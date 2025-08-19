@@ -20,6 +20,9 @@ import React from 'react'
 import {useNode} from '@craftjs/core'
 import type {ImageBlockProps} from './types'
 import {SettingsImageInfos} from '../BlockItems/SettingsImageInfos/SettingsImageInfos'
+import {View} from '@instructure/ui-view'
+import {SettingsUploadImage} from '../BlockItems/SettingsUploadImage/SettingsUploadImage'
+import {ImageData} from '../BlockItems/Image/types'
 
 export const ImageBlockSettings = () => {
   const {
@@ -28,11 +31,15 @@ export const ImageBlockSettings = () => {
     altText,
     altTextAsCaption,
     decorativeImage,
+    url,
+    fileName,
   } = useNode(node => ({
     caption: node.data.props.caption,
     altText: node.data.props.altText,
     altTextAsCaption: node.data.props.altTextAsCaption,
     decorativeImage: node.data.props.decorativeImage,
+    url: node.data.props.url,
+    fileName: node.data.props.fileName,
   }))
 
   const handleCaptionChange = (caption: string) => {
@@ -67,16 +74,36 @@ export const ImageBlockSettings = () => {
     })
   }
 
+  const handleImageDataChange = (imageData: ImageData) => {
+    setProp((props: ImageBlockProps) => {
+      props.url = imageData.url
+      props.altText = imageData.altText
+      props.fileName = imageData.fileName
+      props.decorativeImage = imageData.decorativeImage
+    })
+  }
+
   return (
-    <SettingsImageInfos
-      caption={caption}
-      altText={altText}
-      altTextAsCaption={altTextAsCaption}
-      decorativeImage={decorativeImage}
-      onCaptionChange={handleCaptionChange}
-      onAltTextChange={handleAltTextChange}
-      onAltTextAsCaptionChange={handleAltTextAsCaptionChange}
-      onDecorativeImageChange={handleDecorativeImageChange}
-    />
+    <>
+      <View as="div" margin="0 0 medium 0">
+        <SettingsUploadImage
+          onImageChange={handleImageDataChange}
+          url={url || ''}
+          fileName={fileName || ''}
+        />
+      </View>
+      <View as="div">
+        <SettingsImageInfos
+          caption={caption}
+          altText={altText}
+          altTextAsCaption={altTextAsCaption}
+          decorativeImage={decorativeImage}
+          onCaptionChange={handleCaptionChange}
+          onAltTextChange={handleAltTextChange}
+          onAltTextAsCaptionChange={handleAltTextAsCaptionChange}
+          onDecorativeImageChange={handleDecorativeImageChange}
+        />
+      </View>
+    </>
   )
 }

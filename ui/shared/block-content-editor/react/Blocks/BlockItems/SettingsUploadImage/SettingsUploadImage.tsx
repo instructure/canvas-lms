@@ -25,6 +25,7 @@ import {ImageBlockUploadModal} from '../Image/ImageBlockUploadModal'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
+import {ModalImageData} from '../../BlockItems/Image/types'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -33,19 +34,9 @@ export const SettingsUploadImage = ({url, fileName, onImageChange}: SettingsUplo
   const closeModal = () => setIsOpen(false)
   const openModal = () => setIsOpen(true)
 
-  const onSelected = (
-    url: string,
-    altText: string,
-    decorativeImage: boolean,
-    fileName?: string,
-  ) => {
+  const onSelected = (modalImageData: ModalImageData) => {
     closeModal()
-    onImageChange({
-      url,
-      altText,
-      fileName,
-      decorativeImage,
-    })
+    onImageChange(modalImageData)
   }
 
   const onDeleteImage = () => {

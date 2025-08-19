@@ -19,17 +19,23 @@
 type ImageMetadata = {
   url?: string
   altText?: string
-  caption?: string
-  altTextAsCaption?: boolean
   decorativeImage?: boolean
+}
+
+type ImageCaption = {
+  caption?: string
+}
+
+type ImageSettingAltAsCaption = {
+  altTextAsCaption?: boolean
 }
 
 type ImageFileData = {
   fileName?: string
 }
 
-export type ImageData = ImageMetadata & ImageFileData
-
+export type ImageData = ImageMetadata & ImageFileData & ImageSettingAltAsCaption & ImageCaption
+export type ModalImageData = ImageMetadata & ImageFileData
 export type ImageChangeHandler = {
   onImageChange: (data: ImageData) => void
 }
