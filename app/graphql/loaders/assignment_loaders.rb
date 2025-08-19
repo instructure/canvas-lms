@@ -68,5 +68,57 @@ module Loaders
         end
       end
     end
+
+    class GradedSubmissionsExistLoader < GraphQL::Batch::Loader
+      def perform(assignment_ids)
+        # Load only gradeable assignments (filter non-gradeable at database level)
+        gradeable_assignments = AbstractAssignment.active
+                                                  .where(id: assignment_ids)
+                                                  .where.not(submission_types: ["not_graded", "wiki_page"])
+                                                  .pluck(:id, :moderated_grading)
+                                                  .to_h
+
+        gradeable_assignment_ids = gradeable_assignments.keys
+
+        # Fulfill non-gradeable assignments with false immediately
+        assignment_ids.each do |id|
+          unless gradeable_assignment_ids.include?(id)
+            fulfill(id, false)
+          end
+        end
+
+        # Early return if no gradeable assignments
+        return if gradeable_assignment_ids.empty?
+
+        # Get graded counts for gradeable assignments only
+        graded_counts = Submission
+                        .where(assignment_id: gradeable_assignment_ids)
+                        .graded
+                        .in_workflow_state("graded")
+                        .group(:assignment_id)
+                        .count
+
+        # Check for provisional grades for moderated assignments
+        provisional_grade_assignment_ids = Set.new
+        moderated_assignment_ids = gradeable_assignments.select { |_id, moderated_grading| moderated_grading }.keys
+
+        if moderated_assignment_ids.any?
+          provisional_grade_assignment_ids = ModeratedGrading::ProvisionalGrade
+                                             .joins(:submission)
+                                             .where(submissions: { assignment_id: moderated_assignment_ids })
+                                             .where.not(submissions: { submission_type: nil })
+                                             .where.not(score: nil)
+                                             .distinct
+                                             .pluck("submissions.assignment_id")
+                                             .to_set
+        end
+
+        # Process gradeable assignments
+        gradeable_assignment_ids.each do |id|
+          graded_count = graded_counts.fetch(id, 0)
+          fulfill(id, graded_count > 0 || provisional_grade_assignment_ids.include?(id))
+        end
+      end
+    end
   end
 end

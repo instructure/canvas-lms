@@ -308,8 +308,10 @@ module Types
     field :graded_submissions_exist,
           Boolean,
           "If true, the assignment has at least one graded submission",
-          method: :graded_submissions_exist?,
           null: true
+    def graded_submissions_exist
+      Loaders::AssignmentLoaders::GradedSubmissionsExistLoader.load(assignment.id)
+    end
     field :has_multiple_due_dates, Boolean, method: :multiple_distinct_due_dates?, null: true
     field :has_submitted_submissions,
           Boolean,
