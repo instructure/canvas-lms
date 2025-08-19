@@ -116,7 +116,7 @@ class AssessmentQuestion < ActiveRecord::Base
   end
 
   def translate_link_regex
-    @regex ||= Regexp.new(%{/#{context_type.downcase.pluralize}/#{context_id}/(?:files/(\\d+)/(?:download|preview)|file_contents/(course%20files/[^'"?]*))(?:\\?([^'"]*))?})
+    @regex ||= Regexp.new(%{/((courses)/(#{context_id})|(users)/([0-9~]+))/(?:files/((\\d+(?:~\\d+)?))(?:/(?:download|preview))?|file_contents/(course%20files/[^'"?]*))(?:\\?([^'"]*))?})
   end
 
   def file_substitutions
@@ -127,8 +127,15 @@ class AssessmentQuestion < ActiveRecord::Base
     match_data ||= link.match(translate_link_regex)
     return link unless match_data
 
-    id = match_data[1]
-    path = match_data[2]
+    context_type = (match_data[2] || match_data[4]).singularize.capitalize
+    context_id = if context_type == "User"
+                   match_data[5]
+                 else
+                   match_data[3]
+                 end
+
+    id = match_data[7]
+    path = match_data[8]
     id_or_path = id || path
 
     unless file_substitutions[id_or_path]
@@ -154,8 +161,13 @@ class AssessmentQuestion < ActiveRecord::Base
       file_substitutions[id_or_path] = new_file
     end
     if (sub = file_substitutions[id_or_path])
-      query_rest = match_data[3] ? "&#{match_data[3]}" : ""
-      "/assessment_questions/#{self.id}/files/#{sub.id}/download?verifier=#{sub.uuid}#{query_rest}"
+      query_rest = match_data[9] ? match_data[9].to_s : ""
+      query_rest = if context.root_account.feature_enabled?(:disable_file_verifier_access)
+                     query_rest.blank? ? "" : "?#{query_rest}"
+                   else
+                     query_rest.blank? ? "?verifier=#{sub.uuid}" : "?verifier=#{sub.uuid}&#{query_rest}"
+                   end
+      "/assessment_questions/#{self.id}/files/#{sub.id}/download#{query_rest}"
     else
       link
     end

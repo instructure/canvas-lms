@@ -95,6 +95,39 @@ describe AssessmentQuestion do
     expect(@question.reload.question_data["question_text"]).to eq "Translate this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}'> and this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}'>"
   end
 
+  it "translates user files" do
+    user_file = @teacher.attachments.create!(uploaded_data: fixture_file_upload("docs/doc.doc", "application/msword", true))
+    data = { "name" => "Hi", "question_text" => "Translate this: <img src='/users/#{@teacher.id}/files/#{user_file.id}/download'>", "answers" => [{ "id" => 1 }, { "id" => 2 }] }
+
+    @question = @bank.assessment_questions.create!(question_data: data)
+    @clone = @question.attachments.where(root_attachment: user_file).first
+    expect(@question.reload.question_data["question_text"]).to eq "Translate this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}'>"
+  end
+
+  context "when disable_file_verifier_access feature flag is enabled" do
+    it "translates multiple links in same body and would not add verifiers" do
+      @attachment = attachment_in_course(@course)
+      @attachment.root_account.enable_feature!(:disable_file_verifier_access)
+
+      data = { "name" => "Hi", "question_text" => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download'> and this: <img src='/courses/#{@course.id}/file_contents/course%20files/unfiled/test.jpg'>", "answers" => [{ "id" => 1 }, { "id" => 2 }] }
+      @question = @bank.assessment_questions.create!(question_data: data)
+
+      @clone = @question.attachments.where(root_attachment: @attachment).first
+
+      expect(@question.reload.question_data["question_text"]).to eq "Translate this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download'> and this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download'>"
+    end
+
+    it "translates user files and would not add verifiers" do
+      user_file = @teacher.attachments.create!(uploaded_data: fixture_file_upload("docs/doc.doc", "application/msword", true))
+      data = { "name" => "Hi", "question_text" => "Translate this: <img src='/users/#{@teacher.id}/files/#{user_file.id}/download'>", "answers" => [{ "id" => 1 }, { "id" => 2 }] }
+      user_file.root_account.enable_feature!(:disable_file_verifier_access)
+
+      @question = @bank.assessment_questions.create!(question_data: data)
+      @clone = @question.attachments.where(root_attachment: user_file).first
+      expect(@question.reload.question_data["question_text"]).to eq "Translate this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download'>"
+    end
+  end
+
   it "translates links to be readable w/ verifier" do
     @attachments = {}
     attachment_tag = lambda do |key|
