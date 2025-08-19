@@ -174,7 +174,7 @@ class Lti::IMS::Registration < ApplicationRecord
   end
 
   def self.ims_lti_config_to_internal_placement_config(lti_tool_configuration)
-    messages = lti_tool_configuration["messages"]
+    messages = lti_tool_configuration["messages"] || []
 
     messages.map do |message|
       if Lti::ResourcePlacement::PLACEMENTLESS_MESSAGE_TYPES.include?(message["type"])

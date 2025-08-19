@@ -65,6 +65,27 @@ paths:
           description: TBD
         404:
           description: TBD
+  /api/lti/accounts/:account_id/lti_registration_update_request/uuid/:registration_uuid:
+    get:
+      summary: TBD
+      parameters:
+        - in: path
+          name: registration_uuid
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: TBD
+          content:
+            # We return an Lti::RegistrationUpdateRequest object
+            application/json:
+              schema:
+                type: object
+        401:
+          description: TBD
+        404:
+          description: TBD
   /api/lti/accounts/:account_id/registrations/:registration_id:
     get:
       summary: TBD

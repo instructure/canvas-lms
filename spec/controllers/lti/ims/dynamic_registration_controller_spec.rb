@@ -398,6 +398,81 @@ describe Lti::IMS::DynamicRegistrationController do
           end
         end
       end
+
+      context "with existing_registration in token" do
+        subject do
+          request.headers["Authorization"] = "Bearer #{valid_token_with_existing}"
+          post :create, params: { **registration_params }
+        end
+
+        let(:account) { Account.default }
+        let(:existing_registration) do
+          reg = lti_ims_registration_model(account:)
+          reg.lti_registration.new_external_tool(account)
+          reg
+        end
+        let(:token_hash_with_existing) do
+          {
+            user_id: User.create!.id,
+            initiated_at: 1.minute.ago,
+            root_account_global_id: account.global_id,
+            uuid: SecureRandom.uuid,
+            unified_tool_id: "asdf",
+            registration_url: "https://example.com/registration",
+            existing_registration: existing_registration.lti_registration.id
+          }
+        end
+        let(:valid_token_with_existing) do
+          Canvas::Security.create_jwt(token_hash_with_existing, 1.hour.from_now)
+        end
+
+        it "creates a RegistrationUpdateRequest instead of a new registration" do
+          existing_registration
+          expect { subject }.to change { Lti::RegistrationUpdateRequest.count }.by(1)
+                                                                               .and not_change { Lti::Registration.count }
+        end
+
+        it "creates RegistrationUpdateRequest with correct attributes" do
+          subject
+          update_request = Lti::RegistrationUpdateRequest.last
+          expect(update_request.lti_registration).to eq(existing_registration.lti_registration)
+          expect(update_request.uuid).to eq(token_hash_with_existing[:uuid])
+          expect(update_request.created_by_id).to eq(token_hash_with_existing[:user_id])
+          expect(update_request.root_account_id).to eq(existing_registration.root_account.id)
+          expect(update_request.lti_ims_registration).to be_present
+        end
+
+        it "returns the existing registration data" do
+          subject
+          expect(response).to be_successful
+          parsed_body = response.parsed_body
+          expect(parsed_body["client_id"]).to eq(existing_registration.developer_key.global_id.to_s)
+        end
+
+        context "when existing registration is not found" do
+          let(:token_hash_with_existing) do
+            {
+              user_id: User.create!.id,
+              initiated_at: 1.minute.ago,
+              root_account_global_id: account.global_id,
+              uuid: SecureRandom.uuid,
+              unified_tool_id: "asdf",
+              registration_url: "https://example.com/registration",
+              existing_registration: 999_999
+            }
+          end
+
+          it "does not create a new registration or an update request" do
+            expect { subject }.not_to change { Lti::RegistrationUpdateRequest.count }
+            expect(response).to have_http_status(:not_found)
+          end
+
+          it "does not create an update request" do
+            expect { subject }.not_to change { Lti::Registration.count }
+            expect(response).to have_http_status(:not_found)
+          end
+        end
+      end
     end
 
     context "with an invalid token" do
@@ -545,6 +620,36 @@ describe Lti::IMS::DynamicRegistrationController do
       end
     end
 
+    context "with registration_id parameter" do
+      subject { get :registration_token, params: { account_id: account.id, registration_id: existing_registration.id } }
+
+      let(:account) { Account.default }
+
+      let(:existing_registration) { lti_registration_model(account:) }
+
+      context "with feature flag enabled" do
+        before do
+          account.enable_feature!(:lti_dr_registrations_update)
+        end
+
+        it "includes existing_registration in token" do
+          subject
+          expect(token[:existing_registration]).to eq(existing_registration.id)
+        end
+      end
+
+      context "with feature flag disabled" do
+        before do
+          account.disable_feature!(:lti_dr_registrations_update)
+        end
+
+        it "does not include existing_registration in token" do
+          subject
+          expect(token[:existing_registration]).to be_nil
+        end
+      end
+    end
+
     context "in local dev" do
       before do
         allow(Rails.env).to receive(:development?).and_return true
@@ -672,6 +777,31 @@ describe Lti::IMS::DynamicRegistrationController do
       expect(response).to be_successful
       expect(response.parsed_body["lti_tool_configuration"].with_indifferent_access).to eq(registration.lti_tool_configuration.with_indifferent_access)
       expect(response.parsed_body["overlay"].with_indifferent_access).to eq(registration.registration_overlay.with_indifferent_access)
+    end
+  end
+
+  describe "#lti_registration_update_request_by_uuid" do
+    let(:account) { Account.default }
+    let(:admin) { account_admin_user(account:) }
+
+    it "returns a 404 if the registration update request cannot be found" do
+      user_session(admin)
+      get :lti_registration_update_request_by_uuid, params: { account_id: account.id, registration_uuid: "123" }
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "returns an Lti::RegistrationUpdateRequest" do
+      user_session(admin)
+      update_request = lti_ims_registration_update_request_model(
+        root_account: Account.default,
+        created_by: admin
+      )
+      get :lti_registration_update_request_by_uuid, params: { account_id: account.id, registration_uuid: update_request.uuid }
+      expect(response).to be_successful
+      parsed_body = response.parsed_body
+      expect(parsed_body["uuid"]).to eq(update_request.uuid)
+      expect(parsed_body["lti_registration_id"]).to eq(update_request.lti_registration.id)
+      expect(parsed_body["internal_lti_configuration"]).to be_present
     end
   end
 
