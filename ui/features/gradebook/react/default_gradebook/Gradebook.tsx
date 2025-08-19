@@ -582,6 +582,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       this.options.settings.hide_assignment_group_totals === 'true',
     )
     this.initHideTotal(this.options.settings.hide_total === 'true')
+    this.initViewHiddenGradesIndicator(
+      this.options.settings.view_hidden_grades_indicator === 'true',
+    )
     this.initSubmissionStateMap()
     this.gradebookColumnSizeSettings = this.options.gradebook_column_size_settings
     this.setColumnOrder({
@@ -2274,6 +2277,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
           showSeparateFirstLastNames,
           hideAssignmentGroupTotals,
           hideTotal,
+          viewHiddenGradesIndicator,
         } = this.gridDisplaySettings
 
         return {
@@ -2285,6 +2289,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
           hideAssignmentGroupTotals,
           statusColors: this.state.gridColors,
           viewUngradedAsZero,
+          viewHiddenGradesIndicator,
         }
       },
       onViewOptionsUpdated: this.handleViewOptionsUpdated,
@@ -2303,6 +2308,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     showSeparateFirstLastNames,
     statusColors: colors,
     viewUngradedAsZero,
+    viewHiddenGradesIndicator,
   }: {
     columnSortSettings: {criterion: string; direction: SortDirection}
     hideAssignmentGroupTotals?: boolean
@@ -2312,6 +2318,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     showSeparateFirstLastNames?: boolean
     statusColors?: StatusColors
     viewUngradedAsZero?: boolean
+    viewHiddenGradesIndicator?: boolean
   }): Promise<void | void[]> => {
     // We may have to save changes to more than one endpoint, depending on
     // which options have changed. Additionally, a couple options require us to
@@ -2340,6 +2347,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       showUnpublishedAssignments: oldShowUnpublished,
       showSeparateFirstLastNames: oldShowSeparateFirstLastNames,
       viewUngradedAsZero: oldViewUngradedAsZero,
+      viewHiddenGradesIndicator: oldViewHiddenGradesIndicator,
     } = this.gridDisplaySettings
 
     const viewUngradedAsZeroChanged =
@@ -2351,6 +2359,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     const hideAssignmentGroupTotalsChanged =
       oldHideAssignmentGroupTotals !== hideAssignmentGroupTotals
     const hideTotalChanged = oldHideTotal !== hideTotal
+    const viewHiddenGradesIndicatorChanged =
+      oldViewHiddenGradesIndicator !== viewHiddenGradesIndicator
 
     if (
       colorsChanged ||
@@ -2358,7 +2368,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       hideTotalChanged ||
       showUnpublishedChanged ||
       viewUngradedAsZeroChanged ||
-      showSeparateFirstLastNamesChanged
+      showSeparateFirstLastNamesChanged ||
+      viewHiddenGradesIndicatorChanged
     ) {
       const changedSettings = {
         colors: colorsChanged ? colors : undefined,
@@ -2371,6 +2382,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
           ? showSeparateFirstLastNames
           : undefined,
         viewUngradedAsZero: viewUngradedAsZeroChanged ? viewUngradedAsZero : undefined,
+        viewHiddenGradesIndicator: viewHiddenGradesIndicatorChanged
+          ? viewHiddenGradesIndicator
+          : undefined,
       }
       promises.push(this.saveUpdatedUserSettings(changedSettings))
     }
@@ -2418,6 +2432,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     showUnpublishedAssignments,
     viewUngradedAsZero,
     showSeparateFirstLastNames,
+    viewHiddenGradesIndicator,
   }: {
     colors?: StatusColors
     hideAssignmentGroupTotals?: boolean
@@ -2425,6 +2440,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     showUnpublishedAssignments?: boolean
     viewUngradedAsZero?: boolean
     showSeparateFirstLastNames?: boolean
+    viewHiddenGradesIndicator?: boolean
   }) => {
     return this.saveSettings({
       colors,
@@ -2433,6 +2449,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       showUnpublishedAssignments,
       showSeparateFirstLastNames,
       viewUngradedAsZero,
+      viewHiddenGradesIndicator,
     }).then(() => {
       // Make various updates to the grid depending on what changed.  These
       // triple-equals checks are deliberate: null could be an actual value for
@@ -2468,6 +2485,10 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       if (showSeparateFirstLastNames !== undefined) {
         this.gridDisplaySettings.showSeparateFirstLastNames = showSeparateFirstLastNames
         this.renderActionMenu()
+      }
+
+      if (viewHiddenGradesIndicator !== undefined) {
+        this.gridDisplaySettings.viewHiddenGradesIndicator = viewHiddenGradesIndicator
       }
     })
   }
@@ -2999,6 +3020,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     sortRowsBy = this.getSortRowsBySetting(),
     viewUngradedAsZero = this.gridDisplaySettings.viewUngradedAsZero,
     colors = this.state.gridColors,
+    viewHiddenGradesIndicator = this.gridDisplaySettings.viewHiddenGradesIndicator,
   } = {}) => {
     if (!(selectedViewOptionsFilters.length > 0)) {
       selectedViewOptionsFilters.push('')
@@ -3030,6 +3052,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       sort_rows_by_setting_key: sortRowsBy.settingKey,
       sort_rows_by_direction: sortRowsBy.direction,
       view_ungraded_as_zero: viewUngradedAsZero ? 'true' : 'false',
+      view_hidden_grades_indicator: viewHiddenGradesIndicator ? 'true' : 'false',
       colors,
     }
 
@@ -3943,6 +3966,22 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       hideTotal: this.gridDisplaySettings.hideTotal,
     }).catch(toggleableAction)
     // this pattern keeps the ui snappier rather than waiting for ajax call to complete
+  }
+
+  initViewHiddenGradesIndicator = (viewHiddenGradesIndicator = false) => {
+    this.gridDisplaySettings.viewHiddenGradesIndicator = viewHiddenGradesIndicator
+  }
+
+  toggleViewHiddenGradesIndicator = () => {
+    const toggleableAction = () => {
+      this.gridDisplaySettings.viewHiddenGradesIndicator =
+        !this.gridDisplaySettings.viewHiddenGradesIndicator
+    }
+    toggleableAction()
+    // on success, do nothing since the render happened earlier
+    return this.saveSettings({
+      viewHiddenGradesIndicator: this.gridDisplaySettings.viewHiddenGradesIndicator,
+    }).catch(toggleableAction)
   }
 
   initShowSeparateFirstLastNames = (showSeparateFirstLastNames = false) => {

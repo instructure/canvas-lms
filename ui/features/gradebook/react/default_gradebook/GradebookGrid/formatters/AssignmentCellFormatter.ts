@@ -58,6 +58,7 @@ type Getters = {
     submission: Submission,
   ): ReturnType<Gradebook['submissionStateMap']['getSubmissionState']>
   showUpdatedSimilarityScore(): boolean
+  getViewHiddenGradesIndicator(): boolean
 }
 
 function getTurnitinState(submission: SubmissionWithOriginalityReport) {
@@ -196,6 +197,9 @@ export default class AssignmentCellFormatter {
       showUpdatedSimilarityScore() {
         return gradebook.options.show_similarity_score
       },
+      getViewHiddenGradesIndicator() {
+        return gradebook.gridDisplaySettings.viewHiddenGradesIndicator
+      },
     }
     this.customGradeStatusesEnabled = gradebook.options.custom_grade_statuses_enabled
   }
@@ -254,7 +258,9 @@ export default class AssignmentCellFormatter {
     }
 
     const showUnpostedIndicator =
-      columnDef.postAssignmentGradesTrayOpenForAssignmentId && isPostable(submission)
+      (columnDef.postAssignmentGradesTrayOpenForAssignmentId ||
+        this.options.getViewHiddenGradesIndicator()) &&
+      isPostable(submission)
 
     const options: Options = {
       classNames: classNamesForAssignmentCell(assignmentData, submissionData),
