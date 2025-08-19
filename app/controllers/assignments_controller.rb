@@ -901,7 +901,8 @@ class AssignmentsController < ApplicationController
         PERMISSIONS: {
           can_manage_groups: can_do(@context.groups.temp_record, @current_user, :create),
           can_edit_grades: can_do(@context, @current_user, :manage_grades),
-          manage_grading_schemes: can_do(@context, @current_user, :manage_grades),
+          manage_grading_schemes: can_do(@context, @current_user, :manage_grading_schemes),
+          set_grading_scheme: can_do(@context, @current_user, :set_grading_scheme),
           manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics)
         },
         PLAGIARISM_DETECTION_PLATFORM: Lti::ToolProxy.capability_enabled_in_context?(

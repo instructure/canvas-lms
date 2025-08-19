@@ -31,6 +31,7 @@ function renderGradingSchemesSelector(props: Partial<GradingSchemesSelectorProps
   const utils = render(
     <GradingSchemesSelector
       canManage={true}
+      canSet={true}
       contextType="Course"
       contextId="1"
       archivedGradingSchemesEnabled={true}
@@ -92,6 +93,13 @@ describe('GradingSchemesSelector', () => {
     expect(getByTestId('grading-schemes-selector-view-button')).toBeInTheDocument()
     expect(getByTestId('grading-schemes-selector-copy-button')).toBeInTheDocument()
     expect(getByTestId('grading-schemes-selector-new-grading-scheme-button')).toBeInTheDocument()
+  })
+
+  it('should render disabled unless canSet is true', async () => {
+    const {getByTestId} = renderGradingSchemesSelector({canSet: false})
+    await new Promise(resolve => setTimeout(resolve, 0))
+    expect(getByTestId('grading-schemes-selector-view-button')).not.toBeDisabled()
+    expect(getByTestId('grading-schemes-selector-dropdown')).toBeDisabled()
   })
 
   describe('view button tests', () => {

@@ -2085,6 +2085,9 @@ class AbstractAssignment < ActiveRecord::Base
       can :manage_files_edit and
       can :manage_files_delete
 
+    given { |user, session| context.grants_right?(user, session, :set_grading_scheme) }
+    can :set_grading_scheme
+
     given do |user, session|
       context.grants_right?(user, session, :manage_assignments_add)
     end

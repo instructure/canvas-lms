@@ -1599,7 +1599,8 @@ class CoursesController < ApplicationController
 
       js_permissions = {
         can_manage_courses: @context.account.grants_right?(@current_user, session, :manage_courses_admin),
-        manage_grading_schemes: @context.grants_right?(@current_user, session, :manage_grades),
+        manage_grading_schemes: @context.grants_right?(@current_user, session, :manage_grading_schemes),
+        set_grading_scheme: @context.grants_right?(@current_user, session, :set_grading_scheme),
         manage_students: @context.grants_right?(@current_user, session, :manage_students),
         manage_account_settings: @context.account.grants_right?(@current_user, session, :manage_account_settings),
         manage_feature_flags: @context.grants_right?(@current_user, session, :manage_feature_flags),
@@ -3300,6 +3301,11 @@ class CoursesController < ApplicationController
          @course.root_account.settings[:prevent_course_renaming_by_teachers]
         params_for_update.delete :name
         params_for_update.delete :course_code
+      end
+      if !@course.account.grants_right?(@current_user, session, :manage_courses_admin) &&
+         @course.root_account.settings[:restrict_grading_scheme_editing_to_admins]
+        params_for_update.delete :grading_standard_enabled
+        params_for_update.delete :grading_standard_id
       end
       params[:course][:sis_source_id] = params[:course].delete(:sis_course_id) if api_request?
       if (sis_id = params[:course].delete(:sis_source_id)) &&

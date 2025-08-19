@@ -56,6 +56,7 @@ const I18n = createI18nScope('assignments.grading_type_selector')
 
 export type GradingSchemesSelectorProps = {
   canManage: boolean
+  canSet: boolean
   contextType: 'Course' | 'Account'
   contextId: string
   courseDefaultSchemeId?: string
@@ -69,6 +70,7 @@ export const GradingSchemesSelector = ({
   initiallySelectedGradingSchemeId,
   onChange,
   canManage,
+  canSet,
   contextType,
   contextId,
   courseDefaultSchemeId,
@@ -397,6 +399,7 @@ export const GradingSchemesSelector = ({
                     }
                     data-testid="grading-schemes-selector-dropdown"
                     id="grading-schemes-selector-dropdown"
+                    disabled={!canSet}
                   >
                     <SimpleSelect.Option
                       value=""
@@ -512,28 +515,32 @@ export const GradingSchemesSelector = ({
                   </Button>
                 </View>
               </Flex.Item>
-              <Flex.Item>
-                <View as="div" margin="none none none small" withVisualDebug={false}>
-                  <Button
-                    onClick={openGradingSchemeDuplicateModal}
-                    data-testid="grading-schemes-selector-copy-button"
-                  >
-                    {I18n.t('Copy')}
-                  </Button>
-                </View>
-              </Flex.Item>
-              <Flex.Item>
-                <View as="div" margin="none none none small" withVisualDebug={false}>
-                  <Button
-                    onClick={openGradingSchemeCreateModal}
-                    // @ts-expect-error
-                    renderIcon={IconAddLine}
-                    data-testid="grading-schemes-selector-new-grading-scheme-button"
-                  >
-                    {I18n.t('New Grading Scheme')}
-                  </Button>
-                </View>
-              </Flex.Item>
+              {canManage && (
+                <Flex.Item>
+                  <View as="div" margin="none none none small" withVisualDebug={false}>
+                    <Button
+                      onClick={openGradingSchemeDuplicateModal}
+                      data-testid="grading-schemes-selector-copy-button"
+                    >
+                      {I18n.t('Copy')}
+                    </Button>
+                  </View>
+                </Flex.Item>
+              )}
+              {canManage && (
+                <Flex.Item>
+                  <View as="div" margin="none none none small" withVisualDebug={false}>
+                    <Button
+                      onClick={openGradingSchemeCreateModal}
+                      // @ts-expect-error
+                      renderIcon={IconAddLine}
+                      data-testid="grading-schemes-selector-new-grading-scheme-button"
+                    >
+                      {I18n.t('New Grading Scheme')}
+                    </Button>
+                  </View>
+                </Flex.Item>
+              )}
             </Flex>
           </>
         )}
