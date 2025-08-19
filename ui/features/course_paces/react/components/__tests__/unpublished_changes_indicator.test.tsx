@@ -95,9 +95,13 @@ describe('UnpublishedChangesIndicator', () => {
   })
 
   it('throws when a negative changeCount is specified', () => {
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+
     expect(() =>
       render(<UnpublishedChangesIndicator {...defaultProps} changeCount={-1} />),
-    ).toThrow()
+    ).toThrow('changeCount cannot be negative (-1)')
+
+    consoleErrorSpy.mockRestore()
   })
 
   it('displays a spinner indicating ongoing publishing when isSyncing is true', () => {
