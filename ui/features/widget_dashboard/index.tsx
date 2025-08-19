@@ -26,6 +26,7 @@ import GenericErrorPage from '@canvas/generic-error-page/react'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {queryClient} from '@canvas/query'
+import {WidgetDashboardProvider} from './react/hooks/useWidgetDashboardContext'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -44,7 +45,15 @@ ready(() => {
         }
       >
         <QueryClientProvider client={queryClient}>
-          <WidgetDashboardContainer />
+          <WidgetDashboardProvider
+            preferences={ENV.PREFERENCES}
+            observedUsersList={ENV.OBSERVED_USERS_LIST}
+            canAddObservee={ENV.CAN_ADD_OBSERVEE}
+            currentUser={ENV.current_user}
+            currentUserRoles={ENV.current_user_roles}
+          >
+            <WidgetDashboardContainer />
+          </WidgetDashboardProvider>
         </QueryClientProvider>
       </ErrorBoundary>,
     )

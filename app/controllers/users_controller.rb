@@ -525,12 +525,21 @@ class UsersController < ApplicationController
       # things needed only for widget dashboard (students only)
       js_bundle :widget_dashboard
       css_bundle :dashboard_card
+
+      # Set up observer options if user has observer data
+      observed_users_list = observed_users(@current_user, session)
+
       js_env({
                PREFERENCES: {
                  dashboard_view: @current_user.dashboard_view(@domain_root_account),
                  hide_dashcard_color_overlays: @current_user.preferences[:hide_dashcard_color_overlays],
                  custom_colors: @current_user.custom_colors
-               }
+               },
+               OBSERVED_USERS_LIST: observed_users_list,
+               CAN_ADD_OBSERVEE: @current_user
+                                   .profile
+                                   .tabs_available(@current_user, root_account: @domain_root_account)
+                                   .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
              })
       return render html: "", layout: true
     end
