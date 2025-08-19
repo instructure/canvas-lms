@@ -19,7 +19,7 @@
 import './image-block.css'
 import {useState} from 'react'
 import {ImageBlockUploadModal} from './ImageBlockUploadModal'
-import {ImageBlockAddButton} from './ImageBlockAddButton'
+import {AddButton} from '../AddButton/AddButton'
 import {ImageEditProps, ModalImageData} from './types'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconEditLine, IconUploadLine} from '@instructure/ui-icons'
@@ -72,7 +72,7 @@ export const ImageEdit = ({
             </div>
           </>
         ) : (
-          <ImageBlockAddButton onClick={() => setIsOpen(true)} />
+          <AddButton onClick={() => setIsOpen(true)} />
         )}
       </div>
       <Flex direction="row" gap="x-small">

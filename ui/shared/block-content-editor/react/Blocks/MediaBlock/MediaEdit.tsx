@@ -16,20 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ButtonBlock} from './Blocks/ButtonBlock'
-import {HighlightBlock} from './Blocks/HighlightBlock'
-import {ImageBlock} from './Blocks/ImageBlock'
-import {ImageTextBlock} from './Blocks/ImageTextBlock'
-import {MediaBlock} from './Blocks/MediaBlock'
-import {SeparatorLineBlock} from './Blocks/SeparatorLineBlock'
-import {TextBlock} from './Blocks/TextBlock'
+import React from 'react'
+import {MediaBlockEditProps} from './types'
+import {TitleEdit} from '../BlockItems/Title/TitleEdit'
+import {Flex} from '@instructure/ui-flex'
+import {AddButton} from '../BlockItems/AddButton/AddButton'
 
-export const components = {
-  TextBlock,
-  ImageBlock,
-  MediaBlock,
-  SeparatorLineBlock,
-  ButtonBlock,
-  HighlightBlock,
-  ImageTextBlock,
+export const MediaEdit = (props: MediaBlockEditProps) => {
+  return (
+    <Flex gap="mediumSmall" direction="column">
+      {props.includeBlockTitle && (
+        <TitleEdit title={props.title || ''} onTitleChange={props.onTitleChange} />
+      )}
+      <AddButton
+        onClick={() => {
+          /* open UploadMediaModal here */
+        }}
+      />
+    </Flex>
+  )
 }
