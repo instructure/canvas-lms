@@ -88,6 +88,33 @@ describe SubAccountsController do
       expect(json["parent_account_id"]).to eq sub_account.id
       expect(json["name"]).to eq "Sub Sub-Account"
     end
+
+    it "returns an error when account name is blank" do
+      post "create", params: { account_id: @root_account.id,
+                               account: { name: "" } }
+
+      expect(response).to have_http_status(:bad_request)
+      json = json_parse(response.body)
+      expect(json["message"]).to eq "Account name is required"
+    end
+
+    it "returns an error when account name is nil" do
+      post "create", params: { account_id: @root_account.id,
+                               account: { name: nil } }
+
+      expect(response).to have_http_status(:bad_request)
+      json = json_parse(response.body)
+      expect(json["message"]).to eq "Account name is required"
+    end
+
+    it "returns an error when account name is missing" do
+      post "create", params: { account_id: @root_account.id,
+                               account: { default_storage_quota_mb: 100 } }
+
+      expect(response).to have_http_status(:bad_request)
+      json = json_parse(response.body)
+      expect(json["message"]).to eq "Account name is required"
+    end
   end
 
   describe "GET 'index'" do
