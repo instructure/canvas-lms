@@ -25,15 +25,6 @@ module Types
     field :total, Integer, null: false, method: :normalized_requirement_count
   end
 
-  class ModuleProgressionType < ApplicationObjectType
-    field :incomplete_items_connection,
-          Types::ModuleItemType.connection_type,
-          "Items are ordered by position",
-          null: false,
-          hash_key: :items
-    field :module, Types::ModuleType, null: false
-  end
-
   class CourseProgressionType < ApplicationObjectType
     field :requirements, CourseRequirementsType, null: false
     def requirements
@@ -45,5 +36,14 @@ module Types
           "Modules are ordered by position",
           null: true,
           method: :incomplete_items_for_modules
+  end
+
+  class ModuleProgressionType < ApplicationObjectType
+    field :incomplete_items_connection,
+          Types::ModuleItemType.connection_type,
+          "Items are ordered by position",
+          null: false,
+          hash_key: :items
+    field :module, Types::ModuleType, null: false
   end
 end
