@@ -7864,6 +7864,7 @@ fa:
         course_visibility: "قابلیت مشاهده"
         custom_course_visibility: "سفارشی کردن"
         default_due_time: "زمان مقرر پیش فرض"
+        disable_csp: "سیاست امنیت محتوا را غیر فعال کنید. "
         enrollment_term_id: نیمسال
         enrollments_from_homeroom: "ثبت نام ها"
         friendly_name: "نام دوستانه"
