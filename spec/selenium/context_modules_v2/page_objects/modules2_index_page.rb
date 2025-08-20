@@ -334,6 +334,10 @@ module Modules2IndexPage
     "[data-module-id='#{module_id}']"
   end
 
+  def context_module_name_selector(module_name)
+    "[data-module-name='#{module_name}']"
+  end
+
   def context_module_item_selector(module_item_id)
     "#context_module_item_#{module_item_id}"
   end
@@ -409,6 +413,10 @@ module Modules2IndexPage
 
   def context_module(module_id)
     f(context_module_selector(module_id))
+  end
+
+  def context_module_name(module_name)
+    ff(context_module_name_selector(module_name))
   end
 
   def context_module_expand_toggle(module_id)

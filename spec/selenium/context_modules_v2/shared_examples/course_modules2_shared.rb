@@ -169,6 +169,7 @@ shared_examples_for "course_module2 add module tray" do |context|
   include ContextModulesCommon
   include Modules2IndexPage
   include Modules2ActionTray
+  new_module_name = "First Week 1"
 
   before do
     case context
@@ -186,24 +187,47 @@ shared_examples_for "course_module2 add module tray" do |context|
     wait_for_ajaximations
     add_module_button.click
     expect(input_module_name).to be_displayed
-    fill_in_module_name("Week 1")
+    fill_in_module_name(new_module_name)
     submit_add_module_button.click
 
     created_module = @course.context_modules.last
-    expect(created_module.name).to eq("Week 1")
+    expect(created_module.name).to eq(new_module_name)
     expect(@course.context_modules.count).to eq 1
+    expect(context_module_name(new_module_name)[0]).to be_displayed
   end
 
   it "adds module with add module tray after module image is clicked" do
     get @mod_url
     expect(empty_state_module_creation_button).to be_displayed
     empty_state_module_creation_button.click
-    fill_in_module_name("First Week")
+    fill_in_module_name(new_module_name)
     submit_add_module_button.click
 
     new_module = @course.context_modules.last
-    expect(new_module.name).to eq("First Week")
+    expect(new_module.name).to eq(new_module_name)
     expect(@course.context_modules.count).to eq 1
+    expect(context_module_name(new_module_name)[0]).to be_displayed
+  end
+
+  it "adds module with a prerequisite module in same transaction" do
+    first_module = @course.context_modules.create!(name: "Week 0: Preparation")
+    get @mod_url
+    wait_for_ajaximations
+    add_module_button.click
+
+    expect(input_module_name).to be_displayed
+    fill_in_module_name(new_module_name)
+    expect(add_prerequisite_button).to be_displayed
+    add_prerequisite_button.click
+    wait_for_ajaximations
+    expect(prerequisites_dropdown_value(0)).to eq(first_module.name)
+    submit_add_module_button.click
+
+    created_module = @course.context_modules.last
+    expect(created_module.name).to eq(new_module_name)
+    expect(@course.context_modules.count).to eq 2
+    expect(context_module_prerequisites(created_module.id).text).to eq("Prerequisite: #{first_module.name}")
+    expect(context_module_name(new_module_name)[0]).to be_displayed
   end
 end
 
