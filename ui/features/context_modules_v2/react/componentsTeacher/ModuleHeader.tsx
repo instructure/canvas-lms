@@ -120,6 +120,7 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
                   role="button"
                   className="module_title"
                   tabIndex={0}
+                  aria-describedby={`module_${id}_info`}
                 >
                   <Heading level="h2">
                     <Text size="medium" weight="bold" wrap="break-word">
@@ -129,7 +130,7 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
                 </View>
                 {(unlockAt && isModuleUnlockAtDateInTheFuture(unlockAt)) ||
                 prerequisites?.length ? (
-                  <Flex.Item margin="none">
+                  <Flex.Item margin="none" id={`module_${id}_info`}>
                     <Flex gap="xx-small" alignItems="center" wrap="wrap">
                       {unlockAt && isModuleUnlockAtDateInTheFuture(unlockAt) && (
                         <Flex.Item>
