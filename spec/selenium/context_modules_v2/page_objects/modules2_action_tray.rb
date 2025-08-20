@@ -33,6 +33,14 @@ module Modules2ActionTray
     "#context-modules-header-add-module-button"
   end
 
+  def custom_access_radio_click_selector
+    "//label[../input[@data-testid = 'custom-option']]"
+  end
+
+  def delete_card_button_selector
+    "[data-testid = 'delete-card-button']"
+  end
+
   def tray_header_label_selector
     "h2[data-testid='header-label']"
   end
@@ -59,10 +67,6 @@ module Modules2ActionTray
 
   def custom_access_radio_checked_selector
     "[data-testid = 'custom-option']"
-  end
-
-  def custom_access_radio_click_selector
-    "//label[../input[@data-testid = 'custom-option']]"
   end
 
   def assignee_selection_selector
@@ -102,6 +106,14 @@ module Modules2ActionTray
     f(add_module_tray_selector)
   end
 
+  def custom_access_radio_click
+    fxpath(custom_access_radio_click_selector)
+  end
+
+  def delete_card_button
+    ff(delete_card_button_selector)
+  end
+
   def tray_header_label
     f(tray_header_label_selector)
   end
@@ -132,10 +144,6 @@ module Modules2ActionTray
 
   def everyone_radio_checked
     f(everyone_radio_checked_selector)
-  end
-
-  def custom_access_radio_click
-    fxpath(custom_access_radio_click_selector)
   end
 
   def custom_access_radio_checked
@@ -171,6 +179,11 @@ module Modules2ActionTray
   end
 
   #------------------------------ Actions -------------------------------
+
+  def click_custom_access_radio
+    custom_access_radio_click.click
+  end
+
   def fill_in_module_name(name)
     replace_content(input_module_name, name)
   end

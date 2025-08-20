@@ -131,7 +131,7 @@ module Modules2IndexPage
   end
 
   def module_item_action_menu_link_selector(tool_text)
-    "[role=menuitem]:contains('#{tool_text}')"
+    "//button[.//span[text()='#{tool_text}']]"
   end
 
   def module_item_action_menu_selector
@@ -532,7 +532,7 @@ module Modules2IndexPage
   end
 
   def module_item_action_menu_link(tool_text)
-    fj(module_item_action_menu_link_selector(tool_text))
+    fxpath(module_item_action_menu_link_selector(tool_text))
   end
 
   def module_item_assignment_icon(module_item_id)
@@ -805,6 +805,10 @@ module Modules2IndexPage
     assignments_due_button.click
   end
 
+  def click_manage_module_item_assign_to
+    module_item_action_menu_link("Assign To...").click
+  end
+
   def course_modules_setup(student_view: false)
     student_view ? set_rewrite_student_flag : set_rewrite_flag
     @quiz = @course.quizzes.create!(title: "some quiz")
@@ -890,6 +894,47 @@ module Modules2IndexPage
     fj("button:contains('Add Item')", f("[data-testid='add-item-modal']"))
   end
 
+  # This method only works for simple items right now like Assignment, Quiz, Page, etc.
+  # It does not work for External Tool or File since those require additional steps
+  # after selecting the item type from the dropdown
+  def add_newly_created_item(item_type, cxt_module, item_title_text = nil)
+    add_item_button(cxt_module.id).click
+    wait_for_ajaximations
+
+    # Select from the dropdown
+    click_INSTUI_Select_option(new_item_type_select_selector, item_type)
+    wait_for_ajaximations
+
+    tab_create_item.click
+
+    # Fill in the quiz details
+    new_item_name = (item_title_text || ("New" + item_type)).to_s
+
+    replace_content(create_learning_object_name_input, new_item_name)
+
+    yield if block_given?
+
+    # Click Add Item
+    add_item_modal_add_item_button.click
+    wait_for_ajaximations
+  end
+
+  def add_existing_learning_object(item_type, cxt_module, item_title_text)
+    add_item_button(cxt_module.id).click
+    wait_for_ajaximations
+
+    # Select from the dropdown
+    click_INSTUI_Select_option(new_item_type_select_selector, item_type)
+    wait_for_ajaximations
+
+    # Select the item from the list
+    click_INSTUI_Select_option(add_existing_item_select_selector, item_title_text)
+
+    # Click Add Item
+    add_item_modal_add_item_button.click
+    wait_for_ajaximations
+  end
+
   def expand_all_modules
     expand_all_modules_button.click
     wait_for_ajaximations
@@ -933,5 +978,9 @@ module Modules2IndexPage
     where_to_scroll = element_exists?("#student-view-btn") ? "#student-view-btn" : "#easy_student_view"
     scroll_to(f(where_to_scroll))
     wait_for_ajaximations
+  end
+
+  def module_item_action_menu_link_exists?(tool_text)
+    element_exists?(module_item_action_menu_link_selector(tool_text), true)
   end
 end
