@@ -8704,6 +8704,7 @@ nn:
         course_visibility: Synlegheit
         custom_course_visibility: Tilpass
         default_due_time: "Standard forfallstidspunkt"
+        disable_csp: "Slå av retningslinjer for innhaldstryggleik"
         enable_course_paces: "Skru på emnetempo"
         enrollment_term_id: Semester
         enrollments_from_homeroom: Påmeldingar
