@@ -360,6 +360,17 @@ describe Types::SubmissionCommentType do
 
       let(:moderated_submission_type) { GraphQLTypeTester.new(@moderated_submission, current_user: @final_grader) }
       let(:provisional_submission_type) { GraphQLTypeTester.new(@moderated_submission, current_user: @provisional_grader) }
+      let(:student_submission_type) { GraphQLTypeTester.new(@moderated_submission, current_user: @student1) }
+
+      context "as a student" do
+        it "returns author to comments they have permission to see when assignment is moderated" do
+          @moderated_assignment.update!(grader_names_visible_to_final_grader: false)
+          result = student_submission_type.resolve(
+            "commentsConnection(filter: {allComments: true}, includeProvisionalComments: true) { nodes { author { _id } }}"
+          )
+          expect(result).to eq([@student1.id.to_s])
+        end
+      end
 
       context "final grader/moderator" do
         it "does not return author when assignment is moderated" do
