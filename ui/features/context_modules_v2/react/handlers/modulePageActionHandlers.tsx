@@ -119,20 +119,22 @@ const getModuleItemsFromAvailableSources = (
   return []
 }
 
-const transformModuleItemsForTray = (rawModuleItems: any[]): any[] => {
+export const transformModuleItemsForTray = (rawModuleItems: any[]): any[] => {
   // Filter out SubHeader items as they shouldn't be selectable in the requirements selector
   return rawModuleItems
     .filter((item: any) => item.content?.type !== 'SubHeader')
     .map((item: any) => ({
       id: item._id || '',
       name: item.title || '',
-      resource: getResourceType(item.content?.type?.toLowerCase()),
+      resource: item.content?.isNewQuiz
+        ? 'quiz'
+        : getResourceType(item.content?.type?.toLowerCase()),
       graded: item.content?.graded,
       pointsPossible: item.content?.pointsPossible ? String(item.content.pointsPossible) : '',
     }))
 }
 
-const transformRequirementsForTray = (
+export const transformRequirementsForTray = (
   completionRequirements: any[] = [],
   moduleItems: any[],
   rawModuleItems: any[],
@@ -150,7 +152,10 @@ const transformRequirementsForTray = (
       id: req.id,
       name: moduleItem?.name || '',
       type: mappedType,
-      resource: moduleItem?.resource || 'assignment',
+      resource:
+        rawModuleItem?.content?.isNewQuiz || rawModuleItem?.content?.type == 'Quiz'
+          ? 'quiz'
+          : 'assignment',
       graded: rawModuleItem?.content?.graded,
       pointsPossible:
         moduleItem?.pointsPossible || String(rawModuleItem?.content?.pointsPossible || 0),
