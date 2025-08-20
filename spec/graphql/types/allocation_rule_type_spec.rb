@@ -43,10 +43,6 @@ describe Types::AllocationRuleType do
     @allocation_rule_type_student = GraphQLTypeTester.new(@allocation_rule, current_user: @student1)
   end
 
-  def execute_query(query, variables: {}, current_user: @teacher)
-    CanvasSchema.execute(query, variables:, context: { current_user: })
-  end
-
   let(:base_query) do
     <<~GQL
       query getAllocationRule($id: ID!) {
