@@ -99,7 +99,7 @@ export const sendMoveRequests = (
           )()
         })
         .catch(error => {
-          console.log('Error moving item:', error)
+          console.error('Error moving item:', error)
           if (error.response.status === 409 && isFile(item)) {
             nameCollisions.push({
               ...options,
