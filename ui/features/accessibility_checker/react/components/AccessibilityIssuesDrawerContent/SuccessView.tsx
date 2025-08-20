@@ -56,7 +56,7 @@ const SuccessView: React.FC<SuccessViewProps> = ({
 }) => {
   const regionRef = useRef<HTMLDivElement | null>(null)
   return (
-    <View position="fixed" overflowY="auto">
+    <View position="fixed" overflowY="auto" width="inherit">
       <Flex as="div" direction="column" height="100vh" width="100%">
         <Flex.Item
           as="header"
