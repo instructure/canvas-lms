@@ -23,6 +23,20 @@ require "nokogiri"
 describe CC::LtiResourceLinks do
   include CC::LtiResourceLinks
 
+  let(:assignment) do
+    Assignment.create!(
+      course: tool.context,
+      name: "Test Assignment",
+      workflow_state: "published",
+      submission_types: "external_tool",
+      external_tool_tag_attributes: {
+        url: tool_url,
+        custom:,
+        vendor_code: "test_vendor_code"
+      }
+    )
+  end
+
   let(:resource_link) do
     Lti::ResourceLink.create!(
       context: tool.context,
@@ -131,6 +145,17 @@ describe CC::LtiResourceLinks do
     context "when the lookup uuid is populated" do
       it "includes the lookup_uuid extension property" do
         expect(find_extension(subject, "lookup_uuid")).to eq lookup_uuid
+      end
+    end
+
+    context "when the resource link is associated with an assignment" do
+      before do
+        resource_link.context = assignment
+        resource_link.save!
+      end
+
+      it "includes the assignment_migration_id extension property" do
+        expect(find_extension(subject, "assignment_migration_id")).to eq CC::CCHelper.create_key(resource_link.context, global: true)
       end
     end
   end
