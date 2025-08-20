@@ -18,10 +18,29 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import {setupServer} from 'msw/node'
+import {graphql, HttpResponse} from 'msw'
 import TotalGradeOverrideCellPropFactory from '../../editors/TotalGradeOverrideCellEditor/TotalGradeOverrideCellPropFactory'
 import TotalGradeOverrideCellEditor from '../../editors/TotalGradeOverrideCellEditor/index'
 import GridEvent from '../../GridSupport/GridEvent'
 import {createGradebook} from '../../../__tests__/GradebookSpecHelper'
+
+// Set up MSW to mock GraphQL requests
+const server = setupServer(
+  // Catch-all for any GraphQL operations to prevent network requests
+  graphql.operation(() => {
+    return HttpResponse.json({
+      data: {
+        setOverrideScore: {
+          grades: {
+            customGradeStatusId: null,
+            overrideScore: 85,
+          },
+        },
+      },
+    })
+  }),
+)
 
 describe('GradebookGrid TotalGradeOverrideCellEditor', () => {
   let $container
@@ -29,6 +48,11 @@ describe('GradebookGrid TotalGradeOverrideCellEditor', () => {
   let editorOptions
   let gradebook
   let gridSupport
+
+  // Set up MSW
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
   beforeEach(() => {
     $container = document.body.appendChild(document.createElement('div'))
