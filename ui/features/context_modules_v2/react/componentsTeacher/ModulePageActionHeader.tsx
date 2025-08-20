@@ -23,6 +23,7 @@ import {useContextModule} from '../hooks/useModuleContext'
 import {MODULE_ITEMS, MODULES} from '../utils/constants'
 import {handleAddModule} from '../handlers/moduleActionHandlers'
 import {ModulesPageLegend} from '../components/ModulesPageLegend'
+import {useModules} from '../hooks/queries/useModules'
 
 interface ModulePageActionHeaderProps {
   onCollapseAll: () => void
@@ -40,6 +41,7 @@ const ModulePageActionHeader: React.FC<ModulePageActionHeaderProps> = ({
   hasModules = false,
 }) => {
   const {courseId} = useContextModule()
+  const {data} = useModules(courseId)
 
   const handleCollapseExpandClick = useCallback(() => {
     if (anyModuleExpanded) {
@@ -69,7 +71,7 @@ const ModulePageActionHeader: React.FC<ModulePageActionHeaderProps> = ({
           anyModuleExpanded,
           disabled,
         },
-        handleAddModule: handleAddModule,
+        handleAddModule: () => handleAddModule(courseId, data),
         renderIconLegend: () => (
           <ModulesPageLegend
             is_student={false}
