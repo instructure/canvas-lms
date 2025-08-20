@@ -84,7 +84,7 @@ const ModuleItemTitle: React.FC<ModuleItemTitleProps> = ({
   }, [content, url, onClick, title])
 
   return (
-    <View as="div" padding="xx-small" className="module-title">
+    <View as="div" padding="0 xx-small" className="module-title">
       {titleText}
     </View>
   )
