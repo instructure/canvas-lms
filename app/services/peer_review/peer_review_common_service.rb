@@ -63,6 +63,12 @@ class PeerReview::PeerReviewCommonService < ApplicationService
     end
   end
 
+  def validate_peer_review_sub_assignment_exists
+    if @parent_assignment.peer_review_sub_assignment.blank?
+      raise PeerReview::PeerReviewSubAssignmentNotExistError, I18n.t("Peer review sub assignment does not exist")
+    end
+  end
+
   def peer_review_attributes
     inherited_attributes.merge(specific_attributes)
   end
@@ -100,6 +106,35 @@ class PeerReview::PeerReviewCommonService < ApplicationService
     attrs[:due_at] = @due_at if @due_at
     attrs[:unlock_at] = @unlock_at if @unlock_at
     attrs[:lock_at] = @lock_at if @lock_at
+    attrs
+  end
+
+  def peer_review_attributes_to_update
+    peer_review_sub = @parent_assignment.peer_review_sub_assignment
+    attrs = {}
+
+    # Inherited attributes that have changed on the parent
+    attributes_to_inherit_from_parent.each do |attr|
+      attr_sym = attr.to_sym
+      parent_value = @parent_assignment.send(attr)
+      sub_value = peer_review_sub.send(attr)
+
+      attrs[attr_sym] = parent_value if parent_value != sub_value
+    end
+
+    # Peer review specific attributes that have changed
+    attrs[:points_possible] = @points_possible if @points_possible != peer_review_sub.points_possible
+    attrs[:grading_type] = @grading_type if @grading_type != peer_review_sub.grading_type
+    attrs[:due_at] = @due_at if @due_at != peer_review_sub.due_at
+    attrs[:unlock_at] = @unlock_at if @unlock_at != peer_review_sub.unlock_at
+    attrs[:lock_at] = @lock_at if @lock_at != peer_review_sub.lock_at
+
+    # Title requires special handling
+    expected_title = I18n.t("%{title} Peer Review", title: @parent_assignment.title)
+    if expected_title != peer_review_sub.title
+      attrs[:title] = expected_title
+    end
+
     attrs
   end
 

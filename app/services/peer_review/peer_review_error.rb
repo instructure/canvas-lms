@@ -23,4 +23,5 @@ module PeerReview
   class PeerReviewFeatureDisabledError < PeerReviewError; end
   class PeerReviewInvalidAssignmentSubmissionTypesError < PeerReviewError; end
   class PeerReviewSubAssignmentExistsError < PeerReviewError; end
+  class PeerReviewSubAssignmentNotExistError < PeerReviewError; end
 end

@@ -160,6 +160,28 @@ RSpec.describe PeerReview::PeerReviewCommonService do
     end
   end
 
+  describe "#validate_peer_review_sub_assignment_exists" do
+    it "does not raise an error when peer review sub assignment exists" do
+      PeerReviewSubAssignment.create!(parent_assignment:, context: course)
+      expect { service.send(:validate_peer_review_sub_assignment_exists) }.not_to raise_error
+    end
+
+    it "raises an error when peer review sub assignment does not exist" do
+      expect { service.send(:validate_peer_review_sub_assignment_exists) }.to raise_error(
+        PeerReview::PeerReviewSubAssignmentNotExistError,
+        "Peer review sub assignment does not exist"
+      )
+    end
+
+    it "raises an error when peer review sub assignment is nil" do
+      allow(parent_assignment).to receive(:peer_review_sub_assignment).and_return(nil)
+      expect { service.send(:validate_peer_review_sub_assignment_exists) }.to raise_error(
+        PeerReview::PeerReviewSubAssignmentNotExistError,
+        "Peer review sub assignment does not exist"
+      )
+    end
+  end
+
   describe "#peer_review_attributes" do
     it "returns combined inherited and specific attributes" do
       attributes = service.send(:peer_review_attributes)
@@ -281,6 +303,148 @@ RSpec.describe PeerReview::PeerReviewCommonService do
 
     it "responds to the call class method" do
       expect(described_class).to respond_to(:call)
+    end
+  end
+
+  describe "#peer_review_attributes_to_update" do
+    let!(:peer_review_sub_assignment) do
+      PeerReviewSubAssignment.create!(
+        parent_assignment:,
+        context: course,
+        title: "Test Peer Review",
+        points_possible: 5,
+        grading_type: "pass_fail",
+        due_at: 5.days.from_now,
+        unlock_at: 3.days.from_now,
+        lock_at: 3.weeks.from_now
+      )
+    end
+
+    context "when peer review specific attributes have changed" do
+      let(:new_points_possible) { 15 }
+      let(:new_grading_type) { "points" }
+      let(:new_due_at) { 1.day.from_now }
+      let(:new_unlock_at) { Time.zone.now }
+      let(:new_lock_at) { 4.weeks.from_now }
+
+      let(:service) do
+        described_class.new(
+          parent_assignment:,
+          points_possible: new_points_possible,
+          grading_type: new_grading_type,
+          due_at: new_due_at,
+          unlock_at: new_unlock_at,
+          lock_at: new_lock_at
+        )
+      end
+
+      it "includes all changed peer review specific attributes" do
+        attributes = service.send(:peer_review_attributes_to_update)
+
+        expect(attributes[:points_possible]).to eq(new_points_possible)
+        expect(attributes[:grading_type]).to eq(new_grading_type)
+        expect(attributes[:due_at]).to eq(new_due_at)
+        expect(attributes[:unlock_at]).to eq(new_unlock_at)
+        expect(attributes[:lock_at]).to eq(new_lock_at)
+      end
+
+      it "does not include peer review attributes that match existing values" do
+        service_with_same_points = described_class.new(
+          parent_assignment:,
+          points_possible: peer_review_sub_assignment.points_possible,
+          grading_type: new_grading_type,
+          due_at: new_due_at
+        )
+
+        attributes = service_with_same_points.send(:peer_review_attributes_to_update)
+
+        expect(attributes).not_to have_key(:points_possible)
+        expect(attributes[:grading_type]).to eq(new_grading_type)
+        expect(attributes[:due_at]).to eq(new_due_at)
+      end
+    end
+
+    context "when inherited attributes have changed on parent" do
+      before do
+        parent_assignment.update!(
+          description: "Updated description",
+          peer_review_count: 3
+        )
+      end
+
+      it "includes inherited attributes that differ from the peer review sub assignment" do
+        attributes = service.send(:peer_review_attributes_to_update)
+
+        expect(attributes[:description]).to eq("Updated description")
+        expect(attributes[:peer_review_count]).to eq(3)
+      end
+    end
+
+    context "when both inherited and specific attributes have changed" do
+      before do
+        parent_assignment.update!(
+          description: "New description",
+          peer_review_count: 5
+        )
+      end
+
+      let(:service) do
+        described_class.new(
+          parent_assignment:,
+          points_possible: 20,
+          grading_type: "points",
+          due_at: 2.days.from_now
+        )
+      end
+
+      it "includes both inherited and specific changed attributes" do
+        attributes = service.send(:peer_review_attributes_to_update)
+
+        expect(attributes[:description]).to eq("New description")
+        expect(attributes[:peer_review_count]).to eq(5)
+        expect(attributes[:points_possible]).to eq(20)
+        expect(attributes[:grading_type]).to eq("points")
+        expect(attributes[:due_at]).to be_within(1.second).of(2.days.from_now)
+      end
+    end
+
+    context "handling of title changes" do
+      context "when peer review sub assignment title differs from expected title" do
+        before do
+          peer_review_sub_assignment.update!(title: "Old Incorrect Title")
+        end
+
+        it "includes the correct title in the attributes to update" do
+          attributes = service.send(:peer_review_attributes_to_update)
+          expect(attributes[:title]).to eq("Parent Assignment Peer Review")
+        end
+      end
+
+      context "when peer review sub assignment title matches expected title" do
+        before do
+          expected_title = I18n.t("%{title} Peer Review", title: parent_assignment.title)
+          peer_review_sub_assignment.update!(title: expected_title)
+        end
+
+        it "does not include title in the attributes to update" do
+          attributes = service.send(:peer_review_attributes_to_update)
+
+          expect(attributes).not_to have_key(:title)
+        end
+      end
+
+      context "when parent assignment title changes" do
+        before do
+          initial_title = I18n.t("%{title} Peer Review", title: parent_assignment.title)
+          peer_review_sub_assignment.update!(title: initial_title)
+          parent_assignment.update!(title: "Updated Parent Assignment")
+        end
+
+        it "includes the updated title based on new parent title" do
+          attributes = service.send(:peer_review_attributes_to_update)
+          expect(attributes[:title]).to eq("Updated Parent Assignment Peer Review")
+        end
+      end
     end
   end
 
