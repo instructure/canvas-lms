@@ -87,14 +87,18 @@ const useFetchAssignees = ({
       if (courseSettings?.conditional_release) {
         defaultOptions.push({id: 'mastery_paths', value: I18n.t('Mastery Paths')})
       }
-    } else if (fetchedCourseSettings) {
-      // @ts-expect-error ts-migrate(2531) FIXME: Object is possibly 'null'.
-      showFlashError(I18n.t('Failed to load course settings'))(fetchedCourseSettings?.reason)
-      setHasErrors(true)
     }
 
     return defaultOptions
   }, [courseSettingsIsSuccess, everyoneOption, fetchedCourseSettings])
+
+  useEffect(() => {
+    if (fetchedCourseSettings && !courseSettingsIsSuccess) {
+      // @ts-expect-error ts-migrate(2531) FIXME: Object is possibly 'null'.
+      showFlashError(I18n.t('Failed to load course settings'))(fetchedCourseSettings?.reason)
+      setHasErrors(true)
+    }
+  }, [fetchedCourseSettings, courseSettingsIsSuccess])
 
   useEffect(() => {
     const newOptions = uniqBy([...baseDefaultOptions, ...baseFetchedOptions], 'id')
