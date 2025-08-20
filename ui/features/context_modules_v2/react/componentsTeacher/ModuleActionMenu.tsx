@@ -157,6 +157,9 @@ const ModuleActionMenu: React.FC<ModuleActionMenuProps> = ({
   const canDuplicate =
     moduleItems?.moduleItems.every(item => item.content?.canDuplicate) && expanded
 
+  const canMoveModuleContent =
+    (data?.pages[0].modules?.length ?? 0) > 1 && (moduleItems?.moduleItems?.length ?? 0) > 0
+
   const handleExternalToolLaunch = useCallback(
     (tool: ExternalTool, placement: ExternalToolPlacementType) => {
       launchExternalTool(tool, id, placement)
@@ -217,7 +220,7 @@ const ModuleActionMenu: React.FC<ModuleActionMenuProps> = ({
             </Flex>
           </Menu.Item>
         )}
-        {permissions?.canEdit && (
+        {permissions?.canEdit && canMoveModuleContent && (
           <Menu.Item onClick={handleMoveContentsRef}>
             <Flex>
               <Flex.Item>

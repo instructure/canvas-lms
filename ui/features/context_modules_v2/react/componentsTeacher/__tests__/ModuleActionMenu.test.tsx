@@ -81,8 +81,16 @@ const setUp = (permissions = {}, courseId = 'test-course-id', moduleId = 'test-m
           {
             _id: moduleId,
             id: moduleId,
-            name: 'Test Module',
+            name: 'Test Module 1',
             position: 1,
+            published: true,
+            moduleItems: [],
+          },
+          {
+            _id: 'test-module-id-2',
+            id: 'test-module-id-2',
+            name: 'Test Module 2',
+            position: 2,
             published: true,
             moduleItems: [],
           },
@@ -136,8 +144,25 @@ const setUp = (permissions = {}, courseId = 'test-course-id', moduleId = 'test-m
     ...mockExternalTools,
   }
 
+  return renderMenu({
+    moduleId,
+    contextProps,
+    queryClientOverride: queryClient,
+  })
+}
+
+const renderMenu = ({
+  moduleId = 'test-module-id',
+  contextProps = {},
+  queryClientOverride = null,
+}: {
+  moduleId?: string
+  contextProps?: any
+  queryClientOverride?: QueryClient | null
+} = {}) => {
+  const client = queryClientOverride || queryClient
   return render(
-    <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={client}>
       <ContextModuleProvider {...contextProps}>
         <ModuleActionMenu
           expanded={true}
@@ -345,24 +370,11 @@ describe('ModuleActionMenu', () => {
         courseId,
       }
 
-      render(
-        <QueryClientProvider client={queryClient}>
-          <ContextModuleProvider {...contextProps}>
-            <ModuleActionMenu
-              expanded={true}
-              isMenuOpen={false}
-              setIsMenuOpen={() => {}}
-              id={moduleId}
-              name="Test Module"
-              setIsDirectShareOpen={() => {}}
-              setIsDirectShareCourseOpen={() => {}}
-              setModuleAction={() => {}}
-              setIsManageModuleContentTrayOpen={() => {}}
-              setSourceModule={() => {}}
-            />
-          </ContextModuleProvider>
-        </QueryClientProvider>,
-      )
+      renderMenu({
+        moduleId,
+        contextProps,
+        queryClientOverride: queryClient,
+      })
 
       const menuButton = screen.getByRole('button', {name: 'Module Options'})
       expect(menuButton).toBeDisabled()
@@ -390,27 +402,122 @@ describe('ModuleActionMenu', () => {
         courseId,
       }
 
-      render(
-        <QueryClientProvider client={errorQueryClient}>
-          <ContextModuleProvider {...contextProps}>
-            <ModuleActionMenu
-              expanded={true}
-              isMenuOpen={false}
-              setIsMenuOpen={() => {}}
-              id={moduleId}
-              name="Test Module"
-              setIsDirectShareOpen={() => {}}
-              setIsDirectShareCourseOpen={() => {}}
-              setModuleAction={() => {}}
-              setIsManageModuleContentTrayOpen={setIsManagementContentTrayOpenMock}
-              setSourceModule={() => {}}
-            />
-          </ContextModuleProvider>
-        </QueryClientProvider>,
-      )
+      renderMenu({
+        moduleId,
+        contextProps,
+        queryClientOverride: errorQueryClient,
+      })
 
       const menuButton = screen.getByRole('button', {name: 'Module Options'})
       expect(menuButton).toBeDisabled()
+    })
+
+    it('does not render "Move Contents..." when there is only one module', async () => {
+      queryClient.setQueryData([MODULES, 'test-course-id'], {
+        pages: [
+          {
+            modules: [
+              {
+                _id: 'test-module-id',
+                id: 'test-module-id',
+                name: 'Test Module',
+                position: 1,
+                published: true,
+                moduleItems: [],
+              },
+            ],
+            pageInfo: {
+              hasNextPage: false,
+              endCursor: null,
+            },
+          },
+        ],
+        pageParams: [undefined],
+      })
+      queryClient.setQueryData([MODULE_ITEMS, 'test-module-id', null], {
+        moduleItems: [
+          {
+            _id: '1',
+            id: '1',
+            title: 'Test Item',
+            content: {
+              canDuplicate: true,
+            },
+          },
+        ],
+      })
+
+      const courseId = 'test-course-id'
+      const moduleId = 'test-module-id'
+      const contextProps = {
+        ...contextModuleDefaultProps,
+        courseId,
+      }
+
+      renderMenu({
+        moduleId,
+        contextProps,
+        queryClientOverride: queryClient,
+      })
+      const menuButton = screen.getByRole('button', {name: 'Module Options'})
+      fireEvent.click(menuButton)
+      await waitFor(() => {
+        expect(screen.getByText('Edit')).toBeInTheDocument()
+      })
+      expect(screen.queryByText('Move Contents...')).not.toBeInTheDocument()
+    })
+
+    it('does not render "Move Contents..." when the current module has no items', async () => {
+      queryClient.setQueryData([MODULES, 'test-course-id'], {
+        pages: [
+          {
+            modules: [
+              {
+                _id: 'test-module-id',
+                id: 'test-module-id',
+                name: 'Test Module',
+                position: 1,
+                published: true,
+                moduleItems: [],
+              },
+              {
+                _id: 'another-module-id',
+                id: 'another-module-id',
+                name: 'Another Module',
+                position: 2,
+                published: true,
+                moduleItems: [],
+              },
+            ],
+            pageInfo: {
+              hasNextPage: false,
+              endCursor: null,
+            },
+          },
+        ],
+        pageParams: [undefined],
+      })
+      queryClient.setQueryData([MODULE_ITEMS, 'test-module-id', null], {
+        moduleItems: [],
+      })
+      const courseId = 'test-course-id'
+      const moduleId = 'test-module-id'
+      const contextProps = {
+        ...contextModuleDefaultProps,
+        courseId,
+      }
+
+      renderMenu({
+        moduleId,
+        contextProps,
+        queryClientOverride: queryClient,
+      })
+      const menuButton = screen.getByRole('button', {name: 'Module Options'})
+      fireEvent.click(menuButton)
+      await waitFor(() => {
+        expect(screen.getByText('Edit')).toBeInTheDocument()
+      })
+      expect(screen.queryByText('Move Contents...')).not.toBeInTheDocument()
     })
   })
 
@@ -440,7 +547,7 @@ describe('ModuleActionMenu', () => {
           expect.anything(),
           'test-course-id',
           'test-module-id',
-          'Test Module',
+          'Test Module 1',
           'settings',
           expect.anything(),
         )

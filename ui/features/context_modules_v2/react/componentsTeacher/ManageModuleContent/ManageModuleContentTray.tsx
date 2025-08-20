@@ -232,13 +232,7 @@ const ManageModuleContentTray: React.FC<ManageModuleContentTrayProps> = ({
       selectedItem,
     )
     return order
-  }, [
-    moduleItemsData?.moduleItems,
-    sourceModuleItemsData?.moduleItems,
-    selectedPosition,
-    selectedItem,
-    sourceModuleId,
-  ])
+  }, [moduleItemsData?.moduleItems, selectedPosition, selectedItem, allSourceModuleItems])
 
   const moduleOrder = useMemo(() => {
     return createModuleOrder(sourceModuleId, modules, selectedPosition, selectedItem)
