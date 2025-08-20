@@ -325,7 +325,7 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
   if (isRequestInFlight) return renderSpinner()
 
   return (
-    <View position="fixed" overflowY="auto">
+    <View position="fixed" overflowY="auto" width="inherit">
       <Flex as="div" direction="column" height="100vh" width="100%">
         <Flex.Item
           as="header"
