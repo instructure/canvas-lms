@@ -132,6 +132,13 @@ module CC
               name: "resource_link_url"
             )
           end
+          if resource_link.context_type == "Assignment"
+            extensions.lticm(
+              :property,
+              CCHelper.create_key(resource_link.context, global: true),
+              name: "assignment_migration_id"
+            )
+          end
         end
       end
     end
