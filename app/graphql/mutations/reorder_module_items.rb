@@ -25,7 +25,11 @@ class Mutations::ReorderModuleItems < Mutations::BaseMutation
   argument :old_module_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("ContextModule")
   argument :target_position, Integer, required: false
 
-  field :module, Types::ModuleType, null: true
+  field :module, Types::ModuleType, null: true, resolver_method: :context_module
+  def context_module
+    object[:module]
+  end
+
   field :old_module, Types::ModuleType, null: true
 
   def resolve(input:)
