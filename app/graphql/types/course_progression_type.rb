@@ -44,6 +44,9 @@ module Types
           "Items are ordered by position",
           null: false,
           hash_key: :items
-    field :module, Types::ModuleType, null: false
+    field :module, Types::ModuleType, null: false, resolver_method: :context_module
+    def context_module
+      object[:module]
+    end
   end
 end
