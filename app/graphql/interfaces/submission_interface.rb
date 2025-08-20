@@ -212,6 +212,7 @@ module Interfaces::SubmissionInterface
       load_association(:submission_comments).then do
         provisional_comments_promise.then do |provisional_comments|
           comments = include_draft_comments ? submission.comments_including_drafts_for(current_user) : submission.comments_excluding_drafts_for(current_user)
+          comments = comments.to_a
 
           if include_provisional_comments
             comments.concat(submission.visible_provisional_comments(current_user, provisional_comments:))
