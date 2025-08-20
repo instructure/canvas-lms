@@ -230,26 +230,6 @@ describe "context modules", :ignore_js_errors do
       expect(tray_header_label.text).to eq("Add Module")
     end
 
-    it "adds module with a prerequisite module in same transaction" do
-      skip("LX-3177")
-      first_module = @course.context_modules.create!(name: "First Week")
-      add_module_button.click
-
-      expect(input_module_name).to be_displayed
-      fill_in_module_name("Week 2")
-      expect(add_prerequisite_button).to be_displayed
-      add_prerequisite_button.click
-      wait_for_ajaximations
-      select_prerequisites_dropdown_option(0, first_module.name)
-      expect(prerequisites_dropdown_value(0)).to eq(first_module.name)
-      submit_add_module_button.click
-
-      created_module = @course.context_modules.last
-      expect(created_module.name).to eq("Week 2")
-      expect(@course.context_modules.count).to eq 2
-      expect(context_module_prerequisites(created_module.id).text).to eq("Prerequisite: #{first_module.name}")
-    end
-
     it "can cancel creation of module" do
       add_module_button.click
       expect(input_module_name).to be_displayed
