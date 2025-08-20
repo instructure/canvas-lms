@@ -102,7 +102,7 @@ describe AllocationRule do
 
         rule = AllocationRule.new(valid_attributes.merge(assessor_id: @unassigned_student.id))
         expect(rule).not_to be_valid
-        expect(rule.errors[:assessor_id]).to include("must be a student assigned to this assignment")
+        expect(rule.errors[:assessor_id]).to include("assessor (#{@unassigned_student.id}) must be a student assigned to this assignment")
       end
     end
 
@@ -116,7 +116,7 @@ describe AllocationRule do
       it "is invalid" do
         rule = AllocationRule.new(valid_attributes.merge(assessor_id: @inactive_student.id))
         expect(rule).not_to be_valid
-        expect(rule.errors[:assessor_id]).to include("must have an active enrollment in the course")
+        expect(rule.errors[:assessor_id]).to include("assessor (#{@inactive_student.id}) must have an active enrollment in the course")
       end
     end
 
@@ -132,7 +132,7 @@ describe AllocationRule do
 
         rule = AllocationRule.new(valid_attributes.merge(assessee_id: @unassigned_student.id))
         expect(rule).not_to be_valid
-        expect(rule.errors[:assessee_id]).to include("must be a student with visibility to this assignment")
+        expect(rule.errors[:assessee_id]).to include("assessee (#{@unassigned_student.id}) must be a student with visibility to this assignment")
       end
     end
 
@@ -140,7 +140,7 @@ describe AllocationRule do
       it "is invalid" do
         rule = AllocationRule.new(valid_attributes.merge(assessee_id: @student1.id))
         expect(rule).not_to be_valid
-        expect(rule.errors[:assessee_id]).to include("cannot be the same as the assessor")
+        expect(rule.errors[:assessee_id]).to include("assessee (#{@student1.id}) cannot be the same as the assessor")
       end
     end
   end
@@ -154,13 +154,13 @@ describe AllocationRule do
       it "prevents conflicting review_permitted values" do
         conflicting_rule = AllocationRule.new(valid_attributes.merge(review_permitted: false))
         expect(conflicting_rule).not_to be_valid
-        expect(conflicting_rule.errors[:review_permitted]).to include("conflicts with existing rule that requires this review relationship")
+        expect(conflicting_rule.errors[:assessee_id]).to include("conflicts with rule \"#{@student1.name} must review #{@student2.name}\"")
       end
 
       it "prevents conflicting must_review values" do
         conflicting_rule = AllocationRule.new(valid_attributes.merge(must_review: false))
         expect(conflicting_rule).not_to be_valid
-        expect(conflicting_rule.errors[:must_review]).to include("conflicts with existing rule that requires this review")
+        expect(conflicting_rule.errors[:assessee_id]).to include("conflicts with rule \"#{@student1.name} must review #{@student2.name}\"")
       end
 
       it "allows updating the existing rule" do
