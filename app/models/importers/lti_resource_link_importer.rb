@@ -30,13 +30,14 @@ module Importers
       return false if lti_resource_links.empty?
 
       # Recover all resource links recorded by Importers::AssignmentImporter to
-      resource_links_from_assignments = imported_resource_links_from_assignments(migration)
+      resource_links_by_lookup_uuid = Lti::ResourceLink.where(context: migration.context.assignments).order(:created_at).group_by(&:lookup_uuid)
+      assignments_by_migration_id = migration.context.assignments.joins(:lti_resource_links).index_by(&:migration_id)
 
       # When a resource link was created into Assignment context we have to
       # update the custom params.
       # Otherwise, we have to create a resource link for Course context.
       lti_resource_links.each do |lti_resource_link|
-        updated = update_custom_for_resource_link_from_assignment_context(resource_links_from_assignments, lti_resource_link)
+        updated = update_custom_for_resource_link_from_assignment_context(resource_links_by_lookup_uuid, assignments_by_migration_id, lti_resource_link)
 
         next if updated
 
@@ -48,16 +49,24 @@ module Importers
 
     def self.filter_by_assignment_context(lti_resource_links = [], assignments = [], migration)
       return lti_resource_links if migration.import_everything?
-      return lti_resource_links if lti_resource_links.empty? || assignments.empty?
+      return lti_resource_links if lti_resource_links.empty?
 
-      assignments.each do |assignment|
-        lti_resource_links = lti_resource_links.reject do |lti_resource_link|
-          assignment["resource_link_lookup_uuid"] == lti_resource_link["lookup_uuid"] &&
-            !migration.import_object?("assignments", assignment["migration_id"])
+      assignments_by_lookup_uuid = assignments.group_by { |assignment| assignment["resource_link_lookup_uuid"] }
+
+      lti_resource_links.select do |lti_resource_link|
+        # Rule 3: If the resource link is associated with a course, keep it
+        if lti_resource_link["context_type"] == "Course"
+          true
+        # Rule 2: If it is associated with an assignment, check if the assignment is being imported
+        elsif lti_resource_link["assignment_migration_id"].present?
+          migration.import_object?("assignments", lti_resource_link["assignment_migration_id"])
+        # Rule 1: If the resource link is not associated with an assignment, but matches an assignment's resource_link_lookup_uuid, include it
+        elsif assignments_by_lookup_uuid[lti_resource_link["lookup_uuid"]].present?
+          migration.import_object?("assignments", assignments_by_lookup_uuid[lti_resource_link["lookup_uuid"]].first&.dig("migration_id"))
+        else
+          false
         end
       end
-
-      lti_resource_links
     end
 
     def self.create_or_update_resource_link_for_a_course_context(lti_resource_link, migration)
@@ -72,19 +81,14 @@ module Importers
       resource_link_for_course.save
     end
 
-    def self.find_resource_link_from_assignment_context(resource_links_from_assignments, lookup_uuid)
-      resource_links_from_assignments.find { |item| item.lookup_uuid == lookup_uuid }
-    end
+    def self.update_custom_for_resource_link_from_assignment_context(resource_links_by_lookup_uuid, assignments_by_migration_id, lti_resource_link)
+      resource_link = nil
+      if lti_resource_link["assignment_migration_id"]
+        assignment = assignments_by_migration_id[lti_resource_link["assignment_migration_id"]]
+        resource_link = resource_links_by_lookup_uuid[lti_resource_link["lookup_uuid"]]&.find { |item| item.context == assignment } if assignment
+      end
 
-    def self.imported_resource_links_from_assignments(migration)
-      migration.context.assignments.joins(:lti_resource_links).map(&:lti_resource_links).flatten
-    end
-
-    def self.update_custom_for_resource_link_from_assignment_context(resource_links_from_assignments, lti_resource_link)
-      resource_link = find_resource_link_from_assignment_context(
-        resource_links_from_assignments,
-        lti_resource_link["lookup_uuid"]
-      )
+      resource_link ||= resource_links_by_lookup_uuid[lti_resource_link["lookup_uuid"]]&.first
 
       return false unless resource_link
 

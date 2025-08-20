@@ -117,4 +117,12 @@ describe CC::Importer::Canvas::LtiResourceLinkConverter do
       )
     )
   end
+
+  it "retrieves the assignment_migration_id from the resource link" do
+    expect(lti_resource_links).to include(
+      a_hash_including(
+        assignment_migration_id: "76cf9398-0f63-4be2-a196-8e21d44716de"
+      )
+    )
+  end
 end
