@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {render} from '@testing-library/react'
 import BlueprintIconButton from '../BlueprintIconButton'
 import {FAKE_FILES, FAKE_FOLDERS} from '../../../../fixtures/fakeData'
@@ -30,7 +29,6 @@ const renderComponent = () =>
     <RowsProvider value={mockRowsContext}>
       <BlueprintIconButton {...defaultProps} />
     </RowsProvider>,
-    {container: document.body},
   )
 
 describe('BlueprintIconButton', () => {
