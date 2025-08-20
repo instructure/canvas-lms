@@ -1394,22 +1394,22 @@ class AssignmentsApiController < ApplicationController
   #   Only applies when submission_types includes "student_annotation".
   #
   # @argument assignment[peer_review][points_possible] [Float]
-  #   The maximum points possible for the peer review sub-assignment.
+  #   The maximum points possible for peer reviews.
   #
   # @argument assignment[peer_review][grading_type] ["pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"|"not_graded"]
-  #  The strategy used for grading the peer review sub-assignment.
-  #  The peer review defaults to "points" if this field is omitted.
+  #  The strategy used for grading peer reviews.
+  #  Defaults to "points" if this field is omitted.
   #
   # @argument assignment[peer_review][due_at] [DateTime]
-  #   The day/time the peer review sub-assignment is due. Must be between the lock dates if there are lock dates.
+  #   The day/time the peer reviews are due. Must be between the lock dates if there are lock dates.
   #   Accepts times in ISO 8601 format, e.g. 2025-08-20T12:10:00Z.
   #
   # @argument assignment[peer_review][lock_at] [DateTime]
-  #   The day/time the peer review sub-assignment is locked after. Must be after the due date if there is a due date.
+  #   The day/time the peer reviews are locked after. Must be after the due date if there is a due date.
   #   Accepts times in ISO 8601 format, e.g. 2025-08-25T12:10:00Z.
   #
   # @argument assignment[peer_review][unlock_at] [DateTime]
-  #   The day/time the peer review sub-assignment is unlocked. Must be before the due date if there is a due date.
+  #   The day/time the peer reviews are unlocked. Must be before the due date if there is a due date.
   #   Accepts times in ISO 8601 format, e.g. 2025-08-15T12:10:00Z.
   #
   # @returns Assignment
@@ -1629,6 +1629,25 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[force_updated_at] [Boolean]
   #   If true, updated_at will be set even if no changes were made.
   #
+  # @argument assignment[peer_review][points_possible] [Float]
+  #   The maximum points possible for peer reviews.
+  #
+  # @argument assignment[peer_review][grading_type] ["pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"|"not_graded"]
+  #  The strategy used for grading peer reviews.
+  #  Defaults to "points" if this field is omitted.
+  #
+  # @argument assignment[peer_review][due_at] [DateTime]
+  #   The day/time the peer reviews are due. Must be between the lock dates if there are lock dates.
+  #   Accepts times in ISO 8601 format, e.g. 2025-08-20T12:10:00Z.
+  #
+  # @argument assignment[peer_review][lock_at] [DateTime]
+  #   The day/time the peer reviews are locked after. Must be after the due date if there is a due date.
+  #   Accepts times in ISO 8601 format, e.g. 2025-08-25T12:10:00Z.
+  #
+  # @argument assignment[peer_review][unlock_at] [DateTime]
+  #   The day/time the peer reviews are unlocked. Must be before the due date if there is a due date.
+  #   Accepts times in ISO 8601 format, e.g. 2025-08-15T12:10:00Z.
+  #
   # @returns Assignment
   def update
     @assignment = api_find(@context.active_assignments, params[:id])
@@ -1647,6 +1666,8 @@ class AssignmentsApiController < ApplicationController
 
       @assignment.skip_downstream_changes! if params[:skip_downstream_changes].present?
       result = update_api_assignment(@assignment, params.require(:assignment), @current_user, @context, opts)
+
+      opts[:include_peer_review] = @assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
       render_create_or_update_result(result, opts)
     end
   end
@@ -1726,7 +1747,7 @@ class AssignmentsApiController < ApplicationController
     else
       if result == :peer_review_error
         status = :bad_request
-        errors = I18n.t("Failed to create assignment due to failure to create peer review sub assignment")
+        errors = I18n.t("Failed to create or update peer review sub assignment")
       else
         status = (result == :forbidden) ? :forbidden : :bad_request
         errors = @assignment.errors.as_json[:errors]
