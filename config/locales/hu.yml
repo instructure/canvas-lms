@@ -8033,6 +8033,7 @@ hu:
         course_visibility: Láthatóság
         custom_course_visibility: Testreszabás
         default_due_time: "Alapértelmezett határidő"
+        disable_csp: "Tartalombiztonsági szabályzat letiltása"
         enable_course_paces: "Kurzus ütemezés engedélyezése"
         enrollment_term_id: Félév
         enrollments_from_homeroom: Beiratkozások
