@@ -70,7 +70,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   }
   sanitize_field :description, CanvasSanitize::SANITIZE
   copy_authorized_links(:description) { [context, nil] }
-  validates_with HorizonValidators::QuizzesValidator, if: -> { context.is_a?(Course) && context.horizon_course? }, on: :create
+  validates_with HorizonValidators::QuizzesValidator, if: -> { context.is_a?(Course) && context.horizon_course? }
 
   before_save :generate_quiz_data_on_publish, if: :workflow_state_changed?
   before_save :build_assignment
