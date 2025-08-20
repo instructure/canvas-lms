@@ -412,6 +412,7 @@
   },
   "resolutions": {
     "punycode": "npm:punycode2@1.0.1",
+    "form-data": ">=4.0.4",
     "graphael": "https://github.com/instructure/graphael.git",
     "@instructure/emotion": "10.24.2",
     "@instructure/ui-a11y-content": "10.24.2",
