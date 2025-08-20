@@ -1523,5 +1523,57 @@ describe ContentMigration do
         expect(copied_page2.body).to include("https://www.google.com//")
       end
     end
+
+    it "copies resource links with same lookup_uuid but different custom parameters" do
+      registration = lti_registration_with_tool(account: @copy_from.root_account, created_by: user_model)
+      tool = registration.deployments.first
+      lookup_uuid = "1b302c1e-c0a2-42dc-88b6-c029699a7c7a"
+
+      # Create first assignment with resource link
+      assignment1 = @copy_from.assignments.create!(
+        title: "Assignment 1",
+        submission_types: "external_tool",
+        external_tool_tag_attributes: { content: tool,
+                                        url: tool.url, },
+        points_possible: 10
+      )
+      resource_link1 = assignment1.lti_resource_links.first
+      resource_link1.update!(
+        lookup_uuid:,
+        custom: { "param1" => "value1", "assignment" => "first" }
+      )
+
+      # Create second assignment with resource link using same lookup_uuid
+      assignment2 = @copy_from.assignments.create!(
+        title: "Assignment 2",
+        submission_types: "external_tool",
+        external_tool_tag_attributes: { content: tool,
+                                        url: tool.url, },
+        points_possible: 15
+      )
+      resource_link2 = assignment2.lti_resource_links.first
+      resource_link2.update!(
+        lookup_uuid:,
+        custom: { "param1" => "value2", "assignment" => "second" }
+      )
+
+      run_course_copy
+
+      # Verify assignments were copied
+      copied_assignment1 = @copy_to.assignments.where(migration_id: mig_id(assignment1)).first
+      copied_assignment2 = @copy_to.assignments.where(migration_id: mig_id(assignment2)).first
+      expect(copied_assignment1).not_to be_nil
+      expect(copied_assignment2).not_to be_nil
+
+      # Verify resource links were copied with correct custom parameters
+      copied_resource_link1 = copied_assignment1.lti_resource_links.first
+      copied_resource_link2 = copied_assignment2.lti_resource_links.first
+
+      expect(copied_resource_link1.lookup_uuid).to eq lookup_uuid
+      expect(copied_resource_link1.custom).to eq({ "param1" => "value1", "assignment" => "first" })
+
+      expect(copied_resource_link2.lookup_uuid).to eq lookup_uuid
+      expect(copied_resource_link2.custom).to eq({ "param1" => "value2", "assignment" => "second" })
+    end
   end
 end
