@@ -656,6 +656,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
           tos_uri: "http://example.com/tos",
           policy_uri: "http://example.com/policy",
           lti_tool_configuration: {
+            target_link_uri: "https://example.com/launch",
             domain: "example.com",
             messages: [],
             claims: [
