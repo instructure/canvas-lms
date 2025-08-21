@@ -16,36 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useEffect, useRef} from 'react'
-import {useBlockContentEditorContext} from '../BlockContentEditorContext'
+import {useRef, RefCallback} from 'react'
 
-export const useFocusElement = (focus: boolean | undefined, isRCE: boolean = false) => {
-  const {settingsTray} = useBlockContentEditorContext()
-  const elementRef = useRef<HTMLElement | null>(null)
+export type FocusableElement = Pick<HTMLElement, 'focus'>
+export type FocusHandler = RefCallback<FocusableElement>
 
-  const focusHandler = () => {
-    if (settingsTray.isOpen) {
-      return
+export const useFocusElement = () => {
+  const initialFocus = useRef<boolean>(true)
+
+  const focusHandler: FocusHandler = node => {
+    if (node && initialFocus.current) {
+      setTimeout(() => {
+        node.focus()
+      }, 0)
+      initialFocus.current = false
     }
-    if (focus && elementRef.current) {
-      elementRef.current.focus()
-    }
-  }
-
-  useEffect(() => focusHandler(), [focus, elementRef, settingsTray.isOpen])
-
-  const elementRefHandler = (element: Element | null) => {
-    if (element && 'current' in elementRef) {
-      elementRef.current = element as HTMLElement
-    }
-  }
-
-  const rceHandler = () => {
-    focusHandler()
   }
 
   return {
-    elementRef,
-    refHandler: isRCE ? rceHandler : elementRefHandler,
+    focusHandler,
   }
 }

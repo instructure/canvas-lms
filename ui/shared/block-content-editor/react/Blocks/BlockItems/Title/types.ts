@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {FocusHandler} from '../../../hooks/useFocusElement'
+
 export type TitleData = {
   title: string
 }
@@ -27,5 +29,5 @@ export type TitleViewProps = TitleData & TitleColor
 export type TitleEditPreviewProps = TitleData & TitleColor
 export type TitleEditProps = TitleData & {
   onTitleChange: (newTitle: string) => void
-  focus?: boolean
+  focusHandler?: FocusHandler
 }
