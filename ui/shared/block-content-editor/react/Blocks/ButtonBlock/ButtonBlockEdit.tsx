@@ -20,16 +20,24 @@ import {Flex} from '@instructure/ui-flex'
 import {TitleEdit} from '../BlockItems/Title/TitleEdit'
 import {ButtonBlockEditProps} from './types'
 import {ButtonDisplay} from './ButtonDisplay'
+import {useFocusElement} from '../../hooks/useFocusElement'
 
 export const ButtonBlockEdit = (props: ButtonBlockEditProps) => {
+  const {focusHandler} = useFocusElement()
+
   return (
     <Flex direction="column" gap="mediumSmall">
       {props.settings.includeBlockTitle && (
-        <TitleEdit title={props.title} onTitleChange={props.onTitleChange} />
+        <TitleEdit
+          title={props.title}
+          onTitleChange={props.onTitleChange}
+          focusHandler={focusHandler}
+        />
       )}
       <ButtonDisplay
         dataTestId="button-block-edit"
         settings={props.settings}
+        focusHandler={props.settings.includeBlockTitle ? undefined : focusHandler}
         onButtonClick={() => {}}
       />
     </Flex>

@@ -27,7 +27,12 @@ const alignmentMap = {
   right: 'end',
 } as const
 
-export const ButtonDisplay = ({settings, dataTestId, onButtonClick}: ButtonDisplayProps) => {
+export const ButtonDisplay = ({
+  settings,
+  dataTestId,
+  onButtonClick,
+  focusHandler,
+}: ButtonDisplayProps) => {
   const {buttons, alignment, layout, isFullWidth} = settings
 
   const flexDirection = layout === 'vertical' ? 'column' : 'row'
@@ -44,9 +49,14 @@ export const ButtonDisplay = ({settings, dataTestId, onButtonClick}: ButtonDispl
       wrap="wrap"
       gap="small"
     >
-      {buttons.map(button => (
+      {buttons.map((button, i) => (
         <Flex.Item key={button.id} shouldGrow={isFullWidth} overflowX="visible" overflowY="visible">
-          <SingleButton isFullWidth={isFullWidth} button={button} onButtonClick={onButtonClick} />
+          <SingleButton
+            isFullWidth={isFullWidth}
+            button={button}
+            onButtonClick={onButtonClick}
+            focusHandler={i === 0 ? focusHandler : undefined}
+          />
         </Flex.Item>
       ))}
     </Flex>

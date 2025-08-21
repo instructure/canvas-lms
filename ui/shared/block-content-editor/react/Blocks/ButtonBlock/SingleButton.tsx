@@ -25,7 +25,12 @@ import {getAdjustedColor} from './getAdjustedColor'
 
 const I18n = createI18nScope('block_content_editor')
 
-export const SingleButton = ({button, isFullWidth, onButtonClick}: SingleButtonProps) => {
+export const SingleButton = ({
+  button,
+  isFullWidth,
+  onButtonClick,
+  focusHandler,
+}: SingleButtonProps) => {
   const buttonText = button.text.trim() || I18n.t('Button')
 
   const url = button.url.trim()
@@ -55,6 +60,7 @@ export const SingleButton = ({button, isFullWidth, onButtonClick}: SingleButtonP
 
   return (
     <Button
+      elementRef={el => focusHandler?.(el as HTMLElement)}
       display={isFullWidth ? 'block' : 'inline-block'}
       withBackground={button.style == 'filled'}
       themeOverride={themeOverride}
