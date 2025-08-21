@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {FocusHandler} from '../../hooks/useFocusElement'
 import {TitleData} from '../BlockItems/Title/types'
 
 export type ButtonAlignment = 'left' | 'center' | 'right'
@@ -56,6 +57,7 @@ export type ButtonBlockEditProps = ButtonBlockBase & {
 export type ButtonDisplayProps = ButtonBlockSettings & {
   dataTestId: string
   onButtonClick?: (buttonId: number) => void
+  focusHandler?: FocusHandler
 }
 
 export type ButtonBlockIndividualButtonSettingsProps = {
@@ -85,4 +87,5 @@ export type SingleButtonProps = {
   button: ButtonData
   isFullWidth: boolean
   onButtonClick?: (buttonId: number) => void
+  focusHandler?: FocusHandler
 }
