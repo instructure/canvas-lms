@@ -109,7 +109,7 @@ const ModuleItemSupplementalInfo: React.FC<ModuleItemSupplementalInfoProps> = ({
     } else {
       // Handle regular content dates - only push if DueDateLabel would render something
       // Check for standardized dates first (if enabled)
-      const hasStandardizedDates = content?.assignedToDates && content.assignedToDates.length > 0
+      const hasStandardizedDates = content?.assignedToDates?.some(d => d.dueAt) ?? false
 
       // Check for legacy dates
       const baseDueDate =
