@@ -19,6 +19,7 @@
 #
 
 require_relative "../graphql_spec_helper"
+require_relative "../../conditional_release_spec_helper"
 
 describe Types::ModuleItemType do
   let_once(:course) do
@@ -475,6 +476,21 @@ describe Types::ModuleItemType do
           expect(resolver.resolve("content { isLockedByMasterCourse }")).to be true
         end
       end
+    end
+  end
+
+  context "mastery path triggers" do
+    before :once do
+      setup_course_with_native_conditional_release
+      @course.context_modules.first.add_item({ type: "Assignment", id: @trigger_assmt.id }, nil, position: 2)
+      course_with_student(course: @course)
+    end
+
+    it "includes mastery_path property" do
+      module_item = @course.context_modules.first.content_tags.last
+      resolver = GraphQLTypeTester.new(module_item, current_user: @student)
+
+      expect(resolver.resolve("masteryPaths { locked chooseUrl awaitingChoice stillProcessing assignmentSetCount }")).not_to be_nil
     end
   end
 end

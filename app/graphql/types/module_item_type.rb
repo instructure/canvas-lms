@@ -41,6 +41,10 @@ module Types
   class ModuleItemType < ApplicationObjectType
     graphql_name "ModuleItem"
 
+    include ApplicationHelper
+    include CyoeHelper
+    include Rails.application.routes.url_helpers
+
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
     implements Interfaces::LegacyIDInterface
@@ -166,6 +170,18 @@ module Types
     field :master_course_restrictions, Types::ModuleItemMasterCourseRestrictionType, null: true, description: "Restrictions from master courses for this module item", camelize: true
     def master_course_restrictions
       Loaders::ModuleItemMasterCourseRestrictionsLoader.for(current_user).load(content_tag)
+    end
+
+    field :mastery_paths, Types::ModuleItemMasteryPathInfo, null: true, description: "Mastery path information for this module item"
+    def mastery_paths
+      course = object.context
+      user = context[:current_user]
+      session = context[:session]
+
+      rules = cyoe_rules(course, user, session)
+      is_student = course.grants_right?(user, session, :participate_as_student)
+      path_opts = { conditional_release_rules: rules, is_student:, context: course, user: }
+      conditional_release_rule_for_module_item(object, path_opts)
     end
   end
 end

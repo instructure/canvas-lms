@@ -6253,6 +6253,11 @@ type ModuleItem implements LegacyIDInterface & Node & Timestamped {
   Restrictions from master courses for this module item
   """
   masterCourseRestrictions: ModuleItemMasterCourseRestriction
+
+  """
+  Mastery path information for this module item
+  """
+  masteryPaths: ModuleItemMasteryPathInfo
   module: Module
   moduleItemUrl: URL
   newTab: Boolean
@@ -6424,6 +6429,36 @@ type ModuleItemMasterCourseRestriction {
   Whether settings are restricted
   """
   settings: Boolean
+}
+
+"""
+Mastery path information for a module item
+"""
+type ModuleItemMasteryPathInfo {
+  """
+  Number of assignment sets that can be selected
+  """
+  assignmentSetCount: Int
+
+  """
+  Whether the next assignment set can be chosen
+  """
+  awaitingChoice: Boolean
+
+  """
+  URL to expose next assignment set choice
+  """
+  chooseUrl: String
+
+  """
+  Indicates locked content
+  """
+  locked: Boolean
+
+  """
+  Indicates mastery path handler in-flight
+  """
+  stillProcessing: Boolean
 }
 
 type ModulePrerequisite {
