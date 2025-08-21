@@ -23,10 +23,16 @@ import {SettingsImageInfos} from '../BlockItems/SettingsImageInfos/SettingsImage
 import {View} from '@instructure/ui-view'
 import {SettingsUploadImage} from '../BlockItems/SettingsUploadImage/SettingsUploadImage'
 import {ImageData} from '../BlockItems/Image/types'
+import {SettingsIncludeTitle} from '../BlockItems/SettingsIncludeTitle/SettingsIncludeTitle'
+import {SettingsSectionToggle} from '../BlockItems/SettingsSectionToggle/SettingsSectionToggle'
+import {useScope as createI18nScope} from '@canvas/i18n'
+
+const I18n = createI18nScope('block_content_editor')
 
 export const ImageBlockSettings = () => {
   const {
     actions: {setProp},
+    includeBlockTitle,
     caption,
     altText,
     altTextAsCaption,
@@ -34,6 +40,7 @@ export const ImageBlockSettings = () => {
     url,
     fileName,
   } = useNode(node => ({
+    includeBlockTitle: !!node.data.props.settings?.includeBlockTitle,
     caption: node.data.props.caption,
     altText: node.data.props.altText,
     altTextAsCaption: node.data.props.altTextAsCaption,
@@ -41,6 +48,12 @@ export const ImageBlockSettings = () => {
     url: node.data.props.url,
     fileName: node.data.props.fileName,
   }))
+
+  const handleIncludeBlockTitleChange = () => {
+    setProp((props: ImageBlockProps) => {
+      props.settings.includeBlockTitle = !includeBlockTitle
+    })
+  }
 
   const handleCaptionChange = (caption: string) => {
     setProp((props: ImageBlockProps) => {
@@ -84,26 +97,35 @@ export const ImageBlockSettings = () => {
   }
 
   return (
-    <>
-      <View as="div" margin="0 0 medium 0">
-        <SettingsUploadImage
-          onImageChange={handleImageDataChange}
-          url={url || ''}
-          fileName={fileName || ''}
-        />
-      </View>
-      <View as="div">
-        <SettingsImageInfos
-          caption={caption}
-          altText={altText}
-          altTextAsCaption={altTextAsCaption}
-          decorativeImage={decorativeImage}
-          onCaptionChange={handleCaptionChange}
-          onAltTextChange={handleAltTextChange}
-          onAltTextAsCaptionChange={handleAltTextAsCaptionChange}
-          onDecorativeImageChange={handleDecorativeImageChange}
-        />
-      </View>
-    </>
+    <View as="div">
+      <SettingsIncludeTitle checked={includeBlockTitle} onChange={handleIncludeBlockTitleChange} />
+      <SettingsSectionToggle
+        title={I18n.t('Image settings')}
+        collapsedLabel={I18n.t('Expand image settings')}
+        expandedLabel={I18n.t('Collapse image settings')}
+        defaultExpanded={true}
+        includeSeparator={false}
+      >
+        <View as="div" margin="0 0 medium 0">
+          <SettingsUploadImage
+            onImageChange={handleImageDataChange}
+            url={url || ''}
+            fileName={fileName || ''}
+          />
+        </View>
+        <View as="div">
+          <SettingsImageInfos
+            caption={caption}
+            altText={altText}
+            altTextAsCaption={altTextAsCaption}
+            decorativeImage={decorativeImage}
+            onCaptionChange={handleCaptionChange}
+            onAltTextChange={handleAltTextChange}
+            onAltTextAsCaptionChange={handleAltTextAsCaptionChange}
+            onDecorativeImageChange={handleDecorativeImageChange}
+          />
+        </View>
+      </SettingsSectionToggle>
+    </View>
   )
 }
