@@ -281,8 +281,14 @@ const ModulesList: React.FC = () => {
     }
   }
 
+  const handleDragStart = useCallback(() => {
+    document.dispatchEvent(new CustomEvent('drag-state-change', {detail: {isDragging: true}}))
+  }, [])
+
   // Use the utility function from dndUtils.ts, passing our handleMoveItem as a callback
   const handleDragEnd = (result: DropResult) => {
+    document.dispatchEvent(new CustomEvent('drag-state-change', {detail: {isDragging: false}}))
+
     // Check for no destination or no movement first
     if (
       !result.destination ||
@@ -364,7 +370,7 @@ const ModulesList: React.FC = () => {
   )
 
   return (
-    <DragDropContext onDragEnd={handleDragEnd}>
+    <DragDropContext onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
       <View as="div">
         <ModulePageActionHeader
           onCollapseAll={handleCollapseAllRef}

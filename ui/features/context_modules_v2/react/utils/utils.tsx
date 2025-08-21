@@ -332,7 +332,8 @@ export const validateModuleTeacherRenderRequirements = (prevProps: any, nextProp
     prevProps.completionRequirements === nextProps.completionRequirements &&
     prevProps.unlockAt === nextProps.unlockAt &&
     prevProps.requirementCount === nextProps.requirementCount &&
-    prevProps.lockAt === nextProps.lockAt
+    prevProps.lockAt === nextProps.lockAt &&
+    prevProps.position === nextProps.position
   )
 }
 

@@ -24,6 +24,8 @@ type ElemType = {
 }
 
 class KBNavigator {
+  dragging = false
+
   getElemType(elem: HTMLElement): ElemType {
     const item = elem.closest('.context_module_item') as HTMLElement
     if (item) {
@@ -243,7 +245,7 @@ class KBNavigator {
         courseId,
         moduleId,
         moduleItemId,
-        setMenuIsOpen: undefined, // we didn't get here from the menu
+        setIsMenuOpen: undefined, // we didn't get here from the menu
         onAfterSuccess: focusAfterRemoval,
       })
       return true
@@ -291,9 +293,15 @@ class KBNavigator {
     return true
   }
 
+  handleDragStateChange(event: CustomEvent) {
+    this.dragging = event.detail.isDragging
+  }
+
   // canvas kb shortcuts
   // see: https://community.canvaslms.com/t5/Canvas-Resource-Documents/Canvas-Keyboard-Shortcuts/ta-p/387069
   handleShortcutKey(event: KeyboardEvent) {
+    if (this.dragging) return
+
     if (['ArrowUp', 'ArrowDown', 'j', 'k', 'e', 'd', 'i', 'o', 'n', '?'].includes(event.key)) {
       if (event.ctrlKey || event.metaKey || event.altKey) return
 
@@ -342,5 +350,7 @@ class KBNavigator {
 
 const navigator = new KBNavigator()
 const handleShortcutKey = navigator.handleShortcutKey.bind(navigator)
+
+document.addEventListener('drag-state-change', navigator.handleDragStateChange.bind(navigator))
 
 export {KBNavigator, handleShortcutKey}
