@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'jqueryui/dialog'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {bool, func, number, shape, string} from 'prop-types'
