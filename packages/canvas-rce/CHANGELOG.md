@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 7.2.0 - 2025-08-21
+
+### Added
+- Block content editor RCE variant support
+- YouTube video overlay
+- Lightest colors and white included in color picker
+
+### Fixed
+- Conditionally render screenReader-only Alert in RCEWrapper
+- Canvas-rce translation warnings prevented
+- Background color when RCE is fullscreen
+
+### Changed
+- Upgraded to InstUI 10.24.2
+- Upgraded crypto-es in canvas-rce package
+
+### Localization
+- Updated RCE translations for multiple locales
+
+
 ## 7.1.1 - 2025-07-08
 
 ### Changed
