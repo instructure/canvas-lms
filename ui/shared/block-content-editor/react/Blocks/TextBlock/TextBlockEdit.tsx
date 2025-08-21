@@ -25,9 +25,18 @@ export const TextBlockEdit = (props: TextBlockEditProps) => {
   return (
     <Flex direction="column" gap="mediumSmall">
       {props.settings.includeBlockTitle && (
-        <TitleEdit title={props.title} onTitleChange={props.onTitleChange} />
+        <TitleEdit
+          title={props.title}
+          onTitleChange={props.onTitleChange}
+          focus={props.settings.includeBlockTitle}
+        />
       )}
-      <TextEdit content={props.content} onContentChange={props.onContentChange} height={300} />
+      <TextEdit
+        content={props.content}
+        onContentChange={props.onContentChange}
+        height={300}
+        focus={!props.settings.includeBlockTitle}
+      />
     </Flex>
   )
 }

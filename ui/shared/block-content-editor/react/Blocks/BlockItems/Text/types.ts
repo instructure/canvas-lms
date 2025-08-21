@@ -29,4 +29,5 @@ export type TextViewProps = TextData & TextColor
 export type TextEditProps = TextData & {
   onContentChange: (content: string) => void
   height: number
+  focus?: boolean
 }
