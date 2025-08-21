@@ -16,83 +16,80 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useQuery} from '@tanstack/react-query'
+import {useInfiniteQuery} from '@tanstack/react-query'
 import {executeQuery} from '@canvas/graphql'
 import {gql} from 'graphql-tag'
 import type {Announcement} from '../types'
 
 interface UseAnnouncementsOptions {
   limit?: number
+  filter?: 'unread' | 'read' | 'all'
 }
 
-interface CourseAnnouncement {
-  _id: string
-  title: string
-  message: string
-  createdAt: string
-  contextName: string
-  contextId: string
-  isAnnouncement: boolean
-  author: {
+interface DiscussionParticipant {
+  id: string
+  read: boolean
+  discussionTopic: {
     _id: string
-    name: string
-    avatarUrl: string
-  } | null
-  participant: {
-    id: string
-    read: boolean
-  } | null
-}
-
-interface UserEnrollment {
-  course: {
-    _id: string
-    name: string
-    courseCode: string
-    discussionsConnection: {
-      nodes: CourseAnnouncement[]
-    }
+    title: string
+    message: string
+    createdAt: string
+    contextName: string
+    contextId: string
+    isAnnouncement: boolean
+    author: {
+      _id: string
+      name: string
+      avatarUrl: string
+    } | null
   }
 }
 
 interface GraphQLResponse {
   legacyNode?: {
     _id: string
-    enrollments: UserEnrollment[]
+    discussionParticipantsConnection: {
+      nodes: DiscussionParticipant[]
+      pageInfo: {
+        hasNextPage: boolean
+        hasPreviousPage: boolean
+        startCursor: string | null
+        endCursor: string | null
+      }
+    }
   } | null
   errors?: {message: string}[]
 }
 
 const USER_ANNOUNCEMENTS_QUERY = gql`
-  query GetUserAnnouncements($userId: ID!, $first: Int!) {
+  query GetUserAnnouncements($userId: ID!, $first: Int!, $after: String, $readState: String) {
     legacyNode(_id: $userId, type: User) {
       ... on User {
         _id
-        enrollments {
-          course {
-            _id
-            name
-            courseCode
-            discussionsConnection(first: $first, filter: { isAnnouncement: true }) {
-              nodes {
+        discussionParticipantsConnection(first: $first, after: $after, filter: { isAnnouncement: true, readState: $readState }) {
+          nodes {
+            id
+            read
+            discussionTopic {
+              _id
+              title
+              message
+              createdAt
+              contextName
+              contextId
+              isAnnouncement
+              author {
                 _id
-                title
-                message
-                createdAt
-                contextName
-                contextId
-                isAnnouncement
-                author {
-                  _id
-                  name
-                  avatarUrl
-                }
-                participant {
-                  id
-                  read
-                }
+                name
+                avatarUrl
               }
             }
+          }
+          pageInfo {
+            hasNextPage
+            hasPreviousPage
+            startCursor
+            endCursor
           }
         }
       }
@@ -100,13 +97,13 @@ const USER_ANNOUNCEMENTS_QUERY = gql`
   }
 `
 
-export function useAnnouncements(options: UseAnnouncementsOptions = {}) {
-  const {limit = 10} = options
+export function usePaginatedAnnouncements(options: UseAnnouncementsOptions = {}) {
+  const {limit = 10, filter = 'all'} = options
   const currentUserId = window.ENV?.current_user_id
 
-  return useQuery({
-    queryKey: ['announcements', currentUserId, limit],
-    queryFn: async (): Promise<Announcement[]> => {
+  return useInfiniteQuery({
+    queryKey: ['announcements-paginated', currentUserId, limit, filter],
+    queryFn: async ({pageParam}): Promise<{announcements: Announcement[]; pageInfo: any}> => {
       if (!currentUserId) {
         throw new Error('No current user ID found - please ensure you are logged in')
       }
@@ -114,6 +111,8 @@ export function useAnnouncements(options: UseAnnouncementsOptions = {}) {
       const result = await executeQuery<GraphQLResponse>(USER_ANNOUNCEMENTS_QUERY, {
         userId: currentUserId,
         first: limit,
+        after: pageParam,
+        readState: filter,
       })
 
       if (result.errors) {
@@ -122,35 +121,36 @@ export function useAnnouncements(options: UseAnnouncementsOptions = {}) {
         )
       }
 
-      if (!result.legacyNode?.enrollments) {
-        return []
+      if (!result.legacyNode?.discussionParticipantsConnection) {
+        return {announcements: [], pageInfo: null}
       }
 
-      // Flatten announcements from all courses - GraphQL API handles all permission filtering
-      const allAnnouncements: Announcement[] = result.legacyNode.enrollments
-        .flatMap(enrollment =>
-          enrollment.course.discussionsConnection.nodes.map(announcement => ({
-            id: announcement._id,
-            title: announcement.title,
-            message: announcement.message,
-            posted_at: announcement.createdAt,
-            html_url: `/courses/${enrollment.course._id}/discussion_topics/${announcement._id}`,
-            context_code: `course_${announcement.contextId}`,
-            course: {
-              id: enrollment.course._id,
-              name: enrollment.course.name,
-              courseCode: enrollment.course.courseCode,
-            },
-            author: announcement.author,
-            isRead: announcement.participant?.read ?? false, // Check actual read state from participant
-          })),
-        )
-        .sort((a, b) => new Date(b.posted_at).getTime() - new Date(a.posted_at).getTime())
-        .slice(0, limit)
+      const connection = result.legacyNode.discussionParticipantsConnection
 
-      return allAnnouncements
+      const allAnnouncements: Announcement[] = connection.nodes.map(participant => ({
+        id: participant.discussionTopic._id,
+        title: participant.discussionTopic.title,
+        message: participant.discussionTopic.message,
+        posted_at: participant.discussionTopic.createdAt,
+        html_url: `/courses/${participant.discussionTopic.contextId}/discussion_topics/${participant.discussionTopic._id}`,
+        context_code: `course_${participant.discussionTopic.contextId}`,
+        course: {
+          id: participant.discussionTopic.contextId,
+          name: participant.discussionTopic.contextName,
+          courseCode: '',
+        },
+        author: participant.discussionTopic.author,
+        isRead: participant.read,
+      }))
+
+      return {announcements: allAnnouncements, pageInfo: connection.pageInfo}
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    initialPageParam: undefined,
+    getNextPageParam: lastPage =>
+      lastPage.pageInfo?.hasNextPage ? lastPage.pageInfo.endCursor : undefined,
+    getPreviousPageParam: firstPage =>
+      firstPage.pageInfo?.hasPreviousPage ? firstPage.pageInfo.startCursor : undefined,
+    staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
     retry: false,
     enabled: !!currentUserId,
