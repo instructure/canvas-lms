@@ -25,6 +25,7 @@ import {IconWarningLine} from '@instructure/ui-icons'
 import {TextArea} from '@instructure/ui-text-area'
 import {Text} from '@instructure/ui-text'
 import {HighlightBlockLayout} from './HighlightBlockLayout'
+import {useFocusElement} from '../../hooks/useFocusElement'
 
 export type HighlightBlockProps = {
   content: string
@@ -34,6 +35,24 @@ export type HighlightBlockProps = {
     textColor: string
     backgroundColor: string
   }
+}
+
+const EditMode = ({
+  content,
+  setContent,
+}: {content: string; setContent: (value: string) => void}) => {
+  const {focusHandler} = useFocusElement()
+
+  return (
+    <TextArea
+      textareaRef={element => focusHandler(element)}
+      label={''}
+      placeholder={I18n.t('Start typing...')}
+      value={content}
+      onChange={e => setContent(e.target.value)}
+      resize="vertical"
+    />
+  )
 }
 
 export const HighlightBlockContent = (props: HighlightBlockProps) => {
@@ -71,15 +90,7 @@ export const HighlightBlockContent = (props: HighlightBlockProps) => {
 
   let contentSlot
   if (isEditMode) {
-    contentSlot = (
-      <TextArea
-        label={''}
-        placeholder={I18n.t('Start typing...')}
-        value={content}
-        onChange={e => setContent(e.target.value)}
-        resize="vertical"
-      />
-    )
+    contentSlot = <EditMode content={content} setContent={setContent} />
   } else if (isEditPreviewMode) {
     contentSlot = <PreviewMode>{content || I18n.t('Click to edit')}</PreviewMode>
   } else {
