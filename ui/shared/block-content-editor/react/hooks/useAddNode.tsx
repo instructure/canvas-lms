@@ -32,10 +32,10 @@ export const useAddNode = () => {
     return siblings.indexOf(afterNodeId) + 1
   }
 
-  const addNode = (node: ReactElement, afterNodeId?: string) => {
-    const nodeTree = query.parseReactElement(node).toNodeTree()
+  const addNode = (element: ReactElement, afterNodeId?: string) => {
+    const node = query.createNode(element)
     const index = getIndex(afterNodeId)
-    actions.addNodeTree(nodeTree, 'ROOT', index)
+    actions.add(node, rootNode.id, index)
   }
   return addNode
 }
