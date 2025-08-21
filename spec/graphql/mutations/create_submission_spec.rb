@@ -225,6 +225,19 @@ RSpec.describe Mutations::CreateSubmission do
       ).to be true
     end
 
+    it "sets the correct word count on the submission" do
+      @assignment.update!(submission_types: "online_upload")
+      submission = @assignment.submissions.find_by(user: @student)
+      attachment = create_attachment_for_file_upload_submission!(
+        submission,
+        context: @student,
+        uploaded_data: StringIO.new("@channel MY LEGSSSS!!!!! THEY'RE STUCK UNDER MY DESK!!!!!!!")
+      )
+      run_mutation(submission_type: "online_upload", file_ids: [attachment.id])
+      run_jobs
+      expect(submission.reload.word_count).to eq 8
+    end
+
     it "allows cross-shard users to upload a group assignment" do
       group_model
       @assignment.update!(submission_types: "online_upload", group_category: @course.group_categories.create)
