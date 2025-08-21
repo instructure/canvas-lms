@@ -363,6 +363,7 @@ class AssignmentsController < ApplicationController
 
         env = js_env({
                        COURSE_ID: @context.id,
+                       MODULE_ITEM_ID: params[:module_item_id],
                        ROOT_OUTCOME_GROUP: outcome_group_json(@context.root_outcome_group, @current_user, session),
                        HAS_GRADING_PERIODS: @context.grading_periods?,
                        VALID_DATE_RANGE: CourseDateRange.new(@context),

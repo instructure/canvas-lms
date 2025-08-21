@@ -94,6 +94,10 @@ export const TEACHER_QUERY = gql`
         lid: _id
         name
       }
+      moduleItems {
+        lid: _id
+        title
+      }
       submissionTypes
       allowedExtensions
       allowedAttempts
