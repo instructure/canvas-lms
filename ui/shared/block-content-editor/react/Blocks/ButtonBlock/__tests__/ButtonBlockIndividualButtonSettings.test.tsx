@@ -17,6 +17,7 @@
  */
 
 import {render, screen, fireEvent, act} from '@testing-library/react'
+import {userEvent} from '@testing-library/user-event'
 import {ButtonBlockIndividualButtonSettings} from '../ButtonBlockIndividualButtonSettings'
 import {ButtonData, ButtonBlockIndividualButtonSettingsProps} from '../types'
 
@@ -25,11 +26,22 @@ const createButton = (id: number, options: Partial<ButtonData> = {}): ButtonData
   text: '',
   url: '',
   linkOpenMode: 'new-tab',
+  primaryColor: '#000000',
+  secondaryColor: '#FFFFFF',
+  style: 'filled',
   ...options,
 })
 
 const defaultProps: ButtonBlockIndividualButtonSettingsProps = {
-  initialButtons: [createButton(1, {text: 'Button 1'}), createButton(2, {text: 'Button 2'})],
+  backgroundColor: '#FFFFFF',
+  initialButtons: [
+    createButton(1, {
+      text: 'Button 1',
+    }),
+    createButton(2, {
+      text: 'Button 2',
+    }),
+  ],
   onButtonsChange: jest.fn(),
 }
 
@@ -103,9 +115,17 @@ describe('ButtonBlockIndividualButtonSettings', () => {
 
       expect(screen.getByTestId('button-settings-toggle-3')).toBeVisible()
       expect(buttonsChanged).toHaveBeenCalledWith([
-        createButton(1, {text: 'Button 1'}),
-        createButton(2, {text: 'Button 2'}),
-        createButton(3),
+        createButton(1, {
+          text: 'Button 1',
+        }),
+        createButton(2, {
+          text: 'Button 2',
+        }),
+        createButton(3, {
+          text: '',
+          primaryColor: '#2B7ABC',
+          secondaryColor: '#FFFFFF',
+        }),
       ])
     })
 
@@ -178,6 +198,108 @@ describe('ButtonBlockIndividualButtonSettings', () => {
         createButton(1, {text: 'Updated Button 1'}),
         createButton(2, {text: 'Button 2'}),
       ])
+    })
+
+    describe('updates button color', () => {
+      it('updates button background color', async () => {
+        const buttonsChanged = jest.fn()
+        const newColor = '#FF0000'
+        render(
+          <ButtonBlockIndividualButtonSettings
+            {...defaultProps}
+            onButtonsChange={buttonsChanged}
+          />,
+        )
+        clickToggleButton(1)
+
+        const colorInput = screen.getByLabelText(/background color/i)
+
+        await userEvent.clear(colorInput)
+        await userEvent.type(colorInput, newColor)
+
+        expect(buttonsChanged).toHaveBeenCalledWith([
+          createButton(1, {text: 'Button 1', primaryColor: newColor}),
+          createButton(2, {text: 'Button 2'}),
+        ])
+      })
+
+      it('updates button text color', async () => {
+        const buttonsChanged = jest.fn()
+        const newColor = '#051b53ff'
+        render(
+          <ButtonBlockIndividualButtonSettings
+            {...defaultProps}
+            onButtonsChange={buttonsChanged}
+          />,
+        )
+        clickToggleButton(1)
+
+        const colorInput = screen.getByLabelText(/text color/i)
+
+        await userEvent.clear(colorInput)
+        await userEvent.type(colorInput, newColor)
+
+        expect(buttonsChanged).toHaveBeenCalledWith([
+          createButton(1, {text: 'Button 1', secondaryColor: newColor}),
+          createButton(2, {text: 'Button 2'}),
+        ])
+      })
+    })
+
+    describe('button style', () => {
+      const renderStyleTest = (onButtonsChange = jest.fn()) => {
+        const propsWithStyles = {
+          ...defaultProps,
+          initialButtons: [
+            createButton(1, {text: 'Button 1', style: 'filled'}),
+            createButton(2, {text: 'Button 2', style: 'outlined'}),
+          ],
+          onButtonsChange,
+        }
+        render(<ButtonBlockIndividualButtonSettings {...propsWithStyles} />)
+        return onButtonsChange
+      }
+
+      it('updates button style to outlined', () => {
+        const buttonsChanged = renderStyleTest()
+        clickToggleButton(1)
+
+        fireEvent.click(screen.getByTestId('select-button-style-dropdown'))
+        fireEvent.click(screen.getByText('Outlined'))
+
+        expect(buttonsChanged).toHaveBeenCalledWith([
+          createButton(1, {text: 'Button 1', style: 'outlined'}),
+          createButton(2, {text: 'Button 2', style: 'outlined'}),
+        ])
+      })
+
+      it('button color picker is shown, when style is outlined', () => {
+        renderStyleTest()
+        clickToggleButton(2)
+
+        expect(screen.getByText(/button color/i)).toBeInTheDocument()
+      })
+
+      it('updates button style to filled', () => {
+        const buttonsChanged = renderStyleTest()
+        clickToggleButton(2)
+
+        fireEvent.click(screen.getByTestId('select-button-style-dropdown'))
+        fireEvent.click(screen.getByText('Filled'))
+
+        expect(buttonsChanged).toHaveBeenCalledWith([
+          createButton(1, {text: 'Button 1', style: 'filled'}),
+          createButton(2, {text: 'Button 2', style: 'filled'}),
+        ])
+      })
+
+      it('both color picker is visible, when style is filled', () => {
+        renderStyleTest()
+        clickToggleButton(1)
+
+        expect(screen.getByText(/background color/i)).toBeInTheDocument()
+        expect(screen.getByText(/text color/i)).toBeInTheDocument()
+      })
     })
 
     it('updates button url', () => {

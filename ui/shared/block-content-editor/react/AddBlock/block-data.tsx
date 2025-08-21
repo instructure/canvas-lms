@@ -59,7 +59,17 @@ export const blockFactory = {
         alignment: 'left',
         layout: 'horizontal',
         isFullWidth: false,
-        buttons: [{id: 1, text: '', url: '', linkOpenMode: 'new-tab'}],
+        buttons: [
+          {
+            id: 1,
+            text: '',
+            url: '',
+            linkOpenMode: 'new-tab',
+            primaryColor: colors.primitives.blue45,
+            secondaryColor: colors.primitives.white,
+            style: 'filled',
+          },
+        ],
         backgroundColor: defaultBackgroundColor,
         textColor: defaultTextColor,
       }}

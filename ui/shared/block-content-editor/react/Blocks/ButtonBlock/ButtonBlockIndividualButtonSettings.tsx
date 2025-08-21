@@ -23,16 +23,18 @@ import {TextInput} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {IconTrashLine, IconAddLine} from '@instructure/ui-icons'
-import {SimpleSelect} from '@instructure/ui-simple-select'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import './individual-button-settings.css'
-import {ButtonData, ButtonBlockIndividualButtonSettingsProps} from './types'
+import {ButtonData, ButtonBlockIndividualButtonSettingsProps, ButtonStyle} from './types'
 import {useButtonManager} from './useButtonManager'
 import {ToggleGroup} from '@instructure/ui-toggle-details'
+import {SimpleSelect} from '@instructure/ui-simple-select'
+import {ColorPickerWrapper} from '../BlockItems/ColorPickerWrapper'
 
 const I18n = createI18nScope('block_content_editor')
 
 export const ButtonBlockIndividualButtonSettings = ({
+  backgroundColor,
   initialButtons,
   onButtonsChange,
 }: ButtonBlockIndividualButtonSettingsProps) => {
@@ -80,6 +82,37 @@ export const ButtonBlockIndividualButtonSettings = ({
         onChange={(_e, value) => updateButton(button.id, {text: value})}
         placeholder={I18n.t('Button')}
       />
+      <SimpleSelect
+        renderLabel={I18n.t('Button style')}
+        value={button.style}
+        onChange={(_e, option) => updateButton(button.id, {style: option.value as ButtonStyle})}
+        data-testid="select-button-style-dropdown"
+      >
+        <SimpleSelect.Option id="filled" key="filled" value="filled">
+          {I18n.t('Filled')}
+        </SimpleSelect.Option>
+        <SimpleSelect.Option id="outlined" key="outlined" value="outlined">
+          {I18n.t('Outlined')}
+        </SimpleSelect.Option>
+      </SimpleSelect>
+      <ColorPickerWrapper
+        label={button.style === 'filled' ? I18n.t('Background color') : I18n.t('Button color')}
+        value={button.primaryColor}
+        baseColor={button.style === 'filled' ? button.secondaryColor : backgroundColor}
+        baseColorLabel={
+          button.style === 'filled' ? I18n.t('Text color') : I18n.t('Background color')
+        }
+        onChange={color => updateButton(button.id, {primaryColor: color})}
+      />
+      {button.style === 'filled' && (
+        <ColorPickerWrapper
+          label={I18n.t('Text color')}
+          value={button.secondaryColor}
+          baseColor={button.primaryColor}
+          baseColorLabel={I18n.t('Background color')}
+          onChange={color => updateButton(button.id, {secondaryColor: color})}
+        />
+      )}
       <TextInput
         renderLabel={I18n.t('Url')}
         value={button.url}

@@ -134,6 +134,7 @@ export const ButtonBlockSettings = () => {
         includeSeparator={false}
       >
         <ButtonBlockIndividualButtonSettings
+          backgroundColor={backgroundColor}
           initialButtons={buttons}
           onButtonsChange={handleButtonsChange}
         />

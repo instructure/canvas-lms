@@ -19,6 +19,9 @@
 import {Button} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {SingleButtonProps} from './types'
+import {alpha} from '@instructure/ui-color-utils'
+import {BaseButtonTheme} from '@instructure/shared-types'
+import {getAdjustedColor} from './getAdjustedColor'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -30,9 +33,31 @@ export const SingleButton = ({button, isFullWidth, onButtonClick}: SingleButtonP
   const isNewTabLink = button.linkOpenMode === 'new-tab'
   const href = shouldUseLink ? url : undefined
 
+  const boxShadow = 'inset 0 0 0.1875rem 0.0625rem'
+
+  const adjustedPrimaryColor = getAdjustedColor(button.primaryColor)
+  const adjustedBoxShadow = `${boxShadow} ${alpha(adjustedPrimaryColor, 28)}`
+
+  const themeOverride = (): Partial<BaseButtonTheme> => {
+    return {
+      secondaryActiveBackground: adjustedPrimaryColor,
+      secondaryActiveBoxShadow: adjustedBoxShadow,
+      secondaryBackground: button.primaryColor,
+      secondaryBorderColor: button.primaryColor,
+      secondaryColor: button.secondaryColor,
+      secondaryHoverBackground: adjustedPrimaryColor,
+      secondaryGhostColor: adjustedPrimaryColor,
+      secondaryGhostBorderColor: adjustedPrimaryColor,
+      secondaryGhostHoverBackground: `${alpha(adjustedPrimaryColor, 10)}`,
+      secondaryGhostActiveBoxShadow: adjustedBoxShadow,
+    }
+  }
+
   return (
     <Button
       display={isFullWidth ? 'block' : 'inline-block'}
+      withBackground={button.style == 'filled'}
+      themeOverride={themeOverride}
       href={href}
       target={href && isNewTabLink ? '_blank' : undefined}
       rel={href && isNewTabLink ? 'noopener noreferrer' : undefined}
