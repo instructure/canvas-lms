@@ -159,6 +159,7 @@ describe DataFixup::CreateLtiRegistrationsFromDeveloperKeys do
     let(:policy_uri) { "http://example.com/policy" }
     let(:lti_tool_configuration) do
       {
+        target_link_uri: "https://example.com/launch",
         domain: "example.com",
         messages: [],
         claims: []

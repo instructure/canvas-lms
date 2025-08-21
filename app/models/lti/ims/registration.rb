@@ -55,7 +55,8 @@ class Lti::IMS::Registration < ApplicationRecord
   validate :redirect_uris_contains_uris,
            :lti_tool_configuration_is_valid,
            :scopes_are_valid,
-           :validate_overlay
+           :validate_overlay,
+           :target_link_uri_is_uri
 
   validates :initiate_login_uri,
             :jwks_uri,
@@ -248,6 +249,12 @@ class Lti::IMS::Registration < ApplicationRecord
   end
 
   private
+
+  def target_link_uri_is_uri
+    return if lti_tool_configuration["target_link_uri"]&.match?(URI::DEFAULT_PARSER.make_regexp(["http", "https"]))
+
+    errors.add(:lti_tool_configuration, "target_link_uri must be a valid URI")
+  end
 
   def redirect_uris_contains_uris
     return if redirect_uris.all? { |uri| uri.match? URI::DEFAULT_PARSER.make_regexp(["http", "https"]) }
