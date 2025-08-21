@@ -101,6 +101,52 @@ const AssignToContent = ({
     [type],
   )
 
+  // Helper function to detect if card structure has changed (not just dates)
+  const hasStructuralChanges = useCallback((currentCards, newCards) => {
+    if (!currentCards || !newCards) return true
+
+    const currentKeys = Object.keys(currentCards)
+    const newKeys = Object.keys(newCards)
+
+    // Different number of cards
+    if (currentKeys.length !== newKeys.length) return true
+
+    // Different card IDs
+    if (!currentKeys.every(key => newKeys.includes(key))) return true
+
+    // Check if assignees have changed for any card
+    for (const cardId of currentKeys) {
+      const currentOverrides = currentCards[cardId]?.overrides || []
+      const newOverrides = newCards[cardId]?.overrides || []
+
+      // Different number of overrides
+      if (currentOverrides.length !== newOverrides.length) return true
+
+      // Check if assignee structure has changed (ignoring dates)
+      const currentAssignees = currentOverrides.map(o => ({
+        student_ids: o.student_ids?.sort(),
+        course_section_id: o.course_section_id,
+        group_id: o.group_id,
+        course_id: o.course_id,
+        noop_id: o.noop_id,
+      }))
+
+      const newAssignees = newOverrides.map(o => ({
+        student_ids: o.student_ids?.sort(),
+        course_section_id: o.course_section_id,
+        group_id: o.group_id,
+        course_id: o.course_id,
+        noop_id: o.noop_id,
+      }))
+
+      if (JSON.stringify(currentAssignees) !== JSON.stringify(newAssignees)) {
+        return true
+      }
+    }
+
+    return false
+  }, [])
+
   useEffect(() => {
     const newGroupCategoryId = getGroupCategoryId?.()
     if (newGroupCategoryId !== undefined && newGroupCategoryId !== groupCategoryId) {
@@ -134,11 +180,14 @@ const AssignToContent = ({
       }
       return override
     })
-    setStagedOverrides(updatedOverrides)
+    if (stagedOverridesRef.current === null) {
+      setStagedOverrides(updatedOverrides)
+    }
   }, [overrides])
 
   useEffect(() => {
     if (stagedOverridesRef.current === null) return
+
     const parsedOverrides = getParsedOverrides(
       stagedOverridesRef.current,
       stagedCards,
@@ -146,7 +195,12 @@ const AssignToContent = ({
       defaultSectionId,
     )
     const uniqueOverrides = removeOverriddenAssignees(overrides, parsedOverrides)
-    setStagedCards(uniqueOverrides)
+
+    // Only update stagedCards if the structure has actually changed
+    // This prevents unnecessary rebuilds that lose dates during date-only updates
+    if (initialState === null || hasStructuralChanges(stagedCards, uniqueOverrides)) {
+      setStagedCards(uniqueOverrides)
+    }
     if (initialState === null) {
       const state = cloneObject(uniqueOverrides)
       // initialState is set only 1 time to check if the overrides have pending changes
@@ -369,7 +423,7 @@ const AssignToContent = ({
   const handleDatesUpdate = (cardId, dateType, newDate) => {
     const card = {...stagedCardsRef.current[cardId]}
     const oldOverrides = card.overrides || []
-    const oldDates = card.dates
+    const oldDates = card.dates || {} // Ensure oldDates is never undefined
     const date = newDate === '' ? null : newDate
 
     const initialModuleOverrideState = initialModuleOverrides.find(obj => obj.rowKey === cardId)
@@ -392,6 +446,22 @@ const AssignToContent = ({
     })
 
     updateCard(cardId, newOverrides, newDates)
+
+    // Ensure stagedOverridesRef stays in sync with stagedCards
+    const updatedStagedOverrides = stagedOverridesRef.current.map(override => {
+      if (override.rowKey === cardId || override.rowKey === cardId.toString()) {
+        return {
+          ...override,
+          [dateType]: date,
+          [`${dateType}_overridden`]: !!date,
+          context_module_id: hasDates ? null : initialModuleOverrideState?.context_module_id,
+          context_module_name: hasDates ? null : initialModuleOverrideState?.context_module_name,
+        }
+      }
+      return override
+    })
+
+    setStagedOverrides(updatedStagedOverrides)
   }
 
   const handleAssigneeAddition = (cardId, newAssignee) => {
@@ -503,13 +573,7 @@ const AssignToContent = ({
       )
     }
     return null
-  }, [
-    handleImportantDatesChange,
-    supportDueDates,
-    stagedImportantDates,
-
-    stagedCardsRef?.current,
-  ])
+  }, [handleImportantDatesChange, supportDueDates, stagedImportantDates])
 
   return (
     <View as="div" padding="x-small 0 0 0">
