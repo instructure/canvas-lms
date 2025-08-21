@@ -674,6 +674,14 @@ describe AssignmentsController do
       assert_status(404)
     end
 
+    it "js_env MODULE_ITEM_ID is set when provided in params" do
+      user_session(@student)
+      a = @course.assignments.create(title: "some assignment")
+
+      get "show", params: { course_id: @course.id, id: a.id, module_item_id: "12345" }
+      expect(assigns[:js_env][:MODULE_ITEM_ID]).to eq "12345"
+    end
+
     context "with public course" do
       let(:course) { course_factory(active_all: true, is_public: true) }
       let(:assignment) { assignment_model(course:, submission_types: "online_url") }

@@ -60,6 +60,7 @@ export interface EnvAssignmentsA2StudentView {
   EMOJIS_ENABLED: boolean
   EMOJI_DENY_LIST: any[]
   COURSE_ID: string | number
+  MODULE_ITEM_ID?: string | number
   ISOBSERVER: boolean
   ORIGINALITY_REPORTS_FOR_A2: boolean
   PREREQS: any
