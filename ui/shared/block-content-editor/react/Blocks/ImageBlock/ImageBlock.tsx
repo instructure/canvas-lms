@@ -59,7 +59,7 @@ const ImageContainer = (props: ImageBlockProps) => {
     <>
       {isEditMode && (
         <Layout>
-          {props.settings.includeBlockTitle && (
+          {props.settings?.includeBlockTitle && (
             <TitleEdit title={title} onTitleChange={onTitleChange} />
           )}
           <ImageEdit {...props} onImageChange={onImageChange} />
@@ -67,13 +67,17 @@ const ImageContainer = (props: ImageBlockProps) => {
       )}
       {isEditPreviewMode && (
         <Layout>
-          {props.settings.includeBlockTitle && <TitleEditPreview contentColor="" title={title} />}
+          {props.settings?.includeBlockTitle && (
+            <TitleEditPreview contentColor={props.settings?.textColor || ''} title={title} />
+          )}
           <ImageView {...props} />
         </Layout>
       )}
       {isViewMode && (
         <Layout>
-          {props.settings.includeBlockTitle && <TitleView contentColor="" title={title} />}
+          {props.settings?.includeBlockTitle && (
+            <TitleView contentColor={props.settings?.textColor || ''} title={title} />
+          )}
           <ImageView {...props} />
         </Layout>
       )}
@@ -83,7 +87,11 @@ const ImageContainer = (props: ImageBlockProps) => {
 
 export const ImageBlock = (props: ImageBlockProps) => {
   return (
-    <BaseBlock title={ImageBlock.craft.displayName} statefulProps={{title: props.title}}>
+    <BaseBlock
+      title={ImageBlock.craft.displayName}
+      statefulProps={{title: props.title}}
+      backgroundColor={props.settings?.backgroundColor}
+    >
       <ImageContainer {...props} />
     </BaseBlock>
   )

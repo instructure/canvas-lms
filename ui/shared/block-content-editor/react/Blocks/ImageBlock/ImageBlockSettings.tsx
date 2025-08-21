@@ -26,6 +26,7 @@ import {ImageData} from '../BlockItems/Image/types'
 import {SettingsIncludeTitle} from '../BlockItems/SettingsIncludeTitle/SettingsIncludeTitle'
 import {SettingsSectionToggle} from '../BlockItems/SettingsSectionToggle/SettingsSectionToggle'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {ColorPickerWrapper} from '../BlockItems/ColorPickerWrapper'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -33,6 +34,8 @@ export const ImageBlockSettings = () => {
   const {
     actions: {setProp},
     includeBlockTitle,
+    backgroundColor,
+    textColor,
     caption,
     altText,
     altTextAsCaption,
@@ -41,6 +44,8 @@ export const ImageBlockSettings = () => {
     fileName,
   } = useNode(node => ({
     includeBlockTitle: !!node.data.props.settings?.includeBlockTitle,
+    backgroundColor: node.data.props.settings?.backgroundColor,
+    textColor: node.data.props.settings?.textColor,
     caption: node.data.props.caption,
     altText: node.data.props.altText,
     altTextAsCaption: node.data.props.altTextAsCaption,
@@ -52,6 +57,18 @@ export const ImageBlockSettings = () => {
   const handleIncludeBlockTitleChange = () => {
     setProp((props: ImageBlockProps) => {
       props.settings.includeBlockTitle = !includeBlockTitle
+    })
+  }
+
+  const handleBackgroundColorChange = (color: string) => {
+    setProp((props: ImageBlockProps) => {
+      props.settings.backgroundColor = color
+    })
+  }
+
+  const handleTextColorChange = (color: string) => {
+    setProp((props: ImageBlockProps) => {
+      props.settings.textColor = color
     })
   }
 
@@ -99,6 +116,32 @@ export const ImageBlockSettings = () => {
   return (
     <View as="div">
       <SettingsIncludeTitle checked={includeBlockTitle} onChange={handleIncludeBlockTitleChange} />
+      <SettingsSectionToggle
+        title={I18n.t('Color settings')}
+        collapsedLabel={I18n.t('Expand color settings')}
+        expandedLabel={I18n.t('Collapse color settings')}
+        defaultExpanded={false}
+        includeSeparator={true}
+      >
+        <View as="div" margin="0 0 medium 0">
+          <ColorPickerWrapper
+            label={I18n.t('Background color')}
+            value={backgroundColor}
+            baseColor={textColor}
+            baseColorLabel={I18n.t('Default text color')}
+            onChange={handleBackgroundColorChange}
+          />
+        </View>
+        <View as="div">
+          <ColorPickerWrapper
+            label={I18n.t('Default text color')}
+            value={textColor}
+            baseColor={backgroundColor}
+            baseColorLabel={I18n.t('Background color')}
+            onChange={handleTextColorChange}
+          />
+        </View>
+      </SettingsSectionToggle>
       <SettingsSectionToggle
         title={I18n.t('Image settings')}
         collapsedLabel={I18n.t('Expand image settings')}
