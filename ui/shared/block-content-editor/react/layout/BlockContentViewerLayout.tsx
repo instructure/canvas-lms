@@ -24,7 +24,7 @@ export const BlockContentViewerLayout = (props: {
 }) => {
   return (
     <div className="block-content-editor-container">
-      <div className="editor-area">{props.editor}</div>
+      <div className="viewer-area">{props.editor}</div>
     </div>
   )
 }

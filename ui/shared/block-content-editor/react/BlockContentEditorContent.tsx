@@ -38,7 +38,7 @@ export const BlockContentEditorContent = (props: BlockContentEditorProps) => {
       <SettingsTrayRenderer />
       <AddBlock />
       <Frame data={frameData}>
-        <Element canvas is="div"></Element>
+        <Element canvas is="div" className="content-wrapper"></Element>
       </Frame>
     </>
   )
