@@ -22,7 +22,11 @@ import {ImageTextBlockProps} from '../types'
 
 jest.mock('../../../BlockContentEditorContext', () => ({
   __esModule: true,
-  useBlockContentEditorContext: jest.fn(() => ({})),
+  useBlockContentEditorContext: jest.fn(() => ({
+    settingsTray: {
+      isOpen: false,
+    },
+  })),
 }))
 
 const useGetRenderModeMock = jest.fn()

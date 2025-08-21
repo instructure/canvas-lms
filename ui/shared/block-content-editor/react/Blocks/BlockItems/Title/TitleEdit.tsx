@@ -16,18 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {ChangeEvent} from 'react'
 import {TextInput} from '@instructure/ui-text-input'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {ChangeEvent} from 'react'
 import {TitleEditProps} from './types'
+import {useFocusElement} from '../../../hooks/useFocusElement'
 
 const I18n = createI18nScope('block_content_editor')
 
-export const TitleEdit = ({title, onTitleChange}: TitleEditProps) => {
+export const TitleEdit = ({title, onTitleChange, focus}: TitleEditProps) => {
+  const {refHandler} = useFocusElement(focus)
   const handleOnChange = (event: ChangeEvent<HTMLInputElement>) => onTitleChange(event.target.value)
 
   return (
     <TextInput
+      elementRef={refHandler}
       renderLabel={I18n.t('Block title')}
       placeholder={I18n.t('Start typing...')}
       value={title}

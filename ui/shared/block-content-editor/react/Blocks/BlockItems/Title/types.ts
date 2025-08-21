@@ -27,4 +27,5 @@ export type TitleViewProps = TitleData & TitleColor
 export type TitleEditPreviewProps = TitleData & TitleColor
 export type TitleEditProps = TitleData & {
   onTitleChange: (newTitle: string) => void
+  focus?: boolean
 }
