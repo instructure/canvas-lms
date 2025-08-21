@@ -130,8 +130,8 @@ describe "discussions" do
 
       it "can convert ungraded to graded and checkpointed" do
         get "/courses/#{course.id}/discussion_topics/#{@topic_no_options.id}/edit"
-        force_click_native("input[data-testid='graded-checkbox']")
-        force_click_native("input[data-testid='checkpoints-checkbox']")
+        force_click_native("span[data-testid='graded-checkbox'] input")
+        force_click_native("span[data-testid='checkpoints-checkbox'] input")
         fj("button:contains('Save')").click
         expect(@topic_no_options.reload.checkpoints?).to be_truthy
       end
@@ -139,8 +139,8 @@ describe "discussions" do
       it "cannot convert ungraded to checkpointed if there are replies" do
         @topic_no_options.reply_from({ user: teacher, text: "I feel pretty" })
         get "/courses/#{course.id}/discussion_topics/#{@topic_no_options.id}/edit"
-        force_click_native("input[data-testid='graded-checkbox']")
-        expect(f("input[data-testid='checkpoints-checkbox']").attribute("disabled")).to be_truthy
+        force_click_native("span[data-testid='graded-checkbox'] input")
+        expect(f("span[data-testid='checkpoints-checkbox'] input").attribute("disabled")).to be_truthy
         expect(fj("span[class*='screenReaderContent']:contains('Checkpoints cannot be toggled after replies have been made.')")).to be_present
       end
 
@@ -564,7 +564,7 @@ describe "discussions" do
         expect(fj("span:contains('#{grading_standard.title}')").present?).to be_truthy
         expect(fj("span:contains('Manage All Grading Schemes')").present?).to be_truthy
         # Graded checkbox
-        expect(is_checked(f("input[data-testid='graded-checkbox']"))).to be_truthy
+        expect(is_checked(f("span[data-testid='graded-checkbox'] input"))).to be_truthy
         # Points possible
         expect(f("input[data-testid='points-possible-input']").attribute("value")).to eq "10"
         # Grading type
@@ -747,7 +747,7 @@ describe "discussions" do
 
         force_click_native("input[data-testid='peer_review_manual']")
 
-        force_click_native("input[data-testid='group-discussion-checkbox']")
+        force_click_native("span[data-testid='group-discussion-checkbox'] input")
         force_click_native("input[placeholder='Select a group category']")
         fj("li:contains('#{group_cat.name}')").click
 
@@ -996,7 +996,7 @@ describe "discussions" do
           get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
 
           # select group category
-          force_click_native("input[data-testid='group-discussion-checkbox']")
+          force_click_native("span[data-testid='group-discussion-checkbox'] input")
           force_click_native("input[placeholder='Select a group category']")
           fj("li:contains('#{group_category.name}')").click
 
@@ -1595,11 +1595,11 @@ describe "discussions" do
           topic = group_discussion_assignment
           preserved_id = topic.group_category.id
           get "/courses/#{course.id}/discussion_topics/#{topic.id}/edit"
-          expect(f("input[data-testid='group-discussion-checkbox']").attribute("checked")).to be_truthy
+          expect(f("span[data-testid='group-discussion-checkbox'] input").attribute("checked")).to be_truthy
           expect(f("#discussion_group_category_id").attribute("value")).to eq topic.group_category.name
 
-          force_click_native("input[data-testid='checkpoints-checkbox']")
-          expect(f("input[data-testid='group-discussion-checkbox']").attribute("checked")).to be_truthy
+          force_click_native("span[data-testid='checkpoints-checkbox'] input")
+          expect(f("span[data-testid='group-discussion-checkbox'] input").attribute("checked")).to be_truthy
           expect(f("#discussion_group_category_id").attribute("value")).to eq topic.group_category.name
           fj("button:contains('Save')").click
           expect(topic.reload.group_category.id).to eq preserved_id

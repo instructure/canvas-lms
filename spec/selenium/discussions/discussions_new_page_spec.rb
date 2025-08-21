@@ -652,7 +652,7 @@ describe "discussions" do
 
         f("input[placeholder='Topic Title']").send_keys title
         type_in_tiny("textarea", message)
-        force_click_native("input[data-testid='require-initial-post-checkbox']")
+        force_click_native("span[data-testid='require-initial-post-checkbox'] input")
         f("button[data-testid='save-and-publish-button']").click
         wait_for_ajaximations
         dt = DiscussionTopic.last
@@ -766,8 +766,8 @@ describe "discussions" do
 
         get "/courses/#{course.id}/discussion_topics/new"
         f("input[placeholder='Topic Title']").send_keys "my group discussion from course"
-        force_click_native("input[data-testid='require-initial-post-checkbox']")
-        force_click_native("input[data-testid='group-discussion-checkbox']")
+        force_click_native("span[data-testid='require-initial-post-checkbox'] input")
+        force_click_native("span[data-testid='group-discussion-checkbox'] input")
         f("input[placeholder='Select a group category']").click
         force_click_native("[data-testid='group-category-opt-#{group_category.id}']")
         f("button[data-testid='save-and-publish-button']").click
@@ -782,7 +782,7 @@ describe "discussions" do
         group
 
         get "/courses/#{course.id}/discussion_topics/new"
-        force_click_native("input[data-testid='group-discussion-checkbox']")
+        force_click_native("span[data-testid='group-discussion-checkbox'] input")
         f("input[placeholder='Select a group category']").click
         wait_for_ajaximations
         force_click_native("[data-testid='group-category-opt-new-group-category']")
@@ -1630,7 +1630,7 @@ describe "discussions" do
             f("input[data-testid='reply-to-entry-required-count']").send_keys :backspace
             f("input[data-testid='reply-to-entry-required-count']").send_keys 3
             f("input[data-testid='points-possible-input-reply-to-entry']").send_keys "7"
-            force_click_native("input[data-testid='group-discussion-checkbox']")
+            force_click_native("span[data-testid='group-discussion-checkbox'] input")
             f("input[placeholder='Select a group category']").click
             force_click_native("[data-testid='group-category-opt-#{group_category.id}']")
 
