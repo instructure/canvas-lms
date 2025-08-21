@@ -55,6 +55,8 @@ export const blockFactory = {
       decorativeImage={false}
       settings={{
         includeBlockTitle: true,
+        backgroundColor: defaultBackgroundColor,
+        textColor: defaultTextColor,
       }}
     />
   ),

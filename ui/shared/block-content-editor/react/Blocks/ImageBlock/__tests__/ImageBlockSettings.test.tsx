@@ -19,10 +19,19 @@
 import {ImageBlockSettings} from '../ImageBlockSettings'
 import {renderBlock} from '../../__tests__/render-helper'
 import userEvent from '@testing-library/user-event'
+import {ImageTextBlockSettings} from '../../ImageTextBlock/ImageTextBlockSettings'
+import {RenderResult, waitFor} from '@testing-library/react'
 
 const getSettings = (settings: object) => ({
   settings: {...settings},
 })
+
+const color = '123456'
+
+const toggleSection = async (component: RenderResult, name: RegExp | string) => {
+  const button = component.getByRole('button', {name})
+  await userEvent.click(button)
+}
 
 describe('ImageBlockSettings', () => {
   describe('include title', () => {
@@ -91,6 +100,31 @@ describe('ImageBlockSettings', () => {
       await userEvent.click(component.getByTestId('remove-image-button'))
       expect(component.getByText('Upload image')).toBeInTheDocument()
       expect(component.queryByText('my-image.jpg')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('background color', () => {
+    it('integrates, changing the state', async () => {
+      const component = renderBlock(
+        ImageTextBlockSettings,
+        getSettings({backgroundColor: '000000'}),
+      )
+      await toggleSection(component, /Expand color settings/i)
+      const input = component.getByLabelText(/Background color/i) as HTMLInputElement
+      await userEvent.clear(input)
+      await userEvent.type(input, color)
+      await waitFor(() => expect(input.value).toBe(color))
+    })
+  })
+
+  describe('default text color', () => {
+    it('integrates, changing the state', async () => {
+      const component = renderBlock(ImageTextBlockSettings, getSettings({textColor: '000000'}))
+      await toggleSection(component, /Expand color settings/i)
+      const input = component.getByLabelText(/Default text color/i) as HTMLInputElement
+      await userEvent.clear(input)
+      await userEvent.type(input, color)
+      await waitFor(() => expect(input.value).toBe(color))
     })
   })
 })
