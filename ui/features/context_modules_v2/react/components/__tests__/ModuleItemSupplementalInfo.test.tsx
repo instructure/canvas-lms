@@ -371,11 +371,6 @@ describe('ModuleItemSupplementalInfo', () => {
       },
     }
 
-    beforeEach(() => {
-      // Reset ENV for each test
-      ENV.FEATURES = {standardize_assignment_date_formatting: false}
-    })
-
     describe('graded discussion date handling', () => {
       it('displays assignment.dueAt for graded discussion', () => {
         const container = setUp(gradedDiscussionWithAssignmentDueAt, null)
@@ -391,8 +386,7 @@ describe('ModuleItemSupplementalInfo', () => {
         expect(container.getAllByText('|')).toHaveLength(1)
       })
 
-      it('integrates with standardized dates when feature flag enabled', () => {
-        ENV.FEATURES = {standardize_assignment_date_formatting: true}
+      it('integrates with standardized dates', () => {
         const container = setUp(discussionWithStandardizedDates, null)
         expect(container.getByText('Multiple Due Dates')).toBeInTheDocument()
         expect(container.getByText('20 pts')).toBeInTheDocument()
@@ -400,7 +394,6 @@ describe('ModuleItemSupplementalInfo', () => {
       })
 
       it('shows single date for single standardized date', () => {
-        ENV.FEATURES = {standardize_assignment_date_formatting: true}
         const singleDateContent = {
           ...discussionWithStandardizedDates,
           assignedToDates: [discussionWithStandardizedDates.assignedToDates![0]],
@@ -491,7 +484,6 @@ describe('ModuleItemSupplementalInfo', () => {
       })
 
       it('handles malformed discussion data', () => {
-        ENV.FEATURES = {standardize_assignment_date_formatting: true}
         const container = setUp(discussionWithMalformedData, null)
         expect(container.getByText('15 pts')).toBeInTheDocument()
         expect(container.queryByTestId('due-date')).not.toBeInTheDocument()

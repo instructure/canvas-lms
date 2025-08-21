@@ -224,7 +224,7 @@ module Quizzes
     end
 
     def all_dates
-      Account.site_admin.feature_enabled?(:standardize_assignment_date_formatting) ? quiz.dates_hash_visible_to_v2(user, include_all_dates: true) : quiz.formatted_dates_hash(quiz.all_due_dates)
+      quiz.dates_hash_visible_to(user, include_all_dates: true)
     end
 
     def section_count

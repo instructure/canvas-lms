@@ -325,11 +325,6 @@ describe('DueDateLabel', () => {
         ],
       }
 
-      beforeEach(() => {
-        // Reset ENV for each test
-        ENV.FEATURES = {standardize_assignment_date_formatting: false}
-      })
-
       describe('graded discussions', () => {
         it('shows assignment.dueAt for graded discussion', () => {
           const container = setUp(gradedDiscussionWithAssignmentDueAt)
@@ -345,7 +340,6 @@ describe('DueDateLabel', () => {
         })
 
         it('shows Multiple Due Dates for graded discussion with standardized dates', () => {
-          ENV.FEATURES = {standardize_assignment_date_formatting: true}
           const container = setUp(gradedDiscussionWithStandardizedDates)
           expect(container.getByText('Multiple Due Dates')).toBeInTheDocument()
           // The tooltip contains multiple due-date elements, but the main display should not show individual dates
@@ -353,7 +347,6 @@ describe('DueDateLabel', () => {
         })
 
         it('shows single date for graded discussion with single standardized date', () => {
-          ENV.FEATURES = {standardize_assignment_date_formatting: true}
           const singleDateContent = {
             ...gradedDiscussionWithStandardizedDates,
             assignedToDates: [gradedDiscussionWithStandardizedDates.assignedToDates![0]],
@@ -424,70 +417,6 @@ describe('DueDateLabel', () => {
         it('handles overrides with no due dates gracefully', () => {
           const container = setUp(discussionWithOverridesButNoDates)
           expect(container.container.firstChild).toBeNull()
-        })
-      })
-
-      describe('standardized dates feature flag', () => {
-        const discussionWithBothFormats: ModuleItemContent = {
-          id: '20',
-          _id: '20',
-          type: 'Discussion',
-          graded: true,
-          dueAt: '2024-01-15T23:59:59Z',
-          assignment: {
-            _id: 'assignment-20',
-            dueAt: '2024-01-15T23:59:59Z',
-            assignmentOverrides: {
-              edges: [
-                {
-                  cursor: 'MQ',
-                  node: {
-                    dueAt: '2024-01-16T23:59:59Z',
-                    set: {sectionId: '1'},
-                  },
-                },
-              ],
-            },
-          },
-          assignedToDates: [
-            {
-              id: 'everyone',
-              dueAt: '2024-01-15T23:59:59Z',
-              title: 'Everyone',
-              base: true,
-            },
-            {
-              id: 'section-1',
-              dueAt: '2024-01-16T23:59:59Z',
-              title: 'Section 1',
-              set: {
-                id: '1',
-                type: 'CourseSection',
-              },
-            },
-          ],
-        }
-
-        it('uses standardized dates when feature flag is enabled', () => {
-          ENV.FEATURES = {standardize_assignment_date_formatting: true}
-          const container = setUp(discussionWithBothFormats)
-          expect(container.getByText('Multiple Due Dates')).toBeInTheDocument()
-        })
-
-        it('uses legacy dates when feature flag is disabled', () => {
-          ENV.FEATURES = {standardize_assignment_date_formatting: false}
-          const container = setUp(discussionWithBothFormats)
-          expect(container.getByText('Multiple Due Dates')).toBeInTheDocument()
-        })
-
-        it('falls back to legacy when standardized dates are empty', () => {
-          ENV.FEATURES = {standardize_assignment_date_formatting: true}
-          const contentNoStandardized = {
-            ...discussionWithBothFormats,
-            assignedToDates: [],
-          }
-          const container = setUp(contentNoStandardized)
-          expect(container.getByText('Multiple Due Dates')).toBeInTheDocument()
         })
       })
     })

@@ -309,7 +309,6 @@ export type SiteAdminFeatureId =
   | 'youtube_migration'
   | 'youtube_overlay'
   | 'hide_legacy_course_analytics'
-  | 'standardize_assignment_date_formatting'
   | 'accessibility_tab_enable'
   | 'scheduled_feedback_releases'
 /**
