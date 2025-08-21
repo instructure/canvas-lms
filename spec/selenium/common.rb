@@ -192,7 +192,6 @@ shared_context "in-process server selenium tests" do
         "elements with non-unique id #",
         "Failed to load http://www.example.com/",
         "Failed to load http://example.com/",
-        "Uncaught Error: cannot call methods on timeoutTooltip prior to initialization; attempted to call method 'close'",
         "Failed to load resource",
         "Deprecated use of magic jQueryUI widget markup detected",
         "Uncaught SG: Did not receive drive#about kind when fetching import",
