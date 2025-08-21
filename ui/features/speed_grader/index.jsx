@@ -30,6 +30,7 @@ import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {executeQuery} from '@canvas/graphql'
 import {initializePendo} from '@canvas/pendo'
 import speedGrader from './jquery/speed_grader'
+import SGUploader from './sg_uploader'
 
 const I18n = createI18nScope('speed_grader')
 
@@ -48,11 +49,15 @@ ready(() => {
       'quizzesNext.previousStudent': 'tool.previousStudent',
       'quizzesNext.submissionUpdate': 'tool.submissionUpdate',
     }
+    const sgUploader = new SGUploader()
 
     return {
       executeQuery,
       platform: 'canvas',
       postMessageAliases,
+      mutationFns: {
+        postSubmissionCommentMedia: sgUploader?.doUploadByFile,
+      },
       context: {
         userId: window.ENV.current_user_id,
         assignmentId: params.get('assignment_id'),
