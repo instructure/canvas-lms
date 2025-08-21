@@ -468,6 +468,21 @@ describe('ModuleItemSupplementalInfo', () => {
         pointsPossible: 15,
       }
 
+      const assignmentWithNoDueDate: ModuleItemContent = {
+        id: '15',
+        type: 'Assignment',
+        pointsPossible: 10,
+        assignedToDates: [
+          {
+            id: '123',
+            unlockAt: '2025-08-22T00:00:00-06:00',
+            lockAt: '2025-08-24T23:59:59-06:00',
+            title: 'Everyone',
+            base: true,
+          },
+        ],
+      }
+
       it('handles discussion with no dates gracefully', () => {
         const container = setUp(discussionWithNoDates, null)
         expect(container.getByText('5 pts')).toBeInTheDocument()
@@ -488,6 +503,13 @@ describe('ModuleItemSupplementalInfo', () => {
         expect(container.getByText('15 pts')).toBeInTheDocument()
         expect(container.queryByTestId('due-date')).not.toBeInTheDocument()
         expect(container.queryByText('Multiple Due Dates')).not.toBeInTheDocument()
+      })
+
+      it('does not render the due dates container when due date is empty', () => {
+        const container = setUp(assignmentWithNoDueDate, null)
+        expect(container.getByText('10 pts')).toBeInTheDocument()
+        expect(container.queryByTestId('due-date')).not.toBeInTheDocument()
+        expect(container.queryAllByText('|')).toHaveLength(0)
       })
     })
 
