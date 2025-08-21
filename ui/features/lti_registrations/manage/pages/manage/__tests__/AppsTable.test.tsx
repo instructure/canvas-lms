@@ -42,12 +42,22 @@ describe('AppsTableInner', () => {
         lti_registrations_next: false,
       },
     })
+    // Create flash_screenreader_holder element for Alert components
+    const flashHolder = document.createElement('div')
+    flashHolder.id = 'flash_screenreader_holder'
+    flashHolder.setAttribute('role', 'alert')
+    document.body.appendChild(flashHolder)
   })
 
   afterEach(() => {
     server.resetHandlers()
     server.close()
     fakeENV.teardown()
+    // Clean up any flash_screenreader_holder elements
+    const flashHolder = document.getElementById('flash_screenreader_holder')
+    if (flashHolder) {
+      document.body.removeChild(flashHolder)
+    }
   })
 
   type PropsOverrides = {
