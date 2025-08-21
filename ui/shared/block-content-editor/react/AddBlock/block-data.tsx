@@ -46,7 +46,17 @@ export const blockFactory = {
     />
   ),
   [ImageBlock.name]: () => (
-    <ImageBlock url="" altText="" caption="" altTextAsCaption={false} decorativeImage={false} />
+    <ImageBlock
+      title=""
+      url=""
+      altText=""
+      caption=""
+      altTextAsCaption={false}
+      decorativeImage={false}
+      settings={{
+        includeBlockTitle: true,
+      }}
+    />
   ),
   [SeparatorLineBlock.name]: () => (
     <SeparatorLineBlock
