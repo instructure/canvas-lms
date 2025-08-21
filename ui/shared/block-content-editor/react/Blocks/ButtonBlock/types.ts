@@ -21,12 +21,16 @@ import {TitleData} from '../BlockItems/Title/types'
 export type ButtonAlignment = 'left' | 'center' | 'right'
 export type ButtonLayout = 'horizontal' | 'vertical'
 export type ButtonLinkOpenMode = 'new-tab' | 'same-tab'
+export type ButtonStyle = 'filled' | 'outlined'
 
 export type ButtonData = {
   id: number
   text: string
   url: string
   linkOpenMode: ButtonLinkOpenMode
+  primaryColor: string
+  secondaryColor: string
+  style: ButtonStyle
 }
 
 export type ButtonBlockSettings = {
@@ -55,6 +59,7 @@ export type ButtonDisplayProps = ButtonBlockSettings & {
 }
 
 export type ButtonBlockIndividualButtonSettingsProps = {
+  backgroundColor: string
   initialButtons: ButtonData[]
   onButtonsChange: (buttons: ButtonData[]) => void
 }

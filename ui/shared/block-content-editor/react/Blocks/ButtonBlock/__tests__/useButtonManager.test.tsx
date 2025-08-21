@@ -25,6 +25,9 @@ const createButton = (id: number, text: string = ''): ButtonData => ({
   text,
   url: '',
   linkOpenMode: 'new-tab',
+  primaryColor: '#000000',
+  secondaryColor: '#FFFFFF',
+  style: 'filled',
 })
 
 const MAX_BUTTONS = 5
