@@ -312,6 +312,15 @@ export interface ModuleItem {
   masterCourseRestrictions: ModuleItemMasterCourseRestrictionType | null
   newTab?: boolean
   published?: boolean
+  masteryPaths?: ModuleItemMasteryPath
+}
+
+export interface ModuleItemMasteryPath {
+  awaitingChoice?: boolean
+  chooseUrl?: string
+  locked?: boolean
+  stillProcessing?: boolean
+  assignmentSetCount?: number
 }
 
 export type ModuleAction = 'move_module' | 'move_module_item' | 'move_module_contents'

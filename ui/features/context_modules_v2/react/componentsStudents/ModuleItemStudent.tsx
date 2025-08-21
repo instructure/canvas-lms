@@ -19,11 +19,23 @@
 import React, {useMemo} from 'react'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
+import {Pill} from '@instructure/ui-pill'
+import {Link} from '@instructure/ui-link'
+import {Text} from '@instructure/ui-text'
 import {filterRequirementsMet, getItemIcon, getItemTypeText, INDENT_LOOKUP} from '../utils/utils'
-import {CompletionRequirement, ModuleItemContent, ModuleProgression} from '../utils/types'
+import {
+  CompletionRequirement,
+  ModuleItemContent,
+  ModuleItemMasteryPath,
+  ModuleProgression,
+} from '../utils/types'
 import ModuleItemSupplementalInfoStudent from './ModuleItemSupplementalInfoStudent'
 import ModuleItemStatusIcon from './ModuleItemStatusIcon'
 import ModuleItemTitleStudent from './ModuleItemTitleStudent'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {IconLockLine, IconUnlockLine} from '@instructure/ui-icons'
+
+const I18n = createI18nScope('context_modules_v2')
 
 export interface ModuleItemStudentProps {
   _id: string
@@ -38,6 +50,7 @@ export interface ModuleItemStudentProps {
   completionRequirements?: CompletionRequirement[]
   progression?: ModuleProgression
   smallScreen?: boolean
+  masteryPaths?: ModuleItemMasteryPath
 }
 
 const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
@@ -51,6 +64,7 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
   onClick,
   completionRequirements,
   progression,
+  masteryPaths,
   smallScreen = false,
 }) => {
   // Hooks must be called unconditionally
@@ -84,7 +98,7 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
     cr.completed = isCompleted
   }
 
-  return (
+  const moduleItemWrapContent = (content: JSX.Element, otherProps = {}) => (
     <View
       as="div"
       className="context_module_item"
@@ -93,56 +107,164 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
       borderWidth="0"
       borderRadius="large"
       overflowX="hidden"
-      data-item-id={_id}
-      data-position={position}
       margin="paddingCardMedium"
       minHeight="5.125rem"
       display="flex"
+      {...otherProps}
     >
       <Flex wrap="wrap" width="100%" gap="x-small" direction={smallScreen ? 'column' : 'row'}>
-        <Flex.Item margin={itemIcon ? '0' : `0 small 0 0`} shouldGrow>
-          <div style={{padding: `0 0 0 ${itemLeftMargin}`}}>
-            <Flex alignItems="start" justifyItems="start" wrap="no-wrap" direction="column">
-              {/* Item Title */}
-              <Flex.Item shouldGrow={true}>
-                <ModuleItemTitleStudent
-                  title={title}
-                  content={content}
-                  url={url}
-                  onClick={onClick}
-                  position={position}
-                  requireSequentialProgress={requireSequentialProgress}
-                  progression={progression}
-                />
-              </Flex.Item>
-              {/* Due Date and Points Possible */}
-              {content.type !== 'SubHeader' && (
-                <Flex.Item>
-                  <Flex wrap="wrap" direction="column">
-                    <Flex.Item>
-                      <ModuleItemSupplementalInfoStudent
-                        contentTagId={_id}
-                        content={content}
-                        itemIcon={itemIcon}
-                        itemTypeText={itemTypeText}
-                        completionRequirement={cr}
-                        checkpoints={content.checkpoints}
-                        replyToEntryRequiredCount={content.replyToEntryRequiredCount}
-                      />
-                    </Flex.Item>
-                  </Flex>
-                </Flex.Item>
-              )}
-            </Flex>
-          </div>
-        </Flex.Item>
-        {content.type !== 'SubHeader' && (
-          <Flex.Item margin={smallScreen ? 'x-small 0 0 0' : '0 0 0 small'}>
-            <ModuleItemStatusIcon moduleCompleted={isCompleted} content={content} />
-          </Flex.Item>
-        )}
+        {content}
       </Flex>
     </View>
+  )
+
+  const moduleItemMainContent = moduleItemWrapContent(
+    <>
+      <Flex.Item margin={itemIcon ? '0' : `0 small 0 0`} shouldGrow>
+        <div style={{padding: `0 0 0 ${itemLeftMargin}`}}>
+          <Flex alignItems="start" justifyItems="start" wrap="no-wrap" direction="column">
+            {/* Item Title */}
+            <Flex.Item shouldGrow={true}>
+              <ModuleItemTitleStudent
+                title={title}
+                content={content}
+                url={url}
+                onClick={onClick}
+                position={position}
+                requireSequentialProgress={requireSequentialProgress}
+                progression={progression}
+              />
+            </Flex.Item>
+            {/* Due Date and Points Possible */}
+            {content.type !== 'SubHeader' && (
+              <Flex.Item>
+                <Flex wrap="wrap" direction="column">
+                  <Flex.Item>
+                    <ModuleItemSupplementalInfoStudent
+                      contentTagId={_id}
+                      content={content}
+                      itemIcon={itemIcon}
+                      itemTypeText={itemTypeText}
+                      completionRequirement={cr}
+                      checkpoints={content.checkpoints}
+                      replyToEntryRequiredCount={content.replyToEntryRequiredCount}
+                    />
+                  </Flex.Item>
+                </Flex>
+              </Flex.Item>
+            )}
+          </Flex>
+        </div>
+      </Flex.Item>
+      {content.type !== 'SubHeader' && (
+        <Flex.Item margin={smallScreen ? 'x-small 0 0 0' : '0 0 0 small'}>
+          <ModuleItemStatusIcon moduleCompleted={isCompleted} content={content} />
+        </Flex.Item>
+      )}
+    </>,
+    {'data-item-id': _id, 'data-position': position},
+  )
+
+  const conditionalReleaseRenders: Array<JSX.Element> = []
+  if (masteryPaths?.awaitingChoice) {
+    conditionalReleaseRenders.push(
+      moduleItemWrapContent(
+        <Flex.Item margin="0" shouldGrow>
+          <div style={{padding: `0 0 0 ${itemLeftMargin}`}}>
+            <Flex
+              alignItems="start"
+              justifyItems="start"
+              wrap="no-wrap"
+              gap="space8"
+              direction="row"
+            >
+              <Flex.Item shouldGrow={true}>
+                <IconUnlockLine></IconUnlockLine>
+                <Link href={masteryPaths.chooseUrl} variant="standalone" margin="0 0 0 small">
+                  <Text color="primary">{I18n.t('Choose Assignment Group')}</Text>
+                </Link>
+              </Flex.Item>
+              <Flex.Item>
+                <Pill
+                  themeOverride={{
+                    background: '#1897d8',
+                    primaryColor: 'white',
+                  }}
+                >
+                  {I18n.t('%{count} Options', {count: masteryPaths?.assignmentSetCount})}
+                </Pill>
+              </Flex.Item>
+            </Flex>
+          </div>
+        </Flex.Item>,
+        {'data-testid': 'mastery-path-awaiting-choice'},
+      ),
+    )
+  }
+
+  if (masteryPaths?.locked) {
+    conditionalReleaseRenders.push(
+      moduleItemWrapContent(
+        <Flex.Item margin="0" shouldGrow>
+          <div style={{padding: `0 0 0 ${itemLeftMargin}`}}>
+            <Flex
+              alignItems="start"
+              justifyItems="start"
+              wrap="no-wrap"
+              gap="space8"
+              direction="row"
+            >
+              <Flex.Item>
+                <IconLockLine></IconLockLine>
+              </Flex.Item>
+              <Flex.Item>
+                <Text weight="bold" color="primary">
+                  {I18n.t('Locked until "%{title}" is graded', {title})}
+                </Text>
+              </Flex.Item>
+            </Flex>
+          </div>
+        </Flex.Item>,
+        {'data-testid': 'mastery-path-locked'},
+      ),
+    )
+  }
+
+  if (masteryPaths?.stillProcessing) {
+    conditionalReleaseRenders.push(
+      moduleItemWrapContent(
+        <Flex.Item margin="0" shouldGrow>
+          <div style={{padding: `0 0 0 ${itemLeftMargin}`}}>
+            <Flex
+              alignItems="start"
+              justifyItems="start"
+              wrap="no-wrap"
+              gap="space8"
+              direction="row"
+            >
+              <Flex.Item>
+                <IconLockLine></IconLockLine>
+              </Flex.Item>
+              <Flex.Item>
+                <Text weight="bold" color="primary" fontStyle="italic">
+                  {I18n.t(
+                    'Next mastery path is still processing, please periodically refresh the page',
+                  )}
+                </Text>
+              </Flex.Item>
+            </Flex>
+          </div>
+        </Flex.Item>,
+        {'data-testid': 'mastery-path-still-processing'},
+      ),
+    )
+  }
+
+  return (
+    <>
+      {moduleItemMainContent}
+      {...conditionalReleaseRenders}
+    </>
   )
 }
 
