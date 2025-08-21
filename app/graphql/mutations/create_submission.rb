@@ -78,7 +78,6 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
     submission_params = {
       annotatable_attachment_id: assignment.annotatable_attachment_id,
       attachments: [],
-      body: "",
       require_submission_type_is_valid: true,
       submission_type:,
       url: nil
