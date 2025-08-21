@@ -166,8 +166,15 @@ class AccessToken < ActiveRecord::Base
     tokens.uniq.reject { |token| token.developer_key&.internal_service }
   end
 
+  # If the token exists, and belongs to site admin, return the token itself.
+  # Otherwise return falsey (not specified if it's false or nil).
+  #
+  # This can be used to eliminate an additional call to {.authenticate} once
+  # you know the token is relevant, while still being boolean.
+  #
+  # @return [AccessToken, false, nil]
   def self.site_admin?(token_string)
-    !!authenticate(token_string)&.site_admin?
+    (access_token = authenticate(token_string)) && access_token.site_admin? && access_token
   end
 
   def localized_workflow_state

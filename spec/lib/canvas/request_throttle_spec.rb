@@ -120,6 +120,9 @@ describe RequestThrottle do
 
     it "uses site admin service user id" do
       expect(throttler.client_identifier(req(request_sasu_query_token))).to eq "service_user_key:#{developer_key_sasu.global_id}"
+
+      # make sure we only look up the token once
+      expect(AccessToken).to receive(:authenticate).once.and_call_original
       expect(throttler.client_identifier(req(request_sasu_header_token))).to eq "service_user_key:#{developer_key_sasu.global_id}"
     end
 
