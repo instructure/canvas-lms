@@ -58,7 +58,7 @@ services:
       - postgres
       - redis
     ports:
-      - 8081:80
+      - 80
       - 12345-12354:12345-12354
     networks:
       default:
