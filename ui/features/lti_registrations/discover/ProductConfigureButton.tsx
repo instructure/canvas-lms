@@ -135,6 +135,7 @@ export const ProductConfigureButton = ({buttonWidth, product, accountId}: Config
 
   return (
     <Button
+      id="install-new-lti-app"
       display={buttonWidth}
       color="primary"
       interaction={buttonIsEnabled(integration, jsonFetchStatus) ? 'enabled' : 'disabled'}
