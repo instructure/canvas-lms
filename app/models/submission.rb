@@ -3366,7 +3366,7 @@ class Submission < ActiveRecord::Base
   end
 
   def get_word_count_from_body?
-    !body.nil? && submission_type != "online_quiz"
+    !body.nil? && %w[online_quiz online_upload].exclude?(submission_type)
   end
 
   def update_body_word_count_later
