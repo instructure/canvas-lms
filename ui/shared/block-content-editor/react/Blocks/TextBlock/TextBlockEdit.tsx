@@ -20,22 +20,25 @@ import {TextBlockEditProps} from './types'
 import {Flex} from '@instructure/ui-flex'
 import {TitleEdit} from '../BlockItems/Title/TitleEdit'
 import {TextEdit} from '../BlockItems/Text/TextEdit'
+import {useFocusElement} from '../../hooks/useFocusElement'
 
 export const TextBlockEdit = (props: TextBlockEditProps) => {
+  const {focusHandler} = useFocusElement()
+
   return (
     <Flex direction="column" gap="mediumSmall">
       {props.settings.includeBlockTitle && (
         <TitleEdit
           title={props.title}
           onTitleChange={props.onTitleChange}
-          focus={props.settings.includeBlockTitle}
+          focusHandler={focusHandler}
         />
       )}
       <TextEdit
         content={props.content}
         onContentChange={props.onContentChange}
         height={300}
-        focus={!props.settings.includeBlockTitle}
+        focusHandler={props.settings.includeBlockTitle ? undefined : focusHandler}
       />
     </Flex>
   )
