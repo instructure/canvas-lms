@@ -22,7 +22,6 @@ require_relative "../graphql_spec_helper"
 
 describe Types::SubmissionStatisticsType do
   around do |example|
-    # Freeze time to avoid timebombs
     Timecop.freeze(Time.zone.parse("2025-01-15 12:00:00")) do
       example.run
     end
@@ -30,45 +29,41 @@ describe Types::SubmissionStatisticsType do
 
   before(:once) do
     course_with_student(active_all: true)
-    # Time is frozen to 2025-01-15 12:00:00 (Wednesday at noon)
-    @now = Time.zone.now
+    @now = Time.zone.parse("2025-01-15 12:00:00")
 
-    # Create assignments with different due dates and submission states
     @assignment_due_today = @course.assignments.create!(
       name: "Due Today",
       submission_types: "online_text_entry",
       points_possible: 10,
-      due_at: @now + 6.hours # Same day, later (6 PM)
+      due_at: @now + 6.hours
     )
 
     @assignment_due_tomorrow = @course.assignments.create!(
       name: "Due Tomorrow",
       submission_types: "online_text_entry",
       points_possible: 10,
-      due_at: @now + 1.day + 6.hours # Next day (Thursday 6 PM)
+      due_at: @now + 1.day + 6.hours
     )
 
     @assignment_overdue = @course.assignments.create!(
       name: "Overdue",
       submission_types: "online_text_entry",
       points_possible: 10,
-      due_at: @now - 2.days # Two days ago (Monday)
+      due_at: @now - 2.days
     )
 
     @assignment_due_next_week = @course.assignments.create!(
       name: "Due Next Week",
       submission_types: "online_text_entry",
       points_possible: 10,
-      due_at: @now + 8.days # Next week (Thursday)
+      due_at: @now + 8.days
     )
 
-    # Create submissions with different states
     @submission_submitted = @assignment_due_today.submit_homework(@student, submission_type: "online_text_entry", body: "My submission")
     @submission_graded = @assignment_due_tomorrow.grade_student(@student, score: 8, grader: @teacher).first
     @submission_missing = @assignment_overdue.find_or_create_submission(@student)
     @submission_missing.update!(late_policy_status: "missing")
 
-    # Create unsubmitted assignment for next week
     @assignment_due_next_week.find_or_create_submission(@student)
   end
 
@@ -76,11 +71,16 @@ describe Types::SubmissionStatisticsType do
 
   describe "original fields" do
     describe "submissions_due_this_week_count" do
-      it "counts submissions due within the next 7 days" do
-        # Only counts unsubmitted assignments due in next 7 days
-        # assignment_due_today and assignment_due_tomorrow are submitted/graded
-        # assignment_due_next_week (8 days) is outside the 7-day window
-        expect(course_type.resolve("submissionStatistics { submissionsDueThisWeekCount }")).to eq 0
+      it "counts unsubmitted assignments due within the next 7 days" do
+        assignment_due_this_week = @course.assignments.create!(
+          name: "Due This Week Unsubmitted",
+          submission_types: "online_text_entry",
+          points_possible: 10,
+          due_at: @now + 5.days
+        )
+        assignment_due_this_week.find_or_create_submission(@student)
+
+        expect(course_type.resolve("submissionStatistics { submissionsDueThisWeekCount }")).to eq 1
       end
 
       it "returns 0 when current_user is nil" do
@@ -88,10 +88,7 @@ describe Types::SubmissionStatisticsType do
         expect(course_type_no_user.resolve("submissionStatistics { submissionsDueThisWeekCount }")).to be_nil
       end
 
-      it "verifies the 7-day window calculation" do
-        # assignment_due_next_week is 8 days out (outside 7-day window)
-        # assignment_due_today and assignment_due_tomorrow are submitted/graded
-        # So we should expect 0 for the base case
+      it "returns 0 when all assignments due this week are submitted/graded" do
         result = course_type.resolve("submissionStatistics { submissionsDueThisWeekCount }")
         expect(result).to eq 0
       end
@@ -121,8 +118,6 @@ describe Types::SubmissionStatisticsType do
         result = course_type.resolve(
           "submissionStatistics { submissionsDueCount(startDate: \"#{today.iso8601}\", endDate: \"#{tomorrow.iso8601}\") }"
         )
-        # Both assignments in range (due_today and due_tomorrow) are submitted/graded
-        # so they should not count as "due" (meaning unsubmitted)
         expect(result).to eq 0
       end
 
@@ -139,14 +134,12 @@ describe Types::SubmissionStatisticsType do
         result = course_type.resolve(
           "submissionStatistics { submissionsDueCount(startDate: \"#{next_week_start.iso8601}\", endDate: \"#{next_week_end.iso8601}\") }"
         )
-        expect(result).to eq 1 # The assignment_due_next_week
+        expect(result).to eq 1
       end
 
       it "works without date parameters" do
         result = course_type.resolve("submissionStatistics { submissionsDueCount }")
-        # Should count assignment_due_next_week (8 days out, unsubmitted, future)
-        # Other assignments are either submitted/graded or past due (overdue/missing)
-        expect(result).to eq 1 # just assignment_due_next_week
+        expect(result).to eq 1
       end
     end
 
