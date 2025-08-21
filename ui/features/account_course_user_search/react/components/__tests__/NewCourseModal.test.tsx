@@ -40,10 +40,29 @@ const children = <Button>Add Course</Button>
 describe('NewCourseModal', () => {
   beforeEach(() => {
     fakeENV.setup({LOCALES: ['en']})
+
+    // Set up the flash_screenreader_holder element that SearchableSelect expects
+    const liveRegion = document.createElement('div')
+    liveRegion.id = 'flash_screenreader_holder'
+    liveRegion.setAttribute('role', 'alert')
+    liveRegion.setAttribute('aria-live', 'assertive')
+    liveRegion.setAttribute('aria-atomic', 'true')
+    liveRegion.style.position = 'absolute'
+    liveRegion.style.left = '-10000px'
+    liveRegion.style.width = '1px'
+    liveRegion.style.height = '1px'
+    liveRegion.style.overflow = 'hidden'
+    document.body.appendChild(liveRegion)
   })
 
   afterEach(() => {
     fakeENV.teardown()
+
+    // Clean up the live region element
+    const liveRegion = document.getElementById('flash_screenreader_holder')
+    if (liveRegion) {
+      document.body.removeChild(liveRegion)
+    }
   })
 
   // NewCourseModal uses the old model of stores (CoursesStore)
