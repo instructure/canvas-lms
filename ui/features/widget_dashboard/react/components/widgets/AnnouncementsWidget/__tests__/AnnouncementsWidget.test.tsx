@@ -32,71 +32,144 @@ const mockWidget: Widget = {
   title: 'Announcements',
 }
 
-// Mock GraphQL response data that matches the useAnnouncements hook structure
-const mockAnnouncementsData = [
-  {
-    _id: '1',
-    title: 'Test Announcement 1',
-    message: '<p>This is a test announcement message</p>',
-    createdAt: '2025-01-15T10:00:00Z',
-    contextName: 'Test Course 1',
-    contextId: '1',
-    isAnnouncement: true,
-    author: {
-      _id: 'user1',
-      name: 'Test Teacher 1',
-      avatarUrl: 'https://example.com/avatar1.jpg',
-    },
-    participant: {
-      id: 'participant1',
-      read: true,
-    },
-  },
-  {
-    _id: '2',
-    title: 'Test Announcement 2',
-    message: '<p>Another test announcement</p>',
-    createdAt: '2025-01-14T15:30:00Z',
-    contextName: 'Test Course 2',
-    contextId: '2',
-    isAnnouncement: true,
-    author: {
-      _id: 'user2',
-      name: 'Test Teacher 2',
-      avatarUrl: 'https://example.com/avatar2.jpg',
-    },
-    participant: null,
-  },
-]
-
-const mockGqlResponse = {
+// Mock responses for different read states
+const mockAllAnnouncementsResponse = {
   data: {
     legacyNode: {
       _id: '123',
-      enrollments: [
-        {
-          course: {
-            _id: '1',
-            name: 'Test Course 1',
-            courseCode: 'TEST101',
-            discussionsConnection: {
-              nodes: [mockAnnouncementsData[0]],
+      discussionParticipantsConnection: {
+        nodes: [
+          {
+            id: 'participant1',
+            read: true,
+            discussionTopic: {
+              _id: '1',
+              title: 'Test Announcement 1',
+              message: '<p>This is a test announcement message</p>',
+              createdAt: '2025-01-15T10:00:00Z',
+              contextName: 'Test Course 1',
+              contextId: '1',
+              isAnnouncement: true,
+              author: {
+                _id: 'user1',
+                name: 'Test Teacher 1',
+                avatarUrl: 'https://example.com/avatar1.jpg',
+              },
             },
           },
-        },
-        {
-          course: {
-            _id: '2',
-            name: 'Test Course 2',
-            courseCode: 'TEST102',
-            discussionsConnection: {
-              nodes: [mockAnnouncementsData[1]],
+          {
+            id: 'participant2',
+            read: false,
+            discussionTopic: {
+              _id: '2',
+              title: 'Test Announcement 2',
+              message: '<p>Another test announcement</p>',
+              createdAt: '2025-01-14T15:30:00Z',
+              contextName: 'Test Course 2',
+              contextId: '2',
+              isAnnouncement: true,
+              author: {
+                _id: 'user2',
+                name: 'Test Teacher 2',
+                avatarUrl: 'https://example.com/avatar2.jpg',
+              },
             },
           },
+        ],
+        pageInfo: {
+          hasNextPage: false,
+          hasPreviousPage: false,
+          startCursor: null,
+          endCursor: null,
         },
-      ],
+      },
     },
   },
+}
+
+const mockUnreadAnnouncementsResponse = {
+  data: {
+    legacyNode: {
+      _id: '123',
+      discussionParticipantsConnection: {
+        nodes: [
+          {
+            id: 'participant2',
+            read: false,
+            discussionTopic: {
+              _id: '2',
+              title: 'Test Announcement 2',
+              message: '<p>Another test announcement</p>',
+              createdAt: '2025-01-14T15:30:00Z',
+              contextName: 'Test Course 2',
+              contextId: '2',
+              isAnnouncement: true,
+              author: {
+                _id: 'user2',
+                name: 'Test Teacher 2',
+                avatarUrl: 'https://example.com/avatar2.jpg',
+              },
+            },
+          },
+        ],
+        pageInfo: {
+          hasNextPage: false,
+          hasPreviousPage: false,
+          startCursor: null,
+          endCursor: null,
+        },
+      },
+    },
+  },
+}
+
+const mockReadAnnouncementsResponse = {
+  data: {
+    legacyNode: {
+      _id: '123',
+      discussionParticipantsConnection: {
+        nodes: [
+          {
+            id: 'participant1',
+            read: true,
+            discussionTopic: {
+              _id: '1',
+              title: 'Test Announcement 1',
+              message: '<p>This is a test announcement message</p>',
+              createdAt: '2025-01-15T10:00:00Z',
+              contextName: 'Test Course 1',
+              contextId: '1',
+              isAnnouncement: true,
+              author: {
+                _id: 'user1',
+                name: 'Test Teacher 1',
+                avatarUrl: 'https://example.com/avatar1.jpg',
+              },
+            },
+          },
+        ],
+        pageInfo: {
+          hasNextPage: false,
+          hasPreviousPage: false,
+          startCursor: null,
+          endCursor: null,
+        },
+      },
+    },
+  },
+}
+
+// Helper function to get the appropriate mock response based on read state
+const getMockResponseForReadState = (readState?: string) => {
+  switch (readState) {
+    case 'read':
+      return mockReadAnnouncementsResponse
+    case 'unread':
+      return mockUnreadAnnouncementsResponse
+    case 'all':
+    default:
+      return mockAllAnnouncementsResponse
+  }
 }
 
 const buildDefaultProps = (overrides: Partial<BaseWidgetProps> = {}): BaseWidgetProps => {
@@ -140,6 +213,47 @@ const setup = (props: BaseWidgetProps = buildDefaultProps(), envOverrides = {}) 
   }
 }
 
+// Mock course grades data for course code enrichment
+const mockCourseGradesResponse = {
+  data: {
+    legacyNode: {
+      _id: '123',
+      enrollments: [
+        {
+          course: {
+            _id: '1',
+            name: 'Test Course 1',
+            courseCode: 'MATH 101',
+          },
+          grades: {
+            currentScore: 85,
+            currentGrade: 'B',
+            finalScore: null,
+            finalGrade: null,
+            overrideScore: null,
+            overrideGrade: null,
+          },
+        },
+        {
+          course: {
+            _id: '2',
+            name: 'Test Course 2',
+            courseCode: 'ENG 201',
+          },
+          grades: {
+            currentScore: 92,
+            currentGrade: 'A-',
+            finalScore: null,
+            finalGrade: null,
+            overrideScore: null,
+            overrideGrade: null,
+          },
+        },
+      ],
+    },
+  },
+}
+
 const server = setupServer()
 
 const waitForLoadingToComplete = async () => {
@@ -162,10 +276,10 @@ describe('AnnouncementsWidget', () => {
   it('renders loading state initially', () => {
     // Set up a delayed response to ensure we see the loading state
     server.use(
-      graphql.query('GetUserAnnouncements', () => {
+      graphql.query('GetUserAnnouncements', ({variables}) => {
         return new Promise(resolve => {
           setTimeout(() => {
-            resolve(HttpResponse.json(mockGqlResponse))
+            resolve(HttpResponse.json(getMockResponseForReadState(variables.readState)))
           }, 100)
         })
       }),
@@ -178,8 +292,8 @@ describe('AnnouncementsWidget', () => {
 
   it('renders announcements list after loading', async () => {
     server.use(
-      graphql.query('GetUserAnnouncements', () => {
-        return HttpResponse.json(mockGqlResponse)
+      graphql.query('GetUserAnnouncements', ({variables}) => {
+        return HttpResponse.json(getMockResponseForReadState(variables.readState))
       }),
     )
 
@@ -188,11 +302,9 @@ describe('AnnouncementsWidget', () => {
     await waitForLoadingToComplete()
 
     await waitFor(() => {
-      // With default "unread" filter, only Test Announcement 2 should show (participant: null = unread)
+      // With default "unread" filter, only Test Announcement 2 should show (read: false = unread)
       expect(screen.queryByText('Test Announcement 1')).not.toBeInTheDocument() // This is read
       expect(screen.getByText('Test Announcement 2')).toBeInTheDocument() // This is unread
-      expect(screen.queryByText('TEST101')).not.toBeInTheDocument() // Course code for read announcement
-      expect(screen.getByText('TEST102')).toBeInTheDocument() // Course code for unread announcement
     })
 
     cleanup()
@@ -205,7 +317,15 @@ describe('AnnouncementsWidget', () => {
           data: {
             legacyNode: {
               _id: '123',
-              enrollments: [],
+              discussionParticipantsConnection: {
+                nodes: [],
+                pageInfo: {
+                  hasNextPage: false,
+                  hasPreviousPage: false,
+                  startCursor: null,
+                  endCursor: null,
+                },
+              },
             },
           },
         })
@@ -216,7 +336,7 @@ describe('AnnouncementsWidget', () => {
 
     await waitForLoadingToComplete()
 
-    expect(screen.getByText('No recent announcements')).toBeInTheDocument()
+    expect(screen.getByText('No unread announcements')).toBeInTheDocument()
     cleanup()
   })
 
@@ -245,8 +365,8 @@ describe('AnnouncementsWidget', () => {
 
   it('strips HTML from announcement message preview', async () => {
     server.use(
-      graphql.query('GetUserAnnouncements', () => {
-        return HttpResponse.json(mockGqlResponse)
+      graphql.query('GetUserAnnouncements', ({variables}) => {
+        return HttpResponse.json(getMockResponseForReadState(variables.readState))
       }),
     )
 
@@ -269,7 +389,7 @@ describe('AnnouncementsWidget', () => {
     server.use(
       graphql.query('GetUserAnnouncements', ({variables}) => {
         capturedVariables = variables
-        return HttpResponse.json(mockGqlResponse)
+        return HttpResponse.json(getMockResponseForReadState(variables.readState))
       }),
     )
 
@@ -278,7 +398,7 @@ describe('AnnouncementsWidget', () => {
     await waitForLoadingToComplete()
 
     expect(capturedVariables).not.toBeNull()
-    expect(capturedVariables.first).toBe(8) // Default limit used by the hook
+    expect(capturedVariables.first).toBe(3) // Uses the direct limit value
     expect(capturedVariables.userId).toBe('123') // From ENV.current_user_id
 
     cleanup()
@@ -295,7 +415,7 @@ describe('AnnouncementsWidget', () => {
             errors: [{message: 'GraphQL error'}],
           })
         }
-        return HttpResponse.json(mockGqlResponse)
+        return HttpResponse.json(getMockResponseForReadState('unread'))
       }),
     )
 
@@ -326,36 +446,37 @@ describe('AnnouncementsWidget', () => {
       data: {
         legacyNode: {
           _id: '123',
-          enrollments: [
-            {
-              course: {
-                _id: '1',
-                name: 'This is a Very Long Course Name That Should Be Truncated Because It Exceeds Normal Length',
-                courseCode: 'VERYLONGCODE123',
-                discussionsConnection: {
-                  nodes: [
-                    {
-                      _id: '1',
-                      title:
-                        'This is an Extremely Long Announcement Title That Should Be Truncated Because It Is Way Too Long For The Widget',
-                      message:
-                        '<p>This is an extremely long announcement message that contains lots of details and should be truncated to prevent the widget from overflowing beyond its designated boundaries and breaking the layout</p>',
-                      createdAt: '2025-01-15T10:00:00Z',
-                      contextName: 'Test Course',
-                      contextId: '1',
-                      isAnnouncement: true,
-                      author: {
-                        _id: 'user1',
-                        name: 'Test Teacher',
-                        avatarUrl: 'https://example.com/avatar.jpg',
-                      },
-                      participant: null,
-                    },
-                  ],
+          discussionParticipantsConnection: {
+            nodes: [
+              {
+                id: 'participant1',
+                read: false, // Make it unread so it shows with default "unread" filter
+                discussionTopic: {
+                  _id: '1',
+                  title:
+                    'This is an Extremely Long Announcement Title That Should Be Truncated Because It Is Way Too Long For The Widget',
+                  message:
+                    '<p>This is an extremely long announcement message that contains lots of details and should be truncated to prevent the widget from overflowing beyond its designated boundaries and breaking the layout</p>',
+                  createdAt: '2025-01-15T10:00:00Z',
+                  contextName:
+                    'This is a Very Long Course Name That Should Be Truncated Because It Exceeds Normal Length',
+                  contextId: '1',
+                  isAnnouncement: true,
+                  author: {
+                    _id: 'user1',
+                    name: 'Test Teacher',
+                    avatarUrl: 'https://example.com/avatar.jpg',
+                  },
                 },
               },
+            ],
+            pageInfo: {
+              hasNextPage: false,
+              hasPreviousPage: false,
+              startCursor: null,
+              endCursor: null,
             },
-          ],
+          },
         },
       },
     }
@@ -373,14 +494,9 @@ describe('AnnouncementsWidget', () => {
     // Should show truncated title (max 25 chars) - shows "This is an Extremely Long..."
     expect(screen.getByText(/This is an Extremely Long\.\.\./)).toBeInTheDocument()
 
-    // Should show course code
-    expect(screen.getByText('VERYLONGCODE123')).toBeInTheDocument()
-
-    // Should show truncated message (max 80 chars) - shows "This is an extremely long announcement message that contains lots of details and..."
+    // Should show truncated message (max 60 chars) - shows "This is an extremely long announcement message that contains..."
     expect(
-      screen.getByText(
-        /This is an extremely long announcement message that contains lots of details and\.\.\./,
-      ),
+      screen.getByText(/This is an extremely long announcement message that contains\.\.\./),
     ).toBeInTheDocument()
 
     cleanup()
@@ -388,8 +504,8 @@ describe('AnnouncementsWidget', () => {
 
   it('filters announcements by read status', async () => {
     server.use(
-      graphql.query('GetUserAnnouncements', () => {
-        return HttpResponse.json(mockGqlResponse)
+      graphql.query('GetUserAnnouncements', ({variables}) => {
+        return HttpResponse.json(getMockResponseForReadState(variables.readState))
       }),
     )
 
@@ -435,7 +551,7 @@ describe('AnnouncementsWidget', () => {
     // Mock the mutation response
     server.use(
       graphql.query('GetUserAnnouncements', () => {
-        return HttpResponse.json(mockGqlResponse)
+        return HttpResponse.json(getMockResponseForReadState('unread'))
       }),
       graphql.mutation('UpdateDiscussionReadState', () => {
         return HttpResponse.json({
@@ -468,6 +584,101 @@ describe('AnnouncementsWidget', () => {
     // The mutation should be called (we can't easily test the actual state change
     // without more complex mocking, but we can verify the button exists and is clickable)
     expect(markReadButton).toBeInTheDocument()
+
+    cleanup()
+  })
+
+  it('shows pagination controls when there are multiple pages', async () => {
+    // Mock response with hasNextPage: true to show pagination
+    const paginatedResponse = {
+      data: {
+        legacyNode: {
+          _id: '123',
+          discussionParticipantsConnection: {
+            nodes: [
+              {
+                id: 'participant1',
+                read: true,
+                discussionTopic: {
+                  _id: '1',
+                  title: 'Test Announcement 1',
+                  message: '<p>This is a test announcement message</p>',
+                  createdAt: '2025-01-15T10:00:00Z',
+                  contextName: 'Test Course 1',
+                  contextId: '1',
+                  isAnnouncement: true,
+                  author: {
+                    _id: 'user1',
+                    name: 'Test Teacher 1',
+                    avatarUrl: 'https://example.com/avatar1.jpg',
+                  },
+                },
+              },
+            ],
+            pageInfo: {
+              hasNextPage: true,
+              hasPreviousPage: false,
+              startCursor: 'start-cursor',
+              endCursor: 'end-cursor',
+            },
+          },
+        },
+      },
+    }
+
+    server.use(
+      graphql.query('GetUserAnnouncements', () => {
+        return HttpResponse.json(paginatedResponse)
+      }),
+    )
+
+    const {cleanup} = setup()
+
+    await waitForLoadingToComplete()
+
+    // Change to "all" filter to see the announcement
+    const filterSelect = screen.getByDisplayValue('Unread')
+    fireEvent.click(filterSelect)
+    fireEvent.click(screen.getByText('All'))
+
+    await waitFor(() => {
+      expect(screen.getByText('Test Announcement 1')).toBeInTheDocument()
+    })
+
+    // Check that pagination controls are visible
+    await waitFor(() => {
+      // Check for Instructure UI Pagination component
+      const paginationNav = screen.getByTestId('announcements-pagination')
+      expect(paginationNav).toBeInTheDocument()
+
+      // Check for page buttons by text content
+      expect(screen.getByText('1')).toBeInTheDocument()
+      expect(screen.getByText('2')).toBeInTheDocument()
+    })
+
+    cleanup()
+  })
+
+  it('enriches announcements with course codes from course data', async () => {
+    server.use(
+      graphql.query('GetUserAnnouncements', ({variables}) => {
+        return HttpResponse.json(getMockResponseForReadState(variables.readState))
+      }),
+      graphql.query('GetUserCoursesWithGrades', () => {
+        return HttpResponse.json(mockCourseGradesResponse)
+      }),
+    )
+
+    const {cleanup} = setup()
+
+    await waitForLoadingToComplete()
+
+    // Wait for the component to render and data to be enriched
+    await waitFor(() => {
+      expect(screen.getByText('Test Announcement 2')).toBeInTheDocument() // Default unread filter
+    })
+
+    expect(screen.getByText('ENG 201')).toBeInTheDocument() // Course code should be enriched
 
     cleanup()
   })

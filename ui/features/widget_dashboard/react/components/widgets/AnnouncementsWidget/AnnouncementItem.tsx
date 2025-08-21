@@ -116,7 +116,7 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcement}) => {
   return (
     <View
       as="div"
-      padding="small"
+      padding="x-small"
       borderWidth="0 0 small 0"
       borderColor="primary"
       width="100%"
@@ -124,13 +124,13 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcement}) => {
     >
       <Flex direction="column" gap="xxx-small">
         <Flex.Item>
-          <Flex direction="row" gap="small">
+          <Flex direction="row" gap="x-small">
             {/* Avatar */}
             <Flex.Item shouldShrink>
               <Avatar
-                name={announcement.author?.name || 'Unknown Author'}
+                name={announcement.author?.name || I18n.t('Unknown Author')}
                 src={announcement.author?.avatarUrl}
-                size="small"
+                size="x-small"
               />
             </Flex.Item>
 
@@ -154,7 +154,7 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcement}) => {
                 {/* Row 2: Course code */}
                 <Flex.Item>
                   <Text size="x-small" color="brand" weight="bold">
-                    {announcement.course?.courseCode || 'Unknown'}
+                    {announcement.course?.courseCode || I18n.t('Unknown')}
                   </Text>
                 </Flex.Item>
 
@@ -173,26 +173,19 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcement}) => {
           </Flex>
         </Flex.Item>
         <Flex.Item>
-          {/* Message section - full width below avatar + content */}
+          {/* Announcement Content */}
           {announcement.message && (
             <View padding="0 0 0 xxx-small">
               <Text size="x-small">
-                <TruncatedText maxLength={80}>
+                <TruncatedText maxLength={60}>
                   {announcement.message.replace(/<[^>]*>/g, '')}
-                </TruncatedText>
+                </TruncatedText>{' '}
+                <Link href={announcement.html_url} isWithinText={true}>
+                  <Text size="x-small" color="brand">
+                    {I18n.t('Read more')}
+                  </Text>
+                </Link>
               </Text>
-            </View>
-          )}
-        </Flex.Item>
-        <Flex.Item>
-          {/* Read more section - full width */}
-          {announcement.message && (
-            <View padding="0 0 0 xxx-small">
-              <Link href={announcement.html_url} isWithinText={false}>
-                <Text size="x-small" color="brand">
-                  {I18n.t('Read more')}
-                </Text>
-              </Link>
             </View>
           )}
         </Flex.Item>

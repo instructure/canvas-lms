@@ -22,70 +22,58 @@ import React from 'react'
 import {waitFor} from '@testing-library/react'
 import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
-import {useAnnouncements} from '../useAnnouncements'
-
-const mockAnnouncementsData = [
-  {
-    _id: '1',
-    title: 'Test Announcement 1',
-    message: '<p>This is a test announcement message</p>',
-    createdAt: '2025-01-15T10:00:00Z',
-    contextName: 'Test Course 1',
-    contextId: '1',
-    isAnnouncement: true,
-    author: {
-      _id: 'user1',
-      name: 'Test Teacher 1',
-      avatarUrl: 'https://example.com/avatar1.jpg',
-    },
-    participant: {
-      id: 'participant1',
-      read: true,
-    },
-  },
-  {
-    _id: '2',
-    title: 'Test Announcement 2',
-    message: '<p>Another test announcement</p>',
-    createdAt: '2025-01-14T15:30:00Z',
-    contextName: 'Test Course 2',
-    contextId: '2',
-    isAnnouncement: true,
-    author: {
-      _id: 'user2',
-      name: 'Test Teacher 2',
-      avatarUrl: 'https://example.com/avatar2.jpg',
-    },
-    participant: null,
-  },
-]
+import {usePaginatedAnnouncements} from '../useAnnouncements'
 
 const mockGqlResponse = {
   data: {
     legacyNode: {
       _id: '123',
-      enrollments: [
-        {
-          course: {
-            _id: '1',
-            name: 'Test Course 1',
-            courseCode: 'TEST101',
-            discussionsConnection: {
-              nodes: [mockAnnouncementsData[0]],
+      discussionParticipantsConnection: {
+        nodes: [
+          {
+            id: 'participant1',
+            read: true,
+            discussionTopic: {
+              _id: '1',
+              title: 'Test Announcement 1',
+              message: '<p>This is a test announcement message</p>',
+              createdAt: '2025-01-15T10:00:00Z',
+              contextName: 'Test Course 1',
+              contextId: '1',
+              isAnnouncement: true,
+              author: {
+                _id: 'user1',
+                name: 'Test Teacher 1',
+                avatarUrl: 'https://example.com/avatar1.jpg',
+              },
             },
           },
-        },
-        {
-          course: {
-            _id: '2',
-            name: 'Test Course 2',
-            courseCode: 'TEST102',
-            discussionsConnection: {
-              nodes: [mockAnnouncementsData[1]],
+          {
+            id: 'participant2',
+            read: false,
+            discussionTopic: {
+              _id: '2',
+              title: 'Test Announcement 2',
+              message: '<p>Another test announcement</p>',
+              createdAt: '2025-01-14T15:30:00Z',
+              contextName: 'Test Course 2',
+              contextId: '2',
+              isAnnouncement: true,
+              author: {
+                _id: 'user2',
+                name: 'Test Teacher 2',
+                avatarUrl: 'https://example.com/avatar2.jpg',
+              },
             },
           },
+        ],
+        pageInfo: {
+          hasNextPage: false,
+          hasPreviousPage: false,
+          startCursor: null,
+          endCursor: null,
         },
-      ],
+      },
     },
   },
 }
@@ -114,7 +102,7 @@ const setup = (props = {}, envOverrides = {}) => {
   })
 
   const hookParams = buildDefaultProps(props)
-  const result = renderHook(() => useAnnouncements(hookParams), {
+  const result = renderHook(() => usePaginatedAnnouncements(hookParams), {
     wrapper: ({children}: {children: React.ReactNode}) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     ),
@@ -132,7 +120,7 @@ const setup = (props = {}, envOverrides = {}) => {
 
 const server = setupServer()
 
-describe('useAnnouncements', () => {
+describe('usePaginatedAnnouncements', () => {
   beforeAll(() => {
     server.listen({
       onUnhandledRequest: 'bypass',
@@ -160,11 +148,12 @@ describe('useAnnouncements', () => {
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false)
-      expect(result.current.data).toHaveLength(2)
+      expect(result.current.data?.pages).toHaveLength(1)
+      expect(result.current.data?.pages[0]?.announcements).toHaveLength(2)
       expect(result.current.error).toBeNull()
     })
 
-    expect(result.current.data?.[0]).toEqual({
+    expect(result.current.data?.pages[0]?.announcements[0]).toEqual({
       id: '1',
       title: 'Test Announcement 1',
       message: '<p>This is a test announcement message</p>',
@@ -174,7 +163,7 @@ describe('useAnnouncements', () => {
       course: {
         id: '1',
         name: 'Test Course 1',
-        courseCode: 'TEST101',
+        courseCode: '',
       },
       author: {
         _id: 'user1',
@@ -213,7 +202,15 @@ describe('useAnnouncements', () => {
           data: {
             legacyNode: {
               _id: '123',
-              enrollments: [],
+              discussionParticipantsConnection: {
+                nodes: [],
+                pageInfo: {
+                  hasNextPage: false,
+                  hasPreviousPage: false,
+                  startCursor: null,
+                  endCursor: null,
+                },
+              },
             },
           },
         })
@@ -226,7 +223,8 @@ describe('useAnnouncements', () => {
       expect(result.current.isLoading).toBe(false)
     })
 
-    expect(result.current.data).toEqual([])
+    expect(result.current.data?.pages).toHaveLength(1)
+    expect(result.current.data?.pages[0]?.announcements).toEqual([])
     expect(result.current.error).toBeNull()
 
     cleanup()
@@ -249,7 +247,8 @@ describe('useAnnouncements', () => {
       expect(result.current.isLoading).toBe(false)
     })
 
-    expect(result.current.data).toEqual([])
+    expect(result.current.data?.pages).toHaveLength(1)
+    expect(result.current.data?.pages[0]?.announcements).toEqual([])
     expect(result.current.error).toBeNull()
 
     cleanup()
@@ -277,76 +276,63 @@ describe('useAnnouncements', () => {
   })
 
   it('should sort announcements by creation date descending', async () => {
-    const unsortedResponse = {
+    const sortedResponse = {
       data: {
         legacyNode: {
           _id: '123',
-          enrollments: [
-            {
-              course: {
-                _id: '1',
-                name: 'Test Course',
-                courseCode: 'TEST101',
-                discussionsConnection: {
-                  nodes: [
-                    {
-                      _id: '1',
-                      title: 'Older Announcement',
-                      message: 'Older',
-                      createdAt: '2025-01-10T10:00:00Z',
-                      contextName: 'Test Course',
-                      contextId: '1',
-                      isAnnouncement: true,
-                      lockAt: null,
-                      delayedPostAt: null,
-                      postedAt: '2025-01-10T10:00:00Z',
-                      published: true,
-                      availableForUser: true,
-                      author: {
-                        _id: 'user1',
-                        name: 'Test Teacher 1',
-                        avatarUrl: 'https://example.com/avatar1.jpg',
-                      },
-                      participant: null,
-                      permissions: {
-                        read: true,
-                      },
-                    },
-                    {
-                      _id: '2',
-                      title: 'Newer Announcement',
-                      message: 'Newer',
-                      createdAt: '2025-01-20T10:00:00Z',
-                      contextName: 'Test Course',
-                      contextId: '1',
-                      isAnnouncement: true,
-                      lockAt: null,
-                      delayedPostAt: null,
-                      postedAt: '2025-01-20T10:00:00Z',
-                      published: true,
-                      availableForUser: true,
-                      author: {
-                        _id: 'user2',
-                        name: 'Test Teacher 2',
-                        avatarUrl: 'https://example.com/avatar2.jpg',
-                      },
-                      participant: null,
-                      permissions: {
-                        read: true,
-                      },
-                    },
-                  ],
+          discussionParticipantsConnection: {
+            nodes: [
+              {
+                id: 'participant2',
+                read: false,
+                discussionTopic: {
+                  _id: '2',
+                  title: 'Newer Announcement',
+                  message: 'Newer',
+                  createdAt: '2025-01-20T10:00:00Z',
+                  contextName: 'Test Course',
+                  contextId: '1',
+                  isAnnouncement: true,
+                  author: {
+                    _id: 'user2',
+                    name: 'Test Teacher 2',
+                    avatarUrl: 'https://example.com/avatar2.jpg',
+                  },
                 },
               },
+              {
+                id: 'participant1',
+                read: false,
+                discussionTopic: {
+                  _id: '1',
+                  title: 'Older Announcement',
+                  message: 'Older',
+                  createdAt: '2025-01-10T10:00:00Z',
+                  contextName: 'Test Course',
+                  contextId: '1',
+                  isAnnouncement: true,
+                  author: {
+                    _id: 'user1',
+                    name: 'Test Teacher 1',
+                    avatarUrl: 'https://example.com/avatar1.jpg',
+                  },
+                },
+              },
+            ],
+            pageInfo: {
+              hasNextPage: false,
+              hasPreviousPage: false,
+              startCursor: null,
+              endCursor: null,
             },
-          ],
+          },
         },
       },
     }
 
     server.use(
       graphql.query('GetUserAnnouncements', () => {
-        return HttpResponse.json(unsortedResponse)
+        return HttpResponse.json(sortedResponse)
       }),
     )
 
@@ -356,9 +342,10 @@ describe('useAnnouncements', () => {
       expect(result.current.isLoading).toBe(false)
     })
 
-    expect(result.current.data).toHaveLength(2)
-    expect(result.current.data?.[0]?.title).toBe('Newer Announcement')
-    expect(result.current.data?.[1]?.title).toBe('Older Announcement')
+    expect(result.current.data?.pages).toHaveLength(1)
+    expect(result.current.data?.pages[0]?.announcements).toHaveLength(2)
+    expect(result.current.data?.pages[0]?.announcements[0]?.title).toBe('Newer Announcement')
+    expect(result.current.data?.pages[0]?.announcements[1]?.title).toBe('Older Announcement')
 
     cleanup()
   })
@@ -369,34 +356,34 @@ describe('useAnnouncements', () => {
       data: {
         legacyNode: {
           _id: '123',
-          enrollments: [
-            {
-              course: {
-                _id: '1',
-                name: 'Test Course',
-                courseCode: 'TEST101',
-                discussionsConnection: {
-                  nodes: [
-                    {
-                      _id: '1',
-                      title: 'Visible Announcement',
-                      message: 'This announcement is visible to the user',
-                      createdAt: '2025-01-15T10:00:00Z',
-                      contextName: 'Test Course',
-                      contextId: '1',
-                      isAnnouncement: true,
-                      author: {
-                        _id: 'user1',
-                        name: 'Test Teacher',
-                        avatarUrl: 'https://example.com/avatar.jpg',
-                      },
-                      participant: null,
-                    },
-                  ],
+          discussionParticipantsConnection: {
+            nodes: [
+              {
+                id: 'participant1',
+                read: false,
+                discussionTopic: {
+                  _id: '1',
+                  title: 'Visible Announcement',
+                  message: 'This announcement is visible to the user',
+                  createdAt: '2025-01-15T10:00:00Z',
+                  contextName: 'Test Course',
+                  contextId: '1',
+                  isAnnouncement: true,
+                  author: {
+                    _id: 'user1',
+                    name: 'Test Teacher',
+                    avatarUrl: 'https://example.com/avatar.jpg',
+                  },
                 },
               },
+            ],
+            pageInfo: {
+              hasNextPage: false,
+              hasPreviousPage: false,
+              startCursor: null,
+              endCursor: null,
             },
-          ],
+          },
         },
       },
     }
@@ -414,8 +401,9 @@ describe('useAnnouncements', () => {
     })
 
     // The API should return only announcements the user can see
-    expect(result.current.data).toHaveLength(1)
-    expect(result.current.data?.[0]?.title).toBe('Visible Announcement')
+    expect(result.current.data?.pages).toHaveLength(1)
+    expect(result.current.data?.pages[0]?.announcements).toHaveLength(1)
+    expect(result.current.data?.pages[0]?.announcements[0]?.title).toBe('Visible Announcement')
     expect(result.current.error).toBeNull()
 
     cleanup()
