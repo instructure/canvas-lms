@@ -1769,34 +1769,14 @@ describe Types::AssignmentType do
   end
 
   describe "assignedToDates field" do
-    context "when standardize_assignment_date_formatting feature flag is disabled" do
-      before do
-        Account.site_admin.disable_feature!(:standardize_assignment_date_formatting)
-      end
+    it "includes assignment overrides when present" do
+      override = assignment_override_model(assignment:, due_at: 2.weeks.from_now)
+      override.assignment_override_students.build(user: student)
+      override.save!
 
-      it "returns nil" do
-        expect(assignment_type.resolve("assignedToDates { id }")).to be_nil
-      end
-    end
-
-    context "when standardize_assignment_date_formatting feature flag is enabled" do
-      before do
-        Account.site_admin.enable_feature!(:standardize_assignment_date_formatting)
-      end
-
-      after do
-        Account.site_admin.disable_feature!(:standardize_assignment_date_formatting)
-      end
-
-      it "includes assignment overrides when present" do
-        override = assignment_override_model(assignment:, due_at: 2.weeks.from_now)
-        override.assignment_override_students.build(user: student)
-        override.save!
-
-        result = assignment_type.resolve("assignedToDates { id dueAt title base }")
-        expect(result).to be_an(Array)
-        expect(result.length).to eq(1)
-      end
+      result = assignment_type.resolve("assignedToDates { id dueAt title base }")
+      expect(result).to be_an(Array)
+      expect(result.length).to eq(1)
     end
   end
 

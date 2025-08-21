@@ -59,27 +59,16 @@ class OverrideListPresenter
     student_count = 0
     mastery_paths = false
 
-    if Account.site_admin.feature_enabled?(:standardize_assignment_date_formatting)
-      formatted_override[:options].each do |option|
-        everyone = true if ["Course", nil].include?(option)
-        section_count += 1 if option == "CourseSection"
-        group_count += 1 if option == "Group"
-        tag_count += 1 if option == "Tag"
-        if option&.include?("student")
-          count = option[/\d+/]
-          student_count += count.to_i if count
-        end
-        mastery_paths = true if option == "Noop"
+    formatted_override[:options].each do |option|
+      everyone = true if ["Course", nil].include?(option)
+      section_count += 1 if option == "CourseSection"
+      group_count += 1 if option == "Group"
+      tag_count += 1 if option == "Tag"
+      if option&.include?("student")
+        count = option[/\d+/]
+        student_count += count.to_i if count
       end
-    else
-      formatted_override[:options].each do |option|
-        everyone = true if option == "everyone"
-        section_count += 1 if /\Asection-\d+\z/.match?(option)
-        group_count += 1 if /\Agroup-\d+\z/.match?(option)
-        tag_count += 1 if /\Atag-\d+\z/.match?(option)
-        student_count += 1 if /\Astudent-\d+\z/.match?(option)
-        mastery_paths = true if option == "mastery_paths"
-      end
+      mastery_paths = true if option == "Noop"
     end
 
     have_multiple_due_dates = other_due_dates_exist || section_count > 0 || group_count > 0 || tag_count > 0 || student_count > 0 || mastery_paths
@@ -143,56 +132,12 @@ class OverrideListPresenter
   #   if it isn't needed (e.g. if all sections have overrides).
   #
   # Returns an array of due date hashes.
-  def visible_due_dates
-    if Account.site_admin.feature_enabled?(:standardize_assignment_date_formatting)
-      return visible_due_dates_v2
-    end
+  def visible_due_dates(group_by_date: true)
     return [] unless assignment
 
-    assignment.dates_hash_visible_to(user).each do |due_date|
-      due_date[:raw] = due_date.dup
-      due_date[:lock_at] = lock_at due_date
-      due_date[:unlock_at] = unlock_at due_date
-      due_date[:due_at] = due_at due_date
-      due_date[:due_for] = due_for due_date
-    end
-  end
-
-  def grouped_and_sorted_by_visible_due_dates(group_by_date: true)
-    if Account.site_admin.feature_enabled?(:standardize_assignment_date_formatting)
-      return visible_due_dates_v2(group_by_date:)
-    end
-    return [] unless assignment
-
-    # Only supports classic quizzes and normal assignments
-    type_is_allowed = assignment.is_a?(Assignment) ? assignment.submission_types != "discussion_topic" : assignment.is_a?(Quizzes::Quiz)
-    if type_is_allowed
-      overrides = assignment.formatted_dates_hash_visible_to(user, assignment.context)
-      overrides = convert_non_collaborative_groups_to_tags(overrides)
-      overrides = assignment.merge_overrides_by_date(overrides)
-      other_due_dates_exist = overrides.length > 1
-      overrides.sort_by! { |card| [card[:due_at].nil? ? 1 : 0, card[:due_at]] }
-
-      overrides.map do |due_date|
-        result = {}
-        result[:raw] = due_date.dup
-        result[:lock_at] = lock_at due_date
-        result[:unlock_at] = unlock_at due_date
-        result[:due_at] = due_at due_date
-        result[:due_for] = formatted_due_for(due_date, other_due_dates_exist:)
-        result
-      end
-    else
-      visible_due_dates
-    end
-  end
-
-  def visible_due_dates_v2(group_by_date: true)
-    return [] unless assignment
-
-    overrides = assignment.dates_hash_visible_to_v2(user)
+    overrides = assignment.dates_hash_visible_to(user)
     overrides = convert_non_collaborative_groups_to_tags_v2(overrides)
-    overrides = assignment.merge_overrides_by_date_v2(overrides) if group_by_date
+    overrides = assignment.merge_overrides_by_date(overrides) if group_by_date
     other_due_dates_exist = overrides.length > 1
 
     overrides.map do |due_date|

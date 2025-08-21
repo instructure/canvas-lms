@@ -75,8 +75,6 @@ const aoSetDescriber = (dueAtCount: DueAtCount) => {
 }
 
 const DueDateLabel: React.FC<DueDateLabelProps> = ({contentTagId, content}) => {
-  const isStandardizedFormattingEnabled = !!ENV.FEATURES?.standardize_assignment_date_formatting
-
   const getAssignmentOverrides = (content: ModuleItemContent) => {
     return content?.assignmentOverrides || content?.assignment?.assignmentOverrides
   }
@@ -92,9 +90,8 @@ const DueDateLabel: React.FC<DueDateLabelProps> = ({contentTagId, content}) => {
 
   const assignmentOverrides = getAssignmentOverrides(content)
   const baseDueDate = getBaseDueDate(content)
-  const assignedToDates = isStandardizedFormattingEnabled ? content?.assignedToDates : null
+  const assignedToDates = content?.assignedToDates
   const useStandardizedDates = assignedToDates && assignedToDates.length > 0
-  const isUngradedDiscussion = content?.type === 'Discussion' && content?.graded === false
 
   const tooltipContents = useMemo(() => {
     if (useStandardizedDates) {
