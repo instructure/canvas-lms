@@ -19,6 +19,7 @@
 import {fireEvent} from '@testing-library/react'
 import {KBNavigator, handleShortcutKey} from '../KBNavigator'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {DragStateChangeDetail} from '../types'
 
 const buildTeacherModule = (id: string, position: number, collapsed: boolean): HTMLElement => {
   const mod = `
@@ -432,7 +433,7 @@ describe('KBNavigator', () => {
             courseId: '123',
             moduleId: '3',
             moduleItemId: '3-1',
-            setMenuIsOpen: undefined,
+            setIsMenuOpen: undefined,
             onAfterSuccess: expect.any(Function),
           })
         })
@@ -572,27 +573,61 @@ describe('KBNavigator', () => {
         })
       })
     })
+    describe('other cases', () => {
+      afterEach(() => {
+        document.dispatchEvent(
+          new CustomEvent<DragStateChangeDetail>('drag-state-change', {
+            detail: {isDragging: false},
+          }),
+        )
+      })
 
-    it('should not handle unhandled keys - no focus change', () => {
-      const module1 = document.querySelector('[data-module-id="1"]') as HTMLElement
-      module1.focus()
-      const initialFocus = document.activeElement
+      it('should handle ? key press for help - no focus change', () => {
+        const module1 = document.querySelector('[data-module-id="1"]') as HTMLElement
+        module1.focus()
+        const initialFocus = document.activeElement
 
-      fireEvent.keyDown(module1, {key: 'x'})
+        fireEvent.keyDown(module1, {key: '?', shiftKey: true})
 
-      // Unhandled keys don't change focus
-      expect(document.activeElement).toBe(initialFocus)
-    })
+        // Help action doesn't change focus
+        expect(document.activeElement).toBe(initialFocus)
+      })
 
-    it('should not handle keys when ctrl is pressed - no focus change', () => {
-      const module1 = document.querySelector('[data-module-id="1"]') as HTMLElement
-      module1.focus()
-      const initialFocus = document.activeElement
+      it('should not handle unhandled keys - no focus change', () => {
+        const module1 = document.querySelector('[data-module-id="1"]') as HTMLElement
+        module1.focus()
+        const initialFocus = document.activeElement
 
-      fireEvent.keyDown(module1, {key: 'ArrowDown', ctrlKey: true})
+        fireEvent.keyDown(module1, {key: 'x'})
 
-      // Ctrl+ArrowDown should be ignored
-      expect(document.activeElement).toBe(initialFocus)
+        // Unhandled keys don't change focus
+        expect(document.activeElement).toBe(initialFocus)
+      })
+
+      it('should not handle keys when ctrl is pressed - no focus change', () => {
+        const module1 = document.querySelector('[data-module-id="1"]') as HTMLElement
+        module1.focus()
+        const initialFocus = document.activeElement
+
+        fireEvent.keyDown(module1, {key: 'ArrowDown', ctrlKey: true})
+
+        // Ctrl+ArrowDown should be ignored
+        expect(document.activeElement).toBe(initialFocus)
+      })
+
+      it('should not handle keys while dnd is in progress', () => {
+        document.dispatchEvent(
+          new CustomEvent<DragStateChangeDetail>('drag-state-change', {detail: {isDragging: true}}),
+        )
+        const module1 = document.querySelector('[data-module-id="1"]') as HTMLElement
+        module1.focus()
+        const initialFocus = document.activeElement
+
+        fireEvent.keyDown(module1, {key: 'j'})
+
+        // Unhandled keys don't change focus
+        expect(document.activeElement).toBe(initialFocus)
+      })
     })
   })
 })

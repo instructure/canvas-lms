@@ -407,15 +407,28 @@ export interface HTMLElementWithRoot extends HTMLElement {
   reactRoot?: Root
 }
 
+export type DragStateChangeEvent = 'drag-state-change'
+export interface DragStateChangeDetail {
+  isDragging: boolean
+}
+
 declare global {
   interface Document {
     addEventListener(
       type: ModuleKBActionEvent,
       listener: (event: CustomEvent<ModuleActionEventDetail>) => void,
     ): void
+    addEventListener(
+      type: DragStateChangeEvent,
+      listener: (event: CustomEvent<DragStateChangeDetail>) => void,
+    ): void
     removeEventListener(
       type: ModuleKBActionEvent,
       listener: (event: CustomEvent<ModuleActionEventDetail>) => void,
+    ): void
+    removeEventListener(
+      type: DragStateChangeEvent,
+      listener: (event: CustomEvent<DragStateChangeDetail>) => void,
     ): void
   }
 }
