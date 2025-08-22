@@ -75,7 +75,7 @@ class NotificationPolicyOverride < ActiveRecord::Base
   end
 
   def self.enabled_for_all_contexts(user, contexts, channel: nil)
-    !(find_all_for(user, contexts, channel:).find { |npo| npo.notification_id.nil? && npo.workflow_state == "disabled" })
+    !find_all_for(user, contexts, channel:).find { |npo| npo.notification_id.nil? && npo.workflow_state == "disabled" }
   end
 
   def self.find_all_for(user, contexts, channel: nil)

@@ -250,7 +250,7 @@ class NotificationMessageCreator
     # only use new policies for default channel when there are no other policies for the notification and user.
     # If another policy exists then it means the notification preferences page has been visited and null values
     # show as never policies in the UI.
-    default_email?(user, channel) && (user.notification_policies.find { |np| np.notification_id == @notification.id }).nil?
+    default_email?(user, channel) && user.notification_policies.find { |np| np.notification_id == @notification.id }.nil?
   end
 
   def default_email?(user, channel)

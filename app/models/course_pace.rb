@@ -452,7 +452,7 @@ class CoursePace < ActiveRecord::Base
 
   def weekends_excluded
     if skip_selected_days_enabled?
-      (%w[sun sat].all? { |weekend_day| selected_days_to_skip.include?(weekend_day) })
+      %w[sun sat].all? { |weekend_day| selected_days_to_skip.include?(weekend_day) }
     else
       exclude_weekends
     end
