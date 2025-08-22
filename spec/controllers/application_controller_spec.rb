@@ -971,6 +971,40 @@ RSpec.describe ApplicationController do
         allow(PageView).to receive(:find_for_update).and_return(page_view)
         expect { controller.send(:add_interaction_seconds) }.not_to raise_error
       end
+
+      context "when page view update is disabled" do
+        before do
+          Setting.set("skip_pageview_updates", "true")
+          Setting.set("enable_page_views", "true")
+        end
+
+        after do
+          Setting.set("skip_pageview_updates", "false")
+          Setting.set("enable_page_views", "false")
+        end
+
+        it "sets created_at for the page view thus allowing the interaction token to be generated correctly" do
+          Timecop.freeze do
+            request_id = "31877f1c-7bfc-4389-8daa-3adb48d98829"
+            interaction_seconds = 12
+            created_at = Time.zone.now
+            expected_interaction_token = "#{request_id}|#{created_at.iso8601(2)}|#{interaction_seconds}"
+            controller.response = double("response", headers: {})
+            controller.params[:page_view_token] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpIjoiMzE4NzdmMWMtN2JmYy00Mzg5LThkYWEtM2FkYjQ4ZDk4ODI5IiwidSI6bnVsbCwiYyI6bnVsbH0.IltPMbU08FUf-Kr_5vYzie4HnSW2tW8qFfYJunR9Z4o"
+            controller.params[:interaction_seconds] = interaction_seconds
+            allow(controller.request).to receive_messages(xhr?: 0, put?: true)
+            allow(controller.response).to receive(:headers).and_return({})
+            expect(RequestContext::Generator).to receive(:add_meta_header).with("r", expected_interaction_token)
+
+            controller.send(:add_interaction_seconds)
+
+            jwt_from_url = controller.response.headers["X-Canvas-Page-View-Update-Url"].split("=").last
+            page_view = CanvasSecurity::PageViewJwt.decode(jwt_from_url)
+            expect(page_view[:request_id]).to eq request_id
+            expect(page_view[:created_at]).to be_truthy
+          end
+        end
+      end
     end
 
     describe "rescue_action_in_public" do

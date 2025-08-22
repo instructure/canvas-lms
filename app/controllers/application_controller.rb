@@ -1931,10 +1931,6 @@ class ApplicationController < ActionController::Base
     return unless (request.xhr? || request.put?) && params[:page_view_token] && !updated_fields.empty?
     return unless page_views_enabled?
 
-    RequestContext::Generator.store_interaction_seconds_update(
-      params[:page_view_token],
-      updated_fields[:interaction_seconds]
-    )
     page_view_info = CanvasSecurity::PageViewJwt.decode(params[:page_view_token])
     @page_view = PageView.find_for_update(page_view_info[:request_id])
     if @page_view
@@ -1945,6 +1941,11 @@ class ApplicationController < ActionController::Base
       end
       @page_view.do_update(updated_fields)
       @page_view_update = true
+
+      RequestContext::Generator.store_interaction_seconds_update(
+        @page_view,
+        updated_fields[:interaction_seconds]
+      )
     end
   end
 
