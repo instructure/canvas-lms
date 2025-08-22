@@ -69,6 +69,22 @@ describe User do
     end
   end
 
+  context "associations" do
+    it "has many discussion_topic_participants" do
+      user = user_model
+      course = course_factory
+      announcement = course.announcements.create!(title: "Test", message: "Test")
+
+      participant = user.discussion_topic_participants.create!(
+        discussion_topic: announcement,
+        workflow_state: "read"
+      )
+
+      expect(user.discussion_topic_participants).to include(participant)
+      expect(user.discussion_topic_participants.count).to eq(1)
+    end
+  end
+
   describe "notifications" do
     describe "#daily_notification_time" do
       it "returns the users 6pm local time" do

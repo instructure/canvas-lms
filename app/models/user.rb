@@ -176,6 +176,7 @@ class User < ActiveRecord::Base
   has_many :discussion_entries
   has_many :discussion_entry_drafts, inverse_of: :user
   has_many :discussion_entry_versions, inverse_of: :user
+  has_many :discussion_topic_participants, dependent: :destroy
   has_many :all_attachments, as: "context", class_name: "Attachment"
   has_many :folders, -> { order("folders.name") }, as: :context, inverse_of: :context
   has_many :submissions_folders, -> { where.not(folders: { submission_context_code: nil }) }, as: :context, inverse_of: :context, class_name: "Folder"

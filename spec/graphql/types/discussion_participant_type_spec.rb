@@ -35,6 +35,7 @@ describe Types::DiscussionParticipantType do
       workflowState
       expanded
       sortOrder
+      discussionTopic
     ]
     expect(Types::DiscussionParticipantType.fields.keys).to match_array(expected_fields)
   end
@@ -58,6 +59,19 @@ describe Types::DiscussionParticipantType do
 
       @participant.update!(workflow_state: "unread")
       expect(@participant.workflow_state).to eq("unread")
+    end
+  end
+
+  describe "discussion_topic field" do
+    it "returns the associated discussion topic" do
+      expect(@participant.discussion_topic).to eq(@discussion)
+      expect(@participant.discussion_topic.title).to eq("Test Discussion")
+    end
+
+    it "loads the association properly" do
+      # Ensure the association is loaded without additional queries
+      expect(@participant.discussion_topic).to be_a(DiscussionTopic)
+      expect(@participant.discussion_topic.id).to eq(@discussion.id)
     end
   end
 end
