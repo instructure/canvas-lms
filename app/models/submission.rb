@@ -135,6 +135,7 @@ class Submission < ActiveRecord::Base
   attr_writer :regraded
   attr_writer :audit_grade_changes
   attr_writer :versioned_originality_reports
+  attr_writer :auto_grade_result_present
 
   belongs_to :attachment # this refers to the screenshot of the submission if it is a url submission
   belongs_to :assignment, inverse_of: :submissions, class_name: "AbstractAssignment"
@@ -193,6 +194,7 @@ class Submission < ActiveRecord::Base
            dependent: :destroy,
            inverse_of: :submission
   has_many :submission_texts, dependent: :destroy
+  has_many :auto_grade_results, dependent: :destroy
 
   serialize :turnitin_data, type: Hash
 
@@ -246,6 +248,24 @@ class Submission < ActiveRecord::Base
       .order(graded_at: :desc)
       .limit(limit)
   }
+
+  # Returns true if an AutoGradeResult exists for this submission and attempt.
+  # Used by GraphQL SubmissionInterface to surface AI-grading disclaimer flags.
+  def auto_grade_result_present?
+    return @auto_grade_result_present if defined?(@auto_grade_result_present)
+
+    auto_grade_results.where(attempt: attempt || 1).exists?
+  end
+
+  alias_method :auto_grade_result_present, :auto_grade_result_present?
+
+  def self.preload_auto_grade_result_present(submissions)
+    ids_with_auto_grade_results = Submission.joins(:auto_grade_results)
+                                            .where(submissions: { id: submissions })
+                                            .where("auto_grade_results.attempt = COALESCE(submissions.attempt, 1)")
+                                            .pluck("submissions.id")
+    submissions.each { |sub| sub.auto_grade_result_present = ids_with_auto_grade_results.include?(sub.id) }
+  end
 
   scope :for_course, ->(course) { where(course_id: course) }
   scope :for_assignment, ->(assignment) { where(assignment:) }

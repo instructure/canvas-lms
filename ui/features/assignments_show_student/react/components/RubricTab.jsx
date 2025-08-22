@@ -29,6 +29,7 @@ import {Text} from '@instructure/ui-text'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {Alert} from '@instructure/ui-alerts'
 import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
 import useStore from './stores/index'
 import {RubricAssessmentTray, TraditionalView} from '@canvas/rubrics/react/RubricAssessment'
 import {Button} from '@instructure/ui-buttons'
@@ -147,6 +148,7 @@ export default function RubricTab(props) {
         criteria={rubricCriteria}
         hidePoints={hidePoints}
         isPreviewMode={true}
+        isAiEvaluated={props.isAiEvaluated}
         isFreeFormCriterionComments={props.rubric.free_form_criterion_comments}
         onUpdateAssessmentData={() => {}}
         ratingOrder={props.rubric.ratingOrder}
@@ -162,6 +164,7 @@ export default function RubricTab(props) {
         onAssessmentChange={
           props.peerReviewModeEnabled && !hasSubmittedAssessment ? onAssessmentChange : null
         }
+        isAiEvaluated={props.isAiEvaluated}
       />
     )
   }
@@ -191,6 +194,7 @@ export default function RubricTab(props) {
               isOpen={rubricTrayOpen}
               isPreviewMode={hasSubmittedAssessment}
               isPeerReview={true}
+              isAiEvaluated={props.isAiEvaluated}
               onDismiss={() => setRubricTrayOpen(false)}
               rubricAssessmentData={rubricAssessmentData}
               rubric={rubricData}
@@ -263,6 +267,7 @@ RubricTab.propTypes = {
   peerReviewModeEnabled: bool,
   rubricExpanded: bool,
   toggleRubricExpanded: func,
+  isAiEvaluated: bool,
 }
 
 RubricTab.defaultProps = {

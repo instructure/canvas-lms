@@ -22,6 +22,14 @@ import Rubric from '../Rubric'
 import {rubric, assessments} from './fixtures'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
+// Mock the AiUsageButton component
+jest.mock('../components/AiUsageButton', () => {
+  return {
+    __esModule: true,
+    default: () => <button data-testid="ai-usage-button">AI Assisted</button>,
+  }
+})
+
 describe('the Rubric component', () => {
   it('renders as expected', () => {
     const {container} = render(
@@ -183,6 +191,43 @@ describe('the Rubric component', () => {
       )
       expect(queryByTestId('rubric-total')).not.toBeInTheDocument()
       expect(queryAllByTestId('table-heading-points')).toHaveLength(0)
+    })
+  })
+
+  describe('AiUsageButton rendering', () => {
+    it('renders AiUsageButton when isAiEvaluated is true', () => {
+      const {getByTestId} = render(
+        <Rubric
+          rubric={rubric}
+          rubricAssessment={assessments.points}
+          rubricAssociation={assessments.points.rubric_association}
+          isAiEvaluated={true}
+        />,
+      )
+      expect(getByTestId('ai-usage-button')).toBeInTheDocument()
+    })
+
+    it('does not render AiUsageButton when isAiEvaluated is false', () => {
+      const {queryByTestId} = render(
+        <Rubric
+          rubric={rubric}
+          rubricAssessment={assessments.points}
+          rubricAssociation={assessments.points.rubric_association}
+          isAiEvaluated={false}
+        />,
+      )
+      expect(queryByTestId('ai-usage-button')).not.toBeInTheDocument()
+    })
+
+    it('does not render AiUsageButton when isAiEvaluated is not provided', () => {
+      const {queryByTestId} = render(
+        <Rubric
+          rubric={rubric}
+          rubricAssessment={assessments.points}
+          rubricAssociation={assessments.points.rubric_association}
+        />,
+      )
+      expect(queryByTestId('ai-usage-button')).not.toBeInTheDocument()
     })
   })
 })

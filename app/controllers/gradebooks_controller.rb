@@ -123,6 +123,7 @@ class GradebooksController < ApplicationController
     end
 
     ActiveRecord::Associations.preload(@presenter.submissions, :visible_submission_comments)
+    Submission.preload_auto_grade_result_present(@presenter.submissions)
     custom_gradebook_statuses_enabled = Account.site_admin.feature_enabled?(:custom_gradebook_statuses)
     submissions_json = @presenter.submissions.map do |submission|
       json = {
@@ -135,7 +136,8 @@ class GradebooksController < ApplicationController
                       workflow_state: submission.workflow_state,
                       asset_processors: asset_processors(assignment: submission.assignment),
                       asset_reports: @presenter.user_has_elevated_permissions? ? nil : asset_reports(submission:),
-                      submission_type: submission.submission_type
+                      submission_type: submission.submission_type,
+                      auto_grade_result_present: submission.auto_grade_result_present?
                     })
         json[:custom_grade_status_id] = submission.custom_grade_status_id if custom_gradebook_statuses_enabled
       end

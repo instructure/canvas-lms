@@ -30,6 +30,8 @@ import type {
 } from '../types/rubric'
 import {TraditionalViewCriterionRow} from './TraditionalViewCriterionRow'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Flex} from '@instructure/ui-flex'
+import AiUsageButton from '../components/AiUsageButton'
 
 const I18n = createI18nScope('rubrics-assessment-tray')
 
@@ -39,6 +41,7 @@ export type TraditionalViewProps = {
   isFreeFormCriterionComments: boolean
   isPeerReview?: boolean
   isPreviewMode: boolean
+  isAiEvaluated?: boolean
   ratingOrder?: string
   rubricAssessmentData: RubricAssessmentData[]
   rubricSavedComments?: Record<string, string[]>
@@ -55,6 +58,7 @@ export const TraditionalView = ({
   isFreeFormCriterionComments,
   isPeerReview,
   isPreviewMode,
+  isAiEvaluated = false,
   ratingOrder = 'descending',
   rubricAssessmentData,
   rubricSavedComments,
@@ -116,7 +120,10 @@ export const TraditionalView = ({
         padding="x-small small"
         themeOverride={{paddingXSmall: '0.438rem'}}
       >
-        <Text weight="bold">{rubricTitle}</Text>
+        <Flex justifyItems="space-between" alignItems="center" padding="0">
+          <Text weight="bold">{rubricTitle}</Text>
+          {isAiEvaluated && <AiUsageButton />}
+        </Flex>
       </View>
 
       <table style={{width: '100%', height: '100%'}}>

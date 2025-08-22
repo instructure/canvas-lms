@@ -60,6 +60,7 @@ export const RUBRIC_QUERY = gql`
     }
     submission(id: $submissionID) {
       id
+      autoGradeResultPresent
       rubricAssessmentsConnection(filter: {forAttempt: $submissionAttempt}) {
         nodes {
           ...RubricAssessment
