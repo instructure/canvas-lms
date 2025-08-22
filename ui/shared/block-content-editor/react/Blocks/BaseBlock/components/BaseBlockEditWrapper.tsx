@@ -33,6 +33,8 @@ import {ApplyButton} from './ApplyButton'
 import {MoveButton} from './MoveButton'
 import {BackgroundColorApplier} from './BackgroundColorApplier'
 import {Flex} from '@instructure/ui-flex'
+import {A11ySaveButton} from './A11ySaveButton'
+import {A11yEditButton} from './A11yEditButton'
 
 const InsertButton = () => {
   const {addBlockModal} = useBlockContentEditorContext()
@@ -90,7 +92,13 @@ export const BaseBlockEditWrapper = (
         addButton={<InsertButton />}
         actionButtons={
           props.isEditMode
-            ? [<ApplyButton key="action-save-button" onClick={() => props.setIsEditMode(false)} />]
+            ? [
+                <A11ySaveButton
+                  key="a11y-save-button"
+                  onKeyDown={() => props.setIsEditMode(false)}
+                />,
+                <ApplyButton key="action-save-button" onClick={() => props.setIsEditMode(false)} />,
+              ]
             : []
         }
         menu={
@@ -100,6 +108,9 @@ export const BaseBlockEditWrapper = (
             <DeleteButton key="menu-delete-button" />
             <MoveBlockButton key="menu-move-block-button" />
           </Flex>
+        }
+        a11yEditButton={
+          !props.isEditMode && <A11yEditButton onKeyDown={() => props.setIsEditMode(true)} />
         }
       >
         {props.children}

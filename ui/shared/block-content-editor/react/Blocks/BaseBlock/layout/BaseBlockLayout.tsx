@@ -28,22 +28,30 @@ export const BaseBlockLayout = React.forwardRef<
     menu: ReactNode
     actionButtons: ReactNode
     addButton: ReactNode
+    a11yEditButton: ReactNode
   }>
 >((props, ref) => {
   return (
     <div ref={ref} className="base-block-layout">
-      <Flex direction="column" padding="paddingCardLarge" gap="mediumSmall">
-        <Flex justifyItems="space-between">
-          <Flex data-header>
-            <Tag text={props.title} size="medium" data-testid="block-type-label" />
+      <Flex direction="column" padding="paddingCardLarge">
+        {props.a11yEditButton && (
+          <Flex data-focus-reveal-parent margin="0 0 mediumSmall 0">
+            {props.a11yEditButton}
           </Flex>
-          <Flex>{props.menu}</Flex>
-        </Flex>
-        <Flex direction="column" gap="small" width={'100%'}>
-          {props.children}
-        </Flex>
-        <Flex direction="row-reverse" width={'100%'} justifyItems="space-between">
-          <Flex.Item>{props.actionButtons}</Flex.Item>
+        )}
+        <Flex direction="column" gap="mediumSmall">
+          <Flex justifyItems="space-between">
+            <Flex data-header>
+              <Tag text={props.title} size="medium" data-testid="block-type-label" />
+            </Flex>
+            <Flex>{props.menu}</Flex>
+          </Flex>
+          <Flex direction="column" gap="small" width={'100%'}>
+            {props.children}
+          </Flex>
+          <Flex width={'100%'} justifyItems="end" gap="small">
+            {props.actionButtons}
+          </Flex>
         </Flex>
       </Flex>
       {props.addButton}
