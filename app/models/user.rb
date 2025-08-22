@@ -159,6 +159,7 @@ class User < ActiveRecord::Base
   has_many :notification_endpoints, -> { merge(AccessToken.active) }, through: :access_tokens, multishard: true
   has_many :context_external_tools, -> { order(:name) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :lti_results, inverse_of: :user, class_name: "Lti::Result", dependent: :destroy
+  has_many :lti_registration_history_entries, inverse_of: :created_by, class_name: "Lti::RegistrationHistoryEntry", foreign_key: "created_by_id"
 
   has_many :student_enrollments
   has_many :ta_enrollments
