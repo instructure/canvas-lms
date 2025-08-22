@@ -84,6 +84,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :delete_submission_comment, mutation: Mutations::DeleteSubmissionComment
   field :delete_submission_draft, mutation: Mutations::DeleteSubmissionDraft
   field :delete_user_inbox_label, mutation: Mutations::DeleteUserInboxLabel
+  field :dismiss_account_notification, mutation: Mutations::DismissAccountNotification
   field :import_outcomes, mutation: Mutations::ImportOutcomes
   field :mark_submission_comments_read, mutation: Mutations::MarkSubmissionCommentsRead
   field :move_outcome_links, mutation: Mutations::MoveOutcomeLinks

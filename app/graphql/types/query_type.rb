@@ -251,6 +251,25 @@ module Types
       Setting.all
     end
 
+    field :account_notifications, [Types::AccountNotificationType], null: false do
+      description "Account notifications for the current user"
+      argument :account_id, ID, "Account ID to fetch notifications for", required: false
+    end
+    def account_notifications(account_id: nil)
+      return [] unless context[:current_user]
+
+      account = if account_id
+                  Account.find_by(id: account_id)
+                else
+                  # Use root account from domain
+                  context[:domain_root_account]
+                end
+
+      return [] unless account
+
+      AccountNotification.for_user_and_account(context[:current_user], account)
+    end
+
     field :rubric, Types::RubricType, null: true do
       description "Rubric"
       argument :id,

@@ -299,4 +299,212 @@ describe Types::QueryType do
       expect(settings["outOfOfficeMessage"]).to eq "Out of office for a week"
     end
   end
+
+  context "accountNotifications" do
+    before(:once) do
+      @account = Account.default
+      @admin = account_admin_user(account: @account)
+      @student = student_in_course(account: @account, active_all: true).user
+      @teacher = teacher_in_course(account: @account, active_all: true).user
+    end
+
+    def create_notification(opts = {})
+      AccountNotification.create!(
+        {
+          account: @account,
+          subject: "Test Notification",
+          message: "<p>Test message</p>",
+          start_at: 1.day.ago,
+          end_at: 30.days.from_now,
+          user: @admin
+        }.merge(opts)
+      )
+    end
+
+    def execute_query(context_user = @student, account_id = nil)
+      query = <<~GQL
+        query {
+          accountNotifications#{"(accountId: \"#{account_id}\")" if account_id} {
+            id
+            _id
+            subject
+            message
+            startAt
+            endAt
+            accountName
+            siteAdmin
+            notificationType
+          }
+        }
+      GQL
+      CanvasSchema.execute(query, context: { current_user: context_user, domain_root_account: @account })
+    end
+
+    describe "fetching notifications" do
+      it "returns empty array when no notifications exist" do
+        result = execute_query(@student)
+        expect(result.dig("data", "accountNotifications")).to eq []
+      end
+
+      it "returns empty array for unauthenticated users" do
+        result = execute_query(nil)
+        expect(result.dig("data", "accountNotifications")).to eq []
+      end
+
+      it "returns active notifications for authenticated users" do
+        notification = create_notification
+        result = execute_query(@student)
+        notifications = result.dig("data", "accountNotifications")
+
+        expect(notifications.length).to eq 1
+        expect(notifications[0]["subject"]).to eq "Test Notification"
+        expect(notifications[0]["_id"]).to eq notification.id.to_s
+      end
+
+      it "excludes expired notifications" do
+        create_notification(start_at: 2.days.ago, end_at: 1.day.ago)
+        result = execute_query(@student)
+        expect(result.dig("data", "accountNotifications")).to eq []
+      end
+
+      it "excludes future notifications" do
+        create_notification(start_at: 1.day.from_now)
+        result = execute_query(@student)
+        expect(result.dig("data", "accountNotifications")).to eq []
+      end
+
+      it "includes currently active notifications" do
+        active_notification = create_notification(
+          start_at: 1.hour.ago,
+          end_at: 1.hour.from_now
+        )
+        result = execute_query(@student)
+        notifications = result.dig("data", "accountNotifications")
+
+        expect(notifications.length).to eq 1
+        expect(notifications[0]["_id"]).to eq active_notification.id.to_s
+      end
+    end
+
+    describe "role-based filtering" do
+      before(:once) do
+        @student_notification = create_notification(subject: "Student Only")
+        @student_role = Role.get_built_in_role("StudentEnrollment", root_account_id: @account.root_account.id)
+        AccountNotificationRole.create!(
+          account_notification: @student_notification,
+          role: @student_role
+        )
+
+        @teacher_notification = create_notification(subject: "Teacher Only")
+        @teacher_role = Role.get_built_in_role("TeacherEnrollment", root_account_id: @account.root_account.id)
+        AccountNotificationRole.create!(
+          account_notification: @teacher_notification,
+          role: @teacher_role
+        )
+
+        @all_users_notification = create_notification(subject: "All Users")
+      end
+
+      it "shows role-specific notifications to users with that role" do
+        result = execute_query(@student)
+        notifications = result.dig("data", "accountNotifications")
+        subjects = notifications.pluck("subject")
+
+        expect(subjects).to include("Student Only")
+        expect(subjects).to include("All Users")
+        expect(subjects).not_to include("Teacher Only")
+      end
+
+      it "shows teacher notifications to teachers" do
+        result = execute_query(@teacher)
+        notifications = result.dig("data", "accountNotifications")
+        subjects = notifications.pluck("subject")
+
+        expect(subjects).to include("Teacher Only")
+        expect(subjects).to include("All Users")
+        expect(subjects).not_to include("Student Only")
+      end
+
+      it "shows all notifications when no role restrictions" do
+        result = execute_query(@teacher)
+        notifications = result.dig("data", "accountNotifications")
+
+        expect(notifications.any? { |n| n["subject"] == "All Users" }).to be true
+      end
+    end
+
+    describe "dismissed notifications" do
+      before(:once) do
+        @notification1 = create_notification(subject: "Notification 1")
+        @notification2 = create_notification(subject: "Notification 2")
+      end
+
+      it "excludes dismissed notifications" do
+        @student.set_preference(:closed_notifications, [@notification1.id])
+
+        result = execute_query(@student)
+        notifications = result.dig("data", "accountNotifications")
+
+        expect(notifications.length).to eq 1
+        expect(notifications[0]["subject"]).to eq "Notification 2"
+      end
+
+      it "shows all notifications when none are dismissed" do
+        result = execute_query(@student)
+        notifications = result.dig("data", "accountNotifications")
+
+        expect(notifications.length).to eq 2
+      end
+
+      it "excludes multiple dismissed notifications" do
+        @student.set_preference(:closed_notifications, [@notification1.id, @notification2.id])
+
+        result = execute_query(@student)
+        notifications = result.dig("data", "accountNotifications")
+
+        expect(notifications).to eq []
+      end
+    end
+
+    describe "with account_id parameter" do
+      before(:once) do
+        @other_account = Account.create!(name: "Other Account")
+        @other_notification = AccountNotification.create!(
+          account: @other_account,
+          subject: "Other Account Notification",
+          message: "Message",
+          start_at: 1.day.ago,
+          end_at: 30.days.from_now,
+          user: @admin
+        )
+      end
+
+      it "returns notifications for specified account" do
+        result = execute_query(@admin, @other_account.id)
+        notifications = result.dig("data", "accountNotifications")
+
+        expect(notifications.length).to eq 1
+        expect(notifications[0]["subject"]).to eq "Other Account Notification"
+      end
+
+      it "returns empty array when account not found" do
+        result = execute_query(@student, "99999999")
+        expect(result.dig("data", "accountNotifications")).to eq []
+      end
+    end
+
+    describe "notification ordering" do
+      it "orders notifications by end date descending" do
+        create_notification(subject: "First", end_at: 10.days.from_now)
+        create_notification(subject: "Second", end_at: 20.days.from_now)
+        create_notification(subject: "Third", end_at: 15.days.from_now)
+
+        result = execute_query(@student)
+        notifications = result.dig("data", "accountNotifications")
+        subjects = notifications.pluck("subject")
+
+        expect(subjects).to eq %w[Second Third First]
+      end
+    end
+  end
 end

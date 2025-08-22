@@ -22,6 +22,7 @@ import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import DashboardTabs from './components/DashboardTabs'
+import DashboardNotifications from './components/DashboardNotifications'
 import ObserverOptions from '@canvas/observer-picker'
 import {
   getHandleChangeObservedUser,
@@ -36,6 +37,7 @@ const WidgetDashboardContainer: React.FC = () => {
 
   return (
     <View as="div">
+      <DashboardNotifications />
       <Flex margin="0 0 medium" alignItems="center">
         <Flex.Item shouldGrow>
           <Heading level="h1" margin="0" data-testid="dashboard-heading">
