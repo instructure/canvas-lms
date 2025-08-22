@@ -19682,6 +19682,7 @@ tr:
   to_view_all_notifications_sent_to_a_canvas_user_se_6172daa: "Bir Canvas kullanıcısına gönderilen tüm bildirimleri görmek için kullanıcıyı ve tarih aralığını seçin"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "Ödevleri görüntülemek için *Gündem* görünümünün etkin olduğundan emin olun."
   today_76e10f9c: Bugün
+  today_b7202098: bugün
   toggle_course_card_color_overlays_b5b8137a: "Renklendirilmiş ders kartları görünümüne geç"
   toggle_editing_answer_text_as_html_9a93fe6: "Cevap metnini HTML olarak düzenlemeye geçiş yap"
   token_9a020862: Token
@@ -20362,6 +20363,7 @@ tr:
   video_options_24ef6e5d: "Video Seçenekleri"
   video_player_b371005: "Video Oynatıcı"
   vietnam_84_e50a2a44: "Viyetnam (+84)"
+  view_all_courses_1b4ea3e4: "Tüm dersleri göster"
   view_analytics_91a3b7a: "Analitikleri Göster"
   view_analytics_data_in_tables_instead_of_graphs_8a33f536: "Analitik verilerini grafik yerine tablo olarak göster"
   view_announcements_b6d6d819: "Duyuruları göster"
