@@ -25,6 +25,7 @@ import Criterion from './Criterion'
 import {getSavedComments} from './helpers'
 import {roundIfWhole} from './Points'
 import {rubricAssessmentShape, rubricAssociationShape, rubricShape} from './types'
+import AiUsageButton from './components/AiUsageButton'
 
 const I18n = createI18nScope('edit_rubricRubric')
 
@@ -57,6 +58,7 @@ const Rubric = ({
   rubric,
   rubricAssessment = null,
   rubricAssociation = {},
+  isAiEvaluated = false,
   isSummary = false,
   flexWidth = false,
 }) => {
@@ -193,7 +195,10 @@ const Rubric = ({
           <HiddenTableRow>{headingCells}</HiddenTableRow>
           <Table.Row>
             <Table.ColHeader id="rubric-title" colSpan={numColumns}>
-              {rubric.title}
+              <Flex justifyItems="space-between" alignItems="center" padding="0">
+                {rubric.title}
+                {isAiEvaluated && <AiUsageButton />}
+              </Flex>
             </Table.ColHeader>
           </Table.Row>
           <Table.Row>{headingCells}</Table.Row>

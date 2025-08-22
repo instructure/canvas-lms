@@ -22,6 +22,14 @@ import userEvent from '@testing-library/user-event'
 import {TraditionalView} from '../TraditionalView'
 import type {RubricCriterion, RubricAssessmentData} from '../../types/rubric'
 
+// Mock AiUsageButton component
+jest.mock('../../components/AiUsageButton', () => {
+  return {
+    __esModule: true,
+    default: () => <button data-testid="ai-usage-button">AI Assisted</button>,
+  }
+})
+
 const defaultCriteria: RubricCriterion[] = [
   {
     id: 'criterion_1',
@@ -182,5 +190,22 @@ describe('TraditionalView', () => {
       ratingId: defaultAssessmentData[1].id,
     })
     expect(defaultProps.onUpdateAssessmentData).toHaveBeenCalledTimes(1)
+  })
+
+  describe('AiUsageButton rendering', () => {
+    it('renders AiUsageButton when isAiEvaluated is true', () => {
+      render(<TraditionalView {...defaultProps} isAiEvaluated={true} />)
+      expect(screen.getByTestId('ai-usage-button')).toBeInTheDocument()
+    })
+
+    it('does not render AiUsageButton when isAiEvaluated is false', () => {
+      render(<TraditionalView {...defaultProps} isAiEvaluated={false} />)
+      expect(screen.queryByTestId('ai-usage-button')).not.toBeInTheDocument()
+    })
+
+    it('does not render AiUsageButton when isAiEvaluated is not provided', () => {
+      render(<TraditionalView {...defaultProps} />)
+      expect(screen.queryByTestId('ai-usage-button')).not.toBeInTheDocument()
+    })
   })
 })

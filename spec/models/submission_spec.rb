@@ -10329,4 +10329,51 @@ describe Submission do
       end
     end
   end
+
+  describe "#auto_grade_result_present" do
+    before(:once) do
+      @course = Course.create!
+      @student = course_with_student(course: @course, active_all: true).user
+      @assignment = @course.assignments.create!(title: "Test Assignment")
+      @submission = @assignment.submit_homework(@student, body: "test submission")
+    end
+
+    it "returns false when no AutoGradeResult exists" do
+      expect(@submission.auto_grade_result_present).to be false
+    end
+
+    it "returns true when AutoGradeResult exists for current attempt" do
+      AutoGradeResult.create!(
+        submission: @submission,
+        attempt: @submission.attempt || 1,
+        grade_data: { "score" => 85 },
+        grading_attempts: 1,
+        root_account_id: @course.root_account_id
+      )
+      expect(@submission.auto_grade_result_present).to be true
+    end
+
+    it "returns false when AutoGradeResult exists for different attempt" do
+      AutoGradeResult.create!(
+        submission: @submission,
+        attempt: (@submission.attempt || 1) + 1,
+        grade_data: { "score" => 85 },
+        grading_attempts: 1,
+        root_account_id: @course.root_account_id
+      )
+      expect(@submission.auto_grade_result_present).to be false
+    end
+
+    it "handles nil attempt correctly" do
+      @submission.update!(attempt: nil)
+      AutoGradeResult.create!(
+        submission: @submission,
+        attempt: 1,
+        grade_data: { "score" => 85 },
+        grading_attempts: 1,
+        root_account_id: @course.root_account_id
+      )
+      expect(@submission.auto_grade_result_present).to be true
+    end
+  end
 end

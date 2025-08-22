@@ -87,6 +87,28 @@ describe GradebooksController do
         end
       end
 
+      it "includes auto_grade_result_present in submissions_json when auto grade result exists" do
+        @assignment.grade_student(@student, grade: 10, grader: @teacher)
+        allow_any_instance_of(Submission).to receive(:auto_grade_result_present?).and_return(true)
+
+        get "grade_summary", params: { course_id: @course.id, id: @student.id }
+
+        submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
+        expect(submission).to have_key(:auto_grade_result_present)
+        expect(submission[:auto_grade_result_present]).to be true
+      end
+
+      it "includes auto_grade_result_present as false in submissions_json when no auto grade result exists" do
+        @assignment.grade_student(@student, grade: 10, grader: @teacher)
+        allow_any_instance_of(Submission).to receive(:auto_grade_result_present).and_return(false)
+
+        get "grade_summary", params: { course_id: @course.id, id: @student.id }
+
+        submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
+        expect(submission).to have_key(:auto_grade_result_present)
+        expect(submission[:auto_grade_result_present]).to be false
+      end
+
       it "includes submission_comments of posted submissions" do
         @assignment.anonymous_peer_reviews = true
         @assignment.save!

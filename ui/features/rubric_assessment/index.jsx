@@ -36,11 +36,19 @@ const findRubricAssessment = id => {
   return null
 }
 
+const findSubmission = assessmentId => {
+  if (ENV.submissions) {
+    return ENV.submissions.find(s => s.assignment_id === assessmentId)
+  }
+  return null
+}
+
 ready(() => {
   const rubricElements = document.querySelectorAll('.react_rubric_container')
   Array.prototype.forEach.call(rubricElements, rubricElement => {
     const rubric = findRubric(rubricElement.dataset.rubricId)
     const assessment = findRubricAssessment(rubricElement.dataset.rubricAssessmentId)
+    const submission = findSubmission(rubricElement.dataset.assignmentId)
 
     ReactDOM.render(
       <Rubric
@@ -49,6 +57,7 @@ ready(() => {
         rubricAssociation={assessment.rubric_association}
         customRatings={ENV.outcome_proficiency ? ENV.outcome_proficiency.ratings : []}
         flexWidth={ENV.gradebook_non_scoring_rubrics_enabled}
+        isAiEvaluated={submission ? submission.auto_grade_result_present : false}
       />,
       rubricElement,
     )

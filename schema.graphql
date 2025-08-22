@@ -8981,6 +8981,11 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
   ): AuditEventConnection
 
   """
+  Indicates whether an auto-grading result exists for the submission.
+  """
+  autoGradeResultPresent: Boolean!
+
+  """
   Errors related to the submission
   """
   autoGradeSubmissionErrors: [String!]!
@@ -9397,6 +9402,11 @@ type SubmissionHistory implements SubmissionInterface & Timestamped {
   attachment: File
   attachments: [File!]
   attempt: Int!
+
+  """
+  Indicates whether an auto-grading result exists for the submission.
+  """
+  autoGradeResultPresent: Boolean!
   body: String
   cachedDueDate: DateTime
   commentsConnection(
@@ -9612,6 +9622,11 @@ interface SubmissionInterface {
   attachment: File
   attachments: [File!]
   attempt: Int!
+
+  """
+  Indicates whether an auto-grading result exists for the submission.
+  """
+  autoGradeResultPresent: Boolean!
   body: String
   cachedDueDate: DateTime
   commentsConnection(
