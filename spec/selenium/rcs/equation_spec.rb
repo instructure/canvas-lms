@@ -23,6 +23,7 @@ describe "equation editor" do
   include_context "in-process server selenium tests"
   include QuizzesCommon
   include RCENextPage
+
   it "keeps cursor position when clicking close" do
     course_with_teacher_logged_in
     quiz_model(course: @course)

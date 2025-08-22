@@ -25,6 +25,7 @@ require_relative "../helpers/shared_examples_common"
 describe "discussion permissions" do
   include SharedExamplesCommon
   include DiscussionHelpers
+
   include_context "in-process server selenium tests"
   include_context "discussions_page_shared_context"
   extend DiscussionHelpers::SetupContext

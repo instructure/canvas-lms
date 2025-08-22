@@ -23,6 +23,7 @@ require_relative "../helpers/calendar2_common"
 
 describe "Notifications" do
   include NotificationsCommon
+
   include_context "in-process server selenium tests"
   include Calendar2Common
 

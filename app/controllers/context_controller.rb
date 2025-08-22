@@ -26,6 +26,7 @@ class ContextController < ApplicationController
   before_action :require_context, except: [:inbox, :object_snippet]
 
   include HorizonMode
+
   before_action :load_canvas_career, only: [:roster]
 
   before_action :require_user, only: [:inbox, :report_avatar_image]

@@ -23,6 +23,7 @@ require "nokogiri"
 class BigBlueButtonConference < WebConference
   include ActionDispatch::Routing::PolymorphicRoutes
   include CanvasRails::Application.routes.url_helpers
+
   after_destroy :end_meeting
   after_destroy :delete_all_recordings
 

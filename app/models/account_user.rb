@@ -45,6 +45,7 @@ class AccountUser < ActiveRecord::Base
   scope :deleted, -> { where(workflow_state: "deleted") }
 
   include Workflow
+
   workflow do
     state :active
 

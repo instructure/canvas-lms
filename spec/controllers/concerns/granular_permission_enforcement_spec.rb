@@ -22,6 +22,7 @@ require "spec_helper"
 describe GranularPermissionEnforcement do
   controller(ApplicationController) do
     include GranularPermissionEnforcement
+
     before_action :authorize_action
 
     def index

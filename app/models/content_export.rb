@@ -21,6 +21,7 @@ require "English"
 
 class ContentExport < ActiveRecord::Base
   include Workflow
+
   belongs_to :context, polymorphic: [:course, :group, { context_user: "User" }]
   belongs_to :user
   belongs_to :attachment

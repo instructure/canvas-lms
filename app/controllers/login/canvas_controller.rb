@@ -20,6 +20,7 @@
 
 class Login::CanvasController < ApplicationController
   include Login::Shared
+
   helper NewLoginHelper
 
   before_action :validate_auth_type

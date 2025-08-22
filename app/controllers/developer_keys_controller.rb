@@ -191,6 +191,7 @@ class DeveloperKeysController < ApplicationController
   before_action :require_root_account, only: %i[index create]
 
   include HorizonMode
+
   before_action :load_canvas_career, only: [:index]
 
   include Api::V1::DeveloperKey

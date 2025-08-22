@@ -346,6 +346,7 @@ class Course < ActiveRecord::Base
   sanitize_field :syllabus_body, CanvasSanitize::SANITIZE
 
   include StickySisFields
+
   are_sis_sticky :name,
                  :course_code,
                  :start_at,
@@ -359,6 +360,7 @@ class Course < ActiveRecord::Base
   include FeatureFlags
 
   include ContentNotices
+
   define_content_notice :import_in_progress,
                         text: -> { t("One or more items are currently being imported. They will be shown in the course below once they are available.") },
                         link_text: -> { t("Import Status") },
@@ -2782,6 +2784,7 @@ class Course < ActiveRecord::Base
       comments += turnitin_comments
     end
     extend TextHelper
+
     format_message(comments).first
   end
 

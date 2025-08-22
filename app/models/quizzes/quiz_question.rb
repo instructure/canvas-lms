@@ -31,6 +31,7 @@
 # @see AssessmentQuestionBank#select_for_submission()
 class Quizzes::QuizQuestion < ActiveRecord::Base
   extend RootAccountResolver
+
   self.table_name = "quiz_questions"
 
   include Workflow
@@ -59,6 +60,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   resolves_root_account through: :quiz
 
   include MasterCourses::CollectionRestrictor
+
   self.collection_owner_association = :quiz
   restrict_columns :content, %i[question_data position quiz_group_id workflow_state]
 

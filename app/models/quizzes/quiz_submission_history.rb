@@ -24,6 +24,7 @@
 
 class Quizzes::QuizSubmissionHistory
   extend Forwardable
+
   def_delegators :attempts, :length, :size, :[], :each, :last
   include Enumerable
 

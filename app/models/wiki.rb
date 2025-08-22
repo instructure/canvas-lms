@@ -188,6 +188,7 @@ class Wiki < ActiveRecord::Base
         t :default_group_wiki_name, "%{group_name} Wiki", group_name: nil
 
         extend TextHelper
+
         name = CanvasTextHelper.truncate_text(context.name, { max_length: 200, ellipsis: "" })
 
         context.wiki = wiki = Wiki.create!(title: "#{name} Wiki", root_account_id: context.root_account_id)

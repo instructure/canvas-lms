@@ -91,6 +91,7 @@ WebMock.enable!
 # unlike webmock/rspec, only reset in groups that actually do stubbing
 module WebMock::API
   include WebMock::Matchers
+
   def self.included(other)
     other.before { allow(CanvasHttp).to receive(:insecure_host?).and_return(false) }
     other.after { WebMock.reset! }

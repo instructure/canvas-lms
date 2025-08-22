@@ -22,6 +22,7 @@ class LearningOutcome < ActiveRecord::Base
   include ManyRootAccounts
   include Workflow
   include MasterCourses::Restrictor
+
   restrict_columns :state, [:workflow_state]
   include LinkedAttachmentHandler
   include CanvasOutcomesHelper

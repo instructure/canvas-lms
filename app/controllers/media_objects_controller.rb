@@ -195,12 +195,11 @@ class MediaObjectsController < ApplicationController
     end
 
     if params[:user_entered_title].blank?
-      return(
-        render json: { message: "The user_entered_title parameter must have a value" },
-               status: :bad_request
-      )
+      return render json: { message: "The user_entered_title parameter must have a value" },
+                    status: :bad_request
     end
     extend TextHelper
+
     @media_object.user_entered_title =
       CanvasTextHelper.truncate_text(params[:user_entered_title], max_length: 255)
     @media_object.save!

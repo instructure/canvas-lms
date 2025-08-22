@@ -30,6 +30,7 @@ shared_examples "Enhanced Gradebook Filters" do |ff_enabled|
   include_context "in-process server selenium tests"
   include GradebookCommon
   include GradebookSetup
+
   include_context "late_policy_course_setup"
 
   def format_grading_period_title_with_date(grp)

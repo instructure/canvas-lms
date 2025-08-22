@@ -36,6 +36,7 @@ require "optparse"
 # rubocop:disable Style/MixinUsage
 include Factories
 # rubocop:enable Style/MixinUsage
+
 # rubocop:enable Specs/ScopeIncludes
 
 # rubocop:disable Specs/ScopeHelperModules

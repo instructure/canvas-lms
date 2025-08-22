@@ -25,6 +25,7 @@ class WikiPagesController < ApplicationController
   before_action :require_context
 
   include HorizonMode
+
   before_action :load_canvas_career, only: [:index, :show]
 
   before_action :get_wiki_page, except: [:front_page]

@@ -20,6 +20,7 @@
 module QuizVisibility
   class QuizVisibilityService
     extend VisibilityHelpers::Common
+
     class << self
       def visible_quiz_ids_in_course_by_user(user_ids:, course_ids:, use_global_id: false)
         vis_hash = quizzes_visible_to_students(user_ids:, course_ids:)

@@ -100,6 +100,7 @@ class Group < ActiveRecord::Base
   end
 
   include StickySisFields
+
   are_sis_sticky :name
 
   validates_each :name do |record, attr, value|

@@ -23,11 +23,13 @@ class CoursePace < ActiveRecord::Base
   include Canvas::SoftDeletable
 
   include MasterCourses::Restrictor
+
   restrict_columns :content, [:duration]
   restrict_columns :state, [:workflow_state]
   restrict_columns :settings, %i[exclude_weekends selected_days_to_skip hard_end_dates]
 
   extend RootAccountResolver
+
   resolves_root_account through: :course
 
   belongs_to :course, inverse_of: :course_paces

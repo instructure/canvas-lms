@@ -272,6 +272,7 @@ class DiscussionTopicsController < ApplicationController
   before_action :require_context_and_read_access, except: :public_feed
 
   include HorizonMode
+
   before_action :load_canvas_career, only: [:index, :show]
 
   before_action :rce_js_env

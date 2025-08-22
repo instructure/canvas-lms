@@ -30,6 +30,7 @@ class Account < ActiveRecord::Base
   include Workflow
   include BrandConfigHelpers
   include Canvas::Security::PasswordPolicyAccountSettingValidator
+
   belongs_to :root_account, class_name: "Account"
   belongs_to :parent_account, class_name: "Account"
 
@@ -214,9 +215,11 @@ class Account < ActiveRecord::Base
   validates :account_calendar_subscription_type, inclusion: { in: CALENDAR_SUBSCRIPTION_TYPES }
   validate :validate_number_separators, if: ->(a) { a.settings_changed? && (a.settings.dig(:decimal_separator, :value) != a.settings_was.dig(:decimal_separator, :value) || a.settings.dig(:thousand_separator, :value) != a.settings_was.dig(:thousand_separator, :value)) }
   include StickySisFields
+
   are_sis_sticky :name, :parent_account_id
 
   include FeatureFlags
+
   def feature_flag_cache
     MultiCache.cache
   end

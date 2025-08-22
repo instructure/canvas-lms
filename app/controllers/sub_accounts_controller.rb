@@ -29,6 +29,7 @@ class SubAccountsController < ApplicationController
   before_action :require_account_management, except: [:index]
 
   include HorizonMode
+
   before_action :load_canvas_career, only: [:index]
 
   def index

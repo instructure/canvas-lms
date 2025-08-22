@@ -1211,6 +1211,7 @@ describe ExternalToolsController do
 
       context "when resource_link_lookup_uuid is passed" do
         include Lti::RedisMessageClient
+
         let(:launch_params) do
           JSON.parse(
             fetch_and_delete_launch(

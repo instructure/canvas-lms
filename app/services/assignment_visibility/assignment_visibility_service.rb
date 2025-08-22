@@ -20,6 +20,7 @@
 module AssignmentVisibility
   class AssignmentVisibilityService
     extend VisibilityHelpers::Common
+
     class << self
       def visible_assignment_ids_in_course_by_user(user_ids:, course_ids:, use_global_id: false)
         vis_hash = assignments_visible_to_students(user_ids:, course_ids:)

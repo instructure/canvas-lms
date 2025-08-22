@@ -28,6 +28,7 @@ class BrandConfigsController < ApplicationController
   before_action { |c| c.active_tab = "brand_configs" }
 
   include HorizonMode
+
   before_action :load_canvas_career, only: [:index]
 
   def index

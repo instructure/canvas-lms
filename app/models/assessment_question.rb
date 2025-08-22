@@ -54,6 +54,7 @@ class AssessmentQuestion < ActiveRecord::Base
   serialize :question_data
 
   include MasterCourses::CollectionRestrictor
+
   self.collection_owner_association = :assessment_question_bank
   restrict_columns :content, [:name, :question_data]
 

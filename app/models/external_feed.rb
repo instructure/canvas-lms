@@ -29,6 +29,7 @@ class ExternalFeed < ActiveRecord::Base
   before_validation :infer_defaults
 
   include CustomValidations
+
   validates :url, :context_id, :context_type, presence: true
   validates_as_url :url
   validates :url,
@@ -90,6 +91,7 @@ class ExternalFeed < ActiveRecord::Base
       ""
     when "truncate"
       extend TextHelper
+
       truncate_html(desc, max_length: 250)
     else
       desc

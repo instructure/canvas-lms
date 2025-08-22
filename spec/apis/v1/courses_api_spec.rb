@@ -23,6 +23,7 @@ require_relative "../file_uploads_spec_helper"
 
 class TestCourseApi
   include Api::V1::Course
+
   def feeds_calendar_url(feed_code)
     "feed_calendar_url(#{feed_code.inspect})"
   end

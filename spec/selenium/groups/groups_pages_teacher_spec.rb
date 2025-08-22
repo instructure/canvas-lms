@@ -40,6 +40,7 @@ describe "groups" do
   include GroupsCommon
   include WikiAndTinyCommon
   include FilesPage
+
   setup_group_page_urls
 
   context "as a teacher" do

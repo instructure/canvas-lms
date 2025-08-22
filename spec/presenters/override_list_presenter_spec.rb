@@ -19,6 +19,7 @@
 
 describe OverrideListPresenter do
   include TextHelper
+
   before do
     allow(AssignmentOverrideApplicator).to receive(:assignment_overridden_for)
       .with(assignment, user).and_return overridden_assignment

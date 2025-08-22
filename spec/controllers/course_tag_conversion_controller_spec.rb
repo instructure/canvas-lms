@@ -19,6 +19,7 @@
 
 describe CourseTagConversionController do
   include DifferentiationTag
+
   before :once do
     @course = course_factory(active_all: true)
     @teacher = teacher_in_course(active_all: true, course: @course).user

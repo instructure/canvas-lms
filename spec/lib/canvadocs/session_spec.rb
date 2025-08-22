@@ -20,6 +20,7 @@
 
 describe Canvadocs::Session do
   include Canvadocs::Session
+
   def submissions
     [@submission]
   end

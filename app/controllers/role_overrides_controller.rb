@@ -174,6 +174,7 @@ class RoleOverridesController < ApplicationController
   before_action :require_context
 
   include HorizonMode
+
   before_action :load_canvas_career, only: [:index]
 
   before_action :require_role, only: %i[activate_role remove_role update show]

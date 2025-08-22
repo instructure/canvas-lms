@@ -20,6 +20,7 @@
 
 class CustomGradebookColumn < ActiveRecord::Base
   include Workflow
+
   acts_as_list scope: :course_id
 
   belongs_to :course

@@ -22,6 +22,7 @@ require "sanitize"
 
 class Quizzes::QuizSubmission < ActiveRecord::Base
   extend RootAccountResolver
+
   self.table_name = "quiz_submissions"
 
   include Workflow
@@ -269,6 +270,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   def finished_in_words
     extend ActionView::Helpers::DateHelper
+
     started_at && finished_at && time_ago_in_words(Time.zone.now - (finished_at - started_at))
   end
 

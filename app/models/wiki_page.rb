@@ -39,6 +39,7 @@ class WikiPage < ActiveRecord::Base
   include Accessibility::Scannable
 
   include MasterCourses::Restrictor
+
   restrict_columns :content, [:body, :title]
   restrict_columns :settings, [:editing_roles, :url]
   restrict_assignment_columns
@@ -46,6 +47,7 @@ class WikiPage < ActiveRecord::Base
   restrict_columns :availability_dates, [:publish_at]
 
   include SmartSearchable
+
   use_smart_search title_column: :title,
                    body_column: :body,
                    index_scope: ->(course) { course.wiki_pages.not_deleted },

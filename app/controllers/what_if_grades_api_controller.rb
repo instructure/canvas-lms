@@ -137,6 +137,7 @@
 
 class WhatIfGradesApiController < ApplicationController
   include SubmissionsHelper
+
   before_action :require_user
 
   # @API Update a submission's what-if score and calculate grades

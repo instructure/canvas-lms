@@ -19,6 +19,7 @@
 
 module Canvadocs
   extend CanvadocsHelper
+
   RENDER_O365     = "office_365"
   RENDER_BOX      = "box_view"
   RENDER_CROCODOC = "crocodoc"

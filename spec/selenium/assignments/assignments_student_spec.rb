@@ -221,6 +221,7 @@ describe "assignments" do
 
       it "shows overridden lock dates for student" do
         extend TextHelper
+
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         expected_unlock = datetime_string(@override.unlock_at).gsub(/\s+/, " ")
         expect(f("#content")).to include_text "locked until #{expected_unlock}."

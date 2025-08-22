@@ -196,6 +196,7 @@ describe Attachment do
 
   context "crocodoc" do
     include HmacHelper
+
     let_once(:user) { user_model }
     let_once(:course) { course_model }
     let_once(:student) do

@@ -2377,6 +2377,7 @@ describe Assignment do
 
     context "group assignments with all students assigned to a group" do
       include GroupsCommon
+
       it "sorts by group name" do
         student_one = student_in_course(
           active_all: true, name: "Frodo Bravo", sortable_name: "Bravo, Frodo"
@@ -2449,6 +2450,7 @@ describe Assignment do
 
     context "group assignments with some students assigned to a group and some not" do
       include GroupsCommon
+
       it "sorts by student name and group name" do
         student_one = student_in_course(
           active_all: true, name: "Frodo Bravo", sortable_name: "Bravo, Frodo"
@@ -2572,6 +2574,7 @@ describe Assignment do
 
   context "group assignments with all students assigned to a group and grade_group_students_individually set to true" do
     include GroupsCommon
+
     it "sorts by sortable_name" do
       student_one = student_in_course(
         active_all: true, name: "Frodo Bravo", sortable_name: "Bravo, Frodo"

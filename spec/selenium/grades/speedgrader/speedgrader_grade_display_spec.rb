@@ -25,6 +25,7 @@ require_relative "../pages/speedgrader_page"
 describe "SpeedGrader - grade display" do
   include_context "in-process server selenium tests"
   include SpeedGraderCommon
+
   include_context "late_policy_course_setup"
   include GradebookCommon
 

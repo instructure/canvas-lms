@@ -25,6 +25,7 @@ describe AdheresToPolicy::Policy, "set_policy" do
     expect do
       Class.new do
         extend AdheresToPolicy::ClassMethods
+
         set_policy { 1 + 1 }
       end
     end.not_to raise_error

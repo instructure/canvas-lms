@@ -212,6 +212,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   include StickySisFields
+
   are_sis_sticky :start_at, :end_at
 
   has_a_broadcast_policy

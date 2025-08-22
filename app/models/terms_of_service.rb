@@ -20,6 +20,7 @@
 #
 class TermsOfService < ActiveRecord::Base
   include Canvas::SoftDeletable
+
   belongs_to :account
   belongs_to :terms_of_service_content
   validates :terms_type, presence: true

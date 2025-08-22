@@ -36,6 +36,7 @@ class Quizzes::QuizzesController < ApplicationController
   before_action :require_context
 
   include HorizonMode
+
   before_action :load_canvas_career, only: [:index, :show]
 
   before_action :rce_js_env, only: %i[show new edit]
@@ -685,6 +686,7 @@ class Quizzes::QuizzesController < ApplicationController
 
   def managed_quiz_data
     extend Api::V1::User
+
     if authorized_action(@quiz, @current_user, [:grade, :read_statistics])
       student_scope = @context.students_visible_to(@current_user, include: :inactive)
       if @quiz.differentiated_assignments_applies?

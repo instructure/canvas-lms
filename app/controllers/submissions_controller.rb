@@ -96,6 +96,7 @@ class SubmissionsController < SubmissionsBaseController
   before_action :require_context
 
   include HorizonMode
+
   before_action :load_canvas_career, only: [:index, :show]
 
   include K5Mode

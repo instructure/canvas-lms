@@ -105,6 +105,7 @@ class Assignment < AbstractAssignment
   end
 
   include SmartSearchable
+
   use_smart_search title_column: :title,
                    body_column: :description,
                    index_scope: ->(course) { course.assignments.active },

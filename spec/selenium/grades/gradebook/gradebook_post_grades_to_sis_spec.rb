@@ -29,6 +29,7 @@ shared_examples "Gradebook - post grades to SIS" do |ff_enabled|
   include GradebookCommon
   include GradebookSetup
   include FeatureFlagHelper
+
   include_context "in-process server selenium tests"
 
   before(:once) do

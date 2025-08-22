@@ -24,6 +24,7 @@ describe AuthenticationProvider::PluginSettings do
   let(:klass) do
     Class.new(AuthenticationProvider) do
       include AuthenticationProvider::PluginSettings
+
       self.plugin = :custom_plugin
 
       def noninherited_method

@@ -83,6 +83,7 @@ class ContentExportsApiController < ApplicationController
   include ContentExportApiHelper
   include SupportHelpers::ControllerHelpers
   include Api::V1::ContentExport
+
   before_action :require_context
   before_action :require_site_admin, only: :update
 
