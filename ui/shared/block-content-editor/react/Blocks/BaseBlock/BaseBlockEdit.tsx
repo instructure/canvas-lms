@@ -16,40 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {PropsWithChildren} from 'react'
+import {BaseBlockEditWrapper} from './components/BaseBlockEditWrapper'
 import {useNode} from '@craftjs/core'
-import {ComponentProps, ElementType, useCallback, useEffect, useRef} from 'react'
+import {useIsEditingBlock} from '../../hooks/useIsEditingBlock'
 import {useBlockContentEditorContext} from '../../BlockContentEditorContext'
 
-export const useSave = <T extends ElementType>() => {
-  const {
-    actions: {setProp},
-  } = useNode()
-
-  return useCallback(
-    (data: Partial<ComponentProps<T>>) => {
-      setProp((props: any) => {
-        Object.assign(props, data)
-      })
-    },
-    [setProp],
-  )
-}
-
-export const useSave2 = <T extends ElementType>(fn: () => Partial<ComponentProps<T>>) => {
-  const {
-    actions: {setProp},
-  } = useNode()
+export const BaseBlockEdit = (
+  props: PropsWithChildren<{
+    title: string
+    backgroundColor: string
+  }>,
+) => {
+  const {id} = useNode()
+  const isEditingBlock = useIsEditingBlock()
   const {editingBlock} = useBlockContentEditorContext()
-  const fnRef = useRef(fn)
-  fnRef.current = fn
 
-  useEffect(() => {
-    const callback = () => {
-      setProp((props: any) => {
-        Object.assign(props, fnRef.current())
-      })
-    }
-    editingBlock.addSaveCallback(callback)
-    return () => editingBlock.deleteSaveCallback(callback)
-  }, [])
+  return (
+    <BaseBlockEditWrapper
+      title={props.title}
+      isEditMode={isEditingBlock}
+      setIsEditMode={isEdit => {
+        editingBlock.setId(isEdit ? id : null)
+      }}
+      backgroundColor={props.backgroundColor}
+    >
+      {props.children}
+    </BaseBlockEditWrapper>
+  )
 }

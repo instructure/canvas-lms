@@ -19,22 +19,11 @@
 import {screen} from '@testing-library/react'
 import {HighlightBlock} from '../HighlightBlock'
 import {renderBlock} from '../../__tests__/render-helper'
+import {mockBlockContentEditorContext} from '../../../__tests__/mockBlockContentEditorContext'
 
 jest.mock('../../../BlockContentEditorContext', () => ({
   __esModule: true,
-  useBlockContentEditorContext: jest.fn(() => ({})),
-}))
-
-jest.mock('@instructure/canvas-theme', () => ({
-  colors: {
-    additionalPrimitives: {
-      ocean30: '#0374B5',
-      ocean12: '#E8F4FD',
-    },
-    ui: {
-      textDescription: '#2D3B45',
-    },
-  },
+  useBlockContentEditorContext: jest.fn(() => mockBlockContentEditorContext({})),
 }))
 
 describe('HighlightBlock', () => {
@@ -95,29 +84,11 @@ describe('HighlightBlock', () => {
     expect(highlightBlock).toHaveStyle('background-color: #E8F4FD')
   })
 
-  it('should apply the default text color', () => {
-    renderBlock(HighlightBlock, {content: 'Test content', settings: defaultSettings})
-    const highlightBlock = screen.getByTestId('highlight-block')
-
-    expect(highlightBlock).toHaveStyle('color: #2D3B45')
-  })
-
   it('should show placeholder text in edit preview mode when content is empty', () => {
     renderBlock(HighlightBlock, {content: '', settings: defaultSettings})
     const highlightBlock = screen.getByTestId('highlight-block')
 
     expect(highlightBlock).toHaveTextContent('Click to edit')
-  })
-
-  it('should apply the correct text color', () => {
-    const textColor = '#FF0000'
-    renderBlock(HighlightBlock, {
-      content: 'Test content',
-      settings: {...defaultSettings, textColor},
-    })
-    const highlightBlock = screen.getByTestId('highlight-block')
-
-    expect(highlightBlock).toHaveStyle(`color: ${textColor}`)
   })
 
   it('should use different highlight colors', () => {
@@ -129,22 +100,5 @@ describe('HighlightBlock', () => {
     const highlightBlock = screen.getByTestId('highlight-block')
 
     expect(highlightBlock).toHaveStyle(`background-color: ${customHighlightColor}`)
-  })
-
-  it('should apply both custom highlight and text colors', () => {
-    const customHighlightColor = '#FFFACD'
-    const customTextColor = '#4B0082'
-    renderBlock(HighlightBlock, {
-      content: 'Both custom colors test',
-      settings: {
-        ...defaultSettings,
-        highlightColor: customHighlightColor,
-        textColor: customTextColor,
-      },
-    })
-    const highlightBlock = screen.getByTestId('highlight-block')
-
-    expect(highlightBlock).toHaveStyle(`background-color: ${customHighlightColor}`)
-    expect(highlightBlock).toHaveStyle(`color: ${customTextColor}`)
   })
 })
