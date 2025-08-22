@@ -77,7 +77,7 @@ describe WikiPagesApiController, type: :request do
       it "returns a list of wiki pages" do
         response = get_wiki_pages(@teacher, ["body"])
         expect(response).to be_an(Array)
-        expect(response.map { |page| page["id"] }).to include(@wiki_page["id"])
+        expect(response.pluck("id")).to include(@wiki_page["id"])
       end
     end
 
@@ -89,7 +89,7 @@ describe WikiPagesApiController, type: :request do
       it "returns a list of wiki pages" do
         response = get_wiki_pages(@teacher, ["body"])
         expect(response).to be_an(Array)
-        expect(response.map { |page| page["id"] }).to include(@wiki_page["id"])
+        expect(response.pluck("id")).to include(@wiki_page["id"])
       end
     end
   end

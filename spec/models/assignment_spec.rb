@@ -831,7 +831,7 @@ describe Assignment do
 
       identities = @assignment.grader_identities
       expect(identities.length).to eq 3
-      expect(identities.map { |i| i[:user_id] }).to eq [@teacher.id, second_teacher.id, third_teacher.id]
+      expect(identities.pluck(:user_id)).to eq [@teacher.id, second_teacher.id, third_teacher.id]
     end
   end
 

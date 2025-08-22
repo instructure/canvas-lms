@@ -904,28 +904,28 @@ describe "Roles API", type: :request do
         json = api_call(:get,
                         "/api/v1/accounts/#{Account.default.id}/roles/permissions?search_term=404_game",
                         { controller: "role_overrides", action: "manageable_permissions", format: "json", account_id: Account.default.to_param, search_term: "404_game" })
-        expect(json.map { |p| p["key"] }).to contain_exactly("play_404_game")
+        expect(json.pluck("key")).to contain_exactly("play_404_game")
       end
 
       it "searches by label" do
         json = api_call(:get,
                         "/api/v1/accounts/#{Account.default.id}/roles/permissions?search_term=CREATE",
                         { controller: "role_overrides", action: "manageable_permissions", format: "json", account_id: Account.default.to_param, search_term: "CREATE" })
-        expect(json.map { |p| p["key"] }).to contain_exactly("fabricate_analytics")
+        expect(json.pluck("key")).to contain_exactly("fabricate_analytics")
       end
 
       it "searches by group" do
         json = api_call(:get,
                         "/api/v1/accounts/#{Account.default.id}/roles/permissions?search_term=stuff",
                         { controller: "role_overrides", action: "manageable_permissions", format: "json", account_id: Account.default.to_param, search_term: "stuff" })
-        expect(json.map { |p| p["key"] }).to contain_exactly("view_analytics", "fabricate_analytics")
+        expect(json.pluck("key")).to contain_exactly("view_analytics", "fabricate_analytics")
       end
 
       it "searches by group_label" do
         json = api_call(:get,
                         "/api/v1/accounts/#{Account.default.id}/roles/permissions?search_term=joy",
                         { controller: "role_overrides", action: "manageable_permissions", format: "json", account_id: Account.default.to_param, search_term: "joy" })
-        expect(json.map { |p| p["key"] }).to contain_exactly("play_404_game")
+        expect(json.pluck("key")).to contain_exactly("play_404_game")
       end
 
       it "returns an empty array if no permissions match" do

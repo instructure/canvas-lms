@@ -89,8 +89,8 @@ describe AssetProcessorStudentHelper do
       reports = asset_reports(submission: @submission)
       expect(reports).to be_a(Array)
       expect(reports.length).to eq(2)
-      expect(reports.map { |r| r[:title] }).to include("Asset Report 1", "Asset Report 2")
-      expect(reports.map { |r| r[:title] }).not_to include("Deleted Asset Report")
+      expect(reports.pluck(:title)).to include("Asset Report 1", "Asset Report 2")
+      expect(reports.pluck(:title)).not_to include("Deleted Asset Report")
     end
 
     it "returns nil when submission is blank" do
@@ -133,8 +133,8 @@ describe AssetProcessorStudentHelper do
 
       reports = asset_reports(submission: @submission)
       expect(reports).to be_a(Array)
-      expect(reports.map { |r| r[:title] }).to include("Asset Report 1", "Asset Report 2")
-      expect(reports.map { |r| r[:title] }).not_to include("Failed Report")
+      expect(reports.pluck(:title)).to include("Asset Report 1", "Asset Report 2")
+      expect(reports.pluck(:title)).not_to include("Failed Report")
     end
 
     it "does not include reports with non-processed statuses" do
@@ -199,7 +199,7 @@ describe AssetProcessorStudentHelper do
       expect(reports).to be_a(Array)
 
       # Should include our original processed reports and the new processed report
-      expect(reports.map { |r| r[:title] }).to include("Asset Report 1", "Asset Report 2", "Processed Report")
+      expect(reports.pluck(:title)).to include("Asset Report 1", "Asset Report 2", "Processed Report")
 
       # Should not include any of the non-processed reports
       filtered_titles = [
@@ -229,8 +229,8 @@ describe AssetProcessorStudentHelper do
 
       reports = asset_reports(submission: @submission)
       expect(reports).to be_a(Array)
-      expect(reports.map { |r| r[:title] }).to include("Asset Report 1", "Asset Report 2")
-      expect(reports.map { |r| r[:title] }).not_to include("Hidden Report")
+      expect(reports.pluck(:title)).to include("Asset Report 1", "Asset Report 2")
+      expect(reports.pluck(:title)).not_to include("Hidden Report")
     end
 
     it "returns nil if lti_asset_processor feature flag is disabled" do
@@ -247,7 +247,7 @@ describe AssetProcessorStudentHelper do
       expect(processors).to be_a(Array)
       expect(processors.length).to eq(1) # One active processor
       expect(processors.first[:title]).to eq("Live AP")
-      expect(processors.map { |p| p[:title] }).not_to include("Deleted AP")
+      expect(processors.pluck(:title)).not_to include("Deleted AP")
     end
 
     it "returns empty array when no processors are attached to the assignment" do
