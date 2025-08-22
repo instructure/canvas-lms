@@ -192,7 +192,7 @@ describe Lti::AssetProcessor do
       ap1 = make_ap(tool, 1)
       ap2 = make_ap(tool, 2)
       ap1.destroy!
-      expect(subject.map { |ap| ap[:id] }).to eq([ap2.id])
+      expect(subject.pluck(:id)).to eq([ap2.id])
     end
 
     def set_ap_settings(tool, icon_url: nil, text: nil)

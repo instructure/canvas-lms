@@ -6824,7 +6824,7 @@ describe "Submissions API", type: :request do
 
       json = api_call_as_user(@teacher, :get, @path + "?sort=name&order=asc", @params.merge(sort: "name", order: "asc"))
 
-      display_names = json.map { |student| student["display_name"] }
+      display_names = json.pluck("display_name")
 
       expect(display_names).to start_with("Alice Anderson", "Bob Brown", "Charlie Clark")
     end
@@ -6835,7 +6835,7 @@ describe "Submissions API", type: :request do
 
       json = api_call_as_user(@teacher, :get, @path + "?sort=name&order=desc", @params.merge(sort: "name", order: "desc"))
 
-      display_names = json.map { |student| student["display_name"] }
+      display_names = json.pluck("display_name")
 
       expect(display_names.last(2)).to eq(["Bob Brown", "Alice Anderson"])
     end
@@ -6846,7 +6846,7 @@ describe "Submissions API", type: :request do
 
       json_default = api_call_as_user(@teacher, :get, @path, @params)
 
-      student_ids = json_default.map { |s| s["id"] }
+      student_ids = json_default.pluck("id")
       expect(student_ids).to eq(student_ids.sort)
     end
 

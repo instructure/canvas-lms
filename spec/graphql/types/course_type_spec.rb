@@ -2439,7 +2439,7 @@ describe Types::CourseType do
           modules = fetch_modules_from_result(result)
 
           expect(modules.length).to eq(3)
-          module_names = modules.map { |m| m["name"] }
+          module_names = modules.pluck("name")
           expect(module_names).to contain_exactly("Started Module", "Unlocked Module", "No Progression Module")
         end
 
@@ -2456,7 +2456,7 @@ describe Types::CourseType do
           modules = fetch_modules_from_result(result)
 
           expect(modules.length).to eq(2)
-          module_names = modules.map { |m| m["name"] }
+          module_names = modules.pluck("name")
           expect(module_names).to contain_exactly("Unlocked Module", "No Progression Module")
         end
 
@@ -2527,7 +2527,7 @@ describe Types::CourseType do
           modules = fetch_modules_from_result(result)
 
           expect(modules.length).to eq(4)
-          module_names = modules.map { |m| m["name"] }
+          module_names = modules.pluck("name")
           expect(module_names).to contain_exactly(
             "Completed Module",
             "Started Module",

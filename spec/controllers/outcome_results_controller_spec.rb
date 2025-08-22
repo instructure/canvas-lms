@@ -400,7 +400,7 @@ describe OutcomeResultsController do
         json = parse_response(response)
         alignments = json["linked"]["alignments"]
         expect(alignments.length).to eq 2
-        expect(alignments.map { |a| a["name"] }).to include("Test Bank")
+        expect(alignments.pluck("name")).to include("Test Bank")
       end
     end
 

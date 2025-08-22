@@ -130,7 +130,7 @@ describe Lti::AssetProcessorNotifier do
       expect(Lti::PlatformNotificationService).to have_received(:notify_tools).exactly(3).times
       notice_params = received_notifications.last
       builder_params = notice_params[:builders].first.instance_variable_get(:@params)
-      asset_filenames = builder_params[:assets].map { it[:filename] }
+      asset_filenames = builder_params[:assets].pluck(:filename)
       expect(asset_filenames).to eq([attachment.display_name])
     end
 

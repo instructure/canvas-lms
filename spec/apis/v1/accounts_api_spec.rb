@@ -2377,7 +2377,7 @@ describe "Accounts API", type: :request do
                           account_id: @a1.to_param,
                           format: "json",
                           search_term: not_a_global_id })
-        expect(json.map { |row| row["id"] }).to include course.id
+        expect(json.pluck("id")).to include course.id
       end
     end
 

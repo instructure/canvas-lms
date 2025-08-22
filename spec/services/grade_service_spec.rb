@@ -426,7 +426,7 @@ RSpec.describe GradeService do
         filtered = service.send(:filter_repeating_keys, json_array)
 
         expect(filtered.length).to eq(2)
-        expect(filtered.map { |item| item["criterion"] }).to match_array(["Meets requirements", "Unique criterion"])
+        expect(filtered.pluck("criterion")).to match_array(["Meets requirements", "Unique criterion"])
       end
 
       it "keeps the first occurrence of duplicate criteria" do
