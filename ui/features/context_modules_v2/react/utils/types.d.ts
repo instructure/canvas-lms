@@ -29,6 +29,7 @@ export interface Checkpoint {
   dueAt?: string
   name?: string
   tag?: string
+  assignedToDates?: StandardizedDateHash[]
   assignmentOverrides?: AssignmentOverrideGraphQLResult
 }
 
@@ -109,6 +110,7 @@ export type ModuleItemContent = {
     _id: string
     dueAt?: string
     assignmentOverrides?: AssignmentOverrideGraphQLResult
+    assignedToDates?: StandardizedDateHash[]
   }
   isNewQuiz?: boolean
 } | null
@@ -130,16 +132,6 @@ export interface AssignmentOverride {
     courseId?: string
     groupId?: string
   }
-}
-
-export type DueAtCount = {
-  groups?: number
-  sections?: number
-  students?: number
-}
-
-export type DueAtCounts = {
-  [key: string]: DueAtCount
 }
 
 export interface CompletionRequirement {

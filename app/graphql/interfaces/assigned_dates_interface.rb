@@ -29,7 +29,7 @@ module Interfaces
     field :assigned_to_dates,
           [Types::DateHashType],
           null: true,
-          description: "Standardized date hash visible to current user (when feature flag enabled)"
+          description: "Standardized date hash visible to current user"
 
     def assigned_to_dates
       # For graded discussions, use the assignment's dates; for ungraded discussions, return nil
