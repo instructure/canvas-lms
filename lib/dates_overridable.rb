@@ -131,7 +131,7 @@ module DatesOverridable
 
   def self.preload_overrides(learning_objects)
     assignment_ids, quiz_ids, discussion_topic_ids, wiki_page_ids = learning_objects.each_with_object([[], [], [], []]) do |lo, (a_ids, q_ids, d_ids, w_ids)|
-      a_ids << lo.id if lo.is_a?(Assignment)
+      a_ids << lo.id if lo.is_a?(Assignment) || lo.is_a?(SubAssignment)
       q_ids << lo.id if lo.is_a?(Quizzes::Quiz)
       d_ids << lo.id if lo.is_a?(DiscussionTopic)
       w_ids << lo.id if lo.is_a?(WikiPage)
