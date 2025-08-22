@@ -32,11 +32,21 @@ export const ImageTextBlockView = ({
   includeBlockTitle,
   arrangement,
   textToImageRatio,
+  caption,
+  altTextAsCaption,
 }: ImageTextBlockViewProps) => {
   return (
     <ImageTextBlockLayout
       titleComponent={<TitleView contentColor={textColor} title={title} />}
-      imageComponent={<ImageView url={url} altText={altText} decorativeImage={decorativeImage} />}
+      imageComponent={
+        <ImageView
+          url={url}
+          altText={altText}
+          decorativeImage={decorativeImage}
+          caption={caption}
+          altTextAsCaption={altTextAsCaption}
+        />
+      }
       textComponent={<TextView contentColor={textColor} content={content} />}
       includeBlockTitle={includeBlockTitle}
       arrangement={arrangement}

@@ -55,7 +55,7 @@ export const ImageEdit = ({
   }
 
   return (
-    <>
+    <Flex direction="column" gap="mediumSmall">
       <ImageBlockUploadModal open={isOpen} onDismiss={closeModal} onSelected={onSelected} />
 
       <div className="image-actions-container">
@@ -86,6 +86,6 @@ export const ImageEdit = ({
           <IconEditLine fontSize="small" />
         </IconButton>
       </Flex>
-    </>
+    </Flex>
   )
 }

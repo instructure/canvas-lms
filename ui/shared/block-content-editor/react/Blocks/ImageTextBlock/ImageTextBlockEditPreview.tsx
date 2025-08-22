@@ -32,11 +32,21 @@ export const ImageTextBlockEditPreview = ({
   arrangement,
   textToImageRatio,
   includeBlockTitle,
+  caption,
+  altTextAsCaption,
 }: ImageTextBlockEditPreviewProps) => {
   return (
     <ImageTextBlockLayout
       titleComponent={<TitleEditPreview contentColor={textColor} title={title} />}
-      imageComponent={<ImageView url={url} altText={altText} decorativeImage={decorativeImage} />}
+      imageComponent={
+        <ImageView
+          url={url}
+          altText={altText}
+          decorativeImage={decorativeImage}
+          caption={caption}
+          altTextAsCaption={altTextAsCaption}
+        />
+      }
       textComponent={<TextEditPreview contentColor={textColor} content={content} />}
       includeBlockTitle={includeBlockTitle}
       arrangement={arrangement}
