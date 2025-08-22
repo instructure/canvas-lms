@@ -120,6 +120,7 @@ export interface EnvCommon {
   csp?: string
   current_user_id: string | null
   current_user_global_id: string
+  current_user_uuid: string | null
   current_user_usage_metrics_id: string
   COURSE_ROLES: Role[]
   COURSE_USERS_PATH?: string
