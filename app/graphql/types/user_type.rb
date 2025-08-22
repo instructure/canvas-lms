@@ -222,6 +222,69 @@ module Types
       end
     end
 
+    field :enrollments_connection, EnrollmentType.connection_type, null: true do
+      argument :course_id,
+               ID,
+               "only return enrollments for this course",
+               required: false,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
+      argument :current_only,
+               Boolean,
+               "Whether or not to restrict results to `active` enrollments in `available` courses",
+               required: false
+      argument :exclude_concluded,
+               Boolean,
+               "Whether or not to exclude `completed` enrollments",
+               required: false
+      argument :horizon_courses,
+               Boolean,
+               "Whether or not to include or exclude Canvas Career courses",
+               required: false
+      argument :order_by,
+               [String],
+               "The fields to order the results by",
+               required: false,
+               validates: { all: { inclusion: { in: ALLOWED_ORDER_BY_VALUES } } }
+      argument :sort,
+               EnrollmentsSortInputType,
+               "The sort field and direction for the results. Secondary sort is by section name",
+               required: false
+    end
+    def enrollments_connection(course_id: nil, current_only: false, order_by: [], exclude_concluded: false, horizon_courses: nil, sort: {})
+      # Check basic permission - return empty instead of nil
+      unless object == current_user || object.grants_right?(current_user, session, :read_profile)
+        return Enrollment.none
+      end
+
+      # Start with user's enrollments, but only for courses where current_user has permission
+      enrollments = object.enrollments.joins(:course)
+
+      # If not viewing own enrollments, filter to only courses where current_user has read permissions
+      if object != current_user
+        # For GraphQL connections, we need to filter at SQL level. Use a subquery to find
+        # courses where the current user has enrollments (which grants read permission)
+        # TODO: This may be too restrictive - consider including completed courses where teacher had enrollment
+        permitted_course_ids = current_user.enrollments.select(:course_id)
+        enrollments = enrollments.where(course_id: permitted_course_ids)
+      end
+
+      # Apply filters similar to the loader logic
+      if course_id
+        enrollments = enrollments.where(course_id:)
+      end
+
+      if current_only
+        enrollments = enrollments.where(workflow_state: "active")
+                                 .where(courses: { workflow_state: "available" })
+      end
+
+      if exclude_concluded
+        enrollments = enrollments.where.not(workflow_state: "completed")
+      end
+
+      enrollments.order(:id)
+    end
+
     field :notification_preferences_enabled, Boolean, null: false do
       argument :account_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Account")
       argument :context_type, NotificationPreferencesContextType, required: true
