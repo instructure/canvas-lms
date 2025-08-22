@@ -16,16 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createContext, PropsWithChildren, useContext} from 'react'
+import {createContext, PropsWithChildren, useContext, useRef, useState} from 'react'
 import {SerializedNodes} from '@craftjs/core'
 import {AddBlockModal, useAddBlockModal} from './hooks/useAddBlockModal'
 import {SettingsTray, useSettingsTray} from './hooks/useSettingsTray'
 import {useEditorMode} from './hooks/useEditorMode'
+import {useEditingBlock} from './hooks/useEditingBlock'
 
 export type BlockContentEditorContextType = {
   addBlockModal: AddBlockModal
   settingsTray: SettingsTray
   editor: ReturnType<typeof useEditorMode>
+  editingBlock: ReturnType<typeof useEditingBlock>
 }
 
 export type BlockContentEditorContextProps = {
@@ -42,6 +44,7 @@ export const BlockContentEditorContext = (
   const addBlockModal = useAddBlockModal()
   const settingsTray = useSettingsTray()
   const editor = useEditorMode()
+  const editingBlock = useEditingBlock()
 
   return (
     <Context.Provider
@@ -49,6 +52,7 @@ export const BlockContentEditorContext = (
         addBlockModal,
         settingsTray,
         editor,
+        editingBlock,
       }}
     >
       {props.children}

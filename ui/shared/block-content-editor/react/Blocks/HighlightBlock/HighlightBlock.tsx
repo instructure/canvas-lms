@@ -16,16 +16,48 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useEffect, useState, useCallback} from 'react'
-import {BaseBlock, useGetRenderMode} from '../BaseBlock'
+import {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {useSave} from '../BaseBlock/useSave'
 import {HighlightBlockSettings} from './HighlightBlockSettings'
-import {IconWarningLine} from '@instructure/ui-icons'
-import {TextArea} from '@instructure/ui-text-area'
-import {Text} from '@instructure/ui-text'
 import {HighlightBlockLayout} from './HighlightBlockLayout'
-import {useFocusElement} from '../../hooks/useFocusElement'
+import {getIcon} from './components/getIcon'
+import {HighlightText} from './components/HighlightText'
+import {HighlightTextEdit} from './components/HighlightTextEdit'
+import {useSave2} from '../BaseBlock/useSave'
+import {BaseBlockHOC} from '../BaseBlock'
+
+const I18n = createI18nScope('block_content_editor')
+
+const HighlightBlockView = (props: HighlightBlockProps) => {
+  return (
+    <HighlightBlockLayout
+      icon={getIcon(props.settings.displayIcon, props.settings.textColor)}
+      content={<HighlightText content={props.content} color={props.settings.textColor} />}
+      backgroundColor={props.settings.highlightColor}
+    />
+  )
+}
+
+const HighlightBlockEditView = (props: HighlightBlockProps) => {
+  const content = props.content || I18n.t('Click to edit')
+  return <HighlightBlockView {...props} content={content} />
+}
+
+const HighlightBlockEdit = (props: HighlightBlockProps) => {
+  const [content, setContent] = useState(props.content)
+
+  useSave2<typeof HighlightBlock>(() => ({
+    content,
+  }))
+
+  return (
+    <HighlightBlockLayout
+      icon={getIcon(props.settings.displayIcon, props.settings.textColor)}
+      content={<HighlightTextEdit content={content} setContent={setContent} />}
+      backgroundColor={props.settings.highlightColor}
+    />
+  )
+}
 
 export type HighlightBlockProps = {
   content: string
@@ -37,87 +69,16 @@ export type HighlightBlockProps = {
   }
 }
 
-const EditMode = ({
-  content,
-  setContent,
-}: {content: string; setContent: (value: string) => void}) => {
-  const {focusHandler} = useFocusElement()
-
-  return (
-    <TextArea
-      textareaRef={element => focusHandler(element)}
-      label={''}
-      placeholder={I18n.t('Start typing...')}
-      value={content}
-      onChange={e => setContent(e.target.value)}
-      resize="vertical"
-    />
-  )
-}
-
-export const HighlightBlockContent = (props: HighlightBlockProps) => {
-  const {isEditMode, isEditPreviewMode} = useGetRenderMode()
-  const save = useSave<typeof HighlightBlock>()
-
-  const [content, setContent] = useState(props.content)
-
-  const handleSave = useCallback(() => {
-    save({content, settings: props.settings})
-  }, [content, props.settings, save])
-
-  useEffect(() => {
-    if (isEditPreviewMode) {
-      handleSave()
-    }
-  }, [isEditPreviewMode, handleSave])
-
-  const getIcon = () => {
-    switch (props.settings.displayIcon) {
-      case 'warning':
-        return <IconWarningLine size="medium" style={{color: props.settings.textColor}} />
-      default:
-        return null
-    }
-  }
-
-  const PreviewMode = ({children}: {children: React.ReactNode}) => {
-    return (
-      <Text variant="contentImportant">
-        <span style={{whiteSpace: 'break-spaces'}}>{children}</span>
-      </Text>
-    )
-  }
-
-  let contentSlot
-  if (isEditMode) {
-    contentSlot = <EditMode content={content} setContent={setContent} />
-  } else if (isEditPreviewMode) {
-    contentSlot = <PreviewMode>{content || I18n.t('Click to edit')}</PreviewMode>
-  } else {
-    contentSlot = <PreviewMode>{content}</PreviewMode>
-  }
-
-  return (
-    <HighlightBlockLayout
-      icon={getIcon()}
-      content={contentSlot}
-      backgroundColor={props.settings.highlightColor}
-      textColor={props.settings.textColor}
-    />
-  )
-}
-
-const I18n = createI18nScope('block_content_editor')
-
 export const HighlightBlock = (props: HighlightBlockProps) => {
   return (
-    <BaseBlock<typeof HighlightBlock>
+    <BaseBlockHOC
+      ViewComponent={HighlightBlockView}
+      EditViewComponent={HighlightBlockEditView}
+      EditComponent={HighlightBlockEdit}
+      componentProps={props}
       title={HighlightBlock.craft.displayName}
       backgroundColor={props.settings.backgroundColor}
-      statefulProps={{content: props.content}}
-    >
-      <HighlightBlockContent {...props} />
-    </BaseBlock>
+    />
   )
 }
 
