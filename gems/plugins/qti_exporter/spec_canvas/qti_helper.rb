@@ -57,12 +57,12 @@ def get_manifest_node(question, opts = {})
   s["value"] = "237.0"
   allow(manifest_node).to receive(:at_css).with("instructureField[name=max_score]").and_return(s)
 
-  it = nil
+  interaction = nil
   if opts[:interaction_type]
-    it = Object.new
-    allow(it).to receive(:text).and_return(opts[:interaction_type])
+    interaction = Object.new
+    allow(interaction).to receive(:text).and_return(opts[:interaction_type])
   end
-  allow(manifest_node).to receive(:at_css).with("interactionType").and_return(it)
+  allow(manifest_node).to receive(:at_css).with("interactionType").and_return(interaction)
 
   bbqt = nil
   if opts[:bb_question_type]
