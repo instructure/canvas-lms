@@ -155,7 +155,7 @@ module AttachmentFu # :nodoc:
           rescue Object
             raise unless load_related_exception?($!)
 
-            puts "Problems loading #{options[:processor]}Processor: #{$!}"
+            warn "Problems loading #{options[:processor]}Processor: #{$!}"
           end
         end
       end # Don't let child override processor
