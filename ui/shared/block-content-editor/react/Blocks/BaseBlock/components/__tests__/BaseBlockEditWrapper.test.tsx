@@ -146,7 +146,7 @@ describe('BaseBlockEditWrapper', () => {
 
     it('opens Settings Tray when Edit button is clicked', () => {
       const component = renderBlock(BaseBlockEditWrapper, getDefaultProps())
-      const editButton = component.getByText(/edit/i)
+      const editButton = component.getByText(/edit block/i)
 
       fireEvent.click(editButton)
 
