@@ -402,6 +402,18 @@ module Modules2IndexPage
     "[data-testid='quiz-icon']"
   end
 
+  def text_header_input_selector
+    "[placeholder='Enter header text']"
+  end
+
+  def url_input_selector
+    "[placeholder='https://example.com']"
+  end
+
+  def url_title_input_selector
+    "[placeholder='Enter page name']"
+  end
+
   def visible_modules_header_selector
     "div[class*='context_module'] h2"
   end
@@ -747,6 +759,18 @@ module Modules2IndexPage
     f(teacher_modules_container_selector)
   end
 
+  def text_header_input
+    f(text_header_input_selector)
+  end
+
+  def url_input
+    f(url_input_selector)
+  end
+
+  def url_title_input
+    f(url_title_input_selector)
+  end
+
   def screenreader_alert
     f("#flash_screenreader_holder")
   end
@@ -990,5 +1014,17 @@ module Modules2IndexPage
 
   def module_item_action_menu_link_exists?(tool_text)
     element_exists?(module_item_action_menu_link_selector(tool_text), true)
+  end
+
+  def input_text_in_text_header_input(text)
+    replace_content(text_header_input, text)
+  end
+
+  def input_text_in_url_input(text)
+    replace_content(url_input, text)
+  end
+
+  def input_text_in_url_title_input(text)
+    replace_content(url_title_input, text)
   end
 end
