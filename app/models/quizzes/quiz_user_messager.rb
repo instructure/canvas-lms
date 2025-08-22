@@ -21,6 +21,7 @@
 module Quizzes
   class QuizUserMessager
     extend Forwardable
+
     attr_reader :sender, :async, :recipient_list, :conversation, :quiz
     attr_reader :root_account_id, :context_id
 

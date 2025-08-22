@@ -24,6 +24,7 @@ module LtiAdvantage::Claims
   # https://purl.imsglobal.org/spec/lti/claim/activity
   class Activity
     include ActiveModel::Model
+
     attr_accessor :id, :context, :title, :type
 
     validates_presence_of :id

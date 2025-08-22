@@ -953,6 +953,7 @@ describe ActiveRecord::Base do
     it "uses default scope" do
       mock_account = Class.new(Account) do
         include RSpec::Matchers
+
         before_save do
           expect(Account.all.to_sql).not_to match(/callbacks something/)
           expect(self.class.all.to_sql).not_to match(/callbacks something/)

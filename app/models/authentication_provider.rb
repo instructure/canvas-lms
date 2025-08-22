@@ -24,6 +24,7 @@ NetLdapExtensions.apply
 
 class AuthenticationProvider < ActiveRecord::Base
   include Workflow
+
   validates :auth_filter, length: { maximum: maximum_text_length, allow_blank: true }
 
   DEBUG_EXPIRE = 30.minutes
@@ -103,6 +104,7 @@ class AuthenticationProvider < ActiveRecord::Base
   scope :active, -> { where.not(workflow_state: "deleted") }
   belongs_to :account
   include ::Canvas::RootAccountCacher
+
   has_many :pseudonyms, inverse_of: :authentication_provider
   acts_as_list scope: { account: self, workflow_state: [nil, "active"] }
 

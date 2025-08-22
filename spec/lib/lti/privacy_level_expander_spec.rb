@@ -20,6 +20,7 @@
 
 describe Lti::PrivacyLevelExpander do
   include ExternalToolsSpecHelper
+
   let(:course) { course_model }
   let(:user) { course_with_student(course:).user }
   let(:placement) { "resource_selection" }

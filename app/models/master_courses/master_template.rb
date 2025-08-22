@@ -48,6 +48,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   include Canvas::SoftDeletable
 
   include MasterCourses::TagHelper
+
   self.content_tag_association = :master_content_tags
 
   scope :for_full_course, -> { where(full_course: true) }

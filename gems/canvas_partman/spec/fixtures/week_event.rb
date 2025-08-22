@@ -19,6 +19,7 @@
 
 class CanvasPartmanTest::WeekEvent < ActiveRecord::Base
   include CanvasPartman::Concerns::Partitioned
+
   self.partitioning_strategy = :by_date
   self.partitioning_interval = :weeks
 

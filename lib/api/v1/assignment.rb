@@ -361,6 +361,7 @@ module Api::V1::Assignment
 
     if opts[:include_discussion_topic] && assignment.discussion_topic?
       extend Api::V1::DiscussionTopics
+
       hash["discussion_topic"] = discussion_topic_api_json(
         assignment.discussion_topic,
         assignment.discussion_topic.context,

@@ -20,6 +20,7 @@
 
 class AssignmentGroup < ActiveRecord::Base
   include Workflow
+
   # Unlike our other soft-deletable models, assignment groups use 'available' instead of 'active'
   # to indicate a not-deleted state. This means we have to add the 'available' state here before
   # Canvas::SoftDeletable adds the 'active' and 'deleted' states, so that 'available' becomes the
@@ -28,6 +29,7 @@ class AssignmentGroup < ActiveRecord::Base
   include Canvas::SoftDeletable
 
   include MasterCourses::Restrictor
+
   restrict_columns :content, [:group_weight, :rules]
 
   attr_readonly :context_id, :context_type

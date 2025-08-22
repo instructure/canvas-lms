@@ -67,6 +67,7 @@ class User < ActiveRecord::Base
 
   serialize :preferences
   include TimeZoneHelper
+
   time_zone_attribute :time_zone
   include Workflow
   include UserPreferenceValue::UserMethods # include after other callbacks are defined
@@ -290,6 +291,7 @@ class User < ActiveRecord::Base
   belongs_to :merged_into_user, class_name: "User"
 
   include StickySisFields
+
   are_sis_sticky :name, :sortable_name, :short_name, :pronouns
 
   include FeatureFlags

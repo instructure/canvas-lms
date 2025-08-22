@@ -39,6 +39,7 @@ class ApplicationController < ActionController::Base
   include AuthenticationMethods
 
   include Canvas::RequestForgeryProtection
+
   protect_from_forgery with: :exception
 
   # Before/around actions run in order defined (even if interleaved)
@@ -3092,6 +3093,7 @@ class ApplicationController < ActionController::Base
     extend Api::V1::UserProfile
     extend Api::V1::Course
     extend Api::V1::Group
+
     includes ||= []
     data = user_profile_json(profile, viewer, session, includes, profile)
     data[:can_edit] = viewer == profile.user && profile.user.user_can_edit_profile?

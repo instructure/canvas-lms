@@ -43,6 +43,7 @@ module DrDiff
     end
 
     extend Forwardable
+
     def_delegators :@git, :wip?, :changes
 
     def parsed_diff

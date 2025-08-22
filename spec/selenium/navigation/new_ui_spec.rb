@@ -82,6 +82,7 @@ describe "new ui" do
 
     context("files rewrite tooggle") do
       include FilesPage
+
       folder_name = "base folder"
 
       before do

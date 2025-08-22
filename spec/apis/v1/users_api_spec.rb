@@ -23,6 +23,7 @@ require_relative "../file_uploads_spec_helper"
 
 class TestUserApi
   include Api::V1::User
+
   attr_accessor :services_enabled, :context, :current_user, :params, :request
 
   def service_enabled?(service)

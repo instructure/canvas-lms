@@ -20,6 +20,7 @@
 module ModuleVisibility
   class ModuleVisibilityService
     extend VisibilityHelpers::Common
+
     class << self
       def modules_visible_to_students(course_ids: nil, user_ids: nil, context_module_ids: nil)
         unless course_ids || user_ids || context_module_ids

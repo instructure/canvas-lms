@@ -161,6 +161,7 @@ class ProfileController < ApplicationController
   before_action :require_password_session, only: %i[communication communication_update update]
 
   include HorizonMode
+
   before_action :load_canvas_career, only: %i[show settings communication content_shares qr_mobile_login]
 
   include Api::V1::Avatar

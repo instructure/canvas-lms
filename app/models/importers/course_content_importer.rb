@@ -584,7 +584,7 @@ module Importers
     end
 
     def self.shift_date_options(course, options = {})
-      return({ remove_dates: true }) if Canvas::Plugin.value_to_boolean(options[:remove_dates])
+      return { remove_dates: true } if Canvas::Plugin.value_to_boolean(options[:remove_dates])
 
       result = {}
       remove_bad_end_dates!(options)

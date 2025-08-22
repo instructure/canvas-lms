@@ -20,6 +20,7 @@
 
 class OutcomeImport < ApplicationRecord
   include Workflow
+
   belongs_to :context, polymorphic: %i[account course], optional: false
   belongs_to :attachment
   belongs_to :user

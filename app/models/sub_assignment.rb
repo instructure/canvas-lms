@@ -64,6 +64,7 @@ class SubAssignment < AbstractAssignment
   # AbstractAssignment method with support for sub_assignments and sub_assignment overrides
   def to_atom(opts = {})
     extend ApplicationHelper
+
     author_name = context.present? ? context.name : t("atom_no_author", "No Author")
     content = "#{before_label(:due, "Due")} #{datetime_string(due_at, :due_date)}"
     unless opts[:exclude_description]

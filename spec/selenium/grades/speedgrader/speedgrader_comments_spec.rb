@@ -113,6 +113,7 @@ describe "SpeedGrader" do
 
       # immediately from javascript
       extend TextHelper
+
       expected_posted_at = datetime_string(@comment.created_at).gsub(/\s+/, " ")
       expect(Speedgrader.fetch_comment_posted_at_by_index(0)).to include_text(expected_posted_at)
       # after refresh

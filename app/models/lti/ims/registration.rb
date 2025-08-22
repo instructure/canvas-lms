@@ -20,6 +20,7 @@
 class Lti::IMS::Registration < ApplicationRecord
   include Canvas::SoftDeletable
   extend RootAccountResolver
+
   self.table_name = "lti_ims_registrations"
 
   # These attributes are in the spec (config JSON) but not stored in the

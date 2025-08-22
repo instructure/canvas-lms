@@ -107,6 +107,7 @@ module BasicLTI
 
     class LtiResponse
       include TextHelper
+
       attr_accessor :code_major, :severity, :description, :body, :error_code
 
       def initialize(lti_request)

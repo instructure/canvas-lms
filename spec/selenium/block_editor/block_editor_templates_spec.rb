@@ -32,6 +32,7 @@ require_relative "pages/block_editor_page"
 describe "Block Editor templates", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include BlockEditorPage
+
   def drop_new_block(block_name, where)
     drag_and_drop_element(block_toolbox_box_by_block_name(block_name), where)
   end

@@ -22,6 +22,7 @@ module Canvas::Migration
 
   class PackageIdentifier
     include Canvas::Migration::XMLHelper
+
     attr_reader :type, :converter
 
     COMMON_CARTRIDGE_REGEX = /IMS(?: Thin)? Common Cartridge/i

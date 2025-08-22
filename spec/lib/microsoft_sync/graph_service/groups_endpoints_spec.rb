@@ -60,6 +60,7 @@ end
 
 describe MicrosoftSync::GraphService::GroupsEndpoints do
   include MicrosoftSync::GraphService::GroupsEndpoints::SpecHelper
+
   include_context "microsoft_sync_graph_service_endpoints"
 
   describe "#update_group" do

@@ -45,6 +45,7 @@ class ContentTag < ActiveRecord::Base
   include SearchTermHelper
 
   include MasterCourses::Restrictor
+
   restrict_columns :state, [:workflow_state]
   restrict_columns :content, %i[content_id url new_tab]
 
@@ -90,6 +91,7 @@ class ContentTag < ActiveRecord::Base
   after_create :update_outcome_contexts
 
   include CustomValidations
+
   validates_as_url :url
 
   validate :check_for_restricted_content_changes

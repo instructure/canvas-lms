@@ -32,6 +32,7 @@ class Message < ActiveRecord::Base
   include Messages::SendStudentNamesHelper
 
   include CanvasPartman::Concerns::Partitioned
+
   self.partitioning_strategy = :by_date
   self.partitioning_interval = :weeks
 
@@ -74,6 +75,7 @@ class Message < ActiveRecord::Base
   belongs_to :communication_channel
   belongs_to :context, polymorphic: [], exhaustive: false
   include NotificationPreloader
+
   belongs_to :user
   belongs_to :root_account, class_name: "Account"
   has_many   :attachments, as: :context, inverse_of: :context

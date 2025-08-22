@@ -960,6 +960,7 @@ class UsersController < ApplicationController
   end
 
   include Api::V1::TodoItem
+
   # @API List the TODO items
   # A paginated list of the current user's list of todo items.
   #

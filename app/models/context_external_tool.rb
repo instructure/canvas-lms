@@ -40,6 +40,7 @@ class ContextExternalTool < ActiveRecord::Base
   belongs_to :lti_registration, class_name: "Lti::Registration"
 
   include MasterCourses::Restrictor
+
   restrict_columns :content, [:name, :description]
   restrict_columns :settings, %i[consumer_key shared_secret url domain settings]
 

@@ -65,6 +65,7 @@
 #
 class OutcomeProficiencyApiController < ApplicationController
   include Api::V1::OutcomeProficiency
+
   before_action :get_context
 
   # @API Create/update proficiency ratings

@@ -19,6 +19,7 @@
 
 class GradingPeriodSerializer < Canvas::APISerializer
   include PermissionsSerializer
+
   root :grading_period
 
   attributes :id,

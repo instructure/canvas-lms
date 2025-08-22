@@ -87,6 +87,7 @@ class AbstractAssignment < ActiveRecord::Base
   attr_writer :updating_user
 
   include MasterCourses::Restrictor
+
   restrict_columns :content, [:title, :description]
   restrict_assignment_columns
   restrict_columns :state, [:workflow_state]
@@ -1819,6 +1820,7 @@ class AbstractAssignment < ActiveRecord::Base
 
   def to_atom(opts = {})
     extend ApplicationHelper
+
     author_name = context.present? ? context.name : t("atom_no_author", "No Author")
     content = "#{before_label(:due, "Due")} #{datetime_string(due_at, :due_date)}"
     unless opts[:exclude_description]

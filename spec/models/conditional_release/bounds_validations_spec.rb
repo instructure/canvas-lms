@@ -26,6 +26,7 @@ module ConditionalRelease
       Class.new do
         include ActiveModel::Validations
         include BoundsValidations
+
         attr_accessor :upper_bound, :lower_bound
       end.new
     end

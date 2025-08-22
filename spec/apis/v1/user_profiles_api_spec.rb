@@ -24,6 +24,7 @@ require_relative "../../helpers/k5_common"
 # FIXME: don't copy paste
 class TestUserApi
   include Api::V1::UserProfile
+
   attr_accessor :services_enabled, :context, :current_user
 
   def service_enabled?(service)

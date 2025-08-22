@@ -20,6 +20,7 @@
 module BroadcastPolicies
   class AssignmentPolicy
     extend DatesOverridable::ClassMethods
+
     attr_reader :assignment
 
     def initialize(assignment)

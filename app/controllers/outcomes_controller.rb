@@ -25,6 +25,7 @@ class OutcomesController < ApplicationController
   before_action :require_context, except: [:build_outcomes]
 
   include HorizonMode
+
   before_action :load_canvas_career, only: [:index, :show]
 
   add_crumb(proc { t "#crumbs.outcomes", "Outcomes" }, except: [:destroy, :build_outcomes]) { |c| c.send :named_context_url, c.instance_variable_get(:@context), :context_outcomes_path }

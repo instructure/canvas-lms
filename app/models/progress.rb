@@ -49,6 +49,7 @@ class Progress < ActiveRecord::Base
   scope :is_pending, -> { where(workflow_state: ["queued", "running"]) }
 
   include Workflow
+
   workflow do
     state :queued do
       event :start, transitions_to: :running

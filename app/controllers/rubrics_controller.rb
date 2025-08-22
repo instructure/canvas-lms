@@ -23,6 +23,7 @@ class RubricsController < ApplicationController
   before_action :require_context
 
   include HorizonMode
+
   before_action :load_canvas_career, only: [:index, :show]
 
   before_action { |c| c.active_tab = "rubrics" }

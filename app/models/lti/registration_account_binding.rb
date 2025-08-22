@@ -21,6 +21,7 @@ class Lti::RegistrationAccountBinding < ActiveRecord::Base
   extend RootAccountResolver
 
   include Workflow
+
   workflow do
     state :off
     state :on

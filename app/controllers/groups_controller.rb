@@ -933,6 +933,7 @@ class GroupsController < ApplicationController
   end
 
   include Api::V1::User
+
   # @API List group's users
   #
   # Returns a paginated list of users in the group.
@@ -1047,6 +1048,7 @@ class GroupsController < ApplicationController
   end
 
   include Api::V1::PreviewHtml
+
   # @API Preview processed html
   #
   # Preview html content processed for this group
@@ -1071,6 +1073,7 @@ class GroupsController < ApplicationController
   end
 
   include Api::V1::StreamItem
+
   # @API Group activity stream
   # Returns the current user's group-specific activity stream, paginated.
   #

@@ -368,6 +368,7 @@ class CoursesController < ApplicationController
   before_action :check_horizon_redirect, only: [:show]
 
   include HorizonMode
+
   before_action :load_canvas_career, only: %i[settings index]
 
   include Api::V1::Course
@@ -1365,6 +1366,7 @@ class CoursesController < ApplicationController
   end
 
   include Api::V1::PreviewHtml
+
   # @API Preview processed html
   #
   # Preview html content processed for this course
@@ -1388,6 +1390,7 @@ class CoursesController < ApplicationController
   end
 
   include Api::V1::StreamItem
+
   # @API Course activity stream
   # Returns the current user's course-specific activity stream, paginated.
   #
@@ -1413,6 +1416,7 @@ class CoursesController < ApplicationController
   end
 
   include Api::V1::TodoItem
+
   # @API Course TODO items
   # Returns the current user's course-specific todo items.
   #

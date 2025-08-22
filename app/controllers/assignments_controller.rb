@@ -36,12 +36,15 @@ class AssignmentsController < ApplicationController
   include KalturaHelper
   include ObserverEnrollmentsHelper
   include SyllabusHelper
+
   before_action :require_context
 
   include HorizonMode
+
   before_action :load_canvas_career, only: %i[index show syllabus]
 
   include K5Mode
+
   add_crumb(
     proc { t "#crumbs.assignments", "Assignments" },
     except: %i[destroy syllabus index new edit]

@@ -20,6 +20,7 @@
 
 class RoleOverride < ActiveRecord::Base
   extend RootAccountResolver
+
   belongs_to :context, polymorphic: [:account]
 
   belongs_to :role

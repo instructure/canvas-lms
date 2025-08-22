@@ -169,6 +169,7 @@ shared_examples_for "course_module2 add module tray" do |context|
   include ContextModulesCommon
   include Modules2IndexPage
   include Modules2ActionTray
+
   new_module_name = "First Week 1"
 
   before do
@@ -235,6 +236,7 @@ shared_examples_for "course_module2 module tray assign to" do |context|
   include ContextModulesCommon
   include Modules2IndexPage
   include Modules2ActionTray
+
   before do
     case context
     when :context_modules

@@ -21,6 +21,7 @@
 module Canvas::Migration
   class Migrator
     include MigratorHelper
+
     SCRAPE_ALL_HASH = { "course_outline" => true, "announcements" => true, "assignments" => true, "goals" => true, "rubrics" => true, "web_links" => true, "learning_modules" => true, "calendar_events" => true, "calendar_start" => nil, "calendar_end" => nil, "discussions" => true, "assessments" => true, "question_bank" => true, "all_files" => true, "groups" => true, "assignment_groups" => true, "tasks" => true, "wikis" => true }.freeze
 
     attr_accessor :course, :extra_settings, :total_error_count, :package_root

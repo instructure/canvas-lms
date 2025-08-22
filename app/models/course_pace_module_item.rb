@@ -24,6 +24,7 @@ class CoursePaceModuleItem < ActiveRecord::Base
   belongs_to :root_account, class_name: "Account"
 
   extend RootAccountResolver
+
   resolves_root_account through: :course_pace
 
   validates :course_pace, presence: true

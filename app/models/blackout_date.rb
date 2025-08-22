@@ -29,6 +29,7 @@ class BlackoutDate < ActiveRecord::Base
   validate :end_date_not_before_start_date
 
   extend RootAccountResolver
+
   resolves_root_account through: :context
 
   def end_date_not_before_start_date

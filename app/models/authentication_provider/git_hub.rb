@@ -20,6 +20,7 @@
 
 class AuthenticationProvider::GitHub < AuthenticationProvider::OAuth2
   include AuthenticationProvider::PluginSettings
+
   self.plugin = :github
   plugin_settings :domain, :client_id, client_secret: :client_secret_dec
 

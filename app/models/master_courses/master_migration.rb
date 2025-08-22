@@ -49,6 +49,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
   has_a_broadcast_policy
 
   include Workflow
+
   workflow do
     state :created
     state :queued # before the migration job has run

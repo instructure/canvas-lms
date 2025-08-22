@@ -21,6 +21,7 @@ require "canvas/draft_state_validations"
 
 class Quizzes::Quiz < ActiveRecord::Base
   extend RootAccountResolver
+
   self.table_name = "quizzes"
 
   include Workflow
@@ -99,6 +100,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   resolves_root_account through: :context
 
   include MasterCourses::Restrictor
+
   restrict_columns :content, [:title, :description]
   restrict_columns :settings, %i[
     quiz_type

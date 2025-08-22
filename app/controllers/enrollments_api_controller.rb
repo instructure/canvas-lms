@@ -342,6 +342,7 @@ class EnrollmentsApiController < ApplicationController
 
   include Api::V1::User
   include Api::V1::Progress
+
   # @API List enrollments
   # Depending on the URL given, return a paginated list of either (1) all of
   # the enrollments in a course, (2) all of the enrollments in a section or (3)

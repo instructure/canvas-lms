@@ -27,6 +27,7 @@ class RubricAssessmentsController < ApplicationController
   before_action :require_user
 
   include Api::V1::SubmissionComment
+
   # @API Create a single rubric assessment
   #
   # Returns the rubric assessment with the given id.

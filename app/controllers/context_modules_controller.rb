@@ -27,6 +27,7 @@ class ContextModulesController < ApplicationController
   before_action :require_context
 
   include HorizonMode
+
   before_action :load_canvas_career, only: [:index, :show]
 
   add_crumb(proc { t("#crumbs.modules", "Modules") }) { |c| c.send :named_context_url, c.instance_variable_get(:@context), :context_context_modules_url }
@@ -927,6 +928,7 @@ class ContextModulesController < ApplicationController
   end
 
   include ContextModulesHelper
+
   def add_item
     @module = @context.context_modules.not_deleted.find(params[:context_module_id])
 

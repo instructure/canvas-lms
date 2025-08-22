@@ -23,6 +23,7 @@ require_relative "codepoint_test_helper"
 
 describe "BasicLatin" do
   include CodepointTestHelper
+
   # This test suite is just regression test and debugging
   # to better transliterate the Basic Latin Unicode codepoints
   #

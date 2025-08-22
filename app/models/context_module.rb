@@ -26,6 +26,7 @@ class ContextModule < ActiveRecord::Base
   include DifferentiableAssignment
 
   include MasterCourses::Restrictor
+
   restrict_columns :state, [:workflow_state]
   restrict_columns :settings, %i[prerequisites completion_requirements requirement_count require_sequential_progress]
 

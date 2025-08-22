@@ -167,6 +167,7 @@ class DiscussionTopic < ActiveRecord::Base
   after_create :create_materialized_view
 
   include SmartSearchable
+
   use_smart_search title_column: :title,
                    body_column: :message,
                    index_scope: ->(course) { course.discussion_topics.active },

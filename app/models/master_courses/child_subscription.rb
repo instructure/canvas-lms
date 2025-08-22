@@ -48,6 +48,7 @@ class MasterCourses::ChildSubscription < ActiveRecord::Base
   include Canvas::SoftDeletable
 
   include MasterCourses::TagHelper
+
   self.content_tag_association = :child_content_tags
 
   def invalidate_course_cache

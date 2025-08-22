@@ -21,6 +21,7 @@
 class RubricAssessmentImport < ApplicationRecord
   include Workflow
   include RubricImporterErrors
+
   belongs_to :course
   belongs_to :assignment
   belongs_to :attachment

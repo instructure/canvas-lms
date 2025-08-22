@@ -23,6 +23,7 @@ module Lti
     describe GradebookServices do
       controller(ApplicationController) do
         include Lti::IMS::Concerns::GradebookServices
+
         before_action :prepare_line_item_for_ags!, :verify_user_in_context, :verify_line_item_in_context
         skip_before_action(
           :verify_access_token,

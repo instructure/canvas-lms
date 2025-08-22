@@ -793,6 +793,7 @@ class Submission < ActiveRecord::Base
 
   def plaintext_body
     extend HtmlTextHelper
+
     strip_tags((body || "").gsub(%r{<\s*br\s*/>}, "\n<br/>").gsub(%r{</p>}, "</p>\n"))
   end
 
