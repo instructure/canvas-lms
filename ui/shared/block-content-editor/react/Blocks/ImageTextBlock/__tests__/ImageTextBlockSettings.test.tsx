@@ -105,4 +105,58 @@ describe('ImageTextBlockSettings', () => {
       expect(component.queryByText('my-image.jpg')).not.toBeInTheDocument()
     })
   })
+
+  describe('caption', () => {
+    it('integrates, changing the state', async () => {
+      const component = renderBlock(
+        ImageTextBlockSettings,
+        getSettings({caption: 'Initial caption'}),
+      )
+      const input = component.getByLabelText(/Image caption/i) as HTMLInputElement
+      expect(input.value).toBe('Initial caption')
+      await userEvent.clear(input)
+      await userEvent.type(input, 'New caption')
+      expect(input.value).toBe('New caption')
+    })
+  })
+
+  describe('alt text', () => {
+    it('integrates, changing the state', async () => {
+      const component = renderBlock(
+        ImageTextBlockSettings,
+        getSettings({altText: 'Initial alt text'}),
+      )
+      const input = component.getByRole('textbox', {name: /Alt text/i}) as HTMLInputElement
+      expect(input.value).toBe('Initial alt text')
+      await userEvent.clear(input)
+      await userEvent.type(input, 'New alt text')
+      expect(input.value).toBe('New alt text')
+    })
+  })
+
+  describe('alt text as caption', () => {
+    it('integrates, changing the state', async () => {
+      const component = renderBlock(
+        ImageTextBlockSettings,
+        getSettings({
+          altText: 'Sample alt text',
+          altTextAsCaption: false,
+        }),
+      )
+      const checkbox = component.getByLabelText(/Use alt text as caption/i)
+      expect(checkbox).not.toBeChecked()
+      await userEvent.click(checkbox)
+      expect(checkbox).toBeChecked()
+    })
+  })
+
+  describe('decorative image', () => {
+    it('integrates, changing the state', async () => {
+      const component = renderBlock(ImageTextBlockSettings, getSettings({decorativeImage: false}))
+      const checkbox = component.getByLabelText(/Decorative image/i)
+      expect(checkbox).not.toBeChecked()
+      await userEvent.click(checkbox)
+      expect(checkbox).toBeChecked()
+    })
+  })
 })

@@ -108,6 +108,7 @@ export const blockFactory = {
       fileName=""
       title=""
       content=""
+      decorativeImage={false}
       settings={{
         includeBlockTitle: true,
         backgroundColor: defaultBackgroundColor,

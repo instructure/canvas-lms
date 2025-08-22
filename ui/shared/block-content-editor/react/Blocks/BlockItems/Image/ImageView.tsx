@@ -32,7 +32,7 @@ export const ImageView = ({
   const calculatedCaption = altTextAsCaption ? altText : caption
 
   return (
-    <Flex direction="column" gap="small">
+    <Flex direction="column" gap="mediumSmall">
       {url ? (
         // eslint-disable-next-line jsx-a11y/alt-text
         <img

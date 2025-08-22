@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {PropsWithChildren, useEffect, useState} from 'react'
+import {useEffect, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {BaseBlock, useGetRenderMode} from '../BaseBlock'
 import {useSave} from '../BaseBlock/useSave'
@@ -27,17 +27,8 @@ import {ImageBlockProps} from './types'
 import {TitleEdit} from '../BlockItems/Title/TitleEdit'
 import {TitleView} from '../BlockItems/Title/TitleView'
 import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
-import {Flex} from '@instructure/ui-flex'
 
 const I18n = createI18nScope('block_content_editor')
-
-const Layout = ({children}: PropsWithChildren) => {
-  return (
-    <Flex direction="column" gap="mediumSmall">
-      {children}
-    </Flex>
-  )
-}
 
 const ImageContainer = (props: ImageBlockProps) => {
   const [title, setTitle] = useState(props.title || '')
@@ -58,28 +49,28 @@ const ImageContainer = (props: ImageBlockProps) => {
   return (
     <>
       {isEditMode && (
-        <Layout>
+        <>
           {props.settings?.includeBlockTitle && (
             <TitleEdit title={title} onTitleChange={onTitleChange} />
           )}
           <ImageEdit {...props} onImageChange={onImageChange} />
-        </Layout>
+        </>
       )}
       {isEditPreviewMode && (
-        <Layout>
+        <>
           {props.settings?.includeBlockTitle && (
             <TitleEditPreview contentColor={props.settings?.textColor || ''} title={title} />
           )}
           <ImageView {...props} />
-        </Layout>
+        </>
       )}
       {isViewMode && (
-        <Layout>
+        <>
           {props.settings?.includeBlockTitle && (
             <TitleView contentColor={props.settings?.textColor || ''} title={title} />
           )}
           <ImageView {...props} />
-        </Layout>
+        </>
       )}
     </>
   )

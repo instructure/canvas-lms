@@ -38,6 +38,7 @@ const ImageTextContent = (props: ImageTextBlockProps) => {
   const [url, setUrl] = useState(props.url)
   const [altText, setAltText] = useState(props.altText)
   const [fileName, setFileName] = useState(props.fileName)
+  const [decorativeImage, setDectorativeImage] = useState(props.decorativeImage)
 
   useEffect(() => {
     if (isEditPreviewMode) {
@@ -47,9 +48,10 @@ const ImageTextContent = (props: ImageTextBlockProps) => {
         url,
         altText,
         fileName,
+        decorativeImage,
       })
     }
-  }, [altText, content, fileName, isEditPreviewMode, save, title, url])
+  }, [altText, content, decorativeImage, fileName, isEditPreviewMode, save, title, url])
 
   useEffect(() => {
     setUrl(props.settings.url)
@@ -64,11 +66,33 @@ const ImageTextContent = (props: ImageTextBlockProps) => {
   }, [props.settings.fileName])
 
   useEffect(() => {
-    if (url || altText || fileName) {
-      save({settings: {...props.settings, url, altText, fileName}})
+    setDectorativeImage(props.settings.decorativeImage)
+  }, [props.settings.decorativeImage])
+
+  useEffect(() => {
+    if (url || altText || fileName || decorativeImage) {
+      let captionSetting = props.settings.caption
+      let calculatedAltText = altText
+
+      if (decorativeImage) {
+        calculatedAltText = ''
+        captionSetting = ''
+        setAltText(calculatedAltText)
+      }
+
+      save({
+        settings: {
+          ...props.settings,
+          url,
+          altText: calculatedAltText,
+          fileName,
+          decorativeImage,
+          caption: captionSetting,
+        },
+      })
     }
     // NOTE: props.settings is excluded for prevent infinity loop
-  }, [altText, fileName, save, url])
+  }, [altText, fileName, save, url, decorativeImage])
 
   const onTitleChange = (newTitle: string) => setTitle(newTitle)
   const onContentChange = (newContent: string) => setContent(newContent)
@@ -77,6 +101,7 @@ const ImageTextContent = (props: ImageTextBlockProps) => {
     setUrl(imageData.url)
     setAltText(imageData.altText)
     setFileName(imageData.fileName)
+    setDectorativeImage(imageData.decorativeImage)
   }
 
   return (
@@ -105,11 +130,13 @@ const ImageTextContent = (props: ImageTextBlockProps) => {
           content={content}
           url={url}
           altText={altText}
-          decorativeImage={props.settings.decorativeImage}
           textColor={props.settings.textColor}
           arrangement={props.settings.arrangement}
           textToImageRatio={props.settings.textToImageRatio}
           includeBlockTitle={props.settings.includeBlockTitle}
+          decorativeImage={props.settings.decorativeImage}
+          altTextAsCaption={props.settings.altTextAsCaption}
+          caption={props.settings.caption}
         />
       )}
       {isViewMode && (
@@ -118,11 +145,13 @@ const ImageTextContent = (props: ImageTextBlockProps) => {
           content={content}
           url={url}
           altText={altText}
-          decorativeImage={props.settings.decorativeImage}
           textColor={props.settings.textColor}
           arrangement={props.settings.arrangement}
           textToImageRatio={props.settings.textToImageRatio}
           includeBlockTitle={props.settings.includeBlockTitle}
+          decorativeImage={props.settings.decorativeImage}
+          altTextAsCaption={props.settings.altTextAsCaption}
+          caption={props.settings.caption}
         />
       )}
     </Flex>
@@ -140,6 +169,7 @@ export const ImageTextBlock = (props: ImageTextBlockProps) => {
         url: props.url,
         altText: props.altText,
         fileName: props.fileName,
+        decorativeImage: props.decorativeImage,
       }}
     >
       <ImageTextContent {...props} />

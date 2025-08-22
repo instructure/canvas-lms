@@ -28,7 +28,8 @@ import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {Flex, FlexItem} from '@instructure/ui-flex'
-import {ReactNode} from 'react'
+import React, {ReactNode} from 'react'
+import {SettingsImageInfos} from '../BlockItems/SettingsImageInfos/SettingsImageInfos'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -84,6 +85,10 @@ export const ImageTextBlockSettings = () => {
     textToImageRatio,
     url,
     fileName,
+    altText,
+    caption,
+    altTextAsCaption,
+    decorativeImage,
   } = useNode(node => ({
     includeBlockTitle: node.data.props.settings.includeBlockTitle,
     backgroundColor: node.data.props.settings.backgroundColor,
@@ -92,6 +97,10 @@ export const ImageTextBlockSettings = () => {
     textToImageRatio: node.data.props.settings.textToImageRatio,
     url: node.data.props.settings.url,
     fileName: node.data.props.settings.fileName,
+    altText: node.data.props.settings.altText,
+    caption: node.data.props.settings.caption,
+    altTextAsCaption: node.data.props.settings.altTextAsCaption,
+    decorativeImage: node.data.props.settings.decorativeImage,
   }))
 
   const handleIncludeBlockTitleChange = () => {
@@ -131,6 +140,38 @@ export const ImageTextBlockSettings = () => {
       props.settings.url = imageData.url
       props.settings.altText = imageData.altText
       props.settings.fileName = imageData.fileName
+    })
+  }
+
+  const handleCaptionChange = (caption: string) => {
+    setProp((props: ImageTextBlockProps) => {
+      props.settings.caption = caption
+    })
+  }
+
+  const handleAltTextChange = (altText: string) => {
+    setProp((props: ImageTextBlockProps) => {
+      props.settings.altText = altText
+    })
+  }
+
+  const handleAltTextAsCaptionChange = (newAltTextAsCaption: boolean) => {
+    setProp((props: ImageTextBlockProps) => {
+      props.settings.altTextAsCaption = newAltTextAsCaption
+      if (newAltTextAsCaption) {
+        props.settings.caption = props.settings.altText
+      }
+    })
+  }
+
+  const handleDecorativeImageChange = (newDecorativeImage: boolean) => {
+    setProp((props: ImageTextBlockProps) => {
+      props.settings.decorativeImage = newDecorativeImage
+      if (props.settings.decorativeImage) {
+        props.settings.altText = ''
+        props.settings.altTextAsCaption = false
+        props.settings.caption = ''
+      }
     })
   }
 
@@ -194,11 +235,23 @@ export const ImageTextBlockSettings = () => {
             ))}
           </RadioInputGroup>
         </View>
-        <View as="div">
+        <View as="div" margin="0 0 medium 0">
           <SettingsUploadImage
             onImageChange={handleImageDataChange}
             url={url || ''}
             fileName={fileName || ''}
+          />
+        </View>
+        <View as="div">
+          <SettingsImageInfos
+            caption={caption}
+            altText={altText}
+            altTextAsCaption={altTextAsCaption}
+            decorativeImage={decorativeImage}
+            onCaptionChange={handleCaptionChange}
+            onAltTextChange={handleAltTextChange}
+            onAltTextAsCaptionChange={handleAltTextAsCaptionChange}
+            onDecorativeImageChange={handleDecorativeImageChange}
           />
         </View>
       </SettingsSectionToggle>
