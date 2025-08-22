@@ -1191,7 +1191,7 @@ GEM
       guardrail (~> 3.0.1)
       parallel (~> 1.22)
       railties (>= 7.0, < 7.3)
-    switchman-inst-jobs (4.1.0)
+    switchman-inst-jobs (4.2.0)
       inst-jobs (>= 2.4.9, < 4.0)
       parallel (>= 1.19)
       railties (>= 7.0, < 8.0)
