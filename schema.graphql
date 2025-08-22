@@ -10663,6 +10663,57 @@ type User implements LegacyIDInterface & Node & Timestamped {
     """
     sort: EnrollmentsSortInputType
   ): [Enrollment!]!
+  enrollmentsConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    only return enrollments for this course
+    """
+    courseId: ID
+
+    """
+    Whether or not to restrict results to `active` enrollments in `available` courses
+    """
+    currentOnly: Boolean
+
+    """
+    Whether or not to exclude `completed` enrollments
+    """
+    excludeConcluded: Boolean
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Whether or not to include or exclude Canvas Career courses
+    """
+    horizonCourses: Boolean
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+
+    """
+    The fields to order the results by
+    """
+    orderBy: [String!]
+
+    """
+    The sort field and direction for the results. Secondary sort is by section name
+    """
+    sort: EnrollmentsSortInputType
+  ): EnrollmentConnection
   favoriteCoursesConnection(
     """
     Returns the elements in the list that come after the specified cursor.

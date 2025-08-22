@@ -606,6 +606,149 @@ describe Types::UserType do
     end
   end
 
+  context "enrollments_connection" do
+    before(:once) do
+      @course1 = @course
+      @course2 = course_factory
+      @course2.enroll_student(@student, enrollment_state: "active")
+      @course3 = course_factory
+      @course3.enroll_student(@student, enrollment_state: "active")
+      @course4 = course_factory
+      @course4.enroll_student(@student, enrollment_state: "active")
+    end
+
+    it "returns paginated enrollments with default limit" do
+      user_type.extract_result = false
+      result = user_type.resolve("enrollmentsConnection { nodes { _id } pageInfo { hasNextPage hasPreviousPage } }")
+      enrollments_result = result["enrollmentsConnection"]
+
+      expect(enrollments_result["nodes"]).to be_an(Array)
+      expect(enrollments_result["pageInfo"]).to include("hasNextPage", "hasPreviousPage")
+    end
+
+    it "returns enrollments with specified limit" do
+      user_type.extract_result = false
+      result = user_type.resolve("enrollmentsConnection(first: 2) { nodes { _id } pageInfo { hasNextPage hasPreviousPage endCursor startCursor } }")
+      enrollments_result = result["enrollmentsConnection"]
+      expect(enrollments_result["nodes"].length).to be <= 2
+      expect(enrollments_result["pageInfo"]).to include("hasNextPage", "hasPreviousPage", "endCursor", "startCursor")
+    end
+
+    it "supports cursor-based pagination" do
+      user_type.extract_result = false
+      # Get first page
+      first_page_result = user_type.resolve("enrollmentsConnection(first: 2) { nodes { _id } pageInfo { endCursor hasNextPage } }")
+      first_page = first_page_result["enrollmentsConnection"]
+
+      if first_page["pageInfo"]["hasNextPage"]
+        cursor = first_page["pageInfo"]["endCursor"]
+        # Get second page
+        second_page_result = user_type.resolve(%|enrollmentsConnection(first: 2, after: "#{cursor}") { nodes { _id } pageInfo { hasPreviousPage } }|)
+        second_page = second_page_result["enrollmentsConnection"]
+        expect(second_page["pageInfo"]["hasPreviousPage"]).to be true
+
+        # Ensure different results
+        first_ids = first_page["nodes"].map { |n| n["_id"] }
+        second_ids = second_page["nodes"].map { |n| n["_id"] }
+        expect(first_ids & second_ids).to be_empty
+      end
+    end
+
+    it "returns enrollments for a given course with pagination" do
+      user_type.extract_result = false
+      result = user_type.resolve(%|enrollmentsConnection(courseId: "#{@course1.id}", first: 1) { nodes { _id } }|)
+      enrollments_result = result["enrollmentsConnection"]
+      expect(enrollments_result["nodes"].length).to eq 1
+      expect(enrollments_result["nodes"].first["_id"]).to eq @student.enrollments.where(course: @course1).first.to_param
+    end
+
+    it "excludes unavailable courses when currentOnly is true" do
+      @course1.complete
+      user_type.extract_result = false
+      result = user_type.resolve("enrollmentsConnection(currentOnly: true) { nodes { _id } }")
+      enrollments_result = result["enrollmentsConnection"]
+      course1_enrollment_id = @student.enrollments.where(course: @course1).first.to_param
+      node_ids = enrollments_result["nodes"].map { |n| n["_id"] }
+      expect(node_ids).not_to include(course1_enrollment_id)
+    end
+
+    it "excludes concluded enrollments when excludeConcluded is true" do
+      @student.enrollments.where(course: @course1).update_all(workflow_state: "completed")
+      user_type.extract_result = false
+      result = user_type.resolve("enrollmentsConnection(excludeConcluded: true) { nodes { _id } }")
+      enrollments_result = result["enrollmentsConnection"]
+      course1_enrollment_id = @student.enrollments.where(course: @course1).first.to_param
+      node_ids = enrollments_result["nodes"].map { |n| n["_id"] }
+      expect(node_ids).not_to include(course1_enrollment_id)
+    end
+
+    it "applies same permission checks as regular enrollments field" do
+      # Test that user can't see enrollments for courses they don't have permission for
+      user_type.extract_result = false
+      result = user_type.resolve(%|enrollmentsConnection(courseId: "#{@course2.id}") { nodes { _id } }|)
+      enrollments_result = result["enrollmentsConnection"]
+      expect(enrollments_result["nodes"]).to eq []
+    end
+
+    it "supports sorting with orderBy parameter" do
+      @course2.start_at = 1.week.ago
+      @course2.save!
+
+      user_type.extract_result = false
+      result = user_type.resolve('enrollmentsConnection(orderBy: ["courses.start_at"]) {
+                                   nodes {
+                                     _id
+                                     course { _id }
+                                   }
+                                 }',
+                                 current_user: @student)
+      enrollments_result = result["enrollmentsConnection"]
+
+      course_ids = enrollments_result["nodes"].map { |n| n["course"]["_id"].to_i }
+      expect(course_ids).to include(@course2.id, @course1.id)
+    end
+
+    context "with many enrollments" do
+      before(:once) do
+        # Create additional courses to test pagination behavior
+        5.times do |i|
+          course = course_factory(course_name: "Test Course #{i + 5}")
+          course.enroll_student(@student, enrollment_state: "active")
+        end
+      end
+
+      it "properly paginates through all enrollments" do
+        user_type.extract_result = false
+        all_enrollment_ids = []
+        has_next = true
+        cursor = nil
+
+        while has_next
+          query = if cursor
+                    %|enrollmentsConnection(first: 3, after: "#{cursor}") { nodes { _id } pageInfo { hasNextPage endCursor } }|
+                  else
+                    "enrollmentsConnection(first: 3) { nodes { _id } pageInfo { hasNextPage endCursor } }"
+                  end
+
+          result = user_type.resolve(query, current_user: @student)
+          enrollments_result = result["enrollmentsConnection"]
+          page_ids = enrollments_result["nodes"].map { |n| n["_id"] }
+          all_enrollment_ids.concat(page_ids)
+
+          has_next = enrollments_result["pageInfo"]["hasNextPage"]
+          cursor = enrollments_result["pageInfo"]["endCursor"]
+
+          # Safety break to prevent infinite loops in tests
+          break if all_enrollment_ids.length > 20
+        end
+
+        # Verify we got all enrollments and no duplicates
+        expect(all_enrollment_ids.uniq.length).to eq all_enrollment_ids.length
+        expect(all_enrollment_ids.length).to eq @student.enrollments.count
+      end
+    end
+  end
+
   context "email" do
     let!(:read_email_override) do
       RoleOverride.create!(
