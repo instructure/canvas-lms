@@ -21,7 +21,7 @@ import {renderHook} from '@testing-library/react-hooks'
 import {waitFor} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {setupServer} from 'msw/node'
-import {graphql, HttpResponse} from 'msw'
+import {http, HttpResponse} from 'msw'
 import {useCourseWork} from '../useCourseWork'
 import type {CourseWorkItem} from '../useCourseWork'
 
@@ -65,118 +65,110 @@ const createWrapper = () => {
 describe('useCourseWork', () => {
   it('returns course work items from multiple courses', async () => {
     server.use(
-      graphql.query('GetUserCourseWork', () => {
-        return HttpResponse.json({
-          data: {
-            legacyNode: {
-              _id: '1',
-              enrollments: [
-                {
-                  course: {
-                    _id: '101',
-                    name: 'Biology',
-                    assignmentsConnection: {
-                      nodes: [
-                        {
-                          _id: '1',
-                          name: 'Lab Assignment',
-                          dueAt: dayAfterTomorrow.toISOString(),
-                          pointsPossible: 25,
-                          htmlUrl: '/courses/101/assignments/1',
-                          submissionTypes: ['online_upload'],
-                          state: 'published',
-                          published: true,
-                          quiz: null,
-                          discussion: null,
-                          submissionsConnection: {
-                            nodes: [
-                              {
-                                _id: 'sub1',
-                                cachedDueDate: dayAfterTomorrow.toISOString(),
-                                submittedAt: null,
-                                late: false,
-                                missing: false,
-                                excused: false,
-                                state: 'unsubmitted',
-                              },
-                            ],
-                          },
+      http.post('/api/graphql', async ({request}) => {
+        const body = (await request.json()) as {query: string; variables: any}
+        if (body.query.includes('GetUserCourseWork')) {
+          return HttpResponse.json({
+            data: {
+              legacyNode: {
+                _id: '1',
+                courseWorkSubmissionsConnection: {
+                  nodes: [
+                    {
+                      _id: 'sub2',
+                      cachedDueDate: tomorrow.toISOString(),
+                      submittedAt: null,
+                      late: false,
+                      missing: false,
+                      excused: false,
+                      state: 'unsubmitted',
+                      assignment: {
+                        _id: '2',
+                        name: 'Chapter Quiz Assignment',
+                        dueAt: tomorrow.toISOString(),
+                        pointsPossible: 50,
+                        htmlUrl: '/courses/101/assignments/2',
+                        submissionTypes: ['online_quiz'],
+                        state: 'published',
+                        published: true,
+                        quiz: {_id: '2', title: 'Chapter 5 Quiz'},
+                        discussion: null,
+                        course: {
+                          _id: '101',
+                          name: 'Biology',
                         },
-                        {
-                          _id: '2',
-                          name: 'Chapter Quiz Assignment',
-                          dueAt: tomorrow.toISOString(),
-                          pointsPossible: 50,
-                          htmlUrl: '/courses/101/assignments/2',
-                          submissionTypes: ['online_quiz'],
-                          state: 'published',
-                          published: true,
-                          quiz: {_id: '2', title: 'Chapter 5 Quiz'},
-                          discussion: null,
-                          submissionsConnection: {
-                            nodes: [
-                              {
-                                _id: 'sub2',
-                                cachedDueDate: tomorrow.toISOString(),
-                                submittedAt: null,
-                                late: false,
-                                missing: false,
-                                excused: false,
-                                state: 'unsubmitted',
-                              },
-                            ],
-                          },
-                        },
-                      ],
+                      },
                     },
+                    {
+                      _id: 'sub1',
+                      cachedDueDate: dayAfterTomorrow.toISOString(),
+                      submittedAt: null,
+                      late: false,
+                      missing: false,
+                      excused: false,
+                      state: 'unsubmitted',
+                      assignment: {
+                        _id: '1',
+                        name: 'Lab Assignment',
+                        dueAt: dayAfterTomorrow.toISOString(),
+                        pointsPossible: 25,
+                        htmlUrl: '/courses/101/assignments/1',
+                        submissionTypes: ['online_upload'],
+                        state: 'published',
+                        published: true,
+                        quiz: null,
+                        discussion: null,
+                        course: {
+                          _id: '101',
+                          name: 'Biology',
+                        },
+                      },
+                    },
+                    {
+                      _id: 'sub3',
+                      cachedDueDate: threeDaysFromNow.toISOString(),
+                      submittedAt: null,
+                      late: false,
+                      missing: false,
+                      excused: false,
+                      state: 'unsubmitted',
+                      assignment: {
+                        _id: '3',
+                        name: 'Discussion Assignment',
+                        dueAt: threeDaysFromNow.toISOString(),
+                        pointsPossible: 15,
+                        htmlUrl: '/courses/102/assignments/3',
+                        submissionTypes: ['discussion_topic'],
+                        state: 'published',
+                        published: true,
+                        quiz: null,
+                        discussion: {_id: '3', title: 'WWI Discussion'},
+                        course: {
+                          _id: '102',
+                          name: 'History',
+                        },
+                      },
+                    },
+                  ],
+                  pageInfo: {
+                    hasNextPage: false,
+                    hasPreviousPage: false,
+                    endCursor: null,
+                    startCursor: null,
                   },
                 },
-                {
-                  course: {
-                    _id: '102',
-                    name: 'History',
-                    assignmentsConnection: {
-                      nodes: [
-                        {
-                          _id: '3',
-                          name: 'Discussion Assignment',
-                          dueAt: threeDaysFromNow.toISOString(),
-                          pointsPossible: 15,
-                          htmlUrl: '/courses/102/assignments/3',
-                          submissionTypes: ['discussion_topic'],
-                          state: 'published',
-                          published: true,
-                          quiz: null,
-                          discussion: {_id: '3', title: 'WWI Discussion'},
-                          submissionsConnection: {
-                            nodes: [
-                              {
-                                _id: 'sub3',
-                                cachedDueDate: threeDaysFromNow.toISOString(),
-                                submittedAt: null,
-                                late: false,
-                                missing: false,
-                                excused: false,
-                                state: 'unsubmitted',
-                              },
-                            ],
-                          },
-                        },
-                      ],
-                    },
-                  },
-                },
-              ],
+              },
             },
-          },
-        })
+          })
+        }
+        return HttpResponse.json({errors: [{message: 'Query not matched'}]}, {status: 400})
       }),
     )
 
     const {result} = renderHook(() => useCourseWork(), {wrapper: createWrapper()})
 
     await waitFor(() => {
-      expect(result.current.isLoading).toBe(false)
+      expect(result.current.data?.pages?.[0]?.items).toBeDefined()
     })
 
     const expectedItems: CourseWorkItem[] = [
@@ -209,258 +201,316 @@ describe('useCourseWork', () => {
       },
     ]
 
-    expect(result.current.data).toEqual(expectedItems)
+    expect(result.current.data?.pages?.[0]?.items).toEqual(expectedItems)
   })
 
-  it('returns all course work items from all courses', async () => {
+  it('supports course filtering', async () => {
     server.use(
-      graphql.query('GetUserCourseWork', () => {
-        return HttpResponse.json({
-          data: {
-            legacyNode: {
-              _id: '1',
-              enrollments: [
-                {
-                  course: {
-                    _id: '101',
-                    name: 'Biology',
-                    assignmentsConnection: {
-                      nodes: [
-                        {
-                          _id: '1',
-                          name: 'Lab Assignment',
-                          dueAt: dayAfterTomorrow.toISOString(),
-                          pointsPossible: 25,
-                          htmlUrl: '/courses/101/assignments/1',
-                          submissionTypes: ['online_upload'],
-                          state: 'published',
-                          published: true,
-                          quiz: null,
-                          discussion: null,
-                          submissionsConnection: {
-                            nodes: [
-                              {
-                                _id: 'sub1',
-                                cachedDueDate: dayAfterTomorrow.toISOString(),
-                                submittedAt: null,
-                                late: false,
-                                missing: false,
-                                excused: false,
-                                state: 'unsubmitted',
-                              },
-                            ],
-                          },
-                        },
-                      ],
+      http.post('/api/graphql', async ({request}) => {
+        const body = (await request.json()) as {query: string; variables: any}
+        if (body.query.includes('GetUserCourseWork')) {
+          // Mock backend filtering - only return Biology course items when courseFilter is provided
+          const submissions =
+            body.variables.courseFilter === '101'
+              ? [
+                  {
+                    _id: 'sub1',
+                    cachedDueDate: dayAfterTomorrow.toISOString(),
+                    submittedAt: null,
+                    late: false,
+                    missing: false,
+                    excused: false,
+                    state: 'unsubmitted',
+                    assignment: {
+                      _id: '1',
+                      name: 'Lab Assignment',
+                      dueAt: dayAfterTomorrow.toISOString(),
+                      pointsPossible: 25,
+                      htmlUrl: '/courses/101/assignments/1',
+                      submissionTypes: ['online_upload'],
+                      state: 'published',
+                      published: true,
+                      quiz: null,
+                      discussion: null,
+                      course: {
+                        _id: '101',
+                        name: 'Biology',
+                      },
                     },
                   },
-                },
-                {
-                  course: {
-                    _id: '102',
-                    name: 'History',
-                    assignmentsConnection: {
-                      nodes: [
-                        {
-                          _id: '2',
-                          name: 'History Essay',
-                          dueAt: tomorrow.toISOString(),
-                          pointsPossible: 100,
-                          htmlUrl: '/courses/102/assignments/2',
-                          submissionTypes: ['online_text_entry'],
-                          state: 'published',
-                          published: true,
-                          quiz: null,
-                          discussion: null,
-                          submissionsConnection: {
-                            nodes: [
-                              {
-                                _id: 'sub4',
-                                cachedDueDate: tomorrow.toISOString(),
-                                submittedAt: null,
-                                late: false,
-                                missing: false,
-                                excused: false,
-                                state: 'unsubmitted',
-                              },
-                            ],
-                          },
-                        },
-                      ],
-                    },
+                ]
+              : []
+
+          return HttpResponse.json({
+            data: {
+              legacyNode: {
+                _id: '1',
+                courseWorkSubmissionsConnection: {
+                  nodes: submissions,
+                  pageInfo: {
+                    hasNextPage: false,
+                    hasPreviousPage: false,
+                    endCursor: null,
+                    startCursor: null,
                   },
                 },
-              ],
+              },
             },
-          },
-        })
+          })
+        }
+        return HttpResponse.json({errors: [{message: 'Query not matched'}]}, {status: 400})
       }),
     )
 
-    const {result} = renderHook(() => useCourseWork(), {wrapper: createWrapper()})
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false)
+    const {result} = renderHook(() => useCourseWork({courseFilter: '101'}), {
+      wrapper: createWrapper(),
     })
 
-    expect(result.current.data).toHaveLength(2)
-    expect(result.current.data?.map(item => item.title)).toEqual([
-      'History Essay',
-      'Lab Assignment',
-    ])
-    expect(result.current.data?.map(item => item.course.name)).toEqual(['History', 'Biology'])
+    await waitFor(() => {
+      expect(result.current.data?.pages?.[0]?.items).toBeDefined()
+    })
+
+    expect(result.current.data?.pages?.[0]?.items).toHaveLength(1)
+    expect(result.current.data?.pages?.[0]?.items?.[0].course.id).toBe('101')
+    expect(result.current.data?.pages?.[0]?.items?.[0].title).toBe('Lab Assignment')
   })
 
-  it('handles empty response', async () => {
+  it('supports different page sizes', async () => {
     server.use(
-      graphql.query('GetUserCourseWork', () => {
-        return HttpResponse.json({
-          data: {
-            legacyNode: {
-              _id: '1',
-              enrollments: [],
+      http.post('/api/graphql', async ({request}) => {
+        const body = (await request.json()) as {query: string; variables: any}
+        if (body.query.includes('GetUserCourseWork')) {
+          return HttpResponse.json({
+            data: {
+              legacyNode: {
+                _id: '1',
+                courseWorkSubmissionsConnection: {
+                  nodes: [
+                    {
+                      _id: 'sub1',
+                      cachedDueDate: tomorrow.toISOString(),
+                      submittedAt: null,
+                      late: false,
+                      missing: false,
+                      excused: false,
+                      state: 'unsubmitted',
+                      assignment: {
+                        _id: '1',
+                        name: 'Page Size Test Item',
+                        dueAt: tomorrow.toISOString(),
+                        pointsPossible: 25,
+                        htmlUrl: '/courses/101/assignments/1',
+                        submissionTypes: ['online_upload'],
+                        state: 'published',
+                        published: true,
+                        quiz: null,
+                        discussion: null,
+                        course: {
+                          _id: '101',
+                          name: 'Biology',
+                        },
+                      },
+                    },
+                  ],
+                  pageInfo: {
+                    hasNextPage: false,
+                    hasPreviousPage: false,
+                    endCursor: null,
+                    startCursor: null,
+                  },
+                },
+              },
             },
-          },
-        })
+          })
+        }
+        return HttpResponse.json({errors: [{message: 'Query not matched'}]}, {status: 400})
       }),
     )
 
-    const {result} = renderHook(() => useCourseWork(), {wrapper: createWrapper()})
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false)
+    const {result} = renderHook(() => useCourseWork({pageSize: 2}), {
+      wrapper: createWrapper(),
     })
 
-    expect(result.current.data).toEqual([])
+    await waitFor(() => {
+      expect(result.current.data?.pages?.[0]?.items).toBeDefined()
+    })
+
+    expect(result.current.data?.pages?.[0]?.items).toHaveLength(1)
+    expect(result.current.data?.pages?.[0]?.items?.[0].title).toBe('Page Size Test Item')
   })
 
   it('handles null response', async () => {
     server.use(
-      graphql.query('GetUserCourseWork', () => {
-        return HttpResponse.json({
-          data: {
-            legacyNode: null,
-          },
-        })
+      http.post('/api/graphql', async ({request}) => {
+        const body = (await request.json()) as {query: string; variables: any}
+        if (body.query.includes('GetUserCourseWork')) {
+          return HttpResponse.json({
+            data: {
+              legacyNode: null,
+            },
+          })
+        }
+        return HttpResponse.json({errors: [{message: 'Query not matched'}]}, {status: 400})
       }),
     )
 
     const {result} = renderHook(() => useCourseWork(), {wrapper: createWrapper()})
 
     await waitFor(() => {
-      expect(result.current.isLoading).toBe(false)
+      expect(result.current.data?.pages?.[0]?.items).toBeDefined()
     })
 
-    expect(result.current.data).toEqual([])
+    expect(result.current.data?.pages?.[0]?.items).toEqual([])
+    expect(result.current.data?.pages?.[0]?.pageInfo.hasNextPage).toBe(false)
+  })
+
+  it('handles empty response', async () => {
+    server.use(
+      http.post('/api/graphql', async ({request}) => {
+        const body = (await request.json()) as {query: string; variables: any}
+        if (body.query.includes('GetUserCourseWork')) {
+          return HttpResponse.json({
+            data: {
+              legacyNode: {
+                _id: '1',
+                courseWorkSubmissionsConnection: {
+                  nodes: [],
+                  pageInfo: {
+                    hasNextPage: false,
+                    hasPreviousPage: false,
+                    endCursor: null,
+                    startCursor: null,
+                  },
+                },
+              },
+            },
+          })
+        }
+        return HttpResponse.json({errors: [{message: 'Query not matched'}]}, {status: 400})
+      }),
+    )
+
+    const {result} = renderHook(() => useCourseWork(), {wrapper: createWrapper()})
+
+    await waitFor(() => {
+      expect(result.current.data?.pages?.[0]?.items).toBeDefined()
+    })
+
+    expect(result.current.data?.pages?.[0]?.items).toEqual([])
+    expect(result.current.data?.pages?.[0]?.pageInfo.hasNextPage).toBe(false)
   })
 
   it('sorts items by due date (soonest first, null last)', async () => {
     server.use(
-      graphql.query('GetUserCourseWork', () => {
-        return HttpResponse.json({
-          data: {
-            legacyNode: {
-              _id: '1',
-              enrollments: [
-                {
-                  course: {
-                    _id: '101',
-                    name: 'Test Course',
-                    assignmentsConnection: {
-                      nodes: [
-                        {
-                          _id: '1',
-                          name: 'Assignment C',
-                          dueAt: fiveDaysFromNow.toISOString(),
-                          pointsPossible: 100,
-                          htmlUrl: '/courses/101/assignments/1',
-                          submissionTypes: ['online_upload'],
-                          state: 'published',
-                          published: true,
-                          quiz: null,
-                          discussion: null,
-                          submissionsConnection: {
-                            nodes: [
-                              {
-                                _id: 'sub5',
-                                cachedDueDate: fiveDaysFromNow.toISOString(),
-                                submittedAt: null,
-                                late: false,
-                                missing: false,
-                                excused: false,
-                                state: 'unsubmitted',
-                              },
-                            ],
-                          },
+      http.post('/api/graphql', async ({request}) => {
+        const body = (await request.json()) as {query: string; variables: any}
+        if (body.query.includes('GetUserCourseWork')) {
+          return HttpResponse.json({
+            data: {
+              legacyNode: {
+                _id: '1',
+                courseWorkSubmissionsConnection: {
+                  nodes: [
+                    {
+                      _id: 'sub1',
+                      cachedDueDate: tomorrow.toISOString(),
+                      submittedAt: null,
+                      late: false,
+                      missing: false,
+                      excused: false,
+                      state: 'unsubmitted',
+                      assignment: {
+                        _id: '1',
+                        name: 'Assignment A',
+                        dueAt: tomorrow.toISOString(),
+                        pointsPossible: 25,
+                        htmlUrl: '/courses/101/assignments/1',
+                        submissionTypes: ['online_upload'],
+                        state: 'published',
+                        published: true,
+                        quiz: null,
+                        discussion: null,
+                        course: {
+                          _id: '101',
+                          name: 'Course 1',
                         },
-                        {
-                          _id: '2',
-                          name: 'Assignment A',
-                          dueAt: dayAfterTomorrow.toISOString(),
-                          pointsPossible: 50,
-                          htmlUrl: '/courses/101/assignments/2',
-                          submissionTypes: ['online_upload'],
-                          state: 'published',
-                          published: true,
-                          quiz: null,
-                          discussion: null,
-                          submissionsConnection: {
-                            nodes: [
-                              {
-                                _id: 'sub1',
-                                cachedDueDate: dayAfterTomorrow.toISOString(),
-                                submittedAt: null,
-                                late: false,
-                                missing: false,
-                                excused: false,
-                                state: 'unsubmitted',
-                              },
-                            ],
-                          },
-                        },
-                        {
-                          _id: '3',
-                          name: 'Assignment B',
-                          dueAt: null,
-                          pointsPossible: 25,
-                          htmlUrl: '/courses/101/assignments/3',
-                          submissionTypes: ['online_upload'],
-                          state: 'published',
-                          published: true,
-                          quiz: null,
-                          discussion: null,
-                          submissionsConnection: {
-                            nodes: [
-                              {
-                                _id: 'sub6',
-                                cachedDueDate: null,
-                                submittedAt: null,
-                                late: false,
-                                missing: false,
-                                excused: false,
-                                state: 'unsubmitted',
-                              },
-                            ],
-                          },
-                        },
-                      ],
+                      },
                     },
+                    {
+                      _id: 'sub2',
+                      cachedDueDate: threeDaysFromNow.toISOString(),
+                      submittedAt: null,
+                      late: false,
+                      missing: false,
+                      excused: false,
+                      state: 'unsubmitted',
+                      assignment: {
+                        _id: '2',
+                        name: 'Assignment C',
+                        dueAt: threeDaysFromNow.toISOString(),
+                        pointsPossible: 50,
+                        htmlUrl: '/courses/101/assignments/2',
+                        submissionTypes: ['online_upload'],
+                        state: 'published',
+                        published: true,
+                        quiz: null,
+                        discussion: null,
+                        course: {
+                          _id: '101',
+                          name: 'Course 1',
+                        },
+                      },
+                    },
+                    {
+                      _id: 'sub3',
+                      cachedDueDate: null,
+                      submittedAt: null,
+                      late: false,
+                      missing: false,
+                      excused: false,
+                      state: 'unsubmitted',
+                      assignment: {
+                        _id: '3',
+                        name: 'Assignment B',
+                        dueAt: null,
+                        pointsPossible: 10,
+                        htmlUrl: '/courses/101/assignments/3',
+                        submissionTypes: ['online_upload'],
+                        state: 'published',
+                        published: true,
+                        quiz: null,
+                        discussion: null,
+                        course: {
+                          _id: '101',
+                          name: 'Course 1',
+                        },
+                      },
+                    },
+                  ],
+                  pageInfo: {
+                    hasNextPage: false,
+                    hasPreviousPage: false,
+                    endCursor: null,
+                    startCursor: null,
                   },
                 },
-              ],
+              },
             },
-          },
-        })
+          })
+        }
+        return HttpResponse.json({errors: [{message: 'Query not matched'}]}, {status: 400})
       }),
     )
 
     const {result} = renderHook(() => useCourseWork(), {wrapper: createWrapper()})
 
     await waitFor(() => {
-      expect(result.current.isLoading).toBe(false)
+      expect(result.current.data?.pages?.[0]?.items).toBeDefined()
     })
 
-    expect(result.current.data?.map(item => item.title)).toEqual([
+    expect(
+      result.current.data?.pages?.[0]?.items?.map((item: CourseWorkItem) => item.title),
+    ).toEqual([
       'Assignment A', // Earliest due date
       'Assignment C', // Later due date
       'Assignment B', // No due date (null)
