@@ -259,7 +259,7 @@ class GroupsController < ApplicationController
           scope.preload(:group_category, :context)
         end
         @groups = Api.paginate(@groups, self, api_v1_current_user_groups_url)
-        render json: (@groups.map { |g| group_json(g, @current_user, session, includes) })
+        render json: @groups.map { |g| group_json(g, @current_user, session, includes) }
       end
     end
   end

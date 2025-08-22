@@ -21,7 +21,7 @@ require_relative "cc_spec_helper"
 require "nokogiri"
 
 describe CC::BasicLTILinks do
-  subject { (Class.new { include CC::BasicLTILinks }).new }
+  subject { Class.new { include CC::BasicLTILinks }.new }
 
   let(:tool) do
     ContextExternalTool.new

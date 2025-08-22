@@ -139,7 +139,7 @@ class TabsController < ApplicationController
     css_class = params["tab_id"]
     new_pos = params["position"].to_i if params["position"]
     tabs = context_tabs(@context, @current_user)
-    tab = (tabs.find { |t| t.with_indifferent_access[:css_class] == css_class }).with_indifferent_access
+    tab = tabs.find { |t| t.with_indifferent_access[:css_class] == css_class }.with_indifferent_access
     tab_config = @context.tab_configuration
     if tab_config.blank? || tab_config.count != tabs.count
       tab_config = tabs.map do |t|
