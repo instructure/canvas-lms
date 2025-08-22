@@ -833,8 +833,7 @@ describe "Roles API", type: :request do
       allow(RoleOverride).to receive(:manageable_permissions).with(Account.default).and_return(
         {
           view_analytics: {
-            label: -> { "View Analytics" },
-            label_v2: -> { "Analytics - View" },
+            label: -> { "Analytics - View" },
             group: "analytics_stuff",
             group_label: -> { "Analytics" },
             available_to: %w[AccountAdmin TaEnrollment TeacherEnrollment StudentEnrollment AccountMembership],
@@ -842,7 +841,7 @@ describe "Roles API", type: :request do
           },
           fabricate_analytics: {
             group: "analytics_stuff",
-            label_v2: -> { "Analytics - Create" },
+            label: -> { "Analytics - Create" },
             available_to: %w[AccountAdmin AccountMembership],
             true_for: %w[AccountAdmin]
           },

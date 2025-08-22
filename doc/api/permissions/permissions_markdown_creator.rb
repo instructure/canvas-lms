@@ -54,7 +54,7 @@ class PermissionsMarkdownCreator
                     .map do |key, info|
                       { key:,
                         group: info[:group_label]&.call.to_s,
-                        label: info[:label_v2]&.call || info[:label]&.call }
+                        label: info[:label].call }
                     end
                     .sort_by { |entry| [entry[:group], entry[:key]] }
                     .group_by { |entry| entry[:group] }
@@ -63,7 +63,7 @@ class PermissionsMarkdownCreator
                    .map do |key, info|
                      { key:,
                        group: info[:group_label]&.call.to_s,
-                       label: info[:label_v2]&.call || info[:label]&.call,
+                       label: info[:label].call,
                        available_to: available_defaults(info) }
                    end
                    .sort_by { |entry| [entry[:group], entry[:key]] }

@@ -369,8 +369,7 @@ class RoleOverridesController < ApplicationController
     json = role_json(@context, role, @current_user, session)
 
     if (base_role = RoleOverride.enrollment_type_labels.find { |br| br[:base_role_name] == base_role_type })
-      # NOTE: p[1][:label_v2].call could eventually be removed if we copied everything over to :label
-      json["base_role_type_label"] = base_role.key?(:label_v2) ? base_role[:label_v2].call : base_role[:label].call
+      json["base_role_type_label"] = base_role[:label].call
     end
 
     render json:
@@ -518,7 +517,7 @@ class RoleOverridesController < ApplicationController
 
       perms.transform_values! do |info|
         {
-          label: info[:label_v2]&.call || info[:label]&.call,
+          label: info[:label].call,
           available_to: info[:available_to],
           true_for: info[:true_for]
         }.tap do |h|
@@ -707,8 +706,7 @@ class RoleOverridesController < ApplicationController
     }
 
     RoleOverride.manageable_permissions(context).each do |p|
-      # NOTE: p[1][:label_v2].call could eventually be removed if we copied everything over to :label
-      hash = { label: p[1].key?(:label_v2) ? p[1][:label_v2].call : p[1][:label].call, permission_name: p[0] }
+      hash = { label: p[1][:label].call, permission_name: p[0] }
       if p[1].key?(:group)
         hash[:granular_permission_group] = p[1][:group] if p[1].key?(:group)
         hash[:granular_permission_group_label] = p[1][:group_label].call
@@ -734,9 +732,7 @@ class RoleOverridesController < ApplicationController
     res << course if course[:group_permissions].any?
 
     res.each do |pg|
-      # NOTE: p[1][:label_v2].call could eventually be removed if we copied everything over to :label
-      pg[:group_permissions] =
-        pg[:group_permissions].sort_by { |p| p.key?(:label_v2) ? p[:label_v2] : p[:label] }
+      pg[:group_permissions].sort_by! { |p| p[:label] }
     end
 
     res
@@ -780,8 +776,7 @@ class RoleOverridesController < ApplicationController
     RoleOverride.manageable_permissions(context).each do |p|
       next if !context.root_account? && p[0].to_s == "manage_developer_keys"
 
-      # NOTE: p[1][:label_v2].call could eventually be removed if we copied everything over to :label
-      hash = { label: p[1].key?(:label_v2) ? p[1][:label_v2].call : p[1][:label].call, permission_name: p[0] }
+      hash = { label: p[1][:label].call, permission_name: p[0] }
       if p[1].key?(:group)
         hash[:granular_permission_group] = p[1][:group] if p[1].key?(:group)
         hash[:granular_permission_group_label] = p[1][:group_label].call
@@ -807,9 +802,7 @@ class RoleOverridesController < ApplicationController
     res << course if course[:group_permissions].any?
 
     res.each do |pg|
-      # NOTE: p[1][:label_v2].call could eventually be removed if we copied everything over to :label
-      pg[:group_permissions] =
-        pg[:group_permissions].sort_by { |p| p.key?(:label_v2) ? p[:label_v2] : p[:label] }
+      pg[:group_permissions].sort_by! { |p| p[:label] }
     end
 
     res

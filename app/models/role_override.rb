@@ -149,7 +149,7 @@ class RoleOverride < ActiveRecord::Base
     permissions.map do |k, p|
       {
         name: "#{ACCESS_TOKEN_SCOPE_PREFIX}.#{k}",
-        label: p.key?(label_v2) ? p[:label_v2].call : p[:label].call
+        label: p[:label].call
       }
     end
   end
