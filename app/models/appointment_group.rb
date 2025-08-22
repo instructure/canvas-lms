@@ -146,7 +146,7 @@ class AppointmentGroup < ActiveRecord::Base
           @new_contexts.each do |context|
             context_subs = context.course_sections.map(&:asset_string)
             # if context has no selected subcontexts, add all subcontexts
-            if (@new_sub_context_codes & context_subs).count == 0
+            unless @new_sub_context_codes.intersect?(context_subs)
               @new_sub_context_codes += context_subs
             end
           end
