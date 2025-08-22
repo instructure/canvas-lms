@@ -30,19 +30,19 @@ class Loaders::AuditEventsLoader < GraphQL::Batch::Loader
     audit_events = AnonymousOrModerationEvent.events_for_submissions(ids)
 
     data = Hash.new { |hash, key| hash[key] = [] }
-    audit_events.each do |it|
-      submission_id = it[:submission_id]
-      assignment_id = it[:assignment_id]
+    audit_events.each do |event|
+      submission_id = event[:submission_id]
+      assignment_id = event[:assignment_id]
 
       if submission_id.nil?
         # If submission_id is nil, add the event to all submission_ids for the matching assignment_id
         submission_ids_for_assignment = assignment_id_to_submission_id_map[assignment_id] || []
         submission_ids_for_assignment.each do |sub_id|
-          data[sub_id] << it
+          data[sub_id] << event
         end
       else
         # Otherwise, add the event to the specific submission_id
-        data[submission_id] << it
+        data[submission_id] << event
       end
     end
 

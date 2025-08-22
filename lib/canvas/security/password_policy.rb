@@ -55,7 +55,7 @@ module Canvas::Security
         end
         # not enough symbols
         if Canvas::Plugin.value_to_boolean(policy[:require_symbol_characters])
-          symbol_regex = %r{[\!\@\#\$\%\^\&\*\(\)\_\+\-\=\[\]\{\}\|\;\:\'\"\<\>\,\.\?/]}
+          symbol_regex = %r{[!@\#$%\^&*()_+\-=\[\]\{\}|;:'"<>,.?/]}
           record.errors.add attr, "no_symbols" unless symbol_regex.match?(value)
         end
         # a password dictionary has been provided to check against

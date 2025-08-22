@@ -1378,7 +1378,7 @@ describe Course do
 
           @course.reload
           expect(@course.uuid).to eq orig_uuid
-          expect(new_course.uuid).to match(/[0-9a-zA-z]{40}/)
+          expect(new_course.uuid).to match(/[0-9a-zA-Z]{40}/)
         end
 
         it "moves the uuid to the new course during reset if feature flag is disabled" do

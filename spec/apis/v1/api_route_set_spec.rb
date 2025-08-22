@@ -137,7 +137,7 @@ RSpec.describe ApiRouteSet, type: :request do
           get "foobars/:foobar_id",
               action: "action_with_foobar_id",
               as: :action_with_foobar_id,
-              constraints: { foobar_id: %r{[^/\?]+} }
+              constraints: { foobar_id: %r{[^/?]+} }
         end
       end
     end
