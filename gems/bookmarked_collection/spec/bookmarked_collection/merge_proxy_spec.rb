@@ -36,7 +36,7 @@ describe "BookmarkedCollection::MergeProxy" do
           comparison = (pager.include_bookmark ? "id >= ?" : "id > ?")
           scope = scope.where(comparison, bookmark)
         end
-        scope.order("id ASC")
+        scope.order(:id)
       end
     end
   end
@@ -167,8 +167,8 @@ describe "BookmarkedCollection::MergeProxy" do
       it "merges when bookmarks have nil values" do
         nil_bookmark = BookmarkedCollection::SimpleBookmarker.new(@example_class, :date, :id)
         course = @created_scope.create!(date: "2017-11-30T00:00:00-06:00")
-        created_collection = BookmarkedCollection.wrap(nil_bookmark, @created_scope.order("date DESC, id"))
-        deleted_collection = BookmarkedCollection.wrap(nil_bookmark, @deleted_scope.order("date DESC, id"))
+        created_collection = BookmarkedCollection.wrap(nil_bookmark, @created_scope.order(date: :desc, id: :asc))
+        deleted_collection = BookmarkedCollection.wrap(nil_bookmark, @deleted_scope.order(date: :desc, id: :asc))
         proxy = BookmarkedCollection::MergeProxy.new([
                                                        ["created", created_collection],
                                                        ["deleted", deleted_collection]

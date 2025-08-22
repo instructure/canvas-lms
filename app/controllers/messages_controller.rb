@@ -28,7 +28,7 @@ class MessagesController < ApplicationController
   end
 
   def index
-    @messages = @context.messages.order("created_at DESC").paginate(page: params[:page], per_page: 20)
+    @messages = @context.messages.order(created_at: :desc).paginate(page: params[:page], per_page: 20)
     add_crumb t("Messsages")
     page_has_instui_topnav
   end

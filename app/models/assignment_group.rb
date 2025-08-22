@@ -42,7 +42,7 @@ class AssignmentGroup < ActiveRecord::Base
   serialize :integration_data, type: Hash
 
   has_many :scores, -> { active }
-  has_many :assignments, -> { order("position, due_at, title") }
+  has_many :assignments, -> { order(:position, :due_at, :title) }
 
   has_many :active_assignments,
            lambda {

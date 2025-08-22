@@ -1861,7 +1861,7 @@ class AccountsController < ApplicationController
       return redirect_to account_settings_url(@account) if !@account.allow_sis_import || !@account.root_account?
 
       @current_batch = @account.current_sis_batch
-      @last_batch = @account.sis_batches.order("created_at DESC").first
+      @last_batch = @account.sis_batches.order(created_at: :desc).first
       respond_to do |format|
         format.html
         format.json { render json: @current_batch }

@@ -254,7 +254,7 @@ class AccountNotification < ActiveRecord::Base
         load_by_account = lambda do |slice_account_ids|
           scope = AccountNotification.active
                                      .where(account_id: slice_account_ids)
-                                     .order("start_at DESC")
+                                     .order(start_at: :desc)
                                      .preload({ account: :root_account }, account_notification_roles: :role)
           scope = if include_all
                     scope.preload(:user)

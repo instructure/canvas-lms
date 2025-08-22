@@ -25,9 +25,9 @@ class EpubExport < ActiveRecord::Base
   belongs_to :content_export
   belongs_to :course
   belongs_to :user
-  has_many :attachments, -> { order("created_at DESC") }, dependent: :destroy, as: :context, inverse_of: :context, class_name: "Attachment"
-  has_one :epub_attachment, -> { where(content_type: "application/epub+zip").order("created_at DESC") }, as: :context, inverse_of: :context, class_name: "Attachment"
-  has_one :zip_attachment, -> { where(content_type: "application/zip").order("created_at DESC") }, as: :context, inverse_of: :context, class_name: "Attachment"
+  has_many :attachments, -> { order(created_at: :desc) }, dependent: :destroy, as: :context, inverse_of: :context, class_name: "Attachment"
+  has_one :epub_attachment, -> { where(content_type: "application/epub+zip").order(created_at: :desc) }, as: :context, inverse_of: :context, class_name: "Attachment"
+  has_one :zip_attachment, -> { where(content_type: "application/zip").order(created_at: :desc) }, as: :context, inverse_of: :context, class_name: "Attachment"
   has_one :job_progress, as: :context, inverse_of: :context, class_name: "Progress"
   validates :course_id, :workflow_state, presence: true
   has_a_broadcast_policy

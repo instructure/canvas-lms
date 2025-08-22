@@ -37,7 +37,7 @@ class ConversationParticipant < ActiveRecord::Base
   scope :unread, -> { where(workflow_state: "unread") }
   scope :archived, -> { where(workflow_state: "archived") }
   scope :starred, -> { where(label: "starred") }
-  scope :sent, -> { where.not(visible_last_authored_at: nil).order("visible_last_authored_at DESC, conversation_id DESC") }
+  scope :sent, -> { where.not(visible_last_authored_at: nil).order(visible_last_authored_at: :desc, conversation_id: :desc) }
   scope :for_masquerading_user, lambda { |masquerading_user, user_being_viewed|
     # site admins can see everything
     next all if masquerading_user.account_users.active.map(&:account_id).include?(Account.site_admin.id)
@@ -227,7 +227,7 @@ class ConversationParticipant < ActiveRecord::Base
                          .select("conversation_messages.*, conversation_message_participants.tags")
                          .joins(:conversation_message_participants)
                          .where("conversation_id=? AND user_id=?", conversation_id, user_id)
-                         .order("created_at DESC, id DESC")
+                         .order(created_at: :desc, id: :desc)
     end
   end
 

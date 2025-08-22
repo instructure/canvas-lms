@@ -137,7 +137,7 @@ class MasterCourses::ChildSubscription < ActiveRecord::Base
   end
 
   def last_migration_id
-    child_course.content_migrations.where(child_subscription_id: self).order("id desc").limit(1).pick(:id)
+    child_course.content_migrations.where(child_subscription_id: self).order(id: :desc).limit(1).pick(:id)
   end
 
   def set_root_account_id

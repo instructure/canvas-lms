@@ -4772,7 +4772,7 @@ describe "Submissions API", type: :request do
       },
       { comment: { text_comment: "a comment!" } }
     )
-    expect(submission.submission_comments.order("id DESC").first).to be_hidden
+    expect(submission.submission_comments.order(id: :desc).first).to be_hidden
   end
 
   it "does not hide comments when the submission is already posted" do
@@ -4797,7 +4797,7 @@ describe "Submissions API", type: :request do
       },
       { comment: { text_comment: "a comment!" } }
     )
-    expect(submission.submission_comments.order("id DESC").first).not_to be_hidden
+    expect(submission.submission_comments.order(id: :desc).first).not_to be_hidden
   end
 
   it "does not hide student comments on muted assignments" do
@@ -4817,7 +4817,7 @@ describe "Submissions API", type: :request do
                assignment_id: assignment.to_param,
                user_id: student.to_param },
              { comment: { text_comment: "hidden comment" } })
-    expect(submission.submission_comments.order("id DESC").first).not_to be_hidden
+    expect(submission.submission_comments.order(id: :desc).first).not_to be_hidden
   end
 
   it "allows submitting points" do
