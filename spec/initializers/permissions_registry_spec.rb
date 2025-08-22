@@ -36,7 +36,6 @@ describe "Permission Registry" do
 
     expect(registered_permissions[:become_user]).to include(
       label: an_instance_of(Proc),
-      label_v2: an_instance_of(Proc),
       account_only: :root,
       true_for: %w[AccountAdmin],
       available_to: %w[AccountAdmin AccountMembership]
