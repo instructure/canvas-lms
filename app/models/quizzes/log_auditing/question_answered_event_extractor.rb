@@ -55,7 +55,7 @@ module Quizzes::LogAuditing
                                                           attempt: event.attempt,
                                                           started_at: quiz_submission.started_at,
                                                           created_at: event.created_at
-                                                        }).order("created_at DESC")
+                                                        }).order(created_at: :desc)
 
       if predecessors.any?
         optimizer = Quizzes::LogAuditing::QuestionAnsweredEventOptimizer.new

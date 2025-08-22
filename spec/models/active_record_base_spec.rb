@@ -140,7 +140,7 @@ describe ActiveRecord::Base do
 
       it "finds all enrollments from course join" do
         e = Course.active.where(id: [@c1, @c2]).select("enrollments.id AS e_id")
-                  .joins(:enrollments).order("e_id asc")
+                  .joins(:enrollments).order(:e_id)
         batch_size = 2
         es = []
         Course.transaction do

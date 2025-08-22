@@ -168,7 +168,7 @@ class ContentMigrationsController < ApplicationController
       js_env(SHOW_SELECT: should_show_course_copy_dropdown)
       set_tutorial_js_env
     else
-      scope = @context.content_migrations.where(child_subscription_id: nil).order("id DESC")
+      scope = @context.content_migrations.where(child_subscription_id: nil).order(id: :desc)
       @migrations = Api.paginate(scope, self, api_v1_course_content_migration_list_url(@context))
       @migrations.each(&:check_for_pre_processing_timeout)
       content_migration_json_hash = content_migrations_json(@migrations, @current_user, session)

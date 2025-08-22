@@ -222,7 +222,7 @@ class PageView < ActiveRecord::Base
         result = AccountFilter.filter(result, viewer) if viewer
         result
       else
-        scope = where(user_id: user).order("created_at desc")
+        scope = where(user_id: user).order(created_at: :desc)
         scope = scope.where(created_at: options[:oldest]..) if options[:oldest]
         scope = scope.where(created_at: ..options[:newest]) if options[:newest]
         if viewer

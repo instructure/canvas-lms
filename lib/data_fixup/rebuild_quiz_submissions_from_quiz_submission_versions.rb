@@ -92,7 +92,7 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionVersions
       models = Version.where(
         versionable_type: "Quizzes::QuizSubmission",
         versionable_id: qs_id
-      ).order("id ASC").map(&:model)
+      ).order(:id).map(&:model)
 
       # Filter by attempt
       models.select! { |qs| qs.attempt = submission.attempt }

@@ -24,7 +24,7 @@ class WebConference < ActiveRecord::Base
 
   attr_readonly :context_id, :context_type
   belongs_to :context, polymorphic: %i[course group account]
-  has_one :calendar_event, -> { order("updated_at desc") }, inverse_of: :web_conference, dependent: :nullify
+  has_one :calendar_event, -> { order(updated_at: :desc) }, inverse_of: :web_conference, dependent: :nullify
   has_many :web_conference_participants
   has_many :users, through: :web_conference_participants
   has_many :invitees, -> { where(web_conference_participants: { participation_type: "invitee" }) }, through: :web_conference_participants, source: :user

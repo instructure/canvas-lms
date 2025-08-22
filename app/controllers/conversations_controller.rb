@@ -474,7 +474,7 @@ class ConversationsController < ApplicationController
         end
 
         # reload and preload stuff
-        conversations = ConversationParticipant.where(id: batch.conversations).preload(:conversation).order("visible_last_authored_at DESC, last_message_at DESC, id DESC")
+        conversations = ConversationParticipant.where(id: batch.conversations).preload(:conversation).order(visible_last_authored_at: :desc, last_message_at: :desc, id: :desc)
         Conversation.preload_participants(conversations.map(&:conversation))
         ConversationParticipant.preload_latest_messages(conversations, @current_user)
         visibility_map = infer_visibility(conversations)

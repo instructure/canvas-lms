@@ -84,7 +84,7 @@ module SimplyVersioned
       options[:exclude] = Array(options[:exclude]).map(&:to_s)
 
       has_many :versions,
-               -> { order("number DESC") },
+               -> { order(number: :desc) },
                class_name: "SimplyVersioned::Version",
                as: :versionable,
                dependent: :destroy,
@@ -93,7 +93,7 @@ module SimplyVersioned
       # INSTRUCTURE: Added to allow quick access to the most recent version
       # See 'current_version' below for the common use of current_version_unidirectional
       has_one :current_version_unidirectional,
-              -> { order("number DESC") },
+              -> { order(number: :desc) },
               class_name: "SimplyVersioned::Version",
               as: :versionable
       # INSTRUCTURE: Lets us ignore certain things when deciding whether to store a new version

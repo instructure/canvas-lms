@@ -100,7 +100,7 @@ class Course < ActiveRecord::Base
   has_many :all_real_student_enrollments, -> { where("enrollments.type = 'StudentEnrollment' AND enrollments.workflow_state <> 'deleted'").preload(:user) }, class_name: "StudentEnrollment"
   has_many :all_real_students, through: :all_real_student_enrollments, source: :user
   has_many :teacher_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'deleted') AND enrollments.type = 'TeacherEnrollment'").preload(:user) }, class_name: "TeacherEnrollment"
-  has_many :teachers, -> { order("sortable_name") }, through: :teacher_enrollments, source: :user
+  has_many :teachers, -> { order(:sortable_name) }, through: :teacher_enrollments, source: :user
   has_many :ta_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'deleted')").preload(:user) }, class_name: "TaEnrollment"
   has_many :tas, through: :ta_enrollments, source: :user
   has_many :observer_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'deleted')").preload(:user) }, class_name: "ObserverEnrollment"
@@ -195,7 +195,7 @@ class Course < ActiveRecord::Base
   has_many :folders, -> { order("folders.name") }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :active_folders, -> { where("folders.workflow_state<>'deleted'").order("folders.name") }, class_name: "Folder", as: :context, inverse_of: :context
   has_many :messages, as: :context, inverse_of: :context, dependent: :destroy
-  has_many :context_external_tools, -> { order("name") }, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :context_external_tools, -> { order(:name) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :tool_proxies, class_name: "Lti::ToolProxy", as: :context, inverse_of: :context, dependent: :destroy
   belongs_to :wiki
   has_many :wiki_pages, as: :context, inverse_of: :context
@@ -212,7 +212,7 @@ class Course < ActiveRecord::Base
   has_many :external_feeds, as: :context, inverse_of: :context, dependent: :destroy
   belongs_to :grading_standard
   has_many :grading_standards, -> { where("workflow_state<>'deleted'") }, as: :context, inverse_of: :context
-  has_many :web_conferences, -> { order("created_at DESC") }, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :web_conferences, -> { order(created_at: :desc) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :collaborations, -> { order(Arel.sql("collaborations.title, collaborations.created_at")) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :context_modules, -> { ordered }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :context_module_progressions, through: :context_modules
@@ -224,7 +224,7 @@ class Course < ActiveRecord::Base
   has_many :role_overrides, as: :context, inverse_of: :context
   has_many :content_migrations, as: :context, inverse_of: :context
   has_many :content_exports, as: :context, inverse_of: :context
-  has_many :epub_exports, -> { where(type: nil).order("created_at DESC") }
+  has_many :epub_exports, -> { where(type: nil).order(created_at: :desc) }
   has_many :course_reports, dependent: :destroy
 
   has_many :gradebook_filters, inverse_of: :course, dependent: :destroy
@@ -971,9 +971,9 @@ class Course < ActiveRecord::Base
     end
   end
 
-  scope :recently_started, -> { where(start_at: 1.month.ago..Time.zone.now).order("start_at DESC").limit(10) }
-  scope :recently_ended, -> { where(conclude_at: 1.month.ago..Time.zone.now).order("start_at DESC").limit(10) }
-  scope :recently_created, -> { where(created_at: 1.month.ago..Time.zone.now).order("created_at DESC").limit(50).preload(:teachers) }
+  scope :recently_started, -> { where(start_at: 1.month.ago..Time.zone.now).order(start_at: :desc).limit(10) }
+  scope :recently_ended, -> { where(conclude_at: 1.month.ago..Time.zone.now).order(start_at: :desc).limit(10) }
+  scope :recently_created, -> { where(created_at: 1.month.ago..Time.zone.now).order(created_at: :desc).limit(50).preload(:teachers) }
   scope :for_term, ->(term) { term ? where(enrollment_term_id: term) : all }
   scope :active_first, -> { order(Arel.sql("CASE WHEN courses.workflow_state='available' THEN 0 ELSE 1 END, #{best_unicode_collation_key("name")}")) }
   scope :name_like, lambda { |query|

@@ -77,7 +77,7 @@ class ConversationMessage < ActiveRecord::Base
         ret = where(base_conditions)
               .joins("JOIN #{ConversationMessageParticipant.quoted_table_name} ON conversation_messages.id = conversation_message_id")
               .select("conversation_messages.*, conversation_participant_id, conversation_message_participants.user_id, conversation_message_participants.tags")
-              .order("conversation_id DESC, user_id DESC, created_at DESC")
+              .order(conversation_id: :desc, user_id: :desc, created_at: :desc)
               .distinct_on(:conversation_id, :user_id).to_a
         map = ret.index_by { |m| [m.conversation_id, m.user_id] }
         backmap = ret.index_by(&:conversation_participant_id)
@@ -305,7 +305,7 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def forwarded_messages
-    @forwarded_messages ||= (forwarded_message_ids && self.class.unscoped { self.class.where(id: forwarded_message_ids.split(",")).order("created_at DESC").to_a }) || []
+    @forwarded_messages ||= (forwarded_message_ids && self.class.unscoped { self.class.where(id: forwarded_message_ids.split(",")).order(created_at: :desc).to_a }) || []
   end
 
   def all_forwarded_messages

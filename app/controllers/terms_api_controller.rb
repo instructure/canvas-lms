@@ -178,7 +178,7 @@ class TermsApiController < ApplicationController
         state = nil if Array(state).include?("all")
 
         @terms = @terms.where(workflow_state: state) if state.present?
-        @terms = @terms.order("start_at DESC, end_at DESC, id ASC")
+        @terms = @terms.order(start_at: :desc, end_at: :desc, id: :asc)
         @terms = Api.paginate(@terms,
                               self,
                               api_v1_enrollment_terms_url)

@@ -917,7 +917,7 @@ class UsersController < ApplicationController
               else
                 @context.manageable_courses(include_concluded).limit(limit)
               end
-      @courses += scope.select("courses.*,#{Course.best_unicode_collation_key("name")} AS sort_key").order("sort_key").preload(:enrollment_term).to_a
+      @courses += scope.select("courses.*,#{Course.best_unicode_collation_key("name")} AS sort_key").order(:sort_key).preload(:enrollment_term).to_a
     end
 
     @courses = @courses.sort_by do |c|

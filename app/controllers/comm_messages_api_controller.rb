@@ -124,7 +124,7 @@ class CommMessagesApiController < ApplicationController
     start_time = CanvasTime.try_parse(params[:start_time])
     end_time = CanvasTime.try_parse(params[:end_time])
 
-    query = user.messages.order("created_at DESC")
+    query = user.messages.order(created_at: :desc)
 
     # site admins see all, but if not a site admin...
     unless Account.site_admin.grants_right?(@current_user, :read_messages) && @domain_root_account.grants_right?(@current_user, :read)

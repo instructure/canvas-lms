@@ -406,8 +406,8 @@ class StreamItem < ActiveRecord::Base
     count
   end
 
-  scope :before, ->(id) { where("id<?", id).order("updated_at DESC").limit(21) }
-  scope :after, ->(start_at) { where("updated_at>?", start_at).order("updated_at DESC").limit(21) }
+  scope :before, ->(id) { where("id<?", id).order(updated_at: :desc).limit(21) }
+  scope :after, ->(start_at) { where("updated_at>?", start_at).order(updated_at: :desc).limit(21) }
 
   def associated_shards
     if self.context.try(:respond_to?, :associated_shards)

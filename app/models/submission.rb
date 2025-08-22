@@ -159,7 +159,7 @@ class Submission < ActiveRecord::Base
   has_many :visible_submission_comments,
            -> { published.visible.for_final_grade.order(:created_at, :id) },
            class_name: "SubmissionComment"
-  has_many :hidden_submission_comments, -> { order("created_at, id").where(provisional_grade_id: nil, hidden: true) }, class_name: "SubmissionComment"
+  has_many :hidden_submission_comments, -> { order(:created_at, :id).where(provisional_grade_id: nil, hidden: true) }, class_name: "SubmissionComment"
   has_many :assessment_requests, as: :asset
   has_many :assigned_assessments, class_name: "AssessmentRequest", as: :assessor_asset
   has_many :rubric_assessments, as: :artifact
@@ -242,7 +242,7 @@ class Submission < ActiveRecord::Base
       .joins(:assignment)
       .joins("JOIN #{Course.quoted_table_name} ON courses.id=assignments.context_id")
       .where("graded_at>? AND user_id=? AND muted=?", date, user_id, false)
-      .order("graded_at DESC")
+      .order(graded_at: :desc)
       .limit(limit)
   }
 

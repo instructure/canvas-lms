@@ -183,8 +183,8 @@ class User < ActiveRecord::Base
   has_many :calendar_events, -> { preload(:parent_event) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :eportfolios, dependent: :destroy
   has_many :quiz_submissions, dependent: :destroy, class_name: "Quizzes::QuizSubmission"
-  has_many :dashboard_messages, -> { where(to: "dashboard", workflow_state: "dashboard").order("created_at DESC") }, class_name: "Message", dependent: :destroy
-  has_many :user_services, -> { order("created_at") }, dependent: :destroy
+  has_many :dashboard_messages, -> { where(to: "dashboard", workflow_state: "dashboard").order(created_at: :desc) }, class_name: "Message", dependent: :destroy
+  has_many :user_services, -> { order(:created_at) }, dependent: :destroy
   has_many :rubric_associations, -> { preload(:rubric).order(created_at: :desc) }, as: :context, inverse_of: :context
   has_many :rubrics
   has_many :context_rubrics, as: :context, inverse_of: :context, class_name: "Rubric"
@@ -298,11 +298,11 @@ class User < ActiveRecord::Base
 
   def conversations
     # i.e. exclude any where the user has deleted all the messages
-    all_conversations.visible.order("last_message_at DESC, conversation_id DESC")
+    all_conversations.visible.order(last_message_at: :desc, conversation_id: :desc)
   end
 
   def starred_conversations
-    all_conversations.order("updated_at DESC, conversation_id DESC").starred
+    all_conversations.order(updated_at: :desc, conversation_id: :desc).starred
   end
 
   def page_views(options = {})
@@ -462,7 +462,7 @@ class User < ActiveRecord::Base
     end
     scope.select("MIN(#{Enrollment.type_rank_sql(:student)}) AS enrollment_rank")
          .group(User.connection.group_by(User))
-         .order("enrollment_rank")
+         .order(:enrollment_rank)
          .order_by_sortable_name
   end
 
@@ -1769,7 +1769,7 @@ class User < ActiveRecord::Base
   end
 
   scope :with_avatar_state, lambda { |state|
-    scope = where.not(avatar_image_url: nil).order("avatar_image_updated_at DESC")
+    scope = where.not(avatar_image_url: nil).order(avatar_image_updated_at: :desc)
     if state == "any"
       scope.where("avatar_state IS NOT NULL AND avatar_state<>'none'")
     else
@@ -2453,7 +2453,7 @@ class User < ActiveRecord::Base
                                    .joins(:assignment, assignment: [:post_policy])
                                    .where(assignments: { workflow_state: "published" })
                                    .where("last_comment_at > ?", start_at)
-                                   .limit(limit).order("last_comment_at").to_a
+                                   .limit(limit).order(:last_comment_at).to_a
 
           submissions = submissions.sort_by { |t| t.last_comment_at || t.created_at }.reverse
           submissions = submissions.uniq

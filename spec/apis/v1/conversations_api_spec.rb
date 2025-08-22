@@ -599,7 +599,7 @@ describe ConversationsController, type: :request do
         end
         json.each { |c| c["messages"].each { |m| m["participating_user_ids"].sort! } }
         json.each { |c| c.delete("last_authored_message_at") } # This is sometimes not updated. It's a known bug.
-        conversation = @me.all_conversations.order("conversation_id DESC").first
+        conversation = @me.all_conversations.order(conversation_id: :desc).first
         expect(json).to eql [
           {
             "id" => conversation.conversation_id,
@@ -884,7 +884,7 @@ describe ConversationsController, type: :request do
         end
         json.each { |c| c["messages"].each { |m| m["participating_user_ids"].sort! } }
         json.each { |c| c.delete("last_authored_message_at") } # This is sometimes not updated. It's a known bug.
-        conversation = @me.all_conversations.order("conversation_id DESC").first
+        conversation = @me.all_conversations.order(conversation_id: :desc).first
         expect(json).to eql [
           {
             "id" => conversation.conversation_id,
@@ -1080,7 +1080,7 @@ describe ConversationsController, type: :request do
                 m["forwarded_messages"].each { |fm| fm["participating_user_ids"].sort! }
               end
             end
-            conversation = @me.all_conversations.order(Conversation.nulls(:first, :last_message_at, :desc)).order("conversation_id DESC").first
+            conversation = @me.all_conversations.order(Conversation.nulls(:first, :last_message_at, :desc)).order(conversation_id: :desc).first
             expected = [
               {
                 "id" => conversation.conversation_id,
@@ -1192,7 +1192,7 @@ describe ConversationsController, type: :request do
         end
         json.each { |c| c["messages"].each { |m| m["participating_user_ids"].sort! } }
         json.each { |c| c.delete("last_authored_message_at") } # This is sometimes not updated. It's a known bug.
-        conversation = @me.all_conversations.order("conversation_id DESC").first
+        conversation = @me.all_conversations.order(conversation_id: :desc).first
         expect(json).to eql [
           {
             "id" => conversation.conversation_id,

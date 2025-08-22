@@ -401,7 +401,7 @@ class SisImportsApiController < ApplicationController
   # @returns [SisImport]
   def index
     if authorized_action(@account, @current_user, [:import_sis, :manage_sis])
-      scope = @account.sis_batches.order("created_at DESC")
+      scope = @account.sis_batches.order(created_at: :desc)
       if (created_since = CanvasTime.try_parse(params[:created_since]))
         scope = scope.where("created_at > ?", created_since)
       end

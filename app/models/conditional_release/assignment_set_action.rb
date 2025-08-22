@@ -36,7 +36,7 @@ module ConditionalRelease
 
     scope :latest, lambda {
       select("DISTINCT ON (assignment_set_id, student_id) id")
-        .order("assignment_set_id, student_id, updated_at DESC")
+        .order(:assignment_set_id, :student_id, updated_at: :desc)
     }
 
     def self.current_assignments(student_id_or_ids, sets = nil)

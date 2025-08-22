@@ -96,7 +96,7 @@ class ContentExportsApiController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :read)
       scope = @context.content_exports_visible_to(@current_user).active.not_for_copy
-      scope = scope.order("id DESC")
+      scope = scope.order(id: :desc)
       route = polymorphic_url([:api_v1, @context, :content_exports])
       exports = Api.paginate(scope, self, route)
       render json: exports.map { |export| content_export_json(export, @current_user, session) }

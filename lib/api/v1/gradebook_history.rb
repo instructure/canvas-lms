@@ -139,7 +139,7 @@ module Api::V1
     end
 
     def submissions_set(course, api_context, options = {})
-      collection = ::Submission.for_course(course).order("graded_at DESC")
+      collection = ::Submission.for_course(course).order(graded_at: :desc)
 
       if options[:date]
         date = options[:date]
