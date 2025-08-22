@@ -55,6 +55,7 @@ module Quizzes
         @submission.submission = assignment_submission
       end
       @submission.with_versioning(true) do |s|
+        s.updating_user = @submission.updating_user
         original_score = s.kept_score
         original_workflow_state = s.workflow_state
         if s.save && outcomes_require_update(s, original_score, original_workflow_state)

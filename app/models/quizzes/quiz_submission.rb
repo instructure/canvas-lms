@@ -26,6 +26,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   self.table_name = "quiz_submissions"
 
   include Workflow
+  include LinkedAttachmentHandler
 
   attr_readonly :quiz_id, :user_id
   attr_accessor :grader_id
@@ -56,6 +57,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   after_save :delete_ignores
 
   has_many :attachments, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :attachment_associations, as: :context, inverse_of: :context, dependent: :destroy
   has_many :events, class_name: "Quizzes::QuizSubmissionEvent"
 
   resolves_root_account through: :quiz
@@ -64,6 +66,49 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   # ensures that quiz submissions with essay questions don't show as graded in SpeedGrader until the instructor
   # has graded the essays.
   after_update :grade_submission!, if: :just_completed?
+
+  def update_attachment_associations
+    return unless attachment_associations_creation_enabled?
+    return unless saved_change_to_attribute?(:submission_data) || saved_change_to_attribute?(:quiz_data)
+
+    all_html = []
+    unless submission_data.is_a?(Hash)
+      submission_data&.each do |answer|
+        all_html << answer[:text] if answer.key?(:text) && answer[:text].present?
+      end
+    end
+
+    AttachmentAssociation.where(context_type: "Quizzes::QuizSubmission", context_id: id).delete_all
+    associate_attachments_to_rce_object(all_html.compact.join("\n"), updating_user) unless all_html.empty?
+
+    clone_quiz_attachment_associations
+  end
+
+  def clone_quiz_attachment_associations
+    return if quiz_data.blank?
+
+    non_aq_question_ids = Quizzes::QuizQuestion.where(
+      quiz_id:,
+      id: quiz_data.filter_map { |q| q[:id] },
+      workflow_state: "active"
+    ).pluck(:id)
+
+    return if non_aq_question_ids.empty?
+
+    to_create = []
+    AttachmentAssociation.where(context_type: "Quizzes::QuizQuestion", context_id: non_aq_question_ids).find_each do |assoc|
+      to_create << {
+        context_type: "Quizzes::QuizSubmission",
+        context_id: id,
+        attachment_id: assoc.attachment_id,
+        user_id: assoc.user_id,
+        context_concern: nil,
+        root_account_id:
+      }
+    end
+
+    AttachmentAssociation.insert_all(to_create, returning: false) if to_create.any?
+  end
 
   def just_completed?
     submission_id? && saved_change_to_workflow_state? && completed?

@@ -18,6 +18,63 @@
 #
 
 describe Quizzes::QuizSubmission do
+  context "for attachment associations" do
+    before do
+      course_with_teacher
+      @pupil = User.create!(name: "some user")
+      @course.enroll_student(@pupil, enrollment_state: "active")
+
+      @bank = @course.assessment_question_banks.create!(title: "Test Bank")
+      aq1 = assessment_question_model(name: "Question 1", bank: @bank, question_data: { question_type: "essay_question" })
+      assessment_question_model(name: "Question 2", bank: @bank)
+      @aq_attachment = attachment_with_context(aq1)
+      aq1.question_data["question_text"] = "<p>Attachment: <a href=\"/assessment_questions/#{aq1.id}/files/#{@aq_attachment.id}/download\">file</a></p>"
+      aq1.save!
+
+      @quiz = @course.quizzes.create!(title: "new quiz")
+      @quiz_group = @quiz.quiz_groups.create!(assessment_question_bank: @bank, pick_count: 2)
+      @qq_attachment = attachment_with_context(@course)
+      @quiz_question = @quiz.quiz_questions.create!(question_data: {
+                                                      name: "test 1",
+                                                      question_text: "<p>what a <a href='/courses/#{@course.id}/files/#{@qq_attachment.id}/download'>link</a></p>",
+                                                      question_type: "file_upload_question",
+                                                    },
+                                                    quiz_group: nil,
+                                                    saving_user: @teacher)
+      @quiz.generate_quiz_data
+      @quiz.save
+    end
+
+    it "processes them for both quiz and submission data" do
+      @submission = @quiz.generate_submission(@pupil)
+      upload_attachment = attachment_with_context(@pupil)
+      essay_attachment = attachment_with_context(@pupil)
+
+      essay_question = nil
+      upload_question = nil
+      @submission.quiz_data.each do |question|
+        case question["question_type"]
+        when "essay_question"
+          essay_question = question
+        when "file_upload_question"
+          upload_question = question
+        end
+      end
+
+      @submission.submission_data = [
+        { question_id: upload_question["id"], attachment_ids: [upload_attachment.id] },
+        { question_id: essay_question["id"], text: "<p>Here is my essay with an attachment: <a href=\"/users/#{@pupil.id}/files/#{essay_attachment.id}/download\">file</a></p>" }
+      ]
+
+      @submission.updating_user = @pupil
+      @submission.save!
+      @submission.reload
+
+      associated_ids = @submission.attachment_associations.pluck(:attachment_id)
+      expect(associated_ids).to match_array([@qq_attachment.id, essay_attachment.id])
+    end
+  end
+
   context "with course and quiz" do
     before(:once) do
       course_factory
