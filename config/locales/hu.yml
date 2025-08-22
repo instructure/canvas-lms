@@ -25989,6 +25989,7 @@ hu:
                                     Felhasználók - lista megtekintése opciót.
   today_76e10f9c: Ma
   today_at_date_214c7a60: "Ma ekkor: %{date}"
+  today_b7202098: ma
   toggle_alignment_details_for_title_944f605: "A %{title} igazítás részleteinek váltása"
   toggle_course_card_color_overlays_b5b8137a: "A kurzuskártya színének átkapcsolása"
   toggle_debugging_info_a0c6babd: "Hibakeresési információk kapcsolása"
