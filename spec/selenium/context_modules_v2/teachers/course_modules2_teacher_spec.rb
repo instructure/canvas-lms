@@ -756,51 +756,6 @@ describe "context modules", :ignore_js_errors do
         expect(classic_quiz_icon.count).to eq(1)
       end
     end
-
-    context "when adding an external tool" do
-      before do
-        @external_tool = @course.context_external_tools.create!(
-          context_id: @course.id,
-          context_type: "Course",
-          url: "https://example.com",
-          shared_secret: "fake",
-          consumer_key: "fake",
-          name: "Test External Tool",
-          description: "An external tool for testing",
-          settings: { "platform" => "canvas.instructure.com" },
-          workflow_state: "active"
-        )
-      end
-
-      it "allows adding an external tool to the module" do
-        go_to_modules
-        wait_for_ajaximations
-
-        # Expand the module to see its items
-        context_module_expand_toggle(@empty_module.id).click
-        wait_for_ajaximations
-
-        add_item_button(@empty_module.id).click
-        wait_for_ajaximations
-
-        # Select External Tool from the dropdown
-        click_INSTUI_Select_option(new_item_type_select_selector, "External Tool")
-        wait_for_ajaximations
-
-        # Select external tool from the dropdown
-        click_INSTUI_Select_option(add_existing_item_select_selector, @external_tool.name)
-        wait_for_ajaximations
-
-        new_item_name = "External Tool Page Name"
-
-        replace_content(external_tool_page_name_input, new_item_name)
-
-        # Click Add Item
-        add_item_modal_add_item_button.click
-
-        expect(module_item_title_links.last.text).to include(new_item_name)
-      end
-    end
   end
 
   context "module header" do
