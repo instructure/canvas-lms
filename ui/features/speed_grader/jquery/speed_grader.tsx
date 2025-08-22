@@ -73,7 +73,7 @@ import ScreenCaptureIcon from '../react/ScreenCaptureIcon'
 import SpeedGraderAlerts from '../react/SpeedGraderAlerts'
 import SpeedGraderProvisionalGradeSelector from '../react/SpeedGraderProvisionalGradeSelector'
 import SpeedGraderStatusMenu from '../react/SpeedGraderStatusMenu'
-import {LtiAssetReportsWrapper} from '@canvas/lti-asset-processor/react/LtiAssetReportsWrapper'
+import {LtiAssetReportsForSpeedgraderWrapper} from '@canvas/lti-asset-processor/react/LtiAssetReportsForSpeedgraderWrapper'
 import useStore from '../stores/index'
 import type {
   Attachment,
@@ -161,6 +161,8 @@ import {createRoot} from 'react-dom/client'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {SpeedGraderCheckpointsWrapper} from '../react/SpeedGraderCheckpoints/SpeedGraderCheckpointsWrapper'
 import {SpeedGraderDiscussionsNavigation2} from '../react/SpeedGraderDiscussionsNavigation2'
+import {StudentUserIdOrAnonymousId} from '@canvas/lti-asset-processor/shared-with-sg/replicated/queries/getLtiAssetReports'
+import {ensureCompatibleSubmissionType} from '@canvas/lti-asset-processor/shared-with-sg/replicated/types/LtiAssetReports'
 
 declare global {
   interface Window {
@@ -936,29 +938,35 @@ function renderHiddenSubmissionPill(submission: Submission) {
 export function renderLtiAssetReports(
   submission: Submission,
   historicalSubmission: HistoricalSubmission,
-  jsonData: SpeedGraderResponse,
 ) {
   if (!ENV.FEATURES?.lti_asset_processor) return
-  if (!jsonData.lti_asset_processors) return
 
   const mountPoint = document.getElementById(SPEED_GRADER_LTI_ASSET_REPORTS_MOUNT_POINT)
   if (!mountPoint) throw new Error('LTI Asset Reports mount point not found')
 
-  const studentId = isAnonymous ? `anonymous:${submission.anonymous_id}` : submission.user_id
+  let student: StudentUserIdOrAnonymousId | undefined = undefined
+  if (submission.user_id) {
+    student = {studentUserId: submission.user_id, studentAnonymousId: null}
+  } else if (submission.anonymous_id) {
+    student = {studentUserId: null, studentAnonymousId: submission.anonymous_id}
+  }
+
+  const {attempt, submission_type: submissionType} = historicalSubmission
+  const assignmentId = submission.assignment_id
+
   if (
-    historicalSubmission.attempt &&
-    (historicalSubmission.submission_type === 'online_text_entry' ||
-      historicalSubmission.submission_type === 'online_upload')
+    student &&
+    assignmentId &&
+    attempt &&
+    submissionType &&
+    ensureCompatibleSubmissionType(submissionType)
   ) {
-    const props = {
-      versionedAttachments: historicalSubmission?.versioned_attachments,
-      reports: submission.lti_asset_reports,
-      assetProcessors: jsonData.lti_asset_processors,
-      studentId,
-      attempt: historicalSubmission.attempt.toString(),
-      submissionType: historicalSubmission.submission_type,
-    }
-    ReactDOM.render(<LtiAssetReportsWrapper {...props} />, mountPoint)
+    const attachments = (historicalSubmission.versioned_attachments || []).map(({attachment}) => ({
+      _id: attachment.id,
+      displayName: attachment.display_name,
+    }))
+    const props = {...student, assignmentId, attachments, attempt, submissionType}
+    ReactDOM.render(<LtiAssetReportsForSpeedgraderWrapper {...props} />, mountPoint)
   } else {
     ReactDOM.unmountComponentAtNode(mountPoint)
   }
@@ -2612,7 +2620,7 @@ EG = {
         submissionHistory[currentSelectedIndex]
     }
 
-    renderLtiAssetReports(submissionHolder, submission, window.jsonData)
+    renderLtiAssetReports(submissionHolder, submission)
 
     const turnitinEnabled =
       submission.turnitin_data && typeof submission.turnitin_data.provider === 'undefined'

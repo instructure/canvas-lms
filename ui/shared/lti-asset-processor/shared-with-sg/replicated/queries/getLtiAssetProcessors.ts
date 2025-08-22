@@ -1,0 +1,55 @@
+/*
+ * Copyright (C) 2025 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import {z} from 'zod'
+import {gql, type GqlTemplateStringType} from '../../dependenciesShims'
+import {useScope as createI18nScope} from '@canvas/i18n'
+
+const I18n = createI18nScope('lti_asset_processor')
+
+// Exported for use in Canvas
+export const LTI_ASSET_PROCESSORS_QUERY: GqlTemplateStringType = gql`
+  query SpeedGrader_LtiAssetProcessorsQuery($assignmentId: ID!) {
+    assignment(id: $assignmentId) {
+      ltiAssetProcessorsConnection {
+        nodes {
+          _id
+          title
+          iconOrToolIconUrl
+          externalTool {
+            _id
+            name
+            labelFor(placement: ActivityAssetProcessor)
+          }
+        }
+      }
+    }
+  }
+`
+
+export const ZGetLtiAssetProcessorsParams: z.ZodSchema<{
+  assignmentId: string
+}> = z.object({
+  assignmentId: z.string().min(1),
+})
+
+export type GetLtiAssetProcessorsParams = z.infer<typeof ZGetLtiAssetProcessorsParams>
+
+export function getLtiAssetProcessorsErrorMessage(): string {
+  return I18n.t('Error loading Document Processors')
+}

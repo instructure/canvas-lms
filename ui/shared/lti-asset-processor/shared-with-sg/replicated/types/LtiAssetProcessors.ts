@@ -16,17 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {queryClient} from '@canvas/query'
-import {QueryClientProvider} from '@tanstack/react-query'
-import {LtiAssetReports, LtiAssetReportsProps} from './LtiAssetReports'
+import type {GetLtiAssetProcessorsResult} from '../../dependenciesShims'
 
-// Small wrapper around LtiAssetReports to make LtiAssetReports
-// copiable directly into SpeedGrader 2 (which has its own
-// QueryClientProvider).
-export function LtiAssetReportsWrapper(props: LtiAssetReportsProps) {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <LtiAssetReports {...props} />
-    </QueryClientProvider>
-  )
-}
+type LtiAssetProcessorsConnection = NonNullable<
+  NonNullable<GetLtiAssetProcessorsResult['assignment']>['ltiAssetProcessorsConnection']
+>
+
+type LtiAssetProcessorsNodes = NonNullable<LtiAssetProcessorsConnection['nodes']>
+export type LtiAssetProcessor = NonNullable<LtiAssetProcessorsNodes[number]>

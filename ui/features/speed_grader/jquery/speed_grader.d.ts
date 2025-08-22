@@ -20,8 +20,6 @@ import {z} from 'zod'
 import type JQuery from 'jquery'
 import {ZSubmissionOriginalityData, ZVericiteOriginalityData} from '@canvas/grading/grading.d'
 import type {SubmissionOriginalityData} from '@canvas/grading/grading.d'
-import {ZExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
-import {ZSpeedGraderLtiAssetReports} from '@canvas/lti-asset-processor/model/AssetReport'
 import PostPolicies from '../react/PostPolicies/index'
 import AssessmentAuditTray from '../react/AssessmentAuditTray'
 
@@ -217,7 +215,6 @@ export type SubmissionHistoryEntry = z.infer<typeof ZSubmissionHistoryEntry>
 
 export const ZSubmission = ZBaseSubmission.extend({
   submission_history: z.array(ZSubmissionHistoryEntry),
-  lti_asset_reports: ZSpeedGraderLtiAssetReports,
 })
 
 export type Submission = z.infer<typeof ZSubmission>
@@ -779,7 +776,6 @@ export const ZSpeedGraderResponse = z
     line_item_tag: z.null(), // not used in SpeedGrader
     lock_at: z.null(), // not used in SpeedGrader
     lti_context_id: z.string(), // not used in SpeedGrader
-    lti_asset_processors: z.array(ZExistingAttachedAssetProcessor).optional(),
     lti_resource_link_custom_params: z.null(), // not used in SpeedGrader
     lti_resource_link_lookup_uuid: z.string().nullish(), // not used in SpeedGrader
     lti_resource_link_url: z.null(), // not used in SpeedGrader

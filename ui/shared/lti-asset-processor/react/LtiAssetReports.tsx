@@ -35,12 +35,10 @@ import {
   LtiAssetReportsCard,
   LtiAssetReportsMissingReportsCard,
 } from './LtiAssetReports/LtiAssetReportsCard'
-import {
-  type ResubmitLtiAssetReportsProps,
-  useResubmitLtiAssetReports,
-} from './LtiAssetReports/useResubmitLtiAssetReports'
+import {useResubmitLtiAssetReports} from './hooks/useResubmitLtiAssetReports'
 import {Button} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {ResubmitLtiAssetReportsParams} from '../shared-with-sg/replicated/mutations/resubmitLtiAssetReports'
 
 const I18n = createI18nScope('speed_grader')
 
@@ -133,7 +131,7 @@ function shouldShowResubmitButton({
   return false // Handle unexpected submission types
 }
 
-export function ResubmitButton(props: ResubmitLtiAssetReportsProps) {
+export function ResubmitButton(props: ResubmitLtiAssetReportsParams) {
   const resubmitMutation = useResubmitLtiAssetReports()
   return (
     <Flex.Item>
