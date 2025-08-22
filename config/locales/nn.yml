@@ -27750,6 +27750,7 @@ nn:
   to_view_users_and_user_account_details_users_view__ff62392: "For å vise brukarar og brukarkontodetaljer må «Brukarar - vis liste» være aktivert. For å endre brukarpassord må «Brukarar - vis liste» også være aktivert. For å vise ein brukar sin SIS-ID må «SIS-data - administrer» eller «SIS-data - les» også være aktivert. For å vise ein brukar sin integrasjons-ID må «SIS-data - administrer» også være aktivert."
   today_76e10f9c: "I dag"
   today_at_date_214c7a60: "I dag på %{date}"
+  today_b7202098: "i dag"
   toggle_alignment_details_for_title_944f605: "Vis/skul justeringsdetaljar for %{title}"
   toggle_course_card_color_overlays_b5b8137a: "Slå av/på fargelag på emnekort"
   toggle_debugging_info_a0c6babd: "Skru av/på feilsøkingsinformasjon"
