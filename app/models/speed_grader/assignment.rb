@@ -493,8 +493,6 @@ module SpeedGrader
       res[:GROUP_GRADING_MODE] = assignment.grade_as_group?
       res[:quiz_lti] = assignment.quiz_lti?
 
-      merge_lti_asset_processor_data!(assignment:, response_hash: res)
-
       StringifyIds.recursively_stringify_ids(res)
     ensure
       Attachment.skip_thumbnails = nil
@@ -627,22 +625,6 @@ module SpeedGrader
         current_user
           .get_preference(:gradebook_settings, course.global_id)
           &.dig("filter_rows_by", "section_id")
-      end
-    end
-
-    def merge_lti_asset_processor_data!(assignment:, response_hash:)
-      return unless assignment.root_account.feature_enabled?(:lti_asset_processor)
-
-      submission_ids = response_hash["submissions"].pluck("id")
-      reports_by_submission = Lti::AssetReport.info_for_display_by_submission(submission_ids:)
-
-      return unless reports_by_submission.present?
-
-      response_hash[:lti_asset_processors] =
-        Lti::AssetProcessor.where(assignment:).info_for_display
-      response_hash["submissions"].each do |sub|
-        reports = reports_by_submission[sub["id"]]
-        sub[:lti_asset_reports] = reports if reports
       end
     end
   end
