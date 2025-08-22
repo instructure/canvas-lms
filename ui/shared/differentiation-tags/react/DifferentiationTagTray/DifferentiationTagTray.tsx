@@ -21,7 +21,7 @@ import {Tray} from '@instructure/ui-tray'
 import {FileDrop} from '@instructure/ui-file-drop'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {IconExternalLinkLine, IconUploadLine} from '@instructure/ui-icons'
+import {IconDownloadLine, IconExternalLinkLine, IconUploadLine} from '@instructure/ui-icons'
 import {Img} from '@instructure/ui-img'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
@@ -474,10 +474,14 @@ export default function DifferentiationTagTray(props: DifferentiationTagTrayProp
             )}
           </Text>
         </Flex.Item>
-        <Flex.Item padding="0 medium" margin="0 0 large 0">
-          {/* TODO: Uncomment in EGG-1472
-          <Link variant="standalone" renderIcon={<IconDownloadLine />} href="">{I18n.t('Download Template File')}</Link> 
-          */}
+        <Flex.Item padding="xx-small medium" margin="0 0 large 0">
+          <Link
+            variant="standalone"
+            renderIcon={IconDownloadLine}
+            href={`/api/v1/courses/${ENV.course?.id}/group_categories/export_tags`}
+          >
+            {I18n.t('Download Template File')}
+          </Link>
           <Link
             variant="standalone"
             renderIcon={<IconExternalLinkLine />}
