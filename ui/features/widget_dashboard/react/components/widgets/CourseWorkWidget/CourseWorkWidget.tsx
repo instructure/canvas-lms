@@ -27,7 +27,7 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {IconExternalLinkLine} from '@instructure/ui-icons'
 import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import type {BaseWidgetProps, CourseOption} from '../../../types'
-import {useUserCourses} from '../../../hooks/useUserCourses'
+import {usePaginatedCoursesWithGrades} from '../../../hooks/useUserCourses'
 import {useCourseWork, type CourseWorkItem} from '../../../hooks/useCourseWork'
 import {startOfToday, endOfDay, addDays, getTomorrow} from '../../../utils/dateUtils'
 
@@ -50,7 +50,11 @@ const CourseWorkWidget: React.FC<BaseWidgetProps> = ({
   const [selectedDateFilter, setSelectedDateFilter] = useState<DateFilterOption>('all')
 
   // Fetch user's enrolled courses
-  const {data: userCourses = []} = useUserCourses()
+  const {data: courseGrades = []} = usePaginatedCoursesWithGrades({limit: 1000})
+  const userCourses: CourseOption[] = courseGrades.map(courseGrade => ({
+    id: courseGrade.courseId,
+    name: courseGrade.courseName,
+  }))
 
   // Fetch all course work items
   const {
