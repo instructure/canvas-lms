@@ -92,10 +92,6 @@ class ServicesApiController < ApplicationController
       serverTime: Time.zone.now.to_i
     }
     if value_to_boolean(params[:include_upload_config])
-      pseudonym = SisPseudonym.for(@current_user,
-                                   @context || @domain_root_account,
-                                   type: :implicit,
-                                   require_sis: false)
       hash[:kaltura_setting] = CanvasKaltura::ClientV3.config.try(:slice,
                                                                   "domain",
                                                                   "resource_domain",
@@ -116,11 +112,8 @@ class ServicesApiController < ApplicationController
       hash[:kaltura_setting][:uploadUrl] = "#{base_url}/upload"
       hash[:kaltura_setting][:entryUrl] = "#{base_url}/addEntry"
       hash[:kaltura_setting][:uiconfUrl] = "#{base_url}/getuiconf"
-      hash[:kaltura_setting][:partner_data] = {
-        root_account_id: @domain_root_account.id,
-        sis_user_id: pseudonym&.sis_user_id,
-        sis_source_id: @context&.sis_source_id
-      }
+      hash[:kaltura_setting][:partner_data] = Rack::Utils.build_nested_query(root_account_uuid: @domain_root_account.uuid,
+                                                                             user_uuid: @user.uuid)
     end
     render json: hash
   end
