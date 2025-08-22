@@ -62,6 +62,26 @@ const server = setupServer(
   graphql.query('GetUserCourseStatistics', () => {
     return HttpResponse.json(mockStatisticsData)
   }),
+  graphql.query('GetUserCourseWork', () => {
+    return HttpResponse.json({
+      data: {
+        legacyNode: {
+          _id: '123',
+          enrollments: [
+            {
+              course: {
+                _id: '123',
+                name: 'Test Course',
+                assignmentsConnection: {
+                  nodes: [],
+                },
+              },
+            },
+          ],
+        },
+      },
+    })
+  }),
   graphql.query('GetUserAnnouncements', () => {
     return HttpResponse.json(mockAnnouncementsData)
   }),
