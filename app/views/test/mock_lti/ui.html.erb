@@ -1,0 +1,18 @@
+<html>
+  <body>
+    <button id="notification-btn" onclick="sendRequest('pns_subscribe')">Subscribe to Notification Service</button>
+
+    <script>
+      const data = <%= raw(@data.to_json) %>
+
+      const sendRequest = async (requestType) => {
+        const requestData = data[requestType]
+        await fetch(requestData.url, {
+          method: requestData.method,
+          headers: data.headers,
+          body: JSON.stringify(requestData.body)
+        })
+      }
+    </script>
+  </body>
+</html>

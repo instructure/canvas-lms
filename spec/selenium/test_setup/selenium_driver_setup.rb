@@ -20,7 +20,9 @@
 require_relative "common_helper_methods/custom_alert_actions"
 require_relative "common_helper_methods/custom_screen_actions"
 require_relative "patches/selenium/webdriver/remote/w3c/bridge"
+require_relative "test_only_routes"
 
+# rubocop:disable Rails/Output
 module SeleniumDriverSetup
   CONFIG = ConfigFile.load("selenium") || {}.freeze
   SECONDS_UNTIL_GIVING_UP = 10
@@ -85,7 +87,9 @@ module SeleniumDriverSetup
         # examples in this group, meaning other workers won't pick them
         # up).
         #
+        # rubocop:disable Rails/Exit
         exit! 98
+        # rubocop:enable Rails/Exit
       end
 
       at_exit { shutdown }
@@ -115,7 +119,6 @@ module SeleniumDriverSetup
       @driver = create_driver
 
       set_timeouts(TIMEOUTS)
-
       puts "Browser: #{browser_name} - #{browser_version}"
 
       @driver
@@ -398,6 +401,7 @@ module SeleniumDriverSetup
 
     def spec_safe_rack_app
       app = base_rack_app
+      TestOnlyRoutes.create_routes(app)
 
       lambda do |env|
         nope = [503, {}, [""]]
@@ -470,6 +474,7 @@ module SeleniumDriverSetup
     end
   end
 end
+# rubocop:enable Rails/Output
 
 # make Wait play nicely with Timecop
 module Selenium::WebDriver::Wait::Time
