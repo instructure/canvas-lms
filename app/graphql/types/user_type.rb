@@ -27,6 +27,20 @@ module Types
              required: false
   end
 
+  class DiscussionParticipantFilterInputType < BaseInputObject
+    graphql_name "DiscussionParticipantFilter"
+    argument :is_announcement, Boolean, <<~MD, required: false
+      only return participants for discussions that are announcements (true) or
+      regular discussions (false). If not provided, returns both.
+    MD
+    argument :course_id, ID, <<~MD, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
+      only return participants for discussions in the specified course
+    MD
+    argument :read_state, String, <<~MD, required: false
+      only return participants with specific read state: 'read', 'unread', or 'all' (default)
+    MD
+  end
+
   class UserType < ApplicationObjectType
     #
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -654,6 +668,78 @@ module Types
       end
 
       comments
+    end
+
+    field :discussion_participants_connection, Types::DiscussionParticipantType.connection_type, null: true do
+      description "All discussion topic participants for the user, optionally filtered by announcement status"
+      argument :filter, DiscussionParticipantFilterInputType, required: false
+    end
+    def discussion_participants_connection(filter: {})
+      return unless object == current_user
+
+      # Start with user's discussion topic participants, joining discussion_topic for filtering
+      participants = current_user.discussion_topic_participants
+                                 .joins(:discussion_topic)
+
+      # Filter by announcement status if specified
+      if filter[:is_announcement] == true
+        participants = participants.where(discussion_topics: { type: "Announcement" })
+      elsif filter[:is_announcement] == false
+        participants = participants.where(discussion_topics: { type: ["DiscussionTopic", nil] })
+      end
+
+      # Filter by course if specified
+      if filter[:course_id].present?
+        participants = participants.where(discussion_topics: { context_id: filter[:course_id], context_type: "Course" })
+      end
+
+      # Filter by read state if specified
+      if filter[:read_state] == "read"
+        participants = participants.where(workflow_state: "read")
+      elsif filter[:read_state] == "unread"
+        participants = participants.where(workflow_state: "unread")
+      end
+      # For 'all' or no filter, include both read and unread
+
+      # Apply visibility filtering - only active/unpublished discussions
+      participants = participants.where(
+        discussion_topics: {
+          workflow_state: ["active", "unpublished"]
+        }
+      )
+
+      # Filter to only discussions in courses where user has active enrollment
+      # Use a subquery to avoid loading all enrollment IDs into memory
+      enrollment_subquery = current_user.enrollments
+                                        .active_by_date
+                                        .joins(:course)
+                                        .where(courses: { workflow_state: "available" })
+                                        .select(:course_id)
+
+      participants = participants.where(
+        discussion_topics: {
+          context_id: enrollment_subquery,
+          context_type: "Course"
+        }
+      )
+
+      # Apply time-based filtering for announcements (similar to official announcements page)
+      if filter[:is_announcement] == true
+        current_time = Time.now.utc
+        participants = participants.where(
+          "(discussion_topics.unlock_at IS NULL OR discussion_topics.unlock_at < :current_time) AND
+           (discussion_topics.delayed_post_at IS NULL OR discussion_topics.delayed_post_at < :current_time) AND
+           (discussion_topics.lock_at IS NULL OR discussion_topics.lock_at > :current_time)",
+          current_time:
+        )
+      end
+
+      # Order by discussion topic creation date (newest first) for announcements
+      if filter[:is_announcement] == false
+        participants.order("discussion_topics.id ASC")
+      else
+        participants.order("discussion_topics.created_at DESC")
+      end
     end
 
     field :comment_bank_items_count, Integer, null: true

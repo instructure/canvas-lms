@@ -42,5 +42,10 @@ module Types
 
     field :summary_enabled, Boolean, null: true
     field :workflow_state, String, null: false
+
+    field :discussion_topic, Types::DiscussionType, null: false
+    def discussion_topic
+      load_association(:discussion_topic)
+    end
   end
 end

@@ -648,8 +648,8 @@ describe Types::UserType do
         expect(second_page["pageInfo"]["hasPreviousPage"]).to be true
 
         # Ensure different results
-        first_ids = first_page["nodes"].map { |n| n["_id"] }
-        second_ids = second_page["nodes"].map { |n| n["_id"] }
+        first_ids = first_page["nodes"].pluck("_id")
+        second_ids = second_page["nodes"].pluck("_id")
         expect(first_ids & second_ids).to be_empty
       end
     end
@@ -668,7 +668,7 @@ describe Types::UserType do
       result = user_type.resolve("enrollmentsConnection(currentOnly: true) { nodes { _id } }")
       enrollments_result = result["enrollmentsConnection"]
       course1_enrollment_id = @student.enrollments.where(course: @course1).first.to_param
-      node_ids = enrollments_result["nodes"].map { |n| n["_id"] }
+      node_ids = enrollments_result["nodes"].pluck("_id")
       expect(node_ids).not_to include(course1_enrollment_id)
     end
 
@@ -678,7 +678,7 @@ describe Types::UserType do
       result = user_type.resolve("enrollmentsConnection(excludeConcluded: true) { nodes { _id } }")
       enrollments_result = result["enrollmentsConnection"]
       course1_enrollment_id = @student.enrollments.where(course: @course1).first.to_param
-      node_ids = enrollments_result["nodes"].map { |n| n["_id"] }
+      node_ids = enrollments_result["nodes"].pluck("_id")
       expect(node_ids).not_to include(course1_enrollment_id)
     end
 
@@ -732,7 +732,7 @@ describe Types::UserType do
 
           result = user_type.resolve(query, current_user: @student)
           enrollments_result = result["enrollmentsConnection"]
-          page_ids = enrollments_result["nodes"].map { |n| n["_id"] }
+          page_ids = enrollments_result["nodes"].pluck("_id")
           all_enrollment_ids.concat(page_ids)
 
           has_next = enrollments_result["pageInfo"]["hasNextPage"]
@@ -2196,6 +2196,191 @@ describe Types::UserType do
       expect(cur_resolver.resolve("activityStream(onlyActiveCourses: true) { summary { count } } ")).to match_array [1]
       expect(cur_resolver.resolve("activityStream(onlyActiveCourses: true) { summary { unreadCount } } ")).to match_array [1]
       expect(cur_resolver.resolve("activityStream(onlyActiveCourses: true) { summary { notificationCategory } } ")).to match_array [nil]
+    end
+  end
+
+  context "discussion_participants_connection" do
+    before do
+      @course1 = course_factory(active_all: true)
+      @course2 = course_factory(active_all: true)
+      @student_user = user_factory(active_all: true)
+
+      # Enroll user in both courses
+      @course1.enroll_user(@student_user, "StudentEnrollment", enrollment_state: "active")
+      @course2.enroll_user(@student_user, "StudentEnrollment", enrollment_state: "active")
+
+      # Create announcements and discussions
+      @announcement1 = @course1.announcements.create!(title: "Course 1 Announcement", message: "Test announcement 1")
+      @announcement2 = @course2.announcements.create!(title: "Course 2 Announcement", message: "Test announcement 2")
+      @discussion1 = @course1.discussion_topics.create!(title: "Course 1 Discussion", message: "Test discussion 1")
+      @discussion2 = @course2.discussion_topics.create!(title: "Course 2 Discussion", message: "Test discussion 2")
+
+      # Create participants for the user
+      @participant1 = @student_user.discussion_topic_participants.create!(
+        discussion_topic: @announcement1,
+        workflow_state: "read"
+      )
+      @participant2 = @student_user.discussion_topic_participants.create!(
+        discussion_topic: @announcement2,
+        workflow_state: "unread"
+      )
+      @participant3 = @student_user.discussion_topic_participants.create!(
+        discussion_topic: @discussion1,
+        workflow_state: "read"
+      )
+      @participant4 = @student_user.discussion_topic_participants.create!(
+        discussion_topic: @discussion2,
+        workflow_state: "unread"
+      )
+
+      @user_type_tester = GraphQLTypeTester.new(
+        @student_user,
+        current_user: @student_user,
+        domain_root_account: @course1.account.root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+    end
+
+    def resolve_participants_connection(filter: nil, first: nil)
+      filter_str = filter ? build_filter_string(filter) : ""
+      first_str = first ? %(first: #{first}) : ""
+      args = [filter_str, first_str].reject(&:empty?).join(", ")
+      query = %(discussionParticipantsConnection#{"(#{args})" unless args.empty?} { nodes { id } })
+      @user_type_tester.resolve(query)
+    end
+
+    def resolve_participants_with_topics(filter: nil)
+      filter_str = filter ? build_filter_string(filter) : ""
+      query = %(discussionParticipantsConnection#{"(#{filter_str})" unless filter_str.empty?} {
+        nodes {
+          discussionTopic {
+            title
+          }
+        }
+      })
+      @user_type_tester.resolve(query)
+    end
+
+    def build_filter_string(filter)
+      filter_parts = []
+      filter_parts << "isAnnouncement: #{filter[:isAnnouncement]}" if filter.key?(:isAnnouncement)
+      filter_parts << "courseId: \"#{filter[:courseId]}\"" if filter.key?(:courseId)
+      filter_parts << "readState: \"#{filter[:readState]}\"" if filter.key?(:readState)
+      "filter: { #{filter_parts.join(", ")} }"
+    end
+
+    it "returns all discussion participants for the user" do
+      result = resolve_participants_connection
+
+      expect(result.length).to eq(4)
+      # GraphQL returns Global IDs (Base64 encoded), so we just check we get 4 unique IDs
+      expect(result.flatten.uniq.length).to eq(4)
+    end
+
+    it "filters by announcements only when isAnnouncement is true" do
+      result = resolve_participants_with_topics(filter: { isAnnouncement: true })
+
+      expect(result.length).to eq(2)
+      titles = result.flatten
+      expect(titles).to match_array(["Course 1 Announcement", "Course 2 Announcement"])
+    end
+
+    it "filters by discussions only when isAnnouncement is false" do
+      result = resolve_participants_with_topics(filter: { isAnnouncement: false })
+
+      expect(result.length).to eq(2)
+      titles = result.flatten
+      expect(titles).to match_array(["Course 1 Discussion", "Course 2 Discussion"])
+    end
+
+    it "filters by course when courseId is provided" do
+      result = resolve_participants_with_topics(filter: { courseId: @course1.id })
+
+      expect(result.length).to eq(2)
+      titles = result.flatten
+      expect(titles).to match_array(["Course 1 Announcement", "Course 1 Discussion"])
+    end
+
+    it "respects pagination with first parameter" do
+      result = resolve_participants_connection(first: 2)
+
+      expect(result.length).to eq(2)
+    end
+
+    it "returns null for non-current user" do
+      other_user = user_factory
+      other_user_tester = GraphQLTypeTester.new(
+        other_user,
+        current_user: @student_user,
+        domain_root_account: @course1.account.root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+
+      result = other_user_tester.resolve("discussionParticipantsConnection { nodes { id } }")
+      expect(result).to be_nil
+    end
+
+    context "with read state filtering" do
+      it "filters by read status when readState is 'read'" do
+        result = resolve_participants_with_topics(filter: { readState: "read" })
+
+        expect(result.length).to eq(2)
+        titles = result.flatten
+        expect(titles).to match_array(["Course 1 Announcement", "Course 1 Discussion"])
+      end
+
+      it "filters by unread status when readState is 'unread'" do
+        result = resolve_participants_with_topics(filter: { readState: "unread" })
+
+        expect(result.length).to eq(2)
+        titles = result.flatten
+        expect(titles).to match_array(["Course 2 Announcement", "Course 2 Discussion"])
+      end
+
+      it "returns all participants when readState is 'all'" do
+        result = resolve_participants_with_topics(filter: { readState: "all" })
+
+        expect(result.length).to eq(4)
+        titles = result.flatten
+        expect(titles).to match_array([
+                                        "Course 1 Announcement",
+                                        "Course 2 Announcement",
+                                        "Course 1 Discussion",
+                                        "Course 2 Discussion"
+                                      ])
+      end
+
+      it "combines readState with isAnnouncement filter" do
+        result = resolve_participants_with_topics(filter: { readState: "read", isAnnouncement: true })
+
+        expect(result.length).to eq(1)
+        titles = result.flatten
+        expect(titles).to eq(["Course 1 Announcement"])
+      end
+    end
+
+    context "with time-based filtering for announcements" do
+      it "excludes locked announcements" do
+        @announcement1.update!(lock_at: 1.day.ago)
+
+        result = resolve_participants_with_topics(filter: { isAnnouncement: true })
+        titles = result.flatten
+
+        expect(result.length).to eq(1)
+        expect(titles).to eq(["Course 2 Announcement"])
+      end
+    end
+
+    context "with enrollment filtering" do
+      it "excludes participants from courses where user has no active enrollment" do
+        # Deactivate enrollment in course2
+        @course2.enrollments.where(user: @student_user).first.deactivate
+
+        result = resolve_participants_connection
+
+        # Should only return participants from course1
+        expect(result.length).to eq(2)
+      end
     end
   end
 end
