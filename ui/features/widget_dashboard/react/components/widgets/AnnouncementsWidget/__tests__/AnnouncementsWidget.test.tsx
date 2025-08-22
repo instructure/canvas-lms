@@ -218,38 +218,46 @@ const mockCourseGradesResponse = {
   data: {
     legacyNode: {
       _id: '123',
-      enrollments: [
-        {
-          course: {
-            _id: '1',
-            name: 'Test Course 1',
-            courseCode: 'MATH 101',
+      enrollmentsConnection: {
+        nodes: [
+          {
+            course: {
+              _id: '1',
+              name: 'Test Course 1',
+              courseCode: 'MATH 101',
+            },
+            grades: {
+              currentScore: 85,
+              currentGrade: 'B',
+              finalScore: null,
+              finalGrade: null,
+              overrideScore: null,
+              overrideGrade: null,
+            },
           },
-          grades: {
-            currentScore: 85,
-            currentGrade: 'B',
-            finalScore: null,
-            finalGrade: null,
-            overrideScore: null,
-            overrideGrade: null,
+          {
+            course: {
+              _id: '2',
+              name: 'Test Course 2',
+              courseCode: 'ENG 201',
+            },
+            grades: {
+              currentScore: 92,
+              currentGrade: 'A-',
+              finalScore: null,
+              finalGrade: null,
+              overrideScore: null,
+              overrideGrade: null,
+            },
           },
+        ],
+        pageInfo: {
+          hasNextPage: false,
+          hasPreviousPage: false,
+          startCursor: null,
+          endCursor: null,
         },
-        {
-          course: {
-            _id: '2',
-            name: 'Test Course 2',
-            courseCode: 'ENG 201',
-          },
-          grades: {
-            currentScore: 92,
-            currentGrade: 'A-',
-            finalScore: null,
-            finalGrade: null,
-            overrideScore: null,
-            overrideGrade: null,
-          },
-        },
-      ],
+      },
     },
   },
 }
@@ -664,7 +672,7 @@ describe('AnnouncementsWidget', () => {
       graphql.query('GetUserAnnouncements', ({variables}) => {
         return HttpResponse.json(getMockResponseForReadState(variables.readState))
       }),
-      graphql.query('GetUserCoursesWithGrades', () => {
+      graphql.query('GetUserCoursesWithGradesConnection', () => {
         return HttpResponse.json(mockCourseGradesResponse)
       }),
     )

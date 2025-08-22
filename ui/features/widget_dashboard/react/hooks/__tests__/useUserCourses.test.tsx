@@ -22,108 +22,7 @@ import React from 'react'
 import {waitFor} from '@testing-library/react'
 import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
-import {useUserCourses, useUserCoursesWithGrades} from '../useUserCourses'
-
-const mockCoursesData = [
-  {
-    id: '1',
-    name: 'Introduction to Computer Science',
-  },
-  {
-    id: '2',
-    name: 'Advanced Mathematics',
-  },
-  {
-    id: '3',
-    name: 'Biology Fundamentals',
-  },
-]
-
-const mockCourseGradesData = [
-  {
-    courseId: '1',
-    courseCode: 'CS101',
-    courseName: 'Introduction to Computer Science',
-    currentGrade: 95,
-    gradingScheme: 'letter',
-    lastUpdated: new Date('2025-01-01T00:00:00Z'),
-  },
-  {
-    courseId: '2',
-    courseCode: 'MATH301',
-    courseName: 'Advanced Mathematics',
-    currentGrade: 87,
-    gradingScheme: 'letter',
-    lastUpdated: new Date('2025-01-01T00:00:00Z'),
-  },
-  {
-    courseId: '3',
-    courseCode: 'BIO101',
-    courseName: 'Biology Fundamentals',
-    currentGrade: 92,
-    gradingScheme: 'letter',
-    lastUpdated: new Date('2025-01-01T00:00:00Z'),
-  },
-]
-
-// Mock response structure that matches the GraphQL query in useUserCourses
-const mockGqlResponse = {
-  data: {
-    legacyNode: {
-      _id: '123',
-      enrollments: [
-        {
-          course: {
-            _id: '1',
-            name: 'Introduction to Computer Science',
-            courseCode: 'CS101',
-          },
-          updatedAt: '2025-01-01T00:00:00Z',
-          grades: {
-            currentScore: 95,
-            currentGrade: 'A',
-            finalScore: 95,
-            finalGrade: 'A',
-            overrideScore: null,
-            overrideGrade: null,
-          },
-        },
-        {
-          course: {
-            _id: '2',
-            name: 'Advanced Mathematics',
-            courseCode: 'MATH301',
-          },
-          updatedAt: '2025-01-01T00:00:00Z',
-          grades: {
-            currentScore: 87,
-            currentGrade: 'B+',
-            finalScore: 87,
-            finalGrade: 'B+',
-            overrideScore: null,
-            overrideGrade: null,
-          },
-        },
-        {
-          course: {
-            _id: '3',
-            name: 'Biology Fundamentals',
-            courseCode: 'BIO101',
-          },
-          updatedAt: '2025-01-01T00:00:00Z',
-          grades: {
-            currentScore: 92,
-            currentGrade: 'A-',
-            finalScore: 92,
-            finalGrade: 'A-',
-            overrideScore: null,
-            overrideGrade: null,
-          },
-        },
-      ],
-    },
-  },
-}
+import {usePaginatedCoursesWithGrades} from '../useUserCourses'
 
 const errorMsg = 'Failed to fetch courses'
 
@@ -131,7 +30,7 @@ const buildDefaultProps = () => ({
   current_user_id: '123',
 })
 
-const setup = (hookFn: any = useUserCourses, envOverrides = {}) => {
+const setup = (hookFn: any, envOverrides = {}) => {
   // Set up Canvas ENV with current_user_id
   const originalEnv = window.ENV
   window.ENV = {
@@ -167,160 +66,92 @@ const setup = (hookFn: any = useUserCourses, envOverrides = {}) => {
 
 const server = setupServer()
 
-describe('useUserCourses', () => {
-  beforeAll(() => {
-    server.listen({
-      onUnhandledRequest: 'error',
-    })
-  })
-  afterEach(() => {
-    server.resetHandlers()
-  })
-  afterAll(() => server.close())
-
-  it('should return loading state initially', () => {
-    server.use(
-      graphql.query('GetUserCoursesWithGrades', () => {
-        // Return a delayed response to test loading state
-        return new Promise(resolve => {
-          setTimeout(() => {
-            resolve(HttpResponse.json(mockGqlResponse))
-          }, 100)
-        })
-      }),
-    )
-
-    const {result, cleanup} = setup(useUserCourses)
-
-    expect(result.current.isLoading).toBe(true)
-    expect(result.current.data).toBeUndefined()
-    expect(result.current.error).toBeNull()
-
-    cleanup()
-  })
-
-  it('should return courses data on successful request', async () => {
-    server.use(
-      graphql.query('GetUserCoursesWithGrades', ({variables}) => {
-        expect(variables.userId).toBe('123')
-        return HttpResponse.json(mockGqlResponse)
-      }),
-    )
-
-    const {result, cleanup} = setup(useUserCourses)
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false)
-      expect(result.current.data).toEqual(mockCoursesData)
-      expect(result.current.error).toBeNull()
-    })
-
-    cleanup()
-  })
-
-  it('should handle GraphQL errors', async () => {
-    server.use(
-      graphql.query('GetUserCoursesWithGrades', () => {
-        return HttpResponse.json({
-          errors: [{message: errorMsg}],
-        })
-      }),
-    )
-
-    const {result, cleanup} = setup(useUserCourses)
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false)
-      expect(result.current.data).toBeUndefined()
-      expect(result.current.error?.message).toContain(errorMsg)
-    })
-
-    cleanup()
-  })
-
-  it('should handle network errors', async () => {
-    server.use(
-      graphql.query('GetUserCoursesWithGrades', () => {
-        return new HttpResponse(null, {status: 500})
-      }),
-    )
-
-    const {result, cleanup} = setup(useUserCourses)
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false)
-      expect(result.current.data).toBeUndefined()
-      expect(result.current.error).toBeTruthy()
-    })
-
-    cleanup()
-  })
-
-  it('should handle empty courses response', async () => {
-    const emptyResponse = {
-      data: {
-        legacyNode: {
-          _id: '123',
-          enrollments: [],
+// Mock response structure for the connection query
+const mockConnectionResponse = {
+  data: {
+    legacyNode: {
+      _id: '123',
+      enrollmentsConnection: {
+        nodes: [
+          {
+            course: {
+              _id: '1',
+              name: 'Introduction to Computer Science',
+              courseCode: 'CS101',
+            },
+            updatedAt: '2025-01-01T00:00:00Z',
+            grades: {
+              currentScore: 95,
+              currentGrade: 'A',
+              finalScore: 95,
+              finalGrade: 'A',
+              overrideScore: null,
+              overrideGrade: null,
+            },
+          },
+          {
+            course: {
+              _id: '2',
+              name: 'Advanced Mathematics',
+              courseCode: 'MATH301',
+            },
+            updatedAt: '2025-01-01T00:00:00Z',
+            grades: {
+              currentScore: 87,
+              currentGrade: 'B+',
+              finalScore: 87,
+              finalGrade: 'B+',
+              overrideScore: null,
+              overrideGrade: null,
+            },
+          },
+        ],
+        pageInfo: {
+          hasNextPage: false,
+          hasPreviousPage: false,
+          startCursor: 'cursor1',
+          endCursor: 'cursor2',
         },
       },
-    }
+    },
+  },
+}
 
-    server.use(
-      graphql.query('GetUserCoursesWithGrades', () => {
-        return HttpResponse.json(emptyResponse)
-      }),
-    )
+const mockConnectionResponseWithPagination = {
+  data: {
+    legacyNode: {
+      _id: '123',
+      enrollmentsConnection: {
+        nodes: [
+          {
+            course: {
+              _id: '1',
+              name: 'Introduction to Computer Science',
+              courseCode: 'CS101',
+            },
+            updatedAt: '2025-01-01T00:00:00Z',
+            grades: {
+              currentScore: 95,
+              currentGrade: 'A',
+              finalScore: 95,
+              finalGrade: 'A',
+              overrideScore: null,
+              overrideGrade: null,
+            },
+          },
+        ],
+        pageInfo: {
+          hasNextPage: true,
+          hasPreviousPage: false,
+          startCursor: 'cursor1',
+          endCursor: 'cursor1',
+        },
+      },
+    },
+  },
+}
 
-    const {result, cleanup} = setup(useUserCourses)
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false)
-      expect(result.current.data).toEqual([])
-      expect(result.current.error).toBeNull()
-    })
-
-    cleanup()
-  })
-
-  it('should refetch courses when invalidated', async () => {
-    let callCount = 0
-    server.use(
-      graphql.query('GetUserCoursesWithGrades', () => {
-        callCount++
-        return HttpResponse.json(mockGqlResponse)
-      }),
-    )
-
-    const {result, cleanup} = setup(useUserCourses)
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false)
-      expect(callCount).toBe(1)
-    })
-
-    // Trigger refetch
-    result.current.refetch()
-
-    await waitFor(() => {
-      expect(callCount).toBe(2)
-    })
-
-    cleanup()
-  })
-
-  it('should skip request when current_user_id is missing', () => {
-    const {result, cleanup} = setup(useUserCourses, {current_user_id: undefined})
-
-    expect(result.current.isLoading).toBe(false)
-    expect(result.current.data).toBeUndefined()
-    expect(result.current.error).toBeNull()
-
-    cleanup()
-  })
-})
-
-describe('useUserCoursesWithGrades', () => {
+describe('usePaginatedCoursesWithGrades', () => {
   beforeAll(() => {
     server.listen({
       onUnhandledRequest: 'error',
@@ -333,39 +164,95 @@ describe('useUserCoursesWithGrades', () => {
 
   it('should return loading state initially', () => {
     server.use(
-      graphql.query('GetUserCoursesWithGrades', () => {
-        // Return a delayed response to test loading state
+      graphql.query('GetUserCoursesWithGradesConnection', () => {
         return new Promise(resolve => {
           setTimeout(() => {
-            resolve(HttpResponse.json(mockGqlResponse))
+            resolve(HttpResponse.json(mockConnectionResponse))
           }, 100)
         })
       }),
     )
 
-    const {result, cleanup} = setup(useUserCoursesWithGrades)
+    const {result, cleanup} = setup(() => usePaginatedCoursesWithGrades())
 
     expect(result.current.isLoading).toBe(true)
-    expect(result.current.data).toBeUndefined()
+    expect(result.current.data).toEqual([])
     expect(result.current.error).toBeNull()
+    expect(result.current.hasNextPage).toBe(false)
+    expect(result.current.hasPreviousPage).toBe(false)
+    expect(result.current.currentPage).toBe(1)
+    expect(result.current.totalPages).toBe(1)
+    expect(typeof result.current.fetchNextPage).toBe('function')
+    expect(typeof result.current.fetchPreviousPage).toBe('function')
 
     cleanup()
   })
 
   it('should return course grades data on successful request', async () => {
     server.use(
-      graphql.query('GetUserCoursesWithGrades', ({variables}) => {
+      graphql.query('GetUserCoursesWithGradesConnection', ({variables}) => {
         expect(variables.userId).toBe('123')
-        return HttpResponse.json(mockGqlResponse)
+        expect(variables.first).toBe(6) // Default limit
+        expect(variables.after).toBeUndefined()
+        return HttpResponse.json(mockConnectionResponse)
       }),
     )
 
-    const {result, cleanup} = setup(useUserCoursesWithGrades)
+    const {result, cleanup} = setup(() => usePaginatedCoursesWithGrades())
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false)
-      expect(result.current.data).toEqual(mockCourseGradesData)
       expect(result.current.error).toBeNull()
+      expect(result.current.data).toHaveLength(2)
+      expect(result.current.data[0]).toEqual({
+        courseId: '1',
+        courseCode: 'CS101',
+        courseName: 'Introduction to Computer Science',
+        currentGrade: 95,
+        gradingScheme: 'letter',
+        lastUpdated: new Date('2025-01-01T00:00:00Z'),
+      })
+      expect(result.current.hasNextPage).toBe(false)
+      expect(result.current.hasPreviousPage).toBe(false)
+      expect(result.current.currentPage).toBe(1)
+      expect(result.current.totalPages).toBe(1)
+    })
+
+    cleanup()
+  })
+
+  it('should support custom limit parameter', async () => {
+    server.use(
+      graphql.query('GetUserCoursesWithGradesConnection', ({variables}) => {
+        expect(variables.first).toBe(3)
+        return HttpResponse.json(mockConnectionResponse)
+      }),
+    )
+
+    const {result, cleanup} = setup(() => usePaginatedCoursesWithGrades({limit: 3}))
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false)
+    })
+
+    cleanup()
+  })
+
+  it('should return correct pagination state when hasNextPage is true', async () => {
+    server.use(
+      graphql.query('GetUserCoursesWithGradesConnection', () => {
+        return HttpResponse.json(mockConnectionResponseWithPagination)
+      }),
+    )
+
+    const {result, cleanup} = setup(() => usePaginatedCoursesWithGrades({limit: 1}))
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false)
+      expect(result.current.data).toHaveLength(1)
+      expect(result.current.hasNextPage).toBe(true)
+      expect(result.current.hasPreviousPage).toBe(false)
+      expect(result.current.currentPage).toBe(1)
     })
 
     cleanup()
@@ -373,75 +260,191 @@ describe('useUserCoursesWithGrades', () => {
 
   it('should handle GraphQL errors', async () => {
     server.use(
-      graphql.query('GetUserCoursesWithGrades', () => {
+      graphql.query('GetUserCoursesWithGradesConnection', () => {
         return HttpResponse.json({
           errors: [{message: errorMsg}],
         })
       }),
     )
 
-    const {result, cleanup} = setup(useUserCoursesWithGrades)
+    const {result, cleanup} = setup(() => usePaginatedCoursesWithGrades())
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false)
-      expect(result.current.data).toBeUndefined()
+      expect(result.current.data).toEqual([])
       expect(result.current.error?.message).toContain(errorMsg)
+      expect(result.current.hasNextPage).toBe(false)
+      expect(result.current.hasPreviousPage).toBe(false)
     })
 
     cleanup()
   })
 
-  it('should handle network errors', async () => {
-    server.use(
-      graphql.query('GetUserCoursesWithGrades', () => {
-        return new HttpResponse(null, {status: 500})
-      }),
-    )
-
-    const {result, cleanup} = setup(useUserCoursesWithGrades)
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false)
-      expect(result.current.data).toBeUndefined()
-      expect(result.current.error).toBeTruthy()
-    })
-
-    cleanup()
-  })
-
-  it('should handle empty courses response', async () => {
-    const emptyResponse = {
+  it('should handle empty connection response', async () => {
+    const emptyConnectionResponse = {
       data: {
         legacyNode: {
           _id: '123',
-          enrollments: [],
+          enrollmentsConnection: {
+            nodes: [],
+            pageInfo: {
+              hasNextPage: false,
+              hasPreviousPage: false,
+              startCursor: null,
+              endCursor: null,
+            },
+          },
         },
       },
     }
 
     server.use(
-      graphql.query('GetUserCoursesWithGrades', () => {
-        return HttpResponse.json(emptyResponse)
+      graphql.query('GetUserCoursesWithGradesConnection', () => {
+        return HttpResponse.json(emptyConnectionResponse)
       }),
     )
 
-    const {result, cleanup} = setup(useUserCoursesWithGrades)
+    const {result, cleanup} = setup(() => usePaginatedCoursesWithGrades())
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false)
       expect(result.current.data).toEqual([])
       expect(result.current.error).toBeNull()
+      expect(result.current.hasNextPage).toBe(false)
+      expect(result.current.hasPreviousPage).toBe(false)
+      expect(result.current.currentPage).toBe(1)
+      expect(result.current.totalPages).toBe(1)
+    })
+
+    cleanup()
+  })
+
+  it('should handle missing enrollmentsConnection in response', async () => {
+    const invalidResponse = {
+      data: {
+        legacyNode: {
+          _id: '123',
+          enrollmentsConnection: null,
+        },
+      },
+    }
+
+    server.use(
+      graphql.query('GetUserCoursesWithGradesConnection', () => {
+        return HttpResponse.json(invalidResponse)
+      }),
+    )
+
+    const {result, cleanup} = setup(() => usePaginatedCoursesWithGrades())
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false)
+      expect(result.current.data).toEqual([])
+      expect(result.current.error).toBeNull()
+      expect(result.current.hasNextPage).toBe(false)
+      expect(result.current.hasPreviousPage).toBe(false)
+    })
+
+    cleanup()
+  })
+
+  it('should transform enrollments to course grades correctly', async () => {
+    const responseWithDifferentGradeTypes = {
+      data: {
+        legacyNode: {
+          _id: '123',
+          enrollmentsConnection: {
+            nodes: [
+              {
+                course: {
+                  _id: '1',
+                  name: 'Course with Override',
+                  courseCode: 'TEST101',
+                },
+                updatedAt: '2025-01-01T00:00:00Z',
+                grades: {
+                  currentScore: 85,
+                  currentGrade: 'B',
+                  finalScore: 88,
+                  finalGrade: 'B+',
+                  overrideScore: 92,
+                  overrideGrade: 'A-',
+                },
+              },
+              {
+                course: {
+                  _id: '2',
+                  name: 'Course with Final Only',
+                  courseCode: null, // Test default course code
+                },
+                updatedAt: '2025-01-01T00:00:00Z',
+                grades: {
+                  currentScore: 85,
+                  currentGrade: 'B',
+                  finalScore: 88,
+                  finalGrade: null, // Test percentage scheme
+                  overrideScore: null,
+                  overrideGrade: null,
+                },
+              },
+            ],
+            pageInfo: {
+              hasNextPage: false,
+              hasPreviousPage: false,
+              startCursor: null,
+              endCursor: null,
+            },
+          },
+        },
+      },
+    }
+
+    server.use(
+      graphql.query('GetUserCoursesWithGradesConnection', () => {
+        return HttpResponse.json(responseWithDifferentGradeTypes)
+      }),
+    )
+
+    const {result, cleanup} = setup(() => usePaginatedCoursesWithGrades())
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false)
+      expect(result.current.data).toHaveLength(2)
+
+      // Test override grade priority
+      expect(result.current.data[0]).toEqual({
+        courseId: '1',
+        courseCode: 'TEST101',
+        courseName: 'Course with Override',
+        currentGrade: 92, // Override score used
+        gradingScheme: 'letter', // Has override grade
+        lastUpdated: new Date('2025-01-01T00:00:00Z'),
+      })
+
+      // Test final grade fallback and default course code
+      expect(result.current.data[1]).toEqual({
+        courseId: '2',
+        courseCode: 'N/A', // Default course code
+        courseName: 'Course with Final Only',
+        currentGrade: 88, // Final score used
+        gradingScheme: 'percentage', // No final grade string
+        lastUpdated: new Date('2025-01-01T00:00:00Z'),
+      })
     })
 
     cleanup()
   })
 
   it('should skip request when current_user_id is missing', () => {
-    const {result, cleanup} = setup(useUserCoursesWithGrades, {current_user_id: undefined})
+    const {result, cleanup} = setup(() => usePaginatedCoursesWithGrades(), {
+      current_user_id: undefined,
+    })
 
     expect(result.current.isLoading).toBe(false)
-    expect(result.current.data).toBeUndefined()
+    expect(result.current.data).toEqual([])
     expect(result.current.error).toBeNull()
+    expect(result.current.hasNextPage).toBe(false)
+    expect(result.current.hasPreviousPage).toBe(false)
 
     cleanup()
   })

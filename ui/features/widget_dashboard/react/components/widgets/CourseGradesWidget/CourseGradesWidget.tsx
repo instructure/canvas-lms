@@ -21,50 +21,67 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Grid} from '@instructure/ui-grid'
-import {Link} from '@instructure/ui-link'
 import {Checkbox} from '@instructure/ui-checkbox'
+import {Pagination} from '@instructure/ui-pagination'
 import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import CourseGradeCard from './CourseGradeCard'
 import type {BaseWidgetProps} from '../../../types'
-import {useUserCoursesWithGrades} from '../../../hooks/useUserCourses'
-import {createGradebookHandler, createShowAllGradesHandler, limitToGrid} from './utils'
+import {usePaginatedCoursesWithGrades} from '../../../hooks/useUserCourses'
+import {createGradebookHandler} from './utils'
 import {COURSE_GRADES_WIDGET} from '../../../constants'
 
 const I18n = createI18nScope('widget_dashboard')
 
 const CourseGradesWidget: React.FC<BaseWidgetProps> = ({widget}) => {
-  const {data: courseGrades = [], isLoading, error} = useUserCoursesWithGrades()
   const [gradeVisibilities, setGradeVisibilities] = useState<{[key: string]: boolean}>({})
+  const [globalGradeVisibility, setGlobalGradeVisibility] = useState(true)
 
-  const handleShowAllGrades = createShowAllGradesHandler()
-  const displayedGrades = limitToGrid(courseGrades)
+  const {
+    data: courseGrades,
+    isLoading,
+    error,
+    hasNextPage,
+    hasPreviousPage,
+    fetchNextPage,
+    fetchPreviousPage,
+    goToPage,
+    currentPage,
+    totalPages,
+  } = usePaginatedCoursesWithGrades({
+    limit: COURSE_GRADES_WIDGET.MAX_GRID_ITEMS,
+  })
 
-  // Initialize visibilities for new courses (default to true)
+  const displayedGrades = courseGrades
+
+  // Initialize visibilities for new courses using the global visibility state
   useEffect(() => {
     displayedGrades.forEach(grade => {
       if (!(grade.courseId in gradeVisibilities)) {
-        setGradeVisibilities(prev => ({...prev, [grade.courseId]: true}))
+        setGradeVisibilities(prev => ({...prev, [grade.courseId]: globalGradeVisibility}))
       }
     })
-  }, [displayedGrades, gradeVisibilities])
+  }, [displayedGrades, gradeVisibilities, globalGradeVisibility])
 
-  // Calculate if any grades are visible (default to true if no visibilities set yet)
-  const hasVisibleGrades =
-    Object.keys(gradeVisibilities).length === 0
-      ? true
-      : Object.values(gradeVisibilities).some(visible => visible)
+  // Calculate if any grades are visible based on current global state
+  const hasVisibleGrades = globalGradeVisibility
 
   const handleGradeVisibilityChange = (courseId: string, visible: boolean) => {
     setGradeVisibilities(prev => ({...prev, [courseId]: visible}))
   }
 
   const handleToggleAllGrades = () => {
-    const newVisibility = !hasVisibleGrades
-    const newVisibilities: {[key: string]: boolean} = {}
+    const newVisibility = !globalGradeVisibility
+    setGlobalGradeVisibility(newVisibility)
+    // Update visibilities for all currently displayed grades
+    const newVisibilities = {...gradeVisibilities}
     displayedGrades.forEach(grade => {
       newVisibilities[grade.courseId] = newVisibility
     })
     setGradeVisibilities(newVisibilities)
+  }
+
+  const handlePageChange = (page: number) => {
+    goToPage(page)
   }
 
   return (
@@ -123,20 +140,21 @@ const CourseGradesWidget: React.FC<BaseWidgetProps> = ({widget}) => {
           </View>
         </Flex.Item>
 
-        <Flex.Item shouldShrink>
-          <View as="div" textAlign="center" padding="small 0">
-            <Link
-              href="#"
-              isWithinText={false}
-              onClick={e => {
-                e.preventDefault()
-                handleShowAllGrades()
-              }}
-            >
-              {I18n.t('View all course grades')}
-            </Link>
-          </View>
-        </Flex.Item>
+        {(hasNextPage || hasPreviousPage) && (
+          <Flex.Item shouldShrink>
+            <View as="div" textAlign="center" padding="x-small 0">
+              <Pagination
+                as="nav"
+                margin="x-small"
+                variant="compact"
+                currentPage={currentPage}
+                totalPageNumber={totalPages}
+                onPageChange={handlePageChange}
+                aria-label={I18n.t('Course grades pagination')}
+              />
+            </View>
+          </Flex.Item>
+        )}
       </Flex>
     </TemplateWidget>
   )

@@ -26,7 +26,8 @@ import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import AnnouncementItem from './AnnouncementItem'
 import type {BaseWidgetProps} from '../../../types'
 import {usePaginatedAnnouncements} from '../../../hooks/useAnnouncements'
-import {useUserCoursesWithGrades} from '../../../hooks/useUserCourses'
+import {usePaginatedCoursesWithGrades} from '../../../hooks/useUserCourses'
+import {COURSE_GRADES_WIDGET} from '../../../constants'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -46,7 +47,9 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
     setCurrentPageIndex(0)
   }
 
-  const {data: courses = []} = useUserCoursesWithGrades()
+  const {data: courses = []} = usePaginatedCoursesWithGrades({
+    limit: COURSE_GRADES_WIDGET.MAX_GRID_ITEMS,
+  })
 
   const coursesById = useMemo(() => {
     return courses.reduce(
