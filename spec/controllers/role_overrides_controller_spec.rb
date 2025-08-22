@@ -312,9 +312,8 @@ describe RoleOverridesController do
     describe "manage_catalog permission" do
       context "when catalog is enabled" do
         before do
-          a = Account.default
-          a.settings[:catalog_enabled] = true
-          a.save!
+          @account.settings[:catalog_enabled] = true
+          @account.save!
         end
 
         context "for an admin" do
