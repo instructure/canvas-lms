@@ -80,7 +80,7 @@ describe "ModuleVisibility" do
         @group = @group_category.groups.first
         @group.add_user(@student3, "accepted")
 
-        @module3.assignment_overrides.create!(set: @group)
+        @override = @module3.assignment_overrides.create!(set: @group)
       end
 
       it "does not consider differentiation tags when the feature is disabled" do
@@ -100,13 +100,18 @@ describe "ModuleVisibility" do
         expect(module_ids_visible_to_user(@student3)).to contain_exactly(@module1.id, @module2.id, @module3.id)
       end
 
-      it "ignore group overrides when they are deleted" do
+      it "deletes associated group overrides when they are deleted" do
+        # do sanity checks before and after deleting the group category
+        expect(@group.assignment_overrides.active).to include(@override)
+        # destroying the group category triggers group destruction which in turn, triggers override destruction
         @group_category.destroy
-        @group_category.groups.each(&:destroy)
+        expect(@group.assignment_overrides.active).to be_empty
 
-        expect(module_ids_visible_to_user(@student1)).to contain_exactly(@module1.id, @module2.id)
-        expect(module_ids_visible_to_user(@student2)).to contain_exactly(@module1.id, @module2.id)
-        expect(module_ids_visible_to_user(@student3)).to contain_exactly(@module1.id, @module2.id)
+        # since @module3 was exclusively assigned to @group category, deleting @group_category
+        # makes the mobule assigned to everyone by default
+        expect(module_ids_visible_to_user(@student1)).to contain_exactly(@module1.id, @module2.id, @module3.id)
+        expect(module_ids_visible_to_user(@student2)).to contain_exactly(@module1.id, @module2.id, @module3.id)
+        expect(module_ids_visible_to_user(@student3)).to contain_exactly(@module1.id, @module2.id, @module3.id)
       end
 
       it "ignore assignment overrides when they are deleted" do

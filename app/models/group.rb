@@ -46,6 +46,7 @@ class Group < ActiveRecord::Base
   belongs_to :group_category
   belongs_to :account
   belongs_to :root_account, class_name: "Account", inverse_of: :all_groups
+  has_many :assignment_overrides, as: :set, dependent: :destroy
   has_many :calendar_events, as: :context, inverse_of: :context, dependent: :destroy
   has_many :discussion_topics, -> { where("discussion_topics.workflow_state<>'deleted'").preload(:user).order("discussion_topics.position DESC, discussion_topics.created_at DESC") }, dependent: :destroy, as: :context, inverse_of: :context
   has_many :active_discussion_topics, -> { where("discussion_topics.workflow_state<>'deleted'").preload(:user) }, as: :context, inverse_of: :context, class_name: "DiscussionTopic"
@@ -326,6 +327,11 @@ class Group < ActiveRecord::Base
   def destroy
     self.workflow_state = "deleted"
     self.deleted_at = Time.now.utc
+
+    if non_collaborative?
+      remove_active_overrides
+    end
+
     save
   end
 
@@ -1024,6 +1030,10 @@ class Group < ActiveRecord::Base
   end
 
   private
+
+  def remove_active_overrides
+    assignment_overrides&.each(&:destroy)
+  end
 
   def validate_non_collaborative_constraints
     if non_collaborative?

@@ -675,6 +675,8 @@ describe "Differentiation Tag Management" do
             ff("button[data-testid='remove-tag']")[0].click
             wait_for_ajaximations
 
+            f("[data-testid='continue-warning-modal']").click
+
             fj("button:contains('Save')").click
             wait_for_ajaximations
 
@@ -695,6 +697,8 @@ describe "Differentiation Tag Management" do
             # Delete the second tag variant via its remove button (updated selector)
             ff("button[data-testid='remove-tag']")[0].click
             wait_for_ajaximations
+
+            f("[data-testid='continue-warning-modal']").click
 
             # Add a new tag variant (updated button text)
             fj("button:contains('+ Add another tag')").click
