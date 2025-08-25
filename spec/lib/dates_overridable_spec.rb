@@ -918,6 +918,16 @@ describe "preload_override_data_for_objects" do
       expect(@discussion1.assignment.module_ids).to eq [@module1.id]
     end
 
+    it "works for assignments that are subassignments of a discussion" do
+      discussion_assignment = @discussion1.assignment = @course.assignments.create!(title: "discussion")
+      discussion_sub_assignment = discussion_assignment.sub_assignments.create!(title: "sub assignment", context: discussion_assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+      @discussion1.save!
+      @discussion1.context_module_tags.create!(context_module: @module1, context: @course, tag_type: "context_module")
+      DatesOverridable.preload_module_ids([discussion_sub_assignment])
+      expect(discussion_sub_assignment.preloaded_module_ids).to eq [@module1.id]
+      expect(discussion_sub_assignment.module_ids).to eq [@module1.id]
+    end
+
     it "works for assignments that are part of a page" do
       @page1.assignment = @course.assignments.create!(title: "page")
       @page1.save!

@@ -178,8 +178,9 @@ module DatesOverridable
   end
 
   def self.preload_module_ids(learning_objects)
-    assignments, lo_quizzes, lo_discussions, lo_wiki_pages = learning_objects.each_with_object([[], [], [], []]) do |lo, (a, q, d, w)|
+    assignments, sub_assignments, lo_quizzes, lo_discussions, lo_wiki_pages = learning_objects.each_with_object([[], [], [], [], []]) do |lo, (a, sa, q, d, w)|
       a << lo if lo.is_a?(AbstractAssignment)
+      sa << lo if lo.is_a?(SubAssignment)
       q << lo if lo.is_a?(Quizzes::Quiz)
       d << lo if lo.is_a?(DiscussionTopic)
       w << lo if lo.is_a?(WikiPage)
@@ -187,7 +188,9 @@ module DatesOverridable
     quizzes_with_assignments = Quizzes::Quiz.where(assignment_id: assignments)
     quizzes = lo_quizzes + quizzes_with_assignments
     discussions_with_assignments = DiscussionTopic.where(assignment_id: assignments)
-    discussion_topics = lo_discussions + discussions_with_assignments
+    parent_assignment_ids = sub_assignments.pluck(:parent_assignment_id).uniq
+    discussions_with_sub_assignments = DiscussionTopic.where(assignment_id: parent_assignment_ids)
+    discussion_topics = lo_discussions + discussions_with_assignments + discussions_with_sub_assignments
     pages_with_assignments = WikiPage.where(assignment_id: assignments)
     wiki_pages = lo_wiki_pages + pages_with_assignments
     tags_scope = ContentTag.not_deleted.where(tag_type: "context_module")
@@ -201,6 +204,11 @@ module DatesOverridable
     quiz_ids_by_assignment_ids = quizzes_with_assignments.index_by(&:assignment_id).transform_values(&:id)
     discussion_ids_by_assignment_ids = discussions_with_assignments.index_by(&:assignment_id).transform_values(&:id)
     page_ids_by_assignment_ids = pages_with_assignments.index_by(&:assignment_id).transform_values(&:id)
+
+    sub_assignments.each do |sub_assignment|
+      discussion = discussions_with_sub_assignments.find { |d| d.assignment_id == sub_assignment.parent_assignment_id }
+      discussion_ids_by_assignment_ids[sub_assignment.id] = discussion.id if discussion
+    end
 
     grouped_mids = module_ids.group_by { |m| [m[0], m[1]] }
     grouped_mids.default = []
