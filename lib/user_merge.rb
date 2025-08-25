@@ -139,7 +139,6 @@ class UserMerge
 
       attachments = Attachment.where(user_id: from_user)
       merge_data.add_more_data(attachments)
-      Attachment.delay.migrate_attachments(from_user, target_user)
 
       updates = {}
       %w[access_tokens
@@ -194,6 +193,7 @@ class UserMerge
       @data = []
       Enrollment.delay.recompute_due_dates_and_scores(target_user.id)
     end
+    Attachment.delay.migrate_attachments(from_user, target_user)
 
     from_user.reload
     target_user.reload
