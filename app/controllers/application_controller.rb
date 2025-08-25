@@ -486,6 +486,7 @@ class ApplicationController < ActionController::Base
     file_verifiers_for_quiz_links
     horizon_learner_app
     horizon_learning_provider_app_on_contextless_routes
+    increased_top_nav_pane_size
     instui_nav
     login_registration_ui_identity
     lti_apps_page_ai_translation

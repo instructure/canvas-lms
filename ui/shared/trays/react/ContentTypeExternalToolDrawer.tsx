@@ -31,6 +31,7 @@ import MutexManager from '@canvas/mutex-manager/MutexManager'
 import type {Tool} from '@canvas/global/env/EnvCommon'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import {onLtiClosePostMessage} from '@canvas/lti/jquery/messages'
+import useBreakpoints from '@canvas/lti-apps/hooks/useBreakpoints'
 
 type Props = {
   tool: Tool | null
@@ -67,6 +68,7 @@ export default function ContentTypeExternalToolDrawer({
   const pageContentRef = useRef()
   // @ts-expect-error
   const initDrawerLayoutMutex = window.ENV.INIT_DRAWER_LAYOUT_MUTEX
+  const {isMaxMobile, isMaxTablet} = useBreakpoints()
 
   useEffect(
     // setup DrawerLayout content
@@ -109,6 +111,17 @@ export default function ContentTypeExternalToolDrawer({
     }
   }, [open, onDismiss])
 
+  let trayWidth: string
+  if (window.ENV.FEATURES?.increased_top_nav_pane_size) {
+    if (isMaxMobile || isMaxTablet) {
+      trayWidth = `100vw`
+    } else {
+      trayWidth = '33vw'
+    }
+  } else {
+    trayWidth = '320px'
+  }
+
   return (
     <View display="block" height={pageContentHeight}>
       <DrawerLayout minWidth={pageContentMinWidth}>
@@ -134,8 +147,9 @@ export default function ContentTypeExternalToolDrawer({
                 justifyItems="space-between"
                 alignItems="center"
                 padding="medium small medium small"
-                width="320px"
+                width={trayWidth}
                 direction="row-reverse"
+                data-testid="drawer-header"
               >
                 <Flex.Item padding="none none none small">
                   <CloseButton size="small" onClick={onDismiss} screenReaderLabel="Close" />
