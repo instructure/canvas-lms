@@ -36,13 +36,16 @@ class DropLoginAttributeFromPseudonyms < ActiveRecord::Migration[7.2]
     now = Time.now.utc
     # these pseudonyms are for the wrong login attribute, so we need to delete them
     # before we lose this information
+    user_ids = []
     Pseudonym.active
              .where.not(login_attribute: nil)
              .joins(:authentication_provider)
              .merge(AuthenticationProvider.active)
              .where("pseudonyms.login_attribute<>authentication_providers.login_attribute")
-             .in_batches
-             .update_all(workflow_state: "deleted", updated_at: now)
+             .in_batches do |batch|
+      user_ids.concat(batch.pluck(:user_id))
+      batch.update_all(workflow_state: "deleted", updated_at: now)
+    end
 
     # delete pseudonyms that will soon conflict with a NULL login_attribute
     # (should be nearly impossible, since we set login_attribute on new pseudonyms)
@@ -63,7 +66,10 @@ class DropLoginAttributeFromPseudonyms < ActiveRecord::Migration[7.2]
                .where(authentication_provider_id:, unique_id_normalized:, account_id:)
                .order("login_attribute NULLS LAST")
                .offset(1)
-               .update_all(workflow_state: "deleted", updated_at: now)
+               .in_batches do |batch|
+        user_ids.concat(batch.pluck(:user_id))
+        batch.update_all(workflow_state: "deleted", updated_at: now)
+      end
     end
 
     remove_index :pseudonyms, name: "index_temp_pseudonyms_on_login_attribute", algorithm: :concurrently # rubocop:disable Migration/NonTransactional
@@ -80,6 +86,10 @@ class DropLoginAttributeFromPseudonyms < ActiveRecord::Migration[7.2]
 
     remove_column :pseudonyms, :login_attribute, if_exists: true # rubocop:disable Rails/BulkChangeTable
     remove_column :pseudonyms, :verification_token, if_exists: true
+
+    User.where(id: user_ids).find_each do |user|
+      user.try(:sync_with_identity, root_accounts: nil, sync_type: :delayed)
+    end
   end
 
   def down
