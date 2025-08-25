@@ -27,7 +27,7 @@ import {
   UploadData,
   UploadFilePanelIds,
 } from './handle-image'
-import {ModalImageData} from '../Image/types'
+import {ModalImageData} from './types'
 
 export const ImageBlockUploadModal = (props: {
   open: boolean
@@ -68,6 +68,7 @@ export const ImageBlockUploadModal = (props: {
       onSubmit={handleSubmit}
       canvasOrigin={window.location?.origin}
       uploading={isUploading}
+      forBlockEditorUse
     />
   ) : null
 }
