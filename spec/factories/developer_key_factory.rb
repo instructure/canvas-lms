@@ -37,6 +37,8 @@ module Factories
     }
   end
 
+  # @deprecated Please use `lti_registration_with_tool` instead, as it will give you everything you need for LTI 1.3 testing
+  # in a single call.
   def lti_developer_key_model(opts = {})
     opts[:account] ||= Account.default
     opts[:account] = nil if opts[:account].site_admin?

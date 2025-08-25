@@ -50,6 +50,9 @@ module Lti
   # @param developer_key_params [Hash] Attributes to update on the DeveloperKey.
   # These take precedence over attributes calculated from registration or configuration.
   #
+  # @param comment [String | nil] A comment to be stored in the change-log for why this change
+  # was made.
+  #
   # @return [Lti::Registration] the updated registration
   class UpdateRegistrationService < ApplicationService
     def initialize(
@@ -60,7 +63,8 @@ module Lti
       configuration_params: {},
       overlay_params: {},
       binding_params: {},
-      developer_key_params: {}
+      developer_key_params: {},
+      comment: nil
     )
       @id = id
       @account = account
@@ -70,21 +74,27 @@ module Lti
       @overlay_params = overlay_params
       @binding_params = binding_params
       @developer_key_params = developer_key_params
+      @comment = comment
       super()
     end
 
     def call
       Lti::Registration.transaction do
-        update_registration!
+        Lti::RegistrationHistoryEntry.track_changes(lti_registration: registration,
+                                                    current_user: @updated_by,
+                                                    context: @account,
+                                                    comment: @comment) do
+          update_registration!
 
-        update_manual_configuration!
-        update_overlay!
-        update_developer_key!
+          update_manual_configuration!
+          update_overlay!
+          update_developer_key!
 
-        propagate_to_external_tools!
-        bind_to_account!
+          propagate_to_external_tools!
+          bind_to_account!
 
-        registration
+          registration
+        end
       end
     end
 

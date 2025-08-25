@@ -20,6 +20,13 @@
 class Lti::Registration < ActiveRecord::Base
   DEFAULT_PRIVACY_LEVEL = "anonymous"
   CANVAS_EXTENSION_LABEL = "canvas.instructure.com"
+  TRACKED_ATTRIBUTES = %w[
+    admin_nickname
+    name
+    vendor
+    workflow_state
+    description
+  ].freeze
 
   extend RootAccountResolver
   include Canvas::SoftDeletable
@@ -258,6 +265,10 @@ class Lti::Registration < ActiveRecord::Base
     lti_registration_account_bindings.each(&:undestroy)
     manual_configuration&.undestroy
     super
+  end
+
+  def current_tracked_attributes
+    attributes.with_indifferent_access.slice(*TRACKED_ATTRIBUTES)
   end
 
   private
