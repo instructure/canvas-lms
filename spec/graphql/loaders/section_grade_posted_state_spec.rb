@@ -82,4 +82,73 @@ describe Loaders::SectionGradePostedState do
       end
     end.to raise_error(ActiveRecord::RecordNotFound)
   end
+
+  it "excludes test student submissions when determining grade posting status" do
+    # Create a test student (StudentViewEnrollment)
+    test_student = @course.student_view_student
+    test_submission = Submission.where(user_id: test_student.id, assignment_id: @assignment.id).first
+
+    # Post the real student's grade but leave test student unposted
+    @submission.update!(posted_at: Time.zone.now)
+    test_submission&.update!(posted_at: nil)
+
+    # Should return true because only real student submissions matter
+    GraphQL::Batch.batch do
+      loader.for(@assignment.id, @account.id).load(section).then do |is_posted|
+        expect(is_posted).to be true
+      end
+    end
+  end
+
+  it "handles multiple sections from the same course" do
+    section2 = @course.course_sections.create!
+    student2 = @course.enroll_student(User.create!, enrollment_state: "active", section: section2).user
+    Submission.where(user_id: student2.id, assignment_id: @assignment.id).first
+
+    # Post first section's grade, leave second unposted
+    @submission.update!(posted_at: Time.zone.now)
+
+    GraphQL::Batch.batch do
+      loader_instance = loader.for(@assignment.id, @account.id)
+      promise1 = loader_instance.load(section)
+      promise2 = loader_instance.load(section2)
+
+      promise1.then do |is_posted1|
+        promise2.then do |is_posted2|
+          expect(is_posted1).to be true  # first section is posted
+          expect(is_posted2).to be false # second section is not posted
+        end
+      end
+    end
+  end
+
+  it "returns false if assignment has excused but unposted submissions" do
+    @submission.update!(excused: true, posted_at: nil)
+
+    GraphQL::Batch.batch do
+      loader.for(@assignment.id, @account.id).load(section).then do |is_posted|
+        expect(is_posted).to be false
+      end
+    end
+  end
+
+  it "returns true if assignment has ungraded submissions that are not excused" do
+    @submission.update!(score: nil, excused: false, posted_at: nil, workflow_state: "submitted")
+
+    GraphQL::Batch.batch do
+      loader.for(@assignment.id, @account.id).load(section).then do |is_posted|
+        expect(is_posted).to be true
+      end
+    end
+  end
+
+  it "returns false if assignment has graded but unposted submissions" do
+    @submission.update!(score: 85, excused: false, posted_at: nil, workflow_state: "graded")
+
+    GraphQL::Batch.batch do
+      loader.for(@assignment.id, @account.id).load(section).then do |is_posted|
+        expect(is_posted).to be false
+      end
+    end
+  end
 end

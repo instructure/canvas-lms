@@ -8564,6 +8564,7 @@ type Section implements LegacyIDInterface & Node & Timestamped {
   ): UserConnection
   createdAt: DateTime
   gradesPosted(assignmentId: ID): Boolean!
+  gradesPresent(assignmentId: ID!): Boolean!
   id: ID!
   name: String!
   sisId: String
