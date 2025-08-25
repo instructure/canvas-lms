@@ -10376,4 +10376,241 @@ describe Submission do
       expect(@submission.auto_grade_result_present).to be true
     end
   end
+
+  describe "#need_to_extract_text? (private method)" do
+    before(:once) do
+      @course = Course.create!
+      @student = course_with_student(course: @course, active_all: true).user
+      @assignment = @course.assignments.create!(title: "Test Assignment")
+      @submission = @assignment.submit_homework(@student, body: "test submission")
+      @submission.reload # Clear any saved changes from the creation
+    end
+
+    it "returns false when attempt has not changed" do
+      expect(@submission.send(:need_to_extract_text?)).to be false
+    end
+
+    context "when attempt has changed" do
+      before do
+        @submission.update!(attempt: 2)
+      end
+
+      context "for upload submissions" do
+        before do
+          allow(@submission).to receive(:extract_text_from_upload?).and_return(true)
+        end
+
+        it "returns true when attachment_ids changed and attachments are present" do
+          allow(@submission).to receive_messages(saved_change_to_attachment_ids?: true, attachment_ids: [1, 2])
+
+          expect(@submission.send(:need_to_extract_text?)).to be true
+        end
+
+        it "returns false when attachment_ids changed but no attachments" do
+          allow(@submission).to receive_messages(saved_change_to_attachment_ids?: true, attachment_ids: [])
+
+          expect(@submission.send(:need_to_extract_text?)).to be false
+        end
+
+        it "returns false when attachment_ids did not change" do
+          allow(@submission).to receive(:saved_change_to_attachment_ids?).and_return(false)
+
+          expect(@submission.send(:need_to_extract_text?)).to be false
+        end
+      end
+
+      context "for non-upload submissions" do
+        before do
+          allow(@submission).to receive(:extract_text_from_upload?).and_return(false)
+        end
+
+        it "returns true when body changed and body is present" do
+          allow(@submission).to receive_messages(saved_change_to_body?: true, body: "some text")
+
+          expect(@submission.send(:need_to_extract_text?)).to be true
+        end
+
+        it "returns false when body changed but body is blank" do
+          allow(@submission).to receive_messages(saved_change_to_body?: true, body: "")
+
+          expect(@submission.send(:need_to_extract_text?)).to be false
+        end
+
+        it "returns false when body did not change" do
+          allow(@submission).to receive(:saved_change_to_body?).and_return(false)
+
+          expect(@submission.send(:need_to_extract_text?)).to be false
+        end
+      end
+    end
+  end
+
+  describe "#extract_text (private method)" do
+    before(:once) do
+      @course = Course.create!
+      @student = course_with_student(course: @course, active_all: true).user
+      @assignment = @course.assignments.create!(title: "Test Assignment")
+    end
+
+    context "when extracting from uploads" do
+      before do
+        @attachment1 = Attachment.create!(
+          context: @assignment,
+          uploaded_data: StringIO.new("file content"),
+          filename: "test1.pdf",
+          display_name: "test1.pdf"
+        )
+        @attachment2 = Attachment.create!(
+          context: @assignment,
+          uploaded_data: StringIO.new("file content"),
+          filename: "test2.pdf",
+          display_name: "test2.pdf"
+        )
+        @submission = @assignment.submit_homework(@student, submission_type: "online_upload", attachments: [@attachment1, @attachment2])
+        allow(@submission).to receive_messages(extract_text_from_upload?: true, root_account: @course.root_account)
+      end
+
+      it "processes all attachments and creates SubmissionText records when text is present" do
+        service_result1 = FileTextExtractionService::Result.new("extracted text 1", true)
+        service_result2 = FileTextExtractionService::Result.new("extracted text 2", false)
+
+        allow(FileTextExtractionService).to receive(:new).with(attachment: @attachment1).and_return(double(call: service_result1))
+        allow(FileTextExtractionService).to receive(:new).with(attachment: @attachment2).and_return(double(call: service_result2))
+
+        expect(SubmissionText).to receive(:upsert_all) do |rows, options|
+          expect(rows.length).to eq(2)
+          expect(rows[0][:text]).to eq("extracted text 1")
+          expect(rows[0][:contains_images]).to be true
+          expect(rows[0][:attachment_id]).to eq(@attachment1.id)
+          expect(rows[1][:text]).to eq("extracted text 2")
+          expect(rows[1][:contains_images]).to be false
+          expect(rows[1][:attachment_id]).to eq(@attachment2.id)
+          expect(options[:unique_by]).to eq(:index_on_sub_attempt_attach)
+        end
+
+        @submission.send(:extract_text)
+      end
+
+      it "skips attachments when FileTextExtractionService returns nil" do
+        service_result1 = nil
+        service_result2 = FileTextExtractionService::Result.new("extracted text 2", false)
+
+        allow(FileTextExtractionService).to receive(:new).with(attachment: @attachment1).and_return(double(call: service_result1))
+        allow(FileTextExtractionService).to receive(:new).with(attachment: @attachment2).and_return(double(call: service_result2))
+
+        expect(SubmissionText).to receive(:upsert_all) do |rows, _options|
+          valid_rows = rows.compact
+          expect(valid_rows.length).to eq(1)
+          expect(valid_rows[0][:text]).to eq("extracted text 2")
+          expect(valid_rows[0][:attachment_id]).to eq(@attachment2.id)
+        end
+
+        @submission.send(:extract_text)
+      end
+
+      it "skips attachments when FileTextExtractionService returns empty text" do
+        service_result1 = FileTextExtractionService::Result.new("", false)
+        service_result2 = FileTextExtractionService::Result.new("extracted text 2", false)
+
+        allow(FileTextExtractionService).to receive(:new).with(attachment: @attachment1).and_return(double(call: service_result1))
+        allow(FileTextExtractionService).to receive(:new).with(attachment: @attachment2).and_return(double(call: service_result2))
+
+        expect(SubmissionText).to receive(:upsert_all) do |rows, _options|
+          valid_rows = rows.compact
+          expect(valid_rows.length).to eq(1)
+          expect(valid_rows[0][:text]).to eq("extracted text 2")
+        end
+
+        @submission.send(:extract_text)
+      end
+
+      it "skips attachments when FileTextExtractionService returns blank text" do
+        service_result1 = FileTextExtractionService::Result.new("   ", false)
+        service_result2 = FileTextExtractionService::Result.new("extracted text 2", false)
+
+        allow(FileTextExtractionService).to receive(:new).with(attachment: @attachment1).and_return(double(call: service_result1))
+        allow(FileTextExtractionService).to receive(:new).with(attachment: @attachment2).and_return(double(call: service_result2))
+
+        expect(SubmissionText).to receive(:upsert_all) do |rows, _options|
+          valid_rows = rows.compact
+          expect(valid_rows.length).to eq(1)
+          expect(valid_rows[0][:text]).to eq("extracted text 2")
+        end
+
+        @submission.send(:extract_text)
+      end
+
+      it "does not call upsert_all when no valid text is extracted" do
+        service_result1 = nil
+        service_result2 = FileTextExtractionService::Result.new("", false)
+
+        allow(FileTextExtractionService).to receive(:new).with(attachment: @attachment1).and_return(double(call: service_result1))
+        allow(FileTextExtractionService).to receive(:new).with(attachment: @attachment2).and_return(double(call: service_result2))
+
+        expect(SubmissionText).not_to receive(:upsert_all)
+
+        @submission.send(:extract_text)
+      end
+    end
+
+    context "when extracting from submission body" do
+      before do
+        @submission = @assignment.submit_homework(@student, body: "<p>Submission text with <img src='file.jpg'> image</p>")
+        allow(@submission).to receive_messages(extract_text_from_upload?: false, root_account: @course.root_account)
+      end
+
+      it "creates SubmissionText record from body when body is present" do
+        allow(@submission).to receive(:contains_rce_file_link?).with(@submission.body).and_return(true)
+
+        expect(SubmissionText).to receive(:upsert_all) do |rows, options|
+          expect(rows.length).to eq(1)
+          expect(rows[0][:text]).to eq(@submission.body)
+          expect(rows[0][:contains_images]).to be true
+          expect(rows[0][:attachment_id]).to be_nil
+          expect(options[:unique_by]).to eq(:index_on_sub_attempt)
+        end
+
+        @submission.send(:extract_text)
+      end
+
+      it "sets contains_images to false when body has no file links" do
+        allow(@submission).to receive(:contains_rce_file_link?).with(@submission.body).and_return(false)
+
+        expect(SubmissionText).to receive(:upsert_all) do |rows, _options|
+          expect(rows[0][:contains_images]).to be false
+        end
+
+        @submission.send(:extract_text)
+      end
+
+      it "does not create SubmissionText record when body is blank" do
+        @submission.update!(body: "")
+
+        expect(SubmissionText).not_to receive(:upsert_all)
+
+        @submission.send(:extract_text)
+      end
+
+      it "does not create SubmissionText record when body is nil" do
+        @submission.update!(body: nil)
+
+        expect(SubmissionText).not_to receive(:upsert_all)
+
+        @submission.send(:extract_text)
+      end
+    end
+
+    context "when neither upload nor body conditions are met" do
+      before do
+        @submission = @assignment.submit_homework(@student, body: "")
+        allow(@submission).to receive(:extract_text_from_upload?).and_return(false)
+      end
+
+      it "does not create any SubmissionText records" do
+        expect(SubmissionText).not_to receive(:upsert_all)
+
+        @submission.send(:extract_text)
+      end
+    end
+  end
 end
