@@ -34,7 +34,7 @@ export const TextEdit = ({content, height, onContentChange, focusHandler}: TextE
       onContentChange={onContentChange}
       height={height}
       onInit={() => {
-        focusHandler?.(rceRef.current)
+        focusHandler && focusHandler(rceRef.current)
       }}
     />
   )

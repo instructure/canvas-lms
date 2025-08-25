@@ -18,10 +18,11 @@
 
 import {TextBlock} from '../TextBlock'
 import {renderBlock} from '../../__tests__/render-helper'
+import {mockBlockContentEditorContext} from '../../../__tests__/mockBlockContentEditorContext'
 
 jest.mock('../../../BlockContentEditorContext', () => ({
   __esModule: true,
-  useBlockContentEditorContext: jest.fn(() => ({})),
+  useBlockContentEditorContext: jest.fn(() => mockBlockContentEditorContext({})),
 }))
 
 describe('TextBlock', () => {
