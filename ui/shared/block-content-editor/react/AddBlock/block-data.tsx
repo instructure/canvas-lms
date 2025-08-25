@@ -62,7 +62,7 @@ export const blockFactory = {
   ),
   [SeparatorLineBlock.name]: () => (
     <SeparatorLineBlock
-      thickness="small"
+      thickness="medium"
       settings={{separatorColor: colors.ui.lineDivider, backgroundColor: defaultBackgroundColor}}
     />
   ),
