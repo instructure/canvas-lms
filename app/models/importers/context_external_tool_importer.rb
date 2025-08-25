@@ -27,7 +27,7 @@ module Importers
         next unless migration.import_object?("context_external_tools", tool["migration_id"]) || migration.import_object?("external_tools", tool["migration_id"])
 
         begin
-          import_from_migration(tool, migration.context, migration)
+          import_from_migration(tool, migration.context, migration:)
         rescue
           migration.add_import_warning(t("#migration.external_tool_type", "External Tool"), tool[:title], $!)
         end
@@ -39,7 +39,7 @@ module Importers
       end
     end
 
-    def self.import_from_migration(hash, context, migration, item = nil, persist = true)
+    def self.import_from_migration(hash, context, migration: nil, item: nil, persist: true)
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:external_tools_to_import] && !hash[:external_tools_to_import][hash[:migration_id]]
 

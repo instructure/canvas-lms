@@ -2341,6 +2341,11 @@ describe ExternalToolsController do
           error_message = response.parsed_body.dig("errors", "tool_currently_installed").first["message"]
           expect(error_message).to eq "The tool is already installed in this context."
         end
+
+        it "does not save duplicate record" do
+          user_session(@teacher)
+          expect { post "create", params:, format: "json" }.not_to change(ContextExternalTool, :count)
+        end
       end
 
       context "create manually" do
