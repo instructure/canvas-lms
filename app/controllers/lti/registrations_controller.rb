@@ -1358,6 +1358,7 @@ class Lti::RegistrationsController < ApplicationController
   # @argument overlay [Lti::Overlay] The overlay configuration for the tool. Overrides values in the base configuration. Note that updating the overlay of a registration associated with a Dynamic Registration IS allowed.
   # @argument workflow_state [String, "on" | "off" | "allow"]
   #  The desired state for this registration/account binding. "allow" is only valid for Site Admin registrations.
+  # @argument comment [String | nil] A comment explaining why this change was made. Cannot exceed 2000 characters.
   #
   # @example_request
   #
@@ -1403,7 +1404,8 @@ class Lti::RegistrationsController < ApplicationController
       configuration_params:,
       overlay_params:,
       binding_params:,
-      updated_by: @current_user
+      updated_by: @current_user,
+      comment: params[:comment]&.to_s
     }
 
     registration = Lti::UpdateRegistrationService.call(**update_params)
