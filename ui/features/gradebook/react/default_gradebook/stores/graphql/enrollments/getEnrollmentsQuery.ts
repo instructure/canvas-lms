@@ -55,7 +55,7 @@ query getEnrollments($after: String, $courseId: ID!, $userIds: [ID!]) {
         course {
           _id
         }
-        grades {
+        grades(gradingPeriodId: null) {
           currentGrade
           currentScore
           finalGrade
