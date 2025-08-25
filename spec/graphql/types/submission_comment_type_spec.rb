@@ -568,5 +568,17 @@ describe Types::SubmissionCommentType do
         ).to eq [true, true, true]
       end
     end
+
+    context "course is concluded" do
+      before(:once) do
+        @course.update!(conclude_at: "2019-01-01", restrict_enrollments_to_course_dates: true)
+      end
+
+      it "returns false" do
+        expect(
+          GraphQLTypeTester.new(@submission, current_user: @student1).resolve("commentsConnection(filter: {allComments: true}) { nodes { canReply }}")
+        ).to eq [false, false, false]
+      end
+    end
   end
 end
