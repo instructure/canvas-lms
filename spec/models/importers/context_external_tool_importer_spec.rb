@@ -24,7 +24,7 @@ describe Importers::ContextExternalToolImporter do
 
   it "works for course-level tools" do
     migration = @course.content_migrations.create!
-    tool = Importers::ContextExternalToolImporter.import_from_migration({ title: "tool", url: "http://example.com" }, @course, migration)
+    tool = Importers::ContextExternalToolImporter.import_from_migration({ title: "tool", url: "http://example.com" }, @course, migration:)
     expect(tool).not_to be_nil
     expect(tool.context).to eq @course
   end
@@ -32,13 +32,13 @@ describe Importers::ContextExternalToolImporter do
   it 'does not create a new record if "persist" is falsey' do
     migration = @course.content_migrations.create!
     expect do
-      Importers::ContextExternalToolImporter.import_from_migration({ title: "tool", url: "http://example.com" }, @course, migration, nil, false)
+      Importers::ContextExternalToolImporter.import_from_migration({ title: "tool", url: "http://example.com" }, @course, migration:, persist: false)
     end.not_to change { ContextExternalTool.count }
   end
 
   it "works for account-level tools" do
     migration = @course.account.content_migrations.create!
-    tool = Importers::ContextExternalToolImporter.import_from_migration({ title: "tool", url: "http://example.com" }, @course.account, migration)
+    tool = Importers::ContextExternalToolImporter.import_from_migration({ title: "tool", url: "http://example.com" }, @course.account, migration:)
     expect(tool).not_to be_nil
     expect(tool.context).to eq @course.account
   end
@@ -50,7 +50,7 @@ describe Importers::ContextExternalToolImporter do
     import_hash[:privacy_level] = import_hash.delete :workflow_state
     migration = @course.account.content_migrations.create!
     expect do
-      Importers::ContextExternalToolImporter.import_from_migration(import_hash, @course, migration, nil, true)
+      Importers::ContextExternalToolImporter.import_from_migration(import_hash, @course, migration:)
     end.not_to change { ContextExternalTool.count }
   end
 
@@ -64,7 +64,7 @@ describe Importers::ContextExternalToolImporter do
     import_hash[:migration_id] = "hi"
     migration = @course.account.content_migrations.create!
     expect do
-      Importers::ContextExternalToolImporter.import_from_migration(import_hash, @course, migration, nil, true)
+      Importers::ContextExternalToolImporter.import_from_migration(import_hash, @course, migration:)
     end.not_to change { ContextExternalTool.count }
     expect(tool2.reload.identity_hash).to eq "duplicate"
   end
@@ -74,7 +74,7 @@ describe Importers::ContextExternalToolImporter do
       Importers::ContextExternalToolImporter.import_from_migration(
         tool_hash,
         course.account,
-        migration
+        migration:
       )
     end
 
@@ -152,8 +152,8 @@ describe Importers::ContextExternalToolImporter do
       Importers::ContextExternalToolImporter.import_from_migration(
         tool_hash,
         @course.account,
-        migration,
-        tool
+        migration:,
+        item: tool
       )
     end
 
@@ -210,8 +210,8 @@ describe Importers::ContextExternalToolImporter do
       Importers::ContextExternalToolImporter.import_from_migration(
         tool_hash,
         @course.account,
-        migration,
-        tool
+        migration:,
+        item: tool
       )
     end
 
@@ -262,7 +262,7 @@ describe Importers::ContextExternalToolImporter do
       ]
 
       data.each do |hash|
-        Importers::ContextExternalToolImporter.import_from_migration(hash, @course, @migration)
+        Importers::ContextExternalToolImporter.import_from_migration(hash, @course, migration: @migration)
       end
 
       expect(@course.context_external_tools.map(&:migration_id).sort).to eq ["1", "2"]
@@ -275,7 +275,7 @@ describe Importers::ContextExternalToolImporter do
         { migration_id: "3", title: "tool", url: "http://notexample.com" }
       ]
       data.each do |hash|
-        Importers::ContextExternalToolImporter.import_from_migration(hash, @course, @migration)
+        Importers::ContextExternalToolImporter.import_from_migration(hash, @course, migration: @migration)
       end
 
       expect(@course.context_external_tools.map(&:migration_id).sort).to eq ["1", "3"]
@@ -296,7 +296,7 @@ describe Importers::ContextExternalToolImporter do
       ]
 
       data.each do |hash|
-        Importers::ContextExternalToolImporter.import_from_migration(hash, @course, @migration)
+        Importers::ContextExternalToolImporter.import_from_migration(hash, @course, migration: @migration)
       end
 
       expect(@course.context_external_tools.map(&:migration_id).sort).to eq ["1", "3"]
@@ -317,7 +317,7 @@ describe Importers::ContextExternalToolImporter do
       ]
 
       data.each do |hash|
-        Importers::ContextExternalToolImporter.import_from_migration(hash, @course, @migration)
+        Importers::ContextExternalToolImporter.import_from_migration(hash, @course, migration: @migration)
       end
 
       expect(@course.context_external_tools.map(&:migration_id).sort).to eq ["1", "3"]
@@ -338,7 +338,7 @@ describe Importers::ContextExternalToolImporter do
       ]
 
       data.each do |hash|
-        Importers::ContextExternalToolImporter.import_from_migration(hash, @course, @migration)
+        Importers::ContextExternalToolImporter.import_from_migration(hash, @course, migration: @migration)
       end
 
       expect(@course.context_external_tools.map(&:migration_id).sort).to eq ["1", "3"]
@@ -358,7 +358,7 @@ describe Importers::ContextExternalToolImporter do
       ]
 
       data.each do |hash|
-        Importers::ContextExternalToolImporter.import_from_migration(hash, @course, @migration)
+        Importers::ContextExternalToolImporter.import_from_migration(hash, @course, migration: @migration)
       end
 
       expect(@course.context_external_tools.map(&:migration_id).sort).to eq ["1"]
@@ -399,7 +399,7 @@ describe Importers::ContextExternalToolImporter do
 
     it "does not search if setting not enabled" do
       @data.each do |hash|
-        Importers::ContextExternalToolImporter.import_from_migration(hash, @course, @migration)
+        Importers::ContextExternalToolImporter.import_from_migration(hash, @course, migration: @migration)
       end
 
       expect(@course.context_external_tools.map(&:migration_id).sort).to eq %w[1 2 3 4]
@@ -408,7 +408,7 @@ describe Importers::ContextExternalToolImporter do
     it "searches for existing tools if setting enabled" do
       @migration.migration_settings[:prefer_existing_tools] = true
       @data.each do |hash|
-        Importers::ContextExternalToolImporter.import_from_migration(hash, @course, @migration)
+        Importers::ContextExternalToolImporter.import_from_migration(hash, @course, migration: @migration)
       end
 
       expect(@course.context_external_tools.map(&:migration_id).sort).to eq ["3"]
@@ -424,7 +424,7 @@ describe Importers::ContextExternalToolImporter do
         if hash[:migration_id] == "4"
           hash[:title] = "haha totally different tool"
         end
-        Importers::ContextExternalToolImporter.import_from_migration(hash, @course, @migration)
+        Importers::ContextExternalToolImporter.import_from_migration(hash, @course, migration: @migration)
       end
 
       expect(@course.context_external_tools.map(&:migration_id).sort).to eq ["3", "4"] # brings in tool 4 now
@@ -438,7 +438,7 @@ describe Importers::ContextExternalToolImporter do
         if hash[:migration_id] == "4"
           hash[:title] = "haha totally different tool"
         end
-        Importers::ContextExternalToolImporter.import_from_migration(hash, @course, @migration)
+        Importers::ContextExternalToolImporter.import_from_migration(hash, @course, migration: @migration)
       end
 
       expect(@course.context_external_tools.map(&:migration_id).sort).to eq ["3"] # still compacts
