@@ -80,9 +80,8 @@ class GroupMembership < ActiveRecord::Base
     p.whenever do |record|
       record.previously_new_record? &&
         record.accepted? &&
-        record.group &&
-        record.group.context_available? &&
-        record.group&.can_participate?(user) &&
+        record.group&.context_available? &&
+        record.group.can_participate?(user) &&
         record.sis_batch_id.blank?
     end
     p.data { course_broadcast_data }
@@ -92,9 +91,8 @@ class GroupMembership < ActiveRecord::Base
     p.whenever do |record|
       record.previously_new_record? &&
         record.invited? &&
-        record.group &&
-        record.group.context_available? &&
-        record.group&.can_participate?(user) &&
+        record.group&.context_available? &&
+        record.group.can_participate?(user) &&
         record.sis_batch_id.blank?
     end
     p.data { course_broadcast_data }

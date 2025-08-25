@@ -4417,7 +4417,7 @@ class CoursesController < ApplicationController
        @context.open_enrollment &&
        (!@context_enrollment || !@context_enrollment.active?)
       :enroll
-    elsif @context_enrollment&.self_enrolled && @context_enrollment&.active?
+    elsif @context_enrollment&.self_enrolled && @context_enrollment.active?
       :unenroll
     end
   end
