@@ -1046,7 +1046,7 @@ describe "Group Categories API", type: :request do
       csv_data = CSV.parse(response.body)
       data_rows = csv_data[1..]
 
-      names = data_rows.map { |row| row[0] }
+      names = data_rows.pluck(0)
       expect(names).to eq(names.sort)
     end
 

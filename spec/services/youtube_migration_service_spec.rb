@@ -456,7 +456,7 @@ RSpec.describe YoutubeMigrationService do
       announcement_key = "Announcement|#{announcement.id}"
       expect(resources[announcement_key]).to be_present
       expect(resources[announcement_key][:count]).to eq(2) # 1 from announcement, 1 from entry
-      embeds_srcs = resources[announcement_key][:embeds].map { |e| e[:src] }
+      embeds_srcs = resources[announcement_key][:embeds].pluck(:src)
       expect(embeds_srcs).to include(
         "https://www.youtube.com/embed/main_video",
         "https://www.youtube.com/embed/reply_video"
