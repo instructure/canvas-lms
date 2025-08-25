@@ -143,6 +143,9 @@ module CanvasRails
     config.active_support.encode_big_decimal_as_string = false
     config.active_support.remove_deprecated_time_with_zone_name = true
 
+    # Skip loading generators at boot - they're only needed for `rails generate` commands
+    Rails.autoloaders.main.ignore(Rails.root.join("lib/generators"))
+
     config.paths["lib"].eager_load!
     config.paths.add("app/middleware", eager_load: true, autoload_once: true)
     # The main autoloader should ignore it so the `once` autoloader can happily load it

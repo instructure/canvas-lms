@@ -140,6 +140,8 @@ end
 
 These settings can be changed on-the-fly; just be sure to send SIGHUP to job hosts to ensure configuration is reloaded.
 
+A data fixup operation and associated files can be generated with `rails g data_fixup <OperationName>`.
+
 See [`lib/canvas_operations/base_concerns/settings.rb`](lib/canvas_operations/base_concerns/settings.rb) for more details on using operation settings.
 
 
