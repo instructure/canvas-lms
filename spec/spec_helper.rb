@@ -812,7 +812,7 @@ RSpec.configure do |config|
     BACKENDS = %w[FileSystem S3].map { |backend| AttachmentFu::Backends.const_get(:"#{backend}Backend") }.freeze
 
     class As # :nodoc:
-      private(*instance_methods.grep_v(/(^__|^\W|^binding$|^untaint$|^object_id$)/)) # rubocop:disable Style/AccessModifierDeclarations
+      private(*instance_methods.grep_v(/(^__|^\W|^binding$|^untaint$|^object_id$)/))
 
       def initialize(subject, ancestor)
         @subject = subject

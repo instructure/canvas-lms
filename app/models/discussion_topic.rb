@@ -1925,7 +1925,7 @@ class DiscussionTopic < ActiveRecord::Base
         locked = { object: self, module: item.context_module }
       elsif locked? # nothing more specific, it's just locked
         locked = { object: self, can_view: true }
-      elsif (l = root_topic&.low_level_locked_for?(user, opts)) # rubocop:disable Lint/DuplicateBranch
+      elsif (l = root_topic&.low_level_locked_for?(user, opts))
         locked = l
       end
       locked

@@ -27,7 +27,7 @@ module Types
     value "deleted"
   end
 
-  class GroupMembershipType < ApplicationObjectType # rubocop:disable GraphQL/NotAuthorizedNodeType
+  class GroupMembershipType < ApplicationObjectType
     implements Interfaces::TimestampInterface
     implements Interfaces::LegacyIDInterface
 

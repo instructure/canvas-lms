@@ -132,7 +132,7 @@ class Assignment < AbstractAssignment
     save!
   end
 
-  def has_student_submissions_for_sub_assignments? # rubocop:disable Naming/PredicateName
+  def has_student_submissions_for_sub_assignments?
     return false unless has_sub_assignments?
 
     sub_assignments.active.any?(&:has_student_submissions?)

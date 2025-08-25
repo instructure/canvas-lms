@@ -44,7 +44,7 @@ module UsersHelper
     return false unless pseudonym
 
     partial = "shared/svg/svg_icon_#{pseudonym.authentication_provider&.auth_type}"
-    lookup_context.exists?( # rubocop:disable Rails/WhereExists
+    lookup_context.exists?(
       partial,
       [],
       true,

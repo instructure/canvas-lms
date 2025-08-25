@@ -228,7 +228,7 @@ describe "Files API", type: :request do
     def upload_data
       @attachment.workflow_state = nil
       @content = Tempfile.new(["test", ".txt"])
-      def @content.content_type # rubocop:disable Lint/NestedMethodDefinition
+      def @content.content_type
         "text/plain"
       end
       @content.write("test file")

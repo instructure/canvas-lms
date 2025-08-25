@@ -290,7 +290,7 @@ module Lti
     end
 
     def create_attributes
-      (update_attributes + [:file_id]).freeze # rubocop:disable Rails/ActiveRecordAliases -- not ActiveRecord::Base#update_attributes
+      (update_attributes + [:file_id]).freeze
     end
 
     def update_attributes
@@ -349,7 +349,7 @@ module Lti
 
     def update_report_params
       @_update_report_params ||= begin
-        report_attributes = params.require(:originality_report).permit(update_attributes) # rubocop:disable Rails/ActiveRecordAliases -- not ActiveRecord::Base#update_attributes
+        report_attributes = params.require(:originality_report).permit(update_attributes)
         report_attributes[:lti_link_attributes] = lti_link_params
         report_attributes
       end

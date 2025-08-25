@@ -36,7 +36,7 @@ def init
       @file = File.basename(@file.path)
     end
     @object = @object.dup if @object.frozen?
-    def @object.source_type; end # rubocop:disable Lint/NestedMethodDefinition -- rubocop bug?
+    def @object.source_type; end
     sections :layout, [:diskfile]
   elsif options[:all_resources]
     sections :layout, [T("topic")]

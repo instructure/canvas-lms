@@ -305,9 +305,7 @@ class Message < ActiveRecord::Base
     # which can't handle URLs with spaces. As that is the root cause
     # of this change, we'll just use the deprecated URI::DEFAULT_PARSER.escape method.
     #
-    # rubocop:disable Lint/UriEscapeUnescape
     URI.join("#{HostUrl.protocol}://#{HostUrl.context_host(author_account)}", URI::DEFAULT_PARSER.escape(url)).to_s if url
-    # rubocop:enable Lint/UriEscapeUnescape
   end
 
   def author_short_name
