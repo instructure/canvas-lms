@@ -39,6 +39,9 @@ describe('Webzip export app', () => {
   afterAll(() => server.close())
 
   test('renders a spinner before API call', () => {
+    // Set up handler to prevent MSW warning, but the test checks the loading state
+    // before the API response is processed
+    server.use(http.get('/api/v1/courses/2/web_zip_exports', () => HttpResponse.json([])))
     ENV.context_asset_string = 'courses_2'
     const wrapper = render(<WebZipExportApp />)
     expect(wrapper.getByText('Loading')).toBeInTheDocument()
