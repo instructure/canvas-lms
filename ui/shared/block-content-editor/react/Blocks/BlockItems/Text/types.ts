@@ -31,5 +31,5 @@ export type TextViewProps = TextData & TextColor
 export type TextEditProps = TextData & {
   onContentChange: (content: string) => void
   height: number
-  focusHandler?: FocusHandler
+  focusHandler?: FocusHandler | false
 }

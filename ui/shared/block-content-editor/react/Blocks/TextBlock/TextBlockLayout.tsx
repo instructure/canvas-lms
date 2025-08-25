@@ -16,18 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {TextBlockPreviewProps} from './types'
-import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
-import {TextEditPreview} from '../BlockItems/Text/TextEditPreview'
 import {Flex} from '@instructure/ui-flex'
+import React from 'react'
 
-export const TextBlockEditPreview = (props: TextBlockPreviewProps) => {
+export const TextBlockLayout = (props: {
+  title?: React.ReactNode
+  text: React.ReactNode
+}) => {
   return (
     <Flex direction="column" gap="mediumSmall">
-      {props.settings.includeBlockTitle && (
-        <TitleEditPreview title={props.title} contentColor={props.settings.titleColor} />
-      )}
-      <TextEditPreview content={props.content} />
+      {props.title}
+      {props.text}
     </Flex>
   )
 }
