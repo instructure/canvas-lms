@@ -24,6 +24,7 @@ class YoutubeMigrationService
     Quizzes::QuizQuestion.name,
     AssessmentQuestion.name,
     DiscussionTopic.name,
+    Announcement.name,
     DiscussionEntry.name,
     CalendarEvent.name,
     Assignment.name,
@@ -336,6 +337,10 @@ class YoutubeMigrationService
       topic = course.discussion_topics.find(resource_id)
       topic.message = replace_youtube_embed_in_html(topic.message, embed, new_html)
       topic.save!
+    when "Announcement"
+      announcement = course.announcements.find(resource_id)
+      announcement.message = replace_youtube_embed_in_html(announcement.message, embed, new_html)
+      announcement.save!
     when "DiscussionEntry"
       entry = DiscussionEntry.find(resource_id)
       entry.message = replace_youtube_embed_in_html(entry.message, embed, new_html)
