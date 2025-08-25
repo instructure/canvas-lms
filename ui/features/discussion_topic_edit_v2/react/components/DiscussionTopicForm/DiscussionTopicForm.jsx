@@ -1143,13 +1143,10 @@ function DiscussionTopicForm({
           <FormFieldGroup description="" rowSpacing="small">
             {renderAllowParticipantsToComment()}
             {!isStudent && (!isAnnouncement || (isAnnouncement && !locked)) && (
-              <View
-                display="inline-block"
-                padding={isAnnouncement ? '0 0 0 medium' : '0'}
-                data-testid="disallow_threaded_replies"
-                data-action-state={isThreaded ? 'disallowThreads' : 'allowThreads'}
-              >
+              <View display="inline-block" padding={isAnnouncement ? '0 0 0 medium' : '0'}>
                 <Checkbox
+                  data-testid="disallow_threaded_replies"
+                  data-action-state={isThreaded ? 'disallowThreads' : 'allowThreads'}
                   label={I18n.t('Disallow threaded replies')}
                   value="disallow-threaded-replies"
                   inline={true}
@@ -1168,15 +1165,14 @@ function DiscussionTopicForm({
             )}
 
             {((!isGroupContext && !isAnnouncement) || (isAnnouncement && !locked)) && (
-              <View
-                display="inline-block"
-                padding={isAnnouncement ? '0 0 0 medium' : '0'}
-                data-testid="require-initial-post-checkbox"
-                data-action-state={
-                  requireInitialPost ? 'disableInitiatorRequirement' : 'enableInitiatorRequirement'
-                }
-              >
+              <View display="inline-block" padding={isAnnouncement ? '0 0 0 medium' : '0'}>
                 <Checkbox
+                  data-testid="require-initial-post-checkbox"
+                  data-action-state={
+                    requireInitialPost
+                      ? 'disableInitiatorRequirement'
+                      : 'enableInitiatorRequirement'
+                  }
                   label={I18n.t(
                     'Participants must respond to the topic before viewing other replies',
                   )}
@@ -1189,33 +1185,26 @@ function DiscussionTopicForm({
             )}
 
             {shouldShowPodcastFeedOption && (
-              <View
-                display="inline-block"
+              <Checkbox
                 data-testid="enable-podcast-checkbox"
                 data-action-state={enablePodcastFeed ? 'disablePodcast' : 'enablePodcast'}
-              >
-                <Checkbox
-                  label={I18n.t('Enable podcast feed')}
-                  value="enable-podcast-feed"
-                  inline={true}
-                  checked={enablePodcastFeed}
-                  onChange={() => {
-                    setIncludeRepliesInFeed(!enablePodcastFeed && includeRepliesInFeed)
-                    setEnablePodcastFeed(!enablePodcastFeed)
-                  }}
-                />
-              </View>
+                label={I18n.t('Enable podcast feed')}
+                value="enable-podcast-feed"
+                inline={true}
+                checked={enablePodcastFeed}
+                onChange={() => {
+                  setIncludeRepliesInFeed(!enablePodcastFeed && includeRepliesInFeed)
+                  setEnablePodcastFeed(!enablePodcastFeed)
+                }}
+              />
             )}
             {enablePodcastFeed && !isGroupContext && (
-              <View
-                display="block"
-                padding="none none none medium"
-                data-testid="include-replies-in-podcast-checkbox"
-                data-action-state={
-                  includeRepliesInFeed ? 'disableRepliesInFeed' : 'includeRepliesInFeed'
-                }
-              >
+              <View display="block" padding="none none none medium">
                 <Checkbox
+                  data-testid="include-replies-in-podcast-checkbox"
+                  data-action-state={
+                    includeRepliesInFeed ? 'disableRepliesInFeed' : 'includeRepliesInFeed'
+                  }
                   label={I18n.t('Include student replies in podcast feed')}
                   value="include-student-replies-in-podcast-feed"
                   inline={true}
@@ -1225,33 +1214,26 @@ function DiscussionTopicForm({
               </View>
             )}
             {shouldShowGradedDiscussionOptions && (
-              <View
-                display="inline-block"
+              <Checkbox
                 data-testid="graded-checkbox"
+                data-pendo="graded-checkbox"
                 data-action-state={isGraded ? 'disableGrades' : 'enableGrades'}
-              >
-                <Checkbox
-                  data-pendo="graded-checkbox"
-                  label={I18n.t('Graded')}
-                  value="graded"
-                  inline={true}
-                  checked={isGraded}
-                  onChange={handleGradedCheckboxChange}
-                  disabled={discussionAnonymousState !== 'off'}
-                  // disabled={sectionIdsToPostTo === [allSectionsOption._id]}
-                />
-              </View>
+                label={I18n.t('Graded')}
+                value="graded"
+                inline={true}
+                checked={isGraded}
+                onChange={handleGradedCheckboxChange}
+                disabled={discussionAnonymousState !== 'off'}
+                // disabled={sectionIdsToPostTo === [allSectionsOption._id]}
+              />
             )}
             {shouldShowCheckpointsOptions && (
               <>
-                <View
-                  display="inline-block"
-                  padding="0 0 0 medium"
-                  data-testid="checkpoints-checkbox"
-                  data-action-state={isCheckpoints ? 'disableCheckpoints' : 'enableCheckpoints'}
-                >
+                <View display="inline-block" padding="0 0 0 medium">
                   <Checkbox
+                    data-testid="checkpoints-checkbox"
                     data-pendo="checkpoints-checkbox"
+                    data-action-state={isCheckpoints ? 'disableCheckpoints' : 'enableCheckpoints'}
                     label={I18n.t('Assign graded checkpoints')}
                     value="checkpoints"
                     inline={true}
@@ -1276,16 +1258,13 @@ function DiscussionTopicForm({
               </>
             )}
             {shouldShowSuppressAssignmentOption && (
-              <View
-                display="inline-block"
-                padding="0 0 0 medium"
-                data-testid="suppressed-assignment-checkbox"
-                data-action-state={
-                  suppressedAssignment ? 'suppressFromGradebook' : 'shownInGradebook'
-                }
-              >
+              <View display="inline-block" padding="0 0 0 medium">
                 <Checkbox
+                  data-testid="suppressed-assignment-checkbox"
                   data-pendo="suppressed-assignment-checkbox"
+                  data-action-state={
+                    suppressedAssignment ? 'suppressFromGradebook' : 'shownInGradebook'
+                  }
                   label={I18n.t('Hide from gradebook view and student grades view')}
                   value="suppress_from_gradebook"
                   inline={true}
@@ -1298,33 +1277,26 @@ function DiscussionTopicForm({
             )}
             {shouldShowLikingOption && (
               <>
-                <View
+                <Checkbox
                   data-testid="like-checkbox"
                   data-action-state={allowLiking ? 'disallowLiking' : 'allowLiking'}
-                  display="block"
-                >
-                  <Checkbox
-                    label={I18n.t('Allow liking')}
-                    value="allow-liking"
-                    inline={true}
-                    checked={allowLiking}
-                    onChange={() => {
-                      setOnlyGradersCanLike(!allowLiking && onlyGradersCanLike)
-                      setAllowLiking(!allowLiking)
-                    }}
-                  />
-                </View>
+                  label={I18n.t('Allow liking')}
+                  value="allow-liking"
+                  inline={true}
+                  checked={allowLiking}
+                  onChange={() => {
+                    setOnlyGradersCanLike(!allowLiking && onlyGradersCanLike)
+                    setAllowLiking(!allowLiking)
+                  }}
+                />
                 {allowLiking && (
-                  <View
-                    display="block"
-                    padding="small none none medium"
-                    data-testid="exclude-non-graders-checkbox"
-                    data-action-state={
-                      onlyGradersCanLike ? 'allowNonGradersLiking' : 'excludeNonGradersLiking'
-                    }
-                  >
+                  <View display="block" padding="small none none medium">
                     <FormFieldGroup description="" rowSpacing="small">
                       <Checkbox
+                        data-testid="exclude-non-graders-checkbox"
+                        data-action-state={
+                          onlyGradersCanLike ? 'allowNonGradersLiking' : 'excludeNonGradersLiking'
+                        }
                         label={I18n.t('Only graders can like')}
                         value="only-graders-can-like"
                         inline={true}
@@ -1338,22 +1310,18 @@ function DiscussionTopicForm({
             )}
             {shouldShowTodoSettings && (
               <>
-                <View
+                <Checkbox
                   data-testid="add-todo-checkbox"
                   data-action-state={addToTodo ? 'dontAddToTodo' : 'addToTodo'}
-                  display="inline-block"
-                >
-                  <Checkbox
-                    label={I18n.t('Add to student to-do')}
-                    value="add-to-student-to-do"
-                    inline={true}
-                    checked={addToTodo}
-                    onChange={() => {
-                      setTodoDate(!addToTodo ? todoDate : null)
-                      setAddToTodo(!addToTodo)
-                    }}
-                  />
-                </View>
+                  label={I18n.t('Add to student to-do')}
+                  value="add-to-student-to-do"
+                  inline={true}
+                  checked={addToTodo}
+                  onChange={() => {
+                    setTodoDate(!addToTodo ? todoDate : null)
+                    setAddToTodo(!addToTodo)
+                  }}
+                />
                 {addToTodo && (
                   <View
                     display="block"
@@ -1385,38 +1353,34 @@ function DiscussionTopicForm({
               </>
             )}
             {shouldShowGroupOptions && (
-              <View
+              <Checkbox
+                id="has_group_category"
                 data-testid="group-discussion-checkbox"
                 data-action-state={
                   isGroupDiscussion ? 'removeGroupDiscussion' : 'addGroupDiscussion'
                 }
-                display="inline-block"
-              >
-                <Checkbox
-                  id="has_group_category"
-                  label={I18n.t('This is a Group Discussion')}
-                  value="group-discussion"
-                  inline={true}
-                  checked={isGroupDiscussion}
-                  messages={groupDiscussionErrors}
-                  onChange={() => {
-                    if (hasGroupOverrides()) {
-                      setGroupDiscussionErrors([
-                        {
-                          type: 'error',
-                          text: I18n.t(
-                            'You must remove any groups from the Assign Access section to change this setting.',
-                          ),
-                        },
-                      ])
-                      return
-                    }
-                    setGroupCategoryId(!isGroupDiscussion ? '' : groupCategoryId)
-                    setIsGroupDiscussion(!isGroupDiscussion)
-                  }}
-                  disabled={!canGroupDiscussion || discussionAnonymousState !== 'off'}
-                />
-              </View>
+                label={I18n.t('This is a Group Discussion')}
+                value="group-discussion"
+                inline={true}
+                checked={isGroupDiscussion}
+                messages={groupDiscussionErrors}
+                onChange={() => {
+                  if (hasGroupOverrides()) {
+                    setGroupDiscussionErrors([
+                      {
+                        type: 'error',
+                        text: I18n.t(
+                          'You must remove any groups from the Assign Access section to change this setting.',
+                        ),
+                      },
+                    ])
+                    return
+                  }
+                  setGroupCategoryId(!isGroupDiscussion ? '' : groupCategoryId)
+                  setIsGroupDiscussion(!isGroupDiscussion)
+                }}
+                disabled={!canGroupDiscussion || discussionAnonymousState !== 'off'}
+              />
             )}
             {shouldShowGroupOptions && isGroupDiscussion && (
               <View display="block" padding="none none none medium">
