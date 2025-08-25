@@ -270,6 +270,40 @@ RSpec.describe YoutubeMigrationService do
       expect(convert_progress.results).to be_present
       expect(convert_progress.results[:error]).to eq("Studio LTI tool not found for account")
     end
+
+    it "successfully converts YouTube embed in announcement" do
+      announcement = course.announcements.create!(
+        title: "Test Announcement",
+        message: '<p>Before</p><iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" width="560" height="315"></iframe><p>After</p>'
+      )
+
+      announcement_embed = youtube_embed.merge(
+        id: announcement.id,
+        resource_type: "Announcement",
+        field: :message
+      )
+
+      scan_progress.results[:resources]["Announcement|#{announcement.id}"] = {
+        name: announcement.title,
+        embeds: [announcement_embed],
+        count: 1
+      }
+      scan_progress.results[:total_count] += 1
+      scan_progress.save!
+
+      described_class.perform_conversion(convert_progress, course.id, scan_progress.id, announcement_embed)
+
+      convert_progress.reload
+      expect(convert_progress.results).to be_present
+      expect(convert_progress.results[:success]).to be true
+
+      announcement.reload
+      expect(announcement.message).to include("lti-embed")
+      expect(announcement.message).to include("Test Video Title")
+      expect(announcement.message).not_to include("youtube.com")
+      expect(announcement.message).to include("Before")
+      expect(announcement.message).to include("After")
+    end
   end
 
   describe "#scan_course_for_embeds" do
@@ -387,6 +421,45 @@ RSpec.describe YoutubeMigrationService do
       expect(embeds_srcs).to include(
         "https://www.youtube.com/embed/topic123",
         "https://www.youtube.com/embed/entry456"
+      )
+    end
+
+    it "finds YouTube embeds in announcements" do
+      announcement = course.announcements.create!(
+        title: "Important Announcement",
+        message: '<p>Check out this video:</p><iframe src="https://www.youtube.com/embed/announcement123" width="560" height="315"></iframe><p>End of message</p>'
+      )
+
+      resources = service.scan_course_for_embeds
+
+      announcement_key = "Announcement|#{announcement.id}"
+      expect(resources[announcement_key]).to be_present
+      expect(resources[announcement_key][:name]).to eq("Important Announcement")
+      expect(resources[announcement_key][:count]).to eq(1)
+      expect(resources[announcement_key][:embeds].first[:src]).to include("announcement123")
+      expect(resources[announcement_key][:embeds].first[:resource_type]).to eq("Announcement")
+      expect(resources[announcement_key][:embeds].first[:field]).to eq(:message)
+    end
+
+    it "finds YouTube embeds in announcements with discussion entries" do
+      announcement = course.announcements.create!(
+        title: "Announcement with Video",
+        message: '<iframe src="https://www.youtube.com/embed/main_video" width="560" height="315"></iframe>'
+      )
+      announcement.discussion_entries.create!(
+        message: '<iframe src="https://www.youtube.com/embed/reply_video" width="560" height="315"></iframe>',
+        user: @teacher
+      )
+
+      resources = service.scan_course_for_embeds
+
+      announcement_key = "Announcement|#{announcement.id}"
+      expect(resources[announcement_key]).to be_present
+      expect(resources[announcement_key][:count]).to eq(2) # 1 from announcement, 1 from entry
+      embeds_srcs = resources[announcement_key][:embeds].map { |e| e[:src] }
+      expect(embeds_srcs).to include(
+        "https://www.youtube.com/embed/main_video",
+        "https://www.youtube.com/embed/reply_video"
       )
     end
 
@@ -615,6 +688,33 @@ RSpec.describe YoutubeMigrationService do
         discussion_topic.reload
         expect(discussion_topic.message).to include("lti-embed")
         expect(discussion_topic.message).not_to include("youtube.com")
+      end
+    end
+
+    context "with Announcement" do
+      let(:announcement) { course.announcements.create!(title: "Test Announcement", message: original_html) }
+      let(:embed) { youtube_embed.merge(id: announcement.id, resource_type: "Announcement", field: :message) }
+
+      it "updates the announcement message" do
+        service.update_resource_content(embed, new_html)
+
+        announcement.reload
+        expect(announcement.message).to include("lti-embed")
+        expect(announcement.message).not_to include("youtube.com")
+        expect(announcement.message).to include("Before")
+        expect(announcement.message).to include("After")
+      end
+
+      it "preserves the announcement title and other properties" do
+        original_title = announcement.title
+        original_workflow_state = announcement.workflow_state
+
+        service.update_resource_content(embed, new_html)
+
+        announcement.reload
+        expect(announcement.title).to eq(original_title)
+        expect(announcement.workflow_state).to eq(original_workflow_state)
+        expect(announcement.type).to eq("Announcement")
       end
     end
 
