@@ -1325,4 +1325,213 @@ describe RubricsController do
       expect(response).to be_bad_request
     end
   end
+
+  describe "POST 'llm_regenerate_criteria'" do
+    before do
+      course_with_teacher_logged_in(active_all: true)
+      @assignment = @course.assignments.create!(assignment_valid_attributes)
+
+      @course.enable_feature!(:enhanced_rubrics)
+      @course.enable_feature!(:ai_rubrics)
+
+      @inst_llm = double("InstLLM::Client")
+      allow(InstLLMHelper).to receive(:client).and_return(@inst_llm)
+
+      # Set up existing criteria structure
+      @existing_criteria = {
+        "0" => {
+          id: "1",
+          description: "Original Criterion 1",
+          long_description: "Original long description 1",
+          points: 10,
+          criterion_use_range: false,
+          ratings: [
+            { id: "1", criterion_id: "1", description: "Excellent", long_description: "Excellent work", points: 10 },
+            { id: "2", criterion_id: "1", description: "Good", long_description: "Good work", points: 7 },
+            { id: "3", criterion_id: "1", description: "Poor", long_description: "Poor work", points: 4 }
+          ]
+        },
+        "1" => {
+          id: "2",
+          description: "Original Criterion 2",
+          long_description: "Original long description 2",
+          points: 10,
+          criterion_use_range: true,
+          ratings: [
+            { id: "4", criterion_id: "2", description: "Excellent", long_description: "Excellent work", points: 10 },
+            { id: "5", criterion_id: "2", description: "Good", long_description: "Good work", points: 7 },
+            { id: "6", criterion_id: "2", description: "Poor", long_description: "Poor work", points: 4 }
+          ]
+        }
+      }
+    end
+
+    it "queues job for regeneration of criteria via LLM when features are enabled" do
+      llm_response = {
+        criteria: [
+          {
+            name: "Enhanced Critical Analysis",
+            description: "Demonstrates thorough understanding and enhanced analysis",
+            ratings: [
+              { title: "Excellent", description: "Thoroughly demonstrated enhanced understanding" },
+              { title: "Good", description: "Partially demonstrated enhanced understanding" },
+              { title: "Needs Improvement", description: "Failed to demonstrate enhanced understanding" }
+            ]
+          },
+          {
+            name: "Original Criterion 2",
+            description: "Original long description 2",
+            ratings: [
+              { title: "Excellent", description: "Excellent work" },
+              { title: "Good", description: "Good work" },
+              { title: "Poor", description: "Poor work" }
+            ]
+          }
+        ]
+      }
+
+      expect(@inst_llm).to receive(:chat).and_return(
+        InstLLM::Response::ChatResponse.new(
+          model: "model",
+          message: { role: :assistant, content: llm_response.to_json },
+          stop_reason: "stop_reason",
+          usage: {
+            input_tokens: 15,
+            output_tokens: 25,
+          }
+        )
+      )
+
+      post "llm_regenerate_criteria",
+           params: {
+             course_id: @course.id,
+             rubric_association: { association_type: "Assignment", association_id: @assignment.id },
+             criteria: @existing_criteria,
+             criterion_id: "1",
+             additional_user_prompt: "Make this more comprehensive",
+             regenerate_options: { criterion_id: "1", additional_user_prompt: "Make this more comprehensive", standard: "high" },
+             generate_options: { criteria_count: 2, rating_count: 3, points_per_criterion: 10, use_range: true, grade_level: "college" }
+           },
+           format: :json
+
+      expect(response).to be_successful
+      json = response.parsed_body
+      expect(json).to be_present
+      expect(json["workflow_state"]).to eq "queued"
+
+      run_jobs
+
+      progress = Progress.find(json["id"])
+      expect(progress.results).to be_present
+      expect(progress.results[:criteria].length).to eq 2
+    end
+
+    it "returns error when features are disabled" do
+      @course.disable_feature!(:enhanced_rubrics)
+      @course.disable_feature!(:ai_rubrics)
+
+      post "llm_regenerate_criteria",
+           params: {
+             course_id: @course.id,
+             rubric_association: { association_type: "Assignment", association_id: @assignment.id },
+             criteria: @existing_criteria,
+             criterion_id: "1",
+             regenerate_options: { criterion_id: "1" },
+             generate_options: { criteria_count: 2, rating_count: 3, points_per_criterion: 5 }
+           },
+           format: :json
+
+      expect(response).to be_forbidden
+    end
+
+    it "returns error when user lacks permissions" do
+      course_with_student_logged_in(active_all: true, course: @course)
+
+      post "llm_regenerate_criteria",
+           params: {
+             course_id: @course.id,
+             rubric_association: { association_type: "Assignment", association_id: @assignment.id },
+             criteria: @existing_criteria,
+             criterion_id: "1",
+             regenerate_options: { criterion_id: "1" },
+             generate_options: { criteria_count: 2, rating_count: 3, points_per_criterion: 5 }
+           },
+           format: :json
+
+      expect(response).to be_forbidden
+    end
+
+    it "returns error when additional_user_prompt is too long" do
+      long_prompt = "a" * 1001
+
+      post "llm_regenerate_criteria",
+           params: {
+             course_id: @course.id,
+             rubric_association: { association_type: "Assignment", association_id: @assignment.id },
+             criteria: @existing_criteria,
+             criterion_id: "1",
+             additional_user_prompt: long_prompt,
+             regenerate_options: { criterion_id: "1", additional_user_prompt: long_prompt },
+             generate_options: {}
+           },
+           format: :json
+
+      expect(response).to be_bad_request
+      json = response.parsed_body
+      expect(json["error"]).to eq "additional_user_prompt must be less than 1000 characters"
+    end
+
+    it "returns error when criteria_count is out of bounds in generate_options" do
+      post "llm_regenerate_criteria",
+           params: {
+             course_id: @course.id,
+             rubric_association: { association_type: "Assignment", association_id: @assignment.id },
+             criteria: @existing_criteria,
+             criterion_id: "1",
+             regenerate_options: { criterion_id: "1" },
+             generate_options: { criteria_count: 1, rating_count: 3, points_per_criterion: 5 }
+           },
+           format: :json
+
+      expect(response).to be_bad_request
+      json = response.parsed_body
+      expect(json["error"]).to eq "criteria_count must be between 2 and 8 inclusive"
+    end
+
+    it "returns error when rating_count is out of bounds in generate_options" do
+      post "llm_regenerate_criteria",
+           params: {
+             course_id: @course.id,
+             rubric_association: { association_type: "Assignment", association_id: @assignment.id },
+             criteria: @existing_criteria,
+             criterion_id: "1",
+             regenerate_options: { criterion_id: "1" },
+             generate_options: { criteria_count: 3, rating_count: 9, points_per_criterion: 5 }
+           },
+           format: :json
+
+      expect(response).to be_bad_request
+      json = response.parsed_body
+      expect(json["error"]).to eq "rating_count must be between 2 and 8 inclusive"
+    end
+
+    it "returns error when additional_prompt_info is too long in generate_options" do
+      long_info = "b" * 1001
+
+      post "llm_regenerate_criteria",
+           params: {
+             course_id: @course.id,
+             rubric_association: { association_type: "Assignment", association_id: @assignment.id },
+             criteria: @existing_criteria,
+             criterion_id: "1",
+             regenerate_options: { criterion_id: "1" },
+             generate_options: { criteria_count: 3, rating_count: 3, additional_prompt_info: long_info }
+           },
+           format: :json
+
+      expect(response).to be_bad_request
+      json = response.parsed_body
+      expect(json["error"]).to eq "additional_prompt_info must be less than 1000 characters"
+    end
+  end
 end

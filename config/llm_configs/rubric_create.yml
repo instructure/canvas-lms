@@ -29,19 +29,33 @@ template: |
   <CONTENT_PLACEHOLDER>
   </assignment_description>
 
+  <state_standard>
+  <STANDARD_PLACEHOLDER>
+  </state_standard>
+
   Please follow these steps to create a rubric:
 
-  1. Analyze the assignment description. Identify the main objectives of the assignment, note specific requirements or criteria mentioned, and determine key skills or knowledge areas being assessed. <ADDITIONAL_PROMPT_INFO_PLACEHOLDER>
+  1. Analyze the assignment description and state standard (if provided). 
+     - Identify the main objectives of the assignment and note specific requirements or criteria mentioned
+     - Determine key skills or knowledge areas being assessed
+     - If a state standard is provided, identify the core competencies and expectations from the standard that are relevant to this specific assignment
+     - Consider how the standard applies in the context of the specific assignment rather than as generic requirements
+     <ADDITIONAL_PROMPT_INFO_PLACEHOLDER>
 
   2. Create rubric criteria:
-  - Brainstorm potential criteria based on your analysis, then select the best <CRITERIA_COUNT_PLACEHOLDER> criteria that encompass the essential elements of the assignment.
-  - Ensure these criteria align with the assignment's objectives and requirements.
-  - Make sure criteria are clear, concise, and mutually exclusive.
+  - Brainstorm potential criteria based on your analysis of both the assignment and state standard (if provided)
+  - If a state standard is provided, incorporate key expectations from the standard into one or more relevant criteria that align with the assignment context
+  - Ensure the rubric reflects both core competencies from the standard AND assignment-specific elements
+  - Do not limit all rubric criteria to the standard alone - the rubric should comprehensively evaluate the assignment
+  - Select the best <CRITERIA_COUNT_PLACEHOLDER> criteria that encompass the essential elements of the assignment while incorporating relevant standard expectations
+  - Ensure these criteria align with the assignment's objectives and requirements
+  - Make sure criteria are clear, concise, and mutually exclusive
 
   3. Develop the rating scale for each criterion:
-  - For each criterion, create ratings for <RATING_COUNT_PLACEHOLDER> performance levels.
-  - Describe what constitutes each level of performance in clear, specific, and succinct terms.
-  - Ensure that each rating is measurable and observable.
+  - For each criterion, create ratings for <RATING_COUNT_PLACEHOLDER> performance levels
+  - When incorporating state standard expectations, ensure the performance levels reflect appropriate progression toward meeting the standard within the assignment context
+  - Describe what constitutes each level of performance in clear, specific, and succinct terms
+  - Ensure that each rating is measurable and observable
 
   4. Format the final rubric:
   Present the final rubric in a JSON structure. Here's an example of how the structure should look (do not use this content, it's just to illustrate the format):
@@ -73,8 +87,8 @@ template: |
     ]
   }
 
-  Ensure that your rubric is comprehensive, covering all major aspects of the assignment, and that it provides clear guidance for evaluating student work at different performance levels. The JSON structure should be consistent and properly formatted for easy parsing.
+  Ensure that your rubric is comprehensive, covering all major aspects of the assignment, and that it provides clear guidance for evaluating student work at different performance levels. If a state standard was provided, ensure that relevant standard expectations are thoughtfully integrated into appropriate criteria while maintaining focus on the specific assignment requirements. The JSON structure should be consistent and properly formatted for easy parsing.
 
-  Now, please create the rubric based on the assignment description provided earlier, in the same language as the assignment description, with <CRITERIA_COUNT_PLACEHOLDER> criteria each containing <RATING_COUNT_PLACEHOLDER> ratings. Your final output should only include the JSON structure with no extra explanation.
+  Now, please create the rubric based on the assignment description and state standard (if provided) above, in the same language as the assignment description, with <CRITERIA_COUNT_PLACEHOLDER> criteria each containing <RATING_COUNT_PLACEHOLDER> ratings. Your final output should only include the JSON structure with no extra explanation.
 options:
   max_tokens: 5000

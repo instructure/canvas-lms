@@ -448,6 +448,7 @@ CanvasRails::Application.routes.draw do
     resources :gradebook_uploads
     resources :rubrics
     post "rubrics/llm_criteria", controller: :rubrics, action: :llm_criteria
+    post "rubrics/llm_regenerate_criteria", controller: :rubrics, action: :llm_regenerate_criteria
     resources :rubric_associations do
       post "remind/:assessment_request_id" => "rubric_assessments#remind", :as => :remind_assessee
       resources :rubric_assessments, path: "assessments"
