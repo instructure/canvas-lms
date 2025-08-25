@@ -472,7 +472,7 @@ class Submission < ActiveRecord::Base
   before_save :clear_body_word_count, if: -> { body.nil? }
   before_save :set_lti_id
   after_save :update_body_word_count_later, if: -> { saved_change_to_body? && get_word_count_from_body? }
-  after_save :extract_text_later
+  after_save :extract_text_later, if: -> { need_to_extract_text? }
   after_save :touch_user
   after_save :clear_user_submissions_cache
   after_save :touch_graders
@@ -3584,6 +3584,21 @@ class Submission < ActiveRecord::Base
                              tags: { quiz_type: (submission_type == "online_quiz") ? "classic_quiz" : "new_quiz" })
   end
 
+  # we should only extract text when the content associated with the submission has changed, and is present.
+  def need_to_extract_text?
+    # the submission body or the attached files get updated in the same update that changes the attempt number
+    return false unless saved_change_to_attempt?
+
+    if extract_text_from_upload?
+      # the attachment_ids change when something new gets uploaded
+      # and we don't want to create a SubmissionText record when there's no attachment
+      saved_change_to_attachment_ids? && attachment_ids.present?
+    else
+      # we don't want to create a SubmissionText record when there's no attachment nor body
+      saved_change_to_body? && body.present?
+    end
+  end
+
   def extract_text_later
     return unless course&.feature_enabled?(:project_lhotse)
 
@@ -3595,8 +3610,10 @@ class Submission < ActiveRecord::Base
 
   def extract_text
     if extract_text_from_upload?
-      upsert_rows = attachments.map do |attachment|
+      upsert_rows = attachments.filter_map do |attachment|
         result = FileTextExtractionService.new(attachment:).call
+
+        next unless result && result.text.present?
 
         build_upsert_row(
           text: result.text,
@@ -3606,7 +3623,7 @@ class Submission < ActiveRecord::Base
       end
 
       SubmissionText.upsert_all(upsert_rows, unique_by: :index_on_sub_attempt_attach) if upsert_rows.any?
-    else
+    elsif body.present?
       upsert_rows = [
         build_upsert_row(
           text: body,
