@@ -5653,6 +5653,11 @@ describe Assignment do
       end
 
       context "touch_assignment_and_submittables" do
+        it "does touch assignment" do
+          expect(@assignment).to receive(:touch).once
+          @assignment.touch_assignment_and_submittable
+        end
+
         it "does not schedule 'do_auto_peer_review' job" do
           expects_job_with_tag("Assignment#do_auto_peer_review", 0) do
             @assignment.touch_assignment_and_submittable
@@ -9581,6 +9586,26 @@ describe Assignment do
       let(:secure_params) { "notajwt" }
 
       it { is_expected.to be_nil }
+    end
+  end
+
+  describe "#touch_assignment_and_submittable" do
+    it "does touch assignment" do
+      assignment = @course.assignments.create!(points_possible: 10, unlock_at: 30.minutes.from_now)
+      expect(assignment).to receive(:touch).once
+      assignment.touch_assignment_and_submittable
+    end
+  end
+
+  describe "#touch_on_unlock_if_necessary" do
+    it "schedules touch on unlock assignment delayed job" do
+      unlock_at_date = 30.minutes.from_now
+      assignment = @course.assignments.create!(points_possible: 10, unlock_at: unlock_at_date)
+      singleton = "touch_on_unlock_assignment_#{assignment.global_id}_#{unlock_at_date}"
+      assignment.touch_on_unlock_if_necessary
+
+      job = Delayed::Job.where(tag: "Assignment#touch_assignment_and_submittable", singleton:).last
+      expect(job.run_at).to eq unlock_at_date
     end
   end
 
