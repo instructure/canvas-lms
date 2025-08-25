@@ -685,7 +685,6 @@ class LearningOutcome < ActiveRecord::Base
   end
 
   # set color defaults for ratings in an outcome
-  # rubocop:disable Lint/DuplicateBranch
   def find_or_set_default_mastery_colors(ratings, mastery_index)
     length = ratings.length
     # apply appropriate defaults for each length if
@@ -724,7 +723,6 @@ class LearningOutcome < ActiveRecord::Base
       ratings[5][:color] ||= "555555"
     end
   end
-  # rubocop:enable Lint/DuplicateBranch
 
   def set_mastery_level(ratings, mastery_index)
     ratings.each_with_index do |rating, i|

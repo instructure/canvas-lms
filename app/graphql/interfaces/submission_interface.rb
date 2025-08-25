@@ -288,7 +288,7 @@ module Interfaces::SubmissionInterface
   field :submitted_at, Types::DateTimeType, null: true
 
   field :has_postable_comments, Boolean, null: false
-  def has_postable_comments # rubocop:disable Naming/PredicateName
+  def has_postable_comments
     Loaders::HasPostableCommentsLoader.load(submission.id)
   end
 

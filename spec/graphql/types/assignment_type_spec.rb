@@ -1386,7 +1386,7 @@ describe Types::AssignmentType do
     end
 
     def format_timestamps(timestamp)
-      timestamp.map { |t| t&.strftime("%Y-%m-%dT%H:%M:%SZ") } # rubocop:disable Specs/NoStrftime
+      timestamp.map { |t| t&.strftime("%Y-%m-%dT%H:%M:%SZ") }
     end
 
     def sorted_results(field, sort_by, direction = "ascending")
