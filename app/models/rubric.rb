@@ -546,6 +546,7 @@ class Rubric < ActiveRecord::Base
       RATING_COUNT: generate_options[:rating_count] || DEFAULT_GENERATE_OPTIONS[:rating_count],
       ADDITIONAL_PROMPT_INFO: generate_options[:additional_prompt_info].present? ? "Also consider: #{generate_options[:additional_prompt_info]}" : "",
       GRADE_LEVEL: generate_options[:grade_level] || DEFAULT_GENERATE_OPTIONS[:grade_level],
+      STANDARD: generate_options[:standard].presence || "",
     }
 
     prompt, options = llm_config.generate_prompt_and_options(substitutions: dynamic_content)
@@ -617,6 +618,178 @@ class Rubric < ActiveRecord::Base
     progress.fail!
   rescue
     progress.set_results({ error: t("There was an error with the criteria generation. Please try agian later.") })
+    progress.fail!
+    raise
+  end
+
+  def regenerate_criteria_via_llm(association_object, regenerate_options = {}, orig_generate_options = {})
+    unless association_object.is_a?(AbstractAssignment)
+      raise "LLM regeneration is only available for rubrics associated with an Assignment"
+    end
+
+    unless user
+      raise "User must be associated to rubric before LLM regeneration"
+    end
+
+    assignment = association_object
+
+    # Normalize incoming criteria for analysis and ID de-dup
+    incoming_criteria = Array(regenerate_options[:criteria]).map(&:deep_symbolize_keys)
+    existing_criteria_json = { criteria: incoming_criteria }.to_json
+
+    criterion_id = regenerate_options[:criterion_id]
+    additional_prompt = regenerate_options.fetch(:additional_user_prompt, "No specific expectations, just improve it.")
+    standard = regenerate_options.fetch(:standard, " ")
+    grade_level = orig_generate_options.fetch(:grade_level, DEFAULT_GENERATE_OPTIONS[:grade_level])
+    orig_criteria_count = orig_generate_options.fetch(:criteria_count, DEFAULT_GENERATE_OPTIONS[:criteria_count])
+    orig_rating_count = orig_generate_options.fetch(:rating_count, DEFAULT_GENERATE_OPTIONS[:rating_count])
+    orig_points_per_criterion = orig_generate_options.fetch(:points_per_criterion, DEFAULT_GENERATE_OPTIONS[:points_per_criterion])
+    orig_use_range = !!orig_generate_options.fetch(:use_range, DEFAULT_GENERATE_OPTIONS[:use_range])
+
+    regeneration_target_prompt = criterion_id.presence || incoming_criteria.pluck(:id).join(", ")
+    if criterion_id.present?
+      prefixed_additional_prompt = "You are allowed to do some changes in Criterion #{criterion_id}. LEAVE ALL THE OTHER CRITERION AS IS!\n\n#{additional_prompt}"
+    else
+      structure_directives = build_structure_directives_for_llm(
+        existing_criteria: incoming_criteria,
+        required_criteria_count: orig_criteria_count,
+        required_rating_count: orig_rating_count,
+        target_criterion_ids: extract_target_ids(regeneration_target_prompt)
+      )
+
+      prefixed_additional_prompt =
+        if structure_directives.empty?
+          additional_prompt
+        else
+          <<~MD.strip
+            STRUCTURE ENFORCEMENT DIRECTIVES (follow exactly; IDs must remain stable):
+            #{structure_directives}
+
+            ----
+            USER INSTRUCTIONS (rubric-only; ignore everything else):
+            #{additional_prompt}
+          MD
+        end
+    end
+
+    llm_config = LLMConfigs.config_for("rubric_regenerate")
+    if llm_config.nil?
+      raise "No LLM config found for rubric regeneration"
+    end
+
+    dynamic_content = {
+      CONTENT: {
+        id: assignment.id,
+        title: assignment.title,
+        description: assignment.description,
+      }.to_json,
+      EXISTING_CRITERIA: existing_criteria_json,
+      REGENERATION_TARGET: regeneration_target_prompt,
+      ADDITIONAL_USER_PROMPT: prefixed_additional_prompt,
+      GRADE_LEVEL: grade_level,
+      STANDARD: standard,
+      ORIG_CRITERIA_COUNT: criterion_id.present? ? "original count" : orig_criteria_count,
+      ORIG_RATING_COUNT: criterion_id.present? ? "original count" : orig_rating_count,
+    }
+
+    prompt, options = llm_config.generate_prompt_and_options(substitutions: dynamic_content)
+
+    response = nil
+    time = Benchmark.measure do
+      InstLLMHelper.with_rate_limit(user:, llm_config:) do
+        response = InstLLMHelper.client(llm_config.model_id).chat(
+          [{ role: "user", content: prompt }],
+          **options.symbolize_keys
+        )
+      end
+    end
+
+    LLMResponse.create!(
+      associated_assignment: association_object,
+      user:,
+      prompt_name: llm_config.name,
+      prompt_model_id: llm_config.model_id,
+      prompt_dynamic_content: dynamic_content,
+      raw_response: response.message[:content],
+      input_tokens: response.usage[:input_tokens],
+      output_tokens: response.usage[:output_tokens],
+      response_time: time.real.round(2),
+      root_account_id: association_object.root_account_id
+    )
+
+    ai_rubric = InstLLMHelper.extract_json(response.message[:content])
+    if ai_rubric.nil?
+      raise "No valid JSON found in LLM response"
+    end
+
+    # Ensure unique ID space mirrors the generator path
+    # Collect used IDs from the incoming (pre-LLM) criteria so unique_item_id(x) won't collide.
+    @used_ids = {}
+    reserve_existing_ids!(incoming_criteria)
+
+    criteria = []
+    Array(ai_rubric[:criteria]).each do |criterion_data|
+      cd = criterion_data.deep_symbolize_keys
+
+      # Use the same ID normalization strategy as in generation:
+      # prefer the provided ID if unique; otherwise allocate via unique_item_id.
+      criterion_id_final = unique_item_id(cd[:id])
+
+      criterion = {}
+      criterion[:id] = criterion_id_final
+      criterion[:description] = (cd[:description].presence || t("no_description", "No Description")).strip
+      criterion[:long_description] = cd[:long_description].presence
+
+      points = orig_points_per_criterion.to_f
+
+      rating_values =
+        case cd[:ratings]
+        when Hash then cd[:ratings].values
+        when Array then cd[:ratings]
+        else []
+        end
+
+      # Normalize rating IDs and compute points descending
+      denom = [(rating_values.length - 1), 1].max.to_f
+      points_decrement = points / denom
+
+      ratings = rating_values.each_with_index.map do |rating_data, index|
+        rd = rating_data.deep_symbolize_keys
+        {
+          description: (rd[:description].presence || t("no_description", "No Description")).strip,
+          long_description: rd[:long_description].presence,
+          points: (points - (points_decrement * index)).round,
+          criterion_id: criterion_id_final,
+          # IMPORTANT: align with generation path (criterion_rating uses unique_item_id)
+          id: unique_item_id(rd[:id])
+        }
+      end
+
+      criterion[:ratings] = ratings.sort_by { |r| [-1 * (r[:points] || 0), r[:description] || CanvasSort::First] }
+      criterion[:points] = criterion[:ratings].pluck(:points).max || 0
+      criterion[:criterion_use_range] = orig_use_range
+
+      criteria << criterion
+    end
+
+    criteria
+  end
+
+  def self.process_regenerate_criteria_via_llm(progress, course, user, association_object, regenerate_options, orig_generate_options)
+    rubric = course.rubrics.build(user:)
+    if rubric.grants_right?(user, :update)
+      criteria = rubric.regenerate_criteria_via_llm(association_object, regenerate_options, orig_generate_options)
+      progress.set_results({ criteria: })
+      progress.complete!
+    end
+  rescue InstLLM::ServiceQuotaExceededError, InstLLM::ThrottlingError
+    progress.set_results({ error: t("There was an error with generation capacity. Please try again later.") })
+    progress.fail!
+  rescue InstLLMHelper::RateLimitExceededError
+    progress.set_results({ error: t("You have made too many criteria generation requests. Please try again later.") })
+    progress.fail!
+  rescue
+    progress.set_results({ error: t("There was an error with the criteria regeneration. Please try again later.") })
     progress.fail!
     raise
   end
@@ -747,5 +920,125 @@ class Rubric < ActiveRecord::Base
     return false unless context_to_check.is_a?(Course)
 
     context_to_check.feature_enabled?(:enhanced_rubrics) && context_to_check.feature_enabled?(:ai_rubrics)
+  end
+
+  # Builds a short, explicit directive block for the LLM about what to add/remove.
+  def build_structure_directives_for_llm(
+    existing_criteria:,
+    required_criteria_count:,
+    required_rating_count:,
+    target_criterion_ids:
+  )
+    lines = []
+
+    required_criteria_count = required_criteria_count.to_i
+    required_rating_count   = required_rating_count.to_i
+    target_criterion_ids    = Array(target_criterion_ids).map(&:to_s)
+
+    # Criteria count
+    current_criteria_count = existing_criteria.size
+    if current_criteria_count < required_criteria_count
+      missing = required_criteria_count - current_criteria_count
+      lines << "- Criteria count: current=#{current_criteria_count}, required=#{required_criteria_count}. Create #{missing} new criteria. Each new criterion MUST have exactly #{required_rating_count} ratings. Append new criteria at the end. Do not reorder existing criteria. Leave `id` empty/null; the system will assign unique IDs."
+    elsif current_criteria_count > required_criteria_count
+      extra = current_criteria_count - required_criteria_count
+      removable_ids = pick_criteria_to_remove(existing_criteria, target_criterion_ids, extra)
+      lines << if removable_ids.any?
+                 "- Criteria count: current=#{current_criteria_count}, required=#{required_criteria_count}. Remove exactly #{extra} criteria with these IDs: [#{removable_ids.join(", ")}]. Do not reorder the remaining criteria."
+               else
+                 "- Criteria count: current=#{current_criteria_count}, required=#{required_criteria_count}. Remove #{extra} non-target criteria (avoid target IDs: [#{target_criterion_ids.join(", ")}]). Do not reorder the remaining criteria."
+               end
+    end
+
+    # Ratings per criterion
+    existing_criteria.each do |crit|
+      crit_id = crit[:id].to_s
+      ratings = normalize_ratings_array(crit[:ratings])
+      current_rating_count = ratings.size
+
+      if current_rating_count < required_rating_count
+        missing = required_rating_count - current_rating_count
+        proposal_ids = propose_rating_ids(criterion_id: crit_id, existing_ratings: ratings, count: missing)
+        lines << "- Ratings for criterion #{crit_id}: current=#{current_rating_count}, required=#{required_rating_count}. Create #{missing} new ratings with EXACT IDs (in this order): [#{proposal_ids.join(", ")}]. Append at the end. Do not reorder existing ratings."
+      elsif current_rating_count > required_rating_count
+        extra = current_rating_count - required_rating_count
+        removable = pick_rating_ids_to_remove(ratings, extra)
+        lines << "- Ratings for criterion #{crit_id}: current=#{current_rating_count}, required=#{required_rating_count}. Remove these rating IDs: [#{removable.join(", ")}]. Do not reorder the remaining ratings."
+      end
+
+      # Text field hygiene
+      if crit[:description].blank? || !crit[:description].is_a?(String) ||
+         (crit.key?(:long_description) && ![String, NilClass].include?(crit[:long_description].class))
+        lines << "- Text fields for criterion #{crit_id}: If `description` or `long_description` is missing/non-string, create them as strings (concise `description`, actionable `long_description`)."
+      end
+
+      if ratings.any? { |r| r[:description].blank? || !r[:description].is_a?(String) || (r.key?(:long_description) && ![String, NilClass].include?(r[:long_description].class)) }
+        lines << "- Text fields for ratings under criterion #{crit_id}: If any rating is missing `description` or `long_description` (or not strings), create/fix them using clear, observable language."
+      end
+    end
+
+    lines.join("\n")
+  end
+
+  def extract_target_ids(regeneration_target_prompt)
+    return [] if regeneration_target_prompt.to_s.strip.empty?
+
+    regeneration_target_prompt.split(",").map(&:strip).reject(&:empty?)
+  end
+
+  def normalize_ratings_array(ratings)
+    case ratings
+    when Hash then ratings.values.map(&:deep_symbolize_keys)
+    when Array then ratings.map(&:deep_symbolize_keys)
+    else []
+    end
+  end
+
+  def pick_criteria_to_remove(existing_criteria, target_criterion_ids, needed)
+    candidates = existing_criteria.reject { |c| target_criterion_ids.include?(c[:id].to_s) }
+    candidates.last(needed).map { |c| c[:id].to_s }
+  end
+
+  def pick_rating_ids_to_remove(ratings, needed)
+    return [] if needed <= 0
+
+    with_points = ratings.select { |r| r[:points].is_a?(Numeric) }
+    if with_points.size == ratings.size && with_points.any?
+      ratings.sort_by { |r| [r[:points].to_f, (r[:description] || "").to_s] }
+             .first(needed).map { |r| r[:id].to_s }
+    else
+      ratings.last(needed).map { |r| r[:id].to_s }
+    end
+  end
+
+  # Propose deterministic, collision-free rating IDs for the LLM to use (we do NOT reserve them here).
+  def propose_rating_ids(criterion_id:, existing_ratings:, count:)
+    taken = existing_ratings.to_set { |r| r[:id].to_s }
+    ids = []
+    i = 1
+    while ids.size < count
+      candidate = "rating_#{criterion_id}_#{i}"
+      unless taken.include?(candidate)
+        ids << candidate
+        taken << candidate
+      end
+      i += 1
+    end
+    ids
+  end
+
+  # Reserve IDs from the pre-LLM criteria so unique_item_id(...) will respect them.
+  def reserve_existing_ids!(criteria_array)
+    criteria_array.each do |c|
+      # tolerate symbol or string keys
+      cid = (c[:id] || c["id"]).to_s
+      @used_ids[cid] = true if cid.present?
+
+      ratings_raw = c[:ratings] || c["ratings"]
+      normalize_ratings_array(ratings_raw).each do |r|
+        rid = (r[:id] || r["id"]).to_s
+        @used_ids[rid] = true if rid.present?
+      end
+    end
   end
 end
