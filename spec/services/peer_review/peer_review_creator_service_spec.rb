@@ -148,6 +148,41 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
         expect(recompute_call_count).to be > 0
       end
 
+      it "links existing assessment requests to the newly created peer review sub assignment" do
+        student1 = user_model
+        student2 = user_model
+        student3 = user_model
+        create_enrollment(course, student1, enrollment_state: "active")
+        create_enrollment(course, student2, enrollment_state: "active")
+        create_enrollment(course, student3, enrollment_state: "active")
+        submission1 = submission_model(assignment: parent_assignment, user: student1)
+        submission2 = submission_model(assignment: parent_assignment, user: student2)
+        submission3 = submission_model(assignment: parent_assignment, user: student3)
+
+        assessment_request1 = AssessmentRequest.create!(
+          user: student1,
+          asset: submission1,
+          assessor_asset: submission2,
+          assessor: student2
+        )
+        assessment_request2 = AssessmentRequest.create!(
+          user: student2,
+          asset: submission2,
+          assessor_asset: submission3,
+          assessor: student3
+        )
+
+        expect(assessment_request1.peer_review_sub_assignment_id).to be_nil
+        expect(assessment_request2.peer_review_sub_assignment_id).to be_nil
+
+        result = service.call
+
+        assessment_request1.reload
+        assessment_request2.reload
+        expect(assessment_request1.peer_review_sub_assignment_id).to eq(result.id)
+        expect(assessment_request2.peer_review_sub_assignment_id).to eq(result.id)
+      end
+
       it "uses custom dates when provided" do
         custom_due_at = 3.days.from_now
         custom_unlock_at = 2.days.from_now
@@ -208,7 +243,7 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
       end
 
       it "raises error when peer review sub assignment already exists" do
-        PeerReviewSubAssignment.create!(parent_assignment:, context: course)
+        PeerReviewSubAssignment.create!(parent_assignment:)
         expect { service.call }.to raise_error(
           PeerReview::PeerReviewSubAssignmentExistsError,
           "Peer review sub assignment exists"
@@ -303,6 +338,41 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
       )
 
       service.send(:compute_due_dates_and_create_submissions, peer_review_sub_assignment)
+    end
+  end
+
+  describe "#link_existing_assessment_requests" do
+    let(:peer_review_sub_assignment) do
+      # Create the sub assignment without triggering the full service
+      service.send(:run_validations)
+      service.send(:create_peer_review_sub_assignment)
+    end
+
+    it "links existing assessment requests for the parent assignment to the peer review sub assignment" do
+      student1 = user_model
+      student2 = user_model
+      create_enrollment(course, student1, enrollment_state: "active")
+      create_enrollment(course, student2, enrollment_state: "active")
+      submission1 = submission_model(assignment: parent_assignment, user: student1)
+      submission2 = submission_model(assignment: parent_assignment, user: student2)
+
+      assessment_request = AssessmentRequest.create!(
+        user: student1,
+        asset: submission1,
+        assessor_asset: submission2,
+        assessor: student2
+      )
+
+      expect(assessment_request.peer_review_sub_assignment_id).to be_nil
+
+      service.send(:link_existing_assessment_requests, peer_review_sub_assignment)
+
+      assessment_request.reload
+      expect(assessment_request.peer_review_sub_assignment_id).to eq(peer_review_sub_assignment.id)
+    end
+
+    it "handles the case when there are no existing assessment requests" do
+      expect { service.send(:link_existing_assessment_requests, peer_review_sub_assignment) }.not_to raise_error
     end
   end
 

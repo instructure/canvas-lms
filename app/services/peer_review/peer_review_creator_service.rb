@@ -32,6 +32,7 @@ class PeerReview::PeerReviewCreatorService < PeerReview::PeerReviewCommonService
   def call
     run_validations
     peer_review_sub_assignment = create_peer_review_sub_assignment
+    link_existing_assessment_requests(peer_review_sub_assignment)
     compute_due_dates_and_create_submissions(peer_review_sub_assignment)
     peer_review_sub_assignment
   end
@@ -51,5 +52,10 @@ class PeerReview::PeerReviewCreatorService < PeerReview::PeerReviewCommonService
       peer_review_sub.save!
       peer_review_sub
     end
+  end
+
+  def link_existing_assessment_requests(peer_review_sub_assignment)
+    existing_assessment_requests = AssessmentRequest.for_assignment(@parent_assignment.id)
+    existing_assessment_requests.update_all(peer_review_sub_assignment_id: peer_review_sub_assignment.id)
   end
 end
