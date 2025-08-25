@@ -48,6 +48,15 @@ describe Types::UserType do
     )
   end
 
+  let(:student_user_type) do
+    GraphQLTypeTester.new(
+      @student,
+      current_user: @student,
+      domain_root_account: @course.account.root_account,
+      request: ActionDispatch::TestRequest.create
+    )
+  end
+
   context "node" do
     it "works" do
       expect(user_type.resolve("_id")).to eq @student.id.to_s
@@ -2380,6 +2389,113 @@ describe Types::UserType do
 
         # Should only return participants from course1
         expect(result.length).to eq(2)
+      end
+    end
+  end
+
+  context "course_work_submissions_connection" do
+    before(:once) do
+      @frozen_time = Time.zone.parse("2024-01-15 12:00:00")
+
+      Timecop.freeze(@frozen_time) do
+        @assignment = @course.assignments.create!(
+          title: "Test Assignment",
+          due_at: (@frozen_time + 1.day).end_of_day, # Due tomorrow
+          workflow_state: "published",
+          submission_types: "online_text_entry"
+        )
+        # Create unsubmitted submission (actionable) - use find_or_create pattern
+        @submission = @assignment.submissions.find_or_create_by(user: @student) do |s|
+          s.submitted_at = nil
+          s.workflow_state = "unsubmitted"
+        end
+      end
+    end
+
+    it "returns the connection field" do
+      Timecop.freeze(@frozen_time) do
+        result = student_user_type.resolve("courseWorkSubmissionsConnection { edges { node { _id } } }")
+        expect(result).to be_an(Array)
+      end
+    end
+
+    it "returns actual submissions data" do
+      Timecop.freeze(@frozen_time) do
+        expect(@submission).not_to be_nil
+        expect(@submission.submitted_at).to be_nil # Should be unsubmitted
+        expect(@submission.excused).to be_falsey # Should not be excused
+        expect(@assignment.workflow_state).to eq("published")
+        expect(@course.workflow_state).to eq("available")
+
+        enrollment = @student.enrollments.where(course: @course).first
+        expect(enrollment).not_to be_nil
+        expect(enrollment.workflow_state).to eq("active")
+
+        # Test with date range parameters (next 7 days from frozen time)
+        start_date = @frozen_time.beginning_of_day
+        end_date = (@frozen_time + 7.days).end_of_day
+
+        result = student_user_type.resolve("courseWorkSubmissionsConnection(startDate: \"#{start_date.iso8601}\", endDate: \"#{end_date.iso8601}\") { edges { node { assignment { title } } } }")
+        expect(result).not_to be_empty, "Expected to find submissions with date range filter"
+        expect(result.first).to eq("Test Assignment")
+      end
+    end
+
+    it "only returns data for current user" do
+      Timecop.freeze(@frozen_time) do
+        result = user_type.resolve("courseWorkSubmissionsConnection { edges { node { _id } } }")
+        expect(result).to eq([])
+      end
+    end
+
+    it "filters by includeOverdue parameter" do
+      Timecop.freeze(@frozen_time) do
+        # Create an overdue assignment (due 2 days ago from frozen time)
+        overdue_assignment = @course.assignments.create!(
+          title: "Overdue Assignment",
+          due_at: (@frozen_time - 2.days).end_of_day,
+          workflow_state: "published",
+          submission_types: "online_text_entry"
+        )
+        overdue_assignment.submissions.find_or_create_by(user: @student) do |s|
+          s.submitted_at = nil
+          s.workflow_state = "unsubmitted"
+        end
+
+        result = student_user_type.resolve("courseWorkSubmissionsConnection(includeOverdue: true) { edges { node { assignment { title } } } }")
+        expect(result).to include("Overdue Assignment")
+      end
+    end
+
+    it "filters by onlySubmitted parameter" do
+      Timecop.freeze(@frozen_time) do
+        # Create a submitted assignment (due tomorrow from frozen time)
+        submitted_assignment = @course.assignments.create!(
+          title: "Submitted Assignment",
+          due_at: (@frozen_time + 1.day).end_of_day,
+          workflow_state: "published",
+          submission_types: "online_text_entry"
+        )
+        submitted_submission = submitted_assignment.submissions.find_or_create_by(user: @student)
+        submitted_submission.update!(
+          submitted_at: @frozen_time - 1.hour,
+          workflow_state: "submitted"
+        )
+
+        result = student_user_type.resolve("courseWorkSubmissionsConnection(onlySubmitted: true) { edges { node { assignment { title } } } }")
+        expect(result).to include("Submitted Assignment")
+        expect(result).not_to include("Test Assignment") # Should not include unsubmitted
+      end
+    end
+
+    it "handles NULL excused values correctly" do
+      Timecop.freeze(@frozen_time) do
+        # Explicitly set excused to nil to test our NULL handling
+        @submission.update_column(:excused, nil)
+
+        result = student_user_type.resolve("courseWorkSubmissionsConnection { edges { node { assignment { title } } } }")
+        expect(result).not_to be_empty, "Should include submissions with NULL excused values"
+        expect(result.first).to eq("Test Assignment")
       end
     end
   end
