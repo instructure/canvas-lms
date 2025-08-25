@@ -430,7 +430,8 @@ class GradeCalculator
     end
   end
 
-  def group_dropped_rows
+  # if use_batches_score_metadata_updates is OFF, we use this method
+  def group_dropped_rows_old
     enrollments_by_user.keys.map do |user_id|
       current = @current_groups[user_id].pluck(:global_id, :dropped).to_h
       final = @final_groups[user_id].pluck(:global_id, :dropped).to_h
@@ -445,6 +446,24 @@ class GradeCalculator
         end
       end
     end.flatten
+  end
+
+  # if use_batches_score_metadata_updates is ON, we use this method
+  def group_dropped_rows
+    enrollments_by_user.keys.flat_map do |user_id|
+      current = @current_groups[user_id].pluck(:global_id, :dropped).to_h
+      final = @final_groups[user_id].pluck(:global_id, :dropped).to_h
+      @groups.flat_map do |group|
+        agid = group.global_id
+        hsh = {
+          current: { dropped: current[agid] },
+          final: { dropped: final[agid] }
+        }
+        enrollments_by_user[user_id].map do |enrollment|
+          [enrollment.id, group.id, hsh]
+        end
+      end
+    end
   end
 
   def updated_at
@@ -490,8 +509,11 @@ class GradeCalculator
         save_course_and_grading_period_metadata
         score_rows = group_score_rows
         if @grading_period.nil? && score_rows.any?
-          dropped_rows = group_dropped_rows
-          save_assignment_group_scores(score_rows, dropped_rows)
+          if Account.site_admin.feature_enabled?(:use_batches_score_metadata_updates)
+            save_assignment_group_scores(score_rows, group_dropped_rows)
+          else
+            save_assignment_group_scores_old(score_rows, group_dropped_rows_old)
+          end
         end
       end
     end
@@ -657,7 +679,8 @@ class GradeCalculator
     end
   end
 
-  def save_assignment_group_scores(score_values, dropped_values)
+  # if use_batches_score_metadata_updates is OFF, we use this method
+  def save_assignment_group_scores_old(score_values, dropped_values)
     table = Score.quoted_table_name
 
     update_columns, update_conditions = assignment_group_columns_to_insert_or_update[:update_columns]
@@ -737,6 +760,131 @@ class GradeCalculator
           #{table}.calculation_details #>>'{current,dropped}' IS DISTINCT FROM excluded.calculation_details #>>'{current,dropped}' OR
           #{table}.calculation_details #>>'{final,dropped}' IS DISTINCT FROM excluded.calculation_details #>>'{final,dropped}'
         SQL
+      end
+    end
+  rescue ActiveRecord::Deadlocked => e
+    Canvas::Errors.capture_exception(:grade_calculator, e, :warn)
+    raise Delayed::RetriableError, "Deadlock in upserting assignment group scores"
+  end
+
+  # if use_batches_score_metadata_updates is ON, we use this method
+  def save_assignment_group_scores(score_values, dropped_values)
+    table = Score.quoted_table_name
+
+    update_columns, update_conditions = assignment_group_columns_to_insert_or_update[:update_columns]
+                                        .each_with_object([+"", +""]) do |uc, (cols, conds)|
+      cols << %(#{", " unless cols.empty?}#{uc[:column]} = #{uc[:target]})
+      conds << %(#{" OR " unless conds.empty?}#{table}.#{uc[:column]} IS DISTINCT FROM #{uc[:target]})
+    end
+
+    value_names = assignment_group_columns_to_insert_or_update[:value_names]
+                  .map.with_index { |name, i| %((x->>#{i + 2})::FLOAT8 AS #{name}) }.join(", ")
+
+    Score.connection.with_max_update_limit(score_values.length) do
+      # Update existing assignment group Scores or create them if needed.
+      Score.connection.execute(<<~SQL.squish)
+        INSERT INTO #{table} (
+          enrollment_id, assignment_group_id,
+          #{assignment_group_columns_to_insert_or_update[:value_names].join(", ")},
+          course_score, root_account_id, created_at, updated_at
+        )
+          SELECT
+            val.enrollment_id AS enrollment_id,
+            val.assignment_group_id as assignment_group_id,
+            #{assignment_group_columns_to_insert_or_update[:insert_columns].join(", ")},
+            FALSE AS course_score,
+            #{@course.root_account_id} AS root_account_id,
+            #{updated_at} AS created_at,
+            #{updated_at} AS updated_at
+          FROM
+            (
+              SELECT
+                (x->>0)::INT8 AS enrollment_id,
+                (x->>1)::INT8 AS assignment_group_id,
+                #{value_names}
+              FROM
+                jsonb_array_elements('#{score_values.to_json}') x
+            ) val
+          ORDER BY assignment_group_id, enrollment_id
+        ON CONFLICT (enrollment_id, assignment_group_id) WHERE assignment_group_id IS NOT NULL
+        DO UPDATE SET
+          #{update_columns},
+          updated_at = excluded.updated_at,
+          root_account_id = excluded.root_account_id,
+          workflow_state = COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')
+        WHERE
+          #{update_conditions}
+          OR #{table}.root_account_id IS DISTINCT FROM excluded.root_account_id
+          OR #{table}.workflow_state IS DISTINCT FROM COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')
+      SQL
+    end
+
+    # We only save score metadata for posted grades. This means, if we're
+    # calculating unposted grades (which means @ignore_muted is false),
+    # we don't want to update the score metadata. TODO: start storing the
+    # score metadata for unposted grades.
+    if @ignore_muted
+      table = ScoreMetadata.quoted_table_name
+      batch_size = 1000
+
+      # Separate data into empty drops and non-empty drops
+      empty_drop_hsh = { current: { dropped: [] }, final: { dropped: [] } }
+      empty_drop_json = "'#{empty_drop_hsh.to_json}'::json"
+
+      empty_drop_rows = []
+      non_empty_drop_rows = []
+
+      dropped_values.each do |enrollment_id, group_id, hsh|
+        if hsh == empty_drop_hsh
+          empty_drop_rows << "(#{enrollment_id}, #{group_id})"
+        else
+          non_empty_drop_rows << "(#{enrollment_id}, #{group_id}, '#{hsh.to_json}')"
+        end
+      end
+
+      execute_score_metadata_upsert = lambda do |max_update_limit, from_clause|
+        Score.connection.with_max_update_limit(max_update_limit) do
+          ScoreMetadata.connection.execute(<<~SQL.squish)
+            INSERT INTO #{table}
+              (score_id, calculation_details, created_at, updated_at)
+              SELECT
+                scores.id AS score_id,
+                CAST(val.calculation_details as json) AS calculation_details,
+                #{updated_at} AS created_at,
+                #{updated_at} AS updated_at
+              #{from_clause}
+              LEFT OUTER JOIN #{Score.quoted_table_name} scores ON
+                scores.enrollment_id = val.enrollment_id AND
+                scores.assignment_group_id = val.assignment_group_id
+              ORDER BY score_id
+            ON CONFLICT (score_id)
+            DO UPDATE SET
+              calculation_details = excluded.calculation_details,
+              updated_at = excluded.updated_at
+            WHERE
+            #{table}.calculation_details #>>'{current,dropped}' IS DISTINCT FROM excluded.calculation_details #>>'{current,dropped}' OR
+            #{table}.calculation_details #>>'{final,dropped}' IS DISTINCT FROM excluded.calculation_details #>>'{final,dropped}'
+          SQL
+        end
+      end
+
+      # CROSS JOIN optimization: reference identical JSON once instead of repeating in massive VALUES
+      empty_drop_rows.each_slice(batch_size) do |batch_values|
+        from_clause = <<~SQL.squish
+          FROM (
+            SELECT pairs.enrollment_id, pairs.assignment_group_id, json_data.calculation_details
+            FROM (VALUES #{batch_values.join(",")}) pairs(enrollment_id, assignment_group_id)
+            CROSS JOIN (SELECT #{empty_drop_json} as calculation_details) json_data
+          ) val
+        SQL
+
+        execute_score_metadata_upsert.call(batch_values.length, from_clause)
+      end
+
+      non_empty_drop_rows.each_slice(batch_size) do |batch_values|
+        from_clause = "FROM (VALUES #{batch_values.join(",")}) val (enrollment_id, assignment_group_id, calculation_details)"
+
+        execute_score_metadata_upsert.call(batch_values.length, from_clause)
       end
     end
   rescue ActiveRecord::Deadlocked => e
