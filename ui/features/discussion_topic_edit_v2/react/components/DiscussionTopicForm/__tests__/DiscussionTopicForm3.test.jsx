@@ -110,10 +110,8 @@ describe('DiscussionTopicForm', () => {
         currentDiscussionTopic: DiscussionTopic.mock({anonymousState: 'full_anonymity'}),
       })
 
-      expect(document.queryByTestId('graded-checkbox').querySelector('input')).toBeDisabled()
-      expect(
-        document.queryByTestId('group-discussion-checkbox').querySelector('input'),
-      ).toBeDisabled()
+      expect(document.queryByTestId('graded-checkbox')).toBeDisabled()
+      expect(document.queryByTestId('group-discussion-checkbox')).toBeDisabled()
     })
 
     it('hides student ToDo, and ungraded options when Graded', () => {
@@ -318,7 +316,7 @@ describe('DiscussionTopicForm', () => {
         }),
       })
 
-      expect(queryByTestId('checkpoints-checkbox').querySelector('input')).toBeDisabled()
+      expect(queryByTestId('checkpoints-checkbox')).toBeDisabled()
     })
 
     it('displays "Allow Participants to Comment"', () => {
@@ -381,11 +379,8 @@ describe('DiscussionTopicForm', () => {
       window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.has_threaded_replies = false
       const {getByTestId} = setup({currentDiscussionTopic: {discussionType: 'side_comment'}})
 
-      const checkbox = getByTestId('disallow_threaded_replies').querySelector('input')
-      expect(getByTestId('disallow_threaded_replies')).toHaveAttribute(
-        'data-action-state',
-        'allowThreads',
-      )
+      const checkbox = getByTestId('disallow_threaded_replies')
+      expect(checkbox).toHaveAttribute('data-action-state', 'allowThreads')
       expect(checkbox.checked).toBe(true)
     })
 
@@ -393,7 +388,7 @@ describe('DiscussionTopicForm', () => {
       window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.has_threaded_replies = true
       const {getByTestId} = setup({currentDiscussionTopic: {discussionType: 'side_comment'}})
 
-      const checkbox = getByTestId('disallow_threaded_replies').querySelector('input')
+      const checkbox = getByTestId('disallow_threaded_replies')
       expect(checkbox.disabled).toBe(true)
       expect(checkbox.checked).toBe(false)
     })
@@ -415,11 +410,8 @@ describe('DiscussionTopicForm', () => {
 
       const {getByTestId} = setup({currentDiscussionTopic: {discussionType: 'threaded'}})
 
-      const checkbox = getByTestId('disallow_threaded_replies').querySelector('input')
-      expect(getByTestId('disallow_threaded_replies')).toHaveAttribute(
-        'data-action-state',
-        'disallowThreads',
-      )
+      const checkbox = getByTestId('disallow_threaded_replies')
+      expect(checkbox).toHaveAttribute('data-action-state', 'disallowThreads')
       expect(checkbox.disabled).toBe(false)
       expect(checkbox.checked).toBe(false)
     })
