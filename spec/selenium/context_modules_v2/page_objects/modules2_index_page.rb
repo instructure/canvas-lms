@@ -417,6 +417,10 @@ module Modules2IndexPage
   def visible_modules_header_selector
     "div[class*='context_module'] h2"
   end
+
+  def quiz_engine_option_selector
+    "[data-testid='create-item-quiz-engine-select']"
+  end
   #------------------------------ Elements ------------------------------
 
   def completion_requirement
@@ -825,6 +829,10 @@ module Modules2IndexPage
 
   def view_assign_to_link_on_module(module_id)
     fj(context_module_view_assign_to_link_selector(module_id))
+  end
+
+  def quiz_engine_option_exists?
+    element_exists?(quiz_engine_option_selector)
   end
 
   #------------------------------ Actions -------------------------------

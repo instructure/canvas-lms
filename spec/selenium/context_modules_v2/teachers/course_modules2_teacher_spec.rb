@@ -649,6 +649,9 @@ describe "context modules", :ignore_js_errors do
           url: "http://example.com/launch"
         )
 
+        @course.root_account.enable_feature! :new_quizzes_by_default
+        @course.enable_feature! :new_quizzes_by_default
+
         go_to_modules
         wait_for_ajaximations
 
@@ -664,6 +667,9 @@ describe "context modules", :ignore_js_errors do
         wait_for_ajaximations
 
         tab_create_item.click
+
+        # Verify that quiz engine selector is NOT shown
+        expect(quiz_engine_option_exists?).to be_falsey
 
         # Fill in the quiz details
         new_item_name = "New Quizz"
@@ -754,6 +760,42 @@ describe "context modules", :ignore_js_errors do
 
         # A quiz with classic Quiz engine is created and found in Module Item list
         expect(classic_quiz_icon.count).to eq(1)
+      end
+
+      it "shows quiz engine selector" do
+        @course.root_account.settings[:provision] = { "lti" => "lti url" }
+        @course.root_account.save!
+        @course.root_account.enable_feature! :quizzes_next
+        @course.enable_feature! :quizzes_next
+        @course.root_account.disable_feature! :new_quizzes_by_default
+        @course.disable_feature! :new_quizzes_by_default
+
+        @course.context_external_tools.create!(
+          name: "Quizzes.Next",
+          consumer_key: "test_key",
+          shared_secret: "test_secret",
+          tool_id: "Quizzes 2",
+          url: "http://example.com/launch"
+        )
+
+        go_to_modules
+        wait_for_ajaximations
+
+        # Expand the module to see its items
+        context_module_expand_toggle(@empty_module.id).click
+        wait_for_ajaximations
+
+        add_item_button(@empty_module.id).click
+        wait_for_ajaximations
+
+        # Select Quiz from the dropdown
+        click_INSTUI_Select_option(new_item_type_select_selector, "Quiz")
+        wait_for_ajaximations
+
+        tab_create_item.click
+
+        # Verify that quiz engine selector is shown
+        expect(quiz_engine_option_exists?).to be_truthy
       end
     end
   end
