@@ -26,6 +26,7 @@ import {useCourseFolders} from '../../hooks/queries/useCourseFolders'
 import {useContextModule} from '../../hooks/useModuleContext'
 import {useAssignmentGroups} from '../../hooks/queries/useAssignmentGroups'
 import ModuleFileDrop from '../AddItemModalComponents/ModuleFileDrop'
+import {QuizEngine} from '../../utils/types'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -44,12 +45,12 @@ export const CreateLearningObjectForm: React.FC<CreateLearningObjectFormProps> =
   nameError,
   setName,
   name,
-}) => {
+}: CreateLearningObjectFormProps) => {
   const [assignmentGroup, setAssignmentGroup] = useState<string | undefined>(undefined)
   const [folder, setFolder] = useState<string | undefined>(undefined)
   const [file, setFile] = useState<File | null>(null)
 
-  const {courseId} = useContextModule()
+  const {courseId, showQuizzesEngineSelection, quizEngine, setQuizEngine} = useContextModule()
   const {folders} = useCourseFolders(courseId)
   const {data: assignmentGroups} = useAssignmentGroups(courseId)
 
@@ -63,24 +64,26 @@ export const CreateLearningObjectForm: React.FC<CreateLearningObjectFormProps> =
     [onChange],
   )
 
-  return (
-    <View as="form" padding="small" display="block">
-      {itemType !== 'file' && (
-        <TextInput
-          renderLabel="Name"
-          value={name}
-          onChange={(_e, val) => {
-            setName(val)
-            onChange('name', val)
-          }}
-          margin="0 0 medium 0"
-          required
-          isRequired={true}
-          messages={nameError ? [{text: nameError, type: 'newError'}] : []}
-          data-testid="create-learning-object-name-input"
-        />
-      )}
-      {itemType === 'quiz' && (
+  const renderQuizFormFields = () => {
+    return (
+      <View as="div">
+        {showQuizzesEngineSelection && (
+          <SimpleSelect
+            data-testid="create-item-quiz-engine-select"
+            renderLabel={I18n.t('Select quiz type')}
+            assistiveText={I18n.t('Type or use arrow keys to navigate options.')}
+            value={quizEngine}
+            onChange={(_e, {value}) => setQuizEngine(value as QuizEngine)}
+          >
+            <SimpleSelect.Option id="classic" key="classic" value="classic">
+              {I18n.t('Quiz Classic')}
+            </SimpleSelect.Option>
+            <SimpleSelect.Option id="new" key="new" value="new">
+              {I18n.t('Quiz New')}
+            </SimpleSelect.Option>
+          </SimpleSelect>
+        )}
+
         <SimpleSelect
           renderLabel="Assignment Group"
           value={assignmentGroup}
@@ -96,7 +99,29 @@ export const CreateLearningObjectForm: React.FC<CreateLearningObjectFormProps> =
             </SimpleSelect.Option>
           ))}
         </SimpleSelect>
+      </View>
+    )
+  }
+
+  return (
+    <View as="form" padding="small" display="block">
+      {itemType !== 'file' && (
+        <TextInput
+          renderLabel="Name"
+          value={name}
+          onChange={(_e, val) => {
+            setName(val)
+            onChange('name', val)
+          }}
+          required
+          isRequired={true}
+          messages={nameError ? [{text: nameError, type: 'newError'}] : []}
+          data-testid="create-learning-object-name-input"
+        />
       )}
+
+      {itemType === 'quiz' && renderQuizFormFields()}
+
       <ModuleFileDrop
         itemType={itemType}
         onChange={onChange}
@@ -126,7 +151,8 @@ export const CreateLearningObjectForm: React.FC<CreateLearningObjectFormProps> =
       )}
       {file && (
         <View as="div" margin="small 0 0 0">
-          <Text weight="bold">{I18n.t('Selected file:')}</Text> {file.name}
+          <Text weight="bold">{I18n.t('Selected file:')}</Text>
+          <Text> {file.name}</Text>
         </View>
       )}
     </View>
