@@ -234,6 +234,57 @@ shared_examples_for "context modules for teachers" do
     expect(f("#context_module_item_#{tag.id}")).to have_attribute(:class, "context_external_tool")
   end
 
+  it "allows selecting external tool from LTI list by clicking" do
+    @course.context_external_tools.create!(
+      name: "Test LTI Tool",
+      consumer_key: "test_key",
+      shared_secret: "test_secret",
+      url: "http://example.com/lti",
+      settings: {
+        "link_selection" => {
+          "url" => "http://example.com/resource_selection",
+          "selection_width" => 500,
+          "selection_height" => 500
+        }
+      }
+    )
+
+    @course.context_modules.create!(name: "Test Module")
+    get "/courses/#{@course.id}/modules"
+
+    f(".ig-header-admin .al-trigger").click
+    f(".add_module_item_link").click
+    select_module_item("#add_module_item_select", "External Tool")
+    wait_for_ajaximations
+
+    wait_for(method: nil, timeout: 10) do
+      !ff("#context_external_tools_select .tools .tool").empty?
+    end
+
+    tool_element = fj("#context_external_tools_select .tools .tool:contains('Test LTI Tool')")
+    tool_element.click
+    wait_for_ajaximations
+
+    wait_for(method: nil, timeout: 5) do
+      url_field = f("#external_tool_create_url")
+      url_field.attribute("value") != ""
+    end
+
+    url_field = f("#external_tool_create_url")
+    expect(url_field.attribute("value")).to eq("http://example.com/resource_selection")
+
+    title_field = f("#external_tool_create_title")
+    expect(title_field.attribute("value")).to eq("Test LTI Tool")
+
+    submit_btn = f(".add_item_button.ui-button")
+    scroll_to(submit_btn)
+    submit_btn.click
+    wait_for_ajaximations
+
+    expect(f("body")).not_to contain_css(".alert.alert-error")
+    expect(f(".context_module_item")).to include_text("Test LTI Tool")
+  end
+
   it "does not save an invalid external tool", priority: "1" do
     @course.context_modules.create!(name: "Test Module")
 
