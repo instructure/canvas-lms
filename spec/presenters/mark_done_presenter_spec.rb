@@ -31,8 +31,8 @@ describe MarkDonePresenter do
   end
 
   def create_presenter(tag)
-    ctrl = double("Controller", session: true)
-    context = double("Context", "grants_any_right?" => true)
+    ctrl = instance_double(ApplicationController, session: true)
+    context = instance_double(Course, grants_any_right?: true)
     MarkDonePresenter.new(ctrl, context, tag.id, @user, nil)
   end
 
@@ -49,24 +49,24 @@ describe MarkDonePresenter do
 
   describe "#initialize" do
     it "doesn't blow up trying to coerce a garbage receiver into an integer" do
-      ctrl = double("Controller", session: true)
-      context = double("Context", "grants_any_right?" => true)
+      ctrl = instance_double(ApplicationController, session: true)
+      context = instance_double(Course, grants_any_right?: true)
       garbage_item_id = { "'": nil }
       mdp = MarkDonePresenter.new(ctrl, context, garbage_item_id, @user, nil)
       expect(mdp.item).to be_nil
     end
 
     it "is happy setting item attr with a valid module item id" do
-      ctrl = double("Controller", session: true)
-      context = double("Context", "grants_any_right?" => true)
+      ctrl = instance_double(ApplicationController, session: true)
+      context = instance_double(Course, grants_any_right?: true)
       tag = add_wiki_page_to_module
       mdp = MarkDonePresenter.new(ctrl, context, tag.id, @user, nil)
       expect(mdp.item).to eq tag
     end
 
     it "ignores invalid module item ids" do
-      ctrl = double("Controller", session: true)
-      context = double("Context", "grants_any_right?" => true)
+      ctrl = instance_double(ApplicationController, session: true)
+      context = instance_double(Course, grants_any_right?: true)
       mdp = MarkDonePresenter.new(ctrl, context, "string", @user, nil)
       expect(mdp.item).to be_nil
     end
