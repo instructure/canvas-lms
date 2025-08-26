@@ -46,8 +46,8 @@ describe('utils', () => {
   })
 
   describe('getItemIcon', () => {
-    const renderIcon = (content: any) =>
-      render(<div data-testid="host">{getItemIcon(content)}</div>)
+    const renderIcon = (content: any, published = true) =>
+      render(<div data-testid="host">{getItemIcon(content, published)}</div>)
 
     it('returns the correct icon for an assignment', () => {
       renderIcon({type: 'Assignment'})

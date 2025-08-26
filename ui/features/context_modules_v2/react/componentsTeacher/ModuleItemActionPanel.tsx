@@ -55,6 +55,7 @@ import BlueprintLockIcon from './BlueprintLockIcon'
 import PublishCloud from '@canvas/files/react/components/PublishCloud'
 import ModuleFile from '@canvas/files/backbone/models/ModuleFile'
 import {dispatchCommandEvent} from '../handlers/dispatchCommandEvent'
+import {MODULE_ITEMS} from '../utils/constants'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -237,6 +238,10 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
       userCanEditFilesForContext: ENV.MODULE_FILE_PERMISSIONS?.manage_files_edit ?? false,
       usageRightsRequiredForContext: ENV.MODULE_FILE_PERMISSIONS?.usage_rights_required,
       fileName: content?.displayName,
+      onPublishChange: () => {
+        queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId || '']})
+        queryClient.invalidateQueries({queryKey: ['MODULE_ITEMS_ALL', moduleId || '']})
+      },
     }
 
     return <PublishCloud {...props} model={file} disabled={false} />

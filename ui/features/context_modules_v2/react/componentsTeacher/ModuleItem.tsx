@@ -104,7 +104,7 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
 
   const masteryPathsData = getMasteryPathsData()
 
-  const itemIcon = useMemo(() => getItemIcon(content), [content])
+  const itemIcon = useMemo(() => getItemIcon(content, !!published), [content, published])
 
   const itemLeftMargin = useMemo(() => INDENT_LOOKUP[indent ?? 0], [indent])
 
