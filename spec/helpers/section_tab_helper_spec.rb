@@ -66,7 +66,9 @@ describe SectionTabHelper do
   describe "AvailableSectionTabs" do
     let_once(:current_user) { course.users.first }
     let_once(:domain_root_account) { LoadAccount.default_domain_root_account }
-    let(:session) { user_session(current_user) }
+    before do
+      user_session(current_user)
+    end
 
     let_once(:quiz_lti_tool) do
       ContextExternalTool.create!(
