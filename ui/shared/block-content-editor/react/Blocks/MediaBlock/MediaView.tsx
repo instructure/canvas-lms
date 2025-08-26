@@ -29,7 +29,14 @@ export const MediaView = ({src, title, titleColor, includeBlockTitle}: MediaData
       {includeBlockTitle && <TitleEditPreview title={title} contentColor={titleColor} />}
       {src ? (
         <View as="div" width="100%" height="400px">
-          Media content here...
+          <iframe
+            src={src}
+            title={title || 'Media content'}
+            width="100%"
+            height="100%"
+            allow="fullscreen"
+            data-media-type="video"
+          />
         </View>
       ) : (
         <DefaultPreviewImage blockType="media" />
