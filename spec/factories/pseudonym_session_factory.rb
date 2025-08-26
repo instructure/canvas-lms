@@ -24,9 +24,8 @@ module Factories
     end
 
     unless pseudonym
-      pseudonym = double(
-        "Pseudonym",
-        record: user,
+      pseudonym = instance_double(
+        Pseudonym,
         user_id: user.id,
         user:,
         login_count: 1,
@@ -34,19 +33,18 @@ module Factories
         sis_user_id: "U001",
         shard: Shard.default,
         works_for_account?: true,
-        suspended?: false
+        suspended?: false,
+        unique_id: "unique_id",
+        global_id: 10_000_000_000_001
       )
       # at least one thing cares about the id of the pseudonym... using the
       # object_id should make it unique (but obviously things will fail if
       # it tries to load it from the db.)
-      allow(pseudonym).to receive_messages(id: pseudonym.object_id,
-                                           unique_id: "unique_id",
-                                           global_id: 10_000_000_000_001)
+      allow(pseudonym).to receive(:id).and_return(pseudonym.object_id)
     end
 
-    session = double("PseudonymSession",
-                     record: pseudonym)
-    allow(session).to receive(:[]).with(anything).and_return(nil)
+    session = instance_double(PseudonymSession,
+                              record: pseudonym)
 
     @session_stubbed = true
     allow(PseudonymSession).to receive(:find).and_wrap_original do |original|

@@ -42,7 +42,11 @@ describe "Api::V1::ObserverAlert" do
 
   describe "#observer_alert_json" do
     let(:user) { user_with_pseudonym }
-    let(:session) { user_session(user) }
+    let(:session) { {} }
+
+    before do
+      user_session(user)
+    end
 
     it "returns json" do
       alert = observer_alert_model(observer: user)
