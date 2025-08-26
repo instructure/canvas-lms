@@ -127,6 +127,12 @@ module LinkedAttachmentHandler
     end
   end
 
+  def copy_attachment_associations_from(other)
+    return unless attachment_associations_enabled?
+
+    AttachmentAssociation.copy_associations(other, [self])
+  end
+
   def attachment_associations_creation_enabled?
     root_account&.feature_enabled?(:allow_attachment_association_creation)
   end

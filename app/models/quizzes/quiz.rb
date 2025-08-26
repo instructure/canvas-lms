@@ -833,7 +833,10 @@ class Quizzes::Quiz < ActiveRecord::Base
       question["question_data"] = assessment_question.question_data
       question.assessment_question = assessment_question
       question.assessment_question_version = assessment_question.version_number
-      question.save
+      Quizzes::QuizQuestion.suspend_callbacks(:update_attachment_associations) do
+        question.save
+        question.copy_attachment_associations_from(assessment_question)
+      end
       question
     end
     questions.compact.uniq
