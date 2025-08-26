@@ -837,9 +837,9 @@ GEM
       rspec-rails (>= 4.0)
     os (1.1.4)
     ostruct (0.6.1)
-    outrigger (3.0.3)
-      activerecord (>= 6.0, <= 8.0)
-      railties (>= 6.0, <= 8.0)
+    outrigger (3.1.0)
+      activerecord (>= 6.0, < 8.1)
+      railties (>= 6.0, < 8.1)
     packs-specification (0.0.10)
       sorbet-runtime
     pact (1.66.1)
