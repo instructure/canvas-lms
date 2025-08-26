@@ -905,7 +905,7 @@ describe Types::UserType do
     end
 
     it "calls the DifferentiationTagsLoader" do
-      loader_instance = double("loader instance")
+      loader_instance = instance_double(GraphQL::Schema::Loader)
       expect(loader_instance).to receive(:load).with(@student.id).and_return([])
       expect(Loaders::UserLoaders::DifferentiationTagsLoader)
         .to receive(:for)
@@ -915,7 +915,7 @@ describe Types::UserType do
     end
 
     it "passes correct parameters to the the DifferentiationTagsLoader" do
-      loader_instance = double("loader instance")
+      loader_instance = instance_double(GraphQL::Schema::Loader)
       expect(loader_instance).to receive(:load).with(@student.id).and_return([])
       expect(Loaders::UserLoaders::DifferentiationTagsLoader)
         .to receive(:for)
@@ -1918,7 +1918,7 @@ describe Types::UserType do
 
   describe "course_progression" do
     let(:progress_helper) do
-      progress_helper = double(CourseProgress.name)
+      progress_helper = instance_double(CourseProgress)
       allow(progress_helper).to receive_messages(can_evaluate_progression?: true, normalized_requirement_count: 1)
       progress_helper
     end
