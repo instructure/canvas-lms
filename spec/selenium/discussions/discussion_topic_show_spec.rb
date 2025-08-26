@@ -814,7 +814,7 @@ describe "Discussion Topic Show" do
     before do
       Account.default.enable_feature!(:discussion_summary)
 
-      @inst_llm = double("InstLLM::Client")
+      @inst_llm = instance_double(InstLLM::Client)
       allow(InstLLMHelper).to receive(:client).and_return(@inst_llm)
 
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"

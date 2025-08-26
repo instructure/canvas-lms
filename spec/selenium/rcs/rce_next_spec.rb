@@ -1059,7 +1059,7 @@ describe "RCE next tests", :ignore_js_errors do
 
     describe "kaltura interaction" do
       it "includes media upload option if kaltura is enabled" do
-        double("CanvasKaltura::ClientV3")
+        instance_double(CanvasKaltura::ClientV3)
         allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
         visit_front_page_edit(@course)
         media_button = media_toolbar_menubutton
@@ -1073,7 +1073,7 @@ describe "RCE next tests", :ignore_js_errors do
       end
 
       it "does not include media upload option if kaltura is disabled" do
-        double("CanvasKaltura::ClientV3")
+        instance_double(CanvasKaltura::ClientV3)
         allow(CanvasKaltura::ClientV3).to receive(:config).and_return(nil)
         visit_front_page_edit(@course)
         media_button = media_toolbar_menubutton
@@ -1086,7 +1086,7 @@ describe "RCE next tests", :ignore_js_errors do
       end
 
       it "does not include media upload option if button is disabled" do
-        double("CanvasKaltura::ClientV3")
+        instance_double(CanvasKaltura::ClientV3)
         allow(CanvasKaltura::ClientV3).to receive(:config).and_return({ "hide_rte_button" => true })
         visit_front_page_edit(@course)
         media_button = media_toolbar_menubutton
@@ -1099,7 +1099,7 @@ describe "RCE next tests", :ignore_js_errors do
       end
 
       it "opens upload document modal when clicking upload option" do
-        double("CanvasKaltura::ClientV3")
+        instance_double(CanvasKaltura::ClientV3)
         allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
         visit_front_page_edit(@course)
 
@@ -1109,7 +1109,7 @@ describe "RCE next tests", :ignore_js_errors do
       end
 
       it "opens upload media modal when clicking upload option" do
-        double("CanvasKaltura::ClientV3")
+        instance_double(CanvasKaltura::ClientV3)
         allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
         visit_front_page_edit(@course)
 
@@ -1138,7 +1138,7 @@ describe "RCE next tests", :ignore_js_errors do
 
     it "adds a title attribute to an inserted iframe" do
       # as typically happens when embedding media, like a youtube video
-      double("CanvasKaltura::ClientV3")
+      instance_double(CanvasKaltura::ClientV3)
       allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
       visit_front_page_edit(@course)
 
@@ -1427,7 +1427,7 @@ describe "RCE next tests", :ignore_js_errors do
 
     describe "Insert menubar menu" do
       it "shows content insertion menu items" do
-        double("CanvasKaltura::ClientV3")
+        instance_double(CanvasKaltura::ClientV3)
         allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
         rce_wysiwyg_state_setup(@course)
         menubar_open_menu("Insert")
