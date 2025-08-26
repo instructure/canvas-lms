@@ -368,7 +368,6 @@ describe "context modules", :ignore_js_errors do
     end
 
     it "does not show the assign to buttons when the user does not have the manage_course_content_edit permission" do
-      skip("LX-3149")
       @module1.assignment_overrides.create!
 
       go_to_modules
@@ -630,6 +629,16 @@ describe "context modules", :ignore_js_errors do
     before do
       user_session(@teacher)
       @empty_module = @course.context_modules.create!(name: "Multi File Module")
+    end
+
+    it "does not appear when user does not have the manage_course_content_add permission" do
+      go_to_modules
+      wait_for_ajaximations
+      expect(element_exists?(add_item_button_selector)).to be true
+
+      RoleOverride.create!(context: @course.account, permission: "manage_course_content_add", role: teacher_role, enabled: false)
+      go_to_modules
+      expect(element_exists?(add_item_button_selector)).to be false
     end
 
     context "when adding a quiz" do
@@ -928,6 +937,18 @@ describe "context modules", :ignore_js_errors do
   end
 
   context "module publish menu" do
+    it "does not show the publish buttons when the user does not have the manage_course_content_edit permission" do
+      go_to_modules
+      wait_for_ajaximations
+      expect(element_exists?(context_module_published_icon_selector(@module1.id))).to be true
+      expect(element_exists?(bulk_publish_button_selector)).to be true
+
+      RoleOverride.create!(context: @course.account, permission: "manage_course_content_edit", role: teacher_role, enabled: false)
+      go_to_modules
+      expect(element_exists?(context_module_published_icon_selector(@module1.id))).to be false
+      expect(element_exists?(bulk_publish_button_selector)).to be false
+    end
+
     context "'Publish module and all items' button" do
       it "publishes the module and all its items" do
         prepare_unpublished_modules(@course.context_modules)

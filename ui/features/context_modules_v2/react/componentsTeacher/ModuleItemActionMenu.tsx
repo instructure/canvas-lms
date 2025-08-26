@@ -46,6 +46,7 @@ export interface ModuleItemActionMenuProps {
   moduleId: string
   itemType: string
   content: ModuleItemContent
+  published: boolean
   canDuplicate: boolean
   isMenuOpen: boolean
   setIsMenuOpen: (isOpen: boolean) => void
@@ -73,6 +74,7 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
   moduleId,
   itemType,
   content,
+  published,
   canDuplicate,
   isMenuOpen,
   setIsMenuOpen,
@@ -97,16 +99,19 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
   const isModuleLoading = !!menuItemLoadingState?.[moduleId]?.state
   const canEdit = permissions?.canEdit
   const canAdd = permissions?.canAdd
+  const canDelete = permissions?.canDelete
   const canManageSpeedGrader = permissions?.canManageSpeedGrader
   const canDirectShare = permissions?.canDirectShare
 
   const isNotSpecialType = !isBasic && !isFile && !isExternalTool
   const showSpeedGrader =
     canManageSpeedGrader &&
-    (itemType === 'Assignment' || itemType === 'Quiz') &&
-    !!content?.published
+    (itemType === 'Assignment' ||
+      itemType === 'Quiz' ||
+      (content?.assignment && itemType === 'Discussion')) &&
+    published
   const showAssignTo = !!content?.canManageAssignTo
-  const showDirectShare = canDirectShare && isNotSpecialType
+  const showDirectShare = canDirectShare && !isBasic && !isExternalTool
 
   const renderMenuItem = (condition: boolean, handler: () => void, icon: any, label: string) => {
     if (!condition) return null
@@ -138,7 +143,7 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
     >
       {renderMenuItem(canEdit, handleEdit, <IconEditLine />, I18n.t('Edit'))}
       {renderMenuItem(
-        showSpeedGrader,
+        !!showSpeedGrader,
         handleSpeedGrader,
         <IconSpeedGraderLine />,
         I18n.t('SpeedGrader'),
@@ -176,7 +181,7 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
         <IconMasteryPathsLine />,
         masteryPathsData?.isTrigger ? I18n.t('Edit Mastery Paths') : I18n.t('Add Mastery Paths'),
       )}
-      {renderMenuItem(canEdit, handleRemove, <IconTrashLine />, I18n.t('Remove'))}
+      {renderMenuItem(canDelete, handleRemove, <IconTrashLine />, I18n.t('Remove'))}
     </Menu>
   )
 }

@@ -59,6 +59,7 @@ const ModulesList: React.FC = () => {
     courseId,
     moduleCursorState,
     setModuleCursorState,
+    permissions,
   } = useContextModule()
   useDefaultCourseFolder()
   const reorderItemsMutation = useReorderModuleItemsGQL()
@@ -516,7 +517,13 @@ const ModulesList: React.FC = () => {
                 ) : null}
                 <View className="context_module_list">
                   {data?.pages[0]?.modules.length === 0 ? (
-                    <CreateNewModule courseId={courseId} data={data} />
+                    permissions.canAdd ? (
+                      <CreateNewModule courseId={courseId} data={data} />
+                    ) : (
+                      <View as="div" textAlign="center" padding="large" className="no_modules">
+                        <Text>{I18n.t('No modules found')}</Text>
+                      </View>
+                    )
                   ) : (
                     data?.pages
                       .flatMap(page => page.modules)
