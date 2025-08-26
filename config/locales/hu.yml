@@ -8757,6 +8757,7 @@ hu:
   decaying_average_recentint_remainderint_ab0636cc: "Csökkenő átlag - %{recentInt}%/%{remainderInt}%"
   december_acc47508: December
   decorative_image_3c28aa7d: "Dekoratív kép"
+  decorative_image_fde98579: "Dekorációs célú kép"
   decrease_indent_d9cf469d: "Behúzás csökkentése"
   decrease_indent_de6343ab: "Behúzás csökkentése"
   deduction_interval_e18bd51: "Levonási intervallum"
@@ -26536,6 +26537,7 @@ hu:
   use_webcam_1ed0bf6b: "Webkamera használata"
   use_window_parent_in_deep_linking_response_8fe5f845: "A window.parent használata a Deep Linking válaszban"
   used_by_permission_314a78dd: "Használat engedéllyel"
+  used_by_screen_readers_to_describe_the_content_of__b1e76d9e: "Képernyőolvasók által egy kép tartalmának leírásához használt szöveg"
   user: 
     default_user_name: Felhasználó
     errors: 
