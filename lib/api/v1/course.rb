@@ -141,12 +141,7 @@ module Api::V1::Course
       end
       # undocumented; used in AccountCourseUserSearch
       if includes.include?("active_teachers")
-        course.shard.activate do
-          scope =
-            TeacherEnrollment.where.not(workflow_state: %w[rejected completed deleted inactive]).where(course_id: course.id).distinct.select(:user_id)
-          hash["teachers"] =
-            User.where(id: scope).map { |teacher| user_display_json(teacher) }
-        end
+        hash["teachers"] = course.active_teachers.uniq(&:id).map { |teacher| user_display_json(teacher) }
       end
       hash["tabs"] = tabs_available_json(course, user, session, ["external"], precalculated_permissions:) if includes.include?("tabs")
       hash["locale"] = course.locale unless course.locale.nil?

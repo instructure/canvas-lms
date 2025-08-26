@@ -935,21 +935,18 @@ class AccountsController < ApplicationController
     all_precalculated_permissions = nil
 
     page_opts = { total_entries: nil }
-    if includes.include?("ui_invoked")
-      page_opts = {} # let Folio calculate total entries
-      includes.delete("ui_invoked")
-    end
+    page_opts = {} if includes.include?("ui_invoked") # let Folio calculate total entries
 
     GuardRail.activate(:secondary) do
       @courses = Api.paginate(@courses, self, api_v1_account_courses_url, page_opts)
 
       course_preloads = [:account, :root_account, { course_account_associations: :account }]
       course_preloads << :default_post_policy if includes.include?("post_manually")
+      course_preloads << :active_teachers if includes.include?("active_teachers")
+      course_preloads << :enrollment_term if includes.include?("term") || includes.include?("concluded")
       ActiveRecord::Associations.preload(@courses, course_preloads)
 
       preload_teachers(@courses) if includes.include?("teachers")
-      preload_teachers(@courses) if includes.include?("active_teachers")
-      ActiveRecord::Associations.preload(@courses, [:enrollment_term]) if includes.include?("term") || includes.include?("concluded")
 
       if includes.include?("total_students")
         student_counts = StudentEnrollment.shard(@account.shard).not_fake.active_or_pending

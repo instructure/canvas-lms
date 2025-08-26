@@ -101,6 +101,8 @@ class Course < ActiveRecord::Base
   has_many :all_real_students, through: :all_real_student_enrollments, source: :user
   has_many :teacher_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'deleted') AND enrollments.type = 'TeacherEnrollment'").preload(:user) }, class_name: "TeacherEnrollment"
   has_many :teachers, -> { order(:sortable_name) }, through: :teacher_enrollments, source: :user
+  has_many :active_teacher_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive') AND enrollments.type = 'TeacherEnrollment'").preload(:user) }, class_name: "TeacherEnrollment"
+  has_many :active_teachers, -> { order(:sortable_name) }, through: :active_teacher_enrollments, source: :user
   has_many :ta_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'deleted')").preload(:user) }, class_name: "TaEnrollment"
   has_many :tas, through: :ta_enrollments, source: :user
   has_many :observer_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'deleted')").preload(:user) }, class_name: "ObserverEnrollment"
