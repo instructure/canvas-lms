@@ -20,6 +20,7 @@ import {connect} from 'react-redux'
 import {arrayOf, bool, func, string} from 'prop-types'
 import React, {useEffect, useRef, useState} from 'react'
 import {flatten} from 'lodash'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
 import {IconButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
@@ -35,9 +36,13 @@ import RoleTrayTableRow from './RoleTrayTableRow'
 import permissionPropTypes, {COURSE} from '@canvas/permissions/react/propTypes'
 
 import DetailsToggle from './DetailsToggle'
-import {PERMISSION_DETAIL_SECTIONS} from '../generateActionTemplates'
 
 const I18n = createI18nScope('permissions_role_tray')
+
+const PERMISSION_DETAIL_SECTIONS = [
+  {title: () => I18n.t('What it does'), key: 'details'},
+  {title: () => I18n.t('Additional considerations'), key: 'considerations'},
+]
 
 function PermissionDetailToggles({tab, permissionName}) {
   const [permData, setPermData] = useState(null)
@@ -47,9 +52,9 @@ function PermissionDetailToggles({tab, permissionName}) {
   async function loadTemplate(name) {
     if (!name || canceling.current === name) return
     try {
-      const {template} = await import(`../templates/${name}`)
+      const {json} = await doFetchApi({path: `/api/v1/permissions/${tab}/${name}/help`})
       if (canceling.current !== name) {
-        setPermData(template)
+        setPermData(json)
         setError(null)
       }
     } catch (e) {
@@ -63,11 +68,11 @@ function PermissionDetailToggles({tab, permissionName}) {
   }
 
   useEffect(() => {
-    loadTemplate(permissionName)
+    loadTemplate(permissionName, tab)
     return () => {
       canceling.current = permissionName
     }
-  }, [permissionName])
+  }, [permissionName, tab])
 
   if (error) {
     return (
@@ -82,7 +87,7 @@ function PermissionDetailToggles({tab, permissionName}) {
       <DetailsToggle
         key={section.key}
         title={section.title()}
-        detailItems={permData[tab][section.key]}
+        detailItems={permData[section.key]}
       />
     ))
   }

@@ -161,6 +161,7 @@ export default combineReducers({
   contextId: (state, _action) => state || '',
   nextFocus: setFocusReducer,
   permissions,
+  permissionGroups: (state, _action) => state || {},
   roles,
   apiBusy,
 })

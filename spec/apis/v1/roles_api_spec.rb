@@ -834,25 +834,26 @@ describe "Roles API", type: :request do
         {
           view_analytics: {
             label: -> { "Analytics - View" },
-            group: "analytics_stuff",
+            group: :analytics_stuff,
             group_label: -> { "Analytics" },
             available_to: %w[AccountAdmin TaEnrollment TeacherEnrollment StudentEnrollment AccountMembership],
             true_for: %w[AccountAdmin TaEnrollment TeacherEnrollment]
           },
           fabricate_analytics: {
-            group: "analytics_stuff",
+            group: :analytics_stuff,
             label: -> { "Analytics - Create" },
             available_to: %w[AccountAdmin AccountMembership],
             true_for: %w[AccountAdmin]
           },
           play_404_game: {
             label: -> { "Play 404 Games" },
-            group_label: -> { "Joy" },
+            group: :joy,
             available_to: %w[AccountAdmin StudentEnrollment],
             true_for: %w[AccountAdmin]
           }
         }
       )
+      allow(Permissions).to receive(:group_label) { |group| group.to_s.titleize }
     end
 
     before :once do
@@ -878,13 +879,14 @@ describe "Roles API", type: :request do
                              "key" => "view_analytics",
                              "label" => "Analytics - View",
                              "group" => "analytics_stuff",
-                             "group_label" => "Analytics",
+                             "group_label" => "Analytics Stuff",
                              "available_to" => %w[AccountAdmin TaEnrollment TeacherEnrollment StudentEnrollment AccountMembership],
                              "true_for" => %w[AccountAdmin TaEnrollment TeacherEnrollment]
                            },
                            {
                              "key" => "fabricate_analytics",
                              "group" => "analytics_stuff",
+                             "group_label" => "Analytics Stuff",
                              "label" => "Analytics - Create",
                              "available_to" => %w[AccountAdmin AccountMembership],
                              "true_for" => %w[AccountAdmin]
@@ -892,6 +894,7 @@ describe "Roles API", type: :request do
                            {
                              "key" => "play_404_game",
                              "label" => "Play 404 Games",
+                             "group" => "joy",
                              "group_label" => "Joy",
                              "available_to" => %w[AccountAdmin StudentEnrollment],
                              "true_for" => %w[AccountAdmin]

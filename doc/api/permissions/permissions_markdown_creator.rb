@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_relative "../../../config/initializers/permissions_groups"
+
 class PermissionsMarkdownCreator
   TEMPLATE = "doc/api/permissions/permissions.md.erb"
   OUTPUT_FILE = "doc/api/permissions/md/dynamic/permissions.md"
@@ -53,7 +55,7 @@ class PermissionsMarkdownCreator
                     .reject { |_, info| info[:account_only] == :site_admin }
                     .map do |key, info|
                       { key:,
-                        group: info[:group_label]&.call.to_s,
+                        group: (info[:group] && PERMISSION_GROUPS.dig(info[:group], :label)&.call) || "",
                         label: info[:label].call }
                     end
                     .sort_by { |entry| [entry[:group], entry[:key]] }
@@ -62,7 +64,7 @@ class PermissionsMarkdownCreator
     course_perms = course_perms
                    .map do |key, info|
                      { key:,
-                       group: info[:group_label]&.call.to_s,
+                       group: (info[:group] && PERMISSION_GROUPS.dig(info[:group], :label)&.call) || "",
                        label: info[:label].call,
                        available_to: available_defaults(info) }
                    end
