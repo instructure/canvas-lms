@@ -44,7 +44,7 @@ describe Quizzes::QuizSerializer do
     @quiz.context = @context
     @user = User.new
     allow(@quiz).to receive_messages(locked_for?: false, check_right?: true)
-    @session = double(:[] => nil)
+    @session = {}
     allow(controller).to receive_messages(session:, context:)
     allow(@quiz).to receive(:grants_right?).at_least(:once).and_return true
     allow(@context).to receive(:grants_right?).at_least(:once).and_return true

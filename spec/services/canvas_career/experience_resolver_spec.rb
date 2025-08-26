@@ -40,14 +40,14 @@ module CanvasCareer
     end
 
     before do
-      @config = double("config",
-                       learning_provider_app_launch_url: "https://learning-provider.example.com",
-                       learner_app_launch_url: "https://learner.example.com")
-      @user_preference = double("user_preference",
-                                prefers_academic?: false,
-                                prefers_career?: false,
-                                prefers_learning_provider?: false,
-                                prefers_learner?: false)
+      @config = instance_double(Config,
+                                learning_provider_app_launch_url: "https://learning-provider.example.com",
+                                learner_app_launch_url: "https://learner.example.com")
+      @user_preference = instance_double(UserPreferenceManager,
+                                         prefers_academic?: false,
+                                         prefers_career?: false,
+                                         prefers_learning_provider?: false,
+                                         prefers_learner?: false)
       allow(Config).to receive(:new).with(@root_account).and_return(@config)
       allow(UserPreferenceManager).to receive(:new).with(@session).and_return(@user_preference)
     end

@@ -69,7 +69,7 @@ RSpec.describe YoutubeMigrationService do
   before do
     allow(Lti::ContextToolFinder).to receive(:all_tools_for)
       .with(root_account)
-      .and_return(double(active: double(find_by: studio_tool)))
+      .and_return(class_double(ContextExternalTool, active: class_double(ContextExternalTool, find_by: studio_tool)))
   end
 
   describe "#queue_scan_course_for_embeds" do

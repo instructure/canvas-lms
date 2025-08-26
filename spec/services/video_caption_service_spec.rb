@@ -40,7 +40,7 @@ RSpec.describe VideoCaptionService, type: :service do
         allow(service).to receive_messages(
           url: "https://example.com/video.mp4",
           handoff_video_for_processing: "1234",
-          request_caption: double("Response", code: 200),
+          request_caption: instance_double(HTTParty::Response, code: 200),
           media: { "media" => { "captions" => [{ "language" => "en", "status" => "succeeded" }] } },
           grab_captions: "Captions for the video",
           config: { "app-host" => "https://example.com" },
@@ -139,7 +139,7 @@ RSpec.describe VideoCaptionService, type: :service do
         allow(service).to receive_messages(
           url: "https://example.com/video.mp4",
           handoff_video_for_processing: "1234",
-          request_caption: double("Response", code: 500),
+          request_caption: instance_double(HTTParty::Response, code: 500),
           config: { "app-host" => "https://example.com" },
           auth_token: "token"
         )
@@ -161,7 +161,7 @@ RSpec.describe VideoCaptionService, type: :service do
         allow(service).to receive_messages(
           url: "https://example.com/video.mp4",
           handoff_video_for_processing: "1234",
-          request_caption: double("Response", code: 200),
+          request_caption: instance_double(HTTParty::Response, code: 200),
           media: { "media" => { "captions" => [{ "status" => "in_progress" }] } },
           config: { "app-host" => "https://example.com" },
           auth_token: "token"
@@ -184,7 +184,7 @@ RSpec.describe VideoCaptionService, type: :service do
         allow(service).to receive_messages(
           url: "https://example.com/video.mp4",
           handoff_video_for_processing: "1234",
-          request_caption: double("Response", code: 200),
+          request_caption: instance_double(HTTParty::Response, code: 200),
           media: { "media" => { "captions" => [{ "language" => "en", "status" => "succeeded" }] } },
           grab_captions: nil,
           config: { "app-host" => "https://example.com" },
