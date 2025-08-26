@@ -22,6 +22,47 @@ RSpec.describe Lti::Asset do
     subject { lti_asset_model }
 
     it { is_expected.to be_valid }
+
+    context "exactly one locator field present" do
+      it "is valid with only attachment_id" do
+        expect(lti_asset_model(attachment: attachment_model).save).to be_truthy
+      end
+
+      it "is valid with only submission_attempt (RCE)" do
+        submission = submission_model(submission_type: "online_text_entry", body: "hi")
+        asset = lti_asset_model(submission:, submission_attempt: submission.attempt)
+        expect(asset.save).to be_truthy
+      end
+
+      it "is valid with only discussion_entry_version_id" do
+        topic = course_model.discussion_topics.create!
+        entry = topic.discussion_entries.create!(message: "msg", user: user_model)
+        dev = entry.discussion_entry_versions.first
+        submission = submission_model
+        asset = Lti::Asset.new(submission:, discussion_entry_version: dev)
+        expect(asset.save).to be_truthy
+      end
+
+      it "is valid with none present (referenced entity (discussion_entry_version_id) has been deleted)" do
+        submission = submission_model
+        asset = Lti::Asset.new(submission:, attachment: nil, submission_attempt: nil, discussion_entry_version_id: nil)
+        expect(asset).not_to be_valid
+        expect(asset.errors.full_messages.join).to match(/Exactly one of/)
+        expect(asset.save(validate: false)).to be_truthy
+      end
+
+      it "is invalid with multiple present" do
+        submission = submission_model(submission_type: "online_text_entry", body: "hi")
+        topic = submission.assignment.context.discussion_topics.create!
+        entry = topic.discussion_entries.create!(message: "msg", user: user_model)
+        dev = entry.discussion_entry_versions.first
+        # use raw model to control fields
+        asset = Lti::Asset.new(submission:, attachment: attachment_model, submission_attempt: submission.attempt, discussion_entry_version_id: dev.id)
+        expect(asset).not_to be_valid
+        expect(asset.errors.full_messages.join).to match(/Exactly one of/)
+        expect { asset.save!(validate: false) }.to raise_error(ActiveRecord::StatementInvalid, /CheckViolation|chk_one_asset_locator_present/)
+      end
+    end
   end
 
   it "generates a uuid" do
@@ -38,6 +79,7 @@ RSpec.describe Lti::Asset do
     asset1.submission.destroy
 
     expect(asset1.reload.submission_id).to be_nil
+    expect(asset1.asset_type).to eq "deleted"
   end
 
   it "allows multiple rows with the same attachment_id and empty submission id" do
@@ -53,12 +95,69 @@ RSpec.describe Lti::Asset do
     expect(asset2.reload.submission_id).to be_nil
   end
 
+  it "allows multiple rows with the same submission_attempt and empty submission id" do
+    submission = submission_model(submission_type: "online_text_entry", body: "hello body")
+    attempt_number = submission.attempt
+    asset1 = lti_asset_model(submission:, submission_attempt: attempt_number)
+    submission.destroy
+    asset1.reload
+    expect(asset1.submission_id).to be_nil
+
+    asset2 = Lti::Asset.new(submission_attempt: attempt_number)
+    asset2.uuid = SecureRandom.uuid
+    asset2.root_account_id = asset1.root_account_id
+    expect { asset2.save!(validate: false) }.not_to raise_error
+  end
+
   it "soft deleted when attachment is deleted" do
     asset1 = lti_asset_model
 
     asset1.attachment.destroy
 
     expect(asset1.reload.workflow_state).to eq("deleted")
+  end
+
+  describe "discussion_entry_version_id" do
+    it "prevents duplicates at the DB level" do
+      submission = submission_model
+      topic = submission.assignment.context.discussion_topics.create!
+      entry = topic.discussion_entries.create!(message: "msg", user: user_model)
+      dev = entry.discussion_entry_versions.first
+      first = Lti::Asset.create!(submission:, attachment: nil, submission_attempt: nil, discussion_entry_version_id: dev.id)
+      expect(first).to be_persisted
+
+      dup = Lti::Asset.new(submission:, discussion_entry_version_id: dev.id)
+      expect { dup.save! }.to raise_error(ActiveRecord::RecordNotUnique)
+    end
+
+    it "when deleting a discussion_entry_version referenced by an asset the asset is soft-deleted" do
+      submission = submission_model
+      topic = submission.assignment.context.discussion_topics.create!
+      entry = topic.discussion_entries.create!(message: "msg", user: user_model)
+      dev = entry.discussion_entry_versions.first
+      asset = Lti::Asset.create!(submission:, discussion_entry_version: dev)
+
+      dev.destroy!
+      expect(asset.reload.workflow_state).to eq("active")
+      expect(asset.discussion_entry_version_id).to be_nil
+    end
+
+    it "nullifies discussion_entry_version_id at the DB level via FK ON DELETE SET NULL" do
+      submission = submission_model
+      topic = submission.assignment.context.discussion_topics.create!
+      entry = topic.discussion_entries.create!(message: "msg", user: user_model)
+      dev = entry.discussion_entry_versions.first
+      asset = Lti::Asset.create!(submission:, discussion_entry_version: dev)
+
+      # Direct SQL delete to bypass AR callbacks and ensure database FK handles nullification
+      DiscussionEntryVersion.connection.execute("DELETE FROM #{DiscussionEntryVersion.quoted_table_name} WHERE id = #{dev.id}")
+
+      asset.reload
+      expect(asset.discussion_entry_version_id).to be_nil
+      # Asset should remain active and still have its submission id set
+      expect(asset.workflow_state).to eq("active")
+      expect(asset.submission_id).not_to be_nil
+    end
   end
 
   describe "#compatible_with_processor?" do
