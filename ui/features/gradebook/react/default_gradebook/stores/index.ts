@@ -33,6 +33,7 @@ import rubricAssessmentImport, {
 import rubricAssessmentExport, {
   type RubricAssessmentExportState,
 } from './rubricAssessmentExportState'
+import generateUUID from '@canvas/quiz-log-auditing/jquery/util/generateUUID'
 
 const defaultPerformanceControls = new PerformanceControls()
 
@@ -45,6 +46,7 @@ type State = {
   dispatch: RequestDispatch
   courseId: string
   flashMessages: FlashMessage[]
+  correlationId: string
 }
 
 export type GradebookStore = State &
@@ -66,6 +68,14 @@ const store = create<GradebookStore>((set, get) => ({
   courseId: '0',
 
   flashMessages: [],
+
+  // Unique identifier for tracking related API requests that belong to the same page load session.
+  // Currently used to correlate REST API requests by appending as a query parameter
+  // (?correlation_id=xxx). This allows observability tools like Observe to group related
+  // requests and calculate total/average load times for performance monitoring and REST vs
+  // GraphQL comparison analysis. Note: GraphQL request correlation method is still being
+  // determined.
+  correlationId: generateUUID(),
 
   ...filters(set, get),
 
