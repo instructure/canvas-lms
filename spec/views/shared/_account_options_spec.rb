@@ -54,7 +54,7 @@ describe "shared/_account_options" do
   end
 
   it "selects the current account when @context is set" do
-    assign(:context, double(account_id: @nested_sub_account1.id))
+    assign(:context, instance_double(Course, account_id: @nested_sub_account1.id))
 
     render partial: "shared/account_options", locals: { account: @root_account }
 
@@ -95,7 +95,7 @@ describe "shared/_account_options" do
 
   context "when the context is associated with a horizon account" do
     before do
-      assign(:context, double(account_id: @sub_account2.id))
+      assign(:context, instance_double(Course, account_id: @sub_account2.id))
     end
 
     it "marks the horizon account as selected" do

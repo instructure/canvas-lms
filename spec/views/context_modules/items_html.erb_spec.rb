@@ -27,7 +27,7 @@ describe "context_modules/items_html" do
 
   let(:can_view) { true }
   let(:is_student) { true }
-  let(:session_mock) { double("session_mock") }
+  let(:session_mock) { {} }
   let(:context_module) { @course.context_modules.create! }
   let(:non_call_render_params) do
     {
@@ -95,7 +95,7 @@ describe "context_modules/items_html" do
 
   context "when module is given" do
     let(:items_restrictions_mock) { [true] }
-    let(:item_mock) { double("item_mock", id: 1) }
+    let(:item_mock) { instance_double(Assignment, id: 1) }
     let(:item_data_mock) { { show_cyoe_placeholder: false } }
     let(:mock_module_data) do
       {
