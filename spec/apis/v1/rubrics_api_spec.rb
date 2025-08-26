@@ -488,6 +488,13 @@ describe "Rubrics API", type: :request do
         expected_assignments = [{ "id" => assignment.id, "title" => assignment.title }]
         expect(locations.first["assignments"]).to eq expected_assignments
       end
+
+      it "returns not found when provided a nonexistent rubric id" do
+        @user = account_admin_user
+        user_session(@user)
+        get "/api/v1/courses/#{@course.id}/rubrics/999/used_locations", as: :json
+        expect(response).to have_http_status(:not_found)
+      end
     end
 
     describe "upload status in a course" do
