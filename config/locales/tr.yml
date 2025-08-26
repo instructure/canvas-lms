@@ -19884,6 +19884,7 @@ tr:
   use_this_rubric_for_assignment_grading_a02fd079: "Ödev değerlendirmesi için bu ölçeği kullan"
   use_this_same_grade_for_the_resubmission_eaa6bf55: "Tekrar gönderimde aynı notu kullan"
   used_by_permission_314a78dd: "İzinli Kullanıldı"
+  used_by_screen_readers_to_describe_the_content_of__b1e76d9e: "Ekran okuyucuları tarafından bir görselin içeriğini açıklamak için kullanılır"
   user: 
     default_user_name: Kullanıcı
     errors: 
