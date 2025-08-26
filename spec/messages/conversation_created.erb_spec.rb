@@ -42,12 +42,12 @@ message")
   describe ".email" do
     it "doesnt have trailing erb closures" do
       allow(@message).to receive(:attachments).and_return([
-                                                            double("attachment",
-                                                                   display_name: "FileName",
-                                                                   readable_size: "1MB",
-                                                                   id: 42,
-                                                                   context: @teacher_enrollment.course,
-                                                                   uuid: "abcdef123456")
+                                                            instance_double(Attachment,
+                                                                            display_name: "FileName",
+                                                                            readable_size: "1MB",
+                                                                            id: 42,
+                                                                            context: @teacher_enrollment.course,
+                                                                            uuid: "abcdef123456")
                                                           ])
       msg = generate_message(:conversation_created, :email, @message)
       expect(msg.html_body).not_to match(/%>/)

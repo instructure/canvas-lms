@@ -44,7 +44,7 @@ describe "CanvasHttp Configuration" do
   end
 
   it "logs TLS versions" do
-    tls_socket = double(OpenSSL::SSL::SSLSocket)
+    tls_socket = instance_double(OpenSSL::SSL::SSLSocket)
     allow(tls_socket).to receive_messages(hostname: "example.com",
                                           cipher: ["TLS_AES_128_GCM_SHA256", "TLSv1.3", 256, 256])
 
