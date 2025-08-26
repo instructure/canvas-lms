@@ -22,13 +22,20 @@ import {Flex} from '@instructure/ui-flex'
 import {IconAiColoredSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import RegenerateCriteria from './RegenerateCriteria'
 
 const I18n = createI18nScope('rubrics-form-generated-criteria')
 
 type GeneratedCriteriaHeaderProps = {
   aiFeedbackLink?: string
+  onRegenerateAll: (additionalPrompt: string) => void
+  isGenerating?: boolean
 }
-export const GeneratedCriteriaHeader = ({aiFeedbackLink}: GeneratedCriteriaHeaderProps) => {
+export const GeneratedCriteriaHeader = ({
+  aiFeedbackLink,
+  onRegenerateAll,
+  isGenerating = false,
+}: GeneratedCriteriaHeaderProps) => {
   return (
     <View
       as="div"
@@ -43,23 +50,34 @@ export const GeneratedCriteriaHeader = ({aiFeedbackLink}: GeneratedCriteriaHeade
           <Heading level="h4">
             <Flex alignItems="center" gap="small">
               <IconAiColoredSolid />
-              <Text>{I18n.t('Auto-Generate Criteria')}</Text>
+              <Text>{I18n.t('Criteria Auto-Generated')}</Text>
             </Flex>
           </Heading>
         </Flex.Item>
         <Flex.Item shouldGrow={true}></Flex.Item>
-        {aiFeedbackLink && (
-          <Flex.Item>
-            <a
-              data-testid="give-feedback-link"
-              href={aiFeedbackLink}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {I18n.t('Give Feedback')}
-            </a>
-          </Flex.Item>
-        )}
+        <Flex.Item>
+          <Flex gap="small">
+            {aiFeedbackLink && (
+              <Flex.Item>
+                <a
+                  data-testid="give-feedback-link"
+                  href={aiFeedbackLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {I18n.t('Give Feedback')}
+                </a>
+              </Flex.Item>
+            )}
+            <Flex.Item>
+              <RegenerateCriteria
+                buttonColor="ai-primary"
+                disabled={isGenerating}
+                onRegenerate={onRegenerateAll}
+              />
+            </Flex.Item>
+          </Flex>
+        </Flex.Item>
       </Flex>
     </View>
   )

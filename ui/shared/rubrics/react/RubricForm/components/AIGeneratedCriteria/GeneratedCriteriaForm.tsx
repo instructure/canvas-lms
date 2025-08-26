@@ -46,6 +46,7 @@ export const defaultGenerateCriteriaForm: GenerateCriteriaFormProps = {
   useRange: false,
   additionalPromptInfo: '',
   gradeLevel: 'higher-ed',
+  standard: '',
 }
 
 const gradeLevels = {
@@ -76,6 +77,7 @@ type GeneratedCriteriaFormProps = {
   setShowGenerateCriteriaForm: (show: boolean) => void
   setShowGenerateCriteriaHeader: (show: boolean) => void
   setRubricFormField: RubricFormFieldSetter
+  onFormOptionsChange?: (options: GenerateCriteriaFormProps) => void
 }
 export const GeneratedCriteriaForm = ({
   courseId,
@@ -88,10 +90,17 @@ export const GeneratedCriteriaForm = ({
   setShowGenerateCriteriaForm,
   setShowGenerateCriteriaHeader,
   setRubricFormField,
+  onFormOptionsChange,
 }: GeneratedCriteriaFormProps) => {
   const [generateCriteriaForm, setGenerateCriteriaForm] = useState<GenerateCriteriaFormProps>(
     defaultGenerateCriteriaForm,
   )
+
+  // Notify parent component when form options change
+  const updateGenerateCriteriaForm = (newForm: GenerateCriteriaFormProps) => {
+    setGenerateCriteriaForm(newForm)
+    onFormOptionsChange?.(newForm)
+  }
 
   const onHandleProgressUpdates = (progress: CanvasProgress) => {
     handleProgressUpdates(progress)
@@ -162,7 +171,7 @@ export const GeneratedCriteriaForm = ({
             value={generateCriteriaForm.gradeLevel}
             onChange={(_event, {value}) => {
               if (value) {
-                setGenerateCriteriaForm({
+                updateGenerateCriteriaForm({
                   ...generateCriteriaForm,
                   gradeLevel: value.toString(),
                 })
@@ -184,7 +193,7 @@ export const GeneratedCriteriaForm = ({
             renderLabel={I18n.t('Number of Criteria')}
             value={generateCriteriaForm.criteriaCount.toString()}
             onChange={(_event, {value}) =>
-              setGenerateCriteriaForm({
+              updateGenerateCriteriaForm({
                 ...generateCriteriaForm,
                 criteriaCount: value ? parseInt(value.toString(), 10) : 0,
               })
@@ -206,7 +215,7 @@ export const GeneratedCriteriaForm = ({
             renderLabel={I18n.t('Number of Ratings')}
             value={generateCriteriaForm.ratingCount.toString()}
             onChange={(_event, {value}) =>
-              setGenerateCriteriaForm({
+              updateGenerateCriteriaForm({
                 ...generateCriteriaForm,
                 ratingCount: value ? parseInt(value.toString(), 10) : 0,
               })
@@ -228,7 +237,7 @@ export const GeneratedCriteriaForm = ({
             renderLabel={I18n.t('Points per Criterion')}
             value={generateCriteriaForm.pointsPerCriterion}
             onChange={(_event, value) =>
-              setGenerateCriteriaForm({
+              updateGenerateCriteriaForm({
                 ...generateCriteriaForm,
                 pointsPerCriterion: value,
               })
@@ -243,7 +252,7 @@ export const GeneratedCriteriaForm = ({
               label={I18n.t('Enable Range')}
               checked={generateCriteriaForm.useRange}
               onChange={_event =>
-                setGenerateCriteriaForm({
+                updateGenerateCriteriaForm({
                   ...generateCriteriaForm,
                   useRange: !generateCriteriaForm.useRange,
                 })
@@ -254,34 +263,67 @@ export const GeneratedCriteriaForm = ({
         <Flex.Item shouldGrow={true}></Flex.Item>
       </Flex>
       <Flex alignItems="end" gap="medium" margin="medium 0 0">
-        <Flex.Item shouldGrow={true}>
-          <TextArea
-            data-testid="additional-prompt-info-input"
-            label={I18n.t('Additional Prompt Information')}
-            placeholder={I18n.t(
-              'Optional. For example, "Target a college-level seminar." or "Focus on argument substance." or "Be lenient."',
-            )}
-            value={generateCriteriaForm.additionalPromptInfo}
-            onChange={event =>
-              setGenerateCriteriaForm({
-                ...generateCriteriaForm,
-                additionalPromptInfo: event.target.value,
-              })
-            }
-            messages={
-              generateCriteriaForm.additionalPromptInfo.length > 1000
-                ? [
-                    {
-                      text: I18n.t(
-                        'Additional prompt information must be less than 1000 characters',
-                      ),
-                      type: 'error',
-                    },
-                  ]
-                : undefined
-            }
-            height="4rem"
-          />
+        <Flex.Item shouldGrow={true} overflowX="visible" overflowY="visible">
+          <Flex direction="column" gap="medium">
+            <Flex.Item overflowX="visible" overflowY="visible">
+              <TextArea
+                data-testid="standard-objective-input"
+                label={I18n.t('Standard / Outcome Information')}
+                placeholder={I18n.t(
+                  'Optional. Place standard or outcome here. For example, "Students will analyze primary sources".',
+                )}
+                value={generateCriteriaForm.standard}
+                onChange={event =>
+                  updateGenerateCriteriaForm({
+                    ...generateCriteriaForm,
+                    standard: event.target.value,
+                  })
+                }
+                messages={
+                  generateCriteriaForm.standard.length > 1000
+                    ? [
+                        {
+                          text: I18n.t(
+                            'Standard and Outcome information must be less than 1000 characters',
+                          ),
+                          type: 'error',
+                        },
+                      ]
+                    : undefined
+                }
+                height="4rem"
+              />
+            </Flex.Item>
+            <Flex.Item overflowX="visible" overflowY="visible">
+              <TextArea
+                data-testid="additional-prompt-info-input"
+                label={I18n.t('Additional Prompt Information')}
+                placeholder={I18n.t(
+                  'Optional. For example, "Target a college-level seminar." or "Focus on argument substance." or "Be lenient."',
+                )}
+                value={generateCriteriaForm.additionalPromptInfo}
+                onChange={event =>
+                  updateGenerateCriteriaForm({
+                    ...generateCriteriaForm,
+                    additionalPromptInfo: event.target.value,
+                  })
+                }
+                messages={
+                  generateCriteriaForm.additionalPromptInfo.length > 1000
+                    ? [
+                        {
+                          text: I18n.t(
+                            'Additional prompt information must be less than 1000 characters',
+                          ),
+                          type: 'error',
+                        },
+                      ]
+                    : undefined
+                }
+                height="4rem"
+              />
+            </Flex.Item>
+          </Flex>
         </Flex.Item>
         <Flex.Item>
           <Button
@@ -290,7 +332,9 @@ export const GeneratedCriteriaForm = ({
             color="ai-primary"
             renderIcon={<IconAiSolid />}
             disabled={
-              generateCriteriaForm.additionalPromptInfo.length > 1000 || criteriaBeingGenerated
+              generateCriteriaForm.additionalPromptInfo.length > 1000 ||
+              generateCriteriaForm.standard.length > 1000 ||
+              criteriaBeingGenerated
             }
           >
             {I18n.t('Generate Criteria')}
