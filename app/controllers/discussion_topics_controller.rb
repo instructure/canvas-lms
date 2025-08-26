@@ -2134,8 +2134,8 @@ class DiscussionTopicsController < ApplicationController
   # LTI 1.3 Asset Processor Eula Service for discussions
   def asset_processor_eula_js_env_for_discussion
     return unless @current_user
-    # We show EULA for users who can post comments, which are forwarded to the asset processor.
-    # This can be a teacher or student.
+    # We show EULA for users who will have their entry content sent, e.g., students
+    return unless @context_enrollment.try(:student?) || @context_enrollment.is_a?(GroupMembership)
     return unless @topic.grants_right?(@current_user, session, :reply)
     return unless @topic.root_account.feature_enabled?(:lti_asset_processor_discussions)
     return unless @topic.assignment
