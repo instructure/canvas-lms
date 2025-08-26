@@ -292,6 +292,7 @@ const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
               <Flex.Item overflowY="visible">
                 <View
                   id="context-modules-publish-menu"
+                  data-testid="context-modules-publish-menu"
                   as="div"
                   display={responsive.props.display}
                   maxHeight="2.375rem"

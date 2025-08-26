@@ -346,6 +346,10 @@ module Modules2IndexPage
     "#context_module_item_#{module_item_id}"
   end
 
+  def bulk_publish_button_selector
+    "[data-testid='context-modules-publish-menu']"
+  end
+
   def context_module_item_published_icon_selector(module_item_id)
     "#{context_module_item_selector(module_item_id)} svg[name='IconPublish']"
   end
@@ -936,6 +940,10 @@ module Modules2IndexPage
 
   def add_item_button(module_id)
     fj("button:contains('Add Item')", context_module_selector(module_id))
+  end
+
+  def add_item_button_selector
+    "[data-testid='add-item-button']"
   end
 
   def new_item_type_select_selector

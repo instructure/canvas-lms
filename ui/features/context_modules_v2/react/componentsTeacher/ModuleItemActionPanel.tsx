@@ -101,7 +101,8 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   const [isDirectShareCourseOpen, setIsDirectShareCourseOpen] = useState(false)
   const [isPublishButtonEnabled, setIsPublishButtonEnabled] = useState(true)
 
-  const {courseId, isMasterCourse, isChildCourse, setMenuItemLoadingState} = useContextModule()
+  const {courseId, isMasterCourse, isChildCourse, setMenuItemLoadingState, permissions} =
+    useContextModule()
 
   const renderMasteryPathsInfo = () => {
     if (!masteryPathsData || (!masteryPathsData.isTrigger && !masteryPathsData.releasedLabel)) {
@@ -285,31 +286,34 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
           />
         )}
         {/* Publish Icon */}
-        <Flex.Item>{renderPublishButton(content?.type)}</Flex.Item>
+        {permissions.canEdit && <Flex.Item>{renderPublishButton(content?.type)}</Flex.Item>}
         {/* Kebab Menu */}
-        <Flex.Item data-testid={`module-item-action-menu_${itemId}`}>
-          <ModuleItemActionMenu
-            moduleId={moduleId}
-            itemType={content?.type || ''}
-            content={content}
-            canDuplicate={content?.canDuplicate || false}
-            isMenuOpen={isMenuOpen}
-            setIsMenuOpen={setIsMenuOpen}
-            indent={indent}
-            handleEdit={handleEditRef}
-            handleSpeedGrader={handleSpeedGraderRef}
-            handleAssignTo={handleAssignToRef}
-            handleDuplicate={handleDuplicateRef}
-            handleMoveTo={handleMoveToRef}
-            handleDecreaseIndent={handleDecreaseIndentRef}
-            handleIncreaseIndent={handleIncreaseIndentRef}
-            handleSendTo={handleSendToRef}
-            handleCopyTo={handleCopyToRef}
-            handleRemove={handleRemoveRef}
-            masteryPathsData={masteryPathsData}
-            handleMasteryPaths={handleMasteryPathsRef}
-          />
-        </Flex.Item>
+        {(permissions.canView || permissions.canDirectShare) && (
+          <Flex.Item data-testid={`module-item-action-menu_${itemId}`}>
+            <ModuleItemActionMenu
+              moduleId={moduleId}
+              itemType={content?.type || ''}
+              content={content}
+              published={published}
+              canDuplicate={content?.canDuplicate || false}
+              isMenuOpen={isMenuOpen}
+              setIsMenuOpen={setIsMenuOpen}
+              indent={indent}
+              handleEdit={handleEditRef}
+              handleSpeedGrader={handleSpeedGraderRef}
+              handleAssignTo={handleAssignToRef}
+              handleDuplicate={handleDuplicateRef}
+              handleMoveTo={handleMoveToRef}
+              handleDecreaseIndent={handleDecreaseIndentRef}
+              handleIncreaseIndent={handleIncreaseIndentRef}
+              handleSendTo={handleSendToRef}
+              handleCopyTo={handleCopyToRef}
+              handleRemove={handleRemoveRef}
+              masteryPathsData={masteryPathsData}
+              handleMasteryPaths={handleMasteryPathsRef}
+            />
+          </Flex.Item>
+        )}
       </Flex>
       {['assignment', 'attachment', 'discussion', 'page', 'quiz', 'module', 'module_item'].includes(
         content?.type?.toLowerCase() || '',

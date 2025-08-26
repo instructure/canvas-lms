@@ -77,6 +77,7 @@ const contextModuleDefaultProps = {
     canAdd: false,
     canEdit: false,
     canDelete: false,
+    canView: false,
     canViewUnpublished: false,
     canDirectShare: false,
   },

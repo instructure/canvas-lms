@@ -46,6 +46,7 @@ export interface EnvContextModules {
         canAdd: boolean
         canEdit: boolean
         canDelete: boolean
+        canView: boolean
         canViewUnpublished: boolean
         canDirectShare: boolean
         canManageSpeedGrader: boolean

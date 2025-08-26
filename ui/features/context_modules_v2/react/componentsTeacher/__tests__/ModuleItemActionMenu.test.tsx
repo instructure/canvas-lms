@@ -21,13 +21,18 @@ import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useM
 import ModuleItemActionMenu from '../ModuleItemActionMenu'
 import type {ModuleItemContent} from '../../utils/types'
 
-const setUp = (itemType: string = 'Assignment', content: ModuleItemContent = {}) => {
+const setUp = (
+  itemType: string = 'Assignment',
+  content: ModuleItemContent = {},
+  published: boolean = true,
+) => {
   const container = render(
     <ContextModuleProvider {...contextModuleDefaultProps}>
       <ModuleItemActionMenu
         moduleId=""
         itemType={itemType}
         content={content}
+        published={published}
         canDuplicate={true}
         isMenuOpen={false}
         setIsMenuOpen={() => {}}
@@ -60,15 +65,17 @@ const setUp = (itemType: string = 'Assignment', content: ModuleItemContent = {})
 const assertMenuItems = ({
   itemType,
   content,
+  published = true,
   visibleItems = [],
   hiddenItems = [],
 }: {
   itemType: string
   content: ModuleItemContent
+  published?: boolean
   visibleItems: string[]
   hiddenItems: string[]
 }) => {
-  const {container, menuButton} = setUp(itemType, content)
+  const {container, menuButton} = setUp(itemType, content, published)
   fireEvent.click(menuButton)
 
   for (const text of visibleItems) {
@@ -90,7 +97,6 @@ describe('ModuleItemActionMenu', () => {
     assertMenuItems({
       itemType: 'Assignment',
       content: {
-        published: true,
         canManageAssignTo: true,
       },
       visibleItems: [
@@ -113,7 +119,28 @@ describe('ModuleItemActionMenu', () => {
     assertMenuItems({
       itemType: 'Assignment',
       content: {
-        published: false,
+        canManageAssignTo: true,
+      },
+      published: false,
+      visibleItems: [
+        'Edit',
+        'Assign To...',
+        'Duplicate',
+        'Move to...',
+        'Decrease indent',
+        'Increase indent',
+        'Send To...',
+        'Copy To...',
+        'Remove',
+      ],
+      hiddenItems: ['SpeedGrader'],
+    })
+  })
+
+  it('does not show speedgrader for ungraded discussions', () => {
+    assertMenuItems({
+      itemType: 'Discussion',
+      content: {
         canManageAssignTo: true,
       },
       visibleItems: [
@@ -128,6 +155,31 @@ describe('ModuleItemActionMenu', () => {
         'Remove',
       ],
       hiddenItems: ['SpeedGrader'],
+    })
+  })
+
+  it('shows SpeedGrader for graded discussions', () => {
+    assertMenuItems({
+      itemType: 'Discussion',
+      content: {
+        canManageAssignTo: true,
+        assignment: {
+          _id: '123',
+        },
+      },
+      visibleItems: [
+        'Edit',
+        'Assign To...',
+        'Duplicate',
+        'Move to...',
+        'Decrease indent',
+        'Increase indent',
+        'Send To...',
+        'Copy To...',
+        'Remove',
+        'SpeedGrader',
+      ],
+      hiddenItems: [],
     })
   })
 
@@ -169,9 +221,9 @@ describe('ModuleItemActionMenu', () => {
     })
   })
 
-  it.each([['File'], ['ExternalTool']])('hides specific menu items for %s itemType', itemType => {
+  it('hides specific menu items for ExternalTool itemType', () => {
     assertMenuItems({
-      itemType,
+      itemType: 'ExternalTool',
       content: {},
       visibleItems: ['Edit', 'Move to...', 'Decrease indent', 'Increase indent', 'Remove'],
       hiddenItems: [
@@ -180,6 +232,29 @@ describe('ModuleItemActionMenu', () => {
         'Duplicate',
         'Send To...',
         'Copy To...',
+        'Add Mastery Paths',
+        'Edit Mastery Paths',
+      ],
+    })
+  })
+
+  it('hides specific menu items for File itemType', () => {
+    assertMenuItems({
+      itemType: 'File',
+      content: {},
+      visibleItems: [
+        'Edit',
+        'Move to...',
+        'Decrease indent',
+        'Increase indent',
+        'Remove',
+        'Send To...',
+        'Copy To...',
+      ],
+      hiddenItems: [
+        'SpeedGrader',
+        'Assign To...',
+        'Duplicate',
         'Add Mastery Paths',
         'Edit Mastery Paths',
       ],

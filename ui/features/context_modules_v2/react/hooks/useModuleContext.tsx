@@ -112,6 +112,7 @@ export const ContextModuleProvider = ({
         canAdd: boolean
         canEdit: boolean
         canDelete: boolean
+        canView: boolean
         canViewUnpublished: boolean
         canDirectShare: boolean
       }
@@ -187,6 +188,7 @@ export const contextModuleDefaultProps = {
     canAdd: true,
     canEdit: true,
     canDelete: true,
+    canView: true,
     canViewUnpublished: true,
     canDirectShare: true,
     readAsAdmin: true,
