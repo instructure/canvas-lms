@@ -177,7 +177,11 @@ const DiscussionPostButtonsToolbar = props => {
   const createDrillDownOptions = () => {
     const options = []
     const childTopicSize = props.childTopics?.length
-    if (childTopicSize >= 0 && props.isAdmin) {
+    if (
+      !window.top.location.href.includes('speed_grader') &&
+      childTopicSize >= 0 &&
+      props.isAdmin
+    ) {
       options.push(
         <Drilldown.Option
           id="maingroup"
