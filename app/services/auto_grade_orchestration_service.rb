@@ -217,9 +217,9 @@ class AutoGradeOrchestrationService
   def get_criteria_missing_grades(grade_data, rubric)
     return rubric.data.pluck(:description) unless grade_data
 
-    graded_criteria = grade_data.pluck("description")
-    all_criteria = rubric.data.pluck(:description)
-    all_criteria - graded_criteria
+    graded_norm = grade_data.pluck("description").map { |d| TextNormalizerHelper.normalize(d) }
+    rubric_desc = rubric.data.pluck(:description)
+    rubric_desc.reject { |d| graded_norm.include?(TextNormalizerHelper.normalize(d)) }
   end
 
   def get_criteria_missing_comments(grade_data, rubric)
