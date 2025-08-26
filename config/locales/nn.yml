@@ -9474,6 +9474,7 @@ nn:
   decaying_average_recentint_remainderint_ab0636cc: "Synkande gjennomsnitt - %{recentInt}%/%{remainderInt}%"
   december_acc47508: Desember
   decorative_image_3c28aa7d: "Dekorativt bilde"
+  decorative_image_fde98579: "Dekorativt bilde"
   decrease_indent_d9cf469d: "Reduser innrykk"
   decrease_indent_de6343ab: "Reduser innrykk"
   deduct_104e8866: Utrekne
@@ -28377,6 +28378,7 @@ nn:
   use_this_same_grade_for_the_resubmission_eaa6bf55: "Bruk same vurdering for den nye innleveringa"
   use_webcam_1ed0bf6b: "Bruk Webkamera"
   used_by_permission_314a78dd: "Med løyve"
+  used_by_screen_readers_to_describe_the_content_of__b1e76d9e: "Skjermlesarar brukar dette for å skildre innhaldet i eit bilde"
   user: 
     default_user_name: Brukar
     errors: 
