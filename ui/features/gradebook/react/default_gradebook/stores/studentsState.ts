@@ -20,7 +20,11 @@ import {difference, chunk, keyBy, groupBy, cloneDeep, setWith as lodashSetWith} 
 import type {StoreApi} from 'zustand'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {GradebookStore} from './index'
-import {getContentForStudentIdChunk} from './studentsState.utils'
+import {
+  flashStudentLoadError,
+  flashSubmissionLoadError,
+  getContentForStudentIdChunk,
+} from './studentsState.utils'
 import {asJson, consumePrefetchedXHR} from '@canvas/util/xhr'
 import type {
   AssignmentUserSubmissionMap,
@@ -330,6 +334,7 @@ export default (
         limit(async () => {
           const {data} = await getAllSubmissions({
             queryParams: {userIds: userIdChunk, courseId},
+            onError: flashSubmissionLoadError,
           })
           const submissionsByUserId = groupBy(data.map(transformSubmission), 'user_id')
 
@@ -350,6 +355,7 @@ export default (
       const userIds = users.course.usersConnection.nodes.map(it => it._id)
       const {data: enrollments} = await getAllEnrollments({
         queryParams: {userIds: userIds, courseId},
+        onError: flashStudentLoadError,
       })
       await onEnrollmentSuccess(users.course.usersConnection.nodes, enrollments)
     }
@@ -361,6 +367,7 @@ export default (
         first: GRADEBOOK_GRAPHQL_CONFIG.usersPageSize,
       },
       onSuccess: onUserPageSuccess,
+      onError: flashStudentLoadError,
     })
     await Promise.all([...onSuccessCallbacks, ...onErrorCallbacks])
 
