@@ -21,6 +21,22 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import type {RequestDispatch} from '@canvas/network'
 import type {Student, UserSubmissionGroup} from '../../../../../api.d'
+import GRADEBOOK_GRAPHQL_CONFIG from './graphql/config'
+
+/**
+ * Calculates the optimal number of students per submission request to maximize
+ * parallel request efficiency. This function ensures we use the maximum allowed
+ * parallel threads by distributing students across requests rather than making
+ * fewer requests with more students each. For example, with many students, it's
+ * faster to make more parallel requests with fewer students per request than
+ * fewer requests with many students each.
+ */
+export const smartStudentsPerSubmissionRequest = (totalCount: number) => {
+  return Math.min(
+    Math.ceil(totalCount / GRADEBOOK_GRAPHQL_CONFIG.maxSubmissionRequestCount),
+    GRADEBOOK_GRAPHQL_CONFIG.initialNumberOfStudentsPerSubmissionRequest,
+  )
+}
 
 const I18n = createI18nScope('gradebook')
 

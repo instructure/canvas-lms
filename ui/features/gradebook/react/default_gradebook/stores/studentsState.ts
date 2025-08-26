@@ -24,6 +24,7 @@ import {
   flashStudentLoadError,
   flashSubmissionLoadError,
   getContentForStudentIdChunk,
+  smartStudentsPerSubmissionRequest,
 } from './studentsState.utils'
 import {asJson, consumePrefetchedXHR} from '@canvas/util/xhr'
 import type {
@@ -325,10 +326,7 @@ export default (
       })
 
       // fetch submissions for userIds
-      const userIdChunks = chunk(
-        userIds,
-        GRADEBOOK_GRAPHQL_CONFIG.initialNumberOfStudentsPerSubmissionRequest,
-      )
+      const userIdChunks = chunk(userIds, smartStudentsPerSubmissionRequest(userIds.length))
 
       const promises = userIdChunks.map(userIdChunk =>
         limit(async () => {
