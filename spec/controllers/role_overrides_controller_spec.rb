@@ -392,8 +392,7 @@ describe RoleOverridesController do
             end
           end
 
-          expect(wiki_permissions.pluck(:granular_permission_group).uniq).to eq ["manage_wiki"]
-          expect(wiki_permissions.pluck(:granular_permission_group_label).uniq).to eq ["Manage Pages"]
+          expect(wiki_permissions.pluck(:granular_permission_group).uniq).to eq [:manage_wiki]
         end
       end
     end

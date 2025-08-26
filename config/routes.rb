@@ -1862,6 +1862,11 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/permissions/:permission", action: :check_account_permission
     end
 
+    scope(controller: :permissions_help) do
+      get "permissions/groups", action: :groups
+      get "permissions/:context_type/:permission/help", action: :help
+    end
+
     scope(controller: :account_reports) do
       get "accounts/:account_id/reports/:report", action: :index
       get "accounts/:account_id/reports", action: :available_reports

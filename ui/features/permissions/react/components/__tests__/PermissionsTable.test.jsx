@@ -23,7 +23,7 @@ import {Provider} from 'react-redux'
 import $ from 'jquery'
 
 import PermissionsTable from '../PermissionsTable'
-import {ROLES, PERMISSIONS} from '../../__tests__/examples'
+import {ROLES, PERMISSIONS, PERMISSION_GROUPS} from '../../__tests__/examples'
 import createStore from '../../store'
 
 // Mock jQuery screenReaderFlashMessage
@@ -44,6 +44,7 @@ const defaultProps = () => ({
   permissions: PERMISSIONS.filter(p => p.displayed),
   setAndOpenRoleTray: jest.fn(),
   setAndOpenPermissionTray: jest.fn(),
+  permissionGroups: PERMISSION_GROUPS,
 })
 
 const defaultInitialState = () => ({

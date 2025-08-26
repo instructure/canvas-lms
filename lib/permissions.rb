@@ -66,4 +66,16 @@ module Permissions
 
     @permissions
   end
+
+  def self.permission_groups
+    PERMISSION_GROUPS
+  end
+
+  def self.group_info(group)
+    PERMISSION_GROUPS[group]
+  end
+
+  def self.group_label(group)
+    PERMISSION_GROUPS.dig(group, :label)&.call
+  end
 end

@@ -1926,6 +1926,10 @@
 - verb: PUT
   path: '/api/v1/outcomes/:id'
 - verb: GET
+  path: '/api/v1/permissions/:context_type/:permission/help'
+- verb: GET
+  path: '/api/v1/permissions/groups'
+- verb: GET
   path: '/api/v1/planner/items'
 - verb: GET
   path: '/api/v1/planner/overrides'
