@@ -497,7 +497,7 @@ describe "profile" do
     context "google drive" do
       it "links back to profile/settings in oauth callbacks" do
         allow(Canvas::Plugin).to receive(:find).and_call_original
-        allow(Canvas::Plugin).to receive(:find).with(:google_drive).and_return(double(enabled?: true))
+        allow(Canvas::Plugin).to receive(:find).with(:google_drive).and_return(instance_double(Canvas::Plugin, enabled?: true))
         @user.account.enable_service(:google_drive)
         @user.account.save!
         get "/profile/settings"

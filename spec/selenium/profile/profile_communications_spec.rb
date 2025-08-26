@@ -30,8 +30,8 @@ describe "profile communication settings" do
     @sub_comment = Notification.create(name: "Submission Comment1", category: "Submission Comment")
   end
 
-  let(:sns_response) { double(data: { endpointarn: "endpointarn" }) }
-  let(:sns_client) { double(create_platform_endpoint: sns_response) }
+  let(:sns_response) { instance_double(Aws::SNS::Types::CreateEndpointResponse, data: { endpointarn: "endpointarn" }) }
+  let(:sns_client) { instance_double(Aws::SNS::Client, create_platform_endpoint: sns_response) }
   let(:sns_developer_key_sns_field) { sns_client }
 
   let(:sns_developer_key) do
