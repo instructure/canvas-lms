@@ -25,11 +25,12 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {func, string} from 'prop-types'
 
 const I18n = createI18nScope('groups')
-const pctFormat = new Intl.NumberFormat(ENV.LOCALE || navigator.language, {style: 'percent'}).format
 
 const POLLING_INTERVAL = 1000
 
 export const AssignmentProgress = ({url, onCompletion, apiCall}) => {
+  const pctFormat = new Intl.NumberFormat(ENV.LOCALE || navigator.language, {style: 'percent'})
+    .format
   const [progressPercent, setProgressPercent] = useState(0)
 
   function startPolling() {
