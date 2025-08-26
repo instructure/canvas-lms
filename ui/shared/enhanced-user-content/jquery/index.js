@@ -137,36 +137,33 @@ function enhanceUserJQueryWidgetContent() {
 }
 
 function ellipsifyBreadcrumbs() {
-  // this next block of code adds the ellipsis on the breadcrumb if it overflows one line
-  const $breadcrumbs = $('#breadcrumbs')
-  if ($breadcrumbs.length) {
-    let $breadcrumbEllipsis
-    let addedEllipsisClass = false
-    // if we ever change the styling of the breadcrumbs so their height changes, change this too. the * 1.5 part is just in case to ever handle any padding or margin.
-    const hightOfOneBreadcrumb = 27 * 1.5
-    let taskID
-    const resizeBreadcrumb = () => {
-      if (taskID) (window.cancelIdleCallback || window.cancelAnimationFrame)(taskID)
-      taskID = (window.requestIdleCallback || window.requestAnimationFrame)(() => {
-        let maxWidth = 500
-        $breadcrumbEllipsis = $breadcrumbEllipsis || $breadcrumbs.find('.ellipsible')
-        $breadcrumbEllipsis.ifExists(() => {
-          $breadcrumbEllipsis.css('maxWidth', '')
-          for (let i = 0; $breadcrumbs.height() > hightOfOneBreadcrumb && i < 20; i++) {
-            // the i here is just to make sure we don't get into an ifinite loop somehow
-            if (!addedEllipsisClass) {
-              addedEllipsisClass = true
-              $breadcrumbEllipsis.addClass('ellipsis')
-            }
-            $breadcrumbEllipsis.css('maxWidth', (maxWidth -= 20))
+  const breadcrumbs = document.getElementById('breadcrumbs')
+  if (breadcrumbs === null) return
+  let breadcrumbEllipsis
+  let addedEllipsisClass = false
+  const heightOfOneBreadcrumb = 27 * 1.5
+  let taskID
+  function resizeBreadcrumb() {
+    if (taskID) (window.cancelIdleCallback || window.cancelAnimationFrame)(taskID)
+    taskID = (window.requestIdleCallback || window.requestAnimationFrame)(() => {
+      let maxWidth = 500
+      breadcrumbEllipsis = breadcrumbEllipsis || breadcrumbs.querySelector('.ellipsible')
+      if (breadcrumbEllipsis) {
+        breadcrumbEllipsis.style.maxWidth = ''
+        for (let i = 0; breadcrumbs.offsetHeight > heightOfOneBreadcrumb && i < 20; i++) {
+          if (!addedEllipsisClass) {
+            addedEllipsisClass = true
+            breadcrumbEllipsis.classList.add('ellipsis')
           }
-        })
-      })
-    }
-    resizeBreadcrumb() // force it to run once right now
-    $(window).resize(resizeBreadcrumb)
-    // end breadcrumb ellipsis
+          maxWidth -= 20
+          breadcrumbEllipsis.style.maxWidth = `${maxWidth}px`
+        }
+      }
+    })
   }
+  resizeBreadcrumb() // force it to run once right now
+  window.addEventListener('resize', resizeBreadcrumb)
+  // end breadcrumb ellipsis
 }
 
 function bindKeyboardShortcutsHelpPanel() {
@@ -550,50 +547,94 @@ function doThingsToModuleSequenceFooter() {
 
 function showHideRemoveThingsToRightSideMoreLinksWhenClicked() {
   // this is for things like the to-do, recent items and upcoming, it
-  // happend a lot so rather than duplicating it everywhere I stuck it here
-  $('#right-side').on('click', '.more_link', function (event) {
-    const $this = $(this)
-    const $children = $this.parents('ul').children(':hidden').show()
-    $this.closest('li').remove()
+  // happened a lot so rather than duplicating it everywhere I stuck it here
+  const rightSide = document.getElementById('right-side')
+  if (!rightSide) return
+
+  rightSide.addEventListener('click', event => {
+    const target = event.target.closest('.more_link')
+    if (!target) return
+
+    event.preventDefault()
+
+    const ul = target.closest('ul')
+    const hiddenCSS = ':scope > li[style*="display: none"], :scope > li[hidden]'
+    const hiddenItems = Array.from(ul.querySelectorAll(hiddenCSS))
+
+    // Show all hidden items
+    hiddenItems.forEach(item => {
+      item.style.display = ''
+      if (item.hasAttribute('hidden')) item.removeAttribute('hidden')
+    })
+
+    // Remove the "more" list item
+    target.closest('li')?.remove()
+
     // if they are using the keyboard to navigate (they hit enter on the link instead of actually
     // clicking it) then put focus on the first of the now-visible items--otherwise, since the
     // .more_link is hidden, focus would be completely lost and leave a blind person stranded.
     // don't want to set focus if came from a mouse click because then you'd have 2 of the tooltip
     // bubbles staying visible, see #9211
-    if (event.screenX === 0) {
-      $children.first().find(':tabbable:first').focus()
+    if (event.screenX === 0 && hiddenItems.length > 0) {
+      const focusableCSS = 'a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      hiddenItems[0].querySelector(focusableCSS)?.focus()
     }
-    return false
   })
 }
 
 function confirmAndDeleteRightSideTodoItemsWhenClicked() {
-  $('#right-side').on('click', '.disable-todo-item-link', function (event) {
+  const rightSide = document.getElementById('right-side')
+  if (!rightSide) return
+
+  rightSide.addEventListener('click', event => {
+    const target = event.target.closest('.disable-todo-item-link')
+    if (!target) return
+
     event.preventDefault()
-    const $item = $(this).parents('li, div.topic_message').last()
-    const $prevItem = $(this).closest('.to-do-list > li').prev()
-    const toFocus =
-      ($prevItem.find('.disable-todo-item-link').length &&
-        $prevItem.find('.disable-todo-item-link')) ||
-      $('.todo-list-header')
-    const url = $(this).data('api-href')
-    const flashMessage = $(this).data('flash-message')
-    function remove(delete_url) {
-      $item.confirmDelete({
-        url: delete_url,
-        noMessage: true,
-        success() {
-          if (flashMessage) {
-            $.flashMessage(flashMessage)
-          }
-          $(this).slideUp(function () {
-            $(this).remove()
-            toFocus.focus()
-          })
-        },
-      })
+
+    // Find the item to be removed (equivalent to $(this).parents('li, div.topic_message').last())
+    const item = target.closest('li') || target.closest('div.topic_message')
+    if (!item) return
+
+    // Find previous item for focus management
+    const todoList = target.closest('.to-do-list')
+    let toFocus
+
+    if (todoList) {
+      const parentLi = target.closest('li')
+      const prevItem = parentLi.previousElementSibling
+      if (prevItem) {
+        toFocus = prevItem.querySelector('.disable-todo-item-link')
+      }
     }
-    remove(url)
+
+    if (!toFocus) {
+      toFocus = document.querySelector('.todo-list-header')
+    }
+
+    // Get data attributes
+    const url = target.dataset.apiHref
+    const flashMessage = target.dataset.flashMessage
+
+    // This is a complex part because confirmDelete is a jQuery plugin
+    // We need to use the jQuery implementation for now since creating a full
+    // native confirmation dialog with AJAX would be too complex
+    const $item = $(item)
+    $item.confirmDelete({
+      url: url,
+      noMessage: true,
+      success() {
+        if (flashMessage) {
+          $.flashMessage(flashMessage)
+        }
+
+        // Use jQuery for animation for now (slideUp with callback)
+        $(this).slideUp(function () {
+          this.remove()
+          if (toFocus) toFocus.focus()
+        })
+      },
+    })
   })
 }
 
