@@ -1809,6 +1809,8 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def user_name
+    return nil if anonymous? && !context.user_is_instructor?(user)
+
     user&.name
   end
 
