@@ -58,7 +58,7 @@ describe QuizzesNext::QuizSerializer do
     )
   end
   let(:user) { User.create }
-  let(:session) { double(:[] => nil) }
+  let(:session) { {} }
   let(:controller) do
     ActiveModel::FakeController.new(accepts_jsonapi: false, stringify_json_ids: false)
   end

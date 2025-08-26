@@ -24,7 +24,7 @@ describe Accessibility::ResourceScannerService do
   let(:wiki_page) { wiki_page_model(course:, body: "<ul><li>foo</li></ul>") }
 
   describe "#call" do
-    let(:delay_mock) { double("delay") }
+    let(:delay_mock) { instance_double(described_class) }
 
     before do
       allow(subject).to receive(:delay).and_return(delay_mock)

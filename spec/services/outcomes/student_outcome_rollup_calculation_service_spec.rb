@@ -28,12 +28,7 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
   end
 
   describe ".calculate_for_student" do
-    let(:delay_mock) { double("delay") }
-
-    before do
-      allow(Outcomes::StudentOutcomeRollupCalculationService).to receive(:delay).and_return(delay_mock)
-      allow(delay_mock).to receive(:call)
-    end
+    let(:delay_mock) { class_double(described_class) }
 
     it "enqueues a delayed job to calculate student outcome rollups" do
       Timecop.freeze do
@@ -620,8 +615,8 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
 
       before do
         # Mock only the quiz_lti scope to return our quiz assignment
-        where_scope = double("where_scope")
-        active_scope = double("active_scope")
+        where_scope = class_double(Assignment)
+        active_scope = class_double(Assignment)
 
         allow(Assignment).to receive(:active).and_return(active_scope)
         allow(active_scope).to receive(:where).and_return(where_scope)
@@ -1269,8 +1264,8 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
           outcome.save!
 
           # Mock only the quiz_lti scope to return our quiz assignment
-          where_scope = double("where_scope")
-          active_scope = double("active_scope")
+          where_scope = class_double(Assignment)
+          active_scope = class_double(Assignment)
 
           allow(Assignment).to receive(:active).and_return(active_scope)
           allow(active_scope).to receive(:where).and_return(where_scope)
@@ -1329,8 +1324,8 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
         outcome.calculation_method = "highest"
         outcome.save!
 
-        where_scope = double("where_scope")
-        active_scope = double("active_scope")
+        where_scope = class_double(Assignment)
+        active_scope = class_double(Assignment)
 
         allow(Assignment).to receive(:active).and_return(active_scope)
         allow(active_scope).to receive(:where).and_return(where_scope)
