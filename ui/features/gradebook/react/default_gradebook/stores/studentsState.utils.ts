@@ -84,6 +84,7 @@ export function getStudentsChunk(
   courseId: string,
   studentIds: string[],
   dispatch: RequestDispatch,
+  correlationId: string,
 ) {
   const params = {
     enrollment_state: ['active', 'completed', 'inactive', 'invited'],
@@ -91,6 +92,7 @@ export function getStudentsChunk(
     include: ['avatar_url', 'enrollments', 'group_ids', 'last_name', 'first_name'],
     per_page: studentIds.length,
     user_ids: studentIds,
+    correlation_id: correlationId, // Enables request correlation for performance monitoring and analysis
   }
   return dispatch.getJSON<Student[]>(`/api/v1/courses/${courseId}/users`, params)
 }
@@ -102,10 +104,16 @@ export function getSubmissionsForStudents(
   // @ts-expect-error
   allEnqueued,
   dispatch: RequestDispatch,
+  correlationId: string,
 ) {
   return new Promise<UserSubmissionGroup[]>((resolve, reject) => {
     const url = `/api/v1/courses/${courseId}/students/submissions`
-    const params = {...submissionsParams, student_ids: studentIds, per_page: submissionsPerPage}
+    const params = {
+      ...submissionsParams,
+      student_ids: studentIds,
+      per_page: submissionsPerPage,
+      correlation_id: correlationId, // Enables request correlation for performance monitoring and analysis
+    }
 
     dispatch
       .getDepaginated<UserSubmissionGroup[]>(url, params, undefined, allEnqueued)
@@ -125,6 +133,7 @@ export function getContentForStudentIdChunk(
   submissionsPerPage: number,
   gotChunkOfStudents: (students: Student[]) => void,
   gotSubmissionsChunk: (student_submission_groups: UserSubmissionGroup[]) => void,
+  correlationId: string,
 ) {
   // @ts-expect-error
   let resolveEnqueued
@@ -132,7 +141,9 @@ export function getContentForStudentIdChunk(
     resolveEnqueued = resolve
   })
 
-  const studentRequest = getStudentsChunk(courseId, studentIds, dispatch).then(gotChunkOfStudents)
+  const studentRequest = getStudentsChunk(courseId, studentIds, dispatch, correlationId).then(
+    gotChunkOfStudents,
+  )
 
   const submissionRequestChunks = chunk(studentIds, submissionsChunkSize)
   const submissionRequests: Promise<void>[] = []
@@ -147,6 +158,7 @@ export function getContentForStudentIdChunk(
       // @ts-expect-error
       resolveEnqueued,
       dispatch,
+      correlationId,
     )
       .then(subs => (submissions = subs))
       // within the main Gradebook object, students must be received before
