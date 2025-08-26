@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -53,7 +53,7 @@ export default function RequirementForm({
   onDropRequirement,
   onUpdateRequirement,
   pointsInputMessages,
-  validatePointsInput
+  validatePointsInput,
 }: RequirementFormProps) {
   const addRequirementButton = createRef<Button>()
   const internalLastAction = useRef<{action: 'add' | 'delete'; index: number} | null>(null)
@@ -145,6 +145,7 @@ export default function RequirementForm({
             } as Requirement)
           }}
           renderIcon={<IconAddLine />}
+          data-testid="add-requirement-button"
         >
           <AccessibleContent alt={I18n.t('Add Requirement')}>
             {I18n.t('Requirement')}

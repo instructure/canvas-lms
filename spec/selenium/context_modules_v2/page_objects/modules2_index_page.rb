@@ -34,6 +34,10 @@ module Modules2IndexPage
     "[data-testid='completion-requirement']"
   end
 
+  def context_module_completion_requirement_selector(module_id)
+    "#context_module_#{module_id} [data-testid='completion-requirement']"
+  end
+
   def copy_to_button_selector
     "button:contains('Copy')"
   end
@@ -350,6 +354,10 @@ module Modules2IndexPage
     "#{context_module_item_selector(module_item_id)} svg[name='IconUnpublished']"
   end
 
+  def context_module_item_todo_selector(module_item_id, todo_text)
+    "#{context_module_item_selector(module_item_id)} span:contains('#{todo_text}')"
+  end
+
   def context_module_published_icon_selector(module_id)
     "#{context_module_selector(module_id)} svg[name='IconPublish']"
   end
@@ -429,6 +437,10 @@ module Modules2IndexPage
 
   def context_module(module_id)
     f(context_module_selector(module_id))
+  end
+
+  def context_module_completion_requirement(module_id)
+    f(context_module_completion_requirement_selector(module_id))
   end
 
   def context_module_name(module_name)
@@ -621,6 +633,10 @@ module Modules2IndexPage
 
   def module_item_titles
     ff(module_item_title_selector)
+  end
+
+  def context_module_item_todo(module_item_id, todo_text)
+    fj(context_module_item_todo_selector(module_item_id, todo_text))
   end
 
   def module_item_title_links
@@ -1034,5 +1050,9 @@ module Modules2IndexPage
 
   def input_text_in_url_title_input(text)
     replace_content(url_title_input, text)
+  end
+
+  def scroll_to_module(module_id)
+    scroll_to(f("[data-testid='module-action-menu_#{module_id}']"))
   end
 end

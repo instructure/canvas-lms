@@ -97,6 +97,42 @@ module Modules2ActionTray
     "[data-testid='convert-differentiation-tags-button']"
   end
 
+  def add_requirement_button_selector
+    "[data-testid='add-requirement-button']"
+  end
+
+  def complete_all_radio_checked_selector
+    "[data-testid = 'complete-all-radio']"
+  end
+
+  def complete_one_radio_click_selector
+    "//label[../input[@data-testid = 'complete-one-radio']]"
+  end
+
+  def complete_one_radio_checked_selector
+    "[data-testid = 'complete-one-radio']"
+  end
+
+  def sequential_order_checkbox_selector
+    "//label[../input[@data-testid='sequential-progress-checkbox']]"
+  end
+
+  def module_requirement_card_selector
+    "[data-testid='module-requirement-card']"
+  end
+
+  def requirement_item_selector
+    "//*[starts-with(@id, 'requirement-item-')]"
+  end
+
+  def requirement_type_selector
+    "//*[starts-with(@id, 'requirement-type-')]"
+  end
+
+  def remove_requirement_button_selector(content_name)
+    "//button[.//*[contains(text(), 'Remove #{content_name} Content Requirement')]]"
+  end
+
   #------------------------------ Elements ------------------------------
   def add_module_button
     f(add_module_button_selector)
@@ -178,6 +214,49 @@ module Modules2ActionTray
     f(convert_differentiated_tag_button_selector)
   end
 
+  def add_requirement_button
+    f(add_requirement_button_selector)
+  end
+
+  def complete_all_radio_checked
+    f(complete_all_radio_checked_selector)
+  end
+
+  def complete_one_radio_checked
+    f(complete_one_radio_checked_selector)
+  end
+
+  def complete_one_radio_click
+    fxpath(complete_one_radio_click_selector)
+  end
+
+  def sequential_order_checkbox
+    fxpath(sequential_order_checkbox_selector)
+  end
+
+  def module_requirement_card
+    ff(module_requirement_card_selector)
+  end
+
+  def requirement_item
+    ffxpath(requirement_item_selector)
+  end
+
+  def requirement_type
+    ffxpath(requirement_type_selector)
+  end
+
+  def select_requirement_item_option(item_number, option)
+    click_option(requirement_item[item_number], option)
+  end
+
+  def select_requirement_type_option(item_number, option)
+    click_option(requirement_type[item_number], option)
+  end
+
+  def remove_requirement_button(content_name)
+    fxpath(remove_requirement_button_selector(content_name))
+  end
   #------------------------------ Actions -------------------------------
 
   def click_custom_access_radio
@@ -194,5 +273,20 @@ module Modules2ActionTray
 
   def settings_tray_exists?
     element_exists?(module_settings_tray_selector)
+  end
+
+  def click_add_requirement_button
+    expect(add_requirement_button).to be_displayed
+    add_requirement_button.click
+  end
+
+  def select_complete_one_radio
+    expect(complete_one_radio_click).to be_displayed
+    complete_one_radio_click.click
+  end
+
+  def click_save_module_tray_change
+    submit_add_module_button.click
+    wait_for_ajaximations
   end
 end
