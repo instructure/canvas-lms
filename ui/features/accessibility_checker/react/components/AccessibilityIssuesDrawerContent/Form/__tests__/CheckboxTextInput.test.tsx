@@ -18,7 +18,7 @@
 
 import {render, screen, fireEvent, waitFor} from '@testing-library/react'
 import CheckboxTextInput from '../CheckboxTextInput'
-import {FormType} from '../../../../types'
+import {FormType, IssueWorkflowState} from '../../../../types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 jest.mock('@canvas/do-fetch-api-effect')
@@ -62,6 +62,7 @@ describe('CheckboxTextInput', () => {
       element: 'test-element',
       displayName: 'Test Display Name',
       path: 'test-path',
+      workflowState: IssueWorkflowState.Active,
       form: {
         type: FormType.CheckboxTextInput,
         checkboxLabel: 'Test Checkbox Label',

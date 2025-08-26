@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
-import {AccessibilityIssue, FormType} from '../../../../types'
+import {AccessibilityIssue, FormType, IssueWorkflowState} from '../../../../types'
 import Form, {FormHandle} from '../index'
 import userEvent from '@testing-library/user-event'
 
@@ -31,6 +31,7 @@ describe('Form', () => {
     why: 'Test why',
     element: 'div',
     path: '//div',
+    workflowState: IssueWorkflowState.Active,
     form: {
       type: formType,
       label: 'Test label',

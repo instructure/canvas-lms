@@ -16,7 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AccessibilityResourceScan, ContentItem, FormType, ResourceType} from '../../../../types'
+import {
+  AccessibilityResourceScan,
+  ContentItem,
+  FormType,
+  IssueWorkflowState,
+  ResourceType,
+} from '../../../../types'
 import {getAsAccessibilityResourceScan} from '../../../../utils/apiData'
 
 // Base content item template for creating new items
@@ -54,6 +60,7 @@ export const buttonRuleItem: AccessibilityResourceScan = {
       ruleId: 'button-rule',
       displayName: 'Button Issue',
       message: 'This is a button issue that needs to be fixed',
+      workflowState: IssueWorkflowState.Active,
       form: {
         type: FormType.Button,
         label: 'Apply',
@@ -74,6 +81,7 @@ export const checkboxTextInputRuleItem: AccessibilityResourceScan = {
       ruleId: 'checkbox-text-input-rule',
       displayName: 'Checkbox Text Input Issue',
       message: 'This is a checkbox text input issue that needs to be fixed',
+      workflowState: IssueWorkflowState.Active,
       form: {
         type: FormType.CheckboxTextInput,
         label: 'Text Input',
@@ -98,6 +106,7 @@ export const colorPickerRuleItem: AccessibilityResourceScan = {
       ruleId: 'color-picker-rule',
       displayName: 'Color Picker Issue',
       message: 'This is a color picker issue that needs to be fixed',
+      workflowState: IssueWorkflowState.Active,
       form: {
         type: FormType.ColorPicker,
         label: 'Choose Color',
@@ -120,6 +129,7 @@ export const radioInputGroupRuleItem: AccessibilityResourceScan = {
       ruleId: 'radio-input-group-rule',
       displayName: 'Radio Input Group Issue',
       message: 'This is a radio input group issue that needs to be fixed',
+      workflowState: IssueWorkflowState.Active,
       form: {
         type: FormType.RadioInputGroup,
         label: 'Choose one',
@@ -143,6 +153,7 @@ export const textInputRuleItem: AccessibilityResourceScan = {
       ruleId: 'text-input-rule',
       displayName: 'Text Input Issue',
       message: 'This is a text input issue that needs to be fixed',
+      workflowState: IssueWorkflowState.Active,
       form: {
         type: FormType.TextInput,
         label: 'Enter text',
@@ -165,6 +176,7 @@ export const multiIssueItem: AccessibilityResourceScan = {
       ruleId: 'adjacent-links',
       displayName: 'Adjacent links',
       message: 'This is a test issue',
+      workflowState: IssueWorkflowState.Active,
       form: {
         type: FormType.Button,
         label: 'Apply',
@@ -178,6 +190,7 @@ export const multiIssueItem: AccessibilityResourceScan = {
       ruleId: 'headings-sequence',
       displayName: 'Heading sequence',
       message: 'Second issue',
+      workflowState: IssueWorkflowState.Active,
       form: {
         type: FormType.RadioInputGroup,
         label: 'Choose one',

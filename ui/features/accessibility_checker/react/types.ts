@@ -59,6 +59,12 @@ export interface IssueForm {
   inputMaxLength?: number
 }
 
+export enum IssueWorkflowState {
+  Active = 'active',
+  Dismissed = 'dismissed',
+  Resolved = 'resolved',
+}
+
 export enum ScanWorkflowState {
   Queued = 'queued',
   InProgress = 'in_progress',
@@ -101,6 +107,7 @@ export interface AccessibilityIssue {
   path: string
   issueUrl?: string
   form: IssueForm
+  workflowState: IssueWorkflowState
 }
 
 export interface AccessibilityData {

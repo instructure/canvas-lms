@@ -28,7 +28,7 @@ import {
 import {API_FETCH_ERROR_MESSAGE_PREFIX, IssuesTableHeaderApiNames} from '../constants'
 import {AccessibilityResourceScan, Filters} from '../types'
 import {convertKeysToCamelCase, getParsedFilters} from '../utils/apiData'
-import {updateQueryParams} from '../utils/query'
+import {getCourseBasedPath, updateQueryParams} from '../utils/query'
 
 const getApiRequestParams = (requestedFetch: NewStateToFetch): Record<string, any> => {
   const params: Record<string, any> = {}
@@ -122,10 +122,7 @@ export const useAccessibilityScansFetchUtils = () => {
         setLoading(true)
         setError(null)
 
-        const path = window.location.pathname.replace(
-          '/accessibility',
-          '/accessibility_resource_scans',
-        )
+        const path = getCourseBasedPath('/accessibility_resource_scans')
 
         const data: DoFetchApiResults<AccessibilityResourceScan[]> = await doFetchApi({
           path,

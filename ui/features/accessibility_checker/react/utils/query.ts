@@ -76,11 +76,19 @@ export const parseFetchParams = () => {
 
 /**
  * Strip the query string part (set by the deeplinking feature) from the URL
- * @param href - the full length URL including the query string
+ * @param href - the full length URL including the query string, pointing to the course accessibility page
  * @returns - the URL without the query string
  */
 export const stripQueryString = (href: string): string => {
   return href.replace(/\?.*$/, '')
+}
+
+/**
+ * Get a new path based on the base path for the course, if on the course accessibility page
+ * @returns - the newPath relative to course base path (e.g. /courses/123/accessibility)
+ */
+export const getCourseBasedPath = (newPath = ''): string => {
+  return window.location.pathname.replace(/\/accessibility.*/, newPath)
 }
 
 /**

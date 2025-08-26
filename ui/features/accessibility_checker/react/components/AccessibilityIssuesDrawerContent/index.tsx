@@ -16,8 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Ref, useCallback, useEffect, useRef, useState, useContext, useMemo} from 'react'
-
+import {Ref, useCallback, useEffect, useRef, useState, useContext, useMemo} from 'react'
+import {useDebouncedCallback} from 'use-debounce'
+import {useShallow} from 'zustand/react/shallow'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import {Alert} from '@instructure/ui-alerts'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
@@ -26,30 +30,30 @@ import {CloseButton} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
-import {useShallow} from 'zustand/react/shallow'
 import {FormFieldMessage} from '@instructure/ui-form-field'
 
-import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
-import doFetchApi from '@canvas/do-fetch-api-effect'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import {useDebouncedCallback} from 'use-debounce'
 import {AccessibilityCheckerContext} from '../../contexts/AccessibilityCheckerContext'
-import AccessibilityIssuesDrawerFooter from './Footer'
-import Form, {FormHandle} from './Form'
-import {AccessibilityIssue, AccessibilityResourceScan, FormType, FormValue} from '../../types'
-import {findById, getAsContentItemType, replaceById} from '../../utils/apiData'
-import {stripQueryString} from '../../utils/query'
-import Preview, {PreviewHandle} from './Preview'
-import WhyMattersPopover from './WhyMattersPopover'
-import ApplyButton from './ApplyButton'
+import {useNextResource} from '../../hooks/useNextResource'
 import {
   useAccessibilityScansStore,
   defaultNextResource,
   NextResource,
 } from '../../stores/AccessibilityScansStore'
-
+import {
+  AccessibilityIssue,
+  AccessibilityResourceScan,
+  FormType,
+  FormValue,
+  IssueWorkflowState,
+} from '../../types'
+import {findById, replaceById} from '../../utils/apiData'
+import {getCourseBasedPath} from '../../utils/query'
+import ApplyButton from './ApplyButton'
+import AccessibilityIssuesDrawerFooter from './Footer'
+import Form, {FormHandle} from './Form'
+import Preview, {PreviewHandle} from './Preview'
 import SuccessView from './SuccessView'
-import {useNextResource} from '../../hooks/useNextResource'
+import WhyMattersPopover from './WhyMattersPopover'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -207,49 +211,50 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
     [accessibilityScans, item.id, setAccessibilityScans],
   )
 
-  const handleSaveAndNext = useCallback(() => {
+  const handleSaveAndNext = useCallback(async () => {
     if (!current.issue) return
 
-    const issueId = current.issue.id
-    const formValue = formRef.current?.getValue()
+    try {
+      const issueId = current.issue.id
+      const formValue = formRef.current?.getValue()
 
-    setIsRequestInFlight(true)
-    doFetchApi({
-      path: stripQueryString(window.location.href) + '/issues',
-      method: 'PUT',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        content_type: getAsContentItemType(current.resource.resourceType)!,
-        content_id: current.resource.resourceId,
-        rule: current.issue.ruleId,
-        path: current.issue.path,
-        value: formValue,
-      }),
-    })
-      .then(() => {
-        const updatedIssues = issues.filter(issue => issue.id !== issueId)
-        setIssues(updatedIssues)
-        if (accessibilityScans) {
-          const updatedOrderedTableData = updateCountPropertyForItem(
-            accessibilityScans,
-            current.resource,
-          )
-          setAccessibilityScans(updatedOrderedTableData)
-          if (nextResource) {
-            const nextItem: AccessibilityResourceScan = accessibilityScans[nextResource.index]
-            if (nextItem) {
-              nextItem.issues = getAccessibilityIssuesByItem(accessibilityScans, nextItem)
+      setIsRequestInFlight(true)
 
-              const updatedNextResource: NextResource = {index: nextResource.index, item: nextItem}
-              setNextResource(updatedNextResource)
-            }
+      await doFetchApi({
+        path: getCourseBasedPath(`/accessibility_issues/${issueId}`),
+        method: 'PATCH',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          workflow_state: IssueWorkflowState.Resolved,
+          value: formValue,
+        }),
+      })
+
+      const updatedIssues = issues.filter(issue => issue.id !== issueId)
+      setIssues(updatedIssues)
+      if (accessibilityScans) {
+        const updatedOrderedTableData = updateCountPropertyForItem(
+          accessibilityScans,
+          current.resource,
+        )
+        setAccessibilityScans(updatedOrderedTableData)
+        if (nextResource) {
+          const nextItem: AccessibilityResourceScan = accessibilityScans[nextResource.index]
+          if (nextItem) {
+            nextItem.issues = getAccessibilityIssuesByItem(accessibilityScans, nextItem)
+
+            const updatedNextResource: NextResource = {index: nextResource.index, item: nextItem}
+            setNextResource(updatedNextResource)
           }
         }
-        updateAccessibilityIssues(updatedIssues)
-        setCurrentIssueIndex(prev => Math.max(0, Math.min(prev, updatedIssues.length - 1)))
-      })
-      .catch(err => console.error('Error saving accessibility issue. Error is: ' + err.message))
-      .finally(() => setIsRequestInFlight(false))
+      }
+      updateAccessibilityIssues(updatedIssues)
+      setCurrentIssueIndex(prev => Math.max(0, Math.min(prev, updatedIssues.length - 1)))
+    } catch (err: any) {
+      console.error('Error saving accessibility issue. Error is: ' + err.message)
+    } finally {
+      setIsRequestInFlight(false)
+    }
   }, [
     formRef,
     current.issue,

@@ -18,7 +18,6 @@
 
 import {createElement} from 'react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {InstUISettingsProvider} from '@instructure/emotion'
 import {render, screen, fireEvent, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
@@ -26,7 +25,7 @@ import {
   AccessibilityCheckerContext,
   type AccessibilityCheckerContextType,
 } from '../../../../contexts/AccessibilityCheckerContext'
-import {FormType} from '../../../../types'
+import {FormType, IssueWorkflowState} from '../../../../types'
 import {getAsAccessibilityResourceScan} from '../../../../utils/apiData'
 import TextInputForm from '../TextInput'
 
@@ -61,6 +60,7 @@ describe('TextInputForm', () => {
       why: 'Test why',
       element: 'test-element',
       path: 'test-path',
+      workflowState: IssueWorkflowState.Active,
       form: {
         type: FormType.TextInput,
         label: 'Test Label',

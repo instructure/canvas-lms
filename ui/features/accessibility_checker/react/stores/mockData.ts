@@ -20,6 +20,7 @@ import {
   AccessibilityIssue,
   AccessibilityResourceScan,
   FormType,
+  IssueWorkflowState,
   ResourceType,
   ResourceWorkflowState,
   ScanWorkflowState,
@@ -35,6 +36,7 @@ export const mockIssue1: AccessibilityIssue = {
   why: 'When two or more links are next to each other and lead to the same destination, screen readers interpret them as two separate links, even though the intent is usually displaying a single link. This creates unnecessary repetition and is confusing.',
   path: "./p/a[contains(concat(' ', normalize-space(@class), ' '), ' inline_disabled ')][1]",
   issueUrl: 'https://www.w3.org/TR/WCAG20-TECHS/H2.html',
+  workflowState: IssueWorkflowState.Active,
   form: {
     type: FormType.Button,
     label: 'Merge links',
@@ -54,6 +56,7 @@ export const mockIssue2: AccessibilityIssue = {
   why: 'When two or more links are next to each other and lead to the same destination, screen readers interpret them as two separate links, even though the intent is usually displaying a single link. This creates unnecessary repetition and is confusing.',
   path: "./p/a[contains(concat(' ', normalize-space(@class), ' '), ' inline_disabled ')][1]",
   issueUrl: 'https://www.w3.org/TR/WCAG20-TECHS/H2.html',
+  workflowState: IssueWorkflowState.Active,
   form: {
     type: FormType.Button,
     label: 'Merge links',
@@ -73,6 +76,7 @@ export const mockIssue3: AccessibilityIssue = {
   why: 'When heading levels are skipped (for example, from an H2 to an H4, skipping H3), screen reader users may have difficulty understanding the page structure. This creates a confusing outline of the page for assistive technology users.',
   path: './h4',
   issueUrl: 'https://www.w3.org/TR/WCAG20-TECHS/G141.html',
+  workflowState: IssueWorkflowState.Active,
   form: {
     type: FormType.RadioInputGroup,
     label: 'How would you like to proceed?',
@@ -93,6 +97,7 @@ export const mockIssue4: AccessibilityIssue = {
   why: 'When two or more links are next to each other and lead to the same destination, screen readers interpret them as two separate links, even though the intent is usually displaying a single link. This creates unnecessary repetition and is confusing.',
   path: "./p/a[contains(concat(' ', normalize-space(@class), ' '), ' inline_disabled ')][1]",
   issueUrl: 'https://www.w3.org/TR/WCAG20-TECHS/H2.html',
+  workflowState: IssueWorkflowState.Active,
   form: {
     type: FormType.Button,
     label: 'Merge links',
@@ -112,6 +117,7 @@ export const mockIssue5: AccessibilityIssue = {
   why: 'When heading levels are skipped (for example, from an H2 to an H4, skipping H3), screen reader users may have difficulty understanding the page structure. This creates a confusing outline of the page for assistive technology users.',
   path: './h4',
   issueUrl: 'https://www.w3.org/TR/WCAG20-TECHS/G141.html',
+  workflowState: IssueWorkflowState.Active,
   form: {
     type: FormType.RadioInputGroup,
     label: 'How would you like to proceed?',

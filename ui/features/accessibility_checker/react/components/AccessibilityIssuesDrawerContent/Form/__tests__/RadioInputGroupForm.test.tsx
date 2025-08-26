@@ -18,7 +18,7 @@
 
 import {render, screen, fireEvent} from '@testing-library/react'
 
-import {AccessibilityIssue, FormType} from '../../../../types'
+import {AccessibilityIssue, FormType, IssueWorkflowState} from '../../../../types'
 import RadioInputGroupForm from '../RadioInputGroupForm'
 
 describe('RadioInputGroupForm', () => {
@@ -30,6 +30,7 @@ describe('RadioInputGroupForm', () => {
     why: '',
     element: '',
     path: '',
+    workflowState: IssueWorkflowState.Active,
     form: {
       type: FormType.RadioInputGroup,
       label: 'Test label',

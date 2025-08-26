@@ -18,7 +18,13 @@
 
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
-import {AccessibilityIssue, FormValue, PreviewResponse, ResourceType} from '../../../types'
+import {
+  AccessibilityIssue,
+  FormValue,
+  IssueWorkflowState,
+  PreviewResponse,
+  ResourceType,
+} from '../../../types'
 import Preview, {PreviewHandle} from '../Preview'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
@@ -36,6 +42,7 @@ describe('Preview', () => {
     message: 'Test accessibility issue',
     why: 'This is why it is an issue',
     element: 'div',
+    workflowState: IssueWorkflowState.Active,
     form: {
       type: 'textinput' as any,
       label: 'Test label',
