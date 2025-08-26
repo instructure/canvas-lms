@@ -27,19 +27,25 @@ import type {RubricCriterion} from '@canvas/rubrics/react/types/rubric'
 
 type RubricCriteriaRowsProps = {
   rubricForm: RubricFormProps
+  isGenerating?: boolean
+  showCriteriaRegeneration?: boolean
   handleDragEnd: (result: DropResult) => void
   deleteCriterion: (criterion: RubricCriterion) => void
   duplicateCriterion: (criterion: RubricCriterion) => void
   openCriterionModal: (criterion?: RubricCriterion) => void
   openOutcomeDialog: () => void
+  onRegenerateCriterion?: (criterion: RubricCriterion, additionalPrompt: string) => void
 }
 export const RubricCriteriaContainer = ({
   rubricForm,
+  isGenerating = false,
+  showCriteriaRegeneration = false,
   handleDragEnd,
   deleteCriterion,
   duplicateCriterion,
   openCriterionModal,
   openOutcomeDialog,
+  onRegenerateCriterion,
 }: RubricCriteriaRowsProps) => {
   return (
     <Flex.Item shouldGrow={true} shouldShrink={true} as="main" padding="xx-small">
@@ -66,6 +72,9 @@ export const RubricCriteriaContainer = ({
                         onDeleteCriterion={() => deleteCriterion(criterion)}
                         onDuplicateCriterion={() => duplicateCriterion(criterion)}
                         onEditCriterion={() => openCriterionModal(criterion)}
+                        onRegenerateCriterion={onRegenerateCriterion}
+                        isRegenerating={isGenerating}
+                        showCriteriaRegeneration={showCriteriaRegeneration}
                       />
                     )
                   })}

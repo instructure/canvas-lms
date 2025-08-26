@@ -518,6 +518,7 @@ describe('RubricForm Tests', () => {
       expect(getByTestId('criteria-count-input')).toHaveValue('5')
       expect(getByTestId('rating-count-input')).toHaveValue('4')
       expect(getByTestId('points-per-criterion-input')).toHaveValue('20')
+      expect(getByTestId('standard-objective-input')).toBeInTheDocument()
       expect(getByTestId('additional-prompt-info-input')).toBeInTheDocument()
     })
 
@@ -554,6 +555,24 @@ describe('RubricForm Tests', () => {
       expect(RubricFormQueries.generateCriteria as jest.Mock).not.toHaveBeenCalled()
       expect(document.querySelector('#flashalert_message_holder')).toHaveTextContent(
         'Points per criterion must be a valid number',
+      )
+    })
+
+    it('validates standard objective length', async () => {
+      const {getByTestId} = renderComponent({
+        aiRubricsEnabled: true,
+        assignmentId: '1',
+        courseId: '1',
+      })
+
+      const longText = 'a'.repeat(1001)
+      const standardObjectiveInput = getByTestId('standard-objective-input')
+      fireEvent.change(standardObjectiveInput, {target: {value: longText}})
+
+      expect(getByTestId('generate-criteria-button')).toBeDisabled()
+      const form = getByTestId('generate-criteria-form')
+      expect(form).toHaveTextContent(
+        'Standard and Outcome information must be less than 1000 characters',
       )
     })
 
@@ -605,6 +624,10 @@ describe('RubricForm Tests', () => {
         courseId: '1',
       })
 
+      const standardText = `Compare and contrast the experience of reading a story, drama, or poem to listening to or viewing an audio, video, or live version of the text, including contrasting what they "see" and "hear" when reading the text to what they perceive when they listen or watch.`
+      const standardObjectiveInput = getByTestId('standard-objective-input')
+      fireEvent.change(standardObjectiveInput, {target: {value: standardText}})
+
       const generateButton = getByTestId('generate-criteria-button')
       fireEvent.click(generateButton)
 
@@ -616,6 +639,7 @@ describe('RubricForm Tests', () => {
         pointsPerCriterion: '20',
         useRange: false,
         additionalPromptInfo: '',
+        standard: standardText,
         gradeLevel: 'higher-ed',
       })
       expect(getByTestId('rubric-criteria-container')).toHaveTextContent('Generated Criterion 1')

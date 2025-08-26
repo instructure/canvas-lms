@@ -25,7 +25,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import {Flex} from '@instructure/ui-flex'
 import {Responsive} from '@instructure/ui-responsive'
 import {fetchRubric, type SaveRubricResponse} from './queries/RubricFormQueries'
-import type {RubricFormProps} from './types/RubricForm'
+import type {RubricFormProps, GenerateCriteriaFormProps} from './types/RubricForm'
 import {CriterionModal} from './components/CriterionModal/CriterionModal'
 import {WarningModal} from './components/WarningModal'
 import type {DropResult} from 'react-beautiful-dnd'
@@ -43,10 +43,14 @@ import {
 } from './utils'
 import {useQuery} from '@tanstack/react-query'
 import useOutcomeDialog from './hooks/useOutcomeDialog'
-import {GeneratedCriteriaForm} from './components/AIGeneratedCriteria/GeneratedCriteriaForm'
+import {
+  GeneratedCriteriaForm,
+  defaultGenerateCriteriaForm,
+} from './components/AIGeneratedCriteria/GeneratedCriteriaForm'
 import {GeneratedCriteriaHeader} from './components/AIGeneratedCriteria/GeneratedCriteriaHeader'
 import {RubricFormFooter} from './components/RubricFormFooter'
 import {useSaveRubricForm} from './hooks/useSaveRubricForm'
+import {useRegenerateCriteria} from './hooks/useRegenerateCriteria'
 import {RubricCriteriaContainer} from './components/RubricCriteriaContainer'
 import {RubricFormHeader} from './components/RubricFormHeader'
 import {CriteriaBuilderHeader} from './components/CriteriaBuilderHeader'
@@ -120,37 +124,14 @@ export const RubricForm = ({
   const [showGenerateCriteriaHeader, setShowGenerateCriteriaHeader] = useState(false)
   const [generatedCriteriaProgress, setGeneratedCriteriaProgress] = useState<CanvasProgress>()
   const [generatedCriteriaIsPending, setGeneratedCriteriaIsPending] = useState(false)
+  const [generateCriteriaFormOptions, setGenerateCriteriaFormOptions] =
+    useState<GenerateCriteriaFormProps>(defaultGenerateCriteriaForm)
   const [isSaveConfirmModalOpen, setIsSaveConfirmModalOpen] = useState(false)
   const hasAssignment = !!assignmentId && assignmentId !== ''
   const showAssignmentSettings = hasAssignment
-
-  const criteriaRef = useRef(rubricForm.criteria)
-
   const isNewRubric = !rubricId && !rubric?.id
 
-  const header = isNewRubric ? I18n.t('Create New Rubric') : I18n.t('Edit Rubric')
-  const queryKey = ['fetch-rubric', rubricId ?? '']
-  const formValid = !validationErrors.title?.message && rubricForm.criteria.length > 0
-  const criteriaBeingGenerated =
-    generatedCriteriaIsPending ||
-    (generatedCriteriaProgress &&
-      !['failed', 'completed'].includes(generatedCriteriaProgress.workflow_state))
-
-  const {data, isLoading} = useQuery({
-    queryKey,
-    queryFn: fetchRubric,
-    enabled: !!rubricId && canManageRubrics && !rubric,
-  })
-
-  const {savePending, saveSuccess, saveError, saveRubricMutation} = useSaveRubricForm({
-    accountId,
-    assignmentId,
-    courseId,
-    queryKey,
-    rubricId,
-    rubricForm,
-    handleSaveSuccess: setSavedRubricResponse,
-  })
+  const criteriaRef = useRef(rubricForm.criteria)
 
   const setRubricFormField = useCallback(
     <K extends keyof RubricFormProps>(key: K, value: RubricFormProps[K]) => {
@@ -173,6 +154,48 @@ export const RubricForm = ({
     },
     [setRubricForm],
   )
+
+  // Initialize regeneration manager for AI-generated criteria
+  const {regenerateAllCriteria, regenerateSingleCriterion, regenerateCriteriaIsPending} =
+    useRegenerateCriteria({
+      assignmentId,
+      courseId: rubricForm.courseId,
+      criteriaRef,
+      formOptions: generateCriteriaFormOptions,
+      setRubricFormField,
+      handleInProgressUpdates: setGeneratedCriteriaIsPending,
+      handleProgressUpdates: setGeneratedCriteriaProgress,
+    })
+
+  const header = isNewRubric ? I18n.t('Create New Rubric') : I18n.t('Edit Rubric')
+  const queryKey = ['fetch-rubric', rubricId ?? '']
+  const formValid = !validationErrors.title?.message && rubricForm.criteria.length > 0
+  const criteriaBeingGenerated =
+    generatedCriteriaIsPending ||
+    regenerateCriteriaIsPending ||
+    (generatedCriteriaProgress &&
+      !['failed', 'completed'].includes(generatedCriteriaProgress.workflow_state))
+
+  const {data, isLoading} = useQuery({
+    queryKey,
+    queryFn: fetchRubric,
+    enabled: !!rubricId && canManageRubrics && !rubric,
+  })
+
+  const {savePending, saveSuccess, saveError, saveRubricMutation} = useSaveRubricForm({
+    accountId,
+    assignmentId,
+    courseId,
+    queryKey,
+    rubricId,
+    rubricForm,
+    handleSaveSuccess: setSavedRubricResponse,
+  })
+
+  // Keep criteriaRef in sync with current criteria
+  useEffect(() => {
+    criteriaRef.current = rubricForm.criteria
+  }, [rubricForm.criteria])
 
   const {openOutcomeDialog} = useOutcomeDialog({
     criteriaRef,
@@ -365,11 +388,16 @@ export const RubricForm = ({
               setShowGenerateCriteriaForm={setShowGenerateCriteriaForm}
               setShowGenerateCriteriaHeader={setShowGenerateCriteriaHeader}
               setRubricFormField={setRubricFormField}
+              onFormOptionsChange={setGenerateCriteriaFormOptions}
             />
           )}
 
           {showGenerateCriteriaHeader && (
-            <GeneratedCriteriaHeader aiFeedbackLink={window.ENV.AI_FEEDBACK_LINK} />
+            <GeneratedCriteriaHeader
+              aiFeedbackLink={window.ENV.AI_FEEDBACK_LINK}
+              onRegenerateAll={regenerateAllCriteria}
+              isGenerating={criteriaBeingGenerated}
+            />
           )}
         </Flex.Item>
 
@@ -386,6 +414,9 @@ export const RubricForm = ({
           duplicateCriterion={duplicateCriterion}
           openCriterionModal={openCriterionModal}
           openOutcomeDialog={openOutcomeDialog}
+          onRegenerateCriterion={regenerateSingleCriterion}
+          isGenerating={criteriaBeingGenerated}
+          showCriteriaRegeneration={aiRubricsEnabled && !!assignmentId && !rubric?.id}
         />
       </Flex>
 
