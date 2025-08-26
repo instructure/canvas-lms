@@ -282,6 +282,57 @@ export function uploadToIconMakerFolder(svg, uploadSettings = {}) {
   }
 }
 
+export function uploadToMediaFolderWithoutEditor(fileMetaProps) {
+  return (_, getState) => {
+    const {source, jwt, host, contextId, contextType} = getState()
+    return source
+      .fetchMediaFolder({jwt, host, contextId, contextType})
+      .then(async ({folders}) => {
+        fileMetaProps.parentFolderId = folders[0].id
+        if (fileMetaProps.domObject) {
+          delete fileMetaProps.domObject.preview // don't need this anymore
+        }
+
+        const getCategory = async fileProps => {
+          const categoryObject = await CategoryProcessor.process(fileProps.domObject)
+          return categoryObject?.category
+        }
+
+        const category = await getCategory(fileMetaProps)
+
+        return source
+          .preflightUpload(fileMetaProps, {jwt, host, contextId, contextType, category})
+          .then(results => {
+            return source.uploadFRD(fileMetaProps.domObject, results)
+          })
+          .then(results => {
+            return setUsageRights(source, fileMetaProps, results)
+          })
+          .then(results => {
+            return getFileUrlIfMissing(source, results)
+          })
+          .then(results => {
+            return fixupFileUrl(contextType, contextId, results, source.canvasOrigin)
+          })
+          .then(results => {
+            return setAltText(fileMetaProps.altText, results)
+          })
+          .then(results => {
+            if (fileMetaProps.isDecorativeImage) {
+              results.isDecorativeImage = fileMetaProps.isDecorativeImage
+            }
+            if (fileMetaProps.displayAs) {
+              results.displayAs = fileMetaProps.displayAs
+            }
+            return results
+          })
+      })
+      .catch(e => {
+        console.error('Upload to the media folder failed.', e)
+      })
+  }
+}
+
 export function uploadToMediaFolder(tabContext, fileMetaProps) {
   return (dispatch, getState) => {
     const editorComponent = bridge.activeEditor()
@@ -319,7 +370,7 @@ export function uploadToMediaFolder(tabContext, fileMetaProps) {
       .catch(e => {
         // Get rid of any placeholder that might be there.
         dispatch(removePlaceholdersFor(fileMetaProps.name))
-         
+
         console.error('Fetching the media folder failed.', e)
       })
   }

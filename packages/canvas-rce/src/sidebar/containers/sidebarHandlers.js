@@ -28,6 +28,7 @@ import {
   uploadPreflight,
   uploadToIconMakerFolder,
   uploadToMediaFolder,
+  uploadToMediaFolderWithoutEditor,
 } from '../actions/upload'
 import {searchFlickr, openOrCloseFlickrForm} from '../actions/flickr'
 import {toggle as toggleFolder} from '../actions/files'
@@ -62,6 +63,8 @@ export default function propsFromDispatch(dispatch) {
       dispatch(uploadToIconMakerFolder(fileMetaProps, uploadSettings)),
     startMediaUpload: (tabContext, fileMetaProps) =>
       dispatch(uploadToMediaFolder(tabContext, fileMetaProps)),
+    startMediaUploadInStandaloneMode: fileMetaProps =>
+      dispatch(uploadToMediaFolderWithoutEditor(fileMetaProps)),
     createMediaServerSession: () => dispatch(createMediaServerSession()),
     // saveMediaRecording: (file, editor, dismiss) => dispatch(saveMediaRecording(file, editor, dismiss)),
     mediaUploadComplete: (error, uploadData) => dispatch(mediaUploadComplete(error, uploadData)),

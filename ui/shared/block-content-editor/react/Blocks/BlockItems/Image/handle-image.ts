@@ -36,7 +36,7 @@ export type UploadData = {
 }
 
 export type StoreProp = {
-  startMediaUpload: Function
+  startMediaUploadInStandaloneMode: Function
 }
 
 export const panels = ['COMPUTER', 'URL', 'course_images', 'user_images'] as const
@@ -61,8 +61,7 @@ const handleComputerUpload = async (uploadData: UploadData, storeProps: StorePro
   }
 
   try {
-    const tabContext = 'documents'
-    const result = await storeProps?.startMediaUpload(tabContext, fileMetaData)
+    const result = await storeProps?.startMediaUploadInStandaloneMode(fileMetaData)
     return prepEmbedSrc(result.href || result.url) as string
   } catch (_err) {
     throw new Error('Failed to upload the image, please try again')
