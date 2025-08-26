@@ -57,11 +57,15 @@ export const getIconColor = (published: boolean | undefined, isStudentView = fal
   return published && !isStudentView ? 'success' : 'primary'
 }
 
-export const getItemIcon = (content: ModuleItemContent, isStudentView = false) => {
+export const getItemIcon = (
+  content: ModuleItemContent,
+  published: boolean,
+  isStudentView = false,
+) => {
   if (!content?.type) return <IconDocumentLine />
 
   const type = content.type
-  const color = getIconColor(content?.published, isStudentView)
+  const color = getIconColor(published, isStudentView)
 
   switch (type) {
     case 'Assignment':

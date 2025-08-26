@@ -35,6 +35,7 @@ const PublishCloud = ({
   usageRightsRequiredForContext,
   fileName,
   disabled,
+  onPublishChange,
 }) => {
   const publishCloudRef = useRef(null)
 
@@ -120,6 +121,7 @@ const PublishCloud = ({
           closeDialog={() => {
             $dialog.dialog('close')
           }}
+          onPublishChange={onPublishChange}
         />,
         $dialog[0],
       )
@@ -240,6 +242,7 @@ PublishCloud.propTypes = {
   usageRightsRequiredForContext: PropTypes.bool,
   fileName: PropTypes.string,
   disabled: PropTypes.bool,
+  onPublishChange: PropTypes.func,
 }
 
 export default PublishCloud
