@@ -1925,7 +1925,15 @@ class CoursesController < ApplicationController
     if params[:reject]
       reject_enrollment(@pending_enrollment)
     elsif params[:accept]
-      accept_enrollment(@pending_enrollment)
+      if params[:action] == "show"
+        # If a user has invites to multiple sections in a course, accept all of them
+        Enrollment.invited_by_date.where(
+          user_id: @pending_enrollment.user_id,
+          course_id: @pending_enrollment.course_id
+        ).find_each { |e| accept_enrollment(e) }
+      else
+        accept_enrollment(@pending_enrollment)
+      end
     else
       redirect_to course_url(@context.id)
     end

@@ -1906,6 +1906,17 @@ describe CoursesController do
         expect(@course.workflow_state).to eq "claimed"
         expect(@course.stuck_sis_fields).to be_empty
       end
+
+      it "accepts all section invites on opening the course page" do
+        Account.default.settings[:allow_invitation_previews] = false
+        Account.default.save!
+
+        second_section = @course.course_sections.create!
+        course_with_student course: @course, section: second_section, user: @student, allow_multiple_enrollments: true
+        user_session(@student)
+
+        expect { get "show", params: { id: @course.id } }.to change { @student.enrollments.invited.count }.from(2).to(0)
+      end
     end
 
     it "sets ENV.COURSE_ID for assignments view" do
