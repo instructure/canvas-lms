@@ -169,6 +169,9 @@ module Schemas
             editor_button: { use_tray: { type: ["boolean", "string"] } },
             file_menu: { accept_media_types: { type: "string" } },
             global_navigation: { icon_svg_path_64: { type: "string" } },
+            top_navigation: {
+              allow_fullscreen: { type: "boolean", description: "Used only by top_navigation" }
+            },
             submission_type_selection: {
               description: { type: "string", maxLength: 255, errorMessage: "description must be a string with a maximum length of 255" },
               require_resource_selection: { type: "boolean" },
