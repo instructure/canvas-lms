@@ -40,14 +40,14 @@ export const AddBlock = () => {
           {I18n.t('Add a block')}
         </Heading>
         <Flex direction="column" alignItems="center">
-          <Text>
+          <span style={{textAlign: 'center'}}>
             {I18n.t('A block is a building element of your page. It helps you organize content.')}
-          </Text>
-          <Text>
+          </span>
+          <span style={{textAlign: 'center'}}>
             {I18n.t(
               'You can add, customize, and rearrange blocks to create a structured and engaging page.',
             )}
-          </Text>
+          </span>
         </Flex>
         <AddButton onClicked={addBlockModal.open} />
       </Flex>
