@@ -93,7 +93,7 @@ export const MoveButton = (props: {
       withArrow={false}
     >
       {menuItems.map(item => (
-        <Menu.Item key={item.key} onClick={item.onClick}>
+        <Menu.Item key={item.key} onClick={item.onClick} data-testid={`${item.key}-menu-item`}>
           <Flex>
             <Flex.Item>{item.icon}</Flex.Item>
             <Flex.Item margin="0 0 0 small">{item.label}</Flex.Item>

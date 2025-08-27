@@ -17,10 +17,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 require_relative "../../common"
+require_relative "../components/block_component"
 
 module BlockContentEditorPage
   def add_block_modal_selector
     "[data-testid='add-block-modal']"
+  end
+
+  def block_selector
+    ".base-block-layout"
   end
 
   def bce_container
@@ -44,7 +49,7 @@ module BlockContentEditorPage
   end
 
   def block_groups
-    f("[data-testid='grouped-select-groups']")
+    ff("[data-testid='grouped-select-groups']>div")
   end
 
   def selected_block_group
@@ -52,7 +57,7 @@ module BlockContentEditorPage
   end
 
   def block_items
-    f("[data-testid='grouped-select-items']")
+    ff("[data-testid='grouped-select-items']>div")
   end
 
   def selected_block_item
@@ -72,7 +77,27 @@ module BlockContentEditorPage
   end
 
   def block_layout
-    f(".base-block-layout")
+    f(block_selector)
+  end
+
+  def blocks
+    find_all_with_jquery(block_selector).map { |element| BlockComponent.new(element) }
+  end
+
+  def settings_tray
+    f("[data-testid='settings-tray']")
+  end
+
+  def block(index = 0)
+    blocks[index]
+  end
+
+  def first_block
+    blocks.first
+  end
+
+  def last_block
+    blocks.last
   end
 
   def create_wiki_page_with_block_content_editor(course)
@@ -81,6 +106,25 @@ module BlockContentEditorPage
     wait_for_ajaximations
     click_option(f("[data-testid=\"choose-an-editor-dropdown\"]"), "Try the Block Content Editor")
     fj("button:contains('Continue')").click
+    wait_for_ajaximations
+  end
+
+  def click_block_option(block_options, block_option_name)
+    block_option = block_options.find { |group| group.text.include?(block_option_name) }
+    raise ArgumentError, "Invalid block option: '#{block_option_name}'. Valid options: #{block_options.map(&:text).join(", ")}" unless block_option
+
+    block_option.click
+    wait_for_ajaximations
+  end
+
+  def add_a_block(block_group_name, block_item_name)
+    add_block_button.click
+    wait_for_ajaximations
+
+    click_block_option(block_groups, block_group_name)
+    click_block_option(block_items, block_item_name)
+
+    add_to_page_button.click
     wait_for_ajaximations
   end
 end
