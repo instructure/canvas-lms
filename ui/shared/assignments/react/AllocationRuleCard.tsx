@@ -42,8 +42,10 @@ export type AllocationRuleType = {
 
 const AllocationRuleCard = ({
   rule,
+  canEdit,
 }: {
   rule: AllocationRuleType
+  canEdit: boolean
 }): React.ReactElement => {
   const {mustReview, reviewPermitted, appliesToReviewer, reviewer, reviewee} = rule
 
@@ -83,36 +85,39 @@ const AllocationRuleCard = ({
             {formatRuleDescription()}
           </Text>
         </Flex.Item>
-        <Flex.Item>
-          <Flex>
-            <Flex.Item padding="small none x-small small">
-              <IconButton
-                data-testid="edit-allocation-rule-button"
-                renderIcon={<IconEditLine color="brand" />}
-                withBackground={false}
-                withBorder={false}
-                size="small"
-                screenReaderLabel={I18n.t('Edit Allocation Rule: %{rule}', {
-                  rule: formatRuleDescription(),
-                })}
-                onClick={() => {}} // TODO [EGG-1627]: Open edit allocation rule modal
-              />
-            </Flex.Item>
-            <Flex.Item padding="small none x-small">
-              <IconButton
-                data-testid="delete-allocation-rule-button"
-                renderIcon={<IconTrashLine color="brand" />}
-                withBackground={false}
-                withBorder={false}
-                size="small"
-                screenReaderLabel={I18n.t('Delete Allocation Rule: %{rule}', {
-                  rule: formatRuleDescription(),
-                })}
-                onClick={() => {}} // TODO [EGG-1628]: Delete allocation rule
-              />
-            </Flex.Item>
-          </Flex>
-        </Flex.Item>
+
+        {canEdit && (
+          <Flex.Item>
+            <Flex>
+              <Flex.Item padding="small none x-small small">
+                <IconButton
+                  data-testid="edit-allocation-rule-button"
+                  renderIcon={<IconEditLine color="brand" />}
+                  withBackground={false}
+                  withBorder={false}
+                  size="small"
+                  screenReaderLabel={I18n.t('Edit Allocation Rule: %{rule}', {
+                    rule: formatRuleDescription(),
+                  })}
+                  onClick={() => {}} // TODO [EGG-1627]: Open edit allocation rule modal
+                />
+              </Flex.Item>
+              <Flex.Item padding="small none x-small">
+                <IconButton
+                  data-testid="delete-allocation-rule-button"
+                  renderIcon={<IconTrashLine color="brand" />}
+                  withBackground={false}
+                  withBorder={false}
+                  size="small"
+                  screenReaderLabel={I18n.t('Delete Allocation Rule: %{rule}', {
+                    rule: formatRuleDescription(),
+                  })}
+                  onClick={() => {}} // TODO [EGG-1628]: Delete allocation rule
+                />
+              </Flex.Item>
+            </Flex>
+          </Flex.Item>
+        )}
       </Flex>
     </View>
   )

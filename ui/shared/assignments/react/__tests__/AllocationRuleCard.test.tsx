@@ -52,7 +52,7 @@ describe('AllocationRuleCard', () => {
         appliesToReviewer: true,
       }
 
-      render(<AllocationRuleCard rule={rule} />)
+      render(<AllocationRuleCard rule={rule} canEdit={false} />)
 
       expect(screen.getByText('Pikachu')).toBeInTheDocument()
       expect(screen.getByText('Must review Piplup')).toBeInTheDocument()
@@ -68,7 +68,7 @@ describe('AllocationRuleCard', () => {
         appliesToReviewer: true,
       }
 
-      render(<AllocationRuleCard rule={rule} />)
+      render(<AllocationRuleCard rule={rule} canEdit={false} />)
 
       expect(screen.getByText('Pikachu')).toBeInTheDocument()
       expect(screen.getByText('Must not review Piplup')).toBeInTheDocument()
@@ -84,7 +84,7 @@ describe('AllocationRuleCard', () => {
         appliesToReviewer: true,
       }
 
-      render(<AllocationRuleCard rule={rule} />)
+      render(<AllocationRuleCard rule={rule} canEdit={false} />)
 
       expect(screen.getByText('Pikachu')).toBeInTheDocument()
       expect(screen.getByText('Should review Piplup')).toBeInTheDocument()
@@ -100,7 +100,7 @@ describe('AllocationRuleCard', () => {
         appliesToReviewer: true,
       }
 
-      render(<AllocationRuleCard rule={rule} />)
+      render(<AllocationRuleCard rule={rule} canEdit={false} />)
 
       expect(screen.getByText('Pikachu')).toBeInTheDocument()
       expect(screen.getByText('Should not review Piplup')).toBeInTheDocument()
@@ -118,7 +118,7 @@ describe('AllocationRuleCard', () => {
         appliesToReviewer: false,
       }
 
-      render(<AllocationRuleCard rule={rule} />)
+      render(<AllocationRuleCard rule={rule} canEdit={false} />)
 
       expect(screen.getByText('Piplup')).toBeInTheDocument()
       expect(screen.getByText('Must be reviewed by Pikachu')).toBeInTheDocument()
@@ -134,7 +134,7 @@ describe('AllocationRuleCard', () => {
         appliesToReviewer: false,
       }
 
-      render(<AllocationRuleCard rule={rule} />)
+      render(<AllocationRuleCard rule={rule} canEdit={false} />)
 
       expect(screen.getByText('Piplup')).toBeInTheDocument()
       expect(screen.getByText('Must not be reviewed by Pikachu')).toBeInTheDocument()
@@ -150,7 +150,7 @@ describe('AllocationRuleCard', () => {
         appliesToReviewer: false,
       }
 
-      render(<AllocationRuleCard rule={rule} />)
+      render(<AllocationRuleCard rule={rule} canEdit={false} />)
 
       expect(screen.getByText('Piplup')).toBeInTheDocument()
       expect(screen.getByText('Should be reviewed by Pikachu')).toBeInTheDocument()
@@ -166,7 +166,7 @@ describe('AllocationRuleCard', () => {
         appliesToReviewer: false,
       }
 
-      render(<AllocationRuleCard rule={rule} />)
+      render(<AllocationRuleCard rule={rule} canEdit={false} />)
 
       expect(screen.getByText('Piplup')).toBeInTheDocument()
       expect(screen.getByText('Should not be reviewed by Pikachu')).toBeInTheDocument()
@@ -183,22 +183,38 @@ describe('AllocationRuleCard', () => {
       appliesToReviewer: true,
     }
 
-    beforeEach(() => {
-      render(<AllocationRuleCard rule={defaultRule} />)
+    describe('when user can edit allocation rules', () => {
+      it('renders the edit button with correct accessibility label', () => {
+        render(<AllocationRuleCard rule={defaultRule} canEdit={true} />)
+        const editButton = screen.getByTestId('edit-allocation-rule-button')
+
+        expect(editButton).toBeInTheDocument()
+        expect(screen.getByText(/^Edit Allocation Rule:/)).toBeInTheDocument()
+      })
+
+      it('renders the delete button with correct accessibility label', () => {
+        render(<AllocationRuleCard rule={defaultRule} canEdit={true} />)
+        const deleteButton = screen.getByTestId('delete-allocation-rule-button')
+
+        expect(deleteButton).toBeInTheDocument()
+        expect(screen.getByText(/^Delete Allocation Rule:/)).toBeInTheDocument()
+      })
     })
 
-    it('renders the edit button with correct accessibility label', () => {
-      const editButton = screen.getByTestId('edit-allocation-rule-button')
+    describe('when user cannot edit allocation rules', () => {
+      it('does not render the edit button', () => {
+        render(<AllocationRuleCard rule={defaultRule} canEdit={false} />)
+        const editButton = screen.queryByTestId('edit-allocation-rule-button')
 
-      expect(editButton).toBeInTheDocument()
-      expect(screen.getByText('Edit Allocation Rule: Must review Piplup')).toBeInTheDocument()
-    })
+        expect(editButton).not.toBeInTheDocument()
+      })
 
-    it('renders the delete button with correct accessibility label', () => {
-      const deleteButton = screen.getByTestId('delete-allocation-rule-button')
+      it('does not render the delete button', () => {
+        render(<AllocationRuleCard rule={defaultRule} canEdit={false} />)
+        const deleteButton = screen.queryByTestId('delete-allocation-rule-button')
 
-      expect(deleteButton).toBeInTheDocument()
-      expect(screen.getByText('Delete Allocation Rule: Must review Piplup')).toBeInTheDocument()
+        expect(deleteButton).not.toBeInTheDocument()
+      })
     })
   })
 })
