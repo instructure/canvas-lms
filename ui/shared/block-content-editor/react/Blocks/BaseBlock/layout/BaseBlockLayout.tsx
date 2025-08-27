@@ -25,32 +25,30 @@ export const BaseBlockLayout = (
   props: PropsWithChildren<{
     title: string
     menu: ReactNode
-    actionButtons: ReactNode
     addButton: ReactNode
-    a11yEditButton: ReactNode
+    topA11yActionMenu: ReactNode
+    bottomA11yActionMenu: ReactNode
     nodeId: string
   }>,
 ) => {
   return (
     <div data-bce-node-id={props.nodeId} className="base-block-layout">
       <Flex direction="column" padding="paddingCardLarge">
-        {props.a11yEditButton && (
-          <Flex data-focus-reveal-parent margin="0 0 mediumSmall 0">
-            {props.a11yEditButton}
+        <Flex justifyItems="space-between" margin="0 0 mediumSmall 0">
+          <Flex data-header>
+            <Tag text={props.title} size="medium" data-testid="block-type-label" />
           </Flex>
-        )}
+          <Flex>{props.menu}</Flex>
+        </Flex>
+        <Flex data-focus-reveal-parent margin="0 0 mediumSmall 0">
+          {props.topA11yActionMenu}
+        </Flex>
         <Flex direction="column" gap="mediumSmall">
-          <Flex justifyItems="space-between">
-            <Flex data-header>
-              <Tag text={props.title} size="medium" data-testid="block-type-label" />
-            </Flex>
-            <Flex>{props.menu}</Flex>
-          </Flex>
           <Flex direction="column" gap="small" width={'100%'}>
             {props.children}
           </Flex>
           <Flex width={'100%'} justifyItems="end" gap="small">
-            {props.actionButtons}
+            {props.bottomA11yActionMenu}
           </Flex>
         </Flex>
       </Flex>

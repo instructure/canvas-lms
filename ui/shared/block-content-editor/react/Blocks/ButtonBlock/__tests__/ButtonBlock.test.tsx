@@ -37,6 +37,16 @@ jest.mock('../../../hooks/useIsEditingBlock', () => ({
   useIsEditingBlock: () => useIsEditingBlockMock(),
 }))
 
+const setIsEditedViaEditButtonMock = jest.fn()
+const getUseIsEditingBlockMock = ({
+  isEditingBlock,
+  isEditedViaEditButton,
+}: {isEditingBlock: boolean; isEditedViaEditButton: boolean}) => ({
+  isEditingBlock,
+  isEditedViaEditButton,
+  setIsEditedViaEditButton: setIsEditedViaEditButtonMock,
+})
+
 const defaultProps: ButtonBlockProps = {
   includeBlockTitle: false,
   alignment: 'left',
@@ -65,14 +75,18 @@ describe('ButtonBlock', () => {
 
   it('renders ButtonBlockEdit in edit mode', () => {
     useIsInEditorMock.mockReturnValue(true)
-    useIsEditingBlockMock.mockReturnValue(true)
+    useIsEditingBlockMock.mockReturnValue(
+      getUseIsEditingBlockMock({isEditingBlock: true, isEditedViaEditButton: false}),
+    )
     renderBlock(ButtonBlock, defaultProps)
     expect(screen.getByTestId('button-block-edit')).toBeInTheDocument()
   })
 
   it('renders ButtonBlockEditPreview in editPreview mode', () => {
     useIsInEditorMock.mockReturnValue(true)
-    useIsEditingBlockMock.mockReturnValue(false)
+    useIsEditingBlockMock.mockReturnValue(
+      getUseIsEditingBlockMock({isEditingBlock: false, isEditedViaEditButton: false}),
+    )
     renderBlock(ButtonBlock, defaultProps)
     expect(screen.getByTestId('button-block-edit-preview')).toBeInTheDocument()
   })
