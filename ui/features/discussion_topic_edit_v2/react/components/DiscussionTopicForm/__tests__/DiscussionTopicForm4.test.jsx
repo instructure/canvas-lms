@@ -184,7 +184,7 @@ describe('DiscussionTopicForm', () => {
 
         getByLabelText('Graded').click()
 
-        const checkbox = getByTestId('checkpoints-checkbox')
+        const checkbox = getByTestId('checkpoints-checkbox').querySelector('input')
         checkbox.click()
         expect(checkbox.checked).toBe(true)
 
@@ -196,14 +196,14 @@ describe('DiscussionTopicForm', () => {
         const {getByTestId, getByLabelText} = setup()
 
         getByLabelText('Graded').click()
-        getByTestId('checkpoints-checkbox').click()
-        expect(getByTestId('checkpoints-checkbox').checked).toBe(true)
+        getByTestId('checkpoints-checkbox').querySelector('input').click()
+        expect(getByTestId('checkpoints-checkbox').querySelector('input').checked).toBe(true)
 
         // 1st graded click will uncheck checkpoints. but it also hides from document.
         // 2nd graded click will render checkpoints, notice its unchecked.
         getByLabelText('Graded').click()
         getByLabelText('Graded').click()
-        expect(getByTestId('checkpoints-checkbox').checked).toBe(false)
+        expect(getByTestId('checkpoints-checkbox').querySelector('input').checked).toBe(false)
       })
 
       it('renders the checkpoints checkbox as selected when there are existing checkpoints', () => {
@@ -212,7 +212,7 @@ describe('DiscussionTopicForm', () => {
             assignment: Assignment.mock({hasSubAssignments: true}),
           }),
         })
-        const checkbox = getByTestId('checkpoints-checkbox')
+        const checkbox = getByTestId('checkpoints-checkbox').querySelector('input')
         expect(checkbox.checked).toBe(true)
       })
       describe('Checkpoints Settings', () => {
@@ -226,7 +226,7 @@ describe('DiscussionTopicForm', () => {
 
           getByLabelText('Graded').click()
 
-          const checkbox = getByTestId('checkpoints-checkbox')
+          const checkbox = getByTestId('checkpoints-checkbox').querySelector('input')
           checkbox.click()
         }
 
