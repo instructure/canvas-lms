@@ -21,7 +21,7 @@ import {map, some, every, find as _find, filter, reject, isEmpty} from 'lodash'
 import {View} from '@canvas/backbone'
 import template from '../../jst/rosterUser.handlebars'
 import EditSectionsView from './EditSectionsView'
-import EditRolesView from './EditRolesView'
+import EditRolesModal from '../../react/EditRolesModal'
 import InvitationsView from './InvitationsView'
 import React from 'react'
 import {createRoot} from 'react-dom/client'
@@ -38,8 +38,9 @@ import {queryClient} from '@canvas/query'
 const I18n = createI18nScope('RosterUserView')
 
 let editSectionsDialog = null
-let editRolesDialog = null
 let invitationDialog = null
+let linkToStudentsRoot = null
+let editRolesRoot = null
 
 export default class RosterUserView extends View {
   static initClass() {
@@ -142,15 +143,18 @@ export default class RosterUserView extends View {
       ENV.permissions.can_manage_differentiation_tags &&
       ENV.permissions.allow_assign_to_differentiation_tags
 
-    const candoAdminActions = ENV.permissions.can_allow_course_admin_actions
-
-    json.canManage = some(['TeacherEnrollment', 'DesignerEnrollment', 'TaEnrollment'], et =>
-      this.model.hasEnrollmentType(et),
-    )
-      ? candoAdminActions
-      : this.model.hasEnrollmentType('ObserverEnrollment')
-        ? candoAdminActions || ENV.permissions.manage_students
-        : ENV.permissions.manage_students
+    const canDoAdminActions = ENV.permissions.can_allow_course_admin_actions
+    if (
+      some(['TeacherEnrollment', 'DesignerEnrollment', 'TaEnrollment'], et =>
+        this.model.hasEnrollmentType(et),
+      )
+    ) {
+      json.canManage = canDoAdminActions
+    } else if (this.model.hasEnrollmentType('ObserverEnrollment')) {
+      json.canManage = canDoAdminActions || ENV.permissions.manage_students
+    } else {
+      json.canManage = ENV.permissions.manage_students
+    }
     json.customLinks = this.model.get('custom_links')
 
     if (json.canViewLoginIdColumn) {
@@ -221,14 +225,6 @@ export default class RosterUserView extends View {
     return editSectionsDialog.render().show()
   }
 
-  editRoles() {
-    if (!editRolesDialog) {
-      editRolesDialog = new EditRolesView()
-    }
-    editRolesDialog.model = this.model
-    return editRolesDialog.render().show()
-  }
-
   getUniqueObservees(enrollments) {
     const uniqueObserveesMap = new Map()
 
@@ -244,7 +240,7 @@ export default class RosterUserView extends View {
 
   linkToStudents() {
     const mountPoint = document.getElementById('link_to_students_mount_point')
-    const root = createRoot(mountPoint)
+    linkToStudentsRoot = createRoot(mountPoint)
     const observer = this.model.attributes
     const observerEnrollmentsWithObservedUser = observer.enrollments.filter(
       enrollment => enrollment.type === 'ObserverEnrollment' && enrollment.observed_user,
@@ -252,7 +248,7 @@ export default class RosterUserView extends View {
     const initialObservees = this.getUniqueObservees(observerEnrollmentsWithObservedUser)
     const course = ENV.current_context
 
-    root.render(
+    linkToStudentsRoot.render(
       <LinkToStudents
         observer={observer}
         initialObservees={initialObservees}
@@ -261,7 +257,29 @@ export default class RosterUserView extends View {
           this.updateEnrollments(addedEnrollments, removedEnrollments)
         }}
         onClose={() => {
-          root.unmount()
+          linkToStudentsRoot.render(null)
+        }}
+      />,
+    )
+  }
+
+  editRoles() {
+    if (editRolesRoot === null) {
+      const mountPoint = document.getElementById('edit_roles_mount_point')
+      editRolesRoot = createRoot(mountPoint)
+    }
+
+    const availableRoles = ENV.ALL_ROLES.filter(role => role.addable_by_user)
+    editRolesRoot.render(
+      <EditRolesModal
+        currentEnrollments={this.model.enrollments()}
+        availableRoles={availableRoles}
+        userId={this.model.get('id')}
+        onClose={() => {
+          editRolesRoot.render(null)
+        }}
+        onSubmit={(newEnrollments, deletedEnrollments) => {
+          this.updateEnrollments(newEnrollments, deletedEnrollments)
         }}
       />,
     )
