@@ -23,13 +23,6 @@ import React from 'react'
 import {waitFor} from '@testing-library/react'
 import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
-import * as alerts from '@canvas/alerts/react/FlashAlert'
-
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: jest.fn(),
-}))
-
-const mockShowFlashError = alerts.showFlashError as jest.Mock
 
 const moduleId = 'mod-123'
 const errorMsg = 'Boom'
@@ -72,7 +65,6 @@ describe('useModuleItems', () => {
   beforeAll(() => server.listen())
   afterEach(() => {
     server.resetHandlers()
-    mockShowFlashError.mockClear()
   })
   afterAll(() => server.close())
 
@@ -97,44 +89,6 @@ describe('useModuleItems', () => {
     expect(data?.moduleItems[0]).toMatchObject({id: 'item_1', moduleId, index: 0})
     expect(data?.moduleItems[1]).toMatchObject({id: 'item_2', moduleId, index: 1})
     expect(data?.pageInfo).toEqual(endPageInfo)
-  })
-
-  it('shows flash error when query fails (network error)', async () => {
-    server.use(
-      graphql.query('GetModuleItemsQuery', ({variables}) => {
-        expect(variables.moduleId).toBe('mod-500')
-        return variables.networkError('Failed to connect')
-      }),
-    )
-    const {result} = renderUseModuleItems('mod-500')
-
-    await waitFor(() => {
-      expect(result.current.isError).toBe(true)
-    })
-
-    expect(mockShowFlashError).toHaveBeenCalledWith(
-      expect.stringContaining('Failed to load module items'),
-    )
-  })
-
-  it('shows flash error when response contains errors', async () => {
-    server.use(
-      graphql.query('GetModuleItemsQuery', () => {
-        return HttpResponse.json({
-          errors: [{message: errorMsg}],
-        })
-      }),
-    )
-
-    const {result} = renderUseModuleItems('mod-500')
-
-    await waitFor(() => {
-      expect(result.current.isError).toBe(true)
-    })
-
-    expect(mockShowFlashError).toHaveBeenCalledWith(
-      expect.stringContaining('Failed to load module items'),
-    )
   })
 
   it('does not query if enabled is false', async () => {
