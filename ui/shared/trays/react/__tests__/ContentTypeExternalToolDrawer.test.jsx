@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent, waitFor} from '@testing-library/react'
+import {render, fireEvent, waitFor, act} from '@testing-library/react'
 import ContentTypeExternalToolDrawer from '../ContentTypeExternalToolDrawer'
 import MutexManager from '@canvas/mutex-manager/MutexManager'
 import {fallbackIframeAllowances} from '../constants'
@@ -132,7 +132,7 @@ describe('ContentTypeExternalToolDrawer', () => {
       it('sets the width to 100vw on mobile view', () => {
         useBreakpoints.mockReturnValue({
           isMaxMobile: true,
-          isMaxTablet: false,
+          isMaxTablet: true,
         })
         const {getByTestId} = renderTray()
         expect(getByTestId('drawer-header')).toHaveStyle('width: 100vw')
@@ -154,6 +154,102 @@ describe('ContentTypeExternalToolDrawer', () => {
         })
         const {getByTestId} = renderTray()
         expect(getByTestId('drawer-header')).toHaveStyle('width: 33vw')
+      })
+
+      describe('fullscreen functionality', () => {
+        const toolWithFullscreen = {
+          ...tool,
+          allow_fullscreen: true,
+        }
+
+        it('does not render the fullscreen button if allow_fullscreen is false', () => {
+          const {queryByTestId} = renderTray({tool: {...tool, allow_fullscreen: false}})
+          expect(queryByTestId('fullscreen-button')).not.toBeInTheDocument()
+        })
+
+        it('does not render the fullscreen button on mobile view', () => {
+          useBreakpoints.mockReturnValue({
+            isMaxMobile: true,
+            isMaxTablet: true,
+          })
+          const {queryByTestId} = renderTray({tool: toolWithFullscreen})
+          expect(queryByTestId('fullscreen-button')).not.toBeInTheDocument()
+        })
+
+        it('renders the fullscreen button on desktop view when enabled', () => {
+          useBreakpoints.mockReturnValue({isDesktop: true})
+          const {getByTestId} = renderTray({tool: toolWithFullscreen})
+          expect(getByTestId('fullscreen-button')).toBeInTheDocument()
+        })
+
+        it('toggles drawer width and button state on click', () => {
+          useBreakpoints.mockReturnValue({isDesktop: true})
+          const mockNavToggle = document.createElement('div')
+          Object.defineProperty(mockNavToggle, 'getBoundingClientRect', {
+            value: () => ({width: 50}),
+          })
+          jest.spyOn(document, 'getElementById').mockReturnValue(mockNavToggle)
+
+          const {getByTestId, queryByTestId} = renderTray({tool: toolWithFullscreen})
+          const drawerHeader = getByTestId('drawer-header')
+
+          fireEvent.click(getByTestId('fullscreen-button'))
+
+          expect(getByTestId('exit-fullscreen-button')).toBeInTheDocument()
+          expect(queryByTestId('fullscreen-button')).not.toBeInTheDocument()
+          expect(drawerHeader).toHaveStyle('width: calc(100vw - 50px)')
+
+          fireEvent.click(getByTestId('exit-fullscreen-button'))
+
+          expect(getByTestId('fullscreen-button')).toBeInTheDocument()
+          expect(queryByTestId('exit-fullscreen-button')).not.toBeInTheDocument()
+          expect(drawerHeader).toHaveStyle('width: 33vw')
+        })
+
+        it('resets fullscreen state when the drawer is closed and reopened', async () => {
+          const {getByTestId, queryByTestId, rerender} = renderTray({
+            tool: toolWithFullscreen,
+            open: true,
+          })
+
+          fireEvent.click(getByTestId('fullscreen-button'))
+          expect(getByTestId('exit-fullscreen-button')).toBeInTheDocument()
+
+          await act(async () => {
+            await rerender(
+              <ContentTypeExternalToolDrawer
+                {...{
+                  tool: toolWithFullscreen,
+                  pageContent,
+                  pageContentTitle,
+                  onDismiss,
+                  onExternalContentReady,
+                  open: false,
+                }}
+              />,
+            )
+          })
+
+          await act(async () => {
+            await rerender(
+              <ContentTypeExternalToolDrawer
+                {...{
+                  tool: toolWithFullscreen,
+                  pageContent,
+                  pageContentTitle,
+                  onDismiss,
+                  onExternalContentReady,
+                  open: true,
+                }}
+              />,
+            )
+          })
+
+          await waitFor(() => {
+            expect(getByTestId('fullscreen-button')).toBeInTheDocument()
+            expect(queryByTestId('exit-fullscreen-button')).not.toBeInTheDocument()
+          })
+        })
       })
     })
 

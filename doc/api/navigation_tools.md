@@ -357,6 +357,10 @@ All of these settings are present for the **top_navigation** placement:
 
   This currently has no effect as the Drawer height is fixed to the available space of the browser viewport minus the tool title header and close button.
 
+- allow_fullscreen: &lt;boolean&gt; (optional)
+
+  This setting controls whether the tool is allowed to enter fullscreen mode. If not set, the tool will not be able to enter fullscreen.
+
 ### Post Message API
 
 We have also introduced two new postMessage functions to enhance the Top Navigation placement. The first, **lti.getPageContent**, allows an LTI tool to request the content of the current page, providing valuable context data directly from the front end without the need for a REST API call. The second, **lti.getPageSettings**, returns an object containing locale, timezone, and theme information, enabling tools to match Canvas's appearance for improved accessibility and cohesion.

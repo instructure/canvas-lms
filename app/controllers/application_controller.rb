@@ -716,6 +716,8 @@ class ApplicationController < ActionController::Base
 
     if type == :top_navigation
       hash[:pinned] = tool.top_nav_favorite_in_context?(context)
+      allow_fullscreen = tool.extension_setting(:top_navigation, "allow_fullscreen")
+      hash[:allow_fullscreen] = allow_fullscreen if allow_fullscreen.present?
     end
 
     # Add the tool's postmessage scopes to the JS environment, if present.

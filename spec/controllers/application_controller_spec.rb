@@ -1969,6 +1969,7 @@ RSpec.describe ApplicationController do
         @tool = @course.context_external_tools.new(name: "bob", consumer_key: "test", shared_secret: "secret", url: "http://example.com")
 
         @tool_settings = %i[
+          top_navigation
           user_navigation
           course_navigation
           account_navigation
@@ -2053,6 +2054,80 @@ RSpec.describe ApplicationController do
           controller.external_tools_display_hashes(:account_navigation, @course)
 
           expect(controller.js_env[:LTI_TOOL_SCOPES]).to eq("http://example.com" => TokenScopes::LTI_POSTMESSAGE_SCOPES)
+        end
+      end
+
+      context "when type is :submission_type_selection" do
+        before do
+          @tool.submission_type_selection = {
+            description: "Select a file to submit.",
+            require_resource_selection: true
+          }
+          @tool.save!
+        end
+
+        it "includes submission type selection details" do
+          hash = controller.external_tool_display_hash(@tool, :submission_type_selection)
+          expect(hash[:description]).to eq "Select a file to submit."
+          expect(hash[:require_resource_selection]).to be true
+        end
+      end
+
+      context "when type is :top_navigation" do
+        it "includes the pinned status" do
+          allow(@tool).to receive(:top_nav_favorite_in_context?).with(@course).and_return(true)
+          hash = controller.external_tool_display_hash(@tool, :top_navigation)
+          expect(hash[:pinned]).to be true
+
+          allow(@tool).to receive(:top_nav_favorite_in_context?).with(@course).and_return(false)
+          hash = controller.external_tool_display_hash(@tool, :top_navigation)
+          expect(hash[:pinned]).to be false
+        end
+
+        context "for the allow_fullscreen setting" do
+          before do
+            @tool.settings["top_navigation"]["allow_fullscreen"] = true
+            @tool.save!
+          end
+
+          it "includes allow_fullscreen ONLY when the type is :top_navigation" do
+            top_nav_hash = controller.external_tool_display_hash(@tool, :top_navigation)
+            expect(top_nav_hash).to include(:allow_fullscreen)
+
+            course_nav_hash = controller.external_tool_display_hash(@tool, :course_navigation)
+            expect(course_nav_hash.keys).not_to include(:allow_fullscreen)
+          end
+        end
+      end
+
+      context "with optional parameters" do
+        it "appends url_params to the base_url" do
+          params_to_add = { custom_param: "value123" }
+          hash = controller.external_tool_display_hash(@tool, :course_navigation, params_to_add)
+          expect(hash[:base_url]).to include("custom_param=value123")
+        end
+
+        it "adds keys from custom_settings" do
+          custom = [:base_title, :external_url]
+          hash = controller.external_tool_display_hash(@tool, :course_navigation, {}, @course, custom)
+          expect(hash[:base_title]).to eq @tool.name
+          expect(hash[:external_url]).to eq @tool.url
+        end
+      end
+
+      context "for other initial hash keys" do
+        it "includes allow_fullscreen when set" do
+          @tool.settings["top_navigation"] = { "allow_fullscreen" => true }
+          @tool.save!
+          hash = controller.external_tool_display_hash(@tool, :top_navigation)
+          expect(hash[:allow_fullscreen]).to be true
+        end
+
+        it "omits tool_id when it is not present" do
+          @tool.tool_id = nil
+          @tool.save!
+          hash = controller.external_tool_display_hash(@tool, :course_navigation)
+          expect(hash.keys).not_to include(:tool_id)
         end
       end
 

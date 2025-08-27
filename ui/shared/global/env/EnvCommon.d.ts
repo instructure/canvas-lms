@@ -51,6 +51,7 @@ export type Tool = {
   icon_url: string
   pinned?: boolean
   placement?: ToolPlacement
+  allow_fullscreen?: boolean
 }
 
 export type GroupOutcome = {
