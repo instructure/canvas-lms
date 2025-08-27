@@ -16,36 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Button} from '@instructure/ui-buttons'
-import {IconEditLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {IconButton} from '@instructure/ui-buttons'
+import {IconEditLine} from '@instructure/ui-icons'
 
 const I18n = createI18nScope('block_content_editor')
 
-type A11yEditButtonProps = {
-  onUserAction: () => void
-  elementRef?: (element: Element | null) => void
-}
-
-export const A11yEditButton = ({onUserAction, elementRef}: A11yEditButtonProps) => {
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault()
-      onUserAction()
-    }
-  }
-
+export const SettingsButton = (props: {
+  onClicked: () => void
+}) => {
   return (
-    <Button
-      data-focus-reveal-button
-      color="primary"
-      renderIcon={<IconEditLine />}
-      aria-label={I18n.t('Edit block content')}
-      onKeyDown={handleKeyDown}
-      onClick={onUserAction}
-      elementRef={elementRef}
+    <IconButton
+      data-testid="block-settings-button"
+      data-action-button
+      screenReaderLabel={I18n.t('Block settings')}
+      onClick={props.onClicked}
     >
-      {I18n.t('Edit')}
-    </Button>
+      <IconEditLine />
+    </IconButton>
   )
 }

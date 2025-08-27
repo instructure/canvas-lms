@@ -20,7 +20,6 @@ import {ComponentProps} from 'react'
 import {useIsInEditor} from '../../hooks/useIsInEditor'
 import {useIsEditingBlock} from '../../hooks/useIsEditingBlock'
 import {BaseBlockViewLayout} from './layout/BaseBlockViewLayout'
-import {useNode} from '@craftjs/core'
 import {useBlockContentEditorContext} from '../../BlockContentEditorContext'
 import {BaseBlockEditWrapper} from './components/BaseBlockEditWrapper'
 import {Mask} from './components/Mask/Mask'
@@ -35,20 +34,11 @@ function BaseBlockViewerMode<T extends {}>(props: ComponentProps<typeof BaseBloc
 }
 
 function BaseBlockEditorMode<T extends {}>(props: ComponentProps<typeof BaseBlock<T>>) {
-  const isEditing = useIsEditingBlock()
-  const {id} = useNode()
-  const isEditingBlock = useIsEditingBlock()
-  const {editingBlock, settingsTray} = useBlockContentEditorContext()
-  const Component = isEditing ? props.EditComponent : props.EditViewComponent
+  const {settingsTray} = useBlockContentEditorContext()
+  const {isEditingBlock} = useIsEditingBlock()
+  const Component = isEditingBlock ? props.EditComponent : props.EditViewComponent
   return (
-    <BaseBlockEditWrapper
-      title={props.title}
-      isEditMode={isEditingBlock}
-      setIsEditMode={isEdit => {
-        editingBlock.setId(isEdit ? id : null)
-      }}
-      backgroundColor={props.backgroundColor}
-    >
+    <BaseBlockEditWrapper title={props.title} backgroundColor={props.backgroundColor}>
       <Component {...props.componentProps} />
       {settingsTray.isOpen && <Mask />}
     </BaseBlockEditWrapper>

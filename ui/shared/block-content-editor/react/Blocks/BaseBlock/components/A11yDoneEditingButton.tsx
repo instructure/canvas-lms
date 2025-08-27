@@ -16,23 +16,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Button} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {IconButton} from '@instructure/ui-buttons'
-import {IconEditLine} from '@instructure/ui-icons'
 
 const I18n = createI18nScope('block_content_editor')
 
-export const EditButton = (props: {
-  onClicked: () => void
-}) => {
+type A11ySaveButtonProps = {
+  onUserAction: () => void
+  isFullyVisible: boolean
+}
+
+export const A11yDoneEditingButton = ({onUserAction, isFullyVisible}: A11ySaveButtonProps) => {
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      onUserAction()
+    }
+  }
+
   return (
-    <IconButton
-      data-testid="edit-block-button"
-      data-action-button
-      screenReaderLabel={I18n.t('Edit block')}
-      onClick={props.onClicked}
+    <Button
+      {...(!isFullyVisible && {'data-focus-reveal-button': true})}
+      color="primary"
+      aria-label={I18n.t('Done editing block content')}
+      onKeyDown={handleKeyDown}
+      onClick={onUserAction}
     >
-      <IconEditLine />
-    </IconButton>
+      {I18n.t('Done editing')}
+    </Button>
   )
 }

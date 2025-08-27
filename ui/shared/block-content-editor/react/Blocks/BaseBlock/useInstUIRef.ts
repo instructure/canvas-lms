@@ -16,27 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Button} from '@instructure/ui-buttons'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useRef} from 'react'
 
-const I18n = createI18nScope('block_content_editor')
-
-export const A11ySaveButton = (props: {onKeyDown: () => void}) => {
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault()
-      props.onKeyDown()
-    }
-  }
-
-  return (
-    <Button
-      data-focus-reveal-button
-      color="primary"
-      aria-label={I18n.t('Save block content')}
-      onKeyDown={handleKeyDown}
-    >
-      {I18n.t('Save')}
-    </Button>
-  )
+export function useInstUIRef<T>() {
+  const ref = useRef<T | null>(null)
+  return [ref, (element: Element | null) => (ref.current = element as T)] as const
 }

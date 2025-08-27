@@ -87,7 +87,7 @@ describe "Block Content Editor", :ignore_js_errors do
     end
 
     it "opens settings tray" do
-      first_block.edit_button.click
+      first_block.settings_button.click
       wait_for_ajaximations
 
       expect(settings_tray).to be_displayed

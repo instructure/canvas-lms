@@ -29,15 +29,32 @@ const mockMoveDown = jest.fn()
 const mockMoveToTop = jest.fn()
 const mockMoveToBottom = jest.fn()
 const mockUseMoveBlock = jest.fn()
+const mockEditingBlockSetId = jest.fn()
+const mockUseIsEditingBlock = jest.fn()
+const mockSetIsEditedViaEditButton = jest.fn()
 
 jest.mock('../../../../BlockContentEditorContext', () => ({
   useBlockContentEditorContext: () => ({
     addBlockModal: {open: mockAddBlockModalOpen},
     settingsTray: {open: mockSettingsTrayOpen},
+    editingBlock: {setId: mockEditingBlockSetId},
     initialAddBlockHandler: jest.fn(),
     editor: jest.fn(),
   }),
 }))
+
+jest.mock('../../../../hooks/useIsEditingBlock', () => ({
+  useIsEditingBlock: () => mockUseIsEditingBlock(),
+}))
+
+const getUseIsEditingBlockMock = ({
+  isEditingBlock,
+  isEditedViaEditButton,
+}: {isEditingBlock: boolean; isEditedViaEditButton: boolean}) => ({
+  isEditingBlock,
+  isEditedViaEditButton,
+  setIsEditedViaEditButton: mockSetIsEditedViaEditButton,
+})
 
 jest.mock('../../../../hooks/useDeleteNode', () => ({
   useDeleteNode: () => mockDeleteNode,
@@ -66,13 +83,14 @@ const getMoveBlockMock = ({
 describe('BaseBlockEditWrapper', () => {
   const getDefaultProps = (props: object = {}) => ({
     title: 'Test Block Title',
-    setIsEditMode: jest.fn(),
-    isEditMode: false,
     ...props,
   })
 
   beforeEach(() => {
     jest.clearAllMocks()
+    mockUseIsEditingBlock.mockReturnValue(
+      getUseIsEditingBlockMock({isEditingBlock: false, isEditedViaEditButton: false}),
+    )
     mockUseMoveBlock.mockReturnValue(
       getMoveBlockMock({
         canMoveUp: true,
@@ -146,7 +164,7 @@ describe('BaseBlockEditWrapper', () => {
 
     it('opens Settings Tray when Edit button is clicked', () => {
       const component = renderBlock(BaseBlockEditWrapper, getDefaultProps())
-      const editButton = component.getByText(/edit block/i)
+      const editButton = component.getByText(/block settings/i)
 
       fireEvent.click(editButton)
 
