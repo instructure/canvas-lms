@@ -34,7 +34,7 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def actual_saving_user
-    user
+    saving_user || user
   end
 
   attr_readonly :discussion_topic_id, :user_id, :parent_id, :is_anonymous_author
@@ -226,6 +226,7 @@ class DiscussionEntry < ActiveRecord::Base
                                                         user:,
                                                         parent_entry: self)
         if entry.grants_right?(user, :create)
+          entry.saving_user = user
           entry.save!
           entry
         else

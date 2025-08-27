@@ -164,6 +164,7 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
     end
 
     discussion_topic.saved_by = :assignment if discussion_topic.assignment.present?
+    discussion_topic.saving_user = current_user
     return errors_for(discussion_topic) unless discussion_topic.save!
 
     if input.key?(:ungraded_discussion_overrides)

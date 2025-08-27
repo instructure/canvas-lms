@@ -2893,6 +2893,7 @@ describe DiscussionTopicsController, type: :request do
       it "tags attachment urls with location of the asset" do
         @attachment.root_account.enable_feature!(:file_association_access)
         message = "<img src='/courses/#{@course.id}/files/#{@attachment.id}'>"
+        @entry.saving_user = @user
         @entry.update!(message:)
         json = api_call(
           :get,
@@ -3085,6 +3086,7 @@ describe DiscussionTopicsController, type: :request do
 
     it "translates user content in replies" do
       should_translate_user_content(@course) do |user_content|
+        @reply.saving_user = @user
         @reply.update_attribute("message", user_content)
         json = api_call(
           :get,
@@ -3103,6 +3105,7 @@ describe DiscussionTopicsController, type: :request do
 
     it "translates user content in replies without verifiers" do
       should_translate_user_content(@course, false) do |user_content|
+        @reply.saving_user = @user
         @reply.update_attribute("message", user_content)
         json = api_call(
           :get,
@@ -3958,6 +3961,7 @@ describe DiscussionTopicsController, type: :request do
         @reply3.change_read_state("read", @user)
         # have the teacher edit one of the student's replies
         @reply_reply1.editor = @teacher
+        @reply_reply1.saving_user = @teacher
         @reply_reply1.update(message: "<p>censored</p>")
 
         @all_entries.each(&:reload)
@@ -4097,7 +4101,7 @@ describe DiscussionTopicsController, type: :request do
       before :once do
         course_with_teacher(active_all: true)
         student_in_course(course: @course, active_all: true)
-        @topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, discussion_type: "threaded")
+        @topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, saving_user: @teacher, discussion_type: "threaded")
         @root1 = @topic.reply_from(user: @student, html: "root1")
         @reply1 = @root1.reply_from(user: @teacher, html: "reply1")
 
@@ -4147,7 +4151,7 @@ describe DiscussionTopicsController, type: :request do
     it "includes new entries if the flag is given" do
       course_with_teacher(active_all: true)
       student_in_course(course: @course, active_all: true)
-      @topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, discussion_type: "threaded")
+      @topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, saving_user: @teacher, discussion_type: "threaded")
       @root1 = @topic.reply_from(user: @student, html: "root1")
 
       # materialized view jobs are now delayed
@@ -4208,7 +4212,7 @@ describe DiscussionTopicsController, type: :request do
     it "resolves the placeholder domain in new entries" do
       course_with_teacher(active_all: true)
       student_in_course(course: @course, active_all: true)
-      @topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, discussion_type: "threaded")
+      @topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, saving_user: @teacher, discussion_type: "threaded")
       @root1 = @topic.reply_from(user: @student, html: "root1")
 
       link = "/courses/#{@course.id}/discussion_topics"
@@ -4249,10 +4253,11 @@ describe DiscussionTopicsController, type: :request do
                         section: @section,
                         enrollment_state: :active)
 
-    @topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, discussion_type: "threaded")
+    @topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, saving_user: @teacher, discussion_type: "threaded")
     @assignment = @course.assignments.build(submission_types: "discussion_topic", title: @topic.title, due_at: 1.day.from_now)
     @assignment.saved_by = :discussion_topic
     @topic.assignment = @assignment
+    @topic.saving_user = @teacher
     @topic.save
 
     override = @assignment.assignment_overrides.build
@@ -4722,6 +4727,7 @@ def create_topic(context, opts = {})
   opts[:user] ||= @user
   topic = context.discussion_topics.build(opts)
   topic.attachment = attachment if attachment
+  topic.saving_user = opts[:user]
   topic.save!
   topic.publish if topic.unpublished?
   topic

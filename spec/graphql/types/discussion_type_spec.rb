@@ -165,6 +165,7 @@ RSpec.shared_examples "DiscussionType" do
                                                  context: @course,
                                                  user: @teacher,
                                                  editor: @teacher,
+                                                 saving_user: @teacher,
                                                  attachment:,
                                                  is_anonymous_author: true)
       discussion_type = GraphQLTypeTester.new(discussion_topic, current_user: @teacher, domain_root_account: attachment.root_account)
@@ -177,7 +178,7 @@ RSpec.shared_examples "DiscussionType" do
   it "returns if the current user requires an initial post" do
     discussion.update!(require_initial_post: true)
     student_in_course(active_all: true)
-    discussion.discussion_entries.create!(message: "other student entry", user: @student)
+    discussion.discussion_entries.create!(message: "other student entry", user: @student, saving_user: @student)
 
     student_in_course(active_all: true)
     type_with_student = GraphQLTypeTester.new(discussion, current_user: @student)
@@ -185,7 +186,7 @@ RSpec.shared_examples "DiscussionType" do
     expect(type_with_student.resolve("initialPostRequiredForCurrentUser")).to be true
     expect(type_with_student.resolve("discussionEntriesConnection { nodes { message } }").count).to eq 0
 
-    discussion.discussion_entries.create!(message: "Here is my entry", user: @student)
+    discussion.discussion_entries.create!(message: "Here is my entry", user: @student, saving_user: @student)
     expect(type_with_student.resolve("initialPostRequiredForCurrentUser")).to be false
     expect(type_with_student.resolve("discussionEntriesConnection { nodes { message } }").count).to eq 2
   end
@@ -230,21 +231,21 @@ RSpec.shared_examples "DiscussionType" do
   end
 
   it "orders root_entries by their created_at" do
-    de = discussion.discussion_entries.create!(message: "root entry", user: @teacher)
-    de2 = discussion.discussion_entries.create!(message: "root entry", user: @teacher)
-    de3 = discussion.discussion_entries.create!(message: "root entry", user: @teacher)
+    de = discussion.discussion_entries.create!(message: "root entry", user: @teacher, saving_user: @teacher)
+    de2 = discussion.discussion_entries.create!(message: "root entry", user: @teacher, saving_user: @teacher)
+    de3 = discussion.discussion_entries.create!(message: "root entry", user: @teacher, saving_user: @teacher)
     # adding a discussion entry should NOT impact sort order of root entries
-    discussion.discussion_entries.create!(message: "sub entry", user: @teacher, parent_id: de2.id)
+    discussion.discussion_entries.create!(message: "sub entry", user: @teacher, parent_id: de2.id, saving_user: @teacher)
     discussion.update!(sort_order: "asc", sort_order_locked: true)
     expect(discussion_type.resolve("discussionEntriesConnection(rootEntries: true) { nodes { _id } }")).to eq [de.id, de2.id, de3.id].map(&:to_s)
     discussion.update!(sort_order: "desc")
     expect(discussion_type.resolve("discussionEntriesConnection(rootEntries: true) { nodes { _id } }")).to eq [de3.id, de2.id, de.id].map(&:to_s)
-    discussion.discussion_entries.create!(message: "sub entry", user: @teacher, parent_id: de3.id)
+    discussion.discussion_entries.create!(message: "sub entry", user: @teacher, parent_id: de3.id, saving_user: @teacher)
     expect(discussion_type.resolve("discussionEntriesConnection(rootEntries: true) { nodes { _id } }")).to eq [de3.id, de2.id, de.id].map(&:to_s)
   end
 
   it "loads discussion_entry_drafts" do
-    de = discussion.discussion_entries.create!(message: "root entry", user: @teacher)
+    de = discussion.discussion_entries.create!(message: "root entry", user: @teacher, saving_user: @teacher)
     dr = DiscussionEntryDraft.upsert_draft(user: @teacher, topic: discussion, message: "hey")
     dr2 = DiscussionEntryDraft.upsert_draft(user: @teacher, topic: discussion, message: "hooo", parent: de)
     dr3 = DiscussionEntryDraft.upsert_draft(user: @teacher, topic: discussion, message: "party now", entry: de)
@@ -257,8 +258,8 @@ RSpec.shared_examples "DiscussionType" do
   end
 
   it "allows querying root discussion entries" do
-    de = discussion.discussion_entries.create!(message: "root entry", user: @teacher)
-    discussion.discussion_entries.create!(message: "sub entry", user: @teacher, parent_id: de.id)
+    de = discussion.discussion_entries.create!(message: "root entry", user: @teacher, saving_user: @teacher)
+    discussion.discussion_entries.create!(message: "sub entry", user: @teacher, parent_id: de.id, saving_user: @teacher)
 
     result = discussion_type.resolve("discussionEntriesConnection(rootEntries:true) { nodes { message } }")
     expect(result.count).to be 1

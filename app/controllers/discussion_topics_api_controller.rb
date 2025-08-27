@@ -603,6 +603,7 @@ class DiscussionTopicsApiController < ApplicationController
     return unless authorized_action(@topic, @current_user, :duplicate)
 
     new_topic = @topic.duplicate({ user: @current_user })
+    new_topic.saving_user = @current_user
     if @topic.pinned
       new_topic.position = @topic.context.discussion_topics.maximum(:position) + 1
     end
@@ -748,6 +749,7 @@ class DiscussionTopicsApiController < ApplicationController
     @parent = all_entries(@topic).find(params[:entry_id])
     @entry = build_entry(@parent.discussion_subentries)
     if authorized_action(@entry, @current_user, :create)
+      @entry.saving_user = @current_user
       save_entry
     end
   end
@@ -1135,6 +1137,7 @@ class DiscussionTopicsApiController < ApplicationController
 
   def build_entry(association)
     params[:message] = process_incoming_html_content(params[:message]) if params.key?(:message)
+    @topic.saving_user = @current_user
     @topic.save! if @topic.new_record?
     association.build(message: params[:message], user: @current_user, discussion_topic: @topic)
   end
@@ -1145,6 +1148,7 @@ class DiscussionTopicsApiController < ApplicationController
     return if has_attachment && !@topic.for_assignment? && params[:attachment].size > 1.kilobyte &&
               quota_exceeded(@current_user, named_context_url(@context, :context_discussion_topic_url, @topic.id))
 
+    @entry.saving_user = @current_user
     if @entry.save
       log_asset_access(@topic, "topics", "topics", "participate")
 
@@ -1156,6 +1160,7 @@ class DiscussionTopicsApiController < ApplicationController
         @attachment = create_attachment
         @attachment.handle_duplicates(:rename)
         @entry.attachment = @attachment
+        @entry.saving_user = @current_user
         @entry.save
       end
       render json: discussion_entry_api_json([@entry], @context, @current_user, session, [:user_name, :display_user]).first, status: :created

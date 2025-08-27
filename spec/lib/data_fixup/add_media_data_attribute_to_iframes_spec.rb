@@ -111,8 +111,9 @@ describe DataFixup::AddMediaDataAttributeToIframes do
       assignment = another_course.assignments.create!(description: record_body, submission_types: "online_text_entry", points_possible: 2, saving_user: @user)
       assessment_question_bank = another_course.assessment_question_banks.create!
       assessment_question = assessment_question_bank.assessment_questions.create!(question_data: { "question_text" => record_body })
-      discussion_topic = another_course.discussion_topics.create!(message: record_body, user: @user)
-      discussion_entry = discussion_topic.discussion_entries.create! message: record_body, user: User.create!
+      discussion_topic = another_course.discussion_topics.create!(message: record_body, user: @user, saving_user: @user)
+      sa = User.create!
+      discussion_entry = discussion_topic.discussion_entries.create!(message: record_body, user: sa, saving_user: sa)
       quiz = Quizzes::Quiz.create! context: another_course
       quiz_question = quiz.quiz_questions.create!(question_data: { "question_text" => record_body }, saving_user: @user)
       wiki_page = another_course.wiki_pages.create!(title: "Whatevs", body: record_body, saving_user: @user)
