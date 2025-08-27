@@ -77,9 +77,8 @@ describe QuizzesNext::QuizzesApiController, type: :request do
       end
 
       before do
-        allow_any_instance_of(ListNewQuizzesWithQuestionCountService)
-          .to receive(:question_count)
-          .and_return(quiz_data_mock)
+        allow(ListNewQuizzesWithQuestionCountService).to receive(:new)
+          .and_return(instance_double(ListNewQuizzesWithQuestionCountService, question_count: quiz_data_mock))
       end
 
       it "returns list of old quizzes" do
@@ -208,9 +207,8 @@ describe QuizzesNext::QuizzesApiController, type: :request do
       before(:once) { student_in_course(active_all: true) }
 
       before do
-        allow_any_instance_of(ListNewQuizzesWithQuestionCountService)
-          .to receive(:question_count)
-          .and_return(quiz_data_mock)
+        allow(ListNewQuizzesWithQuestionCountService).to receive(:new)
+          .and_return(instance_double(ListNewQuizzesWithQuestionCountService, question_count: quiz_data_mock))
       end
 
       context "quiz tab is disabled" do
