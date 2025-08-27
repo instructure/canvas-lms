@@ -18,7 +18,7 @@
  */
 import React from 'react'
 import {Tag} from '@instructure/ui-tag'
-import {AppliedFilter, FilterDateKeys, FilterOption, Filters} from '../../../types'
+import {AppliedFilter, FilterOption, Filters} from '../../../types'
 import {View} from '@instructure/ui-view'
 import {getFilters} from '../../../utils/filter'
 import * as tz from '@instructure/moment-utils'
@@ -46,7 +46,7 @@ const AppliedFilters: React.FC<AppliedFiltersProps> = ({
   }
 
   return (
-    <View as="div" width="100%">
+    <View as="div" width="100%" data-testid="applied-filters">
       {appliedFilters.map((filter: AppliedFilter, index: number) => (
         <Tag
           text={
