@@ -64,6 +64,10 @@ const getFetchScansRequestParams = (requestedFetch: NewStateToFetch): Record<str
       requestedFetch.tableSortState.sortDirection === 'ascending' ? 'asc' : 'desc'
   }
 
+  if (requestedFetch.search) {
+    params['search'] = requestedFetch.search
+  }
+
   applySearchAndFilterParams(requestedFetch, params)
 
   return params
@@ -71,7 +75,9 @@ const getFetchScansRequestParams = (requestedFetch: NewStateToFetch): Record<str
 
 const getFetchSummaryRequestParams = (requestedFetch: NewStateToFetch): Record<string, any> => {
   const params: Record<string, any> = {}
-
+  if (requestedFetch.search) {
+    params['search'] = requestedFetch.search
+  }
   applySearchAndFilterParams(requestedFetch, params)
 
   return params
@@ -135,7 +141,6 @@ export const useAccessibilityScansFetchUtils = () => {
           page,
           pageSize,
           tableSortState: tableSortState || defaultStateToFetch.tableSortState,
-          search: search || defaultStateToFetch.search,
           filters: filters ? getParsedFilters(filters) : undefined,
         }
 
@@ -193,7 +198,7 @@ export const useAccessibilityScansFetchUtils = () => {
         // Picking up existing state (or default, if not yet set)
         const newStateToFetch: NewStateToFetch = {
           ...defaultStateToFetch,
-          search: search || defaultStateToFetch.search,
+          // search: search || defaultStateToFetch.search,
           filters: filters ? getParsedFilters(filters) : undefined,
         }
 

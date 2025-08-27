@@ -101,10 +101,14 @@ export const AccessibilityCheckerApp: React.FC = () => {
       const newSearch = value
       setSearch(newSearch)
       if (newSearch.length >= 0) {
-        await doFetchAccessibilityScanData({search: newSearch, page: 1})
+        const params = {...parseFetchParams(), search: newSearch}
+        await Promise.all([
+          doFetchAccessibilityIssuesSummary(params, filters),
+          doFetchAccessibilityScanData(params, filters),
+        ])
       }
     },
-    [setSearch, doFetchAccessibilityScanData],
+    [setSearch, doFetchAccessibilityScanData, filters],
   )
 
   return (

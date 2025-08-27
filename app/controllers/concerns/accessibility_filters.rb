@@ -28,8 +28,10 @@ module AccessibilityFilters
   # @param relation [ActiveRecord::Relation] the base query
   # @param filters [Hash] the filter parameters
   # @return [ActiveRecord::Relation] the filtered query
-  def apply_accessibility_filters(relation, filters)
-    return relation if filters.blank?
+  def apply_accessibility_filters(relation, filters = {}, search = nil)
+    filters = filters.presence || {}
+
+    return relation if filters.empty? && search.blank?
 
     rule_types = filters[:ruleTypes]
     resource_types = filters[:artifactTypes]
@@ -37,10 +39,41 @@ module AccessibilityFilters
     from_date = parse_date_safely(filters[:fromDate])
     to_date = parse_date_safely(filters[:toDate])
 
-    relation = apply_rule_type_filter(relation, rule_types)
-    relation = apply_resource_type_filter(relation, resource_types)
-    relation = apply_workflow_state_filter(relation, workflow_states)
-    apply_date_range_filter(relation, from_date, to_date)
+    relation = apply_rule_type_filter(relation, rule_types) if rule_types.present?
+    relation = apply_resource_type_filter(relation, resource_types) if resource_types.present?
+    relation = apply_workflow_state_filter(relation, workflow_states) if workflow_states.present?
+    relation = apply_search_term_filter(relation, search) if search.present?
+    relation = apply_date_range_filter(relation, from_date, to_date) if from_date.present? || to_date.present?
+
+    relation
+  end
+
+  # Apply search term filtering
+  # @param relation [ActiveRecord::Relation] the base query
+  # @param search_term [String] the term to search for
+  # @return [ActiveRecord::Relation] the filtered query
+  def apply_search_term_filter(relation, search_term)
+    return relation if search_term.blank?
+
+    matching_rule_types = rule_types_from_label_search(search_term)
+    term = "%#{search_term.downcase.strip}%"
+
+    conditions = [
+      "accessibility_resource_scans.resource_name ILIKE :term",
+      "accessibility_resource_scans.resource_workflow_state ILIKE :term",
+      "accessibility_resource_scans.error_message ILIKE :term"
+    ]
+
+    if matching_rule_types.any?
+      relation = relation.joins(:accessibility_issues).distinct
+      conditions << "accessibility_issues.rule_type IN (:matching_rule_types)"
+    end
+
+    relation.where(
+      conditions.join(" OR "),
+      term:,
+      matching_rule_types:
+    )
   end
 
   private
@@ -75,6 +108,7 @@ module AccessibilityFilters
   def apply_resource_type_filter(relation, resource_types)
     return relation if resource_types.blank?
 
+    resource_types = Array(resource_types).map(&:to_s)
     valid_resource_types = %w[wiki_page assignment attachment]
     valid_filters = resource_types & valid_resource_types
 
@@ -109,5 +143,18 @@ module AccessibilityFilters
     relation = relation.where(resource_updated_at: from_date..) if from_date.present?
     relation = relation.where(resource_updated_at: ..to_date) if to_date.present?
     relation
+  end
+
+  # Given a search term, return an array of rule types whose display names
+  # include the term (case insensitive).
+  #
+  # @param term [String] the search term
+  # @return [Array<String>] the matching rule types
+  def rule_types_from_label_search(term)
+    downcased_term = term.downcase.strip
+
+    Accessibility::Rule.registry.select do |_type, rule|
+      rule.display_name.downcase.include?(downcased_term)
+    end.keys
   end
 end

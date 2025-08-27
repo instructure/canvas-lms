@@ -36,7 +36,7 @@ class AccessibilityResourceScansController < ApplicationController
             .where(course_id: @context.id)
 
     scans = apply_sorting(scans)
-    scans = apply_accessibility_filters(scans, params[:filters]) if params[:filters].present?
+    scans = apply_accessibility_filters(scans, params[:filters], params[:search]) if params[:filters].present? || params[:search].present?
 
     base_url = course_accessibility_resource_scans_path(@context)
     paginated = Api.paginate(scans, self, base_url)

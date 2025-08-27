@@ -47,7 +47,7 @@ module Accessibility
               .preload(:accessibility_issues)
               .where(course_id: @context.id)
 
-      scans = apply_accessibility_filters(scans, params[:filters])
+      scans = apply_accessibility_filters(scans, params[:filters], params[:search]) if params[:filters].present? || params[:search].present?
 
       all_issues = AccessibilityIssue
                    .active
