@@ -71,11 +71,13 @@ const PeerReviewAllocationRulesTray = ({
   assignmentId,
   isTrayOpen,
   closeTray,
+  canEdit = false,
 }: {
   courseId: string
   assignmentId: string
   isTrayOpen: boolean
   closeTray: () => void
+  canEdit: boolean
 }): React.ReactElement => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const trayLabel = I18n.t('Allocation Rules')
@@ -144,17 +146,21 @@ const PeerReviewAllocationRulesTray = ({
               .
             </Text>
           </Flex.Item>
-          <Flex.Item as="div" padding="x-small medium">
-            <Button color="primary" onClick={() => setIsCreateModalOpen(true)}>
-              {I18n.t('+ Rule')}
-            </Button>
-          </Flex.Item>
+
+          {canEdit && (
+            <Flex.Item as="div" padding="x-small medium">
+              <Button color="primary" onClick={() => setIsCreateModalOpen(true)}>
+                {I18n.t('+ Rule')}
+              </Button>
+            </Flex.Item>
+          )}
+
           {rules.length === 0 ? (
             <EmptyState />
           ) : (
             rules.map(rule => (
               <Flex.Item as="div" padding="x-small medium" key={rule.id}>
-                <AllocationRuleCard rule={rule} />
+                <AllocationRuleCard rule={rule} canEdit={canEdit} />
               </Flex.Item>
             ))
           )}

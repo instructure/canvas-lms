@@ -29,6 +29,7 @@ describe('PeerReviewAllocationRulesTray', () => {
     assignmentId: '456',
     isTrayOpen: true,
     closeTray: jest.fn(),
+    canEdit: false,
   }
 
   let user: ReturnType<typeof userEvent.setup>
@@ -95,14 +96,17 @@ describe('PeerReviewAllocationRulesTray', () => {
   })
 
   describe('Add Rule section', () => {
-    beforeEach(() => {
-      render(<PeerReviewAllocationRulesTray {...defaultProps} />)
-    })
-
-    it('renders the Add Rule button', () => {
+    it('renders the Add Rule button if canEdit is true', () => {
+      render(<PeerReviewAllocationRulesTray {...defaultProps} canEdit={true} />)
       const addRuleButton = screen.getByText('+ Rule')
       expect(addRuleButton).toBeInTheDocument()
       expect(addRuleButton.closest('button')).toBeInTheDocument()
+    })
+
+    it('Add Rule button is not rendered when canEdit is false', () => {
+      render(<PeerReviewAllocationRulesTray {...defaultProps} />)
+      const addRuleButton = screen.queryByText('+ Rule')
+      expect(addRuleButton).not.toBeInTheDocument()
     })
   })
 

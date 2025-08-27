@@ -155,6 +155,10 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
             <PeerReviewAllocationRulesTray
               courseId={assignment.courseID()}
               assignmentId={assignment.getId()}
+              // For now, always allow editing of allocation rules from the details view.
+              // Once we expose proper permissions in the API, we can use that to determine if editing
+              // https://instructure.atlassian.net/browse/EGG-1709
+              canEdit={true}
               isTrayOpen={showRuleTray}
               closeTray={() => setShowRuleTray(false)}
             />
