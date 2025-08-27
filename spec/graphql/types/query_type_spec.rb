@@ -42,6 +42,78 @@ describe Types::QueryType do
     ).to match_array [test_course_1, test_course_2].map(&:to_param)
   end
 
+  context "courses query" do
+    it "works with ids" do
+      course1 = Course.create! name: "TEST1"
+      course2 = Course.create! name: "TEST2", is_public_to_auth_users: true, workflow_state: "available"
+      course3 = Course.create! name: "TEST3", workflow_state: "available"
+      teacher = user_factory(name: "Teacher")
+      course1.enroll_user(teacher, "TeacherEnrollment", enrollment_state: "active")
+
+      result = CanvasSchema.execute(
+        "{ courses(ids: [\"#{course1.id}\", \"#{course2.id}\", \"#{course3.id}\"]) { _id } }",
+        context: { current_user: teacher }
+      )
+
+      expect(result.dig("data", "courses").pluck("_id"))
+        .to match_array([course1.to_param, course2.to_param])
+    end
+
+    it "works with sis ids" do
+      course1 = Course.create! name: "TEST1", sis_source_id: "sis_course_1"
+      course2 = Course.create! name: "TEST2", sis_source_id: "sis_course_2", is_public_to_auth_users: true, workflow_state: "available"
+      Course.create! name: "TEST3", sis_source_id: "sis_course_3", workflow_state: "available"
+      teacher = user_factory(name: "Teacher")
+      course1.enroll_user(teacher, "TeacherEnrollment", enrollment_state: "active")
+
+      result = CanvasSchema.execute(
+        "{ courses(sisIds: [\"sis_course_1\", \"sis_course_2\", \"sis_course_3\"]) { _id } }",
+        context: { current_user: teacher }
+      )
+
+      expect(result.dig("data", "courses").pluck("_id"))
+        .to match_array([course1.to_param, course2.to_param])
+    end
+
+    it "errors when both ids and sis_ids provided" do
+      result = CanvasSchema.execute(
+        "{ courses(ids: [\"123\"], sisIds: [\"sis123\"]) { _id } }",
+        context: { current_user: user_factory }
+      )
+
+      expect(result.dig("errors", 0, "message")).to eq "Must specify exactly one of ids or sisIds"
+    end
+
+    it "errors when neither ids nor sis_ids provided" do
+      result = CanvasSchema.execute(
+        "{ courses { _id } }",
+        context: { current_user: user_factory }
+      )
+
+      expect(result.dig("errors", 0, "message")).to eq "Must specify exactly one of ids or sisIds"
+    end
+
+    it "errors when requesting more than 100 courses at once" do
+      course_ids = (1..101).map(&:to_s)
+      result = CanvasSchema.execute(
+        "{ courses(ids: #{course_ids.to_json}) { _id } }",
+        context: { current_user: user_factory }
+      )
+
+      expect(result.dig("errors", 0, "message")).to eq "Cannot request more than 100 courses at once"
+    end
+
+    it "errors when requesting more than 100 courses via sis_ids" do
+      sis_ids = (1..101).map { |i| "sis_course_#{i}" }
+      result = CanvasSchema.execute(
+        "{ courses(sisIds: #{sis_ids.to_json}) { _id } }",
+        context: { current_user: user_factory }
+      )
+
+      expect(result.dig("errors", 0, "message")).to eq "Cannot request more than 100 courses at once"
+    end
+  end
+
   context "OutcomeCalculationMethod" do
     it "works" do
       @course = Course.create! name: "TEST"

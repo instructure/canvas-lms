@@ -2476,6 +2476,59 @@ class User < ActiveRecord::Base
   end
   private :cached_course_ids
 
+  # Returns courses the user can read via Canvas permissions:
+  # public courses, institution-public courses, enrolled courses, or admin access.
+  # All courses must be published to be accessible.
+  def accessible_courses_by_ids(course_ids, opts = {})
+    return [] if course_ids.blank?
+
+    @accessible_courses_by_ids ||= {}
+    cache_key = course_ids.sort.join(",")
+
+    courses = @accessible_courses_by_ids[cache_key] ||= shard.activate do
+      Rails.cache.fetch_with_batched_keys(
+        ["accessible_courses", cache_key].cache_key,
+        batch_object: self,
+        batched_keys: [:enrollments, :account_users],
+        expires_in: 1.hour
+      ) do
+        courses = Course.where(id: course_ids)
+        courses.select { |course| course.grants_right?(self, :read) }
+      end
+    end
+
+    if opts[:preload_courses]
+      ActiveRecord::Associations.preload(courses, :enrollment_term)
+    end
+
+    courses
+  end
+
+  def accessible_courses_by_sis_ids(sis_ids, opts = {})
+    return [] if sis_ids.blank?
+
+    @accessible_courses_by_sis_ids ||= {}
+    cache_key = sis_ids.sort.join(",")
+
+    courses = @accessible_courses_by_sis_ids[cache_key] ||= shard.activate do
+      Rails.cache.fetch_with_batched_keys(
+        ["accessible_courses_by_sis", cache_key].cache_key,
+        batch_object: self,
+        batched_keys: [:enrollments, :account_users],
+        expires_in: 1.hour
+      ) do
+        courses = Course.where(sis_source_id: sis_ids).to_a
+        courses.select { |course| course.grants_right?(self, :read) }
+      end
+    end
+
+    if opts[:preload_courses]
+      ActiveRecord::Associations.preload(courses, :enrollment_term)
+    end
+
+    courses
+  end
+
   def participating_enrollments
     @participating_enrollments ||= shard.activate do
       Rails.cache.fetch_with_batched_keys([self, "participating_enrollments2", ApplicationController.region].cache_key, batch_object: self, batched_keys: :enrollments) do
