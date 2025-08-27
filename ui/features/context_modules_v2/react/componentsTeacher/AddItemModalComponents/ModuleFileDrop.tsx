@@ -25,6 +25,7 @@ import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {sharedHandleFileDrop} from '../../handlers/addItemHandlers'
 import {RocketSVG} from '@instructure/canvas-media'
+import {Action} from 'redux'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -33,25 +34,27 @@ const FILE_DROP_HEIGHT = '350px'
 export interface ModuleFileDropProps {
   itemType: 'file' | 'folder' | string
   onChange: (field: string, value: any) => void
-  setFile?: (file: File | null) => void
+  dispatch?: React.Dispatch<Action>
+  nameError?: string | null
   shouldAllowMultiple?: boolean
 }
 
 export const ModuleFileDrop: React.FC<ModuleFileDropProps> = ({
   itemType,
   onChange,
-  setFile,
+  dispatch,
+  nameError,
   shouldAllowMultiple = true,
 }) => {
   const handleDrop = useCallback(
     (
       accepted: ArrayLike<File | DataTransferItem>,
-      rejected: ArrayLike<File | DataTransferItem>,
-      event: React.DragEvent<Element>,
+      _rejected: ArrayLike<File | DataTransferItem>,
+      _e: React.DragEvent,
     ) => {
-      sharedHandleFileDrop(accepted, rejected, event, {setFile, onChange})
+      sharedHandleFileDrop(accepted, {onChange, dispatch})
     },
-    [setFile, onChange],
+    [onChange, dispatch],
   )
 
   return (
@@ -61,6 +64,7 @@ export const ModuleFileDrop: React.FC<ModuleFileDropProps> = ({
           height={FILE_DROP_HEIGHT}
           shouldAllowMultiple={shouldAllowMultiple}
           onDrop={handleDrop}
+          messages={nameError ? [{text: nameError, type: 'newError'}] : []}
           renderLabel={
             <Flex direction="column" height="100%" alignItems="center" justifyItems="center">
               <Billboard

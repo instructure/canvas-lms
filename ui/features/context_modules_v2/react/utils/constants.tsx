@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import persistedQueries from '@canvas/graphql/persistedQueries'
+import {ModuleItemContentType} from '../hooks/queries/useModuleItemContent'
 
 export const SHOW_ALL_PAGE_SIZE = 100
 
@@ -45,3 +46,39 @@ export const MODULE_ITEMS_MAP: Record<string, string> = {
 export const MOVE_MODULE_ITEM = 'move_module_item' as const
 export const MOVE_MODULE_CONTENTS = 'move_module_contents' as const
 export const MOVE_MODULE = 'move_module' as const
+
+export const ITEM_TYPE = {
+  ASSIGNMENT: 'assignment',
+  QUIZ: 'quiz',
+  FILE: 'file',
+  PAGE: 'page',
+  DISCUSSION: 'discussion',
+  CONTEXT_MODULE_SUB_HEADER: 'context_module_sub_header',
+  EXTERNAL_URL: 'external_url',
+  EXTERNAL_TOOL: 'external_tool',
+} as const
+
+export type ItemType = (typeof ITEM_TYPE)[keyof typeof ITEM_TYPE]
+
+export const TYPES_WITH_CREATE_NAME: readonly ItemType[] = [
+  ITEM_TYPE.ASSIGNMENT,
+  ITEM_TYPE.QUIZ,
+  ITEM_TYPE.PAGE,
+  ITEM_TYPE.DISCUSSION,
+] as const
+
+export const TYPES_WITH_URL: readonly ItemType[] = [ITEM_TYPE.EXTERNAL_URL, ITEM_TYPE.EXTERNAL_TOOL]
+
+export const TYPES_WITH_TABS: ModuleItemContentType[] = [
+  ITEM_TYPE.ASSIGNMENT,
+  ITEM_TYPE.QUIZ,
+  ITEM_TYPE.FILE,
+  ITEM_TYPE.PAGE,
+  ITEM_TYPE.DISCUSSION,
+]
+export const NAMELESS_TYPES = ['file', 'context_module_sub_header', 'external_url', 'external_tool']
+export const NEW_ITEM_FIELDS = ['name', 'assignmentGroup', 'file', 'folder'] as const
+
+const BASE_EXTERNAL_FIELDS = ['url', 'name', 'newTab', 'isUrlValid'] as const
+export const EXTERNAL_NEW_ITEM_FIELDS = BASE_EXTERNAL_FIELDS
+export const EXTERNAL_TOOL_NEW_ITEM_FIELDS = [...BASE_EXTERNAL_FIELDS, 'selectedToolId'] as const

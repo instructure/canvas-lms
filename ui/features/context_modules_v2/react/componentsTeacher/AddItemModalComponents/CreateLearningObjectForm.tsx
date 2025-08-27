@@ -26,7 +26,8 @@ import {useCourseFolders} from '../../hooks/queries/useCourseFolders'
 import {useContextModule} from '../../hooks/useModuleContext'
 import {useAssignmentGroups} from '../../hooks/queries/useAssignmentGroups'
 import ModuleFileDrop from '../AddItemModalComponents/ModuleFileDrop'
-import {QuizEngine} from '../../utils/types'
+import {QuizEngine, FormState} from '../../utils/types'
+import type {Action} from '../../hooks/mutations/useAddModuleItem'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -35,24 +36,22 @@ export type CreateLearningObjectFormProps = {
   itemType: 'page' | 'quiz' | 'file' | 'external_url' | string
   onChange: (field: string, value: any) => void
   nameError: string | null
-  setName: (name: string) => void
-  name: string
+  dispatch: React.Dispatch<Action>
+  state: FormState
 }
 
 export const CreateLearningObjectForm: React.FC<CreateLearningObjectFormProps> = ({
   itemType,
   onChange,
   nameError,
-  setName,
-  name,
-}: CreateLearningObjectFormProps) => {
-  const [assignmentGroup, setAssignmentGroup] = useState<string | undefined>(undefined)
+  dispatch,
+  state,
+}) => {
   const [folder, setFolder] = useState<string | undefined>(undefined)
-  const [file, setFile] = useState<File | null>(null)
-
   const {courseId, showQuizzesEngineSelection, quizEngine, setQuizEngine} = useContextModule()
   const {folders} = useCourseFolders(courseId)
   const {data: assignmentGroups} = useAssignmentGroups(courseId)
+  const defaultAssignmentGroup = assignmentGroups?.assignmentGroups[0]
 
   const handleFolderChange = useCallback(
     (_e: React.SyntheticEvent, data: {value?: string | number}) => {
@@ -67,52 +66,61 @@ export const CreateLearningObjectForm: React.FC<CreateLearningObjectFormProps> =
   const renderQuizFormFields = () => {
     return (
       <View as="div">
-        {showQuizzesEngineSelection && (
-          <SimpleSelect
-            data-testid="create-item-quiz-engine-select"
-            renderLabel={I18n.t('Select quiz type')}
-            assistiveText={I18n.t('Type or use arrow keys to navigate options.')}
-            value={quizEngine}
-            onChange={(_e, {value}) => setQuizEngine(value as QuizEngine)}
-          >
-            <SimpleSelect.Option id="classic" key="classic" value="classic">
-              {I18n.t('Quiz Classic')}
-            </SimpleSelect.Option>
-            <SimpleSelect.Option id="new" key="new" value="new">
-              {I18n.t('Quiz New')}
-            </SimpleSelect.Option>
-          </SimpleSelect>
-        )}
+        <View as="div" margin="small 0">
+          {showQuizzesEngineSelection && (
+            <SimpleSelect
+              data-testid="create-item-quiz-engine-select"
+              renderLabel={I18n.t('Select quiz type')}
+              assistiveText={I18n.t('Type or use arrow keys to navigate options.')}
+              value={quizEngine}
+              onChange={(_e, {value}) => setQuizEngine(value as QuizEngine)}
+            >
+              <SimpleSelect.Option id="classic" key="classic" value="classic">
+                {I18n.t('Quiz Classic')}
+              </SimpleSelect.Option>
+              <SimpleSelect.Option id="new" key="new" value="new">
+                {I18n.t('Quiz New')}
+              </SimpleSelect.Option>
+            </SimpleSelect>
+          )}
+        </View>
 
-        <SimpleSelect
-          renderLabel="Assignment Group"
-          value={assignmentGroup}
-          onChange={(_e, {value}) => {
-            setAssignmentGroup(String(value))
-            onChange('assignmentGroup', value)
-          }}
-          placeholder="Select assignment group"
-        >
-          {assignmentGroups?.assignmentGroups?.map(group => (
-            <SimpleSelect.Option id={group._id} key={group._id} value={group._id}>
-              {group.name}
-            </SimpleSelect.Option>
-          ))}
-        </SimpleSelect>
+        <View as="div" margin="small 0">
+          <SimpleSelect
+            renderLabel="Assignment Group"
+            value={state.newItem.assignmentGroup}
+            defaultValue={defaultAssignmentGroup?._id}
+            onChange={(_e, {value}) => onChange('assignmentGroup', value)}
+            placeholder={defaultAssignmentGroup?.name}
+          >
+            {assignmentGroups?.assignmentGroups?.map(group => (
+              <SimpleSelect.Option id={group._id} key={group._id} value={group._id}>
+                {group.name}
+              </SimpleSelect.Option>
+            ))}
+          </SimpleSelect>
+        </View>
       </View>
     )
   }
+
+  const handleTextInputChange = useCallback(
+    (_e: React.SyntheticEvent, val: string) => {
+      onChange('name', val)
+      if (itemType === 'quiz') {
+        onChange('assignmentGroup', state.newItem.assignmentGroup ?? defaultAssignmentGroup?._id)
+      }
+    },
+    [onChange, itemType, state.newItem.assignmentGroup, defaultAssignmentGroup?._id],
+  )
 
   return (
     <View as="form" padding="small" display="block">
       {itemType !== 'file' && (
         <TextInput
           renderLabel="Name"
-          value={name}
-          onChange={(_e, val) => {
-            setName(val)
-            onChange('name', val)
-          }}
+          value={state.newItem.name}
+          onChange={handleTextInputChange}
           required
           isRequired={true}
           messages={nameError ? [{text: nameError, type: 'newError'}] : []}
@@ -125,8 +133,9 @@ export const CreateLearningObjectForm: React.FC<CreateLearningObjectFormProps> =
       <ModuleFileDrop
         itemType={itemType}
         onChange={onChange}
-        setFile={setFile}
+        dispatch={dispatch}
         shouldAllowMultiple={false}
+        nameError={!state.newItem.file?.name && nameError ? nameError : null}
       />
       {itemType === 'file' && (
         <View as="div" margin="medium 0 0 0">
@@ -149,10 +158,9 @@ export const CreateLearningObjectForm: React.FC<CreateLearningObjectFormProps> =
           </SimpleSelect>
         </View>
       )}
-      {file && (
+      {state.newItem.file?.name && (
         <View as="div" margin="small 0 0 0">
-          <Text weight="bold">{I18n.t('Selected file:')}</Text>
-          <Text> {file.name}</Text>
+          <Text weight="bold">{I18n.t('Selected file:')}</Text> {state.newItem.file?.name}
         </View>
       )}
     </View>

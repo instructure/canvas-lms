@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {
   prepareModuleItemData,
   buildFormData,
@@ -341,19 +340,24 @@ describe('addItemHandlers', () => {
   describe('sharedHandleFileDrop', () => {
     const dummyFile = new File(['hello'], 'hello.txt', {type: 'text/plain'})
 
-    it('should call setFile and onChange with File object', () => {
-      const setFile = jest.fn()
+    it('should call onChange and dispatch with File object', () => {
+      const dummyFile = new File(['content'], 'test.txt', {type: 'text/plain'})
       const onChange = jest.fn()
+      const dispatch = jest.fn()
 
-      sharedHandleFileDrop([dummyFile], [], {} as React.DragEvent<Element>, {setFile, onChange})
+      sharedHandleFileDrop([dummyFile], {onChange, dispatch})
 
-      expect(setFile).toHaveBeenCalledWith(dummyFile)
       expect(onChange).toHaveBeenCalledWith('file', dummyFile)
+      expect(dispatch).toHaveBeenCalledWith({
+        type: 'SET_NEW_ITEM',
+        field: 'file',
+        value: dummyFile,
+      })
     })
 
-    it('should call setFile and onChange with DataTransferItem as file', () => {
-      const setFile = jest.fn()
+    it('should not call onChange or dispatch when given DataTransferItem', () => {
       const onChange = jest.fn()
+      const dispatch = jest.fn()
 
       const mockItem: DataTransferItem = {
         kind: 'file',
@@ -363,17 +367,18 @@ describe('addItemHandlers', () => {
         webkitGetAsEntry: jest.fn(),
       }
 
-      sharedHandleFileDrop([mockItem], [], {} as React.DragEvent<Element>, {setFile, onChange})
+      sharedHandleFileDrop([mockItem], {onChange, dispatch})
 
-      expect(setFile).toHaveBeenCalledWith(dummyFile)
-      expect(onChange).toHaveBeenCalledWith('file', dummyFile)
+      expect(onChange).not.toHaveBeenCalled()
+      expect(dispatch).not.toHaveBeenCalled()
     })
 
     it('should do nothing when no accepted files are provided', () => {
       const setFile = jest.fn()
       const onChange = jest.fn()
+      const dispatch = jest.fn()
 
-      sharedHandleFileDrop([], [], {} as React.DragEvent<Element>, {setFile, onChange})
+      sharedHandleFileDrop([], {onChange, dispatch})
 
       expect(setFile).not.toHaveBeenCalled()
       expect(onChange).not.toHaveBeenCalled()

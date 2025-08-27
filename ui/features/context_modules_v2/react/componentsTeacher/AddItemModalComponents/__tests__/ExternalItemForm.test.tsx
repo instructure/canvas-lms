@@ -16,30 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ExternalItemForm from '../ExternalItemForm'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../../hooks/useModuleContext'
 import {ContentItem} from '../../../hooks/queries/useModuleItemContent'
-import {ExternalToolModalItem} from '../../../utils/types'
 
-const mockContentItems: ExternalToolModalItem[] = [
+const mockContentItems: ContentItem[] = [
   {
-    definition_id: '1',
+    id: '1',
     name: 'Google Docs',
     description: 'Create and edit documents online',
     domain: 'docs.google.com',
     url: 'https://docs.google.com/launch',
-    definition_type: 'external_tool',
     placements: {},
   },
   {
-    definition_id: '2',
+    id: '2',
     name: 'Youtube',
     description: 'Watch and share videos',
     domain: 'youtube.com',
-    definition_type: 'external_tool',
     url: 'https://youtube.com/video',
     placements: {
       assignmentSelection: {
@@ -54,6 +50,7 @@ const buildProps = (overrides = {}) => ({
   onChange: jest.fn(),
   itemType: 'external_url' as const,
   contentItems: mockContentItems,
+  formErrors: {},
   ...overrides,
 })
 
