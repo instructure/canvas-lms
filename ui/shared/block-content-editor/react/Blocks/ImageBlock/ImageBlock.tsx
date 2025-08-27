@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useEffect, useState} from 'react'
+import {useRef, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {BaseBlock, useGetRenderMode} from '../BaseBlock'
-import {useSave} from '../BaseBlock/useSave'
+import {BaseBlockHOC} from '../BaseBlock'
+import {useSave2} from '../BaseBlock/useSave'
 import {ImageBlockSettings} from './ImageBlockSettings'
 import {ImageEdit, ImageView} from '../BlockItems/Image'
 import {ImageData} from '../BlockItems/Image/types'
@@ -27,64 +27,59 @@ import {ImageBlockProps} from './types'
 import {TitleEdit} from '../BlockItems/Title/TitleEdit'
 import {TitleView} from '../BlockItems/Title/TitleView'
 import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
+import {Flex} from '@instructure/ui-flex'
 
 const I18n = createI18nScope('block_content_editor')
 
-const ImageContainer = (props: ImageBlockProps) => {
+const ImageBlockView = (props: ImageBlockProps) => {
+  return (
+    <Flex direction="column" gap="mediumSmall">
+      {props.settings.includeBlockTitle && (
+        <TitleView contentColor={props.settings.textColor || ''} title={props.title} />
+      )}
+      <ImageView {...props} />
+    </Flex>
+  )
+}
+
+const ImageBlockEditView = (props: ImageBlockProps) => {
+  return (
+    <>
+      {props.settings.includeBlockTitle && (
+        <TitleEditPreview contentColor={props.settings.textColor || ''} title={props.title} />
+      )}
+      <ImageView {...props} />
+    </>
+  )
+}
+
+const ImageBlockEdit = (props: ImageBlockProps) => {
   const [title, setTitle] = useState(props.title || '')
-  const {isEditMode, isViewMode, isEditPreviewMode} = useGetRenderMode()
-  const save = useSave<typeof ImageBlock>()
+  const [imageData, setImageData] = useState<ImageData>(props)
 
-  useEffect(() => {
-    if (isEditPreviewMode) {
-      save({
-        title,
-      })
-    }
-  }, [isEditPreviewMode, save, title])
-
-  const onImageChange = (data: ImageData) => save(data)
-  const onTitleChange = (newTitle: string) => setTitle(newTitle)
+  useSave2(() => ({
+    title,
+    ...imageData,
+  }))
 
   return (
     <>
-      {isEditMode && (
-        <>
-          {props.settings?.includeBlockTitle && (
-            <TitleEdit title={title} onTitleChange={onTitleChange} />
-          )}
-          <ImageEdit {...props} onImageChange={onImageChange} />
-        </>
-      )}
-      {isEditPreviewMode && (
-        <>
-          {props.settings?.includeBlockTitle && (
-            <TitleEditPreview contentColor={props.settings?.textColor || ''} title={title} />
-          )}
-          <ImageView {...props} />
-        </>
-      )}
-      {isViewMode && (
-        <>
-          {props.settings?.includeBlockTitle && (
-            <TitleView contentColor={props.settings?.textColor || ''} title={title} />
-          )}
-          <ImageView {...props} />
-        </>
-      )}
+      {props.settings.includeBlockTitle && <TitleEdit title={title} onTitleChange={setTitle} />}
+      <ImageEdit {...props} {...imageData} onImageChange={setImageData} />
     </>
   )
 }
 
 export const ImageBlock = (props: ImageBlockProps) => {
   return (
-    <BaseBlock
+    <BaseBlockHOC
+      ViewComponent={ImageBlockView}
+      EditComponent={ImageBlockEdit}
+      EditViewComponent={ImageBlockEditView}
+      componentProps={props}
       title={ImageBlock.craft.displayName}
-      statefulProps={{title: props.title}}
-      backgroundColor={props.settings?.backgroundColor}
-    >
-      <ImageContainer {...props} />
-    </BaseBlock>
+      backgroundColor={props.settings.backgroundColor}
+    />
   )
 }
 
