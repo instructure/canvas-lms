@@ -142,6 +142,7 @@ export const saveRubric = async (
     hideScoreTotal,
     useForGrading,
     rubricAssociationId,
+    skipUpdatingPointsPossible,
   } = rubric
 
   const urlPrefix = accountId ? `/accounts/${accountId}` : `/courses/${courseId}`
@@ -212,6 +213,7 @@ export const saveRubric = async (
         hide_score_total: hideScoreTotal ? 1 : 0,
         use_for_grading: useForGrading ? 1 : 0,
       },
+      skip_updating_points_possible: skipUpdatingPointsPossible,
     }),
   })
 
