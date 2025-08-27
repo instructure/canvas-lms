@@ -18,7 +18,6 @@
 
 import {useCallback, useContext, useMemo} from 'react'
 import {useShallow} from 'zustand/react/shallow'
-import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 
 import {AccessibilityCheckerContext} from '../../contexts/AccessibilityCheckerContext'
@@ -29,14 +28,13 @@ import {AccessibilityResourceScan} from '../../types'
 import {parseFetchParams} from '../../utils/query'
 import {AccessibilityIssuesSummary} from '../AccessibilityIssuesSummary/AccessibilityIssuesSummary'
 import {AccessibilityIssuesTable} from '../AccessibilityIssuesTable/AccessibilityIssuesTable'
-import FiltersPopover from './Filter/FiltersPopover'
 import {SearchIssue} from './Search/SearchIssue'
 import {useDeepCompareEffect} from './useDeepCompareEffect'
 import {AccessibilityCheckerHeader} from './AccessibilityCheckerHeader'
 import {findById} from '../../utils/apiData'
 
-import AppliedFilters from './Filter/AppliedFilters'
 import {getAppliedFilters} from '../../utils/filter'
+import {FiltersPanel} from './Filter'
 
 export const AccessibilityCheckerApp: React.FC = () => {
   const context = useContext(AccessibilityCheckerContext)
@@ -112,15 +110,10 @@ export const AccessibilityCheckerApp: React.FC = () => {
   return (
     <View as="div" data-testid="accessibility-checker-app">
       <AccessibilityCheckerHeader />
-      <Flex alignItems="start" direction="row" margin="small 0">
-        <Flex.Item width="100%">
-          <Flex justifyItems="space-between" gap="small">
-            <SearchIssue onSearchChange={handleSearchChange} />
-            <FiltersPopover appliedFilters={appliedFilters} onFilterChange={setFilters} />
-          </Flex>
-        </Flex.Item>
-      </Flex>
-      <AppliedFilters appliedFilters={appliedFilters} setFilters={setFilters} />
+      <View as="div" margin="medium 0">
+        <SearchIssue onSearchChange={handleSearchChange} />
+      </View>
+      <FiltersPanel appliedFilters={appliedFilters} onFilterChange={setFilters} />
       <View as="div" margin={appliedFilters.length === 0 ? 'medium 0' : 'small 0'}>
         <AccessibilityIssuesSummary />
       </View>
