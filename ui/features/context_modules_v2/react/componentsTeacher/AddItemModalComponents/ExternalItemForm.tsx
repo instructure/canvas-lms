@@ -16,14 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useMemo} from 'react'
 import {TextInput} from '@instructure/ui-text-input'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import ExternalToolSelector, {ExternalTool} from './ExternalToolSelector'
-import {ModuleItemContentType} from '../../hooks/queries/useModuleItemContent'
+import ExternalToolSelector from './ExternalToolSelector'
+import {ContentItem, ModuleItemContentType} from '../../hooks/queries/useModuleItemContent'
 import {ExternalToolModalItem} from '../../utils/types'
+import {ITEM_TYPE} from '../../utils/constants'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -45,8 +46,8 @@ interface ExternalItemFormProps {
   externalUrlName?: string
   newTab?: boolean
   itemType?: ModuleItemContentType
-  contentItems?: ExternalToolModalItem[]
-  urlError?: string
+  contentItems?: ContentItem[]
+  formErrors: {name?: string; url?: string}
 }
 
 export const ExternalItemForm: React.FC<ExternalItemFormProps> = ({
@@ -56,14 +57,28 @@ export const ExternalItemForm: React.FC<ExternalItemFormProps> = ({
   newTab = false,
   itemType = 'external_url',
   contentItems = [],
-  urlError = '',
+  formErrors = {},
 }) => {
   const [url, setUrl] = useState(externalUrlValue)
   const [pageName, setPageName] = useState(externalUrlName)
   const [loadInNewTab, setLoadInNewTab] = useState(newTab)
   const [selectedToolId, setSelectedToolId] = useState<string | undefined>(undefined)
-  const [localUrlError, setLocalUrlError] = useState('')
+  const [localUrlError, setLocalUrlError] = useState(formErrors.url || '')
   const [hasUserInteracted, setHasUserInteracted] = useState(false)
+
+  const externalToolItems = useMemo(
+    () =>
+      contentItems.map((item: ContentItem) => ({
+        definition_id: item.id,
+        definition_type: ITEM_TYPE.EXTERNAL_TOOL,
+        name: item.name,
+        url: item.url,
+        domain: item.domain,
+        description: item.description,
+        placements: item.placements,
+      })) as ExternalToolModalItem[],
+    [contentItems],
+  )
 
   // Handle tool selection and auto-populate URL/name
   const handleToolSelect = (tool: ExternalToolModalItem | null) => {
@@ -115,7 +130,7 @@ export const ExternalItemForm: React.FC<ExternalItemFormProps> = ({
           <ExternalToolSelector
             selectedToolId={selectedToolId}
             onToolSelect={handleToolSelect}
-            contentItems={contentItems}
+            contentItems={externalToolItems}
           />
         </View>
       )}
@@ -139,7 +154,9 @@ export const ExternalItemForm: React.FC<ExternalItemFormProps> = ({
         margin="0 0 medium 0"
         required
         messages={
-          localUrlError || urlError ? [{text: localUrlError || urlError, type: 'error'}] : undefined
+          localUrlError || formErrors.url
+            ? [{text: localUrlError || formErrors.url, type: 'newError'}]
+            : []
         }
       />
       <TextInput
@@ -152,6 +169,7 @@ export const ExternalItemForm: React.FC<ExternalItemFormProps> = ({
           onChange('name', val)
         }}
         margin="0 0 medium 0"
+        messages={formErrors.name ? [{text: formErrors.name, type: 'newError'}] : []}
         required
       />
       <Checkbox

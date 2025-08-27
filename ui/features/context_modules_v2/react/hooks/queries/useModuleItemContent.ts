@@ -69,6 +69,7 @@ export interface GraphQLResponse {
         _id: string
         name: string
         pointsPossible: number
+        submissionTypes?: string[]
         dueAt: string
         published: boolean
       }>
@@ -161,6 +162,7 @@ const ASSIGNMENTS_QUERY = gql`
             id
             name
             pointsPossible
+            submissionTypes
             dueAt
             published
           }
@@ -330,6 +332,14 @@ function getQueryForContentType(contentType: ModuleItemContentType) {
   }
 }
 
+const hasQuizSubmissionType = (submissionTypes: unknown): boolean =>
+  Array.isArray(submissionTypes) &&
+  submissionTypes.some(
+    (t: unknown) =>
+      typeof t === 'string' &&
+      (t.toLowerCase().includes('quiz') || t.toLowerCase() === 'external_tool'),
+  )
+
 // Function to transform the query result into a standardized format
 function transformQueryResult(
   contentType: ModuleItemContentType,
@@ -349,6 +359,7 @@ function transformQueryResult(
             id: node._id,
             name: node.name,
             pointsPossible: node.pointsPossible,
+            isQuiz: hasQuizSubmissionType(node?.submissionTypes),
             dueAt: node.dueAt,
             published: node.published,
           })) || [],

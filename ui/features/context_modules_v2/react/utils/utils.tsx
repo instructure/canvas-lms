@@ -29,6 +29,16 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {CompletionRequirement, ModuleItemContent, ModuleRequirement} from './types'
 import {DateTime} from '@instructure/ui-i18n'
 import moment from 'moment'
+import {ModuleItemContentType} from '../hooks/queries/useModuleItemContent'
+import {
+  EXTERNAL_NEW_ITEM_FIELDS,
+  EXTERNAL_TOOL_NEW_ITEM_FIELDS,
+  ITEM_TYPE,
+  ItemType,
+  TYPES_WITH_CREATE_NAME,
+  TYPES_WITH_URL,
+} from './constants'
+import {captureMessage} from '@sentry/react'
 
 const I18n = createI18nScope('context_modules_v2')
 const pixelOffset = 20
@@ -373,4 +383,63 @@ export function focusModuleItemTitleLinkById(id?: string, preventScroll = false)
   if (el && typeof el.focus === 'function') {
     el.focus({preventScroll})
   }
+}
+
+export function getItemTypeLabel(type: ModuleItemContentType): string {
+  switch (type) {
+    case ITEM_TYPE.ASSIGNMENT:
+      return I18n.t('Assignment')
+    case ITEM_TYPE.QUIZ:
+      return I18n.t('Quiz')
+    case ITEM_TYPE.DISCUSSION:
+      return I18n.t('Discussion')
+    case ITEM_TYPE.FILE:
+      return I18n.t('File')
+    case ITEM_TYPE.PAGE:
+      return I18n.t('Page')
+    case ITEM_TYPE.EXTERNAL_URL:
+      return I18n.t('External URL')
+    case ITEM_TYPE.EXTERNAL_TOOL:
+      return I18n.t('External Tool')
+    case ITEM_TYPE.CONTEXT_MODULE_SUB_HEADER:
+      return I18n.t('Header')
+    default: {
+      captureMessage(`Unhandled ModuleItemContentType: ${String(type)}`, 'error')
+      return I18n.t('Unknown')
+    }
+  }
+}
+
+export const getWarningLabel = (itemType: ItemType, state: {tabIndex: number}, type: string) => {
+  const itemLabel = getItemTypeLabel(itemType)
+
+  if (TYPES_WITH_CREATE_NAME.includes(itemType) && state.tabIndex == 1) {
+    return I18n.t('%{itemLabel} name is required', {itemLabel})
+  }
+
+  if (itemType === ITEM_TYPE.CONTEXT_MODULE_SUB_HEADER) {
+    return I18n.t('Header text is required')
+  }
+
+  if (TYPES_WITH_URL.includes(itemType) && type === 'name') {
+    return I18n.t('Page name is required')
+  }
+
+  if (TYPES_WITH_URL.includes(itemType) && type === 'url') {
+    return I18n.t('Url is required')
+  }
+
+  return I18n.t('%{itemLabel} is required', {itemLabel})
+}
+
+export const isExternalNewItemField = (
+  field: string,
+): field is (typeof EXTERNAL_NEW_ITEM_FIELDS)[number] => {
+  return (EXTERNAL_NEW_ITEM_FIELDS as readonly string[]).includes(field)
+}
+
+export const isExternalToolNewItemField = (
+  field: string,
+): field is (typeof EXTERNAL_TOOL_NEW_ITEM_FIELDS)[number] => {
+  return (EXTERNAL_TOOL_NEW_ITEM_FIELDS as readonly string[]).includes(field)
 }

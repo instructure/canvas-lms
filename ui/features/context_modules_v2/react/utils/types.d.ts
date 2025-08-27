@@ -17,6 +17,7 @@
  */
 
 import {type Root} from 'react-dom/client'
+import {NEW_ITEM_FIELDS} from '../utils/constants'
 
 export interface MasteryPathsData {
   isCyoeAble: boolean
@@ -44,6 +45,39 @@ export interface StandardizedDateHash {
     id?: string
     type?: string
   }
+}
+
+export type ExternalUrl = {
+  url: string
+  name: string
+  newTab: boolean
+  isUrlValid?: boolean
+}
+
+export type ExternalToolUrl = {
+  url: string
+  name: string
+  newTab: boolean
+  selectedToolId?: string
+  isUrlValid?: boolean
+}
+
+export type NewItem = {
+  name: string
+  assignmentGroup: string
+  file: File | null
+  folder: string
+}
+
+export type FormState = {
+  indentation: number
+  textHeader: string
+  externalUrl: ExternalUrl
+  externalTool: ExternalToolUrl
+  newItem: NewItem
+  selectedItemId: string
+  tabIndex: number
+  isLoading: boolean
 }
 
 // Add new menu actions here (e.g., 'delete', 'sendTo', 'copyTo')

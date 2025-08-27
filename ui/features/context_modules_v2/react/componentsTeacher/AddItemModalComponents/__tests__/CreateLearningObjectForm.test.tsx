@@ -16,22 +16,37 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {render, screen} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
-import {contextModuleDefaultProps} from '../../../hooks/useModuleContext'
-import CreateLearningObjectForm from '../CreateLearningObjectForm'
-import {ContextModuleProvider} from '../../../hooks/useModuleContext'
+import {contextModuleDefaultProps, ContextModuleProvider} from '../../../hooks/useModuleContext'
+import CreateLearningObjectForm, {CreateLearningObjectFormProps} from '../CreateLearningObjectForm'
+import {FormState} from '../../../utils/types'
 
-const defaultProps = {
+const makeState = (overrides: Partial<FormState['newItem']> = {}): FormState =>
+  ({
+    newItem: {
+      name: '',
+      assignmentGroup: undefined,
+      file: undefined,
+      ...overrides,
+    },
+  }) as unknown as FormState
+
+const buildProps = (
+  overrides: Partial<CreateLearningObjectFormProps> = {},
+): CreateLearningObjectFormProps => ({
   itemType: 'quiz',
-  onChange: () => {},
+  onChange: jest.fn(),
   nameError: null,
-  setName: () => {},
-  name: 'Test Quiz',
-}
+  dispatch: jest.fn(),
+  state: makeState(),
+  ...overrides,
+})
 
-const renderWithContext = (contextProps = {}) => {
+const renderWithContext = (
+  contextProps: Record<string, any> = {},
+  propsOverrides: Partial<CreateLearningObjectFormProps> = {},
+) => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {retry: false},
@@ -44,10 +59,12 @@ const renderWithContext = (contextProps = {}) => {
     ...contextProps,
   }
 
+  const props = buildProps(propsOverrides)
+
   return render(
     <QueryClientProvider client={queryClient}>
       <ContextModuleProvider {...contextModuleProps}>
-        <CreateLearningObjectForm {...defaultProps} />
+        <CreateLearningObjectForm {...props} />
       </ContextModuleProvider>
     </QueryClientProvider>,
   )

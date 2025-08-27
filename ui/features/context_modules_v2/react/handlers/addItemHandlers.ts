@@ -301,28 +301,29 @@ export const submitModuleItem = async (
   }
 }
 
-export const sharedHandleFileDrop = (
+export function sharedHandleFileDrop(
   accepted: ArrayLike<File | DataTransferItem>,
-  _rejected: ArrayLike<File | DataTransferItem>,
-  _event: React.DragEvent<Element>,
   {
-    setFile,
     onChange,
+    dispatch,
   }: {
-    setFile?: (file: File | null) => void
-    onChange?: (field: string, value: File) => void
+    onChange: (field: string, value: any) => void
+    dispatch?: React.Dispatch<{type: string; field?: string; value?: any}> | null
   },
-) => {
-  Array.from(accepted).forEach(item => {
-    if (item instanceof File) {
-      setFile?.(item)
-      onChange?.('file', item)
-    } else if (item.kind === 'file') {
-      const file = item.getAsFile()
-      if (file) {
-        setFile?.(file)
-        onChange?.('file', file)
-      }
+) {
+  const files: File[] = Array.from(accepted).flatMap(item => {
+    if (item instanceof File) return [item]
+    if (item instanceof DataTransferItem && item.kind === 'file') {
+      const fileItem = item.getAsFile()
+      return fileItem ? [fileItem] : []
     }
+    return []
+  })
+
+  if (files.length === 0) return
+
+  files.forEach(file => {
+    onChange('file', file)
+    dispatch?.({type: 'SET_NEW_ITEM', field: 'file', value: file})
   })
 }

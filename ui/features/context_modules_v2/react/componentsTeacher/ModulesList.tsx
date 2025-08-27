@@ -44,7 +44,7 @@ import {useCourseTeacher} from '../hooks/queriesTeacher/useCourseTeacher'
 import {validateModuleTeacherRenderRequirements, ALL_MODULES} from '../utils/utils'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useHowManyModulesAreFetchingItems} from '../hooks/queries/useHowManyModulesAreFetchingItems'
-import {TEACHER, STUDENT, MODULE_ITEMS, PAGE_SIZE, SHOW_ALL_PAGE_SIZE} from '../utils/constants'
+import {TEACHER, STUDENT, MODULE_ITEMS, SHOW_ALL_PAGE_SIZE} from '../utils/constants'
 import CreateNewModule from '../components/CreateNewModule'
 import {useDefaultCourseFolder} from '../hooks/mutations/useDefaultCourseFolder'
 
