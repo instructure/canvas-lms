@@ -18986,6 +18986,7 @@ hu:
   points_should_be_strictly_decreasing_l_r_18f26f87: "A pontoknak szigorúan csökkenőnek kell lenni: %{l} <= %{r}"
   points_to_endofrangepoints_pts_aad207f0: "%{points} - >%{endOfRangePoints} pont"
   points_total_pts_5b4cbd77: "%{points} / %{total} pont"
+  pointspossible_points_possible_964c8592: "%{pointsPossible} elérhető pont"
   pointspossible_pts_624a6733: "%{pointsPossible} pont"
   poland_48_e77cc14d: "Lengyelország (+48)"
   polish_4cf2ecaf: Lengyel
