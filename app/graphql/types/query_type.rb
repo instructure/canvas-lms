@@ -188,6 +188,32 @@ module Types
                 .order("courses.name ASC")
     end
 
+    field :courses,
+          [Types::CourseType],
+          "Courses by IDs that are viewable by the current user",
+          null: true do
+      argument :ids, [ID], "graphql or legacy course IDs", required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Course")
+      argument :sis_ids, [String], "ids from the original SIS system", required: false
+    end
+    def courses(ids: nil, sis_ids: nil)
+      raise GraphQL::ExecutionError, "Must specify exactly one of ids or sisIds" if (ids && sis_ids) || !(ids || sis_ids)
+
+      course_ids = ids || sis_ids
+      raise GraphQL::ExecutionError, "Cannot request more than 100 courses at once" if course_ids&.length.to_i > 100
+
+      courses = if ids
+                  current_user&.accessible_courses_by_ids(ids, preload_courses: true)
+                elsif sis_ids
+                  current_user&.accessible_courses_by_sis_ids(sis_ids, preload_courses: true)
+                end
+
+      courses&.index_by(&:id)
+             &.values
+             &.sort_by! do |course|
+               Canvas::ICU.collation_key(course.nickname_for(current_user))
+             end
+    end
+
     field :module_item, Types::ModuleItemType, null: true do
       description "ModuleItem"
       argument :id,

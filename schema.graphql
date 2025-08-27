@@ -8006,6 +8006,21 @@ type Query {
   ): EnrollmentConnection
 
   """
+  Courses by IDs that are viewable by the current user
+  """
+  courses(
+    """
+    graphql or legacy course IDs
+    """
+    ids: [ID!]
+
+    """
+    ids from the original SIS system
+    """
+    sisIds: [String!]
+  ): [Course!]
+
+  """
   Pending enrollment invitations for the current user
   """
   enrollmentInvitations(includeEnrollmentUuid: String): [Enrollment!]!

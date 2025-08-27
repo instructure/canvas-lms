@@ -5389,4 +5389,58 @@ describe User do
       end
     end
   end
+
+  describe "#accessible_courses_by_ids" do
+    it "returns accessible courses for given ids" do
+      user = user_factory
+      enrolled_course = course_with_student(user:, active_all: true).course
+      public_course = course_factory(active_course: true, is_public: true)
+      private_course = course_factory
+
+      accessible_courses = user.accessible_courses_by_ids([enrolled_course.id, public_course.id, private_course.id])
+      expect(accessible_courses).to contain_exactly(enrolled_course, public_course)
+    end
+
+    it "returns empty array for blank input" do
+      user = user_factory
+      expect(user.accessible_courses_by_ids([])).to eq([])
+      expect(user.accessible_courses_by_ids(nil)).to eq([])
+    end
+
+    it "filters out courses user cannot read" do
+      user = user_factory
+      private_course = course_factory
+      expect(user.accessible_courses_by_ids([private_course.id])).to eq([])
+    end
+  end
+
+  describe "#accessible_courses_by_sis_ids" do
+    it "returns accessible courses for given sis ids" do
+      user = user_factory
+      enrolled_course = course_with_student(user:, active_all: true).course
+      enrolled_course.update!(sis_source_id: "enrolled_sis")
+
+      public_course = course_factory(active_course: true, is_public: true)
+      public_course.update!(sis_source_id: "public_sis")
+
+      private_course = course_factory
+      private_course.update!(sis_source_id: "private_sis")
+
+      accessible_courses = user.accessible_courses_by_sis_ids(%w[enrolled_sis public_sis private_sis])
+      expect(accessible_courses).to contain_exactly(enrolled_course, public_course)
+    end
+
+    it "returns empty array for blank input" do
+      user = user_factory
+      expect(user.accessible_courses_by_sis_ids([])).to eq([])
+      expect(user.accessible_courses_by_sis_ids(nil)).to eq([])
+    end
+
+    it "filters out courses user cannot read" do
+      user = user_factory
+      private_course = course_factory
+      private_course.update!(sis_source_id: "private_sis")
+      expect(user.accessible_courses_by_sis_ids(["private_sis"])).to eq([])
+    end
+  end
 end
