@@ -3306,7 +3306,7 @@ describe MasterCourses::MasterMigration do
       expect(@att_copy).to be_present
 
       Timecop.freeze(1.minute.from_now) do
-        @topic = @copy_from.discussion_topics.create!(title: "some topic", message: "<img src='/courses/#{@copy_from.id}/files/#{@att.id}/download?wrap=1'>", user: @user)
+        @topic = @copy_from.discussion_topics.create!(title: "some topic", message: "<img src='/courses/#{@copy_from.id}/files/#{@att.id}/download?wrap=1'>", user: @user, saving_user: @user)
       end
       run_master_migration
 

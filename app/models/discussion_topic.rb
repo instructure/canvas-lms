@@ -39,7 +39,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def actual_saving_user
-    user
+    saving_user || user
   end
 
   REQUIRED_CHECKPOINT_COUNT = 2
@@ -1337,6 +1337,7 @@ class DiscussionTopic < ActiveRecord::Base
       shard.activate do
         entry = discussion_entries.new(message:, user:)
         if entry.grants_right?(user, :create) && !comments_disabled? && !locked_announcement?
+          entry.saving_user = user
           entry.save!
           entry
         else
