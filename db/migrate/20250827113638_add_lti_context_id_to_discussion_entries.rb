@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2024 - present Instructure, Inc.
+# Copyright (C) 2025 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,15 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Lti
-  module Pns
-    class NoticeTypes
-      HELLO_WORLD = "LtiHelloWorldNotice"
-      ASSET_PROCESSOR_SUBMISSION = "LtiAssetProcessorSubmissionNotice"
-      ASSET_PROCESSOR_CONTRIBUTION = "LtiAssetProcessorContributionNotice"
-      CONTEXT_COPY = "LtiContextCopyNotice"
+class AddLtiContextIdToDiscussionEntries < ActiveRecord::Migration[7.2]
+  tag :predeploy
+  disable_ddl_transaction!
 
-      ALL = [HELLO_WORLD, ASSET_PROCESSOR_SUBMISSION, CONTEXT_COPY, ASSET_PROCESSOR_CONTRIBUTION].freeze
-    end
+  def change
+    add_column :discussion_entries, :lti_id, :string, limit: 255, if_not_exists: true
   end
 end

@@ -41,6 +41,27 @@ describe DiscussionEntry do
     it "sets the root_account_id using topic" do
       expect(entry.root_account_id).to eq topic.root_account_id
     end
+
+    it "generates an lti_id if not provided" do
+      expect(entry.lti_id).to be_present
+    end
+
+    it "does not overwrite a provided lti_id" do
+      custom_id = SecureRandom.uuid
+      e = topic.discussion_entries.create!(user: @teacher, lti_id: custom_id)
+      expect(e.lti_id).to eq custom_id
+    end
+
+    it "cannot update lti_id once set" do
+      entry # trigger creation
+      original = entry.lti_id
+      expect(original).to be_present
+      # attempt update
+      expect do
+        entry.update(lti_id: SecureRandom.uuid)
+      end.not_to change { entry.reload.lti_id }
+      expect(entry.errors[:lti_id]).to include("Cannot change lti_id!")
+    end
   end
 
   it "is not marked as deleted when parent is deleted" do
