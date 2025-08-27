@@ -143,6 +143,7 @@ export const DiscussionPostToolbar = props => {
         data-action-state={showTranslationControl ? 'disableTranslation' : 'enableTranslation'}
         renderIcon={showTranslationControl ? <IconXSolid /> : <IconAiColoredSolid />}
         color={showTranslationControl ? 'secondary' : 'ai-secondary'}
+        aria-expanded={showTranslationControl ? I18n.t('Expanded') : I18n.t('Collapsed')}
       >
         {ENV.ai_translation_improvements ? improvedText : text}
       </Button>
