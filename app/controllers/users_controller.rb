@@ -470,8 +470,13 @@ class UsersController < ApplicationController
     GuardRail.activate(:secondary) do
       users = Api.paginate(users, self, api_v1_account_users_url, page_opts)
 
-      user_json_preloads(users, includes.include?("email"))
-      User.preload_last_login(users, @context.resolved_root_account_id) if includes.include?("last_login") && params[:sort] != "last_login"
+      preload_profiles = @domain_root_account.enable_profiles?
+      user_json_preloads(users, includes.include?("email"), profile: preload_profiles)
+
+      if includes.include?("last_login") && params[:sort] != "last_login"
+        User.preload_last_login(users, @context.resolved_root_account_id)
+      end
+
       render json: users.map { |u| user_json(u, @current_user, session, includes) }
     end
   end
