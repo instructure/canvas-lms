@@ -121,6 +121,7 @@ react_people_page:
   description: |-
     This feature flag enables the React/InstUI and GraphQL People page upgrade.
   applies_to: RootAccount
+  shadow: true
 
 discussion_checkpoints:
   state: allowed
