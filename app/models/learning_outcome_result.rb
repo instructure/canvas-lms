@@ -20,6 +20,7 @@
 
 class LearningOutcomeResult < ActiveRecord::Base
   include Canvas::SoftDeletable
+  include CanvasOutcomesHelper
 
   belongs_to :user
   belongs_to :learning_outcome
@@ -54,6 +55,7 @@ class LearningOutcomeResult < ActiveRecord::Base
   before_save :infer_defaults
   before_save :ensure_user_uuid
   before_save :set_root_account_id
+  after_commit :rollup_calculation
 
   def calculate_percent!
     scale_data = scale_params
@@ -256,6 +258,20 @@ class LearningOutcomeResult < ActiveRecord::Base
       return unless parent_has_mastery? && parent_outcome.points_possible.to_f > 0
 
       parent_outcome.mastery_points.to_f / parent_outcome.points_possible.to_f
+    end
+  end
+
+  def rollup_calculation
+    return unless context && user
+
+    begin
+      enqueue_rollup_calculation(course_id: context.id, student_id: user.id)
+    rescue => e
+      Canvas::Errors.capture_exception(:outcome_rollup_callback, e, {
+                                         course_id: context.id,
+                                         user_id: user.id,
+                                         learning_outcome_result_id: id
+                                       })
     end
   end
 end

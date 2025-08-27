@@ -49,6 +49,7 @@ import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Transition} from '@instructure/ui-motion'
+import {SafeString} from '@instructure/html-escape'
 
 const I18n = createI18nScope('ajaxflashalert')
 
@@ -101,7 +102,7 @@ const isLoadingChunkError = (a?: string): boolean => {
 
 type FlashAlertProps = {
   onClose: () => void
-  message: string | React.ReactNode
+  message: string | React.ReactNode | SafeString
   error?: Error | null
   variant?: 'info' | 'success' | 'warning' | 'error'
   timeout?: number
@@ -208,7 +209,14 @@ export default class FlashAlert extends React.Component<FlashAlertProps> {
           liveRegionPoliteness={this.props.liveRegionPoliteness}
         >
           <div>
-            <p style={{margin: '0 -5px'}}>{this.props.message}</p>
+            {this.props.message instanceof SafeString ? (
+              <p
+                style={{margin: '0 -5px'}}
+                dangerouslySetInnerHTML={{__html: this.props.message}}
+              />
+            ) : (
+              <p style={{margin: '0 -5px'}}>{this.props.message}</p>
+            )}
             {details}
           </div>
         </Alert>
@@ -218,7 +226,7 @@ export default class FlashAlert extends React.Component<FlashAlertProps> {
 }
 
 type ShowFlashAlertArgs = {
-  message: string | React.ReactNode
+  message: string | React.ReactNode | SafeString
   err?: Error | null
   type?: 'info' | 'success' | 'warning' | 'error'
   srOnly?: boolean
@@ -296,7 +304,7 @@ export function showFlashError(message = I18n.t('An error occurred making a netw
   return (err?: Error) => showFlashAlert({message, err, type: 'error'})
 }
 
-export function showFlashSuccess(message: string) {
+export function showFlashSuccess(message: string | SafeString) {
   return () => showFlashAlert({message, type: 'success'})
 }
 

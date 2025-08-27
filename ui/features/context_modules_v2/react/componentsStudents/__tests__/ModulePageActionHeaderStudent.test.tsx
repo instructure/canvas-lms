@@ -22,6 +22,7 @@ import ModulePageActionHeaderStudent from '../ModulePageActionHeaderStudent'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {CourseStudentResponse} from '../../utils/types.d'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
+import {ObserverCourseData} from '../../hooks/queriesStudent/useCourseObserver'
 import userEvent from '@testing-library/user-event'
 
 const contextModuleHeaderDefaultProps = {
@@ -130,10 +131,48 @@ const setupTest = (
   )
 }
 
+// Helper function for setting up observer tests
+const setupObserverTest = (
+  props: DefaultProps,
+  observerData?: ObserverCourseData,
+  courseId: string = '1',
+  observedStudent: {id: string; name: string} | null = {id: '101', name: 'Alice Student'},
+) => {
+  queryClient.clear()
+
+  queryClient.setQueryData(
+    ['courseObserver', courseId],
+    observerData?.courseData || {
+      name: 'Test Course',
+      submissionStatistics: {
+        missingSubmissionsCount: 5,
+        submissionsDueThisWeekCount: 10,
+      },
+      settings: {showStudentOnlyModuleId: 'mod_1'},
+    },
+  )
+
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <ContextModuleProvider
+        {...contextModuleDefaultProps}
+        courseId={courseId}
+        isObserver={true}
+        observedStudent={observedStudent}
+        moduleMenuModalTools={[]}
+        moduleGroupMenuTools={[]}
+        moduleMenuTools={[]}
+        moduleIndexMenuModalTools={[]}
+      >
+        <ModulePageActionHeaderStudent {...props} />
+      </ContextModuleProvider>
+    </QueryClientProvider>,
+  )
+}
+
 describe('ModulePageActionHeaderStudent', () => {
   beforeEach(() => {
     queryClient.clear()
-    // @ts-expect-error
     window.ENV.CONTEXT_MODULES_HEADER_PROPS = contextModuleHeaderDefaultProps
   })
 
@@ -258,5 +297,131 @@ describe('ModulePageActionHeaderStudent', () => {
     )
 
     expect(container).toBeEmptyDOMElement()
+  })
+
+  describe('Observer functionality', () => {
+    it('renders observer-specific welcome message', () => {
+      const {getByText, queryByText} = setupObserverTest(buildDefaultProps())
+
+      expect(
+        getByText(
+          'Your course content is organized into modules below. Explore each one to learn and complete activities.',
+        ),
+      ).toBeInTheDocument()
+      // Course name might not show due to how observer data is structured
+      expect(queryByText('Welcome to Test Course!')).toBeInTheDocument()
+    })
+
+    it('shows missing assignments for observer', () => {
+      const observerData = {
+        courseData: {
+          name: 'Test Course',
+          submissionStatistics: {
+            missingSubmissionsCount: 8,
+            submissionsDueThisWeekCount: 0,
+          },
+          settings: {showStudentOnlyModuleId: 'mod_1'},
+        },
+        observedStudent: {id: '101', name: 'Alice Student'},
+      }
+
+      const {getByText} = setupObserverTest(buildDefaultProps(), observerData)
+
+      expect(getByText('8 Missing Assignments')).toBeInTheDocument()
+    })
+
+    it('handles observed student missing assignments', () => {
+      const observerData = {
+        courseData: {
+          name: 'Test Course',
+          submissionStatistics: {
+            missingSubmissionsCount: 3,
+            submissionsDueThisWeekCount: 0,
+          },
+          settings: {showStudentOnlyModuleId: 'mod_1'},
+        },
+        observedStudent: {id: '101', name: 'Alice Student'},
+      }
+
+      const {getByText} = setupObserverTest(buildDefaultProps(), observerData, '1', {
+        id: '101',
+        name: 'Alice Student',
+      })
+
+      expect(getByText('3 Missing Assignments')).toBeInTheDocument()
+    })
+
+    it('does not show due this week button for observers', () => {
+      const observerData = {
+        courseData: {
+          name: 'Test Course',
+          submissionStatistics: {
+            missingSubmissionsCount: 2,
+            submissionsDueThisWeekCount: 5,
+          },
+          settings: {showStudentOnlyModuleId: 'mod_1'},
+        },
+        observedStudent: {id: '101', name: 'Alice Student'},
+      }
+
+      const {queryByTestId} = setupObserverTest(buildDefaultProps(), observerData)
+
+      expect(queryByTestId('assignment-due-this-week-button')).not.toBeInTheDocument()
+    })
+
+    it('handles observer with no missing assignments', () => {
+      const observerData = {
+        courseData: {
+          name: 'Test Course',
+          submissionStatistics: {
+            missingSubmissionsCount: 0,
+            submissionsDueThisWeekCount: 0,
+          },
+          settings: {showStudentOnlyModuleId: 'mod_1'},
+        },
+        observedStudent: {id: '101', name: 'Alice Student'},
+      }
+
+      const {queryByTestId} = setupObserverTest(buildDefaultProps(), observerData)
+
+      expect(queryByTestId('missing-assignment-button')).not.toBeInTheDocument()
+      expect(queryByTestId('assignment-due-this-week-button')).not.toBeInTheDocument()
+    })
+
+    it('renders nothing when observer data is loading', () => {
+      const props = buildDefaultProps()
+      queryClient.clear()
+
+      const {container} = render(
+        <QueryClientProvider client={queryClient}>
+          <ContextModuleProvider
+            {...contextModuleDefaultProps}
+            courseId="1"
+            isObserver={true}
+            observedStudent={{id: '101', name: 'Alice Student'}}
+            permissions={contextModuleDefaultProps.permissions}
+          >
+            <ModulePageActionHeaderStudent {...props} />
+          </ContextModuleProvider>
+        </QueryClientProvider>,
+      )
+
+      expect(container).toBeEmptyDOMElement()
+    })
+
+    it('handles observer with undefined course name gracefully', () => {
+      const observerData = {
+        courseData: {
+          name: undefined,
+          submissionStatistics: undefined,
+          settings: {showStudentOnlyModuleId: 'mod_1'},
+        },
+        observedStudent: {id: '101', name: 'Alice Student'},
+      }
+
+      const {queryByText} = setupObserverTest(buildDefaultProps(), observerData)
+
+      expect(queryByText(/Observing/)).not.toBeInTheDocument()
+    })
   })
 })

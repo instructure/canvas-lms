@@ -341,9 +341,9 @@ module Lti
               end
         control_params.permit(:account_id, :course_id, :deployment_id, :available).to_h.tap do |p|
           # insert_all requires that all hashes have the same keys
-          p[:account_id] = nil unless p.key?(:account_id)
-          p[:course_id] = nil unless p.key?(:course_id)
-          p[:deployment_id] ||= root_account_deployment&.id
+          p[:account_id] = p.key?(:account_id) ? p[:account_id].to_i : nil
+          p[:course_id] = p.key?(:course_id) ? p[:course_id].to_i : nil
+          p[:deployment_id] = p.key?(:deployment_id) ? p[:deployment_id].to_i : root_account_deployment&.id
           p[:available] = true unless p.key?(:available)
           p[:registration_id] = registration.id
           p[:workflow_state] = :active
@@ -363,17 +363,17 @@ module Lti
       deployment_course_ids = ContextExternalTool.where(id: deployments, context_type: "Course").pluck(:id, :context_id).to_h
       course_account_ids = Course.where(id: controls.pluck(:course_id).uniq).pluck(:id, :account_id).to_h
       deployment_account_ids = ContextExternalTool.where(id: deployments, context_type: "Account").pluck(:id, :context_id).to_h
-      account_chains = Account.partitioned_sub_account_ids_recursive(deployment_account_ids.values)
+      deployment_account_chains = Account.partitioned_sub_account_ids_recursive(deployment_account_ids.values)
 
       invalid_controls = controls.reject do |control_params|
-        deployment_id = control_params[:deployment_id].to_i
+        deployment_id = control_params[:deployment_id]
 
         if deployment_course_ids.key?(deployment_id)
-          deployment_course_ids[deployment_id] == control_params[:course_id].to_i
+          deployment_course_ids[deployment_id] == control_params[:course_id]
         else
-          account_id = control_params[:account_id]&.to_i || course_account_ids[control_params[:course_id].to_i]
+          account_id = control_params[:account_id] || course_account_ids[control_params[:course_id]]
           deployment_account_ids[deployment_id] == account_id ||
-            account_chains[deployment_account_ids[deployment_id]]&.include?(account_id)
+            deployment_account_chains[deployment_account_ids[deployment_id]]&.include?(account_id)
         end
       end
 
@@ -391,9 +391,20 @@ module Lti
         )
       end
 
+      anchor_controls = Lti::ContextControlService.build_anchor_controls(
+        controls:,
+        account_chains: chains,
+        course_account_ids:,
+        deployments:,
+        deployment_account_ids:,
+        deployment_course_ids:,
+        cached_paths:
+      )
+      controls += anchor_controls
+
       ids = Lti::ContextControl.transaction do
-        # Postgres's ON CONFLICT <conflict_target> can only handle a single unique index at a time,
-        # hence the split
+        # Postgres's ON CONFLICT <conflict_target> can only handle a single unique index at a time, hence the split
+        # upsert needed here to restore any previously deleted controls
         control_ids = Lti::ContextControl.upsert_all(controls.filter { |c| c[:course_id].present? }, unique_by: [:course_id, :deployment_id], returning: :id).rows.flatten
         control_ids + Lti::ContextControl.upsert_all(controls.filter { |c| c[:account_id].present? }, unique_by: [:account_id, :deployment_id], returning: :id).rows.flatten
       end

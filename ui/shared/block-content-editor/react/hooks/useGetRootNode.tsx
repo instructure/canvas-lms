@@ -16,15 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useCallback} from 'react'
-import {useEditor} from '@craftjs/core'
+import {useEditor, Node} from '@craftjs/core'
 
-export const useGetRootNode = () => {
-  const {query} = useEditor()
+export type EditorRootNode = {
+  rootNode: Node
+}
 
-  const getRootNode = useCallback(() => {
-    return query.node('ROOT').get()
-  }, [query])
+export const useGetRootNode = (): EditorRootNode => {
+  const {rootNode} = useEditor((_, query) => ({
+    rootNode: query.node('ROOT').get(),
+  }))
 
-  return getRootNode
+  return {rootNode}
 }

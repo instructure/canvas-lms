@@ -133,7 +133,7 @@ describe UserMerge do
     end
 
     it "moves access tokens to the new user" do
-      at = AccessToken.create!(user: user2, developer_key: DeveloperKey.default)
+      at = AccessToken.create!(user: user2, developer_key: DeveloperKey.default, purpose: "test")
       UserMerge.from(user2).into(user1)
       at.reload
       expect(at.user_id).to eq user1.id

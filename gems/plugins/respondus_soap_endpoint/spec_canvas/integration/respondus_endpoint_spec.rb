@@ -143,7 +143,7 @@ Implemented for: Canvas LMS)
     it "allows using an oauth token for delegated auth" do
       uname = "oauth_access_token"
       # we already test the oauth flow in spec/apis/oauth_spec, so shortcut here
-      @key = DeveloperKey.create!
+      @key = DeveloperKey.create!(name: "Test Key")
       @token = AccessToken.create!(user: @user, developer_key: @key)
       soap_response = soap_request("ValidateAuth",
                                    uname,

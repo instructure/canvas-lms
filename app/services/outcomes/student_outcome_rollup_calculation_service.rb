@@ -62,22 +62,48 @@ module Outcomes
     # @param student_id [Integer] the student_id for whom to calculate rollups
     def initialize(course_id:, student_id:)
       super()
-      @course  = Course.find(course_id)
-      @student = User.find(student_id)
+      @course = Course.find(course_id)
+      @student = @course.students.find(student_id)
+    rescue ActiveRecord::RecordNotFound => e
+      raise ArgumentError, "Invalid course_id (#{course_id}) or student_id (#{student_id}): #{e.message}"
     end
 
     # Runs the full calculation and returns student outcome rollups.
     # @return [Array<Rollup>]
     def call
-      # Fetch both Canvas and Outcomes Service results
-      canvas_results = fetch_canvas_results
-      os_results     = fetch_outcomes_service_results
+      Utils::InstStatsdUtils::Timing.track("rollup.student.runtime") do |timing_meta|
+        rollups_created = 0
 
-      combined_results = combine_results(canvas_results, os_results)
-      return OutcomeRollup.none if combined_results.empty?
+        begin
+          # Fetch both Canvas and Outcomes Service results
+          canvas_results = fetch_canvas_results
+          os_results     = fetch_outcomes_service_results
 
-      student_rollups = generate_student_rollups(combined_results)
-      store_rollups(student_rollups)
+          combined_results = combine_results(canvas_results, os_results)
+          if combined_results.empty?
+            timing_meta.tags = { course_id: course.id }
+            InstStatsd::Statsd.distributed_increment("rollup.student.success", tags: { course_id: course.id })
+            InstStatsd::Statsd.count("rollup.student.records_processed", rollups_created, tags: { course_id: course.id })
+            return OutcomeRollup.none
+          end
+
+          student_rollups = generate_student_rollups(combined_results)
+          stored_rollups = store_rollups(student_rollups)
+
+          rollups_created = stored_rollups.is_a?(ActiveRecord::Relation) ? stored_rollups.count : 0
+          timing_meta.tags = { course_id: course.id, records_processed: rollups_created }
+
+          InstStatsd::Statsd.distributed_increment("rollup.student.success", tags: { course_id: course.id })
+          InstStatsd::Statsd.count("rollup.student.records_processed", rollups_created, tags: { course_id: course.id })
+
+          stored_rollups
+        rescue => e
+          timing_meta.tags = { course_id: course.id, error: true }
+          InstStatsd::Statsd.distributed_increment("rollup.student.error", tags: { course_id: course.id })
+          InstStatsd::Statsd.count("rollup.student.records_processed", rollups_created, tags: { course_id: course.id })
+          raise e
+        end
+      end
     end
 
     private
@@ -115,18 +141,13 @@ module Outcomes
       outcomes = course.linked_learning_outcomes
       return [] if outcomes.blank?
 
-      begin
-        os_results_json = find_outcomes_service_outcome_results(
-          users: [student],
-          context: course,
-          outcomes:,
-          assignments: new_quiz_assignments
-        )
-        return [] if os_results_json.blank?
-      rescue => e
-        Rails.logger.error("Failed to fetch outcomes service results: #{e.message}")
-        raise e
-      end
+      os_results_json = find_outcomes_service_outcome_results(
+        users: [student],
+        context: course,
+        outcomes:,
+        assignments: new_quiz_assignments
+      )
+      return [] if os_results_json.blank?
 
       handle_outcomes_service_results(
         os_results_json,

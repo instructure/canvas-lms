@@ -71,8 +71,11 @@ class Lti::AssetProcessor < ApplicationRecord
   end
 
   def icon_or_tool_icon_url
-    icon_url ||
-      context_external_tool.extension_setting(:ActivityAssetProcessor, :icon_url)
+    icon_url || context_external_tool.extension_setting(placement, :icon_url)
+  end
+
+  def tool_placement_label
+    context_external_tool.label_for(placement, I18n.locale)
   end
 
   # Result structure should match with ExistingAttachedAssetProcessor in UI
@@ -88,7 +91,7 @@ class Lti::AssetProcessor < ApplicationRecord
         text: ap.text,
         tool_id: ap.context_external_tool_id,
         tool_name: ap.context_external_tool.name,
-        tool_placement_label: ap.context_external_tool.label_for(:ActivityAssetProcessor, I18n.locale),
+        tool_placement_label: ap.tool_placement_label,
         icon_or_tool_icon_url: ap.icon_or_tool_icon_url,
         iframe: ap.iframe,
         window: ap.window,
@@ -98,5 +101,13 @@ class Lti::AssetProcessor < ApplicationRecord
 
   def report_custom_variables
     (custom || {}).merge(report&.dig("custom") || {})
+  end
+
+  def discussion_ap?
+    assignment.discussion_topic?
+  end
+
+  def placement
+    discussion_ap? ? :ActivityAssetProcessorContribution : :ActivityAssetProcessor
   end
 end

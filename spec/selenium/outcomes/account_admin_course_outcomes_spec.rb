@@ -55,7 +55,7 @@ describe "account admin outcomes" do
       end
 
       it "validates decaying average_range", priority: "2" do
-        should_validate_decaying_average_range
+        should_validate_decaying_average_range "not a valid value for this calculation method"
       end
 
       it "validates n mastery_range", priority: "2" do

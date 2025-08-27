@@ -18,7 +18,8 @@
 
 import React from 'react'
 import $ from 'jquery'
-import {render} from '@testing-library/react'
+import '@canvas/files/mockFilesENV'
+import {render, screen} from '@testing-library/react'
 import FilePreview from '@canvas/files/react/components/FilePreview'
 import Folder from '@canvas/files/backbone/models/Folder'
 import File from '@canvas/files/backbone/models/File'
@@ -158,6 +159,56 @@ describe('File Preview Rendering', () => {
     const downloadBtn = $('.ef-file-preview-header-download')[0]
     expect(downloadBtn).toBeInTheDocument()
     expect((downloadBtn as HTMLAnchorElement).href).toContain(file3.get('url'))
+  })
+
+  describe('when restrict_student_access is enabled and user is a student', () => {
+    beforeEach(() => {
+      window.ENV.FEATURES.restrict_student_access = true
+    })
+
+    afterEach(() => {
+      delete window.ENV.FEATURES.restrict_student_access
+    })
+
+    describe('when current user is a student', () => {
+      beforeEach(() => {
+        window.ENV.current_user_roles = ['student']
+      })
+
+      test('download button should not be rendered on the file preview', () => {
+        render(
+          <FilePreview
+            isOpen={true}
+            query={{
+              preview: '3',
+            }}
+            currentFolder={currentFolder}
+          />,
+        )
+        const downloadBtn = screen.queryByText(/download/i)
+        expect(downloadBtn).toBeNull()
+      })
+    })
+
+    describe('when current user is not student', () => {
+      beforeEach(() => {
+        window.ENV.current_user_roles = ['teacher']
+      })
+
+      test('download button should be rendered on the file preview', () => {
+        render(
+          <FilePreview
+            isOpen={true}
+            query={{
+              preview: '3',
+            }}
+            currentFolder={currentFolder}
+          />,
+        )
+        const downloadBtn = screen.queryByText(/download/i)
+        expect(downloadBtn).toBeInTheDocument()
+      })
+    })
   })
 
   test('clicking the close button calls closePreview with the correct url', () => {

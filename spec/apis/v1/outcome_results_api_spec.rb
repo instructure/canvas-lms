@@ -798,19 +798,74 @@ describe "Outcome Results API", type: :request do
           )
         end
 
-        it "side loads users" do
-          outcome_assessment
-          api_call(:get,
-                   outcome_rollups_url(outcome_course, include: ["users"]),
-                   controller: "outcome_results",
-                   action: "rollups",
-                   format: "json",
-                   course_id: outcome_course.id.to_s,
-                   include: ["users"])
-          json = JSON.parse(response.body)
-          expect(json["linked"]).to be_present
-          expect(json["linked"]["users"]).to be_present
-          expect(json["linked"]["users"][0]["id"]).to eq outcome_student.id.to_s
+        describe "users" do
+          before do
+            outcome_student.pseudonyms.create!(
+              unique_id: "os-login-id",
+              sis_user_id: "os-sis-user-id",
+              integration_id: "os-integration-id",
+              account: Account.default
+            )
+          end
+
+          it "side loads users" do
+            outcome_assessment
+            api_call(:get,
+                     outcome_rollups_url(outcome_course, include: ["users"]),
+                     controller: "outcome_results",
+                     action: "rollups",
+                     format: "json",
+                     course_id: outcome_course.id.to_s,
+                     include: ["users"])
+            json = JSON.parse(response.body)
+            expect(json["linked"]).to be_present
+            expect(json["linked"]["users"].size).to be > 0
+            user = json["linked"]["users"][0]
+            expect(user["id"]).to eq outcome_student.id.to_s
+            expect(user["display_name"]).to eq outcome_student.short_name
+            expect(user["sortable_name"]).to eq outcome_student.sortable_name
+            expect(user["name"]).to eq outcome_student.name
+            expect(user["integration_id"]).to eq "os-integration-id"
+            expect(user["login_id"]).to eq "os-login-id"
+            expect(user["sis_id"]).to eq "os-sis-user-id"
+          end
+
+          it "exclude login_id when view_user_logins is disabled" do
+            RoleOverride.create!(context: Account.default,
+                                 role: teacher_role,
+                                 permission: "view_user_logins",
+                                 enabled: false)
+            api_call(:get,
+                     outcome_rollups_url(outcome_course, include: ["users"]),
+                     controller: "outcome_results",
+                     action: "rollups",
+                     format: "json",
+                     course_id: outcome_course.id.to_s,
+                     include: ["users"])
+            json = JSON.parse(response.body)
+            expect(json["linked"]["users"].size).to be > 0
+            user = json["linked"]["users"][0]
+            expect(user.keys).not_to include "login_id"
+          end
+
+          it "exclude sis data when read_sis is disabled" do
+            RoleOverride.create!(context: Account.default,
+                                 role: teacher_role,
+                                 permission: "read_sis",
+                                 enabled: false)
+            api_call(:get,
+                     outcome_rollups_url(outcome_course, include: ["users"]),
+                     controller: "outcome_results",
+                     action: "rollups",
+                     format: "json",
+                     course_id: outcome_course.id.to_s,
+                     include: ["users"])
+            json = JSON.parse(response.body)
+            expect(json["linked"]["users"].size).to be > 0
+            user = json["linked"]["users"][0]
+            expect(user.keys).not_to include "sis_id"
+            expect(user.keys).not_to include "integration_id"
+          end
         end
 
         it "side loads alignments" do

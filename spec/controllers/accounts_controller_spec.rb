@@ -215,6 +215,14 @@ describe AccountsController do
         expect(@account.reload.users.find_by(name: "Alice")).to be_nil
         expect(@account.reload.users.find_by(name: "Bob")).to_not be_nil
       end
+
+      it "returns bad request if user_ids are over the limit" do
+        user_session(@admin)
+
+        delete "remove_users", params: { account_id: @account.id, user_ids: (1..101).to_a }
+
+        expect(response).to be_bad_request
+      end
     end
 
     describe "user bulk edit" do
@@ -296,6 +304,12 @@ describe AccountsController do
         expect(progress.results[:errors]).to have_key("9999")
         expect(@u1.pseudonym.reload).to be_suspended
         expect(@u3.pseudonym.reload).to be_suspended
+      end
+
+      it "returns bad request if enrollments are over the limit" do
+        user_session(@admin)
+        put :update_users, params: { account_id: @account.id, user_ids: [@u1.id] * 101, user: { event: "suspend" } }, format: :json
+        expect(response).to be_bad_request
       end
     end
   end

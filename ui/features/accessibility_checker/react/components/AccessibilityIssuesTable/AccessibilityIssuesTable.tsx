@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useCallback, useEffect, useMemo, useState} from 'react'
+import {useCallback} from 'react'
 import {useShallow} from 'zustand/react/shallow'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Alert} from '@instructure/ui-alerts'
@@ -29,41 +29,73 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
 import {IssuesTableColumns, IssuesTableColumnHeaders} from '../../constants'
-import {ContentItem} from '../../types'
-import {getSortingFunction} from '../../utils'
+import {AccessibilityResourceScan} from '../../types'
 import {AccessibilityIssuesTableRow} from './AccessibilityIssuesTableRow'
-import {useAccessibilityCheckerStore, TableSortState} from '../../stores/AccessibilityCheckerStore'
-import {useAccessibilityFetchUtils} from '../AccessibilityCheckerApp/useAccessibilityFetchUtils'
+import {useAccessibilityScansStore, TableSortState} from '../../stores/AccessibilityScansStore'
+import {useAccessibilityScansFetchUtils} from '../../hooks/useAccessibilityScansFetchUtils'
 
 const I18n = createI18nScope('accessibility_checker')
 
 type Props = {
-  onRowClick?: (item: ContentItem) => void
+  onRowClick?: (item: AccessibilityResourceScan) => void
 }
 
 const headerThemeOverride: TableColHeaderProps['themeOverride'] = _componentTheme => ({
   padding: '0.875rem 0.75rem', // Make column header height 3rem
 })
 
+const getNewTableSortState = (
+  _event: React.SyntheticEvent,
+  param: {id: TableColHeaderProps['id']},
+  existingSortState?: TableSortState | null,
+): TableSortState => {
+  let sortDirection: TableSortState['sortDirection'] = ReverseOrderingFirst.includes(param.id)
+    ? 'descending'
+    : 'ascending'
+
+  if (existingSortState?.sortId === param.id) {
+    if (ReverseOrderingFirst.includes(param.id)) {
+      sortDirection =
+        existingSortState?.sortDirection === 'descending'
+          ? 'ascending'
+          : existingSortState?.sortDirection === 'ascending'
+            ? 'none'
+            : 'descending'
+    } else {
+      // If the same column is clicked, cycle the sort direction
+      sortDirection =
+        existingSortState?.sortDirection === 'ascending'
+          ? 'descending'
+          : existingSortState?.sortDirection === 'descending'
+            ? 'none'
+            : 'ascending'
+    }
+  }
+  return {
+    sortId: param.id,
+    sortDirection,
+  }
+}
+
 const renderTableData = (
-  tableData?: ContentItem[] | null,
+  scans?: AccessibilityResourceScan[] | null,
   error?: string | null,
-  onRowClick?: (item: ContentItem) => void,
+  onRowClick?: (item: AccessibilityResourceScan) => void,
 ) => {
   if (error) return
 
   return (
     <>
-      {tableData?.length === 0 || !tableData ? (
+      {scans?.length === 0 || !scans ? (
         <Table.Row data-testid="no-issues-row">
           <Table.Cell colSpan={5} textAlign="center">
             <Text color="secondary">{I18n.t('No accessibility issues found')}</Text>
           </Table.Cell>
         </Table.Row>
       ) : (
-        tableData.map(item => (
+        scans.map(item => (
           <AccessibilityIssuesTableRow
-            key={`${item.type}-${item.id}`}
+            key={`${item.resourceType}-${item.id}`}
             item={item}
             onRowClick={onRowClick}
           />
@@ -90,103 +122,50 @@ const renderLoading = () => {
 const ReverseOrderingFirst = [IssuesTableColumns.Issues, IssuesTableColumns.LastEdited]
 
 export const AccessibilityIssuesTable = ({onRowClick}: Props) => {
-  const {updateQueryParamPage, updateQueryParamTableSortState} = useAccessibilityFetchUtils()
+  const {doFetchAccessibilityScanData} = useAccessibilityScansFetchUtils()
 
-  const error = useAccessibilityCheckerStore(useShallow(state => state.error))
-  const loading = useAccessibilityCheckerStore(useShallow(state => state.loading))
-  const tableData = useAccessibilityCheckerStore(useShallow(state => state.tableData))
-  const [tableSortState, setTableSortState] = useAccessibilityCheckerStore(
-    useShallow(state => [state.tableSortState, state.setTableSortState]),
-  )
-  const [page, setPage] = useAccessibilityCheckerStore(
-    useShallow(state => [state.page, state.setPage]),
-  )
-  const pageSize = useAccessibilityCheckerStore(useShallow(state => state.pageSize))
-
-  const setOrderedTableData = useAccessibilityCheckerStore(
-    useShallow(state => state.setOrderedTableData),
-  )
-  const orderedTableData = useAccessibilityCheckerStore(useShallow(state => state.orderedTableData))
+  const [error, loading, page, pageCount, accessibilityScans, tableSortState] =
+    useAccessibilityScansStore(
+      useShallow(state => [
+        state.error,
+        state.loading,
+        state.page,
+        state.pageCount,
+        state.accessibilityScans,
+        state.tableSortState,
+      ]),
+    )
 
   const handleSort = useCallback(
     (_event: React.SyntheticEvent, param: {id: TableColHeaderProps['id']}) => {
-      let sortDirection: TableSortState['sortDirection'] = ReverseOrderingFirst.includes(param.id)
-        ? 'descending'
-        : 'ascending'
+      const newState: Partial<TableSortState> = getNewTableSortState(_event, param, tableSortState)
 
-      if (tableSortState?.sortId === param.id) {
-        if (ReverseOrderingFirst.includes(param.id)) {
-          sortDirection =
-            tableSortState?.sortDirection === 'descending'
-              ? 'ascending'
-              : tableSortState?.sortDirection === 'ascending'
-                ? 'none'
-                : 'descending'
-        } else {
-          // If the same column is clicked, cycle the sort direction
-          sortDirection =
-            tableSortState?.sortDirection === 'ascending'
-              ? 'descending'
-              : tableSortState?.sortDirection === 'descending'
-                ? 'none'
-                : 'ascending'
-        }
-      }
-      const newState: Partial<TableSortState> = {
-        sortId: param.id,
-        sortDirection,
-      }
-
-      setTableSortState(newState)
-      updateQueryParamTableSortState(newState)
+      doFetchAccessibilityScanData({
+        tableSortState: newState,
+        page: 1,
+      })
     },
-    [tableSortState, setTableSortState, updateQueryParamTableSortState],
+    [tableSortState, doFetchAccessibilityScanData],
   )
 
-  const getCurrentSortDirection = (
-    id: TableColHeaderProps['id'],
-  ): 'ascending' | 'descending' | 'none' => {
-    if (tableSortState?.sortId === id) {
-      return tableSortState?.sortDirection || 'none'
-    }
-    return 'none'
-  }
-
-  useEffect(() => {
-    const newOrderedTableData: ContentItem[] = [...(tableData || [])]
-
-    if (tableSortState && tableSortState.sortId) {
-      if (
-        tableSortState.sortDirection === 'ascending' ||
-        tableSortState.sortDirection === 'descending'
-      ) {
-        const sortFn = getSortingFunction(tableSortState.sortId, tableSortState!.sortDirection)
-        newOrderedTableData.sort(sortFn)
+  const getCurrentSortDirection = useCallback(
+    (id: TableColHeaderProps['id']): 'ascending' | 'descending' | 'none' => {
+      if (tableSortState?.sortId === id) {
+        return tableSortState?.sortDirection || 'none'
       }
-    }
-    setPage(0)
-    updateQueryParamPage(0)
-    setOrderedTableData(newOrderedTableData)
-  }, [tableData, tableSortState, setPage, setOrderedTableData, updateQueryParamPage])
-
-  const pageCount = (pageSize && Math.ceil((tableData ?? []).length / pageSize)) || 1
+      return 'none'
+    },
+    [tableSortState],
+  )
 
   const handlePageChange = useCallback(
     (nextPage: number) => {
-      setPage(nextPage - 1)
-      updateQueryParamPage(nextPage - 1)
+      doFetchAccessibilityScanData({
+        page: nextPage,
+      })
     },
-    [setPage, updateQueryParamPage],
+    [doFetchAccessibilityScanData],
   )
-
-  // TODO Remove, once we are dealing with paginated and sorted data from the backend
-  const pseudoPaginatedData = useMemo(() => {
-    const startIndex = page * pageSize
-    const endIndex = startIndex + pageSize
-    const paginatedData = (orderedTableData || []).slice(startIndex, endIndex)
-
-    return paginatedData
-  }, [page, pageSize, orderedTableData])
 
   return (
     <View width="100%">
@@ -233,7 +212,7 @@ export const AccessibilityIssuesTable = ({onRowClick}: Props) => {
                 </Table.Cell>
               </Table.Row>
             )}
-            {renderTableData(pseudoPaginatedData, error, onRowClick)}
+            {renderTableData(accessibilityScans, error, onRowClick)}
           </Table.Body>
         </Table>
       </View>
@@ -246,7 +225,7 @@ export const AccessibilityIssuesTable = ({onRowClick}: Props) => {
             labelNext={I18n.t('Next Page')}
             labelPrev={I18n.t('Previous Page')}
             margin="small"
-            currentPage={page + 1}
+            currentPage={page}
             onPageChange={handlePageChange}
             totalPageNumber={pageCount}
           />

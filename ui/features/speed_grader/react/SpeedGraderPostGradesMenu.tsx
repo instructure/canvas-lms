@@ -30,13 +30,14 @@ const {Item: MenuItem} = Menu as any
 type Props = {
   allowHidingGradesOrComments: boolean
   allowPostingGradesOrComments: boolean
+  allowManageGrades?: boolean
   hasGradesOrPostableComments: boolean
   onHideGrades: () => void
   onPostGrades: () => void
 }
 
 export default function SpeedGraderPostGradesMenu(props: Props) {
-  const {allowHidingGradesOrComments, allowPostingGradesOrComments} = props
+  const {allowHidingGradesOrComments, allowPostingGradesOrComments, allowManageGrades} = props
   const Icon = allowPostingGradesOrComments ? IconOffLine : IconEyeLine
   const menuTrigger = (
     <IconButton
@@ -54,7 +55,7 @@ export default function SpeedGraderPostGradesMenu(props: Props) {
   return (
     <Menu placement="bottom end" trigger={menuTrigger}>
       {allowPostingGradesOrComments ? (
-        <MenuItem name="postGrades" onSelect={props.onPostGrades}>
+        <MenuItem name="postGrades" onSelect={props.onPostGrades} disabled={!allowManageGrades}>
           <Text>{I18n.t('Post Grades')}</Text>
         </MenuItem>
       ) : (
@@ -68,7 +69,7 @@ export default function SpeedGraderPostGradesMenu(props: Props) {
       )}
 
       {allowHidingGradesOrComments ? (
-        <MenuItem name="hideGrades" onSelect={props.onHideGrades}>
+        <MenuItem name="hideGrades" onSelect={props.onHideGrades} disabled={!allowManageGrades}>
           <Text>{I18n.t('Hide Grades')}</Text>
         </MenuItem>
       ) : (

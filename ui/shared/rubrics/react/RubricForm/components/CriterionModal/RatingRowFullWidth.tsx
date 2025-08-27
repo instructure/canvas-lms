@@ -45,7 +45,6 @@ export const RatingRowFullWidth = ({
   setPointsInputText,
   showRemoveButton,
   onRemove,
-  unassessed,
 }: RatingRowProps) => {
   return (
     <Flex>
@@ -71,29 +70,21 @@ export const RatingRowFullWidth = ({
                       </View>
                     </Flex.Item>
                   )}
-                  {unassessed ? (
-                    <Flex.Item>
-                      <RatingPointsInput
-                        index={index}
-                        isRange={criterionUseRange}
-                        pointsInputText={pointsInputText}
-                        rating={rating}
-                        ratingInputRefs={ratingInputRefs}
-                        onPointsBlur={onPointsBlur}
-                        setNewRating={(newNumber, textValue) => {
-                          setRatingForm('points', newNumber)
-                          setPointsInputText(textValue)
-                        }}
-                        shouldRenderLabel={false}
-                      />
-                    </Flex.Item>
-                  ) : (
-                    <Flex.Item margin="0 0 x-small 0">
-                      <View as="span" data-testid="rating-points-assessed">
-                        {rating.points}
-                      </View>
-                    </Flex.Item>
-                  )}
+                  <Flex.Item>
+                    <RatingPointsInput
+                      index={index}
+                      isRange={criterionUseRange}
+                      pointsInputText={pointsInputText}
+                      rating={rating}
+                      ratingInputRefs={ratingInputRefs}
+                      onPointsBlur={onPointsBlur}
+                      setNewRating={(newNumber, textValue) => {
+                        setRatingForm('points', newNumber)
+                        setPointsInputText(textValue)
+                      }}
+                      shouldRenderLabel={false}
+                    />
+                  </Flex.Item>
                 </Flex>
               </View>
             </Flex.Item>
@@ -107,7 +98,7 @@ export const RatingRowFullWidth = ({
             return (
               <div ref={provided.innerRef} {...provided.draggableProps}>
                 <Flex>
-                  <Flex.Item align="start" draggable={unassessed} data-testid="rating-drag-handle">
+                  <Flex.Item align="start" draggable data-testid="rating-drag-handle">
                     <View
                       as="div"
                       width="3rem"
@@ -140,23 +131,21 @@ export const RatingRowFullWidth = ({
                       />
                     </View>
                   </Flex.Item>
-                  {unassessed && (
-                    <Flex.Item align="start">
-                      <View as="div" width="2.375rem">
-                        {showRemoveButton && (
-                          <IconButton
-                            screenReaderLabel={I18n.t('Remove %{ratingName} Rating', {
-                              ratingName: rating.description,
-                            })}
-                            onClick={onRemove}
-                            data-testid="remove-rating"
-                          >
-                            <IconTrashLine />
-                          </IconButton>
-                        )}
-                      </View>
-                    </Flex.Item>
-                  )}
+                  <Flex.Item align="start">
+                    <View as="div" width="2.375rem">
+                      {showRemoveButton && (
+                        <IconButton
+                          screenReaderLabel={I18n.t('Remove %{ratingName} Rating', {
+                            ratingName: rating.description,
+                          })}
+                          onClick={onRemove}
+                          data-testid="remove-rating"
+                        >
+                          <IconTrashLine />
+                        </IconButton>
+                      )}
+                    </View>
+                  </Flex.Item>
                 </Flex>
               </div>
             )

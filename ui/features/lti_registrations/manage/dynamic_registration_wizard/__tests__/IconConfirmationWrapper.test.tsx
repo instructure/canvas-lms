@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {mockConfigWithPlacements, mockRegistration} from './helpers'
 import {createDynamicRegistrationOverlayStore} from '../DynamicRegistrationOverlayState'
 import {IconConfirmationWrapper} from '../components/IconConfirmationWrapper'
@@ -115,8 +114,13 @@ describe('IconConfirmation', () => {
     expect(input).toHaveValue(iconUrl)
   })
 
-  it('should render the default generated icon if no icon url is provided for the EditorButton, TopNavigation placements', () => {
-    const defaultIconPlacements = [LtiPlacements.EditorButton, LtiPlacements.TopNavigation]
+  it('should render the default generated icon if no icon url is provided for the EditorButton, TopNavigation, and Asset Processor* placements', () => {
+    const defaultIconPlacements = [
+      LtiPlacements.EditorButton,
+      LtiPlacements.TopNavigation,
+      LtiPlacements.ActivityAssetProcessor,
+      LtiPlacements.ActivityAssetProcessorContribution,
+    ]
     const config = mockConfigWithPlacements([
       ...defaultIconPlacements,
       LtiPlacements.GlobalNavigation,

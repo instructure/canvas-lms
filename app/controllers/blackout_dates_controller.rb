@@ -72,10 +72,7 @@ class BlackoutDatesController < ApplicationController
     return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
 
     @blackout_dates = @context.blackout_dates.order(:start_date)
-    respond_to do |format|
-      format.html
-      format.json { render json: @blackout_dates.as_json(include_root: false) }
-    end
+    render json: @blackout_dates.as_json(include_root: false)
   end
 
   # @API Get a single blackout date

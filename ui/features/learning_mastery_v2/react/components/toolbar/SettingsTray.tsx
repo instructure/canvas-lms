@@ -16,21 +16,49 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {CloseButton} from '@instructure/ui-buttons'
+import React, {useState} from 'react'
+import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {Tray} from '@instructure/ui-tray'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {GradebookSettings} from '../../utils/constants'
+import {SecondaryInfoSelector} from './SecondaryInfoSelector'
+import {DisplayFilterSelector} from './DisplayFilterSelector'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 
 export interface SettingsTrayProps {
   open: boolean
   onDismiss: () => void
+  gradebookSettings: GradebookSettings
+  setGradebookSettings: (settings: GradebookSettings) => void
 }
 
-export const SettingsTray: React.FC<SettingsTrayProps> = ({open, onDismiss}) => {
+export const SettingsTray: React.FC<SettingsTrayProps> = ({
+  open,
+  onDismiss,
+  gradebookSettings,
+  setGradebookSettings,
+}) => {
+  const [secondaryInfoDisplay, setSecondaryInfoDisplay] = useState(
+    gradebookSettings.secondaryInfoDisplay,
+  )
+  const [displayFilters, setDisplayFilters] = useState(gradebookSettings.displayFilters)
+
+  const resetForm = () => {
+    setSecondaryInfoDisplay(gradebookSettings.secondaryInfoDisplay)
+    setDisplayFilters(gradebookSettings.displayFilters)
+  }
+
+  const saveSettings = () => {
+    setGradebookSettings({
+      ...gradebookSettings,
+      secondaryInfoDisplay,
+      displayFilters,
+    })
+  }
+
   return (
     <Tray
       label={I18n.t('Settings Tray')}
@@ -52,7 +80,38 @@ export const SettingsTray: React.FC<SettingsTrayProps> = ({open, onDismiss}) => 
             data-testid="lmgb-close-settings-button"
           />
         </Flex>
-        <hr />
+        <hr style={{marginBottom: '0', marginTop: '16px'}} />
+      </Flex>
+      <Flex direction="column" padding="small medium" alignItems="stretch" gap="medium">
+        <SecondaryInfoSelector
+          value={secondaryInfoDisplay}
+          onChange={info => setSecondaryInfoDisplay(info)}
+        />
+        <DisplayFilterSelector
+          values={displayFilters}
+          onChange={filters => setDisplayFilters(filters)}
+        />
+        <Flex gap="small" alignItems="stretch" direction="column">
+          <Button
+            color="primary"
+            onClick={() => {
+              saveSettings()
+              onDismiss()
+            }}
+          >
+            {I18n.t('Apply')}
+          </Button>
+          <Button
+            withBackground={false}
+            onClick={() => {
+              resetForm()
+              onDismiss()
+            }}
+            themeOverride={{borderWidth: '0px'}}
+          >
+            {I18n.t('Cancel')}
+          </Button>
+        </Flex>
       </Flex>
     </Tray>
   )

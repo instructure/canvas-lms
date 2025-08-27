@@ -341,7 +341,12 @@ export default function DifferentiationTagTray(props: DifferentiationTagTrayProp
         onEditCategory={handleEditCategory}
         focusElRef={focusElRef}
         onDeleteFocusFallback={() =>
-          setFocusIndex((index >= 1 && paginatedCategories[index - 1]?.id) || -1)
+          index >= 1
+            ? setFocusIndex(paginatedCategories[index - 1]?.id || -1)
+            : (() => {
+                const el = document.querySelector('[role="dialog"] button')
+                if (el instanceof HTMLElement) el.focus()
+              })()
         }
       />
     ))

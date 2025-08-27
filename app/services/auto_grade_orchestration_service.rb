@@ -23,8 +23,9 @@ class CedarAIGraderError < StandardError; end
 class AutoGradeOrchestrationService
   MAX_ATTEMPTS = 3
 
-  def initialize(course:)
+  def initialize(course:, current_user:)
     @course = course
+    @current_user = current_user
   end
 
   def auto_grade_in_background(submission:)
@@ -85,7 +86,8 @@ class AutoGradeOrchestrationService
         assignment: assignment_text,
         essay:,
         rubric: relevant_rubric,
-        root_account_uuid:
+        root_account_uuid:,
+        current_user: @current_user
       ).call
 
       # Merge new grade data with existing data
@@ -128,7 +130,8 @@ class AutoGradeOrchestrationService
       grade_data_with_comments = CommentsService.new(
         assignment: assignment_text,
         grade_data: relevant_grade_data,
-        root_account_uuid:
+        root_account_uuid:,
+        current_user: @current_user
       ).call
 
       # Merge new grade data with existing data

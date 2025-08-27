@@ -25,12 +25,9 @@ class Loaders::SubmissionLtiAssetReportsStudentLoader < GraphQL::Batch::Loader
   include AssetProcessorStudentHelper
 
   def perform(submission_ids)
-    submission_ids.each do |submission_id|
-      submission = Submission.find_by(id: submission_id)
-      next fulfill(submission_id, nil) unless submission
-
+    Submission.where(id: submission_ids).find_each do |submission|
       reports = raw_asset_reports(submission:)
-      fulfill(submission_id, reports)
+      fulfill(submission.id, reports)
     end
   end
 end

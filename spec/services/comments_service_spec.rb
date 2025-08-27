@@ -24,6 +24,7 @@ require_relative "../../app/services/auto_grade_orchestration_service"
 RSpec.describe CommentsService, type: :service do
   let(:assignment) { "Write an essay about your favorite book." }
   let(:root_account_uuid) { "test-root-uuid" }
+  let(:current_user) { User.create!(name: "Test User") }
   let(:grade_data) do
     [
       {
@@ -47,17 +48,18 @@ RSpec.describe CommentsService, type: :service do
   before do
     stub_const("CedarClient", Class.new do
       def self.prompt(*)
-        [
+        res = [
           { "criterion" => "Content", "guidance" => "Add more specific examples to support your points." },
           { "criterion" => "Grammar", "guidance" => "Review your essay for subject-verb agreement and punctuation." }
         ].to_json
+        Struct.new(:response, keyword_init: true).new(response: res)
       end
     end)
   end
 
   describe "#call" do
     it "calls CedarClient and updates grade_data with comments" do
-      service = described_class.new(assignment:, grade_data: grade_data.deep_dup, root_account_uuid:)
+      service = described_class.new(assignment:, grade_data: grade_data.deep_dup, root_account_uuid:, current_user:)
       result = service.call
 
       expect(result[0]["comments"]).to eq("Add more specific examples to support your points.")
@@ -67,18 +69,18 @@ RSpec.describe CommentsService, type: :service do
     it "raises CedarAIGraderError on invalid JSON response" do
       stub_const("CedarClient", Class.new do
         def self.prompt(*)
-          "not-json"
+          Struct.new(:response, keyword_init: true).new(response: "not-json")
         end
       end)
 
-      service = described_class.new(assignment:, grade_data: grade_data.deep_dup, root_account_uuid:)
+      service = described_class.new(assignment:, grade_data: grade_data.deep_dup, root_account_uuid:, current_user:)
       expect { service.call }.to raise_error(CedarAIGraderError, /Invalid JSON response/)
     end
   end
 
   describe "#build_prompt" do
     it "includes assignment and list_of_reasonings in the prompt" do
-      service = described_class.new(assignment:, grade_data:, root_account_uuid:)
+      service = described_class.new(assignment:, grade_data:, root_account_uuid:, current_user:)
       prompt = service.build_prompt(list_of_reasonings: [{ "CRITERION" => "Content", "REASONING" => "Needs more detail." }])
       expect(prompt).to include("Write an essay about your favorite book.")
       expect(prompt).to include("Needs more detail.")

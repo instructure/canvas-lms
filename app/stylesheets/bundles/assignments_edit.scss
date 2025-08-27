@@ -109,6 +109,15 @@ div.form-column-right, div.overrides-column-right {
     }
   }
 
+  .allocation-grading-container {
+    padding: 0 !important;
+
+    label {
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+  }
+
   label:hover {
     background: #E7F4FF;
   }

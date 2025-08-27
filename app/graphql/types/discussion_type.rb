@@ -52,6 +52,7 @@ module Types
     implements Interfaces::TimestampInterface
     implements Interfaces::ModuleItemInterface
     implements Interfaces::LegacyIDInterface
+    implements Interfaces::AssignedDatesInterface
 
     include Rails.application.routes.url_helpers
     include Canvas::LockExplanation
@@ -455,12 +456,19 @@ module Types
     end
 
     def sort_order
-      object.sanitized_sort_order.to_sym
+      object.sort_order.to_sym
     end
 
     field :participant, Types::DiscussionParticipantType, null: true
     def participant
       object.participant(current_user) || object.update_or_create_participant(current_user:)
+    end
+
+    field :pinned_entries, [Types::DiscussionEntryType], null: true
+    def pinned_entries
+      return [] unless object.context.feature_enabled?(:discussion_pin_post)
+
+      object.pinned_entries
     end
   end
 end

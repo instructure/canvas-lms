@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {memo, useState, useLayoutEffect} from 'react'
+import React, {memo} from 'react'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import ModuleItemStudent from './ModuleItemStudent'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {validateModuleItemStudentRenderRequirements, LARGE_MODULE_THRESHOLD} from '../utils/utils'
+import {validateModuleItemStudentRenderRequirements} from '../utils/utils'
 import type {CompletionRequirement, ModuleItem, ModuleProgression} from '../utils/types'
 
 const I18n = createI18nScope('context_modules_v2')
@@ -37,9 +37,10 @@ export interface ModuleItemListStudentProps {
   completionRequirements?: CompletionRequirement[]
   requireSequentialProgress?: boolean
   progression?: ModuleProgression
-  isLoading: boolean
   error: any
+  isLoading?: boolean
   smallScreen?: boolean
+  isEmpty?: boolean
 }
 
 const ModuleItemListStudent: React.FC<ModuleItemListStudentProps> = ({
@@ -47,55 +48,31 @@ const ModuleItemListStudent: React.FC<ModuleItemListStudentProps> = ({
   completionRequirements,
   requireSequentialProgress,
   progression,
-  isLoading,
   error,
+  isLoading = false,
   smallScreen = false,
+  isEmpty,
 }) => {
-  const isLargeModule = moduleItems.length >= LARGE_MODULE_THRESHOLD
-  const [isSlowRendering, setIsSlowRendering] = useState(false)
-
-  // Detect slow rendering for large modules
-  useLayoutEffect(() => {
-    if (!isLoading && isLargeModule && moduleItems.length > 0) {
-      setIsSlowRendering(true)
-      const renderTimer = setTimeout(() => {
-        setIsSlowRendering(false)
-      }, 150) // Show spinner for 150ms during heavy rendering
-      return () => clearTimeout(renderTimer)
-    } else {
-      setIsSlowRendering(false)
-    }
-  }, [moduleItems.length, isLoading, isLargeModule])
   return (
     <View as="div" overflowX="hidden">
-      {isLoading || isSlowRendering ? (
+      {isLoading ? (
         <View as="div" textAlign="center" padding="medium">
           <Spinner
-            renderTitle={
-              isSlowRendering
-                ? I18n.t('Rendering %{count} module items...', {
-                    count: moduleItems.length,
-                  })
-                : I18n.t('Loading %{count} module items...', {
-                    count: moduleItems.length || 'module',
-                  })
-            }
+            renderTitle={I18n.t('Loading %{count} module items...', {
+              count: moduleItems.length || 'module',
+            })}
             size="small"
             margin="0 small 0 0"
           />
           <Text size="small" color="secondary">
-            {isSlowRendering
-              ? I18n.t('Rendering %{count} items...', {count: moduleItems.length})
-              : moduleItems.length > 0
-                ? I18n.t('Loading %{count} items...', {count: moduleItems.length})
-                : I18n.t('Loading module items...')}
+            {I18n.t('Loading %{count} items...', {count: moduleItems.length})}
           </Text>
         </View>
       ) : error ? (
         <View as="div" textAlign="center" padding="medium">
           <Text color="danger">{I18n.t('Error loading module items')}</Text>
         </View>
-      ) : moduleItems.length === 0 ? (
+      ) : moduleItems.length === 0 && isEmpty ? (
         <View as="div" textAlign="center" padding="medium">
           <Text>{I18n.t('No items in this module')}</Text>
         </View>

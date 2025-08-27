@@ -7864,6 +7864,7 @@ fa:
         course_visibility: "قابلیت مشاهده"
         custom_course_visibility: "سفارشی کردن"
         default_due_time: "زمان مقرر پیش فرض"
+        disable_csp: "سیاست امنیت محتوا را غیر فعال کنید. "
         enrollment_term_id: نیمسال
         enrollments_from_homeroom: "ثبت نام ها"
         friendly_name: "نام دوستانه"
@@ -24640,6 +24641,7 @@ fa:
       برای مشاهده شناسه سامانه اطلاعات دانشجویی کاربر، "اطلاعات سامانه اطلاعات دانشجو - مدیریت" یا "اطلاعات سامانه اطلاعات دانشجو - خواندنی" نیز باید
       فعال باشد. برای مشاهده شناسه یکپارچگی کاربر ،"اطلاعات سامانه اطلاعات دانشجو - مدیریت" نیز باید فعال باشد.
   today_76e10f9c: امروز
+  today_b7202098: امروز
   toggle_alignment_details_for_title_944f605: "جزئیات تطبیق را  برای %{title} تغییر دهید"
   toggle_course_card_color_overlays_b5b8137a: "تغییر پوشش رنگ کارت درس"
   toggle_editing_answer_text_as_html_9a93fe6: "تغییر ویرایش متن پاسخ به عنوان HTML"
@@ -25619,6 +25621,7 @@ fa:
   video_player_b371005: "پخش کننده فیلم"
   vietnam_84_e50a2a44: "ویتنام (+84)"
   vietnamese_e7a76583: ویتنامی
+  view_all_courses_1b4ea3e4: "مشاهده همه درس ها"
   view_all_e13bf0a6: "مشاهده همه"
   view_analytics_91a3b7a: "مشاهده تحلیل ها"
   view_analytics_data_in_tables_instead_of_graphs_8a33f536: "مشاهده داده های تحلیل ها به صورت جدول به جای نمودار"

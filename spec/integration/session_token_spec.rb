@@ -61,12 +61,12 @@ describe "session token" do
 
     token = SessionToken.new(@pseudonym.id)
     token.created_at = 1.day.ago
-    token.signature = Canvas::Security.hmac_sha1(token.signature_string)
     get "http://test1.instructure.com/?session_token=#{token}"
     expect(response).to be_redirect
     expect(response.location).to eq "http://test1.instructure.com/login"
 
     token = SessionToken.new(@pseudonym.id)
+    token.to_s # cache the signature
     token.pseudonym_id = @pseudonym.id - 1
     get "http://test1.instructure.com/?session_token=#{token}"
     expect(response).to be_redirect

@@ -64,6 +64,19 @@ describe('EditView', () => {
       .get('path:/api/v1/courses/1/lti_apps/launch_definitions', {
         tools: [],
       })
+      .post(/.*\/api\/graphql/, {
+        data: {
+          course: {
+            enrollmentsConnection: {
+              nodes: [],
+              pageInfo: {
+                hasNextPage: false,
+                endCursor: null,
+              },
+            },
+          },
+        },
+      })
       .get('*', 200) // Catch any other requests
   })
 

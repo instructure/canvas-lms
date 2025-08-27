@@ -120,12 +120,17 @@ describe('ToggleShowByView', function () {
   beforeEach(() => {
     fakeENV.setup()
     ENV.observed_student_ids = []
+    document.documentElement.setAttribute('lang', 'en')
+    if (!document.title) {
+      document.title = 'Test Page'
+    }
   })
 
   afterEach(() => {
     fakeENV.teardown()
     $('.ui-dialog').remove()
     $('ul[id^=ui-id-]').remove()
+    document.documentElement.removeAttribute('lang')
   })
 
   test('should be accessible', done => {

@@ -24,6 +24,7 @@ import {Reply} from './Reply'
 import {Like} from './Like'
 import {Expansion} from './Expansion'
 import {MarkAsRead} from './MarkAsRead'
+import {Restore} from './Restore'
 import {SpeedGraderNavigator} from './SpeedGraderNavigator'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
@@ -105,5 +106,6 @@ ThreadingToolbar.Like = Like
 ThreadingToolbar.Pin = Pin
 ThreadingToolbar.Expansion = Expansion
 ThreadingToolbar.MarkAsRead = MarkAsRead
+ThreadingToolbar.Restore = Restore
 
 export default ThreadingToolbar

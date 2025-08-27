@@ -237,6 +237,22 @@ module CanvasOutcomesHelper
     url
   end
 
+  def enqueue_rollup_calculation(course_id: nil, student_id: nil, outcome_id: nil)
+    raise ArgumentError, "Must provide at least course_id" unless course_id
+    return unless Account.site_admin.feature_enabled?(:outcomes_rollup_propagation)
+
+    if course_id && student_id
+      Outcomes::StudentOutcomeRollupCalculationService.calculate_for_student(
+        course_id:,
+        student_id:
+      )
+    else
+      Outcomes::StudentOutcomeRollupCalculationService.calculate_for_course(
+        course_id:
+      )
+    end
+  end
+
   private
 
   def artifact_type_lookup(artifact)

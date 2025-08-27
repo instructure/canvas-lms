@@ -16,17 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ContentItem, ContentItemType, FormType} from '../../../../types'
+import {AccessibilityResourceScan, ContentItem, FormType, ResourceType} from '../../../../types'
+import {getAsAccessibilityResourceScan} from '../../../../utils/apiData'
 
 // Base content item template for creating new items
-const createBaseItem = (
+const createBaseContentItem = (
   title: string,
   url: string,
   editUrl: string,
 ): Omit<ContentItem, 'issues'> => ({
   id: Math.floor(Math.random() * 1000),
   title,
-  type: ContentItemType.WikiPage,
+  type: ResourceType.WikiPage, // ContentItemType.WikiPage,
   url,
   editUrl,
   published: true,
@@ -34,13 +35,18 @@ const createBaseItem = (
   count: 1,
 })
 
+const createBaseScan = (
+  resourceName: string,
+  resourceUrl: string,
+): Omit<AccessibilityResourceScan, 'issues'> => {
+  return getAsAccessibilityResourceScan(
+    createBaseContentItem(resourceName, resourceUrl, `${resourceUrl}/edit`),
+  )
+}
+
 // Button Rule Mock
-export const buttonRuleItem: ContentItem = {
-  ...createBaseItem(
-    'Button Rule Test Page',
-    'http://test.com/button-page',
-    'http://test.com/button-page/edit',
-  ),
+export const buttonRuleItem: AccessibilityResourceScan = {
+  ...createBaseScan('Button Rule Test Page', 'http://test.com/button-page'),
   issues: [
     {
       id: 'button-issue-1',
@@ -59,12 +65,8 @@ export const buttonRuleItem: ContentItem = {
 }
 
 // Checkbox Text Input Rule Mock
-export const checkboxTextInputRuleItem: ContentItem = {
-  ...createBaseItem(
-    'Checkbox Text Input Test Page',
-    'http://test.com/checkbox-text-input-page',
-    'http://test.com/checkbox-text-input-page/edit',
-  ),
+export const checkboxTextInputRuleItem: AccessibilityResourceScan = {
+  ...createBaseScan('Checkbox Text Input Test Page', 'http://test.com/checkbox-text-input-page'),
   issues: [
     {
       id: 'checkbox-text-input-issue-1',
@@ -87,12 +89,8 @@ export const checkboxTextInputRuleItem: ContentItem = {
 }
 
 // Color Picker Rule Mock
-export const colorPickerRuleItem: ContentItem = {
-  ...createBaseItem(
-    'Color Picker Test Page',
-    'http://test.com/color-picker-page',
-    'http://test.com/color-picker-page/edit',
-  ),
+export const colorPickerRuleItem: AccessibilityResourceScan = {
+  ...createBaseScan('Color Picker Test Page', 'http://test.com/color-picker-page'),
   issues: [
     {
       id: 'color-picker-issue-1',
@@ -113,12 +111,8 @@ export const colorPickerRuleItem: ContentItem = {
 }
 
 // Radio Input Group Rule Mock
-export const radioInputGroupRuleItem: ContentItem = {
-  ...createBaseItem(
-    'Radio Input Group Test Page',
-    'http://test.com/radio-input-group-page',
-    'http://test.com/radio-input-group-page/edit',
-  ),
+export const radioInputGroupRuleItem: AccessibilityResourceScan = {
+  ...createBaseScan('Radio Input Group Test Page', 'http://test.com/radio-input-group-page'),
   issues: [
     {
       id: 'radio-input-group-issue-1',
@@ -140,12 +134,8 @@ export const radioInputGroupRuleItem: ContentItem = {
 }
 
 // Text Input Rule Mock
-export const textInputRuleItem: ContentItem = {
-  ...createBaseItem(
-    'Text Input Test Page',
-    'http://test.com/text-input-page',
-    'http://test.com/text-input-page/edit',
-  ),
+export const textInputRuleItem: AccessibilityResourceScan = {
+  ...createBaseScan('Text Input Test Page', 'http://test.com/text-input-page'),
   issues: [
     {
       id: 'text-input-issue-1',
@@ -165,13 +155,9 @@ export const textInputRuleItem: ContentItem = {
 }
 
 // Multi-issue item (unique to this file)
-export const multiIssueItem: ContentItem = {
-  ...createBaseItem(
-    'Multi Issue Test Page',
-    'http://test.com/multi-issue-page',
-    'http://test.com/multi-issue-page/edit',
-  ),
-  count: 2,
+export const multiIssueItem: AccessibilityResourceScan = {
+  ...createBaseScan('Multi Issue Test Page', 'http://test.com/multi-issue-page'),
+  issueCount: 2,
   issues: [
     {
       id: 'issue-1',

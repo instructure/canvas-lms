@@ -278,7 +278,7 @@ describe AuthenticationMethods do
       end
 
       it "finds a user by access token" do
-        token = AccessToken.create!(user: @user)
+        token = AccessToken.create!(user: @user, purpose: "Test Access Token")
         controller = setup_with_token(token)
 
         expect(controller.send(:load_user)).to eq @user
@@ -286,7 +286,7 @@ describe AuthenticationMethods do
       end
 
       it "sets {real_,}current_user from token" do
-        token = AccessToken.create!(user: @user, real_user: @real_user)
+        token = AccessToken.create!(user: @user, real_user: @real_user, purpose: "Test Access Token")
         controller = setup_with_token(token)
 
         expect(controller.send(:load_user)).to eq @user
@@ -295,7 +295,7 @@ describe AuthenticationMethods do
       end
 
       it "sets current_pseudonym" do
-        token = AccessToken.create!(user: @user)
+        token = AccessToken.create!(user: @user, purpose: "Test Access Token")
         controller = setup_with_token(token)
 
         expect(controller.send(:load_user)).to eq @user
@@ -304,7 +304,7 @@ describe AuthenticationMethods do
       end
 
       it "sets real current_pseudonym" do
-        token = AccessToken.create!(user: @user, real_user: @real_user)
+        token = AccessToken.create!(user: @user, real_user: @real_user, purpose: "Test Access Token")
         controller = setup_with_token(token)
 
         expect(controller.send(:load_user)).to eq @user
@@ -313,7 +313,7 @@ describe AuthenticationMethods do
       end
 
       it "marks the access token as used" do
-        token = AccessToken.create!(user: @user)
+        token = AccessToken.create!(user: @user, purpose: "Test Access Token")
         controller = setup_with_token(token)
 
         expect(controller.send(:load_user)).to eq @user
@@ -321,14 +321,14 @@ describe AuthenticationMethods do
       end
 
       it "raises RevokedAccessTokenError if the access token is revoked" do
-        token = AccessToken.create!(user: @user, workflow_state: "deleted")
+        token = AccessToken.create!(user: @user, workflow_state: "deleted", purpose: "Test Access Token")
         controller = setup_with_token(token)
 
         expect { controller.send(:load_user) }.to raise_error(AuthenticationMethods::RevokedAccessTokenError)
       end
 
       it "raises ExpiredAccessTokenError if the access token is expired" do
-        token = AccessToken.create!(user: @user, permanent_expires_at: 1.day.ago)
+        token = AccessToken.create!(user: @user, permanent_expires_at: 1.day.ago, purpose: "Test Access Token")
         controller = setup_with_token(token)
 
         expect { controller.send(:load_user) }.to raise_error(AuthenticationMethods::ExpiredAccessTokenError)
@@ -336,14 +336,14 @@ describe AuthenticationMethods do
 
       it "raises AccessTokenError if current_user and current_pseudonym are not set" do
         allow(SisPseudonym).to receive(:for).and_return(nil)
-        token = AccessToken.create!(user: @user)
+        token = AccessToken.create!(user: @user, purpose: "Test Access Token")
         controller = setup_with_token(token)
 
         expect { controller.send(:load_user) }.to raise_error(AuthenticationMethods::AccessTokenError)
       end
 
       it "accepts as_user_id on a masquerading token if masquerade matches" do
-        token = AccessToken.create!(user: @user, real_user: @real_user)
+        token = AccessToken.create!(user: @user, real_user: @real_user, purpose: "Test Access Token")
         controller = setup_with_token(token)
         controller.params[:as_user_id] = @user.id
 
@@ -355,7 +355,7 @@ describe AuthenticationMethods do
       it "rejects as_user_id on a masquerading token if masquerade does not match" do
         @other_user = @user
         user_with_pseudonym
-        token = AccessToken.create!(user: @user, real_user: @real_user)
+        token = AccessToken.create!(user: @user, real_user: @real_user, purpose: "Test Access Token")
         controller = setup_with_token(token)
         controller.params[:as_user_id] = @other_user.id
 
@@ -409,7 +409,7 @@ describe AuthenticationMethods do
 
   describe "#access_token_account" do
     let(:account) { Account.create! }
-    let(:dev_key) { DeveloperKey.create!(account:) }
+    let(:dev_key) { DeveloperKey.create!(account:, name: "Test Developer Key") }
     let(:access_token) { AccessToken.create!(developer_key: dev_key) }
     let(:request) { double(format: double(json?: false), host_with_port: "") }
     let(:controller) { mock_controller_class.new(request:, root_account: account) }

@@ -702,7 +702,7 @@ describe WikiPage do
 
         file_url = "/courses/#{some_other_course.id}/files/1"
         link_string = "<a href='#{file_url}'>link</a>"
-        page = course.wiki_pages.create!(title: "New", body: "<p>#{link_string}</p>", user: @user)
+        page = course.wiki_pages.create!(title: "New", body: "<p>#{link_string}</p>", user: @user, saving_user: @user)
         expect(page.body).to include(file_url)
       end
     end

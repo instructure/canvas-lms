@@ -89,6 +89,60 @@ describe('HeaderInputs', () => {
     )
   }
 
+  describe('when restrict_student_access feature is enabled', () => {
+    beforeAll(() => {
+      window.ENV.FEATURES ||= {}
+      window.ENV.FEATURES.restrict_student_access = true
+    })
+
+    afterAll(() => {
+      delete window.ENV.FEATURES.restrict_student_access
+    })
+
+    describe('when user is a teacher', () => {
+      beforeAll(() => {
+        window.ENV.current_user_has_teacher_enrollment = true
+      })
+
+      afterAll(() => {
+        delete window.ENV.current_user_has_teacher_enrollment
+      })
+
+      it('does not render checkbox for individual message to each recipient', () => {
+        jest.useFakeTimers()
+        const props = defaultProps({addressBookContainerOpen: true})
+        const {queryByText} = setup(props)
+        expect(queryByText('Send an individual message to each recipient')).not.toBeInTheDocument()
+      })
+    })
+
+    describe('when user is a student', () => {
+      beforeAll(() => {
+        window.ENV.current_user_roles = ['student']
+      })
+
+      afterAll(() => {
+        delete window.ENV.current_user_roles
+      })
+
+      it('does render checkbox for individual message to each recipient', () => {
+        jest.useFakeTimers()
+        const props = defaultProps({addressBookContainerOpen: true})
+        const {getByText} = setup(props)
+        expect(getByText('Send an individual message to each recipient')).toBeInTheDocument()
+      })
+    })
+  })
+
+  describe('when restrict_student_access feature is disabled', () => {
+    it('does render checkbox for individual message to each recipient', () => {
+      jest.useFakeTimers()
+      const props = defaultProps({addressBookContainerOpen: true})
+      const {getByText} = setup(props)
+      expect(getByText('Send an individual message to each recipient')).toBeInTheDocument()
+    })
+  })
+
   it('calls onSelectedIdsChange when using the Address Book component', async () => {
     jest.useFakeTimers()
     const props = defaultProps({addressBookContainerOpen: true})

@@ -147,10 +147,48 @@ const disableCheckbox = id => {
 }
 
 beforeEach(() => {
+  // Use fetchMock for REST API calls
   fetchMock.get(/\/api\/v1\/courses\/\d+\/lti_apps\/launch_definitions/, [])
   fetchMock.get(/\/api\/v1\/courses\/\d+\/assignments\/\d+/, [])
   fetchMock.get(/\/api\/v1\/courses\/\d+\/settings/, {})
   fetchMock.get(/\/api\/v1\/courses\/\d+\/sections/, [])
+
+  // Mock GraphQL endpoint with fetch-mock
+  fetchMock.post('http://localhost/api/graphql', (url, opts) => {
+    const body = JSON.parse(opts.body)
+
+    // Check if this is the Selective_Release_GetStudentsQuery
+    if (body.query && body.query.includes('Selective_Release_GetStudentsQuery')) {
+      return {
+        data: {
+          __typename: 'Query',
+          legacyNode: {
+            __typename: 'Course',
+            id: '1',
+            name: 'Test Course',
+            enrollmentsConnection: {
+              edges: [],
+            },
+          },
+        },
+      }
+    }
+
+    // Default response for any other GraphQL queries
+    return {
+      data: {
+        __typename: 'Query',
+        legacyNode: {
+          __typename: 'Course',
+          id: '1',
+          name: 'Test Course',
+          enrollmentsConnection: {
+            edges: [],
+          },
+        },
+      },
+    }
+  })
 })
 
 afterEach(() => {

@@ -929,6 +929,7 @@ class DiscussionTopicsController < ApplicationController
                DISCUSSION_CHECKPOINTS_ENABLED: @context.discussion_checkpoints_enabled?,
                DISCUSSION_DEFAULT_EXPAND_ENABLED: true, # this is to avoid a small p4 on release
                DISCUSSION_DEFAULT_SORT_ENABLED: true, # this is to avoid a small p4 on release
+               restore_discussion_entry: context.feature_enabled?(:restore_discussion_entry),
              })
       unless @locked
         InstStatsd::Statsd.distributed_increment("discussion_topic.visit.redesign")
@@ -1109,6 +1110,19 @@ class DiscussionTopicsController < ApplicationController
     add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
     add_crumb t(:insights_crumb, "Discussion Insights")
     @page_title = join_title("Discussion Insights", @topic.title)
+    @assignment_presenter = AssignmentPresenter.new(@topic.assignment)
+    @presenter = DiscussionTopicPresenter.new(@topic, @current_user)
+    speedgrader_url =
+      if @topic.for_assignment? && @presenter.allows_speed_grader? && @assignment_presenter.can_view_speed_grader_link?(@current_user)
+        named_context_url(
+          @topic.assignment.context,
+          :speed_grader_context_gradebook_url,
+          assignment_id: @topic.assignment.id,
+          student_id: ":student_id"
+        )
+      else
+        nil
+      end
     js_bundle :discussion_topic_insights
     js_env({
              course_id: params[:course_id] || @context.course&.id,
@@ -1116,6 +1130,8 @@ class DiscussionTopicsController < ApplicationController
              context_id: @context.id,
              discussion_topic_id: @topic.id,
              INSIGHTS_URL: context_url(@topic.context, :insights_context_discussion_topic_url, @topic),
+             discussion_ai_survey_link: Setting.get("discussion_ai_survey_link", "https://docs.google.com/forms/d/e/1FAIpQLSf6YbHitSwTemk5v1qf8lCFdgVdQvIHXQ16zhzo05qbrqctfA/viewform"),
+             SPEEDGRADER_URL_TEMPLATE: speedgrader_url,
            })
     render html: "<div id='discussion-insights-container'/>".html_safe, layout: true
   end

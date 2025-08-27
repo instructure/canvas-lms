@@ -23,16 +23,17 @@ module Loaders
       # This loader handles fetching group memberships for multiple users efficiently
       # and supports filtering by state, group state, and group course ID.
 
-      def self.for(filter: {})
+      def self.for(executing_user:, filter: {})
         # Create a consistent string key by sorting the filter hash entries
         key = filter.to_h.sort.map { |k, v| "#{k}:#{v}" }.join(";")
 
         @loaders ||= {}
-        @loaders[key] ||= new(filter:)
+        @loaders[key] ||= new(executing_user:, filter:)
       end
 
-      def initialize(filter: {})
+      def initialize(executing_user:, filter: {})
         super()
+        @executing_user = executing_user
         @filter = filter
       end
 
@@ -48,6 +49,12 @@ module Loaders
 
         scope = scope.where(workflow_state: @filter[:state]) if @filter[:state].present?
 
+        # Remove any group memberships the executing user should not see
+        scope = scope.preload(:group).filter do |membership|
+          group = membership.group
+          next group.grants_right?(@executing_user, :read)
+        end
+
         # Group results by user_id for efficient lookup
         memberships_by_user_id = scope.group_by(&:user_id)
 
@@ -55,6 +62,12 @@ module Loaders
         user_ids.each do |user_id|
           fulfill(user_id, memberships_by_user_id[user_id] || [])
         end
+      end
+
+      # This method is for testing to clear cached loaders
+      # Loaders can persist across multiple tests, so we need a way to reset them
+      def self.clear_cache
+        @loaders = {}
       end
     end
 

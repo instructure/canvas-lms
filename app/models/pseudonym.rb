@@ -20,12 +20,14 @@
 class ImpossibleCredentialsError < ArgumentError; end
 
 class Pseudonym < ActiveRecord::Base
-  self.ignored_columns += %w[auth_type]
+  self.ignored_columns += %w[auth_type login_attribute verification_token]
 
   # this field is used for audit logging.
   # if a request is deleting a pseudonym, it should set this value
   # before persisting the change.
   attr_writer :current_user
+
+  after_commit :expire_pseudonym_session_cache_if_password_changed
 
   include Workflow
   include SearchTermHelper
@@ -68,7 +70,6 @@ class Pseudonym < ActiveRecord::Base
             inclusion: { in: %w[administrative observer staff student student_other teacher] }
 
   before_save :set_password_changed
-  before_save :clear_login_attribute_if_needed
   before_validation :infer_defaults, :verify_unique_sis_user_id, :verify_unique_integration_id
   after_save :update_account_associations_if_account_changed
   has_a_broadcast_policy
@@ -85,7 +86,7 @@ class Pseudonym < ActiveRecord::Base
             length: { within: 1..MAX_UNIQUE_ID_LENGTH },
             uniqueness: {
               case_sensitive: false,
-              scope: %i[account_id workflow_state authentication_provider_id login_attribute],
+              scope: %i[account_id workflow_state authentication_provider_id],
               if: ->(p) { (p.unique_id_changed? || p.workflow_state_changed?) && p.active? }
             }
 
@@ -224,11 +225,6 @@ class Pseudonym < ActiveRecord::Base
     p.dispatch :pseudonym_registration_done
     p.to { communication_channel || user.communication_channel }
     p.whenever { @send_registration_done_notification }
-
-    p.dispatch :account_verification
-    p.to { communication_channel || user.communication_channel }
-    p.whenever { saved_change_to_verification_token? }
-    p.data { { from_host: HostUrl.context_host(account) } }
   end
 
   def update_account_associations_if_account_changed
@@ -265,28 +261,6 @@ class Pseudonym < ActiveRecord::Base
     @send_confirmation = true
     save!
     @send_confirmation = false
-  end
-
-  def begin_login_attribute_migration!(unique_ids)
-    self.unique_ids = unique_ids
-    if verification_token.present? && updated_at > 5.minutes.ago
-      verification_token_will_change! # force email to be resent
-    else
-      self.verification_token = CanvasSlug.generate(nil, 6)
-    end
-    save!
-  end
-
-  # supply either the verification code emailed to the user
-  # or an admin user who has permission to update the pseudonym
-  def migrate_login_attribute(code: nil, admin_user: nil)
-    return false unless verification_token.present?
-    return false unless code == verification_token || grants_right?(admin_user, :update)
-
-    login_attribute = authentication_provider&.login_attribute
-    return false unless unique_ids.key?(login_attribute)
-
-    update!(unique_id: unique_ids[login_attribute])
   end
 
   scope :by_unique_id, lambda { |unique_id|
@@ -329,21 +303,11 @@ class Pseudonym < ActiveRecord::Base
     scope = scope.where(authentication_provider_id: filter)
     scope = scope.order("authentication_provider_id NULLS LAST") unless filter == auth_provider
 
-    if unique_ids.is_a?(Hash)
-      login_attribute = auth_provider.login_attribute
-      unique_id = unique_ids[login_attribute]
-      # form this query to allow NULL login_attribute on the pseudonym, if it
-      # hasn't been populated yet (i.e. the backfill is not yet complete)
-      scope = scope.by_unique_id(unique_id)
-                   .where(login_attribute: [login_attribute, nil])
-                   .order("login_attribute NULLS LAST")
-    else
-      scope = scope.by_unique_id(unique_ids)
-    end
+    unique_ids = unique_ids[auth_provider.login_attribute] if unique_ids.is_a?(Hash)
+    scope = scope.by_unique_id(unique_ids)
 
     result = scope.take
     if result && unique_ids.is_a?(Hash)
-      result.login_attribute ||= login_attribute
       result.unique_ids = unique_ids
       begin
         result.save! if result.changed?
@@ -367,10 +331,6 @@ class Pseudonym < ActiveRecord::Base
 
   def set_password_changed
     @password_changed = password && password_confirmation == password
-  end
-
-  def clear_login_attribute_if_needed
-    self.login_attribute = nil if authentication_provider_id.nil? && will_save_change_to_authentication_provider_id?
   end
 
   def password=(new_pass)
@@ -457,11 +417,10 @@ class Pseudonym < ActiveRecord::Base
       errors.add(:unique_id, "not_email")
       throw :abort
     end
-    self.login_attribute ||= authentication_provider&.login_attribute_for_pseudonyms if new_record?
 
     unless deleted?
       shard.activate do
-        scope = Pseudonym.active.by_unique_id(unique_id).where(account_id:, login_attribute:)
+        scope = Pseudonym.active.by_unique_id(unique_id).where(account_id:)
         scope = scope.where.not(id: self) unless new_record?
         scope = if authentication_provider.nil?
                   scope.left_joins(:authentication_provider)
@@ -889,5 +848,26 @@ class Pseudonym < ActiveRecord::Base
 
   def self.expire_oidc_session(logout_token, _request)
     Canvas.redis.set(oidc_session_key(logout_token["iss"], logout_token["sub"], logout_token["sid"]), true, ex: CAS_TICKET_TTL)
+  end
+
+  def self.expire_cache(pseudonym_global_id)
+    Shard.shard_for(pseudonym_global_id).activate do
+      Rails.cache.delete(cache_key_for(pseudonym_global_id))
+    end
+  end
+
+  def self.cache_key_for(pseudonym_global_id)
+    ["pseudonym_session", pseudonym_global_id].cache_key
+  end
+
+  private
+
+  # invalidate session cache immediately when password changes to prevent
+  # login redirects; without this, stale cache persists for ~5 seconds,
+  # potentially causing authentication failures during that time
+  def expire_pseudonym_session_cache_if_password_changed
+    return unless saved_change_to_crypted_password?
+
+    self.class.expire_cache(global_id)
   end
 end

@@ -72,10 +72,6 @@ class Login::OAuthBaseController < ApplicationController
     end
 
     pseudonym = @aac.account.pseudonyms.for_auth_configuration(unique_ids, @aac)
-    if !pseudonym && need_email_verification?(unique_ids, @aac)
-      increment_statsd(:failure, reason: :need_email_verification)
-      return
-    end
 
     # Apply any authentication-provider-specific validations on the found pseudonym. This validation needs to happen
     # before we apply any federated attributes so that we do not update the user and pseudonym if the validation

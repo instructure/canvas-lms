@@ -36,7 +36,7 @@ describe "user_content post processing" do
 
   def create_wiki_page_with_content(page_title, page_content)
     @root_folder = Folder.root_folders(@course).first
-    @course.wiki_pages.create!(title: page_title, body: page_content)
+    @course.wiki_pages.create!(title: page_title, body: page_content, saving_user: @teacher)
   end
 
   def wait_for_loading_image(&)

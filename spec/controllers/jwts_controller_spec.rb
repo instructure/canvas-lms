@@ -64,7 +64,7 @@ describe JwtsController do
       it "generates a token that includes the root account uuid" do
         root_account_uuid = LoadAccount.default_domain_root_account.uuid
         pseudonym(admin_user)
-        access_token = admin_user.access_tokens.create!.full_token
+        access_token = admin_user.access_tokens.create!(purpose: "test").full_token
         request.headers["Authorization"] = "Bearer #{access_token}"
         post "create", format: "json"
         jwt = translate_token.call(response)
@@ -101,7 +101,7 @@ describe JwtsController do
 
         before do
           pseudonym(admin_user)
-          access_token = admin_user.access_tokens.create!.full_token
+          access_token = admin_user.access_tokens.create!(purpose: "test").full_token
           admin_user.access_tokens.first.developer_key.update!(allowed_audiences: [allowed_audience])
           request.headers["Authorization"] = "Bearer #{access_token}"
         end
@@ -341,7 +341,7 @@ describe JwtsController do
 
       context "calling user cannot refresh for another user" do
         before do
-          access_token = other_user.access_tokens.create!.full_token
+          access_token = other_user.access_tokens.create!(purpose: "test").full_token
           request.headers["Authorization"] = "Bearer #{access_token}"
           post "refresh", params: { jwt: "testjwt" }, format: "json"
         end
@@ -355,7 +355,7 @@ describe JwtsController do
       context "calling user is able to refresh for another user" do
         before do
           pseudonym(admin_user)
-          access_token = admin_user.access_tokens.create!.full_token
+          access_token = admin_user.access_tokens.create!(purpose: "test").full_token
           admin_user.access_tokens.first.developer_key.update!(internal_service: true)
           request.headers["Authorization"] = "Bearer #{access_token}"
           expect(CanvasSecurity::ServicesJwt).to receive(:refresh_for_user)
@@ -379,7 +379,7 @@ describe JwtsController do
       context "the developer key of the calling user is not an internal service key" do
         before do
           pseudonym(admin_user)
-          access_token = admin_user.access_tokens.create!.full_token
+          access_token = admin_user.access_tokens.create!(purpose: "test").full_token
           admin_user.access_tokens.first.developer_key.update!(internal_service: false)
           request.headers["Authorization"] = "Bearer #{access_token}"
 
@@ -396,7 +396,7 @@ describe JwtsController do
         before do
           allow(CanvasSecurity::ServicesJwt).to receive(:decrypt).and_raise(JSON::JWE::DecryptionFailed)
           pseudonym(admin_user)
-          access_token = admin_user.access_tokens.create!.full_token
+          access_token = admin_user.access_tokens.create!(purpose: "test").full_token
           admin_user.access_tokens.first.developer_key.update!(internal_service: true)
           request.headers["Authorization"] = "Bearer #{access_token}"
 

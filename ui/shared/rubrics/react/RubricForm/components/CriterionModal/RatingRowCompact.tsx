@@ -49,7 +49,6 @@ export const RatingRowCompact = ({
   setPointsInputText,
   showRemoveButton,
   onRemove,
-  unassessed,
   isLastIndex,
   handleMoveRating,
 }: RatingRowCompactProps) => {
@@ -68,38 +67,32 @@ export const RatingRowCompact = ({
         </Flex.Item>
         {!hidePoints && (
           <Flex.Item shouldGrow shouldShrink>
-            {unassessed ? (
-              <View as="div" display="inline-block">
-                {criterionUseRange && (
-                  <View
-                    as="span"
-                    data-testid="range-start"
-                    display="inline-block"
-                    margin="medium small 0"
-                    themeOverride={{marginMedium: '2rem'}}
-                  >
-                    {rangeStart ? I18n.t('%{rangeStart} to ', {rangeStart}) : `--`}
-                  </View>
-                )}
-                <RatingPointsInput
-                  index={index}
-                  isRange={criterionUseRange}
-                  pointsInputText={pointsInputText}
-                  rating={rating}
-                  ratingInputRefs={ratingInputRefs}
-                  onPointsBlur={onPointsBlur}
-                  setNewRating={(newNumber, textValue) => {
-                    setRatingForm('points', newNumber)
-                    setPointsInputText(textValue)
-                  }}
-                  shouldRenderLabel={true}
-                />
-              </View>
-            ) : (
-              <View as="span" data-testid="rating-points-assessed">
-                {rating.points}
-              </View>
-            )}
+            <View as="div" display="inline-block">
+              {criterionUseRange && (
+                <View
+                  as="span"
+                  data-testid="range-start"
+                  display="inline-block"
+                  margin="medium small 0"
+                  themeOverride={{marginMedium: '2rem'}}
+                >
+                  {rangeStart ? I18n.t('%{rangeStart} to ', {rangeStart}) : `--`}
+                </View>
+              )}
+              <RatingPointsInput
+                index={index}
+                isRange={criterionUseRange}
+                pointsInputText={pointsInputText}
+                rating={rating}
+                ratingInputRefs={ratingInputRefs}
+                onPointsBlur={onPointsBlur}
+                setNewRating={(newNumber, textValue) => {
+                  setRatingForm('points', newNumber)
+                  setPointsInputText(textValue)
+                }}
+                shouldRenderLabel={true}
+              />
+            </View>
           </Flex.Item>
         )}
         <Flex.Item align="end">

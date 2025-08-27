@@ -16,17 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+export interface HasId {
+  id: number
+}
+
 export enum ContentItemType {
   WikiPage = 'Page',
   Assignment = 'Assignment',
   Attachment = 'attachment',
 }
 
-export const ContentTypeToKey = {
+/* export const ContentTypeToKey = {
   [ContentItemType.WikiPage]: 'pages',
   [ContentItemType.Assignment]: 'assignments',
   [ContentItemType.Attachment]: 'attachments',
-} as const
+} as const */
 
 export enum FormType {
   TextInput = 'textinput',
@@ -55,6 +59,38 @@ export interface IssueForm {
   inputMaxLength?: number
 }
 
+export enum ScanWorkflowState {
+  Queued = 'queued',
+  InProgress = 'in_progress',
+  Completed = 'completed',
+  Failed = 'failed',
+}
+
+export enum ResourceWorkflowState {
+  Unpublished = 'unpublished',
+  Published = 'published',
+}
+
+export enum ResourceType {
+  WikiPage = 'WikiPage',
+  Assignment = 'Assignment',
+  Attachment = 'Attachment',
+}
+
+export interface AccessibilityResourceScan extends HasId {
+  id: number
+  resourceId: number
+  resourceType: ResourceType
+  resourceName: string
+  resourceWorkflowState: ResourceWorkflowState
+  resourceUpdatedAt: string
+  resourceUrl: string
+  workflowState: ScanWorkflowState
+  errorMessage?: string
+  issueCount: number
+  issues?: AccessibilityIssue[]
+}
+
 export interface AccessibilityIssue {
   id: string
   ruleId: string
@@ -75,9 +111,9 @@ export interface AccessibilityData {
   accessibilityScanDisabled?: boolean
 }
 
-export interface ContentItem {
+export interface ContentItem extends HasId {
   id: number
-  type: ContentItemType
+  type: ResourceType // Was ContentItemType
   title: string
   published: boolean
   updatedAt: string
@@ -86,21 +122,6 @@ export interface ContentItem {
   editUrl?: string
   issues?: AccessibilityIssue[]
   severity?: Severity
-}
-
-/**
- * This can be used to display content items in a table or list format.
- * It includes only the necessary fields for display purposes.
- */
-export interface ContentItemForDisplay {
-  id: number
-  type: ContentItemType
-  title: string
-  published: boolean
-  updatedAt: string
-  count: number
-  url: string
-  editUrl?: string
 }
 
 export interface PreviewResponse {
@@ -132,4 +153,19 @@ export type ContrastData = {
 
 export type GenerateResponse = {
   value?: string
+}
+
+export type Filters = {
+  ruleTypes?: string[]
+  artifactTypes?: string[]
+  workflowStates?: string[]
+  fromDate?: Date | null
+  toDate?: Date | null
+}
+
+export type FilterDateKeys = 'fromDate' | 'toDate'
+
+export type ParsedFilters = Omit<Partial<Filters>, FilterDateKeys> & {
+  fromDate?: string
+  toDate?: string
 }

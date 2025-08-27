@@ -30,8 +30,8 @@ class TermsOfServiceContent < ActiveRecord::Base
   before_save :set_terms_updated_at
   after_save :clear_cache
 
-  delegate :root_account, to: :account
-  delegate :root_account_id, to: :account
+  delegate :root_account, to: :account, allow_nil: true
+  delegate :root_account_id, to: :account, allow_nil: true
 
   include LinkedAttachmentHandler
 

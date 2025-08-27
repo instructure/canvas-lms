@@ -28,11 +28,11 @@ import {
   AccessibilityCheckerContext,
   type AccessibilityCheckerContextType,
 } from '../../../../contexts/AccessibilityCheckerContext'
-import React from 'react'
+import {getAsAccessibilityResourceScan} from '../../../../utils/apiData'
 
 // Create a fully typed mock context
 const mockContextValue: AccessibilityCheckerContextType = {
-  selectedItem: {
+  selectedItem: getAsAccessibilityResourceScan({
     id: 123,
     type: 'Page' as any, // Using string literal that matches ContentItemType.WikiPage
     title: 'Mock Page',
@@ -41,7 +41,7 @@ const mockContextValue: AccessibilityCheckerContextType = {
     count: 0,
     url: 'http://example.com',
     editUrl: 'http://example.com/edit',
-  },
+  }),
   setSelectedItem: jest.fn(),
   isTrayOpen: false,
   setIsTrayOpen: jest.fn(),
@@ -228,10 +228,8 @@ describe('CheckboxTextInput', () => {
       },
     }
 
-    // Mock console.error to prevent test output pollution
-    const consoleSpy = jest.fn()
-    const originalConsoleError = console.error
-    console.error = consoleSpy
+    // Mock console.error to suppress expected error output
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
 
     // Mock API failure
     ;(doFetchApi as jest.Mock).mockImplementation(options => {
@@ -251,16 +249,22 @@ describe('CheckboxTextInput', () => {
     const generateButton = screen.getByText('Generate Alt Text')
     fireEvent.click(generateButton)
 
-    // Wait for the async operation to complete
+    // Verify loading indicator appears
+    expect(screen.getByText('Generating...')).toBeInTheDocument()
+
+    // Wait for the loading state to be cleared after the error
     await waitFor(() => {
-      expect(consoleSpy).toHaveBeenCalledWith('Error during generation:', expect.any(Error))
+      expect(screen.queryByText('Generating...')).not.toBeInTheDocument()
     })
 
-    // Check that loading state is cleared
-    expect(screen.queryByText('Generating...')).not.toBeInTheDocument()
+    // Verify that console.error was called with the expected error
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Error generating text input:', expect.any(Error))
 
-    // Restore the original console.error
-    console.error = originalConsoleError
+    // Verify that onChangeValue was not called (since the API failed)
+    expect(defaultProps.onChangeValue).not.toHaveBeenCalled()
+
+    // Restore console.error
+    consoleErrorSpy.mockRestore()
   })
 
   it('does not call onReload on initial mount', () => {

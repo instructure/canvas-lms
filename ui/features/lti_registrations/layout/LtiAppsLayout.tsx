@@ -27,13 +27,12 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Text} from '@instructure/ui-text'
 import {Outlet, useMatch, useNavigate} from 'react-router-dom'
 import {openRegistrationWizard} from '../manage/registration_wizard/RegistrationWizardModalState'
-import {refreshRegistrations} from '../manage/pages/manage/ManagePageLoadingState'
 import {useMedia} from 'react-use'
 import {View} from '@instructure/ui-view'
-import {Pill} from '@instructure/ui-pill'
 import {LtiRegistrationsTab} from './constants'
 import {isLtiRegistrationsDiscoverEnabled} from '../discover/utils'
 import {isLtiRegistrationsUsageEnabled} from '../monitor/utils'
+import {refreshRegistrations} from '../manage/api/registrations'
 
 const I18n = createI18nScope('lti_registrations')
 

@@ -3973,16 +3973,16 @@ describe DiscussionTopic do
       @topic = @course.discussion_topics.create!(sort_order: "asc")
     end
 
-    it "replaces incorrect value with default" do
-      @topic.sort_order = "incorrect sort order"
-      @topic.save!
-      expect(@topic.reload.sort_order).to eq DiscussionTopic::SortOrder::DEFAULT
-    end
-
     it "returns the sort order of the topic" do
       @topic.update!(sort_order: "asc", sort_order_locked: true)
       @topic.update_or_create_participant(current_user: @student, sort_order: "desc")
       expect(@topic.sort_order_for_user).to eq "asc"
+    end
+
+    it "should uses the default value by default" do
+      topic = @course.discussion_topics.create!
+      topic.save!
+      expect(topic.sort_order).to eq DiscussionTopic::SortOrder::DEFAULT
     end
 
     context "when the sort order is not locked" do

@@ -43,6 +43,8 @@ class CareerController < ApplicationController
     remote_env(canvas_career_config: config.public_app_config(request)) if @domain_root_account.feature_enabled?(:horizon_injected_config)
     deferred_js_bundle(:canvas_career)
 
+    @include_masquerade_layout = true
+
     respond_to do |format|
       format.html { render html: "", layout: "bare" }
     end

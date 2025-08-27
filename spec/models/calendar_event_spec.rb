@@ -251,7 +251,7 @@ describe CalendarEvent do
         double_testing_with_disable_adding_uuid_verifier_in_api_ff do
           it "does not add verifiers to files unless course or attachment is public" do
             html = %(<div><a href="/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1">here</a></div>)
-            calendar_event_model(start_at: "Sep 3 2008 12:00am", description: html)
+            calendar_event_model(start_at: "Sep 3 2008 12:00am", description: html, saving_user: @teacher)
             ev = @event.to_ics(in_own_calendar: false)
             expect(ev.description).to_not include("verifier")
 
@@ -1090,6 +1090,7 @@ describe CalendarEvent do
                                              { start_at: "2012-01-02 12:00:00", end_at: "2012-01-02 13:00:00", context_code: s2.asset_string },
                                            ]
         e1.updating_user = @user
+        e1.saving_user = @user
         e1.save!
         e1.child_event_data = [
           { start_at: "2012-01-01 12:00:00", end_at: "2012-01-01 13:00:00", context_code: @course.default_section.asset_string },

@@ -120,8 +120,13 @@ export default function FullBatchDropdown(props: Props) {
   }
 
   const matchValue = (terms: Term[]) => {
-    // an option matching user input exists
-    if (terms.length >= 1) {
+    const matchesSelected = terms.some(
+      term => term.name === termName && term.id === selectedOption?.id,
+    )
+    if (matchesSelected) {
+      // stick with the selected option; do nothing
+      return
+    } else if (terms.length >= 1) {
       const onlyOption = terms[0]
       // automatically select the matching option
       setTermName(onlyOption.name)

@@ -17,7 +17,7 @@
  */
 
 import {PostMessage} from '../PostMessage'
-import React, {useState} from 'react'
+import React, {useCallback, useState} from 'react'
 import {render, screen, act, waitFor, cleanup} from '@testing-library/react'
 import {DiscussionManagerUtilityContext, SearchContext} from '../../../utils/constants'
 import {User} from '../../../../graphql/User'
@@ -74,6 +74,23 @@ const setupWithTranslationLanguageSelected = (
     const initSet = new Set()
     initSet.add(entryId)
     const [entryTranslatingSet, setEntryTranslatingSet] = useState(initSet)
+    const setEntryTranslating = useCallback(() => {
+      const newSet = new Set(entryTranslatingSet)
+      if (loading) {
+        newSet.add(entryId)
+      } else {
+        newSet.delete(entryId)
+      }
+
+      setEntryTranslatingSet(newSet)
+      // This is just a mock to be able to mock the loading behavior.
+      // If we include the correct dependencies, we get into an infinite render loop.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
+    const enqueueTranslation = useCallback(jobFn => {
+      jobFn()
+    }, [])
 
     return (
       <DiscussionManagerUtilityContext.Provider
@@ -83,16 +100,8 @@ const setupWithTranslationLanguageSelected = (
           },
           translateTargetLanguage,
           entryTranslatingSet,
-          setEntryTranslating: () => {
-            const newSet = new Set(entryTranslatingSet)
-            if (loading) {
-              newSet.add(entryId)
-            } else {
-              newSet.delete(entryId)
-            }
-
-            setEntryTranslatingSet(newSet)
-          },
+          setEntryTranslating,
+          enqueueTranslation,
         }}
       >
         <SearchContext.Provider value={{searchTerm}}>{children}</SearchContext.Provider>

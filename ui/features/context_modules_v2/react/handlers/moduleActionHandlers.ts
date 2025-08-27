@@ -20,6 +20,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import type {QueryClient} from '@tanstack/react-query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {MODULE_ITEMS, MODULES} from '../utils/constants'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -28,8 +29,9 @@ export const handlePublishComplete = (
   moduleId: string,
   courseId: string,
 ) => {
-  queryClient.invalidateQueries({queryKey: ['modules', courseId || '']})
-  queryClient.invalidateQueries({queryKey: ['moduleItems', moduleId || '']})
+  queryClient.invalidateQueries({queryKey: [MODULES, courseId || '']})
+  queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId || '']})
+  queryClient.invalidateQueries({queryKey: ['MODULE_ITEMS_ALL', moduleId || '']})
 }
 
 export const handleDelete = (
@@ -50,7 +52,7 @@ export const handleDelete = (
             name: name,
           }),
         )
-        queryClient.invalidateQueries({queryKey: ['modules', courseId || '']})
+        queryClient.invalidateQueries({queryKey: [MODULES, courseId || '']})
       })
       .catch(() => {
         showFlashError(I18n.t('Failed to remove module'))
@@ -78,7 +80,9 @@ export const handleDuplicate = (
           name: name,
         }),
       )
-      queryClient.invalidateQueries({queryKey: ['modules', courseId || '']})
+      queryClient.invalidateQueries({queryKey: [MODULES, courseId || '']})
+      queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, id]})
+      queryClient.invalidateQueries({queryKey: ['MODULE_ITEMS_ALL', id]})
     })
     .catch(() => {
       showFlashError(I18n.t('Failed to duplicate module'))

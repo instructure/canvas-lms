@@ -150,17 +150,9 @@ describe OutcomesController do
 
     context "outcomes_friendly_description" do
       it "returns true if outcomes_friendly_description feature flag is enabled" do
-        Account.site_admin.enable_feature!(:outcomes_friendly_description)
         user_session(@admin)
         get "index", params: { account_id: @account.id }
         expect(assigns[:js_env][:OUTCOMES_FRIENDLY_DESCRIPTION]).to be true
-      end
-
-      it "returns false if outcomes_friendly_description feature flag is disabled" do
-        Account.site_admin.disable_feature!(:outcomes_friendly_description)
-        user_session(@admin)
-        get "index", params: { account_id: @account.id }
-        expect(assigns[:js_env][:OUTCOMES_FRIENDLY_DESCRIPTION]).to be false
       end
     end
 

@@ -38,19 +38,37 @@ const HelpTray = () => {
 
   return (
     <Tray
+      data-testid="help-tray"
+      id="helpTray"
       label={I18n.t('%{helpLinkText} Menu', {helpLinkText: helpLink?.text})}
       onDismiss={closeHelpTray}
       open={isHelpTrayOpen}
       placement="start"
       shouldCloseOnDocumentClick={true}
-      id="helpTray"
+      size="regular"
     >
       <View as="div" padding="medium">
         <Flex direction="column" gap="medium">
           <Flex alignItems="center" justifyItems="space-between">
-            <Flex.Item>{helpLink?.text && <Heading>{helpLink.text}</Heading>}</Flex.Item>
+            {helpLink?.text && (
+              <Flex.Item padding="0 space36 0 0">
+                <Heading>
+                  <span
+                    style={{
+                      overflowWrap: 'anywhere',
+                      wordBreak: 'break-word',
+                      hyphens: 'auto',
+                    }}
+                  >
+                    {helpLink.text}
+                  </span>
+                </Heading>
+              </Flex.Item>
+            )}
+
             <Flex.Item>
               <CloseButton
+                data-testid="close-help-tray-button"
                 offset="medium"
                 onClick={closeHelpTray}
                 placement="end"

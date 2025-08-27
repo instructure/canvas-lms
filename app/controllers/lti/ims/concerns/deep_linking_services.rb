@@ -144,7 +144,7 @@ module Lti::IMS::Concerns
 
       def verified_jwt_using_fetched_jwks_url
         jwk_set =
-          begin
+          InstrumentTLSCiphers.without_tls_metrics do
             JSON.parse(CanvasHttp.get(public_jwk_url).body)
           rescue JSON::ParserError, *CanvasHttp::ALL_HTTP_ERRORS => e
             errors.add(:jwt, "Fetching JWK from public_jwk_url failed")

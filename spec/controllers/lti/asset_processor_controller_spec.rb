@@ -161,6 +161,35 @@ describe Lti::AssetProcessorController do
         end
       end
     end
+
+    context "when assignment uses anonymous grading" do
+      let(:assignment) { assignment_model(course:, submission_types: "online_upload", anonymous_grading: true) }
+      let(:submission) do
+        assignment.submit_homework(student, submission_type: "online_upload", attachments: [attachment])
+      end
+      let(:anonymous_id) { submission.anonymous_id }
+      let(:params) { { asset_processor_id: asset_processor.id, student_id: "anonymous:#{anonymous_id}", attempt: } }
+
+      before do
+        user_session(teacher)
+      end
+
+      it "processes anonymous student ID and returns success" do
+        expect(Lti::AssetProcessorNotifier).to receive(:notify_asset_processors).with(
+          submission,
+          asset_processor
+        )
+
+        post(:resubmit_notice, params:)
+        expect(response).to have_http_status(:no_content)
+      end
+
+      it "returns not found for invalid anonymous_id" do
+        invalid_params = { asset_processor_id: asset_processor.id, student_id: "anonymous:invalid_id", attempt: }
+        post(:resubmit_notice, params: invalid_params)
+        expect(response).to have_http_status(:not_found)
+      end
+    end
   end
 
   describe "helper methods" do
@@ -197,11 +226,26 @@ describe Lti::AssetProcessorController do
         controller.params = params
         expect(controller.send(:student).id).to eq(student.id)
       end
+
+      context "with anonymous student ID" do
+        let(:anonymous_params) { { asset_processor_id: asset_processor.id, student_id: "anonymous:#{submission.anonymous_id}" } }
+
+        it "finds and returns the student using anonymous_id" do
+          controller.params = anonymous_params
+          expect(controller.send(:student).id).to eq(student.id)
+        end
+      end
     end
 
     describe "#submission" do
       it "returns the submission for the student" do
         controller.params = params
+        expect(controller.send(:submission)).to eq(submission)
+      end
+
+      it "returns the submission for anonymous student ID" do
+        anonymous_params = { asset_processor_id: asset_processor.id, student_id: "anonymous:#{submission.anonymous_id}" }
+        controller.params = anonymous_params
         expect(controller.send(:submission)).to eq(submission)
       end
     end

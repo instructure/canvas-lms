@@ -137,7 +137,7 @@ describe AuthenticationMethods::InstAccessToken do
         end
 
         context "and the header is standard access token string" do
-          let(:authorization) { "Bearer #{AccessToken.create!(user: service_user).full_token}" }
+          let(:authorization) { "Bearer #{AccessToken.create!(user: service_user, purpose: "Test Access Token").full_token}" }
 
           it_behaves_like "contexts that do not return a tag identifier"
         end
@@ -252,7 +252,7 @@ describe AuthenticationMethods::InstAccessToken do
         end
 
         context "and the header is standard access token string" do
-          let(:authorization) { "Bearer #{AccessToken.create!(user: service_user).full_token}" }
+          let(:authorization) { "Bearer #{AccessToken.create!(user: service_user, purpose: "Test Access Token").full_token}" }
 
           it_behaves_like "contexts that do not block"
         end

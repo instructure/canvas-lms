@@ -16,16 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 import ModuleItemActionMenu from '../ModuleItemActionMenu'
+import type {ModuleItemContent} from '../../utils/types'
 
-const setUp = (itemType: string = 'Assignment') => {
+const setUp = (itemType: string = 'Assignment', content: ModuleItemContent = {}) => {
   const container = render(
     <ContextModuleProvider {...contextModuleDefaultProps}>
       <ModuleItemActionMenu
+        moduleId=""
         itemType={itemType}
+        content={content}
         canDuplicate={true}
         isMenuOpen={false}
         setIsMenuOpen={() => {}}
@@ -57,14 +59,16 @@ const setUp = (itemType: string = 'Assignment') => {
 
 const assertMenuItems = ({
   itemType,
+  content,
   visibleItems = [],
   hiddenItems = [],
 }: {
   itemType: string
+  content: ModuleItemContent
   visibleItems: string[]
   hiddenItems: string[]
 }) => {
-  const {container, menuButton} = setUp(itemType)
+  const {container, menuButton} = setUp(itemType, content)
   fireEvent.click(menuButton)
 
   for (const text of visibleItems) {
@@ -85,6 +89,10 @@ describe('ModuleItemActionMenu', () => {
   it('renders menu with correct props for default itemType', () => {
     assertMenuItems({
       itemType: 'Assignment',
+      content: {
+        published: true,
+        canManageAssignTo: true,
+      },
       visibleItems: [
         'Edit',
         'SpeedGrader',
@@ -101,9 +109,53 @@ describe('ModuleItemActionMenu', () => {
     })
   })
 
+  it('only shows SpeedGrader for published assignments', () => {
+    assertMenuItems({
+      itemType: 'Assignment',
+      content: {
+        published: false,
+        canManageAssignTo: true,
+      },
+      visibleItems: [
+        'Edit',
+        'Assign To...',
+        'Duplicate',
+        'Move to...',
+        'Decrease indent',
+        'Increase indent',
+        'Send To...',
+        'Copy To...',
+        'Remove',
+      ],
+      hiddenItems: ['SpeedGrader'],
+    })
+  })
+
+  it('does not show Assign to if canManageAssignTo is false', () => {
+    assertMenuItems({
+      itemType: 'Discussion',
+      content: {
+        published: true,
+        canManageAssignTo: false,
+      },
+      visibleItems: [
+        'Edit',
+        'Duplicate',
+        'Move to...',
+        'Decrease indent',
+        'Increase indent',
+        'Send To...',
+        'Copy To...',
+        'Remove',
+      ],
+      hiddenItems: ['Assign To...', 'SpeedGrader'],
+    })
+  })
+
   it('renders menu for basic content types like SubHeader', () => {
     assertMenuItems({
       itemType: 'SubHeader',
+      content: {},
       visibleItems: ['Edit', 'Move to...', 'Decrease indent', 'Increase indent', 'Remove'],
       hiddenItems: [
         'SpeedGrader',
@@ -120,6 +172,7 @@ describe('ModuleItemActionMenu', () => {
   it.each([['File'], ['ExternalTool']])('hides specific menu items for %s itemType', itemType => {
     assertMenuItems({
       itemType,
+      content: {},
       visibleItems: ['Edit', 'Move to...', 'Decrease indent', 'Increase indent', 'Remove'],
       hiddenItems: [
         'SpeedGrader',

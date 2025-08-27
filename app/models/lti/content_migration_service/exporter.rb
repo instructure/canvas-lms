@@ -39,7 +39,9 @@ module Lti
 
       def export_completed?
         response = Canvas.retriable(on: Timeout::Error) do
-          CanvasHttp.get(@status_url, base_request_headers)
+          InstrumentTLSCiphers.without_tls_metrics do
+            CanvasHttp.get(@status_url, base_request_headers)
+          end
         end
         if response.code.to_i == 200
           parsed_response = JSON.parse(response.body)
@@ -61,7 +63,9 @@ module Lti
         return nil if @export_status == FAILED_STATUS
 
         response = Canvas.retriable(on: Timeout::Error) do
-          CanvasHttp.get(@fetch_url, base_request_headers)
+          InstrumentTLSCiphers.without_tls_metrics do
+            CanvasHttp.get(@fetch_url, base_request_headers)
+          end
         end
         if response.code.to_i == 200
           JSON.parse(response.body)
@@ -75,24 +79,26 @@ module Lti
       def start!
         return if defined? @status_url
 
-        response = Canvas.retriable(on: Timeout::Error) do
-          case export_format
-          when JSON_FORMAT
-            CanvasHttp.post(export_start_url, base_request_headers, body: start_export_post_body.to_json, content_type: "application/json")
-          else
-            CanvasHttp.post(export_start_url, base_request_headers, form_data: Rack::Utils.build_nested_query(start_export_post_body))
+        InstrumentTLSCiphers.without_tls_metrics do
+          response = Canvas.retriable(on: Timeout::Error) do
+            case export_format
+            when JSON_FORMAT
+              CanvasHttp.post(export_start_url, base_request_headers, body: start_export_post_body.to_json, content_type: "application/json")
+            else
+              CanvasHttp.post(export_start_url, base_request_headers, form_data: Rack::Utils.build_nested_query(start_export_post_body))
+            end
           end
-        end
-        case response.code.to_i
-        when (200..201)
-          parsed_response = JSON.parse(response.body)
-          unless parsed_response.empty?
-            @status_url = parsed_response["status_url"]
-            @fetch_url = parsed_response["fetch_url"]
+          case response.code.to_i
+          when (200..201)
+            parsed_response = JSON.parse(response.body)
+            unless parsed_response.empty?
+              @status_url = parsed_response["status_url"]
+              @fetch_url = parsed_response["fetch_url"]
+            end
           end
+        rescue JSON::JSONError, Timeout::Error
+          # We're ok with this, we'll just assume it failed.
         end
-      rescue JSON::JSONError, Timeout::Error
-        # We're ok with this, we'll just assume it failed.
       end
 
       def successfully_started?

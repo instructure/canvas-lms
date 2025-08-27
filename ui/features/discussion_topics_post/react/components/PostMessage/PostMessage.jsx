@@ -33,6 +33,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import theme from '@instructure/canvas-theme'
 import {View} from '@instructure/ui-view'
 import {IconWarningSolid, IconAiLine} from '@instructure/ui-icons'
+import useTranslateEntry from '../../hooks/useTranslateEntry'
 
 const I18n = createI18nScope('discussion_posts')
 
@@ -56,57 +57,28 @@ export function PostMessage({...props}) {
   let heading = 'h2'
 
   if (props.discussionEntry) {
-    const depth = Math.min(props.discussionEntry.depth + 2, 5)
+    const depth = Math.min((props.discussionEntry.depth || 0) + 2, 5)
     heading = 'h' + depth.toString()
   }
 
-  const {translationLanguages, translateTargetLanguage, entryTranslatingSet, setEntryTranslating} =
-    useContext(DiscussionManagerUtilityContext)
+  const {translationLanguages, translateTargetLanguage, entryTranslatingSet} = useContext(
+    DiscussionManagerUtilityContext,
+  )
   const [translatedTitle, setTranslatedTitle] = useState(null)
   const [translatedMessage, setTranslatedMessage] = useState(null)
   const [translationError, setTranslationError] = useState(null)
 
   const id = props.discussionEntry?.id || 'topic'
+  useTranslateEntry(
+    id,
+    props.title,
+    props.message,
+    setTranslatedTitle,
+    setTranslatedMessage,
+    setTranslationError,
+  )
+
   const isTranslating = entryTranslatingSet?.has(id)
-  // Shouldn't fire if not feature flagged.
-  // TODO Create a custom hook for translation logic.
-  useEffect(() => {
-    if (translateTargetLanguage == null) {
-      setTranslatedTitle(null)
-      setTranslatedMessage(null)
-      return
-    }
-
-    setTranslationError(null)
-
-    const translationAttempts = [
-      getTranslation(props.title, translateTargetLanguage),
-      getTranslation(props.message, translateTargetLanguage),
-    ]
-
-    // Begin translating, clear spinner when done.
-    setEntryTranslating(id, true)
-    Promise.all(translationAttempts)
-      .then(translations => {
-        setTranslatedTitle(translations[0])
-        setTranslatedMessage(translations[1])
-      })
-      .catch(e => {
-        setTranslatedTitle(null)
-        setTranslatedMessage(null)
-
-        if (e.translationError) {
-          setTranslationError(e.translationError)
-        } else {
-          setTranslationError({
-            type: 'newError',
-            message: I18n.t('There was an unexpected error during translation.'),
-          })
-        }
-      })
-      .finally(() => setEntryTranslating(id, false))
-  }, [translateTargetLanguage, props.title, props.message])
-
   const isTitleTranslationReady = !props.title || translatedTitle
   const isMessageTranslationReady = !props.message || translatedMessage
   const isTranslationReady =

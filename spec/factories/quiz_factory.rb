@@ -520,6 +520,7 @@ module Factories
   def course_quiz(active = false)
     @quiz = @course.quizzes.create
     @quiz.workflow_state = "available" if active
+    @quiz.saving_user = @teacher
     @quiz.save!
     @quiz
   end

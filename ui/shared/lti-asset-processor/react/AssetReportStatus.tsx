@@ -22,14 +22,13 @@ import {IconCompleteSolid, IconWarningSolid} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {ViewOwnProps} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 
 const I18n = createI18nScope('submissions_show_preview_asset_report_status')
 
 interface Props {
   reports: LtiAssetReportWithAsset[]
-  openModal?: (event: React.MouseEvent<ViewOwnProps, MouseEvent>) => void
+  openModal?: () => void
 }
 
 export default function AssetReportStatus({reports, openModal}: Props) {
@@ -44,15 +43,15 @@ export default function AssetReportStatus({reports, openModal}: Props) {
   }
 }
 
-function renderStatus(
-  status: 'high' | 'ok',
-  openModal?: (event: React.MouseEvent<ViewOwnProps, MouseEvent>) => void,
-) {
+function renderStatus(status: 'high' | 'ok', openModal?: () => void) {
   if (openModal) {
     return (
       <Link
         href="#"
-        onClick={openModal}
+        onClick={event => {
+          event.preventDefault()
+          openModal()
+        }}
         renderIcon={status === 'ok' ? <IconCompleteSolid /> : <IconWarningSolid color="error" />}
         variant="inline"
         themeOverride={

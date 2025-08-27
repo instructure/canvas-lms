@@ -33,10 +33,12 @@ type Props = {
   label: string
   timezones: Timezone[]
   priority_zones: Timezone[]
+  name?: string
   onChange: (event: React.ChangeEvent<HTMLSelectElement>, value: string) => void
-} & CanvasSelectProps
+} & Omit<CanvasSelectProps, 'children'> // exclude children prop since we don't use it
 
 const TimeZoneSelect: React.FC<Props> = ({
+  name,
   label,
   timezones,
   priority_zones,
@@ -51,7 +53,12 @@ const TimeZoneSelect: React.FC<Props> = ({
     onChange(event, value) // so it works either way, instui Select callback, or traditional
   }
   return (
-    <CanvasSelect label={label} onChange={onChangeTimezone} {...otherPropsToPassOnToSelect}>
+    <CanvasSelect
+      name={name}
+      label={label}
+      onChange={onChangeTimezone}
+      {...otherPropsToPassOnToSelect}
+    >
       <CanvasSelect.Option id={`${++idval}`} value="">
         &nbsp;
       </CanvasSelect.Option>

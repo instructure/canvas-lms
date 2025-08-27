@@ -67,26 +67,27 @@ describe "outcomes" do
         end
 
         it "validates default values", priority: "1" do
-          expect(f("#calculation_method")).to have_value("decaying_average")
+          click_option("#calculation_method", "Decaying Average")
+          expect(f("#calculation_method")).to have_value("standard_decaying_average")
           expect(f("#calculation_int")).to have_value("65")
-          expect(f("#calculation_int_example")).to include_text("Most recent result counts as 65% " \
-                                                                "of mastery weight, average of all other results count " \
-                                                                "as 35% of weight. If there is only one result, the single score " \
-                                                                "will be returned.")
+          expect(f("#calculation_int_example")).to include_text("For each additional assessment, " \
+                                                                "the sum of the previous score " \
+                                                                "calculations decay by an additional")
         end
 
         it "validates decaying average_range", priority: "2" do
-          should_validate_decaying_average_range
+          should_validate_decaying_average_range "The value must be between '50' and '99'"
         end
 
-        it "validates calculation int accepatble values", priority: "1" do
+        it "validates calculation int acceptable values", priority: "1" do
           save_without_error(1)
           f(".edit_button").click
-          save_without_error(99)
+          save_without_error(65)
         end
 
         it "retains the settings after saving", priority: "1" do
-          save_without_error(rand(1..99), "Decaying Average")
+          click_option("#calculation_method", "Decaying Average")
+          save_without_error(rand(50..99), "Decaying Average")
           expect(f("#calculation_method").text).to include("Decaying Average")
         end
       end
@@ -335,10 +336,6 @@ describe "outcomes" do
         end
 
         describe "with friendly_description enabled" do
-          before do
-            enable_friendly_description
-          end
-
           it "creates an outcome with a friendly description present" do
             get outcome_url
             create_outcome_with_friendly_desc("Outcome", "Standard Desc", "Friendly Desc")

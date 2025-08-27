@@ -34,12 +34,13 @@ describe DataFixup::AddAttachmentAssociationsToAssets do
             alt="rick_other.png">
       </p>
     HTML
+    @course.saving_user = @user
     @course.save!
     @course.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
   end
 
   it "creates attachment associations for any attachment on syllabus body" do
-    expect(AttachmentAssociation.all).to be_empty
+    AttachmentAssociation.destroy_all
 
     DataFixup::AddAttachmentAssociationsToAssets.run
 
@@ -51,6 +52,7 @@ describe DataFixup::AddAttachmentAssociationsToAssets do
   end
 
   it "would not re-create attachment associations if they already exist on syllabus attachments" do
+    AttachmentAssociation.destroy_all
     @image.attachment_associations.create!(
       context: @course,
       context_concern: "syllabus_body",

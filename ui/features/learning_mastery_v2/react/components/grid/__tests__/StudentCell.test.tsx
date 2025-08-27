@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {render} from '@testing-library/react'
 import {StudentCell, StudentCellProps} from '../StudentCell'
 import {Student} from '../../../types/rollup'
+import {SecondaryInfoDisplay} from '../../../utils/constants'
+import {MOCK_STUDENTS} from '../../../__fixtures__/rollups'
 
 describe('StudentCell', () => {
   const defaultProps = (props: Partial<StudentCellProps> = {}): StudentCellProps => ({
@@ -83,6 +84,48 @@ describe('StudentCell', () => {
         <StudentCell {...defaultProps({student: getTestStudent('concluded')})} />,
       )
       expect(getByTestId('student-status')).toBeInTheDocument()
+    })
+  })
+
+  it('does not render student avatar when showStudentAvatar is false', () => {
+    const {queryByTestId} = render(<StudentCell {...defaultProps({showStudentAvatar: false})} />)
+    expect(queryByTestId('student-avatar')).not.toBeInTheDocument()
+  })
+
+  describe('secondary info display', () => {
+    it('does not render secondary info when not specified', () => {
+      const {queryByTestId} = render(<StudentCell {...defaultProps()} />)
+      expect(queryByTestId('student-secondary-info')).not.toBeInTheDocument()
+    })
+
+    it('renders SIS ID when specified', () => {
+      const {getByTestId} = render(
+        <StudentCell
+          {...defaultProps({secondaryInfoDisplay: SecondaryInfoDisplay.SIS_ID})}
+          student={{...MOCK_STUDENTS[0], sis_id: 'SIS123'}}
+        />,
+      )
+      expect(getByTestId('student-secondary-info')).toHaveTextContent('SIS123')
+    })
+
+    it('renders integration ID when specified', () => {
+      const {getByTestId} = render(
+        <StudentCell
+          {...defaultProps({secondaryInfoDisplay: SecondaryInfoDisplay.INTEGRATION_ID})}
+          student={{...MOCK_STUDENTS[0], integration_id: 'INT123'}}
+        />,
+      )
+      expect(getByTestId('student-secondary-info')).toHaveTextContent('INT123')
+    })
+
+    it('renders login ID when specified', () => {
+      const {getByTestId} = render(
+        <StudentCell
+          {...defaultProps({secondaryInfoDisplay: SecondaryInfoDisplay.LOGIN_ID})}
+          student={{...MOCK_STUDENTS[0], login_id: 'LOGIN123'}}
+        />,
+      )
+      expect(getByTestId('student-secondary-info')).toHaveTextContent('LOGIN123')
     })
   })
 })

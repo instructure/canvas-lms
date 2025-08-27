@@ -41,7 +41,7 @@ jest.mock('@canvas/util/globalUtils', () => ({
   windowPathname: jest.fn(() => '/'),
 }))
 
-const defaultMocks = (result = {data: {}}) => [
+const defaultMocks = (result = {data: {course: {externalToolsConnection: {nodes: []}}}}) => [
   {
     request: {
       query: EXTERNAL_TOOLS_QUERY,
@@ -74,6 +74,7 @@ describe('ContentTabs', () => {
       context_asset_string: 'course_1',
       current_user: {id: '1', display_name: 'Test User'},
       enrollment_state: 'active',
+      RICH_CONTENT_CAN_UPLOAD_FILES: false,
     })
   })
 

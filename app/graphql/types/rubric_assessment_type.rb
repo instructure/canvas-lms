@@ -51,9 +51,30 @@ module Types
 
     field :assessor, UserType, null: true
     def assessor
-      return nil unless object.grants_right?(current_user, session, :read_assessor)
+      if object.grants_right?(current_user, session, :read_assessor)
+        return load_association(:assessor)
+      end
 
-      load_association(:assessor)
+      assignment = nil
+      if object.rubric_association&.association_object.is_a?(Assignment)
+        assignment = object.rubric_association.association_object
+      elsif object.artifact.is_a?(Submission)
+        assignment = object.artifact.assignment
+      elsif object.artifact.is_a?(ModeratedGrading::ProvisionalGrade)
+        assignment = object.artifact.submission.assignment
+      end
+
+      if assignment&.moderated_grading? && object.assessor_id
+        grader_identities = assignment.grader_identities
+        grader_identity = grader_identities.find { |grader| grader[:user_id] == object.assessor_id }
+        anonymous_identity = Assignments::GraderIdentities.anonymize_grader_identity(grader_identity)
+
+        if anonymous_identity
+          return User.new(name: anonymous_identity[:name], short_name: anonymous_identity[:name])
+        end
+      end
+
+      nil
     end
 
     field :assessment_ratings, [RubricAssessmentRatingType], <<~MD, null: true

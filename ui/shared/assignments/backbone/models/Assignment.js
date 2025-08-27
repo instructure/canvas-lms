@@ -213,6 +213,7 @@ function Assignment() {
   this.vericiteAvailable = this.vericiteAvailable.bind(this)
   this.vericiteEnabled = this.vericiteEnabled.bind(this)
   this.withoutGradedSubmission = this.withoutGradedSubmission.bind(this)
+  this.getId = this.getId.bind(this)
   return Assignment.__super__.constructor.apply(this, arguments)
 }
 
@@ -1763,6 +1764,10 @@ Assignment.prototype.getCheckpointGroup = function (checkpoint) {
 
 Assignment.prototype.isHorizonCourse = function () {
   return ENV.horizon_course
+}
+
+Assignment.prototype.getId = function () {
+  return this.get('id')
 }
 
 export default Assignment

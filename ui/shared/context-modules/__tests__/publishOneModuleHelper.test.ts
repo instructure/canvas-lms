@@ -113,7 +113,16 @@ describe('publishOneModuleHelper', () => {
       const moduleId = 1
       let skipItems = false
       const onPublishComplete = () => {}
-      publishModule(courseId, moduleId, skipItems, onPublishComplete)
+      const setIsPublishing = () => {}
+      const moduleIsPublished = false
+      publishModule({
+        courseId,
+        moduleId,
+        skipItems,
+        onPublishComplete,
+        setIsPublishing,
+        moduleIsPublished,
+      })
       expect(spy).toHaveBeenCalledWith(
         courseId,
         moduleId,
@@ -122,10 +131,19 @@ describe('publishOneModuleHelper', () => {
         'Publishing module and items',
         'Module and items published',
         onPublishComplete,
+        setIsPublishing,
+        moduleIsPublished,
       )
       spy.mockClear()
       skipItems = true
-      publishModule(courseId, moduleId, skipItems, onPublishComplete)
+      publishModule({
+        courseId,
+        moduleId,
+        skipItems,
+        onPublishComplete,
+        setIsPublishing,
+        moduleIsPublished,
+      })
       expect(spy).toHaveBeenCalledWith(
         courseId,
         moduleId,
@@ -134,6 +152,8 @@ describe('publishOneModuleHelper', () => {
         'Publishing module',
         'Module published',
         onPublishComplete,
+        setIsPublishing,
+        moduleIsPublished,
       )
     })
   })
@@ -152,7 +172,16 @@ describe('publishOneModuleHelper', () => {
       const moduleId = 1
       const skipItems = false
       const onPublishComplete = () => {}
-      unpublishModule(courseId, moduleId, skipItems, onPublishComplete)
+      const setIsPublishing = () => {}
+      const moduleIsPublished = false
+      unpublishModule({
+        courseId,
+        moduleId,
+        skipItems,
+        onPublishComplete,
+        setIsPublishing,
+        moduleIsPublished,
+      })
       expect(spy).toHaveBeenCalledWith(
         courseId,
         moduleId,
@@ -161,6 +190,8 @@ describe('publishOneModuleHelper', () => {
         'Unpublishing module and items',
         'Module and items unpublished',
         onPublishComplete,
+        setIsPublishing,
+        moduleIsPublished,
       )
     })
   })

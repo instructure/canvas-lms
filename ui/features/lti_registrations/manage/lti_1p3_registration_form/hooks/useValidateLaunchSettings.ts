@@ -18,11 +18,6 @@
 
 import React, {useMemo} from 'react'
 import type {FormMessage} from '@instructure/ui-form-field'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import {isValidHttpUrl} from '../../../common/lib/validators/isValidHttpUrl'
-import {isValidDomainName} from '../../../common/lib/validators/isValidDomainName'
-import {ZPublicJwk} from '../../model/internal_lti_configuration/PublicJwk'
-import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
 import {
   validateCustomFields,
   validateDomain,
@@ -31,8 +26,6 @@ import {
   validateRedirectUris,
   validateTargetLinkURI,
 } from '../../registration_overlay/validateLti1p3RegistrationOverlayState'
-
-const I18n = createI18nScope('lti_registrations')
 
 export type LaunchSettingsValidationMessages = {
   redirectUrisMessages: FormMessage[]

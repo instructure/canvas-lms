@@ -1,0 +1,15 @@
+.individual-button-settings-container [data-buttonsettingstoggle] {
+  border-color: transparent !important;
+  background-color: transparent !important;
+}
+
+.individual-button-settings-container [data-buttonsettingstoggle] > span {
+  border-top: 0 !important;
+}
+
+.individual-button-settings-container
+  [data-buttonsettingstoggle]
+  > span:first-child {
+  flex-direction: row-reverse !important;
+  padding: 0.25rem !important;
+}

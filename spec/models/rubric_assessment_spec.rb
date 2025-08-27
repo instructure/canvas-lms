@@ -1068,6 +1068,85 @@ describe RubricAssessment do
     end
   end
 
+  describe "can_read_assessor_name?" do
+    before(:once) do
+      @submission = @assignment.find_or_create_submission(@student)
+      @assessment = @association.assess({
+                                          user: @student,
+                                          assessor: @teacher,
+                                          artifact: @submission,
+                                          assessment: {
+                                            assessment_type: "grading",
+                                            criterion_crit1: {
+                                              points: 5,
+                                              comments: "comments",
+                                            }
+                                          }
+                                        })
+    end
+
+    context "when user is the assessor" do
+      it "returns true" do
+        expect(@assessment.can_read_assessor_name?(@teacher, nil)).to be true
+      end
+    end
+
+    context "when provisional grader names are hidden" do
+      before do
+        allow(@assessment).to receive(:provisional_grader_names_hidden?).and_return(true)
+      end
+
+      it "returns false" do
+        expect(@assessment.can_read_assessor_name?(@student, nil)).to be false
+      end
+    end
+
+    context "when assessment type is grading" do
+      it "returns true" do
+        expect(@assessment.can_read_assessor_name?(@student, nil)).to be true
+      end
+    end
+
+    context "when assessment is not considered anonymous" do
+      before do
+        allow(@assessment).to receive(:considered_anonymous?).and_return(false)
+      end
+
+      it "returns true" do
+        @assessment.assessment_type = "peer_review"
+        expect(@assessment.can_read_assessor_name?(@student, nil)).to be true
+      end
+    end
+
+    context "when assessment is considered anonymous" do
+      before do
+        @assessment.assessment_type = "peer_review"
+        @assignment.update!(anonymous_peer_reviews: true)
+        allow(@assessment).to receive(:considered_anonymous?).and_return(true)
+      end
+
+      context "when user has view_all_grades permission" do
+        before do
+          allow(@assignment).to receive(:grants_right?).with(@teacher, nil, :view_all_grades).and_return(true)
+        end
+
+        it "returns true" do
+          expect(@assessment.can_read_assessor_name?(@teacher, nil)).to be true
+        end
+      end
+
+      context "when user does not have view_all_grades permission" do
+        before do
+          allow(@assignment).to receive(:grants_right?).with(@student, nil, :view_all_grades).and_return(false)
+        end
+
+        it "returns false" do
+          expect(@assessment.can_read_assessor_name?(@student, nil)).to be false
+        end
+      end
+    end
+  end
+
   describe "mark_unread_assessments" do
     before do
       @submission = @assignment.find_or_create_submission(@student)

@@ -17,6 +17,7 @@
  */
 
 export interface EnvDiscussions {
+  discussion_ai_survey_link: string
   DISCUSSION_TOPIC: {
     ATTRIBUTES: Record<string, any>
   }

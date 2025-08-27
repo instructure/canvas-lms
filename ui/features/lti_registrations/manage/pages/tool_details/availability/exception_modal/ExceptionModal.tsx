@@ -111,8 +111,8 @@ export const ExceptionModal = ({
         <CloseButton placement="end" offset="small" onClick={close} screenReaderLabel="Close" />
         <Heading>{I18n.t('Add Availability and Exceptions')}</Heading>
       </Modal.Header>
-      <Modal.Body>
-        <View minHeight="20em" as="div">
+      <Modal.Body overflow="scroll">
+        <View height="25rem" as="div">
           <Flex gap="small" margin="0 0 medium 0">
             <Flex.Item shouldGrow>
               {openState.open ? (

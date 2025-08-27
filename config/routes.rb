@@ -486,7 +486,6 @@ CanvasRails::Application.routes.draw do
       end
     end
 
-    get "blackout_dates" => "blackout_dates#index"
     get "course_pacing" => "course_paces#index"
 
     post "collapse_all_modules" => "context_modules#toggle_collapse_all"
@@ -548,6 +547,7 @@ CanvasRails::Application.routes.draw do
     end
 
     resources :accessibility_resource_scans, only: [:index]
+    resources :accessibility_issues, only: [:update]
   end
 
   get "quiz_statistics/:quiz_statistics_id/files/:file_id/download" => "files#show", :as => :quiz_statistics_download, :download => "1"
@@ -841,8 +841,6 @@ CanvasRails::Application.routes.draw do
 
     get "release_notes" => "release_notes#manage", :as => :release_notes_manage
 
-    get "blackout_dates" => "blackout_dates#index"
-
     get "grading_schemes" => "grading_schemes_json#detail_list"
     get "grading_scheme_summaries" => "grading_schemes_json#summary_list"
     get "grading_scheme_grouped" => "grading_schemes_json#grouped_list"
@@ -889,9 +887,6 @@ CanvasRails::Application.routes.draw do
     get "/parent", to: "login/canvas#new", as: :parent
     get "/teacher", to: "login/canvas#new", as: :teacher
   end
-
-  get "login/email_verify" => "login/email_verify#show", :as => :login_email_verify_show
-  post "login/email_verify" => "login/email_verify#verify", :as => :login_email_verify
 
   get "login/ldap" => "login/ldap#new"
   post "login/ldap" => "login/ldap#create"
@@ -1233,6 +1228,7 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/youtube_migration/scan", action: :youtube_migration_scan, as: "course_youtube_migration_scan"
       post "courses/:course_id/youtube_migration/scan", action: :start_youtube_migration_scan
       post "courses/:course_id/youtube_migration/convert", action: :start_youtube_migration_convert
+      get "courses/:course_id/youtube_migration/conversion_status", action: :youtube_migration_conversion_status
 
       post "courses/:course_id/reset_content", action: :reset_content
       get  "users/:user_id/courses", action: :user_index, as: "user_courses"
@@ -1821,7 +1817,6 @@ CanvasRails::Application.routes.draw do
       put "accounts/:account_id/logins/:id", action: :update
       delete "users/:user_id/logins/:id", action: :destroy
       post "users/reset_password", action: :forgot_password
-      post "users/:user_id/logins/:id/migrate_login_attribute", action: :migrate_login_attribute
     end
 
     scope(controller: :accounts) do
@@ -2007,10 +2002,13 @@ CanvasRails::Application.routes.draw do
       delete "groups/:group_id/followers/self", action: :unfollow
       get "groups/:group_id/collaborations", controller: :collaborations, action: :api_index, as: "group_collaborations_index"
       delete "groups/:group_id/collaborations/:id", controller: :collaborations, action: :destroy
+      get "courses/:course_id/bulk_user_tags", to: "groups#bulk_user_tags"
 
       scope(controller: :group_memberships) do
         resources :memberships, path: "groups/:group_id/memberships", name_prefix: "group_", controller: :group_memberships
         resources :users, path: "groups/:group_id/users", name_prefix: "group_", controller: :group_memberships, except: [:index, :create]
+
+        delete "groups/:group_id/users", to: "group_memberships#destroy_bulk"
       end
 
       get "groups/:group_id/files", controller: :files, action: :api_index, as: "group_files"
@@ -2543,6 +2541,8 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/grading_standards/:grading_standard_id", action: :context_show
       post "accounts/:account_id/grading_standards", action: :create
       post "courses/:course_id/grading_standards", action: :create
+      put "courses/:course_id/grading_standards/:grading_standard_id", action: :update
+      put "accounts/:account_id/grading_standards/:grading_standard_id", action: :update
       delete "courses/:course_id/grading_standards/:grading_standard_id", action: :destroy
       delete "accounts/:account_id/grading_standards/:grading_standard_id", action: :destroy
     end

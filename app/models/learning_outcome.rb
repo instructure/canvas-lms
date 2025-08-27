@@ -29,6 +29,12 @@ class LearningOutcome < ActiveRecord::Base
     %w[description]
   end
 
+  def attachment_associations_creation_enabled?
+    return context.root_account.feature_enabled?(:allow_attachment_association_creation) if context&.root_account
+
+    Account.site_admin.feature_enabled?(:allow_attachment_association_creation)
+  end
+
   def attachment_associations_enabled?
     return context.root_account.feature_enabled?(:file_association_access) if context&.root_account
 

@@ -93,6 +93,20 @@ module CustomValidators
     expect(f("body")).not_to contain_css("#flashalert_message_holder")
   end
 
+  def expect_element_in_viewport(selector)
+    in_viewport = driver.execute_script <<~JS, selector
+      var $box = $(arguments[0])[0].getBoundingClientRect()
+      return (
+        $box.bottom >= 0 &&
+        $box.right >= 0 &&
+        $box.top <= (window.innerHeight || document.documentElement.clientHeight) &&
+        $box.left <= (window.innerWidth || document.documentElement.clientWidth)
+      )
+    JS
+
+    expect(in_viewport).to be true
+  end
+
   def assert_flash_notice_message(okay_message)
     expect_flash_message :success, okay_message
   end

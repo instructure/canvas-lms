@@ -1356,6 +1356,16 @@ describe Types::SubmissionType do
         result = submission_type.resolve("ltiAssetReportsConnection { nodes { _id } }")
         expect(result).to eq [@lti_asset_report.id.to_s]
       end
+
+      it "returns LTI asset reports when latest is false" do
+        result = submission_type.resolve("ltiAssetReportsConnection(latest: false) { nodes { _id } }")
+        expect(result).to eq [@lti_asset_report.id.to_s]
+      end
+
+      it "returns nil when latest is true (not implemented yet)" do
+        result = submission_type.resolve("ltiAssetReportsConnection(latest: true) { nodes { _id } }")
+        expect(result).to be_nil
+      end
     end
 
     context "when the current user is a student" do

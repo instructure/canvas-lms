@@ -49,6 +49,7 @@ import StickyToolbarWrapper from './containers/StickyToolbarWrapper/StickyToolba
 import useCreateDiscussionEntry from './hooks/useCreateDiscussionEntry'
 import useHighlightStore from './hooks/useHighlightStore'
 import useNavigateEntries from './hooks/useNavigateEntries'
+import {useTranslationQueue} from './hooks/useTranslationQueue'
 import {getCheckpointSubmission, getOptimisticResponse, responsiveQuerySizes} from './utils'
 import {
   AllThreadsState,
@@ -83,6 +84,8 @@ const DiscussionTopicManager = props => {
   const [translateTargetLanguage, setTranslateTargetLanguage] = useState(null)
   const [entryTranslatingSet, setEntryTranslatingSet] = useState(new Set())
   const [focusSelector, setFocusSelector] = useState('')
+
+  const {enqueueTranslation} = useTranslationQueue()
 
   const setEntryTranslating = useCallback((id, isTranslating) => {
     setEntryTranslatingSet(prevSet => {
@@ -187,6 +190,7 @@ const DiscussionTopicManager = props => {
     setTranslateTargetLanguage,
     entryTranslatingSet,
     setEntryTranslating,
+    enqueueTranslation,
     isSummaryEnabled,
     setIsSummaryEnabled,
   }

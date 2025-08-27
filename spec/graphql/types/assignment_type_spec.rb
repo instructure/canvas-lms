@@ -41,8 +41,8 @@ describe Types::AssignmentType do
   let(:admin_user_assignment_type) { GraphQLTypeTester.new(assignment, current_user: admin_user) }
 
   let(:assignment_visibility) do
-    AssignmentVisibility::AssignmentVisibilityService.users_with_visibility_by_assignment(
-      course_id: course.id, user_ids: [student.id], assignment_ids: [assignment.id]
+    AssignmentVisibility::AssignmentVisibilityService.assignments_with_user_visibilities(
+      course, [assignment]
     )[assignment.id].map(&:to_s)
   end
 
@@ -186,6 +186,7 @@ describe Types::AssignmentType do
 
     it "is not returned if the association is soft-deleted" do
       @rubric_association.destroy!
+      expect(assignment_type.resolve("rubric { _id }")).to be_nil
       expect(assignment_type.resolve("rubricAssociation { _id }")).to be_nil
     end
   end
@@ -331,7 +332,7 @@ describe Types::AssignmentType do
 
   context "description" do
     before do
-      assignment.update description: %(Hi <img src="/courses/#{course.id}/files/12/download"<h1>Content</h1>)
+      assignment.update(description: %(Hi <img src="/courses/#{course.id}/files/12/download"<h1>Content</h1>), saving_user: teacher)
     end
 
     it "includes description when lock settings allow" do
@@ -349,7 +350,7 @@ describe Types::AssignmentType do
     end
 
     it "works for assignments in public courses" do
-      course.update! is_public: true
+      course.update!(is_public: true, saving_user: teacher)
       expect(
         assignment_type.resolve(
           "description",
@@ -1764,6 +1765,101 @@ describe Types::AssignmentType do
       end
 
       it_behaves_like "grader name visibility"
+    end
+  end
+
+  describe "assignedToDates field" do
+    context "when standardize_assignment_date_formatting feature flag is disabled" do
+      before do
+        Account.site_admin.disable_feature!(:standardize_assignment_date_formatting)
+      end
+
+      it "returns nil" do
+        expect(assignment_type.resolve("assignedToDates { id }")).to be_nil
+      end
+    end
+
+    context "when standardize_assignment_date_formatting feature flag is enabled" do
+      before do
+        Account.site_admin.enable_feature!(:standardize_assignment_date_formatting)
+      end
+
+      after do
+        Account.site_admin.disable_feature!(:standardize_assignment_date_formatting)
+      end
+
+      it "includes assignment overrides when present" do
+        override = assignment_override_model(assignment:, due_at: 2.weeks.from_now)
+        override.assignment_override_students.build(user: student)
+        override.save!
+
+        result = assignment_type.resolve("assignedToDates { id dueAt title base }")
+        expect(result).to be_an(Array)
+        expect(result.length).to eq(1)
+      end
+    end
+  end
+
+  describe "N+1 query prevention" do
+    it "prevents N+1 queries when accessing assignment overrides and dates" do
+      # Create assignments with context modules
+      module1 = course.context_modules.create!(name: "Module 1")
+      assignments = []
+      5.times do |i|
+        assignment = course.assignments.create!(title: "Assignment #{i}")
+        assignment.context_module_tags.create!(context_module: module1, context: course, tag_type: "context_module")
+        assignments << assignment
+      end
+
+      # Create some overrides
+      module1.assignment_overrides.create!
+
+      # Build GraphQL query that accesses fields that could cause N+1 queries
+      query = <<~GQL
+        query {
+          course(id: "#{course.id}") {
+            assignmentsConnection {
+              nodes {
+                id
+                visibleToEveryone
+                assignmentOverrides {
+                  nodes {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        }
+      GQL
+
+      # Track N+1 queries to module_ids/assignment_context_modules
+      module_query_count = 0
+      override_query_count = 0
+
+      subscriber = ActiveSupport::Notifications.subscribe("sql.active_record") do |_name, _start, _finish, _id, payload|
+        # Check for module_ids N+1 queries
+        if /FROM\s+["`]?context_modules["`]?\s+WHERE.*context_modules\.workflow_state.*context_modules\.id.*IN.*SELECT.*context_module_id/i.match?(payload[:sql])
+          module_query_count += 1
+        end
+        # Check for assignment override N+1 queries
+        if /FROM\s+["`]?assignment_overrides["`]?\s+WHERE.*assignment_overrides\.assignment_id.*LIMIT\s+1/i.match?(payload[:sql])
+          override_query_count += 1
+        end
+      end
+
+      # Execute the GraphQL query
+      result = CanvasSchema.execute(query, context: { current_user: teacher, request: ActionDispatch::TestRequest.create })
+
+      # Should be bulk loading, not N+1 queries
+      expect(module_query_count).to be <= 1
+      expect(override_query_count).to be <= 1
+
+      # Verify the query succeeded
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "course", "assignmentsConnection", "nodes")).to be_present
+
+      ActiveSupport::Notifications.unsubscribe(subscriber)
     end
   end
 end

@@ -22,7 +22,6 @@ describe CareerController do
   before :once do
     course_with_teacher(active_all: true)
     @account = @course.account
-    @account.enable_feature!(:horizon_learning_provider_app_for_accounts)
     @course.update!(horizon_course: true)
   end
 
@@ -64,8 +63,6 @@ describe CareerController do
         end
 
         it "sets up the JS environment with features" do
-          @account.enable_feature!(:horizon_crm_integration)
-
           get :show, params: { course_id: @course.id }
 
           expect(assigns[:js_env][:CANVAS_CAREER][:FEATURES]).to include(
@@ -74,8 +71,6 @@ describe CareerController do
         end
 
         it "sets up the JS environment with MAX_GROUP_CONVERSATION_SIZE" do
-          @account.enable_feature!(:horizon_crm_integration)
-
           Setting.set("max_group_conversation_size", 2)
 
           get :show, params: { course_id: @course.id }
@@ -98,6 +93,12 @@ describe CareerController do
         it "renders with bare layout" do
           get :show, params: { course_id: @course.id }
           expect(response).to render_template("layouts/bare")
+        end
+
+        it "assigns @include_masquerade_layout to true" do
+          allow(resolver).to receive(:resolve).and_return(CanvasCareer::Constants::App::CAREER_LEARNING_PROVIDER)
+          get :show, params: { course_id: @course.id }
+          expect(assigns(:include_masquerade_layout)).to be(true)
         end
       end
 

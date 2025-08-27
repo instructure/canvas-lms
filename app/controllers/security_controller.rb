@@ -50,6 +50,7 @@ class SecurityController < ApplicationController
       Lti::ResourcePlacement::PLACEMENTS_BY_MESSAGE_TYPE[message_type]
       .reject { |p| p == :resource_selection }
       .reject { |p| p == :ActivityAssetProcessor unless account.root_account.feature_enabled?(:lti_asset_processor) }
+      .reject { |p| p == :ActivityAssetProcessorContribution unless account.root_account.feature_enabled?(:lti_asset_processor_discussions) }
       .map { |p| Lti::ResourcePlacement.add_extension_prefix_if_necessary(p) }
     ) + [Lti::ResourcePlacement::CONTENT_AREA] + (
       (message_type == LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE) ? [Lti::ResourcePlacement::RICH_TEXT_EDITOR] : []
@@ -110,14 +111,14 @@ class SecurityController < ApplicationController
       return
     end
 
-    account_domain = HostUrl.context_host(account, ApplicationController.test_cluster_name)
+    host = Lti::Oidc.auth_domain(HostUrl.context_host(account, request.host_with_port))
 
     render json: {
       issuer: Canvas::Security.config["lti_iss"],
-      authorization_endpoint: lti_authorize_redirect_url(host: Lti::Oidc.auth_domain(account_domain)),
-      registration_endpoint: create_lti_registration_url(host: account_domain),
-      jwks_uri: lti_jwks_url(host: Lti::Oidc.auth_domain(account_domain)),
-      token_endpoint: oauth2_token_url(host: Lti::Oidc.auth_domain(account_domain)),
+      authorization_endpoint: lti_authorize_redirect_url(host:),
+      registration_endpoint: create_lti_registration_url(host:),
+      jwks_uri: lti_jwks_url(host:),
+      token_endpoint: oauth2_token_url(host:),
       token_endpoint_auth_methods_supported: ["private_key_jwt"],
       token_endpoint_auth_signing_alg_values_supported: ["RS256"],
       scopes_supported:
@@ -127,7 +128,7 @@ class SecurityController < ApplicationController
       # TODO: this list can probably be dynamic, with admins choosing the scopes they want to admit to this tool
       claims_supported: %w[sub picture email name given_name family_name locale],
       subject_types_supported: ["public"],
-      authorization_server: Lti::Oidc.auth_domain(account_domain),
+      authorization_server: host,
       "https://purl.imsglobal.org/spec/lti-platform-configuration": lti_platform_configuration(account)
     }
   end

@@ -25,7 +25,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('discussion_survey_link')
 
-export const SurveyLinkBox = ({text, marginTop}) => {
+export const SurveyLinkBox = ({url, text, marginTop}) => {
   if (!window.ENV?.FEATURES?.discussion_ai_survey_link || window.ENV?.current_user_is_student) {
     return null
   }
@@ -38,7 +38,7 @@ export const SurveyLinkBox = ({text, marginTop}) => {
           __html: text,
         }}
       ></Text>
-      <Link href="https://inst.bid/ai/feedback/" target="_blank" margin="0 0 0 x-small">
+      <Link href={url} target="_blank" margin="0 0 0 x-small">
         {I18n.t('Please share your feedback')}
       </Link>
     </View>
@@ -46,6 +46,7 @@ export const SurveyLinkBox = ({text, marginTop}) => {
 }
 
 SurveyLinkBox.propTypes = {
+  url: PropTypes.string,
   text: PropTypes.object,
   marginTop: PropTypes.string,
 }

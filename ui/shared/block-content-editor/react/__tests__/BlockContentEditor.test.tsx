@@ -20,12 +20,14 @@ import {render} from '@testing-library/react'
 import {BlockContentEditor} from '../BlockContentEditor'
 import {useBlockContentEditorContext} from '../BlockContentEditorContext'
 
-jest.mock('../BlockContentEditorWrapper', () => ({
-  BlockContentEditorWrapper: () => <div data-testid="block-content-editor-wrapper" />,
+const mockPreviewComponent = jest.fn()
+jest.mock('../Preview/BlockContentPreview', () => ({
+  BlockContentPreview: (props: any) => mockPreviewComponent(props),
 }))
 
-jest.mock('../Preview/BlockContentPreview', () => ({
-  BlockContentPreview: () => <div data-testid="block-content-preview" />,
+const mockEditorContentComponent = jest.fn()
+jest.mock('../BlockContentEditorContent', () => ({
+  BlockContentEditorContent: (props: any) => mockEditorContentComponent(props),
 }))
 
 jest.mock('../layout/BlockContentEditorLayout', () => ({
@@ -35,7 +37,7 @@ jest.mock('../layout/BlockContentEditorLayout', () => ({
 }))
 
 jest.mock('../Toolbar', () => ({
-  Toolbar: () => <div data-testid="toolbar" />,
+  Toolbar: () => null,
 }))
 
 jest.mock('../BlockContentEditorContext', () => ({
@@ -54,10 +56,6 @@ function setupMockContext(mode: string = 'default') {
       isOpen: false,
       openModal: jest.fn(),
       closeModal: jest.fn(),
-    },
-    initialAddBlockHandler: {
-      showInitialAddBlock: false,
-      hideInitialAddBlock: jest.fn(),
     },
     settingsTray: {
       isOpen: false,
@@ -84,10 +82,9 @@ describe('BlockContentEditor', () => {
       setupMockContext('default')
     })
 
-    it('renders the BlockContentEditorWrapper component', () => {
-      const {getByTestId} = render(<BlockContentEditor data={null} onInit={null} />)
-      const editorWrapper = getByTestId('block-content-editor-wrapper')
-      expect(editorWrapper).toBeInTheDocument()
+    it('renders the BlockContentEditorContent component', () => {
+      render(<BlockContentEditor data={null} onInit={null} />)
+      expect(mockEditorContentComponent).toHaveBeenCalled()
     })
   })
 
@@ -97,9 +94,8 @@ describe('BlockContentEditor', () => {
     })
 
     it('renders the BlockContentPreview component', () => {
-      const {getByTestId} = render(<BlockContentEditor data={null} onInit={null} />)
-      const previewElement = getByTestId('block-content-preview')
-      expect(previewElement).toBeInTheDocument()
+      render(<BlockContentEditor data={null} onInit={null} />)
+      expect(mockPreviewComponent).toHaveBeenCalled()
     })
   })
 })

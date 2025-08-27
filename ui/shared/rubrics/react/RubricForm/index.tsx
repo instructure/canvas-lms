@@ -54,6 +54,7 @@ import {RubricAssignmentSettings} from './components/RubricAssignmentSettings'
 import {RubricFormSettings} from './components/RubricFormSettings'
 import {CanvasProgress} from '@canvas/progress/ProgressHelpers'
 import {EditConfirmModal} from '../RubricAssignment/components/EditConfirmModal'
+import {SaveRubricConfirmationModal} from './components/SaveRubricConfirmationModal'
 
 const I18n = createI18nScope('rubrics-form')
 
@@ -98,10 +99,12 @@ export const RubricForm = ({
   onSaveRubric,
   onCancel,
 }: RubricFormComponentProp) => {
+  const defaultAssociationType = assignmentId ? 'Assignment' : accountId ? 'Account' : 'Course'
   const [rubricForm, setRubricForm] = useState<RubricFormProps>({
     ...defaultRubricForm,
     accountId,
     courseId,
+    associationType: defaultAssociationType,
   })
   const [validationErrors, setValidationErrors] = useState<RubricFormValidationProps>({})
   const [selectedCriterion, setSelectedCriterion] = useState<RubricCriterion>()
@@ -117,12 +120,15 @@ export const RubricForm = ({
   const [showGenerateCriteriaHeader, setShowGenerateCriteriaHeader] = useState(false)
   const [generatedCriteriaProgress, setGeneratedCriteriaProgress] = useState<CanvasProgress>()
   const [generatedCriteriaIsPending, setGeneratedCriteriaIsPending] = useState(false)
+  const [isSaveConfirmModalOpen, setIsSaveConfirmModalOpen] = useState(false)
   const hasAssignment = !!assignmentId && assignmentId !== ''
   const showAssignmentSettings = hasAssignment
 
   const criteriaRef = useRef(rubricForm.criteria)
 
-  const header = rubricId || rubric?.id ? I18n.t('Edit Rubric') : I18n.t('Create New Rubric')
+  const isNewRubric = !rubricId && !rubric?.id
+
+  const header = isNewRubric ? I18n.t('Create New Rubric') : I18n.t('Edit Rubric')
   const queryKey = ['fetch-rubric', rubricId ?? '']
   const formValid = !validationErrors.title?.message && rubricForm.criteria.length > 0
   const criteriaBeingGenerated =
@@ -299,6 +305,7 @@ export const RubricForm = ({
     <View as="div" margin="0 0 medium 0" overflowY="hidden" overflowX="hidden" padding="large">
       <Flex as="div" direction="column" style={{minHeight: '100%'}}>
         <RubricFormHeader
+          canUpdateRubric={isNewRubric || rubricForm.canUpdateRubric}
           header={header}
           hideHeader={hideHeader}
           isUnassessed={rubricForm.unassessed}
@@ -319,13 +326,11 @@ export const RubricForm = ({
                 ]}
               />
             </Flex.Item>
-            {rubricForm.unassessed && (
-              <RubricFormSettings
-                showAdditionalOptions={showAdditionalOptions}
-                rubricForm={rubricForm}
-                setRubricFormField={setRubricFormField}
-              />
-            )}
+            <RubricFormSettings
+              showAdditionalOptions={showAdditionalOptions}
+              rubricForm={rubricForm}
+              setRubricFormField={setRubricFormField}
+            />
           </Flex>
 
           {showAdditionalOptions && showAssignmentSettings && (
@@ -392,8 +397,10 @@ export const RubricForm = ({
         handleSave={() => {
           if (rubric && hasAssignment && hasRubricChanged(rubricForm, rubric)) {
             setIsEditConfirmModalOpen(true)
-          } else {
+          } else if (rubricForm.unassessed) {
             handleSave()
+          } else {
+            setIsSaveConfirmModalOpen(true)
           }
         }}
         formValid={formValid}
@@ -423,7 +430,6 @@ export const RubricForm = ({
               freeFormCriterionComments={rubricForm.freeFormCriterionComments}
               isFullWidth={isFullWidth}
               isOpen={isCriterionModalOpen}
-              unassessed={rubricForm.unassessed}
               onDismiss={() => setIsCriterionModalOpen(false)}
               onSave={(updatedCriteria: RubricCriterion) => handleSaveCriterion(updatedCriteria)}
             />
@@ -450,6 +456,14 @@ export const RubricForm = ({
           handleSave()
         }}
         onDismiss={() => setIsEditConfirmModalOpen(false)}
+      />
+      <SaveRubricConfirmationModal
+        isOpen={isSaveConfirmModalOpen}
+        onConfirm={() => {
+          setIsSaveConfirmModalOpen(false)
+          handleSave()
+        }}
+        onDismiss={() => setIsSaveConfirmModalOpen(false)}
       />
     </View>
   )

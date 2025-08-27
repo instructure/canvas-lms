@@ -27,7 +27,6 @@ import {ZLtiOverlay, ZLtiOverlayWithVersions} from './LtiOverlay'
 import {ZLtiRegistrationAccountBinding} from './LtiRegistrationAccountBinding'
 import {ZLtiRegistrationId} from './LtiRegistrationId'
 import {ZUser} from './User'
-import {ZLtiOverlayVersion} from './LtiOverlayVersion'
 import {ZLtiPrivacyLevel} from './LtiPrivacyLevel'
 import {ZInternalPlacementConfiguration} from './internal_lti_configuration/placement_configuration/InternalPlacementConfiguration'
 

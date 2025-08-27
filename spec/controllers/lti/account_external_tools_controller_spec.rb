@@ -138,7 +138,7 @@ describe Lti::AccountExternalToolsController do
 
       context "with no account binding" do
         let(:developer_key2) do
-          dk = DeveloperKey.create!(account: root_account)
+          dk = DeveloperKey.create!(name: "test_key_#{SecureRandom.hex(4)}", account: root_account)
           dk.developer_key_account_bindings.destroy_all
           dk
         end

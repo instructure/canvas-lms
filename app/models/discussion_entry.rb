@@ -73,12 +73,16 @@ class DiscussionEntry < ActiveRecord::Base
   after_create :log_discussion_entry_metrics
   after_create :clear_planner_cache_for_participants
   after_create :update_topic
+  after_destroy :remove_pin
   validates :message, length: { maximum: maximum_text_length, allow_blank: true }
   validates :discussion_topic_id, presence: true
   before_validation :set_depth, on: :create
   validate :validate_depth, on: :create
   validate :discussion_not_deleted, on: :create
   validate :must_be_reply_to_same_discussion, on: :create
+  validate :validate_pin_type
+
+  scope :pinned, -> { where.not(pin_type: nil) }
 
   module PinningTypes
     THREAD = "thread"
@@ -361,13 +365,6 @@ class DiscussionEntry < ActiveRecord::Base
       DiscussionTopicParticipant.where(discussion_topic_id:)
                                 .where.not(user_id: discussion_entry_participants.read.pluck(:user_id))
                                 .update_all("unread_entry_count = unread_entry_count + 1")
-      # users = discussion_topic.discussion_topic_participants
-      #                         .where.not(user_id: discussion_entry_participants.read.pluck(:user_id)).pluck(:user_id)
-      # # increment unread_entry_count for topic participants
-      # if users.present?
-      #   DiscussionTopicParticipant.where(discussion_topic_id:, user_id: users)
-      #                             .update_all("unread_entry_count = unread_entry_count + 1")
-      # end
     end
   end
 
@@ -447,7 +444,7 @@ class DiscussionEntry < ActiveRecord::Base
     can :create
 
     given { |user, session| !discussion_topic.root_topic_id && context.grants_right?(user, session, :moderate_forum) }
-    can :update and can :delete and can :read
+    can :update and can :delete and can :read and can :pin
 
     given { |user, session| discussion_topic.root_topic&.context&.grants_right?(user, session, :moderate_forum) && !discussion_topic.locked_for?(user, check_policies: true) }
     can :update and can :delete and can :read and can :attach
@@ -459,7 +456,7 @@ class DiscussionEntry < ActiveRecord::Base
     can :create
 
     given { |user, session| discussion_topic.root_topic&.context&.grants_right?(user, session, :moderate_forum) }
-    can :update and can :delete and can :read
+    can :update and can :delete and can :read and can :pin
 
     given { |user, session| discussion_topic.grants_right?(user, session, :rate) }
     can :rate
@@ -822,5 +819,13 @@ class DiscussionEntry < ActiveRecord::Base
   def restore
     update(workflow_state: "active", deleted_at: nil)
     increment_unread_counts_after_restore
+  end
+
+  def validate_pin_type
+    return unless pin_type.present?
+
+    errors.add(:pin_type, I18n.t("Invalid pin type")) unless DiscussionEntry::PinningTypes::TYPES.include?(pin_type)
+    errors.add(:base, I18n.t("Discussion topic has too many pinned entries")) if discussion_topic.pinned_entries.count >= DiscussionTopic::MAX_ENTRIES_PINNED
+    errors.add(:pin_type, I18n.t("Pin type 'thread' can only be used for top-level entries")) if pin_type == DiscussionEntry::PinningTypes::THREAD && !parent_entry.nil?
   end
 end

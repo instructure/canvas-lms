@@ -1,0 +1,14 @@
+<svg width="414" height="143" viewBox="0 0 414 143" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="0.5" y="0.5" width="413" height="142" fill="white"/>
+<rect x="0.5" y="0.5" width="413" height="142" stroke="#D7DADE"/>
+<rect width="185" height="111" transform="translate(16 16)" fill="#D7DADE"/>
+<rect width="183" height="109" transform="translate(17 17)" fill="white"/>
+<rect width="183" height="109" transform="translate(17 17)" fill="#F2F4F4"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M115.171 77.7745H99.3235C103.041 64.2696 105.942 77.4696 108.799 73.3698C112.357 68.2663 116.181 68.2988 117.676 77.7745H115.171ZM104.971 63.6569C106.531 63.6569 107.794 64.9218 107.794 66.4804C107.794 68.039 106.531 69.304 104.971 69.304C103.412 69.304 102.147 68.039 102.147 66.4804C102.147 64.9218 103.412 63.6569 104.971 63.6569ZM96.5 82.0098H120.5V60.8334H96.5V82.0098Z" fill="#D7DADE"/>
+<rect x="213" y="16" width="68" height="8" fill="#D7DADE"/>
+<rect x="213" y="32" width="185" height="8" fill="#D7DADE"/>
+<rect x="213" y="48" width="166" height="8" fill="#D7DADE"/>
+<rect x="213" y="64" width="185" height="8" fill="#D7DADE"/>
+<rect x="213" y="80" width="166" height="8" fill="#D7DADE"/>
+<rect x="213" y="96" width="185" height="8" fill="#D7DADE"/>
+</svg>

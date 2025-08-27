@@ -20,63 +20,17 @@ import {renderHook, act} from '@testing-library/react-hooks/dom'
 import axios from '@canvas/axios'
 import useRollups from '../useRollups'
 import {DEFAULT_STUDENTS_PER_PAGE, SortOrder} from '../../utils/constants'
+import {Outcome, Rating, Student} from '../../types/rollup'
+import {MOCK_OUTCOMES, MOCK_RATINGS, MOCK_STUDENTS} from '../../__fixtures__/rollups'
 
 jest.useFakeTimers()
 
 jest.mock('@canvas/axios')
 
 describe('useRollups', () => {
-  const mockedUsers = [
-    {
-      id: '1',
-      name: 'Student 1',
-      display_name: 'Student 1',
-      avatar_url: 'url',
-      status: 'active',
-    },
-    {
-      id: '2',
-      name: 'Student 2',
-      display_name: 'Student 2',
-      avatar_url: 'url',
-      status: 'inactive',
-    },
-    {
-      id: '3',
-      name: 'Student 3',
-      display_name: 'Student 3',
-      avatar_url: 'url',
-      status: 'concluded',
-    },
-  ]
-
-  const mockedRatings: Array<{
-    color: string
-    description: string
-    mastery: boolean
-    points: number
-  }> = [
-    {
-      color: 'green',
-      description: 'mastery!',
-      mastery: true,
-      points: 3,
-    },
-    {
-      color: 'red',
-      description: 'not great',
-      mastery: false,
-      points: 0,
-    },
-  ]
-
-  const mockedOutcomes = [
-    {
-      id: '1',
-      title: 'outcome 1',
-      ratings: mockedRatings,
-    },
-  ]
+  const mockedStudents: Student[] = MOCK_STUDENTS
+  const mockedRatings: Rating[] = MOCK_RATINGS
+  const mockedOutcomes: Outcome[] = MOCK_OUTCOMES
 
   const mockedRollups = [
     {
@@ -128,7 +82,7 @@ describe('useRollups', () => {
       status: 200,
       data: {
         linked: {
-          users: mockedUsers,
+          users: mockedStudents,
           outcomes: mockedOutcomes,
         },
         rollups: mockedRollups,
@@ -168,29 +122,40 @@ describe('useRollups', () => {
       expect(isLoading).toEqual(false)
       expect(error).toEqual(null)
       expect(axios.get).toHaveBeenCalled()
-      expect(students).toEqual(mockedUsers)
+      expect(students).toEqual(mockedStudents)
       expect(outcomes).toEqual(mockedOutcomes)
       expect(gradebookFilters).toEqual([])
-      expect(rollups).toStrictEqual([
+
+      const expectedRollups = [
         {
           studentId: '1',
           outcomeRollups: [
-            {outcomeId: '1', rating: {...mockedRatings[0], color: `#${mockedRatings[0].color}`}},
+            {
+              outcomeId: '1',
+              rating: {...mockedRatings[0], color: `#${mockedRatings[0].color}`},
+            },
           ],
         },
         {
           studentId: '2',
           outcomeRollups: [
-            {outcomeId: '1', rating: {...mockedRatings[0], color: `#${mockedRatings[0].color}`}},
+            {
+              outcomeId: '1',
+              rating: {...mockedRatings[0], color: `#${mockedRatings[0].color}`},
+            },
           ],
         },
         {
           studentId: '3',
           outcomeRollups: [
-            {outcomeId: '1', rating: {...mockedRatings[1], color: `#${mockedRatings[1].color}`}},
+            {
+              outcomeId: '1',
+              rating: {...mockedRatings[1], color: `#${mockedRatings[1].color}`},
+            },
           ],
         },
-      ])
+      ]
+      expect(rollups).toStrictEqual(expectedRollups)
     })
 
     it("correctly translates student status from 'completed' to 'concluded' when loading rollups", async () => {
@@ -200,13 +165,7 @@ describe('useRollups', () => {
       await act(async () => jest.runAllTimers())
       const {students} = result.current
       expect(axios.get).toHaveBeenCalled()
-      expect(students[2]).toStrictEqual({
-        id: '3',
-        name: 'Student 3',
-        display_name: 'Student 3',
-        avatar_url: 'url',
-        status: 'concluded',
-      })
+      expect(students[2].status).toEqual('concluded')
     })
 
     it('calls the /rollups URL with the right parameters', async () => {

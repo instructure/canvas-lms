@@ -21,11 +21,20 @@ import CalendarHeader from '../CalendarHeader'
 import {isAccessible} from '@canvas/test-utils/jestAssertions'
 
 let header
+let originalENV
 
 describe('CalendarHeader', function () {
   beforeEach(function () {
     // set up fixtures
     $('<div id="fixtures"></div>').appendTo('body')
+
+    originalENV = global.ENV
+
+    global.ENV = {
+      current_user_roles: [],
+      FEATURES: {},
+    }
+
     header = new CalendarHeader()
     header.$el.appendTo($('#fixtures'))
   })
@@ -33,6 +42,8 @@ describe('CalendarHeader', function () {
   afterEach(function () {
     header.$el.remove()
     $('#fixtures').empty()
+
+    global.ENV = originalENV
   })
 
   // fails in Jest, passes in QUnit
@@ -145,5 +156,221 @@ describe('CalendarHeader', function () {
         done()
       })
     $('.calendar_view_buttons button').last().click()
+  })
+
+  describe('_shouldShowCreateEventLink', function () {
+    test('returns true when user is not a student', function () {
+      global.ENV.current_user_roles = ['teacher']
+      global.ENV.FEATURES = {restrict_student_access: true}
+      expect(header._shouldShowCreateEventLink()).toBe(true)
+    })
+
+    test('returns true when user is a student but restrict_student_access is false', function () {
+      global.ENV.current_user_roles = ['student']
+      global.ENV.FEATURES = {restrict_student_access: false}
+      expect(header._shouldShowCreateEventLink()).toBe(true)
+    })
+
+    test('returns true when user is a student but restrict_student_access is undefined', function () {
+      global.ENV.current_user_roles = ['student']
+      global.ENV.FEATURES = {}
+      expect(header._shouldShowCreateEventLink()).toBe(true)
+    })
+
+    test('returns false when user is a student and restrict_student_access is true', function () {
+      global.ENV.current_user_roles = ['student']
+      global.ENV.FEATURES = {restrict_student_access: true}
+      expect(header._shouldShowCreateEventLink()).toBe(false)
+    })
+
+    test('returns false when user is a student with other roles and restrict_student_access is true', function () {
+      global.ENV.current_user_roles = ['student', 'observer']
+      global.ENV.FEATURES = {restrict_student_access: true}
+      expect(header._shouldShowCreateEventLink()).toBe(false)
+    })
+
+    test('returns true when current_user_roles is undefined', function () {
+      global.ENV.current_user_roles = undefined
+      global.ENV.FEATURES = {restrict_student_access: true}
+      expect(header._shouldShowCreateEventLink()).toBe(true)
+    })
+
+    test('returns true when current_user_roles is empty', function () {
+      global.ENV.current_user_roles = []
+      global.ENV.FEATURES = {restrict_student_access: true}
+      expect(header._shouldShowCreateEventLink()).toBe(true)
+    })
+  })
+
+  describe('showNavigator behavior with create event link', function () {
+    beforeEach(function () {
+      header.$navigator = {show: jest.fn()}
+
+      header.$createNewEventLink = {
+        show: jest.fn(),
+        hide: jest.fn(),
+      }
+    })
+
+    test('shows create event link when user is not a student', function () {
+      global.ENV.current_user_roles = ['teacher']
+      global.ENV.FEATURES = {restrict_student_access: true}
+
+      header.showNavigator()
+
+      expect(header.$createNewEventLink.show).toHaveBeenCalled()
+      expect(header.$createNewEventLink.hide).not.toHaveBeenCalled()
+    })
+
+    test('hides create event link when user is a student and restrict_student_access is enabled', function () {
+      global.ENV.current_user_roles = ['student']
+      global.ENV.FEATURES = {restrict_student_access: true}
+
+      header.showNavigator()
+
+      expect(header.$createNewEventLink.hide).toHaveBeenCalled()
+      expect(header.$createNewEventLink.show).not.toHaveBeenCalled()
+    })
+
+    test('shows create event link when user is a student but restrict_student_access is disabled', function () {
+      global.ENV.current_user_roles = ['student']
+      global.ENV.FEATURES = {restrict_student_access: false}
+
+      header.showNavigator()
+
+      expect(header.$createNewEventLink.show).toHaveBeenCalled()
+      expect(header.$createNewEventLink.hide).not.toHaveBeenCalled()
+    })
+
+    test('handles missing create event link gracefully', function () {
+      header.$createNewEventLink = null
+      global.ENV.current_user_roles = ['teacher']
+      global.ENV.FEATURES = {restrict_student_access: true}
+
+      expect(() => {
+        header.showNavigator()
+      }).not.toThrow()
+    })
+  })
+
+  describe('_triggerCreateNewEvent behavior', function () {
+    let mockEvent
+    let triggerSpy
+
+    beforeEach(function () {
+      mockEvent = {
+        preventDefault: jest.fn(),
+      }
+      triggerSpy = jest.spyOn(header, 'trigger').mockImplementation(() => {})
+    })
+
+    afterEach(function () {
+      triggerSpy.mockRestore()
+    })
+
+    test('triggers createNewEvent when user is not a student', function () {
+      global.ENV.current_user_roles = ['teacher']
+      global.ENV.FEATURES = {restrict_student_access: true}
+
+      const result = header._triggerCreateNewEvent(mockEvent)
+
+      expect(mockEvent.preventDefault).toHaveBeenCalled()
+      expect(triggerSpy).toHaveBeenCalledWith('createNewEvent')
+      expect(result).not.toBe(false)
+    })
+
+    test('prevents default and returns false when user is a student and restrict_student_access is enabled', function () {
+      global.ENV.current_user_roles = ['student']
+      global.ENV.FEATURES = {restrict_student_access: true}
+
+      const result = header._triggerCreateNewEvent(mockEvent)
+
+      expect(mockEvent.preventDefault).toHaveBeenCalled()
+      expect(triggerSpy).not.toHaveBeenCalled()
+      expect(result).toBe(false)
+    })
+
+    test('triggers createNewEvent when user is a student but restrict_student_access is disabled', function () {
+      global.ENV.current_user_roles = ['student']
+      global.ENV.FEATURES = {restrict_student_access: false}
+
+      const result = header._triggerCreateNewEvent(mockEvent)
+
+      expect(mockEvent.preventDefault).toHaveBeenCalled()
+      expect(triggerSpy).toHaveBeenCalledWith('createNewEvent')
+      expect(result).not.toBe(false)
+    })
+  })
+
+  describe('_triggerCreateNewEvent behavior', function () {
+    let mockEvent
+    let triggerSpy
+
+    beforeEach(function () {
+      mockEvent = {
+        preventDefault: jest.fn(),
+      }
+      triggerSpy = jest.spyOn(header, 'trigger').mockImplementation(() => {})
+    })
+
+    afterEach(function () {
+      triggerSpy.mockRestore()
+    })
+
+    test('triggers createNewEvent when user is not a student', function () {
+      global.ENV.current_user_roles = ['teacher']
+
+      const result = header._triggerCreateNewEvent(mockEvent)
+
+      expect(mockEvent.preventDefault).toHaveBeenCalled()
+      expect(triggerSpy).toHaveBeenCalledWith('createNewEvent')
+      expect(result).not.toBe(false)
+    })
+
+    test('prevents default and returns false when user is a student', function () {
+      global.ENV.current_user_roles = ['student']
+      global.ENV.FEATURES = {restrict_student_access: true} // Add this line
+
+      const result = header._triggerCreateNewEvent(mockEvent)
+
+      expect(mockEvent.preventDefault).toHaveBeenCalled()
+      expect(triggerSpy).not.toHaveBeenCalled()
+      expect(result).toBe(false)
+    })
+  })
+
+  describe('_isUserStudent', function () {
+    test('returns true when user has student role', function () {
+      global.ENV.current_user_roles = ['student']
+      expect(header._isUserStudent()).toBe(true)
+    })
+
+    test('returns true when user has student role among others', function () {
+      global.ENV.current_user_roles = ['teacher', 'student', 'admin']
+      expect(header._isUserStudent()).toBe(true)
+    })
+
+    test('returns false when user does not have student role', function () {
+      global.ENV.current_user_roles = ['teacher', 'admin']
+      expect(header._isUserStudent()).toBe(false)
+    })
+
+    test('returns undefined when current_user_roles is undefined', function () {
+      global.ENV = {
+        FEATURES: {},
+        current_user_roles: undefined,
+      }
+      expect(header._isUserStudent()).toBeUndefined()
+    })
+
+    test('returns null when current_user_roles is null', function () {
+      global.ENV.current_user_roles = null
+      expect(header._isUserStudent()).toBeNull()
+    })
+
+    test('returns false when current_user_roles is empty', function () {
+      global.ENV.current_user_roles = []
+      expect(header._isUserStudent()).toBe(false)
+    })
   })
 })

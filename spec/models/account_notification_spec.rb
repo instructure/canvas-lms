@@ -34,6 +34,26 @@ describe AccountNotification do
     expect(AccountNotification.for_user_and_account(@user, Account.default)).to eq [@announcement]
   end
 
+  describe "#clear_cache" do
+    subject { announcement.clear_cache }
+
+    let(:announcement) { @announcement }
+
+    it "clears the cache for the root account" do
+      enable_cache do
+        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.zone.now))).to be_nil
+        AccountNotification.for_account(@account, include_all: true)
+        AccountNotification.for_account(@account, include_all: false)
+        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.zone.now, include_all: true))).not_to be_nil
+        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.zone.now, include_all: false))).not_to be_nil
+
+        subject
+        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.zone.now, include_all: true))).to be_nil
+        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.zone.now, include_all: false))).to be_nil
+      end
+    end
+  end
+
   context "for announcement access" do
     before do
       @announcement.destroy
@@ -286,6 +306,56 @@ describe AccountNotification do
 
         root_account_only = AccountNotification.for_account(Account.default)
         expect(root_account_only.count).to eq 1
+      end
+    end
+
+    context "with account notification for the default account" do
+      subject {  ->(local_args, local_kwargs) { AccountNotification.for_account(*local_args, **local_kwargs) } }
+
+      let(:args) do
+        [
+          Account.default,
+        ]
+      end
+      let(:kwargs) do
+        {
+          include_all: true
+        }
+      end
+
+      let(:root_account) { Account.default }
+      let(:account_notification_args) do
+        {
+          subject: "sub account notification",
+          account: root_account,
+          start_at: 30.days.ago,
+          end_at: 29.days.ago
+        }
+      end
+      let!(:account_notification) { sub_account_notification(account_notification_args) }
+
+      context "when the first request ran with include all = 'false'" do
+        it "respects include_all when creating the account level cache" do
+          enable_cache do
+            second_request_result = subject.call(args, kwargs.merge(include_all: false))
+            expect(second_request_result.count).to eq 1
+
+            first_request_result = subject.call(args, kwargs)
+            expect(first_request_result.count).to eq 2
+          end
+        end
+      end
+
+      context "when the first request ran with include all = 'true'" do
+        it "respects include_all when creating the account level cache" do
+          enable_cache do
+            first_request_result = subject.call(args, kwargs)
+            expect(first_request_result.count).to eq 2
+
+            second_request_result = subject.call(args, kwargs.merge(include_all: false))
+            expect(second_request_result.count).to eq 1
+          end
+        end
       end
     end
 

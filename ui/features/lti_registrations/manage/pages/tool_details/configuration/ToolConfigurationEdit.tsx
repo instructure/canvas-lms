@@ -26,9 +26,8 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import * as React from 'react'
 import {unstable_usePrompt, useNavigate, useOutletContext} from 'react-router-dom'
-import {formatApiResultError, isSuccessful} from '../../../../common/lib/apiResult/ApiResult'
 import {OverrideURIsConfirmation} from '../../../../manage/registration_wizard_forms/OverrideURIsConfirmation'
-import type {UpdateRegistration} from '../../../api/registrations'
+import {useUpdateRegistration} from '../../../api/registrations'
 import {convertToLtiConfigurationOverlay} from '../../../registration_overlay/Lti1p3RegistrationOverlayStateHelpers'
 import {createLti1p3RegistrationOverlayStore} from '../../../registration_overlay/Lti1p3RegistrationOverlayStore'
 import {
@@ -92,10 +91,9 @@ const onBeforeUnload = (formIsDirty: boolean) => async (e: BeforeUnloadEvent) =>
   }
 }
 
-export const ToolConfigurationEdit = (props: {
-  updateLtiRegistration: UpdateRegistration
-}) => {
-  const {registration, refreshRegistration} = useOutletContext<ToolDetailsOutletContext>()
+export const ToolConfigurationEdit = () => {
+  const {registration} = useOutletContext<ToolDetailsOutletContext>()
+  const updateMutation = useUpdateRegistration()
   const navigate = useNavigate()
 
   /**
@@ -133,10 +131,8 @@ export const ToolConfigurationEdit = (props: {
     when: isDirty,
   })
 
-  const [saveState, setSaveState] = React.useState<SaveState>({tag: 'initial'})
-
   const save = React.useCallback(async () => {
-    if (saveState.tag !== 'saving') {
+    if (!updateMutation.isPending) {
       const {state, setDirty, setHasSubmitted} = useOverlayState.getState()
       setHasSubmitted(true)
       const errors = validateLti1p3RegistrationOverlayState(state)
@@ -148,18 +144,16 @@ export const ToolConfigurationEdit = (props: {
 
       const {overlay, config} = convertToLtiConfigurationOverlay(state, registration.configuration)
 
-      const result = await props.updateLtiRegistration({
-        accountId: registration.account_id,
-        registrationId: registration.id,
-        overlay,
-        adminNickname: state.naming.nickname,
-        ...(showAllSettings ? {internalConfig: config} : {}),
-      })
-
-      if (isSuccessful(result)) {
+      try {
+        await updateMutation.mutateAsync({
+          accountId: registration.account_id,
+          registrationId: registration.id,
+          overlay,
+          adminNickname: state.naming.nickname,
+          ...(showAllSettings ? {internalConfig: config} : {}),
+        })
         window.removeEventListener('beforeunload', unloadHandler)
         setDirty(false)
-        refreshRegistration()
         // setTimeout here needed to wait one tick
         // for react router's unstable_usePrompt
         // to catch up to the dirty state
@@ -168,19 +162,15 @@ export const ToolConfigurationEdit = (props: {
             replace: true,
           }),
         )
-      } else {
+      } catch {
         showFlashAlert({
           message: I18n.t('An error occurred while updating the configuration.'),
           type: 'error',
           politeness: 'assertive',
         })
-        setSaveState(() => ({
-          tag: 'errors',
-          errors: [formatApiResultError(result)],
-        }))
       }
     }
-  }, [registration, setSaveState, saveState, unloadHandler])
+  }, [navigate, registration, showAllSettings, unloadHandler, updateMutation, useOverlayState])
 
   return (
     <div>
@@ -247,7 +237,7 @@ export const ToolConfigurationEdit = (props: {
       <Section>
         <IconConfirmationPerfWrapper overlayStore={useOverlayState} registration={registration} />
       </Section>
-      <Footer save={save} isSaving={saveState.tag === 'saving'} />
+      <Footer save={save} isSaving={updateMutation.isPending} />
     </div>
   )
 }

@@ -4175,6 +4175,7 @@ describe CoursesController, type: :request do
     it "returns the course syllabus" do
       should_translate_user_content(@course1) do |content|
         @course1.syllabus_body = content
+        @course1.saving_user = @me
         @course1.save!
         json = api_call(:get,
                         "/api/v1/courses.json?enrollment_type=teacher&include[]=syllabus_body",
@@ -4186,6 +4187,7 @@ describe CoursesController, type: :request do
     it "returns the course syllabus without verifiers" do
       should_translate_user_content(@course1, false) do |content|
         @course1.syllabus_body = content
+        @course1.saving_user = @me
         @course1.save!
         json = api_call(:get,
                         "/api/v1/courses.json?enrollment_type=teacher&include[]=syllabus_body",

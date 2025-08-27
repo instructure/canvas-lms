@@ -21,7 +21,7 @@ import React from 'react'
 import {MessageDetailActions} from '../MessageDetailActions'
 
 describe('MessageDetailActions', () => {
-  it('sends the selected option to the provided callback function', () => {
+  const setup = () => {
     const props = {
       onReply: jest.fn(),
       onReplyAll: jest.fn(),
@@ -29,28 +29,68 @@ describe('MessageDetailActions', () => {
       onForward: jest.fn(),
       authorName: 'John Cena',
     }
-    const {getByRole, getByText} = render(<MessageDetailActions {...props} />)
 
-    const replyButton = getByRole(
-      (role, element) => role === 'button' && element.textContent === 'Reply to John Cena',
-    )
-    fireEvent.click(replyButton)
+    const utils = render(<MessageDetailActions {...props} />)
+    const {getByText} = utils
+
+    const openMoreOptionsMenu = () => {
+      const moreOptionsButton = getByText('More options for message from John Cena')
+      fireEvent.click(moreOptionsButton)
+    }
+
+    const clickOption = label => {
+      const {getByText} = utils
+      openMoreOptionsMenu()
+      fireEvent.click(getByText(label))
+    }
+
+    return {
+      ...utils,
+      props,
+      clickOption,
+      openMoreOptionsMenu,
+    }
+  }
+
+  it('sends the selected option to the provided callback function', () => {
+    const {getByText, props, clickOption} = setup()
+
+    fireEvent.click(getByText('Reply to John Cena'))
     expect(props.onReply).toHaveBeenCalled()
 
-    const moreOptionsButton = getByRole(
-      (role, element) =>
-        role === 'button' && element.textContent === 'More options for message from John Cena',
-    )
-    fireEvent.click(moreOptionsButton)
-    fireEvent.click(getByText('Reply All'))
+    clickOption('Reply All')
     expect(props.onReplyAll).toHaveBeenCalled()
 
-    fireEvent.click(moreOptionsButton)
-    fireEvent.click(getByText('Delete'))
+    clickOption('Delete')
     expect(props.onDelete).toHaveBeenCalled()
 
-    fireEvent.click(moreOptionsButton)
-    fireEvent.click(getByText('Forward'))
+    clickOption('Forward')
     expect(props.onForward).toHaveBeenCalled()
+  })
+
+  describe('when restrict_student_access feature is enabled', () => {
+    beforeAll(() => {
+      window.ENV.FEATURES ||= {}
+      window.ENV.FEATURES.restrict_student_access = true
+    })
+
+    afterAll(() => {
+      delete window.ENV.FEATURES.restrict_student_access
+    })
+
+    it('does not render the reply all & delete button', async () => {
+      const {queryByText, openMoreOptionsMenu} = setup()
+      openMoreOptionsMenu()
+
+      expect(queryByText('Reply All')).not.toBeInTheDocument()
+      expect(queryByText('Delete')).not.toBeInTheDocument()
+    })
+
+    it('renders only Forward button', async () => {
+      const {getByText, openMoreOptionsMenu} = setup()
+      openMoreOptionsMenu()
+
+      expect(getByText('Forward')).toBeInTheDocument()
+    })
   })
 })

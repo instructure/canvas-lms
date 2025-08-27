@@ -74,6 +74,7 @@ export default function SettingsTabs({tabs = []}: SettingsTabsProps): JSX.Elemen
           value={t.id}
           renderTitle={() => t.title}
           isSelected={selectedTab === t.id}
+          themeOverride={{defaultOverflowY: 'unset'}}
         >
           <div
             ref={

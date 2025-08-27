@@ -57,7 +57,7 @@ k20_course_readiness_due_date_criteria:
   applies_to: Account
   display_name: Intelligent Insights - Course Readiness - Due Date Criteria
   description:
-    k20_course_readiness_due_date_criteria: Enables the Intelligent Insights - Course Readiness - Due Date Criteria feature and accompanying permission.
+    k20_course_readiness_due_date_criteria: Enables the Intelligent Insights - Course Readiness - Due Date Criteria feature.
   root_opt_in: true
   beta: true
   shadow: true
@@ -66,7 +66,7 @@ k20_course_readiness_gradebook_criteria:
   applies_to: Account
   display_name: Intelligent Insights - Course Readiness - Gradebook Criteria
   description:
-    k20_course_readiness_gradebook_criteria: Enables the Intelligent Insights - Course Readiness - Gradebook Criteria feature and accompanying permission.
+    k20_course_readiness_gradebook_criteria: Enables the Intelligent Insights - Course Readiness - Gradebook Criteria feature.
   root_opt_in: true
   beta: true
   shadow: true
@@ -75,7 +75,61 @@ k20_course_readiness_broken_links_criteria:
   applies_to: Account
   display_name: Intelligent Insights - Course Readiness - Broken Links Criteria
   description:
-    k20_course_readiness_broken_links_criteria: Enables the Intelligent Insights - Course Readiness - Broken Links Criteria feature and accompanying permission.
+    k20_course_readiness_broken_links_criteria: Enables the Intelligent Insights - Course Readiness - Broken Links Criteria feature.
+  root_opt_in: true
+  beta: true
+  shadow: true
+k20_course_readiness_lti_apps_criteria:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Course Readiness - LTI Apps Criteria
+  description:
+    k20_course_readiness_lti_apps_criteria: Enables the Intelligent Insights - Course Readiness - LTI Apps Criteria feature.
+  root_opt_in: true
+  beta: true
+  shadow: true
+k20_course_readiness_homepage_criteria:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Course Readiness - Homepage Criteria
+  description:
+    k20_course_readiness_homepage_criteria: Enables the Intelligent Insights - Course Readiness - Homepage Criteria feature.
+  root_opt_in: true
+  beta: true
+  shadow: true
+k20_course_readiness_criteria_set_results_preview:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Course Readiness - Criteria Set Results Preview
+  description:
+    k20_course_readiness_criteria_set_results_preview: Enables the Intelligent Insights - Course Readiness - Criteria Set Results Preview feature.
+  root_opt_in: true
+  beta: true
+  shadow: true
+k20_criteria_set_preview:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Criteria Set Preview
+  description:
+    k20_criteria_set_preview: Enables the Intelligent Insights - Criteria Set Preview feature.
+  root_opt_in: true
+  beta: true
+  shadow: true
+k20_course_readiness_course_nav_criteria:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Course Readiness - Course Nav Criteria
+  description:
+    k20_course_readiness_course_nav_criteria: Enables the Intelligent Insights - Course Readiness - Course Nav Criteria feature.
+  root_opt_in: true
+  beta: true
+  shadow: true
+k20_course_readiness_rubric_criteria:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Course Readiness - Rubric Criteria
+  description:
+    k20_course_readiness_rubric_criteria: Enables the Intelligent Insights - Course Readiness - Rubric Criteria feature.
   root_opt_in: true
   beta: true
   shadow: true

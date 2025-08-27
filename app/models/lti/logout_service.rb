@@ -67,7 +67,9 @@ module Lti
     Runner = Struct.new(:callbacks) do
       def perform
         callbacks.each_value do |callback|
-          CanvasHttp.get(URI.parse(callback).to_s)
+          InstrumentTLSCiphers.without_tls_metrics do
+            CanvasHttp.get(URI.parse(callback).to_s)
+          end
         rescue => e
           Rails.logger.error("Failed to call logout callback '#{callback}': #{e.inspect}")
         end

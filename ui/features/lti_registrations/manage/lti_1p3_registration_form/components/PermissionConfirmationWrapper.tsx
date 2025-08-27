@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import type {Lti1p3RegistrationOverlayStore} from '../../registration_overlay/Lti1p3RegistrationOverlayStore'
 import {PermissionConfirmation} from '../../registration_wizard_forms/PermissionConfirmation'
 import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'

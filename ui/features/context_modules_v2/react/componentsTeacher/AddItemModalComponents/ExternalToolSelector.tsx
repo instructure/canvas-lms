@@ -22,8 +22,8 @@ import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {useContextModule} from '../../hooks/useModuleContext'
 import {ExternalToolModalItem} from '../../utils/types'
+import {ContentItem} from '../../hooks/queries/useModuleItemContent'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -34,19 +34,20 @@ interface ExternalToolSelectorProps {
   selectedToolId?: string
   onToolSelect: (tool: ExternalToolModalItem | null) => void
   disabled?: boolean
+  contentItems: ExternalToolModalItem[]
 }
 
 export const ExternalToolSelector: React.FC<ExternalToolSelectorProps> = ({
   selectedToolId,
   onToolSelect,
   disabled = false,
+  contentItems,
 }) => {
-  const {moduleMenuModalTools} = useContextModule()
-  const availableTools: ExternalToolModalItem[] = moduleMenuModalTools as ExternalToolModalItem[]
+  const availableTools = contentItems
 
   const selectedTool = useMemo(() => {
     if (!selectedToolId) return null
-    return availableTools.find(tool => tool.definition_id.toString() === selectedToolId) || null
+    return availableTools.find(tool => tool.definition_id === selectedToolId) || null
   }, [availableTools, selectedToolId])
 
   const handleToolChange = (_event: React.SyntheticEvent, data: {value?: string | number}) => {
@@ -55,7 +56,7 @@ export const ExternalToolSelector: React.FC<ExternalToolSelectorProps> = ({
       return
     }
 
-    const tool = availableTools.find(t => t.definition_id.toString() === data.value?.toString())
+    const tool = availableTools.find(t => t.definition_id === data.value?.toString())
 
     if (tool) {
       onToolSelect(tool)
@@ -73,10 +74,11 @@ export const ExternalToolSelector: React.FC<ExternalToolSelectorProps> = ({
   return (
     <Flex direction="column" gap="small" margin="0 0 small 0">
       <SimpleSelect
+        data-testid="add-item-content-select"
         renderLabel={I18n.t('Select External Tool')}
         assistiveText={I18n.t('Type to search for tools or use arrow keys to navigate options')}
         placeholder={I18n.t('Choose an external tool...')}
-        value={selectedTool?.definition_id?.toString() || ''}
+        value={selectedTool?.definition_id || ''}
         onChange={handleToolChange}
         disabled={disabled}
       >
@@ -87,9 +89,13 @@ export const ExternalToolSelector: React.FC<ExternalToolSelectorProps> = ({
           .sort((a, b) => a.name.localeCompare(b.name))
           .map(tool => (
             <SimpleSelect.Option
-              id={tool.definition_id.toString()}
+              id={
+                typeof tool.definition_id === 'number'
+                  ? String(tool.definition_id)
+                  : tool.definition_id
+              }
               key={tool.definition_id}
-              value={tool.definition_id.toString()}
+              value={tool.definition_id}
             >
               {tool.name}
             </SimpleSelect.Option>

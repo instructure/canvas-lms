@@ -23,12 +23,8 @@ describe Accessibility::IssuesController do
   let(:course) { Course.create!(name: "Test Course", id: 42) }
 
   before do
-    allow_any_instance_of(described_class).to receive(:require_context).and_return(true)
     allow_any_instance_of(described_class).to receive(:require_user).and_return(true)
-    allow_any_instance_of(described_class).to receive(:authorized_action).and_return(true)
-    allow_any_instance_of(described_class).to receive(:tab_enabled?).with(Course::TAB_ACCESSIBILITY).and_return(true)
-    allow_any_instance_of(described_class).to receive(:t).and_return("Accessibility")
-    allow_any_instance_of(described_class).to receive(:add_crumb)
+    allow_any_instance_of(described_class).to receive(:check_authorized_action).and_return(true)
   end
 
   describe "POST #create" do
@@ -79,24 +75,18 @@ describe Accessibility::IssuesController do
   end
 
   describe "PUT #update" do
+    let(:course) { course_model }
+    let(:resource) { wiki_page_model(course:, title: "Test Page", body: "<div><h1>Page Title</h1></div>") }
+
     it "updates the wiki page body with the fixed content" do
-      wiki_page = course.wiki_pages.create!(title: "Test Page", body: "<div>old content</div>")
-      context_double = double("Context")
-      wiki_pages_double = double("WikiPages")
-      allow(context_double).to receive_messages(id: course.id, wiki_pages: wiki_pages_double)
-      allow(wiki_pages_double).to receive(:find_by).and_return(wiki_page)
-      controller.instance_variable_set(:@context, context_double)
-
-      allow_any_instance_of(Accessibility::Issue::HtmlFixer).to receive(:fix_content).and_return("<div>fixed content</div>")
-
       put :update,
           params: { course_id: course.id },
           body: {
-            rule: "adjacent-links",
+            rule: Accessibility::Rules::HeadingsStartAtH2Rule.id,
             content_type: "Page",
-            content_id: wiki_page.id,
-            path: "/div",
-            value: "new value"
+            content_id: resource.id,
+            path: ".//h1",
+            value: "Change it to Heading 2"
           }.to_json,
           as: :json
 
@@ -104,8 +94,7 @@ describe Accessibility::IssuesController do
 
       expect(response).to have_http_status(:ok)
       expect(json["success"]).to be(true)
-      wiki_page.reload
-      expect(wiki_page.body).to eq("<div>fixed content</div>")
+      expect(resource.reload.body).to eq("<div><h2>Page Title</h2></div>")
     end
   end
 end

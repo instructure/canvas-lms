@@ -20,7 +20,7 @@ import {createRoot} from 'react-dom/client'
 
 import {useEffect} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
+import {AssetProcessorType, ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
 import {
   AssetProcessors,
   AssetProcessorsProps,
@@ -30,11 +30,14 @@ import {
   useShouldShowAssetProcessors,
 } from '@canvas/lti-asset-processor/react/hooks/AssetProcessorsState'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {LtiPlacements} from 'features/developer_keys_v2/model/LtiPlacements'
 
 const I18n = createI18nScope('assignment_edit')
 const queryClient = new QueryClient()
 
-export type AssetProcessorsForAssignmentProps = AssetProcessorsProps & {
+type AssetProcessorsPropsWithoutType = Omit<AssetProcessorsProps, 'type'>
+
+export type AssetProcessorsForAssignmentProps = AssetProcessorsPropsWithoutType & {
   initialAttachedProcessors: ExistingAttachedAssetProcessor[]
 }
 
@@ -73,7 +76,7 @@ export function AssetProcessorsForAssignment({
 
   const attachedProcessors = useAssetProcessorsState(s => s.attachedProcessors)
 
-  const shouldShow = useShouldShowAssetProcessors(props.courseId)
+  const shouldShow = useShouldShowAssetProcessors(props.courseId, 'ActivityAssetProcessor')
 
   if (!shouldShow) {
     return null
@@ -84,7 +87,7 @@ export function AssetProcessorsForAssignment({
       <div className="form-column-left">{I18n.t('Document Processing App(s)')}</div>
       <div className="form-column-right">
         <div className="border border-trbl border-round">
-          <AssetProcessors {...props} />
+          <AssetProcessors {...props} type="ActivityAssetProcessor" />
         </div>
         {attachedProcessors.map((processor, index) => (
           <input

@@ -102,6 +102,26 @@ describe('EditItemModal', () => {
     expect(titleInput).toHaveValue('New Title')
   })
 
+  it('shows error if title is empty', () => {
+    setUp(buildDefaultProps())
+
+    const titleInput = screen.getByTestId('edit-modal-title')
+    fireEvent.change(titleInput, {target: {value: ''}})
+    fireEvent.click(screen.getByText('Update'))
+    expect(screen.getByText('Name is required')).toBeInTheDocument()
+  })
+
+  it('removes name error when valid title is entered', () => {
+    setUp(buildDefaultProps())
+
+    const titleInput = screen.getByTestId('edit-modal-title')
+    fireEvent.change(titleInput, {target: {value: ''}})
+    fireEvent.click(screen.getByText('Update'))
+    expect(screen.getByText('Name is required')).toBeInTheDocument()
+    fireEvent.change(titleInput, {target: {value: 'Valid Title'}})
+    expect(screen.queryByText('Name is required')).not.toBeInTheDocument()
+  })
+
   it('updates indent when changed', () => {
     setUp(buildDefaultProps())
 

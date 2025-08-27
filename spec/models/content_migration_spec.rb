@@ -2561,8 +2561,8 @@ describe ContentMigration do
       @att2 = Attachment.create!(filename: "second.webm", uploaded_data: stub_file_data("second.webm", "asdf", "video/mp4"), folder: uploaded_media_folder, context: @copy_from, media_entry_id: "m-media_id_2")
       MediaObject.create!(attachment_id: @att1.id, media_id: "m-media_id_1")
       MediaObject.create!(attachment_id: @att2.id, media_id: "m-media_id_2")
-      @copy_from.wiki_pages.create! title: "wp1", body: "<iframe data-media-type=\"audio\" data-media-id=\"#{@att1.media_entry_id}\" src=\"/media_attachments_iframe/#{@att1.id}?type=audio\"></iframe>"
-      @copy_from.wiki_pages.create! title: "wp2", body: "<iframe data-media-type=\"video\" data-media-id=\"#{@att2.media_entry_id}\" src=\"/media_attachments_iframe/#{@att2.id}?type=video\"></iframe>"
+      @copy_from.wiki_pages.create! title: "wp1", body: "<iframe data-media-type=\"audio\" data-media-id=\"#{@att1.media_entry_id}\" src=\"/media_attachments_iframe/#{@att1.id}?type=audio\"></iframe>", saving_user: @teacher
+      @copy_from.wiki_pages.create! title: "wp2", body: "<iframe data-media-type=\"video\" data-media-id=\"#{@att2.media_entry_id}\" src=\"/media_attachments_iframe/#{@att2.id}?type=video\"></iframe>", saving_user: @teacher
       @kaltura = double("CanvasKaltura::ClientV3")
       @kaltura_media_handler = instance_double(KalturaMediaFileHandler)
       expect(@kaltura_media_handler).to receive(:add_media_files) do |_attachments, _wait_for_completion|

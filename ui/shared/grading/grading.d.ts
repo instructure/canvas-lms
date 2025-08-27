@@ -182,7 +182,7 @@ export type CamelizedAssignment = {
   moderatedGrading: boolean
   muted: boolean
   name: string
-  pointsPossible: number
+  pointsPossible: number | null
   postManually: boolean
   published: boolean
   hasRubric: boolean | null

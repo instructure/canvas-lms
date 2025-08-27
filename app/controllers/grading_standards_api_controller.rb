@@ -212,6 +212,97 @@ class GradingStandardsApiController < ApplicationController
     end
   end
 
+  # @API Update a grading standard
+  # Updates the grading standard with the given id
+  #
+  # If the grading standard has been used for grading, only the title can be updated.
+  # The data, points_based, and scaling_factor cannot be modified once the grading
+  # standard has been used to grade assignments.
+  #
+  # @argument title [String]
+  #   The title for the Grading Standard
+  #
+  # @argument points_based [Boolean]
+  #   Whether or not a grading scheme is points based.
+  #   Defaults to false.
+  #
+  # @argument scaling_factor [Integer]
+  #   The factor by which to scale a percentage into a points based scheme grade.
+  #   This is the maximum number of points possible in the grading scheme.
+  #   Defaults to 1. Not required for percentage based grading schemes.
+  #
+  # @argument grading_scheme_entry[][name] [String]
+  #   The name for an entry value within a GradingStandard that describes the range of the value
+  #   e.g. A-
+  #
+  # @argument grading_scheme_entry[][value] [Required, Integer]
+  #   The value for the name of the entry within a GradingStandard.
+  #   The entry represents the lower bound of the range for the entry.
+  #   This range includes the value up to the next entry in the GradingStandard,
+  #   or 100 if there is no upper bound. The lowest value will have a lower bound range of 0.
+  #   e.g. 93
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/courses/1/grading_standards/5 \
+  #     -X PUT \
+  #     -H 'Authorization: Bearer <token>' \
+  #     -d 'title=Updated+Grading+Standard'
+  #     -d 'points_based=false' \
+  #     -d 'scaling_factor=1.0' \
+  #     -d 'grading_scheme_entry[][name]=A' \
+  #     -d 'grading_scheme_entry[][value]=94' \
+  #     -d 'grading_scheme_entry[][name]=A-' \
+  #     -d 'grading_scheme_entry[][value]=90' \
+  #     -d 'grading_scheme_entry[][name]=B+' \
+  #     -d 'grading_scheme_entry[][value]=87' \
+  #     -d 'grading_scheme_entry[][name]=B' \
+  #     -d 'grading_scheme_entry[][value]=84' \
+  #     -d 'grading_scheme_entry[][name]=B-' \
+  #     -d 'grading_scheme_entry[][value]=80' \
+  #     -d 'grading_scheme_entry[][name]=C+' \
+  #     -d 'grading_scheme_entry[][value]=77' \
+  #     -d 'grading_scheme_entry[][name]=C' \
+  #     -d 'grading_scheme_entry[][value]=74' \
+  #     -d 'grading_scheme_entry[][name]=C-' \
+  #     -d 'grading_scheme_entry[][value]=70' \
+  #     -d 'grading_scheme_entry[][name]=D+' \
+  #     -d 'grading_scheme_entry[][value]=67' \
+  #     -d 'grading_scheme_entry[][name]=D' \
+  #     -d 'grading_scheme_entry[][value]=64' \
+  #     -d 'grading_scheme_entry[][name]=D-' \
+  #     -d 'grading_scheme_entry[][value]=61' \
+  #     -d 'grading_scheme_entry[][name]=F' \
+  #     -d 'grading_scheme_entry[][value]=0'
+  #
+  # @returns GradingStandard
+  def update
+    grading_standard = @context.grading_standards.find(params[:grading_standard_id])
+    return unless authorized_action(grading_standard, @current_user, :manage)
+
+    if grading_standard.assessed_assignment?
+      if params.key?(:grading_scheme_entry) || params.key?(:points_based) || params.key?(:scaling_factor)
+        return respond_to do |format|
+          format.json { render json: { errors: { base: [t("errors.grading_standard.cannot_modify", "Cannot modify grading scheme data, points_based setting, or scaling_factor for a grading standard that has been used for grading. Only the title can be updated.")] } }, status: :bad_request }
+        end
+      end
+      grading_standard_params = params.permit("title")
+    else
+      grading_standard_params = if params.key?(:grading_scheme_entry) || params.key?(:points_based) || params.key?(:scaling_factor)
+                                  build_grading_scheme(params)
+                                else
+                                  params.permit("title")
+                                end
+    end
+
+    respond_to do |format|
+      if grading_standard.update(grading_standard_params)
+        format.json { render json: grading_standard_json(grading_standard, @current_user, session) }
+      else
+        format.json { render json: grading_standard.errors, status: :bad_request }
+      end
+    end
+  end
+
   # @API Delete a grading standard
   # Deletes the grading standard with the given id
   #

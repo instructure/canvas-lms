@@ -39,17 +39,22 @@ export function loadStudents() {
 
     dispatch(setLoadStudentsStatus(STARTED))
 
-    StudentsApi.loadStudents(assignment.courseId, assignment.id, {
-      onAllPagesLoaded() {
-        dispatch(setLoadStudentsStatus(SUCCESS))
+    StudentsApi.loadStudents(
+      assignment.courseId,
+      assignment.id,
+      {
+        onAllPagesLoaded() {
+          dispatch(setLoadStudentsStatus(SUCCESS))
+        },
+        onFailure() {
+          dispatch(setLoadStudentsStatus(FAILURE))
+        },
+        onPageLoaded({provisionalGrades, students}) {
+          dispatch(addStudents(students))
+          dispatch(addProvisionalGrades(provisionalGrades))
+        },
       },
-      onFailure() {
-        dispatch(setLoadStudentsStatus(FAILURE))
-      },
-      onPageLoaded({provisionalGrades, students}) {
-        dispatch(addStudents(students))
-        dispatch(addProvisionalGrades(provisionalGrades))
-      },
-    })
+      {sort: 'name', order: 'asc'},
+    )
   }
 }

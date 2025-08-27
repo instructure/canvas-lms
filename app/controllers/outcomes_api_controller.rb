@@ -375,7 +375,7 @@ class OutcomesApiController < ApplicationController
   end
 
   # @API Get aligned assignments for an outcome in a course for a particular student
-  #
+  # Returns all assignments aligned to a specific outcome for a student in a course.
   # @argument course_id [Integer]
   #   The id of the course
   #

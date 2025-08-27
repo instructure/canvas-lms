@@ -40,4 +40,23 @@ describe('assetProcessorContentItemToDto', () => {
       thumbnail: {url: 'http://example.com/thumbnail'},
     })
   })
+
+  it('converts an AssetProcessorContentItem to the format used by discussions mutations', () => {
+    const contentItem: AssetProcessorContentItem = {
+      type: 'ltiAssetProcessorContribution',
+      url: 'http://example.com',
+      title: 'example',
+      text: 'example',
+      icon: {url: 'http://example.com/icon'},
+      thumbnail: {url: 'http://example.com/thumbnail'},
+    }
+    expect(assetProcessorContentItemToDto(contentItem, 1)).toEqual({
+      context_external_tool_id: 1,
+      url: 'http://example.com',
+      title: 'example',
+      text: 'example',
+      icon: {url: 'http://example.com/icon'},
+      thumbnail: {url: 'http://example.com/thumbnail'},
+    })
+  })
 })

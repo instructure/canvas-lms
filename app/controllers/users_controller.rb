@@ -448,7 +448,11 @@ class UsersController < ApplicationController
       users = users.with_last_login if params[:sort] == "last_login"
     end
 
-    if params[:uuids].present? && (uuids = Array(params[:uuids]).flatten.take(MAX_UUIDS_IN_FILTER))
+    if params[:uuids].present? && Array(params[:uuids]).size > MAX_UUIDS_IN_FILTER
+      return render json: { error: "Too many UUIDs in filter. Current limit is #{MAX_UUIDS_IN_FILTER}" }, status: :bad_request
+    end
+
+    if params[:uuids].present? && (uuids = Array(params[:uuids]).flatten)
       users = users.where(uuid: uuids)
     end
 
@@ -520,6 +524,14 @@ class UsersController < ApplicationController
     if !k5_user? && !@current_user.non_student_enrollment? && @domain_root_account.feature_enabled?(:widget_dashboard)
       # things needed only for widget dashboard (students only)
       js_bundle :widget_dashboard
+      css_bundle :dashboard_card
+      js_env({
+               PREFERENCES: {
+                 dashboard_view: @current_user.dashboard_view(@domain_root_account),
+                 hide_dashcard_color_overlays: @current_user.preferences[:hide_dashcard_color_overlays],
+                 custom_colors: @current_user.custom_colors
+               }
+             })
       return render html: "", layout: true
     end
 
@@ -2917,7 +2929,7 @@ class UsersController < ApplicationController
   end
 
   # @API Get a users most recently graded submissions
-  #
+  # Returns a list of the user's most recently graded submissions.
   # @example_request
   #     curl https://<canvas>/api/v1/users/<user_id>/graded_submissions \
   #          -X POST \

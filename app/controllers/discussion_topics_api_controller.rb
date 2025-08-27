@@ -310,6 +310,10 @@ class DiscussionTopicsApiController < ApplicationController
 
     if DiscussionTopicInsight::TERMINAL_WORKFLOW_STATES.include?(insight.workflow_state)
       data[:needs_processing] = insight.needs_processing?
+      # The needs_processing in the root is obsolete. The reason it's still here is to maintain backward compatibility
+      # with speedgrader's current behaviour. Once the latest speedgrader is deployed, we can remove this.
+
+      data[:student_ids_needs_processing] = insight.student_ids_needs_processing
     end
 
     render(json: data)
@@ -1059,10 +1063,8 @@ class DiscussionTopicsApiController < ApplicationController
                            .in_batches
                            .update_all(discussion_type: DiscussionTopic::DiscussionTypes::THREADED, updated_at: Time.now.utc)
 
-    tags = { institution: @domain_root_account&.name || "unknown" }
-
-    InstStatsd::Statsd.distributed_increment("discussion_topic.migrate_disallow.count", tags:)
-    InstStatsd::Statsd.gauge("discussion_topic.migrate_disallow.discussions_updated", update_count, tags:)
+    InstStatsd::Statsd.distributed_increment("discussion_topic.migrate_disallow.count")
+    InstStatsd::Statsd.gauge("discussion_topic.migrate_disallow.discussions_updated", update_count)
 
     render json: { update_count: }
   end
@@ -1089,8 +1091,12 @@ class DiscussionTopicsApiController < ApplicationController
       return render(json: { error: "Invalid data", count: side_comment_count }, status: :bad_request)
     end
 
-    to_threaded.in_batches.update_all(discussion_type: DiscussionTopic::DiscussionTypes::THREADED, updated_at: Time.now.utc)
-    to_not_threaded.in_batches.update_all(discussion_type: DiscussionTopic::DiscussionTypes::NOT_THREADED, updated_at: Time.now.utc)
+    to_threaded_update_count = to_threaded.in_batches.update_all(discussion_type: DiscussionTopic::DiscussionTypes::THREADED, updated_at: Time.now.utc)
+    to_not_threaded_update_count = to_not_threaded.in_batches.update_all(discussion_type: DiscussionTopic::DiscussionTypes::NOT_THREADED, updated_at: Time.now.utc)
+
+    InstStatsd::Statsd.distributed_increment("discussion_topic.migrate_disallow_manage.count")
+    InstStatsd::Statsd.gauge("discussion_topic.migrate_disallow_manage.discussions_updated", to_threaded_update_count, tags: { type: DiscussionTopic::DiscussionTypes::THREADED })
+    InstStatsd::Statsd.gauge("discussion_topic.migrate_disallow_manage.discussions_updated", to_not_threaded_update_count, tags: { type: DiscussionTopic::DiscussionTypes::NOT_THREADED })
 
     render json: { success: "true" }
   end

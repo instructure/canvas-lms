@@ -157,7 +157,7 @@ describe Lti::ContextControlsController, type: :request do
 
     context "with deployments" do
       let(:deployment) { registration.deployments.first }
-      let(:control) { deployment.context_controls.first }
+      let(:control) { deployment.primary_context_control }
       let(:course) { course_model(account:) }
       let(:subaccount) { account_model(parent_account: account) }
       let(:course_deployment) { deployment_for(course) }
@@ -335,7 +335,7 @@ describe Lti::ContextControlsController, type: :request do
     subject { get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/controls/#{control.id}" }
 
     let(:deployment) { deployment_for(account) }
-    let(:control) { deployment.context_controls.first }
+    let(:control) { deployment.primary_context_control }
 
     it "is successful" do
       subject
@@ -528,6 +528,30 @@ describe Lti::ContextControlsController, type: :request do
       end
     end
 
+    context "for context deep in deployment's hierarchy" do
+      let(:subaccount) { account_model(parent_account: account) }
+      let(:subsubaccount) { account_model(parent_account: subaccount) }
+      let(:params) { { account_id: subsubaccount.id } }
+
+      it "also creates an anchor control" do
+        expect { subject }.to change { Lti::ContextControl.count }.by(2)
+      end
+
+      context "anchor control" do
+        let(:anchor_control) { Lti::ContextControl.find_by(deployment: root_deployment, account: subaccount) }
+
+        it "belongs to context right below deployment" do
+          subject
+          expect(anchor_control).to be_present
+        end
+
+        it "matches deployment control's availability" do
+          subject
+          expect(anchor_control.available).to eq(root_deployment.primary_context_control.available)
+        end
+      end
+    end
+
     context "with existing control" do
       let(:params) { { account_id: account.id } }
 
@@ -670,6 +694,57 @@ describe Lti::ContextControlsController, type: :request do
             hash_including(account_id: subaccount.id, deployment_id: subdeployment.id)
           ]
         )
+      end
+    end
+
+    describe "with controls that need anchors" do
+      # see Lti::ContextControlService.build_anchor_controls for what these mean
+      let(:params) do
+        [
+          { account_id: other_subsubaccount.id.to_s, available: true },
+          { course_id: course.id.to_s, available: false },
+        ]
+      end
+
+      let(:course) { course_model(account: subaccount) }
+      let(:subaccount) { account_model(parent_account: account) }
+      let(:other_subaccount) { account_model(parent_account: account) }
+      let(:other_subsubaccount) { account_model(parent_account: other_subaccount) }
+
+      it "creates controls and anchor controls where needed" do
+        expect { subject }.to change { Lti::ContextControl.count }.by(4)
+        expect(response).to be_successful
+        expect(response_json.length).to eq(4)
+        expect(response_json.map(&:with_indifferent_access)).to match_array(
+          [
+            hash_including(account_id: other_subsubaccount.id, available: true),
+            hash_including(course_id: course.id, available: false),
+            hash_including(account_id: other_subaccount.id, available: root_deployment.primary_context_control.available), # anchor
+            hash_including(account_id: subaccount.id, available: root_deployment.primary_context_control.available) # anchor
+          ]
+        )
+      end
+
+      context "when anchor control already exists" do
+        let(:anchor_control) { Lti::ContextControl.create!(account: other_subaccount, registration:, deployment: root_deployment, available: true) }
+
+        before do
+          anchor_control
+        end
+
+        it "does not create a new anchor control" do
+          expect { subject }.to change { Lti::ContextControl.count }.by(3)
+          expect(response).to be_successful
+          expect(response_json.length).to eq(4)
+          expect(response_json.map(&:with_indifferent_access)).to match_array(
+            [
+              hash_including(account_id: other_subsubaccount.id, available: true),
+              hash_including(course_id: course.id, available: false),
+              hash_including(account_id: other_subaccount.id, available: root_deployment.primary_context_control.available), # existing anchor is still returned
+              hash_including(account_id: subaccount.id, available: root_deployment.primary_context_control.available) # anchor
+            ]
+          )
+        end
       end
     end
 
@@ -898,7 +973,7 @@ describe Lti::ContextControlsController, type: :request do
     end
 
     let(:deployment) { deployment_for(account) }
-    let(:control) { deployment.context_controls.first }
+    let(:control) { deployment.primary_context_control }
     let(:params) { { available: false } }
     # control_id and registration_id are specified here so that it's easy to create
     # an id variable for a control or registration that doesn't exist.
@@ -972,7 +1047,7 @@ describe Lti::ContextControlsController, type: :request do
     end
 
     context "with the deployment's primary control" do
-      let(:control) { deployment.context_controls.first }
+      let(:control) { deployment.primary_context_control }
 
       it "returns a 422" do
         subject

@@ -118,6 +118,7 @@ describe('LtiRegistration', () => {
       const extraPlacement = {
         placement: 'ActivityAssetProcessor',
         eula: {
+          enabled: true,
           target_link_uri: 'https://example.com/123',
           custom_fields: {foo: 'bar'},
         },

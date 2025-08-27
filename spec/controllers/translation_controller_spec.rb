@@ -105,7 +105,7 @@ describe TranslationController do
         post :translate, params: { course_id: @course.id, inputs: params }
 
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(response.parsed_body.deep_symbolize_keys).to eq({ translationError: { type: "info", message: "Looks like you're trying to translate into the same language." } })
+        expect(response.parsed_body.deep_symbolize_keys).to eq({ translationError: { type: "error", message: "Translation is identical to source language." } })
       end
     end
 
@@ -164,7 +164,7 @@ describe TranslationController do
           post :translate, params: { course_id: @course.id, inputs: params }
 
           expect(response).to have_http_status(:unprocessable_entity)
-          expect(response.parsed_body.deep_symbolize_keys).to eq({ translationError: { type: "error", message: "Couldn’t translate because the text is too long." } })
+          expect(response.parsed_body.deep_symbolize_keys).to eq({ translationError: { type: "error", message: "Translation failed because the text is longer than the character limit (5000)." } })
         end
       end
 
@@ -178,7 +178,7 @@ describe TranslationController do
           post :translate_paragraph, params: { course_id: @course.id, inputs: params }
 
           expect(response).to have_http_status(:unprocessable_entity)
-          expect(response.parsed_body.deep_symbolize_keys).to eq({ translationErrorTextTooLong: { type: "error", message: "Couldn’t translate because the text is too long." } })
+          expect(response.parsed_body.deep_symbolize_keys).to eq({ translationErrorTextTooLong: { type: "error", message: "Translation failed because the text is longer than the character limit (5000)." } })
         end
       end
     end

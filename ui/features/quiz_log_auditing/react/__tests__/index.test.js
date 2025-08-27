@@ -867,9 +867,28 @@ const fixture = {
 
 // Setup MSW server
 const server = setupServer(
-  ...Object.entries(fixture).map(([url, response]) =>
-    http.get(url, () => HttpResponse.json(response)),
-  ),
+  ...Object.entries(fixture).map(([url, response]) => {
+    // Extract base path and query parameters from the URL
+    const urlObj = new URL(url, 'http://localhost')
+    const basePath = urlObj.pathname
+    const expectedParams = Object.fromEntries(urlObj.searchParams)
+
+    return http.get(basePath, ({request}) => {
+      // Check if query parameters match for URLs that have them
+      if (Object.keys(expectedParams).length > 0) {
+        const actualParams = Object.fromEntries(new URL(request.url).searchParams)
+
+        // Check if all expected params are present with correct values
+        for (const [key, value] of Object.entries(expectedParams)) {
+          if (actualParams[key] !== value) {
+            return new HttpResponse(null, {status: 404})
+          }
+        }
+      }
+
+      return HttpResponse.json(response)
+    })
+  }),
 )
 
 describe('canvas_quizzes/events', () => {

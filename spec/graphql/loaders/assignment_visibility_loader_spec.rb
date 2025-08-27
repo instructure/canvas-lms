@@ -41,15 +41,15 @@ describe Loaders::AssignmentVisibilityLoader do
   end
 
   it "returns assignments with their visibility data" do
-    expect(AssignmentVisibility::AssignmentVisibilityService).to receive(:users_with_visibility_by_assignment)
-      .with(course_id: @course1.id, assignment_ids: [@assignment1.id, @assignment2.id])
+    expect(AssignmentVisibility::AssignmentVisibilityService).to receive(:assignments_with_user_visibilities)
+      .with(@course1, [@assignment1, @assignment2])
       .and_return({
                     @assignment1.id => [@student1.id],
                     @assignment2.id => [@student1.id, @student2.id]
                   })
 
-    expect(AssignmentVisibility::AssignmentVisibilityService).to receive(:users_with_visibility_by_assignment)
-      .with(course_id: @course2.id, assignment_ids: [@assignment3.id])
+    expect(AssignmentVisibility::AssignmentVisibilityService).to receive(:assignments_with_user_visibilities)
+      .with(@course2, [@assignment3])
       .and_return({
                     @assignment3.id => [@student3.id]
                   })
@@ -79,8 +79,8 @@ describe Loaders::AssignmentVisibilityLoader do
     @assignment4 = @course1.assignments.create!(title: "Assignment 4")
 
     # Mock the visibility service to return empty data for this assignment
-    expect(AssignmentVisibility::AssignmentVisibilityService).to receive(:users_with_visibility_by_assignment)
-      .with(course_id: @course1.id, assignment_ids: [@assignment4.id])
+    expect(AssignmentVisibility::AssignmentVisibilityService).to receive(:assignments_with_user_visibilities)
+      .with(@course1, [@assignment4])
       .and_return({
                     @assignment4.id => []
                   })
@@ -110,15 +110,15 @@ describe Loaders::AssignmentVisibilityLoader do
 
   it "correctly handles assignments from multiple courses" do
     # We'll make separate calls for each course's assignments
-    expect(AssignmentVisibility::AssignmentVisibilityService).to receive(:users_with_visibility_by_assignment)
-      .with(course_id: @course1.id, assignment_ids: [@assignment1.id, @assignment2.id])
+    expect(AssignmentVisibility::AssignmentVisibilityService).to receive(:assignments_with_user_visibilities)
+      .with(@course1, [@assignment1, @assignment2])
       .and_return({
                     @assignment1.id => [@student1.id],
                     @assignment2.id => [@student1.id, @student2.id]
                   })
 
-    expect(AssignmentVisibility::AssignmentVisibilityService).to receive(:users_with_visibility_by_assignment)
-      .with(course_id: @course2.id, assignment_ids: [@assignment3.id])
+    expect(AssignmentVisibility::AssignmentVisibilityService).to receive(:assignments_with_user_visibilities)
+      .with(@course2, [@assignment3])
       .and_return({
                     @assignment3.id => [@student3.id]
                   })

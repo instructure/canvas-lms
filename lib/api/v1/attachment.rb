@@ -302,8 +302,10 @@ module Api::V1::Attachment
     params = opts[:params] || request.params
 
     if opts[:submit_assignment]
-      # as: automatically submit
+      # as: auto_submitted
       RequestContext::Generator.add_meta_header("as", "1")
+    else
+      RequestContext::Generator.add_meta_header("as", "0")
     end
 
     # Handle deprecated folder path

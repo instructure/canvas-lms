@@ -140,7 +140,7 @@ export const MessageDetailHeader: React.FC<MessageDetailHeaderProps> = ({
                   </Tooltip>
                 }
               >
-                {props.onReplyAll && (
+                {props.onReplyAll && !ENV?.FEATURES?.restrict_student_access && (
                   <Menu.Item value="reply-all" onSelect={() => props.onReplyAll?.()}>
                     {I18n.t('Reply All')}
                   </Menu.Item>
@@ -170,9 +170,11 @@ export const MessageDetailHeader: React.FC<MessageDetailHeaderProps> = ({
                     {I18n.t('Unstar')}
                   </Menu.Item>
                 )}
-                <Menu.Item value="delete" onSelect={props.onDelete}>
-                  {I18n.t('Delete')}
-                </Menu.Item>
+                {!ENV?.FEATURES?.restrict_student_access && (
+                  <Menu.Item value="delete" onSelect={props.onDelete}>
+                    {I18n.t('Delete')}
+                  </Menu.Item>
+                )}
               </Menu>
             </Flex.Item>
           )}

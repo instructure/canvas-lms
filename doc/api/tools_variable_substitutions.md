@@ -1006,6 +1006,15 @@ Returns the users preference for high contrast colors (an accessibility feature)
 ```
 false
 ```
+## Canvas.user.prefersDyslexicFont
+Returns the users preference for using a dyslexia friendly font (an accessibility feature).
+
+**Availability**: *when launched by a logged in user*  
+
+
+```
+false
+```
 ## com.instructure.Course.groupIds
 returns the Canvas ids of all active groups in the current course.
 

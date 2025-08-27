@@ -804,7 +804,7 @@ class EnrollmentsApiController < ApplicationController
   end
 
   # @API Enroll multiple users to one or more courses
-  #
+  # Enrolls multiple users in one or more courses in a single operation.
   # @argument user_ids[] [Required, Integer]
   #   The user IDs to enroll in the courses.
   #
@@ -812,7 +812,7 @@ class EnrollmentsApiController < ApplicationController
   #  The course IDs to enroll each user in.
   #
   # @example_request
-  #   curl https://<canvas>/api/v1/account/:account_id/bulk_enrollments \
+  #   curl https://<canvas>/api/v1/account/:account_id/bulk_enrollment \
   #     -X POST \
   #     -F 'user_ids[]=1' \
   #     -F 'user_ids[]=2' \
@@ -820,7 +820,7 @@ class EnrollmentsApiController < ApplicationController
   #     -F 'course_ids[]=11' \
   #
   # @example_request
-  #   curl https://<canvas>/api/v1/account/:account_id/bulk_enrollments \
+  #   curl https://<canvas>/api/v1/account/:account_id/bulk_enrollment \
   #     -X POST \
   #     -F 'user_ids[]=1' \
   #     -F 'course_ids[]=10' \
@@ -833,6 +833,10 @@ class EnrollmentsApiController < ApplicationController
 
     user_ids = params[:user_ids]
     course_ids = params[:course_ids]
+    if !user_ids.empty? && !course_ids.empty? && (user_ids.size * course_ids.size) > 500
+      return render json: { errors: "Too many users to enroll at once." }, status: :bad_request
+    end
+
     progress = Progress.create!(context: @context, user: @current_user, tag: :bulk_enrollment)
     process_params = {
       user_ids:,

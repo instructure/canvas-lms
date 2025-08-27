@@ -18,7 +18,6 @@
 
 import {screen, render} from '@testing-library/react'
 
-import React from 'react'
 import {ReviewScreenWrapper} from '../components/ReviewScreenWrapper'
 import {mockConfigWithPlacements, mockRegistration, mockToolConfiguration} from './helpers'
 import {LtiPlacements, type LtiPlacementWithIcon} from '../../model/LtiPlacement'

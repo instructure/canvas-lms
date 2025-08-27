@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {updateDeveloperKeyWorkflowState} from '../api/developerKey'
 import type {fetchRegistrationToken, getLtiRegistrationByUUID} from '../api/ltiImsRegistration'
 import type {
   deleteRegistration,
@@ -28,6 +27,5 @@ export interface DynamicRegistrationWizardService {
   getRegistrationByUUID: typeof getLtiRegistrationByUUID
   fetchLtiRegistration: typeof fetchLtiRegistration
   updateRegistration: typeof updateRegistration
-  updateDeveloperKeyWorkflowState: typeof updateDeveloperKeyWorkflowState
   deleteRegistration: typeof deleteRegistration
 }

@@ -19,8 +19,6 @@
 #
 
 class User < ActiveRecord::Base
-  self.ignored_columns += ["page_views_count"]
-
   GRAVATAR_PATTERN = %r{^https?://[a-zA-Z0-9.-]+\.gravatar\.com/}
   MAX_ROOT_ACCOUNT_ID_SYNC_ATTEMPTS = 5
   MINIMAL_COLUMNS_TO_SAVE = %i[avatar_image_source
@@ -274,6 +272,18 @@ class User < ActiveRecord::Base
   has_many :gradebook_filters, inverse_of: :user, dependent: :destroy
   has_many :quiz_migration_alerts, dependent: :destroy
   has_many :custom_data, class_name: "CustomData"
+
+  has_many :assessor_allocation_rules,
+           class_name: "AllocationRule",
+           foreign_key: "assessor_id",
+           dependent: :destroy,
+           inverse_of: :assessor
+
+  has_many :assessee_allocation_rules,
+           class_name: "AllocationRule",
+           foreign_key: "assessee_id",
+           dependent: :destroy,
+           inverse_of: :assessee
 
   belongs_to :otp_communication_channel, class_name: "CommunicationChannel"
 
@@ -2317,6 +2327,15 @@ class User < ActiveRecord::Base
 
     @_has_student_enrollment = Rails.cache.fetch_with_batched_keys(["has_student_enrollment", ApplicationController.region].cache_key, batch_object: self, batched_keys: :enrollments) do
       enrollments.shard(in_region_associated_shards).where(type: %w[StudentEnrollment StudentViewEnrollment])
+                 .where.not(workflow_state: %w[rejected inactive deleted]).exists?
+    end
+  end
+
+  def teacher_enrollment?
+    return @_teacher_enrollment if defined?(@_teacher_enrollment)
+
+    @_teacher_enrollment = Rails.cache.fetch_with_batched_keys(["has_teacher_enrollment", ApplicationController.region].cache_key, batch_object: self, batched_keys: :enrollments) do
+      enrollments.shard(in_region_associated_shards).where(type: %w[TeacherEnrollment])
                  .where.not(workflow_state: %w[rejected inactive deleted]).exists?
     end
   end

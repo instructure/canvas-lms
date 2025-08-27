@@ -63,12 +63,14 @@ module Lti
               tc_half_shared_secret:
             )
 
-            ack_response = CanvasHttp.put(ack_url)
-            if ack_response.code == "200"
-              success = true
-            else
-              # something went terribly wrong
-              raise ActiveRecord::Rollback
+            InstrumentTLSCiphers.without_tls_metrics do
+              ack_response = CanvasHttp.put(ack_url)
+              if ack_response.code == "200"
+                success = true
+              else
+                # something went terribly wrong
+                raise ActiveRecord::Rollback
+              end
             end
           end
         end
@@ -88,7 +90,9 @@ module Lti
         @tool_proxy.update_payload = nil
         @tool_proxy.save!
 
-        CanvasHttp.delete(ack_url)
+        InstrumentTLSCiphers.without_tls_metrics do
+          CanvasHttp.delete(ack_url)
+        end
         render json: '{"status":"success"}'
       end
     end

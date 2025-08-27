@@ -610,10 +610,13 @@ describe AppointmentGroup do
 
   context "possible_participants" do
     before :once do
-      course_with_teacher(active_all: true)
+      enrollment = course_with_test_student(active_all: true)
+      @test_student = @user
+      course_with_teacher(course: enrollment.course, active_all: true)
       @teacher = @user
 
       @users, @sections = [], []
+      @users << @test_student
       2.times do
         @sections << section = @course.course_sections.create!
         student_in_course(active_all: true)
@@ -637,20 +640,20 @@ describe AppointmentGroup do
 
     it "respects course_section sub_contexts" do
       @ag.appointment_group_sub_contexts.create! sub_context: @sections.first
-      expect(@ag.possible_participants).to eql [@users.first]
+      expect(@ag.possible_participants).to eql [@users[1]]
     end
 
     it "respects group sub_contexts" do
       @ag.appointment_group_sub_contexts.create! sub_context: @gc
       expect(@ag.possible_participants.sort_by(&:id)).to eql [@group1, @group2].sort_by(&:id)
-      expect(@ag.possible_users).to eql [@users.last]
+      expect(@ag.possible_users).to eql [@users[2]]
     end
 
     it "allows filtering on registration status" do
-      @ag.appointments.first.reserve_for(@users.first, @users.first)
+      @ag.appointments.first.reserve_for(@users[1], @users[1])
       expect(@ag.possible_participants).to eql @users
-      expect(@ag.possible_participants(registration_status: "registered")).to eql [@users.first]
-      expect(@ag.possible_participants(registration_status: "unregistered")).to eql [@users.last]
+      expect(@ag.possible_participants(registration_status: "registered")).to eql [@users[1]]
+      expect(@ag.possible_participants(registration_status: "unregistered")).to eql [@users[0], @users[2]]
     end
 
     it "allows filtering on registration status (for groups)" do
@@ -659,6 +662,10 @@ describe AppointmentGroup do
       expect(@ag.possible_participants.sort_by(&:id)).to eql [@group1, @group2].sort_by(&:id)
       expect(@ag.possible_participants(registration_status: "registered")).to eql [@group1]
       expect(@ag.possible_participants(registration_status: "unregistered")).to eql [@group2]
+    end
+
+    it "normalizes participant list" do
+      expect(@ag.possible_participants(current_user: @teacher, context_code: "course_#{@ag.context.id}")).to eql [@users[1], @users[2]]
     end
 
     it "returns only the active courses users" do

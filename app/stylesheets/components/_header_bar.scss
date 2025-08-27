@@ -22,6 +22,7 @@
   min-height: 33px;
   padding-bottom: $ic-sp;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
 
   &.pinned {
@@ -55,6 +56,11 @@
 
     .kebab-trigger {
       margin: 0 12px;
+    }
+  }
+  @media (max-width: 600px) {
+    .header-bar-right {
+      margin-#{direction(left)}: 0 !important;
     }
   }
   .no-font-size {

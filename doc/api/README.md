@@ -83,6 +83,13 @@ be redirected to HTTPS. However, at that point, the credentials
 have already been sent in clear over the internet. Please make
 sure that you are using HTTPS.
 
+Canvas Experiences
+------
+
+Canvas LMS supports several experiences including Canvas Career and Canvas
+for Elementary. The vast majority of these API resources are shared, though
+some are applicable only to certain experiences.
+
 About this Documentation
 ------------------------
 

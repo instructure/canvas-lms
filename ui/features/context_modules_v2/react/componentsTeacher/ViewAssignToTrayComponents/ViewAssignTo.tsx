@@ -49,6 +49,7 @@ const ViewAssignTo: React.FC<ViewAssignToProps> = ({
   const {data} = useModules(courseId)
   const {data: moduleItems, isLoading: isModuleItemsLoading} = useModuleItems(
     moduleId,
+    null,
     expanded || isMenuOpen,
   )
 

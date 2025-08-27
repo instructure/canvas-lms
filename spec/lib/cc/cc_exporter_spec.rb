@@ -232,8 +232,8 @@ describe "Common Cartridge exporting" do
 
     it "creates a quizzes-only export" do
       att = attachment_model(uploaded_data: fixture_file_upload("test_image.jpg"))
-      @q1 = @course.quizzes.create!(title: "quiz1", description: %(<p><img src="/courses/#{@course.id}/files/#{att.id}/preview" width="150" height="150" /></p>"))
-      @q2 = @course.quizzes.create!(title: "quiz2")
+      @q1 = @course.quizzes.create!(title: "quiz1", description: %(<p><img src="/courses/#{@course.id}/files/#{att.id}/preview" width="150" height="150" /></p>"), saving_user: @user)
+      @q2 = @course.quizzes.create!(title: "quiz2", saving_user: @user)
 
       @ce.export_type = ContentExport::QTI
       @ce.selected_content = {
@@ -453,7 +453,7 @@ describe "Common Cartridge exporting" do
         folder = Folder.create!(name: "hidden", context: @course, hidden: true, parent_folder: Folder.root_folders(@course).first)
         @linked_att = Attachment.create!(filename: "linked.png", uploaded_data: StringIO.new("1"), folder:, context: @course)
         Attachment.create!(filename: "not-linked.jpg", uploaded_data: StringIO.new("2"), folder:, context: @course)
-        @course.wiki_pages.create!(title: "paeg", body: "Image yo: <img src=\"/courses/#{@course.id}/files/#{@linked_att.id}/preview\">")
+        @course.wiki_pages.create!(title: "paeg", body: "Image yo: <img src=\"/courses/#{@course.id}/files/#{@linked_att.id}/preview\">", saving_user: @user)
         @ce.export_type = ContentExport::COMMON_CARTRIDGE
         @ce.save!
       end
@@ -747,7 +747,7 @@ describe "Common Cartridge exporting" do
 
     it "does not get confused by attachments with absolute paths" do
       @att = Attachment.create!(filename: "first.png", uploaded_data: StringIO.new("ohai"), folder: Folder.unfiled_folder(@course), context: @course)
-      @q1 = @course.quizzes.create(title: "quiz1", description: %(<img src="https://example.com/files/#{@att.id}/download?download_frd=1">))
+      @q1 = @course.quizzes.create(title: "quiz1", description: %(<img src="https://example.com/files/#{@att.id}/download?download_frd=1">), saving_user: @user)
       @ce.export_type = ContentExport::COMMON_CARTRIDGE
       run_export
       doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(@q1)}/assessment_meta.xml"))
@@ -790,11 +790,13 @@ describe "Common Cartridge exporting" do
       @att = Attachment.create!(filename: "first.txt", uploaded_data: StringIO.new("ohai"), folder: Folder.unfiled_folder(@course), context: @course)
       link_thing = %(<a href="/courses/#{@course.id}/files/#{@att.id}/download?wrap=1">/courses/#{@course.id}/files/#{@att.id}/download?wrap=1</a>)
       @course.syllabus_body = link_thing
+      @course.saving_user = @user
       @course.save!
       @ag = @course.assignment_groups.create!(name: "group1")
       @asmnt = @course.assignments.create!(title: "Assignment 1",
                                            points_possible: 10,
                                            assignment_group: @ag,
+                                           saving_user: @user,
                                            description: link_thing)
       @ag2 = @course.assignment_groups.create!(name: "group2")
       @asmnt2 = @course.assignments.create!(title: "Assignment 2", points_possible: 10, assignment_group: @ag2)
@@ -953,6 +955,7 @@ describe "Common Cartridge exporting" do
       @course.assignments.create! name: "test assignment",
                                   description: %(<a href="/courses/#{@course.id}/files/#{@file.id}/preview">what?</a>),
                                   points_possible: 11,
+                                  saving_user: @user,
                                   submission_types: "online_text_entry,online_upload,online_url"
       @ce.export_type = ContentExport::COMMON_CARTRIDGE
       @ce.save!
@@ -1099,8 +1102,8 @@ describe "Common Cartridge exporting" do
         doc = Nokogiri::XML(@zip_file.read("course_settings/lti_context_controls.xml"))
         expect(doc).to be_present
 
-        expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool.context_controls.first)}]")).to be_present
-        expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool2.context_controls.first)}]")).to be_present
+        expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool.primary_context_control)}]")).to be_present
+        expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool2.primary_context_control)}]")).to be_present
       end
 
       context "selectively exporting the tool" do
@@ -1116,10 +1119,10 @@ describe "Common Cartridge exporting" do
           doc = Nokogiri::XML(@zip_file.read("course_settings/lti_context_controls.xml"))
           expect(doc).to be_present
 
-          first_tool = doc.at_css("lti_context_control[identifier=#{mig_id(tool.context_controls.first)}]")
+          first_tool = doc.at_css("lti_context_control[identifier=#{mig_id(tool.primary_context_control)}]")
           expect(first_tool).to be_present
           expect(first_tool.at_css("deployment_migration_id").text).to eq mig_id(tool)
-          expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool2.context_controls.first)}]")).to be_nil
+          expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool2.primary_context_control)}]")).to be_nil
         end
       end
 
@@ -1147,8 +1150,8 @@ describe "Common Cartridge exporting" do
           doc = Nokogiri::XML(@zip_file.read("course_settings/lti_context_controls.xml"))
           expect(doc).to be_present
 
-          expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool.context_controls.first)}]")).to be_nil
-          expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool2.context_controls.first)}]")).to be_nil
+          expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool.primary_context_control)}]")).to be_nil
+          expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool2.primary_context_control)}]")).to be_nil
           tool_node = doc.at_css("lti_context_control[identifier=#{mig_id(account_level_tool.context_controls.find_by(course:))}]")
           expect(tool_node).to be_present
           expect(tool_node.at_css("deployment_migration_id")).to be_nil

@@ -29,6 +29,7 @@ type RubricFormHeaderProps = {
   header: string
   hideHeader: boolean
   isUnassessed: boolean
+  canUpdateRubric: boolean
   saveError: boolean
 }
 
@@ -36,6 +37,7 @@ export const RubricFormHeader = ({
   header,
   hideHeader,
   isUnassessed,
+  canUpdateRubric,
   saveError,
 }: RubricFormHeaderProps) => {
   return (
@@ -60,10 +62,21 @@ export const RubricFormHeader = ({
           </Heading>
         </Flex.Item>
       )}
-      {!isUnassessed && (
-        <Flex.Item data-testid="rubric-limited-edit-mode-alert">
+      {!canUpdateRubric && (
+        <Flex.Item>
+          <Alert variant="info" margin="medium 0 0 0" data-testid="rubric-cannot-update-alert">
+            {I18n.t(
+              'Rubrics cannot be modified once they have been used in more than one place. Any saved changes will create a new rubric.',
+            )}
+          </Alert>
+        </Flex.Item>
+      )}
+      {!isUnassessed && canUpdateRubric && (
+        <Flex.Item>
           <Alert variant="info" margin="medium 0 0 0" data-testid="rubric-limited-edit-mode-alert">
-            {I18n.t('Editing is limited for this rubric as it has already been used for grading.')}
+            {I18n.t(
+              'This rubric has already been used for grading. Any changes made may impact existing student scores or grading data.',
+            )}
           </Alert>
         </Flex.Item>
       )}

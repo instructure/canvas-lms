@@ -337,6 +337,10 @@ module ApplicationHelper
     stylesheet_link_tag css_url_for(:common), media: "all"
   end
 
+  def include_masquerade_stylesheets
+    stylesheet_link_tag css_url_for(:user_masquerade), media: "all"
+  end
+
   def embedded_chat_quicklaunch_params
     {
       user_id: @current_user.id,
@@ -482,7 +486,7 @@ module ApplicationHelper
     # called outside of Lti::ContextToolFinder to make sure that
     # @context is non-nil and also a type of Context that would have
     # tools in it (ie Course/Account/Group/User)
-    contexts = Lti::ContextToolFinder.contexts_to_search(@context)
+    contexts = Lti::ToolFinderUtils.contexts_to_search(@context)
     return [] if contexts.empty?
 
     cached_tools =
@@ -1346,23 +1350,22 @@ module ApplicationHelper
     render json: { location:, token: file_authenticator.instfs_bearer_token }
   end
 
-  def authenticated_url_options(attachment)
-    options = { original_url: request.original_url }
+  def authenticated_url_options(attachment, options: {})
+    options[:fallback_url] ||= request.original_url
     options[:tenant_auth] = attachment.instfs_tenant_auth if attachment&.instfs_tenant_auth.present?
     options
   end
 
-  def authenticated_download_url(attachment)
-    file_authenticator.download_url(attachment, options: authenticated_url_options(attachment))
+  def authenticated_download_url(attachment, options: {})
+    file_authenticator.download_url(attachment, options: authenticated_url_options(attachment, options:))
   end
 
-  def authenticated_inline_url(attachment)
-    file_authenticator.inline_url(attachment, options: authenticated_url_options(attachment))
+  def authenticated_inline_url(attachment, options: {})
+    file_authenticator.inline_url(attachment, options: authenticated_url_options(attachment, options:))
   end
 
-  def authenticated_thumbnail_url(attachment, options = {})
-    options[:original_url] = request.original_url
-    file_authenticator.thumbnail_url(attachment, options)
+  def authenticated_thumbnail_url(attachment, options: {})
+    file_authenticator.thumbnail_url(attachment, authenticated_url_options(attachment, options:))
   end
 
   def thumbnail_image_url(attachment, uuid = nil, url_options = {})

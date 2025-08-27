@@ -453,6 +453,54 @@ class GroupsController < ApplicationController
     end
   end
 
+  # @API Bulk fetch user tags for multiple users in a course
+  #
+  # Returns a mapping of user IDs to arrays of non-collaborative group (tag) IDs for each user in the given course.
+  #
+  # @argument course_id [Integer]
+  #   The ID of the course context (from the route).
+  #
+  # @argument user_ids[] [Integer]
+  #   An array of user IDs to fetch tags for.
+  #
+  # @example_request
+  #     curl "https://<canvas>/api/v1/courses/1/bulk_user_tags?user_ids[]=35&user_ids[]=79" \
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @returns [Hash]
+  #   A mapping of user IDs to arrays of tag (group) IDs.
+  #   Example:
+  #     {
+  #       "35": [5],
+  #       "79": [3, 4, 5]
+  #     }
+  def bulk_user_tags
+    return unless authorized_action(@context, @current_user, %i[manage_tags_add manage_tags_manage manage_tags_delete])
+
+    course_id = params[:course_id].to_i
+
+    @groups = Group.where(
+      non_collaborative: true,
+      context_type: "Course",
+      context_id: course_id
+    )
+
+    user_ids = Array(params[:user_ids]).map(&:to_i)
+    result = {}
+
+    user_groups = @groups.left_outer_joins(:users)
+                         .where(users: { id: user_ids })
+                         .select("groups.id as group_id, users.id as user_id")
+                         .distinct
+
+    user_groups_by_user = user_groups.group_by(&:user_id)
+
+    user_ids.each do |user_id|
+      result[user_id] = user_groups_by_user[user_id]&.map(&:group_id) || []
+    end
+    render json: result
+  end
+
   # @API Get a single group
   #
   # Returns the data for a single group, or a 401 if the caller doesn't have

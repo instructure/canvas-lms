@@ -1,0 +1,7 @@
+.preview-selector-bar-container > div {
+  align-items: center;
+}
+
+.preview-selector-bar-container > div > div:not(:first-child) {
+  display: none;
+}

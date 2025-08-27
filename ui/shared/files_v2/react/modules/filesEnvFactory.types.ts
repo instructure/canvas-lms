@@ -53,4 +53,5 @@ export interface FilesEnv {
   baseUrl: string
   contextFor(folder: {contextType: string; contextId: string}): FileContext | undefined
   userHasPermission(folder: {contextType: string; contextId: string}, action: string): boolean
+  userFileAccessRestricted?: boolean
 }

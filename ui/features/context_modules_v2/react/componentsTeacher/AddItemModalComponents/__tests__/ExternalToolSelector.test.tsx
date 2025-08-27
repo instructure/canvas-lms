@@ -21,47 +21,50 @@ import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ExternalToolSelector, {ExternalTool} from '../ExternalToolSelector'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../../hooks/useModuleContext'
+import {ContentItem} from '../../../hooks/queries/useModuleItemContent'
+import {ExternalToolModalItem} from '../../../utils/types'
 
-const mockTools: ExternalTool[] = [
+const contentItems: ExternalToolModalItem[] = [
   {
-    definition_type: 'ContextExternalTool',
     definition_id: '1',
+    definition_type: 'external_tool',
     name: 'Google Docs',
     description: 'Create and edit documents online',
     domain: 'docs.google.com',
     url: 'https://docs.google.com/launch',
     placements: {
-      assignment_selection: {
+      assignmentSelection: {
         url: 'https://docs.google.com/assignment',
         title: 'Google Docs Assignment',
       },
-      link_selection: {
+      linkSelection: {
         url: 'https://docs.google.com/link',
         title: 'Google Docs Link',
       },
     },
   },
   {
-    definition_type: 'ContextExternalTool',
     definition_id: '2',
+    definition_type: 'external_tool',
     name: 'YouTube',
     description: 'Video platform',
     domain: 'youtube.com',
     url: 'https://youtube.com/launch',
     placements: {
-      link_selection: {
+      linkSelection: {
         url: 'https://youtube.com/link',
         title: 'YouTube Video',
       },
     },
   },
   {
-    definition_type: 'ContextExternalTool',
     definition_id: '3',
+    definition_type: 'external_tool',
     name: 'Khan Academy',
+    description: 'Educational platform',
     domain: 'khanacademy.org',
     placements: {
-      assignment_selection: {
+      assignmentSelection: {
         url: 'https://khanacademy.org/assignment',
         title: 'Khan Academy Exercise',
       },
@@ -71,17 +74,14 @@ const mockTools: ExternalTool[] = [
 
 const buildProps = (overrides = {}) => ({
   onToolSelect: jest.fn(),
+  contentItems: contentItems,
   ...overrides,
 })
 
-const setUp = (props = {}, externalTools: ExternalTool[] = mockTools) => {
+const setUp = (props = {}) => {
   const finalProps = buildProps(props)
   return {
-    ...render(
-      <ContextModuleProvider {...contextModuleDefaultProps} moduleMenuModalTools={externalTools}>
-        <ExternalToolSelector {...finalProps} />
-      </ContextModuleProvider>,
-    ),
+    ...render(<ExternalToolSelector {...finalProps} />),
     props: finalProps,
   }
 }
@@ -96,7 +96,7 @@ describe('ExternalToolSelector', () => {
   })
 
   it('shows "no tools available" message when no external tools provided', () => {
-    setUp({}, [])
+    setUp({contentItems: []})
 
     expect(screen.getByText('No external tools are available for this course')).toBeInTheDocument()
   })
@@ -116,7 +116,7 @@ describe('ExternalToolSelector', () => {
 
     await user.click(screen.getByText('Google Docs'))
 
-    expect(props.onToolSelect).toHaveBeenCalledWith(mockTools[0])
+    expect(props.onToolSelect).toHaveBeenCalledWith(contentItems[0])
   })
 
   it('calls onToolSelect with null when "Select a tool" is chosen', async () => {
@@ -144,16 +144,16 @@ describe('ExternalToolSelector', () => {
   })
 
   it('handles tools without descriptions or domains', () => {
-    const toolsWithoutDetails: ExternalTool[] = [
+    const toolsWithoutDetails: ExternalToolModalItem[] = [
       {
-        definition_type: 'ContextExternalTool',
         definition_id: '4',
+        definition_type: 'external_tool',
         name: 'Simple Tool',
         placements: {},
       },
     ]
 
-    setUp({selectedToolId: '4'}, toolsWithoutDetails)
+    setUp({selectedToolId: '4', contentItems: toolsWithoutDetails})
 
     expect(screen.getByText('Selected Tool: Simple Tool')).toBeInTheDocument()
     expect(screen.queryByText('Domain:')).not.toBeInTheDocument()

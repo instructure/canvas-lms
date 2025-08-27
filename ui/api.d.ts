@@ -65,7 +65,7 @@ export type Student = Readonly<{
   group_ids: string[]
   id: string
   integration_id: null | string
-  login_id: string
+  login_id: string | null
   short_name: string
   sis_import_id: null | string
   sis_user_id: null | string
@@ -136,6 +136,7 @@ export type StudentGroupCategory = Readonly<{
   self_signup: null | string
   sis_group_category_id: null | string
   sis_import_id: null | string
+  non_collaborative: null | boolean
 }>
 
 export type StudentGroupMap = {
@@ -223,7 +224,7 @@ export type Assignment = Readonly<{
   original_lti_resource_link_id: null | string
   original_quiz_id: null | string
   peer_reviews: boolean
-  points_possible: number
+  points_possible: number | null
   position: number
   post_to_sis: boolean
   published: boolean
@@ -425,7 +426,7 @@ export type Submission = Readonly<{
   entered_score: null | number
   grade_matches_current_submission: boolean
   gradeLocked: boolean
-  grading_period_id: string
+  grading_period_id: string | null
   grading_type: GradingType
   has_originality_report: boolean
   has_postable_comments: boolean
@@ -449,7 +450,6 @@ export type Submission = Readonly<{
   sub_assignment_submissions?: SubAssignmentSubmission[]
 }> & {
   assignedAssessments?: AssignedAssessments[]
-  attempt?: number
   excused: boolean
   external_tool_url?: string
   grade: string | null
@@ -779,6 +779,7 @@ export type YoutubeEmbed = Readonly<{
 }>
 
 export type YoutubeScanResource = Readonly<{
+  id: number
   name: string
   type: string
   content_url: string

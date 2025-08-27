@@ -21,13 +21,15 @@
 class Mutations::CreateCommentBankItem < Mutations::BaseMutation
   graphql_name "CreateCommentBankItem"
 
+  argument :assignment_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Assignment")
   argument :comment, String, required: true
   argument :course_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
   field :comment_bank_item, Types::CommentBankItemType, null: true
 
   def resolve(input:)
     course = get_course(input[:course_id])
-    record = CommentBankItem.new(course:, user: current_user, comment: input[:comment])
+    assignment = get_assignment(input[:assignment_id], course) if input[:assignment_id]
+    record = CommentBankItem.new(course:, user: current_user, comment: input[:comment], assignment:)
     verify_authorized_action!(record, :create)
     return errors_for(record) unless record.save
 
@@ -40,5 +42,11 @@ class Mutations::CreateCommentBankItem < Mutations::BaseMutation
     Course.active.find_by(id: course_id).tap do |course|
       raise GraphQL::ExecutionError, I18n.t("Course not found") if course.nil?
     end
+  end
+
+  def get_assignment(assignment_id, course)
+    course.assignments.active.find(assignment_id)
+  rescue ActiveRecord::RecordNotFound
+    raise GraphQL::ExecutionError, I18n.t("Assignment not found")
   end
 end

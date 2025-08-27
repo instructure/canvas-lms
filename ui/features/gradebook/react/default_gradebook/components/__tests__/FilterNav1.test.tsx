@@ -72,6 +72,7 @@ const StudentGroupCategoryProps = {
   self_signup: null,
   sis_group_category_id: null,
   sis_import_id: null,
+  non_collaborative: false,
 }
 
 const defaultProps: FilterNavProps = {
@@ -165,6 +166,16 @@ const defaultProps: FilterNavProps = {
       groups: [
         {id: '3', name: 'Student Group 3'},
         {id: '4', name: 'Student Group 4'},
+      ],
+    },
+    '3': {
+      ...StudentGroupCategoryProps,
+      id: '3',
+      name: 'Non Collaborative Group Category 1',
+      non_collaborative: true,
+      groups: [
+        {id: '5', name: 'Non Collaborative Group 1', non_collaborative: true},
+        {id: '6', name: 'Non Collaborative Group 2', non_collaborative: true},
       ],
     },
   },
@@ -495,6 +506,18 @@ describe('FilterNav', () => {
       await user.click(endDateFilter as HTMLElement)
       await user.click(getByTestId('end-date-filter-type'))
       expect(getByTestId(`end-date-input`)).toBeVisible()
+    })
+
+    it('renders menu differentiation tags correctly', async () => {
+      const user = userEvent.setup(USER_EVENT_OPTIONS)
+      const {getByText, getByTestId, getByRole} = render(<FilterNav {...filterProps} />)
+      await user.click(getByText('Apply Filters'))
+      await user.click(getByRole('menuitemradio', {name: 'Differentiation Tags'}))
+      await user.click(getByTestId('Non Collaborative Group 1-sorted-filter'))
+      await user.click(getByTestId('applied-filter-Non Collaborative Group 1'))
+
+      expect(getByTestId('Non Collaborative Group Category 1-sorted-filter-group')).toBeVisible()
+      expect(getByTestId('Non Collaborative Group 1-sorted-filter-group-item')).toBeVisible()
     })
 
     it('renders menu student groups correctly', async () => {

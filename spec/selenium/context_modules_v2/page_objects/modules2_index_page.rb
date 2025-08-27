@@ -182,9 +182,20 @@ module Modules2IndexPage
     "#{module_item_by_id_selector(module_item_id)} [data-testid='url-icon']"
   end
 
-  def blueprint_lock_icon_selector(module_item_id, locked: false)
-    selector = locked ? "[data-testid='lock-icon-locked']" : "[data-testid='lock-icon-unlock']"
-    "#{module_item_by_id_selector(module_item_id)} #{selector}"
+  def blueprint_lock_button_selector(locked: false)
+    locked ? '[data-testid="blueprint-lock-button"][aria-pressed="true"]' : '[data-testid="blueprint-lock-button"][aria-pressed="false"]'
+  end
+
+  def module_blueprint_lock_button_selector(module_item_id, locked: false)
+    "#{module_item_by_id_selector(module_item_id)} #{blueprint_lock_button_selector(locked:)}"
+  end
+
+  def blueprint_lock_icon_selector(locked: false)
+    locked ? 'svg[name="IconBlueprintLock"]' : 'svg[name="IconBlueprint"]'
+  end
+
+  def module_blueprint_lock_icon_selector(module_item_id, locked: false)
+    "#{module_item_by_id_selector(module_item_id)} #{blueprint_lock_icon_selector(locked:)}"
   end
 
   def module_prerequisite_selector
@@ -197,6 +208,30 @@ module Modules2IndexPage
 
   def module_progression_info_selector(module_id)
     "#{module_header_selector(module_id)} progress"
+  end
+
+  def module_publish_menu_selector(module_id)
+    "#{module_header_selector(module_id)} [data-testid='module-publish-menu']"
+  end
+
+  def module_publish_with_all_items_selector
+    "[data-testid='module-publish-with-all-items']"
+  end
+
+  def module_publish_selector
+    "[data-testid='module-publish']"
+  end
+
+  def module_unpublish_with_all_items_selector
+    "[data-testid='module-unpublish-with-all-items']"
+  end
+
+  def module_unpublish_selector
+    "[data-testid='module-unpublish']"
+  end
+
+  def modules_publish_modal_selector
+    "[data-testid='context-modules-publish-modal']"
   end
 
   def option_list_options_selector(option_list_id)
@@ -243,6 +278,18 @@ module Modules2IndexPage
     "#unpublish_module_only_menu_item"
   end
 
+  def pagination_container_selector
+    '[data-testid="pagination-container"]'
+  end
+
+  def pagination_info_text_selector
+    "#{pagination_container_selector} [data-testid='pagination-info-text']"
+  end
+
+  def pagination_page_buttons_selector
+    "#{pagination_container_selector} button"
+  end
+
   def send_to_modal_input_selector
     "#content-share-user-search"
   end
@@ -263,6 +310,26 @@ module Modules2IndexPage
     "[data-module-id='#{module_id}']"
   end
 
+  def context_module_item_selector(module_item_id)
+    "#context_module_item_#{module_item_id}"
+  end
+
+  def context_module_item_published_icon_selector(module_item_id)
+    "#{context_module_item_selector(module_item_id)} svg[name='IconPublish']"
+  end
+
+  def context_module_item_unpublished_icon_selector(module_item_id)
+    "#{context_module_item_selector(module_item_id)} svg[name='IconUnpublished']"
+  end
+
+  def context_module_published_icon_selector(module_id)
+    "#{context_module_selector(module_id)} svg[name='IconPublish']"
+  end
+
+  def context_module_unpublished_icon_selector(module_id)
+    "#{context_module_selector(module_id)} svg[name='IconUnpublished']"
+  end
+
   def context_module_expand_toggle_selector(module_id)
     "#{context_module_selector(module_id)} [data-testid='module-header-expand-toggle'][aria-expanded='false']"
   end
@@ -271,6 +338,13 @@ module Modules2IndexPage
     "#{context_module_selector(module_id)} [data-testid='module-header-expand-toggle'][aria-expanded='true']"
   end
 
+  def move_item_tray_selector
+    "[data-testid='manage-module-content-tray']"
+  end
+
+  def external_tool_page_name_input_selector
+    "[data-testid='external_item_page_name']"
+  end
   #------------------------------ Elements ------------------------------
 
   def completion_requirement
@@ -311,6 +385,14 @@ module Modules2IndexPage
 
   def edit_item_modal
     f(edit_item_modal_selector)
+  end
+
+  def edit_item_modal_title_input_value
+    edit_item_modal.find_element(:id, "title").attribute("value")
+  end
+
+  def edit_item_modal_url_value
+    edit_item_modal.find_element(:css, "input[data-testid='edit-modal-url']").attribute("value")
   end
 
   def expand_all_modules_button
@@ -441,8 +523,16 @@ module Modules2IndexPage
     f(module_item_url_icon_selector(module_item_id))
   end
 
-  def blueprint_lock_icon(module_item_id, locked: false)
-    f(blueprint_lock_icon_selector(module_item_id, locked:))
+  def modules_publish_modal
+    f(modules_publish_modal_selector)
+  end
+
+  def module_blueprint_lock_icon(module_item_id, locked: false)
+    f(module_blueprint_lock_icon_selector(module_item_id, locked:))
+  end
+
+  def module_blueprint_lock_button(module_item_id, locked: false)
+    f(module_blueprint_lock_button_selector(module_item_id, locked:))
   end
 
   def module_prerequisite
@@ -501,6 +591,42 @@ module Modules2IndexPage
     f(unpublish_modules_only_selector)
   end
 
+  def module_publish_menu(module_id)
+    f(module_publish_menu_selector(module_id))
+  end
+
+  def module_publish_with_all_items
+    f(module_publish_with_all_items_selector)
+  end
+
+  def module_publish
+    f(module_publish_selector)
+  end
+
+  def module_unpublish_with_all_items
+    f(module_unpublish_with_all_items_selector)
+  end
+
+  def module_unpublish
+    f(module_unpublish_selector)
+  end
+
+  def module_pagination_container(module_id)
+    f("#{context_module_selector(module_id)} #{pagination_container_selector}")
+  end
+
+  def module_pagination_buttons(module_id)
+    ff("#{context_module_selector(module_id)} #{pagination_page_buttons_selector}")
+  end
+
+  def pagination_info_text
+    f(pagination_info_text_selector).text
+  end
+
+  def pagination_page_buttons
+    ff(pagination_page_buttons_selector)
+  end
+
   def send_to_form_selected_elements
     ff("button[type='button']", send_to_modal_input_container)
   end
@@ -527,6 +653,30 @@ module Modules2IndexPage
 
   def screenreader_alert
     f("#flash_screenreader_holder")
+  end
+
+  def move_item_tray_select_modules_listbox
+    f("[data-testid='select_module_listbox']")
+  end
+
+  def move_item_tray_place_contents_listbox
+    f("[data-testid='select_position_listbox']")
+  end
+
+  def place_item_at_bottom_option
+    fj("[role='option']:contains('At the bottom')")
+  end
+
+  def cancel_tray_button
+    fxpath("//button[.//span[text()='Cancel']]")
+  end
+
+  def submit_move_to_button
+    fxpath("//button[.//span[text()='Move']]")
+  end
+
+  def close_tray_button
+    fxpath("//button[.//span[text()='Close']]")
   end
 
   #------------------------------ Actions -------------------------------
@@ -592,6 +742,10 @@ module Modules2IndexPage
     element_value_for_attr(module_progression_info(module_id), "aria-valuetext")
   end
 
+  def pagination_info_text_includes?(text)
+    pagination_info_text.include?(text)
+  end
+
   def set_rewrite_flag(rewrite_status: true)
     rewrite_status ? @course.root_account.enable_feature!(:modules_page_rewrite) : @course.root_account.disable_feature!(:modules_page_rewrite)
   end
@@ -618,5 +772,42 @@ module Modules2IndexPage
 
   def add_item_modal_add_item_button
     fj("button:contains('Add Item')", f("[data-testid='add-item-modal']"))
+  end
+
+  def expand_all_modules
+    expand_all_modules_button.click
+    wait_for_ajaximations
+  end
+
+  def modules_published_icon_state?(published: true, modules: nil)
+    (modules || @course.context_modules).all? do |context_module|
+      if published
+        f(context_module_published_icon_selector(context_module.id))
+      else
+        f(context_module_unpublished_icon_selector(context_module.id))
+      end
+    end
+  end
+
+  def module_items_published_icon_state?(published: true, modules: nil)
+    (modules || @course.context_modules).all? do |context_module|
+      context_module.content_tags.all? do |content_tag|
+        if published
+          f(context_module_item_published_icon_selector(content_tag.id))
+        else
+          f(context_module_item_unpublished_icon_selector(content_tag.id))
+        end
+      end
+    end
+  end
+
+  def wait_until_bulk_publish_action_finished
+    wait = Selenium::WebDriver::Wait.new(timeout: 5)
+
+    wait.until { !element_exists?(modules_publish_modal_selector) }
+  end
+
+  def external_tool_page_name_input
+    f(external_tool_page_name_input_selector)
   end
 end

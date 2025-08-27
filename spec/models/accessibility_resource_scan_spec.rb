@@ -38,7 +38,7 @@ describe AccessibilityResourceScan do
     describe ".for_context" do
       context "when context is valid" do
         let(:wiki_page) { wiki_page_model }
-        let(:subject_for_context) { accessibility_resource_scan_model(wiki_page:) }
+        let(:subject_for_context) { accessibility_resource_scan_model(context: wiki_page) }
 
         it "returns the correct record" do
           expect(described_class.for_context(wiki_page)).to contain_exactly(subject_for_context)
@@ -124,7 +124,7 @@ describe AccessibilityResourceScan do
         let(:wiki_page) { wiki_page_model(course:) }
 
         before do
-          accessibility_resource_scan_model(wiki_page:)
+          accessibility_resource_scan_model(context: wiki_page)
           subject.wiki_page = wiki_page
         end
 
@@ -141,7 +141,7 @@ describe AccessibilityResourceScan do
         let(:assignment) { assignment_model(course:) }
 
         before do
-          accessibility_resource_scan_model(assignment:)
+          accessibility_resource_scan_model(context: assignment)
           subject.assignment = assignment
         end
 
@@ -158,7 +158,7 @@ describe AccessibilityResourceScan do
         let(:attachment) { attachment_model(course:) }
 
         before do
-          accessibility_resource_scan_model(attachment:)
+          accessibility_resource_scan_model(context: attachment)
           subject.attachment = attachment
         end
 
@@ -166,6 +166,31 @@ describe AccessibilityResourceScan do
           expect(subject).not_to be_valid
           expect(subject.errors[:attachment_id]).to include("has already been taken")
         end
+      end
+    end
+  end
+
+  describe "#update_issue_count!" do
+    let(:scan) { accessibility_resource_scan_model }
+
+    context "when accessibility issues exist" do
+      before do
+        3.times { accessibility_issue_model(accessibility_resource_scan: scan, workflow_state: "active") }
+        2.times { accessibility_issue_model(accessibility_resource_scan: scan, workflow_state: "resolved") }
+      end
+
+      it "updates issue_count with active issues count" do
+        scan.update_issue_count!
+
+        expect(scan.reload.issue_count).to eq 3
+      end
+    end
+
+    context "when no accessibility issues exist" do
+      it "updates issue_count to zero" do
+        scan.update_issue_count!
+
+        expect(scan.reload.issue_count).to eq 0
       end
     end
   end

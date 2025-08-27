@@ -118,7 +118,7 @@ RSpec.describe AutoGradeOrchestrationService do
       end
 
       it "calls GradeService with only missing criteria and merges results" do
-        service = AutoGradeOrchestrationService.new(course:)
+        service = AutoGradeOrchestrationService.new(course:, current_user: user)
         grade_service = instance_double(GradeService)
 
         allow(GradeService).to receive(:new).and_return(grade_service)
@@ -138,13 +138,14 @@ RSpec.describe AutoGradeOrchestrationService do
           assignment: assignment_text,
           essay:,
           rubric: rubric_data[1..],
-          root_account_uuid:
+          root_account_uuid:,
+          current_user: user
         )
         expect(grade_service).to have_received(:call)
       end
 
       it "raises error when GradeService doesn't return all missing criteria" do
-        service = AutoGradeOrchestrationService.new(course:)
+        service = AutoGradeOrchestrationService.new(course:, current_user: user)
         grade_service = instance_double(GradeService)
 
         allow(GradeService).to receive(:new).and_return(grade_service)
@@ -174,7 +175,7 @@ RSpec.describe AutoGradeOrchestrationService do
       end
 
       it "generates comments for all criteria in the rubric" do
-        service = AutoGradeOrchestrationService.new(course:)
+        service = AutoGradeOrchestrationService.new(course:, current_user: user)
         comment_service = instance_double(CommentsService)
 
         auto_grade_result = AutoGradeResult.create!(
@@ -213,14 +214,15 @@ RSpec.describe AutoGradeOrchestrationService do
         expect(CommentsService).to have_received(:new).with(
           assignment: assignment_text,
           grade_data: missing_criteria_data,
-          root_account_uuid:
+          root_account_uuid:,
+          current_user: user
         )
         expect(comment_service).to have_received(:call)
         expect(result.grade_data.all? { |item| item["comments"].present? }).to be true
       end
 
       it "raises error when comments are missing for some criteria" do
-        service = AutoGradeOrchestrationService.new(course:)
+        service = AutoGradeOrchestrationService.new(course:, current_user: user)
         comment_service = instance_double(CommentsService)
 
         auto_grade_result = AutoGradeResult.create!(

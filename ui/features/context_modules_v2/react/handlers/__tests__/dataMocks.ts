@@ -135,6 +135,7 @@ export const defaultModules: Module[] = [
     moduleItems: [],
     requireSequentialProgress: false,
     hasActiveOverrides: false,
+    moduleItemsTotalCount: 10,
   },
   {
     id: '1',
@@ -149,6 +150,7 @@ export const defaultModules: Module[] = [
     moduleItems: [],
     requireSequentialProgress: false,
     hasActiveOverrides: false,
+    moduleItemsTotalCount: 10,
   },
   {
     id: '2',
@@ -163,6 +165,7 @@ export const defaultModules: Module[] = [
     moduleItems: [],
     requireSequentialProgress: false,
     hasActiveOverrides: false,
+    moduleItemsTotalCount: 10,
   },
   {
     id: '3',
@@ -177,6 +180,7 @@ export const defaultModules: Module[] = [
     moduleItems: [],
     requireSequentialProgress: false,
     hasActiveOverrides: false,
+    moduleItemsTotalCount: 10,
   },
   {
     id: '4',
@@ -191,5 +195,6 @@ export const defaultModules: Module[] = [
     moduleItems: [],
     requireSequentialProgress: false,
     hasActiveOverrides: false,
+    moduleItemsTotalCount: 10,
   },
 ]

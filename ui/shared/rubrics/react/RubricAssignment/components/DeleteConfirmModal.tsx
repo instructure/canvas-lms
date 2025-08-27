@@ -42,7 +42,7 @@ export const DeleteConfirmModal = ({
     ? I18n.t(
         'The rubric is associated with another assignment. You can remove this rubric from the assignment without impacting other assignments by unlinking it',
       )
-    : I18n.t('You are about to permanently delete this rubric. Do you wish to proceed?')
+    : I18n.t('Are you sure you want to delete this rubric?')
 
   return (
     <Modal

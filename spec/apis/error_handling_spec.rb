@@ -24,7 +24,7 @@ describe "API Error Handling", type: :request do
   before :once do
     user_with_pseudonym(active_all: true)
     enable_default_developer_key!
-    @token = @user.access_tokens.create!
+    @token = @user.access_tokens.create!(purpose: "Test")
   end
 
   describe "ActiveRecord Error JSON override" do

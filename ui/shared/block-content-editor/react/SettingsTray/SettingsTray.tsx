@@ -37,6 +37,7 @@ export const SettingsTray = (
       placement="end"
       size="regular"
       data-testid="settings-tray"
+      shouldCloseOnDocumentClick={true}
     >
       {props.children}
     </CanvasTray>

@@ -275,13 +275,13 @@ describe Api::V1::Attachment do
     def render(*); end
 
     context "submit_assignment param" do
-      it "includes as (automatically submit) in request headers" do
+      it "includes as=1 (auto_submitted) in request headers" do
         expect(RequestContext::Generator).to receive(:add_meta_header).with("as", "1")
         api_attachment_preflight(context, request, submit_assignment: true)
       end
 
-      it "does not include as (automatically submit) in request headers" do
-        expect(RequestContext::Generator).not_to receive(:add_meta_header).with("as", "1")
+      it "includes as=0 (auto_submitted) in request headers" do
+        expect(RequestContext::Generator).to receive(:add_meta_header).with("as", "0")
         api_attachment_preflight(context, request, submit_assignment: false)
       end
     end

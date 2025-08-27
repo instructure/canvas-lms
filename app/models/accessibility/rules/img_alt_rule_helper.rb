@@ -69,8 +69,7 @@ module Accessibility
           end
         rescue => e
           Rails.logger.error("Error generating alt text: #{e.message}")
-          Rails.logger.error e.backtrace.join("\n")
-          nil
+          raise
         end
       end
 

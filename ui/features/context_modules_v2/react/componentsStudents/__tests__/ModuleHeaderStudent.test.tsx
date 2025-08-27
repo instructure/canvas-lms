@@ -20,6 +20,8 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import ModuleHeaderStudent, {ModuleHeaderStudentProps} from '../ModuleHeaderStudent'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
+import {MODULES} from '../../utils/constants'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -30,10 +32,37 @@ const queryClient = new QueryClient({
   },
 })
 
-const setUp = (props: ModuleHeaderStudentProps) => {
+const setUp = (props: ModuleHeaderStudentProps, itemCount: number = 10) => {
+  // Set up modules data for the useModules hook
+  const modulePage = {
+    pageInfo: {
+      hasNextPage: false,
+      endCursor: null,
+    },
+    modules: [
+      {
+        _id: props.id,
+        moduleItemsTotalCount: itemCount,
+      },
+    ],
+    getModuleItemsTotalCount: (moduleId: string) => (moduleId === props.id ? itemCount : 0),
+    isFetching: false,
+  }
+
+  const modulesData = {
+    pages: [modulePage],
+    pageParams: [null],
+    getModuleItemsTotalCount: modulePage.getModuleItemsTotalCount,
+    isFetching: false,
+  }
+
+  queryClient.setQueryData([MODULES, 'course123'], modulesData)
+
   return render(
     <QueryClientProvider client={queryClient}>
-      <ModuleHeaderStudent {...props} />
+      <ContextModuleProvider {...contextModuleDefaultProps} courseId="course123">
+        <ModuleHeaderStudent {...props} />
+      </ContextModuleProvider>
     </QueryClientProvider>,
   )
 }

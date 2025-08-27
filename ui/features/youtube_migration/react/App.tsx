@@ -267,6 +267,8 @@ const EmbedsModal: React.FC<{
   courseId: string
   scanId: number
   handleOnClose: () => void
+  resourceType: string
+  resourceId: number
 }> = ({
   youtubeEmbeds,
   resourceTitle,
@@ -275,11 +277,14 @@ const EmbedsModal: React.FC<{
   courseId,
   scanId,
   handleOnClose,
+  resourceType,
+  resourceId,
 }) => {
   const isConvertHappened = useRef(false)
   const [youtubeEmbedsState, setYoutubeEmbedsState] =
     useState<Array<YoutubeEmbed & {convertStatus?: ConvertStatus}>>(youtubeEmbeds)
   const activePolls = useRef<Map<number, number>>(new Map())
+  const [isCheckingExistingConversions, setIsCheckingExistingConversions] = useState(false)
 
   useEffect(() => {
     setYoutubeEmbedsState(youtubeEmbeds)
@@ -407,6 +412,57 @@ const EmbedsModal: React.FC<{
     isConvertHappened.current = true
   }
 
+  const checkExistingConversions = useCallback(async () => {
+    setIsCheckingExistingConversions(true)
+    try {
+      const params = new URLSearchParams({
+        resource_type: resourceType,
+        resource_id: resourceId.toString(),
+      })
+      const {json} = await doFetchApi<{
+        conversions: Array<{
+          id: string
+          workflow_state: string
+          original_embed: YoutubeEmbed
+        }>
+      }>({
+        path: `/api/v1/courses/${courseId}/youtube_migration/conversion_status?${params.toString()}`,
+      })
+
+      if (json && json.conversions) {
+        json.conversions.forEach(conversion => {
+          const originalEmbed = conversion.original_embed
+          if (originalEmbed) {
+            const embedIndex = youtubeEmbeds.findIndex(
+              embed => embed.src === originalEmbed.src && embed.path === originalEmbed.path,
+            )
+            if (embedIndex !== -1) {
+              handleEmbedConvertStatus(embedIndex, ConvertStatus.Converting)
+              startProgressPolling(conversion.id, embedIndex)
+            }
+          }
+        })
+      }
+    } catch (_error) {
+      showFlashError(I18n.t('Failed to check existing conversions'))()
+    } finally {
+      setIsCheckingExistingConversions(false)
+    }
+  }, [
+    courseId,
+    resourceType,
+    resourceId,
+    youtubeEmbeds,
+    handleEmbedConvertStatus,
+    startProgressPolling,
+  ])
+
+  useEffect(() => {
+    if (showModal && resourceType && resourceId) {
+      checkExistingConversions()
+    }
+  }, [showModal, resourceType, resourceId, checkExistingConversions])
+
   const getConvertButtonText = (convertStatus?: ConvertStatus): string => {
     if (convertStatus === ConvertStatus.Converted) {
       return I18n.t('Converted')
@@ -459,18 +515,22 @@ const EmbedsModal: React.FC<{
                   display="block"
                   onClick={() => handleEmbedConvert(courseId, embed, index)}
                   disabled={
+                    isCheckingExistingConversions ||
                     embed.convertStatus === ConvertStatus.Converted ||
                     embed.convertStatus === ConvertStatus.Converting
                   }
                 >
-                  {embed.convertStatus === ConvertStatus.Converting && (
+                  {(embed.convertStatus === ConvertStatus.Converting ||
+                    (isCheckingExistingConversions && !embed.convertStatus)) && (
                     <Spinner
                       renderTitle={() => I18n.t('Converting')}
                       size="x-small"
                       margin="0 small 0 0"
                     />
                   )}
-                  {getConvertButtonText(embed.convertStatus)}
+                  {isCheckingExistingConversions && !embed.convertStatus
+                    ? I18n.t('Checking...')
+                    : getConvertButtonText(embed.convertStatus)}
                 </Button>
               </Flex.Item>
             </Flex>
@@ -515,14 +575,24 @@ const LastScanResultView: React.FC<{
   const [showModal, setShowModal] = useState(false)
   const [modalYoutubeEmbeds, setYoutubeModalEmbeds] = useState<Array<YoutubeEmbed>>([])
   const [modalResourceTitle, setModalResourceTitle] = useState('')
+  const [modalResourceType, setModalResourceType] = useState('')
+  const [modalResourceId, setModalResourceId] = useState(0)
 
   const handleShowReview = useCallback(
-    (youtubeEmbeds: Array<YoutubeEmbed>, resourceTitle: string) => {
+    (youtubeEmbeds: Array<YoutubeEmbed>, resourceTitle: string, resource: YoutubeScanResource) => {
       setYoutubeModalEmbeds(youtubeEmbeds)
       setModalResourceTitle(resourceTitle)
+      setModalResourceType(resource.type)
+      setModalResourceId(resource.id)
       setShowModal(true)
     },
-    [setYoutubeModalEmbeds, setModalResourceTitle, setShowModal],
+    [
+      setYoutubeModalEmbeds,
+      setModalResourceTitle,
+      setModalResourceType,
+      setModalResourceId,
+      setShowModal,
+    ],
   )
 
   const handleModalClose = useCallback(() => {
@@ -561,6 +631,8 @@ const LastScanResultView: React.FC<{
           courseId={courseId}
           scanId={scanId}
           handleOnClose={handleCourseScanReload}
+          resourceType={modalResourceType}
+          resourceId={modalResourceId}
         />
         <Table layout="auto" caption={I18n.t('YouTube content detected table')}>
           <Table.Head>
@@ -610,7 +682,7 @@ const LastScanResultView: React.FC<{
                   <Button
                     color="secondary"
                     size="small"
-                    onClick={() => handleShowReview(resource.embeds, resource.name)}
+                    onClick={() => handleShowReview(resource.embeds, resource.name, resource)}
                   >
                     {I18n.t('Review')}
                   </Button>
@@ -641,14 +713,7 @@ const HeaderView: React.FC<{
         </Heading>
         <Text>
           {I18n.t(
-            'This tool helps you identify YouTube videos in your course that may display ads. Each row shows a Canvas Page, Module, or Discussion where one or more YouTube video were found. When you visit these pages, you’ll see a ‘Remove Ads’ button to convert videos to an ad-free experience.',
-          )}
-        </Text>
-        <br />
-        <br />
-        <Text>
-          {I18n.t(
-            'The videos remain as links, so no extra storage is used. You can rescan the course anytime with the ‘Scan’ button.',
+            'This tool helps you identify YouTube videos in your course that may display ads. Each row shows a Canvas Page, Module, or Discussion where one or more YouTube videos were found. After migration, videos will be added to the course collection and remain as links, so no extra storage will be used. You can rescan the course anytime with the ‘Scan’ button.',
           )}
         </Text>
       </Flex.Item>

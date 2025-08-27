@@ -16,8 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {View} from '@instructure/ui-view'
+import {Editor, Frame} from '@craftjs/core'
+import {BlockContentPreviewLayout} from './BlockContentPreviewLayout'
+import {BlockContentPreviewSelectorBar} from './BlockContentPreviewSelectorBar'
+import {usePreviewMode} from './usePreviewMode'
+import {components} from '../block-content-editor-components'
+import {useGetSerializedNodes} from '../hooks/useGetSerializedNodes'
 
 export const BlockContentPreview = () => {
-  return <View background="secondary" height="100%" />
+  const {previewMode, setPreviewMode} = usePreviewMode()
+  const data = useGetSerializedNodes()
+
+  return (
+    <BlockContentPreviewLayout
+      selectorbar={
+        <BlockContentPreviewSelectorBar activeTab={previewMode} onTabChange={setPreviewMode} />
+      }
+      preview={
+        <Editor enabled={false} resolver={components}>
+          <Frame data={data} />
+        </Editor>
+      }
+    />
+  )
 }

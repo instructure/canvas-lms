@@ -129,8 +129,7 @@ class LoadInitialData < ActiveRecord::Migration[7.0]
                              "Merge Email Communication Channel",
                              "Pseudonym Registration",
                              "Pseudonym Registration Done",
-                             "Self Enrollment Registration",
-                             "Account Verification"].freeze
+                             "Self Enrollment Registration"].freeze
 
     Notification.where(name: priority_message_list).update_all(priority: true)
   end

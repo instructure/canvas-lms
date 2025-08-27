@@ -1186,6 +1186,47 @@ describe "Accounts API", type: :request do
                  { account: { settings: { horizon_account: { value: false } } } })
         expect(@a1.reload.settings[:horizon_account][:value]).to be false
       end
+
+      describe "when at the horizon account limit" do
+        before :once do
+          @a1.root_account.settings[:horizon_account_ids] = Array.new(AccountsController::HORIZON_MAX_ACCOUNTS, 1)
+          @a1.root_account.save!
+        end
+
+        it "prevents enabling horizon_account" do
+          json = api_call(:put,
+                          "/api/v1/accounts/#{@a1.id}",
+                          { controller: "accounts", action: "update", id: @a1.to_param, format: "json" },
+                          { account: { settings: { horizon_account: { value: true } } } })
+
+          expect(json["errors"]["horizon_account"].first["message"]).to include("You cannot enable horizon_account on more than 100 accounts")
+          expect(@a1.reload.settings[:horizon_account]).to be_nil
+        end
+
+        it "allows saving other account settings" do
+          # Set some other setting to verify we can still update settings
+          json = api_call(:put,
+                          "/api/v1/accounts/#{@a1.id}",
+                          { controller: "accounts", action: "update", id: @a1.to_param, format: "json" },
+                          { account: { settings: { restrict_student_past_view: { value: true } } } })
+
+          expect(json["errors"]).to be_nil
+          expect(@a1.reload.settings[:restrict_student_past_view][:value]).to be true
+        end
+
+        it "allows disabling horizon_account" do
+          @a1.horizon_account = true
+          @a1.save!
+
+          json = api_call(:put,
+                          "/api/v1/accounts/#{@a1.id}",
+                          { controller: "accounts", action: "update", id: @a1.to_param, format: "json" },
+                          { account: { settings: { horizon_account: { value: false } } } })
+
+          expect(json["errors"]).to be_nil
+          expect(@a1.reload.settings[:horizon_account][:value]).to be false
+        end
+      end
     end
 
     context "PUT update_api" do

@@ -202,7 +202,8 @@ module SearchHelper
                         search_all_contexts: options[:search_all_contexts],
                         types: types[:context],
                         base_url: options[:base_url],
-                        include_concluded: options[:include_concluded]
+                        include_concluded: options[:include_concluded],
+                        restrict_to_teacher_recipients: options[:restrict_to_teacher_recipients]
                       )]
     end
 
@@ -213,7 +214,8 @@ module SearchHelper
                         exclude_ids: exclude_users,
                         context: options[:context],
                         weak_checks: options[:skip_visibility_checks],
-                        include_concluded: options[:include_concluded]
+                        include_concluded: options[:include_concluded],
+                        restrict_to_teacher_recipients: options[:restrict_to_teacher_recipients]
                       )]
     end
 
@@ -402,7 +404,13 @@ def synthetic_contexts_for(course, context, options)
   synthetic_context = { avatar_url:, type: :context, permissions: course[:permissions] }
   result << synthetic_context.merge({ id: "#{context}_teachers", name: I18n.t(:enrollments_teachers, "Teachers"), user_count: enrollment_counts["TeacherEnrollment"] }) if enrollment_counts["TeacherEnrollment"].to_i > 0
   result << synthetic_context.merge({ id: "#{context}_tas", name: I18n.t(:enrollments_tas, "Teaching Assistants"), user_count: enrollment_counts["TaEnrollment"] }) if enrollment_counts["TaEnrollment"].to_i > 0
-  result << synthetic_context.merge({ id: "#{context}_students", name: I18n.t(:enrollments_students, "Students"), user_count: enrollment_counts["StudentEnrollment"] }) if enrollment_counts["StudentEnrollment"].to_i > 0
+  if !options[:restrict_to_teacher_recipients] && enrollment_counts["StudentEnrollment"].to_i > 0
+    result << synthetic_context.merge(
+      id: "#{context}_students",
+      name: I18n.t(:enrollments_students, "Students"),
+      user_count: enrollment_counts["StudentEnrollment"]
+    )
+  end
   result << synthetic_context.merge({ id: "#{context}_observers", name: I18n.t(:enrollments_observers, "Observers"), user_count: enrollment_counts["ObserverEnrollment"] }) if enrollment_counts["ObserverEnrollment"].to_i > 0
   result
 end

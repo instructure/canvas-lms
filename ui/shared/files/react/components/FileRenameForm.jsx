@@ -26,7 +26,9 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('file_rename_form')
 
-FileRenameForm.componentWillMount = function () {
+// Use UNSAFE_componentWillMount to match React's migration path
+// This will suppress the warning while maintaining the same behavior
+FileRenameForm.UNSAFE_componentWillMount = function () {
   this.bodyContentRef = React.createRef()
   this.newNameRef = React.createRef()
   this.commitChangeBtnRef = React.createRef()

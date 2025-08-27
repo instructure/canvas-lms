@@ -20,7 +20,7 @@
 RSpec.shared_context "lti2_course_spec_helper", shared_context: :metadata do
   let(:account) { Account.create! }
   let(:course) { Course.create!(account:) }
-  let(:developer_key) { DeveloperKey.create!(redirect_uri: "http://www.example.com/redirect") }
+  let(:developer_key) { DeveloperKey.create!(name: "test_key_#{SecureRandom.hex(4)}", redirect_uri: "http://www.example.com/redirect") }
   let(:product_family) do
     Lti::ProductFamily.create!(
       vendor_code: "123",

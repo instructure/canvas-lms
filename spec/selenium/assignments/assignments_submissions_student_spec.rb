@@ -192,9 +192,6 @@ describe "submissions" do
       create_assignment_and_go_to_page "media_recording"
       f(".submit_assignment_link").click
       expect(f("#media_comment_submit_button")).not_to be_displayed
-      # leave so the "are you sure?!" message doesn't freeze up selenium
-      f("#section-tabs .home").click
-      driver.switch_to.alert.accept
     end
 
     it "does not break when submitting a media recording with url online entry as an option" do
@@ -586,12 +583,6 @@ describe "submissions" do
 
         # Make sure the flash message is being displayed
         expect_flash_message :error
-
-        # navigate off the page and dismiss the alert box to avoid problems
-        # with other selenium tests
-        f("#section-tabs .home").click
-        driver.switch_to.alert.accept
-        driver.switch_to.default_content
       end
     end
 

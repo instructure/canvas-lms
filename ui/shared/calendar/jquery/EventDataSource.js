@@ -620,6 +620,9 @@ export default class EventDataSource {
           `/api/v1/appointment_groups/${appointmentGroup.id}/${type}`,
           {
             registration_status: registrationStatus,
+            ...(appointmentGroup.context_codes.length > 0 && {
+              context_code: appointmentGroup.context_codes[0],
+            }),
           },
         ],
       ],

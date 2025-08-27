@@ -42,7 +42,7 @@ const ColorPickerForm: React.FC<FormComponentProps & React.RefAttributes<FormCom
           options={issue.form.options}
           backgroundColor={issue.form.backgroundColor}
           foregroundColor={issue.form.value}
-          contrastRatio={issue.form.contrastRatio}
+          description={issue.message || I18n.t('Invalid Contrast Ratio.')}
           onChange={onChangeValue}
           inputRef={el => (colorPickerInputRef.current = el)}
           messages={error ? [{text: error, type: 'newError'}] : []}

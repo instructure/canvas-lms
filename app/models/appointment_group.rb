@@ -21,6 +21,7 @@
 class AppointmentGroup < ActiveRecord::Base
   include Workflow
   include TextHelper
+  include ConversationsHelper
 
   # rubocop:disable Rails/InverseOf
   has_many :appointments,
@@ -332,7 +333,7 @@ class AppointmentGroup < ActiveRecord::Base
     end
   end
 
-  def possible_participants(registration_status: nil, include_observers: false)
+  def possible_participants(registration_status: nil, include_observers: false, context_code: nil, current_user: nil)
     participants = if participant_type == "User"
                      participant_func = if include_observers
                                           ->(c) { c.participating_students_by_date + c.participating_observers_by_date }
@@ -359,6 +360,12 @@ class AppointmentGroup < ActiveRecord::Base
                    else
                      participants
                    end
+
+    if current_user && context_code
+      recipients = normalize_recipients(recipients: participants.map(&:id), context_code:, current_user:)
+      recipient_ids = recipients.map(&:id)
+      participants = participants.select { |p| recipient_ids.include?(p.id) }
+    end
 
     if participant_type == "User"
       participants.sort_by { |p| [Canvas::ICU.collation_key(p.sortable_name), p.id] }

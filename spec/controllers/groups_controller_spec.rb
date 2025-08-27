@@ -1800,5 +1800,64 @@ describe GroupsController do
         expect(json["message"]).to eq "Not authorized to manage differentiation tag."
       end
     end
+
+    describe "GET #bulk_user_tags" do
+      before do
+        @student1 = User.create!(name: "Student 1")
+        @student2 = User.create!(name: "Student 2")
+        @tag1 = @course.group_categories.create!(name: "Tag 1", non_collaborative: true)
+        @tag2 = @course.group_categories.create!(name: "Tag 2", non_collaborative: true)
+        @other = @course.group_categories.create!(name: "Other", non_collaborative: false)
+        @course.enroll_user(@teacher, "TeacherEnrollment")
+        @course.enroll_user(@student1, "StudentEnrollment")
+        @course.enroll_user(@student2, "StudentEnrollment")
+        @tag1_group = @course.groups.create!(name: "Tag 1", group_category: @tag1)
+        @tag2_group = @course.groups.create!(name: "Tag 2", group_category: @tag2)
+        @other_group = @course.groups.create!(name: "Other", group_category: @other)
+        @tag1_group.add_user(@student1)
+        @tag1_group.add_user(@student2)
+        @tag2_group.add_user(@student2)
+        @other_group.add_user(@student1)
+      end
+
+      it "returns correct tag IDs for each user" do
+        get :bulk_user_tags, params: { course_id: @course.id, user_ids: [@student1.id, @student2.id] }, format: :json
+        expect(response).to have_http_status(:ok)
+        json = response.parsed_body
+        expect(json[@student1.id.to_s]).to match_array([@tag1_group.id])
+        expect(json[@student2.id.to_s]).to match_array([@tag1_group.id, @tag2_group.id])
+      end
+
+      it "returns empty array for users with no tags" do
+        user3 = User.create!(name: "No Tags")
+        get :bulk_user_tags, params: { course_id: @course.id, user_ids: [user3.id] }, format: :json
+        expect(response).to have_http_status(:ok)
+        json = response.parsed_body
+        expect(json[user3.id.to_s]).to eq([])
+      end
+
+      it "returns 403 if not authorized" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+        get :bulk_user_tags,
+            params: { course_id: @course.id, user_ids: [@student1.id] },
+            format: :json
+        expect(response)
+          .to have_http_status(:forbidden)
+          .or have_http_status(:unauthorized)
+      end
+
+      it "returns ok for empty user_ids" do
+        get :bulk_user_tags, params: { course_id: @course.id, user_ids: [] }, format: :json
+        expect(response).to have_http_status(:ok)
+        json = response.parsed_body
+        expect(json).to eq({})
+      end
+    end
   end
 end

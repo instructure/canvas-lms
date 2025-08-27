@@ -2364,4 +2364,206 @@ describe Types::CourseType do
       end
     end
   end
+
+  describe "modules_connection with filters" do
+    let(:course) { @course }
+    let(:student) { @student }
+    let(:teacher) { @teacher }
+
+    def execute_with_context(query, user)
+      CanvasSchema.execute(query, context: { current_user: user })
+    end
+
+    before :once do
+      # Create modules with different completion states
+      @completed_module = @course.context_modules.create!(name: "Completed Module")
+      @started_module = @course.context_modules.create!(name: "Started Module")
+      @unlocked_module = @course.context_modules.create!(name: "Unlocked Module")
+      @no_progression_module = @course.context_modules.create!(name: "No Progression Module")
+
+      # Create progressions for student and ensure they're persisted
+      completed_progression = @completed_module.context_module_progressions.create!(
+        user: @student,
+        workflow_state: "completed"
+      )
+      started_progression = @started_module.context_module_progressions.create!(
+        user: @student,
+        workflow_state: "started"
+      )
+      unlocked_progression = @unlocked_module.context_module_progressions.create!(
+        user: @student,
+        workflow_state: "unlocked"
+      )
+
+      # Ensure all progressions are committed to the database before tests run
+      [completed_progression, started_progression, unlocked_progression].each(&:reload)
+    end
+
+    context "filtering by completion status" do
+      def modules_query(completion_status, user_id = nil)
+        <<~GQL
+          query {
+            course(id: "#{@course.id}") {
+              modulesConnection(filter: {
+                completionStatus: #{completion_status}
+                #{", userId: \"#{user_id}\"" if user_id}
+              }) {
+                nodes {
+                  _id
+                  name
+                  progression {
+                    workflowState
+                  }
+                }
+              }
+            }
+          }
+        GQL
+      end
+
+      def fetch_modules_from_result(result)
+        result.dig("data", "course", "modulesConnection", "nodes")
+      end
+
+      context "as a student" do
+        it "returns completed modules" do
+          result = execute_with_context(modules_query("COMPLETED"), student)
+          modules = fetch_modules_from_result(result)
+
+          expect(modules.length).to eq(1)
+          expect(modules[0]["name"]).to eq("Completed Module")
+        end
+
+        it "returns incomplete modules" do
+          result = execute_with_context(modules_query("INCOMPLETE"), student)
+          modules = fetch_modules_from_result(result)
+
+          expect(modules.length).to eq(3)
+          module_names = modules.map { |m| m["name"] }
+          expect(module_names).to contain_exactly("Started Module", "Unlocked Module", "No Progression Module")
+        end
+
+        it "returns in progress modules" do
+          result = execute_with_context(modules_query("IN_PROGRESS"), student)
+          modules = fetch_modules_from_result(result)
+
+          expect(modules.length).to eq(1)
+          expect(modules[0]["name"]).to eq("Started Module")
+        end
+
+        it "returns not started modules" do
+          result = execute_with_context(modules_query("NOT_STARTED"), student)
+          modules = fetch_modules_from_result(result)
+
+          expect(modules.length).to eq(2)
+          module_names = modules.map { |m| m["name"] }
+          expect(module_names).to contain_exactly("Unlocked Module", "No Progression Module")
+        end
+
+        it "returns error when trying to view another user's progress" do
+          other_student = user_factory(active_all: true)
+          @course.enroll_student(other_student, enrollment_state: "active")
+
+          # Ensure they're different users
+          expect(student.id).not_to eq(other_student.id)
+
+          result = execute_with_context(modules_query("COMPLETED", other_student.id), student)
+
+          expect(result["errors"]).to be_present
+          expect(result["errors"][0]["message"]).to eq("Not authorized to view this user's module progress")
+        end
+      end
+
+      context "as a teacher" do
+        it "can view student's completed modules" do
+          result = execute_with_context(modules_query("COMPLETED", student.id), teacher)
+          modules = fetch_modules_from_result(result)
+
+          expect(modules.length).to eq(1)
+          expect(modules[0]["name"]).to eq("Completed Module")
+        end
+
+        it "defaults to teacher's own progress when no user_id specified" do
+          # Teacher has no progressions, so should return no completed modules
+          result = execute_with_context(modules_query("COMPLETED"), teacher)
+          modules = fetch_modules_from_result(result)
+
+          expect(modules).to be_empty
+        end
+      end
+
+      context "filtering performance" do
+        it "uses efficient filtering at database level for completion status" do
+          # Create many modules and ensure progressions are persisted
+          progressions = []
+          10.times do |i|
+            mod = @course.context_modules.create!(name: "Module #{i}")
+            progressions << mod.context_module_progressions.create!(
+              user: student,
+              workflow_state: i.even? ? "completed" : "started"
+            )
+          end
+
+          # Ensure all progressions are committed to the database before testing
+          progressions.each(&:reload)
+
+          # The filter uses a JOIN which is expected for database-level filtering
+          result = execute_with_context(modules_query("COMPLETED"), student)
+          modules = fetch_modules_from_result(result)
+
+          # Should return only completed modules
+          expect(modules.length).to eq(6) # 1 original + 5 even-numbered new ones
+          expect(modules.all? { |m| m.dig("progression", "workflowState") == "completed" }).to be true
+        end
+      end
+
+      context "as an unauthenticated user (public course)" do
+        before do
+          @course.update!(is_public: true)
+        end
+
+        it "returns all modules for incomplete filter" do
+          result = execute_with_context(modules_query("INCOMPLETE"), nil)
+          modules = fetch_modules_from_result(result)
+
+          expect(modules.length).to eq(4)
+          module_names = modules.map { |m| m["name"] }
+          expect(module_names).to contain_exactly(
+            "Completed Module",
+            "Started Module",
+            "Unlocked Module",
+            "No Progression Module"
+          )
+        end
+
+        it "returns no modules for completed filter" do
+          result = execute_with_context(modules_query("COMPLETED"), nil)
+          modules = fetch_modules_from_result(result)
+
+          expect(modules).to be_empty
+        end
+
+        it "returns no modules for in_progress filter" do
+          result = execute_with_context(modules_query("IN_PROGRESS"), nil)
+          modules = fetch_modules_from_result(result)
+
+          expect(modules).to be_empty
+        end
+
+        it "returns no modules for not_started filter" do
+          result = execute_with_context(modules_query("NOT_STARTED"), nil)
+          modules = fetch_modules_from_result(result)
+
+          expect(modules).to be_empty
+        end
+
+        it "cannot specify a user_id when unauthenticated" do
+          result = execute_with_context(modules_query("COMPLETED", student.id), nil)
+
+          expect(result["errors"]).to be_present
+          expect(result["errors"][0]["message"]).to eq("Authentication required to view other users' module progress")
+        end
+      end
+    end
+  end
 end

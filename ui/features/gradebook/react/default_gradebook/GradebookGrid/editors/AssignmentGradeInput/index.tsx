@@ -35,7 +35,7 @@ const CLASSNAME_FOR_ENTER_GRADES_AS = {
 
 type Props = {
   assignment: {
-    pointsPossible: number
+    pointsPossible: number | null
   }
   disabled: boolean
   enterGradesAs: 'gradingScheme' | 'passFail' | 'percent' | 'points'

@@ -32,8 +32,10 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Tray} from '@instructure/ui-tray'
-
 import {Link} from '@instructure/ui-link'
+import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
+import {Tag} from '@instructure/ui-tag'
 
 const I18n = createI18nScope('student_context_trayStudentContextTray')
 
@@ -50,6 +52,7 @@ const dataShape = PropTypes.shape({
   loading: PropTypes.bool.isRequired,
   course: courseShape,
   user: userShape,
+  refetch: PropTypes.func,
 })
 
 export default class StudentContextTray extends React.Component {
@@ -98,7 +101,16 @@ export default class StudentContextTray extends React.Component {
 
   UNSAFE_componentWillReceiveProps(_nextProps) {
     if (!this.state.isOpen) {
-      this.setState({isOpen: true})
+      this.setState({isOpen: true}, () => {
+        // Refetch to update tags
+        if (
+          window.ENV?.permissions?.can_manage_differentiation_tags &&
+          this.props.data.refetch &&
+          typeof this.props.data.refetch === 'function'
+        ) {
+          this.props.data.refetch()
+        }
+      })
     }
   }
 
@@ -194,10 +206,48 @@ export default class StudentContextTray extends React.Component {
     ) : null
   }
 
+  renderTags(user) {
+    const tags = user.differentiationTagsConnection?.edges || []
+    // Display max 4 lines of tags (tags can have long names)
+    const overThreshold = tags.length > 4
+
+    return (
+      <View
+        as="div"
+        maxHeight={overThreshold ? '8rem' : undefined}
+        overflowY={overThreshold ? 'auto' : undefined}
+        position="relative"
+        margin="none none small none"
+        data-testid="tags-container"
+      >
+        <Flex as="div" wrap="wrap" width="100%">
+          {tags.map(({node: {group}}) => {
+            const singleTag = group?.groupCategory?.singleTag
+            const groupCategoryName = group?.groupCategory?.name || ''
+            const groupName = group?.name || ''
+            const tagName = singleTag ? groupCategoryName : `${groupCategoryName} | ${groupName}`
+
+            return (
+              <Flex.Item key={group._id} overflowY="hidden" overflowX="hidden">
+                <div style={{padding: '0.1875rem 0.75rem 0.1875rem 0'}}>
+                  <Tag data-testid={`tag-${group._id}`} text={tagName} size="small" />
+                </div>
+              </Flex.Item>
+            )
+          })}
+        </Flex>
+      </View>
+    )
+  }
+
   render() {
     const {
       data: {loading, course, user},
     } = this.props
+
+    const shouldRenderTags =
+      window.ENV?.permissions?.can_manage_differentiation_tags &&
+      user?.differentiationTagsConnection?.edges?.length > 0
 
     return (
       <div>
@@ -240,7 +290,10 @@ export default class StudentContextTray extends React.Component {
               </div>
             ) : (
               <div>
-                <header className="StudentContextTray-Header">
+                <header
+                  className="StudentContextTray-Header"
+                  style={shouldRenderTags ? {marginBottom: '0.25rem'} : {}}
+                >
                   <Avatar
                     name={user.short_name}
                     user={user}
@@ -278,12 +331,16 @@ export default class StudentContextTray extends React.Component {
                           {course.name}
                         </Text>
                       </div>
-                      <Text size="x-small" color="secondary" as="div">
-                        <SectionInfo user={user} />
-                      </Text>
-                      <Text size="x-small" color="secondary" as="div">
-                        <LastActivity user={user} />
-                      </Text>
+                      {!shouldRenderTags && (
+                        <>
+                          <Text size="x-small" color="secondary" as="div">
+                            <SectionInfo user={user} />
+                          </Text>
+                          <Text size="x-small" color="secondary" as="div">
+                            <LastActivity user={user} />
+                          </Text>
+                        </>
+                      )}
                     </div>
                     {course.permissions.send_messages &&
                     user.enrollments.some(e => e.state === 'active') ? (
@@ -304,6 +361,17 @@ export default class StudentContextTray extends React.Component {
                     ) : null}
                   </div>
                 </header>
+                {shouldRenderTags && this.renderTags(user)}
+                {shouldRenderTags && (
+                  <section className="StudentContextTray__Section">
+                    <Text size="x-small" color="secondary" as="div">
+                      <SectionInfo user={user} />
+                    </Text>
+                    <Text size="x-small" color="secondary" as="div">
+                      <LastActivity user={user} />
+                    </Text>
+                  </section>
+                )}
                 {this.renderQuickLinks(user, course)}
                 <MetricsList
                   user={user}

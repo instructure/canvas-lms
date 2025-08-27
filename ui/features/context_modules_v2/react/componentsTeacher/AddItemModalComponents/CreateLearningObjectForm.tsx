@@ -33,13 +33,18 @@ const I18n = createI18nScope('context_modules_v2')
 export type CreateLearningObjectFormProps = {
   itemType: 'page' | 'quiz' | 'file' | 'external_url' | string
   onChange: (field: string, value: any) => void
+  nameError: string | null
+  setName: (name: string) => void
+  name: string
 }
 
 export const CreateLearningObjectForm: React.FC<CreateLearningObjectFormProps> = ({
   itemType,
   onChange,
+  nameError,
+  setName,
+  name,
 }) => {
-  const [name, setName] = useState('')
   const [assignmentGroup, setAssignmentGroup] = useState<string | undefined>(undefined)
   const [folder, setFolder] = useState<string | undefined>(undefined)
   const [file, setFile] = useState<File | null>(null)
@@ -70,6 +75,8 @@ export const CreateLearningObjectForm: React.FC<CreateLearningObjectFormProps> =
           }}
           margin="0 0 medium 0"
           required
+          isRequired={true}
+          messages={nameError ? [{text: nameError, type: 'newError'}] : []}
         />
       )}
       {itemType === 'quiz' && (

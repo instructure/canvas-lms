@@ -238,5 +238,26 @@ describe Lti::AssetProcessor do
       ]
       expect(subject).to eq(expected)
     end
+
+    it "uses ActivityAssetProcessorContribution icon_url when assignment relates to a discussion" do
+      tool = external_tool_1_3_model(opts: { name: "discussion tool" })
+
+      tool.settings["ActivityAssetProcessor"] = { icon_url: "https://example.com/assignment-icon.png" }
+      tool.settings["ActivityAssetProcessorContribution"] = { icon_url: "https://example.com/discussion-icon.png" }
+      tool.save!
+
+      discussion_topic = graded_discussion_topic
+      discussion_assignment = discussion_topic.assignment
+
+      ap = lti_asset_processor_model(
+        context_external_tool: tool,
+        assignment: discussion_assignment
+      )
+      ap.icon = nil
+      ap.save!
+
+      result = Lti::AssetProcessor.where(assignment_id: discussion_assignment.id).info_for_display
+      expect(result[0][:icon_or_tool_icon_url]).to eq("https://example.com/discussion-icon.png")
+    end
   end
 end

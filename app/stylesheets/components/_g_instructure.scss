@@ -1788,7 +1788,7 @@ form.user_content_post_form {
   margin: 4px 0;
 }
 
-.with-fixed-bottom .ic-Layout-wrapper {
+.with-fixed-bottom:not(.content-only) .ic-Layout-wrapper {
   padding-bottom: 60px;
   box-sizing: border-box;
 }
@@ -1827,6 +1827,10 @@ form.user_content_post_form {
     .warning_message {
       margin-#{direction(left)}: auto;
     }
+  }
+
+  body.content-only & {
+    display: none;
   }
 }
 

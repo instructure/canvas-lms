@@ -17,10 +17,11 @@
  */
 
 import {useNode} from '@craftjs/core'
-import {View} from '@instructure/ui-view'
-import {Checkbox} from '@instructure/ui-checkbox'
+import {TextBlockProps} from './types'
+import {SettingsIncludeTitle} from '../BlockItems/SettingsIncludeTitle/SettingsIncludeTitle'
+import {SettingsSectionToggle} from '../BlockItems/SettingsSectionToggle/SettingsSectionToggle'
+import {ColorPickerWrapper} from '../BlockItems/ColorPickerWrapper'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {type TextBlockProps} from './TextBlock'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -28,24 +29,42 @@ export const TextBlockSettings = () => {
   const {
     actions: {setProp},
     includeBlockTitle,
+    backgroundColor,
   } = useNode(node => ({
     includeBlockTitle: node.data.props.settings.includeBlockTitle,
+    backgroundColor: node.data.props.settings.backgroundColor,
   }))
 
-  const handleIncludeBlockTitleChange = (includeBlockTitle: boolean) => {
+  const handleIncludeBlockTitleChange = () => {
     setProp((props: TextBlockProps) => {
-      props.settings.includeBlockTitle = includeBlockTitle
+      props.settings.includeBlockTitle = !includeBlockTitle
+    })
+  }
+
+  const handleBackgroundColorChange = (color: string) => {
+    setProp((props: TextBlockProps) => {
+      props.settings.backgroundColor = color
     })
   }
 
   return (
-    <View as="div" padding="small">
-      <Checkbox
-        variant="toggle"
-        label={I18n.t('Include block title')}
-        checked={includeBlockTitle}
-        onChange={() => handleIncludeBlockTitleChange(!includeBlockTitle)}
-      />
-    </View>
+    <>
+      <SettingsIncludeTitle checked={includeBlockTitle} onChange={handleIncludeBlockTitleChange} />
+      <SettingsSectionToggle
+        title={I18n.t('Color settings')}
+        collapsedLabel={I18n.t('Expand color settings')}
+        expandedLabel={I18n.t('Collapse color settings')}
+        defaultExpanded={false}
+        includeSeparator={true}
+      >
+        <ColorPickerWrapper
+          label={I18n.t('Background')}
+          value={backgroundColor}
+          baseColor="#000000" // Temporary base color
+          baseColorLabel={I18n.t('Text')}
+          onChange={handleBackgroundColorChange}
+        />
+      </SettingsSectionToggle>
+    </>
   )
 }

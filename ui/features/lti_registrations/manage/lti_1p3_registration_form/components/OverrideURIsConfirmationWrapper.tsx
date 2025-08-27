@@ -19,8 +19,6 @@
 import React from 'react'
 import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
 
-import {useScope as createI18nScope} from '@canvas/i18n'
-import {isValidHttpUrl} from '../../../common/lib/validators/isValidHttpUrl'
 import {Lti1p3RegistrationOverlayStore} from '../../registration_overlay/Lti1p3RegistrationOverlayStore'
 import {RegistrationModalBody} from '../../registration_wizard/RegistrationModalBody'
 import {Footer} from '../../registration_wizard_forms/Footer'
@@ -29,8 +27,6 @@ import {
   getInputIdForField,
   validateOverrideUris,
 } from '../../registration_overlay/validateLti1p3RegistrationOverlayState'
-
-const I18n = createI18nScope('lti_registration.wizard')
 
 export type OverrideURIsConfirmationWrapperProps = {
   overlayStore: Lti1p3RegistrationOverlayStore

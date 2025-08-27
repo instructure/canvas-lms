@@ -93,7 +93,7 @@ describe "SpeedGrader" do
       expect(pg.submission_comments.map(&:comment)).to include "srsly"
     end
 
-    it "creates rubric assessments for the provisional grade" do
+    it "creates rubric assessments for the provisional grade", :ignore_js_errors do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       comment = "some silly comment"

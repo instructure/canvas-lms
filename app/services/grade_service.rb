@@ -42,18 +42,20 @@ class GradeService
 
     Here is the output schema:
     ```
-    {"properties": {"rubric_category": {"title": "Rubric Category", "description": "The name of the rubric category for which the criterion is selected", "type": "string"}, "reasoning": {"title": "Reasoning", "description": "A concise but descriptive two sentence explanation of how you arrived at the awarded score, including reference to the threshold criteria that were met.", "type": "string"}, "criterion": {"title": "Criterion", "description": "The specific rubric criterion (i.e., the highest threshold met) that best fits your evaluation.", "type": "string"}}, "required": ["rubric_category", "reasoning", "criterion"]}
+    {"properties": {"rubric_category": {"title": "Rubric Category", "description": "The name of the rubric category for which the criterion is selected", "type": "string"}, "reasoning": {"title": "Reasoning", "description": "A concise but descriptive explanation of why a criterion best suits the essay. You must justify your reasoning using text snippet from the essay and mention the threshold criterion that was met.", "type": "string"}, "criterion": {"title": "Criterion", "description": "The specific rubric criterion (i.e., the highest threshold met) that best fits your evaluation.", "type": "string"}}, "required": ["rubric_category", "reasoning", "criterion"]}
     ```
     For each rubric category, select the most appropriate criterion that matches the essay.
+    Provide reasoning for why the criterion is appropriate and include a text snippet from the essay to back it up.
     Your response must contain ONLY the JSON array - no additional text, explanations, or formatting. Any non-JSON content will cause parsing errors.
     </INSTRUCTIONS>
   TEXT
 
-  def initialize(assignment:, essay:, rubric:, root_account_uuid:)
+  def initialize(assignment:, essay:, rubric:, root_account_uuid:, current_user:)
     @assignment = assignment.to_s
     @essay = essay.to_s
     @rubric = rubric
     @root_account_uuid = root_account_uuid
+    @current_user = current_user
     @rubric_prompt_format = self.class.normalize_rubric_for_prompt(@rubric)
   end
 
@@ -72,8 +74,9 @@ class GradeService
         prompt:,
         model: "anthropic.claude-3-haiku-20240307-v1:0",
         feature_slug: "grading-assistance",
-        root_account_uuid: @root_account_uuid
-      )
+        root_account_uuid: @root_account_uuid,
+        current_user: @current_user
+      ).response
 
       body = safe_parse_json_array(response)
       parsed_result = filter_repeating_keys(body)

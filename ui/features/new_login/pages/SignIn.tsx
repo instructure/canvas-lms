@@ -103,7 +103,11 @@ const SignIn = () => {
   const handleFailedLogin = () => {
     setPasswordError('')
     setPassword('')
-    setUsernameError(I18n.t('Please verify your email and password and try again.'))
+    setUsernameError(
+      I18n.t('Please verify your %{loginHandleName} or password and try again.', {
+        loginHandleName: loginHandleName?.toLowerCase(),
+      }),
+    )
     // focus set in useEffect above …
   }
 

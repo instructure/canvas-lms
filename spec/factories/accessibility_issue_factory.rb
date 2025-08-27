@@ -21,9 +21,7 @@ module Factories
   def accessibility_issue_model(opts = {})
     opts[:course] ||= course_model
     opts[:accessibility_resource_scan] ||= accessibility_resource_scan_model(course: opts[:course])
-    if !opts[:wiki_page] && !opts[:assignment] && !opts[:attachment]
-      opts[:wiki_page] = wiki_page_model(course: opts[:course])
-    end
+    opts[:context] ||= opts[:accessibility_resource_scan].context
     opts[:rule_type] ||= Accessibility::Rules::ImgAltRule.id
 
     AccessibilityIssue.create!(opts)

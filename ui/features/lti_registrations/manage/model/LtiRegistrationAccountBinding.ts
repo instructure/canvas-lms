@@ -18,7 +18,6 @@
 
 import {z} from 'zod'
 import {ZLtiRegistrationId} from './LtiRegistrationId'
-import {ZUserId} from './UserId'
 import {ZAccountId} from './AccountId'
 import {ZUser} from './User'
 

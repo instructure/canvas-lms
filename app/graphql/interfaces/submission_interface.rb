@@ -529,69 +529,80 @@ module Interfaces::SubmissionInterface
 
     Promise
       .all([load_association(:assignment), load_association(:rubric_assessments)])
-      .then do
-        # If the target_attempt is nil, we don't need to preload because visible_rubric_assessments_for
-        # will early return and load all rubric assessments for the submission with no version checks
-        assessments_needing_versions_loaded = if target_attempt.nil?
-                                                []
-                                              else
-                                                submission.rubric_assessments.reject { |ra| ra.artifact_attempt == target_attempt }
-                                              end
+      .then do |assignment_and_assessments|
+        assignment = assignment_and_assessments[0]
 
-        versionable_loader_promise =
-          if assessments_needing_versions_loaded.empty?
-            Promise.resolve(nil)
-          else
-            Loaders::AssociationLoader
-              .for(RubricAssessment, :versions)
-              .load_many(assessments_needing_versions_loaded)
-          end
-
-        provisional_loader_promise = if include_provisional
-                                       Loaders::AssociationLoader
-                                         .for(Submission, :provisional_grades)
-                                         .load(submission)
-                                         .then do |provisional_grades|
-                                           if provisional_grades.present?
-                                             RubricAssessment
-                                               .where(
-                                                 artifact_type: "ModeratedGrading::ProvisionalGrade",
-                                                 artifact_id: provisional_grades.map(&:id)
-                                               )
-                                               .preload(:rubric_association, :assessor, :user)
-                                               .then do |provisional_rubric_assessments|
-                                                 provisional_rubric_assessments
-                                               end
-                                           else
-                                             Promise.resolve(nil)
-                                           end
-                                         end
+        moderation_graders_promise = if assignment&.moderated_grading?
+                                       Loaders::AssignmentLoaders::OrderedModerationGradersWithSlotTakenLoader
+                                         .load(assignment.id)
                                      else
-                                       Promise.resolve(nil)
+                                       Promise.resolve([])
                                      end
 
-        Promise
-          .all(
-            [
-              versionable_loader_promise,
+        moderation_graders_promise.then do |moderation_graders|
+          assignment.instance_variable_set(:@ordered_moderation_graders_with_slot_taken, moderation_graders) if assignment&.moderated_grading?
+
+          assessments_needing_versions_loaded = if target_attempt.nil?
+                                                  []
+                                                else
+                                                  submission.rubric_assessments.reject { |ra| ra.artifact_attempt == target_attempt }
+                                                end
+
+          versionable_loader_promise =
+            if assessments_needing_versions_loaded.empty?
+              Promise.resolve(nil)
+            else
               Loaders::AssociationLoader
-                .for(Assignment, :rubric_association)
-                .load(submission.assignment),
-              Loaders::AssociationLoader
-                .for(RubricAssessment, :rubric_association)
-                .load_many(submission.rubric_assessments),
-              provisional_loader_promise
-            ]
-          )
-          .then do |results|
-            provisional_assessments = results.last || []
-            submission.visible_rubric_assessments_for(
-              current_user,
-              attempt: target_attempt,
-              include_provisional:,
-              provisional_assessments:
+                .for(RubricAssessment, :versions)
+                .load_many(assessments_needing_versions_loaded)
+            end
+
+          provisional_loader_promise = if include_provisional
+                                         Loaders::AssociationLoader
+                                           .for(Submission, :provisional_grades)
+                                           .load(submission)
+                                           .then do |provisional_grades|
+                                             if provisional_grades.present?
+                                               RubricAssessment
+                                                 .where(
+                                                   artifact_type: "ModeratedGrading::ProvisionalGrade",
+                                                   artifact_id: provisional_grades.map(&:id)
+                                                 )
+                                                 .preload(:rubric_association, :assessor, :user)
+                                                 .then do |provisional_rubric_assessments|
+                                                   provisional_rubric_assessments
+                                                 end
+                                             else
+                                               Promise.resolve(nil)
+                                             end
+                                           end
+                                       else
+                                         Promise.resolve(nil)
+                                       end
+
+          Promise
+            .all(
+              [
+                versionable_loader_promise,
+                Loaders::AssociationLoader
+                  .for(Assignment, :rubric_association)
+                  .load(submission.assignment),
+                Loaders::AssociationLoader
+                  .for(RubricAssessment, :rubric_association)
+                  .load_many(submission.rubric_assessments),
+                provisional_loader_promise
+              ]
             )
-          end
+            .then do |results|
+              provisional_assessments = results.last || []
+              submission.visible_rubric_assessments_for(
+                current_user,
+                attempt: target_attempt,
+                include_provisional:,
+                provisional_assessments:
+              )
+            end
+        end
       end
   end
 

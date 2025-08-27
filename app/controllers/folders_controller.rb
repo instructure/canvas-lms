@@ -116,6 +116,7 @@ class FoldersController < ApplicationController
 
   before_action :require_context, except: %i[list_folders_and_files api_index show api_destroy update create create_file copy_folder copy_file]
   before_action :check_limited_access_for_students, only: %i[create_file]
+  before_action :check_restricted_file_access_for_students, only: %i[create_file copy_file copy_folder]
 
   def index
     if authorized_action(@context, @current_user, :read_files)
@@ -438,6 +439,8 @@ class FoldersController < ApplicationController
           folder_params[:hidden] = true
         end
         if (parent_folder_id = folder_params.delete(:parent_folder_id))
+          return if check_restricted_file_access_and_return?
+
           parent_folder = @context.folders.active.find(parent_folder_id)
           return unless authorized_action(parent_folder, @current_user, :manage_contents)
 

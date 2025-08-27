@@ -22,7 +22,7 @@ module Types
   class LtiAssetReportType < ApplicationObjectType
     implements Interfaces::LegacyIDInterface
 
-    field :asset, LtiAssetType, null: true
+    field :asset, LtiAssetType, null: false
     def asset
       load_association(:asset)
     end

@@ -597,4 +597,123 @@ describe LearningOutcomeResult do
       expect(version_model).to have_attributes(attributes)
     end
   end
+
+  describe "rollup calculation integration" do
+    let_once(:outcome) { course.created_learning_outcomes.create!(title: "Test Outcome") }
+    let_once(:alignment) do
+      ContentTag.create!(
+        title: "content",
+        context: course,
+        learning_outcome: outcome,
+        content_id: quiz.id
+      )
+    end
+
+    describe "#rollup_calculation" do
+      context "with feature flag enabled" do
+        before do
+          Account.site_admin.enable_feature!(:outcomes_rollup_propagation)
+        end
+
+        it "enqueues rollup calculation when result is saved" do
+          lor = LearningOutcomeResult.new(
+            alignment:,
+            user: student,
+            context: course,
+            learning_outcome: outcome,
+            score: 3.0,
+            possible: 5.0
+          )
+
+          expect(lor).to receive(:enqueue_rollup_calculation)
+            .with(course_id: course.id, student_id: student.id)
+
+          lor.save!
+        end
+
+        it "enqueues rollup calculation when result is updated" do
+          lor = LearningOutcomeResult.create!(
+            alignment:,
+            user: student,
+            context: course,
+            learning_outcome: outcome,
+            score: 3.0,
+            possible: 5.0
+          )
+
+          expect(lor).to receive(:enqueue_rollup_calculation)
+            .with(course_id: course.id, student_id: student.id)
+
+          lor.update!(score: 4.0)
+        end
+      end
+
+      context "with feature flag disabled" do
+        before do
+          Account.site_admin.disable_feature!(:outcomes_rollup_propagation)
+        end
+
+        it "does not enqueue rollup calculation when feature flag is disabled" do
+          lor = LearningOutcomeResult.new(
+            alignment:,
+            user: student,
+            context: course,
+            learning_outcome: outcome,
+            score: 3.0,
+            possible: 5.0
+          )
+
+          # Expect that the service method is not called when feature flag is off
+          expect(Outcomes::StudentOutcomeRollupCalculationService).not_to receive(:calculate_for_student)
+
+          lor.save!
+        end
+      end
+
+      context "edge cases" do
+        before do
+          Account.site_admin.enable_feature!(:outcomes_rollup_propagation)
+        end
+
+        it "does not enqueue rollup calculation when context is nil" do
+          lor = LearningOutcomeResult.create!(
+            alignment:,
+            user: student,
+            context: course,
+            learning_outcome: outcome,
+            score: 3.0,
+            possible: 5.0
+          )
+
+          # Now stub the context to be nil and trigger an update
+          # to test the after_commit callback behavior
+          allow(lor).to receive(:context).and_return(nil)
+
+          expect(lor).not_to receive(:enqueue_rollup_calculation)
+
+          lor.update!(score: 4.0)
+        end
+
+        it "does not enqueue rollup calculation when user is nil" do
+          lor = LearningOutcomeResult.create!(
+            alignment:,
+            user: student,
+            context: course,
+            learning_outcome: outcome,
+            score: 3.0,
+            possible: 5.0
+          )
+
+          # Now stub the user to be nil and trigger an update
+          # to test the after_commit callback behavior
+          allow(lor).to receive(:user).and_return(nil)
+
+          # The rollup calculation should not be enqueued when user is nil
+          expect(lor).not_to receive(:enqueue_rollup_calculation)
+
+          lor.update!(score: 4.0)
+        end
+      end
+    end
+  end
 end

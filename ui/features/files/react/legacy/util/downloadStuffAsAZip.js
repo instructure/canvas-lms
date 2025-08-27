@@ -21,6 +21,7 @@ import $ from 'jquery'
 import {throttle} from 'lodash'
 import Progress from '@canvas/progress/backbone/models/Progress'
 import Folder from '@canvas/files/backbone/models/Folder'
+import {assignLocation} from '@canvas/util/globalUtils'
 
 const I18n = createI18nScope('react_files')
 
@@ -89,7 +90,7 @@ export default function downloadStuffAsAZip(filesAndFolders, {contextType, conte
     .pipe(response => {
       $(window).off('beforeunload', promptBeforeLeaving)
       if (response.workflow_state === 'exported') {
-        window.location = response.attachment.url
+        assignLocation(response.attachment.url)
       } else {
         $.flashError(I18n.t('An error occurred trying to prepare download, please try again.'))
       }

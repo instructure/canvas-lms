@@ -123,6 +123,18 @@ class Discussion
       "[data-testid='summary-user-input']"
     end
 
+    def sort_button_selector
+      "[data-testid='sort-order-dropdown']"
+    end
+
+    def sort_order_selector
+      "[data-testid='sort-order-select']"
+    end
+
+    def discussion_entries_selector
+      "[data-testid='discussion-entry-container']"
+    end
+
     def sync_to_sis_checkbox_selector
       "input[type=checkbox][value='post_to_sis']"
     end
@@ -228,6 +240,10 @@ class Discussion
       f(summary_user_input_selector)
     end
 
+    def discussion_entries
+      ff(discussion_entries_selector)
+    end
+
     def sync_to_sis_checkbox
       f(sync_to_sis_checkbox_selector)
     end
@@ -318,6 +334,14 @@ class Discussion
 
     def click_summary_generate_button
       summary_generate_button.click
+    end
+
+    def click_sort_dropdown
+      f(sort_order_selector).click
+    end
+
+    def select_sort_option(option)
+      fj("[data-testid='sort-order-select-option-#{option}']").click
     end
 
     def click_sync_to_sis_checkbox

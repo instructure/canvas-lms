@@ -19,6 +19,7 @@
 import {DropResult} from 'react-beautiful-dnd'
 import {InfiniteData, QueryClient} from '@tanstack/react-query'
 import type {ModulesResponse} from './types'
+import {MODULES} from '../utils/constants'
 
 const getModuleItemsFromDOM = (moduleId: string): any[] => {
   const moduleElement = document.querySelector(`[data-module-id="${moduleId}"]`)
@@ -133,7 +134,7 @@ export const handleDragEnd = (
 
     newModules.splice(destinationIndex, 0, movedModule)
 
-    queryClient.setQueryData(['modules', courseId], (oldData: any) => ({
+    queryClient.setQueryData([MODULES, courseId], (oldData: any) => ({
       ...oldData,
       pages: oldData.pages.map((page: any) => ({
         ...page,

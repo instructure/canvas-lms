@@ -21,7 +21,7 @@ export const COLUMN_WIDTH: number = 160
 export const STUDENT_COLUMN_WIDTH: number = 220
 export const STUDENT_COLUMN_RIGHT_PADDING: number = 15
 export const COLUMN_PADDING: number = 2
-export const CELL_HEIGHT: number = 45
+export const CELL_HEIGHT: number = 48
 
 export const DEFAULT_STUDENTS_PER_PAGE: number = 15
 export const STUDENTS_PER_PAGE_OPTIONS: number[] = [15, 30, 50, 100]
@@ -37,4 +37,26 @@ export enum SortBy {
   SisId = 'student_sis_id',
   IntegrationId = 'student_integration_id',
   LoginId = 'student_login_id',
+}
+
+export enum SecondaryInfoDisplay {
+  NONE = 'none',
+  SIS_ID = 'sis_id',
+  INTEGRATION_ID = 'integration_id',
+  LOGIN_ID = 'login_id',
+}
+
+export enum DisplayFilter {
+  SHOW_STUDENTS_WITH_NO_RESULTS = 'show_students_with_no_results',
+  SHOW_STUDENT_AVATARS = 'show_student_avatars',
+}
+
+export interface GradebookSettings {
+  secondaryInfoDisplay: SecondaryInfoDisplay
+  displayFilters: DisplayFilter[]
+}
+
+export const DEFAULT_GRADEBOOK_SETTINGS: GradebookSettings = {
+  secondaryInfoDisplay: SecondaryInfoDisplay.NONE,
+  displayFilters: [DisplayFilter.SHOW_STUDENT_AVATARS, DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS],
 }

@@ -282,6 +282,8 @@ module SeleniumDriverSetup
         options.args << "--enable-automation"
         options.args << "--disable-dev-shm-usage"
         options.add_preference("profile.password_manager_leak_detection", false)
+        options.web_socket_url = true
+        options.unhandled_prompt_behavior = "ignore" # accept, dismiss, ignore
         if ENV["DISABLE_CORS"]
           options.args << "disable-web-security"
         end

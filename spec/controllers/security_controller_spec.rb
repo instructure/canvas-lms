@@ -130,6 +130,7 @@ RSpec.describe SecurityController, type: :request do
          "placements" =>
          ["https://canvas.instructure.com/lti/assignment_selection",
           "ActivityAssetProcessor",
+          "ActivityAssetProcessorContribution",
           "https://canvas.instructure.com/lti/collaboration",
           "https://canvas.instructure.com/lti/conference_selection",
           "https://canvas.instructure.com/lti/course_assignments_menu",
@@ -174,10 +175,11 @@ RSpec.describe SecurityController, type: :request do
       parsed_body = response.parsed_body
       expect(parsed_body["issuer"]).to eq "https://canvas.instructure.com"
       expect(parsed_body["authorization_endpoint"]).to eq "http://canvas.instructure.com/api/lti/authorize_redirect"
-      expect(parsed_body["registration_endpoint"]).to eq "http://localhost/api/lti/registrations"
+      expect(parsed_body["registration_endpoint"]).to eq "http://canvas.instructure.com/api/lti/registrations"
       expect(parsed_body["scopes_supported"]).to match_array(["openid", *TokenScopes::LTI_SCOPES.keys])
       expect(parsed_body["jwks_uri"]).to eq "http://canvas.instructure.com/api/lti/security/jwks"
       expect(parsed_body["token_endpoint"]).to eq "http://canvas.instructure.com/login/oauth2/token"
+      expect(parsed_body["authorization_server"]).to eq "canvas.instructure.com"
       lti_platform_configuration = parsed_body["https://purl.imsglobal.org/spec/lti-platform-configuration"]
       expect(lti_platform_configuration["product_family_code"]).to eq "canvas"
       expect(lti_platform_configuration["https://canvas.instructure.com/lti/account_name"]).to eq "Default Account"
@@ -219,6 +221,85 @@ RSpec.describe SecurityController, type: :request do
       end
     end
 
+    context "when the lti_asset_processor_discussions feature flag is off" do
+      before do
+        Account.default.disable_feature!(:lti_asset_processor_discussions)
+      end
+
+      it "contains the correct information" do
+        messages.each do |message|
+          message["placements"] -= ["ActivityAssetProcessorContribution"] if message["placements"]
+        end
+
+        get "/api/lti/security/openid-configuration?registration_token=#{make_jwt}"
+
+        expect(response).to have_http_status :ok
+        parsed_body = response.parsed_body
+        lti_platform_configuration = parsed_body["https://purl.imsglobal.org/spec/lti-platform-configuration"]
+        expect(lti_platform_configuration["messages_supported"]).to eq messages
+      end
+    end
+
+    context "when running locally" do
+      before do
+        allow(Lti::Oidc).to receive(:auth_domain).and_call_original
+      end
+
+      it "uses the account's domain for all of the URLs" do
+        get "/api/lti/security/openid-configuration?registration_token=#{make_jwt}"
+
+        expect(response).to have_http_status :ok
+        parsed_body = response.parsed_body
+        expect(parsed_body["registration_endpoint"]).to eq "http://localhost/api/lti/registrations"
+        expect(parsed_body["authorization_endpoint"]).to eq "http://localhost/api/lti/authorize_redirect"
+        expect(parsed_body["jwks_uri"]).to eq "http://localhost/api/lti/security/jwks"
+        expect(parsed_body["token_endpoint"]).to eq "http://localhost/login/oauth2/token"
+        expect(parsed_body["authorization_server"]).to eq "localhost"
+      end
+    end
+
+    context "in a beta environment" do
+      before do
+        allow(CanvasSecurity).to receive(:config).and_return({ "lti_iss" => "https://canvas.beta.instructure.com" })
+        allow(Lti::Oidc).to receive(:auth_domain).and_return("canvas.beta.instructure.com")
+        host! "canvas.beta.instructure.com"
+      end
+
+      it "modifies the URLs to point to the beta environment" do
+        get "/api/lti/security/openid-configuration?registration_token=#{make_jwt}"
+        expect(response).to have_http_status :ok
+        parsed_body = response.parsed_body
+        expect(parsed_body["issuer"]).to eq "https://canvas.beta.instructure.com"
+        expect(parsed_body["authorization_endpoint"]).to eq "http://canvas.beta.instructure.com/api/lti/authorize_redirect"
+        expect(parsed_body["registration_endpoint"]).to eq "http://canvas.beta.instructure.com/api/lti/registrations"
+        expect(parsed_body["scopes_supported"]).to match_array(["openid", *TokenScopes::LTI_SCOPES.keys])
+        expect(parsed_body["jwks_uri"]).to eq "http://canvas.beta.instructure.com/api/lti/security/jwks"
+        expect(parsed_body["token_endpoint"]).to eq "http://canvas.beta.instructure.com/login/oauth2/token"
+        expect(parsed_body["authorization_server"]).to eq "canvas.beta.instructure.com"
+      end
+    end
+
+    context "in a test environment" do
+      before do
+        allow(CanvasSecurity).to receive(:config).and_return({ "lti_iss" => "https://canvas.test.instructure.com" })
+        allow(Lti::Oidc).to receive(:auth_domain).and_return("canvas.test.instructure.com")
+        host! "canvas.test.instructure.com"
+      end
+
+      it "modifies the URLs to point to the test environment" do
+        get "/api/lti/security/openid-configuration?registration_token=#{make_jwt}"
+        expect(response).to have_http_status :ok
+        parsed_body = response.parsed_body
+        expect(parsed_body["issuer"]).to eq "https://canvas.test.instructure.com"
+        expect(parsed_body["authorization_endpoint"]).to eq "http://canvas.test.instructure.com/api/lti/authorize_redirect"
+        expect(parsed_body["registration_endpoint"]).to eq "http://canvas.test.instructure.com/api/lti/registrations"
+        expect(parsed_body["scopes_supported"]).to match_array(["openid", *TokenScopes::LTI_SCOPES.keys])
+        expect(parsed_body["jwks_uri"]).to eq "http://canvas.test.instructure.com/api/lti/security/jwks"
+        expect(parsed_body["token_endpoint"]).to eq "http://canvas.test.instructure.com/login/oauth2/token"
+        expect(parsed_body["authorization_server"]).to eq "canvas.test.instructure.com"
+      end
+    end
+
     context "sharding" do
       specs_require_sharding
 
@@ -246,7 +327,7 @@ RSpec.describe SecurityController, type: :request do
         parsed_body = response.parsed_body
         expect(parsed_body["issuer"]).to eq "https://canvas.instructure.com"
         expect(parsed_body["authorization_endpoint"]).to eq "http://canvas.instructure.com/api/lti/authorize_redirect"
-        expect(parsed_body["registration_endpoint"]).to eq "http://localhost/api/lti/registrations"
+        expect(parsed_body["registration_endpoint"]).to eq "http://canvas.instructure.com/api/lti/registrations"
         expect(parsed_body["scopes_supported"]).to match_array(["openid", *TokenScopes::LTI_SCOPES.keys])
         lti_platform_configuration = parsed_body["https://purl.imsglobal.org/spec/lti-platform-configuration"]
         expect(lti_platform_configuration["product_family_code"]).to eq "canvas"

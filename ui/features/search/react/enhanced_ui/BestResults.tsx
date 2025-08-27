@@ -41,7 +41,10 @@ export default function BestResults(props: Props) {
   const splitTranslated = startOverMsg.split('ZZZZ_STARTOVER')
   return (
     <Flex direction="column" gap="sectionElements">
-      <Flex direction="row" alignItems="start">
+      <Flex direction="row-reverse" alignItems="start">
+        <Flex.Item>
+          <Feedback courseId={props.courseId} searchTerm={props.searchTerm} />
+        </Flex.Item>
         <Flex.Item shouldGrow>
           <Heading variant="titleSection" level="h2">
             {I18n.t(
@@ -62,9 +65,6 @@ export default function BestResults(props: Props) {
               {splitTranslated[1]}
             </Text>
           )}
-        </Flex.Item>
-        <Flex.Item>
-          <Feedback courseId={props.courseId} searchTerm={props.searchTerm} />
         </Flex.Item>
       </Flex>
       {props.results.map(result => {

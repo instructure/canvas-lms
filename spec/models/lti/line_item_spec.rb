@@ -125,7 +125,7 @@ RSpec.describe Lti::LineItem do
   context "when updating the associated assignment" do
     let(:line_item) do
       Time.zone.now
-      tool = AccessToken.create!
+      tool = AccessToken.create!(purpose: "tool")
       line_item_params = { start_date_time: 1.day.ago, end_date_time: Time.zone.now, score_maximum: 10.0, label: "a line item" }
       line_item = Lti::LineItem.create_line_item!(nil, course_model, tool, line_item_params)
       # This is necessary because the line item only gets associated to the assignment after

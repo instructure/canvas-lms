@@ -1159,4 +1159,75 @@ describe DiscussionEntry do
       expect(root.edited_at).not_to be_nil
     end
   end
+
+  describe "validate_pin_type" do
+    let(:entry) do
+      topic.discussion_entries.build(
+        user: @teacher,
+        message: "Reply entry"
+      )
+    end
+    let(:topic) { @course.discussion_topics.create!(user: @teacher, message: "Test topic") }
+
+    before(:once) do
+      course_with_teacher(active_all: true)
+    end
+
+    it "allows 'reply' pin_type" do
+      entry.pin_type = DiscussionEntry::PinningTypes::REPLY
+      expect(entry).to be_valid
+    end
+
+    it "allows nil pin_type" do
+      entry.pin_type = nil
+      expect(entry).to be_valid
+    end
+
+    it "adds an error for invalid pin type" do
+      entry.pin_type = "invalid_type"
+      expect(entry).not_to be_valid
+      expect(entry.errors[:pin_type]).to include("Invalid pin type")
+    end
+
+    context "when pin_type is 'thread' on a non-top-level entry" do
+      it "adds an error when trying to pin a reply as thread" do
+        parent_entry = topic.discussion_entries.create!(user: @teacher, message: "Parent entry")
+        child_entry = topic.discussion_entries.build(
+          user: @teacher,
+          message: "Child entry",
+          parent_entry:,
+          pin_type: DiscussionEntry::PinningTypes::THREAD
+        )
+        expect(child_entry).not_to be_valid
+        expect(child_entry.errors[:pin_type]).to include("Pin type 'thread' can only be used for top-level entries")
+      end
+
+      it "allows 'thread' pin_type for top-level entries" do
+        entry.pin_type = DiscussionEntry::PinningTypes::THREAD
+        expect(entry).to be_valid
+      end
+    end
+
+    context "when maximum number of pinned entries is reached" do
+      before do
+        DiscussionTopic::MAX_ENTRIES_PINNED.times do |i|
+          topic.discussion_entries.create!(
+            user: @teacher,
+            message: "Pinned entry #{i}",
+            pin_type: DiscussionEntry::PinningTypes::REPLY
+          )
+        end
+      end
+
+      it "adds an error when trying to pin more than MAX_ENTRIES_PINNED entries" do
+        limit_entry = topic.discussion_entries.build(
+          user: @teacher,
+          message: "One too many",
+          pin_type: DiscussionEntry::PinningTypes::REPLY
+        )
+        expect(limit_entry).not_to be_valid
+        expect(limit_entry.errors[:base]).to include("Discussion topic has too many pinned entries")
+      end
+    end
+  end
 end

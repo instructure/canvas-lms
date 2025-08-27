@@ -35,7 +35,7 @@ export const transformSubmission = (it: Submission): ApiSubmission => {
   const vericiteData: Record<
     string,
     NonNullable<SubmissionWithOriginalityReport['vericite_data']>
-  > = mapValues(keyBy(it.turnitinData ?? [], 'assetString'), x => ({
+  > = mapValues(keyBy(it.vericiteData ?? [], 'assetString'), x => ({
     status: x.status ?? '',
     state: x.state ?? '',
     similarity_score: x.score ?? 0,
@@ -45,18 +45,18 @@ export const transformSubmission = (it: Submission): ApiSubmission => {
     id: it._id,
     anonymous_id: it.anonymousId ?? undefined,
     assignment_id: it.assignment._id ?? '',
-    attempt: it.attempt,
+    attempt: it.attempt === 0 ? null : it.attempt,
     cached_due_date: it.cachedDueDate,
     custom_grade_status_id: it.customGradeStatusId,
     points_deducted: it.deductedPoints,
     entered_grade: it.enteredGrade,
     entered_score: it.enteredScore,
-    excused: it.excused ?? false,
+    excused: Boolean(it.excused),
     grade: it.grade,
     grading_type: undefined as unknown as GradingType,
     gradingType: undefined as unknown as GradingType,
     grade_matches_current_submission: it.gradeMatchesCurrentSubmission !== false,
-    grading_period_id: it.gradingPeriodId ?? '',
+    grading_period_id: it.gradingPeriodId,
     has_postable_comments: it.hasPostableComments,
     late: it.late,
     late_policy_status: it.latePolicyStatus === 'none' ? null : it.latePolicyStatus,

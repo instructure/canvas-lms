@@ -44,6 +44,7 @@ describe "SpeedGrader" do
 
   context "alerts" do
     it "alerts the teacher before leaving the page if comments are not saved", priority: "1" do
+      skip "QE Team will revisit due to chrome update TESTOPS-232"
       student_in_course(active_user: true).user
       Speedgrader.visit(@course.id, @assignment.id)
       replace_content(Speedgrader.new_comment_text_area, "oh no i forgot to save this comment!")
@@ -273,9 +274,9 @@ describe "SpeedGrader" do
       end
 
       it "when going back to the assignment", priority: "1" do
+        skip "QE Team will revisit due to chrome update TESTOPS-232"
         expect do
           Speedgrader.assignment_link.click
-          dismiss_alert
           wait_for_ajaximations
         end.to change {
           SubmissionComment.draft.count

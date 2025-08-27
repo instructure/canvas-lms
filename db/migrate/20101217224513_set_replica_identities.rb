@@ -35,6 +35,7 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :course_account_associations
     set_replica_identity :course_pace_module_items
     set_replica_identity :course_paces
+    set_replica_identity :course_reports
     set_replica_identity :course_sections
     set_replica_identity :courses
     set_replica_identity :custom_grade_statuses
@@ -43,6 +44,8 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :discussion_entries
     set_replica_identity :discussion_entry_versions
     set_replica_identity :discussion_entry_participants
+    set_replica_identity :discussion_topic_insight_entries
+    set_replica_identity :discussion_topic_insights
     set_replica_identity :discussion_topic_participants
     set_replica_identity :discussion_topics
     set_replica_identity :discussion_topic_summaries
@@ -51,6 +54,7 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :enrollment_states
     set_replica_identity :enrollment_terms
     set_replica_identity :enrollments
+    set_replica_identity :estimated_durations
     set_replica_identity :favorites
     set_replica_identity :folders
     set_replica_identity :group_categories
@@ -58,6 +62,7 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :groups
     set_replica_identity :inbox_settings
     set_replica_identity :lti_assets
+    set_replica_identity :lti_asset_processor_eula_acceptances
     set_replica_identity :lti_asset_processors
     set_replica_identity :lti_asset_reports
     set_replica_identity :lti_ims_registrations

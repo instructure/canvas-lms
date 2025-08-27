@@ -19,7 +19,6 @@
 
 module Accessibility
   class Issue
-    include ActiveModel::Model
     include WikiPageIssues
     include AssignmentIssues
     include AttachmentIssues
@@ -57,28 +56,33 @@ module Accessibility
       }
     end
 
-    def update_content(rule, content_type, content_id, path, value)
-      html_fixer = HtmlFixer.new(rule, content_type, content_id, path, value, self)
-      return error_response(html_fixer.errors.full_messages.join(", "), :bad_request) unless html_fixer.valid?
-
-      html_fixer.apply_fix!
+    def update_content(rule_id, resource_type, resource_id, path, value)
+      resource = find_resource(resource_type, resource_id)
+      HtmlFixer.new(rule_id, resource, path, value).apply_fix!
     end
 
-    def update_preview(rule, content_type, content_id, path, value)
-      html_fixer = HtmlFixer.new(rule, content_type, content_id, path, value, self)
-      return error_response(html_fixer.errors.full_messages.join(", "), :bad_request) unless html_fixer.valid?
-
-      html_fixer.fix_preview
+    def update_preview(rule_id, resource_type, resource_id, path, value)
+      resource = find_resource(resource_type, resource_id)
+      HtmlFixer.new(rule_id, resource, path, value).preview_fix
     end
 
-    def generate_fix(rule, content_type, content_id, path, value)
-      html_fixer = HtmlFixer.new(rule, content_type, content_id, path, value, self)
-      return error_response(html_fixer.errors.full_messages.join(", "), :bad_request) unless html_fixer.valid?
-
-      html_fixer.generate_fix
+    def generate_fix(rule_id, resource_type, resource_id, path, value)
+      resource = find_resource(resource_type, resource_id)
+      HtmlFixer.new(rule_id, resource, path, value).generate_fix
     end
 
     private
+
+    def find_resource(resource_type, resource_id)
+      case resource_type
+      when "Page"
+        context.wiki_pages.find(resource_id)
+      when "Assignment"
+        context.assignments.find(resource_id)
+      else
+        raise ArgumentError, "Unsupported resource type: #{resource_type}"
+      end
+    end
 
     def filter_resources(resources, query)
       resources.values&.select do |resource|

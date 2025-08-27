@@ -54,7 +54,9 @@ describe "Differentiation Tag Management" do
 
     @single_tag_with_long_name = @course.group_categories.create!(name: "tag with a really long truncated name", non_collaborative: true)
     @single_tag_with_long_name_1 = @course.groups.create!(name: "tag with a really long truncated name variant", group_category: @single_tag_with_long_name)
-    @single_tag_with_long_name_2 = @course.groups.create!(name: "tag with a really long truncated name variant", group_category: @single_tag_with_long_name)
+
+    # Add @single_tag_2 to the long name category so we have a second tag for testing without breaking single tag behavior
+    @single_tag_2 = @course.groups.create!(name: "my tag 2", group_category: @single_tag_with_long_name)
   end
 
   describe "in the people page" do
@@ -392,10 +394,25 @@ describe "Differentiation Tag Management" do
           f("button[data-testid='user-diff-tag-manager-tag-as-button']").click
           wait_for_ajaximations
 
+          force_click("span:contains('#{@single_tag_2.name}')")
+          wait_for_ajaximations
+
+          expect(@student.current_differentiation_tag_memberships.pluck(:group_id)).to include @single_tag_2.id
+        end
+
+        it "Removes a single tag from the selected user" do
+          # First, add the tag to the student
+          @single_tag_1.add_user(@student)
+
+          f("input[type='checkbox'][aria-label='Select #{@student.name}']").click
+          expect(f("input[type='checkbox'][aria-label='Select #{@student.name}']").attribute("checked")).to be_truthy
+          f("button[data-testid='user-diff-tag-manager-tag-as-button']").click
+          wait_for_ajaximations
+
           force_click("span:contains('#{@single_tag_1.name}')")
           wait_for_ajaximations
 
-          expect(@student.current_differentiation_tag_memberships.pluck(:group_id)).to include @single_tag_1.id
+          expect(@student.current_differentiation_tag_memberships.pluck(:group_id)).not_to include @single_tag_1.id
         end
 
         it "Adds a multiple tag variant to the selected user" do
@@ -432,8 +449,12 @@ describe "Differentiation Tag Management" do
           # remove the user from the tag
           f("a[aria-label='View #{@student.name} user tags']").click
           wait_for_ajaximations
+
+          # Wait for the user tags modal to load and find the remove button for the specific tag
+          keep_trying_until { element_exists?("button[data-testid='user-tag-#{@multiple_tags_1.id}']") }
           f("button[data-testid='user-tag-#{@multiple_tags_1.id}']").click
           wait_for_ajaximations
+
           expect(fj("h2:contains('Remove Tag')")).to be_displayed
           fj("button:contains('Confirm')").click
           wait_for_ajaximations

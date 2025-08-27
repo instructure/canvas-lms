@@ -20,6 +20,8 @@
 module Accessibility
   module Rules
     class ImgAltFilenameRule < Accessibility::Rule
+      IMAGE_FILENAME_PATTERN = /[^\s]+(.*?)\.(jpg|jpeg|png|gif|svg|bmp|webp)$/i
+
       self.id = "img-alt-filename"
       self.link = "https://www.w3.org/TR/WCAG20-TECHS/H37.html"
 
@@ -33,7 +35,9 @@ module Accessibility
         return nil if alt == "" && role == "presentation"
         return nil if alt.blank?
 
-        I18n.t("Alt text should not be the filename of the image.") if filename_like?(alt)
+        filename_like = IMAGE_FILENAME_PATTERN.match?(alt)
+
+        I18n.t("Image filenames should not be used as the alt attribute.") if filename_like
       end
 
       def self.message
@@ -74,32 +78,16 @@ module Accessibility
       end
 
       def self.fix!(elem, value)
-        if value == "" || value.nil?
+        if value.blank?
           elem["role"] = "presentation"
-        else
-          src = elem.get_attribute("src")
-          if src
-            filename = src.split("/").last.split("?").first
-            filename_without_extension = filename.split(".").first
-            if value == filename || value == filename_without_extension
-              raise StandardError, I18n.t("Alt text should not be the filename of the image.")
-            end
-          end
+        elsif IMAGE_FILENAME_PATTERN.match?(value)
+          raise StandardError, I18n.t("Image filenames should not be used as the alt attribute.")
         end
 
-        return nil if elem["alt"] == value
+        return elem if elem["alt"] == value
 
         elem["alt"] = value
         elem
-      end
-
-      def self.filename_like?(string)
-        return false if string.blank?
-
-        parts = string.split(".")
-        return false if parts.length < 2 || parts.last.empty?
-
-        !parts.first.match(/\s+/) && parts.last.match?(/^\w+$/)
       end
     end
   end

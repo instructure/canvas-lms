@@ -933,33 +933,35 @@ function renderHiddenSubmissionPill(submission: Submission) {
   }
 }
 
-function renderLtiAssetReports(
+export function renderLtiAssetReports(
   submission: Submission,
   historicalSubmission: HistoricalSubmission,
   jsonData: SpeedGraderResponse,
 ) {
   if (!ENV.FEATURES?.lti_asset_processor) return
   if (!jsonData.lti_asset_processors) return
-  if (!historicalSubmission.attempt) return
-  if (
-    !historicalSubmission.submission_type ||
-    (historicalSubmission.submission_type !== 'online_text_entry' &&
-      historicalSubmission.submission_type !== 'online_upload')
-  )
-    return
 
   const mountPoint = document.getElementById(SPEED_GRADER_LTI_ASSET_REPORTS_MOUNT_POINT)
   if (!mountPoint) throw new Error('LTI Asset Reports mount point not found')
 
-  const props = {
-    versionedAttachments: historicalSubmission?.versioned_attachments,
-    reports: submission.lti_asset_reports,
-    assetProcessors: jsonData.lti_asset_processors,
-    studentId: submission.user_id,
-    attempt: historicalSubmission.attempt.toString(),
-    submissionType: historicalSubmission.submission_type,
+  const studentId = isAnonymous ? `anonymous:${submission.anonymous_id}` : submission.user_id
+  if (
+    historicalSubmission.attempt &&
+    (historicalSubmission.submission_type === 'online_text_entry' ||
+      historicalSubmission.submission_type === 'online_upload')
+  ) {
+    const props = {
+      versionedAttachments: historicalSubmission?.versioned_attachments,
+      reports: submission.lti_asset_reports,
+      assetProcessors: jsonData.lti_asset_processors,
+      studentId,
+      attempt: historicalSubmission.attempt.toString(),
+      submissionType: historicalSubmission.submission_type,
+    }
+    ReactDOM.render(<LtiAssetReportsWrapper {...props} />, mountPoint)
+  } else {
+    ReactDOM.unmountComponentAtNode(mountPoint)
   }
-  ReactDOM.render(<LtiAssetReportsWrapper {...props} />, mountPoint)
 }
 
 function renderCheckpoints(submission: Submission) {

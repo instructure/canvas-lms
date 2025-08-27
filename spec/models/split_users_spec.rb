@@ -241,7 +241,7 @@ describe SplitUsers do
       end
 
       it "handles access tokens" do
-        at = AccessToken.create!(user: restored_user, developer_key: DeveloperKey.default)
+        at = AccessToken.create!(user: restored_user, developer_key: DeveloperKey.default, purpose: "test")
         UserMerge.from(restored_user).into(source_user)
         expect(at.reload.user_id).to eq source_user.id
         SplitUsers.split_db_users(source_user)
@@ -568,7 +568,7 @@ describe SplitUsers do
       let!(:shard1_course) { shard1_account.courses.create! }
 
       it "handles access tokens" do
-        at = AccessToken.create!(user: restored_user, developer_key: DeveloperKey.default)
+        at = AccessToken.create!(user: restored_user, developer_key: DeveloperKey.default, purpose: "test")
         UserMerge.from(restored_user).into(shard1_source_user)
         expect(at.reload.user_id).to eq shard1_source_user.id
         SplitUsers.split_db_users(shard1_source_user)

@@ -27,6 +27,7 @@ import ExternalToolsButton from './ExternalToolsButton'
 import UploadButton from './UploadButton'
 import {Flex} from '@instructure/ui-flex'
 import {reloadWindow} from '@canvas/util/globalUtils'
+import {getFilesEnv} from '../../../utils/filesEnvUtils'
 
 const I18n = createI18nScope('files_v2')
 interface TopLevelButtonsProps {
@@ -93,16 +94,23 @@ const TopLevelButtons = ({
     if (!ENV.FEATURES?.files_a11y_rewrite_toggle) return null
     if (!ENV.current_user_id) return null
     return (
-      <Button color="secondary" display={buttonDisplay} onClick={handleSwitchToOldFiles}>
+      <Button
+        color="secondary"
+        display={buttonDisplay}
+        onClick={handleSwitchToOldFiles}
+        data-id="switch-to-old-files-button"
+      >
         {I18n.t('Switch to Old Files Page')}
       </Button>
     )
   }
 
+  const isAccessRestricted = getFilesEnv().userFileAccessRestricted
+
   if (size === 'small') {
     return (
       <Flex as="div" gap="small" direction="column">
-        {uploadButton()}
+        {!isAccessRestricted && uploadButton()}
         {createFolderButton()}
         {allMyFilesButton()}
         {externalToolsButton()}
@@ -117,7 +125,7 @@ const TopLevelButtons = ({
       {externalToolsButton()}
       {allMyFilesButton()}
       {createFolderButton()}
-      {uploadButton()}
+      {!isAccessRestricted && uploadButton()}
     </Flex>
   )
 }

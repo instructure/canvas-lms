@@ -26,7 +26,7 @@ RSpec.describe Accessibility::PreviewController do
     let(:accessibility_issue_instance) { instance_double(Accessibility::Issue) }
 
     before do
-      allow(controller).to receive_messages(require_context: true, require_user: true, validate_allowed: true)
+      allow(controller).to receive_messages(require_context: true, require_user: true, check_authorized_action: true)
       controller.instance_variable_set(:@context, course)
       controller.instance_variable_set(:@current_user, user)
 
@@ -103,7 +103,7 @@ RSpec.describe Accessibility::PreviewController do
     let!(:user) { User.create! }
 
     before do
-      allow(controller).to receive_messages(require_context: true, require_user: true, validate_allowed: true)
+      allow(controller).to receive_messages(require_context: true, require_user: true, check_authorized_action: true)
       controller.instance_variable_set(:@context, course)
       controller.instance_variable_set(:@current_user, user)
     end

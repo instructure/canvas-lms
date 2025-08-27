@@ -42,4 +42,16 @@ describe "CanvasHttp Configuration" do
     end
     expect { CanvasHttp.get("some.url.com") }.to raise_error(CanvasHttp::CircuitBreakerError)
   end
+
+  it "logs TLS versions" do
+    tls_socket = double(OpenSSL::SSL::SSLSocket)
+    allow(tls_socket).to receive_messages(hostname: "example.com",
+                                          cipher: ["TLS_AES_128_GCM_SHA256", "TLSv1.3", 256, 256])
+
+    expect(InstStatsd::Statsd).to receive(:distributed_increment).with(
+      "canvas.tls.connection",
+      tags: { hostname: "example.com", cipher: "TLS_AES_128_GCM_SHA256", tls_version: "TLSv1.3" }
+    )
+    InstrumentTLSCiphers.connected(tls_socket)
+  end
 end

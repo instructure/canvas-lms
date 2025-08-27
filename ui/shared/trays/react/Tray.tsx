@@ -62,6 +62,8 @@ type Props = {
   // specify this if the header text should be different than the modal's label
   title?: string
 
+  shouldCloseOnDocumentClick?: boolean
+
   // Optional props to pass to the GenericErrorPage in ErrorBoundary
   errorSubject?: string
   errorCategory?: string

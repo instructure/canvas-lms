@@ -177,6 +177,14 @@ class ContextExternalTool < ActiveRecord::Base
     control.nil? || control.available?
   end
 
+  def primary_context_control
+    if context_type == "Course"
+      context_controls.find_by(course_id: context_id)
+    elsif context_type == "Account"
+      context_controls.find_by(account_id: context_id)
+    end
+  end
+
   class << self
     # because global navigation tool visibility can depend on a user having particular permissions now
     # this needs to expand from being a simple "admins/members" check to something more full-fledged

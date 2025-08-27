@@ -41,6 +41,7 @@ describe AccessibilityController do
 
       it "renders the accessibility checker container" do
         get :index, params: { course_id: 42 }
+        expect(assigns[:js_env][:SCAN_DISABLED]).not_to be_nil
         expect(response).to be_successful
         expect(response.body).to include("accessibility-checker-container")
       end

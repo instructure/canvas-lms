@@ -85,20 +85,22 @@ class ExternalFeedAggregator
     @logger.info("requesting entries")
     require "net/http"
 
-    response = CanvasHttp.get(feed.url)
-    case response
-    when Net::HTTPSuccess
-      success = parse_entries(feed, response.body)
-      @logger.info(success ? "successful response" : "200 with no data returned")
-      feed.consecutive_failures = 0 if success
-      feed.update_attribute(:refresh_at, 2.hours.from_now)
-    else
-      @logger.info("request failed #{response.class}")
+    InstrumentTLSCiphers.without_tls_metrics do
+      response = CanvasHttp.get(feed.url)
+      case response
+      when Net::HTTPSuccess
+        success = parse_entries(feed, response.body)
+        @logger.info(success ? "successful response" : "200 with no data returned")
+        feed.consecutive_failures = 0 if success
+        feed.update_attribute(:refresh_at, 2.hours.from_now)
+      else
+        @logger.info("request failed #{response.class}")
+        handle_failure(feed)
+      end
+    rescue *CanvasHttp::ALL_HTTP_ERRORS => e
+      Canvas::Errors.capture_exception(:external_feed, e, :info)
       handle_failure(feed)
     end
-  rescue *CanvasHttp::ALL_HTTP_ERRORS => e
-    Canvas::Errors.capture_exception(:external_feed, e, :info)
-    handle_failure(feed)
   end
 
   def handle_failure(feed)

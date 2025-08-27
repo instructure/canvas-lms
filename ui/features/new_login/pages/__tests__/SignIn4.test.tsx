@@ -169,7 +169,7 @@ describe('SignIn', () => {
       })
       // check form-field validation error states
       const usernameError = await screen.findByText(
-        'Please verify your email and password and try again.',
+        'Please verify your email or password and try again.',
       )
       expect(usernameError).toBeInTheDocument()
       expect(usernameInput).toHaveAttribute('aria-invalid', 'true')

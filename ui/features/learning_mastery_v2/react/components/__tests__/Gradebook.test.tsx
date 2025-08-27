@@ -16,52 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {render} from '@testing-library/react'
 import {Gradebook, GradebookProps} from '../Gradebook'
 import {SortOrder, SortBy} from '../../utils/constants'
+import {MOCK_OUTCOMES, MOCK_STUDENTS} from '../../__fixtures__/rollups'
 
 describe('Gradebook', () => {
   const defaultProps = (props = {}): GradebookProps => {
     return {
-      students: [
-        {
-          status: 'active',
-          name: 'Student Test',
-          display_name: 'Student Test',
-          avatar_url: '/avatar-url',
-          id: '1',
-        },
-        {
-          status: 'active',
-          name: 'Student Test 2',
-          display_name: 'Student Test 2',
-          avatar_url: '/avatar-url-2',
-          id: '2',
-        },
-      ],
-      outcomes: [
-        {
-          id: '1',
-          title: 'outcome 1',
-          description: 'Outcome description',
-          display_name: 'Friendly outcome name',
-          calculation_method: 'decaying_average',
-          calculation_int: 65,
-          mastery_points: 5,
-          ratings: [],
-        },
-        {
-          id: '2',
-          title: 'outcome 2',
-          description: 'Outcome description',
-          display_name: 'Friendly outcome name',
-          calculation_method: 'decaying_average',
-          calculation_int: 65,
-          mastery_points: 5,
-          ratings: [],
-        },
-      ],
+      students: MOCK_STUDENTS,
+      outcomes: MOCK_OUTCOMES,
       rollups: [
         {
           studentId: '1',
@@ -73,8 +37,6 @@ describe('Gradebook', () => {
         },
       ],
       courseId: '100',
-      gradebookFilters: [],
-      gradebookFilterHandler: jest.fn(),
       setCurrentPage: jest.fn(),
       sorting: {
         sortOrder: SortOrder.ASC,

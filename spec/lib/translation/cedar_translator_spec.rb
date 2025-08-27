@@ -20,6 +20,7 @@ TranslationResponse = Struct.new(:translation, :source_language, keyword_init: t
 
 describe Translation::CedarTranslator do
   let(:translator) { described_class.new }
+  let(:user) { User.create!(name: "Test User") }
 
   describe "#available?" do
     context "when CedarClient is defined and enabled" do
@@ -42,7 +43,7 @@ describe Translation::CedarTranslator do
   describe "#translate_text" do
     let(:text) { "Hello, world!" }
     let(:tgt_lang) { "es" }
-    let(:options) { { root_account_uuid: "1234567890", feature_slug: "discussion" } }
+    let(:options) { { root_account_uuid: "1234567890", feature_slug: "discussion", current_user: user } }
 
     context "when available" do
       before do
@@ -60,7 +61,8 @@ describe Translation::CedarTranslator do
           content: text,
           target_language: tgt_lang,
           feature_slug: "discussion",
-          root_account_uuid: "1234567890"
+          root_account_uuid: "1234567890",
+          current_user: user
         )
         translator.translate_text(text:, tgt_lang:, options:)
       end
@@ -90,7 +92,7 @@ describe Translation::CedarTranslator do
   describe "#translate_html" do
     let(:html_string) { "<p>Hello, world!</p>" }
     let(:tgt_lang) { "es" }
-    let(:options) { { root_account_uuid: "939393", feature_slug: "discussion" } }
+    let(:options) { { root_account_uuid: "939393", feature_slug: "discussion", current_user: user } }
 
     context "when available" do
       before do
@@ -108,7 +110,8 @@ describe Translation::CedarTranslator do
           content: html_string,
           target_language: tgt_lang,
           feature_slug: "discussion",
-          root_account_uuid: "939393"
+          root_account_uuid: "939393",
+          current_user: user
         )
         translator.translate_html(html_string:, tgt_lang:, options:)
       end

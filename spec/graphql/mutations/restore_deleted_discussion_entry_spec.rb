@@ -62,9 +62,10 @@ RSpec.describe Mutations::RestoreDeletedDiscussionEntry do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
     discussion_topic_model({ context: @course })
+    @course.enable_feature!(:restore_discussion_entry)
   end
 
-  describe "run #restoreDeletedDiscussionEntry mutattion" do
+  describe "run #restoreDeletedDiscussionEntry mutation" do
     let(:entry) do
       entry = @topic.discussion_entries.create!(message: "Test entry", user: entry_user)
       entry.destroy
@@ -102,6 +103,17 @@ RSpec.describe Mutations::RestoreDeletedDiscussionEntry do
           expect(result.dig("data", "restoreDeletedDiscussionEntry", "errors")).to be_nil
         end
       end
+
+      it "throws an error if the feature is disabled" do
+        @course.disable_feature!(:restore_discussion_entry)
+
+        expect(entry.deleted?).to be true
+
+        result = subject
+
+        expect(result.dig("data", "restoreDeletedDiscussionEntry", "discussionEntry")).to be_nil
+        expect(result.dig("data", "restoreDeletedDiscussionEntry", "errors").first["message"]).to eq("Insufficient Permissions")
+      end
     end
 
     context "as a student" do
@@ -131,6 +143,17 @@ RSpec.describe Mutations::RestoreDeletedDiscussionEntry do
           expect(result.dig("data", "restoreDeletedDiscussionEntry", "discussionEntry")).to be_nil
           expect(result.dig("data", "restoreDeletedDiscussionEntry", "errors").first["message"]).to eq("Insufficient Permissions")
         end
+      end
+
+      it "throws an error if the feature is disabled" do
+        @course.disable_feature!(:restore_discussion_entry)
+
+        expect(entry.deleted?).to be true
+
+        result = subject
+
+        expect(result.dig("data", "restoreDeletedDiscussionEntry", "discussionEntry")).to be_nil
+        expect(result.dig("data", "restoreDeletedDiscussionEntry", "errors").first["message"]).to eq("Insufficient Permissions")
       end
     end
   end

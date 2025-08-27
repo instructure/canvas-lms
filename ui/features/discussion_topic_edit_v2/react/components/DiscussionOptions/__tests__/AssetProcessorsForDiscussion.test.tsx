@@ -99,7 +99,7 @@ describe('AssetProcessorsForDiscussion', () => {
       description: 'This is a test tool',
       domain: 'https://example.com',
       placements: {
-        ActivityAssetProcessor: {
+        ActivityAssetProcessorContribution: {
           message_type: 'LtiDeepLinkingRequest',
           url: 'https://example.com/tool/launch',
           title: 'bar',

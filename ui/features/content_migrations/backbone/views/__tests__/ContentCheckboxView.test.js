@@ -155,12 +155,15 @@ describe('Sublevel Content Checkbox and Carrot Behaviors', () => {
   beforeEach(() => {
     fakeENV.setup()
     server.use(
-      http.get(url, () => {
-        const [status, headers, body] = CheckboxHelper.serverResponse()
-        return new Response(body, {
-          status,
-          headers: new Headers(headers),
-        })
+      http.get('/api/v1/courses/42/content_migrations/5/selective_data', ({request}) => {
+        const searchParams = new URL(request.url).searchParams
+        if (searchParams.get('type') === 'assignments') {
+          const [status, headers, body] = CheckboxHelper.serverResponse()
+          return new Response(body, {
+            status,
+            headers: new Headers(headers),
+          })
+        }
       }),
     )
     CheckboxHelper.renderView({sub_items_url: url})

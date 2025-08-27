@@ -42,6 +42,16 @@ class DiscussionTopicInsight < ActiveRecord::Base
     unprocessed_entries.any? || processed_entries.any? { |entry| entry.discussion_entry.workflow_state == "deleted" }
   end
 
+  def student_ids_needs_processing
+    unprocessed_entry_ids = unprocessed_entries.map { |entry, _| entry.user_id.to_s }
+    deleted_entry_ids =
+      processed_entries.filter_map do |entry|
+        entry.discussion_entry.user_id.to_s if entry.discussion_entry.workflow_state == "deleted"
+      end
+
+    (unprocessed_entry_ids + deleted_entry_ids).uniq
+  end
+
   def generate
     update!(workflow_state: "in_progress")
 

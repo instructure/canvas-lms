@@ -251,10 +251,6 @@ describe "assignments" do
     end
 
     context "click_away_accept_alert" do # this context exits to handle the click_away_accept_alert method call after each spec that needs it even if it fails early to prevent other specs from failing
-      after do
-        click_away_accept_alert
-      end
-
       it "expands the comments box on click" do
         @assignment.update(submission_types: "online_upload")
 

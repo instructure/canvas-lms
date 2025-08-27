@@ -2066,6 +2066,23 @@ describe DiscussionTopicsController do
         get :insights, params: { course_id: @course.id, id: @topic.id }
         expect(response).to have_http_status(:ok)
       end
+
+      it "sets speedgrader URL template to nil when topic has no assignment" do
+        user_session(@teacher)
+        get :insights, params: { course_id: @course.id, id: @topic.id }
+        expect(assigns[:js_env][:SPEEDGRADER_URL_TEMPLATE]).to be_nil
+      end
+
+      it "sets speedgrader URL template when topic has assignment" do
+        user_session(@teacher)
+        @topic.assignment = @course.assignments.build(submission_types: "discussion_topic", title: @topic.title)
+        @topic.assignment.infer_times
+        @topic.assignment.saved_by = :discussion_topic
+        @topic.save!
+
+        get :insights, params: { course_id: @course.id, id: @topic.id }
+        expect(assigns[:js_env][:SPEEDGRADER_URL_TEMPLATE]).not_to be_nil
+      end
     end
   end
 

@@ -150,6 +150,59 @@ describe('DiscussionThreadContainer', () => {
     })
   })
 
+  describe('restore button', () => {
+    it('does not render if the discussion entry is not deleted', () => {
+      const {queryByTestId} = setup(defaultProps())
+      expect(queryByTestId('restore-button')).not.toBeInTheDocument()
+    })
+
+    describe('when feature flag is enabled', () => {
+      beforeAll(() => {
+        window.ENV.restore_discussion_entry = true
+      })
+
+      afterAll(() => {
+        window.ENV.restore_discussion_entry = false
+      })
+
+      it('renders the restore button if is deleted', async () => {
+        const props = defaultProps({
+          discussionEntryOverrides: {deleted: true},
+        })
+        const {getByTestId} = setup(props)
+        expect(getByTestId('threading-toolbar-restore')).toBeInTheDocument()
+      })
+
+      it('renders the restore button if the user is not the owner, but has the permission', () => {
+        const props = defaultProps({
+          discussionEntryOverrides: {
+            deleted: true,
+            editor: User.mock({_id: '3', displayName: 'Jane Doe'}),
+          },
+        })
+
+        const {getByTestId} = setup(props)
+        expect(getByTestId('threading-toolbar-restore')).toBeInTheDocument()
+      })
+
+      it('does not render the restore button if the user is not the owner and does not have the permission', () => {
+        const props = defaultProps({
+          discussionEntryOverrides: {
+            deleted: true,
+            author: User.mock({_id: '3', displayName: 'Jane Doe'}),
+            editor: User.mock({_id: '3', displayName: 'Jane Doe'}),
+          },
+          discussionOverrides: {
+            permissions: DiscussionPermissions.mock({moderateForum: false}),
+          },
+        })
+        props.discussionEntry.permissions.delete = false
+        const {queryByTestId} = setup(props)
+        expect(queryByTestId('threading-toolbar-restore')).not.toBeInTheDocument()
+      })
+    })
+  })
+
   describe('Roles', () => {
     it('does not display author role if not the author', async () => {
       const {queryByTestId} = setup(defaultProps())

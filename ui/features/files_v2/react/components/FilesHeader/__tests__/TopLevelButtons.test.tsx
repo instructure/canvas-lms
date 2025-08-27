@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
+import '@canvas/files/mockFilesENV'
 import TopLevelButtons from '../TopLevelButtons'
 import {
   FileManagementProvider,
@@ -49,6 +50,16 @@ const renderComponent = (props?: any, context: Partial<FileManagementContextProp
 }
 
 describe('TopLevelButtons', () => {
+  let originalENV: typeof ENV
+
+  beforeEach(() => {
+    originalENV = {...window.ENV}
+  })
+
+  afterEach(() => {
+    Object.assign(ENV, originalENV)
+  })
+
   it('renders "All My Files" button when isUserContext is false', () => {
     renderComponent()
 
@@ -139,6 +150,24 @@ describe('TopLevelButtons', () => {
     expect(uploadButton).not.toBeInTheDocument()
     expect(createFolderButton).not.toBeInTheDocument()
     expect(externalToolsButton).not.toBeInTheDocument()
+  })
+
+  it('does not render upload buttons when student access is restricted', () => {
+    ENV.FEATURES = {restrict_student_access: true}
+    ENV.current_user_roles = ['student']
+
+    const fileIndexMenuTools = [
+      {id: '1', title: 'Tool 1', base_url: 'http://tool1.com', icon_url: 'http://someurl.com'},
+    ]
+    renderComponent({}, {fileIndexMenuTools})
+
+    const uploadButton = screen.queryByText(/Upload/i)
+    const createFolderButton = screen.queryByText(/Folder/i)
+    const externalToolsButton = screen.queryByText(/external tools menu/i)
+
+    expect(uploadButton).not.toBeInTheDocument()
+    expect(createFolderButton).toBeInTheDocument()
+    expect(externalToolsButton).toBeInTheDocument()
   })
 
   it('does not render external tools button when no tools', () => {

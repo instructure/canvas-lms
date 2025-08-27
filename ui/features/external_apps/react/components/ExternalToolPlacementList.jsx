@@ -30,7 +30,8 @@ import {Spinner} from '@instructure/ui-spinner'
 
 const I18n = createI18nScope('external_tools')
 
-const ALL_PLACEMENTS = {
+export const ALL_PLACEMENTS = {
+  analytics_hub: I18n.t('Analytics Hub'),
   account_navigation: I18n.t('Account Navigation'),
   assignment_edit: I18n.t('Assignment Edit'),
   assignment_selection: I18n.t('Assignment Selection'),
@@ -72,6 +73,7 @@ const ALL_PLACEMENTS = {
   wiki_index_menu: I18n.t('Pages Index Menu'),
   default_placements: I18n.t('Assignment and Link Selection'), // for 1.1 display only
   ActivityAssetProcessor: I18n.t('Assignment Document Processor'),
+  ActivityAssetProcessorContribution: I18n.t('Discussions Document Processor'),
 }
 
 const DEFAULT_1_1_PLACEMENTS = ['assignment_selection', 'link_selection', 'resource_selection']

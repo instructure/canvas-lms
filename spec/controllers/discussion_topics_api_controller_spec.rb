@@ -659,7 +659,7 @@ describe DiscussionTopicsApiController do
       get "insight", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
 
       expect(response).to be_successful
-      expect(response.parsed_body).to eq({ "workflow_state" => "failed", "needs_processing" => true })
+      expect(response.parsed_body).to eq({ "workflow_state" => "failed", "needs_processing" => true, "student_ids_needs_processing" => [student.id.to_s] })
     end
 
     it "returns completed insight" do
@@ -670,7 +670,7 @@ describe DiscussionTopicsApiController do
       get "insight", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
 
       expect(response).to be_successful
-      expect(response.parsed_body).to eq({ "workflow_state" => "completed", "needs_processing" => false })
+      expect(response.parsed_body).to eq({ "workflow_state" => "completed", "needs_processing" => false, "student_ids_needs_processing" => [] })
     end
   end
 
@@ -978,6 +978,8 @@ describe DiscussionTopicsApiController do
   context "update_discussion_types" do
     before do
       course_with_teacher(active_all: true)
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+      allow(InstStatsd::Statsd).to receive(:gauge)
     end
 
     it "should update the discussions types to 'threaded' and 'not_threaded' according to the parameters" do
@@ -991,6 +993,25 @@ describe DiscussionTopicsApiController do
       expect(response).to be_successful
       expect(topic1.reload.discussion_type).to eq("threaded")
       expect(topic2.reload.discussion_type).to eq("not_threaded")
+
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("discussion_topic.migrate_disallow_manage.count").exactly(:once)
+      expect(InstStatsd::Statsd)
+        .to have_received(:gauge)
+        .with(
+          "discussion_topic.migrate_disallow_manage.discussions_updated",
+          1,
+          tags: { type: DiscussionTopic::DiscussionTypes::THREADED }
+        )
+        .once
+
+      expect(InstStatsd::Statsd)
+        .to have_received(:gauge)
+        .with(
+          "discussion_topic.migrate_disallow_manage.discussions_updated",
+          1,
+          tags: { type: DiscussionTopic::DiscussionTypes::NOT_THREADED }
+        )
+        .once
     end
 
     it "should return an error if the discussion type is not side_comment" do

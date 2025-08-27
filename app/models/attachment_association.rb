@@ -54,6 +54,8 @@ class AttachmentAssociation < ActiveRecord::Base
   after_save :set_word_count
 
   def self.verify_access(location_param, attachment, user, session = nil)
+    return false if attachment.currently_locked
+
     splat = location_param.split("_")
     return false unless splat.length >= 2
 

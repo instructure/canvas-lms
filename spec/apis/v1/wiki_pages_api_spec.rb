@@ -349,7 +349,7 @@ describe WikiPagesApiController, type: :request do
       wiki_body = <<~HTML
         <img src="/courses/#{@course.id}/files/#{attachment.id}/preview">
       HTML
-      @page.update(body: wiki_body)
+      @page.update(body: wiki_body, saving_user: @teacher)
       json = get_wiki_page(@student)
       expect(json["body"]).to include("location=#{@page.asset_string}")
     end

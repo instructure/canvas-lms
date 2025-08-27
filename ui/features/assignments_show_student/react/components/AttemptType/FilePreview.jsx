@@ -34,7 +34,7 @@ import {Flex} from '@instructure/ui-flex'
 import {IconCompleteSolid, IconDownloadLine} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import {Table} from '@instructure/ui-table'
-import {Text} from '@instructure/ui-text'
+import {Text as UIText} from '@instructure/ui-text'
 import {bool} from 'prop-types'
 import {useEffect, useState} from 'react'
 import previewUnavailable from '../../../images/PreviewUnavailable.svg'
@@ -55,10 +55,6 @@ export default function FilePreview({submission, isOriginalityReportVisible}) {
     if (index >= 0 || index < submission.attachments.length) {
       setSelectedFileIndex(index)
     }
-  }
-
-  const handleOpenModal = attachmentId => {
-    setApModalAttachmentId(attachmentId)
   }
 
   const shouldDisplayThumbnail = file => {
@@ -161,7 +157,7 @@ export default function FilePreview({submission, isOriginalityReportVisible}) {
                   <Table.Cell themeOverride={cellTheme}>
                     <AssetReportStatus
                       reports={filterReports(ENV.ASSET_REPORTS, file._id)}
-                      openModal={() => handleOpenModal(file._id)}
+                      openModal={() => setApModalAttachmentId(file._id)}
                     />
                   </Table.Cell>
                 )}
@@ -191,7 +187,7 @@ export default function FilePreview({submission, isOriginalityReportVisible}) {
             `,
           }}
         >
-          <Text size="large">{message}</Text>
+          <UIText size="large">{message}</UIText>
         </div>
       </div>
     )

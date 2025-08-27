@@ -64,28 +64,43 @@ module Lti
       render status: :forbidden, plain: "invalid_request"
     end
 
+    # Format: <student_id> or "anonymous:<anonymous_id>"
     def student_id
       params.require(:student_id)
     end
 
+    def anonymous_student_id?
+      student_id.to_s.start_with?("anonymous:")
+    end
+
+    def extract_anonymous_id
+      student_id.to_s.sub("anonymous:", "")
+    end
+
     def student
-      @student ||= User.find_by(id: student_id)
+      @student ||= if anonymous_student_id?
+                     @current_submission ||= assignment.submissions.find_by(anonymous_id: extract_anonymous_id)
+                     @current_submission&.user
+                   else
+                     User.find_by(id: student_id)
+                   end
     end
 
     # "latest", 0, or any invalid value will be treated as latest
     def attempt
-      @params ||= params[:attempt].to_i
+      @attempt ||= params[:attempt].to_i
     end
 
     def submission
       @submission ||=
         begin
-          sub = assignment.submission_for_student(student)
-          if attempt.positive?
-            version = sub.versions.find { |s| s.model.attempt == attempt }&.model
+          @current_submission ||= assignment.submission_for_student(student)
+
+          if @current_submission && attempt.positive?
+            version = @current_submission.versions.find { |s| s.model.attempt == attempt }&.model
           end
 
-          version || sub
+          version || @current_submission
         end
     end
 

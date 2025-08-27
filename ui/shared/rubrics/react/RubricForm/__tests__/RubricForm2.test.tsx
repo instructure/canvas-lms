@@ -112,6 +112,8 @@ describe('RubricForm Tests', () => {
             hideOutcomeResults: false,
             id: '1',
             useForGrading: true,
+            associationType: 'Assignment',
+            associationId: '1',
           },
         }),
       )

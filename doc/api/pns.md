@@ -3,7 +3,7 @@ Platform Notification Service
 
 Platform Notification Service (PNS) enables server-to-server communication by allowing the Platform to send messages, known as Notices, to Tools outside the scope of an active user session. Tools can register a "webhook" or handler endpoint using PNS to receive specific types of Notices, facilitating seamless integration and automation.
 
-See also <a href="/doc/api/notice_handlers.html">endpoint-level documentation</a> and <a href="https://www.imsglobal.org/spec/lti-pns/v1p0/main" target="_blank">Official (1EdTech) documentation</a>.
+See also <a href="notice_handlers.html">endpoint-level documentation</a> and <a href="https://www.imsglobal.org/spec/lti-pns/v1p0/main" target="_blank">Official (1EdTech) documentation</a>.
 
 ## Tool Configuration
 
@@ -79,9 +79,9 @@ Response:
             "notice_type": "LtiContextCopyNotice",
             "handler": "http://lti-13-test-tool.inseng.test/notice_handlers/106:8865aa05b4b79b64a91a86042e43af5ea8ae79eb"
         },
-        { 
-            "notice_type": "LtiHelloWorldNotice", 
-            "handler": "" 
+        {
+            "notice_type": "LtiHelloWorldNotice",
+            "handler": ""
         }
     ]
 }
@@ -97,7 +97,7 @@ Response:
 
 ## Receiving Notices
 
-Canvas sends notices with POST to the registered handlers. The body contains an array of notices. Every notice is a signed JWT. 
+Canvas sends notices with POST to the registered handlers. The body contains an array of notices. Every notice is a signed JWT.
 Example body:
 ```json
 {

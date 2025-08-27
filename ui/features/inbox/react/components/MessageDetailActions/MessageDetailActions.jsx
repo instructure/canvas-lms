@@ -65,7 +65,7 @@ export const MessageDetailActions = ({...props}) => {
           </Tooltip>
         }
       >
-        {props.onReplyAll && (
+        {props.onReplyAll && !ENV?.FEATURES?.restrict_student_access && (
           <Menu.Item value="reply-all" onSelect={props.onReplyAll}>
             {I18n.t('Reply All')}
           </Menu.Item>
@@ -75,9 +75,11 @@ export const MessageDetailActions = ({...props}) => {
             {I18n.t('Forward')}
           </Menu.Item>
         )}
-        <Menu.Item value="delete" onSelect={props.onDelete} data-testid="message-delete">
-          {I18n.t('Delete')}
-        </Menu.Item>
+        {!ENV?.FEATURES?.restrict_student_access && (
+          <Menu.Item value="delete" onSelect={props.onDelete} data-testid="message-delete">
+            {I18n.t('Delete')}
+          </Menu.Item>
+        )}
       </Menu>
     </>
   )

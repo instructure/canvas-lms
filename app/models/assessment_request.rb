@@ -28,6 +28,7 @@ class AssessmentRequest < ActiveRecord::Base
   belongs_to :assessor_asset, polymorphic: [:submission], polymorphic_prefix: true
   belongs_to :assessor, class_name: "User"
   belongs_to :rubric_association
+  belongs_to :peer_review_sub_assignment, optional: true
   has_many :submission_comments, -> { published }
   has_many :ignores, dependent: :destroy, as: :asset
   belongs_to :rubric_assessment

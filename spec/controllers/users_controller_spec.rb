@@ -3458,7 +3458,7 @@ describe UsersController do
       user_with_pseudonym(active_user: true, username: "test1@example.com", password: "test1234")
       @user
     end
-    let(:developer_key) { DeveloperKey.create! }
+    let(:developer_key) { DeveloperKey.create!(name: "dev key") }
     let(:access_token) { user.access_tokens.create!(developer_key:) }
     let(:endpoint) { "https://example.com" }
     let(:app_key) { "VALID" }
@@ -3651,7 +3651,7 @@ describe UsersController do
     let(:admin) { account_admin_user(active_all: true)  }
 
     def add_mobile_access_token(user)
-      user.access_tokens.create!
+      user.access_tokens.create!(purpose: "mobile")
 
       @sns_client = double
       allow(DeveloperKey).to receive(:sns).and_return(@sns_client)
@@ -3707,7 +3707,7 @@ describe UsersController do
     end
 
     it "only expires access tokens associated to mobile app developer keys" do
-      dev_key = DeveloperKey.create!
+      dev_key = DeveloperKey.create!(name: "dev key")
       user2.access_tokens.create!(developer_key: dev_key)
 
       user_session(admin)

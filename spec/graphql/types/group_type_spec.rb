@@ -142,4 +142,61 @@ describe Types::GroupType do
       expect(cur_resolver.resolve("activityStream { summary { notificationCategory } } ")).to match_array [nil]
     end
   end
+
+  describe "group_category" do
+    it "returns group category when user has proper permissions" do
+      expect(group_type.resolve("groupCategory { _id }")).to eq @group_set.id.to_s
+      expect(group_type.resolve("groupCategory { name }")).to eq @group_set.name
+    end
+
+    it "returns nil when user lacks permissions" do
+      unauthorized_user = user_factory(active_all: true)
+      result = GraphQLTypeTester.new(@group, current_user: unauthorized_user).resolve("groupCategory { _id }")
+      expect(result).to be_nil
+    end
+
+    it "returns group category for teacher" do
+      teacher = GraphQLTypeTester.new(@group, current_user: @teacher)
+      expect(teacher.resolve("groupCategory { _id }")).to eq @group_set.id.to_s
+    end
+
+    it "returns group category when user has read permissions on group category (e.g. student in group)" do
+      student = GraphQLTypeTester.new(@group, current_user: @student_in_group)
+      expect(student.resolve("groupCategory { _id }")).to eq @group_set.id.to_s
+    end
+
+    it "returns nil when user lacks read permissions on group category (e.g. student not in group)" do
+      student_not_in_group = GraphQLTypeTester.new(@group, current_user: @student_not_in_group)
+      expect(student_not_in_group.resolve("groupCategory { _id }")).to be_nil
+    end
+
+    context "with non-collaborative group category" do
+      let(:account) { @course.account }
+
+      before(:once) do
+        account.enable_feature!(:assign_to_differentiation_tags)
+        account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+        account.save!
+        @non_collab_group_category = @course.group_categories.create!(name: "non-collaborative group category", non_collaborative: true)
+        @non_collab_group = @non_collab_group_category.groups.create!(name: "non-collaborative group", context: @course)
+      end
+
+      it "returns group category for user with manage tags permissions" do
+        user_with_permissions = GraphQLTypeTester.new(@non_collab_group, current_user: @teacher)
+        expect(user_with_permissions.resolve("groupCategory { _id }")).to eq @non_collab_group_category.id.to_s
+      end
+
+      it "returns nil for user without any granular manage tags permissions" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+        user_without_permissions = GraphQLTypeTester.new(@non_collab_group, current_user: @teacher)
+        expect(user_without_permissions.resolve("groupCategory { _id }")).to be_nil
+      end
+    end
+  end
 end

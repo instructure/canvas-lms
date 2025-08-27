@@ -356,6 +356,7 @@ class CoursesController < ApplicationController
   include WebZipExportHelper
   include CoursesHelper
   include NewQuizzesFeaturesHelper
+  include ObserverModuleInfo
   include ObserverEnrollmentsHelper
   include DefaultDueTimeHelper
 
@@ -607,6 +608,8 @@ class CoursesController < ApplicationController
         [e.course.enrollment_term.default_term? ? 1 : 0, e.course.enrollment_term.name]
       when "enrolled_as"
         e.readable_role_name
+      when "accessibility"
+        [e.course.exceeds_accessibility_scan_limit? ? 1 : 0, accessibility_issues_count(e.course)]
       else
         if type == "past"
           [e.course.published? ? 0 : 1, Canvas::ICU.collation_key(e.long_name)]
@@ -2495,10 +2498,14 @@ class CoursesController < ApplicationController
               canDelete: @can_delete,
               canViewUnpublished: @can_view_unpublished,
               canDirectShare: can_do(@context, @current_user, :direct_share),
-              readAsAdmin: @context.grants_right?(@current_user, session, :read_as_admin)
+              readAsAdmin: @context.grants_right?(@current_user, session, :read_as_admin),
+              canManageSpeedGrader: @context.allows_speed_grader? && @context.grants_any_right?(@current_user, :manage_grades, :view_all_grades)
             }
 
+            modules_observer_info = observer_module_info
+
             js_env(MODULES_PERMISSIONS: modules_permissions)
+            js_env(MODULES_OBSERVER_INFO: modules_observer_info)
 
             js_bundle :context_modules_v2
             css_bundle :content_next, :context_modules2, :context_modules_v2
@@ -4042,7 +4049,7 @@ class CoursesController < ApplicationController
       return render status: :not_found, template: "shared/errors/404_message"
     end
 
-    authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+    return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
 
     js_env(COURSE_ID: @context.id)
     js_bundle :youtube_migration
@@ -4057,7 +4064,7 @@ class CoursesController < ApplicationController
       return render status: :not_found, template: "shared/errors/404_message"
     end
 
-    authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+    return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
 
     progress = YoutubeMigrationService.last_youtube_embed_scan_progress_by_course(@context)
 
@@ -4100,7 +4107,7 @@ class CoursesController < ApplicationController
       return render status: :not_found, template: "shared/errors/404_message"
     end
 
-    authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+    return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
 
     progress = YoutubeMigrationService.queue_scan_course_for_embeds(@context)
 
@@ -4114,9 +4121,9 @@ class CoursesController < ApplicationController
       return render status: :not_found, template: "shared/errors/404_message"
     end
 
-    authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+    return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
 
-    embed = params.require(:embed).permit(:field, :id, :path, :resource_type, :src, :resource_group_key).to_h.with_indifferent_access
+    embed = params.require(:embed).permit(:width, :height, :field, :id, :path, :resource_type, :src, :resource_group_key).to_h.with_indifferent_access
     embed[:id] = embed[:id].to_i
     embed[:field] = embed[:field].to_sym
     scan_id = params.require(:scan_id)
@@ -4125,6 +4132,38 @@ class CoursesController < ApplicationController
     progress = service.convert_embed(scan_id, embed)
 
     render json: { id: progress.id }, status: :ok
+  end
+
+  def youtube_migration_conversion_status
+    get_context
+
+    unless @context.feature_enabled?(:youtube_migration)
+      return render status: :not_found, template: "shared/errors/404_message"
+    end
+
+    return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+
+    resource_type = params[:resource_type]
+    resource_id = params[:resource_id]
+
+    if resource_type.present? && resource_id.present?
+      resource_key = YoutubeMigrationService.generate_resource_key(resource_type, resource_id)
+      progresses = Progress.where(tag: "youtube_embed_convert", context: @context, message: resource_key)
+                           .is_pending
+                           .select(:id, :workflow_state, :results)
+
+      active_conversions = progresses.map do |progress|
+        {
+          id: progress.id,
+          workflow_state: progress.workflow_state,
+          original_embed: progress.results&.with_indifferent_access&.dig("original_embed")
+        }
+      end
+    else
+      active_conversions = []
+    end
+
+    render json: { conversions: active_conversions }, status: :ok
   end
 
   def start_link_validation
@@ -4371,6 +4410,13 @@ class CoursesController < ApplicationController
     end
   end
   helper_method :visible_self_enrollment_option
+
+  def accessibility_issues_count(course)
+    return 0 if course.exceeds_accessibility_scan_limit?
+
+    AccessibilityIssue.active.where(course:).count
+  end
+  helper_method :accessibility_issues_count
 
   private
 

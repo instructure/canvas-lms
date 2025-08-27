@@ -59,7 +59,7 @@ declare const ENV: GlobalEnv &
     NEW_QUIZZES_BY_DEFAULT: boolean
   }
 
-type LtiLaunchPlacement = {
+export type LtiLaunchPlacement = {
   message_type:
     | 'LtiDeepLinkingRequest'
     | 'ContentItemSelectionRequest'
@@ -81,6 +81,7 @@ type SelectContentPlacementType =
   | 'assignment_selection'
   | 'link_selection'
   | 'ActivityAssetProcessor'
+  | 'ActivityAssetProcessorContribution'
 
 export type LtiLaunchDefinition = {
   definition_type: 'ContextExternalTool' | 'Lti::MessageHandler'

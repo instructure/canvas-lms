@@ -24,6 +24,7 @@ RSpec.describe GradeService do
   let(:assignment_text) { "Write an essay about your summer vacation" }
   let(:essay) { "I went to the beach and had a great time..." }
   let(:root_account_uuid) { "mock-root-uuid" }
+  let(:current_user) { double("User") }
 
   # Sample rubric data with two criteria: Content and Grammar
   let(:rubric_data) do
@@ -49,7 +50,7 @@ RSpec.describe GradeService do
 
   # Mock response from Cedar AI that includes all criteria
   let(:mock_cedar_response) do
-    [
+    Struct.new(:response, keyword_init: true).new(response: [
       {
         "rubric_category" => "Content",
         "reasoning" => "Well developed ideas",
@@ -60,7 +61,7 @@ RSpec.describe GradeService do
         "reasoning" => "Flawless grammar",
         "criterion" => "Excellent grammar"
       }
-    ]
+    ].to_json)
   end
 
   # Setup CedarClient mock for all tests
@@ -69,18 +70,7 @@ RSpec.describe GradeService do
 
     stub_const("CedarClient", Class.new do
       def self.prompt(*)
-        [
-          {
-            "rubric_category" => "Content",
-            "reasoning" => "Well developed ideas",
-            "criterion" => "Meets requirements"
-          },
-          {
-            "rubric_category" => "Grammar",
-            "reasoning" => "Flawless grammar",
-            "criterion" => "Excellent grammar"
-          }
-        ].to_json
+        mock_cedar_response
       end
     end)
   end
@@ -95,14 +85,16 @@ RSpec.describe GradeService do
         prompt: kind_of(String),
         model: "anthropic.claude-3-haiku-20240307-v1:0",
         feature_slug: "grading-assistance",
-        root_account_uuid: "mock-root"
-      ).and_return(mock_cedar_response.to_json)
+        root_account_uuid: "mock-root",
+        current_user:
+      ).and_return(mock_cedar_response)
 
       result = described_class.new(
         assignment:,
         essay:,
         rubric:,
-        root_account_uuid: "mock-root"
+        root_account_uuid: "mock-root",
+        current_user:
       ).call
 
       expect(result).to eq(
@@ -140,7 +132,8 @@ RSpec.describe GradeService do
           assignment:,
           essay:,
           rubric:,
-          root_account_uuid:
+          root_account_uuid:,
+          current_user:
         ).call
       end.to raise_error(CedarAIGraderError, /Invalid JSON response/)
     end
@@ -149,14 +142,14 @@ RSpec.describe GradeService do
     context "when Cedar returns partial criteria" do
       before do
         allow(CedarClient).to receive(:prompt).and_return(
-          [
+          Struct.new(:response, keyword_init: true).new(response: [
             {
               "rubric_category" => "Content",
               "reasoning" => "Well developed ideas",
               "criterion" => "Meets requirements"
             }
             # Grammar is missing from response, but this is a valid partial response
-          ].to_json
+          ].to_json)
         )
       end
 
@@ -165,7 +158,8 @@ RSpec.describe GradeService do
           assignment:,
           essay:,
           rubric:,
-          root_account_uuid: "mock-root"
+          root_account_uuid: "mock-root",
+          current_user:
         ).call
 
         expect(result.length).to eq(1)
@@ -177,7 +171,7 @@ RSpec.describe GradeService do
     context "when Cedar returns invalid criteria" do
       before do
         allow(CedarClient).to receive(:prompt).and_return(
-          [
+          Struct.new(:response, keyword_init: true).new(response: [
             {
               "rubric_category" => "Invalid Category", # This category doesn't exist in our rubric
               "reasoning" => "Some reasoning",
@@ -188,7 +182,7 @@ RSpec.describe GradeService do
               "reasoning" => "Well developed ideas",
               "criterion" => "Meets requirements"
             }
-          ].to_json
+          ].to_json)
         )
       end
 
@@ -197,7 +191,8 @@ RSpec.describe GradeService do
           assignment:,
           essay:,
           rubric:,
-          root_account_uuid: "mock-root"
+          root_account_uuid: "mock-root",
+          current_user:
         ).call
 
         expect(result.length).to eq(1)
@@ -230,7 +225,7 @@ RSpec.describe GradeService do
       ]
     end
 
-    let(:service) { described_class.new(assignment: "", essay: "", rubric:, root_account_uuid:) }
+    let(:service) { described_class.new(assignment: "", essay: "", rubric:, root_account_uuid:, current_user:) }
 
     # Test successful mapping of valid criteria
     it "maps grader response to rubric structure" do
@@ -313,7 +308,7 @@ RSpec.describe GradeService do
   end
 
   describe "#sanitize_essay" do
-    let(:service) { described_class.new(assignment: "Test Assignment", essay: "", rubric: [], root_account_uuid: "mock-root") }
+    let(:service) { described_class.new(assignment: "Test Assignment", essay: "", rubric: [], root_account_uuid: "mock-root", current_user:) }
 
     # Test essay length validation
     context "when validating essay length" do
@@ -352,7 +347,7 @@ RSpec.describe GradeService do
   end
 
   describe "#rubric_matches_default_template" do
-    let(:service) { described_class.new(assignment: "Test Assignment", essay: "Test Essay", rubric:, root_account_uuid:) }
+    let(:service) { described_class.new(assignment: "Test Assignment", essay: "Test Essay", rubric:, root_account_uuid:, current_user:) }
 
     # Test various default rubric templates
     context "when rubric matches a default template" do
@@ -363,19 +358,19 @@ RSpec.describe GradeService do
           { description: "Time" },
           { description: "Participation" }
         ]
-        service = described_class.new(assignment: "Test", essay: "Test", rubric:, root_account_uuid:)
+        service = described_class.new(assignment: "Test", essay: "Test", rubric:, root_account_uuid:, current_user:)
         expect(service.send(:rubric_matches_default_template)).to be true
       end
 
       it "returns true for Peer Review template" do
         rubric = [{ description: "Peer Review" }]
-        service = described_class.new(assignment: "Test", essay: "Test", rubric:, root_account_uuid:)
+        service = described_class.new(assignment: "Test", essay: "Test", rubric:, root_account_uuid:, current_user:)
         expect(service.send(:rubric_matches_default_template)).to be true
       end
 
       it "returns true for generic criterion template" do
         rubric = [{ description: "Description of criterion" }]
-        service = described_class.new(assignment: "Test", essay: "Test", rubric:, root_account_uuid:)
+        service = described_class.new(assignment: "Test", essay: "Test", rubric:, root_account_uuid:, current_user:)
         expect(service.send(:rubric_matches_default_template)).to be true
       end
     end
@@ -387,7 +382,7 @@ RSpec.describe GradeService do
           { description: "Custom Criterion 1" },
           { description: "Custom Criterion 2" }
         ]
-        service = described_class.new(assignment: "Test", essay: "Test", rubric:, root_account_uuid:)
+        service = described_class.new(assignment: "Test", essay: "Test", rubric:, root_account_uuid:, current_user:)
         expect(service.send(:rubric_matches_default_template)).to be false
       end
 
@@ -396,14 +391,14 @@ RSpec.describe GradeService do
           { description: "Exit Ticket Prompt" },
           { description: "Custom Criterion" }
         ]
-        service = described_class.new(assignment: "Test", essay: "Test", rubric:, root_account_uuid:)
+        service = described_class.new(assignment: "Test", essay: "Test", rubric:, root_account_uuid:, current_user:)
         expect(service.send(:rubric_matches_default_template)).to be false
       end
     end
   end
 
   describe "#filter_repeating_keys" do
-    let(:service) { described_class.new(assignment: "Test Assignment", essay: "Test Essay", rubric: [], root_account_uuid: "mock-root") }
+    let(:service) { described_class.new(assignment: "Test Assignment", essay: "Test Essay", rubric: [], root_account_uuid: "mock-root", current_user:) }
 
     # Test handling of duplicate criteria
     context "when JSON array contains duplicate criteria" do
@@ -470,7 +465,7 @@ RSpec.describe GradeService do
   end
 
   describe "#safe_parse_json_array" do
-    let(:service) { described_class.new(assignment: "Test", essay: "Test Essay", rubric: [], root_account_uuid: "mock-root") }
+    let(:service) { described_class.new(assignment: "Test", essay: "Test Essay", rubric: [], root_account_uuid: "mock-root", current_user:) }
 
     context "when response is a valid JSON array" do
       it "returns the parsed array" do

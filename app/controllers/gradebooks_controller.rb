@@ -133,7 +133,8 @@ class GradebooksController < ApplicationController
                       score: submission.score,
                       workflow_state: submission.workflow_state,
                       asset_processors: asset_processors(assignment: submission.assignment),
-                      asset_reports: asset_reports(submission:)
+                      asset_reports: @presenter.user_has_elevated_permissions? ? nil : asset_reports(submission:),
+                      submission_type: submission.submission_type
                     })
         json[:custom_grade_status_id] = submission.custom_grade_status_id if custom_gradebook_statuses_enabled
       end
@@ -1065,7 +1066,6 @@ class GradebooksController < ApplicationController
     if @assignment.moderated_grading? && !@assignment.user_is_moderation_grader?(@current_user)
       @assignment.create_moderation_grader(@current_user, occupy_slot: false)
     end
-
     if platform_service_speedgrader_enabled
       InstStatsd::Statsd.distributed_increment("speedgrader.platform_service.load")
       @page_title = t("SpeedGrader")
@@ -1083,6 +1083,7 @@ class GradebooksController < ApplicationController
         EMOJI_DENY_LIST: @context.root_account.settings[:emoji_deny_list],
         ENHANCED_RUBRICS_ENABLED: @context.feature_enabled?(:enhanced_rubrics),
         PLATFORM_SERVICE_SPEEDGRADER_ENABLED: platform_service_speedgrader_enabled,
+        MANAGE_GRADES: @context.grants_right?(@current_user, session, :manage_grades),
         RESTRICT_QUANTITATIVE_DATA_ENABLED: @context.restrict_quantitative_data?(@current_user),
         GRADE_BY_STUDENT_ENABLED: @context.root_account.feature_enabled?(:speedgrader_grade_by_student),
         STICKERS_ENABLED_FOR_ASSIGNMENT: @assignment.present? && @assignment.stickers_enabled?(@current_user),
@@ -1096,6 +1097,7 @@ class GradebooksController < ApplicationController
         DISCUSSION_INSIGHTS_ENABLED: @context.feature_enabled?(:discussion_insights),
         MULTISELECT_FILTERS_ENABLED: multiselect_filters_enabled,
         gradebook_section_filter_id: multiselect_filters_enabled ? gradebook_settings(@context.global_id)&.dig("filter_rows_by", "section_ids") : gradebook_settings(@context.global_id)&.dig("filter_rows_by", "section_id"),
+        COMMENT_BANK_PER_ASSIGNMENT_ENABLED: Account.site_admin.feature_enabled?(:comment_bank_per_assignment),
       }
       js_env(env)
 
@@ -1542,10 +1544,10 @@ class GradebooksController < ApplicationController
     categories
       .joins("LEFT JOIN #{Group.quoted_table_name} ON groups.group_category_id=group_categories.id AND groups.workflow_state <> 'deleted'")
       .group("group_categories.id", "group_categories.name")
-      .pluck("group_categories.id", "group_categories.name", Arel.sql("json_agg(json_build_object('id', groups.id, 'name', groups.name))"))
-      .map do |category_id, category_name, original_groups|
+      .pluck("group_categories.id", "group_categories.name", "group_categories.non_collaborative", Arel.sql("json_agg(json_build_object('id', groups.id, 'name', groups.name, 'non_collaborative',groups.non_collaborative))"))
+      .map do |category_id, category_name, category_non_collaborative, original_groups|
         groups = original_groups.select { |g| g["id"] }.map(&:with_indifferent_access)
-        { id: category_id, name: category_name, groups: }.with_indifferent_access
+        { id: category_id, name: category_name, non_collaborative: category_non_collaborative, groups: }.with_indifferent_access
       end
   end
 

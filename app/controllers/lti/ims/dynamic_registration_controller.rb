@@ -208,17 +208,19 @@ module Lti
             ims_registration:
           )
 
+          deployment = nil
+
           ActiveRecord::Base.transaction do
             developer_key.save!
             ims_registration.save!
             registration.save!
 
             if root_account.feature_enabled?(:lti_registrations_next)
-              registration.new_external_tool(root_account, current_user:, available: false)
+              deployment = registration.new_external_tool(root_account, current_user:, available: false)
             end
           end
 
-          render_registration(ims_registration, developer_key) if ims_registration.persisted?
+          render_registration(ims_registration, developer_key, deployment) if ims_registration.persisted?
         end
       end
 
@@ -252,7 +254,7 @@ module Lti
 
       private
 
-      def render_registration(registration, developer_key)
+      def render_registration(registration, developer_key, deployment)
         render json: {
           client_id: developer_key.global_id.to_s,
           application_type: Lti::IMS::Registration::REQUIRED_APPLICATION_TYPE,
@@ -270,7 +272,8 @@ module Lti
               "https://#{Lti::IMS::Registration::CANVAS_EXTENSION_LABEL}/lti/registration_config_url": lti_registration_config_url(registration.global_id),
             }
           ),
-        }
+          deployment_id: deployment&.deployment_id
+        }.compact
       end
 
       def respond_with_error(status_code, message)

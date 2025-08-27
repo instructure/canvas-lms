@@ -16,36 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as createI18nScope} from '@canvas/i18n'
-import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {IconEyeLine} from '@instructure/ui-icons'
+import {PreviewButton} from './PreviewButton'
+import {RedoButton} from './RedoButton'
+import {UndoButton} from './UndoButton'
 import {useBlockContentEditorContext} from '../BlockContentEditorContext'
-
-const I18n = createI18nScope('page_editor')
-
-const PreviewButton = (props: {
-  active: boolean
-  onClick: () => void
-}) => {
-  return (
-    <IconButton
-      screenReaderLabel={I18n.t('preview')}
-      color={props.active ? 'primary' : 'secondary'}
-      renderIcon={<IconEyeLine />}
-      onClick={props.onClick}
-    />
-  )
-}
+import {useEditHistory} from '../hooks/useEditHistory'
 
 export const Toolbar = () => {
   const {
     editor: {mode, setMode},
   } = useBlockContentEditorContext()
+  const {undo, redo, canUndo, canRedo} = useEditHistory()
   const isPreviewMode = mode === 'preview'
 
   return (
-    <Flex direction="row">
+    <Flex direction="column">
+      <UndoButton active={canUndo} onClick={undo} />
+      <RedoButton active={canRedo} onClick={redo} />
       <PreviewButton
         active={isPreviewMode}
         onClick={() => setMode(isPreviewMode ? 'default' : 'preview')}

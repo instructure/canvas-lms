@@ -1172,6 +1172,12 @@ class SubmissionsApiController < ApplicationController
   #
   # Section-limited instructors will only see students in their own sections.
   #
+  # @argument sort [String, "name"]
+  #   Sort results by this field.
+  #
+  # @argument order [String, "asc"|"desc"]
+  #   The sorting order. Defaults to 'asc'.
+  #
   # @returns [UserDisplay] if anonymous grading is not enabled for the assignment or if the
   #   allow_new_anonymous_id parameter is not true
   # @returns [AnonymousUserDisplay] if anonymous grading is enabled for the assignment and the
@@ -1187,7 +1193,20 @@ class SubmissionsApiController < ApplicationController
 
       student_scope = context.students_visible_to(@current_user, include: :inactive)
       submission_scope = @assignment.submissions.except(:preload).where(user_id: student_scope)
-                                    .order(can_view_student_names ? :user_id : :anonymous_id)
+
+      if params[:sort] == "name"
+        order = (params[:order].to_s.downcase == "desc") ? "DESC" : "ASC"
+        if can_view_student_names
+          order_clause = User.sortable_name_order_by_clause("users")
+          order_clause = "#{order_clause} #{order}"
+          submission_scope = submission_scope.joins(:user).order(Arel.sql(order_clause))
+        else
+          # For anonymous grading, we can't sort by name, so fall back to anonymous_id
+          submission_scope = submission_scope.order("anonymous_id #{order}")
+        end
+      else
+        submission_scope = submission_scope.order(can_view_student_names ? :user_id : :anonymous_id)
+      end
       submission_scope = submission_scope.preload(:user) if can_view_student_names
       if (include_pg = includes.include?("provisional_grades"))
         render_unauthorized_action and return unless @assignment.permits_moderation?(@current_user)

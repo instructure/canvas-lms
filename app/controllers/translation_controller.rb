@@ -27,7 +27,7 @@ class TranslationController < ApplicationController
   # Skip the authenticity token as this is an API endpoint.
   skip_before_action :verify_authenticity_token, only: [:translate]
 
-  rescue_from Translation::SameLanguageTranslationError, with: :handle_same_language_error
+  rescue_from Translation::TranslationError, with: :handle_translation_error
   rescue_from Aws::Translate::Errors::ServiceError, with: :handle_generic_error
 
   def translate
@@ -41,7 +41,8 @@ class TranslationController < ApplicationController
                                                  flags: translation_flags,
                                                  options: {
                                                    root_account_uuid: @domain_root_account.uuid,
-                                                   feature_slug: required_params[:feature_slug]
+                                                   feature_slug: required_params[:feature_slug],
+                                                   current_user: @current_user
                                                  })
 
     render json: { translated_text: }
@@ -61,7 +62,8 @@ class TranslationController < ApplicationController
       flags: translation_flags,
       options: {
         root_account_uuid: @domain_root_account.uuid,
-        feature_slug: required_params[:feature_slug]
+        feature_slug: required_params[:feature_slug],
+        current_user: @current_user
       }
     )
     if Translation.current_translation_provider_type(translation_flags) == Translation::TranslationType::AWS_TRANSLATE
@@ -71,9 +73,29 @@ class TranslationController < ApplicationController
     render json: { translated_text: }
   end
 
-  def handle_same_language_error
-    InstStatsd::Statsd.distributed_increment("translation.errors", tags: ["error:same_language"])
-    render json: { translationError: { type: "info", message: I18n.t("Looks like you're trying to translate into the same language.") } }, status: :unprocessable_entity
+  def handle_translation_error(exception)
+    tags = []
+    case exception
+    when Translation::SameLanguageTranslationError
+      tags = ["error:same_language"]
+      message = I18n.t("Translation is identical to source language.")
+      status = :unprocessable_entity
+    when Translation::TextTooLongError
+      tags = ["error:text_size_limit"]
+      message = I18n.t("Couldn’t translate because the text is too long.")
+      status = :unprocessable_entity
+    else
+      # Generic response for all other ServiceErrors
+      tags = ["error:generic"]
+      message = I18n.t("There was an unexpected error during translation.")
+      status = :internal_server_error
+    end
+
+    InstStatsd::Statsd.distributed_increment("translation.errors", tags:)
+
+    render(json: { translationErrorTextTooLong: { type: "error", message: } }, status:) and return if action_name == "translate_paragraph" && tags == ["error:text_size_limit"]
+
+    render json: { translationError: { type: "error", message: } }, status:
   end
 
   def handle_generic_error(exception)
@@ -95,7 +117,7 @@ class TranslationController < ApplicationController
       status = :unprocessable_entity
     when Aws::Translate::Errors::TextSizeLimitExceededException
       tags = ["error:text_size_limit"]
-      message = I18n.t("Couldn’t translate because the text is too long.")
+      message = I18n.t("Translation failed because the text is longer than the character limit (5000).")
       status = :unprocessable_entity
     else
       # Generic response for all other ServiceErrors

@@ -44,9 +44,9 @@ import {
 import {handleOpeningModuleUpdateTray} from '../handlers/modulePageActionHandlers'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useContextModule} from '../hooks/useModuleContext'
-import {useModuleItems} from '../hooks/queries/useModuleItems'
 import {ModuleAction, ExternalTool, ExternalToolPlacementType} from '../utils/types'
 import {useExternalToolLaunch} from '../hooks/useExternalToolLaunch'
+import {useModuleItems} from '../hooks/queries/useModuleItems'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -88,7 +88,7 @@ const ModuleActionMenu: React.FC<ModuleActionMenuProps> = ({
     moduleMenuTools,
   } = useExternalToolLaunch()
 
-  const {data: moduleItems} = useModuleItems(id, expanded || isMenuOpen)
+  const {data: moduleItems} = useModuleItems(id, null, expanded || isMenuOpen)
 
   const handleEditRef = useCallback(() => {
     handleOpeningModuleUpdateTray(

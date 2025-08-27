@@ -194,9 +194,14 @@ class MessageableUser
         scope = search_in_context_scope(global_exclude_ids:, **options)
         bookmark(scope)
       else
-        scope = self_scope(options)
-        scope = search_scope(scope, options[:search], global_exclude_ids)
-        collections = [["self", bookmark(scope)]]
+        collections = []
+        if options[:restrict_to_teacher_recipients]
+          collections << ["self", bookmark(MessageableUser.none)]
+        else
+          scope = self_scope(options)
+          scope = search_scope(scope, options[:search], global_exclude_ids)
+          collections << ["self", bookmark(scope)]
+        end
 
         Shard.with_each_shard(@user.associated_shards) do
           if all_courses.present?
@@ -402,6 +407,8 @@ class MessageableUser
         enrollment_types = ["TeacherEnrollment", "TaEnrollment"]
       elsif enrollment_type
         enrollment_types = ["#{enrollment_type.capitalize.singularize}Enrollment"]
+      elsif options[:restrict_to_teacher_recipients]
+        enrollment_types = ["TeacherEnrollment"]
       end
 
       case context_type
@@ -668,6 +675,8 @@ class MessageableUser
     def visible_enrollment_scope(options = {})
       scope = enrollment_scope(options).where(visibility_restriction_clause)
       scope = scope.where(observer_restriction_clause) if student_courses.present?
+
+      scope = scope.where("enrollments.type = 'TeacherEnrollment'") if options[:restrict_to_teacher_recipients]
 
       # redundant with the visibility_restriction_clause, which is narrower, but
       # helps out the query planner

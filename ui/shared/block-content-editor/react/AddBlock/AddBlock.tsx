@@ -23,12 +23,14 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {useBlockContentEditorContext} from '../BlockContentEditorContext'
 import {AddButton} from './AddButton'
+import {useGetBlocksCount} from '../hooks/useGetBlocksCount'
 
-const I18n = createI18nScope('page_editor')
+const I18n = createI18nScope('block_content_editor')
 
 export const AddBlock = () => {
-  const {addBlockModal, initialAddBlockHandler} = useBlockContentEditorContext()
-  if (!initialAddBlockHandler.shouldShow) {
+  const {addBlockModal} = useBlockContentEditorContext()
+  const {blocksCount} = useGetBlocksCount()
+  if (blocksCount > 0) {
     return null
   }
   return (

@@ -39,6 +39,7 @@ export const Submission = {
       excused
       studentEnteredScore
       state
+      submissionType
       commentsConnection {
         nodes {
           ...SubmissionComment
@@ -49,13 +50,15 @@ export const Submission = {
           ...RubricAssessment
         }
       }
-      ltiAssetReportsConnection(first: 10) {
+      ltiAssetReportsConnection(first: 10, latest: true) {
         nodes {
           _id
           asset {
             _id
             attachmentId
+            attachmentName
             submissionAttempt
+            submissionId
           }
           comment
           errorCode
@@ -90,6 +93,7 @@ export const Submission = {
     excused: bool,
     studentEnteredScore: string,
     state: string,
+    submissionType: string,
     commentsConnection: arrayOf({
       nodes: arrayOf({
         comment: string,
@@ -107,7 +111,9 @@ export const Submission = {
         asset: {
           _id: string,
           attachmentId: string,
-          submissionAttempt: number,
+          attachmentName: string,
+          submissionAttempt: string,
+          submissionId: string,
         },
         comment: string,
         errorCode: string,
@@ -140,6 +146,7 @@ export const Submission = {
     studentEnteredScore = '8',
     state = 'graded',
     submittedAt = null,
+    submissionType = 'online_text_entry',
     commentsConnection = {
       nodes: [
         {
@@ -174,6 +181,7 @@ export const Submission = {
     studentEnteredScore,
     state,
     submittedAt,
+    submissionType,
     commentsConnection,
     rubricAssessmentsConnection,
     ltiAssetReportsConnection,

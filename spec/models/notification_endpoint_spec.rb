@@ -20,7 +20,7 @@
 
 describe NotificationEndpoint do
   before :once do
-    @at = AccessToken.create!(user: user_model, developer_key: DeveloperKey.default)
+    @at = AccessToken.create!(user: user_model, developer_key: DeveloperKey.default, purpose: "test")
   end
 
   before do

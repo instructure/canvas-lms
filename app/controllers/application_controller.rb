@@ -306,6 +306,9 @@ class ApplicationController < ActionController::Base
           RAILS_ENVIRONMENT: Canvas.environment
         }
         @js_env[:use_dyslexic_font] = @current_user&.prefers_dyslexic_font? if @current_user&.can_see_dyslexic_font_feature_flag?(session) && !mobile_device?
+        if @domain_root_account&.feature_enabled?(:restrict_student_access)
+          @js_env[:current_user_has_teacher_enrollment] = @current_user&.teacher_enrollment?
+        end
         @js_env[:IN_PACED_COURSE] = @context.enable_course_paces? if @context.is_a?(Course)
         unless SentryExtensions::Settings.settings.blank?
           @js_env[:SENTRY_FRONTEND] = {
@@ -368,7 +371,7 @@ class ApplicationController < ActionController::Base
         @js_env[:USE_CLASSIC_FONT] = @context.is_a?(Course) ? @context.account.use_classic_font_in_k5? : use_classic_font?
         @js_env[:K5_HOMEROOM_COURSE] = @context.is_a?(Course) && @context.elementary_homeroom_course?
         @js_env[:K5_SUBJECT_COURSE] = @context.is_a?(Course) && @context.elementary_subject_course?
-        @js_env[:LOCALE_TRANSLATION_FILE] = ::Canvas::Cdn.registry.url_for("javascripts/translations/#{@js_env[:LOCALES].first}.json")
+        @js_env[:LOCALE_TRANSLATION_FILE] = helpers.path_to_asset("javascripts/translations/#{@js_env[:LOCALES].first}.json")
         @js_env[:ACCOUNT_ID] = effective_account_id(@context)
         @js_env[:user_cache_key] = CanvasSecurity.hmac_sha512(@current_user.uuid) if @current_user.present?
         @js_env[:top_navigation_tools] = external_tools_display_hashes(:top_navigation) if !!@domain_root_account&.feature_enabled?(:top_navigation_placement)
@@ -460,7 +463,10 @@ class ApplicationController < ActionController::Base
     files_a11y_rewrite
     rce_a11y_resize
     hide_legacy_course_analytics
+    scheduled_feedback_releases
+    standardize_assignment_date_formatting
     youtube_overlay
+    accessibility_tab_enable
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours
@@ -503,6 +509,7 @@ class ApplicationController < ActionController::Base
     lti_apps_page_ai_translation
     ams_service
     open_tools_in_new_tab
+    restrict_student_access
     horizon_learner_app
     horizon_learning_provider_app_on_contextless_routes
     youtube_migration
@@ -1760,6 +1767,7 @@ class ApplicationController < ActionController::Base
             pseudonym_session.non_explicit_session = true
             pseudonym_session.save!
             session[:used_remember_me_token] = true if token.used_remember_me_token
+            @session_token = token
           end
           if pseudonym && token.current_user_id
             target_user = User.find(token.current_user_id)
@@ -2549,7 +2557,7 @@ class ApplicationController < ActionController::Base
       # i don't know if we really need this but in case these expired tokens are a client caching issue,
       # let's throw an extra param in the fallback so we hopefully don't infinite loop
       fallback_url += (query.present? ? "&" : "?") + "fallback_ts=#{Time.now.to_i}"
-      authorization ||= { attachment: } if Account.site_admin.feature_enabled?(:safe_files_token)
+      authorization ||= { attachment: }
       opts = generate_access_verifier(return_url:, fallback_url:, authorization:)
       opts[:verifier] = verifier if verifier.present?
 
@@ -2950,22 +2958,52 @@ class ApplicationController < ActionController::Base
     render_unauthorized_action if limit_access
   end
 
-  def context_account
-    @context_account ||= if @context.is_a?(Account)
-                           @context
-                         elsif @context.is_a?(Course) || @context.is_a?(Group)
-                           @context.account
-                         elsif @context.is_a?(User)
-                           raise "Account can't be derived from a User context"
-                         elsif @context.is_a?(CourseSection)
-                           @context.course.account
-                         else
-                           a = @context.try(:account)
-                           raise ActiveRecord::RecordNotFound, "No account found for context" unless a.present?
+  def check_restricted_file_access_for_students
+    return if @context.blank? && @current_user.blank?
 
-                           a
-                         end
+    account = @context.blank? ? @current_user&.account : context_account_for_student
+
+    if account&.restricted_file_access_for_user?(@current_user)
+      render_unauthorized_action and return
+    end
   end
+
+  def check_restricted_file_access_and_return?
+    check_restricted_file_access_for_students
+    performed?
+  end
+
+  def context_account_for_student
+    @context_account_for_student ||= resolve_context_account(allow_user_root_account: true)
+  end
+
+  def context_account
+    @context_account ||= resolve_context_account(allow_user_root_account: false)
+  end
+
+  def resolve_context_account(allow_user_root_account: false)
+    case @context
+    when Account
+      @context
+    when Course, Group
+      @context.account
+    when User
+      if allow_user_root_account
+        @context.account.root_account
+      else
+        raise "Account can't be derived from a User context"
+      end
+    when CourseSection
+      @context.course.account
+    else
+      account = @context.try(:account)
+      raise ActiveRecord::RecordNotFound, "No account found for context" unless account.present?
+
+      account
+    end
+  end
+
+  private :resolve_context_account
 
   def set_site_admin_context
     @context = Account.site_admin

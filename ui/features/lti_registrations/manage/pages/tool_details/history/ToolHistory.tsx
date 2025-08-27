@@ -30,6 +30,7 @@ import {useQuery} from '@tanstack/react-query'
 import {queryify} from '@canvas/query/queryify'
 import {fetchLtiRegistrationOverlayHistory} from '../../../api/registrations'
 import {RenderApiResult} from '../../../../common/lib/apiResult/RenderApiResult'
+import {AccountId} from '../../../model/AccountId'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -39,13 +40,17 @@ const I18n = createI18nScope('lti_registrations')
  */
 const HISTORY_DISPLAY_LIMIT = 100
 
-export const ToolHistory = () => {
+export type ToolHistoryProps = {
+  accountId: AccountId
+}
+
+export const ToolHistory = (props: ToolHistoryProps) => {
   const {registration} = useOutletContext<ToolDetailsOutletContext>()
 
   const overlayHistoryQuery = useQuery({
     queryKey: [
       'ltiRegistrationHistory',
-      registration.account_id,
+      props.accountId,
       registration.id,
       HISTORY_DISPLAY_LIMIT + 1,
     ],

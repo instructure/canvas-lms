@@ -26,7 +26,7 @@ RSpec.describe Accessibility::GenerateController do
     let(:accessibility_issue_instance) { instance_double(Accessibility::Issue) }
 
     before do
-      allow(controller).to receive_messages(require_context: true, require_user: true, validate_allowed: true)
+      allow(controller).to receive_messages(require_context: true, require_user: true, check_authorized_action: true)
       controller.instance_variable_set(:@context, course)
       controller.instance_variable_set(:@current_user, user)
 
@@ -99,6 +99,32 @@ RSpec.describe Accessibility::GenerateController do
       end
     end
 
+    context "when rate limit is exceeded" do
+      let(:params) do
+        {
+          course_id: course.id,
+          rule: "img-alt",
+          content_type: "WikiPage",
+          content_id: "123",
+          path: "img_path",
+          value: "test_value"
+        }
+      end
+
+      before do
+        # Override the previous mock to throw the rate limit exception
+        # The error requires a limit parameter
+        rate_limit_error = InstLLMHelper::RateLimitExceededError.new(limit: 10)
+        allow(InstLLMHelper).to receive(:with_rate_limit).and_raise(rate_limit_error)
+      end
+
+      it "returns a too many requests status with appropriate error message" do
+        post :create, params:, format: :json
+
+        expect(response).to have_http_status(:too_many_requests)
+      end
+    end
+
     context "rate limiting" do
       let(:params) do
         {
@@ -130,7 +156,7 @@ RSpec.describe Accessibility::GenerateController do
     end
   end
 
-  describe "#validate_allowed" do
+  describe "#check_authorized_action" do
     let!(:course) { Course.create! }
     let!(:user) { User.create! }
 
@@ -145,7 +171,7 @@ RSpec.describe Accessibility::GenerateController do
 
       expect(controller).to receive(:render_unauthorized_action)
 
-      controller.send(:validate_allowed)
+      controller.send(:check_authorized_action)
     end
 
     it "calls authorized_action if tab is enabled" do
@@ -153,7 +179,7 @@ RSpec.describe Accessibility::GenerateController do
 
       expect(controller).to receive(:authorized_action).with(course, user, [:read, :update]).and_return(true)
 
-      controller.send(:validate_allowed)
+      controller.send(:check_authorized_action)
     end
   end
 end

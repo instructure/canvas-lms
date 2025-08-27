@@ -4200,6 +4200,7 @@ el:
       add: "Προσθήκη Λειτουργικής Μονάδας"
       add_item: "Πρόσθεση Στοιχείου στο %{module}"
       add_prerequisite: "Προσθήκη Προαπαιτούμενου στην ενότητα *%{module}*"
+      course_modules: "Ενότητες Μαθήματος"
       edit: "Τροποποίηση Ρυθμίσεων Ενότητας"
       edit_item: "Επεξεργασία Λεπτομερειών Αντικειμένου"
     url_show: 
@@ -11318,6 +11319,7 @@ el:
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Τα πιθανά μόρια πρέπει να είναι 0 ή μεγαλύτερα από το 0 για τον επιλεγμένο τύπο βαθμολόγησης"
   points_possible_pts_aedb481e: "%{points_possible} μόρια"
   points_pts_e5596bf7: "%{points} μόρια"
+  pointspossible_points_possible_964c8592: "%{pointsPossible} Δυνατά Μόρια"
   pointspossible_pts_624a6733: "%{pointsPossible} μόρια"
   polling: 
     poll_sessions: 
@@ -15326,6 +15328,7 @@ el:
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "Για να καρφιτσώσετε μια συζήτηση στο επάνω μέρος της σελίδας, σύρετε τη συζήτηση εδώ ή επιλέξτε Καρφίτσωμα από το μενού ρυθμίσεων της συζήτησης."
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "Για να περιορίσετε χρήστες από το συγκεκριμένο domain Google Apps, εισαγάγετε το domain εδώ."
   to_view_all_notifications_sent_to_a_canvas_user_se_6172daa: "Για να δείτε όλες τις ειδοποιήσεις που έχουν σταλεί σε ένα χρήστη του Canvas, επιλέξτε τον χρήστη και το εύρος ημερομηνιών για την αναζήτησή σας."
+  today_b7202098: σήμερα
   toggle_editing_answer_text_as_html_9a93fe6: "Εναλλαγή της επεξεργασίας του κειμένου απάντησης σε HTML"
   token_9a020862: Token
   tolerance_value_9e96573c: "Τιμή ανοχής"

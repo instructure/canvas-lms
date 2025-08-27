@@ -36,13 +36,16 @@ import {
 } from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useContextModule} from '../hooks/useModuleContext'
+import type {ModuleItemContent} from '../utils/types'
 
 const I18n = createI18nScope('context_modules_v2')
 
 const basicContentTypes = ['SubHeader', 'ExternalUrl']
 
 export interface ModuleItemActionMenuProps {
+  moduleId: string
   itemType: string
+  content: ModuleItemContent
   canDuplicate: boolean
   isMenuOpen: boolean
   setIsMenuOpen: (isOpen: boolean) => void
@@ -67,7 +70,9 @@ export interface ModuleItemActionMenuProps {
 }
 
 const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
+  moduleId,
   itemType,
+  content,
   canDuplicate,
   isMenuOpen,
   setIsMenuOpen,
@@ -88,20 +93,25 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
   const isBasic = basicContentTypes.includes(itemType)
   const isFile = itemType === 'File'
   const isExternalTool = itemType === 'ExternalTool'
-
-  const {permissions} = useContextModule()
+  const {permissions, menuItemLoadingState} = useContextModule()
+  const isModuleLoading = !!menuItemLoadingState?.[moduleId]?.state
   const canEdit = permissions?.canEdit
   const canAdd = permissions?.canAdd
+  const canManageSpeedGrader = permissions?.canManageSpeedGrader
   const canDirectShare = permissions?.canDirectShare
 
   const isNotSpecialType = !isBasic && !isFile && !isExternalTool
-  const showSpeedGrader = canEdit && isNotSpecialType
+  const showSpeedGrader =
+    canManageSpeedGrader &&
+    (itemType === 'Assignment' || itemType === 'Quiz') &&
+    !!content?.published
+  const showAssignTo = !!content?.canManageAssignTo
   const showDirectShare = canDirectShare && isNotSpecialType
 
   const renderMenuItem = (condition: boolean, handler: () => void, icon: any, label: string) => {
     if (!condition) return null
     return (
-      <Menu.Item onClick={handler}>
+      <Menu.Item onClick={isModuleLoading ? undefined : handler} disabled={isModuleLoading}>
         <Flex>
           <Flex.Item>{icon}</Flex.Item>
           <Flex.Item margin="0 0 0 x-small">{label}</Flex.Item>
@@ -134,7 +144,7 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
         I18n.t('SpeedGrader'),
       )}
       {renderMenuItem(
-        showSpeedGrader,
+        showAssignTo,
         handleAssignTo,
         <IconPermissionsSolid />,
         I18n.t('Assign To...'),

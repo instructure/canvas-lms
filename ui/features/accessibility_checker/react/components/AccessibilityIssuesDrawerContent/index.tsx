@@ -36,16 +36,17 @@ import {useDebouncedCallback} from 'use-debounce'
 import {AccessibilityCheckerContext} from '../../contexts/AccessibilityCheckerContext'
 import AccessibilityIssuesDrawerFooter from './Footer'
 import Form, {FormHandle} from './Form'
-import {AccessibilityIssue, ContentItem, ContentTypeToKey, FormType, FormValue} from '../../types'
-import {stripQueryString} from '../../utils'
+import {AccessibilityIssue, AccessibilityResourceScan, FormType, FormValue} from '../../types'
+import {findById, getAsContentItemType, replaceById} from '../../utils/apiData'
+import {stripQueryString} from '../../utils/query'
 import Preview, {PreviewHandle} from './Preview'
 import WhyMattersPopover from './WhyMattersPopover'
 import ApplyButton from './ApplyButton'
 import {
-  useAccessibilityCheckerStore,
+  useAccessibilityScansStore,
   defaultNextResource,
   NextResource,
-} from '../../stores/AccessibilityCheckerStore'
+} from '../../stores/AccessibilityScansStore'
 
 import SuccessView from './SuccessView'
 import {useNextResource} from '../../hooks/useNextResource'
@@ -53,7 +54,7 @@ import {useNextResource} from '../../hooks/useNextResource'
 const I18n = createI18nScope('accessibility_checker')
 
 interface AccessibilityIssuesDrawerContentProps {
-  item: ContentItem
+  item: AccessibilityResourceScan
   onClose: () => void
 }
 
@@ -80,24 +81,16 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
   const [isFormLocked, setIsFormLocked] = useState<boolean>(false)
   const [assertiveAlertMessage, setAssertiveAlertMessage] = useState<string | null>(null)
   const [formError, setFormError] = useState<string | null>()
-  const [accessibilityIssues, setAccessibilityIssues, tableData, setTableData] =
-    useAccessibilityCheckerStore(
-      useShallow(state => [
-        state.accessibilityIssues,
-        state.setAccessibilityIssues,
-        state.tableData,
-        state.setTableData,
-      ]),
-    )
+
+  const [accessibilityScans, nextResource] = useAccessibilityScansStore(
+    useShallow(state => [state.accessibilityScans, state.nextResource]),
+  )
+  const [setAccessibilityScans, setNextResource] = useAccessibilityScansStore(
+    useShallow(state => [state.setAccessibilityScans, state.setNextResource]),
+  )
 
   const {getNextResource, updateCountPropertyForItem, getAccessibilityIssuesByItem} =
     useNextResource()
-  const orderedTableData = useAccessibilityCheckerStore(useShallow(state => state.orderedTableData))
-  const setOrderedTableData = useAccessibilityCheckerStore(
-    useShallow(state => state.setOrderedTableData),
-  )
-  const nextResource = useAccessibilityCheckerStore(useShallow(state => state.nextResource))
-  const setNextResource = useAccessibilityCheckerStore(useShallow(state => state.setNextResource))
 
   const previewRef: Ref<PreviewHandle> = useRef<PreviewHandle>(null)
   const formRef: Ref<FormHandle> = useRef<FormHandle>(null)
@@ -140,14 +133,17 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
     if (!nextResource) return
     const nextItem = nextResource.item
     if (!nextItem) return
+
     setSelectedItem(nextItem)
-    if (orderedTableData) {
-      const newNextResource = getNextResource(orderedTableData, nextItem)
+
+    if (accessibilityScans) {
+      const newNextResource = getNextResource(accessibilityScans, nextItem)
       if (newNextResource) {
         setNextResource(newNextResource)
       }
     }
-  }, [nextResource, orderedTableData, setSelectedItem, setNextResource])
+  }, [accessibilityScans, nextResource, setSelectedItem, setNextResource, getNextResource])
+
   const handleApply = useCallback(() => {
     setIsFormLocked(true)
     const formValue = formRef.current?.getValue()
@@ -192,45 +188,23 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
     )
   }, [formRef, previewRef])
 
-  const updateTableData = useCallback(
-    (updatedIssues: AccessibilityIssue[]) => {
-      if (!tableData) return
-      const updatedTableData = tableData.map(contentItem => {
-        if (contentItem.id === item.id && contentItem.type === item.type) {
-          return {...contentItem, count: updatedIssues.length}
-        }
-        return contentItem
-      })
-      setTableData(updatedTableData)
-    },
-    [tableData, item, setTableData],
-  )
-
   const updateAccessibilityIssues = useCallback(
     (updatedIssues: AccessibilityIssue[]) => {
-      if (!accessibilityIssues) return
+      if (!accessibilityScans) return
 
-      const key = ContentTypeToKey[item.type]
-      const collection = accessibilityIssues[key]
-      const target = collection?.[item.id]
+      const target = findById(accessibilityScans, item.id)
 
       if (!target) return
 
-      const updated = {
-        ...accessibilityIssues,
-        [key]: {
-          ...collection,
-          [item.id]: {
-            ...target,
-            issues: updatedIssues,
-            count: updatedIssues.length,
-          },
-        },
-      }
+      const updated: AccessibilityResourceScan[] = replaceById(accessibilityScans, {
+        ...target,
+        issues: updatedIssues,
+        issueCount: updatedIssues.length,
+      })
 
-      setAccessibilityIssues(updated)
+      setAccessibilityScans(updated)
     },
-    [accessibilityIssues, item.id, item.type, setAccessibilityIssues],
+    [accessibilityScans, item.id, setAccessibilityScans],
   )
 
   const handleSaveAndNext = useCallback(() => {
@@ -245,8 +219,8 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
       method: 'PUT',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
-        content_type: current.resource.type,
-        content_id: current.resource.id,
+        content_type: getAsContentItemType(current.resource.resourceType)!,
+        content_id: current.resource.resourceId,
         rule: current.issue.ruleId,
         path: current.issue.path,
         value: formValue,
@@ -255,40 +229,39 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
       .then(() => {
         const updatedIssues = issues.filter(issue => issue.id !== issueId)
         setIssues(updatedIssues)
-        if (orderedTableData) {
+        if (accessibilityScans) {
           const updatedOrderedTableData = updateCountPropertyForItem(
-            orderedTableData,
+            accessibilityScans,
             current.resource,
           )
-          setOrderedTableData(updatedOrderedTableData)
+          setAccessibilityScans(updatedOrderedTableData)
           if (nextResource) {
-            const nextItem: ContentItem = orderedTableData[nextResource.index]
+            const nextItem: AccessibilityResourceScan = accessibilityScans[nextResource.index]
             if (nextItem) {
-              if (accessibilityIssues) {
-                nextItem.issues = getAccessibilityIssuesByItem(accessibilityIssues, nextItem)
-              }
+              nextItem.issues = getAccessibilityIssuesByItem(accessibilityScans, nextItem)
+
               const updatedNextResource: NextResource = {index: nextResource.index, item: nextItem}
               setNextResource(updatedNextResource)
             }
           }
         }
-        updateTableData(updatedIssues)
         updateAccessibilityIssues(updatedIssues)
         setCurrentIssueIndex(prev => Math.max(0, Math.min(prev, updatedIssues.length - 1)))
       })
       .catch(err => console.error('Error saving accessibility issue. Error is: ' + err.message))
       .finally(() => setIsRequestInFlight(false))
   }, [
-    current.issue,
     formRef,
-    current.resource.id,
-    current.resource.type,
+    current.issue,
+    current.resource,
     issues,
-    updateTableData,
     updateAccessibilityIssues,
-    accessibilityIssues,
-    orderedTableData,
+    accessibilityScans,
     nextResource,
+    getAccessibilityIssuesByItem,
+    setAccessibilityScans,
+    setNextResource,
+    updateCountPropertyForItem,
   ])
 
   const handleApplyAndSaveAndNext = useCallback(() => {
@@ -338,7 +311,7 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
   if (!current.issue)
     return (
       <SuccessView
-        title={current.resource.title}
+        title={current.resource.resourceName}
         nextResource={nextResource || defaultNextResource}
         onClose={onClose}
         handleNext={handleNext}
@@ -363,7 +336,7 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
         >
           <View>
             <Heading level="h2" variant="titleCardRegular">
-              {current.resource.title}
+              {current.resource.resourceName}
             </Heading>
             <CloseButton
               placement="end"
@@ -388,10 +361,10 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
           <Flex justifyItems="space-between">
             <Text weight="weightImportant">{I18n.t('Problem area')}</Text>
             <Flex gap="small">
-              <Link href={current.resource.url} variant="standalone">
+              <Link href={current.resource.resourceUrl} variant="standalone">
                 {I18n.t('Open Page')}
               </Link>
-              <Link href={current.resource.editUrl} variant="standalone">
+              <Link href={`${current.resource.resourceUrl}/edit`} variant="standalone">
                 {I18n.t('Edit Page')}
               </Link>
             </Flex>
@@ -400,15 +373,17 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
             <Preview
               ref={previewRef}
               issue={current.issue}
-              itemId={current.resource.id}
-              itemType={current.resource.type}
+              resourceId={current.resource.resourceId}
+              itemType={current.resource.resourceType}
             />
           </View>
-          <View as="section" margin="medium 0">
-            <Text weight="weightImportant">{I18n.t('Issue description')}</Text>
-            <br aria-hidden={true} />
-            <Text weight="weightRegular">{current.issue.message}</Text>
-          </View>
+          {current.issue.form.type !== FormType.ColorPicker && (
+            <View as="section" margin="medium 0">
+              <Text weight="weightImportant">{I18n.t('Issue description')}</Text>
+              <br aria-hidden={true} />
+              <Text weight="weightRegular">{current.issue.message}</Text>
+            </View>
+          )}
           <View as="section" margin="medium 0">
             <Form
               ref={formRef}

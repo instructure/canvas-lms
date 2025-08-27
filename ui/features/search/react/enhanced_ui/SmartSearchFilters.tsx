@@ -16,13 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {useState} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {Button, CloseButton} from '@instructure/ui-buttons'
+import {Alert} from '@instructure/ui-alerts'
 import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {useState} from 'react'
+import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 
 const I18n = createI18nScope('SmartSearch')
 
@@ -36,6 +38,7 @@ export const ALL_SOURCES = ['all', 'assignments', 'announcements', 'discussion_t
 
 export default function SmartSearchFilters(props: Props) {
   const [checkedSources, setCheckedSources] = useState<(string | number)[]>(props.filters)
+  const [reset, setReset] = useState(false)
 
   const handleCheckboxChange = (values: (string | number)[]) => {
     const allSelected = values.includes('all') && !checkedSources.includes('all')
@@ -55,10 +58,12 @@ export default function SmartSearchFilters(props: Props) {
     } else {
       setCheckedSources(values)
     }
+    setReset(false)
   }
 
   const handleResetFilters = () => {
     setCheckedSources(ALL_SOURCES)
+    setReset(true)
   }
 
   return (
@@ -88,6 +93,11 @@ export default function SmartSearchFilters(props: Props) {
         />
       </Flex>
       <Flex.Item shouldGrow shouldShrink>
+        {reset && (
+          <Alert screenReaderOnly isLiveRegionAtomic liveRegion={getLiveRegion}>
+            {I18n.t('Filters have been reset to defaults')}
+          </Alert>
+        )}
         <Flex direction="column" gap="inputFields" padding="sectionElements space8">
           <Heading variant="titleCardRegular" level="h3">
             {I18n.t('Sources')}

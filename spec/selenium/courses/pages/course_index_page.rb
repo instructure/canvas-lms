@@ -53,6 +53,10 @@ module CourseIndexPage
     "span[data-course-name='#{course_name}'] .course-list-favorite-icon"
   end
 
+  def accessibility_column_selector
+    ".course-list-accessibility-column"
+  end
+
   #------------------------- Elements ---------------------------
   def current_enrollments
     f(current_enrollments_selector)
@@ -100,6 +104,10 @@ module CourseIndexPage
 
   def published_column_header(table)
     table_header_row(table)[5]
+  end
+
+  def accessibility_column_header(table)
+    table_header_row(table)[6]
   end
 
   def table_rows(table)

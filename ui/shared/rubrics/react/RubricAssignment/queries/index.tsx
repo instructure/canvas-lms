@@ -86,7 +86,7 @@ export const addRubricToAssignment = async (
     rubricAssociation: mappedRubricAssociation,
     rubric: {
       ...mappedRubric,
-      can_update: result.rubric.permissions?.update,
+      canUpdateRubric: result.rubric.permissions?.update,
       association_count: result.rubric.association_count,
     } as AssignmentRubric,
   }

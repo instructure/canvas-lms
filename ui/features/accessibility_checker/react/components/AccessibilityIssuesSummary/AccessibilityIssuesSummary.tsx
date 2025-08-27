@@ -15,26 +15,29 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
+import {useMemo} from 'react'
 import {useShallow} from 'zustand/react/shallow'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 
-import {useAccessibilityCheckerStore} from '../../stores/AccessibilityCheckerStore'
-import {calculateTotalIssuesCount} from '../../utils'
+import {useAccessibilityScansStore} from '../../stores/AccessibilityScansStore'
+import {calculateTotalIssuesCount, parseAccessibilityScans} from '../../utils/apiData'
 import {IssuesByTypeChart} from './IssuesByTypeChart'
 import {IssuesCounter} from './IssuesCounter'
+import {AccessibilityData} from '../../types'
 
 export const AccessibilityIssuesSummary = () => {
-  const [accessibilityIssues, accessibilityScanDisabled, loading] = useAccessibilityCheckerStore(
-    useShallow(state => [
-      state.accessibilityIssues,
-      state.accessibilityScanDisabled,
-      state.loading,
-    ]),
+  const [accessibilityScans, loading] = useAccessibilityScansStore(
+    useShallow(state => [state.accessibilityScans, state.loading]),
   )
 
-  if (accessibilityScanDisabled || loading) return null
+  const issues = useMemo(() => {
+    return accessibilityScans
+      ? parseAccessibilityScans(accessibilityScans)
+      : ({} as AccessibilityData)
+  }, [accessibilityScans])
+
+  if (window.ENV.SCAN_DISABLED === true || loading) return null
 
   return (
     <Flex
@@ -45,12 +48,12 @@ export const AccessibilityIssuesSummary = () => {
     >
       <Flex.Item>
         <View as="div" padding="medium" borderWidth="small" borderRadius="medium" height="100%">
-          <IssuesCounter count={calculateTotalIssuesCount(accessibilityIssues)} />
+          <IssuesCounter count={calculateTotalIssuesCount(accessibilityScans)} />
         </View>
       </Flex.Item>
       <Flex.Item shouldGrow shouldShrink>
         <View as="div" padding="x-small" borderWidth="small" borderRadius="medium" height="100%">
-          <IssuesByTypeChart accessibilityIssues={accessibilityIssues} isLoading={loading} />
+          <IssuesByTypeChart accessibilityIssues={issues} isLoading={loading} />
         </View>
       </Flex.Item>
     </Flex>

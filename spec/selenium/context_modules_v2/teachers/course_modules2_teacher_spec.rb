@@ -46,6 +46,7 @@ describe "context modules", :ignore_js_errors do
   it "creates a screenreader alert when all module items are loaded" do
     go_to_modules
     expand_all_modules_button.click if element_exists?(expand_all_modules_button_selector)
+    wait_for_ajaximations
     expect(screenreader_alert).to include_text("All module items loaded")
   end
 
@@ -62,7 +63,7 @@ describe "context modules", :ignore_js_errors do
     expect(item_indent).to match("padding: 0px 0px 0px 40px;")
   end
 
-  context "modules action menu" do
+  context "module items action menu" do
     before do
       # Create a module with at least one item of each type
       module_setup
@@ -83,16 +84,15 @@ describe "context modules", :ignore_js_errors do
     def validate_text_fields_has_right_value(item)
       manage_module_item_button(item.id).click
       module_item_action_menu_link("Edit").click
-
+      wait_for_ajaximations
       item_title = item.title
-      title = edit_item_modal.find_element(:css, "input[data-testid='edit-modal-title']")
-
-      expect(title.attribute("value")).to eq(item_title)
+      title = edit_item_modal_title_input_value
+      expect(title).to eq(item_title)
 
       # URL field is only present for ExternalTool, ExternalUrl, and ContextExternalTool items
       if %w[External ExternalUrl ExternalTool ContextExternalTool].include?(item.content_type)
-        url = edit_item_modal.find_element(:css, "input[data-testid='edit-modal-url']")
-        expect(url.attribute("value")).to eq(item.url)
+        url_value = edit_item_modal_url_value
+        expect(url_value).to eq(item.url)
 
         new_tab = edit_item_modal.find_element(:css, "input[data-testid='edit-modal-new-tab']")
         new_tab_value = item.new_tab.nil? ? false : item.new_tab
@@ -106,6 +106,7 @@ describe "context modules", :ignore_js_errors do
     def validate_update_module_item_title(item, new_title = "New Title")
       manage_module_item_button(item.id).click
       module_item_action_menu_link("Edit").click
+      wait_for_ajaximations
 
       title = edit_item_modal.find_element(:css, "input[data-testid='edit-modal-title']")
       replace_content(title, new_title)
@@ -229,6 +230,102 @@ describe "context modules", :ignore_js_errors do
         copy_and_expect(@assignment_item, "assignments")
         copy_and_expect(@discussion_item, "discussion_topics")
         copy_and_expect(@page_item, "wiki_pages")
+      end
+    end
+
+    context "move module item kebab form" do
+      it "shows move item tray and close it" do
+        go_to_modules
+        module_header_expand_toggles.first.click
+        wait_for_ajaximations
+
+        manage_module_item_button(@module1.content_tags.first.id).click
+        module_item_action_menu_link("Move to...").click
+        expect(f("body")).to contain_css(move_item_tray_selector)
+        expect(cancel_tray_button).to be_displayed
+        cancel_tray_button.click
+        expect(f("body")).not_to contain_css(move_item_tray_selector)
+
+        manage_module_item_button(@module1.content_tags.first.id).click
+        module_item_action_menu_link("Move to...").click
+        expect(f("body")).to contain_css(move_item_tray_selector)
+        expect(close_tray_button).to be_displayed
+        close_tray_button.click
+        expect(f("body")).not_to contain_css(move_item_tray_selector)
+      end
+
+      it "moves module item to another module" do
+        go_to_modules
+        module_header_expand_toggles.first.click
+        module_header_expand_toggles.last.click
+        wait_for_ajaximations
+
+        moved_item = @module.content_tags.first
+        manage_module_item_button(moved_item.id).click
+        module_item_action_menu_link("Move to...").click
+        expect(move_item_tray_select_modules_listbox).to be_displayed
+        move_item_tray_select_modules_listbox.click
+
+        option_list_id = move_item_tray_select_modules_listbox.attribute("aria-controls")
+        option_list_course_option(option_list_id, @module1.name).click
+        move_item_tray_place_contents_listbox.click
+        place_item_at_bottom_option.click
+        submit_move_to_button.click
+        wait_for_ajaximations
+
+        item_titles_list = module_item_title_links.map(&:text)
+        expect(@module1.content_tags.last.title).to include(moved_item.title)
+        expect(item_titles_list.count(moved_item.title)).to eq(1)
+      end
+    end
+
+    context "duplicate module item" do
+      before :once do
+        @dup_assignment = @course.assignments.create!(title: "Dup me", submission_types: "online_text_entry")
+        @dup_item = @module1.add_item(type: "assignment", id: @dup_assignment.id)
+      end
+
+      it "duplicates the module item (UI shows new row and DB count increases)" do
+        go_to_modules
+        wait_for_ajaximations
+
+        context_module_expand_toggle(@module1.id).click
+        wait_for_ajaximations
+
+        ui_count_before = module_item_title_links.length
+        manage_module_item_button(@dup_item.id).click
+        module_item_action_menu_link("Duplicate").click
+        wait_for_ajaximations
+
+        expect(module_item_title_links.length).to eq(ui_count_before + 1)
+        expect(module_item_title_links.last.text).to eq("Dup me Copy")
+      end
+    end
+  end
+
+  context "mastery paths" do
+    before do
+      @item = @module1.content_tags[0]
+    end
+
+    context "when mastery path is not already set" do
+      before do
+        allow(ConditionalRelease::Service).to receive_messages(enabled_in_context?: true, rules_for: [])
+      end
+
+      it "navigates to mastery paths edit page when Add Mastery Paths is clicked" do
+        go_to_modules
+        module_header_expand_toggles.first.click
+        wait_for_ajaximations
+
+        manage_module_item_button(@item.id).click
+        wait_for_ajaximations
+
+        module_item_action_menu_link("Add Mastery Paths").click
+        wait_for_ajaximations
+
+        expect(driver.current_url).to include("/courses/#{@course.id}/assignments/#{@item.content_id}/edit")
+        expect(driver.current_url).to include("#mastery-paths-editor")
       end
     end
   end
@@ -407,6 +504,63 @@ describe "context modules", :ignore_js_errors do
       item_titles2 = module_item_title_links[1].text
       expect(item_titles1).to include("a_file.txt")
       expect(item_titles2).to include("b_file.txt")
+    end
+  end
+
+  context "add items to module" do
+    before :once do
+      @course = course_factory(active_all: true)
+      @teacher = @course.teachers.first
+    end
+
+    before do
+      user_session(@teacher)
+      @empty_module = @course.context_modules.create!(name: "Multi File Module")
+    end
+
+    context "when adding an external tool" do
+      before do
+        @external_tool = @course.context_external_tools.create!(
+          context_id: @course.id,
+          context_type: "Course",
+          url: "https://example.com",
+          shared_secret: "fake",
+          consumer_key: "fake",
+          name: "Test External Tool",
+          description: "An external tool for testing",
+          settings: { "platform" => "canvas.instructure.com" },
+          workflow_state: "active"
+        )
+      end
+
+      it "allows adding an external tool to the module" do
+        go_to_modules
+        wait_for_ajaximations
+
+        # Expand the module to see its items
+        context_module_expand_toggle(@empty_module.id).click
+        wait_for_ajaximations
+
+        add_item_button(@empty_module.id).click
+        wait_for_ajaximations
+
+        # Select External Tool from the dropdown
+        click_INSTUI_Select_option(new_item_type_select_selector, "External Tool")
+        wait_for_ajaximations
+
+        # Select external tool from the dropdown
+        click_INSTUI_Select_option(add_existing_item_select_selector, @external_tool.name)
+        wait_for_ajaximations
+
+        new_item_name = "External Tool Page Name"
+
+        replace_content(external_tool_page_name_input, new_item_name)
+
+        # Click Add Item
+        add_item_modal_add_item_button.click
+
+        expect(module_item_title_links.last.text).to include(new_item_name)
+      end
     end
   end
 
@@ -628,6 +782,80 @@ describe "context modules", :ignore_js_errors do
     end
   end
 
+  context "module publish menu" do
+    context "'Publish module and all items' button" do
+      it "publishes the module and all its items" do
+        prepare_unpublished_modules(@course.context_modules)
+
+        go_to_modules
+        wait_for_ajaximations
+        module_publish_menu(@module1.id).click
+
+        module_publish_with_all_items.click
+
+        wait_for_ajaximations
+
+        verify_publication_state([@module1], module_published: true, items_published: true)
+        expect(modules_published_icon_state?(published: true, modules: [@module1])).to be true
+        expand_all_modules
+        expect(module_items_published_icon_state?(published: true, modules: [@module1])).to be true
+      end
+    end
+
+    context "'Publish module only' button" do
+      it "publishes the module but not its items" do
+        prepare_unpublished_modules(@course.context_modules)
+
+        go_to_modules
+        wait_for_ajaximations
+        module_publish_menu(@module1.id).click
+
+        module_publish.click
+
+        wait_for_ajaximations
+
+        verify_publication_state([@module1], module_published: true, items_published: false)
+        expect(modules_published_icon_state?(published: true, modules: [@module1])).to be true
+        expand_all_modules
+        expect(module_items_published_icon_state?(published: false, modules: [@module1])).to be true
+      end
+    end
+
+    context "'Unpublish module and all items' button" do
+      it "unpublishes the module and all its items" do
+        go_to_modules
+        wait_for_ajaximations
+        module_publish_menu(@module1.id).click
+
+        module_unpublish_with_all_items.click
+
+        wait_for_ajaximations
+
+        verify_publication_state([@module1], module_published: false, items_published: false)
+        expect(modules_published_icon_state?(published: false, modules: [@module1])).to be true
+        expand_all_modules
+        expect(module_items_published_icon_state?(published: false, modules: [@module1])).to be true
+      end
+    end
+
+    context "'Unpublish module only' button" do
+      it "unpublishes the module but not its items" do
+        go_to_modules
+        wait_for_ajaximations
+        module_publish_menu(@module1.id).click
+
+        module_unpublish.click
+
+        wait_for_ajaximations
+
+        verify_publication_state([@module1], module_published: false, items_published: true)
+        expect(modules_published_icon_state?(published: false, modules: [@module1])).to be true
+        expand_all_modules
+        expect(module_items_published_icon_state?(published: true, modules: [@module1])).to be true
+      end
+    end
+  end
+
   context "publish all menu" do
     context "'Publish all modules and items' button" do
       it "publishes all modules and items" do
@@ -642,6 +870,10 @@ describe "context modules", :ignore_js_errors do
         run_jobs
 
         verify_publication_state(@course.context_modules, module_published: true, items_published: true)
+        wait_until_bulk_publish_action_finished
+        expect(modules_published_icon_state?(published: true)).to be true
+        expand_all_modules
+        expect(module_items_published_icon_state?(published: true)).to be true
       end
     end
 
@@ -658,6 +890,10 @@ describe "context modules", :ignore_js_errors do
         run_jobs
 
         verify_publication_state(@course.context_modules, module_published: true, items_published: false)
+        wait_until_bulk_publish_action_finished
+        expect(modules_published_icon_state?(published: true)).to be true
+        expand_all_modules
+        expect(module_items_published_icon_state?(published: false)).to be true
       end
     end
 
@@ -672,6 +908,10 @@ describe "context modules", :ignore_js_errors do
         run_jobs
 
         verify_publication_state(@course.context_modules, module_published: false, items_published: false)
+        wait_until_bulk_publish_action_finished
+        expect(modules_published_icon_state?(published: false)).to be true
+        expand_all_modules
+        expect(module_items_published_icon_state?(published: false)).to be true
       end
     end
 
@@ -686,6 +926,10 @@ describe "context modules", :ignore_js_errors do
         run_jobs
 
         verify_publication_state(@course.context_modules, module_published: false, items_published: true)
+        wait_until_bulk_publish_action_finished
+        expect(modules_published_icon_state?(published: false)).to be true
+        expand_all_modules
+        expect(module_items_published_icon_state?(published: true)).to be true
       end
     end
   end

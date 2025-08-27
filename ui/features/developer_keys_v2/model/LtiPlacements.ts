@@ -34,6 +34,11 @@ export const LtiPlacements = {
    */
   AccountNavigation: 'account_navigation',
   /**
+   * Similar to account_navigation, but allows for better analytics
+   * of what tools use this type of placement.
+   */
+  AnalyticsHub: 'analytics_hub',
+  /**
    * Renders a frame on the assignment edit page, under
    * the native assignment options
    */
@@ -123,16 +128,18 @@ export const LtiPlacements = {
   WikiIndexMenu: 'wiki_index_menu',
   DefaultPlacements: 'default_placements',
   ActivityAssetProcessor: 'ActivityAssetProcessor',
+  ActivityAssetProcessorContribution: 'ActivityAssetProcessorContribution',
 } as const
 
 export const i18nLtiPlacement = (placement: LtiPlacement): string =>
-  // @ts-expect-error
   ({
     account_navigation: I18n.t('Account Navigation'),
+    analytics_hub: I18n.t('Analytics Hub'),
     assignment_edit: I18n.t('Assignment Edit'),
     assignment_selection: I18n.t('Assignment Selection'),
     assignment_view: I18n.t('Assignment View'),
     ActivityAssetProcessor: I18n.t('Assignment Document Processor'),
+    ActivityAssetProcessorContribution: I18n.t('Discussions Document Processor'),
     similarity_detection: I18n.t('Similarity Detection'),
     assignment_menu: I18n.t('Assignment Menu'),
     assignment_index_menu: I18n.t('Assignments Index Menu'),
@@ -163,6 +170,7 @@ export const i18nLtiPlacement = (placement: LtiPlacement): string =>
     submission_type_selection: I18n.t('Submission Type Selection'),
     student_context_card: I18n.t('Student Context Card'),
     tool_configuration: I18n.t('Tool Configuration'),
+    top_navigation: I18n.t('Top Navigation'),
     user_navigation: I18n.t('User Navigation'),
     wiki_page_menu: I18n.t('Page Menu'),
     wiki_index_menu: I18n.t('Pages Index Menu'),

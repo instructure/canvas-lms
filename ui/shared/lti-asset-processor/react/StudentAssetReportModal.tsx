@@ -56,41 +56,10 @@ export default function StudentAssetReportModal({
   reports,
   submissionType,
 }: Props) {
-  const sgReports: SpeedGraderLtiAssetReports = {}
-  const attachments: LtiAssetReportsProps['versionedAttachments'] = []
-  let attachmentName: string = ''
-  let attempt: string = ''
+  const {sgReports, attachments, mainTitle} = mapData(reports, submissionType)
   const assetProcessorsWithReports = assetProcessors.filter(assetProcessor =>
     reports.some(report => report.asset_processor_id === assetProcessor.id),
   )
-
-  if (submissionType === 'online_text_entry') {
-    attachmentName = I18n.t('Text submitted to Canvas')
-    attempt = reports?.[0]?.asset?.submission_attempt?.toString() ?? ''
-    sgReports['by_attempt'] = {
-      [attempt]: groupBy(reports, rep => rep.asset_processor_id),
-    }
-  } else if (submissionType === 'online_upload') {
-    const attachmentId = reports?.[0]?.asset.attachment_id
-    attachmentName = reports?.[0]?.asset.attachment_name ?? ''
-    if (!attachmentId) {
-      return null
-    }
-    attachments.push({
-      attachment: {
-        id: attachmentId,
-      },
-    })
-
-    sgReports['by_attachment'] = {
-      [attachmentId]: groupBy(reports, rep => rep.asset_processor_id),
-    }
-  } else {
-    console.warn(
-      `Unsupported submission type: ${submissionType}. Expected 'online_text_entry' or 'online_upload'.`,
-    )
-    return null
-  }
 
   return (
     <Modal
@@ -121,7 +90,7 @@ export default function StudentAssetReportModal({
                   horizontalOffset={0}
                   backgroundColor="primary-inverse"
                 >
-                  {attachmentName}
+                  {mainTitle}
                 </TruncateWithTooltip>
               </Text>
             </View>
@@ -132,7 +101,7 @@ export default function StudentAssetReportModal({
         </Flex>
         <LtiAssetReports
           assetProcessors={assetProcessorsWithReports}
-          attempt={attempt}
+          attempt={sgReports.by_attempt ? Object.keys(sgReports.by_attempt)[0] : ''}
           reports={sgReports}
           studentId={undefined}
           versionedAttachments={attachments}
@@ -141,4 +110,65 @@ export default function StudentAssetReportModal({
       </Modal.Body>
     </Modal>
   )
+}
+
+function mapData(
+  reports: LtiAssetReportWithAsset[],
+  submissionType: 'online_text_entry' | 'online_upload',
+): {
+  sgReports: SpeedGraderLtiAssetReports
+  attachments: LtiAssetReportsProps['versionedAttachments']
+  mainTitle: string
+} {
+  if (submissionType === 'online_text_entry') {
+    const attempt = reports?.[0]?.asset?.submission_attempt?.toString() ?? ''
+    return {
+      attachments: [],
+      mainTitle: I18n.t('Text submitted to Canvas'),
+      sgReports: {
+        by_attempt: {
+          [attempt]: groupBy(reports, rep => rep.asset_processor_id),
+        },
+      },
+    }
+  } else if (submissionType === 'online_upload') {
+    const attachmentNames: Record<string, string> = {}
+    const by_attachment: SpeedGraderLtiAssetReports['by_attachment'] = {}
+    for (const report of reports ?? []) {
+      const {
+        asset_processor_id,
+        asset: {attachment_id},
+      } = report
+      if (attachment_id) {
+        by_attachment[attachment_id] ??= {}
+        by_attachment[attachment_id][asset_processor_id] ??= []
+        by_attachment[attachment_id][asset_processor_id].push(report)
+        attachmentNames[attachment_id] = report.asset.attachment_name ?? ''
+      }
+    }
+    const attachmentIds = Object.keys(by_attachment)
+    if (attachmentIds.length === 1) {
+      return {
+        attachments: [{attachment: {id: attachmentIds[0]}}],
+        mainTitle: attachmentNames[attachmentIds[0]] ?? '',
+        sgReports: {
+          by_attachment,
+        },
+      }
+    } else {
+      return {
+        attachments: attachmentIds.map(id => ({
+          attachment: {id, display_name: attachmentNames[id]},
+        })),
+        mainTitle: '',
+        sgReports: {
+          by_attachment,
+        },
+      }
+    }
+  } else {
+    throw new Error(
+      `Unsupported submission type: ${submissionType}. Expected 'online_text_entry' or 'online_upload'.`,
+    )
+  }
 }

@@ -28,7 +28,6 @@ class Loaders::SubmissionLtiAssetReportsLoader < GraphQL::Batch::Loader
       .active
       .for_active_processors
       .for_submissions(submission_ids)
-      .preload(:asset)
       .group_by { |rep| rep.asset.submission_id }
 
     submission_ids.each do |sub_id|

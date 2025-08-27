@@ -26,6 +26,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import IndexingProgress from '../IndexingProgress'
 import {Alert} from '@instructure/ui-alerts'
+import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 
 const RELEVANCE_THRESHOLD = 50
 const MAX_NUMBER_OF_RESULTS = 25
@@ -50,7 +51,12 @@ export default function EnhancedSmartSearch(props: Props) {
     } else if (isLoading) {
       return (
         <Flex justifyItems="center" alignItems="center" margin="space12 0 0">
-          <Spinner renderTitle={I18n.t('Searching')} />
+          <>
+            <Alert screenReaderOnly isLiveRegionAtomic liveRegion={getLiveRegion}>
+              {I18n.t('Smart search is in progress')}
+            </Alert>
+            <Spinner renderTitle={I18n.t('Searching')} />
+          </>
         </Flex>
       )
     } else if (searchResults == null) {
@@ -74,6 +80,9 @@ export default function EnhancedSmartSearch(props: Props) {
       const similarResults = results.filter(result => result.relevance < RELEVANCE_THRESHOLD)
       return (
         <>
+          <Alert screenReaderOnly isLiveRegionAtomic liveRegion={getLiveRegion}>
+            {I18n.t('Smart search results loaded.')}
+          </Alert>
           <BestResults
             searchTerm={previousSearch.current}
             results={bestResults}

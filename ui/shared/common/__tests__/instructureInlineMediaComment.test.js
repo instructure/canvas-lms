@@ -82,4 +82,94 @@ describe('inlineMediaComment', () => {
     $link.click()
     equal('300px', $link.closest('td').css('width'))
   })
+
+  describe('getMediaAttachmentId', () => {
+    let $link
+
+    beforeEach(() => {
+      $link = $('<a></a>')
+    })
+
+    test('returns attachment ID from data-api-endpoint when available', () => {
+      $link.data('api-endpoint', '/api/v1/files/12345')
+
+      const result = inlineMediaComment.getMediaAttachmentId($link)
+
+      equal(result, '12345')
+    })
+
+    test('returns attachment ID from data-api-endpoint with different path structure', () => {
+      $link.data('api-endpoint', '/courses/123/files/67890')
+
+      const result = inlineMediaComment.getMediaAttachmentId($link)
+
+      equal(result, '67890')
+    })
+
+    test('falls back to href parsing when data-api-endpoint is not available', () => {
+      $link.attr('href', '/courses/123/files/54321/preview')
+
+      const result = inlineMediaComment.getMediaAttachmentId($link)
+
+      equal(result, '54321')
+    })
+
+    test('falls back to href parsing when data-api-endpoint returns NaN', () => {
+      $link.data('api-endpoint', '/api/v1/files/invalid/download')
+      $link.attr('href', '/courses/123/files/99888/preview')
+
+      const result = inlineMediaComment.getMediaAttachmentId($link)
+
+      equal(result, '99888')
+    })
+
+    test('falls back to href parsing when data-api-endpoint is empty', () => {
+      $link.data('api-endpoint', '')
+      $link.attr('href', '/files/77766')
+
+      const result = inlineMediaComment.getMediaAttachmentId($link)
+
+      equal(result, '77766')
+    })
+
+    test('returns undefined when no attachment ID can be found', () => {
+      $link.attr('href', '/some/other/path')
+
+      const result = inlineMediaComment.getMediaAttachmentId($link)
+
+      expect(result).toBeUndefined()
+    })
+
+    test('returns undefined when href does not match files pattern', () => {
+      $link.attr('href', '/courses/123/assignments/456')
+
+      const result = inlineMediaComment.getMediaAttachmentId($link)
+
+      expect(result).toBeUndefined()
+    })
+
+    test('handles href with query parameters', () => {
+      $link.attr('href', '/courses/123/files/11223?wrap=1&download=1')
+
+      const result = inlineMediaComment.getMediaAttachmentId($link)
+
+      equal(result, '11223')
+    })
+
+    test('handles href with hash fragments', () => {
+      $link.attr('href', '/files/44556#preview')
+
+      const result = inlineMediaComment.getMediaAttachmentId($link)
+
+      equal(result, '44556')
+    })
+
+    test('returns first match when multiple file IDs in href', () => {
+      $link.attr('href', '/courses/123/files/11111/compare/files/22222')
+
+      const result = inlineMediaComment.getMediaAttachmentId($link)
+
+      equal(result, '11111')
+    })
+  })
 })

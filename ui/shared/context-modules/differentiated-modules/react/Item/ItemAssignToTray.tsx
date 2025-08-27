@@ -333,25 +333,27 @@ export default function ItemAssignToTray({
   })
 
   const focusErrors = useCallback(() => {
-    if (mustConvertTags()) {
-      const button = document.getElementById(CONVERT_DIFF_TAGS_BUTTON)
-      button?.setAttribute('aria-describedby', CONVERT_DIFF_TAGS_MESSAGE)
-      button?.focus()
-      return true
-    }
+    let isError = false
 
     const hasErrors = assignToCards.some(card => !card.isValid)
     // If a card has errors it should not save and the respective card should be focused
     if (hasErrors) {
       const firstCardWithError = assignToCards.find(card => !card.isValid)
-      if (!firstCardWithError) return false
-      const firstCardWithErrorRef = cardsRefs.current[firstCardWithError.key]
+      if (firstCardWithError) {
+        const firstCardWithErrorRef = cardsRefs.current[firstCardWithError.key]
 
-      Object.values(cardsRefs.current).forEach(c => c.current?.showValidations())
-      firstCardWithErrorRef?.current?.focusInputs()
-      return true
+        Object.values(cardsRefs.current).forEach(c => c.current?.showValidations())
+        if (!mustConvertTags()) firstCardWithErrorRef?.current?.focusInputs()
+        isError = true
+      }
     }
-    return false
+    if (mustConvertTags()) {
+      const button = document.getElementById(CONVERT_DIFF_TAGS_BUTTON)
+      button?.setAttribute('aria-describedby', CONVERT_DIFF_TAGS_MESSAGE)
+      button?.focus()
+      isError = true
+    }
+    return isError
   }, [assignToCards])
 
   const handleUpdate = useCallback(() => {

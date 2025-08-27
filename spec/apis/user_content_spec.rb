@@ -77,7 +77,7 @@ describe UserContent, type: :request do
         it "translates file download links to directly-downloadable urls for deleted and replaced files" do
           expect(@context.attachments.find(@attachment.id).id).to eq @attachment2.id
 
-          @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/download\" alt=\"important\">")
+          @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/download\" alt=\"important\">", saving_user: @teacher)
           subject
           expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment2.id}/download#{"?verifier=#{@attachment2.uuid}" unless disable_adding_uuid_verifier_in_api}"
         end
@@ -91,13 +91,13 @@ describe UserContent, type: :request do
 
       double_testing_with_disable_adding_uuid_verifier_in_api_ff do
         it "translates course file download links to directly-downloadable urls" do
-          @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/download\" alt=\"important\">")
+          @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/download\" alt=\"important\">", saving_user: @teacher)
           subject
           expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download#{"?verifier=#{@attachment.uuid}" unless disable_adding_uuid_verifier_in_api}"
         end
 
         it "translates file preview links to directly-downloadable preview urls" do
-          @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/preview\" alt=\"important\">")
+          @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/preview\" alt=\"important\">", saving_user: @teacher)
           subject
           expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/preview#{"?verifier=#{@attachment.uuid}" unless disable_adding_uuid_verifier_in_api}"
         end
@@ -111,13 +111,13 @@ describe UserContent, type: :request do
 
       double_testing_with_disable_adding_uuid_verifier_in_api_ff do
         it "does not corrupt absolute links" do
-          @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download\" alt=\"important\">")
+          @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download\" alt=\"important\">", saving_user: @teacher)
           subject
           expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download#{"?verifier=#{@attachment.uuid}" unless disable_adding_uuid_verifier_in_api}"
         end
 
         it "does not remove wrap parameter on file download links" do
-          @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1\" alt=\"important\">")
+          @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1\" alt=\"important\">", saving_user: @teacher)
           subject
           expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?#{"verifier=#{@attachment.uuid}&" unless disable_adding_uuid_verifier_in_api}wrap=1"
         end
@@ -155,7 +155,7 @@ describe UserContent, type: :request do
     end
 
     it "does not translate links from content not viewable by user" do
-      @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/preview\" alt=\"important\">")
+      @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/preview\" alt=\"important\">", saving_user: @teacher)
       student_in_course(course: @course, active_all: true)
       @attachment.locked = true
       @attachment.save
@@ -227,6 +227,7 @@ describe UserContent, type: :request do
           </p>
         HTML
         @wiki_page.workflow_state = "active"
+        @wiki_page.saving_user = @teacher
         @wiki_page.save!
 
         json = api_call(:get,
@@ -280,6 +281,7 @@ describe UserContent, type: :request do
           </p>
         HTML
         @wiki_page.workflow_state = "active"
+        @wiki_page.saving_user = @group.users.first
         @wiki_page.save!
 
         json = api_call(:get,
@@ -308,7 +310,7 @@ describe UserContent, type: :request do
 
     context "user context" do
       it "processes links to each type of object" do
-        @topic = @course.discussion_topics.create!(message: <<~HTML)
+        @topic = @course.discussion_topics.create!(message: <<~HTML, user: @teacher)
           <a href='/users/#{@teacher.id}/files'>file index</a>
           <a href='/users/#{@teacher.id}/files/789/preview'>file</a>
         HTML

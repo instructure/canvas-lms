@@ -20,8 +20,6 @@
 
 module Types
   class EligibilityIssueType < ApplicationObjectType
-    implements Interfaces::LegacyIDInterface
-
     field :level, String, null: false
     field :message, String, null: false
   end

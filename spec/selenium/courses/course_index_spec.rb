@@ -139,6 +139,131 @@ describe "course index" do
     end
   end
 
+  context "accessibility column" do
+    before do
+      Account.site_admin.enable_feature!(:accessibility_tab_enable)
+    end
+
+    it "is visible when at least one classic course exists" do
+      get "/courses"
+
+      expect(current_enrollments).to contain_css(accessibility_column_selector)
+      expect(past_enrollments).to contain_css(accessibility_column_selector)
+      expect(future_enrollments).to contain_css(accessibility_column_selector)
+    end
+
+    it "displays no issues when the course has no accessibility issues" do
+      [@current_courses, @past_courses, @future_courses].flatten.each do |course|
+        wiki_page = wiki_page_model(course:, body: "<ul><li>foo</li></ul>")
+        accessibility_resource_scan = AccessibilityResourceScan.for_context(wiki_page).first_or_initialize
+        accessibility_resource_scan.assign_attributes(
+          course:,
+          workflow_state: "completed",
+          resource_name: wiki_page.title,
+          resource_workflow_state: "published",
+          resource_updated_at: wiki_page.updated_at,
+          issue_count: 0,
+          error_message: nil
+        )
+        accessibility_resource_scan.save!
+      end
+
+      get "/courses"
+
+      rows = table_rows(current_enrollments_selector)
+      # remove header row
+      rows.shift
+      rows.each do |row|
+        expect(row).to contain_css(".icon-publish")
+        expect(row.find(".message").text).to eq "No issues"
+      end
+    end
+
+    it "displays status pills when the course has accessibility issues" do
+      [@current_courses, @past_courses, @future_courses].flatten.each do |course|
+        wiki_page = wiki_page_model(course:, body: "<ul><li>foo</li></ul>")
+        accessibility_resource_scan = AccessibilityResourceScan.for_context(wiki_page).first_or_initialize
+        accessibility_resource_scan.assign_attributes(
+          course:,
+          workflow_state: "completed",
+          resource_name: wiki_page.title,
+          resource_workflow_state: "published",
+          resource_updated_at: wiki_page.updated_at,
+          issue_count: 1,
+          error_message: nil
+        )
+        accessibility_resource_scan.save!
+        accessibility_issue_model(course:, accessibility_resource_scan:, wiki_page:)
+      end
+
+      get "/courses"
+
+      rows = table_rows(current_enrollments_selector)
+      # remove header row
+      rows.shift
+      rows.each do |row|
+        expect(row).to contain_css(".status-pill")
+        expect(row.find(".status-pill").text).to eq "1 issue"
+      end
+    end
+
+    it "displays checking spinner when the course is being scanned" do
+      [@current_courses, @past_courses, @future_courses].flatten.each do |course|
+        wiki_page = wiki_page_model(course:, body: "<ul><li>foo</li></ul>")
+        accessibility_resource_scan = AccessibilityResourceScan.for_context(wiki_page).first_or_initialize
+        accessibility_resource_scan.assign_attributes(
+          course:,
+          workflow_state: "in_progress",
+          resource_name: wiki_page.title,
+          resource_workflow_state: "published",
+          resource_updated_at: wiki_page.updated_at,
+          issue_count: 1,
+          error_message: nil
+        )
+        accessibility_resource_scan.save!
+      end
+
+      get "/courses"
+
+      rows = table_rows(current_enrollments_selector)
+      # remove header row
+      rows.shift
+      rows.each do |row|
+        expect(row).to contain_css(".course-list-checking-spinner")
+        expect(row.find(".message").text).to eq "Checking..."
+      end
+    end
+
+    it "displays a question icon when the course exceeds the accessibility scan limit" do
+      stub_const("Course::MAX_ACCESSIBILITY_SCAN_RESOURCES", 0)
+      [@current_courses, @past_courses, @future_courses].flatten.each do |course|
+        wiki_page = wiki_page_model(course:, body: "<ul><li>foo</li></ul>")
+        accessibility_resource_scan = AccessibilityResourceScan.for_context(wiki_page).first_or_initialize
+        accessibility_resource_scan.assign_attributes(
+          course:,
+          workflow_state: "completed",
+          resource_name: wiki_page.title,
+          resource_workflow_state: "published",
+          resource_updated_at: wiki_page.updated_at,
+          issue_count: 1,
+          error_message: nil
+        )
+        accessibility_resource_scan.save!
+        accessibility_issue_model(course:, accessibility_resource_scan:, wiki_page:)
+      end
+
+      get "/courses"
+
+      rows = table_rows(current_enrollments_selector)
+      # remove header row
+      rows.shift
+      rows.each do |row|
+        expect(row).to contain_css(".icon-question")
+        expect(row.find(".message").text).to eq "Unknown"
+      end
+    end
+  end
+
   context "start new course button" do
     it "launches k5 dialog for k5 users" do
       course_with_teacher_logged_in(account: @k5_account)

@@ -103,3 +103,22 @@ especially useful when running specs many times to check for flakiness.
 
 See the [Selenium section](https://github.com/instructure/canvas-lms/blob/master/doc/docker/developing_with_docker.md#selenium)
 of the `doc/docker/developing_with_docker.md` instructions.
+
+## Selenium Testing Best Practices
+
+### Using Helper Methods for Waiting
+
+For clarity and reliability, prefer using built-in helper methods instead of relying on numerous `expect` statements to handle asynchronous operations. Canvas provides many useful helper methods in `spec/selenium/test_setup/common_helper_methods/` including:
+
+- `custom_wait_methods.rb` - Contains `wait_for`, `wait_for_new_page_load`, and other waiting utilities
+- `custom_page_loaders.rb` - Page loading and navigation helpers
+- `custom_selenium_actions.rb` - Common Selenium actions
+- `custom_validators.rb` - Validation helpers for Selenium tests
+
+Using these helpers makes tests more readable and reliable than chains of expect statements.
+
+### Selenium-Specific Guidelines
+
+- **Use `expect` syntax:** Use the `expect(value).to matcher` syntax consistently
+- **Organize with contexts:** Use `context` blocks to describe different test scenarios
+- **Use `let` for test data:** Use `let` to define reusable test data and objects

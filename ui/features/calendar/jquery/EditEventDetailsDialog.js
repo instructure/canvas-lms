@@ -165,6 +165,14 @@ export default class EditEventDetailsDialog {
     }
   }
 
+  isUserStudent = () => {
+    return ENV.current_user_roles && ENV.current_user_roles.includes('student')
+  }
+
+  canCreateEvent = () => {
+    return !(ENV?.FEATURES?.restrict_student_access && this.isUserStudent())
+  }
+
   canManageAppointments = () => {
     if (
       ENV.CALENDAR.SHOW_SCHEDULER &&
@@ -177,6 +185,10 @@ export default class EditEventDetailsDialog {
   }
 
   show = async () => {
+    if (!this.canCreateEvent()) {
+      return
+    }
+
     if (this.event.isAppointmentGroupEvent()) {
       return new EditApptCalendarEventDialog(this.event).show()
     } else {

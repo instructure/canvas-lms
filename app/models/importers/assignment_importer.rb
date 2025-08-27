@@ -114,6 +114,7 @@ module Importers
       item ||= context.assignments.temp_record # new(:context => context)
 
       item.updating_user = migration.user
+      item.saving_user = migration.user
       item.saved_by = :migration
       item.mark_as_importing!(migration)
       master_migration = migration&.for_master_course_import? # propagate null dates only for blueprint syncs
@@ -452,6 +453,7 @@ module Importers
 
       if tool_hash
         active_proxies = Lti::ToolProxy.find_active_proxies_for_context_by_vendor_code_and_product_code(context:, vendor_code: tool_hash["vendor_code"], product_code: tool_hash["product_code"])
+        return migration.add_warning(I18n.t("The export had an improperly attached similarity detection tool, so the import won't include it")) if active_proxies.blank? && tool_hash["vendor_code"].blank? && tool_hash["product_code"].blank? && Account.site_admin.feature_enabled?(:exclude_deleted_lti2_tools_on_assignment_export)
         return migration.add_warning(I18n.t("We were unable to find a tool profile match for vendor_code: \"%{vendor_code}\" product_code: \"%{product_code}\".", vendor_code: tool_hash["vendor_code"], product_code: tool_hash["product_code"])) if active_proxies.blank?
       else
         item.assignment_configuration_tool_lookups.destroy_all if migration.for_master_course_import?

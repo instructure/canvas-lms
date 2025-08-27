@@ -6333,6 +6333,7 @@ uk:
   debugging_f98fcd74: Відлагодження
   decaying_average_8bf6a0dd: "Середнє розпаду"
   decorative_image_3c28aa7d: "Декоративне зображення"
+  decorative_image_fde98579: "Декоративне зображення"
   decrease_indent_d9cf469d: "Зменшити відступ"
   decrease_indent_de6343ab: "Зменшити відступ"
   deduct_104e8866: Віднімати
@@ -13339,6 +13340,7 @@ uk:
   points_possible_pts_aedb481e: "%{points_possible}бал"
   points_pts_e5596bf7: "%{points} балів"
   points_total_pts_5b4cbd77: "%{points} / %{total} балів"
+  pointspossible_points_possible_964c8592: "%{pointsPossible} можливих балів"
   pointspossible_pts_624a6733: "%{pointsPossible} балів"
   poland_48_e77cc14d: "Польща (+48)"
   polling: 
@@ -18076,6 +18078,7 @@ uk:
   to_restrict_to_users_of_your_azure_active_director_df7cdd41: "Щоб обмежити користувачів Azure Active Directory, введіть тут свого орендаря."
   to_view_all_notifications_sent_to_a_canvas_user_se_6172daa: "Щоб переглянути всі повідомлення, надіслані користувачу Canvas, виберіть користувача та діапазон дат для свого пошуку."
   today_76e10f9c: Сьогодні
+  today_b7202098: сьогодні
   toggle_course_card_color_overlays_b5b8137a: "Переключити кольорові картки курсу"
   toggle_editing_answer_text_as_html_9a93fe6: "Переключити редагування тексту відповіді на HTML"
   toggle_select_course_name_310fdee4: "Обрати курс %{name}"

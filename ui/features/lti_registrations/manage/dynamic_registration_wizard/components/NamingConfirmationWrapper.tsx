@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {NamingConfirmation} from '../../registration_wizard_forms/NamingConfirmation'
 import type {DynamicRegistrationOverlayStore} from '../DynamicRegistrationOverlayState'
 import type {LtiRegistrationWithConfiguration} from '../../model/LtiRegistration'

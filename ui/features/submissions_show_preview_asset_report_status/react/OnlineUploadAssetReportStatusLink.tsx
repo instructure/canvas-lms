@@ -19,7 +19,6 @@
 import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
 import {LtiAssetReportWithAsset} from '@canvas/lti-asset-processor/model/AssetReport'
 import {filterReports} from '@canvas/lti-asset-processor/react/AssetProcessorHelper'
-import {ViewOwnProps} from '@instructure/ui-view'
 import {useMemo} from 'react'
 import AssetReportStatus from '@canvas/lti-asset-processor/react/AssetReportStatus'
 
@@ -50,16 +49,18 @@ export default function OnlineUploadAssetReportStatusLink({
     [assetReports, attachmentId],
   )
 
-  function openModal(event: React.MouseEvent<ViewOwnProps, MouseEvent>) {
-    event.preventDefault()
-    window.parent.postMessage({
-      type: ASSET_REPORT_MODAL_EVENT,
-      assetReports: reports,
-      assetProcessors,
-      assignmentName,
-      submissionType: 'online_upload',
-    })
-  }
-
-  return <AssetReportStatus reports={reports} openModal={openModal} />
+  return (
+    <AssetReportStatus
+      reports={reports}
+      openModal={() =>
+        window.parent.postMessage({
+          type: ASSET_REPORT_MODAL_EVENT,
+          assetReports: reports,
+          assetProcessors,
+          assignmentName,
+          submissionType: 'online_upload',
+        })
+      }
+    />
+  )
 }

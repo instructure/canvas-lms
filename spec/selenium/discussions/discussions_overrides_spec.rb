@@ -138,7 +138,7 @@ describe "discussions overrides" do
       @assignment.update!(only_visible_to_overrides: true)
     end
 
-    it "shows convert override message when diff tags setting disabled" do
+    it "shows convert override message when diff tags setting disabled", :ignore_js_errors do
       @course.account.tap do |a|
         a.settings[:allow_assign_to_differentiation_tags] = { value: false }
         a.save!
@@ -146,6 +146,8 @@ describe "discussions overrides" do
       get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}/edit"
       wait_for_ajaximations
       expect(element_exists?(convert_override_alert_selector)).to be_truthy
+      f("[data-testid='save-button']").click
+      expect(f("body").text).to include "Invalid group selected"
     end
 
     it "clicking convert overrides button converts the override and refreshes the cards" do

@@ -16,45 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useRef} from 'react'
-import CanvasRce from '@canvas/rce/react/CanvasRce'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import {uid} from '@instructure/uid'
-import {TextInput} from '@instructure/ui-text-input'
-import {type TextBlockProps} from './TextBlock'
+import {TextBlockEditProps} from './types'
+import {Flex} from '@instructure/ui-flex'
+import {TitleEdit} from '../BlockItems/Title/TitleEdit'
+import {TextEdit} from '../BlockItems/Text/TextEdit'
 
-const I18n = createI18nScope('page_editor')
-
-export const TextBlockEdit = (
-  props: TextBlockProps & {
-    onTitleChange: (newTitle: string) => void
-    onContentChange: (newContent: string) => void
-  },
-) => {
-  const rceRef = useRef(null)
-
+export const TextBlockEdit = (props: TextBlockEditProps) => {
   return (
-    <>
+    <Flex direction="column" gap="mediumSmall">
       {props.settings.includeBlockTitle && (
-        <TextInput
-          renderLabel={I18n.t('Block title')}
-          placeholder={I18n.t('Start typing...')}
-          value={props.title}
-          onChange={e => props.onTitleChange(e.target.value)}
-        />
+        <TitleEdit title={props.title} onTitleChange={props.onTitleChange} />
       )}
-      <CanvasRce
-        ref={rceRef}
-        autosave={false}
-        textareaId={uid('rceblock')}
-        variant="text-block"
-        defaultContent={props.content}
-        onContentChange={props.onContentChange}
-        editorOptions={{
-          focus: false,
-        }}
-        height={300}
-      />
-    </>
+      <TextEdit content={props.content} onContentChange={props.onContentChange} height={300} />
+    </Flex>
   )
 }

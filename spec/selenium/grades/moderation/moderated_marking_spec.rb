@@ -223,6 +223,29 @@ shared_examples "Moderated Marking" do |ff_enabled|
       expect(student_names).to match_array [@student1.name, @student2.name]
     end
 
+    it "displays students in alphabetical order" do
+      alice = student_in_course(course: @moderated_course, name: "Alice Anderson", active_all: true).user
+      bob = student_in_course(course: @moderated_course, name: "Bob Brown", active_all: true).user
+      charlie = student_in_course(course: @moderated_course, name: "Charlie Clark", active_all: true).user
+
+      @moderated_assignment.submit_homework(alice, body: "Alice's submission")
+      @moderated_assignment.submit_homework(bob, body: "Bob's submission")
+      @moderated_assignment.submit_homework(charlie, body: "Charlie's submission")
+
+      @moderated_assignment.grade_student(alice, grade: 10, grader: @teacher2, provisional: true)
+      @moderated_assignment.grade_student(bob, grade: 10, grader: @teacher2, provisional: true)
+      @moderated_assignment.grade_student(charlie, grade: 10, grader: @teacher2, provisional: true)
+
+      refresh_page
+      wait_for_ajaximations
+
+      student_names = ModeratePage.student_table_row_headers.map(&:text)
+
+      expected_start = ["Alice Anderson", "Bob Brown", "Charlie Clark"]
+      actual_start = student_names.first(3)
+      expect(actual_start).to eq expected_start
+    end
+
     it "anonymizes students if anonymous grading is enabled", priority: "1" do
       # enable anonymous grading
       @moderated_assignment.update(anonymous_grading: true)

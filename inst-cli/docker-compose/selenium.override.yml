@@ -6,7 +6,7 @@ services:
 ##  reasons. Listing all of them as selenium-hub saves a great deal of configuration issues
 ## Chrome
   selenium-hub:
-    image: selenium/standalone-chromium:126.0-20240621
+    image: selenium/standalone-chromium:137.0.7151.68
     shm_size: 2gb
     depends_on:
       - web

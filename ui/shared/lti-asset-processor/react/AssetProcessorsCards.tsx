@@ -38,7 +38,7 @@ type AttachedAssetProcessorsMenuProps = {
   modifyInNewWindow: boolean
   nameForScreenReader: string
   onModify?: () => void
-  onDelete: () => void
+  onRemove: () => void
 }
 
 type AssetProcessorsCardCommonProps = {
@@ -60,7 +60,7 @@ type AssetProcessorsCardProps = AssetProcessorsCardCommonProps & {
 
 type AssetProcessorsAttachedProcessorCardProps = AssetProcessorsCardCommonProps & {
   assetProcessorId?: number
-  onDelete: () => void
+  onRemove: () => void
   iframeSettings?: IframeDimensions
   windowSettings?: AssetProcessorWindowSettings
 }
@@ -69,7 +69,7 @@ const AttachedAssetProcessorsMenu = ({
   modifyInNewWindow,
   nameForScreenReader,
   onModify,
-  onDelete,
+  onRemove,
 }: AttachedAssetProcessorsMenuProps) => {
   return (
     <Menu
@@ -86,8 +86,8 @@ const AttachedAssetProcessorsMenu = ({
         />
       }
       onSelect={(_e, value) => {
-        if (value === 'delete') {
-          onDelete()
+        if (value === 'remove') {
+          onRemove()
         } else if (value === 'modify') {
           onModify?.()
         }
@@ -107,8 +107,8 @@ const AttachedAssetProcessorsMenu = ({
           </View>
         </Menu.Item>
       )}
-      <Menu.Item data-pendo="asset-processor-delete-button" value="delete">
-        <View padding="0 x-large 0 small">{I18n.t('Delete')}</View>
+      <Menu.Item data-pendo="asset-processor-remove-button" value="remove">
+        <View padding="0 x-large 0 small">{I18n.t('Remove')}</View>
       </Menu.Item>
     </Menu>
   )
@@ -117,7 +117,7 @@ const AttachedAssetProcessorsMenu = ({
 export const AssetProcessorsAttachedProcessorCard = ({
   assetProcessorId,
   iframeSettings,
-  onDelete,
+  onRemove,
   windowSettings,
   ...commonProps
 }: AssetProcessorsAttachedProcessorCardProps) => {
@@ -153,7 +153,7 @@ export const AssetProcessorsAttachedProcessorCard = ({
     <>
       <ExternalToolModalLauncher
         isOpen={settingsLaunchModalVisible}
-        title={I18n.t('Modify settings for %{documentProcessingAppName}', {
+        title={I18n.t('Modify Settings for %{documentProcessingAppName}', {
           documentProcessingAppName: title,
         })}
         onRequestClose={() => setSettingsLaunchModalVisible(false)}
@@ -169,7 +169,7 @@ export const AssetProcessorsAttachedProcessorCard = ({
               nameForScreenReader={title}
               onModify={isNil(assetProcessorId) ? undefined : onModify}
               modifyInNewWindow={modifyInNewWindow}
-              onDelete={onDelete}
+              onRemove={onRemove}
             />
           </div>
         }
@@ -233,7 +233,7 @@ export const AssetProcessorsCard = ({
             </TruncateWithTooltip>
           </div>
           {description ? (
-            <div style={{marginTop: '0.75em', marginRight: '1.4em'}}>
+            <div style={{marginRight: '1.4em'}}>
               <TruncateWithTooltip
                 linesAllowed={4}
                 horizontalOffset={0}

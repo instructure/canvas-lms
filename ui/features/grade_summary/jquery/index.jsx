@@ -815,9 +815,14 @@ function addAssetProcessorToLegacyTable() {
     return
   }
 
-  const hasAssetReports = submission =>
-    submission.asset_reports !== null && submission.asset_reports !== undefined
-  const shouldShow = ENV.submissions?.some(hasAssetReports)
+  const hasAssetReports = submission => Array.isArray(submission.asset_reports)
+  const submissionsWithReportsByAssignmentId = ENV.submissions
+    .filter(hasAssetReports)
+    .reduce((map, submission) => {
+      map[submission.assignment_id] = submission
+      return map
+    }, {})
+  const shouldShow = Object.keys(submissionsWithReportsByAssignmentId).length > 0
 
   if (!shouldShow) {
     return
@@ -829,18 +834,14 @@ function addAssetProcessorToLegacyTable() {
   const assetProcessorCells = document.querySelectorAll('.asset_processors_cell')
   assetProcessorCells.forEach(cell => {
     const assignmentId = cell.dataset.assignmentId
-    const submissionId = cell.dataset.submissionId
+    const assignmentName = cell.dataset.assignmentName
 
-    if (assignmentId && submissionId) {
-      const submission = ENV.submissions.find(
-        submission => assignmentId === submission.assignment_id,
-      )
+    if (assignmentId) {
+      const submission = submissionsWithReportsByAssignmentId[assignmentId]
       if (!submission) {
         return
       }
-      if (hasAssetReports(submission) === false) {
-        return
-      }
+
       if (!assetProcessorCellRoots.has(cell)) {
         assetProcessorCellRoots.set(cell, ReactDOM.createRoot(cell))
       }
@@ -849,6 +850,8 @@ function addAssetProcessorToLegacyTable() {
         <AssetProcessorCell
           assetProcessors={submission.asset_processors}
           assetReports={submission.asset_reports}
+          submissionType={submission.submission_type}
+          assignmentName={assignmentName}
         />,
       )
     }

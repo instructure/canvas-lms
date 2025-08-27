@@ -36,12 +36,14 @@ import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import preventDefault from '@canvas/util/preventDefault'
 import CreateOrUpdateUserModal from './CreateOrUpdateUserModal'
+import {Flex} from '@instructure/ui-flex'
 
 const I18n = createI18nScope('account_course_user_search')
 
 export default function UsersToolbar(props) {
   const [recipientsFilterChecked, setRecipientFilterChecked] = useState(false)
   const [providersFilterChecked, setProvidersFilterChecked] = useState(false)
+  const [modalOpen, setModalOpen] = useState(false)
 
   function handleRoleSelect(_event, value) {
     props.onUpdateFilters({role_filter_id: value})
@@ -83,7 +85,12 @@ export default function UsersToolbar(props) {
   const placeholder = I18n.t('Search people...')
 
   return (
-    <form onSubmit={preventDefault(props.onApplyFilters)}>
+    <form
+      onSubmit={event => {
+        event.preventDefault()
+        props.onApplyFilters()
+      }}
+    >
       <Grid vAlign="top" startAt="medium">
         <Grid.Row>
           <Grid.Col>
@@ -135,20 +142,28 @@ export default function UsersToolbar(props) {
                     }
                   />
                 </Grid.Col>
-                <Grid.Col>
-                  {window.ENV.PERMISSIONS.can_create_users && (
-                    <CreateOrUpdateUserModal
-                      createOrUpdate="create"
-                      url={`/accounts/${props.accountId}/users`}
-                      afterSave={props.onApplyFilters} // update displayed results in case new user should appear
-                    >
-                      <Button aria-label={I18n.t('Add people')}>
-                        <IconPlusLine />
-                        {I18n.t('People')}
-                      </Button>
-                    </CreateOrUpdateUserModal>
-                  )}{' '}
-                  {renderKabobMenu(props.accountId)}
+                <Grid.Col width="auto">
+                  <Flex gap="buttons" direction="row">
+                    {window.ENV.PERMISSIONS.can_create_users && (
+                      <>
+                        <Button
+                          aria-label={I18n.t('Add people')}
+                          onClick={() => setModalOpen(true)}
+                        >
+                          <IconPlusLine />
+                          {I18n.t('People')}
+                        </Button>
+                        <CreateOrUpdateUserModal
+                          createOrUpdate="create"
+                          url={`/accounts/${props.accountId}/users`}
+                          afterSave={props.onApplyFilters} // update displayed results in case new user should appear
+                          open={modalOpen}
+                          onClose={() => setModalOpen(false)}
+                        />
+                      </>
+                    )}
+                    {renderKabobMenu(props.accountId)}
+                  </Flex>
                 </Grid.Col>
               </Grid.Row>
               {window.ENV.PERMISSIONS.can_view_temporary_enrollments && (

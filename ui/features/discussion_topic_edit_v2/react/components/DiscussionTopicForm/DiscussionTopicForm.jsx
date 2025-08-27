@@ -87,7 +87,7 @@ import {SendEditNotificationModal} from '../SendEditNotificationModal'
 import {Views, DiscussionTopicFormViewSelector} from './DiscussionTopicFormViewSelector'
 import {MasteryPathsReactWrapper} from '@canvas/conditional-release-editor/react/MasteryPathsReactWrapper'
 import {showPostToSisFlashAlert} from '@canvas/due-dates/util/differentiatedModulesUtil'
-import {existingAttachedAssetProcessorFromGraphql} from '../../util/assetProcessorGraphqlTypes'
+import {existingAttachedAssetProcessorFromGraphql} from '@canvas/lti/model/AssetProcessor'
 import {useAssetProcessorsState} from '@canvas/lti-asset-processor/react/hooks/AssetProcessorsState'
 
 const I18n = createI18nScope('discussion_create')

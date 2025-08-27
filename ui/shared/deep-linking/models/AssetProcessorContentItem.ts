@@ -27,7 +27,7 @@ export type AssetProcessorContentItemReport = {
 }
 
 export type AssetProcessorContentItem = {
-  type: 'ltiAssetProcessor'
+  type: 'ltiAssetProcessor' | 'ltiAssetProcessorContribution'
   // Not sure where this comes from. Cargo cult from ResourceLinkContentItem, needed by usages of ContentItem.
   // presumably Canvas is adding it somewhere
   errors?: Record<string, string>

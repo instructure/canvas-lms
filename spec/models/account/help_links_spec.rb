@@ -113,4 +113,14 @@ describe Account::HelpLinks do
       expect(described_class.validate_links(links)).to include(/cannot be featured and new/)
     end
   end
+
+  describe "#default_links" do
+    it "includes ada chatbot link when feature flag is enabled" do
+      account.root_account.enable_feature!(:ada_chatbot)
+      default_links = subject.default_links(false)
+      ada_link = default_links.find { |link| link[:id] == :ada_chatbot }
+      expect(ada_link).to be_present
+      expect(ada_link[:url]).to eq("#ada_chatbot")
+    end
+  end
 end

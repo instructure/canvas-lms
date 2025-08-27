@@ -18,7 +18,7 @@
 
 import './base-block-layout.css'
 import {Flex} from '@instructure/ui-flex'
-import {Text} from '@instructure/ui-text'
+import {Tag} from '@instructure/ui-tag'
 import React, {PropsWithChildren, ReactNode} from 'react'
 
 export const BaseBlockLayout = React.forwardRef<
@@ -35,9 +35,7 @@ export const BaseBlockLayout = React.forwardRef<
       <Flex direction="column" padding="paddingCardLarge" gap="mediumSmall">
         <Flex justifyItems="space-between">
           <Flex data-header>
-            <Text data-title variant="descriptionSection">
-              {props.title}
-            </Text>
+            <Tag text={props.title} size="medium" />
           </Flex>
           <Flex>{props.menu}</Flex>
         </Flex>

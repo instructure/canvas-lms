@@ -688,18 +688,18 @@ RSpec.describe Lti::Registration do
       it "creates a context control" do
         expect { subject }.to change { Lti::ContextControl.count }.by(1)
         expect(subject.context_controls).to include(Lti::ContextControl.last)
-        expect(subject.context_controls.first.deployment).to eq(subject)
+        expect(subject.primary_context_control.deployment).to eq(subject)
       end
 
       it "sets context control to available" do
-        expect(subject.context_controls.first.available).to be true
+        expect(subject.primary_context_control.available).to be true
       end
 
       context "with available: false" do
         subject { registration.new_external_tool(account, available: false) }
 
         it "sets context control to unavailable" do
-          expect(subject.context_controls.first.available).to be false
+          expect(subject.primary_context_control.available).to be false
         end
 
         context "with an existing tool" do
@@ -718,7 +718,7 @@ RSpec.describe Lti::Registration do
 
           it "does not change availability" do
             subject
-            expect(existing_tool.context_controls.first.available).to be false
+            expect(existing_tool.primary_context_control.available).to be false
           end
         end
       end
@@ -739,18 +739,18 @@ RSpec.describe Lti::Registration do
       it "creates a context control" do
         expect { subject }.to change { Lti::ContextControl.count }.by(1)
         expect(subject.context_controls).to include(Lti::ContextControl.last)
-        expect(subject.context_controls.first.deployment).to eq(subject)
+        expect(subject.primary_context_control.deployment).to eq(subject)
       end
 
       it "sets context control to available" do
-        expect(subject.context_controls.first.available).to be true
+        expect(subject.primary_context_control.available).to be true
       end
 
       context "with available: false" do
         subject { registration.new_external_tool(account, available: false) }
 
         it "sets context control to unavailable" do
-          expect(subject.context_controls.first.available).to be false
+          expect(subject.primary_context_control.available).to be false
         end
       end
     end

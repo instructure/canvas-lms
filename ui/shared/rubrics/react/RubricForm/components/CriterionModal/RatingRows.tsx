@@ -39,7 +39,6 @@ type RatingRowsProps = {
   criterionUseRange: boolean
   dragging: boolean
   hidePoints: boolean
-  unassessed: boolean
   ratingInputRefs: React.MutableRefObject<HTMLInputElement[]>
 }
 export const RatingRows = ({
@@ -56,7 +55,6 @@ export const RatingRows = ({
   criterionUseRange,
   dragging,
   hidePoints,
-  unassessed,
   ratingInputRefs,
 }: RatingRowsProps) => {
   return (
@@ -76,11 +74,7 @@ export const RatingRows = ({
                   return (
                     <View as="div" key={`rating-row-${rating.id}-${index}`}>
                       {isFullWidth && (
-                        <AddRatingRow
-                          onClick={() => addRating(index)}
-                          unassessed={unassessed}
-                          isDragging={dragging}
-                        />
+                        <AddRatingRow onClick={() => addRating(index)} isDragging={dragging} />
                       )}
                       <RatingRow
                         handleMoveRating={handleMoveRating}
@@ -95,7 +89,6 @@ export const RatingRows = ({
                         showRemoveButton={ratings.length > 1}
                         criterionUseRange={criterionUseRange}
                         rangeStart={rangeStart}
-                        unassessed={unassessed}
                         onRemove={() => removeRating(index)}
                         onChange={updatedRating => updateRating(index, updatedRating)}
                         onPointsBlur={reorderRatings}
@@ -104,13 +97,9 @@ export const RatingRows = ({
                   )
                 })}
                 {isFullWidth && (
-                  <AddRatingRow
-                    onClick={() => addRating(ratings.length)}
-                    unassessed={unassessed}
-                    isDragging={dragging}
-                  />
+                  <AddRatingRow onClick={() => addRating(ratings.length)} isDragging={dragging} />
                 )}
-                {!isFullWidth && unassessed && (
+                {!isFullWidth && (
                   <View as="div" margin="large 0">
                     <Button
                       data-testid="add-rating-button"

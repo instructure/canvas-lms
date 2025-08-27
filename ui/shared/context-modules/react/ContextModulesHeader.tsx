@@ -79,6 +79,7 @@ type OverridesProps = {
     disabled?: boolean
   }
   handleAddModule?: () => void
+  renderIconLegend?: () => JSX.Element
 }
 
 type Props = {
@@ -205,7 +206,8 @@ const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
           overflowY="visible"
           margin={responsive.matches.includes('large') ? 'x-small 0 0 0' : '0'}
         >
-          <Flex gap="small" wrap="wrap" withVisualDebug={false}>
+          <Flex gap="small" wrap="wrap" justifyItems="end" withVisualDebug={false}>
+            {props.overrides?.renderIconLegend?.()}
             {props.moreMenu.menuTools.visible && (
               <Flex.Item overflowY="visible">
                 <View

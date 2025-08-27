@@ -1,0 +1,44 @@
+query GetModulesQuery($courseId: ID!, $cursor: String) {
+  legacyNode(_id: $courseId, type: Course) {
+    ... on Course {
+      modulesConnection(first: 100, after: $cursor) {
+        edges {
+          cursor
+          node {
+            id
+            _id
+            name
+            moduleItemsTotalCount
+            position
+            published
+            unlockAt
+            requirementCount
+            requireSequentialProgress
+            hasActiveOverrides
+            prerequisites {
+              id
+              name
+              type
+            }
+            completionRequirements {
+              id
+              type
+              minScore
+              minPercentage
+            }
+            progression {
+              id
+              _id
+              collapsed
+            }
+            moduleItemsTotalCount
+          }
+        }
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
+      }
+    }
+  }
+}

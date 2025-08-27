@@ -17,9 +17,8 @@
  */
 import {AllLtiScopes} from '@canvas/lti/model/LtiScope'
 import {i18nLtiScope} from '@canvas/lti/model/i18nLtiScope'
-import {render, screen} from '@testing-library/react'
 import {clickOrFail} from '../../../__tests__/interactionHelpers'
-import {createMemoryRouter, RouterProvider, Outlet, Route, Routes} from 'react-router-dom'
+import {createMemoryRouter, Outlet, Route, Routes} from 'react-router-dom'
 import {AllLtiPlacements} from '../../../../model/LtiPlacement'
 import {AllLtiPrivacyLevels} from '../../../../model/LtiPrivacyLevel'
 import {i18nLtiPlacement} from '../../../../model/i18nLtiPlacement'
@@ -29,9 +28,9 @@ import {ZLtiToolConfigurationId} from '../../../../model/lti_tool_configuration/
 import {ToolConfigurationView} from '../ToolConfigurationView'
 import {mockConfiguration, renderApp} from './helpers'
 import {
-  mockRegistrationWithAllInformation,
   mockSiteAdminRegistration,
   mockNonDynamicRegistration,
+  mockRegistrationWithAllInformation,
 } from '../../../manage/__tests__/helpers'
 import fetchMock from 'fetch-mock'
 
@@ -345,16 +344,23 @@ describe('Tool Configuration Restore Default Button', () => {
         ),
       },
     ])
-    const wrapper = render(<RouterProvider router={router} />)
+    const wrapper = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: mockSiteAdminRegistration('site admin reg', 1),
+    })(<ToolConfigurationView />)
 
     expect(wrapper.getByText('Restore Default').closest('button')).toHaveAttribute('disabled')
   })
 
   it('should call the delete endpoint when clicked', async () => {
-    fetchMock.put('/api/v1/accounts/1/lti_registrations/1/reset', {
-      __type: 'Success',
-      data: {},
-    })
+    fetchMock.put(
+      '/api/v1/accounts/1/lti_registrations/1/reset',
+      mockRegistrationWithAllInformation({
+        n: 'Test App',
+        i: 1,
+      }),
+    )
 
     const {getByText} = renderApp({
       n: 'Test App',
@@ -414,7 +420,11 @@ describe('Tool Configuration Copy JSON Code button', () => {
         ),
       },
     ])
-    const wrapper = render(<RouterProvider router={router} />)
+    const wrapper = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration,
+    })(<ToolConfigurationView />)
 
     expect(wrapper.getByText('Copy JSON Code').closest('button')).toBeInTheDocument()
   })

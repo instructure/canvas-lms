@@ -113,7 +113,13 @@ export default function CoursesToolbar({
 
   return (
     <div>
-      <form onSubmit={preventDefault(onApplyFilters)} disabled={isLoading}>
+      <form
+        onSubmit={event => {
+          event.preventDefault()
+          onApplyFilters()
+        }}
+        disabled={isLoading}
+      >
         <Grid vAlign="top" startAt="medium">
           <Grid.Row>
             <Grid.Col>

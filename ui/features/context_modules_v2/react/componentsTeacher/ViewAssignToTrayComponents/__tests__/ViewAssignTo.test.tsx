@@ -24,6 +24,7 @@ import ViewAssignTo, {ViewAssignToProps} from '../ViewAssignTo'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../../hooks/useModuleContext'
+import {MODULES} from '../../../utils/constants'
 
 const server = setupServer(
   graphql.query('GetModulesQuery', () => {
@@ -158,7 +159,7 @@ describe('ViewAssignTo', () => {
 
   it('disables the link when module items are loading', () => {
     // Don't set module items data to simulate loading state
-    queryClient.setQueryData(['modules', '123'], {
+    queryClient.setQueryData([MODULES, '123'], {
       pages: [
         {
           modules: [

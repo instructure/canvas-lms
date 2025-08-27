@@ -21,6 +21,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Module} from '../../utils/types'
+import {MOVE_MODULE_ITEM} from '../../utils/constants'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -49,9 +50,10 @@ const ModuleSelect: React.FC<ModuleSelectProps> = ({
         assistiveText={I18n.t('Select a destination module')}
         value={selectedModule}
         onChange={onModuleChange}
+        data-testid="select_module_listbox"
       >
         {modules
-          .filter(module => moduleAction === 'move_module_item' || module._id !== sourceModuleId)
+          .filter(module => moduleAction === MOVE_MODULE_ITEM || module._id !== sourceModuleId)
           .map((module: Module) => (
             <SimpleSelect.Option key={module._id} id={module._id} value={module._id}>
               {module.name}

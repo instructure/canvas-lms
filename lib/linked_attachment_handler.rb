@@ -27,7 +27,7 @@ module LinkedAttachmentHandler
   end
 
   def update_attachment_associations
-    return unless attachment_associations_enabled?
+    return unless attachment_associations_creation_enabled?
 
     self.class.html_fields.each do |field|
       next unless saved_change_to_attribute?(field)
@@ -90,7 +90,7 @@ module LinkedAttachmentHandler
     to_process = to_create + to_delete
 
     return if to_process.none?
-    return unless attachment_associations_enabled?
+    return unless attachment_associations_creation_enabled?
     raise "User is required to update attachment links" if user.blank? && !skip_user_verification
 
     if to_process.any?
@@ -127,8 +127,12 @@ module LinkedAttachmentHandler
     end
   end
 
+  def attachment_associations_creation_enabled?
+    root_account&.feature_enabled?(:allow_attachment_association_creation)
+  end
+
   def attachment_associations_enabled?
-    root_account.feature_enabled?(:file_association_access)
+    root_account&.feature_enabled?(:file_association_access)
   end
 
   def actual_saving_user

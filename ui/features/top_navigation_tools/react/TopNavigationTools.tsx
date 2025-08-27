@@ -35,7 +35,7 @@ type TopNavigationToolsProps = {
 }
 
 export const handleToolIconError = (tool: Tool) => (event: any) => {
-  event.target.src = `/lti/tool_default_icon?name=${tool.title[0]}`
+  event.target.src = `/lti/tool_default_icon?name=${encodeURIComponent(tool.title || '')}`
   event.onerror = null
 }
 

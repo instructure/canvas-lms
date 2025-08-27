@@ -29,7 +29,7 @@ import AccessibilityIssuesDrawerFooter from './Footer'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 import SuccessBallons from '../../../images/success-ballons.svg'
-import {NextResource} from '../../stores/AccessibilityCheckerStore'
+import {NextResource} from '../../stores/AccessibilityScansStore'
 
 const I18n = createI18nScope('accessibility_checker')
 

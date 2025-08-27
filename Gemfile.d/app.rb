@@ -113,7 +113,7 @@ gem "ruby-rtf", "0.0.5"
 gem "rubyzip", "~> 2.3", require: "zip"
 gem "saml2", "~> 3.1"
 gem "sanitize", "~> 7.0", require: false
-gem "stackprof", "~> 0.2" # must be loaded before Sentry
+gem "stackprof", github: "instructure/stackprof", branch: "switch-d3-data-to-iterative"
 gem "sentry-rails", "~> 5.10"
 gem "sentry-inst_jobs", "~> 5.10"
 gem "soap4r-ng", github: "instructure/soap4r", require: false # dependency of respondus_soap_endpoint, but we need to use an unreleased fork

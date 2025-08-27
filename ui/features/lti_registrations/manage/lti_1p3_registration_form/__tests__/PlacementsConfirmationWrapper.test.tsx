@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {PlacementsConfirmationWrapper} from '../components/PlacementsConfirmationWrapper'
@@ -24,13 +23,13 @@ import {mockInternalConfiguration} from './helpers'
 import {createLti1p3RegistrationOverlayStore} from '../../registration_overlay/Lti1p3RegistrationOverlayStore'
 import {AllLtiPlacements, InternalOnlyLtiPlacements} from '../../model/LtiPlacement'
 import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
-import {UNDOCUMENTED_PLACEMENTS} from '../../registration_wizard_forms/PlacementsConfirmation'
 
 describe('PlacementsConfirmationWrapper', () => {
   it('renders a checkbox for every available placement, minus internal-only placements', () => {
     const internalConfig = mockInternalConfiguration({placements: []})
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
     window.ENV.FEATURES.lti_asset_processor = true
+    window.ENV.FEATURES.lti_asset_processor_discussions = true
 
     render(
       <PlacementsConfirmationWrapper internalConfig={internalConfig} overlayStore={overlayStore} />,

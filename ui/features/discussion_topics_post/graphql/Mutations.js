@@ -284,3 +284,22 @@ export const UPDATE_DISCUSSION_TOPIC_PARTICIPANT = gql`
     }
   }
 `
+
+export const RESTORE_DELETED_DISCUSSION_ENTRY = gql`
+  mutation RestoreDeletedDiscussionEntry($discussionEntryId: ID!) {
+    restoreDeletedDiscussionEntry(input: {discussionEntryId: $discussionEntryId}) {
+      discussionEntry {
+        ...DiscussionEntry
+        anonymousAuthor {
+          ...AnonymousUser
+        }
+      }
+      errors {
+        ...Error
+      }
+    }
+  }
+  ${DiscussionEntry.fragment}
+  ${AnonymousUser.fragment}
+  ${Error.fragment}
+`

@@ -482,6 +482,7 @@ class Quizzes::QuizzesApiController < ApplicationController
   def create
     if authorized_action(@context.quizzes.temp_record, @current_user, :create)
       @quiz = @context.quizzes.build
+      @quiz.saving_user = @current_user
       quiz_params = accepts_jsonapi? ? Array(params[:quizzes]).first : params[:quiz] || {}
       return render_create_error(:forbidden) unless grading_periods_allow_submittable_create?(@quiz, quiz_params)
 
@@ -506,6 +507,7 @@ class Quizzes::QuizzesApiController < ApplicationController
   # @returns Quiz
   def update
     if authorized_action(@quiz, @current_user, :update)
+      @quiz.saving_user = @current_user
       quiz_params = accepts_jsonapi? ? Array(params[:quizzes]).first : params[:quiz] || {}
       return render_update_error(:forbidden) unless grading_periods_allow_submittable_update?(@quiz, quiz_params)
 
@@ -523,7 +525,7 @@ class Quizzes::QuizzesApiController < ApplicationController
   end
 
   # @API Delete a quiz
-  #
+  # Deletes a quiz and returns the deleted quiz object.
   # @returns Quiz
   def destroy
     if authorized_action(@quiz, @current_user, :delete)

@@ -273,11 +273,23 @@ export default forwardRef(function ItemAssignToCard(
   ])
 
   useEffect(() => {
-    const errorMessage: FormMessage = {
+    const newError: FormMessage[] = []
+    const blankErrorMessage: FormMessage = {
       text: I18n.t('A student or section must be selected'),
       type: 'error',
     }
-    const newError = selectedAssigneeIds.length > 0 ? [] : [errorMessage]
+    const tagErrorMessage: FormMessage = {
+      text: I18n.t('Invalid group selected'),
+      type: 'error',
+    }
+
+    if (selectedAssigneeIds.length === 0) newError.push(blankErrorMessage)
+    if (
+      selectedAssigneeIds.some(
+        id => id.includes('tag-') && !ENV.ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS,
+      )
+    )
+      newError.push(tagErrorMessage)
     if (newError.length !== error.length) setError(newError)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedAssigneeIds.length])

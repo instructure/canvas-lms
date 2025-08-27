@@ -1074,6 +1074,24 @@ describe "Importing assignments" do
           end
         end
       end
+
+      context "when vendor_code and product_code are empty" do
+        let(:vendor_code) { "" }
+        let(:product_code) { "" }
+        let(:resource_type_code) { "" }
+
+        before do
+          Account.site_admin.enable_feature!(:exclude_deleted_lti2_tools_on_assignment_export)
+        end
+
+        it "adds a meaningful warning to the migration without an active tool_proxy" do
+          course_model
+          migration = @course.content_migrations.create!
+          @course.assignments.create!(title: "test", due_at: Time.zone.now, unlock_at: 1.day.ago, lock_at: 1.day.from_now, peer_reviews_due_at: 2.days.from_now, migration_id:)
+          expect(migration).to receive(:add_warning).with("The export had an improperly attached similarity detection tool, so the import won't include it")
+          Importers::AssignmentImporter.import_from_migration(assign_hash, @course, migration)
+        end
+      end
     end
 
     it "sets the vendor/product/resource_type codes" do

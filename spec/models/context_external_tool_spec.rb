@@ -67,11 +67,7 @@ describe ContextExternalTool do
 
   describe "available_in_context?" do
     let_once(:account) { account_model }
-    let_once(:registration) do
-      lti_developer_key_model(account:).tap do |k|
-        lti_tool_configuration_model(account: k.account, developer_key: k, lti_registration: k.lti_registration)
-      end.lti_registration
-    end
+    let_once(:registration) { lti_registration_with_tool(account:) }
     let_once(:tool) { registration.new_external_tool(account) }
 
     context "with the lti_registrations_next flag off" do
@@ -84,7 +80,7 @@ describe ContextExternalTool do
       end
 
       it "returns true even if the tool is not set to available" do
-        tool.context_controls.first.update!(available: false)
+        tool.primary_context_control.update!(available: false)
         expect(tool.available_in_context?(account)).to be true
       end
     end
@@ -99,14 +95,14 @@ describe ContextExternalTool do
     end
 
     it "returns false if the tool is set to unavailable" do
-      tool.context_controls.first.update!(available: false)
+      tool.primary_context_control.update!(available: false)
 
       expect(tool.available_in_context?(account)).to be false
     end
 
     it "ignores context controls associated with other tools from the same registration" do
       duplicate_tool = registration.new_external_tool(account)
-      duplicate_tool.context_controls.first.update!(available: false)
+      duplicate_tool.primary_context_control.update!(available: false)
 
       expect(tool.available_in_context?(account)).to be true
     end
@@ -123,6 +119,44 @@ describe ContextExternalTool do
       expect(sentry_scope).to receive(:set_context).with("tool", tool.global_id)
 
       expect(tool.available_in_context?(account)).to be true
+    end
+  end
+
+  describe "#primary_context_control" do
+    subject { tool.primary_context_control }
+
+    let_once(:account) { account_model }
+    let_once(:registration) { lti_registration_with_tool(account:) }
+    let_once(:tool) { registration.deployments.first }
+
+    it { is_expected.to be_present }
+
+    it "returns the primary control for the tool" do
+      expect(subject).to be_present
+      expect(subject.account_id).to eq account.id
+    end
+
+    context "when the contexts are not in order" do
+      before do
+        primary_control = tool.primary_context_control.dup
+        Lti::ContextControl.suspend_callbacks do
+          tool.primary_context_control.destroy_permanently!
+        end
+
+        subaccount = account_model(parent_account: account)
+        Lti::ContextControl.create!(
+          account: subaccount,
+          registration:,
+          deployment: tool
+        )
+        primary_control.save!
+      end
+
+      it "returns the primary control for the tool" do
+        expect(subject).to be_present
+        expect(subject.account_id).to eq account.id
+        expect(subject.workflow_state).to eq "active"
+      end
     end
   end
 

@@ -22,7 +22,7 @@ require_relative "api_spec_helper"
 
 describe "API Authentication", type: :request do
   before :once do
-    @key = DeveloperKey.create!
+    @key = DeveloperKey.create!(name: "test_key_#{SecureRandom.hex(4)}")
     enable_developer_key_account_binding!(@key)
   end
 
@@ -444,7 +444,7 @@ describe "API Authentication", type: :request do
 
               # create the dev key on a different account
               account2 = Account.create!
-              developer_key = DeveloperKey.create!(account: account2, redirect_uri: "http://www.example.com/my_uri")
+              developer_key = DeveloperKey.create!(name: "test_key_#{SecureRandom.hex(4)}", account: account2, redirect_uri: "http://www.example.com/my_uri")
 
               get "/login/oauth2/auth", params: { response_type: "code", client_id: developer_key.id, redirect_uri: "http://www.example.com/my_uri" }
               expect(response).to be_redirect
@@ -475,7 +475,7 @@ describe "API Authentication", type: :request do
                 yield token if block_given?
               end
 
-              params = { response_type: "code", client_id: @client_id, redirect_uri: "http://www.example.com/my_uri" }
+              params = { response_type: "code", client_id: @client_id, purpose: token&.purpose, redirect_uri: "http://www.example.com/my_uri" }
               params[:scope] = "/auth/userinfo" if userinfo
               get("/login/oauth2/auth", params:)
               expect(response).to be_redirect
@@ -791,7 +791,7 @@ describe "API Authentication", type: :request do
         @sub_account2 = @account.sub_accounts.create!
 
         @not_sub_account = Account.create!
-        @key = DeveloperKey.create!(redirect_uri: "http://example.com/a/b", account: @account)
+        @key = DeveloperKey.create!(name: "test_key_#{SecureRandom.hex(4)}", redirect_uri: "http://example.com/a/b", account: @account)
       end
 
       it "allows a token previously linked to a dev key same account to work" do
@@ -799,7 +799,7 @@ describe "API Authentication", type: :request do
           enable_cache do
             user_with_pseudonym(active_user: true, username: "test1@example.com", password: "test1234", account: @account)
             course_with_teacher(user: @user, account: @account)
-            developer_key = DeveloperKey.create!(account: @account, redirect_uri: "http://www.example.com/my_uri")
+            developer_key = DeveloperKey.create!(name: "test_key_#{SecureRandom.hex(4)}", account: @account, redirect_uri: "http://www.example.com/my_uri")
             enable_developer_key_account_binding!(developer_key)
             @token = @user.access_tokens.create!(developer_key:)
 
@@ -815,7 +815,7 @@ describe "API Authentication", type: :request do
           enable_cache do
             user_with_pseudonym(active_user: true, username: "test1@example.com", password: "test1234", account: @sub_account1)
             course_with_teacher(user: @user, account: @sub_account1)
-            developer_key = DeveloperKey.create!(account: @account, redirect_uri: "http://www.example.com/my_uri")
+            developer_key = DeveloperKey.create!(name: "test_key_#{SecureRandom.hex(4)}", account: @account, redirect_uri: "http://www.example.com/my_uri")
             enable_developer_key_account_binding!(developer_key)
             @token = @user.access_tokens.create!(developer_key:)
 
@@ -831,7 +831,7 @@ describe "API Authentication", type: :request do
           enable_cache do
             user_with_pseudonym(active_user: true, username: "test1@example.com", password: "test1234", account: @account)
             course_with_teacher(user: @user, account: @account)
-            developer_key = DeveloperKey.create!(account: @not_sub_account, redirect_uri: "http://www.example.com/my_uri")
+            developer_key = DeveloperKey.create!(name: "test_key_#{SecureRandom.hex(4)}", account: @not_sub_account, redirect_uri: "http://www.example.com/my_uri")
             @token = @user.access_tokens.create!(developer_key:)
 
             allow(LoadAccount).to receive(:default_domain_root_account).and_return(@account)
@@ -851,7 +851,7 @@ describe "API Authentication", type: :request do
           enable_default_developer_key!
           user_with_pseudonym(active_user: true, username: "test1@example.com", password: "test1234", account: @account)
           course_with_teacher(user: @user, account: @account)
-          @token = @user.access_tokens.create!(developer_key: DeveloperKey.default)
+          @token = @user.access_tokens.create!(developer_key: DeveloperKey.default, purpose: "test")
           expect(@token.developer_key.shard).to be_default
         end
         allow(LoadAccount).to receive(:default_domain_root_account).and_return(@account)
@@ -868,7 +868,7 @@ describe "API Authentication", type: :request do
         @shard1.activate do
           # create the dev key on a different account
           account2 = Account.create!
-          developer_key = DeveloperKey.create!(account: account2, redirect_uri: "http://www.example.com/my_uri")
+          developer_key = DeveloperKey.create!(name: "test_key_#{SecureRandom.hex(4)}", account: account2, redirect_uri: "http://www.example.com/my_uri")
           enable_developer_key_account_binding!(developer_key)
           @token = @user.access_tokens.create!(developer_key:)
           expect(@token.developer_key.shard).to be @shard1

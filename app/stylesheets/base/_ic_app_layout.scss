@@ -83,6 +83,10 @@ body:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
     padding: 0 1em 1em;
   }
 
+  body.content-only & {
+    padding: 0;
+  }
+
   body.ic-framed-lti-tool & {
     padding: 0 $ic-sp * 2;
 

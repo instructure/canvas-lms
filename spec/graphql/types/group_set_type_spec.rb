@@ -58,6 +58,33 @@ describe Types::GroupSetType do
     expect(group_set_type.resolve("groups{  _id }")).to eq [@group.id.to_s]
   end
 
+  describe "single_tag field" do
+    it "returns false when there are multiple groups in the category" do
+      @group_set.groups.create! name: "group 2", context: @course
+
+      expect(group_set_type.resolve("singleTag")).to be false
+    end
+
+    it "returns false when there is one group but group name differs from category name" do
+      @group.destroy
+      @group_set.groups.create! name: "different name", context: @course
+
+      expect(group_set_type.resolve("singleTag")).to be false
+    end
+
+    it "returns true when there is exactly one group and group name matches category name" do
+      @group.update! name: @group_set.name
+
+      expect(group_set_type.resolve("singleTag")).to be true
+    end
+
+    it "returns false when there are no groups in the category" do
+      @group.destroy
+
+      expect(group_set_type.resolve("singleTag")).to be false
+    end
+  end
+
   it "returns 'disabled' for null self_signup" do
     @group_set.update! self_signup: nil
     expect(group_set_type.resolve("selfSignup")).to eq "disabled"

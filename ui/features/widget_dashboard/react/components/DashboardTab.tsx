@@ -19,27 +19,15 @@
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
-import {Heading} from '@instructure/ui-heading'
-import {Text} from '@instructure/ui-text'
+import {DEFAULT_WIDGET_CONFIG} from '../constants'
+import WidgetGrid from './WidgetGrid'
 
 const I18n = createI18nScope('widget_dashboard')
 
 const DashboardTab: React.FC = () => {
   return (
-    <View as="div" padding="medium" data-testid="dashboard-tab-content">
-      <Heading level="h2" margin="0 0 medium" data-testid="dashboard-tab-heading">
-        {I18n.t('Dashboard')}
-      </Heading>
-      <Text>
-        {I18n.t(
-          'Welcome to your dashboard! This is where you can view and manage your dashboard widgets.',
-        )}
-      </Text>
-      <View as="div" margin="medium 0 0">
-        <Text size="small" color="secondary">
-          {I18n.t('Dashboard widgets and customization features coming soon.')}
-        </Text>
-      </View>
+    <View as="div" data-testid="dashboard-tab-content">
+      <WidgetGrid config={DEFAULT_WIDGET_CONFIG} />
     </View>
   )
 }

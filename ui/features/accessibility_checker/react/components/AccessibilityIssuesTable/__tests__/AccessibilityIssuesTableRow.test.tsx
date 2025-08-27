@@ -19,11 +19,11 @@
 import {render, screen} from '@testing-library/react'
 
 import {AccessibilityIssuesTableRow} from '../AccessibilityIssuesTableRow'
-import {sampleTableData} from '../../../stores/mockData'
+import {mockScan1} from '../../../stores/mockData'
 
 describe('AccessibilityIssuesTableRow', () => {
   it('renders without crashing', () => {
-    render(<AccessibilityIssuesTableRow item={sampleTableData[0]} />)
+    render(<AccessibilityIssuesTableRow item={mockScan1} />)
     expect(screen.getByTestId('issue-row-1')).toBeInTheDocument()
   })
 })

@@ -18,47 +18,38 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe AccessibilityResourceScansController do
   let(:course) { course_model }
 
   before do
-    # Stub authentication/authorization helpers expected by ApplicationController
-    allow_any_instance_of(described_class).to receive(:require_context).and_return(true)
     allow_any_instance_of(described_class).to receive(:require_user).and_return(true)
-    allow_any_instance_of(described_class).to receive(:authorized_action).and_return(true)
-    allow_any_instance_of(described_class).to receive(:tab_enabled?)
-      .with(Course::TAB_ACCESSIBILITY).and_return(true)
-
-    # Provide @context so the controller can scope the query
-    controller.instance_variable_set(:@context, course)
+    allow_any_instance_of(described_class).to receive(:check_authorized_action).and_return(true)
 
     # Create three scans with differing attributes so every sort field has
     # distinguishable values.
     accessibility_resource_scan_model(
       course:,
-      assignment: assignment_model(course:),
+      context: assignment_model(course:),
       workflow_state: "queued",
       resource_name: "Queued Resource",
       resource_workflow_state: :published,
       issue_count: 1,
-      resource_updated_at: 2.days.ago
+      resource_updated_at: 3.days.ago
     )
 
     accessibility_resource_scan_model(
       course:,
-      attachment: attachment_model(course:),
+      context: attachment_model(course:),
       workflow_state: "in_progress",
       resource_name: "In Progress Resource",
       resource_workflow_state: :unpublished,
       issue_count: 2,
-      resource_updated_at: 1.day.ago
+      resource_updated_at: 2.days.ago.beginning_of_day
     )
 
     accessibility_resource_scan_model(
       course:,
-      wiki_page: wiki_page_model(course:),
+      context: wiki_page_model(course:),
       workflow_state: "completed",
       resource_name: "Completed Resource",
       resource_workflow_state: :published,
@@ -113,7 +104,7 @@ describe AccessibilityResourceScansController do
       let(:scan_with_issues) do
         accessibility_resource_scan_model(
           course:,
-          wiki_page:,
+          context: wiki_page,
           workflow_state: "completed",
           resource_updated_at: "2025-07-19T02:18:00Z",
           resource_name: "Tutorial",
@@ -124,7 +115,6 @@ describe AccessibilityResourceScansController do
       let!(:issue) do
         accessibility_issue_model(
           course:,
-          wiki_page:,
           accessibility_resource_scan: scan_with_issues,
           rule_type: Accessibility::Rules::HeadingsStartAtH2Rule.id,
           node_path: "./div/h1",
@@ -171,6 +161,94 @@ describe AccessibilityResourceScansController do
         }
 
         expect(scan_with_issues_json).to eq(expected_json)
+      end
+
+      context "with resolved or dismissed issues" do
+        let!(:resolved_issue) do
+          accessibility_issue_model(
+            course:,
+            context: wiki_page,
+            accessibility_resource_scan: scan_with_issues,
+            rule_type: Accessibility::Rules::HeadingsStartAtH2Rule.id,
+            workflow_state: "resolved"
+          )
+        end
+        let!(:dismissed_issue) do
+          accessibility_issue_model(
+            course:,
+            context: wiki_page,
+            accessibility_resource_scan: scan_with_issues,
+            rule_type: Accessibility::Rules::HeadingsStartAtH2Rule.id,
+            workflow_state: "dismissed"
+          )
+        end
+
+        it "does not retrieve resolved or dismissed issues" do
+          get :index, params: { course_id: course.id }, format: :json
+          expect(response).to have_http_status(:ok)
+
+          json = response.parsed_body
+          scan_with_issues_json = json.find { |scan| scan["id"] == scan_with_issues.id }
+          issue_ids = scan_with_issues_json["issues"].map { |x| x["id"] }
+
+          expect(issue_ids).not_to include(resolved_issue.id)
+          expect(issue_ids).not_to include(dismissed_issue.id)
+        end
+      end
+
+      context "with filters" do
+        it "filters by rule types" do
+          get :index, params: { course_id: course.id, filters: { ruleTypes: ["headings-start-at-h2"] } }, format: :json
+          expect(response).to have_http_status(:ok)
+
+          json = response.parsed_body
+          expect(json.length).to eq(1)
+          expect(json.first["id"]).to eq(scan_with_issues.id)
+        end
+
+        it "filters by resource types" do
+          get :index, params: { course_id: course.id, filters: { artifactTypes: ["assignment"] } }, format: :json
+          expect(response).to have_http_status(:ok)
+
+          json = response.parsed_body
+          expect(json.length).to eq(1)
+          expect(json.all? { |scan| scan["resource_type"] == "Assignment" }).to be true
+        end
+
+        it "filters by workflow states" do
+          get :index, params: { course_id: course.id, filters: { workflowStates: ["published"] } }, format: :json
+          expect(response).to have_http_status(:ok)
+
+          json = response.parsed_body
+          expect(json.length).to eq(3)
+          expect(json.all? { |scan| scan["resource_workflow_state"] == "published" }).to be true
+        end
+
+        it "filters by date range" do
+          get :index, params: { course_id: course.id, filters: { fromDate: 2.days.ago.beginning_of_day, toDate: 1.day.ago } }, format: :json
+          expect(response).to have_http_status(:ok)
+
+          json = response.parsed_body
+          expect(json.length).to eq(1)
+          expect(json.first["resource_name"]).to eq("In Progress Resource")
+        end
+
+        it "applies multiple filters together" do
+          get :index, params: { course_id: course.id, filters: { artifactTypes: ["wiki_page"], workflowStates: ["published"] } }, format: :json
+          expect(response).to have_http_status(:ok)
+
+          json = response.parsed_body
+          expect(json.length).to eq(2)
+          expect(json.first["resource_name"]).to eq("Completed Resource")
+        end
+
+        it "returns all scans if filters are empty" do
+          get :index, params: { course_id: course.id, filters: {} }, format: :json
+          expect(response).to have_http_status(:ok)
+
+          json = response.parsed_body
+          expect(json.length).to eq(4)
+        end
       end
     end
   end

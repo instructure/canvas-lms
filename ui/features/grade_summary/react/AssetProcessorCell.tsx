@@ -16,16 +16,44 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import AssetReportStatus from '@canvas/lti-asset-processor/react/AssetReportStatus'
+import StudentAssetReportModal from '@canvas/lti-asset-processor/react/StudentAssetReportModal'
 import {LtiAssetReportWithAsset} from '@canvas/lti-asset-processor/model/AssetReport'
 import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
 
 interface AssetProcessorCellProps {
   assetProcessors: ExistingAttachedAssetProcessor[]
   assetReports: LtiAssetReportWithAsset[]
+  submissionType: 'online_upload' | 'online_text_entry'
+  assignmentName: string
 }
 
-export default function AssetProcessorCell({assetReports}: AssetProcessorCellProps) {
-  return <AssetReportStatus reports={assetReports} openModal={() => alert('To be implemented.')} />
+export default function AssetProcessorCell({
+  assetProcessors,
+  assetReports,
+  submissionType,
+  assignmentName,
+}: AssetProcessorCellProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  function handleClose() {
+    setIsModalOpen(false)
+  }
+
+  return (
+    <>
+      <AssetReportStatus reports={assetReports} openModal={() => setIsModalOpen(true)} />
+      {isModalOpen && (
+        <StudentAssetReportModal
+          assetProcessors={assetProcessors}
+          assignmentName={assignmentName}
+          open={isModalOpen}
+          onClose={handleClose}
+          reports={assetReports}
+          submissionType={submissionType}
+        />
+      )}
+    </>
+  )
 }

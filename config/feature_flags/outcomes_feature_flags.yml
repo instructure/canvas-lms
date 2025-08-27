@@ -18,6 +18,10 @@ limit_section_visibility_in_lmgb:
   environments:
     development:
       state: on
+    test:
+      state: on
+    ci:
+      state: on
 outcome_alignments_course_migration:
   state: hidden
   applies_to: RootAccount
@@ -48,6 +52,13 @@ assignment_comment_library:
   applies_to: RootAccount
   display_name: Comment Library
   description: Allows users to save and search frequently used feedback in a library of comments to be used in SpeedGrader.
+  environments:
+    development:
+      state: on
+    test:
+      state: on
+    ci:
+      state: on
 improved_lmgb:
   type: setting
   state: hidden
@@ -79,6 +90,10 @@ outcomes_friendly_description:
   environments:
     development:
       state: on
+    test:
+      state: on
+    ci:
+      state: on
 outcome_service_results_to_canvas:
   state: hidden
   applies_to: Course
@@ -103,6 +118,10 @@ outcome_alignment_summary_with_new_quizzes:
   environments:
     development:
       state: on
+    test:
+      state: on
+    ci:
+      state: on
 outcomes_new_decaying_average_calculation:
   state: hidden
   applies_to: RootAccount
@@ -110,6 +129,10 @@ outcomes_new_decaying_average_calculation:
   description: Allows users to use new decaying average as a calculation method for a given outcome.
   environments:
     development:
+      state: on
+    test:
+      state: on
+    ci:
       state: on
 archive_outcomes:
   state: hidden
@@ -136,3 +159,13 @@ improved_outcome_report_generation:
   environments:
     development:
       state: on
+    test:
+      state: on
+    ci:
+      state: on
+outcomes_rollup_propagation:
+  state: hidden
+  display_name: Outcomes Rollup Propagation
+  description: Controls whether background jobs populate the rollup table. Only Site Admins can toggle.
+  applies_to: SiteAdmin
+  shadow: true

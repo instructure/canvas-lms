@@ -226,10 +226,11 @@ module DatesOverridable
   end
 
   def self.preload_module_overrides(learning_objects)
-    all_module_ids = learning_objects.map(&:module_ids).flatten.uniq
+    # Use preloaded module IDs instead of calling module_ids to avoid N+1 queries
+    all_module_ids = learning_objects.map(&:preloaded_module_ids).flatten.uniq
     all_module_overrides = AssignmentOverride.active.where(context_module_id: all_module_ids)
     learning_objects.each do |lo|
-      lo.preloaded_module_overrides = all_module_overrides.select { |ao| lo.module_ids.include?(ao.context_module_id) }
+      lo.preloaded_module_overrides = all_module_overrides.select { |ao| lo.preloaded_module_ids.include?(ao.context_module_id) }
     end
   end
 

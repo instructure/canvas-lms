@@ -413,6 +413,9 @@
     "content_type_2cf90d95": {
         "message": "Cineál Ábhar"
     },
+    "continue_to_youtube_content_a34f0f85": {
+        "message": "Lean ar aghaidh chuig ábhar YouTube"
+    },
     "coproduct_e7838082": {
         "message": "Comhtháirge"
     },
@@ -2470,6 +2473,9 @@
     },
     "this_image_is_currently_unavailable_25c68857": {
         "message": "Níl an íomhá seo ar fáil faoi láthair"
+    },
+    "this_video_may_display_youtube_ads_4d19d590": {
+        "message": "D’fhéadfadh fógraí YouTube a bheith le feiceáil sa fhíseán seo."
     },
     "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
         "message": "Cé go mbeidh an teideal ceart ar do fhíseán sa bhrabhsálaí, níor éirigh linn é a nuashonrú sa bhunachar sonraí."

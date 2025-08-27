@@ -468,6 +468,7 @@ const SubmissionManager = ({
   }
 
   const shouldRenderSubmit = () => {
+    const allowedAttempts = totalAllowedAttempts(assignment, latestSubmission)
     return (
       !assignment.env.peerReviewModeEnabled &&
       !uploadingFiles &&
@@ -477,7 +478,7 @@ const SubmissionManager = ({
       !assignment.lockInfo.isLocked &&
       !shouldRenderNewAttempt() &&
       submission.gradingStatus !== 'excused' &&
-      (assignment.allowedAttempts == null || assignment.allowedAttempts >= submission.attempt) &&
+      (assignment.allowedAttempts == null || allowedAttempts >= submission.attempt) &&
       submission.state === 'unsubmitted'
     )
   }

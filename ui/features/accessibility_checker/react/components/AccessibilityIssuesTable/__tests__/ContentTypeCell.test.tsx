@@ -19,21 +19,31 @@
 import {render, screen} from '@testing-library/react'
 
 import {ContentTypeCell} from '../ContentTypeCell'
-import {ContentItemType, ContentItem} from '../../../types'
+import {AccessibilityResourceScan, ResourceType} from '../../../types'
 
 describe('ContentTypeCell', () => {
   it('renders "Page"', () => {
-    render(<ContentTypeCell item={{type: ContentItemType.WikiPage} as ContentItem} />)
+    render(
+      <ContentTypeCell item={{resourceType: ResourceType.WikiPage} as AccessibilityResourceScan} />,
+    )
     expect(screen.getByText('Page')).toBeInTheDocument()
   })
 
   it('renders "Assignment"', () => {
-    render(<ContentTypeCell item={{type: ContentItemType.Assignment} as ContentItem} />)
+    render(
+      <ContentTypeCell
+        item={{resourceType: ResourceType.Assignment} as AccessibilityResourceScan}
+      />,
+    )
     expect(screen.getByText('Assignment')).toBeInTheDocument()
   })
 
   it('renders "Attachment"', () => {
-    render(<ContentTypeCell item={{type: ContentItemType.Attachment} as ContentItem} />)
+    render(
+      <ContentTypeCell
+        item={{resourceType: ResourceType.Attachment} as AccessibilityResourceScan}
+      />,
+    )
     expect(screen.getByText('Attachment')).toBeInTheDocument()
   })
 })

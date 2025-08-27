@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {render, screen, fireEvent, waitFor} from '@testing-library/react'
+import '@canvas/files/mockFilesENV'
 import {FileManagementProvider} from '../../../contexts/FileManagementContext'
 import {RowFocusProvider} from '../../../contexts/RowFocusContext'
 import {RowsProvider} from '../../../contexts/RowsContext'
@@ -50,6 +51,16 @@ const renderComponent = (props: BulkActionButtonsProps = {...defaultProps}) => {
 }
 
 describe('BulkActionButtons', () => {
+  let originalENV: typeof ENV
+
+  beforeEach(() => {
+    originalENV = {...window.ENV}
+  })
+
+  afterEach(() => {
+    Object.assign(ENV, originalENV)
+  })
+
   it('renders component with all options enabled', async () => {
     renderComponent()
     expect(screen.getByText('2 of 10 selected')).toBeInTheDocument()
@@ -68,6 +79,13 @@ describe('BulkActionButtons', () => {
   it('does not render delete button when userCanDeleteFilesForContext is false', () => {
     renderComponent({...defaultProps, userCanDeleteFilesForContext: false})
     expect(screen.queryByTestId('bulk-actions-delete-button')).toBeNull()
+  })
+
+  it('does not render move button when student access is restricted', () => {
+    ENV.FEATURES = {restrict_student_access: true}
+    ENV.current_user_roles = ['student']
+    renderComponent({...defaultProps})
+    expect(screen.queryByTestId('bulk-actions-move-button')).toBeNull()
   })
 
   it('does not render permissions button when userCanRestrictFilesForContext is false', async () => {

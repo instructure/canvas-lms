@@ -26,7 +26,7 @@ const I18n = createI18nScope('gradebook')
 
 type Props = {
   assignment: {
-    pointsPossible: number
+    pointsPossible: number | null
   }
   enterGradesAs: 'points' | 'percent' | 'passFail' | 'gradingScheme'
   gradingScheme: Array<Array<string | number>>

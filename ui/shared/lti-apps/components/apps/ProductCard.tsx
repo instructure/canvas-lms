@@ -91,7 +91,13 @@ const ProductCard = (props: ProductCardProps) => {
           </View>
           <View as="div" margin="auto 0 0 0">
             {product?.tags?.slice(0, 1).map(tag => (
-              <Tag key={tag.name} text={tag.name} size="small" margin="0 xx-small 0 0" />
+              <Tag
+                key={tag.name}
+                text={tag.name}
+                size="small"
+                margin="0 xx-small 0 0"
+                themeOverride={{maxWidth: 'none'}}
+              />
             ))}
           </View>
           {'organization_tool' in product && product.organization_tool.product_status && (
@@ -105,6 +111,7 @@ const ProductCard = (props: ProductCardProps) => {
                   defaultBackground: 'white',
                   defaultColor: product.organization_tool.product_status?.color,
                   defaultBorderColor: product.organization_tool.product_status?.color,
+                  maxWidth: 'none',
                 }}
               />
             </View>

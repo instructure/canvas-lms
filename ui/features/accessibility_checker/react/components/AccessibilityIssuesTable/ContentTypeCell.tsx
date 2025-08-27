@@ -23,32 +23,32 @@ import {Text} from '@instructure/ui-text'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-import {ContentItem, ContentItemType} from '../../types'
+import {AccessibilityResourceScan, ResourceType} from '../../types'
 
 interface ContentTypeCellProps {
-  item: ContentItem
+  item: AccessibilityResourceScan
 }
 
 const I18n = createI18nScope('accessibility_checker')
 
-function getIconByContentType(contentType: ContentItemType) {
+function getIconByContentType(contentType: ResourceType) {
   switch (contentType) {
-    case ContentItemType.WikiPage:
+    case ResourceType.WikiPage:
       return <IconDocumentLine />
-    case ContentItemType.Assignment:
+    case ResourceType.Assignment:
       return <IconAssignmentLine />
-    case ContentItemType.Attachment:
+    case ResourceType.Attachment:
       return <IconMsWordLine />
   }
 }
 
-function getTextByContentType(contentType: ContentItemType) {
+function getTextByContentType(contentType: ResourceType) {
   switch (contentType) {
-    case ContentItemType.WikiPage:
+    case ResourceType.WikiPage:
       return I18n.t('Page')
-    case ContentItemType.Assignment:
+    case ResourceType.Assignment:
       return I18n.t('Assignment')
-    case ContentItemType.Attachment:
+    case ResourceType.Attachment:
       return I18n.t('Attachment')
   }
 }
@@ -56,10 +56,10 @@ function getTextByContentType(contentType: ContentItemType) {
 export const ContentTypeCell: React.FC<ContentTypeCellProps> = ({item}: ContentTypeCellProps) => (
   <Flex gap="x-small">
     <Flex.Item>
-      <PresentationContent>{getIconByContentType(item.type)}</PresentationContent>
+      <PresentationContent>{getIconByContentType(item.resourceType)}</PresentationContent>
     </Flex.Item>
     <Flex.Item>
-      <Text>{getTextByContentType(item.type)}</Text>
+      <Text>{getTextByContentType(item.resourceType)}</Text>
     </Flex.Item>
   </Flex>
 )

@@ -58,6 +58,8 @@ export const RUBRIC_ASSOCIATION: RubricAssociation = {
   id: '1',
   useForGrading: true,
   hideOutcomeResults: false,
+  associationType: 'Assignment',
+  associationId: '1',
 }
 
 export const RUBRIC_CONTEXTS = [

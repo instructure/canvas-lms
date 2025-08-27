@@ -15,14 +15,16 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 import React, {useState, useEffect} from 'react'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import ModuleHeader from '../componentsTeacher/ModuleHeader'
 import ModuleItemList from '../componentsTeacher/ModuleItemList'
-import {useModuleItems} from '../hooks/queries/useModuleItems'
+import ModuleItemListSmart from '../components/ModuleItemListSmart'
 import {Prerequisite, CompletionRequirement, ModuleAction} from '../utils/types'
+import {TEACHER} from '../utils/constants'
+import {useShowAllState} from '../hooks/useShowAllState'
+import {useContextModule} from '../hooks/useModuleContext'
 
 export interface ModuleProps {
   id: string
@@ -57,20 +59,22 @@ const Module: React.FC<ModuleProps> = ({
   setModuleAction,
   setIsManageModuleContentTrayOpen,
   setSelectedModuleItem,
-  setSourceModule: setSourceModule,
+  setSourceModule,
 }) => {
   const [isExpanded, setIsExpanded] = useState(propExpanded !== undefined ? propExpanded : false)
-  const {data, isLoading, error} = useModuleItems(id, !!isExpanded)
-
-  const moduleItems = data?.moduleItems || []
+  const [showAll, setShowAll] = useShowAllState(id)
+  const {modulesArePaginated} = useContextModule()
 
   const toggleExpanded = () => {
     const newExpandedState = !isExpanded
     setIsExpanded(newExpandedState)
-
     if (onToggleExpand) {
       onToggleExpand(id)
     }
+  }
+
+  const handleToggleShowAll = () => {
+    setShowAll(prev => !prev)
   }
 
   useEffect(() => {
@@ -107,8 +111,9 @@ const Module: React.FC<ModuleProps> = ({
             requirementCount={requirementCount || 0}
             unlockAt={unlockAt}
             dragHandleProps={dragHandleProps}
-            itemCount={moduleItems.length}
             hasActiveOverrides={hasActiveOverrides}
+            showAll={showAll}
+            onToggleShowAll={handleToggleShowAll}
             setModuleAction={setModuleAction}
             setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}
             setSourceModule={setSourceModule}
@@ -116,17 +121,25 @@ const Module: React.FC<ModuleProps> = ({
         </Flex.Item>
         {isExpanded && (
           <Flex.Item>
-            <ModuleItemList
+            <ModuleItemListSmart
               moduleId={id}
-              moduleTitle={name}
-              moduleItems={moduleItems}
-              completionRequirements={completionRequirements}
-              isLoading={isLoading}
-              error={error}
-              setModuleAction={setModuleAction}
-              setSelectedModuleItem={setSelectedModuleItem}
-              setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}
-              setSourceModule={setSourceModule}
+              view={TEACHER}
+              isExpanded={isExpanded}
+              isPaginated={modulesArePaginated && !showAll}
+              renderList={({moduleItems, isEmpty, error}) => (
+                <ModuleItemList
+                  moduleId={id}
+                  moduleTitle={name}
+                  moduleItems={moduleItems}
+                  completionRequirements={completionRequirements}
+                  error={error}
+                  setModuleAction={setModuleAction}
+                  setSelectedModuleItem={setSelectedModuleItem}
+                  setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}
+                  setSourceModule={setSourceModule}
+                  isEmpty={isEmpty}
+                />
+              )}
             />
           </Flex.Item>
         )}

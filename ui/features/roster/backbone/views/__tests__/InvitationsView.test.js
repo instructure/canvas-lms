@@ -68,7 +68,10 @@ describe('InvitationsView', () => {
       },
     ]
     const view = buildView(enrollments)
-    isAccessible(view, done, {a11yReport: true})
+    isAccessible(view, done, {
+      a11yReport: true,
+      ignores: ['document-title', 'html-has-lang'],
+    })
   })
 
   test('knows when invitation is pending', () => {

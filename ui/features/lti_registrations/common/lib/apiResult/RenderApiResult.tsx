@@ -16,14 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {InfiniteData, UseInfiniteQueryResult, useQuery, UseQueryResult} from '@tanstack/react-query'
-import {
-  ApiResult,
-  combineAllApiResults,
-  exception,
-  isUnsuccessful,
-  UnsuccessfulApiResult,
-} from './ApiResult'
+import {UseQueryResult} from '@tanstack/react-query'
+import {ApiResult, exception, isUnsuccessful, UnsuccessfulApiResult} from './ApiResult'
 import {ReactElement} from 'react'
 import {ApiResultErrorPage} from './ApiResultErrorPage'
 import {Flex} from '@instructure/ui-flex'

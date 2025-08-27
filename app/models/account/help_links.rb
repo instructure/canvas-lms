@@ -58,8 +58,23 @@ class Account::HelpLinks
         is_featured: false,
         is_new: false,
         feature_headline: -> { "" }
-      }.freeze
+      }.freeze,
     ]
+
+    if @account.root_account.feature_enabled?(:ada_chatbot)
+      defaults << {
+        available_to: %w[user student teacher admin observer unenrolled],
+        text: -> { I18n.t("#help_dialog.ada_chatbot", "Ask Panda Bot") },
+        subtext: -> { I18n.t("#help_dialog.ada_chatbot_sub", "Get instant help from our Virtual Assistant") },
+        url: "#ada_chatbot",
+        type: "default",
+        id: :ada_chatbot,
+        is_featured: false,
+        is_new: false,
+        feature_headline: -> { "" }
+      }.freeze
+    end
+
     filter ? filtered_links(defaults) : defaults
   end
 

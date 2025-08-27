@@ -28,6 +28,8 @@ import {CopyButton} from './CopyButton'
 import {EditButton} from './EditButton'
 import {RemoveButton} from './RemoveButton'
 import {ApplyButton} from './ApplyButton'
+import {BackgroundColorApplier} from './BackgroundColorApplier'
+import {Flex} from '@instructure/ui-flex'
 
 const InsertButton = () => {
   const {addBlockModal} = useBlockContentEditorContext()
@@ -57,28 +59,33 @@ export const BaseBlockEditWrapper = (
     title: string
     setIsEditMode: (isEditMode: boolean) => void
     isEditMode: boolean
+    backgroundColor?: string
   }>,
 ) => {
   const ref = useRef<HTMLDivElement>(null)
   useSetEditMode(ref, props.setIsEditMode)
 
   return (
-    <BaseBlockLayout
-      ref={ref}
-      title={props.title}
-      addButton={<InsertButton />}
-      actionButtons={
-        props.isEditMode
-          ? [<ApplyButton key="action-save-button" onClick={() => props.setIsEditMode(false)} />]
-          : []
-      }
-      menu={[
-        <DuplicateButton key="menu-duplicate-button" />,
-        <EditSettingsButton key="menu-edit-settings-button" />,
-        <DeleteButton key="menu-delete-button" />,
-      ]}
-    >
-      {props.children}
-    </BaseBlockLayout>
+    <BackgroundColorApplier backgroundColor={props.backgroundColor || 'white'}>
+      <BaseBlockLayout
+        ref={ref}
+        title={props.title}
+        addButton={<InsertButton />}
+        actionButtons={
+          props.isEditMode
+            ? [<ApplyButton key="action-save-button" onClick={() => props.setIsEditMode(false)} />]
+            : []
+        }
+        menu={
+          <Flex gap="mediumSmall">
+            <DuplicateButton key="menu-duplicate-button" />
+            <EditSettingsButton key="menu-edit-settings-button" />
+            <DeleteButton key="menu-delete-button" />
+          </Flex>
+        }
+      >
+        {props.children}
+      </BaseBlockLayout>
+    </BackgroundColorApplier>
   )
 }

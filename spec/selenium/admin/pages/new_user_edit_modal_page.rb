@@ -26,15 +26,15 @@ module NewUserEditModalPage
   end
 
   def full_name_input
-    f('input[data-testid="Full Name"]', modal_object)
+    f('input[data-testid="full-name"]', modal_object)
   end
 
   def email_input
-    f('input[data-testid="Email"]', modal_object)
+    f('input[data-testid="unique-id"]', modal_object)
   end
 
   def sortable_name_input
-    f('input[data-testid="Sortable Name"]', modal_object)
+    f('input[data-testid="sortable-name"]', modal_object)
   end
 
   def email_about_creation_check

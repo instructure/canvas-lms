@@ -164,7 +164,7 @@ class OutcomeGroupsApiController < ApplicationController
   end
 
   # @API Get all outcome groups for context
-  #
+  # Returns a list of all outcome groups in the specified context.
   # @returns [OutcomeGroup]
   def index
     return unless can_read_outcomes
@@ -175,7 +175,7 @@ class OutcomeGroupsApiController < ApplicationController
   end
 
   # @API Get all outcome links for context
-  #
+  # Returns a list of all outcome links in the specified context.
   # @argument outcome_style [Optional, String]
   #   The detail level of the outcomes. Defaults to "abbrev".
   #   Specify "full" for more information.
@@ -213,7 +213,7 @@ class OutcomeGroupsApiController < ApplicationController
   end
 
   # @API Show an outcome group
-  #
+  # Returns detailed information about a specific outcome group.
   # @returns OutcomeGroup
   #
   def show

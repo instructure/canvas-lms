@@ -88,5 +88,17 @@ describe Types::RubricAssociationType do
         submission_type.resolve("rubricAssessmentsConnection { nodes { rubricAssociation { savedComments } } }")
       ).to eq ["{\"1\":[\"comment\"]}"]
     end
+
+    it "association_type" do
+      expect(
+        submission_type.resolve("rubricAssessmentsConnection { nodes { rubricAssociation { associationType } } }")
+      ).to eq [rubric_association.association_type]
+    end
+
+    it "association_id" do
+      expect(
+        submission_type.resolve("rubricAssessmentsConnection { nodes { rubricAssociation { associationId } } }")
+      ).to eq [rubric_association.association_id.to_s]
+    end
   end
 end

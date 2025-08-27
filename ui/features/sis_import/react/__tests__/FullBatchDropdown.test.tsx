@@ -37,6 +37,8 @@ const allTerms: Term[] = [
     start_at: '',
     end_at: '',
   },
+  {id: '3', name: 'Spring 1998', start_at: '', end_at: ''},
+  {id: '4', name: 'Spring', start_at: '', end_at: ''},
 ]
 
 const props = {
@@ -124,5 +126,22 @@ describe('FullBatchDropdown', () => {
     await user.click(option1)
 
     expect(props.onSelect).toHaveBeenCalledWith('1')
+  })
+
+  it('sticks to the selected option after blurring', async () => {
+    const user = userEvent.setup()
+    const {getByTestId} = renderDropdown(props)
+
+    const dropdown = getByTestId('full-batch-dropdown')
+    await user.click(dropdown)
+    const option1 = getByTestId('option-4')
+    await user.click(option1)
+
+    expect(props.onSelect).toHaveBeenCalledWith('4')
+
+    dropdown.blur()
+    await waitFor(() => {
+      expect(dropdown).toHaveValue('Spring')
+    })
   })
 })

@@ -62,6 +62,23 @@ describe('AssignmentHeader', () => {
     })
   })
 
+  describe('Grading Progress', () => {
+    it('renders grading progress in saved view', () => {
+      const {getByTestId} = setUp()
+      expect(getByTestId('submission-grading-progress')).toBeInTheDocument()
+    })
+
+    it('does not render grading progress in create view', () => {
+      const {queryByTestId} = setUp({type: 'create'})
+      expect(queryByTestId('submission-grading-progress')).not.toBeInTheDocument()
+    })
+
+    it('does not render grading progress in edit view', () => {
+      const {queryByTestId} = setUp({type: 'edit'})
+      expect(queryByTestId('submission-grading-progress')).not.toBeInTheDocument()
+    })
+  })
+
   describe('status pill', () => {
     it('does not render status pill if there are no submissions', () => {
       const {queryByTestId} = setUp()

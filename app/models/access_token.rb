@@ -40,12 +40,13 @@ class AccessToken < ActiveRecord::Base
 
   serialize :scopes, type: Array
 
-  validates :purpose, length: { maximum: maximum_string_length }
+  validates :purpose, length: { minimum: 1, maximum: maximum_string_length }
   validate :must_only_include_valid_scopes, unless: :deleted?
 
   has_many :notification_endpoints, -> { where(workflow_state: "active") }, dependent: :destroy
 
   before_validation -> { self.developer_key ||= DeveloperKey.default }
+  before_validation -> { self.purpose ||= self.developer_key&.name unless manually_created? }
 
   resolves_root_account through: :developer_key
 
@@ -92,7 +93,7 @@ class AccessToken < ActiveRecord::Base
     can :delete
   end
 
-  # For user-generated tokens, purpose can be manually set.
+  # For user-generated tokens, purpose should always be set.
   # For app-generated tokens, this should be generated based
   # on the scope defined in the auth process (scope has not
   # yet been implemented)
@@ -362,7 +363,7 @@ class AccessToken < ActiveRecord::Base
   end
 
   def manually_created?
-    developer_key_id == DeveloperKey.default.id
+    developer_key_id == DeveloperKey.default.id || developer_key&.name == DeveloperKey::DEFAULT_KEY_NAME
   end
 
   # if user is not provided, all user tokens in the account will be invalidated

@@ -17,7 +17,13 @@
  */
 
 import {createContext, useContext, useState} from 'react'
-import {ExternalTool} from '../utils/types'
+import {
+  ExternalTool,
+  ModuleCursorState,
+  MenuAction,
+  MenuItemActionState,
+  PerModuleState,
+} from '../utils/types'
 
 const ContextModule = createContext<{
   courseId: string
@@ -29,13 +35,19 @@ const ContextModule = createContext<{
   teacherViewEnabled: boolean
   studentViewEnabled: boolean
   restrictQuantitativeData: boolean
+  isObserver: boolean
+  observedStudent: {id: string; name: string} | null
   externalTools: ExternalTool[]
   moduleMenuModalTools: ExternalTool[]
   moduleGroupMenuTools: ExternalTool[]
   moduleMenuTools: ExternalTool[]
   moduleIndexMenuModalTools: ExternalTool[]
-  state: Record<string, any>
-  setState: (state: Record<string, any>) => void
+  menuItemLoadingState: PerModuleState<MenuItemActionState>
+  setMenuItemLoadingState: React.Dispatch<React.SetStateAction<PerModuleState<MenuItemActionState>>>
+  moduleCursorState: ModuleCursorState
+  setModuleCursorState: React.Dispatch<React.SetStateAction<ModuleCursorState>>
+  modulesArePaginated: boolean
+  pageSize: number
 }>(
   {} as {
     courseId: string
@@ -47,13 +59,21 @@ const ContextModule = createContext<{
     teacherViewEnabled: boolean
     studentViewEnabled: boolean
     restrictQuantitativeData: boolean
+    isObserver: boolean
+    observedStudent: {id: string; name: string} | null
     externalTools: ExternalTool[]
     moduleMenuModalTools: ExternalTool[]
     moduleGroupMenuTools: ExternalTool[]
     moduleMenuTools: ExternalTool[]
     moduleIndexMenuModalTools: ExternalTool[]
-    state: Record<string, any>
-    setState: (state: Record<string, any>) => void
+    menuItemLoadingState: PerModuleState<MenuItemActionState>
+    setMenuItemLoadingState: React.Dispatch<
+      React.SetStateAction<PerModuleState<MenuItemActionState>>
+    >
+    moduleCursorState: ModuleCursorState
+    setModuleCursorState: React.Dispatch<React.SetStateAction<ModuleCursorState>>
+    modulesArePaginated: boolean
+    pageSize: number
   },
 )
 
@@ -68,10 +88,14 @@ export const ContextModuleProvider = ({
   teacherViewEnabled,
   studentViewEnabled,
   restrictQuantitativeData,
+  isObserver,
+  observedStudent,
   moduleMenuModalTools,
   moduleGroupMenuTools,
   moduleMenuTools,
   moduleIndexMenuModalTools,
+  modulesArePaginated,
+  pageSize,
 }: {
   children: React.ReactNode
   courseId: string
@@ -92,12 +116,19 @@ export const ContextModuleProvider = ({
   teacherViewEnabled: boolean
   studentViewEnabled: boolean
   restrictQuantitativeData: boolean | undefined
+  isObserver?: boolean
+  observedStudent?: {id: string; name: string} | null
   moduleMenuModalTools: ExternalTool[]
   moduleGroupMenuTools: ExternalTool[]
   moduleMenuTools: ExternalTool[]
   moduleIndexMenuModalTools: ExternalTool[]
+  modulesArePaginated?: boolean
+  pageSize?: number
 }) => {
-  const [state, setState] = useState({})
+  const [menuItemLoadingState, setMenuItemLoadingState] = useState<
+    PerModuleState<MenuItemActionState>
+  >({})
+  const [moduleCursorState, setModuleCursorState] = useState<ModuleCursorState>({})
 
   return (
     <ContextModule.Provider
@@ -111,13 +142,19 @@ export const ContextModuleProvider = ({
         teacherViewEnabled,
         studentViewEnabled,
         restrictQuantitativeData: restrictQuantitativeData ?? false,
+        isObserver: isObserver ?? false,
+        observedStudent: observedStudent ?? null,
         externalTools: moduleMenuModalTools,
         moduleMenuModalTools,
         moduleGroupMenuTools,
         moduleMenuTools,
         moduleIndexMenuModalTools,
-        state,
-        setState,
+        menuItemLoadingState,
+        setMenuItemLoadingState,
+        moduleCursorState,
+        setModuleCursorState,
+        modulesArePaginated: modulesArePaginated ?? false,
+        pageSize: pageSize ?? 10,
       }}
     >
       {children}
@@ -140,17 +177,24 @@ export const contextModuleDefaultProps = {
     canViewUnpublished: true,
     canDirectShare: true,
     readAsAdmin: true,
+    canManageSpeedGrader: true,
   },
   NEW_QUIZZES_BY_DEFAULT: false,
   DEFAULT_POST_TO_SIS: false,
   teacherViewEnabled: false,
   studentViewEnabled: false,
   restrictQuantitativeData: false,
+  isObserver: false,
+  observedStudent: null,
   externalTools: [],
   moduleMenuModalTools: [],
   moduleGroupMenuTools: [],
   moduleMenuTools: [],
   moduleIndexMenuModalTools: [],
-  state: {},
-  setState: () => {},
+  menuItemLoadingState: {},
+  setMenuItemLoadingState: () => {},
+  moduleCursorState: {},
+  setModuleCursorState: () => {},
+  modulesArePaginated: false,
+  pageSize: 10,
 }

@@ -37,6 +37,7 @@ import {type Breakpoints} from '@canvas/with-breakpoints'
 import type {TeacherAssignmentType} from '../graphql/teacher/AssignmentTeacherTypes'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ASSIGNMENT_VIEW_TYPES} from './AssignmentTypes'
+import SubmissionGradingProgress from './SubmissionGradingProgress'
 
 const I18n = createI18nScope('assignment_teacher_header')
 
@@ -86,6 +87,14 @@ const AssignmentHeader: React.FC<HeaderProps> = ({type, assignment, breakpoints}
               </Pill>
             )}
           </Flex>
+          {isSavedView && (
+            <View data-testid="submission-grading-progress" margin="x-small none" tabIndex={0}>
+              <SubmissionGradingProgress
+                totalSubmissions={assignment.totalSubmissions || 0}
+                totalGradedSubmissions={assignment.totalGradedSubmissions || 0}
+              />
+            </View>
+          )}
         </Flex>
         <View
           display={isMobile ? 'block' : 'flex'}

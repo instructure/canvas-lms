@@ -67,9 +67,9 @@ module Lti
         return nil unless id.present?
 
         context.shard.activate do
-          scope = ContextExternalTool.active.where(id:, context: Lti::ContextToolFinder.contexts_to_search(context))
+          scope = ContextExternalTool.active.where(id:, context: Lti::ToolFinderUtils.contexts_to_search(context))
           scope = scope.placements(placement) if placement
-          scope = filter_by_unavailable_context_controls(scope, context)
+          scope = Lti::ToolFinderUtils.filter_by_unavailable_context_controls(scope, context)
           scope.first
         end
       end
@@ -82,7 +82,7 @@ module Lti
       #
       # @return [ContextExternalTool] The first tool that matches the given scope
       def from_context(context, scope:)
-        scope.find_by(context: Lti::ContextToolFinder.contexts_to_search(context))
+        scope.find_by(context: Lti::ToolFinderUtils.contexts_to_search(context))
       end
 
       # Returns the ContextExternalTool for this id, given that it is
@@ -209,7 +209,7 @@ module Lti
           original_client_id = preferred_tool&.developer_key_id
           can_use_preferred_tool = preferred_tool.present? &&
                                    preferred_tool.active? &&
-                                   Lti::ContextToolFinder.contexts_to_search(context).member?(preferred_tool.context)
+                                   Lti::ToolFinderUtils.contexts_to_search(context).member?(preferred_tool.context)
 
           can_use_preferred_tool &&= preferred_tool.available_in_context?(context) if check_availability
 
@@ -224,7 +224,7 @@ module Lti
             prefer_1_1:
           ).active
 
-          potential_tools = filter_by_unavailable_context_controls(potential_tools, context) if check_availability
+          potential_tools = Lti::ToolFinderUtils.filter_by_unavailable_context_controls(potential_tools, context) if check_availability
 
           potential_tools = potential_tools.where(developer_key_id: preferred_client_id) if preferred_client_id
           potential_tools = potential_tools.where.not(id: exclude_tool_id) if exclude_tool_id
@@ -270,23 +270,6 @@ module Lti
         end
 
         ContextExternalTool.find_by(id:)
-      end
-
-      # Filters the given scope of ContextExternalTools by the context controls
-      # that are set for the given context.
-      #
-      # @param scope [ActiveRecord::Relation] a ContextExternalTool query to narrow the search
-      # @param context [Account | Course | Group | Assignment] the current context
-      # @return [ActiveRecord::Relation] the scope filtered by context controls. All LTI 1.1 tools are included
-      #  since they do not support context controls and are always considered available so long as they are active.
-      def filter_by_unavailable_context_controls(scope, context)
-        return scope unless context.root_account.feature_enabled?(:lti_registrations_next)
-
-        deployment_ids = Lti::ContextControl.deployment_ids_for_context(context)
-
-        context.shard.activate do
-          scope.where(id: deployment_ids).or(scope.lti_1_1)
-        end
       end
 
       private
@@ -349,7 +332,7 @@ module Lti
             order_clauses.prepend(sort_by_sql_string("developer_key_id = #{original_client_id}"))
           end
 
-          contexts = Lti::ContextToolFinder.contexts_to_search(context)
+          contexts = Lti::ToolFinderUtils.contexts_to_search(context)
           ContextExternalTool
             .where(context: contexts)
             .joins(Lti::ContextToolFinder.context_ordering_sql(contexts))

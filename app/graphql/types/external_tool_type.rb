@@ -55,6 +55,7 @@ module Types
     implements Interfaces::TimestampInterface
     implements Interfaces::ModuleItemInterface
     implements Interfaces::LegacyIDInterface
+    implements Interfaces::PlacementsInterface
 
     field :url, Types::UrlType, null: true
 
@@ -62,15 +63,16 @@ module Types
       object.login_or_launch_url
     end
 
-    field :name, String, null: true
+    field :name, String, null: false
 
     field :description, String, null: true
 
     field :published, Boolean, null: true
-
     def published
-      object.workflow_state != "deleted"
+      object.active?
     end
+
+    field :domain, String, null: true
 
     field :settings, ExternalToolSettingsType, null: true
 

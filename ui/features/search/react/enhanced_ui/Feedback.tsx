@@ -82,6 +82,7 @@ export default function Feedback(props: Props) {
                 <IconLikeLine color="brand" />
               )
             }
+            aria-pressed={feedback === 'liked'}
           >
             <ScreenReaderContent>{I18n.t('I like these results')}</ScreenReaderContent>
           </CondensedButton>
@@ -102,6 +103,7 @@ export default function Feedback(props: Props) {
                   <IconLikeLine color="brand" />
                 )
               }
+              aria-pressed={feedback === 'disliked'}
             >
               <ScreenReaderContent>{I18n.t('I do not like these results')}</ScreenReaderContent>
             </CondensedButton>

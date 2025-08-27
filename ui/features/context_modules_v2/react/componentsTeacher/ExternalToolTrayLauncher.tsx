@@ -47,7 +47,7 @@ const ExternalToolTrayLauncher: React.FC<ExternalToolTrayLauncherProps> = ({
   isMenuOpen,
 }) => {
   const {courseId} = useContextModule()
-  const {data: moduleItems} = useModuleItems(moduleId, expanded || isMenuOpen)
+  const {data: moduleItems} = useModuleItems(moduleId, null, expanded || isMenuOpen)
 
   const handleExternalContentReady = () => {
     onClose()

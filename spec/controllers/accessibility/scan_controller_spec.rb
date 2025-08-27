@@ -23,7 +23,7 @@ RSpec.describe Accessibility::ScanController do
     let!(:user) { User.create! }
 
     before do
-      allow(controller).to receive_messages(validate_allowed: true, require_user: true)
+      allow(controller).to receive_messages(check_authorized_action: true, require_user: true)
       controller.instance_variable_set(:@current_user, user)
     end
 
@@ -37,7 +37,7 @@ RSpec.describe Accessibility::ScanController do
 
     context "when the course exists" do
       it "calls the CourseScannerService and returns success" do
-        allow(controller).to receive(:validate_allowed).and_return(true)
+        allow(controller).to receive(:check_authorized_action).and_return(true)
         expect(Accessibility::CourseScannerService).to receive(:call).with(course:)
 
         post :create, params: { course_id: course.id }
@@ -50,7 +50,7 @@ RSpec.describe Accessibility::ScanController do
       let(:params) { { course_id: -1 } }
 
       it "returns a not found error" do
-        allow(controller).to receive(:validate_allowed).and_return(true)
+        allow(controller).to receive(:check_authorized_action).and_return(true)
 
         post :create, params: { course_id: -1 }
 

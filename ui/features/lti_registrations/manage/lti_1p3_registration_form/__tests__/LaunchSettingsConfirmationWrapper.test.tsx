@@ -16,23 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {LaunchSettingsConfirmationWrapper} from '../components/LaunchSettingsConfirmationWrapper'
 import {mockInternalConfiguration} from './helpers'
 import {createLti1p3RegistrationOverlayStore} from '../../registration_overlay/Lti1p3RegistrationOverlayStore'
-import fakeENV from '@canvas/test-utils/fakeENV'
-
-beforeEach(() => {
-  fakeENV.setup()
-  jest.useRealTimers()
-})
-
-afterEach(() => {
-  jest.useFakeTimers()
-  fakeENV.teardown()
-})
 
 describe('LaunchSettings', () => {
   it('renders the form correctly', () => {

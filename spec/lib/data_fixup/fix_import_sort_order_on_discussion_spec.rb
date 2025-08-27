@@ -21,9 +21,10 @@ RSpec.describe DataFixup::FixImportSortOrderOnDiscussion do
   describe ".run" do
     let!(:topic_asc) { discussion_topic_model({ sort_order: "asc" }) }
     let!(:topic_desc) { discussion_topic_model({ sort_order: "desc" }) }
-    let!(:topic_f) { discussion_topic_model({ sort_order: "f" }) }
+    let!(:topic_f) { discussion_topic_model }
 
     before do
+      topic_f.update_column(:sort_order, "f")
       DataFixup::FixImportSortOrderOnDiscussion.run
     end
 

@@ -109,5 +109,7 @@ module Types
         set.sis_source_id if root_account.grants_any_right?(current_user, :read_sis, :manage_sis)
       end
     end
+
+    field :single_tag, Boolean, null: false, method: :single_tag?
   end
 end

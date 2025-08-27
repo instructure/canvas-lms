@@ -27,7 +27,7 @@ module Lti::IMS
   # `https://purl.imsglobal.org/spec/lti/scope/noticehandlers` scope.
   #
   # See the Canvas
-  # <a href="/doc/api/file.pns.html">Platform Notification Service</a>
+  # <a href="file.pns.html">Platform Notification Service</a>
   # intro guide for an overview of these endpoints and information on specific
   # notice types.
   #

@@ -9784,6 +9784,16 @@ describe Submission do
       expect(sub.reload.word_count).to eq 12
     end
 
+    it "uses the attachment content — and not the body — to calculate word count when it's a file upload submission" do
+      student_in_course(active_all: true)
+      submission_text = "@channel MY LEGSSSS!!!!! THEY'RE STUCK UNDER MY DESK!!!!!!!"
+      attachment = attachment_model(uploaded_data: stub_file_data("submission.txt", submission_text, "text/plain"), context: @student)
+      sub = @assignment.submit_homework(@student, attachments: [attachment])
+      sub.update!(body: "")
+      run_jobs
+      expect(sub.reload.word_count).to eq 8
+    end
+
     context "when calculating word count on-the-fly" do
       before { Account.site_admin.disable_feature!(:use_body_word_count) }
 

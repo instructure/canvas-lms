@@ -83,6 +83,7 @@ const StudentGroupCategoryProps = {
   self_signup: null,
   sis_group_category_id: null,
   sis_import_id: null,
+  non_collaborative: false,
 }
 
 const defaultProps: FilterNavProps = {
@@ -176,6 +177,16 @@ const defaultProps: FilterNavProps = {
       groups: [
         {id: '3', name: 'Student Group 3'},
         {id: '4', name: 'Student Group 4'},
+      ],
+    },
+    '3': {
+      ...StudentGroupCategoryProps,
+      id: '3',
+      name: 'Differentiation Tag Group Category 1',
+      non_collaborative: true,
+      groups: [
+        {id: '3', name: 'Differentiation Tag Group 1', non_collaborative: true},
+        {id: '4', name: 'Differentiation Tag Group 2', non_collaborative: true},
       ],
     },
   },
@@ -307,6 +318,7 @@ describe('Filter dropdown', () => {
     expect(getByText('Grading Periods')).toBeVisible()
     expect(getByText('Assignment Groups')).toBeVisible()
     expect(getByText('Student Groups')).toBeVisible()
+    expect(getByText('Differentiation Tags')).toBeVisible()
     expect(getByText('Status')).toBeVisible()
     expect(getByText('Submissions')).toBeVisible()
     expect(getByText('Start & End Date')).toBeVisible()

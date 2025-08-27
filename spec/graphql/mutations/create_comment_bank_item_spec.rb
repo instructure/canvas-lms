@@ -57,6 +57,15 @@ describe Mutations::CreateCommentBankItem do
     GQL
   end
 
+  let(:valid_query_with_assignment) do
+    assignment = @course.assignments.create!(title: "Test Assignment")
+    <<~GQL
+      courseId: #{@course.id}
+      comment: "this is my assignment comment"
+      assignmentId: #{assignment.id}
+    GQL
+  end
+
   it "creates a comment bank item for the current_user" do
     result = execute_with_input(valid_query)
     expect(result["errors"]).to be_nil
@@ -75,6 +84,35 @@ describe Mutations::CreateCommentBankItem do
     GQL
     courseId = execute_with_input(query).dig("data", "createCommentBankItem", "commentBankItem", "courseId")
     expect(courseId).to eq @course.id.to_s
+  end
+
+  it "creates a comment bank item with assignment" do
+    assignment = @course.assignments.create!(title: "Test Assignment")
+    query = <<~GQL
+      courseId: #{@course.id}
+      comment: "this is my assignment comment"
+      assignmentId: #{assignment.id}
+    GQL
+    result = execute_with_input(query)
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "createCommentBankItem", "errors")).to be_nil
+    comment_bank_item_id = result.dig("data", "createCommentBankItem", "commentBankItem", "_id")
+    record = CommentBankItem.find(comment_bank_item_id)
+    expect(record.assignment).to eq assignment
+  end
+
+  it "allows relay id for assignment_id" do
+    assignment = @course.assignments.create!(title: "Test Assignment")
+    query = <<~GQL
+      courseId: #{@course.id}
+      comment: "assignment comment"
+      assignmentId: #{GraphQLHelpers.relay_or_legacy_id_prepare_func("Assignment").call(assignment.id.to_s)}
+    GQL
+    result = execute_with_input(query)
+    expect(result["errors"]).to be_nil
+    comment_bank_item_id = result.dig("data", "createCommentBankItem", "commentBankItem", "_id")
+    record = CommentBankItem.find(comment_bank_item_id)
+    expect(record.assignment).to eq assignment
   end
 
   context "errors" do
@@ -106,6 +144,40 @@ describe Mutations::CreateCommentBankItem do
       GQL
       result = execute_with_input(query, user_executing: @student)
       expect_error(result, "not found")
+    end
+
+    it "invalid assignment id" do
+      query = <<~GQL
+        courseId: #{@course.id}
+        comment: "comment"
+        assignmentId: 999999
+      GQL
+      result = execute_with_input(query)
+      expect_error(result, "Assignment not found")
+    end
+
+    it "assignment from different course" do
+      other_course = Course.create!(name: "Other Course", account: @account)
+      other_assignment = other_course.assignments.create!(title: "Other Assignment")
+      query = <<~GQL
+        courseId: #{@course.id}
+        comment: "comment"
+        assignmentId: #{other_assignment.id}
+      GQL
+      result = execute_with_input(query)
+      expect_error(result, "Assignment not found")
+    end
+
+    it "inactive assignment" do
+      assignment = @course.assignments.create!(title: "Test Assignment")
+      assignment.destroy
+      query = <<~GQL
+        courseId: #{@course.id}
+        comment: "comment"
+        assignmentId: #{assignment.id}
+      GQL
+      result = execute_with_input(query)
+      expect_error(result, "Assignment not found")
     end
   end
 end

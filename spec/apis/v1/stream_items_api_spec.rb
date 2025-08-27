@@ -358,7 +358,7 @@ describe UsersController, type: :request do
   it "translates user content in discussion topic" do
     should_translate_user_content(@course) do |user_content|
       @context = @course
-      discussion_topic_model(message: user_content)
+      discussion_topic_model(message: user_content, user: @user)
       json = api_call(:get,
                       "/api/v1/users/activity_stream.json",
                       { controller: "users", action: "activity_stream", format: "json" })
@@ -369,7 +369,7 @@ describe UsersController, type: :request do
   it "translates user content in discussion topic without verifiers" do
     should_translate_user_content(@course, false) do |user_content|
       @context = @course
-      discussion_topic_model(message: user_content)
+      discussion_topic_model(message: user_content, user: @user)
       json = api_call(:get,
                       "/api/v1/users/activity_stream.json",
                       { controller: "users", action: "activity_stream", format: "json", no_verifiers: true })
@@ -436,7 +436,7 @@ describe UsersController, type: :request do
   it "translates user content in announcement messages" do
     should_translate_user_content(@course) do |user_content|
       @context = @course
-      announcement_model(message: user_content)
+      announcement_model(message: user_content, user: @user)
       json = api_call(:get,
                       "/api/v1/users/activity_stream.json",
                       { controller: "users", action: "activity_stream", format: "json" })
@@ -447,7 +447,7 @@ describe UsersController, type: :request do
   it "translates user content in announcement messages without verifiers" do
     should_translate_user_content(@course, false) do |user_content|
       @context = @course
-      announcement_model(message: user_content)
+      announcement_model(message: user_content, user: @user)
       json = api_call(:get,
                       "/api/v1/users/activity_stream.json",
                       { controller: "users", action: "activity_stream", format: "json", no_verifiers: true })

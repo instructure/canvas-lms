@@ -56,7 +56,11 @@ export default function HelpLinks({onClick}: Props) {
   const showSeparator = featuredLink && !!nonFeaturedLinks.length
 
   const handleClick = (link: HelpLink) => (event: React.MouseEvent<unknown, MouseEvent>) => {
-    if (link.url === '#create_ticket' || link.url === '#teacher_feedback') {
+    if (
+      link.url === '#create_ticket' ||
+      link.url === '#teacher_feedback' ||
+      link.url === '#ada_chatbot'
+    ) {
       event.preventDefault()
       onClick(link.url)
     }

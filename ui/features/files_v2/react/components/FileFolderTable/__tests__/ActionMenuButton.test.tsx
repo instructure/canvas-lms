@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
+import '@canvas/files/mockFilesENV'
 import {BrowserRouter as Router} from 'react-router-dom'
 import ActionMenuButton, {ActionMenuButtonProps} from '../ActionMenuButton'
 import {FAKE_FILES, FAKE_FOLDERS} from '../../../../fixtures/fakeData'
@@ -39,9 +40,9 @@ jest.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashError: jest.fn().mockReturnValue(() => {}),
 }))
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
-}))
+// jest.mock('@canvas/util/globalUtils', () => ({
+//   assignLocation: jest.fn(),
+// }))
 
 jest.mock('../../../../utils/downloadUtils', () => ({
   downloadZip: jest.fn(),
@@ -78,6 +79,9 @@ describe('ActionMenuButton', () => {
   afterEach(() => {
     fetchMock.restore()
     jest.clearAllMocks()
+    if (ENV.FEATURES?.restrict_student_access !== undefined) {
+      delete ENV.FEATURES.restrict_student_access
+    }
   })
 
   describe('when item is a file', () => {
@@ -102,6 +106,44 @@ describe('ActionMenuButton', () => {
         expect(screen.getByText('Copy To...')).toBeInTheDocument()
         expect(screen.getByText('Move To...')).toBeInTheDocument()
         expect(screen.getByText('Delete')).toBeInTheDocument()
+      })
+    })
+
+    it('does not render move button for file when student access is restricted', async () => {
+      ENV.FEATURES = {restrict_student_access: true}
+      ENV.current_user_roles = ['student']
+
+      const user = userEvent.setup()
+      renderComponent()
+
+      const button = screen.getByTestId('action-menu-button-large')
+      expect(button).toBeInTheDocument()
+
+      await user.click(button)
+      await waitFor(() => {
+        expect(screen.getByText('Rename')).toBeInTheDocument()
+        expect(screen.queryByText('Download')).toBeNull()
+        expect(screen.getByText('Edit Permissions')).toBeInTheDocument()
+        expect(screen.getByText('Manage Usage Rights')).toBeInTheDocument()
+        expect(screen.getByText('Send To...')).toBeInTheDocument()
+        expect(screen.getByText('Copy To...')).toBeInTheDocument()
+        expect(screen.queryByText('Move To...')).toBeNull()
+        expect(screen.getByText('Delete')).toBeInTheDocument()
+      })
+    })
+
+    it('does not render download button for file when student access is restricted', async () => {
+      ENV.FEATURES = {restrict_student_access: true}
+      ENV.current_user_roles = ['student']
+
+      const user = userEvent.setup()
+      renderComponent()
+
+      const button = screen.getByTestId('action-menu-button-large')
+      await user.click(button)
+
+      await waitFor(() => {
+        expect(screen.queryByText('Download')).toBeNull()
       })
     })
 
@@ -324,6 +366,26 @@ describe('ActionMenuButton', () => {
       })
     })
 
+    it('does not render move button for folder when student access is restricted', async () => {
+      ENV.FEATURES = {restrict_student_access: true}
+      ENV.current_user_roles = ['student']
+
+      const user = userEvent.setup()
+      renderComponent()
+
+      const button = screen.getByTestId('action-menu-button-large')
+      expect(button).toBeInTheDocument()
+
+      await user.click(button)
+      await waitFor(() => {
+        expect(screen.getByText('Rename')).toBeInTheDocument()
+        expect(screen.queryByText('Download')).toBeNull()
+        expect(screen.getByText('Edit Permissions')).toBeInTheDocument()
+        expect(screen.getByText('Manage Usage Rights')).toBeInTheDocument()
+        expect(screen.queryByText('Move To...')).toBeNull()
+        expect(screen.getByText('Delete')).toBeInTheDocument()
+      })
+    })
     it('does call correct download API with correct parameters', async () => {
       const user = userEvent.setup()
       renderComponent()

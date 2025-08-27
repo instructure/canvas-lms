@@ -23,6 +23,7 @@
  */
 export interface EnvContextModules {
   course_id: string
+  PAGE_TITLE: string | null
   CONTEXT_URL_ROOT: string
   ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: boolean
   CONTENT_MIGRATIONS_EXPIRE_DAYS: number
@@ -47,6 +48,7 @@ export interface EnvContextModules {
         canDelete: boolean
         canViewUnpublished: boolean
         canDirectShare: boolean
+        canManageSpeedGrader: boolean
       }
     | undefined
   NEW_QUIZZES_BY_DEFAULT: boolean | undefined
@@ -71,5 +73,13 @@ export interface EnvContextModules {
   MODULE_FEATURES?: {
     STUDENT_MODULE_SELECTION: boolean
     TEACHER_MODULE_SELECTION: boolean
+    MODULES_ARE_PAGINATED?: boolean
+    PAGE_SIZE?: number
   }
+  MODULES_OBSERVER_INFO?: {
+    isObserver: boolean
+    observedStudent: {id: string; name: string} | null
+    courseName: string
+  }
+  CONTEXT_MODULES_HEADER_PROPS?: any
 }

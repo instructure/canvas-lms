@@ -28,6 +28,7 @@ import {
 
 import {
   AssetProcessorWindowSettings,
+  AssetProcessorType,
   ExistingAttachedAssetProcessor,
   safeDigIconUrl,
   ZAssetProcessorContentItem,
@@ -35,16 +36,28 @@ import {
 import {IframeDimensions} from '@canvas/lti/model/common'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {confirmDanger} from '@canvas/instui-bindings/react/Confirm'
-import {LtiLaunchDefinition} from '@canvas/select-content-dialog/jquery/select_content_dialog'
+import {
+  LtiLaunchDefinition,
+  LtiLaunchPlacement,
+} from '@canvas/select-content-dialog/jquery/select_content_dialog'
 import {useAssetProcessorsToolsList} from './useAssetProcessorsToolsList'
 
 const I18n = createI18nScope('asset_processors_selection')
 
+export enum ContentItemType {
+  LtiAssetProcessor = 'ltiAssetProcessor',
+  LtiAssetProcessorContribution = 'ltiAssetProcessorContribution',
+}
+
 export type AssetProcessorsState = {
   attachedProcessors: AttachedAssetProcessor[]
 
-  addAttachedProcessors: ({tool, data}: {tool: LtiLaunchDefinition; data: DeepLinkResponse}) => void
-  deleteAttachedProcessor: (index: number, onDelete?: () => void) => Promise<void>
+  addAttachedProcessors: ({
+    tool,
+    data,
+    type,
+  }: {tool: LtiLaunchDefinition; data: DeepLinkResponse; type: AssetProcessorType}) => void
+  removeAttachedProcessor: (index: number, onRemove?: () => void) => Promise<void>
   setFromExistingAttachedProcessors: (processors: ExistingAttachedAssetProcessor[]) => void
 }
 
@@ -85,13 +98,13 @@ function newAttachedAssetProcessor({
   tool,
   contentItem,
 }: {tool: LtiLaunchDefinition; contentItem: AssetProcessorContentItem}): AttachedAssetProcessor {
+  const placement = placementData(tool, placementForContentItemType(contentItem))
   return {
     toolId: tool.definition_id,
     // tool.name in LtiLaunchDefinitions is not really tool name, it's the placement title
-    toolName: tool.placements.ActivityAssetProcessor!.tool_name_for_default_icon || tool.name,
-    toolPlacementLabel: tool.placements.ActivityAssetProcessor!.title,
-    iconOrToolIconUrl:
-      safeDigIconUrl(contentItem.icon) || tool.placements.ActivityAssetProcessor!.icon_url,
+    toolName: placement?.tool_name_for_default_icon || tool.name,
+    toolPlacementLabel: placement?.title,
+    iconOrToolIconUrl: safeDigIconUrl(contentItem.icon) || placement?.icon_url,
     text: contentItem.text,
     title: contentItem.title,
     iframe: contentItem.iframe,
@@ -100,6 +113,19 @@ function newAttachedAssetProcessor({
       new_content_item: assetProcessorContentItemToDto(contentItem, tool.definition_id),
     },
   }
+}
+
+function placementForContentItemType(contentItem: AssetProcessorContentItem): AssetProcessorType {
+  return contentItem.type === ContentItemType.LtiAssetProcessor
+    ? 'ActivityAssetProcessor'
+    : 'ActivityAssetProcessorContribution'
+}
+
+function placementData(
+  tool: LtiLaunchDefinition,
+  type: AssetProcessorType,
+): LtiLaunchPlacement | undefined {
+  return tool.placements?.[type]
 }
 
 function existingAttachedAssetProcessor(
@@ -146,28 +172,33 @@ function showFlashMessagesFromDeepLinkingResponse(data: DeepLinkResponse) {
 export const useAssetProcessorsState = create<AssetProcessorsState>((set, get) => ({
   attachedProcessors: [],
 
-  addAttachedProcessors({tool, data}) {
+  addAttachedProcessors({tool, data, type}) {
     showFlashMessagesFromDeepLinkingResponse(data)
 
+    const allowedType =
+      type === 'ActivityAssetProcessor'
+        ? ContentItemType.LtiAssetProcessor
+        : ContentItemType.LtiAssetProcessorContribution
+
     const newProcessors = data.content_items
-      .filter(item => item.type === 'ltiAssetProcessor')
+      .filter(item => item.type === allowedType)
       .map(item => ZAssetProcessorContentItem.parse(item))
       .map(contentItem => newAttachedAssetProcessor({tool, contentItem}))
 
     set({attachedProcessors: [...get().attachedProcessors, ...newProcessors]})
   },
 
-  deleteAttachedProcessor: async (index: number, onDelete?: () => void) => {
+  removeAttachedProcessor: async (index: number, onRemove?: () => void) => {
     const attachedProcessors = get().attachedProcessors
     const processor = attachedProcessors[index]
 
-    const title = I18n.t('Confirm Delete')
+    const title = I18n.t('Confirm Removal')
     const msg = I18n.t(
-      "Are you sure you'd like to delete *%{title}*? Deleting %{title} will will prevent future submissions from being processed by them as well as removing any existing reports by %{title} from your Speedgrader view.",
+      "Are you sure you'd like to remove *%{title}*? Removing %{title} will prevent future submissions from being processed by them as well as removing any existing reports by %{title} from your Speedgrader view.",
       {title: processor.title, wrapper: '<strong>$1</strong>'},
     )
     const messageDangerouslySetInnerHTML = {__html: msg}
-    const confirmButtonLabel = I18n.t('Delete')
+    const confirmButtonLabel = I18n.t('Remove')
     if (
       await confirmDanger({
         title,
@@ -177,7 +208,7 @@ export const useAssetProcessorsState = create<AssetProcessorsState>((set, get) =
       })
     ) {
       set({attachedProcessors: get().attachedProcessors.filter((_, i) => i !== index)})
-      onDelete?.()
+      onRemove?.()
     }
   },
 
@@ -189,8 +220,8 @@ export const useAssetProcessorsState = create<AssetProcessorsState>((set, get) =
  * Returns true if there are any asset processors attached to the assignment or
  * discussion, or if there are tools available to attach.
  */
-export function useShouldShowAssetProcessors(courseId: number): boolean {
+export function useShouldShowAssetProcessors(courseId: number, type: AssetProcessorType): boolean {
   const attachedProcessors = useAssetProcessorsState(s => s.attachedProcessors)
-  const toolsAvailable = !!useAssetProcessorsToolsList(courseId).data?.length
+  const toolsAvailable = !!useAssetProcessorsToolsList(courseId, type).data?.length
   return toolsAvailable || attachedProcessors.length > 0
 }

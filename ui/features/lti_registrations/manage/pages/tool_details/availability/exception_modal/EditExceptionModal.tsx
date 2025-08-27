@@ -25,6 +25,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {List} from '@instructure/ui-list'
 import {Modal} from '@instructure/ui-modal'
+import {View} from '@instructure/ui-view'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Spinner} from '@instructure/ui-spinner'
 import {useMutation} from '@tanstack/react-query'
@@ -92,64 +93,70 @@ export const EditExceptionModal = ({
         <CloseButton placement="end" offset="small" onClick={onClose} screenReaderLabel="Close" />
         <Heading>{I18n.t('Edit Exception')}</Heading>
       </Modal.Header>
-      <Modal.Body padding="medium medium">
-        {updateMutation.isPending ? (
-          <Flex justifyItems="center" alignItems="center" margin="small">
-            <Flex.Item>
-              <Spinner size="large" margin="0 small" renderTitle={I18n.t('Deleting exceptions')} />
-            </Flex.Item>
-          </Flex>
-        ) : (
-          <List isUnstyled itemSpacing="medium" margin="0">
-            <List.Item>
-              <Alert hasShadow={false} margin="0">
-                {createAlertMessage(control)}
-              </Alert>
-            </List.Item>
-            <List.Item>
-              <Heading level="h3" margin="0 0 small 0">
-                {I18n.t('Exception to be edited:')}
-              </Heading>
-            </List.Item>
-            <List.Item>
-              <ContextCard
-                context_name={control.context_name}
-                inherit_note={availableInParentContext === available}
-                course_id={toUndefined(control.course_id)}
-                account_id={toUndefined(control.account_id)}
-                exception_counts={{
-                  child_control_count: control.child_control_count,
-                  course_count: control.course_count,
-                  subaccount_count: control.subaccount_count,
-                }}
-                path_segments={control.display_path}
-              />
-            </List.Item>
-            <List.Item>
-              <Flex direction="row" gap="small" margin="0 0 0 medium">
-                <Flex.Item shouldShrink>
-                  <Tag text={control.available ? I18n.t('Available') : I18n.t('Not Available')} />
-                </Flex.Item>
-                <Flex.Item>→</Flex.Item>
-                <Flex.Item shouldShrink shouldGrow={false}>
-                  <SimpleSelect
-                    inputRef={ref => (selectorRef.current = ref)}
-                    renderLabel={''}
-                    value={available ? 'available' : 'unavailable'}
-                    onChange={(_, {value}) => setAvailable(value === 'available')}
-                  >
-                    <SimpleSelect.Option id="available" value="available">
-                      {I18n.t('Available')}
-                    </SimpleSelect.Option>
-                    <SimpleSelect.Option id="unavailable" value="unavailable">
-                      {I18n.t('Not Available')}
-                    </SimpleSelect.Option>
-                  </SimpleSelect>
-                </Flex.Item>
-              </Flex>
-            </List.Item>
-          </List>
-        )}
+      <Modal.Body overflow="scroll" padding="medium medium">
+        <View height="25rem" as="div">
+          {updateMutation.isPending ? (
+            <Flex justifyItems="center" alignItems="center" margin="small">
+              <Flex.Item>
+                <Spinner
+                  size="large"
+                  margin="0 small"
+                  renderTitle={I18n.t('Deleting exceptions')}
+                />
+              </Flex.Item>
+            </Flex>
+          ) : (
+            <List isUnstyled itemSpacing="medium" margin="0">
+              <List.Item>
+                <Alert hasShadow={false} margin="0">
+                  {createAlertMessage(control)}
+                </Alert>
+              </List.Item>
+              <List.Item>
+                <Heading level="h3" margin="0 0 small 0">
+                  {I18n.t('Exception to be edited:')}
+                </Heading>
+              </List.Item>
+              <List.Item>
+                <ContextCard
+                  context_name={control.context_name}
+                  inherit_note={availableInParentContext === available}
+                  course_id={toUndefined(control.course_id)}
+                  account_id={toUndefined(control.account_id)}
+                  exception_counts={{
+                    child_control_count: control.child_control_count,
+                    course_count: control.course_count,
+                    subaccount_count: control.subaccount_count,
+                  }}
+                  path_segments={control.display_path}
+                />
+              </List.Item>
+              <List.Item>
+                <Flex direction="row" gap="small" margin="0 0 0 medium">
+                  <Flex.Item shouldShrink>
+                    <Tag text={control.available ? I18n.t('Available') : I18n.t('Not Available')} />
+                  </Flex.Item>
+                  <Flex.Item>→</Flex.Item>
+                  <Flex.Item shouldShrink shouldGrow={false}>
+                    <SimpleSelect
+                      inputRef={ref => (selectorRef.current = ref)}
+                      renderLabel={''}
+                      value={available ? 'available' : 'unavailable'}
+                      onChange={(_, {value}) => setAvailable(value === 'available')}
+                    >
+                      <SimpleSelect.Option id="available" value="available">
+                        {I18n.t('Available')}
+                      </SimpleSelect.Option>
+                      <SimpleSelect.Option id="unavailable" value="unavailable">
+                        {I18n.t('Not Available')}
+                      </SimpleSelect.Option>
+                    </SimpleSelect>
+                  </Flex.Item>
+                </Flex>
+              </List.Item>
+            </List>
+          )}
+        </View>
       </Modal.Body>
       <Modal.Footer>
         <Button margin="0 small 0 0" onClick={onClose}>

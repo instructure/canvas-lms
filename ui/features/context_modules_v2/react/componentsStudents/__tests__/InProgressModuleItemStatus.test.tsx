@@ -22,7 +22,6 @@ import ModuleItemListStudent, {ModuleItemListStudentProps} from '../ModuleItemLi
 
 const defaultProps: ModuleItemListStudentProps = {
   moduleItems: [],
-  isLoading: false,
   error: null,
   completionRequirements: [],
 }
@@ -37,18 +36,13 @@ const renderComponent = (props: Partial<ModuleItemListStudentProps>) => {
 }
 
 describe('ModuleItemListStudent', () => {
-  it('displays loading spinner when isLoading is true', () => {
-    renderComponent({isLoading: true})
-    expect(screen.getByText('Loading module items...')).toBeInTheDocument()
-  })
-
   it('displays error message when error is present', () => {
     renderComponent({error: {message: 'Failed to load'}})
     expect(screen.getByText('Error loading module items')).toBeInTheDocument()
   })
 
   it('displays "No items in this module" when moduleItems is empty', () => {
-    renderComponent({})
+    renderComponent({isEmpty: true})
     expect(screen.getByText('No items in this module')).toBeInTheDocument()
   })
 })

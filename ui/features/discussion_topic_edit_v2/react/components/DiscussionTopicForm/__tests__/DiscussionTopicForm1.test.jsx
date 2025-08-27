@@ -34,8 +34,8 @@ describe('DiscussionTopicForm', () => {
     assignmentGroups = [],
     isStudent = false,
     sections = [
-      {id: 1, name: 'Section 1'},
-      {id: 2, name: 'Section 2'},
+      {id: '1', name: 'Section 1'},
+      {id: '2', name: 'Section 2'},
     ],
     groupCategories = [],
     onSubmit = () => {},
@@ -360,7 +360,7 @@ describe('DiscussionTopicForm', () => {
       const {getByText} = setup({
         currentDiscussionTopic: DiscussionTopic.mock({
           groupSet: false,
-          courseSections: [{_id: 1, name: 'Section 1'}],
+          courseSections: [{_id: '1', name: 'Section 1'}],
         }),
       })
       expect(getByText('Section 1')).toBeTruthy()

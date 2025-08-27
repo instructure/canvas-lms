@@ -17,10 +17,9 @@
  */
 
 // tests/SearchIssue.test.js
-import React from 'react'
 import {render, screen, fireEvent, waitFor} from '@testing-library/react'
 import '@testing-library/jest-dom'
-import SearchIssue from '../SearchIssue'
+import {SearchIssue} from '../SearchIssue'
 
 describe('SearchIssue Component', () => {
   beforeEach(() => {
