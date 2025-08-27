@@ -3478,6 +3478,7 @@ class Course < ActiveRecord::Base
     cache_key = [user, self, opts].cache_key
     @tabs_available ||= {}
     @tabs_available[cache_key] ||= uncached_tabs_available(user, opts)
+    @tabs_available[cache_key]
   end
 
   def uncached_tabs_available(user, opts)
