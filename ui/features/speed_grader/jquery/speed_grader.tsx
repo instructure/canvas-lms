@@ -653,37 +653,93 @@ export function initDropdown() {
     const $selectmenu_list = $selectmenu?.data('ui-selectmenu').list
     const $menu = $('#section-menu')
 
-    $menu
-      .find('ul')
-      .append(
-        $.map(
-          window.jsonData.context.active_course_sections,
-          section =>
-            `<li><a class="section_${section.id}" data-section-id="${
-              section.id
-            }" href="#">${htmlEscape(section.name)}</a></li>`,
-        ).join(''),
-      )
-
-    $menu
-      .insertBefore($selectmenu_list)
-      .bind('mouseenter mouseleave', function (event) {
-        $(this)
-          .toggleClass(
-            'ui-selectmenu-item-selected ui-selectmenu-item-focus ui-state-hover',
-            event.type === 'mouseenter',
-          )
-          .find('ul')
-          .toggle(event.type === 'mouseenter')
-      })
-      .find('ul')
-      .hide()
-      .menu()
-      .on('click mousedown', 'a', function (_event) {
-        EG.changeToSection($(this).data('section-id'))
-      })
-
     if (ENV.multiselect_filters_enabled) {
+      $menu
+        .find('ul')
+        .append(
+          $.map(window.jsonData.context.active_course_sections, section => {
+            const $li = $('<li>')
+            const $div = $('<div>', {class: 'sg-sections-menu-item'})
+
+            const $input = $('<input>', {
+              id: `section_box_${section.id}`,
+              type: 'checkbox',
+              'data-section-id': section.id,
+            })
+
+            const $link = $('<a>', {
+              class: `section_${section.id}`,
+              'data-section-id': section.id,
+              href: '#',
+            }).text(section.name)
+
+            $div.append($input, $link)
+            $li.append($div)
+
+            return $li
+          }),
+        )
+        .append(
+          $('<li>', {class: 'ui-menu-item', id: 'sg-section-filter-apply-container'}).append(
+            $('<button>', {text: I18n.t('Apply')}),
+          ),
+        )
+
+      $menu
+        .insertBefore($selectmenu_list)
+        .bind('mouseenter mouseleave', function (event) {
+          $(this)
+            .toggleClass(
+              'ui-selectmenu-item-selected ui-selectmenu-item-focus ui-state-hover',
+              event.type === 'mouseenter',
+            )
+            .find('ul')
+            .toggle(event.type === 'mouseenter')
+        })
+        .find('ul')
+        .hide()
+        .menu()
+        .on('mousedown', 'li', function (event) {
+          event.stopPropagation()
+
+          const $checkbox = $(this).find('input[type="checkbox"]')
+          const isAll = $checkbox.val() === 'all'
+
+          // don't uncheck the "Show All Sections" checkbox if nothing else is selected
+          if (isAll && $checkbox.prop('checked')) {
+            return
+          }
+
+          $checkbox.prop('checked', function (i, val) {
+            return !val
+          })
+
+          if (isAll) {
+            // if "Show All Sections" is checked, uncheck others
+            if ($checkbox.prop('checked')) {
+              $menu.find('ul li input[type="checkbox"]').not($checkbox).prop('checked', false)
+            }
+          } else {
+            // if a specific section is checked, uncheck "Show All Sections"
+            $menu.find('ul li input[type="checkbox"][value="all"]').prop('checked', false)
+
+            // if nothing is checked anymore, fall back to "all"
+            const noneChecked = $menu.find('ul li input[type="checkbox"]:checked').length === 0
+            if (noneChecked) {
+              $menu.find('ul li input[type="checkbox"][value="all"]').prop('checked', true)
+            }
+          }
+        })
+        .on('click', 'button', function (event) {
+          event.stopPropagation()
+          const selectedSections = $menu
+            .find('ul li input[type="checkbox"]:checked')
+            .map((_, el) => $(el).data('section-id')?.toString())
+            .get()
+            .filter(Boolean) as string[]
+          EG.changeToSection(selectedSections.length === 0 ? 'all' : selectedSections)
+        })
+
       if (sectionsToShow && sectionsToShow.length > 0) {
         const text = $.map(window.jsonData.context.active_course_sections, section => {
           if (sectionsToShow?.includes(section.id)) {
@@ -704,8 +760,53 @@ export function initDropdown() {
               : false
           })
           .addClass('selected')
+
+        $menu
+          .find('ul li input[type="checkbox"]')
+          .filter((_, el) => {
+            const sectionId = $(el).data('section-id')?.toString()
+            return Array.isArray(sectionsToShow) && sectionId
+              ? sectionsToShow.includes(sectionId)
+              : false
+          })
+          .prop('checked', true)
+
+        $menu.find('ul li input[type="checkbox"][value="all"]').show().prop('checked', false)
+      } else {
+        $menu.find('ul li input[type="checkbox"][value="all"]').show().prop('checked', true)
+        $menu.find('ul li input[type="checkbox"]').not('[value="all"]').prop('checked', false)
       }
     } else {
+      $menu.find('ul').append(
+        $.map(window.jsonData.context.active_course_sections, section => {
+          return $('<li>').append(
+            $('<a>', {
+              class: `section_${section.id}`,
+              'data-section-id': section.id,
+              href: '#',
+            }).text(section.name),
+          )
+        }),
+      )
+
+      $menu
+        .insertBefore($selectmenu_list)
+        .bind('mouseenter mouseleave', function (event) {
+          $(this)
+            .toggleClass(
+              'ui-selectmenu-item-selected ui-selectmenu-item-focus ui-state-hover',
+              event.type === 'mouseenter',
+            )
+            .find('ul')
+            .toggle(event.type === 'mouseenter')
+        })
+        .find('ul')
+        .hide()
+        .menu()
+        .on('click mousedown', 'a', function (_event) {
+          EG.changeToSection($(this).data('section-id'))
+        })
+
       if (sectionToShow) {
         const text = $.map(window.jsonData.context.active_course_sections, section => {
           if (section.id == sectionToShow) {
@@ -4699,10 +4800,10 @@ EG = {
     ReactDOM.render(gradeSelector, mountPoint)
   },
 
-  changeToSection(sectionId: string) {
+  changeToSection(sectionId: string | string[] | 'all') {
     if (ENV.multiselect_filters_enabled) {
       if (ENV.settings_url) {
-        $.post(ENV.settings_url, {selected_section_ids: sectionId}, () => {
+        $.post(ENV.settings_url, {checkboxed_selected_section_ids: sectionId}, () => {
           SpeedgraderHelpers.reloadPage()
         })
       } else {

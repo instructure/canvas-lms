@@ -494,7 +494,7 @@ export type SpeedGrader = {
   assessmentAuditTray?: AssessmentAuditTray | null
   attachmentIframeContents: (attachment: Attachment) => string
   beforeLeavingSpeedgrader: (event: BeforeUnloadEvent) => void
-  changeToSection: (sectionId: string) => void
+  changeToSection: (sectionId: string | string[] | 'all') => void
   currentDisplayedSubmission: () => HistoricalSubmission
   currentIndex: () => number
   currentStudent: StudentWithSubmission
