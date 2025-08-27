@@ -48,7 +48,7 @@ class Discussion
     end
 
     def checkpoints_checkbox_selector
-      "input[data-testid='checkpoints-checkbox']"
+      "span[data-testid='checkpoints-checkbox'] input"
     end
 
     def topic_input_selector
