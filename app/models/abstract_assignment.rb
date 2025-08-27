@@ -163,6 +163,8 @@ class AbstractAssignment < ActiveRecord::Base
 
   belongs_to :parent_assignment, class_name: "Assignment", inverse_of: :sub_assignments
   has_many :sub_assignments, -> { active }, foreign_key: :parent_assignment_id, inverse_of: :parent_assignment
+  # always returns "reply_to_topic" checkpoint first, "reply_to_entry" checkpoint second
+  has_many :ordered_sub_assignments, -> { active.order(sub_assignment_tag: :desc) }, foreign_key: :parent_assignment_id, inverse_of: :parent_assignment, class_name: "SubAssignment"
   has_many :sub_assignment_submissions, through: :sub_assignments, source: :submissions
   has_many :sub_assignment_overrides, through: :sub_assignments, source: :assignment_overrides
   has_one :estimated_duration, dependent: :destroy, inverse_of: :assignment

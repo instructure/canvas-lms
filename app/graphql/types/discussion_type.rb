@@ -174,7 +174,7 @@ module Types
     def checkpoints
       load_association(:assignment).then do |assignment|
         if assignment&.context&.discussion_checkpoints_enabled?
-          assignment.sub_assignments
+          assignment.ordered_sub_assignments
         end
       end
     end

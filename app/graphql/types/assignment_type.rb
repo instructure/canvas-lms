@@ -710,7 +710,7 @@ module Types
     def checkpoints
       load_association(:context).then do |course|
         if course.discussion_checkpoints_enabled?
-          load_association(:sub_assignments)
+          load_association(:ordered_sub_assignments)
         end
       end
     end

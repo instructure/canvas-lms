@@ -1136,7 +1136,7 @@ describe Types::AssignmentType do
         end
 
         it "checkpoints returns the points possible" do
-          expect(assignment_type.resolve("checkpoints {pointsPossible}")).to match_array [@c1.points_possible, @c2.points_possible]
+          expect(assignment_type.resolve("checkpoints {pointsPossible}")).to eq [@c1.points_possible, @c2.points_possible]
         end
 
         it "checkpoints returns the due at" do
