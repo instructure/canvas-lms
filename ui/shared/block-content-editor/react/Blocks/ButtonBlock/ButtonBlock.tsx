@@ -16,49 +16,78 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useState, useEffect} from 'react'
-import {BaseBlock, useGetRenderMode} from '../BaseBlock'
+import {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {ButtonBlockEdit} from './ButtonBlockEdit'
-import {ButtonBlockEditPreview} from './ButtonBlockEditPreview'
-import {ButtonBlockView} from './ButtonBlockView'
+import {BaseBlockHOC} from '../BaseBlock'
 import {ButtonBlockSettings} from './ButtonBlockSettings'
-import {useSave} from '../BaseBlock/useSave'
+import {useSave2} from '../BaseBlock/useSave'
 import {ButtonBlockProps} from './types'
-
-export const ButtonBlockContent = (props: ButtonBlockProps) => {
-  const {isEditMode, isEditPreviewMode} = useGetRenderMode()
-  const save = useSave<typeof ButtonBlock>()
-  const [title, setTitle] = useState(props.title)
-
-  useEffect(() => {
-    if (isEditPreviewMode) {
-      save({title})
-    }
-  }, [isEditPreviewMode, title, save])
-
-  if (isEditMode) {
-    return <ButtonBlockEdit settings={props.settings} title={title} onTitleChange={setTitle} />
-  }
-
-  if (isEditPreviewMode) {
-    return <ButtonBlockEditPreview settings={props.settings} title={title} />
-  }
-
-  return <ButtonBlockView settings={props.settings} title={title} />
-}
+import {Flex} from '@instructure/ui-flex'
+import {TitleView} from '../BlockItems/Title/TitleView'
+import {ButtonDisplay} from './ButtonDisplay'
+import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
+import {useFocusElement} from '../../hooks/useFocusElement'
+import {TitleEdit} from '../BlockItems/Title/TitleEdit'
 
 const I18n = createI18nScope('block_content_editor')
 
+const ButtonBlockView = (props: ButtonBlockProps) => {
+  return (
+    <Flex direction="column" gap="mediumSmall">
+      {props.settings.includeBlockTitle && (
+        <TitleView title={props.title} contentColor={props.settings.textColor} />
+      )}
+      <ButtonDisplay dataTestId="button-block-view" settings={props.settings} />
+    </Flex>
+  )
+}
+
+const ButtonBlockEditView = (props: ButtonBlockProps) => {
+  return (
+    <Flex direction="column" gap="mediumSmall">
+      {props.settings.includeBlockTitle && (
+        <TitleEditPreview title={props.title} contentColor={props.settings.textColor} />
+      )}
+      <ButtonDisplay
+        dataTestId="button-block-edit-preview"
+        settings={props.settings}
+        onButtonClick={() => {}}
+      />
+    </Flex>
+  )
+}
+
+const ButtonBlockEdit = (props: ButtonBlockProps) => {
+  const [title, setTitle] = useState(props.title)
+
+  const {focusHandler} = useFocusElement()
+  useSave2(() => ({title}))
+
+  return (
+    <Flex direction="column" gap="mediumSmall">
+      {props.settings.includeBlockTitle && (
+        <TitleEdit title={title} onTitleChange={setTitle} focusHandler={focusHandler} />
+      )}
+      <ButtonDisplay
+        dataTestId="button-block-edit"
+        settings={props.settings}
+        focusHandler={props.settings.includeBlockTitle ? undefined : focusHandler}
+        onButtonClick={() => {}}
+      />
+    </Flex>
+  )
+}
+
 export const ButtonBlock = (props: ButtonBlockProps) => {
   return (
-    <BaseBlock<typeof ButtonBlock>
+    <BaseBlockHOC
+      ViewComponent={ButtonBlockView}
+      EditComponent={ButtonBlockEdit}
+      EditViewComponent={ButtonBlockEditView}
+      componentProps={props}
       title={ButtonBlock.craft.displayName}
       backgroundColor={props.settings.backgroundColor}
-      statefulProps={{title: props.title}}
-    >
-      <ButtonBlockContent {...props} />
-    </BaseBlock>
+    />
   )
 }
 
