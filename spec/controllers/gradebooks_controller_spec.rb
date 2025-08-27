@@ -3728,6 +3728,69 @@ describe GradebooksController do
         expect(course_settings.dig("filter_rows_by", "section_ids")).not_to include(other_course_section.id.to_s)
       end
     end
+
+    describe "checkboxed_selected_section_ids preference" do
+      let(:course_settings) { @teacher.reload.get_preference(:gradebook_settings, @course.global_id) }
+
+      before do
+        user_session(@teacher)
+      end
+
+      it "overwrites section IDs with the passed-in values" do
+        section1 = @course.course_sections.first.id
+        section2 = (@course.course_sections.second || @course.course_sections.create!).id
+
+        # First set a different selection
+        @teacher.set_preference(:gradebook_settings, @course.global_id, {
+                                  filter_rows_by: { section_ids: [section1.to_s] }
+                                })
+
+        # Overwrite with new selection
+        post "speed_grader_settings", params: {
+          course_id: @course.id,
+          checkboxed_selected_section_ids: [section2]
+        }
+
+        expect(course_settings.dig("filter_rows_by", "section_ids")).to eq [section2.to_s]
+        expect(course_settings["selected_view_options_filters"]).to include("sections")
+      end
+
+      it 'clears the selected sections if passed the value "all"' do
+        section1 = @course.course_sections.first.id
+        @teacher.set_preference(:gradebook_settings, @course.global_id, {
+                                  filter_rows_by: { section_ids: [section1.to_s] }
+                                })
+
+        post "speed_grader_settings", params: {
+          course_id: @course.id,
+          checkboxed_selected_section_ids: "all"
+        }
+
+        expect(course_settings.dig("filter_rows_by", "section_ids")).to be_nil
+      end
+
+      it "ignores invalid section IDs" do
+        invalid_id = "9999999"
+
+        post "speed_grader_settings", params: {
+          course_id: @course.id,
+          checkboxed_selected_section_ids: [invalid_id]
+        }
+
+        expect(course_settings.dig("filter_rows_by", "section_ids")).to be_empty
+      end
+
+      it "ignores section IDs that don't belong to the course" do
+        other_course_section = Course.create!.course_sections.create!
+
+        post "speed_grader_settings", params: {
+          course_id: @course.id,
+          checkboxed_selected_section_ids: [other_course_section.id]
+        }
+
+        expect(course_settings.dig("filter_rows_by", "section_ids")).to be_empty
+      end
+    end
   end
 
   describe "POST 'save_assignment_order'" do

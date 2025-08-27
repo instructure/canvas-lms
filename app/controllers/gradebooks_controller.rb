@@ -1318,6 +1318,30 @@ class GradebooksController < ApplicationController
       @current_user.set_preference(:gradebook_settings, @context.global_id, context_settings)
     end
 
+    if params[:checkboxed_selected_section_ids]
+      context_settings = gradebook_settings(@context.global_id)
+
+      if params[:checkboxed_selected_section_ids] == "all"
+        sections_to_show = nil
+      else
+        selected_ids = Array(params[:checkboxed_selected_section_ids])
+
+        # Make sure sections are all valid ids
+        sections_to_show = @context.active_course_sections.where(id: selected_ids).pluck(:id).map(&:to_s)
+      end
+
+      context_settings.deep_merge!({
+                                     "filter_rows_by" => {
+                                       "section_ids" => sections_to_show
+                                     }
+                                   })
+
+      # Showing a specific section should always display the "Sections" filter
+      ensure_section_view_filter_enabled(context_settings) if sections_to_show.present?
+
+      @current_user.set_preference(:gradebook_settings, @context.global_id, context_settings)
+    end
+
     head :ok
   end
 
