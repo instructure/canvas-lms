@@ -776,6 +776,8 @@ export type YoutubeEmbed = Readonly<{
   field: string
   id: number
   resource_group_key: string
+  converted?: boolean
+  converted_at?: string
 }>
 
 export type YoutubeScanResource = Readonly<{
@@ -784,6 +786,7 @@ export type YoutubeScanResource = Readonly<{
   type: string
   content_url: string
   count: number
+  converted_count?: number
   failed?: boolean
   embeds: Array<YoutubeEmbed>
 }>
@@ -794,6 +797,7 @@ export type YoutubeScanResultReport = Readonly<{
   workflow_state: YoutubeScanWorkflowState | null
   resources: Array<YoutubeScanResource>
   total_count: number | null
+  total_converted?: number
   id: number
   page: number
   per_page: number
