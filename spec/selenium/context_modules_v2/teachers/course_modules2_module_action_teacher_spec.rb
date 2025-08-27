@@ -57,6 +57,49 @@ describe "context modules", :ignore_js_errors do
     end
   end
 
+  context "uses tray to edit prerequisites" do
+    it "has no add prerequisites button when first module" do
+      go_to_modules
+      module_action_menu(@module1.id).click
+      module_item_action_menu_link("Edit").click
+
+      expect(element_exists?(add_prerequisite_button_selector)).to be false
+    end
+
+    it "accesses prerequisites dropdown for module and assigns prerequisites" do
+      go_to_modules
+      module_action_menu(@module3.id).click
+      module_item_action_menu_link("Edit").click
+      click_add_prerequisites_button
+
+      expect(prerequisites_dropdown[0]).to be_displayed
+      select_prerequisites_dropdown_option(0, @module2.name)
+      expect(prerequisites_dropdown_value(0)).to eq(@module2.name)
+      click_save_module_tray_change
+      ignore_relock
+
+      expect(context_module_prerequisites(@module3.id).text).to eq("Prerequisite: #{@module2.name}")
+    end
+
+    it "does not save prerequisites selected when update cancelled." do
+      go_to_modules
+      module_action_menu(@module2.id).click
+      module_item_action_menu_link("Edit").click
+      click_add_prerequisites_button
+
+      expect(prerequisites_dropdown[0]).to be_displayed
+      select_prerequisites_dropdown_option(0, @module1.name)
+      expect(prerequisites_dropdown_value(0)).to eq(@module1.name)
+      cancel_tray_button.click
+      wait_for_ajaximations
+
+      expect(element_exists?(context_module_prerequisites_selector(@module2.id))).to be false
+    end
+
+    it_behaves_like "course_module2 module tray prerequisites", :context_modules
+    it_behaves_like "course_module2 module tray prerequisites", :course_homepage
+  end
+
   context "uses tray to edit module requirements" do
     before :once do
       @module4 = @course.context_modules.create!(name: "module with no items")
@@ -153,5 +196,37 @@ describe "context modules", :ignore_js_errors do
 
     it_behaves_like "course_module2 module tray requirements", :context_modules
     it_behaves_like "course_module2 module tray requirements", :course_homepage
+  end
+
+  context "uses tray to edit lock until" do
+    it "sets lock until date to the past and not display lock until label on the module header" do
+      go_to_modules
+      past_date = format_date_for_view(Time.zone.today - 2.days)
+      module_action_menu(@module1.id).click
+      module_item_action_menu_link("Edit").click
+      click_lock_until_checkbox
+
+      update_lock_until_date(past_date)
+      update_lock_until_time("12:00 AM")
+      click_save_module_tray_change
+      expect(element_exists?(module_header_will_unlock_selector(@module1.id))).to be false
+    end
+
+    it "shows error if lock until date and time are empty on edit module tray" do
+      go_to_modules
+      empty_input = ""
+      module_action_menu(@module1.id).click
+      module_item_action_menu_link("Edit").click
+      click_lock_until_checkbox
+
+      update_lock_until_date(empty_input)
+      update_lock_until_time(empty_input)
+      click_save_module_tray_change
+      expect(lock_until_input.text).to include("Unlock date can’t be blank")
+      check_element_has_focus(lock_until_date)
+    end
+
+    it_behaves_like "course_module2 module tray lock until", :context_modules
+    it_behaves_like "course_module2 module tray lock until", :course_homepage
   end
 end

@@ -49,10 +49,6 @@ module Modules2ActionTray
     "[data-testid='module-name-input']"
   end
 
-  def add_prerequisite_button_selector
-    "//*[@data-testid = 'prerequisite-form']//button[.//*[.='Prerequisite']]"
-  end
-
   def submit_add_module_button_selector
     "button[data-testid='differentiated_modules_save_button']"
   end
@@ -97,8 +93,28 @@ module Modules2ActionTray
     "[data-testid='convert-differentiation-tags-button']"
   end
 
+  def lock_until_checkbox_selector
+    "//label[../input[@data-testid='lock-until-checkbox']]"
+  end
+
+  def lock_until_date_selector
+    "//*[@data-testid = 'lock-until-input']//*[contains(@class,'-dateInput')]//input"
+  end
+
+  def lock_until_input_selector
+    "[data-testid='lock-until-input']"
+  end
+
+  def lock_until_time_selector
+    "//*[@data-testid = 'lock-until-input']//*[contains(@class, '-select')]//input"
+  end
+
   def add_requirement_button_selector
     "[data-testid='add-requirement-button']"
+  end
+
+  def add_prerequisite_button_selector
+    "[data-testid='add-prerequisite-button']"
   end
 
   def complete_all_radio_checked_selector
@@ -158,8 +174,24 @@ module Modules2ActionTray
     f(input_module_name_selector)
   end
 
+  def lock_until_checkbox
+    fxpath(lock_until_checkbox_selector)
+  end
+
+  def lock_until_date
+    fxpath(lock_until_date_selector)
+  end
+
+  def lock_until_input
+    f(lock_until_input_selector)
+  end
+
+  def lock_until_time
+    fxpath(lock_until_time_selector)
+  end
+
   def add_prerequisite_button
-    fxpath(add_prerequisite_button_selector)
+    f(add_prerequisite_button_selector)
   end
 
   def prerequisites_dropdown
@@ -275,9 +307,27 @@ module Modules2ActionTray
     element_exists?(module_settings_tray_selector)
   end
 
+  def click_lock_until_checkbox
+    expect(lock_until_checkbox).to be_displayed
+    lock_until_checkbox.click
+  end
+
+  def update_lock_until_date(date)
+    replace_content(lock_until_date, date, tab_out: true)
+  end
+
+  def update_lock_until_time(time)
+    replace_content(lock_until_time, time, tab_out: true)
+  end
+
   def click_add_requirement_button
     expect(add_requirement_button).to be_displayed
     add_requirement_button.click
+  end
+
+  def click_add_prerequisites_button
+    expect(add_prerequisite_button).to be_displayed
+    add_prerequisite_button.click
   end
 
   def select_complete_one_radio
