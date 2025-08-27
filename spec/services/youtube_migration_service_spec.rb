@@ -995,7 +995,7 @@ RSpec.describe YoutubeMigrationService do
     end
   end
 
-  describe "#delete_embed_from_scan" do
+  describe "#mark_embed_as_converted" do
     let(:scan_progress) do
       embed_data = {
         path: youtube_embed[:path],
@@ -1022,19 +1022,29 @@ RSpec.describe YoutubeMigrationService do
       )
     end
 
-    it "removes the embed from scan results" do
-      service.delete_embed_from_scan(scan_progress, youtube_embed)
+    it "marks the embed as converted in scan results" do
+      service.mark_embed_as_converted(scan_progress, youtube_embed)
 
       scan_progress.reload
       resource = scan_progress.results[:resources]["WikiPage|#{wiki_page.id}"]
 
-      expect(resource[:count]).to eq(1)
-      expect(resource[:embeds].length).to eq(1)
-      expect(resource[:embeds].first[:src]).to eq("https://www.youtube.com/embed/other")
-      expect(scan_progress.results[:total_count]).to eq(1)
+      expect(resource[:count]).to eq(2)
+      expect(resource[:embeds].length).to eq(2)
+      expect(resource[:converted_count]).to eq(1)
+
+      # Find the converted embed
+      converted_embed = resource[:embeds].find { |e| e[:src] == youtube_embed[:src] }
+      expect(converted_embed[:converted]).to be true
+      expect(converted_embed[:converted_at]).not_to be_nil
+
+      # Other embed remains unchanged
+      other_embed = resource[:embeds].find { |e| e[:src] == "https://www.youtube.com/embed/other" }
+      expect(other_embed[:converted]).to be_nil
+
+      expect(scan_progress.results[:total_converted]).to eq(1)
     end
 
-    it "removes entire resource if no embeds remain" do
+    it "marks all embeds as converted and keeps resource" do
       # Set up scan with only one embed
       embed_data = {
         path: youtube_embed[:path],
@@ -1057,17 +1067,22 @@ RSpec.describe YoutubeMigrationService do
         }
       )
 
-      service.delete_embed_from_scan(scan_progress, youtube_embed)
+      service.mark_embed_as_converted(scan_progress, youtube_embed)
 
       scan_progress.reload
-      expect(scan_progress.results[:resources]).to be_empty
-      expect(scan_progress.results[:total_count]).to eq(0)
+      resource = scan_progress.results[:resources]["WikiPage|#{wiki_page.id}"]
+
+      expect(resource).not_to be_nil
+      expect(resource[:count]).to eq(1)
+      expect(resource[:converted_count]).to eq(1)
+      expect(resource[:embeds].first[:converted]).to be true
+      expect(scan_progress.results[:total_converted]).to eq(1)
     end
 
     it "raises error if embed not found" do
       nonexistent_embed = youtube_embed.merge(path: "//iframe[@src='https://www.youtube.com/embed/nonexistent']")
 
-      expect { service.delete_embed_from_scan(scan_progress, nonexistent_embed) }
+      expect { service.mark_embed_as_converted(scan_progress, nonexistent_embed) }
         .to raise_error(YoutubeMigrationService::EmbedNotFoundError)
     end
   end
