@@ -178,7 +178,7 @@ export const ImageTextBlock = (props: ImageTextBlockProps) => {
 }
 
 ImageTextBlock.craft = {
-  displayName: I18n.t('Image + text block') as string,
+  displayName: I18n.t('Image + text') as string,
   related: {
     settings: ImageTextBlockSettings,
   },

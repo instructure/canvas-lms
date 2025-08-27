@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useRef, useState} from 'react'
+import {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {BaseBlockHOC} from '../BaseBlock'
 import {useSave2} from '../BaseBlock/useSave'

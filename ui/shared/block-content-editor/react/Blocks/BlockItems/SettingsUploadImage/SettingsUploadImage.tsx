@@ -25,7 +25,8 @@ import {ImageBlockUploadModal} from '../Image/ImageBlockUploadModal'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
-import {ModalImageData} from '../../BlockItems/Image/types'
+import {ModalImageData} from '../Image/types'
+import {View} from '@instructure/ui-view'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -83,9 +84,11 @@ export const SettingsUploadImage = ({url, fileName, onImageChange}: SettingsUplo
             </Flex.Item>
           </Flex>
         )}
-        <CondensedButton renderIcon={<IconUploadLine />} onClick={openModal}>
-          {buttonText}
-        </CondensedButton>
+        <View display="block">
+          <CondensedButton renderIcon={<IconUploadLine />} onClick={openModal}>
+            {buttonText}
+          </CondensedButton>
+        </View>
       </Flex>
     </>
   )
