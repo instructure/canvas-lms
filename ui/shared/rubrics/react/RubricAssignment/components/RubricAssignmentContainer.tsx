@@ -46,6 +46,7 @@ const I18n = createI18nScope('enhanced-rubrics-assignment-container')
 
 export type RubricAssignmentContainerProps = {
   assignmentId: string
+  assignmentPointsPossible?: number
   assignmentRubric?: AssignmentRubric
   assignmentRubricAssociation?: RubricAssociation
   canManageRubrics: boolean
@@ -56,6 +57,7 @@ export type RubricAssignmentContainerProps = {
 }
 export const RubricAssignmentContainer = ({
   assignmentId,
+  assignmentPointsPossible,
   assignmentRubric,
   assignmentRubricAssociation,
   canManageRubrics,
@@ -72,11 +74,21 @@ export const RubricAssignmentContainer = ({
   const [searchPreviewRubric, setSearchPreviewRubric] = useState<Rubric>()
   const [isDeleteConfirmModalOpen, setIsDeleteConfirmModalOpen] = useState(false)
   const [_criteriaViaLlm, setCriteriaViaLlm] = useState(false)
+  const [assignmentPoints, setAssignmentPoints] = useState(assignmentPointsPossible)
 
-  const handleSaveRubric = (savedRubricResponse: SaveRubricResponse) => {
+  const handleSaveRubric = (
+    savedRubricResponse: SaveRubricResponse,
+    updatePointsPossible?: boolean,
+  ) => {
     setRubric(savedRubricResponse.rubric)
     setRubricAssociation(savedRubricResponse.rubricAssociation)
     setRubricCreateModalOpen(false)
+
+    handleUpdateAssignmentPoints(
+      savedRubricResponse.rubric?.pointsPossible,
+      savedRubricResponse.rubricAssociation?.useForGrading,
+      updatePointsPossible,
+    )
   }
 
   const handleRemoveRubric = async () => {
@@ -112,6 +124,37 @@ export const RubricAssignmentContainer = ({
 
     setCriteriaViaLlm(false)
     setRubricCreateModalOpen(true)
+  }
+
+  const handleUpdateAssignmentPoints = (
+    pointsPossible?: number,
+    useForGrading?: boolean,
+    updatePointsPossible?: boolean,
+  ) => {
+    if (useForGrading && updatePointsPossible) {
+      setAssignmentPoints(pointsPossible ?? 0)
+      // Vanilla JS is used here because the assignment points are updated in the assignment
+      // show page which is rendered by ERB and needs to update existing DOM elements.
+      const pointsPossibleElement = document.querySelector('#assignment_show .points_possible')
+      if (pointsPossibleElement) {
+        pointsPossibleElement.textContent = String(pointsPossible ?? 0)
+      }
+
+      const discussion_points_text = I18n.t(
+        'discussion_points_possible',
+        {one: '%{count} point possible', other: '%{count} points possible'},
+        {
+          count: pointsPossible,
+          precision: 2,
+          strip_insignificant_zeros: true,
+        },
+      )
+
+      const discussionPointsElement = document.querySelector('.discussion-title .discussion-points')
+      if (discussionPointsElement) {
+        discussionPointsElement.textContent = discussion_points_text
+      }
+    }
   }
 
   return (
@@ -219,6 +262,8 @@ export const RubricAssignmentContainer = ({
         onDismiss={() => setIsDeleteConfirmModalOpen(false)}
       />
       <RubricCreateModal
+        assignmentId={assignmentId}
+        assignmentPointsPossible={assignmentPoints}
         isOpen={rubricCreateModalOpen}
         rubric={rubric}
         rubricAssociation={rubricAssociation}

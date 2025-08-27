@@ -54,6 +54,7 @@ export interface EnvAssignmentsA2StudentView {
   LTI_TOOL_SELECTION_WIDTH?: string
   LTI_TOOL_SELECTION_HEIGHT?: string
   ASSIGNMENT_ID: string | number
+  ASSIGNMENT_POINTS?: number
   CONFETTI_ENABLED: boolean
   CURRENT_USER_CAN_GRADE_SUBMISSION: boolean
   EMOJIS_ENABLED: boolean

@@ -50,6 +50,7 @@ export type RubricFormProps = {
   hideScoreTotal: boolean
   useForGrading: boolean
   rubricAssociationId?: string
+  skipUpdatingPointsPossible?: boolean
 }
 
 export type RubricFormFieldSetter = <K extends keyof RubricFormProps>(

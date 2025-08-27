@@ -354,6 +354,7 @@ $(() => {
       <RubricAssignmentContainer
         assignmentId={ENV.ASSIGNMENT_ID}
         assignmentRubric={assignmentRubric}
+        assignmentPointsPossible={ENV.ASSIGNMENT_POINTS}
         assignmentRubricAssociation={assignmentRubricAssociation}
         canManageRubrics={ENV.PERMISSIONS.manage_rubrics}
         courseId={ENV.COURSE_ID}

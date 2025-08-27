@@ -92,6 +92,7 @@ module Api::V1::Rubric
     rubrics_hash = {
       ACCOUNT_LEVEL_MASTERY_SCALES: @context.root_account.feature_enabled?(:account_level_mastery_scales),
       ASSIGNMENT_ID: assignment.id,
+      ASSIGNMENT_POINTS: assignment.points_possible,
       COURSE_ID: @context.id,
       ROOT_OUTCOME_GROUP: outcome_group_json(@context.root_outcome_group, @current_user, session),
       ai_rubrics_enabled: Rubric.ai_rubrics_enabled?(@context),

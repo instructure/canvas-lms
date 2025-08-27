@@ -93,6 +93,7 @@ function renderRubric() {
         assignmentId={ENV.ASSIGNMENT_ID}
         assignmentRubric={assignmentRubric}
         assignmentRubricAssociation={assignmentRubricAssociation}
+        assignmentPointsPossible={ENV.ASSIGNMENT_POINTS}
         canManageRubrics={ENV.PERMISSIONS?.manage_rubrics}
         courseId={ENV.COURSE_ID}
         currentUserId={ENV.current_user_id}
