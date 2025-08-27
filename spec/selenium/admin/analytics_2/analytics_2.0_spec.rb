@@ -35,6 +35,7 @@ describe "analytics in Canvas" do
     end
 
     it "with Analytics 1 enabled, displays the account analytics nav menu item" do
+      skip "Until analytics removing merged EAX-2072"
       skip unless defined? Analytics
       # enable Analytics 1
       @admin.account.update(allowed_services: "+analytics")
@@ -114,6 +115,7 @@ describe "analytics in Canvas" do
         end
 
         it "displays Analytics 1 link in manage user menu" do
+          skip "Until analytics removing merged EAX-2072"
           skip unless defined? Analytics
           visit_course_people_page(@course.id)
           manage_user_link(@student.name).click
