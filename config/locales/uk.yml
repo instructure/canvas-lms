@@ -13340,6 +13340,7 @@ uk:
   points_possible_pts_aedb481e: "%{points_possible}бал"
   points_pts_e5596bf7: "%{points} балів"
   points_total_pts_5b4cbd77: "%{points} / %{total} балів"
+  pointspossible_points_possible_964c8592: "%{pointsPossible} можливих балів"
   pointspossible_pts_624a6733: "%{pointsPossible} балів"
   poland_48_e77cc14d: "Польща (+48)"
   polling: 
