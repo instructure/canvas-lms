@@ -63,24 +63,26 @@ class DiscussionEntry < ActiveRecord::Base
   has_one :external_feed_entry, as: :asset
   has_many :attachment_associations, as: :context, inverse_of: :context
 
+  before_validation :set_depth, on: :create
   before_save :set_edited_at
   before_create :infer_root_entry_id
   before_create :set_root_account_id
-  after_save :update_discussion
-  after_save :context_module_action_later
-  after_save :create_discussion_entry_versions
+  before_create :set_lti_id
   after_create :create_participants
   after_create :log_discussion_entry_metrics
   after_create :clear_planner_cache_for_participants
   after_create :update_topic
   after_destroy :remove_pin
+  after_save :update_discussion
+  after_save :context_module_action_later
+  after_save :create_discussion_entry_versions
   validates :message, length: { maximum: maximum_text_length, allow_blank: true }
   validates :discussion_topic_id, presence: true
-  before_validation :set_depth, on: :create
   validate :validate_depth, on: :create
   validate :discussion_not_deleted, on: :create
   validate :must_be_reply_to_same_discussion, on: :create
   validate :validate_pin_type
+  validate :preserve_lti_id
 
   scope :pinned, -> { where.not(pin_type: nil) }
 
@@ -762,6 +764,14 @@ class DiscussionEntry < ActiveRecord::Base
 
   def set_root_account_id
     self.root_account_id ||= discussion_topic.root_account_id
+  end
+
+  def set_lti_id
+    self.lti_id ||= SecureRandom.uuid
+  end
+
+  def preserve_lti_id
+    errors.add(:lti_id, "Cannot change lti_id!") if lti_id_changed? && !lti_id_was.nil?
   end
 
   def author_name(current_user = nil)
