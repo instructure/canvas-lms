@@ -105,7 +105,7 @@ export const DiscussionTranslationModuleContainer = ({isAnnouncement}) => {
         closeModalAndKeepTranslations={closeModalAndKeepTranslations}
         closeModalAndRemoveTranslations={closeModalAndRemoveTranslations}
       />
-      <Heading level="h3">
+      <Heading level="h2">
         {title}
         <span style={{float: 'right'}}>
           <IconButton
