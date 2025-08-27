@@ -114,6 +114,7 @@ export const DiscussionTranslationModuleContainer = ({isAnnouncement}) => {
             withBackground={false}
             withBorder={false}
             screenReaderLabel={I18n.t('Close translations module')}
+            data-testid="close-translation-module-button"
           >
             <IconEndLine />
           </IconButton>
@@ -149,6 +150,7 @@ export const DiscussionTranslationModuleContainer = ({isAnnouncement}) => {
             margin="0 small 0 0"
             color="ai-primary"
             renderIcon={IconAiSolid}
+            data-testid="translate-discussion-button"
           >
             {I18n.t('Translate')}
           </Button>
@@ -156,6 +158,7 @@ export const DiscussionTranslationModuleContainer = ({isAnnouncement}) => {
             onClick={resetTranslationsModule}
             renderIcon={<IconRefreshLine />}
             disabled={entryTranslatingSet.size > 0}
+            data-testid="reset-translation-button"
           >
             {I18n.t('Reset')}
           </Button>
