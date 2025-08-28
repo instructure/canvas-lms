@@ -142,7 +142,10 @@ module LinkedAttachmentHandler
   end
 
   def actual_saving_user
-    saving_user
+    saving_user ||
+      try(:updating_user) ||
+      try(:current_user) ||
+      try(:user)
   end
 
   def access_for_attachment_association?(user, session, _association, _location_param)

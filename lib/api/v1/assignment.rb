@@ -1229,6 +1229,8 @@ module Api::V1::Assignment
       assignment.line_item_tag = line_item[:tag]
     end
 
+    assignment.saving_user = user
+
     {
       assignment:,
       overrides:,
