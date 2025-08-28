@@ -21,7 +21,8 @@
 # the keys in this hash correspond to the `group` values in permissions_registry.rb
 # each must have a `label` and a `subtitle`. it can include `course_subtitle` if this
 # should be different from the account one. it can optionally include help text in
-# `account_details`, `account_considerations`, `course_details`, and `course_considerations`.
+# `details` and/or `considerations`, or `account_` or `course_` prefixed versions
+# of those to display separate help text in each context.
 PERMISSION_GROUPS = {
   manage_account_calendar: {
     label: -> { I18n.t("Manage Account Calendars") },
@@ -141,7 +142,7 @@ PERMISSION_GROUPS = {
   manage_course_content: {
     label: -> { I18n.t("Manage Course Content") },
     subtitle: -> { I18n.t("add / delete / edit") },
-    account_details: [
+    details: [
       { title: -> { I18n.t("Course Content - add") },
         description: -> { I18n.t("Allows user to share course items directly with other users.") } },
       { description: -> { I18n.t("Allows user to copy individual course items to another course.") } },
@@ -186,68 +187,7 @@ PERMISSION_GROUPS = {
       { description: -> { I18n.t("Allows user to view and list course paces via Course Pacing.") } },
       { description: -> { I18n.t("Allows user to view and initiate course link validation.") } }
     ],
-    account_considerations: [
-      { title: -> { I18n.t("Attendance") },
-        description: -> { I18n.t("The Attendance tool must be enabled by your Canvas admin.") } },
-      { title: -> { I18n.t("Chat") },
-        description: -> { I18n.t("The Chat tool must be enabled by your Canvas admin.") } },
-      { title: -> { I18n.t("Commons") },
-        description: -> { I18n.t("To share a Discussion to Commons, Discussions - view must also be enabled.") } },
-      { title: -> { I18n.t("Course Home Page") },
-        description: -> { I18n.t("Teachers, designers, and TAs can select a course home page without the Course content - add / edit / delete permission.") } },
-      { title: -> { I18n.t("Course Settings") },
-        description: -> { I18n.t("The Course Status buttons (unpublished and published) are only displayed until a student submission is received. Courses cannot be unpublished with student submissions.") } },
-      { title: -> { I18n.t("Modules") },
-        description: -> { I18n.t("Module items cannot be unpublished if there are student submissions.") } },
-      { title: -> { I18n.t("Course Pacing") },
-        description: -> { I18n.t("Course Pacing feature preview must be enabled in your institution.") } }
-    ],
-    course_details: [
-      { title: -> { I18n.t("Course Content - add") },
-        description: -> { I18n.t("Allows user to share course items directly with other users.") } },
-      { description: -> { I18n.t("Allows user to copy individual course items to another course.") } },
-      { description: -> { I18n.t("Allows user to view course copy status.") } },
-      { description: -> { I18n.t("Allows user to create content migrations.") } },
-      { description: -> { I18n.t("Allows user to create blackout dates.") } },
-      { description: -> { I18n.t("Allows user to add events to Calendar List View Dashboard via the Add to Student To-Do checkbox. ") } },
-      { description: -> { I18n.t("Allows user to create a course pace via Course Pacing.") } },
-      { description: -> { I18n.t("Allows user to import resources from Commons into a course.") } },
-      { description: -> { I18n.t("Allows user to import content using the Course Import Tool.") } },
-      { description: -> { I18n.t("Allows user to add non-graded discussions to List View Dashboard via the Add to Student To-Do checkbox.") } },
-      { description: -> { I18n.t("Allows user to create, add items, and duplicate modules.") } },
-      { description: -> { I18n.t("Allows user to add pages to List View Dashboard via the Add to Student To-Do checkbox.") } },
-      { title: -> { I18n.t("Course Content - edit") },
-        description: -> { I18n.t("Allows user to lock / unlock selected announcements individually or in bulk.") } },
-      { description: -> { I18n.t("Allows user to edit a list of assignment blackout dates.") } },
-      { description: -> { I18n.t("Allows user to share assignments to Commons or edit previously shared content.") } },
-      { description: -> { I18n.t("Allows user to edit to-do date on a course Page that supports it.") } },
-      { description: -> { I18n.t("Allows user to edit Conferences.") } },
-      { description: -> { I18n.t("Allows user to edit title, and description on all collaborations.") } },
-      { description: -> { I18n.t("Allows user to update modules (edit module settings, publish, unpublish, batch edit, assign modules).") } },
-      { description: -> { I18n.t("Allows user to edit content migrations.") } },
-      { description: -> { I18n.t("Allows user to edit and publish a course pace via Course Pacing.") } },
-      { description: -> { I18n.t("Allows user to edit the course syllabus.") } },
-      { description: -> { I18n.t("Allows user to edit course tabs.") } },
-      { title: -> { I18n.t("Course Content - delete") },
-        description: -> { I18n.t("Allows user to remove selected announcements individually or in bulk.") } },
-      { description: -> { I18n.t("Allows user to remove assignment blackout dates.") } },
-      { description: -> { I18n.t("Allows user to remove collaborators on all collaborations.") } },
-      { title: -> { I18n.t("Course Content - add / edit / or delete") },
-        description: -> { I18n.t("Allows user to have full section visibility when viewing announcements.") } },
-      { description: -> { I18n.t("Allows user to access the Attendance tool.") } },
-      { description: -> { I18n.t("Allows user to view Course Status, Choose Home Page, and Course Setup Checklist buttons in the Home page.") } },
-      { description: -> { I18n.t("Allows user to access the Chat tool.") } },
-      { description: -> { I18n.t("Allows user to view course Conferences.") } },
-      { description: -> { I18n.t("Allows user to view and list content migrations.") } },
-      { description: -> { I18n.t("Allows user to view a content migration content list by type.") } },
-      { description: -> { I18n.t("Allows user access to LTI sub navigation tool selection for assignment syllabus configuration.") } },
-      { description: -> { I18n.t("Allows user to view or retrieve a list of assignment blackout dates.") } },
-      { description: -> { I18n.t("Allows user to view a content migration notice to an \"import in progress\".") } },
-      { description: -> { I18n.t("Allows user to view previously created collaborations.") } },
-      { description: -> { I18n.t("Allows user to view and list course paces via Course Pacing.") } },
-      { description: -> { I18n.t("Allows user to view and initiate course link validation.") } }
-    ],
-    course_considerations: [
+    considerations: [
       { title: -> { I18n.t("Attendance") },
         description: -> { I18n.t("The Attendance tool must be enabled by your Canvas admin.") } },
       { title: -> { I18n.t("Chat") },
@@ -550,7 +490,7 @@ PERMISSION_GROUPS = {
   manage_files: {
     label: -> { I18n.t("Manage Course Files") },
     subtitle: -> { I18n.t("add / delete / edit") },
-    account_details: [
+    details: [
       { title: -> { I18n.t("Course Files - add") },
         description: -> { I18n.t("Allows user to add course files and folders.") } },
       { description: -> { I18n.t("Allows user to import a zip file.") } },
@@ -566,15 +506,6 @@ PERMISSION_GROUPS = {
         description: -> { I18n.t("To import files using the Course Import Tool, Course files - add and Course Content - add / edit / delete must be enabled.") } },
       { title: -> { I18n.t("Blueprint Courses") },
         description: -> { I18n.t("To edit lock settings for course files, Course files - edit, Blueprint Courses - add / edit / associate / delete, and Courses - manage must also be enabled.") } }
-    ],
-    course_details: [
-      { title: -> { I18n.t("Course Files - add") },
-        description: -> { I18n.t("Allows user to add course files and folders.") } },
-      { description: -> { I18n.t("Allows user to import a zip file.") } },
-      { title: -> { I18n.t("Course Files - edit") },
-        description: -> { I18n.t("Allows user to edit course files and folders.") } },
-      { title: -> { I18n.t("Course Files - delete") },
-        description: -> { I18n.t("Allows user to delete course files and folders.") } }
     ],
     course_considerations: [
       { title: -> { I18n.t("Course Files") },
@@ -660,10 +591,6 @@ PERMISSION_GROUPS = {
       { title: -> { I18n.t("LTI - edit") },
         description: -> { I18n.t("Allows user to edit configurations for manually added external apps.") } }
     ],
-    account_considerations: [
-      { title: -> { I18n.t("External Apps") },
-        description: -> { I18n.t("If LTI - add is disabled, users can still install approved apps through the Canvas App Center (if enabled for your institution). However, if LTI - delete is not enabled, they cannot delete manually added external apps.") } }
-    ],
     course_details: [
       { title: -> { I18n.t("LTI - add") },
         description: -> { I18n.t("Allows user to manually add an app in Course Settings.") } },
@@ -672,7 +599,7 @@ PERMISSION_GROUPS = {
       { title: -> { I18n.t("LTI - edit") },
         description: -> { I18n.t("Allows user to edit configurations for manually added external apps.") } }
     ],
-    course_considerations: [
+    considerations: [
       { title: -> { I18n.t("External Apps") },
         description: -> { I18n.t("If LTI - add is disabled, users can still install approved apps through the Canvas App Center (if enabled for your institution). However, if LTI - delete is not enabled, they cannot delete manually added external apps.") } }
     ]

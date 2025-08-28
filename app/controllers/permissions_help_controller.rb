@@ -63,9 +63,11 @@ class PermissionsHelpController < ApplicationController
     raise ActiveRecord::RecordNotFound, "unknown permission" unless info
 
     h = if params[:context_type]&.downcase == "course"
-          { details: info[:course_details] || [], considerations: info[:course_considerations] || [] }
+          { details: info[:course_details] || info[:details] || [],
+            considerations: info[:course_considerations] || info[:considerations] || [] }
         else
-          { details: info[:account_details] || [], considerations: info[:account_considerations] || [] }
+          { details: info[:account_details] || info[:details] || [],
+            considerations: info[:account_considerations] || info[:considerations] || [] }
         end
 
     h[:details] = h[:details].map { |entry| entry.transform_values(&:call) }
