@@ -27,7 +27,7 @@ describe "smart search" do
     skip "smart search is not available to test" unless ActiveRecord::Base.connection.table_exists?("wiki_page_embeddings")
 
     allow(SmartSearch).to receive(:generate_embedding) { |input| input.chars.map(&:ord).fill(0, input.size...1024).slice(0...1024) }
-    allow(SmartSearch).to receive(:bedrock_client).and_return(double)
+    allow(SmartSearch).to receive(:bedrock_client).and_return(instance_double(Aws::BedrockRuntime::Client))
     admin_logged_in
   end
 

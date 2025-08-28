@@ -46,7 +46,7 @@ describe CoursePacing::PaceService do
 
   describe ".paces_in_course" do
     it "requires implementation" do
-      expect { CoursePacing::PaceService.paces_in_course(double) }.to raise_error(NotImplementedError)
+      expect { CoursePacing::PaceService.paces_in_course(instance_double(Course)) }.to raise_error(NotImplementedError)
     end
   end
 
@@ -57,7 +57,7 @@ describe CoursePacing::PaceService do
       end
 
       it "returns nil if invalid context" do
-        expect(CoursePacing::PaceService.pace_for(double)).to be_nil
+        expect(CoursePacing::PaceService.pace_for(instance_double(Course))).to be_nil
       end
     end
 
@@ -65,7 +65,7 @@ describe CoursePacing::PaceService do
       before { allow(CoursePacing::PaceService).to receive(:pace_in_context).and_return("foobar") }
 
       it "returns the pace in the context" do
-        expect(CoursePacing::PaceService.pace_for(double)).to eq "foobar"
+        expect(CoursePacing::PaceService.pace_for(instance_double(Course))).to eq "foobar"
       end
     end
 
@@ -75,22 +75,22 @@ describe CoursePacing::PaceService do
       end
 
       it "returns nil" do
-        expect(CoursePacing::PaceService.pace_for(double)).to be_nil
+        expect(CoursePacing::PaceService.pace_for(instance_double(Course))).to be_nil
       end
 
       context "when there is an existing template to fall back to" do
-        let(:template) { double }
+        let(:template) { instance_double(CoursePace) }
 
         before { allow(CoursePacing::PaceService).to receive(:template_pace_for).and_return(template) }
 
         it "returns the existing template" do
-          expect(CoursePacing::PaceService.pace_for(double)).to eq template
+          expect(CoursePacing::PaceService.pace_for(instance_double(Course))).to eq template
         end
 
         context "when the should_duplicate option is set to true" do
           it "duplicates the template within the context" do
             expect(template).to receive(:duplicate)
-            CoursePacing::PaceService.pace_for(double, should_duplicate: true)
+            CoursePacing::PaceService.pace_for(instance_double(Course), should_duplicate: true)
           end
         end
       end
@@ -100,7 +100,7 @@ describe CoursePacing::PaceService do
   describe ".pace_in_context" do
     it "requires implementation" do
       expect do
-        CoursePacing::PaceService.pace_in_context(double)
+        CoursePacing::PaceService.pace_in_context(instance_double(Course))
       end.to raise_error NotImplementedError
     end
   end
@@ -202,7 +202,7 @@ describe CoursePacing::PaceService do
   describe ".delete_in_context" do
     it "requires implementation" do
       expect do
-        CoursePacing::PaceService.delete_in_context(double)
+        CoursePacing::PaceService.delete_in_context(instance_double(Course))
       end.to raise_error NotImplementedError
     end
   end

@@ -20,7 +20,7 @@
 describe AuthenticationProvidersPresenter do
   describe "initialization" do
     it "wraps an account" do
-      account = double
+      account = instance_double(Account)
       presenter = described_class.new(account)
       expect(presenter.account).to eq(account)
     end
@@ -45,7 +45,7 @@ describe AuthenticationProvidersPresenter do
     end
 
     it "only pulls from the db connection one time" do
-      account = double
+      account = instance_double(Account)
       expect(account).to receive(:authentication_providers).once.and_return(class_double(AuthenticationProvider, active: []))
       presenter = described_class.new(account)
       5.times { presenter.configs }
@@ -53,7 +53,7 @@ describe AuthenticationProvidersPresenter do
   end
 
   describe "SAML view helpers" do
-    let(:presenter) { described_class.new(double) }
+    let(:presenter) { described_class.new(instance_double(Account)) }
 
     describe "#saml_identifiers" do
       it "is empty when saml disabled" do
@@ -161,7 +161,7 @@ describe AuthenticationProvidersPresenter do
 
   describe "#login_placeholder" do
     it "wraps AAC.default_delegated_login_handle_name" do
-      expect(described_class.new(double).login_placeholder).to eq(
+      expect(described_class.new(instance_double(Account)).login_placeholder).to eq(
         AuthenticationProvider.default_delegated_login_handle_name
       )
     end
