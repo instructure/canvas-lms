@@ -25,12 +25,18 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 
-import {fetchGradesForGradingPeriod, getCourseGrades, transformGrades} from '@canvas/k5/react/utils'
+import {
+  fetchGradesForGradingPeriod,
+  fetchGradesForGradingPeriodAsObserver,
+  getCourseGrades,
+  transformGrades,
+} from '@canvas/k5/react/utils'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import GradesSummary from './GradesSummary'
 import GradingPeriodSelect, {ALL_PERIODS_OPTION} from './GradingPeriodSelect'
 import LoadingWrapper from '@canvas/k5/react/LoadingWrapper'
 import useFetchApi from '@canvas/use-fetch-api-hook'
+import {isUserObservingStudent} from './utils'
 
 const I18n = createI18nScope('dashboard_grades_page')
 
@@ -111,8 +117,9 @@ export const GradesPage = ({visible, currentUserRoles, observedUserId, currentUs
   const [courses, setCourses] = useState(null)
   const [coursesByUser, setCoursesByUser] = useState(null)
   const [gradingPeriods, setGradingPeriods] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [selectedGradingPeriodId, selectGradingPeriodId] = useState('')
+  const [initalLoading, setInitialLoading] = useState(true)
+  const [gradesLoading, setGradesLoading] = useState(false)
+  const [selectedGradingPeriodId, setSelectedGradingPeriodId] = useState('')
   const [specificPeriodGrades, setSpecificPeriodGrades] = useState([])
   const userRef = useRef(null)
   const includeObservedUsers = currentUserRoles.includes('observer')
@@ -136,16 +143,16 @@ export const GradesPage = ({visible, currentUserRoles, observedUserId, currentUs
           setCourses(subjects)
           setCoursesByUser(getCoursesByObservee(subjects, observedUserId, currentUser))
           setGradingPeriods(getGradingPeriodsFromCourses(subjects))
-          setLoading(false)
+          setInitialLoading(false)
         }
       },
       [currentUser], // eslint-disable-line react-hooks/exhaustive-deps
     ),
     error: useCallback(err => {
       showFlashError(I18n.t('Failed to load the grades tab'))(err)
-      setLoading(false)
+      setInitialLoading(false)
     }, []),
-    loading: setLoading,
+    loading: setInitialLoading,
     path: '/api/v1/users/self/courses',
     fetchAllPages: true,
     params: {
@@ -162,33 +169,43 @@ export const GradesPage = ({visible, currentUserRoles, observedUserId, currentUs
     }
   }, [courses, visible, observedUserId, currentUser])
 
-  const loadSpecificPeriodGrades = gradingPeriodId => {
-    if (gradingPeriodId === ALL_PERIODS_OPTION) {
+  useEffect(() => {
+    if (!selectedGradingPeriodId) {
+      setSpecificPeriodGrades([])
+      return
+    }
+
+    if (selectedGradingPeriodId === ALL_PERIODS_OPTION) {
       const allGrades = coursesByUser.map(course => ({
         courseId: course.courseId,
         score: course.totalScoreForAllGradingPeriods,
         grade: course.totalGradeForAllGradingPeriods,
       }))
       setSpecificPeriodGrades(allGrades)
-    } else if (gradingPeriodId) {
-      setLoading(true)
-      fetchGradesForGradingPeriod(gradingPeriodId)
+      return
+    }
+
+    if (selectedGradingPeriodId) {
+      setGradesLoading(true)
+      const isObservingStudent = isUserObservingStudent()
+      const fetchFunction = isObservingStudent
+        ? fetchGradesForGradingPeriodAsObserver
+        : fetchGradesForGradingPeriod
+      fetchFunction(selectedGradingPeriodId, observedUserId)
         .then(results => {
           setSpecificPeriodGrades(results)
-          setLoading(false)
         })
         .catch(err => {
           showFlashError(I18n.t('Failed to load grades for the requested grading period'))(err)
-          setLoading(false)
         })
-    } else {
-      setSpecificPeriodGrades([])
+        .finally(() => {
+          setGradesLoading(false)
+        })
     }
-  }
+  }, [selectedGradingPeriodId, observedUserId, coursesByUser])
 
   const handleSelectGradingPeriod = (_, {value}) => {
-    selectGradingPeriodId(value)
-    loadSpecificPeriodGrades(value)
+    setSelectedGradingPeriodId(value)
   }
 
   // Override current grading period grades with selected period if they exist
@@ -200,7 +217,7 @@ export const GradesPage = ({visible, currentUserRoles, observedUserId, currentUs
 
   // Only show the grading period selector if the user has student role
   const hasStudentRole = currentUserRoles?.some(r => ['student', 'observer'].includes(r))
-
+  const loading = initalLoading || gradesLoading
   return (
     <section
       id="dashboard_page_grades"
