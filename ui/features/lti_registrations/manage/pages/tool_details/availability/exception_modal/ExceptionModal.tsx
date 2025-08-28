@@ -98,7 +98,16 @@ export const ExceptionModal = ({
       control => control.context.context.id === context.context.id,
     )
     if (!existingControl) {
-      setContextControlForm(prev => [...prev, {context, available: false}])
+      const maxControlsSelectable = 100
+      if (contextControlForm.length >= maxControlsSelectable) {
+        alert(
+          I18n.t('Sorry, you can only add %{maxControlsSelectable} exceptions at a time.', {
+            maxControlsSelectable,
+          }),
+        )
+      } else {
+        setContextControlForm(prev => [...prev, {context, available: false}])
+      }
     }
     setBrowserOpen(false)
   }
