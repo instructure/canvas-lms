@@ -19,15 +19,14 @@
 import React, {useState, useRef, useMemo} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import {RadioInput} from '@instructure/ui-radio-input'
 import CanvasMultiSelect from '@canvas/multi-select/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Language} from './TranslationControls'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
-import {IconAiLine, IconAiSolid} from '@instructure/ui-icons'
+import {IconAiSolid} from '@instructure/ui-icons'
 import {useTranslationContext} from '../../hooks/useTranslationContext'
-import {canvas} from '@instructure/ui-themes'
+import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 
 const I18n = createI18nScope('conversations_2')
 
@@ -148,27 +147,27 @@ const TranslationOptions: React.FC<Props> = ({asPrimary, onSetPrimary}) => {
             </Flex.Item>
           </Flex>
         </Flex.Item>
-        <Flex.Item padding="0 small">
-          <Flex justifyItems="start" gap="medium" margin="0 0 medium 0" padding="x-small 0">
-            <Flex.Item>
-              <RadioInput
-                label={I18n.t('Show translation second')}
-                value="secondary"
-                name="secondary"
-                checked={asPrimary === false}
-                onChange={() => onSetPrimary(false)}
-              />
-            </Flex.Item>
-            <Flex.Item>
-              <RadioInput
-                label={I18n.t('Show translation first')}
-                value="primary"
-                name="primary"
-                checked={asPrimary === true}
-                onChange={() => onSetPrimary(true)}
-              />
-            </Flex.Item>
-          </Flex>
+        <Flex.Item padding="0 small" margin="0 0 medium 0">
+          <RadioInputGroup
+            layout="columns"
+            name="translationPlacement"
+            description={I18n.t('Choose placement')}
+          >
+            <RadioInput
+              label={I18n.t('Show translation second')}
+              value="secondary"
+              name="secondary"
+              checked={asPrimary === false}
+              onChange={() => onSetPrimary(false)}
+            />
+            <RadioInput
+              label={I18n.t('Show translation first')}
+              value="primary"
+              name="primary"
+              checked={asPrimary === true}
+              onChange={() => onSetPrimary(true)}
+            />
+          </RadioInputGroup>
         </Flex.Item>
       </Flex>
       <Flex padding="0 small">
