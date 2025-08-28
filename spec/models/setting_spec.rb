@@ -94,7 +94,7 @@ describe Setting do
 
     context "when in a Rails console" do
       before do
-        stub_const("Console", {})
+        stub_const("Rails::Console", {})
       end
 
       it "logs a notice about SIGHUP" do
