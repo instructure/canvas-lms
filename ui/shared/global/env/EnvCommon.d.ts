@@ -286,6 +286,7 @@ export interface EnvCommon {
  * From ApplicationController#JS_ENV_SITE_ADMIN_FEATURES
  */
 export type SiteAdminFeatureId =
+  | 'accessibility_issues_in_full_page'
   | 'account_calendar_events'
   | 'account_level_blackout_dates'
   | 'courses_popout_sisid'
