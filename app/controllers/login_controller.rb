@@ -154,11 +154,15 @@ class LoginController < ApplicationController
   end
 
   def redirect_to_specific_provider(auth_type)
-    auth_type ||= @domain_root_account.authentication_providers.active.first&.auth_type
+    auth_type ||= inferred_auth_type
     auth_type ||= "canvas"
 
     redirect_to url_for({ controller: "login/#{auth_type}", action: :new }
       .merge(params.permit(:id, :login_hint).to_unsafe_h))
+  end
+
+  def inferred_auth_type
+    @domain_root_account.authentication_providers.active.first&.auth_type
   end
 
   def auth_type; end
