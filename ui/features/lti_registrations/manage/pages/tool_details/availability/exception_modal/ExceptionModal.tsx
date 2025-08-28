@@ -101,7 +101,7 @@ export const ExceptionModal = ({
       const maxControlsSelectable = 100
       if (contextControlForm.length >= maxControlsSelectable) {
         alert(
-          I18n.t('Sorry, you can only add %{maxControlsSelectable} exceptions at a time.', {
+          I18n.t('Sorry, only %{maxControlsSelectable} exceptions can be loaded at one time.', {
             maxControlsSelectable,
           }),
         )
