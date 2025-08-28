@@ -23,7 +23,6 @@ export const ImageTextBlockLayout = ({
   titleComponent,
   textComponent,
   imageComponent,
-  includeBlockTitle,
   arrangement,
   textToImageRatio,
   dataTestId,
@@ -39,7 +38,7 @@ export const ImageTextBlockLayout = ({
 
   return (
     <>
-      {includeBlockTitle && titleComponent}
+      {titleComponent}
       <Flex direction={direction} data-testid={dataTestId}>
         <Flex.Item size={imageSize} align="start" padding={imagePadding}>
           {imageComponent}

@@ -24,13 +24,11 @@ import {ReactNode} from 'react'
 export type ArrangementOption = 'left' | 'right'
 export type TextToImageRatioOption = '1:1' | '2:1'
 export type ImageTextSettings = {
-  settings: {
-    includeBlockTitle: boolean
-    backgroundColor: string
-    textColor: string
-    arrangement: ArrangementOption
-    textToImageRatio: TextToImageRatioOption
-  } & ImageData
+  includeBlockTitle: boolean
+  backgroundColor: string
+  textColor: string
+  arrangement: ArrangementOption
+  textToImageRatio: TextToImageRatioOption
 }
 export type ImageTextData = TextData & ImageData
 export type ImageTextEditHandlers = {
@@ -44,7 +42,6 @@ export type ImageTextBlockLayoutProps = {
   textComponent: ReactNode
   arrangement: ArrangementOption
   textToImageRatio: TextToImageRatioOption
-  includeBlockTitle: boolean
   dataTestId?: string
 }
 

@@ -90,87 +90,87 @@ export const ImageTextBlockSettings = () => {
     altTextAsCaption,
     decorativeImage,
   } = useNode(node => ({
-    includeBlockTitle: node.data.props.settings.includeBlockTitle,
-    backgroundColor: node.data.props.settings.backgroundColor,
-    textColor: node.data.props.settings.textColor,
-    arrangement: node.data.props.settings.arrangement,
-    textToImageRatio: node.data.props.settings.textToImageRatio,
-    url: node.data.props.settings.url,
-    fileName: node.data.props.settings.fileName,
-    altText: node.data.props.settings.altText,
-    caption: node.data.props.settings.caption,
-    altTextAsCaption: node.data.props.settings.altTextAsCaption,
-    decorativeImage: node.data.props.settings.decorativeImage,
+    includeBlockTitle: node.data.props.includeBlockTitle,
+    backgroundColor: node.data.props.backgroundColor,
+    textColor: node.data.props.textColor,
+    arrangement: node.data.props.arrangement,
+    textToImageRatio: node.data.props.textToImageRatio,
+    url: node.data.props.url,
+    fileName: node.data.props.fileName,
+    altText: node.data.props.altText,
+    caption: node.data.props.caption,
+    altTextAsCaption: node.data.props.altTextAsCaption,
+    decorativeImage: node.data.props.decorativeImage,
   }))
 
   const handleIncludeBlockTitleChange = () => {
     setProp((props: ImageTextBlockProps) => {
-      props.settings.includeBlockTitle = !includeBlockTitle
+      props.includeBlockTitle = !includeBlockTitle
     })
   }
 
   const handleBackgroundColorChange = (color: string) => {
     setProp((props: ImageTextBlockProps) => {
-      props.settings.backgroundColor = color
+      props.backgroundColor = color
     })
   }
 
   const handleTextColorChange = (color: string) => {
     setProp((props: ImageTextBlockProps) => {
-      props.settings.textColor = color
+      props.textColor = color
     })
   }
 
   const handleArrangementChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
     const arrangement = value as ArrangementOption
     setProp((props: ImageTextBlockProps) => {
-      props.settings.arrangement = arrangement
+      props.arrangement = arrangement
     })
   }
 
   const handleTextToImageRatioChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
     const textToImageRatio = value as TextToImageRatioOption
     setProp((props: ImageTextBlockProps) => {
-      props.settings.textToImageRatio = textToImageRatio
+      props.textToImageRatio = textToImageRatio
     })
   }
 
   const handleImageDataChange = (imageData: ImageData) => {
     setProp((props: ImageTextBlockProps) => {
-      props.settings.url = imageData.url
-      props.settings.altText = imageData.altText
-      props.settings.fileName = imageData.fileName
+      props.url = imageData.url
+      props.altText = imageData.altText
+      props.fileName = imageData.fileName
     })
   }
 
   const handleCaptionChange = (caption: string) => {
     setProp((props: ImageTextBlockProps) => {
-      props.settings.caption = caption
+      props.caption = caption
     })
   }
 
   const handleAltTextChange = (altText: string) => {
     setProp((props: ImageTextBlockProps) => {
-      props.settings.altText = altText
+      props.altText = altText
     })
   }
 
   const handleAltTextAsCaptionChange = (newAltTextAsCaption: boolean) => {
     setProp((props: ImageTextBlockProps) => {
-      props.settings.altTextAsCaption = newAltTextAsCaption
+      props.altTextAsCaption = newAltTextAsCaption
       if (newAltTextAsCaption) {
-        props.settings.caption = props.settings.altText
+        props.caption = props.altText
       }
     })
   }
 
   const handleDecorativeImageChange = (newDecorativeImage: boolean) => {
     setProp((props: ImageTextBlockProps) => {
-      props.settings.decorativeImage = newDecorativeImage
-      if (props.settings.decorativeImage) {
-        props.settings.altText = ''
-        props.settings.altTextAsCaption = false
-        props.settings.caption = ''
+      props.decorativeImage = newDecorativeImage
+      if (props.decorativeImage) {
+        props.altText = ''
+        props.altTextAsCaption = false
+        props.caption = ''
       }
     })
   }

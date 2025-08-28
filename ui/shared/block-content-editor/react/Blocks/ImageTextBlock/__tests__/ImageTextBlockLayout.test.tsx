@@ -59,14 +59,18 @@ describe('ImageTextBlockLayout', () => {
   })
 
   describe('include title', () => {
-    it('renders title when includeBlockTitle is true', () => {
-      const component = render(<ImageTextBlockLayout {...mockProps} includeBlockTitle={true} />)
+    it('renders title when present', () => {
+      const component = render(<ImageTextBlockLayout {...mockProps} />)
 
       expect(component.getByTestId(titleTestId)).toBeInTheDocument()
     })
 
-    it('does not render title when includeBlockTitle is false', () => {
-      const component = render(<ImageTextBlockLayout {...mockProps} includeBlockTitle={false} />)
+    it('does not render title when not present', () => {
+      const props = {
+        ...mockProps,
+        titleComponent: null,
+      }
+      const component = render(<ImageTextBlockLayout {...props} />)
 
       expect(component.queryByTestId(titleTestId)).not.toBeInTheDocument()
     })
