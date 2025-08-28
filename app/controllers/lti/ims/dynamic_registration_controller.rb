@@ -172,9 +172,9 @@ module Lti
         return render status: :unprocessable_entity, json: { errors: } if errors.present?
 
         registration_url = jwt["registration_url"]
-        current_user = User.find(jwt["user_id"])
 
         root_account.shard.activate do
+          current_user = User.find(jwt["user_id"])
           developer_key = DeveloperKey.new(
             current_user:,
             name: registration_attrs["client_name"],

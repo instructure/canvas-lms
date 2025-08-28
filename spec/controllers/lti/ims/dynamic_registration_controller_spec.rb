@@ -249,6 +249,65 @@ describe Lti::IMS::DynamicRegistrationController do
             expect(context_control.available).to be false
           end
         end
+
+        # Context: In production Canvas cloud, all Dynamic Registration install requests
+        # are routed through sso.canvaslms.com and we handle routing to the correct shard.
+        # This test ensures that even with that happening, we still create all the right records
+        # in all the right places.
+        context "with an installation happening across shards" do
+          specs_require_sharding
+
+          let(:token_hash) do
+            # Mimic the token being created on the user's shard, like would happen typically.
+            @shard2.activate do
+              {
+                user_id: user.id,
+                initiated_at: 1.minute.ago,
+                root_account_global_id: account.global_id,
+                uuid: SecureRandom.uuid,
+                unified_tool_id: "asdf",
+                registration_url: "https://example.com/registration",
+              }
+            end
+          end
+
+          let(:account) { @shard2.activate { account_model } }
+          let(:user) { @shard2.activate { user_model } }
+
+          it "still finds the user, even though we start the create request on the other shard" do
+            subject
+            expect(response).to be_successful
+
+            # Everything should exist on shard2
+            @shard2.activate do
+              parsed_body = response.parsed_body
+              expected_response_keys = {
+                "application_type" => registration_params["application_type"],
+                "grant_types" => registration_params["grant_types"],
+                "initiate_login_uri" => registration_params["initiate_login_uri"],
+                "redirect_uris" => registration_params["redirect_uris"],
+                "logo_uri" => registration_params["logo_uri"],
+                "response_types" => registration_params["response_types"],
+                "client_name" => registration_params["client_name"],
+                "jwks_uri" => registration_params["jwks_uri"],
+                "token_endpoint_auth_method" => registration_params["token_endpoint_auth_method"],
+                "scope" => registration_params["scope"],
+              }
+
+              expect(parsed_body).to include(expected_response_keys)
+              expect(parsed_body["client_id"]).to eq DeveloperKey.last.global_id.to_s
+              created_registration = Lti::IMS::Registration.last
+              expect(created_registration.privacy_level).to eq("email_only")
+              expect(created_registration).not_to be_nil
+              expect(parsed_body["https://purl.imsglobal.org/spec/lti-tool-configuration"]["https://canvas.instructure.com/lti/registration_config_url"]).to eq "http://test.host/api/lti/registrations/#{created_registration.global_id}/view"
+              expect(created_registration.canvas_configuration["custom_fields"]).to eq({ "global_foo" => "global_bar" })
+              expect(created_registration.unified_tool_id).to eq("asdf")
+              expect(created_registration.registration_url).to eq("https://example.com/registration")
+              expect(created_registration.lti_registration.account).to eq(account)
+              expect(created_registration.lti_registration.created_by).to eq(user)
+            end
+          end
+        end
       end
 
       context "and with invalid registration params" do
