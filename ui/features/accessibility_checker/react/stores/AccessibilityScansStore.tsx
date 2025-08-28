@@ -20,7 +20,12 @@ import {TableColHeaderProps} from '@instructure/ui-table'
 import {create} from 'zustand'
 import {devtools} from 'zustand/middleware'
 
-import {AccessibilityResourceScan, Filters, ParsedFilters} from '../types'
+import {
+  AccessibilityIssuesSummaryData,
+  AccessibilityResourceScan,
+  Filters,
+  ParsedFilters,
+} from '../types'
 
 export const USE_ACCESSIBILITY_SCANS_STORE = false
 
@@ -46,13 +51,16 @@ export type AccessibilityScansState = {
   page: number
   pageCount: number
   pageSize: number
-  totalCount: number
-  loading?: boolean
-  error?: string | null
-  accessibilityScans: AccessibilityResourceScan[] | null
   tableSortState?: TableSortState | null
   search?: string | null
   filters?: Filters | null
+  totalCount: number
+  loading?: boolean
+  loadingOfSummary?: boolean
+  error?: string | null
+  errorOfSummary?: string | null
+  accessibilityScans: AccessibilityResourceScan[] | null
+  issuesSummary: AccessibilityIssuesSummaryData | null
   nextResource: NextResource
 }
 
@@ -60,13 +68,16 @@ export type AccessibilityScansActions = {
   setPage: (page: number) => void
   setPageCount: (pageCount: number) => void
   setPageSize: (pageSize: number) => void
-  setTotalCount: (totalCount: number) => void
-  setLoading: (loading: boolean) => void
-  setError: (error: string | null) => void
-  setAccessibilityScans: (accessibilityScans: AccessibilityResourceScan[] | null) => void
   setTableSortState: (tableSortState: TableSortState | null) => void
   setSearch: (search: string | null) => void
   setFilters: (filters: Filters | null) => void
+  setTotalCount: (totalCount: number) => void
+  setLoading: (loading: boolean) => void
+  setLoadingOfSummary: (loadingOfSummary: boolean) => void
+  setError: (error: string | null) => void
+  setErrorOfSummary: (errorOfSummary: string | null) => void
+  setAccessibilityScans: (accessibilityScans: AccessibilityResourceScan[] | null) => void
+  setIssuesSummary: (issuesSummary: AccessibilityIssuesSummaryData | null) => void
   setNextResource: (nextResource: NextResource) => void
 }
 
@@ -76,13 +87,16 @@ export const initialState: AccessibilityScansState = {
   page: 1,
   pageCount: 1,
   pageSize: 10,
-  totalCount: 0,
-  loading: true,
-  error: null,
-  accessibilityScans: null,
   tableSortState: null,
   search: null,
   filters: null,
+  totalCount: 0,
+  loading: true,
+  loadingOfSummary: true,
+  error: null,
+  errorOfSummary: null,
+  accessibilityScans: null,
+  issuesSummary: null,
   nextResource: defaultNextResource,
 }
 
@@ -104,13 +118,16 @@ export const useAccessibilityScansStore = create<
       setPage: page => set({page}),
       setPageCount: pageCount => set({pageCount}),
       setPageSize: pageSize => set({pageSize}),
-      setTotalCount: totalCount => set({totalCount}),
-      setLoading: loading => set({loading}),
-      setError: error => set({error}),
-      setAccessibilityScans: accessibilityScans => set({accessibilityScans}),
       setTableSortState: tableSortState => set({tableSortState}),
       setSearch: search => set({search}),
       setFilters: filters => set({filters}),
+      setTotalCount: totalCount => set({totalCount}),
+      setLoading: loading => set({loading}),
+      setLoadingOfSummary: loadingOfSummary => set({loadingOfSummary}),
+      setError: error => set({error}),
+      setErrorOfSummary: errorOfSummary => set({errorOfSummary}),
+      setAccessibilityScans: accessibilityScans => set({accessibilityScans}),
+      setIssuesSummary: issuesSummary => set({issuesSummary}),
       setNextResource: nextResource => set({nextResource}),
     }),
     {

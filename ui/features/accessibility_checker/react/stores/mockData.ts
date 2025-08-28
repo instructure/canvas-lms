@@ -18,6 +18,7 @@
 
 import {
   AccessibilityIssue,
+  AccessibilityIssuesSummaryData,
   AccessibilityResourceScan,
   FormType,
   IssueWorkflowState,
@@ -205,3 +206,12 @@ export const mockScanData: AccessibilityResourceScan[] = [
   mockScan4,
   mockScan5,
 ]
+
+export const mockIssuesSummary: AccessibilityIssuesSummaryData = {
+  total: 5,
+  byRuleType: {
+    'headings-sequence': 1,
+    'adjacent-links': 50,
+    'small-text-contrast': 10,
+  },
+}

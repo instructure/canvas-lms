@@ -21,7 +21,7 @@ import {act, renderHook} from '@testing-library/react-hooks'
 
 import {useAccessibilityScansStore} from '../../../stores/AccessibilityScansStore'
 import {AccessibilityIssuesSummary} from '../../AccessibilityIssuesSummary/AccessibilityIssuesSummary'
-import {mockScanData} from '../../../stores/mockData'
+import {mockIssuesSummary} from '../../../stores/mockData'
 
 describe('AccessibilityIssuesSummary', () => {
   beforeEach(() => {
@@ -32,8 +32,8 @@ describe('AccessibilityIssuesSummary', () => {
     const {result} = renderHook(() => useAccessibilityScansStore())
 
     await act(() => {
-      result.current.setLoading(false)
-      result.current.setAccessibilityScans(mockScanData)
+      result.current.setLoadingOfSummary(false)
+      result.current.setIssuesSummary(mockIssuesSummary)
     })
 
     render(<AccessibilityIssuesSummary />)
@@ -46,8 +46,8 @@ describe('AccessibilityIssuesSummary', () => {
     const {result} = renderHook(() => useAccessibilityScansStore())
 
     await act(() => {
-      result.current.setLoading(false)
-      result.current.setAccessibilityScans([])
+      result.current.setLoadingOfSummary(false)
+      result.current.setIssuesSummary({total: 0, byRuleType: {}})
     })
 
     render(<AccessibilityIssuesSummary />)
@@ -68,8 +68,8 @@ describe('AccessibilityIssuesSummary', () => {
     const {result} = renderHook(() => useAccessibilityScansStore())
 
     act(() => {
-      result.current.setLoading(true)
-      result.current.setAccessibilityScans(null)
+      result.current.setLoadingOfSummary(true)
+      result.current.setIssuesSummary(null)
     })
 
     render(<AccessibilityIssuesSummary />)

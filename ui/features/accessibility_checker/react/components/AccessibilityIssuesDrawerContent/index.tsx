@@ -33,6 +33,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {FormFieldMessage} from '@instructure/ui-form-field'
 
 import {AccessibilityCheckerContext} from '../../contexts/AccessibilityCheckerContext'
+import {useAccessibilityScansFetchUtils} from '../../hooks/useAccessibilityScansFetchUtils'
 import {useNextResource} from '../../hooks/useNextResource'
 import {
   useAccessibilityScansStore,
@@ -86,6 +87,7 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
   const [assertiveAlertMessage, setAssertiveAlertMessage] = useState<string | null>(null)
   const [formError, setFormError] = useState<string | null>()
 
+  const {doFetchAccessibilityIssuesSummary} = useAccessibilityScansFetchUtils()
   const [accessibilityScans, nextResource] = useAccessibilityScansStore(
     useShallow(state => [state.accessibilityScans, state.nextResource]),
   )
@@ -250,6 +252,7 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
       }
       updateAccessibilityIssues(updatedIssues)
       setCurrentIssueIndex(prev => Math.max(0, Math.min(prev, updatedIssues.length - 1)))
+      doFetchAccessibilityIssuesSummary({})
     } catch (err: any) {
       console.error('Error saving accessibility issue. Error is: ' + err.message)
     } finally {
@@ -267,6 +270,7 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
     setAccessibilityScans,
     setNextResource,
     updateCountPropertyForItem,
+    doFetchAccessibilityIssuesSummary,
   ])
 
   const handleApplyAndSaveAndNext = useCallback(() => {

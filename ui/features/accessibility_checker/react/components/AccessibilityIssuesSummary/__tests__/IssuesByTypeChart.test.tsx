@@ -17,9 +17,12 @@
  */
 
 import {render, screen} from '@testing-library/react'
+import {act, renderHook} from '@testing-library/react-hooks'
 import '@testing-library/jest-dom'
+
 import {IssuesByTypeChart} from '../IssuesByTypeChart'
-import {AccessibilityData, ContentItem, Severity} from '../../../types'
+import {useAccessibilityScansStore, initialState} from '../../../stores/AccessibilityScansStore'
+import {mockIssuesSummary} from '../../../stores/mockData'
 
 // Mock ResizeObserver since it's not supported in jsdom
 class ResizeObserver {
@@ -29,49 +32,55 @@ class ResizeObserver {
 }
 window.ResizeObserver = ResizeObserver
 
-const sampleData: AccessibilityData = {
-  pages: {
-    1: {
-      severity: 'Medium' as Severity,
-      issues: [
-        {ruleId: 'img-alt', displayName: 'Image alt text'},
-        {ruleId: 'img-alt', displayName: 'Image alt text'},
-      ],
-    } as ContentItem,
-  },
-  attachments: {
-    2: {
-      severity: 'Low',
-      issues: [
-        {ruleId: 'img-alt', displayName: 'Image alt text'},
-        {ruleId: 'table-caption', displayName: 'Table caption'},
-      ],
-    } as ContentItem,
-    3: {
-      severity: 'High',
-      issues: [{ruleId: 'img-alt', displayName: 'Image alt text'}],
-    } as ContentItem,
-  },
-}
-
 describe('IssuesByTypeChart', () => {
+  const mockState = {
+    ...initialState,
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    jest.restoreAllMocks()
+    useAccessibilityScansStore.setState({...mockState})
+  })
+
   it('renders chart heading', () => {
-    render(<IssuesByTypeChart accessibilityIssues={sampleData} isLoading={false} />)
+    const {result} = renderHook(() => useAccessibilityScansStore())
+
+    act(() => {
+      result.current.setLoadingOfSummary(false)
+      result.current.setIssuesSummary(mockIssuesSummary)
+    })
+
+    render(<IssuesByTypeChart />)
     expect(screen.getByText('Issues by type')).toBeInTheDocument()
   })
 
   it('renders chart region with aria-label', () => {
-    render(<IssuesByTypeChart accessibilityIssues={sampleData} isLoading={false} />)
+    const {result} = renderHook(() => useAccessibilityScansStore())
+
+    act(() => {
+      result.current.setLoadingOfSummary(false)
+      result.current.setIssuesSummary(mockIssuesSummary)
+    })
+
+    render(<IssuesByTypeChart />)
     const chart = screen.getByTestId('issues-by-type-chart')
     expect(chart).toBeInTheDocument()
     expect(chart).toHaveAttribute(
       'aria-label',
-      'Issues by type chart. High: 4 issues, Medium: 0 issues, Low: 1 issues.',
+      'Issues by type chart. High: 50 issues, Medium: 10 issues, Low: 1 issues.',
     )
   })
 
   it('handles empty data gracefully', () => {
-    render(<IssuesByTypeChart accessibilityIssues={null} isLoading={false} />)
+    const {result} = renderHook(() => useAccessibilityScansStore())
+
+    act(() => {
+      result.current.setLoadingOfSummary(false)
+      result.current.setIssuesSummary(null)
+    })
+
+    render(<IssuesByTypeChart />)
     const chart = screen.getByTestId('issues-by-type-chart')
     expect(chart).toBeInTheDocument()
     expect(chart).toHaveAttribute(
@@ -81,7 +90,13 @@ describe('IssuesByTypeChart', () => {
   })
 
   it('renders loading state', () => {
-    render(<IssuesByTypeChart accessibilityIssues={null} isLoading={true} />)
+    const {result} = renderHook(() => useAccessibilityScansStore())
+
+    act(() => {
+      result.current.setLoading(true)
+    })
+
+    render(<IssuesByTypeChart />)
     expect(screen.getByText('Loading accessibility issues')).toBeInTheDocument()
   })
 })

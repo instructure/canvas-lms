@@ -16,10 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useMemo, useRef, useState} from 'react'
-import {View} from '@instructure/ui-view'
-import {Heading} from '@instructure/ui-heading'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useEffect, useMemo, useRef, useState} from 'react'
+import {useShallow} from 'zustand/react/shallow'
 import {
   Chart as ChartJS,
   BarController,
@@ -29,23 +27,23 @@ import {
   Tooltip,
   Title,
 } from 'chart.js'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {Heading} from '@instructure/ui-heading'
+import {Spinner} from '@instructure/ui-spinner'
+import {View} from '@instructure/ui-view'
+
+import {useAccessibilityScansStore} from '../../stores/AccessibilityScansStore'
+import {IssueDataPoint} from '../../types'
 import {
   getChartData,
   getChartOptions,
   getSeverityCounts,
   processIssuesToChartData,
 } from '../../utils/chart'
-import {AccessibilityData, IssueDataPoint} from '../../types'
-import {Spinner} from '@instructure/ui-spinner'
 
 const I18n = createI18nScope('issuesByTypeChart')
 
 ChartJS.register(BarController, CategoryScale, LinearScale, BarElement, Title, Tooltip)
-
-type IssuesByTypeChartProps = {
-  accessibilityIssues: AccessibilityData | null
-  isLoading?: boolean
-}
 
 function renderLoading() {
   return (
@@ -55,10 +53,11 @@ function renderLoading() {
   )
 }
 
-export const IssuesByTypeChart: React.FC<IssuesByTypeChartProps> = ({
-  accessibilityIssues,
-  isLoading,
-}) => {
+export const IssuesByTypeChart = () => {
+  const [issuesSummary, loadingOfSummary] = useAccessibilityScansStore(
+    useShallow(state => [state.issuesSummary, state.loadingOfSummary]),
+  )
+
   const containerRef = useRef<HTMLDivElement | null>(null)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const chartRef = useRef<ChartJS<'bar'> | null>(null)
@@ -76,13 +75,12 @@ export const IssuesByTypeChart: React.FC<IssuesByTypeChartProps> = ({
     })
     observer.observe(element as Element)
     return () => observer.disconnect()
-  }, [isLoading])
+  }, [loadingOfSummary])
 
   const issuesData: IssueDataPoint[] = useMemo(
-    () => processIssuesToChartData(accessibilityIssues),
-    [accessibilityIssues],
+    () => processIssuesToChartData(issuesSummary?.byRuleType),
+    [issuesSummary],
   )
-  const severityCounts = useMemo(() => getSeverityCounts(issuesData), [issuesData])
   const chartData = useMemo(
     () => getChartData(issuesData, containerWidth),
     [issuesData, containerWidth],
@@ -91,6 +89,8 @@ export const IssuesByTypeChart: React.FC<IssuesByTypeChartProps> = ({
     () => getChartOptions(issuesData, containerWidth),
     [issuesData, containerWidth],
   )
+
+  const severityCounts = useMemo(() => getSeverityCounts(issuesData), [issuesData])
 
   const ariaLabel = I18n.t(
     'Issues by type chart. High: %{high} issues, Medium: %{medium} issues, Low: %{low} issues.',
@@ -116,7 +116,7 @@ export const IssuesByTypeChart: React.FC<IssuesByTypeChartProps> = ({
     }
   }, [])
 
-  if (isLoading) return renderLoading()
+  if (loadingOfSummary) return renderLoading()
 
   return (
     <View as="div" height="250px">

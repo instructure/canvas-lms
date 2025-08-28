@@ -26,11 +26,28 @@ import {
   useAccessibilityScansStore,
 } from '../stores/AccessibilityScansStore'
 import {API_FETCH_ERROR_MESSAGE_PREFIX, IssuesTableHeaderApiNames} from '../constants'
-import {AccessibilityResourceScan, Filters} from '../types'
+import {AccessibilityIssuesSummaryData, AccessibilityResourceScan, Filters} from '../types'
 import {convertKeysToCamelCase, getParsedFilters} from '../utils/apiData'
 import {getCourseBasedPath, updateQueryParams} from '../utils/query'
 
-const getApiRequestParams = (requestedFetch: NewStateToFetch): Record<string, any> => {
+/**
+ * Applies search and filter parameters to the API request.
+ */
+const applySearchAndFilterParams = (
+  requestedFetch: NewStateToFetch,
+  params: Record<string, any>,
+): void => {
+  if (requestedFetch.filters !== undefined) {
+    params['filters'] = requestedFetch.filters
+  }
+
+  if (requestedFetch.search) {
+    // TODO Check API support for search
+    // params['search'] = requestedFetch.search
+  }
+}
+
+const getFetchScansRequestParams = (requestedFetch: NewStateToFetch): Record<string, any> => {
   const params: Record<string, any> = {}
 
   if (requestedFetch.page !== undefined) {
@@ -47,14 +64,15 @@ const getApiRequestParams = (requestedFetch: NewStateToFetch): Record<string, an
       requestedFetch.tableSortState.sortDirection === 'ascending' ? 'asc' : 'desc'
   }
 
-  if (requestedFetch.filters !== undefined) {
-    params['filters'] = requestedFetch.filters
-  }
+  applySearchAndFilterParams(requestedFetch, params)
 
-  if (requestedFetch.search) {
-    // TODO Check API support for search
-    // params['search'] = requestedFetch.search
-  }
+  return params
+}
+
+const getFetchSummaryRequestParams = (requestedFetch: NewStateToFetch): Record<string, any> => {
+  const params: Record<string, any> = {}
+
+  applySearchAndFilterParams(requestedFetch, params)
 
   return params
 }
@@ -80,7 +98,10 @@ export const useAccessibilityScansFetchUtils = () => {
   const [
     setAccessibilityScans,
     setError,
+    setErrorOfSummary,
+    setIssuesSummary,
     setLoading,
+    setLoadingOfSummary,
     setPage,
     setPageCount,
     setPageSize,
@@ -90,7 +111,10 @@ export const useAccessibilityScansFetchUtils = () => {
     useShallow(state => [
       state.setAccessibilityScans,
       state.setError,
+      state.setErrorOfSummary,
+      state.setIssuesSummary,
       state.setLoading,
+      state.setLoadingOfSummary,
       state.setPage,
       state.setPageCount,
       state.setPageSize,
@@ -117,7 +141,7 @@ export const useAccessibilityScansFetchUtils = () => {
 
         Object.assign(newStateToFetch, requestedStateChange)
 
-        const params = getApiRequestParams(newStateToFetch)
+        const params = getFetchScansRequestParams(newStateToFetch)
 
         setLoading(true)
         setError(null)
@@ -163,7 +187,44 @@ export const useAccessibilityScansFetchUtils = () => {
     ],
   )
 
+  const doFetchAccessibilityIssuesSummary = useCallback(
+    async (requestedStateChange: Partial<NewStateToFetch>, filters: Filters | null = null) => {
+      try {
+        // Picking up existing state (or default, if not yet set)
+        const newStateToFetch: NewStateToFetch = {
+          ...defaultStateToFetch,
+          search: search || defaultStateToFetch.search,
+          filters: filters ? getParsedFilters(filters) : undefined,
+        }
+
+        Object.assign(newStateToFetch, requestedStateChange)
+
+        const params = getFetchSummaryRequestParams(newStateToFetch)
+
+        setLoadingOfSummary(true)
+        setErrorOfSummary(null)
+
+        const path = getCourseBasedPath('/accessibility/issue_summary')
+
+        const data: DoFetchApiResults<AccessibilityIssuesSummaryData> = await doFetchApi({
+          path,
+          params,
+          method: 'GET',
+        })
+
+        const issuesSummary = convertKeysToCamelCase(data.json) as AccessibilityIssuesSummaryData
+        setIssuesSummary(issuesSummary)
+      } catch (err: any) {
+        setErrorOfSummary(API_FETCH_ERROR_MESSAGE_PREFIX + err.message)
+      } finally {
+        setLoadingOfSummary(false)
+      }
+    },
+    [search, setIssuesSummary, setErrorOfSummary, setLoadingOfSummary],
+  )
+
   return {
+    doFetchAccessibilityIssuesSummary,
     doFetchAccessibilityScanData,
   }
 }

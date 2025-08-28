@@ -17,7 +17,6 @@
  */
 
 import {
-  AccessibilityData,
   AccessibilityResourceScan,
   ContentItem,
   ContentItemType,
@@ -30,8 +29,6 @@ import {
   ScanWorkflowState,
   Severity,
 } from '../types'
-
-// COMMON API UTILS
 
 const snakeToCamel = function (str: string): string {
   return str.replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase())
@@ -62,7 +59,7 @@ export const getAsContentItem = (scan: AccessibilityResourceScan): ContentItem =
     url: scan.resourceUrl,
     editUrl: `${scan.resourceUrl}/edit`,
     issues: scan.issues,
-    severity: issueSeverity(scan.issueCount),
+    severity: getIssueSeverity(scan.issueCount),
   }
 }
 
@@ -81,10 +78,6 @@ export const getAsAccessibilityResourceScan = (item: ContentItem): Accessibility
     issueCount: item.count,
     issues: item.issues || [],
   }
-}
-
-export function parseScansToContentItems(scans: AccessibilityResourceScan[]): ContentItem[] {
-  return scans.map((scan): ContentItem => getAsContentItem(scan))
 }
 
 // Backwards compatibility for remediation APIs
@@ -109,12 +102,6 @@ export const replaceById = <T extends HasId>(data: T[] | null, item: T): T[] => 
   if (!data) return []
   return data.map(existingItem => (existingItem.id === item.id ? item : existingItem))
 }
-
-/*
- * FOR UPGRADED API
- * From this point, this file holds utility functions to process the raw response data
- * of the upgraded API implementation for the Accessibility Checker.
- */
 
 export const calculateTotalIssuesCount = (data?: AccessibilityResourceScan[] | null): number => {
   if (!data) return 0
@@ -151,63 +138,8 @@ export const getParsedFilters = (filters: Filters | null): ParsedFilters => {
   return parsed
 }
 
-export const issueSeverity = (count: number): Severity => {
+export const getIssueSeverity = (count: number): Severity => {
   if (count > 30) return 'High'
   if (count > 2) return 'Medium'
   return 'Low'
-}
-
-/*
- * FOR INITIAL API
- * From this point, this file holds utility functions to process the raw response data
- * of the initial API implementation for the Accessibility Checker.
- *
- * These functions will be deprecated once the upgraded API is fully adopted.
- */
-
-export function parseAccessibilityScans(scans: any[]): AccessibilityData {
-  const pages: Record<string, ContentItem> = {}
-  const assignments: Record<string, ContentItem> = {}
-  const attachments: Record<string, ContentItem> = {}
-
-  for (const scan of scans) {
-    const resourceId = String(scan.resourceId)
-    const resourceType = scan.resourceType // as ContentItemType
-
-    const contentItem: ContentItem = {
-      id: Number(resourceId),
-      type: resourceType,
-      title: scan.resourceName ?? '',
-      published: scan.resourceWorkflowState === 'published',
-      updatedAt: scan.resourceUpdatedAt || new Date().toISOString(),
-      count: scan.issueCount,
-      url: scan.resourceUrl,
-      editUrl: `${scan.resourceUrl}/edit`,
-      issues: scan.issues ?? [],
-      severity: issueSeverity(scan.issueCount),
-    }
-
-    if (resourceType === ResourceType.WikiPage) {
-      // ('WikiPage' as ContentItemType)
-      pages[resourceId] = contentItem
-    } else if (resourceType === ResourceType.Assignment) {
-      // ('Assignment' as ContentItemType)
-      assignments[resourceId] = contentItem
-    } else if (resourceType === ResourceType.Attachment) {
-      // ('Attachment' as ContentItemType)
-      attachments[resourceId] = contentItem
-    }
-  }
-
-  return {
-    pages,
-    assignments,
-    attachments,
-    lastChecked: new Date().toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    }),
-    accessibilityScanDisabled: false,
-  }
 }

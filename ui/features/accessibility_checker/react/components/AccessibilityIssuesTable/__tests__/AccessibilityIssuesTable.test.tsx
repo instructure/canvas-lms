@@ -31,16 +31,8 @@ jest.mock('../../../hooks/useAccessibilityScansFetchUtils', () => ({
 const mockDoFetch = jest.fn()
 
 describe('AccessibilityIssuesTable', () => {
-  const mockSetLoading = jest.fn()
-  const mockSetError = jest.fn()
-  const mockSetTableSortState = jest.fn()
-  const mockSetTableData = jest.fn()
   const mockState = {
     ...initialState,
-    mockSetLoading,
-    mockSetError,
-    mockSetTableSortState,
-    mockSetTableData,
   }
 
   beforeEach(() => {
