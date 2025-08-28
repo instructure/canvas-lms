@@ -19,7 +19,7 @@
 import {useState} from 'react'
 import {prepareModuleItemData} from '../../handlers/addItemHandlers'
 import {useInlineSubmission} from './useInlineSubmission'
-import {useDefaultCourseFolder} from '../../hooks/mutations/useDefaultCourseFolder'
+import {useDefaultCourseFolder} from './useDefaultCourseFolder'
 
 interface UseAddItemInlineProps {
   moduleId: string
