@@ -45,9 +45,8 @@ import {validateModuleTeacherRenderRequirements, ALL_MODULES} from '../utils/uti
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useHowManyModulesAreFetchingItems} from '../hooks/queries/useHowManyModulesAreFetchingItems'
 import {TEACHER, STUDENT, MODULE_ITEMS, PAGE_SIZE, SHOW_ALL_PAGE_SIZE} from '../utils/constants'
-import {IconModuleSolid} from '@instructure/ui-icons'
-import {handleAddModule} from '../handlers/moduleActionHandlers'
 import CreateNewModule from '../components/CreateNewModule'
+import {useDefaultCourseFolder} from '../hooks/mutations/useDefaultCourseFolder'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -61,6 +60,7 @@ const ModulesList: React.FC = () => {
     moduleCursorState,
     setModuleCursorState,
   } = useContextModule()
+  useDefaultCourseFolder()
   const reorderItemsMutation = useReorderModuleItemsGQL()
   const reorderModulesMutation = useReorderModules()
   const {data, isLoading, error} = useModules(courseId || '')
