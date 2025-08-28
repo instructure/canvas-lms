@@ -157,7 +157,8 @@ course_copy_alignments:
   state: hidden
   applies_to: RootAccount
   display_name: Course Copy Alignments Clone
-  description: Allow to clone alignments after the course copy process
+  description: Allow to clone alignments after the course copy process. This is related to new quizzes alignments.
+  after_state_change_proc: rollback_assignments_state
 prevent_deletion_outcomes_with_os_alignments:
   state: hidden
   applies_to: SiteAdmin
