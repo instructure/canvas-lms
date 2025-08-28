@@ -179,6 +179,7 @@ describe "student k5 dashboard" do
     let(:math_subject_grade) { "75" }
 
     let(:assignment) { create_and_submit_assignment(@subject_course, "Assignment 1", "new assignment", 100) }
+    let(:assignment_two) { create_and_submit_assignment(@subject_course, "Assignment 2", "new assignment 2", 100) }
 
     it "shows the grades panel with two courses" do
       subject_title2 = "Social Studies"
@@ -216,12 +217,15 @@ describe "student k5 dashboard" do
       associate_course_to_term("Fall Term")
       assignment.update!(due_at: 1.week.ago)
       assignment.grade_student(@student, grader: @homeroom_teacher, score: "90", points_deducted: 0)
+      assignment_two.update!(due_at: Time.zone.now)
+      assignment_two.grade_student(@student, grader: @homeroom_teacher, score: "70", points_deducted: 0)
 
       get "/#grades"
 
       click_option(grading_period_dropdown_selector, "GP Ended")
-
       expect(subject_grade("90%")).to be_displayed
+      click_option(grading_period_dropdown_selector, "GP Current")
+      expect(subject_grade("70%")).to be_displayed
     end
 
     it "shows two dashes and empty progress bar if no grades are available for a course" do
