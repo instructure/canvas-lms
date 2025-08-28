@@ -16,53 +16,94 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useState} from 'react'
 import {MediaBlockSettings} from './MediaBlockSettings'
-import {MediaEdit} from './MediaEdit'
-import {MediaView} from './MediaView'
-import {BaseBlock, useGetRenderMode} from '../BaseBlock'
-import {MediaBlockProps, MediaData} from './types'
-
+import {BaseBlockHOC} from '../BaseBlock'
+import {MediaBlockProps} from './types'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {useSave} from '../BaseBlock/useSave'
+import {useSave2} from '../BaseBlock/useSave'
+import {Flex} from '@instructure/ui-flex'
+import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
+import {View} from '@instructure/ui-view'
+import {DefaultPreviewImage} from '../BlockItems/DefaultPreviewImage/DefaultPreviewImage'
+import {TitleEdit} from '../BlockItems/Title/TitleEdit'
+import {AddButton} from '../BlockItems/AddButton/AddButton'
+import {UploadMediaModal} from './UploadMediaModal'
 
 const I18n = createI18nScope('block_content_editor')
 
-const MediaContainer = (props: MediaData) => {
-  const {isEditMode, isEditPreviewMode} = useGetRenderMode()
+const MediaBlockView = (props: MediaBlockProps) => {
+  return (
+    <Flex gap="mediumSmall" direction="column">
+      {props.includeBlockTitle && (
+        <TitleEditPreview title={props.title} contentColor={props.titleColor} />
+      )}
+      {props.src ? (
+        <View as="div" width="100%" height="400px">
+          <iframe
+            src={props.src}
+            title={props.title || 'Media content'}
+            width="100%"
+            height="100%"
+            allow="fullscreen"
+            data-media-type="video"
+          />
+        </View>
+      ) : (
+        <DefaultPreviewImage blockType="media" />
+      )}
+    </Flex>
+  )
+}
 
+const MediaBlockEdit = (props: MediaBlockProps) => {
   const [title, setTitle] = useState(props.title)
+  const [showModal, setShowModal] = useState(false)
 
-  const save = useSave<typeof MediaBlock>()
+  const save = useSave2(() => ({
+    title,
+  }))
 
-  useEffect(() => {
-    if (isEditPreviewMode) {
-      save({title})
-    }
-  }, [isEditPreviewMode, title, save])
-
-  return isEditMode ? (
-    <MediaEdit {...props} onTitleChange={setTitle} title={title} />
-  ) : (
-    <MediaView {...props} title={title} />
+  return (
+    <Flex gap="mediumSmall" direction="column">
+      {props.includeBlockTitle && <TitleEdit title={title} onTitleChange={setTitle} />}
+      {props.src ? (
+        <View as="div" width={'100%'} height={'400px'}>
+          <iframe
+            src={props.src}
+            title={title || 'Media content'}
+            width="100%"
+            height="100%"
+            style={{
+              border: 'none',
+              borderRadius: '4px',
+            }}
+            allow="fullscreen"
+            data-media-type="video"
+          />
+        </View>
+      ) : (
+        <AddButton onClick={() => setShowModal(true)} />
+      )}
+      <UploadMediaModal
+        open={showModal}
+        onSubmit={(src: string) => save({src})}
+        onDismiss={() => setShowModal(false)}
+      />
+    </Flex>
   )
 }
 
 export const MediaBlock = (props: MediaBlockProps) => {
   return (
-    <BaseBlock
+    <BaseBlockHOC
+      ViewComponent={MediaBlockView}
+      EditComponent={MediaBlockEdit}
+      EditViewComponent={MediaBlockView}
+      componentProps={props}
       title={MediaBlock.craft.displayName}
       backgroundColor={props.backgroundColor}
-      statefulProps={{
-        src: props.src,
-        title: props.title,
-        backgroundColor: props.backgroundColor,
-        titleColor: props.titleColor,
-        includeBlockTitle: props.includeBlockTitle,
-      }}
-    >
-      <MediaContainer {...props} />
-    </BaseBlock>
+    />
   )
 }
 
