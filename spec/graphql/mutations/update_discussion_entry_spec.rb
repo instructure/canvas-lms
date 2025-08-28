@@ -278,4 +278,17 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
       expect(result.dig("data", "updateDiscussionEntry", "errors", 0, "message")).to include("Insufficient pin permissions")
     end
   end
+
+  context "LTI asset processor notifications" do
+    before(:once) do
+      @graded_topic = DiscussionTopic.create_graded_topic!(course: @course, title: "Graded Discussion")
+      @graded_entry = @graded_topic.discussion_entries.create!(message: "Original message", user: @student)
+    end
+
+    it "calls notify_asset_processors_of_discussion for graded discussion updates" do
+      expect(Lti::AssetProcessorDiscussionNotifier).to receive(:notify_asset_processors_of_discussion)
+
+      run_mutation(discussion_entry_id: @graded_entry.id, message: "Updated message")
+    end
+  end
 end

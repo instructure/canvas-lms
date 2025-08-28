@@ -318,4 +318,16 @@ RSpec.describe Mutations::CreateDiscussionEntry do
       expect(result.dig("data", "createDiscussionEntry", "errors", 0, "message")).to eq "Insufficient attach permissions"
     end
   end
+
+  context "LTI asset processor notifications" do
+    before(:once) do
+      @graded_topic = DiscussionTopic.create_graded_topic!(course: @course, title: "Graded Discussion")
+    end
+
+    it "calls notify_asset_processors_of_discussion for graded discussions" do
+      expect(Lti::AssetProcessorDiscussionNotifier).to receive(:notify_asset_processors_of_discussion)
+
+      run_mutation(discussion_topic_id: @graded_topic.id, message: "test message")
+    end
+  end
 end

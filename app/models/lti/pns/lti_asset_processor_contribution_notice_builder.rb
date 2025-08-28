@@ -30,7 +30,17 @@ module Lti
         discussion_entry_version
       ].freeze
       REQUIRED_ASSETS_PARAMS = %i[asset_id url sha256_checksum timestamp size content_type].freeze
-      VALID_CONTRIBUTION_STATUSES = %w[Draft Submitted Deleted Hidden].freeze
+      DRAFT = "Draft"
+      SUBMITTED = "Submitted"
+      DELETED = "Deleted"
+      HIDDEN = "Hidden"
+
+      VALID_CONTRIBUTION_STATUSES = [
+        DRAFT,
+        SUBMITTED,
+        DELETED,
+        HIDDEN
+      ].freeze
 
       def initialize(params)
         validate_params!(params)

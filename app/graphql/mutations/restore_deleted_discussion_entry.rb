@@ -32,6 +32,7 @@ class Mutations::RestoreDeletedDiscussionEntry < Mutations::BaseMutation
     return validation_error(I18n.t("Insufficient Permissions")) unless entry.grants_right?(current_user, session, :update)
 
     if entry.deleted?
+      entry.saving_user = current_user
       entry.restore
       { discussion_entry: entry }
     else

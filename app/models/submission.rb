@@ -1094,6 +1094,10 @@ class Submission < ActiveRecord::Base
     (submission_type == "online_upload" || text_entry_submission?) && root_account.feature_enabled?(:lti_asset_processor)
   end
 
+  def asset_processor_for_discussions_compatible?
+    assignment.discussion_topic? && root_account.feature_enabled?(:lti_asset_processor) && root_account.feature_enabled?(:lti_asset_processor_discussions)
+  end
+
   # VeriCite
 
   # this function will check if the score needs to be updated and update/save the new score if so,
@@ -3472,12 +3476,6 @@ class Submission < ActiveRecord::Base
   def set_lti_id
     # Old records may not have an lti_id, so we need to set one
     self.lti_id ||= SecureRandom.uuid
-  end
-
-  # For internal use only.
-  # The lti_id field on its own is not enough to uniquely identify a submission; use lti_attempt_id instead.
-  def lti_id
-    read_attribute(:lti_id)
   end
 
   def set_anonymous_id

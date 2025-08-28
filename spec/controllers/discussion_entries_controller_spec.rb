@@ -451,4 +451,38 @@ describe DiscussionEntriesController do
       expect(assigns[:discussion_entries].length).to be 1
     end
   end
+
+  context "LTI asset processor notifications" do
+    before :once do
+      @graded_topic = DiscussionTopic.create_graded_topic!(course: @course, title: "Graded Discussion")
+      @graded_entry = @graded_topic.discussion_entries.create!(message: "Original message", user: @student)
+    end
+
+    describe "POST 'create'" do
+      it "calls notify_asset_processors_of_discussion for graded discussions" do
+        user_session(@student)
+        expect(Lti::AssetProcessorDiscussionNotifier).to receive(:notify_asset_processors_of_discussion)
+
+        post "create", params: { course_id: @course.id, discussion_entry: { discussion_topic_id: @graded_topic.id, message: "test message" } }
+      end
+    end
+
+    describe "PUT 'update'" do
+      it "calls notify_asset_processors_of_discussion for graded discussions" do
+        user_session(@student)
+        expect(Lti::AssetProcessorDiscussionNotifier).to receive(:notify_asset_processors_of_discussion)
+
+        put "update", params: { course_id: @course.id, id: @graded_entry.id, discussion_entry: { message: "updated message" } }
+      end
+    end
+
+    describe "DELETE 'destroy'" do
+      it "calls notify_asset_processors_of_discussion for graded discussions" do
+        user_session(@teacher)
+        expect(Lti::AssetProcessorDiscussionNotifier).to receive(:notify_asset_processors_of_discussion)
+
+        delete "destroy", params: { course_id: @course.id, id: @graded_entry.id }
+      end
+    end
+  end
 end
