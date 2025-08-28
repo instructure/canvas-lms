@@ -23,17 +23,18 @@
 module Utils
   module InstStatsdUtils
     class TimingMeta
-      attr_accessor :tags
+      attr_accessor :tags, :send_stats
 
       def initialize(tags)
         @tags = tags
+        @send_stats = true
       end
     end
 
     class Timing
       # Use this method to time a block of code. The name is the name of the metric
-      # sent to datadog. The block is passed an empty hash which can be used
-      # to add tags to the metric.
+      # sent to datadog. The block is passed a TimingMeta object which can be used
+      # to add tags to the metric and control whether stats are sent.
       # Example:
       #   Utils::InstStatsdUtils::Timing.track('my.metric') do |meta|
       #     ...
@@ -41,14 +42,17 @@ module Utils
       #       tag1: 'value1',
       #       tag2: 'value2'
       #     }
+      #     meta.send_stats = false  # optional: skip sending stats
       #   end
       def self.track(name)
         timing_start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
         timing_meta = TimingMeta.new({})
         yield(timing_meta)
       ensure
-        timing_end = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-        InstStatsd::Statsd.timing(name, timing_end - timing_start, tags: timing_meta.tags || {})
+        if timing_meta.send_stats
+          timing_end = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+          InstStatsd::Statsd.timing(name, timing_end - timing_start, tags: timing_meta.tags || {})
+        end
       end
     end
   end
