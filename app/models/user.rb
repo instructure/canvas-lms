@@ -508,6 +508,7 @@ class User < ActiveRecord::Base
                 :require_self_enrollment_code,
                 :self_enrollment_code,
                 :self_enrollment_course,
+                :self_enrollment_section,
                 :validation_root_account,
                 :sortable_name_explicitly_set
   attr_reader :self_enrollment
@@ -2133,7 +2134,9 @@ class User < ActiveRecord::Base
     return if @self_enrolling # avoid infinite recursion when enrolling across shards (pseudonym creation + shard association stuff)
 
     @self_enrolling = true
-    @self_enrollment = @self_enrollment_course.self_enroll_student(self, skip_pseudonym: @just_created, skip_touch_user: true)
+    enrollment_options = { skip_pseudonym: @just_created, skip_touch_user: true }
+    enrollment_options[:section] = @self_enrollment_section if @self_enrollment_section
+    @self_enrollment = @self_enrollment_course.self_enroll_student(self, enrollment_options)
     @self_enrolling = false
   end
 

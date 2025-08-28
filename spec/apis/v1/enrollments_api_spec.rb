@@ -883,6 +883,9 @@ describe EnrollmentsApiController, type: :request do
         Account.default.allow_self_enrollment!
         course_factory(active_all: true)
         @course.update_attribute(:self_enrollment, true)
+
+        # Remove sections, so default section creation can be tested
+        @course.course_sections.each(&:destroy)
         @unenrolled_user = user_with_pseudonym
         @path = "/api/v1/courses/#{@course.id}/enrollments"
         @path_options = { controller: "enrollments_api", action: "create", format: "json", course_id: @course.id.to_s }
@@ -1034,6 +1037,148 @@ describe EnrollmentsApiController, type: :request do
           expect(json["id"]).to eq enrollment.id
           expect(enrollment.reload).to be_active
         end
+      end
+
+      it "enrolls in default section when course has no sections and default section is created" do
+        # @course already has all sections deleted, so default section will be created
+        json = api_call :post,
+                        @path,
+                        @path_options,
+                        {
+                          enrollment: {
+                            user_id: "self",
+                            self_enrollment_code: @course.self_enrollment_code
+                          }
+                        }
+        new_enrollment = Enrollment.find(json["id"])
+        expect(new_enrollment.course_section).to eq @course.default_section
+        expect(new_enrollment.course_section.default_section).to be true
+        expect(new_enrollment).to be_active
+        expect(new_enrollment).to be_self_enrolled
+      end
+
+      it "enrolls in open regular section when default section is concluded" do
+        # Create default section that is concluded
+        @course.course_sections.create!(
+          name: "Default Section",
+          default_section: true,
+          end_at: 1.week.ago,
+          restrict_enrollments_to_section_dates: true
+        )
+
+        # Create regular section that is open
+        open_section = @course.course_sections.create!(
+          name: "Open Section",
+          end_at: nil,
+          restrict_enrollments_to_section_dates: true
+        )
+
+        json = api_call :post,
+                        @path,
+                        @path_options,
+                        {
+                          enrollment: {
+                            user_id: "self",
+                            self_enrollment_code: @course.self_enrollment_code
+                          }
+                        }
+        new_enrollment = Enrollment.find(json["id"])
+        expect(new_enrollment.course_section).to eq open_section
+        expect(new_enrollment).to be_active
+        expect(new_enrollment).to be_self_enrolled
+      end
+
+      it "returns error when all sections are concluded" do
+        # Create default section that is concluded
+        @course.course_sections.create!(
+          name: "Default Section",
+          default_section: true,
+          end_at: 1.day.ago,
+          restrict_enrollments_to_section_dates: true
+        )
+
+        # Create regular section that is also concluded
+        @course.course_sections.create!(
+          name: "Regular Section",
+          end_at: 1.day.ago,
+          restrict_enrollments_to_section_dates: true
+        )
+
+        raw_api_call :post,
+                     @path,
+                     @path_options,
+                     {
+                       enrollment: {
+                         user_id: "self",
+                         self_enrollment_code: @course.self_enrollment_code
+                       }
+                     }
+        expect(response).to have_http_status :bad_request
+        json = JSON.parse(response.body)
+        expect(json["message"]).to include "Course has no open sections"
+      end
+
+      it "enrolls in default section when both sections are open" do
+        # Create default section that is open
+        default_section = @course.course_sections.create!(
+          name: "Default Section",
+          default_section: true,
+          end_at: 1.day.from_now,
+          restrict_enrollments_to_section_dates: true
+        )
+
+        # Create regular section that is also open
+        @course.course_sections.create!(
+          name: "Regular Section",
+          end_at: 1.day.from_now,
+          restrict_enrollments_to_section_dates: true
+        )
+
+        json = api_call :post,
+                        @path,
+                        @path_options,
+                        {
+                          enrollment: {
+                            user_id: "self",
+                            self_enrollment_code: @course.self_enrollment_code
+                          }
+                        }
+        new_enrollment = Enrollment.find(json["id"])
+        expect(new_enrollment.course_section).to eq default_section
+        expect(new_enrollment).to be_active
+        expect(new_enrollment).to be_self_enrolled
+      end
+
+      it "enrolls in specified section when section_id is provided" do
+        # Create default section that is open
+        @course.course_sections.create!(
+          name: "Default Section",
+          default_section: true,
+          end_at: 1.day.from_now,
+          restrict_enrollments_to_section_dates: true
+        )
+
+        # Create regular section that is also open
+        target_section = @course.course_sections.create!(
+          name: "Target Section",
+          end_at: 1.day.from_now,
+          restrict_enrollments_to_section_dates: true
+        )
+
+        json = api_call :post,
+                        @path,
+                        @path_options,
+                        {
+                          enrollment: {
+                            user_id: "self",
+                            self_enrollment_code: @course.self_enrollment_code,
+                            course_section_id: target_section.id
+                          }
+                        }
+        new_enrollment = Enrollment.find(json["id"])
+        expect(new_enrollment.course_section).to eq target_section
+        expect(new_enrollment).to be_active
+        expect(new_enrollment).to be_self_enrolled
       end
     end
   end
