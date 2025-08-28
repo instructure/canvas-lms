@@ -435,6 +435,30 @@ describe "context module items", :ignore_js_errors do
         expect(@module1.content_tags.last.title).to include(moved_item.title)
         expect(item_titles_list.count(moved_item.title)).to eq(1)
       end
+
+      it "moves module item within the same module" do
+        go_to_modules
+        module_header_expand_toggles.first.click
+        module_header_expand_toggles.last.click
+        wait_for_ajaximations
+
+        moved_item = @module.content_tags.first
+        manage_module_item_button(moved_item.id).click
+        module_item_action_menu_link("Move to...").click
+        expect(move_item_tray_select_modules_listbox).to be_displayed
+        move_item_tray_select_modules_listbox.click
+
+        option_list_id = move_item_tray_select_modules_listbox.attribute("aria-controls")
+        option_list_course_option(option_list_id, @module.name).click
+        move_item_tray_place_contents_listbox.click
+        place_item_at_bottom_option.click
+        submit_move_to_button.click
+        wait_for_ajaximations
+
+        item_titles_list = module_item_title_links.map(&:text)
+        expect(@module.content_tags.last.title).to include(moved_item.title)
+        expect(item_titles_list.count(moved_item.title)).to eq(1)
+      end
     end
 
     context "duplicate module item" do
