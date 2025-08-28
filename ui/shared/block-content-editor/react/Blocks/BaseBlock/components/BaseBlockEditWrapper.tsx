@@ -20,6 +20,7 @@ import {PropsWithChildren, useRef} from 'react'
 import {useNode} from '@craftjs/core'
 import {AddButton} from '../../../AddBlock/AddButton'
 import {useBlockContentEditorContext} from '../../../BlockContentEditorContext'
+import {useOpenSettingsTray} from '../../../hooks/useOpenSettingsTray'
 import {useDeleteNode} from '../../../hooks/useDeleteNode'
 import {useDuplicateNode} from '../../../hooks/useDuplicateNode'
 import {useMoveBlock} from '../../../hooks/useMoveBlock'
@@ -50,10 +51,9 @@ const DuplicateButton = () => {
 }
 
 const EditSettingsButton = () => {
-  const {settingsTray} = useBlockContentEditorContext()
-  const {id} = useNode()
+  const {openSettingsTray} = useOpenSettingsTray()
 
-  return <EditButton onClicked={() => settingsTray.open(id)} />
+  return <EditButton onClicked={openSettingsTray} />
 }
 
 const MoveBlockButton = () => {

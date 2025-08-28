@@ -27,6 +27,7 @@ import {TitleView} from '../BlockItems/Title/TitleView'
 import {ButtonDisplay} from './ButtonDisplay'
 import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
 import {useFocusElement} from '../../hooks/useFocusElement'
+import {useOpenSettingsTray} from '../../hooks/useOpenSettingsTray'
 import {TitleEdit} from '../BlockItems/Title/TitleEdit'
 
 const I18n = createI18nScope('block_content_editor')
@@ -58,6 +59,7 @@ const ButtonBlockEditView = (props: ButtonBlockProps) => {
 }
 
 const ButtonBlockEdit = (props: ButtonBlockProps) => {
+  const {openSettingsTray} = useOpenSettingsTray()
   const [title, setTitle] = useState(props.title)
 
   const {focusHandler} = useFocusElement()
@@ -72,7 +74,7 @@ const ButtonBlockEdit = (props: ButtonBlockProps) => {
         dataTestId="button-block-edit"
         settings={props.settings}
         focusHandler={props.settings.includeBlockTitle ? undefined : focusHandler}
-        onButtonClick={() => {}}
+        onButtonClick={openSettingsTray}
       />
     </Flex>
   )

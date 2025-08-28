@@ -58,15 +58,21 @@ export const SingleButton = ({
     }
   }
 
+  const buttonActionProps = onButtonClick
+    ? {onClick: onButtonClick as () => void}
+    : {
+        href,
+        target: isNewTabLink ? '_blank' : undefined,
+        rel: isNewTabLink ? 'noopener noreferrer' : undefined,
+      }
+
   return (
     <Button
       elementRef={el => focusHandler?.(el as HTMLElement)}
       display={isFullWidth ? 'block' : 'inline-block'}
       withBackground={button.style == 'filled'}
       themeOverride={themeOverride}
-      href={href}
-      target={href && isNewTabLink ? '_blank' : undefined}
-      rel={href && isNewTabLink ? 'noopener noreferrer' : undefined}
+      {...buttonActionProps}
       data-singlebutton
     >
       {buttonText}
