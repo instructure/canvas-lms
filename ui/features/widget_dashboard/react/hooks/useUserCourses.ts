@@ -25,6 +25,8 @@ import {COURSE_GRADES_WIDGET, QUERY_CONFIG} from '../constants'
 
 interface UsePaginatedCoursesWithGradesOptions {
   limit?: number
+  orderBy?: 'name' | 'code' | 'id' | 'updated'
+  order?: 'asc' | 'desc'
 }
 
 interface UsePaginatedCoursesWithGradesResult {
@@ -139,12 +141,12 @@ function transformEnrollmentToCourseGrade(enrollment: UserEnrollment): CourseGra
 export function usePaginatedCoursesWithGrades(
   options: UsePaginatedCoursesWithGradesOptions = {},
 ): UsePaginatedCoursesWithGradesResult {
-  const {limit = COURSE_GRADES_WIDGET.MAX_GRID_ITEMS} = options
+  const {limit = COURSE_GRADES_WIDGET.MAX_GRID_ITEMS, orderBy, order = 'asc'} = options
   const [currentPageIndex, setCurrentPageIndex] = useState(0)
 
   const query = useInfiniteQuery({
     ...createUserQueryConfig(
-      ['userCoursesWithGradesPaginated', limit],
+      ['userCoursesWithGradesPaginated', limit, orderBy, order],
       QUERY_CONFIG.STALE_TIME.GRADES,
     ),
     queryFn: async ({
@@ -178,9 +180,43 @@ export function usePaginatedCoursesWithGrades(
       }
 
       const {nodes, pageInfo} = result.legacyNode.enrollmentsConnection
+      let courseGrades = nodes.map(transformEnrollmentToCourseGrade)
+
+      // Apply sorting if specified
+      if (orderBy) {
+        courseGrades = courseGrades.sort((a, b) => {
+          let aValue: string | number | Date
+          let bValue: string | number | Date
+
+          switch (orderBy) {
+            case 'name':
+              aValue = a.courseName.toLowerCase()
+              bValue = b.courseName.toLowerCase()
+              break
+            case 'code':
+              aValue = a.courseCode.toLowerCase()
+              bValue = b.courseCode.toLowerCase()
+              break
+            case 'id':
+              aValue = a.courseId
+              bValue = b.courseId
+              break
+            case 'updated':
+              aValue = a.lastUpdated
+              bValue = b.lastUpdated
+              break
+            default:
+              return 0
+          }
+
+          if (aValue < bValue) return order === 'asc' ? -1 : 1
+          if (aValue > bValue) return order === 'asc' ? 1 : -1
+          return 0
+        })
+      }
 
       return {
-        data: nodes.map(transformEnrollmentToCourseGrade),
+        data: courseGrades,
         hasNextPage: pageInfo.hasNextPage,
         hasPreviousPage: pageInfo.hasPreviousPage,
         endCursor: pageInfo.endCursor,

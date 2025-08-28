@@ -7945,6 +7945,36 @@ type Query {
   ): Course
 
   """
+  Paginated instructor enrollments across multiple courses
+  """
+  courseInstructorsConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Course IDs to get instructors for
+    """
+    courseIds: [ID!]!
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): EnrollmentConnection
+
+  """
   Folder
   """
   folder(
@@ -10939,9 +10969,19 @@ type User implements LegacyIDInterface & Node & Timestamped {
     courseId: ID
 
     """
+    only return enrollments for these courses
+    """
+    courseIds: [ID!]
+
+    """
     Whether or not to restrict results to `active` enrollments in `available` courses
     """
     currentOnly: Boolean
+
+    """
+    Filter by enrollment types (e.g., TeacherEnrollment, TaEnrollment)
+    """
+    enrollmentTypes: [EnrollmentType!]
 
     """
     Whether or not to exclude `completed` enrollments
