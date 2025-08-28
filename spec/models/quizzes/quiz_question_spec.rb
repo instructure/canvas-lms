@@ -75,6 +75,40 @@ describe Quizzes::QuizQuestion do
       @question = @quiz.quiz_questions.create(question_data: @data)
     end
 
+    describe "attachment handling" do
+      before do
+        @aa_test_data = AttachmentAssociationsSpecHelper.new(@course.account, @course)
+        @data = { question_name: "test question",
+                  points_possible: "1",
+                  question_type: "multiple_choice_question",
+                  question_text: @aa_test_data.base_html,
+                  answers: [{ "answer_text" => "1", "id" => 1 },
+                            { "answer_html" => @aa_test_data.replaced_html, "id" => 2 },
+                            { "answer_text" => "3", "id" => 3 },
+                            { "answer_text" => "4", "id" => 4 }] }
+
+        @question = @quiz.quiz_questions.create(question_data: @data, saving_user: @teacher)
+      end
+
+      it "creates associations on quiz question creation" do
+        expect(@question.attachment_associations.count).to eq(2)
+        expect(@question.attachment_associations.pluck(:attachment_id)).to match_array [@aa_test_data.attachment1.id, @aa_test_data.attachment2.id]
+      end
+
+      it "updates associations on quiz update" do
+        data = { question_name: "test question",
+                 points_possible: "1",
+                 question_type: "multiple_choice_question",
+                 question_text: "no attachments here",
+                 answers: [{ "answer_text" => "1", "id" => 1 },
+                           { "answer_html" => @aa_test_data.removed_html, "id" => 2 },
+                           { "answer_text" => "3", "id" => 3 },
+                           { "answer_text" => "4", "id" => 4 }] }
+        @question.update!(question_data: data, saving_user: @teacher)
+        expect(@question.attachment_associations.count).to eq(0)
+      end
+    end
+
     it "saves regrade if passed in regrade option in data hash" do
       expect(Quizzes::QuizQuestionRegrade.first).to be_nil
 

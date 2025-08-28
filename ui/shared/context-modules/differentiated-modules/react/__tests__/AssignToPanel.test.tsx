@@ -412,7 +412,8 @@ describe('AssignToPanel', () => {
         onDidSubmit: onDidSubmitMock,
         onDismiss: onDismissMock,
       })
-      await userEvent.click(screen.getByTestId('custom-option'))
+      const customOption = await screen.findByTestId('custom-option')
+      await userEvent.click(customOption)
       await userEvent.click(screen.getByTestId('assignee_selector'))
       await userEvent.click(screen.getByText(SECTIONS_DATA[0].name))
       await userEvent.click(screen.getByTestId('differentiated_modules_save_button'))

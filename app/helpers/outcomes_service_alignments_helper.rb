@@ -22,6 +22,7 @@ require "parallel"
 
 module OutcomesServiceAlignmentsHelper
   include CanvasOutcomesHelper
+
   OSA_CACHE_EXPIRATION = 60.seconds
   THREAD_POOL_SIZE = 4
   PER_PAGE = 25

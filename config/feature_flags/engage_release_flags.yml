@@ -2,11 +2,13 @@
 assignment_enhancements_teacher_view:
   state: hidden
   applies_to: RootAccount
+  shadow: true
   display_name: Assignment Enhancements Teacher View (Saved)
   description: Updates to the Teacher saved view of assignments.
 assignment_edit_enhancements_teacher_view:
   state: hidden
   applies_to: RootAccount
+  shadow: true
   display_name: Assignment Enhancements Teacher View (Create/Edit)
   description: Updates to the Teacher create/edit view of assignments.
 assign_to_differentiation_tags:
@@ -28,6 +30,7 @@ self_signup_deadline:
 people_page_modernization:
   state: hidden
   applies_to: Account
+  shadow: true
   display_name: People Page Modernization
   description: People page modernization
 deprecate_context_groups_old_view:

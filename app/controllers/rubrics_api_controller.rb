@@ -310,12 +310,14 @@ class RubricsApiController < ApplicationController
     end
   end
 
-  # @API Get the courses and assignments for
-  # Returns the rubric with the given id.
+  # @API Get the courses and assignments for a rubric
+  # Returns the courses and assignments where a rubric is being used
   # @returns UsedLocations
   def used_locations
-    rubric = @context.rubric_associations.bookmarked.find_by(rubric_id: params[:id])&.rubric
     return unless authorized_action(@context, @current_user, :manage_rubrics)
+
+    rubric = @context.rubric_associations.bookmarked.find_by(rubric_id: params[:id])&.rubric
+    return render json: { message: "Rubric not found" }, status: :not_found unless rubric.present? && !rubric.deleted?
 
     render json: used_locations_for(rubric)
   end
@@ -384,7 +386,7 @@ class RubricsApiController < ApplicationController
   end
 
   def download_rubrics
-    return unless authorized_action(@context, @current_user, :manage_rubrics)
+    return unless authorized_action(@context, @current_user, :read_rubrics)
 
     rubric_ids = params[:rubric_ids]
     if rubric_ids.blank?

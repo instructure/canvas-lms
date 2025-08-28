@@ -46,6 +46,6 @@ describe Quizzes::QuizQuestion::AnswerParsers::MultipleAnswers do
     let(:parser_class) { Quizzes::QuizQuestion::AnswerParsers::MultipleAnswers }
     let(:question_params) { {} }
 
-    include_examples "All answer parsers"
+    it_behaves_like "All answer parsers"
   end
 end

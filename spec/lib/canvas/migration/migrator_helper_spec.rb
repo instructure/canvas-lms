@@ -22,6 +22,7 @@ describe Canvas::Migration::MigratorHelper do
   subject do
     Class.new do
       include Canvas::Migration::MigratorHelper
+
       attr_accessor :course
       attr_accessor :settings
     end

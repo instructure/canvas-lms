@@ -22,7 +22,7 @@ class DeleteFieldNameFieldFromAttachmentAssociations < ActiveRecord::Migration[7
   disable_ddl_transaction!
 
   def change
-    remove_column :attachment_associations, :field_name, if_exists: true # rubocop:disable Migration/RemoveColumn,Rails/ReversibleMigration
+    remove_column :attachment_associations, :field_name, if_exists: true # rubocop:disable Migration/RemoveColumn
     begin
       drop_enum :enum_attachment_associations_field_name, if_exists: true
     rescue ActiveRecord::StatementInvalid => e

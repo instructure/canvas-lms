@@ -206,17 +206,7 @@ describe CanvasOutcomesHelper do
       end
     end
 
-    context "without outcome_service_results_to_canvas feature flag enabled" do
-      it "returns nil" do
-        expect(subject.get_outcome_alignments(@course, "123")).to be_nil
-      end
-    end
-
     context "returns results" do
-      before do
-        @course.enable_feature!(:outcome_service_results_to_canvas)
-      end
-
       def mock_alignment_response(external_ids, include_group, alignments)
         response = external_ids.split(",").map do |e_id|
           {
@@ -314,10 +304,6 @@ describe CanvasOutcomesHelper do
     end
 
     context "no results found" do
-      before do
-        @course.enable_feature!(:outcome_service_results_to_canvas)
-      end
-
       it "returns empty array when no outcome ids are matched" do
         stub_get_alignments("context_uuid=#{@course.uuid}&external_outcome_id_list=123&page=1&per_page=200").to_return(status: 200, body: "[]", headers: { "Per-Page" => 200, "Total" => 0 })
         expect(subject.get_outcome_alignments(@course, "123")).to eq []
@@ -337,13 +323,13 @@ describe CanvasOutcomesHelper do
 
     context "without account outcome settings" do
       it "returns nil with no provision settings" do
-        expect(subject.get_lmgb_results(account, "1", "assign.type", "1", one_user_uuid)).to be_nil
+        expect(subject.get_lmgb_results(account, "1", "assign.type", "1", one_user_uuid)).to eq []
       end
 
       it "returns nil with no outcome provision settings" do
         account.settings[:provision] = {}
         account.save!
-        expect(subject.get_lmgb_results(account, "1", "assign.type", "1", one_user_uuid)).to be_nil
+        expect(subject.get_lmgb_results(account, "1", "assign.type", "1", one_user_uuid)).to eq []
       end
     end
 
@@ -386,11 +372,13 @@ describe CanvasOutcomesHelper do
 
       context "without user uuids" do
         it "returns nil when user uuids is nil" do
-          expect(subject.get_lmgb_results(account, "1", "assign.type", "1", nil)).to be_nil
+          stub_get_lmgb_results("artifact_type=quizzes.quiz&associated_asset_id_list=1&associated_asset_type=assign.type&external_outcome_id_list=1&page=1&per_page=200").to_return(status: 200, body: '{"results":[]}', headers: { "Per-Page" => 200, "Total" => 1 })
+          expect(subject.get_lmgb_results(account, "1", "assign.type", "1", nil)).to be_empty
         end
 
         it "returns nil when user uuids is empty" do
-          expect(subject.get_lmgb_results(account, "1", "assign.type", "1", "")).to be_nil
+          stub_get_lmgb_results("artifact_type=quizzes.quiz&associated_asset_id_list=1&associated_asset_type=assign.type&external_outcome_id_list=1&page=1&per_page=200").to_return(status: 200, body: '{"results":[]}', headers: { "Per-Page" => 200, "Total" => 1 })
+          expect(subject.get_lmgb_results(account, "1", "assign.type", "1", "")).to be_empty
         end
       end
 
@@ -399,10 +387,6 @@ describe CanvasOutcomesHelper do
           let(:user1) { User.create! }
           let(:user2) { User.create! }
           let(:multiple_user_uuids) { "#{user1.uuid},#{user2.uuid}" }
-
-          before do
-            @course.enable_feature!(:outcome_service_results_to_canvas)
-          end
 
           it "throws OSFetchError if call fails" do
             expect(CanvasHttp).to receive(:get).and_raise("failed call").exactly(3).times
@@ -517,16 +501,6 @@ describe CanvasOutcomesHelper do
             end
           end
         end
-
-        context "with outcome_service_results_to_canvas FF off" do
-          before do
-            @course.disable_feature!(:outcome_service_results_to_canvas)
-          end
-
-          it "returns nil when FF is off" do
-            expect(subject.get_lmgb_results(@course, "1", "assign.type", "1", one_user_uuid)).to be_nil
-          end
-        end
       end
     end
   end
@@ -542,17 +516,7 @@ describe CanvasOutcomesHelper do
         account.save!
       end
 
-      context "with outcome_service_results_to_canvas FF off" do
-        it "returns nil when FF is off" do
-          expect(subject.get_lmgb_results(account, "1", "assign.type", "1", one_user_uuid)).to be_nil
-        end
-      end
-
       context "with outcome_service_results_to_canvas FF on" do
-        before do
-          account.enable_feature!(:outcome_service_results_to_canvas)
-        end
-
         it "returns results with one assignment id" do
           expected_results = [{ result: "stuff" }]
           stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type&external_outcome_id_list=1&artifact_type=quizzes.quiz&user_uuid_list=#{one_user_uuid}&per_page=200&page=1").to_return(status: 200, body: '{"results":[{"result":"stuff"}]}', headers: { "Per-Page" => 200, "Total" => 1 })

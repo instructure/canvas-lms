@@ -44,7 +44,6 @@ import type {LtiContextControl, LtiContextControlId} from '../../../model/LtiCon
 import type {LtiDeployment} from '../../../model/LtiDeployment'
 import type {LtiRegistrationWithAllInformation} from '../../../model/LtiRegistration'
 import type {LtiRegistrationId} from '../../../model/LtiRegistrationId'
-import {askForContextControl} from './AskForContextControl'
 import {ContextCard} from './ContextCard'
 import {
   DeleteExceptionModal,
@@ -388,35 +387,6 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
           <>
             <Button
               onClick={() => {
-                askForContextControl({
-                  title: 'Create Control',
-                }).then(([contextId, isCourse]) => {
-                  createContextControls({
-                    registrationId: registration.id,
-                    contextControls: [
-                      Object.assign(
-                        {},
-                        {
-                          available: true,
-                          deployment_id: deployment.id,
-                        },
-                        isCourse
-                          ? {
-                              course_id: ZCourseId.parse(contextId),
-                            }
-                          : {
-                              account_id: ZAccountId.parse(contextId),
-                            },
-                      ),
-                    ],
-                  })
-                })
-              }}
-            >
-              Create Control
-            </Button>
-            <Button
-              onClick={() => {
                 confirm({
                   title: 'Delete Deployment',
                   message: 'Are you sure you want to delete this deployment?',
@@ -427,7 +397,7 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
                     // Call the API to delete the deployment
                     deleteDeployment({
                       registrationId: registration.id,
-                      accountId: registration.account_id,
+                      accountId: props.accountId,
                       deploymentId: deployment.id,
                     }).then(result => {
                       if (result._type === 'Success') {

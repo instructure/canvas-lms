@@ -78,7 +78,7 @@ describe EventStream::IndexStrategy::ActiveRecord do
       outcome.paginate(per_page: 10)
       conditions = fake_record_type.applied_conditions
       expect(conditions).to include({ one: "abc", two: "def" })
-      expect(conditions).to include("created_at DESC")
+      expect(conditions).to include(created_at: :desc)
     end
 
     it "handles bookmark presence" do
@@ -93,7 +93,7 @@ describe EventStream::IndexStrategy::ActiveRecord do
       end
       base_scope = fake_record_type
       expect(fake_record_type).to receive(:where).with(created_at: ...Time.zone.parse("2020-06-12T15:34:13-06:00")).and_return(fake_record_type)
-      expect(fake_record_type).to receive(:order).with("created_at DESC").and_return(fake_record_type)
+      expect(fake_record_type).to receive(:order).with(created_at: :desc).and_return(fake_record_type)
       EventStream::IndexStrategy::ActiveRecord.pager_to_records(base_scope, pager_type.new)
     end
   end

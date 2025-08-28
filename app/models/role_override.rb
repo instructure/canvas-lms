@@ -20,6 +20,7 @@
 
 class RoleOverride < ActiveRecord::Base
   extend RootAccountResolver
+
   belongs_to :context, polymorphic: [:account]
 
   belongs_to :role
@@ -149,7 +150,7 @@ class RoleOverride < ActiveRecord::Base
     permissions.map do |k, p|
       {
         name: "#{ACCESS_TOKEN_SCOPE_PREFIX}.#{k}",
-        label: p.key?(label_v2) ? p[:label_v2].call : p[:label].call
+        label: p[:label].call
       }
     end
   end
@@ -326,9 +327,11 @@ class RoleOverride < ActiveRecord::Base
     role_context = role.account if role_context == :role_account
 
     # Determine if the permission is able to be used for the account. A non-setting is 'true'.
-    # Execute linked proc if given.
+    # When the proc is called, it should receive the account as an argument, and if the permission
+    # check needs to be more specific, it can use the account's root account in the block
+    # defined in account_allows in permissions_registry.rb
     account_allows = !!(default_data[:account_allows].nil? || (default_data[:account_allows].respond_to?(:call) &&
-        default_data[:account_allows].call(context.root_account)))
+      default_data[:account_allows].call(context.is_a?(Account) ? context : context.root_account)))
 
     base_role = role.base_role_type
     enabled = if account_allows && (default_data[:true_for].include?(base_role) || true_for_custom_site_admin_role)

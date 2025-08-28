@@ -135,7 +135,7 @@ describe ExternalToolsController do
           it "still includes the tool in the response" do
             subject
             expect(response.parsed_body.length).to eq 2
-            expect(response.parsed_body.map { |t| t["id"] }).to include tool.id
+            expect(response.parsed_body.pluck("id")).to include tool.id
           end
         end
 
@@ -143,7 +143,7 @@ describe ExternalToolsController do
           it "includes the tool in the response" do
             subject
             expect(response.parsed_body.length).to eq 2
-            expect(response.parsed_body.map { |t| t["id"] }).to include tool.id
+            expect(response.parsed_body.pluck("id")).to include tool.id
           end
         end
       end
@@ -159,7 +159,7 @@ describe ExternalToolsController do
           it "does not include the tool in the response" do
             subject
             expect(response.parsed_body.length).to eq 1
-            expect(response.parsed_body.map { |t| t["id"] }).not_to include tool.id
+            expect(response.parsed_body.pluck("id")).not_to include tool.id
           end
         end
 
@@ -167,7 +167,7 @@ describe ExternalToolsController do
           it "includes the tool in the response" do
             subject
             expect(response.parsed_body.length).to eq 2
-            expect(response.parsed_body.map { |t| t["id"] }).to include tool.id
+            expect(response.parsed_body.pluck("id")).to include tool.id
           end
         end
       end
@@ -185,7 +185,7 @@ describe ExternalToolsController do
       it "includes tools from the parent account" do
         subject
         expect(response).to be_successful
-        expect(response.parsed_body.map { |t| t["id"] }).to include parent_tool.id
+        expect(response.parsed_body.pluck("id")).to include parent_tool.id
       end
     end
 
@@ -201,7 +201,7 @@ describe ExternalToolsController do
       it "does not include tools from the parent account" do
         subject
         expect(response).to be_successful
-        expect(response.parsed_body.map { |t| t["id"] }).not_to include parent_tool.id
+        expect(response.parsed_body.pluck("id")).not_to include parent_tool.id
       end
     end
 
@@ -220,8 +220,8 @@ describe ExternalToolsController do
       it "only includes tools that are in the specified placements" do
         subject
         expect(response).to be_successful
-        expect(response.parsed_body.map { |t| t["id"] }).to include course_nav_tool.id
-        expect(response.parsed_body.map { |t| t["id"] }).not_to include editor_button_tool.id
+        expect(response.parsed_body.pluck("id")).to include course_nav_tool.id
+        expect(response.parsed_body.pluck("id")).not_to include editor_button_tool.id
       end
     end
 
@@ -240,7 +240,7 @@ describe ExternalToolsController do
         subject
         expect(response).to be_successful
         expect(response.parsed_body.length).to eq 1
-        expect(response.parsed_body.map { |t| t["id"] }).to include selectable_tool.id
+        expect(response.parsed_body.pluck("id")).to include selectable_tool.id
       end
     end
 
@@ -1211,6 +1211,7 @@ describe ExternalToolsController do
 
       context "when resource_link_lookup_uuid is passed" do
         include Lti::RedisMessageClient
+
         let(:launch_params) do
           JSON.parse(
             fetch_and_delete_launch(
@@ -2339,6 +2340,11 @@ describe ExternalToolsController do
           post "create", params:, format: "json"
           error_message = response.parsed_body.dig("errors", "tool_currently_installed").first["message"]
           expect(error_message).to eq "The tool is already installed in this context."
+        end
+
+        it "does not save duplicate record" do
+          user_session(@teacher)
+          expect { post "create", params:, format: "json" }.not_to change(ContextExternalTool, :count)
         end
       end
 

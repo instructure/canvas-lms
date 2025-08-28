@@ -730,6 +730,7 @@ class ContextModuleItemsApiController < ApplicationController
   #       -H 'Authorization: Bearer <token>'
   #
   include ContextModulesHelper
+
   def duplicate
     original_tag = @context.context_module_tags.not_deleted.find(params[:id])
     if authorized_action(original_tag.context_module, @current_user, :update)

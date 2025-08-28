@@ -52,13 +52,9 @@ export const AccessibilityCheckerHeader: React.FC = () => {
     useShallow(state => [state.setFilters, state.setLoading, state.setSearch]),
   )
 
-  const lastCheckedDate = getLastCheckedDate() // TODO Calculate. Currently unavailable with the async API.
+  const lastCheckedDate = null // TODO Calculate with getLastCheckedDate(), Currently unavailable with the async API.
 
   const accessibilityScanDisabled = window.ENV.SCAN_DISABLED
-
-  const handleReload = useCallback(() => {
-    window.location.reload()
-  }, [])
 
   return (
     <>
@@ -78,13 +74,6 @@ export const AccessibilityCheckerHeader: React.FC = () => {
           <Flex.Item>
             <Heading level="h1">{I18n.t('Course Accessibility Checker')}</Heading>
           </Flex.Item>
-          {!loading && !accessibilityScanDisabled && (
-            <Flex.Item margin="0 0 0 auto" padding="small 0">
-              <Button color="primary" onClick={handleReload} disabled={accessibilityScanDisabled}>
-                {I18n.t('Check Accessibility')}
-              </Button>
-            </Flex.Item>
-          )}
         </Flex>
       </Flex>
 

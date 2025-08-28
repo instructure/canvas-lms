@@ -17,6 +17,7 @@
  */
 
 import {Flex} from '@instructure/ui-flex'
+import {View} from '@instructure/ui-view'
 import {PreviewButton} from './PreviewButton'
 import {RedoButton} from './RedoButton'
 import {UndoButton} from './UndoButton'
@@ -31,13 +32,19 @@ export const Toolbar = () => {
   const isPreviewMode = mode === 'preview'
 
   return (
-    <Flex direction="column">
-      <UndoButton active={canUndo} onClick={undo} />
-      <RedoButton active={canRedo} onClick={redo} />
-      <PreviewButton
-        active={isPreviewMode}
-        onClick={() => setMode(isPreviewMode ? 'default' : 'preview')}
-      />
-    </Flex>
+    <View shadow="resting" display="block">
+      <Flex direction="column">
+        <PreviewButton
+          active={isPreviewMode}
+          onClick={() => setMode(isPreviewMode ? 'default' : 'preview')}
+        />
+        {!isPreviewMode && (
+          <>
+            <UndoButton active={canUndo} onClick={undo} />
+            <RedoButton active={canRedo} onClick={redo} />
+          </>
+        )}
+      </Flex>
+    </View>
   )
 }

@@ -236,7 +236,8 @@ describe Quizzes::QuizQuestionsController, type: :request do
                                                        "points_possible" => "1",
                                                        "question_text" => content,
                                                        "answers" => []
-                                                     })
+                                                     },
+                                                     saving_user: @user)
 
             json = api_call(:get,
                             "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/#{@question.id}",
@@ -259,8 +260,8 @@ describe Quizzes::QuizQuestionsController, type: :request do
                                                        "points_possible" => "1",
                                                        "question_text" => content,
                                                        "answers" => []
-                                                     })
-
+                                                     },
+                                                     saving_user: @user)
             json = api_call(:get,
                             "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/#{@question.id}",
                             controller: "quizzes/quiz_questions",
@@ -284,7 +285,8 @@ describe Quizzes::QuizQuestionsController, type: :request do
                                                        "points_possible" => "1",
                                                        "question_text" => "stuff",
                                                        "answers" => [{ "text" => plain_answer_txt }, { "html" => content }]
-                                                     })
+                                                     },
+                                                     saving_user: @user)
 
             json = api_call(:get,
                             "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/#{@question.id}",
@@ -309,7 +311,8 @@ describe Quizzes::QuizQuestionsController, type: :request do
                                                        "points_possible" => "1",
                                                        "question_text" => "stuff",
                                                        "answers" => [{ "text" => plain_answer_txt }, { "html" => content }]
-                                                     })
+                                                     },
+                                                     saving_user: @user)
 
             json = api_call(:get,
                             "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/#{@question.id}",

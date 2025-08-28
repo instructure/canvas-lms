@@ -18,6 +18,7 @@
 
 import {useState, useRef, useCallback, useEffect} from 'react'
 import {ButtonData} from './types'
+import {colors} from '@instructure/canvas-theme'
 
 const MAX_BUTTONS = 5
 const MIN_BUTTONS = 1
@@ -25,6 +26,11 @@ const MIN_BUTTONS = 1
 export const createEmptyButton = (buttonId: number): ButtonData => ({
   id: buttonId,
   text: '',
+  url: '',
+  linkOpenMode: 'new-tab',
+  secondaryColor: colors.primitives.white,
+  primaryColor: colors.primitives.blue45,
+  style: 'filled',
 })
 
 export const useButtonManager = (

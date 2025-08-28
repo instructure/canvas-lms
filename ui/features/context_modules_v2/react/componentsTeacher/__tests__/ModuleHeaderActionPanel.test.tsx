@@ -97,7 +97,6 @@ const createQueryClient = () =>
 const buildDefaultProps = (overrides: Partial<ComponentProps> = {}): ComponentProps => ({
   id: 'mod_1',
   name: 'Module 1',
-  prerequisites: [],
   completionRequirements: [],
   requirementCount: 0,
   published: true,
@@ -180,20 +179,6 @@ describe('ModuleHeaderActionPanel', () => {
   it('does not render ViewAssignTo when hasActiveOverrides is false', () => {
     const {queryByText} = setUp(buildDefaultProps({hasActiveOverrides: false}))
     expect(queryByText('View Assign To')).not.toBeInTheDocument()
-  })
-
-  it('does not display prerequisites (moved to ModuleHeader)', () => {
-    const prerequisiteProps = buildDefaultProps({
-      prerequisites: [
-        {id: 'prereq_1', name: 'Prerequisite Module 1', type: 'context_module'},
-        {id: 'prereq_2', name: 'Prerequisite Module 2', type: 'context_module'},
-      ],
-      hasActiveOverrides: false,
-    })
-    const {queryByText} = setUp(prerequisiteProps)
-
-    expect(queryByText(/Prerequisite/)).not.toBeInTheDocument()
-    expect(queryByText('Prerequisite Module 1')).not.toBeInTheDocument()
   })
 
   it('does not show Show All button when module is not expanded', () => {

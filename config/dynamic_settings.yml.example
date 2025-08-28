@@ -150,6 +150,7 @@ development:
       # canvas_career.yml: |
       #   learner_launch_url: "http://localhost:3002/remoteEntry.js"
       #   learning_provider_launch_url: "http://localhost:3003/remoteEntry.js"
+      #   theme_url: "http://localhost:3002/themes/horizon.json"
       #   public_app_config:
       #     hosts:
       #       api_proxy: "https://dev.cd.canvashorizon.com"

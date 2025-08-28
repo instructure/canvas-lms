@@ -55,84 +55,6 @@ describe('RegisterService', () => {
     })
   })
 
-  describe('when the service is Skype', () => {
-    const serviceName = 'skype'
-    const config = serviceConfigByName[serviceName]
-
-    it('should render correctly', () => {
-      render(<RegisterService serviceName={serviceName} onSubmit={onSubmit} onClose={onClose} />)
-      const title = screen.getByText(config.title)
-      const description = screen.getByText(config.description)
-      const logo = screen.getByAltText(config.image.alt)
-      const skypeName = screen.getByLabelText('Skype Name')
-      const button = screen.getByLabelText('Save Skype Name')
-
-      expect(title).toBeInTheDocument()
-      expect(description).toBeInTheDocument()
-      expect(logo).toBeInTheDocument()
-      expect(skypeName).toBeInTheDocument()
-      expect(button).toBeInTheDocument()
-    })
-
-    it('should show an error message if the Skype Name is empty', async () => {
-      render(<RegisterService serviceName={serviceName} onSubmit={onSubmit} onClose={onClose} />)
-      const button = screen.getByLabelText('Save Skype Name')
-
-      fireEvent.click(button)
-
-      const errorText = await screen.findByText('This field is required.')
-      expect(errorText).toBeInTheDocument()
-    })
-
-    it('should show an error message if the Skype Name is too long', async () => {
-      render(<RegisterService serviceName={serviceName} onSubmit={onSubmit} onClose={onClose} />)
-      const skypeName = screen.getByLabelText('Skype Name')
-      const button = screen.getByLabelText('Save Skype Name')
-
-      fireEvent.input(skypeName, {target: {value: 'a'.repeat(256)}})
-      fireEvent.click(button)
-
-      const errorText = await screen.findByText(
-        `Exceeded the maximum length (${USERNAME_MAX_LENGTH} characters).`,
-      )
-      expect(errorText).toBeInTheDocument()
-    })
-
-    it('should show an error if the network request fails', async () => {
-      fetchMock.post(USER_SERVICE_URI, 500, {overwriteRoutes: true})
-      render(<RegisterService serviceName={serviceName} onSubmit={onSubmit} onClose={onClose} />)
-      const skypeName = screen.getByLabelText('Skype Name')
-      const button = screen.getByLabelText('Save Skype Name')
-
-      fireEvent.input(skypeName, {target: {value: 'a'.repeat(20)}})
-      fireEvent.click(button)
-
-      const errorAlerts = await screen.findAllByText(
-        'Registration failed. Check the username and/or password, and try again.',
-      )
-      expect(errorAlerts.length).toBeTruthy()
-    })
-
-    it('should be able to submit the form if it is valid', async () => {
-      fetchMock.post(USER_SERVICE_URI, 200, {overwriteRoutes: true})
-      const skypeNameValue = 'test-skype-name'
-      render(<RegisterService serviceName={serviceName} onSubmit={onSubmit} onClose={onClose} />)
-      const skypeName = screen.getByLabelText('Skype Name')
-      const button = screen.getByLabelText('Save Skype Name')
-
-      fireEvent.input(skypeName, {target: {value: skypeNameValue}})
-      fireEvent.click(button)
-
-      await waitFor(() => {
-        fetchMock.called(USER_SERVICE_URI, {
-          method: 'POST',
-          body: {user_service: {service: serviceName, user_name: skypeNameValue}},
-        })
-        expect(onSubmit).toHaveBeenCalled()
-      })
-    })
-  })
-
   describe('when the service is Diigo', () => {
     const serviceName = 'diigo'
     const config = serviceConfigByName[serviceName]
@@ -154,7 +76,7 @@ describe('RegisterService', () => {
       expect(button).toBeInTheDocument()
     })
 
-    it('should show an error message if the Skype Name is empty', async () => {
+    it('should show an error message if the username field is empty', async () => {
       render(<RegisterService serviceName={serviceName} onSubmit={onSubmit} onClose={onClose} />)
       const button = screen.getByLabelText('Save Login')
 
@@ -164,7 +86,7 @@ describe('RegisterService', () => {
       expect(errorText).toBeInTheDocument()
     })
 
-    it('should show an error message if the Skype Name is too long', async () => {
+    it('should show an error message if the username is too long', async () => {
       render(<RegisterService serviceName={serviceName} onSubmit={onSubmit} onClose={onClose} />)
       const username = screen.getByLabelText('Username')
       const button = screen.getByLabelText('Save Login')

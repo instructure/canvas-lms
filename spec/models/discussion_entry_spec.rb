@@ -504,7 +504,7 @@ describe DiscussionEntry do
         @entry2.change_read_state("read", @student)
 
         # Notice we read the entries 1 min after the the query issues
-        expect(DiscussionEntry.unread_for_user_before(@student, Time.utc(2013, 3, 13, 10, 11)).order("id").map(&:message)).to eq(["entry 2", "entry 3"])
+        expect(DiscussionEntry.unread_for_user_before(@student, Time.utc(2013, 3, 13, 10, 11)).order(:id).map(&:message)).to eq(["entry 2", "entry 3"])
       end
     end
   end

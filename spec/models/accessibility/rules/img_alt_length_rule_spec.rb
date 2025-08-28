@@ -91,7 +91,7 @@ describe Accessibility::Rules::ImgAltLengthRule do
       input_html = "<div><img alt='#{long_alt_text}'></div>"
 
       elem = Nokogiri::HTML.fragment(input_html).css("img").first
-      form = Accessibility::Rules::ImgAltLengthRule.form(elem)
+      form = Accessibility::Rules::ImgAltLengthRule.new.form(elem)
 
       expect(form).to be_a(Accessibility::Forms::TextInputWithCheckboxField)
       expect(form.value).to eq(long_alt_text)
@@ -114,7 +114,7 @@ describe Accessibility::Rules::ImgAltLengthRule do
         .and_return(generated_alt)
 
       # Call the method with our image element
-      result = Accessibility::Rules::ImgAltRule.generate_fix(img_element)
+      result = Accessibility::Rules::ImgAltRule.new.generate_fix(img_element)
 
       # Verify the result is what our mock returned
       expect(result).to eq(generated_alt)

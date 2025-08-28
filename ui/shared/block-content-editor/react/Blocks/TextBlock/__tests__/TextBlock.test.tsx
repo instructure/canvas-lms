@@ -18,10 +18,11 @@
 
 import {TextBlock} from '../TextBlock'
 import {renderBlock} from '../../__tests__/render-helper'
+import {mockBlockContentEditorContext} from '../../../__tests__/mockBlockContentEditorContext'
 
 jest.mock('../../../BlockContentEditorContext', () => ({
   __esModule: true,
-  useBlockContentEditorContext: jest.fn(() => ({})),
+  useBlockContentEditorContext: jest.fn(() => mockBlockContentEditorContext({})),
 }))
 
 describe('TextBlock', () => {
@@ -31,6 +32,7 @@ describe('TextBlock', () => {
       settings: {
         includeBlockTitle: true,
         backgroundColor: '#ff0000',
+        titleColor: '#00ff00',
       },
       content: '',
     })

@@ -36,7 +36,7 @@ const CourseWorkSummaryWidget: React.FC<BaseWidgetProps> = ({widget}) => {
   const [selectedDateRange, setSelectedDateRange] = useState<string>('next_3_days')
 
   // Fetch user's enrolled courses
-  const {data: userCourses = [], isLoading: coursesLoading} = useUserCourses()
+  const {data: userCourses = []} = useUserCourses()
 
   const courseOptions: CourseOption[] = useMemo(
     () => [{id: 'all', name: I18n.t('All Courses')}, ...userCourses],

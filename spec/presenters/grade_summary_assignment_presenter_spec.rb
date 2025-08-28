@@ -244,7 +244,7 @@ describe GradeSummaryAssignmentPresenter do
 
   describe "#show_submission_details?" do
     before do
-      @submission_stub = double
+      @submission_stub = instance_double(Submission)
       allow(@submission_stub).to receive(:originality_reports_for_display)
     end
 
@@ -442,7 +442,7 @@ describe GradeSummaryAssignmentPresenter do
 
       context "when points_based is true" do
         it "returns the formatted score with precision" do
-          grading_standard = double("GradingStandard", points_based: true)
+          grading_standard = instance_double(GradingStandard, points_based: true)
           allow(@assignment).to receive(:grading_standard_or_default).and_return(grading_standard)
 
           expect(presenter.display_score).to eq("5.67 F")
@@ -451,7 +451,7 @@ describe GradeSummaryAssignmentPresenter do
 
       context "when points_based is false" do
         it "returns the formatted score without precision" do
-          grading_standard = double("GradingStandard", points_based: false)
+          grading_standard = instance_double(GradingStandard, points_based: false)
           allow(@assignment).to receive(:grading_standard_or_default).and_return(grading_standard)
 
           expect(presenter.display_score).to eq("5.666666667 F")

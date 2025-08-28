@@ -36,6 +36,7 @@ class Quizzes::QuizzesController < ApplicationController
   before_action :require_context
 
   include HorizonMode
+
   before_action :load_canvas_career, only: [:index, :show]
 
   before_action :rce_js_env, only: %i[show new edit]
@@ -448,6 +449,7 @@ class Quizzes::QuizzesController < ApplicationController
           @assignment.assignment_group = @assignment_group
           @assignment.saved_by = :quiz
           @assignment.workflow_state = "unpublished"
+          @assignment.saving_user = @current_user
           @assignment.save
           quiz_params[:assignment_id] = @assignment.id
         end
@@ -456,6 +458,7 @@ class Quizzes::QuizzesController < ApplicationController
       end
       @quiz.content_being_saved_by(@current_user)
       @quiz.infer_times
+      @quiz.saving_user = @current_user
       @quiz.transaction do
         @quiz.update!(quiz_params)
         batch_update_assignment_overrides(@quiz, overrides, @current_user) unless overrides.nil?
@@ -524,10 +527,10 @@ class Quizzes::QuizzesController < ApplicationController
           @quiz.did_edit if @quiz.created?
         end
       end
-      quiz_params[:saving_user] = @current_user
 
       cached_due_dates_changed = @quiz.update_cached_due_dates?(quiz_params[:quiz_type])
 
+      @quiz.saving_user = @current_user
       # TODO: API for Quiz overrides!
       respond_to do |format|
         Assignment.suspend_due_date_caching do
@@ -536,7 +539,9 @@ class Quizzes::QuizzesController < ApplicationController
 
             old_assignment = nil
             if @quiz.assignment.present?
+              @quiz.assignment.saving_user = @current_user
               old_assignment = @quiz.assignment.clone
+
               old_assignment.instance_variable_set(:@new_record, false)
               old_assignment.id = @quiz.assignment.id
 
@@ -564,6 +569,7 @@ class Quizzes::QuizzesController < ApplicationController
             end
 
             if old_assignment && @quiz.assignment.present?
+              @quiz.assignment.saving_user = @current_user
               @quiz.assignment.save
             end
 
@@ -680,6 +686,7 @@ class Quizzes::QuizzesController < ApplicationController
 
   def managed_quiz_data
     extend Api::V1::User
+
     if authorized_action(@quiz, @current_user, [:grade, :read_statistics])
       student_scope = @context.students_visible_to(@current_user, include: :inactive)
       if @quiz.differentiated_assignments_applies?

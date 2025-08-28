@@ -667,7 +667,7 @@ describe "submissions" do
         assignment.grade_student @student, excuse: true, grader: @teacher
       end
 
-      include_examples "shows as excused"
+      it_behaves_like "shows as excused"
     end
 
     context "an unsubmitted online assignment" do
@@ -675,7 +675,7 @@ describe "submissions" do
         @course.assignments.create!(title: "Assignment", submission_types: "online_text_entry", points_possible: 20)
       end
 
-      include_examples "shows as excused"
+      it_behaves_like "shows as excused"
     end
 
     context "an assignment with no submission type" do
@@ -683,7 +683,7 @@ describe "submissions" do
         @course.assignments.create!(title: "Assignment", submission_types: "none", points_possible: 20)
       end
 
-      include_examples "shows as excused"
+      it_behaves_like "shows as excused"
     end
 
     context "an on_paper assignment" do
@@ -691,7 +691,7 @@ describe "submissions" do
         @course.assignments.create!(title: "Assignment", submission_types: "on_paper", points_possible: 20)
       end
 
-      include_examples "shows as excused"
+      it_behaves_like "shows as excused"
     end
 
     it "does not allow submissions", priority: "1" do

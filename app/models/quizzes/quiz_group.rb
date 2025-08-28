@@ -20,6 +20,7 @@
 
 class Quizzes::QuizGroup < ActiveRecord::Base
   extend RootAccountResolver
+
   self.table_name = "quiz_groups"
 
   attr_readonly :quiz_id
@@ -40,6 +41,7 @@ class Quizzes::QuizGroup < ActiveRecord::Base
   resolves_root_account through: :quiz
 
   include MasterCourses::CollectionRestrictor
+
   self.collection_owner_association = :quiz
   restrict_columns :points, [:pick_count, :question_points]
   restrict_columns :content, [:name, :pick_count]

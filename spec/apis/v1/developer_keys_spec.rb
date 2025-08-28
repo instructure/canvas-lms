@@ -81,7 +81,7 @@ describe DeveloperKeysController, type: :request do
       d.update! visible: true
       get "/api/v1/accounts/#{a.id}/developer_keys", params: { inherited: true }
       expect(json_parse.first.keys).to match_array(
-        %w[name created_at icon_url workflow_state id developer_key_account_binding is_lti_key inherited_from is_lti_registration]
+        %w[name created_at icon_url workflow_state id developer_key_account_binding is_lti_key inherited_from is_lti_registration lti_registration_id]
       )
     end
 
@@ -104,7 +104,7 @@ describe DeveloperKeysController, type: :request do
       it "only includes a subset of attributes" do
         subject
         expect(json_parse.first.keys).to match_array(
-          %w[name created_at icon_url workflow_state id developer_key_account_binding is_lti_key inherited_from is_lti_registration]
+          %w[name created_at icon_url workflow_state id developer_key_account_binding is_lti_key inherited_from is_lti_registration lti_registration_id]
         )
       end
 

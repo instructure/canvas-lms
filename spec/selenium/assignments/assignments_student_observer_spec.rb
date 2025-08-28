@@ -44,6 +44,7 @@ describe "assignments" do
 
       it "sees own section's lock dates" do
         extend TextHelper
+
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         expected_unlock = datetime_string(@override.unlock_at).gsub(/\s+/, " ")
         expect(f("#content")).to include_text "locked until #{expected_unlock}."
@@ -54,6 +55,7 @@ describe "assignments" do
           @assignment.update lock_at: @lock_at + 22.days
           @course.enroll_user(@observer, "ObserverEnrollment", section: @section1, enrollment_state: "active")
           extend TextHelper
+
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
           expected_unlock = datetime_string(@override.unlock_at).gsub(/\s+/, " ")
           expect(f("#content")).to include_text "locked until #{expected_unlock}."
@@ -70,6 +72,7 @@ describe "assignments" do
 
       it "returns student's lock dates" do
         extend TextHelper
+
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         expected_unlock = datetime_string(@override.unlock_at).gsub(/\s+/, " ")
         expect(f("#content")).to include_text "locked until #{expected_unlock}."
@@ -83,6 +86,7 @@ describe "assignments" do
 
         it "shows overridden lock dates for student" do
           extend TextHelper
+
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
           expected_unlock = datetime_string(@override.unlock_at).gsub(/\s+/, " ")
           expect(f("#content")).to include_text "locked until #{expected_unlock}."

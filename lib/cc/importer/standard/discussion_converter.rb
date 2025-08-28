@@ -20,6 +20,7 @@
 module CC::Importer::Standard
   module DiscussionConverter
     include CC::Importer
+
     TOPIC_NODE = "topic"
 
     def convert_discussions

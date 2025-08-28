@@ -333,6 +333,62 @@ describe('DiscussionThreadContainer', () => {
     })
   })
 
+  describe('pin', () => {
+    describe('when feature flag enabled', () => {
+      beforeAll(() => {
+        window.ENV.discussion_pin_post = true
+      })
+
+      afterAll(() => {
+        window.ENV.discussion_pin_post = false
+      })
+
+      it('renders the pin button if user has moderate forum permission', () => {
+        const props = defaultProps({
+          discussionEntryOverrides: {
+            editor: User.mock({_id: '1', displayName: 'Teacher Bipin'}),
+          },
+        })
+
+        const {getByTestId} = setup(props)
+        expect(getByTestId('threading-toolbar-pin')).toBeInTheDocument()
+      })
+
+      it('does not render the pin button if entry is deleted', () => {
+        const props = defaultProps({
+          discussionEntryOverrides: {
+            deleted: true,
+            editor: User.mock({_id: '1', displayName: 'Teacher Bipin'}),
+          },
+        })
+
+        const {queryByTestId} = setup(props)
+        expect(queryByTestId('threading-toolbar-pin')).not.toBeInTheDocument()
+      })
+
+      it('does not render the pin button if user permission is missing', () => {
+        const props = defaultProps({
+          discussionEntryOverrides: {
+            editor: User.mock({_id: '2', displayName: 'Student Little'}),
+          },
+          discussionOverrides: {
+            permissions: DiscussionPermissions.mock({moderateForum: false}),
+          },
+        })
+
+        const {queryByTestId} = setup(props)
+        expect(queryByTestId('threading-toolbar-pin')).not.toBeInTheDocument()
+      })
+    })
+
+    describe('when feature flag disabled', () => {
+      it('does not render the pin button', () => {
+        const {queryByTestId} = setup(defaultProps())
+        expect(queryByTestId('threading-toolbar-pin')).not.toBeInTheDocument()
+      })
+    })
+  })
+
   describe('SpeedGrader', () => {
     it('Should be able to open SpeedGrader when speedGrader permission is true', async () => {
       const {getByTestId} = setup(defaultProps())

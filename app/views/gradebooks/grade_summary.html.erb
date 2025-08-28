@@ -485,7 +485,7 @@
                     <% if sub_assignment.sub_assignment_tag == CheckpointLabels::REPLY_TO_TOPIC %>
                       <td class="title" scope="row"> <%= t "Reply To Topic" %> </td>
                     <% else%>
-                      <td> <%=t("Reply To Entry (%{required_count})", :required_count => assignment.discussion_topic.reply_to_entry_required_count) %> </td>
+                      <td> <%=t("Reply To Entry (%{required_count})", :required_count => assignment.discussion_topic&.reply_to_entry_required_count || 0) %> </td>
                     <% end%>
                     <td class="due">
                       <% if sub_assignment_presenter.has_no_group_weight?  %>

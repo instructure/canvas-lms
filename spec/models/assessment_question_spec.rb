@@ -20,7 +20,7 @@
 
 describe AssessmentQuestion do
   before :once do
-    course_factory
+    course_factory(active_all: true)
     @bank = @course.assessment_question_banks.create!(title: "Test Bank")
   end
 
@@ -35,7 +35,9 @@ describe AssessmentQuestion do
   end
 
   it "creates a new instance given valid attributes" do
-    assessment_question_model(bank: AssessmentQuestionBank.create!(context: Course.create!))
+    expect do
+      assessment_question_model(bank: AssessmentQuestionBank.create!(context: Course.create!))
+    end.not_to raise_error
   end
 
   it "infer_defaultses from question_data before validation" do

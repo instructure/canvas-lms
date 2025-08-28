@@ -21,6 +21,7 @@
 class SisBatch < ActiveRecord::Base
   include Workflow
   include CaptureJobIds
+
   belongs_to :account
   serialize :data
   serialize :options, type: Hash

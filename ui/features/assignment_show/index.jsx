@@ -357,6 +357,7 @@ $(() => {
         assignmentRubricAssociation={assignmentRubricAssociation}
         canManageRubrics={ENV.PERMISSIONS.manage_rubrics}
         courseId={ENV.COURSE_ID}
+        currentUserId={ENV.current_user_id}
         rubricSelfAssessmentFFEnabled={ENV.rubric_self_assessment_ff_enabled}
         aiRubricsEnabled={ENV.ai_rubrics_enabled}
       />,

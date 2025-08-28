@@ -287,7 +287,8 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
                 field === 'url' ||
                 field === 'name' ||
                 field === 'newTab' ||
-                field === 'selectedToolId'
+                field === 'selectedToolId' ||
+                field === 'isUrlValid'
               ) {
                 dispatch({
                   type: 'SET_EXTERNAL',

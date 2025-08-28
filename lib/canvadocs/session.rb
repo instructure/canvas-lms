@@ -21,6 +21,7 @@
 module Canvadocs
   module Session
     include CanvadocsHelper
+
     # this expects the class to have submissions and attachment defined
     def canvadocs_session_url(opts = {})
       user = opts.delete(:user)

@@ -20,6 +20,7 @@
 
 class RubricAssessmentCSVImporter
   include RubricImporterErrors
+
   def initialize(attachment, rubric, rubric_association)
     @attachment = attachment
     @rubric = rubric

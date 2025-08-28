@@ -73,6 +73,8 @@ export const getItemIcon = (content: ModuleItemContent, isStudentView = false) =
       return <IconLinkLine color={color} data-testid="url-icon" />
     case 'Page':
       return <IconDocumentLine color={color} data-testid="page-icon" />
+    case 'SubHeader':
+      return null
     default:
       return <IconDocumentLine color="primary" data-testid="document-icon" />
   }
@@ -144,7 +146,8 @@ export const validateModuleStudentRenderRequirements = (prevProps: any, nextProp
     prevProps.id === nextProps.id &&
     prevProps.expanded === nextProps.expanded &&
     prevProps.name === nextProps.name &&
-    prevProps.completionRequirements === nextProps.completionRequirements
+    prevProps.completionRequirements === nextProps.completionRequirements &&
+    prevProps.position === nextProps.position
   )
 }
 
@@ -283,9 +286,11 @@ export const validateModuleItemTeacherRenderRequirements = (prevProps: any, next
     prevProps.index === nextProps.index &&
     prevProps.indent === nextProps.indent &&
     prevProps.title === nextProps.title &&
+    prevProps.focusTargetItemId === nextProps.focusTargetItemId &&
     prevProps?.content?.dueAt === nextProps?.content?.dueAt &&
     prevProps?.content?.lockAt === nextProps?.content?.lockAt &&
-    prevProps?.content?.unlockAt === nextProps?.content?.unlockAt
+    prevProps?.content?.unlockAt === nextProps?.content?.unlockAt &&
+    prevProps.position === nextProps.position
 
   if (!basicPropsEqual) return false
 
@@ -327,7 +332,8 @@ export const validateModuleTeacherRenderRequirements = (prevProps: any, nextProp
     prevProps.completionRequirements === nextProps.completionRequirements &&
     prevProps.unlockAt === nextProps.unlockAt &&
     prevProps.requirementCount === nextProps.requirementCount &&
-    prevProps.lockAt === nextProps.lockAt
+    prevProps.lockAt === nextProps.lockAt &&
+    prevProps.position === nextProps.position
   )
 }
 
@@ -356,4 +362,15 @@ export const isModuleUnlockAtDateInTheFuture = (unlockAtDate: string) => {
   const now = moment.tz(TIMEZONE)
 
   return unlockMoment.isAfter(now)
+}
+
+export function focusModuleItemTitleLinkById(id?: string, preventScroll = false) {
+  if (!id) return
+
+  const selector = `[data-testid="module-item-title-link"][data-module-item-id="${id}"]`
+  const el = document.querySelector<HTMLElement>(selector)
+
+  if (el && typeof el.focus === 'function') {
+    el.focus({preventScroll})
+  }
 }

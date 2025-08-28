@@ -20,13 +20,14 @@
 describe Accessibility::Rules::HasLangEntryRule do
   def find_issues(elem, id)
     rule_class = self.class.described_class
-    if rule_class.test(elem).nil?
+    rule = rule_class.new
+    if rule.test(elem).nil?
       []
     else
       [{
         rule_id: rule_class.id,
-        message: rule_class.message,
-        why: rule_class.why,
+        message: rule.message,
+        why: rule.why,
         link: rule_class.link,
         data: {
           id:

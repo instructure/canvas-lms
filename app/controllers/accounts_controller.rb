@@ -311,6 +311,7 @@ class AccountsController < ApplicationController
   before_action :rce_js_env, only: [:settings]
 
   include HorizonMode
+
   before_action :load_canvas_career, only: %i[show users sis_import admin_tools settings]
 
   include Api::V1::Account
@@ -542,7 +543,7 @@ class AccountsController < ApplicationController
   #
   # @argument permissions[] [String]
   #   List of permissions to check against the authenticated user.
-  #   Permission names are documented in the {api:RoleOverridesController#add_role Create a role} endpoint.
+  #   Permission names are documented in the {api:RoleOverridesController#manageable_permissions List assignable permissions} endpoint.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/accounts/self/permissions \
@@ -911,7 +912,7 @@ class AccountsController < ApplicationController
         or_clause = Course.where(code).or(Course.where(name))
 
         if search_term =~ Api::ID_REGEX && Api::MAX_ID_RANGE.cover?(search_term.to_i)
-          or_clause = Course.where(id: search_term).or(or_clause)
+          or_clause = Course.shard(@account.shard).where(id: search_term).or(or_clause)
         end
 
         if @account.grants_any_right?(@current_user, :read_sis, :manage_sis)
@@ -934,21 +935,18 @@ class AccountsController < ApplicationController
     all_precalculated_permissions = nil
 
     page_opts = { total_entries: nil }
-    if includes.include?("ui_invoked")
-      page_opts = {} # let Folio calculate total entries
-      includes.delete("ui_invoked")
-    end
+    page_opts = {} if includes.include?("ui_invoked") # let Folio calculate total entries
 
     GuardRail.activate(:secondary) do
       @courses = Api.paginate(@courses, self, api_v1_account_courses_url, page_opts)
 
       course_preloads = [:account, :root_account, { course_account_associations: :account }]
       course_preloads << :default_post_policy if includes.include?("post_manually")
+      course_preloads << :active_teachers if includes.include?("active_teachers")
+      course_preloads << :enrollment_term if includes.include?("term") || includes.include?("concluded")
       ActiveRecord::Associations.preload(@courses, course_preloads)
 
       preload_teachers(@courses) if includes.include?("teachers")
-      preload_teachers(@courses) if includes.include?("active_teachers")
-      ActiveRecord::Associations.preload(@courses, [:enrollment_term]) if includes.include?("term") || includes.include?("concluded")
 
       if includes.include?("total_students")
         student_counts = StudentEnrollment.shard(@account.shard).not_fake.active_or_pending
@@ -1363,6 +1361,7 @@ class AccountsController < ApplicationController
              enable_eportfolios
              enable_profiles
              enable_turnitin
+             enable_content_a11y_checker
              suppress_assignments
              include_integration_ids_in_gradebook_exports
              show_scheduler
@@ -1859,7 +1858,7 @@ class AccountsController < ApplicationController
       return redirect_to account_settings_url(@account) if !@account.allow_sis_import || !@account.root_account?
 
       @current_batch = @account.current_sis_batch
-      @last_batch = @account.sis_batches.order("created_at DESC").first
+      @last_batch = @account.sis_batches.order(created_at: :desc).first
       respond_to do |format|
         format.html
         format.json { render json: @current_batch }
@@ -2174,12 +2173,14 @@ class AccountsController < ApplicationController
                                    :enable_course_catalog,
                                    :limit_parent_app_web_access,
                                    :limit_personal_access_tokens,
+                                   :restrict_personal_access_tokens_from_students,
                                    { allow_gradebook_show_first_last_names: [:value] }.freeze,
                                    { enable_offline_web_export: [:value] }.freeze,
                                    { disable_rce_media_uploads: [:value] }.freeze,
                                    :enable_profiles,
                                    :enable_gravatar,
                                    :enable_turnitin,
+                                   :enable_content_a11y_checker,
                                    :equella_endpoint,
                                    :equella_teaser,
                                    :external_notification_warning,

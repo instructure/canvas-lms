@@ -82,7 +82,7 @@ module YARD::Templates::Helpers
       when :root, :module, :constant
         false
       when :method, :class
-        !object.tags("API").empty? && (ENV["INCLUDE_INTERNAL"] || object.tags("internal").empty?)
+        !object.tags("API").empty? && (show_internal? || object.tags("internal").empty?)
       else
         if object.parent.nil?
           false
@@ -90,6 +90,10 @@ module YARD::Templates::Helpers
           relevant_object?(object.parent)
         end
       end
+    end
+
+    def show_internal?
+      ["true", true].include?(ENV["INCLUDE_INTERNAL_API_DOCS"])
     end
   end
 end

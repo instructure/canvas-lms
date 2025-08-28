@@ -42,7 +42,13 @@ type StatusBarFeature =
   | 'resize_handle'
   | 'a11y_resize_handlers'
 
-export const RCEVariantValues = ['full', 'lite', 'text-only', 'text-block'] as const
+export const RCEVariantValues = [
+  'full',
+  'lite',
+  'text-only',
+  'text-block',
+  'block-content-editor',
+] as const
 
 export type RCEVariant = (typeof RCEVariantValues)[number]
 
@@ -163,6 +169,38 @@ export function getToolbarForVariant(
     ]
   }
 
+  if (variant === 'block-content-editor') {
+    return [
+      {
+        name: formatMessage('Styles'),
+        items: ['fontsizeselect', 'formatselect'],
+      },
+      {
+        name: formatMessage('Formatting'),
+        items: [
+          'bold',
+          'italic',
+          'underline',
+          'instructure_color',
+          'inst_subscript',
+          'inst_superscript',
+        ],
+      },
+      {
+        name: formatMessage('Content'),
+        items: ['instructure_links', 'instructure_documents'],
+      },
+      {
+        name: formatMessage('Alignment and Lists'),
+        items: ['align', 'bullist', 'inst_indent', 'inst_outdent'],
+      },
+      {
+        name: formatMessage('Miscellaneous'),
+        items: ['removeformat', 'instructure_equation'],
+      },
+    ]
+  }
+
   return [
     {
       name: formatMessage('Styles'),
@@ -220,6 +258,10 @@ export function getStatusBarFeaturesForVariant(
 ): StatusBarFeature[] {
   if (variant === 'text-block') {
     return []
+  }
+
+  if (variant === 'block-content-editor') {
+    return ['keyboard_shortcuts', 'word_count']
   }
 
   const platformFeatures = options.isDesktop ? DESKTOP_FEATURES : MOBILE_FEATURES

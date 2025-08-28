@@ -20,6 +20,7 @@
 class GradeSummaryAssignmentPresenter
   include TextHelper
   include GradeDisplay
+
   attr_reader :assignment, :submission, :originality_reports
 
   def initialize(summary, current_user, assignment, submission)

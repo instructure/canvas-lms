@@ -20,22 +20,22 @@ import {useRef} from 'react'
 import {uid} from '@instructure/uid'
 import CanvasRce from '@canvas/rce/react/CanvasRce'
 import {TextEditProps} from './types'
+import RCEWrapper from '@instructure/canvas-rce/es/rce/RCEWrapper'
 
-export const TextEdit = ({content, height, onContentChange}: TextEditProps) => {
-  const rceRef = useRef(null)
-
+export const TextEdit = ({content, height, onContentChange, focusHandler}: TextEditProps) => {
+  const rceRef = useRef<RCEWrapper | null>(null)
   return (
     <CanvasRce
       ref={rceRef}
       autosave={false}
       textareaId={uid('rceblock')}
-      variant="text-block"
+      variant="block-content-editor"
       defaultContent={content}
       onContentChange={onContentChange}
-      editorOptions={{
-        focus: false,
-      }}
       height={height}
+      onInit={() => {
+        focusHandler && focusHandler(rceRef.current)
+      }}
     />
   )
 }

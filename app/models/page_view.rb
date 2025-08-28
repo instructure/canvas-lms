@@ -68,7 +68,10 @@ class PageView < ActiveRecord::Base
     if PageView.updates_enabled? && db?
       find_by(id: request_id)
     else
-      new { |p| p.request_id = request_id }
+      new do |p|
+        p.request_id = request_id
+        p.created_at = Time.zone.now
+      end
     end
   end
 
@@ -219,7 +222,7 @@ class PageView < ActiveRecord::Base
         result = AccountFilter.filter(result, viewer) if viewer
         result
       else
-        scope = where(user_id: user).order("created_at desc")
+        scope = where(user_id: user).order(created_at: :desc)
         scope = scope.where(created_at: options[:oldest]..) if options[:oldest]
         scope = scope.where(created_at: ..options[:newest]) if options[:newest]
         if viewer

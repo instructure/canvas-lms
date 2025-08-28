@@ -57,7 +57,7 @@ module EventStream::IndexStrategy
       if (bookmark = pager.current_bookmark)
         bookmark_scope = bookmark_scope.where(created_at: ...Time.zone.parse(bookmark))
       end
-      bookmark_scope = bookmark_scope.order("created_at DESC")
+      bookmark_scope = bookmark_scope.order(created_at: :desc)
       bookmark_scope.paginate(page: 1, per_page: pager.per_page)
     end
 

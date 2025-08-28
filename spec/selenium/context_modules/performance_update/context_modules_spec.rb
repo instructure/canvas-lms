@@ -24,6 +24,7 @@ describe "context modules, performance update" do
   include_context "in-process server selenium tests"
   include ContextModulesCommon
   include ModulesIndexPage
+
   before(:once) do
     course_factory(active_course: true)
     @page1 = @course.wiki_pages.create! title: "title1"

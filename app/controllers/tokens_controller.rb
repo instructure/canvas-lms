@@ -60,7 +60,7 @@ class TokensController < ApplicationController
     token_params[:developer_key] = DeveloperKey.default
     @token = @context.access_tokens.build(token_params)
 
-    return render_unauthorized_action unless @token.grants_right?(logged_in_user, :create)
+    return render_unauthorized_action unless @token.grants_right?(logged_in_user, AccessToken.account_session_for_permissions(@domain_root_account), :create)
 
     # unless we're creating it for ourselves (and not masquerading), set it to pending
     @token.workflow_state = "pending" unless @context == logged_in_user
@@ -87,7 +87,7 @@ class TokensController < ApplicationController
   # @argument token[regenerate] [Boolean] Regenerate the actual token.
   #
   def update
-    unless @token.grants_right?(logged_in_user, :update)
+    unless @token.grants_right?(logged_in_user, AccessToken.account_session_for_permissions(@domain_root_account), :update)
       if @current_user.id == @token.user_id
         return render_unauthorized_action
       else

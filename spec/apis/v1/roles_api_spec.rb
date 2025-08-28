@@ -827,4 +827,113 @@ describe "Roles API", type: :request do
       end
     end
   end
+
+  describe "manageable_permissions" do
+    before do
+      allow(RoleOverride).to receive(:manageable_permissions).with(Account.default).and_return(
+        {
+          view_analytics: {
+            label: -> { "Analytics - View" },
+            group: "analytics_stuff",
+            group_label: -> { "Analytics" },
+            available_to: %w[AccountAdmin TaEnrollment TeacherEnrollment StudentEnrollment AccountMembership],
+            true_for: %w[AccountAdmin TaEnrollment TeacherEnrollment]
+          },
+          fabricate_analytics: {
+            group: "analytics_stuff",
+            label: -> { "Analytics - Create" },
+            available_to: %w[AccountAdmin AccountMembership],
+            true_for: %w[AccountAdmin]
+          },
+          play_404_game: {
+            label: -> { "Play 404 Games" },
+            group_label: -> { "Joy" },
+            available_to: %w[AccountAdmin StudentEnrollment],
+            true_for: %w[AccountAdmin]
+          }
+        }
+      )
+    end
+
+    before :once do
+      account_admin_user(account: Account.default)
+    end
+
+    it "requires :manage_role_overrides permission" do
+      user_factory
+      api_call(:get,
+               "/api/v1/accounts/#{Account.default.id}/roles/permissions",
+               { controller: "role_overrides", action: "manageable_permissions", format: "json", account_id: Account.default.to_param },
+               {},
+               {},
+               { expected_status: 403 })
+    end
+
+    it "returns the expected information" do
+      json = api_call(:get,
+                      "/api/v1/accounts/#{Account.default.id}/roles/permissions",
+                      { controller: "role_overrides", action: "manageable_permissions", format: "json", account_id: Account.default.to_param })
+      expect(json).to eq([
+                           {
+                             "key" => "view_analytics",
+                             "label" => "Analytics - View",
+                             "group" => "analytics_stuff",
+                             "group_label" => "Analytics",
+                             "available_to" => %w[AccountAdmin TaEnrollment TeacherEnrollment StudentEnrollment AccountMembership],
+                             "true_for" => %w[AccountAdmin TaEnrollment TeacherEnrollment]
+                           },
+                           {
+                             "key" => "fabricate_analytics",
+                             "group" => "analytics_stuff",
+                             "label" => "Analytics - Create",
+                             "available_to" => %w[AccountAdmin AccountMembership],
+                             "true_for" => %w[AccountAdmin]
+                           },
+                           {
+                             "key" => "play_404_game",
+                             "label" => "Play 404 Games",
+                             "group_label" => "Joy",
+                             "available_to" => %w[AccountAdmin StudentEnrollment],
+                             "true_for" => %w[AccountAdmin]
+                           }
+                         ])
+    end
+
+    describe "searching" do
+      it "searches by key" do
+        json = api_call(:get,
+                        "/api/v1/accounts/#{Account.default.id}/roles/permissions?search_term=404_game",
+                        { controller: "role_overrides", action: "manageable_permissions", format: "json", account_id: Account.default.to_param, search_term: "404_game" })
+        expect(json.pluck("key")).to contain_exactly("play_404_game")
+      end
+
+      it "searches by label" do
+        json = api_call(:get,
+                        "/api/v1/accounts/#{Account.default.id}/roles/permissions?search_term=CREATE",
+                        { controller: "role_overrides", action: "manageable_permissions", format: "json", account_id: Account.default.to_param, search_term: "CREATE" })
+        expect(json.pluck("key")).to contain_exactly("fabricate_analytics")
+      end
+
+      it "searches by group" do
+        json = api_call(:get,
+                        "/api/v1/accounts/#{Account.default.id}/roles/permissions?search_term=stuff",
+                        { controller: "role_overrides", action: "manageable_permissions", format: "json", account_id: Account.default.to_param, search_term: "stuff" })
+        expect(json.pluck("key")).to contain_exactly("view_analytics", "fabricate_analytics")
+      end
+
+      it "searches by group_label" do
+        json = api_call(:get,
+                        "/api/v1/accounts/#{Account.default.id}/roles/permissions?search_term=joy",
+                        { controller: "role_overrides", action: "manageable_permissions", format: "json", account_id: Account.default.to_param, search_term: "joy" })
+        expect(json.pluck("key")).to contain_exactly("play_404_game")
+      end
+
+      it "returns an empty array if no permissions match" do
+        json = api_call(:get,
+                        "/api/v1/accounts/#{Account.default.id}/roles/permissions?search_term=blah",
+                        { controller: "role_overrides", action: "manageable_permissions", format: "json", account_id: Account.default.to_param, search_term: "blah" })
+        expect(json).to eq([])
+      end
+    end
+  end
 end

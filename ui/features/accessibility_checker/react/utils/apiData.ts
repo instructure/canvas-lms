@@ -21,7 +21,7 @@ import {
   AccessibilityResourceScan,
   ContentItem,
   ContentItemType,
-  FilterDateKeys,
+  FilterOption,
   Filters,
   HasId,
   ParsedFilters,
@@ -125,22 +125,30 @@ export const calculateTotalIssuesCount = (data?: AccessibilityResourceScan[] | n
 }
 
 export const getParsedFilters = (filters: Filters | null): ParsedFilters => {
-  const parsed = {} as ParsedFilters
-  if (filters) {
-    ;(Object.keys(filters) as Array<keyof Filters>).forEach((key: keyof Filters) => {
-      const typedKey = key as keyof Filters
-      const value = filters[typedKey]
-      if (Array.isArray(value)) {
-        ;(parsed[typedKey] as any) = value.includes('all') ? undefined : value
-      } else if (value instanceof Date) {
-        parsed[typedKey as FilterDateKeys] = value.toISOString() as string
-      } else {
-        parsed[typedKey] = value ?? undefined
-      }
-    })
+  if (!filters) return {}
+
+  const hasAll = (opts?: FilterOption[]) => !!opts?.some(o => o?.value?.toLowerCase?.() === 'all')
+
+  const toValueArray = (opts?: FilterOption[]): string[] | undefined => {
+    if (!opts || opts.length === 0) return undefined
+    return hasAll(opts) ? undefined : opts.map(o => o.value)
   }
 
-  return parsed || {}
+  const parsed: ParsedFilters = {}
+  const ruleTypes = toValueArray(filters.ruleTypes)
+  if (ruleTypes) parsed.ruleTypes = ruleTypes
+
+  const artifactTypes = toValueArray(filters.artifactTypes)
+  if (artifactTypes) parsed.artifactTypes = artifactTypes
+
+  const workflowStates = toValueArray(filters.workflowStates)
+  if (workflowStates) parsed.workflowStates = workflowStates
+
+  if (filters.fromDate?.value) parsed.fromDate = filters.fromDate?.value
+
+  if (filters.toDate?.value) parsed.toDate = filters.toDate?.value
+
+  return parsed
 }
 
 export const issueSeverity = (count: number): Severity => {

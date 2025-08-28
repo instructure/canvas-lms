@@ -121,11 +121,11 @@ RSpec.shared_examples "it has a single accessibility context" do
       end
 
       context "when context is not supported" do
-        let(:invalid_context) { double("InvalidContext", id: 1) }
+        let(:invalid_context) { instance_double(PluginSetting, id: 1) }
 
         it "raises an error" do
           expect { subject.context = invalid_context }.to(
-            raise_error(ArgumentError, "Unsupported context type: RSpec::Mocks::Double")
+            raise_error(ArgumentError, "Unsupported context type: RSpec::Mocks::InstanceVerifyingDouble")
           )
         end
       end

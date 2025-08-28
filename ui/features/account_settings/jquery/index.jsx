@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'jqueryui/dialog'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 // eslint-disable-next-line import/no-named-as-default

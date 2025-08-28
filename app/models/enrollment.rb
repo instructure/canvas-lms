@@ -212,6 +212,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   include StickySisFields
+
   are_sis_sticky :start_at, :end_at
 
   has_a_broadcast_policy
@@ -462,6 +463,8 @@ class Enrollment < ActiveRecord::Base
     ).find_each do |tag|
       # Only remove differentiation tag memberships if the enrollment is being deleted/rejected
       next unless is_deleted
+
+      next if other_section_enrollment_exists?
 
       membership = tag.group_memberships.where(user_id:).first
       membership&.destroy

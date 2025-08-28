@@ -23,6 +23,7 @@ describe RootAccountResolver do
   let(:minimal_active_record) do
     Class.new do
       extend ActiveModel::Callbacks
+
       define_model_callbacks :save
 
       attr_accessor :root_account_id

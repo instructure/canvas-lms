@@ -61,6 +61,7 @@ class CanvasSchema < GraphQL::Schema
     case obj
     when Account then Types::AccountType
     when Course then Types::CourseType
+    when AllocationRule then Types::AllocationRuleType
     when Assignment then Types::AssignmentType
     when AssignmentGroup then Types::AssignmentGroupType
     when CommentBankItem then Types::CommentBankItemType

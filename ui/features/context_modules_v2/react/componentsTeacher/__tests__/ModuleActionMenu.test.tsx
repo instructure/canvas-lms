@@ -17,11 +17,28 @@
  */
 
 import React from 'react'
-import {fireEvent, render, screen} from '@testing-library/react'
+import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 import ModuleActionMenu from '../ModuleActionMenu'
-import {PAGE_SIZE, MODULE_ITEMS, MODULES} from '../../utils/constants'
+import {MODULE_ITEMS, MODULE_ITEM_TITLES, MODULES} from '../../utils/constants'
+import {
+  handleDelete,
+  handleDuplicate,
+  handleSendTo,
+  handleCopyTo,
+} from '../../handlers/moduleActionHandlers'
+import {handleOpeningModuleUpdateTray} from '../../handlers/modulePageActionHandlers'
+import '../../handlers/modulePageCommandEventHandlers'
+
+jest.mock('../../handlers/moduleActionHandlers')
+jest.mock('../../handlers/modulePageActionHandlers', () => ({
+  ...jest.requireActual('../../handlers/modulePageActionHandlers'),
+  handleOpeningModuleUpdateTray: jest.fn(),
+}))
+
+const setIsManagementContentTrayOpenMock = jest.fn()
 
 // External tool data to be provided through context
 const mockExternalTools = {
@@ -55,27 +72,25 @@ const mockExternalTools = {
   moduleIndexMenuModalTools: [],
 }
 
-const createQueryClient = () =>
-  new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-      },
-    },
-  })
-
 const setUp = (permissions = {}, courseId = 'test-course-id', moduleId = 'test-module-id') => {
-  const queryClient = createQueryClient()
-
   // Set up query data for modules
   queryClient.setQueryData([MODULES, courseId], {
     pages: [
       {
         modules: [
           {
+            _id: moduleId,
             id: moduleId,
-            name: 'Test Module',
+            name: 'Test Module 1',
             position: 1,
+            published: true,
+            moduleItems: [],
+          },
+          {
+            _id: 'test-module-id-2',
+            id: 'test-module-id-2',
+            name: 'Test Module 2',
+            position: 2,
             published: true,
             moduleItems: [],
           },
@@ -93,6 +108,7 @@ const setUp = (permissions = {}, courseId = 'test-course-id', moduleId = 'test-m
   queryClient.setQueryData([MODULE_ITEMS, moduleId, null], {
     moduleItems: [
       {
+        _id: '1',
         id: '1',
         title: 'Test Item',
         content: {
@@ -100,6 +116,22 @@ const setUp = (permissions = {}, courseId = 'test-course-id', moduleId = 'test-m
         },
       },
     ],
+  })
+
+  queryClient.setQueryData([MODULE_ITEM_TITLES, moduleId], {
+    legacyNode: {
+      moduleItemsConnection: {
+        edges: [
+          {
+            node: {
+              _id: '1',
+              id: '1',
+              title: 'Test Item',
+            },
+          },
+        ],
+      },
+    },
   })
 
   const contextProps = {
@@ -112,8 +144,25 @@ const setUp = (permissions = {}, courseId = 'test-course-id', moduleId = 'test-m
     ...mockExternalTools,
   }
 
+  return renderMenu({
+    moduleId,
+    contextProps,
+    queryClientOverride: queryClient,
+  })
+}
+
+const renderMenu = ({
+  moduleId = 'test-module-id',
+  contextProps = {},
+  queryClientOverride = null,
+}: {
+  moduleId?: string
+  contextProps?: any
+  queryClientOverride?: QueryClient | null
+} = {}) => {
+  const client = queryClientOverride || queryClient
   return render(
-    <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={client}>
       <ContextModuleProvider {...contextProps}>
         <ModuleActionMenu
           expanded={true}
@@ -121,11 +170,10 @@ const setUp = (permissions = {}, courseId = 'test-course-id', moduleId = 'test-m
           setIsMenuOpen={() => {}}
           id={moduleId}
           name="Test Module"
-          prerequisites={[]}
           setIsDirectShareOpen={() => {}}
           setIsDirectShareCourseOpen={() => {}}
           setModuleAction={() => {}}
-          setIsManageModuleContentTrayOpen={() => {}}
+          setIsManageModuleContentTrayOpen={setIsManagementContentTrayOpenMock}
           setSourceModule={() => {}}
         />
       </ContextModuleProvider>
@@ -134,236 +182,514 @@ const setUp = (permissions = {}, courseId = 'test-course-id', moduleId = 'test-m
 }
 
 describe('ModuleActionMenu', () => {
-  it('renders the menu trigger button', () => {
-    setUp()
-    const menuButton = screen.getByRole('button', {name: 'Module Options'})
-    expect(menuButton).toBeInTheDocument()
-    expect(menuButton).toHaveAttribute('data-testid', 'module-action-menu_test-module-id')
+  afterEach(() => {
+    jest.clearAllMocks()
   })
-
-  it('renders all menu items when user has all permissions', () => {
-    setUp()
-    const menuButton = screen.getByRole('button', {name: 'Module Options'})
-    fireEvent.click(menuButton)
-
-    // Check that all menu items are rendered
-    expect(screen.getByText('Edit')).toBeInTheDocument()
-    expect(screen.getByText('Move Contents...')).toBeInTheDocument()
-    expect(screen.getByText('Move Module...')).toBeInTheDocument()
-    expect(screen.getByText('Assign To...')).toBeInTheDocument()
-    expect(screen.getByText('Delete')).toBeInTheDocument()
-    expect(screen.getByText('Duplicate')).toBeInTheDocument()
-    expect(screen.getByText('Send To...')).toBeInTheDocument()
-    expect(screen.getByText('Copy To...')).toBeInTheDocument()
-  })
-
-  it('renders external tool menu items', () => {
-    setUp()
-    const menuButton = screen.getByRole('button', {name: 'Module Options'})
-    fireEvent.click(menuButton)
-
-    // Check that external tool menu items are rendered
-    expect(screen.getByText('External Tool 1')).toBeInTheDocument()
-    expect(screen.getByText('External Tool 2')).toBeInTheDocument()
-    expect(screen.getByText('External Tool 3')).toBeInTheDocument()
-  })
-
-  it('only renders edit menu items when user can only edit', () => {
-    setUp({
-      canEdit: true,
-      canDelete: false,
-      canAdd: false,
-      canDirectShare: false,
+  describe('rendering', () => {
+    it('renders the menu trigger button', () => {
+      setUp()
+      const menuButton = screen.getByRole('button', {name: 'Module Options'})
+      expect(menuButton).toBeInTheDocument()
+      expect(menuButton).toHaveAttribute('data-testid', 'module-action-menu_test-module-id')
     })
-    const menuButton = screen.getByRole('button', {name: 'Module Options'})
-    fireEvent.click(menuButton)
 
-    // Should show edit-related items
-    expect(screen.getByText('Edit')).toBeInTheDocument()
-    expect(screen.getByText('Move Contents...')).toBeInTheDocument()
-    expect(screen.getByText('Move Module...')).toBeInTheDocument()
-    expect(screen.getByText('Assign To...')).toBeInTheDocument()
+    it('renders all menu items when user has all permissions', async () => {
+      setUp()
+      const menuButton = screen.getByRole('button', {name: 'Module Options'})
+      fireEvent.click(menuButton)
 
-    // Should not show delete, duplicate, or share items
-    expect(screen.queryByText('Delete')).not.toBeInTheDocument()
-    expect(screen.queryByText('Duplicate')).not.toBeInTheDocument()
-    expect(screen.queryByText('Send To...')).not.toBeInTheDocument()
-    expect(screen.queryByText('Copy To...')).not.toBeInTheDocument()
-  })
-
-  it('only renders delete menu item when user can only delete', () => {
-    setUp({
-      canEdit: false,
-      canDelete: true,
-      canAdd: false,
-      canDirectShare: false,
+      // Check that all menu items are rendered
+      await waitFor(() => {
+        expect(screen.getByText('Edit')).toBeInTheDocument()
+      })
+      expect(screen.getByText('Move Contents...')).toBeInTheDocument()
+      expect(screen.getByText('Move Module...')).toBeInTheDocument()
+      expect(screen.getByText('Assign To...')).toBeInTheDocument()
+      expect(screen.getByText('Delete')).toBeInTheDocument()
+      expect(screen.getByText('Duplicate')).toBeInTheDocument()
+      expect(screen.getByText('Send To...')).toBeInTheDocument()
+      expect(screen.getByText('Copy To...')).toBeInTheDocument()
     })
-    const menuButton = screen.getByRole('button', {name: 'Module Options'})
-    fireEvent.click(menuButton)
 
-    // Should show delete item
-    expect(screen.getByText('Delete')).toBeInTheDocument()
+    it('renders external tool menu items', async () => {
+      setUp()
+      const menuButton = screen.getByRole('button', {name: 'Module Options'})
+      fireEvent.click(menuButton)
 
-    // Should not show other items
-    expect(screen.queryByText('Edit')).not.toBeInTheDocument()
-    expect(screen.queryByText('Move Contents...')).not.toBeInTheDocument()
-    expect(screen.queryByText('Move Module...')).not.toBeInTheDocument()
-    expect(screen.queryByText('Assign To...')).not.toBeInTheDocument()
-    expect(screen.queryByText('Duplicate')).not.toBeInTheDocument()
-    expect(screen.queryByText('Send To...')).not.toBeInTheDocument()
-    expect(screen.queryByText('Copy To...')).not.toBeInTheDocument()
-  })
-
-  it('only renders duplicate menu item when user can add and module is expanded', () => {
-    setUp({
-      canEdit: false,
-      canDelete: false,
-      canAdd: true,
-      canDirectShare: false,
+      // Check that external tool menu items are rendered
+      await waitFor(() => {
+        expect(screen.getByText('External Tool 1')).toBeInTheDocument()
+      })
+      expect(screen.getByText('External Tool 2')).toBeInTheDocument()
+      expect(screen.getByText('External Tool 3')).toBeInTheDocument()
     })
-    const menuButton = screen.getByRole('button', {name: 'Module Options'})
-    fireEvent.click(menuButton)
 
-    // Should show duplicate item (since module is expanded and items can be duplicated)
-    expect(screen.getByText('Duplicate')).toBeInTheDocument()
+    it('only renders edit menu items when user can only edit', async () => {
+      setUp({
+        canEdit: true,
+        canDelete: false,
+        canAdd: false,
+        canDirectShare: false,
+      })
+      const menuButton = screen.getByRole('button', {name: 'Module Options'})
+      fireEvent.click(menuButton)
 
-    // Should not show other items
-    expect(screen.queryByText('Edit')).not.toBeInTheDocument()
-    expect(screen.queryByText('Move Contents...')).not.toBeInTheDocument()
-    expect(screen.queryByText('Move Module...')).not.toBeInTheDocument()
-    expect(screen.queryByText('Assign To...')).not.toBeInTheDocument()
-    expect(screen.queryByText('Delete')).not.toBeInTheDocument()
-    expect(screen.queryByText('Send To...')).not.toBeInTheDocument()
-    expect(screen.queryByText('Copy To...')).not.toBeInTheDocument()
-  })
+      // Should show edit-related items
+      await waitFor(() => {
+        expect(screen.getByText('Edit')).toBeInTheDocument()
+      })
+      expect(screen.getByText('Move Contents...')).toBeInTheDocument()
+      expect(screen.getByText('Move Module...')).toBeInTheDocument()
+      expect(screen.getByText('Assign To...')).toBeInTheDocument()
 
-  it('only renders share menu items when user can direct share', () => {
-    setUp({
-      canEdit: false,
-      canDelete: false,
-      canAdd: false,
-      canDirectShare: true,
+      // Should not show delete, duplicate, or share items
+      expect(screen.queryByText('Delete')).not.toBeInTheDocument()
+      expect(screen.queryByText('Duplicate')).not.toBeInTheDocument()
+      expect(screen.queryByText('Send To...')).not.toBeInTheDocument()
+      expect(screen.queryByText('Copy To...')).not.toBeInTheDocument()
     })
-    const menuButton = screen.getByRole('button', {name: 'Module Options'})
-    fireEvent.click(menuButton)
 
-    // Should show share items
-    expect(screen.getByText('Send To...')).toBeInTheDocument()
-    expect(screen.getByText('Copy To...')).toBeInTheDocument()
+    it('only renders delete menu item when user can only delete', async () => {
+      setUp({
+        canEdit: false,
+        canDelete: true,
+        canAdd: false,
+        canDirectShare: false,
+      })
+      const menuButton = screen.getByRole('button', {name: 'Module Options'})
+      fireEvent.click(menuButton)
 
-    // Should not show other items
-    expect(screen.queryByText('Edit')).not.toBeInTheDocument()
-    expect(screen.queryByText('Move Contents...')).not.toBeInTheDocument()
-    expect(screen.queryByText('Move Module...')).not.toBeInTheDocument()
-    expect(screen.queryByText('Assign To...')).not.toBeInTheDocument()
-    expect(screen.queryByText('Delete')).not.toBeInTheDocument()
-    expect(screen.queryByText('Duplicate')).not.toBeInTheDocument()
-  })
+      // Should show delete item
+      await waitFor(() => {
+        expect(screen.getByText('Delete')).toBeInTheDocument()
+      })
 
-  it('renders no menu items when user has no permissions', () => {
-    setUp({
-      canEdit: false,
-      canDelete: false,
-      canAdd: false,
-      canDirectShare: false,
+      // Should not show other items
+      expect(screen.queryByText('Edit')).not.toBeInTheDocument()
+      expect(screen.queryByText('Move Contents...')).not.toBeInTheDocument()
+      expect(screen.queryByText('Move Module...')).not.toBeInTheDocument()
+      expect(screen.queryByText('Assign To...')).not.toBeInTheDocument()
+      expect(screen.queryByText('Duplicate')).not.toBeInTheDocument()
+      expect(screen.queryByText('Send To...')).not.toBeInTheDocument()
+      expect(screen.queryByText('Copy To...')).not.toBeInTheDocument()
     })
-    const menuButton = screen.getByRole('button', {name: 'Module Options'})
-    fireEvent.click(menuButton)
 
-    // Should not show any standard menu items
-    expect(screen.queryByText('Edit')).not.toBeInTheDocument()
-    expect(screen.queryByText('Move Contents...')).not.toBeInTheDocument()
-    expect(screen.queryByText('Move Module...')).not.toBeInTheDocument()
-    expect(screen.queryByText('Assign To...')).not.toBeInTheDocument()
-    expect(screen.queryByText('Delete')).not.toBeInTheDocument()
-    expect(screen.queryByText('Duplicate')).not.toBeInTheDocument()
-    expect(screen.queryByText('Send To...')).not.toBeInTheDocument()
-    expect(screen.queryByText('Copy To...')).not.toBeInTheDocument()
+    it('only renders duplicate menu item when user can add and module is expanded', async () => {
+      setUp({
+        canEdit: false,
+        canDelete: false,
+        canAdd: true,
+        canDirectShare: false,
+      })
+      const menuButton = screen.getByRole('button', {name: 'Module Options'})
+      fireEvent.click(menuButton)
 
-    // Should still show external tool items
-    expect(screen.getByText('External Tool 1')).toBeInTheDocument()
-    expect(screen.getByText('External Tool 2')).toBeInTheDocument()
-    expect(screen.getByText('External Tool 3')).toBeInTheDocument()
-  })
+      // Should show duplicate item (since module is expanded and items can be duplicated)
+      await waitFor(() => {
+        expect(screen.getByText('Duplicate')).toBeInTheDocument()
+      })
 
-  it('disables menu button when modules are loading', () => {
-    const queryClient = createQueryClient()
-    const courseId = 'test-course-id'
-    const moduleId = 'test-module-id'
+      // Should not show other items
+      expect(screen.queryByText('Edit')).not.toBeInTheDocument()
+      expect(screen.queryByText('Move Contents...')).not.toBeInTheDocument()
+      expect(screen.queryByText('Move Module...')).not.toBeInTheDocument()
+      expect(screen.queryByText('Assign To...')).not.toBeInTheDocument()
+      expect(screen.queryByText('Delete')).not.toBeInTheDocument()
+      expect(screen.queryByText('Send To...')).not.toBeInTheDocument()
+      expect(screen.queryByText('Copy To...')).not.toBeInTheDocument()
+    })
 
-    // Don't set any query data to simulate loading state
-    const contextProps = {
-      ...contextModuleDefaultProps,
-      courseId,
-    }
+    it('only renders share menu items when user can direct share', async () => {
+      setUp({
+        canEdit: false,
+        canDelete: false,
+        canAdd: false,
+        canDirectShare: true,
+      })
+      const menuButton = screen.getByRole('button', {name: 'Module Options'})
+      fireEvent.click(menuButton)
 
-    render(
-      <QueryClientProvider client={queryClient}>
-        <ContextModuleProvider {...contextProps}>
-          <ModuleActionMenu
-            expanded={true}
-            isMenuOpen={false}
-            setIsMenuOpen={() => {}}
-            id={moduleId}
-            name="Test Module"
-            prerequisites={[]}
-            setIsDirectShareOpen={() => {}}
-            setIsDirectShareCourseOpen={() => {}}
-            setModuleAction={() => {}}
-            setIsManageModuleContentTrayOpen={() => {}}
-            setSourceModule={() => {}}
-          />
-        </ContextModuleProvider>
-      </QueryClientProvider>,
-    )
+      // Should show share items
+      await waitFor(() => {
+        expect(screen.getByText('Send To...')).toBeInTheDocument()
+      })
+      expect(screen.getByText('Copy To...')).toBeInTheDocument()
 
-    const menuButton = screen.getByRole('button', {name: 'Module Options'})
-    expect(menuButton).toBeDisabled()
-  })
+      // Should not show other items
+      expect(screen.queryByText('Edit')).not.toBeInTheDocument()
+      expect(screen.queryByText('Move Contents...')).not.toBeInTheDocument()
+      expect(screen.queryByText('Move Module...')).not.toBeInTheDocument()
+      expect(screen.queryByText('Assign To...')).not.toBeInTheDocument()
+      expect(screen.queryByText('Delete')).not.toBeInTheDocument()
+      expect(screen.queryByText('Duplicate')).not.toBeInTheDocument()
+    })
 
-  it('disables menu button when there is an error loading modules', () => {
-    const courseId = 'test-course-id'
-    const moduleId = 'test-module-id'
+    it('renders no menu items when user has no permissions', async () => {
+      setUp({
+        canEdit: false,
+        canDelete: false,
+        canAdd: false,
+        canDirectShare: false,
+      })
+      const menuButton = screen.getByRole('button', {name: 'Module Options'})
+      fireEvent.click(menuButton)
 
-    // Create a query client that will return an error for the modules query
-    const errorQueryClient = new QueryClient({
-      defaultOptions: {
-        queries: {
-          retry: false,
-          gcTime: 0,
-          queryFn: () => {
-            throw new Error('Failed to load modules')
+      // Should still show external tool items
+      await waitFor(() => {
+        expect(screen.getByText('External Tool 1')).toBeInTheDocument()
+        expect(screen.getByText('External Tool 2')).toBeInTheDocument()
+        expect(screen.getByText('External Tool 3')).toBeInTheDocument()
+      })
+
+      // Should not show any standard menu items
+      expect(screen.queryByText('Edit')).not.toBeInTheDocument()
+      expect(screen.queryByText('Move Contents...')).not.toBeInTheDocument()
+      expect(screen.queryByText('Move Module...')).not.toBeInTheDocument()
+      expect(screen.queryByText('Assign To...')).not.toBeInTheDocument()
+      expect(screen.queryByText('Delete')).not.toBeInTheDocument()
+      expect(screen.queryByText('Duplicate')).not.toBeInTheDocument()
+      expect(screen.queryByText('Send To...')).not.toBeInTheDocument()
+      expect(screen.queryByText('Copy To...')).not.toBeInTheDocument()
+    })
+
+    it('disables menu button when modules are loading', () => {
+      const queryClient = new QueryClient({
+        defaultOptions: {
+          queries: {
+            retry: false,
           },
         },
-      },
+      })
+
+      const courseId = 'test-course-id'
+      const moduleId = 'test-module-id'
+
+      // Don't set any query data to simulate loading state
+      const contextProps = {
+        ...contextModuleDefaultProps,
+        courseId,
+      }
+
+      renderMenu({
+        moduleId,
+        contextProps,
+        queryClientOverride: queryClient,
+      })
+
+      const menuButton = screen.getByRole('button', {name: 'Module Options'})
+      expect(menuButton).toBeDisabled()
     })
 
-    const contextProps = {
-      ...contextModuleDefaultProps,
-      courseId,
-    }
+    it('disables menu button when there is an error loading modules', () => {
+      const courseId = 'test-course-id'
+      const moduleId = 'test-module-id'
 
-    render(
-      <QueryClientProvider client={errorQueryClient}>
-        <ContextModuleProvider {...contextProps}>
-          <ModuleActionMenu
-            expanded={true}
-            isMenuOpen={false}
-            setIsMenuOpen={() => {}}
-            id={moduleId}
-            name="Test Module"
-            prerequisites={[]}
-            setIsDirectShareOpen={() => {}}
-            setIsDirectShareCourseOpen={() => {}}
-            setModuleAction={() => {}}
-            setIsManageModuleContentTrayOpen={() => {}}
-            setSourceModule={() => {}}
-          />
-        </ContextModuleProvider>
-      </QueryClientProvider>,
-    )
+      // Create a query client that will return an error for the modules query
+      const errorQueryClient = new QueryClient({
+        defaultOptions: {
+          queries: {
+            retry: false,
+            gcTime: 0,
+            queryFn: () => {
+              throw new Error('Failed to load modules')
+            },
+          },
+        },
+      })
 
-    const menuButton = screen.getByRole('button', {name: 'Module Options'})
-    expect(menuButton).toBeDisabled()
+      const contextProps = {
+        ...contextModuleDefaultProps,
+        courseId,
+      }
+
+      renderMenu({
+        moduleId,
+        contextProps,
+        queryClientOverride: errorQueryClient,
+      })
+
+      const menuButton = screen.getByRole('button', {name: 'Module Options'})
+      expect(menuButton).toBeDisabled()
+    })
+
+    it('does not render "Move Contents..." when there is only one module', async () => {
+      queryClient.setQueryData([MODULES, 'test-course-id'], {
+        pages: [
+          {
+            modules: [
+              {
+                _id: 'test-module-id',
+                id: 'test-module-id',
+                name: 'Test Module',
+                position: 1,
+                published: true,
+                moduleItems: [],
+              },
+            ],
+            pageInfo: {
+              hasNextPage: false,
+              endCursor: null,
+            },
+          },
+        ],
+        pageParams: [undefined],
+      })
+      queryClient.setQueryData([MODULE_ITEMS, 'test-module-id', null], {
+        moduleItems: [
+          {
+            _id: '1',
+            id: '1',
+            title: 'Test Item',
+            content: {
+              canDuplicate: true,
+            },
+          },
+        ],
+      })
+
+      const courseId = 'test-course-id'
+      const moduleId = 'test-module-id'
+      const contextProps = {
+        ...contextModuleDefaultProps,
+        courseId,
+      }
+
+      renderMenu({
+        moduleId,
+        contextProps,
+        queryClientOverride: queryClient,
+      })
+      const menuButton = screen.getByRole('button', {name: 'Module Options'})
+      fireEvent.click(menuButton)
+      await waitFor(() => {
+        expect(screen.getByText('Edit')).toBeInTheDocument()
+      })
+      expect(screen.queryByText('Move Contents...')).not.toBeInTheDocument()
+    })
+
+    it('does not render "Move Contents..." when the current module has no items', async () => {
+      queryClient.setQueryData([MODULES, 'test-course-id'], {
+        pages: [
+          {
+            modules: [
+              {
+                _id: 'test-module-id',
+                id: 'test-module-id',
+                name: 'Test Module',
+                position: 1,
+                published: true,
+                moduleItems: [],
+              },
+              {
+                _id: 'another-module-id',
+                id: 'another-module-id',
+                name: 'Another Module',
+                position: 2,
+                published: true,
+                moduleItems: [],
+              },
+            ],
+            pageInfo: {
+              hasNextPage: false,
+              endCursor: null,
+            },
+          },
+        ],
+        pageParams: [undefined],
+      })
+      queryClient.setQueryData([MODULE_ITEMS, 'test-module-id', null], {
+        moduleItems: [],
+      })
+      const courseId = 'test-course-id'
+      const moduleId = 'test-module-id'
+      const contextProps = {
+        ...contextModuleDefaultProps,
+        courseId,
+      }
+
+      renderMenu({
+        moduleId,
+        contextProps,
+        queryClientOverride: queryClient,
+      })
+      const menuButton = screen.getByRole('button', {name: 'Module Options'})
+      fireEvent.click(menuButton)
+      await waitFor(() => {
+        expect(screen.getByText('Edit')).toBeInTheDocument()
+      })
+      expect(screen.queryByText('Move Contents...')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('actions', () => {
+    const modulePageActionEventHandler = jest.fn()
+    beforeAll(() => {
+      document.addEventListener('module-action', modulePageActionEventHandler)
+    })
+    afterAll(() => {
+      document.removeEventListener('module-action', modulePageActionEventHandler)
+    })
+
+    it('opens the differentiated modules tray on edit', async () => {
+      setUp()
+      const menuButton = screen.getByRole('button', {name: 'Module Options'})
+      fireEvent.click(menuButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Edit')).toBeInTheDocument()
+      })
+
+      const editMenuItem = screen.getByText('Edit') as HTMLElement
+      fireEvent.click(editMenuItem)
+
+      await waitFor(() => {
+        expect(handleOpeningModuleUpdateTray).toHaveBeenCalledWith(
+          expect.anything(),
+          'test-course-id',
+          'test-module-id',
+          'Test Module 1',
+          'settings',
+          expect.anything(),
+        )
+      })
+    })
+
+    it('calls handleDelete on delete', async () => {
+      setUp()
+      const menuButton = screen.getByRole('button', {name: 'Module Options'})
+      fireEvent.click(menuButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Delete')).toBeInTheDocument()
+      })
+
+      const deleteMenuItem = screen.getByText('Delete') as HTMLElement
+      fireEvent.click(deleteMenuItem)
+
+      await waitFor(() => {
+        expect(handleDelete).toHaveBeenCalledWith(
+          'test-module-id',
+          'Test Module',
+          queryClient,
+          'test-course-id',
+          expect.anything(),
+        )
+      })
+    })
+
+    it('calls duplicateModule on duplicate', async () => {
+      setUp()
+      const menuButton = screen.getByRole('button', {name: 'Module Options'})
+      fireEvent.click(menuButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Duplicate')).toBeInTheDocument()
+      })
+
+      const duplicateMenuItem = screen.getByText('Duplicate') as HTMLElement
+      fireEvent.click(duplicateMenuItem)
+
+      await waitFor(() => {
+        expect(handleDuplicate).toHaveBeenCalledWith(
+          'test-module-id',
+          'Test Module',
+          queryClient,
+          'test-course-id',
+          expect.anything(),
+        )
+      })
+    })
+
+    it('calls handleSendTo on send to', async () => {
+      setUp()
+      const menuButton = screen.getByRole('button', {name: 'Module Options'})
+      fireEvent.click(menuButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Send To...')).toBeInTheDocument()
+      })
+
+      const sendToMenuItem = screen.getByText('Send To...') as HTMLElement
+      fireEvent.click(sendToMenuItem)
+
+      await waitFor(() => {
+        expect(handleSendTo).toHaveBeenCalled()
+      })
+    })
+
+    it('calls handleCopyTo on copy to', async () => {
+      setUp()
+      const menuButton = screen.getByRole('button', {name: 'Module Options'})
+      fireEvent.click(menuButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Copy To...')).toBeInTheDocument()
+      })
+
+      const copyToMenuItem = screen.getByText('Copy To...') as HTMLElement
+      fireEvent.click(copyToMenuItem)
+
+      await waitFor(() => {
+        expect(handleCopyTo).toHaveBeenCalledWith(expect.any(Function))
+      })
+    })
+
+    it('opens the management tray on move contents', async () => {
+      setUp()
+      const menuButton = screen.getByRole('button', {name: 'Module Options'})
+      fireEvent.click(menuButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Move Contents...')).toBeInTheDocument()
+      })
+
+      const moveContentsMenuItem = screen.getByText('Move Contents...') as HTMLElement
+      fireEvent.click(moveContentsMenuItem)
+
+      await waitFor(() => {
+        expect(setIsManagementContentTrayOpenMock).toHaveBeenCalledWith(true)
+      })
+    })
+
+    it('opens the management tray on move module', async () => {
+      setUp()
+      const menuButton = screen.getByRole('button', {name: 'Module Options'})
+      fireEvent.click(menuButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Move Module...')).toBeInTheDocument()
+      })
+
+      const moveModuleMenuItem = screen.getByText('Move Module...') as HTMLElement
+      fireEvent.click(moveModuleMenuItem)
+
+      await waitFor(() => {
+        expect(setIsManagementContentTrayOpenMock).toHaveBeenCalledWith(true)
+      })
+    })
+
+    it('opens the differentiated modules tray on assign to', async () => {
+      setUp()
+      const menuButton = screen.getByRole('button', {name: 'Module Options'})
+      fireEvent.click(menuButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Assign To...')).toBeInTheDocument()
+      })
+
+      const assignToMenuItem = screen.getByText('Assign To...') as HTMLElement
+      fireEvent.click(assignToMenuItem)
+
+      await waitFor(() => {
+        expect(handleOpeningModuleUpdateTray).toHaveBeenCalledWith(
+          expect.anything(),
+          'test-course-id',
+          'test-module-id',
+          'Test Module',
+          'assign-to',
+          expect.anything(),
+        )
+      })
+    })
   })
 })

@@ -27,13 +27,13 @@ describe AuthenticationProvidersPresenter do
   end
 
   def stubbed_account(providers = [])
-    double(authentication_providers: double(active: providers))
+    instance_double(Account, authentication_providers: class_double(AuthenticationProvider, active: providers))
   end
 
   describe "#configs" do
     it "pulls configs from account" do
-      config2 = double(visible_to?: true)
-      account = stubbed_account([double(visible_to?: true), config2])
+      config2 = instance_double(AuthenticationProvider, visible_to?: true)
+      account = stubbed_account([instance_double(AuthenticationProvider, visible_to?: true), config2])
       presenter = described_class.new(account)
       expect(presenter.configs[1]).to eq(config2)
     end
@@ -46,7 +46,7 @@ describe AuthenticationProvidersPresenter do
 
     it "only pulls from the db connection one time" do
       account = double
-      expect(account).to receive(:authentication_providers).exactly(1).times.and_return(double(active: []))
+      expect(account).to receive(:authentication_providers).once.and_return(class_double(AuthenticationProvider, active: []))
       presenter = described_class.new(account)
       5.times { presenter.configs }
     end
@@ -93,13 +93,13 @@ describe AuthenticationProvidersPresenter do
 
   describe "#auth?" do
     it "is true for one aac" do
-      account = stubbed_account([double(visible_to?: true)])
+      account = stubbed_account([instance_double(AuthenticationProvider, visible_to?: true)])
       presenter = described_class.new(account)
       expect(presenter.auth?).to be(true)
     end
 
     it "is true for many aacs" do
-      account = stubbed_account([double(visible_to?: true), double(visible_to?: true)])
+      account = stubbed_account([instance_double(AuthenticationProvider, visible_to?: true), instance_double(AuthenticationProvider, visible_to?: true)])
       presenter = described_class.new(account)
       expect(presenter.auth?).to be(true)
     end
@@ -125,7 +125,8 @@ describe AuthenticationProvidersPresenter do
     end
 
     it "is false for aacs which are not ldap" do
-      account = stubbed_account([double(auth_type: "saml", visible_to?: true), double(auth_type: "cas", visible_to?: true)])
+      account = stubbed_account([instance_double(AuthenticationProvider, auth_type: "saml", visible_to?: true),
+                                 instance_double(AuthenticationProvider, auth_type: "cas", visible_to?: true)])
       presenter = described_class.new(account)
       expect(presenter.ldap_config?).to be(false)
     end
@@ -185,7 +186,10 @@ describe AuthenticationProvidersPresenter do
     it "selects out all ldap configs" do
       config = AuthenticationProvider::LDAP.new
       config2 = AuthenticationProvider::LDAP.new
-      account = stubbed_account([double(visible_to?: true), config, double(visible_to?: true), config2])
+      account = stubbed_account([instance_double(AuthenticationProvider, visible_to?: true),
+                                 config,
+                                 instance_double(AuthenticationProvider, visible_to?: true),
+                                 config2])
       presenter = described_class.new(account)
       expect(presenter.ldap_configs).to eq([config, config2])
     end
@@ -195,7 +199,10 @@ describe AuthenticationProvidersPresenter do
     it "selects out all saml configs" do
       config = AuthenticationProvider::SAML.new
       config2 = AuthenticationProvider::SAML.new
-      pre_configs = [double(visible_to?: true), config, double(visible_to?: true), config2]
+      pre_configs = [instance_double(AuthenticationProvider, visible_to?: true),
+                     config,
+                     instance_double(AuthenticationProvider, visible_to?: true),
+                     config2]
       allow(pre_configs).to receive(:all).and_return(AuthenticationProvider)
       account = stubbed_account(pre_configs)
       configs = described_class.new(account).saml_configs

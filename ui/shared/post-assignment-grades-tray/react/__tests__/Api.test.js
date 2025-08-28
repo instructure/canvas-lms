@@ -30,6 +30,8 @@ describe('PostAssignmentGradesTray Api', () => {
   const PROGRESS_ID = 7331
   const SECTION_IDS = ['2001', '2002', '2003']
 
+  const originalConsoleLog = console.log
+
   beforeEach(() => {
     MockCanvasClient.install([
       {
@@ -145,10 +147,18 @@ describe('PostAssignmentGradesTray Api', () => {
     })
 
     test('consumers are required to handle when mutating rejects', async () => {
+      const mockConsoleLog = jest.spyOn(console, 'log').mockImplementation(message => {
+        if (!message.includes('[GraphQL error]')) {
+          originalConsoleLog(message)
+        }
+      })
+
       try {
         await Api.postAssignmentGrades(BAD_ASSIGNMENT_ID)
       } catch (error) {
         strictEqual(error.message, 'a graphql error')
+      } finally {
+        mockConsoleLog.mockRestore()
       }
     })
   })
@@ -169,10 +179,18 @@ describe('PostAssignmentGradesTray Api', () => {
     })
 
     test('consumers are required to handle when mutating rejects', async () => {
+      const mockConsoleLog = jest.spyOn(console, 'log').mockImplementation(message => {
+        if (!message.includes('[GraphQL error]')) {
+          originalConsoleLog(message)
+        }
+      })
+
       try {
         await Api.postAssignmentGradesForSections(BAD_ASSIGNMENT_ID, SECTION_IDS)
       } catch (error) {
         strictEqual(error.message, 'a graphql error')
+      } finally {
+        mockConsoleLog.mockRestore()
       }
     })
   })

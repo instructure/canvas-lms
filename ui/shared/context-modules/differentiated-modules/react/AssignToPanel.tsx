@@ -296,60 +296,60 @@ export default function AssignToPanel({
           <Flex.Item>
             <Text>{I18n.t('By default, this module is visible to everyone.')}</Text>
           </Flex.Item>
-          <Flex.Item overflowX="hidden" margin="small 0 0 0">
-            <RadioInputGroup
-              description={I18n.t('Set Visibility')}
-              name="access_type"
-              data-testid="assign-to-panel-radio-group"
-            >
-              {[EVERYONE_OPTION, CUSTOM_OPTION].map(option => (
-                <Flex key={option.value} margin="0 xx-small 0 0">
-                  <Flex.Item align="start">
-                    <View as="div" margin="xx-small">
-                      <RadioInput
-                        data-testid={`${option.value}-option`}
-                        value={option.value}
-                        checked={selectedOption === option.value}
-                        onChange={handleChange}
-                        label={<ScreenReaderContent>{option.getLabel()}</ScreenReaderContent>}
-                      />
-                    </View>
-                  </Flex.Item>
-                  <Flex.Item shouldGrow={true} shouldShrink={true}>
-                    <View as="div">
-                      <Text>{option.getLabel()}</Text>
-                    </View>
-                    <View as="div">
-                      <Text color="secondary" size="small">
-                        {option.getDescription()}
-                      </Text>
-                    </View>
-                    {option.value === CUSTOM_OPTION.value &&
-                      selectedOption === CUSTOM_OPTION.value && (
-                        <View as="div" margin="small 0 0">
-                          <ModuleAssignments
-                            inputRef={el => (assigneeSelectorRef.current = el)}
-                            messages={visibleErrors}
-                            courseId={courseId}
-                            onSelect={assignees => {
-                              // i.e., if there's existing assignees and the user is removing all of them
-                              if (selectedAssignees.length > 0 && assignees.length === 0) {
-                                setSuppressEmptyAssigneeError(false)
-                              }
-                              setSelectedAssignees(assignees)
-                              changed.current = true
-                            }}
-                            defaultValues={selectedAssignees}
-                            onDismiss={onDismiss}
-                            onBlur={handleBlur}
-                          />
+          {!isLoading && (
+            <View margin="small 0 0 0">
+              <RadioInputGroup
+                description={I18n.t('Set Visibility')}
+                name="access_type"
+                data-testid="assign-to-panel-radio-group"
+                defaultValue={selectedOption}
+              >
+                {[EVERYONE_OPTION, CUSTOM_OPTION].map(option => (
+                  <RadioInput
+                    key={option.value}
+                    data-testid={`${option.value}-option`}
+                    value={option.value}
+                    checked={selectedOption === option.value}
+                    onChange={handleChange}
+                    label={
+                      <View as="div" padding="none small">
+                        <View as="div">
+                          <Text>{option.getLabel()}</Text>
                         </View>
-                      )}
+                        <View as="div">
+                          <Text color="secondary" size="small">
+                            {option.getDescription()}
+                          </Text>
+                        </View>
+                      </View>
+                    }
+                  />
+                ))}
+              </RadioInputGroup>
+              {selectedOption === CUSTOM_OPTION.value && (
+                <Flex margin="x-small large">
+                  <Flex.Item shouldGrow={true}>
+                    <ModuleAssignments
+                      inputRef={el => (assigneeSelectorRef.current = el)}
+                      messages={visibleErrors}
+                      courseId={courseId}
+                      onSelect={assignees => {
+                        // i.e., if there's existing assignees and the user is removing all of them
+                        if (selectedAssignees.length > 0 && assignees.length === 0) {
+                          setSuppressEmptyAssigneeError(false)
+                        }
+                        setSelectedAssignees(assignees)
+                        changed.current = true
+                      }}
+                      defaultValues={selectedAssignees}
+                      onDismiss={onDismiss}
+                      onBlur={handleBlur}
+                    />
                   </Flex.Item>
                 </Flex>
-              ))}
-            </RadioInputGroup>
-          </Flex.Item>
+              )}
+            </View>
+          )}
         </Flex>
       </Flex.Item>
       <Flex.Item margin="auto none none none" size={footerHeight}>

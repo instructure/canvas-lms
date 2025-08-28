@@ -244,6 +244,14 @@ describe Schemas::Lti::IMS::OidcRegistration do
       expect(errors(jwks_uri: "invalid")).to include("jwks_uri")
     end
 
+    it "requires a target_link_uri" do
+      expect(errors(ltc: { target_link_uri: :delete })).to include("target_link_uri")
+    end
+
+    it "doesn't allow a null target_link_uri" do
+      expect(errors(ltc: { target_link_uri: nil })).to include("target_link_uri")
+    end
+
     it "requires token_endpoint_auth_method to be 'private_key_jwt'" do
       expect(errors(token_endpoint_auth_method: "invalid")).to include("token_endpoint_auth_method")
     end

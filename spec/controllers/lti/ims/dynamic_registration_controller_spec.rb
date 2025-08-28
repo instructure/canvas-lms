@@ -116,7 +116,7 @@ describe Lti::IMS::DynamicRegistrationController do
       context "with no scopes" do
         subject do
           request.headers["Authorization"] = "Bearer #{valid_token}"
-          post :create, params: { **registration_params }
+          post :create, params: { **registration_params }, format: :json
         end
 
         let(:scopes) { nil }
@@ -314,6 +314,34 @@ describe Lti::IMS::DynamicRegistrationController do
         subject do
           request.headers["Authorization"] = "Bearer #{valid_token}"
           post :create, params: invalid_registration_params
+        end
+
+        context "missing a target_link_uri" do
+          let(:invalid_registration_params) do
+            invalid_params = registration_params
+            invalid_params["https://purl.imsglobal.org/spec/lti-tool-configuration"].delete("target_link_uri")
+            invalid_params
+          end
+
+          it "returns a 422 with validation errors" do
+            subject
+            expect(response).to have_http_status(:unprocessable_entity)
+            expect(response.body).to match(/target_link_uri/)
+          end
+        end
+
+        context "with a nil target_link_uri" do
+          let(:invalid_registration_params) do
+            invalid_params = registration_params
+            invalid_params["https://purl.imsglobal.org/spec/lti-tool-configuration"]["target_link_uri"] = nil
+            invalid_params
+          end
+
+          it "returns a 422 with validation errors" do
+            subject
+            expect(response).to have_http_status(:unprocessable_entity)
+            expect(response.body).to match(/target_link_uri/)
+          end
         end
 
         context "with invalid grant types" do

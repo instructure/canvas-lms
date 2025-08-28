@@ -64,7 +64,7 @@ describe "youtube migration", :ignore_js_errors do
         course_with_teacher_logged_in
       end
 
-      include_examples "overlay visibility"
+      it_behaves_like "overlay visibility"
     end
 
     context "student" do
@@ -72,7 +72,7 @@ describe "youtube migration", :ignore_js_errors do
         course_with_student_logged_in
       end
 
-      include_examples "overlay visibility"
+      it_behaves_like "overlay visibility"
     end
   end
 end

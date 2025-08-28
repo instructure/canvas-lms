@@ -22,6 +22,18 @@ import ContentTypeExternalToolDrawer from '../ContentTypeExternalToolDrawer'
 import MutexManager from '@canvas/mutex-manager/MutexManager'
 import {fallbackIframeAllowances} from '../constants'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
+import '@testing-library/jest-dom/extend-expect'
+import useBreakpoints from '@canvas/lti-apps/hooks/useBreakpoints'
+
+// Mock the useBreakpoints hook
+jest.mock('../../../lti-apps/hooks/useBreakpoints', () => ({
+  __esModule: true,
+  default: jest.fn(() => ({
+    isDesktop: true,
+    isMaxMobile: false,
+    isMaxTablet: false,
+  })),
+}))
 
 describe('ContentTypeExternalToolDrawer', () => {
   const tool = {
@@ -41,6 +53,15 @@ describe('ContentTypeExternalToolDrawer', () => {
   })()
   const pageContentTitle = 'page-content-title'
 
+  beforeEach(() => {
+    onDismiss.mockClear()
+    onExternalContentReady.mockClear()
+  })
+
+  afterAll(() => {
+    jest.resetAllMocks()
+  })
+
   function renderTray(props) {
     return render(
       <ContentTypeExternalToolDrawer
@@ -56,10 +77,6 @@ describe('ContentTypeExternalToolDrawer', () => {
       />,
     )
   }
-
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
 
   it('labels page content with LTI title', () => {
     const {getByLabelText} = renderTray()
@@ -92,6 +109,72 @@ describe('ContentTypeExternalToolDrawer', () => {
     it('renders an icon', () => {
       const {getByAltText} = renderTray()
       expect(getByAltText('First LTI Icon')).toHaveAttribute('src', icon_url)
+    })
+  })
+
+  describe('tray width', () => {
+    let origEnv
+
+    beforeEach(() => {
+      origEnv = {...window.ENV}
+    })
+
+    describe('when increased_top_nav_pane_size feature flag is enabled', () => {
+      beforeEach(() => {
+        window.ENV.FEATURES = {increased_top_nav_pane_size: true}
+      })
+
+      afterEach(() => {
+        window.ENV = origEnv
+        jest.clearAllMocks()
+      })
+
+      it('sets the width to 100vw on mobile view', () => {
+        useBreakpoints.mockReturnValue({
+          isMaxMobile: true,
+          isMaxTablet: false,
+        })
+        const {getByTestId} = renderTray()
+        expect(getByTestId('drawer-header')).toHaveStyle('width: 100vw')
+      })
+
+      it('sets the width to 100vw on tablet view', () => {
+        useBreakpoints.mockReturnValue({
+          isMaxMobile: false,
+          isMaxTablet: true,
+        })
+        const {getByTestId} = renderTray()
+        expect(getByTestId('drawer-header')).toHaveStyle('width: 100vw')
+      })
+
+      it('sets the width to 33vw on desktop view', () => {
+        useBreakpoints.mockReturnValue({
+          isMaxMobile: false,
+          isMaxTablet: false,
+        })
+        const {getByTestId} = renderTray()
+        expect(getByTestId('drawer-header')).toHaveStyle('width: 33vw')
+      })
+    })
+
+    describe('when increased_top_nav_pane_size feature flag is disabled', () => {
+      beforeEach(() => {
+        window.ENV.FEATURES = {increased_top_nav_pane_size: false}
+      })
+
+      afterEach(() => {
+        window.ENV = origEnv
+        jest.clearAllMocks()
+      })
+
+      it('sets the width to 320px regardless of viewport', () => {
+        useBreakpoints.mockReturnValue({
+          isMaxMobile: false,
+          isMaxTablet: false,
+        })
+        const {getByTestId} = renderTray()
+        expect(getByTestId('drawer-header')).toHaveStyle('width: 320px')
+      })
     })
   })
 

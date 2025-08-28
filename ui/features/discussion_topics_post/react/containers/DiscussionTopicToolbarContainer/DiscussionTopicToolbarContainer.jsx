@@ -136,7 +136,7 @@ const DiscussionTopicToolbarContainer = props => {
             </Flex.Item>
             <Flex.Item id="Main">
               <DiscussionPostButtonsToolbar
-                isAdmin={props.discussionTopic.permissions.readAsAdmin}
+                canViewGroupPages={props.discussionTopic.permissions.viewGroupPages}
                 canEdit={props.discussionTopic.permissions.update}
                 childTopics={getGroupsMenuTopics()}
                 selectedView={filter}
@@ -207,7 +207,7 @@ const DiscussionTopicToolbarContainer = props => {
             <h1>{props.discussionTopic.title}</h1>
           </ScreenReaderContent>
           <DiscussionPostToolbar
-            isAdmin={props.discussionTopic.permissions.readAsAdmin}
+            canViewGroupPages={props.discussionTopic.permissions.viewGroupPages}
             canEdit={props.discussionTopic.permissions.update}
             childTopics={getGroupsMenuTopics()}
             selectedView={filter}

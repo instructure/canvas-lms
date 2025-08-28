@@ -21,6 +21,7 @@ require "canvas/draft_state_validations"
 
 class Quizzes::Quiz < ActiveRecord::Base
   extend RootAccountResolver
+
   self.table_name = "quizzes"
 
   include Workflow
@@ -99,6 +100,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   resolves_root_account through: :context
 
   include MasterCourses::Restrictor
+
   restrict_columns :content, [:title, :description]
   restrict_columns :settings, %i[
     quiz_type
@@ -831,7 +833,10 @@ class Quizzes::Quiz < ActiveRecord::Base
       question["question_data"] = assessment_question.question_data
       question.assessment_question = assessment_question
       question.assessment_question_version = assessment_question.version_number
-      question.save
+      Quizzes::QuizQuestion.suspend_callbacks(:update_attachment_associations) do
+        question.save
+        question.copy_attachment_associations_from(assessment_question)
+      end
       question
     end
     questions.compact.uniq
@@ -1052,7 +1057,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     last_quiz_activity = [
       published_at || created_at,
-      quiz_submissions.completed.order("updated_at DESC").limit(1).pick(:updated_at)
+      quiz_submissions.completed.order(updated_at: :desc).limit(1).pick(:updated_at)
     ].compact.max
 
     candidate_stats = quiz_statistics.report_type(report_type).where(quiz_stats_opts).last

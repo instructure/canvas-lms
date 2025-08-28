@@ -69,7 +69,7 @@ RSpec.describe YoutubeMigrationService do
   before do
     allow(Lti::ContextToolFinder).to receive(:all_tools_for)
       .with(root_account)
-      .and_return(double(active: double(find_by: studio_tool)))
+      .and_return(class_double(ContextExternalTool, active: class_double(ContextExternalTool, find_by: studio_tool)))
   end
 
   describe "#queue_scan_course_for_embeds" do
@@ -354,7 +354,7 @@ RSpec.describe YoutubeMigrationService do
       expect(resources[aq_key]).to be_present
       expect(resources[aq_key][:name]).to eq("YouTube Question")
       expect(resources[aq_key][:count]).to eq(2)
-      expect(resources[aq_key][:embeds].map { |e| e[:src] }).to include(
+      expect(resources[aq_key][:embeds].pluck(:src)).to include(
         "https://www.youtube.com/embed/test123",
         "https://www.youtube.com/embed/comment456"
       )
@@ -394,7 +394,7 @@ RSpec.describe YoutubeMigrationService do
       quiz_key = "Quizzes::Quiz|#{quiz.id}"
       expect(resources[quiz_key]).to be_present
       expect(resources[quiz_key][:count]).to eq(3) # 1 from description, 2 from question
-      embeds_srcs = resources[quiz_key][:embeds].map { |e| e[:src] }
+      embeds_srcs = resources[quiz_key][:embeds].pluck(:src)
       expect(embeds_srcs).to include(
         "https://www.youtube.com/embed/quizdesc",
         "https://www.youtube.com/embed/quizq123",
@@ -417,7 +417,7 @@ RSpec.describe YoutubeMigrationService do
       topic_key = "DiscussionTopic|#{topic.id}"
       expect(resources[topic_key]).to be_present
       expect(resources[topic_key][:count]).to eq(2) # 1 from topic, 1 from entry
-      embeds_srcs = resources[topic_key][:embeds].map { |e| e[:src] }
+      embeds_srcs = resources[topic_key][:embeds].pluck(:src)
       expect(embeds_srcs).to include(
         "https://www.youtube.com/embed/topic123",
         "https://www.youtube.com/embed/entry456"
@@ -456,7 +456,7 @@ RSpec.describe YoutubeMigrationService do
       announcement_key = "Announcement|#{announcement.id}"
       expect(resources[announcement_key]).to be_present
       expect(resources[announcement_key][:count]).to eq(2) # 1 from announcement, 1 from entry
-      embeds_srcs = resources[announcement_key][:embeds].map { |e| e[:src] }
+      embeds_srcs = resources[announcement_key][:embeds].pluck(:src)
       expect(embeds_srcs).to include(
         "https://www.youtube.com/embed/main_video",
         "https://www.youtube.com/embed/reply_video"

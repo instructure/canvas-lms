@@ -43,6 +43,7 @@ import {EnvSmartSearch} from './EnvSmartSearch'
 import {EnvUserMerge} from './EnvUserMerge'
 import {EnvWikiPages} from './EnvWikiPages'
 import {EnvAuthentication} from './EnvAuthentication'
+import {EnvWidgetDashboard} from './EnvWidgetDashboard'
 
 /**
  * Top level ENV variable.
@@ -84,5 +85,6 @@ export type GlobalEnv =
         EnvLtiRegistrations &
         EnvSmartSearch &
         EnvHorizon &
-        EnvAuthentication
+        EnvAuthentication &
+        EnvWidgetDashboard
     >

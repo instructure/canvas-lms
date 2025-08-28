@@ -675,6 +675,8 @@ describe "Differentiation Tag Management" do
             ff("button[data-testid='remove-tag']")[0].click
             wait_for_ajaximations
 
+            f("[data-testid='continue-warning-modal']").click
+
             fj("button:contains('Save')").click
             wait_for_ajaximations
 
@@ -695,6 +697,8 @@ describe "Differentiation Tag Management" do
             # Delete the second tag variant via its remove button (updated selector)
             ff("button[data-testid='remove-tag']")[0].click
             wait_for_ajaximations
+
+            f("[data-testid='continue-warning-modal']").click
 
             # Add a new tag variant (updated button text)
             fj("button:contains('+ Add another tag')").click
@@ -771,6 +775,45 @@ describe "Differentiation Tag Management" do
             wait_for_ajaximations
             expect(f(".flashalert-message")).to be_displayed
             expect(fj("p:contains('Validation failed: You have reached the tag limit for this course')")).to be_displayed
+          end
+
+          it "focus the edit button after tag creation" do
+            fj("button:contains('+ Tag')").click
+            wait_for_ajaximations
+
+            expect(fj("h2:contains('Create Tag')")).to be_displayed
+
+            tag_input = f("[data-testid='tag-name-input']")
+            tag_input.send_keys("New Single Tag")
+
+            fj("button:contains('Save')").click
+            wait_for_ajaximations
+
+            # Verify that the modal is closed and the new tag is visible in the tray
+            expect(f("body")).not_to contain_jqcss("h2:contains('Create Tag')")
+            expect(fj("span:contains('New Single Tag')")).to be_displayed
+
+            active_element = driver.switch_to.active_element
+            expect(active_element.attribute("data-testid")).to eq "edit-button-tag-cat-#{GroupCategory.last.id}"
+
+            fj("button:contains('+ Tag')").click
+            wait_for_ajaximations
+
+            expect(fj("h2:contains('Create Tag')")).to be_displayed
+
+            tag_input = f("[data-testid='tag-name-input']")
+            tag_input.send_keys("New Single Tag 2")
+
+            fj("button:contains('Save')").click
+            wait_for_ajaximations
+
+            # Verify that the modal is closed and the new tag is visible in the tray
+            expect(f("body")).not_to contain_jqcss("h2:contains('Create Tag')")
+            expect(fj("span:contains('New Single Tag 2')")).to be_displayed
+
+            # Verify that focus is returned to the new tag on another page
+            active_element = driver.switch_to.active_element
+            expect(active_element.attribute("data-testid")).to eq "edit-button-tag-cat-#{GroupCategory.last.id}"
           end
         end
       end

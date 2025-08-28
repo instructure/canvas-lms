@@ -40,14 +40,14 @@ module CanvasCareer
     end
 
     before do
-      @config = double("config",
-                       learning_provider_app_launch_url: "https://learning-provider.example.com",
-                       learner_app_launch_url: "https://learner.example.com")
-      @user_preference = double("user_preference",
-                                prefers_academic?: false,
-                                prefers_career?: false,
-                                prefers_learning_provider?: false,
-                                prefers_learner?: false)
+      @config = instance_double(Config,
+                                learning_provider_app_launch_url: "https://learning-provider.example.com",
+                                learner_app_launch_url: "https://learner.example.com")
+      @user_preference = instance_double(UserPreferenceManager,
+                                         prefers_academic?: false,
+                                         prefers_career?: false,
+                                         prefers_learning_provider?: false,
+                                         prefers_learner?: false)
       allow(Config).to receive(:new).with(@root_account).and_return(@config)
       allow(UserPreferenceManager).to receive(:new).with(@session).and_return(@user_preference)
     end
@@ -384,6 +384,28 @@ module CanvasCareer
           Constants::App::ACADEMIC,
           Constants::App::CAREER_LEARNING_PROVIDER
         )
+      end
+    end
+
+    describe "self.career_affiliated_institution?" do
+      it "returns true when root account has horizon_account_ids" do
+        expect(ExperienceResolver.career_affiliated_institution?(@root_account)).to be true
+      end
+
+      it "returns false when root account has no horizon_account_ids" do
+        @root_account.settings[:horizon_account_ids] = []
+        @root_account.save!
+        expect(ExperienceResolver.career_affiliated_institution?(@root_account)).to be false
+      end
+
+      it "returns false when root account's horizon_account_ids is nil" do
+        @root_account.settings[:horizon_account_ids] = nil
+        @root_account.save!
+        expect(ExperienceResolver.career_affiliated_institution?(@root_account)).to be false
+      end
+
+      it "returns false when root account is nil" do
+        expect(ExperienceResolver.career_affiliated_institution?(nil)).to be false
       end
     end
   end

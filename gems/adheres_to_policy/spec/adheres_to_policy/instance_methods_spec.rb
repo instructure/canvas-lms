@@ -26,6 +26,7 @@ describe AdheresToPolicy::InstanceMethods do
       attr_accessor :user
 
       extend AdheresToPolicy::ClassMethods
+
       set_policy do
         given { |user| self.user == user }
         can :read
@@ -50,6 +51,7 @@ describe AdheresToPolicy::InstanceMethods do
   it "allows multiple forms of can statements" do
     actor_class = Class.new do
       extend AdheresToPolicy::ClassMethods
+
       set_policy do
         given { |user| user == 1 }
         can :read and can :write
@@ -71,6 +73,7 @@ describe AdheresToPolicy::InstanceMethods do
   it "checks parent conditions" do
     actor_class = Class.new do
       extend AdheresToPolicy::ClassMethods
+
       set_policy do
         given { |value| value[0] == true }
         use_additional_policy do
@@ -90,6 +93,7 @@ describe AdheresToPolicy::InstanceMethods do
   it "checks deeply nested parent conditions" do
     actor_class = Class.new do
       extend AdheresToPolicy::ClassMethods
+
       set_policy do
         given { |value| value[0] == true }
         use_additional_policy do
@@ -457,6 +461,7 @@ describe AdheresToPolicy::InstanceMethods do
           attr_reader :session
 
           extend AdheresToPolicy::ClassMethods
+
           set_policy do
             given { |_, session| @session = session }
             can :read
@@ -475,6 +480,7 @@ describe AdheresToPolicy::InstanceMethods do
         }
         actor_class = Class.new do
           extend AdheresToPolicy::ClassMethods
+
           set_policy do
             given { |_| true }
             can :read
@@ -497,6 +503,7 @@ describe AdheresToPolicy::InstanceMethods do
       it "must not use the rails cache for permissions included in the configured blacklist" do
         klass = Class.new do
           extend AdheresToPolicy::ClassMethods
+
           set_policy do
             given { |_| true }
             can :read
@@ -513,6 +520,7 @@ describe AdheresToPolicy::InstanceMethods do
       it "must cache permissions calculated using the same given block by default" do
         klass = Class.new do
           extend AdheresToPolicy::ClassMethods
+
           set_policy do
             given { |_| true }
             can :read, :write
@@ -532,6 +540,7 @@ describe AdheresToPolicy::InstanceMethods do
         AdheresToPolicy.configuration.cache_related_permissions = false
         klass = Class.new do
           extend AdheresToPolicy::ClassMethods
+
           set_policy do
             given { |_| true }
             can :read, :write

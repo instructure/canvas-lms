@@ -71,7 +71,10 @@ const Header = ({
   </Flex>
 )
 
-const EmptyState = ({onCreate}: {onCreate: () => void}) => (
+const EmptyState = ({
+  onCreate,
+  handleUploadCSV,
+}: {onCreate: () => void; handleUploadCSV: () => void}) => (
   <Flex
     direction="column"
     alignItems="center"
@@ -79,6 +82,7 @@ const EmptyState = ({onCreate}: {onCreate: () => void}) => (
     padding="medium"
     textAlign="center"
     margin="large 0 0 0"
+    data-testid="empty-state"
   >
     <Img
       src={pandasBalloonUrl}
@@ -99,9 +103,19 @@ const EmptyState = ({onCreate}: {onCreate: () => void}) => (
         {I18n.t('Learn more about how we used your input to create differentiation tags.')}
       </Link>
     </Text>
-    <Button onClick={onCreate} margin="large 0 0 0" color="primary" size="medium">
+    <Button onClick={onCreate} margin="large 0 medium 0" color="primary" size="medium">
       {I18n.t('Get Started')}
     </Button>
+    <Text size="small">{I18n.t('Or if you have already created tags with a CSV file,')}</Text>
+    <Link
+      variant="standalone"
+      as={'button'}
+      renderIcon={<IconUploadLine />}
+      href=""
+      onClick={handleUploadCSV}
+    >
+      {I18n.t('Upload CSV')}
+    </Link>
   </Flex>
 )
 
@@ -139,10 +153,19 @@ export default function DifferentiationTagTray(props: DifferentiationTagTrayProp
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create')
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | undefined>(undefined)
   const [currentPage, setCurrentPage] = useState(1)
+  const [newlyCreatedCategoryId, setNewlyCreatedCategoryId] = useState<number | null>(null)
   const itemsPerPage = 4
   const addTagRef = useRef<HTMLElement | null>(null)
   const focusElRef = useRef<(HTMLElement | null)[]>([])
   const [focusIndex, setFocusIndex] = useState<number | null>(null)
+
+  const handleCreationSuccess = (newCategoryID: number) => {
+    setNewlyCreatedCategoryId(newCategoryID)
+    if (searchTerm.length === 0) {
+      const newPage = Math.ceil((differentiationTagCategories.length + 1) / itemsPerPage)
+      setCurrentPage(newPage)
+    }
+  }
 
   const setAddTagRef = useCallback((el: Element | null) => {
     if (el instanceof HTMLElement) {
@@ -348,9 +371,11 @@ export default function DifferentiationTagTray(props: DifferentiationTagTrayProp
                 if (el instanceof HTMLElement) el.focus()
               })()
         }
+        newlyCreatedCategoryId={newlyCreatedCategoryId}
+        onEditButtonBlur={() => setNewlyCreatedCategoryId(null)}
       />
     ))
-  }, [paginatedCategories, handleEditCategory, focusElRef])
+  }, [paginatedCategories, handleEditCategory, focusElRef, newlyCreatedCategoryId])
 
   const handlePageChange = useCallback((newPage: number) => {
     setCurrentPage(newPage)
@@ -405,7 +430,7 @@ export default function DifferentiationTagTray(props: DifferentiationTagTrayProp
           </Text>
         </Flex.Item>
       ) : differentiationTagCategories.length === 0 ? (
-        <EmptyState onCreate={handleCreateNewTag} />
+        <EmptyState onCreate={handleCreateNewTag} handleUploadCSV={handleUploadCSV} />
       ) : filteredCategories.length === 0 && searchTerm.trim() ? (
         <Flex.Item shouldGrow shouldShrink margin="medium" textAlign="center">
           <Text>{I18n.t('No matching tags found.')}</Text>
@@ -449,10 +474,14 @@ export default function DifferentiationTagTray(props: DifferentiationTagTrayProp
             )}
           </Text>
         </Flex.Item>
-        <Flex.Item padding="0 medium" margin="0 0 large 0">
-          {/* TODO: Uncomment in EGG-1472
-          <Link variant="standalone" renderIcon={<IconDownloadLine />} href="">{I18n.t('Download Template File')}</Link> 
-          */}
+        <Flex.Item padding="xx-small medium" margin="0 0 large 0">
+          <Link
+            variant="standalone"
+            renderIcon={IconDownloadLine}
+            href={`/api/v1/courses/${ENV.course?.id}/group_categories/export_tags`}
+          >
+            {I18n.t('Download Template File')}
+          </Link>
           <Link
             variant="standalone"
             renderIcon={<IconExternalLinkLine />}
@@ -519,6 +548,7 @@ export default function DifferentiationTagTray(props: DifferentiationTagTrayProp
         onClose={() => setIsModalOpen(false)}
         mode={modalMode}
         differentiationTagCategoryId={selectedCategoryId}
+        onCreationSuccess={handleCreationSuccess}
       />
     </View>
   )

@@ -21,7 +21,7 @@ require_relative "page_objects/accessibility_pages"
 require_relative "page_objects/accessibility_dashboard"
 require_relative "page_objects/accessibility_drawer"
 
-describe "Accessibility Checker App UI", skip: "skipping for now to avoid flakiness, these specs will be updated in future PSs", type: :selenium do
+describe "Accessibility Checker App UI", skip: "temporarily skipping due to flakiness", type: :selenium do
   include_context "in-process server selenium tests"
   include AccessibilityPages
   include AccessibilityDrawer
@@ -35,7 +35,7 @@ describe "Accessibility Checker App UI", skip: "skipping for now to avoid flakin
     let(:scan_with_issues) do
       accessibility_resource_scan_model(
         course: @course,
-        wiki_page:,
+        context: wiki_page,
         workflow_state: "completed",
         resource_updated_at: "2025-07-19T02:18:00Z",
         resource_name: "Tutorial",
@@ -45,14 +45,23 @@ describe "Accessibility Checker App UI", skip: "skipping for now to avoid flakin
     end
 
     before do
+      # disable auto-scan on Account
+      allow_any_instance_of(Account).to receive(:enqueue_a11y_scan_if_enabled)
+      # disable auto-scan on WikiPage
+      allow_any_instance_of(WikiPage).to receive(:trigger_accessibility_scan_on_create)
+      allow_any_instance_of(WikiPage).to receive(:trigger_accessibility_scan_on_update)
+      allow_any_instance_of(WikiPage).to receive(:remove_accessibility_scan)
+
       course_with_teacher_logged_in
-      @course.enable_feature!(:accessibility_tab_enable)
+      account = @course.root_account
+      account.settings[:enable_content_a11y_checker] = true
+      account.save!
     end
 
     context "renders" do
       it "the Accessibility Checker App UI" do
         visit_accessibility_home_page(@course.id)
-        expect(accessibility_checker_container).to be_displayed
+        expect_a11y_container_to_be_displayed
       end
     end
 
@@ -61,7 +70,6 @@ describe "Accessibility Checker App UI", skip: "skipping for now to avoid flakin
         before do
           accessibility_issue_model(
             course: @course,
-            wiki_page:,
             accessibility_resource_scan: scan_with_issues,
             rule_type: Accessibility::Rules::ParagraphsForHeadingsRule.id,
             node_path: "./h2",
@@ -76,7 +84,7 @@ describe "Accessibility Checker App UI", skip: "skipping for now to avoid flakin
 
         it "page violates the paragraphs for headings rule" do
           visit_accessibility_home_page(@course.id)
-          expect(accessibility_checker_container).to be_displayed
+          expect_a11y_container_to_be_displayed
           fix_button(1).click
           apply_button.click
           expect(issue_preview).to contain_css("p")
@@ -94,7 +102,6 @@ describe "Accessibility Checker App UI", skip: "skipping for now to avoid flakin
           wiki_page.update(body: headings_start_at_h2_html)
           accessibility_issue_model(
             course: @course,
-            wiki_page:,
             accessibility_resource_scan: scan_with_issues,
             rule_type: Accessibility::Rules::HeadingsStartAtH2Rule.id,
             node_path: "./h1",
@@ -113,7 +120,7 @@ describe "Accessibility Checker App UI", skip: "skipping for now to avoid flakin
 
         it "page violates the headings start at h2 rule" do
           visit_accessibility_home_page(@course.id)
-          expect(accessibility_checker_container).to be_displayed
+          expect_a11y_container_to_be_displayed
           fix_button(1).click
           apply_button.click
           expect(issue_preview).to contain_css("h2")
@@ -130,17 +137,18 @@ describe "Accessibility Checker App UI", skip: "skipping for now to avoid flakin
       context "form type: text input with checkbox" do
         context "page violates img alt rule" do
           before do
-            # wiki_page.update(body: img_alt_rule_html, user: @teacher)
+            wiki_page.update(body: img_alt_rule_html)
             accessibility_issue_model(
               course: @course,
-              wiki_page:,
               accessibility_resource_scan: scan_with_issues,
               rule_type: Accessibility::Rules::ImgAltRule.id,
               node_path: "./p/img",
               metadata: {
                 element: "img",
                 form: {
-                  type: "checkbox_text_input"
+                  type: "checkbox_text_input",
+                  checkbox_label: "This image is decorative",
+                  label: "Alt text",
                 },
               }
             )
@@ -149,7 +157,7 @@ describe "Accessibility Checker App UI", skip: "skipping for now to avoid flakin
           it "selects the checkbox to fix the issue" do
             role = 'role="presentation"'
             visit_accessibility_home_page(@course.id)
-            expect(accessibility_checker_container).to be_displayed
+            expect_a11y_container_to_be_displayed
             fix_button(1).click
             text_input_with_checkbox_form_checkbox.click
             save_button.click
@@ -159,7 +167,7 @@ describe "Accessibility Checker App UI", skip: "skipping for now to avoid flakin
           it "selects the text input to fix the issue" do
             alt_text = 'alt="this is an alt"'
             visit_accessibility_home_page(@course.id)
-            expect(accessibility_checker_container).to be_displayed
+            expect_a11y_container_to_be_displayed
             fix_button(1).click
             text_input_with_checkbox_form_input.send_keys(alt_text.gsub("alt=", "").delete('"'))
             save_button.click
@@ -173,14 +181,14 @@ describe "Accessibility Checker App UI", skip: "skipping for now to avoid flakin
           wiki_page.update(body: table_caption_rule_html)
           accessibility_issue_model(
             course: @course,
-            wiki_page:,
             accessibility_resource_scan: scan_with_issues,
             rule_type: Accessibility::Rules::TableCaptionRule.id,
             node_path: "./table",
             metadata: {
               element: "table",
               form: {
-                type: "textinput"
+                type: "textinput",
+                label: "Table caption"
               },
             }
           )
@@ -189,7 +197,7 @@ describe "Accessibility Checker App UI", skip: "skipping for now to avoid flakin
         it "page violates the table caption rule" do
           caption = "<caption>This is a caption</caption>"
           visit_accessibility_home_page(@course.id)
-          expect(accessibility_checker_container).to be_displayed
+          expect_a11y_container_to_be_displayed
           fix_button(1).click
           text_input_form_input.send_keys("This is a caption")
           apply_button.click
@@ -208,7 +216,6 @@ describe "Accessibility Checker App UI", skip: "skipping for now to avoid flakin
           wiki_page.update(body: small_text_contrast_rule_html)
           accessibility_issue_model(
             course: @course,
-            wiki_page:,
             accessibility_resource_scan: scan_with_issues,
             rule_type: Accessibility::Rules::SmallTextContrastRule.id,
             node_path: "./p/span",
@@ -225,7 +232,7 @@ describe "Accessibility Checker App UI", skip: "skipping for now to avoid flakin
           base_color = { rgba: "rgba(248, 202, 198, 1)" }
           new_color = { hex: "248029", rgba: "rgba(36, 128, 41, 1)" }
           visit_accessibility_home_page(@course.id)
-          expect(accessibility_checker_container).to be_displayed
+          expect_a11y_container_to_be_displayed
           fix_button(1).click
           color_picker_form_input.send_keys(:control, "a")
           color_picker_form_input.send_keys(new_color[:hex])
@@ -239,6 +246,14 @@ describe "Accessibility Checker App UI", skip: "skipping for now to avoid flakin
           expect(wiki_page.reload.body).to include "color: ##{new_color[:hex]}"
         end
       end
+    end
+  end
+
+  private
+
+  def expect_a11y_container_to_be_displayed
+    keep_trying_for_attempt_times(attempts: 5, sleep_interval: 0.5) do
+      expect(accessibility_checker_container).to be_displayed
     end
   end
 end

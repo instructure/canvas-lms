@@ -271,7 +271,8 @@ export default class RosterUserView extends View {
     if (
       !window.confirm(
         I18n.t(
-          'Are you sure you want to deactivate this user? They will be unable to participate in the course while inactive.',
+          'Are you sure you want to deactivate %{name}? They will be unable to participate in the course while inactive.',
+          {name: this.model.get('name')},
         ),
       )
     ) {
@@ -323,7 +324,11 @@ export default class RosterUserView extends View {
   }
 
   removeFromCourse(_e) {
-    if (!window.confirm(I18n.t('Are you sure you want to remove this user?'))) {
+    if (
+      !window.confirm(
+        I18n.t('Are you sure you want to remove %{name}?', {name: this.model.get('name')}),
+      )
+    ) {
       return
     }
     this.$el.hide()

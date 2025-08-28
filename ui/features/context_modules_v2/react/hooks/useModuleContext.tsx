@@ -20,9 +20,9 @@ import {createContext, useContext, useState} from 'react'
 import {
   ExternalTool,
   ModuleCursorState,
-  MenuAction,
   MenuItemActionState,
   PerModuleState,
+  QuizEngine,
 } from '../utils/types'
 
 const ContextModule = createContext<{
@@ -30,7 +30,6 @@ const ContextModule = createContext<{
   isMasterCourse: boolean
   isChildCourse: boolean
   permissions: Record<string, boolean>
-  NEW_QUIZZES_BY_DEFAULT: boolean
   DEFAULT_POST_TO_SIS: boolean
   teacherViewEnabled: boolean
   studentViewEnabled: boolean
@@ -48,13 +47,15 @@ const ContextModule = createContext<{
   setModuleCursorState: React.Dispatch<React.SetStateAction<ModuleCursorState>>
   modulesArePaginated: boolean
   pageSize: number
+  showQuizzesEngineSelection: boolean
+  quizEngine: QuizEngine
+  setQuizEngine: React.Dispatch<React.SetStateAction<QuizEngine>>
 }>(
   {} as {
     courseId: string
     isMasterCourse: boolean
     isChildCourse: boolean
     permissions: Record<string, boolean>
-    NEW_QUIZZES_BY_DEFAULT: boolean
     DEFAULT_POST_TO_SIS: boolean
     teacherViewEnabled: boolean
     studentViewEnabled: boolean
@@ -74,6 +75,9 @@ const ContextModule = createContext<{
     setModuleCursorState: React.Dispatch<React.SetStateAction<ModuleCursorState>>
     modulesArePaginated: boolean
     pageSize: number
+    showQuizzesEngineSelection: boolean
+    quizEngine: QuizEngine
+    setQuizEngine: React.Dispatch<React.SetStateAction<QuizEngine>>
   },
 )
 
@@ -83,6 +87,7 @@ export const ContextModuleProvider = ({
   isMasterCourse,
   isChildCourse,
   permissions,
+  NEW_QUIZZES_ENABLED,
   NEW_QUIZZES_BY_DEFAULT,
   DEFAULT_POST_TO_SIS,
   teacherViewEnabled,
@@ -111,6 +116,7 @@ export const ContextModuleProvider = ({
         canDirectShare: boolean
       }
     | undefined
+  NEW_QUIZZES_ENABLED: boolean | undefined
   NEW_QUIZZES_BY_DEFAULT: boolean | undefined
   DEFAULT_POST_TO_SIS: boolean | undefined
   teacherViewEnabled: boolean
@@ -130,6 +136,11 @@ export const ContextModuleProvider = ({
   >({})
   const [moduleCursorState, setModuleCursorState] = useState<ModuleCursorState>({})
 
+  const initialQuizEngine = NEW_QUIZZES_ENABLED ? 'new' : 'classic'
+  const [quizEngine, setQuizEngine] = useState<QuizEngine>(initialQuizEngine)
+
+  const showQuizzesEngineSelection = !!(NEW_QUIZZES_ENABLED && !NEW_QUIZZES_BY_DEFAULT)
+
   return (
     <ContextModule.Provider
       value={{
@@ -137,7 +148,6 @@ export const ContextModuleProvider = ({
         isMasterCourse,
         isChildCourse,
         permissions: permissions ?? {},
-        NEW_QUIZZES_BY_DEFAULT: NEW_QUIZZES_BY_DEFAULT ?? false,
         DEFAULT_POST_TO_SIS: DEFAULT_POST_TO_SIS ?? false,
         teacherViewEnabled,
         studentViewEnabled,
@@ -155,6 +165,9 @@ export const ContextModuleProvider = ({
         setModuleCursorState,
         modulesArePaginated: modulesArePaginated ?? false,
         pageSize: pageSize ?? 10,
+        showQuizzesEngineSelection: showQuizzesEngineSelection,
+        quizEngine,
+        setQuizEngine,
       }}
     >
       {children}
@@ -179,7 +192,8 @@ export const contextModuleDefaultProps = {
     readAsAdmin: true,
     canManageSpeedGrader: true,
   },
-  NEW_QUIZZES_BY_DEFAULT: false,
+  NEW_QUIZZES_BY_DEFAULT: true,
+  NEW_QUIZZES_ENABLED: false,
   DEFAULT_POST_TO_SIS: false,
   teacherViewEnabled: false,
   studentViewEnabled: false,

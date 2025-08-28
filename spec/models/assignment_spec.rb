@@ -831,7 +831,7 @@ describe Assignment do
 
       identities = @assignment.grader_identities
       expect(identities.length).to eq 3
-      expect(identities.map { |i| i[:user_id] }).to eq [@teacher.id, second_teacher.id, third_teacher.id]
+      expect(identities.pluck(:user_id)).to eq [@teacher.id, second_teacher.id, third_teacher.id]
     end
   end
 
@@ -2377,6 +2377,7 @@ describe Assignment do
 
     context "group assignments with all students assigned to a group" do
       include GroupsCommon
+
       it "sorts by group name" do
         student_one = student_in_course(
           active_all: true, name: "Frodo Bravo", sortable_name: "Bravo, Frodo"
@@ -2449,6 +2450,7 @@ describe Assignment do
 
     context "group assignments with some students assigned to a group and some not" do
       include GroupsCommon
+
       it "sorts by student name and group name" do
         student_one = student_in_course(
           active_all: true, name: "Frodo Bravo", sortable_name: "Bravo, Frodo"
@@ -2572,6 +2574,7 @@ describe Assignment do
 
   context "group assignments with all students assigned to a group and grade_group_students_individually set to true" do
     include GroupsCommon
+
     it "sorts by sortable_name" do
       student_one = student_in_course(
         active_all: true, name: "Frodo Bravo", sortable_name: "Bravo, Frodo"
@@ -3477,15 +3480,15 @@ describe Assignment do
     end
 
     context "topics" do
-      let(:submission_type) { "discussion_topic" }
-
-      include_examples "submittable"
+      it_behaves_like "submittable" do
+        let(:submission_type) { "discussion_topic" }
+      end
     end
 
     context "pages" do
-      let(:submission_type) { "wiki_page" }
-
-      include_examples "submittable"
+      it_behaves_like "submittable" do
+        let(:submission_type) { "wiki_page" }
+      end
     end
   end
 
@@ -5650,6 +5653,11 @@ describe Assignment do
       end
 
       context "touch_assignment_and_submittables" do
+        it "does touch assignment" do
+          expect(@assignment).to receive(:touch).once
+          @assignment.touch_assignment_and_submittable
+        end
+
         it "does not schedule 'do_auto_peer_review' job" do
           expects_job_with_tag("Assignment#do_auto_peer_review", 0) do
             @assignment.touch_assignment_and_submittable
@@ -6550,44 +6558,44 @@ describe Assignment do
     end
 
     context "topics" do
-      let(:submission_type) { "discussion_topic" }
-      let(:submission_class) { DiscussionTopic }
+      it_behaves_like "submittable" do
+        let(:submission_type) { "discussion_topic" }
+        let(:submission_class) { DiscussionTopic }
 
-      include_examples "submittable"
+        it "does not delete the topic if non-empty when unlinked" do
+          expect(@a.submission_types).to eql(submission_type)
+          @topic = @a.discussion_topic
+          expect(@topic).not_to be_nil
+          expect(@topic.assignment_id).to eql(@a.id)
+          @topic.discussion_entries.create!(user: @user, message: "testing")
+          @a.discussion_topic.reload
+          @a.submission_types = "on_paper"
+          @a.save!
+          @a.reload
+          expect(@a.discussion_topic).to be_nil
+          expect(@a.state).to be(:published)
+          @topic = submission_class.find(@topic.id)
+          expect(@topic.assignment_id).to be_nil
+          expect(@topic.state).to be(:active)
+        end
 
-      it "does not delete the topic if non-empty when unlinked" do
-        expect(@a.submission_types).to eql(submission_type)
-        @topic = @a.discussion_topic
-        expect(@topic).not_to be_nil
-        expect(@topic.assignment_id).to eql(@a.id)
-        @topic.discussion_entries.create!(user: @user, message: "testing")
-        @a.discussion_topic.reload
-        @a.submission_types = "on_paper"
-        @a.save!
-        @a.reload
-        expect(@a.discussion_topic).to be_nil
-        expect(@a.state).to be(:published)
-        @topic = submission_class.find(@topic.id)
-        expect(@topic.assignment_id).to be_nil
-        expect(@topic.state).to be(:active)
-      end
-
-      it "grabs the original topic if unlinked and relinked" do
-        expect(@a.submission_types).to eql(submission_type)
-        @topic = @a.discussion_topic
-        expect(@topic).not_to be_nil
-        expect(@topic.assignment_id).to eql(@a.id)
-        @topic.discussion_entries.create!(user: @user, message: "testing")
-        @a.discussion_topic.reload
-        @a.submission_types = "on_paper"
-        @a.save!
-        @a.submission_types = "discussion_topic"
-        @a.save!
-        @a.reload
-        expect(@a.discussion_topic).to eql(@topic)
-        expect(@a.state).to be(:published)
-        @topic.reload
-        expect(@topic.state).to be(:active)
+        it "grabs the original topic if unlinked and relinked" do
+          expect(@a.submission_types).to eql(submission_type)
+          @topic = @a.discussion_topic
+          expect(@topic).not_to be_nil
+          expect(@topic.assignment_id).to eql(@a.id)
+          @topic.discussion_entries.create!(user: @user, message: "testing")
+          @a.discussion_topic.reload
+          @a.submission_types = "on_paper"
+          @a.save!
+          @a.submission_types = "discussion_topic"
+          @a.save!
+          @a.reload
+          expect(@a.discussion_topic).to eql(@topic)
+          expect(@a.state).to be(:published)
+          @topic.reload
+          expect(@topic.state).to be(:active)
+        end
       end
     end
 
@@ -6601,7 +6609,7 @@ describe Assignment do
           @course.save!
         end
 
-        include_examples "submittable"
+        it_behaves_like "submittable"
       end
 
       it "does not create a record if feature is disabled" do
@@ -9578,6 +9586,26 @@ describe Assignment do
       let(:secure_params) { "notajwt" }
 
       it { is_expected.to be_nil }
+    end
+  end
+
+  describe "#touch_assignment_and_submittable" do
+    it "does touch assignment" do
+      assignment = @course.assignments.create!(points_possible: 10, unlock_at: 30.minutes.from_now)
+      expect(assignment).to receive(:touch).once
+      assignment.touch_assignment_and_submittable
+    end
+  end
+
+  describe "#touch_on_unlock_if_necessary" do
+    it "schedules touch on unlock assignment delayed job" do
+      unlock_at_date = 30.minutes.from_now
+      assignment = @course.assignments.create!(points_possible: 10, unlock_at: unlock_at_date)
+      singleton = "touch_on_unlock_assignment_#{assignment.global_id}_#{unlock_at_date}"
+      assignment.touch_on_unlock_if_necessary
+
+      job = Delayed::Job.where(tag: "Assignment#touch_assignment_and_submittable", singleton:).last
+      expect(job.run_at).to eq unlock_at_date
     end
   end
 
@@ -12745,7 +12773,8 @@ describe Assignment do
   end
 
   it_behaves_like "an accessibility scannable resource" do
-    let(:valid_attributes) { { title: "Test Assignment", course: course_model } }
+    let(:course) { course_model }
+    let(:valid_attributes) { { title: "Test Assignment", course: } }
     let(:relevant_attributes_for_scan) { { description: "<p>Lorem ipsum</p>" } }
   end
 

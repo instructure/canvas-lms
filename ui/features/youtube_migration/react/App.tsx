@@ -509,7 +509,7 @@ const EmbedsModal: React.FC<{
                   </Flex.Item>
                 </Flex>
               </Flex.Item>
-              <Flex.Item margin="medium 0 0 0">
+              <Flex.Item margin="medium 0 0 0" padding="x-small">
                 <Button
                   color="primary"
                   display="block"

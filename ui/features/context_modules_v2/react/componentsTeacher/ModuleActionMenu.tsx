@@ -47,6 +47,8 @@ import {useContextModule} from '../hooks/useModuleContext'
 import {ModuleAction, ExternalTool, ExternalToolPlacementType} from '../utils/types'
 import {useExternalToolLaunch} from '../hooks/useExternalToolLaunch'
 import {useModuleItems} from '../hooks/queries/useModuleItems'
+import {dispatchCommandEvent} from '../handlers/dispatchCommandEvent'
+import {MOVE_MODULE, MOVE_MODULE_CONTENTS} from '../utils/constants'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -56,7 +58,6 @@ export interface ModuleActionMenuProps {
   setIsMenuOpen: React.Dispatch<React.SetStateAction<boolean>>
   id: string
   name: string
-  prerequisites?: {id: string; name: string; type: string}[]
   setIsDirectShareOpen: React.Dispatch<React.SetStateAction<boolean>>
   setIsDirectShareCourseOpen: React.Dispatch<React.SetStateAction<boolean>>
   setModuleAction?: React.Dispatch<React.SetStateAction<ModuleAction | null>>
@@ -70,7 +71,6 @@ const ModuleActionMenu: React.FC<ModuleActionMenuProps> = ({
   setIsMenuOpen,
   id,
   name,
-  prerequisites,
   setIsDirectShareOpen,
   setIsDirectShareCourseOpen,
   setModuleAction,
@@ -91,16 +91,8 @@ const ModuleActionMenu: React.FC<ModuleActionMenuProps> = ({
   const {data: moduleItems} = useModuleItems(id, null, expanded || isMenuOpen)
 
   const handleEditRef = useCallback(() => {
-    handleOpeningModuleUpdateTray(
-      data,
-      courseId,
-      id,
-      name,
-      prerequisites,
-      'settings',
-      moduleItems?.moduleItems,
-    )
-  }, [data, courseId, id, name, prerequisites, moduleItems])
+    dispatchCommandEvent({action: 'edit', courseId, moduleId: id})
+  }, [courseId, id])
 
   const handleMoveContentsRef = useCallback(() => {
     if (!data || !setModuleAction || !setIsManageModuleContentTrayOpen) return
@@ -109,7 +101,7 @@ const ModuleActionMenu: React.FC<ModuleActionMenuProps> = ({
       setSourceModule({id, title: name})
     }
 
-    setModuleAction('move_module_contents')
+    setModuleAction(MOVE_MODULE_CONTENTS)
     setIsManageModuleContentTrayOpen(true)
     setIsMenuOpen(false)
   }, [
@@ -129,7 +121,7 @@ const ModuleActionMenu: React.FC<ModuleActionMenuProps> = ({
       setSourceModule({id, title: name})
     }
 
-    setModuleAction('move_module')
+    setModuleAction(MOVE_MODULE)
     setIsManageModuleContentTrayOpen(true)
     setIsMenuOpen(false)
   }, [
@@ -143,16 +135,8 @@ const ModuleActionMenu: React.FC<ModuleActionMenuProps> = ({
   ])
 
   const handleAssignToRef = useCallback(() => {
-    handleOpeningModuleUpdateTray(
-      data,
-      courseId,
-      id,
-      name,
-      prerequisites,
-      'assign-to',
-      moduleItems?.moduleItems,
-    )
-  }, [data, courseId, id, name, prerequisites, moduleItems])
+    handleOpeningModuleUpdateTray(data, courseId, id, name, 'assign-to', moduleItems?.moduleItems)
+  }, [data, courseId, id, name, moduleItems])
 
   const handleDeleteRef = useCallback(() => {
     handleDelete(id, name, queryClient, courseId, setIsMenuOpen)
@@ -172,6 +156,9 @@ const ModuleActionMenu: React.FC<ModuleActionMenuProps> = ({
 
   const canDuplicate =
     moduleItems?.moduleItems.every(item => item.content?.canDuplicate) && expanded
+
+  const canMoveModuleContent =
+    (data?.pages[0].modules?.length ?? 0) > 1 && (moduleItems?.moduleItems?.length ?? 0) > 0
 
   const handleExternalToolLaunch = useCallback(
     (tool: ExternalTool, placement: ExternalToolPlacementType) => {
@@ -233,7 +220,7 @@ const ModuleActionMenu: React.FC<ModuleActionMenuProps> = ({
             </Flex>
           </Menu.Item>
         )}
-        {permissions?.canEdit && (
+        {permissions?.canEdit && canMoveModuleContent && (
           <Menu.Item onClick={handleMoveContentsRef}>
             <Flex>
               <Flex.Item>

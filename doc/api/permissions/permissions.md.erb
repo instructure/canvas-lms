@@ -1,0 +1,32 @@
+Permissions
+==============
+
+This document lists permissions that can be granted to account- and course-level roles in Canvas.
+
+## For Account-level roles only
+
+<% account_perms.keys.each do |perm_group| %>
+ <% if perm_group.present? %>
+### <%= perm_group %>
+ <% end %>
+| Key | Permission |
+|-----|------------| <% account_perms[perm_group].each do |perm| %>
+| `<%= perm[:key] %>` | <%= perm[:label] %> | <% end %>
+<% end %>
+
+## For both Account-level and Course-level roles
+
+ Note: Applicable enrollment types for course-level roles are given in brackets:
+   S = student, T = teacher (instructor), A = TA, D = designer, O = observer.
+   Lower-case letters indicate permissions that are off by default.
+   A missing letter indicates the permission cannot be enabled for the role
+   or any derived custom roles.
+
+<% course_perms.keys.each do |perm_group| %>
+  <% if perm_group.present? %>
+### <%= perm_group %>
+  <% end %>
+| Key | Available To | Permission |
+|-----|--------------|------------|  <% course_perms[perm_group].each do |perm| %>
+| `<%= perm[:key] %>` | `<%= perm[:available_to] %>` | <%= perm[:label] %> | <% end %>
+<% end %>

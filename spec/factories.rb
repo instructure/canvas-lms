@@ -46,7 +46,7 @@ module Factories
       klass.connection.bulk_insert klass.table_name, records
       next if return_type == :nil
 
-      scope = klass.order("id DESC").limit(records.size)
+      scope = klass.order(id: :desc).limit(records.size)
       if return_type == :record
         scope.to_a.reverse
       else

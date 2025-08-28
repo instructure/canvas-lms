@@ -18,6 +18,10 @@
 
 import {AccountWithCounts, SubaccountQueryKey} from './types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {createContext, ReactNode} from 'react'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {AsyncQueuer} from '@tanstack/react-pacer'
+import {queryClient as baseQueryClient} from '@canvas/query'
 
 const SUBACCOUNTS_PER_PAGE = 100
 
@@ -112,4 +116,52 @@ export const getSubAccounts = async ({
     addSubAccountsToSession(accountId, response)
   }
   return response
+}
+
+const CONCURRENCY = 2
+
+export const SubaccountContext = createContext<AsyncQueuer<() => void> | undefined>(undefined)
+
+interface SubaccountProviderProps {
+  children: ReactNode
+}
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      ...baseQueryClient.getDefaultOptions().queries,
+      experimental_prefetchInRender: true,
+    },
+  },
+})
+
+export const SubaccountProvider = ({children}: SubaccountProviderProps) => {
+  const queue = new AsyncQueuer(
+    async (enableQuery: () => void) => {
+      return enableQuery()
+    },
+    {
+      wait: (queue: AsyncQueuer<() => void>) => {
+        if (queue.store.state.size > CONCURRENCY) {
+          return 1000 // wait 1 second if the queue is long
+        }
+        return 0 // no wait time if the queue is short (ex. click expand button)
+      },
+      concurrency: CONCURRENCY,
+      started: true,
+      // if any query fails, log the error and move on
+      onReject: error => {
+        console.error('Error processing subaccount query:', error)
+      },
+      onError: error => {
+        console.error('Error processing subaccount query:', error)
+      },
+    },
+  )
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <SubaccountContext.Provider value={queue}>{children}</SubaccountContext.Provider>
+    </QueryClientProvider>
+  )
 }

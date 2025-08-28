@@ -22,7 +22,7 @@ require_relative "test_file_manager"
 module OtherHelperMethods
   def stub_kaltura
     # trick kaltura into being activated
-    kal = double("CanvasKaltura::ClientV3")
+    kal = instance_double(CanvasKaltura::ClientV3)
     allow(kal).to receive(:startSession).and_return "new_session_id_here"
     allow(CanvasKaltura::ClientV3).to receive_messages(
       config: {

@@ -23,16 +23,31 @@ module Types
     graphql_name "DiscussionParticipant"
 
     global_id_field :id
-    field :summary_enabled, Boolean, null: true
 
     field :expanded, Boolean, null: true
     def expanded
       object.discussion_topic.expanded_for_user(current_user)
     end
 
+    field :read, Boolean, null: false
+    def read_status
+      object.workflow_state == "read"
+    end
+    alias_method :read, :read_status
+
     field :sort_order, Types::DiscussionSortOrderType, null: true
     def sort_order
       object.discussion_topic.sort_order_for_user(current_user).to_sym
+    end
+
+    field :summary_enabled, Boolean, null: true
+    field :workflow_state, String, null: false
+    field :has_unread_pinned_entry, Boolean, null: true
+    field :show_pinned_entries, Boolean, null: true
+
+    field :discussion_topic, Types::DiscussionType, null: false
+    def discussion_topic
+      load_association(:discussion_topic)
     end
   end
 end

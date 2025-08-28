@@ -18,6 +18,7 @@
 
 export * from './RubricAssessmentTray'
 export * from './RubricAssessmentContainer'
+export * from './RubricAssessmentContainerWrapper'
 export * from './TraditionalView'
 export * from './utils/rubricUtils'
 export * from './OutcomeTag'

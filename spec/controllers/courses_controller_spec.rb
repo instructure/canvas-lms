@@ -281,7 +281,7 @@ describe CoursesController do
 
       context "on accessibility column" do
         before do
-          skip("Flaky spec needs fixed in LMA-226") unless Account.site_admin.feature_enabled?(:accessibility_tab_enable)
+          skip("Flaky spec needs fixed in LMA-226") unless @course1.root_account.enable_content_a11y_checker?
 
           # For accessibility column
           wiki_page = wiki_page_model(course: @course1)
@@ -2752,7 +2752,7 @@ describe CoursesController do
 
       it "creates attachment_associations when files are linked in the syllabus" do
         attachment_model(context: @user)
-        put "create", params: { account_id: @account.id, course: { syllabus_body: "<p><a href=\"/files/#{@attachment.id}\">#{@attachment.display_name}</a></p>" }, format: :json }
+        put "create", params: { account_id: @account.id, course: { syllabus_body: "<p><a href=\"/users/#{@user.id}/files/#{@attachment.id}\">#{@attachment.display_name}</a></p>" }, format: :json }
 
         expect(response).to be_successful
         json = response.parsed_body
@@ -3375,7 +3375,7 @@ describe CoursesController do
       it "adds attachment_associations when new files are linked in the syllabus" do
         media = attachment_model(context: @course, display_name: "292.mp3", uploaded_data: fixture_file_upload("292.mp3"), instfs_uuid: "media")
         new_body = <<~HTML
-          <p><a href="/files/#{@image.id}">#{@image.display_name}</a></p>
+          <p><a href="/courses/#{@course.id}/files/#{@image.id}">#{@image.display_name}</a></p>
           <p><iframe src="/media_attachments_iframe/#{media.id}?type=video&amp;embedded=true"></iframe></p>
         HTML
         put "update", params: { id: @course.id, course: { syllabus_body: new_body }, format: :json }

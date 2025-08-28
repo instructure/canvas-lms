@@ -20,16 +20,31 @@ import Animation from '../animation'
 import {continueLoadingInitialItems, loadFutureItems} from '../../actions'
 
 export class ContinueInitialLoad extends Animation {
+  getTotalItemsLoaded() {
+    const state = this.store().getState()
+    const days = state.days || []
+    let totalItems = 0
+    days.forEach(day => {
+      const items = day[1] || []
+      totalItems += items.length
+    })
+    return totalItems
+  }
+
   uiDidUpdate() {
     const moreItemsToLoad = !this.store().getState().loading.allFutureItemsLoaded
-    const keepLoading =
-      moreItemsToLoad &&
-      this.animator().isOnScreen(this.app().fixedElementForItemScrolling(), this.stickyOffset())
+    const totalItemsLoaded = this.getTotalItemsLoaded()
+    const MAX_ITEMS_THRESHOLD = 50
+    const hasEnoughItems = totalItemsLoaded >= MAX_ITEMS_THRESHOLD
+    const screenFull = !this.animator().isOnScreen(
+      this.app().fixedElementForItemScrolling(),
+      this.stickyOffset(),
+    )
+    const keepLoading = moreItemsToLoad && !hasEnoughItems && !screenFull
+
     if (keepLoading) {
-      // we have to do this after this animation is complete,
-      // because these actions can't be received recursively.
       this.window().setTimeout(() => {
-        this.store().dispatch(continueLoadingInitialItems()) // so we can invoke this animation again
+        this.store().dispatch(continueLoadingInitialItems())
         this.store().dispatch(loadFutureItems())
       }, 0)
     }

@@ -52,6 +52,7 @@ export interface EnvContextModules {
       }
     | undefined
   NEW_QUIZZES_BY_DEFAULT: boolean | undefined
+  NEW_QUIZZES_ENABLED: boolean | undefined
   DEFAULT_POST_TO_SIS: boolean | undefined
   MODULE_TOOLS: Record<string, unknown>
 
@@ -80,6 +81,10 @@ export interface EnvContextModules {
     isObserver: boolean
     observedStudent: {id: string; name: string} | null
     courseName: string
+  }
+  OBSERVER_OPTIONS?: {
+    OBSERVED_USERS_LIST: Array<{id: string; name: string; avatar_url?: string | null}>
+    CAN_ADD_OBSERVEE: boolean
   }
   CONTEXT_MODULES_HEADER_PROPS?: any
 }

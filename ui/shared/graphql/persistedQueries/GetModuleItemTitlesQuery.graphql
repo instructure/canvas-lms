@@ -1,0 +1,21 @@
+query GetModuleItemTitlesQuery($moduleId: ID!) {
+  legacyNode(_id: $moduleId, type: Module) {
+    ... on Module {
+      moduleItemsConnection(first: 1000) {
+        edges {
+          node {
+            _id
+            id
+            title
+            content {
+              type: __typename
+              ... on Assignment {
+                isNewQuiz
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

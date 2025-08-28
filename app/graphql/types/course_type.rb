@@ -258,7 +258,7 @@ module Types
         scope = apply_module_filters(scope, filter)
       end
 
-      scope.order("name")
+      scope.order(:name)
     end
 
     field :rubrics_connection, RubricType.connection_type, null: true

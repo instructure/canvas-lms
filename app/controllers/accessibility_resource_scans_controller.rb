@@ -111,9 +111,9 @@ class AccessibilityResourceScansController < ApplicationController
 
     if resource_types.present?
       conditions = []
-      conditions << "wiki_page_id IS NOT NULL" if resource_types.include?("wiki_page")
-      conditions << "assignment_id IS NOT NULL" if resource_types.include?("assignment")
-      conditions << "attachment_id IS NOT NULL" if resource_types.include?("attachment")
+      conditions << "accessibility_resource_scans.wiki_page_id IS NOT NULL" if resource_types.include?("wiki_page")
+      conditions << "accessibility_resource_scans.assignment_id IS NOT NULL" if resource_types.include?("assignment")
+      conditions << "accessibility_resource_scans.attachment_id IS NOT NULL" if resource_types.include?("attachment")
       relation = relation.where(conditions.join(" OR ")) if conditions.any?
     end
 
@@ -141,7 +141,7 @@ class AccessibilityResourceScansController < ApplicationController
       workflow_state: scan.workflow_state,
       error_message: scan.error_message || "",
       issue_count: scan_completed ? scan.issue_count : 0,
-      issues: scan_completed ? scan.accessibility_issues.active.map { |issue| issue_attributes(issue) } : []
+      issues: scan_completed ? scan.accessibility_issues.select(&:active?).map { |issue| issue_attributes(issue) } : []
     }
   end
 
@@ -158,7 +158,7 @@ class AccessibilityResourceScansController < ApplicationController
       message: rule&.message,
       why: rule&.why,
       path: issue.node_path,
-      issue_url: rule&.link,
+      issue_url: rule&.class&.link,
       form: issue.metadata["form"]
     }
   end

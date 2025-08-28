@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# rubocop:disable Migration/AddIndex, Migration/ChangeColumn, Migration/Execute, Migration/IdColumn
+# rubocop:disable Migration/ChangeColumn, Migration/Execute, Migration/IdColumn
 # rubocop:disable Migration/PrimaryKey, Migration/RootAccountId, Rails/CreateTableWithTimestamps
 # rubocop:disable Rails/ThreeStateBooleanColumn
 class InitCanvasDb < ActiveRecord::Migration[7.0]
@@ -5029,6 +5029,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     raise ActiveRecord::IrreversibleMigration
   end
 end
-# rubocop:enable Migration/AddIndex, Migration/ChangeColumn, Migration/Execute, Migration/IdColumn
+# rubocop:enable Migration/ChangeColumn, Migration/Execute, Migration/IdColumn
 # rubocop:enable Migration/PrimaryKey, Migration/RootAccountId, Rails/CreateTableWithTimestamps
 # rubocop:enable Rails/ThreeStateBooleanColumn

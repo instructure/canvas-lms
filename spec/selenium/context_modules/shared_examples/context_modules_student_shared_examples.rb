@@ -774,7 +774,7 @@ shared_examples "context modules for students" do
       sub_account = Account.create!(name: "sub account", parent_account: Account.default)
       @course.update!(account: sub_account)
       @course.account.enable_feature!(:discussion_checkpoints)
-      modules = create_modules(1, true)
+      @modules = create_modules(1, true)
 
       @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed topic")
       @c1 = Checkpoints::DiscussionCheckpointCreatorService.call(
@@ -790,7 +790,7 @@ shared_examples "context modules for students" do
         points_possible: 5,
         replies_required: 2
       )
-      modules[0].add_item({ id: @topic.id, type: "discussion_topic" })
+      @ck_item = @modules[0].add_item({ id: @topic.id, type: "discussion_topic" })
     end
 
     it "shows checkpoints with a submitted icon only when student has submitted" do
@@ -805,6 +805,25 @@ shared_examples "context modules for students" do
       checkpoints = ff("div[data-testid='checkpoint']")
       expect(checkpoints[0].text).to include("submitted")
       expect(checkpoints[1].text).to include("submitted")
+    end
+
+    it "shows checkpoints with completed icon when teacher grades the discussion" do
+      rtt = @topic.discussion_entries.create!(user: @student, message: "my reply to topic")
+      2.times do |i|
+        @topic.discussion_entries.create!(
+          user: @student, message: "my reply to entry #{i}", parent_entry: rtt
+        )
+      end
+
+      @c1.grade_student(@student, grade: 5, grader: @teacher)
+      @c2.grade_student(@student, grade: 5, grader: @teacher)
+      @modules[0].completion_requirements = { @ck_item.id => { type: "must_submit" } }
+      @modules[0].save!
+      user_session(@student)
+
+      go_to_modules
+
+      validate_context_module_item_icon(@ck_item.id, "icon-check")
     end
 
     it "shows checkpoints (with applicable override for student) as child items in checkpointed discussions" do

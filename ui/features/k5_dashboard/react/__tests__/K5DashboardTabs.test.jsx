@@ -32,6 +32,8 @@ const render = children =>
 
 const server = setupServer(
   http.get('/api/v1/dashboard/dashboard_cards', () => HttpResponse.json([])),
+  http.get('/api/v1/calendar_events', () => HttpResponse.json([])),
+  http.get('/api/v1/users/self/courses', () => HttpResponse.json([])),
 )
 
 // getByRole() causes these tests to be very slow, so provide a much faster helper

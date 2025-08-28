@@ -16,18 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {mockBlockContentEditorContext} from '../../../__tests__/mockBlockContentEditorContext'
 import {renderBlock} from '../../__tests__/render-helper'
 import {ImageTextBlock} from '../ImageTextBlock'
 import {ImageTextBlockProps} from '../types'
 
 jest.mock('../../../BlockContentEditorContext', () => ({
   __esModule: true,
-  useBlockContentEditorContext: jest.fn(() => ({})),
+  useBlockContentEditorContext: jest.fn(() => mockBlockContentEditorContext({})),
 }))
 
-const useGetRenderModeMock = jest.fn()
-jest.mock('../../BaseBlock/useGetRenderMode', () => ({
-  useGetRenderMode: () => useGetRenderModeMock(),
+const useIsInEditorMock = jest.fn()
+jest.mock('../../../hooks/useIsInEditor', () => ({
+  useIsInEditor: () => useIsInEditorMock(),
+}))
+
+const useIsEditingBlockMock = jest.fn()
+jest.mock('../../../hooks/useIsEditingBlock', () => ({
+  useIsEditingBlock: () => useIsEditingBlockMock(),
 }))
 
 const defaultProps: ImageTextBlockProps = {
@@ -35,31 +41,15 @@ const defaultProps: ImageTextBlockProps = {
   content: '',
   url: '',
   altText: '',
-  settings: {
-    includeBlockTitle: false,
-    backgroundColor: '',
-    textColor: '',
-    arrangement: 'left',
-    textToImageRatio: '1:1',
-  },
-}
-
-const editMode = {
-  isEditMode: true,
-  isEditPreviewMode: false,
-  isViewMode: false,
-}
-
-const previewMode = {
-  isEditMode: false,
-  isEditPreviewMode: true,
-  isViewMode: false,
-}
-
-const viewMode = {
-  isEditMode: false,
-  isEditPreviewMode: false,
-  isViewMode: true,
+  includeBlockTitle: false,
+  backgroundColor: '',
+  textColor: '',
+  arrangement: 'left',
+  textToImageRatio: '1:1',
+  fileName: '',
+  altTextAsCaption: false,
+  decorativeImage: false,
+  caption: '',
 }
 
 describe('ImageTextBlock', () => {
@@ -69,7 +59,8 @@ describe('ImageTextBlock', () => {
 
   describe('when block in edit mode', () => {
     beforeEach(() => {
-      useGetRenderModeMock.mockReturnValue(editMode)
+      useIsInEditorMock.mockReturnValue(true)
+      useIsEditingBlockMock.mockReturnValue(true)
     })
 
     it('does render in edit mode', () => {
@@ -80,7 +71,8 @@ describe('ImageTextBlock', () => {
 
   describe('when block in preview mode', () => {
     beforeEach(() => {
-      useGetRenderModeMock.mockReturnValue(previewMode)
+      useIsInEditorMock.mockReturnValue(true)
+      useIsEditingBlockMock.mockReturnValue(false)
     })
 
     it('does render in preview mode', () => {
@@ -91,7 +83,7 @@ describe('ImageTextBlock', () => {
 
   describe('when block in view mode', () => {
     beforeEach(() => {
-      useGetRenderModeMock.mockReturnValue(viewMode)
+      useIsInEditorMock.mockReturnValue(false)
     })
 
     it('does render in view mode', () => {

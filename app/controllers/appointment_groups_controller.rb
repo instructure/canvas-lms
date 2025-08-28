@@ -257,7 +257,7 @@ class AppointmentGroupsController < ApplicationController
       scope = scope.current unless value_to_boolean(params[:include_past_appointments])
     end
     groups = Api.paginate(
-      scope.order("id"),
+      scope.order(:id),
       self,
       api_v1_appointment_groups_url(scope: params[:scope])
     )

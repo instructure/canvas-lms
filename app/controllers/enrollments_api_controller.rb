@@ -342,6 +342,7 @@ class EnrollmentsApiController < ApplicationController
 
   include Api::V1::User
   include Api::V1::Progress
+
   # @API List enrollments
   # Depending on the URL given, return a paginated list of either (1) all of
   # the enrollments in a course, (2) all of the enrollments in a section or (3)
@@ -806,13 +807,17 @@ class EnrollmentsApiController < ApplicationController
   # @API Enroll multiple users to one or more courses
   # Enrolls multiple users in one or more courses in a single operation.
   # @argument user_ids[] [Required, Integer]
-  #   The user IDs to enroll in the courses.
+  #  The user IDs to enroll in the courses.
   #
   # @argument course_ids[] [Required, Integer]
   #  The course IDs to enroll each user in.
   #
+  # @argument enrollment_type [String, "StudentEnrollment"|"TeacherEnrollment"|"TaEnrollment"|"ObserverEnrollment"|"DesignerEnrollment"]
+  #   Enroll each user as a student, teacher, TA, observer, or designer. If no
+  #   value is given, the type will be 'StudentEnrollment'.
+  #
   # @example_request
-  #   curl https://<canvas>/api/v1/account/:account_id/bulk_enrollment \
+  #   curl https://<canvas>/api/v1/accounts/:account_id/bulk_enrollment \
   #     -X POST \
   #     -F 'user_ids[]=1' \
   #     -F 'user_ids[]=2' \
@@ -820,27 +825,39 @@ class EnrollmentsApiController < ApplicationController
   #     -F 'course_ids[]=11' \
   #
   # @example_request
-  #   curl https://<canvas>/api/v1/account/:account_id/bulk_enrollment \
+  #   curl https://<canvas>/api/v1/accounts/:account_id/bulk_enrollment \
   #     -X POST \
   #     -F 'user_ids[]=1' \
   #     -F 'course_ids[]=10' \
   #     -F 'course_ids[]=11' \
   #     -F 'course_ids[]=12' \
+  #     -F 'enrollment_type=TeacherEnrollment' \
   #
   # @returns Progress
   def bulk_enrollment
-    return render_unauthorized_action unless @context.grants_right?(@current_user, :manage_users_in_bulk)
-
     user_ids = params[:user_ids]
     course_ids = params[:course_ids]
+    enrollment_type = params[:enrollment_type] || "StudentEnrollment"
+
+    unless Enrollment.valid_type?(enrollment_type)
+      return render json: { errors: "Invalid enrollment type." }, status: :bad_request
+    end
+
     if !user_ids.empty? && !course_ids.empty? && (user_ids.size * course_ids.size) > 500
       return render json: { errors: "Too many users to enroll at once." }, status: :bad_request
+    end
+
+    course_ids.each do |course_id|
+      unless @current_user.can_create_enrollment_for?(api_find(Course, course_id), session, enrollment_type)
+        render_unauthorized_action and return
+      end
     end
 
     progress = Progress.create!(context: @context, user: @current_user, tag: :bulk_enrollment)
     process_params = {
       user_ids:,
-      course_ids:
+      course_ids:,
+      enrollment_type:
     }
 
     progress.process_job(Enrollment::BulkUpdate.new(@context, @current_user), :bulk_enrollment, { run_at: Time.zone.now, priority: Delayed::NORMAL_PRIORITY }, **process_params)

@@ -46,6 +46,10 @@ improved_outcomes_management:
   environments:
     development:
       state: on
+    test:
+      state: on
+    ci:
+      state: on
 assignment_comment_library:
   type: setting
   state: hidden
@@ -80,6 +84,10 @@ menu_option_for_outcome_details_page:
   environments:
     development:
       state: on
+    test:
+      state: on
+    ci:
+      state: on
 outcomes_friendly_description:
   state: hidden
   applies_to: SiteAdmin
@@ -101,6 +109,10 @@ outcome_service_results_to_canvas:
   description: Allows result data stored in the Outcomes Service to display in Canvas reporting (LMGB, sLMGB and outcome related admin reporting).
   environments:
     development:
+      state: on
+    test:
+      state: on
+    ci:
       state: on
 outcome_average_calculation:
   state: allowed_on
@@ -167,5 +179,11 @@ outcomes_rollup_propagation:
   state: hidden
   display_name: Outcomes Rollup Propagation
   description: Controls whether background jobs populate the rollup table. Only Site Admins can toggle.
+  applies_to: SiteAdmin
+  shadow: true
+outcomes_rollup_read:
+  state: hidden
+  display_name: Outcomes Rollup Read
+  description: When enabled, LMGB reads from rollup table instead of calculating. Only Site Admins can toggle.
   applies_to: SiteAdmin
   shadow: true

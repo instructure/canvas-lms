@@ -20,6 +20,7 @@
 module UngradedDiscussionVisibility
   class UngradedDiscussionVisibilityService
     extend VisibilityHelpers::Common
+
     class << self
       def discussion_topics_visible(course_ids: nil, user_ids: nil, discussion_topic_ids: nil)
         unless course_ids || user_ids || discussion_topic_ids

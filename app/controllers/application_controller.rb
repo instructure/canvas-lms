@@ -39,6 +39,7 @@ class ApplicationController < ActionController::Base
   include AuthenticationMethods
 
   include Canvas::RequestForgeryProtection
+
   protect_from_forgery with: :exception
 
   # Before/around actions run in order defined (even if interleaved)
@@ -284,7 +285,7 @@ class ApplicationController < ActionController::Base
           group_information:,
           DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account&.global_id,
           DOMAIN_ROOT_ACCOUNT_UUID: @domain_root_account&.uuid,
-          HORIZON_DOMAIN: @domain_root_account&.horizon_domain,
+          CAREER_THEME_URL: CanvasCareer::ExperienceResolver.career_affiliated_institution?(@domain_root_account) ? CanvasCareer::Config.new(@domain_root_account).theme_url : nil,
           k12: k12?,
           help_link_name:,
           help_link_icon:,
@@ -301,6 +302,7 @@ class ApplicationController < ActionController::Base
             release_notes_badge_disabled: @current_user&.release_notes_badge_disabled?,
             can_add_pronouns: @domain_root_account&.can_add_pronouns?,
             show_sections_in_course_tray: @domain_root_account&.show_sections_in_course_tray?,
+            enable_content_a11y_checker: @domain_root_account&.enable_content_a11y_checker?,
             suppress_assignments: @domain_root_account&.suppress_assignments?
           },
           RAILS_ENVIRONMENT: Canvas.environment
@@ -433,92 +435,92 @@ class ApplicationController < ActionController::Base
   # so altogether we can get them faster the vast majority of the time
   JS_ENV_SITE_ADMIN_FEATURES = %i[
     account_level_blackout_dates
-    render_both_to_do_lists
+    assignment_edit_placement_not_on_announcements
     commons_new_quizzes
     consolidated_media_player
-    explicit_latex_typesetting
-    media_links_use_attachment_id
-    permanent_page_links
-    enhanced_course_creation_account_fetching
-    instui_for_import_page
-    multiselect_gradebook_filters
-    assignment_edit_placement_not_on_announcements
-    instui_header
-    rce_find_replace
     courses_popout_sisid
+    create_external_apps_side_tray_overrides
+    create_wiki_page_mastery_path_overrides
     dashboard_graphql_integration
+    disallow_threaded_replies_fix_alert
+    disallow_threaded_replies_manage
     discussion_ai_survey_link
     discussion_checkpoints
     discussion_permalink
-    speedgrader_studio_media_capture
-    disallow_threaded_replies_fix_alert
-    disallow_threaded_replies_manage
-    horizon_course_setting
-    new_quizzes_media_type
-    validate_call_to_action
-    new_quizzes_navigation_updates
-    create_wiki_page_mastery_path_overrides
-    create_external_apps_side_tray_overrides
-    files_a11y_rewrite_toggle
+    enhanced_course_creation_account_fetching
+    explicit_latex_typesetting
     files_a11y_rewrite
-    rce_a11y_resize
+    files_a11y_rewrite_toggle
     hide_legacy_course_analytics
+    horizon_course_setting
+    instui_for_import_page
+    instui_header
+    media_links_use_attachment_id
+    multiselect_gradebook_filters
+    new_quizzes_media_type
+    new_quizzes_navigation_updates
+    permanent_page_links
+    rce_a11y_resize
+    rce_find_replace
+    render_both_to_do_lists
     scheduled_feedback_releases
-    standardize_assignment_date_formatting
+    speedgrader_studio_media_capture
+    validate_call_to_action
     youtube_overlay
-    accessibility_tab_enable
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
-    product_tours
+    account_level_mastery_scales
+    ams_service
+    buttons_and_icons_root_account
+    course_pace_allow_bulk_pace_assign
+    course_pace_download_document
+    course_pace_draft_state
+    course_pace_pacing_status_labels
+    course_pace_pacing_with_mastery_paths
+    course_pace_time_selection
+    course_pace_weighted_assignments
+    course_paces_skip_selected_days
     create_course_subaccount_picker
+    disable_iframe_sandbox_file_show
+    extended_submission_state
     file_verifiers_for_quiz_links
+    horizon_learner_app
+    horizon_learning_provider_app_on_contextless_routes
+    increased_top_nav_pane_size
+    instui_nav
+    login_registration_ui_identity
+    lti_apps_page_ai_translation
+    lti_apps_page_instructors
+    lti_asset_processor
+    lti_asset_processor_discussions
     lti_deep_linking_module_index_menu_modal
+    lti_link_to_apps_from_developer_keys
+    lti_registrations_discover_page
     lti_registrations_next
     lti_registrations_page
     lti_registrations_usage_data
     lti_registrations_usage_tab
-    lti_asset_processor
-    lti_asset_processor_discussions
-    buttons_and_icons_root_account
-    extended_submission_state
+    lti_toggle_placements
+    mobile_offline_mode
+    modules_requirements_allow_percentage
+    non_scoring_rubrics
+    open_tools_in_new_tab
+    product_tours
+    rce_lite_enabled_speedgrader_comments
+    rce_transform_loaded_content
+    react_discussions_post
+    restrict_student_access
+    rubric_criterion_range
     scheduled_page_publication
     send_usage_metrics
-    rce_transform_loaded_content
-    disable_iframe_sandbox_file_show
-    mobile_offline_mode
-    react_discussions_post
-    instui_nav
-    lti_registrations_discover_page
-    account_level_mastery_scales
-    non_scoring_rubrics
     top_navigation_placement
-    rubric_criterion_range
-    rce_lite_enabled_speedgrader_comments
-    lti_toggle_placements
-    login_registration_ui_identity
-    lti_apps_page_instructors
-    course_paces_skip_selected_days
-    course_pace_download_document
-    course_pace_draft_state
-    course_pace_time_selection
-    course_pace_pacing_status_labels
-    course_pace_pacing_with_mastery_paths
-    course_pace_weighted_assignments
-    modules_requirements_allow_percentage
-    course_pace_allow_bulk_pace_assign
-    lti_apps_page_ai_translation
-    ams_service
-    open_tools_in_new_tab
-    restrict_student_access
-    horizon_learner_app
-    horizon_learning_provider_app_on_contextless_routes
     youtube_migration
   ].freeze
   JS_ENV_ROOT_ACCOUNT_SERVICES = %i[account_survey_notifications].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = %i[
-    embedded_release_notes
-    discussion_checkpoints
     assign_to_differentiation_tags
+    discussion_checkpoints
+    embedded_release_notes
   ].freeze
   JS_ENV_FEATURES_HASH = Digest::SHA256.hexdigest(
     [
@@ -983,7 +985,7 @@ class ApplicationController < ActionController::Base
   ensure
     # this resets any locale set in set_locale_with_localizer (implicitly called
     # on any translation call)
-    I18n.locale = I18n.default_locale # rubocop:disable Rails/I18nLocaleAssignment
+    I18n.locale = I18n.default_locale
     I18n.localizer = nil
   end
 
@@ -1931,10 +1933,6 @@ class ApplicationController < ActionController::Base
     return unless (request.xhr? || request.put?) && params[:page_view_token] && !updated_fields.empty?
     return unless page_views_enabled?
 
-    RequestContext::Generator.store_interaction_seconds_update(
-      params[:page_view_token],
-      updated_fields[:interaction_seconds]
-    )
     page_view_info = CanvasSecurity::PageViewJwt.decode(params[:page_view_token])
     @page_view = PageView.find_for_update(page_view_info[:request_id])
     if @page_view
@@ -1945,6 +1943,11 @@ class ApplicationController < ActionController::Base
       end
       @page_view.do_update(updated_fields)
       @page_view_update = true
+
+      RequestContext::Generator.store_interaction_seconds_update(
+        @page_view,
+        updated_fields[:interaction_seconds]
+      )
     end
   end
 
@@ -3091,6 +3094,7 @@ class ApplicationController < ActionController::Base
     extend Api::V1::UserProfile
     extend Api::V1::Course
     extend Api::V1::Group
+
     includes ||= []
     data = user_profile_json(profile, viewer, session, includes, profile)
     data[:can_edit] = viewer == profile.user && profile.user.user_can_edit_profile?

@@ -37,6 +37,7 @@ export interface ModuleStudentProps {
   id: string
   name: string
   completionRequirements?: CompletionRequirement[]
+  position?: number
   prerequisites?: Prerequisite[]
   expanded?: boolean
   onToggleExpand?: (id: string) => void
@@ -50,6 +51,7 @@ export interface ModuleStudentProps {
 const ModuleStudent: React.FC<ModuleStudentProps> = ({
   id,
   completionRequirements,
+  position,
   prerequisites,
   expanded: propExpanded,
   onToggleExpand,
@@ -100,7 +102,8 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
             shadow="resting"
             overflowX="hidden"
             data-module-id={id}
-            className={`context_module module_${id}`}
+            data-position={position}
+            className={`context_module module_${id} ${isExpanded ? 'expanded' : 'collapsed'}`}
             id={`context_module_${id}`}
           >
             <Flex direction="column">

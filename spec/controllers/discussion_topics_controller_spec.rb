@@ -854,6 +854,60 @@ describe DiscussionTopicsController do
       expect(controller.js_env[:discussion_topic_menu_tools].first).to eq commons_hash
     end
 
+    context "ASSET_PROCESSOR_EULA_LAUNCH_URLS" do
+      it "sets ASSET_PROCESSOR_EULA_LAUNCH_URLS if the user is a student and the discussion is graded" do
+        assignment = assignment_model(course: @course)
+        discussion = discussion_topic_model(context: @course, assignment:)
+        user_session(@student)
+        urls = [
+          { name: "test tool", url: "http://localhost/courses/#{@course.id}/external_tools/1/eula_launch" }
+        ]
+        allow(Lti::EulaUiService).to receive(:eula_launch_urls)
+          .with(user: @student, assignment:)
+          .and_return(urls)
+
+        get :show, params: { course_id: @course.id, id: discussion.id }
+
+        expect(assigns[:js_env][:ASSET_PROCESSOR_EULA_LAUNCH_URLS]).to eq urls
+      end
+
+      it "does set ASSET_PROCESSOR_EULA_LAUNCH_URLS if the user is a teacher" do
+        assignment = assignment_model(course: @course)
+        discussion = discussion_topic_model(context: @course, assignment:)
+        user_session(@teacher)
+        urls = [
+          { name: "test tool", url: "http://localhost/courses/#{@course.id}/external_tools/1/eula_launch" }
+        ]
+        allow(Lti::EulaUiService).to receive(:eula_launch_urls)
+          .with(user: @teacher, assignment:)
+          .and_return(urls)
+
+        get :show, params: { course_id: @course.id, id: discussion.id }
+
+        expect(assigns[:js_env][:ASSET_PROCESSOR_EULA_LAUNCH_URLS]).to eq urls
+      end
+
+      it "does not set ASSET_PROCESSOR_EULA_LAUNCH_URLS for non-graded discussions" do
+        discussion = discussion_topic_model(context: @course)
+        user_session(@student)
+
+        get :show, params: { course_id: @course.id, id: discussion.id }
+
+        expect(assigns[:js_env][:ASSET_PROCESSOR_EULA_LAUNCH_URLS]).to be_nil
+      end
+
+      it "does not set ASSET_PROCESSOR_EULA_LAUNCH_URLS when lti_asset_processor_discussions feature flag is disabled" do
+        @course.root_account.disable_feature! :lti_asset_processor_discussions
+        assignment = assignment_model(course: @course)
+        discussion = discussion_topic_model(context: @course, assignment:)
+        user_session(@student)
+
+        get :show, params: { course_id: @course.id, id: discussion.id }
+
+        expect(assigns[:js_env][:ASSET_PROCESSOR_EULA_LAUNCH_URLS]).to be_nil
+      end
+    end
+
     context "assign to differentiation tags" do
       before :once do
         @course.account.enable_feature! :assign_to_differentiation_tags
@@ -1470,6 +1524,22 @@ describe DiscussionTopicsController do
         expect(@topic.read_state(@student)).to eq "unread"
         get "index", params: { course_id: @course.id, exclude_context_module_locked_topics: true }, format: "json"
         expect(response.parsed_body.pluck("id")).to_not include @topic.id
+      end
+
+      it "sets ASSET_PROCESSOR_EULA_LAUNCH_URLS with group context" do
+        user_session(@student)
+
+        urls = [
+          { name: "test tool", url: "http://localhost/courses/#{@course.id}/external_tools/1/eula_launch" }
+        ]
+
+        expect(Lti::EulaUiService).to receive(:eula_launch_urls)
+          .with(user: @student, assignment: @topic.assignment)
+          .and_return(urls)
+
+        get :show, params: { id: @group1.all_discussion_topics.last.id, group_id: @group1.id }
+
+        expect(assigns[:js_env][:ASSET_PROCESSOR_EULA_LAUNCH_URLS]).to eq urls
       end
     end
 

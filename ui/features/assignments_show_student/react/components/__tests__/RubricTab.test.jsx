@@ -17,6 +17,7 @@
  */
 import {fireEvent, render} from '@testing-library/react'
 import {mockQuery} from '@canvas/assignments/graphql/studentMocks'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import React from 'react'
 import $ from 'jquery'
 import RubricTab from '../RubricTab'
@@ -113,6 +114,14 @@ function makeStore(props) {
 }
 const originalENV = window.ENV
 
+const renderRubricTab = props => {
+  return render(
+    <MockedQueryProvider>
+      <RubricTab {...props} />
+    </MockedQueryProvider>,
+  )
+}
+
 describe('RubricTab', () => {
   beforeEach(() => {
     $.screenReaderFlashMessage = jest.fn()
@@ -128,7 +137,7 @@ describe('RubricTab', () => {
     it('contains "View Rubric" when peer review mode is OFF', async () => {
       const props = await makeProps({graded: false})
       props.peerReviewModeEnabled = false
-      const {findByText, queryByText} = render(<RubricTab {...props} />)
+      const {findByText, queryByText} = renderRubricTab(props)
 
       expect(await findByText('View Rubric')).toBeInTheDocument()
       expect(await queryByText('Fill Out Rubric')).not.toBeInTheDocument()
@@ -138,7 +147,7 @@ describe('RubricTab', () => {
       const props = await makeProps({graded: false})
       props.peerReviewModeEnabled = true
       makeStore(props)
-      const {findByText, queryByText} = render(<RubricTab {...props} />)
+      const {findByText, queryByText} = renderRubricTab(props)
 
       expect(await findByText('Fill Out Rubric')).toBeInTheDocument()
       expect(await queryByText('View Rubric')).not.toBeInTheDocument()
@@ -148,7 +157,7 @@ describe('RubricTab', () => {
       const props = await makeProps({graded: false})
       props.rubric.criteria[0].ratings[0].points = 9
       makeStore(props)
-      const {findByText, queryByText} = render(<RubricTab {...props} />)
+      const {findByText, queryByText} = renderRubricTab(props)
       fireEvent.click(await findByText(`9 pts`))
       expect(await queryByText(/^Total Points: 9 out of/)).not.toBeInTheDocument()
     })
@@ -165,7 +174,7 @@ describe('RubricTab', () => {
       it('contains "View Rubric" when peer review mode is OFF', async () => {
         const props = await makeProps({graded: false})
         props.peerReviewModeEnabled = false
-        const {findByText, queryByText} = render(<RubricTab {...props} />)
+        const {findByText, queryByText} = renderRubricTab(props)
 
         expect(await findByText('View Rubric')).toBeInTheDocument()
         expect(await queryByText('Fill Out Rubric')).not.toBeInTheDocument()
@@ -175,7 +184,7 @@ describe('RubricTab', () => {
         const props = await makeProps({graded: false})
         props.peerReviewModeEnabled = true
         makeStore(props)
-        const {findByText, queryByText} = render(<RubricTab {...props} />)
+        const {findByText, queryByText} = renderRubricTab(props)
 
         expect(await findByText('Fill Out Rubric')).toBeInTheDocument()
         expect(await queryByText('View Rubric')).not.toBeInTheDocument()
@@ -189,7 +198,7 @@ describe('RubricTab', () => {
       props.peerReviewModeEnabled = true
       props.rubric.criteria[0].ratings[0].points = 9
       makeStore(props)
-      const {findByText} = render(<RubricTab {...props} />)
+      const {findByText} = renderRubricTab(props)
       fireEvent.click(await findByText(`9 pts`))
       expect(await findByText(/^Total Points: 9 out of/)).toBeInTheDocument()
     })
@@ -198,7 +207,7 @@ describe('RubricTab', () => {
       const props = await makeProps({graded: true})
       props.peerReviewModeEnabled = true
       makeStore(props)
-      const {queryByText} = render(<RubricTab {...props} />)
+      const {queryByText} = renderRubricTab(props)
       expect(await queryByText('Select Grader')).not.toBeInTheDocument()
     })
 
@@ -206,14 +215,14 @@ describe('RubricTab', () => {
       const props = await makeProps({graded: true})
       props.peerReviewModeEnabled = true
       makeStore(props)
-      const {findByText} = render(<RubricTab {...props} />)
+      const {findByText} = renderRubricTab(props)
       expect(await findByText('Total Points: 8')).toBeInTheDocument()
     })
 
     it('shows alert explaining that the rubric needs to be filled out to complete the review', async () => {
       const props = await makeProps({graded: false})
       props.peerReviewModeEnabled = true
-      const {findByText} = render(<RubricTab {...props} />)
+      const {findByText} = renderRubricTab(props)
 
       expect(
         await findByText(
@@ -228,7 +237,7 @@ describe('RubricTab', () => {
       const assessment = {_id: '1', assessor: {_id: '1'}}
       props.assessments = [assessment]
       window.ENV.current_user.id = '1'
-      const {queryByText} = render(<RubricTab {...props} />)
+      const {queryByText} = renderRubricTab(props)
 
       expect(
         await queryByText(
@@ -249,7 +258,7 @@ describe('RubricTab', () => {
       it('opens rubric assessment tray by default', async () => {
         const props = makeProps({graded: false})
         props.peerReviewModeEnabled = true
-        const {getByTestId} = render(<RubricTab {...props} />)
+        const {getByTestId} = renderRubricTab(props)
         expect(getByTestId('enhanced-rubric-assessment-tray')).toBeInTheDocument()
       })
     })
@@ -259,7 +268,7 @@ describe('RubricTab', () => {
     it('contains the rubric ratings heading', async () => {
       const props = await makeProps({graded: false})
       makeStore(props)
-      const {findAllByText} = render(<RubricTab {...props} />)
+      const {findAllByText} = renderRubricTab(props)
 
       expect((await findAllByText('Ratings'))[1]).toBeInTheDocument()
     })
@@ -267,7 +276,7 @@ describe('RubricTab', () => {
     it('contains the rubric points heading', async () => {
       const props = await makeProps({graded: false})
       makeStore(props)
-      const {findAllByText} = render(<RubricTab {...props} />)
+      const {findAllByText} = renderRubricTab(props)
 
       expect((await findAllByText('Pts'))[1]).toBeInTheDocument()
     })
@@ -277,7 +286,7 @@ describe('RubricTab', () => {
       props.rubricAssociation = {_id: '1', hide_score_total: false, use_for_grading: false}
       makeStore(props)
 
-      const {findByText} = render(<RubricTab {...props} />)
+      const {findByText} = renderRubricTab(props)
 
       expect(await findByText(/\/ 6 pts/)).toBeInTheDocument()
     })
@@ -292,7 +301,7 @@ describe('RubricTab', () => {
       }
       makeStore(props)
 
-      const {queryByText} = render(<RubricTab {...props} />)
+      const {queryByText} = renderRubricTab(props)
 
       expect(queryByText(/\/ 6 pts/)).not.toBeInTheDocument()
     })
@@ -310,12 +319,12 @@ describe('RubricTab', () => {
     })
 
     it('displays comments', async () => {
-      const {findAllByText} = render(<RubricTab {...props} />)
+      const {findAllByText} = renderRubricTab(props)
       expect((await findAllByText('Comments'))[0]).toBeInTheDocument()
     })
 
     it('displays the points for an individual criterion', async () => {
-      const {findByText} = render(<RubricTab {...props} />)
+      const {findByText} = renderRubricTab(props)
       expect(await findByText('6 / 6 pts')).toBeInTheDocument()
     })
 
@@ -327,35 +336,35 @@ describe('RubricTab', () => {
         hide_points: true,
       }
 
-      const {queryByText} = render(<RubricTab {...props} />)
+      const {queryByText} = renderRubricTab(props)
       expect(queryByText('6 / 6 pts')).not.toBeInTheDocument()
     })
 
     it('displays the total points for the rubric assessment', async () => {
-      const {findByText} = render(<RubricTab {...props} />)
+      const {findByText} = renderRubricTab(props)
       expect(await findByText('Total Points: 5')).toBeInTheDocument()
     })
 
     it('displays the name of the assessor if present', async () => {
-      const {findByLabelText, findByText} = render(<RubricTab {...props} />)
+      const {findByLabelText, findByText} = renderRubricTab(props)
       fireEvent.click(await findByLabelText('Select Grader'))
       expect(await findByText('assessor1')).toBeInTheDocument()
     })
 
     it('displays the assessor enrollment if present', async () => {
-      const {findByLabelText, findByText} = render(<RubricTab {...props} />)
+      const {findByLabelText, findByText} = renderRubricTab(props)
       fireEvent.click(await findByLabelText('Select Grader'))
       expect(await findByText('assessor2 (TA)')).toBeInTheDocument()
     })
 
     it('displays "Anonymous" if the assessor is hidden', async () => {
-      const {findByLabelText, findByText} = render(<RubricTab {...props} />)
+      const {findByLabelText, findByText} = renderRubricTab(props)
       fireEvent.click(await findByLabelText('Select Grader'))
       expect(await findByText('Anonymous')).toBeInTheDocument()
     })
 
     it('changes the score when selecting a different assessor', async () => {
-      const {findByLabelText, findByText} = render(<RubricTab {...props} />)
+      const {findByLabelText, findByText} = renderRubricTab(props)
 
       expect(await findByText('Total Points: 5')).toBeInTheDocument()
       fireEvent.click(await findByLabelText('Select Grader'))
@@ -373,13 +382,13 @@ describe('RubricTab', () => {
       })
 
       it('displays the name of the assessor if present', async () => {
-        const {findByLabelText, findByText} = render(<RubricTab {...props} />)
+        const {findByLabelText, findByText} = renderRubricTab(props)
         fireEvent.click(await findByLabelText('Select Grader'))
         expect(await findByText('assessor1')).toBeInTheDocument()
       })
 
       it('displays in preview mode', () => {
-        const {getByTestId} = render(<RubricTab {...props} />)
+        const {getByTestId} = renderRubricTab(props)
         const assessmentData = props.assessments[0].data[0]
         const {criterion_id} = assessmentData
         const commentSection = getByTestId('comment-preview-text-area')

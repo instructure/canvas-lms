@@ -231,6 +231,8 @@ const DiscussionEntryContainerBase = ({breakpoints, ...props}) => {
                   breakpoints={breakpoints}
                   published={props.discussionTopic?.published}
                   isAnnouncement={props.discussionTopic?.isAnnouncement}
+                  isPinned={props.isPinned}
+                  pinnedBy={props.pinnedBy}
                 />
               </Flex.Item>
             )}
@@ -320,6 +322,8 @@ DiscussionEntryContainerBase.propTypes = {
   toggleUnread: PropTypes.func,
   breakpoints: breakpointsShape,
   delayedPostAt: PropTypes.string,
+  isPinned: PropTypes.bool,
+  pinnedBy: User.shape,
 }
 
 DiscussionEntryContainerBase.defaultProps = {

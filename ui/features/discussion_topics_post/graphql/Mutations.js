@@ -153,6 +153,7 @@ export const UPDATE_DISCUSSION_ENTRY = gql`
     $fileId: ID
     $removeAttachment: Boolean
     $quotedEntryId: ID
+    $pinType: DiscussionEntryPinningType
   ) {
     updateDiscussionEntry(
       input: {
@@ -161,6 +162,7 @@ export const UPDATE_DISCUSSION_ENTRY = gql`
         fileId: $fileId
         removeAttachment: $removeAttachment
         quotedEntryId: $quotedEntryId
+        pinType: $pinType
       }
     ) {
       discussionEntry {

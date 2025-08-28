@@ -76,6 +76,16 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
     onToggleExpand(id)
   }, [onToggleExpand, id])
 
+  const handleTitleKey = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault()
+        onToggleExpandRef()
+      }
+    },
+    [onToggleExpandRef],
+  )
+
   return (
     <View as="div" background="secondary" borderWidth="0 0 small 0">
       <Flex padding="small" justifyItems="space-between" alignItems="center" wrap="wrap">
@@ -88,6 +98,7 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
             </Flex.Item>
             <Flex.Item>
               <IconButton
+                id={`module-header-expand-toggle-${id}`}
                 size="small"
                 withBorder={false}
                 screenReaderLabel={expanded ? I18n.t('Collapse module') : I18n.t('Expand module')}
@@ -100,16 +111,26 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
             </Flex.Item>
             <Flex.Item padding="0 0 x-small 0" shouldGrow shouldShrink>
               <Flex direction="column" as="div" margin="none">
-                <Flex.Item margin="none">
+                <View
+                  as="span"
+                  margin="none"
+                  borderRadius="medium"
+                  onClick={onToggleExpandRef}
+                  onKeyDown={handleTitleKey}
+                  role="button"
+                  className="module_title"
+                  tabIndex={0}
+                  aria-describedby={`module_${id}_info`}
+                >
                   <Heading level="h2">
                     <Text size="medium" weight="bold" wrap="break-word">
                       {name}
                     </Text>
                   </Heading>
-                </Flex.Item>
+                </View>
                 {(unlockAt && isModuleUnlockAtDateInTheFuture(unlockAt)) ||
                 prerequisites?.length ? (
-                  <Flex.Item margin="none">
+                  <Flex.Item margin="none" id={`module_${id}_info`}>
                     <Flex gap="xx-small" alignItems="center" wrap="wrap">
                       {unlockAt && isModuleUnlockAtDateInTheFuture(unlockAt) && (
                         <Flex.Item>
@@ -158,7 +179,6 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
             name={name}
             expanded={expanded}
             published={published}
-            prerequisites={prerequisites}
             completionRequirements={completionRequirements}
             requirementCount={requirementCount || undefined}
             hasActiveOverrides={hasActiveOverrides}

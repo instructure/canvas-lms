@@ -40,6 +40,7 @@ class ContextExternalTool < ActiveRecord::Base
   belongs_to :lti_registration, class_name: "Lti::Registration"
 
   include MasterCourses::Restrictor
+
   restrict_columns :content, [:name, :description]
   restrict_columns :settings, %i[consumer_key shared_secret url domain settings]
 
@@ -632,7 +633,7 @@ class ContextExternalTool < ActiveRecord::Base
     if tool_hash[:error]
       @config_errors << [error_field, tool_hash[:error]]
     else
-      Importers::ContextExternalToolImporter.import_from_migration(tool_hash, context, nil, self)
+      Importers::ContextExternalToolImporter.import_from_migration(tool_hash, context, item: self, persist: false)
     end
     self.name = real_name unless real_name.blank?
   rescue CC::Importer::BLTIConverter::CCImportError => e

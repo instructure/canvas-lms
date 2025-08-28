@@ -17,6 +17,7 @@
  */
 
 import {useNode} from '@craftjs/core'
+import {Flex} from '@instructure/ui-flex'
 import {TextBlockProps} from './types'
 import {SettingsIncludeTitle} from '../BlockItems/SettingsIncludeTitle/SettingsIncludeTitle'
 import {SettingsSectionToggle} from '../BlockItems/SettingsSectionToggle/SettingsSectionToggle'
@@ -30,9 +31,11 @@ export const TextBlockSettings = () => {
     actions: {setProp},
     includeBlockTitle,
     backgroundColor,
+    titleColor,
   } = useNode(node => ({
     includeBlockTitle: node.data.props.settings.includeBlockTitle,
     backgroundColor: node.data.props.settings.backgroundColor,
+    titleColor: node.data.props.settings.titleColor,
   }))
 
   const handleIncludeBlockTitleChange = () => {
@@ -47,6 +50,12 @@ export const TextBlockSettings = () => {
     })
   }
 
+  const handleTitleColorChange = (color: string) => {
+    setProp((props: TextBlockProps) => {
+      props.settings.titleColor = color
+    })
+  }
+
   return (
     <>
       <SettingsIncludeTitle checked={includeBlockTitle} onChange={handleIncludeBlockTitleChange} />
@@ -54,16 +63,28 @@ export const TextBlockSettings = () => {
         title={I18n.t('Color settings')}
         collapsedLabel={I18n.t('Expand color settings')}
         expandedLabel={I18n.t('Collapse color settings')}
-        defaultExpanded={false}
+        defaultExpanded={true}
         includeSeparator={true}
       >
-        <ColorPickerWrapper
-          label={I18n.t('Background')}
-          value={backgroundColor}
-          baseColor="#000000" // Temporary base color
-          baseColorLabel={I18n.t('Text')}
-          onChange={handleBackgroundColorChange}
-        />
+        <Flex direction="column" gap="medium">
+          <ColorPickerWrapper
+            label={I18n.t('Background')}
+            value={backgroundColor}
+            baseColor={titleColor}
+            baseColorLabel={I18n.t('Title')}
+            onChange={handleBackgroundColorChange}
+          />
+
+          {includeBlockTitle && (
+            <ColorPickerWrapper
+              label={I18n.t('Title')}
+              value={titleColor}
+              baseColor={backgroundColor}
+              baseColorLabel={I18n.t('Background')}
+              onChange={handleTitleColorChange}
+            />
+          )}
+        </Flex>
       </SettingsSectionToggle>
     </>
   )

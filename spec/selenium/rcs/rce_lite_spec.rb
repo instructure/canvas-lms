@@ -28,7 +28,7 @@ require_relative "../helpers/wiki_and_tiny_common"
 require_relative "pages/rce_next_page"
 require_relative "pages/rcs_sidebar_page"
 
-# rubocop:disable Specs/NoNoSuchElementError, Specs/NoExecuteScript
+# rubocop:disable Specs/NoExecuteScript
 
 describe "RCE next tests" do
   include_context "in-process server selenium tests"
@@ -223,4 +223,4 @@ describe "RCE next tests" do
   # there is an rce variant 'no-controls', but I don't think it's useful and will probably be removed
 end
 
-# rubocop:enable Specs/NoNoSuchElementError, Specs/NoExecuteScript
+# rubocop:enable Specs/NoExecuteScript

@@ -198,7 +198,7 @@ module Lti
       context "placements" do
         RSpec::Matchers.define :include_placement do |placement|
           match do |resource_placements|
-            !(resource_placements.select { |p| p.placement == placement }).empty?
+            resource_placements.any? { |p| p.placement == placement }
           end
         end
 

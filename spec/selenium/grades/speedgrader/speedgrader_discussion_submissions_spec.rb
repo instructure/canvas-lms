@@ -211,6 +211,9 @@ describe "SpeedGrader - discussion submissions", :ignore_js_errors do
         Speedgrader.wait_for_discussions_iframe
         in_frame("discussion_preview_iframe") do
           wait_for_ajaximations
+          # neither btn nor button should be present
+          expect(f("body")).not_to contain_css("[data-testid='groups-menu-btn']")
+          expect(f("body")).not_to contain_css("[data-testid='groups-menu-button']")
           expect(f("div[data-testid='isHighlighted']").text).to include(@student.name)
           expect(f(".discussions-search-filter")).to be_displayed
         end

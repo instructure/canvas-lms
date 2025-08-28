@@ -29,13 +29,13 @@ module Accessibility
     private
 
     def trigger_accessibility_scan_on_create
-      return unless Account.site_admin.feature_enabled?(:accessibility_tab_enable)
+      return unless root_account.enable_content_a11y_checker?
 
       Accessibility::ResourceScannerService.call(resource: self)
     end
 
     def trigger_accessibility_scan_on_update
-      return unless Account.site_admin.feature_enabled?(:accessibility_tab_enable)
+      return unless root_account.enable_content_a11y_checker?
       return unless scan_relevant_attribute_changed?
 
       Accessibility::ResourceScannerService.call(resource: self)
@@ -44,14 +44,14 @@ module Accessibility
     def scan_relevant_attribute_changed?
       case self
       when WikiPage
-        saved_change_to_body?
+        saved_change_to_body? || saved_change_to_title?
       else
         true
       end
     end
 
     def remove_accessibility_scan
-      return unless Account.site_admin.feature_enabled?(:accessibility_tab_enable)
+      return unless root_account.enable_content_a11y_checker?
 
       AccessibilityResourceScan.for_context(self).destroy_all
     end

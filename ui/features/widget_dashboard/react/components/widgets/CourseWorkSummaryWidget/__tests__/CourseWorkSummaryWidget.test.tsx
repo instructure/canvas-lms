@@ -17,12 +17,13 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor, fireEvent} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
 import CourseWorkSummaryWidget from '../CourseWorkSummaryWidget'
 import type {BaseWidgetProps, Widget} from '../../../../types'
+import {defaultGraphQLHandlers} from '../../../../__tests__/testHelpers'
 
 const mockCoursesData = [
   {
@@ -91,7 +92,7 @@ const setup = (props: Props = buildDefaultProps()) => {
   }
 }
 
-const server = setupServer()
+const server = setupServer(...defaultGraphQLHandlers)
 
 describe('CourseWorkSummaryWidget', () => {
   beforeAll(() => server.listen())

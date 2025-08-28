@@ -176,7 +176,7 @@ export const AddressBook = ({
   // read out every item for screenreader
   useEffect(() => {
     if (selectedItemName && isMenuOpen) {
-      setOnSuccess(selectedItemName)
+      setOnSuccess(I18n.t("Filtered by '%{selectedItemName}'", {selectedItemName}))
     }
   }, [isMenuOpen, selectedItemName, setOnSuccess])
 
@@ -522,7 +522,7 @@ export const AddressBook = ({
       addTag(menuItem, shouldCloseMenu)
       onSelect(menuItem)
       if (onUserFilterSelect) {
-        onUserFilterSelect(menuItem?._id ? `user_${menuItem?._id}` : undefined)
+        onUserFilterSelect(menuItem)
       }
     } else {
       setIsSubMenuSelection(true)

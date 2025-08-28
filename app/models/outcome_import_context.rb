@@ -22,6 +22,7 @@ module OutcomeImportContext
   def self.included(klass)
     klass.class_eval do
       include Canvas::OutcomeImportValidations
+
       has_many :outcome_imports, as: :context, inverse_of: :context, dependent: :destroy
       belongs_to :latest_outcome_import, class_name: "OutcomeImport"
     end

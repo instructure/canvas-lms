@@ -21,9 +21,7 @@
 # some if the specs in here include "ignore_js_errors: true". This is because
 # console errors are emitted for things that aren't really errors, like react
 # jsx attribute type warnings
-#
-# rubocop:disable Specs/NoNoSuchElementError, Specs/NoExecuteScript
-#
+
 require_relative "../common"
 require_relative "pages/block_editor_page"
 
@@ -342,4 +340,3 @@ describe "Block Editor", :ignore_js_errors do
     end
   end
 end
-# rubocop:enable Specs/NoNoSuchElementError, Specs/NoExecuteScript

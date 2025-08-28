@@ -20,6 +20,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
+import {possibleStringValue} from '../../Points'
 
 const I18n = createI18nScope('rubrics-form')
 
@@ -56,7 +57,9 @@ export const CriteriaBuilderHeader = ({
               data-testid={`rubric-points-possible-${rubricId}`}
               themeOverride={{h2FontWeight: 700, h2FontSize: '22px', lineHeight: '1.75rem'}}
             >
-              {pointsPossible} {I18n.t('Points Possible')}
+              {I18n.t('%{pointsPossible} Points Possible', {
+                pointsPossible: possibleStringValue(pointsPossible),
+              })}
             </Heading>
           </Flex.Item>
         )}

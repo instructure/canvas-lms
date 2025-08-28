@@ -29,6 +29,7 @@ class ParallelImporter < ActiveRecord::Base
   scope :not_completed, -> { where(workflow_state: %w[pending queued running retry]) }
 
   include Workflow
+
   workflow do
     state :pending
     state :queued

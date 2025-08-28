@@ -78,7 +78,6 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
     submission_params = {
       annotatable_attachment_id: assignment.annotatable_attachment_id,
       attachments: [],
-      body: "",
       require_submission_type_is_valid: true,
       submission_type:,
       url: nil
@@ -93,31 +92,25 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
       submission_params[:resource_link_lookup_uuid] = input[:resource_link_lookup_uuid]
     when "student_annotation"
       if assignment.annotatable_attachment_id.blank?
-        return(
-          validation_error(
-            I18n.t("Student Annotation submissions require an annotatable_attachment_id to submit")
-          )
+        return validation_error(
+          I18n.t("Student Annotation submissions require an annotatable_attachment_id to submit")
         )
       end
     when "media_recording"
       unless input[:media_id]
-        return(
-          validation_error(
-            I18n.t(
-              "%{media_recording} submissions require a %{media_id} to submit",
-              { media_recording: "media_recording", media_id: "media_id" }
-            )
+        return validation_error(
+          I18n.t(
+            "%{media_recording} submissions require a %{media_id} to submit",
+            { media_recording: "media_recording", media_id: "media_id" }
           )
         )
       end
       media_object = MediaObject.by_media_id(input[:media_id]).first
       unless media_object
-        return(
-          validation_error(
-            I18n.t(
-              "The %{media_id} does not correspond to an existing media object",
-              { media_id: "media_id" }
-            )
+        return validation_error(
+          I18n.t(
+            "The %{media_id} does not correspond to an existing media object",
+            { media_id: "media_id" }
           )
         )
       end
@@ -151,14 +144,12 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
       end
 
       if error_files.present?
-        return(
-          validation_error(
-            I18n.t(
-              "No attachments found for the following ids: %{ids}",
-              { ids: error_files }
-            ),
-            attribute: "file_ids"
-          )
+        return validation_error(
+          I18n.t(
+            "No attachments found for the following ids: %{ids}",
+            { ids: error_files }
+          ),
+          attribute: "file_ids"
         )
       end
 
@@ -185,11 +176,9 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
   # TODO: move file validation to the model
   def validate_online_upload(assignment, attachments, is_proxy: false)
     if attachments.blank?
-      return(
-        validation_error(
-          I18n.t("You must attach at least one file to this assignment"),
-          attribute: "file_ids"
-        )
+      return validation_error(
+        I18n.t("You must attach at least one file to this assignment"),
+        attribute: "file_ids"
       )
     end
 

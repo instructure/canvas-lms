@@ -16,90 +16,129 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {BaseBlock, useGetRenderMode} from '../BaseBlock'
+import {BaseBlockHOC} from '../BaseBlock'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ImageTextBlockSettings} from './ImageTextBlockSettings'
-import {Flex} from '@instructure/ui-flex'
-import {ImageTextBlockEdit} from './ImageTextBlockEdit'
-import {ImageTextBlockEditPreview} from './ImageTextBlockEditPreview'
 import {ImageTextBlockProps} from './types'
-import {useSave} from '../BaseBlock/useSave'
-import {ImageData} from '../BlockItems/Image/types'
-import {useEffect, useState} from 'react'
-import {ImageTextBlockView} from './ImageTextBlockView'
+import {useSave2} from '../BaseBlock/useSave'
+import {useState} from 'react'
+import {ImageTextBlockLayout} from './ImageTextBlockLayout'
+import {TitleView} from '../BlockItems/Title/TitleView'
+import {ImageEdit, ImageView} from '../BlockItems/Image'
+import {TextView} from '../BlockItems/Text/TextView'
+import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
+import {TextEditPreview} from '../BlockItems/Text/TextEditPreview'
+import {TitleEdit} from '../BlockItems/Title/TitleEdit'
+import {TextEdit} from '../BlockItems/Text/TextEdit'
 
 const I18n = createI18nScope('block_content_editor')
 
-const ImageTextContent = (props: ImageTextBlockProps) => {
-  const {isEditMode, isEditPreviewMode, isViewMode} = useGetRenderMode()
-  const save = useSave<typeof ImageTextBlock>()
+const ImageTextBlockView = ({
+  title,
+  content,
+  url,
+  altText,
+  decorativeImage,
+  textColor,
+  includeBlockTitle,
+  arrangement,
+  textToImageRatio,
+  caption,
+  altTextAsCaption,
+}: ImageTextBlockProps) => {
+  return (
+    <ImageTextBlockLayout
+      titleComponent={includeBlockTitle && <TitleView contentColor={textColor} title={title} />}
+      imageComponent={
+        <ImageView
+          url={url}
+          altText={altText}
+          decorativeImage={decorativeImage}
+          caption={caption}
+          altTextAsCaption={altTextAsCaption}
+        />
+      }
+      textComponent={<TextView contentColor={textColor} content={content} />}
+      arrangement={arrangement}
+      textToImageRatio={textToImageRatio}
+      dataTestId="imagetext-block-view"
+    />
+  )
+}
+
+const ImageTextBlockEditView = ({
+  title,
+  content,
+  url,
+  altText,
+  decorativeImage,
+  textColor,
+  arrangement,
+  textToImageRatio,
+  includeBlockTitle,
+  caption,
+  altTextAsCaption,
+}: ImageTextBlockProps) => {
+  return (
+    <ImageTextBlockLayout
+      titleComponent={
+        includeBlockTitle && <TitleEditPreview contentColor={textColor} title={title} />
+      }
+      imageComponent={
+        <ImageView
+          url={url}
+          altText={altText}
+          decorativeImage={decorativeImage}
+          caption={caption}
+          altTextAsCaption={altTextAsCaption}
+        />
+      }
+      textComponent={<TextEditPreview contentColor={textColor} content={content} />}
+      arrangement={arrangement}
+      textToImageRatio={textToImageRatio}
+      dataTestId="imagetext-block-editpreview"
+    />
+  )
+}
+
+const ImageTextBlockEdit = (props: ImageTextBlockProps) => {
   const [title, setTitle] = useState(props.title)
   const [content, setContent] = useState(props.content)
-  const [url, setUrl] = useState(props.url)
-  const [altText, setAltText] = useState(props.altText)
 
-  useEffect(() => {
-    if (isEditPreviewMode) {
-      save({
-        title,
-        content,
-        url,
-        altText,
-      })
-    }
-  }, [altText, content, isEditPreviewMode, save, title, url])
-
-  const onTitleChange = (newTitle: string) => setTitle(newTitle)
-  const onContentChange = (newContent: string) => setContent(newContent)
-
-  const onImageChange = (imageData: ImageData) => {
-    setUrl(imageData.url)
-    setAltText(imageData.altText)
-  }
-
-  const dataProps = {
-    settings: props.settings,
+  const save = useSave2(() => ({
     title,
     content,
-    url,
-    altText,
-  }
+  }))
 
   return (
-    <Flex direction="column" gap="mediumSmall">
-      {isEditMode && (
-        <ImageTextBlockEdit
-          {...dataProps}
-          onTitleChange={onTitleChange}
-          onContentChange={onContentChange}
-          onImageChange={onImageChange}
-        />
-      )}
-      {isEditPreviewMode && <ImageTextBlockEditPreview {...dataProps} />}
-      {isViewMode && <ImageTextBlockView {...dataProps} />}
-    </Flex>
+    <ImageTextBlockLayout
+      titleComponent={
+        props.includeBlockTitle && <TitleEdit title={title} onTitleChange={setTitle} />
+      }
+      imageComponent={<ImageEdit {...props} onImageChange={data => save({...data})} />}
+      textComponent={<TextEdit content={content} onContentChange={setContent} height={300} />}
+      arrangement={props.arrangement}
+      textToImageRatio={props.textToImageRatio}
+      dataTestId="imagetext-block-edit"
+    />
   )
 }
 
 export const ImageTextBlock = (props: ImageTextBlockProps) => {
   return (
-    <BaseBlock<typeof ImageTextBlock>
+    <BaseBlockHOC
+      ViewComponent={ImageTextBlockView}
+      EditComponent={ImageTextBlockEdit}
+      EditViewComponent={ImageTextBlockEditView}
+      componentProps={props}
       title={ImageTextBlock.craft.displayName}
-      backgroundColor={props.settings.backgroundColor}
-      statefulProps={{
-        title: props.title,
-        content: props.content,
-        url: props.url,
-        altText: props.altText,
-      }}
-    >
-      <ImageTextContent {...props} />
-    </BaseBlock>
+      backgroundColor={props.backgroundColor}
+    />
   )
 }
 
 ImageTextBlock.craft = {
-  displayName: I18n.t('Image + text block') as string,
+  displayName: I18n.t('Image + text') as string,
   related: {
     settings: ImageTextBlockSettings,
   },

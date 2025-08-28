@@ -23,6 +23,7 @@ require_relative "../file_uploads_spec_helper"
 
 class TestUserApi
   include Api::V1::User
+
   attr_accessor :services_enabled, :context, :current_user, :params, :request
 
   def service_enabled?(service)
@@ -1539,7 +1540,7 @@ describe "Users API", type: :request do
                         search_term: "testuser",
                         per_page: "1",
                         sort: "id" })
-      expect(json.map { |user| user["name"] }).to eq ["testuser 0"]
+      expect(json.pluck("name")).to eq ["testuser 0"]
 
       links = Api.parse_pagination_links(response.headers["Link"])
       next_link = links.detect { |link| link[:rel] == "next" }
@@ -1555,7 +1556,7 @@ describe "Users API", type: :request do
                         per_page: "1",
                         sort: "id",
                         page: next_link["page"] })
-      expect(json.map { |user| user["name"] }).to eq ["testuser 1"]
+      expect(json.pluck("name")).to eq ["testuser 1"]
     end
   end
 

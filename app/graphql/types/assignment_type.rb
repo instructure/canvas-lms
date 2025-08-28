@@ -308,8 +308,10 @@ module Types
     field :graded_submissions_exist,
           Boolean,
           "If true, the assignment has at least one graded submission",
-          method: :graded_submissions_exist?,
           null: true
+    def graded_submissions_exist
+      Loaders::AssignmentLoaders::GradedSubmissionsExistLoader.load(assignment.id)
+    end
     field :has_multiple_due_dates, Boolean, method: :multiple_distinct_due_dates?, null: true
     field :has_submitted_submissions,
           Boolean,
@@ -708,7 +710,7 @@ module Types
     def checkpoints
       load_association(:context).then do |course|
         if course.discussion_checkpoints_enabled?
-          load_association(:sub_assignments)
+          load_association(:ordered_sub_assignments)
         end
       end
     end
@@ -826,6 +828,17 @@ module Types
       Loaders::AssignmentLoaders::OrderedModerationGradersWithSlotTakenLoader.load(object.id).then do |graders|
         AbstractAssignment.build_grader_identities(graders, anonymize: !object.can_view_other_grader_identities?(current_user))
       end
+    end
+
+    field :allocation_rules_connection, AllocationRuleType.connection_type, null: true do
+      description "Allocation rules if peer review is enabled"
+    end
+    def allocation_rules_connection
+      return nil unless assignment.grants_right?(current_user, :grade) &&
+                        assignment.context.feature_enabled?(:peer_review_allocation_and_grading) &&
+                        assignment.peer_reviews
+
+      load_association(:allocation_rules).then(&:active)
     end
   end
 end

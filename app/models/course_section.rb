@@ -62,6 +62,7 @@ class CourseSection < ActiveRecord::Base
   after_save :republish_course_pace_if_needed
 
   include StickySisFields
+
   are_sis_sticky :course_id, :name, :start_at, :end_at, :restrict_enrollments_to_section_dates
 
   delegate :account, to: :course

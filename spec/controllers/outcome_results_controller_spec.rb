@@ -19,8 +19,11 @@
 #
 
 require_relative "../apis/api_spec_helper"
+require "feature_flag_helper"
 
 describe OutcomeResultsController do
+  include FeatureFlagHelper
+
   def context_outcome(context)
     @outcome_group = context.root_outcome_group
     @outcome = context.created_learning_outcomes.create!(title: "outcome")
@@ -397,7 +400,7 @@ describe OutcomeResultsController do
         json = parse_response(response)
         alignments = json["linked"]["alignments"]
         expect(alignments.length).to eq 2
-        expect(alignments.map { |a| a["name"] }).to include("Test Bank")
+        expect(alignments.pluck("name")).to include("Test Bank")
       end
     end
 
@@ -804,19 +807,8 @@ describe OutcomeResultsController do
           find_or_create_outcome_submission({ student:, assignment: @assignment2 })
         end
 
-        it "FF disabled - only display results for canvas" do
-          user_session(user)
-          @course.disable_feature!(:outcome_service_results_to_canvas)
-          create_result(student.id, @outcome, @assignment, 2, { possible: 5 })
-          expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).and_return(nil)
-          json = parse_response(get_results({ user_ids: [student], include: ["assignments"] }))
-          expect(json["outcome_results"].length).to be 1
-          expect(json["linked"]["assignments"].length).to be 1
-        end
-
         context "FF enabled" do
           before do
-            @course.enable_feature!(:outcome_service_results_to_canvas)
             user_session(user)
           end
 
@@ -978,197 +970,8 @@ describe OutcomeResultsController do
 
     context "with outcome_service_results_to_canvas FF" do
       context "user_rollups" do
-        context "disabled FF" do
-          before do
-            @course.disable_feature!(:outcome_service_results_to_canvas)
-            new_quizzes_assignment(course: @course, title: "new quiz")
-          end
-
-          it "only display rollups for canvas" do
-            create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
-            expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).and_return(nil)
-            json = parse_response(get_rollups(sort_by: "student", sort_order: "desc", per_page: 1, page: 1))
-            expect(json["rollups"].length).to be 1
-          end
-
-          context "caching - converted OS LearningOutcomeResults are stored in cache" do
-            before do
-              controller.instance_variable_set(:@domain_root_account, @account)
-            end
-
-            it "caches lgmb rollup request per course, user, and user shard id" do
-              # creating a student result in @course aka outcome_course
-              create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
-              # OS api should only be hit once
-              expect(controller).to receive(:find_outcomes_service_outcome_results).with(any_args).once.and_return(nil)
-
-              enable_cache do
-                user_session @teacher
-                teacher_json = parse_response(get_rollups(include: %w[outcomes users outcome_paths],
-                                                          exclude: %w[concluded_enrollments inactive_enrollments missing_user_rollups],
-                                                          sort_by: "student",
-                                                          sort_order: "desc",
-                                                          per_page: 1,
-                                                          page: 1))
-                # validating the data returned is correct.  Should have 1 rollup.
-                expect(teacher_json["rollups"].length).to be 1
-                # should have one key in the cache for OS
-                expect(Rails.cache.exist?(["lmgb", "context_uuid", @course.uuid, "current_user_uuid", @teacher.uuid, "account_uuid", @account.uuid])).to be_truthy
-              end
-            end
-
-            it "caches lmgb rollup requests separately per user session enrolled in the same course" do
-              # creating a student result in @course aka outcome_course
-              create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
-              # OS api should only be hit twice - one time for each teacher
-              expect(controller).to receive(:find_outcomes_service_outcome_results).with(any_args).twice.and_return(nil)
-
-              enable_cache do
-                user_session @teacher
-                teacher1_json = parse_response(get_rollups(include: %w[outcomes users outcome_paths],
-                                                           exclude: %w[concluded_enrollments inactive_enrollments missing_user_rollups],
-                                                           sort_by: "student",
-                                                           sort_order: "desc",
-                                                           per_page: 1,
-                                                           page: 1))
-                expect(Rails.cache.exist?(["lmgb", "context_uuid", @course.uuid, "current_user_uuid", @teacher.uuid, "account_uuid", @account.uuid])).to be_truthy
-                expect(Rails.cache.instance_variable_get(:@data).keys.grep(/lmgb/i).count).to eq 1
-
-                # creating and enrolling teacher 2 in @course aka outcomes_course
-                teacher2 = teacher_in_course(course: @course, active_all: true).user
-                teacher2.save!
-                user_session teacher2
-                teacher2_json = parse_response(get_rollups(include: %w[outcomes users outcome_paths],
-                                                           exclude: %w[concluded_enrollments inactive_enrollments missing_user_rollups],
-                                                           sort_by: "student",
-                                                           sort_order: "desc",
-                                                           per_page: 1,
-                                                           page: 1))
-                expect(Rails.cache.exist?(["lmgb", "context_uuid", @course.uuid, "current_user_uuid", teacher2.uuid, "account_uuid", @account.uuid])).to be_truthy
-
-                # validating the rollups returned is the same for Teacher 1 and Teacher 2
-                expect(teacher2_json["rollups"]).to eq teacher1_json["rollups"]
-                # validating that there are 2 keys for lmgb
-                expect(Rails.cache.instance_variable_get(:@data).keys.grep(/lmgb/i).count).to eq 2
-              end
-            end
-
-            it "caches the outcome_ids in the cache key" do
-              outcome_ids = [@outcome.id]
-              cache_key = ["lmgb", "context_uuid", @course.uuid, "current_user_uuid", @teacher.uuid, "account_uuid", @account.uuid, Digest::MD5.hexdigest(outcome_ids.join("|"))]
-
-              expect(controller).to receive(:find_outcomes_service_outcome_results).with(any_args).once.and_return(nil)
-
-              enable_cache do
-                expect(Rails.cache.exist?(cache_key)).to be_falsey
-
-                get "rollups",
-                    params: {
-                      course_id: @course.id,
-                      outcome_ids: @outcome.id,
-                    },
-                    format: "json"
-                expect(response).to be_successful
-
-                expect(Rails.cache.exist?(cache_key)).to be_truthy
-              end
-            end
-
-            it "manually created course and user to test caching with different course than outcome_course" do
-              manually_created_course = Course.create!(name: "Advanced Strength & Speed", account: @account)
-              new_quizzes_assignment(course: manually_created_course, title: "new quiz")
-              super_teacher = User.create(name: "Black Panther")
-              super_teacher.pseudonyms.create(unique_id: "black@panther.com")
-              # OS api should only be hit once
-              expect(controller).to receive(:find_outcomes_service_outcome_results).with(any_args).once.and_return(nil)
-
-              @course = manually_created_course
-              @user = super_teacher
-              @course.enroll_teacher(@user, enrollment_state: :active)
-
-              enable_cache do
-                user_session @user
-
-                super_teacher_json = parse_response(get_rollups(include: %w[outcomes users outcome_paths],
-                                                                exclude: %w[concluded_enrollments inactive_enrollments missing_user_rollups],
-                                                                sort_by: "student",
-                                                                sort_order: "desc",
-                                                                per_page: 1,
-                                                                page: 1))
-                # validating the data returned is correct. Should not have any rollups
-                expect(super_teacher_json["rollups"].length).to be 0
-                # should have one key in the cache for OS
-                expect(Rails.cache.exist?(["lmgb", "context_uuid", manually_created_course.uuid, "current_user_uuid", super_teacher.uuid, "account_uuid", @account.uuid])).to be_truthy
-                expect(Rails.cache.instance_variable_get(:@data).keys.grep(/lmgb/i).count).to eq 1
-              end
-            end
-
-            it "manually created course and user with no new quiz assignments should not hit the cache" do
-              manually_created_course = Course.create!(name: "Advanced Strength & Speed", account: @account)
-              super_teacher = User.create(name: "Black Panther")
-              super_teacher.pseudonyms.create(unique_id: "black@panther.com")
-              # OS api should not be hit
-              expect(controller).not_to receive(:fetch_and_handle_os_results_for_all_users)
-
-              @course = manually_created_course
-              @user = super_teacher
-              @course.enroll_teacher(@user, enrollment_state: :active)
-
-              enable_cache do
-                user_session @user
-
-                get_rollups(include: %w[outcomes users outcome_paths],
-                            exclude: %w[concluded_enrollments inactive_enrollments missing_user_rollups],
-                            sort_by: "student",
-                            sort_order: "desc",
-                            per_page: 1,
-                            page: 1)
-                # should have one key in the cache for OS
-                expect(Rails.cache.exist?(["lmgb", "context_uuid", manually_created_course.uuid, "current_user_uuid", super_teacher.uuid, "account_uuid", @account.uuid])).to be_falsy
-                expect(Rails.cache.instance_variable_get(:@data).keys.grep(/lmgb/i).count).to eq 0
-              end
-            end
-
-            it "caches slgmb rollup request per opts, user_ids param, course, user, and user shard id" do
-              create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
-              # OS api should not be hit
-              expect(controller).to receive(:find_outcomes_service_outcome_results).with(any_args).once.and_return(nil)
-
-              enable_cache do
-                user_session @teacher
-                get_rollups({ user_ids: [@student.id], per_page: 100 })
-                user_id_cache_key = "slmgb_user_ids_#{@student.id}"
-                expect(Rails.cache.exist?([user_id_cache_key, "context_uuid", @course.uuid, "current_user_uuid", @teacher.uuid, "account_uuid", @account.uuid])).to be_truthy
-                expect(Rails.cache.instance_variable_get(:@data).keys.grep(/#{user_id_cache_key}/i).count).to eq 1
-              end
-            end
-
-            it "caches lmgb section rollup request per opts, section_id param, course, user, and user shard id" do
-              section1 = add_section "s1", course: @course
-              student_in_section section1, user: @student2, allow_multiple_enrollments: true
-              create_result(@student2.id, @outcome, outcome_assignment, 2, { possible: 5 })
-              # OS api should not be hit
-              expect(controller).to receive(:find_outcomes_service_outcome_results).with(any_args).once.and_return(nil)
-
-              enable_cache do
-                user_session @teacher
-                get_rollups({ include: %w[outcomes users outcome_paths],
-                              section_id: section1.id,
-                              sort_by: "student",
-                              sort_order: "desc",
-                              per_page: 1,
-                              page: 1 })
-                section_id_cache_key = "lmgb_section_id_#{section1.id}"
-                expect(Rails.cache.exist?([section_id_cache_key, "context_uuid", @course.uuid, "current_user_uuid", @teacher.uuid, "account_uuid", @account.uuid])).to be_truthy
-                expect(Rails.cache.instance_variable_get(:@data).keys.grep(/#{section_id_cache_key}/i).count).to eq 1
-              end
-            end
-          end
-        end
-
         context "enabled" do
           before do
-            @course.enable_feature!(:outcome_service_results_to_canvas)
             new_quizzes_assignment(course: @course, title: "new quiz")
           end
 
@@ -1239,22 +1042,7 @@ describe OutcomeResultsController do
         end
 
         context "aggregate_user_rollups" do
-          it "disabled - only display rollups for canvas" do
-            @course.disable_feature!(:outcome_service_results_to_canvas)
-            # already existing results for @student1 & @student2
-            # creating result for @student
-            create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
-            expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).and_return(nil)
-            json = parse_response(get_rollups(aggregate: "course", aggregate_stat: "mean", per_page: 5, page: 1))
-            expect(json["rollups"].length).to be 1
-            expect(json["rollups"][0]["scores"][0]["count"]).to be 3
-          end
-
           context "enabled" do
-            before do
-              @course.enable_feature!(:outcome_service_results_to_canvas)
-            end
-
             it "no OS results found - Canvas results found" do
               # already existing results for @student1 & @student2
               # creating result for @student
@@ -1299,25 +1087,7 @@ describe OutcomeResultsController do
         end
 
         context "remove_users_with_no_results" do
-          it "disabled - only display rollups for canvas" do
-            @course.disable_feature!(:outcome_service_results_to_canvas)
-            # already existing results for @student1 & @student2
-            # creating result for @student
-            create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
-            expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).twice.and_return(nil)
-            json = parse_response(get_rollups(sort_by: "student",
-                                              sort_order: "desc",
-                                              exclude: ["missing_user_rollups"],
-                                              per_page: 5,
-                                              page: 1))
-            expect(json["rollups"].length).to be 3
-          end
-
           context "enabled" do
-            before do
-              @course.enable_feature!(:outcome_service_results_to_canvas)
-            end
-
             it "No OS results found" do
               # already existing results for @student1 & @student2
               # creating result for @student
@@ -1638,7 +1408,7 @@ describe OutcomeResultsController do
 
       context "outcomes_friendly_description disabled" do
         before do
-          Account.site_admin.disable_feature!(:outcomes_friendly_description)
+          mock_feature_flag_on_account(:outcomes_friendly_description, false)
         end
 
         it "returns outcomes without friendlly_description" do
@@ -1650,7 +1420,8 @@ describe OutcomeResultsController do
 
       context "outcomes_friendly_description enabled, but improved_outcomes_management disabled" do
         before do
-          @course.root_account.disable_feature!(:improved_outcomes_management)
+          mock_feature_flag_on_account(:outcomes_friendly_description, true)
+          mock_feature_flag_on_account(:improved_outcomes_management, false)
         end
 
         it "returns outcomes without friendlly_description" do
@@ -2128,6 +1899,55 @@ describe OutcomeResultsController do
             end
           end
         end
+      end
+    end
+
+    context "StatsD metrics" do
+      before do
+        allow(InstStatsd::Statsd).to receive(:time).and_call_original
+      end
+
+      it "tracks runtime with outcomes_rollup_read tag when feature flag is off" do
+        Account.site_admin.disable_feature!(:outcomes_rollup_read)
+        get_rollups({})
+
+        expect(InstStatsd::Statsd).to have_received(:time).with(
+          "lmgb.rollup.endpoint.runtime",
+          tags: { outcomes_rollup_read: "off" }
+        )
+      end
+
+      it "tracks runtime with outcomes_rollup_read tag when feature flag is on" do
+        Account.site_admin.enable_feature!(:outcomes_rollup_read)
+        get_rollups({})
+
+        expect(InstStatsd::Statsd).to have_received(:time).with(
+          "lmgb.rollup.endpoint.runtime",
+          tags: { outcomes_rollup_read: "on" }
+        )
+      end
+
+      it "tracks runtime for CSV format" do
+        Account.site_admin.disable_feature!(:outcomes_rollup_read)
+        get "rollups",
+            params: {
+              context_id: @course.id,
+              course_id: @course.id,
+              context_type: "Course"
+            },
+            format: "csv"
+
+        expect(InstStatsd::Statsd).to have_received(:time).with(
+          "lmgb.rollup.endpoint.runtime",
+          tags: { outcomes_rollup_read: "off" }
+        )
+      end
+
+      it "does not track metrics for aggregate rollups since feature flag doesn't affect them" do
+        Account.site_admin.disable_feature!(:outcomes_rollup_read)
+        get_rollups({ aggregate: "course" })
+
+        expect(InstStatsd::Statsd).not_to have_received(:time)
       end
     end
   end

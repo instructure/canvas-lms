@@ -36,12 +36,15 @@ class AssignmentsController < ApplicationController
   include KalturaHelper
   include ObserverEnrollmentsHelper
   include SyllabusHelper
+
   before_action :require_context
 
   include HorizonMode
+
   before_action :load_canvas_career, only: %i[index show syllabus]
 
   include K5Mode
+
   add_crumb(
     proc { t "#crumbs.assignments", "Assignments" },
     except: %i[destroy syllabus index new edit]
@@ -915,8 +918,7 @@ class AssignmentsController < ApplicationController
         GRADING_SCHEME_UPDATES_ENABLED:
           Account.site_admin.feature_enabled?(:grading_scheme_updates),
         ARCHIVED_GRADING_SCHEMES_ENABLED: Account.site_admin.feature_enabled?(:archived_grading_schemes),
-        OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION:
-          @context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation),
+        OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION: @context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation),
         PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED: @context.feature_enabled?(:peer_review_allocation_and_grading)
       }
 

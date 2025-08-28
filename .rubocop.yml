@@ -58,16 +58,16 @@ Lint/AmbiguousBlockAssociation:
     - change
     - not_change
     - raise_error
+Lint/MixedCaseRange:
+  # this error is usually due to a typo, not a misunderstanding of ranges, and the auto-correct may be worse
+  # for example, it will change `[a-fA-f]` to `[a-fA-Za-f]` instead of `[a-fA-F]`
+  AutoCorrect: false
 Lint/NoFileUtilsRmRf:
   Severity: warning # intended for specs; not enforced
 Lint/NoSleep:
   Severity: warning # intended for specs; not enforced
 Lint/NonLocalExitFromIterator:
   Enabled: false # SnR is too low because of how often this construct is used
-Lint/RedundantCopDisableDirective:
-  Enabled: false # can't have this enabled until https://github.com/rubocop/rubocop/issues/10263
-Lint/SafeNavigationConsistency:
-  Enabled: false # https://github.com/rubocop/rubocop/issues/9816
 
 Migration/Tagged:
   AllowedTags:
@@ -138,6 +138,10 @@ Rails/InverseOf:
 Rails/NegateInclude:
   Enabled: false # exclude? isn't as intuitive as !include?
 Rails/Output:
+  Exclude:
+    - gems/dr_diff/**/*.rb
+    - gems/i18n_tasks/**/*.rb
+    - gems/tatl_tael/**/*.rb
   AutoCorrect: false # Force the developer to think about what to do; don't just silently convert it to a debug log
 Rails/Present:
   UnlessBlank: false # allow `unless foo.blank?`
@@ -294,6 +298,11 @@ Rails/DeprecatedActiveModelErrorsMethods:
   AutoCorrect: false
 Rails/EagerEvaluationLogMessage:
   Severity: convention
+  AutoCorrect: false
+Rails/FindByOrAssignmentMemoization:
+  Severity: warning
+  # the autocorrect will check instance_variable_defined?, which might be right,
+  # but it might also be better to use find_by!
   AutoCorrect: false
 Rails/FindEach:
   Severity: convention

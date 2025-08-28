@@ -21,12 +21,15 @@ import {Element, Frame} from '@craftjs/core'
 import {AddBlockModalRenderer} from './AddBlock/AddBlockModalRenderer'
 import {SettingsTrayRenderer} from './SettingsTray'
 import {AddBlock} from './AddBlock'
-import {useGetSerializedNodes} from './hooks/useGetSerializedNodes'
 import {BlockContentEditorProps} from './BlockContentEditor'
+import {useGetSerializedNodes} from './hooks/useGetSerializedNodes'
+import {useEditHistory} from './hooks/useEditHistory'
 
 export const BlockContentEditorContent = (props: BlockContentEditorProps) => {
+  const {isEdited} = useEditHistory()
   const editorData = useGetSerializedNodes()
-  const frameData = editorData['ROOT'] ? editorData : props.data
+
+  const frameData = isEdited ? editorData : (props.data ?? undefined)
 
   return (
     <>
@@ -34,8 +37,8 @@ export const BlockContentEditorContent = (props: BlockContentEditorProps) => {
       <AddBlockModalRenderer />
       <SettingsTrayRenderer />
       <AddBlock />
-      <Frame data={frameData ?? undefined}>
-        <Element is="div"></Element>
+      <Frame data={frameData}>
+        <Element canvas is="div" className="content-wrapper"></Element>
       </Frame>
     </>
   )

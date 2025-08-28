@@ -18,35 +18,92 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import NewCourseModal from '../NewCourseModal'
 import {Button} from '@instructure/ui-buttons'
+import fakeENV from '@canvas/test-utils/fakeENV'
+import NewCourseModal from '../NewCourseModal'
+import AccountsTreeStore from '../../store/AccountsTreeStore'
 
 const terms = {
-    data: [{
-        id: '1',
-        name: 'First Term',
-        start_at: '2025-01-01T00:00:00Z',
-        end_at: '2025-05-01T00:00:00Z'
-    }],
-    loading: false
+  data: [
+    {
+      id: '1',
+      name: 'First Term',
+      start_at: '2025-01-01T00:00:00Z',
+      end_at: '2025-05-01T00:00:00Z',
+    },
+  ],
+  loading: false,
 }
 
 const children = <Button>Add Course</Button>
 
-describe ('NewCourseModal', () => {
+describe('NewCourseModal', () => {
+  beforeEach(() => {
+    fakeENV.setup({LOCALES: ['en']})
 
-    // NewCourseModal uses the old model of stores (CoursesStore)
-    // so it's easier to test via selenium (new_course_search_spec.rb)
-    // than make a top-level test in AccountCourseUserSearch.test.tsx
-    it('renders modal after clicking button', () => {
-        const {getByText} = render(<NewCourseModal terms={terms}>{children}</NewCourseModal>)
+    // Set up the flash_screenreader_holder element that SearchableSelect expects
+    const liveRegion = document.createElement('div')
+    liveRegion.id = 'flash_screenreader_holder'
+    liveRegion.setAttribute('role', 'alert')
+    liveRegion.setAttribute('aria-live', 'assertive')
+    liveRegion.setAttribute('aria-atomic', 'true')
+    liveRegion.style.position = 'absolute'
+    liveRegion.style.left = '-10000px'
+    liveRegion.style.width = '1px'
+    liveRegion.style.height = '1px'
+    liveRegion.style.overflow = 'hidden'
+    document.body.appendChild(liveRegion)
+  })
 
-        // open modal
-        getByText('Add Course').click()
-        expect(getByText('Add a New Course')).toBeInTheDocument()
-        expect(getByText('Course Name')).toBeInTheDocument()
-        expect(getByText('Reference Code')).toBeInTheDocument()
-        expect(getByText('Enrollment Term')).toBeInTheDocument()
-        expect(getByText('Subaccount')).toBeInTheDocument()
+  afterEach(() => {
+    fakeENV.teardown()
+
+    // Clean up the live region element
+    const liveRegion = document.getElementById('flash_screenreader_holder')
+    if (liveRegion) {
+      document.body.removeChild(liveRegion)
+    }
+  })
+
+  // NewCourseModal uses the old model of stores (CoursesStore)
+  // so it's easier to test via selenium (new_course_search_spec.rb)
+  // than make a top-level test in AccountCourseUserSearch.test.tsx
+  it('renders modal after clicking button', () => {
+    const {getByText} = render(<NewCourseModal terms={terms}>{children}</NewCourseModal>)
+
+    // open modal
+    getByText('Add Course').click()
+    expect(getByText('Add a New Course')).toBeInTheDocument()
+    expect(getByText('Course Name')).toBeInTheDocument()
+    expect(getByText('Reference Code')).toBeInTheDocument()
+    expect(getByText('Enrollment Term')).toBeInTheDocument()
+    expect(getByText('Subaccount')).toBeInTheDocument()
+  })
+
+  it('handles accounts with null names gracefully', () => {
+    const mockGetTree = jest.spyOn(AccountsTreeStore, 'getTree').mockReturnValue({
+      loading: false,
+      accounts: [
+        {
+          id: '1',
+          name: 'Valid Account',
+          subAccounts: [],
+        },
+        {
+          id: '2',
+          name: null as any, // Force null name to test the scenario
+          subAccounts: [],
+        },
+      ],
     })
+
+    const {getByText} = render(<NewCourseModal terms={terms}>{children}</NewCourseModal>)
+
+    // This should trigger the renderAccountOptions function
+    getByText('Add Course').click()
+    expect(getByText('Add a New Course')).toBeInTheDocument()
+    expect(getByText('Subaccount')).toBeInTheDocument()
+
+    mockGetTree.mockRestore()
+  })
 })

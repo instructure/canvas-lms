@@ -1127,9 +1127,9 @@ Assignment.prototype.singleSection = function () {
 }
 
 Assignment.prototype.singleSectionDueDate = function () {
-  let allDates, i, len, section
-  if (!this.multipleDueDates() && !this.dueAt()) {
-    allDates = this.allDates()
+  const allDates = this.allDates()
+  let i, len, section
+  if (!this.multipleDueDates() && allDates.length > 0) {
     for (i = 0, len = allDates.length; i < len; i++) {
       section = allDates[i]
       if (section.dueAt) {

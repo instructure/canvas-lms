@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {type Root} from 'react-dom/client'
+
 export interface MasteryPathsData {
   isCyoeAble: boolean
   isTrigger: boolean
@@ -27,6 +29,7 @@ export interface Checkpoint {
   dueAt?: string
   name?: string
   tag?: string
+  assignedToDates?: StandardizedDateHash[]
   assignmentOverrides?: AssignmentOverrideGraphQLResult
 }
 
@@ -107,6 +110,7 @@ export type ModuleItemContent = {
     _id: string
     dueAt?: string
     assignmentOverrides?: AssignmentOverrideGraphQLResult
+    assignedToDates?: StandardizedDateHash[]
   }
   isNewQuiz?: boolean
 } | null
@@ -128,16 +132,6 @@ export interface AssignmentOverride {
     courseId?: string
     groupId?: string
   }
-}
-
-export type DueAtCount = {
-  groups?: number
-  sections?: number
-  students?: number
-}
-
-export type DueAtCounts = {
-  [key: string]: DueAtCount
 }
 
 export interface CompletionRequirement {
@@ -386,4 +380,47 @@ export interface PaginatedNavigationResponse {
 interface PaginatedNavigationGraphQLResult {
   legacyNode?: LegacyNodeModuleItemsConnection
   errors?: GraphQLError[]
+}
+
+export type QuizEngine = 'new' | 'classic'
+
+export type ModuleKBActionEvent = 'module-action'
+export type ModuleKBAction = 'edit' | 'delete' | 'new'
+export type ModuleItemKBAction = 'edit' | 'remove' | 'indent' | 'outdent'
+export interface ModuleActionEventDetail {
+  action: ModuleKBAction | ModuleItemKBAction
+  courseId: string
+  moduleId?: string
+  moduleItemId?: string
+  [key: string]: unknown
+}
+
+export interface HTMLElementWithRoot extends HTMLElement {
+  reactRoot?: Root
+}
+
+export type DragStateChangeEvent = 'drag-state-change'
+export interface DragStateChangeDetail {
+  isDragging: boolean
+}
+
+declare global {
+  interface Document {
+    addEventListener(
+      type: ModuleKBActionEvent,
+      listener: (event: CustomEvent<ModuleActionEventDetail>) => void,
+    ): void
+    addEventListener(
+      type: DragStateChangeEvent,
+      listener: (event: CustomEvent<DragStateChangeDetail>) => void,
+    ): void
+    removeEventListener(
+      type: ModuleKBActionEvent,
+      listener: (event: CustomEvent<ModuleActionEventDetail>) => void,
+    ): void
+    removeEventListener(
+      type: DragStateChangeEvent,
+      listener: (event: CustomEvent<DragStateChangeDetail>) => void,
+    ): void
+  }
 }

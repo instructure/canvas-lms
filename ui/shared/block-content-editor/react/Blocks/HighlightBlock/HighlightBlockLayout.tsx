@@ -23,14 +23,12 @@ type HighlightBlockLayoutProps = {
   icon?: React.ReactNode
   content: React.ReactNode
   backgroundColor: string
-  textColor: string
 }
 
 export const HighlightBlockLayout = ({
   icon,
   content,
   backgroundColor,
-  textColor,
 }: HighlightBlockLayoutProps) => {
   return (
     <View
@@ -41,7 +39,6 @@ export const HighlightBlockLayout = ({
       background="primary"
       themeOverride={{
         backgroundPrimary: backgroundColor,
-        color: textColor,
       }}
     >
       <Flex gap="mediumSmall" direction="row">

@@ -50,7 +50,7 @@ describe AccessToken do
         expect(DeveloperKey.default.auto_expire_tokens).to be true
       end
 
-      include_examples "#authenticate"
+      it_behaves_like "#authenticate"
     end
 
     context "Without auto expire" do
@@ -64,7 +64,7 @@ describe AccessToken do
         expect(@dk.auto_expire_tokens).to be false
       end
 
-      include_examples "#authenticate"
+      it_behaves_like "#authenticate"
     end
 
     context "when an access token argument is provided" do

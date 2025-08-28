@@ -56,45 +56,38 @@ const SuccessView: React.FC<SuccessViewProps> = ({
 }) => {
   const regionRef = useRef<HTMLDivElement | null>(null)
   return (
-    <>
+    <View position="fixed" overflowY="auto" width="inherit">
       <Flex as="div" direction="column" height="100vh" width="100%">
-        <Flex.Item shouldGrow={true} as="main">
-          <View
-            as="header"
-            padding="medium"
-            elementRef={(el: Element | null) => {
-              regionRef.current = el as HTMLDivElement | null
-            }}
-            aria-label={I18n.t('Accessibility Issues for %{title}', {
-              title: title,
-            })}
-          >
-            <View>
-              <Heading level="h2" variant="titleCardRegular">
-                {title}
-              </Heading>
-              <CloseButton
-                placement="end"
-                data-testid="close-button"
-                margin="small"
-                screenReaderLabel={I18n.t('Close')}
-                onClick={onClose}
-              />
-            </View>
-            <View margin="large 0">
-              <Text size="large" variant="descriptionPage" as="h3">
-                {I18n.t('You have fixed all accessibility issues on this page.')}
-              </Text>
-            </View>
-            <View as="div" padding="xx-large x-large">
-              <Img
-                src={SuccessBallons}
-                data-testid="success-ballons"
-                height="378px"
-                width="308px"
-              />
-            </View>
+        <Flex.Item
+          as="header"
+          padding="medium"
+          elementRef={(el: Element | null) => {
+            regionRef.current = el as HTMLDivElement | null
+          }}
+          aria-label={I18n.t('Accessibility Issues for %{title}', {
+            title: title,
+          })}
+        >
+          <View>
+            <Heading level="h2" variant="titleCardRegular">
+              {title}
+            </Heading>
+            <CloseButton
+              placement="end"
+              data-testid="close-button"
+              margin="small"
+              screenReaderLabel={I18n.t('Close')}
+              onClick={onClose}
+            />
           </View>
+          <View margin="large 0">
+            <Text size="large" variant="descriptionPage" as="h3">
+              {I18n.t('You have fixed all accessibility issues on this page.')}
+            </Text>
+          </View>
+        </Flex.Item>
+        <Flex.Item as="main" padding="xx-large x-large" shouldGrow={true}>
+          <Img src={SuccessBallons} data-testid="success-ballons" height="378px" width="308px" />
         </Flex.Item>
         <Flex.Item as="footer">
           <AccessibilityIssuesDrawerFooter
@@ -111,7 +104,7 @@ const SuccessView: React.FC<SuccessViewProps> = ({
       <Alert screenReaderOnly={true} liveRegionPoliteness="assertive" liveRegion={getLiveRegion}>
         {assertiveAlertMessage}
       </Alert>
-    </>
+    </View>
   )
 }
 export default SuccessView

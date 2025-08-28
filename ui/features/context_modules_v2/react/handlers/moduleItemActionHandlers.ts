@@ -30,6 +30,7 @@ import type {
 } from '../utils/types'
 import React from 'react'
 import {MODULE_ITEMS, MODULES, MOVE_MODULE_ITEM} from '../utils/constants'
+import {dispatchCommandEvent} from './dispatchCommandEvent'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -62,7 +63,7 @@ export const handlePublishToggle = async (
         title: title,
         publishState: newPublishedState ? I18n.t('published') : I18n.t('unpublished'),
       }),
-    )
+    )()
 
     queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId || '']})
     queryClient.invalidateQueries({queryKey: ['MODULE_ITEMS_ALL', moduleId || '']})
@@ -71,13 +72,13 @@ export const handlePublishToggle = async (
       I18n.t('Failed to change published state for %{title}', {
         title: title,
       }),
-    )
+    )()
     console.error('Error updating published state:', error)
   }
 }
 
-export const handleEdit = (setIsEditItemOpen: (isOpen: boolean) => void) => {
-  setIsEditItemOpen(true)
+export const handleEdit = (courseId: string, itemId: string) => {
+  dispatchCommandEvent({action: 'edit', courseId, moduleItemId: itemId})
 }
 
 export const handleSpeedGrader = (
@@ -229,15 +230,10 @@ export const updateIndent = async (
 export const handleDecreaseIndent = async (
   itemId: string,
   moduleId: string,
-  indent: number,
   courseId: string,
-  queryClient: QueryClient,
   setIsMenuOpen?: (isOpen: boolean) => void,
 ) => {
-  if (indent > 0) {
-    const newIndent = Math.max(indent - 1, 0)
-    await updateIndent(itemId, moduleId, newIndent, courseId, queryClient)
-  }
+  dispatchCommandEvent({action: 'outdent', courseId, moduleId, moduleItemId: itemId})
   if (setIsMenuOpen) {
     setIsMenuOpen(false)
   }
@@ -246,15 +242,10 @@ export const handleDecreaseIndent = async (
 export const handleIncreaseIndent = async (
   itemId: string,
   moduleId: string,
-  indent: number,
   courseId: string,
-  queryClient: QueryClient,
   setIsMenuOpen?: (isOpen: boolean) => void,
 ) => {
-  if (indent < 5) {
-    const newIndent = Math.min(indent + 1, 5)
-    await updateIndent(itemId, moduleId, newIndent, courseId, queryClient)
-  }
+  dispatchCommandEvent({action: 'indent', courseId, moduleId, moduleItemId: itemId})
   if (setIsMenuOpen) {
     setIsMenuOpen(false)
   }
@@ -287,6 +278,7 @@ export const handleRemove = (
   queryClient: QueryClient,
   courseId: string,
   setIsMenuOpen?: (isOpen: boolean) => void,
+  onAfterSuccess?: () => void,
 ) => {
   if (window.confirm(I18n.t('Are you sure you want to remove this item from the module?'))) {
     doFetchApi({
@@ -302,6 +294,9 @@ export const handleRemove = (
         queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId || '']})
         queryClient.invalidateQueries({queryKey: ['MODULE_ITEMS_ALL', moduleId || '']})
         queryClient.invalidateQueries({queryKey: [MODULES, courseId]})
+      })
+      .then(() => {
+        if (onAfterSuccess) onAfterSuccess()
       })
       .catch(() => {
         showFlashError(I18n.t('Failed to remove item'))

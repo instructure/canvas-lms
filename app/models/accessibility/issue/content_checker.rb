@@ -27,17 +27,17 @@ module Accessibility
 
       private
 
-      def build_issue(rule_class, element:, form: nil, path: nil)
+      def build_issue(rule, element:, form: nil, path: nil)
         {
           id: SecureRandom.uuid,
-          rule_id: rule_class.id,
+          rule_id: rule.class.id,
           element:,
-          display_name: rule_class.display_name,
-          message: rule_class.message,
-          why: rule_class.why,
+          display_name: rule.display_name,
+          message: rule.message,
+          why: rule.why,
           path:,
           severity: "error",
-          issue_url: rule_class.link,
+          issue_url: rule.class.link,
           form:
         }
       end
@@ -58,8 +58,8 @@ module Accessibility
         "none"
       end
 
-      def log_rule_error(rule_class, element, error)
-        Rails.logger.error "Accessibility check problem with rule '#{rule_class.id}', element '#{element}': #{error.message}"
+      def log_rule_error(rule, element, error)
+        Rails.logger.error "Accessibility check problem with rule '#{rule.class.id}', element '#{element}': #{error.message}"
         Rails.logger.error error.backtrace.join("\n")
       end
 

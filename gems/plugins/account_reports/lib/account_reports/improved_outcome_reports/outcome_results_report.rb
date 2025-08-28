@@ -324,6 +324,7 @@ module AccountReports
       end
 
       def outcome_results_scope
+        inst_identity = Pseudonym.column_names.include?("is_inst_id")
         students = account.learning_outcome_links.active
                           .select(<<~SQL.squish)
                             distinct on (#{outcome_order}, p.id, s.id, r.id, qr.id, q.id, a.id, subs.id, qs.id, aq.id)
@@ -371,6 +372,7 @@ module AccountReports
                             INNER JOIN #{ContentTag.quoted_table_name} ct ON r.content_tag_id = ct.id
                             INNER JOIN #{User.quoted_table_name} u ON u.id = r.user_id
                             INNER JOIN #{Pseudonym.quoted_table_name} p on p.user_id = r.user_id
+                              #{"AND p.is_inst_id = false" if inst_identity}
                             INNER JOIN #{Course.quoted_table_name} c ON r.context_id = c.id
                             INNER JOIN #{Account.quoted_table_name} acct ON acct.id = c.account_id
                             INNER JOIN #{Enrollment.quoted_table_name} e ON e.type = 'StudentEnrollment' and e.root_account_id = #{account.root_account.id}

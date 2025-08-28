@@ -23,6 +23,7 @@ require_relative "../graphql_spec_helper"
 
 describe Mutations::MoveOutcomeLinks do
   include GraphQLSpecHelper
+
   before(:once) do
     @site_admin = site_admin_user
     course_with_teacher

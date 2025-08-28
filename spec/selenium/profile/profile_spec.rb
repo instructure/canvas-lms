@@ -28,12 +28,24 @@ describe "profile" do
     edit_form
   end
 
-  def add_skype_service
-    f("#unregistered_service_skype > a").click
-    skype_dialog = f("[role=dialog][aria-label='Register Skype']")
-    skype_dialog.find_element(:name, "username").send_keys("jakesorce")
-    wait_for_new_page_load { submit_form(skype_dialog) }
-    expect(f("#registered_services")).to include_text("Skype")
+  def add_diigo_service
+    f("#unregistered_service_diigo > a").click
+    diigo_dialog = f("[role=dialog][aria-label='Diigo login']")
+    diigo_dialog.find_element(:name, "username").send_keys("diigo")
+    diigo_dialog.find_element(:name, "password").send_keys("password")
+    wait_for_new_page_load { submit_form(diigo_dialog) }
+    expect(f("#registered_services")).to include_text("Diigo")
+  end
+
+  def set_up_diigo_service
+    # Mock Diigo connection and API calls
+    allow(Diigo::Connection).to receive_messages(
+      config: { api_key: "test_key" },
+      verify_credentials: true,
+      diigo_get_bookmarks: []
+    )
+    allow_any_instance_of(UserService).to receive(:verify_diigo_credentials).and_return(true)
+    @user.account.enable_service(:diigo)
   end
 
   def generate_access_token(expiration: nil, purpose: "testing", close_dialog: true)
@@ -352,24 +364,27 @@ describe "profile" do
     end
 
     it "registers a service" do
+      set_up_diigo_service
       get "/profile/settings"
-      add_skype_service
+      add_diigo_service
     end
 
     it "deletes a service" do
+      set_up_diigo_service
       get "/profile/settings"
-      add_skype_service
+      add_diigo_service
       driver.action.move_to(f(".service")).perform
       f(".delete_service_link").click
       expect(driver.switch_to.alert).not_to be_nil
       driver.switch_to.alert.accept
       wait_for_ajaximations
-      expect(f("#unregistered_services")).to include_text("Skype")
+      expect(f("#unregistered_services")).to include_text("Diigo")
     end
 
     it "toggles user services visibility" do
+      set_up_diigo_service
       get "/profile/settings"
-      add_skype_service
+      add_diigo_service
       selector = "#show_user_services"
       expect(f(selector).selected?).to be_truthy
       f(selector).click
@@ -482,7 +497,7 @@ describe "profile" do
     context "google drive" do
       it "links back to profile/settings in oauth callbacks" do
         allow(Canvas::Plugin).to receive(:find).and_call_original
-        allow(Canvas::Plugin).to receive(:find).with(:google_drive).and_return(double(enabled?: true))
+        allow(Canvas::Plugin).to receive(:find).with(:google_drive).and_return(instance_double(Canvas::Plugin, enabled?: true))
         @user.account.enable_service(:google_drive)
         @user.account.save!
         get "/profile/settings"

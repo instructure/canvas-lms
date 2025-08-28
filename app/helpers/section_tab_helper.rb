@@ -40,6 +40,12 @@ module SectionTabHelper
     *RoleOverride::GRANULAR_MANAGE_USER_PERMISSIONS
   ].freeze
 
+  # if a tab depends on a Course FF, it should be included here so that the cache is busted
+  FLAGS_FOR_CACHE_KEY = [
+    :smart_search,
+    :youtube_migration
+  ].freeze
+
   def available_section_tabs
     @available_section_tabs ||=
       AvailableSectionTabs.new(@context, @current_user, @domain_root_account, session).to_a
@@ -137,8 +143,13 @@ module SectionTabHelper
         "section_tabs_hash",
         I18n.locale
       ]
-      if context.is_a?(Course) && context.elementary_homeroom_course?
-        k << "homeroom_course"
+      # need to include FF for courses in order to bust the cache
+      if context.is_a?(Course)
+        flag_states = FLAGS_FOR_CACHE_KEY.map { |flag| context.feature_enabled?(flag) }
+        k.concat(flag_states)
+        if context.elementary_homeroom_course?
+          k << "homeroom_course"
+        end
       end
 
       k.cache_key
@@ -200,6 +211,8 @@ module SectionTabHelper
         class: a_classes
       }.tap do |h|
         h[:target] = @tab.target if @tab.target?
+        # For security reasons only add the rel attribute if the link is for an external tool and target is "_blank"
+        h["rel"] = "opener" if @tab.target == "_blank" && @tab.path.include?("external_tools")
         if @tab.hide? || @tab.unused?
           h["data-tooltip"] = ""
           h["data-html-tooltip-title"] = a_title

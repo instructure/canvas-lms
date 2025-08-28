@@ -27,6 +27,7 @@ class ContextModulesController < ApplicationController
   before_action :require_context
 
   include HorizonMode
+
   before_action :load_canvas_career, only: [:index, :show]
 
   add_crumb(proc { t("#crumbs.modules", "Modules") }) { |c| c.send :named_context_url, c.instance_variable_get(:@context), :context_context_modules_url }
@@ -107,6 +108,8 @@ class ContextModulesController < ApplicationController
 
       assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
 
+      new_quizzes_enabled = NewQuizzesFeaturesHelper.new_quizzes_enabled?(@context)
+
       hash = {
         course_id: @context.id,
         CONTEXT_URL_ROOT: polymorphic_path([@context]),
@@ -121,7 +124,9 @@ class ContextModulesController < ApplicationController
         MODULE_TOOLS: module_tool_definitions,
         DEFAULT_POST_TO_SIS: @context.account.sis_default_grade_export[:value] && !AssignmentUtil.due_date_required_for_account?(@context.account),
         PUBLISH_FINAL_GRADE: Canvas::Plugin.find!("grade_export").enabled?,
-        restrict_quantitative_data: @context.is_a?(Course) ? @context.restrict_quantitative_data?(@current_user) : false
+        restrict_quantitative_data: @context.is_a?(Course) ? @context.restrict_quantitative_data?(@current_user) : false,
+        NEW_QUIZZES_ENABLED: new_quizzes_enabled,
+        NEW_QUIZZES_BY_DEFAULT: new_quizzes_enabled && @context.feature_enabled?(:new_quizzes_by_default)
       }
 
       is_master_course = MasterCourses::MasterTemplate.is_master_course?(@context)
@@ -332,10 +337,23 @@ class ContextModulesController < ApplicationController
           canManageSpeedGrader: @context.allows_speed_grader? && @context.grants_any_right?(@current_user, :manage_grades, :view_all_grades)
         }
 
-        modules_observer_info = observer_module_info
+        # Only set observer options if user has observer data
+        if @current_user
+          observed_users_list = observed_users(@current_user, session, @context.id)
+          if observed_users_list.present?
+            js_env({ OBSERVER_OPTIONS: {
+                     OBSERVED_USERS_LIST: observed_users_list,
+                     CAN_ADD_OBSERVEE: @current_user
+                                        .profile
+                                        .tabs_available(@current_user, root_account: @domain_root_account)
+                                        .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
+                   } })
+          end
+        end
 
         js_env(MODULES_PERMISSIONS: modules_permissions)
-        js_env(MODULES_OBSERVER_INFO: modules_observer_info)
+        js_env(MODULES_OBSERVER_INFO: observer_module_info)
+
         js_env(PAGE_TITLE: "#{t("titles.course_modules", "Course Modules")}: #{@context.name}")
 
         js_bundle :context_modules_v2
@@ -910,6 +928,7 @@ class ContextModulesController < ApplicationController
   end
 
   include ContextModulesHelper
+
   def add_item
     @module = @context.context_modules.not_deleted.find(params[:context_module_id])
 

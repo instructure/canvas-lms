@@ -53,7 +53,7 @@ describe AccountUser do
   end
 
   context "non-sharded" do
-    include_examples "touching"
+    it_behaves_like "touching"
 
     before :once do
       @account = Account.default
@@ -63,7 +63,7 @@ describe AccountUser do
 
   context "sharding" do
     specs_require_sharding
-    include_examples "touching"
+    it_behaves_like "touching"
 
     before :once do
       @account = @shard1.activate { Account.create! }

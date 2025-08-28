@@ -20,6 +20,7 @@
 module Canvas
   module LockExplanation
     include TextHelper
+
     def lock_explanation(hash, type, context = nil, options = {})
       include_js = options.fetch(:include_js, true)
       url_options = options.key?(:only_path) ? { only_path: options[:only_path] } : {}

@@ -201,8 +201,11 @@ class ContextModuleProgression < ActiveRecord::Base
         calc.check_action!(req, false)
       elsif req[:type] == "must_submit"
         req_met = !!(subs && subs.any? do |sub|
-          if sub.workflow_state == "graded" && sub.attempt.nil?
-            # is a manual grade - doesn't count for submission
+          if sub.workflow_state == "graded" && sub.attempt.nil? && !(
+            tag.content_type_discussion? &&
+            tag.content&.assignment&.checkpoints_parent?
+          )
+            # is a manual grade - doesn't count for submission. Excluding discussion checkpoints
             false
           elsif %w[submitted graded complete pending_review].include?(sub.workflow_state)
             true

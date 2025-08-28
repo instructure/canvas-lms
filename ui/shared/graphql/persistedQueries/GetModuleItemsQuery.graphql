@@ -109,6 +109,18 @@ query GetModuleItemsQuery($moduleId: ID!, $cursor: String, $first: Int) {
                   dueAt(applyOverrides: true)
                   name
                   tag
+                  assignedToDates {
+                    id
+                    dueAt
+                    unlockAt
+                    lockAt
+                    title
+                    base
+                    set {
+                      id
+                      type
+                    }
+                  }
                 }
                 assignment {
                   _id

@@ -18,7 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require "feature_flag_helper"
+
 describe Loaders::OutcomeFriendlyDescriptionLoader do
+  include FeatureFlagHelper
+
   before do
     course_with_student(active_all: true)
     outcome_model(context: @course)
@@ -180,7 +184,7 @@ describe Loaders::OutcomeFriendlyDescriptionLoader do
   end
 
   it "resolves to nil if IOM FF disabled" do
-    @parent_account.disable_feature!(:improved_outcomes_management)
+    mock_feature_flag_on_account(:improved_outcomes_management, false)
 
     create_course_fd
     create_account_fd

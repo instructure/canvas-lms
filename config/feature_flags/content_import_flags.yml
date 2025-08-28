@@ -1,0 +1,6 @@
+---
+skip_reactivating_deleted_attachments:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Skip reactivating deleted attachments on import
+  description: When enabled, importing course content attachments will not reactivate previously deleted ones

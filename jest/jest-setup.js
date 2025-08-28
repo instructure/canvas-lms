@@ -154,16 +154,6 @@ if (!Array.prototype.flatMap) {
   })
 }
 
-if (!Set.prototype.isDisjointFrom) {
-  Object.defineProperty(Set.prototype, 'isDisjointFrom', {
-    configurable: true,
-    value: function isDisjointFrom(otherSet) {
-      return Array.from(this).every(value => !otherSet.has(value))
-    },
-    writable: true,
-  })
-}
-
 require('@instructure/ui-themes')
 
 // set up mocks for native APIs

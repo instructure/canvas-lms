@@ -36,6 +36,7 @@ describe "enrollment_registration" do
 
   it "displays account name as plain text and removes footer links" do
     include MessagesCommon
+
     Notification.find_or_create_by!(category: "Registration", name: notification_name)
     msg = generate_message(notification_name, :email, asset)
     # this means the account name is not enclosed in a link

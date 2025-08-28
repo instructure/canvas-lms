@@ -324,9 +324,8 @@ describe RoleOverride do
       end
 
       it "is enabled for account if specified" do
-        root_account = @account.root_account
-        root_account.settings[:admins_can_view_notifications] = true
-        root_account.save!
+        @account.settings[:admins_can_view_notifications] = true
+        @account.save!
         permission_data = RoleOverride.permission_for(@account, :view_notifications, admin_role)
         expect(permission_data[:account_allows]).to be_truthy
         expect(permission_data[:enabled]).to be_falsey
@@ -334,11 +333,34 @@ describe RoleOverride do
       end
 
       it "is disabled for account if lambda evaluates to false" do
+        @account.settings[:admins_can_view_notifications] = false
+        @account.save!
+        permission_data = RoleOverride.permission_for(@account, :view_notifications, admin_role)
+        expect(permission_data[:account_allows]).to be_falsey
+        expect(permission_data[:enabled]).to be_falsey
+        expect(permission_data[:explicit]).to be_falsey
+      end
+
+      it "is enabled for account even though the setting is disabled for the root account" do
         root_account = @account.root_account
         root_account.settings[:admins_can_view_notifications] = false
         root_account.save!
+        @account.settings[:admins_can_view_notifications] = true
+        @account.save!
         permission_data = RoleOverride.permission_for(@account, :view_notifications, admin_role)
-        expect(permission_data[:account_allows]).to be_falsey
+        expect(permission_data[:account_allows]).to be_truthy
+        expect(permission_data[:enabled]).to be_falsey
+        expect(permission_data[:explicit]).to be_falsey
+      end
+
+      it "is disabled for account even though the setting is enabled for the root account" do
+        root_account = @account.root_account
+        root_account.settings[:admins_can_view_notifications] = true
+        root_account.save!
+        @account.settings[:admins_can_view_notifications] = false
+        @account.save!
+        permission_data = RoleOverride.permission_for(@account, :view_notifications, admin_role)
+        expect(permission_data[:account_allows]).to be_falsy
         expect(permission_data[:enabled]).to be_falsey
         expect(permission_data[:explicit]).to be_falsey
       end

@@ -19,12 +19,14 @@
 import React from 'react'
 import {View} from '@instructure/ui-view'
 import ModulesList from './componentsTeacher/ModulesList'
+import './handlers/modulePageCommandEventHandlers'
 
 const ModulesContainer: React.FC = () => {
   return (
     <View as="div" data-testid="modules-rewrite-container" className="modules-rewrite-container">
       <ModulesList />
       <div id="differentiated-modules-mount-point" />
+      <div id="module-item-mount-point" />
     </View>
   )
 }

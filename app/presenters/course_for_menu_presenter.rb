@@ -76,6 +76,7 @@ class CourseForMenuPresenter
                                        include_external: false,
                                        include_hidden_unused: false,
                                      })
+        tabs = tabs.reject { |tab| tab[:id] == Course::TAB_YOUTUBE_MIGRATION }
         hash[:links] = tabs.map do |tab|
           presenter = SectionTabPresenter.new(tab, course)
           presenter.to_h

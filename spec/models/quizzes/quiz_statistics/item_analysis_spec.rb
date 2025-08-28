@@ -23,7 +23,7 @@ require_relative "common"
 describe Quizzes::QuizStatistics::ItemAnalysis do
   let(:report_type) { "item_analysis" }
 
-  include_examples "Quizzes::QuizStatistics::Report"
+  it_behaves_like "Quizzes::QuizStatistics::Report"
 
   before(:once) do
     simple_quiz_with_submissions(

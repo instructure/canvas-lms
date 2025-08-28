@@ -87,6 +87,52 @@ describe ContextModulesController do
       expect(combined_active_quizzes_includes_both_types).to be false
     end
 
+    describe "index quizzes engine js_env" do
+      before do
+        user_session(@teacher)
+        @course.root_account.settings[:provision] = { "lti" => "lti url" }
+        @course.root_account.save!
+        @course.root_account.enable_feature! :quizzes_next
+        @course.enable_feature! :quizzes_next
+        @course.enable_feature!(:new_quizzes_by_default)
+      end
+
+      it "new quizzes enabled if flag on and context_external_tools present" do
+        @course.context_external_tools.create!(
+          name: "Quizzes.Next",
+          consumer_key: "test_key",
+          shared_secret: "test_secret",
+          tool_id: "Quizzes 2",
+          url: "http://example.com/launch"
+        )
+
+        get "index", params: { course_id: @course.id }
+        js_env = controller.js_env
+        expect(js_env[:NEW_QUIZZES_ENABLED]).to be true
+      end
+
+      it "new quizzes by default enabled if flag on and new quizzes enabled" do
+        @course.context_external_tools.create!(
+          name: "Quizzes.Next",
+          consumer_key: "test_key",
+          shared_secret: "test_secret",
+          tool_id: "Quizzes 2",
+          url: "http://example.com/launch"
+        )
+
+        get "index", params: { course_id: @course.id }
+        js_env = controller.js_env
+        expect(js_env[:NEW_QUIZZES_BY_DEFAULT]).to be true
+      end
+
+      it "new quizzes and new quizzes by default disabled if context_external_tools NOT present" do
+        get "index", params: { course_id: @course.id }
+        js_env = controller.js_env
+        expect(js_env[:NEW_QUIZZES_ENABLED]).to be false
+        expect(js_env[:NEW_QUIZZES_BY_DEFAULT]).to be false
+      end
+    end
+
     it "touches modules if necessary" do
       time = 2.days.ago
       Timecop.freeze(time) do

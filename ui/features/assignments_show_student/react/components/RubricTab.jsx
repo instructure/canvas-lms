@@ -186,6 +186,7 @@ export default function RubricTab(props) {
               {hasSubmittedAssessment ? I18n.t('View Rubric') : I18n.t('Fill Out Rubric')}
             </Button>
             <RubricAssessmentTray
+              currentUserId={ENV.current_user_id ?? ''}
               hidePoints={hidePoints}
               isOpen={rubricTrayOpen}
               isPreviewMode={hasSubmittedAssessment}
@@ -193,6 +194,7 @@ export default function RubricTab(props) {
               onDismiss={() => setRubricTrayOpen(false)}
               rubricAssessmentData={rubricAssessmentData}
               rubric={rubricData}
+              viewModeOverride="traditional"
               onSubmit={assessment => {
                 const updatedState = {
                   score: assessment.reduce((prev, curr) => prev + (curr.points ?? 0), 0),

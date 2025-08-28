@@ -196,7 +196,7 @@ class ConferencesController < ApplicationController
                   else
                     @current_user.web_conferences.active.shard(@context.shard).where(context_type: @context.class.to_s, context_id: @context.id)
                   end
-    conferences = conferences.with_config_for(context: @context).order("created_at DESC, id DESC")
+    conferences = conferences.with_config_for(context: @context).order(created_at: :desc, id: :desc)
     api_request? ? api_index(conferences, polymorphic_url([:api_v1, @context, :conferences])) : web_index(conferences)
   end
 
@@ -220,7 +220,7 @@ class ConferencesController < ApplicationController
 
         scope = scope.where("ROW(created_at, id) #{comparison} ROW(?, ?)", creation_date, id)
       end
-      scope.order("created_at DESC, id DESC")
+      scope.order(created_at: :desc, id: :desc)
     end
   end
 
@@ -251,14 +251,14 @@ class ConferencesController < ApplicationController
       conference_scope = WebConference.active.where(context_type: "Course", context_id: enrollments_scope.active.select(:course_id))
                                       .where(WebConferenceParticipant.where("web_conference_id = web_conferences.id AND user_id = ?", @current_user.id).arel.exists)
       conference_scope = conference_scope.live if params[:state] == "live"
-      conference_scope.order("created_at DESC, id DESC")
+      conference_scope.order(created_at: :desc, id: :desc)
     end
 
     groups_collection = ShardedBookmarkedCollection.build(UserConferencesBookmarker, @current_user.groups) do |groups_scope|
       conference_scope = WebConference.active.where(context_type: "Group", context_id: groups_scope.active.select(:id))
                                       .where(WebConferenceParticipant.where("web_conference_id = web_conferences.id AND user_id = ?", @current_user.id).arel.exists)
       conference_scope = conference_scope.live if params[:state] == "live"
-      conference_scope.order("created_at DESC, id DESC")
+      conference_scope.order(created_at: :desc, id: :desc)
     end
 
     # ShardedBookmarkedCollection.build will return an ActiveRecord relation as

@@ -2366,6 +2366,19 @@ describe "Accounts API", type: :request do
         expect(json.length).to be 1
         expect(json.first["name"]).to eq @course.name
       end
+
+      it "finds a SIS ID that looks like a global ID" do
+        not_a_global_id = "#{@shard1.id}~1"
+        course = @a1.courses.create!(name: "wat", sis_source_id: not_a_global_id)
+        json = api_call(:get,
+                        "/api/v1/accounts/#{@a1.id}/courses?search_term=#{not_a_global_id}",
+                        { controller: "accounts",
+                          action: "courses_api",
+                          account_id: @a1.to_param,
+                          format: "json",
+                          search_term: not_a_global_id })
+        expect(json.pluck("id")).to include course.id
+      end
     end
 
     context "blueprint courses" do

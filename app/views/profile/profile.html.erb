@@ -360,9 +360,6 @@ TEXT
       <li id="unregistered_service_google_drive" class="service" style="<%= hidden if !feature_and_service_enabled?(:google_drive) || services.include?("google_drive") %>">
         <a href="#" class="btn btn-small"><%= image_tag "google_drive_icon.png", :alt => '' %> <%= t('links.google_drive', "Google Drive") %></a>
       </li>
-      <li id="unregistered_service_skype" class="service" style="<%= hidden if services.include?("skype") || !service_enabled?(:skype) %>">
-        <a href="#" class="btn btn-small"><%= image_tag "skype_icon.png", :alt => '' %> <%= t('links.skype', "Skype") %></a>
-      </li>
       <li id="unregistered_service_diigo" class="service" style="<%= hidden if services.include?("diigo") || !feature_and_service_enabled?(:diigo) %>">
         <a href="#" class="btn btn-small"><%= image_tag "diigo_icon.png", :alt => '' %> <%= t('links.diigo', "Diigo") %></a>
       </li>
@@ -407,12 +404,20 @@ TEXT
       </tbody>
     </table>
   </div>
-  <% allow_token_creation = @current_user.access_tokens.temp_record.grants_right?(logged_in_user, :create) %>
+  <% allow_token_creation = @current_user.access_tokens.temp_record.grants_right?(logged_in_user, AccessToken.account_session_for_permissions(@domain_root_account), :create) %>
   <% prohibit_info_text = t("Your Canvas administrators have chosen to limit your ability to generate your own access token. Please reach out to your Canvas administrators to have them generate an access token on your behalf.") %>
-  <div style="margin-top: 10px;" title="<%= prohibit_info_text unless allow_token_creation || @real_current_user %>" >
+  <div style="margin-top: 10px;">
     <a href="#" class="btn btn-primary add_access_token_link" <%= "disabled" unless allow_token_creation %> >
       <i class="icon-plus" aria-hidden="true"></i> <%= t('buttons.new_access_token', "New Access Token") %>
     </a>
+    <% unless allow_token_creation %>
+      <a class="icon-info"
+          tabindex="0"
+          data-tooltip='{"tooltipClass":"popover popover-padded", "position":"right"}'
+          title="<%= prohibit_info_text %>">
+          <span class="screenreader-only"><%= t "Why can't I create an access token?" %></span>
+      </a>
+    <% end %>
   </div>
   <div id='access_token_details_mount_point'></div>
   <div id='new_access_token_mount_point'></div>

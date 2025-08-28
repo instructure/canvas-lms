@@ -211,9 +211,10 @@ class RequestThrottle
 
     return unless (token_string = AuthenticationMethods.access_token(request))
 
-    return unless AccessToken.site_admin?(token_string)
+    access_token = AccessToken.site_admin?(token_string)
+    return unless access_token
 
-    AccessToken.authenticate(token_string).global_developer_key_id
+    access_token.global_developer_key_id
   end
 
   def service_user_jwt_key(request)

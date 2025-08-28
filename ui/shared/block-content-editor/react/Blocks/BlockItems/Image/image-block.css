@@ -1,7 +1,7 @@
 .image-block-container {
   display: flex;
   width: 100%;
-  height: 670px;
+  height: 300px;
   align-items: center;
   justify-content: center;
   border: solid 1px #d7dade;

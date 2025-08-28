@@ -26,6 +26,7 @@ describe "dashboard" do
   include NotificationsCommon
   include K5DashboardPageObject
   include DashboardPage
+
   include_context "in-process server selenium tests"
 
   shared_examples_for "load events list" do

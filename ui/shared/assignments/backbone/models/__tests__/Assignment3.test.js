@@ -184,7 +184,7 @@ describe('Assignment', () => {
       expect(assignment.singleSectionDueDate()).toBe(dueAt.toISOString())
     })
 
-    it('returns due_at when only one date/section are present', () => {
+    it('returns due_at when no other dates/sections are present', () => {
       const date = Date.now()
       const assignment = new Assignment({name: 'Taco party!'})
       assignment.set('due_at', date)
@@ -192,6 +192,21 @@ describe('Assignment', () => {
       ENV.PERMISSIONS = {manage: false}
       expect(assignment.singleSectionDueDate()).toBe(assignment.dueAt())
       ENV.PERMISSIONS = {}
+    })
+
+    it('prefers all_dates to due_at', () => {
+      const date = Date.now()
+      const assignment = new Assignment({
+        name: 'Taco party!',
+        all_dates: [
+          {
+            due_at: null,
+            title: 'Section 1',
+          },
+        ],
+      })
+      assignment.set('due_at', date)
+      expect(assignment.singleSectionDueDate()).toBe(undefined)
     })
   })
 

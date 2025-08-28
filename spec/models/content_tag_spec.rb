@@ -592,7 +592,7 @@ describe ContentTag do
     expect(att.display_name).to eq "important title.txt"
   end
 
-  include_examples "url validation tests"
+  include_context "url validation tests"
   it "checks url validity" do
     quiz = course_factory.quizzes.create!
     test_url_validation(ContentTag.create!(content: quiz, context: @course))

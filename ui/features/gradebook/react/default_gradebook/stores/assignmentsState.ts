@@ -285,7 +285,10 @@ export default (
   fetchCompositeAssignmentGroups: ({params}) => {
     const path = `/api/v1/courses/${get().courseId}/assignment_groups`
 
-    return get().dispatch.getDepaginated<AssignmentGroup[]>(path, params)
+    return get().dispatch.getDepaginated<AssignmentGroup[]>(path, {
+      ...params,
+      correlation_id: get().correlationId, // Enables request correlation for performance monitoring and analysis
+    })
   },
 
   fetchGrapqhlAssignmentGroups: async ({gradingPeriodIds = null}) => {

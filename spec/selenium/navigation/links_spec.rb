@@ -74,6 +74,7 @@ describe "links", priority: "2" do
 
     context("files rewrite tooggle") do
       include FilesPage
+
       before(:once) do
         Account.site_admin.enable_feature! :files_a11y_rewrite
         Account.site_admin.enable_feature! :files_a11y_rewrite_toggle

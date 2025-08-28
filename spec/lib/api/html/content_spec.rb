@@ -204,7 +204,7 @@ module Api
                 <a href="/users/4567282/files/15~8723/download?verifier=123">link</a>
                 <a href="/files/3/download?wrap=1">link</a>
                 <iframe src="/media_attachments_iframe/4">
-                <a href="#">/files/no1/download</a>
+                <a href="#">/users/3/files/no1/download</a>
                 <div src="files/9/preview"></div>
               </div>
               </body>
@@ -213,7 +213,7 @@ module Api
 
           results = Content.collect_attachment_ids(string)
 
-          expect(results).to include("1", "3", "4", "15~8723")
+          expect(results).to include("1", "4", "3", "15~8723")
           expect(results).not_to include("no1", "9")
         end
 

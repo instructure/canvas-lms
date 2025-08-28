@@ -20,6 +20,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {TextBlock} from '../Blocks/TextBlock'
 import {ReactElement} from 'react'
 import {ImageBlock} from '../Blocks/ImageBlock'
+import {MediaBlock} from '../Blocks/MediaBlock'
 import {SeparatorLineBlock} from '../Blocks/SeparatorLineBlock'
 import {ButtonBlock} from '../Blocks/ButtonBlock'
 import {HighlightBlock} from '../Blocks/HighlightBlock'
@@ -31,19 +32,38 @@ const I18n = createI18nScope('block_content_editor')
 type BlockFactory = {[key: string]: () => ReactElement}
 
 const defaultBackgroundColor = colors.primitives.white
+const defaultTextColor = colors.ui.textDescription
 
 export const blockFactory = {
   [TextBlock.name]: () => (
     <TextBlock
       title=""
       content=""
-      settings={{includeBlockTitle: true, backgroundColor: defaultBackgroundColor}}
+      settings={{
+        includeBlockTitle: true,
+        backgroundColor: defaultBackgroundColor,
+        titleColor: defaultTextColor,
+      }}
     />
   ),
-  [ImageBlock.name]: () => <ImageBlock url="" altText="" />,
+  [ImageBlock.name]: () => (
+    <ImageBlock
+      title=""
+      url=""
+      altText=""
+      caption=""
+      altTextAsCaption={false}
+      decorativeImage={false}
+      settings={{
+        includeBlockTitle: true,
+        backgroundColor: defaultBackgroundColor,
+        textColor: defaultTextColor,
+      }}
+    />
+  ),
   [SeparatorLineBlock.name]: () => (
     <SeparatorLineBlock
-      thickness="small"
+      thickness="medium"
       settings={{separatorColor: colors.ui.lineDivider, backgroundColor: defaultBackgroundColor}}
     />
   ),
@@ -54,8 +74,19 @@ export const blockFactory = {
         alignment: 'left',
         layout: 'horizontal',
         isFullWidth: false,
-        buttons: [{id: 1, text: ''}],
+        buttons: [
+          {
+            id: 1,
+            text: '',
+            url: '',
+            linkOpenMode: 'new-tab',
+            primaryColor: colors.primitives.blue45,
+            secondaryColor: colors.primitives.white,
+            style: 'filled',
+          },
+        ],
         backgroundColor: defaultBackgroundColor,
+        textColor: defaultTextColor,
       }}
       title=""
     />
@@ -66,7 +97,7 @@ export const blockFactory = {
       settings={{
         displayIcon: 'warning',
         highlightColor: colors.additionalPrimitives.ocean12,
-        textColor: colors.ui.textDescription,
+        textColor: defaultTextColor,
         backgroundColor: defaultBackgroundColor,
       }}
     />
@@ -75,18 +106,28 @@ export const blockFactory = {
     <ImageTextBlock
       url=""
       altText=""
+      fileName=""
       title=""
       content=""
-      settings={{
-        includeBlockTitle: true,
-        backgroundColor: defaultBackgroundColor,
-        textColor: colors.ui.textDescription,
-        arrangement: 'left',
-        textToImageRatio: '1:1',
-      }}
+      decorativeImage={false}
+      includeBlockTitle={true}
+      backgroundColor={defaultBackgroundColor}
+      textColor={defaultTextColor}
+      arrangement="left"
+      textToImageRatio="1:1"
+      altTextAsCaption={false}
+      caption=""
     />
   ),
-  video: () => <p>video</p>,
+  [MediaBlock.name]: () => (
+    <MediaBlock
+      src=""
+      title=""
+      backgroundColor={defaultBackgroundColor}
+      titleColor={defaultTextColor}
+      includeBlockTitle={true}
+    />
+  ),
 } as const satisfies BlockFactory
 
 export type BlockTypes = keyof typeof blockFactory
@@ -121,7 +162,7 @@ export const blockData: BlockData[] = [
   },
   {
     groupName: I18n.t('Multimedia'),
-    items: [{itemName: I18n.t('Video'), id: 'video'}],
+    items: [{itemName: MediaBlock.craft.displayName, id: MediaBlock.name}],
   },
   {
     groupName: I18n.t('Interactive element'),

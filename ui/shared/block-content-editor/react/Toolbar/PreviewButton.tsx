@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {IconButton} from '@instructure/ui-buttons'
+import {ToolbarButton} from './ToolbarButton'
 import {IconEyeLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
@@ -27,7 +27,7 @@ export const PreviewButton = (props: {
   onClick: () => void
 }) => {
   return (
-    <IconButton
+    <ToolbarButton
       screenReaderLabel={I18n.t('preview')}
       color={props.active ? 'primary' : 'secondary'}
       renderIcon={<IconEyeLine />}

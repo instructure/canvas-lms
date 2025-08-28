@@ -16,9 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export type ImageData = {
-  url: string | undefined
-  altText: string | undefined
+type ImageMetadata = {
+  url?: string
+  altText?: string
+  decorativeImage?: boolean
 }
-export type ImageEditProps = ImageData & {onImageChange: (data: ImageData) => void}
+
+type ImageCaption = {
+  caption?: string
+}
+
+type ImageSettingAltAsCaption = {
+  altTextAsCaption?: boolean
+}
+
+type ImageFileData = {
+  fileName?: string
+}
+
+export type ImageData = ImageMetadata & ImageFileData & ImageSettingAltAsCaption & ImageCaption
+export type ModalImageData = ImageMetadata & ImageFileData
+export type ImageChangeHandler = {
+  onImageChange: (data: ImageData) => void
+}
+export type ImageEditProps = ImageData & ImageChangeHandler
 export type ImageViewProps = ImageData

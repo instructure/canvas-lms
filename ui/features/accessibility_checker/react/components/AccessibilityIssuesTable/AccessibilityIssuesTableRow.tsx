@@ -25,8 +25,8 @@ import {Table, TableCellProps} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 
 import {AccessibilityResourceScan, ResourceWorkflowState} from '../../types'
-import {ContentTypeCell} from './ContentTypeCell'
-import {IssueCell} from './IssueCell'
+import {ContentTypeCell} from './Cells/ContentTypeCell'
+import {ScanStateCell} from './Cells/ScanStateCell'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -58,7 +58,7 @@ export const AccessibilityIssuesTableRow = ({item, onRowClick}: Props) => {
         </Link>
       </Table.Cell>
       <Table.Cell textAlign="center">
-        <IssueCell item={item} onClick={handleRowClick} />
+        <ScanStateCell item={item} onClick={handleRowClick} />
       </Table.Cell>
       <Table.Cell>
         <ContentTypeCell item={item} />

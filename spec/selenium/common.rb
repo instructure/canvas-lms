@@ -81,12 +81,6 @@ shared_context "in-process server selenium tests" do
     driver.ready_for_interaction = false # need to `get` before we do anything selenium-y in a spec
   end
 
-  around :all do |group|
-    GreatExpectations.with_config(MISSING: :raise) do
-      group.run_examples
-    end
-  end
-
   append_before :all do
     retry_count = 0
     begin
@@ -198,7 +192,6 @@ shared_context "in-process server selenium tests" do
         "elements with non-unique id #",
         "Failed to load http://www.example.com/",
         "Failed to load http://example.com/",
-        "Uncaught Error: cannot call methods on timeoutTooltip prior to initialization; attempted to call method 'close'",
         "Failed to load resource",
         "Deprecated use of magic jQueryUI widget markup detected",
         "Uncaught SG: Did not receive drive#about kind when fetching import",

@@ -1297,9 +1297,22 @@ Returns the assignment_description of the assignment that was launched.
 ```
 "Example Description"
 ```
+## CourseGroup.id
+Returns the Canvas id of the group the current user is in if launching
+from a group assignment otherwise empty string.
+
+**Availability**: *when launched by a logged in user and when launched as an assignment*  
+
+
+```
+481
+```
 ## com.instructure.Group.id
 Returns the Canvas id of the group the current user is in if launching
 from a group assignment.
+
+This is similar to `CourseGroup.id` but unlike that this returns
+`$com.instructure.Group.id` for non group assignments and not an empty string.
 
 **Availability**: *when launched by a logged in user and when launched as an assignment*  
 **Launch Parameter**: *vnd_canvas_group_id*  

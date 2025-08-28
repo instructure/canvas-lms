@@ -188,7 +188,7 @@ describe Accessibility::Rules::ListStructureRule do
 
   context "form" do
     it "returns the proper form" do
-      expect(Accessibility::Rules::ListStructureRule.form(nil).label).to eq("Reformat")
+      expect(Accessibility::Rules::ListStructureRule.new.form(nil).label).to eq("Reformat")
     end
   end
 end

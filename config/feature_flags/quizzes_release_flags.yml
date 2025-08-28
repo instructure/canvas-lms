@@ -118,3 +118,8 @@ new_quizzes_ai_quiz_generation:
   state: hidden
   shadow: true
   applies_to: Course
+new_quizzes_scanning_youtube_links:
+  display_name: Scanning Youtube links in New Quizzes
+  description: Enabling the YouTube Migration - New Quizzes feature adds the scanning ability and the convert option on Youtube embeddings in New Quizzes.
+  state: hidden
+  applies_to: SiteAdmin

@@ -310,6 +310,7 @@ export default function SmartSearchHeader(props: Props) {
         <Heading variant="titlePageDesktop" level="h1" data-testid="smart-search-heading">
           <Flex alignItems="center" gap="small">
             <IconAiColoredSolid size="small" />
+            <ScreenReaderContent>{I18n.t('Ignite AI')}</ScreenReaderContent>
             {I18n.t('Smart Search')}
           </Flex>
         </Heading>

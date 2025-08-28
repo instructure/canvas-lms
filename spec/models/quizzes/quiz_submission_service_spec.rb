@@ -80,7 +80,7 @@ describe Quizzes::QuizSubmissionService do
         ->(*_) { subject.create quiz }
       end
 
-      include_examples "Takeable Quiz Services"
+      it_behaves_like "Takeable Quiz Services"
 
       it "creates a QS" do
         expect { subject.create quiz }.to_not raise_error
@@ -184,7 +184,7 @@ describe Quizzes::QuizSubmissionService do
         ->(*_) { subject.complete qs, qs.attempt }
       end
 
-      include_examples "Takeable Quiz Services"
+      it_behaves_like "Takeable Quiz Services"
 
       it "completes the QS" do
         expect do
@@ -242,7 +242,7 @@ describe Quizzes::QuizSubmissionService do
         ->(*_) { subject.update_question({}, qs, qs.attempt) }
       end
 
-      include_examples "Takeable Quiz Services"
+      it_behaves_like "Takeable Quiz Services"
 
       it "updates a question" do
         expect do

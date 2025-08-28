@@ -132,7 +132,7 @@ describe ActiveRecord::Base do
       let(:strategy) { :temp_table }
       let(:extra_kwargs) { { ignore_transaction: true } }
 
-      include_examples "batches"
+      it_behaves_like "batches"
 
       it "raises an error when not in a transaction" do
         expect { User.find_in_batches(strategy: :temp_table) { nil } }.to raise_error(ArgumentError)
@@ -140,7 +140,7 @@ describe ActiveRecord::Base do
 
       it "finds all enrollments from course join" do
         e = Course.active.where(id: [@c1, @c2]).select("enrollments.id AS e_id")
-                  .joins(:enrollments).order("e_id asc")
+                  .joins(:enrollments).order(:e_id)
         batch_size = 2
         es = []
         Course.transaction do
@@ -159,7 +159,7 @@ describe ActiveRecord::Base do
     context "with cursor" do
       let(:strategy) { :cursor }
 
-      include_examples "batches"
+      it_behaves_like "batches"
 
       context "sharding" do
         specs_require_sharding
@@ -182,7 +182,7 @@ describe ActiveRecord::Base do
       let(:strategy) { :copy }
       let(:extra_kwargs) { { load: true } }
 
-      include_examples "batches"
+      it_behaves_like "batches"
 
       it "works with load: false" do
         User.in_batches(strategy: :copy) { |r| expect(r.to_a).to match_array([@u1, @u2, @u3]) }
@@ -953,6 +953,7 @@ describe ActiveRecord::Base do
     it "uses default scope" do
       mock_account = Class.new(Account) do
         include RSpec::Matchers
+
         before_save do
           expect(Account.all.to_sql).not_to match(/callbacks something/)
           expect(self.class.all.to_sql).not_to match(/callbacks something/)

@@ -55,7 +55,7 @@ describe Accessibility::Rules::AdjacentLinksRule do
 
   context "form" do
     it "merges adjacent links with the same URL" do
-      expect(Accessibility::Rules::AdjacentLinksRule.form(nil).label).to eq("Merge links")
+      expect(Accessibility::Rules::AdjacentLinksRule.new.form(nil).label).to eq("Merge links")
     end
   end
 end

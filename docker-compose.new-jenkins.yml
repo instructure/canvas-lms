@@ -30,6 +30,7 @@ services:
       RSPECQ_REDIS_URL:
       RSPECQ_FILE_SPLIT_THRESHOLD:
       RSPECQ_MAX_REQUEUES:
+      RSPECQ_WORKER_LIVENESS_SEC:
 
       # rspec-parallel-log build
       RSPEC_LOG:

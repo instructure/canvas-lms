@@ -17,10 +17,12 @@
  */
 
 import {prepEmbedSrc} from '@instructure/canvas-rce/es/common/fileUrl'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
 export type UploadData = {
   theFile: File
   fileUrl: string
+  fileName: string
   usageRights: {
     usageRight: string
     ccLicense: string
@@ -34,7 +36,7 @@ export type UploadData = {
 }
 
 export type StoreProp = {
-  startMediaUpload: Function
+  startMediaUploadInStandaloneMode: Function
 }
 
 export const panels = ['COMPUTER', 'URL', 'course_images', 'user_images'] as const
@@ -59,8 +61,7 @@ const handleComputerUpload = async (uploadData: UploadData, storeProps: StorePro
   }
 
   try {
-    const tabContext = 'documents'
-    const result = await storeProps?.startMediaUpload(tabContext, fileMetaData)
+    const result = await storeProps?.startMediaUploadInStandaloneMode(fileMetaData)
     return prepEmbedSrc(result.href || result.url) as string
   } catch (_err) {
     throw new Error('Failed to upload the image, please try again')
@@ -73,12 +74,17 @@ export const handleImageSubmit = async (
   storeProps: StoreProp,
 ) => {
   const altText = getAltText(uploadData)
+  const decorativeImage = getDecorativeImage(uploadData)
   const url = await getUrl(selectedPanel, uploadData, storeProps)
-  return {url, altText}
+  return {url, altText, decorativeImage}
 }
 
 const getAltText = (uploadData: UploadData) => {
   return uploadData?.imageOptions?.isDecorativeImage ? '' : uploadData?.imageOptions?.altText || ''
+}
+
+const getDecorativeImage = (uploadData: UploadData) => {
+  return uploadData?.imageOptions?.isDecorativeImage
 }
 
 const getUrl = async (
@@ -100,4 +106,13 @@ const getUrl = async (
       throw new Error('Selected Panel is invalid')
     }
   }
+}
+
+export const loadFileMetaData = async (url: string) => {
+  const cleanUrl = url.endsWith('/preview') ? url.slice(0, -8) : url
+  const {json} = await doFetchApi<{attachment: {display_name: string}}>({
+    path: cleanUrl,
+    method: 'GET',
+  })
+  return json
 }

@@ -22,6 +22,10 @@ import {useGetRenderMode} from './useGetRenderMode'
 import {BaseBlockViewLayout} from './layout/BaseBlockViewLayout'
 import {BaseBlockEditWrapper} from './components/BaseBlockEditWrapper'
 import {useGenHistoryKey} from '../../hooks/useGenHistoryKey'
+import {useIsInEditor} from '../../hooks/useIsInEditor'
+import {BaseBlockView} from './BaseBlockView'
+import {BaseBlockEdit} from './BaseBlockEdit'
+import {useIsEditingBlock} from '../../hooks/useIsEditingBlock'
 
 const BaseBlockContent = (
   props: ComponentProps<typeof BaseBlock> & {
@@ -52,4 +56,36 @@ export function BaseBlock<T extends ElementType>(props: BaseBlockProps<T>) {
       <BaseBlockContent key={historyKey} {...props} setIsEditMode={setIsEditMode} />
     </BlockContext.Provider>
   )
+}
+
+function BaseBlockViewerMode<T extends {}>(props: ComponentProps<typeof BaseBlockHOC<T>>) {
+  const Component = props.ViewComponent
+  return (
+    <BaseBlockView backgroundColor={props.backgroundColor ?? ''}>
+      <Component {...props.componentProps} />
+    </BaseBlockView>
+  )
+}
+
+function BaseBlockEditorMode<T extends {}>(props: ComponentProps<typeof BaseBlockHOC<T>>) {
+  const isEditing = useIsEditingBlock()
+  const Component = isEditing ? props.EditComponent : props.EditViewComponent
+  return (
+    <BaseBlockEdit title={props.title} backgroundColor={props.backgroundColor ?? ''}>
+      <Component {...props.componentProps} />
+    </BaseBlockEdit>
+  )
+}
+
+export function BaseBlockHOC<T extends {}>(props: {
+  ViewComponent: React.ComponentType<T>
+  EditViewComponent: React.ComponentType<T>
+  EditComponent: React.ComponentType<T>
+  componentProps: T
+  title: string
+  backgroundColor?: string
+}) {
+  const isInEditor = useIsInEditor()
+  const Component = isInEditor ? BaseBlockEditorMode : BaseBlockViewerMode
+  return <Component {...props} />
 }

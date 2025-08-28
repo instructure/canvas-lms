@@ -819,7 +819,7 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @response_field user_id The unique identifier for the author of the reply.
   #
-  # @response_field user_name The name of the author of the reply.
+  # @response_field user_name The author's display name, or null for anonymous topics when the author is not an instructor.
   #
   # @response_field message The content of the reply.
   #

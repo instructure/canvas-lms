@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {IconButton} from '@instructure/ui-buttons'
+import {ToolbarButton} from './ToolbarButton'
 import {IconDiscussionReply2Line} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
@@ -27,7 +27,7 @@ export const UndoButton = (props: {
   onClick: () => void
 }) => {
   return (
-    <IconButton
+    <ToolbarButton
       interaction={props.active ? 'enabled' : 'disabled'}
       screenReaderLabel={I18n.t('undo')}
       renderIcon={<IconDiscussionReply2Line />}

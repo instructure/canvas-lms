@@ -70,6 +70,7 @@ class GradebookSettingsController < ApplicationController
       :sort_rows_by_setting_key,
       :sort_rows_by_direction,
       :view_ungraded_as_zero,
+      :view_hidden_grades_indicator,
       { colors: %i[late missing resubmitted dropped excused extended] }
     )
     gradebook_settings_params[:enter_grades_as] = params[:gradebook_settings][:enter_grades_as]

@@ -28,153 +28,52 @@ const defaultContent: ModuleItemContent = {
   id: '19',
   dueAt: currentDate,
   pointsPossible: 100,
+  assignedToDates: [
+    {
+      id: 'everyone',
+      dueAt: currentDate,
+      title: 'Everyone',
+      base: true,
+    },
+  ],
 }
 
 const contentWithManyDueDates: ModuleItemContent = {
   ...defaultContent,
-  assignmentOverrides: {
-    edges: [
-      {
-        cursor: 'cursor',
-        node: {
-          set: {
-            students: [
-              {
-                id: 'student_id_1',
-              },
-            ],
-          },
-          dueAt: new Date().addDays(-1).toISOString(), // # yesterday
-        },
+  assignedToDates: [
+    {
+      id: 'student_id_1',
+      dueAt: new Date().addDays(-1).toISOString(), // # yesterday
+      title: '1 student',
+      set: {
+        id: '1',
+        type: 'ADHOC',
       },
-      {
-        cursor: 'cursor_2',
-        node: {
-          set: {
-            sectionId: 'section_id',
-          },
-          dueAt: new Date().addDays(1).toISOString(), // # tomorrow
-        },
-      },
-    ],
-  },
-}
-
-const contentWithRedundantDueDates: ModuleItemContent = {
-  ...defaultContent,
-  assignmentOverrides: {
-    edges: [
-      {
-        cursor: 'cursor',
-        node: {
-          set: {
-            students: [
-              {
-                id: 'student_id_1',
-              },
-            ],
-          },
-          dueAt: currentDate,
-        },
-      },
-    ],
-  },
-}
-
-const gradedDiscussionWithAssignmentOverrides: ModuleItemContent = {
-  id: '1',
-  _id: '1',
-  type: 'Discussion',
-  graded: true,
-  dueAt: '2024-01-15T23:59:59Z',
-  assignment: {
-    _id: 'assignment-1',
-    dueAt: '2024-01-15T23:59:59Z',
-    assignmentOverrides: {
-      edges: [
-        {
-          cursor: 'MQ',
-          node: {
-            dueAt: '2024-01-16T23:59:59Z',
-            set: {sectionId: '1'},
-          },
-        },
-        {
-          cursor: 'Mg',
-          node: {
-            dueAt: '2024-01-17T23:59:59Z',
-            set: {sectionId: '2'},
-          },
-        },
-      ],
     },
-  },
-}
-
-const gradedDiscussionWithAssignmentBaseDuePlusOverride: ModuleItemContent = {
-  id: '2',
-  _id: '2',
-  type: 'Discussion',
-  graded: true,
-  assignment: {
-    _id: 'assignment-2',
-    dueAt: '2024-01-15T23:59:59Z',
-    assignmentOverrides: {
-      edges: [
-        {
-          cursor: 'MQ',
-          node: {
-            dueAt: '2024-01-16T23:59:59Z',
-            set: {
-              students: [{id: '123'}],
-            },
-          },
-        },
-      ],
+    {
+      id: 'section_id',
+      dueAt: new Date().addDays(1).toISOString(), // # tomorrow
+      title: '1 section',
+      set: {
+        id: '1',
+        type: 'CourseSection',
+      },
     },
-  },
+  ],
 }
 
-const assignmentWithBaseDueDateAndStudentOverride: ModuleItemContent = {
-  id: '1',
-  _id: '1',
-  type: 'Assignment',
-  graded: true,
-  dueAt: '2024-01-15T23:59:59Z',
-  assignmentOverrides: {
-    edges: [
-      {
-        cursor: 'MQ',
-        node: {
-          dueAt: '2024-01-16T23:59:59Z',
-          set: {
-            students: [{id: '123'}],
-          },
-        },
-      },
-    ],
-  },
-}
-
-const assignmentWithSameDueDateInOverride: ModuleItemContent = {
-  id: '2',
-  _id: '2',
-  type: 'Assignment',
-  graded: true,
-  dueAt: '2024-01-15T23:59:59Z',
-  assignmentOverrides: {
-    edges: [
-      {
-        cursor: 'MQ',
-        node: {
-          dueAt: '2024-01-15T23:59:59Z',
-          set: {
-            students: [{id: '123'}],
-          },
-        },
-      },
-    ],
-  },
+const contentWithConflictingAssignmentDueAt: ModuleItemContent = {
+  id: '13',
+  _id: '13',
+  dueAt: '2024-01-18T23:59:59Z',
+  assignedToDates: [
+    {
+      id: 'everyone',
+      dueAt: '2024-01-15T23:59:59Z',
+      title: 'Everyone',
+      base: true,
+    },
+  ],
 }
 
 const setUp = (content: ModuleItemContent = defaultContent) => {
@@ -192,6 +91,12 @@ describe('DueDateLabel', () => {
       expect(container.container).toBeInTheDocument()
       expect(container.getByTestId('due-date')).toBeInTheDocument()
     })
+
+    it('prefers assignedToDates for due date if it differs from dueAt', () => {
+      const container = setUp(contentWithConflictingAssignmentDueAt)
+      expect(container.getByTestId('due-date')).toBeInTheDocument()
+      expect(container.getAllByText('Jan 15, 2024')[0]).toBeInTheDocument()
+    })
   })
   describe('with multiple due dates', () => {
     it('renders', () => {
@@ -204,11 +109,11 @@ describe('DueDateLabel', () => {
       const container = setUp(contentWithManyDueDates)
       const dueAtFormat = '%b %-d at %l:%M%P'
       const dueDate1 = format(
-        contentWithManyDueDates.assignmentOverrides?.edges?.[0].node.dueAt,
+        contentWithManyDueDates.assignedToDates?.[0].dueAt,
         dueAtFormat,
       ) as string
       const dueDate2 = format(
-        contentWithManyDueDates.assignmentOverrides?.edges?.[1].node.dueAt,
+        contentWithManyDueDates.assignedToDates?.[1].dueAt,
         dueAtFormat,
       ) as string
 
@@ -221,244 +126,98 @@ describe('DueDateLabel', () => {
       expect(container.getByTestId('override-details')).toHaveTextContent('1 section')
       expect(container.getByTestId('override-details').textContent).toContain(dueDate2)
     })
-
-    it('shows a single date when overrides are redundant', () => {
-      const container = setUp(contentWithRedundantDueDates)
-      expect(container.container).toBeInTheDocument()
-      expect(container.getByTestId('due-date')).toBeInTheDocument()
-    })
   })
 
-  describe('with discussion types', () => {
-    it('shows multiple due dates for graded discussion with assignment overrides', () => {
-      const container = setUp(gradedDiscussionWithAssignmentOverrides)
-      expect(container.container).toBeInTheDocument()
-      expect(container.getByText('Multiple Due Dates')).toBeInTheDocument()
-      // Should show "Multiple Due Dates" link for discussions with assignment-level overrides
-      expect(container.queryByText('Multiple Due Dates')).toBeInTheDocument()
-    })
-
-    it('shows multiple due dates for graded discussion with assignment base due date plus override', () => {
-      const container = setUp(gradedDiscussionWithAssignmentBaseDuePlusOverride)
-      expect(container.container).toBeInTheDocument()
-      expect(container.getByText('Multiple Due Dates')).toBeInTheDocument()
-      // Should show "Multiple Due Dates" when discussion has assignment base due date + student override
-      expect(container.queryByText('Multiple Due Dates')).toBeInTheDocument()
-    })
-
-    it('shows multiple due dates for assignment with base due date and student override', () => {
-      const container = setUp(assignmentWithBaseDueDateAndStudentOverride)
-      expect(container.container).toBeInTheDocument()
-      expect(container.getByText('Multiple Due Dates')).toBeInTheDocument()
-      // Should show "Multiple Due Dates" when there's a base due date + individual student override
-      expect(container.queryByText('Multiple Due Dates')).toBeInTheDocument()
-    })
-
-    it('shows single date when base due date and override are the same', () => {
-      const container = setUp(assignmentWithSameDueDateInOverride)
-      expect(container.container).toBeInTheDocument()
-      expect(container.getByTestId('due-date')).toBeInTheDocument()
-      expect(container.queryByText('Multiple Due Dates')).not.toBeInTheDocument()
-    })
-
-    describe('comprehensive discussion date handling', () => {
-      const gradedDiscussionWithAssignmentDueAt: ModuleItemContent = {
-        id: '13',
-        _id: '13',
-        type: 'Discussion',
-        graded: true,
-        assignment: {
-          _id: 'assignment-13',
-          dueAt: '2024-01-15T23:59:59Z',
+  describe('graded discussion date handling', () => {
+    const gradedDiscussionWithMultipleDates: ModuleItemContent = {
+      id: '1',
+      _id: '1',
+      type: 'Discussion',
+      graded: true,
+      dueAt: '2024-01-15T23:59:59Z',
+      assignment: {
+        _id: 'assignment-1',
+        dueAt: '2024-01-15T23:59:59Z',
+      },
+      assignedToDates: [
+        {
+          id: 'section-1',
+          dueAt: '2024-01-16T23:59:59Z',
+          title: 'Section 1',
+          set: {id: '1', type: 'CourseSection'},
         },
-      }
-
-      const gradedDiscussionWithCheckpointOverrides: ModuleItemContent = {
-        id: '14',
-        _id: '14',
-        type: 'Discussion',
-        graded: true,
-        checkpoints: [
-          {
-            dueAt: '2024-01-20T23:59:59Z',
-            name: 'Reply to Topic',
-            tag: 'reply_to_topic',
-          },
-        ],
-        assignment: {
-          _id: 'assignment-14',
-          assignmentOverrides: {
-            edges: [
-              {
-                cursor: 'MQ',
-                node: {
-                  dueAt: '2024-01-21T23:59:59Z',
-                  set: {sectionId: '1'},
-                },
-              },
-            ],
-          },
+        {
+          id: 'section-2',
+          dueAt: '2024-01-17T23:59:59Z',
+          title: 'Section 2',
+          set: {id: '2', type: 'CourseSection'},
         },
-      }
-
-      const gradedDiscussionWithStandardizedDates: ModuleItemContent = {
-        id: '15',
-        _id: '15',
-        type: 'Discussion',
-        graded: true,
-        assignedToDates: [
-          {
-            id: 'everyone',
-            dueAt: '2024-01-15T23:59:59Z',
-            title: 'Everyone',
-            base: true,
-          },
-          {
-            id: 'section-1',
-            dueAt: '2024-01-16T23:59:59Z',
-            title: 'Section 1',
-            set: {
-              id: '1',
-              type: 'CourseSection',
-            },
-          },
-        ],
-      }
-
-      beforeEach(() => {
-        // Reset ENV for each test
-        ENV.FEATURES = {standardize_assignment_date_formatting: false}
-      })
-
-      describe('graded discussions', () => {
-        it('shows assignment.dueAt for graded discussion', () => {
-          const container = setUp(gradedDiscussionWithAssignmentDueAt)
-          expect(container.getByTestId('due-date')).toBeInTheDocument()
-          expect(container.queryByText('Multiple Due Dates')).not.toBeInTheDocument()
-        })
-
-        it('shows single date for checkpointed discussion with overrides', () => {
-          const container = setUp(gradedDiscussionWithCheckpointOverrides)
-          // Checkpointed discussions show individual checkpoint dates, not "Multiple Due Dates"
-          expect(container.getByTestId('due-date')).toBeInTheDocument()
-          expect(container.queryByText('Multiple Due Dates')).not.toBeInTheDocument()
-        })
-
-        it('shows Multiple Due Dates for graded discussion with standardized dates', () => {
-          ENV.FEATURES = {standardize_assignment_date_formatting: true}
-          const container = setUp(gradedDiscussionWithStandardizedDates)
-          expect(container.getByText('Multiple Due Dates')).toBeInTheDocument()
-          // The tooltip contains multiple due-date elements, but the main display should not show individual dates
-          expect(container.queryByText('Multiple Due Dates')).toBeInTheDocument()
-        })
-
-        it('shows single date for graded discussion with single standardized date', () => {
-          ENV.FEATURES = {standardize_assignment_date_formatting: true}
-          const singleDateContent = {
-            ...gradedDiscussionWithStandardizedDates,
-            assignedToDates: [gradedDiscussionWithStandardizedDates.assignedToDates![0]],
-          }
-          const container = setUp(singleDateContent)
-          expect(container.getByTestId('due-date')).toBeInTheDocument()
-          expect(container.queryByText('Multiple Due Dates')).not.toBeInTheDocument()
-        })
-      })
-
-      describe('edge cases', () => {
-        const discussionWithNullDates: ModuleItemContent = {
-          id: '17',
-          _id: '17',
-          type: 'Discussion',
-          graded: false,
-          todoDate: undefined,
-          lockAt: undefined,
-          dueAt: undefined,
-        }
-
-        const discussionWithEmptyOverrides: ModuleItemContent = {
-          id: '18',
-          _id: '18',
-          type: 'Discussion',
-          graded: true,
-          assignment: {
-            _id: 'assignment-18',
-            dueAt: '2024-01-15T23:59:59Z',
-            assignmentOverrides: {
-              edges: [],
-            },
-          },
-        }
-
-        const discussionWithOverridesButNoDates: ModuleItemContent = {
-          id: '19',
-          _id: '19',
-          type: 'Discussion',
-          graded: true,
-          assignment: {
-            _id: 'assignment-19',
-            assignmentOverrides: {
-              edges: [
-                {
-                  cursor: 'MQ',
-                  node: {
-                    dueAt: undefined,
-                    set: {sectionId: '1'},
-                  },
-                },
-              ],
-            },
-          },
-        }
-
-        it('returns null when discussion has no dates', () => {
-          const container = setUp(discussionWithNullDates)
-          expect(container.container.firstChild).toBeNull()
-        })
-
-        it('shows single date when discussion has empty overrides', () => {
-          const container = setUp(discussionWithEmptyOverrides)
-          expect(container.getByTestId('due-date')).toBeInTheDocument()
-          expect(container.queryByText('Multiple Due Dates')).not.toBeInTheDocument()
-        })
-
-        it('handles overrides with no due dates gracefully', () => {
-          const container = setUp(discussionWithOverridesButNoDates)
-          expect(container.container.firstChild).toBeNull()
-        })
-      })
-
-      describe('standardized dates feature flag', () => {
-        const discussionWithBothFormats: ModuleItemContent = {
-          id: '20',
-          _id: '20',
-          type: 'Discussion',
-          graded: true,
+      ],
+    }
+    const gradedDiscussionWithOneDate: ModuleItemContent = {
+      id: '13',
+      _id: '13',
+      type: 'Discussion',
+      graded: true,
+      assignment: {
+        _id: 'assignment-13',
+        dueAt: '2024-01-15T23:59:59Z',
+      },
+      assignedToDates: [
+        {
+          id: 'everyone',
           dueAt: '2024-01-15T23:59:59Z',
-          assignment: {
-            _id: 'assignment-20',
-            dueAt: '2024-01-15T23:59:59Z',
-            assignmentOverrides: {
-              edges: [
-                {
-                  cursor: 'MQ',
-                  node: {
-                    dueAt: '2024-01-16T23:59:59Z',
-                    set: {sectionId: '1'},
-                  },
-                },
-              ],
-            },
-          },
+          title: 'Everyone',
+          base: true,
+        },
+      ],
+    }
+
+    const gradedDiscussionWithCheckpointDate: ModuleItemContent = {
+      id: '14',
+      _id: '14',
+      type: 'Discussion',
+      graded: true,
+      checkpoints: [
+        {
+          dueAt: '2024-01-20T23:59:59Z',
+          name: 'Reply to Topic',
+          tag: 'reply_to_topic',
           assignedToDates: [
             {
               id: 'everyone',
-              dueAt: '2024-01-15T23:59:59Z',
+              dueAt: '2024-01-20T23:59:59Z',
+              title: 'Everyone',
+              base: true,
+            },
+          ],
+        },
+      ],
+      assignment: {
+        _id: 'assignment-14',
+      },
+    }
+
+    const gradedDiscussionWithMultipleCheckpointDates: ModuleItemContent = {
+      id: '14',
+      _id: '14',
+      type: 'Discussion',
+      graded: true,
+      checkpoints: [
+        {
+          dueAt: '2024-01-20T23:59:59Z',
+          name: 'Reply to Topic',
+          tag: 'reply_to_topic',
+          assignedToDates: [
+            {
+              id: 'everyone',
+              dueAt: '2024-01-20T23:59:59Z',
               title: 'Everyone',
               base: true,
             },
             {
               id: 'section-1',
-              dueAt: '2024-01-16T23:59:59Z',
+              dueAt: '2024-01-21T23:59:59Z',
               title: 'Section 1',
               set: {
                 id: '1',
@@ -466,29 +225,53 @@ describe('DueDateLabel', () => {
               },
             },
           ],
-        }
+        },
+      ],
+      assignment: {
+        _id: 'assignment-14',
+      },
+    }
 
-        it('uses standardized dates when feature flag is enabled', () => {
-          ENV.FEATURES = {standardize_assignment_date_formatting: true}
-          const container = setUp(discussionWithBothFormats)
-          expect(container.getByText('Multiple Due Dates')).toBeInTheDocument()
-        })
+    it('shows multiple due dates for graded discussion with multiple assign to dates', () => {
+      const container = setUp(gradedDiscussionWithMultipleDates)
+      expect(container.container).toBeInTheDocument()
+      expect(container.getByText('Multiple Due Dates')).toBeInTheDocument()
+      // Should show "Multiple Due Dates" link for discussions with assignment-level overrides
+      expect(container.queryByText('Multiple Due Dates')).toBeInTheDocument()
+    })
 
-        it('uses legacy dates when feature flag is disabled', () => {
-          ENV.FEATURES = {standardize_assignment_date_formatting: false}
-          const container = setUp(discussionWithBothFormats)
-          expect(container.getByText('Multiple Due Dates')).toBeInTheDocument()
-        })
+    it('shows one due date for graded discussion with one assign to date', () => {
+      const container = setUp(gradedDiscussionWithOneDate)
+      expect(container.getByTestId('due-date')).toBeInTheDocument()
+      expect(container.queryByText('Multiple Due Dates')).not.toBeInTheDocument()
+    })
 
-        it('falls back to legacy when standardized dates are empty', () => {
-          ENV.FEATURES = {standardize_assignment_date_formatting: true}
-          const contentNoStandardized = {
-            ...discussionWithBothFormats,
-            assignedToDates: [],
-          }
-          const container = setUp(contentNoStandardized)
-          expect(container.getByText('Multiple Due Dates')).toBeInTheDocument()
-        })
+    it('shows single date for checkpointed discussion with single date', () => {
+      const container = setUp(gradedDiscussionWithCheckpointDate.checkpoints?.[0])
+      expect(container.getByTestId('due-date')).toBeInTheDocument()
+      expect(container.queryByText('Multiple Due Dates')).not.toBeInTheDocument()
+    })
+
+    it('shows multiple dates for checkpointed discussion with multiple dates', () => {
+      const container = setUp(gradedDiscussionWithMultipleCheckpointDates.checkpoints?.[0])
+      expect(container.getByText('Multiple Due Dates')).toBeInTheDocument()
+    })
+
+    describe('edge cases', () => {
+      const discussionWithNullDates: ModuleItemContent = {
+        id: '17',
+        _id: '17',
+        type: 'Discussion',
+        graded: false,
+        todoDate: undefined,
+        lockAt: undefined,
+        dueAt: undefined,
+        assignedToDates: [],
+      }
+
+      it('returns null when discussion has no dates', () => {
+        const container = setUp(discussionWithNullDates)
+        expect(container.container.firstChild).toBeNull()
       })
     })
   })

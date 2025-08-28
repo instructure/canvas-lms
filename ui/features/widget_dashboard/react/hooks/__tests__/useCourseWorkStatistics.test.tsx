@@ -263,7 +263,7 @@ describe('useCourseWorkStatistics', () => {
       }),
     )
 
-    const {result, rerender, cleanup} = setup()
+    const {result, cleanup} = setup()
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false)

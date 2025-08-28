@@ -21,7 +21,7 @@
 require_relative("web_conference_spec_helper")
 
 describe BigBlueButtonConference do
-  include_examples "WebConference"
+  it_behaves_like "WebConference"
 
   context "big_blue_button" do
     before do

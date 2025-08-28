@@ -81,3 +81,43 @@ export interface WidgetRenderer {
 }
 
 export type WidgetRegistry = Record<string, WidgetRenderer>
+
+export interface CourseGrade {
+  courseId: string
+  courseCode: string
+  courseName: string
+  currentGrade: number | null
+  gradingScheme: string
+  lastUpdated: Date
+}
+
+export interface CourseGradeCardProps {
+  courseId: string
+  courseCode: string
+  courseName: string
+  currentGrade: number | null
+  lastUpdated: Date
+  onShowGradebook: () => void
+  gridIndex?: number
+  globalGradeVisibility?: boolean
+  onGradeVisibilityChange?: (visible: boolean) => void
+}
+export interface Announcement {
+  id: string
+  title: string
+  message: string
+  posted_at: string
+  html_url: string
+  context_code: string
+  course?: {
+    id: string
+    name: string
+    courseCode?: string
+  }
+  author?: {
+    _id: string
+    name: string
+    avatarUrl: string
+  } | null
+  isRead?: boolean
+}

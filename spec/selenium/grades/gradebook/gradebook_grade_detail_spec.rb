@@ -30,6 +30,7 @@ shared_examples "Grade Detail Tray:" do |ff_enabled|
   include_context "in-process server selenium tests"
   include GradebookCommon
   include FilesCommon
+
   include_context "late_policy_course_setup"
 
   before :once do

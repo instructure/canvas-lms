@@ -46,6 +46,7 @@ class ErrorReport < ActiveRecord::Base
     IGNORED_CATEGORIES = %w[404 ActionDispatch::RemoteIp::IpSpoofAttackError Turnitin::Errors::SubmissionNotScoredError PG::ConnectionBad].freeze
 
     include ActiveSupport::Callbacks
+
     define_callbacks :on_log_error
 
     attr_reader :opts, :exception

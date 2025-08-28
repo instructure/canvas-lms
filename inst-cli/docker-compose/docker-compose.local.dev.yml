@@ -9,6 +9,7 @@ x-environment: &BASE-ENV
   CANVAS_DEV_DOMAIN: canvas-web.$INST_DOMAIN
   CANVAS_PROD_DOMAIN: canvas-web.$INST_DOMAIN
   RCE_HOST: canvas-rce-api-web.$INST_DOMAIN
+  INCLUDE_INTERNAL_API_DOCS: 'true'
 
 x-base-service: &BASE-SERVICE
   build:
@@ -57,6 +58,7 @@ services:
       - postgres
       - redis
     ports:
+      - 80
       - 12345-12354:12345-12354
     networks:
       default:

@@ -21,8 +21,6 @@ import {createRoot} from 'react-dom/client'
 import SuspendedIcon from '../react/SuspendedIcon'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */
-import 'jqueryui/dialog'
-import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf */
 import '@canvas/util/templateData'
 import AddEditPseudonym from '../react/AddEditPseudonym'

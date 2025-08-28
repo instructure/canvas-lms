@@ -101,18 +101,30 @@ describe('useShowAllState', () => {
     expect(newShowAll).toBe(true)
   })
 
-  it('handles localStorage errors gracefully', () => {
-    localStorageMock.setItem.mockImplementationOnce(() => {
-      throw new Error('Storage error')
+  describe('error handling', () => {
+    let originalError: any
+    beforeEach(() => {
+      originalError = window.onerror
+      console.error = () => {}
     })
 
-    const {result} = renderHook(() => useShowAllState(moduleId))
-    const [, setShowAll] = result.current
+    afterEach(() => {
+      console.error = originalError
+    })
 
-    expect(() => {
-      act(() => {
-        setShowAll(true)
+    it('handles localStorage errors gracefully', () => {
+      localStorageMock.setItem.mockImplementationOnce(() => {
+        throw new Error('Storage error')
       })
-    }).not.toThrow()
+
+      const {result} = renderHook(() => useShowAllState(moduleId))
+      const [, setShowAll] = result.current
+
+      expect(() => {
+        act(() => {
+          setShowAll(true)
+        })
+      }).not.toThrow()
+    })
   })
 })

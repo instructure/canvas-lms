@@ -22,6 +22,7 @@ class Quizzes::QuizQuestion::AnswerGroup
   attr_accessor :answers, :taken_ids
 
   extend Forwardable
+
   def_delegators :@answers, :each, :<<, :[], :[]=, :each_with_index, :empty?, :first
   include Enumerable
 
@@ -70,6 +71,7 @@ class Quizzes::QuizQuestion::AnswerGroup
 
   class Answer
     extend Forwardable
+
     def_delegators :@data, :[], :[]=
 
     def initialize(data = {})

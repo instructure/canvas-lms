@@ -19,17 +19,16 @@
 import {ImageData} from '../BlockItems/Image/types'
 import {TextData} from '../BlockItems/Text/types'
 import {TitleData} from '../BlockItems/Title/types'
+import {ReactNode} from 'react'
 
 export type ArrangementOption = 'left' | 'right'
 export type TextToImageRatioOption = '1:1' | '2:1'
 export type ImageTextSettings = {
-  settings: {
-    includeBlockTitle: boolean
-    backgroundColor: string
-    textColor: string
-    arrangement: ArrangementOption
-    textToImageRatio: TextToImageRatioOption
-  }
+  includeBlockTitle: boolean
+  backgroundColor: string
+  textColor: string
+  arrangement: ArrangementOption
+  textToImageRatio: TextToImageRatioOption
 }
 export type ImageTextData = TextData & ImageData
 export type ImageTextEditHandlers = {
@@ -37,9 +36,38 @@ export type ImageTextEditHandlers = {
   onContentChange: (content: string) => void
   onImageChange: (imageData: ImageData) => void
 }
+export type ImageTextBlockLayoutProps = {
+  titleComponent: ReactNode
+  imageComponent: ReactNode
+  textComponent: ReactNode
+  arrangement: ArrangementOption
+  textToImageRatio: TextToImageRatioOption
+  dataTestId?: string
+}
 
-export type ImageTextBlockBase = ImageTextData & ImageTextSettings & TitleData
-export type ImageTextBlockProps = ImageTextBlockBase
-export type ImageTextBlockEditProps = ImageTextBlockBase & ImageTextEditHandlers
-export type ImageTextBlockEditPreviewProps = ImageTextBlockBase
-export type ImageTextBlockViewProps = ImageTextBlockBase
+export type ImageTextBlockProps = ImageTextData & TitleData & ImageTextSettings
+export type ImageTextBlockEditProps = TitleData &
+  ImageTextEditHandlers &
+  ImageData &
+  TextData & {
+    includeBlockTitle: boolean
+    textColor: string
+    arrangement: ArrangementOption
+    textToImageRatio: TextToImageRatioOption
+  }
+export type ImageTextBlockEditPreviewProps = TitleData &
+  ImageData &
+  TextData & {
+    includeBlockTitle: boolean
+    textColor: string
+    arrangement: ArrangementOption
+    textToImageRatio: TextToImageRatioOption
+  }
+export type ImageTextBlockViewProps = TitleData &
+  ImageData &
+  TextData & {
+    includeBlockTitle: boolean
+    textColor: string
+    arrangement: ArrangementOption
+    textToImageRatio: TextToImageRatioOption
+  }

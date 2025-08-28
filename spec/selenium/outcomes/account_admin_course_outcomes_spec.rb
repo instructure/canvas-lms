@@ -18,9 +18,11 @@
 
 require_relative "../common"
 require_relative "../helpers/outcome_common"
+require "feature_flag_helper"
 
 describe "account admin outcomes" do
   include_context "in-process server selenium tests"
+  include FeatureFlagHelper
   include OutcomeCommon
 
   let(:outcome_url) { "/accounts/#{Account.default.id}/outcomes" }
@@ -29,6 +31,8 @@ describe "account admin outcomes" do
 
   describe "course outcomes" do
     before do
+      mock_feature_flag_on_account(:improved_outcomes_management, false)
+
       RoleOverride.create!(context: account,
                            permission: "manage_courses_admin",
                            role: admin_role,

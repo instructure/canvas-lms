@@ -32,12 +32,16 @@ rescue
   secret = SecureRandom.hex(64)
 end
 
-config = {
+base_config = {
   key: "_normandy_session",
-  secret:,
-  legacy_key: "_legacy_normandy_session",
-  same_site: :none
-}.merge((ConfigFile.load("session_store").dup || {}).symbolize_keys)
+  secret:
+}
+# Only use same_site :none in environments where we can use secure cookies, as browsers otherwise don't accept it
+if Rails.application.config.force_ssl
+  base_config[:same_site] = :none
+  base_config[:secure] = true
+end
+config = base_config.merge((ConfigFile.load("session_store").dup || {}).symbolize_keys)
 
 # :expire_after is the "true" option, and :expires is a legacy option, but is applied
 # to the cookie after :expire_after is, so by setting it to nil, we force the lesser
@@ -48,6 +52,5 @@ config[:logger] = Rails.logger
 
 Autoextend.hook(:EncryptedCookieStore, :SessionsTimeout)
 
-# after iOS12 is dead, change this back to :encrypted_cookie_store and remove lib/samesite_transition_cookie_store.rb
-CanvasRails::Application.config.session_store(:samesite_transition_cookie_store, **config)
+CanvasRails::Application.config.session_store(:enhanced_cookie_store, **config)
 CanvasRails::Application.config.secret_token = config[:secret]

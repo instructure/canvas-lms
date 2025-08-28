@@ -190,13 +190,16 @@ export const RubricForm = ({
   }
 
   const duplicateCriterion = (criterion: RubricCriterion) => {
+    const clonedCriterion = structuredClone(criterion)
+
     const newCriterion: RubricCriterion = {
-      ...criterion,
+      ...clonedCriterion,
       id: Date.now().toString(),
       outcome: undefined,
       learningOutcomeId: undefined,
-      description: stripHtmlTags(criterion.description) ?? '',
-      longDescription: stripHtmlTags(criterion.longDescription) ?? '',
+      description: stripHtmlTags(clonedCriterion.description) ?? '',
+      longDescription: stripHtmlTags(clonedCriterion.longDescription) ?? '',
+      points: Math.max(...clonedCriterion.ratings.map(r => r.points), 0),
     }
 
     setSelectedCriterion(newCriterion)
@@ -442,6 +445,7 @@ export const RubricForm = ({
         onDismiss={() => setIsOutcomeCriterionModalOpen(false)}
       />
       <RubricAssessmentTray
+        currentUserId={ENV.current_user_id ?? ''}
         hidePoints={rubricForm.hidePoints}
         isOpen={isPreviewTrayOpen}
         isPreviewMode={false}

@@ -96,6 +96,12 @@ describe('api actions', () => {
 
   describe('savePlannerItem', () => {
     it('dispatches saving, clearUpdateTodo, and saved actions', () => {
+      server.use(
+        http.post('/api/v1/planner_notes', () => {
+          return HttpResponse.json({}, {status: 201})
+        }),
+      )
+
       const mockDispatch = jest.fn()
       const plannerItem = simpleItem()
       const savePromise = Actions.savePlannerItem(plannerItem)(mockDispatch, getBasicState)
@@ -109,6 +115,12 @@ describe('api actions', () => {
     })
 
     it('sets isNewItem to false if the item id exists', () => {
+      server.use(
+        http.put('/api/v1/planner_notes/42', () => {
+          return HttpResponse.json({id: '42'}, {status: 200})
+        }),
+      )
+
       const mockDispatch = jest.fn()
       const plannerItem = simpleItem({id: '42'})
       const savePromise = Actions.savePlannerItem(plannerItem)(mockDispatch, getBasicState)
@@ -258,8 +270,14 @@ describe('api actions', () => {
 
   describe('deletePlannerItem', () => {
     it('dispatches deleting, clearUpdateTodo, deleted, and maybe update sidebar actions', () => {
+      server.use(
+        http.delete('/api/v1/planner_notes/:id', () => {
+          return HttpResponse.json({}, {status: 200})
+        }),
+      )
+
       const mockDispatch = jest.fn()
-      const plannerItem = simpleItem()
+      const plannerItem = simpleItem({id: '1'})
       const deletePromise = Actions.deletePlannerItem(plannerItem)(mockDispatch, getBasicState)
       expect(isPromise(deletePromise)).toBe(true)
       expect(mockDispatch).toHaveBeenCalledWith({

@@ -74,7 +74,17 @@ module Importers
           item.locked = true if hash[:locked]
           item.lock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:lock_at]) if hash[:lock_at]
           item.unlock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:unlock_at]) if hash[:unlock_at]
-          item.file_state = hash[:hidden] ? "hidden" : "available"
+          item.file_state = if context.root_account.feature_enabled?(:skip_reactivating_deleted_attachments)
+                              if hash[:hidden]
+                                "hidden"
+                              elsif item.media_entry_id.present?
+                                "available"
+                              else
+                                item.file_state
+                              end
+                            else
+                              hash[:hidden] ? "hidden" : "available"
+                            end
           item.display_name = hash[:display_name] if hash[:display_name]
           item.usage_rights_id = find_or_create_usage_rights(context, hash[:usage_rights], created_usage_rights_map) if hash[:usage_rights]
           item.set_publish_state_for_usage_rights unless hash[:locked]

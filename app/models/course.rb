@@ -100,7 +100,9 @@ class Course < ActiveRecord::Base
   has_many :all_real_student_enrollments, -> { where("enrollments.type = 'StudentEnrollment' AND enrollments.workflow_state <> 'deleted'").preload(:user) }, class_name: "StudentEnrollment"
   has_many :all_real_students, through: :all_real_student_enrollments, source: :user
   has_many :teacher_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'deleted') AND enrollments.type = 'TeacherEnrollment'").preload(:user) }, class_name: "TeacherEnrollment"
-  has_many :teachers, -> { order("sortable_name") }, through: :teacher_enrollments, source: :user
+  has_many :teachers, -> { order(:sortable_name) }, through: :teacher_enrollments, source: :user
+  has_many :active_teacher_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive') AND enrollments.type = 'TeacherEnrollment'").preload(:user) }, class_name: "TeacherEnrollment"
+  has_many :active_teachers, -> { order(:sortable_name) }, through: :active_teacher_enrollments, source: :user
   has_many :ta_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'deleted')").preload(:user) }, class_name: "TaEnrollment"
   has_many :tas, through: :ta_enrollments, source: :user
   has_many :observer_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'deleted')").preload(:user) }, class_name: "ObserverEnrollment"
@@ -195,7 +197,7 @@ class Course < ActiveRecord::Base
   has_many :folders, -> { order("folders.name") }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :active_folders, -> { where("folders.workflow_state<>'deleted'").order("folders.name") }, class_name: "Folder", as: :context, inverse_of: :context
   has_many :messages, as: :context, inverse_of: :context, dependent: :destroy
-  has_many :context_external_tools, -> { order("name") }, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :context_external_tools, -> { order(:name) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :tool_proxies, class_name: "Lti::ToolProxy", as: :context, inverse_of: :context, dependent: :destroy
   belongs_to :wiki
   has_many :wiki_pages, as: :context, inverse_of: :context
@@ -212,7 +214,7 @@ class Course < ActiveRecord::Base
   has_many :external_feeds, as: :context, inverse_of: :context, dependent: :destroy
   belongs_to :grading_standard
   has_many :grading_standards, -> { where("workflow_state<>'deleted'") }, as: :context, inverse_of: :context
-  has_many :web_conferences, -> { order("created_at DESC") }, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :web_conferences, -> { order(created_at: :desc) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :collaborations, -> { order(Arel.sql("collaborations.title, collaborations.created_at")) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :context_modules, -> { ordered }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :context_module_progressions, through: :context_modules
@@ -224,7 +226,7 @@ class Course < ActiveRecord::Base
   has_many :role_overrides, as: :context, inverse_of: :context
   has_many :content_migrations, as: :context, inverse_of: :context
   has_many :content_exports, as: :context, inverse_of: :context
-  has_many :epub_exports, -> { where(type: nil).order("created_at DESC") }
+  has_many :epub_exports, -> { where(type: nil).order(created_at: :desc) }
   has_many :course_reports, dependent: :destroy
 
   has_many :gradebook_filters, inverse_of: :course, dependent: :destroy
@@ -346,6 +348,7 @@ class Course < ActiveRecord::Base
   sanitize_field :syllabus_body, CanvasSanitize::SANITIZE
 
   include StickySisFields
+
   are_sis_sticky :name,
                  :course_code,
                  :start_at,
@@ -359,6 +362,7 @@ class Course < ActiveRecord::Base
   include FeatureFlags
 
   include ContentNotices
+
   define_content_notice :import_in_progress,
                         text: -> { t("One or more items are currently being imported. They will be shown in the course below once they are available.") },
                         link_text: -> { t("Import Status") },
@@ -969,9 +973,9 @@ class Course < ActiveRecord::Base
     end
   end
 
-  scope :recently_started, -> { where(start_at: 1.month.ago..Time.zone.now).order("start_at DESC").limit(10) }
-  scope :recently_ended, -> { where(conclude_at: 1.month.ago..Time.zone.now).order("start_at DESC").limit(10) }
-  scope :recently_created, -> { where(created_at: 1.month.ago..Time.zone.now).order("created_at DESC").limit(50).preload(:teachers) }
+  scope :recently_started, -> { where(start_at: 1.month.ago..Time.zone.now).order(start_at: :desc).limit(10) }
+  scope :recently_ended, -> { where(conclude_at: 1.month.ago..Time.zone.now).order(start_at: :desc).limit(10) }
+  scope :recently_created, -> { where(created_at: 1.month.ago..Time.zone.now).order(created_at: :desc).limit(50).preload(:teachers) }
   scope :for_term, ->(term) { term ? where(enrollment_term_id: term) : all }
   scope :active_first, -> { order(Arel.sql("CASE WHEN courses.workflow_state='available' THEN 0 ELSE 1 END, #{best_unicode_collation_key("name")}")) }
   scope :name_like, lambda { |query|
@@ -2100,6 +2104,18 @@ class Course < ActiveRecord::Base
     completed? || soft_concluded?(enrollment_type)
   end
 
+  def active_now?
+    now = Time.zone.now
+    if restrict_enrollments_to_course_dates
+      started = start_at.nil? || start_at <= now
+      not_concluded = conclude_at.nil? || conclude_at > now
+    else
+      started = enrollment_term&.start_at.nil? || enrollment_term.start_at <= now
+      not_concluded = enrollment_term&.end_at.nil? || enrollment_term.end_at > now
+    end
+    started && not_concluded
+  end
+
   def set_concluded_assignments_grading_standard
     ActiveRecord::Base.transaction do
       assignments.where(grading_type: ["letter_grade", "gpa_scale"], grading_standard_id: nil).in_batches(of: 10_000).update_all(grading_standard_id: 0, updated_at: Time.zone.now)
@@ -2782,6 +2798,7 @@ class Course < ActiveRecord::Base
       comments += turnitin_comments
     end
     extend TextHelper
+
     format_message(comments).first
   end
 
@@ -3461,6 +3478,7 @@ class Course < ActiveRecord::Base
     cache_key = [user, self, opts].cache_key
     @tabs_available ||= {}
     @tabs_available[cache_key] ||= uncached_tabs_available(user, opts)
+    @tabs_available[cache_key]
   end
 
   def uncached_tabs_available(user, opts)
@@ -3497,7 +3515,7 @@ class Course < ActiveRecord::Base
                           })
     end
 
-    if feature_enabled?(:accessibility_tab_enable)
+    if root_account.enable_content_a11y_checker?
       # Add Accessibility tab at the end of the tabs (except for Settings tab)
       default_tabs.push({
                           id: TAB_ACCESSIBILITY,

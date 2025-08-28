@@ -16,14 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {FocusHandler} from '../../hooks/useFocusElement'
 import {TitleData} from '../BlockItems/Title/types'
 
 export type ButtonAlignment = 'left' | 'center' | 'right'
 export type ButtonLayout = 'horizontal' | 'vertical'
+export type ButtonLinkOpenMode = 'new-tab' | 'same-tab'
+export type ButtonStyle = 'filled' | 'outlined'
 
 export type ButtonData = {
   id: number
   text: string
+  url: string
+  linkOpenMode: ButtonLinkOpenMode
+  primaryColor: string
+  secondaryColor: string
+  style: ButtonStyle
 }
 
 export type ButtonBlockSettings = {
@@ -34,6 +42,7 @@ export type ButtonBlockSettings = {
     layout: ButtonLayout
     isFullWidth: boolean
     backgroundColor: string
+    textColor: string
   }
 }
 
@@ -47,9 +56,12 @@ export type ButtonBlockEditProps = ButtonBlockBase & {
 
 export type ButtonDisplayProps = ButtonBlockSettings & {
   dataTestId: string
+  onButtonClick?: (buttonId: number) => void
+  focusHandler?: FocusHandler
 }
 
 export type ButtonBlockIndividualButtonSettingsProps = {
+  backgroundColor: string
   initialButtons: ButtonData[]
   onButtonsChange: (buttons: ButtonData[]) => void
 }
@@ -63,7 +75,17 @@ export type ButtonBlockGeneralButtonSettingsProps = {
   onIsFullWidthChange: (isFullWidth: boolean) => void
 }
 
+export type ButtonBlockColorSettingsProps = {
+  includeBlockTitle: boolean
+  backgroundColor: string
+  textColor: string
+  onBackgroundColorChange: (color: string) => void
+  onTextColorChange: (color: string) => void
+}
+
 export type SingleButtonProps = {
   button: ButtonData
   isFullWidth: boolean
+  onButtonClick?: (buttonId: number) => void
+  focusHandler?: FocusHandler
 }

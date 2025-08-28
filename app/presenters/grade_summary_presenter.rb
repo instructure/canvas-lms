@@ -84,7 +84,7 @@ class GradeSummaryPresenter
 
   def observed_student
     # be consistent about which student we return by default
-    (observed_students.to_a.min_by { |e| e[0].sortable_name })[1].first
+    observed_students.to_a.min_by { |e| e[0].sortable_name }[1].first
   end
 
   def linkable_observed_students

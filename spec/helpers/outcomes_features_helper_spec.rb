@@ -18,7 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require "feature_flag_helper"
+
 describe OutcomesFeaturesHelper do
+  include FeatureFlagHelper
   include OutcomesFeaturesHelper
 
   describe "OutcomesFeaturesHelper" do
@@ -73,19 +76,19 @@ describe OutcomesFeaturesHelper do
       end
 
       it "returns false when improved_outcomes_management FF is disabled" do
-        @context.root_account.disable_feature!(:improved_outcomes_management)
+        mock_feature_flag_on_account(:improved_outcomes_management, false)
         expect(improved_outcomes_management_enabled?(@course_outcome.context)).to be false
       end
 
       it "returns FF status with Course context as argument" do
         expect(improved_outcomes_management_enabled?(@course_outcome.context)).to be true
-        @context.root_account.disable_feature!(:improved_outcomes_management)
+        mock_feature_flag_on_account(:improved_outcomes_management, false)
         expect(improved_outcomes_management_enabled?(@course_outcome.context)).to be false
       end
 
       it "returns FF status with Account context as argument" do
         expect(improved_outcomes_management_enabled?(@account_outcome.context)).to be true
-        @context.root_account.disable_feature!(:improved_outcomes_management)
+        mock_feature_flag_on_account(:improved_outcomes_management, false)
         expect(improved_outcomes_management_enabled?(@account_outcome.context)).to be false
       end
 

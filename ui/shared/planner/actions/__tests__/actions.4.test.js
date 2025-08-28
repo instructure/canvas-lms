@@ -96,6 +96,12 @@ describe('api actions', () => {
 
   describe('togglePlannerItemCompletion', () => {
     it('dispatches saving, saved, and maybe update sidebar actions', () => {
+      server.use(
+        http.post('/api/v1/planner/overrides', () => {
+          return HttpResponse.json({}, {status: 201})
+        }),
+      )
+
       const mockDispatch = jest.fn()
       const plannerItem = simpleItem()
       const savingItem = {...plannerItem, show: true, toggleAPIPending: true}

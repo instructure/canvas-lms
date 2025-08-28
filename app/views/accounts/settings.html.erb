@@ -481,6 +481,12 @@
                       <%= settings.label :limit_personal_access_tokens, t("Limit personal access token creation to Admins.") %>
                     </td>
                   </tr>
+                  <tr>
+                    <td colspan="2">
+                      <%= settings.check_box :restrict_personal_access_tokens_from_students, checked: @account.restrict_personal_access_tokens_from_students? %>
+                      <%= settings.label :restrict_personal_access_tokens_from_students, t("Restrict students from creating personal access tokens.") %>
+                    </td>
+                  </tr>
                 <% end%>
               <% end %>
             <% end %>
@@ -637,6 +643,16 @@
                 </div>
               </div>
             </div>
+
+            <% if @account.primary_settings_root_account? &&
+                  !@account.site_admin? &&
+                  Account.site_admin.grants_right?(@current_user, session, :read) &&  # Until the end of the EAP, only Instructure will be able to see this option.
+                  @account.grants_right?(@current_user, :manage_account_settings) %>
+              <div>
+                <%= settings.check_box :enable_content_a11y_checker, :checked => @account.settings[:enable_content_a11y_checker] %>
+                <%= settings.label :enable_content_a11y_checker, :en => "Content Accessibility Checker" %>
+              </div>
+            <% end %>
 
             <% if !@account.site_admin? && @account.feature_enabled?(:assign_to_differentiation_tags) %>
               <div>

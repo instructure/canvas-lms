@@ -23,7 +23,9 @@ module Accessibility
       self.id = "adjacent-links"
       self.link = "https://www.w3.org/TR/WCAG20-TECHS/H2.html"
 
-      def self.test(elem)
+      # Accessibility::Rule methods
+
+      def test(elem)
         return nil if elem.tag_name != "a"
 
         next_elem = elem.next_element_sibling
@@ -35,27 +37,7 @@ module Accessibility
         I18n.t("Adjacent links contain the same URL.") if elem_href == next_href
       end
 
-      def self.display_name
-        I18n.t("Adjacent links")
-      end
-
-      def self.message
-        I18n.t("These are two links that go to the same place. Turn them into one link to avoid repetition.")
-      end
-
-      def self.why
-        I18n.t(
-          "When two or more links are next to each other and lead to the same destination, " \
-          "screen readers interpret them as two separate links, even though the intent is usually displaying a single link. " \
-          "This creates unnecessary repetition and is confusing."
-        )
-      end
-
-      def self.root_node(elem)
-        elem.parent_node
-      end
-
-      def self.form(_elem)
+      def form(_elem)
         Accessibility::Forms::Button.new(
           label: I18n.t("Merge links"),
           value: "false",
@@ -63,7 +45,7 @@ module Accessibility
         )
       end
 
-      def self.fix!(elem, value)
+      def fix!(elem, value)
         return nil if test(elem).nil?
         return nil unless value == "true" || elem.tag_name == "a"
 
@@ -71,12 +53,12 @@ module Accessibility
 
         return elem unless next_elem && next_elem.tag_name == "a" && elem.get_attribute("href") == next_elem.get_attribute("href")
 
-        left_image = single_child_image(elem)
-        right_image = single_child_image(next_elem)
+        left_image = self.class.single_child_image(elem)
+        right_image = self.class.single_child_image(next_elem)
 
-        if left_image && !right_image && normalize_text(left_image.get_attribute("alt")) == normalize_text(next_elem.text_content)
+        if left_image && !right_image && self.class.normalize_text(left_image.get_attribute("alt")) == self.class.normalize_text(next_elem.text_content)
           left_image.set_attribute("alt", "")
-        elsif right_image && !left_image && normalize_text(right_image.get_attribute("alt")) == normalize_text(elem.text_content)
+        elsif right_image && !left_image && self.class.normalize_text(right_image.get_attribute("alt")) == self.class.normalize_text(elem.text_content)
           right_image.set_attribute("alt", "")
         end
 
@@ -85,6 +67,28 @@ module Accessibility
         next_elem.remove
 
         elem
+      end
+
+      def display_name
+        I18n.t("Adjacent links")
+      end
+
+      def message
+        I18n.t("These are two links that go to the same place. Turn them into one link to avoid repetition.")
+      end
+
+      def why
+        I18n.t(
+          "When two or more links are next to each other and lead to the same destination, " \
+          "screen readers interpret them as two separate links, even though the intent is usually displaying a single link. " \
+          "This creates unnecessary repetition and is confusing."
+        )
+      end
+
+      # Helper methods
+
+      def self.root_node(elem)
+        elem.parent_node
       end
 
       def self.single_child_image(link)

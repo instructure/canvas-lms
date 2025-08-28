@@ -54,18 +54,33 @@ class Accessibility::ResourceScannerService < ApplicationService
 
     issues = scan_resource_for_issues
 
-    scan.accessibility_issues.delete_all
+    scan.accessibility_issues.active.delete_all
     scan.accessibility_issues.create!(issues) if issues.any?
 
     scan.update(
       workflow_state: "completed",
       issue_count: issues.count
     )
+    log_to_datadog(scan)
   rescue => e
     handle_scan_failure(scan, e)
   end
 
   private
+
+  def log_to_datadog(scan)
+    InstStatsd::Statsd.distributed_increment("accessibility.resources_scanned", tags: { course_id: scan.course_id })
+
+    if scan.wiki_page_id?
+      InstStatsd::Statsd.distributed_increment("accessibility.pages_scanned", tags: { course_id: scan.course_id })
+    elsif scan.assignment_id?
+      InstStatsd::Statsd.distributed_increment("accessibility.assignments_scanned", tags: { course_id: scan.course_id })
+    end
+
+    if scan.failed?
+      InstStatsd::Statsd.distributed_increment("accessibility.resource_scan_failed", tags: { course_id: scan.course_id, scan_id: scan.id })
+    end
+  end
 
   def scan_already_queued_or_in_progress?
     AccessibilityResourceScan.for_context(@resource)
@@ -103,6 +118,7 @@ class Accessibility::ResourceScannerService < ApplicationService
       workflow_state: "failed",
       error_message:
     )
+    log_to_datadog(scan)
     Rails.logger.warn("[A11Y Scan] Skipped resource #{@resource&.id} due to size limit.")
   end
 
@@ -149,5 +165,6 @@ class Accessibility::ResourceScannerService < ApplicationService
   def handle_scan_failure(scan, error)
     Rails.logger.warn("[A11Y Scan] Failed to scan resource #{@resource&.id}: #{error.message}")
     scan&.update(workflow_state: "failed", error_message: error.message)
+    log_to_datadog(scan)
   end
 end

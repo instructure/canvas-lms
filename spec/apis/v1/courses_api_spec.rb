@@ -23,6 +23,7 @@ require_relative "../file_uploads_spec_helper"
 
 class TestCourseApi
   include Api::V1::Course
+
   def feeds_calendar_url(feed_code)
     "feed_calendar_url(#{feed_code.inspect})"
   end
@@ -2495,6 +2496,101 @@ describe CoursesController, type: :request do
     it "includes subaccount_name if requested for backwards compatibility" do
       json = api_call(:get, "/api/v1/courses.json", { controller: "courses", action: "index", format: "json" }, { include: ["subaccount"] })
       expect(json.first["subaccount_name"]).to eq "Default Account"
+    end
+
+    describe "active_teachers include" do
+      before :once do
+        @active_teacher = user_factory(name: "Active Teacher")
+        @inactive_teacher = user_factory(name: "Inactive Teacher")
+        @rejected_teacher = user_factory(name: "Rejected Teacher")
+        @deleted_teacher = user_factory(name: "Deleted Teacher")
+        @user = @me
+
+        @active_enrollment = @course1.enroll_teacher(@active_teacher)
+
+        @inactive_enrollment = @course1.enroll_teacher(@inactive_teacher)
+        @inactive_enrollment.update!(workflow_state: "inactive")
+
+        @rejected_enrollment = @course1.enroll_teacher(@rejected_teacher)
+        @rejected_enrollment.update!(workflow_state: "rejected")
+
+        @deleted_enrollment = @course1.enroll_teacher(@deleted_teacher)
+        @deleted_enrollment.update!(workflow_state: "deleted")
+      end
+
+      it "includes only active teachers when active_teachers is requested" do
+        json = api_call(:get,
+                        "/api/v1/courses.json",
+                        { controller: "courses", action: "index", format: "json" },
+                        { include: ["active_teachers"] })
+
+        course_json = json.find { |c| c["id"] == @course1.id }
+        expect(course_json).not_to be_nil
+        expect(course_json).to have_key("teachers")
+
+        teacher_names = course_json["teachers"].pluck("display_name")
+        expect(teacher_names).to include("Active Teacher")
+        expect(teacher_names).not_to include("Inactive Teacher")
+        expect(teacher_names).not_to include("Rejected Teacher")
+        expect(teacher_names).not_to include("Deleted Teacher")
+      end
+
+      it "includes unique active teachers when active_teachers is requested" do
+        @course1.enroll_teacher(@active_teacher, section: @course1.course_sections.create!(name: "Section 2"))
+
+        json = api_call(:get,
+                        "/api/v1/courses.json",
+                        { controller: "courses", action: "index", format: "json" },
+                        { include: ["active_teachers"] })
+
+        course_json = json.find { |c| c["id"] == @course1.id }
+        expect(course_json).not_to be_nil
+        expect(course_json).to have_key("teachers")
+
+        active_teacher_entries = course_json["teachers"].select { |t| t["display_name"] == "Active Teacher" }
+        expect(active_teacher_entries.length).to eq(1)
+      end
+
+      it "includes active_teachers for individual course show" do
+        json = api_call_as_user(@me,
+                                :get,
+                                "/api/v1/courses/#{@course1.id}",
+                                { controller: "courses", action: "show", id: @course1.to_param, format: "json" },
+                                { include: ["active_teachers"] })
+
+        expect(json).to have_key("teachers")
+        teacher_names = json["teachers"].pluck("display_name")
+        expect(teacher_names).to include("Active Teacher")
+        expect(teacher_names).not_to include("Inactive Teacher")
+        expect(teacher_names).not_to include("Rejected Teacher")
+        expect(teacher_names).not_to include("Deleted Teacher")
+      end
+
+      it "returns empty teachers array when no active teachers exist" do
+        @course1.teacher_enrollments.update_all(workflow_state: "inactive")
+        @course1.enroll_student(@me, enrollment_state: "active")
+        @me.account_users.create!(account: @course1.account, role: admin_role)
+
+        json = api_call(:get,
+                        "/api/v1/courses.json",
+                        { controller: "courses", action: "index", format: "json" },
+                        { include: ["active_teachers"] })
+
+        course_json = json.find { |c| c["id"] == @course1.id }
+        expect(course_json).not_to be_nil
+        expect(course_json).to have_key("teachers")
+        expect(course_json["teachers"]).to be_empty
+      end
+
+      it "does not include teachers key when active_teachers is not requested" do
+        json = api_call(:get,
+                        "/api/v1/courses.json",
+                        { controller: "courses", action: "index", format: "json" })
+
+        course_json = json.find { |c| c["id"] == @course1.id }
+        expect(course_json).not_to be_nil
+        expect(course_json).not_to have_key("teachers")
+      end
     end
 
     it "includes term name in course list if requested" do

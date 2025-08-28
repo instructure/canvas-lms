@@ -91,4 +91,89 @@ describe Loaders::SubmissionLtiAssetReportsLoader do
       expect(subject.values.flatten).to match_array([rep1aIi, rep1aIii, rep1bIi, rep2aIi])
     end
   end
+
+  context "with group assignments" do
+    subject do
+      # Ensure let's runs
+      [group1_sub1, group1_sub2, group2_sub1, group2_sub2, group3_sub1, group3_sub2]
+      [group1_student1_rep1, group2_student1_rep1, group3_student1_rep1]
+
+      obj = described_class.new
+      result = {}
+
+      allow(obj).to receive(:fulfill) do |submission_id, reports|
+        raise "called multiple times for the same submission_id" if result.key?(submission_id)
+
+        result[submission_id] = reports
+      end
+
+      obj.perform([group1_sub2.id, group2_sub2.id])
+
+      result
+    end
+
+    # Have three groups and two students and 1 report for student1 in each group
+
+    let(:group_category) { course.group_categories.create!(name: "Group Category") }
+    let(:group1) { group_category.groups.create!(name: "Test Group 1", context: course) }
+    let(:group2) { group_category.groups.create!(name: "Test Group 2", context: course) }
+    let(:group3) { group_category.groups.create!(name: "Test Group 3", context: course) }
+
+    let(:group1_student1) { student_in_course(course:).user }
+    let(:group1_student2) { student_in_course(course:).user }
+    let(:group2_student1) { student_in_course(course:).user }
+    let(:group2_student2) { student_in_course(course:).user }
+    let(:group3_student1) { student_in_course(course:).user }
+    let(:group3_student2) { student_in_course(course:).user }
+
+    let(:assignment) { assignment_model(course:, group_category:) }
+    let(:asset_processor) { lti_asset_processor_model(assignment:) }
+
+    let(:group1_sub1) do
+      group1.add_user(group1_student1)
+      assignment.submissions.find_by(user: group1_student1).tap { |s| s.update!(group: group1) }
+    end
+    let(:group1_sub2) do
+      group1.add_user(group1_student2)
+      assignment.submissions.find_by(user: group1_student2).tap { |s| s.update!(group: group1) }
+    end
+    let(:group2_sub1) do
+      group2.add_user(group2_student1)
+      assignment.submissions.find_by(user: group2_student1).tap { |s| s.update!(group: group2) }
+    end
+    let(:group2_sub2) do
+      group2.add_user(group2_student2)
+      assignment.submissions.find_by(user: group2_student2).tap { |s| s.update!(group: group2) }
+    end
+    let(:group3_sub1) do
+      group3.add_user(group3_student1)
+      assignment.submissions.find_by(user: group3_student1).tap { |s| s.update!(group: group3) }
+    end
+    let(:group3_sub2) do
+      group3.add_user(group3_student2)
+      assignment.submissions.find_by(user: group3_student2).tap { |s| s.update!(group: group3) }
+    end
+
+    let(:group1_student1_asset1) { lti_asset_model(submission: group1_sub1, attachment: attachment_model(context: group1_student1)) }
+    let(:group2_student1_asset1) { lti_asset_model(submission: group2_sub1, attachment: attachment_model(context: group2_student1)) }
+    let(:group3_student1_asset1) { lti_asset_model(submission: group3_sub1, attachment: attachment_model(context: group3_student1)) }
+
+    let(:group1_student1_rep1) { lti_asset_report_model(asset: group1_student1_asset1, asset_processor:, report_type: "group_type_1") }
+    let(:group2_student1_rep1) { lti_asset_report_model(asset: group2_student1_asset1, asset_processor:, report_type: "group_type_1") }
+    let(:group3_student1_rep1) { lti_asset_report_model(asset: group3_student1_asset1, asset_processor:, report_type: "group_type_1") }
+
+    it "includes reports for mate submissions in the same group" do
+      result = subject
+      expect(result.keys).to match_array([group1_sub2.id, group2_sub2.id])
+      # Each submission should get all reports from the group
+      expect(result[group1_sub2.id]).to match_array([group1_student1_rep1])
+      expect(result[group2_sub2.id]).to match_array([group2_student1_rep1])
+    end
+
+    it "doesn't include reports for different group" do
+      # Test that we don't get duplicate reports
+      all_reports = subject.values.flatten
+      expect(all_reports).not_to include(group3_student1_rep1)
+    end
+  end
 end

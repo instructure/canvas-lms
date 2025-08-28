@@ -99,7 +99,11 @@ export const ViewRubrics = ({
   }
 
   const handleDownloadRubrics = async () => {
-    await downloadRubrics(courseId, accountId, selectedRubricIds)
+    try {
+      await downloadRubrics(courseId, accountId, selectedRubricIds)
+    } catch (error) {
+      showFlashError(I18n.t('Error Downloading Rubrics'))()
+    }
   }
 
   const path = useRef<string | undefined>(undefined)
@@ -440,6 +444,7 @@ export const ViewRubrics = ({
             )}
 
             <RubricAssessmentTray
+              currentUserId={ENV.current_user_id ?? ''}
               isLoading={isLoadingPreview}
               isOpen={isPreviewTrayOpen}
               isPreviewMode={false}

@@ -17,9 +17,12 @@
  */
 
 import React from 'react'
-import {render, screen, fireEvent} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {setupServer} from 'msw/node'
 import CourseGradesWidget from '../CourseGradesWidget'
 import type {BaseWidgetProps, Widget} from '../../../../types'
+import {defaultGraphQLHandlers} from '../../../../__tests__/testHelpers'
 
 const mockWidget: Widget = {
   id: 'test-course-grades-widget',
@@ -36,10 +39,48 @@ const buildDefaultProps = (overrides: Partial<BaseWidgetProps> = {}): BaseWidget
   }
 }
 
-describe('CourseGradesWidget', () => {
-  it('renders basic widget', () => {
-    render(<CourseGradesWidget {...buildDefaultProps()} />)
+const renderWithQueryClient = (component: React.ReactElement) => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+    },
+  })
+  return render(<QueryClientProvider client={queryClient}>{component}</QueryClientProvider>)
+}
 
-    expect(screen.getByText('Course Grades Widget')).toBeInTheDocument()
+const server = setupServer(...defaultGraphQLHandlers)
+
+describe('CourseGradesWidget', () => {
+  let originalEnv: any
+
+  beforeAll(() => {
+    // Set up Canvas ENV with current_user_id
+    originalEnv = window.ENV
+    window.ENV = {
+      ...originalEnv,
+      current_user_id: '123',
+    }
+
+    server.listen({
+      onUnhandledRequest: 'error',
+    })
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
+  })
+
+  afterAll(() => {
+    server.close()
+    // Restore original ENV
+    window.ENV = originalEnv
+  })
+
+  it('renders basic widget', () => {
+    renderWithQueryClient(<CourseGradesWidget {...buildDefaultProps()} />)
+
+    expect(screen.getByText('Course Grades')).toBeInTheDocument()
   })
 })

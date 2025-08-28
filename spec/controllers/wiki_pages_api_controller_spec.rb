@@ -52,6 +52,48 @@ describe WikiPagesApiController, type: :request do
     api_call_as_user(user, :post, url, path, params, {}, { expected_status: })
   end
 
+  def get_wiki_pages(user, include_params = [], expected_status: 200)
+    url = "/api/v1/courses/#{@course.id}/pages"
+    path = {
+      controller: "wiki_pages_api",
+      action: "index",
+      format: "json",
+      course_id: @course.id.to_s
+    }
+    params = { include: include_params }
+    api_call_as_user(user, :get, url, path, params, {}, { expected_status: })
+  end
+
+  describe "index" do
+    before do
+      @wiki_page = create_wiki_page(@teacher, { title: "Pläcëhöldër", body: "Test" }, expected_status: 200)
+    end
+
+    context "block_content_editor feature is disabled" do
+      before do
+        @course.account.disable_feature!(:block_content_editor)
+      end
+
+      it "returns a list of wiki pages" do
+        response = get_wiki_pages(@teacher, ["body"])
+        expect(response).to be_an(Array)
+        expect(response.pluck("id")).to include(@wiki_page["id"])
+      end
+    end
+
+    context "block_content_editor feature is enabled" do
+      before do
+        @course.account.enable_feature!(:block_content_editor)
+      end
+
+      it "returns a list of wiki pages" do
+        response = get_wiki_pages(@teacher, ["body"])
+        expect(response).to be_an(Array)
+        expect(response.pluck("id")).to include(@wiki_page["id"])
+      end
+    end
+  end
+
   describe "attachment associations" do
     before do
       @aa_test_data = AttachmentAssociationsSpecHelper.new(@course.account, @course)

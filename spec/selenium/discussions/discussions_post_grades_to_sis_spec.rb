@@ -26,6 +26,7 @@ require_relative "../helpers/discussions_common"
 # permanently removed. Testing both flag states is necessary during the transition phase.
 shared_examples "sync grades to sis" do |ff_enabled|
   include FeatureFlagHelper
+
   include_context "in-process server selenium tests"
 
   before :once do

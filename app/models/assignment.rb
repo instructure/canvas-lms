@@ -105,6 +105,7 @@ class Assignment < AbstractAssignment
   end
 
   include SmartSearchable
+
   use_smart_search title_column: :title,
                    body_column: :description,
                    index_scope: ->(course) { course.assignments.active },
@@ -131,7 +132,7 @@ class Assignment < AbstractAssignment
     save!
   end
 
-  def has_student_submissions_for_sub_assignments? # rubocop:disable Naming/PredicateName
+  def has_student_submissions_for_sub_assignments?
     return false unless has_sub_assignments?
 
     sub_assignments.active.any?(&:has_student_submissions?)

@@ -64,13 +64,16 @@ describe DataFixup::AddMediaIdAndStyleDisplayAttributesToIframes do
         }
       ]
       q = course.quizzes.create!(description: quiz_description, quiz_data:, saving_user: @user)
-      q.quiz_questions.create! question_data: {
-        "question_text" => question_text_3,
-        "answers" => [
-          { "id" => "7427", "text" => answer_text_5, "comments" => "", "comments_html" => "", "weight" => 100.0 },
-          { "id" => "3893", "text" => answer_text_6, "comments" => "", "comments_html" => "", "weight" => 0.0 }
-        ],
-      }
+      q.quiz_questions.create!(
+        question_data: {
+          "question_text" => question_text_3,
+          "answers" => [
+            { "id" => "7427", "text" => answer_text_5, "comments" => "", "comments_html" => "", "weight" => 100.0 },
+            { "id" => "3893", "text" => answer_text_6, "comments" => "", "comments_html" => "", "weight" => 0.0 }
+          ],
+        },
+        saving_user: @user
+      )
       DataFixup::AddMediaIdAndStyleDisplayAttributesToIframes.run
       q.reload
       expect(q.description).to eq expected_body(first_matching_attachment.id, first_matching_attachment.media_entry_id)
@@ -92,12 +95,12 @@ describe DataFixup::AddMediaIdAndStyleDisplayAttributesToIframes do
       another_course.update! syllabus_body: record_body, saving_user: @user
       assignment = another_course.assignments.create!(description: record_body, submission_types: "online_text_entry", points_possible: 2, saving_user: @user)
       assessment_question_bank = another_course.assessment_question_banks.create!
-      assessment_question = assessment_question_bank.assessment_questions.create! question_data: { "question_text" => record_body }
+      assessment_question = assessment_question_bank.assessment_questions.create!(question_data: { "question_text" => record_body })
       discussion_topic = another_course.discussion_topics.create!(message: record_body, user: User.create!)
       discussion_entry = discussion_topic.discussion_entries.create! message: record_body, user: User.create!
-      quiz = Quizzes::Quiz.create! context: another_course
-      quiz_question = quiz.quiz_questions.create! question_data: { "question_text" => record_body }
-      wiki_page = another_course.wiki_pages.create! title: "Whatevs", body: record_body, saving_user: @user
+      quiz = Quizzes::Quiz.create!(context: another_course, saving_user: @user)
+      quiz_question = quiz.quiz_questions.create!(question_data: { "question_text" => record_body }, saving_user: @user)
+      wiki_page = another_course.wiki_pages.create!(title: "Whatevs", body: record_body, saving_user: @user)
       DataFixup::AddMediaIdAndStyleDisplayAttributesToIframes.run
       expect(another_course.reload.syllabus_body).to eq(expected_body(att.id, att.media_entry_id))
       expect(assignment.reload.description).to eq(expected_body(att.id, att.media_entry_id))

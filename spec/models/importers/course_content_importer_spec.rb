@@ -814,11 +814,11 @@ describe Course do
     end
 
     context "with allow_student_discussion_reporting" do
-      include_examples "setting set correctly", :allow_student_discussion_reporting
+      it_behaves_like "setting set correctly", :allow_student_discussion_reporting
     end
 
     context "with allow_student_anonymous_discussion_topics" do
-      include_examples "setting set correctly", :allow_student_anonymous_discussion_topics
+      it_behaves_like "setting set correctly", :allow_student_anonymous_discussion_topics
     end
   end
 
@@ -880,7 +880,7 @@ describe Course do
       migration.save!
 
       Importers::CourseContentImporter.import_content(@course, @data, @params, migration)
-      expect(@module.content_tags.order("position").pluck(:content_type)).to eq(%w[ContextModuleSubHeader Assignment])
+      expect(@module.content_tags.order(:position).pluck(:content_type)).to eq(%w[ContextModuleSubHeader Assignment])
     end
 
     it "can insert items from one module to an existing module" do
@@ -904,7 +904,7 @@ describe Course do
       migration.save!
 
       Importers::CourseContentImporter.import_content(@course, @data, @params, migration)
-      expect(@module.content_tags.order("position").pluck(:content_type)).to eq(%w[Assignment ContextModuleSubHeader])
+      expect(@module.content_tags.order(:position).pluck(:content_type)).to eq(%w[Assignment ContextModuleSubHeader])
     end
 
     it "respects insert_into_module_type" do
@@ -915,7 +915,7 @@ describe Course do
       migration.migration_settings[:insert_into_module_type] = "assignment"
       migration.save!
       Importers::CourseContentImporter.import_content(@course, @data, @params, migration)
-      expect(@module.content_tags.order("position").pluck(:content_type)).to eq(%w[ContextModuleSubHeader Assignment])
+      expect(@module.content_tags.order(:position).pluck(:content_type)).to eq(%w[ContextModuleSubHeader Assignment])
     end
   end
 

@@ -31,10 +31,11 @@ export interface DifferentiationTagModalManagerProps {
   onClose: () => void
   mode: 'create' | 'edit'
   differentiationTagCategoryId?: number
+  onCreationSuccess?: (newCategoryID: number) => void
 }
 
 function DifferentiationTagModalContainer(props: DifferentiationTagModalManagerProps) {
-  const {isOpen, onClose, mode, differentiationTagCategoryId} = props
+  const {isOpen, onClose, mode, differentiationTagCategoryId, onCreationSuccess} = props
 
   const courseID = Number(ENV?.course?.id)
   const hasValidCourseID = typeof courseID === 'number' && !isNaN(courseID)
@@ -57,6 +58,7 @@ function DifferentiationTagModalContainer(props: DifferentiationTagModalManagerP
       differentiationTagSet={tagSet}
       categories={categories}
       courseId={courseID}
+      onCreationSuccess={onCreationSuccess}
     />
   )
 }

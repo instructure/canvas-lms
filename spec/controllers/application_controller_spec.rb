@@ -392,13 +392,15 @@ RSpec.describe ApplicationController do
                               uuid: "bleh",
                               salesforce_id: "blah",
                               horizon_domain: nil,
-                              suppress_assignments?: false)
+                              suppress_assignments?: false,
+                              enable_content_a11y_checker?: true)
         allow(root_account).to receive(:kill_joy?).and_return(false)
         allow(HostUrl).to receive_messages(file_host: "files.example.com")
         controller.instance_variable_set(:@domain_root_account, root_account)
         expect(controller.js_env[:SETTINGS][:open_registration]).to be_truthy
         expect(controller.js_env[:SETTINGS][:can_add_pronouns]).to be_truthy
         expect(controller.js_env[:SETTINGS][:show_sections_in_course_tray]).to be_truthy
+        expect(controller.js_env[:SETTINGS][:enable_content_a11y_checker]).to be_truthy
         expect(controller.js_env[:KILL_JOY]).to be_falsey
       end
 
@@ -415,6 +417,7 @@ RSpec.describe ApplicationController do
                               uuid: "blah",
                               salesforce_id: "bleh",
                               horizon_domain: nil,
+                              enable_content_a11y_checker?: false,
                               suppress_assignments?: false)
         allow(root_account).to receive(:kill_joy?).and_return(true)
         allow(HostUrl).to receive_messages(file_host: "files.example.com")
@@ -616,6 +619,22 @@ RSpec.describe ApplicationController do
           controller.instance_variable_set :@context, @user
           controller.instance_variable_set :@domain_root_account, Account.default
           expect(controller.js_env[:ACCOUNT_ID]).to eq Account.default.id
+        end
+      end
+
+      describe "CAREER_THEME_URL" do
+        before do
+          allow_any_instance_of(CanvasCareer::Config).to receive(:theme_url).and_return("https://theme.url")
+        end
+
+        it "is nil if career is not enabled" do
+          allow(CanvasCareer::ExperienceResolver).to receive(:career_affiliated_institution?).and_return(false)
+          expect(@controller.js_env[:CAREER_THEME_URL]).to be_nil
+        end
+
+        it "is set to the theme url if career is enabled" do
+          allow(CanvasCareer::ExperienceResolver).to receive(:career_affiliated_institution?).and_return(true)
+          expect(@controller.js_env[:CAREER_THEME_URL]).to eq "https://theme.url"
         end
       end
     end
@@ -951,6 +970,40 @@ RSpec.describe ApplicationController do
         allow(CanvasSecurity::PageViewJwt).to receive(:decode).and_return(page_view_info)
         allow(PageView).to receive(:find_for_update).and_return(page_view)
         expect { controller.send(:add_interaction_seconds) }.not_to raise_error
+      end
+
+      context "when page view update is disabled" do
+        before do
+          Setting.set("skip_pageview_updates", "true")
+          Setting.set("enable_page_views", "true")
+        end
+
+        after do
+          Setting.set("skip_pageview_updates", "false")
+          Setting.set("enable_page_views", "false")
+        end
+
+        it "sets created_at for the page view thus allowing the interaction token to be generated correctly" do
+          Timecop.freeze do
+            request_id = "31877f1c-7bfc-4389-8daa-3adb48d98829"
+            interaction_seconds = 12
+            created_at = Time.zone.now
+            expected_interaction_token = "#{request_id}|#{created_at.iso8601(2)}|#{interaction_seconds}"
+            controller.response = double("response", headers: {})
+            controller.params[:page_view_token] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpIjoiMzE4NzdmMWMtN2JmYy00Mzg5LThkYWEtM2FkYjQ4ZDk4ODI5IiwidSI6bnVsbCwiYyI6bnVsbH0.IltPMbU08FUf-Kr_5vYzie4HnSW2tW8qFfYJunR9Z4o"
+            controller.params[:interaction_seconds] = interaction_seconds
+            allow(controller.request).to receive_messages(xhr?: 0, put?: true)
+            allow(controller.response).to receive(:headers).and_return({})
+            expect(RequestContext::Generator).to receive(:add_meta_header).with("r", expected_interaction_token)
+
+            controller.send(:add_interaction_seconds)
+
+            jwt_from_url = controller.response.headers["X-Canvas-Page-View-Update-Url"].split("=").last
+            page_view = CanvasSecurity::PageViewJwt.decode(jwt_from_url)
+            expect(page_view[:request_id]).to eq request_id
+            expect(page_view[:created_at]).to be_truthy
+          end
+        end
       end
     end
 

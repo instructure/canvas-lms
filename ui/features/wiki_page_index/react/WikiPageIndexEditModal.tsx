@@ -46,7 +46,7 @@ export interface WikiPageIndexEditModalProps {
 }
 
 const WikiPageIndexEditModal = ({model, modalOpen, closeModal}: WikiPageIndexEditModalProps) => {
-  const [name, setName] = useState(model?.get('title'))
+  const [name, setName] = useState(model?.get('title') || '')
   const [messages, setMessages] = useState<FormMessage[]>([])
   const [open, setOpen] = useState(modalOpen)
   const [saving, setSaving] = useState(false)
@@ -54,7 +54,7 @@ const WikiPageIndexEditModal = ({model, modalOpen, closeModal}: WikiPageIndexEdi
   useEffect(() => {
     setOpen(modalOpen)
     if (modalOpen) {
-      setName(model?.get('title'))
+      setName(model?.get('title') || '')
       setMessages([])
       setSaving(false)
     }
@@ -147,7 +147,7 @@ const WikiPageIndexEditModal = ({model, modalOpen, closeModal}: WikiPageIndexEdi
         <TextInput
           id="page-title-input"
           data-testid="page-title-input"
-          value={name || undefined}
+          value={name}
           isRequired={true}
           disabled={saving}
           messages={messages}

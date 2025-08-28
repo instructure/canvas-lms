@@ -87,26 +87,22 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
   return (
     <View
       as="div"
+      className="context_module_item"
       padding="paddingCardMedium"
       background="primary"
       borderWidth="0"
       borderRadius="large"
       overflowX="hidden"
       data-item-id={_id}
+      data-position={position}
       margin="paddingCardMedium"
       minHeight="5.125rem"
       display="flex"
     >
-      <Flex wrap="wrap" width="100%" direction={smallScreen ? 'column' : 'row'}>
+      <Flex wrap="wrap" width="100%" gap="x-small" direction={smallScreen ? 'column' : 'row'}>
         <Flex.Item margin={itemIcon ? '0' : `0 small 0 0`} shouldGrow>
           <div style={{padding: `0 0 0 ${itemLeftMargin}`}}>
-            <Flex
-              alignItems="start"
-              justifyItems="start"
-              wrap="no-wrap"
-              gap="space8"
-              direction="column"
-            >
+            <Flex alignItems="start" justifyItems="start" wrap="no-wrap" direction="column">
               {/* Item Title */}
               <Flex.Item shouldGrow={true}>
                 <ModuleItemTitleStudent

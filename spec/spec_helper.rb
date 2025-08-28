@@ -91,6 +91,7 @@ WebMock.enable!
 # unlike webmock/rspec, only reset in groups that actually do stubbing
 module WebMock::API
   include WebMock::Matchers
+
   def self.included(other)
     other.before { allow(CanvasHttp).to receive(:insecure_host?).and_return(false) }
     other.after { WebMock.reset! }
@@ -109,7 +110,6 @@ TestDatabaseUtils.reset_database! unless ENV["DB_VALIDITY_ENSURED"] == "1"
 TestDatabaseUtils.check_migrations! unless ENV["DB_VALIDITY_ENSURED"] == "1"
 Setting.reset_cache!
 BlankSlateProtection.install!
-GreatExpectations.install!
 
 ActionView::TestCase::TestController.view_paths = ApplicationController.view_paths
 ActionView::Base.streaming_completion_on_exception = "</html>"
@@ -812,7 +812,7 @@ RSpec.configure do |config|
     BACKENDS = %w[FileSystem S3].map { |backend| AttachmentFu::Backends.const_get(:"#{backend}Backend") }.freeze
 
     class As # :nodoc:
-      private(*instance_methods.grep_v(/(^__|^\W|^binding$|^untaint$|^object_id$)/)) # rubocop:disable Style/AccessModifierDeclarations
+      private(*instance_methods.grep_v(/(^__|^\W|^binding$|^untaint$|^object_id$)/))
 
       def initialize(subject, ancestor)
         @subject = subject

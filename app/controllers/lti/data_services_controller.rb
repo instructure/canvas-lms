@@ -28,56 +28,57 @@ module Lti
   #       "id": "DataServiceSubscription",
   #       "description": "A subscription to a data service live event.",
   #       "properties": {
-  #          "ContextId": {
-  #            "description": "The id of the context for the subscription.",
-  #            "example": "8ADadf-asdfas-asdfas-asdfaew",
-  #            "type": "string"
-  #          },
-  #          "ContextType": {
-  #            "description": "The type of context for the subscription. Must be 'assignment', or 'root_account'",
-  #            "example": "root_account",
-  #            "type": "string"
-  #          },
-  #          "EventTypes": {
-  #            "description": "Array of strings representing the event types for the subscription.",
-  #            "example": ["asset_accessed"],
-  #            "type": "array",
-  #            "items": {"type": "string"}
-  #          },
-  #          "Format": {
-  #            "description": "Format to deliver the live events. Must be 'live-event' or 'caliper'.",
-  #            "example": "caliper",
-  #            "type": "string"
-  #          },
-  #          "TransportMetadata": {
-  #            "description": "An object with a single key: 'Url'.",
-  #            "example": "{\n\t\"Url\":\"sqs.example\"}",
-  #            "type": "string"
-  #          },
-  #          "TransportType": {
-  #            "description": "The type of transport for the event. Must be either 'sqs' or 'https'.",
-  #            "example": "sqs",
-  #            "type": "string"
-  #          }
+  #         "ContextId": {
+  #           "description": "The id of the context for the subscription.",
+  #           "example": "8ADadf-asdfas-asdfas-asdfaew",
+  #           "type": "string"
+  #         },
+  #         "ContextType": {
+  #           "description": "The type of context for the subscription. Must be 'assignment', or 'root_account'",
+  #           "example": "root_account",
+  #           "type": "string"
+  #         },
+  #         "EventTypes": {
+  #           "description": "Array of strings representing the event types for the subscription.",
+  #           "example": ["asset_accessed"],
+  #           "type": "array",
+  #           "items": {"type": "string"}
+  #         },
+  #         "Format": {
+  #           "description": "Format to deliver the live events. Must be 'live-event' or 'caliper'.",
+  #           "example": "caliper",
+  #           "type": "string"
+  #         },
+  #         "TransportMetadata": {
+  #           "description": "An object with a single key: 'Url'.",
+  #           "example": "{\n\t\"Url\":\"sqs.example\"}",
+  #           "type": "string"
+  #         },
+  #         "TransportType": {
+  #           "description": "The type of transport for the event. Must be either 'sqs' or 'https'.",
+  #           "example": "sqs",
+  #           "type": "string"
+  #         }
   #       }
   #     }
   #
-  #     @model DataServiceEventTypes
-  #         {
-  #            "id": "DataServiceEventTypes",
-  #            "description": "A categorized list of all possible event types",
-  #            "properties": {
-  #               "EventCategory": {
-  #                 "description": "An array of strings representing the event types in the category.",
-  #                 "example": ["assignment_created"],
-  #                 "type": "array",
-  #                 "items": {"type": "string"}
-  #               }
-  #             }
+  # @model DataServiceEventTypes
+  #     {
+  #        "id": "DataServiceEventTypes",
+  #        "description": "A categorized list of all possible event types",
+  #        "properties": {
+  #           "EventCategory": {
+  #             "description": "An array of strings representing the event types in the category.",
+  #             "example": ["assignment_created"],
+  #             "type": "array",
+  #             "items": {"type": "string"}
+  #           }
   #         }
+  #     }
   #
   class DataServicesController < ApplicationController
     include ::Lti::IMS::Concerns::AdvantageServices
+
     MIME_TYPE = "application/vnd.canvas.dataservices+json"
 
     ACTION_SCOPE_MATCHERS = {

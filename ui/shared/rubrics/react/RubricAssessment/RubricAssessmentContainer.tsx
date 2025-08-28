@@ -18,12 +18,8 @@
 
 import React, {useEffect, useMemo, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
-import {SimpleSelect} from '@instructure/ui-simple-select'
-import {Button, CloseButton} from '@instructure/ui-buttons'
-import {Text} from '@instructure/ui-text'
 import type {
   RubricAssessmentData,
   RubricCriterion,
@@ -33,19 +29,18 @@ import type {
 } from '../types/rubric'
 import {ModernView, type ModernViewModes} from './ModernView'
 import {TraditionalView} from './TraditionalView'
-import {InstructorScore} from './InstructorScore'
 import {findCriterionMatchingRatingIndex} from './utils/rubricUtils'
-import {SelfAssessmentInstructorScore} from '@canvas/rubrics/react/RubricAssessment/SelfAssessmentInstructorScore'
-import {SelfAssessmentInstructions} from '@canvas/rubrics/react/RubricAssessment/SelfAssessmentInstructions'
-import {Checkbox} from '@instructure/ui-checkbox'
-import { Heading } from '@instructure/ui-heading'
+import useLocalStorage from '@canvas/local-storage'
+import * as CONSTANTS from './constants'
+import {type ViewMode} from './ViewModeSelect'
+import {AssessmentHeader} from './AssessmentHeader'
+import {AssessmentFooter} from './AssessmentFooter'
 
 const I18n = createI18nScope('rubrics-assessment-tray')
 
-export type ViewMode = 'horizontal' | 'vertical' | 'traditional'
-
 export type RubricAssessmentContainerProps = {
   criteria: RubricCriterion[]
+  currentUserId: string
   hidePoints: boolean
   isPreviewMode: boolean
   isPeerReview: boolean
@@ -67,6 +62,7 @@ export type RubricAssessmentContainerProps = {
 }
 export const RubricAssessmentContainer = ({
   criteria,
+  currentUserId,
   hidePoints,
   isPreviewMode,
   isPeerReview,
@@ -86,13 +82,21 @@ export const RubricAssessmentContainer = ({
   onSubmit,
   onViewModeChange,
 }: RubricAssessmentContainerProps) => {
-  const [viewModeSelect, setViewModeSelect] = useState<ViewMode>(viewModeOverride ?? 'traditional')
+  const [viewModeSelect, setViewModeSelect] = useLocalStorage<ViewMode>(
+    CONSTANTS.RUBRIC_VIEW_MODE_LOCALSTORAGE_KEY(currentUserId),
+    viewModeOverride ?? CONSTANTS.RUBRIC_VIEW_MODE_DEFAULT,
+  )
+
   const [rubricAssessmentDraftData, setRubricAssessmentDraftData] = useState<
     RubricAssessmentData[]
   >([])
   const [showSelfAssessment, setShowSelfAssessment] = useState<boolean>(false)
-  const viewMode = viewModeOverride ?? viewModeSelect
+  let viewMode = viewModeOverride ?? viewModeSelect
   const isTraditionalView = viewMode === 'traditional'
+  const isVerticalView = viewModeSelect === 'vertical'
+  if (isVerticalView && isFreeFormCriterionComments) {
+    viewMode = 'horizontal'
+  }
   const instructorPoints = rubricAssessmentDraftData.reduce(
     (prev, curr) => prev + (!curr.ignoreForScoring && curr.points ? curr.points : 0),
     0,
@@ -301,226 +305,6 @@ export const RubricAssessmentContainer = ({
               onDismiss={onDismiss}
               onSubmit={onSubmit ? () => validateOnSubmit(rubricAssessmentDraftData) : undefined}
             />
-          </Flex.Item>
-        )}
-      </Flex>
-    </View>
-  )
-}
-
-type ViewModeSelectProps = {
-  isFreeFormCriterionComments: boolean
-  selectedViewMode: ViewMode
-  onViewModeChange: (viewMode: ViewMode) => void
-}
-const ViewModeSelect = ({
-  isFreeFormCriterionComments,
-  selectedViewMode,
-  onViewModeChange,
-}: ViewModeSelectProps) => {
-  const handleSelect = (viewMode: string) => {
-    onViewModeChange(viewMode as ViewMode)
-  }
-
-  return (
-    <SimpleSelect
-      renderLabel={
-        <ScreenReaderContent>{I18n.t('Rubric Assessment View Mode')}</ScreenReaderContent>
-      }
-      width="10rem"
-      height="2.375rem"
-      value={selectedViewMode}
-      data-testid="rubric-assessment-view-mode-select"
-      onChange={(_e, {value}) => handleSelect(value as string)}
-    >
-      <SimpleSelect.Option
-        id="traditional"
-        value="traditional"
-        data-testid="traditional-view-option"
-      >
-        {I18n.t('Traditional')}
-      </SimpleSelect.Option>
-      <SimpleSelect.Option id="horizontal" value="horizontal" data-testid="horizontal-view-option">
-        {I18n.t('Horizontal')}
-      </SimpleSelect.Option>
-      {!isFreeFormCriterionComments && (
-        <SimpleSelect.Option id="vertical" value="vertical" data-testid="vertical-view-option">
-          {I18n.t('Vertical')}
-        </SimpleSelect.Option>
-      )}
-    </SimpleSelect>
-  )
-}
-
-type AssessmentHeaderProps = {
-  hidePoints: boolean
-  instructorPoints: number
-  pointsPossible?: number
-  isFreeFormCriterionComments: boolean
-  isPreviewMode: boolean
-  isPeerReview: boolean
-  isSelfAssessment: boolean
-  isStandaloneContainer: boolean
-  isTraditionalView: boolean
-  onDismiss: () => void
-  onViewModeChange: (viewMode: ViewMode) => void
-  rubricHeader: string
-  selectedViewMode: ViewMode
-  selfAssessmentEnabled?: boolean
-  toggleSelfAssessment: () => void
-}
-const AssessmentHeader = ({
-  hidePoints,
-  instructorPoints,
-  isFreeFormCriterionComments,
-  isPreviewMode,
-  isPeerReview,
-  isSelfAssessment,
-  pointsPossible,
-  isStandaloneContainer,
-  isTraditionalView,
-  onDismiss,
-  onViewModeChange,
-  rubricHeader,
-  selectedViewMode,
-  selfAssessmentEnabled,
-  toggleSelfAssessment,
-}: AssessmentHeaderProps) => {
-  const showTraditionalView = () => isTraditionalView && !isSelfAssessment
-
-  return (
-    <View
-      as="div"
-      padding={isTraditionalView ? '0 0 medium 0' : '0'}
-      overflowX="hidden"
-      overflowY="hidden"
-    >
-      <Flex>
-        <Flex.Item align="end">
-          <Heading 
-            level="h2" 
-            data-testid="rubric-assessment-header"
-            margin="xxx-small 0"
-            themeOverride={{h2FontSize: "1.375rem", h2FontWeight: 700}}
-          >
-            {rubricHeader}
-          </Heading>
-        </Flex.Item>
-        {!isStandaloneContainer && (
-          <Flex.Item align="end">
-            <CloseButton
-              placement="end"
-              offset="x-small"
-              screenReaderLabel="Close"
-              onClick={onDismiss}
-            />
-          </Flex.Item>
-        )}
-      </Flex>
-
-      <View as="hr" margin="x-small 0 small" aria-hidden={true} />
-      <Flex wrap="wrap" gap="medium 0">
-        {!isSelfAssessment && (
-          <Flex.Item shouldGrow={true} shouldShrink={true}>
-            <ViewModeSelect
-              isFreeFormCriterionComments={isFreeFormCriterionComments}
-              selectedViewMode={selectedViewMode}
-              onViewModeChange={onViewModeChange}
-            />
-          </Flex.Item>
-        )}
-        {showTraditionalView() && (
-          <>
-            {!hidePoints && (
-              <Flex.Item>
-                <View as="div" margin="0 large 0 0" themeOverride={{marginLarge: '2.938rem'}}>
-                  <InstructorScore
-                    isPeerReview={isPeerReview}
-                    instructorPoints={instructorPoints}
-                    isPreviewMode={isPreviewMode}
-                  />
-                </View>
-              </Flex.Item>
-            )}
-          </>
-        )}
-      </Flex>
-      {isSelfAssessment && <SelfAssessmentInstructions />}
-      {!showTraditionalView() && (
-        <>
-          {!hidePoints && (
-            <>
-              {isSelfAssessment ? (
-                <SelfAssessmentInstructorScore
-                  instructorPoints={instructorPoints}
-                  pointsPossible={pointsPossible}
-                />
-              ) : (
-                <View as="div" margin="medium 0 0">
-                  <InstructorScore
-                    isPeerReview={isPeerReview}
-                    instructorPoints={instructorPoints}
-                    isPreviewMode={isPreviewMode}
-                  />
-                </View>
-              )}
-            </>
-          )}
-
-          <View as="hr" margin="medium 0 medium 0" aria-hidden={true} />
-        </>
-      )}
-
-      {selfAssessmentEnabled && (
-        <View as="div" margin="small 0 0">
-          <Checkbox
-            label="View Student Self-Assessment"
-            data-testid="self-assessment-toggle"
-            variant="toggle"
-            size="medium"
-            onClick={toggleSelfAssessment}
-          />
-        </View>
-      )}
-    </View>
-  )
-}
-
-type AssessmentFooterProps = {
-  isPreviewMode: boolean
-  isStandAloneContainer: boolean
-  onDismiss: () => void
-  onSubmit?: () => void
-}
-const AssessmentFooter = ({
-  isPreviewMode,
-  isStandAloneContainer,
-  onDismiss,
-  onSubmit,
-}: AssessmentFooterProps) => {
-  return (
-    <View as="div" data-testid="rubric-assessment-footer" overflowX="hidden" overflowY="hidden">
-      <Flex justifyItems="end" margin="small 0">
-        {isStandAloneContainer && (
-          <Flex.Item margin="0 small 0 0">
-            <Button
-              color="secondary"
-              onClick={() => onDismiss()}
-              data-testid="cancel-rubric-assessment-button"
-            >
-              {I18n.t('Cancel')}
-            </Button>
-          </Flex.Item>
-        )}
-        {onSubmit && !isPreviewMode && (
-          <Flex.Item>
-            <Button
-              color="primary"
-              onClick={() => onSubmit()}
-              data-testid="save-rubric-assessment-button"
-            >
-              {I18n.t('Submit Assessment')}
-            </Button>
           </Flex.Item>
         )}
       </Flex>

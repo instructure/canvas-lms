@@ -16,12 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import doFetchApi from '@canvas/do-fetch-api-effect'
 import {
   prepareModuleItemData,
   buildFormData,
   createNewItemApiPath,
   sharedHandleFileDrop,
+  createNewItem,
 } from '../addItemHandlers'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+import {QuizEngine} from '../../utils/types'
+
+const server = setupServer()
 
 describe('addItemHandlers', () => {
   describe('prepareModuleItemData', () => {
@@ -51,11 +58,12 @@ describe('addItemHandlers', () => {
       })
     })
 
-    it('should prepare module item data for quiz', () => {
+    it('should prepare module item data for classic quiz', () => {
       const itemData = {
         type: 'quiz',
         itemCount: 1,
         indentation: 0,
+        quizEngine: 'classic' as QuizEngine,
         textHeaderValue: 'Quiz',
         externalUrlName: 'External URL',
         externalUrlValue: 'https://example.com',
@@ -71,6 +79,35 @@ describe('addItemHandlers', () => {
         quiz_lti: false,
         'content_details[]': 'items',
         type: 'quiz',
+        new_tab: 0,
+        graded: 0,
+        _method: 'POST',
+      })
+    })
+
+    it('should prepare module item data for new quiz engine', () => {
+      const itemData = {
+        type: 'quiz',
+        itemCount: 1,
+        indentation: 0,
+        quizEngine: 'new' as QuizEngine,
+        textHeaderValue: 'Quiz',
+        externalUrlName: 'External URL',
+        externalUrlValue: 'https://example.com',
+        externalUrlNewTab: false,
+        selectedItem: null,
+        selectedTabIndex: 0,
+      }
+      const result = prepareModuleItemData('moduleId', itemData)
+
+      // The quiz_lti should be true for new quiz engine also item type should be 'assignment'
+      expect(result).toEqual({
+        'item[type]': 'assignment',
+        'item[position]': 2,
+        'item[indent]': 0,
+        quiz_lti: true,
+        'content_details[]': 'items',
+        type: 'assignment',
         new_tab: 0,
         graded: 0,
         _method: 'POST',
@@ -195,7 +232,7 @@ describe('addItemHandlers', () => {
     it('should build form data', () => {
       const type = 'assignment'
       const newItemName = 'New Assignment'
-      const result = buildFormData(type, newItemName, '', false, false)
+      const result = buildFormData(type, newItemName, '', 'classic', false)
       const formData = new FormData()
       formData.append('item[id]', 'new')
       formData.append('item[title]', newItemName)
@@ -207,7 +244,7 @@ describe('addItemHandlers', () => {
     it('should build form data for quiz', () => {
       const type = 'quiz'
       const newItemName = 'New Quiz'
-      const result = buildFormData(type, newItemName, '', false, false)
+      const result = buildFormData(type, newItemName, '', 'classic', false)
       const formData = new FormData()
       formData.append('item[id]', 'new')
       formData.append('item[title]', newItemName)
@@ -219,7 +256,7 @@ describe('addItemHandlers', () => {
     it('should build form data for discussion', () => {
       const type = 'discussion'
       const newItemName = 'New Discussion'
-      const result = buildFormData(type, newItemName, '', false, false)
+      const result = buildFormData(type, newItemName, '', 'classic', false)
       const formData = new FormData()
       formData.append('item[id]', 'new')
       formData.append('item[title]', newItemName)
@@ -230,11 +267,36 @@ describe('addItemHandlers', () => {
     it('should build form data for page', () => {
       const type = 'page'
       const newItemName = 'New Page'
-      const result = buildFormData(type, newItemName, '', false, false)
+      const result = buildFormData(type, newItemName, '', 'classic', false)
       const formData = new FormData()
       formData.append('item[id]', 'new')
       formData.append('item[title]', newItemName)
       formData.append('wiki_page[title]', newItemName)
+      expect(result).toEqual(formData)
+    })
+
+    it('should build form data for classic quiz', () => {
+      const type = 'quiz'
+      const newItemName = 'Classic Quiz'
+      const result = buildFormData(type, newItemName, '', 'classic', false)
+      const formData = new FormData()
+      formData.append('item[id]', 'new')
+      formData.append('item[title]', newItemName)
+      formData.append('quiz[title]', newItemName)
+      formData.append('quiz[assignment_group_id]', '')
+      expect(result).toEqual(formData)
+    })
+
+    it('should build form data for new quiz engine', () => {
+      const type = 'quiz'
+      const newItemName = 'New Quiz'
+      const result = buildFormData(type, newItemName, '', 'new', false)
+      const formData = new FormData()
+      formData.append('item[id]', 'new')
+      formData.append('item[title]', newItemName)
+      formData.append('assignment[title]', newItemName)
+      formData.append('quiz_lti', '1')
+      formData.append('quiz[assignment_group_id]', '')
       expect(result).toEqual(formData)
     })
   })
@@ -243,28 +305,35 @@ describe('addItemHandlers', () => {
     it('should return correct API path', () => {
       const type = 'assignment'
       const courseId = '1'
-      const result = createNewItemApiPath(type, courseId, false)
+      const result = createNewItemApiPath(type, courseId, 'classic')
       expect(result).toEqual('/courses/1/assignments')
     })
 
-    it('should return correct API path for quiz', () => {
+    it('should return correct API path for classic quiz engine', () => {
       const type = 'quiz'
       const courseId = '1'
-      const result = createNewItemApiPath(type, courseId, false)
+      const result = createNewItemApiPath(type, courseId, 'classic')
       expect(result).toEqual('/courses/1/quizzes')
+    })
+
+    it('should return correct API path for new quiz engine', () => {
+      const type = 'quiz'
+      const courseId = '1'
+      const result = createNewItemApiPath(type, courseId, 'new')
+      expect(result).toEqual('/courses/1/assignments')
     })
 
     it('should return correct API path for discussion', () => {
       const type = 'discussion'
       const courseId = '1'
-      const result = createNewItemApiPath(type, courseId, false)
+      const result = createNewItemApiPath(type, courseId, 'classic')
       expect(result).toEqual('/api/v1/courses/1/discussion_topics')
     })
 
     it('should return correct API path for page', () => {
       const type = 'page'
       const courseId = '1'
-      const result = createNewItemApiPath(type, courseId, false)
+      const result = createNewItemApiPath(type, courseId, 'classic')
       expect(result).toEqual('/api/v1/courses/1/pages')
     })
   })
@@ -308,6 +377,47 @@ describe('addItemHandlers', () => {
 
       expect(setFile).not.toHaveBeenCalled()
       expect(onChange).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('createNewItem', () => {
+    afterAll(() => {
+      server.resetHandlers()
+      server.close()
+    })
+
+    it('should create new item for classic quiz engine', async () => {
+      const courseId = '1'
+      const type = 'quiz'
+      const newItemName = 'Classic Quiz'
+      const responseData = {id: '123', title: newItemName}
+
+      server.use(
+        http.post('/courses/1/quizzes', () => {
+          return HttpResponse.json({quiz: responseData})
+        }),
+      )
+      server.listen()
+
+      const result = await createNewItem(type, courseId, '', newItemName, 'classic', false)
+      expect(result).toEqual(responseData)
+    })
+
+    it('should create new item for new quiz engine', async () => {
+      const courseId = '1'
+      const type = 'quiz'
+      const newItemName = 'New Quiz'
+      const responseData = {id: '123', title: newItemName}
+
+      server.use(
+        http.post('/courses/1/assignments', () => {
+          return HttpResponse.json({assignment: responseData})
+        }),
+      )
+      server.listen()
+
+      const result = await createNewItem(type, courseId, '', newItemName, 'new', false)
+      expect(result).toEqual(responseData)
     })
   })
 })

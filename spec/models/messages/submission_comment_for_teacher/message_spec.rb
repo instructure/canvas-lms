@@ -37,5 +37,5 @@ describe "submission_comment_for_teacher" do
   let_once(:asset) { submission.add_comment(author: commenter, comment: "Looks good!") }
   let_once(:notification_name) { "Submission Comment For Teacher" }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 end
