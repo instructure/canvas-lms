@@ -19,6 +19,7 @@ import {cleanup, fireEvent, render, screen} from '@testing-library/react'
 import React from 'react'
 import '@testing-library/jest-dom/extend-expect'
 import {ltiState} from '@canvas/lti/jquery/messages'
+import {reloadWindow} from '@canvas/util/globalUtils'
 import IndexMenu from '../IndexMenu'
 import Actions from '../actions/IndexMenuActions'
 
@@ -32,6 +33,10 @@ jest.mock('@canvas/lti/jquery/messages', () => ({
     tray: null,
   },
   onLtiClosePostMessage: jest.fn(),
+}))
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  reloadWindow: jest.fn(),
 }))
 
 function createFakeStore(initialState) {
@@ -92,6 +97,7 @@ describe('AssignmentsIndexMenu', () => {
   afterEach(() => {
     window.ENV = oldEnv
     jest.restoreAllMocks()
+    reloadWindow.mockClear()
   })
 
   it('renders a dropdown menu trigger and options list', () => {
@@ -249,6 +255,8 @@ describe('AssignmentsIndexMenu', () => {
 
       // Verify that the LTI state was accessed
       expect(ltiState.tray.refreshOnClose).toBe(true)
+      // Verify that reloadWindow was called
+      expect(reloadWindow).toHaveBeenCalled()
     })
 
     it('clears the window listener handler when unmounted', () => {
