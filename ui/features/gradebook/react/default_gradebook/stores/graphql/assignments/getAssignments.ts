@@ -151,8 +151,12 @@ export type GetAssignmentsParams = {
   gradingPeriodId: string | null
   after?: string
 }
-export const getAssignments = async (params: GetAssignmentsParams) => {
-  const data = await executeQuery<GetAssignmentsResult>(GET_ASSIGNMENTS_QUERY, params)
+export const getAssignments = async (
+  params: GetAssignmentsParams,
+  headers?: Record<string, string>,
+) => {
+  const data = await executeQuery<GetAssignmentsResult>(GET_ASSIGNMENTS_QUERY, params, headers)
+
   const validation = ZGetAssignmentsResult.safeParse(data)
   if (!validation.success) {
     console.error('Validation failed:', validation.error.format())
