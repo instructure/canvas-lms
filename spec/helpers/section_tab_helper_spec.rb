@@ -148,6 +148,35 @@ describe SectionTabHelper do
           end
         end
 
+        context "and YouTube Migration is available" do
+          before do
+            allow(course).to receive(:tabs_available).and_call_original
+            allow(course).to receive(:has_studio_integration?).and_return(true)
+            course.set_feature_flag!(:youtube_migration, "off")
+          end
+
+          let(:available_section_tabs) do
+            SectionTabHelperSpec::AvailableSectionTabs.new(
+              course, current_user, domain_root_account, session
+            )
+          end
+
+          it "uncaches tabs when youtube migration FF is updated" do
+            enable_cache do
+              expect(course).to receive(:tabs_available).twice.and_call_original
+              tabs_without_ym = available_section_tabs.to_a
+              youtube_migration_tab = tabs_without_ym.find { |tab| tab[:id] == Course::TAB_YOUTUBE_MIGRATION }
+              expect(youtube_migration_tab).to be_nil
+              course.remove_instance_variable(:@tabs_available) if course.instance_variable_defined?(:@tabs_available)
+
+              course.set_feature_flag!(:youtube_migration, "on")
+              tabs_with_ym = available_section_tabs.to_a
+              youtube_migration_tab = tabs_with_ym.find { |tab| tab[:id] == Course::TAB_YOUTUBE_MIGRATION }
+              expect(youtube_migration_tab).to_not be_nil
+            end
+          end
+        end
+
         context "and tabs include TAB_CONFERENCES" do
           it "includes TAB_CONFERENCES if WebConference.config" do
             allow(WebConference).to receive(:config).and_return({})

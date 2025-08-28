@@ -42,7 +42,8 @@ module SectionTabHelper
 
   # if a tab depends on a Course FF, it should be included here so that the cache is busted
   FLAGS_FOR_CACHE_KEY = [
-    :smart_search
+    :smart_search,
+    :youtube_migration
   ].freeze
 
   def available_section_tabs
