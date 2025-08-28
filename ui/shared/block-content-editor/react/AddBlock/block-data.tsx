@@ -110,19 +110,13 @@ export const blockFactory = {
       title=""
       content=""
       decorativeImage={false}
-      settings={{
-        includeBlockTitle: true,
-        backgroundColor: defaultBackgroundColor,
-        textColor: defaultTextColor,
-        arrangement: 'left',
-        textToImageRatio: '1:1',
-        url: '',
-        altText: '',
-        fileName: '',
-        altTextAsCaption: false,
-        decorativeImage: false,
-        caption: '',
-      }}
+      includeBlockTitle={true}
+      backgroundColor={defaultBackgroundColor}
+      textColor={defaultTextColor}
+      arrangement="left"
+      textToImageRatio="1:1"
+      altTextAsCaption={false}
+      caption=""
     />
   ),
   [MediaBlock.name]: () => (

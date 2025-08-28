@@ -21,10 +21,6 @@ import {renderBlock} from '../../__tests__/render-helper'
 import {RenderResult, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
-const getSettings = (settings: object) => ({
-  settings: {...settings},
-})
-
 const color = '123456'
 
 const toggleSection = async (component: RenderResult, name: RegExp | string) => {
@@ -35,7 +31,7 @@ const toggleSection = async (component: RenderResult, name: RegExp | string) => 
 describe('ImageTextBlockSettings', () => {
   describe('include title', () => {
     it('integrates, changing the state', async () => {
-      const component = renderBlock(ImageTextBlockSettings, getSettings({includeBlockTitle: false}))
+      const component = renderBlock(ImageTextBlockSettings, {includeBlockTitle: false})
       const checkbox = component.getByLabelText(/Include block title/i)
       expect(checkbox).not.toBeChecked()
       await userEvent.click(checkbox)
@@ -45,10 +41,7 @@ describe('ImageTextBlockSettings', () => {
 
   describe('background color', () => {
     it('integrates, changing the state', async () => {
-      const component = renderBlock(
-        ImageTextBlockSettings,
-        getSettings({backgroundColor: '000000'}),
-      )
+      const component = renderBlock(ImageTextBlockSettings, {backgroundColor: '000000'})
       await toggleSection(component, /Expand color settings/i)
       const input = component.getByLabelText(/Background color/i) as HTMLInputElement
       await userEvent.clear(input)
@@ -59,7 +52,7 @@ describe('ImageTextBlockSettings', () => {
 
   describe('default text color', () => {
     it('integrates, changing the state', async () => {
-      const component = renderBlock(ImageTextBlockSettings, getSettings({textColor: '000000'}))
+      const component = renderBlock(ImageTextBlockSettings, {textColor: '000000'})
       await toggleSection(component, /Expand color settings/i)
       const input = component.getByLabelText(/Default text color/i) as HTMLInputElement
       await userEvent.clear(input)
@@ -70,7 +63,7 @@ describe('ImageTextBlockSettings', () => {
 
   describe('arrangement', () => {
     it('integrates, changing the state', async () => {
-      const component = renderBlock(ImageTextBlockSettings, getSettings({arrangement: 'left'}))
+      const component = renderBlock(ImageTextBlockSettings, {arrangement: 'left'})
       const radioButton = component.getByLabelText(/Image on the right/i)
       expect(radioButton).not.toBeChecked()
       await userEvent.click(radioButton)
@@ -80,7 +73,7 @@ describe('ImageTextBlockSettings', () => {
 
   describe('text to image ratio', () => {
     it('integrates, changing the state', async () => {
-      const component = renderBlock(ImageTextBlockSettings, getSettings({textToImageRatio: '1:1'}))
+      const component = renderBlock(ImageTextBlockSettings, {textToImageRatio: '1:1'})
       const radioButton = component.getByLabelText(/2:1/i)
       expect(radioButton).not.toBeChecked()
       await userEvent.click(radioButton)
@@ -90,14 +83,11 @@ describe('ImageTextBlockSettings', () => {
 
   describe('image upload', () => {
     it('integrates, changing the state', async () => {
-      const component = renderBlock(
-        ImageTextBlockSettings,
-        getSettings({
-          url: 'https://example.com/image.jpg',
-          altText: 'Sample image',
-          fileName: 'my-image.jpg',
-        }),
-      )
+      const component = renderBlock(ImageTextBlockSettings, {
+        url: 'https://example.com/image.jpg',
+        altText: 'Sample image',
+        fileName: 'my-image.jpg',
+      })
 
       expect(component.getByText('my-image.jpg')).toBeInTheDocument()
       await userEvent.click(component.getByTestId('remove-image-button'))
@@ -108,10 +98,7 @@ describe('ImageTextBlockSettings', () => {
 
   describe('caption', () => {
     it('integrates, changing the state', async () => {
-      const component = renderBlock(
-        ImageTextBlockSettings,
-        getSettings({caption: 'Initial caption'}),
-      )
+      const component = renderBlock(ImageTextBlockSettings, {caption: 'Initial caption'})
       const input = component.getByLabelText(/Image caption/i) as HTMLInputElement
       expect(input.value).toBe('Initial caption')
       await userEvent.clear(input)
@@ -122,10 +109,7 @@ describe('ImageTextBlockSettings', () => {
 
   describe('alt text', () => {
     it('integrates, changing the state', async () => {
-      const component = renderBlock(
-        ImageTextBlockSettings,
-        getSettings({altText: 'Initial alt text'}),
-      )
+      const component = renderBlock(ImageTextBlockSettings, {altText: 'Initial alt text'})
       const input = component.getByRole('textbox', {name: /Alt text/i}) as HTMLInputElement
       expect(input.value).toBe('Initial alt text')
       await userEvent.clear(input)
@@ -136,13 +120,10 @@ describe('ImageTextBlockSettings', () => {
 
   describe('alt text as caption', () => {
     it('integrates, changing the state', async () => {
-      const component = renderBlock(
-        ImageTextBlockSettings,
-        getSettings({
-          altText: 'Sample alt text',
-          altTextAsCaption: false,
-        }),
-      )
+      const component = renderBlock(ImageTextBlockSettings, {
+        altText: 'Sample alt text',
+        altTextAsCaption: false,
+      })
       const checkbox = component.getByLabelText(/Use alt text as caption/i)
       expect(checkbox).not.toBeChecked()
       await userEvent.click(checkbox)
@@ -152,7 +133,7 @@ describe('ImageTextBlockSettings', () => {
 
   describe('decorative image', () => {
     it('integrates, changing the state', async () => {
-      const component = renderBlock(ImageTextBlockSettings, getSettings({decorativeImage: false}))
+      const component = renderBlock(ImageTextBlockSettings, {decorativeImage: false})
       const checkbox = component.getByLabelText(/Decorative image/i)
       expect(checkbox).not.toBeChecked()
       await userEvent.click(checkbox)

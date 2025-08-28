@@ -44,12 +44,18 @@ export const useSave2 = <T extends ElementType>(fn: () => Partial<ComponentProps
   fnRef.current = fn
 
   useEffect(() => {
-    const callback = () => {
+    const saveHandler = () => {
       setProp((props: any) => {
         Object.assign(props, fnRef.current())
       })
     }
-    editingBlock.addSaveCallback(callback)
-    return () => editingBlock.deleteSaveCallback(callback)
+    editingBlock.addSaveCallback(saveHandler)
+    return () => editingBlock.deleteSaveCallback(saveHandler)
+  }, [])
+
+  return useCallback((newProps: Partial<ComponentProps<T>>) => {
+    setProp((props: any) => {
+      Object.assign(props, newProps)
+    })
   }, [])
 }
