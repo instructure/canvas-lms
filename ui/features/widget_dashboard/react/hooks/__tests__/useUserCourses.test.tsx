@@ -448,4 +448,167 @@ describe('usePaginatedCoursesWithGrades', () => {
 
     cleanup()
   })
+
+  it('should sort courses by name when orderBy is specified', async () => {
+    const sortingResponse = {
+      data: {
+        legacyNode: {
+          _id: '123',
+          enrollmentsConnection: {
+            nodes: [
+              {
+                course: {
+                  _id: '3',
+                  name: 'Zebra Studies',
+                  courseCode: 'ZOO300',
+                },
+                updatedAt: '2025-01-01T00:00:00Z',
+                grades: {
+                  currentScore: 95,
+                  currentGrade: 'A',
+                  finalScore: null,
+                  finalGrade: null,
+                  overrideScore: null,
+                  overrideGrade: null,
+                },
+              },
+              {
+                course: {
+                  _id: '1',
+                  name: 'Alpha Course',
+                  courseCode: 'ALP100',
+                },
+                updatedAt: '2025-01-01T00:00:00Z',
+                grades: {
+                  currentScore: 87,
+                  currentGrade: 'B+',
+                  finalScore: null,
+                  finalGrade: null,
+                  overrideScore: null,
+                  overrideGrade: null,
+                },
+              },
+              {
+                course: {
+                  _id: '2',
+                  name: 'Beta Studies',
+                  courseCode: 'BET200',
+                },
+                updatedAt: '2025-01-01T00:00:00Z',
+                grades: {
+                  currentScore: 92,
+                  currentGrade: 'A-',
+                  finalScore: null,
+                  finalGrade: null,
+                  overrideScore: null,
+                  overrideGrade: null,
+                },
+              },
+            ],
+            pageInfo: {
+              hasNextPage: false,
+              hasPreviousPage: false,
+              startCursor: null,
+              endCursor: null,
+            },
+          },
+        },
+      },
+    }
+
+    server.use(
+      graphql.query('GetUserCoursesWithGradesConnection', () => {
+        return HttpResponse.json(sortingResponse)
+      }),
+    )
+
+    const {result, cleanup} = setup(() =>
+      usePaginatedCoursesWithGrades({orderBy: 'name', order: 'asc'}),
+    )
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false)
+      expect(result.current.data).toHaveLength(3)
+
+      // Should be sorted alphabetically by course name
+      expect(result.current.data[0].courseName).toBe('Alpha Course')
+      expect(result.current.data[1].courseName).toBe('Beta Studies')
+      expect(result.current.data[2].courseName).toBe('Zebra Studies')
+    })
+
+    cleanup()
+  })
+
+  it('should sort courses by code when orderBy is code', async () => {
+    const sortingResponse = {
+      data: {
+        legacyNode: {
+          _id: '123',
+          enrollmentsConnection: {
+            nodes: [
+              {
+                course: {
+                  _id: '1',
+                  name: 'Course One',
+                  courseCode: 'ZZZ999',
+                },
+                updatedAt: '2025-01-01T00:00:00Z',
+                grades: {
+                  currentScore: 95,
+                  currentGrade: 'A',
+                  finalScore: null,
+                  finalGrade: null,
+                  overrideScore: null,
+                  overrideGrade: null,
+                },
+              },
+              {
+                course: {
+                  _id: '2',
+                  name: 'Course Two',
+                  courseCode: 'AAA111',
+                },
+                updatedAt: '2025-01-01T00:00:00Z',
+                grades: {
+                  currentScore: 87,
+                  currentGrade: 'B+',
+                  finalScore: null,
+                  finalGrade: null,
+                  overrideScore: null,
+                  overrideGrade: null,
+                },
+              },
+            ],
+            pageInfo: {
+              hasNextPage: false,
+              hasPreviousPage: false,
+              startCursor: null,
+              endCursor: null,
+            },
+          },
+        },
+      },
+    }
+
+    server.use(
+      graphql.query('GetUserCoursesWithGradesConnection', () => {
+        return HttpResponse.json(sortingResponse)
+      }),
+    )
+
+    const {result, cleanup} = setup(() =>
+      usePaginatedCoursesWithGrades({orderBy: 'code', order: 'asc'}),
+    )
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false)
+      expect(result.current.data).toHaveLength(2)
+
+      // Should be sorted alphabetically by course code
+      expect(result.current.data[0].courseCode).toBe('AAA111')
+      expect(result.current.data[1].courseCode).toBe('ZZZ999')
+    })
+
+    cleanup()
+  })
 })

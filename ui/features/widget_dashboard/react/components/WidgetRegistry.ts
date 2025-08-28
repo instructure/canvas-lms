@@ -22,6 +22,7 @@ import CourseWorkSummaryWidget from './widgets/CourseWorkSummaryWidget/CourseWor
 import CourseWorkWidget from './widgets/CourseWorkWidget/CourseWorkWidget'
 import CourseGradesWidget from './widgets/CourseGradesWidget/CourseGradesWidget'
 import AnnouncementsWidget from './widgets/AnnouncementsWidget/AnnouncementsWidget'
+import PeopleWidget from './widgets/PeopleWidget/PeopleWidget'
 
 const widgetRegistry: WidgetRegistry = {
   [WIDGET_TYPES.COURSE_WORK_SUMMARY]: {
@@ -43,6 +44,11 @@ const widgetRegistry: WidgetRegistry = {
     component: AnnouncementsWidget,
     displayName: 'Announcements',
     description: 'Stay updated with the latest announcements from your courses',
+  },
+  [WIDGET_TYPES.PEOPLE]: {
+    component: PeopleWidget,
+    displayName: 'People',
+    description: 'View and contact your course instructors and teaching assistants',
   },
 }
 

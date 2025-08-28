@@ -242,9 +242,18 @@ module Types
                "only return enrollments for this course",
                required: false,
                prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
+      argument :course_ids,
+               [ID],
+               "only return enrollments for these courses",
+               required: false,
+               prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Course")
       argument :current_only,
                Boolean,
                "Whether or not to restrict results to `active` enrollments in `available` courses",
+               required: false
+      argument :enrollment_types,
+               [EnrollmentTypeType],
+               "Filter by enrollment types (e.g., TeacherEnrollment, TaEnrollment)",
                required: false
       argument :exclude_concluded,
                Boolean,
@@ -264,7 +273,7 @@ module Types
                "The sort field and direction for the results. Secondary sort is by section name",
                required: false
     end
-    def enrollments_connection(course_id: nil, current_only: false, order_by: [], exclude_concluded: false, horizon_courses: nil, sort: {})
+    def enrollments_connection(course_id: nil, course_ids: nil, current_only: false, order_by: [], exclude_concluded: false, horizon_courses: nil, sort: {}, enrollment_types: nil)
       # Check basic permission - return empty instead of nil
       unless object == current_user || object.grants_right?(current_user, session, :read_profile)
         return Enrollment.none
@@ -282,9 +291,11 @@ module Types
         enrollments = enrollments.where(course_id: permitted_course_ids)
       end
 
-      # Apply filters similar to the loader logic
+      # Apply course filtering - support both single course_id and multiple course_ids
       if course_id
         enrollments = enrollments.where(course_id:)
+      elsif course_ids.present?
+        enrollments = enrollments.where(course_id: course_ids)
       end
 
       if current_only
@@ -294,6 +305,11 @@ module Types
 
       if exclude_concluded
         enrollments = enrollments.where.not(workflow_state: "completed")
+      end
+
+      # Filter by enrollment types if specified
+      if enrollment_types.present?
+        enrollments = enrollments.where(type: enrollment_types.map(&:to_s))
       end
 
       enrollments.order(:id)

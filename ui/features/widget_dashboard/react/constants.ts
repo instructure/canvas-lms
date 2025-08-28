@@ -32,6 +32,7 @@ export const WIDGET_TYPES = {
   COURSE_WORK: 'course_work',
   COURSE_GRADES: 'course_grades',
   ANNOUNCEMENTS: 'announcements',
+  PEOPLE: 'people',
 } as const
 
 export type WidgetType = (typeof WIDGET_TYPES)[keyof typeof WIDGET_TYPES]
@@ -67,6 +68,13 @@ export const DEFAULT_WIDGET_CONFIG = {
       size: {width: 2, height: 2},
       title: I18n.t('Course Work'),
     },
+    {
+      id: 'people-widget',
+      type: WIDGET_TYPES.PEOPLE,
+      position: {col: 3, row: 3},
+      size: {width: 1, height: 2},
+      title: I18n.t('People'),
+    },
   ],
 }
 
@@ -90,6 +98,7 @@ export const QUERY_CONFIG = {
     COURSES: 10, // minutes
     GRADES: 5, // minutes
     STATISTICS: 5, // minutes
+    USERS: 10, // minutes
   },
   RETRY: {
     DISABLED: false,

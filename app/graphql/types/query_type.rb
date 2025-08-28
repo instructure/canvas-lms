@@ -160,6 +160,34 @@ module Types
                   end&.map(&:course)
     end
 
+    field :course_instructors_connection, EnrollmentType.connection_type, null: true do
+      description "Paginated instructor enrollments across multiple courses"
+      argument :course_ids,
+               [ID],
+               "Course IDs to get instructors for",
+               required: true,
+               prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Course")
+    end
+    def course_instructors_connection(course_ids:, **_args)
+      return Enrollment.none unless current_user
+
+      user_course_ids = current_user.enrollments.pluck(:course_id).uniq.map(&:to_s)
+      course_ids = if course_ids.blank?
+                     user_course_ids
+                   else
+                     course_ids & user_course_ids
+                   end
+
+      # Get unique instructor enrollments grouped by user, ordered by course name
+      # to ensure consistent pagination and grouping by course
+      Enrollment.joins(:course, :user)
+                .where(course_id: course_ids)
+                .where(type: ["TeacherEnrollment", "TaEnrollment"])
+                .where(workflow_state: "active")
+                .where(courses: { workflow_state: "available" })
+                .order("courses.name ASC")
+    end
+
     field :module_item, Types::ModuleItemType, null: true do
       description "ModuleItem"
       argument :id,
