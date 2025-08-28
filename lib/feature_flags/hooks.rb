@@ -185,5 +185,19 @@ module FeatureFlags
 
       bce_shadow_flag_enabled
     end
+
+    def self.rollback_assignments_state(_user, context, _old_state, new_state)
+      if new_state == "off"
+        affected_states = ["outcome_alignment_cloning", "failed_to_clone_outcome_alignment"]
+        context.delay_if_production(
+          priority: Delayed::LOW_PRIORITY,
+          n_strand: ["rollback_assignment_states", context.global_id]
+        ).all_courses.find_ids_in_ranges do |start_id, end_id|
+          Assignment.where(workflow_state: affected_states, context_type: "Course")
+                    .where(context_id: start_id..end_id)
+                    .update_all(workflow_state: "unpublished")
+        end
+      end
+    end
   end
 end
