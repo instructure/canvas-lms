@@ -76,6 +76,8 @@ class Lti::Asset < ApplicationRecord
     digester = Digest::SHA256.new
     if text_entry?
       digester << submission.body_for_attempt(submission_attempt)
+    elsif discussion_entry?
+      digester << discussion_entry_version.message
     else
       attachment.open do |chunk|
         digester << chunk
@@ -117,8 +119,12 @@ class Lti::Asset < ApplicationRecord
     asset_type == "text_entry"
   end
 
+  def discussion_entry?
+    asset_type == "discussion_entry"
+  end
+
   def content_type
-    if text_entry?
+    if text_entry? || discussion_entry?
       "text/html"
     else
       attachment.content_type
@@ -128,6 +134,8 @@ class Lti::Asset < ApplicationRecord
   def content_size
     if text_entry?
       submission.body_for_attempt(submission_attempt).bytesize
+    elsif discussion_entry?
+      discussion_entry_version.message.bytesize
     else
       attachment.size
     end

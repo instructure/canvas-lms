@@ -280,7 +280,6 @@ describe DiscussionTopicsApiController do
 
           it "returns an error message" do
             get "find_summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
-            puts("response: #{response.body}")
             expect(response).to be_not_found
           end
         end
@@ -836,8 +835,6 @@ describe DiscussionTopicsApiController do
 
       put "insight_entry_update", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, entry_id: @insight_entry.id, relevance_human_feedback_action: "invalid" }, format: "json"
 
-      puts response.body
-      puts response.status
       expect(response).to be_bad_request
     end
 
@@ -1045,6 +1042,35 @@ describe DiscussionTopicsApiController do
 
       expect(response).to be_not_found
       expect(topic1.reload.discussion_type).to eq("side_comment")
+    end
+  end
+
+  context "LTI asset processor notifications" do
+    before :once do
+      course_with_student active_all: true
+      @graded_topic = DiscussionTopic.create_graded_topic!(course: @course, title: "Graded Discussion")
+      @entry = @graded_topic.discussion_entries.create!(message: "Original message", user: @student)
+    end
+
+    before do
+      user_session(@student)
+      allow(controller).to receive_messages(form_authenticity_token: "abc", form_authenticity_param: "abc")
+    end
+
+    describe "POST add_entry" do
+      it "calls notify_asset_processors_of_discussion for graded discussions" do
+        expect(Lti::AssetProcessorDiscussionNotifier).to receive(:notify_asset_processors_of_discussion)
+
+        post "add_entry", params: { topic_id: @graded_topic.id, course_id: @course.id, message: "test message" }, format: "json"
+      end
+    end
+
+    describe "POST add_reply" do
+      it "calls notify_asset_processors_of_discussion for graded discussion replies" do
+        expect(Lti::AssetProcessorDiscussionNotifier).to receive(:notify_asset_processors_of_discussion)
+
+        post "add_reply", params: { topic_id: @graded_topic.id, entry_id: @entry.id, course_id: @course.id, message: "reply message" }, format: "json"
+      end
     end
   end
 end
