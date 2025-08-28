@@ -66,7 +66,11 @@ describe CareerController do
           get :show, params: { course_id: @course.id }
 
           expect(assigns[:js_env][:CANVAS_CAREER][:FEATURES]).to include(
-            horizon_program_management: false
+            horizon_root_experience: false,
+            horizon_dashboard_ai_widgets: false,
+            horizon_hris_integrations: false,
+            horizon_user_profile_page: false,
+            horizon_bulk_metadata_import: false
           )
         end
 
