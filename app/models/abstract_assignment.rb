@@ -368,6 +368,7 @@ class AbstractAssignment < ActiveRecord::Base
     opts_with_default = default_opts.merge(opts)
 
     result = clone
+    result.saving_user = opts[:user]
     result.all_submissions.clear
     result.attachments.clear
     result.ignores.clear
@@ -394,7 +395,8 @@ class AbstractAssignment < ActiveRecord::Base
     if wiki_page && opts_with_default[:duplicate_wiki_page]
       result.wiki_page = wiki_page.duplicate({
                                                duplicate_assignment: false,
-                                               copy_title: result.title
+                                               copy_title: result.title,
+                                               user: opts_with_default[:user]
                                              })
     end
 
