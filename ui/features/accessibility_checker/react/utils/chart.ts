@@ -16,63 +16,36 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {severityColors} from '../constants'
-import {IssueDataPoint, RawData, Severity} from '../types'
 import {useScope as createI18nScope} from '@canvas/i18n'
+
+import {issueTypeOptions, severityColors} from '../constants'
+import {IssueDataPoint} from '../types'
+import {getIssueSeverity} from '../utils/apiData'
 
 const I18n = createI18nScope('accessibility_checker')
 
-export function processIssuesToChartData(raw: RawData | null): IssueDataPoint[] {
-  if (!raw || typeof raw !== 'object') {
+export const processIssuesToChartData = (byRuleType?: Record<string, number>): IssueDataPoint[] => {
+  if (!byRuleType || typeof byRuleType !== 'object') {
     return []
   }
 
-  const grouped: Record<string, {count: number; displayName: string; severity: Severity}> = {}
+  const dataPoints: Record<string, IssueDataPoint> = {}
 
-  const rootSeverityMap: Record<string, Severity> = {
-    low: 'Low',
-    medium: 'Medium',
-    high: 'High',
-  }
-
-  Object.values(raw).forEach((category: any) => {
-    Object.values(category).forEach((item: any) => {
-      const itemRootSeverity = rootSeverityMap[item.severity?.toLowerCase()] || 'Low'
-      const issues = item.issues || []
-
-      issues.forEach((issue: any) => {
-        const ruleId = issue.ruleId
-
-        if (!grouped[ruleId]) {
-          grouped[ruleId] = {
-            count: 1,
-            severity: itemRootSeverity,
-            displayName: issue.displayName,
-          }
-        } else {
-          grouped[ruleId].count += 1
-          grouped[ruleId].severity = prioritizeSeverity(grouped[ruleId].severity, itemRootSeverity)
-        }
-      })
-    })
+  Object.entries(byRuleType).forEach(([ruleType, count]: [string, number]) => {
+    dataPoints[ruleType] = {
+      id: ruleType,
+      count,
+      issue: issueTypeOptions.find(option => option.value === ruleType)?.label || ruleType, // displayName
+      severity: getIssueSeverity(count),
+    }
   })
 
-  return Object.entries(grouped).map(([ruleId, data]) => ({
-    id: ruleId.replace(/-/g, '_'),
-    issue: data.displayName,
-    count: data.count,
-    severity: data.severity,
-  }))
-}
-
-function prioritizeSeverity(a: Severity, b: Severity): Severity {
-  const order = {High: 3, Medium: 2, Low: 1}
-  return order[a] >= order[b] ? a : b
+  return Object.values(dataPoints)
 }
 
 const wrapLabel = (label: string): string[] => label.split(' ')
 
-export function getChartData(issuesData: IssueDataPoint[], containerWidth: number) {
+export const getChartData = (issuesData: IssueDataPoint[], containerWidth: number) => {
   // Adaptive labels depending on container size
   const datasetData = issuesData.map(d => d.count)
   const labels = issuesData.map(d => {
@@ -99,7 +72,7 @@ export function getChartData(issuesData: IssueDataPoint[], containerWidth: numbe
   }
 }
 
-export function getChartOptions(issuesData: IssueDataPoint[], containerWidth: number) {
+export const getChartOptions = (issuesData: IssueDataPoint[], containerWidth: number) => {
   const tooltips = issuesData.map(d => d.issue)
   const datasetData = issuesData.map(d => d.count)
 

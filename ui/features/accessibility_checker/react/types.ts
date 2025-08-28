@@ -110,12 +110,9 @@ export interface AccessibilityIssue {
   workflowState: IssueWorkflowState
 }
 
-export interface AccessibilityData {
-  pages?: Record<string, ContentItem>
-  assignments?: Record<string, ContentItem>
-  attachments?: Record<string, ContentItem>
-  lastChecked?: string
-  accessibilityScanDisabled?: boolean
+export interface AccessibilityIssuesSummaryData {
+  total: number
+  byRuleType: Record<string, number>
 }
 
 export interface ContentItem extends HasId {
@@ -141,13 +138,11 @@ export type FormValue = any
 export type Severity = 'High' | 'Medium' | 'Low'
 
 export type IssueDataPoint = {
-  id: string
+  id?: string // not sure if we need this anymore
   issue: string
   count: number
   severity: Severity
 }
-
-export type RawData = Record<string, any>
 
 export type ContrastData = {
   contrast: number

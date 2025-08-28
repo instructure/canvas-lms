@@ -44,7 +44,8 @@ export const AccessibilityCheckerApp: React.FC = () => {
 
   const {getNextResource} = useNextResource()
 
-  const {doFetchAccessibilityScanData} = useAccessibilityScansFetchUtils()
+  const {doFetchAccessibilityScanData, doFetchAccessibilityIssuesSummary} =
+    useAccessibilityScansFetchUtils()
 
   const [accessibilityScans, filters] = useAccessibilityScansStore(
     useShallow(state => [state.accessibilityScans, state.filters]),
@@ -65,7 +66,9 @@ export const AccessibilityCheckerApp: React.FC = () => {
 
   useDeepCompareEffect(() => {
     if (!accessibilityScanDisabled) {
-      doFetchAccessibilityScanData(parseFetchParams(), filters)
+      const parsedFetchParams = parseFetchParams()
+      doFetchAccessibilityScanData(parsedFetchParams, filters)
+      doFetchAccessibilityIssuesSummary(parsedFetchParams, filters)
     } else {
       setLoading(false)
     }

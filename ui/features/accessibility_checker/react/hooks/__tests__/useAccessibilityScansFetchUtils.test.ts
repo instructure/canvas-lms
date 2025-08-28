@@ -36,16 +36,8 @@ import {
 jest.mock('@canvas/do-fetch-api-effect')
 
 describe('useAccessibilityScanFetchUtils', () => {
-  const mockSetLoading = jest.fn()
-  const mockSetError = jest.fn()
-  const mockSetTableSortState = jest.fn()
-  const mockSetTableData = jest.fn()
   const mockState = {
     ...initialState,
-    mockSetLoading,
-    mockSetError,
-    mockSetTableSortState,
-    mockSetTableData,
   }
 
   const testNewStateToFetch: NewStateToFetch = {

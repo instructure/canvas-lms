@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {mockIssuesSummary} from '../../stores/mockData'
 import {IssueDataPoint} from '../../types'
 import {
   getChartData,
@@ -36,57 +37,38 @@ const sampleData: IssueDataPoint[] = [
   {id: 'heading_structure', issue: 'Heading structure', count: 1, severity: 'Low'},
 ]
 
+const parsedIssueDataPoints: IssueDataPoint[] = [
+  {
+    id: 'headings-sequence',
+    issue: 'Headings sequence',
+    count: 1,
+    severity: 'Low',
+  },
+  {
+    id: 'small-text-contrast',
+    issue: 'Small text contrast',
+    count: 10,
+    severity: 'Medium',
+  },
+  {
+    id: 'adjacent-links',
+    issue: 'Adjacent links',
+    count: 50,
+    severity: 'High',
+  },
+]
+
 describe('processIssuesToChartData', () => {
-  const rawData = {
-    pages: {
-      1: {
-        severity: 'medium',
-        issues: [
-          {ruleId: 'img-alt', displayName: 'Image alt text'},
-          {ruleId: 'img-alt', displayName: 'Image alt text'},
-        ],
-      },
-    },
-    attachments: {
-      2: {
-        severity: 'low',
-        issues: [
-          {ruleId: 'img-alt', displayName: 'Image alt text'},
-          {ruleId: 'table-caption', displayName: 'Table caption'},
-        ],
-      },
-      3: {
-        severity: 'high',
-        issues: [{ruleId: 'img-alt', displayName: 'Image alt text'}],
-      },
-    },
-  }
-
-  const parsedData: IssueDataPoint[] = [
-    {
-      id: 'img_alt',
-      issue: 'Image alt text',
-      count: 4,
-      severity: 'High', // highest severity among sources
-    },
-    {
-      id: 'table_caption',
-      issue: 'Table caption',
-      count: 1,
-      severity: 'Low',
-    },
-  ]
-
   it('returns empty array if input is null', () => {
-    const result = processIssuesToChartData(null)
+    const result = processIssuesToChartData({})
     expect(result).toEqual([])
   })
 
   it('processes raw data into chart data correctly', () => {
-    const result = processIssuesToChartData(rawData)
+    const result = processIssuesToChartData(mockIssuesSummary.byRuleType)
 
-    expect(result).toEqual(expect.arrayContaining(parsedData))
-    expect(result).toHaveLength(2)
+    expect(result).toEqual(expect.arrayContaining(parsedIssueDataPoints))
+    expect(result).toHaveLength(3)
   })
 })
 
