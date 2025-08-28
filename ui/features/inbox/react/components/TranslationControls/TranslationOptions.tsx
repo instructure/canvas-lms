@@ -138,6 +138,7 @@ const TranslationOptions: React.FC<Props> = ({asPrimary, onSetPrimary}) => {
             <Flex.Item>
               <Button
                 color="ai-primary"
+                aria-label={I18n.t('Ignite AI Translate')}
                 renderIcon={<IconAiSolid />}
                 disabled={translationLoading}
                 onClick={handleSubmit}

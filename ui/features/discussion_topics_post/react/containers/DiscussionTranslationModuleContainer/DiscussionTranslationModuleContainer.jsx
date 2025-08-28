@@ -152,6 +152,7 @@ export const DiscussionTranslationModuleContainer = ({isAnnouncement}) => {
             disabled={entryTranslatingSet.size > 0}
             margin="0 small 0 0"
             color="ai-primary"
+            aria-label={I18n.t('Ignite AI Translate')}
             renderIcon={IconAiSolid}
             data-testid="translate-discussion-button"
           >
