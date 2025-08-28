@@ -451,7 +451,6 @@ class ApplicationController < ActionController::Base
     explicit_latex_typesetting
     files_a11y_rewrite
     files_a11y_rewrite_toggle
-    hide_legacy_course_analytics
     horizon_course_setting
     instui_for_import_page
     instui_header
