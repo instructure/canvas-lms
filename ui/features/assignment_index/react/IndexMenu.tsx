@@ -28,6 +28,7 @@ import ReactDOM from 'react-dom'
 import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternalToolTray'
 import type {SelectableItem} from '@canvas/trays/react/ContentTypeExternalToolTray'
 import {ltiState} from '@canvas/lti/jquery/messages'
+import {reloadWindow} from '@canvas/util/globalUtils'
 
 const I18n = createI18nScope('assignment_index_menu')
 
@@ -190,7 +191,7 @@ export default class IndexMenu extends React.Component<Props, State> {
       this.setExternalToolTray(null)
       returnFocusTo.focus()
       if (ltiState?.tray?.refreshOnClose) {
-        window.location.reload()
+        reloadWindow()
       }
     }
     const groupData: SelectableItem[] = [
