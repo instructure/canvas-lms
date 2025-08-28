@@ -295,7 +295,6 @@ export type SiteAdminFeatureId =
   | 'explicit_latex_typesetting'
   | 'files_a11y_rewrite'
   | 'files_a11y_rewrite_toggle'
-  | 'hide_legacy_course_analytics'
   | 'instui_for_import_page'
   | 'instui_header'
   | 'instui_nav'
