@@ -5756,4 +5756,97 @@ describe CoursesController do
       end
     end
   end
+
+  describe "request metrics tracking for users action" do
+    before do
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+      user_session(@teacher)
+      allow(InstStatsd::Statsd).to receive(:timing)
+    end
+
+    # Helper methods for consistent test setup
+    def set_gradebook_headers(correlation_id: "test-correlation-id")
+      request.env["HTTP_REFERER"] = "https://example.com/gradebook"
+      request.env["HTTP_CORRELATION_ID"] = correlation_id
+    end
+
+    def set_non_gradebook_headers(correlation_id: "test-correlation-id")
+      request.env["HTTP_REFERER"] = "https://example.com/other-page"
+      request.env["HTTP_CORRELATION_ID"] = correlation_id
+    end
+
+    def make_request
+      get :users, params: { course_id: @course.id }, format: :json
+    end
+
+    def expect_metrics_sent_with(expected_tags = {})
+      expect(InstStatsd::Statsd).to have_received(:timing).with(
+        "canvas.controller.request_time",
+        be_a(Float),
+        tags: {
+          controller: "courses",
+          action: "users",
+          method: "get",
+          referer: "/gradebook",
+          domain: be_a(String),
+          correlation_id: "test-correlation-id"
+        }.merge(expected_tags)
+      )
+    end
+
+    def expect_no_metrics_sent
+      expect(InstStatsd::Statsd).not_to have_received(:timing).with("canvas.controller.request_time", any_args)
+    end
+
+    context "when tracking conditions are met" do
+      it "sends success metrics with gradebook referer and correlation_id" do
+        set_gradebook_headers
+
+        make_request
+
+        expect_metrics_sent_with(status: "success")
+      end
+    end
+
+    context "when tracking conditions are not met" do
+      it "does not send metrics without gradebook referer" do
+        set_non_gradebook_headers
+
+        make_request
+
+        expect_no_metrics_sent
+      end
+
+      it "does not send metrics without correlation_id" do
+        request.env["HTTP_REFERER"] = "https://example.com/gradebook"
+
+        make_request
+
+        expect_no_metrics_sent
+      end
+    end
+
+    context "when request fails with exception" do
+      it "sends error metrics for Ruby exceptions" do
+        set_gradebook_headers
+        # Mock the users action itself to raise an exception
+        allow(@controller).to receive(:users) do
+          raise StandardError, "test error"
+        end
+
+        # The exception may be rescued by Rails, so we don't expect it to propagate
+        begin
+          make_request
+        rescue
+          # Exception may or may not propagate depending on Rails rescue handling
+        end
+
+        expect_metrics_sent_with(
+          status: "error",
+          error_type: "StandardError"
+        )
+      end
+    end
+  end
 end
