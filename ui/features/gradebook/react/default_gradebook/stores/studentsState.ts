@@ -332,6 +332,7 @@ export default (
         limit(async () => {
           const {data} = await getAllSubmissions({
             queryParams: {userIds: userIdChunk, courseId},
+            headers: {'Correlation-Id': get().correlationId},
             onError: flashSubmissionLoadError,
           })
           const submissionsByUserId = groupBy(data.map(transformSubmission), 'user_id')
@@ -353,6 +354,7 @@ export default (
       const userIds = users.course.usersConnection.nodes.map(it => it._id)
       const {data: enrollments} = await getAllEnrollments({
         queryParams: {userIds: userIds, courseId},
+        headers: {'Correlation-Id': get().correlationId},
         onError: flashStudentLoadError,
       })
       await onEnrollmentSuccess(users.course.usersConnection.nodes, enrollments)
@@ -364,6 +366,7 @@ export default (
         courseId,
         first: GRADEBOOK_GRAPHQL_CONFIG.usersPageSize,
       },
+      headers: {'Correlation-Id': get().correlationId},
       onSuccess: onUserPageSuccess,
       onError: flashStudentLoadError,
     })

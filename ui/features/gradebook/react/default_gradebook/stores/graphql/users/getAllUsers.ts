@@ -22,14 +22,16 @@ import {getUsers, GetUsersParams, GetUsersResult, User} from './getUsers'
 
 type GetAllUsersParams = {
   queryParams: Pick<GetUsersParams, 'courseId' | 'userIds' | 'first'>
+  headers?: Record<string, string>
 } & GetAllPagesCallbacks<GetUsersResult>
 
 export const getAllUsers = ({
   queryParams,
+  headers,
   ...params
 }: GetAllUsersParams): GetAllPagesReturnValue<User[]> =>
   getAllPages({
-    query: (after: string) => getUsers({...queryParams, after}),
+    query: (after: string) => getUsers({...queryParams, after}, headers),
     getPageInfo: res => res.course.usersConnection.pageInfo,
     flattenPages: pages => flatten(pages.map(page => page.course.usersConnection.nodes)),
     ...params,

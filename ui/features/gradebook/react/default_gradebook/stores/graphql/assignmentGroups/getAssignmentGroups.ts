@@ -58,11 +58,15 @@ export type GetAssignmentGroupsParams = {
   courseId: string
   after?: string
 }
-export const getAssignmentGroups = async ({after, courseId}: GetAssignmentGroupsParams) => {
-  const data = await executeQuery<GetAssignmentGroupsResult>(GET_ASSIGNMENT_GROUPS_QUERY, {
-    courseId,
-    after,
-  })
+export const getAssignmentGroups = async (
+  params: GetAssignmentGroupsParams,
+  headers?: Record<string, string>,
+) => {
+  const data = await executeQuery<GetAssignmentGroupsResult>(
+    GET_ASSIGNMENT_GROUPS_QUERY,
+    params,
+    headers,
+  )
 
   const validation = ZGetAssignmentGroupsResult.safeParse(data)
   if (!validation.success) {
