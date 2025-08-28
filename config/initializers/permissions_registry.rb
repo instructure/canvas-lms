@@ -18,8 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # NOTE: manage_alerts = Global Announcements and manage_interaction_alerts = Alerts for legacy reasons
-# `group` values are keys into PERMISSION_GROUPS defined in permissions_groups.rb
-#
+# `group` values are keys into PERMISSION_GROUPS defined in permissions_groups.rb.
+# help text can be provided in `details` or `considerations` (which will apply in both account and course contexts)
+# and or `account_` / `course_` prefixed versions, which will only apply in those contexts.
 BASE_PERMISSIONS = {
   become_user: {
     label: -> { I18n.t("Users - act as") },
@@ -217,11 +218,7 @@ BASE_PERMISSIONS = {
     label: -> { I18n.t("Courses - change visibility") },
     available_to: %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment DesignerEnrollment],
     true_for: %w[AccountAdmin TeacherEnrollment TaEnrollment DesignerEnrollment],
-    account_details: [
-      { title: -> { I18n.t("Course Settings") },
-        description: -> { I18n.t("Allows user to manage the Visibility options in Course Settings or when creating a new course.") } }
-    ],
-    course_details: [
+    details: [
       { title: -> { I18n.t("Course Settings") },
         description: -> { I18n.t("Allows user to manage the Visibility options in Course Settings or when creating a new course.") } }
     ]
@@ -591,30 +588,18 @@ BASE_PERMISSIONS = {
                      AccountAdmin
                      AccountMembership],
     true_for: %w[StudentEnrollment TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
-    account_details: [
+    details: [
       { title: -> { I18n.t("Collaborations") },
         description: -> { I18n.t("Allows user to create collaborations.") } },
       { description: -> { I18n.t("Allows user to view, edit, and delete collaborations they created.") } }
     ],
-    account_considerations: [
+    considerations: [
       { title: -> { I18n.t("Collaborations") },
         description: -> { I18n.t("To allow view edit delete functionality of collaborations created by other users, Course Content - add / edit / delete must also be enabled.") } },
       { description: -> { I18n.t("If Course Content - add / edit / delete is enabled and Student Collaborations - create is disabled, the user will not be able to create new collaborations but will be able to view edit delete all collaborations.") } },
       { description: -> { I18n.t("To add students to a collaboration, Users - view list must also be enabled.") } },
       { description: -> { I18n.t("To add a course group to a collaboration, Groups - add must also be enabled.") } }
     ],
-    course_details: [
-      { title: -> { I18n.t("Collaborations") },
-        description: -> { I18n.t("Allows user to create collaborations.") } },
-      { description: -> { I18n.t("Allows user to view, edit, and delete conferences they created.") } }
-    ],
-    course_considerations: [
-      { title: -> { I18n.t("Collaborations") },
-        description: -> { I18n.t("To allow view, edit, and delete functionality of collaborations created by other users, Course Content - add / edit / delete must also be enabled.") } },
-      { description: -> { I18n.t("If Course Content - add / edit / delete is enabled and Student Collaborations - create is disabled, the user will not be able to create new collaborations but will be able to view, edit, and delete all collaborations.") } },
-      { description: -> { I18n.t("To add students to a collaboration, Users - view list must also be enabled.") } },
-      { description: -> { I18n.t("To add a course group to a collaboration, Groups - add must also be enabled.") } }
-    ]
   },
   create_conferences: {
     label: -> { I18n.t("Web Conferences - create") },
@@ -626,23 +611,12 @@ BASE_PERMISSIONS = {
                      AccountAdmin
                      AccountMembership],
     true_for: %w[StudentEnrollment TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
-    account_details: [
+    details: [
       { title: -> { I18n.t("Conferences") },
         description: -> { I18n.t("Allows user to create new conferences in courses and groups.") } },
       { description: -> { I18n.t("Allows user to start conferences they created.") } }
     ],
-    account_considerations: [
-      { title: -> { I18n.t("Conferences") },
-        description: -> { I18n.t("To allow full management of conferences created by the user or others, the Course Content permission must also be enabled.") } },
-      { description: -> { I18n.t("To end a long-running conference, the Course Content permission must be enabled.") } },
-      { description: -> { I18n.t("If the Course Content permission enabled and Web Conferences - create is disabled, the user can still manage conferences.") } }
-    ],
-    course_details: [
-      { title: -> { I18n.t("Conferences") },
-        description: -> { I18n.t("Allows user to create new conferences in courses and groups.") } },
-      { description: -> { I18n.t("Allows user to start conferences they created.") } }
-    ],
-    course_considerations: [
+    considerations: [
       { title: -> { I18n.t("Conferences") },
         description: -> { I18n.t("To allow full management of conferences created by the user or others, the Course Content permission must also be enabled.") } },
       { description: -> { I18n.t("To end a long-running conference, the Course Content permission must be enabled.") } },
@@ -660,23 +634,11 @@ BASE_PERMISSIONS = {
                      AccountMembership],
     true_for: %w[StudentEnrollment TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
     restrict_future_enrollments: true,
-    account_details: [
+    details: [
       { title: -> { I18n.t("Discussions") },
         description: -> { I18n.t("Allows user to add discussions in the Discussions page.") } }
     ],
-    account_considerations: [
-      { title: -> { I18n.t("Announcements") },
-        description: -> { I18n.t("To create announcements, Discussions - moderate must also be enabled.") } },
-      { title: -> { I18n.t("Discussions") },
-        description: -> { I18n.t("To view discussions in a course, Discussions - view must be enabled.") } },
-      { description: -> { I18n.t("Both Discussions - create and Discussions - moderate allow the user to create a discussion in the Discussions page.") } },
-      { description: -> { I18n.t("To manage discussions, Discussions - moderate must also be enabled.") } }
-    ],
-    course_details: [
-      { title: -> { I18n.t("Discussions") },
-        description: -> { I18n.t("Allows user to add discussions in the Discussions page.") } }
-    ],
-    course_considerations: [
+    considerations: [
       { title: -> { I18n.t("Announcements") },
         description: -> { I18n.t("To create announcements, Discussions - moderate must also be enabled.") } },
       { title: -> { I18n.t("Discussions") },
@@ -725,13 +687,9 @@ BASE_PERMISSIONS = {
                      AccountAdmin
                      AccountMembership],
     true_for: %w[DesignerEnrollment TeacherEnrollment AccountAdmin],
-    account_details: [
+    details: [
       { title: -> { I18n.t("Outcomes") },
         description: -> { I18n.t("Allows user to import account learning outcomes.") } }
-    ],
-    course_details: [
-      { title: -> { I18n.t("Outcomes") },
-        description: -> { I18n.t("Allows user to import course learning outcomes.") } }
     ]
   },
   manage_lti_add: {
@@ -756,7 +714,7 @@ BASE_PERMISSIONS = {
     label: -> { I18n.t("Users - allow administrative actions in courses") },
     available_to: %w[TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin AccountMembership],
     true_for: %w[TeacherEnrollment AccountAdmin],
-    account_details: [
+    details: [
       { title: -> { I18n.t("People (Course)") },
         description: -> { I18n.t("Allows user to view login ID information for users.") } },
       { description: -> { I18n.t("Allows user to view user details for course users.") } },
@@ -773,12 +731,6 @@ BASE_PERMISSIONS = {
       { title: -> { I18n.t("Observers (Course)") },
         description: -> { I18n.t("To link an observer to a student, Users - manage login details and Conversations - send to individual course members must be enabled.") } },
       { description: -> { I18n.t("To generate a pairing code on behalf of a student to share with an observer, Users - Generate observer pairing code for students must also be enabled.") } }
-    ],
-    course_details: [
-      { title: -> { I18n.t("People") },
-        description: -> { I18n.t("Allows user to view login ID information for users.") } },
-      { description: -> { I18n.t("Allows user to view user details for course users.") } },
-      { description: -> { I18n.t("Allows user to edit a user’s section or role (if not added via SIS).") } }
     ],
     course_considerations: [
       { title: -> { I18n.t("People") },
@@ -899,29 +851,17 @@ BASE_PERMISSIONS = {
                      AccountAdmin
                      AccountMembership],
     true_for: %w[TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
-    account_details: [
+    details: [
       { title: -> { I18n.t("Calendar") },
         description: -> { I18n.t("Allows user to add, edit, and delete events in the course calendar.") } },
       { title: -> { I18n.t("Scheduler") },
         description: -> { I18n.t("Allows user to create and manage appointments on the calendar using Scheduler.") } }
     ],
-    account_considerations: [
+    considerations: [
       { title: -> { I18n.t("Calendar") },
         description: -> { I18n.t("Regardless of whether this permission is enabled or disabled, users will still be able to manage events in their personal calendar.") } },
       { title: -> { I18n.t("Scheduler") },
         description: -> { I18n.t("Scheduler must be enabled for your account.") } }
-    ],
-    course_details: [
-      { title: -> { I18n.t("Calendar") },
-        description: -> { I18n.t("Allows user to add, edit, and delete events in the course calendar.") } },
-      { title: -> { I18n.t("Scheduler") },
-        description: -> { I18n.t("Allows user to create and manage appointments on the calendar using Scheduler.") } }
-    ],
-    course_considerations: [
-      { title: -> { I18n.t("Calendar") },
-        description: -> { I18n.t("Regardless of whether this permission is enabled or disabled, users will still be able to manage events in their personal calendar.") } },
-      { title: -> { I18n.t("Scheduler") },
-        description: -> { I18n.t("Scheduler must be enabled by your Canvas admin.") } }
     ]
   },
   manage_course_content_add: {
@@ -987,15 +927,11 @@ BASE_PERMISSIONS = {
       { title: -> { I18n.t("Item Banks") },
         description: -> { I18n.t("Allows a user to view and manage all item banks in an account directly from within a course and account.") } }
     ],
-    account_considerations: [
-      { title: -> { I18n.t("Item Banks") },
-        description: -> { I18n.t("This permission must be disabled for users to only view item banks created by them, shared with them from another user, or shared indirectly via the course they are enrolled in as an instructor.") } }
-    ],
     course_details: [
       { title: -> { I18n.t("Item Banks") },
         description: -> { I18n.t("Allows a user to view and manage all item banks in an account from directly within a course.") } }
     ],
-    course_considerations: [
+    considerations: [
       { title: -> { I18n.t("Item Banks") },
         description: -> { I18n.t("This permission must be disabled for users to only view item banks created by them, shared with them from another user, or shared indirectly via the course they are enrolled in as an instructor.") } }
     ]
@@ -1005,17 +941,13 @@ BASE_PERMISSIONS = {
     available_to: %w[DesignerEnrollment TaEnrollment TeacherEnrollment AccountAdmin AccountMembership],
     true_for: %w[AccountAdmin],
     account_allows: ->(_a) { Account.site_admin.feature_enabled?(:new_quizzes_subaccount_sharing_permission) },
-    account_details: [
+    details: [
       { title: -> { I18n.t("Item Banks") },
         description: -> { I18n.t("Allows a user to manage sharing of item banks with subaccounts.") } }
     ],
     account_considerations: [
       { title: -> { I18n.t("Item Banks") },
         description: -> { I18n.t("If this permission is disabled, users cannot share item banks to subaccounts. When a user with an admin role is granted this permission, the user can share item banks to subaccounts they administer.") } }
-    ],
-    course_details: [
-      { title: -> { I18n.t("Item Banks") },
-        description: -> { I18n.t("Allows a user to manage sharing of item banks with subaccounts.") } }
     ],
     course_considerations: [
       { title: -> { I18n.t("Item Banks") },
@@ -1203,17 +1135,13 @@ BASE_PERMISSIONS = {
     label: -> { I18n.t("Alerts - add / edit / delete") },
     true_for: %w[AccountAdmin TeacherEnrollment],
     available_to: %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment],
-    account_details: [
+    details: [
       { title: -> { I18n.t("Course Settings") },
         description: -> { I18n.t("Allows user to configure alerts in Course Settings.") } }
     ],
     account_considerations: [
       { title: -> { I18n.t("Account Settings") },
         description: -> { I18n.t("This is an account setting that must be enabled by a Customer Success Manager. Alerts are a seldom-used feature designed to send an alert to students, teachers or admins for specific triggers (e.g., no student-teacher interaction for 7 days). They are checked every day, and notifications will be sent to the student and/or the teacher until the triggering problem is resolved.") } }
-    ],
-    course_details: [
-      { title: -> { I18n.t("Course Settings") },
-        description: -> { I18n.t("Allows user to configure alerts in Course Settings.") } }
     ],
     course_considerations: [
       { title: -> { I18n.t("Account Settings") },
@@ -1236,19 +1164,11 @@ BASE_PERMISSIONS = {
       { description: -> { I18n.t("Allows user to view the Outcomes Manage tab at the account and course levels.") } },
       { description: -> { I18n.t("Allows user to create, edit, and delete outcomes and outcome groups at the account and course levels.") } }
     ],
-    account_considerations: [
-      { title: -> { I18n.t("Feature Option") },
-        description: -> { I18n.t("If the Account and Course Level Outcome Mastery Scales feature option is enabled, the Manage tab displays an updated interface. Additionally, the Outcomes page will display two additional tabs that decouple mastery scales and proficiency calculations from outcomes management.") } },
-      { description: -> { I18n.t("Access to these tabs requires the Outcome Proficiency Calculations - add / edit and Outcome Mastery Scales - add / edit permissions.") } },
-      { title: -> { I18n.t("Outcomes") },
-        description: -> { I18n.t("To allow the Outcomes page as read-only, this permission can be disabled but Course Content - view must be enabled.") } },
-      { description: -> { I18n.t("To import learning outcomes, Learning Outcomes - import must also be enabled.") } }
-    ],
     course_details: [
       { title: -> { I18n.t("Outcomes") },
         description: -> { I18n.t("Allows user to create, edit, and delete outcomes and outcome groups at the course level.") } }
     ],
-    course_considerations: [
+    considerations: [
       { title: -> { I18n.t("Feature Option") },
         description: -> { I18n.t("If the Account and Course Level Outcome Mastery Scales feature option is enabled, the Manage tab displays an updated interface. Additionally, the Outcomes page will display two additional tabs that decouple mastery scales and proficiency calculations from outcomes management.") } },
       { description: -> { I18n.t("Access to these tabs requires the Outcome Proficiency Calculations - add / edit and Outcome Mastery Scales - add / edit permissions.") } },
@@ -1479,7 +1399,7 @@ BASE_PERMISSIONS = {
                      AccountAdmin
                      AccountMembership],
     true_for: %w[TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
-    account_details: [
+    details: [
       { title: -> { I18n.t("Announcements") },
         description: -> { I18n.t("Allows user to view the New Announcement button in the Home page.") } },
       { description: -> { I18n.t("Allows user to add announcements in the Announcements page.") } },
@@ -1502,18 +1422,6 @@ BASE_PERMISSIONS = {
       { description: -> { I18n.t("To view discussions in a course, Discussions - view must be enabled.") } },
       { description: -> { I18n.t("To reply to a discussion, Discussions - post must be enabled.") } },
       { description: -> { I18n.t("To edit a discussion, Discussions - moderate must also be enabled.") } }
-    ],
-    course_details: [
-      { title: -> { I18n.t("Announcements") },
-        description: -> { I18n.t("Allows user to view the New Announcement button in the Home page.") } },
-      { description: -> { I18n.t("Allows user to add announcements in the Announcements page.") } },
-      { title: -> { I18n.t("Blueprint Courses") },
-        description: -> { I18n.t("Allows user to edit Blueprint lock settings on the Discussions index page in a Blueprint master course.") } },
-      { title: -> { I18n.t("Discussions") },
-        description: -> { I18n.t("Allows user to add discussions in the Discussions page.") } },
-      { description: -> { I18n.t("Allows user to close for comments, move, pin/unpin, edit, and delete discussion topics in the Discussions page.") } },
-      { description: -> { I18n.t("Allows user to edit discussion topics.") } },
-      { description: -> { I18n.t("Allows user to view all replies within a discussion topic.") } }
     ],
     course_considerations: [
       { title: -> { I18n.t("Announcements") },
@@ -1550,7 +1458,7 @@ BASE_PERMISSIONS = {
     true_for: %w[StudentEnrollment TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
     restrict_future_enrollments: true,
     applies_to_concluded: %w[TeacherEnrollment TaEnrollment],
-    account_details: [
+    details: [
       { title: -> { I18n.t("Discussions") },
         description: -> { I18n.t("Allows user to reply to a discussion post.") } }
     ],
@@ -1558,10 +1466,6 @@ BASE_PERMISSIONS = {
       { title: -> { I18n.t("Discussions") },
         description: -> { I18n.t("To view discussions in a course, Discussions - view must also be enabled.") } },
       { description: -> { I18n.t("If the option requiring users to post before seeing replies is selected in a discussion, users must post a reply to view all posts unless Discussions - moderate is also enabled.") } }
-    ],
-    course_details: [
-      { title: -> { I18n.t("Discussions") },
-        description: -> { I18n.t("Allows user to reply to a discussion post.") } }
     ],
     course_considerations: [
       { title: -> { I18n.t("Discussions") },
@@ -1574,20 +1478,11 @@ BASE_PERMISSIONS = {
     available_to: %w[TaEnrollment TeacherEnrollment AccountAdmin AccountMembership],
     true_for: [],
     account_allows: ->(_a) { Account.site_admin.feature_enabled?(:proxy_file_uploads) },
-    account_details: [
+    details: [
       { title: -> { I18n.t("Submissions") },
         description: -> { I18n.t("Allows instructors to submit file attachments on behalf of a student.") } }
     ],
-    account_considerations: [
-      { title: -> { I18n.t("Submissions") },
-        description: -> { I18n.t("Once enabled, this option is visible in gradebook for instructors.") } },
-      { description: -> { I18n.t("Instructors are not bound by attempt limits, but an instructor's submission WILL count as a student's attempt.") } }
-    ],
-    course_details: [
-      { title: -> { I18n.t("Submissions") },
-        description: -> { I18n.t("Allows instructors to submit file attachments on behalf of a student.") } }
-    ],
-    course_considerations: [
+    considerations: [
       { title: -> { I18n.t("Submissions") },
         description: -> { I18n.t("Once enabled, this option is visible in gradebook for instructors.") } },
       { description: -> { I18n.t("Instructors are not bound by attempt limits, but an instructor's submission WILL count as a student's attempt.") } }
@@ -1898,11 +1793,11 @@ BASE_PERMISSIONS = {
     label: -> { I18n.t("Grades - select final grade for moderation") },
     true_for: %w[AccountAdmin TeacherEnrollment TaEnrollment],
     available_to: %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment],
-    account_details: [
+    details: [
       { title: -> { I18n.t("Grades") },
         description: -> { I18n.t("Allows user to select final grade for moderated assignments.") } }
     ],
-    account_considerations: [
+    considerations: [
       { title: -> { I18n.t("Assignments") },
         description: -> { I18n.t("To add students to a moderation set, Grades - view all grades must also be enabled.") } },
       { title: -> { I18n.t("Grades") },
@@ -1910,19 +1805,6 @@ BASE_PERMISSIONS = {
       { description: -> { I18n.t("To post or hide grades for a moderated assignment, Grades - edit must also be enabled.") } },
       { title: -> { I18n.t("SpeedGrader") },
         description: -> { I18n.t("To review a moderated assignment in SpeedGrader, Grades - edit must also be enabled.") } }
-    ],
-    course_details: [
-      { title: -> { I18n.t("Grades") },
-        description: -> { I18n.t("Allows user to select final grade for moderated assignments.") } }
-    ],
-    course_considerations: [
-      { title: -> { I18n.t("Assignments") },
-        description: -> { I18n.t("To add students to a moderation set, Grades - view all grades must also be enabled.") } },
-      { title: -> { I18n.t("SpeedGrader") },
-        description: -> { I18n.t("To review a moderated assignment in SpeedGrader, Grades - edit must also be enabled.") } },
-      { title: -> { I18n.t("Grades") },
-        description: -> { I18n.t("To publish final grades for a moderated assignment, Grades - edit must also be enabled.") } },
-      { description: -> { I18n.t("To post or hide grades for a moderated assignment, Grades - edit must also be enabled.") } }
     ]
   },
   send_messages: {
@@ -1935,21 +1817,11 @@ BASE_PERMISSIONS = {
                      AccountAdmin
                      AccountMembership],
     true_for: %w[StudentEnrollment TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
-    account_details: [
+    details: [
       { title: -> { I18n.t("Conversations") },
         description: -> { I18n.t("Allows user to send messages to individual course members.") } }
     ],
-    account_considerations: [
-      { title: -> { I18n.t("Conversations") },
-        description: -> { I18n.t("When disabled, students can still send individual messages to course teachers, course TAs, and students who belong to the same account-level groups.") } },
-      { title: -> { I18n.t("People (Course)") },
-        description: -> { I18n.t("To edit a user’s section, Users - allow administrative actions in courses and Users - view list must also be enabled.") } }
-    ],
-    course_details: [
-      { title: -> { I18n.t("Conversations") },
-        description: -> { I18n.t("Allows user to send messages to individual course members.") } }
-    ],
-    course_considerations: [
+    considerations: [
       { title: -> { I18n.t("Conversations") },
         description: -> { I18n.t("When disabled, students can still send individual messages to course teachers, course TAs, and students that belong to the same account-level groups.") } },
       { title: -> { I18n.t("People") },
@@ -1966,33 +1838,20 @@ BASE_PERMISSIONS = {
                      AccountAdmin
                      AccountMembership],
     true_for: %w[TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
-    account_details: [
+    details: [
       { title: -> { I18n.t("Conversations") },
         description: -> { I18n.t("Allows user to send a message to “All in [course name]” or \"All in [course group]\".") } }
-    ],
-    course_details: [
-      { title: -> { I18n.t("Conversations") },
-        description: -> { I18n.t("Allows user to send a message to “All in [course name],” or “All in [course group].”") } }
     ]
   },
   view_audit_trail: {
     label: -> { I18n.t("Grades - view audit trail") },
     true_for: %w[AccountAdmin],
     available_to: %w[TeacherEnrollment AccountAdmin AccountMembership],
-    account_details: [
+    details: [
       { title: -> { I18n.t("Grades") },
         description: -> { I18n.t("Allows user to review an audit trail in assignments, both moderated and anonymous.") } }
     ],
-    account_considerations: [
-      { title: -> { I18n.t("Grades") },
-        description: -> { I18n.t("To moderate grades, Grades - Select final grade for moderation must also be enabled.") } },
-      { description: -> { I18n.t("To post or hide grades for an assignment, Grades - edit must also be enabled.") } }
-    ],
-    course_details: [
-      { title: -> { I18n.t("Grades") },
-        description: -> { I18n.t("Allows user to review an audit trail in assignments, both moderated and anonymous.") } }
-    ],
-    course_considerations: [
+    considerations: [
       { title: -> { I18n.t("Grades") },
         description: -> { I18n.t("To moderate grades, Grades - Select final grade for moderation must also be enabled.") } },
       { description: -> { I18n.t("To post or hide grades for an assignment, Grades - edit must also be enabled.") } }
@@ -2093,21 +1952,12 @@ BASE_PERMISSIONS = {
                      AccountMembership],
     true_for: %w[TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
     applies_to_concluded: true,
-    account_details: [
+    details: [
       { title: -> { I18n.t("Groups") },
         description: -> { I18n.t("Allows user to view the group home pages of all student groups.") } },
       { description: -> { I18n.t("Allows students to access other student groups within a group set with a direct link.") } }
     ],
-    account_considerations: [
-      { title: -> { I18n.t("Groups") },
-        description: -> { I18n.t("By default students are able to create groups; to restrict students from creating groups, do not select the Let students organize their own groups checkbox in Course Settings.") } }
-    ],
-    course_details: [
-      { title: -> { I18n.t("Groups") },
-        description: -> { I18n.t("Allows user to view the group home pages of all student groups.") } },
-      { description: -> { I18n.t("Allows students to access other student groups within a group set with a direct link.") } }
-    ],
-    course_considerations: [
+    considerations: [
       { title: -> { I18n.t("Groups") },
         description: -> { I18n.t("By default students are able to create groups; to restrict students from creating groups, do not select the Let students organize their own groups checkbox in Course Settings.") } }
     ]
@@ -2133,22 +1983,12 @@ BASE_PERMISSIONS = {
     available_to: %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment],
     true_for: %w[AccountAdmin TeacherEnrollment TaEnrollment],
     applies_to_concluded: %w[TeacherEnrollment TaEnrollment],
-    account_details: [
+    details: [
       { title: -> { I18n.t("People (Account, Course)") },
         description: -> { I18n.t("Allows user to search for other users by Login ID in the account People page.") } }
     ],
-    account_considerations: [
+    considerations: [
       { title: -> { I18n.t("People (Account, Course)") },
-        description: -> { I18n.t("To access the People page, Users - view list must be enabled.") } },
-      { description: -> { I18n.t("If this permission is enabled, and if Users - view primary email address is disabled, users will see email addresses used as login IDs.") } },
-      { description: -> { I18n.t("To view login IDs, Users - allow administrative actions in courses must also be enabled.") } }
-    ],
-    course_details: [
-      { title: -> { I18n.t("People") },
-        description: -> { I18n.t("Allows user to search for other users by Login ID in the course People page.") } }
-    ],
-    course_considerations: [
-      { title: -> { I18n.t("People") },
         description: -> { I18n.t("To access the People page, Users - view list must be enabled.") } },
       { description: -> { I18n.t("If this permission is enabled, and if Users - view primary email address is disabled, users will see email addresses used as login IDs.") } },
       { description: -> { I18n.t("To view login IDs, Users - allow administrative actions in courses must also be enabled.") } }
@@ -2272,19 +2112,11 @@ BASE_PERMISSIONS = {
     label: -> { I18n.t("New Quizzes - view multi session information") },
     available_to: %w[TeacherEnrollment AccountAdmin AccountMembership],
     true_for: %w[AccountAdmin],
-    account_details: [
+    details: [
       { title: -> { I18n.t("New Quizzes") },
         description: -> { I18n.t("This permission allows users to view multi-session activity information on the activity log and the moderate page.") } }
     ],
-    account_considerations: [
-      { title: -> { I18n.t("Quiz settings") },
-        description: -> { I18n.t("Educators can enable the Detect Multiple Sessions setting on their quizzes to collect multi-session information on student submissions. This permission determines who can view this data in the activity log and moderate page.") } }
-    ],
-    course_details: [
-      { title: -> { I18n.t("New Quizzes") },
-        description: -> { I18n.t("This permission allows users to view multi-session activity information on the activity log and the moderate page.") } }
-    ],
-    course_considerations: [
+    considerations: [
       { title: -> { I18n.t("Quiz settings") },
         description: -> { I18n.t("Educators can enable the Detect Multiple Sessions setting on their quizzes to collect multi-session information on student submissions. This permission determines who can view this data in the activity log and moderate page.") } }
     ]
