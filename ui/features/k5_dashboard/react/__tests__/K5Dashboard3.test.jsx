@@ -168,6 +168,7 @@ beforeEach(() => {
     body: {status: 'ok'},
   })
   fetchMock.put(/\/api\/v1\/users\/\d+\/colors\.*/, {status: 200, body: []})
+  fetchMock.post(/\/api\/graphql/, {data: MOCK_QUERY_CARDS_RESPONSE})
   fakeENV.setup(defaultEnv)
 })
 
