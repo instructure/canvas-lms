@@ -1841,6 +1841,76 @@ describe Types::AssignmentType do
 
       ActiveSupport::Notifications.unsubscribe(subscriber)
     end
+
+    it "prevents N+1 queries when accessing overridden date fields (OverrideAssignmentLoader)" do
+      # Create multiple assignments with different due dates
+      assignments = []
+      5.times do |i|
+        assignment = course.assignments.create!(
+          title: "Assignment #{i}",
+          due_at: (i + 1).days.from_now,
+          lock_at: (i + 2).days.from_now,
+          unlock_at: i.days.from_now
+        )
+        assignments << assignment
+      end
+
+      # Create some overrides that would trigger the loader logic
+      assignments.first.assignment_overrides.create!(
+        due_at: 1.week.from_now,
+        set_type: "CourseSection",
+        set_id: course.course_sections.first.id
+      )
+
+      # Build GraphQL query that accesses overridden date fields
+      query = <<~GQL
+        query {
+          course(id: "#{course.id}") {
+            assignmentsConnection {
+              nodes {
+                _id
+                dueAt
+                lockAt
+                unlockAt
+              }
+            }
+          }
+        }
+      GQL
+
+      # Track queries that would indicate N+1 issues in override calculations
+      override_query_count = 0
+      student_query_count = 0
+
+      subscriber = ActiveSupport::Notifications.subscribe("sql.active_record") do |_name, _start, _finish, _id, payload|
+        sql = payload[:sql]
+
+        # Check for individual assignment override queries (N+1 pattern)
+        if /assignment_overrides.*WHERE.*assignment_id.*= \?.*LIMIT/i.match?(sql) ||
+           /assignment_overrides.*WHERE.*assignment_overrides\.assignment_id IN \(\?\)/i.match?(sql)
+          override_query_count += 1
+        end
+
+        # Check for individual assignment override student queries (N+1 pattern)
+        if /assignment_override_students.*assignment_override_id.*= \?/i.match?(sql)
+          student_query_count += 1
+        end
+      end
+
+      # Execute the GraphQL query
+      result = CanvasSchema.execute(query, context: { current_user: teacher, request: ActionDispatch::TestRequest.create })
+
+      # Should use bulk loading from OverrideAssignmentLoader, not individual queries per assignment
+      expect(override_query_count).to be <= 2, "Expected ≤2 bulk override queries, got #{override_query_count} (indicates N+1)"
+      expect(student_query_count).to be <= 2, "Expected ≤2 bulk student queries, got #{student_query_count} (indicates N+1)"
+
+      # Verify the query succeeded and returned data
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "course", "assignmentsConnection", "nodes")).to be_present
+      expect(result.dig("data", "course", "assignmentsConnection", "nodes").length).to eq 5
+
+      ActiveSupport::Notifications.unsubscribe(subscriber)
+    end
   end
 
   describe "allocation_rules_connection" do
