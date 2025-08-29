@@ -48,6 +48,20 @@ module QuizVisibility
           )
         end
       end
+
+      def invalidate_cache(course_ids: nil, user_ids: nil, quiz_ids: nil, include_concluded: true)
+        unless course_ids || quiz_ids
+          raise ArgumentError, "at least one non nil course_id or quiz_id is required (for query performance reasons)"
+        end
+
+        course_ids = Array(course_ids) if course_ids
+        user_ids = Array(user_ids) if user_ids
+        quiz_ids = Array(quiz_ids) if quiz_ids
+
+        key = service_cache_key(service: name, course_ids:, user_ids:, additional_ids: quiz_ids, include_concluded:)
+
+        Rails.cache.delete(key)
+      end
     end
   end
 end
