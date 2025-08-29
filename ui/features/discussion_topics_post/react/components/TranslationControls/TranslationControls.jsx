@@ -33,6 +33,9 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 const I18n = createI18nScope('discussion_posts')
 
 export const TranslationControls = forwardRef((props, ref) => {
+  const languageNotSelectedErrorMessage = I18n.t('Please select a language.')
+  const languageAlreadyActiveErrorMessage = I18n.t('Already translated into the selected language.')
+
   const {translationLanguages, setTranslateTargetLanguage} = useContext(
     DiscussionManagerUtilityContext,
   )
@@ -76,10 +79,14 @@ export const TranslationControls = forwardRef((props, ref) => {
   }))
 
   const messages = []
+  let assistiveText = ''
+
   if (props.isLanguageNotSelectedError) {
-    messages.push({type: 'error', text: I18n.t('Please select a language.')})
+    messages.push({type: 'error', text: languageNotSelectedErrorMessage})
+    assistiveText = languageNotSelectedErrorMessage
   } else if (props.isLanguageAlreadyActiveError) {
-    messages.push({type: 'error', text: I18n.t('Already translated into the selected language.')})
+    messages.push({type: 'error', text: languageAlreadyActiveErrorMessage})
+    assistiveText = languageAlreadyActiveErrorMessage
   }
 
   useEffect(() => {
@@ -92,6 +99,7 @@ export const TranslationControls = forwardRef((props, ref) => {
     <View ref={ref} as="div">
       <SimpleSelect
         renderLabel=""
+        assistiveText={assistiveText}
         aria-labelledby="translate-select-label"
         placeholder={I18n.t('Select a language...')}
         value={selectedLanguage}
