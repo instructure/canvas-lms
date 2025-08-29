@@ -590,7 +590,8 @@ class GradebooksController < ApplicationController
       stickers_enabled: @context.feature_enabled?(:submission_stickers),
       teacher_notes: teacher_notes && custom_gradebook_column_json(teacher_notes, @current_user, session),
       user_asset_string: @current_user&.asset_string,
-      performance_improvements_for_gradebook: @context.feature_enabled?(:performance_improvements_for_gradebook),
+      performance_improvements_for_gradebook: @context.feature_enabled?(:performance_improvements_for_gradebook) &&
+                                              Services::PlatformServiceGradebook.use_graphql?(@context.account.global_id, @context.global_id),
       version: params.fetch(:version, nil),
       assignment_missing_shortcut: Account.site_admin.feature_enabled?(:assignment_missing_shortcut),
       grading_periods_filter_dates_enabled: Account.site_admin.feature_enabled?(:grading_periods_filter_dates),
