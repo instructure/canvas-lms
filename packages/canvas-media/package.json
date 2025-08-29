@@ -65,7 +65,7 @@
     "@instructure/uid": "10.24.2",
     "@sheerun/mutationobserver-shim": "^0.3.2",
     "aphrodite": "^2",
-    "axios": "^1.11.0",
+    "axios": "^0.30.0",
     "format-message": "^6",
     "format-message-generate-id": "^6",
     "lodash": "^4.17.21",
