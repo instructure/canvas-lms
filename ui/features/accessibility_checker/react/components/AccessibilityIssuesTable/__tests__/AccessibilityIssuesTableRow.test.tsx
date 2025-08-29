@@ -17,13 +17,20 @@
  */
 
 import {render, screen} from '@testing-library/react'
+import {Table} from '@instructure/ui-table'
 
 import {AccessibilityIssuesTableRow} from '../AccessibilityIssuesTableRow'
 import {mockScan1} from '../../../stores/mockData'
 
 describe('AccessibilityIssuesTableRow', () => {
   it('renders without crashing', () => {
-    render(<AccessibilityIssuesTableRow item={mockScan1} />)
+    render(
+      <Table caption="Test table">
+        <Table.Body>
+          <AccessibilityIssuesTableRow item={mockScan1} />
+        </Table.Body>
+      </Table>,
+    )
     expect(screen.getByTestId('issue-row-1')).toBeInTheDocument()
   })
 })
