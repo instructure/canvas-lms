@@ -184,3 +184,30 @@ export interface AppliedFilter {
   key: keyof Filters
   option: FilterOption
 }
+
+export type IssueRuleType =
+  | 'small-text-contrast'
+  | 'table-header-scope'
+  | 'img-alt'
+  | 'large-text-contrast'
+  | 'list-structure'
+  | 'headings-sequence'
+  | 'img-alt-length'
+  | 'table-header'
+  | 'table-caption'
+  | 'headings-start-at-h2'
+  | 'link-text'
+  | 'link-purpose'
+  | 'adjacent-links'
+  | 'has-lang-entry'
+  | 'img-alt-filename'
+  | 'paragraphs-for-headings'
+
+// Used in the GroupedIssueSummary, merges multiple IssueRuleTypes per group
+export type IssueSummaryGroup =
+  | 'headings'
+  | 'links'
+  | 'img-alt-text'
+  | 'tables'
+  | 'lists'
+  | 'low-contrast'

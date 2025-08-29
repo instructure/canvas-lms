@@ -24,7 +24,6 @@ import {
   PresentationContent,
   ScreenReaderContent,
 } from '@instructure/ui-a11y-content'
-import {Badge, BadgeProps} from '@instructure/ui-badge'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconEditLine, IconPublishSolid, IconQuestionLine} from '@instructure/ui-icons'
@@ -35,6 +34,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {AccessibilityResourceScan, ResourceType, ScanWorkflowState} from '../../../types'
+import {IssueCountBadge} from '../../IssueCountBadge/IssueCountBadge'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -43,43 +43,7 @@ interface ScanStateCellProps {
   onClick?: (item: AccessibilityResourceScan) => void
 }
 
-const MAX_COUNT = 100
 const ISSUES_COUNT_OFFSET = '2.75rem'
-
-const badgeThemeOverride: BadgeProps['themeOverride'] = (_componentTheme, currentTheme) => ({
-  colorDanger: currentTheme.colors.primitives.orange45,
-  fontWeight: 700,
-  padding: '0.5rem',
-  fontSize: '1rem',
-  size: '1.375rem',
-})
-
-const IssueCountBadge = ({item}: {item: AccessibilityResourceScan}) => {
-  return (
-    <Flex.Item textAlign="end" size={ISSUES_COUNT_OFFSET}>
-      <Badge
-        standalone
-        variant="danger"
-        countUntil={MAX_COUNT}
-        themeOverride={badgeThemeOverride}
-        count={item.issueCount}
-        formatOverflowText={(_count: number, countUntil: number) => `${countUntil - 1}+`}
-        formatOutput={formattedCount => {
-          const altText =
-            formattedCount === '1'
-              ? I18n.t('1 Issue')
-              : I18n.t('%{count} Issues', {count: formattedCount})
-
-          return (
-            <AccessibleContent alt={altText} data-testid="issue-count-badge">
-              {formattedCount}
-            </AccessibleContent>
-          )
-        }}
-      />
-    </Flex.Item>
-  )
-}
 
 const FixOrReviewAction = ({item, onClick}: ScanStateCellProps) => {
   const handleClick = useCallback(() => onClick?.(item), [item, onClick])
@@ -103,7 +67,9 @@ const FixOrReviewAction = ({item, onClick}: ScanStateCellProps) => {
 const IssueCountAndAction = ({item, onClick}: ScanStateCellProps) => {
   return (
     <Flex gap="x-small">
-      <IssueCountBadge item={item} />
+      <Flex.Item textAlign="end" size={ISSUES_COUNT_OFFSET}>
+        <IssueCountBadge issueCount={item.issueCount} />
+      </Flex.Item>
       {onClick && <FixOrReviewAction item={item} onClick={onClick} />}
     </Flex>
   )
