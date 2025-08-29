@@ -27,7 +27,7 @@ const color = '123456'
 const defaultProps: ImageTextBlockProps = {
   title: '',
   content: '',
-  url: '',
+  url: 'http://example.com/image.jpg',
   altText: '',
   includeBlockTitle: false,
   backgroundColor: '',

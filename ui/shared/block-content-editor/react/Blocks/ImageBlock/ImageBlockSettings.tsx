@@ -87,20 +87,12 @@ export const ImageBlockSettings = () => {
   const handleAltTextAsCaptionChange = (newAltTextAsCaption: boolean) => {
     setProp((props: ImageBlockProps) => {
       props.altTextAsCaption = newAltTextAsCaption
-      if (newAltTextAsCaption) {
-        props.caption = props.altText
-      }
     })
   }
 
   const handleDecorativeImageChange = (newDecorativeImage: boolean) => {
     setProp((props: ImageBlockProps) => {
       props.decorativeImage = newDecorativeImage
-      if (newDecorativeImage) {
-        props.altText = ''
-        props.altTextAsCaption = false
-        props.caption = ''
-      }
     })
   }
 
@@ -160,6 +152,7 @@ export const ImageBlockSettings = () => {
           <SettingsImageInfos
             caption={caption}
             altText={altText}
+            disabled={!url}
             altTextAsCaption={altTextAsCaption}
             decorativeImage={decorativeImage}
             onCaptionChange={handleCaptionChange}
