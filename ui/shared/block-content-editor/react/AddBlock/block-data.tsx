@@ -94,12 +94,10 @@ export const blockFactory = {
   [HighlightBlock.name]: () => (
     <HighlightBlock
       content=""
-      settings={{
-        displayIcon: 'warning',
-        highlightColor: colors.additionalPrimitives.ocean12,
-        textColor: defaultTextColor,
-        backgroundColor: defaultBackgroundColor,
-      }}
+      displayIcon="warning"
+      highlightColor={colors.additionalPrimitives.ocean12}
+      textColor={defaultTextColor}
+      backgroundColor={defaultBackgroundColor}
     />
   ),
   [ImageTextBlock.name]: () => (
