@@ -21,7 +21,8 @@ require_relative "../api_spec_helper"
 
 describe "Module Items API", type: :request do
   before :once do
-    course_factory.offer!
+    course_with_teacher
+    @course.offer!
 
     @module1 = @course.context_modules.create!(name: "module1")
     @assignment = @course.assignments.create!(name: "pls submit", submission_types: ["online_text_entry"], points_possible: 20)
@@ -62,7 +63,8 @@ describe "Module Items API", type: :request do
                                                unlock_at: @christmas,
                                                require_sequential_progress: true)
     @module2.prerequisites = "module_#{@module1.id}"
-    @wiki_page = @course.wiki_pages.create!(title: "wiki title", body: "")
+    @aa_test_data = AttachmentAssociationsSpecHelper.new(@course.account, @course)
+    @wiki_page = @course.wiki_pages.create!(title: "wiki title", body: @aa_test_data.base_html, saving_user: @teacher)
     @wiki_page.workflow_state = "active"
     @wiki_page.save!
     @wiki_page_tag = @module2.add_item(id: @wiki_page.id, type: "wiki_page")
@@ -2564,6 +2566,23 @@ describe "Module Items API", type: :request do
                {},
                {},
                { expected_status: 200 })
+    end
+
+    it "duplicates module items with HTML content and attachments" do
+      json_result = api_call(:post,
+                             "/api/v1/courses/#{@course.id}/modules/items/#{@wiki_page_tag.id}/duplicate",
+                             { controller: "context_module_items_api",
+                               action: "duplicate",
+                               format: "json",
+                               course_id: @course.id.to_s,
+                               id: @wiki_page_tag.id.to_s },
+                             {},
+                             {},
+                             { expected_status: 200 })
+      expect(json_result["content_tag"]["title"]).to eq("wiki title Copy")
+      associations = WikiPage.find(json_result["content_tag"]["content_id"]).attachment_associations
+      expect(associations.length).to eq 1
+      expect(associations.first.attachment_id).to eq @aa_test_data.attachment1.id
     end
 
     it "does not duplicate invalid module item" do
