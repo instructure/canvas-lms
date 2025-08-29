@@ -18,8 +18,8 @@
 
 import {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {BaseBlockHOC} from '../BaseBlock'
-import {useSave2} from '../BaseBlock/useSave'
+import {BaseBlock} from '../BaseBlock'
+import {useSave} from '../BaseBlock/useSave'
 import {ImageBlockSettings} from './ImageBlockSettings'
 import {ImageEdit, ImageView} from '../BlockItems/Image'
 import {ImageData} from '../BlockItems/Image/types'
@@ -57,7 +57,7 @@ const ImageBlockEdit = (props: ImageBlockProps) => {
   const [title, setTitle] = useState(props.title || '')
   const [imageData, setImageData] = useState<ImageData>(props)
 
-  useSave2(() => ({
+  useSave(() => ({
     title,
     ...imageData,
   }))
@@ -72,7 +72,7 @@ const ImageBlockEdit = (props: ImageBlockProps) => {
 
 export const ImageBlock = (props: ImageBlockProps) => {
   return (
-    <BaseBlockHOC
+    <BaseBlock
       ViewComponent={ImageBlockView}
       EditComponent={ImageBlockEdit}
       EditViewComponent={ImageBlockEditView}

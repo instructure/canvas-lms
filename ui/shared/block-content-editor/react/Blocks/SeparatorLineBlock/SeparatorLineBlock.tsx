@@ -19,7 +19,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {BorderWidth, BorderWidthValues} from '@instructure/emotion'
-import {BaseBlockHOC} from '../BaseBlock'
+import {BaseBlock} from '../BaseBlock'
 import {SeparatorLineBlockSettings} from './SeparatorLineBlockSettings'
 
 const I18n = createI18nScope('block_content_editor')
@@ -51,7 +51,7 @@ export const SeparatorLineBlockView = (props: SeparatorLineBlockProps) => {
 
 export const SeparatorLineBlock = (props: SeparatorLineBlockProps) => {
   return (
-    <BaseBlockHOC
+    <BaseBlock
       ViewComponent={SeparatorLineBlockView}
       EditViewComponent={SeparatorLineBlockView}
       EditComponent={SeparatorLineBlockView}

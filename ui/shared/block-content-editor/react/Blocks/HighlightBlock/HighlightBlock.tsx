@@ -23,8 +23,8 @@ import {HighlightBlockLayout} from './HighlightBlockLayout'
 import {getIcon} from './components/getIcon'
 import {HighlightText} from './components/HighlightText'
 import {HighlightTextEdit} from './components/HighlightTextEdit'
-import {useSave2} from '../BaseBlock/useSave'
-import {BaseBlockHOC} from '../BaseBlock'
+import {useSave} from '../BaseBlock/useSave'
+import {BaseBlock} from '../BaseBlock'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -46,7 +46,7 @@ const HighlightBlockEditView = (props: HighlightBlockProps) => {
 const HighlightBlockEdit = (props: HighlightBlockProps) => {
   const [content, setContent] = useState(props.content)
 
-  useSave2<typeof HighlightBlock>(() => ({
+  useSave<typeof HighlightBlock>(() => ({
     content,
   }))
 
@@ -69,7 +69,7 @@ export type HighlightBlockProps = {
 
 export const HighlightBlock = (props: HighlightBlockProps) => {
   return (
-    <BaseBlockHOC
+    <BaseBlock
       ViewComponent={HighlightBlockView}
       EditViewComponent={HighlightBlockEditView}
       EditComponent={HighlightBlockEdit}

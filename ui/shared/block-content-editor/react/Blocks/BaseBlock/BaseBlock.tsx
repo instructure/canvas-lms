@@ -16,68 +16,44 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ComponentProps, ElementType, PropsWithChildren, useState} from 'react'
-import {BlockContext} from './BaseBlockContext'
-import {useGetRenderMode} from './useGetRenderMode'
-import {BaseBlockViewLayout} from './layout/BaseBlockViewLayout'
-import {BaseBlockEditWrapper} from './components/BaseBlockEditWrapper'
-import {useGenHistoryKey} from '../../hooks/useGenHistoryKey'
+import {ComponentProps} from 'react'
 import {useIsInEditor} from '../../hooks/useIsInEditor'
-import {BaseBlockView} from './BaseBlockView'
-import {BaseBlockEdit} from './BaseBlockEdit'
 import {useIsEditingBlock} from '../../hooks/useIsEditingBlock'
+import {BaseBlockViewLayout} from './layout/BaseBlockViewLayout'
+import {useNode} from '@craftjs/core'
+import {useBlockContentEditorContext} from '../../BlockContentEditorContext'
+import {BaseBlockEditWrapper} from './components/BaseBlockEditWrapper'
 
-const BaseBlockContent = (
-  props: ComponentProps<typeof BaseBlock> & {
-    setIsEditMode: (isEditMode: boolean) => void
-  },
-) => {
-  const {isViewMode, isEditMode} = useGetRenderMode()
-  return isViewMode ? (
-    <BaseBlockViewLayout backgroundColor={props.backgroundColor}>
-      {props.children}
-    </BaseBlockViewLayout>
-  ) : (
-    <BaseBlockEditWrapper {...props} isEditMode={isEditMode} />
-  )
-}
-
-type BaseBlockProps<T extends ElementType> = PropsWithChildren<{
-  title: string
-  backgroundColor?: string
-  statefulProps: Partial<ComponentProps<T>>
-}>
-
-export function BaseBlock<T extends ElementType>(props: BaseBlockProps<T>) {
-  const [isEditMode, setIsEditMode] = useState(false)
-  const historyKey = useGenHistoryKey(props.statefulProps)
-  return (
-    <BlockContext.Provider value={{isEditMode}}>
-      <BaseBlockContent key={historyKey} {...props} setIsEditMode={setIsEditMode} />
-    </BlockContext.Provider>
-  )
-}
-
-function BaseBlockViewerMode<T extends {}>(props: ComponentProps<typeof BaseBlockHOC<T>>) {
+function BaseBlockViewerMode<T extends {}>(props: ComponentProps<typeof BaseBlock<T>>) {
   const Component = props.ViewComponent
   return (
-    <BaseBlockView backgroundColor={props.backgroundColor ?? ''}>
+    <BaseBlockViewLayout backgroundColor={props.backgroundColor}>
       <Component {...props.componentProps} />
-    </BaseBlockView>
+    </BaseBlockViewLayout>
   )
 }
 
-function BaseBlockEditorMode<T extends {}>(props: ComponentProps<typeof BaseBlockHOC<T>>) {
+function BaseBlockEditorMode<T extends {}>(props: ComponentProps<typeof BaseBlock<T>>) {
   const isEditing = useIsEditingBlock()
+  const {id} = useNode()
+  const isEditingBlock = useIsEditingBlock()
+  const {editingBlock} = useBlockContentEditorContext()
   const Component = isEditing ? props.EditComponent : props.EditViewComponent
   return (
-    <BaseBlockEdit title={props.title} backgroundColor={props.backgroundColor ?? ''}>
+    <BaseBlockEditWrapper
+      title={props.title}
+      isEditMode={isEditingBlock}
+      setIsEditMode={isEdit => {
+        editingBlock.setId(isEdit ? id : null)
+      }}
+      backgroundColor={props.backgroundColor}
+    >
       <Component {...props.componentProps} />
-    </BaseBlockEdit>
+    </BaseBlockEditWrapper>
   )
 }
 
-export function BaseBlockHOC<T extends {}>(props: {
+export function BaseBlock<T extends {}>(props: {
   ViewComponent: React.ComponentType<T>
   EditViewComponent: React.ComponentType<T>
   EditComponent: React.ComponentType<T>

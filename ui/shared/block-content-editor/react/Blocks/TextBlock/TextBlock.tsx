@@ -19,8 +19,8 @@
 import {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {TextBlockSettings} from './TextBlockSettings'
-import {BaseBlockHOC} from '../BaseBlock'
-import {useSave2} from '../BaseBlock/useSave'
+import {BaseBlock} from '../BaseBlock'
+import {useSave} from '../BaseBlock/useSave'
 import {TextBlockProps} from './types'
 import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
 import {TextEditPreview} from '../BlockItems/Text/TextEditPreview'
@@ -49,7 +49,7 @@ const TextBlockEdit = (props: TextBlockProps) => {
   const [title, setTitle] = useState(props.title)
   const [content, setContent] = useState(props.content)
 
-  useSave2<typeof TextBlock>(() => ({
+  useSave<typeof TextBlock>(() => ({
     title,
     content,
   }))
@@ -75,7 +75,7 @@ const TextBlockEdit = (props: TextBlockProps) => {
 
 export const TextBlock = (props: TextBlockProps) => {
   return (
-    <BaseBlockHOC
+    <BaseBlock
       ViewComponent={TextBlockView}
       EditComponent={TextBlockEdit}
       EditViewComponent={TextBlockView}
