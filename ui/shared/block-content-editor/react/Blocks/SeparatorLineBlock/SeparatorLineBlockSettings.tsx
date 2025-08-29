@@ -28,20 +28,22 @@ const I18n = createI18nScope('block_content_editor')
 export const SeparatorLineBlockSettings = () => {
   const {
     actions: {setProp},
-    settings,
+    separatorColor,
+    backgroundColor,
   } = useNode(node => ({
-    settings: node.data.props.settings,
+    separatorColor: node.data.props.separatorColor,
+    backgroundColor: node.data.props.backgroundColor,
   }))
 
   const handleSeparatorColorChange = (value: string) => {
     setProp((props: SeparatorLineBlockProps) => {
-      props.settings.separatorColor = value
+      props.separatorColor = value
     })
   }
 
   const handleBackgroundColorChange = (value: string) => {
     setProp((props: SeparatorLineBlockProps) => {
-      props.settings.backgroundColor = value
+      props.backgroundColor = value
     })
   }
 
@@ -56,16 +58,16 @@ export const SeparatorLineBlockSettings = () => {
       >
         <ColorPickerWrapper
           label={I18n.t('Background')}
-          value={settings.backgroundColor}
-          baseColor={settings.separatorColor}
+          value={backgroundColor}
+          baseColor={separatorColor}
           onChange={handleBackgroundColorChange}
           baseColorLabel={I18n.t('Background')}
         />
       </SettingsSectionToggle>
       <ColorPickerWrapper
         label={I18n.t('Separator')}
-        value={settings.separatorColor}
-        baseColor={settings.backgroundColor}
+        value={separatorColor}
+        baseColor={backgroundColor}
         onChange={handleSeparatorColorChange}
         baseColorLabel={I18n.t('Background')}
       />
