@@ -134,7 +134,7 @@ export const DiscussionTranslationModuleContainer = ({isAnnouncement}) => {
         </label>
       </View>
       <Flex direction="row" alignItems="start" gap="small" wrap="wrap">
-        <Flex.Item>
+        <Flex.Item maxWidth="360px" shouldGrow>
           <TranslationControls
             ref={translationControlsRef}
             isLanguageNotSelectedError={isLanguageNotSelectedError}
