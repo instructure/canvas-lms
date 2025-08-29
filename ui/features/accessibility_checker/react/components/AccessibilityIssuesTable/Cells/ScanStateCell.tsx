@@ -141,7 +141,7 @@ const Explanation = ({icon, tooltipText}: ExplanationProps) => {
       color="primary"
       data-testid="scan-state-explanation"
     >
-      <div
+      <span
         style={{display: 'inline-block', marginLeft: theme.spacing.xxSmall}}
         data-testid="scan-state-explanation-trigger"
         // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
@@ -149,7 +149,7 @@ const Explanation = ({icon, tooltipText}: ExplanationProps) => {
       >
         {icon}
         <ScreenReaderContent>{tooltipText}</ScreenReaderContent>
-      </div>
+      </span>
     </Tooltip>
   )
 }
