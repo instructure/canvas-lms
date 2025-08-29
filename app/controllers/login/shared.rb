@@ -76,6 +76,8 @@ module Login::Shared
     redirect_to unknown_user_url || login_url
   end
 
+  def finalize_login(_user, _pseudonym); end
+
   def successful_login(user, pseudonym, otp_passed = false)
     reset_authenticity_token!
     Auditors::Authentication.record(pseudonym, "login")
@@ -122,6 +124,8 @@ module Login::Shared
     session[:require_terms] = true if @domain_root_account.require_acceptance_of_terms?(user)
     @current_user = user
     @current_pseudonym = pseudonym
+
+    finalize_login(user, pseudonym)
 
     respond_to do |format|
       if (oauth = session[:oauth2])
