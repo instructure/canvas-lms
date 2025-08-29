@@ -18,10 +18,10 @@
 
 import React, {useState} from 'react'
 import {MediaBlockSettings} from './MediaBlockSettings'
-import {BaseBlockHOC} from '../BaseBlock'
+import {BaseBlock} from '../BaseBlock'
 import {MediaBlockProps} from './types'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {useSave2} from '../BaseBlock/useSave'
+import {useSave} from '../BaseBlock/useSave'
 import {Flex} from '@instructure/ui-flex'
 import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
 import {View} from '@instructure/ui-view'
@@ -60,7 +60,7 @@ const MediaBlockEdit = (props: MediaBlockProps) => {
   const [title, setTitle] = useState(props.title)
   const [showModal, setShowModal] = useState(false)
 
-  const save = useSave2(() => ({
+  const save = useSave(() => ({
     title,
   }))
 
@@ -96,7 +96,7 @@ const MediaBlockEdit = (props: MediaBlockProps) => {
 
 export const MediaBlock = (props: MediaBlockProps) => {
   return (
-    <BaseBlockHOC
+    <BaseBlock
       ViewComponent={MediaBlockView}
       EditComponent={MediaBlockEdit}
       EditViewComponent={MediaBlockView}

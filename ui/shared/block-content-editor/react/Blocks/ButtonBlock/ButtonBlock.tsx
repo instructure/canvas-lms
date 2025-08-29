@@ -18,9 +18,9 @@
 
 import {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {BaseBlockHOC} from '../BaseBlock'
+import {BaseBlock} from '../BaseBlock'
 import {ButtonBlockSettings} from './ButtonBlockSettings'
-import {useSave2} from '../BaseBlock/useSave'
+import {useSave} from '../BaseBlock/useSave'
 import {ButtonBlockProps} from './types'
 import {Flex} from '@instructure/ui-flex'
 import {TitleView} from '../BlockItems/Title/TitleView'
@@ -63,7 +63,7 @@ const ButtonBlockEdit = (props: ButtonBlockProps) => {
   const [title, setTitle] = useState(props.title)
 
   const {focusHandler} = useFocusElement()
-  useSave2(() => ({title}))
+  useSave(() => ({title}))
 
   return (
     <Flex direction="column" gap="mediumSmall">
@@ -82,7 +82,7 @@ const ButtonBlockEdit = (props: ButtonBlockProps) => {
 
 export const ButtonBlock = (props: ButtonBlockProps) => {
   return (
-    <BaseBlockHOC
+    <BaseBlock
       ViewComponent={ButtonBlockView}
       EditComponent={ButtonBlockEdit}
       EditViewComponent={ButtonBlockEditView}

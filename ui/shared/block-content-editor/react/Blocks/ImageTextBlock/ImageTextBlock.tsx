@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {BaseBlockHOC} from '../BaseBlock'
+import {BaseBlock} from '../BaseBlock'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ImageTextBlockSettings} from './ImageTextBlockSettings'
 import {ImageTextBlockProps} from './types'
-import {useSave2} from '../BaseBlock/useSave'
+import {useSave} from '../BaseBlock/useSave'
 import {useState} from 'react'
 import {ImageTextBlockLayout} from './ImageTextBlockLayout'
 import {TitleView} from '../BlockItems/Title/TitleView'
@@ -105,7 +105,7 @@ const ImageTextBlockEdit = (props: ImageTextBlockProps) => {
   const [title, setTitle] = useState(props.title)
   const [content, setContent] = useState(props.content)
 
-  const save = useSave2(() => ({
+  const save = useSave(() => ({
     title,
     content,
   }))
@@ -126,7 +126,7 @@ const ImageTextBlockEdit = (props: ImageTextBlockProps) => {
 
 export const ImageTextBlock = (props: ImageTextBlockProps) => {
   return (
-    <BaseBlockHOC
+    <BaseBlock
       ViewComponent={ImageTextBlockView}
       EditComponent={ImageTextBlockEdit}
       EditViewComponent={ImageTextBlockEditView}
