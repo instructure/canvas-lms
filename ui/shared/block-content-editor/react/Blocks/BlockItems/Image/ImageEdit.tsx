@@ -47,13 +47,10 @@ export const ImageEdit = ({
   const openModal = () => setIsOpen(true)
   const onSelected = (modalImageData: ModalImageData) => {
     closeModal()
-    const imageCaption = altTextAsCaption ? modalImageData.altText : caption
-    onImageChange({
-      ...modalImageData,
-      altText: modalImageData.decorativeImage ? '' : modalImageData.altText,
-      caption: modalImageData.decorativeImage ? '' : imageCaption,
-    })
+    onImageChange(modalImageData)
   }
+
+  const calculatedCaption = altTextAsCaption ? altText : caption
 
   return (
     <Flex direction="column" gap="mediumSmall">
@@ -80,7 +77,7 @@ export const ImageEdit = ({
         )}
       </div>
       <Flex direction="row" gap="x-small">
-        <ImageCaption>{caption || I18n.t('Image caption')}</ImageCaption>
+        <ImageCaption>{calculatedCaption || I18n.t('Image caption')}</ImageCaption>
         <IconButton
           data-testid="edit-block-image"
           screenReaderLabel={I18n.t('Edit block')}
