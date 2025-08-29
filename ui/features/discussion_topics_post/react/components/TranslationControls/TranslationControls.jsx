@@ -36,7 +36,7 @@ export const TranslationControls = forwardRef((props, ref) => {
     const result = translationLanguages.current.find(({id: _id}) => id === _id)
 
     //TODO: Somehow trigger this function if not valid item is selected
-    if(ENV.ai_translation_improvements) {
+    if (ENV.ai_translation_improvements) {
       props.onSetIsLanguageNotSelectedError(false)
       props.onSetIsLanguageAlreadyActiveError(false)
       props.onSetSelectedLanguage(result.id)
@@ -85,12 +85,16 @@ export const TranslationControls = forwardRef((props, ref) => {
         onChange={handleSelect}
         inputValue={input}
         onInputChange={e => setInput(e.target.value)}
-        width="360px"
         placeholder={I18n.t('Select a language...')}
         messages={messages}
       >
         {filteredLanguages.map(({id, name}) => (
-          <CanvasMultiSelect.Option key={id} id={id} value={id} isSelected={id === props.selectedLanguage}>
+          <CanvasMultiSelect.Option
+            key={id}
+            id={id}
+            value={id}
+            isSelected={id === props.selectedLanguage}
+          >
             {name}
           </CanvasMultiSelect.Option>
         ))}
