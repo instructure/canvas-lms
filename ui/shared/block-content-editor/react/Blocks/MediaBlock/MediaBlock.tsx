@@ -56,6 +56,39 @@ const MediaBlockView = (props: MediaBlockProps) => {
   )
 }
 
+const MediaBlockEditView = (props: MediaBlockProps) => {
+  return (
+    <Flex gap="mediumSmall" direction="column">
+      {props.includeBlockTitle && (
+        <TitleEditPreview title={props.title} contentColor={props.titleColor} />
+      )}
+      {props.src ? (
+        <View as="div" width="100%" height="400px" position="relative">
+          <iframe
+            src={props.src}
+            title={props.title || 'Media content'}
+            width="100%"
+            height="100%"
+            allow="fullscreen"
+            data-media-type="video"
+          />
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+            }}
+          />
+        </View>
+      ) : (
+        <DefaultPreviewImage blockType="media" />
+      )}
+    </Flex>
+  )
+}
+
 const MediaBlockEdit = (props: MediaBlockProps) => {
   const [title, setTitle] = useState(props.title)
   const [showModal, setShowModal] = useState(false)
@@ -99,7 +132,7 @@ export const MediaBlock = (props: MediaBlockProps) => {
     <BaseBlock
       ViewComponent={MediaBlockView}
       EditComponent={MediaBlockEdit}
-      EditViewComponent={MediaBlockView}
+      EditViewComponent={MediaBlockEditView}
       componentProps={props}
       title={MediaBlock.craft.displayName}
       backgroundColor={props.backgroundColor}

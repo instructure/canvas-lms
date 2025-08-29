@@ -25,11 +25,9 @@ import {useDeleteNode} from '../../../hooks/useDeleteNode'
 import {useDuplicateNode} from '../../../hooks/useDuplicateNode'
 import {useMoveBlock} from '../../../hooks/useMoveBlock'
 import {BaseBlockLayout} from '../layout/BaseBlockLayout'
-import {useSetEditMode} from '../useSetEditMode'
 import {CopyButton} from './CopyButton'
 import {EditButton} from './EditButton'
 import {RemoveButton} from './RemoveButton'
-import {ApplyButton} from './ApplyButton'
 import {MoveButton} from './MoveButton'
 import {BackgroundColorApplier} from './BackgroundColorApplier'
 import {Flex} from '@instructure/ui-flex'
@@ -81,13 +79,12 @@ export const BaseBlockEditWrapper = (
     backgroundColor?: string
   }>,
 ) => {
-  const ref = useRef<HTMLDivElement>(null)
-  useSetEditMode(ref, props.setIsEditMode)
+  const {id} = useNode()
 
   return (
     <BackgroundColorApplier backgroundColor={props.backgroundColor || 'white'}>
       <BaseBlockLayout
-        ref={ref}
+        nodeId={id}
         title={props.title}
         addButton={<InsertButton />}
         actionButtons={
@@ -97,7 +94,6 @@ export const BaseBlockEditWrapper = (
                   key="a11y-save-button"
                   onKeyDown={() => props.setIsEditMode(false)}
                 />,
-                <ApplyButton key="action-save-button" onClick={() => props.setIsEditMode(false)} />,
               ]
             : []
         }

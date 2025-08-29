@@ -21,6 +21,8 @@ import {useRef, useState} from 'react'
 export const useEditingBlock = () => {
   const [id, setId] = useState<string | null>(null)
   const callbackRef = useRef<Set<() => void>>(new Set())
+  const idRef = useRef<string | null>(id)
+  idRef.current = id
 
   return {
     id,
@@ -30,6 +32,7 @@ export const useEditingBlock = () => {
       }
       setId(newId)
     },
+    idRef,
     addSaveCallback: (callback: () => void) => {
       callbackRef.current.add(callback)
     },
