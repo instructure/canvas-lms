@@ -128,7 +128,7 @@ export default function CoursesToolbar({
                   <Grid.Col width={4}>
                     <SearchableSelect
                       id="termFilter"
-                      placeholder="Filter by term"
+                      placeholder={I18n.t('Filter by term')}
                       isLoading={terms.loading}
                       label={<ScreenReaderContent>{I18n.t('Filter by term')}</ScreenReaderContent>}
                       value={draftFilters.enrollment_term_id}
