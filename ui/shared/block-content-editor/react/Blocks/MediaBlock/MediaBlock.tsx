@@ -32,6 +32,11 @@ import {UploadMediaModal} from './UploadMediaModal'
 
 const I18n = createI18nScope('block_content_editor')
 
+const setBorder = {
+  border: 'none',
+  borderRadius: '4px',
+}
+
 const MediaBlockView = (props: MediaBlockProps) => {
   return (
     <Flex gap="mediumSmall" direction="column">
@@ -45,6 +50,7 @@ const MediaBlockView = (props: MediaBlockProps) => {
             title={props.title || 'Media content'}
             width="100%"
             height="100%"
+            style={setBorder}
             allow="fullscreen"
             data-media-type="video"
           />
@@ -69,6 +75,7 @@ const MediaBlockEditView = (props: MediaBlockProps) => {
             title={props.title || 'Media content'}
             width="100%"
             height="100%"
+            style={setBorder}
             allow="fullscreen"
             data-media-type="video"
           />
@@ -97,6 +104,11 @@ const MediaBlockEdit = (props: MediaBlockProps) => {
     title,
   }))
 
+  const onSubmit = (src: string) => {
+    save({src})
+    setShowModal(false)
+  }
+
   return (
     <Flex gap="mediumSmall" direction="column">
       {props.includeBlockTitle && <TitleEdit title={title} onTitleChange={setTitle} />}
@@ -107,10 +119,7 @@ const MediaBlockEdit = (props: MediaBlockProps) => {
             title={title || 'Media content'}
             width="100%"
             height="100%"
-            style={{
-              border: 'none',
-              borderRadius: '4px',
-            }}
+            style={setBorder}
             allow="fullscreen"
             data-media-type="video"
           />
@@ -120,7 +129,7 @@ const MediaBlockEdit = (props: MediaBlockProps) => {
       )}
       <UploadMediaModal
         open={showModal}
-        onSubmit={(src: string) => save({src})}
+        onSubmit={onSubmit}
         onDismiss={() => setShowModal(false)}
       />
     </Flex>
