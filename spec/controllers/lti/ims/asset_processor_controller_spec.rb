@@ -266,5 +266,34 @@ describe Lti::IMS::AssetProcessorController do
         expect(response.body).to eq(text_content)
       end
     end
+
+    context "when the asset is a discussion entry version" do
+      let(:discussion_topic) { graded_discussion_topic(course:) }
+      let(:assignment) { discussion_topic.assignment }
+      let(:submission) { submission_model(assignment:, submission_type: "discussion_topic") }
+      let(:student) { submission.user }
+      let(:discussion_message) { "<p>This is a discussion entry message with <strong>HTML</strong>.</p>" }
+      let(:discussion_entry) { discussion_topic.discussion_entries.create!(user: student, message: discussion_message) }
+      let(:discussion_entry_version) { discussion_entry.discussion_entry_versions.first }
+      let(:asset) { lti_asset_model(submission:, discussion_entry_version:) }
+
+      before { tool.root_account.enable_feature!(:lti_asset_processor_discussions) }
+
+      it "returns the discussion entry message as a downloadable file" do
+        send_request
+        expect(response).to have_http_status(:ok)
+        expect(response.headers["Content-Type"]).to eq("text/html")
+        expect(response.headers["Content-Disposition"]).to eq("attachment")
+        expect(response.body).to eq(discussion_message)
+      end
+
+      context "when the lti_asset_processor_discussions feature flag is disabled" do
+        before { tool.root_account.disable_feature!(:lti_asset_processor_discussions) }
+
+        it "returns not found" do
+          expect_not_found
+        end
+      end
+    end
   end
 end
