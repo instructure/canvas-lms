@@ -30,9 +30,15 @@ const I18n = createI18nScope('block_content_editor')
 export const HighlightBlockSettings = () => {
   const {
     actions: {setProp},
-    settings,
+    backgroundColor,
+    highlightColor,
+    textColor,
+    displayIcon,
   } = useNode(node => ({
-    settings: node.data.props.settings,
+    backgroundColor: node.data.props.backgroundColor,
+    highlightColor: node.data.props.highlightColor,
+    textColor: node.data.props.textColor,
+    displayIcon: node.data.props.displayIcon,
   }))
 
   return (
@@ -46,12 +52,12 @@ export const HighlightBlockSettings = () => {
       >
         <ColorPickerWrapper
           label={I18n.t('Background')}
-          value={settings.backgroundColor}
-          baseColor={settings.highlightColor}
+          value={backgroundColor}
+          baseColor={highlightColor}
           baseColorLabel={I18n.t('Highlight')}
           onChange={color =>
             setProp((props: HighlightBlockProps) => {
-              props.settings.backgroundColor = color
+              props.backgroundColor = color
             })
           }
         />
@@ -67,32 +73,32 @@ export const HighlightBlockSettings = () => {
           <Checkbox
             label={I18n.t('Display icon')}
             variant="toggle"
-            checked={settings.displayIcon === 'warning'}
+            checked={displayIcon === 'warning'}
             onChange={e =>
               setProp((props: HighlightBlockProps) => {
-                props.settings.displayIcon = e.target.checked ? 'warning' : null
+                props.displayIcon = e.target.checked ? 'warning' : null
               })
             }
           />
           <ColorPickerWrapper
             label={I18n.t('Highlight')}
-            value={settings.highlightColor}
-            baseColor={settings.textColor}
+            value={highlightColor}
+            baseColor={textColor}
             baseColorLabel={I18n.t('Text')}
             onChange={color =>
               setProp((props: HighlightBlockProps) => {
-                props.settings.highlightColor = color
+                props.highlightColor = color
               })
             }
           />
           <ColorPickerWrapper
             label={I18n.t('Text')}
-            value={settings.textColor}
-            baseColor={settings.highlightColor}
+            value={textColor}
+            baseColor={highlightColor}
             baseColorLabel={I18n.t('Highlight')}
             onChange={color =>
               setProp((props: HighlightBlockProps) => {
-                props.settings.textColor = color
+                props.textColor = color
               })
             }
           />

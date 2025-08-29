@@ -27,7 +27,8 @@ jest.mock('../../../BlockContentEditorContext', () => ({
 }))
 
 describe('HighlightBlock', () => {
-  const defaultSettings = {
+  const defaultProps = {
+    content: 'Test content',
     displayIcon: 'warning',
     highlightColor: '#E8F4FD',
     textColor: '#2D3B45',
@@ -35,14 +36,14 @@ describe('HighlightBlock', () => {
   }
 
   it('should render with Highlight title', () => {
-    renderBlock(HighlightBlock, {content: 'Test content', settings: defaultSettings})
+    renderBlock(HighlightBlock, {...defaultProps})
     const title = screen.getByText('Highlight')
 
     expect(title).toBeInTheDocument()
   })
 
   it('should render the content', () => {
-    renderBlock(HighlightBlock, {content: 'Test highlight content', settings: defaultSettings})
+    renderBlock(HighlightBlock, {...defaultProps, content: 'Test highlight content'})
     const highlightBlock = screen.getByTestId('highlight-block')
 
     expect(highlightBlock).toBeInTheDocument()
@@ -50,7 +51,7 @@ describe('HighlightBlock', () => {
   })
 
   it('should display the icon by default', () => {
-    renderBlock(HighlightBlock, {content: 'Test content', settings: defaultSettings})
+    renderBlock(HighlightBlock, {...defaultProps})
     const icon = screen.getByTestId('highlight-icon')
 
     expect(icon).toBeInTheDocument()
@@ -58,8 +59,8 @@ describe('HighlightBlock', () => {
 
   it('should not display the icon when displayIcon is null', () => {
     renderBlock(HighlightBlock, {
-      content: 'Test content',
-      settings: {...defaultSettings, displayIcon: null},
+      ...defaultProps,
+      displayIcon: null,
     })
     const icon = screen.queryByTestId('highlight-icon')
 
@@ -69,8 +70,8 @@ describe('HighlightBlock', () => {
   it('should apply the correct highlight color', () => {
     const highlightColor = '#ffeb3b'
     renderBlock(HighlightBlock, {
-      content: 'Test content',
-      settings: {...defaultSettings, highlightColor},
+      ...defaultProps,
+      highlightColor,
     })
     const highlightBlock = screen.getByTestId('highlight-block')
 
@@ -78,14 +79,14 @@ describe('HighlightBlock', () => {
   })
 
   it('should apply default highlight color if none is provided', () => {
-    renderBlock(HighlightBlock, {content: 'Test content', settings: defaultSettings})
+    renderBlock(HighlightBlock, {...defaultProps})
     const highlightBlock = screen.getByTestId('highlight-block')
 
     expect(highlightBlock).toHaveStyle('background-color: #E8F4FD')
   })
 
   it('should show placeholder text in edit preview mode when content is empty', () => {
-    renderBlock(HighlightBlock, {content: '', settings: defaultSettings})
+    renderBlock(HighlightBlock, {...defaultProps, content: ''})
     const highlightBlock = screen.getByTestId('highlight-block')
 
     expect(highlightBlock).toHaveTextContent('Click to edit')
@@ -94,8 +95,9 @@ describe('HighlightBlock', () => {
   it('should use different highlight colors', () => {
     const customHighlightColor = '#FFE4E1'
     renderBlock(HighlightBlock, {
+      ...defaultProps,
       content: 'Different background test',
-      settings: {...defaultSettings, highlightColor: customHighlightColor},
+      highlightColor: customHighlightColor,
     })
     const highlightBlock = screen.getByTestId('highlight-block')
 

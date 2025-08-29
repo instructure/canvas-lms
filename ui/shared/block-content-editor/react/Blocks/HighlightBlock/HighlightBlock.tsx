@@ -31,9 +31,9 @@ const I18n = createI18nScope('block_content_editor')
 const HighlightBlockView = (props: HighlightBlockProps) => {
   return (
     <HighlightBlockLayout
-      icon={getIcon(props.settings.displayIcon, props.settings.textColor)}
-      content={<HighlightText content={props.content} color={props.settings.textColor} />}
-      backgroundColor={props.settings.highlightColor}
+      icon={getIcon(props.displayIcon, props.textColor)}
+      content={<HighlightText content={props.content} color={props.textColor} />}
+      backgroundColor={props.highlightColor}
     />
   )
 }
@@ -52,21 +52,19 @@ const HighlightBlockEdit = (props: HighlightBlockProps) => {
 
   return (
     <HighlightBlockLayout
-      icon={getIcon(props.settings.displayIcon, props.settings.textColor)}
+      icon={getIcon(props.displayIcon, props.textColor)}
       content={<HighlightTextEdit content={content} setContent={setContent} />}
-      backgroundColor={props.settings.highlightColor}
+      backgroundColor={props.highlightColor}
     />
   )
 }
 
 export type HighlightBlockProps = {
   content: string
-  settings: {
-    displayIcon: string | null
-    highlightColor: string
-    textColor: string
-    backgroundColor: string
-  }
+  displayIcon: string | null
+  highlightColor: string
+  textColor: string
+  backgroundColor: string
 }
 
 export const HighlightBlock = (props: HighlightBlockProps) => {
@@ -77,7 +75,7 @@ export const HighlightBlock = (props: HighlightBlockProps) => {
       EditComponent={HighlightBlockEdit}
       componentProps={props}
       title={HighlightBlock.craft.displayName}
-      backgroundColor={props.settings.backgroundColor}
+      backgroundColor={props.backgroundColor}
     />
   )
 }
