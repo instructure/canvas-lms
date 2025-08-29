@@ -1195,7 +1195,15 @@ export const groupDetailMocks = ({
             title,
             outcomesCount: 1,
             notImportedOutcomesCount,
-            outcomes: {},
+            outcomes: {
+              __typename: 'ContentTagConnection',
+              pageInfo: {
+                hasNextPage: false,
+                endCursor: null,
+                __typename: 'PageInfo',
+              },
+              edges: [],
+            },
             __typename: 'LearningOutcomeGroup',
           },
         },
