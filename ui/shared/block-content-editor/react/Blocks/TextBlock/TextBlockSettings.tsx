@@ -33,26 +33,26 @@ export const TextBlockSettings = () => {
     backgroundColor,
     titleColor,
   } = useNode(node => ({
-    includeBlockTitle: node.data.props.settings.includeBlockTitle,
-    backgroundColor: node.data.props.settings.backgroundColor,
-    titleColor: node.data.props.settings.titleColor,
+    includeBlockTitle: node.data.props.includeBlockTitle,
+    backgroundColor: node.data.props.backgroundColor,
+    titleColor: node.data.props.titleColor,
   }))
 
   const handleIncludeBlockTitleChange = () => {
     setProp((props: TextBlockProps) => {
-      props.settings.includeBlockTitle = !includeBlockTitle
+      props.includeBlockTitle = !includeBlockTitle
     })
   }
 
   const handleBackgroundColorChange = (color: string) => {
     setProp((props: TextBlockProps) => {
-      props.settings.backgroundColor = color
+      props.backgroundColor = color
     })
   }
 
   const handleTitleColorChange = (color: string) => {
     setProp((props: TextBlockProps) => {
-      props.settings.titleColor = color
+      props.titleColor = color
     })
   }
 
