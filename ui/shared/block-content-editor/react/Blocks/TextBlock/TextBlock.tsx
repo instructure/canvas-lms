@@ -35,8 +35,8 @@ const TextBlockView = (props: TextBlockProps) => {
   return (
     <TextBlockLayout
       title={
-        props.settings.includeBlockTitle && (
-          <TitleEditPreview title={props.title} contentColor={props.settings.titleColor} />
+        props.includeBlockTitle && (
+          <TitleEditPreview title={props.title} contentColor={props.titleColor} />
         )
       }
       text={<TextEditPreview content={props.content} />}
@@ -57,7 +57,7 @@ const TextBlockEdit = (props: TextBlockProps) => {
   return (
     <TextBlockLayout
       title={
-        props.settings.includeBlockTitle && (
+        props.includeBlockTitle && (
           <TitleEdit title={title} onTitleChange={setTitle} focusHandler={focusHandler} />
         )
       }
@@ -66,7 +66,7 @@ const TextBlockEdit = (props: TextBlockProps) => {
           content={content}
           onContentChange={setContent}
           height={300}
-          focusHandler={props.settings.includeBlockTitle && focusHandler}
+          focusHandler={props.includeBlockTitle && focusHandler}
         />
       }
     />
@@ -81,7 +81,7 @@ export const TextBlock = (props: TextBlockProps) => {
       EditViewComponent={TextBlockView}
       componentProps={props}
       title={TextBlock.craft.displayName}
-      backgroundColor={props.settings.backgroundColor}
+      backgroundColor={props.backgroundColor}
     />
   )
 }

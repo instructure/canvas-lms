@@ -20,11 +20,9 @@ import {TextData} from '../BlockItems/Text/types'
 import {TitleData} from '../BlockItems/Title/types'
 
 export type TextSettings = {
-  settings: {
-    includeBlockTitle: boolean
-    backgroundColor: string
-    titleColor: string
-  }
+  includeBlockTitle: boolean
+  backgroundColor: string
+  titleColor: string
 }
 export type TextBlockEditHandlers = {
   onTitleChange: (newTitle: string) => void

@@ -39,11 +39,9 @@ export const blockFactory = {
     <TextBlock
       title=""
       content=""
-      settings={{
-        includeBlockTitle: true,
-        backgroundColor: defaultBackgroundColor,
-        titleColor: defaultTextColor,
-      }}
+      includeBlockTitle={true}
+      backgroundColor={defaultBackgroundColor}
+      titleColor={defaultTextColor}
     />
   ),
   [ImageBlock.name]: () => (
