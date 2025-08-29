@@ -22,7 +22,6 @@ import {BaseBlock} from '../BaseBlock'
 import {useSave} from '../BaseBlock/useSave'
 import {ImageBlockSettings} from './ImageBlockSettings'
 import {ImageEdit, ImageView} from '../BlockItems/Image'
-import {ImageData} from '../BlockItems/Image/types'
 import {ImageBlockProps} from './types'
 import {TitleEdit} from '../BlockItems/Title/TitleEdit'
 import {TitleView} from '../BlockItems/Title/TitleView'
@@ -55,17 +54,13 @@ const ImageBlockEditView = (props: ImageBlockProps) => {
 
 const ImageBlockEdit = (props: ImageBlockProps) => {
   const [title, setTitle] = useState(props.title || '')
-  const [imageData, setImageData] = useState<ImageData>(props)
 
-  useSave(() => ({
-    title,
-    ...imageData,
-  }))
+  const save = useSave(() => ({title}))
 
   return (
     <>
       {props.settings.includeBlockTitle && <TitleEdit title={title} onTitleChange={setTitle} />}
-      <ImageEdit {...props} {...imageData} onImageChange={setImageData} />
+      <ImageEdit {...props} onImageChange={data => save({...data})} />
     </>
   )
 }
