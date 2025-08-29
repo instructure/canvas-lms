@@ -234,7 +234,7 @@ class ContextModulesApiController < ApplicationController
       return render json: { error: "unable to find module to duplicate" }, status: :bad_request unless old_module
       return render json: { error: "cannot duplicate this module" }, status: :bad_request unless old_module.can_be_duplicated?
 
-      new_module = old_module.duplicate
+      new_module = old_module.duplicate({ user: @current_user })
       new_module.save!
       new_module.insert_at(old_module.position + 1)
       if new_module

@@ -109,6 +109,30 @@ describe "Modules API", type: :request do
         expect(content_tags[1]["content_tag"]["content_type"]).to eq("ContextModuleSubHeader")
       end
 
+      it "properly handles duplication of a module that has HTML content with attachments in it" do
+        aa_test_data = AttachmentAssociationsSpecHelper.new(@course.account, @course)
+        course_module = @course.context_modules.create!(name: "empty module", workflow_state: "published")
+        page = @course.wiki_pages.create!(title: "Page with HTML", body: aa_test_data.base_html, saving_user: @teacher)
+        course_module.add_item(id: page.id, type: "wiki_page")
+        course_module.save!
+        json = api_call(:post,
+                        "/api/v1/courses/#{@course.id}/modules/#{course_module.id}/duplicate",
+                        { controller: "context_modules_api",
+                          action: "duplicate",
+                          format: "json",
+                          course_id: @course.id.to_s,
+                          module_id: course_module.id.to_s },
+                        {},
+                        {},
+                        { expected_status: 200 })
+        content_tags = json["context_module"]["content_tags"]
+        expect(content_tags[0]["content_tag"]["title"]).to eq("Page with HTML Copy")
+        expect(content_tags[0]["content_tag"]["content_type"]).to eq("WikiPage")
+        associations = WikiPage.find(content_tags[0]["content_tag"]["content_id"]).attachment_associations
+        expect(associations.length).to eq 1
+        expect(associations.first.attachment_id).to eq aa_test_data.attachment1.id
+      end
+
       it "cannot duplicate module with quiz" do
         course_module = @course.context_modules.create!(name: "empty module", workflow_state: "published")
         # To be rigorous, make a quiz and add it as an *assignment*
