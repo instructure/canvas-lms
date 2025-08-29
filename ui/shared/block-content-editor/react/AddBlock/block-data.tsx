@@ -62,7 +62,8 @@ export const blockFactory = {
   [SeparatorLineBlock.name]: () => (
     <SeparatorLineBlock
       thickness="medium"
-      settings={{separatorColor: colors.ui.lineDivider, backgroundColor: defaultBackgroundColor}}
+      separatorColor={colors.ui.lineDivider}
+      backgroundColor={defaultBackgroundColor}
     />
   ),
   [ButtonBlock.name]: () => (

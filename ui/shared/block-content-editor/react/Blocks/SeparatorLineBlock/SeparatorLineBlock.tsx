@@ -26,10 +26,8 @@ const I18n = createI18nScope('block_content_editor')
 
 export type SeparatorLineBlockProps = {
   thickness: BorderWidthValues
-  settings: {
-    separatorColor: string
-    backgroundColor: string
-  }
+  separatorColor: string
+  backgroundColor: string
 }
 
 export const SeparatorLineBlockView = (props: SeparatorLineBlockProps) => {
@@ -43,7 +41,7 @@ export const SeparatorLineBlockView = (props: SeparatorLineBlockProps) => {
       borderColor="primary"
       margin="none"
       themeOverride={{
-        borderColorPrimary: props.settings.separatorColor,
+        borderColorPrimary: props.separatorColor,
       }}
     />
   )
@@ -57,7 +55,7 @@ export const SeparatorLineBlock = (props: SeparatorLineBlockProps) => {
       EditComponent={SeparatorLineBlockView}
       componentProps={props}
       title={SeparatorLineBlock.craft.displayName}
-      backgroundColor={props.settings.backgroundColor}
+      backgroundColor={props.backgroundColor}
     />
   )
 }
