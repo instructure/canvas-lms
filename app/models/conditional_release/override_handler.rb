@@ -145,6 +145,7 @@ module ConditionalRelease
 
           if course.root_account.feature_enabled? :mastery_path_invalidate_assignment_visibility_cache
             AssignmentVisibility::AssignmentVisibilityService.invalidate_cache(course_ids: [course.id], user_ids: [student_id])
+            QuizVisibility::QuizVisibilityService.invalidate_cache(user_ids: [student_id], course_ids: [course.id])
           end
         end
       end
