@@ -62,6 +62,10 @@ class Lti::Asset < ApplicationRecord
 
   before_validation :generate_uuid, on: :create
 
+  TYPE_TEXT_ENTRY = "text_entry"
+  TYPE_DISCUSSION_ENTRY = "discussion_entry"
+  TYPE_ATTACHMENT = "attachment"
+
   def compatible_with_processor?(processor)
     !!submission&.assignment && submission.assignment == processor&.assignment
   end
@@ -100,13 +104,13 @@ class Lti::Asset < ApplicationRecord
 
     # if submission_attempt is set, it's RCE content
     if submission_attempt.present?
-      "text_entry"
+      TYPE_TEXT_ENTRY
     # if attachment_id is set, it's a file attachment of a submission
     elsif attachment_id.present?
-      "attachment"
+      TYPE_ATTACHMENT
     # if discussion_entry_version_id is set, it's a discussion entry (comment)
     elsif discussion_entry_version_id.present?
-      "discussion_entry"
+      TYPE_DISCUSSION_ENTRY
     else
       Rails.logger.error(
         "Lti::Asset unknown type id=#{id}, submission_id=#{submission_id}, attachment_id=#{attachment_id}, submission_attempt=#{submission_attempt}, discussion_entry_version_id=#{discussion_entry_version_id}"
@@ -116,7 +120,7 @@ class Lti::Asset < ApplicationRecord
   end
 
   def text_entry?
-    asset_type == "text_entry"
+    asset_type == TYPE_TEXT_ENTRY
   end
 
   def discussion_entry?
