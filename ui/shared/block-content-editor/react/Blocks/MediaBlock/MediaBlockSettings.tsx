@@ -22,9 +22,12 @@ import {View} from '@instructure/ui-view'
 import {SettingsIncludeTitle} from '../BlockItems/SettingsIncludeTitle/SettingsIncludeTitle'
 import {Text} from '@instructure/ui-text'
 import {ColorPickerWrapper} from '../BlockItems/ColorPickerWrapper'
-import {MediaSettings} from './types'
+import {MediaData, MediaSettings} from './types'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {SettingsSectionToggle} from '../BlockItems/SettingsSectionToggle/SettingsSectionToggle'
+import {SettingsUploadMedia} from '../BlockItems/SettingsUploadMedia/SettingsUploadMedia'
+import {Flex} from '@instructure/ui-flex'
 
 const I18n = createI18nScope('block-editor')
 
@@ -56,6 +59,12 @@ export const MediaBlockSettings = () => {
     })
   }
 
+  const handleMediaChange = (src: string) => {
+    setProp((props: MediaData) => {
+      props.src = src
+    })
+  }
+
   return (
     <>
       <View as="div" margin="0 0 medium 0">
@@ -65,26 +74,39 @@ export const MediaBlockSettings = () => {
       </View>
 
       <SettingsIncludeTitle checked={includeBlockTitle} onChange={handleIncludeBlockTitleChange} />
-
-      <View as="div" margin="0 0 medium 0">
-        <ColorPickerWrapper
-          label={I18n.t('Background Color')}
-          value={props.backgroundColor}
-          baseColor={props.titleColor}
-          baseColorLabel={I18n.t('Title Color')}
-          onChange={handleBackgroundColorChange}
-        />
-      </View>
-
-      <View as="div" margin="0 0 medium 0">
-        <ColorPickerWrapper
-          label={I18n.t('Title Color')}
-          value={props.titleColor}
-          baseColor={props.backgroundColor}
-          baseColorLabel={I18n.t('Background Color')}
-          onChange={handleTitleColorChange}
-        />
-      </View>
+      <SettingsSectionToggle
+        title={I18n.t('Color settings')}
+        collapsedLabel={I18n.t('Expand color settings')}
+        expandedLabel={I18n.t('Collapse color settings')}
+        defaultExpanded={true}
+        includeSeparator={true}
+      >
+        <Flex direction="column" gap="medium">
+          <ColorPickerWrapper
+            label={I18n.t('Background Color')}
+            value={props.backgroundColor}
+            baseColor={props.titleColor}
+            baseColorLabel={I18n.t('Title Color')}
+            onChange={handleBackgroundColorChange}
+          />
+          <ColorPickerWrapper
+            label={I18n.t('Title Color')}
+            value={props.titleColor}
+            baseColor={props.backgroundColor}
+            baseColorLabel={I18n.t('Background Color')}
+            onChange={handleTitleColorChange}
+          />
+        </Flex>
+      </SettingsSectionToggle>
+      <SettingsSectionToggle
+        title={I18n.t('Media settings')}
+        collapsedLabel={I18n.t('Expand media settings')}
+        expandedLabel={I18n.t('Collapse media settings')}
+        defaultExpanded={true}
+        includeSeparator={false}
+      >
+        <SettingsUploadMedia onMediaChange={handleMediaChange} url={props.src} />
+      </SettingsSectionToggle>
     </>
   )
 }
