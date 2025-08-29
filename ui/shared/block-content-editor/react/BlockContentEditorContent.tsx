@@ -24,10 +24,12 @@ import {AddBlock} from './AddBlock'
 import {BlockContentEditorProps} from './BlockContentEditor'
 import {useGetSerializedNodes} from './hooks/useGetSerializedNodes'
 import {useEditHistory} from './hooks/useEditHistory'
+import {useEditClickHandler} from './hooks/useEditClickHandler'
 
 export const BlockContentEditorContent = (props: BlockContentEditorProps) => {
   const {isEdited} = useEditHistory()
   const editorData = useGetSerializedNodes()
+  useEditClickHandler()
 
   const frameData = isEdited ? editorData : (props.data ?? undefined)
 

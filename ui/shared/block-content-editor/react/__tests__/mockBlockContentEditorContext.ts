@@ -42,6 +42,7 @@ export const mockBlockContentEditorContext = ({openMock = jest.fn()}: Partial<Mo
     editingBlock: {
       id: null,
       setId: jest.fn(),
+      idRef: {current: null},
       addSaveCallback: jest.fn(),
       deleteSaveCallback: jest.fn(),
     },

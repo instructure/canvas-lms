@@ -19,20 +19,20 @@
 import './base-block-layout.css'
 import {Flex} from '@instructure/ui-flex'
 import {Tag} from '@instructure/ui-tag'
-import React, {PropsWithChildren, ReactNode} from 'react'
+import {PropsWithChildren, ReactNode} from 'react'
 
-export const BaseBlockLayout = React.forwardRef<
-  HTMLDivElement,
-  PropsWithChildren<{
+export const BaseBlockLayout = (
+  props: PropsWithChildren<{
     title: string
     menu: ReactNode
     actionButtons: ReactNode
     addButton: ReactNode
     a11yEditButton: ReactNode
-  }>
->((props, ref) => {
+    nodeId: string
+  }>,
+) => {
   return (
-    <div ref={ref} className="base-block-layout">
+    <div data-bce-node-id={props.nodeId} className="base-block-layout">
       <Flex direction="column" padding="paddingCardLarge">
         {props.a11yEditButton && (
           <Flex data-focus-reveal-parent margin="0 0 mediumSmall 0">
@@ -57,4 +57,4 @@ export const BaseBlockLayout = React.forwardRef<
       {props.addButton}
     </div>
   )
-})
+}

@@ -28,12 +28,9 @@ export const EditButton = (props: {
   return (
     <IconButton
       data-testid="edit-block-button"
-      data-copybutton
+      data-action-button
       screenReaderLabel={I18n.t('Edit block')}
-      onClick={e => {
-        e.stopPropagation()
-        props.onClicked()
-      }}
+      onClick={props.onClicked}
     >
       <IconEditLine />
     </IconButton>
