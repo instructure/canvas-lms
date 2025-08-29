@@ -1109,6 +1109,61 @@ describe GradebooksController do
           end
         end
       end
+
+      describe "performance_improvements_for_gradebook" do
+        before do
+          user_session(@teacher)
+        end
+
+        context "when feature flag is disabled" do
+          before do
+            @course.disable_feature!(:performance_improvements_for_gradebook)
+          end
+
+          it "sets performance_improvements_for_gradebook to false in js_env" do
+            get :show, params: { course_id: @course.id }
+
+            expect(Services::PlatformServiceGradebook).not_to receive(:use_graphql?)
+            expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:performance_improvements_for_gradebook]).to be false
+          end
+        end
+
+        context "when feature flag is enabled" do
+          before do
+            @course.enable_feature!(:performance_improvements_for_gradebook)
+          end
+
+          context "and PlatformServiceGradebook.use_graphql? returns true" do
+            before do
+              allow(Services::PlatformServiceGradebook).to receive(:use_graphql?)
+                .with(@course.account.global_id, @course.global_id)
+                .and_return(true)
+            end
+
+            it "sets performance_improvements_for_gradebook to true in js_env" do
+              get :show, params: { course_id: @course.id }
+
+              expect(Services::PlatformServiceGradebook).not_to receive(:use_graphql?).with(@course.account.global_id, @course.global_id)
+              expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:performance_improvements_for_gradebook]).to be true
+            end
+          end
+
+          context "and PlatformServiceGradebook.use_graphql? returns false" do
+            before do
+              allow(Services::PlatformServiceGradebook).to receive(:use_graphql?)
+                .with(@course.account.global_id, @course.global_id)
+                .and_return(false)
+            end
+
+            it "sets performance_improvements_for_gradebook to false in js_env" do
+              get :show, params: { course_id: @course.id }
+
+              expect(Services::PlatformServiceGradebook).not_to receive(:use_graphql?).with(@course.account.global_id, @course.global_id)
+              expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:performance_improvements_for_gradebook]).to be false
+            end
+          end
+        end
+      end
     end
 
     context "in development and requested version is 'default'" do
