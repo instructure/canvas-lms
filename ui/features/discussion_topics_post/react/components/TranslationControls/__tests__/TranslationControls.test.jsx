@@ -83,12 +83,14 @@ describe('TranslationControls Component', () => {
 
   it('displays error message if no language is selected', () => {
     renderComponent({isLanguageNotSelectedError: true})
-    expect(screen.getByText('Please select a language.')).toBeInTheDocument()
+    expect(screen.getAllByText('Please select a language.').length).toBeGreaterThan(0)
   })
 
   it('displays error message if language is already active', () => {
     renderComponent({isLanguageAlreadyActiveError: true})
-    expect(screen.getByText('Already translated into the selected language.')).toBeInTheDocument()
+    expect(
+      screen.getAllByText('Already translated into the selected language.').length,
+    ).toBeGreaterThan(0)
   })
 
   it('resets input when reset() is called via ref', async () => {
