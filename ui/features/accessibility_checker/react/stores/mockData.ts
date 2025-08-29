@@ -207,11 +207,27 @@ export const mockScanData: AccessibilityResourceScan[] = [
   mockScan5,
 ]
 
-export const mockIssuesSummary: AccessibilityIssuesSummaryData = {
-  total: 5,
+export const mockIssuesSummary1: AccessibilityIssuesSummaryData = {
+  total: 61,
   byRuleType: {
     'headings-sequence': 1,
     'adjacent-links': 50,
     'small-text-contrast': 10,
   },
+}
+
+export const mockIssuesSummary2: AccessibilityIssuesSummaryData = {
+  total: 15,
+  byRuleType: {
+    'img-alt': 5,
+    'img-alt-length': 2,
+    'headings-sequence': 3,
+    'link-text': 4,
+    'table-header': 1,
+  },
+}
+
+export const mockEmptyIssuesSummary: AccessibilityIssuesSummaryData = {
+  total: 0,
+  byRuleType: {},
 }

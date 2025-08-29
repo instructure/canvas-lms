@@ -22,7 +22,7 @@ import '@testing-library/jest-dom'
 
 import {IssuesByTypeChart} from '../IssuesByTypeChart'
 import {useAccessibilityScansStore, initialState} from '../../../stores/AccessibilityScansStore'
-import {mockIssuesSummary} from '../../../stores/mockData'
+import {mockIssuesSummary1} from '../../../stores/mockData'
 
 // Mock ResizeObserver since it's not supported in jsdom
 class ResizeObserver {
@@ -48,7 +48,7 @@ describe('IssuesByTypeChart', () => {
 
     act(() => {
       result.current.setLoadingOfSummary(false)
-      result.current.setIssuesSummary(mockIssuesSummary)
+      result.current.setIssuesSummary(mockIssuesSummary1)
     })
 
     render(<IssuesByTypeChart />)
@@ -60,7 +60,7 @@ describe('IssuesByTypeChart', () => {
 
     act(() => {
       result.current.setLoadingOfSummary(false)
-      result.current.setIssuesSummary(mockIssuesSummary)
+      result.current.setIssuesSummary(mockIssuesSummary1)
     })
 
     render(<IssuesByTypeChart />)

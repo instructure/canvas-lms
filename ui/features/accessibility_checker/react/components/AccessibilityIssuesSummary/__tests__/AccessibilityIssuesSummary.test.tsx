@@ -21,7 +21,7 @@ import {act, renderHook} from '@testing-library/react-hooks'
 
 import {useAccessibilityScansStore} from '../../../stores/AccessibilityScansStore'
 import {AccessibilityIssuesSummary} from '../../AccessibilityIssuesSummary/AccessibilityIssuesSummary'
-import {mockIssuesSummary} from '../../../stores/mockData'
+import {mockIssuesSummary1} from '../../../stores/mockData'
 
 describe('AccessibilityIssuesSummary', () => {
   beforeEach(() => {
@@ -33,7 +33,7 @@ describe('AccessibilityIssuesSummary', () => {
 
     await act(() => {
       result.current.setLoadingOfSummary(false)
-      result.current.setIssuesSummary(mockIssuesSummary)
+      result.current.setIssuesSummary(mockIssuesSummary1)
     })
 
     render(<AccessibilityIssuesSummary />)

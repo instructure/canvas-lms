@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {mockIssuesSummary} from '../../stores/mockData'
+import {mockIssuesSummary1} from '../../stores/mockData'
 import {IssueDataPoint} from '../../types'
 import {
   getChartData,
@@ -65,7 +65,7 @@ describe('processIssuesToChartData', () => {
   })
 
   it('processes raw data into chart data correctly', () => {
-    const result = processIssuesToChartData(mockIssuesSummary.byRuleType)
+    const result = processIssuesToChartData(mockIssuesSummary1.byRuleType)
 
     expect(result).toEqual(expect.arrayContaining(parsedIssueDataPoints))
     expect(result).toHaveLength(3)
