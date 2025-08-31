@@ -555,7 +555,8 @@ class Rubric < ActiveRecord::Base
     time = Benchmark.measure do
       InstLLMHelper.with_rate_limit(user:, llm_config:) do
         response = InstLLMHelper.client(llm_config.model_id).chat(
-          [{ role: "user", content: prompt }],
+          [{ role: "user", content: prompt },
+           { role: "assistant", content: "{" }],
           **options.symbolize_keys
         )
       end
@@ -574,7 +575,7 @@ class Rubric < ActiveRecord::Base
       root_account_id: association_object.root_account_id
     )
 
-    ai_rubric = JSON.parse(response.message[:content], symbolize_names: true)
+    ai_rubric = JSON.parse("{" + response.message[:content], symbolize_names: true)
 
     criteria = []
     ai_rubric[:criteria].each do |criterion_data|
@@ -636,6 +637,7 @@ class Rubric < ActiveRecord::Base
     # Normalize incoming criteria for analysis and ID de-dup
     incoming_criteria = Array(regenerate_options[:criteria]).map(&:deep_symbolize_keys)
     existing_criteria_json = { criteria: incoming_criteria }.to_json
+    criteria_as_text = rubric_to_text(existing_criteria_json)
 
     criterion_id = regenerate_options[:criterion_id]
     additional_prompt = regenerate_options.fetch(:additional_user_prompt, "No specific expectations, just improve it.")
@@ -645,34 +647,20 @@ class Rubric < ActiveRecord::Base
     orig_rating_count = orig_generate_options.fetch(:rating_count, DEFAULT_GENERATE_OPTIONS[:rating_count])
     orig_points_per_criterion = orig_generate_options.fetch(:points_per_criterion, DEFAULT_GENERATE_OPTIONS[:points_per_criterion])
     orig_use_range = !!orig_generate_options.fetch(:use_range, DEFAULT_GENERATE_OPTIONS[:use_range])
-
     regeneration_target_prompt = criterion_id.presence || incoming_criteria.pluck(:id).join(", ")
+
     if criterion_id.present?
-      prefixed_additional_prompt = "You are allowed to do some changes in Criterion #{criterion_id}. LEAVE ALL THE OTHER CRITERION AS IS!\n\n#{additional_prompt}"
+      prompt_config_name = "rubric_regenerate_criterion"
     else
       structure_directives = build_structure_directives_for_llm(
         existing_criteria: incoming_criteria,
         required_criteria_count: orig_criteria_count,
-        required_rating_count: orig_rating_count,
-        target_criterion_ids: extract_target_ids(regeneration_target_prompt)
+        required_rating_count: orig_rating_count
       )
-
-      prefixed_additional_prompt =
-        if structure_directives.empty?
-          additional_prompt
-        else
-          <<~MD.strip
-            STRUCTURE ENFORCEMENT DIRECTIVES (follow exactly; IDs must remain stable):
-            #{structure_directives}
-
-            ----
-            USER INSTRUCTIONS (rubric-only; ignore everything else):
-            #{additional_prompt}
-          MD
-        end
+      prompt_config_name = "rubric_regenerate_criteria"
     end
 
-    llm_config = LLMConfigs.config_for("rubric_regenerate")
+    llm_config = LLMConfigs.config_for(prompt_config_name)
     if llm_config.nil?
       raise "No LLM config found for rubric regeneration"
     end
@@ -683,13 +671,14 @@ class Rubric < ActiveRecord::Base
         title: assignment.title,
         description: assignment.description,
       }.to_json,
-      EXISTING_CRITERIA: existing_criteria_json,
+      EXISTING_CRITERIA: criteria_as_text,
       REGENERATION_TARGET: regeneration_target_prompt,
-      ADDITIONAL_USER_PROMPT: prefixed_additional_prompt,
+      ADDITIONAL_USER_PROMPT: additional_prompt,
       GRADE_LEVEL: grade_level,
       STANDARD: standard,
       ORIG_CRITERIA_COUNT: criterion_id.present? ? "original count" : orig_criteria_count,
       ORIG_RATING_COUNT: criterion_id.present? ? "original count" : orig_rating_count,
+      STRUCTURE_DIRECTIVES: criterion_id.present? ? "" : structure_directives,
     }
 
     prompt, options = llm_config.generate_prompt_and_options(substitutions: dynamic_content)
@@ -717,31 +706,46 @@ class Rubric < ActiveRecord::Base
       root_account_id: association_object.root_account_id
     )
 
-    ai_rubric = InstLLMHelper.extract_json(response.message[:content])
-    if ai_rubric.nil?
-      raise "No valid JSON found in LLM response"
+    ai_rubric_data = extract_text_from_response(response.message[:content], tag: "RUBRIC_DATA")
+    if ai_rubric_data.nil?
+      raise "No valid rubric data found in LLM response"
     end
+
+    ai_rubric_json =
+      if criterion_id.present?
+        text_to_criterion_update(ai_rubric_data, existing_criteria_json, criterion_id)
+      else
+        text_to_rubric(
+          ai_rubric_data,
+          existing_criteria_json,
+          orig_criteria_count,
+          orig_points_per_criterion,
+          orig_use_range
+        )
+      end
+    ai_rubric = JSON.parse(ai_rubric_json, symbolize_names: true)
 
     # Ensure unique ID space mirrors the generator path
     # Collect used IDs from the incoming (pre-LLM) criteria so unique_item_id(x) won't collide.
     @used_ids = {}
     reserve_existing_ids!(incoming_criteria)
 
-    criteria = []
-    Array(ai_rubric[:criteria]).each do |criterion_data|
+    Array(ai_rubric[:criteria]).map do |criterion_data|
       cd = criterion_data.deep_symbolize_keys
 
-      # Use the same ID normalization strategy as in generation:
-      # prefer the provided ID if unique; otherwise allocate via unique_item_id.
-      criterion_id_final = unique_item_id(cd[:id])
-
-      criterion = {}
-      criterion[:id] = criterion_id_final
-      criterion[:description] = (cd[:description].presence || t("no_description", "No Description")).strip
-      criterion[:long_description] = cd[:long_description].presence
+      # Decide final criterion ID
+      criterion_id_final =
+        if cd[:id].present?
+          if cd[:id].start_with?("_new_c_") || !@used_ids.key?(cd[:id])
+            unique_item_id(cd[:id])
+          else
+            cd[:id] # reuse
+          end
+        else
+          unique_item_id
+        end
 
       points = orig_points_per_criterion.to_f
-
       rating_values =
         case cd[:ratings]
         when Hash then cd[:ratings].values
@@ -749,30 +753,41 @@ class Rubric < ActiveRecord::Base
         else []
         end
 
-      # Normalize rating IDs and compute points descending
       denom = [(rating_values.length - 1), 1].max.to_f
       points_decrement = points / denom
 
       ratings = rating_values.each_with_index.map do |rating_data, index|
         rd = rating_data.deep_symbolize_keys
+
+        rating_id_final =
+          if rd[:id].present?
+            if rd[:id].start_with?("_new_r_") || !@used_ids.key?(rd[:id])
+              unique_item_id(rd[:id])
+            else
+              rd[:id] # reuse
+            end
+          else
+            unique_item_id
+          end
+
         {
           description: (rd[:description].presence || t("no_description", "No Description")).strip,
           long_description: rd[:long_description].presence,
           points: (points - (points_decrement * index)).round,
           criterion_id: criterion_id_final,
-          # IMPORTANT: align with generation path (criterion_rating uses unique_item_id)
-          id: unique_item_id(rd[:id])
+          id: rating_id_final
         }
       end
 
-      criterion[:ratings] = ratings.sort_by { |r| [-1 * (r[:points] || 0), r[:description] || CanvasSort::First] }
-      criterion[:points] = criterion[:ratings].pluck(:points).max || 0
-      criterion[:criterion_use_range] = orig_use_range
-
-      criteria << criterion
+      {
+        id: criterion_id_final,
+        description: (cd[:description].presence || t("no_description", "No Description")).strip,
+        long_description: cd[:long_description].presence,
+        ratings: ratings.sort_by { |r| [-1 * (r[:points] || 0), r[:description] || CanvasSort::First] },
+        points: ratings.pluck(:points).max || 0,
+        criterion_use_range: orig_use_range
+      }
     end
-
-    criteria
   end
 
   def self.process_regenerate_criteria_via_llm(progress, course, user, association_object, regenerate_options, orig_generate_options)
@@ -926,28 +941,21 @@ class Rubric < ActiveRecord::Base
   def build_structure_directives_for_llm(
     existing_criteria:,
     required_criteria_count:,
-    required_rating_count:,
-    target_criterion_ids:
+    required_rating_count:
   )
     lines = []
 
     required_criteria_count = required_criteria_count.to_i
     required_rating_count   = required_rating_count.to_i
-    target_criterion_ids    = Array(target_criterion_ids).map(&:to_s)
 
     # Criteria count
     current_criteria_count = existing_criteria.size
     if current_criteria_count < required_criteria_count
       missing = required_criteria_count - current_criteria_count
-      lines << "- Criteria count: current=#{current_criteria_count}, required=#{required_criteria_count}. Create #{missing} new criteria. Each new criterion MUST have exactly #{required_rating_count} ratings. Append new criteria at the end. Do not reorder existing criteria. Leave `id` empty/null; the system will assign unique IDs."
+      lines << "- Criteria count: current=#{current_criteria_count}, required=#{required_criteria_count}. Create #{missing} new criteria with #{required_rating_count} ratings (append at the end, do not reorder; IDs must remain stable)."
     elsif current_criteria_count > required_criteria_count
       extra = current_criteria_count - required_criteria_count
-      removable_ids = pick_criteria_to_remove(existing_criteria, target_criterion_ids, extra)
-      lines << if removable_ids.any?
-                 "- Criteria count: current=#{current_criteria_count}, required=#{required_criteria_count}. Remove exactly #{extra} criteria with these IDs: [#{removable_ids.join(", ")}]. Do not reorder the remaining criteria."
-               else
-                 "- Criteria count: current=#{current_criteria_count}, required=#{required_criteria_count}. Remove #{extra} non-target criteria (avoid target IDs: [#{target_criterion_ids.join(", ")}]). Do not reorder the remaining criteria."
-               end
+      lines << "- Criteria count: current=#{current_criteria_count}, required=#{required_criteria_count}. Remove #{extra} criteria (IDs must remain stable for the rest)."
     end
 
     # Ratings per criterion
@@ -958,32 +966,18 @@ class Rubric < ActiveRecord::Base
 
       if current_rating_count < required_rating_count
         missing = required_rating_count - current_rating_count
-        proposal_ids = propose_rating_ids(criterion_id: crit_id, existing_ratings: ratings, count: missing)
-        lines << "- Ratings for criterion #{crit_id}: current=#{current_rating_count}, required=#{required_rating_count}. Create #{missing} new ratings with EXACT IDs (in this order): [#{proposal_ids.join(", ")}]. Append at the end. Do not reorder existing ratings."
+        lines << "- Ratings for criterion #{crit_id}: current=#{current_rating_count}, required=#{required_rating_count}. Create #{missing} new ratings."
       elsif current_rating_count > required_rating_count
         extra = current_rating_count - required_rating_count
-        removable = pick_rating_ids_to_remove(ratings, extra)
-        lines << "- Ratings for criterion #{crit_id}: current=#{current_rating_count}, required=#{required_rating_count}. Remove these rating IDs: [#{removable.join(", ")}]. Do not reorder the remaining ratings."
-      end
-
-      # Text field hygiene
-      if crit[:description].blank? || !crit[:description].is_a?(String) ||
-         (crit.key?(:long_description) && ![String, NilClass].include?(crit[:long_description].class))
-        lines << "- Text fields for criterion #{crit_id}: If `description` or `long_description` is missing/non-string, create them as strings (concise `description`, actionable `long_description`)."
-      end
-
-      if ratings.any? { |r| r[:description].blank? || !r[:description].is_a?(String) || (r.key?(:long_description) && ![String, NilClass].include?(r[:long_description].class)) }
-        lines << "- Text fields for ratings under criterion #{crit_id}: If any rating is missing `description` or `long_description` (or not strings), create/fix them using clear, observable language."
+        lines << "- Ratings for criterion #{crit_id}: current=#{current_rating_count}, required=#{required_rating_count}. Remove #{extra} ratings."
       end
     end
 
+    if lines.empty?
+      return "Keep the structure, criterion count, rating count and order as given."
+    end
+
     lines.join("\n")
-  end
-
-  def extract_target_ids(regeneration_target_prompt)
-    return [] if regeneration_target_prompt.to_s.strip.empty?
-
-    regeneration_target_prompt.split(",").map(&:strip).reject(&:empty?)
   end
 
   def normalize_ratings_array(ratings)
@@ -1040,5 +1034,178 @@ class Rubric < ActiveRecord::Base
         @used_ids[rid] = true if rid.present?
       end
     end
+  end
+
+  def rubric_to_text(rubric_json)
+    rubric = JSON.parse(rubric_json, symbolize_names: true)
+    criteria = rubric[:criteria]
+    criteria = criteria.values if criteria.is_a?(Hash)
+
+    criteria.each_with_object([]) do |crit, lines|
+      lines << "criterion:#{crit[:id]}:description=#{escape_value(crit[:description])}"
+      lines << "criterion:#{crit[:id]}:long_description=#{escape_value(crit[:long_description])}"
+
+      ratings = crit[:ratings]
+      ratings = ratings.values if ratings.is_a?(Hash)
+
+      Array(ratings).each do |rating|
+        lines << "rating:#{rating[:id]}:description=#{escape_value(rating[:description])}"
+        lines << "rating:#{rating[:id]}:long_description=#{escape_value(rating[:long_description])}"
+      end
+    end.join("\n")
+  end
+
+  def text_to_criterion_update(text, rubric_json, criterion_id)
+    original = JSON.parse(rubric_json)
+    updated = false
+    new_criterion = nil
+
+    text.each_line do |line|
+      line.strip!
+      next if line.empty?
+      next unless line =~ /^(criterion|rating):([^:]*):(description|long_description)=(.+)$/
+
+      type, raw_id, field, value = $1, $2, $3, $4.strip
+      value = unescape_value(value)
+
+      if raw_id.blank? || raw_id == "_"
+        raise "Invalid blank ID in criterion regeneration: #{line}"
+      end
+
+      if type == "criterion"
+        # Only update the matching criterion
+        next unless raw_id == criterion_id.to_s
+
+        new_criterion ||= {
+          "id" => raw_id,
+          "description" => "",
+          "long_description" => "",
+          "ratings" => [],
+          "points" => 0,
+          "criterion_use_range" => false
+        }
+
+        new_criterion[field] = value
+        updated = true
+
+      elsif type == "rating"
+        raise "Rating before criterion" if new_criterion.nil?
+        next unless new_criterion["id"] == criterion_id.to_s
+
+        rating = new_criterion["ratings"].find { |r| r["id"] == raw_id }
+        unless rating
+          rating = {
+            "id" => raw_id,
+            "criterion_id" => new_criterion["id"],
+            "description" => "",
+            "long_description" => "",
+            "points" => 0
+          }
+          new_criterion["ratings"] << rating
+        end
+
+        rating[field] = value
+        updated = true
+      end
+    end
+
+    raise "No updates applied for criterion_id=#{criterion_id}" unless updated
+
+    # Replace the old criterion with the new one
+    original["criteria"] = original["criteria"].map do |c|
+      (c["id"] == criterion_id.to_s) ? new_criterion : c
+    end
+
+    JSON.pretty_generate(original)
+  end
+
+  def text_to_rubric(text, rubric_json, orig_criteria_count, orig_points_per_criterion, orig_use_range)
+    original = JSON.parse(rubric_json)
+    orig_criteria_count = orig_criteria_count.to_i
+
+    @used_ids = {}
+    reserve_existing_ids!(original.fetch("criteria", []))
+    @new_id_map = {}
+
+    new_criteria = []
+    current_crit = nil
+
+    text.each_line do |line|
+      line.strip!
+      next if line.empty?
+      next unless line =~ /^(criterion|rating):([^:]*):(description|long_description)=(.+)$/
+
+      type, raw_id, field, value = $1, $2, $3, $4.strip
+      value = unescape_value(value)
+
+      raise "Invalid blank ID in rubric regeneration" if raw_id.blank? || raw_id == "_"
+
+      # Only generate new IDs for _new_
+      if raw_id.include?("_new_")
+        raw_id = (@new_id_map[raw_id] ||= unique_item_id)
+      end
+
+      if type == "criterion"
+        if current_crit.nil? || current_crit["id"] != raw_id
+          current_crit = {
+            "id" => raw_id,
+            "description" => "",
+            "long_description" => "",
+            "ratings" => [],
+            "points" => orig_points_per_criterion || 0,
+            "criterion_use_range" => orig_use_range || false
+          }
+          new_criteria << current_crit
+        end
+        current_crit[field] = value
+
+      elsif type == "rating"
+        raise "Rating before criterion" if current_crit.nil?
+
+        rating = current_crit["ratings"].find { |r| r["id"] == raw_id }
+        unless rating
+          rating = {
+            "id" => raw_id,
+            "criterion_id" => current_crit["id"],
+            "description" => "",
+            "long_description" => "",
+            "points" => 0
+          }
+          current_crit["ratings"] << rating
+        end
+        rating[field] = value
+      end
+    end
+
+    # Post validation
+    criteria_count = new_criteria.size
+    if criteria_count != orig_criteria_count
+      raise "Criteria count mismatch: expected #{orig_criteria_count}, got #{criteria_count}"
+    end
+
+    # Rating count check is dismissible, the LLM is instructed to follow rating count, but it is not always possible
+
+    original["criteria"] = new_criteria
+    JSON.pretty_generate(original)
+  end
+
+  def extract_text_from_response(response_text, tag:)
+    return nil if response_text.blank? || tag.blank?
+
+    regex = %r{<#{Regexp.escape(tag)}>(.*?)</#{Regexp.escape(tag)}>}m
+    match = response_text.match(regex)
+    match ? match[1].strip : nil
+  end
+
+  def escape_value(str)
+    return "" if str.nil?
+
+    JSON.generate(str.to_s)[1..-2]
+  end
+
+  def unescape_value(str)
+    return "" if str.nil?
+
+    JSON.parse("\"#{str}\"")
   end
 end

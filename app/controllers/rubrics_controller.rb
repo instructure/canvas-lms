@@ -244,6 +244,7 @@ class RubricsController < ApplicationController
     end
   end
 
+  MAX_LLM_INPUT_CHARS = 1000
   ALLOWED_GENERATE_PARAMS = %w[criteria_count rating_count points_per_criterion use_range additional_prompt_info grade_level standard].freeze
   def llm_criteria
     association_object = RubricAssociation.get_association_object(params[:rubric_association])
@@ -256,10 +257,10 @@ class RubricsController < ApplicationController
     if generate_options[:rating_count].present? && !(2..8).cover?(generate_options[:rating_count].to_i)
       return render json: { error: "rating_count must be between 2 and 8 inclusive" }, status: :bad_request
     end
-    if generate_options[:additional_prompt_info].present? && generate_options[:additional_prompt_info].length > 1000
+    if generate_options[:additional_prompt_info].present? && generate_options[:additional_prompt_info].length > MAX_LLM_INPUT_CHARS
       return render json: { error: "additional_prompt_info must be less than 1000 characters" }, status: :bad_request
     end
-    if generate_options[:standard].present? && generate_options[:standard].length > 1000
+    if generate_options[:standard].present? && generate_options[:standard].length > MAX_LLM_INPUT_CHARS
       return render json: { error: "standard must be less than 1000 characters" }, status: :bad_request
     end
 
@@ -291,7 +292,7 @@ class RubricsController < ApplicationController
   def llm_regenerate_criteria
     association_object = RubricAssociation.get_association_object(params[:rubric_association])
 
-    criteria_params = params.fetch(:criteria, []).values.map do |crit|
+    criteria_params = params.fetch(:criteria, {}).values.map do |crit|
       crit.permit(
         :id,
         :description,
@@ -304,8 +305,11 @@ class RubricsController < ApplicationController
 
     regenerate_options = params.fetch(:regenerate_options, {}).permit(*ALLOWED_REGENERATE_PARAMS)
     regenerate_options[:criteria] = criteria_params
-    if regenerate_options[:additional_user_prompt].present? && regenerate_options[:additional_user_prompt].length > 1000
+    if regenerate_options[:additional_user_prompt].present? && regenerate_options[:additional_user_prompt].length > MAX_LLM_INPUT_CHARS
       return render json: { error: "additional_user_prompt must be less than 1000 characters" }, status: :bad_request
+    end
+    if regenerate_options[:standard].present? && regenerate_options[:standard].length > MAX_LLM_INPUT_CHARS
+      return render json: { error: "standard must be less than 1000 characters" }, status: :bad_request
     end
 
     orig_generate_options = params.fetch(:generate_options, {}).permit(*ALLOWED_ORIG_GENERATE_PARAMS)
@@ -316,7 +320,7 @@ class RubricsController < ApplicationController
     if orig_generate_options[:rating_count].present? && !(2..8).cover?(orig_generate_options[:rating_count].to_i)
       return render json: { error: "rating_count must be between 2 and 8 inclusive" }, status: :bad_request
     end
-    if orig_generate_options[:additional_prompt_info].present? && orig_generate_options[:additional_prompt_info].length > 1000
+    if orig_generate_options[:additional_prompt_info].present? && orig_generate_options[:additional_prompt_info].length > MAX_LLM_INPUT_CHARS
       return render json: { error: "additional_prompt_info must be less than 1000 characters" }, status: :bad_request
     end
 
