@@ -615,7 +615,7 @@ describe Rubric do
         expect(@inst_llm).to receive(:chat).and_return(
           InstLLM::Response::ChatResponse.new(
             model: "model",
-            message: { role: :assistant, content: llm_response.to_json },
+            message: { role: :assistant, content: llm_response.to_json[1..] },
             stop_reason: "stop_reason",
             usage: {
               input_tokens: 10,
@@ -669,6 +669,283 @@ describe Rubric do
 
         expect(association).to be_present
         expect(llm_rubric.data[0][:description]).to eq "Test 1"
+      end
+    end
+
+    describe "regenerate_criteria_via_llm" do
+      let(:existing_criteria) do
+        [
+          {
+            id: "c1",
+            description: "Old desc 1",
+            long_description: "Old long desc 1",
+            points: 20,
+            ratings: [
+              { id: "r1", description: "Old rating 1", long_description: "Old long desc", points: 20 }
+            ]
+          }
+        ]
+      end
+
+      before do
+        @inst_llm = double("InstLLM::Client")
+        allow(InstLLMHelper).to receive(:client).and_return(@inst_llm)
+      end
+
+      context "extra failure paths" do
+        it "raises if no updates applied for the given criterion_id" do
+          llm_response_text = <<~TEXT
+            <RUBRIC_DATA>
+            # note: no lines touching c1
+            criterion:c2:description=Other Criterion
+            criterion:c2:long_description=Other description
+            </RUBRIC_DATA>
+          TEXT
+
+          expect(@inst_llm).to receive(:chat).and_return(
+            InstLLM::Response::ChatResponse.new(
+              model: "model",
+              message: { role: :assistant, content: llm_response_text },
+              stop_reason: "stop",
+              usage: { input_tokens: 5, output_tokens: 10 }
+            )
+          )
+
+          rubric = course.rubrics.build(user: teacher)
+          rubric.data = existing_criteria
+
+          expect do
+            rubric.regenerate_criteria_via_llm(
+              assignment,
+              { criteria: existing_criteria, criterion_id: "c1" },
+              { criteria_count: 1, rating_count: 1 }
+            )
+          end.to raise_error(/No updates applied for criterion_id=c1/)
+        end
+
+        it "raises if a blank or underscore ID is given in criterion regeneration" do
+          llm_response_text = <<~TEXT
+            <RUBRIC_DATA>
+            criterion:_:description=Invalid Criterion
+            </RUBRIC_DATA>
+          TEXT
+
+          expect(@inst_llm).to receive(:chat).and_return(
+            InstLLM::Response::ChatResponse.new(
+              model: "model",
+              message: { role: :assistant, content: llm_response_text },
+              stop_reason: "stop",
+              usage: { input_tokens: 5, output_tokens: 10 }
+            )
+          )
+
+          rubric = course.rubrics.build(user: teacher)
+          rubric.data = existing_criteria
+
+          expect do
+            rubric.regenerate_criteria_via_llm(
+              assignment,
+              { criteria: existing_criteria, criterion_id: "c1" },
+              { criteria_count: 1, rating_count: 1 }
+            )
+          end.to raise_error(/Invalid blank ID/)
+        end
+
+        it "raises if a blank or underscore ID is given in rubric regeneration" do
+          llm_response_text = <<~TEXT
+            <RUBRIC_DATA>
+            criterion::description=Broken Criterion
+            </RUBRIC_DATA>
+          TEXT
+
+          expect(@inst_llm).to receive(:chat).and_return(
+            InstLLM::Response::ChatResponse.new(
+              model: "model",
+              message: { role: :assistant, content: llm_response_text },
+              stop_reason: "stop",
+              usage: { input_tokens: 5, output_tokens: 10 }
+            )
+          )
+
+          rubric = course.rubrics.build(user: teacher)
+          rubric.data = existing_criteria
+
+          expect do
+            rubric.regenerate_criteria_via_llm(
+              assignment,
+              { criteria: existing_criteria },
+              { criteria_count: 1, rating_count: 1 }
+            )
+          end.to raise_error(/Invalid blank ID/)
+        end
+
+        it "raises if a rating appears before any criterion" do
+          llm_response_text = <<~TEXT
+            <RUBRIC_DATA>
+            rating:rX:description=Floating rating
+            rating:rX:long_description=Appears before criterion
+            </RUBRIC_DATA>
+          TEXT
+
+          expect(@inst_llm).to receive(:chat).and_return(
+            InstLLM::Response::ChatResponse.new(
+              model: "model",
+              message: { role: :assistant, content: llm_response_text },
+              stop_reason: "stop",
+              usage: { input_tokens: 5, output_tokens: 10 }
+            )
+          )
+
+          rubric = course.rubrics.build(user: teacher)
+          rubric.data = existing_criteria
+
+          expect do
+            rubric.regenerate_criteria_via_llm(
+              assignment,
+              { criteria: existing_criteria },
+              { criteria_count: 1, rating_count: 1 }
+            )
+          end.to raise_error(/Rating before criterion/)
+        end
+
+        it "merges multiple lines for the same rating ID into a single rating" do
+          llm_response_text = <<~TEXT
+            <RUBRIC_DATA>
+            criterion:c1:description=Criterion 1
+            rating:r1:description=First rating
+            rating:r1:long_description=Extra details
+            </RUBRIC_DATA>
+          TEXT
+
+          expect(@inst_llm).to receive(:chat).and_return(
+            InstLLM::Response::ChatResponse.new(
+              model: "model",
+              message: { role: :assistant, content: llm_response_text },
+              stop_reason: "stop",
+              usage: { input_tokens: 5, output_tokens: 10 }
+            )
+          )
+
+          rubric = course.rubrics.build(user: teacher)
+          rubric.data = existing_criteria
+
+          new_criteria = rubric.regenerate_criteria_via_llm(
+            assignment,
+            { criteria: existing_criteria },
+            { criteria_count: 1, rating_count: 1 }
+          )
+
+          rating = new_criteria.first[:ratings].first
+          expect(rating[:description]).to eq("First rating")
+          expect(rating[:long_description]).to eq("Extra details")
+        end
+
+        it "ignores updates to unrelated criteria when regenerating a single criterion" do
+          llm_response_text = <<~TEXT
+            <RUBRIC_DATA>
+            criterion:c1:description=Updated Criterion 1
+            criterion:c2:description=Should be ignored
+            </RUBRIC_DATA>
+          TEXT
+
+          expect(@inst_llm).to receive(:chat).and_return(
+            InstLLM::Response::ChatResponse.new(
+              model: "model",
+              message: { role: :assistant, content: llm_response_text },
+              stop_reason: "stop",
+              usage: { input_tokens: 5, output_tokens: 10 }
+            )
+          )
+
+          rubric = course.rubrics.build(user: teacher)
+          rubric.data = existing_criteria
+
+          new_criteria = rubric.regenerate_criteria_via_llm(
+            assignment,
+            { criteria: existing_criteria, criterion_id: "c1" },
+            { criteria_count: 1, rating_count: 1 }
+          )
+
+          expect(new_criteria.first[:description]).to eq("Updated Criterion 1")
+          expect(new_criteria.any? { |c| c[:id] == "c2" }).to be_falsey
+        end
+
+        it "round-trips multiline descriptions via escaped newlines" do
+          original = {
+            criteria: [
+              {
+                id: "c1",
+                description: "Simple criterion",
+                long_description: "First line\nSecond line",
+                ratings: [
+                  { id: "r1", description: "Good", long_description: "One\nTwo", points: 5 }
+                ]
+              }
+            ]
+          }.to_json
+
+          rubric = Rubric.new
+          text = rubric.rubric_to_text(original)
+
+          expect(text).to include("\\n")
+
+          regenerated = rubric.text_to_rubric(text, original, 1, 20, false)
+          parsed = JSON.parse(regenerated)
+
+          expect(parsed["criteria"][0]["long_description"]).to eq("First line\nSecond line")
+          expect(parsed["criteria"][0]["ratings"][0]["long_description"]).to eq("One\nTwo")
+        end
+
+        it "round-trips values with backslashes, tabs, and carriage returns" do
+          original = {
+            criteria: [
+              {
+                id: "c1",
+                description: "Path with backslash C:\\Users\\Test",
+                long_description: "Line1\rLine2\tTabbed",
+                ratings: [
+                  { id: "r1", description: "Has = sign", long_description: "Escapes correctly", points: 5 }
+                ]
+              }
+            ]
+          }.to_json
+
+          rubric = Rubric.new
+          text = rubric.rubric_to_text(original)
+          regenerated = rubric.text_to_rubric(text, original, 1, 20, false)
+          parsed = JSON.parse(regenerated)
+
+          crit = parsed["criteria"][0]
+          expect(crit["description"]).to eq("Path with backslash C:\\Users\\Test")
+          expect(crit["long_description"]).to eq("Line1\rLine2\tTabbed")
+          expect(crit["ratings"][0]["description"]).to eq("Has = sign")
+        end
+
+        it "round-trips values containing colons and equals signs" do
+          original = {
+            criteria: [
+              {
+                id: "c1",
+                description: "This:has:colons=and=equals",
+                long_description: "Colon: inside and equals=inside",
+                ratings: [
+                  { id: "r1", description: "Rating:one=1", long_description: "Details:with=equals", points: 5 }
+                ]
+              }
+            ]
+          }.to_json
+
+          rubric = Rubric.new
+          text = rubric.rubric_to_text(original)
+          regenerated = rubric.text_to_rubric(text, original, 1, 20, false)
+          parsed = JSON.parse(regenerated)
+
+          crit = parsed["criteria"][0]
+          expect(crit["description"]).to eq("This:has:colons=and=equals")
+          expect(crit["long_description"]).to eq("Colon: inside and equals=inside")
+          expect(crit["ratings"][0]["description"]).to eq("Rating:one=1")
+          expect(crit["ratings"][0]["long_description"]).to eq("Details:with=equals")
+        end
       end
     end
   end
