@@ -2271,6 +2271,7 @@ hu:
   adds_an_account_course_setting_for_a_default_due_t_9903738a: "Fiók-/kurzusbeállítás hozzáadása az új feladatok alapértelmezett esedékességi idejéhez"
   adds_an_emoji_picker_that_allows_students_and_teac_cf517b1b: "Hangulatjelválasztó hozzáadása, amely lehetővé teszi a hangulatjelek használatát a hallgatók és oktatók számára a megjegyzések hozzáadásánál"
   adds_analytics_link_on_the_user_settings_menu_3a048816: "Analitika hivatkozás hozzáadása a felhasználói beállítások menübe"
+  adds_analytics_to_a_student_s_context_card_43560ed9: "Analitika hozzáadása a hallgató tartalmi kártyájához"
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Analitika hozzáadása a hallgató tartalmi kártyájához"
   adds_granular_permissions_for_adding_and_removing__e1e484a3: "Részletes engedélyeket ad hozzá az egyes szerepkörök hozzáadásához és eltávolításához, valamint külön engedélyt az egyéb kurzusadminisztrátori műveletekhez"
   adds_menu_option_for_accessing_alignments_at_the_o_6d3bce6: "Hozzáad egy menüpontot az eredményszintű összehangolások eléréséhez a Javított eredménykezeléssel."
@@ -2572,6 +2573,7 @@ hu:
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "Ismétlődő naptári események ütemezésének engedélyezése"
   allows_user_access_to_lti_sub_navigation_tool_sele_2bdf577: "Engedélyezi a felhasználó számára a hozzáférést az LTI al-navigációs eszköz kiválasztásához a hozzárendelési tananyag konfigurációjához."
   allows_user_to_access_a_user_s_settings_menu_and_u_235d8fd8: "Engedélyezi a felhasználó számára, hogy hozzáférjen a felhasználói beállítások menüjéhez és a felhasználói adatokhoz."
+  allows_user_to_access_a_user_s_settings_menu_and_u_37f4692e: "Engedélyezi a felhasználó számára, hogy hozzáférjen a felhasználói beállítások menüjéhez és a felhasználói adatokhoz."
   allows_user_to_access_and_edit_the_admin_settings__e45da9d7: "Engedélyezi a felhasználónak a Commons rendszergazdai beállításainak elérését és szerkesztését."
   allows_user_to_access_and_manage_canvas_data_servi_ee75e004: "Engedélyezi a felhasználó számára a Canvas Data Services elérését és kezelését."
   allows_user_to_access_gradebook_history_9d599681: "Engedélyezi a felhasználó számára, hogy hozzáférjen az Osztálynapló előzményekhez."
@@ -2609,6 +2611,7 @@ hu:
   allows_user_to_add_edit_delete_and_publish_and_unp_5b1059b: "Engedélyezi a felhasználó számára feladatok hozzáadását, szerkesztését, törlését, valamint közzétételét és közzétételének visszavonását."
   allows_user_to_add_edit_delete_and_publish_and_unp_5f5b97aa: "Engedélyezi a felhasználók számára kvízek hozzáadását, szerkesztését, törlését, közzétételét és közzétételének visszavonását."
   allows_user_to_add_events_to_calendar_list_view_da_1d15328d: " Engedélyezi a felhasználó számára, hogy eseményeket adjon hozzá a Naptárlista nézet vezérlőpultjához a Hozzáadás a hallgatói teendőkhöz jelölőnégyzet segítségével. "
+  allows_user_to_add_events_to_calendar_list_view_da_c78d0c41: " Engedélyezi a felhasználó számára, hogy eseményeket adjon hozzá a Naptárlista nézet vezérlőpultjához a Hozzáadás a hallgatói teendőkhöz jelölőnégyzet segítségével. "
   allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: "Engedélyezi a felhasználónak, hogy eseményeket adjon hozzá az irányítópult listanézetéhez a Hozzáadás a hallgatói feladatokhoz jelölőnégyzet segítségével."
   allows_user_to_add_events_to_list_view_dashboard_v_2ad5de25: "Engedélyezi a felhasználónak, hogy eseményeket adjon hozzá a Listanézet vezérlőpultjához a Hozzáadás a tanulói feladatokhoz jelölőnégyzet segítségével."
   allows_user_to_add_external_app_icons_to_the_rich__27174e71: "Engedélyezi a felhasználó számára, hogy külső alkalmazásikonokat adjon hozzá a Rich Content Editor eszköztárához."
@@ -2685,6 +2688,7 @@ hu:
   allows_user_to_duplicate_assignments_in_a_course_a3bf4f54: "Engedélyezi a felhasználók számára, hogy megkettőzzenek egy kurzuson belüli feladatokat."
   allows_user_to_duplicate_quizzes_in_a_course_1d3437f2: "Engedélyezi a felhasználó számára a kvízek megkettőzését egy kurzusban."
   allows_user_to_edit_a_list_of_assignment_blackout__9c734bf0: "Engedélyezi a felhasználó számára a hozzárendelési tilalmi időpontok listájának szerkesztését."
+  allows_user_to_edit_a_user_s_section_or_role_if_no_bc979122: "Engedélyezi a felhasználó számára egy felhasználói szekció vagy szerepkör szerkesztését (ha nem  a SIS-en keresztül adták hozzá)."
   allows_user_to_edit_a_user_s_section_or_role_if_no_cf272262: "Engedélyezi a felhasználó számára egy felhasználói szekció vagy szerepkör szerkesztését (ha nem  a SIS-en keresztül adták hozzá)."
   allows_user_to_edit_account_and_course_groups_259139c0: "Engedélyezi a felhasználó számára a fiók- és kurzuscsoportok szerkesztését."
   allows_user_to_edit_and_publish_a_course_pace_via__1ccb27ef: |-
@@ -2757,6 +2761,7 @@ hu:
   allows_user_to_randomly_assign_users_to_a_course_g_e866fc4: "Engedélyezi a felhasználó számára, hogy véletlenszerűen hozzárendeljen felhasználókat egy kurzuscsoporthoz."
   allows_user_to_randomly_assign_users_to_an_account_f6f24e8b: "Engedélyezi a felhasználó számára, hogy véletlenszerűen hozzárendeljen felhasználókat egy fiókhoz vagy kurzuscsoporthoz."
   allows_user_to_remove_a_course_as_a_course_templat_15e653d3: "Engedélyezi a felhasználó számára, hogy kurzussablonként eltávolítson egy kurzust a kurzusbeállításokban."
+  allows_user_to_remove_a_student_s_section_enrollme_38018d99: "Engedélyezi a felhasználó számára, hogy eltávolítsa egy tanuló szekcióba való beiratkozását vagy szerepkörét."
   allows_user_to_remove_a_student_s_section_enrollme_78d1916e: "Engedélyezi a felhasználó számára, hogy eltávolítsa egy tanuló szekcióba való beiratkozását vagy szerepkörét."
   allows_user_to_remove_and_merge_users_in_an_accoun_b7e1aec7: "Engedélyezi a felhasználók számára, hogy eltávolítsák és egyesítsék a felhasználókat egy fiókban."
   allows_user_to_remove_assignment_blackout_dates_804b1d6d: "Engedélyezi a felhasználó számára a hozzárendelési tilalmi időpontok eltávolítását."
@@ -2788,7 +2793,9 @@ hu:
   allows_user_to_select_final_grade_for_moderated_as_c5e28a9c: "Engedélyezi a felhasználó számára, hogy végső osztályzatot válasszon ki a moderált feladatokhoz."
   allows_user_to_send_a_message_in_conversations_wit_d48abf1a: "Engedélyezi a felhasználó számára, hogy kurzus kiválasztása nélkül küldjön üzenetet a Beszélgetésekben."
   allows_user_to_send_a_message_to_all_in_course_nam_4f41b5a2: "Engedélyezi a felhasználó számára, hogy üzenetet küldjön a „Minden itt: [kurzus neve]” vagy „Minden a [kurzuscsoportban]” címre."
+  allows_user_to_send_a_message_to_all_in_course_nam_7340c066: "Engedélyezi a felhasználó számára, hogy üzenetet küldjön a „Minden itt: [kurzus neve]” vagy „Minden a [kurzuscsoportban]” címre."
   allows_user_to_send_a_message_to_all_in_course_nam_992e425: "Engedélyezi a felhasználó számára, hogy üzenetet küldjön a „Minden itt: [kurzus neve]” vagy „Minden a [kurzuscsoportban]” címre."
+  allows_user_to_send_a_message_to_all_in_course_nam_ab3f18d0: "Engedélyezi a felhasználó számára, hogy üzenetet küldjön a „Minden itt: [kurzus neve]” vagy „Minden a [kurzuscsoportban]” címre."
   allows_user_to_send_messages_to_individual_course__9347e1e2: "Engedélyezi a felhasználó számára, hogy üzeneteket küldjön a kurzus egyes tagjainak."
   allows_user_to_set_a_template_for_an_account_34fe3695: "Engedélyezi a felhasználó számára, hogy sablont állítson be egy fiókhoz."
   allows_user_to_set_an_account_to_not_use_a_templat_d34fe23c: "Engedélyezi a felhasználó számára, hogy úgy állítsa be fiókját, hogy ne használjon sablont."
@@ -2799,9 +2806,11 @@ hu:
   allows_user_to_start_conferences_they_created_281b03ea: "Engedélyezi a felhasználó számára az általa létrehozott konferenciák elindítását."
   allows_user_to_sync_blueprint_courses_db4fcc03: "Engedélyezi a felhasználó számára a Blueprint kurzusok szinkronizálását."
   allows_user_to_update_a_student_s_section_enrollme_80420ac9: "Engedélyezi a felhasználó számára, hogy frissítse a tanuló szekcióba való beiratkozását vagy szerepkörét."
+  allows_user_to_update_a_student_s_section_enrollme_be9a15e8: "Engedélyezi a felhasználó számára, hogy frissítse a tanuló szekcióba való beiratkozását vagy szerepkörét."
   allows_user_to_update_modules_edit_module_settings_3a2636b: "Engedélyezi a felhasználó számára a modulok frissítését (modulbeállítások szerkesztése,közzététel, közzététel megszüntetése, kötegelt szerkesztés, modulok hozzárendelése).                        "
   allows_user_to_view_a_content_migration_content_li_6906f889: "Engedélyezi a felhasználó számára a tartalom áttelepítésének tartalomjegyzékének típusonkénti megtekintését."
   allows_user_to_view_a_content_migration_notice_to__f4759b8a: "Engedélyezi a felhasználó számára, hogy megtekinthesse a \"folyamatban lévő importálás\" tartalmi migrációs értesítését."
+  allows_user_to_view_a_course_s_sis_id_2a342763: "Engedélyezi a felhasználó számára a kurzus SIS azonosítójának megtekintését."
   allows_user_to_view_a_course_s_sis_id_5c4a4c50: "Engedélyezi a felhasználó számára a kurzus SIS azonosítójának megtekintését."
   allows_user_to_view_a_link_to_speedgrader_from_ass_8ed9b342: "Engedélyezi a felhasználó számára a Gyorsértékelőre mutató hivatkozások megtekintését a feladatokból."
   allows_user_to_view_a_link_to_the_faculty_journal__61d71a94: "Engedélyezi a felhasználónak, hogy megtekintsen egy hivatkozást az intézményi naplóra a Felhasználó adatai oldal oldalsávjában."
@@ -2814,6 +2823,7 @@ hu:
   allows_user_to_view_and_add_users_in_a_collaborati_9ec3c68b: "Engedélyezi a felhasználók számára, hogy megtekintsenek és hozzáadjanak felhasználókat egy együttműködésben."
   allows_user_to_view_and_configure_reports_in_accou_d3cee49f: "Engedélyezi a felhasználó számára a jelentések megtekintését és konfigurálását a Fiókbeállításokban."
   allows_user_to_view_and_edit_the_sis_id_and_integr_af6dc3f3: "Engedélyezi a felhasználónak a SIS-azonosító és az integrációs azonosító megtekintését és szerkesztését a felhasználó bejelentkezési adatai között."
+  allows_user_to_view_and_edit_the_sis_id_and_integr_c68a90fb: "Engedélyezi a felhasználónak a SIS-azonosító és az integrációs azonosító megtekintését és szerkesztését a felhasználó bejelentkezési adatai között."
   allows_user_to_view_and_initiate_course_link_valid_982986c9: "Engedélyezi a felhasználó számára, hogy megtekintse és kezdeményezze a kurzus linkek érvényesítését.\n\
       \x20       "
   allows_user_to_view_and_insert_data_in_the_sis_id__921967c: "Engedélyezi a felhasználó számára, hogy adatokat tekintsen meg és szúrjon be a SIS ID mezőbe."
@@ -2902,6 +2912,7 @@ hu:
   allows_user_to_view_the_reset_course_content_butto_75c8c410: "Engedélyezi a felhasználó számára a Kurzustartalom visszaállítása gomb megtekintését."
   allows_user_to_view_the_rubrics_link_in_course_nav_41052c80: "Engedélyezi a felhasználó számára az Értékelőtáblák hivatkozás megtekintését a kurzusnavigációban."
   allows_user_to_view_the_sis_id_in_a_user_s_login_d_71e0922b: "Engedélyezi a felhasználónak, hogy megtekintse a SIS-azonosítót a felhasználó bejelentkezési adatai között."
+  allows_user_to_view_the_sis_id_in_a_user_s_login_d_ff770220: "Engedélyezi a felhasználónak, hogy megtekintse a SIS-azonosítót a felhasználó bejelentkezési adatai között."
   allows_user_to_view_the_user_sis_id_column_in_the__265cb234: "Engedélyezi a felhasználónak, hogy megtekintse a felhasználói SIS-azonosító oszlopot a kvízelemzési CSV-fájlban."
   allows_user_to_view_user_details_for_course_users_ec1b6218: "Engedélyezi a felhasználó számára, hogy megtekintse a kurzus felhasználóinak felhasználói adatait."
   allows_user_to_view_user_sis_ids_68a9d218: "Engedélyezi a felhasználó számára a felhasználói SIS-azonosítók megtekintését."
@@ -10033,6 +10044,10 @@ hu:
   english_united_kingdom_a613f831: "English (United Kingdom)"
   enhance_color_contrast_of_content_685ddd49: "A tartalom színkontrasztjának javítása"
   enhance_password_options_efbf3e48: "Jelszóopciók bővítése"
+  enhanced-rubrics-assignment-container: 
+    discussion_points_possible: 
+      one: "%{count} elérhető pont"
+      other: "elérhető pont: %{count} "
   enhanced_docviewer_url_security_72e9baa9: "Továbbfejlesztett DocViewer URL biztonság"
   enhanced_gradebook_filters_a3be5e7d: "Továbbfejlesztett osztálynapló szűrők"
   enhanced_gradebook_filters_description: "Ez a funkció javítja a Canvas-élményt a Fórumokon és a Hirdetményeken belül. Ha ez a jelző engedélyezve van, minden kiadáskor automatikusan megjelenik a folyamatban lévő fejlesztésekhez való korai hozzáférés. A részletekért tekintse meg a Canvas közösség *Gradebook Filters User Group felhasználói csoportját*."
@@ -12694,6 +12709,7 @@ hu:
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "Ha egy paraméter nem véglegesként van megjelölve, akkor csak akkor lesz használva, amikor a Just in Time Provisioning egy új felhasználót hoz létre, és nem minden bejelentkezés alkalmával. "
   if_an_enrollment_is_created_via_sis_only_admins_ca_729493d3: "Ha a beiratkozás a SIS-en keresztül jön létre, csak az adminisztrátorok távolíthatják el a jelentkezést a kurzusról."
   if_blueprint_courses_add_edit_associate_delete_and_9ebd192d: "Ha a Blueprint kurzusok - hozzáadása / szerkesztése / társítása / törlése és a Kurzusok - kezelése engedélyezve van, de a Feladatok és kvízek - szerkesztés nincs engedélyezve, akkor a feladat blueprint zárolási beállításai a feladat részleteit tartalmazó oldalon kezelhetők."
+  if_blueprint_courses_add_edit_associate_delete_and_b1135b2: "Ha a Blueprint kurzusok - hozzáadása / szerkesztése / társítása / törlése és a Kurzusok - kezelése engedélyezve van, de a Feladatok és kvízek - szerkesztés nincs engedélyezve, akkor a feladat blueprint zárolási beállításai a feladat részleteit tartalmazó oldalon kezelhetők."
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "Ha az érdemjegyek – szerkesztés és érdemjegyek – az összes érdemjegy megtekintése is le van tiltva, az Osztálynapló el lesz rejtve a kurzusnavigáció elől."
   if_checkpoints_are_defined_forcheckpoints_true_mus_865a0b5b: "Ha ellenőrzési pontok vannak definiálva, forCheckpoints:igazat kell beállítani a fórumtéma feladathoz.\n\
       \x20       "
@@ -25268,6 +25284,7 @@ hu:
   this_panel_lists_the_users_ready_to_be_added_to_th_79efad22: "Ez a panel felsorolja a kurzushoz hozzáadható felhasználókat."
   this_permission_must_be_disabled_for_users_to_only_451cfcc5: "Ezt a jogosultságot le kell tiltani ahhoz, hogy a felhasználók csak az általuk létrehozott, egy másik felhasználó által megosztott vagy közvetve, az oktatóként beiratkozott kurzuson keresztül megosztott itembankokat tekinthessék meg."
   this_permission_only_affects_course_announcements__6bc2b0a5: "Ez a jogosultság csak a kurzushirdetésekre vonatkozik; a globális hirdetések kezeléséhez engedélyezni kell a Globális hirdetések - hozzáadás / szerkesztés / törlés opciót."
+  this_permission_only_affects_course_announcements__897b8de8: "Ez a jogosultság csak a kurzushirdetésekre vonatkozik; a globális hirdetések kezeléséhez engedélyezni kell a Globális hirdetések - hozzáadás / szerkesztés / törlés opciót."
   this_permission_requires_the_account_and_course_le_618da734: "Ehhez az engedélyhez a Fiók- és kurzusspecifikus eredmények mesterfokú skálái funkció opcióra van szükség, amelyet az ügyfélsiker-menedzsernek kell engedélyeznie."
   this_permission_requires_the_account_and_course_le_bdeefd51: |-
       Ehhez az engedélyhez szükséges a Fiók- és kurzusszintű kimenetel-mesterségi skálák funkció opció, amely
@@ -25797,10 +25814,14 @@ hu:
   to_do_time_a7e17623: "Teendő idő"
   to_edit_a_discussion_discussions_moderate_must_als_bd4c60f7: "Egy fórum szerkesztéséhez a Fórumok - moderálás funkciót is engedélyezni kell."
   to_edit_a_student_s_section_conversations_send_to__12a2623f: "Egy hallgató szekciójának szerkesztéséhez a Beszélgetések - küldés az egyes kurzustagoknak opciót is engedélyezni kell."
+  to_edit_a_student_s_section_conversations_send_to__c8c81493: "Egy hallgató szekciójának szerkesztéséhez a Beszélgetések - küldés az egyes kurzustagoknak opciót is engedélyezni kell."
+  to_edit_a_user_s_section_conversations_send_to_ind_3f9df116: "Egy felhasználó szekciójának szerkesztéséhez engedélyezni kell a Beszélgetések - küldés az egyes kurzustagoknak opciót."
   to_edit_a_user_s_section_conversations_send_to_ind_a54de83d: "Egy felhasználó szekciójának szerkesztéséhez engedélyezni kell a Beszélgetések - küldés az egyes kurzustagoknak opciót."
   to_edit_a_user_s_section_the_appropriate_users_per_31b7a90d: "Egy felhasználó szekciójának szerkesztéséhez engedélyezni kell a megfelelő Felhasználók engedélyt (pl. Felhasználók - Tanárok), a Felhasználók - Adminisztratív műveletek   engedélyezése a kurzusokban és a Beszélgetések - Küldés az egyes kurzustagoknak engedélyt is."
+  to_edit_a_user_s_section_the_appropriate_users_per_4c6dd7de: "Egy felhasználó szekciójának szerkesztéséhez engedélyezni kell a megfelelő Felhasználók engedélyt (pl. Felhasználók - Tanárok), a Felhasználók - Adminisztratív műveletek   engedélyezése a kurzusokban és a Beszélgetések - Küldés az egyes kurzustagoknak engedélyt is."
   to_edit_a_user_s_section_users_allow_administrativ_69b3cdaa: " Egy felhasználó szekciójának szerkesztéséhez a Felhasználók - Adminisztrációs műveletek engedélyezése a kurzusokban és a Felhasználók - lista megtekintése opciót is engedélyezni kell. "
   to_edit_a_user_s_section_users_allow_administrativ_966b3fcc: "Egy felhasználó szekciójának szerkesztéséhez a Felhasználók - Adminisztrációs műveletek engedélyezése a kurzusokban és a Felhasználók - lista megtekintése opciót is engedélyezni kell."
+  to_edit_a_user_s_section_users_allow_administrativ_9c445151: "Egy felhasználó szekciójának szerkesztéséhez a Felhasználók - Adminisztrációs műveletek engedélyezése a kurzusokban és a Felhasználók - lista megtekintése opciót is engedélyezni kell."
   to_edit_assignment_details_on_individual_discussio_99f718a7: "Az egyes fórumokok feladatainak szerkesztéséhez a Fórumok - kezelése funkciót is engedélyezni kell.        "
   to_edit_blueprint_lock_settings_from_the_discussio_66c1f4d3: "A Blueprint zárolási beállításainak szerkesztéséhez a Fórumok index oldalon Fórumok – moderálás lehetőséget is engedélyezni kell."
   to_edit_course_grading_schemes_courses_manage_must_b6de9dbc: "A kurzusok osztályozási sémáinak szerkesztéséhez a Kurzusok - kezelése funkciót is engedélyezni kell."
@@ -25849,6 +25870,7 @@ hu:
       A kapcsolódó kurzusok kezeléséhez a Kurzusok - lista megtekintése és a Kurzusok -
                                     hozzáadás funkciót is engedélyezni kell.
   to_manage_associated_courses_courses_view_list_and_e0ec8c09: "A társított kurzusok kezeléséhez engedélyezni kell a Kurzusok - lista megtekintése és a Kurzusok - kezelés/frissítés lehetőséget is."
+  to_manage_course_announcements_discussions_moderat_498f3d80: "A kurzushirdetmények kezeléséhez a Fórumok - moderálás funkciót is engedélyezni kell."
   to_manage_course_announcements_discussions_moderat_5f02f46e: "A kurzushirdetmények kezeléséhez a Fórumok - moderálás funkciót is engedélyezni kell."
   to_manage_course_content_courses_manage_and_course_c7a49f42: "A kurzus tartalom kezeléséhez engedélyezni kell a kurzusok - kezelése és a kurzus  tartalom - hozzáadás / szerkesztés / törlés funkciót."
   to_manage_discussions_discussions_moderate_must_al_834a8b9: "A fórumokok kezeléséhez a Fórumok - moderálás funkciót is engedélyezni kell."
@@ -25908,9 +25930,12 @@ hu:
   to_share_a_discussion_to_commons_discussions_view__ef6c015a: "Ahhoz, hogy megoszthasson egy Fórumot a Commonsban, a Megviták - nézet opciót is engedélyezni kell."
   to_toggle_microsoft_teams_sync_you_need_to_input_a_d32476b0: "A Microsoft Teams szinkronizálás bekapcsolásához be kell adnia egy bérlői tartományt.                        "
   to_upload_some_submissions_for_this_assignment_cli_22368328: "A feladathoz tartozó beadandók feltöltéséhez kattintson a fenti \"Vissza a feladathoz\" gombra."
+  to_view_a_user_s_integration_id_sis_data_manage_mu_6cac8ec9: "A felhasználó integrációs azonosítójának megtekintéséhez a SIS Data - manage funkciót is engedélyezni kell."
   to_view_a_user_s_integration_id_sis_data_manage_mu_99438830: "A felhasználó integrációs azonosítójának megtekintéséhez a SIS Data - manage funkciót is engedélyezni kell."
   to_view_a_user_s_login_details_users_view_list_and_6d42118b: "A felhasználók bejelentkezési adatainak megtekintéséhez a Felhasználók - lista megtekintése és a Felhasználók bejelentkezési adatainak módosítása is engedélyezve kell lennie."
+  to_view_a_user_s_login_details_users_view_list_and_faa21c46: "A felhasználók bejelentkezési adatainak megtekintéséhez a Felhasználók - lista megtekintése és a Felhasználók bejelentkezési adatainak módosítása is engedélyezve kell lennie."
   to_view_a_user_s_sis_id_sis_data_manage_or_sis_dat_1f603502: "A felhasználó SIS-azonosítójának megtekintéséhez a SIS-adatok kezelése vagy a SIS-adatok olvasása funkciót is engedélyezni kell.                        "
+  to_view_a_user_s_sis_id_sis_data_manage_or_sis_dat_c673090a: "A felhasználó SIS-azonosítójának megtekintéséhez a SIS-adatok kezelése vagy a SIS-adatok olvasása funkciót is engedélyezni kell.                        "
   to_view_account_level_groups_groups_manage_must_al_ca16b035: "A fiókszintű csoportok megtekintéséhez a Csoportok - kezelése funkciót is engedélyezni kell."
   to_view_account_level_groups_users_view_list_must__3e933ddf: "A fiókszintű csoportok megtekintéséhez a Felhasználók - lista megtekintése opciót is engedélyezni kell."
   to_view_all_notifications_sent_to_a_canvas_user_se_6172daa: "Egy Canvas-felhasználónak küldött összes értesítés megtekintéséhez válassza ki a felhasználót és a keresés dátumtartományát."
@@ -25933,6 +25958,10 @@ hu:
       A felhasználó SIS-azonosítójának vagy integrációs azonosítójának megtekintéséhez vagy
                                     szerkesztéséhez a Felhasználók - lista megtekintése és a Felhasználók - bejelentkezési
                                     adatok kezelése funkciót is engedélyezni kell.
+  to_view_or_edit_a_user_s_sis_id_or_integration_id__9a8aef8b: |-
+      A felhasználó SIS-azonosítójának vagy integrációs azonosítójának megtekintéséhez vagy
+                                    szerkesztéséhez a Felhasználók - lista megtekintése és a Felhasználók - bejelentkezési
+                                    adatok kezelése funkciót is engedélyezni kell.
   to_view_recent_announcements_on_the_home_page_cour_5a91447e: "Ahhoz, hogy a legutóbbi hirdetmények a kezdőlapon megjelenjenek, a kurzus tartalma - nézetnek engedélyezve kell lennie, és a kurzus beállításai között be kell jelölni a Legutóbbi hirdetmények megjelenítése a kurzus kezdőlapján jelölőnégyzetet."
   to_view_recent_announcements_on_the_home_page_the__fbd8d115: "Ahhoz, hogy a legutóbbi hirdetmények a kezdőlapon megjelenjenek, a kurzus beállításaiban be kell jelölni a Legutóbbi hirdetmények                              megjelenítése a kurzus kezdőlapján jelölőnégyzetet."
   to_view_sis_ids_sis_data_read_must_be_enabled_12edce68: "A SIS-azonosítók megtekintéséhez engedélyezni kell a SIS-adatok olvasását."
@@ -25947,6 +25976,9 @@ hu:
   to_view_student_analytics_users_view_list_and_anal_41d32ecb: |-
       A Hallgatói analitika megtekintéséhez a Felhasználók - lista megtekintése és az
                                     Analitika - megtekintés funkciót is engedélyezni kell.
+  to_view_student_analytics_users_view_list_and_grad_44aa0d9d: "A Hallgatói elemzések megtekintéséhez a Felhasználók - lista megtekintése és az\n\
+      \x20                             Érettségi osztályzatok - összes osztályzat megtekintése funkciót is engedélyezni kell.\n\
+      \x20                       "
   to_view_student_analytics_users_view_list_and_grad_59d0da3e: "A Hallgatói elemzések megtekintéséhez a Felhasználók - lista megtekintése és az\n\
       \x20                             Érettségi osztályzatok - összes osztályzat megtekintése funkciót is engedélyezni kell.\n\
       \x20                       "
@@ -27002,6 +27034,7 @@ hu:
   users_allow_administrative_actions_in_courses_97a2eb19: "Felhasználók - engedélyezze az adminisztrációs műveleteket a kurzusokban"
   users_allowed_to_edit_this_page_d6d316d0: "Az oldal szerkesztéséhez engedélyezett felhasználók"
   users_and_terms_are_located_at_the_account_so_the__8f3258e6: "A felhasználók és a feltételek a fiókban találhatók, így a SIS végpont mindig megerősíti  a felhasználó jogosultságait a fióknak megfelelően."
+  users_and_terms_are_located_at_the_account_so_the__a4a7dc27: "A felhasználók és a feltételek a fiókban találhatók, így a SIS végpont mindig megerősíti  a felhasználó jogosultságait a fióknak megfelelően."
   users_can_access_and_create_but_not_edit_individua_59bcb8dd: "A felhasználók a Feladatokon keresztül hozzáférhetnek és létrehozhatnak (de nem szerkeszthetnek) egyéni feladat értékelőtáblákat, ha a Feladatok és tesztek - hozzáadás engedélyezve van."
   users_can_access_and_create_but_not_edit_individua_a0b26adf: "A felhasználók a Feladatokon keresztül hozzáférhetnek és létrehozhatnak (de nem szerkeszthetnek) egyéni feladat értékelőtáblákat, ha a kurzus tartalom - megtekintés és a Feladatok és tesztek - hozzáadás engedélyezve van."
   users_can_add_this_calendar_to_their_other_calenda_69daaa69: "A felhasználók hozzáadhatják ezt a naptárat az \"Egyéb naptárak\" listához."
