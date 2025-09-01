@@ -6555,6 +6555,10 @@ hy:
   end_date_e0093ed7: "Ավարտման ամսաթիվ"
   ending_date_e1ea13a4: "Ավարտման ամսաթիվ"
   ends_e3a6843f: Ավարտը
+  enhanced-rubrics-assignment-container: 
+    discussion_points_possible: 
+      one: "%{count} հնարավոր միավոր"
+      other: "%{count} հնարավոր միավորներ"
   enhanced_individual_gradebook: 
     avg_score: "Միջին գնահատական"
     high_score: "Բարձր գնահատական"
