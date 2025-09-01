@@ -60,6 +60,7 @@ class YoutubeMigrationService
     return progress if progress && (progress.pending? || progress.running?)
 
     progress = Progress.create!(tag: SCAN_TAG, context: course)
+
     # Use n_strand to make sure not monopolize the workpool
     n_strand = "youtube_embed_scan_#{course.global_id}"
     progress.process_job(self, :scan, { n_strand: })
@@ -71,9 +72,24 @@ class YoutubeMigrationService
     resources_with_embeds = service.scan_course_for_embeds
     total_count = resources_with_embeds.values.sum { |resource| resource[:count] || 0 }
     progress.set_results({ resources: resources_with_embeds, total_count:, completed_at: Time.now.utc })
+
+    call_external_tool(progress.context, progress.id) if new_quizzes?(progress.context)
   rescue
     report_id = Canvas::Errors.capture_exception(:youtube_embed_scan, $ERROR_INFO)[:error_report]
     progress.set_results({ error_report_id: report_id, completed_at: Time.now.utc })
+  end
+
+  def self.call_external_tool(course, scan_id)
+    payload = Struct.new(:scan_id, :course_id, :external_context_id).new(
+      scan_id,
+      course.id,
+      course.lti_context_id
+    )
+    Canvas::LiveEvents.scan_youtube_links(payload)
+  end
+
+  def self.new_quizzes?(course)
+    Account.site_admin.feature_enabled?(:new_quizzes_scanning_youtube_links) && course.assignments.active.type_quiz_lti.any?
   end
 
   def self.generate_resource_key(type, id)
