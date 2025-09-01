@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 require_relative "../../common"
 require_relative "../components/block_component"
+require_relative "../components/toolbar_component"
 
 module BlockContentEditorPage
   def add_block_modal_selector
@@ -98,6 +99,10 @@ module BlockContentEditorPage
 
   def last_block
     blocks.last
+  end
+
+  def toolbar_component
+    ToolbarComponent.new
   end
 
   def create_wiki_page_with_block_content_editor(course)

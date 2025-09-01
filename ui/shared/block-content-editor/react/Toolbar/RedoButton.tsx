@@ -32,6 +32,7 @@ export const RedoButton = (props: {
       screenReaderLabel={I18n.t('redo')}
       renderIcon={<IconForwardLine />}
       onClick={props.onClick}
+      data-testid="redo-button"
     />
   )
 }
