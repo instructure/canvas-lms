@@ -219,6 +219,7 @@
     "zustand": "^4.5.5"
   },
   "devDependencies": {
+    "@module-federation/enhanced": "^0.14.3",
     "@babel/cli": "^7.0.0",
     "@babel/core": "^7.0.0",
     "@babel/parser": "^7",
