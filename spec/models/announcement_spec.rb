@@ -300,26 +300,43 @@ describe Announcement do
       end.to change { @a.messages_sent[notification_name] }
     end
 
-    it "does not broadcast on update if announcement is locked_for user" do
-      course_with_student(active_all: true)
-      notification_name = "New Announcement"
-      Notification.create(name: notification_name, category: "TestImmediately")
+    context "with different locked_for states" do
+      it "does not broadcast on update if announcement is locked_for user" do
+        course_with_student(active_all: true)
+        notification_name = "New Announcement"
+        Notification.create(name: notification_name, category: "TestImmediately")
 
-      pseudo_teacher_role = @course.account.roles.create!(
-        name: "Pseudo Teacher",
-        base_role_type: "StudentEnrollment"
-      )
-      pseudo_teacher = user_factory(active_all: true)
-      # pseudo teacher have been enrolled as a teacher but only has user permissions
-      # hence no matter what his enrollement is, he should not receive the announcement
-      @course.enroll_user(pseudo_teacher, "TeacherEnrollment", role: pseudo_teacher_role, enrollment_state: "active")
-      communication_channel(pseudo_teacher)
+        pseudo_teacher_role = @course.account.roles.create!(
+          name: "Pseudo Teacher",
+          base_role_type: "StudentEnrollment"
+        )
+        pseudo_teacher = user_factory(active_all: true)
+        # pseudo teacher have been enrolled as a teacher but only has user permissions
+        # hence no matter what his enrollement is, he should not receive the announcement
+        @course.enroll_user(pseudo_teacher, "TeacherEnrollment", role: pseudo_teacher_role, enrollment_state: "active")
+        communication_channel(pseudo_teacher)
 
-      announcement_model(user: @teacher, context: @course)
+        announcement_model(user: @teacher, context: @course)
 
-      @a.update!(message: "Updated message", notify_users: true)
-      to_users = @a.messages_sent[notification_name].map(&:user)
-      expect(to_users).not_to include(pseudo_teacher)
+        @a.update!(message: "Updated message", notify_users: true)
+        to_users = @a.messages_sent[notification_name].map(&:user)
+        expect(to_users).not_to include(pseudo_teacher)
+      end
+
+      it "does broadcast if announcement is locked for comments" do
+        # the locked_for? method returns a hash if the user is only able to see the announcement but not comment
+        course_with_student(active_all: true)
+        notification_name = "New Announcement"
+        Notification.create(name: notification_name, category: "TestImmediately")
+
+        second_teacher = user_factory(active_all: true)
+        @course.enroll_teacher(second_teacher, enrollment_state: "active")
+
+        announcement_model(user: @teacher, context: @course, locked: true)
+
+        expect(@a.messages_sent[notification_name].map(&:user)).to include(@student)
+        expect(@a.messages_sent[notification_name].map(&:user)).to include(second_teacher)
+      end
     end
   end
 
