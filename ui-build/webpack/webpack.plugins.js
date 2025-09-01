@@ -26,9 +26,7 @@ const {
 const MomentTimezoneDataPlugin = require('moment-timezone-data-webpack-plugin')
 const {WebpackManifestPlugin} = require('rspack-manifest-plugin')
 const {RetryChunkLoadPlugin} = require('webpack-retry-chunk-load-plugin')
-const {
-  container: {ModuleFederationPlugin},
-} = require('@rspack/core')
+const {ModuleFederationPlugin} = require('@module-federation/enhanced/rspack')
 const WebpackHooks = require('./webpackHooks')
 const {
   fetchSpeedGraderLibrary,
