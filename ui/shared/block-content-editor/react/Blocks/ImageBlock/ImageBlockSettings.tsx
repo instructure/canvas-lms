@@ -43,9 +43,9 @@ export const ImageBlockSettings = () => {
     url,
     fileName,
   } = useNode(node => ({
-    includeBlockTitle: !!node.data.props.settings?.includeBlockTitle,
-    backgroundColor: node.data.props.settings?.backgroundColor,
-    textColor: node.data.props.settings?.textColor,
+    includeBlockTitle: !!node.data.props.includeBlockTitle,
+    backgroundColor: node.data.props.backgroundColor,
+    textColor: node.data.props.textColor,
     caption: node.data.props.caption,
     altText: node.data.props.altText,
     altTextAsCaption: node.data.props.altTextAsCaption,
@@ -56,19 +56,19 @@ export const ImageBlockSettings = () => {
 
   const handleIncludeBlockTitleChange = () => {
     setProp((props: ImageBlockProps) => {
-      props.settings.includeBlockTitle = !includeBlockTitle
+      props.includeBlockTitle = !includeBlockTitle
     })
   }
 
   const handleBackgroundColorChange = (color: string) => {
     setProp((props: ImageBlockProps) => {
-      props.settings.backgroundColor = color
+      props.backgroundColor = color
     })
   }
 
   const handleTextColorChange = (color: string) => {
     setProp((props: ImageBlockProps) => {
-      props.settings.textColor = color
+      props.textColor = color
     })
   }
 
