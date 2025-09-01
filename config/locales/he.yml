@@ -2031,6 +2031,7 @@ he:
   addressbook_microservice_a4940422: "שרות מיקרו עבור פנקס הכתובות"
   addressbook_performance_tap_98ddf67: "הקשה על ביצועי ספר הכתובות "
   adds_analytics_link_on_the_user_settings_menu_3a048816: "מוסיף קישור analytics בתפריט הגדרות המשתמש"
+  adds_analytics_to_a_student_s_context_card_43560ed9: "מוסיף  analytics להקשר של כרטיס התלמיד "
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "מוסיף  analytics להקשר של כרטיס התלמיד "
   adjust_events_and_due_dates_879744fc: "התאמת אירועים ותאריכי יעד"
   adjust_final_grade_fa45e7e0: "התאמת ההערכה המסכמת"
@@ -7820,6 +7821,11 @@ he:
   ends_4fcb632: "מסתיים:"
   ends_at_9a62b528: "מסתיים ב"
   ends_e3a6843f: מסתיים
+  enhanced-rubrics-assignment-container: 
+    discussion_points_possible: 
+      one: " נקודה %{count} אפשרית"
+      other: "%{count} נקודות אפשריות"
+      two: "%{count} נקודות אפשריות"
   enhanced_individual_gradebook: 
     avg_score: "ציון ממוצע"
     high_score: "ציון גבוה"
