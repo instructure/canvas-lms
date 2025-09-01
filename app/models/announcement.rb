@@ -215,6 +215,9 @@ class Announcement < DiscussionTopic
   def new_announcement_recipients
     potential_recipients = active_participants_include_tas_and_teachers(true).without(user)
     recipients = users_with_permissions(potential_recipients)
-    recipients.reject { |u| locked_for?(u, check_policies: true) }
+    recipients.reject do |u|
+      locked_for = locked_for?(u, check_policies: true)
+      locked_for && !locked_for[:can_view]
+    end
   end
 end
