@@ -8103,6 +8103,10 @@ tr:
   ends_at_9a62b528: "Şu zaman bitiyor"
   ends_e3a6843f: Bitiyor
   english_c60612e2: İngilizce
+  enhanced-rubrics-assignment-container: 
+    discussion_points_possible: 
+      one: "%{count} olası puan"
+      other: "%{count} olası puan"
   enhanced_individual_gradebook: 
     avg_score: "Ortalama Puan"
     high_score: "Yüksek Puan"
