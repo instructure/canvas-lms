@@ -17,6 +17,7 @@
  */
 
 import React, {useRef} from 'react'
+import {getAccessToken, refreshToken, getUser} from './auth'
 
 interface AmsModule {
   render: (container: HTMLElement, config: {routerBasename: string}) => void
@@ -42,6 +43,11 @@ export function Component(): JSX.Element | null {
             routerBasename: ENV.context_url ?? '',
             themeOverrides: window.CANVAS_ACTIVE_BRAND_VARIABLES ?? null,
             useHighContrast: ENV.use_high_contrast ?? false,
+            auth: {
+              getAccessToken,
+              refreshToken,
+              getUser,
+            },
           })
         }
       })
