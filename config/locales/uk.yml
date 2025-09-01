@@ -7152,6 +7152,12 @@ uk:
   ends_4fcb632: "Закінчення:"
   ends_at_9a62b528: "Закінчується в:"
   ends_e3a6843f: Кінці
+  enhanced-rubrics-assignment-container: 
+    discussion_points_possible: 
+      few: "%{count} можливих балів"
+      many: "%{count} можливих балів"
+      one: "%{count} можливий бал"
+      other: "%{count} можливих балів"
   enhanced_individual_gradebook: 
     avg_score: "Середній бал"
     high_score: "Висока оцінка"
