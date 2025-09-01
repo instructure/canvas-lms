@@ -33,8 +33,8 @@ const I18n = createI18nScope('block_content_editor')
 const ImageBlockView = (props: ImageBlockProps) => {
   return (
     <Flex direction="column" gap="mediumSmall">
-      {props.settings.includeBlockTitle && (
-        <TitleView contentColor={props.settings.textColor || ''} title={props.title} />
+      {props.includeBlockTitle && (
+        <TitleView contentColor={props.textColor || ''} title={props.title} />
       )}
       <ImageView {...props} />
     </Flex>
@@ -44,8 +44,8 @@ const ImageBlockView = (props: ImageBlockProps) => {
 const ImageBlockEditView = (props: ImageBlockProps) => {
   return (
     <>
-      {props.settings.includeBlockTitle && (
-        <TitleEditPreview contentColor={props.settings.textColor || ''} title={props.title} />
+      {props.includeBlockTitle && (
+        <TitleEditPreview contentColor={props.textColor || ''} title={props.title} />
       )}
       <ImageView {...props} />
     </>
@@ -59,7 +59,7 @@ const ImageBlockEdit = (props: ImageBlockProps) => {
 
   return (
     <>
-      {props.settings.includeBlockTitle && <TitleEdit title={title} onTitleChange={setTitle} />}
+      {props.includeBlockTitle && <TitleEdit title={title} onTitleChange={setTitle} />}
       <ImageEdit {...props} onImageChange={data => save({...data})} />
     </>
   )
@@ -73,7 +73,7 @@ export const ImageBlock = (props: ImageBlockProps) => {
       EditViewComponent={ImageBlockEditView}
       componentProps={props}
       title={ImageBlock.craft.displayName}
-      backgroundColor={props.settings.backgroundColor}
+      backgroundColor={props.backgroundColor}
     />
   )
 }

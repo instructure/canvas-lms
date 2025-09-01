@@ -29,7 +29,9 @@ describe('ImageBlock', () => {
   it('should render without crashing', () => {
     renderBlock(ImageBlock, {
       title: '',
-      settings: {includeBlockTitle: false, backgroundColor: 'color', textColor: 'color'},
+      includeBlockTitle: false,
+      backgroundColor: 'color',
+      textColor: 'color',
       url: 'https://example.com/image.jpg',
       altText: 'Example Image',
       caption: 'This is an example image.',

@@ -19,12 +19,7 @@
 import {ImageBlockSettings} from '../ImageBlockSettings'
 import {renderBlock} from '../../__tests__/render-helper'
 import userEvent from '@testing-library/user-event'
-import {ImageTextBlockSettings} from '../../ImageTextBlock/ImageTextBlockSettings'
 import {RenderResult, waitFor} from '@testing-library/react'
-
-const getSettings = (settings: object) => ({
-  settings: {...settings},
-})
 
 const color = '123456'
 
@@ -36,7 +31,7 @@ const toggleSection = async (component: RenderResult, name: RegExp | string) => 
 describe('ImageBlockSettings', () => {
   describe('include title', () => {
     it('integrates, changing the state', async () => {
-      const component = renderBlock(ImageBlockSettings, getSettings({includeBlockTitle: false}))
+      const component = renderBlock(ImageBlockSettings, {includeBlockTitle: false})
       const checkbox = component.getByLabelText(/Include block title/i)
       expect(checkbox).not.toBeChecked()
       await userEvent.click(checkbox)
@@ -105,10 +100,7 @@ describe('ImageBlockSettings', () => {
 
   describe('background color', () => {
     it('integrates, changing the state', async () => {
-      const component = renderBlock(
-        ImageTextBlockSettings,
-        getSettings({backgroundColor: '000000'}),
-      )
+      const component = renderBlock(ImageBlockSettings, {backgroundColor: '000000'})
       await toggleSection(component, /Expand color settings/i)
       const input = component.getByLabelText(/Background color/i) as HTMLInputElement
       await userEvent.clear(input)
@@ -119,7 +111,7 @@ describe('ImageBlockSettings', () => {
 
   describe('default text color', () => {
     it('integrates, changing the state', async () => {
-      const component = renderBlock(ImageTextBlockSettings, getSettings({textColor: '000000'}))
+      const component = renderBlock(ImageBlockSettings, {textColor: '000000'})
       await toggleSection(component, /Expand color settings/i)
       const input = component.getByLabelText(/Default text color/i) as HTMLInputElement
       await userEvent.clear(input)
