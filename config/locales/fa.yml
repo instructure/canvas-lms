@@ -2203,6 +2203,7 @@ fa:
   adds_an_account_course_setting_for_a_default_due_t_9903738a: "تنظیم حساب/درس را برای زمان مقرر پیش‌فرض برای تکالیف جدید اضافه می‌کند"
   adds_an_emoji_picker_that_allows_students_and_teac_cf517b1b: "یک انتخابگر ایموجی اضافه می کند که به دانشجویان و اساتید اجازه می دهد تا ایموجی ها را به نظرات ارسالی خود اضافه کنند."
   adds_analytics_link_on_the_user_settings_menu_3a048816: "پیوند تحلیل‌ها را در منوی تنظیمات کاربر اضافه می کند."
+  adds_analytics_to_a_student_s_context_card_43560ed9: "تحلیل را به یک کارت زمینه دانشجو اضافه می‌کند."
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "تحلیل را به یک کارت زمینه دانشجو اضافه می‌کند."
   adds_granular_permissions_for_adding_and_removing__e1e484a3: "مجوزهای ریز را برای افزودن و حذف هر نقش و یک مجوز جداگانه برای سایر اقدامات مدیریت درس را اضافه می کند."
   adjust_events_and_due_dates_879744fc: "تنظیم رویداد ها و تاریخ های مهلت"
@@ -2418,6 +2419,7 @@ fa:
   allows_the_duplication_of_calendar_events_7bb0d6c5: "امکان دوتا کردن رویدادهای تقویم"
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "امکان زمان بندی رویدادهای تکرار شونده تقویم را فراهم می کند"
   allows_user_to_access_a_user_s_settings_menu_and_u_235d8fd8: "به کاربر اجازه می دهد تا به منوی تنظیمات کاربر و جزئیات کاربر دسترسی داشته باشد."
+  allows_user_to_access_a_user_s_settings_menu_and_u_37f4692e: "به کاربر اجازه می دهد تا به منوی تنظیمات کاربر و جزئیات کاربر دسترسی داشته باشد."
   allows_user_to_access_and_edit_the_admin_settings__b3390b66: "به کاربر امکان دسترسی و ویرایش تنظیمات مدیر درموارد رایج را می دهد. به کاربر امکان می دهد گروه ها را ایجاد و مدیریت کند. به کاربر اجازه می دهد تا منابع مشترک در حساب را مدیریت کند."
   allows_user_to_access_gradebook_history_9d599681: "به کاربر امکان دسترسی به تاریخچه دفتر نمره را می دهد."
   allows_user_to_access_speedgrader_from_an_assignme_3b908f7: "به کاربر اجازه می‌دهد تا از طریق یک تکلیف به نمره گذاری سریع  دسترسی پیدا کند."
@@ -2655,6 +2657,7 @@ fa:
   allows_user_to_randomly_assign_users_to_a_course_g_e866fc4: "به کاربر اجازه می دهد تا به طور تصادفی کاربران را به یک گروه دوره اختصاص دهد."
   allows_user_to_randomly_assign_users_to_an_account_f6f24e8b: "به کاربر اجازه می دهد تا به طور تصادفی کاربران را به یک حساب یا گروه دوره اختصاص دهد."
   allows_user_to_remove_a_course_as_a_course_templat_15e653d3: "به کاربر اجازه می دهد یک دوره را به عنوان الگوی دوره در تنظیمات دوره حذف کند."
+  allows_user_to_remove_a_student_s_section_enrollme_38018d99: "به کاربر اجازه می دهد تا ثبت نام یا نقش یک دانشجو را حذف کند."
   allows_user_to_remove_a_student_s_section_enrollme_78d1916e: "به کاربر اجازه می دهد تا ثبت نام یا نقش یک دانشجو را حذف کند."
   allows_user_to_remove_and_merge_users_in_an_accoun_b7e1aec7: "به کاربر امکان حذف و ادغام کاربران در یک حساب را می دهد."
   allows_user_to_remove_designers_from_a_course_fa9e887e: "به کاربر اجازه می دهد طراحان را از دوره حذف کند."
@@ -2685,9 +2688,11 @@ fa:
   allows_user_to_send_a_message_to_all_in_course_nam_697703a0: |-
       به کاربر اجازه می دهد تا یک پیام را به ”همه در [نام درس]“ را ارسال کند.
       به کاربر اجازه می دهد تا یک پیام را به ”همه در [گروه درس]“ را ارسال کند.
+  allows_user_to_send_a_message_to_all_in_course_nam_7340c066: "به کاربر اجازه می‌دهد به ”همه در  [course name],“ یا ”همه در [course group]. “ پیام ارسال کند."
   allows_user_to_send_a_message_to_all_in_course_nam_992e425: "به کاربر اجازه می‌دهد به ”همه در  [course name],“ یا ”همه در [course group]. “ پیام ارسال کند."
   allows_user_to_send_messages_to_individual_course__9347e1e2: "به کاربر اجازه می دهد تا برای اعضای درس انفردی پیام ارسال کند."
   allows_user_to_share_a_quiz_to_commons_6746e0da: "به کاربر اجازه می دهد یک آزمون را در نظر به اشتراک بگذارد."
+  allows_user_to_view_a_course_s_sis_id_2a342763: "به کاربر اجازه می دهد شناسه های سامانه اطلاعات دانشجویی یک درس را مشاهده کند."
   allows_user_to_view_a_course_s_sis_id_5c4a4c50: "به کاربر اجازه می دهد شناسه های سامانه اطلاعات دانشجویی یک درس را مشاهده کند."
   allows_user_to_view_a_link_to_speedgrader_from_ass_8ed9b342: "به کاربر اجازه می دهد پیوندی نمره گذاری سریع  را از تکالیف مشاهده کند."
   allows_user_to_view_a_link_to_the_faculty_journal__13b353a8: |-
@@ -2783,6 +2788,7 @@ fa:
   allows_user_to_view_the_people_link_in_course_navi_58b38f5d: "به کاربر اجازه می دهد پیوند افراد را در پیمایش دوره مشاهده کند."
   allows_user_to_view_the_reset_course_content_butto_75c8c410: "به کاربر اجازه می دهد تا دکمه \"بازنشانی محتوای درس\" را مشاهده کند."
   allows_user_to_view_the_sis_id_in_a_user_s_login_d_71e0922b: "به کاربر اجازه می‌دهد شناسه سامانه اطلاعات دانشجو را در اطلاعات ورود کاربر مشاهده کند."
+  allows_user_to_view_the_sis_id_in_a_user_s_login_d_ff770220: "به کاربر اجازه می‌دهد شناسه سامانه اطلاعات دانشجو را در اطلاعات ورود کاربر مشاهده کند."
   allows_user_to_view_the_user_sis_id_column_in_the__265cb234: "به کاربر اجازه می دهد تا ستون شناسه سامانه اطلاعات دانشجویی کاربر را در فایل CSV تحلیل پرسش آزمون مشاهده کند."
   allows_user_to_view_user_details_for_course_users_ec1b6218: "به کاربر اجازه می دهد تا جزئیات کاربر را برای کاربران دوره مشاهده کند."
   allows_user_to_view_user_sis_ids_68a9d218: "به کاربر اجازه می دهد شناسه های سامانه اطلاعات دانشجویی کاربر را مشاهده کند."
@@ -9761,6 +9767,10 @@ fa:
   english_canada_12688ee4: "انگلیسی (کانادا)"
   english_united_kingdom_a613f831: "انگلیسی (بریتانیا)"
   enhance_color_contrast_of_content_685ddd49: "کنتراست رنگ محتوا را افزایش دهید"
+  enhanced-rubrics-assignment-container: 
+    discussion_points_possible: 
+      one: "%{count} امتیاز ممکن"
+      other: "%{count} امتیاز ممکن"
   enhanced_grade_change_auditing_2b155dfa: "ارتقا حسابرسی تغییر نمره "
   enhanced_gradebook_filters_a3be5e7d: "افزایش فیلتر دفتر نمره"
   enhanced_individual_gradebook: 
@@ -24105,6 +24115,7 @@ fa:
       برای مدیریت کامل بانک‌های سوالات درس، این مجوز و "تکالیف و آزمون‌ها - افزودن / ویرایش / حذف" هر دو باید فعال باشند.
   this_permission_is_available_for_all_canvas_accoun_25cd5444: "این مجوز برای همه حساب‌های کانواس در دسترس است اما فقط برای موسسات مرتبط با حساب کاتالوگ کانواس استفاده می شود. مجوز در حال حاضر هیچ اثری از پیش ندارد، اما مهندسی پیشنهاد می‎دهد که این اجازه برای مدیران همچنان فعال باقی بماند. برای نقش های دیگر این مجوز می‌تواند غیرفعال شود."
   this_permission_only_affects_course_announcements__6bc2b0a5: "این مجوز فقط روی اطلاعیه‌های درس تأثیر می گذارد. برای مدیریت اطلاعیه‌های جهانی، اطلاعیه‌های جهانی - افزودن / ویرایش / حذف باید فعال شود."
+  this_permission_only_affects_course_announcements__897b8de8: "این مجوز فقط روی اطلاعیه‌های درس تأثیر می گذارد. برای مدیریت اطلاعیه‌های جهانی، اطلاعیه‌های جهانی - افزودن / ویرایش / حذف باید فعال شود."
   this_permission_only_controls_adding_users_at_the__f33e8ae8: |-
       این اجازه فقط افزودن کاربران را در سطح حساب کنترل می کند. برای افزودن کاربران
       به یک درس، "کاربران - افزودن / حذف  از یک درس" یا "کاربران - افزودن / حذف اساتید، طراحان درس یا دستیاران آموزشی از دروس" در یک درس باید فعال باشد.
@@ -24579,6 +24590,7 @@ fa:
       برای وارد کردن نتایج یادگیری از صفحه نتایج ، "دستورالعمل های ارزیابی - افزودن / ویرایش / حذف کردن" نیز باید فعال باشد.
       هنگامی که "محتوای درس - مشاهده" و "تکالیف و آزمون‌ها - افزودن / ویرایش / حذف" فعال هستند، کاربران می توانند از طریق "تکالیف" به  دستورالعمل‌های ارزیابی تکلیف انفرادی دسترسی پیدا کرده و آن‌ها را ایجاد کنند (اما نمی‌توانند آن‌ها را ویرایش کنند).
   to_view_a_user_s_login_details_users_view_list_and_6d42118b: "برای مشاهده اطلاعات ورود کاربر، کاربران - مشاهده لیست و تغییر اطلاعات ورود برای کاربران نیز باید فعال باشند."
+  to_view_a_user_s_login_details_users_view_list_and_faa21c46: "برای مشاهده اطلاعات ورود کاربر، کاربران - مشاهده لیست و تغییر اطلاعات ورود برای کاربران نیز باید فعال باشند."
   to_view_account_level_groups_groups_add_edit_delet_bf12e984: "برای مشاهده گروه های سطح-حساب، گروه‎ها - افزودن / ویرایش / حذف نیز باید فعال شوند. "
   to_view_all_notifications_sent_to_a_canvas_user_se_6172daa: "برای مشاهده همه اعلان‌هایی که برای یک کاربر کانواس ارسال می‌شود، کاربر و بازه زمانی را برای جستجوی خود انتخاب کنید."
   to_view_announcements_announcements_view_must_also_75f652df: "برای مشاهده اطلاعیه‌ها ، نمایش-اطلاعیه ها  نیز باید فعال باشد."
@@ -24604,6 +24616,7 @@ fa:
   to_view_student_analytics_in_course_analytics_grad_91d58a8a: "برای مشاهده تجزیه و تحلیل دانشجو در تجزیه و تحلیل درس ، نمرات - مشاهده همه نمرات نیز باید فعال باشد"
   to_view_student_analytics_users_view_list_and_anal_2c2776b2: "برای مشاهده تحلیل‌ها دانشجویان، کاربران-مشاهده لیست و تحلیل‌ها-مشاهده نیز باید فعال شوند."
   to_view_student_analytics_users_view_list_and_anal_41d32ecb: "برای مشاهده تحلیل‌ها دانشجویان، کاربران-مشاهده لیست و تحلیل‌ها-مشاهده نیز باید فعال شوند."
+  to_view_student_analytics_users_view_list_and_grad_44aa0d9d: "برای مشاهده تحلیل‌ها دانشجویان، کاربران - مشاهده لیست و نمرات - مشاهده تمام نمرات نیز باید فعال باشند."
   to_view_student_analytics_users_view_list_and_grad_59d0da3e: "برای مشاهده تحلیل‌ها دانشجویان، کاربران - مشاهده لیست و نمرات - مشاهده تمام نمرات نیز باید فعال باشند."
   to_view_the_account_people_page_users_view_list_mu_f44cef80: "برای مشاهده حساب صفحه افراد، مشاهده-فهرست کاربران باید فعال باشد. اگر این مجوز غیرفعال باشد، و مشاهده شناسه‌های ورود-کاربران  را فعال باشد، کاربران همچنان آدرس‌های ایمیل را که به عنوان شناسه ورود به سیستم استفاده می‌شود، مشاهده خواهند کرد."
   to_view_the_list_of_users_in_an_account_users_view_401b8462: "برای مشاهده لیست کاربران در یک حساب، فهرست کاربران -مشاهده باید فعال باشد."
