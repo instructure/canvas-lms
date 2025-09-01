@@ -3692,6 +3692,8 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def update_due_date_smart_alerts
+    return unless context.active_now?
+
     unless saved_by == :migration
       if due_at.nil? || due_at < Time.zone.now
         ScheduledSmartAlert.find_by(context_type: self.class.name, context_id: id, alert_type: :due_date_reminder)&.destroy

@@ -247,6 +247,14 @@ describe Assignment do
         assignment.update!(due_at: 1.day.from_now)
       end
 
+      it "does not create a ScheduledSmartAlert if course is not active" do
+        assignment = @course.assignments.new(assignment_valid_attributes)
+        @course.enrollment_term.update!(start_at: 1.month.from_now, end_at: 3.months.from_now)
+        expect(ScheduledSmartAlert).not_to receive(:upsert)
+
+        assignment.update!(due_at: 2.months.from_now)
+      end
+
       it "deletes the ScheduledSmartAlert if the due date is removed" do
         assignment = @course.assignments.new(assignment_valid_attributes)
         assignment.update!(due_at: 1.day.from_now)
