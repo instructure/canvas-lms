@@ -88,6 +88,29 @@ describe CC::BasicLTILinks do
       expect(xml_doc.at_xpath("//blti:secure_launch_url").text).to eq tool.url
     end
 
+    it "sets a launch_url for valid URLs without explicit scheme" do
+      tool.url = "example.com/launch"
+      subject.create_blti_link(tool, lti_doc)
+      xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
+      expect(xml_doc.at_xpath("//blti:launch_url").text).to eq tool.url
+    end
+
+    it "does not set a launch_url for invalid URLs" do
+      tool.url = "not a valid url"
+      subject.create_blti_link(tool, lti_doc)
+      xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
+      expect(xml_doc.at_xpath("//blti:launch_url")).to be_nil
+      expect(xml_doc.at_xpath("//blti:secure_launch_url")).to be_nil
+    end
+
+    it "does not set a launch_url when url is blank" do
+      tool.url = ""
+      subject.create_blti_link(tool, lti_doc)
+      xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
+      expect(xml_doc.at_xpath("//blti:launch_url")).to be_nil
+      expect(xml_doc.at_xpath("//blti:secure_launch_url")).to be_nil
+    end
+
     it "add an icon element if found in the tool settings" do
       tool.icon_url = "http://example.com/icon"
       subject.create_blti_link(tool, lti_doc)
