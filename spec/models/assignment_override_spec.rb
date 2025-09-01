@@ -1447,6 +1447,14 @@ describe AssignmentOverride do
       override.update!(due_at: 1.day.from_now, due_at_overridden: true)
     end
 
+    it "does not create a ScheduledSmartAlert if course is not active" do
+      override = assignment_override_model(course: @course)
+      @course.enrollment_term.update!(start_at: 1.month.from_now, end_at: 3.months.from_now)
+      expect(ScheduledSmartAlert).not_to receive(:upsert)
+
+      override.update!(due_at: 2.months.from_now, due_at_overridden: true)
+    end
+
     it "deletes the ScheduledSmartAlert if the due date is removed" do
       override = assignment_override_model(course: @course)
       override.update!(due_at: 1.day.from_now, due_at_overridden: true)
