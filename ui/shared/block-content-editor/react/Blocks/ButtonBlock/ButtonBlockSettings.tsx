@@ -39,54 +39,54 @@ export const ButtonBlockSettings = () => {
     isFullWidth,
     buttons,
   } = useNode(node => ({
-    includeBlockTitle: node.data.props.settings.includeBlockTitle,
-    backgroundColor: node.data.props.settings.backgroundColor,
-    textColor: node.data.props.settings.textColor,
-    alignment: node.data.props.settings.alignment,
-    layout: node.data.props.settings.layout,
-    isFullWidth: node.data.props.settings.isFullWidth,
-    buttons: node.data.props.settings.buttons,
+    includeBlockTitle: node.data.props.includeBlockTitle,
+    backgroundColor: node.data.props.backgroundColor,
+    textColor: node.data.props.textColor,
+    alignment: node.data.props.alignment,
+    layout: node.data.props.layout,
+    isFullWidth: node.data.props.isFullWidth,
+    buttons: node.data.props.buttons,
   }))
 
   const handleIncludeBlockTitleChange = () => {
     setProp((props: ButtonBlockProps) => {
-      props.settings.includeBlockTitle = !includeBlockTitle
+      props.includeBlockTitle = !includeBlockTitle
     })
   }
 
   const handleBackgroundColorChange = (color: string) => {
     setProp((props: ButtonBlockProps) => {
-      props.settings.backgroundColor = color
+      props.backgroundColor = color
     })
   }
 
   const handleTextColorChange = (color: string) => {
     setProp((props: ButtonBlockProps) => {
-      props.settings.textColor = color
+      props.textColor = color
     })
   }
 
   const handleAlignmentChange = (alignment: ButtonAlignment) => {
     setProp((props: ButtonBlockProps) => {
-      props.settings.alignment = alignment
+      props.alignment = alignment
     })
   }
 
   const handleLayoutChange = (layout: ButtonLayout) => {
     setProp((props: ButtonBlockProps) => {
-      props.settings.layout = layout
+      props.layout = layout
     })
   }
 
   const handleIsFullWidthChange = (isFullWidth: boolean) => {
     setProp((props: ButtonBlockProps) => {
-      props.settings.isFullWidth = isFullWidth
+      props.isFullWidth = isFullWidth
     })
   }
 
   const handleButtonsChange = (buttons: ButtonData[]) => {
     setProp((props: ButtonBlockProps) => {
-      props.settings.buttons = buttons
+      props.buttons = buttons
     })
   }
 

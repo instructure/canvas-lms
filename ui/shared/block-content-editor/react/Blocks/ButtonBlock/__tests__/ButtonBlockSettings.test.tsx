@@ -22,13 +22,11 @@ import {ButtonBlockSettings} from '../ButtonBlockSettings'
 import {renderBlock} from '../../__tests__/render-helper'
 
 const defaultProps = {
-  settings: {
-    includeBlockTitle: false,
-    alignment: 'left',
-    layout: 'horizontal',
-    isFullWidth: false,
-    buttons: [{id: 1, text: 'Button1'}],
-  },
+  includeBlockTitle: false,
+  alignment: 'left',
+  layout: 'horizontal',
+  isFullWidth: false,
+  buttons: [{id: 1, text: 'Button1'}],
 }
 
 const toggleSection = async (component: RenderResult, name: RegExp | string) => {
@@ -61,10 +59,8 @@ describe('ButtonBlockSettings', () => {
 
     it('integrates, changing the text color state', async () => {
       const component = renderBlock(ButtonBlockSettings, {
-        settings: {
-          ...defaultProps.settings,
-          includeBlockTitle: true,
-        },
+        ...defaultProps,
+        includeBlockTitle: true,
       })
       await toggleSection(component, /Expand color settings/i)
       const textBox = component.getByRole('textbox', {name: /text #/i})

@@ -35,15 +35,13 @@ export type ButtonData = {
 }
 
 export type ButtonBlockSettings = {
-  settings: {
-    buttons: ButtonData[]
-    includeBlockTitle: boolean
-    alignment: ButtonAlignment
-    layout: ButtonLayout
-    isFullWidth: boolean
-    backgroundColor: string
-    textColor: string
-  }
+  buttons: ButtonData[]
+  includeBlockTitle: boolean
+  alignment: ButtonAlignment
+  layout: ButtonLayout
+  isFullWidth: boolean
+  backgroundColor: string
+  textColor: string
 }
 
 export type ButtonBlockBase = TitleData & ButtonBlockSettings
