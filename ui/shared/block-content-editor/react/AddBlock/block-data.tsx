@@ -68,25 +68,23 @@ export const blockFactory = {
   ),
   [ButtonBlock.name]: () => (
     <ButtonBlock
-      settings={{
-        includeBlockTitle: true,
-        alignment: 'left',
-        layout: 'horizontal',
-        isFullWidth: false,
-        buttons: [
-          {
-            id: 1,
-            text: '',
-            url: '',
-            linkOpenMode: 'new-tab',
-            primaryColor: colors.primitives.blue45,
-            secondaryColor: colors.primitives.white,
-            style: 'filled',
-          },
-        ],
-        backgroundColor: defaultBackgroundColor,
-        textColor: defaultTextColor,
-      }}
+      includeBlockTitle={true}
+      alignment="left"
+      layout="horizontal"
+      isFullWidth={false}
+      buttons={[
+        {
+          id: 1,
+          text: '',
+          url: '',
+          linkOpenMode: 'new-tab',
+          primaryColor: colors.primitives.blue45,
+          secondaryColor: colors.primitives.white,
+          style: 'filled',
+        },
+      ]}
+      backgroundColor={defaultBackgroundColor}
+      textColor={defaultTextColor}
       title=""
     />
   ),

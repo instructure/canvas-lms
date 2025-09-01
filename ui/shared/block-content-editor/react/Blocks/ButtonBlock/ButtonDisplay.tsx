@@ -28,13 +28,14 @@ const alignmentMap = {
 } as const
 
 export const ButtonDisplay = ({
-  settings,
+  buttons,
+  alignment,
+  layout,
+  isFullWidth,
   dataTestId,
   onButtonClick,
   focusHandler,
 }: ButtonDisplayProps) => {
-  const {buttons, alignment, layout, isFullWidth} = settings
-
   const flexDirection = layout === 'vertical' ? 'column' : 'row'
   const justifyItems = !isFullWidth && layout === 'horizontal' ? alignmentMap[alignment] : undefined
   const alignItems = !isFullWidth && layout === 'vertical' ? alignmentMap[alignment] : undefined
