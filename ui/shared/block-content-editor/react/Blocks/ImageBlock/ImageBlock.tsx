@@ -27,6 +27,7 @@ import {TitleEdit} from '../BlockItems/Title/TitleEdit'
 import {TitleView} from '../BlockItems/Title/TitleView'
 import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
 import {Flex} from '@instructure/ui-flex'
+import {useFocusElement} from '../../hooks/useFocusElement'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -53,14 +54,21 @@ const ImageBlockEditView = (props: ImageBlockProps) => {
 }
 
 const ImageBlockEdit = (props: ImageBlockProps) => {
+  const {focusHandler} = useFocusElement()
   const [title, setTitle] = useState(props.title || '')
 
   const save = useSave(() => ({title}))
 
   return (
     <>
-      {props.includeBlockTitle && <TitleEdit title={title} onTitleChange={setTitle} />}
-      <ImageEdit {...props} onImageChange={data => save({...data})} />
+      {props.includeBlockTitle && (
+        <TitleEdit title={title} onTitleChange={setTitle} focusHandler={focusHandler} />
+      )}
+      <ImageEdit
+        {...props}
+        onImageChange={data => save({...data})}
+        focusHandler={!props.includeBlockTitle && focusHandler}
+      />
     </>
   )
 }

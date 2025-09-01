@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {FocusHandler} from '../../../hooks/useFocusElement'
+
 type ImageMetadata = {
   url?: string
   altText?: string
@@ -39,5 +41,8 @@ export type ModalImageData = ImageMetadata & ImageFileData
 export type ImageChangeHandler = {
   onImageChange: (data: ImageData) => void
 }
-export type ImageEditProps = ImageData & ImageChangeHandler
+export type ImageEditProps = ImageData &
+  ImageChangeHandler & {
+    focusHandler?: FocusHandler | false
+  }
 export type ImageViewProps = ImageData

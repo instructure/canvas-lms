@@ -37,6 +37,7 @@ export const ImageEdit = ({
   altText,
   caption,
   altTextAsCaption,
+  focusHandler,
 }: ImageEditProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const {settingsTray} = useBlockContentEditorContext()
@@ -68,11 +69,14 @@ export const ImageEdit = ({
                 onClick={openModal}
                 screenReaderLabel={I18n.t('Change image')}
                 size="small"
+                elementRef={
+                  focusHandler ? element => focusHandler(element as HTMLElement) : undefined
+                }
               />
             </div>
           </>
         ) : (
-          <AddButton onClick={() => setIsOpen(true)} />
+          <AddButton onClick={() => setIsOpen(true)} focusHandler={focusHandler} />
         )}
       </div>
       <Flex direction="row" gap="x-small">
