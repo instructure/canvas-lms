@@ -30,6 +30,7 @@ import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
 import {TextEditPreview} from '../BlockItems/Text/TextEditPreview'
 import {TitleEdit} from '../BlockItems/Title/TitleEdit'
 import {TextEdit} from '../BlockItems/Text/TextEdit'
+import {useFocusElement} from '../../hooks/useFocusElement'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -102,6 +103,7 @@ const ImageTextBlockEditView = ({
 }
 
 const ImageTextBlockEdit = (props: ImageTextBlockProps) => {
+  const {focusHandler} = useFocusElement()
   const [title, setTitle] = useState(props.title)
   const [content, setContent] = useState(props.content)
 
@@ -113,9 +115,17 @@ const ImageTextBlockEdit = (props: ImageTextBlockProps) => {
   return (
     <ImageTextBlockLayout
       titleComponent={
-        props.includeBlockTitle && <TitleEdit title={title} onTitleChange={setTitle} />
+        props.includeBlockTitle && (
+          <TitleEdit title={title} onTitleChange={setTitle} focusHandler={focusHandler} />
+        )
       }
-      imageComponent={<ImageEdit {...props} onImageChange={data => save({...data})} />}
+      imageComponent={
+        <ImageEdit
+          {...props}
+          onImageChange={data => save({...data})}
+          focusHandler={!props.includeBlockTitle && focusHandler}
+        />
+      }
       textComponent={<TextEdit content={content} onContentChange={setContent} height={300} />}
       arrangement={props.arrangement}
       textToImageRatio={props.textToImageRatio}
