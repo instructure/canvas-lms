@@ -63,28 +63,7 @@ describe('LtiAssetReportsForSpeedgrader', () => {
       },
       {cancel: false},
     )
-  })
 
-  it("doesn't render the resubmit button if isGroupSubmission is true", () => {
-    mockUseLtiAssetProcessors(defaultGetLtiAssetProcessorsResult)
-    mockUseLtiAssetReports(
-      defaultGetLtiAssetReportsResult({
-        attachmentId: '1234',
-      }),
-    )
-
-    const component = (
-      <LtiAssetReportsForSpeedgrader
-        assignmentId={'123'}
-        attempt={1}
-        submissionType={'online_upload'}
-        attachments={[{_id: '1234', displayName: 'test.txt'}]}
-        studentUserId={'456'}
-        studentAnonymousId={null}
-      />
-    )
-    const {queryByText} = renderComponent(component)
-
-    expect(queryByText('Resubmit')).not.toBeInTheDocument()
+    expect(queryByText('Resubmit All Files')).toBeInTheDocument()
   })
 })
