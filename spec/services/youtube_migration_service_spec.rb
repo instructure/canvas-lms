@@ -1223,5 +1223,29 @@ RSpec.describe YoutubeMigrationService do
         expect(key).to eq("WikiPage|123")
       end
     end
+
+    describe "JWT token generation with user_uuid" do
+      let(:user) { user_factory(active_all: true) }
+      let(:user_uuid) { user.uuid }
+
+      before do
+        stub_request(:post, "https://arc.instructure.com/api/internal/youtube_embed")
+          .to_return(
+            status: 200,
+            body: studio_api_response.to_json,
+            headers: { "Content-Type" => "application/json" }
+          )
+      end
+
+      it "includes user_uuid in JWT token payload when converting YouTube to Studio" do
+        expect(CanvasSecurity::ServicesJwt).to receive(:generate) do |payload|
+          expect(payload[:sub]).to eq(course.account.uuid)
+          expect(payload[:user_uuid]).to eq(user_uuid)
+          "mock.jwt.token"
+        end
+
+        service.convert_youtube_to_studio(youtube_embed, studio_tool, user_uuid:)
+      end
+    end
   end
 end

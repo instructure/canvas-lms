@@ -4147,7 +4147,7 @@ class CoursesController < ApplicationController
     scan_id = params.require(:scan_id)
 
     service = YoutubeMigrationService.new(@context)
-    progress = service.convert_embed(scan_id, embed)
+    progress = service.convert_embed(scan_id, embed, user_uuid: @current_user.uuid)
 
     render json: { id: progress.id }, status: :ok
   end

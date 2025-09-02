@@ -151,7 +151,7 @@ class YoutubeMigrationService
     raise ResourceNotFoundError, "Resource not found for type: #{resource_type}, id: #{resource_id}"
   end
 
-  def convert_embed(scan_id, embed)
+  def convert_embed(scan_id, embed, user_uuid: nil)
     validate_scan_exists!(scan_id)
     validate_supported_resource!(embed[:resource_type])
 
@@ -166,11 +166,11 @@ class YoutubeMigrationService
 
     job_priority = Account.site_admin.feature_enabled?(:youtube_migration_high_priority) ? Delayed::HIGH_PRIORITY : Delayed::LOW_PRIORITY
     n_strand = "youtube_embed_convert_#{course.global_id}_#{resource_group_key}"
-    convert_progress.process_job(YoutubeMigrationService, :perform_conversion, { n_strand:, priority: job_priority }, course.id, scan_id, embed)
+    convert_progress.process_job(YoutubeMigrationService, :perform_conversion, { n_strand:, priority: job_priority }, course.id, scan_id, embed, user_uuid:)
     convert_progress
   end
 
-  def self.perform_conversion(progress, course_id, scan_id, embed)
+  def self.perform_conversion(progress, course_id, scan_id, embed, user_uuid: nil)
     course = Course.find(course_id)
     service = new(course)
     scan_progress = YoutubeMigrationService.find_scan(course, scan_id)
@@ -184,7 +184,7 @@ class YoutubeMigrationService
       return
     end
 
-    studio_embed_html = service.convert_youtube_to_studio(embed, studio_tool)
+    studio_embed_html = service.convert_youtube_to_studio(embed, studio_tool, user_uuid:)
     service.update_resource_content(embed, studio_embed_html)
 
     service.mark_embed_as_converted(scan_progress, embed)
@@ -342,13 +342,13 @@ class YoutubeMigrationService
       course.account.context_external_tools.active.find_by(domain: STUDIO_LTI_TOOL_DOMAIN)
   end
 
-  def convert_youtube_to_studio(embed, studio_tool)
+  def convert_youtube_to_studio(embed, studio_tool, user_uuid: nil)
     studio_url_domain = studio_tool.url
     uri = URI.parse(studio_url_domain)
     studio_url = "#{uri.scheme}://#{uri.host}"
 
     account = course.account
-    token = CanvasSecurity::ServicesJwt.generate({ sub: account.uuid }, false, encrypt: false)
+    token = CanvasSecurity::ServicesJwt.generate({ sub: account.uuid, user_uuid: }, false, encrypt: false)
     headers = { "Authorization" => "Bearer #{token}" }
 
     body = {

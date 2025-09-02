@@ -5360,7 +5360,7 @@ describe CoursesController do
 
       before do
         allow(YoutubeMigrationService).to receive(:new).with(@course).and_return(service)
-        allow(service).to receive(:convert_embed).with(scan_id, embed).and_return(progress)
+        allow(service).to receive(:convert_embed).and_return(progress)
       end
 
       include_examples "youtube migration protection"
@@ -5375,7 +5375,7 @@ describe CoursesController do
 
         it "permits width parameter" do
           embed_with_width = embed.merge(width: "640")
-          allow(service).to receive(:convert_embed).with(scan_id, embed_with_width.stringify_keys).and_return(progress)
+          allow(service).to receive(:convert_embed).with(scan_id, embed_with_width.stringify_keys, user_uuid: @teacher.uuid).and_return(progress)
 
           post :start_youtube_migration_convert, params: {
             course_id: @course.id,
@@ -5384,12 +5384,12 @@ describe CoursesController do
           }
 
           expect(response).to have_http_status(:ok)
-          expect(service).to have_received(:convert_embed).with(scan_id, embed_with_width.stringify_keys)
+          expect(service).to have_received(:convert_embed).with(scan_id, embed_with_width.stringify_keys, user_uuid: @teacher.uuid)
         end
 
         it "permits height parameter" do
           embed_with_height = embed.merge(height: "480")
-          allow(service).to receive(:convert_embed).with(scan_id, embed_with_height.stringify_keys).and_return(progress)
+          allow(service).to receive(:convert_embed).with(scan_id, embed_with_height.stringify_keys, user_uuid: @teacher.uuid).and_return(progress)
 
           post :start_youtube_migration_convert, params: {
             course_id: @course.id,
@@ -5398,12 +5398,12 @@ describe CoursesController do
           }
 
           expect(response).to have_http_status(:ok)
-          expect(service).to have_received(:convert_embed).with(scan_id, embed_with_height.stringify_keys)
+          expect(service).to have_received(:convert_embed).with(scan_id, embed_with_height.stringify_keys, user_uuid: @teacher.uuid)
         end
 
         it "permits both width and height parameters" do
           embed_with_dimensions = embed.merge(width: "1280", height: "720")
-          allow(service).to receive(:convert_embed).with(scan_id, embed_with_dimensions.stringify_keys).and_return(progress)
+          allow(service).to receive(:convert_embed).with(scan_id, embed_with_dimensions.stringify_keys, user_uuid: @teacher.uuid).and_return(progress)
 
           post :start_youtube_migration_convert, params: {
             course_id: @course.id,
@@ -5412,13 +5412,13 @@ describe CoursesController do
           }
 
           expect(response).to have_http_status(:ok)
-          expect(service).to have_received(:convert_embed).with(scan_id, embed_with_dimensions.stringify_keys)
+          expect(service).to have_received(:convert_embed).with(scan_id, embed_with_dimensions.stringify_keys, user_uuid: @teacher.uuid)
         end
 
         it "converts numeric width and height to strings" do
           embed_with_numeric_dimensions = embed.merge(width: 1920, height: 1080)
           expected_embed = embed.merge(width: "1920", height: "1080").stringify_keys
-          allow(service).to receive(:convert_embed).with(scan_id, expected_embed).and_return(progress)
+          allow(service).to receive(:convert_embed).with(scan_id, expected_embed, user_uuid: @teacher.uuid).and_return(progress)
 
           post :start_youtube_migration_convert, params: {
             course_id: @course.id,
@@ -5427,7 +5427,7 @@ describe CoursesController do
           }
 
           expect(response).to have_http_status(:ok)
-          expect(service).to have_received(:convert_embed).with(scan_id, expected_embed)
+          expect(service).to have_received(:convert_embed).with(scan_id, expected_embed, user_uuid: @teacher.uuid)
         end
 
         it "filters out unpermitted parameters but keeps width and height" do
@@ -5438,7 +5438,7 @@ describe CoursesController do
             another_bad_param: "also_filtered"
           )
           expected_embed = embed.merge(width: "800", height: "600").stringify_keys
-          allow(service).to receive(:convert_embed).with(scan_id, expected_embed).and_return(progress)
+          allow(service).to receive(:convert_embed).with(scan_id, expected_embed, user_uuid: @teacher.uuid).and_return(progress)
 
           post :start_youtube_migration_convert, params: {
             course_id: @course.id,
@@ -5447,7 +5447,21 @@ describe CoursesController do
           }
 
           expect(response).to have_http_status(:ok)
-          expect(service).to have_received(:convert_embed).with(scan_id, expected_embed)
+          expect(service).to have_received(:convert_embed).with(scan_id, expected_embed, user_uuid: @teacher.uuid)
+        end
+
+        it "passes user_uuid to convert_embed method" do
+          expected_embed = embed.stringify_keys
+          allow(service).to receive(:convert_embed).with(scan_id, expected_embed, user_uuid: @teacher.uuid).and_return(progress)
+
+          post :start_youtube_migration_convert, params: {
+            course_id: @course.id,
+            scan_id:,
+            embed:
+          }
+
+          expect(response).to have_http_status(:ok)
+          expect(service).to have_received(:convert_embed).with(scan_id, expected_embed, user_uuid: @teacher.uuid)
         end
       end
     end
