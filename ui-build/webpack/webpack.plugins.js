@@ -175,4 +175,5 @@ exports.moduleFederation = new ModuleFederationPlugin({
   },
   exposes: {},
   shared: {},
+  dts: false,
 })
