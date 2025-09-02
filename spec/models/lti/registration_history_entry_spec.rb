@@ -52,4 +52,29 @@ describe Lti::RegistrationHistoryEntry do
       expect(history_entry).not_to be_valid
     end
   end
+
+  describe "cross-shard associations" do
+    specs_require_sharding
+
+    it "allows creating history entries for registrations on different shards" do
+      # Create registration on shard1
+      registration = nil
+      @shard1.activate do
+        shard1_account = account_model
+        registration = lti_registration_with_tool(account: shard1_account)
+      end
+
+      # Create history entry on default shard referencing shard1 registration
+      history_entry = Lti::RegistrationHistoryEntry.create!(
+        lti_registration: registration,
+        diff: [["+", "foo.bar", "stuff"]],
+        update_type: "manual_edit",
+        created_by: user
+      )
+
+      expect(history_entry).to be_persisted
+      expect(history_entry.lti_registration).to eq registration
+      expect(history_entry.lti_registration.shard).to eq @shard1
+    end
+  end
 end
