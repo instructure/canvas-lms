@@ -51,6 +51,7 @@ export interface ModuleItemData {
   selectedItem?: {
     id: string
     name: string
+    quizType?: string
   } | null
   newItemName?: string
 }
@@ -85,6 +86,15 @@ export const prepareModuleItemData = (
     _method: 'POST',
   }
 
+  // Helper function to apply LTI quiz configuration
+  const applyLtiQuizConfig = (
+    result: Record<string, string | number | string[] | undefined | boolean>,
+  ) => {
+    result['item[type]'] = 'assignment'
+    result['type'] = 'assignment'
+    result['quiz_lti'] = true
+  }
+
   // Add type-specific data
   if (type === 'context_module_sub_header' && textHeaderValue) {
     result['item[id]'] = 'new'
@@ -103,14 +113,15 @@ export const prepareModuleItemData = (
     result['item[new_tab]'] = externalUrlNewTab ? '1' : '0'
     result['new_tab'] = externalUrlNewTab ? 1 : 0
   } else if (selectedItem && selectedTabIndex === 0) {
+    if (type === 'quiz' && selectedItem.quizType && selectedItem.quizType === 'assignment') {
+      applyLtiQuizConfig(result)
+    }
     // Using an existing item
     result['item[id]'] = selectedItem.id
     result['item[title]'] = selectedItem.name
     result['title'] = selectedItem.name
   } else if (type === 'quiz' && quizEngine && quizEngine === 'new') {
-    result['item[type]'] = 'assignment'
-    result['type'] = 'assignment'
-    result['quiz_lti'] = true
+    applyLtiQuizConfig(result)
   }
 
   return result

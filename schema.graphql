@@ -8196,6 +8196,11 @@ type Quiz implements AssignedDates & LegacyIDInterface & ModuleItemInterface & N
   published: Boolean
 
   """
+  The type of quiz: 'quiz' for regular quizzes, 'assignment' for LTI quiz assignments
+  """
+  quizType: String!
+
+  """
   submissions for this quiz's assignment
   """
   submissionsConnection(
