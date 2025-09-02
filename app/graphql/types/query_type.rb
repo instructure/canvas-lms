@@ -298,6 +298,19 @@ module Types
       AccountNotification.for_user_and_account(context[:current_user], account)
     end
 
+    field :enrollment_invitations, [Types::EnrollmentType], null: false do
+      description "Pending enrollment invitations for the current user"
+      argument :include_enrollment_uuid, String, required: false
+    end
+    def enrollment_invitations(include_enrollment_uuid: nil)
+      return [] unless context[:current_user]
+
+      context[:current_user].cached_invitations(
+        include_enrollment_uuid:,
+        preload_course: true
+      )
+    end
+
     field :rubric, Types::RubricType, null: true do
       description "Rubric"
       argument :id,

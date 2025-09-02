@@ -153,6 +153,11 @@ module Types
       load_association(:role)
     end
 
+    field :role_label, String, null: true
+    def role_label
+      load_association(:role).then(&:label)
+    end
+
     field :grades, GradesType, null: true do
       argument :grading_period_id,
                ID,
@@ -221,6 +226,10 @@ module Types
     end
 
     field :sis_role, String, null: true
+
+    field :uuid, String, null: true
+
+    field :invitation_sent_at, DateTimeType, null: true
 
     field :html_url, UrlType, null: true
     def html_url
