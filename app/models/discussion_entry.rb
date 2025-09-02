@@ -33,10 +33,6 @@ class DiscussionEntry < ActiveRecord::Base
     %w[message]
   end
 
-  def actual_saving_user
-    saving_user || user
-  end
-
   attr_readonly :discussion_topic_id, :user_id, :parent_id, :is_anonymous_author
   has_many :discussion_entry_drafts, inverse_of: :discussion_entry
   has_many :discussion_entry_versions, -> { order(version: :desc) }, inverse_of: :discussion_entry, dependent: :destroy

@@ -38,10 +38,6 @@ class DiscussionTopic < ActiveRecord::Base
     %w[message]
   end
 
-  def actual_saving_user
-    saving_user || user
-  end
-
   REQUIRED_CHECKPOINT_COUNT = 2
   MAX_ENTRIES_PINNED = 10
 
