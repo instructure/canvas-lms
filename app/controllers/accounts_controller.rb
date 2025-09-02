@@ -2214,6 +2214,7 @@ class AccountsController < ApplicationController
                                                          common_passwords_folder_id] }.freeze,
                                    :prevent_course_availability_editing_by_teachers,
                                    :prevent_course_renaming_by_teachers,
+                                   :restrict_grading_scheme_editing_to_admins,
                                    :restrict_quiz_questions,
                                    { restrict_student_future_listing: [:value, :locked] }.freeze,
                                    { restrict_student_future_view: [:value, :locked] }.freeze,

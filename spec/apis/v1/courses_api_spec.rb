@@ -1985,6 +1985,14 @@ describe CoursesController, type: :request do
           expect(@course.sis_source_id).to eql original_sis
         end
 
+        it "is not able to update the grading scheme when restricted to admins" do
+          @course.root_account.settings[:restrict_grading_scheme_editing_to_admins] = true
+          expect do
+            api_call(:put, @path, @params, course: { grading_standard_id: 123 })
+            @course.reload
+          end.to_not change { @course.grading_standard_id }
+        end
+
         context "when an assignment is due in a closed grading period" do
           before :once do
             @course.update(group_weighting_scheme: "equal")

@@ -1923,6 +1923,12 @@ class Course < ActiveRecord::Base
       use_student_view
     ]
 
+    given { |user| grants_right?(user, :manage) && !root_account.settings[:restrict_grading_scheme_editing_to_admins] }
+    can :set_grading_scheme
+
+    given { |user| grants_right?(user, :manage_grades) && !root_account.settings[:restrict_grading_scheme_editing_to_admins] }
+    can :manage_grading_schemes
+
     # Teachers and Designers can reset content, but not TAs
     given do |user|
       user && !deleted? && !template? &&
@@ -1996,8 +2002,15 @@ class Course < ActiveRecord::Base
     given do |user|
       account_membership_allows(user, :manage_courses_admin)
     end
-    can :manage and can :update and can :use_student_view and can :manage_feature_flags and
-      can :view_feature_flags
+    can %i[
+      manage
+      update
+      use_student_view
+      manage_feature_flags
+      view_feature_flags
+      set_grading_scheme
+      manage_grading_schemes
+    ]
 
     # reset course content
     given do |user|
