@@ -209,4 +209,38 @@ class Announcement < DiscussionTopic
     end
   end
   handle_asynchronously :create_observer_alerts, priority: Delayed::LOW_PRIORITY, max_attempts: 1
+
+  private
+
+  def create_participant
+    super # Create participant for author (from DiscussionTopic)
+    create_participants_for_course # Create participants for all course students
+  end
+
+  # Creates participant records for all enrolled users who don't already have them
+  # This ensures proper read/unread tracking for announcements
+  def create_participants_for_course
+    return unless context.is_a?(Course)
+
+    # Use query builder to efficiently find users without participant records
+    # This avoids loading all participants into memory and uses SQL for filtering
+    users_without_participants = User.joins(:enrollments)
+                                     .where(enrollments: { course_id: context.id, workflow_state: "active" })
+                                     .where.not(id: discussion_topic_participants.select(:user_id))
+                                     .distinct
+                                     .pluck(:id)
+
+    return if users_without_participants.empty?
+
+    bulk_insert_participants(users_without_participants)
+  end
+
+  def new_announcement_recipients
+    potential_recipients = active_participants_include_tas_and_teachers(true).without(user)
+    recipients = users_with_permissions(potential_recipients)
+    recipients.reject do |u|
+      locked_for = locked_for?(u, check_policies: true)
+      locked_for && !locked_for[:can_view]
+    end
+  end
 end
