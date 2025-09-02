@@ -42,7 +42,7 @@ const ACCOUNT_NOTIFICATIONS_QUERY = gql`
 const DISMISS_NOTIFICATION_MUTATION = gql`
   mutation DismissAccountNotification($notificationId: ID!) {
     dismissAccountNotification(input: {notificationId: $notificationId}) {
-      success
+      errors { message }
     }
   }
 `
