@@ -6596,6 +6596,52 @@ describe Course do
       end
     end
 
+    context "cross-course section enrollment constraint handling" do
+      before :once do
+        @course1 = course_factory(active_all: true)
+        @course2 = course_factory(active_all: true)
+        @section = @course1.course_sections.create!(name: "Cross-list Section")
+        user_factory
+      end
+
+      it "reuses enrollment from original course when section is cross-listed to new course" do
+        enrollment1 = @course1.enroll_user(@user, "TeacherEnrollment", section: @section)
+        expect(enrollment1.course_id).to eq @course1.id
+        expect(enrollment1.course_section_id).to eq @section.id
+
+        enrollment1.destroy
+
+        @section.crosslist_to_course(@course2)
+        @section.reload
+        expect(@section.course_id).to eq @course2.id
+
+        enrollment2 = @course2.enroll_user(@user, "TeacherEnrollment", section: @section)
+
+        # Should reuse the same enrollment record but transfer it to course2
+        expect(enrollment2.id).to eq enrollment1.id
+        expect(enrollment2.course_id).to eq @course2.id
+        expect(enrollment2.course_section_id).to eq @section.id
+        expect(enrollment2.already_enrolled).to be_truthy
+      end
+
+      it "prefers enrollments in current course over cross-course enrollments" do
+        different_section = @course1.course_sections.create!(name: "Different Section")
+        current_course_enrollment = @course1.enroll_user(@user, "TeacherEnrollment", section: different_section)
+
+        target_enrollment = @course1.enroll_user(@user, "TeacherEnrollment", section: @section)
+        target_enrollment.destroy
+        @section.crosslist_to_course(@course2)
+        @section.reload
+
+        result_enrollment = @course1.enroll_user(@user, "TeacherEnrollment", section: @section)
+
+        # Should reuse the current course enrollment, not the cross-course one
+        expect(result_enrollment.id).to eq current_course_enrollment.id
+        expect(result_enrollment.course_id).to eq @course1.id
+        expect(result_enrollment.course_section_id).to eq @section.id
+      end
+    end
+
     describe "already_enrolled" do
       before :once do
         course_factory
