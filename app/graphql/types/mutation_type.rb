@@ -57,6 +57,7 @@ class Types::MutationType < Types::ApplicationObjectType
     Sets the post policy for the course, with an option to override and delete
     existing assignment post policies.
   MD
+  field :accept_enrollment_invitation, mutation: Mutations::AcceptEnrollmentInvitation
   field :create_assignment, mutation: Mutations::CreateAssignment
   field :create_comment_bank_item, mutation: Mutations::CreateCommentBankItem
   field :create_discussion_entry, mutation: Mutations::CreateDiscussionEntry
@@ -89,6 +90,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :mark_submission_comments_read, mutation: Mutations::MarkSubmissionCommentsRead
   field :move_outcome_links, mutation: Mutations::MoveOutcomeLinks
   field :post_draft_submission_comment, mutation: Mutations::PostDraftSubmissionComment
+  field :reject_enrollment_invitation, mutation: Mutations::RejectEnrollmentInvitation
   field :restore_deleted_discussion_entry, mutation: Mutations::RestoreDeletedDiscussionEntry
   field :save_rubric_assessment, mutation: Mutations::SaveRubricAssessment
   field :set_friendly_description, mutation: Mutations::SetFriendlyDescription

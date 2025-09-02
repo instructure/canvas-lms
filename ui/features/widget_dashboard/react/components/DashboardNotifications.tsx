@@ -17,17 +17,31 @@
  */
 
 import React, {useState} from 'react'
-import {useQuery, useMutation, gql} from '@apollo/client'
+import {useQuery, useMutation} from '@tanstack/react-query'
+import {gql} from 'graphql-tag'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {ApolloProvider, createClient} from '@canvas/apollo-v3'
+import {executeQuery} from '@canvas/graphql'
 import NotificationAlert, {AccountNotificationData} from './NotificationAlert'
+import EnrollmentInvitation, {EnrollmentInvitationData} from './EnrollmentInvitation'
+
+interface DashboardNotificationsResponse {
+  accountNotifications?: AccountNotificationData[]
+  enrollmentInvitations?: EnrollmentInvitationData[]
+}
+
+interface DismissNotificationResponse {
+  dismissAccountNotification?: {
+    success?: boolean
+    errors?: Array<{message: string}>
+  }
+}
 
 const I18n = createI18nScope('dashboard_notifications')
 
-const ACCOUNT_NOTIFICATIONS_QUERY = gql`
-  query GetAccountNotifications {
+const DASHBOARD_NOTIFICATIONS_QUERY = gql`
+  query GetDashboardNotifications {
     accountNotifications {
       id
       _id
@@ -38,6 +52,18 @@ const ACCOUNT_NOTIFICATIONS_QUERY = gql`
       accountName
       siteAdmin
       notificationType
+    }
+    enrollmentInvitations {
+      id
+      uuid
+      course {
+        id
+        name
+      }
+      role {
+        name
+      }
+      roleLabel
     }
   }
 `
@@ -51,21 +77,45 @@ const DISMISS_NOTIFICATION_MUTATION = gql`
 `
 
 const DashboardNotifications: React.FC = () => {
-  const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set())
-  const {loading, error, data} = useQuery(ACCOUNT_NOTIFICATIONS_QUERY)
-  const [dismissNotification] = useMutation(DISMISS_NOTIFICATION_MUTATION)
+  const [dismissedNotificationIds, setDismissedNotificationIds] = useState<Set<string>>(new Set())
+  const [dismissedInvitationIds, setDismissedInvitationIds] = useState<Set<string>>(new Set())
 
-  const handleDismiss = async (id: string) => {
-    try {
-      const result = await dismissNotification({
-        variables: {notificationId: id},
+  const {
+    data,
+    isLoading: loading,
+    error,
+  } = useQuery<DashboardNotificationsResponse>({
+    queryKey: ['dashboardNotifications'],
+    queryFn: () => executeQuery(DASHBOARD_NOTIFICATIONS_QUERY, {}),
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  })
+
+  const dismissMutation = useMutation<DismissNotificationResponse, Error, string>({
+    mutationFn: async (notificationId: string) => {
+      return executeQuery<DismissNotificationResponse>(DISMISS_NOTIFICATION_MUTATION, {
+        notificationId,
       })
-      if (result.data?.dismissAccountNotification?.success) {
-        setDismissedIds(prev => new Set([...prev, id]))
+    },
+  })
+
+  const handleDismissNotification = async (id: string) => {
+    try {
+      const result = await dismissMutation.mutateAsync(id)
+      if (result?.dismissAccountNotification?.success) {
+        setDismissedNotificationIds(prev => new Set([...prev, id]))
       }
     } catch (err) {
       console.error('Failed to dismiss notification:', err)
     }
+  }
+
+  const handleAcceptInvitation = (invitationId: string) => {
+    setDismissedInvitationIds(prev => new Set([...prev, invitationId]))
+  }
+
+  const handleRejectInvitation = (invitationId: string) => {
+    setDismissedInvitationIds(prev => new Set([...prev, invitationId]))
   }
 
   if (loading) {
@@ -76,41 +126,41 @@ const DashboardNotifications: React.FC = () => {
     )
   }
 
-  if (error || !data?.accountNotifications) {
+  if (error || (!data?.accountNotifications && !data?.enrollmentInvitations)) {
     return null
   }
 
-  const visibleNotifications = data.accountNotifications.filter(
-    (notification: AccountNotificationData) => !dismissedIds.has(notification.id),
+  const visibleNotifications = (data?.accountNotifications || []).filter(
+    (notification: AccountNotificationData) => !dismissedNotificationIds.has(notification.id),
   )
 
-  if (visibleNotifications.length === 0) {
+  const visibleInvitations = (data?.enrollmentInvitations || []).filter(
+    (invitation: EnrollmentInvitationData) => !dismissedInvitationIds.has(invitation.id),
+  )
+
+  if (visibleNotifications.length === 0 && visibleInvitations.length === 0) {
     return null
   }
 
   return (
     <View as="div" margin="0 0 medium 0">
+      {visibleInvitations.map((invitation: EnrollmentInvitationData) => (
+        <EnrollmentInvitation
+          key={invitation.id}
+          invitation={invitation}
+          onAccept={handleAcceptInvitation}
+          onReject={handleRejectInvitation}
+        />
+      ))}
       {visibleNotifications.map((notification: AccountNotificationData) => (
         <NotificationAlert
           key={notification.id}
           notification={notification}
-          onDismiss={handleDismiss}
+          onDismiss={handleDismissNotification}
         />
       ))}
     </View>
   )
 }
 
-export {DashboardNotifications}
-
-const DashboardNotificationsWithApollo: React.FC = () => {
-  const apolloClient = createClient()
-
-  return (
-    <ApolloProvider client={apolloClient}>
-      <DashboardNotifications />
-    </ApolloProvider>
-  )
-}
-
-export default DashboardNotificationsWithApollo
+export default DashboardNotifications

@@ -17,6 +17,7 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {gql} from 'graphql-tag'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -111,3 +112,36 @@ export const URL_PATTERNS = {
   GRADEBOOK: '/courses/{courseId}/gradebook',
   ALL_GRADES: '/grades',
 } as const
+
+// GraphQL mutations
+export const ACCEPT_ENROLLMENT_INVITATION = gql`
+  mutation AcceptEnrollmentInvitation($enrollmentUuid: String!) {
+    acceptEnrollmentInvitation(input: {enrollmentUuid: $enrollmentUuid}) {
+      success
+      enrollment {
+        id
+        course {
+          id
+          name
+        }
+      }
+      errors {
+        message
+      }
+    }
+  }
+`
+
+export const REJECT_ENROLLMENT_INVITATION = gql`
+  mutation RejectEnrollmentInvitation($enrollmentUuid: String!) {
+    rejectEnrollmentInvitation(input: {enrollmentUuid: $enrollmentUuid}) {
+      success
+      enrollment {
+        id
+      }
+      errors {
+        message
+      }
+    }
+  }
+`
