@@ -40,6 +40,9 @@ describe Course do
       data["all_files_export"] = {
         "file_path" => File.join(IMPORT_JSON_DIR, "import_from_migration_small.zip")
       }
+      aa_test_data = AttachmentAssociationsSpecHelper.new(@course.account, @course)
+      data[:course] = { syllabus_body: aa_test_data.base_html }
+
       migration = ContentMigration.create!(context: @course, started_at: Time.zone.now, user: account_admin_user)
       allow(migration).to receive(:canvas_import?).and_return(true)
 
@@ -75,6 +78,9 @@ describe Course do
 
       Importers::CourseContentImporter.import_content(@course, data, params, migration)
       @course.reload
+
+      expect(@course.attachment_associations.count).to eq 1
+      expect(@course.attachment_associations.first.attachment_id).to eq aa_test_data.attachment1.id
 
       # discussion topic tests
       expect(@course.discussion_topics.length).to eq(3)
@@ -115,7 +121,8 @@ describe Course do
 
       # assignment tests
       @course.reload
-      p @course.assignments.pluck(:migration_id)
+
+      @course.assignments.pluck(:migration_id)
       expect(@course.assignments.length).to eq 4
       expect(@course.assignments.map(&:migration_id).sort).to(
         eq(%w[1865116155002 1865116014002 4407365899221 4469882339231].sort)
@@ -199,8 +206,10 @@ describe Course do
       expect(@course.groups.length).to eq(2)
 
       # files
-      expect(@course.attachments.length).to eq(4)
+      expect(@course.attachments.length).to eq(6)
       @course.attachments.each do |f|
+        next if [aa_test_data.attachment1.id, aa_test_data.attachment2.id].include?(f.id)
+
         expect(File).to exist(f.full_filename)
       end
       file = @course.attachments.where(migration_id: "1865116044002").first

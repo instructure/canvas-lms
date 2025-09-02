@@ -62,7 +62,8 @@ def import_example_questions
 end
 
 def get_import_context(_system = nil)
-  course_model
+  course_with_teacher
+  @course
 end
 
 class ImportHelper
