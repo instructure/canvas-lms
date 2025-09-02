@@ -326,7 +326,7 @@ multiselect_gradebook_filters:
     ci:
       state: allowed
     development:
-      state: allowed
+      state: allowed_on
 customizable_default_due_time:
   state: hidden
   applies_to: SiteAdmin
@@ -509,7 +509,7 @@ scheduled_feedback_releases:
   applies_to: SiteAdmin
   display_name: Scheduled Feedback Release
   description: |
-      This feature allows for graders to schedule the release of grades and comments at a set date/time when 
+      This feature allows for graders to schedule the release of grades and comments at a set date/time when
       an assignment is set to be posted manually.
   environments:
     ci:
