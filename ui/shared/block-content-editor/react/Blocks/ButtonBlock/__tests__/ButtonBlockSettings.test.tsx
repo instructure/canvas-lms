@@ -20,13 +20,27 @@ import {fireEvent, RenderResult} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {ButtonBlockSettings} from '../ButtonBlockSettings'
 import {renderBlock} from '../../__tests__/render-helper'
+import {ButtonBlockProps} from '../types'
 
-const defaultProps = {
+const defaultProps: ButtonBlockProps = {
+  title: '',
   includeBlockTitle: false,
   alignment: 'left',
   layout: 'horizontal',
   isFullWidth: false,
-  buttons: [{id: 1, text: 'Button1'}],
+  backgroundColor: '#ffffff',
+  textColor: '#000000',
+  buttons: [
+    {
+      id: 1,
+      text: 'Button1',
+      url: '',
+      linkOpenMode: 'new-tab',
+      primaryColor: '#ff0000',
+      secondaryColor: '#00ff00',
+      style: 'filled',
+    },
+  ],
 }
 
 const toggleSection = async (component: RenderResult, name: RegExp | string) => {
@@ -50,7 +64,7 @@ describe('ButtonBlockSettings', () => {
       const component = renderBlock(ButtonBlockSettings, defaultProps)
       await toggleSection(component, /Expand color settings/i)
       const textBox = component.getByRole('textbox', {name: /background #/i})
-      expect(textBox).toHaveValue('')
+      expect(textBox).toHaveValue('ffffff')
       fireEvent.change(textBox, {
         target: {value: '012345'},
       })
@@ -64,7 +78,7 @@ describe('ButtonBlockSettings', () => {
       })
       await toggleSection(component, /Expand color settings/i)
       const textBox = component.getByRole('textbox', {name: /text #/i})
-      expect(textBox).toHaveValue('')
+      expect(textBox).toHaveValue('000000')
       fireEvent.change(textBox, {
         target: {value: '012345'},
       })
