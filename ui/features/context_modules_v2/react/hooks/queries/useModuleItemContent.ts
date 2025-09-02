@@ -50,6 +50,8 @@ export interface ContentItem {
   domain?: string
   description?: string
   placements?: Record<string, placementContent>
+  // Applies for quizzes
+  quizType?: 'quiz' | 'assignment'
 }
 
 // Common response structure for all queries
@@ -84,6 +86,7 @@ export interface GraphQLResponse {
         title: string
         pointsPossible: number
         published: boolean
+        type: 'assignment' | 'quiz'
       }>
       pageInfo: {
         hasNextPage: boolean
@@ -188,6 +191,7 @@ const QUIZZES_QUERY = gql`
             title
             pointsPossible
             published
+            quizType
           }
           pageInfo {
             hasNextPage
@@ -373,6 +377,7 @@ function transformQueryResult(
             name: node.title,
             pointsPossible: node.pointsPossible,
             published: node.published,
+            quizType: node.quizType,
           })) || [],
         pageInfo: course?.quizzesConnection?.pageInfo,
       }
