@@ -604,6 +604,7 @@ class WikiPagesApiController < ApplicationController
       @page.title = @revision.title
       @page.url = @revision.url
       @page.user_id = @current_user.id if @current_user
+      @page.saving_user = @current_user
       if @page.save
         render json: wiki_page_revision_json(@page.versions.current, @current_user, session, true, @page.current_version)
       else
