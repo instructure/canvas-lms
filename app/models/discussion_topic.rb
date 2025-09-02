@@ -2279,4 +2279,25 @@ class DiscussionTopic < ActiveRecord::Base
       errors.add(:expanded_locked, t("Cannot lock a collapsed discussion"))
     end
   end
+
+  # Bulk insert participants for announcements - called from Announcement model
+  def bulk_insert_participants(user_ids)
+    return if user_ids.empty?
+
+    current_time = Time.zone.now
+    participants_data = user_ids.map do |user_id|
+      {
+        discussion_topic_id: id,
+        user_id:,
+        workflow_state: "unread",
+        unread_entry_count: 1,
+        subscribed: false, # Default for bulk creation of announcements
+        root_account_id: self.root_account_id,
+        created_at: current_time,
+        updated_at: current_time
+      }
+    end
+
+    DiscussionTopicParticipant.bulk_insert(participants_data)
+  end
 end

@@ -2224,15 +2224,13 @@ describe Types::UserType do
       @discussion1 = @course1.discussion_topics.create!(title: "Course 1 Discussion", message: "Test discussion 1")
       @discussion2 = @course2.discussion_topics.create!(title: "Course 2 Discussion", message: "Test discussion 2")
 
-      # Create participants for the user
-      @participant1 = @student_user.discussion_topic_participants.create!(
-        discussion_topic: @announcement1,
-        workflow_state: "read"
-      )
-      @participant2 = @student_user.discussion_topic_participants.create!(
-        discussion_topic: @announcement2,
-        workflow_state: "unread"
-      )
+      # Get participant records (announcements auto-create them, discussions need manual creation)
+      @participant1 = @student_user.discussion_topic_participants.find_by(discussion_topic: @announcement1)
+      @participant1.update!(workflow_state: "read") # Update to desired test state
+
+      @participant2 = @student_user.discussion_topic_participants.find_by(discussion_topic: @announcement2)
+      # @participant2 is already "unread" from auto-creation
+
       @participant3 = @student_user.discussion_topic_participants.create!(
         discussion_topic: @discussion1,
         workflow_state: "read"

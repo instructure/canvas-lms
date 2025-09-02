@@ -327,4 +327,155 @@ describe Announcement do
       it_behaves_like "expected_values_for_teacher_student", true, false
     end
   end
+
+  describe "participant creation" do
+    before do
+      course_with_teacher(active_all: true)
+      @student1 = student_in_course(active_all: true).user
+      @student2 = student_in_course(active_all: true).user
+      @student3 = student_in_course(active_all: true).user
+    end
+
+    it "creates participants for all course students when announcement is created" do
+      announcement = @course.announcements.create!(valid_announcement_attributes.merge(user: @teacher))
+
+      # Author should have participant record
+      author_participant = announcement.discussion_topic_participants.find_by(user: @teacher)
+      expect(author_participant).to be_present
+      expect(author_participant.workflow_state).to eq("read")
+      expect(author_participant.unread_entry_count).to eq(0)
+
+      # All students should have participant records
+      [@student1, @student2, @student3].each do |student|
+        participant = announcement.discussion_topic_participants.find_by(user: student)
+        expect(participant).to be_present
+        expect(participant.workflow_state).to eq("unread")
+        expect(participant.unread_entry_count).to eq(1)
+        expect(participant.subscribed).to be_falsey
+        expect(participant.root_account_id).to eq(announcement.root_account_id)
+      end
+    end
+
+    it "does not create duplicate participants if called multiple times" do
+      announcement = @course.announcements.create!(valid_announcement_attributes.merge(user: @teacher))
+      initial_count = announcement.discussion_topic_participants.count
+
+      # Call the method again (simulating edge case) - should handle gracefully
+      expect { announcement.send(:create_participants_for_course) }.not_to raise_error
+
+      # Should not create duplicates due to unique constraint handling
+      expect(announcement.discussion_topic_participants.count).to eq(initial_count)
+    end
+
+    it "only creates participants for announcements, not regular discussions" do
+      regular_discussion = @course.discussion_topics.create!(
+        title: "Regular Discussion",
+        message: "This is not an announcement",
+        user: @teacher
+      )
+
+      # Only author should have participant record
+      expect(regular_discussion.discussion_topic_participants.count).to eq(1)
+      expect(regular_discussion.discussion_topic_participants.first.user).to eq(@teacher)
+    end
+
+    it "handles courses with no students gracefully" do
+      empty_course = course_factory
+      teacher = teacher_in_course(course: empty_course, active_all: true).user
+
+      announcement = empty_course.announcements.create!(valid_announcement_attributes.merge(user: teacher))
+
+      # Only author should have participant record
+      expect(announcement.discussion_topic_participants.count).to eq(1)
+      expect(announcement.discussion_topic_participants.first.user).to eq(teacher)
+    end
+
+    it "works with large numbers of students" do
+      # Create 50 additional students (already have 3 from setup)
+      50.times { student_in_course(course: @course, active_all: true) }
+
+      announcement = @course.announcements.create!(valid_announcement_attributes.merge(user: @teacher))
+
+      # Should have participants for all active enrollments (students, teachers, TAs, etc.)
+      total_active_enrollments = @course.enrollments.active.count
+      expect(announcement.discussion_topic_participants.count).to eq(total_active_enrollments)
+
+      # All non-author participants should be unread
+      non_author_participants = announcement.discussion_topic_participants.where.not(user: @teacher)
+      expected_non_author_count = total_active_enrollments - 1 # exclude the teacher/author
+      expect(non_author_participants.count).to eq(expected_non_author_count)
+      expect(non_author_participants.pluck(:workflow_state).uniq).to eq(["unread"])
+    end
+
+    it "excludes the author from bulk participant creation" do
+      announcement = @course.announcements.create!(valid_announcement_attributes.merge(user: @teacher))
+
+      # Teacher should have exactly one participant record (not duplicated)
+      teacher_participants = announcement.discussion_topic_participants.where(user: @teacher)
+      expect(teacher_participants.count).to eq(1)
+      expect(teacher_participants.first.workflow_state).to eq("read")
+    end
+
+    it "sets correct default values for bulk-created participants" do
+      announcement = @course.announcements.create!(valid_announcement_attributes.merge(user: @teacher))
+
+      student_participant = announcement.discussion_topic_participants.find_by(user: @student1)
+      expect(student_participant.workflow_state).to eq("unread")
+      expect(student_participant.unread_entry_count).to eq(1)
+      expect(student_participant.subscribed).to be_falsey
+      expect(student_participant.root_account_id).to eq(announcement.root_account_id)
+    end
+
+    context "with group context" do
+      before do
+        @group = group_with_user(user: @teacher, active_all: true).group
+        @group.add_user(@student1, "active")
+      end
+
+      it "does not create bulk participants for group announcements" do
+        announcement = @group.announcements.create!(valid_announcement_attributes.merge(user: @teacher))
+
+        # Only author should have participant record for group announcements
+        expect(announcement.discussion_topic_participants.count).to eq(1)
+        expect(announcement.discussion_topic_participants.first.user).to eq(@teacher)
+      end
+    end
+
+    describe "#bulk_insert_participants" do
+      before do
+        @isolated_course = course_factory
+        @isolated_teacher = teacher_in_course(course: @isolated_course, active_all: true).user
+        @isolated_student1 = student_in_course(course: @isolated_course, active_all: true).user
+        @isolated_student2 = student_in_course(course: @isolated_course, active_all: true).user
+
+        @announcement = @isolated_course.announcements.build(valid_announcement_attributes.merge(user: @isolated_teacher, workflow_state: "active"))
+        @announcement.save!(validate: false) # Skip callbacks to test method directly
+      end
+
+      it "does nothing when given no user IDs" do
+        initial_count = @announcement.discussion_topic_participants.count
+        expect { @announcement.send(:bulk_insert_participants, []) }.not_to raise_error
+        # No new participants should be created, count remains the same
+        expect(@announcement.discussion_topic_participants.count).to eq(initial_count)
+      end
+
+      it "creates participants with correct attributes when called directly" do
+        # Clear any existing participants first to ensure clean state
+        @announcement.discussion_topic_participants.destroy_all
+
+        @announcement.send(:bulk_insert_participants, [@isolated_student1.id, @isolated_student2.id])
+
+        participants = @announcement.discussion_topic_participants.where(user: [@isolated_student1, @isolated_student2])
+        expect(participants.count).to eq(2)
+
+        participants.each do |participant|
+          expect(participant.discussion_topic_id).to eq(@announcement.id)
+          expect(participant.workflow_state).to eq("unread")
+          expect(participant.unread_entry_count).to eq(1)
+          expect(participant.subscribed).to be_falsey
+          expect(participant.root_account_id).to eq(@announcement.root_account_id)
+        end
+      end
+    end
+  end
 end
