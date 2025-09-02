@@ -20,7 +20,10 @@ class Lti::RegistrationHistoryEntry < ApplicationRecord
 
   VALID_UPDATE_TYPES = %w[manual_edit registration_update].freeze
 
+  # Account will always be on the same shard as the entry, but not necessarily
+  # the registration (think Site Admin registrations)
   belongs_to :root_account, class_name: "Account", inverse_of: :lti_registration_history_entries
+  # The registration can be cross-shard
   belongs_to :lti_registration, class_name: "Lti::Registration", inverse_of: :lti_registration_history_entries
   belongs_to :created_by, class_name: "User", inverse_of: :lti_registration_history_entries
 
