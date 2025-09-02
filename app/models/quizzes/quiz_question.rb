@@ -75,9 +75,11 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   scope :generated, -> { where(workflow_state: "generated") }
   scope :not_deleted, -> { where.not(workflow_state: "deleted").or(where(workflow_state: nil)) }
 
+  attr_accessor :force_attachment_associations_update
+
   def update_attachment_associations
     return unless attachment_associations_enabled?
-    return unless saved_change_to_attribute?(:question_data)
+    return if !saved_change_to_attribute?(:question_data) && !force_attachment_associations_update
 
     all_html = [
       question_data[:question_text],
