@@ -302,6 +302,10 @@ BASE_PERMISSIONS = {
     account_details: [
       { title: -> { I18n.t("LTI Registrations - Manage") },
         description: -> { I18n.t("Allows users to view, add, modify, and delete LTI 1.3 tool registrations on the new Apps page.") } }
+    ],
+    account_considerations: [
+      { title: -> { I18n.t("Additional Requirements") },
+        description: -> { I18n.t("The Developer Keys - Manage permission must also be enabled for the Apps link to appear.") } }
     ]
   },
   manage_release_notes: {
