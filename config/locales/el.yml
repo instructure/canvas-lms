@@ -6071,6 +6071,10 @@ el:
   end_date_e0093ed7: "Ημερομηνία Λήξης"
   ending_date_e1ea13a4: "Ημερομηνία Λήξης"
   ends_e3a6843f: Τελειώνει
+  enhanced-rubrics-assignment-container: 
+    discussion_points_possible: 
+      one: "%{count} πιθανό μόριο"
+      other: "%{count} πιθανά μόρια"
   enhanced_individual_gradebook: 
     avg_score: "Μέσος όρος"
     high_score: "Υψηλή Βαθμολογία"
