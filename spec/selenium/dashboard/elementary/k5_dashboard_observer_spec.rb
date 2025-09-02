@@ -318,4 +318,28 @@ describe "observer k5 dashboard" do
   context "schedule shared examples" do
     it_behaves_like "k5 schedule"
   end
+
+  context "learning mastery gradebook" do
+    before :once do
+      turn_on_learning_mastery_gradebook
+      add_and_assess_rubric_assignment
+    end
+
+    it "shows learning mastery gradebook tab on student subject grades tab when enabled" do
+      get "/courses/#{@subject_course.id}#grades"
+
+      expect(learning_mastery_tab).to be_displayed
+      expect(assignments_tab).to be_displayed
+    end
+
+    it "brings up learning mastery grades when tab is clicked" do
+      get "/courses/#{@subject_course.id}#grades"
+
+      click_learning_mastery_tab
+
+      expect(outcomes_group).to be_displayed
+      expect(outcomes_group).to include_text(@subject_course.name)
+      expect(outcomes_group).to include_text("1 of 1 Mastered")
+    end
+  end
 end

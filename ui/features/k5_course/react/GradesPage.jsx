@@ -136,7 +136,7 @@ export const GradesPage = ({
       <div id="outcomes">
         <IndividualStudentMastery
           courseId={courseId}
-          studentId={currentUser.id}
+          studentId={observedUserId || currentUser.id}
           outcomeProficiency={outcomeProficiency}
         />
       </div>
