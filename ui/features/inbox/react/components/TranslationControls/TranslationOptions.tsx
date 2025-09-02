@@ -67,6 +67,8 @@ const TranslationOptions: React.FC<Props> = ({asPrimary, onSetPrimary}) => {
   }
 
   const handleSubmit = () => {
+    if (translationLoading) return
+
     if (!input) {
       setErrorMessages([{type: 'newError', text: I18n.t('Please select a language')}])
       return
@@ -164,7 +166,6 @@ const TranslationOptions: React.FC<Props> = ({asPrimary, onSetPrimary}) => {
                       color="ai-primary"
                       aria-label={I18n.t('Ignite AI Translate')}
                       renderIcon={<IconAiSolid />}
-                      disabled={translationLoading}
                       onClick={handleSubmit}
                       display={responsiveProps.display}
                     >
