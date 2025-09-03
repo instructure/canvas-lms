@@ -634,6 +634,7 @@ pipeline {
                       callableWithDelegate(lintersStage.typescriptStage(nestedStages))()
                       callableWithDelegate(lintersStage.masterBouncerStage(nestedStages))()
                       callableWithDelegate(lintersStage.yarnStage(nestedStages, buildConfig))()
+                      callableWithDelegate(lintersStage.graphqlSchemaStage(nestedStages, buildConfig))()
 
                       parallel(nestedStages)
                     }
