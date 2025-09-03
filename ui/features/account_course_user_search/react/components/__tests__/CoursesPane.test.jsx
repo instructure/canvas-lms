@@ -35,9 +35,20 @@ describe('Account Course User Search CoursesPane View', () => {
   afterEach(() => {
     stores.forEach(store => store.reset({}))
     jest.useRealTimers()
+    // Clean up any mock elements
+    const mockElement = document.getElementById('flash_screenreader_holder')
+    if (mockElement) {
+      mockElement.remove()
+    }
   })
 
   const renderComponent = () => {
+    // Mock the live alert region to prevent warning about screenReaderOnly requiring liveRegion
+    const mockDiv = document.createElement('div')
+    mockDiv.id = 'flash_screenreader_holder'
+    mockDiv.setAttribute('role', 'alert')
+    document.body.appendChild(mockDiv)
+
     return render(
       <CoursesPane
         accountId="1"
