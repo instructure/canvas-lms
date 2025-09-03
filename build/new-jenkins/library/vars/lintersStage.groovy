@@ -26,7 +26,7 @@ def nodeRequirementsTemplate() {
     ]
   ]
 
-  def containers = ['bundle', 'gergichLinters', 'ESLint', 'TypeScript', 'Biome', 'miscJsChecks', 'feature-flag', 'groovy', 'master-bouncer', 'webpack', 'yarn'].collect { containerName ->
+  def containers = ['bundle', 'gergichLinters', 'ESLint', 'TypeScript', 'Biome', 'miscJsChecks', 'feature-flag', 'groovy', 'master-bouncer', 'webpack', 'yarn', 'graphqlSchema'].collect { containerName ->
     baseTestContainer + [name: containerName]
   }
 
@@ -160,6 +160,16 @@ def groovyStage(stages, buildConfig) {
       name: 'groovy',
       required: env.GERRIT_PROJECT == 'canvas-lms' && filesChangedStage.hasGroovyFiles(buildConfig),
       command: 'npx npm-groovy-lint --path \".\" --ignorepattern \"**/node_modules/**\" --files \"**/*.groovy,**/Jenkinsfile*\" --config \".groovylintrc.json\" --loglevel info --failon warning',
+    )
+  }
+}
+
+def graphqlSchemaStage(stages, buildConfig) {
+  { ->
+    callableWithDelegate(queueTestStage())(stages,
+      name: 'graphqlSchema',
+      required: env.GERRIT_PROJECT == 'canvas-lms' && filesChangedStage.hasGraphqlFiles(buildConfig),
+      command: './build/new-jenkins/linters/run-gergich-graphql-schema.sh',
     )
   }
 }
