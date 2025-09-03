@@ -35,6 +35,8 @@ import React from 'react'
 import EditView from '../EditView'
 import '@canvas/jquery/jquery.simulate'
 import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 jest.mock('@canvas/rce/serviceRCELoader')
 jest.mock('@canvas/external-tools/react/components/ExternalToolModalLauncher')
@@ -65,6 +67,52 @@ $.widget = jest.fn((name, base, prototype = {}) => {
   $[namespace] = $[namespace] || {}
   $[namespace][widgetName] = jest.fn()
   $.fn[widgetName] = jest.fn()
+})
+
+// MSW server setup
+const server = setupServer(
+  // Mock all XMLHttpRequest calls to localhost to return empty responses
+  http.all('http://127.0.0.1:80/*', () => {
+    return HttpResponse.json([])
+  }),
+  http.all('http://localhost:80/*', () => {
+    return HttpResponse.json([])
+  }),
+  http.all('http://localhost/*', () => {
+    return HttpResponse.json([])
+  }),
+  // Mock specific API endpoints that might be called
+  http.get(/\/api\/v1\/courses\/\d+\/lti_apps\/launch_definitions/, () => {
+    return HttpResponse.json([])
+  }),
+  http.get(/\/api\/v1\/courses\/\d+\/assignments\/\d+/, () => {
+    return HttpResponse.json({})
+  }),
+  http.get(/\/api\/v1\/courses\/\d+\/settings/, () => {
+    return HttpResponse.json({})
+  }),
+  http.get(/\/api\/v1\/courses\/\d+\/sections/, () => {
+    return HttpResponse.json([])
+  }),
+  // Default handler for other API calls
+  http.all(/\/api\/.*/, () => {
+    return HttpResponse.json([])
+  }),
+)
+
+// Start server before all tests
+beforeAll(() => {
+  server.listen({onUnhandledRequest: 'bypass'})
+})
+
+// Reset handlers after each test
+afterEach(() => {
+  server.resetHandlers()
+})
+
+// Clean up after all tests
+afterAll(() => {
+  server.close()
 })
 
 const s_params = 'some super secure params'
