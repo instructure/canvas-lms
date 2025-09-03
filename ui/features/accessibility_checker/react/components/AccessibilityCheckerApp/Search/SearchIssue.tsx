@@ -29,7 +29,7 @@ interface SearchIssueProps {
 }
 
 export const SearchIssue: React.FC<SearchIssueProps> = ({onSearchChange}) => {
-  const [search, setSearch] = useState<string | undefined>()
+  const [search, setSearch] = useState<string>('')
 
   useEffect(() => {
     const queryString = window.location.search
@@ -53,7 +53,6 @@ export const SearchIssue: React.FC<SearchIssueProps> = ({onSearchChange}) => {
   return (
     <TextInput
       id="issueSearchInput"
-      defaultValue={search || undefined}
       value={search}
       renderBeforeInput={() => <IconSearchLine inline={false} />}
       renderLabel={''}
