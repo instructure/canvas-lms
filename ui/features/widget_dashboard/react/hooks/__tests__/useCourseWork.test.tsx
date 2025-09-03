@@ -180,6 +180,9 @@ describe('useCourseWork', () => {
         points: 50,
         htmlUrl: '/courses/101/assignments/2',
         type: 'quiz',
+        late: false,
+        missing: false,
+        state: 'unsubmitted',
       },
       {
         id: '1',
@@ -189,6 +192,9 @@ describe('useCourseWork', () => {
         points: 25,
         htmlUrl: '/courses/101/assignments/1',
         type: 'assignment',
+        late: false,
+        missing: false,
+        state: 'unsubmitted',
       },
       {
         id: '3',
@@ -198,6 +204,9 @@ describe('useCourseWork', () => {
         points: 15,
         htmlUrl: '/courses/102/assignments/3',
         type: 'discussion',
+        late: false,
+        missing: false,
+        state: 'unsubmitted',
       },
     ]
 

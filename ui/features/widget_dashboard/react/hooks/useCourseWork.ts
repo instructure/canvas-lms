@@ -33,6 +33,9 @@ export interface CourseWorkItem {
   points: number | null
   htmlUrl: string
   type: 'assignment' | 'quiz' | 'discussion'
+  late: boolean
+  missing: boolean
+  state: string
 }
 
 interface Submission {
@@ -283,6 +286,9 @@ export function useCourseWork(options: UseCourseWorkOptions = {}) {
           points: assignment.pointsPossible || null,
           htmlUrl: assignment.htmlUrl,
           type: determineItemType(assignment),
+          late: submission.late || false,
+          missing: submission.missing || false,
+          state: submission.state || 'not_submitted',
         }
       })
 

@@ -22,17 +22,27 @@ import {
   IconQuizLine,
   IconDiscussionLine,
   IconDocumentLine,
+  IconCalendarClockLine,
+  IconCheckMarkLine,
+  IconWarningLine,
 } from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {startOfToday, getTomorrow} from '../../../utils/dateUtils'
 import type {CourseWorkItem} from '../../../hooks/useCourseWork'
 
 const I18n = createI18nScope('widget_dashboard')
+export interface SubmissionStatus {
+  type: 'submitted' | 'late' | 'missing' | 'pending_review' | 'due_soon' | 'not_submitted'
+  label: string
+  color: {background: string; textColor: string}
+  icon?: any
+  iconColor?: string
+}
 
 function dueDateTime(dueDate: Date, day: string): string {
-  return I18n.t('Due %{day} at %{time}', {
+  return I18n.t('%{day} %{time}', {
     day,
-    time: dueDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}),
+    time: dueDate.toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'}),
   })
 }
 
@@ -47,28 +57,15 @@ export function formatDueDate(dueAt: string | null): string {
   const dueTomorrow = dueDate.toDateString() === tomorrow.toDateString()
 
   if (dueToday) {
-    return dueDateTime(dueDate, I18n.t('today'))
+    return dueDateTime(dueDate, I18n.t('Today'))
   }
   if (dueTomorrow) {
-    return dueDateTime(dueDate, I18n.t('tomorrow'))
+    return dueDateTime(dueDate, I18n.t('Tomorrow'))
   }
-  return I18n.t('Due %{date} at %{time}', {
+  return I18n.t('%{date} %{time}', {
     date: dueDate.toLocaleDateString(),
     time: dueDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}),
   })
-}
-
-export function getTypeInfo(type: CourseWorkItem['type']) {
-  switch (type) {
-    case 'assignment':
-      return {color: 'info' as const, label: I18n.t('Assignment')}
-    case 'quiz':
-      return {color: 'warning' as const, label: I18n.t('Quiz')}
-    case 'discussion':
-      return {color: 'success' as const, label: I18n.t('Discussion')}
-    default:
-      return {color: 'primary' as const, label: I18n.t('Item')}
-  }
 }
 
 export function getTypeIcon(type: CourseWorkItem['type']) {
@@ -82,5 +79,81 @@ export function getTypeIcon(type: CourseWorkItem['type']) {
       return <IconDiscussionLine size={iconSize} data-testid="discussion-icon" />
     default:
       return <IconDocumentLine size={iconSize} data-testid="document-icon" />
+  }
+}
+
+interface SubmissionStatusColors {
+  [key: string]: {
+    background: string
+    textColor: string
+  }
+}
+
+const SUBMISSION_STATUS_COLORS: SubmissionStatusColors = {
+  blue: {background: '#E0EBF5', textColor: '#2B7ABC'},
+  red: {background: '#FCE4E5', textColor: '#E62429'},
+  orange: {background: '#FCE5D9', textColor: '#CF4A00'},
+  green: {background: '#DCEEE4', textColor: '#03893D'},
+  grey: {background: '#E8EAEC', textColor: '#6A7883'},
+}
+
+export function getSubmissionStatus(
+  late: boolean,
+  missing: boolean,
+  state: string,
+  dueAt: string | null,
+): SubmissionStatus {
+  if (missing) {
+    return {
+      type: 'missing',
+      label: I18n.t('Missing'),
+      color: SUBMISSION_STATUS_COLORS.red,
+      icon: IconWarningLine,
+      iconColor: 'error',
+    }
+  }
+
+  if (late) {
+    return {
+      type: 'late',
+      label: I18n.t('Late'),
+      color: SUBMISSION_STATUS_COLORS.orange,
+      icon: IconWarningLine,
+      iconColor: 'warning',
+    }
+  }
+
+  if (state === 'pending_review') {
+    return {
+      type: 'pending_review',
+      label: I18n.t('Pending Review'),
+      color: SUBMISSION_STATUS_COLORS.orange,
+    }
+  }
+
+  if (state === 'submitted' || state === 'graded') {
+    return {
+      type: 'submitted',
+      label: I18n.t('Submitted'),
+      color: SUBMISSION_STATUS_COLORS.green,
+      icon: IconCheckMarkLine,
+      iconColor: 'success',
+    }
+  }
+
+  if (dueAt) {
+    return {
+      type: 'due_soon',
+      label: formatDueDate(dueAt),
+      color: SUBMISSION_STATUS_COLORS.blue,
+      icon: IconCalendarClockLine,
+      iconColor: 'brand',
+    }
+  }
+
+  return {
+    type: 'not_submitted',
+    label: I18n.t('Not Submitted'),
+    color: SUBMISSION_STATUS_COLORS.grey,
   }
 }
