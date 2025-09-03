@@ -356,6 +356,10 @@ export const DiscussionTopicContainer = ({
             shouldGrow: true,
             shouldShrink: true,
           },
+          insightsButton: {
+            shouldGrow: true,
+            shouldShrink: true,
+          },
           RCE: {
             paddingClosed: 'none',
             paddingOpen: 'none none small',
@@ -380,6 +384,10 @@ export const DiscussionTopicContainer = ({
             display: 'inline-block',
           },
           summaryButton: {
+            shouldGrow: false,
+            shouldShrink: false,
+          },
+          insightsButton: {
             shouldGrow: false,
             shouldShrink: false,
           },
@@ -596,13 +604,19 @@ export const DiscussionTopicContainer = ({
                                   )}
                                   <Flex.Item shouldGrow>
                                     <Flex
-                                      direction="row"
+                                      direction={matches.includes('mobile') ? 'column' : 'row'}
                                       wrap="wrap"
                                       gap="small"
                                       justifyItems="end"
                                     >
                                       {ENV.user_can_access_insights && (
-                                        <Flex.Item overflowY="visible">
+                                        <Flex.Item
+                                          shouldGrow={responsiveProps?.insightsButton?.shouldGrow}
+                                          shouldShrink={
+                                            responsiveProps?.insightsButton?.shouldShrink
+                                          }
+                                          overflowY="visible"
+                                        >
                                           <DiscussionInsightsButton
                                             isMobile={matches.includes('mobile')}
                                             onClick={() => {
