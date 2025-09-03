@@ -1,13 +1,20 @@
 PATH
   remote: .
   specs:
-    activesupport-suspend_callbacks (0.0.1)
-      activesupport (>= 3.2, < 8.1)
+    broadcast_policy (1.0.0)
+      activesupport
+      after_transaction_commit
 
 GEM
   remote: https://rubygems.org/
   specs:
-    activesupport (7.2.2.2)
+    activemodel (8.0.2.1)
+      activesupport (= 8.0.2.1)
+    activerecord (8.0.2.1)
+      activemodel (= 8.0.2.1)
+      activesupport (= 8.0.2.1)
+      timeout (>= 0.4.0)
+    activesupport (8.0.2.1)
       base64
       benchmark (>= 0.3)
       bigdecimal
@@ -19,6 +26,9 @@ GEM
       minitest (>= 5.1)
       securerandom (>= 0.3)
       tzinfo (~> 2.0, >= 2.0.5)
+      uri (>= 0.13.1)
+    after_transaction_commit (2.2.2)
+      activerecord (>= 5.2)
     base64 (0.3.0)
     benchmark (0.4.1)
     bigdecimal (3.2.2)
@@ -29,7 +39,6 @@ GEM
       irb (~> 1.10)
       reline (>= 0.3.8)
     diff-lcs (1.6.2)
-    docile (1.4.1)
     drb (2.2.3)
     erb (5.0.2)
     i18n (1.14.7)
@@ -47,7 +56,6 @@ GEM
     psych (5.2.6)
       date
       stringio
-    rake (13.2.1)
     rdoc (6.14.2)
       erb
       psych (>= 4.0.0)
@@ -67,15 +75,11 @@ GEM
       rspec-support (~> 3.13.0)
     rspec-support (3.13.2)
     securerandom (0.4.1)
-    simplecov (0.22.0)
-      docile (~> 1.1)
-      simplecov-html (~> 0.11)
-      simplecov_json_formatter (~> 0.1)
-    simplecov-html (0.13.1)
-    simplecov_json_formatter (0.1.4)
     stringio (3.1.7)
+    timeout (0.4.3)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
+    uri (1.0.3)
 
 PLATFORMS
   aarch64-linux
@@ -85,11 +89,9 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  activesupport-suspend_callbacks!
+  broadcast_policy!
   debug
-  rake
   rspec (~> 3.12)
-  simplecov (~> 0.22)
 
 RUBY VERSION
    ruby 3.4.1p0
