@@ -6743,7 +6743,7 @@ ga:
         list_services: "Níor chumasaigh tú do liosta seirbhísí cláraithe. Má chumasaítear an liosta seo beidh sé níos éasca do chomhaltaí an chúrsa agus an ghrúpa nascadh leat taobh amuigh den rang."
         services: "Níor cheangail tú do phróifíl úsáideora le haon seirbhísí seachtracha. Is féidir leat do chuntas Canvas a nascadh le seirbhísí ar nós X.com. Déanfaidh sé seo níos fusa do chomhbhaill an chúrsa agus do bhaill an ghrúpa nascadh leat taobh amuigh den rang."
       labels: 
-        public_list_services: "Lig do chomhbhaill an chúrsa/grúpa na seirbhísí a cheangail mé le mo phróifíl a fheiceáil"
+        public_list_services: "Lig do chomhbhaill an chúrsa/an ghrúpa na seirbhísí a cheangail mé le mo phróifíl a fheiceáil"
         user_privileges: Pribhléidí
       legends: 
         memberships: Ballraíocht
@@ -6781,7 +6781,7 @@ ga:
         services_private: "Níor chumasaigh tú do liosta seirbhísí cláraithe. Má chumasaíonn tú an liosta seo, ligfear do chomhbhaill an chúrsa agus don ghrúpa na seirbhísí a bhfuil nasc agat le do chuntas Canvas a fheiceáil."
         user_services: "Má roghnaíonn baill eile, is féidir leo ligean duit a fheiceáil cé na seirbhísí seachtracha a bhfuil nasc acu lena gcuntas Canvas. Féadann sé seo é a dhéanamh níos fusa tionscadail ghrúpa a chomhordú agus nascadh taobh amuigh den rang freisin."
       labels: 
-        allow_view_services: "Lig do chomhbhaill an chúrsa/grúpa na seirbhísí a cheangail mé le mo phróifíl a fheiceáil"
+        allow_view_services: "Lig do chomhbhaill an chúrsa/an ghrúpa na seirbhísí a cheangail mé le mo phróifíl a fheiceáil"
       links: 
         back_to_roster: "Ar ais go Uainchlár"
         link_existing_service_account: "Nasc Cuntas Reatha"
@@ -17334,7 +17334,7 @@ ga:
   must_be_at_least_min_attempts_or_greater_e2ce76fa: "Ní mór dó a bheith ar a laghad %{min_attempts} nó níos mó"
   must_be_at_least_min_length_or_greater_eb55cbf3: "Ní mór dó a bheith ar a laghad %{min_length} nó níos mó"
   must_be_at_least_mincharacterlength_characters_d98113c1: "Ní mór dó a bheith %{minCharacterLength} (g)c(h)arachtar ar a laghad."
-  must_be_at_least_minimumcharacterlength_characters_5fc7095: "Ní mór  dóa bheith ar a laghad %{minimumCharacterLength} (g)C(h)arachtar ar fhad."
+  must_be_at_least_minimumcharacterlength_characters_5fc7095: "Íoslíon riachtanach na gCarachtar: %{minimumCharacterLength}"
   must_be_at_least_one_group_per_section_there_are_c_8e8b58e4: "Ní mór go mbeadh grúpa amháin ar a laghad in aghaidh na roinne; tá %{count} ailt"
   must_be_at_least_value_characters_in_length_2374f68b: "Ní mór a bheith ar a laghad %{value} (g)C(h)arachtar ar fhad"
   must_be_between_1_and_10_e99eb0d1: "caithfidh sé a bheith idir 1 agus 10"
@@ -20249,7 +20249,7 @@ ga:
       hints: 
         expires_at: "fág bán gan aon dul in éag"
         language: "Sáróidh sé seo aon shocruithe brabhsálaí nó cuntais."
-        name: "Úsáidfear an t-ainm seo le haghaidh marcáilte."
+        name: "Úsáidfear an t-ainm seo le haghaidh marcála."
         short_name: "Feicfidh daoine an t-ainm seo i bhfóraim, i dteachtaireachtaí agus i ráitis."
         sortable_name: "Tá an t-ainm seo le feiceáil i liostaí sórtáilte."
       labels: 
@@ -20263,7 +20263,7 @@ ga:
         locale: Teanga
         name: "Ainm iomlán"
         new_password: "Pasfhocal Nua"
-        old_password: "Pasfhocal Sean"
+        old_password: Sean-phasfhocal
         other_services: "Cliceáil ar aon seirbhís thíos chun clárú"
         password: Pasfhocal
         password_for: "Pasfhocal Le haghaidh"
@@ -20271,7 +20271,7 @@ ga:
         pronouns: Forainmneacha
         purpose: Cuspóir
         short_name: "Ainm Taispeána"
-        show_user_services: "Lig do chomhbhaill an chúrsa/grúpa na seirbhísí a cheangail mé le mo phróifíl a fheiceáil"
+        show_user_services: "Lig do chomhbhaill an chúrsa/an ghrúpa na seirbhísí a cheangail mé le mo phróifíl a fheiceáil"
         skype_name: "Ainm Skype"
         sortable_name: "Ainm Insórtáilte"
         time_zone: Amchrios
