@@ -18,6 +18,7 @@
 
 import React, {useState, useEffect} from 'react'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {IconExternalLinkLine} from '@instructure/ui-icons'
@@ -50,9 +51,12 @@ function createOrUpdateRoot(elementId: string, component: React.ReactNode) {
 export const renderPeerReviewDetails = (assignment: Assignment) => {
   const $mountPoint = document.getElementById('peer_reviews_allocation_and_grading_details')
   if ($mountPoint) {
+    const queryClient = new QueryClient()
     createOrUpdateRoot(
       'peer_reviews_allocation_and_grading_details',
-      <PeerReviewDetails assignment={assignment} />,
+      <QueryClientProvider client={queryClient}>
+        <PeerReviewDetails assignment={assignment} />
+      </QueryClientProvider>,
     )
   }
 }
@@ -153,7 +157,6 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
           </Flex.Item>
           <Flex.Item>
             <PeerReviewAllocationRulesTray
-              courseId={assignment.courseID()}
               assignmentId={assignment.getId()}
               // For now, always allow editing of allocation rules from the details view.
               // Once we expose proper permissions in the API, we can use that to determine if editing

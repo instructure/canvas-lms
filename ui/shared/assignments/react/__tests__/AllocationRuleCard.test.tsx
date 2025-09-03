@@ -19,19 +19,17 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import AllocationRuleCard, {
-  type AllocationRuleType,
-  type PeerReviewStudentType,
-} from '../AllocationRuleCard'
+import AllocationRuleCard, {type AllocationRuleType} from '../AllocationRuleCard'
+import {CourseStudent} from '../../graphql/hooks/useAssignedStudents'
 
 describe('AllocationRuleCard', () => {
-  const reviewer: PeerReviewStudentType = {
-    id: '1',
+  const reviewer: CourseStudent = {
+    _id: '1',
     name: 'Pikachu',
   }
 
-  const reviewee: PeerReviewStudentType = {
-    id: '2',
+  const reviewee: CourseStudent = {
+    _id: '2',
     name: 'Piplup',
   }
 

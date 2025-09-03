@@ -23,18 +23,14 @@ import {IconEditLine, IconTrashLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {CourseStudent} from '../graphql/hooks/useAssignedStudents'
 
 const I18n = createI18nScope('peer_review_allocation_rule_card')
 
-export type PeerReviewStudentType = {
-  id: string
-  name: string
-}
-
 export type AllocationRuleType = {
   id: string
-  reviewer: PeerReviewStudentType
-  reviewee: PeerReviewStudentType
+  reviewer: CourseStudent
+  reviewee: CourseStudent
   mustReview: boolean
   reviewPermitted: boolean
   appliesToReviewer: boolean

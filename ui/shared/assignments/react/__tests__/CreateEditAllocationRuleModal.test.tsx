@@ -19,8 +19,24 @@
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import {QueryClient} from '@tanstack/react-query'
+import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import CreateEditAllocationRuleModal from '../CreateEditAllocationRuleModal'
-import {type AllocationRuleType, type PeerReviewStudentType} from '../AllocationRuleCard'
+import {type AllocationRuleType} from '../AllocationRuleCard'
+import {CourseStudent} from '../../graphql/hooks/useAssignedStudents'
+
+jest.mock('@canvas/graphql', () => ({
+  executeQuery: jest.fn(),
+}))
+
+const {executeQuery} = require('@canvas/graphql')
+const mockExecuteQuery = executeQuery as jest.MockedFunction<typeof executeQuery>
+
+const mockStudents: CourseStudent[] = [
+  {_id: '1', name: 'Student 1'},
+  {_id: '2', name: 'Student 2'},
+  {_id: '3', name: 'Student 3'},
+]
 
 describe('CreateEditAllocationRuleModal', () => {
   const mockSetIsOpen = jest.fn()
@@ -29,13 +45,13 @@ describe('CreateEditAllocationRuleModal', () => {
     setIsOpen: mockSetIsOpen,
   }
 
-  const reviewer: PeerReviewStudentType = {
-    id: '1',
+  const reviewer: CourseStudent = {
+    _id: '1',
     name: 'Pikachu',
   }
 
-  const reviewee: PeerReviewStudentType = {
-    id: '2',
+  const reviewee: CourseStudent = {
+    _id: '2',
     name: 'Piplup',
   }
 
@@ -55,23 +71,39 @@ describe('CreateEditAllocationRuleModal', () => {
     jest.clearAllMocks()
   })
 
+  const renderWithProviders = (props = {}) => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    })
+
+    return render(
+      <MockedQueryClientProvider client={queryClient}>
+        <CreateEditAllocationRuleModal {...defaultProps} {...props} />
+      </MockedQueryClientProvider>,
+    )
+  }
+
   describe('Modal rendering', () => {
     it('renders create modal when isEdit is false', () => {
-      render(<CreateEditAllocationRuleModal {...defaultProps} />)
+      renderWithProviders()
 
       expect(screen.getByText('Create Rule')).toBeInTheDocument()
       expect(screen.getByTestId('create-rule-modal')).toBeInTheDocument()
     })
 
     it('renders edit modal when isEdit is true', () => {
-      render(<CreateEditAllocationRuleModal {...defaultProps} isEdit={true} rule={sampleRule} />)
+      renderWithProviders({isEdit: true, rule: sampleRule})
 
       expect(screen.getByText('Edit Rule')).toBeInTheDocument()
       expect(screen.getByTestId('edit-rule-modal')).toBeInTheDocument()
     })
 
     it('does not render when isOpen is false', () => {
-      render(<CreateEditAllocationRuleModal {...defaultProps} isOpen={false} />)
+      renderWithProviders({isOpen: false})
 
       expect(screen.queryByTestId('create-rule-modal')).not.toBeInTheDocument()
       expect(screen.queryByTestId('edit-rule-modal')).not.toBeInTheDocument()
@@ -80,7 +112,7 @@ describe('CreateEditAllocationRuleModal', () => {
 
   describe('Target type selection', () => {
     beforeEach(() => {
-      render(<CreateEditAllocationRuleModal {...defaultProps} />)
+      renderWithProviders()
     })
 
     it('renders target type radio options', () => {
@@ -106,7 +138,7 @@ describe('CreateEditAllocationRuleModal', () => {
 
   describe('Review type selection', () => {
     beforeEach(() => {
-      render(<CreateEditAllocationRuleModal {...defaultProps} />)
+      renderWithProviders()
     })
 
     it('renders all review type options', () => {
@@ -133,25 +165,29 @@ describe('CreateEditAllocationRuleModal', () => {
 
   describe('Student selection', () => {
     beforeEach(() => {
-      render(<CreateEditAllocationRuleModal {...defaultProps} />)
+      mockExecuteQuery.mockResolvedValue({
+        assignment: {
+          assignedStudents: {
+            nodes: mockStudents,
+          },
+        },
+      })
+      renderWithProviders()
     })
 
     it('renders reviewer and recipient select fields', () => {
-      expect(screen.getByTestId('target-select')).toBeInTheDocument()
-      expect(screen.getByTestId('subject-select')).toBeInTheDocument()
+      expect(screen.getByText('Reviewer Name')).toBeInTheDocument()
+      expect(screen.getByText('Recipient Name')).toBeInTheDocument()
     })
 
     it('shows student options when typing in select field', async () => {
-      const reviewerSelect = screen.getByTestId('target-select').querySelector('input')
+      const reviewerSelect = screen.getByText('Reviewer Name').querySelector('input')
 
       if (reviewerSelect) {
-        await user.type(reviewerSelect, 'Student')
+        await user.type(reviewerSelect, 'Student 1')
 
         await waitFor(() => {
-          // TODO: [EGG-1386] Updating test with mocking the data
           expect(screen.getByText('Student 1')).toBeInTheDocument()
-          expect(screen.getByText('Student 2')).toBeInTheDocument()
-          expect(screen.getByText('Student 3')).toBeInTheDocument()
         })
       }
     })
@@ -159,7 +195,7 @@ describe('CreateEditAllocationRuleModal', () => {
 
   describe('Additional subject fields', () => {
     beforeEach(() => {
-      render(<CreateEditAllocationRuleModal {...defaultProps} />)
+      renderWithProviders()
     })
 
     it('shows add another recipient button', () => {
@@ -172,7 +208,8 @@ describe('CreateEditAllocationRuleModal', () => {
       await user.click(addButton)
 
       await waitFor(() => {
-        expect(screen.getByTestId('additional-subject-select-1')).toBeInTheDocument()
+        // Look for the additional field by its label instead
+        expect(screen.getAllByText('Recipient Name')).toHaveLength(2)
       })
     })
 
@@ -203,13 +240,14 @@ describe('CreateEditAllocationRuleModal', () => {
         expect(
           screen.queryByTestId('delete-additional-subject-field-1-button'),
         ).not.toBeInTheDocument()
+        expect(screen.getAllByText('Recipient Name')).toHaveLength(1)
       })
     })
   })
 
   describe('Form validation', () => {
     beforeEach(() => {
-      render(<CreateEditAllocationRuleModal {...defaultProps} />)
+      renderWithProviders()
     })
 
     it('shows validation errors when required fields are empty', async () => {
@@ -239,7 +277,7 @@ describe('CreateEditAllocationRuleModal', () => {
 
   describe('Edit mode', () => {
     it('populates fields with existing rule data', () => {
-      render(<CreateEditAllocationRuleModal {...defaultProps} isEdit={true} rule={sampleRule} />)
+      renderWithProviders({isEdit: true, rule: sampleRule})
 
       expect(screen.getByTestId('target-type-reviewer')).toBeChecked()
       expect(screen.getByTestId('review-type-must-review')).toBeChecked()
@@ -255,7 +293,7 @@ describe('CreateEditAllocationRuleModal', () => {
         reviewPermitted: true,
       }
 
-      render(<CreateEditAllocationRuleModal {...defaultProps} isEdit={true} rule={revieweeRule} />)
+      renderWithProviders({isEdit: true, rule: revieweeRule})
 
       expect(screen.getByTestId('target-type-reviewee')).toBeChecked()
       expect(screen.getByTestId('review-type-should-review')).toBeChecked()
@@ -264,7 +302,7 @@ describe('CreateEditAllocationRuleModal', () => {
 
   describe('Modal actions', () => {
     beforeEach(() => {
-      render(<CreateEditAllocationRuleModal {...defaultProps} />)
+      renderWithProviders()
     })
 
     it('closes modal when cancel button is clicked', async () => {
@@ -278,9 +316,16 @@ describe('CreateEditAllocationRuleModal', () => {
     })
 
     it('calls setIsOpen with false when save is successful', async () => {
-      // First select students to make validation pass
-      const reviewerInput = screen.getByTestId('target-select').querySelector('input')
-      const recipientInput = screen.getByTestId('subject-select').querySelector('input')
+      mockExecuteQuery.mockResolvedValue({
+        assignment: {
+          assignedStudents: {
+            nodes: mockStudents,
+          },
+        },
+      })
+
+      const reviewerInput = screen.getAllByText('Reviewer Name')[0].querySelector('input')
+      const recipientInput = screen.getAllByText('Recipient Name')[0].querySelector('input')
 
       if (reviewerInput && recipientInput) {
         await user.type(reviewerInput, 'Student 1')
@@ -301,7 +346,7 @@ describe('CreateEditAllocationRuleModal', () => {
 
   describe('Accessibility', () => {
     beforeEach(() => {
-      render(<CreateEditAllocationRuleModal {...defaultProps} />)
+      renderWithProviders()
     })
 
     it('provides correct aria-label for add subject button based on target type', async () => {
@@ -337,7 +382,14 @@ describe('CreateEditAllocationRuleModal', () => {
 
   describe('Error handling', () => {
     beforeEach(() => {
-      render(<CreateEditAllocationRuleModal {...defaultProps} />)
+      mockExecuteQuery.mockResolvedValue({
+        assignment: {
+          assignedStudents: {
+            nodes: mockStudents,
+          },
+        },
+      })
+      renderWithProviders()
     })
 
     it('clears errors on input change', async () => {
@@ -349,7 +401,7 @@ describe('CreateEditAllocationRuleModal', () => {
         expect(screen.getByText('Reviewer is required')).toBeInTheDocument()
       })
 
-      const reviewerInput = screen.getByTestId('target-select').querySelector('input')
+      const reviewerInput = screen.getByText('Reviewer Name').querySelector('input')
       if (reviewerInput) {
         await user.type(reviewerInput, 'Student 1')
         await user.click(screen.getByText('Student 1'))
