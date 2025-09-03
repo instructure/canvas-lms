@@ -430,6 +430,12 @@ export interface ModuleActionEventDetail {
   [key: string]: unknown
 }
 
+export type ModulePageNavigationEvent = 'module-page-navigation'
+export interface ModulePageNavigationDetail {
+  moduleId: string
+  pageNumber: number
+}
+
 export interface HTMLElementWithRoot extends HTMLElement {
   reactRoot?: Root
 }
@@ -446,12 +452,20 @@ declare global {
       listener: (event: CustomEvent<ModuleActionEventDetail>) => void,
     ): void
     addEventListener(
+      type: ModulePageNavigationEvent,
+      listener: (event: CustomEvent<ModulePageNavigationDetail>) => void,
+    ): void
+    addEventListener(
       type: DragStateChangeEvent,
       listener: (event: CustomEvent<DragStateChangeDetail>) => void,
     ): void
     removeEventListener(
       type: ModuleKBActionEvent,
       listener: (event: CustomEvent<ModuleActionEventDetail>) => void,
+    ): void
+    removeEventListener(
+      type: ModulePageNavigationEvent,
+      listener: (event: CustomEvent<ModulePageNavigationDetail>) => void,
     ): void
     removeEventListener(
       type: DragStateChangeEvent,

@@ -20,8 +20,7 @@ import type React from 'react'
 import {useCallback, useState, useEffect, useMemo} from 'react'
 import {View} from '@instructure/ui-view'
 import PaginatedNavigation from './PaginatedNavigation'
-import type {ModuleItem} from '../utils/types'
-import {SHOW_ALL_PAGE_SIZE} from '../utils/constants'
+import type {ModuleItem, ModulePageNavigationDetail} from '../utils/types'
 import {useModuleItems} from '../hooks/queries/useModuleItems'
 import {useAllModuleItems} from '../hooks/queries/useAllModuleItems'
 import {Spinner} from '@instructure/ui-spinner'
@@ -64,6 +63,7 @@ const ModuleItemListSmart: React.FC<ModuleItemListSmartProps> = ({
     totalPages: number
   }>()
   const [onPageLoaded, setOnPageLoaded] = useState(() => () => {})
+  const [requestJumpToPage, setRequestJumpToPage] = useState(-1)
 
   const contextModule: any = useContextModule()
   const {courseId, pageSize} = contextModule
@@ -158,6 +158,44 @@ const ModuleItemListSmart: React.FC<ModuleItemListSmartProps> = ({
       }))
     }
   }, [pageIndex, totalPages, moduleId, setModuleCursorState, setPageIndex, getCursor])
+
+  const handleModulePageNavigation = useCallback(
+    (event: CustomEvent<ModulePageNavigationDetail>) => {
+      // because this is called outside the normal rendering flow, we cannot count on
+      // any of the component's state variables being current. We can only update our
+      // state variable and let the useEffect below handle the rest.
+      // This deals with the case when the user adds a new module item, and that item
+      // creates a new page. We want to jump to the new page, but it doesn't exist
+      // in our state data yet.
+      const {detail} = event
+      if (detail.moduleId === moduleId) {
+        setRequestJumpToPage(detail.pageNumber)
+      }
+    },
+    [moduleId],
+  )
+
+  useEffect(() => {
+    document.addEventListener('module-page-navigation', handleModulePageNavigation)
+    return () => {
+      document.removeEventListener('module-page-navigation', handleModulePageNavigation)
+    }
+  }, [handleModulePageNavigation])
+
+  useEffect(() => {
+    if (requestJumpToPage > 0) {
+      // we want to jump to a page
+      if (requestJumpToPage <= totalPages) {
+        // the page now exists
+        setPageIndex(requestJumpToPage)
+        setModuleCursorState((prev: any) => ({
+          ...prev,
+          [moduleId]: getCursor(requestJumpToPage),
+        }))
+        setRequestJumpToPage(-1)
+      }
+    }
+  }, [requestJumpToPage, totalPages, moduleId, setModuleCursorState, setPageIndex, getCursor])
 
   const handlePageChange = (page: number) => {
     setPageIndex(page)

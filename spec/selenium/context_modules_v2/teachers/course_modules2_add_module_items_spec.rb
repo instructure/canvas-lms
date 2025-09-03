@@ -251,5 +251,37 @@ describe "selective_release module item assign to tray", :ignore_js_errors do
 
       expect(element_exists?(context_module_item_selector(module_item.id))).to be true
     end
+
+    context "when paginated" do
+      before(:once) do
+        Setting.set("module_perf_threshold", -1)
+
+        @assignments = []
+        (2..11).each do |i|
+          @assignments << @course.assignments.create!(title: "Assignment #{i}")
+          @module.add_item type: "assignment", id: @assignments.last.id
+        end
+      end
+
+      it("goes to last page when adding a new module item") do
+        go_to_modules
+        wait_for_ajaximations
+        context_module_expand_toggle(@module.id).click
+        wait_for_ajaximations
+
+        add_item_button(@module.id).click
+        wait_for_ajaximations
+
+        click_INSTUI_Select_option(add_existing_item_select_selector, "Assignment 1")
+        add_item_modal_add_item_button.click
+        wait_for_ajaximations
+
+        module_item = ContentTag.find_by(context_id: @course.id, context_module_id: @module.id, content_type: "Assignment", content_id: @assignment.id)
+
+        expect(element_exists?(context_module_item_selector(module_item.id))).to be true
+        expect(pagination_info_text_includes?("Showing 11-11 of 11 items")).to be true
+        expect(pagination_page_current_page_button.text).to eq("2")
+      end
+    end
   end
 end

@@ -24,6 +24,7 @@ import {useDefaultCourseFolder} from '../../hooks/mutations/useDefaultCourseFold
 import type {ContentItem} from '../queries/useModuleItemContent'
 import {useModules} from '../queries/useModules'
 import {ExternalToolUrl, ExternalUrl, FormState, NewItem} from '../../utils/types'
+import {navigateToLastPage} from '../../utils/pageNavigation'
 
 const initialState: FormState = {
   indentation: 0,
@@ -158,27 +159,29 @@ export function useAddModuleItem({
     )
     const isExistingItem = tabIndex === 0 && selectedItem
 
-    if (isSimple || isExistingItem) {
-      await submitItemData(courseId, moduleId, itemData, onRequestClose)
-    } else if (tabIndex === 1) {
-      if (itemType === 'file' && !newItem.file) {
-        dispatch({type: 'SET_LOADING', value: false})
-        return
+    try {
+      if (isSimple || isExistingItem) {
+        await submitItemData(courseId, moduleId, itemData, onRequestClose)
+      } else if (tabIndex === 1) {
+        if (itemType !== 'file' || newItem.file) {
+          await submitInlineItem({
+            moduleId,
+            itemType,
+            newItemName: newItem.name,
+            selectedAssignmentGroup: newItem.assignmentGroup,
+            selectedFile: newItem.file,
+            selectedFolder: newItem.folder || defaultFolder,
+            itemData,
+            onRequestClose,
+          })
+        }
       }
 
-      await submitInlineItem({
-        moduleId,
-        itemType,
-        newItemName: newItem.name,
-        selectedAssignmentGroup: newItem.assignmentGroup,
-        selectedFile: newItem.file,
-        selectedFolder: newItem.folder || defaultFolder,
-        itemData,
-        onRequestClose,
-      })
+      // Navigate to the last page after adding an item
+      navigateToLastPage(moduleId, totalCount + 1)
+    } finally {
+      dispatch({type: 'SET_LOADING', value: false})
     }
-
-    dispatch({type: 'SET_LOADING', value: false})
   }
 
   return {

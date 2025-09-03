@@ -17,47 +17,29 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor, waitForElementToBeRemoved} from '@testing-library/react'
+import {render, screen, waitFor, waitForElementToBeRemoved, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {setupServer} from 'msw/node'
+import {graphql, HttpResponse} from 'msw'
 import ModuleItemListSmart, {ModuleItemListSmartProps} from '../ModuleItemListSmart'
 import type {ModuleItem} from '../../utils/types'
 import {PAGE_SIZE, MODULE_ITEMS, MODULES, SHOW_ALL_PAGE_SIZE} from '../../utils/constants'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
-import {http, HttpResponse} from 'msw'
-import {setupServer} from 'msw/node'
 
-const server = setupServer(
-  http.post('/api/graphql', () => {
-    return HttpResponse.json({
-      data: {
-        legacyNode: {
-          moduleItemsConnection: {
-            edges: [],
-            pageInfo: {
-              hasNextPage: false,
-              endCursor: null,
-            },
-          },
-        },
-      },
-    })
-  }),
-)
-
-const generateItems = (count: number): ModuleItem[] =>
+const generateItems = (count: number, start: number = 0): ModuleItem[] =>
   Array.from({length: count}, (_, i) => ({
-    _id: `mod-item-${i}`,
-    id: `item-${i}`,
-    url: `/modules/items/${i}`,
+    _id: `mod-item-${i + start}`,
+    id: `item-${i + start}`,
+    url: `/modules/items/${i + start}`,
     moduleItemUrl: 'https://example.com',
     indent: 0,
     position: i + 1,
-    title: `Content ${i}`,
+    title: `Content ${i + start}`,
     content: {
       __typename: 'Assignment',
-      id: `content-${i}`,
-      title: `Content ${i}`,
+      id: `content-${i + start}`,
+      title: `Content ${i + start}`,
     },
     masterCourseRestrictions: {
       all: false,
@@ -139,137 +121,193 @@ const renderWithClient = (
 }
 
 describe('ModuleItemListSmart', () => {
-  beforeAll(() => {
-    server.listen()
-  })
-
   afterEach(() => {
     localStorage.clear()
-    server.resetHandlers()
   })
 
-  afterAll(() => {
-    server.close()
-  })
+  describe('rendering', () => {
+    it('renders paginated items and shows pagination UI when needed', async () => {
+      const itemCount = 25 // PAGE_SIZE = 10, so this gives 3 pages
+      renderWithClient(
+        <ModuleItemListSmart {...defaultProps()} renderList={renderList} />,
+        itemCount,
+      )
 
-  it('renders paginated items and shows pagination UI when needed', async () => {
-    const itemCount = 25 // PAGE_SIZE = 10, so this gives 3 pages
-    renderWithClient(<ModuleItemListSmart {...defaultProps()} renderList={renderList} />, itemCount)
+      await screen.findByTestId('item-list')
+      if (screen.queryByTestId('loading')) {
+        await waitForElementToBeRemoved(() => screen.getByTestId('loading'))
+      }
 
-    await screen.findByTestId('item-list')
-    if (screen.queryByTestId('loading')) {
-      await waitForElementToBeRemoved(() => screen.getByTestId('loading'))
-    }
+      const summary = await screen.findByTestId('pagination-info-text')
+      expect(summary).toHaveTextContent(`Showing 1-10 of ${itemCount} items`)
 
-    const summary = await screen.findByTestId('pagination-info-text')
-    expect(summary).toHaveTextContent(`Showing 1-10 of ${itemCount} items`)
+      const alert = await screen.findByRole('alert')
+      expect(alert).toHaveTextContent(/all module items loaded/i)
+    })
 
-    const alert = await screen.findByRole('alert')
-    expect(alert).toHaveTextContent(/all module items loaded/i)
-  })
+    it('navigates to the next page and updates visible items', async () => {
+      const itemCount = PAGE_SIZE * 2
+      const firstPageItems = generateItems(PAGE_SIZE)
+      const secondPageItems = generateItems(PAGE_SIZE, PAGE_SIZE)
 
-  it('navigates to the next page and updates visible items', async () => {
-    const itemCount = PAGE_SIZE * 2
-    const firstPageItems = generateItems(PAGE_SIZE)
-    const secondPageItems = generateItems(PAGE_SIZE).map((item, i) => ({
-      ...item,
-      id: `item-${i + PAGE_SIZE}`,
-      content: {
-        ...item.content,
-        title: `Content ${i + PAGE_SIZE}`,
-      },
-    }))
-
-    const client = new QueryClient({
-      defaultOptions: {
-        queries: {
-          retry: false,
-          staleTime: Infinity,
+      const client = new QueryClient({
+        defaultOptions: {
+          queries: {
+            retry: false,
+            staleTime: Infinity,
+          },
         },
-      },
+      })
+      const user = userEvent.setup()
+
+      // Set up module items for both pages
+      client.setQueryData([MODULE_ITEMS, 'mod123', null], {
+        moduleItems: firstPageItems,
+      })
+      client.setQueryData([MODULE_ITEMS, 'mod123', btoa(String(PAGE_SIZE))], {
+        moduleItems: secondPageItems,
+      })
+
+      const modulePage = createModulePage(itemCount)
+
+      client.setQueryData([MODULES, 'course123'], {
+        pages: [modulePage],
+        pageParams: [null],
+        getModuleItemsTotalCount: modulePage.getModuleItemsTotalCount,
+        isFetching: false,
+      })
+
+      render(
+        <QueryClientProvider client={client}>
+          <ContextModuleProvider {...contextModuleDefaultProps} courseId="course123">
+            <ModuleItemListSmart {...defaultProps()} isPaginated={true} renderList={renderList} />
+          </ContextModuleProvider>
+        </QueryClientProvider>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByText('Content 0')).toBeInTheDocument()
+        expect(screen.getByText(`Showing 1-${PAGE_SIZE} of ${itemCount} items`)).toBeInTheDocument()
+      })
+
+      const pageTwoButton = screen.queryByText('2')?.closest('button')
+      expect(pageTwoButton).toBeInTheDocument()
+      await user.click(pageTwoButton!)
+
+      await waitFor(() => {
+        expect(screen.getByText(`Content ${PAGE_SIZE}`)).toBeInTheDocument()
+        expect(
+          screen.getByText(`Showing ${PAGE_SIZE + 1}-${PAGE_SIZE * 2} of ${itemCount} items`),
+        ).toBeInTheDocument()
+      })
     })
-    const user = userEvent.setup()
 
-    // Set up module items for both pages
-    client.setQueryData([MODULE_ITEMS, 'mod123', null], {
-      moduleItems: firstPageItems,
-    })
-    client.setQueryData([MODULE_ITEMS, 'mod123', btoa(String(PAGE_SIZE))], {
-      moduleItems: secondPageItems,
-    })
-
-    const modulePage = createModulePage(itemCount)
-
-    client.setQueryData([MODULES, 'course123'], {
-      pages: [modulePage],
-      pageParams: [null],
-      getModuleItemsTotalCount: modulePage.getModuleItemsTotalCount,
-      isFetching: false,
-    })
-
-    render(
-      <QueryClientProvider client={client}>
-        <ContextModuleProvider {...contextModuleDefaultProps} courseId="course123">
-          <ModuleItemListSmart {...defaultProps()} isPaginated={true} renderList={renderList} />
-        </ContextModuleProvider>
-      </QueryClientProvider>,
-    )
-
-    expect(await screen.findByText('Content 0')).toBeInTheDocument()
-    expect(
-      await screen.findByText(`Showing 1-${PAGE_SIZE} of ${itemCount} items`),
-    ).toBeInTheDocument()
-
-    const pageTwoButton = screen.queryByText('2')?.closest('button')
-    expect(pageTwoButton).toBeInTheDocument()
-    await user.click(pageTwoButton!)
-
-    await waitFor(() => {
-      expect(screen.getByText(`Content ${PAGE_SIZE}`)).toBeInTheDocument()
-      expect(
-        screen.getByText(`Showing ${PAGE_SIZE + 1}-${PAGE_SIZE * 2} of ${itemCount} items`),
-      ).toBeInTheDocument()
-    })
-  })
-
-  it('renders all items when pagination is not needed', async () => {
-    const client = new QueryClient({
-      defaultOptions: {
-        queries: {
-          retry: false,
-          staleTime: Infinity,
+    it('renders all items when pagination is not needed', async () => {
+      const client = new QueryClient({
+        defaultOptions: {
+          queries: {
+            retry: false,
+            staleTime: Infinity,
+          },
         },
-      },
+      })
+
+      const items1 = generateItems(PAGE_SIZE)
+      const items2 = generateItems(PAGE_SIZE, PAGE_SIZE)
+      // Set up data for the non-paginated query
+      client.setQueryData(['MODULE_ITEMS_ALL', 'mod123', 'teacher', SHOW_ALL_PAGE_SIZE], {
+        moduleItems: items1.concat(items2),
+        pageInfo: {hasNextPage: false, endCursor: null},
+      })
+      client.setQueryData([MODULE_ITEMS, 'mod123', null], {
+        moduleItems: items1,
+      })
+      client.setQueryData([MODULE_ITEMS, 'mod123', btoa(String(PAGE_SIZE))], {
+        moduleItems: items2,
+      })
+
+      const modulePage = createModulePage(PAGE_SIZE * 2)
+
+      const modulesData = {
+        pages: [modulePage],
+        pageParams: [null],
+        getModuleItemsTotalCount: modulePage.getModuleItemsTotalCount,
+        isFetching: false,
+      }
+
+      client.setQueryData([MODULES, 'course123'], modulesData)
+
+      render(
+        <QueryClientProvider client={client}>
+          <ContextModuleProvider {...contextModuleDefaultProps} courseId="course123">
+            <ModuleItemListSmart {...defaultProps()} isPaginated={false} renderList={renderList} />
+          </ContextModuleProvider>
+        </QueryClientProvider>,
+      )
+
+      const list = await screen.findByTestId('item-list')
+      expect(list.children).toHaveLength(PAGE_SIZE * 2)
+      expect(screen.queryByTestId('pagination-info-text')).not.toBeInTheDocument()
     })
 
-    // Set up data for the non-paginated query
-    client.setQueryData(['MODULE_ITEMS_ALL', 'mod123', 'teacher', SHOW_ALL_PAGE_SIZE], {
-      moduleItems: generateItems(PAGE_SIZE),
-      pageInfo: {hasNextPage: false, endCursor: null},
+    describe('loading', () => {
+      let server: ReturnType<typeof setupServer>
+      beforeAll(() => {
+        server = setupServer(
+          graphql.query('GetModuleItemsQuery', () => {
+            return new Promise(resolve => {
+              setTimeout(() => {
+                resolve(
+                  HttpResponse.json({
+                    data: {
+                      legacyNode: {
+                        moduleItems: [],
+                      },
+                    },
+                  }),
+                )
+              }, 50)
+            })
+          }),
+        )
+        server.listen()
+      })
+
+      afterAll(() => {
+        server.close()
+      })
+
+      it('shows loading spinner when data is loading', async () => {
+        // Set up modules data
+        const client = new QueryClient({
+          defaultOptions: {
+            queries: {
+              retry: false,
+              staleTime: Infinity,
+            },
+          },
+        })
+        const modulePage = createModulePage(25)
+        client.setQueryData([MODULES, 'course123'], {
+          pages: [modulePage],
+          pageParams: [null],
+          getModuleItemsTotalCount: modulePage.getModuleItemsTotalCount,
+          isFetching: false,
+        })
+
+        render(
+          <QueryClientProvider client={client}>
+            <ContextModuleProvider {...contextModuleDefaultProps} courseId="course123">
+              <ModuleItemListSmart {...defaultProps()} renderList={renderList} />
+            </ContextModuleProvider>
+          </QueryClientProvider>,
+        )
+
+        await waitFor(() => {
+          expect(screen.getByText(/Loading module items/i)).toBeInTheDocument()
+        })
+      })
     })
-
-    const modulePage = createModulePage(PAGE_SIZE)
-
-    const modulesData = {
-      pages: [modulePage],
-      pageParams: [null],
-      getModuleItemsTotalCount: modulePage.getModuleItemsTotalCount,
-      isFetching: false,
-    }
-
-    client.setQueryData([MODULES, 'course123'], modulesData)
-
-    render(
-      <QueryClientProvider client={client}>
-        <ContextModuleProvider {...contextModuleDefaultProps} courseId="course123">
-          <ModuleItemListSmart {...defaultProps()} isPaginated={false} renderList={renderList} />
-        </ContextModuleProvider>
-      </QueryClientProvider>,
-    )
-
-    const list = await screen.findByTestId('item-list')
-    expect(list.children).toHaveLength(PAGE_SIZE)
-    expect(screen.queryByTestId('pagination-info-text')).not.toBeInTheDocument()
   })
 
   describe('Error handling', () => {
@@ -309,46 +347,112 @@ describe('ModuleItemListSmart', () => {
     })
   })
 
-  it('shows loading spinner when data is loading', async () => {
-    const client = new QueryClient({
-      defaultOptions: {
-        queries: {
-          retry: false,
-          staleTime: 0,
+  describe('Module page navigation events', () => {
+    let client: QueryClient
+    let itemCount: number
+
+    beforeEach(() => {
+      client = new QueryClient({
+        defaultOptions: {
+          queries: {
+            retry: false,
+            staleTime: Infinity,
+          },
         },
-      },
+      })
+
+      // Build 2 pages of items
+      itemCount = PAGE_SIZE * 2 - 2
+      const firstPageItems = generateItems(PAGE_SIZE)
+      client.setQueryData([MODULE_ITEMS, 'mod123', null], {
+        moduleItems: firstPageItems,
+      })
+
+      const secondPageItems = generateItems(PAGE_SIZE, PAGE_SIZE)
+      client.setQueryData([MODULE_ITEMS, 'mod123', btoa(String(PAGE_SIZE))], {
+        moduleItems: secondPageItems,
+      })
+
+      const modulePage = createModulePage(itemCount)
+      client.setQueryData([MODULES, 'course123'], {
+        pages: [modulePage],
+        pageParams: [null],
+        getModuleItemsTotalCount: modulePage.getModuleItemsTotalCount,
+        isFetching: false,
+      })
     })
 
-    const delayedResolve = <T,>(value: T) =>
-      new Promise<T>(resolve => setTimeout(() => resolve(value), 50))
+    it('navigates to page the page specified in the event', async () => {
+      render(
+        <QueryClientProvider client={client}>
+          <ContextModuleProvider {...contextModuleDefaultProps} courseId="course123">
+            <ModuleItemListSmart {...defaultProps()} isPaginated={true} renderList={renderList} />
+          </ContextModuleProvider>
+        </QueryClientProvider>,
+      )
 
-    // Set up modules data
-    const modulePage = createModulePage(25)
+      // The first page is rendered
+      await waitFor(() => {
+        expect(screen.getByText('Content 0')).toBeInTheDocument()
+        expect(screen.getByText(`Showing 1-${PAGE_SIZE} of ${itemCount} items`)).toBeInTheDocument()
+      })
 
-    client.setQueryData([MODULES, 'course123'], {
-      pages: [modulePage],
-      pageParams: [null],
-      getModuleItemsTotalCount: modulePage.getModuleItemsTotalCount,
-      isFetching: false,
-    })
-
-    client.setQueryDefaults([MODULE_ITEMS, 'mod123', null], {
-      queryFn: () =>
-        delayedResolve({
-          moduleItems: generateItems(PAGE_SIZE),
+      // navigate to page 2
+      fireEvent(
+        document,
+        new CustomEvent('module-page-navigation', {
+          detail: {
+            moduleId: 'mod123',
+            pageNumber: 2,
+          },
         }),
+      )
+
+      // Verify that we navigated to page 2
+      await waitFor(() => {
+        expect(screen.getByText(`Content ${PAGE_SIZE}`)).toBeInTheDocument()
+        expect(
+          screen.getByText(`Showing ${PAGE_SIZE + 1}-${itemCount} of ${itemCount} items`),
+        ).toBeInTheDocument()
+      })
     })
 
-    render(
-      <QueryClientProvider client={client}>
-        <ContextModuleProvider {...contextModuleDefaultProps} courseId="course123">
-          <ModuleItemListSmart {...defaultProps()} renderList={renderList} />
-        </ContextModuleProvider>
-      </QueryClientProvider>,
-    )
+    it('ignores module-page-navigation events for different module IDs', async () => {
+      render(
+        <QueryClientProvider client={client}>
+          <ContextModuleProvider {...contextModuleDefaultProps} courseId="course123">
+            <ModuleItemListSmart {...defaultProps()} isPaginated={true} renderList={renderList} />
+          </ContextModuleProvider>
+        </QueryClientProvider>,
+      )
 
-    await waitFor(() => {
-      expect(screen.getByText(/Loading module items/i)).toBeInTheDocument()
+      // Wait for the first page to render
+      await waitFor(() => {
+        expect(screen.getByText('Content 0')).toBeInTheDocument()
+      })
+
+      // Initial page should be page 1
+      await waitFor(() => {
+        expect(screen.getByText(`Showing 1-${PAGE_SIZE} of ${itemCount} items`)).toBeInTheDocument()
+      })
+
+      // Dispatch a custom event for a different module ID
+      fireEvent(
+        document,
+        new CustomEvent('module-page-navigation', {
+          detail: {
+            moduleId: 'different-module-id',
+            pageNumber: 2,
+          },
+        }),
+      )
+
+      // Wait a moment to ensure any async operations would have completed
+      await new Promise(resolve => setTimeout(resolve, 50))
+
+      // Verify we're still on page 1 (no change)
+      expect(screen.getByText('Content 0')).toBeInTheDocument()
+      expect(screen.getByText(`Showing 1-${PAGE_SIZE} of ${itemCount} items`)).toBeInTheDocument()
     })
   })
 })
