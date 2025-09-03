@@ -253,9 +253,12 @@ class RequestThrottle
   end
 
   def rate_limit_exceeded
-    [403,
+    status_code = 403
+    status_code = 429 if Setting.get("request_throttle.send_429_response", "false") == "true"
+
+    [status_code,
      { "Content-Type" => "text/plain; charset=utf-8", "X-Rate-Limit-Remaining" => "0.0" },
-     ["403 #{Rack::Utils::HTTP_STATUS_CODES[403]} (Rate Limit Exceeded)\n"]]
+     ["#{status_code} #{Rack::Utils::HTTP_STATUS_CODES[status_code]} (Rate Limit Exceeded)\n"]]
   end
 
   def report_on_stats(db_runtime, account, starting_mem, ending_mem, user_cpu, system_cpu)
