@@ -329,17 +329,13 @@ describe('DiscussionRow', () => {
       ],
     }
 
-    const {container} = render(<DiscussionRow {...makeProps({discussion})} />)
+    render(<DiscussionRow {...makeProps({discussion})} />)
 
-    // Format the date we're looking for
+    // Format the date we're looking for - should be the furthest future date
     const formattedLaterDate = dateFormatter(furtherFutureDate)
 
-    // Look for the exact text with the formatted date
-    const availabilityText = `Available until ${formattedLaterDate}`
-
-    // Use a more reliable query that searches for the text anywhere in the document
-    const textContent = container.textContent
-    expect(textContent.includes(availabilityText)).toBe(true)
+    // Look for the exact text with the formatted date using screen.getByText
+    expect(screen.getByText(`Available until ${formattedLaterDate}`)).toBeInTheDocument()
   })
 
   it('renders locked at if appropriate', () => {
