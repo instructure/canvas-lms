@@ -534,6 +534,11 @@ class UsersController < ApplicationController
       # Set up observer options if user has observer data
       observed_users_list = observed_users(@current_user, session)
 
+      # Fetch course data with grades for shared context
+      # Use the first observed user if available, otherwise use current user
+      observed_user = observed_users_list.first if observed_users_list.present?
+      course_data_with_grades = fetch_courses_with_grades(@current_user, observed_user)
+
       js_env({
                PREFERENCES: {
                  dashboard_view: @current_user.dashboard_view(@domain_root_account),
@@ -544,7 +549,8 @@ class UsersController < ApplicationController
                CAN_ADD_OBSERVEE: @current_user
                                    .profile
                                    .tabs_available(@current_user, root_account: @domain_root_account)
-                                   .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
+                                   .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES },
+               SHARED_COURSE_DATA: course_data_with_grades
              })
       return render html: "", layout: true
     end
@@ -3498,5 +3504,51 @@ class UsersController < ApplicationController
         end_at_locale: datetime_string(course.conclude_at, :verbose, nil, true)
       }
     end
+  end
+
+  def fetch_courses_with_grades(user, observed_user = nil)
+    # Use the observed user if provided and it's a User object, otherwise use the current user
+    target_user = (observed_user.is_a?(User) ? observed_user : user)
+
+    # Return empty array if no target user
+    return [] unless target_user.is_a?(User)
+
+    # Get current enrollments for the user
+    enrollments = target_user.enrollments.current.preload(:course, :scores)
+
+    course_data = enrollments.map do |enrollment|
+      course = enrollment.course
+
+      # Get the grade data similar to how the GraphQL query does it
+      grades = enrollment.find_score(grading_period: nil)
+
+      # Determine display grade - prioritize override, then final, then current
+      display_grade = nil
+      display_grade_string = nil
+
+      if grades
+        if grades.override_score.present?
+          display_grade = grades.override_score
+          display_grade_string = grades.override_grade
+        elsif grades.final_score.present?
+          display_grade = grades.final_score
+          display_grade_string = grades.final_grade
+        elsif grades.current_score.present?
+          display_grade = grades.current_score
+          display_grade_string = grades.current_grade
+        end
+      end
+
+      {
+        courseId: course.id.to_s,
+        courseCode: course.course_code || "N/A",
+        courseName: course.name,
+        currentGrade: display_grade,
+        gradingScheme: display_grade_string.present? ? "letter" : "percentage",
+        lastUpdated: enrollment.updated_at.iso8601
+      }
+    end
+
+    course_data.compact
   end
 end

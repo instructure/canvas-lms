@@ -23,6 +23,10 @@ import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
 import AnnouncementsWidget from '../AnnouncementsWidget'
 import type {BaseWidgetProps, Widget} from '../../../../types'
+import {
+  WidgetDashboardProvider,
+  type SharedCourseData,
+} from '../../../../hooks/useWidgetDashboardContext'
 
 const mockWidget: Widget = {
   id: 'test-announcements-widget',
@@ -31,6 +35,25 @@ const mockWidget: Widget = {
   size: {width: 1, height: 1},
   title: 'Announcements',
 }
+
+const mockSharedCourseData: SharedCourseData[] = [
+  {
+    courseId: '1',
+    courseCode: 'CS 101',
+    courseName: 'Test Course 1',
+    currentGrade: 95,
+    gradingScheme: 'letter',
+    lastUpdated: '2025-01-01T00:00:00Z',
+  },
+  {
+    courseId: '2',
+    courseCode: 'ENG 201',
+    courseName: 'Test Course 2',
+    currentGrade: 88,
+    gradingScheme: 'percentage',
+    lastUpdated: '2025-01-02T00:00:00Z',
+  },
+]
 
 // Mock responses for different read states
 const mockAllAnnouncementsResponse = {
@@ -179,7 +202,11 @@ const buildDefaultProps = (overrides: Partial<BaseWidgetProps> = {}): BaseWidget
   }
 }
 
-const setup = (props: BaseWidgetProps = buildDefaultProps(), envOverrides = {}) => {
+const setup = (
+  props: BaseWidgetProps = buildDefaultProps(),
+  envOverrides = {},
+  sharedCourseData: SharedCourseData[] = mockSharedCourseData,
+) => {
   // Set up Canvas ENV with current_user_id
   const originalEnv = window.ENV
   window.ENV = {
@@ -199,7 +226,11 @@ const setup = (props: BaseWidgetProps = buildDefaultProps(), envOverrides = {}) 
 
   const result = render(<AnnouncementsWidget {...props} />, {
     wrapper: ({children}: {children: React.ReactNode}) => (
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        <WidgetDashboardProvider sharedCourseData={sharedCourseData}>
+          {children}
+        </WidgetDashboardProvider>
+      </QueryClientProvider>
     ),
   })
 
