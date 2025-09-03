@@ -236,19 +236,6 @@ describe('CourseWorkWidget', () => {
     expect(screen.getByText(/40 pts/)).toBeInTheDocument()
   })
 
-  it('displays due dates correctly', async () => {
-    renderWithProviders(<CourseWorkWidget {...buildDefaultProps()} />)
-
-    // Wait for data to load by looking for multiple due dates
-    const dueDates = await screen.findAllByText(/Due.*at/)
-
-    // Should display formatted due dates (use getAllByText for multiple matches)
-    expect(dueDates.length).toBeGreaterThan(0)
-
-    // The "No due date" text should be present for items without due dates
-    // Switch to "Missing" filter to see assignments without due dates\n    const dateFilterSelect = screen.getByDisplayValue('Next 3 days')\n    fireEvent.click(dateFilterSelect)\n    \n    const missingOption = await screen.findByText('Missing')\n    fireEvent.click(missingOption)\n\n    // Wait for filter to apply and check for "No due date" text\n    await waitFor(() => {\n      expect(screen.getByText(/No due date/)).toBeInTheDocument()\n    })
-  })
-
   it('sorts items by due date with soonest first', async () => {
     renderWithProviders(<CourseWorkWidget {...buildDefaultProps()} />)
 
@@ -393,5 +380,131 @@ describe('CourseWorkWidget', () => {
 
     const labLink = screen.getByTestId('course-work-item-link-4')
     expect(labLink).toHaveAttribute('href', '/courses/104/assignments/4')
+  })
+
+  it('displays correct submission statuses based on submission data', async () => {
+    const yesterday = new Date()
+    yesterday.setDate(yesterday.getDate() - 1)
+    server.use(
+      http.post('/api/graphql', async ({request}) => {
+        const body = (await request.json()) as {query: string; variables: any}
+        if (body.query.includes('GetUserCourseWork')) {
+          return HttpResponse.json({
+            data: {
+              legacyNode: {
+                _id: '1',
+                courseWorkSubmissionsConnection: {
+                  nodes: [
+                    {
+                      _id: 'sub1',
+                      cachedDueDate: tomorrow.toISOString(),
+                      submittedAt: new Date().toISOString(),
+                      late: false,
+                      missing: false,
+                      excused: false,
+                      state: 'submitted',
+                      assignment: {
+                        _id: '1',
+                        name: 'Submitted Assignment',
+                        dueAt: tomorrow.toISOString(),
+                        pointsPossible: 50,
+                        htmlUrl: '/courses/101/assignments/1',
+                        submissionTypes: ['online_text_entry'],
+                        state: 'published',
+                        published: true,
+                        quiz: null,
+                        discussion: null,
+                        course: {_id: '101', name: 'Course 1'},
+                      },
+                    },
+                    {
+                      _id: 'sub2',
+                      cachedDueDate: yesterday.toISOString(),
+                      submittedAt: null,
+                      late: true,
+                      missing: false,
+                      excused: false,
+                      state: 'unsubmitted',
+                      assignment: {
+                        _id: '2',
+                        name: 'Late Assignment',
+                        dueAt: yesterday.toISOString(),
+                        pointsPossible: 25,
+                        htmlUrl: '/courses/102/assignments/2',
+                        submissionTypes: ['online_upload'],
+                        state: 'published',
+                        published: true,
+                        quiz: null,
+                        discussion: null,
+                        course: {_id: '102', name: 'Course 2'},
+                      },
+                    },
+                    {
+                      _id: 'sub3',
+                      cachedDueDate: yesterday.toISOString(),
+                      submittedAt: null,
+                      late: false,
+                      missing: true,
+                      excused: false,
+                      state: 'unsubmitted',
+                      assignment: {
+                        _id: '3',
+                        name: 'Missing Assignment',
+                        dueAt: yesterday.toISOString(),
+                        pointsPossible: 30,
+                        htmlUrl: '/courses/103/assignments/3',
+                        submissionTypes: ['online_text_entry'],
+                        state: 'published',
+                        published: true,
+                        quiz: null,
+                        discussion: null,
+                        course: {_id: '103', name: 'Course 3'},
+                      },
+                    },
+                    {
+                      _id: 'sub4',
+                      cachedDueDate: threeDaysFromNow.toISOString(),
+                      submittedAt: null,
+                      late: false,
+                      missing: false,
+                      excused: false,
+                      state: 'pending_review',
+                      assignment: {
+                        _id: '4',
+                        name: 'Pending Review Assignment',
+                        dueAt: threeDaysFromNow.toISOString(),
+                        pointsPossible: 40,
+                        htmlUrl: '/courses/105/assignments/4',
+                        submissionTypes: ['online_text_entry'],
+                        state: 'published',
+                        published: true,
+                        quiz: null,
+                        discussion: null,
+                        course: {_id: '105', name: 'Course 5'},
+                      },
+                    },
+                  ],
+                  pageInfo: {
+                    hasNextPage: false,
+                    hasPreviousPage: false,
+                    endCursor: null,
+                    startCursor: null,
+                  },
+                },
+              },
+            },
+          })
+        }
+        return new Response('Query not handled', {status: 404})
+      }),
+    )
+
+    renderWithProviders(<CourseWorkWidget {...buildDefaultProps()} />)
+
+    // Wait for data to load and check specific status labels
+    await screen.findByText('Submitted')
+    expect(screen.getByText('Late')).toBeInTheDocument()
+    expect(screen.getByText('Missing')).toBeInTheDocument()
+    expect(screen.getByText('Pending Review')).toBeInTheDocument()
   })
 })

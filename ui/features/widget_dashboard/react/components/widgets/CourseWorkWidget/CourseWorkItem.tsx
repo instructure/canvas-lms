@@ -22,7 +22,7 @@ import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {formatDueDate, getTypeIcon} from './utils'
+import {getSubmissionStatus, getTypeIcon} from './utils'
 import type {CourseWorkItem as CourseWorkItemType} from '../../../hooks/useCourseWork'
 
 const I18n = createI18nScope('widget_dashboard')
@@ -32,10 +32,12 @@ interface CourseWorkItemProps {
 }
 
 export function CourseWorkItem({item}: CourseWorkItemProps) {
+  const submissionStatus = getSubmissionStatus(item.late, item.missing, item.state, item.dueAt)
+
   return (
     <Flex.Item key={item.id} overflowY="hidden">
       <View as="div" margin="small" background="primary">
-        <Flex gap="small" alignItems="start">
+        <Flex gap="small" alignItems="center">
           <Flex.Item shouldShrink>
             <View
               as="div"
@@ -45,7 +47,7 @@ export function CourseWorkItem({item}: CourseWorkItemProps) {
               margin="0 0 x-small 0"
               display="inline-block"
               themeOverride={{
-                backgroundSecondary: '#e3f2fd',
+                backgroundSecondary: submissionStatus.color.background,
               }}
             >
               {getTypeIcon(item.type)}
@@ -66,10 +68,36 @@ export function CourseWorkItem({item}: CourseWorkItemProps) {
                 {item.course.name}
               </Text>
               <Text size="x-small" color="secondary">
-                {formatDueDate(item.dueAt)}
-                {item.points != null && ` • ${I18n.t('%{points} pts', {points: item.points})}`}
+                {item.points != null && `${I18n.t('%{points} pts', {points: item.points})}`}
               </Text>
             </Flex>
+          </Flex.Item>
+          <Flex.Item>
+            <View
+              as="span"
+              background="primary"
+              borderRadius="large"
+              padding="x-small"
+              display="inline-block"
+              themeOverride={{backgroundPrimary: submissionStatus.color.background}}
+            >
+              <Flex gap="xx-small" alignItems="center">
+                {submissionStatus.icon && (
+                  <submissionStatus.icon size="x-small" color={submissionStatus.iconColor} />
+                )}
+                <Text
+                  size="x-small"
+                  weight="bold"
+                  color="primary"
+                  lineHeight="fit"
+                  themeOverride={{
+                    primaryColor: submissionStatus.color.textColor,
+                  }}
+                >
+                  {submissionStatus.label}
+                </Text>
+              </Flex>
+            </View>
           </Flex.Item>
         </Flex>
       </View>
