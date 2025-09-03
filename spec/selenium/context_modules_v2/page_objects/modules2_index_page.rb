@@ -318,6 +318,10 @@ module Modules2IndexPage
     "#{pagination_container_selector} button"
   end
 
+  def pagination_page_current_page_button_selector
+    "#{pagination_container_selector} button[aria-current='page']"
+  end
+
   def send_to_modal_input_selector
     "#content-share-user-search"
   end
@@ -757,6 +761,10 @@ module Modules2IndexPage
 
   def pagination_page_buttons
     ff(pagination_page_buttons_selector)
+  end
+
+  def pagination_page_current_page_button
+    f(pagination_page_current_page_button_selector)
   end
 
   def send_to_form_selected_elements
