@@ -36,6 +36,7 @@ import {TraditionalViewFreeFormComment} from './TraditionalViewFreeFormComment'
 import {TraditionalViewCriterionPoints} from './TraditionalViewCriterionPoints'
 import {TraditionalViewCriterionRatings} from './TraditionalViewCriterionRatings'
 import {colors, borders} from '@instructure/canvas-theme'
+import {useGetRubricOutcome} from './queries/useGetRubricOutcome'
 
 const I18n = createI18nScope('rubrics-assessment-tray')
 
@@ -52,6 +53,8 @@ type TraditionalViewCriterionRowProps = {
   ratingOrder: string
   ratingsColumnMinWidth: number
   rubricSavedComments: string[]
+  selectedLearningOutcomeId?: string
+  selectLearningOutcome: (id: string | undefined) => void
   shouldFocusFirstRating?: boolean
   submissionUser?: RubricSubmissionUser
   validationErrors?: string[]
@@ -70,6 +73,8 @@ export const TraditionalViewCriterionRow: FC<TraditionalViewCriterionRowProps> =
   ratingOrder,
   ratingsColumnMinWidth,
   rubricSavedComments,
+  selectedLearningOutcomeId,
+  selectLearningOutcome,
   shouldFocusFirstRating = false,
   submissionUser,
   validationErrors,
@@ -99,6 +104,8 @@ export const TraditionalViewCriterionRow: FC<TraditionalViewCriterionRowProps> =
     setPointTextInput(criterionAssessment?.points?.toString() ?? '')
   }, [criterionAssessment, isFreeFormCriterionComments])
 
+  const {data: outcome} = useGetRubricOutcome(selectedLearningOutcomeId)
+
   return (
     <>
       <tr
@@ -119,7 +126,11 @@ export const TraditionalViewCriterionRow: FC<TraditionalViewCriterionRowProps> =
           <Flex as="div" direction="column" alignItems="stretch" padding="x-small small">
             {criterion.learningOutcomeId && (
               <View as="div" margin="0 0 small 0">
-                <OutcomeTag displayName={criterion.description} />
+                <OutcomeTag
+                  displayName={criterion.description}
+                  outcome={outcome}
+                  onClick={() => selectLearningOutcome(criterion.learningOutcomeId)}
+                />
               </View>
             )}
             <View as="div">

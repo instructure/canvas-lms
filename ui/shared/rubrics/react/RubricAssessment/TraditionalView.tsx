@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useMemo} from 'react'
+import {useMemo, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {colors} from '@instructure/canvas-theme'
 import {Table} from '@instructure/ui-table'
@@ -68,6 +68,7 @@ export const TraditionalView = ({
   validationErrors,
   onUpdateAssessmentData,
 }: TraditionalViewProps) => {
+  const [selectedLearningOutcomeId, setSelectedLearningOutcomeId] = useState<string>()
   const pointsColumnWidth = hidePoints ? 0 : 8.875
   const criteriaColumnWidth = 11.25
   const maxRatingsCount = Math.max(...criteria.map(criterion => criterion.ratings.length))
@@ -180,6 +181,8 @@ export const TraditionalView = ({
                 ratingOrder={ratingOrder}
                 ratingsColumnMinWidth={ratingsColumnMinWidth}
                 rubricSavedComments={rubricSavedComments?.[criterion.id] ?? []}
+                selectedLearningOutcomeId={selectedLearningOutcomeId}
+                selectLearningOutcome={setSelectedLearningOutcomeId}
                 shouldFocusFirstRating={validationErrors?.[0] === criterion.id}
                 submissionUser={submissionUser}
                 validationErrors={validationErrors}
