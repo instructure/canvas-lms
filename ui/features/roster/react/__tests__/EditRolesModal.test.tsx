@@ -82,7 +82,9 @@ describe('EditRolesModal', () => {
     const user = userEvent.setup()
     const {getByTestId} = render(<EditRolesModal {...defaultProps} />)
     await user.click(getByTestId('cancel-modal'))
-    expect(defaultProps.onClose).toHaveBeenCalled()
+    await waitFor(() => {
+      expect(defaultProps.onClose).toHaveBeenCalled()
+    })
   })
 
   it("skips onSubmit if role hasn't changed", () => {
