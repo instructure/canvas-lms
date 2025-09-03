@@ -58,27 +58,29 @@ export const ModuleFileDrop: React.FC<ModuleFileDropProps> = ({
   )
 
   return (
-    <View as="form" padding="small" display="block" data-testid="module-file-drop">
+    <View as="div" padding="small" display="block">
       {itemType === 'file' && (
-        <FileDrop
-          height={FILE_DROP_HEIGHT}
-          shouldAllowMultiple={shouldAllowMultiple}
-          onDrop={handleDrop}
-          messages={nameError ? [{text: nameError, type: 'newError'}] : []}
-          renderLabel={
-            <Flex direction="column" height="100%" alignItems="center" justifyItems="center">
-              <Billboard
-                size="small"
-                hero={<RocketSVG width="3em" height="3em" />}
-                as="div"
-                headingAs="span"
-                headingLevel="h2"
-                heading={I18n.t('Drop files here to upload')}
-                message={<Text color="brand">{I18n.t('or choose files')}</Text>}
-              />
-            </Flex>
-          }
-        />
+        <form data-testid="module-file-drop">
+          <FileDrop
+            height={FILE_DROP_HEIGHT}
+            shouldAllowMultiple={shouldAllowMultiple}
+            onDrop={handleDrop}
+            messages={nameError ? [{text: nameError, type: 'newError'}] : []}
+            renderLabel={
+              <Flex direction="column" height="100%" alignItems="center" justifyItems="center">
+                <Billboard
+                  size="small"
+                  hero={<RocketSVG width="3em" height="3em" />}
+                  as="div"
+                  headingAs="span"
+                  headingLevel="h2"
+                  heading={I18n.t('Drop files here to upload')}
+                  message={<Text color="brand">{I18n.t('or choose files')}</Text>}
+                />
+              </Flex>
+            }
+          />
+        </form>
       )}
     </View>
   )
