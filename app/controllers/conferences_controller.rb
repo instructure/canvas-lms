@@ -200,30 +200,6 @@ class ConferencesController < ApplicationController
     api_request? ? api_index(conferences, polymorphic_url([:api_v1, @context, :conferences])) : web_index(conferences)
   end
 
-  module UserConferencesBookmarker
-    def self.bookmark_for(conference)
-      # We're sorting in descending order, so we need to "flip" our sort values
-      # to make sure a conference is ordered properly vis-a-vis its neighbors
-      [Time.zone.now - conference.created_at, -conference.id]
-    end
-
-    def self.validate(bookmark)
-      return false unless bookmark.is_a?(Array) && bookmark.length == 2
-
-      bookmark.first.is_a?(ActiveSupport::TimeWithZone) && bookmark.second.is_a?(Integer)
-    end
-
-    def self.restrict_scope(scope, pager)
-      if pager.current_bookmark
-        creation_date, id = pager.current_bookmark
-        comparison = pager.include_bookmark ? "<=" : "<"
-
-        scope = scope.where("ROW(created_at, id) #{comparison} ROW(?, ?)", creation_date, id)
-      end
-      scope.order(created_at: :desc, id: :desc)
-    end
-  end
-
   # @API List conferences for the current user
   # Retrieve the paginated list of conferences for all courses and groups
   # the current user belongs to
@@ -246,15 +222,16 @@ class ConferencesController < ApplicationController
     return render json: api_conferences_json([], @current_user, session) unless WebConference.config
 
     log_api_asset_access(["conferences"], "conferences", "other")
+    bookmarker = Plannable::Bookmarker.new(WebConference, true, :created_at, :id)
 
-    courses_collection = ShardedBookmarkedCollection.build(UserConferencesBookmarker, @current_user.enrollments) do |enrollments_scope|
+    courses_collection = ShardedBookmarkedCollection.build(bookmarker, @current_user.enrollments) do |enrollments_scope|
       conference_scope = WebConference.active.where(context_type: "Course", context_id: enrollments_scope.active.select(:course_id))
                                       .where(WebConferenceParticipant.where("web_conference_id = web_conferences.id AND user_id = ?", @current_user.id).arel.exists)
       conference_scope = conference_scope.live if params[:state] == "live"
       conference_scope.order(created_at: :desc, id: :desc)
     end
 
-    groups_collection = ShardedBookmarkedCollection.build(UserConferencesBookmarker, @current_user.groups) do |groups_scope|
+    groups_collection = ShardedBookmarkedCollection.build(bookmarker, @current_user.groups) do |groups_scope|
       conference_scope = WebConference.active.where(context_type: "Group", context_id: groups_scope.active.select(:id))
                                       .where(WebConferenceParticipant.where("web_conference_id = web_conferences.id AND user_id = ?", @current_user.id).arel.exists)
       conference_scope = conference_scope.live if params[:state] == "live"
@@ -265,8 +242,8 @@ class ConferencesController < ApplicationController
     # a shortcut if it finds results on fewer than two shards. We still need to
     # merge these two result sets, so re-wrap results in a bookmarked
     # collection if needed.
-    courses_collection = BookmarkedCollection.wrap(UserConferencesBookmarker, courses_collection) if courses_collection.is_a?(ActiveRecord::Relation)
-    groups_collection = BookmarkedCollection.wrap(UserConferencesBookmarker, groups_collection) if groups_collection.is_a?(ActiveRecord::Relation)
+    courses_collection = BookmarkedCollection.wrap(bookmarker, courses_collection) if courses_collection.is_a?(ActiveRecord::Relation)
+    groups_collection = BookmarkedCollection.wrap(bookmarker, groups_collection) if groups_collection.is_a?(ActiveRecord::Relation)
 
     merged_collection = BookmarkedCollection.merge(
       ["courses", courses_collection],
