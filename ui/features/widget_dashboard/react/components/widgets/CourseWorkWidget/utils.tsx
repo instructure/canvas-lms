@@ -16,6 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
+import {
+  IconAssignmentLine,
+  IconQuizLine,
+  IconDiscussionLine,
+  IconDocumentLine,
+} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {startOfToday, getTomorrow} from '../../../utils/dateUtils'
 import type {CourseWorkItem} from '../../../hooks/useCourseWork'
@@ -61,5 +68,19 @@ export function getTypeInfo(type: CourseWorkItem['type']) {
       return {color: 'success' as const, label: I18n.t('Discussion')}
     default:
       return {color: 'primary' as const, label: I18n.t('Item')}
+  }
+}
+
+export function getTypeIcon(type: CourseWorkItem['type']) {
+  const iconSize = 'small'
+  switch (type) {
+    case 'assignment':
+      return <IconAssignmentLine size={iconSize} data-testid="assignment-icon" />
+    case 'quiz':
+      return <IconQuizLine size={iconSize} data-testid="quiz-icon" />
+    case 'discussion':
+      return <IconDiscussionLine size={iconSize} data-testid="discussion-icon" />
+    default:
+      return <IconDocumentLine size={iconSize} data-testid="document-icon" />
   }
 }

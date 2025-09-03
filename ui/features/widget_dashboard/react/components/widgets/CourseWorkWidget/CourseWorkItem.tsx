@@ -21,9 +21,8 @@ import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
-import {Tag} from '@instructure/ui-tag'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {formatDueDate, getTypeInfo} from './utils'
+import {formatDueDate, getTypeIcon} from './utils'
 import type {CourseWorkItem as CourseWorkItemType} from '../../../hooks/useCourseWork'
 
 const I18n = createI18nScope('widget_dashboard')
@@ -38,11 +37,19 @@ export function CourseWorkItem({item}: CourseWorkItemProps) {
       <View as="div" margin="small" background="primary">
         <Flex gap="small" alignItems="start">
           <Flex.Item shouldShrink>
-            <Tag
-              text={getTypeInfo(item.type).label}
-              color={getTypeInfo(item.type).color}
+            <View
+              as="div"
+              background="secondary"
+              borderRadius="medium"
+              padding="medium"
               margin="0 0 x-small 0"
-            />
+              display="inline-block"
+              themeOverride={{
+                backgroundSecondary: '#e3f2fd',
+              }}
+            >
+              {getTypeIcon(item.type)}
+            </View>
           </Flex.Item>
           <Flex.Item shouldGrow>
             <Flex direction="column" gap="xx-small">

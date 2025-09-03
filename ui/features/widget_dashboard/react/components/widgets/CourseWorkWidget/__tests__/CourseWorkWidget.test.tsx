@@ -224,10 +224,10 @@ describe('CourseWorkWidget', () => {
     expect(screen.getByText('Art History')).toBeInTheDocument()
     expect(screen.getByText('Chemistry')).toBeInTheDocument()
 
-    // Check that assignment types are displayed (use getAllByText for multiple elements)
-    expect(screen.getAllByText('Assignment')).toHaveLength(2) // Two assignments in mock data
-    expect(screen.getByText('Quiz')).toBeInTheDocument()
-    expect(screen.getByText('Discussion')).toBeInTheDocument()
+    // Check that assignment type icons are displayed with correct data-testids
+    expect(screen.getAllByTestId('assignment-icon')).toHaveLength(2) // Two assignments in mock data
+    expect(screen.getByTestId('quiz-icon')).toBeInTheDocument()
+    expect(screen.getByTestId('discussion-icon')).toBeInTheDocument()
 
     // Check that points are displayed (they're combined with due date text)
     expect(screen.getByText(/50 pts/)).toBeInTheDocument()
