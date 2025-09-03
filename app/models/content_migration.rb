@@ -1272,9 +1272,6 @@ class ContentMigration < ActiveRecord::Base
     dest_id = dest_asset_fields[:id]
 
     mapping[key][src_id] = dest_id if src_id.present?
-
-    return unless asset_map_v2?
-
     mapping[key][mig_id] = {
       source: src_asset_fields,
       destination: dest_asset_fields
@@ -1395,29 +1392,21 @@ class ContentMigration < ActiveRecord::Base
     file_download_url(asset_map_attachment, options)
   end
 
-  def asset_map_v2?
-    Account.site_admin.feature_enabled?(:content_migration_asset_map_v2)
-  end
-
   def generate_asset_map
     data = asset_id_mapping
     return if data.nil?
 
+    root_folder = Folder.root_folders(context).first
     payload = {
       "source_host" => source_course&.root_account&.domain(ApplicationController.test_cluster_name),
       "source_course" => source_course_id&.to_s,
-      "contains_migration_ids" => Account.site_admin.feature_enabled?(:content_migration_asset_map_v2),
       "resource_mapping" => data,
-      "migration_user_uuid" => user&.uuid
+      "migration_user_uuid" => user&.uuid,
+      "destination_course" => context.id.to_s,
+      "destination_hosts" => destination_hosts,
+      "attachment_path_id_lookup" => migration_settings[:attachment_path_id_lookup].presence || attachment_path_id_lookup
     }
-
-    if asset_map_v2?
-      payload["destination_course"] = context.id.to_s
-      payload["destination_hosts"] = destination_hosts
-      root_folder = Folder.root_folders(context).first
-      payload["destination_root_folder"] = root_folder.name + "/" if root_folder
-      payload["attachment_path_id_lookup"] = migration_settings[:attachment_path_id_lookup].presence || attachment_path_id_lookup
-    end
+    payload["destination_root_folder"] = root_folder.name + "/" if root_folder
 
     self.asset_map_attachment = Attachment.new(context: self, filename: "asset_map.json")
     Attachments::Storage.store_for_attachment(asset_map_attachment, StringIO.new(payload.to_json))

@@ -75,12 +75,6 @@ blueprint_line_item_support:
   description: Allows blueprint courses to keep track of assignment's resource id changes.
   applies_to: SiteAdmin
 
-content_migration_asset_map_v2:
-  state: hidden
-  display_name: Content Migration Asset Map v2
-  description: Adds Additional Fields to the Content Migration Asset Map
-  applies_to: SiteAdmin
-
 instui_for_import_page:
   state: hidden
   display_name: Use InstUI for the course import page

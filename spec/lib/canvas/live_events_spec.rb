@@ -1480,7 +1480,6 @@ describe Canvas::LiveEvents do
 
     describe "resource map property" do
       before do
-        allow(migration).to receive(:asset_map_v2?).and_return(true)
         allow(source_course).to receive(:has_new_quizzes?).and_return(false)
       end
 
