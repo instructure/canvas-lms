@@ -25,6 +25,7 @@ describe('SettingsTray', () => {
     title: 'Settings',
     open: true,
     onDismiss: () => {},
+    onClose: () => {},
     children: <p>Settings content</p>,
   }
 

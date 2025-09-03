@@ -68,7 +68,9 @@ type Props = {
   errorSubject?: string
   errorCategory?: string
   errorImageUrl?: string
+
   onDismiss: () => void
+  onClose?: () => void
 }
 
 export default function CanvasTray({

@@ -28,7 +28,8 @@ export const useEditClickHandler = () => {
       const itemExists = document.contains(target)
       const iframeClicked = document.activeElement?.nodeName === 'IFRAME'
       const dialogClicked = target.closest('[role="dialog"]')
-      if (!itemExists || iframeClicked || dialogClicked) {
+      const ignoreClicked = target.closest('[data-ignore-edit-click]')
+      if (!itemExists || iframeClicked || dialogClicked || ignoreClicked) {
         return
       }
 
