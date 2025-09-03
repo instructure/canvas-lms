@@ -26,7 +26,7 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {IconExternalLinkLine} from '@instructure/ui-icons'
 import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import type {BaseWidgetProps, CourseOption} from '../../../types'
-import {usePaginatedCoursesWithGrades} from '../../../hooks/useUserCourses'
+import {useSharedCourses} from '../../../hooks/useSharedCourses'
 import {useCourseWork, type CourseWorkItem} from '../../../hooks/useCourseWork'
 import {Pagination} from '@instructure/ui-pagination'
 import {Spinner} from '@instructure/ui-spinner'
@@ -53,7 +53,7 @@ const CourseWorkWidget: React.FC<BaseWidgetProps> = ({
   const [currentPageIndex, setCurrentPageIndex] = useState<number>(0)
 
   // Fetch user's enrolled courses
-  const {data: courseGrades = []} = usePaginatedCoursesWithGrades({limit: 1000})
+  const {data: courseGrades = []} = useSharedCourses({limit: 1000})
   const userCourses: CourseOption[] = courseGrades.map(courseGrade => ({
     id: courseGrade.courseId,
     name: courseGrade.courseName,

@@ -26,7 +26,7 @@ import {Pagination} from '@instructure/ui-pagination'
 import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import CourseGradeCard from './CourseGradeCard'
 import type {BaseWidgetProps} from '../../../types'
-import {usePaginatedCoursesWithGrades} from '../../../hooks/useUserCourses'
+import {useSharedCourses} from '../../../hooks/useSharedCourses'
 import {createGradebookHandler} from './utils'
 import {COURSE_GRADES_WIDGET} from '../../../constants'
 
@@ -42,12 +42,10 @@ const CourseGradesWidget: React.FC<BaseWidgetProps> = ({widget}) => {
     error,
     hasNextPage,
     hasPreviousPage,
-    fetchNextPage,
-    fetchPreviousPage,
     goToPage,
     currentPage,
     totalPages,
-  } = usePaginatedCoursesWithGrades({
+  } = useSharedCourses({
     limit: COURSE_GRADES_WIDGET.MAX_GRID_ITEMS,
   })
 

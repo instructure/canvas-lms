@@ -24,4 +24,12 @@ export interface EnvWidgetDashboard {
   }
   OBSERVED_USERS_LIST: Array<{id: string; name: string; avatar_url?: string | null}>
   CAN_ADD_OBSERVEE: boolean
+  SHARED_COURSE_DATA: Array<{
+    courseId: string
+    courseCode: string
+    courseName: string
+    currentGrade: number | null
+    gradingScheme: 'letter' | 'percentage'
+    lastUpdated: string
+  }>
 }

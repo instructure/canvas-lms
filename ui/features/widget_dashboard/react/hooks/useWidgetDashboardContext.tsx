@@ -36,12 +36,22 @@ interface DashboardPreferences {
   custom_colors: Record<string, string>
 }
 
+export interface SharedCourseData {
+  courseId: string
+  courseCode: string
+  courseName: string
+  currentGrade: number | null
+  gradingScheme: 'letter' | 'percentage'
+  lastUpdated: string
+}
+
 const WidgetDashboardContext = createContext<{
   preferences: DashboardPreferences
   observedUsersList: ObservedUser[]
   canAddObservee: boolean
   currentUser: CurrentUser | null
   currentUserRoles: string[]
+  sharedCourseData: SharedCourseData[]
 }>({
   preferences: {
     dashboard_view: 'cards',
@@ -52,6 +62,7 @@ const WidgetDashboardContext = createContext<{
   canAddObservee: false,
   currentUser: null,
   currentUserRoles: [],
+  sharedCourseData: [],
 })
 
 export const WidgetDashboardProvider = ({
@@ -61,6 +72,7 @@ export const WidgetDashboardProvider = ({
   canAddObservee,
   currentUser,
   currentUserRoles,
+  sharedCourseData,
 }: {
   children: React.ReactNode
   preferences?: DashboardPreferences
@@ -68,6 +80,7 @@ export const WidgetDashboardProvider = ({
   canAddObservee?: boolean
   currentUser?: CurrentUser | null
   currentUserRoles?: string[]
+  sharedCourseData?: SharedCourseData[]
 }) => {
   const contextValue = useMemo(
     () => ({
@@ -76,8 +89,16 @@ export const WidgetDashboardProvider = ({
       canAddObservee: canAddObservee ?? widgetDashboardDefaultProps.canAddObservee,
       currentUser: currentUser ?? widgetDashboardDefaultProps.currentUser,
       currentUserRoles: currentUserRoles ?? widgetDashboardDefaultProps.currentUserRoles,
+      sharedCourseData: sharedCourseData ?? widgetDashboardDefaultProps.sharedCourseData,
     }),
-    [preferences, observedUsersList, canAddObservee, currentUser, currentUserRoles],
+    [
+      preferences,
+      observedUsersList,
+      canAddObservee,
+      currentUser,
+      currentUserRoles,
+      sharedCourseData,
+    ],
   )
 
   return (
@@ -101,4 +122,5 @@ export const widgetDashboardDefaultProps = {
   canAddObservee: false,
   currentUser: null,
   currentUserRoles: [],
+  sharedCourseData: [],
 }

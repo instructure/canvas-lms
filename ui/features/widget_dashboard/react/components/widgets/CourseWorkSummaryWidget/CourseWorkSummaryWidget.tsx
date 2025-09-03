@@ -27,7 +27,7 @@ import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import StatisticsCard from './StatisticsCard'
 import type {CourseOption, DateRangeOption, BaseWidgetProps} from '../../../types'
 import {useCourseWorkStatistics} from '../../../hooks/useCourseWorkStatistics'
-import {usePaginatedCoursesWithGrades} from '../../../hooks/useUserCourses'
+import {useSharedCourses} from '../../../hooks/useSharedCourses'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -36,7 +36,7 @@ const CourseWorkSummaryWidget: React.FC<BaseWidgetProps> = ({widget}) => {
   const [selectedDateRange, setSelectedDateRange] = useState<string>('next_3_days')
 
   // Fetch user's enrolled courses
-  const {data: courseGrades = []} = usePaginatedCoursesWithGrades({limit: 1000})
+  const {data: courseGrades = []} = useSharedCourses({limit: 1000})
   const userCourses: CourseOption[] = courseGrades.map(courseGrade => ({
     id: courseGrade.courseId,
     name: courseGrade.courseName,
