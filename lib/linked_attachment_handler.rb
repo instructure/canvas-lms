@@ -96,7 +96,7 @@ module LinkedAttachmentHandler
 
     return if to_process.none?
     return unless attachment_associations_creation_enabled?
-    raise "User is required to update attachment links" if user.blank? && !skip_user_verification
+    raise "User is required to update attachment links for #{self.class}:#{try(:id)}" if user.blank? && !skip_user_verification
 
     if to_process.any?
       to_process.each_slice(1000) do |att_ids|

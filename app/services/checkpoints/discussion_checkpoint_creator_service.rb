@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Checkpoints::DiscussionCheckpointCreatorService < Checkpoints::DiscussionCheckpointCommonService
-  def initialize(discussion_topic:, checkpoint_label:, dates:, points_possible:, replies_required: 1)
+  def initialize(discussion_topic:, checkpoint_label:, dates:, points_possible:, replies_required: 1, saving_user: nil)
     super
   end
 
