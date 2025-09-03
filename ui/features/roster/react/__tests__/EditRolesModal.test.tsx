@@ -87,13 +87,13 @@ describe('EditRolesModal', () => {
     })
   })
 
-  it("skips onSubmit if role hasn't changed", () => {
+  it("skips onSubmit if role hasn't changed", async () => {
     const user = userEvent.setup()
     const deleted = mockDelete(currentEnrollments, '1')
     const created = mockPost(currentEnrollments, '1') // 1 is student; existing enrollment is for student
     const {getByTestId} = render(<EditRolesModal {...defaultProps} />)
-    user.click(getByTestId('update-roles'))
-    waitFor(() => {
+    await user.click(getByTestId('update-roles'))
+    await waitFor(() => {
       expect(defaultProps.onSubmit).not.toHaveBeenCalled()
       expect(defaultProps.onClose).toHaveBeenCalled()
       expect(fetchMock.called(deleted.deletedPaths[0], 'DELETE')).toBe(false)
