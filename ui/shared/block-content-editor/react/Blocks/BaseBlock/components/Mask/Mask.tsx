@@ -16,32 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {PropsWithChildren} from 'react'
-import CanvasTray from '@canvas/trays/react/Tray'
+import {Mask as InstUIMask} from '@instructure/ui-overlays'
+import './mask.css'
 
-export type SettingsTrayProps = PropsWithChildren<{
-  title: string
-  open: boolean
-  onDismiss: () => void
-  onClose: () => void
-}>
-
-export const SettingsTray = (props: SettingsTrayProps) => {
-  return (
-    <CanvasTray
-      label={props.title}
-      title={props.title}
-      open={props.open}
-      onDismiss={props.onDismiss}
-      onClose={props.onClose}
-      headerPadding="small"
-      contentPadding="small"
-      placement="end"
-      size="regular"
-      data-testid="settings-tray"
-      shouldCloseOnDocumentClick={true}
-    >
-      {props.children}
-    </CanvasTray>
-  )
+export const Mask = () => {
+  return <InstUIMask data-mask data-ignore-edit-click />
 }

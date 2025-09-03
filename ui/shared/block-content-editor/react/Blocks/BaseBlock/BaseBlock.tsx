@@ -23,6 +23,7 @@ import {BaseBlockViewLayout} from './layout/BaseBlockViewLayout'
 import {useNode} from '@craftjs/core'
 import {useBlockContentEditorContext} from '../../BlockContentEditorContext'
 import {BaseBlockEditWrapper} from './components/BaseBlockEditWrapper'
+import {Mask} from './components/Mask/Mask'
 
 function BaseBlockViewerMode<T extends {}>(props: ComponentProps<typeof BaseBlock<T>>) {
   const Component = props.ViewComponent
@@ -37,7 +38,7 @@ function BaseBlockEditorMode<T extends {}>(props: ComponentProps<typeof BaseBloc
   const isEditing = useIsEditingBlock()
   const {id} = useNode()
   const isEditingBlock = useIsEditingBlock()
-  const {editingBlock} = useBlockContentEditorContext()
+  const {editingBlock, settingsTray} = useBlockContentEditorContext()
   const Component = isEditing ? props.EditComponent : props.EditViewComponent
   return (
     <BaseBlockEditWrapper
@@ -49,6 +50,7 @@ function BaseBlockEditorMode<T extends {}>(props: ComponentProps<typeof BaseBloc
       backgroundColor={props.backgroundColor}
     >
       <Component {...props.componentProps} />
+      {settingsTray.isOpen && <Mask />}
     </BaseBlockEditWrapper>
   )
 }
