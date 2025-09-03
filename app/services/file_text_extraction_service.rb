@@ -75,11 +75,12 @@ class FileTextExtractionService
   end
 
   def extract_docx
-    doc = Docx::Document.open(attachment.open)
+    file = attachment.open
+    doc = Docx::Document.open(file)
     text = doc.text
 
     has_images = false
-    Zip::File.open(attachment.full_filename) do |zip|
+    Zip::File.open(file) do |zip|
       has_images = zip.glob("word/media/*").any?
     end
 
