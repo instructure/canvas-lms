@@ -156,9 +156,10 @@ describe Mutations::CreateDiscussionTopic do
   end
 
   it "successfully creates the discussion topic" do
+    aa_test_data = AttachmentAssociationsSpecHelper.new(@course.account, @course)
     context_type = "Course"
     title = "Test Title"
-    message = "A message"
+    message = aa_test_data.base_html
     published = false
     require_initial_post = true
 
@@ -166,13 +167,14 @@ describe Mutations::CreateDiscussionTopic do
       contextId: "#{@course.id}"
       contextType: #{context_type}
       title: "#{title}"
-      message: "#{message}"
+      message: "#{message.gsub('"', '\"')}"
       published: #{published}
       requireInitialPost: #{require_initial_post}
       anonymousState: off
     GQL
 
     result = execute_with_input(query)
+
     created_discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
 
     expect(result["errors"]).to be_nil
@@ -180,7 +182,7 @@ describe Mutations::CreateDiscussionTopic do
 
     expect(created_discussion_topic["contextType"]).to eq context_type
     expect(created_discussion_topic["title"]).to eq title
-    expect(created_discussion_topic["message"]).to eq message
+    expect(created_discussion_topic["message"]).to include "<p>Here is a link to a file:"
     expect(created_discussion_topic["published"]).to eq published
     expect(created_discussion_topic["requireInitialPost"]).to be true
     expect(created_discussion_topic["anonymousState"]).to be_nil
@@ -943,9 +945,10 @@ describe Mutations::CreateDiscussionTopic do
 
   context "graded discussion topics" do
     it "successfully creates a graded discussion topic" do
+      aa_test_data = AttachmentAssociationsSpecHelper.new(@course.account, @course)
       context_type = "Course"
       title = "Graded Discussion"
-      message = "Lorem ipsum..."
+      message = aa_test_data.base_html
       published = true
       student = @course.enroll_student(User.create!, enrollment_state: "active").user
       group_category = @course.group_categories.create! name: "foo"
@@ -955,7 +958,7 @@ describe Mutations::CreateDiscussionTopic do
         contextId: "#{@course.id}"
         contextType: #{context_type}
         title: "#{title}"
-        message: "#{message}"
+        message: "#{message.gsub('"', '\"')}"
         published: #{published}
         groupCategoryId: "#{group_category.id}"
         lockAt: null

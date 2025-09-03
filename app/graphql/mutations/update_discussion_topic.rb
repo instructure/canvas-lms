@@ -202,7 +202,8 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
             checkpoint_label: checkpoint[:checkpoint_label],
             points_possible: checkpoint[:points_possible],
             dates:,
-            replies_required: checkpoint[:replies_required]
+            replies_required: checkpoint[:replies_required],
+            saving_user: current_user
           )
         end
       end
