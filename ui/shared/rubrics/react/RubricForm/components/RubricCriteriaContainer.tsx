@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {useState} from 'react'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {DragDropContext as DragAndDrop, Droppable} from 'react-beautiful-dnd'
@@ -47,6 +48,8 @@ export const RubricCriteriaContainer = ({
   openOutcomeDialog,
   onRegenerateCriterion,
 }: RubricCriteriaRowsProps) => {
+  const [selectedLearningOutcomeId, setSelectedLearningOutcomeId] = useState<string>()
+
   return (
     <Flex.Item shouldGrow={true} shouldShrink={true} as="main" padding="xx-small">
       <View as="div" margin="0 0 small 0">
@@ -74,6 +77,8 @@ export const RubricCriteriaContainer = ({
                         onEditCriterion={() => openCriterionModal(criterion)}
                         onRegenerateCriterion={onRegenerateCriterion}
                         isRegenerating={isGenerating}
+                        selectedLearningOutcomeId={selectedLearningOutcomeId}
+                        selectLearningOutcome={setSelectedLearningOutcomeId}
                         showCriteriaRegeneration={showCriteriaRegeneration}
                       />
                     )

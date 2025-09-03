@@ -19,6 +19,7 @@
 import React from 'react'
 import {render, screen, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {ModernView} from '../ModernView'
 import type {RubricCriterion, RubricAssessmentData} from '../../types/rubric'
 
@@ -135,12 +136,20 @@ describe('ModernView', () => {
     onUpdateAssessmentData: jest.fn(),
   }
 
+  const renderModernView = (props = {}) => {
+    return render(
+      <MockedQueryProvider>
+        <ModernView {...defaultProps} {...props} />
+      </MockedQueryProvider>,
+    )
+  }
+
   afterEach(() => {
     jest.clearAllMocks()
   })
 
   it('renders criteria descriptions and ratings', () => {
-    render(<ModernView {...defaultProps} />)
+    renderModernView()
 
     mockCriteria.forEach(criterion => {
       if (criterion.description) {
@@ -161,7 +170,7 @@ describe('ModernView', () => {
   })
 
   it('displays outcome tag for criteria with learning outcomes', () => {
-    render(<ModernView {...defaultProps} />)
+    renderModernView()
 
     const outcomeElements = screen.getAllByText('Content Understanding')
     expect(outcomeElements.length).toBeGreaterThan(0)
@@ -169,7 +178,7 @@ describe('ModernView', () => {
   })
 
   it('shows existing assessment data', () => {
-    render(<ModernView {...defaultProps} />)
+    renderModernView()
 
     const assessment = mockRubricAssessmentData[0]
     const pointsInput = screen.getByTestId(`criterion-score-${assessment.criterionId}`)
@@ -179,7 +188,7 @@ describe('ModernView', () => {
 
   it('allows selecting a rating', async () => {
     const user = userEvent.setup()
-    render(<ModernView {...defaultProps} />)
+    renderModernView()
 
     const criterion = mockCriteria[0]
     const nextRating = criterion.ratings[0]
@@ -202,7 +211,7 @@ describe('ModernView', () => {
 
   it('allows entering points directly', async () => {
     const user = userEvent.setup()
-    render(<ModernView {...defaultProps} />)
+    renderModernView()
 
     const pointsInput = screen.getByTestId('criterion-score-criterion_1')
     await user.clear(pointsInput)
@@ -218,7 +227,7 @@ describe('ModernView', () => {
   })
 
   it('disables interactions in preview mode', () => {
-    render(<ModernView {...defaultProps} isPreviewMode={true} />)
+    renderModernView({isPreviewMode: true})
 
     // Points input is replaced with text in preview mode
     const pointsText = screen.getByText('10')
@@ -233,12 +242,16 @@ describe('ModernView', () => {
   })
 
   it('switches between horizontal and vertical views', () => {
-    const {rerender} = render(<ModernView {...defaultProps} selectedViewMode="horizontal" />)
+    const {rerender} = renderModernView({selectedViewMode: 'horizontal'})
     expect(screen.getAllByTestId('rubric-assessment-horizontal-display')).toHaveLength(
       mockCriteria.length,
     )
 
-    rerender(<ModernView {...defaultProps} selectedViewMode="vertical" />)
+    rerender(
+      <MockedQueryProvider>
+        <ModernView {...defaultProps} selectedViewMode="vertical" />
+      </MockedQueryProvider>,
+    )
     expect(screen.getAllByTestId('rubric-assessment-vertical-display')).toHaveLength(
       mockCriteria.length,
     )
@@ -246,14 +259,14 @@ describe('ModernView', () => {
 
   it('displays validation errors', () => {
     const validationErrors = ['criterion_1']
-    render(<ModernView {...defaultProps} validationErrors={validationErrors} />)
+    renderModernView({validationErrors})
 
     expect(screen.getByText('Please select a rating or enter a score')).toBeInTheDocument()
   })
 
   it('shows comment input field and allows typing', async () => {
     const user = userEvent.setup()
-    render(<ModernView {...defaultProps} />)
+    renderModernView()
 
     const commentInput = screen.getByTestId('comment-text-area-criterion_1')
     await user.clear(commentInput)
@@ -269,7 +282,7 @@ describe('ModernView', () => {
   })
 
   it(`comment blur does not clear rating for criterion where ratings' points are different`, async () => {
-    render(<ModernView {...defaultProps} />)
+    renderModernView()
 
     const commentInput = screen.getByTestId('comment-text-area-criterion_1')
     fireEvent.blur(commentInput)
@@ -282,7 +295,7 @@ describe('ModernView', () => {
   })
 
   it(`comment blur does not clear rating for criterion where ratings' points are equal`, async () => {
-    render(<ModernView {...defaultProps} />)
+    renderModernView()
 
     const commentInput = screen.getByTestId('comment-text-area-criterion_3')
     fireEvent.blur(commentInput)

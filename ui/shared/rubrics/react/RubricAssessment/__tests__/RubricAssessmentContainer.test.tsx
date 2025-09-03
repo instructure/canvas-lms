@@ -18,12 +18,16 @@
 
 import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
-import {RUBRIC_DATA, SELF_ASSESSMENT_DATA, TEACHER_ASSESSMENT_DATA} from './fixtures'
+import {queryClient} from '@canvas/query'
+import {OUTCOME_DATA, RUBRIC_DATA, SELF_ASSESSMENT_DATA, TEACHER_ASSESSMENT_DATA} from './fixtures'
+import {RubricCriterion} from '../../types/rubric'
+
 import {
   RubricAssessmentContainer,
   type RubricAssessmentContainerProps,
 } from '../RubricAssessmentContainer'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
+import CalculationMethodContent from '@canvas/grading/CalculationMethodContent'
 
 describe('RubricAssessmentContainer Tests', () => {
   const renderComponent = (props?: Partial<RubricAssessmentContainerProps>) => {
@@ -103,6 +107,73 @@ describe('RubricAssessmentContainer Tests', () => {
       const secondDetailsDiv = getByTestId('rating-details-10')
       expect(secondDetailsDiv).toHaveTextContent('Rating 10')
       expect(secondDetailsDiv).toHaveTextContent('amazing work')
+    })
+  })
+
+  describe('Outcome tag tests', () => {
+    it('displays outcome tag with clickable tag details to open popover', () => {
+      queryClient.setQueryData(['rubric_outcome_', '1'], OUTCOME_DATA)
+      const {friendlyCalculationMethod, exampleText} = new CalculationMethodContent({
+        calculation_method: OUTCOME_DATA.calculationMethod,
+        calculation_int: OUTCOME_DATA.calculationInt,
+        is_individual_outcome: true,
+        mastery_points: OUTCOME_DATA.masteryPoints,
+      }).present()
+      const outcomeCriteria: RubricCriterion = {
+        ...RUBRIC_DATA.criteria[0],
+        outcome: {
+          displayName: 'Test Outcome',
+          title: 'Outcome 1',
+        },
+        learningOutcomeId: '1',
+      }
+
+      const criteria = [outcomeCriteria]
+
+      const {getByTestId} = renderComponent({criteria})
+
+      const outcomeTag = getByTestId('rubric-criteria-row-outcome-tag')
+      expect(outcomeTag).toBeInTheDocument()
+
+      fireEvent.click(outcomeTag)
+
+      expect(getByTestId('outcome-popover-display')).toBeInTheDocument()
+      expect(getByTestId('outcome-popover-display-name')).toHaveTextContent(
+        OUTCOME_DATA.displayName,
+      )
+      expect(getByTestId('outcome-popover-title')).toHaveTextContent(OUTCOME_DATA.title)
+      expect(getByTestId('outcome-popover-display-content-description')).toHaveTextContent(
+        OUTCOME_DATA.description,
+      )
+      expect(getByTestId('outcome-popover-display-content-calculation-method')).toHaveTextContent(
+        friendlyCalculationMethod,
+      )
+      expect(getByTestId('outcome-popover-display-content-example')).toHaveTextContent(exampleText)
+    })
+
+    it('displays outcome tag with title as display name if display name is empty', () => {
+      queryClient.setQueryData(['rubric_outcome_', '1'], {...OUTCOME_DATA, displayName: ''})
+      const outcomeCriteria: RubricCriterion = {
+        ...RUBRIC_DATA.criteria[0],
+        outcome: {
+          displayName: '',
+          title: 'Outcome 1',
+        },
+        learningOutcomeId: '1',
+      }
+
+      const criteria = [outcomeCriteria]
+
+      const {getByTestId, queryByTestId} = renderComponent({criteria})
+
+      const outcomeTag = getByTestId('rubric-criteria-row-outcome-tag')
+      expect(outcomeTag).toBeInTheDocument()
+
+      fireEvent.click(outcomeTag)
+
+      expect(getByTestId('outcome-popover-display')).toBeInTheDocument()
+      expect(getByTestId('outcome-popover-display-name')).toHaveTextContent(OUTCOME_DATA.title)
+      expect(queryByTestId('outcome-popover-title')).not.toBeInTheDocument()
     })
   })
 })
