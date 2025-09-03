@@ -34,23 +34,14 @@ const getDefaultValues = overrides => {
       d.format('YYYY-MM-DD'),
       [
         {
-          dateBucketMoment: d,
+          id: `item-${index}`,
+          uniqueId: `item-${index}`,
+          title: `Test Item ${index}`,
+          date: d,
           context: {
             color: '#5a92de',
             title: 'Test Course',
           },
-          items: [
-            {
-              id: `item-${index}`,
-              uniqueId: `item-${index}`,
-              title: `Test Item ${index}`,
-              date: d,
-              context: {
-                color: '#5a92de',
-                title: 'Test Course',
-              },
-            },
-          ],
         },
       ],
     ]),
@@ -134,7 +125,18 @@ describe('PlannerApp focus handling', () => {
       ...getDefaultValues().days,
       [
         moment.tz(TZ).add(3, 'day').format('YYYY-MM-DD'),
-        [{dateBucketMoment: moment.tz(TZ).add(3, 'day')}],
+        [
+          {
+            id: 'item-3',
+            uniqueId: 'item-3',
+            title: 'Test Item 3',
+            date: moment.tz(TZ).add(3, 'day'),
+            context: {
+              color: '#5a92de',
+              title: 'Test Course',
+            },
+          },
+        ],
       ],
     ]
 
