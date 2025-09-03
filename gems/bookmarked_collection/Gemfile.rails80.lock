@@ -1,41 +1,54 @@
 PATH
+  remote: ../json_token
+  specs:
+    json_token (0.0.1)
+      base64
+      json
+
+PATH
+  remote: ../paginated_collection
+  specs:
+    paginated_collection (1.0.0)
+      folio-pagination (~> 0.0.12)
+      will_paginate (>= 3.0, < 5.0)
+
+PATH
   remote: .
   specs:
-    canvas_partman (2.0.0)
-      activerecord (>= 6.1, < 8.1)
-      activerecord-pg-extensions (~> 0.4)
-      pg (>= 0.17, < 2.0)
+    bookmarked_collection (1.0.0)
+      activerecord (>= 3.2)
+      folio-pagination (~> 0.0.12)
+      json_token
+      paginated_collection
+      railties (>= 3.2)
+      will_paginate (>= 3.0, < 5.0)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    actionpack (7.2.2.2)
-      actionview (= 7.2.2.2)
-      activesupport (= 7.2.2.2)
+    actionpack (8.0.2.1)
+      actionview (= 8.0.2.1)
+      activesupport (= 8.0.2.1)
       nokogiri (>= 1.8.5)
-      racc
-      rack (>= 2.2.4, < 3.2)
+      rack (>= 2.2.4)
       rack-session (>= 1.0.1)
       rack-test (>= 0.6.3)
       rails-dom-testing (~> 2.2)
       rails-html-sanitizer (~> 1.6)
       useragent (~> 0.16)
-    actionview (7.2.2.2)
-      activesupport (= 7.2.2.2)
+    actionview (8.0.2.1)
+      activesupport (= 8.0.2.1)
       builder (~> 3.1)
       erubi (~> 1.11)
       rails-dom-testing (~> 2.2)
       rails-html-sanitizer (~> 1.6)
-    activemodel (7.2.2.2)
-      activesupport (= 7.2.2.2)
-    activerecord (7.2.2.2)
-      activemodel (= 7.2.2.2)
-      activesupport (= 7.2.2.2)
+    activemodel (8.0.2.1)
+      activesupport (= 8.0.2.1)
+    activerecord (8.0.2.1)
+      activemodel (= 8.0.2.1)
+      activesupport (= 8.0.2.1)
       timeout (>= 0.4.0)
-    activerecord-pg-extensions (0.6.0)
-      activerecord (>= 7.0, < 8.1)
-      railties (>= 7.0, < 8.1)
-    activesupport (7.2.2.2)
+    activesupport (8.0.2.1)
       base64
       benchmark (>= 0.3)
       bigdecimal
@@ -47,6 +60,7 @@ GEM
       minitest (>= 5.1)
       securerandom (>= 0.3)
       tzinfo (~> 2.0, >= 2.0.5)
+      uri (>= 0.13.1)
     base64 (0.3.0)
     benchmark (0.4.1)
     bigdecimal (3.2.2)
@@ -55,11 +69,14 @@ GEM
     connection_pool (2.5.3)
     crass (1.0.6)
     date (3.4.1)
+    debug (1.11.0)
+      irb (~> 1.10)
+      reline (>= 0.3.8)
     diff-lcs (1.6.2)
-    docile (1.4.1)
     drb (2.2.3)
     erb (5.0.2)
     erubi (1.13.1)
+    folio-pagination (0.0.12)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
     io-console (0.8.1)
@@ -67,6 +84,7 @@ GEM
       pp (>= 0.6.0)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
+    json (2.13.2)
     logger (1.7.0)
     loofah (2.24.0)
       crass (~> 1.0.2)
@@ -80,7 +98,6 @@ GEM
       racc (~> 1.4)
     nokogiri (1.18.9-x86_64-linux-gnu)
       racc (~> 1.4)
-    pg (1.5.9)
     pp (0.6.2)
       prettyprint
     prettyprint (0.2.0)
@@ -103,9 +120,9 @@ GEM
     rails-html-sanitizer (1.6.2)
       loofah (~> 2.21)
       nokogiri (>= 1.15.7, != 1.16.7, != 1.16.6, != 1.16.5, != 1.16.4, != 1.16.3, != 1.16.2, != 1.16.1, != 1.16.0.rc1, != 1.16.0)
-    railties (7.2.2.2)
-      actionpack (= 7.2.2.2)
-      activesupport (= 7.2.2.2)
+    railties (8.0.2.1)
+      actionpack (= 8.0.2.1)
+      activesupport (= 8.0.2.1)
       irb (~> 1.13)
       rackup (>= 1.0.0)
       rake (>= 12.2)
@@ -131,18 +148,18 @@ GEM
       rspec-support (~> 3.13.0)
     rspec-support (3.13.2)
     securerandom (0.4.1)
-    simplecov (0.22.0)
-      docile (~> 1.1)
-      simplecov-html (~> 0.11)
-      simplecov_json_formatter (~> 0.1)
-    simplecov-html (0.13.1)
-    simplecov_json_formatter (0.1.4)
+    sqlite3 (2.6.0-aarch64-linux-gnu)
+    sqlite3 (2.6.0-arm64-darwin)
+    sqlite3 (2.6.0-x86_64-darwin)
+    sqlite3 (2.6.0-x86_64-linux-gnu)
     stringio (3.1.7)
     thor (1.4.0)
     timeout (0.4.3)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
+    uri (1.0.3)
     useragent (0.16.11)
+    will_paginate (4.0.1)
     zeitwerk (2.7.2)
 
 PLATFORMS
@@ -153,9 +170,13 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  canvas_partman!
+  bookmarked_collection!
+  debug
+  json_token!
+  paginated_collection!
+  rake
   rspec (~> 3.12)
-  simplecov (~> 0.22)
+  sqlite3
 
 RUBY VERSION
    ruby 3.4.1p0
