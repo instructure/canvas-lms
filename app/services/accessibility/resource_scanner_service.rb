@@ -31,7 +31,7 @@ class Accessibility::ResourceScannerService < ApplicationService
   def call
     return if scan_already_queued_or_in_progress?
 
-    scan = AccessibilityResourceScan.for_context(@resource).first_or_initialize
+    scan = AccessibilityResourceScan.where(context: @resource).first_or_initialize
     scan.assign_attributes(
       course: @resource.course,
       workflow_state: "queued",
@@ -83,7 +83,7 @@ class Accessibility::ResourceScannerService < ApplicationService
   end
 
   def scan_already_queued_or_in_progress?
-    AccessibilityResourceScan.for_context(@resource)
+    AccessibilityResourceScan.where(context: @resource)
                              .where(workflow_state: %w[queued in_progress])
                              .exists?
   end

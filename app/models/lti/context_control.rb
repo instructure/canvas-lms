@@ -33,12 +33,7 @@ class Lti::ContextControl < ActiveRecord::Base
   belongs_to :created_by, class_name: "User"
   belongs_to :updated_by, class_name: "User"
 
-  belongs_to :course, optional: true
-  belongs_to :account, optional: true
-
-  validate :only_one_context?
-  validates :course, presence: true, if: -> { account.blank? }
-  validates :account, presence: true, if: -> { course.blank? }
+  belongs_to :context, polymorphic: %i[account course], separate_columns: true, optional: false
 
   validates :deployment_id, uniqueness: { scope: %i[account_id course_id] }
 
@@ -267,19 +262,11 @@ class Lti::ContextControl < ActiveRecord::Base
   end
 
   def set_path
-    self.path = self.class.calculate_path(account || course)
+    self.path = self.class.calculate_path(context)
   end
 
   def set_registration_id
     self.registration_id ||= deployment.lti_registration_id
-  end
-
-  def only_one_context?
-    if account.present? && course.present?
-      errors.add(:context, I18n.t("must have either an account or a course, not both"))
-    elsif account.blank? && course.blank?
-      errors.add(:context, I18n.t("must have either an account or a course"))
-    end
   end
 
   def context_belongs_to_deployment

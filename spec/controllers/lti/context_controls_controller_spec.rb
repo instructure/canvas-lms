@@ -495,7 +495,7 @@ describe Lti::ContextControlsController, type: :request do
       it "returns 422" do
         subject
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(response_json.dig("errors", 0)).to eq("Context must have either an account or a course, not both")
+        expect(response_json.dig("errors", 0)).to eq("Exactly one context must be present")
       end
     end
 

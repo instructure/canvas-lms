@@ -27,8 +27,7 @@ class CreateLtiContextControls < ActiveRecord::Migration[7.1]
 
       t.references :deployment, foreign_key: { to_table: :context_external_tools }, null: false
       t.references :registration, foreign_key: { to_table: :lti_registrations }, null: false
-      t.references :account, foreign_key: true, index: false
-      t.references :course, foreign_key: true, index: false
+      t.references :context, polymorphic: %i[account course], foreign_key: true, index: false, check_constraint: false
 
       t.check_constraint <<~SQL.squish, name: "chk_require_context"
         (account_id IS NOT NULL OR

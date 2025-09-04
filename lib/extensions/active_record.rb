@@ -19,3 +19,5 @@
 #
 
 require_relative "active_record/enum"
+require_relative "active_record/polymorphic_associations"
+require_relative "active_record/schema_statements/polymorphic_associations"
