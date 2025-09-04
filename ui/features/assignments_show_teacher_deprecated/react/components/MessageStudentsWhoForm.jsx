@@ -155,7 +155,7 @@ export default class MessageStudentsWhoForm extends React.Component {
           data-testid="filter-students"
         >
           {options.map(opt => (
-            <Select.Option {...opt} />
+            <Select.Option key={opt.key} id={opt.id} value={opt.value} label={opt.label} />
           ))}
         </Select>
         {this.renderScoreInput()}
