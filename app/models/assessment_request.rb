@@ -37,6 +37,7 @@ class AssessmentRequest < ActiveRecord::Base
   before_save :infer_uuid
   after_save :delete_ignores
   after_save :update_planner_override
+  after_save :update_peer_review_submission
   has_a_broadcast_policy
 
   def infer_uuid
@@ -188,5 +189,19 @@ class AssessmentRequest < ActiveRecord::Base
 
   def active_rubric_association?
     !!rubric_association&.active?
+  end
+
+  def update_peer_review_submission
+    return unless assessment_request_was_completed?
+    return unless peer_review_sub_assignment
+
+    PeerReview::PeerReviewSubmitterService.new(
+      parent_assignment: asset.assignment,
+      assessor:
+    ).call
+  end
+
+  def assessment_request_was_completed?
+    saved_change_to_workflow_state? && workflow_state_before_last_save == "assigned" && workflow_state == "completed"
   end
 end
