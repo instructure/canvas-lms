@@ -166,6 +166,33 @@ export const defaultGraphQLHandlers = [
       },
     })
   }),
+
+  // Handle GetDashboardNotifications query
+  graphql.query('GetDashboardNotifications', () => {
+    return HttpResponse.json({
+      data: {
+        accountNotifications: [],
+        enrollmentInvitations: [],
+      },
+    })
+  }),
+
+  // Handle GetCourseInstructorsPaginated query
+  graphql.query('GetCourseInstructorsPaginated', () => {
+    return HttpResponse.json({
+      data: {
+        courseInstructorsConnection: {
+          nodes: [],
+          pageInfo: {
+            hasNextPage: false,
+            hasPreviousPage: false,
+            startCursor: null,
+            endCursor: null,
+          },
+        },
+      },
+    })
+  }),
 ]
 
 // Helper to create empty responses

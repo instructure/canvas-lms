@@ -170,7 +170,7 @@ describe('DashboardNotifications', () => {
         return HttpResponse.json({
           data: {
             dismissAccountNotification: {
-              success: true,
+              errors: null,
             },
           },
         })

@@ -302,14 +302,6 @@ describe('CourseWorkWidget', () => {
     expect(screen.getByDisplayValue('All Courses')).toBeInTheDocument()
   })
 
-  it.skip('renders action link to view all courses', async () => {
-    renderWithProviders(<CourseWorkWidget {...buildDefaultProps()} />)
-
-    const viewAllLink = await screen.findByTestId('view-all-courses-link')
-    expect(viewAllLink).toBeInTheDocument()
-    expect(viewAllLink).toHaveAttribute('href', '/courses')
-  })
-
   it('handles loading state', () => {
     // Mock with a delayed response to test loading state
     server.use(

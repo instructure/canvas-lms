@@ -19,8 +19,48 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {setupServer} from 'msw/node'
+import {graphql, HttpResponse} from 'msw'
 import PeopleWidget from '../PeopleWidget'
 import type {BaseWidgetProps, Widget} from '../../../../types'
+
+const server = setupServer(
+  // Mock useSharedCourses query
+  graphql.query('GetUserCoursesWithGradesConnection', () => {
+    return HttpResponse.json({
+      data: {
+        legacyNode: {
+          _id: '123',
+          enrollmentsConnection: {
+            nodes: [],
+            pageInfo: {
+              hasNextPage: false,
+              hasPreviousPage: false,
+              startCursor: null,
+              endCursor: null,
+            },
+          },
+        },
+      },
+    })
+  }),
+  // Mock useCourseInstructors query
+  graphql.query('GetCourseInstructorsPaginated', () => {
+    return HttpResponse.json({
+      data: {
+        courseInstructorsConnection: {
+          nodes: [],
+          pageInfo: {
+            hasNextPage: false,
+            hasPreviousPage: false,
+            startCursor: null,
+            endCursor: null,
+          },
+        },
+      },
+    })
+  }),
+)
 
 const mockWidget: Widget = {
   id: 'test-people-widget',
@@ -52,11 +92,20 @@ const renderWithQueryClient = (ui: React.ReactElement) => {
 
 describe('PeopleWidget', () => {
   beforeAll(() => {
+    server.listen({onUnhandledRequest: 'bypass'})
     window.ENV = {
       current_user_id: '123',
       GRAPHQL_URL: '/api/graphql',
       CSRF_TOKEN: 'mock-csrf-token',
     } as any
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   it('renders widget title', () => {
