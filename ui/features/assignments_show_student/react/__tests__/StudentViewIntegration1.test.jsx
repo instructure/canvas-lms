@@ -22,6 +22,8 @@ import {CREATE_SUBMISSION_DRAFT} from '@canvas/assignments/graphql/student/Mutat
 import {createCache} from '@canvas/apollo-v3'
 import {fireEvent, render, waitFor, act} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {
   STUDENT_VIEW_QUERY,
   SUBMISSION_HISTORIES_QUERY,
@@ -35,8 +37,18 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.mock('../components/AttemptSelect')
 
+const server = setupServer()
+
 describe('student view integration tests', () => {
   let user
+
+  beforeAll(() => {
+    server.listen()
+  })
+
+  afterAll(() => {
+    server.close()
+  })
 
   beforeEach(() => {
     user = userEvent.setup()
@@ -45,15 +57,25 @@ describe('student view integration tests', () => {
       context_asset_string: 'test_1',
       ASSIGNMENT_ID: '1',
       COURSE_ID: '1',
+      course_id: '1',
       current_user: {display_name: 'bob', avatar_url: 'awesome.avatar.url', id: '1'},
       PREREQS: {},
       current_user_roles: ['user', 'student'],
     })
+    server.use(
+      http.get('*/courses/*/module_item_sequence*', () => {
+        return HttpResponse.json({
+          items: [],
+          modules: [],
+        })
+      }),
+    )
   })
 
   afterEach(() => {
     fakeENV.teardown()
     jest.clearAllMocks()
+    server.resetHandlers()
   })
 
   describe('StudentViewQuery', () => {
