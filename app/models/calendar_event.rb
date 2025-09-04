@@ -563,8 +563,6 @@ class CalendarEvent < ActiveRecord::Base
     end
   end
 
-  attr_reader :updating_user
-
   def updating_user=(user)
     self.user ||= user
     @updating_user = user

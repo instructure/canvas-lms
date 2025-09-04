@@ -98,7 +98,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
       end
     end
 
-    associate_attachments_to_rce_object(all_html.compact.join("\n"), actual_saving_user)
+    associate_attachments_to_rce_object(all_html.compact.join("\n"), updating_user)
   end
 
   def access_for_attachment_association?(user, session, _association, _location_param)
