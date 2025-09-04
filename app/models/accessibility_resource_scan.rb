@@ -18,11 +18,12 @@
 
 class AccessibilityResourceScan < ActiveRecord::Base
   extend RootAccountResolver
-  include Accessibility::HasContext
 
   resolves_root_account through: :course
 
   belongs_to :course
+  belongs_to :context, polymorphic: %i[assignment attachment wiki_page], separate_columns: true, optional: false
+
   has_many :accessibility_issues, dependent: :destroy
 
   enum :workflow_state, %i[queued in_progress completed failed], validate: true
@@ -38,5 +39,20 @@ class AccessibilityResourceScan < ActiveRecord::Base
 
   def update_issue_count!
     update!(issue_count: accessibility_issues.active.count)
+  end
+
+  def context_url
+    context_id = self.context_id
+    return unless context_id
+
+    url_helpers = Rails.application.routes.url_helpers
+    case context_type
+    when "WikiPage"
+      url_helpers.course_wiki_page_path(course_id, context_id)
+    when "Assignment"
+      url_helpers.course_assignment_path(course_id, context_id)
+    when "Attachment"
+      url_helpers.course_files_path(course_id, preview: context_id)
+    end
   end
 end

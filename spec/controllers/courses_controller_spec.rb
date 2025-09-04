@@ -286,7 +286,7 @@ describe CoursesController do
           account.save!
 
           wiki_page = wiki_page_model(course: @course1, title: "Wiki Page", body: "<div><h1>Document Title</h1></div>")
-          scan = AccessibilityResourceScan.for_context(wiki_page).first
+          scan = AccessibilityResourceScan.where(context: wiki_page).first
           scan.update!(
             course: @course1,
             workflow_state: "completed",

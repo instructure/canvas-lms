@@ -500,109 +500,6 @@ class ActiveRecord::Base
     Arel.sql("#{column} #{direction.to_s.upcase}#{clause}".strip)
   end
 
-  # set up class-specific getters/setters for a polymorphic association, e.g.
-  #   belongs_to :context, polymorphic: [:course, :account]
-  def self.belongs_to(name, scope = nil, **options)
-    if options[:polymorphic] == true
-      raise "Please pass an array of valid types for polymorphic associations. Use exhaustive: false if you really don't want to validate them"
-    end
-
-    polymorphic_prefix = options.delete(:polymorphic_prefix)
-    exhaustive = options.delete(:exhaustive)
-
-    reflection = super[name.to_sym]
-
-    if name.to_s == "developer_key"
-      reflection.instance_eval do
-        def association_class
-          DeveloperKey::CacheOnAssociation
-        end
-      end
-    end
-
-    include Canvas::RootAccountCacher if name.to_s == "root_account"
-    Canvas::AccountCacher.apply_to_reflections(self)
-
-    if reflection.options[:polymorphic].is_a?(Array) ||
-       reflection.options[:polymorphic].is_a?(Hash)
-      reflection.options[:exhaustive] = exhaustive
-      reflection.options[:polymorphic_prefix] = polymorphic_prefix
-      add_polymorph_methods(reflection)
-    end
-    reflection
-  end
-
-  def self.canonicalize_polymorph_list(list)
-    specifics = []
-    Array.wrap(list).each do |name|
-      if name.is_a?(Hash)
-        specifics.concat(name.to_a)
-      else
-        specifics << [name, name.to_s.camelize]
-      end
-    end
-    specifics
-  end
-
-  def self.add_polymorph_methods(reflection)
-    unless @polymorph_module
-      @polymorph_module = Module.new
-      include(@polymorph_module)
-    end
-
-    specifics = canonicalize_polymorph_list(reflection.options[:polymorphic])
-
-    unless reflection.options[:exhaustive] == false
-      specific_classes = specifics.map(&:last).sort
-      validates reflection.foreign_type, inclusion: { in: specific_classes }, allow_nil: true
-
-      @polymorph_module.class_eval <<~RUBY, __FILE__, __LINE__ + 1
-        def #{reflection.name}=(record)
-          if record && [#{specific_classes.join(", ")}].none? { |klass| record.is_a?(klass) }
-            message = "one of #{specific_classes.join(", ")} expected, got \#{record.class}"
-            raise ActiveRecord::AssociationTypeMismatch, message
-          end
-          super
-        end
-      RUBY
-    end
-
-    if reflection.options[:polymorphic_prefix] == true
-      prefix = "#{reflection.name}_"
-    elsif reflection.options[:polymorphic_prefix]
-      prefix = "#{reflection.options[:polymorphic_prefix]}_"
-    end
-
-    specifics.each do |(name, class_name)|
-      # ensure we capture this class's table name
-      table_name = self.table_name
-      belongs_to(:"#{prefix}#{name}",
-                 -> { where(table_name => { reflection.foreign_type => class_name }) },
-                 foreign_key: reflection.foreign_key,
-                 class_name:) # rubocop:disable Rails/ReflectionClassName
-
-      correct_type = "#{reflection.foreign_type} && self.class.send(:compute_type, #{reflection.foreign_type}) <= #{class_name}"
-
-      @polymorph_module.class_eval <<~RUBY, __FILE__, __LINE__ + 1
-        def #{prefix}#{name}
-          #{reflection.name} if #{correct_type}
-        end
-
-        def #{prefix}#{name}=(record)
-          # we don't want to unset it if it's currently some other type, i.e.
-          # foo.bar = Bar.new
-          # foo.baz = nil
-          # foo.bar.should_not be_nil
-          return if record.nil? && !(#{correct_type})
-          association(:#{prefix}#{name}).send(:raise_on_type_mismatch!, record) if record
-
-          self.#{reflection.name} = record
-        end
-
-      RUBY
-    end
-  end
-
   # Returns the class for the provided +name+.
   #
   # It is used to find the class correspondent to the value stored in the polymorphic type column.
@@ -1899,6 +1796,10 @@ module ExistenceInversions
         end
         result
       end
+
+      def invert_rename_constraint(table_name, old_name, new_name, if_exists: false)
+        [:rename_constraint, [table_name, new_name, old_name, { if_exists: if_exists }]]
+      end
     RUBY
   end
 end
@@ -2369,3 +2270,9 @@ module ValidateDateTimeFormat
   end
 end
 ActiveRecord::Base.prepend(ValidateDateTimeFormat)
+
+ActiveRecord::Associations::ClassMethods.prepend(Extensions::ActiveRecord::PolymorphicAssociations::ClassMethods)
+ActiveRecord::PredicateBuilder::PolymorphicArrayValue.prepend(Extensions::ActiveRecord::PolymorphicAssociations::PolymorphicArrayValue)
+
+ActiveRecord::ConnectionAdapters::SchemaStatements.prepend(Extensions::ActiveRecord::SchemaStatements::PolymorphicAssociations)
+ActiveRecord::ConnectionAdapters::TableDefinition.prepend(Extensions::ActiveRecord::SchemaStatements::PolymorphicAssociations::TableDefinition)

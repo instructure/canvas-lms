@@ -2363,12 +2363,12 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
     create_table :estimated_durations do |t|
       t.interval :duration
-      t.references :discussion_topic, foreign_key: true, index: { where: "discussion_topic_id IS NOT NULL", unique: true }
-      t.references :assignment, foreign_key: true, index: { where: "assignment_id IS NOT NULL", unique: true }
-      t.references :attachment, foreign_key: true, index: { where: "attachment_id IS NOT NULL", unique: true }
-      t.references :quiz, foreign_key: true, index: { where: "quiz_id IS NOT NULL", unique: true }
-      t.references :wiki_page, foreign_key: true, index: { where: "wiki_page_id IS NOT NULL", unique: true }
-      t.references :content_tag, foreign_key: true, index: { where: "content_tag_id IS NOT NULL", unique: true }
+
+      t.references :context,
+                   polymorphic: %i[discussion_topic assignment attachment quiz wiki_page content_tag],
+                   foreign_key: true,
+                   index: { unique: true },
+                   check_constraint: false
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
       t.timestamps
 
@@ -4312,8 +4312,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.integer :error_count, default: 0, null: false
       t.json :error_data
       t.timestamps
-      t.references :account, foreign_key: true, index: { where: "account_id IS NOT NULL" }
-      t.references :course, foreign_key: true, index: { where: "course_id IS NOT NULL" }
+      t.references :account, polymorphic: %i[account course], foreign_key: true, check_constraint: false
 
       t.check_constraint <<~SQL.squish, name: "chk_require_association"
         (account_id IS NOT NULL OR

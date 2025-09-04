@@ -26,9 +26,7 @@ class CreateAccessibilityIssues < ActiveRecord::Migration[7.2]
       t.references :root_account, null: false, foreign_key: { to_table: :accounts }, index: false
       t.references :course, null: false, foreign_key: true, index: true
 
-      t.references :wiki_page, foreign_key: true, index: { where: "wiki_page_id IS NOT NULL" }
-      t.references :assignment, foreign_key: true, index: { where: "assignment_id IS NOT NULL" }
-      t.references :attachment, foreign_key: true, index: { where: "attachment_id IS NOT NULL" }
+      t.references :context, polymorphic: %i[wiki_page assignment attachment], foreign_key: true, check_constraint: false
       t.check_constraint <<~SQL.squish, name: "chk_require_context"
         (wiki_page_id IS NOT NULL AND assignment_id IS NULL AND attachment_id IS NULL) OR
         (wiki_page_id IS NULL AND assignment_id IS NOT NULL AND attachment_id IS NULL) OR
