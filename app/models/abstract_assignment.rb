@@ -84,7 +84,6 @@ class AbstractAssignment < ActiveRecord::Base
   )
 
   attr_reader :assignment_changed, :posting_params_for_notifications
-  attr_writer :updating_user
 
   include MasterCourses::Restrictor
 

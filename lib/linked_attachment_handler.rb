@@ -21,9 +21,14 @@ module LinkedAttachmentHandler
 
   def self.included(klass)
     klass.send(:attr_accessor, :saving_user)
+    klass.send(:attr_writer, :updating_user)
 
     klass.after_save :update_attachment_associations
     klass.extend(ClassMethods)
+  end
+
+  def updating_user
+    @updating_user || saving_user || try(:current_user) || try(:editor) || try(:user)
   end
 
   def update_attachment_associations
@@ -33,7 +38,7 @@ module LinkedAttachmentHandler
       next unless saved_change_to_attribute?(field)
 
       context_concern = field if SPECIAL_CONCERN_FIELDS.include?(field)
-      associate_attachments_to_rce_object(send(field), actual_saving_user, context_concern:)
+      associate_attachments_to_rce_object(send(field), updating_user, context_concern:)
     end
   end
 
@@ -141,13 +146,6 @@ module LinkedAttachmentHandler
     root_account&.feature_enabled?(:file_association_access)
   end
 
-  def actual_saving_user
-    saving_user ||
-      try(:updating_user) ||
-      try(:current_user) ||
-      try(:user)
-  end
-
   def access_for_attachment_association?(user, session, _association, _location_param)
     grants_right?(user, session, :read) if user && respond_to?(:grants_right?)
   end
@@ -159,10 +157,6 @@ module LinkedAttachmentHandler
   module ClassMethods
     def html_fields
       raise NotImplementedError
-    end
-
-    def actual_saving_user_attr
-      :saving_user
     end
   end
 end
