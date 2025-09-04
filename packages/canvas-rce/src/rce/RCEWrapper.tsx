@@ -423,6 +423,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
       explicit_latex_typesetting = false,
       rce_transform_loaded_content = false,
       rce_find_replace = false,
+      rce_studio_embed_improvements = false,
       file_verifiers_for_quiz_links = false,
       consolidated_media_player = false,
     } = this.props.features
@@ -431,6 +432,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
       new_math_equation_handling,
       explicit_latex_typesetting,
       rce_transform_loaded_content,
+      rce_studio_embed_improvements,
       file_verifiers_for_quiz_links,
       rce_find_replace,
       consolidated_media_player,
