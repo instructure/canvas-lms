@@ -187,7 +187,7 @@ class YoutubeMigrationService
     studio_embed_html = service.convert_youtube_to_studio(embed, studio_tool)
     service.update_resource_content(embed, studio_embed_html)
 
-    service.delete_embed_from_scan(scan_progress, embed)
+    service.mark_embed_as_converted(scan_progress, embed)
     progress.set_results({
                            success: true,
                            studio_tool_id: studio_tool.id,
@@ -490,29 +490,31 @@ class YoutubeMigrationService
     [[], { id: model.id, resource_type: model.class.name, field: }]
   end
 
-  def delete_embed_from_scan(scan_progress, embed)
+  def mark_embed_as_converted(scan_progress, embed)
     key = embed[:resource_group_key] || YoutubeMigrationService.generate_resource_key(embed[:resource_type], embed[:id])
     resource = scan_progress.results[:resources][key]
     found_embed, index = resource[:embeds].each_with_index.find do |resource_embed, _|
       embed[:path] == resource_embed[:path] &&
         embed[:field] == resource_embed[:field] &&
         embed[:resource_type] == resource_embed[:resource_type] &&
-        embed[:resource_type] == resource_embed[:resource_type] &&
+        embed[:id] == resource_embed[:id] &&
         embed[:resource_group_key] == resource_embed[:resource_group_key]
     end
 
     if found_embed
-      resource[:embeds].delete_at(index)
-      resource[:count] = [resource[:count] - 1, 0].max
-      if resource[:count].zero?
-        scan_progress.results[:resources].delete(key)
-      else
-        scan_progress.results[:resources][key] = resource
+      was_already_converted = resource[:embeds][index][:converted] == true
+
+      unless was_already_converted
+        resource[:embeds][index][:converted] = true
+        resource[:embeds][index][:converted_at] = Time.now.utc
+        resource[:converted_count] = (resource[:converted_count] || 0) + 1
+        scan_progress.results[:total_converted] = (scan_progress.results[:total_converted] || 0) + 1
       end
-      scan_progress.results[:total_count] = [scan_progress.results[:total_count] - 1, 0].max
+
+      scan_progress.results[:resources][key] = resource
       scan_progress.save!
     else
-      raise EmbedNotFoundError, "Embed not found for resource type: #{embed[:resource_type]}, id: #{embed[:id]}"
+      raise EmbedNotFoundError, "Embed not found for resource type: #{embed[:resource_type]}, id: #{embed[:id]}, src: #{embed[:src]}"
     end
   end
 end
