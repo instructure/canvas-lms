@@ -34,6 +34,16 @@ describe AssessmentRequest do
     communication_channel(@student, { username: "test@example.com", active_cc: true })
   end
 
+  def create_assessment_request(workflow_state: "assigned")
+    AssessmentRequest.create!(
+      user: @submission_student,
+      asset: @assignment.find_or_create_submission(@submission_student),
+      assessor_asset: @assignment.find_or_create_submission(@review_student),
+      assessor: @review_student,
+      workflow_state:
+    )
+  end
+
   describe "workflow" do
     it "defaults to assigned" do
       expect(@request).to be_assigned
@@ -339,6 +349,81 @@ describe AssessmentRequest do
       expect(requests_with_sub_assignment).not_to include(other_request)
       expect(requests_without_sub_assignment).to include(other_request)
       expect(requests_without_sub_assignment).not_to include(@request)
+    end
+  end
+
+  describe "#update_peer_review_submission" do
+    let(:service_double) { instance_double(PeerReview::PeerReviewSubmitterService) }
+
+    before :once do
+      @assignment.update!(peer_reviews: true)
+      @assignment.context.enable_feature!(:peer_review_allocation_and_grading)
+      peer_review_sub_assignment = PeerReviewSubAssignment.create!(parent_assignment: @assignment)
+      @request.peer_review_sub_assignment = peer_review_sub_assignment
+      @request.save!
+    end
+
+    it "calls PeerReviewSubmitterService when workflow state changes from assigned to completed and peer_review_sub_assignment exists" do
+      expect(PeerReview::PeerReviewSubmitterService).to receive(:new)
+        .with(parent_assignment: @assignment, assessor: @review_student)
+        .and_return(service_double)
+      expect(service_double).to receive(:call)
+
+      @request.complete!
+    end
+
+    it "does not call service when workflow state does not change" do
+      @request.update!(workflow_state: "completed")
+
+      expect(PeerReview::PeerReviewSubmitterService).not_to receive(:new)
+
+      @request.save!
+    end
+
+    it "does not call service when workflow state changes but not from assigned to completed" do
+      completed_request = create_assessment_request(workflow_state: "completed")
+
+      expect(PeerReview::PeerReviewSubmitterService).not_to receive(:new)
+
+      completed_request.update!(workflow_state: "assigned")
+    end
+
+    it "does not call service when peer_review_sub_assignment is nil" do
+      @request.peer_review_sub_assignment = nil
+      @request.save!
+      expect(@request.peer_review_sub_assignment).to be_nil
+      expect(PeerReview::PeerReviewSubmitterService).not_to receive(:new)
+
+      @request.complete!
+    end
+  end
+
+  describe "#assessment_request_was_completed?" do
+    it "returns true when workflow state changes from assigned to completed" do
+      @request.complete!
+
+      expect(@request.assessment_request_was_completed?).to be true
+    end
+
+    it "returns false when workflow state changes but not from assigned to completed" do
+      completed_request = create_assessment_request(workflow_state: "completed")
+
+      completed_request.workflow_state = "assigned"
+      completed_request.save!
+
+      expect(completed_request.assessment_request_was_completed?).to be false
+    end
+
+    it "returns false when workflow state does not change" do
+      @request.save!
+
+      expect(@request.assessment_request_was_completed?).to be false
+    end
+
+    it "returns false for a new record being created as completed" do
+      request = create_assessment_request(workflow_state: "completed")
+
+      expect(request.assessment_request_was_completed?).to be false
     end
   end
 end
