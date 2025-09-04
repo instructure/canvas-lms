@@ -68,6 +68,8 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
 
   const {courseId} = useContextModule()
   const itemTypeLabel = getItemTypeLabel(itemType)
+  const addPanelRef = React.useRef<HTMLDivElement | null>(null)
+  const createPanelRef = React.useRef<HTMLDivElement | null>(null)
   const isModuleItemContentEnabled =
     isOpen &&
     itemType !== ITEM_TYPE.CONTEXT_MODULE_SUB_HEADER &&
@@ -253,6 +255,22 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
     [dispatch],
   )
 
+  useEffect(() => {
+    if (state.tabIndex === 0 && addPanelRef.current) {
+      addPanelRef.current.focus()
+    } else if (state.tabIndex === 1 && createPanelRef.current) {
+      createPanelRef.current.focus()
+    }
+  }, [state.tabIndex])
+
+  const screenReaderMessage =
+    formErrors.name || formErrors.url
+      ? I18n.t('For %{itemType} items: %{details}', {
+          itemType: itemTypeLabel,
+          details: [formErrors.name, formErrors.url].filter(Boolean).join('. ') + '.',
+        })
+      : ' '
+
   return (
     <CanvasModal
       data-testid="add-item-modal"
@@ -264,6 +282,17 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
       shouldCloseOnDocumentClick
       size="medium"
       title={I18n.t('Add an item to %{module}', {module: moduleName})}
+      onKeyDown={(e: React.KeyboardEvent<HTMLFormElement>) => {
+        if (e.key === 'Enter') {
+          const t = e.target as HTMLElement
+          const isSubmitButton =
+            t.tagName === 'BUTTON' && (t as HTMLButtonElement).type === 'submit'
+          const inFileDrop = t.closest('[data-testid="module-file-drop"]')
+          if (!isSubmitButton && !inFileDrop) {
+            e.preventDefault()
+          }
+        }
+      }}
       onSubmit={(e: React.FormEvent) => {
         e.preventDefault()
         const hasNameError = isNameRequiredAndMissing(state, itemType)
@@ -294,6 +323,9 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
         </>
       }
     >
+      <ScreenReaderContent aria-live="polite" aria-atomic="true">
+        {screenReaderMessage}
+      </ScreenReaderContent>
       <View as="div" margin="0 0 medium 0">
         <AddItemTypeSelector itemType={itemType} onChange={value => setItemType(value)} />
       </View>
@@ -315,6 +347,10 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
               id="add-item-form"
               renderTitle={I18n.t('Add Item')}
               isSelected={state.tabIndex === 0}
+              elementRef={el => {
+                addPanelRef.current = el
+                if (el) el.setAttribute('tabindex', '-1')
+              }}
             >
               {renderContentItems()}
             </Tabs.Panel>
@@ -322,6 +358,10 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
               id="create-item-form"
               renderTitle={I18n.t('Create Item')}
               isSelected={state.tabIndex === 1}
+              elementRef={el => {
+                createPanelRef.current = el
+                if (el) el.setAttribute('tabindex', '-1')
+              }}
             >
               <CreateLearningObjectForm
                 itemType={itemType}

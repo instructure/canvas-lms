@@ -179,6 +179,15 @@ export const ExternalItemForm: React.FC<ExternalItemFormProps> = ({
           setLoadInNewTab(e.target.checked)
           onChange('newTab', e.target.checked)
         }}
+        onKeyDown={e => {
+          if (e.key === 'Enter') {
+            setLoadInNewTab(prev => {
+              const newVal = !prev
+              onChange('newTab', newVal)
+              return newVal
+            })
+          }
+        }}
       />
     </View>
   )
