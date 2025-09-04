@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen, waitFor} from '@testing-library/react'
+import {render, screen, waitFor, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../../hooks/useModuleContext'
@@ -47,7 +47,10 @@ describe('Title validation', () => {
     const nameInput = await screen.findByLabelText(/name/i)
     await userEvent.clear(nameInput)
     await userEvent.click(screen.getByRole('button', {name: /add item/i}))
-    expect(await screen.findByText(/required/i)).toBeInTheDocument()
+    const createPanel = await screen.findByRole('tabpanel', {name: /create item/i})
+    expect(
+      await within(createPanel).findByText('Assignment name is required', {exact: true}),
+    ).toBeInTheDocument()
   })
 
   it('removes error when a valid name is entered', async () => {
@@ -57,11 +60,16 @@ describe('Title validation', () => {
     const nameInput = await screen.findByLabelText(/name/i)
     await userEvent.clear(nameInput)
     await userEvent.click(screen.getByRole('button', {name: /add item/i}))
-    expect(await screen.findByText(/required/i)).toBeInTheDocument()
+    const createPanel = await screen.findByRole('tabpanel', {name: /create item/i})
+    expect(
+      await within(createPanel).findByText('Assignment name is required', {exact: true}),
+    ).toBeInTheDocument()
 
     await userEvent.type(nameInput, 'Valid Name')
     await waitFor(() => {
-      expect(screen.queryByText(/required/i)).not.toBeInTheDocument()
+      expect(
+        within(createPanel).queryByText('Assignment name is required', {exact: true}),
+      ).not.toBeInTheDocument()
     })
   })
 })
