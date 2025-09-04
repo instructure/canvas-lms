@@ -2384,6 +2384,8 @@
 - verb: PUT
   path: '/api/v1/users/:user_id/usage_rights'
 - verb: GET
+  path: '/api/v1/users/:user_id/user_generated_tokens'
+- verb: GET
   path: '/api/v1/users/activity_stream'
 - verb: DELETE
   path: '/api/v1/users/mobile_sessions'

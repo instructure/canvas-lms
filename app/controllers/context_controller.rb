@@ -265,7 +265,8 @@ class ContextController < ApplicationController
           @enrollments = scope.to_a
           user = @membership&.user
           js_permissions = {
-            can_manage_user_details: user.grants_right?(@current_user, :manage_user_details)
+            can_manage_user_details: user.grants_right?(@current_user, :manage_user_details),
+            can_view_user_generated_access_tokens: user.grants_right?(@current_user, :view_user_generated_access_tokens)
           }
           timezones = I18nTimeZone.all.map { |tz| { name: tz.name, name_with_hour_offset: tz.to_s } }
           default_timezone_name = @domain_root_account.try(:default_time_zone)&.name || "Mountain Time (US & Canada)"
@@ -287,6 +288,16 @@ class ContextController < ApplicationController
       when Group
         @membership = @context.group_memberships.active.where(user_id:).first
         @enrollments = []
+        if @membership
+          user = @membership&.user
+          js_permissions = {
+            can_view_user_generated_access_tokens: user.grants_right?(@current_user, :view_user_generated_access_tokens)
+          }
+          js_env({
+                   USER_ID: user_id,
+                   PERMISSIONS: js_permissions,
+                 })
+        end
       end
 
       @user = @membership&.user

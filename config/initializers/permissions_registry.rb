@@ -75,14 +75,42 @@ BASE_PERMISSIONS = {
     available_to: %w[AccountAdmin AccountMembership],
     account_allows: ->(a) { a.feature_enabled?(:admin_manage_access_tokens) },
     group: :users_manage_access_tokens,
+    account_details: [
+      {
+        title: -> { I18n.t("Access Tokens") },
+        description: -> { I18n.t("Allows user to create and update other user's access tokens.") }
+      }
+    ]
   },
   delete_access_tokens: {
     label: -> { I18n.t("Access Tokens - delete") },
     account_only: :root,
     true_for: %w[AccountAdmin],
     available_to: %w[AccountAdmin AccountMembership],
-    account_allows: ->(a) { a.feature_enabled?(:admin_manage_access_tokens) },
+    # Doesn't make a ton of sense for admins to be able to view access tokens but not delete them, hence the
+    # site admin check.
+    account_allows: ->(a) { Account.site_admin.feature_enabled?(:student_access_token_management) || a.feature_enabled?(:admin_manage_access_tokens) },
     group: :users_manage_access_tokens,
+    account_details: [
+      {
+        title: -> { I18n.t("Access Tokens") },
+        description: -> { I18n.t("Allows user to delete other user's access tokens.") }
+      }
+    ]
+  },
+  view_user_generated_access_tokens: {
+    label: -> { I18n.t("Manually Generated Access Tokens - view") },
+    account_only: :root,
+    true_for: %w[AccountAdmin],
+    available_to: %w[AccountAdmin AccountMembership],
+    account_allows: ->(_) { Account.site_admin.feature_enabled?(:student_access_token_management) },
+    group: :users_manage_access_tokens,
+    account_details: [
+      {
+        title: -> { I18n.t("Access Tokens") },
+        description: -> { I18n.t("Allows user to view other user's manually generated access tokens. This does not let them read the actual token value itself, just the information about it.") }
+      }
+    ]
   },
   manage_account_memberships: {
     label: -> { I18n.t("Admins - add / remove") },

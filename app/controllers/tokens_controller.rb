@@ -18,6 +18,26 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # @API Access Tokens
+# @model Token
+#     {
+#       "id": "Token",
+#       "type": "object",
+#       "properties": {
+#         "id": { "type": "integer", "description": "The internal database ID of the token." },
+#         "created_at": { "type": "string", "format": "date-time", "description": "The time the token was created." },
+#         "expires_at": { "type": ["string", "null"], "format": "date-time", "description": "The time the token will permanently expire, or null if it does not permanently expire." },
+#         "workflow_state": { "type": "string", "description": "The current state of the token. One of 'active', 'pending', 'disabled', or 'deleted'." },
+#         "remember_access": { "type": "boolean", "description": "Whether the token should be remembered across sessions. Only applicable for OAuth tokens." },
+#         "scopes": { "type": "array", "items": { "type": "string" }, "description": "The scopes associated with the token. If empty, there are no scope limitations." },
+#         "real_user_id": { "type": ["integer", "null"], "description": "If the token was created while masquerading, this is the ID of the real user. Otherwise, null." },
+#         "token": { "type": "string", "description": "The actual access token. Only included when the token is first created." },
+#         "token_hint": { "type": "string", "description": "A short, unique string that can be used to look up the token." },
+#         "user_id": { "type": "integer", "description": "The ID of the user the token belongs to." },
+#         "purpose": { "type": "string", "description": "The purpose of the token." },
+#         "app_name": { "type": ["string", "null"], "description": "If the token was created by an OAuth application, this is the name of that application. Otherwise, null." },
+#         "can_manually_regenerate": { "type": "boolean", "description": "Whether the current user can manually regenerate this token." }
+#       }
+#     }
 class TokensController < ApplicationController
   include Api::V1::Token
   include StudentEnrollmentHelper
@@ -26,9 +46,39 @@ class TokensController < ApplicationController
 
   before_action :require_registered_user
   before_action :get_context
-  before_action :find_token, except: [:create]
+  before_action :find_token, except: [:create, :user_generated_tokens]
   before_action { |c| c.active_tab = "profile" }
   before_action :require_password_session
+
+  # @API List access tokens for a user
+  #
+  # Returns a list of manually generated access tokens for the specified user.
+  # Note that the actual token values are only returned when the token is first created.
+  #
+  # @argument per_page [Integer]
+  #  The number of results to return per page. Defaults to 10. Maximum of 100.
+  #
+  # @returns [Token]
+  def user_generated_tokens
+    unless @context.grants_right?(@current_user, session, :view_user_generated_access_tokens)
+      return render_unauthorized_action
+    end
+
+    bookmarker = BookmarkedCollection::SimpleBookmarker.new(AccessToken, :created_at, :id)
+
+    paginated_tokens = ShardedBookmarkedCollection.build(bookmarker, @context.access_tokens) do |scope|
+      scope = scope.user_generated.preload(:developer_key)
+      scope.order(:created_at, :id)
+    end
+
+    pagination_args = {
+      per_page: params[:per_page]&.to_i || 10,
+    }
+
+    tokens = Api.paginate(paginated_tokens, self, api_v1_user_generated_tokens_path, pagination_args)
+
+    render json: tokens.map { |token| token_json(token, @current_user, session) }
+  end
 
   # @API Show an access token
   #

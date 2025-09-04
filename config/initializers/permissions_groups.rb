@@ -686,7 +686,7 @@ PERMISSION_GROUPS = {
   },
   users_manage_access_tokens: {
     label: -> { I18n.t("Users - Manage Access Tokens") },
-    subtitle: -> { I18n.t("create / update / delete") },
+    subtitle: -> { I18n.t("create / update / delete / view") },
     account_details: [
       { title: -> { I18n.t("Access Tokens - create / update") },
         description: -> { I18n.t("Allows user to create access tokens on behalf of another user.") } },
@@ -696,7 +696,11 @@ PERMISSION_GROUPS = {
       { description: -> { I18n.t("Allows user to still update their access tokens when the Limit Personal Access Token Creation setting is on.") } },
       { description: -> { I18n.t("Allows user to still regenerate their access tokens when the Limit Personal Access Token Creation setting is on.") } },
       { title: -> { I18n.t("Access Tokens - delete") },
-        description: -> { I18n.t("Allows user to delete access tokens on behalf of another user.") } }
+        description: -> { I18n.t("Allows user to delete access tokens on behalf of another user.") } },
+      {
+        title: -> { I18n.t("Access Tokens - view") },
+        description: -> { I18n.t("Allows user to view access tokens on behalf of another user. This does not include viewing the token string, which is only shown at the time of creation.") }
+      }
     ]
   },
   manage_temporary_enrollments: {
