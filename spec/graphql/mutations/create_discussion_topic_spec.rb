@@ -1612,6 +1612,183 @@ describe Mutations::CreateDiscussionTopic do
         expect(student_ids).to match_array [@student1.global_id, @student2.global_id]
       end
     end
+
+    context "SIS due date validation" do
+      before(:once) do
+        @course.root_account.enable_feature!(:new_sis_integrations)
+        @course.root_account.settings[:sis_require_assignment_due_date] = { value: true }
+        @course.root_account.settings[:sis_syncing] = { value: true }
+        @course.root_account.save!
+      end
+
+      it "returns validation error when checkpoint has nil due_at and Post to Sis is enabled" do
+        context_type = "Course"
+        title = "Graded Discussion w/Checkpoints and SIS"
+        message = "Lorem ipsum..."
+        published = true
+
+        query = <<~GQL
+          contextId: "#{@course.id}"
+          contextType: #{context_type}
+          title: "#{title}"
+          message: "#{message}"
+          published: #{published}
+          assignment: {
+            courseId: "#{@course.id}",
+            name: "#{title}",
+            forCheckpoints: true,
+            postToSis: true
+          }
+          checkpoints: [
+            {
+              checkpointLabel: reply_to_topic,
+              pointsPossible: 10,
+              dates: [{ type: everyone, dueAt: null }]
+            },
+            {
+              checkpointLabel: reply_to_entry,
+              pointsPossible: 15,
+              dates: [{ type: everyone, dueAt: "#{10.days.from_now.iso8601}" }],
+              repliesRequired: 3
+            }
+          ]
+        GQL
+
+        result = execute_with_input_with_assignment(query)
+
+        expect(result.dig("data", "createDiscussionTopic", "discussionTopic")).to be_nil
+        expect(result.dig("data", "createDiscussionTopic", "errors")).to include(
+          hash_including("message" => "Due dates cannot be blank when Post to Sis is checked")
+        )
+      end
+
+      it "returns validation error when multiple checkpoints have nil due_at and Post to Sis is enabled" do
+        context_type = "Course"
+        title = "Graded Discussion w/Multiple Nil Due Dates"
+        message = "Lorem ipsum..."
+        published = true
+
+        query = <<~GQL
+          contextId: "#{@course.id}"
+          contextType: #{context_type}
+          title: "#{title}"
+          message: "#{message}"
+          published: #{published}
+          assignment: {
+            courseId: "#{@course.id}",
+            name: "#{title}",
+            forCheckpoints: true,
+            postToSis: true
+          }
+          checkpoints: [
+            {
+              checkpointLabel: reply_to_topic,
+              pointsPossible: 10,
+              dates: [{ type: everyone, dueAt: null }]
+            },
+            {
+              checkpointLabel: reply_to_entry,
+              pointsPossible: 15,
+              dates: [{ type: everyone, dueAt: null }],
+              repliesRequired: 3
+            }
+          ]
+        GQL
+
+        result = execute_with_input_with_assignment(query)
+
+        expect(result.dig("data", "createDiscussionTopic", "discussionTopic")).to be_nil
+        expect(result.dig("data", "createDiscussionTopic", "errors")).to include(
+          hash_including("message" => "Due dates cannot be blank when Post to Sis is checked")
+        )
+      end
+
+      it "succeeds when all checkpoints have due_at and Post to Sis is enabled" do
+        context_type = "Course"
+        title = "Graded Discussion w/Valid Due Dates"
+        message = "Lorem ipsum..."
+        published = true
+
+        query = <<~GQL
+          contextId: "#{@course.id}"
+          contextType: #{context_type}
+          title: "#{title}"
+          message: "#{message}"
+          published: #{published}
+          assignment: {
+            courseId: "#{@course.id}",
+            name: "#{title}",
+            forCheckpoints: true,
+            postToSis: true
+          }
+          checkpoints: [
+            {
+              checkpointLabel: reply_to_topic,
+              pointsPossible: 10,
+              dates: [{ type: everyone, dueAt: "#{5.days.from_now.iso8601}" }]
+            },
+            {
+              checkpointLabel: reply_to_entry,
+              pointsPossible: 15,
+              dates: [{ type: everyone, dueAt: "#{10.days.from_now.iso8601}" }],
+              repliesRequired: 3
+            }
+          ]
+        GQL
+
+        result = execute_with_input_with_assignment(query)
+        discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
+
+        expect(result["errors"]).to be_nil
+        expect(result.dig("data", "createDiscussionTopic", "errors")).to be_nil
+        expect(discussion_topic).to be_present
+        expect(DiscussionTopic.last.assignment.post_to_sis).to be true
+        expect(discussion_topic["assignment"]["checkpoints"].length).to eq 2
+      end
+
+      it "succeeds when checkpoints have nil due_at but Post to Sis is disabled" do
+        context_type = "Course"
+        title = "Graded Discussion w/No SIS Posting"
+        message = "Lorem ipsum..."
+        published = true
+
+        query = <<~GQL
+          contextId: "#{@course.id}"
+          contextType: #{context_type}
+          title: "#{title}"
+          message: "#{message}"
+          published: #{published}
+          assignment: {
+            courseId: "#{@course.id}",
+            name: "#{title}",
+            forCheckpoints: true,
+            postToSis: false
+          }
+          checkpoints: [
+            {
+              checkpointLabel: reply_to_topic,
+              pointsPossible: 10,
+              dates: [{ type: everyone, dueAt: null }]
+            },
+            {
+              checkpointLabel: reply_to_entry,
+              pointsPossible: 15,
+              dates: [{ type: everyone, dueAt: null }],
+              repliesRequired: 3
+            }
+          ]
+        GQL
+
+        result = execute_with_input_with_assignment(query)
+        discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
+
+        expect(result["errors"]).to be_nil
+        expect(result.dig("data", "createDiscussionTopic", "errors")).to be_nil
+        expect(discussion_topic).to be_present
+        expect(DiscussionTopic.last.assignment.post_to_sis).to be false
+        expect(discussion_topic["assignment"]["checkpoints"].length).to eq 2
+      end
+    end
   end
 
   context "group category id" do
