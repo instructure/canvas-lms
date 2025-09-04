@@ -111,6 +111,38 @@ export const calculateTotalIssuesCount = (data?: AccessibilityResourceScan[] | n
   }, 0)
 }
 
+const formatDateFilter = (label: string, date?: string) => {
+  if (date) {
+    const dateFormatter = new Intl.DateTimeFormat('en-US', {
+      weekday: 'short',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    }).format
+
+    return {
+      label: `${label}: ${dateFormatter(new Date(date))}`,
+      value: new Date(date).toISOString(),
+    }
+  }
+  return undefined
+}
+
+export const getUnparsedFilters = (parsedFilters: ParsedFilters): Filters => {
+  const toFilterOptionArray = (values?: string[]): FilterOption[] | undefined => {
+    if (!values) return undefined
+    return values.map(value => ({value, label: value}))
+  }
+
+  return {
+    ruleTypes: toFilterOptionArray(parsedFilters.ruleTypes),
+    artifactTypes: toFilterOptionArray(parsedFilters.artifactTypes),
+    workflowStates: toFilterOptionArray(parsedFilters.workflowStates),
+    fromDate: formatDateFilter('From Date', parsedFilters.fromDate),
+    toDate: formatDateFilter('To Date', parsedFilters.toDate),
+  }
+}
+
 export const getParsedFilters = (filters: Filters | null): ParsedFilters => {
   if (!filters) return {}
 

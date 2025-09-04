@@ -44,7 +44,7 @@ export type NewStateToFetch = {
   pageSize?: number
   tableSortState?: TableSortState | null
   search?: string | null
-  filters?: ParsedFilters | null
+  filters?: Filters | null
 }
 
 export type AccessibilityScansState = {
