@@ -1431,6 +1431,7 @@ class UsersController < ApplicationController
           @body_classes << "full-width"
 
           js_permissions = {
+            can_view_user_generated_access_tokens: @user.grants_right?(@current_user, :view_user_generated_access_tokens),
             can_manage_sis_pseudonyms: @context_account.root_account.grants_right?(@current_user, :manage_sis),
             can_manage_user_details: @user.grants_right?(@current_user, :manage_user_details),
             can_manage_dsr_requests: @context_account.grants_right?(@current_user, :manage_dsr_requests)
@@ -1460,7 +1461,7 @@ class UsersController < ApplicationController
                    PERMISSIONS: js_permissions,
                    ROOT_ACCOUNT_ID: @context_account.root_account.id,
                    TIMEZONES: timezones,
-                   DEFAULT_TIMEZONE_NAME: default_timezone_name
+                   DEFAULT_TIMEZONE_NAME: default_timezone_name,
                  })
           render status:
         end

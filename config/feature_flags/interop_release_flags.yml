@@ -189,8 +189,8 @@ lti_asset_processor_eap:
   applies_to: RootAccount
   display_name: Automatically set up Lti Asset Processor tools in Beta after refresh.
   description: |-
-    When enabled, the TII beta tool will be automatically installed in a customer's 
-    beta instance on a regular basis, so they don't have to reinstall it after every beta refresh. 
+    When enabled, the TII beta tool will be automatically installed in a customer's
+    beta instance on a regular basis, so they don't have to reinstall it after every beta refresh.
     This helps customers more easily test Asset Processor in beta.
 lti_asset_processor_discussions:
   state: hidden
@@ -486,7 +486,7 @@ student_access_token_management:
   applies_to: SiteAdmin
   display_name: Student Access Token Management
   description: |-
-    If enabled, Canvas will enforce an expiration of at most 120 days 
+    If enabled, Canvas will enforce an expiration of at most 120 days
     to student access tokens for security purposes, and allow Admins
     to delete student access tokens.
   environments:

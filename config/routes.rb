@@ -1340,6 +1340,7 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :tokens) do
+      get "users/:user_id/user_generated_tokens", action: :user_generated_tokens, as: "user_generated_tokens"
       get "users/:user_id/tokens/:id", action: :show, as: "token"
       post "users/:user_id/tokens", action: :create, as: "tokens"
       put "users/:user_id/tokens/:id", action: :update

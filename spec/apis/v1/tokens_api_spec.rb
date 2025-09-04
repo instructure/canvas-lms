@@ -67,9 +67,7 @@ describe TokensController, type: :request do
         Account.default.pseudonyms.create!(user:, unique_id: "unique@email.com")
       end
 
-      context "with admin_manage_access_tokens feature flag" do
-        before { Account.default.enable_feature!(:admin_manage_access_tokens) }
-
+      shared_examples_for "admin successfully deleting access tokens" do
         it "allows them to delete tokens" do
           api_call(:delete,
                    "/api/v1/users/#{user.id}/tokens/#{token.id}",
@@ -108,7 +106,27 @@ describe TokensController, type: :request do
         end
       end
 
-      context "without admin_manage_access_tokens feature flag" do
+      context "with admin_manage_access_tokens feature flag" do
+        before { Account.default.enable_feature!(:admin_manage_access_tokens) }
+
+        it_behaves_like "admin successfully deleting access tokens"
+      end
+
+      context "without admin_manage_access_tokens but with student_access_token_management feature flag" do
+        before do
+          Account.default.disable_feature!(:admin_manage_access_tokens)
+          Account.site_admin.enable_feature!(:student_access_token_management)
+        end
+
+        it_behaves_like "admin successfully deleting access tokens"
+      end
+
+      context "without admin_manage_access_tokens or student_access_token_management feature flag" do
+        before do
+          Account.default.disable_feature!(:admin_manage_access_tokens)
+          Account.site_admin.disable_feature!(:student_access_token_management)
+        end
+
         it "doesn't allow them to delete tokens" do
           api_call(:delete,
                    "/api/v1/users/#{user.id}/tokens/#{token.id}",

@@ -1392,6 +1392,7 @@ class User < ActiveRecord::Base
       api_show_user
       read_email_addresses
       view_user_logins
+      view_user_generated_access_tokens
       generate_observer_pairing_code
       update_speed_grader_settings
     ]
@@ -1436,6 +1437,9 @@ class User < ActiveRecord::Base
 
     given { |user| check_accounts_right?(user, :view_user_logins) }
     can :view_user_logins
+
+    given { |user| check_accounts_right?(user, :view_user_generated_access_tokens) }
+    can :view_user_generated_access_tokens
 
     given { |user| check_accounts_right?(user, :read_email_addresses) }
     can :read_email_addresses

@@ -25,6 +25,9 @@ import ManageTempEnrollButton from '@canvas/temporary-enrollment/react/ManageTem
 import {CreateDSRModal} from '@canvas/dsr'
 import {Button} from '@instructure/ui-buttons'
 import {IconExportLine} from '@instructure/ui-icons'
+import {AccessTokensSection} from '@canvas/access-tokens/AccessTokensSection'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 
 ready(() => {
   const pairing_container = document.getElementById('pairing-code')
@@ -93,5 +96,18 @@ ready(() => {
         </CreateDSRModal>,
       )
     }
+  }
+
+  if (
+    ENV.FEATURES.student_access_token_management &&
+    ENV.PERMISSIONS.can_view_user_generated_access_tokens
+  ) {
+    const accessTokensContainer = document.getElementById('user_access_tokens_react_mount_point')
+    const accessTokensRoot = createRoot(accessTokensContainer)
+    accessTokensRoot.render(
+      <QueryClientProvider client={queryClient}>
+        <AccessTokensSection userId={ENV.USER_ID} />
+      </QueryClientProvider>,
+    )
   }
 })

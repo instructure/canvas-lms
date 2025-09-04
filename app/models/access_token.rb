@@ -33,6 +33,8 @@ class AccessToken < ActiveRecord::Base
   attr_reader :full_token
   attr_reader :plaintext_refresh_token
 
+  scope :user_generated, -> { where(developer_key_id: DeveloperKey.default.id) }
+
   belongs_to :developer_key
   belongs_to :user, inverse_of: :access_tokens
   belongs_to :real_user, inverse_of: :masquerade_tokens, class_name: "User"
@@ -105,16 +107,19 @@ class AccessToken < ActiveRecord::Base
     end
     can :create and can :update
 
+    given { |user| user.id == user_id }
+    can :read and can :delete
+
     given do |user|
       self.user.check_accounts_right?(user, :create_access_tokens)
     end
     can :create and can :update
 
-    given { |user| user.id == user_id }
-    can :read and can :delete
-
     given { |user| self.user.check_accounts_right?(user, :delete_access_tokens) }
     can :delete
+
+    given { |user| self.user.check_accounts_right?(user, :view_user_generated_access_tokens) && developer_key_id == DeveloperKey.default.id }
+    can :read
   end
 
   # For user-generated tokens, purpose should always be set.
@@ -393,6 +398,7 @@ class AccessToken < ActiveRecord::Base
     developer_key.account_id
   end
 
+  # If you have a relation, please use the `user_generated` scope instead of this method.
   def manually_created?
     developer_key_id == DeveloperKey.default.id || developer_key&.name == DeveloperKey::DEFAULT_KEY_NAME
   end

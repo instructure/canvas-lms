@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import type React from 'react'
 import ReactDOM from 'react-dom'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
@@ -38,7 +38,7 @@ export type ConfirmProps = {
   /**
    * To facilitate rich-text and rich-text I18n (I18n with wrapper(s))
    */
-  messageDangerouslySetInnerHTML?: { __html: string }
+  messageDangerouslySetInnerHTML?: {__html: string}
 
   /**
    * defaults to primary except when calling confirmDanger()
@@ -119,15 +119,17 @@ const ConfirmationModal = ({
       <Modal.Body>
         {heading && <Heading level="h3">{heading}</Heading>}
         {typeof message === 'string' ? <Text as="p">{message}</Text> : message}
-        {messageDangerouslySetInnerHTML && (<Text as="p" dangerouslySetInnerHTML={messageDangerouslySetInnerHTML} />)}
+        {messageDangerouslySetInnerHTML && (
+          <Text as="p" dangerouslySetInnerHTML={messageDangerouslySetInnerHTML} />
+        )}
       </Modal.Body>
 
       <Modal.Footer>
-        <View as="div" margin="small 0 0 0">
-          <Button margin="x-small" onClick={onCancel}>
+        <View as="div" margin="x-small 0 x-small 0">
+          <Button margin="0 x-small" onClick={onCancel}>
             {cancelText || I18n.t('Cancel')}
           </Button>
-          <Button margin="x-small" color={confirmColor || 'primary'} onClick={onConfirm}>
+          <Button margin="0 x-small" color={confirmColor || 'primary'} onClick={onConfirm}>
             {confirmText || I18n.t('Confirm')}
           </Button>
         </View>
