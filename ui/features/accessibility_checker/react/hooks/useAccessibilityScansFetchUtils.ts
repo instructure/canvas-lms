@@ -98,8 +98,14 @@ const getPageCountFromResponse = (data: DoFetchApiResults<AccessibilityResourceS
 }
 
 export const useAccessibilityScansFetchUtils = () => {
-  const [page, pageSize, tableSortState, search] = useAccessibilityScansStore(
-    useShallow(state => [state.page, state.pageSize, state.tableSortState, state.search]),
+  const [page, pageSize, tableSortState, search, filters] = useAccessibilityScansStore(
+    useShallow(state => [
+      state.page,
+      state.pageSize,
+      state.tableSortState,
+      state.search,
+      state.filters,
+    ]),
   )
   const [
     setAccessibilityScans,
@@ -113,6 +119,7 @@ export const useAccessibilityScansFetchUtils = () => {
     setPageSize,
     setSearch,
     setTableSortState,
+    setFilters,
   ] = useAccessibilityScansStore(
     useShallow(state => [
       state.setAccessibilityScans,
@@ -126,28 +133,26 @@ export const useAccessibilityScansFetchUtils = () => {
       state.setPageSize,
       state.setSearch,
       state.setTableSortState,
+      state.setFilters,
     ]),
   )
 
   const doFetchAccessibilityScanData = useCallback(
-    async (
-      requestedStateChange: Partial<NewStateToFetch>,
-      filters: Filters | null = null,
-    ): Promise<void> => {
+    async (requestedStateChange: Partial<NewStateToFetch>): Promise<void> => {
       try {
         // Picking up existing state (or default, if not yet set)
+        const filterData = requestedStateChange.filters || filters || null
+        const parsedFilters = filterData ? getParsedFilters(filterData as Filters) : undefined
         const newStateToFetch: NewStateToFetch = {
           ...defaultStateToFetch,
           page,
           pageSize,
           tableSortState: tableSortState || defaultStateToFetch.tableSortState,
-          filters: filters ? getParsedFilters(filters) : undefined,
         }
 
-        Object.assign(newStateToFetch, requestedStateChange)
+        Object.assign(newStateToFetch, requestedStateChange, {filters: parsedFilters})
 
         const params = getFetchScansRequestParams(newStateToFetch)
-
         setLoading(true)
         setError(null)
 
@@ -167,6 +172,7 @@ export const useAccessibilityScansFetchUtils = () => {
         setPageCount(pageCount)
         setPageSize(newStateToFetch.pageSize!)
         setSearch(newStateToFetch.search!)
+        setFilters(filterData || null)
         setTableSortState(newStateToFetch.tableSortState!)
 
         updateQueryParams(newStateToFetch)
@@ -198,11 +204,12 @@ export const useAccessibilityScansFetchUtils = () => {
         // Picking up existing state (or default, if not yet set)
         const newStateToFetch: NewStateToFetch = {
           ...defaultStateToFetch,
-          // search: search || defaultStateToFetch.search,
-          filters: filters ? getParsedFilters(filters) : undefined,
         }
 
-        Object.assign(newStateToFetch, requestedStateChange)
+        const filterData = requestedStateChange.filters || filters || null
+        const parsedFilters = filterData ? getParsedFilters(filterData as Filters) : undefined
+
+        Object.assign(newStateToFetch, requestedStateChange, {filters: parsedFilters})
 
         const params = getFetchSummaryRequestParams(newStateToFetch)
 

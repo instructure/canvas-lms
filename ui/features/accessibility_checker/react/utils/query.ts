@@ -36,6 +36,7 @@ export const parseFetchParams = () => {
     tableSortState: {
       ...defaultStateToFetch.tableSortState,
     },
+    filters: defaultStateToFetch.filters,
     search: defaultStateToFetch.search,
   }
   const queryParams = new URLSearchParams(window.location.search)
@@ -65,6 +66,15 @@ export const parseFetchParams = () => {
     }
 
     parsedFetchParams.tableSortState!.sortId = queryParams.get('sort-id')
+  }
+
+  if (queryParams.has('filters')) {
+    try {
+      const filters = JSON.parse(queryParams.get('filters') || '{}')
+      parsedFetchParams.filters = filters
+    } catch {
+      console.log('Failed to parse filters from query params')
+    }
   }
 
   if (queryParams.has('search')) {
@@ -168,6 +178,16 @@ export const updateQueryParams = (latestFetchedState: NewStateToFetch) => {
   } else {
     queryParams.delete('sort-id')
     queryParams.delete('sort-direction')
+  }
+
+  if (latestFetchedState.filters) {
+    try {
+      queryParams.set('filters', JSON.stringify(latestFetchedState.filters))
+    } catch {
+      console.log('Failed to stringify filters for query params')
+    }
+  } else {
+    queryParams.delete('filters')
   }
 
   if (search) {

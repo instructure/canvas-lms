@@ -45,6 +45,7 @@ describe('useAccessibilityScanFetchUtils', () => {
     pageSize: 5,
     tableSortState: {sortId: IssuesTableColumns.Issues, sortDirection: 'ascending'},
     search: 'test',
+    filters: {ruleTypes: [{value: 'type1', label: 'type1'}]},
   }
 
   beforeEach(() => {
@@ -121,10 +122,14 @@ describe('useAccessibilityScanFetchUtils', () => {
         params: expect.objectContaining({
           page: testNewStateToFetch.page,
           per_page: testNewStateToFetch.pageSize,
+          filters: {
+            ...testNewStateToFetch.filters,
+            ruleTypes: testNewStateToFetch.filters?.ruleTypes?.map(rule => rule.value),
+          },
+          search: testNewStateToFetch.search,
           sort: IssuesTableHeaderApiNames[testNewStateToFetch.tableSortState!.sortId!],
           direction:
             testNewStateToFetch.tableSortState!.sortDirection === 'ascending' ? 'asc' : 'desc',
-          // search: testNewStateToFetch.search, - TODO uncomment when API supports search
         }),
       }),
     )
@@ -135,6 +140,7 @@ describe('useAccessibilityScanFetchUtils', () => {
     expect(storeResult.current.page).toBe(testNewStateToFetch.page)
     expect(storeResult.current.pageSize).toBe(testNewStateToFetch.pageSize)
     expect(storeResult.current.tableSortState).toEqual(testNewStateToFetch.tableSortState)
+    expect(storeResult.current.filters).toBe(testNewStateToFetch.filters)
     expect(storeResult.current.search).toBe(testNewStateToFetch.search)
   })
 

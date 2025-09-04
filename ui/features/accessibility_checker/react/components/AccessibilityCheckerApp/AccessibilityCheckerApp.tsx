@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useCallback, useContext, useMemo} from 'react'
+import {useCallback, useContext, useMemo, useEffect} from 'react'
 import {useShallow} from 'zustand/react/shallow'
 import {View} from '@instructure/ui-view'
 
@@ -24,14 +24,14 @@ import {AccessibilityCheckerContext} from '../../contexts/AccessibilityCheckerCo
 import {useAccessibilityScansFetchUtils} from '../../hooks/useAccessibilityScansFetchUtils'
 import {useNextResource} from '../../hooks/useNextResource'
 import {useAccessibilityScansStore} from '../../stores/AccessibilityScansStore'
-import {AccessibilityResourceScan} from '../../types'
+import {AccessibilityResourceScan, ParsedFilters} from '../../types'
 import {parseFetchParams} from '../../utils/query'
 import {AccessibilityIssuesSummary} from '../AccessibilityIssuesSummary/AccessibilityIssuesSummary'
 import {AccessibilityIssuesTable} from '../AccessibilityIssuesTable/AccessibilityIssuesTable'
 import {SearchIssue} from './Search/SearchIssue'
 import {useDeepCompareEffect} from './useDeepCompareEffect'
 import {AccessibilityCheckerHeader} from './AccessibilityCheckerHeader'
-import {findById} from '../../utils/apiData'
+import {findById, getUnparsedFilters} from '../../utils/apiData'
 
 import {getAppliedFilters} from '../../utils/filter'
 import {FiltersPanel} from './Filter'
@@ -62,11 +62,21 @@ export const AccessibilityCheckerApp: React.FC = () => {
 
   const accessibilityScanDisabled = window.ENV.SCAN_DISABLED
 
+  useEffect(() => {
+    const parsedFetchParams = parseFetchParams()
+    if (parsedFetchParams.filters && !filters) {
+      setFilters(getUnparsedFilters(parsedFetchParams.filters as ParsedFilters))
+    }
+  }, [])
+
   useDeepCompareEffect(() => {
+    const fetchParams = parseFetchParams()
+    if (fetchParams.filters && !filters) return // wait for filters to be set from query params
+
     if (!accessibilityScanDisabled) {
-      const parsedFetchParams = parseFetchParams()
-      doFetchAccessibilityScanData(parsedFetchParams, filters)
-      doFetchAccessibilityIssuesSummary(parsedFetchParams, filters)
+      const parsedFetchParams = {...fetchParams, filters}
+      doFetchAccessibilityScanData(parsedFetchParams)
+      doFetchAccessibilityIssuesSummary(parsedFetchParams)
     } else {
       setLoading(false)
     }
@@ -101,10 +111,10 @@ export const AccessibilityCheckerApp: React.FC = () => {
       const newSearch = value
       setSearch(newSearch)
       if (newSearch.length >= 0) {
-        const params = {...parseFetchParams(), search: newSearch}
+        const params = {...parseFetchParams(), search: newSearch, filters}
         await Promise.all([
-          doFetchAccessibilityIssuesSummary(params, filters),
-          doFetchAccessibilityScanData(params, filters),
+          doFetchAccessibilityIssuesSummary(params),
+          doFetchAccessibilityScanData(params),
         ])
       }
     },
