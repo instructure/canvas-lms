@@ -265,6 +265,12 @@ module SIS
               next
             end
 
+            # In some scenarios, the user may have had a SIS import to delete them attempted
+            # when the user sync flag was in an off state.
+            #
+            # Re-sync the deleted users to ensure retrying that SIS import succeeds.
+            record_sync_for(user)
+
             # if the pseudonym is already deleted, we're done.
             next if pseudo.workflow_state == "deleted"
 
