@@ -83,7 +83,7 @@ class Announcement < DiscussionTopic
 
   set_broadcast_policy! do
     dispatch :new_announcement
-    to { new_announcement_recipients }
+    to { users_with_permissions(active_participants_include_tas_and_teachers(true) - [user]) }
     whenever do |record|
       is_new_announcement = (record.previously_new_record? and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, :unpublished)
 
@@ -209,15 +209,4 @@ class Announcement < DiscussionTopic
     end
   end
   handle_asynchronously :create_observer_alerts, priority: Delayed::LOW_PRIORITY, max_attempts: 1
-
-  private
-
-  def new_announcement_recipients
-    potential_recipients = active_participants_include_tas_and_teachers(true).without(user)
-    recipients = users_with_permissions(potential_recipients)
-    recipients.reject do |u|
-      locked_for = locked_for?(u, check_policies: true)
-      locked_for && !locked_for[:can_view]
-    end
-  end
 end
