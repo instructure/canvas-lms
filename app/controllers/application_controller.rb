@@ -460,6 +460,7 @@ class ApplicationController < ActionController::Base
     new_quizzes_navigation_updates
     permanent_page_links
     rce_a11y_resize
+    rce_studio_embed_improvements
     rce_find_replace
     render_both_to_do_lists
     scheduled_feedback_releases
