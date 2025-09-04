@@ -30,35 +30,31 @@ import {regenerateCriteria} from '../queries/RubricFormQueries'
 const I18n = createI18nScope('rubrics-form-regenerate-criteria')
 
 type UseRegenerateCriteriaProps = {
-  courseId?: string
   assignmentId?: string
+  courseId?: string
   criteriaRef: React.MutableRefObject<RubricCriterion[]>
+  generateOptions: Partial<GenerateCriteriaFormProps>
   setRubricFormField: RubricFormFieldSetter
-  handleInProgressUpdates: (isPending: boolean) => void
-  handleProgressUpdates: (progress: CanvasProgress) => void
-  formOptions?: Partial<GenerateCriteriaFormProps>
 }
 
 export const useRegenerateCriteria = ({
   courseId,
   assignmentId,
   criteriaRef,
+  generateOptions,
   setRubricFormField,
-  handleInProgressUpdates: _handleInProgressUpdates,
-  handleProgressUpdates,
-  formOptions,
 }: UseRegenerateCriteriaProps) => {
   const [regeneratedCriteriaProgress, setRegeneratedCriteriaProgress] = useState<CanvasProgress>()
 
   const onHandleProgressUpdates = useCallback(
     (progress: CanvasProgress) => {
-      handleProgressUpdates(progress)
+      setRegeneratedCriteriaProgress(progress)
       if (progress.workflow_state === 'completed') {
         const transformed = mapRubricUnderscoredKeysToCamelCase(progress.results)
         const newCriteria = transformed.criteria ?? []
 
         // For regeneration, we replace the existing criteria with the new ones
-        // The AI should return the full set of criteria, not just the new ones
+        // The API should return the full set of criteria, not just the new ones
         const updatedCriteria = newCriteria.map(criterion => ({
           ...criterion,
           isGenerated: true,
@@ -71,7 +67,7 @@ export const useRegenerateCriteria = ({
         return
       }
     },
-    [handleProgressUpdates, setRubricFormField],
+    [setRubricFormField],
   )
 
   const updateProgress = (progress: CanvasProgress) => {
@@ -91,12 +87,10 @@ export const useRegenerateCriteria = ({
       criteriaForRegeneration,
       additionalPrompt,
       criterionId,
-      formOpts,
     }: {
       criteriaForRegeneration: RubricCriterion[]
       additionalPrompt: string
       criterionId?: string
-      formOpts?: Partial<GenerateCriteriaFormProps>
     }) => {
       if (courseId && assignmentId) {
         return regenerateCriteria(
@@ -105,7 +99,7 @@ export const useRegenerateCriteria = ({
           criteriaForRegeneration,
           additionalPrompt,
           criterionId,
-          formOpts || formOptions,
+          generateOptions,
         )
       } else {
         throw new Error('Must be called from a course+assignment context')
@@ -122,30 +116,23 @@ export const useRegenerateCriteria = ({
   })
 
   const regenerateAllCriteria = useCallback(
-    (additionalPrompt: string, formOpts?: Partial<GenerateCriteriaFormProps>) => {
+    (additionalPrompt: string) => {
       const currentCriteria = criteriaRef.current
       regenerateCriteriaMutation({
         criteriaForRegeneration: currentCriteria,
         additionalPrompt,
-        criterionId: undefined,
-        formOpts,
       })
     },
     [criteriaRef, regenerateCriteriaMutation],
   )
 
   const regenerateSingleCriterion = useCallback(
-    (
-      criterion: RubricCriterion,
-      additionalPrompt: string,
-      formOpts?: Partial<GenerateCriteriaFormProps>,
-    ) => {
+    (criterion: RubricCriterion, additionalPrompt: string) => {
       const currentCriteria = criteriaRef.current
       regenerateCriteriaMutation({
         criteriaForRegeneration: currentCriteria,
         additionalPrompt,
         criterionId: criterion.id,
-        formOpts,
       })
     },
     [criteriaRef, regenerateCriteriaMutation],
@@ -153,10 +140,15 @@ export const useRegenerateCriteria = ({
 
   return {
     regeneratedCriteriaProgress,
+    regenerateCriteriaIsPending:
+      regenerateCriteriaIsPending ||
+      (regeneratedCriteriaProgress &&
+        !['failed', 'completed'].includes(regeneratedCriteriaProgress.workflow_state)),
+    regenerateCriteriaIsSuccess:
+      regenerateCriteriaIsSuccess || regeneratedCriteriaProgress?.workflow_state === 'completed',
+    regenerateCriteriaIsError:
+      regenerateCriteriaIsError || regeneratedCriteriaProgress?.workflow_state === 'failed',
     regenerateAllCriteria,
     regenerateSingleCriterion,
-    regenerateCriteriaIsPending,
-    regenerateCriteriaIsSuccess,
-    regenerateCriteriaIsError,
   }
 }

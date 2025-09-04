@@ -18,7 +18,6 @@
 
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {CanvasProgress} from '@canvas/progress/ProgressHelpers'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -27,15 +26,10 @@ import {Text} from '@instructure/ui-text'
 import {SimpleSelect, SimpleSelectOption} from '@instructure/ui-simple-select'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Button} from '@instructure/ui-buttons'
-import {useEffect, useState} from 'react'
+import {useState} from 'react'
 import {TextInput} from '@instructure/ui-text-input'
 import {TextArea} from '@instructure/ui-text-area'
-import {calcPointsPossible} from '../../utils'
-import {mapRubricUnderscoredKeysToCamelCase} from '../../../utils'
-import type {GenerateCriteriaFormProps, RubricFormFieldSetter} from '../../types/RubricForm'
-import {RubricCriterion} from '../../../types/rubric'
-import {generateCriteria} from '../../queries/RubricFormQueries'
-import {useGenerateCriteria} from '../../hooks/useGenerateCriteria'
+import type {GenerateCriteriaFormProps} from '../../types/RubricForm'
 
 const I18n = createI18nScope('rubrics-form-generated-criteria')
 
@@ -67,73 +61,25 @@ const gradeLevels = {
 }
 
 type GeneratedCriteriaFormProps = {
-  assignmentId?: string
-  courseId?: string
   criterionUseRangeEnabled: boolean
   criteriaBeingGenerated: boolean
-  criteriaRef: React.MutableRefObject<RubricCriterion[]>
-  handleInProgressUpdates: (isPending: boolean) => void
-  handleProgressUpdates: (progress: CanvasProgress) => void
-  setShowGenerateCriteriaForm: (show: boolean) => void
-  setShowGenerateCriteriaHeader: (show: boolean) => void
-  setRubricFormField: RubricFormFieldSetter
+  generateCriteriaMutation: () => void
   onFormOptionsChange?: (options: GenerateCriteriaFormProps) => void
 }
 export const GeneratedCriteriaForm = ({
-  courseId,
-  assignmentId,
   criterionUseRangeEnabled,
   criteriaBeingGenerated,
-  criteriaRef,
-  handleInProgressUpdates,
-  handleProgressUpdates,
-  setShowGenerateCriteriaForm,
-  setShowGenerateCriteriaHeader,
-  setRubricFormField,
+  generateCriteriaMutation,
   onFormOptionsChange,
 }: GeneratedCriteriaFormProps) => {
   const [generateCriteriaForm, setGenerateCriteriaForm] = useState<GenerateCriteriaFormProps>(
     defaultGenerateCriteriaForm,
   )
 
-  // Notify parent component when form options change
   const updateGenerateCriteriaForm = (newForm: GenerateCriteriaFormProps) => {
     setGenerateCriteriaForm(newForm)
     onFormOptionsChange?.(newForm)
   }
-
-  const onHandleProgressUpdates = (progress: CanvasProgress) => {
-    handleProgressUpdates(progress)
-    if (progress.workflow_state === 'completed') {
-      const transformed = mapRubricUnderscoredKeysToCamelCase(progress.results)
-      const criteria = transformed.criteria ?? []
-      const newCriteria = [
-        ...criteriaRef.current,
-        ...criteria.map(criterion => ({
-          ...criterion,
-          isGenerated: true,
-        })),
-      ]
-      setShowGenerateCriteriaForm(false)
-      setShowGenerateCriteriaHeader(true)
-      setRubricFormField('criteria', newCriteria)
-      setRubricFormField('pointsPossible', calcPointsPossible(newCriteria))
-    } else if (progress.workflow_state === 'failed') {
-      showFlashError(I18n.t('Failed to generate criteria'))()
-      return
-    }
-  }
-
-  const {generateCriteriaMutation, generateCriteriaIsPending} = useGenerateCriteria({
-    generateCriteriaMutationFn: () => {
-      if (courseId && assignmentId) {
-        return generateCriteria(courseId, assignmentId, generateCriteriaForm)
-      } else {
-        throw new Error('Must be called from a course+assignment context')
-      }
-    },
-    handleProgressUpdates: onHandleProgressUpdates,
-  })
 
   const handleGenerateButton = () => {
     const points = parseFloat(generateCriteriaForm.pointsPerCriterion)
@@ -143,10 +89,6 @@ export const GeneratedCriteriaForm = ({
     }
     generateCriteriaMutation()
   }
-
-  useEffect(() => {
-    handleInProgressUpdates(generateCriteriaIsPending)
-  }, [generateCriteriaIsPending, handleInProgressUpdates])
 
   return (
     <View
