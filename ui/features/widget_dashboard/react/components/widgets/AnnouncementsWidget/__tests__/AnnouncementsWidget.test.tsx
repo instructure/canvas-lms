@@ -721,4 +721,62 @@ describe('AnnouncementsWidget', () => {
 
     cleanup()
   })
+
+  it('decodes HTML entities in announcement messages', async () => {
+    const htmlEntitiesResponse = {
+      data: {
+        legacyNode: {
+          _id: '123',
+          discussionParticipantsConnection: {
+            nodes: [
+              {
+                id: 'participant1',
+                read: false,
+                discussionTopic: {
+                  _id: '1',
+                  title: 'Test Announcement with Entities',
+                  message:
+                    '<p>Test&nbsp;with&nbsp;non-breaking&nbsp;spaces&amp;ampersands&lt;brackets&gt;</p>',
+                  createdAt: '2025-01-15T10:00:00Z',
+                  contextName: 'Test Course',
+                  contextId: '1',
+                  isAnnouncement: true,
+                  author: {
+                    _id: 'user1',
+                    name: 'Test Teacher',
+                    avatarUrl: 'https://example.com/avatar.jpg',
+                  },
+                },
+              },
+            ],
+            pageInfo: {
+              hasNextPage: false,
+              hasPreviousPage: false,
+              startCursor: null,
+              endCursor: null,
+            },
+          },
+        },
+      },
+    }
+
+    server.use(
+      graphql.query('GetUserAnnouncements', () => {
+        return HttpResponse.json(htmlEntitiesResponse)
+      }),
+    )
+
+    const {cleanup} = setup()
+
+    await waitForLoadingToComplete()
+
+    await waitFor(() => {
+      // Should show decoded entities: non-breaking spaces, ampersands, and brackets
+      expect(
+        screen.getByText(/Test with non-breaking spaces&ampersands<brackets>/),
+      ).toBeInTheDocument()
+    })
+
+    cleanup()
+  })
 })
