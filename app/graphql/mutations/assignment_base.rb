@@ -80,6 +80,7 @@ class Mutations::AssignmentBase::AssignmentInputBase < GraphQL::Schema::InputObj
   argument :peer_reviews, Mutations::AssignmentBase::AssignmentPeerReviewsUpdate, required: false
   argument :points_possible, Float, required: false
   argument :post_to_sis, Boolean, required: false
+  argument :secure_params, String, required: false
   argument :suppress_assignment, Boolean, required: false
   argument :unlock_at, Types::DateTimeType, required: false
 end

@@ -659,6 +659,12 @@ class AbstractAssignment < ActiveRecord::Base
     Canvas::Security.create_jwt(body)
   end
 
+  def self.secure_params(lti_context_id = nil, lti_assignment_description = nil)
+    body = { lti_assignment_id: lti_context_id || SecureRandom.uuid }
+    body[:lti_assignment_description] = lti_assignment_description if lti_assignment_description
+    Canvas::Security.create_jwt(body)
+  end
+
   def discussion_group_ok?
     return false unless new_record? || group_category_id_changed?
     return false unless group_category_id && submission_types == "discussion_topic"

@@ -2748,6 +2748,42 @@ describe Assignment do
     end
   end
 
+  describe ".secure_params" do
+    it "generates a JWT with a new UUID when no lti_context_id provided" do
+      jwt = Assignment.secure_params
+      decoded = Canvas::Security.decode_jwt(jwt)
+
+      expect(decoded[:lti_assignment_id]).to be_present
+      expect(decoded[:lti_assignment_id]).to match(/\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/)
+    end
+
+    it "uses provided lti_context_id when given" do
+      custom_id = "custom-lti-id"
+      jwt = Assignment.secure_params(custom_id)
+      decoded = Canvas::Security.decode_jwt(jwt)
+
+      expect(decoded[:lti_assignment_id]).to eq(custom_id)
+    end
+
+    it "includes description when provided" do
+      description = "Test assignment description"
+      jwt = Assignment.secure_params(nil, description)
+      decoded = Canvas::Security.decode_jwt(jwt)
+
+      expect(decoded[:lti_assignment_description]).to eq(description)
+    end
+
+    it "generates different UUIDs for multiple calls" do
+      jwt1 = Assignment.secure_params
+      jwt2 = Assignment.secure_params
+
+      decoded1 = Canvas::Security.decode_jwt(jwt1)
+      decoded2 = Canvas::Security.decode_jwt(jwt2)
+
+      expect(decoded1[:lti_assignment_id]).not_to eq(decoded2[:lti_assignment_id])
+    end
+  end
+
   describe "show_in_search_for_user?" do
     let(:user) { User.create }
     let(:assignment) { Assignment.create }

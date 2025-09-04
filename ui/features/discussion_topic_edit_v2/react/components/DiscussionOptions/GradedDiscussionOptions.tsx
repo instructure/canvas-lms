@@ -175,7 +175,11 @@ export const GradedDiscussionOptions = ({
       {ENV.FEATURES.lti_asset_processor_discussions && (
         <AssetProcessorsForDiscussion
           courseId={parseInt(ENV.COURSE_ID!)}
-          secureParams={'' /* TODO in another commit */}
+          secureParams={
+            ENV.DISCUSSION_TOPIC?.ATTRIBUTES?.assignment?.secure_params ||
+            ENV.ASSIGNMENT_SECURE_PARAMS ||
+            ''
+          }
         />
       )}
       {isCheckpoints && <CheckpointsSettings />}
