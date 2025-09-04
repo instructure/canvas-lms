@@ -4428,6 +4428,10 @@ class AbstractAssignment < ActiveRecord::Base
       errors.add(:due_at, I18n.t("must be between availability dates"))
       return false
     end
+
+    if checkpoints_parent? && sub_assignments.empty? && new_record?
+      @skip_sis_due_date_validation = true
+    end
     unless @skip_sis_due_date_validation || AssignmentUtil.due_date_ok?(self)
       errors.add(:due_at, I18n.t("due_at", "cannot be blank when Post to Sis is checked"))
     end
@@ -4437,7 +4441,11 @@ class AbstractAssignment < ActiveRecord::Base
     return true if @skip_sis_due_date_validation
 
     if AssignmentUtil.due_date_required?(self)
-      overrides = gather_override_data(overrides)
+      overrides = if checkpoints_parent?
+                    gather_override_data(sub_assignment_overrides)
+                  else
+                    gather_override_data(overrides)
+                  end
       if overrides.count { |o| !!o[:due_at_overridden] && o[:due_at].blank? && o[:workflow_state] != "deleted" } > 0
         errors.add(:due_at, I18n.t("cannot be blank for any assignees when Post to Sis is checked"))
         return false
@@ -4456,7 +4464,11 @@ class AbstractAssignment < ActiveRecord::Base
       o
     end
     override_ids = overrides.pluck(:id).to_set
-    assignment_overrides.reject { |o| override_ids.include? o[:id] } + overrides
+    if checkpoints_parent?
+      sub_assignment_overrides.reject { |o| override_ids.include? o[:id] } + overrides
+    else
+      assignment_overrides.reject { |o| override_ids.include? o[:id] } + overrides
+    end
   end
 
   def active_assignment_overrides?

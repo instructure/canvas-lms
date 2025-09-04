@@ -549,4 +549,320 @@ describe Assignment do
       end
     end
   end
+
+  describe "checkpoint due date validation" do
+    before do
+      course_with_teacher(active_all: true)
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @course.root_account.enable_feature!(:new_sis_integrations)
+      @course.enable_feature!(:post_grades)
+      @course.root_account.settings[:sis_require_assignment_due_date] = { value: true }
+      @course.root_account.settings[:sis_syncing] = { value: true }
+      @course.root_account.save!
+    end
+
+    describe "#due_date_ok?" do
+      context "when assignment is a checkpoints parent" do
+        before do
+          @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+          @assignment = @topic.assignment
+          @assignment.update!(has_sub_assignments: true)
+        end
+
+        context "with sub_assignments present" do
+          before do
+            Checkpoints::DiscussionCheckpointCreatorService.call(
+              discussion_topic: @topic,
+              checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+              points_possible: 10,
+              dates: [{ type: "everyone", due_at: 1.day.from_now }]
+            )
+          end
+
+          it "validates normally when sub_assignments exist" do
+            @assignment.assign_attributes(post_to_sis: true, due_at: nil)
+            expect(@assignment.valid?).to be false
+            expect(@assignment.errors[:due_at]).to include("cannot be blank when Post to Sis is checked")
+          end
+
+          it "allows nil due_at when not posting to sis" do
+            @assignment.assign_attributes(post_to_sis: false, due_at: nil)
+            expect(@assignment.valid?).to be true
+          end
+        end
+
+        context "with empty sub_assignments and new record" do
+          it "skips sis due date validation for new checkpoints parent" do
+            new_assignment = Assignment.new(
+              course: @course,
+              title: "New Checkpoints Assignment",
+              has_sub_assignments: true,
+              post_to_sis: true,
+              due_at: nil
+            )
+            allow(new_assignment).to receive_messages(checkpoints_parent?: true, sub_assignments: double(empty?: true))
+
+            expect(new_assignment.valid?).to be true
+          end
+
+          it "validates normally for existing checkpoints parent with empty sub_assignments" do
+            @assignment.save!
+            @assignment.assign_attributes(post_to_sis: true, due_at: nil)
+            expect(@assignment.valid?).to be false
+            expect(@assignment.errors[:due_at]).to include("cannot be blank when Post to Sis is checked")
+          end
+        end
+      end
+
+      context "when assignment is not a checkpoints parent" do
+        before do
+          @assignment = @course.assignments.create!(title: "Regular Assignment")
+        end
+
+        it "validates due_at normally" do
+          @assignment.assign_attributes(post_to_sis: true, due_at: nil)
+          expect(@assignment.valid?).to be false
+          expect(@assignment.errors[:due_at]).to include("cannot be blank when Post to Sis is checked")
+        end
+      end
+
+      context "with availability date constraints" do
+        before do
+          @assignment = @course.assignments.create!(title: "Assignment with dates")
+        end
+
+        it "validates due_at is between unlock_at and lock_at" do
+          @assignment.unlock_at = 2.days.from_now
+          @assignment.due_at = 1.day.from_now
+          @assignment.lock_at = 3.days.from_now
+
+          expect(@assignment.valid?).to be false
+          expect(@assignment.errors[:due_at]).to include("must be between availability dates")
+        end
+      end
+    end
+
+    describe "#assignment_overrides_due_date_ok?" do
+      before do
+        @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+        @assignment = @topic.assignment
+        @assignment.update!(has_sub_assignments: true, due_at: 3.days.from_now)
+        @student = student_in_course(active_all: true).user
+      end
+
+      context "when assignment is a checkpoints parent" do
+        before do
+          Checkpoints::DiscussionCheckpointCreatorService.call(
+            discussion_topic: @topic,
+            checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+            points_possible: 5,
+            dates: [{ type: "everyone", due_at: 1.day.from_now }]
+          )
+          Checkpoints::DiscussionCheckpointCreatorService.call(
+            discussion_topic: @topic,
+            checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+            points_possible: 6,
+            dates: [{ type: "everyone", due_at: 2.days.from_now }]
+          )
+        end
+
+        it "uses sub_assignment_overrides for validation" do
+          @assignment.assign_attributes(post_to_sis: true)
+          sub_assignment = @assignment.sub_assignments.first
+          parent_override = @assignment.assignment_overrides.create!(set_type: "ADHOC")
+          override = sub_assignment.assignment_overrides.create!(
+            set_type: "ADHOC",
+            parent_override:,
+            due_at: nil,
+            due_at_overridden: true
+          )
+          override.assignment_override_students.create!(user: @student)
+
+          expect(@assignment.send(:assignment_overrides_due_date_ok?)).to be false
+          expect(@assignment.errors[:due_at]).to include("cannot be blank for any assignees when Post to Sis is checked")
+        end
+
+        it "passes validation when all sub_assignment overrides have due dates" do
+          @assignment.assign_attributes(post_to_sis: true)
+          sub_assignment = @assignment.sub_assignments.first
+          parent_override = @assignment.assignment_overrides.create!(set_type: "ADHOC")
+          override = sub_assignment.assignment_overrides.create!(
+            set_type: "ADHOC",
+            parent_override:,
+            due_at: 3.days.from_now,
+            due_at_overridden: true
+          )
+          override.assignment_override_students.create!(user: @student)
+
+          expect(@assignment.send(:assignment_overrides_due_date_ok?)).to be true
+        end
+
+        it "ignores deleted overrides" do
+          @assignment.assign_attributes(post_to_sis: true)
+          sub_assignment = @assignment.sub_assignments.first
+          parent_override = @assignment.assignment_overrides.create!(set_type: "ADHOC")
+          override = sub_assignment.assignment_overrides.create!(
+            set_type: "ADHOC",
+            parent_override:,
+            due_at: nil,
+            due_at_overridden: true,
+            workflow_state: "deleted"
+          )
+          override.assignment_override_students.create!(user: @student)
+
+          expect(@assignment.send(:assignment_overrides_due_date_ok?)).to be true
+        end
+
+        it "validates with provided override data for checkpoints parent" do
+          @assignment.assign_attributes(post_to_sis: true)
+          # For checkpoints parent, the method ignores provided override data and uses sub_assignment_overrides
+          # So we need to create a sub_assignment override with nil due_at to trigger the failure
+          sub_assignment = @assignment.sub_assignments.first
+          parent_override = @assignment.assignment_overrides.create!(set_type: "ADHOC")
+          override = sub_assignment.assignment_overrides.create!(
+            set_type: "ADHOC",
+            parent_override:,
+            due_at: nil,
+            due_at_overridden: true
+          )
+          override.assignment_override_students.create!(user: @student)
+
+          # Even though we pass override data, it should use sub_assignment_overrides
+          override_data = [
+            { due_at: 2.days.from_now, due_at_overridden: true, workflow_state: "active" }
+          ]
+
+          expect(@assignment.send(:assignment_overrides_due_date_ok?, override_data)).to be false
+          expect(@assignment.errors[:due_at]).to include("cannot be blank for any assignees when Post to Sis is checked")
+        end
+      end
+
+      context "when assignment is not a checkpoints parent" do
+        before do
+          @regular_assignment = @course.assignments.create!(title: "Regular Assignment", due_at: 3.days.from_now)
+        end
+
+        it "uses regular assignment_overrides for validation" do
+          @regular_assignment.assign_attributes(post_to_sis: true)
+          override = @regular_assignment.assignment_overrides.create!(
+            set_type: "ADHOC",
+            due_at: nil,
+            due_at_overridden: true
+          )
+          override.assignment_override_students.create!(user: @student)
+
+          expect(@regular_assignment.send(:assignment_overrides_due_date_ok?)).to be false
+          expect(@regular_assignment.errors[:due_at]).to include("cannot be blank for any assignees when Post to Sis is checked")
+        end
+      end
+
+      it "returns true when skip_sis_due_date_validation is set" do
+        @assignment.instance_variable_set(:@skip_sis_due_date_validation, true)
+        expect(@assignment.send(:assignment_overrides_due_date_ok?)).to be true
+      end
+    end
+
+    describe "#gather_override_data" do
+      before do
+        @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+        @assignment = @topic.assignment
+        @assignment.update!(has_sub_assignments: true, due_at: 3.days.from_now)
+        @student = student_in_course(active_all: true).user
+      end
+
+      context "when assignment is a checkpoints parent" do
+        before do
+          Checkpoints::DiscussionCheckpointCreatorService.call(
+            discussion_topic: @topic,
+            checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+            points_possible: 5,
+            dates: [{ type: "everyone", due_at: 1.day.from_now }]
+          )
+        end
+
+        it "merges sub_assignment_overrides with provided overrides" do
+          sub_assignment = @assignment.sub_assignments.first
+          parent_override = @assignment.assignment_overrides.create!(set_type: "ADHOC")
+          existing_override = sub_assignment.assignment_overrides.create!(
+            set_type: "ADHOC",
+            parent_override:,
+            due_at: 1.day.from_now
+          )
+          existing_override.assignment_override_students.create!(user: @student)
+
+          new_due_date = 2.days.from_now
+          new_override_data = [
+            { id: nil, due_at: new_due_date, due_at_overridden: true }
+          ]
+
+          result = @assignment.send(:gather_override_data, new_override_data)
+
+          expect(result.size).to eq 2
+          expect(result).to include(hash_including(due_at: new_due_date))
+        end
+
+        it "handles hash input with values" do
+          due_date = 3.days.from_now
+          override_hash = {
+            "0" => { due_at: due_date, due_at_overridden: true },
+            "1" => {}
+          }
+
+          result = @assignment.send(:gather_override_data, override_hash)
+          expect(result.size).to eq 1
+          expect(result.first[:due_at]).to eq due_date
+        end
+
+        it "adds due_at_overridden when missing" do
+          override_data = [{ due_at: 2.days.from_now }]
+          result = @assignment.send(:gather_override_data, override_data)
+
+          expect(result.first[:due_at_overridden]).to be true
+        end
+
+        it "excludes existing overrides by id" do
+          sub_assignment = @assignment.sub_assignments.first
+          parent_override = @assignment.assignment_overrides.create!(set_type: "ADHOC")
+          existing_override = sub_assignment.assignment_overrides.create!(
+            set_type: "ADHOC",
+            parent_override:,
+            due_at: 1.day.from_now
+          )
+
+          new_due_date = 2.days.from_now
+          override_data = [
+            { id: existing_override.id, due_at: new_due_date, due_at_overridden: true }
+          ]
+
+          result = @assignment.send(:gather_override_data, override_data)
+          expect(result.size).to eq 1
+          expect(result.first[:due_at]).to eq new_due_date
+        end
+      end
+
+      context "when assignment is not a checkpoints parent" do
+        before do
+          @regular_assignment = @course.assignments.create!(title: "Regular Assignment", due_at: 3.days.from_now)
+        end
+
+        it "merges assignment_overrides with provided overrides" do
+          existing_override = @regular_assignment.assignment_overrides.create!(
+            set_type: "ADHOC",
+            due_at: 1.day.from_now
+          )
+          existing_override.assignment_override_students.create!(user: @student)
+
+          new_due_date = 2.days.from_now
+          new_override_data = [
+            { id: nil, due_at: new_due_date, due_at_overridden: true }
+          ]
+
+          result = @regular_assignment.send(:gather_override_data, new_override_data)
+
+          expect(result.size).to eq 2
+          expect(result).to include(hash_including(due_at: new_due_date))
+        end
+      end
+    end
+  end
 end

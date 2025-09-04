@@ -145,6 +145,10 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
         discussion_topic.unlock_at = created_assignment.unlock_at
       end
 
+      if input.dig(:assignment, :for_checkpoints) && AssignmentUtil.due_date_required_for_account?(discussion_topic_context) && input[:assignment][:post_to_sis] && any_due_at_nil?(input[:checkpoints])
+        return validation_error(I18n.t("Due dates cannot be blank when Post to Sis is checked"))
+      end
+
       # Assignment must be present to set checkpoints
       if input[:checkpoints]&.count == DiscussionTopic::REQUIRED_CHECKPOINT_COUNT
         return validation_error(I18n.t("If checkpoints are defined, forCheckpoints: true must be provided to the discussion topic assignment.")) unless input.dig(:assignment, :for_checkpoints)
@@ -192,6 +196,14 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
       Group.find(context_id)
     else
       nil
+    end
+  end
+
+  def any_due_at_nil?(checkpoints_data)
+    checkpoints_data.any? do |ck|
+      ck[:dates].any? do |date_entry|
+        date_entry[:due_at].nil?
+      end
     end
   end
 end
