@@ -90,10 +90,24 @@ CreateAssignmentView.prototype.initialize = function (options) {
 CreateAssignmentView.prototype.onSaveSuccess = function () {
   this.shouldPublish = false
   CreateAssignmentView.__super__.onSaveSuccess.apply(this, arguments)
-  ENV.PERMISSIONS.by_assignment_id &&
-    (ENV.PERMISSIONS.by_assignment_id[this.model.id] = {
+  // Calculate manage_assign_to permission for new assignments
+  const calculateManageAssignTo = submissionTypes => {
+    // For legacy assignments, default to basic assignment editing permission
+    if (Array.isArray(submissionTypes) && submissionTypes.includes('discussion_topic')) {
+      return ENV.PERMISSIONS.manage_assignments_edit && ENV.PERMISSIONS.moderate_forum
+    }
+    return ENV.PERMISSIONS.manage_assignments_edit
+  }
+
+  if (ENV.PERMISSIONS.by_assignment_id) {
+    ENV.PERMISSIONS.by_assignment_id[this.model.id] = {
       update: ENV.PERMISSIONS.manage_assignments_edit,
-    })
+      delete: ENV.PERMISSIONS.manage_assignments_delete,
+      manage_assign_to:
+        this.model.get('permissions')?.manage_assign_to ??
+        calculateManageAssignTo(this.model.submissionTypes() || this.model.get('submission_types')),
+    }
+  }
   if (this.assignmentGroup) {
     this.assignmentGroup.get('assignments').add(this.model)
     return (this.model = this.generateNewAssignment())
