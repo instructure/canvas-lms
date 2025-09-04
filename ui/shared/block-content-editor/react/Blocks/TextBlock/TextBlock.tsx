@@ -22,16 +22,30 @@ import {TextBlockSettings} from './TextBlockSettings'
 import {BaseBlock} from '../BaseBlock'
 import {useSave} from '../BaseBlock/useSave'
 import {TextBlockProps} from './types'
-import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
 import {TextEditPreview} from '../BlockItems/Text/TextEditPreview'
 import {TitleEdit} from '../BlockItems/Title/TitleEdit'
 import {TextEdit} from '../BlockItems/Text/TextEdit'
 import {useFocusElement} from '../../hooks/useFocusElement'
 import {TextBlockLayout} from './TextBlockLayout'
+import {TitleView} from '../BlockItems/Title/TitleView'
+import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
+import {TextView} from '../BlockItems/Text/TextView'
 
 const I18n = createI18nScope('block_content_editor')
 
 const TextBlockView = (props: TextBlockProps) => {
+  return (
+    <TextBlockLayout
+      title={
+        props.includeBlockTitle &&
+        !!props.title && <TitleView title={props.title} contentColor={props.titleColor} />
+      }
+      text={<TextView content={props.content} />}
+    />
+  )
+}
+
+const TextBlockEditView = (props: TextBlockProps) => {
   return (
     <TextBlockLayout
       title={
@@ -78,7 +92,7 @@ export const TextBlock = (props: TextBlockProps) => {
     <BaseBlock
       ViewComponent={TextBlockView}
       EditComponent={TextBlockEdit}
-      EditViewComponent={TextBlockView}
+      EditViewComponent={TextBlockEditView}
       componentProps={props}
       title={TextBlock.craft.displayName}
       backgroundColor={props.backgroundColor}
