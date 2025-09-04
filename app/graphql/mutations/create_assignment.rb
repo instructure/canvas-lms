@@ -23,6 +23,7 @@ class Mutations::CreateAssignment < Mutations::AssignmentBase::Mutation
 
   argument :course_id, ID, required: true
   argument :name, String, required: true
+  argument :secure_params, String, required: false
   # most arguments inherited from AssignmentBase
 
   def resolve(input:, submittable: nil)

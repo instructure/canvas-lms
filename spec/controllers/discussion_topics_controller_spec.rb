@@ -1906,6 +1906,65 @@ describe DiscussionTopicsController do
       end
     end
 
+    context "assignment secure params" do
+      before(:once) do
+        course_topic
+      end
+
+      before do
+        user_session(@teacher)
+      end
+
+      it "sets ASSIGNMENT_SECURE_PARAMS for new discussion topics without assignments" do
+        new_topic = @course.discussion_topics.create!(title: "New topic")
+
+        get :edit, params: { course_id: @course.id, id: new_topic.id }
+
+        expect(assigns[:js_env][:ASSIGNMENT_SECURE_PARAMS]).to be_present
+        # Verify it contains a JWT token
+        expect(assigns[:js_env][:ASSIGNMENT_SECURE_PARAMS]).to match(/^eyJ/)
+      end
+
+      it "does not set ASSIGNMENT_SECURE_PARAMS for existing discussion topics with assignments" do
+        course_topic(with_assignment: true)
+
+        get :edit, params: { course_id: @course.id, id: @topic.id }
+
+        expect(assigns[:js_env][:ASSIGNMENT_SECURE_PARAMS]).to be_nil
+      end
+
+      it "sets secure_params in DISCUSSION_TOPIC.ATTRIBUTES.assignment for existing assignments" do
+        course_topic(with_assignment: true)
+
+        get :edit, params: { course_id: @course.id, id: @topic.id }
+
+        discussion_topic_data = assigns[:js_env][:DISCUSSION_TOPIC]
+        assignment_data = discussion_topic_data[:ATTRIBUTES][:assignment]
+
+        expect(assignment_data[:secure_params]).to be_present
+        expect(assignment_data[:secure_params]).to match(/^eyJ/)
+        expected_secure_params = @topic.assignment.secure_params(include_description: false)
+        expect(assignment_data[:secure_params]).to eq(expected_secure_params)
+      end
+
+      it "includes description in secure_params when assignment has description" do
+        course_topic(with_assignment: true)
+        @topic.assignment.update!(description: "Test assignment description")
+
+        get :edit, params: { course_id: @course.id, id: @topic.id }
+
+        discussion_topic_data = assigns[:js_env][:DISCUSSION_TOPIC]
+        assignment_data = discussion_topic_data[:ATTRIBUTES][:assignment]
+
+        expect(assignment_data[:secure_params]).to be_present
+        expected_secure_params = @topic.assignment.secure_params(include_description: true)
+        expect(assignment_data[:secure_params]).to eq(expected_secure_params)
+
+        decoded = Canvas::Security.decode_jwt(assignment_data[:secure_params])
+        expect(decoded[:lti_assignment_description]).to be_present
+      end
+    end
+
     it "returns unauthorized for a user that does not have visibilites to view thiss" do
       user_session(@teacher)
       section1 = @course.course_sections.create!(name: "Section 1")

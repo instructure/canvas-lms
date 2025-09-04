@@ -717,6 +717,8 @@ class DiscussionTopicsController < ApplicationController
       end
     end
 
+    js_hash[:ASSIGNMENT_SECURE_PARAMS] = AbstractAssignment.secure_params if @topic.new_record? || @topic.assignment_id.nil?
+
     js_env(js_hash)
 
     set_master_course_js_env_data(@topic, @context)

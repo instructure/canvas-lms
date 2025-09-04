@@ -235,6 +235,7 @@ describe Lti::Messages::DeepLinkingRequest do
 
     context 'when resource type is "ActivityAssetProcessorContribution"' do
       let(:opts) { { resource_type: "ActivityAssetProcessorContribution" } }
+      let(:expander_opts) { super().merge(secure_params: assignment.secure_params) }
 
       it_behaves_like "sets deep linking attributes" do
         let(:accept_types) { %w[ltiAssetProcessorContribution] }
@@ -242,6 +243,12 @@ describe Lti::Messages::DeepLinkingRequest do
         let(:accept_media_types) { "application/vnd.ims.lti.v1.ltilink" }
         let(:auto_create) { true }
         let(:accept_multiple) { true }
+      end
+
+      it "sets the activity id" do
+        activity_claim = jws[:post_payload]["https://purl.imsglobal.org/spec/lti/claim/activity"]
+
+        expect(activity_claim["id"]).to eq(assignment.lti_context_id)
       end
     end
   end

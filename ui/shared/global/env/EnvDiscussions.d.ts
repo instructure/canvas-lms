@@ -22,4 +22,5 @@ export interface EnvDiscussions {
     ATTRIBUTES: Record<string, any>
   }
   discussion_pin_post: string
+  ASSIGNMENT_SECURE_PARAMS?: string
 }

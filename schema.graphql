@@ -937,6 +937,7 @@ input AssignmentCreate {
   peerReviews: AssignmentPeerReviewsUpdate
   pointsPossible: Float
   postToSis: Boolean
+  secureParams: String
   suppressAssignment: Boolean
   unlockAt: DateTime
 }
@@ -1314,6 +1315,7 @@ input AssignmentUpdate {
   peerReviews: AssignmentPeerReviewsUpdate
   pointsPossible: Float
   postToSis: Boolean
+  secureParams: String
   setAssignment: Boolean
   suppressAssignment: Boolean
   unlockAt: DateTime
@@ -3017,6 +3019,7 @@ input CreateAssignmentInput {
   pointsPossible: Float
   position: Int
   postToSis: Boolean
+  secureParams: String
   state: AssignmentState
   submissionTypes: [SubmissionType!]
   suppressAssignment: Boolean

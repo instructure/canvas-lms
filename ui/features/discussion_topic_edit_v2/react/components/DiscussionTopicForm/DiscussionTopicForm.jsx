@@ -585,6 +585,7 @@ function DiscussionTopicForm({
         currentDiscussionTopic?.assignment,
         suppressedAssignment,
         assetProcessors,
+        ENV.DISCUSSION_TOPIC?.ATTRIBUTES?.assignment?.secure_params || ENV.ASSIGNMENT_SECURE_PARAMS,
       ),
       checkpoints: prepareCheckpointsPayload(
         assignedInfoList,

@@ -468,4 +468,28 @@ describe Mutations::CreateAssignment do
     assignment = Assignment.find(result.dig("data", "createAssignment", "assignment", "_id"))
     expect(assignment.suppress_assignment).to be true
   end
+
+  it "uses secureParams to set lti_context_id" do
+    custom_lti_id = "custom-lti-context-123"
+    jwt = Assignment.secure_params(custom_lti_id)
+
+    result = execute_with_input <<~GQL
+      name: "assignment with secure params"
+      courseId: "#{@course.to_param}"
+      secureParams: "#{jwt}"
+    GQL
+
+    assignment = Assignment.find(result.dig("data", "createAssignment", "assignment", "_id"))
+    expect(assignment.lti_context_id).to eq(custom_lti_id)
+  end
+
+  it "raises error for invalid secureParams" do
+    expect do
+      execute_with_input <<~GQL
+        name: "assignment with invalid secure params"
+        courseId: "#{@course.to_param}"
+        secureParams: "invalid_jwt_token"
+      GQL
+    end.to raise_error(CanvasSecurity::InvalidToken, /Invalid JWT Format/)
+  end
 end
