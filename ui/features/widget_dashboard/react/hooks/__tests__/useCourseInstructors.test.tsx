@@ -21,10 +21,10 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import React from 'react'
 import {waitFor} from '@testing-library/react'
 import {useCourseInstructors} from '../useCourseInstructors'
-import {executeQuery} from '@canvas/graphql'
+import {setupServer} from 'msw/node'
+import {graphql, HttpResponse} from 'msw'
 
-jest.mock('@canvas/graphql')
-const mockExecuteQuery = executeQuery as jest.Mock
+const server = setupServer()
 
 const setup = (hookFn: any) => {
   const queryClient = new QueryClient({
@@ -108,6 +108,9 @@ const mockInstructorsResponse = {
 
 describe('useCourseInstructors', () => {
   beforeAll(() => {
+    server.listen({
+      onUnhandledRequest: 'bypass',
+    })
     window.ENV = {
       current_user_id: '123',
       GRAPHQL_URL: '/api/graphql',
@@ -115,20 +118,30 @@ describe('useCourseInstructors', () => {
     } as any
   })
 
-  beforeEach(() => {
-    mockExecuteQuery.mockImplementation(() => {
-      return Promise.resolve(mockInstructorsResponse)
-    })
+  afterEach(() => {
+    server.resetHandlers()
   })
 
-  afterEach(() => {
-    jest.clearAllMocks()
+  afterAll(() => {
+    server.close()
+  })
+
+  beforeEach(() => {
+    server.use(
+      graphql.query('GetCourseInstructorsPaginated', () => {
+        return HttpResponse.json({
+          data: mockInstructorsResponse,
+        })
+      }),
+    )
   })
 
   it('should return loading state initially', () => {
-    mockExecuteQuery.mockImplementation(() => {
-      return new Promise(() => {}) // Never resolves
-    })
+    server.use(
+      graphql.query('GetCourseInstructorsPaginated', async () => {
+        await new Promise(() => {}) // Never resolves
+      }),
+    )
 
     const {result, cleanup} = setup(() => useCourseInstructors({courseIds: ['1']}))
 
@@ -182,9 +195,19 @@ describe('useCourseInstructors', () => {
   })
 
   it('should handle GraphQL errors', async () => {
-    mockExecuteQuery.mockImplementation(() => {
-      return Promise.reject(new Error('GraphQL Error'))
-    })
+    const originalConsoleError = console.error
+    console.error = jest.fn()
+
+    server.use(
+      graphql.query('GetCourseInstructorsPaginated', () => {
+        return HttpResponse.json(
+          {
+            errors: [{message: 'GraphQL Error'}],
+          },
+          {status: 500},
+        )
+      }),
+    )
 
     const {result, cleanup} = setup(() => useCourseInstructors({courseIds: ['1']}))
 
@@ -195,6 +218,7 @@ describe('useCourseInstructors', () => {
     expect(result.current.data).toEqual([])
     expect(result.current.error).toBeTruthy()
 
+    console.error = originalConsoleError
     cleanup()
   })
 

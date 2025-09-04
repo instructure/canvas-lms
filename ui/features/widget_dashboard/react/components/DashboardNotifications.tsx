@@ -102,7 +102,7 @@ const DashboardNotifications: React.FC = () => {
   const handleDismissNotification = async (id: string) => {
     try {
       const result = await dismissMutation.mutateAsync(id)
-      if (result?.dismissAccountNotification?.success) {
+      if (!result?.dismissAccountNotification?.errors) {
         setDismissedNotificationIds(prev => new Set([...prev, id]))
       }
     } catch (err) {

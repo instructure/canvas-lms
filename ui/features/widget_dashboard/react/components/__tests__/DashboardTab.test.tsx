@@ -147,6 +147,22 @@ const server = setupServer(
       },
     })
   }),
+  // Handle GetCourseInstructorsPaginated query
+  graphql.query('GetCourseInstructorsPaginated', () => {
+    return HttpResponse.json({
+      data: {
+        courseInstructorsConnection: {
+          nodes: [],
+          pageInfo: {
+            hasNextPage: false,
+            hasPreviousPage: false,
+            startCursor: null,
+            endCursor: null,
+          },
+        },
+      },
+    })
+  }),
 )
 
 const buildDefaultProps = (overrides = {}): Props => {
