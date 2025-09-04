@@ -28,13 +28,13 @@ const I18n = createI18nScope('rubrics-form-generated-criteria')
 
 type GeneratedCriteriaHeaderProps = {
   aiFeedbackLink?: string
-  onRegenerateAll: (additionalPrompt: string) => void
   isGenerating?: boolean
+  onRegenerateAll: (additionalPrompt: string) => void
 }
 export const GeneratedCriteriaHeader = ({
   aiFeedbackLink,
-  onRegenerateAll,
   isGenerating = false,
+  onRegenerateAll,
 }: GeneratedCriteriaHeaderProps) => {
   return (
     <View

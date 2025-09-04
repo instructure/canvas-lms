@@ -65,14 +65,22 @@ const RegenerateCriteria = ({
         shouldCloseOnDocumentClick={false}
         footer={
           <Flex direction="row" gap="small" padding="small">
-            <Button onClick={onClose}>{I18n.t('Cancel')}</Button>
-            <Button color="ai-primary" onClick={handleRegenerate} renderIcon={<IconAiSolid />}>
+            <Button onClick={onClose} data-testid="regenerate-criteria-cancel-button">
+              {I18n.t('Cancel')}
+            </Button>
+            <Button
+              color="ai-primary"
+              onClick={handleRegenerate}
+              renderIcon={<IconAiSolid />}
+              data-testid="regenerate-criteria-submit-button"
+              disabled={additionalPrompt.length > 1000}
+            >
               {I18n.t('Regenerate')}
             </Button>
           </Flex>
         }
       >
-        <View>
+        <View data-testid="regenerate-criteria-modal-description">
           <Text>
             {isCriterion
               ? I18n.t(
@@ -92,12 +100,24 @@ const RegenerateCriteria = ({
               'Enter additional prompt information here. For example, "Target a college-level seminar." or "Focus on argument substance." or "Be lenient." ',
             )}
             onChange={e => setAdditionalPrompt(e.target.value)}
+            messages={
+              additionalPrompt.length > 1000
+                ? [
+                    {
+                      text: I18n.t(
+                        'Additional prompt information must be less than 1000 characters',
+                      ),
+                      type: 'error',
+                    },
+                  ]
+                : undefined
+            }
           />
         </View>
       </CanvasModal>
       <Button
         onClick={() => setIsOpen(true)}
-        data-testid="generate-criteria-button"
+        data-testid="regenerate-criteria-button"
         color={buttonColor}
         renderIcon={buttonColor === 'ai-primary' ? <IconAiSolid /> : <IconAiColoredSolid />}
         disabled={disabled}
