@@ -371,6 +371,41 @@ describe Types::ModuleItemType do
     end
   end
 
+  context "module_item_url" do
+    it "returns the external URL for external URL module items" do
+      external_url = "https://example.com/test"
+      module_item = module1.content_tags.create!(
+        tag_type: "context_module",
+        content_type: "ExternalUrl",
+        context_id: course.id,
+        context_type: "Course",
+        title: "Test External URL",
+        url: external_url
+      )
+
+      resolver = GraphQLTypeTester.new(module_item, current_user: @teacher)
+      expect(resolver.resolve("moduleItemUrl")).to eq external_url
+    end
+
+    it "returns the external tool URL for external tool module items" do
+      external_tool = external_tool_model(context: course, opts: { url: "https://tool.example.com/launch" })
+      module_item_url = "https://different.example.com/custom"
+      module_item = module1.content_tags.create!(
+        tag_type: "context_module",
+        content_type: "ContextExternalTool",
+        context_id: course.id,
+        context_type: "Course",
+        title: "Test External Tool",
+        url: module_item_url,
+        content_id: external_tool.id
+      )
+
+      resolver = GraphQLTypeTester.new(module_item, current_user: @teacher)
+      expect(resolver.resolve("moduleItemUrl")).to eq module_item_url
+      expect(module_item_url).not_to eq external_tool.url
+    end
+  end
+
   context "blueprint courses" do
     before do
       @course_1 = Course.create!(name: "Course 1")

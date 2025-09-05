@@ -30,6 +30,7 @@ const generateItems = (count: number): ModuleItem[] =>
     _id: `mod-item-${i}`,
     id: `item-${i}`,
     url: `/modules/items/${i}`,
+    moduleItemUrl: null,
     indent: 0,
     position: i + 1,
     title: `Content ${i}`,

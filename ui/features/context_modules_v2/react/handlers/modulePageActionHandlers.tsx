@@ -265,7 +265,7 @@ export const handleOpeningEditItemModal = (
   const itemProps = {
     courseId,
     itemName: moduleItem.title,
-    itemURL: moduleItem.content?.url,
+    itemURL: moduleItem.moduleItemUrl ?? undefined,
     itemNewTab: moduleItem.newTab,
     itemIndent: moduleItem.indent,
     moduleId: moduleId,

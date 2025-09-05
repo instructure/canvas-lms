@@ -304,6 +304,7 @@ export interface ModuleItem {
   id: string
   _id: string
   url: string
+  moduleItemUrl: string | null
   title: string
   indent: number
   position: number

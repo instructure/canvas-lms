@@ -6254,6 +6254,7 @@ type ModuleItem implements LegacyIDInterface & Node & Timestamped {
   """
   masterCourseRestrictions: ModuleItemMasterCourseRestriction
   module: Module
+  moduleItemUrl: URL
   newTab: Boolean
   next: ModuleItem
 
