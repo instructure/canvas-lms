@@ -19,12 +19,26 @@
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import {ThreadActions} from '../ThreadActions'
+import {MockedProvider} from '@apollo/client/testing'
+
+const tryTranslate = jest.fn()
+
+jest.mock('../../../hooks/useTranslation', () => ({
+  useTranslation: () => ({
+    tryTranslate,
+  }),
+}))
 
 const defaultRequiredProps = {
   id: '1',
+  entry: {
+    id: '1',
+  },
   onMarkAllAsUnread: jest.fn(),
   onToggleUnread: jest.fn(),
 }
+
+const defaultMocks = []
 
 const createProps = overrides => {
   return {
@@ -43,11 +57,18 @@ const createProps = overrides => {
   }
 }
 
+const setup = (props, mocks = defaultMocks) =>
+  render(
+    <MockedProvider mocks={mocks}>
+      <ThreadActions {...props} />
+    </MockedProvider>,
+  )
+
 describe('ThreadActions', () => {
   it('renders all the expected buttons', () => {
     window.ENV.FEATURES.discussion_permalink = true
     const props = createProps()
-    const {getByTestId, queryByText} = render(<ThreadActions {...props} />)
+    const {getByTestId, queryByText} = setup(props)
 
     const menu = getByTestId('thread-actions-menu')
     expect(menu).toBeInTheDocument()
@@ -75,7 +96,7 @@ describe('ThreadActions', () => {
 
   it('does not display if callback is not provided', () => {
     window.ENV.FEATURES.discussion_permalink = true
-    const {getByTestId, queryByText} = render(<ThreadActions {...defaultRequiredProps} />)
+    const {getByTestId, queryByText} = setup(defaultRequiredProps)
     const menu = getByTestId('thread-actions-menu')
 
     expect(menu).toBeInTheDocument()
@@ -92,7 +113,7 @@ describe('ThreadActions', () => {
   })
 
   it('should not render when is search', () => {
-    const {queryByTestId} = render(<ThreadActions {...defaultRequiredProps} isSearch={true} />)
+    const {queryByTestId} = setup({...defaultRequiredProps, isSearch: true})
     const menu = queryByTestId('thread-actions-menu')
     expect(menu).toBeNull()
   })
@@ -101,7 +122,7 @@ describe('ThreadActions', () => {
     describe('mark all as read', () => {
       it('calls provided callback when clicked', () => {
         const props = createProps()
-        const {getByTestId, getByText} = render(<ThreadActions {...props} />)
+        const {getByTestId, getByText} = setup(props)
 
         fireEvent.click(getByTestId('thread-actions-menu'))
         expect(props.onMarkAllAsRead.mock.calls).toHaveLength(0)
@@ -113,7 +134,7 @@ describe('ThreadActions', () => {
     describe('mark all as unread', () => {
       it('calls provided callback when clicked', () => {
         const props = createProps()
-        const {getByTestId, getByText} = render(<ThreadActions {...props} />)
+        const {getByTestId, getByText} = setup(props)
 
         fireEvent.click(getByTestId('thread-actions-menu'))
         expect(props.onMarkAllAsUnread.mock.calls).toHaveLength(0)
@@ -125,7 +146,7 @@ describe('ThreadActions', () => {
     describe('mark thread as read', () => {
       it('calls provided callback when clicked', () => {
         const props = createProps()
-        const {getByTestId, getByText} = render(<ThreadActions {...props} />)
+        const {getByTestId, getByText} = setup(props)
 
         fireEvent.click(getByTestId('thread-actions-menu'))
         expect(props.onMarkThreadAsRead.mock.calls).toHaveLength(0)
@@ -137,7 +158,7 @@ describe('ThreadActions', () => {
     describe('mark thread as unread', () => {
       it('calls provided callback when clicked', () => {
         const props = createProps()
-        const {getByTestId, getByText} = render(<ThreadActions {...props} />)
+        const {getByTestId, getByText} = setup(props)
 
         fireEvent.click(getByTestId('thread-actions-menu'))
         expect(props.onMarkThreadAsRead.mock.calls).toHaveLength(0)
@@ -149,7 +170,7 @@ describe('ThreadActions', () => {
     describe('mark as read/unread', () => {
       it('should render Mark as Unread button when read', () => {
         const props = createProps()
-        const {getByTestId} = render(<ThreadActions {...props} />)
+        const {getByTestId} = setup(props)
 
         const menu = getByTestId('thread-actions-menu')
         expect(menu).toBeInTheDocument()
@@ -167,7 +188,7 @@ describe('ThreadActions', () => {
 
       it('should render Mark as Read button when unread', () => {
         const props = createProps({onToggleUnread: jest.fn()})
-        const {getByTestId} = render(<ThreadActions isUnread={true} {...props} />)
+        const {getByTestId} = setup({...props, isUnread: true})
 
         const menu = getByTestId('thread-actions-menu')
         expect(menu).toBeInTheDocument()
@@ -186,7 +207,7 @@ describe('ThreadActions', () => {
 
     describe('edit', () => {
       it('does not render if the callback is not provided', () => {
-        const {getByTestId, queryByText} = render(<ThreadActions {...defaultRequiredProps} />)
+        const {getByTestId, queryByText} = setup({...defaultRequiredProps})
 
         fireEvent.click(getByTestId('thread-actions-menu'))
         expect(queryByText('Edit')).toBeFalsy()
@@ -194,7 +215,7 @@ describe('ThreadActions', () => {
 
       it('calls provided callback when clicked', () => {
         const props = createProps()
-        const {getByTestId, getByText} = render(<ThreadActions {...props} />)
+        const {getByTestId, getByText} = setup(props)
 
         fireEvent.click(getByTestId('thread-actions-menu'))
         expect(props.onEdit.mock.calls).toHaveLength(0)
@@ -205,7 +226,7 @@ describe('ThreadActions', () => {
 
     describe('delete', () => {
       it('does not render if the callback is not provided', () => {
-        const {getByTestId, queryByText} = render(<ThreadActions {...defaultRequiredProps} />)
+        const {getByTestId, queryByText} = setup({...defaultRequiredProps})
 
         fireEvent.click(getByTestId('thread-actions-menu'))
         expect(queryByText('Delete')).toBeFalsy()
@@ -213,7 +234,7 @@ describe('ThreadActions', () => {
 
       it('calls provided callback when clicked', () => {
         const props = createProps()
-        const {getByTestId, getByText} = render(<ThreadActions {...props} />)
+        const {getByTestId, getByText} = setup(props)
 
         fireEvent.click(getByTestId('thread-actions-menu'))
         expect(props.onDelete.mock.calls).toHaveLength(0)
@@ -224,7 +245,7 @@ describe('ThreadActions', () => {
 
     describe('SpeedGrader', () => {
       it('does not render if the callback is not provided', () => {
-        const {getByTestId, queryByText} = render(<ThreadActions {...defaultRequiredProps} />)
+        const {getByTestId, queryByText} = setup({...defaultRequiredProps})
 
         fireEvent.click(getByTestId('thread-actions-menu'))
         expect(queryByText('Open in SpeedGrader')).toBeFalsy()
@@ -232,7 +253,7 @@ describe('ThreadActions', () => {
 
       it('calls provided callback when clicked', () => {
         const props = createProps()
-        const {getByTestId, getByText} = render(<ThreadActions {...props} />)
+        const {getByTestId, getByText} = setup(props)
 
         fireEvent.click(getByTestId('thread-actions-menu'))
         expect(props.onOpenInSpeedGrader.mock.calls).toHaveLength(0)
@@ -243,7 +264,7 @@ describe('ThreadActions', () => {
 
     describe('Go to topic', () => {
       it('does not render if the callback is not provided', () => {
-        const {getByTestId, queryByText} = render(<ThreadActions {...defaultRequiredProps} />)
+        const {getByTestId, queryByText} = setup({...defaultRequiredProps})
 
         fireEvent.click(getByTestId('thread-actions-menu'))
         expect(queryByText('Go To Topic')).toBeFalsy()
@@ -251,7 +272,7 @@ describe('ThreadActions', () => {
 
       it('calls provided callback when clicked', () => {
         const props = createProps()
-        const {getByTestId, getByText} = render(<ThreadActions {...props} />)
+        const {getByTestId, getByText} = setup(props)
 
         fireEvent.click(getByTestId('thread-actions-menu'))
         expect(props.goToTopic.mock.calls).toHaveLength(0)
@@ -262,7 +283,7 @@ describe('ThreadActions', () => {
 
     describe('Go to Parent', () => {
       it('does not render if the callback is not provided', () => {
-        const {getByTestId, queryByText} = render(<ThreadActions {...defaultRequiredProps} />)
+        const {getByTestId, queryByText} = setup({...defaultRequiredProps})
 
         fireEvent.click(getByTestId('thread-actions-menu'))
         expect(queryByText('Go To Parent')).toBeFalsy()
@@ -270,7 +291,7 @@ describe('ThreadActions', () => {
 
       it('calls provided callback when clicked', () => {
         const props = createProps()
-        const {getByTestId, getByText} = render(<ThreadActions {...props} />)
+        const {getByTestId, getByText} = setup(props)
 
         fireEvent.click(getByTestId('thread-actions-menu'))
         expect(props.goToParent.mock.calls).toHaveLength(0)
@@ -283,7 +304,7 @@ describe('ThreadActions', () => {
   describe('Report', () => {
     it('calls provided callback when clicked', () => {
       const props = createProps()
-      const {getByTestId, getByText} = render(<ThreadActions {...props} />)
+      const {getByTestId, getByText} = setup(props)
 
       fireEvent.click(getByTestId('thread-actions-menu'))
       expect(props.onReport.mock.calls).toHaveLength(0)
@@ -293,7 +314,7 @@ describe('ThreadActions', () => {
 
     it('shows Reported if isReported', () => {
       const props = createProps()
-      const {getByTestId, getByText} = render(<ThreadActions {...props} isReported={true} />)
+      const {getByTestId, getByText} = setup({...props, isReported: true})
 
       fireEvent.click(getByTestId('thread-actions-menu'))
       expect(getByText('Reported')).toBeTruthy()
@@ -301,7 +322,7 @@ describe('ThreadActions', () => {
 
     it('cannot click if isReported', () => {
       const props = createProps()
-      const {getByTestId, getByText} = render(<ThreadActions {...props} isReported={true} />)
+      const {getByTestId, getByText} = setup({...props, isReported: true})
 
       fireEvent.click(getByTestId('thread-actions-menu'))
       expect(props.onReport.mock.calls).toHaveLength(0)
@@ -313,7 +334,7 @@ describe('ThreadActions', () => {
   it('does not display copy link if ff if off', () => {
     window.ENV.FEATURES.discussion_permalink = false
     const props = createProps()
-    const {getByTestId, queryByText} = render(<ThreadActions {...props} />)
+    const {getByTestId, queryByText} = setup(props)
 
     const menu = getByTestId('thread-actions-menu')
     expect(menu).toBeInTheDocument()
@@ -322,4 +343,48 @@ describe('ThreadActions', () => {
     expect(queryByText('Copy Link')).toBeFalsy()
   })
 
+  describe('Translate text button', () => {
+    beforeAll(() => {
+      window.ENV.ai_translation_improvements = true
+    })
+
+    afterAll(() => {
+      delete window.ENV.ai_translation_improvements
+    })
+
+    it('does not display if the feature flag is off', () => {
+      window.ENV.ai_translation_improvements = false
+      const props = createProps()
+      const {getByTestId, queryByText} = setup(props)
+      const menu = getByTestId('thread-actions-menu')
+      expect(menu).toBeInTheDocument()
+      fireEvent.click(menu)
+
+      const element = queryByText('Translate Text')
+      expect(element).toBeFalsy()
+
+      window.ENV.ai_translation_improvements = true
+    })
+
+    it('displays if the feature flag is on', () => {
+      const props = createProps()
+      const {getByTestId, queryByText} = setup(props)
+      const menu = getByTestId('thread-actions-menu')
+      expect(menu).toBeInTheDocument()
+      fireEvent.click(menu)
+
+      const element = queryByText('Translate Text')
+      expect(element).toBeInTheDocument()
+    })
+
+    it('calls the onTranslate callback when clicked', () => {
+      const props = createProps()
+      const {getByTestId, getByText} = setup(props)
+
+      fireEvent.click(getByTestId('thread-actions-menu'))
+      expect(tryTranslate.mock.calls).toHaveLength(0)
+      fireEvent.click(getByText('Translate Text'))
+      expect(tryTranslate.mock.calls).toHaveLength(1)
+    })
+  })
 })

@@ -270,9 +270,10 @@ export const UPDATE_DISCUSSION_TOPIC_PARTICIPANT = gql`
     $sortOrder: DiscussionSortOrderType
     $expanded: Boolean
     $summaryEnabled: Boolean
+    $preferredLanguage: PreferredLanguageType
   ) {
     updateDiscussionTopicParticipant(
-      input: {discussionTopicId: $discussionTopicId, sortOrder: $sortOrder, expanded: $expanded, summaryEnabled: $summaryEnabled}
+      input: {discussionTopicId: $discussionTopicId, sortOrder: $sortOrder, expanded: $expanded, summaryEnabled: $summaryEnabled, preferredLanguage: $preferredLanguage}
     ) {
       discussionTopic {
         id
@@ -281,6 +282,7 @@ export const UPDATE_DISCUSSION_TOPIC_PARTICIPANT = gql`
           sortOrder
           expanded
           summaryEnabled
+          preferredLanguage
         }
       }
     }
