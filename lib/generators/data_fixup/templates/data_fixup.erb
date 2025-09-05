@@ -21,8 +21,8 @@ module DataFixup
   class <%= class_name %> < CanvasOperations::DataFixup
     # See doc/canvas_operations_library.md for more details and options
 
-    mode = :batch
-    progress_tracking = false
+    self.mode = :batch
+    self.progress_tracking = false
 
     scope do
       # Your scope here
