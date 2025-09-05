@@ -22,6 +22,8 @@ class AssessmentQuestion < ActiveRecord::Base
   extend RootAccountResolver
   include Workflow
 
+  attr_accessor :current_user
+
   has_many :quiz_questions, class_name: "Quizzes::QuizQuestion"
   has_many :attachments, as: :context, inverse_of: :context
 
@@ -149,6 +151,10 @@ class AssessmentQuestion < ActiveRecord::Base
         file = file.replacement_attachment
       end
       begin
+        if context_type == "User"
+          raise "User does not have access to file" unless current_user && file&.grants_right?(current_user, nil, :create)
+        end
+
         new_file = file.try(:clone_for, self)
       rescue => e
         new_file = nil
