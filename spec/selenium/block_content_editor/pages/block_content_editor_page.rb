@@ -19,6 +19,8 @@
 require_relative "../../common"
 require_relative "../components/block_component"
 require_relative "../components/toolbar_component"
+require_relative "../components/preview_component"
+require_relative "../components/block_modes/block_component_factory"
 
 module BlockContentEditorPage
   def add_block_modal_selector
@@ -27,6 +29,10 @@ module BlockContentEditorPage
 
   def block_selector
     ".base-block-layout"
+  end
+
+  def add_block_button_selector
+    "button[data-testid='add-block-button']"
   end
 
   def bce_container
@@ -42,7 +48,7 @@ module BlockContentEditorPage
   end
 
   def add_block_button
-    f("button[data-testid='add-block-button']")
+    f(add_block_button_selector)
   end
 
   def add_block_modal
@@ -81,28 +87,40 @@ module BlockContentEditorPage
     f(block_selector)
   end
 
-  def blocks
-    find_all_with_jquery(block_selector).map { |element| BlockComponent.new(element) }
+  def blocks(mode: :edit)
+    find_all_with_jquery(block_selector).map { |element| BlockComponentFactory.create(element, mode:) }
+  end
+
+  def edit_blocks
+    blocks(mode: :edit)
+  end
+
+  def preview_blocks
+    blocks(mode: :preview)
   end
 
   def settings_tray
     f("[data-testid='settings-tray']")
   end
 
-  def block(index = 0)
-    blocks[index]
+  def block(index = 0, mode: :edit)
+    blocks(mode:)[index]
   end
 
-  def first_block
-    blocks.first
+  def first_block(mode: :edit)
+    blocks(mode:).first
   end
 
-  def last_block
-    blocks.last
+  def last_block(mode: :edit)
+    blocks(mode:).last
   end
 
   def toolbar_component
     ToolbarComponent.new
+  end
+
+  def preview_component
+    PreviewComponent.new
   end
 
   def create_wiki_page_with_block_content_editor(course)

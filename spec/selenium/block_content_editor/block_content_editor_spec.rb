@@ -17,11 +17,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 require_relative "../common"
+require_relative "../helpers/wiki_and_tiny_common"
 require_relative "pages/block_content_editor_page"
 
 describe "Block Content Editor", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include BlockContentEditorPage
+  include WikiAndTinyCommon
 
   before do
     course_with_teacher_logged_in
@@ -53,10 +55,10 @@ describe "Block Content Editor", :ignore_js_errors do
       wait_for_ajaximations
 
       expect(block_groups.size).to be > 0
-      expect(selected_block_group.text).to include("Text")
+      expect(selected_block_group.text).to eq("Text")
 
       expect(block_items.size).to be > 0
-      expect(selected_block_item.text).to include("Text column")
+      expect(selected_block_item.text).to eq("Text column")
 
       add_to_page_button.click
       wait_for_ajaximations
@@ -170,13 +172,13 @@ describe "Block Content Editor", :ignore_js_errors do
       add_a_block("Text", "Text column")
       add_a_block("Image", "Image + text")
       expect(blocks.size).to eq(2)
-      expect(first_block.block_type_label.text).to include("Text column")
-      expect(last_block.block_type_label.text).to include("Image + text")
+      expect(first_block.block_type_label.text).to eq("Text column")
+      expect(last_block.block_type_label.text).to eq("Image + text")
 
       toolbar_component.undo_button.click
       wait_for_ajaximations
       expect(blocks.size).to eq(1)
-      expect(first_block.block_type_label.text).to include("Text column")
+      expect(first_block.block_type_label.text).to eq("Text column")
 
       toolbar_component.undo_button.click
       wait_for_ajaximations
@@ -186,14 +188,92 @@ describe "Block Content Editor", :ignore_js_errors do
       toolbar_component.redo_button.click
       wait_for_ajaximations
       expect(blocks.size).to eq(1)
-      expect(first_block.block_type_label.text).to include("Text column")
+      expect(first_block.block_type_label.text).to eq("Text column")
 
       toolbar_component.redo_button.click
       wait_for_ajaximations
       expect(blocks.size).to eq(2)
-      expect(first_block.block_type_label.text).to include("Text column")
-      expect(last_block.block_type_label.text).to include("Image + text")
+      expect(first_block.block_type_label.text).to eq("Text column")
+      expect(last_block.block_type_label.text).to eq("Image + text")
       expect(toolbar_component.redo_button).to be_disabled
+    end
+  end
+
+  context "Preview Mode" do
+    before do
+      add_a_block("Text", "Text column")
+      toolbar_component.preview_button.click
+      wait_for_ajaximations
+    end
+
+    it "toggles preview mode when preview button is clicked" do
+      expect(element_exists?(block_selector)).to be false
+      expect(preview_component.preview_selector_bar).to be_displayed
+      expect(preview_component.preview_layout).to be_displayed
+    end
+
+    it "shows only preview button on toolbar in preview mode" do
+      expect(toolbar_component.toolbar_buttons.size).to eq(1)
+      expect(toolbar_component.preview_button).to be_displayed
+      expect(element_exists?(toolbar_component.undo_button_selector)).to be false
+      expect(element_exists?(toolbar_component.redo_button_selector)).to be false
+      expect(element_exists?(toolbar_component.accessibility_checker_selector)).to be false
+    end
+
+    it "shows desktop view as default" do
+      expect(preview_component.tabs.size).to eq(3)
+      expect(preview_component.is_tab_active?(:desktop)).to be true
+      expect(preview_component.is_tab_active?(:tablet)).to be false
+      expect(preview_component.is_tab_active?(:mobile)).to be false
+    end
+
+    shared_examples "preview mode switching" do |target_mode, other_modes|
+      it "switches to #{target_mode} mode" do
+        tab_method = "#{target_mode}_tab"
+        preview_component.send(tab_method).click
+        wait_for_ajaximations
+
+        expect(preview_component.is_tab_active?(target_mode)).to be true
+        other_modes.each do |mode|
+          expect(preview_component.is_tab_active?(mode)).to be false
+        end
+      end
+    end
+
+    include_examples "preview mode switching", :tablet, [:desktop, :mobile]
+    include_examples "preview mode switching", :mobile, [:desktop, :tablet]
+    include_examples "preview mode switching", :desktop, [:tablet, :mobile]
+
+    it "exits preview mode when preview button is clicked" do
+      expect(preview_component.preview_layout).to be_displayed
+
+      toolbar_component.preview_button.click
+      wait_for_ajaximations
+      expect(element_exists?(preview_component.preview_layout_selector)).to be false
+      expect(block_layout).to be_displayed
+    end
+
+    it "has different widths for each device mode" do
+      desktop_mode_width = preview_component.preview_container_width
+
+      preview_component.tablet_tab.click
+      wait_for_ajaximations
+      tablet_mode_width = preview_component.preview_container_width
+
+      preview_component.mobile_tab.click
+      wait_for_ajaximations
+      mobile_mode_width = preview_component.preview_container_width
+
+      expect(desktop_mode_width).to be > tablet_mode_width
+      expect(tablet_mode_width).to be > mobile_mode_width
+    end
+
+    it "renders preview content without block edit controls" do
+      expect(element_exists?(add_block_button_selector)).to be false
+      blocks.each do |block|
+        expect(element_exists?(block.block_menu_selector)).to be false
+        expect(element_exists?(block.block_type_label_selector)).to be false
+      end
     end
   end
 end

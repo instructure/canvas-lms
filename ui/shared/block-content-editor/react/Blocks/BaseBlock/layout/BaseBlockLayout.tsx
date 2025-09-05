@@ -38,7 +38,7 @@ export const BaseBlockLayout = (
           <Flex data-header>
             <Tag text={props.title} size="medium" data-testid="block-type-label" />
           </Flex>
-          <Flex>{props.menu}</Flex>
+          <Flex data-testid="block-menu">{props.menu}</Flex>
         </Flex>
         <Flex data-focus-reveal-parent margin="0 0 mediumSmall 0">
           {props.topA11yActionMenu}

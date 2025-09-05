@@ -69,6 +69,7 @@ export const ScaleView = (
       borderRadius="medium"
       overflowX="hidden"
       overflowY="hidden"
+      data-testid="scale-view"
     >
       <div
         ref={containerRef}
