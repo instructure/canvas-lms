@@ -219,6 +219,18 @@ module CanvasOperations
       Rails.env.test? && ActiveRecord::Base.in_migration
     end
 
+    def report_message(title:, message:, alert_type: :success)
+      log_message("#{title}: #{message}")
+
+      InstStatsd::Statsd.event(
+        "#{name}: #{title}",
+        "#{name} #{message}",
+        tags: event_tags,
+        type: name,
+        alert_type:
+      )
+    end
+
     private
 
     def use_progress_tracking?
