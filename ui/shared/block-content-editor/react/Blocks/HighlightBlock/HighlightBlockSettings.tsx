@@ -51,10 +51,10 @@ export const HighlightBlockSettings = () => {
         includeSeparator={true}
       >
         <ColorPickerWrapper
-          label={I18n.t('Background')}
+          label={I18n.t('Background color')}
           value={backgroundColor}
           baseColor={highlightColor}
-          baseColorLabel={I18n.t('Highlight')}
+          baseColorLabel={I18n.t('Highlight color')}
           onChange={color =>
             setProp((props: HighlightBlockProps) => {
               props.backgroundColor = color
@@ -81,10 +81,10 @@ export const HighlightBlockSettings = () => {
             }
           />
           <ColorPickerWrapper
-            label={I18n.t('Highlight')}
+            label={I18n.t('Highlight color')}
             value={highlightColor}
             baseColor={textColor}
-            baseColorLabel={I18n.t('Text')}
+            baseColorLabel={I18n.t('Text color')}
             onChange={color =>
               setProp((props: HighlightBlockProps) => {
                 props.highlightColor = color
@@ -92,10 +92,10 @@ export const HighlightBlockSettings = () => {
             }
           />
           <ColorPickerWrapper
-            label={I18n.t('Text')}
+            label={I18n.t('Text color')}
             value={textColor}
             baseColor={highlightColor}
-            baseColorLabel={I18n.t('Highlight')}
+            baseColorLabel={I18n.t('Highlight color')}
             onChange={color =>
               setProp((props: HighlightBlockProps) => {
                 props.textColor = color

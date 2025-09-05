@@ -97,7 +97,7 @@ export const ButtonBlockSettings = () => {
         title={I18n.t('Color settings')}
         collapsedLabel={I18n.t('Expand color settings')}
         expandedLabel={I18n.t('Collapse color settings')}
-        defaultExpanded={false}
+        defaultExpanded={true}
         includeSeparator={true}
       >
         <ButtonBlockColorSettings
