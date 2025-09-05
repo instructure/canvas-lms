@@ -64,15 +64,6 @@ module ConversationsCommon
     selected[0].attribute("value")
   end
 
-  def course_filter
-    skip("course filter selector fails intermittently (stale element reference), probably due to dynamic loading and refreshing")
-    # try to make it load the courses first so it doesn't randomly refresh
-    selector = ".course-filter.bootstrap-select"
-    driver.execute_script(%{$('#{selector}').focus();})
-    wait_for_ajaximations
-    f(selector)
-  end
-
   def message_course
     f(".message_course.bootstrap-select")
   end
@@ -100,11 +91,6 @@ module ConversationsCommon
 
   def select_view(new_view)
     view_filter.find_element(:css, "option[value='#{new_view}']").click
-    wait_for_ajaximations
-  end
-
-  def select_course(new_course)
-    set_bootstrap_select_value(course_filter, new_course)
     wait_for_ajaximations
   end
 

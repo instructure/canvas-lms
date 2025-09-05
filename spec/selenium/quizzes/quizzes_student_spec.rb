@@ -162,10 +162,6 @@ describe "quizzes" do
     end
   end
 
-  context "when a student closes the session without submitting" do
-    it "automatically grades the submission when it becomes overdue", priority: "1"
-  end
-
   context "when the 'show correct answers' setting is on" do
     before(:once) do
       quiz_with_submission

@@ -60,16 +60,6 @@ describe "outcomes as a teacher" do
       import_account_level_outcomes
       expect(f(".ellipsis[title='outcome 0']")).to be_displayed
     end
-
-    it "removes account outcomes from course" do
-      skip("no delete button when seeding, functionality should be available")
-      f(".ellipsis[title='outcome 0']").click
-      import_account_level_outcomes
-      f(".ellipsis[title='outcome 0']").click
-      wait_for_ajaximations
-      msg = "redmine bug on this functionality"
-      expect(msg).to eq ""
-    end
   end
 
   context "find/import dialog" do

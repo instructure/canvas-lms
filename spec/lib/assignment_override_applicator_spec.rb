@@ -489,8 +489,6 @@ describe AssignmentOverrideApplicator do
         expect(overrides.last).to eq @course_override
       end
 
-      it "should order section overrides by position" # see TODO in implementation
-
       context "differentiation tag overrides" do
         before do
           account = @course.account
