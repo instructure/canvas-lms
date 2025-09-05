@@ -1079,6 +1079,25 @@ RSpec.describe YoutubeMigrationService do
       expect(scan_progress.results[:total_converted]).to eq(1)
     end
 
+    it "decreases total count when embed is converted" do
+      initial_total_count = scan_progress.results[:total_count]
+
+      service.mark_embed_as_converted(scan_progress, youtube_embed)
+
+      scan_progress.reload
+      expect(scan_progress.results[:total_count]).to eq(initial_total_count - 1)
+    end
+
+    it "does not decrease total count when embed is already converted" do
+      service.mark_embed_as_converted(scan_progress, youtube_embed)
+      scan_progress.reload
+      first_count = scan_progress.results[:total_count]
+      service.mark_embed_as_converted(scan_progress, youtube_embed)
+      scan_progress.reload
+
+      expect(scan_progress.results[:total_count]).to eq(first_count)
+    end
+
     it "raises error if embed not found" do
       nonexistent_embed = youtube_embed.merge(path: "//iframe[@src='https://www.youtube.com/embed/nonexistent']")
 
