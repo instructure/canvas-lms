@@ -16,30 +16,80 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React, {Component} from 'react'
 import {IconAddSolid} from '@instructure/ui-icons'
+import {View} from '@instructure/ui-view'
+import type {Theme} from '@instructure/ui-themes'
+import {withStyle, WithStyleProps} from '@instructure/emotion'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {FocusHandler} from '../../../hooks/useFocusElement'
+import {getContrastingColors, type ContrastingColors} from '../../../utilities/getContrastingColors'
 
-export const AddButton = (props: {
+const I18n = createI18nScope('block_content_editor')
+
+type AddButtonOwnProps = {
   onClick: () => void
   focusHandler?: FocusHandler | false
-}) => {
-  const handleKeyDown = (event: React.KeyboardEvent) => {
+}
+
+type AddButtonStyleProps = ContrastingColors
+
+type AddButtonProps = AddButtonOwnProps & WithStyleProps<AddButtonStyleProps, AddButtonStyleProps>
+
+class ThemedAddButton extends Component<AddButtonProps> {
+  componentDidMount() {
+    this.props.makeStyles!()
+  }
+
+  handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault()
-      props.onClick()
+      this.props.onClick()
     }
   }
 
-  return (
-    <div
-      role="button"
-      tabIndex={0}
-      onClick={props.onClick}
-      onKeyDown={handleKeyDown}
-      className="image-block-container image-block-add-button"
-      ref={props.focusHandler || undefined}
-    >
-      <IconAddSolid size="medium" />
-    </div>
-  )
+  render() {
+    const {foreground, background} = this.props.styles!
+
+    return (
+      <View
+        as="button"
+        type="button"
+        background="primary"
+        borderWidth="small"
+        borderColor="primary"
+        aria-label={I18n.t('Select to initiate file upload')}
+        elementRef={element => this.props.focusHandler && this.props.focusHandler(element)}
+        onKeyDown={this.handleKeyDown}
+        onClick={this.props.onClick}
+        themeOverride={{
+          backgroundPrimary: background,
+          borderColorPrimary: foreground,
+        }}
+        className="image-block-add-button"
+      >
+        <IconAddSolid size="medium" style={{color: `${foreground}`}} />
+      </View>
+    )
+  }
 }
+
+const generateStyles = (componentTheme: AddButtonStyleProps) =>
+  ({
+    ...componentTheme,
+  }) as AddButtonStyleProps
+
+const generateComponentTheme = (theme: Theme): AddButtonStyleProps => {
+  const brandColor = theme['ic-brand-primary']!
+  const {foreground, background} = getContrastingColors(brandColor)
+
+  return {
+    foreground,
+    background,
+  }
+}
+
+export const AddButton = withStyle(
+  generateStyles,
+  generateComponentTheme,
+)(ThemedAddButton) as React.ComponentType<AddButtonProps>

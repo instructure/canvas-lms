@@ -8,12 +8,11 @@
 }
 
 .image-block-add-button {
-  background-color: #ebf1f9;
-  cursor: pointer;
-}
-
-.image-block-add-button svg {
-  color: #2b7abc;
+  display: flex;
+  width: 100%;
+  height: 300px;
+  align-items: center;
+  justify-content: center;
 }
 
 .image-block-default-preview {
