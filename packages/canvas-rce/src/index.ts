@@ -87,3 +87,5 @@ export function getRCSAuthenticationHeaders(jwt: string) {
 export function getRCSOriginFromHost(host: string) {
   return originFromHost(host)
 }
+
+export {default as checkNode} from './rce/plugins/tinymce-a11y-checker/node-checker'

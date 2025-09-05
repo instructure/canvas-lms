@@ -43,6 +43,10 @@ function setupMockContext(mode: string = 'default') {
       mode,
       setMode: mockSetMode,
     },
+    accessibility: {
+      a11yIssueCount: 0,
+      a11yIssues: [],
+    },
   })
 }
 

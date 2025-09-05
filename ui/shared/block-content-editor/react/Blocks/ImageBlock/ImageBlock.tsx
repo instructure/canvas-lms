@@ -44,12 +44,12 @@ const ImageBlockView = (props: ImageBlockProps) => {
 
 const ImageBlockEditView = (props: ImageBlockProps) => {
   return (
-    <>
+    <Flex direction="column" gap="mediumSmall">
       {props.includeBlockTitle && (
         <TitleEditPreview contentColor={props.titleColor || ''} title={props.title} />
       )}
       <ImageView {...props} />
-    </>
+    </Flex>
   )
 }
 
@@ -60,7 +60,7 @@ const ImageBlockEdit = (props: ImageBlockProps) => {
   const save = useSave(() => ({title}))
 
   return (
-    <>
+    <Flex direction="column" gap="mediumSmall">
       {props.includeBlockTitle && (
         <TitleEdit title={title} onTitleChange={setTitle} focusHandler={focusHandler} />
       )}
@@ -69,7 +69,7 @@ const ImageBlockEdit = (props: ImageBlockProps) => {
         onImageChange={data => save({...data})}
         focusHandler={!props.includeBlockTitle && focusHandler}
       />
-    </>
+    </Flex>
   )
 }
 

@@ -60,7 +60,7 @@ export const blockFactory = {
   [SeparatorLineBlock.name]: () => (
     <SeparatorLineBlock
       thickness="medium"
-      separatorColor={colors.ui.lineDivider}
+      separatorColor={colors.primitives.grey57}
       backgroundColor={defaultBackgroundColor}
     />
   ),

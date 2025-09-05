@@ -40,6 +40,7 @@ export const HighlightBlockLayout = ({
       themeOverride={{
         backgroundPrimary: backgroundColor,
       }}
+      display="block"
     >
       <Flex gap="mediumSmall" direction="row">
         {icon && <Flex.Item data-testid="highlight-icon">{icon}</Flex.Item>}

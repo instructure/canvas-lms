@@ -16,20 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useEditor, useNode} from '@craftjs/core'
-import {useBlockContentEditorContext} from '../BlockContentEditorContext'
-
-export const useDeleteNode = () => {
-  const {id} = useNode()
-  const {actions} = useEditor()
-  const {
-    accessibility: {removeA11yIssues},
-  } = useBlockContentEditorContext()
-
-  const deleteNode = () => {
-    removeA11yIssues(id)
-    actions.delete(id)
-  }
-
-  return deleteNode
+export interface AccessibilityRule {
+  id: string
+  test: (elem: Element) => boolean | Promise<boolean>
+  message: () => string
+  why: () => string
+  link: string
+  linkText: () => string
 }
+
+export interface AccessibilityIssue {
+  node: Element
+  rule: AccessibilityRule
+}
+
+export interface AccessibilityCheckResult {
+  issues: AccessibilityIssue[]
+}
+
+export type AccessibilityIssuesMap = Map<string, AccessibilityIssue[]>
