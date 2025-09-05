@@ -23,6 +23,8 @@ import {BaseBlockViewLayout} from './layout/BaseBlockViewLayout'
 import {useBlockContentEditorContext} from '../../BlockContentEditorContext'
 import {BaseBlockEditWrapper} from './components/BaseBlockEditWrapper'
 import {Mask} from './components/Mask/Mask'
+import {AccessibilityChecker} from './components/AccessibilityChecker'
+import type {AccessibilityIssue} from '../../accessibilityChecker/types'
 
 function BaseBlockViewerMode<T extends {}>(props: ComponentProps<typeof BaseBlock<T>>) {
   const Component = props.ViewComponent
@@ -36,10 +38,24 @@ function BaseBlockViewerMode<T extends {}>(props: ComponentProps<typeof BaseBloc
 function BaseBlockEditorMode<T extends {}>(props: ComponentProps<typeof BaseBlock<T>>) {
   const {settingsTray} = useBlockContentEditorContext()
   const {isEditingBlock} = useIsEditingBlock()
-  const Component = isEditingBlock ? props.EditComponent : props.EditViewComponent
+
+  const renderBlockContent = () => {
+    const Component = isEditingBlock ? props.EditComponent : props.EditViewComponent
+
+    if (isEditingBlock) {
+      return <Component {...props.componentProps} />
+    }
+
+    return (
+      <AccessibilityChecker componentProps={props.componentProps}>
+        <Component {...props.componentProps} />
+      </AccessibilityChecker>
+    )
+  }
+
   return (
     <BaseBlockEditWrapper title={props.title} backgroundColor={props.backgroundColor}>
-      <Component {...props.componentProps} />
+      {renderBlockContent()}
       {settingsTray.isOpen && <Mask />}
     </BaseBlockEditWrapper>
   )
@@ -52,6 +68,7 @@ export function BaseBlock<T extends {}>(props: {
   componentProps: T
   title: string
   backgroundColor?: string
+  a11yCheck?: (props: T) => AccessibilityIssue[]
 }) {
   const isInEditor = useIsInEditor()
   const Component = isInEditor ? BaseBlockEditorMode : BaseBlockViewerMode

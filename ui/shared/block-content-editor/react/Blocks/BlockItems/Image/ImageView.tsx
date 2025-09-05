@@ -34,10 +34,9 @@ export const ImageView = ({
   return (
     <Flex direction="column" gap="mediumSmall">
       {url ? (
-        // eslint-disable-next-line jsx-a11y/alt-text
         <img
           src={url}
-          alt={decorativeImage ? undefined : altText}
+          alt={decorativeImage ? '' : altText}
           role={decorativeImage ? 'presentation' : undefined}
         />
       ) : (

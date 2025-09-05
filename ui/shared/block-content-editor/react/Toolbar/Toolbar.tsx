@@ -21,15 +21,19 @@ import {View} from '@instructure/ui-view'
 import {PreviewButton} from './PreviewButton'
 import {RedoButton} from './RedoButton'
 import {UndoButton} from './UndoButton'
+import {AccessibilityCheckerButton} from './AccessibilityCheckerButton'
 import {useBlockContentEditorContext} from '../BlockContentEditorContext'
 import {useEditHistory} from '../hooks/useEditHistory'
 
 export const Toolbar = () => {
   const {
     editor: {mode, setMode},
+    accessibility: {a11yIssueCount, a11yIssues},
   } = useBlockContentEditorContext()
   const {undo, redo, canUndo, canRedo} = useEditHistory()
   const isPreviewMode = mode === 'preview'
+
+  const allIssues = Array.from(a11yIssues.values()).flat()
 
   return (
     <View shadow="resting" display="block">
@@ -42,6 +46,7 @@ export const Toolbar = () => {
           <>
             <UndoButton active={canUndo} onClick={undo} />
             <RedoButton active={canRedo} onClick={redo} />
+            <AccessibilityCheckerButton count={a11yIssueCount} issues={allIssues} />
           </>
         )}
       </Flex>

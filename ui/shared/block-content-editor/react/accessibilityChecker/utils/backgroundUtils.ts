@@ -16,20 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useEditor, useNode} from '@craftjs/core'
-import {useBlockContentEditorContext} from '../BlockContentEditorContext'
-
-export const useDeleteNode = () => {
-  const {id} = useNode()
-  const {actions} = useEditor()
-  const {
-    accessibility: {removeA11yIssues},
-  } = useBlockContentEditorContext()
-
-  const deleteNode = () => {
-    removeA11yIssues(id)
-    actions.delete(id)
+export function getInheritedBackgroundColor(element: Element): string {
+  let el: Element | null = element
+  while (el) {
+    const bg = window.getComputedStyle(el).backgroundColor
+    if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)') {
+      return bg
+    }
+    el = el.parentElement
   }
-
-  return deleteNode
+  return '#fff'
 }
