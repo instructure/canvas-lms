@@ -224,16 +224,16 @@ lti_cache_tool_public_jwks_url:
     for a short amount of time during deep linking flows. If disabled,
     the JWKs will be fetched on every request to deep_linking_response.
   environments:
-      development:
-        state: allowed_on
-      test:
-        state: allowed_on
-      ci:
-        state: allowed_on
-      beta:
-        state: allowed_on
-      production:
-        state: allowed_on
+    development:
+      state: allowed_on
+    test:
+      state: allowed_on
+    ci:
+      state: allowed_on
+    beta:
+      state: allowed_on
+    production:
+      state: allowed_on
 lti_context_copy_notice:
   state: hidden
   shadow: true
@@ -478,6 +478,19 @@ remove_unwanted_lti_validation_claims:
     development:
       state: allowed_on
     test:
+      state: allowed_on
+    ci:
+      state: allowed_on
+student_access_token_management:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Student Access Token Management
+  description: |-
+    If enabled, Canvas will enforce an expiration of at most 120 days 
+    to student access tokens for security purposes, and allow Admins
+    to delete student access tokens.
+  environments:
+    development:
       state: allowed_on
     ci:
       state: allowed_on

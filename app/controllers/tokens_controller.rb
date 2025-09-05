@@ -20,6 +20,9 @@
 # @API Access Tokens
 class TokensController < ApplicationController
   include Api::V1::Token
+  include StudentEnrollmentHelper
+
+  MAXIMUM_EXPIRATION_DURATION = 120.days
 
   before_action :require_registered_user
   before_action :get_context
@@ -55,7 +58,23 @@ class TokensController < ApplicationController
   def create
     token_params = access_token_params
 
-    return render(json: { errors: [{ message: "token[purpose] is missing" }] }, status: :bad_request) unless token_params.key?(:purpose)
+    return render_error("token[purpose] is missing") unless token_params.key?(:purpose)
+
+    # Force an expiration date for students
+    if Account.site_admin.feature_enabled?(:student_access_token_management) &&
+       user_has_only_student_enrollments?(@current_user)
+
+      return render_error("Expiration date is required") unless token_params[:permanent_expires_at]
+
+      begin
+        expiration_date = Time.zone.parse(token_params[:permanent_expires_at])
+        if expiration_date > MAXIMUM_EXPIRATION_DURATION.from_now
+          return render_error("Expiration date cannot be more than 120 days in the future")
+        end
+      rescue ArgumentError
+        return render_error("Invalid expiration date format")
+      end
+    end
 
     token_params[:developer_key] = DeveloperKey.default
     @token = @context.access_tokens.build(token_params)
@@ -154,5 +173,12 @@ class TokensController < ApplicationController
     # rename for API
     result[:permanent_expires_at] = result.delete(:expires_at) if result.key?(:expires_at)
     result
+  end
+
+  def render_error(message, status = :bad_request)
+    render(json: [{
+             message:,
+           }],
+           status:)
   end
 end

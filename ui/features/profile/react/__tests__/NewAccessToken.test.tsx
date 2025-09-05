@@ -31,6 +31,8 @@ describe('NewAccessToken', () => {
   beforeEach(() => {
     window.ENV = window.ENV || {}
     window.ENV.TIMEZONE = 'America/Denver'
+    window.ENV.FEATURES = window.ENV.FEATURES || {}
+    window.ENV.user_is_only_student = false
     moment.tz.setDefault(window.ENV.TIMEZONE)
   })
 
@@ -45,14 +47,14 @@ describe('NewAccessToken', () => {
     expect(errorText).toBeInTheDocument()
   })
 
-  // fickle
-  it.skip('should show an error if the purpose field is too long', async () => {
+  it('should show an error if the purpose field is too long', async () => {
     const user = userEvent.setup()
     render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
     const submit = screen.getByLabelText('Generate Token')
-    const purpose = screen.getByLabelText('Purpose')
+    const purpose = screen.getByLabelText(/Purpose/)
+    purpose.focus()
 
-    await user.type(purpose, 'a'.repeat(256))
+    await user.paste('a'.repeat(256))
     await user.click(submit)
 
     const errorText = await screen.findByText(
@@ -61,15 +63,15 @@ describe('NewAccessToken', () => {
     expect(errorText).toBeInTheDocument()
   })
 
-  // fickle
-  it.skip('should show an error if the network request fails', async () => {
+  it('should show an error if the network request fails', async () => {
     const user = userEvent.setup()
     fetchMock.post(GENERATE_ACCESS_TOKEN_URI, 500, {overwriteRoutes: true})
     render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
     const submit = screen.getByLabelText('Generate Token')
-    const purpose = screen.getByLabelText('Purpose')
+    const purpose = screen.getByLabelText(/Purpose/)
 
-    await user.type(purpose, 'a'.repeat(20))
+    purpose.focus()
+    await user.paste('a'.repeat(20))
     await user.click(submit)
 
     const errorAlert = await screen.findByRole('alert')
@@ -82,11 +84,12 @@ describe('NewAccessToken', () => {
     fetchMock.post(GENERATE_ACCESS_TOKEN_URI, {token}, {overwriteRoutes: true})
     render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
     const submit = screen.getByLabelText('Generate Token')
-    const purpose = screen.getByLabelText('Purpose')
+    const purpose = screen.getByLabelText(/Purpose/)
 
     // Type the text and wait for it to be fully entered
     await user.clear(purpose)
-    await user.type(purpose, token.purpose)
+    purpose.focus()
+    await user.paste(token.purpose)
     expect(purpose).toHaveValue(token.purpose)
 
     await user.click(submit)
@@ -124,18 +127,21 @@ describe('NewAccessToken', () => {
     fetchMock.post(GENERATE_ACCESS_TOKEN_URI, {token}, {overwriteRoutes: true})
     render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
     const submit = screen.getByLabelText('Generate Token')
-    const purpose = screen.getByLabelText('Purpose')
+    const purpose = screen.getByLabelText(/Purpose/)
     const expirationDateInput = screen.getByLabelText('Expiration date')
     const expirationTimeInput = screen.getByLabelText('Expiration time')
 
     // Type the text and wait for it to be fully entered
     await user.clear(purpose)
-    await user.type(purpose, token.purpose)
+    purpose.focus()
+    await user.paste(token.purpose)
     expect(purpose).toHaveValue(token.purpose)
 
-    await user.type(expirationDateInput, expirationDateValue)
+    expirationDateInput.focus()
+    await user.paste(expirationDateValue)
     await user.tab() // blur the date field
-    await user.type(expirationTimeInput, expirationTimeValue)
+    expirationTimeInput.focus()
+    await user.paste(expirationTimeValue)
     await user.tab() // blur the time field
     await user.click(submit)
 
@@ -157,4 +163,194 @@ describe('NewAccessToken', () => {
       {timeout: 20000}, // Increase timeout for CI
     )
   }, 30000) // Add test timeout
+
+  describe('Feature flag behavior', () => {
+    describe('when feature flag is enabled and user is only a student', () => {
+      beforeEach(() => {
+        window.ENV.FEATURES!.student_access_token_management = true
+        window.ENV.user_is_only_student = true
+      })
+
+      it('should require an expiration date', async () => {
+        const user = userEvent.setup()
+        render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
+        const submit = screen.getByLabelText('Generate Token')
+        const purpose = screen.getByLabelText(/Purpose/)
+        const expirationDateInput = screen.getByLabelText(/Expiration date/)
+
+        // Check that expiration is marked as required
+        expect(expirationDateInput).toBeRequired()
+
+        purpose.focus()
+        await user.paste('Test purpose')
+        await user.click(submit)
+
+        // Should show validation error for missing expiration date
+        await waitFor(() => {
+          expect(screen.getByText('Expiration date is required.')).toBeInTheDocument()
+        })
+      })
+
+      it('should show maximum expiration hint message', () => {
+        render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
+
+        expect(screen.getByText('Maximum expiration is 120 days.')).toBeInTheDocument()
+      })
+
+      it('should prevent selecting dates beyond 120 days', async () => {
+        const user = userEvent.setup()
+        render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
+        const purpose = screen.getByLabelText(/Purpose/)
+        const submit = screen.getByLabelText('Generate Token')
+
+        // Try to enter a date that's too far in the future (e.g., 150 days)
+        const futureDate = new Date()
+        futureDate.setDate(futureDate.getDate() + 150)
+        const futureDateString = futureDate.toLocaleDateString('en-US', {
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric',
+        })
+
+        const expirationDateInput = screen.getByLabelText(/Expiration date/)
+        const expirationTimeInput = screen.getByLabelText(/Expiration time/)
+
+        purpose.focus()
+        await user.paste('Test purpose')
+        expirationDateInput.focus()
+        await user.paste(futureDateString)
+        await user.tab() // blur the date field
+        expirationTimeInput.focus()
+        await user.paste('12:00 AM')
+        await user.tab() // blur the time field
+        await user.click(submit)
+
+        await waitFor(() => {
+          expect(
+            screen.getByText('Expiration date cannot be more than 120 days in the future.'),
+          ).toBeInTheDocument()
+        })
+      })
+
+      it('should accept a valid expiration date within 120 days', async () => {
+        const user = userEvent.setup()
+        const validDate = new Date()
+        validDate.setDate(validDate.getDate() + 30) // 30 days from now
+        const token = {
+          purpose: 'Test purpose',
+          expires_at: validDate.toISOString(),
+        }
+        const validDateString = validDate.toLocaleDateString('en-US', {
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric',
+        })
+
+        fetchMock.post(GENERATE_ACCESS_TOKEN_URI, {token}, {overwriteRoutes: true})
+        render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
+
+        const submit = screen.getByLabelText('Generate Token')
+        const purpose = screen.getByLabelText(/Purpose/)
+        const expirationDateInput = screen.getByLabelText(/Expiration date/)
+        const expirationTimeInput = screen.getByLabelText(/Expiration time/)
+
+        purpose.focus()
+        await user.paste(token.purpose)
+        expirationDateInput.focus()
+        await user.paste(validDateString)
+        await user.tab() // blur the date field
+        expirationTimeInput.focus()
+        await user.paste('12:00 AM')
+        await user.tab() // blur the time field
+        await user.click(submit)
+
+        await waitFor(
+          () => {
+            expect(fetchMock.called(GENERATE_ACCESS_TOKEN_URI)).toBe(true)
+          },
+          {timeout: 10000},
+        )
+      })
+    })
+
+    describe('when feature flag is disabled or user is not only a student', () => {
+      beforeEach(() => {
+        window.ENV.FEATURES!.student_access_token_management = false
+        window.ENV.user_is_only_student = false
+      })
+
+      it('should not require an expiration date', () => {
+        render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
+        const expirationDateInput = screen.getByLabelText('Expiration date')
+
+        // Check that expiration is not marked as required
+        expect(expirationDateInput).not.toBeRequired()
+      })
+
+      it('should show no expiration hint message', () => {
+        render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
+
+        expect(
+          screen.getByText('Leave the expiration fields blank for no expiration.'),
+        ).toBeInTheDocument()
+      })
+
+      it('should allow submission without expiration date', async () => {
+        const user = userEvent.setup()
+        const token = {purpose: 'Test purpose'}
+        fetchMock.post(GENERATE_ACCESS_TOKEN_URI, {token}, {overwriteRoutes: true})
+        render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
+
+        const submit = screen.getByLabelText('Generate Token')
+        const purpose = screen.getByLabelText(/Purpose/)
+
+        purpose.focus()
+        await user.paste(token.purpose)
+        await user.click(submit)
+
+        await waitFor(
+          () => {
+            expect(fetchMock.called(GENERATE_ACCESS_TOKEN_URI)).toBe(true)
+          },
+          {timeout: 10000},
+        )
+      })
+    })
+
+    describe('when user is only a student but feature flag is disabled', () => {
+      beforeEach(() => {
+        window.ENV.FEATURES!.student_access_token_management = false
+        window.ENV.user_is_only_student = true
+      })
+
+      it('should not enforce restrictions', () => {
+        render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
+        const expirationDateInput = screen.getByLabelText('Expiration date')
+
+        // Should behave like normal user when feature flag is disabled
+        expect(expirationDateInput).not.toBeRequired()
+        expect(
+          screen.getByText('Leave the expiration fields blank for no expiration.'),
+        ).toBeInTheDocument()
+      })
+    })
+
+    describe('when feature flag is enabled but user is not only a student', () => {
+      beforeEach(() => {
+        window.ENV.FEATURES!.student_access_token_management = true
+        window.ENV.user_is_only_student = false
+      })
+
+      it('should not enforce restrictions', () => {
+        render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
+        const expirationDateInput = screen.getByLabelText('Expiration date')
+
+        // Should behave like normal user when user is not only a student
+        expect(expirationDateInput).not.toBeRequired()
+        expect(
+          screen.getByText('Leave the expiration fields blank for no expiration.'),
+        ).toBeInTheDocument()
+      })
+    })
+  })
 })

@@ -264,7 +264,10 @@ describe TokensController do
         before(:once) { Account.default.root_account.enable_feature!(:admin_manage_access_tokens) }
 
         context "with limit_personal_access_tokens setting on" do
-          before(:once) { Account.default.change_root_account_setting!(:limit_personal_access_tokens, true) }
+          before(:once) do
+            Account.default.change_root_account_setting!(:limit_personal_access_tokens, true)
+            Account.site_admin.disable_feature!(:student_access_token_management)
+          end
 
           context "as non-admin" do
             it "does not allow creating an access token" do
@@ -367,7 +370,10 @@ describe TokensController do
         end
 
         context "with restrict_personal_access_tokens_from_students setting on" do
-          before(:once) { Account.default.change_root_account_setting!(:restrict_personal_access_tokens_from_students, true) }
+          before(:once) do
+            Account.default.change_root_account_setting!(:restrict_personal_access_tokens_from_students, true)
+            Account.site_admin.disable_feature!(:student_access_token_management)
+          end
 
           shared_examples_for "access token creation and update denied" do
             it "does not allow creating an access token" do
@@ -425,6 +431,82 @@ describe TokensController do
               token = @user.access_tokens.create!(purpose: "test")
               put "update", params: { user_id: "self", id: token.id, token: { regenerate: "1" } }
               assert_status(200)
+            end
+          end
+        end
+
+        context "with student_access_token_management flag" do
+          context "when flag is off" do
+            before(:once) { Account.site_admin.disable_feature!(:student_access_token_management) }
+
+            it "doesn't enforce expiry for any user" do
+              post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
+              expect(response).to be_successful
+              expect(assigns[:token].permanent_expires_at).to be_nil
+            end
+          end
+
+          context "when flag is on" do
+            before(:once) { Account.site_admin.enable_feature!(:student_access_token_management) }
+
+            context "as an admin" do
+              before(:once) { @admin = account_admin_user }
+              before { user_session(@admin) }
+
+              it "doesn't enforce expiry for an admin" do
+                post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
+                expect(response).to be_successful
+                expect(assigns[:token].permanent_expires_at).to be_nil
+              end
+            end
+
+            context "as a teacher" do
+              before do
+                course_with_teacher(active_all: true, user: @user)
+              end
+
+              it "doesn't enforce expiry for a teacher" do
+                post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
+                expect(response).to be_successful
+                expect(assigns[:token].permanent_expires_at).to be_nil
+              end
+            end
+
+            context "as a teacher with student enrollments" do
+              before do
+                course_with_teacher(active_all: true, user: @user)
+                course_with_student(active_all: true, user: @user)
+              end
+
+              it "doesn't enforce expiry for a teacher with some student enrollments" do
+                post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
+                expect(response).to be_successful
+                expect(assigns[:token].permanent_expires_at).to be_nil
+              end
+            end
+
+            context "as a user with only student enrollments" do
+              before do
+                course_with_student(active_all: true, user: @user)
+              end
+
+              it "rejects tokens without expiry" do
+                post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
+                # expect response to not be successful
+                expect(response).not_to be_successful
+              end
+
+              it "rejects tokens with an expiry past the maximum" do
+                expires_at = (TokensController::MAXIMUM_EXPIRATION_DURATION + 1.day).from_now
+                post "create", params: { user_id: "self", token: { purpose: "test", expires_at: } }
+                expect(response).not_to be_successful
+              end
+
+              it "allows tokens with an expiry" do
+                expires_at = (TokensController::MAXIMUM_EXPIRATION_DURATION - 1.day).from_now
+                post "create", params: { user_id: "self", token: { purpose: "test", expires_at: } }
+                expect(response).to be_successful
+              end
             end
           end
         end

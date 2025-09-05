@@ -126,6 +126,7 @@ export interface EnvCommon {
   current_user_roles: string[]
   current_user_is_student: boolean
   current_user_is_admin: boolean
+  user_is_only_student: boolean
   current_user_types: string[]
   current_user_disabled_inbox: boolean
   current_user_visited_tabs: null | string[]
@@ -307,6 +308,7 @@ export type SiteAdminFeatureId =
   | 'render_both_to_do_lists'
   | 'scheduled_feedback_releases'
   | 'speedgrader_studio_media_capture'
+  | 'student_access_token_management'
   | 'validate_call_to_action'
   | 'youtube_migration'
   | 'youtube_overlay'
