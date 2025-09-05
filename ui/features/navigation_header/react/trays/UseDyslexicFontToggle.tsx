@@ -165,9 +165,10 @@ export default function DyslexicFontToggle({isMobile}: DyslexicFontToggleProps) 
         checked={enabled}
         readOnly={loading}
         onChange={toggleDyslexicFont}
+        aria-describedby={changed ? 'dyslexic-font-toggle-explainer' : undefined}
       />
       {changed && (
-        <Text size="small">
+        <Text id="dyslexic-font-toggle-explainer" size="small">
           {I18n.t('Reload the page or navigate to a new page for this change to take effect.')}
         </Text>
       )}

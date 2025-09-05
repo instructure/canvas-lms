@@ -182,9 +182,10 @@ export default function HighContrastModeToggle({isMobile}: HighContrastModeToggl
         checked={enabled}
         readOnly={loading}
         onChange={toggleHiContrast}
+        aria-describedby={changed ? 'high-contrast-toggle-explainer' : undefined}
       />
       {changed && (
-        <Text size="small">
+        <Text id="high-contrast-toggle-explainer" size="small">
           {I18n.t('Reload the page or navigate to a new page for this change to take effect.')}
         </Text>
       )}
