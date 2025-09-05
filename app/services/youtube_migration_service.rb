@@ -509,6 +509,7 @@ class YoutubeMigrationService
         resource[:embeds][index][:converted_at] = Time.now.utc
         resource[:converted_count] = (resource[:converted_count] || 0) + 1
         scan_progress.results[:total_converted] = (scan_progress.results[:total_converted] || 0) + 1
+        scan_progress.results[:total_count] = [scan_progress.results[:total_count] - 1, 0].max
       end
 
       scan_progress.results[:resources][key] = resource
