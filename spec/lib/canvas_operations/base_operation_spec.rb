@@ -382,4 +382,75 @@ RSpec.describe CanvasOperations::BaseOperation do
       fail_operation
     end
   end
+
+  describe "#report_message" do
+    subject(:report_message) { operation_instance.send(:report_message, title:, message:, alert_type:) }
+
+    include_context "simple operation"
+
+    let(:operation_instance) { MyOperation.new }
+    let(:title) { "Test Title" }
+    let(:message) { "Test message content" }
+    let(:alert_type) { :success }
+
+    it "logs the message with title" do
+      expect(operation_instance).to receive(:log_message).with("#{title}: #{message}").once
+
+      report_message
+    end
+
+    it "emits an InstStatsd event with correct parameters" do
+      expect(InstStatsd::Statsd).to receive(:event).with(
+        "my_operation: #{title}",
+        "my_operation #{message}",
+        {
+          tags: { cluster: Shard.current.database_server.id, shard: Shard.current.id },
+          type: "my_operation",
+          alert_type:
+        }
+      ).once
+
+      report_message
+    end
+
+    context "with different alert types" do
+      %i[error warning info].each do |type|
+        context "when alert_type is #{type}" do
+          let(:alert_type) { type }
+
+          it "uses the correct alert_type in the event" do
+            expect(InstStatsd::Statsd).to receive(:event).with(
+              "my_operation: #{title}",
+              "my_operation #{message}",
+              {
+                tags: { cluster: Shard.current.database_server.id, shard: Shard.current.id },
+                type: "my_operation",
+                alert_type: type
+              }
+            ).once
+
+            report_message
+          end
+        end
+      end
+    end
+
+    context "with default alert_type" do
+      subject(:report_message) { operation_instance.send(:report_message, title:, message:) }
+
+      it "defaults to :success alert_type" do
+        expect(InstStatsd::Statsd).to receive(:event).with(
+          "my_operation: #{title}",
+          "my_operation #{message}",
+          {
+            tags: { cluster: Shard.current.database_server.id, shard: Shard.current.id },
+            type: "my_operation",
+            alert_type: :success
+          }
+        ).once
+
+        report_message
+      end
+    end
+  end
 end
