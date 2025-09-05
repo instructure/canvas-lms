@@ -2298,8 +2298,10 @@ class CoursesController < ApplicationController
 
       @unauthorized_message = t("unauthorized.invalid_link", "The enrollment link you used appears to no longer be valid.  Please contact the course instructor and make sure you're still correctly enrolled.") if params[:invitation]
       GuardRail.activate(:primary) do
-        claim_course if session[:claim_course_uuid] || params[:verification]
-        @context.claim if @context.created?
+        Course.process_as_sis do
+          claim_course if session[:claim_course_uuid] || params[:verification]
+          @context.claim if @context.created?
+        end
       end
       return if check_enrollment
 

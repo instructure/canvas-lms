@@ -1896,6 +1896,16 @@ describe CoursesController do
         expect(response).to be_successful
         expect(assigns[:pending_enrollment]).to eq @enrollment
       end
+
+      it "doesn't sticky `workflow_state` when changing from `created` to `claimed`" do
+        @course.update workflow_state: "created", stuck_sis_fields: []
+        user_session(@teacher)
+        get "show", params: { id: @course.id }
+        expect(response).to be_successful
+        @course.reload
+        expect(@course.workflow_state).to eq "claimed"
+        expect(@course.stuck_sis_fields).to be_empty
+      end
     end
 
     it "sets ENV.COURSE_ID for assignments view" do
