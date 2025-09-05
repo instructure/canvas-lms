@@ -56,6 +56,7 @@ import PublishCloud from '@canvas/files/react/components/PublishCloud'
 import ModuleFile from '@canvas/files/backbone/models/ModuleFile'
 import {dispatchCommandEvent} from '../handlers/dispatchCommandEvent'
 import {MODULE_ITEMS, MODULE_ITEMS_ALL} from '../utils/constants'
+import {usePublishing} from '@canvas/context-modules/react/publishing/publishingContext'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -109,6 +110,9 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
     permissions,
     moduleCursorState,
   } = useContextModule()
+
+  const publishingContext = usePublishing()
+  const publishingInProgress = !!publishingContext?.publishingInProgress
 
   const renderMasteryPathsInfo = () => {
     if (!masteryPathsData || (!masteryPathsData.isTrigger && !masteryPathsData.releasedLabel)) {
@@ -251,7 +255,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
       },
     }
 
-    return <PublishCloud {...props} model={file} disabled={false} />
+    return <PublishCloud {...props} model={file} disabled={publishingInProgress} />
   }
 
   const renderItemPublishButton = () => {
@@ -264,7 +268,11 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
         withBorder={false}
         color={published ? 'success' : 'secondary'}
         size="small"
-        interaction={canBeUnpublished && isPublishButtonEnabled ? 'enabled' : 'disabled'}
+        interaction={
+          canBeUnpublished && isPublishButtonEnabled && !publishingInProgress
+            ? 'enabled'
+            : 'disabled'
+        }
         onClick={publishIconOnClickRef}
       />
     )

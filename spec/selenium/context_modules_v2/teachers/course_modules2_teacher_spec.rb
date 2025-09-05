@@ -955,7 +955,7 @@ describe "context modules", :ignore_js_errors do
 
         go_to_modules
         wait_for_ajaximations
-        module_publish_menu(@module1.id).click
+        module_publish_menu_for(@module1.id).click
 
         module_publish_with_all_items.click
 
@@ -974,7 +974,7 @@ describe "context modules", :ignore_js_errors do
 
         go_to_modules
         wait_for_ajaximations
-        module_publish_menu(@module1.id).click
+        module_publish_menu_for(@module1.id).click
 
         module_publish.click
 
@@ -991,7 +991,7 @@ describe "context modules", :ignore_js_errors do
       it "unpublishes the module and all its items" do
         go_to_modules
         wait_for_ajaximations
-        module_publish_menu(@module1.id).click
+        module_publish_menu_for(@module1.id).click
 
         module_unpublish_with_all_items.click
 
@@ -1008,7 +1008,7 @@ describe "context modules", :ignore_js_errors do
       it "unpublishes the module but not its items" do
         go_to_modules
         wait_for_ajaximations
-        module_publish_menu(@module1.id).click
+        module_publish_menu_for(@module1.id).click
 
         module_unpublish.click
 
@@ -1060,6 +1060,30 @@ describe "context modules", :ignore_js_errors do
         expect(modules_published_icon_state?(published: true)).to be true
         expand_all_modules
         expect(module_items_published_icon_state?(published: false)).to be true
+      end
+
+      it "displays spinners correctly" do
+        prepare_unpublished_modules(@course.context_modules)
+
+        go_to_modules
+        wait_for_ajaximations
+
+        # Count how many publish buttons are present
+        module_header_publish_buttons_count = module_publish_menu_buttons.length
+        expect(module_header_publish_buttons_count).to eq @course.context_modules.count
+
+        publish_all_menu.click
+        publish_modules_only.click
+        publish_module_only_continue_button.click
+        expect(element_exists?(module_publish_menu_spinner_selector)).to be true
+        # Spinners appear on each module's publish button
+        expect(module_publish_menu_button_spinners.length).to eq module_header_publish_buttons_count
+
+        run_jobs
+        wait_until_bulk_publish_action_finished
+        wait_for_ajaximations
+        # Spinners go away after publishing is finished
+        expect(modules_published_icon_state?(published: true)).to be true
       end
     end
 

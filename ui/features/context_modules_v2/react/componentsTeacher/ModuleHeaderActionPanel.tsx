@@ -34,6 +34,7 @@ import {useContextModule} from '../hooks/useModuleContext'
 import {useModules} from '../hooks/queries/useModules'
 import AddItemModal from './AddItemModalComponents/AddItemModal'
 import ViewAssignTo from './ViewAssignToTrayComponents/ViewAssignTo'
+import {usePublishing} from '@canvas/context-modules/react/publishing/publishingContext'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -75,6 +76,8 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
   const {courseId, modulesArePaginated, pageSize, permissions} = useContextModule()
   const {getModuleItemsTotalCount} = useModules(courseId, 'teacher')
   const totalCount = getModuleItemsTotalCount(id) || 0
+
+  const publishingContext = usePublishing()
 
   useEffect(() => {
     setIsPublishing(false)
@@ -127,7 +130,7 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
               moduleId={id}
               moduleName={name}
               published={published}
-              isPublishing={isPublishing}
+              isPublishing={isPublishing || !!publishingContext?.publishingInProgress}
               setIsPublishing={setIsPublishing}
               onPublishComplete={onPublishCompleteRef}
             />

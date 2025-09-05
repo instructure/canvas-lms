@@ -37,6 +37,7 @@ import {
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useContextModule} from '../hooks/useModuleContext'
 import type {ModuleItemContent} from '../utils/types'
+import {usePublishing} from '@canvas/context-modules/react/publishing/publishingContext'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -113,6 +114,9 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
   const showAssignTo = !!content?.canManageAssignTo
   const showDirectShare = canDirectShare && !isBasic && !isExternalTool
 
+  const publishingContext = usePublishing()
+  const publishingInProgress = !!publishingContext?.publishingInProgress
+
   const renderMenuItem = (condition: boolean, handler: () => void, icon: any, label: string) => {
     if (!condition) return null
     return (
@@ -129,6 +133,7 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
     <Menu
       onToggle={isOpen => setIsMenuOpen(isOpen)}
       open={isMenuOpen}
+      disabled={publishingInProgress}
       trigger={
         <IconButton
           screenReaderLabel={I18n.t('Module Item Options')}

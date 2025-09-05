@@ -242,8 +242,16 @@ module Modules2IndexPage
     "#{module_header_selector(module_id)} progress"
   end
 
-  def module_publish_menu_selector(module_id)
-    "#{module_header_selector(module_id)} [data-testid='module-publish-menu']"
+  def module_publish_menu_selector
+    "[data-testid='module-publish-menu']"
+  end
+
+  def module_publish_menu_for_module_selector(module_id)
+    "#{module_header_selector(module_id)} #{module_publish_menu_selector}"
+  end
+
+  def module_publish_menu_spinner_selector
+    "#{module_publish_menu_selector} [data-testid='publish-icon-spinner']"
   end
 
   def module_publish_with_all_items_selector
@@ -735,8 +743,16 @@ module Modules2IndexPage
     f(unpublish_modules_only_selector)
   end
 
-  def module_publish_menu(module_id)
-    f(module_publish_menu_selector(module_id))
+  def module_publish_menu_buttons
+    ff(module_publish_menu_selector)
+  end
+
+  def module_publish_menu_for(module_id)
+    f(module_publish_menu_for_module_selector(module_id))
+  end
+
+  def module_publish_menu_button_spinners
+    ff(module_publish_menu_spinner_selector)
   end
 
   def module_publish_with_all_items
