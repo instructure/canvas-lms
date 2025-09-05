@@ -17,48 +17,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../../common"
+require_relative "../block_component"
 
-class ToolbarComponent
-  include SeleniumDependencies
-
-  def toolbar
-    f(".toolbar-area")
+class PreviewBlockComponent < BlockComponent
+  def block_title
+    f("h2", @block)
   end
 
-  def toolbar_buttons
-    ff("button", toolbar)
-  end
-
-  def preview_button_selector
-    "[data-testid='preview-button']"
-  end
-
-  def undo_button_selector
-    "[data-testid='undo-button']"
-  end
-
-  def redo_button_selector
-    "[data-testid='redo-button']"
-  end
-
-  def accessibility_checker_selector
-    "[data-testid='accessibility-button']"
-  end
-
-  def preview_button
-    f(preview_button_selector)
-  end
-
-  def undo_button
-    f(undo_button_selector)
-  end
-
-  def redo_button
-    f(redo_button_selector)
-  end
-
-  def accessibility_checker_button
-    f(accessibility_checker_selector)
+  def block_content
+    f("h2 + *", @block)
   end
 end

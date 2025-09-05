@@ -17,48 +17,43 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../../common"
+require_relative "../block_component"
+require_relative "../move_component"
 
-class ToolbarComponent
-  include SeleniumDependencies
-
-  def toolbar
-    f(".toolbar-area")
+class EditBlockComponent < BlockComponent
+  def block_menu_selector
+    "[data-testid='block-menu']"
   end
 
-  def toolbar_buttons
-    ff("button", toolbar)
+  def rce_controller_selector
+    "textarea"
   end
 
-  def preview_button_selector
-    "[data-testid='preview-button']"
+  def block_type_label_selector
+    "[data-testid='block-type-label']"
   end
 
-  def undo_button_selector
-    "[data-testid='undo-button']"
+  def block_menu
+    f(block_menu_selector, @block)
   end
 
-  def redo_button_selector
-    "[data-testid='redo-button']"
+  def duplicate_button
+    f("[data-testid='copy-block-button']", @block)
   end
 
-  def accessibility_checker_selector
-    "[data-testid='accessibility-button']"
+  def settings_button
+    f("[data-testid='block-settings-button']", @block)
   end
 
-  def preview_button
-    f(preview_button_selector)
+  def remove_button
+    f("[data-testid='remove-block-button']", @block)
   end
 
-  def undo_button
-    f(undo_button_selector)
+  def block_type_label
+    f(block_type_label_selector, @block)
   end
 
-  def redo_button
-    f(redo_button_selector)
-  end
-
-  def accessibility_checker_button
-    f(accessibility_checker_selector)
+  def move_component
+    MoveComponent.new(@block)
   end
 end
