@@ -19,7 +19,10 @@
 import {setupServer} from 'msw/node'
 import {queryClient} from '@canvas/query'
 import {handleDelete} from '../moduleActionHandlers'
-import {handleOpeningModuleUpdateTray} from '../modulePageActionHandlers'
+import {
+  handleOpeningModuleUpdateTray,
+  handleOpeningEditItemModal,
+} from '../modulePageActionHandlers'
 import {dispatchCommandEvent} from '../dispatchCommandEvent'
 import {updateIndent} from '../moduleItemActionHandlers'
 import '../modulePageCommandEventHandlers'
@@ -125,6 +128,24 @@ describe('modulePageCommandEventHandlers', () => {
           'settings',
           mockItemsData,
         )
+      })
+
+      it('calls handleOpeningEditItemModal when action is edit with moduleId and moduleItemId', async () => {
+        const event = new CustomEvent('module-action', {
+          detail: {
+            action: 'edit',
+            courseId,
+            moduleId,
+            moduleItemId,
+          },
+        })
+
+        document.dispatchEvent(event)
+
+        // Allow any pending promises to resolve
+        await new Promise(process.nextTick)
+
+        expect(handleOpeningEditItemModal).toHaveBeenCalledWith(courseId, moduleId, moduleItemId)
       })
 
       it('calls handleDeleteModule when action is delete with moduleId', () => {

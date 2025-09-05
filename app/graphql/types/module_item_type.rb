@@ -154,6 +154,8 @@ module Types
       end
     end
 
+    field :module_item_url, Types::UrlType, null: true, method: :url
+
     field :estimated_duration, GraphQL::Types::ISO8601Duration, null: true
     def estimated_duration
       Loaders::AssociationLoader.for(ContentTag, :estimated_duration).load(content_tag).then do |estimated_duration|
