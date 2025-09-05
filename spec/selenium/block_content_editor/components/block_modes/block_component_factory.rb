@@ -17,13 +17,18 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../../common"
-require_relative "move_component"
+require_relative "edit_block_component"
+require_relative "preview_block_component"
 
-class BlockComponent
-  include SeleniumDependencies
-
-  def initialize(block)
-    @block = block
+class BlockComponentFactory
+  def self.create(block, mode:)
+    case mode
+    when :edit
+      EditBlockComponent.new(block)
+    when :preview
+      PreviewBlockComponent.new(block)
+    else
+      raise ArgumentError, "Invalid mode: #{mode}. Valid modes: :edit, :preview"
+    end
   end
 end
