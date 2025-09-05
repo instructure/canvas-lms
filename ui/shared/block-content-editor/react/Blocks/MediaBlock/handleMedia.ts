@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import saveMediaRecording from '@instructure/canvas-media/es/saveMediaRecording'
+import {MediaSources} from './types'
 
 export type StoreProp = {
   jwt: string
@@ -56,27 +57,43 @@ const handleComputerUpload = async (uploadData: UploadData, storeProps: StorePro
     if (!result.mediaObject?.embedded_iframe_url) {
       throw new Error('No iframe media URL given')
     }
-    return result.mediaObject.embedded_iframe_url
+    return result.mediaObject.media_object.media_id
   } catch (error) {
     console.error('Media upload error details:', error)
     throw new Error('Failed to upload the media file, please try again')
   }
 }
 
+const handleCourseMediaUpload = async (uploadData: UploadData) => {
+  const {fileUrl} = uploadData
+  const attachment_id = fileUrl?.split('/').pop()
+  if (!attachment_id) {
+    throw new Error('No attachment ID found in the file URL')
+  }
+
+  return attachment_id
+}
+
 export const handleMediaSubmit = async (
   selectedPanel: UploadFilePanelIds,
   uploadData: UploadData,
   storeProps: StoreProp,
-) => {
+): Promise<MediaSources> => {
   switch (selectedPanel) {
     case 'COMPUTER': {
-      return await handleComputerUpload(uploadData, storeProps)
+      const mediaId = await handleComputerUpload(uploadData, storeProps)
+      return {mediaId}
+    }
+    case 'user_media':
+    case 'course_media': {
+      const attachment_id = await handleCourseMediaUpload(uploadData)
+      return {attachment_id}
     }
     default: {
       if (!uploadData.fileUrl) {
         throw new Error('No iframe media URL given')
       }
-      return uploadData.fileUrl
+      return {src: uploadData.fileUrl || ''}
     }
   }
 }

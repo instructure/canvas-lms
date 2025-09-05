@@ -17,9 +17,15 @@
  */
 
 export type MediaData = {
-  src: string
   title: string
-} & MediaSettings
+} & MediaSettings &
+  MediaSources
+
+export type MediaSources = {
+  src?: string
+  mediaId?: string
+  attachment_id?: string
+}
 
 export type MediaSettings = {
   titleColor: string

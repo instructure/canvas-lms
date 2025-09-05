@@ -21,6 +21,7 @@ import getRCSProps from '@canvas/rce/getRCSProps'
 import {UploadFile} from '@instructure/canvas-rce'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {handleMediaSubmit, panels, StoreProp, UploadData, UploadFilePanelIds} from './handleMedia'
+import {MediaSources} from './types'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -30,7 +31,7 @@ export function UploadMediaModal({
   onDismiss,
 }: {
   open: boolean
-  onSubmit: (iframe_url: string) => void
+  onSubmit: (data: MediaSources) => void
   onDismiss: () => void
 }) {
   const [isUploading, setIsUploading] = useState(false)
@@ -44,8 +45,8 @@ export function UploadMediaModal({
   ) => {
     setIsUploading(true)
     try {
-      const url = await handleMediaSubmit(selectedPanel, uploadData, storeProps)
-      onSubmit(url)
+      const result = await handleMediaSubmit(selectedPanel, uploadData, storeProps)
+      onSubmit(result)
     } catch (error) {
       console.error('Media upload error:', error)
     } finally {

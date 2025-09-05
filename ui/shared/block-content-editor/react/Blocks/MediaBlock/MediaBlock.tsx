@@ -19,7 +19,7 @@
 import React, {useState} from 'react'
 import {MediaBlockSettings} from './MediaBlockSettings'
 import {BaseBlock} from '../BaseBlock'
-import {MediaBlockProps} from './types'
+import {MediaBlockProps, MediaSources} from './types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useSave} from '../BaseBlock/useSave'
 import {Flex} from '@instructure/ui-flex'
@@ -29,12 +29,35 @@ import {DefaultPreviewImage} from '../BlockItems/DefaultPreviewImage/DefaultPrev
 import {TitleEdit} from '../BlockItems/Title/TitleEdit'
 import {AddButton} from '../BlockItems/AddButton/AddButton'
 import {UploadMediaModal} from './UploadMediaModal'
+import CanvasStudioPlayer from '@canvas/canvas-studio-player/react/CanvasStudioPlayer'
 
 const I18n = createI18nScope('block_content_editor')
 
-const setBorder = {
-  border: 'none',
-  borderRadius: '4px',
+const Player = ({mediaId, src, attachment_id}: MediaSources) => {
+  if (!!mediaId || !!attachment_id) {
+    return (
+      <CanvasStudioPlayer
+        media_id={mediaId || ''}
+        attachment_id={attachment_id || ''}
+        explicitSize={{width: '100%', height: 400}}
+      />
+    )
+  }
+
+  return (
+    <iframe
+      src={src}
+      title={'Media content'}
+      width="100%"
+      height="100%"
+      style={{
+        border: 'none',
+        borderRadius: '4px',
+      }}
+      allow="fullscreen"
+      data-media-type="video"
+    />
+  )
 }
 
 const MediaBlockView = (props: MediaBlockProps) => {
@@ -43,17 +66,9 @@ const MediaBlockView = (props: MediaBlockProps) => {
       {props.includeBlockTitle && (
         <TitleEditPreview title={props.title} contentColor={props.titleColor} />
       )}
-      {props.src ? (
+      {props.src || props.mediaId || props.attachment_id ? (
         <View as="div" width="100%" height="400px">
-          <iframe
-            src={props.src}
-            title={props.title || 'Media content'}
-            width="100%"
-            height="100%"
-            style={setBorder}
-            allow="fullscreen"
-            data-media-type="video"
-          />
+          <Player mediaId={props.mediaId} src={props.src} attachment_id={props.attachment_id} />
         </View>
       ) : (
         <DefaultPreviewImage blockType="media" />
@@ -68,17 +83,9 @@ const MediaBlockEditView = (props: MediaBlockProps) => {
       {props.includeBlockTitle && (
         <TitleEditPreview title={props.title} contentColor={props.titleColor} />
       )}
-      {props.src ? (
+      {props.src || props.mediaId || props.attachment_id ? (
         <View as="div" width="100%" height="400px" position="relative">
-          <iframe
-            src={props.src}
-            title={props.title || 'Media content'}
-            width="100%"
-            height="100%"
-            style={setBorder}
-            allow="fullscreen"
-            data-media-type="video"
-          />
+          <Player mediaId={props.mediaId} src={props.src} attachment_id={props.attachment_id} />
           <div
             style={{
               position: 'absolute',
@@ -102,27 +109,21 @@ const MediaBlockEdit = (props: MediaBlockProps) => {
 
   const save = useSave(() => ({
     title,
+    src: props.src,
+    mediaId: props.mediaId,
   }))
 
-  const onSubmit = (src: string) => {
-    save({src})
+  const onSubmit = (mediaSources: MediaSources) => {
+    save(mediaSources)
     setShowModal(false)
   }
 
   return (
     <Flex gap="mediumSmall" direction="column">
       {props.includeBlockTitle && <TitleEdit title={title} onTitleChange={setTitle} />}
-      {props.src ? (
+      {props.src || props.mediaId || props.attachment_id ? (
         <View as="div" width={'100%'} height={'400px'}>
-          <iframe
-            src={props.src}
-            title={title || 'Media content'}
-            width="100%"
-            height="100%"
-            style={setBorder}
-            allow="fullscreen"
-            data-media-type="video"
-          />
+          <Player mediaId={props.mediaId} src={props.src} attachment_id={props.attachment_id} />
         </View>
       ) : (
         <AddButton onClick={() => setShowModal(true)} />

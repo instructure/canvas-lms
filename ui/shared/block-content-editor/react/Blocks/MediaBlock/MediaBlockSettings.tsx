@@ -22,7 +22,7 @@ import {View} from '@instructure/ui-view'
 import {SettingsIncludeTitle} from '../BlockItems/SettingsIncludeTitle/SettingsIncludeTitle'
 import {Text} from '@instructure/ui-text'
 import {ColorPickerWrapper} from '../BlockItems/ColorPickerWrapper'
-import {MediaData, MediaSettings} from './types'
+import {MediaData, MediaSettings, MediaSources} from './types'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {SettingsSectionToggle} from '../BlockItems/SettingsSectionToggle/SettingsSectionToggle'
@@ -59,9 +59,11 @@ export const MediaBlockSettings = () => {
     })
   }
 
-  const handleMediaChange = (src: string) => {
+  const handleMediaChange = (data: MediaSources) => {
     setProp((props: MediaData) => {
-      props.src = src
+      props.src = data.src
+      props.mediaId = data.mediaId
+      props.attachment_id = data.attachment_id
     })
   }
 
