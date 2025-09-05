@@ -33,19 +33,19 @@ export const ButtonBlockColorSettings = ({
   return (
     <Flex direction="column" gap="medium">
       <ColorPickerWrapper
-        label={I18n.t('Background')}
+        label={I18n.t('Background color')}
         value={backgroundColor}
         baseColor={textColor}
-        baseColorLabel={I18n.t('Text')}
+        baseColorLabel={I18n.t('Title color')}
         onChange={onBackgroundColorChange}
       />
 
       {includeBlockTitle && (
         <ColorPickerWrapper
-          label={I18n.t('Text')}
+          label={I18n.t('Title color')}
           value={textColor}
           baseColor={backgroundColor}
-          baseColorLabel={I18n.t('Background')}
+          baseColorLabel={I18n.t('Background color')}
           onChange={onTextColorChange}
         />
       )}

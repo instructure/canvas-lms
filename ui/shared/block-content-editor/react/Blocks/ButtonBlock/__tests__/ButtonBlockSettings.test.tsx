@@ -16,8 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, RenderResult} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import {fireEvent} from '@testing-library/react'
 import {ButtonBlockSettings} from '../ButtonBlockSettings'
 import {renderBlock} from '../../__tests__/render-helper'
 import {ButtonBlockProps} from '../types'
@@ -43,11 +42,6 @@ const defaultProps: ButtonBlockProps = {
   ],
 }
 
-const toggleSection = async (component: RenderResult, name: RegExp | string) => {
-  const button = component.getByRole('button', {name})
-  await userEvent.click(button)
-}
-
 describe('ButtonBlockSettings', () => {
   describe('include title', () => {
     it('integrates, changing the state', () => {
@@ -62,8 +56,7 @@ describe('ButtonBlockSettings', () => {
   describe('Color settings', () => {
     it('integrates, changing the background color state', async () => {
       const component = renderBlock(ButtonBlockSettings, defaultProps)
-      await toggleSection(component, /Expand color settings/i)
-      const textBox = component.getByRole('textbox', {name: /background #/i})
+      const textBox = component.getByRole('textbox', {name: /background color #/i})
       expect(textBox).toHaveValue('ffffff')
       fireEvent.change(textBox, {
         target: {value: '012345'},
@@ -71,13 +64,12 @@ describe('ButtonBlockSettings', () => {
       expect(textBox).toHaveValue('012345')
     })
 
-    it('integrates, changing the text color state', async () => {
+    it('integrates, changing the title color state', async () => {
       const component = renderBlock(ButtonBlockSettings, {
         ...defaultProps,
         includeBlockTitle: true,
       })
-      await toggleSection(component, /Expand color settings/i)
-      const textBox = component.getByRole('textbox', {name: /text #/i})
+      const textBox = component.getByRole('textbox', {name: /title color #/i})
       expect(textBox).toHaveValue('000000')
       fireEvent.change(textBox, {
         target: {value: '012345'},

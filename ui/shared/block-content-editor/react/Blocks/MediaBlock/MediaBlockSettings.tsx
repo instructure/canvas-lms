@@ -83,17 +83,17 @@ export const MediaBlockSettings = () => {
       >
         <Flex direction="column" gap="medium">
           <ColorPickerWrapper
-            label={I18n.t('Background Color')}
+            label={I18n.t('Background color')}
             value={props.backgroundColor}
             baseColor={props.titleColor}
-            baseColorLabel={I18n.t('Title Color')}
+            baseColorLabel={I18n.t('Title color')}
             onChange={handleBackgroundColorChange}
           />
           <ColorPickerWrapper
-            label={I18n.t('Title Color')}
+            label={I18n.t('Title color')}
             value={props.titleColor}
             baseColor={props.backgroundColor}
-            baseColorLabel={I18n.t('Background Color')}
+            baseColorLabel={I18n.t('Background color')}
             onChange={handleTitleColorChange}
           />
         </Flex>

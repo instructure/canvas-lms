@@ -74,11 +74,11 @@ export const SeparatorLineBlockSettings = () => {
         includeSeparator={true}
       >
         <ColorPickerWrapper
-          label={I18n.t('Background')}
+          label={I18n.t('Background color')}
           value={backgroundColor}
           baseColor={separatorColor}
           onChange={handleBackgroundColorChange}
-          baseColorLabel={I18n.t('Background')}
+          baseColorLabel={I18n.t('Separator color')}
         />
       </SettingsSectionToggle>
 
@@ -91,11 +91,11 @@ export const SeparatorLineBlockSettings = () => {
       >
         <Flex direction="column" gap="medium">
           <ColorPickerWrapper
-            label={I18n.t('Separator')}
+            label={I18n.t('Separator color')}
             value={separatorColor}
             baseColor={backgroundColor}
             onChange={handleSeparatorColorChange}
-            baseColorLabel={I18n.t('Background')}
+            baseColorLabel={I18n.t('Background color')}
           />
 
           <RadioInputGroup

@@ -68,19 +68,19 @@ export const TextBlockSettings = () => {
       >
         <Flex direction="column" gap="medium">
           <ColorPickerWrapper
-            label={I18n.t('Background')}
+            label={I18n.t('Background color')}
             value={backgroundColor}
             baseColor={titleColor}
-            baseColorLabel={I18n.t('Title')}
+            baseColorLabel={I18n.t('Title color')}
             onChange={handleBackgroundColorChange}
           />
 
           {includeBlockTitle && (
             <ColorPickerWrapper
-              label={I18n.t('Title')}
+              label={I18n.t('Title color')}
               value={titleColor}
               baseColor={backgroundColor}
-              baseColorLabel={I18n.t('Background')}
+              baseColorLabel={I18n.t('Background color')}
               onChange={handleTitleColorChange}
             />
           )}

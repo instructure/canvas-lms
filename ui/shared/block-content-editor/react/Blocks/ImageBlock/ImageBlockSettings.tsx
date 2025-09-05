@@ -112,7 +112,7 @@ export const ImageBlockSettings = () => {
         title={I18n.t('Color settings')}
         collapsedLabel={I18n.t('Expand color settings')}
         expandedLabel={I18n.t('Collapse color settings')}
-        defaultExpanded={false}
+        defaultExpanded={true}
         includeSeparator={true}
       >
         <View as="div" margin="0 0 medium 0">
@@ -120,13 +120,13 @@ export const ImageBlockSettings = () => {
             label={I18n.t('Background color')}
             value={backgroundColor}
             baseColor={textColor}
-            baseColorLabel={I18n.t('Default text color')}
+            baseColorLabel={I18n.t('Title color')}
             onChange={handleBackgroundColorChange}
           />
         </View>
         <View as="div">
           <ColorPickerWrapper
-            label={I18n.t('Default text color')}
+            label={I18n.t('Title color')}
             value={textColor}
             baseColor={backgroundColor}
             baseColorLabel={I18n.t('Background color')}

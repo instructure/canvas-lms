@@ -18,7 +18,7 @@
 
 import {ImageTextBlockSettings} from '../ImageTextBlockSettings'
 import {renderBlock} from '../../__tests__/render-helper'
-import {RenderResult, waitFor} from '@testing-library/react'
+import {waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {ImageTextBlockProps} from '../types'
 
@@ -38,11 +38,6 @@ const defaultProps: ImageTextBlockProps = {
   altTextAsCaption: false,
   decorativeImage: false,
   caption: '',
-}
-
-const toggleSection = async (component: RenderResult, name: RegExp | string) => {
-  const button = component.getByRole('button', {name})
-  await userEvent.click(button)
 }
 
 describe('ImageTextBlockSettings', () => {
@@ -65,7 +60,6 @@ describe('ImageTextBlockSettings', () => {
         ...defaultProps,
         backgroundColor: '000000',
       })
-      await toggleSection(component, /Expand color settings/i)
       const input = component.getByLabelText(/Background color/i) as HTMLInputElement
       await userEvent.clear(input)
       await userEvent.type(input, color)
@@ -73,11 +67,10 @@ describe('ImageTextBlockSettings', () => {
     })
   })
 
-  describe('default text color', () => {
+  describe('title color', () => {
     it('integrates, changing the state', async () => {
       const component = renderBlock(ImageTextBlockSettings, {...defaultProps, textColor: '000000'})
-      await toggleSection(component, /Expand color settings/i)
-      const input = component.getByLabelText(/Default text color/i) as HTMLInputElement
+      const input = component.getByLabelText(/Title color/i) as HTMLInputElement
       await userEvent.clear(input)
       await userEvent.type(input, color)
       await waitFor(() => expect(input.value).toBe(color))
