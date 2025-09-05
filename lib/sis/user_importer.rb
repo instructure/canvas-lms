@@ -527,8 +527,12 @@ module SIS
         end
       end
 
+      def user_can_still_log_in?(to:, user:, sis_user_id:)
+        to.pseudonyms.active.where(user_id: user).where("sis_user_id != ? OR sis_user_id IS NULL", sis_user_id).exists?
+      end
+
       def remove_enrollments_if_last_login(user, user_id)
-        return false if @root_account.pseudonyms.active.where(user_id: user).where("sis_user_id != ? OR sis_user_id IS NULL", user_id).exists?
+        return false if user_can_still_log_in?(to: @root_account, user:, sis_user_id: user_id)
 
         enrollments = @root_account.enrollments.active.where(user_id: user)
                                    .select(:id, :type, :course_id, :course_section_id, :user_id, :workflow_state).to_a
