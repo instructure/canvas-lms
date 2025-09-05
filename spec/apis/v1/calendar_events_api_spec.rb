@@ -3908,21 +3908,6 @@ describe CalendarEventsApiController, type: :request do
           expect(json.first.keys).not_to include("assignment_override")
         end
 
-        it "gets explicit assignment with override info" do
-          skip "not sure what the desired behavior here is"
-          override = assignment_override_model(assignment: @default_assignment,
-                                               set: @course.default_section,
-                                               due_at: Time.zone.parse("2012-01-14 12:00:00"))
-          json = api_call(:get, "/api/v1/calendar_events/assignment_#{@default_assignment.id}", {
-                            controller: "calendar_events_api", action: "show", id: "assignment_#{@default_assignment.id}", format: "json"
-                          })
-          # json.size.should == 2
-          expect(json.slice("id", "override_id", "end_at")).to eql({ "id" => "assignment_#{@default_assignment.id}",
-                                                                     "override_id" => override.id,
-                                                                     "end_at" => "2012-01-14T12:00:00Z" })
-          expect(json.keys).to match_array expected_fields
-        end
-
         context "with sections" do
           before :once do
             @section1 = @course.course_sections.create!(name: "Section A")

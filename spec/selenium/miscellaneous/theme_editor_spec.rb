@@ -160,8 +160,6 @@ describe "Theme Editor" do
     expect(f('[id="warning-message"]')).to include_text "'#{invalid_color}' is not a valid color."
   end
 
-  it "K12 Theme should be automatically set when K12 Feature Flag is turned on", priority: "1"
-
   it "previews should display a progress bar when generating preview", priority: "1" do
     open_theme_editor(Account.default.id)
     f(".Theme__editor-color-block_input-text").send_keys(random_hex_color)

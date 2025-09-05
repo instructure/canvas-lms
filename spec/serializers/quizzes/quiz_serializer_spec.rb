@@ -260,44 +260,6 @@ describe Quizzes::QuizSerializer do
     end
   end
 
-  describe "takeable" do
-    before { skip }
-
-    before do
-      course_with_teacher(active_all: true)
-      course_quiz(true)
-      quiz_with_graded_submission([], user: @teacher, quiz: @quiz)
-      @serializer = quiz_serializer(quiz_submissions: { @quiz.id => @quiz_submission })
-    end
-
-    it "is true when there is no quiz submision" do
-      Quizzes::QuizSubmission.delete_all
-      expect(quiz_serializer.as_json[:quiz][:takeable]).to be true
-    end
-
-    it "is true when quiz_submission is present but not completed" do
-      @quiz_submission.workflow_state = "settings_only"
-      expect(@serializer.as_json[:quiz][:takeable]).to be true
-    end
-
-    it "is true when the quiz submission is completed but quiz has unlimited attempts" do
-      @quiz_submission.workflow_state = "complete"
-      @quiz.allowed_attempts = -1
-      expect(@serializer.as_json[:quiz][:takeable]).to be true
-    end
-
-    it "is true when quiz submission is completed, !quiz.unlimited_attempts" do
-      @quiz_submission.workflow_state = "complete"
-      @quiz.allowed_attempts = 2
-      # false when attempts left attempts is 0
-      expect(@quiz_submission).to receive(:attempts_left).at_least(:once).and_return 0
-      expect(@serializer.as_json[:quiz][:takeable]).to be false
-      # true when than attempts left greater than 0
-      expect(@quiz_submission).to receive(:attempts_left).at_least(:once).and_return 1
-      expect(@serializer.as_json[:quiz][:takeable]).to be true
-    end
-  end
-
   describe "preview_url" do
     it "is only present when the user can grade the quiz" do
       course_with_teacher(active_all: true)
@@ -311,26 +273,6 @@ describe Quizzes::QuizSerializer do
 
   describe "links" do
     describe "assignment_group" do
-      context "controller accepts_jsonapi?" do
-        before { skip }
-
-        it "serialize the assignment group's url when present" do
-          allow(@quiz).to receive(:context).and_return course = Account.default.courses.new
-          course.id = 1
-          @quiz.assignment_group = assignment_group = AssignmentGroup.new
-          assignment_group.id = 1
-          expect(serializer.as_json[:quiz]["links"]["assignment_group"]).to eq(
-            controller.send(:api_v1_course_assignment_group_url,
-                            course.id,
-                            assignment_group.id)
-          )
-        end
-
-        it "doesn't serialize the assignment group's url if not present" do
-          expect(serializer.as_json[:quiz]).not_to have_key(:links)
-        end
-      end
-
       context "controller doesn't accept jsonapi" do
         it "serialized the assignment_group as assignment_group_id" do
           expect(controller).to receive(:accepts_jsonapi?).at_least(:once).and_return false
@@ -340,51 +282,6 @@ describe Quizzes::QuizSerializer do
           group.id = quiz.assignment_group_id = 1
           expect(serializer.as_json[:quiz][:assignment_group_id]).to eq 1
         end
-      end
-    end
-
-    describe "student_quiz_submissions" do
-      before { skip }
-
-      context "when user may grade" do
-        it "sends the url for all submissions" do
-          course_with_teacher(active_all: true)
-          quiz_with_graded_submission([], course: @course)
-          serializer = quiz_serializer(scope: @teacher)
-          expect(serializer.as_json[:quiz]["links"]["student_quiz_submissions"]).to eq(
-            controller.send(:api_v1_course_quiz_submissions_url, @quiz.context.id, @quiz.id)
-          )
-        end
-
-        it "sends the url when no student_quiz_submissions are present" do
-          course_with_teacher(active_all: true)
-          serializer = quiz_serializer(scope: @teacher)
-          expect(serializer.as_json[:quiz]["links"]["student_quiz_submissions"]).to eq(
-            controller.send(:api_v1_course_quiz_submissions_url, @quiz.context.id, @quiz.id)
-          )
-        end
-      end
-
-      context "when user may not grade" do
-        it "sends nil" do
-          course_with_student(active_all: true)
-          quiz_with_graded_submission([], user: @student, course: @course)
-          serializer = quiz_serializer(scope: @student)
-          expect(serializer.as_json[:quiz]["links"]["student_quiz_submissions"]).to be_nil
-        end
-      end
-    end
-
-    describe "quiz_submission" do
-      before { skip }
-
-      it "includes the quiz_submission in the response if it is present" do
-        course_with_student(active_all: true)
-        quiz_with_graded_submission([], user: @student, course: @course)
-        serializer = quiz_serializer(scope: @student)
-        json = serializer.as_json
-        expect(json["quiz_submissions"].length).to eq 1
-        expect(json[:quiz]["links"]["quiz_submission"]).to eq @quiz_submission.id.to_s
       end
     end
 
@@ -419,57 +316,6 @@ describe Quizzes::QuizSerializer do
         expect(serializer.as_json[:quiz][:quiz_statistics_url]).to eq(
           controller.send(:api_v1_course_quiz_statistics_url, quiz.context.id, quiz.id)
         )
-      end
-    end
-
-    describe "submitted_students" do
-      before { skip }
-
-      it "sends nil if user can't grade" do
-        course_with_student(active_all: true)
-        @quiz.unstub(:check_right?)
-        @quiz.unstub(:grants_right?)
-        @quiz.context.unstub(:grants_right?)
-        serializer = quiz_serializer(scope: @student)
-        expect(serializer.as_json[:quiz]["links"]).not_to have_key "unsubmitted_students"
-      end
-
-      it "sends a url if there are submissions and user can grade" do
-        course_with_teacher(active_all: true)
-        course_with_student(active_all: true, course: @course)
-        quiz_with_graded_submission([], user: @student, course: @course)
-        serializer = quiz_serializer(scope: @teacher)
-        expect(serializer.as_json[:quiz]["links"]["submitted_students"])
-          .to eq controller.send(:api_v1_course_quiz_submission_users_url,
-                                 @quiz.context,
-                                 @quiz,
-                                 submitted: true)
-      end
-    end
-
-    describe "unsubmitted_students" do
-      before { skip }
-
-      it "sends nil if user can't grade" do
-        @quiz.unstub(:check_right?)
-        @quiz.unstub(:grants_right?)
-        @quiz.context.unstub(:grants_right?)
-        course_with_student(active_all: true)
-        serializer = quiz_serializer(scope: @student)
-        expect(serializer.as_json[:quiz]["links"]).not_to have_key "unsubmitted_students"
-      end
-
-      it "sends a url if there are submissions and user can grade" do
-        course_with_teacher(active_all: true)
-        course_with_student(active_all: true, course: @course)
-        course_with_student(active_all: true, course: @course)
-        quiz_with_graded_submission([], user: @student, course: @course)
-        serializer = quiz_serializer(scope: @teacher)
-        expect(serializer.as_json[:quiz]["links"]["unsubmitted_students"])
-          .to eq controller.send(:api_v1_course_quiz_submission_users_url,
-                                 @quiz.context,
-                                 @quiz,
-                                 submitted: "false")
       end
     end
   end

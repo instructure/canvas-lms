@@ -118,15 +118,6 @@ describe Quizzes::QuizIpFiltersController, type: :request do
         expect(json["quiz_ip_filters"][0]["account"]).to eq @quiz.title
         expect(json["quiz_ip_filters"][0]["filter"]).to eq "192.168.1.101"
       end
-
-      context "JSON-API compliance" do
-        it "renders as JSON-API" do
-          skip "CNVS-8978: JSON-API compliance API spec helper"
-
-          json = get_index
-          assert_jsonapi_compliance(json, "quiz_ip_filters")
-        end
-      end
     end
   end
 end

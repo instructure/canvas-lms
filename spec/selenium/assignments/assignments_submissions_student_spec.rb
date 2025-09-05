@@ -497,8 +497,6 @@ describe "submissions" do
       end
     end
 
-    it "should submit an assignment and validate confirmation information", priority: "1"
-
     context "with Canvadocs enabled" do
       before(:once) do
         PluginSetting.create! name: "canvadocs",

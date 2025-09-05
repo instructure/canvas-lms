@@ -527,9 +527,6 @@ describe "profile" do
       expect(is_checked("#account_services_avatars")).to be_truthy
     end
 
-    # TODO: reimplement per CNVS-29610, but make sure we're testing at the right level
-    it "should successfully upload profile pictures"
-
     it "allows users to choose an avatar from their profile page" do
       course_with_teacher_logged_in
 
@@ -568,11 +565,6 @@ describe "profile" do
     expect(f("#name_pronunciation_empty_message").text).to eq "No name pronunciation provided"
     expect(f("#biography_empty_message").text).to eq "No biography has been added"
     expect(f("#links_empty_message").text).to eq "No links have been added"
-  end
-
-  describe "profile pictures s3 tests" do
-    # TODO: reimplement per CNVS-29611, but make sure we're testing at the right level
-    it "should successfully upload profile pictures"
   end
 
   describe "avatar reporting" do
