@@ -23,12 +23,13 @@ import {useState} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {UploadMediaModal} from '../../MediaBlock/UploadMediaModal'
+import {MediaSources} from '../../MediaBlock/types'
 
 const I18n = createI18nScope('block_content_editor')
 
 type SettingsUploadMediaProps = {
   url: string
-  onMediaChange: (src: string) => void
+  onMediaChange: (data: MediaSources) => void
 }
 
 export const SettingsUploadMedia = ({url, onMediaChange}: SettingsUploadMediaProps) => {
@@ -36,9 +37,9 @@ export const SettingsUploadMedia = ({url, onMediaChange}: SettingsUploadMediaPro
   const closeModal = () => setIsOpen(false)
   const openModal = () => setIsOpen(true)
 
-  const onSelected = (fileName: string) => {
+  const onSelected = (data: MediaSources) => {
     closeModal()
-    onMediaChange(fileName)
+    onMediaChange(data)
   }
 
   const buttonText = url?.trim() ? I18n.t('Replace media') : I18n.t('Choose media')
