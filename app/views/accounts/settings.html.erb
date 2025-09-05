@@ -1408,7 +1408,7 @@ acknowledge that you have read and agreed to the
       <% end %>
     <% end %>
     <ul class="announcements_list unstyled_list">
-      <%= will_paginate(@announcements, params: {anchor: "tab-announcements-mount"}) %>
+      <%= will_paginate(@announcements, params: {anchor: "tab-announcements"}) %>
       <% @announcements.each do |announcement| %>
         <li class="announcements_list_item">
           <div class="ic-notification ic-notification--admin-created ic-notification--<%= notification_container_classname(announcement) %>">
@@ -1555,4 +1555,3 @@ acknowledge that you have read and agreed to the
 <% end %>
 
 <div id="rqd_mount"></div>
-
