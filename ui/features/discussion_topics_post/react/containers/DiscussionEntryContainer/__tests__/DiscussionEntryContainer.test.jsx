@@ -22,6 +22,7 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import {User} from '../../../../graphql/User'
 import {Attachment} from '../../../../graphql/Attachment'
+import {MockedProvider} from '@apollo/client/testing'
 
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),
@@ -100,7 +101,11 @@ describe('DiscussionEntryContainer', () => {
   })
 
   const setup = props => {
-    return render(<DiscussionEntryContainer {...props} />)
+    return render(
+      <MockedProvider mocks={[]}>
+        <DiscussionEntryContainer {...props} />
+      </MockedProvider>,
+    )
   }
 
   it('should render', () => {

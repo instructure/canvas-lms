@@ -16,19 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {
-  forwardRef,
-  useContext,
-  useState,
-  useRef,
-  useImperativeHandle,
-  useEffect,
-} from 'react'
+import React, {forwardRef, useContext, useRef, useImperativeHandle, useEffect} from 'react'
 import {View} from '@instructure/ui-view'
 import {DiscussionManagerUtilityContext} from '../../utils/constants'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import {SimpleSelect} from '@instructure/ui-simple-select'
+import {useTranslationStore} from '../../hooks/useTranslationStore'
 
 const I18n = createI18nScope('discussion_posts')
 
@@ -36,12 +30,10 @@ export const TranslationControls = forwardRef((props, ref) => {
   const languageNotSelectedErrorMessage = I18n.t('Please select a language.')
   const languageAlreadyActiveErrorMessage = I18n.t('Already translated into the selected language.')
 
-  const {translationLanguages, setTranslateTargetLanguage} = useContext(
-    DiscussionManagerUtilityContext,
-  )
+  const {translationLanguages} = useContext(DiscussionManagerUtilityContext)
+  const activeLangauge = useTranslationStore(state => state.activeLanguage)
 
   const inputRef = useRef()
-  const [selectedLanguage, setSelectedLanguage] = useState(props.selectedLanguage || '')
 
   const handleSelectOption = (_event, {value}) => {
     const result = translationLanguages.current.find(lang => lang.id === value)
@@ -51,20 +43,13 @@ export const TranslationControls = forwardRef((props, ref) => {
     if (ENV.ai_translation_improvements) {
       props.onSetIsLanguageNotSelectedError(false)
       props.onSetIsLanguageAlreadyActiveError(false)
-      props.onSetSelectedLanguage(result.id)
-    } else {
-      setTranslateTargetLanguage(result.id)
     }
 
-    setSelectedLanguage(value)
+    props.onSetSelectedLanguage(value)
   }
 
   const reset = () => {
-    setSelectedLanguage('')
-
-    if (props.onSetSelectedLanguage) {
-      props.onSetSelectedLanguage(null)
-    }
+    props.onSetSelectedLanguage('')
 
     if (props.onSetIsLanguageNotSelectedError) {
       props.onSetIsLanguageNotSelectedError(false)
@@ -102,8 +87,12 @@ export const TranslationControls = forwardRef((props, ref) => {
         assistiveText={assistiveText}
         aria-labelledby="translate-select-label"
         placeholder={I18n.t('Select a language...')}
-        value={selectedLanguage}
-        defaultValue={''}
+        value={props.selectedLanguage}
+        defaultValue={
+          activeLangauge
+            ? translationLanguages?.current?.find(({id}) => id === activeLangauge)?.name
+            : ''
+        }
         onChange={handleSelectOption}
         messages={messages}
         inputRef={el => {
@@ -121,10 +110,10 @@ export const TranslationControls = forwardRef((props, ref) => {
 })
 
 TranslationControls.propTypes = {
-  selectedLanguage: PropTypes.string,
-  onSetSelectedLanguage: PropTypes.func,
   isLanguageAlreadyActiveError: PropTypes.bool,
   onSetIsLanguageAlreadyActiveError: PropTypes.func,
   isLanguageNotSelectedError: PropTypes.bool,
   onSetIsLanguageNotSelectedError: PropTypes.func,
+  onSetSelectedLanguage: PropTypes.func,
+  selectedLanguage: PropTypes.string,
 }

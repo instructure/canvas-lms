@@ -22,9 +22,21 @@ import {TranslationControls} from '../TranslationControls'
 import {DiscussionManagerUtilityContext} from '../../../utils/constants'
 import userEvent from '@testing-library/user-event'
 
-const mockOnSetSelectedLanguage = jest.fn()
+const mockSetActiveLanguage = jest.fn()
+
+jest.mock('../../../hooks/useTranslationStore', () => ({
+  useTranslationStore: selector => {
+    const state = {
+      activeLanguage: null,
+      setActiveLanguage: mockSetActiveLanguage,
+    }
+    return selector(state)
+  },
+}))
+
 const mockOnSetIsLanguageAlreadyActiveError = jest.fn()
 const mockOnSetIsLanguageNotSelectedError = jest.fn()
+const mockOnSetSelectedLanguage = jest.fn()
 
 const mockTranslationLanguages = {
   current: [
@@ -40,9 +52,9 @@ const renderComponent = (props = {}) => {
       value={{translationLanguages: mockTranslationLanguages}}
     >
       <TranslationControls
-        onSetSelectedLanguage={mockOnSetSelectedLanguage}
         onSetIsLanguageAlreadyActiveError={mockOnSetIsLanguageAlreadyActiveError}
         onSetIsLanguageNotSelectedError={mockOnSetIsLanguageNotSelectedError}
+        onSetSelectedLanguage={mockOnSetSelectedLanguage}
         {...props}
       />
     </DiscussionManagerUtilityContext.Provider>,
@@ -101,9 +113,9 @@ describe('TranslationControls Component', () => {
       >
         <TranslationControls
           ref={ref}
-          onSetSelectedLanguage={mockOnSetSelectedLanguage}
           onSetIsLanguageAlreadyActiveError={mockOnSetIsLanguageAlreadyActiveError}
           onSetIsLanguageNotSelectedError={mockOnSetIsLanguageNotSelectedError}
+          onSetSelectedLanguage={mockOnSetSelectedLanguage}
         />
       </DiscussionManagerUtilityContext.Provider>,
     )
@@ -118,6 +130,6 @@ describe('TranslationControls Component', () => {
       ref.current.reset()
     })
 
-    expect(input.value).toBe('')
+    expect(mockOnSetSelectedLanguage).toHaveBeenCalledWith('')
   })
 })

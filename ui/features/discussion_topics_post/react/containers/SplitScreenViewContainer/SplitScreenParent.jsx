@@ -265,6 +265,7 @@ export const SplitScreenParent = ({isEditing, setIsEditing, ...props}) => {
                       <ThreadActions
                         authorName={getDisplayName(props.discussionEntry)}
                         id={props.discussionEntry.id}
+                        entry={props.discussionEntry}
                         isUnread={!props.discussionEntry.entryParticipant?.read}
                         onToggleUnread={props.onToggleUnread}
                         onDelete={props.discussionEntry.permissions?.delete ? props.onDelete : null}
