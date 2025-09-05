@@ -28,10 +28,22 @@ const toggleSection = async (component: RenderResult, name: RegExp | string) => 
   await userEvent.click(button)
 }
 
+const defaultProps = {
+  title: '',
+  includeBlockTitle: false,
+  backgroundColor: 'color',
+  textColor: 'color',
+  url: 'https://example.com/image.jpg',
+  altText: 'Example Image',
+  caption: 'This is an example image.',
+  altTextAsCaption: false,
+  decorativeImage: false,
+}
+
 describe('ImageBlockSettings', () => {
   describe('include title', () => {
     it('integrates, changing the state', async () => {
-      const component = renderBlock(ImageBlockSettings, {includeBlockTitle: false})
+      const component = renderBlock(ImageBlockSettings, {...defaultProps, includeBlockTitle: false})
       const checkbox = component.getByLabelText(/Include block title/i)
       expect(checkbox).not.toBeChecked()
       await userEvent.click(checkbox)
@@ -41,7 +53,10 @@ describe('ImageBlockSettings', () => {
 
   describe('caption', () => {
     it('integrates, changing the state', async () => {
-      const component = renderBlock(ImageBlockSettings, {caption: 'Initial caption'})
+      const component = renderBlock(ImageBlockSettings, {
+        ...defaultProps,
+        caption: 'Initial caption',
+      })
       const input = component.getByLabelText(/Image caption/i) as HTMLInputElement
       expect(input.value).toBe('Initial caption')
       await userEvent.clear(input)
@@ -52,7 +67,7 @@ describe('ImageBlockSettings', () => {
 
   describe('alt text', () => {
     it('integrates, changing the state', async () => {
-      const component = renderBlock(ImageBlockSettings, {altText: 'text'})
+      const component = renderBlock(ImageBlockSettings, {...defaultProps, altText: 'text'})
       const input = component.getByRole('textbox', {name: /Alt text/i}) as HTMLInputElement
       expect(input.value).toBe('text')
       await userEvent.clear(input)
@@ -64,6 +79,7 @@ describe('ImageBlockSettings', () => {
   describe('alt text as caption', () => {
     it('integrates, changing the state', async () => {
       const component = renderBlock(ImageBlockSettings, {
+        ...defaultProps,
         altText: 'Sample alt text',
         altTextAsCaption: false,
       })
@@ -76,7 +92,7 @@ describe('ImageBlockSettings', () => {
 
   describe('decorative image', () => {
     it('integrates, changing the state', async () => {
-      const component = renderBlock(ImageBlockSettings, {decorativeImage: false})
+      const component = renderBlock(ImageBlockSettings, {...defaultProps, decorativeImage: false})
       const checkbox = component.getByLabelText(/Decorative image/i)
       expect(checkbox).not.toBeChecked()
       await userEvent.click(checkbox)
@@ -87,6 +103,7 @@ describe('ImageBlockSettings', () => {
   describe('image upload', () => {
     it('integrates, changing the state', async () => {
       const component = renderBlock(ImageBlockSettings, {
+        ...defaultProps,
         url: 'https://example.com/image.jpg',
         fileName: 'my-image.jpg',
       })
@@ -100,7 +117,10 @@ describe('ImageBlockSettings', () => {
 
   describe('background color', () => {
     it('integrates, changing the state', async () => {
-      const component = renderBlock(ImageBlockSettings, {backgroundColor: '000000'})
+      const component = renderBlock(ImageBlockSettings, {
+        ...defaultProps,
+        backgroundColor: '000000',
+      })
       await toggleSection(component, /Expand color settings/i)
       const input = component.getByLabelText(/Background color/i) as HTMLInputElement
       await userEvent.clear(input)
@@ -111,7 +131,7 @@ describe('ImageBlockSettings', () => {
 
   describe('default text color', () => {
     it('integrates, changing the state', async () => {
-      const component = renderBlock(ImageBlockSettings, {textColor: '000000'})
+      const component = renderBlock(ImageBlockSettings, {...defaultProps, textColor: '000000'})
       await toggleSection(component, /Expand color settings/i)
       const input = component.getByLabelText(/Default text color/i) as HTMLInputElement
       await userEvent.clear(input)
