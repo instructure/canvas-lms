@@ -18,17 +18,17 @@
 
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {SettingsTray} from '../SettingsTray'
+import {SettingsTray, SettingsTrayProps} from '../SettingsTray'
 
 describe('SettingsTray', () => {
-  const defaultProps = {
+  const defaultProps: SettingsTrayProps = {
     title: 'Settings',
     open: true,
     onDismiss: () => {},
     children: <p>Settings content</p>,
   }
 
-  const renderSettingsTray = async (props: Partial<React.ComponentProps<typeof SettingsTray>>) => {
+  const renderSettingsTray = async (props: Partial<SettingsTrayProps>) => {
     return render(<SettingsTray {...defaultProps} {...props} />)
   }
 
