@@ -38,6 +38,7 @@ module Api::V1::Rubric
       hide_score_total
       data
       rating_order
+      button_display
     ]
   }.freeze
 

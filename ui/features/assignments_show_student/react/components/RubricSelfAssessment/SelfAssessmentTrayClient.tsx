@@ -54,6 +54,7 @@ export const SelfAssessmentTrayClient = ({
     criteriaCount: rubric.criteria?.length ?? 0,
     title: rubric.title,
     ratingOrder: rubric.rating_order,
+    buttonDisplay: rubric.button_display,
     freeFormCriterionComments: rubric.free_form_criterion_comments,
     pointsPossible: rubric.points_possible,
     criteria: (rubric?.criteria || []).map(criterion => {

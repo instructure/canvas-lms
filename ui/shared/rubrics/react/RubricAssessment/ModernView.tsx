@@ -47,6 +47,7 @@ const I18n = createI18nScope('rubrics-assessment-tray')
 export type ModernViewModes = 'horizontal' | 'vertical'
 
 type ModernViewProps = {
+  buttonDisplay: string
   criteria: RubricCriterion[]
   hidePoints: boolean
   isPreviewMode: boolean
@@ -63,6 +64,7 @@ type ModernViewProps = {
   validationErrors?: string[]
 }
 export const ModernView = ({
+  buttonDisplay,
   criteria,
   hidePoints,
   isPreviewMode,
@@ -93,6 +95,7 @@ export const ModernView = ({
         return (
           <CriterionRow
             key={criterion.id}
+            buttonDisplay={buttonDisplay}
             criterion={criterion}
             displayHr={index < criteria.length - 1}
             hidePoints={hidePoints}
@@ -119,6 +122,7 @@ export const ModernView = ({
 }
 
 type CriterionRowProps = {
+  buttonDisplay: string
   criterion: RubricCriterion
   displayHr: boolean
   hidePoints: boolean
@@ -139,6 +143,7 @@ type CriterionRowProps = {
   validationErrors?: string[]
 }
 export const CriterionRow = ({
+  buttonDisplay,
   criterion,
   displayHr,
   hidePoints,
@@ -240,6 +245,7 @@ export const CriterionRow = ({
     if (selectedViewMode === 'horizontal' && ratings.length <= 5) {
       return (
         <HorizontalButtonDisplay
+          buttonDisplay={buttonDisplay}
           hidePoints={hidePoints}
           isPreviewMode={isPreviewMode}
           isSelfAssessment={isSelfAssessment}
@@ -258,6 +264,7 @@ export const CriterionRow = ({
 
     return (
       <VerticalButtonDisplay
+        buttonDisplay={buttonDisplay}
         hidePoints={hidePoints}
         isPreviewMode={isPreviewMode}
         isSelfAssessment={isSelfAssessment}

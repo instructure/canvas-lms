@@ -1274,4 +1274,13 @@ describe Rubric do
       end
     end
   end
+
+  it "allows updates to button_display" do
+    course_factory
+    rubric_model
+    expect(@rubric.button_display).to eq "numeric"
+    @rubric.button_display = "points"
+    @rubric.save!
+    expect(@rubric.button_display).to eq "points"
+  end
 end

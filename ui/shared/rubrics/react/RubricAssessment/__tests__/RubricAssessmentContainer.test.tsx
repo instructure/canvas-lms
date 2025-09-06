@@ -34,6 +34,7 @@ describe('RubricAssessmentContainer Tests', () => {
     return render(
       <MockedQueryProvider>
         <RubricAssessmentContainer
+          buttonDisplay="level"
           criteria={RUBRIC_DATA.criteria}
           currentUserId="1"
           hidePoints={false}
