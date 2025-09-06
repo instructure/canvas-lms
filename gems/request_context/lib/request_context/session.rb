@@ -32,7 +32,8 @@ module RequestContext
         ActionDispatch::Request.new(env).cookie_jar[:log_session_id] = {
           value: session_id,
           secure: Rails.application.config.session_options[:secure],
-          httponly: true
+          httponly: true,
+          same_site: Rails.application.config.session_options[:same_site]
         }
       end
 
