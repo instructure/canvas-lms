@@ -39,6 +39,7 @@ import {AssessmentFooter} from './AssessmentFooter'
 const I18n = createI18nScope('rubrics-assessment-tray')
 
 export type RubricAssessmentContainerProps = {
+  buttonDisplay: string
   criteria: RubricCriterion[]
   currentUserId: string
   hidePoints: boolean
@@ -61,6 +62,7 @@ export type RubricAssessmentContainerProps = {
   onSubmit?: (rubricAssessmentDraftData: RubricAssessmentData[]) => void
 }
 export const RubricAssessmentContainer = ({
+  buttonDisplay,
   criteria,
   currentUserId,
   hidePoints,
@@ -193,6 +195,7 @@ export const RubricAssessmentContainer = ({
 
     return (
       <ModernView
+        buttonDisplay={buttonDisplay}
         criteria={criteria}
         hidePoints={hidePoints}
         isPreviewMode={isPreviewMode}

@@ -28,6 +28,7 @@ import {escapeNewLineText, rangingFrom} from './utils/rubricUtils'
 import {SelfAssessmentRatingButton} from '@canvas/rubrics/react/RubricAssessment/SelfAssessmentRatingButton'
 
 type VerticalButtonDisplayProps = {
+  buttonDisplay: string
   hidePoints: boolean
   isPreviewMode: boolean
   isSelfAssessment: boolean
@@ -40,6 +41,7 @@ type VerticalButtonDisplayProps = {
   shouldFocusFirstRating?: boolean
 }
 export const VerticalButtonDisplay = ({
+  buttonDisplay,
   hidePoints,
   isPreviewMode,
   isSelfAssessment,
@@ -60,6 +62,8 @@ export const VerticalButtonDisplay = ({
     }
   }, [shouldFocusFirstRating])
 
+  const isButtonDisplayPoints = buttonDisplay === 'points' && !hidePoints
+
   return (
     <Flex
       as="div"
@@ -67,7 +71,10 @@ export const VerticalButtonDisplay = ({
       data-testid="rubric-assessment-vertical-display"
     >
       {ratings.map((rating, index) => {
-        const buttonDisplay = (ratings.length - (index + 1)).toString()
+        const buttonLabel =
+          isButtonDisplayPoints && rating.points != null
+            ? rating.points.toString()
+            : (ratings.length - (index + 1)).toString()
         const isSelected = rating.id != null && rating.id === selectedRatingId
         const isSelfAssessmentSelected =
           rating.id != null && rating.id === selectedSelfAssessmentRatingId
@@ -83,7 +90,7 @@ export const VerticalButtonDisplay = ({
         )}`
 
         return (
-          <Flex.Item key={`${rating.id}-${buttonDisplay}`} padding="xx-small 0 0 0">
+          <Flex.Item key={`${rating.id}-${buttonLabel}`} padding="xx-small 0 0 0">
             <Flex>
               <Flex.Item
                 align={isSelected ? 'start' : 'center'}
@@ -97,14 +104,14 @@ export const VerticalButtonDisplay = ({
               >
                 {isSelfAssessment ? (
                   <SelfAssessmentRatingButton
-                    buttonDisplay={buttonDisplay}
+                    buttonLabel={buttonLabel}
                     isPreviewMode={isPreviewMode}
                     isSelected={isSelected}
                     onClick={() => onSelectRating(rating)}
                   />
                 ) : (
                   <RatingButton
-                    buttonDisplay={buttonDisplay}
+                    buttonLabel={buttonLabel}
                     isPreviewMode={isPreviewMode}
                     isSelected={isSelected}
                     isSelfAssessmentSelected={isSelfAssessmentSelected}

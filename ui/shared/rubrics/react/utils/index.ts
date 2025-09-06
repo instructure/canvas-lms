@@ -26,6 +26,7 @@ import type {
 
 export type RubricUnderscoreType = {
   title: string
+  button_display: string
   criteria: RubricUnderscoreCriteria[]
   data?: RubricUnderscoreCriteria[]
   hide_points: boolean
@@ -125,6 +126,7 @@ export const mapRubricUnderscoredKeysToCamelCase = (
     criteriaCount: criteria.length,
     hidePoints: rubric.hide_points,
     id: rubric.id,
+    buttonDisplay: rubric.button_display,
     unassessed: rubric.unassessed,
     workflowState: rubric.workflow_state,
     canUpdateRubric: rubric.can_update,

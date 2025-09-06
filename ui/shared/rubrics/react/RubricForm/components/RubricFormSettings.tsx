@@ -22,6 +22,7 @@ import {GradingTypeSelect} from './RubricFormSelects/GradingTypeSelect'
 import {ScoringTypeSelect} from './RubricFormSelects/ScoringTypeSelect'
 
 import {RubricFormProps, RubricFormFieldSetter} from '../types/RubricForm'
+import {RatingDisplaySelect} from './RubricFormSelects/RatingDisplaySelect'
 
 type RubricFormSettingsParams = {
   showAdditionalOptions: boolean
@@ -45,6 +46,14 @@ export const RubricFormSettings = ({
           />
         </Flex.Item>
       )}
+      {!rubricForm.freeFormCriterionComments && !rubricForm.hidePoints && (
+        <Flex.Item margin="0 0 0 small">
+          <RatingDisplaySelect
+            buttonDisplay={rubricForm.buttonDisplay}
+            onChange={buttonDisplay => setRubricFormField('buttonDisplay', buttonDisplay)}
+          />
+        </Flex.Item>
+      )}
       {!rubricForm.freeFormCriterionComments && (
         <Flex.Item margin="0 0 0 small">
           <RubricRatingOrderSelect
@@ -58,9 +67,15 @@ export const RubricFormSettings = ({
           <ScoringTypeSelect
             hidePoints={rubricForm.hidePoints}
             onChange={() => {
-              setRubricFormField('hidePoints', !rubricForm.hidePoints)
+              const newHidePoints = !rubricForm.hidePoints
+
+              setRubricFormField('hidePoints', newHidePoints)
               setRubricFormField('hideScoreTotal', false)
               setRubricFormField('useForGrading', false)
+
+              if (newHidePoints) {
+                setRubricFormField('buttonDisplay', 'numeric')
+              }
             }}
           />
         </Flex.Item>

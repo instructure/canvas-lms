@@ -115,6 +115,7 @@ const ACCOUNT_RUBRICS_QUERY = gql`
 const RUBRIC_PREVIEW_QUERY = gql`
   query RubricQuery($id: ID!) {
     rubric(id: $id) {
+      buttonDisplay
       criteria {
         id: _id
         ratings {

@@ -124,6 +124,7 @@ const mockRubricAssessmentData: RubricAssessmentData[] = [
 
 describe('ModernView', () => {
   const defaultProps = {
+    buttonDisplay: 'numeric',
     criteria: mockCriteria,
     hidePoints: false,
     isPreviewMode: false,
@@ -305,5 +306,157 @@ describe('ModernView', () => {
       ratingId: mockRubricAssessmentData[1].id,
     })
     expect(defaultProps.onUpdateAssessmentData).toHaveBeenCalledTimes(1)
+  })
+
+  describe('buttonDisplay tests', () => {
+    it('renders numeric button displays by default for horizontal view', () => {
+      renderModernView({selectedViewMode: 'horizontal'})
+
+      const ratingButtons = screen.getAllByTestId('rubric-rating-button-label')
+      const totalRatings = mockCriteria.reduce(
+        (sum, criterion) => sum + criterion.ratings.length,
+        0,
+      )
+      expect(ratingButtons).toHaveLength(totalRatings)
+      const innerText = ratingButtons.map(btn => btn.innerText)
+
+      //criteria 1
+      expect(innerText[0]).toEqual('1')
+      expect(innerText[1]).toEqual('0')
+
+      //criteria 2
+      expect(innerText[2]).toEqual('1')
+      expect(innerText[3]).toEqual('0')
+
+      //criteria 3
+      expect(innerText[4]).toEqual('2')
+      expect(innerText[5]).toEqual('1')
+      expect(innerText[6]).toEqual('0')
+    })
+
+    it('renders numeric button displays by default for vertical view', () => {
+      renderModernView({selectedViewMode: 'vertical'})
+
+      const ratingButtons = screen.getAllByTestId('rubric-rating-button-label')
+      const totalRatings = mockCriteria.reduce(
+        (sum, criterion) => sum + criterion.ratings.length,
+        0,
+      )
+      expect(ratingButtons).toHaveLength(totalRatings)
+      const innerText = ratingButtons.map(btn => btn.innerText)
+
+      //criteria 1
+      expect(innerText[0]).toEqual('1')
+      expect(innerText[1]).toEqual('0')
+
+      //criteria 2
+      expect(innerText[2]).toEqual('1')
+      expect(innerText[3]).toEqual('0')
+
+      //criteria 3
+      expect(innerText[4]).toEqual('2')
+      expect(innerText[5]).toEqual('1')
+      expect(innerText[6]).toEqual('0')
+    })
+
+    it('renders points button displays for horizontal view', () => {
+      renderModernView({selectedViewMode: 'horizontal', buttonDisplay: 'points'})
+
+      const ratingButtons = screen.getAllByTestId('rubric-rating-button-label')
+      const totalRatings = mockCriteria.reduce(
+        (sum, criterion) => sum + criterion.ratings.length,
+        0,
+      )
+      expect(ratingButtons).toHaveLength(totalRatings)
+      const innerText = ratingButtons.map(btn => btn.innerText)
+
+      //criteria 1
+      expect(innerText[0]).toEqual('10')
+      expect(innerText[1]).toEqual('8')
+
+      // criteria 2
+      expect(innerText[2]).toEqual('5')
+      expect(innerText[3]).toEqual('3')
+
+      // criteria 3
+      expect(innerText[4]).toEqual('0')
+      expect(innerText[5]).toEqual('0')
+      expect(innerText[6]).toEqual('0')
+    })
+
+    it('renders points button displays for vertical view', () => {
+      renderModernView({selectedViewMode: 'vertical', buttonDisplay: 'points'})
+
+      const ratingButtons = screen.getAllByTestId('rubric-rating-button-label')
+      const totalRatings = mockCriteria.reduce(
+        (sum, criterion) => sum + criterion.ratings.length,
+        0,
+      )
+      expect(ratingButtons).toHaveLength(totalRatings)
+      const innerText = ratingButtons.map(btn => btn.innerText)
+
+      //criteria 1
+      expect(innerText[0]).toEqual('10')
+      expect(innerText[1]).toEqual('8')
+
+      // criteria 2
+      expect(innerText[2]).toEqual('5')
+      expect(innerText[3]).toEqual('3')
+
+      // criteria 3
+      expect(innerText[4]).toEqual('0')
+      expect(innerText[5]).toEqual('0')
+      expect(innerText[6]).toEqual('0')
+    })
+
+    it('does not renders points button displays for horizontal view when hidePoints is true', () => {
+      renderModernView({selectedViewMode: 'horizontal', buttonDisplay: 'points', hidePoints: true})
+
+      const ratingButtons = screen.getAllByTestId('rubric-rating-button-label')
+      const totalRatings = mockCriteria.reduce(
+        (sum, criterion) => sum + criterion.ratings.length,
+        0,
+      )
+      expect(ratingButtons).toHaveLength(totalRatings)
+      const innerText = ratingButtons.map(btn => btn.innerText)
+
+      //criteria 1
+      expect(innerText[0]).toEqual('1')
+      expect(innerText[1]).toEqual('0')
+
+      //criteria 2
+      expect(innerText[2]).toEqual('1')
+      expect(innerText[3]).toEqual('0')
+
+      //criteria 3
+      expect(innerText[4]).toEqual('2')
+      expect(innerText[5]).toEqual('1')
+      expect(innerText[6]).toEqual('0')
+    })
+
+    it('does not renders points button displays for vertical view when hidePoints is true', () => {
+      renderModernView({selectedViewMode: 'vertical', buttonDisplay: 'points', hidePoints: true})
+
+      const ratingButtons = screen.getAllByTestId('rubric-rating-button-label')
+      const totalRatings = mockCriteria.reduce(
+        (sum, criterion) => sum + criterion.ratings.length,
+        0,
+      )
+      expect(ratingButtons).toHaveLength(totalRatings)
+      const innerText = ratingButtons.map(btn => btn.innerText)
+
+      //criteria 1
+      expect(innerText[0]).toEqual('1')
+      expect(innerText[1]).toEqual('0')
+
+      //criteria 2
+      expect(innerText[2]).toEqual('1')
+      expect(innerText[3]).toEqual('0')
+
+      //criteria 3
+      expect(innerText[4]).toEqual('2')
+      expect(innerText[5]).toEqual('1')
+      expect(innerText[6]).toEqual('0')
+    })
   })
 })

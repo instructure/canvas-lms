@@ -105,6 +105,7 @@ export default ({
     >
       <View as="div">
         <RubricAssessmentContainerWrapper
+          buttonDisplay={mappedRubric?.buttonDisplay ?? 'level'}
           criteria={mappedRubric?.criteria ?? []}
           currentUserId={currentUserId}
           hidePoints={rubricHidePoints}
