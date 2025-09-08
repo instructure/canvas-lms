@@ -69,7 +69,6 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
             onChangeValue(resultJson?.value)
           })
           .catch(error => {
-            console.error('Error generating text input:', error)
             const statusCode = error?.response?.status || 0
 
             if (statusCode == 429) {
