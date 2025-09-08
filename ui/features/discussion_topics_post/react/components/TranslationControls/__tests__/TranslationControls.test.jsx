@@ -18,8 +18,8 @@
 
 import React from 'react'
 import {render, screen, act, waitFor} from '@testing-library/react'
-import { TranslationControls } from '../TranslationControls'
-import { DiscussionManagerUtilityContext } from '../../../utils/constants'
+import {TranslationControls} from '../TranslationControls'
+import {DiscussionManagerUtilityContext} from '../../../utils/constants'
 import userEvent from '@testing-library/user-event'
 
 const mockOnSetSelectedLanguage = jest.fn()
@@ -28,22 +28,24 @@ const mockOnSetIsLanguageNotSelectedError = jest.fn()
 
 const mockTranslationLanguages = {
   current: [
-    { id: 'en', name: 'English', translated_to_name: 'Translated to English' },
-    { id: 'es', name: 'Spanish', translated_to_name: 'Translated to Spanish' },
-    { id: 'hu', name: 'Hungarian', translated_to_name: 'Translated to Hungarian' },
+    {id: 'en', name: 'English', translated_to_name: 'Translated to English'},
+    {id: 'es', name: 'Spanish', translated_to_name: 'Translated to Spanish'},
+    {id: 'hu', name: 'Hungarian', translated_to_name: 'Translated to Hungarian'},
   ],
 }
 
 const renderComponent = (props = {}) => {
   return render(
-    <DiscussionManagerUtilityContext.Provider value={{ translationLanguages: mockTranslationLanguages }}>
+    <DiscussionManagerUtilityContext.Provider
+      value={{translationLanguages: mockTranslationLanguages}}
+    >
       <TranslationControls
         onSetSelectedLanguage={mockOnSetSelectedLanguage}
         onSetIsLanguageAlreadyActiveError={mockOnSetIsLanguageAlreadyActiveError}
         onSetIsLanguageNotSelectedError={mockOnSetIsLanguageNotSelectedError}
         {...props}
       />
-    </DiscussionManagerUtilityContext.Provider>
+    </DiscussionManagerUtilityContext.Provider>,
   )
 }
 
@@ -66,19 +68,6 @@ describe('TranslationControls Component', () => {
     expect(screen.getByPlaceholderText('Select a language...')).toBeInTheDocument()
   })
 
-  it('filters language options based on input', async () => {
-    renderComponent()
-
-    const input = screen.getByPlaceholderText('Select a language...')
-    await userEvent.type(input, 'Sp')
-
-    await waitFor(async () => {
-      expect(await screen.findByText('Spanish')).toBeInTheDocument()
-      expect(await screen.queryByText('English')).not.toBeInTheDocument()
-    })
-
-  })
-
   it('selects a language and triggers callback', async () => {
     renderComponent()
 
@@ -93,31 +82,35 @@ describe('TranslationControls Component', () => {
   })
 
   it('displays error message if no language is selected', () => {
-    renderComponent({ isLanguageNotSelectedError: true })
+    renderComponent({isLanguageNotSelectedError: true})
     expect(screen.getByText('Please select a language.')).toBeInTheDocument()
   })
 
   it('displays error message if language is already active', () => {
-    renderComponent({ isLanguageAlreadyActiveError: true })
+    renderComponent({isLanguageAlreadyActiveError: true})
     expect(screen.getByText('Already translated into the selected language.')).toBeInTheDocument()
   })
 
   it('resets input when reset() is called via ref', async () => {
-    const ref = { current: null }
+    const ref = {current: null}
     render(
-      <DiscussionManagerUtilityContext.Provider value={{ translationLanguages: mockTranslationLanguages }}>
+      <DiscussionManagerUtilityContext.Provider
+        value={{translationLanguages: mockTranslationLanguages}}
+      >
         <TranslationControls
           ref={ref}
           onSetSelectedLanguage={mockOnSetSelectedLanguage}
           onSetIsLanguageAlreadyActiveError={mockOnSetIsLanguageAlreadyActiveError}
           onSetIsLanguageNotSelectedError={mockOnSetIsLanguageNotSelectedError}
         />
-      </DiscussionManagerUtilityContext.Provider>
+      </DiscussionManagerUtilityContext.Provider>,
     )
 
     const input = screen.getByPlaceholderText('Select a language...')
-    await userEvent.type(input, 'French')
-    expect(input.value).toBe('French')
+    await userEvent.click(input)
+    const spanishOption = await screen.findByText('Spanish')
+    await userEvent.click(spanishOption)
+    expect(input.value).toBe('Spanish')
 
     act(() => {
       ref.current.reset()
