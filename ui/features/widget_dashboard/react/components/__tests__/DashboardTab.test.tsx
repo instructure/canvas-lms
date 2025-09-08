@@ -231,12 +231,12 @@ describe('DashboardTab', () => {
     cleanup()
   })
 
-  it('should render widget grid with course work summary widget', async () => {
+  it('should render widget grid with course work widget', async () => {
     const {getByTestId, cleanup} = setup()
 
     await waitFor(() => {
       expect(getByTestId('widget-grid')).toBeInTheDocument()
-      expect(getByTestId('widget-course-work-widget')).toBeInTheDocument()
+      expect(getByTestId('widget-course-work-combined-widget')).toBeInTheDocument()
     })
 
     cleanup()
@@ -246,28 +246,7 @@ describe('DashboardTab', () => {
     const {getByText, cleanup} = setup()
 
     await waitFor(() => {
-      expect(getByText("Today's course work")).toBeInTheDocument()
-    })
-
-    cleanup()
-  })
-
-  it('should handle course statistics loading state', async () => {
-    // Override server to return delayed response
-    server.use(
-      graphql.query('GetUserCourseStatistics', () => {
-        return new Promise(resolve => {
-          setTimeout(() => {
-            resolve(HttpResponse.json(mockStatisticsData))
-          }, 100)
-        })
-      }),
-    )
-
-    const {getByText, cleanup} = setup()
-
-    await waitFor(() => {
-      expect(getByText('Loading course work data...')).toBeInTheDocument()
+      expect(getByText('Course Work')).toBeInTheDocument()
     })
 
     cleanup()

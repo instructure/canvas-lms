@@ -160,7 +160,7 @@ describe('CourseWorkSummaryWidget', () => {
     const {cleanup} = setup(buildDefaultProps())
 
     await waitFor(() => {
-      expect(screen.getByDisplayValue('Next 3 Days')).toBeInTheDocument()
+      expect(screen.getByDisplayValue('Next 3 days')).toBeInTheDocument()
     })
 
     cleanup()

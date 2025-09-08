@@ -20,6 +20,7 @@ import type {WidgetRegistry, WidgetRenderer} from '../types'
 import {WIDGET_TYPES} from '../constants'
 import CourseWorkSummaryWidget from './widgets/CourseWorkSummaryWidget/CourseWorkSummaryWidget'
 import CourseWorkWidget from './widgets/CourseWorkWidget/CourseWorkWidget'
+import CourseWorkCombinedWidget from './widgets/CourseWorkCombinedWidget/CourseWorkCombinedWidget'
 import CourseGradesWidget from './widgets/CourseGradesWidget/CourseGradesWidget'
 import AnnouncementsWidget from './widgets/AnnouncementsWidget/AnnouncementsWidget'
 import PeopleWidget from './widgets/PeopleWidget/PeopleWidget'
@@ -34,6 +35,11 @@ const widgetRegistry: WidgetRegistry = {
     component: CourseWorkWidget,
     displayName: 'Course Work',
     description: 'View and manage all your course assignments and tasks',
+  },
+  [WIDGET_TYPES.COURSE_WORK_COMBINED]: {
+    component: CourseWorkCombinedWidget,
+    displayName: 'Course Work Combined',
+    description: 'View course work statistics and assignments in one comprehensive view',
   },
   [WIDGET_TYPES.COURSE_GRADES]: {
     component: CourseGradesWidget,
