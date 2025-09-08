@@ -559,7 +559,7 @@ class GradebooksController < ApplicationController
       late_policy: @context.late_policy.as_json(include_root: false),
       login_handle_name: root_account.settings[:login_handle_name],
       message_attachment_upload_folder_id: @current_user.conversation_attachments_folder.id.to_s,
-      multiselect_gradebook_filters_enabled: Account.site_admin.feature_enabled?(:multiselect_gradebook_filters),
+      multiselect_gradebook_filters_enabled: multiselect_filters_enabled?,
       outcome_gradebook_enabled: outcome_gradebook_enabled?,
       performance_controls: gradebook_performance_controls,
       post_grades_feature: post_grades_feature?,
@@ -1077,8 +1077,6 @@ class GradebooksController < ApplicationController
 
       remote_env(speedgrader: Services::PlatformServiceSpeedgrader.launch_url)
 
-      multiselect_filters_enabled = Account.site_admin.feature_enabled?(:multiselect_gradebook_filters)
-
       env = {
         A2_STUDENT_ENABLED: @assignment&.a2_enabled? || false,
         COMMENT_LIBRARY_FEATURE_ENABLED:
@@ -1099,8 +1097,8 @@ class GradebooksController < ApplicationController
         PROJECT_LHOTSE_ENABLED: @context.feature_enabled?(:project_lhotse),
         GRADING_ASSISTANCE_FILE_UPLOADS_ENABLED: Account.site_admin.feature_enabled?(:grading_assistance_file_uploads),
         DISCUSSION_INSIGHTS_ENABLED: @context.feature_enabled?(:discussion_insights),
-        MULTISELECT_FILTERS_ENABLED: multiselect_filters_enabled,
-        gradebook_section_filter_id: multiselect_filters_enabled ? gradebook_settings(@context.global_id)&.dig("filter_rows_by", "section_ids") : gradebook_settings(@context.global_id)&.dig("filter_rows_by", "section_id"),
+        MULTISELECT_FILTERS_ENABLED: multiselect_filters_enabled?,
+        gradebook_section_filter_id: filtered_sections,
         COMMENT_BANK_PER_ASSIGNMENT_ENABLED: Account.site_admin.feature_enabled?(:comment_bank_per_assignment),
       }
       js_env(env)
@@ -1173,7 +1171,7 @@ class GradebooksController < ApplicationController
           assignment_missing_shortcut: Account.site_admin.feature_enabled?(:assignment_missing_shortcut),
           enhanced_rubrics_enabled:,
           rubric_outcome_data: enhanced_rubrics_enabled ? rubric&.outcome_data : [],
-          multiselect_filters_enabled: Account.site_admin.feature_enabled?(:multiselect_gradebook_filters)
+          multiselect_filters_enabled: multiselect_filters_enabled?,
         }
         if grading_role_for_user == :moderator
           env[:provisional_select_url] = api_v1_select_provisional_grade_path(@context.id, @assignment.id, "{{provisional_grade_id}}")
@@ -1512,6 +1510,21 @@ class GradebooksController < ApplicationController
   end
 
   private
+
+  def multiselect_filters_enabled?
+    return @multiselect_filters_enabled if defined?(@multiselect_filters_enabled)
+
+    @multiselect_filters_enabled = Account.site_admin.feature_enabled?(:multiselect_gradebook_filters)
+  end
+
+  def filtered_sections
+    if multiselect_filters_enabled?
+      section_ids = gradebook_settings(@context.global_id)&.dig("filter_rows_by", "section_ids")
+      section_ids.blank? ? section_ids : @context.course_sections.active.where(id: section_ids).pluck(:id).map(&:to_s)
+    else
+      gradebook_settings(@context.global_id)&.dig("filter_rows_by", "section_id")
+    end
+  end
 
   def platform_service_speedgrader_enabled?
     return false unless @context.feature_enabled?(:platform_service_speedgrader)
