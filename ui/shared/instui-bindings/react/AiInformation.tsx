@@ -29,9 +29,10 @@ interface Props {
   dataRetention: string
   dataLogging: string
   dataSharedWithModel: string
+  dataSharedWithModelDescription?: string
   regionsSupported: string
   isPIIExposed: boolean
-  piiDescription?: string
+  isPIIExposedDescription?: string
   isFeatureBehindSetting: boolean
   isHumanInTheLoop: boolean
   guardrails?: string
@@ -58,7 +59,7 @@ export default function CanvasAiInformation(props: Props) {
     },
     {
       level: I18n.t('LEVEL 2'),
-      title: I18n.t('AI-Powered Features Without Data Retention'),
+      title: I18n.t('AI-Powered Features Without Data Training'),
       description: I18n.t(
         'We utilize off-the-shelf AI models and customer data as input to provide AI-powered features. No data is used for training this model.',
       ),
@@ -139,6 +140,7 @@ export default function CanvasAiInformation(props: Props) {
             'Indicates which training or operational content was given to the model.',
           ),
           value: props.dataSharedWithModel,
+          valueDescription: props.dataSharedWithModelDescription,
         },
       ],
     },
@@ -168,7 +170,7 @@ export default function CanvasAiInformation(props: Props) {
           segmentTitle: I18n.t('PII'),
           description: I18n.t('Sensitive data that can be used to identify an individual.'),
           value: props.isPIIExposed ? I18n.t('Exposed') : I18n.t('Not Exposed'),
-          valueDescription: props.piiDescription,
+          valueDescription: props.isPIIExposedDescription,
         },
       ],
     },

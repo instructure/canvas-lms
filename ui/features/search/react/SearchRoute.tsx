@@ -20,9 +20,64 @@ import {Portal} from '@instructure/ui-portal'
 import {useParams} from 'react-router-dom'
 import SearchApp from './SearchApp'
 import EnhancedSmartSearch from './enhanced_ui/EnhancedSmartSearch'
+import {useEffect} from 'react'
+import CanvasAiInformation from '@canvas/instui-bindings/react/AiInformation'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {theme} from '@instructure/canvas-theme'
+import {Avatar} from '@instructure/ui-avatar'
+import {createRoot} from 'react-dom/client'
+
+const I18n = createI18nScope('SmartSearch')
 
 export function Component(): JSX.Element | null {
   const {courseId} = useParams()
+
+  useEffect(() => {
+    const aiInformation = (
+      <CanvasAiInformation
+        featureName={I18n.t('Smart Search')}
+        modelName={I18n.t('Cohere Embed Multilingual')}
+        isTrainedWithUserData={false}
+        dataSharedWithModel={I18n.t('Course')}
+        dataSharedWithModelDescription={I18n.t(
+          'Course content is indexed by the model and then stored in the Canvas database.',
+        )}
+        dataRetention={I18n.t('Data is not stored or reused by the model,')}
+        dataLogging={I18n.t('Does Not Log Data')}
+        regionsSupported={I18n.t('US, Canada, EMEA, APAC, LATAM')}
+        isPIIExposed={false}
+        isPIIExposedDescription={I18n.t(
+          'PII in course content may be indexed, but no PII is intentionally sent to the model',
+        )}
+        isFeatureBehindSetting={true}
+        isHumanInTheLoop={true}
+        expectedRisks={I18n.t(
+          'Search results may be incorrectly sorted or may not be relevant to the search term',
+        )}
+        intendedOutcomes={I18n.t(
+          'Students are able to quickly find answers to questions, and instructors are able to quickly navigate their courses.',
+        )}
+        permissionsLevel={2}
+        triggerButton={
+          <Avatar
+            as="button"
+            themeOverride={{
+              color: theme.colors.primitives.grey125,
+              borderColor: theme.colors.primitives.grey125,
+            }}
+            size="x-small"
+            name={I18n.t('Artificial Intelligence')}
+          />
+        }
+      />
+    )
+    const aiInfoElement = document.getElementById('ai-information-mount')
+    if (aiInfoElement) {
+      const root = createRoot(aiInfoElement)
+      root.render(aiInformation)
+    }
+  }, [])
+
   const mountPoint = document.getElementById('search_app')
   if (mountPoint === null) {
     console.error('Cannot render SearchRoute, container is missing')
