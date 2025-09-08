@@ -93,6 +93,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :reject_enrollment_invitation, mutation: Mutations::RejectEnrollmentInvitation
   field :restore_deleted_discussion_entry, mutation: Mutations::RestoreDeletedDiscussionEntry
   field :save_rubric_assessment, mutation: Mutations::SaveRubricAssessment
+  field :select_provisional_grade, mutation: Mutations::SelectProvisionalGrade
   field :set_friendly_description, mutation: Mutations::SetFriendlyDescription
   field :set_module_item_completion, mutation: Mutations::SetModuleItemCompletion
   field :set_override_status, mutation: Mutations::SetOverrideStatus
