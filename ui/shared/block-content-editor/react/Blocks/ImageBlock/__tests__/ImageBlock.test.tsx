@@ -31,7 +31,7 @@ describe('ImageBlock', () => {
       title: '',
       includeBlockTitle: false,
       backgroundColor: 'color',
-      textColor: 'color',
+      titleColor: 'color',
       url: 'https://example.com/image.jpg',
       altText: 'Example Image',
       caption: 'This is an example image.',

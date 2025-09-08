@@ -35,7 +35,7 @@ export const ImageBlockSettings = () => {
     actions: {setProp},
     includeBlockTitle,
     backgroundColor,
-    textColor,
+    titleColor,
     caption,
     altText,
     altTextAsCaption,
@@ -45,7 +45,7 @@ export const ImageBlockSettings = () => {
   } = useNode(node => ({
     includeBlockTitle: !!node.data.props.includeBlockTitle,
     backgroundColor: node.data.props.backgroundColor,
-    textColor: node.data.props.textColor,
+    titleColor: node.data.props.titleColor,
     caption: node.data.props.caption,
     altText: node.data.props.altText,
     altTextAsCaption: node.data.props.altTextAsCaption,
@@ -66,9 +66,9 @@ export const ImageBlockSettings = () => {
     })
   }
 
-  const handleTextColorChange = (color: string) => {
+  const handleTitleColorChange = (color: string) => {
     setProp((props: ImageBlockProps) => {
-      props.textColor = color
+      props.titleColor = color
     })
   }
 
@@ -119,7 +119,7 @@ export const ImageBlockSettings = () => {
           <ColorPickerWrapper
             label={I18n.t('Background color')}
             value={backgroundColor}
-            baseColor={textColor}
+            baseColor={titleColor}
             baseColorLabel={I18n.t('Title color')}
             onChange={handleBackgroundColorChange}
           />
@@ -127,10 +127,10 @@ export const ImageBlockSettings = () => {
         <View as="div">
           <ColorPickerWrapper
             label={I18n.t('Title color')}
-            value={textColor}
+            value={titleColor}
             baseColor={backgroundColor}
             baseColorLabel={I18n.t('Background color')}
-            onChange={handleTextColorChange}
+            onChange={handleTitleColorChange}
           />
         </View>
       </SettingsSectionToggle>

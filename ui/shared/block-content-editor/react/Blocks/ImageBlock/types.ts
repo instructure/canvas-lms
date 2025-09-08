@@ -22,6 +22,6 @@ import {TitleData} from '../BlockItems/Title/types'
 type ImageBlockSettings = {
   includeBlockTitle: boolean
   backgroundColor: string
-  textColor: string
+  titleColor: string
 }
 export type ImageBlockProps = ImageData & TitleData & ImageBlockSettings

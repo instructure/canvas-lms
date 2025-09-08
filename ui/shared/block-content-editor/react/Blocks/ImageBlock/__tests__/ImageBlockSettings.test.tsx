@@ -27,7 +27,7 @@ const defaultProps = {
   title: '',
   includeBlockTitle: false,
   backgroundColor: 'color',
-  textColor: 'color',
+  titleColor: 'color',
   url: 'https://example.com/image.jpg',
   altText: 'Example Image',
   caption: 'This is an example image.',
@@ -125,7 +125,7 @@ describe('ImageBlockSettings', () => {
 
   describe('title color', () => {
     it('integrates, changing the state', async () => {
-      const component = renderBlock(ImageBlockSettings, {...defaultProps, textColor: '000000'})
+      const component = renderBlock(ImageBlockSettings, {...defaultProps, titleColor: '000000'})
       const input = component.getByLabelText(/Title color/i) as HTMLInputElement
       await userEvent.clear(input)
       await userEvent.type(input, color)
