@@ -4508,7 +4508,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   // Context Module Data & Lifecycle Methods
   updateContextModules = (contextModules: Module[]) => {
     this.setContextModules(contextModules)
-    this.setState({modules: contextModules})
+    if (this._isMounted) {
+      this.setState({modules: contextModules})
+    }
     this.renderViewOptionsMenu()
     this.renderFilters()
     this._updateEssentialDataLoaded()
