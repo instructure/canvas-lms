@@ -44,7 +44,13 @@ import {useCourseTeacher} from '../hooks/queriesTeacher/useCourseTeacher'
 import {validateModuleTeacherRenderRequirements, ALL_MODULES} from '../utils/utils'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useHowManyModulesAreFetchingItems} from '../hooks/queries/useHowManyModulesAreFetchingItems'
-import {TEACHER, STUDENT, MODULE_ITEMS, SHOW_ALL_PAGE_SIZE} from '../utils/constants'
+import {
+  TEACHER,
+  STUDENT,
+  MODULE_ITEMS,
+  MODULE_ITEMS_ALL,
+  SHOW_ALL_PAGE_SIZE,
+} from '../utils/constants'
 import CreateNewModule from '../components/CreateNewModule'
 import {useDefaultCourseFolder} from '../hooks/mutations/useDefaultCourseFolder'
 
@@ -207,7 +213,7 @@ const ModulesList: React.FC = () => {
 
     // In "show all" mode, prioritize the complete data over paginated data
     let sourceModuleData = queryClient.getQueryData([
-      'MODULE_ITEMS_ALL',
+      MODULE_ITEMS_ALL,
       dragModuleId,
       view,
       SHOW_ALL_PAGE_SIZE,
@@ -247,13 +253,13 @@ const ModulesList: React.FC = () => {
 
       // Also try to update "show all" cache if it exists with correct key
       const showAllData = queryClient.getQueryData([
-        'MODULE_ITEMS_ALL',
+        MODULE_ITEMS_ALL,
         moduleId,
         view,
         SHOW_ALL_PAGE_SIZE,
       ])
       if (showAllData) {
-        queryClient.setQueryData(['MODULE_ITEMS_ALL', moduleId, view, SHOW_ALL_PAGE_SIZE], {
+        queryClient.setQueryData([MODULE_ITEMS_ALL, moduleId, view, SHOW_ALL_PAGE_SIZE], {
           ...(moduleId === dragModuleId ? sourceModuleData : showAllData),
           moduleItems: updatedItems,
         })
@@ -294,7 +300,7 @@ const ModulesList: React.FC = () => {
       // If not found in paginated cache, try the "show all" cache with correct key
       if (!destModuleData?.moduleItems) {
         destModuleData = queryClient.getQueryData([
-          'MODULE_ITEMS_ALL',
+          MODULE_ITEMS_ALL,
           hoverModuleId,
           view,
           SHOW_ALL_PAGE_SIZE,
@@ -338,13 +344,13 @@ const ModulesList: React.FC = () => {
         })
       }
       const sourceShowAllData = queryClient.getQueryData([
-        'MODULE_ITEMS_ALL',
+        MODULE_ITEMS_ALL,
         dragModuleId,
         view,
         SHOW_ALL_PAGE_SIZE,
       ])
       if (sourceShowAllData) {
-        queryClient.setQueryData(['MODULE_ITEMS_ALL', dragModuleId, view, SHOW_ALL_PAGE_SIZE], {
+        queryClient.setQueryData([MODULE_ITEMS_ALL, dragModuleId, view, SHOW_ALL_PAGE_SIZE], {
           ...sourceShowAllData,
           moduleItems: updatedSourceItems,
         })
@@ -360,13 +366,13 @@ const ModulesList: React.FC = () => {
         })
       }
       const destShowAllData = queryClient.getQueryData([
-        'MODULE_ITEMS_ALL',
+        MODULE_ITEMS_ALL,
         hoverModuleId,
         view,
         SHOW_ALL_PAGE_SIZE,
       ])
       if (destShowAllData) {
-        queryClient.setQueryData(['MODULE_ITEMS_ALL', hoverModuleId, view, SHOW_ALL_PAGE_SIZE], {
+        queryClient.setQueryData([MODULE_ITEMS_ALL, hoverModuleId, view, SHOW_ALL_PAGE_SIZE], {
           ...destShowAllData,
           moduleItems: updatedDestWithIndexes,
         })

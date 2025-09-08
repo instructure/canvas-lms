@@ -103,6 +103,7 @@ describe('assignToUtils', () => {
           moduleId: '1',
           isCheckpointed: false,
           isGraded: true,
+          cursor: null,
         },
       )
       await waitFor(() => {
@@ -124,6 +125,7 @@ describe('assignToUtils', () => {
           moduleId: '1',
           isCheckpointed: false,
           isGraded: false,
+          cursor: null,
         },
       )
       await waitFor(() => {

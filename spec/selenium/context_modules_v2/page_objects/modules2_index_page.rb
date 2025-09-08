@@ -66,6 +66,10 @@ module Modules2IndexPage
     "//button[.//span[text()='Create a new Module']]"
   end
 
+  def clear_due_date_button_selector
+    "[data-testid='due_at_clear_button']"
+  end
+
   def get_student_views_assignment(course_id, assignment_id)
     get "/courses/#{course_id}/assignments/#{assignment_id}"
   end
@@ -473,6 +477,10 @@ module Modules2IndexPage
 
   def empty_state_module_creation_button
     fxpath(empty_state_module_creation_button_selector)
+  end
+
+  def clear_due_date_button
+    f(clear_due_date_button_selector)
   end
 
   def copy_button
