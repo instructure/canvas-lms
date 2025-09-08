@@ -6332,6 +6332,7 @@ uk:
   deactivate_user_86c09036: "Деактивувати користувача"
   debugging_f98fcd74: Відлагодження
   decaying_average_8bf6a0dd: "Середнє розпаду"
+  decline_7eeb5ff4: Відхилити
   decorative_image_3c28aa7d: "Декоративне зображення"
   decorative_image_fde98579: "Декоративне зображення"
   decrease_indent_d9cf469d: "Зменшити відступ"
@@ -18170,6 +18171,7 @@ uk:
   unarchive_f245e2d6: Розархівувати
   unarchive_selected_e0c4bd3d: "Розархівувати обране"
   unauthorized: "не авторизовано"
+  unauthorized_5094f75c: Неавторизований
   unauthorized_message: "Недійсний підпис JWT"
   unauthorized_to_delete_this_file_a1271224: "Неавторизовано для видалення цього файлу"
   unavailable_46d2c344: Недоступний
