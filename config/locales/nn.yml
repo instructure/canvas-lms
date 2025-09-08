@@ -9484,6 +9484,7 @@ nn:
   decaying_average_8bf6a0dd: "Minkande gjennomsnitt"
   decaying_average_recentint_remainderint_ab0636cc: "Synkande gjennomsnitt - %{recentInt}%/%{remainderInt}%"
   december_acc47508: Desember
+  decline_7eeb5ff4: Avslå
   decorative_image_3c28aa7d: "Dekorativt bilde"
   decorative_image_fde98579: "Dekorativt bilde"
   decrease_indent_d9cf469d: "Reduser innrykk"
@@ -28053,6 +28054,7 @@ nn:
   unassigned_permissions_6a38ca95: "Ikkje tilordna løyve"
   unassigned_roles_cb9e95ec: "Roller ikkje tilordna"
   unauthorized: uautorisert
+  unauthorized_5094f75c: Uautorisert
   unauthorized_message: "JWT-signatur er ugyldig"
   unauthorized_to_delete_this_file_a1271224: "Har ikkje autorisasjon til å fjerne denne fila"
   unauthorized_unable_to_add_messages_to_conversatio_d8b9558c: "Uautorisert, kan ikkje legge til meldingar i samtalen"
