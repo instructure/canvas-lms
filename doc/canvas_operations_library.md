@@ -87,6 +87,10 @@ module DataFixup
       # Should records be yielded one at a time, or in batches? (more details below)
       self.mode = :batch
 
+      # If set to true, the return value of `process_record` or `process_batch` will be
+      # recorded in an auditable Attachment associated with the operation's context.
+      self.record_changes = true
+
       # Define the scope of records to process (more details below)
       scope do
         Pseudonym.instructure_identity.where(
@@ -126,6 +130,7 @@ end
 | Property                | Description |
 |-------------------------|-------------|
 | `mode`                  | Controls how records are yielded to your processing logic. <br> - `:individual_record`: Each record is yielded one at a time to the `process_record` method.<br> - `:batch`: Records are yielded in batches to the `process_batch` method. <br> No matter which you choose, records are loaded efficiently in batches. |
+| `record_changes`        | Whether to record changes made by the datafixup in Attachment logs associated with the context. Returns from `process_record` or `process_batch` are written to chunked text files and uploaded as Attachments. Defaults to `false` and is always disabled in test environments. |
 | `scope`                 | The ActiveRecord scope that defines the set of records to be processed by the fixup. |
 | `process_record(record)` | (For `:individual_record` mode) Define this method to specify how to process each individual record. |
 | `process_batch(records)` | (For `:batch` mode) Define this method to specify how to process a batch of records. |

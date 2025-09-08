@@ -27,6 +27,8 @@ RSpec.describe CanvasOperations::DataFixup do
     before do
       stub_const("BatchDataFixup", Class.new(described_class) do
         self.mode = :batch
+        self.progress_tracking = false
+
         scope { User.all }
 
         def process_batch(records)
@@ -36,14 +38,50 @@ RSpec.describe CanvasOperations::DataFixup do
     end
   end
 
+  shared_context "batch data fixup with recording" do
+    before do
+      stub_const("BatchDataFixup", Class.new(described_class) do
+        self.mode = :batch
+        self.record_changes = true
+        self.progress_tracking = false
+
+        scope { User.all }
+
+        def process_batch(records)
+          records.update_all(name: "Fixed User")
+          "Updated #{records.count} users"
+        end
+      end)
+    end
+  end
+
   shared_context "individual record data fixup" do
     before do
       stub_const("IndividualRecordDataFixup", Class.new(described_class) do
         self.mode = :individual_record
+        self.progress_tracking = false
+
         scope { User.all }
 
         def process_record(record)
           record.update!(name: "Fixed User")
+        end
+      end)
+    end
+  end
+
+  shared_context "individual record data fixup with recording" do
+    before do
+      stub_const("IndividualRecordDataFixup", Class.new(described_class) do
+        self.mode = :individual_record
+        self.record_changes = true
+        self.progress_tracking = false
+
+        scope { User.all }
+
+        def process_record(record)
+          record.update!(name: "Fixed User")
+          "Fixed user #{record.id}"
         end
       end)
     end
@@ -54,6 +92,37 @@ RSpec.describe CanvasOperations::DataFixup do
       expect(described_class.range_batch_size).to eq(5_000)
       expect(described_class.job_scheduled_sleep_time).to eq(0.25)
       expect(described_class.processing_sleep_time).to eq(0.1)
+    end
+  end
+
+  describe "record_changes setting" do
+    it "defaults to false" do
+      expect(described_class.record_changes?).to be(false)
+    end
+
+    context "when not in test environment" do
+      before { allow(Rails.env).to receive(:test?).and_return(false) }
+
+      it "can be set to true" do
+        described_class.record_changes = true
+        expect(described_class.record_changes?).to be(true)
+      end
+
+      it "can be set to false" do
+        described_class.record_changes = false
+        expect(described_class.record_changes?).to be(false)
+      end
+    end
+
+    it "raises an error for invalid values" do
+      expect do
+        described_class.record_changes = "invalid"
+      end.to raise_error(CanvasOperations::Errors::InvalidPropertyValue, "record_changes must be a boolean")
+    end
+
+    it "returns false in test environment even when set to true" do
+      described_class.record_changes = true
+      expect(described_class.record_changes?).to be(false)
     end
   end
 
@@ -171,6 +240,105 @@ RSpec.describe CanvasOperations::DataFixup do
               scope { User.all }
             end)
           end.to raise_error(CanvasOperations::Errors::InvalidPropertyValue)
+        end
+      end
+
+      context "with record_changes set to true" do
+        include_context "individual record data fixup with recording"
+
+        let(:fixup_instance) { IndividualRecordDataFixup.new }
+
+        before do
+          allow(described_class).to receive(:auditable_environment?).and_return(true)
+          allow(InstFS).to receive(:direct_upload).and_return(SecureRandom.uuid)
+        end
+
+        context "when record_changes is true" do
+          it "creates attachment audit logs" do
+            user_model
+
+            expect(Attachment).to receive(:create!).with(
+              context: instance_of(Account),
+              instfs_uuid: instance_of(String),
+              filename: "instructure_data_fixup/individual_record_data_fixup/shards/#{Shard.current.id}.part0",
+              content_type: "text/plain"
+            ).and_call_original
+
+            run_fixup
+            run_jobs
+          end
+
+          it "schedules cleanup jobs for audit attachments" do
+            user_model
+
+            expect do
+              run_fixup
+              run_jobs
+            end.to change { Delayed::Job.where(tag: "IndividualRecordDataFixup#delete_audit_attachment").count }.from(0).to(1)
+
+            job = Delayed::Job.find_by(tag: "IndividualRecordDataFixup#delete_audit_attachment")
+            expect(job.run_at).to be_within(2.hours).of(90.days.from_now)
+
+            expect_any_instance_of(Attachment).to receive(:destroy_content)
+            expect_any_instance_of(Attachment).to receive(:destroy_permanently!)
+
+            job.invoke_job
+          end
+        end
+
+        context "when record_changes is false" do
+          before { IndividualRecordDataFixup.record_changes = false }
+
+          it "does not create attachment audit logs" do
+            user_model
+
+            expect(Attachment).not_to receive(:create!)
+
+            run_fixup
+            run_jobs
+          end
+
+          it "does not write to tempfile" do
+            user_model
+
+            expect_any_instance_of(Tempfile).not_to receive(:write)
+
+            run_fixup
+            run_jobs
+          end
+        end
+
+        context "with batch mode auditing" do
+          include_context "batch data fixup with recording"
+
+          let(:fixup_instance) { BatchDataFixup.new }
+
+          before do
+            BatchDataFixup.range_batch_size = 1
+          end
+
+          it "creates attachment audit logs" do
+            user_model
+
+            expect(Attachment).to receive(:create!).with(
+              context: instance_of(Account),
+              instfs_uuid: instance_of(String),
+              filename: "instructure_data_fixup/batch_data_fixup/shards/#{Shard.current.id}.part0",
+              content_type: "text/plain"
+            ).and_call_original
+
+            run_fixup
+            run_jobs
+          end
+
+          it "schedules cleanup jobs for audit attachments" do
+            user_model
+
+            expect do
+              run_fixup
+              run_jobs
+            end.to change { Delayed::Job.where(tag: "BatchDataFixup#delete_audit_attachment").count }.from(0).to(1)
+          end
         end
       end
     end
