@@ -53,7 +53,7 @@ const defaultProps: ImageTextBlockProps = {
   altText: '',
   includeBlockTitle: false,
   backgroundColor: '',
-  textColor: '',
+  titleColor: '',
   arrangement: 'left',
   textToImageRatio: '1:1',
   fileName: '',

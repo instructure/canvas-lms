@@ -26,7 +26,7 @@ export type TextToImageRatioOption = '1:1' | '2:1'
 export type ImageTextSettings = {
   includeBlockTitle: boolean
   backgroundColor: string
-  textColor: string
+  titleColor: string
   arrangement: ArrangementOption
   textToImageRatio: TextToImageRatioOption
 }
@@ -51,7 +51,7 @@ export type ImageTextBlockEditProps = TitleData &
   ImageData &
   TextData & {
     includeBlockTitle: boolean
-    textColor: string
+    titleColor: string
     arrangement: ArrangementOption
     textToImageRatio: TextToImageRatioOption
   }
@@ -59,7 +59,7 @@ export type ImageTextBlockEditPreviewProps = TitleData &
   ImageData &
   TextData & {
     includeBlockTitle: boolean
-    textColor: string
+    titleColor: string
     arrangement: ArrangementOption
     textToImageRatio: TextToImageRatioOption
   }
@@ -67,7 +67,7 @@ export type ImageTextBlockViewProps = TitleData &
   ImageData &
   TextData & {
     includeBlockTitle: boolean
-    textColor: string
+    titleColor: string
     arrangement: ArrangementOption
     textToImageRatio: TextToImageRatioOption
   }
