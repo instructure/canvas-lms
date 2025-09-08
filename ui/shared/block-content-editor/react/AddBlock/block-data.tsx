@@ -82,7 +82,7 @@ export const blockFactory = {
         },
       ]}
       backgroundColor={defaultBackgroundColor}
-      textColor={defaultTextColor}
+      titleColor={defaultTextColor}
       title=""
     />
   ),

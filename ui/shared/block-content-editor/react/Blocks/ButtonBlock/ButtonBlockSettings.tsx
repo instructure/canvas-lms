@@ -33,7 +33,7 @@ export const ButtonBlockSettings = () => {
     actions: {setProp},
     includeBlockTitle,
     backgroundColor,
-    textColor,
+    titleColor,
     alignment,
     layout,
     isFullWidth,
@@ -41,7 +41,7 @@ export const ButtonBlockSettings = () => {
   } = useNode(node => ({
     includeBlockTitle: node.data.props.includeBlockTitle,
     backgroundColor: node.data.props.backgroundColor,
-    textColor: node.data.props.textColor,
+    titleColor: node.data.props.titleColor,
     alignment: node.data.props.alignment,
     layout: node.data.props.layout,
     isFullWidth: node.data.props.isFullWidth,
@@ -60,9 +60,9 @@ export const ButtonBlockSettings = () => {
     })
   }
 
-  const handleTextColorChange = (color: string) => {
+  const handleTitleColorChange = (color: string) => {
     setProp((props: ButtonBlockProps) => {
-      props.textColor = color
+      props.titleColor = color
     })
   }
 
@@ -103,9 +103,9 @@ export const ButtonBlockSettings = () => {
         <ButtonBlockColorSettings
           includeBlockTitle={includeBlockTitle}
           backgroundColor={backgroundColor}
-          textColor={textColor}
+          titleColor={titleColor}
           onBackgroundColorChange={handleBackgroundColorChange}
-          onTextColorChange={handleTextColorChange}
+          onTitleColorChange={handleTitleColorChange}
         />
       </SettingsSectionToggle>
 

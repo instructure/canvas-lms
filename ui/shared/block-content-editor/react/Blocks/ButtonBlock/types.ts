@@ -41,7 +41,7 @@ export type ButtonBlockSettings = {
   layout: ButtonLayout
   isFullWidth: boolean
   backgroundColor: string
-  textColor: string
+  titleColor: string
 }
 
 export type ButtonBlockBase = TitleData & ButtonBlockSettings
@@ -76,9 +76,9 @@ export type ButtonBlockGeneralButtonSettingsProps = {
 export type ButtonBlockColorSettingsProps = {
   includeBlockTitle: boolean
   backgroundColor: string
-  textColor: string
+  titleColor: string
   onBackgroundColorChange: (color: string) => void
-  onTextColorChange: (color: string) => void
+  onTitleColorChange: (color: string) => void
 }
 
 export type SingleButtonProps = {
