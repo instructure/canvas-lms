@@ -452,6 +452,11 @@
 #           "example": "icon-lti",
 #           "type": "string"
 #         },
+#         "allow_fullscreen": {
+#           "description": "Whether to allow fullscreen mode for this placement (top_navigation placement only)",
+#           "example": true,
+#           "type": "boolean"
+#         },
 #         "custom_fields": {
 #           "description": "Custom fields to be sent with this placement's launch. Merged with tool-level custom fields.",
 #           "example": {"placement_id": "course_nav", "special_param": "value"},

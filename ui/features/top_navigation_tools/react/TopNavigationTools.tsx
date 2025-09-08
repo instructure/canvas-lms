@@ -70,7 +70,7 @@ export function TopNavigationTools(props: TopNavigationToolsProps) {
             trigger={
               <Tooltip renderTip={I18n.t('LTI Tools Menu')}>
                 {/* @ts-expect-error */}
-                <Button renderIcon={IconLtiLine} />
+                <Button renderIcon={IconLtiLine} data-pendo="top-nav-menu-button" />
               </Tooltip>
             }
             key="menu"
@@ -84,6 +84,7 @@ export function TopNavigationTools(props: TopNavigationToolsProps) {
                   key={tool.id}
                   value={tool.id}
                   label={I18n.t('Launch %{tool}', {tool: tool.title})}
+                  data-pendo="top-nav-launch-tool-button"
                 >
                   <Flex direction="row" gap="small">
                     {getToolIcon(tool)}
