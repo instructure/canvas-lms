@@ -1846,6 +1846,8 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
           'a11y_checker',
           'wordcount',
           'instructure_wordcount',
+          'instructure_wordcount_header',
+          'instructure_keyboard_shortcuts_header',
           'instructure_studio_media_options',
           'instructure_rce_external_tools',
           ...pastePlugins,
