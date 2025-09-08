@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "base_operation"
+require_relative "data_fixup_concerns/auditing"
 require_relative "errors"
 
 module CanvasOperations
@@ -46,6 +47,8 @@ module CanvasOperations
   # The operation will iterate over the defined scope in ID ranges, scheduling
   # background jobs to process each range according to the specified mode.
   class DataFixup < BaseOperation
+    extend DataFixupConcerns::Auditing
+
     VALID_MODES = [:individual_record, :batch].freeze
 
     setting :range_batch_size, default: 5_000, type_cast: :to_i
@@ -213,20 +216,26 @@ module CanvasOperations
     def process_range(min_id, max_id)
       log_message("Processing records with IDs between #{min_id} and #{max_id}")
 
-      GuardRail.activate(:report) do
-        scope.where(id: min_id..max_id).in_batches(strategy: batch_strategy) do |batch|
-          case mode
-          when :individual_record
-            batch.each do |record|
-              GuardRail.activate(:primary) { process_record(record) }
+      attachment_audits = with_attachment_audits do |record_changes|
+        GuardRail.activate(:report) do
+          scope.where(id: min_id..max_id).in_batches(strategy: batch_strategy) do |batch|
+            case mode
+            when :individual_record
+              batch.each do |record|
+                change = GuardRail.activate(:primary) { process_record(record) }
+                record_changes.call(change) if record_changes? && change.present?
+                wait_between_processing
+              end
+            when :batch
+              change = GuardRail.activate(:primary) { process_batch(batch) }
+              record_changes.call(change) if record_changes? && change.present?
               wait_between_processing
             end
-          when :batch
-            GuardRail.activate(:primary) { process_batch(batch) }
-            wait_between_processing
           end
         end
       end
+
+      log_message("Wrote attachment audits: #{attachment_audits.join(", ")}") if record_changes?
     end
 
     # Returns a string representing the strand identifier for the current object,
