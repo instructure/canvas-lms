@@ -22,8 +22,8 @@ import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {getSubmissionStatus, getTypeIcon} from './utils'
-import type {CourseWorkItem as CourseWorkItemType} from '../../../hooks/useCourseWork'
+import {getSubmissionStatus, getTypeIcon} from '../widgets/CourseWorkWidget/utils'
+import type {CourseWorkItem as CourseWorkItemType} from '../../hooks/useCourseWork'
 
 const I18n = createI18nScope('widget_dashboard')
 

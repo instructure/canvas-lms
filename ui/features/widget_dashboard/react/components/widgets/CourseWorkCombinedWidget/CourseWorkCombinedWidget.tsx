@@ -26,14 +26,19 @@ import CourseWorkFilters, {type DateFilterOption} from '../../shared/CourseWorkF
 import type {BaseWidgetProps, CourseOption} from '../../../types'
 import {useSharedCourses} from '../../../hooks/useSharedCourses'
 import {useCourseWork} from '../../../hooks/useCourseWork'
+import {useCourseWorkStatistics} from '../../../hooks/useCourseWorkStatistics'
+import StatisticsCardsGrid from '../../shared/StatisticsCardsGrid'
 import {Pagination} from '@instructure/ui-pagination'
 import {Spinner} from '@instructure/ui-spinner'
-import {convertDateFilterToParams} from '../../../utils/dateUtils'
+import {
+  convertDateFilterToParams,
+  convertDateFilterToStatisticsRange,
+} from '../../../utils/dateUtils'
 import {CourseWorkItem as CourseWorkItemComponent} from '../../shared/CourseWorkItem'
 
 const I18n = createI18nScope('widget_dashboard')
 
-const CourseWorkWidget: React.FC<BaseWidgetProps> = ({
+const CourseWorkCombinedWidget: React.FC<BaseWidgetProps> = ({
   widget,
   isLoading: externalIsLoading,
   error: externalError,
@@ -43,18 +48,16 @@ const CourseWorkWidget: React.FC<BaseWidgetProps> = ({
   const [selectedDateFilter, setSelectedDateFilter] = useState<DateFilterOption>('next3days')
   const [currentPageIndex, setCurrentPageIndex] = useState<number>(0)
 
-  // Fetch user's enrolled courses
   const {data: courseGrades = []} = useSharedCourses({limit: 1000})
   const userCourses: CourseOption[] = courseGrades.map(courseGrade => ({
     id: courseGrade.courseId,
     name: courseGrade.courseName,
   }))
 
-  // Convert frontend filter values to backend parameters
   const courseFilter = selectedCourse === 'all' ? undefined : selectedCourse.replace('course_', '')
   const dateParams = convertDateFilterToParams(selectedDateFilter)
+  const statisticsDateRange = convertDateFilterToStatisticsRange(selectedDateFilter)
 
-  // Fetch course work items with infinite pagination
   const {
     data,
     isLoading: courseWorkLoading,
@@ -65,29 +68,33 @@ const CourseWorkWidget: React.FC<BaseWidgetProps> = ({
     isFetchingNextPage,
     isFetchingPreviousPage,
   } = useCourseWork({
-    pageSize: 4,
+    pageSize: 6,
     courseFilter,
     ...dateParams,
   })
 
-  // Get current page data from infinite query
+  const {
+    data: summary = {due: 0, missing: 0, submitted: 0},
+    isLoading: statisticsLoading,
+    error: statisticsError,
+  } = useCourseWorkStatistics({
+    startDate: statisticsDateRange.startDate,
+    endDate: statisticsDateRange.endDate,
+    courseId: courseFilter,
+  })
+
   const currentPage = data?.pages?.[currentPageIndex]
-  const allCourseWorkItems = currentPage?.items || []
+  const filteredItems = currentPage?.items || []
   const totalPagesLoaded = data?.pages?.length || 0
 
-  // Calculate pagination state similar to CourseGrades widget
   const effectiveHasNextPage = currentPageIndex < totalPagesLoaded - 1 || hasNextPage
   const effectiveHasPreviousPage = currentPageIndex > 0
   const effectiveTotalPages = hasNextPage ? totalPagesLoaded + 1 : totalPagesLoaded
   const effectiveCurrentPage = currentPageIndex + 1
 
-  // Use external loading/error states if provided, otherwise use hook states
-  const isLoading = externalIsLoading || courseWorkLoading
-  const error = externalError || courseWorkError?.message || null
+  const isLoading = externalIsLoading || courseWorkLoading || statisticsLoading
+  const error = externalError || courseWorkError?.message || statisticsError?.message || null
   const handleRetry = onRetry || (() => refetch())
-
-  // All filtering is now handled server-side
-  const filteredItems = allCourseWorkItems
 
   const resetPagination = useCallback(() => {
     setCurrentPageIndex(0)
@@ -121,10 +128,8 @@ const CourseWorkWidget: React.FC<BaseWidgetProps> = ({
       if (targetIndex < 0) return
 
       if (targetIndex < totalPagesLoaded) {
-        // Page is already cached, navigate directly
         setCurrentPageIndex(targetIndex)
       } else if (targetIndex === totalPagesLoaded && hasNextPage) {
-        // Need to fetch the next page
         fetchNextPage().then(() => {
           setCurrentPageIndex(targetIndex)
         })
@@ -149,44 +154,54 @@ const CourseWorkWidget: React.FC<BaseWidgetProps> = ({
         />
       }
     >
-      {filteredItems.length === 0 ? (
-        <Flex justifyItems="center" padding="large">
-          <Text color="secondary">
-            {selectedCourse === 'all'
-              ? I18n.t('No upcoming course work')
-              : I18n.t('No upcoming course work for selected course')}
-          </Text>
-        </Flex>
-      ) : (
-        <View height="100%">
-          <Flex direction="column">
-            {filteredItems.map(item => (
-              <CourseWorkItemComponent key={item.id} item={item} />
-            ))}
-          </Flex>
-          {(effectiveHasNextPage || effectiveHasPreviousPage) && (
-            <View padding="small" textAlign="center">
-              <Flex direction="row" justifyItems="center" alignItems="center" gap="small">
-                {(isFetchingNextPage || isFetchingPreviousPage) && (
-                  <Spinner size="x-small" renderTitle={I18n.t('Loading course work...')} />
-                )}
-                <Pagination
-                  variant="compact"
-                  margin="small"
-                  labelNext={I18n.t('Next page')}
-                  labelPrev={I18n.t('Previous page')}
-                  currentPage={effectiveCurrentPage}
-                  totalPageNumber={effectiveTotalPages}
-                  onPageChange={goToPage}
-                  aria-label={I18n.t('Course work pagination')}
-                />
+      <Flex direction="column" gap="small" height="100%">
+        {/* Statistics Cards Section */}
+        <Flex.Item overflowY="hidden">
+          <StatisticsCardsGrid summary={summary} margin="small 0" />
+        </Flex.Item>
+
+        {/* Course Work Items Section */}
+        <Flex.Item shouldGrow>
+          {filteredItems.length === 0 ? (
+            <Flex justifyItems="center" padding="large">
+              <Text color="secondary">
+                {selectedCourse === 'all'
+                  ? I18n.t('No upcoming course work')
+                  : I18n.t('No upcoming course work for selected course')}
+              </Text>
+            </Flex>
+          ) : (
+            <View height="100%">
+              <Flex direction="column">
+                {filteredItems.map(item => (
+                  <CourseWorkItemComponent key={item.id} item={item} />
+                ))}
               </Flex>
+              {(effectiveHasNextPage || effectiveHasPreviousPage) && (
+                <View textAlign="center">
+                  <Flex direction="row" justifyItems="center" alignItems="center" gap="small">
+                    {(isFetchingNextPage || isFetchingPreviousPage) && (
+                      <Spinner size="x-small" renderTitle={I18n.t('Loading course work...')} />
+                    )}
+                    <Pagination
+                      variant="compact"
+                      margin="small"
+                      labelNext={I18n.t('Next page')}
+                      labelPrev={I18n.t('Previous page')}
+                      currentPage={effectiveCurrentPage}
+                      totalPageNumber={effectiveTotalPages}
+                      onPageChange={goToPage}
+                      aria-label={I18n.t('Course work pagination')}
+                    />
+                  </Flex>
+                </View>
+              )}
             </View>
           )}
-        </View>
-      )}
+        </Flex.Item>
+      </Flex>
     </TemplateWidget>
   )
 }
 
-export default CourseWorkWidget
+export default CourseWorkCombinedWidget

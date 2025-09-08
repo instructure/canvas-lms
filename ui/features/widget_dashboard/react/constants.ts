@@ -31,6 +31,7 @@ export type TabId = (typeof TAB_IDS)[keyof typeof TAB_IDS]
 export const WIDGET_TYPES = {
   COURSE_WORK_SUMMARY: 'course_work_summary',
   COURSE_WORK: 'course_work',
+  COURSE_WORK_COMBINED: 'course_work_combined',
   COURSE_GRADES: 'course_grades',
   ANNOUNCEMENTS: 'announcements',
   PEOPLE: 'people',
@@ -42,11 +43,11 @@ export const DEFAULT_WIDGET_CONFIG = {
   columns: 3,
   widgets: [
     {
-      id: 'course-work-summary-widget',
-      type: WIDGET_TYPES.COURSE_WORK_SUMMARY,
+      id: 'course-work-combined-widget',
+      type: WIDGET_TYPES.COURSE_WORK_COMBINED,
       position: {col: 1, row: 1},
-      size: {width: 2, height: 1},
-      title: I18n.t("Today's course work"),
+      size: {width: 2, height: 3},
+      title: I18n.t('Course Work'),
     },
     {
       id: 'announcements-widget',
@@ -58,16 +59,9 @@ export const DEFAULT_WIDGET_CONFIG = {
     {
       id: 'course-grades-widget',
       type: WIDGET_TYPES.COURSE_GRADES,
-      position: {col: 1, row: 2},
-      size: {width: 2, height: 2},
-      title: I18n.t('Course Grades'),
-    },
-    {
-      id: 'course-work-widget',
-      type: WIDGET_TYPES.COURSE_WORK,
       position: {col: 1, row: 4},
       size: {width: 2, height: 2},
-      title: I18n.t('Course Work'),
+      title: I18n.t('Course Grades'),
     },
     {
       id: 'people-widget',

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
-import StatisticsCard from '../StatisticsCard'
+import StatisticsCard from '../../shared/StatisticsCard'
 
 describe('StatisticsCard', () => {
   const defaultProps = {
