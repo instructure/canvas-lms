@@ -256,6 +256,11 @@ class User < ActiveRecord::Base
            class_name: "Auditors::ActiveRecord::FeatureFlagRecord",
            dependent: :destroy,
            inverse_of: :user
+  has_many :auditor_performing_user_account_user_records,
+           foreign_key: "performing_user_id",
+           class_name: "Auditors::ActiveRecord::AccountUserRecord",
+           dependent: :nullify,
+           inverse_of: :performing_user
   has_many :created_lti_registrations, class_name: "Lti::Registration", foreign_key: "created_by_id", inverse_of: :created_by
   has_many :updated_lti_registrations, class_name: "Lti::Registration", foreign_key: "updated_by_id", inverse_of: :updated_by
   has_many :created_lti_registration_account_bindings,
@@ -1228,7 +1233,10 @@ class User < ActiveRecord::Base
       user_observee_scope.destroy_all
       eportfolio_scope&.in_batches&.destroy_all
       pseudonym_scope.each(&:destroy)
-      account_users.each(&:destroy)
+      account_users.each do |account_user|
+        account_user.current_user = updating_user
+        account_user.destroy
+      end
 
       # only delete the user's communication channels when the last account is
       # removed (they don't belong to any particular account). they will always

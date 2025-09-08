@@ -163,6 +163,7 @@ class AdminsController < ApplicationController
     require_role
     admin = @context.account_users.where(user_id: user, role_id: @role.id).first!
     if authorized_action(admin, @current_user, :destroy)
+      admin.current_user = @current_user
       admin.destroy
       render json: admin_json(admin, @current_user, session)
     end

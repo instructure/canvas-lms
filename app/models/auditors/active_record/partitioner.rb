@@ -22,6 +22,7 @@ module Auditors::ActiveRecord
     cattr_accessor :logger
 
     AUDITOR_CLASSES = [
+      AccountUserRecord,
       AuthenticationRecord,
       CourseRecord,
       GradeChangeRecord,

@@ -111,6 +111,10 @@ class Account < ActiveRecord::Base
   has_many :rubric_imports, inverse_of: :root_account, foreign_key: :root_account_id
   has_many :rubric_assessment_imports, inverse_of: :root_account, foreign_key: :root_account_id
 
+  has_many :auditor_account_user_records,
+           class_name: "Auditors::ActiveRecord::AccountUserRecord",
+           dependent: :destroy,
+           inverse_of: :account
   has_many :auditor_authentication_records,
            class_name: "Auditors::ActiveRecord::AuthenticationRecord",
            dependent: :destroy,
