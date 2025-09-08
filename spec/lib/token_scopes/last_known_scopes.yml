@@ -1087,8 +1087,6 @@
   path: '/api/v1/courses/:course_id/group_categories'
 - verb: POST
   path: '/api/v1/courses/:course_id/group_categories/bulk_manage_differentiation_tag'
-- verb: GET
-  path: '/api/v1/courses/:course_id/group_categories/export_tags'
 - verb: POST
   path: '/api/v1/courses/:course_id/group_categories/import_tags'
 - verb: GET
