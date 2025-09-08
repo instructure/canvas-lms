@@ -54,6 +54,13 @@ describe RequestThrottle do
     [200, { "Content-Type" => "text/plain" }, ["Hello"]]
   end
 
+  def req(hash)
+    r = ActionDispatch::Request.new(hash).tap(&:fullpath)
+    throttler.inst_access_token_authentication = AuthenticationMethods::InstAccessToken::Authentication.new(r)
+    allow(r).to receive(:user_agent).and_return(hash["USER_AGENT"]) if hash.key?("USER_AGENT")
+    r
+  end
+
   before { RequestThrottle.reload! }
 
   after { RequestThrottle.reload! }
@@ -109,13 +116,6 @@ describe RequestThrottle do
       it "uses the proper client identifier" do
         expect(throttler.client_identifier(request)).to eq "service_user_key:#{key.global_id}"
       end
-    end
-
-    def req(hash)
-      r = ActionDispatch::Request.new(hash).tap(&:fullpath)
-      throttler.inst_access_token_authentication = AuthenticationMethods::InstAccessToken::Authentication.new(r)
-      allow(r).to receive(:user_agent).and_return(hash["USER_AGENT"]) if hash.key?("USER_AGENT")
-      r
     end
 
     it "uses site admin service user id" do
@@ -356,11 +356,11 @@ describe RequestThrottle do
       end
     end
 
-    def throttled_request
+    def throttled_request(client_identifier = "user:1")
       allow(RequestThrottle).to receive(:enabled?).and_return(true)
       allow(Canvas).to receive(:redis_enabled?).and_return(true)
       bucket = double("Bucket")
-      expect(RequestThrottle::LeakyBucket).to receive(:new).with("user:1").and_return(bucket)
+      expect(RequestThrottle::LeakyBucket).to receive(:new).with(client_identifier).and_return(bucket)
       expect(bucket).to receive(:reserve_capacity).and_yield.and_return(1)
       expect(bucket).to receive(:full?).and_return(true)
       expect(bucket).to receive(:to_json) # in the logger.info line
@@ -374,6 +374,20 @@ describe RequestThrottle do
       expected = rate_limit_exceeded
       expected[1]["X-Rate-Limit-Remaining"] = "-2"
       expect(throttler.call(request_user_1)).to eq expected
+    end
+
+    it "logs the access token when a request is throttled" do
+      request = req(request_query_token)
+      client_identifier = throttler.client_identifier(request)
+      bucket = throttled_request(client_identifier)
+      expect(bucket).to receive(:get_up_front_cost_for_path).and_return(1)
+      expect(bucket).to receive(:remaining).and_return(-2)
+
+      allow(RequestContext::Generator).to receive(:add_meta_header).with(any_args)
+      expect(RequestContext::Generator).to receive(:add_meta_header).with("at", token1.global_id)
+      expect(RequestContext::Generator).to receive(:add_meta_header).with("dk", token1.global_developer_key_id)
+
+      throttler.call(request_query_token)
     end
 
     it "does not throttle if disabled" do

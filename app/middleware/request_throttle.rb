@@ -127,6 +127,16 @@ class RequestThrottle
         if RequestThrottle.enabled?
           InstStatsd::Statsd.distributed_increment("request_throttling.throttled")
           Rails.logger.info("blocking request due to throttling, client id: #{client_identifier(request)} bucket: #{bucket.to_json}")
+          token_string = AuthenticationMethods.access_token(request, :GET)
+          # Do not bother with exceptions when trying to get the access token
+          # on a throttled response, just ignore any NotFound errors.
+          begin
+            access_token = AccessToken.authenticate(token_string, load_pseudonym_from_access_token: true)
+          rescue
+            access_token = nil
+          end
+          RequestContext::Generator.add_meta_header("at", access_token&.global_id) if access_token
+          RequestContext::Generator.add_meta_header("dk", access_token&.global_developer_key_id) if access_token&.developer_key_id
           return false
         else
           Rails.logger.info("WOULD HAVE throttled request (config disabled), client id: #{client_identifier(request)} bucket: #{bucket.to_json}")
