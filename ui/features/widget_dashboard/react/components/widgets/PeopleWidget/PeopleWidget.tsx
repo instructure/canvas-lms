@@ -108,22 +108,6 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
       loadingText={I18n.t('Loading people data...')}
     >
       <Flex direction="column" height="100%">
-        <Flex.Item>
-          <View as="div" margin="x-small">
-            <SimpleSelect
-              renderLabel={I18n.t('Course')}
-              value={selectedCourse}
-              onChange={handleCourseChange}
-              width="100%"
-            >
-              {courseOptions.map(option => (
-                <SimpleSelect.Option key={option.id} id={option.id} value={option.id}>
-                  {option.name}
-                </SimpleSelect.Option>
-              ))}
-            </SimpleSelect>
-          </View>
-        </Flex.Item>
         <Flex.Item shouldGrow>
           <View as="div" padding="small 0">
             {instructors.length === 0 ? (
@@ -140,7 +124,7 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
                         data-testid={`instructor-avatar-${instructor.id}`}
                       />
                     </Flex.Item>
-                    <Flex.Item shouldGrow>
+                    <Flex.Item shouldGrow shouldShrink>
                       <View as="div">
                         <Text size="medium" weight="bold" lineHeight="condensed">
                           {instructor.name}

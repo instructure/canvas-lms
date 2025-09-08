@@ -32,17 +32,6 @@ dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2)
 const threeDaysFromNow = new Date()
 threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3)
 
-// const mockCoursesData = [
-//   {
-//     _id: '1',
-//     name: 'Introduction to Computer Science',
-//   },
-//   {
-//     _id: '2',
-//     name: 'Advanced Mathematics',
-//   },
-// ]
-
 const mockStatisticsData = {
   submissionsDueCount: 5,
   missingSubmissionsCount: 2,
@@ -66,18 +55,6 @@ const buildDefaultProps = (overrides: Partial<BaseWidgetProps> = {}): BaseWidget
 
 const server = setupServer(
   ...defaultGraphQLHandlers,
-  // graphql.query('GetUserCourses', () => {
-  //   return HttpResponse.json({
-  //     data: {
-  //       legacyNode: {
-  //         _id: '123',
-  //         enrollments: mockCoursesData.map(course => ({
-  //           course,
-  //         })),
-  //       },
-  //     },
-  //   })
-  // }),
   graphql.query('GetUserCourseStatistics', () => {
     return HttpResponse.json({
       data: {
