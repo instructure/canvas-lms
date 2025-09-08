@@ -3132,6 +3132,37 @@ describe GradebooksController do
         allow(Services::PlatformServiceSpeedgrader).to receive(:launch_url).and_return("http://example.com")
       end
 
+      context "gradebook_section_filter_id when multiselect_gradebook_filters is enabled" do
+        before do
+          Account.site_admin.enable_feature!(:multiselect_gradebook_filters)
+          Account.site_admin.enable_feature!(:platform_service_speedgrader)
+          @assignment.publish
+          @section = @course.course_sections.create!(name: "A Section")
+        end
+
+        it "includes stringified ids of selected sections" do
+          @teacher.set_preference(:gradebook_settings, @course.global_id, {
+                                    "filter_rows_by" => { "section_ids" => [@section.id.to_s] }
+                                  })
+          get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+          expect(assigns[:js_env].dig(:gradebook_section_filter_id, 0)).to eql @section.id.to_s
+        end
+
+        it "filters out deleted saved sections" do
+          @teacher.set_preference(:gradebook_settings, @course.global_id, {
+                                    "filter_rows_by" => { "section_ids" => [@section.id.to_s] }
+                                  })
+          @section.destroy
+          get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+          expect(assigns[:js_env].fetch(:gradebook_section_filter_id)).to be_empty
+        end
+
+        it "returns nil when section filters have not been used" do
+          get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+          expect(assigns[:js_env].fetch(:gradebook_section_filter_id)).to be_nil
+        end
+      end
+
       it "loads the platform speedgrader when the feature flag is on and the platform_sg flag is passed" do
         @assignment.publish
         Account.site_admin.enable_feature!(:platform_service_speedgrader)
