@@ -24,7 +24,11 @@ import {setupServer} from 'msw/node'
 const ok = value => expect(value).toBeTruthy()
 const equal = (value, expected) => expect(value).toEqual(expected)
 
-const server = setupServer()
+const server = setupServer(
+  http.get('/api/v1/courses/:courseId/modules/:moduleId/items', () => {
+    return HttpResponse.json([])
+  }),
+)
 
 describe('Module', () => {
   beforeAll(() => {
@@ -56,7 +60,7 @@ describe('Module', () => {
     })
     ok(mod.itemCollection instanceof ModuleItemCollection, 'itemCollection is not built')
 
-    // Mock the request for module items
+    // Override the default handler with specific test data
     server.use(
       http.get('/api/v1/courses/:courseId/modules/:moduleId/items', () => {
         return HttpResponse.json([{id: 2}])
