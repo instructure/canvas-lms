@@ -25,6 +25,7 @@ import {Text} from '@instructure/ui-text'
 import {Button} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
 import type {BaseWidgetProps} from '../../../types'
+import {useResponsiveContext} from '../../../hooks/useResponsiveContext'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -49,6 +50,7 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
   onRetry,
   loadingText,
 }) => {
+  const {isMobile} = useResponsiveContext()
   const widgetTitle = title || widget.title
 
   const renderContent = () => {
@@ -103,14 +105,29 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
     >
       <Flex direction="column" gap="small" height="100%" style={{overflow: 'hidden'}}>
         {showHeader && widgetTitle && (
-          <Flex direction="row" alignItems="center" justifyItems="space-between">
-            <Flex.Item shouldGrow>
-              <Heading level="h3" margin="0">
-                {widgetTitle}
-              </Heading>
-            </Flex.Item>
-            {headerActions && <Flex.Item shouldGrow={false}>{headerActions}</Flex.Item>}
-          </Flex>
+          <>
+            {isMobile ? (
+              <Flex direction="column" gap="x-small">
+                <Flex.Item>
+                  <Heading level="h3" margin="0">
+                    {widgetTitle}
+                  </Heading>
+                </Flex.Item>
+                {headerActions && (
+                  <Flex.Item padding="x-small 0 x-small x-small">{headerActions}</Flex.Item>
+                )}
+              </Flex>
+            ) : (
+              <Flex direction="row" alignItems="center" justifyItems="space-between">
+                <Flex.Item shouldGrow>
+                  <Heading level="h3" margin="0">
+                    {widgetTitle}
+                  </Heading>
+                </Flex.Item>
+                {headerActions && <Flex.Item shouldGrow={false}>{headerActions}</Flex.Item>}
+              </Flex>
+            )}
+          </>
         )}
 
         <View as="div">{renderContent()}</View>

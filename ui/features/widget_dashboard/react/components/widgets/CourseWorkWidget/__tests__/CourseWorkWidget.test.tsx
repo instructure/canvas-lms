@@ -204,7 +204,6 @@ describe('CourseWorkWidget', () => {
     renderWithProviders(<CourseWorkWidget {...buildDefaultProps()} />)
 
     expect(screen.getByText('Course Work')).toBeInTheDocument()
-    expect(screen.getByText('Filter by course')).toBeInTheDocument()
 
     // Wait for data to load
     await screen.findByText('Essay on Climate Change')

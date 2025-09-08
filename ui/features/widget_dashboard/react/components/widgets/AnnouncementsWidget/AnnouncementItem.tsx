@@ -189,7 +189,7 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcement}) => {
             <View padding="0 0 0 xxx-small">
               <Text size="x-small">
                 <TruncatedText maxLength={60}>{decodedMessage}</TruncatedText>{' '}
-                <Link href={announcement.html_url} isWithinText={true}>
+                <Link href={announcement.html_url} isWithinText={false}>
                   <Text size="x-small" color="brand">
                     {I18n.t('Read more')}
                   </Text>

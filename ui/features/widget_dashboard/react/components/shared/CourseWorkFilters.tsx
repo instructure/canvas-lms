@@ -20,6 +20,7 @@ import React, {useMemo} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {SimpleSelect} from '@instructure/ui-simple-select'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import type {CourseOption} from '../../types'
 
 const I18n = createI18nScope('widget_dashboard')
@@ -81,7 +82,7 @@ const CourseWorkFilters: React.FC<CourseWorkFiltersProps> = ({
   return (
     <Flex gap="small">
       <SimpleSelect
-        renderLabel={I18n.t('Filter by course')}
+        renderLabel={<ScreenReaderContent>{I18n.t('Filter by course')}</ScreenReaderContent>}
         value={selectedCourse}
         onChange={onCourseChange}
         width="200px"
@@ -94,7 +95,7 @@ const CourseWorkFilters: React.FC<CourseWorkFiltersProps> = ({
         ))}
       </SimpleSelect>
       <SimpleSelect
-        renderLabel={I18n.t('Filter by due date')}
+        renderLabel={<ScreenReaderContent>{I18n.t('Filter by due date')}</ScreenReaderContent>}
         value={selectedDateFilter}
         onChange={onDateFilterChange}
         width="150px"

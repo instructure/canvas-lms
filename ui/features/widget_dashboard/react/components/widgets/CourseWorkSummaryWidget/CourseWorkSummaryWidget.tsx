@@ -80,23 +80,6 @@ const CourseWorkSummaryWidget: React.FC<BaseWidgetProps> = ({widget}) => {
     }
   }
 
-  const tooltipMessage = useMemo(() => {
-    const rangeLabels: Partial<Record<DateFilterOption, string>> = {
-      next3days: I18n.t('Next 3 Days'),
-      next7days: I18n.t('Next 7 Days'),
-      next14days: I18n.t('Next 14 Days'),
-    }
-    const rangeLabel = rangeLabels[selectedDateRange] ?? 'selected date range'
-
-    return (
-      <div>
-        <div>{I18n.t('Due: Assignments due within %{range}', {range: rangeLabel})}</div>
-        <div>{I18n.t('Missing: All missing assignments')}</div>
-        <div>{I18n.t('Submitted: All completed assignments')}</div>
-      </div>
-    )
-  }, [selectedDateRange])
-
   return (
     <TemplateWidget
       widget={widget}
@@ -104,35 +87,17 @@ const CourseWorkSummaryWidget: React.FC<BaseWidgetProps> = ({widget}) => {
       error={error ? I18n.t('Failed to load course work data. Please try again.') : null}
       loadingText={I18n.t('Loading course work data...')}
       headerActions={
-        <Tooltip renderTip={tooltipMessage} placement="top">
-          <IconButton
-            size="small"
-            withBackground={false}
-            withBorder={false}
-            screenReaderLabel={I18n.t('Information about course work counts')}
-          >
-            <IconInfoLine size="x-small" />
-          </IconButton>
-        </Tooltip>
+        <CourseWorkFilters
+          selectedCourse={selectedCourse}
+          selectedDateFilter={selectedDateRange}
+          onCourseChange={handleCourseChange}
+          onDateFilterChange={handleDateRangeChange}
+          userCourses={userCourses}
+          statisticsOnly={true}
+        />
       }
     >
-      <Flex direction="column" gap="x-small">
-        <Flex.Item overflowY="hidden">
-          <Flex gap="small" wrap="wrap" padding="xx-small">
-            <CourseWorkFilters
-              selectedCourse={selectedCourse}
-              selectedDateFilter={selectedDateRange}
-              onCourseChange={handleCourseChange}
-              onDateFilterChange={handleDateRangeChange}
-              userCourses={userCourses}
-              statisticsOnly={true}
-            />
-          </Flex>
-        </Flex.Item>
-        <Flex.Item shouldGrow>
-          <StatisticsCardsGrid summary={summary} />
-        </Flex.Item>
-      </Flex>
+      <StatisticsCardsGrid summary={summary} />
     </TemplateWidget>
   )
 }

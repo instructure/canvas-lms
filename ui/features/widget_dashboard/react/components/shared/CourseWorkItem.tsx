@@ -53,7 +53,7 @@ export function CourseWorkItem({item}: CourseWorkItemProps) {
               {getTypeIcon(item.type)}
             </View>
           </Flex.Item>
-          <Flex.Item shouldGrow>
+          <Flex.Item shouldGrow shouldShrink>
             <Flex direction="column" gap="xx-small">
               <Link
                 href={item.htmlUrl}

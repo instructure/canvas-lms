@@ -23,7 +23,7 @@ import WidgetGrid from './WidgetGrid'
 
 const DashboardTab: React.FC = () => {
   return (
-    <View as="div" data-testid="dashboard-tab-content">
+    <View as="div" data-testid="dashboard-tab-content" padding="medium 0 0 0">
       <WidgetGrid config={DEFAULT_WIDGET_CONFIG} />
     </View>
   )
