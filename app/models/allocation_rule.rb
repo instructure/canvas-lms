@@ -98,21 +98,7 @@ class AllocationRule < ApplicationRecord
     existing_rules = existing_rules.where.not(id:) if persisted?
 
     if existing_rules.exists?
-      errors.add(applies_to_assessor ? :assessee_id : :assessor_id, I18n.t("conflicts with rule \"%{rule_text}\"", rule_text: format_rule_text(existing_rules.first)))
-    end
-
-    if must_review && assignment.peer_review_count.present? && assignment.peer_review_count > 0
-      must_review_count = assignment.allocation_rules.where(
-        assessor_id:,
-        must_review: true
-      ).count
-
-      # Add 1 if this is a new "must review" rule
-      must_review_count += 1 unless persisted?
-
-      if must_review_count > assignment.peer_review_count
-        errors.add(:must_review, I18n.t("would exceed the maximum number of required peer reviews (%{count}) for this assessor", count: assignment.peer_review_count))
-      end
+      errors.add(applies_to_assessor ? :assessee_id : :assessor_id, I18n.t("This rule conflicts with rule \"%{rule_text}\"", rule_text: format_rule_text(existing_rules.first)))
     end
 
     check_completed_review_conflicts
@@ -128,15 +114,10 @@ class AllocationRule < ApplicationRecord
 
     completed_assessee_ids = completed_reviews.pluck(:user_id)
 
-    if !completed_assessee_ids.include?(assessee_id) && assignment.peer_review_count.present? && completed_assessee_ids.length >= assignment.peer_review_count && assignment.peer_review_count > 0
-      reviewed_names = User.where(id: completed_assessee_ids).pluck(:name).join(", ")
-      errors.add(:assessor_id, I18n.t("conflicts with completed peer reviews. %{assessor_name} has already completed %{count} peer review(s) for: %{reviewed_names}", assessor_name: User.find(assessor_id).name, count: assignment.peer_review_count, reviewed_names:))
-    end
-
     if !review_permitted && completed_assessee_ids.include?(assessee_id)
       assessee_name = User.find(assessee_id).name
       assessor_name = User.find(assessor_id).name
-      errors.add(:assessee_id, I18n.t("conflicts with completed peer review. %{assessor_name} has already reviewed %{assessee_name}", assessor_name:, assessee_name:))
+      errors.add(:assessee_id, I18n.t("This rule conflicts with completed peer review. %{assessor_name} has already reviewed %{assessee_name}", assessor_name:, assessee_name:))
     end
   end
 

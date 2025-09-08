@@ -51,9 +51,10 @@ RSpec.describe Mutations::CreateAllocationRule, type: :graphql do
               name
             }
           }
-          errors {
+          allocationErrors {
             attribute
             message
+            attributeId
           }
         }
       }
@@ -173,7 +174,7 @@ RSpec.describe Mutations::CreateAllocationRule, type: :graphql do
 
       result = execute_with_input(query)
 
-      errors = result["data"]["createAllocationRule"]["errors"]
+      errors = result["data"]["createAllocationRule"]["allocationErrors"]
       rule_data = result["data"]["createAllocationRule"]["allocationRules"].first
 
       expect(errors).to be_nil
@@ -213,7 +214,7 @@ RSpec.describe Mutations::CreateAllocationRule, type: :graphql do
 
         result = execute_with_input(query)
 
-        errors = result["data"]["createAllocationRule"]["errors"]
+        errors = result["data"]["createAllocationRule"]["allocationErrors"]
 
         expect(errors).not_to be_empty
         expect(errors.first["message"]).to eq("assessor (#{external_user.id}) must be a student assigned to this assignment")
@@ -228,7 +229,7 @@ RSpec.describe Mutations::CreateAllocationRule, type: :graphql do
         GQL
 
         result = execute_with_input(query)
-        errors = result["data"]["createAllocationRule"]["errors"]
+        errors = result["data"]["createAllocationRule"]["allocationErrors"]
 
         expect(errors).not_to be_empty
         expect(errors.first["message"]).to eq("assessee (#{external_user.id}) must be a student with visibility to this assignment")
@@ -242,7 +243,7 @@ RSpec.describe Mutations::CreateAllocationRule, type: :graphql do
         GQL
 
         result = execute_with_input(query)
-        errors = result["data"]["createAllocationRule"]["errors"]
+        errors = result["data"]["createAllocationRule"]["allocationErrors"]
 
         expect(errors).not_to be_empty
         expect(errors.first["message"]).to eq("assessee (#{@student1.id}) cannot be the same as the assessor")
@@ -271,39 +272,12 @@ RSpec.describe Mutations::CreateAllocationRule, type: :graphql do
         GQL
 
         result = execute_with_input(query)
-        errors = result["data"]["createAllocationRule"]["errors"]
+        errors = result["data"]["createAllocationRule"]["allocationErrors"]
 
         expect(errors).not_to be_empty
-        expect(errors.first["message"]).to eq("conflicts with rule \"#{@student1.name} must review #{@student2.name}\"")
-      end
-    end
-
-    context "peer review count limits" do
-      before do
-        @assignment.update!(peer_review_count: 1)
-        AllocationRule.create!(
-          course: @course,
-          assignment: @assignment,
-          assessor: @student1,
-          assessee: @student3,
-          must_review: true,
-          review_permitted: true
-        )
-      end
-
-      it "returns error when exceeding maximum required reviews" do
-        query = <<~GQL
-          assignmentId: "#{@assignment.id}"
-          assessorIds: ["#{@student1.id}"]
-          assesseeIds: ["#{@student2.id}"]
-          mustReview: true
-        GQL
-
-        result = execute_with_input(query)
-        errors = result["errors"]
-
-        expect(errors).not_to be_empty
-        expect(errors.first["message"]).to eq("Creating these rules would exceed the maximum number of required peer reviews (#{@assignment.peer_review_count}) for assessor #{@student1.id}. Current: 1, Adding: 1, Total would be: 2")
+        expect(errors.first["message"]).to eq("This rule conflicts with rule \"#{@student1.name} must review #{@student2.name}\"")
+        expect(errors.first["attribute"]).to eq("assessee_id")
+        expect(errors.first["attributeId"]).to eq(@student2.id.to_s)
       end
     end
 
@@ -330,23 +304,6 @@ RSpec.describe Mutations::CreateAllocationRule, type: :graphql do
         )
       end
 
-      it "returns error when assessor has completed maximum reviews" do
-        student4 = student_in_course(name: "Student 4", course: @course, active_all: true).user
-
-        query = <<~GQL
-          assignmentId: "#{@assignment.id}"
-          assessorIds: ["#{@student1.id}"]
-          assesseeIds: ["#{student4.id}"]
-          mustReview: true
-        GQL
-
-        result = execute_with_input(query)
-        errors = result["data"]["createAllocationRule"]["errors"]
-
-        expect(errors).not_to be_empty
-        expect(errors.first["message"]).to eq("conflicts with completed peer reviews. #{@student1.name} has already completed #{@assignment.peer_review_count} peer review(s) for: #{@student2.name}, #{@student3.name}")
-      end
-
       it "returns error when trying to prohibit completed review" do
         query = <<~GQL
           assignmentId: "#{@assignment.id}"
@@ -356,10 +313,12 @@ RSpec.describe Mutations::CreateAllocationRule, type: :graphql do
         GQL
 
         result = execute_with_input(query)
-        errors = result["data"]["createAllocationRule"]["errors"]
+        errors = result["data"]["createAllocationRule"]["allocationErrors"]
 
         expect(errors).not_to be_empty
-        expect(errors.first["message"]).to eq("conflicts with completed peer review. #{@student1.name} has already reviewed #{@student2.name}")
+        expect(errors.first["message"]).to eq("This rule conflicts with completed peer review. #{@student1.name} has already reviewed #{@student2.name}")
+        expect(errors.first["attribute"]).to eq("assessee_id")
+        expect(errors.first["attributeId"]).to eq(@student2.id.to_s)
       end
     end
   end
@@ -377,7 +336,6 @@ RSpec.describe Mutations::CreateAllocationRule, type: :graphql do
 
         expect(result["errors"]).to be_nil
 
-        # Test the created rules using GraphQLTypeTester
         created_rules = AllocationRule.where(assignment: @assignment)
         expect(created_rules.count).to eq(2)
 
@@ -387,7 +345,6 @@ RSpec.describe Mutations::CreateAllocationRule, type: :graphql do
           expect(rule_type.resolve("appliesToAssessor")).to be true
         end
 
-        # Check that we have both assessees
         assessee_ids = created_rules.map(&:assessee_id)
         expect(assessee_ids).to contain_exactly(@student2.id, @student3.id)
       end
@@ -434,7 +391,6 @@ RSpec.describe Mutations::CreateAllocationRule, type: :graphql do
 
         expect(result["errors"]).to be_nil
 
-        # Test the created rules using GraphQLTypeTester
         created_rules = AllocationRule.where(assignment: @assignment)
         expect(created_rules.count).to eq(2)
 
@@ -444,7 +400,6 @@ RSpec.describe Mutations::CreateAllocationRule, type: :graphql do
           expect(rule_type.resolve("appliesToAssessor")).to be false
         end
 
-        # Check that we have both assessors
         assessor_ids = created_rules.map(&:assessor_id)
         expect(assessor_ids).to contain_exactly(@student1.id, @student2.id)
       end
@@ -506,7 +461,6 @@ RSpec.describe Mutations::CreateAllocationRule, type: :graphql do
 
         expect(result["errors"]).to be_nil
 
-        # Test the created rule using GraphQLTypeTester
         created_rule = AllocationRule.where(assignment: @assignment).first
         rule_type = GraphQLTypeTester.new(created_rule, current_user: @teacher)
 
@@ -537,21 +491,10 @@ RSpec.describe Mutations::CreateAllocationRule, type: :graphql do
 
         result = execute_with_input(query)
 
-        expect(result["data"]["createAllocationRule"]["errors"]).not_to be_empty
-        expect(result["data"]["createAllocationRule"]["errors"].first["message"]).to eq("conflicts with rule \"#{@student1.name} must review #{@student2.name}\"")
-      end
-
-      it "validates rules that exceed the required reviews count" do
-        student4 = student_in_course(name: "Student 4", course: @course, active_all: true).user
-        query = <<~GQL
-          assignmentId: "#{@assignment.id}"
-          assessorIds: ["#{@student1.id}"]
-          assesseeIds: ["#{@student2.id}", "#{@student3.id}", "#{student4.id}"]
-        GQL
-
-        result = execute_with_input(query)
-
-        expect(result["errors"].first["message"]).to eq("Creating these rules would exceed the maximum number of required peer reviews (#{@assignment.peer_review_count}) for assessor #{@student1.id}. Current: 0, Adding: 3, Total would be: 3")
+        expect(result["data"]["createAllocationRule"]["allocationErrors"]).not_to be_empty
+        expect(result["data"]["createAllocationRule"]["allocationErrors"].first["message"]).to eq("This rule conflicts with rule \"#{@student1.name} must review #{@student2.name}\"")
+        expect(result["data"]["createAllocationRule"]["allocationErrors"].first["attribute"]).to eq("assessee_id")
+        expect(result["data"]["createAllocationRule"]["allocationErrors"].first["attributeId"]).to eq(@student2.id.to_s)
       end
     end
 
@@ -606,6 +549,110 @@ RSpec.describe Mutations::CreateAllocationRule, type: :graphql do
 
         assessor_ids = created_rules.map(&:assessor_id)
         expect(assessor_ids).to contain_exactly(@student1.id, @student2.id, @student3.id)
+      end
+    end
+
+    context "array size limits" do
+      it "rejects more than 50 assessors" do
+        students = (1..51).map do |i|
+          student_in_course(
+            name: "Student #{i}",
+            course: @course,
+            active_all: true
+          ).user
+        end
+
+        assessor_ids = students.map { |x| x.id.to_s }.join('", "')
+
+        query = <<~GQL
+          assignmentId: "#{@assignment.id}"
+          assessorIds: ["#{assessor_ids}"]
+          assesseeIds: ["#{@student1.id}"]
+          appliesToAssessor: false
+        GQL
+
+        result = execute_with_input(query)
+
+        expect(result["errors"]).not_to be_empty
+        expect(result["errors"].first["message"]).to eq(
+          "A maximum of 50 assessors can be provided at once"
+        )
+        expect(result["errors"].first["path"]).to eq(["createAllocationRule"])
+      end
+
+      it "rejects more than 50 assessees" do
+        students = (1..51).map do |i|
+          student_in_course(
+            name: "Student #{i}",
+            course: @course,
+            active_all: true
+          ).user
+        end
+
+        assessee_ids = students.map { |x| x.id.to_s }.join('", "')
+
+        query = <<~GQL
+          assignmentId: "#{@assignment.id}"
+          assessorIds: ["#{@student1.id}"]
+          assesseeIds: ["#{assessee_ids}"]
+        GQL
+
+        result = execute_with_input(query)
+
+        expect(result["errors"]).not_to be_empty
+        expect(result["errors"].first["message"]).to eq(
+          "A maximum of 50 assessees can be provided at once"
+        )
+        expect(result["errors"].first["path"]).to eq(["createAllocationRule"])
+      end
+
+      it "allows exactly 50 assessors" do
+        students = (1..50).map do |i|
+          student_in_course(
+            name: "Student #{i}",
+            course: @course,
+            active_all: true
+          ).user
+        end
+
+        assessor_ids = students.map { |x| x.id.to_s }.join('", "')
+
+        query = <<~GQL
+          assignmentId: "#{@assignment.id}"
+          assessorIds: ["#{assessor_ids}"]
+          assesseeIds: ["#{@student1.id}"]
+          appliesToAssessor: false
+        GQL
+
+        result = execute_with_input(query)
+
+        expect(result["errors"]).to be_nil
+        expect(result["data"]["createAllocationRule"]["allocationRules"]).not_to be_empty
+        expect(result["data"]["createAllocationRule"]["allocationRules"].length).to eq(50)
+      end
+
+      it "allows exactly 50 assessees" do
+        students = (1..50).map do |i|
+          student_in_course(
+            name: "Student #{i}",
+            course: @course,
+            active_all: true
+          ).user
+        end
+
+        assessee_ids = students.map { |x| x.id.to_s }.join('", "')
+
+        query = <<~GQL
+          assignmentId: "#{@assignment.id}"
+          assessorIds: ["#{@student1.id}"]
+          assesseeIds: ["#{assessee_ids}"]
+        GQL
+
+        result = execute_with_input(query)
+
+        expect(result["errors"]).to be_nil
+        expect(result["data"]["createAllocationRule"]["allocationRules"]).not_to be_empty
+        expect(result["data"]["createAllocationRule"]["allocationRules"].length).to eq(50)
       end
     end
   end
@@ -735,32 +782,6 @@ RSpec.describe Mutations::CreateAllocationRule, type: :graphql do
         expect(result["errors"].first["path"]).to eq(["createAllocationRule"])
       end
 
-      it "validates peer review count for both directions" do
-        @assignment.update!(peer_review_count: 1)
-
-        AllocationRule.create!(
-          course: @course,
-          assignment: @assignment,
-          assessor: @student1,
-          assessee: @student3,
-          must_review: true,
-          review_permitted: true
-        )
-
-        query = <<~GQL
-          assignmentId: "#{@assignment.id}"
-          assessorIds: ["#{@student1.id}"]
-          assesseeIds: ["#{@student2.id}"]
-          reciprocal: true
-          mustReview: true
-        GQL
-
-        result = execute_with_input(query)
-
-        expect(result["errors"]).not_to be_empty
-        expect(result["errors"].first["message"]).to eq("Creating these rules would exceed the maximum number of required peer reviews (1) for assessor #{@student1.id}. Current: 1, Adding: 1, Total would be: 2")
-      end
-
       it "validates conflicting rules for both directions" do
         AllocationRule.create!(
           course: @course,
@@ -781,8 +802,10 @@ RSpec.describe Mutations::CreateAllocationRule, type: :graphql do
 
         result = execute_with_input(query)
 
-        expect(result["data"]["createAllocationRule"]["errors"]).not_to be_empty
-        expect(result["data"]["createAllocationRule"]["errors"].first["message"]).to eq("conflicts with rule \"#{@student1.name} must review #{@student2.name}\"")
+        expect(result["data"]["createAllocationRule"]["allocationErrors"]).not_to be_empty
+        expect(result["data"]["createAllocationRule"]["allocationErrors"].first["message"]).to eq("This rule conflicts with rule \"#{@student1.name} must review #{@student2.name}\"")
+        expect(result["data"]["createAllocationRule"]["allocationErrors"].first["attribute"]).to eq("assessee_id")
+        expect(result["data"]["createAllocationRule"]["allocationErrors"].first["attributeId"]).to eq(@student2.id.to_s)
       end
 
       it "validates when users are the same" do
@@ -795,8 +818,8 @@ RSpec.describe Mutations::CreateAllocationRule, type: :graphql do
 
         result = execute_with_input(query)
 
-        expect(result["data"]["createAllocationRule"]["errors"]).not_to be_empty
-        expect(result["data"]["createAllocationRule"]["errors"].first["message"]).to eq("assessee (#{@student1.id}) cannot be the same as the assessor")
+        expect(result["data"]["createAllocationRule"]["allocationErrors"]).not_to be_empty
+        expect(result["data"]["createAllocationRule"]["allocationErrors"].first["message"]).to eq("assessee (#{@student1.id}) cannot be the same as the assessor")
       end
     end
 
@@ -825,8 +848,10 @@ RSpec.describe Mutations::CreateAllocationRule, type: :graphql do
 
         result = execute_with_input(query)
 
-        expect(result["data"]["createAllocationRule"]["errors"]).not_to be_empty
-        expect(result["data"]["createAllocationRule"]["errors"].first["message"]).to eq("conflicts with completed peer review. #{@student1.name} has already reviewed #{@student2.name}")
+        expect(result["data"]["createAllocationRule"]["allocationErrors"]).not_to be_empty
+        expect(result["data"]["createAllocationRule"]["allocationErrors"].first["message"]).to eq("This rule conflicts with completed peer review. #{@student1.name} has already reviewed #{@student2.name}")
+        expect(result["data"]["createAllocationRule"]["allocationErrors"].first["attribute"]).to eq("assessee_id")
+        expect(result["data"]["createAllocationRule"]["allocationErrors"].first["attributeId"]).to eq(@student2.id.to_s)
       end
     end
   end
