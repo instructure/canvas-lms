@@ -7201,6 +7201,7 @@ tr:
   deactivate_user_86c09036: "Kullanıcıyı etkisiz kıl"
   debugging_f98fcd74: "Hata  Ayıklaması"
   decaying_average_8bf6a0dd: "Azalan Ortalama"
+  decline_7eeb5ff4: Reddet
   decorative_image_3c28aa7d: "Dekoratif Görsel"
   decrease_indent_d9cf469d: "İçerden başlatma sınırını azalt"
   decrease_indent_de6343ab: "İçerden başlatma sınırını azalt"
@@ -19757,6 +19758,7 @@ tr:
   unaccepted_students_aa68ea98: "Kabul Edilmeyen Öğrenciler"
   unarchive_f245e2d6: Arşivlenmemiş
   unauthorized: yetkilendirilmemiş
+  unauthorized_5094f75c: Yetkilendirilmemiş
   unauthorized_to_delete_this_file_a1271224: "Bu dosyayı silmek için yetki yok"
   unbookmark_this_question_bank_d87d1a07: "Bu Soru Bankasını Sık Kullanılanlardan Çıkar"
   unchanged_aca18e02: "[Değişmemiş]"

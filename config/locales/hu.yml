@@ -8767,6 +8767,7 @@ hu:
   decaying_average_8bf6a0dd: "Súlyozott átlag"
   decaying_average_recentint_remainderint_ab0636cc: "Csökkenő átlag - %{recentInt}%/%{remainderInt}%"
   december_acc47508: December
+  decline_7eeb5ff4: "Visszautasít "
   decorative_image_3c28aa7d: "Dekoratív kép"
   decorative_image_fde98579: "Dekorációs célú kép"
   decrease_indent_d9cf469d: "Behúzás csökkentése"
@@ -26247,6 +26248,7 @@ hu:
   unassigned_permissions_6a38ca95: "Hozzá nem rendelt engedélyek"
   unassigned_roles_cb9e95ec: "Hozzá nem rendelt szerepek"
   unauthorized: "nem engedélyezve"
+  unauthorized_5094f75c: "Nem engedélyezve"
   unauthorized_message: "Helytelen JWT aláírás"
   unauthorized_to_delete_this_file_a1271224: "Ön nem jogosult törölni ezt a fájlt."
   unauthorized_unable_to_add_messages_to_conversatio_d8b9558c: "Nem jogosult, nem tud üzeneteket hozzáadni a beszélgetéshez"
