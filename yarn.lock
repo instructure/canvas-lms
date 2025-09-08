@@ -3580,6 +3580,23 @@
     "@instructure/ui-view" "10.24.2"
     prop-types "^15.8.1"
 
+"@instructure/ui-instructure@10.24.2":
+  version "10.24.2"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-instructure/-/ui-instructure-10.24.2.tgz#45843fb2f1a75c6211510898185fa810861fa660"
+  integrity sha512-IYSBXwb6c/DzYHF/4en15niSv1gVyZ6NoUTK7f2w4ypSz9dvVO/zKCoxM7kBag0189AKvdugCn38LT+DdAawDQ==
+  dependencies:
+    "@babel/runtime" "^7.27.6"
+    "@instructure/emotion" "10.24.2"
+    "@instructure/shared-types" "10.24.2"
+    "@instructure/ui-heading" "10.24.2"
+    "@instructure/ui-modal" "10.24.2"
+    "@instructure/ui-popover" "10.24.2"
+    "@instructure/ui-react-utils" "10.24.2"
+    "@instructure/ui-testable" "10.24.2"
+    "@instructure/ui-text" "10.24.2"
+    "@instructure/ui-view" "10.24.2"
+    prop-types "^15.8.1"
+
 "@instructure/ui-link@10.24.2", "@instructure/ui-link@^10":
   version "10.24.2"
   resolved "https://registry.yarnpkg.com/@instructure/ui-link/-/ui-link-10.24.2.tgz#913f8ad384fa5bcda92da4bfcb3f4ef032a8e721"

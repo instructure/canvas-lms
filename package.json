@@ -51,6 +51,7 @@
     "@instructure/ui-i18n": "10.24.2",
     "@instructure/ui-icons": "10.24.2",
     "@instructure/ui-img": "10.24.2",
+    "@instructure/ui-instructure": "10.24.2",
     "@instructure/ui-link": "10.24.2",
     "@instructure/ui-list": "10.24.2",
     "@instructure/ui-media-player": "^9.0.0",
