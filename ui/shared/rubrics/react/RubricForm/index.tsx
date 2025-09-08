@@ -141,7 +141,7 @@ export const RubricForm = ({
             typeof value === 'string' && value.trim().length > 0 && value.length <= 255
           const message = messageValidation
             ? undefined
-            : I18n.t('The Rubic Name must be between 1 and 255 characters.')
+            : I18n.t('The Rubric Name must be between 1 and 255 characters.')
           setValidationErrors(prevState => ({
             ...prevState,
             [key]: {message},
