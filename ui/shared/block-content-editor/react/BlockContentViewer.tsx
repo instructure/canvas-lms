@@ -19,6 +19,7 @@
 import {Editor, Frame, SerializedNodes} from '@craftjs/core'
 import {BlockContentViewerLayout} from './layout/BlockContentViewerLayout'
 import {components} from './block-content-editor-components'
+import {BlockContentEditorErrorBoundary} from './BlockContentEditorErrorBoundary'
 
 export type BlockContentViewerProps = {
   data: SerializedNodes | null
@@ -27,8 +28,10 @@ export type BlockContentViewerProps = {
 export const BlockContentViewer = (props: BlockContentViewerProps) => {
   const editor = <Frame data={props.data ?? undefined} />
   return (
-    <Editor enabled={false} resolver={components}>
-      <BlockContentViewerLayout editor={editor} />
-    </Editor>
+    <BlockContentEditorErrorBoundary>
+      <Editor enabled={false} resolver={components}>
+        <BlockContentViewerLayout editor={editor} />
+      </Editor>
+    </BlockContentEditorErrorBoundary>
   )
 }
