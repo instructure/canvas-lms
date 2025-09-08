@@ -18,7 +18,6 @@
 
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {CanvasProgress} from '@canvas/progress/ProgressHelpers'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -27,15 +26,10 @@ import {Text} from '@instructure/ui-text'
 import {SimpleSelect, SimpleSelectOption} from '@instructure/ui-simple-select'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Button} from '@instructure/ui-buttons'
-import {useEffect, useState} from 'react'
+import {useState} from 'react'
 import {TextInput} from '@instructure/ui-text-input'
 import {TextArea} from '@instructure/ui-text-area'
-import {calcPointsPossible} from '../../utils'
-import {mapRubricUnderscoredKeysToCamelCase} from '../../../utils'
-import type {GenerateCriteriaFormProps, RubricFormFieldSetter} from '../../types/RubricForm'
-import {RubricCriterion} from '../../../types/rubric'
-import {generateCriteria} from '../../queries/RubricFormQueries'
-import {useGenerateCriteria} from '../../hooks/useGenerateCriteria'
+import type {GenerateCriteriaFormProps} from '../../types/RubricForm'
 
 const I18n = createI18nScope('rubrics-form-generated-criteria')
 
@@ -46,6 +40,7 @@ export const defaultGenerateCriteriaForm: GenerateCriteriaFormProps = {
   useRange: false,
   additionalPromptInfo: '',
   gradeLevel: 'higher-ed',
+  standard: '',
 }
 
 const gradeLevels = {
@@ -66,65 +61,25 @@ const gradeLevels = {
 }
 
 type GeneratedCriteriaFormProps = {
-  assignmentId?: string
-  courseId?: string
   criterionUseRangeEnabled: boolean
   criteriaBeingGenerated: boolean
-  criteriaRef: React.MutableRefObject<RubricCriterion[]>
-  handleInProgressUpdates: (isPending: boolean) => void
-  handleProgressUpdates: (progress: CanvasProgress) => void
-  setShowGenerateCriteriaForm: (show: boolean) => void
-  setShowGenerateCriteriaHeader: (show: boolean) => void
-  setRubricFormField: RubricFormFieldSetter
+  generateCriteriaMutation: () => void
+  onFormOptionsChange?: (options: GenerateCriteriaFormProps) => void
 }
 export const GeneratedCriteriaForm = ({
-  courseId,
-  assignmentId,
   criterionUseRangeEnabled,
   criteriaBeingGenerated,
-  criteriaRef,
-  handleInProgressUpdates,
-  handleProgressUpdates,
-  setShowGenerateCriteriaForm,
-  setShowGenerateCriteriaHeader,
-  setRubricFormField,
+  generateCriteriaMutation,
+  onFormOptionsChange,
 }: GeneratedCriteriaFormProps) => {
   const [generateCriteriaForm, setGenerateCriteriaForm] = useState<GenerateCriteriaFormProps>(
     defaultGenerateCriteriaForm,
   )
 
-  const onHandleProgressUpdates = (progress: CanvasProgress) => {
-    handleProgressUpdates(progress)
-    if (progress.workflow_state === 'completed') {
-      const transformed = mapRubricUnderscoredKeysToCamelCase(progress.results)
-      const criteria = transformed.criteria ?? []
-      const newCriteria = [
-        ...criteriaRef.current,
-        ...criteria.map(criterion => ({
-          ...criterion,
-          isGenerated: true,
-        })),
-      ]
-      setShowGenerateCriteriaForm(false)
-      setShowGenerateCriteriaHeader(true)
-      setRubricFormField('criteria', newCriteria)
-      setRubricFormField('pointsPossible', calcPointsPossible(newCriteria))
-    } else if (progress.workflow_state === 'failed') {
-      showFlashError(I18n.t('Failed to generate criteria'))()
-      return
-    }
+  const updateGenerateCriteriaForm = (newForm: GenerateCriteriaFormProps) => {
+    setGenerateCriteriaForm(newForm)
+    onFormOptionsChange?.(newForm)
   }
-
-  const {generateCriteriaMutation, generateCriteriaIsPending} = useGenerateCriteria({
-    generateCriteriaMutationFn: () => {
-      if (courseId && assignmentId) {
-        return generateCriteria(courseId, assignmentId, generateCriteriaForm)
-      } else {
-        throw new Error('Must be called from a course+assignment context')
-      }
-    },
-    handleProgressUpdates: onHandleProgressUpdates,
-  })
 
   const handleGenerateButton = () => {
     const points = parseFloat(generateCriteriaForm.pointsPerCriterion)
@@ -134,10 +89,6 @@ export const GeneratedCriteriaForm = ({
     }
     generateCriteriaMutation()
   }
-
-  useEffect(() => {
-    handleInProgressUpdates(generateCriteriaIsPending)
-  }, [generateCriteriaIsPending, handleInProgressUpdates])
 
   return (
     <View
@@ -162,7 +113,7 @@ export const GeneratedCriteriaForm = ({
             value={generateCriteriaForm.gradeLevel}
             onChange={(_event, {value}) => {
               if (value) {
-                setGenerateCriteriaForm({
+                updateGenerateCriteriaForm({
                   ...generateCriteriaForm,
                   gradeLevel: value.toString(),
                 })
@@ -184,7 +135,7 @@ export const GeneratedCriteriaForm = ({
             renderLabel={I18n.t('Number of Criteria')}
             value={generateCriteriaForm.criteriaCount.toString()}
             onChange={(_event, {value}) =>
-              setGenerateCriteriaForm({
+              updateGenerateCriteriaForm({
                 ...generateCriteriaForm,
                 criteriaCount: value ? parseInt(value.toString(), 10) : 0,
               })
@@ -206,7 +157,7 @@ export const GeneratedCriteriaForm = ({
             renderLabel={I18n.t('Number of Ratings')}
             value={generateCriteriaForm.ratingCount.toString()}
             onChange={(_event, {value}) =>
-              setGenerateCriteriaForm({
+              updateGenerateCriteriaForm({
                 ...generateCriteriaForm,
                 ratingCount: value ? parseInt(value.toString(), 10) : 0,
               })
@@ -228,7 +179,7 @@ export const GeneratedCriteriaForm = ({
             renderLabel={I18n.t('Points per Criterion')}
             value={generateCriteriaForm.pointsPerCriterion}
             onChange={(_event, value) =>
-              setGenerateCriteriaForm({
+              updateGenerateCriteriaForm({
                 ...generateCriteriaForm,
                 pointsPerCriterion: value,
               })
@@ -243,7 +194,7 @@ export const GeneratedCriteriaForm = ({
               label={I18n.t('Enable Range')}
               checked={generateCriteriaForm.useRange}
               onChange={_event =>
-                setGenerateCriteriaForm({
+                updateGenerateCriteriaForm({
                   ...generateCriteriaForm,
                   useRange: !generateCriteriaForm.useRange,
                 })
@@ -254,34 +205,67 @@ export const GeneratedCriteriaForm = ({
         <Flex.Item shouldGrow={true}></Flex.Item>
       </Flex>
       <Flex alignItems="end" gap="medium" margin="medium 0 0">
-        <Flex.Item shouldGrow={true}>
-          <TextArea
-            data-testid="additional-prompt-info-input"
-            label={I18n.t('Additional Prompt Information')}
-            placeholder={I18n.t(
-              'Optional. For example, "Target a college-level seminar." or "Focus on argument substance." or "Be lenient."',
-            )}
-            value={generateCriteriaForm.additionalPromptInfo}
-            onChange={event =>
-              setGenerateCriteriaForm({
-                ...generateCriteriaForm,
-                additionalPromptInfo: event.target.value,
-              })
-            }
-            messages={
-              generateCriteriaForm.additionalPromptInfo.length > 1000
-                ? [
-                    {
-                      text: I18n.t(
-                        'Additional prompt information must be less than 1000 characters',
-                      ),
-                      type: 'error',
-                    },
-                  ]
-                : undefined
-            }
-            height="4rem"
-          />
+        <Flex.Item shouldGrow={true} overflowX="visible" overflowY="visible">
+          <Flex direction="column" gap="medium">
+            <Flex.Item overflowX="visible" overflowY="visible">
+              <TextArea
+                data-testid="standard-objective-input"
+                label={I18n.t('Standard / Outcome Information')}
+                placeholder={I18n.t(
+                  'Optional. Place standard or outcome here. For example, "Students will analyze primary sources".',
+                )}
+                value={generateCriteriaForm.standard}
+                onChange={event =>
+                  updateGenerateCriteriaForm({
+                    ...generateCriteriaForm,
+                    standard: event.target.value,
+                  })
+                }
+                messages={
+                  generateCriteriaForm.standard.length > 1000
+                    ? [
+                        {
+                          text: I18n.t(
+                            'Standard and Outcome information must be less than 1000 characters',
+                          ),
+                          type: 'error',
+                        },
+                      ]
+                    : undefined
+                }
+                height="4rem"
+              />
+            </Flex.Item>
+            <Flex.Item overflowX="visible" overflowY="visible">
+              <TextArea
+                data-testid="additional-prompt-info-input"
+                label={I18n.t('Additional Prompt Information')}
+                placeholder={I18n.t(
+                  'Optional. For example, "Target a college-level seminar." or "Focus on argument substance." or "Be lenient."',
+                )}
+                value={generateCriteriaForm.additionalPromptInfo}
+                onChange={event =>
+                  updateGenerateCriteriaForm({
+                    ...generateCriteriaForm,
+                    additionalPromptInfo: event.target.value,
+                  })
+                }
+                messages={
+                  generateCriteriaForm.additionalPromptInfo.length > 1000
+                    ? [
+                        {
+                          text: I18n.t(
+                            'Additional prompt information must be less than 1000 characters',
+                          ),
+                          type: 'error',
+                        },
+                      ]
+                    : undefined
+                }
+                height="4rem"
+              />
+            </Flex.Item>
+          </Flex>
         </Flex.Item>
         <Flex.Item>
           <Button
@@ -290,7 +274,9 @@ export const GeneratedCriteriaForm = ({
             color="ai-primary"
             renderIcon={<IconAiSolid />}
             disabled={
-              generateCriteriaForm.additionalPromptInfo.length > 1000 || criteriaBeingGenerated
+              generateCriteriaForm.additionalPromptInfo.length > 1000 ||
+              generateCriteriaForm.standard.length > 1000 ||
+              criteriaBeingGenerated
             }
           >
             {I18n.t('Generate Criteria')}

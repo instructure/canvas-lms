@@ -19,6 +19,7 @@
 #
 
 require "inst_llm"
+require "json"
 
 module InstLLMHelper
   class RateLimitExceededError < StandardError
@@ -78,6 +79,45 @@ module InstLLMHelper
         secret_access_key: credentials.secret_access_key,
         session_token: credentials.session_token
       )
+    end
+
+    def extract_json(text)
+      depth = 0
+      buffer = +""
+      in_string = false
+      escape = false
+
+      text.each_char do |ch|
+        if in_string
+          buffer << ch
+          if escape
+            escape = false
+          elsif ch == "\\"
+            escape = true
+          elsif ch == "\""
+            in_string = false
+          end
+        elsif ch == "\""
+          in_string = true
+          buffer << ch
+        elsif ch == "{"
+          depth += 1
+          buffer << ch
+        elsif ch == "}"
+          buffer << ch
+          depth -= 1
+          if depth == 0
+            begin
+              return JSON.parse(buffer, symbolize_names: true)
+            rescue JSON::ParserError
+              return nil
+            end
+          end
+        elsif depth > 0
+          buffer << ch
+        end
+      end
+      nil
     end
   end
 end

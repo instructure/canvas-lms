@@ -39,6 +39,7 @@ import {
   IconLockLine,
 } from '@instructure/ui-icons'
 import {Draggable} from 'react-beautiful-dnd'
+import RegenerateCriteria from './AIGeneratedCriteria/RegenerateCriteria'
 import '../drag-and-drop/styles.css'
 
 const I18n = createI18nScope('rubrics-criteria-row')
@@ -49,10 +50,13 @@ type RubricCriteriaRowProps = {
   hidePoints: boolean
   rowIndex: number
   isGenerated?: boolean
+  isRegenerating?: boolean
   nextIsGenerated?: boolean
+  showCriteriaRegeneration?: boolean
   onDeleteCriterion: () => void
   onDuplicateCriterion: () => void
   onEditCriterion: () => void
+  onRegenerateCriterion?: (criterion: RubricCriterion, additionalPrompt: string) => void
 }
 
 export const RubricCriteriaRow = ({
@@ -61,10 +65,13 @@ export const RubricCriteriaRow = ({
   hidePoints,
   rowIndex,
   isGenerated,
+  isRegenerating = false,
   nextIsGenerated,
+  showCriteriaRegeneration = false,
   onDeleteCriterion,
   onDuplicateCriterion,
   onEditCriterion,
+  onRegenerateCriterion,
 }: RubricCriteriaRowProps) => {
   const {
     description,
@@ -264,13 +271,47 @@ export const RubricCriteriaRow = ({
                 </View>
               </Flex.Item>
             </Flex>
+
+            {freeFormCriterionComments && showCriteriaRegeneration && onRegenerateCriterion && (
+              <Flex justifyItems="end">
+                <Flex.Item>
+                  <RegenerateCriteria
+                    buttonColor="ai-secondary"
+                    disabled={isRegenerating}
+                    isCriterion={true}
+                    onRegenerate={(additionalPrompt: string) =>
+                      onRegenerateCriterion(criterion, additionalPrompt)
+                    }
+                  />
+                </Flex.Item>
+              </Flex>
+            )}
+
             {!freeFormCriterionComments && (
-              <RatingScaleAccordion
-                hidePoints={hidePoints}
-                ratings={criterion.ratings}
-                criterionUseRange={criterion.criterionUseRange}
-                isGenerated={isGenerated}
-              />
+              <View position="relative">
+                <RatingScaleAccordion
+                  hidePoints={hidePoints}
+                  ratings={criterion.ratings}
+                  criterionUseRange={criterion.criterionUseRange}
+                  isGenerated={isGenerated}
+                  addExtraBottomSpacing={showCriteriaRegeneration}
+                />
+
+                {showCriteriaRegeneration && onRegenerateCriterion && (
+                  <div style={{position: 'absolute', right: 0, top: 0}}>
+                    <View as="span" margin="0 0 0 medium">
+                      <RegenerateCriteria
+                        buttonColor="ai-secondary"
+                        disabled={isRegenerating}
+                        isCriterion={true}
+                        onRegenerate={(additionalPrompt: string) =>
+                          onRegenerateCriterion(criterion, additionalPrompt)
+                        }
+                      />
+                    </View>
+                  </div>
+                )}
+              </View>
             )}
           </div>
         )
@@ -284,15 +325,21 @@ type RatingScaleAccordionProps = {
   ratings: RubricRating[]
   criterionUseRange: boolean
   isGenerated?: boolean
+  addExtraBottomSpacing?: boolean
 }
 const RatingScaleAccordion = ({
   hidePoints,
   ratings,
   criterionUseRange,
   isGenerated = false,
+  addExtraBottomSpacing = false,
 }: RatingScaleAccordionProps) => {
   return (
-    <View as="div" padding="small 0 0 xx-large">
+    <View
+      as="div"
+      padding="0 0 0 xx-large"
+      margin={`small 0 ${addExtraBottomSpacing ? 'small' : '0'} 0`}
+    >
       <ToggleDetails
         data-testid="criterion-row-rating-accordion"
         defaultExpanded={isGenerated}
