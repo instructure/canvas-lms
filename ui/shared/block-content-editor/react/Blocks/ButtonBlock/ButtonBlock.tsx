@@ -35,7 +35,7 @@ const I18n = createI18nScope('block_content_editor')
 const ButtonBlockView = (props: ButtonBlockProps) => {
   return (
     <Flex direction="column" gap="mediumSmall">
-      {props.includeBlockTitle && <TitleView title={props.title} contentColor={props.textColor} />}
+      {props.includeBlockTitle && <TitleView title={props.title} contentColor={props.titleColor} />}
       <ButtonDisplay dataTestId="button-block-view" {...props} />
     </Flex>
   )
@@ -45,7 +45,7 @@ const ButtonBlockEditView = (props: ButtonBlockProps) => {
   return (
     <Flex direction="column" gap="mediumSmall">
       {props.includeBlockTitle && (
-        <TitleEditPreview title={props.title} contentColor={props.textColor} />
+        <TitleEditPreview title={props.title} contentColor={props.titleColor} />
       )}
       <ButtonDisplay dataTestId="button-block-edit-preview" {...props} onButtonClick={() => {}} />
     </Flex>

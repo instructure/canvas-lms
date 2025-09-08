@@ -28,7 +28,7 @@ const defaultProps: ButtonBlockProps = {
   layout: 'horizontal',
   isFullWidth: false,
   backgroundColor: '#ffffff',
-  textColor: '#000000',
+  titleColor: '#000000',
   buttons: [
     {
       id: 1,

@@ -26,16 +26,16 @@ const I18n = createI18nScope('block_content_editor')
 export const ButtonBlockColorSettings = ({
   includeBlockTitle,
   backgroundColor,
-  textColor,
+  titleColor,
   onBackgroundColorChange,
-  onTextColorChange,
+  onTitleColorChange,
 }: ButtonBlockColorSettingsProps) => {
   return (
     <Flex direction="column" gap="medium">
       <ColorPickerWrapper
         label={I18n.t('Background color')}
         value={backgroundColor}
-        baseColor={textColor}
+        baseColor={titleColor}
         baseColorLabel={I18n.t('Title color')}
         onChange={onBackgroundColorChange}
       />
@@ -43,10 +43,10 @@ export const ButtonBlockColorSettings = ({
       {includeBlockTitle && (
         <ColorPickerWrapper
           label={I18n.t('Title color')}
-          value={textColor}
+          value={titleColor}
           baseColor={backgroundColor}
           baseColorLabel={I18n.t('Background color')}
-          onChange={onTextColorChange}
+          onChange={onTitleColorChange}
         />
       )}
     </Flex>

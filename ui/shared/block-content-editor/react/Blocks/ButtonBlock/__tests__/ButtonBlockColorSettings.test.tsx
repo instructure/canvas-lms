@@ -23,9 +23,9 @@ import {ButtonBlockColorSettingsProps} from '../types'
 const defaultProps: ButtonBlockColorSettingsProps = {
   includeBlockTitle: false,
   backgroundColor: '#FFFFFF',
-  textColor: '#000000',
+  titleColor: '#000000',
   onBackgroundColorChange: jest.fn(),
-  onTextColorChange: jest.fn(),
+  onTitleColorChange: jest.fn(),
 }
 
 describe('ButtonBlockColorSettings', () => {

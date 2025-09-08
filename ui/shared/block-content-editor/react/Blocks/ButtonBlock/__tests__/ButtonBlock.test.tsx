@@ -54,7 +54,7 @@ const defaultProps: ButtonBlockProps = {
     },
   ],
   backgroundColor: '#FF0000',
-  textColor: '#000000',
+  titleColor: '#000000',
   title: '',
 }
 
