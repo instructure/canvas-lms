@@ -279,9 +279,9 @@ visibility_performance_improvements:
 youtube_migration:
   applies_to: Course
   state: hidden
-  display_name: YouTube content migration
+  display_name: YouTube to Studio content migration
   description: |-
-    Turn on YouTube Content Migration feature. Adding the scanning ability and the convert option on YouTube embeddings.
+    Turn on YouTube to Studio content migration feature. Adding the scanning ability and the convert option on YouTube embeddings.
 
 youtube_migration_high_priority:
   applies_to: SiteAdmin
