@@ -35,7 +35,7 @@ const ImageBlockView = (props: ImageBlockProps) => {
   return (
     <Flex direction="column" gap="mediumSmall">
       {props.includeBlockTitle && (
-        <TitleView contentColor={props.textColor || ''} title={props.title} />
+        <TitleView contentColor={props.titleColor || ''} title={props.title} />
       )}
       <ImageView {...props} />
     </Flex>
@@ -46,7 +46,7 @@ const ImageBlockEditView = (props: ImageBlockProps) => {
   return (
     <>
       {props.includeBlockTitle && (
-        <TitleEditPreview contentColor={props.textColor || ''} title={props.title} />
+        <TitleEditPreview contentColor={props.titleColor || ''} title={props.title} />
       )}
       <ImageView {...props} />
     </>

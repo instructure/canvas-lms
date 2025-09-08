@@ -54,7 +54,7 @@ export const blockFactory = {
       decorativeImage={false}
       includeBlockTitle={true}
       backgroundColor={defaultBackgroundColor}
-      textColor={defaultTextColor}
+      titleColor={defaultTextColor}
     />
   ),
   [SeparatorLineBlock.name]: () => (
