@@ -22,12 +22,13 @@ import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
 import {PageViewsTable} from './PageViewsTable'
+import {PageViewsDownload} from './PageViewsDownload'
 import {Flex} from '@instructure/ui-flex'
-import {Button} from '@instructure/ui-buttons'
-import {IconMsExcelLine} from '@instructure/ui-icons'
+import {Tabs} from '@instructure/ui-tabs'
+import _ from 'lodash'
+import {Text} from '@instructure/ui-text'
 
 const I18n = i18nScope('page_views')
-const icon = <IconMsExcelLine />
 
 export interface PageViewsProps {
   userId: string
@@ -41,8 +42,9 @@ type DateRange = {
 
 export default function PageViews({userId}: PageViewsProps): React.JSX.Element {
   const [filterDate, setFilterDate] = useState<DateRange>({})
+  const [selectedIndex, setSelectedIndex] = useState(0)
+  const [isTableEmpty, setIsTableEmpty] = useState(false)
   const formatDateForDisplay = useDateTimeFormat('date.formats.long')
-  const baseURL = `/users/${userId}/page_views.csv`
 
   function handleDateChange(date: Date | null) {
     if (date === null) {
@@ -56,38 +58,54 @@ export default function PageViews({userId}: PageViewsProps): React.JSX.Element {
     }
   }
 
-  function downloadURL() {
-    if (!filterDate.start || !filterDate.end) return baseURL
-    return `${baseURL}?start_time=${filterDate.start.toISOString()}&end_time=${filterDate.end.toISOString()}`
+  // data in cache is only for the last 30 days
+  function isDateInCache(isoDate: string): boolean {
+    const date = new Date(isoDate)
+    const now = new Date()
+    const cacheBottomDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+    return date >= cacheBottomDate && date <= now
+  }
+
+  function handleEmpty() {
+    // wait until after render to avoid React state update warning
+    setTimeout(() => {
+      setIsTableEmpty(true)
+    })
   }
 
   return (
-    <Flex direction="column">
-      <Flex.Item padding="small">
-        <CanvasDateInput2
-          placeholder={I18n.t('Limit to a specific date')}
-          selectedDate={filterDate.date?.toISOString()}
-          formatDate={formatDateForDisplay}
-          renderLabel={I18n.t('Filter by date')}
-          onSelectedDateChange={handleDateChange}
-          withRunningValue={true}
-          interaction="enabled"
-          dataTestid="page-views-date-filter"
-        />
-      </Flex.Item>
-      <Flex.Item padding="small">
-        <Button
-          data-testid="page-views-csv-link"
-          size="small"
-          renderIcon={icon}
-          href={downloadURL()}
-        >
-          {I18n.t('Download as CSV')}
-        </Button>
-      </Flex.Item>
-      <Flex.Item>
-        <PageViewsTable userId={userId} startDate={filterDate.start} endDate={filterDate.end} />
-      </Flex.Item>
-    </Flex>
+    <Tabs onRequestTabChange={(_, {index}) => setSelectedIndex(index)} variant="secondary">
+      <Tabs.Panel renderTitle={I18n.t('30-day activity')} isSelected={selectedIndex === 0}>
+        <Flex direction="column" gap="moduleElements">
+          <Text>{I18n.t('This page shows only the past 30 days of history.')}</Text>
+          <Flex.Item>
+            {!isTableEmpty && (
+              <CanvasDateInput2
+                placeholder={I18n.t('Limit to a specific date')}
+                selectedDate={filterDate.date?.toISOString()}
+                disabledDates={date => !isDateInCache(date)}
+                formatDate={formatDateForDisplay}
+                renderLabel={I18n.t('Filter by date')}
+                onSelectedDateChange={handleDateChange}
+                withRunningValue={true}
+                interaction="enabled"
+                dataTestid="page-views-date-filter"
+              />
+            )}
+          </Flex.Item>
+          <Flex.Item>
+            <PageViewsTable
+              userId={userId}
+              startDate={filterDate.start}
+              endDate={filterDate.end}
+              onEmpty={handleEmpty}
+            />
+          </Flex.Item>
+        </Flex>
+      </Tabs.Panel>
+      <Tabs.Panel renderTitle={I18n.t('1-year activity')} isSelected={selectedIndex === 1}>
+        <PageViewsDownload userId={userId} />
+      </Tabs.Panel>
+    </Tabs>
   )
 }

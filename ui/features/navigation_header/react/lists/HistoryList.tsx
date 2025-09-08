@@ -28,6 +28,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Alert} from '@instructure/ui-alerts'
 import {useInfiniteQuery} from '@tanstack/react-query'
 import type {QueryFunctionContext} from '@tanstack/react-query'
+import ConfusedPanda from '@canvas/images/ConfusedPanda.svg'
 
 const I18n = createI18nScope('new_nav')
 
@@ -36,6 +37,26 @@ const fetchHistory = async (context: QueryFunctionContext<string[], string>) => 
   const {json, link} = await doFetchApi({path: pageParam})
   const nextPage = link?.next ? link.next.url : null
   return {json, nextPage}
+}
+
+function EmptyState(): React.JSX.Element {
+  return (
+    <Flex direction="column" alignItems="center" gap="small">
+      <img
+        src={ConfusedPanda}
+        alt={I18n.t('Nothing in the last 30 days')}
+        style={{maxWidth: '160px'}}
+      />
+      <Text size="large" weight="bold">
+        {I18n.t('Nothing in the last 30 days')}
+      </Text>
+      <Text>
+        {I18n.t(
+          "This page shows only the past 30 days of history. It looks like there hasn't been anything recent to show. Once you take some actions, they'll appear here.",
+        )}
+      </Text>
+    </Flex>
+  )
 }
 
 export default function HistoryList() {
@@ -100,11 +121,16 @@ export default function HistoryList() {
     return <Spinner size="small" renderTitle={I18n.t('Loading')} />
   } else {
     const historyEntries = combineHistoryEntries(data.pages)
+
+    if (historyEntries.length === 0) {
+      return <EmptyState />
+    }
+
     return (
       <>
         <List isUnstyled={true} margin="small 0" itemSpacing="small">
           {/* @ts-expect-error */}
-          {historyEntries.map((entry, index) => {
+          {historyEntries.map(entry => {
             return (
               <List.Item key={entry.asset_code}>
                 <Flex>
