@@ -196,7 +196,12 @@ export function getToolbarForVariant(
       },
       {
         name: formatMessage('Miscellaneous'),
-        items: ['removeformat', 'instructure_equation'],
+        items: [
+          'removeformat',
+          'instructure_equation',
+          'instructure_keyboard_shortcuts_header',
+          'instructure_wordcount_header',
+        ],
       },
     ]
   }
@@ -261,7 +266,7 @@ export function getStatusBarFeaturesForVariant(
   }
 
   if (variant === 'block-content-editor') {
-    return ['keyboard_shortcuts', 'word_count']
+    return []
   }
 
   const platformFeatures = options.isDesktop ? DESKTOP_FEATURES : MOBILE_FEATURES
