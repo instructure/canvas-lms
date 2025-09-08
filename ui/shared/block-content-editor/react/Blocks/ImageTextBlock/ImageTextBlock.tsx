@@ -40,7 +40,7 @@ const ImageTextBlockView = ({
   url,
   altText,
   decorativeImage,
-  textColor,
+  titleColor,
   includeBlockTitle,
   arrangement,
   textToImageRatio,
@@ -49,7 +49,7 @@ const ImageTextBlockView = ({
 }: ImageTextBlockProps) => {
   return (
     <ImageTextBlockLayout
-      titleComponent={includeBlockTitle && <TitleView contentColor={textColor} title={title} />}
+      titleComponent={includeBlockTitle && <TitleView contentColor={titleColor} title={title} />}
       imageComponent={
         <ImageView
           url={url}
@@ -59,7 +59,7 @@ const ImageTextBlockView = ({
           altTextAsCaption={altTextAsCaption}
         />
       }
-      textComponent={<TextView contentColor={textColor} content={content} />}
+      textComponent={<TextView content={content} />}
       arrangement={arrangement}
       textToImageRatio={textToImageRatio}
       dataTestId="imagetext-block-view"
@@ -73,7 +73,7 @@ const ImageTextBlockEditView = ({
   url,
   altText,
   decorativeImage,
-  textColor,
+  titleColor,
   arrangement,
   textToImageRatio,
   includeBlockTitle,
@@ -83,7 +83,7 @@ const ImageTextBlockEditView = ({
   return (
     <ImageTextBlockLayout
       titleComponent={
-        includeBlockTitle && <TitleEditPreview contentColor={textColor} title={title} />
+        includeBlockTitle && <TitleEditPreview contentColor={titleColor} title={title} />
       }
       imageComponent={
         <ImageView
@@ -94,7 +94,7 @@ const ImageTextBlockEditView = ({
           altTextAsCaption={altTextAsCaption}
         />
       }
-      textComponent={<TextEditPreview contentColor={textColor} content={content} />}
+      textComponent={<TextEditPreview content={content} />}
       arrangement={arrangement}
       textToImageRatio={textToImageRatio}
       dataTestId="imagetext-block-editpreview"

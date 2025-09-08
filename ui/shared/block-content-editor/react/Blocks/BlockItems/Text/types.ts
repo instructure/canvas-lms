@@ -21,12 +21,9 @@ import {FocusHandler} from '../../../hooks/useFocusElement'
 export type TextData = {
   content: string
 }
-export type TextColor = {
-  contentColor?: string
-}
 
-export type TextEditPreviewProps = TextData & TextColor
-export type TextViewProps = TextData & TextColor
+export type TextEditPreviewProps = TextData
+export type TextViewProps = TextData
 
 export type TextEditProps = TextData & {
   onContentChange: (content: string) => void

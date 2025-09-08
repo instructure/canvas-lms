@@ -24,20 +24,11 @@ const I18n = createI18nScope('block_content_editor')
 
 export const TextEditPreview = (props: TextEditPreviewProps) => {
   const isContentDefined = props.content.trim().length > 0
-  const isColorDefined = props.contentColor && props.contentColor.trim().length > 0
 
   return isContentDefined ? (
-    <div
-      style={{color: props.contentColor}}
-      dangerouslySetInnerHTML={{__html: props.content}}
-    ></div>
+    <div dangerouslySetInnerHTML={{__html: props.content}}></div>
   ) : (
-    <Text
-      as="p"
-      color={isColorDefined ? 'primary' : 'secondary'}
-      themeOverride={{primaryColor: props.contentColor}}
-      variant="content"
-    >
+    <Text as="p" color="secondary" variant="content">
       {I18n.t('Click to edit')}
     </Text>
   )
