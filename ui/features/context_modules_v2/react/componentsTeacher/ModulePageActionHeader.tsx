@@ -20,7 +20,7 @@ import React, {useCallback} from 'react'
 import {queryClient} from '@canvas/query'
 import ContextModulesHeader from '@canvas/context-modules/react/ContextModulesHeader'
 import {useContextModule} from '../hooks/useModuleContext'
-import {MODULE_ITEMS, MODULES} from '../utils/constants'
+import {MODULE_ITEMS, MODULE_ITEMS_ALL, MODULES} from '../utils/constants'
 import {handleAddModule} from '../handlers/moduleActionHandlers'
 import {ModulesPageLegend} from '../components/ModulesPageLegend'
 import {useModules} from '../hooks/queries/useModules'
@@ -55,7 +55,7 @@ const ModulePageActionHeader: React.FC<ModulePageActionHeaderProps> = ({
     queryClient.invalidateQueries({queryKey: [MODULES, courseId]})
     // invalidate all queries that start with 'moduleItems' in their query key
     queryClient.invalidateQueries({queryKey: [MODULE_ITEMS]})
-    queryClient.invalidateQueries({queryKey: ['MODULE_ITEMS_ALL']})
+    queryClient.invalidateQueries({queryKey: [MODULE_ITEMS_ALL]})
   }, [courseId])
 
   return (

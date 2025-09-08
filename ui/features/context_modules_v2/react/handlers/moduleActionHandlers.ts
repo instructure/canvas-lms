@@ -20,7 +20,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import type {InfiniteData, QueryClient} from '@tanstack/react-query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
-import {MODULE_ITEMS, MODULES} from '../utils/constants'
+import {MODULE_ITEMS, MODULE_ITEMS_ALL, MODULES} from '../utils/constants'
 import {handleOpeningModuleUpdateTray} from './modulePageActionHandlers'
 import {ModulesResponse} from '../utils/types'
 
@@ -33,7 +33,7 @@ export const handlePublishComplete = (
 ) => {
   queryClient.invalidateQueries({queryKey: [MODULES, courseId || '']})
   queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId || '']})
-  queryClient.invalidateQueries({queryKey: ['MODULE_ITEMS_ALL', moduleId || '']})
+  queryClient.invalidateQueries({queryKey: [MODULE_ITEMS_ALL, moduleId || '']})
 }
 
 export const handleDelete = (
@@ -84,7 +84,7 @@ export const handleDuplicate = (
       )
       queryClient.invalidateQueries({queryKey: [MODULES, courseId || '']})
       queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, id]})
-      queryClient.invalidateQueries({queryKey: ['MODULE_ITEMS_ALL', id]})
+      queryClient.invalidateQueries({queryKey: [MODULE_ITEMS_ALL, id]})
     })
     .catch(() => {
       showFlashError(I18n.t('Failed to duplicate module'))

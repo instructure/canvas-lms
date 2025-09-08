@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {createRoot, type Root} from 'react-dom/client'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -31,7 +30,7 @@ import {
 } from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
 // Import payload types directly in onSave function to make TypeScript happy
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
-import {MODULE_ITEMS} from '../utils/constants'
+import {MODULE_ITEMS, MODULE_ITEMS_ALL} from '../utils/constants'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -77,6 +76,7 @@ export interface ItemAssignToProps {
   moduleId?: string
   isCheckpointed?: boolean
   isGraded?: boolean
+  cursor: string | null
 }
 
 export const renderItemAssignToManager = (
@@ -139,7 +139,10 @@ export const renderItemAssignToManager = (
               // On success, invalidate queries with exact module ID if available
               if (itemProps.moduleId) {
                 queryClient.invalidateQueries({
-                  queryKey: [MODULE_ITEMS, itemProps.moduleId],
+                  queryKey: [MODULE_ITEMS_ALL, itemProps.moduleId || ''],
+                })
+                queryClient.invalidateQueries({
+                  queryKey: [MODULE_ITEMS, itemProps.moduleId, itemProps.cursor],
                   exact: true,
                 })
               }

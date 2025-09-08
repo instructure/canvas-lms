@@ -98,6 +98,85 @@ describe "selective_release module item assign to tray", :ignore_js_errors do
       expect(element_exists?(context_module_item_selector(module_item.id))).to be true
     end
 
+    it "shows due dates for assignment and quiz in the UI" do
+      assignment_with_due_date = @course.assignments.create!(
+        name: "Assignment With Due Date",
+        submission_types: "online_text_entry",
+        points_possible: 10,
+        workflow_state: "published",
+        due_at: 2.days.from_now
+      )
+
+      quiz_with_due_date = @course.quizzes.create!(
+        title: "Quiz With Due Date",
+        due_at: 3.days.from_now
+      )
+
+      go_to_modules
+
+      add_item_button(@module.id).click
+      click_INSTUI_Select_option(add_existing_item_select_selector, "Assignment With Due Date")
+      add_item_modal_add_item_button.click
+      wait_for_ajaximations
+
+      add_item_button(@module.id).click
+      click_INSTUI_Select_option(new_item_type_select_selector, "Quiz")
+      wait_for_ajaximations
+      click_INSTUI_Select_option(add_existing_item_select_selector, "Quiz With Due Date")
+      add_item_modal_add_item_button.click
+      wait_for_ajaximations
+
+      module_header_expand_toggles.first.click
+
+      assignment_item = ContentTag.find_by(content_id: assignment_with_due_date.id, content_type: "Assignment")
+      assignment_ui = find(context_module_item_selector(assignment_item.id))
+      expect(assignment_ui.text).to include("Due")
+      expect(assignment_ui.text).to include(format_date_for_view(assignment_with_due_date.due_at, "%b"))
+
+      quiz_item = ContentTag.find_by(content_id: quiz_with_due_date.id, content_type: "Quizzes::Quiz")
+      quiz_ui = find(context_module_item_selector(quiz_item.id))
+      expect(quiz_ui.text).to include("Due")
+      expect(quiz_ui.text).to include(format_date_for_view(quiz_with_due_date.due_at, "%b"))
+    end
+
+    it "clears due date from module item when removed via assign to tray" do
+      assignment_with_due_date = @course.assignments.create!(
+        name: "Assignment1",
+        submission_types: "online_text_entry",
+        points_possible: 10,
+        workflow_state: "published",
+        due_at: 2.days.from_now
+      )
+
+      go_to_modules
+
+      add_item_button(@module.id).click
+      click_INSTUI_Select_option(add_existing_item_select_selector, "Assignment1")
+      add_item_modal_add_item_button.click
+      wait_for_ajaximations
+
+      module_header_expand_toggles.first.click
+      wait_for_ajaximations
+
+      module_item = ContentTag.find_by(content_type: "Assignment", content_id: assignment_with_due_date.id)
+      module_item_ui = find(context_module_item_selector(module_item.id))
+      expect(module_item_ui.text).to include(format_date_for_view(assignment_with_due_date.due_at, "%b"))
+
+      wait_for_ajaximations
+      manage_module_item_button(module_item.id).click
+      click_manage_module_item_assign_to
+      wait_for_ajaximations
+
+      clear_due_date_button.click
+      wait_for_ajaximations
+      submit_add_module_button.click
+      wait_for_ajaximations
+
+      module_item_ui = find(context_module_item_selector(module_item.id))
+
+      expect(module_item_ui.text).not_to include(format_date_for_view(assignment_with_due_date.due_at, "%b"))
+    end
+
     it "adds a wiki page to the module" do
       @wiki_page = @course.wiki_pages.create!(title: "Wiki Page 1", body: "This is a wiki page.")
 

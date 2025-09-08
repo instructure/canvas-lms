@@ -24,7 +24,13 @@ import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
 import ModuleItemListSmart, {ModuleItemListSmartProps} from '../ModuleItemListSmart'
 import type {ModuleItem} from '../../utils/types'
-import {PAGE_SIZE, MODULE_ITEMS, MODULES, SHOW_ALL_PAGE_SIZE} from '../../utils/constants'
+import {
+  PAGE_SIZE,
+  MODULE_ITEMS,
+  MODULES,
+  SHOW_ALL_PAGE_SIZE,
+  MODULE_ITEMS_ALL,
+} from '../../utils/constants'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 
 const generateItems = (count: number, start: number = 0): ModuleItem[] =>
@@ -215,7 +221,7 @@ describe('ModuleItemListSmart', () => {
       const items1 = generateItems(PAGE_SIZE)
       const items2 = generateItems(PAGE_SIZE, PAGE_SIZE)
       // Set up data for the non-paginated query
-      client.setQueryData(['MODULE_ITEMS_ALL', 'mod123', 'teacher', SHOW_ALL_PAGE_SIZE], {
+      client.setQueryData([MODULE_ITEMS_ALL, 'mod123', 'teacher', SHOW_ALL_PAGE_SIZE], {
         moduleItems: items1.concat(items2),
         pageInfo: {hasNextPage: false, endCursor: null},
       })
