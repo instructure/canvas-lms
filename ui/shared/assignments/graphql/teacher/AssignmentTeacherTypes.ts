@@ -153,3 +153,36 @@ export type TeacherAssignmentType = {
   submissions?: SubmissionsType
   suppressAssignment?: boolean
 }
+
+export interface CreateAllocationRuleInput {
+  assignmentId: string
+  assessorIds: string[]
+  assesseeIds: string[]
+  mustReview?: boolean
+  reviewPermitted?: boolean
+  appliesToAssessor?: boolean
+  reciprocal?: boolean
+}
+
+export interface CreateAllocationRuleResponse {
+  createAllocationRule: {
+    allocationRules: Array<{
+      _id: string
+      assessor: UserResponse
+      assessee: UserResponse
+      mustReview: boolean
+      reviewPermitted: boolean
+      appliesToAssessor: boolean
+    }>
+    allocationErrors: Array<{
+      message: string
+      attribute: string
+      attributeId: string
+    }>
+  }
+}
+
+interface UserResponse {
+  _id: string
+  name: string
+}

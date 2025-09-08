@@ -30,7 +30,6 @@ class Mutations::CreateAllocationRule < Mutations::AllocationRuleBase
     validate_id_arrays!(input)
 
     allocation_rules = create_allocation_rules(input, assignment, course)
-    validate_peer_review_counts!(allocation_rules, assignment)
 
     process_allocation_rules(allocation_rules)
   end
@@ -55,11 +54,7 @@ class Mutations::CreateAllocationRule < Mutations::AllocationRuleBase
         assessee_id: input[:assessor_ids].first
       }
 
-      new_rule = create_new_rule(assignment, course, opts.merge(shared_opts))
-      allocation_rules << new_rule
-
-      # Check if the reciprocal rule exists already. Otherwise create a new one
-      find_reciprocal_rule(new_rule)
+      allocation_rules << create_or_find_new_rule(assignment, course, opts.merge(shared_opts))
       allocation_rules << create_or_find_new_rule(assignment, course, reciprocal_opts.merge(shared_opts))
     else
       target_id = input[:applies_to_assessor] ? input[:assessor_ids].first : input[:assessee_ids].first

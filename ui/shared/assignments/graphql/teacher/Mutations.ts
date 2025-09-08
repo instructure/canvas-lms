@@ -29,3 +29,29 @@ export const SET_WORKFLOW = gql`
     }
   }
 `
+
+export const CREATE_ALLOCATION_RULE_MUTATION = gql`
+  mutation CreateAllocationRule($input: CreateAllocationRuleInput!) {
+    createAllocationRule(input: $input) {
+      allocationRules {
+        _id
+        assessor {
+          _id
+          name
+        }
+        assessee {
+          _id
+          name
+        }
+        mustReview
+        reviewPermitted
+        appliesToAssessor
+      }
+      allocationErrors {
+        message
+        attribute
+        attributeId
+      }
+    }
+  }
+`
