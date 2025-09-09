@@ -21,11 +21,11 @@ import {Popover} from '@instructure/ui-popover'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {Button, CondensedButton} from '@instructure/ui-buttons'
-import {Text} from '@instructure/ui-text'
+import {Button} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {AccessibilityIssue} from './types'
-import {IconInfoLine} from '@instructure/ui-icons'
+import {NoIssuesContent} from './NoIssuesContent'
+import {IssuesContent} from './IssuesContent'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -37,8 +37,6 @@ interface AccessibilityCheckerPopoverProps {
   issues: AccessibilityIssue[]
 }
 
-const linkColor = '#0374B5'
-
 export const AccessibilityCheckerPopover = ({
   isShowingContent,
   onShowContent,
@@ -47,7 +45,6 @@ export const AccessibilityCheckerPopover = ({
   issues,
 }: AccessibilityCheckerPopoverProps) => {
   const [currentIssueIndex, setCurrentIssueIndex] = useState(0)
-  const [isInfoPopoverOpen, setIsInfoPopoverOpen] = useState(false)
   const originalStylesRef = useRef(new Map<Element, {border?: string; outline?: string}>())
   const previousIssueRef = useRef<Element | null>(null)
 
@@ -97,14 +94,6 @@ export const AccessibilityCheckerPopover = ({
     setCurrentIssueIndex(prev => (prev < totalIssues - 1 ? prev + 1 : 0))
   }
 
-  const handleShowInfoPopover = () => {
-    setIsInfoPopoverOpen(true)
-  }
-
-  const handleHideInfoPopover = () => {
-    setIsInfoPopoverOpen(false)
-  }
-
   useEffect(() => {
     if (!isShowingContent || totalIssues === 0) return
 
@@ -127,6 +116,7 @@ export const AccessibilityCheckerPopover = ({
   useEffect(() => {
     if (!isShowingContent) {
       removeAllHighlights()
+      setCurrentIssueIndex(0)
     }
   }, [isShowingContent])
 
@@ -154,57 +144,14 @@ export const AccessibilityCheckerPopover = ({
             {I18n.t('Accessibility checker')}
           </Heading>
 
-          {totalIssues > 0 && (
-            <View>
-              <Flex alignItems="center" gap="x-small" margin="medium 0 small 0">
-                <Text weight="bold">
-                  {I18n.t('Issue %{current}/%{total}', {
-                    current: currentIssueIndex + 1,
-                    total: totalIssues,
-                  })}
-                </Text>
-                <Popover
-                  isShowingContent={isInfoPopoverOpen}
-                  onShowContent={handleShowInfoPopover}
-                  onHideContent={handleHideInfoPopover}
-                  on="click"
-                  placement="top"
-                  shouldContainFocus
-                  shouldReturnFocus
-                  shouldCloseOnDocumentClick={true}
-                  renderTrigger={() => (
-                    <CondensedButton
-                      onClick={handleShowInfoPopover}
-                      renderIcon={<IconInfoLine />}
-                    ></CondensedButton>
-                  )}
-                >
-                  <Flex direction="column" width="18rem" padding="medium" gap="medium">
-                    <Flex.Item>
-                      <Text size="medium" lineHeight="default">
-                        {currentIssue?.rule.why()}
-                      </Text>
-                    </Flex.Item>
-                    {currentIssue?.rule.link && (
-                      <Flex.Item>
-                        <Text size="medium">
-                          <a
-                            href={currentIssue.rule.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{color: linkColor, textDecoration: 'underline'}}
-                          >
-                            {currentIssue.rule.linkText?.()}
-                          </a>
-                        </Text>
-                      </Flex.Item>
-                    )}
-                  </Flex>
-                </Popover>
-              </Flex>
-
-              <Text variant="content">{currentIssue?.rule.message()}</Text>
-            </View>
+          {totalIssues > 0 ? (
+            <IssuesContent
+              currentIssue={currentIssue}
+              currentIssueIndex={currentIssueIndex}
+              totalIssues={totalIssues}
+            />
+          ) : (
+            <NoIssuesContent />
           )}
         </Flex>
 
