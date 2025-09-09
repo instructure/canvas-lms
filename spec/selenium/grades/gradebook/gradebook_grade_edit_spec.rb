@@ -136,10 +136,13 @@ shared_examples "Gradebook editing grades" do |ff_enabled|
 
     first_cell = Gradebook::Cells.grading_cell(@student_1, @second_assignment)
     first_cell.click
+    wait_for_animations
 
     # Tab to the options menu, then again to leave the cell
     driver.action.send_keys(:tab).perform
+    wait_for_animations
     driver.action.send_keys(:tab).perform
+    wait_for_animations
 
     next_cell = f("#gradebook_grid .container_1 .slick-row:nth-child(1) .b3")
     expect(next_cell).not_to have_class("editable")
