@@ -1094,6 +1094,10 @@
 - verb: GET
   path: '/api/v1/courses/:course_id/groups'
 - verb: GET
+  path: '/api/v1/courses/:course_id/learning_mastery_gradebook_settings'
+- verb: PUT
+  path: '/api/v1/courses/:course_id/learning_mastery_gradebook_settings'
+- verb: GET
   path: '/api/v1/courses/:course_id/link_validation'
 - verb: POST
   path: '/api/v1/courses/:course_id/link_validation'
