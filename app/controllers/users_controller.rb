@@ -3549,6 +3549,6 @@ class UsersController < ApplicationController
       }
     end
 
-    course_data.compact
+    course_data.compact.uniq { |c| c[:courseId] }
   end
 end
