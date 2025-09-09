@@ -113,7 +113,7 @@ shared_examples "Gradebook editing grades" do |ff_enabled|
     assignment_model(course: @course, grading_type: "letter_grade", points_possible: 100, title: "no-points")
     @assignment.update!(grading_standard_id: grading_standard.id)
     @assignment.grade_student(@student_1, grade: 89, grader: @teacher)
-    puts(@student_1.name)
+
     Gradebook.visit(@course)
     expect(f("#gradebook_grid .container_1 .slick-row:nth-child(1) .b4")).to include_text("F")
     edit_grade("#gradebook_grid .container_1 .slick-row:nth-child(1) .b4", "90")
@@ -235,6 +235,8 @@ shared_examples "Gradebook editing grades" do |ff_enabled|
     f("#assign_blanks").click
     fj(".ui-dialog-buttonpane button:visible").click
     accept_alert
+
+    wait_for_ajaximations
 
     expect(find_slick_cells(1, f("#gradebook_grid .container_1"))[0]).to include_text "0"
   end
