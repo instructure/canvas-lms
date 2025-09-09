@@ -5420,6 +5420,7 @@ el:
   deactivate_this_key_3e79a2b5: "Απενεργοποιήστε αυτό το κλειδί"
   deactivate_user_86c09036: "Απενεργοποίηση Χρήστη"
   decaying_average_8bf6a0dd: "Υπολογισμός Με Μεγαλύτερο Βάρος στα Πιο Πρόσφατη βαθμολογία"
+  decline_7eeb5ff4: Απόρριψη
   decrease_indent_d9cf469d: "Μείωση Εσοχής Κειμένου"
   deep_orange_4c7eea99: "Βαθύ πορτοκαλί"
   deep_purple_bb3e2907: "Βαθύ μοβ"
@@ -15394,6 +15395,7 @@ el:
   unarchive_f245e2d6: Απο-αρχειοθέτηση
   unarchive_selected_e0c4bd3d: "Απο-αρχειοθέτηση των Επιλεγμένων"
   unauthorized: "χωρίς εξουσιοδότηση"
+  unauthorized_5094f75c: "Χωρίς εξουσιοδότηση"
   unauthorized_message: "μη έγκυρη υπογραφή JWT"
   unauthorized_to_delete_this_file_a1271224: "Δεν έχετε εξουσιοδότηση να σβήσετε αυτό το αρχείο"
   unchanged_aca18e02: "[Χωρίς αλλαγή]"
