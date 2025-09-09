@@ -16,13 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Prettify} from '../../utilities/Prettify'
-import {ImageData} from '../BlockItems/Image/types'
-import {TitleData} from '../BlockItems/Title/types'
+import {defaultBackgroundColor, defaultSeparatorColor} from '../../block-content-editor-colors'
+import {SeparatorLineBlockProps} from './SeparatorLineBlock'
 
-type ImageBlockSettings = {
-  includeBlockTitle: boolean
-  backgroundColor: string
-  titleColor: string
+export const defaultProps: SeparatorLineBlockProps = {
+  thickness: 'medium',
+  separatorColor: defaultSeparatorColor,
+  backgroundColor: defaultBackgroundColor,
 }
-export type ImageBlockProps = Prettify<ImageData & TitleData & ImageBlockSettings>

@@ -28,18 +28,21 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {SettingsSectionToggle} from '../BlockItems/SettingsSectionToggle/SettingsSectionToggle'
 import {SettingsUploadMedia} from '../BlockItems/SettingsUploadMedia/SettingsUploadMedia'
 import {Flex} from '@instructure/ui-flex'
+import {defaultProps} from './defaultProps'
 
 const I18n = createI18nScope('block-editor')
 
 export const MediaBlockSettings = () => {
   const {
     actions: {setProp},
-    props,
+    includeBlockTitle,
+    titleColor,
+    backgroundColor,
+    src,
   } = useNode(node => ({
-    props: node.data.props,
+    ...defaultProps,
+    ...node.data.props,
   }))
-
-  const includeBlockTitle = props.includeBlockTitle !== false
 
   const handleIncludeBlockTitleChange = () => {
     setProp((props: MediaSettings) => {
@@ -86,15 +89,15 @@ export const MediaBlockSettings = () => {
         <Flex direction="column" gap="medium">
           <ColorPickerWrapper
             label={I18n.t('Background color')}
-            value={props.backgroundColor}
-            baseColor={props.titleColor}
+            value={backgroundColor}
+            baseColor={titleColor}
             baseColorLabel={I18n.t('Title color')}
             onChange={handleBackgroundColorChange}
           />
           <ColorPickerWrapper
             label={I18n.t('Title color')}
-            value={props.titleColor}
-            baseColor={props.backgroundColor}
+            value={titleColor}
+            baseColor={backgroundColor}
             baseColorLabel={I18n.t('Background color')}
             onChange={handleTitleColorChange}
           />
@@ -107,7 +110,7 @@ export const MediaBlockSettings = () => {
         defaultExpanded={true}
         includeSeparator={false}
       >
-        <SettingsUploadMedia onMediaChange={handleMediaChange} url={props.src} />
+        <SettingsUploadMedia onMediaChange={handleMediaChange} url={src!} />
       </SettingsSectionToggle>
     </>
   )

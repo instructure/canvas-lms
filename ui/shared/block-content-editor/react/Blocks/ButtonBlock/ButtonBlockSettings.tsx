@@ -25,6 +25,7 @@ import {ButtonBlockColorSettings} from './ButtonBlockColorSettings'
 import {ButtonBlockProps, ButtonData, ButtonAlignment, ButtonLayout} from './types'
 import {SettingsSectionToggle} from '../BlockItems/SettingsSectionToggle/SettingsSectionToggle'
 import {SettingsIncludeTitle} from '../BlockItems/SettingsIncludeTitle/SettingsIncludeTitle'
+import {defaultProps} from './defaultProps'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -39,13 +40,8 @@ export const ButtonBlockSettings = () => {
     isFullWidth,
     buttons,
   } = useNode(node => ({
-    includeBlockTitle: node.data.props.includeBlockTitle,
-    backgroundColor: node.data.props.backgroundColor,
-    titleColor: node.data.props.titleColor,
-    alignment: node.data.props.alignment,
-    layout: node.data.props.layout,
-    isFullWidth: node.data.props.isFullWidth,
-    buttons: node.data.props.buttons,
+    ...defaultProps,
+    ...node.data.props,
   }))
 
   const handleIncludeBlockTitleChange = () => {

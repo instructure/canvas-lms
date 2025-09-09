@@ -30,6 +30,7 @@ import {TextBlockLayout} from './TextBlockLayout'
 import {TitleView} from '../BlockItems/Title/TitleView'
 import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
 import {TextView} from '../BlockItems/Text/TextView'
+import {defaultProps} from './defaultProps'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -87,15 +88,16 @@ const TextBlockEdit = (props: TextBlockProps) => {
   )
 }
 
-export const TextBlock = (props: TextBlockProps) => {
+export const TextBlock = (props: Partial<TextBlockProps>) => {
+  const componentProps = {...defaultProps, ...props}
   return (
     <BaseBlock
       ViewComponent={TextBlockView}
       EditComponent={TextBlockEdit}
       EditViewComponent={TextBlockEditView}
-      componentProps={props}
+      componentProps={componentProps}
       title={TextBlock.craft.displayName}
-      backgroundColor={props.backgroundColor}
+      backgroundColor={componentProps.backgroundColor}
     />
   )
 }

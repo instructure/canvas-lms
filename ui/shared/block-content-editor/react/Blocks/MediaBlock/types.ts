@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Prettify} from '../../utilities/Prettify'
+
 export type MediaData = {
   title: string
 } & MediaSettings &
@@ -42,4 +44,4 @@ export type MediaBlockEditHandlers = {
 
 export type MediaBlockEditProps = MediaData & MediaBlockEditHandlers
 
-export type MediaBlockProps = BaseBlockSettings & MediaData
+export type MediaBlockProps = Prettify<BaseBlockSettings & MediaData>

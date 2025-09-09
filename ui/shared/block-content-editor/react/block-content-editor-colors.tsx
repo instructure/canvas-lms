@@ -16,13 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Prettify} from '../../utilities/Prettify'
-import {ImageData} from '../BlockItems/Image/types'
-import {TitleData} from '../BlockItems/Title/types'
+import {colors} from '@instructure/canvas-theme'
 
-type ImageBlockSettings = {
-  includeBlockTitle: boolean
-  backgroundColor: string
-  titleColor: string
-}
-export type ImageBlockProps = Prettify<ImageData & TitleData & ImageBlockSettings>
+export const defaultBackgroundColor = colors.primitives.white
+export const defaultTextColor = colors.ui.textDescription
+export const defaultSeparatorColor = colors.ui.lineDivider
+export const defaultHighlightColor = colors.additionalPrimitives.ocean12
+export const defaultButtonPrimaryColor = colors.primitives.blue45
+export const defaultButtonSecondaryColor = colors.primitives.white

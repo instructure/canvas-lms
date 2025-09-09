@@ -25,6 +25,7 @@ import {SettingsSectionToggle} from '../BlockItems/SettingsSectionToggle/Setting
 import {BorderWidthValues} from '@instructure/emotion'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {Flex} from '@instructure/ui-flex'
+import {defaultProps} from './defaultProps'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -41,9 +42,8 @@ export const SeparatorLineBlockSettings = () => {
     thickness,
     backgroundColor,
   } = useNode(node => ({
-    separatorColor: node.data.props.separatorColor,
-    thickness: node.data.props.thickness,
-    backgroundColor: node.data.props.backgroundColor,
+    ...defaultProps,
+    ...node.data.props,
   }))
 
   const handleSeparatorColorChange = (value: string) => {

@@ -25,6 +25,7 @@ import {HighlightText} from './components/HighlightText'
 import {HighlightTextEdit} from './components/HighlightTextEdit'
 import {useSave} from '../BaseBlock/useSave'
 import {BaseBlock} from '../BaseBlock'
+import {defaultProps} from './defaultProps'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -67,15 +68,16 @@ export type HighlightBlockProps = {
   backgroundColor: string
 }
 
-export const HighlightBlock = (props: HighlightBlockProps) => {
+export const HighlightBlock = (props: Partial<HighlightBlockProps>) => {
+  const componentProps = {...defaultProps, ...props}
   return (
     <BaseBlock
       ViewComponent={HighlightBlockView}
       EditViewComponent={HighlightBlockEditView}
       EditComponent={HighlightBlockEdit}
-      componentProps={props}
+      componentProps={componentProps}
       title={HighlightBlock.craft.displayName}
-      backgroundColor={props.backgroundColor}
+      backgroundColor={componentProps.backgroundColor}
     />
   )
 }

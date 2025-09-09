@@ -30,6 +30,7 @@ import {TitleEdit} from '../BlockItems/Title/TitleEdit'
 import {AddButton} from '../BlockItems/AddButton/AddButton'
 import {UploadMediaModal} from './UploadMediaModal'
 import CanvasStudioPlayer from '@canvas/canvas-studio-player/react/CanvasStudioPlayer'
+import {defaultProps} from './defaultProps'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -137,15 +138,16 @@ const MediaBlockEdit = (props: MediaBlockProps) => {
   )
 }
 
-export const MediaBlock = (props: MediaBlockProps) => {
+export const MediaBlock = (props: Partial<MediaBlockProps>) => {
+  const componentProps = {...defaultProps, ...props}
   return (
     <BaseBlock
       ViewComponent={MediaBlockView}
       EditComponent={MediaBlockEdit}
       EditViewComponent={MediaBlockEditView}
-      componentProps={props}
+      componentProps={componentProps}
       title={MediaBlock.craft.displayName}
-      backgroundColor={props.backgroundColor}
+      backgroundColor={componentProps.backgroundColor}
     />
   )
 }
