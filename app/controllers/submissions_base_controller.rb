@@ -23,7 +23,7 @@ class SubmissionsBaseController < ApplicationController
   include AssignmentsHelper
   include AssessmentRequestHelper
   include SubmissionsHelper
-  include AssetProcessorStudentHelper
+  include AssetProcessorReportHelper
 
   include Api::V1::Rubric
   include Api::V1::SubmissionComment

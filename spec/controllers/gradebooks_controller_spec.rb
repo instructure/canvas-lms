@@ -217,7 +217,7 @@ describe GradebooksController do
 
       describe "asset processor functionality" do
         it "includes asset_processors in submission data" do
-          allow_any_instance_of(AssetProcessorStudentHelper).to receive(:asset_processors).and_return([{ id: 1, title: "Test Processor" }])
+          allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_processors).and_return([{ id: 1, title: "Test Processor" }])
           get "grade_summary", params: { course_id: @course.id, id: @student.id }
           submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
           expect(submission).to have_key(:asset_processors)
@@ -225,7 +225,7 @@ describe GradebooksController do
         end
 
         it "includes asset_reports in submission data" do
-          allow_any_instance_of(AssetProcessorStudentHelper).to receive(:asset_reports).and_return([{ id: 1, priority: 0 }])
+          allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_reports).and_return([{ id: 1, priority: 0 }])
           get "grade_summary", params: { course_id: @course.id, id: @student.id }
           submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
           expect(submission).to have_key(:asset_reports)
@@ -296,7 +296,7 @@ describe GradebooksController do
       end
 
       it "returns nil for asset_reports" do
-        allow_any_instance_of(AssetProcessorStudentHelper).to receive(:asset_reports).and_return([{ id: 1, priority: 0 }])
+        allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_reports).and_return([{ id: 1, priority: 0 }])
         get "grade_summary", params: { course_id: @course.id, id: @student.id }
         submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
         expect(submission[:asset_reports]).to be_nil

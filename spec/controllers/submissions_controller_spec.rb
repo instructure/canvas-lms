@@ -1203,8 +1203,8 @@ describe SubmissionsController do
       ]
 
       # Mock helper methods
-      allow_any_instance_of(AssetProcessorStudentHelper).to receive(:asset_reports).and_return(asset_reports_data)
-      allow_any_instance_of(AssetProcessorStudentHelper).to receive(:asset_processors).and_return(asset_processors_data)
+      allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_reports).and_return(asset_reports_data)
+      allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_processors).and_return(asset_processors_data)
 
       get :show, params: { course_id: @course.id, assignment_id: @assignment.id, id: @student.id }
 

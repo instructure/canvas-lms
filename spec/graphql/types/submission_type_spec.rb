@@ -1372,14 +1372,14 @@ describe Types::SubmissionType do
       let(:current_user) { @student }
 
       it "returns LTI asset reports" do
-        allow_any_instance_of(Loaders::SubmissionLtiAssetReportsStudentLoader).to receive(:raw_asset_reports).and_return([@lti_asset_report])
+        @lti_asset_report.update!(processing_progress: Lti::AssetReport::PROGRESS_PROCESSED)
         result = submission_type.resolve("ltiAssetReportsConnection { nodes { _id } }")
         expect(result).to eq [@lti_asset_report.id.to_s]
       end
 
-      it "does not return LTI asset reports" do
+      it "returns [] when there are reports, but not processed" do
         result = submission_type.resolve("ltiAssetReportsConnection { nodes { _id } }")
-        expect(result).to be_nil
+        expect(result).to eq []
       end
 
       it "returns nil when student cannot read their own grade" do

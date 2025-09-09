@@ -21,9 +21,9 @@
 require_relative "../spec_helper"
 require_relative "../lti_spec_helper"
 
-describe AssetProcessorStudentHelper do
+describe AssetProcessorReportHelper do
   include LtiSpecHelper
-  include AssetProcessorStudentHelper
+  include AssetProcessorReportHelper
 
   before do
     # For text_entry scenario
@@ -260,6 +260,200 @@ describe AssetProcessorStudentHelper do
       @domain_root_account.disable_feature!(:lti_asset_processor)
       processors = asset_processors(assignment: @assignment)
       expect(processors).to be_nil
+    end
+  end
+
+  shared_context "group assignment setup" do
+    let(:group_category) { @course.group_categories.create!(name: "Group Category") }
+    let(:group1) { group_category.groups.create!(name: "Test Group 1", context: @course) }
+    let(:group2) { group_category.groups.create!(name: "Test Group 2", context: @course) }
+
+    let(:group1_student1) { student_in_course(course: @course).user }
+    let(:group1_student2) { student_in_course(course: @course).user }
+    let(:group2_student1) { student_in_course(course: @course).user }
+    let(:group2_student2) { student_in_course(course: @course).user }
+
+    let(:group_assignment) { assignment_model(course: @course, group_category:) }
+    let(:group_asset_processor) { lti_asset_processor_model(tool: @tool, assignment: group_assignment) }
+
+    let(:group1_sub1) do
+      group1.add_user(group1_student1)
+      group_assignment.submissions.find_by(user: group1_student1).tap { |s| s.update!(group: group1) }
+    end
+    let(:group1_sub2) do
+      group1.add_user(group1_student2)
+      group_assignment.submissions.find_by(user: group1_student2).tap { |s| s.update!(group: group1) }
+    end
+    let(:group2_sub1) do
+      group2.add_user(group2_student1)
+      group_assignment.submissions.find_by(user: group2_student1).tap { |s| s.update!(group: group2) }
+    end
+    let(:group2_sub2) do
+      group2.add_user(group2_student2)
+      group_assignment.submissions.find_by(user: group2_student2).tap { |s| s.update!(group: group2) }
+    end
+
+    let(:group1_student1_attachment) { attachment_with_context(group1_student1, display_name: "group1_file.txt", uploaded_data: StringIO.new("group1 content")) }
+    let(:group2_student1_attachment) { attachment_with_context(group2_student1, display_name: "group2_file.txt", uploaded_data: StringIO.new("group2 content")) }
+
+    let(:group1_student1_asset) { lti_asset_model(submission: group1_sub1, attachment: group1_student1_attachment) }
+    let(:group2_student1_asset) { lti_asset_model(submission: group2_sub1, attachment: group2_student1_attachment) }
+
+    let(:group1_student2_attachment) { attachment_with_context(group1_student2, display_name: "group1_student2_file.txt", uploaded_data: StringIO.new("group1 student2 content")) }
+    let(:group2_student2_attachment) { attachment_with_context(group2_student2, display_name: "group2_student2_file.txt", uploaded_data: StringIO.new("group2 student2 content")) }
+
+    let(:group1_student2_asset) { lti_asset_model(submission: group1_sub2, attachment: group1_student2_attachment) }
+    let(:group2_student2_asset) { lti_asset_model(submission: group2_sub2, attachment: group2_student2_attachment) }
+
+    let(:group1_student1_report) do
+      lti_asset_report_model(
+        asset_processor: group_asset_processor,
+        asset: group1_student1_asset,
+        title: "Group 1 Student 1 Report",
+        processing_progress: Lti::AssetReport::PROGRESS_PROCESSED,
+        visible_to_owner: true
+      )
+    end
+    let(:group2_student1_report) do
+      lti_asset_report_model(
+        asset_processor: group_asset_processor,
+        asset: group2_student1_asset,
+        title: "Group 2 Student 1 Report",
+        processing_progress: Lti::AssetReport::PROGRESS_PROCESSED,
+        visible_to_owner: true
+      )
+    end
+    let(:group1_student2_report) do
+      lti_asset_report_model(
+        asset_processor: group_asset_processor,
+        asset: group1_student2_asset,
+        title: "Group 1 Student 2 Report",
+        processing_progress: Lti::AssetReport::PROGRESS_PROCESSED,
+        visible_to_owner: true
+      )
+    end
+    let(:group2_student2_report) do
+      lti_asset_report_model(
+        asset_processor: group_asset_processor,
+        asset: group2_student2_asset,
+        title: "Group 2 Student 2 Report",
+        processing_progress: Lti::AssetReport::PROGRESS_PROCESSED,
+        visible_to_owner: true
+      )
+    end
+
+    before do
+      group1_student1_report
+      group1_student2_report
+      group2_student1_report
+      group2_student2_report
+    end
+  end
+
+  describe "#raw_asset_reports with group assignment" do
+    include_context "group assignment setup"
+
+    it "includes reports from group mate submissions for students" do
+      reports = raw_asset_reports(submission_ids: [group1_sub2.id], for_student: true)
+
+      expect(reports[group1_sub2.id]).to be_a(Array)
+      expect(reports[group1_sub2.id]).to include(group1_student1_report, group1_student2_report)
+      expect(reports[group1_sub2.id]).not_to include(group2_student1_report, group2_student2_report)
+    end
+
+    it "includes reports from group mate submissions for teachers" do
+      reports = raw_asset_reports(submission_ids: [group1_sub2.id], for_student: false)
+
+      expect(reports[group1_sub2.id]).to be_a(Array)
+      expect(reports[group1_sub2.id]).to include(group1_student1_report, group1_student2_report)
+      expect(reports[group1_sub2.id]).not_to include(group2_student1_report, group2_student2_report)
+    end
+
+    it "returns reports for multiple group submissions" do
+      reports = raw_asset_reports(submission_ids: [group1_sub2.id, group2_sub2.id], for_student: true)
+
+      expect(reports[group1_sub2.id]).to include(group1_student1_report, group1_student2_report)
+      expect(reports[group1_sub2.id]).not_to include(group2_student1_report, group2_student2_report)
+
+      expect(reports[group2_sub2.id]).to include(group2_student1_report, group2_student2_report)
+      expect(reports[group2_sub2.id]).not_to include(group1_student1_report, group1_student2_report)
+    end
+
+    it "handles submissions not in groups" do
+      reports = raw_asset_reports(submission_ids: [@submission.id], for_student: true)
+
+      expect(reports[@submission.id]).to be_a(Array)
+      expect(reports[@submission.id]).to include(@apreport1)
+    end
+
+    it "filters by visible_to_owner for students" do
+      group1_student1_report.update!(visible_to_owner: false)
+      group1_student2_report.update!(visible_to_owner: false)
+
+      reports = raw_asset_reports(submission_ids: [group1_sub2.id], for_student: true)
+      expect(reports[group1_sub2.id]).to be_nil
+    end
+
+    it "does not filter by visible_to_owner for teachers" do
+      group1_student1_report.update!(visible_to_owner: false)
+      group1_student2_report.update!(visible_to_owner: false)
+
+      reports = raw_asset_reports(submission_ids: [group1_sub2.id], for_student: false)
+      expect(reports[group1_sub2.id]).to include(group1_student1_report, group1_student2_report)
+    end
+
+    it "returns empty array when there are visible reports but none processed for students" do
+      group1_student1_report.update!(processing_progress: Lti::AssetReport::PROGRESS_PENDING)
+      group1_student2_report.update!(processing_progress: Lti::AssetReport::PROGRESS_PENDING)
+
+      reports = raw_asset_reports(submission_ids: [group1_sub2.id], for_student: true)
+      expect(reports[group1_sub2.id]).to eq([])
+    end
+
+    it "returns all reports regardless of processing status for teachers" do
+      group1_student1_report.update!(processing_progress: Lti::AssetReport::PROGRESS_PENDING)
+      group1_student2_report.update!(processing_progress: Lti::AssetReport::PROGRESS_PENDING)
+
+      reports = raw_asset_reports(submission_ids: [group1_sub2.id], for_student: false)
+      expect(reports[group1_sub2.id]).to include(group1_student1_report, group1_student2_report)
+    end
+  end
+
+  describe "#asset_reports with group assignments" do
+    include_context "group assignment setup"
+
+    it "returns reports from group mate submissions" do
+      reports = asset_reports(submission: group1_sub2)
+
+      expect(reports).to be_a(Array)
+      expect(reports.length).to eq(2)
+      expect(reports.pluck(:title)).to include("Group 1 Student 1 Report", "Group 1 Student 2 Report")
+      expect(reports.find { |r| r[:title] == "Group 1 Student 1 Report" }[:asset][:submission_id]).to eq(group1_sub1.id)
+      expect(reports.find { |r| r[:title] == "Group 1 Student 2 Report" }[:asset][:submission_id]).to eq(group1_sub2.id)
+    end
+
+    it "returns nil when no group mate reports exist" do
+      group1_student1_report.destroy!
+      group1_student2_report.destroy!
+
+      reports = asset_reports(submission: group1_sub2)
+      expect(reports).to be_nil
+    end
+
+    it "returns empty array when group mate reports exist but are not processed" do
+      group1_student1_report.update!(processing_progress: Lti::AssetReport::PROGRESS_PENDING)
+      group1_student2_report.update!(processing_progress: Lti::AssetReport::PROGRESS_PENDING)
+
+      reports = asset_reports(submission: group1_sub2)
+      expect(reports).to eq([])
+    end
+
+    it "returns nil when group mate reports are not visible to owner" do
+      group1_student1_report.update!(visible_to_owner: false)
+      group1_student2_report.update!(visible_to_owner: false)
+
+      reports = asset_reports(submission: group1_sub2)
+      expect(reports).to be_nil
     end
   end
 end
