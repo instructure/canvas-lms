@@ -1157,8 +1157,7 @@ module ApplicationHelper
 
   def generate_access_verifier(return_url: nil, fallback_url: nil, authorization: nil)
     developer_key = @advantage_token_developer_key || @access_token&.developer_key
-    verifier_type = @advantage_token_developer_key.present? ? DeveloperKeys::AccessVerifier : Users::AccessVerifier
-    verifier_type.generate(
+    AccessVerifier.generate(
       authorization:,
       user: @current_user,
       real_user: logged_in_user,
@@ -1171,7 +1170,7 @@ module ApplicationHelper
   end
 
   def validate_access_verifier
-    Users::AccessVerifier.validate(params)
+    AccessVerifier.validate(params)
   end
 
   def file_access_user

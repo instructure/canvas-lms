@@ -254,7 +254,7 @@ class FilesController < ApplicationController
     rescue Canvas::Security::TokenExpired
       # maybe their browser is being stupid and came to the files domain directly with an old verifier - try to go back and get a new one
       return redirect_to_fallback_url if files_domain?
-    rescue Users::AccessVerifier::InvalidVerifier, Users::AccessVerifier::JtiReused
+    rescue AccessVerifier::InvalidVerifier, AccessVerifier::JtiReused
       nil
     end
 
