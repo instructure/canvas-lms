@@ -756,6 +756,130 @@ describe Types::UserType do
         expect(all_enrollment_ids.length).to eq @student.enrollments.count
       end
     end
+
+    context "permission handling" do
+      before(:once) do
+        @admin = account_admin_user
+        @observer = user_factory(name: "Observer")
+        @other_course = course_factory
+        @other_student = user_factory(name: "Other Student")
+
+        @other_course.enroll_student(@other_student, enrollment_state: "active")
+        @other_course.enroll_teacher(@teacher, enrollment_state: "active")
+
+        student_course = @student.enrollments.first.course
+        observer_enrollment = student_course.enroll_user(@observer, "ObserverEnrollment", enrollment_state: "active")
+        observer_enrollment.update!(associated_user_id: @student.id)
+        UserObservationLink.create!(
+          student: @student,
+          observer: @observer,
+          root_account: @course.account.root_account
+        )
+      end
+
+      let(:admin_type) do
+        GraphQLTypeTester.new(
+          @student,
+          current_user: @admin,
+          domain_root_account: @course.account.root_account,
+          request: ActionDispatch::TestRequest.create
+        )
+      end
+
+      it "allows admin with manage_students permission to view all user enrollments" do
+        admin_type.extract_result = false
+        result = admin_type.resolve("enrollmentsConnection { nodes { _id } }")
+        enrollments_result = result["enrollmentsConnection"]
+
+        expected_ids = @student.enrollments.pluck(:id).map(&:to_param)
+        actual_ids = enrollments_result["nodes"].pluck("_id")
+        expect(actual_ids).to match_array(expected_ids)
+      end
+
+      it "allows observer to view their observee's enrollments" do
+        observer_viewing_student = GraphQLTypeTester.new(
+          @student,
+          current_user: @observer,
+          domain_root_account: @course.account.root_account,
+          request: ActionDispatch::TestRequest.create
+        )
+
+        observer_viewing_student.extract_result = false
+        result = observer_viewing_student.resolve("enrollmentsConnection { nodes { _id } }")
+        enrollments_result = result["enrollmentsConnection"]
+
+        student_course = @student.enrollments.first.course
+        expected_enrollment = @student.enrollments.find_by(course: student_course)
+        expected_ids = [expected_enrollment.id.to_param]
+        actual_ids = enrollments_result["nodes"].pluck("_id")
+        expect(actual_ids).to match_array(expected_ids)
+      end
+
+      it "allows teacher to view enrollments for students in their course" do
+        teacher_viewing_student = GraphQLTypeTester.new(
+          @student,
+          current_user: @teacher,
+          domain_root_account: @course.account.root_account,
+          request: ActionDispatch::TestRequest.create
+        )
+
+        teacher_viewing_student.extract_result = false
+        result = teacher_viewing_student.resolve("enrollmentsConnection { nodes { _id } }")
+        enrollments_result = result["enrollmentsConnection"]
+
+        actual_ids = enrollments_result["nodes"].pluck("_id")
+        expect(actual_ids.length).to eq(1)
+        expect(@student.enrollments.pluck(:id).map(&:to_s)).to include(actual_ids.first)
+      end
+
+      it "returns empty result when user has no shared courses" do
+        separate_course = course_factory
+        separate_course.enroll_student(@student, enrollment_state: "active")
+        separate_teacher = user_factory
+        separate_course.enroll_teacher(separate_teacher, enrollment_state: "active")
+
+        teacher_no_access = GraphQLTypeTester.new(
+          @student,
+          current_user: separate_teacher,
+          domain_root_account: @course.account.root_account,
+          request: ActionDispatch::TestRequest.create
+        )
+
+        teacher_no_access.extract_result = false
+        result = teacher_no_access.resolve(%|enrollmentsConnection(courseId: "#{@course.id}") { nodes { _id } }|)
+        enrollments_result = result["enrollmentsConnection"]
+
+        expect(enrollments_result["nodes"]).to be_empty
+      end
+
+      it "allows users to view their own enrollments" do
+        user_type.extract_result = false
+        result = user_type.resolve("enrollmentsConnection { nodes { _id } }", current_user: @student)
+        enrollments_result = result["enrollmentsConnection"]
+
+        expected_ids = @student.enrollments.pluck(:id).map(&:to_param)
+        actual_ids = enrollments_result["nodes"].pluck("_id")
+        expect(actual_ids).to match_array(expected_ids)
+      end
+
+      it "respects course_id filtering with proper permissions" do
+        admin_type.extract_result = false
+        result = admin_type.resolve(%|enrollmentsConnection(courseId: "#{@course.id}") { nodes { _id } }|)
+        enrollments_result = result["enrollmentsConnection"]
+
+        expected_ids = @student.enrollments.where(course: @course).pluck(:id).map(&:to_param)
+        actual_ids = enrollments_result["nodes"].pluck("_id")
+        expect(actual_ids).to match_array(expected_ids)
+      end
+
+      it "returns empty result when requesting course without permissions" do
+        user_type.extract_result = false
+        result = user_type.resolve(%|enrollmentsConnection(courseId: "#{@other_course.id}") { nodes { _id } }|, current_user: @student)
+        enrollments_result = result["enrollmentsConnection"]
+
+        expect(enrollments_result["nodes"]).to be_empty
+      end
+    end
   end
 
   context "email" do
