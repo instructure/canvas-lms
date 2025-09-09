@@ -3916,6 +3916,39 @@ describe CoursesController do
         end
       end
     end
+
+    context "csp setting" do
+      before :once do
+        @account = Account.default
+        @account.enable_feature!(:javascript_csp)
+        @account.enable_csp!
+      end
+
+      it "updates the csp setting when admin" do
+        account_admin_user(active_all: true, account: @account)
+        user_session(@admin)
+        # default is enabled
+        expect(@course.csp_enabled?).to be_truthy
+        put "update", params: { id: @course.id, course: { disable_csp: "1" } }
+        @course.reload
+        expect(@course.csp_enabled?).to be_falsey
+        put "update", params: { id: @course.id, course: { disable_csp: "0" } }
+        @course.reload
+        expect(@course.csp_enabled?).to be_truthy
+      end
+
+      it "does not update the csp setting when not admin" do
+        user_session(@teacher)
+        # test for nil param
+        put "update", params: { id: @course.id, course: { name: "New Course Name" } }
+        @course.reload
+        expect(@course.csp_enabled?).to be_truthy
+        # test for false param
+        put "update", params: { id: @course.id, course: { disable_csp: "0" } }
+        @course.reload
+        expect(@course.csp_enabled?).to be_truthy
+      end
+    end
   end
 
   describe "POST 'unconclude'" do
