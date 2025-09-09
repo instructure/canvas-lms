@@ -140,9 +140,6 @@ class AssignmentsController < ApplicationController
   end
 
   def render_a2_student_view(student:)
-    if @context.root_account.feature_enabled?(:instui_nav)
-      add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
-    end
     current_user_submission = @assignment.submissions.find_by(user: student)
     submission = if @context.feature_enabled?(:peer_reviews_for_a2)
                    if params[:reviewee_id].present? && !@assignment.anonymous_peer_reviews?
@@ -333,6 +330,8 @@ class AssignmentsController < ApplicationController
         log_asset_access(@assignment, "assignments", @assignment.assignment_group)
         asset_processor_eula_js_env
 
+        add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
+
         if render_a2_student_view? && params[:display] != "borderless"
           js_env({ OBSERVER_OPTIONS: {
                    OBSERVED_USERS_LIST: observed_users(@current_user, session, @context.id),
@@ -428,7 +427,6 @@ class AssignmentsController < ApplicationController
           return content_tag_redirect(@context, @assignment.external_tool_tag, :context_url, tag_type)
         end
 
-        add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
         @page_title = if @assignment.new_record?
                         t(:new_assignment, "New Assignment")
                       else

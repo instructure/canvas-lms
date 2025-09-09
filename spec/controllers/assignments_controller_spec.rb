@@ -667,6 +667,19 @@ describe AssignmentsController do
   end
 
   describe "GET 'show'" do
+    it "sets correct breadcrumb with assignment title for old assignments (non-enhancement)" do
+      user_session(@student)
+      get :show, params: { course_id: @course.id, id: @assignment.id }
+
+      # Check that we have the expected 4 breadcrumbs: Home, Course, Assignments, Assignment ID
+      expect(assigns[:_crumbs]).to have(4).items
+
+      # Verify the assignment breadcrumb (4th item) contains the assignment title and URL
+      assignment_crumb = assigns[:_crumbs][3]
+      expect(assignment_crumb[0]).to eq(@assignment.title)
+      expect(assignment_crumb[1]).to include("/courses/#{@course.id}/assignments/#{@assignment.id}")
+    end
+
     it "returns 404 on non-existent assignment" do
       user_session(@student)
 
@@ -1271,6 +1284,19 @@ describe AssignmentsController do
           get "show", params: { course_id: @course.id, id: @assignment.id }
 
           expect(assigns[:js_env][:ASSIGNMENT_NAME]).to eq(@assignment.title)
+        end
+
+        it "sets correct breadcrumb with assignment title for assignment enhancements" do
+          user_session(@student)
+          get :show, params: { course_id: @course.id, id: @assignment.id }
+
+          # Check that we have the expected 4 breadcrumbs: Home, Course, Assignments, Assignment ID
+          expect(assigns[:_crumbs]).to have(4).items
+
+          # Verify the assignment breadcrumb (4th item) contains the assignment title and URL
+          assignment_crumb = assigns[:_crumbs][3]
+          expect(assignment_crumb[0]).to eq(@assignment.title)
+          expect(assignment_crumb[1]).to include("/courses/#{@course.id}/assignments/#{@assignment.id}")
         end
       end
 
