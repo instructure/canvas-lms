@@ -250,7 +250,7 @@ describe FilesController do
     end
 
     allow_any_instance_of(ApplicationController).to receive(:files_domain?).and_return(true)
-    expect { Users::AccessVerifier.validate(@qs) }.to raise_exception(Canvas::Security::TokenExpired)
+    expect { AccessVerifier.validate(@qs) }.to raise_exception(Canvas::Security::TokenExpired)
     get @files_domain_location # try to use the expired verifier anyway because durr
 
     expect(response).to be_redirect
@@ -494,7 +494,7 @@ describe FilesController do
       user_factory(active_all: true)
       user_session(@user)
 
-      user_verifier = Users::AccessVerifier.generate(user: @user)
+      user_verifier = AccessVerifier.generate(user: @user)
       get "/files/#{att.id}", params: user_verifier # set the file access session tokens
       expect(session["file_access_user_id"]).to be_present
 

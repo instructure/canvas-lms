@@ -743,11 +743,11 @@ describe FilesController do
         enable_cache do
           user1 = user_factory(active_all: true)
           file1 = user_file
-          verifier1 = Users::AccessVerifier.generate(user: user1)
+          verifier1 = AccessVerifier.generate(user: user1)
 
           user2 = user_factory(active_all: true)
           file2 = user_file
-          verifier2 = Users::AccessVerifier.generate(user: user2)
+          verifier2 = AccessVerifier.generate(user: user2)
 
           # first verifier
           user_session(user1)
@@ -782,7 +782,7 @@ describe FilesController do
         enable_cache do
           user = user_factory(active_all: true)
           file = user_file
-          verifier = Users::AccessVerifier.generate(user:)
+          verifier = AccessVerifier.generate(user:)
 
           # first use to establish session
           get "show", params: verifier.merge(id: file.id)
@@ -791,7 +791,7 @@ describe FilesController do
 
           # second use after verifier expiration but before session expiration.
           # expired verifier should be ignored but session should still be extended
-          Timecop.freeze((Users::AccessVerifier::TTL_MINUTES + 1).minutes.from_now) do
+          Timecop.freeze((AccessVerifier::TTL_MINUTES + 1).minutes.from_now) do
             get "show", params: verifier.merge(id: file.id)
           end
           expect(response).to be_successful
@@ -804,7 +804,7 @@ describe FilesController do
           user = user_factory(active_all: true)
           file = user_file
           authorization = { permission: ["download", "read"], attachment: file }
-          verifier = Users::AccessVerifier.generate(user:, authorization:)
+          verifier = AccessVerifier.generate(user:, authorization:)
           get "show", params: verifier.merge(id: file.id)
           expect(response).to be_successful
           session.delete(:permissions_key)
@@ -1428,7 +1428,7 @@ describe FilesController do
       it "skips verification for an account-context file" do
         account_js_file
         file_verifier = Attachments::Verification.new(@file).verifier_for_user(nil)
-        user_verifier = Users::AccessVerifier.generate(user: @teacher)
+        user_verifier = AccessVerifier.generate(user: @teacher)
         other_params = { download: 1, inline: 1, verifier: file_verifier, account_id: @account.id, file_id: @file.id, file_path: @file.full_path }
         get "show_relative", params: user_verifier.merge(other_params)
         expect(response).to be_successful
@@ -1437,7 +1437,7 @@ describe FilesController do
       it "enforces verification for contexts other than account" do
         course_file
         file_verifier = Attachments::Verification.new(@file).verifier_for_user(nil)
-        user_verifier = Users::AccessVerifier.generate(user: @teacher)
+        user_verifier = AccessVerifier.generate(user: @teacher)
         other_params = { download: 1, inline: 1, verifier: file_verifier, account_id: @account.id, file_id: @file.id, file_path: @file.full_path }
         get "show_relative", params: user_verifier.merge(other_params)
         assert_unauthorized
@@ -1454,7 +1454,7 @@ describe FilesController do
 
       it "does not allow access if the user can't see the file" do
         enable_cache do
-          sf_verifier = Users::AccessVerifier.generate(
+          sf_verifier = AccessVerifier.generate(
             user: @user,
             real_user: @user,
             root_account: Account.last,
@@ -1469,7 +1469,7 @@ describe FilesController do
 
       it "allows access if the sf_verifier includes the file authorization information" do
         enable_cache do
-          sf_verifier = Users::AccessVerifier.generate(
+          sf_verifier = AccessVerifier.generate(
             authorization: { attachment: @file, permission: "download" },
             user: @user,
             real_user: @user,
@@ -1481,6 +1481,25 @@ describe FilesController do
           get "show_relative", params: { course_id: @course.id, file_id: @file.id, file_path: @file.full_display_path, **sf_verifier }
           expect(response).to be_redirect
           expect(response.location).to include "/files/stuff/doc.doc?download=1&token="
+        end
+      end
+
+      context "Asset Processor Asset download" do
+        before do
+          @dk = developer_key_model
+        end
+
+        it "allows access if the sf_verifier includes the file authorization information" do
+          enable_cache do
+            sf_verifier = AccessVerifier.generate(
+              developer_key: @dk,
+              authorization: { attachment: @file, permission: "download" },
+              root_account: @dk.root_account
+            )
+            get "show_relative", params: { course_id: @course.id, file_id: @file.id, file_path: @file.full_display_path, **sf_verifier }
+            expect(response).to be_redirect
+            expect(response.location).to include "/files/stuff/doc.doc?download=1&token="
+          end
         end
       end
     end
