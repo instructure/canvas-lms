@@ -17,7 +17,8 @@
  */
 
 import {bool, shape} from 'prop-types'
-import {EditorEvent, Events} from 'tinymce'
+import {Editor, EditorEvent, Events} from 'tinymce'
+import {findMediaPlayerIframe} from './iframeUtils'
 
 /**
  * Interface for content item's 'custom' field, specifically for what is expected to come from Studio
@@ -103,4 +104,136 @@ export function handleBeforeObjectSelected(e: EditorEvent<Events.ObjectSelectedE
   if (targetElement.getAttribute('data-mce-p-data-studio-resizable') === 'false') {
     targetElement.setAttribute('data-mce-resize', 'false')
   }
+}
+
+export function findStudioLtiIframeFromSelection(selectedNode: Node): HTMLIFrameElement | null {
+  let outerIframe: HTMLIFrameElement | null = null
+
+  // First, find the outer iframe
+  if (selectedNode.nodeName === 'IFRAME') {
+    outerIframe = selectedNode as HTMLIFrameElement
+  } else if (selectedNode.nodeType === Node.ELEMENT_NODE) {
+    // Look for iframe inside the selected element (the span)
+    outerIframe = (selectedNode as Element).querySelector('iframe') as HTMLIFrameElement
+  }
+
+  if (!outerIframe) {
+    console.error('No outer iframe found')
+    return null
+  }
+
+  // Now try to access the content document of the outer iframe
+  try {
+    const outerIframeDoc = outerIframe.contentDocument || outerIframe.contentWindow?.document
+
+    if (!outerIframeDoc) {
+      return outerIframe // Return outer iframe as fallback
+    }
+
+    // Search for nested iframe with data-lti-launch attribute
+    const nestedIframe = outerIframeDoc.querySelector(
+      'iframe[data-lti-launch="true"]',
+    ) as HTMLIFrameElement
+
+    if (nestedIframe) {
+      return nestedIframe
+    } else {
+      // Try to find any iframe inside
+      const anyNestedIframe = outerIframeDoc.querySelector('iframe') as HTMLIFrameElement
+      if (anyNestedIframe) {
+        return anyNestedIframe
+      }
+    }
+  } catch (error) {
+    console.error('>> Cannot access outer iframe content (cross-origin):', error)
+    // Return the outer iframe as fallback since we can't access its contents
+    return outerIframe
+  }
+
+  return outerIframe
+}
+
+export const notifyStudioEmbedTypeChange = (
+  editor: Editor,
+  embedType: 'thumbnail_embed' | 'learn_embed' | 'collaboration_embed',
+) => {
+  const studioIframe = findStudioLtiIframeFromSelection(editor.selection.getNode())
+
+  if (studioIframe && studioIframe.contentWindow) {
+    studioIframe.contentWindow.postMessage(
+      {
+        subject: 'studio.embedTypeChanged',
+        embedType: embedType,
+        timestamp: Date.now(),
+      },
+      '*',
+    )
+  }
+}
+
+export type EmbedType = 'thumbnail_embed' | 'learn_embed' | 'collaboration_embed'
+
+export const updateStudioIframeDimensions = (
+  editor: Editor,
+  width: number,
+  height: number,
+  embedType: EmbedType,
+) => {
+  const selectedNode = editor.selection.getNode()
+  const videoContainer = findMediaPlayerIframe(selectedNode)
+
+  if (videoContainer?.tagName !== 'IFRAME') {
+    return
+  }
+
+  const tinymceIframeShim = videoContainer.parentElement
+
+  if (!tinymceIframeShim) {
+    return
+  }
+
+  editor.dom.setStyles(tinymceIframeShim, {
+    width: `${width}px`,
+    height: `${height}px`,
+  })
+  editor.dom.setStyles(videoContainer, {
+    width: `${width}px`,
+    height: `${height}px`,
+  })
+
+  const href = editor.dom.getAttrib(tinymceIframeShim, 'data-mce-p-src')
+
+  if (href && embedType) {
+    if (embedType) {
+      // Replace thumbnail_embed, learn_embed, or collaboration_embed with the new embed type
+      const updatedHref = href.replace(
+        /(thumbnail_embed|learn_embed|collaboration_embed)/g,
+        embedType,
+      )
+
+      // updating only mce-p-src as in we only want to update the real src whenever we step out of the editor or save it
+      editor.dom.setAttrib(tinymceIframeShim, 'data-mce-p-src', updatedHref)
+      editor.nodeChanged()
+    }
+  }
+
+  editor.fire('ObjectResized', {
+    // @ts-expect-error - needed for aligning tooltip with new iframe size
+    target: videoContainer,
+    width,
+    height,
+  })
+}
+
+type ValidStudioEmbedType = 'thumbnail_embed' | 'learn_embed' | 'collaboration_embed'
+
+export const isValidEmbedType = (embedType: any): embedType is ValidStudioEmbedType => {
+  return (
+    typeof embedType === 'string' &&
+    ['thumbnail_embed', 'learn_embed', 'collaboration_embed'].includes(embedType)
+  )
+}
+
+export const isValidDimension = (value: any): value is number => {
+  return typeof value === 'number' && !isNaN(value) && isFinite(value) && value > 0
 }

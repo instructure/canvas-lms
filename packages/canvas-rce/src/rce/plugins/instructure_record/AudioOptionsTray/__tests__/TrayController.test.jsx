@@ -26,6 +26,8 @@ import * as contentSelection from '../../../shared/ContentSelection'
 import {createLiveRegion, removeLiveRegion} from '../../../../__tests__/liveRegionHelper'
 import bridge from '../../../../../bridge'
 
+import {findMediaPlayerIframe} from '../../../shared/iframeUtils'
+
 const MOCK_AUDIO_PLAYERS = [
   {
     id: 'audio_id',
@@ -134,7 +136,7 @@ describe('RCE "Audios" Plugin > AudioOptionsTray > TrayController', () => {
   describe('#_applyAudioOptions', () => {
     beforeEach(() => {
       // container?.contentWindow.location.reload() is not defined in jsdom
-      const iframe = contentSelection.findMediaPlayerIframe(editors[0].selection.getNode())
+      const iframe = findMediaPlayerIframe(editors[0].selection.getNode())
       delete iframe.contentWindow.location
       iframe.contentWindow.location = {reload: jest.fn()}
     })
@@ -196,7 +198,7 @@ describe('RCE "Audios" Plugin > AudioOptionsTray > TrayController', () => {
 
     it('posts message to iframe onload', () => {
       const postMessageMock = jest.fn()
-      const iframe = contentSelection.findMediaPlayerIframe(editors[0].selection.getNode())
+      const iframe = findMediaPlayerIframe(editors[0].selection.getNode())
       iframe.contentWindow.postMessage = postMessageMock
       trayController.showTrayForEditor(editors[0])
       expect(postMessageMock).toHaveBeenCalledTimes(1)
@@ -204,7 +206,7 @@ describe('RCE "Audios" Plugin > AudioOptionsTray > TrayController', () => {
 
     it('cleans up event listener on tray close', () => {
       const postMessageMock = jest.fn()
-      const iframe = contentSelection.findMediaPlayerIframe(editors[0].selection.getNode())
+      const iframe = findMediaPlayerIframe(editors[0].selection.getNode())
       iframe.contentWindow.postMessage = postMessageMock
       trayController.showTrayForEditor(editors[0])
       trayController.hideTrayForEditor(editors[0])
