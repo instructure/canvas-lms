@@ -1867,6 +1867,46 @@ describe AssignmentOverrideApplicator do
       lock_at = AssignmentOverrideApplicator.overridden_lock_at(@wiki_page, [@override])
       expect(lock_at).to eq @override.lock_at
     end
+
+    context "adhoc override prioritization for admins" do
+      before do
+        student_in_course(active_all: true)
+        teacher_in_course(active_all: true)
+        @assignment = create_assignment(course: @course, lock_at: 5.days.from_now)
+        @adhoc_override = assignment_override_model(assignment: @assignment)
+        @adhoc_override.assignment_override_students.create!(user: @student)
+        @adhoc_lock_at = 6.days.from_now
+        @adhoc_override.override_lock_at(@adhoc_lock_at)
+        @section_override = assignment_override_model(assignment: @assignment, set: @course.default_section)
+        @section_lock_at = 7.days.from_now
+        @section_override.override_lock_at(@section_lock_at)
+        @overrides = [@adhoc_override, @section_override]
+      end
+
+      it "uses the adhoc lock_at for students" do
+        lock_at = AssignmentOverrideApplicator.overridden_lock_at(@assignment, @overrides, @student)
+        expect(lock_at).to eq @adhoc_lock_at
+      end
+
+      it "uses the most lenient lock_at for teachers" do
+        lock_at = AssignmentOverrideApplicator.overridden_lock_at(@assignment, @overrides, @teacher)
+        expect(lock_at).to eq @section_lock_at
+      end
+
+      it "uses the most lenient adhoc lock_at for teachers with multiple adhoc overrides" do
+        student_in_course(active_all: true)
+        student2 = @student
+        adhoc_override2 = assignment_override_model(assignment: @assignment)
+        adhoc_override2.assignment_override_students.create!(user: student2)
+        adhoc_lock_at2 = 8.days.from_now
+        adhoc_override2.override_lock_at(adhoc_lock_at2)
+
+        all_overrides = @overrides + [adhoc_override2]
+
+        lock_at = AssignmentOverrideApplicator.overridden_lock_at(@assignment, all_overrides, @teacher)
+        expect(lock_at).to eq adhoc_lock_at2
+      end
+    end
   end
 
   describe "Overridable#has_no_overrides" do
