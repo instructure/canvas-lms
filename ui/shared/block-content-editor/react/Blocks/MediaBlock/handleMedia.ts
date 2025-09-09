@@ -28,7 +28,7 @@ export type UploadData = {
   theFile?: File
   fileUrl?: string
 }
-export const panels = ['COMPUTER', 'URL', 'course_media', 'user_media']
+export const panels = ['COMPUTER', 'VIDEO_URL', 'course_media', 'user_media']
 export type UploadFilePanelIds = (typeof panels)[number]
 
 const progressCallBack = () => {}

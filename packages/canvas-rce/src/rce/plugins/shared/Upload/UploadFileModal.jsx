@@ -32,10 +32,12 @@ import ImageOptionsForm from '../ImageOptionsForm'
 import UsageRightsSelectBox from './UsageRightsSelectBox'
 import {View} from '@instructure/ui-view'
 import {UploadCanvasPanelIds, CanvasPanelTitles} from '../canvasContentUtils'
+import {validateVideoUrl} from './videoValidationUtils'
 
 const CanvasContentPanel = React.lazy(() => import('./CanvasContentPanel'))
 const ComputerPanel = React.lazy(() => import('./ComputerPanel'))
 const UrlPanel = React.lazy(() => import('./UrlPanel'))
+const VideoUrlPanel = React.lazy(() => import('./VideoUrlPanel'))
 
 function shouldBeDisabled({fileUrl, theFile, error}, selectedPanel, usageRightNotSet) {
   if (error || (usageRightNotSet && selectedPanel === 'COMPUTER')) {
@@ -45,6 +47,7 @@ function shouldBeDisabled({fileUrl, theFile, error}, selectedPanel, usageRightNo
     case 'COMPUTER':
       return !theFile || theFile.error
     case 'URL':
+    case 'VIDEO_URL':
       return !fileUrl
     default:
       if (UploadCanvasPanelIds.includes(selectedPanel)) return !fileUrl
@@ -149,12 +152,24 @@ const UploadFileModal = React.forwardRef(
           if (submitDisabled || uploading) {
             return false
           }
+
+          let finalFileUrl = fileUrl
+
+          if (selectedPanel === 'VIDEO_URL' && finalFileUrl) {
+            const validation = validateVideoUrl(finalFileUrl)
+            if (!validation.isValid) {
+              setError('Invalid video URL')
+              return false
+            }
+            finalFileUrl = validation.embedUrl
+          }
+
           onSubmit(
             editor,
             accept,
             selectedPanel,
             {
-              fileUrl,
+              fileUrl: finalFileUrl,
               theFile,
               imageOptions: {altText, isDecorativeImage, displayAs},
               usageRights: usageRightsState,
@@ -178,7 +193,7 @@ const UploadFileModal = React.forwardRef(
           <Heading>{label}</Heading>
         </Modal.Header>
         <Modal.Body ref={ref}>
-          <Tabs onRequestTabChange={(event, {index}) => handleRequestTabChange(index)}>
+          <Tabs onRequestTabChange={(_event, {index}) => handleRequestTabChange(index)}>
             {panels.map(panel => {
               switch (panel) {
                 case 'COMPUTER':
@@ -216,7 +231,30 @@ const UploadFileModal = React.forwardRef(
                       <Suspense
                         fallback={<Spinner renderTitle={formatMessage('Loading')} size="large" />}
                       >
-                        <UrlPanel fileUrl={fileUrl} setFileUrl={setFileUrl} />
+                        <UrlPanel fileUrl={fileUrl} setFileUrl={setFileUrl} urlHasError={!!error} />
+                      </Suspense>
+                    </Tabs.Panel>
+                  )
+                case 'VIDEO_URL':
+                  return (
+                    <Tabs.Panel
+                      key={panel}
+                      renderTitle={function () {
+                        return formatMessage('Video URL')
+                      }}
+                      isSelected={selectedPanel === 'VIDEO_URL'}
+                    >
+                      <Suspense
+                        fallback={<Spinner renderTitle={formatMessage('Loading')} size="large" />}
+                      >
+                        <VideoUrlPanel
+                          fileUrl={fileUrl}
+                          setFileUrl={url => {
+                            setError(null)
+                            setFileUrl(url)
+                          }}
+                          urlHasError={!!error}
+                        />
                       </Suspense>
                     </Tabs.Panel>
                   )
@@ -321,7 +359,7 @@ UploadFileModal.propTypes = {
   canvasOrigin: string,
   onSubmit: func,
   onDismiss: func.isRequired,
-  panels: arrayOf(oneOf(['COMPUTER', 'URL', ...UploadCanvasPanelIds])),
+  panels: arrayOf(oneOf(['COMPUTER', 'URL', 'VIDEO_URL', ...UploadCanvasPanelIds])),
   label: string.isRequired,
   accept: oneOfType([arrayOf(string), string]),
   modalBodyWidth: number,
