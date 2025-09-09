@@ -97,7 +97,7 @@ const CourseActivityForm = ({accountId, onSubmit}: CourseActivityFormProps) => {
   return (
     <form
       aria-label={I18n.t('Course Activity Form')}
-      className="form-horizontal pad-box border border-trbl search-controls"
+      className="pad-box border border-trbl search-controls"
       noValidate={true}
       onSubmit={handleSubmit(handleFormSubmit)}
     >
