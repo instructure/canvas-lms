@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import {useState} from 'react'
 import {MediaBlockSettings} from './MediaBlockSettings'
 import {BaseBlock} from '../BaseBlock'
 import {MediaBlockProps, MediaSources} from './types'
@@ -31,6 +31,7 @@ import {AddButton} from '../BlockItems/AddButton/AddButton'
 import {UploadMediaModal} from './UploadMediaModal'
 import CanvasStudioPlayer from '@canvas/canvas-studio-player/react/CanvasStudioPlayer'
 import {defaultProps} from './defaultProps'
+import {getContrastingTextColorCached} from '../../utilities/getContrastingTextColor'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -107,6 +108,7 @@ const MediaBlockEditView = (props: MediaBlockProps) => {
 const MediaBlockEdit = (props: MediaBlockProps) => {
   const [title, setTitle] = useState(props.title)
   const [showModal, setShowModal] = useState(false)
+  const labelColor = getContrastingTextColorCached(props.backgroundColor)
 
   const save = useSave(() => ({
     title,
@@ -121,7 +123,9 @@ const MediaBlockEdit = (props: MediaBlockProps) => {
 
   return (
     <Flex gap="mediumSmall" direction="column">
-      {props.includeBlockTitle && <TitleEdit title={title} onTitleChange={setTitle} />}
+      {props.includeBlockTitle && (
+        <TitleEdit title={title} onTitleChange={setTitle} labelColor={labelColor} />
+      )}
       {props.src || props.mediaId || props.attachment_id ? (
         <View as="div" width={'100%'} height={'400px'}>
           <Player mediaId={props.mediaId} src={props.src} attachment_id={props.attachment_id} />
