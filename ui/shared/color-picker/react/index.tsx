@@ -17,10 +17,7 @@
  */
 
 import $ from 'jquery'
-import React from 'react'
-import createReactClass from 'create-react-class'
-import ReactDOM from 'react-dom'
-import PropTypes from 'prop-types'
+import React, {Component, RefObject} from 'react'
 import ReactModal from '@canvas/react-modal'
 import {Button} from '@instructure/ui-buttons'
 import {TextInput} from '@instructure/ui-text-input'
@@ -34,10 +31,17 @@ import '@canvas/rails-flash-notifications'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {IconWarningSolid} from '@instructure/ui-icons'
 import {showFlashError, showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {
+  ColorInfo,
+  isValidHex,
+  shouldApplySwatchBorderColor,
+  shouldApplySelectedStyle,
+  getColorName,
+} from './utils'
 
 const I18n = createI18nScope('calendar_color_picker')
 
-export const PREDEFINED_COLORS = [
+export const PREDEFINED_COLORS: ColorInfo[] = [
   {
     hexcode: '#BD3C14',
     get name() {
@@ -130,109 +134,104 @@ export const PREDEFINED_COLORS = [
   },
 ]
 
-function shouldApplySwatchBorderColor(color) {
-  return this.props.withBoxShadow || this.state.currentColor !== color.hexcode
+interface NicknameInfo {
+  nickname?: string
+  originalName?: string
+  courseId?: string | number
 }
 
-function shouldApplySelectedStyle(color) {
-  return this.state.currentColor === color.hexcode
+interface ColorPickerProps {
+  parentComponent: string
+  colors?: ColorInfo[]
+  isOpen?: boolean
+  afterUpdateColor?: (color: string) => void
+  afterClose?: () => void
+  assetString?: string
+  hideOnScroll?: boolean
+  positions?: {top: number; left: number}
+  nonModal?: boolean
+  hidePrompt?: boolean
+  currentColor?: string
+  nicknameInfo?: NicknameInfo
+  withAnimation?: boolean
+  withArrow?: boolean
+  withBorder?: boolean
+  withBoxShadow?: boolean
+  withDarkCheck?: boolean
+  setStatusColor?: (color: string, onSuccess: () => void, onError: () => void) => void
+  allowWhite?: boolean
+  focusOnMount?: boolean
 }
 
-const ColorPicker = createReactClass({
-  // ===============
-  //     CONFIG
-  // ===============
+interface ColorPickerState {
+  isOpen?: boolean
+  currentColor: string
+  saveInProgress: boolean
+}
 
-  displayName: 'ColorPicker',
+interface ColorSwatchStyle {
+  backgroundColor: string
+  borderColor?: string
+  borderWidth?: string
+}
 
-  propTypes: {
-    parentComponent: PropTypes.string.isRequired,
-    colors: PropTypes.arrayOf(
-      PropTypes.shape({
-        hexcode: PropTypes.string.isRequired,
-        name: PropTypes.string.isRequired,
-      }).isRequired,
-    ),
-    isOpen: PropTypes.bool,
-    afterUpdateColor: PropTypes.func,
-    afterClose: PropTypes.func,
-    assetString: (props, propName, componentName) => {
-      if (props.parentComponent === 'DashboardCardMenu' && props[propName] == null) {
-        return new Error(
-          `Invalid prop '${propName}' supplied to '${componentName}'. ` +
-            `Prop '${propName}' must be present when 'parentComponent' ` +
-            "is 'DashboardCardMenu'. Vaidation failed.",
-        )
+class ColorPicker extends Component<ColorPickerProps, ColorPickerState> {
+  static defaultProps: Partial<ColorPickerProps> = {
+    currentColor: '#efefef',
+    // hideOnScroll exists because the modal doesn't track its target
+    // when the page scrolls, so we just chose to close it.  However on
+    // mobile, focusing on the hex color textbox opens the keyboard which
+    // triggers a scroll and the modal closed. To work around this, init
+    // hideOnScroll to false if we're on a mobile device, which we detect,
+    // somewhat loosely, by seeing if a TouchEven exists.  The result isn't
+    // great, but it's better than before.
+    // A more permenant fix is in the works, pending a fix to INSTUI Popover.
+    hideOnScroll: (function () {
+      try {
+        document.createEvent('TouchEvent')
+        return false
+      } catch (_e) {
+        return true
       }
-      return undefined
-    },
-    hideOnScroll: PropTypes.bool,
-    positions: PropTypes.object,
-    nonModal: PropTypes.bool,
-    hidePrompt: PropTypes.bool,
-    currentColor: PropTypes.string,
-    nicknameInfo: PropTypes.object,
-    withAnimation: PropTypes.bool,
-    withArrow: PropTypes.bool,
-    withBorder: PropTypes.bool,
-    withBoxShadow: PropTypes.bool,
-    withDarkCheck: PropTypes.bool,
-    setStatusColor: PropTypes.func,
-    allowWhite: PropTypes.bool,
-    focusOnMount: PropTypes.bool,
-  },
+    })(),
+    withAnimation: true,
+    withArrow: true,
+    withBorder: true,
+    withBoxShadow: true,
+    withDarkCheck: false,
+    colors: PREDEFINED_COLORS,
+    setStatusColor: () => {},
+    allowWhite: false,
+    focusOnMount: true,
+  }
 
-  hexInputRef: null,
-  courseNicknameEditRef: React.createRef(),
-  colorSwatchRefs: [],
-  pickerBodyRef: React.createRef(),
-  reactModalRef: React.createRef(),
+  private colorSwatchRefs: RefObject<HTMLButtonElement>[]
+  private hexInputRef = React.createRef<HTMLInputElement>()
+  private courseNicknameEditRef = React.createRef<any>()
+  private pickerBodyRef = React.createRef<HTMLDivElement>()
+  private reactModalRef = React.createRef<any>()
 
-  // ===============
-  //    LIFECYCLE
-  // ===============
+  constructor(props: ColorPickerProps) {
+    super(props)
 
-  getInitialState() {
     // Initialize colorSwatchRefs array with refs for each color
-    this.colorSwatchRefs = this.props.colors.map(() => React.createRef())
+    this.colorSwatchRefs = this.props.colors!.map(() => React.createRef<HTMLButtonElement>())
 
-    return {
+    this.state = {
       isOpen: this.props.isOpen,
-      currentColor: this.props.currentColor,
+      currentColor: this.props.currentColor || '#efefef',
       saveInProgress: false,
     }
-  },
 
-  getDefaultProps() {
-    return {
-      currentColor: '#efefef',
-      // hideOnScroll exists because the modal doesn't track its target
-      // when the page scrolls, so we just chose to close it.  However on
-      // mobile, focusing on the hex color textbox opens the keyboard which
-      // triggers a scroll and the modal closed. To work around this, init
-      // hideOnScroll to false if we're on a mobile device, which we detect,
-      // somewhat loosely, by seeing if a TouchEven exists.  The result isn't
-      // great, but it's better than before.
-      // A more permenant fix is in the works, pending a fix to INSTUI Popover.
-      hideOnScroll: (function () {
-        try {
-          document.createEvent('TouchEvent')
-          return false
-        } catch (_e) {
-          return true
-        }
-      })(),
-      withAnimation: true,
-      withArrow: true,
-      withBorder: true,
-      withBoxShadow: true,
-      withDarkCheck: false,
-      colors: PREDEFINED_COLORS,
-      setStatusColor: () => {},
-      allowWhite: false,
-      focusOnMount: true,
+    // Runtime validation for assetString prop (similar to original PropTypes validation)
+    if (this.props.parentComponent === 'DashboardCardMenu' && this.props.assetString == null) {
+      console.error(
+        `Invalid prop 'assetString' supplied to 'ColorPicker'. ` +
+          `Prop 'assetString' must be present when 'parentComponent' ` +
+          `is 'DashboardCardMenu'. Validation failed.`,
+      )
     }
-  },
+  }
 
   componentDidMount() {
     if (this.props.focusOnMount) {
@@ -240,13 +239,13 @@ const ColorPicker = createReactClass({
     }
 
     $(window).on('scroll', this.handleScroll)
-  },
+  }
 
   componentWillUnmount() {
     $(window).off('scroll', this.handleScroll)
-  },
+  }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps: ColorPickerProps) {
     this.setState(
       {
         isOpen: nextProps.isOpen,
@@ -257,9 +256,9 @@ const ColorPicker = createReactClass({
         }
       },
     )
-  },
+  }
 
-  setFocus() {
+  setFocus = () => {
     // focus course nickname input first if it's there, otherwise the first
     // color swatch
     if (this.courseNicknameEditRef.current) {
@@ -267,13 +266,25 @@ const ColorPicker = createReactClass({
     } else if (this.colorSwatchRefs[0] && this.colorSwatchRefs[0].current) {
       this.colorSwatchRefs[0].current.focus()
     }
-  },
+  }
+
+  shouldApplySwatchBorderColor = (color: ColorInfo): boolean => {
+    return shouldApplySwatchBorderColor(
+      color,
+      this.state.currentColor,
+      this.props.withBoxShadow || false,
+    )
+  }
+
+  shouldApplySelectedStyle = (color: ColorInfo): boolean => {
+    return shouldApplySelectedStyle(color, this.state.currentColor)
+  }
 
   // ===============
   //     ACTIONS
   // ===============
 
-  closeModal() {
+  closeModal = () => {
     this.setState({
       isOpen: false,
     })
@@ -281,52 +292,43 @@ const ColorPicker = createReactClass({
     if (this.props.afterClose) {
       this.props.afterClose()
     }
-  },
+  }
 
-  setCurrentColor(color) {
+  setCurrentColor = (color: string): void => {
     this.setState({currentColor: color})
-  },
+  }
 
-  setInputColor(event) {
+  setInputColor = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const value = event.target.value || event.target.placeholder
     event.preventDefault()
     this.setCurrentColor(value)
-  },
+  }
 
-  setColorForCalendar(color) {
+  setColorForCalendar = (color: string): JQuery.jqXHR<any> | undefined => {
     // Remove the hex if needed
-    color = color.replace('#', '')
+    const cleanColor = color.replace('#', '')
+    const currentColor = (this.props.currentColor || '').replace('#', '')
 
-    if (color !== this.props.currentColor.replace('#', '')) {
+    if (cleanColor !== currentColor) {
       return $.ajax({
         url: '/api/v1/users/' + window.ENV.current_user_id + '/colors/' + this.props.assetString,
         type: 'PUT',
         data: {
-          hexcode: color,
+          hexcode: cleanColor,
         },
         success: () => {
-          this.props.afterUpdateColor(color)
+          this.props.afterUpdateColor?.(cleanColor)
         },
         error: () => {},
       })
     }
-  },
+  }
 
-  isValidHex(color) {
-    if (!this.props.allowWhite) {
-      // prevent selection of white (#fff or #ffffff)
-      const whiteHexRe = /^#?([fF]{3}|[fF]{6})$/
-      if (whiteHexRe.test(color)) {
-        return false
-      }
-    }
+  isValidHex = (color: string): boolean => {
+    return isValidHex(color, this.props.allowWhite)
+  }
 
-    // ensure hex is valid
-    const validHexRe = /^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/
-    return validHexRe.test(color)
-  },
-
-  warnIfInvalid() {
+  warnIfInvalid = () => {
     if (!this.isValidHex(this.state.currentColor)) {
       showFlashAlert({
         message: I18n.t(
@@ -339,20 +341,17 @@ const ColorPicker = createReactClass({
         srOnly: true,
       })
     }
-  },
+  }
 
-  setCourseNickname() {
+  setCourseNickname = () => {
     if (this.courseNicknameEditRef.current) {
       return this.courseNicknameEditRef.current.setCourseNickname()
     }
-  },
+  }
 
-  onApply(color, _event) {
+  onApply = (color: string, _event?: React.MouseEvent): void => {
     const doneSaving = () => {
-      // eslint-disable-next-line react/no-is-mounted
-      if (this.isMounted()) {
-        this.setState({saveInProgress: false})
-      }
+      this.setState({saveInProgress: false})
     }
 
     const handleSuccess = () => {
@@ -373,7 +372,7 @@ const ColorPicker = createReactClass({
           this.props.parentComponent === 'StatusColorListItem' ||
           this.props.parentComponent === 'ProficiencyRating'
         ) {
-          this.props.setStatusColor(this.state.currentColor, handleSuccess, handleFailure)
+          this.props.setStatusColor?.(this.state.currentColor, handleSuccess, handleFailure)
         } else {
           // both API calls update the same User model and thus need to be performed serially
           $.when(this.setColorForCalendar(color)).then(() => {
@@ -389,41 +388,41 @@ const ColorPicker = createReactClass({
         type: 'warning',
       })
     }
-  },
+  }
 
-  onCancel() {
+  onCancel = () => {
     // reset to the cards current actual displaying color
-    this.setCurrentColor(this.props.currentColor)
+    this.setCurrentColor(this.props.currentColor || '#efefef')
     this.closeModal()
-  },
+  }
 
-  handleScroll() {
+  handleScroll = () => {
     if (this.props.hideOnScroll) {
       this.closeModal()
-    } else if (this.state.isOpen) {
-      this.hexInputRef.scrollIntoView()
+    } else if (this.state.isOpen && this.hexInputRef.current) {
+      this.hexInputRef.current.scrollIntoView()
     }
-  },
+  }
 
   // ===============
   //    RENDERING
   // ===============
 
-  checkMarkIfMatchingColor(colorCode) {
+  checkMarkIfMatchingColor = (colorCode: string): React.ReactElement | undefined => {
     if (this.state.currentColor === colorCode) {
       return <i className="icon-check" />
     }
-  },
+  }
 
-  renderColorRows() {
-    return this.props.colors.map((color, idx) => {
-      const colorSwatchStyle = {backgroundColor: color.hexcode}
+  renderColorRows = (): React.ReactElement[] => {
+    return this.props.colors!.map((color, idx) => {
+      const colorSwatchStyle: ColorSwatchStyle = {backgroundColor: color.hexcode}
       if (color.hexcode !== '#FFFFFF') {
-        if (shouldApplySwatchBorderColor.call(this, color)) {
+        if (this.shouldApplySwatchBorderColor(color)) {
           colorSwatchStyle.borderColor = color.hexcode
         }
       }
-      if (shouldApplySelectedStyle.call(this, color)) {
+      if (this.shouldApplySelectedStyle(color)) {
         colorSwatchStyle.borderColor = '#6A7883'
         colorSwatchStyle.borderWidth = '2px'
       }
@@ -442,7 +441,7 @@ const ColorPicker = createReactClass({
           aria-checked={this.state.currentColor === color.hexcode}
           style={colorSwatchStyle}
           title={title}
-          onClick={this.setCurrentColor.bind(null, color.hexcode)}
+          onClick={() => this.setCurrentColor(color.hexcode)}
           key={color.hexcode}
         >
           {color.hexcode === '#FFFFFF' && (
@@ -455,21 +454,21 @@ const ColorPicker = createReactClass({
         </button>
       )
     })
-  },
+  }
 
-  nicknameEdit() {
+  nicknameEdit = (): React.ReactElement | undefined => {
     if (this.props.nicknameInfo) {
       return (
         <CourseNicknameEdit
           ref={this.courseNicknameEditRef}
           nicknameInfo={this.props.nicknameInfo}
-          onEnter={this.onApply.bind(null, this.state.currentColor)}
+          onEnter={() => this.onApply(this.state.currentColor)}
         />
       )
     }
-  },
+  }
 
-  prompt() {
+  prompt = (): React.ReactElement | undefined => {
     if (!this.props.hidePrompt) {
       return (
         <div className="ColorPicker__Header">
@@ -477,9 +476,9 @@ const ColorPicker = createReactClass({
         </div>
       )
     }
-  },
+  }
 
-  colorPreview(validHex) {
+  colorPreview = (validHex: boolean): React.ReactElement => {
     let previewColor = validHex ? this.state.currentColor : '#FFFFFF'
     if (previewColor.indexOf('#') < 0) {
       previewColor = '#' + previewColor
@@ -494,7 +493,7 @@ const ColorPicker = createReactClass({
         title={this.state.currentColor}
         role="presentation"
         aria-hidden="true"
-        tabIndex="-1"
+        tabIndex={-1}
         margin="xxx-small x-small 0 0"
         themeOverride={{backgroundPrimary: previewColor, borderColorPrimary: previewColor}}
       >
@@ -507,9 +506,9 @@ const ColorPicker = createReactClass({
         )}
       </View>
     )
-  },
+  }
 
-  pickerBody() {
+  pickerBody = (): React.ReactElement => {
     const validHex = this.isValidHex(this.state.currentColor)
     const containerClasses = classnames({
       ColorPicker__Container: true,
@@ -547,8 +546,10 @@ const ColorPicker = createReactClass({
             onBlur={this.warnIfInvalid}
             size="small"
             margin="0 0 0 x-small"
-            inputRef={r => {
-              this.hexInputRef = r
+            inputRef={element => {
+              if (this.hexInputRef.current !== element) {
+                ;(this.hexInputRef as any).current = element
+              }
             }}
             data-testid="color-picker-input"
             messages={
@@ -579,7 +580,7 @@ const ColorPicker = createReactClass({
             color="primary"
             id="ColorPicker__Apply"
             size="small"
-            onClick={this.onApply.bind(null, this.state.currentColor)}
+            onClick={() => this.onApply(this.state.currentColor)}
             disabled={this.state.saveInProgress || !validHex}
             margin="0 0 0 xxx-small"
           >
@@ -588,17 +589,18 @@ const ColorPicker = createReactClass({
         </div>
       </div>
     )
-  },
+  }
 
-  modalWrapping(body) {
+  modalWrapping = (body: React.ReactElement): React.ReactElement => {
     // TODO: The non-computed styles below could possibly moved out to the
     //       proper stylesheets in the future.
+    const positions = this.props.positions || {top: 0, left: 0}
     const styleObj = {
       content: {
-        position: 'absolute',
-        top: this.props.positions.top - 96,
+        position: 'absolute' as const,
+        top: positions.top - 96,
         right: 'auto',
-        left: isRTL() ? 100 - this.props.positions.left : this.props.positions.left - 174,
+        left: (isRTL as any)() ? 100 - positions.left : positions.left - 174,
         bottom: 0,
         overflow: 'visible',
         padding: 0,
@@ -618,23 +620,15 @@ const ColorPicker = createReactClass({
         {body}
       </ReactModal>
     )
-  },
+  }
 
-  render() {
+  render(): React.ReactElement {
     const body = this.pickerBody()
     return this.props.nonModal ? body : this.modalWrapping(body)
-  },
-})
+  }
 
-ColorPicker.getColorName = colorHex => {
-  const colorWithoutHash = colorHex.replace('#', '')
-
-  const definedColor = PREDEFINED_COLORS.find(
-    color => color.hexcode.replace('#', '') === colorWithoutHash,
-  )
-
-  if (definedColor) {
-    return definedColor.name
+  static getColorName(colorHex: string): string | undefined {
+    return getColorName(colorHex, PREDEFINED_COLORS)
   }
 }
 
