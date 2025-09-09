@@ -54,18 +54,15 @@ module Users
       { sf_verifier: Canvas::Security.create_jwt(jwt_claims, expires, key, :HS512) }
     end
 
-    def self.validate(fields)
-      return {} if fields[:sf_verifier].blank?
+    def self.validate(params)
+      return {} if params[:sf_verifier].blank?
 
-      claims = Canvas::Security.decode_jwt(fields[:sf_verifier])
+      claims = Canvas::Security.decode_jwt(params[:sf_verifier])
       raise JtiReused if claims[:jti].present? && !Rails.cache.delete("sf_verifier:#{claims[:jti]}")
 
       if claims[:attachment_id].present?
-        attachment_id = fields[:attachment_id] || fields[:file_id] || fields[:id]
-        verifier_attachment = Attachment.find_by(id: claims[:attachment_id])
-        raise InvalidVerifier unless attachment_id == verifier_attachment&.id&.to_s ||
-                                     attachment_id == verifier_attachment&.global_id&.to_s ||
-                                     (verifier_attachment&.global_id && attachment_id == Shard.short_id_for(verifier_attachment.global_id))
+        attachment_id = params[:attachment_id] || params[:file_id] || params[:id]
+        raise InvalidVerifier unless Shard.global_id_for(attachment_id) == Shard.global_id_for(claims[:attachment_id])
       end
 
       real_user = user = User.where(id: claims[:user_id]).first
