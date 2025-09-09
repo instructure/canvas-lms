@@ -78,6 +78,17 @@ describe DataFixup::CreateLtiRegistrationsFromDeveloperKeys do
       end
     end
 
+    context "with a deleted developer key" do
+      before do
+        second_account_key.update(workflow_state: "deleted")
+      end
+
+      it "creates a deleted registration" do
+        described_class.run
+        expect(second_account_key.reload.lti_registration.workflow_state).to eq("deleted")
+      end
+    end
+
     context "with invalid developer key" do
       before do
         second_account_key.scopes += ["invalid_scope"]
