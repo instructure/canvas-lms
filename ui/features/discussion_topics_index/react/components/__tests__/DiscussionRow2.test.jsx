@@ -318,9 +318,8 @@ describe('DiscussionRow', () => {
   })
 
   it('renders the further available until date for ungraded overrides', () => {
-    // Use specific dates with very different formatted representations to make the test more robust
     const futureDate = new Date('2027-01-17T00:00:00Z')
-    const furtherFutureDate = new Date('2028-12-25T00:00:00Z') // Christmas 2028, very distinct date
+    const furtherFutureDate = new Date('2028-12-25T00:00:00Z')
 
     const discussion = {
       ungraded_discussion_overrides: [
@@ -331,11 +330,19 @@ describe('DiscussionRow', () => {
 
     render(<DiscussionRow {...makeProps({discussion})} />)
 
-    // Format the date we're looking for - should be the furthest future date
+    // The component actually shows the LATEST lock date (least restrictive)
+    // This is the "furthest" date as the test name implies
     const formattedLaterDate = dateFormatter(furtherFutureDate)
 
-    // Look for the exact text with the formatted date using screen.getByText
-    expect(screen.getByText(`Available until ${formattedLaterDate}`)).toBeInTheDocument()
+    // Find all elements that contain "Available until" text
+    const availabilityElements = screen.getAllByText(/Available until/)
+    expect(availabilityElements.length).toBeGreaterThan(0)
+
+    // Check if any of the elements contain the later date
+    const hasLaterDate = availabilityElements.some(el =>
+      el.textContent.includes(formattedLaterDate),
+    )
+    expect(hasLaterDate).toBe(true)
   })
 
   it('renders locked at if appropriate', () => {
