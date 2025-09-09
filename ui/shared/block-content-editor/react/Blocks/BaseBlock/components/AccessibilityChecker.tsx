@@ -23,24 +23,35 @@ import {checkHtmlContent} from '../../../accessibilityChecker/htmlChecker'
 import {debounce} from 'lodash'
 import {View} from '@instructure/ui-view'
 import {useInstUIRef} from '../useInstUIRef'
+import {AccessibilityRule} from '../../../accessibilityChecker/types'
 
 interface BaseBlockA11yWrapperProps {
   children: ReactNode
-  componentProps: any
+  customAccessibilityCheckRules?: AccessibilityRule[]
+  componentProps: unknown
 }
 
-export function AccessibilityChecker({children, componentProps}: BaseBlockA11yWrapperProps) {
+export function AccessibilityChecker({
+  children,
+  customAccessibilityCheckRules,
+  componentProps,
+}: BaseBlockA11yWrapperProps) {
   const [renderedContentRef, setRenderedContentRef] = useInstUIRef<Element>()
 
   const {
     accessibility: {addA11yIssues},
   } = useBlockContentEditorContext()
-  const {id} = useNode()
+  const {id, blockName} = useNode(node => ({
+    blockName: node.data.name,
+  }))
 
   useEffect(() => {
     const debouncedCheckA11y = debounce(async () => {
       if (renderedContentRef.current && id) {
-        const result = await checkHtmlContent(renderedContentRef.current)
+        const result = await checkHtmlContent(
+          renderedContentRef.current,
+          customAccessibilityCheckRules,
+        )
         addA11yIssues(id, result.issues)
       }
     }, 600)
@@ -49,7 +60,7 @@ export function AccessibilityChecker({children, componentProps}: BaseBlockA11yWr
     return () => {
       debouncedCheckA11y.cancel()
     }
-  }, [componentProps, id])
+  }, [componentProps, id, blockName])
 
   return <View elementRef={setRenderedContentRef}>{children}</View>
 }

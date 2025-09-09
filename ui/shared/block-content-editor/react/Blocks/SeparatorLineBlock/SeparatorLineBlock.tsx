@@ -22,6 +22,7 @@ import {BorderWidth, BorderWidthValues} from '@instructure/emotion'
 import {BaseBlock} from '../BaseBlock'
 import {SeparatorLineBlockSettings} from './SeparatorLineBlockSettings'
 import {defaultProps} from './defaultProps'
+import {separatorLineContrast} from '../../accessibilityChecker/rules/separatorLineContrast'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -58,6 +59,7 @@ export const SeparatorLineBlock = (props: Partial<SeparatorLineBlockProps>) => {
       componentProps={componentProps}
       title={SeparatorLineBlock.craft.displayName}
       backgroundColor={componentProps.backgroundColor}
+      customAccessibilityCheckRules={[separatorLineContrast]}
     />
   )
 }

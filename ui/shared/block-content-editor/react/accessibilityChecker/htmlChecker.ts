@@ -16,14 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {AccessibilityCheckResult, AccessibilityIssue, AccessibilityRule} from './types'
+import {AccessibilityCheckResult, AccessibilityIssue, AccessibilityRule} from './types'
 import {checkNode} from '@instructure/canvas-rce'
-import {buttonBackgroundContrast} from './rules/buttonBackgroundContrast'
-import {separatorLineContrast} from './rules/separatorLineContrast'
 
-const customRules: AccessibilityRule[] = [buttonBackgroundContrast, separatorLineContrast]
-
-export const checkHtmlContent = (htmlContent: Element): Promise<AccessibilityCheckResult> => {
+export const checkHtmlContent = (
+  htmlContent: Element,
+  customAccessibilityCheckRules?: AccessibilityRule[],
+): Promise<AccessibilityCheckResult> => {
   return new Promise(resolve => {
     if (!htmlContent) {
       resolve({
@@ -40,7 +39,7 @@ export const checkHtmlContent = (htmlContent: Element): Promise<AccessibilityChe
         })
       },
       {},
-      customRules,
+      customAccessibilityCheckRules || [],
     )
   })
 }

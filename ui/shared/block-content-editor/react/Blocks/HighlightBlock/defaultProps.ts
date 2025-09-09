@@ -19,7 +19,7 @@
 import {
   defaultBackgroundColor,
   defaultHighlightColor,
-  defaultTextColor,
+  defaultHighlightTextColor,
 } from '../../block-content-editor-colors'
 import {HighlightBlockProps} from './HighlightBlock'
 
@@ -27,6 +27,6 @@ export const defaultProps: HighlightBlockProps = {
   content: '',
   displayIcon: 'warning',
   highlightColor: defaultHighlightColor,
-  textColor: defaultTextColor,
+  textColor: defaultHighlightTextColor,
   backgroundColor: defaultBackgroundColor,
 }

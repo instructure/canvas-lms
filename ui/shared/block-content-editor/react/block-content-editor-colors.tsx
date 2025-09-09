@@ -20,7 +20,8 @@ import {colors} from '@instructure/canvas-theme'
 
 export const defaultBackgroundColor = colors.primitives.white
 export const defaultTextColor = colors.ui.textDescription
-export const defaultSeparatorColor = colors.ui.lineDivider
-export const defaultHighlightColor = colors.additionalPrimitives.ocean12
+export const defaultSeparatorColor = colors.primitives.grey30
+export const defaultHighlightColor = colors.primitives.blue45
+export const defaultHighlightTextColor = colors.primitives.white
 export const defaultButtonPrimaryColor = colors.primitives.blue45
 export const defaultButtonSecondaryColor = colors.primitives.white
