@@ -29,7 +29,16 @@ jest.mock('../../utilities/apiUtils', () => ({
   transformApiToInternalItem: jest.fn(item => `transformed-${item.uniqueId}`),
 }))
 
-const server = setupServer()
+const server = setupServer(
+  http.get('*/api/v1/planner/items', () => {
+    return new HttpResponse(JSON.stringify([]), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+  }),
+)
 
 beforeAll(() => {
   const alertSpy = jest.fn()
