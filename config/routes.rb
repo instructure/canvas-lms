@@ -2644,6 +2644,11 @@ CanvasRails::Application.routes.draw do
       put "courses/:course_id/gradebook_settings", action: :update, as: :course_gradebook_settings_update
     end
 
+    scope(controller: :learning_mastery_gradebook_settings_api) do
+      get "courses/:course_id/learning_mastery_gradebook_settings", action: :show
+      put "courses/:course_id/learning_mastery_gradebook_settings", action: :update
+    end
+
     scope(controller: :announcements_api) do
       get "announcements", action: :index, as: :announcements
     end

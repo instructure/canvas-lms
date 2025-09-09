@@ -62,6 +62,7 @@ class UserPreferenceValue < ActiveRecord::Base
   add_user_preference :viewed_auto_subscribed_account_calendars
   add_user_preference :text_editor_preference
   add_user_preference :files_ui_version
+  add_user_preference :learning_mastery_gradebook_settings, use_sub_keys: true
 
   def self.settings
     @preference_settings ||= {}
