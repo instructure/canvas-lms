@@ -20,7 +20,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 import bridge from '../../../../bridge'
-import {asVideoElement, findMediaPlayerIframe} from '../../shared/ContentSelection'
+import {asVideoElement} from '../../shared/ContentSelection'
+import {findMediaPlayerIframe} from '../../shared/iframeUtils'
 import VideoOptionsTray from '.'
 import {isStudioEmbeddedMedia, parseStudioOptions} from '../../shared/StudioLtiSupportUtils'
 import RCEGlobals from '../../../RCEGlobals'
@@ -32,7 +33,7 @@ export const STUDIO_PLAYER_VIDEO_SIZE_DEFAULT = {height: '300px', width: '480px'
 export const AUDIO_PLAYER_SIZE = {width: '320px', height: '14.25rem'}
 
 export const videoDefaultSize = () => {
-  if(RCEGlobals.getFeatures().consolidated_media_player) {
+  if (RCEGlobals.getFeatures().consolidated_media_player) {
     return STUDIO_PLAYER_VIDEO_SIZE_DEFAULT
   }
 
@@ -159,7 +160,7 @@ export default class TrayController {
             }
           })
           .catch(ex => {
-            console.error('failed updating video captions', ex)  
+            console.error('failed updating video captions', ex)
           })
       }
     }

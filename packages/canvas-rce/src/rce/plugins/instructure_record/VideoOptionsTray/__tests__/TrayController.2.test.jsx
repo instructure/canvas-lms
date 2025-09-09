@@ -26,6 +26,8 @@ import * as contentSelection from '../../../shared/ContentSelection'
 import {createLiveRegion, removeLiveRegion} from '../../../../__tests__/liveRegionHelper'
 import bridge from '../../../../../bridge'
 
+import {findMediaPlayerIframe} from '../../../shared/iframeUtils'
+
 const mockVideoPlayers = [
   {
     titleText: 'video title 0',
@@ -244,7 +246,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
 
     it('posts message to iframe onload', () => {
       const postMessageMock = jest.fn()
-      const iframe = contentSelection.findMediaPlayerIframe(editors[0].selection.getNode())
+      const iframe = findMediaPlayerIframe(editors[0].selection.getNode())
       iframe.contentWindow.postMessage = postMessageMock
       trayController.showTrayForEditor(editors[0])
       expect(postMessageMock).toHaveBeenCalledTimes(1)
@@ -252,7 +254,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
 
     it('cleans up event listener on tray close', () => {
       const postMessageMock = jest.fn()
-      const iframe = contentSelection.findMediaPlayerIframe(editors[0].selection.getNode())
+      const iframe = findMediaPlayerIframe(editors[0].selection.getNode())
       iframe.contentWindow.postMessage = postMessageMock
       trayController.showTrayForEditor(editors[0])
       trayController.hideTrayForEditor(editors[0])

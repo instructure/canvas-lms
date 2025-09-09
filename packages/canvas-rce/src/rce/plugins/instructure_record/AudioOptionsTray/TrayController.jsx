@@ -20,7 +20,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 import bridge from '../../../../bridge'
-import {asAudioElement, findMediaPlayerIframe} from '../../shared/ContentSelection'
+import {asAudioElement} from '../../shared/ContentSelection'
+import {findMediaPlayerIframe} from '../../shared/iframeUtils'
 import AudioOptionsTray from '.'
 
 export const CONTAINER_ID = 'instructure-audio-options-tray-container'
@@ -85,8 +86,7 @@ export default class TrayController {
   }
 
   _applyAudioOptions(audioOptions) {
-    const hasAttachmentId =
-      audioOptions.attachment_id
+    const hasAttachmentId = audioOptions.attachment_id
 
     if (
       !hasAttachmentId &&
@@ -103,7 +103,6 @@ export default class TrayController {
       })
       .then(() => container?.contentWindow.location.reload())
       .catch(ex => {
-         
         console.error('Failed updating audio captions', ex)
       })
   }
