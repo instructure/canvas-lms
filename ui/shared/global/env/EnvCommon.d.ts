@@ -291,7 +291,6 @@ export type SiteAdminFeatureId =
   | 'account_level_blackout_dates'
   | 'courses_popout_sisid'
   | 'create_external_apps_side_tray_overrides'
-  | 'create_wiki_page_mastery_path_overrides'
   | 'dashboard_graphql_integration'
   | 'enhanced_course_creation_account_fetching'
   | 'explicit_latex_typesetting'

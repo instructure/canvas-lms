@@ -186,13 +186,6 @@ modules_page_rewrite_student_view:
     If enabled, the modules page will use the new modules page rewrite on student view.
   applies_to: Course
 
-create_wiki_page_mastery_path_overrides:
-  state: hidden
-  display_name: In MasteryPaths Create AssignmentOverrides on WikiPages Instead of Creating a Hidden Assignment
-  description: |-
-    In Mastery Paths create AssignmentOverrides directly onto WikiPages instead of creating a hidden Assignment.
-  applies_to: SiteAdmin
-
 create_external_apps_side_tray_overrides:
   state: hidden
   display_name: Enable External Apps Side Tray
