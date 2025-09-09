@@ -33,3 +33,8 @@ declare module 'timezone/America/Detroit' {
   const detroit: string
   export default detroit
 }
+
+declare module 'timezone/America/Denver' {
+  const denver: string
+  export default denver
+}
