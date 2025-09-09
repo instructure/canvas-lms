@@ -20,7 +20,7 @@
 
 class GradebooksController < ApplicationController
   include ActionView::Helpers::NumberHelper
-  include AssetProcessorStudentHelper
+  include AssetProcessorReportHelper
   include GradebooksHelper
   include SubmissionCommentsHelper
   include KalturaHelper

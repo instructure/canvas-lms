@@ -23,7 +23,7 @@ module Submissions
     include KalturaHelper
     include Submissions::ShowHelper
     include CoursesHelper
-    include AssetProcessorStudentHelper
+    include AssetProcessorReportHelper
 
     before_action :require_context
 

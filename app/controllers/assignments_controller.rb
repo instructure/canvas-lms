@@ -31,7 +31,7 @@ class AssignmentsController < ApplicationController
   include Api::V1::ContextModule
   include Api::V1::Rubric
   include Api::V1::RubricAssociation
-  include AssetProcessorStudentHelper
+  include AssetProcessorReportHelper
 
   include KalturaHelper
   include ObserverEnrollmentsHelper
