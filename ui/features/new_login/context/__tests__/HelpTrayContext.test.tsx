@@ -23,6 +23,31 @@ import {waitFor} from '@testing-library/dom'
 import {userEvent} from '@testing-library/user-event'
 import {HelpTrayProvider, useHelpTray} from '..'
 
+class ErrorBoundary extends React.Component<
+  {children: React.ReactNode; onError: (error: Error) => void},
+  {hasError: boolean}
+> {
+  constructor(props: {children: React.ReactNode; onError: (error: Error) => void}) {
+    super(props)
+    this.state = {hasError: false}
+  }
+
+  static getDerivedStateFromError() {
+    return {hasError: true}
+  }
+
+  componentDidCatch(error: Error) {
+    this.props.onError(error)
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return null
+    }
+    return this.props.children
+  }
+}
+
 const TestComponent = () => {
   const {isHelpTrayOpen, openHelpTray, closeHelpTray} = useHelpTray()
   return (
@@ -170,13 +195,34 @@ describe('HelpTrayContext', () => {
 
   describe('error handling', () => {
     it('throws an error if useHelpTray is used outside HelpTrayProvider', () => {
-      const OriginalConsoleError = console.error
-      console.error = jest.fn()
-      const renderOutsideProvider = () => {
-        render(<TestComponent />)
-      }
-      expect(renderOutsideProvider).toThrow('useHelpTray must be used within a HelpTrayProvider')
-      console.error = OriginalConsoleError
+      // Suppress console errors during error boundary testing
+      const originalError = console.error
+      const originalWarn = console.warn
+      console.error = () => {}
+      console.warn = () => {}
+
+      // Also suppress jsdom errors
+      const originalOnError = window.onerror
+      window.onerror = () => true
+
+      let caughtError: Error | null = null
+
+      render(
+        <ErrorBoundary
+          onError={(error: Error) => {
+            caughtError = error
+          }}
+        >
+          <TestComponent />
+        </ErrorBoundary>,
+      )
+
+      expect(caughtError!.message).toBe('useHelpTray must be used within a HelpTrayProvider')
+
+      // Restore original handlers
+      console.error = originalError
+      console.warn = originalWarn
+      window.onerror = originalOnError
     })
   })
 })
