@@ -30,4 +30,5 @@ export type TitleEditPreviewProps = TitleData & TitleColor
 export type TitleEditProps = TitleData & {
   onTitleChange: (newTitle: string) => void
   focusHandler?: FocusHandler
+  labelColor?: string | null
 }

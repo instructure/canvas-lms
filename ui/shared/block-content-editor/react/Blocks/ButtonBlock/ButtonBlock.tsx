@@ -31,6 +31,7 @@ import {useOpenSettingsTray} from '../../hooks/useOpenSettingsTray'
 import {TitleEdit} from '../BlockItems/Title/TitleEdit'
 import {defaultProps} from './defaultProps'
 import {buttonBackgroundContrast} from '../../accessibilityChecker/rules/buttonBackgroundContrast'
+import {getContrastingTextColorCached} from '../../utilities/getContrastingTextColor'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -57,6 +58,7 @@ const ButtonBlockEditView = (props: ButtonBlockProps) => {
 const ButtonBlockEdit = (props: ButtonBlockProps) => {
   const {openSettingsTray} = useOpenSettingsTray()
   const [title, setTitle] = useState(props.title)
+  const labelColor = getContrastingTextColorCached(props.backgroundColor)
 
   const {focusHandler} = useFocusElement()
   useSave(() => ({title}))
@@ -64,7 +66,12 @@ const ButtonBlockEdit = (props: ButtonBlockProps) => {
   return (
     <Flex direction="column" gap="mediumSmall">
       {props.includeBlockTitle && (
-        <TitleEdit title={title} onTitleChange={setTitle} focusHandler={focusHandler} />
+        <TitleEdit
+          title={title}
+          onTitleChange={setTitle}
+          focusHandler={focusHandler}
+          labelColor={labelColor}
+        />
       )}
       <ButtonDisplay
         dataTestId="button-block-edit"

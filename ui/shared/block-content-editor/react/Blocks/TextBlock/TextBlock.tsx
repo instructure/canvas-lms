@@ -31,6 +31,7 @@ import {TitleView} from '../BlockItems/Title/TitleView'
 import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
 import {TextView} from '../BlockItems/Text/TextView'
 import {defaultProps} from './defaultProps'
+import {getContrastingTextColorCached} from '../../utilities/getContrastingTextColor'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -63,6 +64,7 @@ const TextBlockEdit = (props: TextBlockProps) => {
   const {focusHandler} = useFocusElement()
   const [title, setTitle] = useState(props.title)
   const [content, setContent] = useState(props.content)
+  const labelColor = getContrastingTextColorCached(props.backgroundColor)
 
   useSave<typeof TextBlock>(() => ({
     title,
@@ -73,7 +75,12 @@ const TextBlockEdit = (props: TextBlockProps) => {
     <TextBlockLayout
       title={
         props.includeBlockTitle && (
-          <TitleEdit title={title} onTitleChange={setTitle} focusHandler={focusHandler} />
+          <TitleEdit
+            title={title}
+            onTitleChange={setTitle}
+            focusHandler={focusHandler}
+            labelColor={labelColor}
+          />
         )
       }
       text={
