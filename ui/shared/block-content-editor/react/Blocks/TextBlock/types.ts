@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Prettify} from '../../utilities/Prettify'
 import {TextData} from '../BlockItems/Text/types'
 import {TitleData} from '../BlockItems/Title/types'
 
@@ -24,12 +25,5 @@ export type TextSettings = {
   backgroundColor: string
   titleColor: string
 }
-export type TextBlockEditHandlers = {
-  onTitleChange: (newTitle: string) => void
-  onContentChange: (newContent: string) => void
-}
 
-export type TextBlockBase = TextData & TitleData & TextSettings
-export type TextBlockEditProps = TextBlockBase & TextBlockEditHandlers
-export type TextBlockPreviewProps = TextBlockBase
-export type TextBlockProps = TextBlockBase
+export type TextBlockProps = Prettify<TextData & TitleData & TextSettings>

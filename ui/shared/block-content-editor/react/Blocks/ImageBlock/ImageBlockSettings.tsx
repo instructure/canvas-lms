@@ -27,6 +27,7 @@ import {SettingsIncludeTitle} from '../BlockItems/SettingsIncludeTitle/SettingsI
 import {SettingsSectionToggle} from '../BlockItems/SettingsSectionToggle/SettingsSectionToggle'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ColorPickerWrapper} from '../BlockItems/ColorPickerWrapper'
+import {defaultProps} from './defaultProps'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -43,15 +44,8 @@ export const ImageBlockSettings = () => {
     url,
     fileName,
   } = useNode(node => ({
-    includeBlockTitle: !!node.data.props.includeBlockTitle,
-    backgroundColor: node.data.props.backgroundColor,
-    titleColor: node.data.props.titleColor,
-    caption: node.data.props.caption,
-    altText: node.data.props.altText,
-    altTextAsCaption: node.data.props.altTextAsCaption,
-    decorativeImage: node.data.props.decorativeImage,
-    url: node.data.props.url,
-    fileName: node.data.props.fileName,
+    ...defaultProps,
+    ...node.data.props,
   }))
 
   const handleIncludeBlockTitleChange = () => {

@@ -20,11 +20,10 @@ import {SeparatorLineBlockSettings} from '../SeparatorLineBlockSettings'
 import {renderBlock} from '../../__tests__/render-helper'
 import userEvent from '@testing-library/user-event'
 import {waitFor} from '@testing-library/react'
-import {SeparatorLineBlockProps} from '../SeparatorLineBlock'
 
 const color = '123456'
 
-const defaultProps: SeparatorLineBlockProps = {
+const defaultProps = {
   separatorColor: '#000000',
   thickness: 'medium',
   backgroundColor: '#ffffff',

@@ -17,6 +17,7 @@
  */
 
 import {FocusHandler} from '../../hooks/useFocusElement'
+import {Prettify} from '../../utilities/Prettify'
 import {TitleData} from '../BlockItems/Title/types'
 
 export type ButtonAlignment = 'left' | 'center' | 'right'
@@ -44,19 +45,15 @@ export type ButtonBlockSettings = {
   titleColor: string
 }
 
-export type ButtonBlockBase = TitleData & ButtonBlockSettings
-export type ButtonBlockProps = ButtonBlockBase
-export type ButtonBlockViewProps = ButtonBlockBase
-export type ButtonBlockEditPreviewProps = ButtonBlockBase
-export type ButtonBlockEditProps = ButtonBlockBase & {
-  onTitleChange: (newTitle: string) => void
-}
+export type ButtonBlockProps = Prettify<TitleData & ButtonBlockSettings>
 
-export type ButtonDisplayProps = ButtonBlockSettings & {
-  dataTestId: string
-  onButtonClick?: (buttonId: number) => void
-  focusHandler?: FocusHandler
-}
+export type ButtonDisplayProps = Prettify<
+  ButtonBlockSettings & {
+    dataTestId: string
+    onButtonClick?: (buttonId: number) => void
+    focusHandler?: FocusHandler
+  }
+>
 
 export type ButtonBlockIndividualButtonSettingsProps = {
   backgroundColor: string

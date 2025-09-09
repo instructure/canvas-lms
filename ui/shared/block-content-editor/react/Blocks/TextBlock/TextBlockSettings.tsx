@@ -23,6 +23,7 @@ import {SettingsIncludeTitle} from '../BlockItems/SettingsIncludeTitle/SettingsI
 import {SettingsSectionToggle} from '../BlockItems/SettingsSectionToggle/SettingsSectionToggle'
 import {ColorPickerWrapper} from '../BlockItems/ColorPickerWrapper'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {defaultProps} from './defaultProps'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -33,9 +34,8 @@ export const TextBlockSettings = () => {
     backgroundColor,
     titleColor,
   } = useNode(node => ({
-    includeBlockTitle: node.data.props.includeBlockTitle,
-    backgroundColor: node.data.props.backgroundColor,
-    titleColor: node.data.props.titleColor,
+    ...defaultProps,
+    ...node.data.props,
   }))
 
   const handleIncludeBlockTitleChange = () => {

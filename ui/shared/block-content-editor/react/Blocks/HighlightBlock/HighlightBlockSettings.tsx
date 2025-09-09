@@ -24,6 +24,7 @@ import {ColorPickerWrapper} from '../BlockItems/ColorPickerWrapper'
 import {SettingsSectionToggle} from '../BlockItems/SettingsSectionToggle/SettingsSectionToggle'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
+import {defaultProps} from './defaultProps'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -35,10 +36,8 @@ export const HighlightBlockSettings = () => {
     textColor,
     displayIcon,
   } = useNode(node => ({
-    backgroundColor: node.data.props.backgroundColor,
-    highlightColor: node.data.props.highlightColor,
-    textColor: node.data.props.textColor,
-    displayIcon: node.data.props.displayIcon,
+    ...defaultProps,
+    ...node.data.props,
   }))
 
   return (

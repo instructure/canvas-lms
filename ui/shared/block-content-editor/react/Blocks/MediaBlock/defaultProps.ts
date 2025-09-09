@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Prettify} from '../../utilities/Prettify'
-import {ImageData} from '../BlockItems/Image/types'
-import {TitleData} from '../BlockItems/Title/types'
+import {defaultBackgroundColor, defaultTextColor} from '../../block-content-editor-colors'
+import {MediaBlockProps} from './types'
 
-type ImageBlockSettings = {
-  includeBlockTitle: boolean
-  backgroundColor: string
-  titleColor: string
+export const defaultProps: MediaBlockProps = {
+  title: '',
+  src: '',
+  includeBlockTitle: true,
+  backgroundColor: defaultBackgroundColor,
+  titleColor: defaultTextColor,
 }
-export type ImageBlockProps = Prettify<ImageData & TitleData & ImageBlockSettings>

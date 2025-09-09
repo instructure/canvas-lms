@@ -31,6 +31,7 @@ import {TextEditPreview} from '../BlockItems/Text/TextEditPreview'
 import {TitleEdit} from '../BlockItems/Title/TitleEdit'
 import {TextEdit} from '../BlockItems/Text/TextEdit'
 import {useFocusElement} from '../../hooks/useFocusElement'
+import {defaultProps} from './defaultProps'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -134,15 +135,16 @@ const ImageTextBlockEdit = (props: ImageTextBlockProps) => {
   )
 }
 
-export const ImageTextBlock = (props: ImageTextBlockProps) => {
+export const ImageTextBlock = (props: Partial<ImageTextBlockProps>) => {
+  const componentProps = {...defaultProps, ...props}
   return (
     <BaseBlock
       ViewComponent={ImageTextBlockView}
       EditComponent={ImageTextBlockEdit}
       EditViewComponent={ImageTextBlockEditView}
-      componentProps={props}
+      componentProps={componentProps}
       title={ImageTextBlock.craft.displayName}
-      backgroundColor={props.backgroundColor}
+      backgroundColor={componentProps.backgroundColor}
     />
   )
 }

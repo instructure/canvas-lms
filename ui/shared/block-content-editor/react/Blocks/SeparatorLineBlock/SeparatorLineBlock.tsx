@@ -21,6 +21,7 @@ import {View} from '@instructure/ui-view'
 import {BorderWidth, BorderWidthValues} from '@instructure/emotion'
 import {BaseBlock} from '../BaseBlock'
 import {SeparatorLineBlockSettings} from './SeparatorLineBlockSettings'
+import {defaultProps} from './defaultProps'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -47,15 +48,16 @@ export const SeparatorLineBlockView = (props: SeparatorLineBlockProps) => {
   )
 }
 
-export const SeparatorLineBlock = (props: SeparatorLineBlockProps) => {
+export const SeparatorLineBlock = (props: Partial<SeparatorLineBlockProps>) => {
+  const componentProps = {...defaultProps, ...props}
   return (
     <BaseBlock
       ViewComponent={SeparatorLineBlockView}
       EditViewComponent={SeparatorLineBlockView}
       EditComponent={SeparatorLineBlockView}
-      componentProps={props}
+      componentProps={componentProps}
       title={SeparatorLineBlock.craft.displayName}
-      backgroundColor={props.backgroundColor}
+      backgroundColor={componentProps.backgroundColor}
     />
   )
 }

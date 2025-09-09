@@ -29,6 +29,7 @@ import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
 import {useFocusElement} from '../../hooks/useFocusElement'
 import {useOpenSettingsTray} from '../../hooks/useOpenSettingsTray'
 import {TitleEdit} from '../BlockItems/Title/TitleEdit'
+import {defaultProps} from './defaultProps'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -74,15 +75,16 @@ const ButtonBlockEdit = (props: ButtonBlockProps) => {
   )
 }
 
-export const ButtonBlock = (props: ButtonBlockProps) => {
+export const ButtonBlock = (props: Partial<ButtonBlockProps>) => {
+  const componentProps = {...defaultProps, ...props}
   return (
     <BaseBlock
       ViewComponent={ButtonBlockView}
       EditComponent={ButtonBlockEdit}
       EditViewComponent={ButtonBlockEditView}
-      componentProps={props}
+      componentProps={componentProps}
       title={ButtonBlock.craft.displayName}
-      backgroundColor={props.backgroundColor}
+      backgroundColor={componentProps.backgroundColor}
     />
   )
 }

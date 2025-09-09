@@ -30,6 +30,7 @@ import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {Flex, FlexItem} from '@instructure/ui-flex'
 import React, {ReactNode} from 'react'
 import {SettingsImageInfos} from '../BlockItems/SettingsImageInfos/SettingsImageInfos'
+import {defaultProps} from './defaultProps'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -90,17 +91,8 @@ export const ImageTextBlockSettings = () => {
     altTextAsCaption,
     decorativeImage,
   } = useNode(node => ({
-    includeBlockTitle: node.data.props.includeBlockTitle,
-    backgroundColor: node.data.props.backgroundColor,
-    titleColor: node.data.props.titleColor,
-    arrangement: node.data.props.arrangement,
-    textToImageRatio: node.data.props.textToImageRatio,
-    url: node.data.props.url,
-    fileName: node.data.props.fileName,
-    altText: node.data.props.altText,
-    caption: node.data.props.caption,
-    altTextAsCaption: node.data.props.altTextAsCaption,
-    decorativeImage: node.data.props.decorativeImage,
+    ...defaultProps,
+    ...node.data.props,
   }))
 
   const handleIncludeBlockTitleChange = () => {

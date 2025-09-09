@@ -28,6 +28,7 @@ import {TitleView} from '../BlockItems/Title/TitleView'
 import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
 import {Flex} from '@instructure/ui-flex'
 import {useFocusElement} from '../../hooks/useFocusElement'
+import {defaultProps} from './defaultProps'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -73,15 +74,16 @@ const ImageBlockEdit = (props: ImageBlockProps) => {
   )
 }
 
-export const ImageBlock = (props: ImageBlockProps) => {
+export const ImageBlock = (props: Partial<ImageBlockProps>) => {
+  const componentProps = {...defaultProps, ...props}
   return (
     <BaseBlock
       ViewComponent={ImageBlockView}
       EditComponent={ImageBlockEdit}
       EditViewComponent={ImageBlockEditView}
-      componentProps={props}
+      componentProps={componentProps}
       title={ImageBlock.craft.displayName}
-      backgroundColor={props.backgroundColor}
+      backgroundColor={componentProps.backgroundColor}
     />
   )
 }
