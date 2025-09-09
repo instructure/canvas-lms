@@ -24,6 +24,26 @@ import ModuleItemListSmart, {ModuleItemListSmartProps} from '../ModuleItemListSm
 import type {ModuleItem} from '../../utils/types'
 import {PAGE_SIZE, MODULE_ITEMS, MODULES, SHOW_ALL_PAGE_SIZE} from '../../utils/constants'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+
+const server = setupServer(
+  http.post('/api/graphql', () => {
+    return HttpResponse.json({
+      data: {
+        legacyNode: {
+          moduleItemsConnection: {
+            edges: [],
+            pageInfo: {
+              hasNextPage: false,
+              endCursor: null,
+            },
+          },
+        },
+      },
+    })
+  }),
+)
 
 const generateItems = (count: number): ModuleItem[] =>
   Array.from({length: count}, (_, i) => ({
@@ -118,8 +138,17 @@ const renderWithClient = (
 }
 
 describe('ModuleItemListSmart', () => {
+  beforeAll(() => {
+    server.listen()
+  })
+
   afterEach(() => {
     localStorage.clear()
+    server.resetHandlers()
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   it('renders paginated items and shows pagination UI when needed', async () => {
