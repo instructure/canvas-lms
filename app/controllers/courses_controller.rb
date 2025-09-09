@@ -2859,6 +2859,11 @@ class CoursesController < ApplicationController
 
     return unless authorized_action(account, @current_user, :create_courses)
 
+    unless copy_course_authorized?(@current_user, @context)
+      render status: :forbidden, template: "shared/errors/403_message"
+      return
+    end
+
     # For warnings messages previous to export
     warnings = @context.export_warnings
     js_env(EXPORT_WARNINGS: warnings) unless warnings.empty?

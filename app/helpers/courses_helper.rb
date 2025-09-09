@@ -243,4 +243,18 @@ module CoursesHelper
         :focus => table
       )
   end
+
+  def copy_course_authorized?(user, course)
+    return false unless show_user_create_course_button(user, course.account)
+
+    root_account = @domain_root_account
+    mcc_account = root_account.manually_created_courses_account
+
+    if !root_account.teachers_can_create_courses_anywhere? &&
+       course.account != mcc_account
+      return false
+    end
+
+    true
+  end
 end
