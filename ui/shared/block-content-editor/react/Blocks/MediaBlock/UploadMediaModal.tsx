@@ -58,7 +58,7 @@ export function UploadMediaModal({
     <UploadFile
       accept={'video/*,audio/*'}
       trayProps={getRCSProps()!}
-      label={I18n.t('Upload Media')}
+      label={I18n.t('Add media')}
       panels={panels as any}
       onDismiss={onDismiss}
       onSubmit={handleSubmit}

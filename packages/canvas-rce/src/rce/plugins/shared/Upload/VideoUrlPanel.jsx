@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,29 +17,41 @@
  */
 
 import React from 'react'
-import {string, func, bool, object} from 'prop-types'
+import {string, func, bool} from 'prop-types'
 import {TextInput} from '@instructure/ui-text-input'
 import formatMessage from '../../../../format-message'
 
-export default function UrlPanel({fileUrl, setFileUrl, urlHasError, urlRef}) {
+export default function VideoUrlPanel({fileUrl, setFileUrl, urlHasError}) {
+  const handleChange = (_e, val) => {
+    setFileUrl(val)
+  }
+
+  const getErrorMessage = () => {
+    if (!urlHasError) return []
+    return [
+      {
+        text: formatMessage('Please enter a valid video URL from a supported platform.'),
+        type: 'newError',
+      },
+    ]
+  }
+
   return (
     <>
       <TextInput
-        name="file-url"
-        renderLabel={formatMessage('File URL')}
-        type="url"
+        name="video-url"
+        renderLabel={formatMessage('YouTube embed URL')}
+        type="text"
         value={fileUrl}
-        onChange={(_e, val) => setFileUrl(val)}
-        messages={urlHasError ? [{text: formatMessage('Invalid URL'), type: 'error'}] : []}
-        ref={urlRef}
+        onChange={handleChange}
+        messages={getErrorMessage()}
       />
     </>
   )
 }
 
-UrlPanel.propTypes = {
+VideoUrlPanel.propTypes = {
   fileUrl: string.isRequired,
   setFileUrl: func.isRequired,
   urlHasError: bool,
-  urlRef: object,
 }
