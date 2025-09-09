@@ -114,4 +114,32 @@ describe "courses/_settings_sidebar" do
       end
     end
   end
+
+  describe "Copy this Course button" do
+    before do
+      view_context(@course, @user)
+      assign(:current_user, @user)
+    end
+
+    it "displays when both conditions are true" do
+      allow(view).to receive_messages(show_user_create_course_button: true, copy_course_authorized?: true)
+
+      render
+      expect(response.body).to match(/Copy this Course/)
+    end
+
+    it "does not display when copy_course_authorized returns false" do
+      allow(view).to receive_messages(show_user_create_course_button: true, copy_course_authorized?: false)
+
+      render
+      expect(response.body).not_to match(/Copy this Course/)
+    end
+
+    it "maintains existing functionality when show_user_create_course_button is false" do
+      allow(view).to receive(:show_user_create_course_button).and_return(false)
+
+      render
+      expect(response.body).not_to match(/Copy this Course/)
+    end
+  end
 end
