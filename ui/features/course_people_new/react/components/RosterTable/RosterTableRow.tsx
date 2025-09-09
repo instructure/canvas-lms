@@ -81,9 +81,9 @@ const RosterTableRow: React.FC<RosterTableRowProps> = ({user, isSelected, handle
 
   const renderSections = () =>
     enrollments.map(e => (
-      <View as="div" key={`enrollment-${e._id}`}>
+      <span style={{display: 'block'}} key={`enrollment-${e._id}`}>
         {e.section.name}
-      </View>
+      </span>
     ))
 
   return (
@@ -141,7 +141,7 @@ const RosterTableRow: React.FC<RosterTableRowProps> = ({user, isSelected, handle
       )}
       {canReadReports ? (
         <Table.Cell data-testid={`total-activity-user-${uid}`}>
-          <View as="div">{totalActivity(enrollments)}</View>
+          <Text>{totalActivity(enrollments)}</Text>
         </Table.Cell>
       ) : (
         <></>
