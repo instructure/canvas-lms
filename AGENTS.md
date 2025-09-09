@@ -49,3 +49,7 @@ yarn build:watch                     # Frontend dev mode
 - JS testing guide: `doc/ui/testing_javascript.md`
 - Run specific tests: `yarn test path/to/test`
 - Coverage: `yarn test:coverage`
+
+## Git Commit Guidelines
+
+- Keep each line in commit messages under 60 characters
