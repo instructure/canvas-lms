@@ -3386,8 +3386,9 @@ class CoursesController < ApplicationController
         params_for_update[:conclude_at] = nil
       end
       can_change_csp = @course.account.grants_right?(@current_user, session, :manage_courses_admin)
-      if params_for_update.key?(:disable_csp) && can_change_csp
-        if value_to_boolean(params_for_update.delete(:disable_csp))
+      disable_csp = params_for_update.delete(:disable_csp)
+      if can_change_csp && !disable_csp.nil?
+        if value_to_boolean(disable_csp)
           @course.disable_csp!
         elsif !@course.csp_inherited?
           @course.inherit_csp!
