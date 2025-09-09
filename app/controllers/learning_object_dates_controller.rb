@@ -93,6 +93,23 @@
 #           "description": "the tag identifying the type of checkpoint (only present for checkpoints)",
 #           "example": "reply_to_topic",
 #           "type": "string"
+#         },
+#         "peer_review_sub_assignment": {
+#           "description": "peer review sub assignment details, only present when include_peer_review=true is specified, assignment has peer reviews enabled, and peer_review_allocation_and_grading feature flag is enabled",
+#           "type": "object",
+#           "properties": {
+#             "id": {"type": "integer"},
+#             "due_at": {"type": "datetime"},
+#             "unlock_at": {"type": "datetime"},
+#             "lock_at": {"type": "datetime"},
+#             "only_visible_to_overrides": {"type": "boolean"},
+#             "visible_to_everyone": {"type": "boolean"},
+#             "overrides": {
+#               "description": "paginated list of AssignmentOverride objects specific to the peer review sub assignment",
+#               "type": "array",
+#               "items": {"$ref": "AssignmentOverride"}
+#             }
+#           }
 #         }
 #       }
 #     }
@@ -114,6 +131,10 @@ class LearningObjectDatesController < ApplicationController
   # Get a learning object's date-related information, including due date, availability dates,
   # override status, and a paginated list of all assignment overrides for the item.
   #
+  # @argument include_peer_review [Boolean]
+  #   If true, includes peer review sub assignment information and overrides in the response.
+  #   Requires the peer_review_allocation_and_grading feature flag to be enabled.
+  #
   # @returns LearningObjectDates
   def show
     route = polymorphic_url([:api_v1, @context, asset, :date_details])
@@ -130,8 +151,10 @@ class LearningObjectDatesController < ApplicationController
     all_overrides = assignment_overrides_json(overrides, @current_user, include_names: true, include_child_override_due_dates:)
     all_overrides += section_visibility_to_override_json(section_visibilities, overridable) if visibilities_to_override
 
+    include_peer_review = value_to_boolean(params[:include_peer_review])
+
     render json: {
-      **learning_object_dates_json(asset, overridable),
+      **learning_object_dates_json(asset, overridable, include_peer_review:),
       **blueprint_date_locks_json(asset),
       overrides: all_overrides,
     }
