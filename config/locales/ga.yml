@@ -3161,7 +3161,7 @@ ga:
   anonymity_settings_are_locked_due_to_a_posted_repl_54e2c2d1: "Tá socruithe anaithnideachta glasáilte mar gheall ar fhreagra postáilte"
   anonymity_settings_are_locked_for_group_and_or_gra_36706d2b: "Tá socruithe anaithnideachta faoi ghlas le haghaidh díospóireachtaí grúpa agus/nó marcáilte"
   anonymize_all_annotations_made_by_instructors_on_s_5540bc09: "Bain ainm ó nótaí mínithe ar fad a rinne teagascóirí ar uaslódálacha don tasc seo in DocViewer"
-  anonymize_all_instructor_comments_and_annotations__713924c9: "Bain ainm ó gach ráitis agus nótaí mínithe ó theagascóirí laistigh de DocViewer"
+  anonymize_all_instructor_comments_and_annotations__713924c9: "Bain ainm teagascóirí ó gach ráiteas agus nóta mínithe laistigh de DocViewer"
   anonymous_assignments_are_hidden_by_default_and_wi_c8884e1e: "Tá tascanna gan ainm i bhfolach de réir réamhshocraithe agus beidh gá iad a phostáil de láimh fiú má tá socrú an chúrsa socraithe go Uathoibríoch."
   anonymous_assignments_must_be_manually_posted_a13d2ca5: "Ní mór tascanna gan ainm a phostáil de láimh"
   anonymous_discussion_1e9b981: "Fóram Anaithnid | "
@@ -3172,7 +3172,7 @@ ga:
   anonymous_grading_with_new_quizzes_ba0391f3: "Marcáil gan Ainm le Quiz Nua"
   anonymous_id_2ef1c6d2: "Gan ainm %{id}"
   anonymous_id_you_cf43ab76: "Gan ainm %{id} (Tusa)"
-  anonymous_instructor_annotations_2b6c822: "Nótaí mínithe Teagascóir Gan Ainm"
+  anonymous_instructor_annotations_2b6c822: "Nótaí mínithe Teagascóra Gan Ainm"
   anonymous_mode_on_2dd9b94a: "Mód Gan Ainm Ar"
   anonymous_mode_on_feb53729: "Mód Gan Ainm Ar:"
   anonymous_moderated_assignments_cannot_be_unmuted__8f7b09e7: "Ní féidir tascanna modhnaithe gan ainm a dhíbhalbhú go dtí go bpostáiltear marcanna"
@@ -13082,7 +13082,7 @@ ga:
   how_do_i_create_outcome_groups_for_a_course_362429a0: "Conas is féidir liom torthaí grúpaí a chruthú do chúrsa?"
   how_do_i_download_the_student_app_4a4b8a63: "Conas a íoslódálaim an aip mac léinn?"
   how_do_i_download_the_student_app_and_get_addition_3604c207: "Conas is féidir liom an Aip Mac Léinn a íoslódáil agus cabhair bhreise a fháil?"
-  how_do_i_edit_an_announcement_in_a_course_815c3c60: "Conas a chuirim fógra i gcúrsa in eagar?"
+  how_do_i_edit_an_announcement_in_a_course_815c3c60: "Conas a chuirim eagar ar fhógra atá i gcúrsa?"
   how_do_i_edit_the_syllabus_description_in_a_course_57f25a87: "Conas a dhéanaim eagarthóireacht ar an gcur síos ar Shiollabas ar chúrsa?"
   how_do_i_enter_and_edit_grades_in_the_gradebook_5002616f: "Conas is féidir liom Marcanna a iontráil agus a chur in eagar i Leabhar na Marcanna?"
   how_do_i_find_my_courses_b826e4ce: "Conas a aimsím mo chúrsaí?"
@@ -14439,7 +14439,7 @@ ga:
   learning_mastery_gradebook_description: |-
       Cuireann an Leabhar Marcanna Forlámhais Foghlama ar chumas múinteoirí spléachadh tapaidh a fháil ar dhul chun cinn na mac léinn agus an chúrsa
       ó thaobh thorthaí foghlama an chúrsa de. Cuirtear torthaí ar fáil i leagan amach ar aon dul le Leabhar na Marcanna
-      agus léirítear dul chun cinn na mac léinn mar scór uimhriúil nó faoi na teidil forlámhaithe/nach mór
+      agus léirítear dul chun cinn na mac léinn mar scór uimhriúil agus faoi na teidil forlámhaithe/nach mór
       forlámhaithe/gá le feabhas.
   learning_mastery_gradebook_error_page_58fbea43: "Leathanach Earráide Leabhar na Marcanna Forlámhas Foghlama"
   learning_mastery_gradebook_redesign_9ca88020: "Forlámhas Foghlama Athdhearadh Leabhar na Marcanna"
@@ -18887,7 +18887,7 @@ ga:
     outcomes_filename: Torthaí
   outcome_results_23a0a117: Torthaí
   outcome_results_title: Torthaí
-  outcome_service_results_to_canvas_reporting_749667bc: "Téadh Marcanna Sheirbhís na dTorthaí go dtí Tuairisciú Canvas"
+  outcome_service_results_to_canvas_reporting_749667bc: "Marcanna Sheirbhís na dTorthaí chuig Tuairisciú Canvas"
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Toradh: Tá stádas %{title} ag %{statusTooltip}"
   outcome_with_canvas_id_id_not_found_215c5227: "Níor aimsíodh an toradh “%{id}“ le hID canvas"
   outcome_with_id_guid_already_exists_in_another_unr_ee551c9d: "Toradh le ID %{guid} cheana féin i gcúrsa nó cuntas eile nach mbaineann (%{name})"
@@ -23840,10 +23840,10 @@ ga:
   share_alike_73044243: "Comhroinn Araon"
   share_important_information_about_your_course_with_dceacbf9: |-
       Roinn eolas tábhachtach faoi do chúrsa le gach úsáideoir.
-            Úsáid fógraí chun dátaí agus tascanna tábhachtacha a mheabhrú do dhaltaí, mic léinn a
-            dhíriú go acmhainní inmheánacha agus seachtracha chun cabhrú leo torthaí cúrsa a bhaint
-            amach, ceiliúradh a dhéanamh ar rath na mac léinn, agus béim a chur ar imeachtaí suimiúla.
-            Is féidir téacs, ilmheán agus comhaid a bheith i bhfógraí.
+            Úsáid fógraí chun na nithe seo a dhéanamh: dátaí agus tascanna tábhachtacha a mheabhrú do
+            mhic léinn; acmhainní inmheánacha agus seachtracha a chur in iúl do mhic léinn chun go n-éireoidh
+            leo sa chúrsa; gaiscí na mac léinn a cheiliúradh; agus imeachtaí spéisiúla a chur ar a súile.
+            Is féidir téacs, ilmheáin agus comhaid a bheith i bhfógraí.
   share_microphone_55dfeddd: "Roinn micreafón"
   share_the_following_pairing_code_with_an_observer__44f50f99: |-
       Roinn an cód péireála seo a leanas le breathnóir chun cead a thabhairt
@@ -25093,7 +25093,7 @@ ga:
   student_outcome_gradebook_description: |-
       Cuireann Leabhar Marcanna Forlámhais Foghlama na Mac Léinn ar chumas na mac léinn spléachadh tapaidh a fháil ar dhul chun cinn
       ó thaobh thorthaí foghlama an chúrsa de. Cuirtear torthaí ar fáil i leagan amach ar aon dul le Leabhar na Marcanna
-      agus léirítear dul chun cinn na mac léinn mar scór uimhriúil nó faoi na teidil forlámhaithe/nach mór
+      agus léirítear dul chun cinn na mac léinn mar scór uimhriúil agus faoi na teidil forlámhaithe/nach mór
       forlámhaithe/gá le feabhas.
   student_outcome_result_b26b7ab4: "Toradh an Mhic Léinn"
   student_pace_2200bf85: "Luas Mac Léinn"
