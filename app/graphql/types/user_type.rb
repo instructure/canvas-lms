@@ -274,24 +274,47 @@ module Types
                required: false
     end
     def enrollments_connection(course_id: nil, course_ids: nil, current_only: false, order_by: [], exclude_concluded: false, horizon_courses: nil, sort: {}, enrollment_types: nil)
-      # Check basic permission - return empty instead of nil
-      unless object == current_user || object.grants_right?(current_user, session, :read_profile)
+      unless object == current_user ||
+             object.grants_right?(current_user, session, :read_profile) ||
+             object.grants_right?(current_user, session, :read)
         return Enrollment.none
       end
 
-      # Start with user's enrollments, but only for courses where current_user has permission
       enrollments = object.enrollments.joins(:course)
 
-      # If not viewing own enrollments, filter to only courses where current_user has read permissions
       if object != current_user
-        # For GraphQL connections, we need to filter at SQL level. Use a subquery to find
-        # courses where the current user has enrollments (which grants read permission)
-        # TODO: This may be too restrictive - consider including completed courses where teacher had enrollment
-        permitted_course_ids = current_user.enrollments.select(:course_id)
-        enrollments = enrollments.where(course_id: permitted_course_ids)
+        domain_root_account = context[:domain_root_account]
+        has_manage_students = domain_root_account&.grants_right?(current_user, session, :manage_students)
+
+        unless has_manage_students
+          permitted_course_conditions = []
+
+          user_enrolled_courses = current_user.enrollments
+                                              .joins(:course)
+                                              .where(courses: { workflow_state: ["available", "completed"] })
+                                              .select(:course_id)
+
+          if user_enrolled_courses.exists?
+            permitted_course_conditions << "courses.id IN (#{user_enrolled_courses.to_sql})"
+          end
+
+          observer_courses = current_user.observer_enrollments
+                                         .active
+                                         .where(associated_user: object)
+                                         .select(:course_id)
+
+          if observer_courses.exists?
+            permitted_course_conditions << "courses.id IN (#{observer_courses.to_sql})"
+          end
+
+          if permitted_course_conditions.any?
+            enrollments = enrollments.where(permitted_course_conditions.join(" OR "))
+          else
+            return Enrollment.none
+          end
+        end
       end
 
-      # Apply course filtering - support both single course_id and multiple course_ids
       if course_id
         enrollments = enrollments.where(course_id:)
       elsif course_ids.present?
@@ -307,7 +330,6 @@ module Types
         enrollments = enrollments.where.not(workflow_state: "completed")
       end
 
-      # Filter by enrollment types if specified
       if enrollment_types.present?
         enrollments = enrollments.where(type: enrollment_types.map(&:to_s))
       end
