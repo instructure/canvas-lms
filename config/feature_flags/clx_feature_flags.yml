@@ -74,6 +74,13 @@ horizon_bulk_metadata_import:
   display_name: "Canvas Career: Bulk Metadata Import"
   description: |-
     Enables importing metadata in bulk in Canvas Career.
+horizon_manual_dashboard_builder:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Manual Dashboard Builder"
+  description: |-
+    Enables manual dashboard builder in Canvas Career.
 
 # Feature flags read by Canvas
 horizon_bulk_api_permission:
