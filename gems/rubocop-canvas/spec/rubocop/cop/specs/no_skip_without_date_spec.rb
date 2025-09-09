@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2017 - present Instructure, Inc.
+# Copyright (C) 2025 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,29 +16,30 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
-describe RuboCop::Cop::Specs::NoSkipWithoutTicket do
+describe RuboCop::Cop::Specs::NoSkipWithoutDate do
   subject(:cop) { described_class.new }
 
-  it "disallows skipping without referencing a ticket" do
+  it "disallows skipping without including a date" do
     offenses = inspect_source(%{
       describe "date stuff" do
         it 'should do date stuff' do
-          skip("fragile")
+          skip("fragile DE-1")
           next_year = 1.year.from_now
         end
       end
     })
     expect(offenses.size).to eq(1)
-    expect(offenses.first.message).to match(/Reference a ticket if skipping/)
+    expect(offenses.first.message).to match(/Must include a date for all 'skip' in the format YYYY-MM-DD/)
     expect(offenses.first.severity.name).to eq(:error)
   end
 
-  it "allows skipping if referencing a ticket" do
+  it "allows skipping if date included" do
     offenses = inspect_source(%{
       describe "date stuff" do
         it 'should do date stuff' do
-          skip("CNVS-1234")
+          skip("CNVS-1234 2022-01-01")
           next_year = 1.year.from_now
         end
       end
@@ -46,7 +47,7 @@ describe RuboCop::Cop::Specs::NoSkipWithoutTicket do
     expect(offenses.size).to eq(0)
   end
 
-  it "allows conditional skipping without a ticket" do
+  it "allows conditional skipping without date" do
     offenses = inspect_source(%{
       describe "date stuff" do
         it 'should do date stuff' do

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2017 - present Instructure, Inc.
+# Copyright (C) 2025 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,18 +16,27 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-
-require "jira_ref_parser"
+#
 
 module RuboCop
   module Cop
     module Specs
-      class NoSkipWithoutTicket < Base
-        MSG = "Reference a ticket if skipping. " \
-              "Example: skip('time bomb on saturdays CNVS-123456')."
-
+      # This cop checks that RSpec's `skip`
+      # includes a date in the comment.
+      #
+      # @example
+      #   # bad
+      #   skip 'This test needs to be fixed'
+      #
+      #   # good
+      #   skip '2025-09-05 This test needs to be fixed'
+      class NoSkipWithoutDate < RuboCop::Cop::Base
+        MSG = "Must include a date for all 'skip' in the format YYYY-MM-DD."
         METHOD = :skip
+        DATE_REGEX = /\d{4}-\d{2}-\d{2}/
 
+        # Determines if a `skip` node is conditional.
+        # Conditional skips are not required to have date.
         def on_if(node)
           @conditional_sends ||= []
           @conditional_sends.concat(node.children.select do |child_node|
@@ -41,18 +50,20 @@ module RuboCop
           _receiver, method_name, *args = *node
           return unless method_name == METHOD
 
-          first_arg = args.to_a.first
-          return unless first_arg
+          # First arg should be a reason, if not present return
+          # and let RSpec/PendingWithoutReason handle it.
+          return unless args.to_a.first
 
-          reason = first_arg.children.first
-          return if refs_ticket?(reason)
+          reason = args.to_a.first.children.first
+          return if contains_date?(reason)
 
+          # If no related comments contain the date format, add an offense.
           add_offense node, message: MSG, severity: :error
         end
 
-        def refs_ticket?(reason)
+        def contains_date?(reason)
           reason = reason.value if reason.is_a?(RuboCop::AST::StrNode)
-          reason.match?(/#{JiraRefParser::IssueIdRegex}/o)
+          reason.match?(DATE_REGEX)
         end
       end
     end
