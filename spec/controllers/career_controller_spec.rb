@@ -70,7 +70,8 @@ describe CareerController do
             horizon_dashboard_ai_widgets: false,
             horizon_hris_integrations: false,
             horizon_user_profile_page: false,
-            horizon_bulk_metadata_import: false
+            horizon_bulk_metadata_import: false,
+            horizon_manual_dashboard_builder: false
           )
         end
 
