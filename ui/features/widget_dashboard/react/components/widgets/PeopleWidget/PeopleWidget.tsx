@@ -24,6 +24,7 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconMessageLine} from '@instructure/ui-icons'
+import MessageStudents from '@canvas/message-students-modal/react'
 import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import type {BaseWidgetProps, CourseOption} from '../../../types'
 import {useSharedCourses} from '../../../hooks/useSharedCourses'
@@ -40,6 +41,13 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
   onRetry,
 }) => {
   const [selectedCourse, setSelectedCourse] = useState<string>('all')
+  const [selectedRecipient, setSelectedRecipient] = useState<{
+    id: string
+    displayName: string
+    email?: string
+    contextCode: string
+  } | null>(null)
+  const [modalKey, setModalKey] = useState(0)
 
   const {
     data: courseGrades = [],
@@ -93,13 +101,19 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
     (instructorsError ? I18n.t('Failed to load instructor data. Please try again.') : null)
   const isLoading = !error && (externalIsLoading || coursesLoading || instructorsLoading)
 
-  const handleCourseChange = (
-    _event: React.SyntheticEvent,
-    data: {value?: string | number; id?: string},
-  ) => {
-    if (data.value && typeof data.value === 'string') {
-      setSelectedCourse(data.value)
-    }
+  const handleOpenMessageModal = (instructor: any) => {
+    const courseId = instructor.enrollments?.[0]?.course_id
+    setSelectedRecipient({
+      id: instructor.id.split('-')[0],
+      displayName: instructor.name,
+      email: instructor.email,
+      contextCode: courseId ? `course_${courseId}` : '',
+    })
+    setModalKey(prev => prev + 1)
+  }
+
+  const handleCloseMessageModal = () => {
+    setSelectedRecipient(null)
   }
 
   return (
@@ -167,7 +181,7 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
                     <Flex.Item>
                       <View as="div" margin="0 small">
                         <IconButton
-                          href={`/conversations?user_name=${encodeURIComponent(instructor.name)}&user_id=${instructor.id.split('-')[0]}`}
+                          onClick={() => handleOpenMessageModal(instructor)}
                           screenReaderLabel={I18n.t('Send a message to %{instructor}', {
                             instructor: instructor.name,
                           })}
@@ -183,6 +197,15 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
           </View>
         </Flex.Item>
       </Flex>
+      {selectedRecipient && (
+        <MessageStudents
+          key={modalKey}
+          contextCode={selectedRecipient.contextCode}
+          recipients={[selectedRecipient]}
+          title={I18n.t('Send Message to %{name}', {name: selectedRecipient.displayName})}
+          onRequestClose={handleCloseMessageModal}
+        />
+      )}
     </TemplateWidget>
   )
 }
