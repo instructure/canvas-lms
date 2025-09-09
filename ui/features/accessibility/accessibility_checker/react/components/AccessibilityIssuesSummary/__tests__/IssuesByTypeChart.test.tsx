@@ -25,7 +25,7 @@ import {
   useAccessibilityScansStore,
   initialState,
 } from '../../../../../shared/react/stores/AccessibilityScansStore'
-import {mockIssuesSummary1} from '../../../stores/mockData'
+import {mockIssuesSummary1} from '../../../../../shared/react/stores/mockData'
 
 // Mock ResizeObserver since it's not supported in jsdom
 class ResizeObserver {

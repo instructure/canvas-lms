@@ -16,17 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  IconImageLine,
-  IconLinkLine,
-  IconPaintLine,
-  IconHeaderLine,
-  IconTableTopHeaderLine,
-  IconBulletListLine,
-} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-import {IssueSummaryGroup, IssueRuleType, Severity} from '../../shared/react/types'
+import {IssueRuleType, Severity} from '../../shared/react/types'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -102,48 +94,3 @@ export const stateOptions = [
 ]
 
 // GroupedIssueSummary
-
-export const IssueSummaryGroups: IssueSummaryGroup[] = [
-  'headings',
-  'links',
-  'img-alt-text',
-  'tables',
-  'lists',
-  'low-contrast',
-]
-
-export const IssueSummaryGroupData: Record<
-  IssueSummaryGroup,
-  {icon: React.ComponentType; label: string; ruleTypes: IssueRuleType[]}
-> = {
-  headings: {
-    icon: IconHeaderLine,
-    label: 'Headings',
-    ruleTypes: ['headings-sequence', 'headings-start-at-h2'],
-  },
-  links: {
-    icon: IconLinkLine,
-    label: 'Links',
-    ruleTypes: ['link-text', 'link-purpose'],
-  },
-  'img-alt-text': {
-    icon: IconImageLine,
-    label: 'Image alt text',
-    ruleTypes: ['img-alt', 'img-alt-length', 'img-alt-filename'],
-  },
-  tables: {
-    icon: IconTableTopHeaderLine,
-    label: 'Tables',
-    ruleTypes: ['table-header-scope', 'table-header', 'table-caption'],
-  },
-  lists: {
-    icon: IconBulletListLine,
-    label: 'Lists',
-    ruleTypes: ['list-structure'],
-  },
-  'low-contrast': {
-    icon: IconPaintLine,
-    label: 'Low contrast',
-    ruleTypes: ['small-text-contrast', 'large-text-contrast'],
-  },
-}

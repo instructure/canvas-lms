@@ -25,9 +25,9 @@ import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 import AccessibilityIssuesContent from '../../../../shared/react/components/AccessibilityIssuesContent'
+import {AccessibilityCheckerContext} from '../../../../shared/react/contexts/AccessibilityCheckerContext'
 import {AccessibilityResourceScan} from '../../../../shared/react/types'
 import {AccessibilityChecker} from '../../index'
-import {AccessibilityCheckerContext} from '../../contexts/AccessibilityCheckerContext'
 
 const I18n = createI18nScope('accessibility_checker')
 

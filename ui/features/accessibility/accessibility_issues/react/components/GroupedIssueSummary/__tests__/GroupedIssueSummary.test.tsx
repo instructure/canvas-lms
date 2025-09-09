@@ -25,7 +25,10 @@ import {
   useAccessibilityScansStore,
   initialState,
 } from '../../../../../shared/react/stores/AccessibilityScansStore'
-import {mockEmptyIssuesSummary, mockIssuesSummary2} from '../../../stores/mockData'
+import {
+  mockEmptyIssuesSummary,
+  mockIssuesSummary2,
+} from '../../../../../shared/react/stores/mockData'
 import {GroupedIssueSummary} from '../GroupedIssueSummary'
 
 describe('GroupedIssueSummary', () => {

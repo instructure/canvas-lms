@@ -20,7 +20,7 @@ import {render, screen} from '@testing-library/react'
 import {Table} from '@instructure/ui-table'
 
 import {AccessibilityIssuesTableRow} from '../AccessibilityIssuesTableRow'
-import {mockScan1} from '../../../stores/mockData'
+import {mockScan1} from '../../../../../shared/react/stores/mockData'
 
 describe('AccessibilityIssuesTableRow', () => {
   it('renders without crashing', () => {

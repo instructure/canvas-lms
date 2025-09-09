@@ -18,6 +18,7 @@
 
 import {useCallback} from 'react'
 
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {theme} from '@instructure/canvas-theme'
 import {
   AccessibleContent,
@@ -31,14 +32,13 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {Tooltip} from '@instructure/ui-tooltip'
-import {useScope as createI18nScope} from '@canvas/i18n'
+
 import {
   AccessibilityResourceScan,
   ResourceType,
   ScanWorkflowState,
 } from '../../../../../shared/react/types'
-import {IssueCountBadge} from '../../IssueCountBadge/IssueCountBadge'
-import {AccessibilityCheckerContext} from '../../../contexts/AccessibilityCheckerContext'
+import {IssueCountBadge} from '../../../../../shared/react/components/IssueCountBadge/IssueCountBadge'
 
 const I18n = createI18nScope('accessibility_checker')
 

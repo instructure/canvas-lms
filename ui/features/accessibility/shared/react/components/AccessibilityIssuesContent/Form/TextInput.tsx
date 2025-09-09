@@ -25,7 +25,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-import {AccessibilityCheckerContext} from '../../../../../accessibility_checker/react/contexts/AccessibilityCheckerContext'
+import {AccessibilityCheckerContext} from '../../../contexts/AccessibilityCheckerContext'
 import {GenerateResponse} from '../../../types'
 import {getAsContentItemType} from '../../../utils/apiData'
 import {stripQueryString} from '../../../utils/query'

@@ -101,14 +101,8 @@ const getPageCountFromResponse = (data: DoFetchApiResults<AccessibilityResourceS
 }
 
 export const useAccessibilityScansFetchUtils = () => {
-  const [page, pageSize, tableSortState, search, filters] = useAccessibilityScansStore(
-    useShallow(state => [
-      state.page,
-      state.pageSize,
-      state.tableSortState,
-      state.search,
-      state.filters,
-    ]),
+  const [page, pageSize, tableSortState, filters] = useAccessibilityScansStore(
+    useShallow(state => [state.page, state.pageSize, state.tableSortState, state.filters]),
   )
   const [
     setAccessibilityScans,
@@ -185,12 +179,13 @@ export const useAccessibilityScansFetchUtils = () => {
       }
     },
     [
+      filters,
       page,
       pageSize,
-      search,
       tableSortState,
       setAccessibilityScans,
       setError,
+      setFilters,
       setLoading,
       setPage,
       setPageCount,
@@ -234,7 +229,7 @@ export const useAccessibilityScansFetchUtils = () => {
         setLoadingOfSummary(false)
       }
     },
-    [search, setIssuesSummary, setErrorOfSummary, setLoadingOfSummary],
+    [setIssuesSummary, setErrorOfSummary, setLoadingOfSummary],
   )
 
   return {
