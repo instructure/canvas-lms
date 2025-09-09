@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AccessibilityIssuesPage from './react/AccessibilityIssuesPage/AccessibilityIssuesPage'
+import AccessibilityIssuesPage from './react/components/AccessibilityIssuesPage/AccessibilityIssuesPage'
 import ready from '../../../../packages/ready'
 import {createRoot} from 'react-dom/client'
 

@@ -24,7 +24,7 @@ import userEvent from '@testing-library/user-event'
 import {
   AccessibilityCheckerContext,
   type AccessibilityCheckerContextType,
-} from '../../../../../../accessibility_checker/react/contexts/AccessibilityCheckerContext'
+} from '../../../../contexts/AccessibilityCheckerContext'
 import {FormType, IssueWorkflowState} from '../../../../types'
 import {getAsAccessibilityResourceScan} from '../../../../utils/apiData'
 import TextInputForm from '../TextInput'

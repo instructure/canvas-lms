@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {mockIssuesSummary1} from '../../stores/mockData'
+import {mockIssuesSummary1} from '../../../../shared/react/stores/mockData'
 import {IssueDataPoint} from '../../../../shared/react/types'
 import {getChartData, getChartOptions, getSeverityCounts, processIssuesToChartData} from '../chart'
 

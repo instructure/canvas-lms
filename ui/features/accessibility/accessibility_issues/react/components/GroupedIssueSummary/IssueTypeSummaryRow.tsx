@@ -22,7 +22,7 @@ import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 
-import {IssueCountBadge} from '../IssueCountBadge/IssueCountBadge'
+import {IssueCountBadge} from '../../../../shared/react/components/IssueCountBadge/IssueCountBadge'
 
 interface IssueTypeSummaryRowProps {
   icon: React.ComponentType

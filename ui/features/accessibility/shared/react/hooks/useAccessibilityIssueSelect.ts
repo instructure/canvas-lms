@@ -17,9 +17,9 @@
  */
 
 import {useCallback, useContext} from 'react'
-import {AccessibilityCheckerContext} from '../../../accessibility_checker/react/contexts/AccessibilityCheckerContext'
+import {AccessibilityCheckerContext} from '../contexts/AccessibilityCheckerContext'
+import {useNextResource} from '../hooks/useNextResource'
 import {useAccessibilityScansStore} from '../stores/AccessibilityScansStore'
-import {useNextResource} from '../../../accessibility_checker/react/hooks/useNextResource'
 import {findById} from '../utils/apiData'
 import {AccessibilityResourceScan} from '../types'
 import {useShallow} from 'zustand/react/shallow'

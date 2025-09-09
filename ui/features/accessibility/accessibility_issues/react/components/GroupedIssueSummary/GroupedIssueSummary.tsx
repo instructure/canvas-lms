@@ -29,11 +29,12 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
 
-import {IssueSummaryGroups, IssueSummaryGroupData} from '../../constants'
+import {IssueCountBadge} from '../../../../shared/react/components/IssueCountBadge/IssueCountBadge'
 import {useAccessibilityScansStore} from '../../../../shared/react/stores/AccessibilityScansStore'
 import {AccessibilityIssuesSummaryData} from '../../../../shared/react/types'
+
+import {IssueSummaryGroups, IssueSummaryGroupData} from '../../constants'
 import {getGroupedIssueSummaryData} from '../../utils/groupedSummary'
-import {IssueCountBadge} from '../IssueCountBadge/IssueCountBadge'
 import IssueTypeSummaryRow from './IssueTypeSummaryRow'
 
 const I18n = createI18nScope('accessibility_checker')

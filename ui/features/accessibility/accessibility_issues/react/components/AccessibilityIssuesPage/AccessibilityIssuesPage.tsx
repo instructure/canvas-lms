@@ -17,15 +17,16 @@
  */
 
 import {useEffect, useState} from 'react'
-import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {AccessibilityResourceScan} from '../../../shared/react/types'
-import AccessibilityIssuesContent from '../../../shared/react/components/AccessibilityIssuesContent'
 import {Spinner} from '@instructure/ui-spinner'
-import {findById} from '../../../shared/react/utils/apiData'
-import {useAccessibilityScansStore} from '../../../shared/react/stores/AccessibilityScansStore'
-import {useAccessibilityIssueSelect} from '../../../shared/react/hooks/useAccessibilityIssueSelect'
-import {useAccessibilityScansFetchUtils} from '../../../shared/react/hooks/useAccessibilityScansFetchUtils'
+import {View} from '@instructure/ui-view'
+
+import AccessibilityIssuesContent from '../../../../shared/react/components/AccessibilityIssuesContent'
+import {useAccessibilityIssueSelect} from '../../../../shared/react/hooks/useAccessibilityIssueSelect'
+import {useAccessibilityScansFetchUtils} from '../../../../shared/react/hooks/useAccessibilityScansFetchUtils'
+import {useAccessibilityScansStore} from '../../../../shared/react/stores/AccessibilityScansStore'
+import {AccessibilityResourceScan} from '../../../../shared/react/types'
+import {findById} from '../../../../shared/react/utils/apiData'
 
 const I18n = createI18nScope('accessibility_issues')
 

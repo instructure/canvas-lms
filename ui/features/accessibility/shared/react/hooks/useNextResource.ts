@@ -16,11 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  defaultNextResource,
-  NextResource,
-} from '../../../shared/react/stores/AccessibilityScansStore'
-import {AccessibilityIssue, AccessibilityResourceScan} from '../../../shared/react/types'
+import {defaultNextResource, NextResource} from '../stores/AccessibilityScansStore'
+import {AccessibilityIssue, AccessibilityResourceScan} from '../types'
 
 export const useNextResource = () => {
   const getNextResource = (

@@ -32,9 +32,9 @@ import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {FormFieldMessage} from '@instructure/ui-form-field'
 
-import {AccessibilityCheckerContext} from '../../../../accessibility_checker/react/contexts/AccessibilityCheckerContext'
+import {AccessibilityCheckerContext} from '../../contexts/AccessibilityCheckerContext'
+import {useNextResource} from '../../hooks/useNextResource'
 import {useAccessibilityScansFetchUtils} from '../../hooks/useAccessibilityScansFetchUtils'
-import {useNextResource} from '../../../../accessibility_checker/react/hooks/useNextResource'
 import {
   useAccessibilityScansStore,
   defaultNextResource,
@@ -336,7 +336,11 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
   if (isRequestInFlight) return renderSpinner()
 
   return (
-    <View position={pageView ? 'relative' : 'fixed'} overflowY="auto" width="100%">
+    <View
+      position={pageView ? 'relative' : 'fixed'}
+      overflowY="auto"
+      width={pageView ? '100%' : 'auto'}
+    >
       <Flex as="div" direction="column" height={pageView ? 'auto' : '100vh'} width="100%">
         <Flex.Item
           as="header"

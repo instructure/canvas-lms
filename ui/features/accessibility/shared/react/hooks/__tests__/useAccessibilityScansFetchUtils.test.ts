@@ -20,18 +20,18 @@ import {act, renderHook} from '@testing-library/react-hooks'
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
-import {useAccessibilityScansFetchUtils} from '../../../../shared/react/hooks/useAccessibilityScansFetchUtils'
+import {useAccessibilityScansFetchUtils} from '../useAccessibilityScansFetchUtils'
 import {
   defaultStateToFetch,
   initialState,
   NewStateToFetch,
   useAccessibilityScansStore,
-} from '../../../../shared/react/stores/AccessibilityScansStore'
+} from '../../stores/AccessibilityScansStore'
 import {
   API_FETCH_ERROR_MESSAGE_PREFIX,
   IssuesTableColumns,
   IssuesTableHeaderApiNames,
-} from '../../constants'
+} from '../../../../accessibility_checker/react/constants'
 
 jest.mock('@canvas/do-fetch-api-effect')
 

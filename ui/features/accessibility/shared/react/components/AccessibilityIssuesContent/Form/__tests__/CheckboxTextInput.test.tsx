@@ -27,7 +27,7 @@ jest.mock('@canvas/do-fetch-api-effect')
 import {
   AccessibilityCheckerContext,
   type AccessibilityCheckerContextType,
-} from '../../../../../../accessibility_checker/react/contexts/AccessibilityCheckerContext'
+} from '../../../../contexts/AccessibilityCheckerContext'
 import {getAsAccessibilityResourceScan} from '../../../../utils/apiData'
 
 // Create a fully typed mock context

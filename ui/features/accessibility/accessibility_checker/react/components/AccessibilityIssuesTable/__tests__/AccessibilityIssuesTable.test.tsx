@@ -24,7 +24,7 @@ import {
   useAccessibilityScansStore,
   initialState,
 } from '../../../../../shared/react/stores/AccessibilityScansStore'
-import {mockScanData} from '../../../stores/mockData'
+import {mockScanData} from '../../../../../shared/react/stores/mockData'
 import {useAccessibilityScansFetchUtils} from '../../../../../shared/react/hooks/useAccessibilityScansFetchUtils'
 
 jest.mock('../../../../../shared/react/hooks/useAccessibilityScansFetchUtils', () => ({

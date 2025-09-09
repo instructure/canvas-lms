@@ -16,13 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useCallback, useContext, useMemo, useEffect} from 'react'
+import {useCallback, useMemo, useEffect} from 'react'
 import {useShallow} from 'zustand/react/shallow'
 import {View} from '@instructure/ui-view'
 
-import {AccessibilityCheckerContext} from '../../contexts/AccessibilityCheckerContext'
 import {useAccessibilityScansFetchUtils} from '../../../../shared/react/hooks/useAccessibilityScansFetchUtils'
-import {useNextResource} from '../../hooks/useNextResource'
 import {useAccessibilityScansStore} from '../../../../shared/react/stores/AccessibilityScansStore'
 import {AccessibilityResourceScan, ParsedFilters} from '../../../../shared/react/types'
 import {parseFetchParams} from '../../../../shared/react/utils/query'
@@ -37,24 +35,15 @@ import {getAppliedFilters} from '../../utils/filter'
 import {useAccessibilityIssueSelect} from '../../../../shared/react/hooks/useAccessibilityIssueSelect'
 
 export const AccessibilityCheckerApp: React.FC = () => {
-  const context = useContext(AccessibilityCheckerContext)
   const {selectIssue} = useAccessibilityIssueSelect()
-  const {getNextResource} = useNextResource()
 
   const {doFetchAccessibilityScanData, doFetchAccessibilityIssuesSummary} =
     useAccessibilityScansFetchUtils()
 
-  const [accessibilityScans, filters] = useAccessibilityScansStore(
-    useShallow(state => [state.accessibilityScans, state.filters]),
-  )
+  const [filters] = useAccessibilityScansStore(useShallow(state => [state.filters]))
 
-  const [setFilters, setLoading, setNextResource, setSearch] = useAccessibilityScansStore(
-    useShallow(state => [
-      state.setFilters,
-      state.setLoading,
-      state.setNextResource,
-      state.setSearch,
-    ]),
+  const [setFilters, setLoading, setSearch] = useAccessibilityScansStore(
+    useShallow(state => [state.setFilters, state.setLoading, state.setSearch]),
   )
 
   const appliedFilters = useMemo(() => getAppliedFilters(filters || {}), [filters])
@@ -100,7 +89,7 @@ export const AccessibilityCheckerApp: React.FC = () => {
         ])
       }
     },
-    [setSearch, doFetchAccessibilityScanData, filters],
+    [setSearch, doFetchAccessibilityScanData, doFetchAccessibilityIssuesSummary, filters],
   )
 
   return (

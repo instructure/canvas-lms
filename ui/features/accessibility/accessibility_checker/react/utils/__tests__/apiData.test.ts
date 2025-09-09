@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {mockScan3, mockScanData} from '../../stores/mockData'
+import {mockScan3, mockScanData} from '../../../../shared/react/stores/mockData'
 import {calculateTotalIssuesCount} from '../../../../shared/react/utils/apiData'
 
 describe('calculateTotalIssuesCount', () => {
