@@ -26,6 +26,7 @@ import {HighlightTextEdit} from './components/HighlightTextEdit'
 import {useSave} from '../BaseBlock/useSave'
 import {BaseBlock} from '../BaseBlock'
 import {defaultProps} from './defaultProps'
+import {highlightBlockContrast} from '../../accessibilityChecker/rules/highlightBlockContrast'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -78,6 +79,7 @@ export const HighlightBlock = (props: Partial<HighlightBlockProps>) => {
       componentProps={componentProps}
       title={HighlightBlock.craft.displayName}
       backgroundColor={componentProps.backgroundColor}
+      customAccessibilityCheckRules={[highlightBlockContrast]}
     />
   )
 }

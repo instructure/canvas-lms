@@ -30,6 +30,7 @@ import {useFocusElement} from '../../hooks/useFocusElement'
 import {useOpenSettingsTray} from '../../hooks/useOpenSettingsTray'
 import {TitleEdit} from '../BlockItems/Title/TitleEdit'
 import {defaultProps} from './defaultProps'
+import {buttonBackgroundContrast} from '../../accessibilityChecker/rules/buttonBackgroundContrast'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -85,6 +86,7 @@ export const ButtonBlock = (props: Partial<ButtonBlockProps>) => {
       componentProps={componentProps}
       title={ButtonBlock.craft.displayName}
       backgroundColor={componentProps.backgroundColor}
+      customAccessibilityCheckRules={[buttonBackgroundContrast]}
     />
   )
 }

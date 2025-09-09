@@ -24,7 +24,7 @@ import {useBlockContentEditorContext} from '../../BlockContentEditorContext'
 import {BaseBlockEditWrapper} from './components/BaseBlockEditWrapper'
 import {Mask} from './components/Mask/Mask'
 import {AccessibilityChecker} from './components/AccessibilityChecker'
-import type {AccessibilityIssue} from '../../accessibilityChecker/types'
+import type {AccessibilityRule} from '../../accessibilityChecker/types'
 
 function BaseBlockViewerMode<T extends {}>(props: ComponentProps<typeof BaseBlock<T>>) {
   const Component = props.ViewComponent
@@ -47,7 +47,10 @@ function BaseBlockEditorMode<T extends {}>(props: ComponentProps<typeof BaseBloc
     }
 
     return (
-      <AccessibilityChecker componentProps={props.componentProps}>
+      <AccessibilityChecker
+        componentProps={props.componentProps}
+        customAccessibilityCheckRules={props.customAccessibilityCheckRules}
+      >
         <Component {...props.componentProps} />
       </AccessibilityChecker>
     )
@@ -68,7 +71,7 @@ export function BaseBlock<T extends {}>(props: {
   componentProps: T
   title: string
   backgroundColor?: string
-  a11yCheck?: (props: T) => AccessibilityIssue[]
+  customAccessibilityCheckRules?: AccessibilityRule[]
 }) {
   const isInEditor = useIsInEditor()
   const Component = isInEditor ? BaseBlockEditorMode : BaseBlockViewerMode
