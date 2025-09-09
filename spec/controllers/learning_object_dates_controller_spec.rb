@@ -2191,47 +2191,6 @@ describe LearningObjectDatesController do
       end
     end
 
-    describe "create_wiki_page_mastery_path_overrides feature enabled" do
-      before do
-        Account.site_admin.enable_feature! :create_wiki_page_mastery_path_overrides
-        @course.conditional_release = true
-        @course.save!
-      end
-
-      context "pages without an assignment" do
-        let_once(:learning_object) do
-          page = @course.wiki_pages.create!(title: "My Page", lock_at: "2022-01-03T01:00:00Z")
-          page.save!
-          page
-        end
-
-        let_once(:default_params) do
-          {
-            course_id: @course.id,
-            url_or_id: learning_object.id
-          }
-        end
-
-        let_once(:differentiable) do
-          learning_object
-        end
-
-        include_examples "learning object updates", false
-
-        it "does not create assignment" do
-          put :update, params: { **default_params, assignment_overrides: [{ noop_id: 1 }] }
-          expect(learning_object.reload.assignment).to be_nil
-        end
-
-        it "creates assignment override and links it to wiki page" do
-          put :update, params: { **default_params, assignment_overrides: [{ noop_id: 1 }] }
-          expect(learning_object.assignment_overrides.active.count).to eq 1
-          assignment_override = learning_object.assignment_overrides.active.first
-          expect(assignment_override).to be_present
-        end
-      end
-    end
-
     context "files" do
       let_once(:learning_object) do
         @course.attachments.create!(filename: "coolpdf.pdf",

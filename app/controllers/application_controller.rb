@@ -441,7 +441,6 @@ class ApplicationController < ActionController::Base
     consolidated_media_player
     courses_popout_sisid
     create_external_apps_side_tray_overrides
-    create_wiki_page_mastery_path_overrides
     dashboard_graphql_integration
     disallow_threaded_replies_fix_alert
     disallow_threaded_replies_manage

@@ -87,7 +87,6 @@ describe "Importing wikis" do
   describe "conditional release and hidden assignment" do
     before do
       stub_const("ASSIGNMENT_MIGRATION_ID", "0000001")
-
       Account.site_admin.disable_feature!(:wiki_page_mastery_path_no_assignment_group)
     end
 

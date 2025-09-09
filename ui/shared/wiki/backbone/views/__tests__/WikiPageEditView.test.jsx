@@ -111,22 +111,4 @@ describe('WikiPageEditView', () => {
       expect($('#wiki_page_body_error').text()).toContain('Input exceeds limit')
     })
   })
-
-  describe('getFormData', () => {
-    test('create_wiki_page_mastery_path_overrides enabled: assignment not sent in request', () => {
-      window.ENV.FEATURES = {create_wiki_page_mastery_path_overrides: true}
-
-      const view = createView()
-      const data = view.getFormData()
-      expect(data.assignment).not.toBeDefined()
-    })
-
-    test('create_wiki_page_mastery_path_overrides disabled: assignment sent in request', () => {
-      window.ENV.FEATURES = {create_wiki_page_mastery_path_overrides: false}
-
-      const view = createView()
-      const data = view.getFormData()
-      expect(data.assignment).toBeDefined()
-    })
-  })
 })
