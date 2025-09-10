@@ -17,6 +17,8 @@
  */
 
 import {waitFor} from '@testing-library/react'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import WikiPage from '@canvas/wiki/backbone/models/WikiPage'
 import WikiPageView from '../WikiPageView'
 import ReactDOM from 'react-dom'
@@ -26,7 +28,20 @@ import '@canvas/jquery/jquery.simulate'
 import '@canvas/module-sequence-footer'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
+const server = setupServer(
+  http.get('/api/v1/courses/:courseId/module_item_sequence', () =>
+    HttpResponse.json({
+      items: [],
+      modules: [],
+    }),
+  ),
+)
+
 describe('WikiPageView', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     fakeENV.setup()
   })
