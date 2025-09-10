@@ -24,7 +24,11 @@ describe RequestThrottle do
   let(:base_req) { { "QUERY_STRING" => "", "PATH_INFO" => "/", "REQUEST_METHOD" => "GET" } }
   let(:request_user_1) { base_req.merge({ "REMOTE_ADDR" => "1.2.3.4", "rack.session" => { user_id: 1 } }) }
   let(:request_user_2) { base_req.merge({ "REMOTE_ADDR" => "4.3.2.1", "rack.session" => { user_id: 2 } }) }
-  let(:token1) { AccessToken.create!(user: user_factory, purpose: "token1") }
+  let(:token1) do
+    AccessToken.create!(user: user_factory, purpose: "token1").tap do |token|
+      token.developer_key.update(unified_tool_id: "sample_utid")
+    end
+  end
   let(:token2) { AccessToken.create!(user: user_factory, purpose: "token2") }
   let(:token_sasu) { AccessToken.create!(developer_key: developer_key_sasu, user: site_admin_service_user) }
   let(:request_query_token) { request_user_1.merge({ "REMOTE_ADDR" => "1.2.3.4", "QUERY_STRING" => "access_token=#{token1.full_token}" }) }
@@ -386,6 +390,7 @@ describe RequestThrottle do
       allow(RequestContext::Generator).to receive(:add_meta_header).with(any_args)
       expect(RequestContext::Generator).to receive(:add_meta_header).with("at", token1.global_id)
       expect(RequestContext::Generator).to receive(:add_meta_header).with("dk", token1.global_developer_key_id)
+      expect(RequestContext::Generator).to receive(:add_meta_header).with("utid", token1.developer_key.unified_tool_id)
 
       throttler.call(request_query_token)
     end
