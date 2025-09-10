@@ -197,7 +197,10 @@ const DiscussionInsights: React.FC = () => {
           <IconButton
             size="small"
             data-testid="viewOriginalReply"
-            screenReaderLabel={I18n.t('See reply')}
+            screenReaderLabel={I18n.t('See reply from %{user} on %{date}', {
+              user: item.student_name,
+              date: formatDate(new Date(item.entry_updated_at)),
+            })}
             onClick={() => handleSeeReply(item)}
             withBackground={false}
             withBorder={false}
@@ -211,7 +214,10 @@ const DiscussionInsights: React.FC = () => {
             <IconButton
               size="small"
               data-testid="viewSpeedGraderReply"
-              screenReaderLabel={I18n.t('See in SpeedGrader')}
+              screenReaderLabel={I18n.t('See reply in SpeedGrader from %{user} on %{date}', {
+                user: item.student_name,
+                date: formatDate(new Date(item.entry_updated_at)),
+              })}
               onClick={() => handleSpeedGrader(item)}
               withBackground={false}
               withBorder={false}
@@ -225,7 +231,10 @@ const DiscussionInsights: React.FC = () => {
           <IconButton
             size="small"
             data-testid="goToOriginalReply"
-            screenReaderLabel={I18n.t('Go to original reply')}
+            screenReaderLabel={I18n.t('See reply in context from %{user} on %{date}', {
+              user: item.student_name,
+              date: formatDate(new Date(item.entry_updated_at)),
+            })}
             onClick={() => handleGoToOriginalReply(item)}
             withBackground={false}
             withBorder={false}
