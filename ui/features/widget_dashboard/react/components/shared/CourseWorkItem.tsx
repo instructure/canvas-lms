@@ -24,6 +24,7 @@ import {Link} from '@instructure/ui-link'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {getSubmissionStatus, getTypeIcon} from '../widgets/CourseWorkWidget/utils'
 import type {CourseWorkItem as CourseWorkItemType} from '../../hooks/useCourseWork'
+import {CourseCode} from './CourseCode'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -64,9 +65,12 @@ export function CourseWorkItem({item}: CourseWorkItemProps) {
                   {item.title}
                 </Text>
               </Link>
-              <Text size="x-small" color="secondary">
-                {item.course.name}
-              </Text>
+              <Flex gap="x-small" alignItems="center">
+                <CourseCode courseId={item.course.id} size="x-small" />
+                <Text size="x-small" color="secondary">
+                  {item.course.name}
+                </Text>
+              </Flex>
               <Text size="x-small" color="secondary">
                 {item.points != null && `${I18n.t('%{points} pts', {points: item.points})}`}
               </Text>

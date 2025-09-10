@@ -30,7 +30,7 @@ import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import type {BaseWidgetProps, CourseOption} from '../../../types'
 import {useSharedCourses} from '../../../hooks/useSharedCourses'
 import {useCourseInstructors} from '../../../hooks/useCourseInstructors'
-import {getCourseCodeColor} from '../CourseGradesWidget/utils'
+import {CourseCode} from '../../shared/CourseCode'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -131,34 +131,11 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
                         </Text>
                         {instructor.course_code && (
                           <View as="div" margin="xxx-small 0 0 0">
-                            {(() => {
-                              const courseCodeStyle = getCourseCodeColor(
-                                undefined,
-                                instructor.course_code,
-                              )
-                              return (
-                                <View
-                                  as="span"
-                                  background="primary"
-                                  borderRadius="large"
-                                  padding="xxx-small x-small"
-                                  display="inline-block"
-                                  themeOverride={{backgroundPrimary: courseCodeStyle.background}}
-                                >
-                                  <Text
-                                    size="x-small"
-                                    weight="bold"
-                                    color="primary"
-                                    lineHeight="fit"
-                                    themeOverride={{
-                                      primaryColor: courseCodeStyle.textColor,
-                                    }}
-                                  >
-                                    {instructor.course_code}
-                                  </Text>
-                                </View>
-                              )
-                            })()}
+                            <CourseCode
+                              courseId={instructor.enrollments[0]?.course_id}
+                              overrideCode={instructor.course_code}
+                              size="x-small"
+                            />
                           </View>
                         )}
                         <View as="div">
