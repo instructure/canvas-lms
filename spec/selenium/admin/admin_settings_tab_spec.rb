@@ -536,7 +536,7 @@ describe "admin settings tab" do
       scroll_into_view(link)
       link.click
       url = f("#admin_settings_custom_link_url")
-      expect(url).to be_disabled
+      expect(url.attribute("readonly")).to eq "true"
       teachers_label = fj('#custom_help_link_settings fieldset .ic-Label:contains("Teachers"):visible')
       scroll_into_view(teachers_label)
       teachers_label.click
