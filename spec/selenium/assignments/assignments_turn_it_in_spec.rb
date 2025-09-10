@@ -88,35 +88,6 @@ describe "assignments turn it in" do
     }
   end
 
-  it "creates turnitin settings" do
-    skip_if_chrome("issue with change_turnitin_settings method")
-    # although we "saved" the dialog, we haven't actually posted anything yet
-    expect do
-      get "/courses/#{@course.id}/assignments/new"
-      f("#assignment_name").send_keys("test assignment")
-      change_turnitin_settings
-    end.to_not change { Assignment.count }
-    expect_new_page_load { submit_form("#edit_assignment_form") }
-    expect(Assignment.last.turnitin_settings).to eq expected_settings
-  end
-
-  it "edits turnitin settings" do
-    skip_if_chrome("issue with change_turnitin_settings method")
-    assignment = @course.assignments.create!(
-      name: "test assignment",
-      due_at: (Time.now.utc + 2.days),
-      assignment_group: @course.assignment_groups.create!(name: "default")
-    )
-
-    get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
-
-    change_turnitin_settings
-    expect_new_page_load { submit_form("#edit_assignment_form") }
-
-    assignment.reload
-    expect(assignment.turnitin_settings).to eq expected_settings
-  end
-
   it "displays validation errors for small matches inputs" do
     skip_if_chrome("issue with change_turnitin_settings method")
     assignment = @course.assignments.create!(

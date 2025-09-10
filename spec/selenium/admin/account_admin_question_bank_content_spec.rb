@@ -247,23 +247,6 @@ describe "account admin question bank" do
       expect(fj("[data-id=#{outcome.id}]:visible")).to include_text outcome.short_description
     end
 
-    it "aligns an outcome" do
-      skip_if_chrome("issue with add_outcome_to_bank method")
-      add_outcome_to_bank(@outcome)
-      expect(fj("[data-id=#{@outcome.id}]:visible")).to include_text("60%")
-      expect(@question_bank.reload.learning_outcome_alignments.count).to be > 0
-      learning_outcome_tag = @question_bank.learning_outcome_alignments.where(mastery_score: 0.6).first
-      expect(learning_outcome_tag).to be_present
-    end
-
-    it "changes the outcome set mastery score" do
-      skip_if_chrome("issue with add_outcome_to_bank method")
-      add_outcome_to_bank(@outcome, 40)
-      expect(fj("[data-id=#{@outcome.id}]:visible .content")).to include_text("mastery at 40%")
-      learning_outcome_tag = AssessmentQuestionBank.last.learning_outcome_alignments.where(mastery_score: 0.4).first
-      expect(learning_outcome_tag).to be_present
-    end
-
     it "deletes an aligned outcome" do
       add_outcome_to_bank(@outcome)
       fj("[data-id='#{@outcome.id}']:visible .delete_outcome_link").click

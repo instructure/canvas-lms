@@ -647,18 +647,6 @@ describe Types::AssignmentType do
     end
   end
 
-  xit "validate assignment 404 return correctly with override instrumenter (ADMIN-2407)" do
-    result = CanvasSchema.execute(<<~GQL, context: { current_user: @teacher })
-      query {
-        assignment(id: "987654321") {
-          _id dueAt lockAt unlockAt
-        }
-      }
-    GQL
-    expect(result["errors"]).to be_nil
-    expect(result.dig("data", "assignment")).to be_nil
-  end
-
   it "can access it's parent course" do
     expect(assignment_type.resolve("course { _id }")).to eq course.to_param
   end

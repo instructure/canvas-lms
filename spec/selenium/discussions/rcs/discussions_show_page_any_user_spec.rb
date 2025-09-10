@@ -100,14 +100,6 @@ describe "discussions" do
           validate_entry_text(entry, text)
           edit_entry(entry, edit_text)
         end
-
-        it "should put order by date, descending"
-        it "should flatten threaded replies into their root entries"
-        it "should show the latest three entries"
-        it "should deep link to an entry rendered on the first page"
-        it "should deep link to an entry rendered on a different page"
-        it "should deep link to a non-rendered child entry of a rendered parent"
-        it "should deep link to a child entry of a non-rendered parent"
       end
     end
   end

@@ -113,33 +113,6 @@ describe "quizzes question creation" do
       end
     end
 
-    it "respects character limits on short answer questions- MFIB", priority: "2" do
-      skip("Skipping this as there is already an existing bug CNVS-27665 for this")
-      question = fj(".question_form:visible")
-      click_option(".question_form:visible .question_type", "Fill In Multiple Blanks")
-      replace_content(question.find_element(:css, "input[name='question_points']"), "4")
-      type_in_tiny ".question_form:visible textarea.question_content", "Roses are [color1], violets are [color2]"
-
-      f("#question_content_0_ifr").send_keys(:tab)
-      click_option("div.question.selectable.fill_in_multiple_blanks_question select.blank_id_select", "color1")
-
-      answers = question.find_elements(:css, ".form_answers > .answer")
-      answer_blank_one = answers[0].find_element(:css, ".short_answer input")
-
-      trigger_max_characters_alert(answer_blank_one) do |alert|
-        expect(alert.text).to eq "Answers for fill in the blank questions must be under 80 characters long"
-      end
-
-      click_option("div.question.selectable.fill_in_multiple_blanks_question select.blank_id_select", "color2")
-
-      answers = question.find_elements(:css, ".form_answers > .answer")
-      answer2 = answers[2].find_element(:css, ".short_answer input")
-
-      trigger_max_characters_alert(answer2) do |alert|
-        expect(alert.text).to eq "Answers for fill in the blank questions must be under 80 characters long"
-      end
-    end
-
     #  This is a function written to capture common code used
     #  in MFIB and FIB case for checking number of characters are <80 in answers
     def trigger_max_characters_alert(web_element)

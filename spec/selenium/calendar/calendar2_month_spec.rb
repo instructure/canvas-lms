@@ -102,20 +102,6 @@ describe "calendar2" do
         create_middle_day_assignment
       end
 
-      it "translates am/pm time strings in assignment event datepicker", priority: "2" do
-        skip("CNVS-28437")
-        @user.locale = "fa"
-        @user.save!
-        load_month_view
-        calendar_create_event_button.click
-        f("#edit_event .edit_assignment_option").click
-        f("#assignment_title").send_keys("test assignment")
-        f("#edit_assignment_form .ui-datepicker-trigger.btn").click
-        wait_for_ajaximations
-        expect(f("#ui-datepicker-div .ui-datepicker-time-ampm")).to include_text("قبل از ظهر")
-        expect(f("#ui-datepicker-div .ui-datepicker-time-ampm")).to include_text("بعد از ظهر")
-      end
-
       context "drag and drop" do
         def element_location
           driver.execute_script("return $('#calendar-app .fc-content-skeleton:first')

@@ -46,9 +46,6 @@ describe "calendar2" do
         expect(fj(".fc-agendaWeek-view:visible")).to be_present
       end
 
-      # TODO: reimplement per CNVS-29592, but make sure we're testing at the right level
-      it "should render assignments due just before midnight"
-
       it "shows manual assignment event due saturday after 6pm", priority: "1" do
         load_week_view
         calendar_create_event_button.click
@@ -256,29 +253,6 @@ describe "calendar2" do
           expect(event1.reload.end_at).to eql(midnight + 12.hours + 30.minutes)
         end
       end
-    end
-
-    it "makes event all-day by dragging", priority: "1" do
-      skip "drag event isn't happening, might be a :timezone: :bomb:"
-
-      # Create an all-day event to act as drag target
-      #   This is a workaround because the all-day row is positioned absolutely
-      midnight = Time.zone.now.beginning_of_day
-      make_event(title: "Event1", start: midnight, all_day: true)
-
-      # Create a second event, starting at noon, to be drag object
-      event2 = make_event(title: "Event2", start: midnight + 12.hours)
-
-      # Drag object event onto target event using calendar icons
-      load_week_view
-      expect(ff(".fc-view-container .icon-calendar-month")).to have_size(2)
-      icon_array = ff(".fc-view-container .icon-calendar-month")
-      drag_and_drop_element(icon_array[1], icon_array[0])
-      wait_for_ajaximations
-
-      # Verify object event is now all-day
-      expect(event2.reload.all_day).to be(true)
-      expect(event2.start_at).to eql(midnight)
     end
 
     context "drag and drop" do

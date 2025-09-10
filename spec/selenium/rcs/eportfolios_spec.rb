@@ -174,21 +174,6 @@ describe "eportfolios" do
       expect(@eportfolio.name).to include("new ePortfolio name1")
     end
 
-    it "has a working flickr search dialog" do
-      skip_if_chrome("fragile in chrome")
-      get "/eportfolios/#{@eportfolio.id}"
-      f("#page_list a.page_url").click
-      expect(f("#page_list a.page_url")).to be_displayed
-      f("#page_sidebar .edit_content_link").click
-      expect(f(".add_content_link.add_rich_content_link")).to be_displayed
-      f(".add_content_link.add_rich_content_link").click
-      expect(f(".mce-container")).to be_displayed
-      f(".mce-container div[aria-label='Embed Image']").click
-      expect(f('a[href="#tabFlickr"]')).to be_displayed
-      f('a[href="#tabFlickr"]').click
-      expect(f("form.FindFlickrImageView")).to be_displayed
-    end
-
     context "with submissions" do
       before do
         @assignment = @course.assignments.create!(

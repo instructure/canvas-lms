@@ -70,46 +70,6 @@ describe "Excuse an Assignment" do
     expect(score).to eq "EX"
   end
 
-  it "Gradebook import accounts for excused assignment", priority: "1" do
-    skip_if_chrome("fragile upload process")
-    @course.assignments.create! title: "Excuse Me", points_possible: 20
-    rows = ["Student Name,ID,Section,Excuse Me",
-            "Student,#{@student.id},,EX"]
-    _filename, fullpath, _data = get_file("gradebook.csv", rows.join("\n"))
-
-    get "/courses/#{@course.id}/gradebook_uploads/new"
-
-    f("#gradebook_upload_uploaded_data").send_keys(fullpath)
-    f("#new_gradebook_upload").submit
-    run_jobs
-    wait_for_ajaximations
-    expect(f(".canvas_1 .new-grade").text).to eq "Excused"
-
-    submit_form("#gradebook_grid_form")
-    driver.switch_to.alert.accept
-    wait_for_ajaximations
-    run_jobs
-
-    get "/courses/#{@course.id}/gradebook"
-    expect(f(".canvas_1 .slick-row .slick-cell:first-child").text).to eq "Excused"
-
-    # Test case insensitivity on 'EX'
-    assign = @course.assignments.create! title: "Excuse Me 2", points_possible: 20
-    assign.grade_student @student, excuse: true, grader: @teacher
-    rows = ["Student Name,ID,Section,Excuse Me 2",
-            "Student,#{@student.id},,Ex"]
-    _filename, fullpath, _data = get_file("gradebook.csv", rows.join("\n"))
-
-    get "/courses/#{@course.id}/gradebook_uploads/new"
-
-    f("#gradebook_upload_uploaded_data").send_keys(fullpath)
-    f("#new_gradebook_upload").submit
-    run_jobs
-    wait_for_ajaximations
-
-    expect(f("#no_changes_detected")).not_to be_nil
-  end
-
   context "SpeedGrader" do
     it "can excuse complete/incomplete assignments", priority: "1" do
       assignment = @course.assignments.create! title: "Excuse Me", points_possible: 20, grading_type: "pass_fail"

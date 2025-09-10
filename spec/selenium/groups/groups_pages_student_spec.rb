@@ -435,8 +435,6 @@ describe "groups" do
         PluginSetting.create!(name: "wimba", settings: { "domain" => "wimba.instructure.com" })
       end
 
-      it_behaves_like "conferences_page", :student
-
       it "allows access to conferences only within the scope of a group", priority: "1" do
         get conferences_page
         expect(f(".new-conference-btn")).to be_displayed

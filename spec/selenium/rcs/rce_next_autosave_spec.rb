@@ -176,24 +176,6 @@ describe "RCE Next autosave feature", :ignore_js_errors do
       driver.local_storage.clear
     end
 
-    it "cleans up this page's expired autosaved entries before prompting to restore" do
-      skip("Hopefully addressed in LA-355")
-      # I con't know why, but this fails flakey-spec-catcher. And when it doesn't
-      # some other spec in here will. I give up. skipping.
-      create_and_edit_announcement
-      saved_content = driver.local_storage[autosave_key]
-      assert(saved_content)
-
-      Setting.set("rce_auto_save_max_age_ms", 1)
-
-      driver.navigate.refresh
-      accept_alert # onbeforeunload "OK to onload?" alert
-      wait_for_rce
-
-      expect(f("body")).not_to contain_css('[data-testid="RCE_RestoreAutoSaveModal"]')
-      driver.local_storage.clear
-    end
-
     it "removes placholder images from autosaved content" do
       skip "LF-716 (9/5/2023)"
       create_and_edit_announcement

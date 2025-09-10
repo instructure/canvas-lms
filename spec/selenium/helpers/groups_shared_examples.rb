@@ -483,38 +483,3 @@ shared_examples "files_page_files_rewrite_ui" do |context|
     expect(get_item_content_files_table(1, 1)).to include("example.pdf")
   end
 end
-
-#-----------------------------------------------------------------------------------------------------------------------
-shared_examples "conferences_page" do |context|
-  include GroupsCommon
-  include SharedExamplesCommon
-
-  it "allows group users to create a conference", priority: pick_priority(context, student: "1", teacher: "2") do
-    skip_if_chrome("issue with invite_all_but_one_user method")
-    title = "test conference"
-    get conferences_page
-    create_conference(title:)
-    expect(f("#new-conference-list .ig-title").text).to include(title)
-  end
-
-  it "allows group users to delete an active conference", priority: pick_priority(context, student: "1", teacher: "2") do
-    skip_if_safari(:alert)
-    skip_if_chrome("delete_conference method is fragile")
-    WimbaConference.create!(title: "new conference", user: @user, context: @testgroup.first)
-    get conferences_page
-
-    delete_conference
-    expect(f("#new-conference-list")).to include_text("There are no new conferences")
-  end
-
-  it "allows group users to delete a concluded conference", priority: pick_priority(context, student: "1", teacher: "2") do
-    skip_if_safari(:alert)
-    skip_if_chrome("delete_conference method is fragile")
-    cc = WimbaConference.create!(title: "cncluded conference", user: @user, context: @testgroup.first)
-    conclude_conference(cc)
-    get conferences_page
-
-    delete_conference
-    expect(f("#concluded-conference-list")).to include_text("There are no concluded conferences")
-  end
-end

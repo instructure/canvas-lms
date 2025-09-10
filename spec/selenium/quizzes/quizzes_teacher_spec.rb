@@ -114,8 +114,6 @@ describe "quizzes" do
       expect(group_form.find_element(:css, ".group_display.name")).to include_text("new group")
     end
 
-    it "should update a question group", priority: "1"
-
     it "does not let you exceed the question limit", priority: "2" do
       get "/courses/#{@course.id}/quizzes"
       click_new_quiz_button
@@ -302,8 +300,6 @@ describe "quizzes" do
       user_session(@user)
     end
 
-    it "should mark dropdown questions as answered", priority: "2"
-
     it "gives a student extra time if the time limit is extended", priority: "2" do
       skip "Failing Crystalball DEMO-212"
       @context = @course
@@ -365,53 +361,6 @@ describe "quizzes" do
       @quiz.reload.quiz_submissions.first
            .submission_data[:"question_#{@question.id}"]
     end
-
-    def file_upload_attachment
-      @quiz.reload.quiz_submissions.first.attachments.first
-    end
-
-    it "works with file upload questions", priority: "1" do
-      skip_if_chrome("issue with upload_attachment_answer")
-      @context = @course
-      bank = @course.assessment_question_banks.create!(title: "Test Bank")
-      q = quiz_model
-      a = bank.assessment_questions.create!
-      answers = { "answer_0" => { "id" => 1 }, "answer_1" => { "id" => 2 } }
-      @question = q.quiz_questions.create!(question_data: {
-                                             :name => "first question",
-                                             "question_type" => "file_upload_question",
-                                             "question_text" => "file upload question maaaan",
-                                             "answers" => answers,
-                                             :points_possible => 1
-                                           },
-                                           assessment_question: a)
-      q.generate_quiz_data
-      q.save!
-      _filename, @fullpath, _data = get_file "testfile1.txt"
-
-      Setting.set("context_default_quota", "1") # shouldn't check quota
-
-      user_session(@student)
-      begin_quiz
-
-      # so we can .send_keys to the input, can't if it's invisible to the browser
-      driver.execute_script "$('.file-upload').removeClass('hidden')"
-      upload_attachment_answer
-      expect(file_upload_submission_data).to eq [file_upload_attachment.id.to_s]
-
-      expect_new_page_load do
-        driver.get driver.current_url
-        driver.switch_to.alert.accept
-      end
-
-      wait_for_ajaximations
-      attachment = file_upload_attachment
-      expect(f(".file-upload-box")).to include_text attachment.display_name
-      f("#submit_quiz_button").click
-      expect(f(".selected_answer")).to include_text attachment.display_name
-    end
-
-    it "should notify a student of extra time given by a moderator", priority: "2"
 
     it "displays a link to quiz statistics for a MOOC", priority: "2" do
       quiz_with_submission
