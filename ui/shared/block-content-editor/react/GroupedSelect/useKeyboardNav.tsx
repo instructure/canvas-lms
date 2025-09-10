@@ -17,14 +17,14 @@
  */
 
 import {useRef, useMemo, useEffect, useCallback} from 'react'
-import {BlockData, BlockTypes} from '../AddBlock/block-data'
+import {GroupedSelectData} from './GroupedSelect'
 
 export const useKeyboardNav = (
-  data: BlockData[],
-  selectedItem: BlockTypes,
+  data: GroupedSelectData[],
+  selectedItem: string,
   selectedGroup: string,
-  onGroupChange: (group: BlockData) => void,
-  onItemChange: (id: BlockTypes) => void,
+  onGroupChange: (group: GroupedSelectData) => void,
+  onItemChange: (id: string) => void,
 ) => {
   const focusedPositionRef = useRef<{column: number; row: number}>({column: 0, row: 0})
   const elementsRef = useRef<Map<string | number, HTMLDivElement | null>>(new Map())

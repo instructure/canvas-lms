@@ -24,31 +24,11 @@ import {SeparatorLineBlock} from '../Blocks/SeparatorLineBlock'
 import {ButtonBlock} from '../Blocks/ButtonBlock'
 import {HighlightBlock} from '../Blocks/HighlightBlock'
 import {ImageTextBlock} from '../Blocks/ImageTextBlock'
-import {ReactElement} from 'react'
+import {GroupedSelectData} from '../GroupedSelect'
 
 const I18n = createI18nScope('block_content_editor')
 
-export const blockFactory: {[key: string]: () => ReactElement} = {
-  [TextBlock.name]: () => <TextBlock />,
-  [ImageBlock.name]: () => <ImageBlock />,
-  [SeparatorLineBlock.name]: () => <SeparatorLineBlock />,
-  [ButtonBlock.name]: () => <ButtonBlock />,
-  [HighlightBlock.name]: () => <HighlightBlock />,
-  [ImageTextBlock.name]: () => <ImageTextBlock />,
-  [MediaBlock.name]: () => <MediaBlock />,
-}
-
-export type BlockTypes = keyof typeof blockFactory
-
-export type BlockData = {
-  groupName: string
-  items: {
-    itemName: string
-    id: BlockTypes
-  }[]
-}
-
-export const blockData: BlockData[] = [
+export const blockData: GroupedSelectData[] = [
   {
     groupName: I18n.t('Text'),
     items: [
