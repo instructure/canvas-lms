@@ -28,6 +28,7 @@ import $ from 'jquery'
 import template from '../../jst/EditHeaderView.handlebars'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import 'jqueryui/tabs'
+import {shimGetterShorthand} from '@canvas/util/legacyCoffeesScriptHelpers'
 
 const I18n = createI18nScope('assignmentsEditHeaderView')
 
@@ -50,9 +51,15 @@ EditHeaderView.prototype.events = {
   tabsbeforeactivate: 'onTabChange',
 }
 
-EditHeaderView.prototype.messages = {
-  confirm: I18n.t('Are you sure you want to delete this assignment?'),
-}
+// same getter pattern as used in AssignmentListItemView
+EditHeaderView.prototype.messages = shimGetterShorthand(
+  {},
+  {
+    confirm() {
+      return I18n.t('Are you sure you want to delete this assignment?')
+    },
+  },
+)
 
 EditHeaderView.prototype.els = {
   '#edit-assignment-header-tabs': '$headerTabs',
