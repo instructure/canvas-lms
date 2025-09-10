@@ -90,4 +90,33 @@ ready(() => {
     renderExternalToolDrawer()
     renderTopNavigationTools()
   }
+
+  /*
+   * Fix for href="#" scroll-to-top behavior when top_navigation_placement feature is enabled.
+   *
+   * When top_navigation is on, the HTML element gets a fixed height and the actual
+   * scrollable area becomes #drawer-layout-content. The browser's natural href="#"
+   * behavior tries to scroll the document, but since HTML can't scroll, it fails.
+   * This fix detects the layout mode and redirects the scroll to the correct container.
+   */
+  document.addEventListener(
+    'click',
+    function (e) {
+      if (!(e.target instanceof Element)) return
+      const link = e.target.closest('a[href="#"]')
+      if (link && link.getAttribute('href') === '#') {
+        const htmlCanScroll =
+          document.documentElement.scrollHeight > document.documentElement.clientHeight
+
+        if (!htmlCanScroll) {
+          const drawerContent = document.querySelector('#drawer-layout-content')
+          if (drawerContent && drawerContent.scrollTop > 0) {
+            e.preventDefault()
+            drawerContent.scrollTo({top: 0})
+          }
+        }
+      }
+    },
+    {capture: true},
+  )
 })
