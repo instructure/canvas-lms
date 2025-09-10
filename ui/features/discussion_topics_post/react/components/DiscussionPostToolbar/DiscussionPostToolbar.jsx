@@ -288,7 +288,7 @@ export const DiscussionPostToolbar = props => {
                   {!window.top.location.href.includes('speed_grader') &&
                     props.childTopics?.length >= 0 &&
                     props.canViewGroupPages &&
-                    !ENV.current_user_roles?.includes('student') && (
+                    !ENV.current_user_is_student && (
                       <Flex.Item
                         data-testid="groups-menu-button"
                         margin={responsiveProps?.groupSelect?.margin}
