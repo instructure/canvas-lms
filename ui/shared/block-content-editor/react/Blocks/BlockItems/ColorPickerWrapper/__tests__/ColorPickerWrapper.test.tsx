@@ -17,11 +17,12 @@
  */
 
 import {render} from '@testing-library/react'
-import {ColorPickerWrapper} from '../ColorPickerWrapper'
+import {ColorPickerWrapper, ColorPickerWrapperProps} from '../ColorPickerWrapper'
 
 describe('ColorPickerWrapper', () => {
-  const defaultProps = {
+  const defaultProps: ColorPickerWrapperProps = {
     label: 'Test Color Picker',
+    popoverButtonScreenReaderLabel: 'Open color picker popover',
     value: '#FF0000',
     baseColor: '#FFFFFF',
     onChange: jest.fn(),

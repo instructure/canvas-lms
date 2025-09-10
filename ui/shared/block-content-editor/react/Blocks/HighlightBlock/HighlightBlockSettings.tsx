@@ -51,6 +51,7 @@ export const HighlightBlockSettings = () => {
       >
         <ColorPickerWrapper
           label={I18n.t('Background color')}
+          popoverButtonScreenReaderLabel={I18n.t('Open background color picker popover')}
           value={backgroundColor}
           baseColor={highlightColor}
           baseColorLabel={I18n.t('Highlight color')}
@@ -81,6 +82,7 @@ export const HighlightBlockSettings = () => {
           />
           <ColorPickerWrapper
             label={I18n.t('Highlight color')}
+            popoverButtonScreenReaderLabel={I18n.t('Open highlight color picker popover')}
             value={highlightColor}
             baseColor={textColor}
             baseColorLabel={I18n.t('Text color')}
@@ -92,6 +94,7 @@ export const HighlightBlockSettings = () => {
           />
           <ColorPickerWrapper
             label={I18n.t('Text color')}
+            popoverButtonScreenReaderLabel={I18n.t('Open text color picker popover')}
             value={textColor}
             baseColor={highlightColor}
             baseColorLabel={I18n.t('Highlight color')}

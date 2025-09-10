@@ -75,6 +75,7 @@ export const SeparatorLineBlockSettings = () => {
       >
         <ColorPickerWrapper
           label={I18n.t('Background color')}
+          popoverButtonScreenReaderLabel={I18n.t('Open background color picker popover')}
           value={backgroundColor}
           baseColor={separatorColor}
           onChange={handleBackgroundColorChange}
@@ -92,6 +93,7 @@ export const SeparatorLineBlockSettings = () => {
         <Flex direction="column" gap="medium">
           <ColorPickerWrapper
             label={I18n.t('Separator color')}
+            popoverButtonScreenReaderLabel={I18n.t('Open separator color picker popover')}
             value={separatorColor}
             baseColor={backgroundColor}
             onChange={handleSeparatorColorChange}
