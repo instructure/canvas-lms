@@ -49,7 +49,6 @@ export type RubricAssessmentTrayProps = {
   onSubmit?: (rubricAssessmentDraftData: RubricAssessmentData[]) => void
 }
 export const RubricAssessmentTray = ({
-  currentUserId,
   hidePoints = false,
   isOpen,
   isLoading = false,
@@ -64,10 +63,12 @@ export const RubricAssessmentTray = ({
   onDismiss,
   onSubmit,
 }: RubricAssessmentTrayProps) => {
-  const [viewMode, setViewMode] = useLocalStorage<ViewMode>(
-    CONSTANTS.RUBRIC_VIEW_MODE_LOCALSTORAGE_KEY(currentUserId),
-    viewModeOverride ?? CONSTANTS.RUBRIC_VIEW_MODE_DEFAULT,
-  )
+  // Temporarily comment out this code for the release
+  // const [viewMode, setViewMode] = useLocalStorage<ViewMode>(
+  //   CONSTANTS.RUBRIC_VIEW_MODE_LOCALSTORAGE_KEY(currentUserId),
+  //   viewModeOverride ?? CONSTANTS.RUBRIC_VIEW_MODE_DEFAULT,
+  // )
+  const [viewMode, setViewMode] = useState<ViewMode>(viewModeOverride ?? 'traditional')
 
   return (
     <Tray
