@@ -18,6 +18,7 @@
 
 import React from 'react'
 import CustomHelpLinkPropTypes from './CustomHelpLinkPropTypes'
+import CustomHelpLinkConstants from './CustomHelpLinkConstants'
 
 export default function CustomHelpLinkHiddenInputs(props) {
   const {
@@ -33,7 +34,8 @@ export default function CustomHelpLinkHiddenInputs(props) {
     is_new,
     feature_headline,
   } = props.link
-  const namePrefix = `account[custom_help_links][${index}]`
+  const namePrefix = `${CustomHelpLinkConstants.NAME_PREFIX}[${index}]`
+
   return (
     <span>
       <input type="hidden" name={`${namePrefix}[id]`} value={id} />
