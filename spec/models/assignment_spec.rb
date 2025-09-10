@@ -255,6 +255,14 @@ describe Assignment do
         assignment.update!(due_at: 2.months.from_now)
       end
 
+      it "does not create a ScheduledSmartAlert if assignment is not published" do
+        assignment = @course.assignments.new(assignment_valid_attributes)
+        assignment.workflow_state = "unpublished"
+        expect(ScheduledSmartAlert).not_to receive(:upsert)
+
+        assignment.update!(due_at: 1.day.from_now)
+      end
+
       it "deletes the ScheduledSmartAlert if the due date is removed" do
         assignment = @course.assignments.new(assignment_valid_attributes)
         assignment.update!(due_at: 1.day.from_now)

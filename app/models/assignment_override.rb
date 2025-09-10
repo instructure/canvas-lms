@@ -220,6 +220,7 @@ class AssignmentOverride < ActiveRecord::Base
 
   def update_due_date_smart_alerts
     return unless assignment&.context&.active_now?
+    return if assignment&.workflow_state != "published"
 
     if due_at.nil? || due_at < Time.zone.now
       ScheduledSmartAlert.find_by(context_type: self.class.name, context_id: id, alert_type: :due_date_reminder)&.destroy

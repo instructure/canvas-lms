@@ -1455,6 +1455,14 @@ describe AssignmentOverride do
       override.update!(due_at: 2.months.from_now, due_at_overridden: true)
     end
 
+    it "does not create a ScheduledSmartAlert if assignment is not published" do
+      override = assignment_override_model(course: @course)
+      override.assignment.workflow_state = "unpublished"
+      expect(ScheduledSmartAlert).not_to receive(:upsert)
+
+      override.update!(due_at: 1.day.from_now, due_at_overridden: true)
+    end
+
     it "deletes the ScheduledSmartAlert if the due date is removed" do
       override = assignment_override_model(course: @course)
       override.update!(due_at: 1.day.from_now, due_at_overridden: true)
