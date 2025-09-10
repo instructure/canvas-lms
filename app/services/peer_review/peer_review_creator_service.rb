@@ -40,10 +40,10 @@ class PeerReview::PeerReviewCreatorService < PeerReview::PeerReviewCommonService
   private
 
   def run_validations
-    validate_parent_assignment
-    validate_assignment_submission_types
-    validate_feature_enabled
-    validate_peer_review_sub_assignment_not_exist
+    validate_parent_assignment(@parent_assignment)
+    validate_assignment_submission_types(@parent_assignment)
+    validate_feature_enabled(@parent_assignment)
+    validate_peer_review_sub_assignment_not_exist(@parent_assignment)
   end
 
   def create_peer_review_sub_assignment

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class PeerReview::PeerReviewCommonService < ApplicationService
-  require_relative "peer_review_error"
+  include PeerReview::Validations
 
   def initialize(
     parent_assignment: nil,
@@ -38,36 +38,6 @@ class PeerReview::PeerReviewCommonService < ApplicationService
   end
 
   private
-
-  def validate_parent_assignment
-    unless @parent_assignment.present? && @parent_assignment.is_a?(Assignment) && @parent_assignment.persisted?
-      raise PeerReview::PeerReviewInvalidParentAssignmentError, I18n.t("Invalid parent assignment")
-    end
-  end
-
-  def validate_assignment_submission_types
-    if @parent_assignment.external_tool?
-      raise PeerReview::PeerReviewInvalidAssignmentSubmissionTypesError, I18n.t("Peer reviews cannot be used with External Tool assignments")
-    end
-  end
-
-  def validate_feature_enabled
-    unless @parent_assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
-      raise PeerReview::PeerReviewFeatureDisabledError, I18n.t("Peer Review Allocation and Grading feature flag is disabled")
-    end
-  end
-
-  def validate_peer_review_sub_assignment_not_exist
-    if @parent_assignment.peer_review_sub_assignment.present?
-      raise PeerReview::PeerReviewSubAssignmentExistsError, I18n.t("Peer review sub assignment exists")
-    end
-  end
-
-  def validate_peer_review_sub_assignment_exists
-    if @parent_assignment.peer_review_sub_assignment.blank?
-      raise PeerReview::PeerReviewSubAssignmentNotExistError, I18n.t("Peer review sub assignment does not exist")
-    end
-  end
 
   def peer_review_attributes
     inherited_attributes.merge(specific_attributes)
