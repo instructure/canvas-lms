@@ -33,6 +33,7 @@ class ApplicationController < ActionController::Base
   include Api::V1::WikiPage
   include LegalInformationHelper
   include ObserverEnrollmentsHelper
+  include IgniteAgentHelper
 
   helper :all
 
@@ -3501,4 +3502,6 @@ class ApplicationController < ActionController::Base
   def inject_ai_feedback_link
     js_env(AI_FEEDBACK_LINK: Setting.get("ai_feedback_link", "https://inst.bid/ai/feedback"))
   end
+
+  helper_method :add_ignite_agent_bundle
 end
