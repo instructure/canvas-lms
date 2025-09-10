@@ -29,7 +29,7 @@ import {queryClient} from '@canvas/query'
 import ModuleActionMenu from '../componentsTeacher/ModuleActionMenu'
 import {handlePublishComplete} from '../handlers/moduleActionHandlers'
 import {Pill} from '@instructure/ui-pill'
-import {Prerequisite, CompletionRequirement, ModuleAction} from '../utils/types'
+import {CompletionRequirement, ModuleAction} from '../utils/types'
 import {useContextModule} from '../hooks/useModuleContext'
 import {useModules} from '../hooks/queries/useModules'
 import AddItemModal from './AddItemModalComponents/AddItemModal'
@@ -42,7 +42,6 @@ interface ModuleHeaderActionPanelProps {
   name: string
   expanded?: boolean
   published?: boolean
-  prerequisites?: Prerequisite[]
   completionRequirements?: CompletionRequirement[]
   requirementCount?: number
   hasActiveOverrides: boolean
@@ -58,7 +57,7 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
   name,
   expanded = false,
   published = false,
-  prerequisites,
+
   completionRequirements,
   requirementCount = null,
   hasActiveOverrides,
@@ -151,7 +150,6 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
             setIsMenuOpen={setIsMenuOpen}
             id={id}
             name={name}
-            prerequisites={prerequisites}
             setIsDirectShareOpen={setIsDirectShareOpen}
             setIsDirectShareCourseOpen={setIsDirectShareCourseOpen}
             setModuleAction={setModuleAction}
@@ -186,13 +184,7 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
         moduleId={id}
       />
       {hasActiveOverrides ? (
-        <ViewAssignTo
-          expanded={expanded}
-          isMenuOpen={isMenuOpen}
-          moduleId={id}
-          moduleName={name}
-          prerequisites={prerequisites}
-        />
+        <ViewAssignTo expanded={expanded} isMenuOpen={isMenuOpen} moduleId={id} moduleName={name} />
       ) : null}
     </>
   )

@@ -373,7 +373,7 @@ export const duplicateRubric = async ({
       rubric: {
         title: title + ' Copy',
         hide_points: hidePoints,
-        free_form_criterion_comments: freeFormCriterionComments,
+        free_form_criterion_comments: freeFormCriterionComments ? 1 : 0,
         criteria: duplicateCriteria,
         button_display: buttonDisplay,
         rating_order: ratingOrder,
@@ -383,6 +383,7 @@ export const duplicateRubric = async ({
       rubric_association: {
         association_id: accountId ?? courseId,
         association_type: accountId ? 'Account' : 'Course',
+        hide_points: hidePoints ? 1 : 0,
       },
     }),
   })

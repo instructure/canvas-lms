@@ -66,7 +66,7 @@ module RspecMockAnyInstantiation
 
   def expect_any_instantiation_of(ar_object)
     ActiveRecord::Base.add_any_instantiation(ar_object)
-    expect(ar_object) # rubocop:disable RSpec/VoidExpect -- we return the expectation object to the caller
+    expect(ar_object)
   end
 end
 ActiveRecord::Base.singleton_class.prepend(RspecMockAnyInstantiation::ClassMethods)

@@ -412,6 +412,11 @@ describe SectionTabHelper do
         tag = SectionTabHelperSpec::SectionTabTag.new(new_window_tab, course, new_window_tab[:css_class])
         expect(tag.a_attributes[:"aria-current"]).to eq "page"
       end
+
+      it "includes rel='opener' if tab has target='_blank'" do
+        tag = SectionTabHelperSpec::SectionTabTag.new(new_window_tab, course)
+        expect(tag.a_attributes["rel"]).to eq "opener"
+      end
     end
 
     describe "#a_tag" do

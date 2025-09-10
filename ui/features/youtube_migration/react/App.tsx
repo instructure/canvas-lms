@@ -41,10 +41,16 @@ import GenericErrorPage from '@canvas/generic-error-page/react'
 import ErrorShip from '@canvas/images/ErrorShip.svg'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {Link} from '@instructure/ui-link'
-import {IconAssignmentLine, IconDiscussionLine, IconDocumentLine} from '@instructure/ui-icons'
+import {
+  IconAssignmentLine,
+  IconDiscussionLine,
+  IconDocumentLine,
+  IconCheckSolid,
+} from '@instructure/ui-icons'
 import {Modal} from '@instructure/ui-modal'
 import {type CanvasProgress} from '@canvas/progress/ProgressHelpers'
 import Paginator from '@canvas/instui-bindings/react/Paginator'
+import {Pill} from '@instructure/ui-pill'
 
 export interface AppProps {
   courseId: string
@@ -493,50 +499,60 @@ const EmbedsModal: React.FC<{
         {resourceTitle && <Heading>{resourceTitle}</Heading>}
       </Modal.Header>
       <Modal.Body>
-        {youtubeEmbedsState.map((embed, index) => (
-          <View key={index} as="div" margin="medium 0 0 0" minWidth="35rem">
-            <Flex justifyItems="center" direction="column">
-              <Flex.Item>
-                <Flex justifyItems="center">
-                  <Flex.Item>
-                    <iframe
-                      src={embed.src}
-                      title={I18n.t('YouTube Embed')}
-                      width="500"
-                      height="315"
-                      style={{border: 'none'}}
-                    />
-                  </Flex.Item>
-                </Flex>
-              </Flex.Item>
-              <Flex.Item margin="medium 0 0 0">
-                <Button
-                  color="primary"
-                  display="block"
-                  onClick={() => handleEmbedConvert(courseId, embed, index)}
-                  disabled={
-                    isCheckingExistingConversions ||
-                    embed.convertStatus === ConvertStatus.Converted ||
-                    embed.convertStatus === ConvertStatus.Converting
-                  }
-                >
-                  {(embed.convertStatus === ConvertStatus.Converting ||
-                    (isCheckingExistingConversions && !embed.convertStatus)) && (
-                    <Spinner
-                      renderTitle={() => I18n.t('Converting')}
-                      size="x-small"
-                      margin="0 small 0 0"
-                    />
-                  )}
-                  {isCheckingExistingConversions && !embed.convertStatus
-                    ? I18n.t('Checking...')
-                    : getConvertButtonText(embed.convertStatus)}
-                </Button>
-              </Flex.Item>
-            </Flex>
-            {index < youtubeEmbeds.length - 1 && <View as="hr" />}
-          </View>
-        ))}
+        {youtubeEmbedsState.map((embed, index) => {
+          const isAlreadyConverted = embed.converted === true
+          const effectiveConvertStatus = isAlreadyConverted
+            ? ConvertStatus.Converted
+            : embed.convertStatus
+
+          return (
+            <View key={index} as="div" margin="medium 0 0 0" minWidth="35rem">
+              <Flex justifyItems="center" direction="column">
+                <Flex.Item>
+                  <Flex justifyItems="center">
+                    <Flex.Item>
+                      <iframe
+                        src={embed.src}
+                        title={I18n.t('YouTube Embed')}
+                        width="500"
+                        height="315"
+                        style={{border: 'none'}}
+                      />
+                    </Flex.Item>
+                  </Flex>
+                </Flex.Item>
+                <Flex.Item margin="medium 0 0 0" padding="x-small">
+                  <Button
+                    color="primary"
+                    display="block"
+                    onClick={() => handleEmbedConvert(courseId, embed, index)}
+                    disabled={
+                      isCheckingExistingConversions ||
+                      isAlreadyConverted ||
+                      effectiveConvertStatus === ConvertStatus.Converted ||
+                      effectiveConvertStatus === ConvertStatus.Converting
+                    }
+                  >
+                    {(effectiveConvertStatus === ConvertStatus.Converting ||
+                      (isCheckingExistingConversions && !effectiveConvertStatus)) && (
+                      <Spinner
+                        renderTitle={() => I18n.t('Converting')}
+                        size="x-small"
+                        margin="0 small 0 0"
+                      />
+                    )}
+                    {isAlreadyConverted
+                      ? I18n.t('Converted')
+                      : isCheckingExistingConversions && !effectiveConvertStatus
+                        ? I18n.t('Checking...')
+                        : getConvertButtonText(effectiveConvertStatus)}
+                  </Button>
+                </Flex.Item>
+              </Flex>
+              {index < youtubeEmbeds.length - 1 && <View as="hr" />}
+            </View>
+          )
+        })}
       </Modal.Body>
       <Modal.Footer>
         <Button onClick={closeModalFunction} margin="0 x-small 0 0">
@@ -550,6 +566,7 @@ const EmbedsModal: React.FC<{
 const LastScanResultView: React.FC<{
   resources: Array<YoutubeScanResource>
   totalCount: number
+  totalConverted?: number
   courseId: string
   scanId: number
   handleCourseScan: () => void
@@ -564,6 +581,7 @@ const LastScanResultView: React.FC<{
   handleCourseScan,
   isRequestLoading,
   totalCount,
+  totalConverted,
   courseId,
   scanId,
   handleCourseScanReload,
@@ -621,6 +639,20 @@ const LastScanResultView: React.FC<{
             <Text size="small">{I18n.t('YouTube content detected')}</Text>
           </Flex.Item>
         </Flex>
+        {totalConverted && totalConverted > 0 ? (
+          <Flex justifyItems="center" margin="x-small 0 0 0">
+            <Flex.Item>
+              <Pill color="success">
+                <Flex alignItems="center" gap="x-small">
+                  <IconCheckSolid size="x-small" />
+                  <Text size="small" weight="bold">
+                    {I18n.t('%{count} converted', {count: totalConverted})}
+                  </Text>
+                </Flex>
+              </Pill>
+            </Flex.Item>
+          </Flex>
+        ) : null}
       </View>
       <View as="div" borderWidth="small small 0 small" margin="small x-small">
         <EmbedsModal
@@ -657,7 +689,7 @@ const LastScanResultView: React.FC<{
                 textAlign="center"
                 id="YoutubeContent"
               >
-                <Text>{I18n.t('YouTube content')}</Text>
+                <Text>{I18n.t('YouTube Content')}</Text>
               </Table.ColHeader>
               <Table.ColHeader themeOverride={{padding: '0.90rem 0.75rem'}} width="10%" id="Action">
                 <Text>{I18n.t('Action')}</Text>
@@ -668,24 +700,56 @@ const LastScanResultView: React.FC<{
             {resources.map((resource, index) => (
               <Table.Row key={index}>
                 <Table.RowHeader themeOverride={{padding: '0.90rem 0.75rem'}}>
-                  <Link href={resource.content_url}>
-                    <Text weight="normal">{resource.name}</Text>
-                  </Link>
+                  <Flex alignItems="center" gap="small">
+                    <Flex.Item>
+                      <Link href={resource.content_url}>
+                        <Text weight="normal">{resource.name}</Text>
+                      </Link>
+                    </Flex.Item>
+                    {(() => {
+                      const convertedCount = resource.converted_count || 0
+                      const isFullyConverted = convertedCount === resource.count
+                      if (isFullyConverted) {
+                        return (
+                          <Flex.Item>
+                            <Pill renderIcon={<IconCheckSolid />} color="success" margin="0">
+                              {I18n.t('All Converted')}
+                            </Pill>
+                          </Flex.Item>
+                        )
+                      }
+                      return null
+                    })()}
+                  </Flex>
                 </Table.RowHeader>
                 <Table.Cell themeOverride={{padding: '0.90rem 0.75rem'}}>
                   {getResultType(resource.type)}
                 </Table.Cell>
                 <Table.Cell themeOverride={{padding: '0.90rem 0.75rem'}} textAlign="center">
-                  {resource.count}
+                  {(() => {
+                    const convertedCount = resource.converted_count || 0
+                    return <Text>{resource.count - convertedCount}</Text>
+                  })()}
                 </Table.Cell>
                 <Table.Cell themeOverride={{padding: '0.90rem 0.75rem'}}>
-                  <Button
-                    color="secondary"
-                    size="small"
-                    onClick={() => handleShowReview(resource.embeds, resource.name, resource)}
-                  >
-                    {I18n.t('Review')}
-                  </Button>
+                  {(() => {
+                    const convertedCount = resource.converted_count || 0
+                    const isFullyConverted = convertedCount === resource.count
+
+                    if (isFullyConverted) {
+                      return null
+                    }
+
+                    return (
+                      <Button
+                        color="secondary"
+                        size="small"
+                        onClick={() => handleShowReview(resource.embeds, resource.name, resource)}
+                      >
+                        {I18n.t('Review')}
+                      </Button>
+                    )
+                  })()}
                 </Table.Cell>
               </Table.Row>
             ))}
@@ -910,6 +974,7 @@ export const App: React.FC<AppProps> = ({courseId}) => {
         isRequestLoading={mutationInProgress}
         resources={data.resources}
         totalCount={data.total_count || 0}
+        totalConverted={data.total_converted}
         courseId={courseId}
         scanId={data.id}
         handleCourseScanReload={handleCourseScanReload}

@@ -22,6 +22,7 @@ class Canvadoc < ActiveRecord::Base
   class UploadTimeout < StandardError; end
 
   include Canvadocs::Session
+
   alias_method :session_url, :canvadocs_session_url
 
   belongs_to :attachment

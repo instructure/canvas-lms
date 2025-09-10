@@ -137,7 +137,7 @@ module LocaleSelection
   def self.locales_with_aliases
     @locales_with_aliases ||= begin
       locales = I18n.available_locales.to_h { |l| [l.to_s, nil] }
-      locales.keys.each do |locale| # rubocop:disable Style/HashEachMethods -- mutation during iteration
+      locales.keys.each do |locale|
         aliases = Array.wrap(I18n.send(:t, :aliases, locale:, default: nil))
         aliases.each do |a|
           locales[a] = locale

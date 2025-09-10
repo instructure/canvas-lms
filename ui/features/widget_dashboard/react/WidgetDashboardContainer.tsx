@@ -20,16 +20,46 @@ import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
 import DashboardTabs from './components/DashboardTabs'
+import ObserverOptions from '@canvas/observer-picker'
+import {
+  getHandleChangeObservedUser,
+  autoFocusObserverPicker,
+} from '@canvas/observer-picker/util/pageReloadHelper'
+import {useWidgetDashboard} from './hooks/useWidgetDashboardContext'
 
 const I18n = createI18nScope('widget_dashboard')
 
 const WidgetDashboardContainer: React.FC = () => {
+  const {observedUsersList, canAddObservee, currentUser, currentUserRoles} = useWidgetDashboard()
+
   return (
-    <View as="div" padding="medium">
-      <Heading level="h1" margin="0 0 medium">
-        {I18n.t('Dashboard')}
-      </Heading>
+    <View as="div">
+      <Flex margin="0 0 medium" alignItems="center">
+        <Flex.Item shouldGrow>
+          <Heading level="h1" margin="0" data-testid="dashboard-heading">
+            {I18n.t('Dashboard')}
+          </Heading>
+        </Flex.Item>
+        {observedUsersList.length > 0 && currentUser && (
+          <Flex.Item>
+            <View as="div">
+              <ObserverOptions
+                autoFocus={autoFocusObserverPicker()}
+                canAddObservee={canAddObservee}
+                currentUserRoles={currentUserRoles}
+                currentUser={currentUser}
+                handleChangeObservedUser={getHandleChangeObservedUser()}
+                observedUsersList={observedUsersList}
+                renderLabel={I18n.t(
+                  'Select a student to view. The page will refresh automatically.',
+                )}
+              />
+            </View>
+          </Flex.Item>
+        )}
+      </Flex>
       <DashboardTabs />
     </View>
   )

@@ -1,0 +1,6 @@
+[data-singlebutton] {
+  text-decoration: none !important;
+}
+[data-singlebutton] > .external_link_icon {
+  display: none !important;
+}

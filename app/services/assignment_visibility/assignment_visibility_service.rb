@@ -20,6 +20,7 @@
 module AssignmentVisibility
   class AssignmentVisibilityService
     extend VisibilityHelpers::Common
+
     class << self
       def visible_assignment_ids_in_course_by_user(user_ids:, course_ids:, use_global_id: false)
         vis_hash = assignments_visible_to_students(user_ids:, course_ids:)
@@ -42,6 +43,8 @@ module AssignmentVisibility
 
       # TODO: better name for this method, or a better location?
       def assignments_with_user_visibilities(course, assignments)
+        DatesOverridable.preload_override_data_for_objects(assignments)
+
         visible_to_everyone, only_visible_to_overrides = assignments.partition(&:visible_to_everyone)
         assignment_visibilities = {}
 

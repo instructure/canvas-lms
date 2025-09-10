@@ -23,7 +23,9 @@ RSpec.shared_examples "an accessibility scannable resource" do
 
       context "when feature is enabled" do
         before do
-          Account.site_admin.enable_feature!(:accessibility_tab_enable)
+          account = course.root_account
+          account.settings[:enable_content_a11y_checker] = true
+          account.save!
         end
 
         it "triggers the scanner service" do
@@ -35,10 +37,6 @@ RSpec.shared_examples "an accessibility scannable resource" do
       end
 
       context "when feature is disabled" do
-        before do
-          Account.site_admin.disable_feature!(:accessibility_tab_enable)
-        end
-
         it "does not trigger the scanner service" do
           expect(Accessibility::ResourceScannerService).not_to receive(:call)
 
@@ -52,7 +50,9 @@ RSpec.shared_examples "an accessibility scannable resource" do
 
       context "when feature is enabled" do
         before do
-          Account.site_admin.enable_feature!(:accessibility_tab_enable)
+          account = resource.root_account
+          account.settings[:enable_content_a11y_checker] = true
+          account.save!
         end
 
         context "when relevant attribute is changed" do
@@ -82,10 +82,6 @@ RSpec.shared_examples "an accessibility scannable resource" do
       end
 
       context "when feature is disabled" do
-        before do
-          Account.site_admin.disable_feature!(:accessibility_tab_enable)
-        end
-
         it "does not trigger the scanner service" do
           expect(Accessibility::ResourceScannerService).not_to receive(:call)
 
@@ -95,12 +91,15 @@ RSpec.shared_examples "an accessibility scannable resource" do
     end
 
     describe "#remove_accessibility_scan" do
-      before do
-        Account.site_admin.enable_feature!(:accessibility_tab_enable)
-      end
+      let(:resource) { described_class.create!(valid_attributes) }
 
-      context "after_commit on destroy" do
-        let(:resource) { described_class.create!(valid_attributes) }
+      context "when feature is enabled" do
+        before do
+          account = resource.root_account
+          account.settings[:enable_content_a11y_checker] = true
+          account.save!
+          resource.update!(relevant_attributes_for_scan) # update resource to trigger a scan
+        end
 
         it "removes the associated AccessibilityResourceScan" do
           expect do
@@ -110,12 +109,6 @@ RSpec.shared_examples "an accessibility scannable resource" do
       end
 
       context "when feature is disabled" do
-        let(:resource) { described_class.create!(valid_attributes) }
-
-        before do
-          Account.site_admin.disable_feature!(:accessibility_tab_enable)
-        end
-
         it "does not remove the associated AccessibilityResourceScan" do
           expect(AccessibilityResourceScan).not_to receive(:for_context)
 

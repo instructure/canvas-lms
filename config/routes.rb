@@ -448,6 +448,7 @@ CanvasRails::Application.routes.draw do
     resources :gradebook_uploads
     resources :rubrics
     post "rubrics/llm_criteria", controller: :rubrics, action: :llm_criteria
+    post "rubrics/llm_regenerate_criteria", controller: :rubrics, action: :llm_regenerate_criteria
     resources :rubric_associations do
       post "remind/:assessment_request_id" => "rubric_assessments#remind", :as => :remind_assessee
       resources :rubric_assessments, path: "assessments"
@@ -1260,6 +1261,8 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :brand_configs_api) do
       get "brand_variables", action: :show
+      get "accounts/:account_id/brand_variables", action: :show_context
+      get "courses/:course_id/brand_variables", action: :show_context
     end
 
     scope(controller: :accounts) do
@@ -1849,6 +1852,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :role_overrides) do
       get "accounts/:account_id/roles", action: :api_index, as: "account_roles"
+      get "accounts/:account_id/roles/permissions", action: :manageable_permissions
       get "accounts/:account_id/roles/:id", action: :show
       post "accounts/:account_id/roles", action: :add_role
       post "accounts/:account_id/roles/:id/activate", action: :activate_role

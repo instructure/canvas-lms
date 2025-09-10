@@ -534,13 +534,26 @@ export default class WikiPageEditView extends ValidatedFormView {
     return errors
   }
 
-  hasUnsavedChanges() {
+  isEditedByRce() {
     const hasEditor = RichContentEditor.callOnRCE(this.$wikiPageBody, 'exists?')
-    let dirty = hasEditor && RichContentEditor.callOnRCE(this.$wikiPageBody, 'is_dirty')
-    if (!dirty && this.toJSON().CAN.EDIT_TITLE) {
-      dirty = (this.model.get('title') || '') !== (this.getFormData().title || '')
+    return hasEditor && RichContentEditor.callOnRCE(this.$wikiPageBody, 'is_dirty')
+  }
+
+  isEditedByBlockContentEditor() {
+    if (this.isBlockContentEditor()) {
+      return this.blockEditorHandler.isEdited()
     }
-    return dirty
+    return false
+  }
+
+  isTitleEdited() {
+    if (this.toJSON().CAN.EDIT_TITLE) {
+      return (this.model.get('title') || '') !== (this.getFormData().title || '')
+    }
+  }
+
+  hasUnsavedChanges() {
+    return this.isTitleEdited() || this.isEditedByRce() || this.isEditedByBlockContentEditor()
   }
 
   unsavedWarning() {

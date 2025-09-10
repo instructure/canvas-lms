@@ -132,7 +132,8 @@ module Api::V1::Assignment
       include_planner_override: false,
       include_can_edit: false,
       include_webhook_info: false,
-      include_assessment_requests: false
+      include_assessment_requests: false,
+      include_peer_review: false
     )
 
     if opts[:override_dates] && !assignment.new_record?
@@ -360,6 +361,7 @@ module Api::V1::Assignment
 
     if opts[:include_discussion_topic] && assignment.discussion_topic?
       extend Api::V1::DiscussionTopics
+
       hash["discussion_topic"] = discussion_topic_api_json(
         assignment.discussion_topic,
         assignment.discussion_topic.context,
@@ -520,6 +522,17 @@ module Api::V1::Assignment
       hash["estimated_duration"] = estimated_duration_json(assignment.estimated_duration, user, session)
     end
 
+    if opts[:include_peer_review] && assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
+      peer_review_sub_assignment = assignment.peer_review_sub_assignment
+      if peer_review_sub_assignment
+        # Exclude recursive peer_review_sub_assignment
+        sub_opts = opts.merge(include_peer_review: false)
+        peer_review_json = assignment_json(peer_review_sub_assignment, user, session, sub_opts)
+      end
+
+      hash["peer_review_sub_assignment"] = peer_review_json
+    end
+
     hash
   end
 
@@ -573,6 +586,7 @@ module Api::V1::Assignment
     peer_review_count
     automatic_peer_reviews
     intra_group_peer_reviews
+    peer_review
     grade_group_students_individually
     turnitin_enabled
     vericite_enabled
@@ -625,6 +639,19 @@ module Api::V1::Assignment
                    prepared_create[:assignment].save!
                    :created
                  end
+    end
+
+    if [:created, :ok].include?(response) &&
+       prepared_create[:assignment].peer_reviews &&
+       prepared_create[:assignment].context.feature_enabled?(:peer_review_allocation_and_grading)
+
+      begin
+        create_api_peer_review_sub_assignment(prepared_create[:assignment], assignment_params[:peer_review])
+        prepared_create[:assignment].association(:peer_review_sub_assignment).reload
+      rescue
+        prepared_create[:assignment].destroy
+        return :peer_review_error
+      end
     end
 
     calc_grades = calculate_grades ? value_to_boolean(calculate_grades) : true
@@ -738,6 +765,24 @@ module Api::V1::Assignment
         end
 
         opts[:migrated_urls_content_migration_id] = content_migration.global_id
+      end
+    end
+
+    if response == :ok && prepared_update[:assignment].context.feature_enabled?(:peer_review_allocation_and_grading)
+      begin
+        if prepared_update[:assignment].peer_review_sub_assignment.present?
+          if prepared_update[:assignment].peer_reviews
+            update_api_peer_review_sub_assignment(prepared_update[:assignment], assignment_params[:peer_review])
+          else
+            prepared_update[:assignment].peer_review_sub_assignment.destroy
+          end
+        else
+          create_api_peer_review_sub_assignment(prepared_update[:assignment], assignment_params[:peer_review])
+        end
+
+        prepared_update[:assignment].association(:peer_review_sub_assignment).reload
+      rescue
+        return :peer_review_error
       end
     end
 
@@ -883,11 +928,13 @@ module Api::V1::Assignment
 
     if update_params.key?("grading_standard_id")
       standard_id = update_params.delete("grading_standard_id")
-      if standard_id.present?
-        grading_standard = GradingStandard.for(context).where(id: standard_id).first
-        assignment.grading_standard = grading_standard if grading_standard
-      else
-        assignment.grading_standard = nil
+      if assignment.grants_right?(user, :set_grading_scheme)
+        if standard_id.present?
+          grading_standard = GradingStandard.for(context).where(id: standard_id).first
+          assignment.grading_standard = grading_standard if grading_standard
+        else
+          assignment.grading_standard = nil
+        end
       end
     end
 
@@ -1023,11 +1070,17 @@ module Api::V1::Assignment
       update_params["important_dates"] = value_to_boolean(update_params["important_dates"])
     end
 
+    # Extract peer_review parameter to avoid conflict with assignment attributes
+    peer_review_sub_assignment_params = update_params.delete("peer_review")
+
     apply_report_visibility_options!(assignment_params, assignment)
 
     assignment.updating_user = user
     assignment.attributes = update_params
     assignment.infer_times
+
+    # Store peer review params in assignment_params for later use
+    assignment_params[:peer_review] = peer_review_sub_assignment_params if peer_review_sub_assignment_params.present?
 
     assignment
   end
@@ -1380,6 +1433,7 @@ module Api::V1::Assignment
       { "ab_guid" => strong_anything },
       ({ "suppress_assignment" => strong_anything } if assignment.root_account.suppress_assignments?),
       ({ "estimated_duration_attributes" => strong_anything } if estimated_duration_enabled?(assignment)),
+      ({ "peer_review" => %w[points_possible grading_type due_at unlock_at lock_at] } if assignment.context.feature_enabled?(:peer_review_allocation_and_grading)),
     ].compact
   end
 
@@ -1436,5 +1490,27 @@ module Api::V1::Assignment
       end
       json[:available] = assessment_request.available?
     end
+  end
+
+  def peer_review_params(params)
+    peer_review_params = {}
+
+    unless params.nil?
+      peer_review_params[:points_possible] = params[:points_possible] if params[:points_possible].present?
+      peer_review_params[:grading_type] = params[:grading_type] if params[:grading_type].present?
+      peer_review_params[:due_at] = params[:due_at] if params[:due_at].present?
+      peer_review_params[:unlock_at] = params[:unlock_at] if params[:unlock_at].present?
+      peer_review_params[:lock_at] = params[:lock_at] if params[:lock_at].present?
+    end
+
+    peer_review_params
+  end
+
+  def create_api_peer_review_sub_assignment(parent_assignment, params)
+    PeerReview::PeerReviewCreatorService.call(parent_assignment:, **peer_review_params(params))
+  end
+
+  def update_api_peer_review_sub_assignment(parent_assignment, params)
+    PeerReview::PeerReviewUpdaterService.call(parent_assignment:, **peer_review_params(params))
   end
 end

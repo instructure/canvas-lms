@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useQuery} from '@tanstack/react-query'
 import SubaccountTree from './SubaccountTree'
 import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'
@@ -24,10 +23,11 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {useParams} from 'react-router-dom'
 import {Portal} from '@instructure/ui-portal'
-import {calculateIndent, fetchRootAccount} from './util'
+import {calculateIndent, fetchRootAccount, SubaccountProvider} from './util'
 import {Flex} from '@instructure/ui-flex'
 import {AccountWithCounts} from './types'
 import {sessionStoragePersister} from '@canvas/query'
+import {useQuery} from '@tanstack/react-query'
 
 const I18n = createI18nScope('sub_accounts')
 
@@ -58,7 +58,11 @@ export function Component(): JSX.Element | null {
         </Flex>
       )
     }
-    return <SubaccountTree rootAccount={data} depth={1} defaultExpanded={true} />
+    return (
+      <SubaccountProvider>
+        <SubaccountTree rootAccount={data} depth={1} defaultExpanded={true} />
+      </SubaccountProvider>
+    )
   }
 
   if (!mountPoint) {

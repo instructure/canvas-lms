@@ -126,7 +126,7 @@ module AccountReports
         account_id: account.id,
         root_account_id: root_account.id
       }
-      students = root_account.pseudonyms.except(:preload)
+      students = root_account.pseudonyms.not_instructure_identity.except(:preload)
                              .select(<<~SQL.squish)
                                pseudonyms.id,
                                u.sortable_name        AS "student name",
@@ -313,6 +313,7 @@ module AccountReports
     # that have results. This prevents us from loading all this information just to
     # later discard it because there are no results from outcome service.
     def decorate_result(account, course, assignment, outcome, os_result)
+      is_inst_id = Pseudonym.column_names.include?("is_inst_id")
       students = User.select(<<~SQL.squish)
         distinct on (users.id, p.id, s.id)
         users.sortable_name                         AS "student name",
@@ -330,7 +331,9 @@ module AccountReports
                      .joins(<<~SQL.squish)
                        INNER JOIN #{Enrollment.quoted_table_name} e ON e.type = 'StudentEnrollment' AND e.root_account_id = #{course.root_account.id}
                          AND e.course_id = #{course.id} AND e.user_id = users.id #{"AND e.workflow_state <> 'deleted'" unless @include_deleted}
-                       INNER JOIN #{Pseudonym.quoted_table_name} p ON p.user_id = users.id #{"AND p.workflow_state<>'deleted'" unless @include_deleted}
+                       INNER JOIN #{Pseudonym.quoted_table_name} p ON p.user_id = users.id
+                         #{"AND p.is_inst_id = false" if is_inst_id}
+                         #{"AND p.workflow_state<>'deleted'" unless @include_deleted}
                        INNER JOIN #{CourseSection.quoted_table_name} s ON e.course_section_id = s.id
                        LEFT OUTER JOIN #{Submission.quoted_table_name} subs ON subs.assignment_id = #{os_result[:associated_asset_id].to_i}
                          AND subs.user_id = users.id AND subs.workflow_state <> 'deleted' AND subs.workflow_state <> 'unsubmitted'
@@ -441,6 +444,7 @@ module AccountReports
     end
 
     def outcome_results_scope
+      inst_identity = Pseudonym.column_names.include?("is_inst_id")
       students = account.learning_outcome_links.active
                         .select(<<~SQL.squish)
                           distinct on (#{outcome_order}, p.id, s.id, r.id, qr.id, q.id, a.id, subs.id, qs.id, aq.id)
@@ -488,6 +492,7 @@ module AccountReports
                           INNER JOIN #{ContentTag.quoted_table_name} ct ON r.content_tag_id = ct.id
                           INNER JOIN #{User.quoted_table_name} u ON u.id = r.user_id
                           INNER JOIN #{Pseudonym.quoted_table_name} p on p.user_id = r.user_id
+                            #{"AND p.is_inst_id = false" if inst_identity}
                           INNER JOIN #{Course.quoted_table_name} c ON r.context_id = c.id
                           INNER JOIN #{Account.quoted_table_name} acct ON acct.id = c.account_id
                           INNER JOIN #{Enrollment.quoted_table_name} e ON e.type = 'StudentEnrollment' and e.root_account_id = #{account.root_account.id}

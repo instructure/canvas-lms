@@ -91,7 +91,7 @@ export const handleMoveItem = (
       courseId,
       moduleId: hoverModuleId,
       oldModuleId: dragModuleId,
-      order: itemIds,
+      itemIds: itemIds,
     })
   } else {
     console.error('No valid item IDs to reorder')

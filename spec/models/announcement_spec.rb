@@ -319,12 +319,12 @@ describe Announcement do
       student_in_course(active_all: true)
     end
 
-    include_examples "expected_values_for_teacher_student", true, true
+    it_behaves_like "expected_values_for_teacher_student", true, true
 
     context "when locked" do
       let(:announcement) { @course.announcements.create!(message: "announcement", locked: true) }
 
-      include_examples "expected_values_for_teacher_student", true, false
+      it_behaves_like "expected_values_for_teacher_student", true, false
     end
   end
 end

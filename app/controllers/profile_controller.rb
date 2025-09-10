@@ -161,6 +161,7 @@ class ProfileController < ApplicationController
   before_action :require_password_session, only: %i[communication communication_update update]
 
   include HorizonMode
+
   before_action :load_canvas_career, only: %i[show settings communication content_shares qr_mobile_login]
 
   include Api::V1::Avatar
@@ -231,7 +232,12 @@ class ProfileController < ApplicationController
     register_cc_tabs.push("sms") if current_mfa_settings != :disabled && otp_via_sms_in_us_region?
     register_cc_tabs.push("slack") if @user.account.feature_enabled?(:slack_notifications)
     is_default_account = @domain_root_account == Account.default
-    can_update_tokens = @current_user.access_tokens.temp_record.grants_right?(logged_in_user, :update)
+    can_update_tokens = @current_user
+                        .access_tokens
+                        .temp_record
+                        .grants_right?(logged_in_user,
+                                       AccessToken.account_session_for_permissions(@domain_root_account),
+                                       :update)
     google_drive_oauth_url = oauth_url(service: "google_drive", return_to: settings_profile_url)
     js_env({ enable_gravatar: @domain_root_account&.enable_gravatar?, register_cc_tabs:, is_default_account:, google_drive_oauth_url:, PERMISSIONS: { can_update_tokens: } })
     respond_to do |format|

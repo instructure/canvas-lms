@@ -17,16 +17,31 @@
  */
 
 import {render, screen, fireEvent, act} from '@testing-library/react'
+import {userEvent} from '@testing-library/user-event'
 import {ButtonBlockIndividualButtonSettings} from '../ButtonBlockIndividualButtonSettings'
 import {ButtonData, ButtonBlockIndividualButtonSettingsProps} from '../types'
 
-const createEmptyButton = (id: number, text: string = ''): ButtonData => ({
+const createButton = (id: number, options: Partial<ButtonData> = {}): ButtonData => ({
   id,
-  text,
+  text: '',
+  url: '',
+  linkOpenMode: 'new-tab',
+  primaryColor: '#000000',
+  secondaryColor: '#FFFFFF',
+  style: 'filled',
+  ...options,
 })
 
 const defaultProps: ButtonBlockIndividualButtonSettingsProps = {
-  initialButtons: [createEmptyButton(1, 'Button 1'), createEmptyButton(2, 'Button 2')],
+  backgroundColor: '#FFFFFF',
+  initialButtons: [
+    createButton(1, {
+      text: 'Button 1',
+    }),
+    createButton(2, {
+      text: 'Button 2',
+    }),
+  ],
   onButtonsChange: jest.fn(),
 }
 
@@ -100,9 +115,17 @@ describe('ButtonBlockIndividualButtonSettings', () => {
 
       expect(screen.getByTestId('button-settings-toggle-3')).toBeVisible()
       expect(buttonsChanged).toHaveBeenCalledWith([
-        {id: 1, text: 'Button 1'},
-        {id: 2, text: 'Button 2'},
-        {id: 3, text: ''},
+        createButton(1, {
+          text: 'Button 1',
+        }),
+        createButton(2, {
+          text: 'Button 2',
+        }),
+        createButton(3, {
+          text: '',
+          primaryColor: '#2B7ABC',
+          secondaryColor: '#FFFFFF',
+        }),
       ])
     })
 
@@ -117,7 +140,46 @@ describe('ButtonBlockIndividualButtonSettings', () => {
       })
 
       expect(screen.queryByTestId('button-settings-toggle-1')).not.toBeInTheDocument()
-      expect(buttonsChanged).toHaveBeenCalledWith([{id: 2, text: 'Button 2'}])
+      expect(buttonsChanged).toHaveBeenCalledWith([createButton(2, {text: 'Button 2'})])
+    })
+
+    describe('focus after delete', () => {
+      const renderFocusTest = (onButtonsChange = jest.fn()) => {
+        const propsWithThreeButtons = {
+          ...defaultProps,
+          initialButtons: [
+            createButton(1, {text: 'Button 1'}),
+            createButton(2, {text: 'Button 2'}),
+            createButton(3, {text: 'Button 3'}),
+          ],
+          onButtonsChange,
+        }
+        render(<ButtonBlockIndividualButtonSettings {...propsWithThreeButtons} />)
+        return onButtonsChange
+      }
+
+      const deleteButton = (buttonId: number) => {
+        act(() => {
+          fireEvent.click(screen.getByTestId(`button-settings-delete-${buttonId}`))
+        })
+      }
+
+      const expectToggleToHaveFocus = (buttonId: number) => {
+        const toggle = screen.getByTestId(`button-settings-toggle-${buttonId}`)
+        expect(toggle.querySelector('button')).toHaveFocus()
+      }
+
+      it('focuses on the button above after deleting a button', () => {
+        renderFocusTest()
+        deleteButton(2)
+        expectToggleToHaveFocus(1)
+      })
+
+      it('focuses on the next button after deleting the first button', () => {
+        renderFocusTest()
+        deleteButton(1)
+        expectToggleToHaveFocus(2)
+      })
     })
 
     it('updates button text', () => {
@@ -133,8 +195,145 @@ describe('ButtonBlockIndividualButtonSettings', () => {
       })
 
       expect(buttonsChanged).toHaveBeenCalledWith([
-        {id: 1, text: 'Updated Button 1'},
-        {id: 2, text: 'Button 2'},
+        createButton(1, {text: 'Updated Button 1'}),
+        createButton(2, {text: 'Button 2'}),
+      ])
+    })
+
+    describe('updates button color', () => {
+      it('updates button background color', async () => {
+        const buttonsChanged = jest.fn()
+        const newColor = '#FF0000'
+        render(
+          <ButtonBlockIndividualButtonSettings
+            {...defaultProps}
+            onButtonsChange={buttonsChanged}
+          />,
+        )
+        clickToggleButton(1)
+
+        const colorInput = screen.getByLabelText(/background color/i)
+
+        await userEvent.clear(colorInput)
+        await userEvent.type(colorInput, newColor)
+
+        expect(buttonsChanged).toHaveBeenCalledWith([
+          createButton(1, {text: 'Button 1', primaryColor: newColor}),
+          createButton(2, {text: 'Button 2'}),
+        ])
+      })
+
+      it('updates button text color', async () => {
+        const buttonsChanged = jest.fn()
+        const newColor = '#051b53ff'
+        render(
+          <ButtonBlockIndividualButtonSettings
+            {...defaultProps}
+            onButtonsChange={buttonsChanged}
+          />,
+        )
+        clickToggleButton(1)
+
+        const colorInput = screen.getByLabelText(/text color/i)
+
+        await userEvent.clear(colorInput)
+        await userEvent.type(colorInput, newColor)
+
+        expect(buttonsChanged).toHaveBeenCalledWith([
+          createButton(1, {text: 'Button 1', secondaryColor: newColor}),
+          createButton(2, {text: 'Button 2'}),
+        ])
+      })
+    })
+
+    describe('button style', () => {
+      const renderStyleTest = (onButtonsChange = jest.fn()) => {
+        const propsWithStyles = {
+          ...defaultProps,
+          initialButtons: [
+            createButton(1, {text: 'Button 1', style: 'filled'}),
+            createButton(2, {text: 'Button 2', style: 'outlined'}),
+          ],
+          onButtonsChange,
+        }
+        render(<ButtonBlockIndividualButtonSettings {...propsWithStyles} />)
+        return onButtonsChange
+      }
+
+      it('updates button style to outlined', () => {
+        const buttonsChanged = renderStyleTest()
+        clickToggleButton(1)
+
+        fireEvent.click(screen.getByTestId('select-button-style-dropdown'))
+        fireEvent.click(screen.getByText('Outlined'))
+
+        expect(buttonsChanged).toHaveBeenCalledWith([
+          createButton(1, {text: 'Button 1', style: 'outlined'}),
+          createButton(2, {text: 'Button 2', style: 'outlined'}),
+        ])
+      })
+
+      it('button color picker is shown, when style is outlined', () => {
+        renderStyleTest()
+        clickToggleButton(2)
+
+        expect(screen.getByText(/button color/i)).toBeInTheDocument()
+      })
+
+      it('updates button style to filled', () => {
+        const buttonsChanged = renderStyleTest()
+        clickToggleButton(2)
+
+        fireEvent.click(screen.getByTestId('select-button-style-dropdown'))
+        fireEvent.click(screen.getByText('Filled'))
+
+        expect(buttonsChanged).toHaveBeenCalledWith([
+          createButton(1, {text: 'Button 1', style: 'filled'}),
+          createButton(2, {text: 'Button 2', style: 'filled'}),
+        ])
+      })
+
+      it('both color picker is visible, when style is filled', () => {
+        renderStyleTest()
+        clickToggleButton(1)
+
+        expect(screen.getByText(/background color/i)).toBeInTheDocument()
+        expect(screen.getByText(/text color/i)).toBeInTheDocument()
+      })
+    })
+
+    it('updates button url', () => {
+      const buttonsChanged = jest.fn()
+      render(
+        <ButtonBlockIndividualButtonSettings {...defaultProps} onButtonsChange={buttonsChanged} />,
+      )
+
+      clickToggleButton(1)
+      const buttonUrlInput = screen.getByRole('textbox', {name: /url/i})
+      act(() => {
+        fireEvent.change(buttonUrlInput, {target: {value: 'https://example.com'}})
+      })
+
+      expect(buttonsChanged).toHaveBeenCalledWith([
+        createButton(1, {text: 'Button 1', url: 'https://example.com'}),
+        createButton(2, {text: 'Button 2'}),
+      ])
+    })
+
+    it('updates button linkOpenMode', () => {
+      const buttonsChanged = jest.fn()
+      render(
+        <ButtonBlockIndividualButtonSettings {...defaultProps} onButtonsChange={buttonsChanged} />,
+      )
+
+      clickToggleButton(1)
+
+      fireEvent.click(screen.getByLabelText(/how to open link/i))
+      fireEvent.click(screen.getByText(/open in the current tab/i))
+
+      expect(buttonsChanged).toHaveBeenCalledWith([
+        createButton(1, {text: 'Button 1', linkOpenMode: 'same-tab'}),
+        createButton(2, {text: 'Button 2'}),
       ])
     })
   })

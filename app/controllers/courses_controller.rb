@@ -368,6 +368,7 @@ class CoursesController < ApplicationController
   before_action :check_horizon_redirect, only: [:show]
 
   include HorizonMode
+
   before_action :load_canvas_career, only: %i[settings index]
 
   include Api::V1::Course
@@ -1365,6 +1366,7 @@ class CoursesController < ApplicationController
   end
 
   include Api::V1::PreviewHtml
+
   # @API Preview processed html
   #
   # Preview html content processed for this course
@@ -1388,6 +1390,7 @@ class CoursesController < ApplicationController
   end
 
   include Api::V1::StreamItem
+
   # @API Course activity stream
   # Returns the current user's course-specific activity stream, paginated.
   #
@@ -1413,6 +1416,7 @@ class CoursesController < ApplicationController
   end
 
   include Api::V1::TodoItem
+
   # @API Course TODO items
   # Returns the current user's course-specific todo items.
   #
@@ -1595,7 +1599,8 @@ class CoursesController < ApplicationController
 
       js_permissions = {
         can_manage_courses: @context.account.grants_right?(@current_user, session, :manage_courses_admin),
-        manage_grading_schemes: @context.grants_right?(@current_user, session, :manage_grades),
+        manage_grading_schemes: @context.grants_right?(@current_user, session, :manage_grading_schemes),
+        set_grading_scheme: @context.grants_right?(@current_user, session, :set_grading_scheme),
         manage_students: @context.grants_right?(@current_user, session, :manage_students),
         manage_account_settings: @context.account.grants_right?(@current_user, session, :manage_account_settings),
         manage_feature_flags: @context.grants_right?(@current_user, session, :manage_feature_flags),
@@ -2286,7 +2291,7 @@ class CoursesController < ApplicationController
         end
 
         @accessibility_scan_enabled =
-          @context.feature_enabled?(:accessibility_tab_enable) ? !@context.exceeds_accessibility_scan_limit? : false
+          @context.root_account.enable_content_a11y_checker? ? !@context.exceeds_accessibility_scan_limit? : false
       end
 
       return if check_for_xlist
@@ -3297,6 +3302,11 @@ class CoursesController < ApplicationController
         params_for_update.delete :name
         params_for_update.delete :course_code
       end
+      if !@course.account.grants_right?(@current_user, session, :manage_courses_admin) &&
+         @course.root_account.settings[:restrict_grading_scheme_editing_to_admins]
+        params_for_update.delete :grading_standard_enabled
+        params_for_update.delete :grading_standard_id
+      end
       params[:course][:sis_source_id] = params[:course].delete(:sis_course_id) if api_request?
       if (sis_id = params[:course].delete(:sis_source_id)) &&
          sis_id != @course.sis_source_id &&
@@ -3374,6 +3384,15 @@ class CoursesController < ApplicationController
       if @course.enrollment_term && !restrict_enrollments_to_course_dates
         params_for_update[:start_at] = nil if @course.unpublished?
         params_for_update[:conclude_at] = nil
+      end
+      can_change_csp = @course.account.grants_right?(@current_user, session, :manage_courses_admin)
+      disable_csp = params_for_update.delete(:disable_csp)
+      if can_change_csp && !disable_csp.nil?
+        if value_to_boolean(disable_csp)
+          @course.disable_csp!
+        elsif !@course.csp_inherited?
+          @course.inherit_csp!
+        end
       end
 
       @default_wiki_editing_roles_was = @course.default_wiki_editing_roles || "teachers"
@@ -3799,7 +3818,7 @@ class CoursesController < ApplicationController
   #
   # @argument permissions[] [String]
   #   List of permissions to check against the authenticated user.
-  #   Permission names are documented in the {api:RoleOverridesController#add_role Create a role} endpoint.
+  #   Permission names are documented in the {api:RoleOverridesController#manageable_permissions List assignable permissions} endpoint.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/permissions \
@@ -4129,7 +4148,7 @@ class CoursesController < ApplicationController
     scan_id = params.require(:scan_id)
 
     service = YoutubeMigrationService.new(@context)
-    progress = service.convert_embed(scan_id, embed)
+    progress = service.convert_embed(scan_id, embed, user_uuid: @current_user.uuid)
 
     render json: { id: progress.id }, status: :ok
   end
@@ -4405,7 +4424,7 @@ class CoursesController < ApplicationController
        @context.open_enrollment &&
        (!@context_enrollment || !@context_enrollment.active?)
       :enroll
-    elsif @context_enrollment&.self_enrolled && @context_enrollment&.active?
+    elsif @context_enrollment&.self_enrolled && @context_enrollment.active?
       :unenroll
     end
   end
@@ -4513,7 +4532,8 @@ class CoursesController < ApplicationController
       :default_due_time,
       :conditional_release,
       :post_manually,
-      :horizon_course
+      :horizon_course,
+      :disable_csp
     )
   end
 

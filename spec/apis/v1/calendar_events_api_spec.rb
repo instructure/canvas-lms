@@ -5434,7 +5434,7 @@ describe CalendarEventsApiController, type: :request do
       get "/feeds/calendars/#{@user.feed_code}.ics"
       expect(response).to be_successful
       cal = Icalendar::Calendar.parse(response.body.dup).first
-      all_day_event = (cal.events.select { |e| e.summary.include? "i am all day" }).first
+      all_day_event = cal.events.find { |e| e.summary.include? "i am all day" }
       expect(all_day_event.dtstart).to eq(due_at.to_date)
       expect(all_day_event.dtend).to be_nil
     end

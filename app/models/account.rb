@@ -30,6 +30,7 @@ class Account < ActiveRecord::Base
   include Workflow
   include BrandConfigHelpers
   include Canvas::Security::PasswordPolicyAccountSettingValidator
+
   belongs_to :root_account, class_name: "Account"
   belongs_to :parent_account, class_name: "Account"
 
@@ -184,10 +185,10 @@ class Account < ActiveRecord::Base
   after_update :clear_special_account_cache_if_special
 
   after_update :clear_cached_short_name, if: :saved_change_to_name?
-
   after_update :log_rqd_setting_enable_or_disable
-
   after_create :create_default_objects
+
+  after_commit :enqueue_a11y_scan_if_enabled, on: :update
 
   serialize :settings, type: Hash
   include TimeZoneHelper
@@ -214,9 +215,11 @@ class Account < ActiveRecord::Base
   validates :account_calendar_subscription_type, inclusion: { in: CALENDAR_SUBSCRIPTION_TYPES }
   validate :validate_number_separators, if: ->(a) { a.settings_changed? && (a.settings.dig(:decimal_separator, :value) != a.settings_was.dig(:decimal_separator, :value) || a.settings.dig(:thousand_separator, :value) != a.settings_was.dig(:thousand_separator, :value)) }
   include StickySisFields
+
   are_sis_sticky :name, :parent_account_id
 
   include FeatureFlags
+
   def feature_flag_cache
     MultiCache.cache
   end
@@ -338,7 +341,8 @@ class Account < ActiveRecord::Base
   add_setting :show_scheduler, boolean: true, root_only: true, default: false
   add_setting :enable_profiles, boolean: true, root_only: true, default: false
   add_setting :enable_turnitin, boolean: true, default: false
-  add_setting :suppress_assignments, boolean: true, default: false, root_only: true
+  add_setting :enable_content_a11y_checker, boolean: true, root_only: true, default: false
+  add_setting :suppress_assignments, boolean: true, root_only: true, default: false
   add_setting :mfa_settings, root_only: true
   add_setting :mobile_qr_login_is_enabled, boolean: true, root_only: true, default: true
   add_setting :admins_can_change_passwords, boolean: true, root_only: true, default: false
@@ -409,6 +413,7 @@ class Account < ActiveRecord::Base
   add_setting :disable_login_search_indexing, boolean: true, root_only: true, default: false
   add_setting :allow_additional_email_at_registration, boolean: true, root_only: true, default: false
   add_setting :limit_personal_access_tokens, boolean: true, root_only: true, default: false
+  add_setting :restrict_personal_access_tokens_from_students, boolean: true, root_only: true, default: false
   add_setting :show_sections_in_course_tray, boolean: true, root_only: true, default: true
 
   # Allow enabling metrics like Heap for sandboxes and other accounts without Salesforce data
@@ -436,6 +441,7 @@ class Account < ActiveRecord::Base
 
   add_setting :enable_limited_access_for_students, boolean: true, root_only: false, default: false, inheritable: false
   add_setting :allow_assign_to_differentiation_tags, boolean: true, root_only: false, default: false, inheritable: true
+  add_setting :restrict_grading_scheme_editing_to_admins, boolean: true, root_only: true, default: false
 
   add_setting :horizon_account, boolean: true, default: false, inheritable: true
 
@@ -1692,6 +1698,9 @@ class Account < ActiveRecord::Base
       limited_access_for_user?(user)
     end
     can :make_submission_comments
+
+    given { |user| grants_right?(user, :manage_grades) }
+    can :manage_grading_schemes
   end
 
   def reload(*)
@@ -2854,5 +2863,16 @@ class Account < ActiveRecord::Base
 
     # If this is the root account, it'll be saved shortly since this is called as a before_save
     root_account.save! unless root_account?
+  end
+
+  def enqueue_a11y_scan_if_enabled
+    return unless root_account?
+    return unless saved_change_to_settings?
+    return unless enable_content_a11y_checker?
+
+    old_settings, = saved_change_to_settings
+    return if old_settings[:enable_content_a11y_checker]
+
+    Accessibility::RootAccountScannerService.call(account: self)
   end
 end

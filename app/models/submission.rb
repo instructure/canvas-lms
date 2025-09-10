@@ -159,7 +159,7 @@ class Submission < ActiveRecord::Base
   has_many :visible_submission_comments,
            -> { published.visible.for_final_grade.order(:created_at, :id) },
            class_name: "SubmissionComment"
-  has_many :hidden_submission_comments, -> { order("created_at, id").where(provisional_grade_id: nil, hidden: true) }, class_name: "SubmissionComment"
+  has_many :hidden_submission_comments, -> { order(:created_at, :id).where(provisional_grade_id: nil, hidden: true) }, class_name: "SubmissionComment"
   has_many :assessment_requests, as: :asset
   has_many :assigned_assessments, class_name: "AssessmentRequest", as: :assessor_asset
   has_many :rubric_assessments, as: :artifact
@@ -242,7 +242,7 @@ class Submission < ActiveRecord::Base
       .joins(:assignment)
       .joins("JOIN #{Course.quoted_table_name} ON courses.id=assignments.context_id")
       .where("graded_at>? AND user_id=? AND muted=?", date, user_id, false)
-      .order("graded_at DESC")
+      .order(graded_at: :desc)
       .limit(limit)
   }
 
@@ -793,6 +793,7 @@ class Submission < ActiveRecord::Base
 
   def plaintext_body
     extend HtmlTextHelper
+
     strip_tags((body || "").gsub(%r{<\s*br\s*/>}, "\n<br/>").gsub(%r{</p>}, "</p>\n"))
   end
 
@@ -947,23 +948,52 @@ class Submission < ActiveRecord::Base
   def originality_report_url(asset_string, user, attempt = nil)
     return unless grants_right?(user, :view_turnitin_report)
 
-    version_sub = if attempt.present?
-                    (attempt.to_i == self.attempt) ? self : versions.find { |v| v.model&.attempt == attempt.to_i }&.model
-                  end
-    requested_attachment = all_versioned_attachments.find_by_asset_string(asset_string) unless asset_string == self.asset_string
-    scope = association(:originality_reports).loaded? ? versioned_originality_reports : originality_reports
-    scope = scope.where(submission_time: version_sub.submitted_at) if version_sub
-    # This ordering ensures that if multiple reports exist for this submission and attachment combo,
-    # we grab the desired report. This is the reversed ordering of
-    # OriginalityReport::PREFERRED_STATE_ORDER
-    report = scope.where(attachment: requested_attachment).order(Arel.sql("CASE
-      WHEN workflow_state = 'scored' THEN 0
-      WHEN workflow_state = 'error' THEN 1
-      WHEN workflow_state = 'pending' THEN 2
-      END"),
-                                                                 updated_at: :desc).first
+    # Find the attachment, returning early if requested but not found.
+    is_attachment_request = (asset_string != self.asset_string)
+    requested_attachment = find_versioned_attachment(asset_string) if is_attachment_request
+    return nil if is_attachment_request && requested_attachment.nil?
+
+    # Start with a base scope for reports.
+    base_scope = association(:originality_reports).loaded? ? versioned_originality_reports : originality_reports
+
+    report = nil
+
+    # Try to find a report for the specific attempt.
+    if attempt.present?
+      submission_version = submission_for_attempt(attempt)
+      if submission_version
+        attempt_scope = base_scope.where(submission_time: submission_version.submitted_at)
+        report = find_preferred_report(attempt_scope, requested_attachment)
+      end
+    end
+
+    # If no report was found (or no attempt was given), search all attempts as a fallback.
+    # We sometimes show scores for the same attachment from a different attempt (see 32f7585d)
+    report ||= find_preferred_report(base_scope, requested_attachment)
+
+    # Return the final launch path.
     report&.report_launch_path(assignment)
   end
+
+  def submission_for_attempt(attempt_number)
+    return self if attempt_number.to_i == attempt
+
+    versions.find { |v| v.model&.attempt == attempt_number.to_i }&.model
+  end
+  private :submission_for_attempt
+
+  def find_versioned_attachment(asset_string)
+    all_versioned_attachments.find_by_asset_string(asset_string)
+  end
+  private :find_versioned_attachment
+
+  def find_preferred_report(scope, attachment)
+    scope.where(attachment:)
+         .in_order_of(:workflow_state, %w[scored error pending])
+         .order(updated_at: :desc)
+         .first
+  end
+  private :find_preferred_report
 
   def has_originality_report?
     versioned_originality_reports.present?

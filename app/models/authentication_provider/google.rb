@@ -20,6 +20,7 @@
 
 class AuthenticationProvider::Google < AuthenticationProvider::OpenIDConnect
   include AuthenticationProvider::PluginSettings
+
   self.plugin = :google_drive
   plugin_settings :client_id, client_secret: :client_secret_dec
 

@@ -19,11 +19,63 @@
 import {Button} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {SingleButtonProps} from './types'
+import {alpha} from '@instructure/ui-color-utils'
+import {BaseButtonTheme} from '@instructure/shared-types'
+import {getAdjustedColor} from './getAdjustedColor'
 
 const I18n = createI18nScope('block_content_editor')
 
-export const SingleButton = (props: SingleButtonProps) => {
-  const buttonText = props.button.text?.trim() || I18n.t('Button')
+export const SingleButton = ({
+  button,
+  isFullWidth,
+  onButtonClick,
+  focusHandler,
+}: SingleButtonProps) => {
+  const buttonText = button.text.trim() || I18n.t('Button')
 
-  return <Button display={props.isFullWidth ? 'block' : 'inline-block'}>{buttonText}</Button>
+  const url = button.url.trim()
+  const shouldUseLink = !onButtonClick && url
+  const isNewTabLink = button.linkOpenMode === 'new-tab'
+  const href = shouldUseLink ? url : undefined
+
+  const boxShadow = 'inset 0 0 0.1875rem 0.0625rem'
+
+  const adjustedPrimaryColor = getAdjustedColor(button.primaryColor)
+  const adjustedBoxShadow = `${boxShadow} ${alpha(adjustedPrimaryColor, 28)}`
+
+  const themeOverride = (): Partial<BaseButtonTheme> => {
+    return {
+      secondaryActiveBackground: adjustedPrimaryColor,
+      secondaryActiveBoxShadow: adjustedBoxShadow,
+      secondaryBackground: button.primaryColor,
+      secondaryBorderColor: button.primaryColor,
+      secondaryColor: button.secondaryColor,
+      secondaryHoverBackground: adjustedPrimaryColor,
+      secondaryGhostColor: adjustedPrimaryColor,
+      secondaryGhostBorderColor: adjustedPrimaryColor,
+      secondaryGhostHoverBackground: `${alpha(adjustedPrimaryColor, 10)}`,
+      secondaryGhostActiveBoxShadow: adjustedBoxShadow,
+    }
+  }
+
+  const buttonActionProps = onButtonClick
+    ? {onClick: onButtonClick as () => void}
+    : {
+        href,
+        target: isNewTabLink ? '_blank' : undefined,
+        rel: isNewTabLink ? 'noopener noreferrer' : undefined,
+      }
+
+  return (
+    <Button
+      elementRef={el => focusHandler?.(el as HTMLElement)}
+      display={isFullWidth ? 'block' : 'inline-block'}
+      withBackground={button.style == 'filled'}
+      themeOverride={themeOverride}
+      {...buttonActionProps}
+      data-singlebutton
+    >
+      {buttonText}
+    </Button>
+  )
 }

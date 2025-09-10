@@ -1001,6 +1001,8 @@ describe "Outcomes API", type: :request do
       end
 
       it "does not allow student to return aligned assignments" do
+        expect_any_instance_of(OutcomesApiController).to receive(:get_lmgb_results).with(any_args).and_return([])
+        expect_any_instance_of(OutcomesApiController).to receive(:get_outcome_alignments).with(any_args).and_return([])
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/outcome_alignments?student_id=#{@student.id}",
                         controller: "outcomes_api",
@@ -1013,6 +1015,8 @@ describe "Outcomes API", type: :request do
 
       it "allows teacher to return aligned assignments for a student" do
         @user = @teacher
+        expect_any_instance_of(OutcomesApiController).to receive(:get_lmgb_results).with(any_args).and_return([])
+        expect_any_instance_of(OutcomesApiController).to receive(:get_outcome_alignments).with(any_args).and_return([])
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/outcome_alignments?student_id=#{@student.id}",
                         controller: "outcomes_api",
@@ -1055,6 +1059,8 @@ describe "Outcomes API", type: :request do
       end
 
       it "returns aligned assignments and assessments for a student" do
+        expect_any_instance_of(OutcomesApiController).to receive(:get_lmgb_results).with(any_args).and_return([])
+        expect_any_instance_of(OutcomesApiController).to receive(:get_outcome_alignments).with(any_args).and_return([])
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/outcome_alignments?student_id=#{@student.id}",
                         controller: "outcomes_api",
@@ -1067,6 +1073,8 @@ describe "Outcomes API", type: :request do
       end
 
       it "allows teacher to return aligned assignments for a student" do
+        expect_any_instance_of(OutcomesApiController).to receive(:get_lmgb_results).with(any_args).and_return([])
+        expect_any_instance_of(OutcomesApiController).to receive(:get_outcome_alignments).with(any_args).and_return([])
         @user = @teacher
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/outcome_alignments?student_id=#{@student.id}",
@@ -1079,6 +1087,8 @@ describe "Outcomes API", type: :request do
       end
 
       it "allows observer to return aligned assignments for a student" do
+        expect_any_instance_of(OutcomesApiController).to receive(:get_lmgb_results).with(any_args).and_return([])
+        expect_any_instance_of(OutcomesApiController).to receive(:get_outcome_alignments).with(any_args).and_return([])
         @user = @observer
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/outcome_alignments?student_id=#{@student.id}",
@@ -1097,6 +1107,8 @@ describe "Outcomes API", type: :request do
         bank = quiz.quiz_questions[0].assessment_question.assessment_question_bank
         outcome.align(bank, course)
         generate_quiz_submission(quiz, student: @student)
+        expect_any_instance_of(OutcomesApiController).to receive(:get_lmgb_results).with(any_args).and_return([])
+        expect_any_instance_of(OutcomesApiController).to receive(:get_outcome_alignments).with(any_args).and_return([])
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/outcome_alignments?student_id=#{@student.id}",
                         controller: "outcomes_api",
@@ -1111,6 +1123,8 @@ describe "Outcomes API", type: :request do
         assignment_model({ course: @course, only_visible_to_overrides: true })
         section = @course.course_sections.create!(name: "test section")
         create_section_override_for_assignment(@assignment, course_section: section)
+        allow_any_instance_of(OutcomesApiController).to receive(:get_outcome_alignments).and_return []
+        expect_any_instance_of(OutcomesApiController).to receive(:get_lmgb_results).with(any_args).and_return([])
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/outcome_alignments?student_id=#{@student.id}",
                         controller: "outcomes_api",
@@ -1209,24 +1223,7 @@ describe "Outcomes API", type: :request do
           }
         end
 
-        it "returns empty array for alignments when FF is disabled" do
-          @course.disable_feature!(:outcome_service_results_to_canvas)
-          expect_any_instance_of(OutcomesApiController).to receive(:find_outcomes_service_assignment_alignments).with(any_args).and_return([])
-          json = api_call(:get,
-                          "/api/v1/courses/#{@course.id}/outcome_alignments?student_id=#{@student.id}",
-                          controller: "outcomes_api",
-                          action: "outcome_alignments",
-                          course_id: @course.id.to_s,
-                          student_id: @student.id.to_s,
-                          format: "json")
-          expect(json.filter_map { |j| j["assignment_id"] }.sort).to eq([@assignment1.id, @assignment2.id, @quiz.assignment_id].sort)
-        end
-
         context "outcome_service_results_to_canvas FF is enabled" do
-          before do
-            @course.enable_feature!(:outcome_service_results_to_canvas)
-          end
-
           describe "returns empty array" do
             it "no alignments found in os" do
               # returns empty array for both os calls

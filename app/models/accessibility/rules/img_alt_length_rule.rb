@@ -25,7 +25,9 @@ module Accessibility
 
       MAX_LENGTH = 120
 
-      def self.test(elem)
+      # Accessibility::Rule methods
+
+      def test(elem)
         return nil if elem.tag_name != "img"
         return nil unless elem.attribute?("alt")
 
@@ -38,21 +40,7 @@ module Accessibility
         I18n.t("Alt text is longer than 120.") if alt.length > MAX_LENGTH
       end
 
-      def self.message
-        I18n.t("The alt text is too long. Alt text should ideally be under 120 characters,
-        so people using screen readers can quickly understand the important content of the image.")
-      end
-
-      def self.why
-        I18n.t("Alt text should be concise. When it's unnecessarily long, it can break the flow of screen reader users.
-        Unless the image conveys complex information, aim for 120 characters or fewer.")
-      end
-
-      def self.display_name
-        I18n.t("Alt text is too long")
-      end
-
-      def self.form(elem)
+      def form(elem)
         Accessibility::Forms::TextInputWithCheckboxField.new(
           checkbox_label: I18n.t("This image is decorative"),
           checkbox_subtext: I18n.t("This image is for visual decoration only and screen readers can skip it."),
@@ -66,7 +54,7 @@ module Accessibility
         )
       end
 
-      def self.generate_fix(elem)
+      def generate_fix(elem)
         return nil if elem.tag_name != "img"
         return nil unless elem.attribute?("src")
 
@@ -74,7 +62,7 @@ module Accessibility
         ImgAltRuleHelper.generate_alt_text(src)
       end
 
-      def self.fix!(elem, value)
+      def fix!(elem, value)
         if value == "" || value.nil?
           elem["role"] = "presentation"
         elsif value.length > MAX_LENGTH
@@ -85,6 +73,20 @@ module Accessibility
 
         elem["alt"] = value
         elem
+      end
+
+      def display_name
+        I18n.t("Alt text is too long")
+      end
+
+      def message
+        I18n.t("The alt text is too long. Alt text should ideally be under 120 characters,
+        so people using screen readers can quickly understand the important content of the image.")
+      end
+
+      def why
+        I18n.t("Alt text should be concise. When it's unnecessarily long, it can break the flow of screen reader users.
+        Unless the image conveys complex information, aim for 120 characters or fewer.")
       end
     end
   end

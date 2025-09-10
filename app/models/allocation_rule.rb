@@ -34,6 +34,7 @@ class AllocationRule < ApplicationRecord
 
   after_initialize :set_defaults
 
+  scope :active, -> { where.not(workflow_state: "deleted") }
   scope :for_user_in_course, lambda { |user_id, course_id|
     where(course_id:)
       .where(
@@ -67,23 +68,23 @@ class AllocationRule < ApplicationRecord
     eligible_students = assignment.students_with_visibility(assignment.context.participating_students_by_date.not_fake_student).pluck(:id)
 
     unless eligible_students.include?(assessor_id)
-      errors.add(:assessor_id, I18n.t("must be a student assigned to this assignment"))
+      errors.add(:assessor_id, I18n.t("assessor (%{assessor_id}) must be a student assigned to this assignment", assessor_id: assessor_id.to_s))
     end
 
     unless course.student_enrollments.active.where(user_id: assessor_id).exists?
-      errors.add(:assessor_id, I18n.t("must have an active enrollment in the course"))
+      errors.add(:assessor_id, I18n.t("assessor (%{assessor_id}) must have an active enrollment in the course", assessor_id: assessor_id.to_s))
     end
 
     unless eligible_students.include?(assessee_id)
-      errors.add(:assessee_id, I18n.t("must be a student with visibility to this assignment"))
+      errors.add(:assessee_id, I18n.t("assessee (%{assessee_id}) must be a student with visibility to this assignment", assessee_id: assessee_id.to_s))
     end
 
     unless course.student_enrollments.active.where(user_id: assessee_id).exists?
-      errors.add(:assessee_id, I18n.t("must have an active enrollment in the course"))
+      errors.add(:assessee_id, I18n.t("assessee (%{assessee_id}) must have an active enrollment in the course", assessee_id: assessee_id.to_s))
     end
 
     if assessor_id == assessee_id
-      errors.add(:assessee_id, I18n.t("cannot be the same as the assessor"))
+      errors.add(:assessee_id, I18n.t("assessee (%{assessee_id}) cannot be the same as the assessor", assessee_id: assessee_id.to_s))
     end
   end
 
@@ -97,22 +98,7 @@ class AllocationRule < ApplicationRecord
     existing_rules = existing_rules.where.not(id:) if persisted?
 
     if existing_rules.exists?
-      conflicting_rule = existing_rules.first
-      if review_permitted != conflicting_rule.review_permitted
-        if review_permitted
-          errors.add(:review_permitted, I18n.t("conflicts with existing rule that prohibits this review relationship"))
-        else
-          errors.add(:review_permitted, I18n.t("conflicts with existing rule that requires this review relationship"))
-        end
-      end
-
-      if must_review != conflicting_rule.must_review
-        if must_review
-          errors.add(:must_review, I18n.t("conflicts with existing rule that makes this review optional"))
-        else
-          errors.add(:must_review, I18n.t("conflicts with existing rule that requires this review"))
-        end
-      end
+      errors.add(applies_to_assessor ? :assessee_id : :assessor_id, I18n.t("conflicts with rule \"%{rule_text}\"", rule_text: format_rule_text(existing_rules.first)))
     end
 
     if must_review && assignment.peer_review_count.present? && assignment.peer_review_count > 0
@@ -151,6 +137,34 @@ class AllocationRule < ApplicationRecord
       assessee_name = User.find(assessee_id).name
       assessor_name = User.find(assessor_id).name
       errors.add(:assessee_id, I18n.t("conflicts with completed peer review. %{assessor_name} has already reviewed %{assessee_name}", assessor_name:, assessee_name:))
+    end
+  end
+
+  def format_rule_text(rule)
+    assessor_name = User.find(rule.assessor_id).name
+    assessee_name = User.find(rule.assessee_id).name
+    if rule.must_review
+      if rule.review_permitted
+        if rule.applies_to_assessor
+          I18n.t("%{assessor_name} must review %{assessee_name}", assessor_name:, assessee_name:)
+        else
+          I18n.t("%{assessee_name} must be reviewed by %{assessor_name}", assessor_name:, assessee_name:)
+        end
+      elsif rule.applies_to_assessor
+        I18n.t("%{assessor_name} must not review %{assessee_name}", assessor_name:, assessee_name:)
+      else
+        I18n.t("%{assessee_name} must not be reviewed by %{assessor_name}", assessor_name:, assessee_name:)
+      end
+    elsif rule.review_permitted
+      if rule.applies_to_assessor
+        I18n.t("%{assessor_name} should review %{assessee_name}", assessor_name:, assessee_name:)
+      else
+        I18n.t("%{assessee_name} should be reviewed by %{assessor_name}", assessor_name:, assessee_name:)
+      end
+    elsif rule.applies_to_assessor
+      I18n.t("%{assessor_name} should not review %{assessee_name}", assessor_name:, assessee_name:)
+    else
+      I18n.t("%{assessee_name} should not be reviewed by %{assessor_name}", assessor_name:, assessee_name:)
     end
   end
 end

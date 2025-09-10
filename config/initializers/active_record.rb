@@ -266,7 +266,7 @@ class ActiveRecord::Base
   end
 
   def touch_context
-    return if @@skip_touch_context ||= false || @skip_touch_context ||= false
+    return if @@skip_touch_context ||= @skip_touch_context ||= false
 
     self.class.connection.after_transaction_commit do
       if respond_to?(:context_type) && respond_to?(:context_id) && context_type && context_id
@@ -972,7 +972,7 @@ module UsefulFindInBatches
     end
     full_query = "COPY (#{relation_for_copy.to_sql}) TO STDOUT"
     conn = connection
-    full_query = conn.annotate_sql(full_query) if defined?(Marginalia)
+    full_query = ActiveRecord::QueryLogs.call(full_query, conn) if Rails.application.config.active_record.query_log_tags_enabled
     pool = conn.pool
     # remove the connection from the pool so that any queries executed
     # while we're running this will get a new connection
@@ -1770,9 +1770,6 @@ module Migrator
 
   def execute_migration_in_transaction(migration)
     old_in_migration, ActiveRecord::Base.in_migration = ActiveRecord::Base.in_migration, true
-    if defined?(Marginalia)
-      old_migration_name, Marginalia::Comment.migration = Marginalia::Comment.migration, migration.name
-    end
     if down? && !Rails.env.test? && !$confirmed_migrate_down
       require "highline"
       if HighLine.new.ask("Revert migration #{migration.name} (#{migration.version}) ? [y/N/a] > ") !~ /^([ya])/i
@@ -1785,7 +1782,6 @@ module Migrator
     super
   ensure
     ActiveRecord::Base.in_migration = old_in_migration
-    Marginalia::Comment.migration = old_migration_name if defined?(Marginalia)
   end
 end
 ActiveRecord::Migrator.prepend(Migrator)

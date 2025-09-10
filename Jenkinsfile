@@ -649,12 +649,6 @@ pipeline {
                       string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
                     ])
 
-                  // Trigger Crystalball map build if spec files were added or removed, will not vote on builds.
-                  // Only trigger for main-postmerge job.
-                  if (env.JOB_NAME == 'Canvas/main-postmerge' && configuration.isChangeMerged() && filesChangedStage.hasNewDeletedSpecFiles(buildConfig)) {
-                    build(wait: false, job: 'Canvas/helpers/crystalball-map')
-                  }
-
                   extendedStage('Flakey Spec Catcher')
                     .hooks(buildSummaryReportHooks.call())
                     .required(!configuration.isChangeMerged() && filesChangedStage.hasSpecFiles(buildConfig) || commitMessageFlag('force-failure-fsc') as Boolean)

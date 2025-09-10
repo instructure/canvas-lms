@@ -121,7 +121,7 @@ pipeline {
     POSTGRES_PREFIX = configuration.buildRegistryPath('postgres-migrations')
 
     IMAGE_CACHE_MERGE_SCOPE = configuration.gerritBranchSanitized()
-    RSPEC_PROCESSES = 6
+    RSPEC_PROCESSES = commitMessageFlag('rspecq-processes').asType(Integer)
 
     DYNAMODB_IMAGE_TAG = "$DYNAMODB_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
     POSTGRES_IMAGE_TAG = "$POSTGRES_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"

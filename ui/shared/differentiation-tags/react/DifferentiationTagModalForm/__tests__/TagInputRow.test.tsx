@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import TagInputRow, {TagInputRowProps} from '../TagInputRow'
 import '@testing-library/jest-dom'
@@ -64,10 +64,18 @@ describe('TagInputRow', () => {
     expect(onChangeMock).toHaveBeenCalled()
   })
 
-  it('calls onRemove when remove button is clicked', async () => {
+  it('calls onRemove when remove button is clicked then confirmed', async () => {
     render(<TagInputRow {...defaultProps} />)
     const removeButton = screen.getByTestId('remove-tag')
     await userEvent.click(removeButton)
+
+    const confirmButton = screen.getByTestId('continue-warning-modal')
+    await userEvent.click(confirmButton)
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('continue-warning-modal')).not.toBeInTheDocument()
+    })
+
     expect(onRemoveMock).toHaveBeenCalledWith(100)
   })
 

@@ -20,9 +20,570 @@
 
 # @API External Tools
 # API for accessing and configuring external tools on accounts and courses.
-# "External tools" are IMS LTI links: http://www.imsglobal.org/developers/LTI/index.cfm
+# "External tools" are IMS LTI links: http://www.imsglobal.org/developers/LTI/index.cfm.
 #
-# NOTE: Placements not documented here should be considered beta features and are not officially supported.
+# For a definitive list of all supported placements for external tools and more information
+# on configuring them,
+# see the <a href="file.placements_overview">Placements Documentation</a>.
+#
+# @model ContextExternalTool
+#     {
+#       "id": "ContextExternalTool",
+#       "description": "An external tool configured for a specific context",
+#       "properties": {
+#         "id": {
+#           "description": "The unique identifier for the external tool",
+#           "example": 37,
+#           "type": "integer"
+#         },
+#         "name": {
+#           "description": "The name of the external tool",
+#           "example": "Basic 1.1 tool",
+#           "type": "string"
+#         },
+#         "description": {
+#           "description": "A description of the external tool",
+#           "example": "Basic LTI 1.1 Tool",
+#           "type": "string"
+#         },
+#         "url": {
+#           "description": "The launch URL for the external tool",
+#           "example": "http://example.com/launch",
+#           "type": "string"
+#         },
+#         "domain": {
+#           "description": "The domain to match links against. Note that this doesn't contain the protocol.",
+#           "example": "example.com",
+#           "type": "string"
+#         },
+#         "consumer_key": {
+#           "description": "The consumer key used by the tool (The associated shared secret is not returned)",
+#           "example": "key",
+#           "type": "string"
+#         },
+#         "created_at": {
+#           "description": "Timestamp of the tool's creation",
+#           "example": "2037-07-21T13:29:31Z",
+#           "type": "string"
+#         },
+#         "updated_at": {
+#           "description": "Timestamp of the tool's last update",
+#           "example": "2037-07-28T19:38:31Z",
+#           "type": "string"
+#         },
+#         "privacy_level": {
+#           "description": "How much user information to send to the external tool",
+#           "example": "anonymous",
+#           "type": "string",
+#           "enum": ["anonymous", "name_only", "email_only", "public"]
+#         },
+#         "custom_fields": {
+#           "description": "Custom fields that will be sent to the tool consumer",
+#           "example": {"key": "value"},
+#           "type": "object"
+#         },
+#         "workflow_state": {
+#           "description": "The current state of the external tool",
+#           "example": "public",
+#           "type": "string",
+#           "enum": ["public", "anonymous", "deleted"]
+#         },
+#         "is_rce_favorite": {
+#           "description": "Boolean determining whether this tool should be in a preferred location in the RCE. Only present if the tool can be an RCE favorite.",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "is_top_nav_favorite": {
+#           "description": "Boolean determining whether this tool should have a dedicated button in Top Navigation. Only present if the tool can be a top nav favorite.",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "selection_width": {
+#           "description": "The pixel width of the iFrame that the tool will be rendered in",
+#           "example": 500,
+#           "type": "integer"
+#         },
+#         "selection_height": {
+#           "description": "The pixel height of the iFrame that the tool will be rendered in",
+#           "example": 500,
+#           "type": "integer"
+#         },
+#         "icon_url": {
+#           "description": "The URL for the tool icon",
+#           "example": "https://example.com/icon.png",
+#           "type": "string"
+#         },
+#         "not_selectable": {
+#           "description": "Whether the tool is not selectable from assignment and modules",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "version": {
+#           "description": "The LTI version of the tool",
+#           "example": "1.1",
+#           "type": "string",
+#           "enum": ["1.1", "1.3"]
+#         },
+#         "unified_tool_id": {
+#           "description": "The unique identifier for the tool in LearnPlatform",
+#           "example": null,
+#           "type": "string"
+#         },
+#         "developer_key_id": {
+#           "description": "The developer key id associated with this tool. Only present for LTI 1.3 tools.",
+#           "example": 123,
+#           "type": "integer"
+#         },
+#         "lti_registration_id": {
+#           "description": "The LTI registration id associated with this tool. Only present for LTI 1.3 tools.",
+#           "example": 456,
+#           "type": "integer"
+#         },
+#         "deployment_id": {
+#           "description": "The unique identifier for the deployment of the tool",
+#           "example": "37:b82229c6e10bcb87beb1f1b287faee560ddc3109",
+#           "type": "string"
+#         },
+#         "allow_membership_service_access": {
+#           "description": "Whether the tool can access the membership service. Only present if the feature is enabled.",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "prefer_sis_email": {
+#           "description": "Whether to send the SIS email address in launches",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "estimated_duration": {
+#           "description": "The estimated duration for completing this tool. Only present for horizon courses when the tool has an estimated duration.",
+#           "$ref": "EstimatedDuration"
+#         },
+#         "account_navigation": {
+#           "description": "Configuration for account navigation placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "analytics_hub": {
+#           "description": "Configuration for analytics hub placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "assignment_edit": {
+#           "description": "Configuration for assignment edit placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "assignment_group_menu": {
+#           "description": "Configuration for assignment group menu placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "assignment_index_menu": {
+#           "description": "Configuration for assignment index menu placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "assignment_menu": {
+#           "description": "Configuration for assignment menu placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "assignment_selection": {
+#           "description": "Configuration for assignment selection placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "assignment_view": {
+#           "description": "Configuration for assignment view placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "collaboration": {
+#           "description": "Configuration for collaboration placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "conference_selection": {
+#           "description": "Configuration for conference selection placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "course_assignments_menu": {
+#           "description": "Configuration for course assignments menu placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "course_home_sub_navigation": {
+#           "description": "Configuration for course home sub navigation placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "course_navigation": {
+#           "description": "Configuration for course navigation placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "course_settings_sub_navigation": {
+#           "description": "Configuration for course settings sub navigation placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "discussion_topic_index_menu": {
+#           "description": "Configuration for discussion topic index menu placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "discussion_topic_menu": {
+#           "description": "Configuration for discussion topic menu placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "editor_button": {
+#           "description": "Configuration for editor button placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "file_index_menu": {
+#           "description": "Configuration for file index menu placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "file_menu": {
+#           "description": "Configuration for file menu placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "global_navigation": {
+#           "description": "Configuration for global navigation placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "homework_submission": {
+#           "description": "Configuration for homework submission placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "link_selection": {
+#           "description": "Configuration for link selection placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "migration_selection": {
+#           "description": "Configuration for migration selection placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "module_group_menu": {
+#           "description": "Configuration for module group menu placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "module_index_menu": {
+#           "description": "Configuration for module index menu placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "module_index_menu_modal": {
+#           "description": "Configuration for module index menu modal placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "module_menu_modal": {
+#           "description": "Configuration for module menu modal placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "module_menu": {
+#           "description": "Configuration for module menu placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "page_index_menu": {
+#           "description": "Configuration for page index menu placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "page_menu": {
+#           "description": "Configuration for page menu placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "post_grades": {
+#           "description": "Configuration for post grades (sync grades) placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "quiz_index_menu": {
+#           "description": "Configuration for quiz index menu placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "quiz_menu": {
+#           "description": "Configuration for quiz menu placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "resource_selection": {
+#           "description": "Configuration for resource selection placement. Null if not configured for this placement. This placement is deprecated.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "similarity_detection": {
+#           "description": "Configuration for similarity detection placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "student_context_card": {
+#           "description": "Configuration for student context card placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "submission_type_selection": {
+#           "description": "Configuration for submission type selection placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "tool_configuration": {
+#           "description": "Configuration for tool configuration placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "top_navigation": {
+#           "description": "Configuration for top navigation placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "user_navigation": {
+#           "description": "Configuration for user navigation placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "wiki_index_menu": {
+#           "description": "Configuration for wiki index menu placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "wiki_page_menu": {
+#           "description": "Configuration for wiki page menu placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "ActivityAssetProcessor": {
+#           "description": "Configuration for activity asset processor placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "ActivityAssetProcessorContribution": {
+#           "description": "Configuration for activity asset processor contribution placement. Null if not configured for this placement.",
+#           "example": {"type": "ContextExternalToolPlacement"},
+#           "$ref": "ContextExternalToolPlacement"
+#         }
+#       }
+#     }
+#
+# @model ContextExternalToolPlacement
+#     {
+#       "id": "ContextExternalToolPlacement",
+#       "description": "Configuration for a specific placement of an external tool. If null, no configuration is present.",
+#       "properties": {
+#         "enabled": {
+#           "description": "Whether this placement is enabled",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "url": {
+#           "description": "The launch URL for this specific placement. Overrides the tool's default URL. For LTI 1.1 tools only.",
+#           "example": "http://example.com/launch?placement=course_navigation",
+#           "type": "string"
+#         },
+#         "target_link_uri": {
+#           "description": "The launch URL for this specific placement. Overrides the tool's default target_link_uri. For LTI 1.3 tools only.",
+#           "example": "http://example.com/launch?placement=course_navigation",
+#           "type": "string"
+#         },
+#         "text": {
+#           "description": "The text/label to display for this placement. Overridable by 'labels' in placement configuration.",
+#           "example": "Course Navigation Tool",
+#           "type": "string"
+#         },
+#         "label": {
+#           "description": "The localized label for this placement. This is the resolved text after applying internationalization.",
+#           "example": "Course Navigation Tool",
+#           "type": "string"
+#         },
+#         "labels": {
+#           "description": "Internationalization labels for this placement. Keys are locale codes, values are localized text.",
+#           "example": {"en": "Course Navigation", "es": "Navegación del Curso"},
+#           "type": "object"
+#         },
+#         "message_type": {
+#           "description": "The LTI message type for this placement. Not all placements support all message types.",
+#           "example": "LtiResourceLinkRequest",
+#           "type": "string",
+#           "enum": ["basic_lti_request", "ContentItemSelectionRequest", "LtiResourceLinkRequest", "LtiDeepLinkingRequest"]
+#         },
+#         "selection_width": {
+#           "description": "The width of the iframe or popup for this placement",
+#           "example": 500,
+#           "type": "integer"
+#         },
+#         "selection_height": {
+#           "description": "The height of the iframe or popup for this placement",
+#           "example": 500,
+#           "type": "integer"
+#         },
+#         "launch_width": {
+#           "description": "The width of the launch window. Not standard everywhere yet.",
+#           "example": 800,
+#           "type": "integer"
+#         },
+#         "launch_height": {
+#           "description": "The height of the launch window. Not standard everywhere yet.",
+#           "example": 600,
+#           "type": "integer"
+#         },
+#         "icon_url": {
+#           "description": "The URL of the icon for this placement",
+#           "example": "https://example.com/icon.png",
+#           "type": "string"
+#         },
+#         "canvas_icon_class": {
+#           "description": "The Canvas icon class to use for this placement instead of an icon URL",
+#           "example": "icon-lti",
+#           "type": "string"
+#         },
+#         "allow_fullscreen": {
+#           "description": "Whether to allow fullscreen mode for this placement (top_navigation placement only)",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "custom_fields": {
+#           "description": "Custom fields to be sent with this placement's launch. Merged with tool-level custom fields.",
+#           "example": {"placement_id": "course_nav", "special_param": "value"},
+#           "type": "object"
+#         },
+#         "visibility": {
+#           "description": "Controls who can see this placement",
+#           "example": "members",
+#           "type": "string",
+#           "enum": ["public", "members", "admins"]
+#         },
+#         "required_permissions": {
+#           "description": "Comma-separated list of Canvas permissions required to launch from this placement. The user must have all permissions in order to launch the tool.",
+#           "example": "manage_course_content_edit,manage_course_content_read",
+#           "type": "string"
+#         },
+#         "default": {
+#           "description": "Default display state for navigation placements. Only applies to account_navigation and course_navigation placements.",
+#           "example": "disabled",
+#           "type": "string",
+#           "enum": ["enabled", "disabled"]
+#         },
+#         "display_type": {
+#           "description": "The layout type to use when launching the tool. For global_navigation and analytics_hub, defaults to 'full_width'.",
+#           "example": "full_width_in_context",
+#           "type": "string",
+#           "enum": ["default", "full_width", "full_width_in_context", "full_width_with_nav", "in_nav_context", "borderless"]
+#         },
+#         "windowTarget": {
+#           "description": "When set to '_blank', opens placement in a new tab. Only '_blank' is supported.",
+#           "example": "_blank",
+#           "type": "string",
+#           "enum": ["_blank"]
+#         },
+#         "accept_media_types": {
+#           "description": "Comma-separated list of media types that the tool can accept. Only valid for file_menu placement.",
+#           "example": "image/*,video/*",
+#           "type": "string"
+#         },
+#         "use_tray": {
+#           "description": "If true, the tool will be launched in the tray. Only used by the editor_button placement.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "icon_svg_path_64": {
+#           "description": "An SVG path to use instead of an icon_url. Only valid for global_navigation placement.",
+#           "example": "M100,37L70.1,10.5v176H37...",
+#           "type": "string"
+#         },
+#         "root_account_only": {
+#           "description": "Whether this placement should only be available at the root account level. Only applies to account_navigation placement.",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "description": {
+#           "description": "A description of this placement. Only valid for submission_type_selection placement. Maximum length of 255 characters.",
+#           "example": "Submit your work using our external tool",
+#           "type": "string"
+#         },
+#         "require_resource_selection": {
+#           "description": "Whether resource selection is required for this placement. Only valid for submission_type_selection placement.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "prefer_sis_email": {
+#           "description": "If true, the tool will send the SIS email in the lis_person_contact_email_primary launch property. LTI 1.1 only.",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "oauth_compliant": {
+#           "description": "If true, query parameters from the launch URL will not be copied to the POST body. LTI 1.1 only.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "eula": {
+#           "description": "End User License Agreement configuration for ActivityAssetProcessor placement. Only valid for ActivityAssetProcessor placement.",
+#           "example": {
+#             "enabled": true,
+#             "target_link_uri": "https://example.com/eula",
+#             "custom_fields": {"agreement_version": "2.1"}
+#           },
+#           "type": "object",
+#           "properties": {
+#             "enabled": {
+#               "description": "Whether the EULA is enabled",
+#               "type": "boolean"
+#             },
+#             "target_link_uri": {
+#               "description": "The URI for the EULA",
+#               "type": "string"
+#             },
+#             "custom_fields": {
+#               "description": "Custom fields for the EULA",
+#               "type": "object"
+#             }
+#           }
+#         }
+#       }
+#     }
+#
+# @model EstimatedDuration
+#     {
+#       "id": "EstimatedDuration",
+#       "description": "An estimated duration for completing a learning activity",
+#       "properties": {
+#         "id": {
+#           "description": "The unique identifier for the estimated duration",
+#           "example": 123,
+#           "type": "integer"
+#         },
+#         "duration": {
+#           "description": "The estimated duration in ISO 8601 format",
+#           "example": "PT30M",
+#           "type": "string"
+#         },
+#         "created_at": {
+#           "description": "Timestamp of when the estimated duration was created",
+#           "example": "2024-01-01T00:00:00Z",
+#           "type": "string"
+#         },
+#         "updated_at": {
+#           "description": "Timestamp of when the estimated duration was last updated",
+#           "example": "2024-01-01T00:00:00Z",
+#           "type": "string"
+#         }
+#       }
+#     }
 class ExternalToolsController < ApplicationController
   class InvalidSettingsError < StandardError; end
 
@@ -62,73 +623,14 @@ class ExternalToolsController < ApplicationController
   # @argument placement [String]
   #   The placement type to filter by.
   #
+  #   Return all tools at the current context as well as all tools from the parent, and filter the tools list to only those with a placement of 'editor_button'
   # @example_request
   #
-  #   Return all tools at the current context as well as all tools from the parent, and filter the tools list to only those with a placement of 'editor_button'
   #   curl 'https://<canvas>/api/v1/courses/<course_id>/external_tools?include_parents=true&placement=editor_button' \
   #        -H "Authorization: Bearer <token>"
   #
-  # @example_response
-  #     [
-  #      {
-  #        "id": 1,
-  #        "domain": "domain.example.com",
-  #        "url": "http://www.example.com/ims/lti",
-  #        "consumer_key": "key",
-  #        "name": "LTI Tool",
-  #        "description": "This is for cool things",
-  #        "created_at": "2037-07-21T13:29:31Z",
-  #        "updated_at": "2037-07-28T19:38:31Z",
-  #        "privacy_level": "anonymous",
-  #        "custom_fields": {"key": "value"},
-  #        "is_rce_favorite": false,
-  #        "is_top_nav_favorite": false,
-  #        "account_navigation": {
-  #             "canvas_icon_class": "icon-lti",
-  #             "icon_url": "...",
-  #             "text": "...",
-  #             "url": "...",
-  #             "label": "...",
-  #             "selection_width": 50,
-  #             "selection_height":50
-  #        },
-  #        "assignment_selection": null,
-  #        "course_home_sub_navigation": null,
-  #        "course_navigation": {
-  #             "canvas_icon_class": "icon-lti",
-  #             "icon_url": "...",
-  #             "text": "...",
-  #             "url": "...",
-  #             "default": "disabled",
-  #             "enabled": "true",
-  #             "visibility": "public",
-  #             "windowTarget": "_blank"
-  #        },
-  #        "editor_button": {
-  #             "canvas_icon_class": "icon-lti",
-  #             "icon_url": "...",
-  #             "message_type": "ContentItemSelectionRequest",
-  #             "text": "...",
-  #             "url": "...",
-  #             "label": "...",
-  #             "selection_width": 50,
-  #             "selection_height": 50
-  #        },
-  #        "homework_submission": null,
-  #        "link_selection": null,
-  #        "migration_selection": null,
-  #        "resource_selection": null,
-  #        "tool_configuration": null,
-  #        "user_navigation": null,
-  #        "selection_width": 500,
-  #        "selection_height": 500,
-  #        "icon_url": "...",
-  #        "not_selectable": false,
-  #        "deployment_id": null,
-  #        "unified_tool_id": null
-  #      },
-  #      { ...  }
-  #     ]
+  # @returns [ContextExternalTool]
+  #
   def index
     if authorized_action(@context, @current_user, :read)
       @tools = if Canvas::Plugin.value_to_boolean(params[:include_parents])
@@ -371,98 +873,7 @@ class ExternalToolsController < ApplicationController
   # @API Get a single external tool
   # Returns the specified external tool.
   #
-  # @response_field id The unique identifier for the tool
-  # @response_field domain The domain to match links against
-  # @response_field url The url to match links against
-  # @response_field consumer_key The consumer key used by the tool (The associated shared secret is not returned)
-  # @response_field name The name of the tool
-  # @response_field description A description of the tool
-  # @response_field created_at Timestamp of creation
-  # @response_field updated_at Timestamp of last update
-  # @response_field privacy_level How much user information to send to the external tool: "anonymous", "name_only", "email_only", "public"
-  # @response_field custom_fields Custom fields that will be sent to the tool consumer
-  # @response_field is_rce_favorite Boolean determining whether this tool should be in a preferred location in the RCE.
-  # @response_field is_top_nav_favorite Boolean determining whether this tool should have a dedicated button in Top Navigation.
-  # @response_field account_navigation The configuration for account navigation links (see create API for values)
-  # @response_field assignment_selection The configuration for assignment selection links (see create API for values)
-  # @response_field course_home_sub_navigation The configuration for course home navigation links (see create API for values)
-  # @response_field course_navigation The configuration for course navigation links (see create API for values)
-  # @response_field editor_button The configuration for a WYSIWYG editor button (see create API for values)
-  # @response_field homework_submission The configuration for homework submission selection (see create API for values)
-  # @response_field link_selection The configuration for link selection (see create API for values)
-  # @response_field migration_selection The configuration for migration selection (see create API for values)
-  # @response_field resource_selection The configuration for a resource selector in modules (see create API for values)
-  # @response_field tool_configuration The configuration for a tool configuration link (see create API for values)
-  # @response_field user_navigation The configuration for user navigation links (see create API for values)
-  # @response_field selection_width The pixel width of the iFrame that the tool will be rendered in
-  # @response_field selection_height The pixel height of the iFrame that the tool will be rendered in
-  # @response_field icon_url The url for the tool icon
-  # @response_field not_selectable whether the tool is not selectable from assignment and modules
-  # @response_field unified_tool_id The unique identifier for the tool in LearnPlatform
-  # @response_field deployment_id The unique identifier for the deployment of the tool
-  #
-  # @example_response
-  #      {
-  #        "id": 1,
-  #        "domain": "domain.example.com",
-  #        "url": "http://www.example.com/ims/lti",
-  #        "consumer_key": "key",
-  #        "name": "LTI Tool",
-  #        "description": "This is for cool things",
-  #        "created_at": "2037-07-21T13:29:31Z",
-  #        "updated_at": "2037-07-28T19:38:31Z",
-  #        "privacy_level": "anonymous",
-  #        "custom_fields": {"key": "value"},
-  #        "account_navigation": {
-  #             "canvas_icon_class": "icon-lti",
-  #             "icon_url": "...",
-  #             "text": "...",
-  #             "url": "...",
-  #             "label": "...",
-  #             "selection_width": 50,
-  #             "selection_height":50
-  #        },
-  #        "assignment_selection": null,
-  #        "course_home_sub_navigation": null,
-  #        "course_navigation": {
-  #             "canvas_icon_class": "icon-lti",
-  #             "icon_url": "...",
-  #             "text": "...",
-  #             "url": "...",
-  #             "default": "disabled",
-  #             "enabled": "true",
-  #             "visibility": "public",
-  #             "windowTarget": "_blank"
-  #        },
-  #        "editor_button": {
-  #             "canvas_icon_class": "icon-lti",
-  #             "icon_url": "...",
-  #             "message_type": "ContentItemSelectionRequest",
-  #             "text": "...",
-  #             "url": "...",
-  #             "label": "...",
-  #             "selection_width": 50,
-  #             "selection_height": 50
-  #        },
-  #        "homework_submission": null,
-  #        "link_selection": null,
-  #        "migration_selection": null,
-  #        "resource_selection": null,
-  #        "tool_configuration": null,
-  #        "user_navigation": {
-  #             "canvas_icon_class": "icon-lti",
-  #             "icon_url": "...",
-  #             "text": "...",
-  #             "url": "...",
-  #             "default": "disabled",
-  #             "enabled": "true",
-  #             "visibility": "public"
-  #        },
-  #        "selection_width": 500,
-  #        "selection_height": 500,
-  #        "icon_url": "...",
-  #        "not_selectable": false
-  #      }
+  # @returns ContextExternalTool
   def show
     Utils::InstStatsdUtils::Timing.track "lti.show.request_time" do |timing_meta|
       if api_request?
@@ -949,180 +1360,25 @@ class ExternalToolsController < ApplicationController
   #   This only applies to tools in root account contexts that have an editor
   #   button placement.
   #
-  # @argument account_navigation[url] [String]
-  #   The url of the external tool for account navigation
+  # @argument <placement_name>[<placement_configuration_key>] [variable]
+  #   Set the <placement_configuration_key> value for a specific placement.
+  # See the <a href="file.lti_dev_key_config.html#placements-params">Placements Documentation</a> for more information on what
+  # placements are available, the possible fields, and their accepted values.
   #
-  # @argument account_navigation[enabled] [Boolean]
-  #   Set this to enable this feature
-  #
-  # @argument account_navigation[text] [String]
-  #   The text that will show on the left-tab in the account navigation
-  #
-  # @argument account_navigation[selection_width] [String]
-  #   The width of the dialog the tool is launched in
-  #
-  # @argument account_navigation[selection_height] [String]
-  #   The height of the dialog the tool is launched in
-  #
-  # @argument account_navigation[display_type] [String]
-  #   The layout type to use when launching the tool. Must be
-  #   "full_width", "full_width_in_context", "full_width_with_nav", "in_nav_context", "borderless", or "default"
-  #
-  # @argument user_navigation[url] [String]
-  #   The url of the external tool for user navigation
-  #
-  # @argument user_navigation[enabled] [Boolean]
-  #   Set this to enable this feature
-  #
-  # @argument user_navigation[text] [String]
-  #   The text that will show on the left-tab in the user navigation
-  #
-  # @argument user_navigation[visibility] [String, "admins"|"members"|"public"]
-  #   Who will see the navigation tab. "admins" for admins, "public" or
-  #   "members" for everyone. Setting this to `null` will remove this configuration
-  #   and use the default behavior, which is "public".
-  #
-  # @argument course_home_sub_navigation[url] [String]
-  #   The url of the external tool for right-side course home navigation menu
-  #
-  # @argument course_home_sub_navigation[enabled] [Boolean]
-  #   Set this to enable this feature
-  #
-  # @argument course_home_sub_navigation[text] [String]
-  #   The text that will show on the right-side course home navigation menu
-  #
-  # @argument course_home_sub_navigation[icon_url] [String]
-  #   The url of the icon to show in the right-side course home navigation menu
-  #
-  # @argument course_navigation[enabled] [Boolean]
-  #   Set this to enable this feature
-  #
-  # @argument course_navigation[text] [String]
-  #   The text that will show on the left-tab in the course navigation
-  #
-  # @argument course_navigation[visibility] [String, "admins"|"members"|"public"]
-  #   Who will see the navigation tab. "admins" for course admins, "members" for
-  #   students, "public" for everyone. Setting this to `null` will remove this configuration
-  #   and use the default behavior, which is "public".
-  #
-  # @argument course_navigation[windowTarget] [String, "_blank"|"_self"]
-  #   Determines how the navigation tab will be opened.
-  #   "_blank"	Launches the external tool in a new window or tab.
-  #   "_self"	(Default) Launches the external tool in an iframe inside of Canvas.
-  #
-  # @argument course_navigation[default] [String, "disabled"|"enabled"]
-  #   If set to "disabled" the tool will not appear in the course navigation
-  #   until a teacher explicitly enables it.
-  #
-  #   If set to "enabled" the tool will appear in the course navigation
-  #   without requiring a teacher to explicitly enable it.
-  #
-  #   defaults to "enabled"
-  #
-  # @argument course_navigation[display_type] [String]
-  #   The layout type to use when launching the tool. Must be
-  #   "full_width", "full_width_in_context", "full_width_with_nav", "in_nav_context", "borderless", or "default"
-  #
-  # @argument editor_button[url] [String]
-  #   The url of the external tool
-  #
-  # @argument editor_button[enabled] [Boolean]
-  #   Set this to enable this feature
-  #
-  # @argument editor_button[icon_url] [String]
-  #   The url of the icon to show in the WYSIWYG editor
-  #
-  # @argument editor_button[selection_width] [String]
-  #   The width of the dialog the tool is launched in
-  #
-  # @argument editor_button[selection_height] [String]
-  #   The height of the dialog the tool is launched in
-  #
-  # @argument editor_button[message_type] [String]
-  #   Set this to ContentItemSelectionRequest to tell the tool to use
-  #   content-item; otherwise, omit
-  #
-  # @argument homework_submission[url] [String]
-  #   The url of the external tool
-  #
-  # @argument homework_submission[enabled] [Boolean]
-  #   Set this to enable this feature
-  #
-  # @argument homework_submission[text] [String]
-  #   The text that will show on the homework submission tab
-  #
-  # @argument homework_submission[message_type] [String]
-  #   Set this to ContentItemSelectionRequest to tell the tool to use
-  #   content-item; otherwise, omit
-  #
-  # @argument link_selection[url] [String]
-  #   The url of the external tool
-  #
-  # @argument link_selection[enabled] [Boolean]
-  #   Set this to enable this feature
-  #
-  # @argument link_selection[text] [String]
-  #   The text that will show for the link selection text
-  #
-  # @argument link_selection[message_type] [String]
-  #   Set this to ContentItemSelectionRequest to tell the tool to use
-  #   content-item; otherwise, omit
-  #
-  # @argument migration_selection[url] [String]
-  #   The url of the external tool
-  #
-  # @argument migration_selection[enabled] [Boolean]
-  #   Set this to enable this feature
-  #
-  # @argument migration_selection[message_type] [String]
-  #   Set this to ContentItemSelectionRequest to tell the tool to use
-  #   content-item; otherwise, omit
-  #
-  # @argument tool_configuration[url] [String]
-  #   The url of the external tool
-  #
-  # @argument tool_configuration[enabled] [Boolean]
-  #   Set this to enable this feature
-  #
-  # @argument tool_configuration[message_type] [String]
-  #   Set this to ContentItemSelectionRequest to tell the tool to use
-  #   content-item; otherwise, omit
-  #
-  # @argument tool_configuration[prefer_sis_email] [Boolean]
-  #   Set this to default the lis_person_contact_email_primary to prefer
-  #   provisioned sis_email; otherwise, omit
-  #
-  # @argument resource_selection[url] [String]
-  #   The url of the external tool
-  #
-  # @argument resource_selection[enabled] [Boolean]
-  #   Set this to enable this feature. If set to false,
-  #   not_selectable must also be set to true in order to hide this tool
-  #   from the selection UI in modules and assignments.
-  #
-  # @argument resource_selection[icon_url] [String]
-  #   The url of the icon to show in the module external tool list
-  #
-  # @argument resource_selection[selection_width] [String]
-  #   The width of the dialog the tool is launched in
-  #
-  # @argument resource_selection[selection_height] [String]
-  #   The height of the dialog the tool is launched in
-  #
-  # @argument config_type [String]
-  #   Configuration can be passed in as CC xml instead of using query
-  #   parameters. If this value is "by_url" or "by_xml" then an xml
+  # @argument config_type [String, "by_url" | "by_xml"]
+  #   Configuration can be passed in as Common Cartridge XML instead of using query
+  #   parameters. If this value is "by_url" or "by_xml" then an XML
   #   configuration will be expected in either the "config_xml" or "config_url"
   #   parameter. Note that the name parameter overrides the tool name provided
-  #   in the xml
+  #   in the XML.
   #
   # @argument config_xml [String]
-  #   XML tool configuration, as specified in the CC xml specification. This is
+  #   XML tool configuration, as specified in the Common Cartridge XML specification. This is
   #   required if "config_type" is set to "by_xml"
   #
   # @argument config_url [String]
   #   URL where the server can retrieve an XML tool configuration, as specified
-  #   in the CC xml specification. This is required if "config_type" is set to
+  #   in the Common Cartridge XML specification. This is required if "config_type" is set to
   #   "by_url"
   #
   # @argument not_selectable [Boolean]
@@ -1176,11 +1432,14 @@ class ExternalToolsController < ApplicationController
   #        -F 'shared_secret=lkjh' \
   #        -F 'config_type=by_url' \
   #        -F 'config_url=https://example.com/ims/lti/tool_config.xml'
+  #
+  # @returns ContextExternalTool
   def create
+    verify_uniqueness = params.dig(:external_tool, :verify_uniqueness).present?
     if params.key?(:client_id)
       raise ActiveRecord::RecordInvalid unless developer_key.usable_in_context?(@context)
 
-      @tool = developer_key.lti_registration.new_external_tool(@context, verify_uniqueness: params.dig(:external_tool, :verify_uniqueness).present?, current_user: @current_user)
+      @tool = developer_key.lti_registration.new_external_tool(@context, verify_uniqueness:, current_user: @current_user)
     else
       external_tool_params = (params[:external_tool] || params).to_unsafe_h
       @tool = @context.context_external_tools.new
@@ -1189,7 +1448,7 @@ class ExternalToolsController < ApplicationController
         external_tool_params[:custom_fields] = custom_fields if custom_fields.present?
       end
       set_tool_attributes(@tool, external_tool_params)
-      @tool.check_for_duplication if params.dig(:external_tool, :verify_uniqueness).present?
+      @tool.check_for_duplication if verify_uniqueness
       unless @tool.errors.blank? && @tool.save
         raise Lti::ContextExternalToolErrors, @tool.errors
       end
@@ -1219,6 +1478,8 @@ class ExternalToolsController < ApplicationController
   #   Stringified object of key/value pairs to be used
   #   as query string parameters on the XML configuration
   #   URL.
+  #
+  # @returns ContextExternalTool
   def create_tool_with_verification
     if authorized_action(@context, @current_user, :update)
       app_api = AppCenter::AppApi.new(@context)
@@ -1252,7 +1513,11 @@ class ExternalToolsController < ApplicationController
   end
 
   # @API Edit an external tool
-  # Update the specified external tool. Uses same parameters as create
+  # Update the specified external tool. Uses same parameters as create. Returns the updated tool.
+  #
+  # NOTE: Any updates made to LTI 1.3 tools with this API will be overridden if any changes are
+  # made to the tool's associated LTI Registration/Developer Key configuration. In almost all cases,
+  # changes should be made to the tool's associated LTI Registration configuration, not individual tools.
   #
   # @example_request
   #
@@ -1261,6 +1526,8 @@ class ExternalToolsController < ApplicationController
   #        -H "Authorization: Bearer <token>" \
   #        -F 'name=Public Example' \
   #        -F 'privacy_level=public'
+  #
+  # @returns ContextExternalTool
   def update
     @tool = Lti::ContextToolFinder.only_for(@context).active.find(params[:id] || params[:external_tool_id])
     if authorized_action(@tool, @current_user, :update_manually)
@@ -1293,6 +1560,9 @@ class ExternalToolsController < ApplicationController
   #   This would delete the specified external tool
   #   curl -X DELETE 'https://<canvas>/api/v1/courses/<course_id>/external_tools/<external_tool_id>' \
   #        -H "Authorization: Bearer <token>"
+  #
+  # @returns ContextExternalTool
+  #
   def destroy
     @tool = Lti::ContextToolFinder.only_for(@context).active.find(params[:id] || params[:external_tool_id])
     delete_tool(@tool)

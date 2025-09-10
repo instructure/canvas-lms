@@ -38,7 +38,7 @@ describe Course do
     end
 
     context "outcome imports" do
-      include_examples "outcome import context examples"
+      it_behaves_like "outcome import context examples"
 
       describe "lti2 proxies" do
         include_context "lti2_course_spec_helper"
@@ -1378,7 +1378,7 @@ describe Course do
 
           @course.reload
           expect(@course.uuid).to eq orig_uuid
-          expect(new_course.uuid).to match(/[0-9a-zA-z]{40}/)
+          expect(new_course.uuid).to match(/[0-9a-zA-Z]{40}/)
         end
 
         it "moves the uuid to the new course during reset if feature flag is disabled" do
@@ -2801,7 +2801,7 @@ describe Course do
       end
 
       it "returns Accessibility tab if feature flag is enabled for teachers" do
-        @course.enable_feature!(:accessibility_tab_enable)
+        @course.root_account.settings[:enable_content_a11y_checker] = true
         tabs = @course.tabs_available(@user)
 
         # Checks that Accessibility tab is at the end of the tabs (except for Settings tab)
@@ -2809,7 +2809,7 @@ describe Course do
         accessibility_tab_index = tabs.pluck(:id).index(Course::TAB_ACCESSIBILITY)
         expect(accessibility_tab_index).to eq(settings_tab_index - 1)
       ensure
-        @course.disable_feature!(:accessibility_tab_enable)
+        @course.root_account.settings[:enable_content_a11y_checker] = false
       end
 
       describe "TAB_YOUTUBE_MIGRATION" do
@@ -6936,25 +6936,25 @@ describe Course do
       describe "restrict_student_future_view" do
         let(:setting) { :restrict_student_future_view }
 
-        include_examples "inherited setting should inherit"
+        it_behaves_like "inherited setting should inherit"
       end
 
       describe "restrict_student_past_view" do
         let(:setting) { :restrict_student_past_view }
 
-        include_examples "inherited setting should inherit"
+        it_behaves_like "inherited setting should inherit"
       end
 
       describe "lock_all_announcements" do
         let(:setting) { :lock_all_announcements }
 
-        include_examples "inherited setting should inherit"
+        it_behaves_like "inherited setting should inherit"
       end
 
       describe "usage_rights_required" do
         let(:setting) { :usage_rights_required }
 
-        include_examples "inherited setting should inherit"
+        it_behaves_like "inherited setting should inherit"
       end
     end
   end
@@ -8855,6 +8855,46 @@ describe Course do
       it "returns false for subdomain" do
         expect(course.has_studio_integration?).to be false
       end
+    end
+  end
+
+  describe "#active_now?" do
+    let(:now) { Time.zone.now }
+
+    def expect_active_now(expected, start_at: nil, end_at: nil, restrict: true)
+      course = Course.new
+      if restrict
+        course.start_at = start_at
+        course.conclude_at = end_at
+        course.restrict_enrollments_to_course_dates = true
+      else
+        course.restrict_enrollments_to_course_dates = false
+        enrollment_term = double("EnrollmentTerm", start_at:, end_at:)
+        allow(course).to receive(:enrollment_term).and_return(enrollment_term)
+      end
+      expect(course.active_now?).to eq(expected)
+    end
+
+    context "when restrict_enrollments_to_course_dates is true" do
+      it { expect_active_now(true, start_at: nil, end_at: nil, restrict: true) }
+      it { expect_active_now(true, start_at: now - 1.day, end_at: nil, restrict: true) }
+      it { expect_active_now(true, start_at: nil, end_at: now + 1.day, restrict: true) }
+      it { expect_active_now(true, start_at: now - 1.day, end_at: now + 1.day, restrict: true) }
+      it { expect_active_now(false, start_at: now + 1.day, end_at: nil, restrict: true) }
+      it { expect_active_now(false, start_at: nil, end_at: now - 1.day, restrict: true) }
+      it { expect_active_now(false, start_at: now + 1.day, end_at: now + 2.days, restrict: true) }
+      it { expect_active_now(false, start_at: now - 2.days, end_at: now - 1.day, restrict: true) }
+    end
+
+    context "when restrict_enrollments_to_course_dates is false" do
+      it { expect_active_now(true, start_at: nil, end_at: nil, restrict: false) }
+      it { expect_active_now(true, start_at: now - 1.day, end_at: nil, restrict: false) }
+      it { expect_active_now(true, start_at: nil, end_at: now + 1.day, restrict: false) }
+      it { expect_active_now(true, start_at: now - 1.day, end_at: now + 1.day, restrict: false) }
+      it { expect_active_now(false, start_at: now + 1.day, end_at: nil, restrict: false) }
+      it { expect_active_now(false, start_at: nil, end_at: now - 1.day, restrict: false) }
+      it { expect_active_now(false, start_at: now + 1.day, end_at: now + 2.days, restrict: false) }
+      it { expect_active_now(false, start_at: now - 2.days, end_at: now - 1.day, restrict: false) }
     end
   end
 end

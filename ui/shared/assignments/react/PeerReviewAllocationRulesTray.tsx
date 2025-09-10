@@ -18,6 +18,7 @@
 
 import React, {useState} from 'react'
 import AllocationRuleCard, {AllocationRuleType} from './AllocationRuleCard'
+import CreateEditAllocationRuleModal from './CreateEditAllocationRuleModal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -76,6 +77,7 @@ const PeerReviewAllocationRulesTray = ({
   isTrayOpen: boolean
   closeTray: () => void
 }): React.ReactElement => {
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const trayLabel = I18n.t('Allocation Rules')
   // TODO: Replace with data fetched in EGG-1589
   // const [rules, setRules] = useState([])
@@ -143,7 +145,9 @@ const PeerReviewAllocationRulesTray = ({
             </Text>
           </Flex.Item>
           <Flex.Item as="div" padding="x-small medium">
-            <Button color="primary">{I18n.t('+ Rule')}</Button>
+            <Button color="primary" onClick={() => setIsCreateModalOpen(true)}>
+              {I18n.t('+ Rule')}
+            </Button>
           </Flex.Item>
           {rules.length === 0 ? (
             <EmptyState />
@@ -156,6 +160,7 @@ const PeerReviewAllocationRulesTray = ({
           )}
         </Flex>
       </Tray>
+      <CreateEditAllocationRuleModal isOpen={isCreateModalOpen} setIsOpen={setIsCreateModalOpen} />
     </View>
   )
 }

@@ -46,6 +46,7 @@ describe('ColorPickerWrapper', () => {
       value: '#FF0000',
       onChange: defaultProps.onChange,
       withAlpha: true,
+      popoverMaxHeight: '50vh',
       colorMixerSettings: {
         popoverAddButtonLabel: 'Apply',
         popoverCloseButtonLabel: 'Close',

@@ -87,6 +87,7 @@ class AbstractAssignment < ActiveRecord::Base
   attr_writer :updating_user
 
   include MasterCourses::Restrictor
+
   restrict_columns :content, [:title, :description]
   restrict_assignment_columns
   restrict_columns :state, [:workflow_state]
@@ -162,6 +163,8 @@ class AbstractAssignment < ActiveRecord::Base
 
   belongs_to :parent_assignment, class_name: "Assignment", inverse_of: :sub_assignments
   has_many :sub_assignments, -> { active }, foreign_key: :parent_assignment_id, inverse_of: :parent_assignment
+  # always returns "reply_to_topic" checkpoint first, "reply_to_entry" checkpoint second
+  has_many :ordered_sub_assignments, -> { active.order(sub_assignment_tag: :desc) }, foreign_key: :parent_assignment_id, inverse_of: :parent_assignment, class_name: "SubAssignment"
   has_many :sub_assignment_submissions, through: :sub_assignments, source: :submissions
   has_many :sub_assignment_overrides, through: :sub_assignments, source: :assignment_overrides
   has_one :estimated_duration, dependent: :destroy, inverse_of: :assignment
@@ -1819,6 +1822,7 @@ class AbstractAssignment < ActiveRecord::Base
 
   def to_atom(opts = {})
     extend ApplicationHelper
+
     author_name = context.present? ? context.name : t("atom_no_author", "No Author")
     content = "#{before_label(:due, "Due")} #{datetime_string(due_at, :due_date)}"
     unless opts[:exclude_description]
@@ -2080,6 +2084,9 @@ class AbstractAssignment < ActiveRecord::Base
       can :manage_files_add and
       can :manage_files_edit and
       can :manage_files_delete
+
+    given { |user, session| context.grants_right?(user, session, :set_grading_scheme) }
+    can :set_grading_scheme
 
     given do |user, session|
       context.grants_right?(user, session, :manage_assignments_add)

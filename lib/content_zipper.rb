@@ -30,6 +30,7 @@ class ContentZipper
 
   # we evaluate some ERB templates from under app/views/ while generating assignment zips
   include I18nUtilities
+
   def t(...)
     I18n.t(...)
   end

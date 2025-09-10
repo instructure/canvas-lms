@@ -100,6 +100,7 @@ export const defaultGradebookEnv = {
   settings_update_url: '/path/to/settingsUpdateUrl',
   speed_grader_enabled: true,
   student_groups: {},
+  viewHiddenGradesIndicator: false,
 }
 
 export const defaultGradebookProps: GradebookProps = {

@@ -20,15 +20,21 @@ import {screen} from '@testing-library/react'
 import {ButtonBlock} from '../ButtonBlock'
 import {ButtonBlockProps} from '../types'
 import {renderBlock} from '../../__tests__/render-helper'
+import {mockBlockContentEditorContext} from '../../../__tests__/mockBlockContentEditorContext'
 
 jest.mock('../../../BlockContentEditorContext', () => ({
   __esModule: true,
-  useBlockContentEditorContext: jest.fn(() => ({})),
+  useBlockContentEditorContext: jest.fn(() => mockBlockContentEditorContext({})),
 }))
 
-const useGetRenderModeMock = jest.fn()
-jest.mock('../../BaseBlock/useGetRenderMode', () => ({
-  useGetRenderMode: () => useGetRenderModeMock(),
+const useIsInEditorMock = jest.fn()
+jest.mock('../../../hooks/useIsInEditor', () => ({
+  useIsInEditor: () => useIsInEditorMock(),
+}))
+
+const useIsEditingBlockMock = jest.fn()
+jest.mock('../../../hooks/useIsEditingBlock', () => ({
+  useIsEditingBlock: () => useIsEditingBlockMock(),
 }))
 
 const defaultProps: ButtonBlockProps = {
@@ -37,8 +43,19 @@ const defaultProps: ButtonBlockProps = {
     alignment: 'left',
     layout: 'horizontal',
     isFullWidth: false,
-    buttons: [{id: 1, text: ''}],
+    buttons: [
+      {
+        id: 1,
+        text: '',
+        url: '',
+        linkOpenMode: 'new-tab',
+        primaryColor: '#000000',
+        secondaryColor: '#FFFFFF',
+        style: 'filled',
+      },
+    ],
     backgroundColor: '#FF0000',
+    textColor: '#000000',
   },
   title: '',
 }
@@ -49,19 +66,21 @@ describe('ButtonBlock', () => {
   })
 
   it('renders ButtonBlockEdit in edit mode', () => {
-    useGetRenderModeMock.mockReturnValue({isEditMode: true})
+    useIsInEditorMock.mockReturnValue(true)
+    useIsEditingBlockMock.mockReturnValue(true)
     renderBlock(ButtonBlock, defaultProps)
     expect(screen.getByTestId('button-block-edit')).toBeInTheDocument()
   })
 
   it('renders ButtonBlockEditPreview in editPreview mode', () => {
-    useGetRenderModeMock.mockReturnValue({isEditPreviewMode: true})
+    useIsInEditorMock.mockReturnValue(true)
+    useIsEditingBlockMock.mockReturnValue(false)
     renderBlock(ButtonBlock, defaultProps)
     expect(screen.getByTestId('button-block-edit-preview')).toBeInTheDocument()
   })
 
   it('renders ButtonBlockView in view mode', () => {
-    useGetRenderModeMock.mockReturnValue({isViewMode: true})
+    useIsInEditorMock.mockReturnValue(false)
     renderBlock(ButtonBlock, defaultProps)
     expect(screen.getByTestId('button-block-view')).toBeInTheDocument()
   })

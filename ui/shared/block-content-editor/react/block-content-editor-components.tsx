@@ -20,12 +20,14 @@ import {ButtonBlock} from './Blocks/ButtonBlock'
 import {HighlightBlock} from './Blocks/HighlightBlock'
 import {ImageBlock} from './Blocks/ImageBlock'
 import {ImageTextBlock} from './Blocks/ImageTextBlock'
+import {MediaBlock} from './Blocks/MediaBlock'
 import {SeparatorLineBlock} from './Blocks/SeparatorLineBlock'
 import {TextBlock} from './Blocks/TextBlock'
 
 export const components = {
   TextBlock,
   ImageBlock,
+  MediaBlock,
   SeparatorLineBlock,
   ButtonBlock,
   HighlightBlock,

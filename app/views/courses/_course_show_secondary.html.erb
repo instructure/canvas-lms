@@ -80,7 +80,7 @@
       </a>
       <% end %>
 
-      <% if @context.feature_enabled?(:accessibility_tab_enable) %>
+      <% if @domain_root_account.enable_content_a11y_checker? %>
         <a id="course_check_accessibility_btn" href="<%= context_url(@context, :controller => :accessibility, :action => :index) %>"
            class="btn button-sidebar-wide accessibility_link <%= 'disabled' unless @accessibility_scan_enabled %>"
            aria-disabled="<%= !@accessibility_scan_enabled %>"

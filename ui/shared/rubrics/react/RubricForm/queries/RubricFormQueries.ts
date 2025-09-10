@@ -21,7 +21,7 @@ import qs from 'qs'
 import {executeQuery} from '@canvas/graphql'
 import type {RubricFormProps, GenerateCriteriaFormProps} from '../types/RubricForm'
 import type {CanvasProgress} from '@canvas/progress/ProgressHelpers'
-import type {Rubric, RubricAssociation} from '@canvas/rubrics/react/types/rubric'
+import type {Rubric, RubricAssociation, RubricCriterion} from '@canvas/rubrics/react/types/rubric'
 import {
   mapRubricAssociationUnderscoredKeysToCamelCase,
   mapRubricUnderscoredKeysToCamelCase,
@@ -264,12 +264,73 @@ export const generateCriteria = async (
         use_range: generateCriteriaProps.useRange,
         additional_prompt_info: generateCriteriaProps.additionalPromptInfo,
         grade_level: generateCriteriaProps.gradeLevel,
+        standard: generateCriteriaProps.standard,
       },
     }),
   })
 
   if (!response.ok) {
     throw new Error(`Failed to generate criteria: ${response.statusText}`)
+  }
+
+  const progress: CanvasProgress = await response.json()
+  return progress
+}
+
+export const regenerateCriteria = async (
+  courseId: string,
+  assignmentId: string,
+  criteriaForRegeneration: RubricCriterion[],
+  additionalPrompt: string,
+  criterionId?: string,
+  generateFormOptions?: Partial<GenerateCriteriaFormProps>,
+): Promise<CanvasProgress> => {
+  const url = `/courses/${courseId}/rubrics/llm_regenerate_criteria`
+  const method = 'POST'
+
+  const response = await fetch(url, {
+    method,
+    headers: {
+      'X-CSRF-Token': getCookie('_csrf_token'),
+      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+    },
+    body: qs.stringify({
+      _method: method,
+      rubric_association: {
+        association_id: assignmentId,
+        association_type: 'Assignment',
+      },
+      criteria: criteriaForRegeneration.map(criterion => ({
+        id: criterion.id,
+        description: criterion.description,
+        long_description: criterion.longDescription,
+        points: criterion.points,
+        criterion_use_range: criterion.criterionUseRange,
+        ratings: criterion.ratings.map(rating => ({
+          id: rating.id,
+          criterion_id: criterion.id,
+          description: rating.description,
+          long_description: rating.longDescription,
+          points: rating.points,
+        })),
+      })),
+      generate_options: {
+        criteria_count: generateFormOptions?.criteriaCount,
+        rating_count: generateFormOptions?.ratingCount,
+        points_per_criterion: generateFormOptions?.pointsPerCriterion,
+        use_range: generateFormOptions?.useRange,
+        grade_level: generateFormOptions?.gradeLevel,
+      },
+      regenerate_options: {
+        criterion_id: criterionId,
+        additional_user_prompt: additionalPrompt,
+        standard: generateFormOptions?.standard,
+      },
+    }),
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to regenerate criteria: ${response.statusText}`)
   }
 
   const progress: CanvasProgress = await response.json()

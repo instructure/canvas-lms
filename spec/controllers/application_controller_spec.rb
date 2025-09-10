@@ -392,13 +392,15 @@ RSpec.describe ApplicationController do
                               uuid: "bleh",
                               salesforce_id: "blah",
                               horizon_domain: nil,
-                              suppress_assignments?: false)
+                              suppress_assignments?: false,
+                              enable_content_a11y_checker?: true)
         allow(root_account).to receive(:kill_joy?).and_return(false)
         allow(HostUrl).to receive_messages(file_host: "files.example.com")
         controller.instance_variable_set(:@domain_root_account, root_account)
         expect(controller.js_env[:SETTINGS][:open_registration]).to be_truthy
         expect(controller.js_env[:SETTINGS][:can_add_pronouns]).to be_truthy
         expect(controller.js_env[:SETTINGS][:show_sections_in_course_tray]).to be_truthy
+        expect(controller.js_env[:SETTINGS][:enable_content_a11y_checker]).to be_truthy
         expect(controller.js_env[:KILL_JOY]).to be_falsey
       end
 
@@ -415,6 +417,7 @@ RSpec.describe ApplicationController do
                               uuid: "blah",
                               salesforce_id: "bleh",
                               horizon_domain: nil,
+                              enable_content_a11y_checker?: false,
                               suppress_assignments?: false)
         allow(root_account).to receive(:kill_joy?).and_return(true)
         allow(HostUrl).to receive_messages(file_host: "files.example.com")
@@ -616,6 +619,22 @@ RSpec.describe ApplicationController do
           controller.instance_variable_set :@context, @user
           controller.instance_variable_set :@domain_root_account, Account.default
           expect(controller.js_env[:ACCOUNT_ID]).to eq Account.default.id
+        end
+      end
+
+      describe "CAREER_THEME_URL" do
+        before do
+          allow_any_instance_of(CanvasCareer::Config).to receive(:theme_url).and_return("https://theme.url")
+        end
+
+        it "is nil if career is not enabled" do
+          allow(CanvasCareer::ExperienceResolver).to receive(:career_affiliated_institution?).and_return(false)
+          expect(@controller.js_env[:CAREER_THEME_URL]).to be_nil
+        end
+
+        it "is set to the theme url if career is enabled" do
+          allow(CanvasCareer::ExperienceResolver).to receive(:career_affiliated_institution?).and_return(true)
+          expect(@controller.js_env[:CAREER_THEME_URL]).to eq "https://theme.url"
         end
       end
     end
@@ -951,6 +970,40 @@ RSpec.describe ApplicationController do
         allow(CanvasSecurity::PageViewJwt).to receive(:decode).and_return(page_view_info)
         allow(PageView).to receive(:find_for_update).and_return(page_view)
         expect { controller.send(:add_interaction_seconds) }.not_to raise_error
+      end
+
+      context "when page view update is disabled" do
+        before do
+          Setting.set("skip_pageview_updates", "true")
+          Setting.set("enable_page_views", "true")
+        end
+
+        after do
+          Setting.set("skip_pageview_updates", "false")
+          Setting.set("enable_page_views", "false")
+        end
+
+        it "sets created_at for the page view thus allowing the interaction token to be generated correctly" do
+          Timecop.freeze do
+            request_id = "31877f1c-7bfc-4389-8daa-3adb48d98829"
+            interaction_seconds = 12
+            created_at = Time.zone.now
+            expected_interaction_token = "#{request_id}|#{created_at.iso8601(2)}|#{interaction_seconds}"
+            controller.response = double("response", headers: {})
+            controller.params[:page_view_token] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpIjoiMzE4NzdmMWMtN2JmYy00Mzg5LThkYWEtM2FkYjQ4ZDk4ODI5IiwidSI6bnVsbCwiYyI6bnVsbH0.IltPMbU08FUf-Kr_5vYzie4HnSW2tW8qFfYJunR9Z4o"
+            controller.params[:interaction_seconds] = interaction_seconds
+            allow(controller.request).to receive_messages(xhr?: 0, put?: true)
+            allow(controller.response).to receive(:headers).and_return({})
+            expect(RequestContext::Generator).to receive(:add_meta_header).with("r", expected_interaction_token)
+
+            controller.send(:add_interaction_seconds)
+
+            jwt_from_url = controller.response.headers["X-Canvas-Page-View-Update-Url"].split("=").last
+            page_view = CanvasSecurity::PageViewJwt.decode(jwt_from_url)
+            expect(page_view[:request_id]).to eq request_id
+            expect(page_view[:created_at]).to be_truthy
+          end
+        end
       end
     end
 
@@ -1916,6 +1969,7 @@ RSpec.describe ApplicationController do
         @tool = @course.context_external_tools.new(name: "bob", consumer_key: "test", shared_secret: "secret", url: "http://example.com")
 
         @tool_settings = %i[
+          top_navigation
           user_navigation
           course_navigation
           account_navigation
@@ -2000,6 +2054,80 @@ RSpec.describe ApplicationController do
           controller.external_tools_display_hashes(:account_navigation, @course)
 
           expect(controller.js_env[:LTI_TOOL_SCOPES]).to eq("http://example.com" => TokenScopes::LTI_POSTMESSAGE_SCOPES)
+        end
+      end
+
+      context "when type is :submission_type_selection" do
+        before do
+          @tool.submission_type_selection = {
+            description: "Select a file to submit.",
+            require_resource_selection: true
+          }
+          @tool.save!
+        end
+
+        it "includes submission type selection details" do
+          hash = controller.external_tool_display_hash(@tool, :submission_type_selection)
+          expect(hash[:description]).to eq "Select a file to submit."
+          expect(hash[:require_resource_selection]).to be true
+        end
+      end
+
+      context "when type is :top_navigation" do
+        it "includes the pinned status" do
+          allow(@tool).to receive(:top_nav_favorite_in_context?).with(@course).and_return(true)
+          hash = controller.external_tool_display_hash(@tool, :top_navigation)
+          expect(hash[:pinned]).to be true
+
+          allow(@tool).to receive(:top_nav_favorite_in_context?).with(@course).and_return(false)
+          hash = controller.external_tool_display_hash(@tool, :top_navigation)
+          expect(hash[:pinned]).to be false
+        end
+
+        context "for the allow_fullscreen setting" do
+          before do
+            @tool.settings["top_navigation"]["allow_fullscreen"] = true
+            @tool.save!
+          end
+
+          it "includes allow_fullscreen ONLY when the type is :top_navigation" do
+            top_nav_hash = controller.external_tool_display_hash(@tool, :top_navigation)
+            expect(top_nav_hash).to include(:allow_fullscreen)
+
+            course_nav_hash = controller.external_tool_display_hash(@tool, :course_navigation)
+            expect(course_nav_hash.keys).not_to include(:allow_fullscreen)
+          end
+        end
+      end
+
+      context "with optional parameters" do
+        it "appends url_params to the base_url" do
+          params_to_add = { custom_param: "value123" }
+          hash = controller.external_tool_display_hash(@tool, :course_navigation, params_to_add)
+          expect(hash[:base_url]).to include("custom_param=value123")
+        end
+
+        it "adds keys from custom_settings" do
+          custom = [:base_title, :external_url]
+          hash = controller.external_tool_display_hash(@tool, :course_navigation, {}, @course, custom)
+          expect(hash[:base_title]).to eq @tool.name
+          expect(hash[:external_url]).to eq @tool.url
+        end
+      end
+
+      context "for other initial hash keys" do
+        it "includes allow_fullscreen when set" do
+          @tool.settings["top_navigation"] = { "allow_fullscreen" => true }
+          @tool.save!
+          hash = controller.external_tool_display_hash(@tool, :top_navigation)
+          expect(hash[:allow_fullscreen]).to be true
+        end
+
+        it "omits tool_id when it is not present" do
+          @tool.tool_id = nil
+          @tool.save!
+          hash = controller.external_tool_display_hash(@tool, :course_navigation)
+          expect(hash.keys).not_to include(:tool_id)
         end
       end
 

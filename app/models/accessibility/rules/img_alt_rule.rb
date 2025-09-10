@@ -23,7 +23,9 @@ module Accessibility
       self.id = "img-alt"
       self.link = "https://www.w3.org/TR/WCAG20-TECHS/H37.html"
 
-      def self.test(elem)
+      # Accessibility::Rule methods
+
+      def test(elem)
         return nil if elem.tag_name != "img"
 
         alt = elem.attribute?("alt") ? elem.get_attribute("alt") : nil
@@ -31,21 +33,7 @@ module Accessibility
         I18n.t("Alt text should be present for the image.") if alt.nil? && role != "presentation"
       end
 
-      def self.display_name
-        I18n.t("Alt text missing")
-      end
-
-      def self.message
-        I18n.t("Add a description for screen readers so people who are blind or have low vision can understand what's in the image.")
-      end
-
-      def self.why
-        I18n.t("Alt text is a description of an image only visible to screen readers.
-          Screen readers are software to help people who are blind or have low vision interact with websites
-          and computers.")
-      end
-
-      def self.form(elem)
+      def form(elem)
         Accessibility::Forms::TextInputWithCheckboxField.new(
           checkbox_label: I18n.t("This image is decorative"),
           checkbox_subtext: I18n.t("This image is for visual decoration only and screen readers can skip it."),
@@ -59,7 +47,7 @@ module Accessibility
         )
       end
 
-      def self.generate_fix(elem)
+      def generate_fix(elem)
         return nil if elem.tag_name != "img"
         return nil unless elem.attribute?("src")
 
@@ -67,7 +55,7 @@ module Accessibility
         ImgAltRuleHelper.generate_alt_text(src)
       end
 
-      def self.fix!(elem, value)
+      def fix!(elem, value)
         if value == "" || value.nil?
           elem["role"] = "presentation"
         end
@@ -76,6 +64,20 @@ module Accessibility
 
         elem["alt"] = value
         elem
+      end
+
+      def display_name
+        I18n.t("Alt text missing")
+      end
+
+      def message
+        I18n.t("Add a description for screen readers so people who are blind or have low vision can understand what's in the image.")
+      end
+
+      def why
+        I18n.t("Alt text is a description of an image only visible to screen readers.
+          Screen readers are software to help people who are blind or have low vision interact with websites
+          and computers.")
       end
     end
   end

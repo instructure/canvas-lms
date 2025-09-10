@@ -23,7 +23,6 @@ class AppointmentGroup < ActiveRecord::Base
   include TextHelper
   include ConversationsHelper
 
-  # rubocop:disable Rails/InverseOf
   has_many :appointments,
            -> { order(:start_at).preload(:child_events).where("calendar_events.workflow_state <> 'deleted'") },
            **(opts = { class_name: "CalendarEvent", as: :context, inverse_of: :context })
@@ -32,7 +31,6 @@ class AppointmentGroup < ActiveRecord::Base
   # strings, just hashes. we create this helper association to ensure
   # appointments_participants conditions have the correct table alias
   has_many :_appointments, -> { order(:start_at).preload(:child_events).where("_appointments_appointments_participants.workflow_state <> 'deleted'") }, **opts
-  # rubocop:enable Rails/InverseOf
   has_many :appointments_participants, -> { where("calendar_events.workflow_state <> 'deleted'").order(:start_at) }, through: :_appointments, source: :child_events
   has_many :appointment_group_contexts
   has_many :appointment_group_sub_contexts, -> { preload(:sub_context) }
@@ -146,7 +144,7 @@ class AppointmentGroup < ActiveRecord::Base
           @new_contexts.each do |context|
             context_subs = context.course_sections.map(&:asset_string)
             # if context has no selected subcontexts, add all subcontexts
-            if (@new_sub_context_codes & context_subs).count == 0
+            unless @new_sub_context_codes.intersect?(context_subs)
               @new_sub_context_codes += context_subs
             end
           end

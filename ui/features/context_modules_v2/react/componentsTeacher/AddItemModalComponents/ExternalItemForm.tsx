@@ -27,6 +27,18 @@ import {ExternalToolModalItem} from '../../utils/types'
 
 const I18n = createI18nScope('context_modules_v2')
 
+const validateUrl = (url: string, shouldValidateEmpty: boolean = false): string => {
+  if (!url.trim()) {
+    return shouldValidateEmpty ? I18n.t('URL is required') : ''
+  }
+
+  if (!URL.canParse(url)) {
+    return I18n.t('Please enter a valid URL')
+  }
+
+  return ''
+}
+
 interface ExternalItemFormProps {
   onChange: (field: string, value: any) => void
   externalUrlValue?: string
@@ -34,6 +46,7 @@ interface ExternalItemFormProps {
   newTab?: boolean
   itemType?: ModuleItemContentType
   contentItems?: ExternalToolModalItem[]
+  urlError?: string
 }
 
 export const ExternalItemForm: React.FC<ExternalItemFormProps> = ({
@@ -43,11 +56,14 @@ export const ExternalItemForm: React.FC<ExternalItemFormProps> = ({
   newTab = false,
   itemType = 'external_url',
   contentItems = [],
+  urlError = '',
 }) => {
   const [url, setUrl] = useState(externalUrlValue)
   const [pageName, setPageName] = useState(externalUrlName)
   const [loadInNewTab, setLoadInNewTab] = useState(newTab)
   const [selectedToolId, setSelectedToolId] = useState<string | undefined>(undefined)
+  const [localUrlError, setLocalUrlError] = useState('')
+  const [hasUserInteracted, setHasUserInteracted] = useState(false)
 
   // Handle tool selection and auto-populate URL/name
   const handleToolSelect = (tool: ExternalToolModalItem | null) => {
@@ -84,7 +100,11 @@ export const ExternalItemForm: React.FC<ExternalItemFormProps> = ({
     onChange('url', url)
     onChange('name', pageName)
     onChange('newTab', loadInNewTab)
-  }, [url, pageName, loadInNewTab, onChange])
+
+    const validationError = validateUrl(url, hasUserInteracted)
+    setLocalUrlError(validationError)
+    onChange('isUrlValid', !validationError && url.trim() !== '')
+  }, [url, pageName, loadInNewTab, onChange, hasUserInteracted])
 
   const isExternalTool = itemType === 'external_tool'
 
@@ -107,9 +127,20 @@ export const ExternalItemForm: React.FC<ExternalItemFormProps> = ({
         onChange={(_e, val) => {
           setUrl(val)
           onChange('url', val)
+          if (!hasUserInteracted) {
+            setHasUserInteracted(true)
+          }
+        }}
+        onBlur={() => {
+          if (!hasUserInteracted) {
+            setHasUserInteracted(true)
+          }
         }}
         margin="0 0 medium 0"
         required
+        messages={
+          localUrlError || urlError ? [{text: localUrlError || urlError, type: 'error'}] : undefined
+        }
       />
       <TextInput
         data-testid="external_item_page_name"

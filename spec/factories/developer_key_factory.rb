@@ -61,6 +61,7 @@ module Factories
     tos_uri = "http://example.com/tos"
     policy_uri = "http://example.com/policy"
     lti_tool_configuration = {
+      target_link_uri: "http://example.com/launch",
       domain: "example.com",
       messages: [
         {

@@ -20,6 +20,7 @@
 
 class DeveloperKeyAccountBinding < ApplicationRecord
   include Workflow
+
   workflow do
     state :off
     state :on

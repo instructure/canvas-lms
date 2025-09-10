@@ -194,13 +194,13 @@ RSpec.describe Lti::AssetReport do
       sub1_reports = subject[sub1.id][:by_attachment]
       sub2_reports = subject[sub2.id][:by_attachment]
 
-      expect(sub1_reports[att1a.id][processorI.id].map { it[:_id] }).to \
+      expect(sub1_reports[att1a.id][processorI.id].pluck(:_id)).to \
         match_array([rep1aIi.id, rep1aIii.id])
-      expect(sub1_reports[att1b.id][processorI.id].map { it[:_id] }).to \
+      expect(sub1_reports[att1b.id][processorI.id].pluck(:_id)).to \
         match_array([rep1bIi.id])
-      expect(sub2_reports[att2a.id][processorI.id].map { it[:_id] }).to \
+      expect(sub2_reports[att2a.id][processorI.id].pluck(:_id)).to \
         match_array([rep2aIi.id])
-      expect(sub2_reports[att2a.id][processorII.id].map { it[:_id] }).to \
+      expect(sub2_reports[att2a.id][processorII.id].pluck(:_id)).to \
         match_array([rep2aIIi.id])
     end
 
@@ -231,7 +231,7 @@ RSpec.describe Lti::AssetReport do
         expect(subject.keys).to match_array([sub2.id])
         expect(subject[sub2.id][:by_attachment].keys).to match_array([att2a.id])
         expect(subject[sub2.id][:by_attachment][att2a.id].keys).to include(processorII.id)
-        expect(subject[sub2.id][:by_attachment][att2a.id][processorII.id].map { it[:_id] }).to \
+        expect(subject[sub2.id][:by_attachment][att2a.id][processorII.id].pluck(:_id)).to \
           match_array([rep2aIIi.id])
       end
     end
@@ -287,7 +287,7 @@ RSpec.describe Lti::AssetReport do
 
         processor_hash = text_entry_by_attempt[online_submission.attempt]
         expect(processor_hash.keys).to include(online_processor.id)
-        report_ids = processor_hash[online_processor.id].map { |r| r[:_id] }
+        report_ids = processor_hash[online_processor.id].pluck(:_id)
         expect(report_ids).to include(online_report.id)
       end
 

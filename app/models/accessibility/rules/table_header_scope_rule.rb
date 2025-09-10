@@ -20,34 +20,21 @@
 module Accessibility
   module Rules
     class TableHeaderScopeRule < Accessibility::Rule
-      self.id = "table-header-scope"
-      self.link = "https://www.w3.org/TR/WCAG20-TECHS/H63.html"
       VALID_SCOPES = %w[row col rowgroup colgroup].freeze
 
-      def self.test(elem)
+      self.id = "table-header-scope"
+      self.link = "https://www.w3.org/TR/WCAG20-TECHS/H63.html"
+
+      # Accessibility::Rule methods
+
+      def test(elem)
         return nil if elem.tag_name.downcase != "th"
 
         I18n.t("Table header shall have a valid scope associated with it.") unless elem.attribute?("scope") && VALID_SCOPES.include?(elem["scope"])
       end
 
-      def self.display_name
-        I18n.t("Table header scope")
-      end
-
-      def self.message
-        I18n.t("Table header cells should have the scope attribute correctly set to a valid scope value.")
-      end
-
-      def self.why
-        I18n.t(
-          "The scope attribute specifies whether a table header cell applies to a column, row, or group of columns or rows. " \
-          "Without this attribute, screen readers may not correctly associate header cells with data cells, " \
-          "making tables difficult to navigate and understand."
-        )
-      end
-
       # TODO: define undo text
-      def self.form(_elem)
+      def form(_elem)
         Accessibility::Forms::RadioInputGroupField.new(
           label: I18n.t("Set header scope"),
           undo_text: I18n.t("Table header scope fixed"),
@@ -56,7 +43,7 @@ module Accessibility
         )
       end
 
-      def self.fix!(elem, value)
+      def fix!(elem, value)
         scope_lookup_table = {
           I18n.t("Row") => "row",
           I18n.t("Column") => "column",
@@ -72,6 +59,22 @@ module Accessibility
           raise StandardError, "Invalid scope value. Valid options are: #{VALID_SCOPES.join(", ")}." unless VALID_SCOPES.include?(value)
         end
         elem
+      end
+
+      def display_name
+        I18n.t("Table header scope")
+      end
+
+      def message
+        I18n.t("Table header cells should have the scope attribute correctly set to a valid scope value.")
+      end
+
+      def why
+        I18n.t(
+          "The scope attribute specifies whether a table header cell applies to a column, row, or group of columns or rows. " \
+          "Without this attribute, screen readers may not correctly associate header cells with data cells, " \
+          "making tables difficult to navigate and understand."
+        )
       end
     end
   end

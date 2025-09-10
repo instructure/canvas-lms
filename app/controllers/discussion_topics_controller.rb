@@ -272,6 +272,7 @@ class DiscussionTopicsController < ApplicationController
   before_action :require_context_and_read_access, except: :public_feed
 
   include HorizonMode
+
   before_action :load_canvas_career, only: [:index, :show]
 
   before_action :rce_js_env
@@ -656,7 +657,8 @@ class DiscussionTopicsController < ApplicationController
       IS_MODULE_ITEM: !@topic.context_module_tags.empty?,
       PERMISSIONS: {
         manage_files: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_FILE_PERMISSIONS),
-        manage_grading_schemes: can_do(@context, @current_user, :manage_grades)
+        manage_grading_schemes: can_do(@context, @current_user, :manage_grading_schemes),
+        set_grading_scheme: can_do(@context, @current_user, :set_grading_scheme)
       },
       REACT_DISCUSSIONS_POST: @context.feature_enabled?(:react_discussions_post),
       allow_student_anonymous_discussion_topics: @context.allow_student_anonymous_discussion_topics,
@@ -743,6 +745,7 @@ class DiscussionTopicsController < ApplicationController
       redirect_to course_context_modules_path(@context.id)
       return
     end
+
     page_has_instui_topnav
     # we still need the lock info even if the current user policies unlock the topic. check the policies manually later if you need to override the lockout.
     @locked = @topic.locked_for?(@current_user, check_policies: true, deep_check_if_needed: true)
@@ -936,6 +939,8 @@ class DiscussionTopicsController < ApplicationController
         InstStatsd::Statsd.count("discussion_topic.visit.entries.redesign", @topic.discussion_entries.count)
         InstStatsd::Statsd.count("discussion_topic.visit.pages.redesign", (@topic.discussion_entries.count / 20).ceil)
       end
+
+      asset_processor_eula_js_env_for_discussion
 
       js_bundle :discussion_topics_post
       css_bundle :discussions_index, :learning_outcomes
@@ -2123,5 +2128,19 @@ class DiscussionTopicsController < ApplicationController
         end
       end
     end
+  end
+
+  # LTI 1.3 Asset Processor Eula Service for discussions
+  def asset_processor_eula_js_env_for_discussion
+    return unless @current_user
+    # We show EULA for users who can post comments, which are forwarded to the asset processor.
+    # This can be a teacher or student.
+    return unless @topic.grants_right?(@current_user, session, :reply)
+    return unless @topic.root_account.feature_enabled?(:lti_asset_processor_discussions)
+    return unless @topic.assignment
+
+    # For graded discussions, delegate to the assignment's asset processors
+    urls = Lti::EulaUiService.eula_launch_urls(user: @current_user, assignment: @topic.assignment)
+    js_env ASSET_PROCESSOR_EULA_LAUNCH_URLS: urls
   end
 end

@@ -85,7 +85,7 @@ class GradingStandard < ActiveRecord::Base
   VERSION = 2
 
   set_policy do
-    given { |user| context.grants_right?(user, :manage_grades) }
+    given { |user| context.grants_right?(user, :manage_grading_schemes) }
     can :manage
   end
 

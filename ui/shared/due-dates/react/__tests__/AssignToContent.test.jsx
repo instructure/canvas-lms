@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, act, screen} from '@testing-library/react'
+import {render, act, within, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import AssignToContent from '../AssignToContent'
 import AssignmentOverrideCollection from '@canvas/assignments/backbone/collections/AssignmentOverrideCollection'
@@ -115,8 +115,82 @@ describe('AssignToContent', () => {
     expect(screen.getAllByTestId('item-assign-to-card')).toHaveLength(1)
   })
 
+  it('preserves dates on the second card when adding an assignee to the first', async () => {
+    const twoCardOverrides = new AssignmentOverrideCollection([
+      {
+        id: '200',
+        assignment_id: '5',
+        title: 'Course 1',
+        due_at: '2025-01-10T23:59:59.000Z',
+        all_day: false,
+        all_day_date: null,
+        unlock_at: '2025-01-05T06:00:00.000Z',
+        lock_at: '2025-01-20T23:59:59.000Z',
+        course_section_id: '1',
+        due_at_overridden: true,
+        unlock_at_overridden: true,
+        lock_at_overridden: true,
+      },
+      {
+        id: '201',
+        assignment_id: '5',
+        title: 'Section A',
+        due_at: '2025-02-10T23:59:59.000Z',
+        all_day: false,
+        all_day_date: null,
+        unlock_at: '2025-02-05T06:00:00.000Z',
+        lock_at: '2025-02-20T23:59:59.000Z',
+        course_section_id: '2',
+        due_at_overridden: true,
+        unlock_at_overridden: true,
+        lock_at_overridden: true,
+      },
+    ])
+
+    const onSyncMock = jest.fn()
+    render(
+      <MockedQueryProvider>
+        <AssignToContent
+          {...props}
+          overrides={twoCardOverrides.models.map(m => m.toJSON().assignment_override)}
+          onSync={onSyncMock}
+        />
+      </MockedQueryProvider>,
+    )
+
+    // Expect two cards with dates already set
+    const cards = await screen.findAllByTestId('item-assign-to-card')
+    expect(cards).toHaveLength(2)
+
+    // Verify initial dates are present (should be much faster than typing)
+    expect(
+      within(within(cards[0]).getByTestId('due_at_input')).getByDisplayValue('Jan 10, 2025'),
+    ).toBeInTheDocument()
+    expect(
+      within(within(cards[1]).getByTestId('due_at_input')).getByDisplayValue('Feb 10, 2025'),
+    ).toBeInTheDocument()
+
+    // Add assignee to first card (the actual test action)
+    const assigneeSelector = within(cards[0]).getByTestId('assignee_selector')
+    await userEvent.click(assigneeSelector)
+
+    const sectionOption = await screen.findByText('Section A')
+    await userEvent.click(sectionOption)
+
+    // Verify dates are preserved on second card
+    expect(
+      within(within(cards[1]).getByTestId('due_at_input')).getByDisplayValue('Feb 10, 2025'),
+    ).toBeInTheDocument()
+    expect(
+      within(within(cards[1]).getByTestId('unlock_at_input')).getByDisplayValue('Feb 5, 2025'),
+    ).toBeInTheDocument()
+    expect(
+      within(within(cards[1]).getByTestId('lock_at_input')).getByDisplayValue('Feb 20, 2025'),
+    ).toBeInTheDocument()
+  })
+
   describe('pending changes', () => {
-    const addAssignee = async (getByTestId, findByTestId, findByText) => {
+    const addAssignee = async (_getByTestId, findByTestId, findByText) => {
       const assigneeSelector = await findByTestId('assignee_selector')
       act(() => assigneeSelector.click())
       const option1 = await findByText(SECTIONS_DATA[0].name)

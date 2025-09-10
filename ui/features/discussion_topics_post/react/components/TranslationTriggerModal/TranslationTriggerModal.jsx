@@ -55,16 +55,26 @@ export const TranslationTriggerModal = ({
       <Modal.Footer>
         <Flex gap="small">
           <Flex.Item>
-            <Button onClick={closeModal}> {I18n.t('Cancel')}</Button>
+            <Button onClick={closeModal} data-testid="cancel-translation-button">
+              {' '}
+              {I18n.t('Cancel')}
+            </Button>
           </Flex.Item>
           <Flex.Item>
-            <Button onClick={closeModalAndKeepTranslations}>
+            <Button
+              onClick={closeModalAndKeepTranslations}
+              data-testid="close-and-keep-translations-button"
+            >
               {' '}
               {I18n.t('Close and Keep Translations')}
             </Button>
           </Flex.Item>
           <Flex.Item>
-            <Button onClick={closeModalAndRemoveTranslations} color="primary">
+            <Button
+              onClick={closeModalAndRemoveTranslations}
+              data-testid="close-and-remove-translations-button"
+              color="primary"
+            >
               {' '}
               {I18n.t('Close and Remove Translations')}
             </Button>

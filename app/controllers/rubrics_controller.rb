@@ -23,6 +23,7 @@ class RubricsController < ApplicationController
   before_action :require_context
 
   include HorizonMode
+
   before_action :load_canvas_career, only: [:index, :show]
 
   before_action { |c| c.active_tab = "rubrics" }
@@ -243,7 +244,8 @@ class RubricsController < ApplicationController
     end
   end
 
-  ALLOWED_GENERATE_PARAMS = %w[criteria_count rating_count points_per_criterion use_range additional_prompt_info grade_level].freeze
+  MAX_LLM_INPUT_CHARS = 1000
+  ALLOWED_GENERATE_PARAMS = %w[criteria_count rating_count points_per_criterion use_range additional_prompt_info grade_level standard].freeze
   def llm_criteria
     association_object = RubricAssociation.get_association_object(params[:rubric_association])
     generate_options = (params[:generate_options] || {}).permit(*ALLOWED_GENERATE_PARAMS)
@@ -255,8 +257,11 @@ class RubricsController < ApplicationController
     if generate_options[:rating_count].present? && !(2..8).cover?(generate_options[:rating_count].to_i)
       return render json: { error: "rating_count must be between 2 and 8 inclusive" }, status: :bad_request
     end
-    if generate_options[:additional_prompt_info].present? && generate_options[:additional_prompt_info].length > 1000
+    if generate_options[:additional_prompt_info].present? && generate_options[:additional_prompt_info].length > MAX_LLM_INPUT_CHARS
       return render json: { error: "additional_prompt_info must be less than 1000 characters" }, status: :bad_request
+    end
+    if generate_options[:standard].present? && generate_options[:standard].length > MAX_LLM_INPUT_CHARS
+      return render json: { error: "standard must be less than 1000 characters" }, status: :bad_request
     end
 
     return render_unauthorized_action unless Rubric.ai_rubrics_enabled?(context)
@@ -276,6 +281,67 @@ class RubricsController < ApplicationController
         @current_user,
         association_object,
         generate_options.to_h
+      )
+
+      render json: progress_json(progress, @current_user, session)
+    end
+  end
+
+  ALLOWED_REGENERATE_PARAMS = %w[criterion_id additional_user_prompt standard].freeze
+  ALLOWED_ORIG_GENERATE_PARAMS = %w[criteria_count rating_count points_per_criterion use_range grade_level additional_prompt_info].freeze
+  def llm_regenerate_criteria
+    association_object = RubricAssociation.get_association_object(params[:rubric_association])
+
+    criteria_params = params.fetch(:criteria, {}).values.map do |crit|
+      crit.permit(
+        :id,
+        :description,
+        :long_description,
+        :points,
+        :criterion_use_range,
+        ratings: %i[id criterion_id description long_description points]
+      )
+    end
+
+    regenerate_options = params.fetch(:regenerate_options, {}).permit(*ALLOWED_REGENERATE_PARAMS)
+    regenerate_options[:criteria] = criteria_params
+    if regenerate_options[:additional_user_prompt].present? && regenerate_options[:additional_user_prompt].length > MAX_LLM_INPUT_CHARS
+      return render json: { error: "additional_user_prompt must be less than 1000 characters" }, status: :bad_request
+    end
+    if regenerate_options[:standard].present? && regenerate_options[:standard].length > MAX_LLM_INPUT_CHARS
+      return render json: { error: "standard must be less than 1000 characters" }, status: :bad_request
+    end
+
+    orig_generate_options = params.fetch(:generate_options, {}).permit(*ALLOWED_ORIG_GENERATE_PARAMS)
+    orig_generate_options[:use_range] = value_to_boolean(orig_generate_options[:use_range])
+    if orig_generate_options[:criteria_count].present? && !(2..8).cover?(orig_generate_options[:criteria_count].to_i)
+      return render json: { error: "criteria_count must be between 2 and 8 inclusive" }, status: :bad_request
+    end
+    if orig_generate_options[:rating_count].present? && !(2..8).cover?(orig_generate_options[:rating_count].to_i)
+      return render json: { error: "rating_count must be between 2 and 8 inclusive" }, status: :bad_request
+    end
+    if orig_generate_options[:additional_prompt_info].present? && orig_generate_options[:additional_prompt_info].length > MAX_LLM_INPUT_CHARS
+      return render json: { error: "additional_prompt_info must be less than 1000 characters" }, status: :bad_request
+    end
+
+    return render_unauthorized_action unless Rubric.ai_rubrics_enabled?(context)
+
+    @rubric = @context.rubrics.build(user: @current_user)
+    if can_manage_rubrics_or_association_object?(association_object) && authorized_action(@rubric, @current_user, :update)
+      progress = Progress.create!(context: association_object, user: @current_user, tag: "llm_rubric_regeneration")
+      progress.process_job(
+        Rubric,
+        :process_regenerate_criteria_via_llm,
+        {
+          priority: Delayed::NORMAL_PRIORITY,
+          n_strand: ["Rubric.process_regenerate_criteria_via_llm", @domain_root_account.global_id],
+          max_attempts: 3,
+        },
+        @context,
+        @current_user,
+        association_object,
+        regenerate_options.to_h,
+        orig_generate_options.to_h
       )
 
       render json: progress_json(progress, @current_user, session)

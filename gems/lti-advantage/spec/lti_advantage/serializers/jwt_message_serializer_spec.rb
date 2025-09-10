@@ -24,6 +24,7 @@ module LtiAdvantage::Serializers
     let(:object) do
       obj = Class.new do
         include ActiveModel::Model
+
         attr_accessor :context, :errors, :validation_context, :custom
       end.new(context: "some_context", errors: {}, validation_context: "ctx", custom: "some_custom")
       obj.validate!

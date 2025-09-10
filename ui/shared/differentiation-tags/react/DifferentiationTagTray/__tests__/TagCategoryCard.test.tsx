@@ -44,6 +44,8 @@ describe('TagCategoryCard', () => {
     const defaultProps: TagCategoryCardProps = {
       category: noTagsCategory,
       onEditCategory: jest.fn(),
+      newlyCreatedCategoryId: null,
+      onEditButtonBlur: jest.fn(),
     }
     return render(<TagCategoryCard {...defaultProps} {...props} />)
   }

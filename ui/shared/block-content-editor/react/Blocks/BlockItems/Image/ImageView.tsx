@@ -18,8 +18,32 @@
 
 import './image-block.css'
 import {ImageViewProps} from './types'
-import {ImageBlockDefaultPreviewImage} from './ImageBlockDefaultPreviewImage'
+import {DefaultPreviewImage} from '../DefaultPreviewImage/DefaultPreviewImage'
+import {ImageCaption} from './ImageCaption'
+import {Flex} from '@instructure/ui-flex'
 
-export const ImageView = ({url, altText}: ImageViewProps) => {
-  return url ? <img src={url} alt={altText} /> : <ImageBlockDefaultPreviewImage />
+export const ImageView = ({
+  url,
+  altText,
+  decorativeImage,
+  altTextAsCaption,
+  caption,
+}: ImageViewProps) => {
+  const calculatedCaption = altTextAsCaption ? altText : caption
+
+  return (
+    <Flex direction="column" gap="mediumSmall">
+      {url ? (
+        // eslint-disable-next-line jsx-a11y/alt-text
+        <img
+          src={url}
+          alt={decorativeImage ? undefined : altText}
+          role={decorativeImage ? 'presentation' : undefined}
+        />
+      ) : (
+        <DefaultPreviewImage blockType="image" />
+      )}
+      {!!calculatedCaption && <ImageCaption>{calculatedCaption}</ImageCaption>}
+    </Flex>
+  )
 }

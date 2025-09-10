@@ -27,10 +27,12 @@ export const STUDENT = 'student'
 export const TEACHER = 'teacher'
 export const MODULE_ITEMS = 'moduleItems'
 export const MODULE_ITEMS_STUDENT = 'moduleItemsStudent'
+export const MODULE_ITEM_TITLES = 'moduleItemTitles'
 export const MODULES = 'modules'
 export const MODULE_ITEMS_QUERY_MAP: Record<string, string> = {
   [TEACHER]: persistedQueries.GetModuleItemsQuery.query,
   [STUDENT]: persistedQueries.GetModuleItemsStudentQuery.query,
+  [MODULE_ITEM_TITLES]: persistedQueries.GetModuleItemTitlesQuery.query,
 }
 export const MODULES_QUERY_MAP: Record<string, string> = {
   [TEACHER]: persistedQueries.GetModulesQuery.query,

@@ -21,8 +21,8 @@ class Enrollment::BulkUpdate
   include Api
 
   DEFAULT_ENROLLMENT = {
-    type: "StudentEnrollment",
     no_notify: false,
+    allow_multiple_enrollments: true
   }.freeze
 
   def initialize(context, user)
@@ -30,7 +30,7 @@ class Enrollment::BulkUpdate
     @current_user = user
   end
 
-  def bulk_enrollment(progress = nil, user_ids:, course_ids:)
+  def bulk_enrollment(progress = nil, user_ids:, course_ids:, enrollment_type: "StudentEnrollment")
     progress&.calculate_completion!(0, user_ids.size * course_ids.size)
     errors = {}
     users = api_find_all(User, user_ids, account: @context)
@@ -39,10 +39,11 @@ class Enrollment::BulkUpdate
       courses.each do |course|
         unless user.can_be_enrolled_in_course?(course)
           errors[user.id] << "User #{user.id} cannot be enrolled in course #{course.id}"
+          next
         end
 
         SubmissionLifecycleManager.with_executing_user(@current_user) do
-          @enrollment = course.enroll_user(user, DEFAULT_ENROLLMENT[:type], DEFAULT_ENROLLMENT.to_h.merge(allow_multiple_enrollments: true))
+          @enrollment = course.enroll_user(user, enrollment_type, DEFAULT_ENROLLMENT)
         end
         errors[user.id] << @enrollment.errors unless @enrollment.valid?
       rescue => e

@@ -76,7 +76,7 @@ module Types
                     load_association(:submission).then do |submission|
                       Loaders::AssociationLoader.for(Submission, :assignment).load(submission)
                     end
-                  ]).then { object.author if !object.submission.assignment.moderated_grading? && object.grants_right?(current_user, :read_author) }
+                  ]).then { object.author if (current_user.id == object.submission.user.id || !object.submission.assignment.moderated_grading) && object.grants_right?(current_user, :read_author) }
     end
 
     def author_visible_name

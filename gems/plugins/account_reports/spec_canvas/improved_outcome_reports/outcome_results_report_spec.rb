@@ -287,29 +287,6 @@ describe "OutcomeResultsReport" do
       let(:outcome_ids) { @outcome.id.to_s }
       let(:uuids) { "#{@user1.uuid},#{@user2.uuid}" }
 
-      it "does not call OS when FF is off for the account" do
-        @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "off")
-
-        expect(outcome_reports).not_to receive(:get_lmgb_results)
-          .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids)
-
-        results = outcome_reports.send(:outcomes_new_quiz_scope)
-        expect(results).to be_empty
-      end
-
-      it "does not call OS when FF is off for course" do
-        @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
-        @course1.set_feature_flag!(:outcome_service_results_to_canvas, "off")
-
-        # get_lmgb_results is still called, but the first line checks is the FF is enabled and returns nil if OFF
-        # In that case, get_lmgb_results returns nil
-        expect(outcome_reports).to receive(:get_lmgb_results)
-          .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids)
-
-        results = outcome_reports.send(:outcomes_new_quiz_scope)
-        expect(results).to be_empty
-      end
-
       it "filters out users that do not have results" do
         @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
 
@@ -328,6 +305,33 @@ describe "OutcomeResultsReport" do
         expect(results[0]["learning outcome points possible"]).to eq 5.0
         expect(results[0]["outcome score"]).to eq 5.0
         expect(results[0]["attempt"]).to eq 1
+      end
+
+      it "does not duplicate user rows for inst ids" do
+        # We will skip this test if the pseudonym table does not have the is_inst_id column
+        inst_identity = Pseudonym.column_names.include?("is_inst_id")
+        if inst_identity
+          @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
+
+          @root_account.pseudonyms.create!(user: @user1, unique_id: "inst_id", is_inst_id: true)
+
+          # uuids contains both @user1 and @user2. The mock result only contains data for @user1, so @user2
+          # will not show up in the report.
+          expect(outcome_reports).to receive(:get_lmgb_results)
+            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids)
+            .and_return(mock_os_result(@user1, @outcome, @new_quiz, "2022-09-19T12:00:00.0Z"))
+
+          results = outcome_reports.send(:outcomes_new_quiz_scope)
+
+          # mock_os_result returns a result that has quiz metadata, but no question meta data. This means that
+          # learning outcome points possible and outcome score will be from the authoritative result.
+
+          expect(results.length).to eq(1)
+          expect(results[0]["student uuid"]).to eq @user1.uuid
+          expect(results[0]["learning outcome points possible"]).to eq 5.0
+          expect(results[0]["outcome score"]).to eq 5.0
+          expect(results[0]["attempt"]).to eq 1
+        end
       end
 
       it "includes users that do not have attempts" do

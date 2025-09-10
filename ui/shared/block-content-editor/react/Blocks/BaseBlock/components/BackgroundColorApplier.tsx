@@ -28,7 +28,12 @@ export const BackgroundColorApplier = ({
   children,
 }: BackgroundColorApplierProps) => {
   return (
-    <View as="div" background="primary" themeOverride={{backgroundPrimary: backgroundColor}}>
+    <View
+      as="div"
+      background="primary"
+      themeOverride={{backgroundPrimary: backgroundColor}}
+      data-testid="background-color-applier"
+    >
       {children}
     </View>
   )

@@ -2031,6 +2031,7 @@ he:
   addressbook_microservice_a4940422: "שרות מיקרו עבור פנקס הכתובות"
   addressbook_performance_tap_98ddf67: "הקשה על ביצועי ספר הכתובות "
   adds_analytics_link_on_the_user_settings_menu_3a048816: "מוסיף קישור analytics בתפריט הגדרות המשתמש"
+  adds_analytics_to_a_student_s_context_card_43560ed9: "מוסיף  analytics להקשר של כרטיס התלמיד "
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "מוסיף  analytics להקשר של כרטיס התלמיד "
   adjust_events_and_due_dates_879744fc: "התאמת אירועים ותאריכי יעד"
   adjust_final_grade_fa45e7e0: "התאמת ההערכה המסכמת"
@@ -6920,6 +6921,7 @@ he:
   deactivate_user_86c09036: "השבתת תלמיד"
   debugging_f98fcd74: מדאבג
   decaying_average_8bf6a0dd: "ממוצע נע משוקלל"
+  decline_7eeb5ff4: דחייה
   decorative_image_fde98579: "תמונת קישוט"
   decrease_indent_d9cf469d: "צמצום עימוד"
   decrease_indent_de6343ab: "הצרת עימוד"
@@ -7820,6 +7822,11 @@ he:
   ends_4fcb632: "מסתיים:"
   ends_at_9a62b528: "מסתיים ב"
   ends_e3a6843f: מסתיים
+  enhanced-rubrics-assignment-container: 
+    discussion_points_possible: 
+      one: " נקודה %{count} אפשרית"
+      other: "%{count} נקודות אפשריות"
+      two: "%{count} נקודות אפשריות"
   enhanced_individual_gradebook: 
     avg_score: "ציון ממוצע"
     high_score: "ציון גבוה"
@@ -20001,6 +20008,7 @@ he:
   unarchive_f245e2d6: "החזרה מהארכיון"
   unarchive_selected_e0c4bd3d: "נבחרה החזרה מהארכיון"
   unauthorized: "לא מורשה"
+  unauthorized_5094f75c: "לא מורשה "
   unauthorized_message: "חותמת ה JWT אינה תקינה"
   unauthorized_to_delete_this_file_a1271224: "אינך מורשה לבטל קובץ זה"
   unavailable_46d2c344: "לא זמין"

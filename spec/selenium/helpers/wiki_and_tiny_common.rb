@@ -20,6 +20,7 @@ require_relative "../common"
 require_relative "../rcs/pages/rce_next_page"
 module WikiAndTinyCommon
   include RCENextPage
+
   def wiki_page_body
     f("textarea.body")
   end

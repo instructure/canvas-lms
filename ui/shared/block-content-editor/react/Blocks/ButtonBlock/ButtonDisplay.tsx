@@ -19,6 +19,7 @@
 import {Flex} from '@instructure/ui-flex'
 import {SingleButton} from './SingleButton'
 import {ButtonDisplayProps} from './types'
+import './button-display.css'
 
 const alignmentMap = {
   left: 'start',
@@ -26,7 +27,12 @@ const alignmentMap = {
   right: 'end',
 } as const
 
-export const ButtonDisplay = ({settings, dataTestId}: ButtonDisplayProps) => {
+export const ButtonDisplay = ({
+  settings,
+  dataTestId,
+  onButtonClick,
+  focusHandler,
+}: ButtonDisplayProps) => {
   const {buttons, alignment, layout, isFullWidth} = settings
 
   const flexDirection = layout === 'vertical' ? 'column' : 'row'
@@ -43,9 +49,14 @@ export const ButtonDisplay = ({settings, dataTestId}: ButtonDisplayProps) => {
       wrap="wrap"
       gap="small"
     >
-      {buttons.map(button => (
+      {buttons.map((button, i) => (
         <Flex.Item key={button.id} shouldGrow={isFullWidth} overflowX="visible" overflowY="visible">
-          <SingleButton isFullWidth={isFullWidth} button={button} />
+          <SingleButton
+            isFullWidth={isFullWidth}
+            button={button}
+            onButtonClick={onButtonClick}
+            focusHandler={i === 0 ? focusHandler : undefined}
+          />
         </Flex.Item>
       ))}
     </Flex>

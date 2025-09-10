@@ -31,6 +31,7 @@ module Lti
 
       controller(ApplicationController) do
         include Lti::IMS::AccessTokenHelper
+
         before_action :authorized_lti2_tool
 
         def index

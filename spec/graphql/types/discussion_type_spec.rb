@@ -1184,36 +1184,20 @@ describe Types::DiscussionType do
     let(:graded_discussion) { DiscussionTopic.create_graded_topic!(course: @course, title: "Graded Discussion") }
     let(:discussion_type) { GraphQLTypeTester.new(graded_discussion, current_user: @student) }
 
-    context "when standardize_assignment_date_formatting feature flag is disabled" do
-      before do
-        Account.site_admin.disable_feature!(:standardize_assignment_date_formatting)
-      end
-
-      it "returns nil" do
-        expect(discussion_type.resolve("assignedToDates { id }")).to be_nil
+    context "for graded discussions with assignments" do
+      it "returns standardized date hash" do
+        result = discussion_type.resolve("assignedToDates { id dueAt title base }")
+        expect(result).to be_an(Array)
+        expect(result.length).to eq(1)
       end
     end
 
-    context "when standardize_assignment_date_formatting feature flag is enabled" do
-      before do
-        Account.site_admin.enable_feature!(:standardize_assignment_date_formatting)
-      end
+    context "for ungraded discussions" do
+      let(:ungraded_discussion) { @course.discussion_topics.create!(title: "Ungraded Discussion") }
+      let(:ungraded_discussion_type) { GraphQLTypeTester.new(ungraded_discussion, current_user: @student) }
 
-      context "for graded discussions with assignments" do
-        it "returns standardized date hash" do
-          result = discussion_type.resolve("assignedToDates { id dueAt title base }")
-          expect(result).to be_an(Array)
-          expect(result.length).to eq(1)
-        end
-      end
-
-      context "for ungraded discussions" do
-        let(:ungraded_discussion) { @course.discussion_topics.create!(title: "Ungraded Discussion") }
-        let(:ungraded_discussion_type) { GraphQLTypeTester.new(ungraded_discussion, current_user: @student) }
-
-        it "returns nil for discussions without assignments" do
-          expect(ungraded_discussion_type.resolve("assignedToDates { id }")).to be_nil
-        end
+      it "returns nil for discussions without assignments" do
+        expect(ungraded_discussion_type.resolve("assignedToDates { id }")).to be_nil
       end
     end
   end

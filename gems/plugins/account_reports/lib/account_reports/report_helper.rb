@@ -254,7 +254,7 @@ module AccountReports::ReportHelper
         .unretired
         .select([:user_id, :path])
         .where(user_id: shard_user_ids)
-        .order("user_id, position ASC")
+        .order(:user_id, :position)
         .distinct_on(:user_id)
     end.index_by(&:user_id)
   end

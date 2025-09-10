@@ -13,5 +13,8 @@
   },
   "GetModuleItemsStudentQuery": {
     "anonymous_access_allowed": true
+  },
+  "GetModuleItemTitlesQuery": {
+    "anonymous_access_allowed": true
   }
 }

@@ -137,6 +137,18 @@ describe('ContextModulesHeader', () => {
       expect(() => getByText(defaultProps.viewProgress.label)).toThrow(/Unable to find an element/)
     })
 
+    it('Expand All is hidden when no modules present', () => {
+      const props = {
+        ...defaultProps,
+        overrides: {
+          hasModules: false,
+        },
+      }
+      // @ts-expect-error
+      const {queryByText} = render(<ContextModulesHeader {...props} />)
+      expect(queryByText('Expand All')).not.toBeInTheDocument()
+    })
+
     it('"Expand All" is visible', () => {
       const {getByText} = render(
         // @ts-expect-error

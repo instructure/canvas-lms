@@ -19,7 +19,7 @@
 #
 
 describe Account do
-  include_examples "outcome import context examples"
+  it_behaves_like "outcome import context examples"
 
   context "domain_method" do
     it "retrieves correct account domain" do
@@ -586,7 +586,7 @@ describe Account do
     disabled_by_default = RoleOverride.permissions.select { |_, v| v[:true_for].empty? }.map(&:first)
     full_access = RoleOverride.permissions.keys +
                   limited_access - disabled_by_default - conditional_access +
-                  [:create_courses]
+                  [:create_courses, :manage_grading_schemes]
 
     full_root_access = full_access - RoleOverride.permissions.select { |_k, v| v[:account_only] == :site_admin }.map(&:first)
     full_sub_access = full_root_access - RoleOverride.permissions.select { |_k, v| v[:account_only] == :root }.map(&:first)
@@ -3348,6 +3348,58 @@ describe Account do
 
       expect(root_account).not_to receive(:save!)
       root_account.denormalize_horizon_account_if_changed
+    end
+  end
+
+  describe "#enqueue_a11y_scan_if_enabled" do
+    let(:account) { account_model }
+
+    context "when the account is not a root account" do
+      before do
+        allow(account).to receive(:root_account?).and_return(false)
+      end
+
+      it "does not enqueue the scan" do
+        expect(Accessibility::RootAccountScannerService).not_to receive(:call)
+
+        account.update!(settings: { enable_content_a11y_checker: true })
+      end
+    end
+
+    context "when settings have not changed" do
+      it "does not enqueue the scan" do
+        expect(Accessibility::RootAccountScannerService).not_to receive(:call)
+
+        account.update!(name: "Something New")
+      end
+    end
+
+    context "when the content accessibility checker is not enabled" do
+      it "does not enqueue the scan" do
+        expect(Accessibility::RootAccountScannerService).not_to receive(:call)
+
+        account.update!(settings: { enable_content_a11y_checker: false })
+      end
+    end
+
+    context "when old settings already enabled content accessibility checker" do
+      before do
+        account.update!(settings: { enable_content_a11y_checker: true })
+      end
+
+      it "does not enqueue the scan" do
+        expect(Accessibility::RootAccountScannerService).not_to receive(:call)
+
+        account.update!(settings: { enable_content_a11y_checker: true })
+      end
+    end
+
+    context "when enable_content_a11y_checker is changed from false to true" do
+      it "calls Accessibility::RootAccountScannerService" do
+        expect(Accessibility::RootAccountScannerService).to receive(:call).with(account:)
+
+        account.update!(settings: { enable_content_a11y_checker: true })
+      end
     end
   end
 end

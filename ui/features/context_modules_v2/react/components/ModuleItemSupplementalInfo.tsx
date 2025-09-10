@@ -61,16 +61,11 @@ const ModuleItemSupplementalInfo: React.FC<ModuleItemSupplementalInfoProps> = ({
         const checkpointContent = {
           ...checkpoint,
           type: 'Discussion' as const,
-          assignmentOverrides: checkpoint.assignmentOverrides,
         }
 
-        const hasOverrides =
-          checkpoint.assignmentOverrides?.edges?.length &&
-          checkpoint.assignmentOverrides?.edges?.length > 0
-        const hasAnyDate =
-          checkpoint.dueAt || checkpoint.assignmentOverrides?.edges?.some(({node}) => node.dueAt)
+        const hasAnyDueDate = checkpoint.assignedToDates?.some(date => date.dueAt)
 
-        const dateComponent = hasAnyDate ? (
+        const dateComponent = hasAnyDueDate ? (
           <DueDateLabel content={checkpointContent} contentTagId={contentTagId} />
         ) : null
 
@@ -83,7 +78,7 @@ const ModuleItemSupplementalInfo: React.FC<ModuleItemSupplementalInfoProps> = ({
               {dateComponent}
             </Flex.Item>,
           )
-        } else if (hasOverrides) {
+        } else if (checkpoint.assignedToDates && checkpoint.assignedToDates.length > 1) {
           // Has overrides but no dates - show "No Due Date"
           sections.push(
             <Flex.Item key={`checkpoint-${index}`}>
@@ -108,23 +103,9 @@ const ModuleItemSupplementalInfo: React.FC<ModuleItemSupplementalInfoProps> = ({
       })
     } else {
       // Handle regular content dates - only push if DueDateLabel would render something
-      // Check for standardized dates first (if enabled)
-      const hasStandardizedDates = content?.assignedToDates && content.assignedToDates.length > 0
+      const hasStandardizedDates = content?.assignedToDates?.some(d => d.dueAt) ?? false
 
-      // Check for legacy dates
-      const baseDueDate =
-        content?.type === 'Discussion' && content?.assignment?.dueAt
-          ? content.assignment.dueAt
-          : content?.dueAt
-      const hasDueDate =
-        baseDueDate ||
-        content?.assignmentOverrides?.edges?.some(({node}) => node.dueAt) ||
-        content?.assignment?.assignmentOverrides?.edges?.some(({node}) => node.dueAt)
-
-      // Show dates if we have standardized dates OR legacy dates
-      const shouldShowDates = hasStandardizedDates || hasDueDate
-
-      if (shouldShowDates) {
+      if (hasStandardizedDates) {
         const dateComponent = <DueDateLabel content={content} contentTagId={contentTagId} />
         sections.push(<Flex.Item key="due-date">{dateComponent}</Flex.Item>)
       }
@@ -171,7 +152,7 @@ const ModuleItemSupplementalInfo: React.FC<ModuleItemSupplementalInfoProps> = ({
   }
 
   return (
-    <Flex gap="xx-small" padding="0 0 0 xx-small" wrap="wrap">
+    <Flex gap="xx-small" padding="x-small xx-small 0" wrap="wrap">
       {sections.map((section, index) => (
         <React.Fragment key={index}>
           {section}

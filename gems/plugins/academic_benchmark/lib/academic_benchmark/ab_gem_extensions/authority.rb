@@ -23,6 +23,7 @@ module AcademicBenchmarks
   module Standards
     class Authority
       include Common
+
       def publication_cache
         @publication_cache ||= {}
       end

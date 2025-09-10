@@ -22,30 +22,7 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
 import DashboardTab from '../DashboardTab'
-
 type Props = Record<string, never> // DashboardTab has no props
-
-const mockCoursesData = {
-  data: {
-    legacyNode: {
-      _id: '123',
-      enrollments: [
-        {
-          course: {
-            _id: '1',
-            name: 'Introduction to Computer Science',
-          },
-        },
-        {
-          course: {
-            _id: '2',
-            name: 'Advanced Mathematics',
-          },
-        },
-      ],
-    },
-  },
-}
 
 const mockStatisticsData = {
   data: {
@@ -81,13 +58,86 @@ const mockStatisticsData = {
 
 let queryClient: QueryClient
 
+const mockAnnouncementsData = {
+  data: {
+    legacyNode: {
+      _id: '123',
+      enrollments: [],
+    },
+  },
+}
+
 const server = setupServer(
-  // Mock GraphQL queries used by CourseWorkSummaryWidget
-  graphql.query('GetUserCourses', () => {
-    return HttpResponse.json(mockCoursesData)
+  // Handle GetUserCoursesWithGrades query with default handler
+  graphql.query('GetUserCoursesWithGrades', () => {
+    return HttpResponse.json({
+      data: {
+        legacyNode: {
+          _id: '123',
+          enrollments: [
+            {
+              course: {
+                _id: '1',
+                name: 'Introduction to Computer Science',
+                courseCode: 'CS101',
+              },
+              updatedAt: '2025-01-01T00:00:00Z',
+              grades: {
+                currentScore: 95,
+                currentGrade: 'A',
+                finalScore: 95,
+                finalGrade: 'A',
+                overrideScore: null,
+                overrideGrade: null,
+              },
+            },
+            {
+              course: {
+                _id: '2',
+                name: 'Advanced Mathematics',
+                courseCode: 'MATH301',
+              },
+              updatedAt: '2025-01-01T00:00:00Z',
+              grades: {
+                currentScore: 87,
+                currentGrade: 'B+',
+                finalScore: 87,
+                finalGrade: 'B+',
+                overrideScore: null,
+                overrideGrade: null,
+              },
+            },
+          ],
+        },
+      },
+    })
   }),
+  // Override specific queries with local mock data
   graphql.query('GetUserCourseStatistics', () => {
     return HttpResponse.json(mockStatisticsData)
+  }),
+  // Mock GraphQL queries used by AnnouncementsWidget
+  graphql.query('GetUserAnnouncements', () => {
+    return HttpResponse.json(mockAnnouncementsData)
+  }),
+  // Handle GetUserCourseWork query
+  graphql.query('GetUserCourseWork', () => {
+    return HttpResponse.json({
+      data: {
+        legacyNode: {
+          _id: '123',
+          enrollments: [],
+        },
+      },
+    })
+  }),
+  // Handle any other common queries that might be used
+  graphql.query('GetAnnouncements', () => {
+    return HttpResponse.json({
+      data: {
+        announcements: [],
+      },
+    })
   }),
 )
 

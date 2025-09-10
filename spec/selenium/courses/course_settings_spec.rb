@@ -149,6 +149,28 @@ describe "course settings" do
       expect(@course.grading_standard).to eq(@standard)
     end
 
+    context "content security policy" do
+      it "renders content security policy options" do
+        @account.enable_feature!(:javascript_csp)
+        @account.enable_csp!
+        account_admin_user(active_all: true, account: @account)
+
+        user_session(@admin)
+        get "/courses/#{@course.id}/settings"
+        expect(f("#course_disable_csp")).to be_displayed
+      end
+
+      it "does not render when CSP is not enabled" do
+        @account.disable_feature!(:javascript_csp)
+        @account.disable_csp!
+        account_admin_user(active_all: true, account: @account)
+
+        user_session(@admin)
+        get "/courses/#{@course.id}/settings"
+        expect(f("body")).not_to contain_css("#course_disable_csp")
+      end
+    end
+
     context "as a ta" do
       before do
         course_with_ta_logged_in(course: @course)

@@ -108,21 +108,17 @@ class UserService < ActiveRecord::Base
     opts[:token] = nil
     opts[:secret] = nil
     opts[:service] = params[:service]
-    case opts[:service]
-    when "diigo"
+
+    if opts[:service] == "diigo"
       opts[:service_domain] = "diigo.com"
       opts[:protocol] = "http-auth"
       opts[:service_user_id] = params[:user_name]
       opts[:service_user_name] = params[:user_name]
       opts[:password] = params[:password]
-    when "skype"
-      opts[:service_domain] = "skype.com"
-      opts[:service_user_id] = params[:user_name]
-      opts[:service_user_name] = params[:user_name]
-      opts[:protocol] = "skype"
     else
       raise "Unknown Service Type"
     end
+
     register(opts)
   end
 
@@ -138,8 +134,6 @@ class UserService < ActiveRecord::Base
     case type
     when "google_drive"
       2
-    when "skype"
-      3
     when "diigo"
       8
     else
@@ -153,8 +147,6 @@ class UserService < ActiveRecord::Base
       t "#user_service.descriptions.google_drive", "Students can use Google Drive to collaborate on group projects.  Google Drive allows for real-time collaborative editing of documents, spreadsheets and presentations."
     when "diigo"
       t "#user_service.descriptions.diigo", "Diigo is a collaborative link-sharing tool.  You can tag any page on the Internet for later reference.  You can also link to other users' Diigo accounts to share links of similar interest."
-    when "skype"
-      t "#user_service.descriptions.skype", "Skype is a free tool for online voice and video calls."
     else # 'google_calendar'
       ""
     end
@@ -168,8 +160,6 @@ class UserService < ActiveRecord::Base
       "http://calendar.google.com"
     when "diigo"
       "https://www.diigo.com/sign-up"
-    when "skype"
-      "http://www.skype.com/go/register"
     else
       nil
     end
@@ -183,8 +173,6 @@ class UserService < ActiveRecord::Base
       "http://calendar.google.com"
     when "diigo"
       "http://www.diigo.com/user/#{service_user_name}"
-    when "skype"
-      "skype:#{service_user_name}?add"
     else
       "http://www.instructure.com"
     end

@@ -20,7 +20,6 @@ import React, {useState, useEffect, useCallback, memo, useMemo} from 'react'
 import {debounce} from '@instructure/debounce'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
-import {Flex} from '@instructure/ui-flex'
 import ModulePageActionHeader from './ModulePageActionHeader'
 import Module from './Module'
 import {DragDropContext, Droppable, Draggable, DropResult} from 'react-beautiful-dnd'
@@ -31,7 +30,7 @@ import {
 } from '../handlers/modulePageActionHandlers'
 import ManageModuleContentTray from './ManageModuleContent/ManageModuleContentTray'
 import {useModules} from '../hooks/queries/useModules'
-import {useReorderModuleItems} from '../hooks/mutations/useReorderModuleItems'
+import {useReorderModuleItemsGQL} from '../hooks/mutations/useReorderModuleItemsGQL'
 import {useReorderModules} from '../hooks/mutations/useReorderModules'
 import {useToggleCollapse, useToggleAllCollapse} from '../hooks/mutations/useToggleCollapse'
 import {useContextModule} from '../hooks/useModuleContext'
@@ -45,7 +44,10 @@ import {useCourseTeacher} from '../hooks/queriesTeacher/useCourseTeacher'
 import {validateModuleTeacherRenderRequirements, ALL_MODULES} from '../utils/utils'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useHowManyModulesAreFetchingItems} from '../hooks/queries/useHowManyModulesAreFetchingItems'
-import {TEACHER, STUDENT, MODULE_ITEMS} from '../utils/constants'
+import {TEACHER, STUDENT, MODULE_ITEMS, PAGE_SIZE, SHOW_ALL_PAGE_SIZE} from '../utils/constants'
+import {IconModuleSolid} from '@instructure/ui-icons'
+import {handleAddModule} from '../handlers/moduleActionHandlers'
+import CreateNewModule from '../components/CreateNewModule'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -59,10 +61,10 @@ const ModulesList: React.FC = () => {
     moduleCursorState,
     setModuleCursorState,
   } = useContextModule()
-  const reorderItemsMutation = useReorderModuleItems()
+  const reorderItemsMutation = useReorderModuleItemsGQL()
   const reorderModulesMutation = useReorderModules()
   const {data, isLoading, error} = useModules(courseId || '')
-  const {moduleFetchingCount, maxFetchingCount, fetchComplete} = useHowManyModulesAreFetchingItems()
+  const {maxFetchingCount, fetchComplete} = useHowManyModulesAreFetchingItems()
   const toggleCollapseMutation = useToggleCollapse(courseId || '')
   const toggleAllCollapse = useToggleAllCollapse(courseId || '')
 
@@ -79,11 +81,21 @@ const ModulesList: React.FC = () => {
   const [teacherViewValue, setTeacherViewValue] = useState(ALL_MODULES)
   const [studentViewValue, setStudentViewValue] = useState(ALL_MODULES)
   const {data: courseStudentData} = useCourseTeacher(courseId || '')
-  const [isDisabled, setIsDisabled] = useState(true)
+  const [isDisabled, setIsDisabled] = useState(false)
+  const [isExpanding, setIsExpanding] = useState(false)
+
+  function resetIfInvalid(allModules: any[], value: any, setValue: (arg0: string) => void) {
+    if (!allModules.some((m: {_id: any}) => m._id === value)) {
+      setValue(ALL_MODULES)
+    }
+  }
 
   useEffect(() => {
-    setIsDisabled(moduleFetchingCount > 0)
-  }, [moduleFetchingCount])
+    if (isExpanding) {
+      setIsDisabled(!fetchComplete)
+      setIsExpanding(!fetchComplete)
+    }
+  }, [isExpanding, fetchComplete])
 
   useEffect(() => {
     if ((!teacherViewEnabled && !studentViewEnabled) || !courseStudentData) return
@@ -126,6 +138,9 @@ const ModulesList: React.FC = () => {
   useEffect(() => {
     if (data?.pages) {
       const allModules = data.pages.flatMap(page => page.modules)
+
+      resetIfInvalid(allModules, teacherViewValue, setTeacherViewValue)
+      resetIfInvalid(allModules, studentViewValue, setStudentViewValue)
 
       // Create a Map for module expansion state
       const initialExpandedState = new Map<string, boolean>()
@@ -187,37 +202,72 @@ const ModulesList: React.FC = () => {
   ) => {
     const dragCursor = moduleCursorState[dragModuleId]
     const hoverCursor = moduleCursorState[hoverModuleId]
+    const view = TEACHER // Always use TEACHER view since DnD is only available in teacher view
 
-    const sourceModuleData = queryClient.getQueryData([MODULE_ITEMS, dragModuleId, dragCursor]) as {
+    // In "show all" mode, prioritize the complete data over paginated data
+    let sourceModuleData = queryClient.getQueryData([
+      'MODULE_ITEMS_ALL',
+      dragModuleId,
+      view,
+      SHOW_ALL_PAGE_SIZE,
+    ]) as {
       moduleItems: ModuleItem[]
     }
 
-    if (!sourceModuleData?.moduleItems?.length) return
+    // Fallback to paginated cache if show all not available
+    if (!sourceModuleData?.moduleItems?.length) {
+      sourceModuleData = queryClient.getQueryData([MODULE_ITEMS, dragModuleId, dragCursor]) as {
+        moduleItems: ModuleItem[]
+      }
+    }
 
     // Get the item being moved
     const movedItem = sourceModuleData.moduleItems[dragIndex]
     if (!movedItem) return
 
     // Helper to update cache and call the mutation
-    const updateAndMutate = (moduleId: string, oldModuleId: string, updatedItems: ModuleItem[]) => {
+    const updateAndMutate = (
+      moduleId: string,
+      oldModuleId: string,
+      updatedItems: ModuleItem[],
+      targetPosition?: number,
+    ) => {
       // Update cache
       const cursor = moduleCursorState[moduleId]
 
-      queryClient.setQueryData([MODULE_ITEMS, moduleId, cursor], {
-        ...(moduleId === dragModuleId
-          ? sourceModuleData
-          : queryClient.getQueryData([MODULE_ITEMS, moduleId, cursor])),
-        moduleItems: updatedItems,
-      })
+      // Try to update paginated cache first
+      const paginatedData = queryClient.getQueryData([MODULE_ITEMS, moduleId, cursor])
+      if (paginatedData) {
+        queryClient.setQueryData([MODULE_ITEMS, moduleId, cursor], {
+          ...(moduleId === dragModuleId ? sourceModuleData : paginatedData),
+          moduleItems: updatedItems,
+        })
+      }
+
+      // Also try to update "show all" cache if it exists with correct key
+      const showAllData = queryClient.getQueryData([
+        'MODULE_ITEMS_ALL',
+        moduleId,
+        view,
+        SHOW_ALL_PAGE_SIZE,
+      ])
+      if (showAllData) {
+        queryClient.setQueryData(['MODULE_ITEMS_ALL', moduleId, view, SHOW_ALL_PAGE_SIZE], {
+          ...(moduleId === dragModuleId ? sourceModuleData : showAllData),
+          moduleItems: updatedItems,
+        })
+      }
 
       // Get item IDs and call mutation if needed
       const itemIds = getItemIds(updatedItems)
+
       if (itemIds.length > 0) {
         reorderItemsMutation.mutate({
           courseId,
           moduleId,
+          itemIds,
           oldModuleId,
-          order: itemIds,
+          targetPosition,
         })
       }
     }
@@ -235,15 +285,28 @@ const ModulesList: React.FC = () => {
       updateAndMutate(dragModuleId, dragModuleId, updateIndexes(updatedItems))
       // For cross-module movement
     } else {
-      const destModuleData = queryClient.getQueryData([
-        MODULE_ITEMS,
-        hoverModuleId,
-        hoverCursor,
-      ]) as {
+      // Try to get destination data from either paginated cache or "show all" cache
+      let destModuleData = queryClient.getQueryData([MODULE_ITEMS, hoverModuleId, hoverCursor]) as {
         moduleItems: ModuleItem[]
       }
 
+      // If not found in paginated cache, try the "show all" cache with correct key
+      if (!destModuleData?.moduleItems) {
+        destModuleData = queryClient.getQueryData([
+          'MODULE_ITEMS_ALL',
+          hoverModuleId,
+          view,
+          SHOW_ALL_PAGE_SIZE,
+        ]) as {
+          moduleItems: ModuleItem[]
+        }
+      }
+
       if (!destModuleData?.moduleItems) return
+
+      // Calculate absolute target position for cross-module moves
+      // For cross-module moves, we want to place the item at the precise drop location
+      const absoluteTargetPosition = hoverIndex + 1
 
       // Prepare source module update (remove the item)
       const updatedSourceItems = updateIndexes(
@@ -260,14 +323,77 @@ const ModulesList: React.FC = () => {
       updatedDestItems.splice(hoverIndex, 0, updatedItem)
       const updatedDestWithIndexes = updateIndexes(updatedDestItems)
 
-      // Update both caches and call mutations
-      updateAndMutate(dragModuleId, dragModuleId, updatedSourceItems)
-      updateAndMutate(hoverModuleId, dragModuleId, updatedDestWithIndexes)
+      // Update source module cache (optimistic update only)
+      const sourceCursor = moduleCursorState[dragModuleId]
+      const sourcePaginatedData = queryClient.getQueryData([
+        MODULE_ITEMS,
+        dragModuleId,
+        sourceCursor,
+      ])
+      if (sourcePaginatedData) {
+        queryClient.setQueryData([MODULE_ITEMS, dragModuleId, sourceCursor], {
+          ...sourcePaginatedData,
+          moduleItems: updatedSourceItems,
+        })
+      }
+      const sourceShowAllData = queryClient.getQueryData([
+        'MODULE_ITEMS_ALL',
+        dragModuleId,
+        view,
+        SHOW_ALL_PAGE_SIZE,
+      ])
+      if (sourceShowAllData) {
+        queryClient.setQueryData(['MODULE_ITEMS_ALL', dragModuleId, view, SHOW_ALL_PAGE_SIZE], {
+          ...sourceShowAllData,
+          moduleItems: updatedSourceItems,
+        })
+      }
+
+      // Update destination module cache
+      const destCursor = moduleCursorState[hoverModuleId]
+      const destPaginatedData = queryClient.getQueryData([MODULE_ITEMS, hoverModuleId, destCursor])
+      if (destPaginatedData) {
+        queryClient.setQueryData([MODULE_ITEMS, hoverModuleId, destCursor], {
+          ...destPaginatedData,
+          moduleItems: updatedDestWithIndexes,
+        })
+      }
+      const destShowAllData = queryClient.getQueryData([
+        'MODULE_ITEMS_ALL',
+        hoverModuleId,
+        view,
+        SHOW_ALL_PAGE_SIZE,
+      ])
+      if (destShowAllData) {
+        queryClient.setQueryData(['MODULE_ITEMS_ALL', hoverModuleId, view, SHOW_ALL_PAGE_SIZE], {
+          ...destShowAllData,
+          moduleItems: updatedDestWithIndexes,
+        })
+      }
+
+      // For cross-module moves, send only the moved item ID
+      const movedItemIds = [movedItem._id].filter(Boolean)
+
+      if (movedItemIds.length > 0) {
+        reorderItemsMutation.mutate({
+          courseId,
+          moduleId: hoverModuleId,
+          itemIds: movedItemIds,
+          oldModuleId: dragModuleId,
+          targetPosition: absoluteTargetPosition,
+        })
+      }
     }
   }
 
+  const handleDragStart = useCallback(() => {
+    document.dispatchEvent(new CustomEvent('drag-state-change', {detail: {isDragging: true}}))
+  }, [])
+
   // Use the utility function from dndUtils.ts, passing our handleMoveItem as a callback
   const handleDragEnd = (result: DropResult) => {
+    document.dispatchEvent(new CustomEvent('drag-state-change', {detail: {isDragging: false}}))
+
     // Check for no destination or no movement first
     if (
       !result.destination ||
@@ -320,6 +446,7 @@ const ModulesList: React.FC = () => {
   }, [data, setExpandedModules, handleToggleAllCollapse])
 
   const handleExpandAllRef = useCallback(() => {
+    setIsExpanding(true)
     // Update UI immediately
     handleExpandAll(data, setExpandedModules)
     // Persist to database
@@ -348,23 +475,26 @@ const ModulesList: React.FC = () => {
   )
 
   return (
-    <DragDropContext onDragEnd={handleDragEnd}>
+    <DragDropContext onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
       <View as="div">
         <ModulePageActionHeader
           onCollapseAll={handleCollapseAllRef}
           onExpandAll={handleExpandAllRef}
           anyModuleExpanded={Array.from(expandedModules.values()).some(expanded => expanded)}
           disabled={isDisabled}
+          hasModules={(data?.pages[0]?.modules.length ?? 0) > 0}
         />
-        {isLoading && !data ? (
+        {isLoading && !data && (
           <View as="div" textAlign="center" padding="large">
             <Spinner renderTitle={I18n.t('Loading modules')} size="large" />
           </View>
-        ) : error ? (
+        )}
+        {(!isLoading || data) && error && (
           <View as="div" textAlign="center" padding="large">
             <Text color="danger">{I18n.t('Error loading modules')}</Text>
           </View>
-        ) : (
+        )}
+        {!isLoading && !error && (
           <Droppable droppableId="modules-list" type="MODULE">
             {provided => (
               <div
@@ -384,11 +514,9 @@ const ModulesList: React.FC = () => {
                     disabled={isDisabled}
                   />
                 ) : null}
-                <Flex direction="column" gap="small">
+                <View className="context_module_list">
                   {data?.pages[0]?.modules.length === 0 ? (
-                    <View as="div" textAlign="center" padding="large">
-                      <Text>{I18n.t('No modules found')}</Text>
-                    </View>
+                    <CreateNewModule courseId={courseId} data={data} />
                   ) : (
                     data?.pages
                       .flatMap(page => page.modules)
@@ -414,6 +542,7 @@ const ModulesList: React.FC = () => {
                               <MemoizedModule
                                 id={module._id}
                                 name={module.name}
+                                position={module.position}
                                 published={module.published}
                                 prerequisites={module.prerequisites}
                                 completionRequirements={module.completionRequirements}
@@ -433,7 +562,7 @@ const ModulesList: React.FC = () => {
                         </Draggable>
                       ))
                   )}
-                </Flex>
+                </View>
                 {provided.placeholder}
               </div>
             )}

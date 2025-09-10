@@ -20,6 +20,7 @@
 module Quizzes
   class QuizUserFinder
     extend Forwardable
+
     attr_reader :quiz, :user
 
     def_delegators :@quiz, :context, :quiz_submissions, :differentiated_assignments_applies?

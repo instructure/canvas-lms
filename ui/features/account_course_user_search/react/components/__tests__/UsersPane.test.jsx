@@ -29,7 +29,17 @@ const equal = (value, expected) => expect(value).toEqual(expected)
 const fakeStore = () => ({
   state: {
     userList: {
-      users: [{}],
+      users: [
+        {
+          id: '1',
+          name: 'Test User',
+          sortable_name: 'User, Test',
+          short_name: 'Test',
+          email: 'test@example.com',
+          sis_user_id: 'test123',
+          last_login: '2023-01-01T00:00:00Z',
+        },
+      ],
       isLoading: false,
       errors: {search_term: ''},
       next: undefined,

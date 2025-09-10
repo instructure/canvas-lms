@@ -228,11 +228,12 @@ describe "conversations new" do
         f("button[data-testid='more-options']").click
         fj("span[class*='-menuItem__label']:contains('Archive')").click
         driver.switch_to.alert.accept
-        expect(fj("span:contains('Message archived!')")).to be_present
         f("button[data-testid='more-options']").click
+        expect(fj("span[class*='-menuItem__label']:contains('Unarchive')")).to be_present
         fj("span[class*='-menuItem__label']:contains('Unarchive')").click
         driver.switch_to.alert.accept
-        expect(fj("span:contains('Message unarchived!')")).to be_present
+        f("button[data-testid='more-options']").click
+        expect(fj("span[class*='-menuItem__label']:contains('Archive')")).to be_present
       end
 
       it "hides selected message while loading" do

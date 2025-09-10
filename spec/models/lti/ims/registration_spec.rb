@@ -30,6 +30,7 @@ module Lti::IMS
     let(:policy_uri) { "http://example.com/policy" }
     let(:lti_tool_configuration) do
       {
+        target_link_uri: "http://example.com/launch",
         domain: "example.com",
         messages: [],
         claims: []
@@ -161,6 +162,22 @@ module Lti::IMS
         end
       end
 
+      context "invalid target_link_uri in config" do
+        let(:lti_tool_configuration) do
+          {
+            domain: "example.com",
+            messages: [],
+            claims: [],
+            target_link_uri: "not a valid url"
+          }
+        end
+
+        it "is invalid" do
+          expect(subject).to be false
+          expect(registration.errors[:lti_tool_configuration]).to be_present
+        end
+      end
+
       context "scopes" do
         context "contains invalid scopes" do
           let(:scopes) { ["asdf"] }
@@ -204,9 +221,9 @@ module Lti::IMS
             "privacy_level" => "anonymous",
             "public_jwk_url" => "http://example.com/jwks",
             "scopes" => [],
-            "target_link_uri" => nil,
+            "target_link_uri" => "http://example.com/launch",
+            "url" => "http://example.com/launch",
             "title" => "Example Tool",
-            "url" => nil,
           }
         )
       end
@@ -306,7 +323,8 @@ module Lti::IMS
           {
             domain: "example.com",
             messages: [],
-            claims: []
+            claims: [],
+            target_link_uri: "https://example.com/launch"
           }
         end
 
@@ -884,6 +902,7 @@ module Lti::IMS
             {
               title: registration.client_name,
               domain: config[:domain],
+              target_link_uri: config[:target_link_uri],
               privacy_level: registration.privacy_level,
               oidc_initiation_url: registration.initiate_login_uri,
               redirect_uris: registration.redirect_uris,

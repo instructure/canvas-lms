@@ -19,6 +19,7 @@
 
 class DiscussionTopicSectionVisibility < ActiveRecord::Base
   include Canvas::SoftDeletable
+
   belongs_to :course_section
   belongs_to :discussion_topic
 

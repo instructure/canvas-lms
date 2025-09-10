@@ -335,6 +335,41 @@ describe('DiscussionTopicForm', () => {
 
     // hides mastery paths
     expect(document.queryByText('Mastery Paths')).toBeFalsy()
+
+    // hides conditional alert
+    expect(document.queryByTestId('schedule-info-alert')).toBeFalsy()
+  })
+
+  it('shows info alert when creating a scheduled announcement in an unpublished course', async () => {
+    window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
+    window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.course_published = false
+
+    const document = setup()
+
+    const dateInput = document.getByTestId('announcement-available-from-date')
+    const timeInput = document.getByTestId('announcement-available-from-time')
+
+    await userEvent.type(dateInput, '2024-12-31')
+    await userEvent.type(timeInput, '10:00')
+
+    expect(await document.findByTestId('schedule-info-alert')).toHaveTextContent(
+      'Notifications will only be sent to students who have been enrolled. Please allow time for this process to finish after publishing your course before scheduling this announcement.',
+    )
+  })
+
+  it('does not show info alert when creating a scheduled announcement in a published course', async () => {
+    window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
+    window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.course_published = true
+
+    const document = setup()
+
+    const dateInput = document.getByTestId('announcement-available-from-date')
+    const timeInput = document.getByTestId('announcement-available-from-time')
+
+    await userEvent.type(dateInput, '2024-12-31')
+    await userEvent.type(timeInput, '10:00')
+
+    expect(await document.queryByTestId('schedule-info-alert')).toBeFalsy()
   })
 
   describe('when user is restricted', () => {

@@ -15,13 +15,14 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import React, {useEffect, useRef} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import $ from 'jquery'
-import {CloseButton} from '@instructure/ui-buttons'
+import {CloseButton, IconButton} from '@instructure/ui-buttons'
 import {DrawerLayout} from '@instructure/ui-drawer-layout'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {IconLtiLine} from '@instructure/ui-icons'
+import {IconLtiLine, IconFullScreenLine, IconExitFullScreenLine} from '@instructure/ui-icons'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {Img} from '@instructure/ui-img'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
@@ -31,6 +32,8 @@ import MutexManager from '@canvas/mutex-manager/MutexManager'
 import type {Tool} from '@canvas/global/env/EnvCommon'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import {onLtiClosePostMessage} from '@canvas/lti/jquery/messages'
+import useBreakpoints from '@canvas/lti-apps/hooks/useBreakpoints'
+import useGlobalNavWidth from './hooks/useGlobalNavWidth'
 
 type Props = {
   tool: Tool | null
@@ -63,10 +66,35 @@ export default function ContentTypeExternalToolDrawer({
   const toolTitle = tool ? tool.title : 'External Tool'
   const toolIconUrl = tool?.icon_url
   const toolIconAlt = toolTitle ? `${toolTitle} Icon` : 'Tool Icon'
+  const allow_fullscreen = tool?.allow_fullscreen
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const pageContentRef = useRef()
   // @ts-expect-error
   const initDrawerLayoutMutex = window.ENV.INIT_DRAWER_LAYOUT_MUTEX
+  const STD_TRAY_WIDTH = window.ENV.FEATURES?.increased_top_nav_pane_size ? '33vw' : '320px'
+
+  const {isMaxTablet} = useBreakpoints()
+  const globalNavWidth = useGlobalNavWidth()
+
+  const [isDrawerFullScreen, setIsDrawerFullScreen] = useState(false)
+  const [trayWidth, setTrayWidth] = useState(STD_TRAY_WIDTH)
+
+  useEffect(() => {
+    if (isDrawerFullScreen) {
+      setTrayWidth(`calc(100vw - ${globalNavWidth})`)
+    } else if (isMaxTablet) {
+      setTrayWidth('100vw')
+    } else {
+      setTrayWidth(STD_TRAY_WIDTH)
+    }
+  }, [isDrawerFullScreen, isMaxTablet, STD_TRAY_WIDTH, globalNavWidth])
+
+  useEffect(() => {
+    // If the drawer is closed from fullscreen, reset the drawer state.
+    if (!open) {
+      setIsDrawerFullScreen(false)
+    }
+  }, [open])
 
   useEffect(
     // setup DrawerLayout content
@@ -134,12 +162,26 @@ export default function ContentTypeExternalToolDrawer({
                 justifyItems="space-between"
                 alignItems="center"
                 padding="medium small medium small"
-                width="320px"
+                width={trayWidth}
                 direction="row-reverse"
+                data-testid="drawer-header"
               >
                 <Flex.Item padding="none none none small">
-                  <CloseButton size="small" onClick={onDismiss} screenReaderLabel="Close" />
+                  <CloseButton
+                    size="small"
+                    onClick={onDismiss}
+                    screenReaderLabel="Close"
+                    data-testid="close-button"
+                  />
                 </Flex.Item>
+                {allow_fullscreen && !isMaxTablet && (
+                  <Flex.Item padding="none none none small">
+                    <TrayExpansion
+                      isDrawerFullScreen={isDrawerFullScreen}
+                      toggleFullScreen={() => setIsDrawerFullScreen(prev => !prev)}
+                    />
+                  </Flex.Item>
+                )}
                 <Flex.Item shouldShrink={true} shouldGrow={true}>
                   <Heading level="h4" as="h2">
                     <TruncateText>{toolTitle}</TruncateText>
@@ -169,5 +211,32 @@ export default function ContentTypeExternalToolDrawer({
         </DrawerLayout.Tray>
       </DrawerLayout>
     </View>
+  )
+}
+
+type TrayExpansionProps = {
+  isDrawerFullScreen: boolean
+  toggleFullScreen: () => void
+}
+
+function TrayExpansion(props: TrayExpansionProps) {
+  const {isDrawerFullScreen, toggleFullScreen} = props
+
+  return (
+    <Tooltip
+      renderTip={isDrawerFullScreen ? 'Exit full screen' : 'Full screen'}
+      on={['hover', 'focus']}
+      placement="bottom"
+    >
+      <IconButton
+        size="small"
+        screenReaderLabel={isDrawerFullScreen ? 'Exit full screen' : 'Full screen'}
+        onClick={toggleFullScreen}
+        data-pendo="top-nav-tray-expansion"
+        data-testid={isDrawerFullScreen ? 'exit-fullscreen-button' : 'fullscreen-button'}
+      >
+        {isDrawerFullScreen ? <IconExitFullScreenLine /> : <IconFullScreenLine />}
+      </IconButton>
+    </Tooltip>
   )
 }

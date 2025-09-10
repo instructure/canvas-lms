@@ -51,6 +51,7 @@ export type Tool = {
   icon_url: string
   pinned?: boolean
   placement?: ToolPlacement
+  allow_fullscreen?: boolean
 }
 
 export type GroupOutcome = {
@@ -151,7 +152,7 @@ export interface EnvCommon {
   LTI_LAUNCH_FRAME_ALLOWANCES: string[]
   LTI_TOOL_SCOPES?: {[key: string]: string[]}
   DEEP_LINKING_POST_MESSAGE_ORIGIN: string
-  HORIZON_DOMAIN: string
+  CAREER_THEME_URL?: string
   comment_library_suggestions_enabled: boolean
   INCOMPLETE_REGISTRATION: boolean
   SETTINGS: Record<Setting, boolean>
@@ -287,72 +288,72 @@ export interface EnvCommon {
 export type SiteAdminFeatureId =
   | 'account_calendar_events'
   | 'account_level_blackout_dates'
+  | 'courses_popout_sisid'
+  | 'create_external_apps_side_tray_overrides'
+  | 'create_wiki_page_mastery_path_overrides'
+  | 'dashboard_graphql_integration'
   | 'enhanced_course_creation_account_fetching'
   | 'explicit_latex_typesetting'
+  | 'files_a11y_rewrite'
+  | 'files_a11y_rewrite_toggle'
+  | 'hide_legacy_course_analytics'
   | 'instui_for_import_page'
+  | 'instui_header'
   | 'instui_nav'
+  | 'lti_registrations_discover_page'
   | 'media_links_use_attachment_id'
   | 'multiselect_gradebook_filters'
+  | 'new_quizzes_navigation_updates'
   | 'permanent_page_links'
   | 'render_both_to_do_lists'
-  | 'instui_header'
-  | 'lti_registrations_discover_page'
-  | 'courses_popout_sisid'
-  | 'dashboard_graphql_integration'
+  | 'scheduled_feedback_releases'
   | 'speedgrader_studio_media_capture'
   | 'validate_call_to_action'
-  | 'new_quizzes_navigation_updates'
-  | 'create_wiki_page_mastery_path_overrides'
-  | 'create_external_apps_side_tray_overrides'
-  | 'files_a11y_rewrite_toggle'
-  | 'files_a11y_rewrite'
   | 'youtube_migration'
   | 'youtube_overlay'
-  | 'hide_legacy_course_analytics'
-  | 'standardize_assignment_date_formatting'
-  | 'accessibility_tab_enable'
-  | 'scheduled_feedback_releases'
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES
  */
 export type RootAccountFeatureId =
+  | 'account_level_mastery_scales'
+  | 'ams_service'
   | 'buttons_and_icons_root_account'
+  | 'course_pace_allow_bulk_pace_assign'
+  | 'course_pace_download_document'
+  | 'course_pace_draft_state'
+  | 'course_pace_pacing_status_labels'
+  | 'course_pace_pacing_with_mastery_paths'
+  | 'course_pace_time_selection'
+  | 'course_pace_weighted_assignments'
+  | 'course_paces_skip_selected_days'
   | 'create_course_subaccount_picker'
+  | 'disable_iframe_sandbox_file_show'
   | 'extended_submission_state'
+  | 'horizon_learner_app'
+  | 'horizon_learning_provider_app_on_contextless_routes'
+  | 'increased_top_nav_pane_size'
   | 'instui_nav'
+  | 'login_registration_ui_identity'
+  | 'lti_apps_page_ai_translation'
+  | 'lti_asset_processor'
+  | 'lti_asset_processor_discussions'
   | 'lti_deep_linking_module_index_menu_modal'
+  | 'lti_link_to_apps_from_developer_keys'
   | 'lti_registrations_next'
   | 'lti_registrations_page'
   | 'lti_registrations_usage_data'
   | 'lti_registrations_usage_tab'
   | 'mobile_offline_mode'
+  | 'modules_requirements_allow_percentage'
+  | 'non_scoring_rubrics'
+  | 'open_tools_in_new_tab'
   | 'product_tours'
+  | 'rce_lite_enabled_speedgrader_comments'
   | 'rce_transform_loaded_content'
+  | 'restrict_student_access'
+  | 'rubric_criterion_range'
   | 'scheduled_page_publication'
   | 'send_usage_metrics'
-  | 'account_level_mastery_scales'
-  | 'non_scoring_rubrics'
-  | 'rubric_criterion_range'
-  | 'rce_lite_enabled_speedgrader_comments'
-  | 'login_registration_ui_identity'
-  | 'course_paces_skip_selected_days'
-  | 'course_pace_download_document'
-  | 'course_pace_draft_state'
-  | 'course_pace_time_selection'
-  | 'course_pace_pacing_status_labels'
-  | 'course_pace_pacing_with_mastery_paths'
-  | 'modules_requirements_allow_percentage'
-  | 'lti_asset_processor'
-  | 'lti_asset_processor_discussions'
-  | 'course_pace_weighted_assignments'
-  | 'course_pace_allow_bulk_pace_assign'
-  | 'disable_iframe_sandbox_file_show'
-  | 'ams_service'
-  | 'lti_apps_page_ai_translation'
-  | 'open_tools_in_new_tab'
-  | 'restrict_student_access'
-  | 'horizon_learner_app'
-  | 'horizon_learning_provider_app_on_contextless_routes'
 
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_SERVICES

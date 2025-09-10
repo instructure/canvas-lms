@@ -163,7 +163,7 @@ export const DateAdjustments = ({
                         handleSetDate(d, setOldStartDate, 'old_start_date')
                       }}
                       formatDate={formatDate}
-                      placeholder={I18n.t('Select a date (optional)')}
+                      placeholder={I18n.t('Select a date')}
                       renderLabel={
                         <ScreenReaderContent>
                           {I18n.t('Select original beginning date')}
@@ -189,7 +189,7 @@ export const DateAdjustments = ({
                         handleSetDate(d, setStartDate, 'new_start_date')
                       }}
                       formatDate={formatDate}
-                      placeholder={I18n.t('Select a date (optional)')}
+                      placeholder={I18n.t('Select a date')}
                       renderLabel={
                         <ScreenReaderContent>
                           {I18n.t('Select new beginning date')}
@@ -216,7 +216,7 @@ export const DateAdjustments = ({
                         handleSetDate(d, setEndFromDate, 'old_end_date')
                       }}
                       formatDate={formatDate}
-                      placeholder={I18n.t('Select a date (optional)')}
+                      placeholder={I18n.t('Select a date')}
                       renderLabel={
                         <ScreenReaderContent>
                           {I18n.t('Select original end date')}
@@ -242,7 +242,7 @@ export const DateAdjustments = ({
                         handleSetDate(d, setEndDate, 'new_end_date')
                       }}
                       formatDate={formatDate}
-                      placeholder={I18n.t('Select a date (optional)')}
+                      placeholder={I18n.t('Select a date')}
                       renderLabel={
                         <ScreenReaderContent>{I18n.t('Select new end date')}</ScreenReaderContent>
                       }

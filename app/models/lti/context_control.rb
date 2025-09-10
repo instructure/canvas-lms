@@ -18,6 +18,7 @@
 
 class Lti::ContextControl < ActiveRecord::Base
   extend RootAccountResolver
+
   resolves_root_account through: ->(cc) { cc.account&.resolved_root_account_id || cc.course&.root_account_id }
 
   include Canvas::SoftDeletable

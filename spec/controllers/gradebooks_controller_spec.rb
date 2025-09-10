@@ -968,17 +968,9 @@ describe GradebooksController do
 
       describe "outcome_service_results_to_canvas" do
         it "is set to true if outcome_service_results_to_canvas feature flag is enabled" do
-          @course.enable_feature!(:outcome_service_results_to_canvas)
           get "grade_summary", params: { course_id: @course.id, id: @student.id }
           js_env = assigns[:js_env]
           expect(js_env[:outcome_service_results_to_canvas]).to be true
-        end
-
-        it "is set to false if outcome_service_results_to_canvas feature flag is disabled" do
-          @course.disable_feature!(:outcome_service_results_to_canvas)
-          get "grade_summary", params: { course_id: @course.id, id: @student.id }
-          js_env = assigns[:js_env]
-          expect(js_env[:outcome_service_results_to_canvas]).to be false
         end
       end
     end
@@ -1982,17 +1974,9 @@ describe GradebooksController do
 
         describe "outcome_service_results_to_canvas" do
           it "is set to true if outcome_service_results_to_canvas feature flag is enabled" do
-            @course.enable_feature!(:outcome_service_results_to_canvas)
             get :show, params: { course_id: @course.id }
             js_env = assigns[:js_env]
             expect(js_env[:outcome_service_results_to_canvas]).to be true
-          end
-
-          it "is set to false if outcome_service_results_to_canvas feature flag is disabled" do
-            @course.disable_feature!(:outcome_service_results_to_canvas)
-            get :show, params: { course_id: @course.id }
-            js_env = assigns[:js_env]
-            expect(js_env[:outcome_service_results_to_canvas]).to be false
           end
         end
 

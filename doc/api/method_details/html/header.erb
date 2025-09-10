@@ -20,5 +20,10 @@
   <% if @beta %>
     <h3 class='beta'>BETA: This API endpoint is not finalized, and there could be breaking changes before its final release.</h3>
   <% end %>
+
+  <% if @internal && @show_internal %>
+    <h3 class='beta'>INTERNAL: This API endpoint is marked as "internal use only" and is not included in the production version of these docs.</h3>
+  <% end %>
+
   <%= yieldall %>
 </div>

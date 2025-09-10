@@ -84,8 +84,15 @@ export default class EditSectionsView extends DialogBaseView {
     const sectionIds = map($('#user_sections').find('input'), i => $(i).val().split('_')[1])
     const newSections = reject(sectionIds, i => includes(currentIds, i))
     const newEnrollments = []
-    const deferreds = []
-    // create new enrollments
+
+    // delete old section enrollments
+    const sectionsToRemove = difference(currentIds, sectionIds)
+    const enrollmentsToRemove = filter(this.model.sectionEditableEnrollments(), en =>
+      includes(sectionsToRemove, en.course_section_id),
+    )
+
+    // First: Add new enrollments
+    const postDeferreds = []
     for (const id of Array.from(newSections)) {
       url = `/api/v1/sections/${id}/enrollments`
       const data = {
@@ -101,42 +108,41 @@ export default class EditSectionsView extends DialogBaseView {
       if (enrollment.role !== enrollment.type) {
         data.enrollment.role_id = enrollment.role_id
       }
-      deferreds.push(
+      postDeferreds.push(
         $.ajaxJSON(url, 'POST', data, newEnrollment => {
           lodashExtend(newEnrollment, {can_be_removed: true})
-          return newEnrollments.push(newEnrollment)
+          newEnrollments.push(newEnrollment)
         }),
       )
     }
 
-    // delete old section enrollments
-    const sectionsToRemove = difference(currentIds, sectionIds)
-    const enrollmentsToRemove = filter(this.model.sectionEditableEnrollments(), en =>
-      includes(sectionsToRemove, en.course_section_id),
-    )
-    for (const en of Array.from(enrollmentsToRemove)) {
-      url = `${ENV.COURSE_ROOT_URL}/unenroll/${en.id}`
-      deferreds.push($.ajaxJSON(url, 'DELETE'))
-    }
+    // When all posts are done, remove enrollments
+    $.when(...postDeferreds)
+      .done(() => {
+        const deleteDeferreds = []
+        for (const en of Array.from(enrollmentsToRemove)) {
+          url = `${ENV.COURSE_ROOT_URL}/unenroll/${en.id}`
+          deleteDeferreds.push($.ajaxJSON(url, 'DELETE'))
+        }
 
-    return this.disable(
-      $.when(...Array.from(deferreds || []))
-        .done(() => {
-          this.updateEnrollments(newEnrollments, enrollmentsToRemove)
-          return $.flashMessage(
-            I18n.t('flash.sections', 'Section enrollments successfully updated'),
-          )
-        })
-        .fail(() =>
-          $.flashError(
-            I18n.t(
-              'flash.sectionError',
-              "Something went wrong updating the user's sections. Please try again later.",
-            ),
+        $.when(...deleteDeferreds)
+          .done(() => {
+            this.updateEnrollments(newEnrollments, enrollmentsToRemove)
+            $.flashMessage(I18n.t('flash.sections', 'Section enrollments successfully updated'))
+          })
+          .always(() => this.close())
+      })
+      .fail(() =>
+        $.flashError(
+          I18n.t(
+            'flash.sectionError',
+            "Something went wrong updating the user's sections. Please try again later.",
           ),
-        )
-        .always(() => this.close()),
-    )
+        ),
+      )
+      .always(() => this.close())
+
+    return this.disable()
   }
 }
 EditSectionsView.initClass()

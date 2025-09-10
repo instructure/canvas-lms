@@ -22,6 +22,11 @@ import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 import React from 'react'
 import ConfirmChangePassword, {type ConfirmChangePasswordProps} from '../ConfirmChangePassword'
+import {assignLocation} from '@canvas/util/globalUtils'
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: jest.fn(),
+}))
 
 describe('ConfirmChangePassword', () => {
   const pseudonyms = [
@@ -163,6 +168,7 @@ describe('ConfirmChangePassword', () => {
           password_confirmation: passwordValue,
         },
       })
+      expect(assignLocation).toHaveBeenCalledWith('/login/canvas?password_changed=1')
     })
   })
 
@@ -192,6 +198,7 @@ describe('ConfirmChangePassword', () => {
           password_confirmation: passwordValue,
         },
       })
+      expect(assignLocation).toHaveBeenCalledWith('/login/canvas')
     })
   })
 

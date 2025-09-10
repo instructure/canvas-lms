@@ -20,7 +20,6 @@
 describe OutcomesRequestBatcher do
   before do
     course_with_teacher_logged_in(active_all: true)
-    @course.enable_feature!(:outcome_service_results_to_canvas)
   end
 
   context "when not provisioned with outcome service" do

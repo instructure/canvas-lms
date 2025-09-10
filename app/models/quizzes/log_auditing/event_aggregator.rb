@@ -63,7 +63,7 @@ module Quizzes::LogAuditing
                                                       Quizzes::QuizSubmissionEvent::EVT_QUESTION_FLAGGED
                                                     ],
                                                     time: timestamp
-                                                  }).order("created_at ASC")
+                                                  }).order(:created_at)
       filtered_events, final_answers = pick_latest_distinct_events_and_answers(events)
       submission_data_hash = build_submission_data_from_events(filtered_events)
       submission_data_hash.merge build_submission_data_from_answers(final_answers)

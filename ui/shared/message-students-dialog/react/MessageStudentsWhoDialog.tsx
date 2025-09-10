@@ -155,15 +155,13 @@ const isReassignable = (assignment: CamelizedAssignment) =>
   assignment !== null &&
   (assignment.allowedAttempts === -1 || (assignment.allowedAttempts || 0) > 1) &&
   assignment.dueAt !== null &&
-  new Set(assignment.submissionTypes).isDisjointFrom(
-    new Set(['on_paper', 'external_tool', 'none', 'discussion_topic', 'online_quiz']),
+  !['on_paper', 'external_tool', 'none', 'discussion_topic', 'online_quiz'].some(type =>
+    assignment.submissionTypes.includes(type),
   )
 
 const isSubmittableAssignment = (assignment: CamelizedAssignment) =>
   !!assignment &&
-  new Set(assignment.submissionTypes).isDisjointFrom(
-    new Set(['on_paper', 'none', 'not_graded', '']),
-  )
+  !['on_paper', 'none', 'not_graded', ''].some(type => assignment.submissionTypes.includes(type))
 
 const filterCriteria: FilterCriterion[] = [
   {

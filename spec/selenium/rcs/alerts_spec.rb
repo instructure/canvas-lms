@@ -135,7 +135,7 @@ describe "Alerts" do
 
     let(:page_url) { "/accounts/#{@context.id}/settings" }
 
-    include_examples "alert CRUD and validation"
+    it_behaves_like "alert CRUD and validation"
 
     it "should show and be able to edit alert with custom role" do
       custom_role = custom_account_role("Custom role", account: @context)
@@ -168,6 +168,6 @@ describe "Alerts" do
 
     let(:page_url) { "/courses/#{@context.id}/settings" }
 
-    include_examples "alert CRUD and validation"
+    it_behaves_like "alert CRUD and validation"
   end
 end

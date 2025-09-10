@@ -141,7 +141,9 @@ describe "course index" do
 
   context "accessibility column" do
     before do
-      Account.site_admin.enable_feature!(:accessibility_tab_enable)
+      account = Account.default
+      account.settings[:enable_content_a11y_checker] = true
+      account.save!
     end
 
     it "is visible when at least one classic course exists" do

@@ -5841,6 +5841,7 @@ hy:
   day_s_7cc1231f: Օր(եր)
   deactivate_this_key_3e79a2b5: "Ապաակտիվացնել այս բանալին"
   decaying_average_8bf6a0dd: "Նվազող միջին միավոր"
+  decline_7eeb5ff4: Մերժել
   decrease_indent_d9cf469d: "Փոքրացնել Ներսի Տողագլուխը"
   deep_orange_4c7eea99: "Մուգ նարնջագույն"
   deep_purple_bb3e2907: "Մուգ մանուշակագույն"
@@ -6555,6 +6556,10 @@ hy:
   end_date_e0093ed7: "Ավարտման ամսաթիվ"
   ending_date_e1ea13a4: "Ավարտման ամսաթիվ"
   ends_e3a6843f: Ավարտը
+  enhanced-rubrics-assignment-container: 
+    discussion_points_possible: 
+      one: "%{count} հնարավոր միավոր"
+      other: "%{count} հնարավոր միավորներ"
   enhanced_individual_gradebook: 
     avg_score: "Միջին գնահատական"
     high_score: "Բարձր գնահատական"
@@ -17175,6 +17180,7 @@ hy:
   unarchive_f245e2d6: "Արխիվից հանել"
   unarchive_selected_e0c4bd3d: "Ընտրված է արխիվացումից հանել:"
   unauthorized: "չի թույլատրված"
+  unauthorized_5094f75c: "արտոնագրված չէ"
   unauthorized_message: "JWT ստորագրությունը անընդունելի է"
   unauthorized_to_delete_this_file_a1271224: "Այս ֆայլը ջնջելու թույլտվություն չկա"
   unchanged_aca18e02: "[Անփոփոխ է]"

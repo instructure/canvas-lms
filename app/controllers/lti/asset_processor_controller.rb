@@ -27,6 +27,10 @@ module Lti
     before_action :require_submission
 
     def resubmit_notice
+      if submission.group_id.present?
+        return render status: :bad_request,
+                      json: { error: "Group Assignment resubmission not supported" }
+      end
       Lti::AssetProcessorNotifier.notify_asset_processors(
         submission,
         asset_processor

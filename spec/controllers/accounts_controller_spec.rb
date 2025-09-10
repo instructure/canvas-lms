@@ -687,6 +687,7 @@ describe AccountsController do
                                  global_includes: true,
                                  enable_profiles: true,
                                  enable_turnitin: true,
+                                 enable_content_a11y_checker: true,
                                  admins_can_change_passwords: true,
                                  admins_can_view_notifications: true,
                                  limit_parent_app_web_access: true,
@@ -695,6 +696,7 @@ describe AccountsController do
       expect(@account.global_includes?).to be_falsey
       expect(@account.enable_profiles?).to be_falsey
       expect(@account.enable_turnitin?).to be_falsey
+      expect(@account.enable_content_a11y_checker?).to be_falsey
       expect(@account.admins_can_change_passwords?).to be_falsey
       expect(@account.admins_can_view_notifications?).to be_falsey
       expect(@account.limit_parent_app_web_access?).to be_falsey
@@ -710,6 +712,7 @@ describe AccountsController do
                                  global_includes: true,
                                  enable_profiles: true,
                                  enable_turnitin: true,
+                                 enable_content_a11y_checker: true,
                                  admins_can_change_passwords: true,
                                  admins_can_view_notifications: true,
                                  limit_parent_app_web_access: true,
@@ -718,6 +721,7 @@ describe AccountsController do
       expect(@account.global_includes?).to be_truthy
       expect(@account.enable_profiles?).to be_truthy
       expect(@account.enable_turnitin?).to be_truthy
+      expect(@account.enable_content_a11y_checker?).to be_truthy
       expect(@account.admins_can_change_passwords?).to be_truthy
       expect(@account.admins_can_view_notifications?).to be_truthy
       expect(@account.limit_parent_app_web_access?).to be_truthy

@@ -654,5 +654,32 @@ describe "differentiated_assignments" do
         end
       end
     end
+
+    context "with caching" do
+      specs_require_cache(:redis_cache_store)
+
+      before do
+        course_with_differentiated_assignments_enabled
+      end
+
+      it "produces cached result when queried with same keys" do
+        quiz_with_false_only_visible_to_overrides
+        visible_quiz_ids_1 = QuizVisibility::QuizVisibilityService.quizzes_visible_to_students(user_ids: @user.id, course_ids: @course.id).map(&:quiz_id)
+        make_quiz
+        visible_quiz_ids_2 = QuizVisibility::QuizVisibilityService.quizzes_visible_to_students(user_ids: @user.id, course_ids: @course.id).map(&:quiz_id)
+
+        expect(visible_quiz_ids_1).to eq(visible_quiz_ids_2)
+      end
+
+      it "produces updated result when cache is invalidated" do
+        course_with_differentiated_assignments_enabled
+        quiz_with_false_only_visible_to_overrides
+        visible_quiz_ids_1 = QuizVisibility::QuizVisibilityService.quizzes_visible_to_students(user_ids: @user.id, course_ids: @course.id).map(&:quiz_id)
+        make_quiz
+        QuizVisibility::QuizVisibilityService.invalidate_cache(user_ids: @user.id, course_ids: @course.id)
+        visible_quiz_ids_2 = QuizVisibility::QuizVisibilityService.quizzes_visible_to_students(user_ids: @user.id, course_ids: @course.id).map(&:quiz_id)
+        expect(visible_quiz_ids_1).not_to eq(visible_quiz_ids_2)
+      end
+    end
   end
 end

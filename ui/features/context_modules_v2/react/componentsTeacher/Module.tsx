@@ -30,6 +30,7 @@ export interface ModuleProps {
   id: string
   name: string
   published?: boolean
+  position?: number
   prerequisites?: Prerequisite[]
   completionRequirements?: CompletionRequirement[]
   requirementCount?: number
@@ -50,6 +51,7 @@ const Module: React.FC<ModuleProps> = ({
   published = false,
   prerequisites,
   completionRequirements,
+  position,
   requirementCount,
   unlockAt,
   dragHandleProps,
@@ -95,7 +97,9 @@ const Module: React.FC<ModuleProps> = ({
       shadow="resting"
       overflowX="hidden"
       data-module-id={id}
-      className={`context_module module_${id}`}
+      data-position={position}
+      data-module-name={name}
+      className={`context_module module_${id} ${isExpanded ? 'expanded' : 'collapsed'}`}
       id={`context_module_${id}`}
     >
       <Flex direction="column">

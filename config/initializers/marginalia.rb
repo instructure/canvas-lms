@@ -20,36 +20,41 @@
 config = ConfigFile.load("marginalia") || {}
 
 if config[:components].present?
-  require "marginalia"
-  Marginalia::Railtie.insert
+  ActiveSupport.on_load(:active_record) do
+    ActiveRecord::QueryLogs.taggings.merge!(
+      controller: ->(context) { context[:controller]&.controller_name },
+      action: ->(context) { context[:controller]&.action_name },
+      hostname: -> { Socket.gethostname },
 
-  module Marginalia
-    module Comment
-      class << self
-        attr_accessor :migration, :rake_task
-
-        def context_id
-          RequestContext::Generator.request_id
-        end
-
-        def job_tag
-          Delayed::Worker.current_job&.[]("tag")
-        end
-      end
-    end
+      context_id: -> { RequestContext::Generator.request_id },
+      job_tag: -> { Delayed::Worker.current_job&.[]("tag") }
+    )
   end
 
-  Marginalia::Comment.components = config[:components].map(&:to_sym)
-  Marginalia::Comment.prepend_comment = true
+  Rails.application.config.active_record.query_log_tags_enabled = true
+  Rails.application.config.action_controller.log_query_tags_around_actions = true
+  Rails.application.config.active_record.query_log_tags = config[:components].map(&:to_sym)
+  ActiveRecord::QueryLogs.prepend_comment = true
 
-  module Marginalia::RakeTask
-    def execute(args = nil)
-      previous, Marginalia::Comment.rake_task = Marginalia::Comment.rake_task, name
+  module ActiveRecord::QueryLogs::Migrator
+    def execute_migration_in_transaction(migration)
+      old_migration_name, ActiveRecord::QueryLogs.taggings[:migration] = ActiveRecord::QueryLogs.taggings[:migration], migration.name
       super
     ensure
-      Marginalia::Comment.rake_task = previous
+      ActiveRecord::QueryLogs.taggings[:migration] = old_migration_name
     end
   end
 
-  Rake::Task.prepend(Marginalia::RakeTask)
+  ActiveRecord::Migrator.prepend(ActiveRecord::QueryLogs::Migrator)
+
+  module ActiveRecord::QueryLogs::RakeTask
+    def execute(args = nil)
+      previous, ActiveRecord::QueryLogs.taggings[:rake_task] = ActiveRecord::QueryLogs.taggings[:rake_task], name
+      super
+    ensure
+      ActiveRecord::QueryLogs.taggings[:rake_task] = previous
+    end
+  end
+
+  Rake::Task.prepend(ActiveRecord::QueryLogs::RakeTask)
 end

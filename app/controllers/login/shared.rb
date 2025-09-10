@@ -200,6 +200,7 @@ module Login::Shared
   end
 
   include PseudonymSessionsController
+
   def remember_me_cookie_domain
     otp_remember_me_cookie_domain
   end

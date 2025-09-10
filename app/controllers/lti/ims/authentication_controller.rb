@@ -175,7 +175,7 @@ module Lti
 
       def public_course?
         # Is the context published and public?
-        context.is_a?(Course) && context&.available? && context&.is_public?
+        context.is_a?(Course) && context&.available? && context.is_public?
       end
 
       def verifier

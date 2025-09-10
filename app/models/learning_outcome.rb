@@ -22,8 +22,10 @@ class LearningOutcome < ActiveRecord::Base
   include ManyRootAccounts
   include Workflow
   include MasterCourses::Restrictor
+
   restrict_columns :state, [:workflow_state]
   include LinkedAttachmentHandler
+  include CanvasOutcomesHelper
 
   def self.html_fields
     %w[description]
@@ -67,6 +69,7 @@ class LearningOutcome < ActiveRecord::Base
   before_save :infer_defaults
   before_save :infer_root_account_ids
   after_save :propagate_changes_to_rubrics
+  after_commit :rollup_calculation, on: :update, if: :rollup_relevant_changes?
 
   validates :description, length: { maximum: maximum_text_length, allow_blank: true }
   validates :short_description, length: { maximum: maximum_string_length }
@@ -553,6 +556,40 @@ class LearningOutcome < ActiveRecord::Base
     LearningOutcome.joins("JOIN (#{sql}) children ON children.id = #{LearningOutcome.quoted_table_name}.id").pluck(:id)
   end
 
+  def rollup_relevant_changes?
+    return true if saved_changes.keys.intersect?(%w[calculation_method calculation_int])
+
+    # Check for rubric_criterion changes that affect scoring
+    if saved_changes.key?("data")
+      old_data = saved_changes["data"][0] || {}
+      new_data = saved_changes["data"][1] || {}
+
+      old_criterion = old_data[:rubric_criterion] || {}
+      new_criterion = new_data[:rubric_criterion] || {}
+
+      # Check for changes in ratings, mastery_points, or points_possible
+      return true if old_criterion[:ratings] != new_criterion[:ratings]
+      return true if old_criterion[:mastery_points] != new_criterion[:mastery_points]
+      return true if old_criterion[:points_possible] != new_criterion[:points_possible]
+    end
+
+    false
+  end
+
+  def rollup_calculation
+    return unless context.is_a?(Course)
+
+    begin
+      enqueue_rollup_calculation(course_id: context.id)
+    rescue => e
+      Canvas::Errors.capture_exception(:outcome_rollup_callback, e, {
+                                         course_id: context.id,
+                                         learning_outcome_id: id,
+                                         calculation_method:
+                                       })
+    end
+  end
+
   private
 
   def create_missing_outcome_link(context)
@@ -648,7 +685,6 @@ class LearningOutcome < ActiveRecord::Base
   end
 
   # set color defaults for ratings in an outcome
-  # rubocop:disable Lint/DuplicateBranch
   def find_or_set_default_mastery_colors(ratings, mastery_index)
     length = ratings.length
     # apply appropriate defaults for each length if
@@ -687,7 +723,6 @@ class LearningOutcome < ActiveRecord::Base
       ratings[5][:color] ||= "555555"
     end
   end
-  # rubocop:enable Lint/DuplicateBranch
 
   def set_mastery_level(ratings, mastery_index)
     ratings.each_with_index do |rating, i|

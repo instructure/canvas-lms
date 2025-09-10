@@ -29,6 +29,7 @@ import {useContextModule} from '../hooks/useModuleContext'
 import {Flex} from '@instructure/ui-flex'
 import {IconAssignmentLine, IconWarningLine} from '@instructure/ui-icons'
 import FeedbackBlock from './FeedbackBlock'
+import {ModulesPageLegend} from '../components/ModulesPageLegend'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -142,6 +143,9 @@ const ModulePageActionHeaderStudent: React.FC<ModulePageActionHeaderStudentProps
                 anyModuleExpanded,
                 disabled,
               },
+              renderIconLegend: () => (
+                <ModulesPageLegend is_student={true} is_blueprint_course={false} />
+              ),
             }}
           />
         )}

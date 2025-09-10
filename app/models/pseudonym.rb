@@ -35,6 +35,7 @@ class Pseudonym < ActiveRecord::Base
   has_many :session_persistence_tokens
   belongs_to :account
   include Canvas::RootAccountCacher
+
   belongs_to :user
   has_many :communication_channels, -> { ordered }
   has_many :sis_enrollments, class_name: "Enrollment", inverse_of: :sis_pseudonym
@@ -79,6 +80,7 @@ class Pseudonym < ActiveRecord::Base
   alias_method :context, :account
 
   include StickySisFields
+
   are_sis_sticky :unique_id, :workflow_state
 
   validates :unique_id,

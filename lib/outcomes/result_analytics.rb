@@ -22,6 +22,7 @@ module Outcomes
   module ResultAnalytics
     include CanvasOutcomesHelper
     include OutcomeResultResolverHelper
+
     Rollup = Struct.new(:context, :scores)
     Result = Struct.new(:learning_outcome, :score, :count, :hide_points) # rubocop:disable Lint/StructNewOverride
 

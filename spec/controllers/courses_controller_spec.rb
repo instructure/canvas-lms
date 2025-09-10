@@ -281,7 +281,7 @@ describe CoursesController do
 
       context "on accessibility column" do
         before do
-          skip("Flaky spec needs fixed in LMA-226") unless Account.site_admin.feature_enabled?(:accessibility_tab_enable)
+          skip("Flaky spec needs fixed in LMA-226") unless @course1.root_account.enable_content_a11y_checker?
 
           # For accessibility column
           wiki_page = wiki_page_model(course: @course1)
@@ -2752,7 +2752,7 @@ describe CoursesController do
 
       it "creates attachment_associations when files are linked in the syllabus" do
         attachment_model(context: @user)
-        put "create", params: { account_id: @account.id, course: { syllabus_body: "<p><a href=\"/files/#{@attachment.id}\">#{@attachment.display_name}</a></p>" }, format: :json }
+        put "create", params: { account_id: @account.id, course: { syllabus_body: "<p><a href=\"/users/#{@user.id}/files/#{@attachment.id}\">#{@attachment.display_name}</a></p>" }, format: :json }
 
         expect(response).to be_successful
         json = response.parsed_body
@@ -3375,7 +3375,7 @@ describe CoursesController do
       it "adds attachment_associations when new files are linked in the syllabus" do
         media = attachment_model(context: @course, display_name: "292.mp3", uploaded_data: fixture_file_upload("292.mp3"), instfs_uuid: "media")
         new_body = <<~HTML
-          <p><a href="/files/#{@image.id}">#{@image.display_name}</a></p>
+          <p><a href="/courses/#{@course.id}/files/#{@image.id}">#{@image.display_name}</a></p>
           <p><iframe src="/media_attachments_iframe/#{media.id}?type=video&amp;embedded=true"></iframe></p>
         HTML
         put "update", params: { id: @course.id, course: { syllabus_body: new_body }, format: :json }
@@ -3887,6 +3887,39 @@ describe CoursesController do
           put "update", params: { id: @course.id, course: { start_at: start_at + 1.day } }
           expect(response).to be_unauthorized
         end
+      end
+    end
+
+    context "csp setting" do
+      before :once do
+        @account = Account.default
+        @account.enable_feature!(:javascript_csp)
+        @account.enable_csp!
+      end
+
+      it "updates the csp setting when admin" do
+        account_admin_user(active_all: true, account: @account)
+        user_session(@admin)
+        # default is enabled
+        expect(@course.csp_enabled?).to be_truthy
+        put "update", params: { id: @course.id, course: { disable_csp: "1" } }
+        @course.reload
+        expect(@course.csp_enabled?).to be_falsey
+        put "update", params: { id: @course.id, course: { disable_csp: "0" } }
+        @course.reload
+        expect(@course.csp_enabled?).to be_truthy
+      end
+
+      it "does not update the csp setting when not admin" do
+        user_session(@teacher)
+        # test for nil param
+        put "update", params: { id: @course.id, course: { name: "New Course Name" } }
+        @course.reload
+        expect(@course.csp_enabled?).to be_truthy
+        # test for false param
+        put "update", params: { id: @course.id, course: { disable_csp: "0" } }
+        @course.reload
+        expect(@course.csp_enabled?).to be_truthy
       end
     end
   end
@@ -5360,7 +5393,7 @@ describe CoursesController do
 
       before do
         allow(YoutubeMigrationService).to receive(:new).with(@course).and_return(service)
-        allow(service).to receive(:convert_embed).with(scan_id, embed).and_return(progress)
+        allow(service).to receive(:convert_embed).and_return(progress)
       end
 
       include_examples "youtube migration protection"
@@ -5375,7 +5408,7 @@ describe CoursesController do
 
         it "permits width parameter" do
           embed_with_width = embed.merge(width: "640")
-          allow(service).to receive(:convert_embed).with(scan_id, embed_with_width.stringify_keys).and_return(progress)
+          allow(service).to receive(:convert_embed).with(scan_id, embed_with_width.stringify_keys, user_uuid: @teacher.uuid).and_return(progress)
 
           post :start_youtube_migration_convert, params: {
             course_id: @course.id,
@@ -5384,12 +5417,12 @@ describe CoursesController do
           }
 
           expect(response).to have_http_status(:ok)
-          expect(service).to have_received(:convert_embed).with(scan_id, embed_with_width.stringify_keys)
+          expect(service).to have_received(:convert_embed).with(scan_id, embed_with_width.stringify_keys, user_uuid: @teacher.uuid)
         end
 
         it "permits height parameter" do
           embed_with_height = embed.merge(height: "480")
-          allow(service).to receive(:convert_embed).with(scan_id, embed_with_height.stringify_keys).and_return(progress)
+          allow(service).to receive(:convert_embed).with(scan_id, embed_with_height.stringify_keys, user_uuid: @teacher.uuid).and_return(progress)
 
           post :start_youtube_migration_convert, params: {
             course_id: @course.id,
@@ -5398,12 +5431,12 @@ describe CoursesController do
           }
 
           expect(response).to have_http_status(:ok)
-          expect(service).to have_received(:convert_embed).with(scan_id, embed_with_height.stringify_keys)
+          expect(service).to have_received(:convert_embed).with(scan_id, embed_with_height.stringify_keys, user_uuid: @teacher.uuid)
         end
 
         it "permits both width and height parameters" do
           embed_with_dimensions = embed.merge(width: "1280", height: "720")
-          allow(service).to receive(:convert_embed).with(scan_id, embed_with_dimensions.stringify_keys).and_return(progress)
+          allow(service).to receive(:convert_embed).with(scan_id, embed_with_dimensions.stringify_keys, user_uuid: @teacher.uuid).and_return(progress)
 
           post :start_youtube_migration_convert, params: {
             course_id: @course.id,
@@ -5412,13 +5445,13 @@ describe CoursesController do
           }
 
           expect(response).to have_http_status(:ok)
-          expect(service).to have_received(:convert_embed).with(scan_id, embed_with_dimensions.stringify_keys)
+          expect(service).to have_received(:convert_embed).with(scan_id, embed_with_dimensions.stringify_keys, user_uuid: @teacher.uuid)
         end
 
         it "converts numeric width and height to strings" do
           embed_with_numeric_dimensions = embed.merge(width: 1920, height: 1080)
           expected_embed = embed.merge(width: "1920", height: "1080").stringify_keys
-          allow(service).to receive(:convert_embed).with(scan_id, expected_embed).and_return(progress)
+          allow(service).to receive(:convert_embed).with(scan_id, expected_embed, user_uuid: @teacher.uuid).and_return(progress)
 
           post :start_youtube_migration_convert, params: {
             course_id: @course.id,
@@ -5427,7 +5460,7 @@ describe CoursesController do
           }
 
           expect(response).to have_http_status(:ok)
-          expect(service).to have_received(:convert_embed).with(scan_id, expected_embed)
+          expect(service).to have_received(:convert_embed).with(scan_id, expected_embed, user_uuid: @teacher.uuid)
         end
 
         it "filters out unpermitted parameters but keeps width and height" do
@@ -5438,7 +5471,7 @@ describe CoursesController do
             another_bad_param: "also_filtered"
           )
           expected_embed = embed.merge(width: "800", height: "600").stringify_keys
-          allow(service).to receive(:convert_embed).with(scan_id, expected_embed).and_return(progress)
+          allow(service).to receive(:convert_embed).with(scan_id, expected_embed, user_uuid: @teacher.uuid).and_return(progress)
 
           post :start_youtube_migration_convert, params: {
             course_id: @course.id,
@@ -5447,7 +5480,21 @@ describe CoursesController do
           }
 
           expect(response).to have_http_status(:ok)
-          expect(service).to have_received(:convert_embed).with(scan_id, expected_embed)
+          expect(service).to have_received(:convert_embed).with(scan_id, expected_embed, user_uuid: @teacher.uuid)
+        end
+
+        it "passes user_uuid to convert_embed method" do
+          expected_embed = embed.stringify_keys
+          allow(service).to receive(:convert_embed).with(scan_id, expected_embed, user_uuid: @teacher.uuid).and_return(progress)
+
+          post :start_youtube_migration_convert, params: {
+            course_id: @course.id,
+            scan_id:,
+            embed:
+          }
+
+          expect(response).to have_http_status(:ok)
+          expect(service).to have_received(:convert_embed).with(scan_id, expected_embed, user_uuid: @teacher.uuid)
         end
       end
     end

@@ -25,6 +25,18 @@ import {calculateTotalIssuesCount, parseAccessibilityScans} from '../../utils/ap
 import {IssuesByTypeChart} from './IssuesByTypeChart'
 import {IssuesCounter} from './IssuesCounter'
 import {AccessibilityData} from '../../types'
+import {Spinner} from '@instructure/ui-spinner'
+import {useScope as createI18nScope} from '@canvas/i18n'
+
+const I18n = createI18nScope('accessibility_checker')
+
+function renderLoading() {
+  return (
+    <View as="div" width="100%" textAlign="center" height="270px">
+      <Spinner renderTitle={I18n.t('Loading accessibility issues')} size="large" margin="auto" />
+    </View>
+  )
+}
 
 export const AccessibilityIssuesSummary = () => {
   const [accessibilityScans, loading] = useAccessibilityScansStore(
@@ -37,15 +49,12 @@ export const AccessibilityIssuesSummary = () => {
       : ({} as AccessibilityData)
   }, [accessibilityScans])
 
-  if (window.ENV.SCAN_DISABLED === true || loading) return null
+  if (window.ENV.SCAN_DISABLED === true) return null
+
+  if (loading) return renderLoading()
 
   return (
-    <Flex
-      margin="medium 0 0 0"
-      gap="small"
-      alignItems="stretch"
-      data-testid="accessibility-issues-summary"
-    >
+    <Flex margin="0" gap="small" alignItems="stretch" data-testid="accessibility-issues-summary">
       <Flex.Item>
         <View as="div" padding="medium" borderWidth="small" borderRadius="medium" height="100%">
           <IssuesCounter count={calculateTotalIssuesCount(accessibilityScans)} />

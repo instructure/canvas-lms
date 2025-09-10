@@ -51,6 +51,7 @@ class Lti::LineItem < ApplicationRecord
   AGS_EXT_LAUNCH_URL = "#{AGS_EXT_PREFIX}launch_url".freeze
 
   include MasterCourses::CollectionRestrictor
+
   self.collection_owner_association = :assignment
   restrict_columns :content, [:resource_id]
 

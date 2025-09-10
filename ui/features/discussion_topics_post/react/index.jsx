@@ -67,7 +67,10 @@ export const DiscussionTopicsPost = props => {
           }
         >
           <AlertManager>
-            <DiscussionTopicManager discussionTopicId={props.discussionTopicId} />
+            <DiscussionTopicManager
+              discussionTopicId={props.discussionTopicId}
+              navbarHeight={props.navbarHeight}
+            />
           </AlertManager>
         </ErrorBoundary>
       </ApolloProvider>
@@ -77,4 +80,5 @@ export const DiscussionTopicsPost = props => {
 
 DiscussionTopicsPost.propTypes = {
   discussionTopicId: PropTypes.string,
+  navbarHeight: PropTypes.number,
 }

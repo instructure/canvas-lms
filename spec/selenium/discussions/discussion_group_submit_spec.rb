@@ -70,7 +70,7 @@ describe "discussion assignments" do
       it "creates an ungraded group discussion in a course context" do
         get "/courses/#{@course.id}/discussion_topics/new"
         f("input[placeholder='Topic Title']").send_keys "Ungraded Group Discussion"
-        force_click_native("input[data-testid='group-discussion-checkbox']")
+        force_click_native("span[data-testid='group-discussion-checkbox'] input")
         force_click_native("input[placeholder='Select a group category']")
         fj("li:contains('category 1')").click
         f("button[data-testid='save-button']").click
@@ -83,7 +83,7 @@ describe "discussion assignments" do
       it "creates a graded group discussion in a course context" do
         get "/courses/#{@course.id}/discussion_topics/new"
         f("input[placeholder='Topic Title']").send_keys "Graded Group Discussion"
-        force_click_native("input[data-testid='group-discussion-checkbox']")
+        force_click_native("span[data-testid='group-discussion-checkbox'] input")
         force_click_native("input[placeholder='Select a group category']")
         fj("li:contains('category 1')").click
         force_click("label:contains('Graded')")

@@ -15,15 +15,13 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React from 'react'
+import React, {useState} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {TextInput} from '@instructure/ui-text-input'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {Text} from '@instructure/ui-text'
-import {View} from '@instructure/ui-view'
+import {DeleteVariantWarningModal} from '../WarningModal'
 
 const I18n = createI18nScope('differentiation_tags')
 
@@ -53,8 +51,20 @@ const TagInputRow: React.FC<TagInputRowProps> = ({
   inputRef,
   focusElRef,
 }) => {
+  const [showWarning, setShowWarning] = useState(false)
+
   return (
     <Flex direction="column" margin="0 0 medium 0">
+      {showWarning && (
+        <DeleteVariantWarningModal
+          open={showWarning}
+          onClose={() => setShowWarning(false)}
+          onContinue={() => {
+            setShowWarning(false)
+            onRemove(tag.id)
+          }}
+        />
+      )}
       <Flex alignItems="end">
         <TextInput
           inputRef={inputRef}
@@ -95,7 +105,7 @@ const TagInputRow: React.FC<TagInputRowProps> = ({
                   ? I18n.t('Remove Tag Name Variant %{tagCount}', {tagCount: index + 1})
                   : I18n.t('Remove Tag Name')
             }
-            onClick={() => onRemove(tag.id)}
+            onClick={() => setShowWarning(true)}
             withBackground={false}
             withBorder={false}
             color="primary"

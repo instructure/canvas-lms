@@ -35,7 +35,7 @@ export const BaseBlockLayout = React.forwardRef<
       <Flex direction="column" padding="paddingCardLarge" gap="mediumSmall">
         <Flex justifyItems="space-between">
           <Flex data-header>
-            <Tag text={props.title} size="medium" />
+            <Tag text={props.title} size="medium" data-testid="block-type-label" />
           </Flex>
           <Flex>{props.menu}</Flex>
         </Flex>

@@ -21,60 +21,74 @@ rate_limit:
   limit: 25
   period: day
 template: |
-  You are an experienced educator tasked with creating a rubric based on an assignment description. This rubric will be used to evaluate student submissions. Your goal is to create a comprehensive, clear, and fair rubric that aligns with the assignment objectives. The rubric will be used to evaluate students in grade level <GRADE_LEVEL_PLACEHOLDER>.
+  You are an experienced educator creating a rubric for an assignment. The rubric must be clear, fair, and grade-appropriate. It will be used to evaluate students in grade level <GRADE_LEVEL_PLACEHOLDER>.
 
-  Here's the assignment description you'll be working with:
-
+  Assignment description:
   <assignment_description>
   <CONTENT_PLACEHOLDER>
   </assignment_description>
 
-  Please follow these steps to create a rubric:
+  State standard (optional):
+  <STANDARD_PLACEHOLDER>
 
-  1. Analyze the assignment description. Identify the main objectives of the assignment, note specific requirements or criteria mentioned, and determine key skills or knowledge areas being assessed. <ADDITIONAL_PROMPT_INFO_PLACEHOLDER>
+  Steps:
+
+  1. Analyze the assignment (and standard if provided).
+  - Identify assignment objectives and requirements according to grade level: <GRADE_LEVEL_PLACEHOLDER>
+  - Note key skills/knowledge being assessed
+  - If a standard is provided, integrate only its key expectations into one or more relevant criteria.
+  - Do not copy the standard text verbatim; adapt it to the assignment context.
+
+  <ADDITIONAL_PROMPT_INFO_PLACEHOLDER>
 
   2. Create rubric criteria:
-  - Brainstorm potential criteria based on your analysis, then select the best <CRITERIA_COUNT_PLACEHOLDER> criteria that encompass the essential elements of the assignment.
-  - Ensure these criteria align with the assignment's objectives and requirements.
-  - Make sure criteria are clear, concise, and mutually exclusive.
+  - Base primarily on assignment objectives; integrate standard expectations only where they fit
+  - Select exactly <CRITERIA_COUNT_PLACEHOLDER> clear, specific, mutually exclusive criteria
+  - Use grade-appropriate language
+  - Adapt both language and performance expectations to the specified grade level:
+    - For younger students, use simpler words and ensure that lower rating levels are realistically achievable, showing clear steps for improvement.
+    - For older students, use more advanced academic language and higher performance expectations that encourage critical thinking and depth.
 
-  3. Develop the rating scale for each criterion:
-  - For each criterion, create ratings for <RATING_COUNT_PLACEHOLDER> performance levels.
-  - Describe what constitutes each level of performance in clear, specific, and succinct terms.
-  - Ensure that each rating is measurable and observable.
+  3. Develop rating scales:
+  - Provide <RATING_COUNT_PLACEHOLDER> levels per criterion
+  - Use grade-level adjusted language (simple for younger, advanced for older)
+  - Make each level measurable and actionable (e.g., “Uses 1–2 sources” vs. “Lacks support”)
+  - Ensure that rating levels show a clear progression of performance, with meaningful distinctions between each level.
+  - Avoid vague/repetitive wording; specify improvements
+  - Keep tone encouraging at all levels
 
-  4. Format the final rubric:
-  Present the final rubric in a JSON structure. Here's an example of how the structure should look (do not use this content, it's just to illustrate the format):
+  4. Output format: JSON only, no extra text. Example (illustrative only):
 
   {
     "criteria": [
       {
         "name": "Game Concept Overview",
-        "description": "Clearly articulates the core game idea, unique selling proposition, and primary gameplay experience.",
+        "description": "Clearly explains the game idea and main features.",
         "ratings": [
           {
             "title": "Exceptional",
-            "description": "Presents an innovative, clearly defined game concept with compelling unique selling points and a detailed vision of the player experience, supported by concrete examples and thorough analysis."
+            "description": "Presents a unique, well-defined concept with clear features and examples."
           },
           {
             "title": "Satisfactory",
-            "description": "Provides a coherent game concept with identifiable unique elements and a basic understanding of the intended gameplay experience, though lacking some depth or distinction."
+            "description": "Explains the concept with some clear features but lacks detail or originality."
           },
           {
             "title": "Inadequate",
-            "description": "Presents a vague or derivative game concept lacking clear differentiation, with minimal explanation of unique features or intended player experience."
+            "description": "Idea is vague or missing important features."
           },
           {
             "title": "No Marks",
-            "description": "Fails to provide a game concept, or presents an incomprehensible or incomplete concept lacking basic required elements."
+            "description": "Does not provide a recognizable concept."
           }
         ]
       }
     ]
   }
 
-  Ensure that your rubric is comprehensive, covering all major aspects of the assignment, and that it provides clear guidance for evaluating student work at different performance levels. The JSON structure should be consistent and properly formatted for easy parsing.
+  Ensure the rubric is comprehensive, grade-appropriate, and integrates only relevant standard expectations.
+  Identify the language of the assignment (english, spanish, etc.) and use the same language throughout.
+  Now, create the rubric in JSON with exactly <CRITERIA_COUNT_PLACEHOLDER> criteria, each containing exactly <RATING_COUNT_PLACEHOLDER> ratings. Do not include any additional criteria or ratings beyond this number.
 
-  Now, please create the rubric based on the assignment description provided earlier, in the same language as the assignment description, with <CRITERIA_COUNT_PLACEHOLDER> criteria each containing <RATING_COUNT_PLACEHOLDER> ratings. Your final output should only include the JSON structure with no extra explanation.
 options:
   max_tokens: 5000

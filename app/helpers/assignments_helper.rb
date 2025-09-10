@@ -74,8 +74,7 @@ module AssignmentsHelper
 
   def due_at(assignment, user)
     if assignment.multiple_due_dates_apply_to?(user)
-      overrides = assignment.formatted_dates_hash_visible_to(user, assignment.context)
-      overrides = assignment.merge_overrides_by_date(overrides) unless Account.site_admin.feature_enabled?(:standardize_assignment_date_formatting)
+      overrides = assignment.dates_hash_visible_to(user)
       if overrides.length > 1
         multiple_due_dates
       else

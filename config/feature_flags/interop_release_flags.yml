@@ -121,6 +121,17 @@ import_numeric_lti_custom_params_as_string:
       state: allowed_on
     ci:
       state: allowed_on
+increased_top_nav_pane_size:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: Increased Top Navigation Pane Size
+  description: When enabled, the default size of the Top Navigation pane is larger, and tools can optionally set a parameter to enable expanding the pane to full size.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 lti_target_link_uri_for_assignment_edit_view:
   state: hidden
   shadow: true
@@ -258,6 +269,20 @@ lti_find_external_tool_prefer_original_client_id:
     When possible, the LTI tool finding logic will prefer tools installed from the same
     developer key as the original tool. This prevents the edge case where multiple developer
     keys share the same domain, and a tool from the wrong developer key would be matched first.
+lti_link_to_apps_from_developer_keys:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: Show links to Canvas Apps page for each LTI key on the Developer Keys page
+  description: |-
+    Link directly to the app's configuration page in Canvas Apps from the Developer Keys page.
+    Replaces the Show Key button, which does nothing for LTI keys since they cannot be used
+    for Canvas API calls via the OAuth flow.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 lti_oidc_missing_cookie_retry:
   state: hidden
   shadow: true

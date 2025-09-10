@@ -21,7 +21,11 @@ module BroadcastPolicies
   describe AssignmentPolicy do
     let(:context) do
       ctx = double
-      allow(ctx).to receive_messages(available?: true, concluded?: false)
+      allow(ctx).to receive_messages(
+        available?: true,
+        concluded?: false,
+        active_now?: true
+      )
       ctx
     end
     let(:assignment) do
@@ -100,6 +104,7 @@ module BroadcastPolicies
 
       specify { wont_send_when { allow(context).to receive(:available?).and_return false } }
       specify { wont_send_when { allow(context).to receive(:concluded?).and_return true } }
+      specify { wont_send_when { allow(context).to receive(:active_now?).and_return false } }
       specify { wont_send_when { allow(assignment).to receive(:previously_new_record?).and_return true } }
       specify { wont_send_when { allow(assignment).to receive(:changed_in_state).and_return false } }
       specify { wont_send_when { allow(assignment).to receive(:due_at).and_return assignment.due_at_before_last_save } }

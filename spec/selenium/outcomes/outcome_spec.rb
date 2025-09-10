@@ -19,9 +19,11 @@
 
 require_relative "../helpers/outcome_common"
 require_relative "pages/improved_outcome_management_page"
+require "feature_flag_helper"
 
 describe "outcomes" do
   include_context "in-process server selenium tests"
+  include FeatureFlagHelper
   include OutcomeCommon
   include ImprovedOutcomeManagementPage
 
@@ -30,6 +32,7 @@ describe "outcomes" do
 
   describe "course outcomes" do
     before do
+      mock_feature_flag_on_account(:improved_outcomes_management, false)
       course_with_teacher_logged_in
     end
 
@@ -215,8 +218,7 @@ describe "outcomes" do
 
     describe "with improved_outcome_management enabled" do
       before do
-        enable_improved_outcomes_management(Account.default)
-        enable_account_level_mastery_scales(Account.default)
+        mock_feature_flag_on_account(:improved_outcomes_management, true)
       end
 
       it "creates an initial outcome in the course level as a teacher" do
@@ -330,43 +332,36 @@ describe "outcomes" do
       end
 
       describe "with account_level_mastery_scales disabled" do
-        before do
-          enable_improved_outcomes_management(Account.default)
-          disable_account_level_mastery_scales(Account.default)
+        it "creates an outcome with a friendly description present" do
+          get outcome_url
+          create_outcome_with_friendly_desc("Outcome", "Standard Desc", "Friendly Desc")
+          # Have to verify model creation with AR to save time since the creation => appearance flow is a little slow
+          outcome = LearningOutcome.find_by(context: @course, short_description: "Outcome", description: "<p>Standard Desc</p>")
+          # Small delay between button click and model population in db
+          keep_trying_until do
+            fd = OutcomeFriendlyDescription.find_by(context: @course, learning_outcome: outcome, description: "Friendly Desc")
+            expect(fd).to be_truthy
+          end
         end
 
-        describe "with friendly_description enabled" do
-          it "creates an outcome with a friendly description present" do
-            get outcome_url
-            create_outcome_with_friendly_desc("Outcome", "Standard Desc", "Friendly Desc")
-            # Have to verify model creation with AR to save time since the creation => appearance flow is a little slow
-            outcome = LearningOutcome.find_by(context: @course, short_description: "Outcome", description: "<p>Standard Desc</p>")
-            # Small delay between button click and model population in db
-            keep_trying_until do
-              fd = OutcomeFriendlyDescription.find_by(context: @course, learning_outcome: outcome, description: "Friendly Desc")
-              expect(fd).to be_truthy
-            end
-          end
-
-          it "edits an outcome's friendly description" do
-            # disable_account_level_mastery_scales(Account.default)
-            create_bulk_outcomes_groups(@course, 1, 1)
-            outcome_title = "outcome 0"
-            outcome = LearningOutcome.find_by(context: @course, short_description: outcome_title)
-            outcome.update!(description: "long description")
-            OutcomeFriendlyDescription.find_or_create_by!(learning_outcome_id: outcome, context: @course, description: "FD")
-            get outcome_url
-            select_outcome_group_with_text(@course.name).click
-            expect(nth_individual_outcome_title(0)).to eq(outcome_title)
-            individual_outcome_kabob_menu(0).click
-            edit_outcome_button.click
-            insert_friendly_description("FD - Edited")
-            click_save_edit_modal
-            expect(nth_individual_outcome_title(0)).to eq(outcome_title)
-            expect(nth_individual_outcome_text(0)).not_to match(/Friendly Description.*FD/m)
-            expand_outcome_description_button(0).click
-            expect(nth_individual_outcome_text(0)).to match(/Friendly Description.*FD - Edited/m)
-          end
+        it "edits an outcome's friendly description" do
+          # disable_account_level_mastery_scales(Account.default)
+          create_bulk_outcomes_groups(@course, 1, 1)
+          outcome_title = "outcome 0"
+          outcome = LearningOutcome.find_by(context: @course, short_description: outcome_title)
+          outcome.update!(description: "long description")
+          OutcomeFriendlyDescription.find_or_create_by!(learning_outcome_id: outcome, context: @course, description: "FD")
+          get outcome_url
+          select_outcome_group_with_text(@course.name).click
+          expect(nth_individual_outcome_title(0)).to eq(outcome_title)
+          individual_outcome_kabob_menu(0).click
+          edit_outcome_button.click
+          insert_friendly_description("FD - Edited")
+          click_save_edit_modal
+          expect(nth_individual_outcome_title(0)).to eq(outcome_title)
+          expect(nth_individual_outcome_text(0)).not_to match(/Friendly Description.*FD/m)
+          expand_outcome_description_button(0).click
+          expect(nth_individual_outcome_text(0)).to match(/Friendly Description.*FD - Edited/m)
         end
 
         it "creates an outcome with default ratings and calculation method" do

@@ -84,6 +84,10 @@ describe('MoveModal utils', () => {
       fetchMock.reset()
     })
 
+    afterEach(() => {
+      jest.restoreAllMocks()
+    })
+
     it('sends move requests for all selected items', async () => {
       fetchMock.put(`/api/v1/files/178`, {
         status: 200,
@@ -123,6 +127,8 @@ describe('MoveModal utils', () => {
     })
 
     it('handles 409 conflict (name collision) for files', async () => {
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+
       fetchMock.put(`/api/v1/files/181`, {
         status: 409,
         headers: {'Content-Type': 'application/json'},
@@ -145,6 +151,7 @@ describe('MoveModal utils', () => {
           expect.objectContaining({file: expect.anything(), name: 'File Conflict'}),
         ]),
       )
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Error moving item:', expect.any(Object))
     })
 
     it('resolves immediately if selectedItems is empty', async () => {

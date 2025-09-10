@@ -60,7 +60,7 @@ describe('DifferentiationTagModalForm', () => {
       ...props,
     } as DifferentiationTagModalFormProps
 
-    render(
+    return render(
       <MockedQueryProvider>
         <DifferentiationTagModalForm {...defaultProps} />
       </MockedQueryProvider>,
@@ -145,7 +145,7 @@ describe('DifferentiationTagModalForm', () => {
     })
 
     it('updates category to "Add as a single tag" when removing a tag leaves one input (create mode)', async () => {
-      renderComponent({mode: CREATE_MODE})
+      const {findByTitle} = renderComponent({mode: CREATE_MODE})
 
       // Initially one tag → option is "Add as a single tag"
       expect(screen.getByTitle('Add as a single tag')).toBeInTheDocument()
@@ -159,11 +159,14 @@ describe('DifferentiationTagModalForm', () => {
       const removeButtons = screen.getAllByRole('button', {name: /remove tag/i, hidden: true})
       await user.click(removeButtons[0])
 
-      // With one tag left, the option should revert to "Add as a single tag".
-      expect(screen.getByTitle('Add as a single tag')).toBeInTheDocument()
+      const confirmButton = screen.getByTestId('continue-warning-modal')
+      await user.click(confirmButton)
+
+      const singleTagOption = await findByTitle('Add as a single tag')
+      expect(singleTagOption).toBeInTheDocument()
     })
 
-    it('moves focus to previous row remove button when a tag input row is deleted', async () => {
+    it('moves focus to previous row remove button when a tag input row is deleted after confirming', async () => {
       renderComponent({mode: CREATE_MODE})
 
       await user.click(screen.getByLabelText('Add another tag'))
@@ -175,8 +178,13 @@ describe('DifferentiationTagModalForm', () => {
         .reverse()
       await user.click(removeButtons[0])
 
-      // Verify that focus has moved to the previous row's remove button
-      expect(removeButtons[1]).toHaveFocus()
+      const confirmButton = screen.getByTestId('continue-warning-modal')
+      await user.click(confirmButton)
+
+      await waitFor(() => {
+        // Verify that focus has moved to the previous row's remove button
+        expect(removeButtons[1]).toHaveFocus()
+      })
     })
 
     it('moves focus to the first tag input row if the second tag input row is deleted', async () => {
@@ -189,8 +197,13 @@ describe('DifferentiationTagModalForm', () => {
       // Remove the second tag input row (first one is the default one)
       await user.click(removeButtons[0])
 
-      // Verify that focus has moved to the first tag input row
-      expect(screen.getAllByLabelText(/Tag Name/i)[0]).toHaveFocus()
+      const confirmButton = screen.getByTestId('continue-warning-modal')
+      await user.click(confirmButton)
+
+      await waitFor(() => {
+        // Verify that focus has moved to the first tag input row
+        expect(screen.getAllByLabelText(/Tag Name/i)[0]).toHaveFocus()
+      })
     })
   })
 

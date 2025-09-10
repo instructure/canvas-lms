@@ -22,14 +22,16 @@ module Accessibility
     class LargeTextContrastRule < Accessibility::Rule
       extend Accessibility::CssAttributesHelper
 
-      self.id = "large-text-contrast"
-      self.link = "https://www.w3.org/TR/WCAG20-TECHS/G17.html"
-
       CONTRAST_THRESHOLD = 3.0
       LARGE_TEXT_MIN_SIZE_PX = 18.5
       LARGE_TEXT_MIN_SIZE_BOLD_PX = 14.0
 
-      def self.test(elem)
+      self.id = "large-text-contrast"
+      self.link = "https://www.w3.org/TR/WCAG20-TECHS/G17.html"
+
+      # Accessibility::Rule methods
+
+      def test(elem)
         tag_name = elem.tag_name.downcase
         return nil if %w[img br hr input select textarea button script style svg canvas iframe].include?(tag_name)
         return nil if elem.text_content.strip.empty?
@@ -39,10 +41,10 @@ module Accessibility
         style_str = elem.attribute("style")&.value.to_s
         return nil if style_str.include?("display: none") || style_str.include?("visibility: hidden")
 
-        return nil unless large_text?(style_str)
+        return nil unless self.class.large_text?(style_str)
 
-        foreground = extract_color(style_str, "color") || "000000"
-        background = extract_color(style_str, "background-color") || "FFFFFF"
+        foreground = self.class.extract_color(style_str, "color") || "000000"
+        background = self.class.extract_color(style_str, "background-color") || "FFFFFF"
 
         contrast_ratio = WCAGColorContrast.ratio(foreground, background)
 
@@ -51,17 +53,57 @@ module Accessibility
         end
       end
 
-      def self.display_name
+      def form(elem)
+        style_str = elem.attribute("style")&.value.to_s
+        foreground = self.class.extract_color(style_str, "color") || "000000"
+        background = self.class.extract_color(style_str, "background-color") || "FFFFFF"
+
+        Accessibility::Forms::ColorPickerField.new(
+          title_label: I18n.t("Contrast Ratio"),
+          input_label: I18n.t("New text color"),
+          label: I18n.t("Change text color"),
+          undo_text: I18n.t("Color changed"),
+          options: ["large"],
+          background_color: "##{background}",
+          value: "##{foreground}",
+          contrast_ratio: WCAGColorContrast.ratio(foreground, background)
+        )
+      end
+
+      def fix!(elem, value)
+        style_str = elem.attribute("style")&.value.to_s
+        styles = style_str.split(";").to_h { |s| s.strip.split(":") }
+
+        styles["color"] = value
+
+        new_style = styles.map { |k, v| "#{k.strip}: #{v.strip}" }.join("; ") + ";"
+        return nil if new_style == style_str
+
+        elem.set_attribute("style", new_style)
+
+        foreground = self.class.extract_color(new_style, "color") || "000000"
+        background = self.class.extract_color(style_str, "background-color") || "FFFFFF"
+
+        contrast_ratio = WCAGColorContrast.ratio(foreground, background)
+
+        raise StandardError, "Insufficient contrast ratio (#{contrast_ratio})." if contrast_ratio < CONTRAST_THRESHOLD
+
+        elem
+      end
+
+      def display_name
         I18n.t("Large text contrast")
       end
 
-      def self.message
+      def message
         I18n.t("Text larger than 18pt (or bold 14pt) should display a minimum contrast ratio of 3:1.")
       end
 
-      def self.why
+      def why
         I18n.t("Text is difficult to read without sufficient contrast between the text and the background, especially for those with low vision.")
       end
+
+      # Helper methods
 
       def self.large_text?(style_str)
         font_size = extract_font_size(style_str) || 16
@@ -99,44 +141,6 @@ module Accessibility
                            "#FFFFFF"
                          end
         { foreground: new_foreground, background: }
-      end
-
-      def self.form(elem)
-        style_str = elem.attribute("style")&.value.to_s
-        foreground = extract_color(style_str, "color") || "000000"
-        background = extract_color(style_str, "background-color") || "FFFFFF"
-
-        Accessibility::Forms::ColorPickerField.new(
-          title_label: I18n.t("Contrast Ratio"),
-          input_label: I18n.t("New text color"),
-          label: I18n.t("Change text color"),
-          undo_text: I18n.t("Color changed"),
-          options: ["large"],
-          background_color: "##{background}",
-          value: "##{foreground}",
-          contrast_ratio: WCAGColorContrast.ratio(foreground, background)
-        )
-      end
-
-      def self.fix!(elem, value)
-        style_str = elem.attribute("style")&.value.to_s
-        styles = style_str.split(";").to_h { |s| s.strip.split(":") }
-
-        styles["color"] = value
-
-        new_style = styles.map { |k, v| "#{k.strip}: #{v.strip}" }.join("; ") + ";"
-        return nil if new_style == style_str
-
-        elem.set_attribute("style", new_style)
-
-        foreground = extract_color(new_style, "color") || "000000"
-        background = extract_color(style_str, "background-color") || "FFFFFF"
-
-        contrast_ratio = WCAGColorContrast.ratio(foreground, background)
-
-        raise StandardError, "Insufficient contrast ratio (#{contrast_ratio})." if contrast_ratio < CONTRAST_THRESHOLD
-
-        elem
       end
     end
   end

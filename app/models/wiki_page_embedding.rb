@@ -20,5 +20,6 @@ class WikiPageEmbedding < ApplicationRecord
   belongs_to :wiki_page, inverse_of: :embeddings
 
   extend RootAccountResolver
+
   resolves_root_account through: :wiki_page
 end

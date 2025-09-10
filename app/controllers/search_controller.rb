@@ -171,7 +171,7 @@ class SearchController < ApplicationController
     @courses = Course.where(root_account_id: @domain_root_account)
                      .where(indexed: true)
                      .where(workflow_state: "available")
-                     .order("created_at")
+                     .order(:created_at)
     @search = params[:search]
     if @search.present?
       @courses = @courses.where(@courses.wildcard("name", @search.to_s))

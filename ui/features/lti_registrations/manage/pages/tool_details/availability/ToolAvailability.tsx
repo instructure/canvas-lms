@@ -171,10 +171,13 @@ export const ToolAvailability = (props: ToolAvailabilityProps) => {
                       // Call the API to create a deployment
                       createDeployment({
                         registrationId: registration.id,
-                        accountId: registration.account_id,
+                        accountId: props.accountId,
                       }).then(result => {
-                        if (result._type === 'Success') {
+                        if (result._type === 'Success' || result._type === 'ApiParseError') {
                           // Handle success (e.g., show a success message or refresh the deployments)
+                          // Deployments from this API do not include context_controls, so the parsing
+                          // fails but since the deployment is created and we don't care about the result,
+                          // we can throw it away.
                           controlsQuery.refetch()
                         } else {
                           showFlashAlert({

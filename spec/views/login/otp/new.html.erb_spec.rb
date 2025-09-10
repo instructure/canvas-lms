@@ -22,12 +22,12 @@ require_relative "../../../spec_helper"
 require_relative "../../views_helper"
 
 describe "login/otp/new" do
-  let(:current_user) { double("User") }
-  let(:current_pseudonym) { double("Pseudonym", unique_id: "unique_id_123") }
-  let(:domain_root_account) { double("Account", name: "Domain Account") }
-  let(:communication_channels) { double("CommunicationChannels", sms: sms_channels) }
-  let(:sms_channels) { double("SmsChannels", unretired: unretired_channels) }
-  let(:unretired_channels) { [double("Channel", path: "1234567890", id: 1)] }
+  let(:current_user) { instance_double(User) }
+  let(:current_pseudonym) { instance_double(Pseudonym, unique_id: "unique_id_123") }
+  let(:domain_root_account) { instance_double(Account, name: "Domain Account") }
+  let(:communication_channels) { class_double(CommunicationChannel, sms: sms_channels) }
+  let(:sms_channels) { class_double(CommunicationChannel, unretired: unretired_channels) }
+  let(:unretired_channels) { [instance_double(CommunicationChannel, path: "1234567890", id: 1)] }
 
   before do
     assign(:current_user, current_user)
@@ -56,7 +56,7 @@ describe "login/otp/new" do
   end
 
   context "with verification code sent to mobile" do
-    let(:cc) { double("CommunicationChannel") }
+    let(:cc) { instance_double(CommunicationChannel) }
 
     before do
       assign(:cc, cc)

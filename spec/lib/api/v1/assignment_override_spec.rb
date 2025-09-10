@@ -23,6 +23,7 @@ describe Api::V1::AssignmentOverride do
   let(:test_class) do
     Class.new do
       include Api::V1::AssignmentOverride
+
       attr_accessor :current_user
 
       def session

@@ -200,7 +200,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "sorts deployments by account hierarchy" do
         subject
-        expect(response_json.map { |d| d["id"] }).to eq([deployment.id, course_deployment.id, subaccount_deployment.id])
+        expect(response_json.pluck("id")).to eq([deployment.id, course_deployment.id, subaccount_deployment.id])
       end
 
       context "when deployment has many controls" do
@@ -216,7 +216,7 @@ describe Lti::ContextControlsController, type: :request do
 
           deployment_json = response_json.find { |d| d["id"] == deployment.id }
           expect(deployment_json["context_controls"].length).to eq(2)
-          expect(deployment_json["context_controls"].map { |cc| cc["id"] }).to include(other_control.id)
+          expect(deployment_json["context_controls"].pluck("id")).to include(other_control.id)
         end
 
         it "includes calculated attributes for a top-level control" do
@@ -252,7 +252,7 @@ describe Lti::ContextControlsController, type: :request do
 
           subject
           controls = response_json.find { |d| d["id"] == deployment.id }["context_controls"]
-          expect(controls.map { |cc| cc["id"] }).not_to include(other_control.id)
+          expect(controls.pluck("id")).not_to include(other_control.id)
         end
       end
     end

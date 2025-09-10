@@ -67,7 +67,7 @@ describe AccessibilityResourceScansController do
         json = response.parsed_body
         expect(json.length).to eq(3)
 
-        asc_values = json.map { |scan| scan[sort_param] }
+        asc_values = json.pluck(sort_param)
 
         # Descending order
         get :index, params: { course_id: course.id, sort: sort_param, direction: "desc" }, format: :json
@@ -75,7 +75,7 @@ describe AccessibilityResourceScansController do
         desc_json = response.parsed_body
         expect(desc_json.length).to eq(3)
 
-        desc_values = desc_json.map { |scan| scan[sort_param] }
+        desc_values = desc_json.pluck(sort_param)
 
         expect(desc_values).to eq(asc_values.reverse)
       end
@@ -189,7 +189,7 @@ describe AccessibilityResourceScansController do
 
           json = response.parsed_body
           scan_with_issues_json = json.find { |scan| scan["id"] == scan_with_issues.id }
-          issue_ids = scan_with_issues_json["issues"].map { |x| x["id"] }
+          issue_ids = scan_with_issues_json["issues"].pluck("id")
 
           expect(issue_ids).not_to include(resolved_issue.id)
           expect(issue_ids).not_to include(dismissed_issue.id)

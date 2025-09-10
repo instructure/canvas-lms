@@ -18,4 +18,5 @@
 
 export * from './ImageEdit'
 export * from './ImageView'
+export * from './ImageCaption'
 export type {ImageEditProps} from './types'

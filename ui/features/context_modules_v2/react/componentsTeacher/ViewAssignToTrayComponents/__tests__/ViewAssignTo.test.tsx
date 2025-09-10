@@ -113,7 +113,6 @@ describe('ViewAssignTo', () => {
     moduleName: 'Test Module',
     expanded: true,
     isMenuOpen: true,
-    prerequisites: [],
     ...overrides,
   })
 

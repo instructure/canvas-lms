@@ -146,7 +146,10 @@ describe('MediaAttempt', () => {
     describe('validation', () => {
       it('displays an error if the user has not uploaded media and tries to submit', async () => {
         const props = await makeProps()
-        props.submission = {submissionDraft: {meetsMediaRecordingCriteria: false}}
+        props.submission = {
+          ...props.submission,
+          submissionDraft: {meetsMediaRecordingCriteria: false},
+        }
         const submitButton = document.createElement('button')
         props.submitButtonRef.current = submitButton
         const {getByText} = render(<MediaAttempt {...props} />)
@@ -156,7 +159,10 @@ describe('MediaAttempt', () => {
 
       it('clears the error when the user clicks the record media button', async () => {
         const props = await makeProps()
-        props.submission = {submissionDraft: {meetsMediaRecordingCriteria: false}}
+        props.submission = {
+          ...props.submission,
+          submissionDraft: {meetsMediaRecordingCriteria: false},
+        }
         const submitButton = document.createElement('button')
         props.submitButtonRef.current = submitButton
         const {getByText, queryByText, getByTestId} = render(<MediaAttempt {...props} />)
@@ -168,7 +174,10 @@ describe('MediaAttempt', () => {
 
       it('clears the error when the user clicks the upload media button', async () => {
         const props = await makeProps()
-        props.submission = {submissionDraft: {meetsMediaRecordingCriteria: false}}
+        props.submission = {
+          ...props.submission,
+          submissionDraft: {meetsMediaRecordingCriteria: false},
+        }
         const submitButton = document.createElement('button')
         props.submitButtonRef.current = submitButton
         const {getByText, queryByText, getByTestId} = render(<MediaAttempt {...props} />)

@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'jqueryui/dialog'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {bool, func, number, shape, string} from 'prop-types'
@@ -24,7 +23,7 @@ import {bool, func, number, shape, string} from 'prop-types'
 import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {IconLtiLine} from '@instructure/ui-icons'
+import {IconExternalLinkLine, IconLtiLine} from '@instructure/ui-icons'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Popover} from '@instructure/ui-popover'
 import {Link} from '@instructure/ui-link'
@@ -135,6 +134,10 @@ class DeveloperKey extends React.Component {
 
   render() {
     const {developerKey, inherited} = this.props
+    const showLinkFlag = window.ENV.FEATURES.lti_link_to_apps_from_developer_keys
+    const showLinkToApps = developerKey.is_lti_key && showLinkFlag
+    // hide secret button if inherited, or lti key and flag on
+    const showClientSecret = !(inherited || showLinkToApps)
 
     return (
       <Table.Row>
@@ -156,7 +159,7 @@ class DeveloperKey extends React.Component {
         <Table.Cell>
           <View maxWidth="200px" as="div">
             <div data-testid="developer-key-id">{developerKey.id}</div>
-            {!inherited && (
+            {showClientSecret && (
               <div>
                 <Popover
                   placement="top"
@@ -185,6 +188,21 @@ class DeveloperKey extends React.Component {
                     {developerKey.api_key}
                   </View>
                 </Popover>
+              </div>
+            )}
+            {showLinkToApps && (
+              <div style={{whiteSpace: 'nowrap'}}>
+                <Link
+                  variant="standalone"
+                  renderIcon={<IconExternalLinkLine />}
+                  target="_blank"
+                  href={`/accounts/${this.props.ctx.params.contextId}/apps/manage/${developerKey.lti_registration_id}`}
+                  screenReaderLabel={I18n.t('View LTI key %{name} in Canvas Apps', {
+                    name: developerKey.name,
+                  })}
+                >
+                  {I18n.t('View in Canvas Apps')}
+                </Link>
               </div>
             )}
             {!inherited && (

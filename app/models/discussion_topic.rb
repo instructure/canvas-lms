@@ -167,6 +167,7 @@ class DiscussionTopic < ActiveRecord::Base
   after_create :create_materialized_view
 
   include SmartSearchable
+
   use_smart_search title_column: :title,
                    body_column: :message,
                    index_scope: ->(course) { course.discussion_topics.active },
@@ -826,6 +827,8 @@ class DiscussionTopic < ActiveRecord::Base
           topic_participant.expanded = opts[:expanded] if opts.key?(:expanded)
           topic_participant.sort_order = opts[:sort_order] if opts.key?(:sort_order)
           topic_participant.summary_enabled = opts[:summary_enabled] if opts.key?(:summary_enabled)
+          topic_participant.show_pinned_entries = opts[:show_pinned_entries] if opts.key?(:show_pinned_entries)
+          topic_participant.has_unread_pinned_entry = opts[:has_unread_pinned_entry] if opts.key?(:has_unread_pinned_entry)
           topic_participant.save
         end
       end
@@ -1452,8 +1455,11 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user, session| !root_topic_id && context.grants_all_rights?(user, session, :read_forum, :moderate_forum) }
     can :update and can :read_as_admin and can :delete and can :read and can :attach
 
+    given { |user, session| !root_topic_id && context.grants_all_rights?(user, session, :read_forum, :view_group_pages) }
+    can :view_group_pages
+
     given { |user, session| root_topic&.grants_right?(user, session, :read_as_admin) }
-    can :read_as_admin
+    can :read_as_admin and can :view_group_pages
 
     given { |user, session| root_topic&.grants_right?(user, session, :delete) }
     can :delete
@@ -1808,6 +1814,8 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def user_name
+    return nil if anonymous? && !context.user_is_instructor?(user)
+
     user&.name
   end
 
@@ -1924,7 +1932,7 @@ class DiscussionTopic < ActiveRecord::Base
         locked = { object: self, module: item.context_module }
       elsif locked? # nothing more specific, it's just locked
         locked = { object: self, can_view: true }
-      elsif (l = root_topic&.low_level_locked_for?(user, opts)) # rubocop:disable Lint/DuplicateBranch
+      elsif (l = root_topic&.low_level_locked_for?(user, opts))
         locked = l
       end
       locked

@@ -19,26 +19,32 @@
 import {QueryMethods, SerializedNodes, useEditor} from '@craftjs/core'
 import {QueryCallbacksFor} from '@craftjs/utils'
 import {useEffect, useRef} from 'react'
+import {useEditHistory} from './hooks/useEditHistory'
 
 export interface BlockContentEditorHandler {
   getContent: () => {
     blocks: SerializedNodes
   }
+  isEdited: () => boolean
 }
 
 export const BlockContentEditorHandlerIntegration = (props: {
   onInit: ((handler: BlockContentEditorHandler) => void) | null
 }) => {
   const {query} = useEditor()
+  const {isEdited} = useEditHistory()
 
   const queryRef = useRef<QueryCallbacksFor<typeof QueryMethods> | null>(null)
+  const isEditedRef = useRef<boolean | null>(null)
   queryRef.current = query
+  isEditedRef.current = isEdited
 
   useEffect(() => {
     const handler: BlockContentEditorHandler = {
       getContent: () => ({
         blocks: queryRef.current ? JSON.parse(queryRef.current.serialize()) : null,
       }),
+      isEdited: () => !!isEditedRef.current,
     }
     props.onInit?.(handler)
   }, [props.onInit])

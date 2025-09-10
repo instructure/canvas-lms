@@ -22,6 +22,7 @@ require "active_support/testing/time_helpers"
 
 describe CoursePaceHardEndDateCompressor do
   include ActiveSupport::Testing::TimeHelpers
+
   before :once do
     course_with_student active_all: true
     @course.update start_at: "2021-09-01", restrict_enrollments_to_course_dates: true

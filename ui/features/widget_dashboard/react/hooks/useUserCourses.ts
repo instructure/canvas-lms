@@ -17,30 +17,37 @@
  */
 
 import {useQuery} from '@tanstack/react-query'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import {executeQuery} from '@canvas/graphql'
 import {gql} from 'graphql-tag'
-import type {CourseOption} from '../types'
-
-const I18n = createI18nScope('widget_dashboard')
+import type {CourseOption, CourseGrade} from '../types'
+import {getCurrentUserId, executeGraphQLQuery, createUserQueryConfig} from '../utils/graphql'
+import {COURSE_GRADES_WIDGET, QUERY_CONFIG} from '../constants'
 
 interface UserEnrollment {
   course: {
     _id: string
     name: string
+    courseCode?: string
   }
+  updatedAt?: string
+  grades?: {
+    currentScore?: number | null
+    currentGrade?: string | null
+    finalScore?: number | null
+    finalGrade?: string | null
+    overrideScore?: number | null
+    overrideGrade?: string | null
+  } | null
 }
 
 interface GraphQLResponse {
-  legacyNode?: {
+  legacyNode: {
     _id: string
     enrollments: UserEnrollment[]
-  } | null
-  errors?: {message: string}[]
+  }
 }
 
-const USER_COURSES_QUERY = gql`
-  query GetUserCourses($userId: ID!) {
+const USER_COURSES_WITH_GRADES_QUERY = gql`
+  query GetUserCoursesWithGrades($userId: ID!) {
     legacyNode(_id: $userId, type: User) {
       ... on User {
         _id
@@ -48,6 +55,16 @@ const USER_COURSES_QUERY = gql`
           course {
             _id
             name
+            courseCode
+          }
+          updatedAt
+          grades {
+            currentScore
+            currentGrade
+            finalScore
+            finalGrade
+            overrideScore
+            overrideGrade
           }
         }
       }
@@ -56,24 +73,14 @@ const USER_COURSES_QUERY = gql`
 `
 
 export function useUserCourses() {
-  const currentUserId = window.ENV?.current_user_id
-
   return useQuery({
-    queryKey: ['userCourses', currentUserId],
+    ...createUserQueryConfig(['userCourses'], QUERY_CONFIG.STALE_TIME.COURSES),
     queryFn: async (): Promise<CourseOption[]> => {
-      if (!currentUserId) {
-        throw new Error('No current user ID found - please ensure you are logged in')
-      }
+      const currentUserId = getCurrentUserId()
 
-      const result = await executeQuery<GraphQLResponse>(USER_COURSES_QUERY, {
+      const result = await executeGraphQLQuery<GraphQLResponse>(USER_COURSES_WITH_GRADES_QUERY, {
         userId: currentUserId,
       })
-
-      if (result.errors) {
-        throw new Error(
-          `GraphQL query failed: ${result.errors.map((err: {message: string}) => err.message).join(', ')}`,
-        )
-      }
 
       if (!result.legacyNode?.enrollments) {
         return []
@@ -84,8 +91,52 @@ export function useUserCourses() {
         name: enrollment.course.name,
       }))
     },
-    staleTime: 10 * 60 * 1000, // 10 minutes - courses don't change frequently
-    refetchOnWindowFocus: false,
-    enabled: !!currentUserId,
+  })
+}
+
+export function useUserCoursesWithGrades() {
+  return useQuery({
+    ...createUserQueryConfig(['userCoursesWithGrades'], QUERY_CONFIG.STALE_TIME.GRADES),
+    queryFn: async (): Promise<CourseGrade[]> => {
+      const currentUserId = getCurrentUserId()
+
+      const result = await executeGraphQLQuery<GraphQLResponse>(USER_COURSES_WITH_GRADES_QUERY, {
+        userId: currentUserId,
+      })
+
+      if (!result.legacyNode?.enrollments) {
+        return []
+      }
+
+      return result.legacyNode.enrollments.map(enrollment => {
+        const grades = enrollment.grades
+
+        // Determine the display grade - prioritize override, then final, then current
+        let displayGrade: number | null = null
+        let displayGradeString: string | null = null
+
+        if (grades?.overrideScore !== null && grades?.overrideScore !== undefined) {
+          displayGrade = grades.overrideScore
+          displayGradeString = grades.overrideGrade || null
+        } else if (grades?.finalScore !== null && grades?.finalScore !== undefined) {
+          displayGrade = grades.finalScore
+          displayGradeString = grades.finalGrade || null
+        } else if (grades?.currentScore !== null && grades?.currentScore !== undefined) {
+          displayGrade = grades.currentScore
+          displayGradeString = grades.currentGrade || null
+        }
+
+        return {
+          courseId: enrollment.course._id,
+          courseCode: enrollment.course.courseCode || COURSE_GRADES_WIDGET.DEFAULT_COURSE_CODE,
+          courseName: enrollment.course.name,
+          currentGrade: displayGrade,
+          gradingScheme: displayGradeString
+            ? COURSE_GRADES_WIDGET.GRADING_SCHEMES.LETTER
+            : COURSE_GRADES_WIDGET.GRADING_SCHEMES.PERCENTAGE,
+          lastUpdated: new Date(enrollment.updatedAt || new Date().toISOString()),
+        }
+      })
+    },
   })
 }

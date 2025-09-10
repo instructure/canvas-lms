@@ -22,6 +22,7 @@ module CC
     class QtiGenerator
       include CC::CCHelper
       include QtiItems
+
       delegate :add_error, :export_object?, :add_exported_asset, :create_key, to: :@manifest
 
       def initialize(manifest, resources_node, html_exporter)

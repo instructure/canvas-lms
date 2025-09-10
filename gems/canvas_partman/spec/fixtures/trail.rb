@@ -19,6 +19,7 @@
 
 class CanvasPartmanTest::Trail < ActiveRecord::Base
   include CanvasPartman::Concerns::Partitioned
+
   self.partitioning_strategy = :by_id
   self.partitioning_field = "zoo_id"
   self.partition_size = 5

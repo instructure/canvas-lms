@@ -288,7 +288,7 @@ class WikiPagesApiController < ApplicationController
       includes = Array(params[:include])
       scope_columns = WikiPage.column_names
       scope_columns -= ["body"] unless includes.include?("body")
-      scope_columns << "CASE WHEN body IS NULL THEN true ELSE false END AS is_body_null" if @context.account.feature_enabled?(:block_content_editor)
+      scope_columns += ["CASE WHEN body IS NULL THEN true ELSE false END AS is_body_null"] if @context.account.feature_enabled?(:block_content_editor)
       scope = @context.wiki_pages.select(scope_columns).preload(:user)
       scope = if params.key?(:published)
                 value_to_boolean(params[:published]) ? scope.published : scope.unpublished

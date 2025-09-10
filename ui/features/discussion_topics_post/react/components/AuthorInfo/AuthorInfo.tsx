@@ -16,39 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AnonymousAvatar} from '@canvas/discussions/react/components/AnonymousAvatar/AnonymousAvatar'
-import {AnonymousUser} from '../../../graphql/AnonymousUser'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import React, {useContext, useMemo} from 'react'
-import {
-  getDisplayName,
-  hideStudentNames,
-  isAnonymous,
-  resolveAuthorRoles,
-  userNameToShow,
-} from '../../utils'
+import React, {useContext} from 'react'
+import {getDisplayName, isAnonymous, resolveAuthorRoles} from '../../utils'
 import {RolePillContainer} from '../RolePillContainer/RolePillContainer'
 import {SearchContext} from '../../utils/constants'
-import {SearchSpan} from '../SearchSpan/SearchSpan'
-import {User} from '../../../graphql/User'
-
-import {Avatar} from '@instructure/ui-avatar'
 import {Badge} from '@instructure/ui-badge'
 import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
-import {Link} from '@instructure/ui-link'
-import {DiscussionEntryVersion} from '../../../graphql/DiscussionEntryVersion'
 import {DiscussionEntryVersionHistory} from '../DiscussionEntryVersionHistory/DiscussionEntryVersionHistory'
 import {ReportsSummaryBadge} from '../ReportsSummaryBadge/ReportsSummaryBadge'
-import theme from '@instructure/canvas-theme'
-import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
-import {parse} from '@instructure/moment-utils'
-import DateHelper from '@canvas/datetime/dateHelper'
+import WithBreakpoints from '@canvas/with-breakpoints'
+import {AuthorAvatar} from './AuthorAvatar'
+import {Timestamps} from './Timestamps'
+import {NameLink} from './NameLink'
+import {IconPinSolid} from '@instructure/ui-icons'
 
 const I18n = createI18nScope('discussion_posts')
 
-interface UserType {
+export interface UserType {
   id?: string
   _id?: string
   avatarUrl?: string
@@ -65,7 +52,7 @@ interface AnonymousUserType {
   shortName?: string
 }
 
-interface AuthorInfoProps {
+export interface AuthorInfoProps {
   /**
    * Object containing author information
    */
@@ -136,13 +123,14 @@ interface AuthorInfoProps {
   published?: boolean
   isAnnouncement?: boolean
   isSplitView?: boolean
+  isPinned: boolean
+  pinnedBy: UserType
 }
 
 const AuthorInfoBase = ({breakpoints, ...props}: AuthorInfoProps) => {
   const {searchTerm} = useContext(SearchContext)
 
   const hasAuthor = Boolean(props.author || props.anonymousAuthor)
-  const avatarUrl = isAnonymous(props) ? null : props.author?.avatarUrl
 
   const getUnreadBadgeOffset = (avatarSize: string) => {
     if (avatarSize === 'x-small') return '-8px'
@@ -198,21 +186,7 @@ const AuthorInfoBase = ({breakpoints, ...props}: AuthorInfoProps) => {
               display: 'initial',
             }}
           >
-            {hasAuthor && !isAnonymous(props) && !hideStudentNames && (
-              <Avatar
-                size={avatarSize}
-                name={getDisplayName(props)}
-                src={avatarUrl || undefined}
-                margin="0"
-                data-testid="author_avatar"
-              />
-            )}
-            {hasAuthor && !isAnonymous(props) && hideStudentNames && (
-              <AnonymousAvatar seedString={props.author?._id} size={avatarSize} />
-            )}
-            {hasAuthor && isAnonymous(props) && (
-              <AnonymousAvatar seedString={props.anonymousAuthor?.shortName} size={avatarSize} />
-            )}
+            <AuthorAvatar entry={props} avatarSize={avatarSize} />
           </div>
         )}
       </Flex.Item>
@@ -276,6 +250,8 @@ const AuthorInfoBase = ({breakpoints, ...props}: AuthorInfoProps) => {
               isTopic={props.isTopic}
               published={props.published}
               isAnnouncement={props.isAnnouncement}
+              isPinned={props.isPinned}
+              pinnedBy={props.pinnedBy}
             />
             {(ENV as any).discussion_entry_version_history &&
               props.discussionEntryVersions &&
@@ -289,205 +265,6 @@ const AuthorInfoBase = ({breakpoints, ...props}: AuthorInfoProps) => {
         </Flex>
       </Flex.Item>
     </Flex>
-  )
-}
-
-interface TimestampsProps {
-  author?: UserType
-  editor?: UserType
-  createdAt?: string
-  delayedPostAt?: string
-  editedTimingDisplay?: string
-  lastReplyAtDisplay?: string
-  timestampTextSize: string
-  mobileOnly?: boolean
-  isTopic?: boolean
-  published?: boolean
-  isAnnouncement?: boolean
-  showCreatedAsTooltip?: boolean
-}
-
-const Timestamps = (props: TimestampsProps) => {
-  const isTeacher =
-    ENV?.current_user_roles &&
-    ENV?.current_user_roles.includes('teacher') &&
-    !ENV?.current_user_is_student
-  const editText = useMemo(() => {
-    if (!props.editedTimingDisplay) {
-      return null
-    }
-
-    const editedDate = parse(props.editedTimingDisplay)
-    const delayedDate = parse(props.delayedPostAt)
-    // do not show edited by info for students if the post is edited before the delayed post date
-    if (!isTeacher && delayedDate && editedDate?.isBefore(delayedDate)) {
-      return null
-    }
-
-    // do not show edited by info for anonymous discussions
-    if (props.editor && props.author && props.editor?._id !== props.author?._id) {
-      return (
-        <span data-testid="editedByText">
-          {!hideStudentNames ? (
-            <>
-              {I18n.t('Edited by')} <NameLink userType="editor" user={props.editor} />{' '}
-              {I18n.t('%{editedTimingDisplay}', {
-                editedTimingDisplay: props.editedTimingDisplay,
-              })}
-            </>
-          ) : (
-            I18n.t('Edited by %{editorName} %{editedTimingDisplay}', {
-              editorName: userNameToShow(
-                props.editor.displayName || props.editor.shortName,
-                props.author._id,
-                props.editor.courseRoles,
-              ),
-              editedTimingDisplay: props.editedTimingDisplay,
-            })
-          )}
-        </span>
-      )
-    } else {
-      return I18n.t('Last edited %{editedTimingDisplay}', {
-        editedTimingDisplay: props.editedTimingDisplay,
-      })
-    }
-  }, [props.editedTimingDisplay, props.delayedPostAt, props.editor, props.author, isTeacher])
-
-  const timestampsPadding = props.mobileOnly ? '0 xx-small 0 0' : 'xx-small xx-small xx-small 0'
-
-  const createdAtText = useMemo(() => {
-    // show basic date for replies
-    if (!props.isTopic) return props.createdAt
-    // show the original created date for teachers
-    if (isTeacher) {
-      return I18n.t('Created %{createdAt}', {createdAt: props.createdAt})
-    } else {
-      // don't show the created date for students if the post is delayed
-      return props.delayedPostAt
-        ? null
-        : I18n.t('Posted %{createdAt}', {createdAt: props.createdAt})
-    }
-  }, [isTeacher, props.createdAt, props.delayedPostAt, props.isTopic])
-
-  const delayedPostText = useMemo(() => {
-    if (!props.isTopic) return null
-    // duplicate createdAt for teachers if the post is instant
-    if (isTeacher && !props.delayedPostAt && props.createdAt && props.published) {
-      return I18n.t('Posted %{createdAt}', {createdAt: props.createdAt})
-    }
-    if (props.delayedPostAt) {
-      // announcements are "published" always, so we need to compare dates
-      if (props.isAnnouncement && parse(props.delayedPostAt)?.isAfter(new Date())) {
-        return null
-      }
-
-      return I18n.t('Posted %{delayedPostAt}', {
-        delayedPostAt: DateHelper.formatDatetimeForDiscussions(props.delayedPostAt),
-      })
-    }
-  }, [
-    isTeacher,
-    props.createdAt,
-    props.delayedPostAt,
-    props.isAnnouncement,
-    props.isTopic,
-    props.published,
-  ])
-
-  return (
-    <Flex wrap="wrap">
-      {createdAtText && (
-        <Flex.Item overflowX="hidden" padding={timestampsPadding}>
-          <Text size={props.timestampTextSize as any}>{createdAtText}</Text>
-        </Flex.Item>
-      )}
-      {delayedPostText && (
-        <Flex.Item overflowX="hidden" padding={timestampsPadding}>
-          <Text size={props.timestampTextSize as any}>
-            {createdAtText && ' | '}
-            {delayedPostText}
-          </Text>
-        </Flex.Item>
-      )}
-      {editText && (
-        <Flex.Item overflowX="hidden" padding={timestampsPadding}>
-          <Text size={props.timestampTextSize as any}>
-            {' | '}
-            {editText}
-          </Text>
-        </Flex.Item>
-      )}
-      {props.lastReplyAtDisplay && (
-        <Flex.Item overflowX="hidden" padding="0 xx-small 0 0">
-          {' | '}
-          <Text size={props.timestampTextSize as any}>
-            {I18n.t('Last reply %{lastReplyAtDisplay}', {
-              lastReplyAtDisplay: props.lastReplyAtDisplay,
-            })}
-          </Text>
-        </Flex.Item>
-      )}
-    </Flex>
-  )
-}
-
-interface NameLinkProps {
-  userType: string
-  user?: UserType
-  searchTerm?: string
-  mobileOnly?: boolean
-  authorNameTextSize?: string
-  discussionEntryProps?: AuthorInfoProps
-}
-
-const NameLink = (props: NameLinkProps) => {
-  let classnames = ''
-  if (props.user?.courseRoles?.includes('StudentEnrollment'))
-    classnames = 'student_context_card_trigger'
-  if (props.mobileOnly) classnames += ' author_post'
-
-  return (
-    <div
-      className={classnames}
-      style={
-        props.userType === 'author'
-          ? {
-              marginBottom: props.mobileOnly ? '0' : '0.3rem',
-              marginTop: props.mobileOnly ? '0' : theme.spacing.xxSmall,
-              marginLeft: theme.spacing.xxSmall,
-              display: 'inline-block',
-            }
-          : {display: 'inline'}
-      }
-      data-testid={`student_context_card_trigger_container_${props.userType}`}
-      data-student_id={props.user?._id}
-      data-course_id={ENV.course_id}
-    >
-      <Link href={props.user?.htmlUrl} isWithinText={false} themeOverride={{fontWeight: 700}}>
-        {props.userType === 'author' ? (
-          <>
-            <SearchSpan
-              isSplitView={props.discussionEntryProps?.isSplitView}
-              searchTerm={props.searchTerm}
-              text={getDisplayName(props.discussionEntryProps)}
-            />
-            {props.user?.pronouns && (
-              <Text
-                lineHeight="condensed"
-                size={props.authorNameTextSize as any}
-                fontStyle="italic"
-                data-testid="author-pronouns"
-              >
-                &nbsp;({props.user?.pronouns})
-              </Text>
-            )}
-          </>
-        ) : (
-          props.user?.displayName
-        )}
-      </Link>
-    </div>
   )
 }
 

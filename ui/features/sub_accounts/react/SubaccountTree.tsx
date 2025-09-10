@@ -16,16 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import doFetchApi, {FetchApiError} from '@canvas/do-fetch-api-effect'
 import {Alert} from '@instructure/ui-alerts'
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
+import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Spinner} from '@instructure/ui-spinner'
 import SubaccountItem from './SubaccountItem'
 import type {AccountWithCounts, SubaccountQueryKey} from './types'
 import {Flex} from '@instructure/ui-flex'
 import SubaccountNameForm from './SubaccountNameForm'
-import {calculateIndent, getSubAccounts, FetchSubAccountsResponse, generateQueryKey} from './util'
+import {
+  calculateIndent,
+  getSubAccounts,
+  FetchSubAccountsResponse,
+  generateQueryKey,
+  SubaccountContext,
+} from './util'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {queryClient} from '@canvas/query'
 import DeleteSubaccountModal from './DeleteSubaccountModal'
@@ -37,6 +43,7 @@ const I18n = createI18nScope('sub_accounts')
 // we will not auto expand themselves or their children
 // this also applies to top-level accounts
 const THRESHOLD_FOR_AUTO_EXPAND = 100
+const RATE_LIMIT_REFETCH_INTERVAL = 20_000 // 20 seconds
 type ModifyType = 'delete' | 'edit' | 'add'
 
 interface Props {
@@ -53,6 +60,7 @@ export default function SubaccountTree(props: Props) {
   const defaultExpanded = useRef(false)
   const newSubaccount = useRef('')
   const observerRef = useRef<IntersectionObserver | null>(null)
+  const [isEnabled, setIsEnabled] = useState(false)
   const [hasFocus, setHasFocus] = useState(props.isFocus || false)
   const [subCount, setSubCount] = useState(props.rootAccount.sub_account_count || 0)
   const [subaccounts, setSubaccounts] = useState([] as AccountWithCounts[])
@@ -60,20 +68,63 @@ export default function SubaccountTree(props: Props) {
   const [isExpanded, setIsExpanded] = useState(false)
   const [displayConfirmation, setDisplayConfirmation] = useState(false)
 
-  const {data, isFetching, isLoading, fetchNextPage, isFetchingNextPage, hasNextPage, error} =
-    useInfiniteQuery<
-      FetchSubAccountsResponse,
-      unknown,
-      InfiniteData<FetchSubAccountsResponse>,
-      SubaccountQueryKey
-    >({
-      queryKey: generateQueryKey(props.rootAccount.id, props.depth),
-      queryFn: getSubAccounts,
-      getNextPageParam: (lastPage: {nextPage: any}) => lastPage.nextPage,
-      enabled: isExpanded,
-      staleTime: 10 * 60 * 1000, // 10 minutes
-      initialPageParam: '1',
+  const queue = useContext(SubaccountContext)
+
+  const {
+    data,
+    isFetching,
+    isLoading,
+    fetchNextPage,
+    isFetchingNextPage,
+    hasNextPage,
+    error,
+    promise,
+  } = useInfiniteQuery<
+    FetchSubAccountsResponse,
+    unknown,
+    InfiniteData<FetchSubAccountsResponse>,
+    SubaccountQueryKey
+  >({
+    queryKey: generateQueryKey(props.rootAccount.id, props.depth),
+    queryFn: getSubAccounts,
+    getNextPageParam: (lastPage: {nextPage: any}) => lastPage.nextPage,
+    enabled: isExpanded && isEnabled,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    initialPageParam: '1',
+    refetchInterval: query => {
+      if (
+        query.state.error &&
+        query.state.error instanceof FetchApiError &&
+        query.state.error.response.status === 403
+      ) {
+        // this is a rate limit error; let's wait and refetch in 20 seconds
+        return RATE_LIMIT_REFETCH_INTERVAL
+      } else {
+        return false
+      }
+    },
+  })
+
+  useEffect(() => {
+    if (isEnabled || !queue || subCount < 1 || !isExpanded) return
+    queue?.addItem(async () => {
+      if (!isEnabled) {
+        setIsEnabled(true)
+      }
+      // 10 second timeout to prevent the queue from getting stuck
+      // this query can still resolve, even after the timeout occurs
+      const timeout = new Promise<void>((resolve, _reject) =>
+        setTimeout(() => {
+          resolve()
+        }, 10_000),
+      )
+      await Promise.race([promise, timeout])
     })
+
+    // only run this effect when we expand the tree
+    // isExpand defaults to false until checked
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isExpanded])
 
   useEffect(() => {
     if (!isFetching && data != null) {

@@ -257,6 +257,83 @@ type AdhocStudents {
   students: [User!]
 }
 
+type AllocationRule implements LegacyIDInterface & Node & Timestamped {
+  """
+  legacy canvas id
+  """
+  _id: ID!
+
+  """
+  Boolean indicating if this rule applies to the assessor (true) or assessee (false)
+  """
+  appliesToAssessor: Boolean!
+
+  """
+  The user who will be receiving the peer review
+  """
+  assessee: User
+
+  """
+  The user who will be doing the peer review
+  """
+  assessor: User
+  assignmentId: ID!
+  courseId: ID!
+  createdAt: DateTime
+  id: ID!
+
+  """
+  Boolean indicating if the assessor must review the assessee
+  """
+  mustReview: Boolean!
+
+  """
+  Boolean indicating if the assessor is permitted to review the assessee
+  """
+  reviewPermitted: Boolean!
+  updatedAt: DateTime
+
+  """
+  The current state of the allocation rule
+  """
+  workflowState: String!
+}
+
+"""
+The connection type for AllocationRule.
+"""
+type AllocationRuleConnection {
+  """
+  A list of edges.
+  """
+  edges: [AllocationRuleEdge]
+
+  """
+  A list of nodes.
+  """
+  nodes: [AllocationRule]
+
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+An edge in a connection.
+"""
+type AllocationRuleEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge.
+  """
+  node: AllocationRule
+}
+
 """
 An anonymous student identity
 """
@@ -307,7 +384,7 @@ Contains standardized date hash information for objects with date overrides
 """
 interface AssignedDates {
   """
-  Standardized date hash visible to current user (when feature flag enabled)
+  Standardized date hash visible to current user
   """
   assignedToDates: [DateHash!]
 }
@@ -321,6 +398,31 @@ type Assignment implements AssignedDates & LegacyIDInterface & ModuleItemInterfa
   legacy canvas id
   """
   _id: ID!
+
+  """
+  Allocation rules if peer review is enabled
+  """
+  allocationRulesConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): AllocationRuleConnection
   allowGoogleDocsSubmission: Boolean
 
   """
@@ -361,7 +463,7 @@ type Assignment implements AssignedDates & LegacyIDInterface & ModuleItemInterfa
   ): UserConnection
 
   """
-  Standardized date hash visible to current user (when feature flag enabled)
+  Standardized date hash visible to current user
   """
   assignedToDates: [DateHash!]
   assignmentGroup: AssignmentGroup
@@ -1404,7 +1506,11 @@ enum AutoLeaderType {
   random
 }
 
-type Checkpoint {
+type Checkpoint implements AssignedDates {
+  """
+  Standardized date hash visible to current user
+  """
+  assignedToDates: [DateHash!]
   assignmentOverrides(
     """
     Returns the elements in the list that come after the specified cursor.
@@ -3544,7 +3650,7 @@ type Discussion implements AssignedDates & LegacyIDInterface & ModuleItemInterfa
   anonymousState: DiscussionTopicAnonymousStateType
 
   """
-  Standardized date hash visible to current user (when feature flag enabled)
+  Standardized date hash visible to current user
   """
   assignedToDates: [DateHash!]
   assignment: Assignment
@@ -4043,6 +4149,12 @@ type DiscussionEntryVersion implements LegacyIDInterface & Timestamped {
 
 input DiscussionFilter {
   """
+  only return discussions that are announcements (true) or
+  regular discussions (false). If not provided, returns both.
+  """
+  isAnnouncement: Boolean
+
+  """
   only return discussions whose title matches this search term
   """
   searchTerm: String
@@ -4065,10 +4177,66 @@ enum DiscussionFilterType {
 }
 
 type DiscussionParticipant {
+  discussionTopic: Discussion!
   expanded: Boolean
   id: ID!
+  read: Boolean!
   sortOrder: DiscussionSortOrderType
   summaryEnabled: Boolean
+  workflowState: String!
+}
+
+"""
+The connection type for DiscussionParticipant.
+"""
+type DiscussionParticipantConnection {
+  """
+  A list of edges.
+  """
+  edges: [DiscussionParticipantEdge]
+
+  """
+  A list of nodes.
+  """
+  nodes: [DiscussionParticipant]
+
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+An edge in a connection.
+"""
+type DiscussionParticipantEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge.
+  """
+  node: DiscussionParticipant
+}
+
+input DiscussionParticipantFilter {
+  """
+  only return participants for discussions in the specified course
+  """
+  courseId: ID
+
+  """
+  only return participants for discussions that are announcements (true) or
+  regular discussions (false). If not provided, returns both.
+  """
+  isAnnouncement: Boolean
+
+  """
+  only return participants with specific read state: 'read', 'unread', or 'all' (default)
+  """
+  readState: String
 }
 
 type DiscussionPermissions {
@@ -6567,6 +6735,12 @@ type Mutation {
     """
     input: PostDraftSubmissionCommentInput!
   ): PostDraftSubmissionCommentPayload
+  reorderModuleItems(
+    """
+    Parameters for ReorderModuleItems
+    """
+    input: ReorderModuleItemsInput!
+  ): ReorderModuleItemsPayload
   restoreDeletedDiscussionEntry(
     """
     Parameters for RestoreDeletedDiscussionEntry
@@ -6903,6 +7077,7 @@ interface Node {
 
 enum NodeType {
   Account
+  AllocationRule
   Assignment
   AssignmentGroup
   Conversation
@@ -7831,7 +8006,7 @@ type Quiz implements AssignedDates & LegacyIDInterface & ModuleItemInterface & N
   anonymousSubmissions: Boolean!
 
   """
-  Standardized date hash visible to current user (when feature flag enabled)
+  Standardized date hash visible to current user
   """
   assignedToDates: [DateHash!]
   canDuplicate: Boolean
@@ -8014,6 +8189,26 @@ type Recipients {
     """
     last: Int
   ): MessageableUserConnection
+}
+
+"""
+Autogenerated input type of ReorderModuleItems
+"""
+input ReorderModuleItemsInput {
+  courseId: ID!
+  itemIds: [ID!]!
+  moduleId: ID!
+  oldModuleId: ID
+  targetPosition: Int
+}
+
+"""
+Autogenerated return type of ReorderModuleItems.
+"""
+type ReorderModuleItemsPayload {
+  errors: [ValidationError!]
+  module: Module
+  oldModule: Module
 }
 
 enum ReportType {
@@ -10493,6 +10688,32 @@ type User implements LegacyIDInterface & Node & Timestamped {
     """
     last: Int
   ): GroupMembershipConnection
+
+  """
+  All discussion topic participants for the user, optionally filtered by announcement status
+  """
+  discussionParticipantsConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    filter: DiscussionParticipantFilter
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): DiscussionParticipantConnection
   discussionsSplitscreenView: Boolean!
   email: String
   enrollments(
@@ -10526,6 +10747,57 @@ type User implements LegacyIDInterface & Node & Timestamped {
     """
     sort: EnrollmentsSortInputType
   ): [Enrollment!]!
+  enrollmentsConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    only return enrollments for this course
+    """
+    courseId: ID
+
+    """
+    Whether or not to restrict results to `active` enrollments in `available` courses
+    """
+    currentOnly: Boolean
+
+    """
+    Whether or not to exclude `completed` enrollments
+    """
+    excludeConcluded: Boolean
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Whether or not to include or exclude Canvas Career courses
+    """
+    horizonCourses: Boolean
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+
+    """
+    The fields to order the results by
+    """
+    orderBy: [String!]
+
+    """
+    The sort field and direction for the results. Secondary sort is by section name
+    """
+    sort: EnrollmentsSortInputType
+  ): EnrollmentConnection
   favoriteCoursesConnection(
     """
     Returns the elements in the list that come after the specified cursor.

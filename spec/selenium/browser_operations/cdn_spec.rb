@@ -36,7 +36,6 @@ describe "Stuff related to how we load stuff from CDN and use brandable_css" do
       it "finds the right fingerprints for normal bundles, plugins & handlebars" do
         sample_bundles = {
           "bundles/common" => false,
-          "../../gems/plugins/analytics/app/stylesheets/analytics" => false, # to test that it works with plugins
           "jst/FindFlickrImageView" => false, # to test that it works with handlebars-loaded css
           "jst/messageStudentsDialog" => true
         }
@@ -47,7 +46,7 @@ describe "Stuff related to how we load stuff from CDN and use brandable_css" do
             expect(!!data[:includesNoVariables]).to eq(includes_no_variables)
             data
           end
-          expect(fingerprints.length).to eq(6), "We have 6 variants"
+          expect(fingerprints.length).to eq(8), "We have 8 variants"
           msg = "make sure the combined results match the result of all_fingerprints_for"
           expect(fingerprints).to eq(BrandableCSS.all_fingerprints_for(bundle_name).values), msg
           next unless includes_no_variables

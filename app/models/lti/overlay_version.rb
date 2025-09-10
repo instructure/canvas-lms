@@ -19,6 +19,7 @@
 
 class Lti::OverlayVersion < ActiveRecord::Base
   extend RootAccountResolver
+
   belongs_to :account, inverse_of: :lti_overlay_versions, optional: false
   belongs_to :lti_overlay, class_name: "Lti::Overlay", inverse_of: :lti_overlay_versions, optional: false
   belongs_to :created_by, class_name: "User", inverse_of: :lti_overlay_versions, optional: false

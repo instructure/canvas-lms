@@ -20,6 +20,7 @@
 #
 class TermsOfServiceContent < ActiveRecord::Base
   include Canvas::SoftDeletable
+
   sanitize_field :content, CanvasSanitize::SANITIZE
   validates :terms_updated_at, presence: true
 

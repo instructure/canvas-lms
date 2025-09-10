@@ -136,7 +136,7 @@ describe LearningOutcomeResult do
       let_once(:assignment) { quiz.assignment }
       let_once(:outcome_result_association_object) { quiz }
 
-      include_examples "muting assignment"
+      it_behaves_like "muting assignment"
     end
 
     context "with assignment result" do
@@ -147,7 +147,7 @@ describe LearningOutcomeResult do
         create_and_associate_lor(assignment)
       end
 
-      include_examples "muting assignment"
+      it_behaves_like "muting assignment"
     end
 
     context "with rubric association result" do
@@ -162,7 +162,7 @@ describe LearningOutcomeResult do
         create_and_associate_lor(rubric_association, assignment)
       end
 
-      include_examples "muting assignment"
+      it_behaves_like "muting assignment"
     end
   end
 

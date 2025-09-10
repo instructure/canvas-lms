@@ -16,10 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
 import CanvasMultiSelect from '@canvas/multi-select'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {FilterOption} from '../../../types'
 
 const I18n = createI18nScope('accessibility_checker')
+
+const ALL_OPTION: FilterOption = {value: 'all', label: I18n.t('All')}
 
 const FilterDropDown = ({
   label,
@@ -30,22 +34,31 @@ const FilterDropDown = ({
 }: {
   label: string
   options: {value: string; label: string}[]
-  selected: string[]
-  onChange: (value: string[]) => void
+  selected: FilterOption[]
+  onChange: (value: FilterOption[]) => void
   dataTestId?: string
 }) => {
-  const allOption = {value: 'all', label: I18n.t('All')}
-  const enhancedOptions = [allOption, ...options]
+  const enhancedOptions = [ALL_OPTION, ...options]
 
   const handleChange = (selectedOptionIds: string[]) => {
-    if (selectedOptionIds.includes('all') && !selected.includes('all')) {
-      onChange(['all'])
-    } else if (!selectedOptionIds.includes('all') && selected.includes('all')) {
-      onChange(selectedOptionIds)
-    } else if (selectedOptionIds.includes('all') && selectedOptionIds.length > 1) {
-      onChange(selectedOptionIds.filter(id => id !== 'all'))
+    const filteredOptions = options.filter(option => selectedOptionIds.includes(option.value))
+    if (
+      filteredOptions.some(option => option.value === 'all') &&
+      !selected.some(option => option.value === 'all')
+    ) {
+      onChange([ALL_OPTION])
+    } else if (
+      !filteredOptions.some(option => option.value === 'all') &&
+      selected.some(option => option.value === 'all')
+    ) {
+      onChange(filteredOptions)
+    } else if (
+      filteredOptions.some(option => option.value === 'all') &&
+      filteredOptions.length > 1
+    ) {
+      onChange(filteredOptions.filter(option => option.value !== 'all'))
     } else {
-      onChange(selectedOptionIds)
+      onChange(filteredOptions)
     }
   }
 
@@ -53,8 +66,8 @@ const FilterDropDown = ({
     <CanvasMultiSelect
       data-testid={dataTestId}
       label={label}
-      selectedOptionIds={selected}
-      onChange={handleChange}
+      selectedOptionIds={selected.map(option => option.value)}
+      onChange={(ids: string[]) => handleChange(ids)}
     >
       {enhancedOptions.map(({value, label}) => (
         <CanvasMultiSelect.Option key={value} id={value} value={value} label={label}>

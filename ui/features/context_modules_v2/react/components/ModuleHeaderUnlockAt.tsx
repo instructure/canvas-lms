@@ -33,14 +33,14 @@ const ModuleHeaderUnlockAt: React.FC<ModuleHeaderUnlockAtProps> = ({unlockAt}) =
   if (!isModuleUnlockAtDateInTheFuture(unlockAt)) return null
 
   return (
-    <Text size="x-small" wrap="break-word" color="secondary">
+    <Text size="x-small" wrap="break-word" color="secondary" data-testid="module-unlock-at-date">
       <FriendlyDatetime
         prefix={I18n.t('Will unlock')}
         prefixMobile={I18n.t('Unlocked')}
-        data-testid="module-unlock-at-date"
         format={I18n.t('#date.formats.date_at_time')}
         dateTime={unlockAt}
         alwaysUseSpecifiedFormat={true}
+        includeScreenReaderContent={false}
       />
     </Text>
   )

@@ -24,6 +24,7 @@ require_relative "../../helpers/k5_common"
 # FIXME: don't copy paste
 class TestUserApi
   include Api::V1::UserProfile
+
   attr_accessor :services_enabled, :context, :current_user
 
   def service_enabled?(service)
@@ -231,11 +232,12 @@ describe "User Profile API", type: :request do
 
   context "user_services" do
     before :once do
-      @student.user_services.create! service: "skype", service_user_name: "user", service_user_id: "user", visible: false
+      @student.user_services.create! service: "diigo", service_user_name: "diigo_user", service_user_id: "diigo_user", visible: false
       @student.user_services.create! service: "somethingthatdoesntexistanymore", service_user_name: "user", service_user_id: "user", visible: true
     end
 
     it "returns user_services, if requested" do
+      allow(Diigo::Connection).to receive(:config).and_return(true)
       @user = @student
       json = api_call(:get,
                       "/api/v1/users/#{@student.id}/profile?include[]=user_services",
@@ -245,7 +247,7 @@ describe "User Profile API", type: :request do
                       format: "json",
                       include: ["user_services"])
       expect(json["user_services"]).to eq [
-        { "service" => "skype", "visible" => false, "service_user_link" => "skype:user?add" }
+        { "service" => "diigo", "visible" => false, "service_user_link" => "http://www.diigo.com/user/diigo_user" }
       ]
     end
 

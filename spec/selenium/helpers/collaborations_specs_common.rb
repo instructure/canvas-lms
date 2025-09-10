@@ -41,7 +41,7 @@ module CollaborationsSpecsCommon
     end
 
     expect(f(".collaboration .title").text).to eq new_title
-    expect(Collaboration.order("id DESC").last.title).to eq new_title
+    expect(Collaboration.order(id: :desc).last.title).to eq new_title
   end
 
   def no_edit_if_no_access(type, title)
@@ -66,7 +66,7 @@ module CollaborationsSpecsCommon
     wait_for_ajaximations
 
     expect(f("#no_collaborations_message")).to be_displayed
-    expect(Collaboration.order("id DESC").last).to be_deleted
+    expect(Collaboration.order(id: :desc).last).to be_deleted
   end
 
   def display_available_collaborators(type)

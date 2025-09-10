@@ -109,7 +109,11 @@ describe CoursePacing::PaceService do
     context "when context is invalid" do
       before { allow(CoursePacing::PaceService).to receive(:valid_context?).and_return(false) }
 
-      let(:context) { double(course_paces: double(not_deleted: double(take: "invalid context"))) }
+      let(:context) do
+        instance_double(Course,
+                        course_paces: class_double(CoursePace,
+                                                   not_deleted: instance_double(ActiveRecord::Relation, take: "invalid context")))
+      end
 
       it "returns nil if invalid context" do
         expect(CoursePacing::PaceService.create_in_context(context)).to be_nil
@@ -117,7 +121,11 @@ describe CoursePacing::PaceService do
     end
 
     context "when the context already has a pace" do
-      let(:context) { double(course_paces: double(not_deleted: double(take: "foobar"))) }
+      let(:context) do
+        instance_double(Course,
+                        course_paces: class_double(CoursePace,
+                                                   not_deleted: instance_double(ActiveRecord::Relation, take: "foobar")))
+      end
 
       it "returns the pace" do
         expect(CoursePacing::PaceService.create_in_context(context)).to eq "foobar"
@@ -125,7 +133,11 @@ describe CoursePacing::PaceService do
     end
 
     context "when the context does not have a pace" do
-      let(:context) { double(course_paces: double(not_deleted: double(take: nil))) }
+      let(:context) do
+        instance_double(Course,
+                        course_paces: class_double(CoursePace,
+                                                   not_deleted: instance_double(ActiveRecord::Relation, take: nil)))
+      end
 
       it "requires implementation" do
         expect do

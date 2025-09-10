@@ -16,11 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {View} from '@instructure/ui-view'
-import {BaseBlock} from '../BaseBlock'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {View} from '@instructure/ui-view'
 import {BorderWidth, BorderWidthValues} from '@instructure/emotion'
+import {BaseBlockHOC} from '../BaseBlock'
 import {SeparatorLineBlockSettings} from './SeparatorLineBlockSettings'
+
+const I18n = createI18nScope('block_content_editor')
 
 export type SeparatorLineBlockProps = {
   thickness: BorderWidthValues
@@ -30,7 +32,7 @@ export type SeparatorLineBlockProps = {
   }
 }
 
-export const SeparatorLineBlockContent = (props: SeparatorLineBlockProps) => {
+export const SeparatorLineBlockView = (props: SeparatorLineBlockProps) => {
   const borderWidth: BorderWidth = `0 0 ${props.thickness} 0`
 
   return (
@@ -39,6 +41,7 @@ export const SeparatorLineBlockContent = (props: SeparatorLineBlockProps) => {
       data-testid="separator-line"
       borderWidth={borderWidth}
       borderColor="primary"
+      margin="none"
       themeOverride={{
         borderColorPrimary: props.settings.separatorColor,
       }}
@@ -46,17 +49,16 @@ export const SeparatorLineBlockContent = (props: SeparatorLineBlockProps) => {
   )
 }
 
-const I18n = createI18nScope('block_content_editor')
-
 export const SeparatorLineBlock = (props: SeparatorLineBlockProps) => {
   return (
-    <BaseBlock<typeof SeparatorLineBlock>
+    <BaseBlockHOC
+      ViewComponent={SeparatorLineBlockView}
+      EditViewComponent={SeparatorLineBlockView}
+      EditComponent={SeparatorLineBlockView}
+      componentProps={props}
       title={SeparatorLineBlock.craft.displayName}
       backgroundColor={props.settings.backgroundColor}
-      statefulProps={{}}
-    >
-      <SeparatorLineBlockContent {...props} />
-    </BaseBlock>
+    />
   )
 }
 

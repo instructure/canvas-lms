@@ -72,12 +72,36 @@ class AccessToken < ActiveRecord::Base
     end
   end
 
+  # helper method to generate a "session" hash that can be passed into
+  # permission checks
+  def self.account_session_for_permissions(root_account)
+    {
+      permissions_key: root_account,
+      root_account:
+    }
+  end
+
   set_policy do
-    given do |user|
-      user.id == user_id && (
-        !user.account.feature_enabled?(:admin_manage_access_tokens) ||
-        !user.account.limit_personal_access_tokens?
-      )
+    given do |user, session|
+      # This block is only for checking if the user can manage their own tokens
+      next false unless user.id == user_id
+
+      # if the session wasn't set up correctly, just ignore the additional restrictions
+      next true unless (root_account = session&.dig(:root_account))
+      # additional restrictions gated by feature flags
+      next true unless root_account.feature_enabled?(:admin_manage_access_tokens)
+
+      # if personal access tokens are limited, then you can't create tokens for yourself
+      # (from this block; if you're an admin, you'll still be able to from the block below)
+      next false if root_account.limit_personal_access_tokens?
+      # if students are restricted from creating personal access tokens,
+      # then if you're _only_ a student, you can't create tokens
+      # (a teacher that is a student will still be allowed to)
+      next false if root_account.restrict_personal_access_tokens_from_students? &&
+                    (roles = user.roles(root_account) - ["user"]) &&
+                    (roles == ["student"] || roles.empty?)
+
+      true
     end
     can :create and can :update
 
@@ -166,8 +190,15 @@ class AccessToken < ActiveRecord::Base
     tokens.uniq.reject { |token| token.developer_key&.internal_service }
   end
 
+  # If the token exists, and belongs to site admin, return the token itself.
+  # Otherwise return falsey (not specified if it's false or nil).
+  #
+  # This can be used to eliminate an additional call to {.authenticate} once
+  # you know the token is relevant, while still being boolean.
+  #
+  # @return [AccessToken, false, nil]
   def self.site_admin?(token_string)
-    !!authenticate(token_string)&.site_admin?
+    (access_token = authenticate(token_string)) && access_token.site_admin? && access_token
   end
 
   def localized_workflow_state

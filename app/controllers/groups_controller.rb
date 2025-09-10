@@ -259,7 +259,7 @@ class GroupsController < ApplicationController
           scope.preload(:group_category, :context)
         end
         @groups = Api.paginate(@groups, self, api_v1_current_user_groups_url)
-        render json: (@groups.map { |g| group_json(g, @current_user, session, includes) })
+        render json: @groups.map { |g| group_json(g, @current_user, session, includes) }
       end
     end
   end
@@ -933,6 +933,7 @@ class GroupsController < ApplicationController
   end
 
   include Api::V1::User
+
   # @API List group's users
   #
   # Returns a paginated list of users in the group.
@@ -1047,6 +1048,7 @@ class GroupsController < ApplicationController
   end
 
   include Api::V1::PreviewHtml
+
   # @API Preview processed html
   #
   # Preview html content processed for this group
@@ -1071,6 +1073,7 @@ class GroupsController < ApplicationController
   end
 
   include Api::V1::StreamItem
+
   # @API Group activity stream
   # Returns the current user's group-specific activity stream, paginated.
   #
@@ -1108,7 +1111,7 @@ class GroupsController < ApplicationController
   #
   # @argument permissions[] [String]
   #   List of permissions to check against the authenticated user.
-  #   Permission names are documented in the {api:RoleOverridesController#add_role Create a role} endpoint.
+  #   Permission names are documented in the {api:RoleOverridesController#manageable_permissions List assignable permissions} endpoint.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/groups/<group_id>/permissions \

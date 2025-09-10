@@ -133,9 +133,8 @@ class Lti::Registration < ActiveRecord::Base
     Importers::ContextExternalToolImporter.import_from_migration(
       deployment_configuration(context:),
       context,
-      nil,
-      tool,
-      false
+      item: tool,
+      persist: false
     )
     tool.lti_registration = self
     tool.developer_key = developer_key

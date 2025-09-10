@@ -2117,7 +2117,7 @@ describe Enrollment do
         end
       end
 
-      include_examples "term and enrollment dates"
+      it_behaves_like "term and enrollment dates"
 
       describe "section dates" do
         before do
@@ -2209,7 +2209,7 @@ describe Enrollment do
         end
       end
 
-      include_examples "term and enrollment dates"
+      it_behaves_like "term and enrollment dates"
     end
 
     it "allows teacher access if both course and term have dates" do
@@ -2824,6 +2824,31 @@ describe Enrollment do
       membership.update!(workflow_state: "deleted")
 
       enrollment = student.enrollments.where(course_section_id: section1.id).first
+      expect { enrollment.destroy }.not_to raise_error
+      diff_tag.reload
+
+      expect(diff_tag.users).not_to include(student)
+    end
+
+    it "does not remove membership when the enrollment is destroyed if there are multiple section enrollments" do
+      student = user_model
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+      @course.enroll_user(student, "StudentEnrollment", section: section1, enrollment_state: "active", allow_multiple_enrollments: true)
+      @course.enroll_user(student, "StudentEnrollment", section: section2, enrollment_state: "active", allow_multiple_enrollments: true)
+
+      non_collab_category = @course.group_categories.create!(name: "Non-Collaborative Category", non_collaborative: true)
+      diff_tag = non_collab_category.groups.create!(context: @course)
+      diff_tag.add_user(student)
+
+      enrollment = student.enrollments.where(course_section_id: section1.id).first
+      expect { enrollment.destroy }.not_to raise_error
+      diff_tag.reload
+
+      expect(diff_tag.users).to include(student)
+
+      # After removing the last section enrollment the membership should also be removed
+      enrollment = student.enrollments.where(course_section_id: section2.id).first
       expect { enrollment.destroy }.not_to raise_error
       diff_tag.reload
 

@@ -23,5 +23,6 @@ class UserProfileLink < ActiveRecord::Base
   validates :title, length: { maximum: maximum_string_length, allow_blank: true }
   validates :url, length: { maximum: 4.kilobytes - 1, allow_blank: true }
   include CustomValidations
+
   validates_as_url :url
 end

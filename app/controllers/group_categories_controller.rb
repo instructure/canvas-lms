@@ -418,7 +418,7 @@ class GroupCategoriesController < ApplicationController
       end
     end
 
-    render json: results.merge(group_category: @group_category)
+    render json: results.merge(group_category: @group_category.attributes)
   rescue ActiveRecord::RecordInvalid => e
     render json: { errors: e.message }, status: :bad_request
   rescue ActiveRecord::RecordNotFound => e
@@ -775,6 +775,7 @@ class GroupCategoriesController < ApplicationController
   end
 
   include Api::V1::User
+
   # @API List users in group category
   #
   # Returns a paginated list of users in the group category.

@@ -382,7 +382,7 @@ describe GroupAndMembershipImporter do
                       is_tags: true)
       existing_tag = @course.differentiation_tags.find_by(id: @tag_0.id)
       expect(existing_tag.group_category.id).to eq(tag_set_2.id)
-      expect(Pseudonym.where(user: existing_tag.users).pluck(:sis_user_id)).to eq ["user_0", "user_1"]
+      expect(Pseudonym.where(user: existing_tag.users).pluck(:sis_user_id)).to match_array ["user_0", "user_1"]
     end
 
     it "restores deleted tags" do

@@ -293,7 +293,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
       process_answer_html_content(question_data)
 
       guard_against_big_fields do
-        @question = @quiz.quiz_questions.create(quiz_group: @group, question_data:)
+        @question = @quiz.quiz_questions.create(quiz_group: @group, question_data:, saving_user: @current_user)
         @quiz.did_edit if @quiz.created?
         render json: question_json(@question, @current_user, session, @context, [:assessment_question, :plain_html])
       end
@@ -359,6 +359,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
   def update
     if authorized_action(@quiz, @current_user, :update)
       @question = @quiz.quiz_questions.active.find(params[:id])
+      @question.saving_user = @current_user
       question_data = params[:question].to_unsafe_h
       question_data[:regrade_user] = @current_user
       question_data[:question_text] = process_incoming_html_content(question_data[:question_text])

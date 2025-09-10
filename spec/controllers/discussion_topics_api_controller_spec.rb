@@ -784,7 +784,7 @@ describe DiscussionTopicsApiController do
       expect(response).to be_successful
       expect(response.parsed_body.count).to eq(2)
       # TODO: assert better when we finalize the response format
-      expect(response.parsed_body.map { |entry| entry["id"] }).to match_array([insight_entry_1.id, insight_entry_2.id])
+      expect(response.parsed_body.pluck("id")).to match_array([insight_entry_1.id, insight_entry_2.id])
     end
   end
 

@@ -19,7 +19,7 @@
 require_relative "../common"
 require_relative "pages/block_content_editor_page"
 
-describe "Block Content Editor" do
+describe "Block Content Editor", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include BlockContentEditorPage
 
@@ -49,15 +49,18 @@ describe "Block Content Editor" do
       wait_for_ajaximations
 
       expect(add_block_modal).to be_displayed
-      expect(block_groups).to be_displayed
-      expect(block_items).to be_displayed
+      expect(block_groups.size).to be > 0
+      expect(block_items.size).to be > 0
     end
 
     it "adds a new block" do
       add_block_button.click
       wait_for_ajaximations
 
+      expect(block_groups.size).to be > 0
       expect(selected_block_group.text).to include("Text")
+
+      expect(block_items.size).to be > 0
       expect(selected_block_item.text).to include("Text column")
 
       add_to_page_button.click
@@ -67,5 +70,61 @@ describe "Block Content Editor" do
       expect(block_layout).to be_displayed
       expect(add_block_button).to be_displayed
     end
+  end
+
+  context "Block menu options" do
+    before do
+      create_wiki_page_with_block_content_editor(@course)
+      add_a_block("Image", "Image + text")
+    end
+
+    it "duplicates a block" do
+      first_block.duplicate_button.click
+      wait_for_ajaximations
+
+      expect(blocks.size).to eq(2)
+    end
+
+    it "removes a block" do
+      first_block.remove_button.click
+      wait_for_ajaximations
+
+      expect(element_exists?(block_selector)).to be false
+    end
+
+    it "opens settings tray" do
+      first_block.edit_button.click
+      wait_for_ajaximations
+
+      expect(settings_tray).to be_displayed
+    end
+  end
+
+  context "Moving blocks" do
+    before do
+      create_wiki_page_with_block_content_editor(@course)
+      add_a_block("Interactive element", "Button")
+      add_a_block("Divider", "Separator line")
+    end
+
+    shared_examples "block movement" do |block_selector, move_direction, expected_order|
+      it "moves a block #{move_direction}" do
+        expected_labels = expected_order.map { |block_name| send(block_name).block_type_label.text }
+        target_block = send(block_selector)
+        target_block.move_component.move_button.click
+        wait_for_ajaximations
+
+        target_block.move_component.click_move_option(move_direction)
+        wait_for_ajaximations
+
+        actual_labels = blocks.map { |block| block.block_type_label.text }
+        expect(actual_labels).to eq(expected_labels)
+      end
+    end
+
+    include_examples "block movement", :last_block, :up, [:last_block, :first_block]
+    include_examples "block movement", :first_block, :down, [:last_block, :first_block]
+    include_examples "block movement", :last_block, :to_top, [:last_block, :first_block]
+    include_examples "block movement", :first_block, :to_bottom, [:last_block, :first_block]
   end
 end

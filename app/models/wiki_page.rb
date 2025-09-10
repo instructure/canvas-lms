@@ -39,6 +39,7 @@ class WikiPage < ActiveRecord::Base
   include Accessibility::Scannable
 
   include MasterCourses::Restrictor
+
   restrict_columns :content, [:body, :title]
   restrict_columns :settings, [:editing_roles, :url]
   restrict_assignment_columns
@@ -46,6 +47,7 @@ class WikiPage < ActiveRecord::Base
   restrict_columns :availability_dates, [:publish_at]
 
   include SmartSearchable
+
   use_smart_search title_column: :title,
                    body_column: :body,
                    index_scope: ->(course) { course.wiki_pages.not_deleted },
@@ -496,15 +498,32 @@ class WikiPage < ActiveRecord::Base
   end
 
   def participants
-    res = []
-    if context&.available?
-      res += if active?
-               context.participants(by_date: true)
-             else
-               context.participating_admins
-             end
-    end
-    res.flatten.uniq
+    return [] unless context&.available?
+    return context.participating_admins unless active?
+
+    has_selective_release = context.is_a?(Course) &&
+                            (only_visible_to_overrides || (assignment_id && assignment&.only_visible_to_overrides))
+    return context.participants(by_date: true) unless has_selective_release
+
+    res = context.participating_admins
+    all_students = context.participating_students_by_date
+    all_student_ids = all_students.pluck(:id)
+    visible_student_ids = if assignment_id
+                            AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(
+                              assignment_ids: assignment_id,
+                              course_ids: context.id,
+                              user_ids: all_student_ids
+                            ).map(&:user_id).uniq
+                          else
+                            WikiPageVisibility::WikiPageVisibilityService.wiki_pages_visible_to_students(
+                              course_ids: context.id,
+                              user_ids: all_student_ids,
+                              wiki_page_ids: id
+                            ).map(&:user_id).uniq
+                          end
+
+    res += all_students.where(id: visible_student_ids) if visible_student_ids.any?
+    res.uniq
   end
 
   def get_potentially_conflicting_titles(title_base)

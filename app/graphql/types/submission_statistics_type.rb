@@ -29,7 +29,13 @@ module Types
       start_date = Time.zone.now
       end_date = Time.zone.now.advance(days: 7)
 
-      submissions.count { |submission| submission.cached_due_date&.between?(start_date, end_date) }
+      submissions.count do |submission|
+        submission.cached_due_date&.between?(start_date, end_date) &&
+          !submission.submitted? &&
+          !submission.graded? &&
+          !submission.excused? &&
+          !submission.missing?
+      end
     end
 
     field :missing_submissions_count, Integer, null: false
@@ -95,7 +101,8 @@ module Types
           submission.cached_due_date < now &&
           !submission.submitted? &&
           !submission.graded? &&
-          !submission.excused?
+          !submission.excused? &&
+          !submission.missing?
       end
     end
 

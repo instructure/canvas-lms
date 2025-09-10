@@ -68,7 +68,7 @@ import AssessmentAuditTray from '../react/AssessmentAuditTray/index'
 import CommentArea from '../react/CommentArea'
 import GradeLoadingSpinner from '../react/GradeLoadingSpinner'
 import PostPolicies from '../react/PostPolicies/index'
-import RubricAssessmentContainerWrapper from '../react/RubricAssessmentContainerWrapper'
+import RubricAssessmentWrapper from '../react/RubricAssessmentWrapper'
 import ScreenCaptureIcon from '../react/ScreenCaptureIcon'
 import SpeedGraderAlerts from '../react/SpeedGraderAlerts'
 import SpeedGraderProvisionalGradeSelector from '../react/SpeedGraderProvisionalGradeSelector'
@@ -2198,7 +2198,8 @@ EG = {
 
   setUpRubricAssessmentContainerWrapper() {
     ReactDOM.render(
-      <RubricAssessmentContainerWrapper
+      <RubricAssessmentWrapper
+        currentUserId={ENV.current_user_id ?? ''}
         rubric={ENV.rubric as RubricUnderscoreType}
         rubricOutcomeData={ENV.rubric_outcome_data as RubricOutcomeUnderscore[]}
         onDismiss={() => EG.toggleFullRubric('close')}

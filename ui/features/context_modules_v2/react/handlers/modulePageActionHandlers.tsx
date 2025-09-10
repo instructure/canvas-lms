@@ -22,10 +22,16 @@ import {Module as ModuleType} from '@canvas/context-modules/differentiated-modul
 import DifferentiatedModulesTray from '@canvas/context-modules/differentiated-modules/react/DifferentiatedModulesTray'
 import {queryClient} from '@canvas/query'
 import {InfiniteData} from '@tanstack/react-query'
-import type {ModuleItem, ModulesResponse} from '../utils/types'
+import type {
+  HTMLElementWithRoot,
+  ModuleItem,
+  ModulesResponse,
+  PaginatedNavigationResponse,
+} from '../utils/types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {MODULES} from '../utils/constants'
+import {MODULE_ITEMS, MODULES} from '../utils/constants'
+import EditItemModal from '../componentsTeacher/EditItemModal'
 
 export const handleCollapseAll = (
   data: InfiniteData<ModulesResponse> | undefined,
@@ -101,7 +107,7 @@ const requirementTypeMap: Record<string, string> = {
 }
 
 const getModuleItemsFromAvailableSources = (
-  providedModuleItems: ModuleItem[],
+  providedModuleItems: Partial<ModuleItem>[],
   currentModule?: any,
 ): any[] => {
   if (providedModuleItems.length > 0) {
@@ -119,20 +125,22 @@ const getModuleItemsFromAvailableSources = (
   return []
 }
 
-const transformModuleItemsForTray = (rawModuleItems: any[]): any[] => {
+export const transformModuleItemsForTray = (rawModuleItems: any[]): any[] => {
   // Filter out SubHeader items as they shouldn't be selectable in the requirements selector
   return rawModuleItems
     .filter((item: any) => item.content?.type !== 'SubHeader')
     .map((item: any) => ({
       id: item._id || '',
       name: item.title || '',
-      resource: getResourceType(item.content?.type?.toLowerCase()),
+      resource: item.content?.isNewQuiz
+        ? 'quiz'
+        : getResourceType(item.content?.type?.toLowerCase()),
       graded: item.content?.graded,
       pointsPossible: item.content?.pointsPossible ? String(item.content.pointsPossible) : '',
     }))
 }
 
-const transformRequirementsForTray = (
+export const transformRequirementsForTray = (
   completionRequirements: any[] = [],
   moduleItems: any[],
   rawModuleItems: any[],
@@ -150,7 +158,10 @@ const transformRequirementsForTray = (
       id: req.id,
       name: moduleItem?.name || '',
       type: mappedType,
-      resource: moduleItem?.resource || 'assignment',
+      resource:
+        rawModuleItem?.content?.isNewQuiz || rawModuleItem?.content?.type == 'Quiz'
+          ? 'quiz'
+          : 'assignment',
       graded: rawModuleItem?.content?.graded,
       pointsPossible:
         moduleItem?.pointsPossible || String(rawModuleItem?.content?.pointsPossible || 0),
@@ -174,9 +185,8 @@ export const handleOpeningModuleUpdateTray = (
   courseId: string,
   moduleId?: string,
   moduleName?: string,
-  prerequisites?: {id: string; name: string; type: string}[],
   openTab: 'settings' | 'assign-to' = 'settings',
-  providedModuleItems: ModuleItem[] = [],
+  providedModuleItems: Partial<ModuleItem>[] = [],
 ) => {
   const moduleElement = document.createElement('div')
   moduleElement.id = moduleId ? `context_module_${moduleId}` : 'context_module_new'
@@ -195,6 +205,7 @@ export const handleOpeningModuleUpdateTray = (
     ? data?.pages.flatMap(page => page.modules).find(module => module._id === moduleId)
     : undefined
 
+  const prerequisites = currentModule?.prerequisites || []
   const rawModuleItems = getModuleItemsFromAvailableSources(providedModuleItems, currentModule)
   const moduleItems = transformModuleItemsForTray(rawModuleItems)
   const requirementCount = currentModule?.requirementCount === 1 ? 'one' : 'all'
@@ -236,6 +247,45 @@ export const handleOpeningModuleUpdateTray = (
   }
 
   root.render(<DifferentiatedModulesTray {...(trayProps as any)} />)
+}
+
+export const handleOpeningEditItemModal = (
+  courseId: string,
+  moduleId: string,
+  moduleItemId: string,
+) => {
+  const queryData = queryClient.getQueryData<PaginatedNavigationResponse>([
+    MODULE_ITEMS,
+    moduleId,
+    null,
+  ])
+  if (!queryData) return
+  const moduleItem = queryData.moduleItems.find((item: any) => item._id === moduleItemId)
+  if (!moduleItem) return
+  const itemProps = {
+    courseId,
+    itemName: moduleItem.title,
+    itemURL: moduleItem.content?.url,
+    itemNewTab: moduleItem.newTab,
+    itemIndent: moduleItem.indent,
+    moduleId: moduleId,
+    itemId: moduleItem._id,
+    itemType: moduleItem.content?.type?.toLowerCase(),
+    masterCourseRestrictions: moduleItem.masterCourseRestrictions,
+  }
+
+  const mountPoint = document.getElementById('module-item-mount-point') as HTMLElementWithRoot
+  let root = mountPoint.reactRoot
+  if (!root) {
+    root = createRoot(mountPoint)
+    mountPoint.reactRoot = root
+  }
+
+  const onRequestClose = () => {
+    root.render(<EditItemModal {...itemProps} isOpen={false} onRequestClose={onRequestClose} />)
+  }
+
+  root.render(<EditItemModal {...itemProps} isOpen={true} onRequestClose={onRequestClose} />)
 }
 
 export const handleAddItem = (

@@ -152,7 +152,6 @@ export default class GradingPeriodSet extends React.Component {
         saving: false,
       },
     }
-    this._refs = {}
     this.editButtonRef = React.createRef()
     this.deleteButtonRef = React.createRef()
     this.addPeriodButtonRef = React.createRef()
@@ -174,7 +173,7 @@ export default class GradingPeriodSet extends React.Component {
       const period = {id: prevState.editPeriod.id}
       const refKey = getShowGradingPeriodRef(period)
       if (this.periodRefs[refKey] && this.periodRefs[refKey].current) {
-        this.periodRefs[refKey].current._refs.editButton.focus()
+        this.periodRefs[refKey].current.editButtonRef.current.focus()
       }
     }
   }

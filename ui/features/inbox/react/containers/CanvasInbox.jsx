@@ -55,7 +55,7 @@ import InboxSettingsModalContainer, {
   LOAD_SETTINGS_FAIL,
 } from './InboxSettingsModalContainer/InboxSettingsModalContainer'
 import TopNavPortal from '@canvas/top-navigation/react/TopNavPortal'
-import { InstUISettingsProvider } from '@instructure/emotion'
+import {InstUISettingsProvider} from '@instructure/emotion'
 import canvas from '@instructure/ui-themes'
 
 const I18n = createI18nScope('conversations_2')
@@ -76,9 +76,11 @@ const parseFilterHash = hash => {
 
 const CanvasInbox = ({breakpoints}) => {
   const urlFilters = parseFilterHash(window.location.hash)
-
   const [scope, setScope] = useState(urlFilters.filterType || 'inbox')
   const [courseFilter, setCourseFilter] = useState(urlFilters.courseSelection)
+  const [courseNameFilter, setCourseNameFilter] = useState('')
+  const [userFilterName, setUserFilterName] = useState('')
+
   const [userFilter, setUserFilter] = useState()
   const [selectedConversations, setSelectedConversations] = useState([])
   const [selectedConversationMessage, setSelectedConversationMessage] = useState()
@@ -245,10 +247,27 @@ const CanvasInbox = ({breakpoints}) => {
         searchResults.length > 0
           ? I18n.t('%{count} Conversation messages loaded', {count: searchResults.length})
           : I18n.t('No Conversation messages loaded')
-      setOnSuccess(successMessage)
+
+      const filterParts = []
+      if (courseNameFilter !== '') {
+        filterParts.push(I18n.t('Filtered by %{courseName}', {courseName: courseNameFilter}))
+      }
+      if (scope !== 'inbox') {
+        filterParts.push(I18n.t('Filtered by %{scopeName}', {scopeName: scope}))
+      }
+      if (userFilterName !== '') {
+        filterParts.push(I18n.t('Filtered by %{user}', {user: userFilterName}))
+      }
+
+      const completeMessage =
+        filterParts.length > 0 ? `${filterParts.join('. ')}. ${successMessage}` : successMessage
+
+      setTimeout(() => {
+        setOnSuccess(completeMessage)
+      }, 2500)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [conversationsQuery.loading, conversationsQuery.data])
+  }, [conversationsQuery.loading, conversationsQuery.data, userFilterName, scope, courseNameFilter])
 
   const submissionCommentsQuery = useQuery(VIEWABLE_SUBMISSIONS_QUERY, {
     variables: {...commonQueryVariables, sort: 'desc'},
@@ -762,8 +781,8 @@ const CanvasInbox = ({breakpoints}) => {
         <InstUISettingsProvider
           theme={{
             componentOverrides: {
-              View: { borderColorSecondary: canvas.colors.contrasts.grey3045 }
-            }
+              View: {borderColorSecondary: canvas.colors.contrasts.grey3045},
+            },
           }}
         >
           <Flex as="div" height="100vh" direction="column">
@@ -822,12 +841,20 @@ const CanvasInbox = ({breakpoints}) => {
                     setSelectedConversations([])
                     setCourseFilter(course)
                   }}
-                  onUserFilterSelect={userIDFilter => {
-                    setUserFilter(userIDFilter)
+                  onUserFilterSelect={user => {
+                    if (!user) {
+                      setUserFilter(undefined)
+                      setUserFilterName('')
+                      return
+                    }
+                    setUserFilter(`user_${user?._id}`)
+                    setUserFilterName(user.name)
                   }}
                   selectedConversations={selectedConversations}
                   onCompose={() => setComposeModal(true)}
-                  onManageLabels={() => (userInboxLabelsQuery.loading ? null : setManageLabels(true))}
+                  onManageLabels={() =>
+                    userInboxLabelsQuery.loading ? null : setManageLabels(true)
+                  }
                   onReply={() => onReply()}
                   onReplyAll={() => onReply({replyAll: true})}
                   onForward={() => onForward()}
@@ -846,6 +873,7 @@ const CanvasInbox = ({breakpoints}) => {
                   onReadStateChange={handleReadState}
                   canReply={canReply}
                   showComposeButton={!inboxSettingsFeature} // TODO: after feature flag is removed, this should always be false
+                  setCourseNameFilter={setCourseNameFilter}
                 />
               </Flex.Item>
             )}

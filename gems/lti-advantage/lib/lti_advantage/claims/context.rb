@@ -7,6 +7,7 @@ module LtiAdvantage::Claims
   # https://purl.imsglobal.org/spec/lti/claim/context
   class Context
     include ActiveModel::Model
+
     attr_accessor :id, :label, :title, :type
 
     validates_presence_of :id

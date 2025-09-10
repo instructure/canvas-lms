@@ -104,6 +104,12 @@ module Lti
       def opts
         { extra_claims: %i[roles eulaservice], custom_params: @params[:custom] }
       end
+
+      def expander_opts
+        {
+          assignment: @params[:assignment]
+        }
+      end
     end
   end
 end

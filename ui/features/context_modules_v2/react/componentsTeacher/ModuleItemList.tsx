@@ -105,49 +105,59 @@ const ModuleItemList: React.FC<ModuleItemListProps> = ({
             )}
             {!error &&
               !isEmpty &&
-              moduleItems.map((item, index) => (
-                <Draggable key={`${item.id}-${index}`} draggableId={item.id} index={index}>
-                  {(dragProvided, dragSnapshot) => (
-                    <div
-                      ref={dragProvided.innerRef}
-                      {...dragProvided.draggableProps}
-                      style={{
-                        ...dragProvided.draggableProps.style,
-                        background: dragSnapshot.isDragging ? '#ffffff' : 'transparent',
-                        boxShadow: dragSnapshot.isDragging ? '0 2px 8px rgba(0,0,0,0.15)' : 'none',
-                        overflowX: 'hidden',
-                        borderWidth: item.content?.published ? '0 0 0 large' : '0',
-                        borderColor: 'success',
-                      }}
-                      data-item-id={item._id}
-                    >
-                      <View as="div" borderWidth={`${index === 0 ? '0' : 'small'} 0 0 0`}>
-                        <View
-                          as="div"
-                          borderWidth="0 0 0 large"
-                          borderColor={item.content?.published ? 'success' : 'transparent'}
-                        >
-                          <MemoizedModuleItem
-                            {...item}
-                            moduleId={moduleId}
-                            moduleTitle={moduleTitle}
-                            index={index}
-                            id={item.id}
-                            published={!!item.published}
-                            canUnpublish={item.content?.canUnpublish ?? true}
-                            completionRequirements={completionRequirements}
-                            dragHandleProps={dragProvided.dragHandleProps}
-                            setModuleAction={setModuleAction}
-                            setSelectedModuleItem={setSelectedModuleItem}
-                            setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}
-                            setSourceModule={setSourceModule}
-                          />
+              moduleItems.map((item, index) => {
+                // Get next item's ID, or last if next is not available
+                // If no items, pass undefined
+                const focusTargetItemId = moduleItems[index + 1]?._id ?? moduleItems[index - 1]?._id
+                return (
+                  <Draggable key={`${item.id}`} draggableId={item.id} index={index}>
+                    {(dragProvided, dragSnapshot) => (
+                      <div
+                        ref={dragProvided.innerRef}
+                        {...dragProvided.draggableProps}
+                        style={{
+                          ...dragProvided.draggableProps.style,
+                          background: dragSnapshot.isDragging ? '#ffffff' : 'transparent',
+                          boxShadow: dragSnapshot.isDragging
+                            ? '0 2px 8px rgba(0,0,0,0.15)'
+                            : 'none',
+                          overflowX: 'hidden',
+                          borderWidth: item.content?.published ? '0 0 0 large' : '0',
+                          borderColor: 'success',
+                        }}
+                        data-item-id={item._id}
+                      >
+                        <View as="div" borderWidth={`${index === 0 ? '0' : 'small'} 0 0 0`}>
+                          <View
+                            as="div"
+                            borderWidth="0 0 0 large"
+                            borderColor={item.content?.published ? 'success' : 'transparent'}
+                          >
+                            <MemoizedModuleItem
+                              key={`memoized-module-item-${item._id}`}
+                              {...item}
+                              moduleId={moduleId}
+                              moduleTitle={moduleTitle}
+                              index={index}
+                              id={item.id}
+                              position={item.position}
+                              published={!!item.published}
+                              canUnpublish={item.content?.canUnpublish ?? true}
+                              completionRequirements={completionRequirements}
+                              dragHandleProps={dragProvided.dragHandleProps}
+                              focusTargetItemId={focusTargetItemId}
+                              setModuleAction={setModuleAction}
+                              setSelectedModuleItem={setSelectedModuleItem}
+                              setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}
+                              setSourceModule={setSourceModule}
+                            />
+                          </View>
                         </View>
-                      </View>
-                    </div>
-                  )}
-                </Draggable>
-              ))}
+                      </div>
+                    )}
+                  </Draggable>
+                )
+              })}
             {provided.placeholder}
           </div>
         )}

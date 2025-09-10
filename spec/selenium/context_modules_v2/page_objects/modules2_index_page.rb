@@ -34,6 +34,10 @@ module Modules2IndexPage
     "[data-testid='completion-requirement']"
   end
 
+  def context_module_completion_requirement_selector(module_id)
+    "#context_module_#{module_id} [data-testid='completion-requirement']"
+  end
+
   def copy_to_button_selector
     "button:contains('Copy')"
   end
@@ -56,6 +60,10 @@ module Modules2IndexPage
 
   def expand_all_modules_button_selector
     "button[aria-label='Expand All Modules']"
+  end
+
+  def empty_state_module_creation_button_selector
+    "//button[.//span[text()='Create a new Module']]"
   end
 
   def get_student_views_assignment(course_id, assignment_id)
@@ -84,6 +92,10 @@ module Modules2IndexPage
 
   def module_action_menu_copy_selector(module_id)
     "[data-testid='module-action-menu_#{module_id}-copy']"
+  end
+
+  def module_page_dropdowns_selector
+    "input[role='combobox'][title='All Modules']"
   end
 
   def module_file_drop_selector(module_id)
@@ -123,7 +135,7 @@ module Modules2IndexPage
   end
 
   def module_item_action_menu_link_selector(tool_text)
-    "[role=menuitem]:contains('#{tool_text}')"
+    "//button[.//span[text()='#{tool_text}']]"
   end
 
   def module_item_action_menu_selector
@@ -138,12 +150,24 @@ module Modules2IndexPage
     "[data-item-id='#{module_item_id}']"
   end
 
+  def module_item_title_by_id_selector(module_item_id)
+    "[data-testid='module-item-title-link'][data-module-item-id='#{module_item_id}']"
+  end
+
   def module_item_discussion_icon_selector(module_item_id)
     "#{module_item_by_id_selector(module_item_id)} [data-testid='discussion-icon']"
   end
 
+  def module_item_due_date_selector(module_item_id)
+    "#context_module_item_#{module_item_id} [data-testid='due-date']"
+  end
+
   def module_item_header_selector(module_item_id)
     "#{module_item_by_id_selector(module_item_id)} [data-testid='subheader-title-text']"
+  end
+
+  def module_item_multiple_due_date_selector(module_item_id)
+    "#context_module_item_#{module_item_id}  a:contains('Multiple Due Dates')"
   end
 
   def module_item_text_header_icon_selector(module_item_id)
@@ -156,6 +180,10 @@ module Modules2IndexPage
 
   def module_item_page_icon_selector(module_item_id)
     "#{module_item_by_id_selector(module_item_id)} [data-testid='page-icon']"
+  end
+
+  def module_item_publish_button_selector(module_item_id)
+    "[data-testid='module-item-publish-button-#{module_item_id}']"
   end
 
   def module_item_quiz_icon_selector(module_item_id)
@@ -310,6 +338,10 @@ module Modules2IndexPage
     "[data-module-id='#{module_id}']"
   end
 
+  def context_module_name_selector(module_name)
+    "[data-module-name='#{module_name}']"
+  end
+
   def context_module_item_selector(module_item_id)
     "#context_module_item_#{module_item_id}"
   end
@@ -320,6 +352,10 @@ module Modules2IndexPage
 
   def context_module_item_unpublished_icon_selector(module_item_id)
     "#{context_module_item_selector(module_item_id)} svg[name='IconUnpublished']"
+  end
+
+  def context_module_item_todo_selector(module_item_id, todo_text)
+    "#{context_module_item_selector(module_item_id)} span:contains('#{todo_text}')"
   end
 
   def context_module_published_icon_selector(module_id)
@@ -338,12 +374,60 @@ module Modules2IndexPage
     "#{context_module_selector(module_id)} [data-testid='module-header-expand-toggle'][aria-expanded='true']"
   end
 
+  def context_module_prerequisites_selector(module_id)
+    "#{context_module_selector(module_id)} [data-testid='module-header-prerequisites']"
+  end
+
+  def context_module_view_assign_to_link_selector(module_id)
+    "#{context_module_selector(module_id)} button:contains('View Assign To')"
+  end
+
+  def view_assign_to_link_selector
+    "button:contains('View Assign To')"
+  end
+
   def move_item_tray_selector
     "[data-testid='manage-module-content-tray']"
   end
 
   def external_tool_page_name_input_selector
     "[data-testid='external_item_page_name']"
+  end
+
+  def tab_create_item_selector
+    "#tab-create-item-form"
+  end
+
+  def create_learning_object_name_input_selector
+    "[data-testid='create-learning-object-name-input']"
+  end
+
+  def new_quiz_icon_selector
+    "[data-testid='new-quiz-icon']"
+  end
+
+  def classic_quiz_icon_selector
+    "[data-testid='quiz-icon']"
+  end
+
+  def text_header_input_selector
+    "[placeholder='Enter header text']"
+  end
+
+  def url_input_selector
+    "[placeholder='https://example.com']"
+  end
+
+  def url_title_input_selector
+    "[placeholder='Enter page name']"
+  end
+
+  def visible_modules_header_selector
+    "div[class*='context_module'] h2"
+  end
+
+  def quiz_engine_option_selector
+    "[data-testid='create-item-quiz-engine-select']"
   end
   #------------------------------ Elements ------------------------------
 
@@ -353,6 +437,14 @@ module Modules2IndexPage
 
   def context_module(module_id)
     f(context_module_selector(module_id))
+  end
+
+  def context_module_completion_requirement(module_id)
+    f(context_module_completion_requirement_selector(module_id))
+  end
+
+  def context_module_name(module_name)
+    ff(context_module_name_selector(module_name))
   end
 
   def context_module_expand_toggle(module_id)
@@ -369,6 +461,10 @@ module Modules2IndexPage
 
   def collapse_all_modules_button
     f(collapse_all_modules_button_selector)
+  end
+
+  def empty_state_module_creation_button
+    fxpath(empty_state_module_creation_button_selector)
   end
 
   def copy_button
@@ -423,6 +519,14 @@ module Modules2IndexPage
     f(module_action_menu_copy_selector(module_id))
   end
 
+  def module_page_student_dropdown
+    ff(module_page_dropdowns_selector)[1]
+  end
+
+  def module_page_teacher_dropdown
+    ff(module_page_dropdowns_selector)[0]
+  end
+
   def module_file_drop_element(module_id)
     f(module_file_drop_selector(module_id))
   end
@@ -464,7 +568,7 @@ module Modules2IndexPage
   end
 
   def module_item_action_menu_link(tool_text)
-    fj(module_item_action_menu_link_selector(tool_text))
+    fxpath(module_item_action_menu_link_selector(tool_text))
   end
 
   def module_item_assignment_icon(module_item_id)
@@ -475,8 +579,16 @@ module Modules2IndexPage
     f(module_item_by_id_selector(module_item_id))
   end
 
+  def module_item_title_by_id(module_item_id)
+    f(module_item_title_by_id_selector(module_item_id))
+  end
+
   def module_item_discussion_icon(module_item_id)
     f(module_item_discussion_icon_selector(module_item_id))
+  end
+
+  def module_item_due_date(module_item_id)
+    f(module_item_due_date_selector(module_item_id))
   end
 
   def module_item_header(module_item_id)
@@ -491,8 +603,16 @@ module Modules2IndexPage
     f(module_item_mission_pill_selector(module_item_id))
   end
 
+  def module_item_multiple_due_dates(module_item_id)
+    fj(module_item_multiple_due_date_selector(module_item_id))
+  end
+
   def module_item_page_icon(module_item_id)
     f(module_item_page_icon_selector(module_item_id))
+  end
+
+  def module_item_publish_button(module_item_id)
+    f(module_item_publish_button_selector(module_item_id))
   end
 
   def module_item_quiz_icon(module_item_id)
@@ -515,8 +635,16 @@ module Modules2IndexPage
     ff(module_item_title_selector)
   end
 
+  def context_module_item_todo(module_item_id, todo_text)
+    fj(context_module_item_todo_selector(module_item_id, todo_text))
+  end
+
   def module_item_title_links
     ff(module_item_title_link_selector)
+  end
+
+  def context_module_prerequisites(module_id)
+    f(context_module_prerequisites_selector(module_id))
   end
 
   def module_item_url_icon(module_item_id)
@@ -651,6 +779,18 @@ module Modules2IndexPage
     f(teacher_modules_container_selector)
   end
 
+  def text_header_input
+    f(text_header_input_selector)
+  end
+
+  def url_input
+    f(url_input_selector)
+  end
+
+  def url_title_input
+    f(url_title_input_selector)
+  end
+
   def screenreader_alert
     f("#flash_screenreader_holder")
   end
@@ -679,6 +819,38 @@ module Modules2IndexPage
     fxpath("//button[.//span[text()='Close']]")
   end
 
+  def tab_create_item
+    f(tab_create_item_selector)
+  end
+
+  def create_learning_object_name_input
+    f(create_learning_object_name_input_selector)
+  end
+
+  def new_quiz_icon
+    ff(new_quiz_icon_selector)
+  end
+
+  def classic_quiz_icon
+    ff(classic_quiz_icon_selector)
+  end
+
+  def visible_module_headers
+    ff(visible_modules_header_selector)
+  end
+
+  def view_assign_to_links
+    ffj(view_assign_to_link_selector)
+  end
+
+  def view_assign_to_link_on_module(module_id)
+    fj(context_module_view_assign_to_link_selector(module_id))
+  end
+
+  def quiz_engine_option_exists?
+    element_exists?(quiz_engine_option_selector)
+  end
+
   #------------------------------ Actions -------------------------------
 
   def assignments_due_button_exists?
@@ -687,6 +859,10 @@ module Modules2IndexPage
 
   def click_assignments_due_button
     assignments_due_button.click
+  end
+
+  def click_manage_module_item_assign_to
+    module_item_action_menu_link("Assign To...").click
   end
 
   def course_modules_setup(student_view: false)
@@ -774,6 +950,47 @@ module Modules2IndexPage
     fj("button:contains('Add Item')", f("[data-testid='add-item-modal']"))
   end
 
+  # This method only works for simple items right now like Assignment, Quiz, Page, etc.
+  # It does not work for External Tool or File since those require additional steps
+  # after selecting the item type from the dropdown
+  def add_newly_created_item(item_type, cxt_module, item_title_text = nil)
+    add_item_button(cxt_module.id).click
+    wait_for_ajaximations
+
+    # Select from the dropdown
+    click_INSTUI_Select_option(new_item_type_select_selector, item_type)
+    wait_for_ajaximations
+
+    tab_create_item.click
+
+    # Fill in the quiz details
+    new_item_name = (item_title_text || ("New" + item_type)).to_s
+
+    replace_content(create_learning_object_name_input, new_item_name)
+
+    yield if block_given?
+
+    # Click Add Item
+    add_item_modal_add_item_button.click
+    wait_for_ajaximations
+  end
+
+  def add_existing_learning_object(item_type, cxt_module, item_title_text)
+    add_item_button(cxt_module.id).click
+    wait_for_ajaximations
+
+    # Select from the dropdown
+    click_INSTUI_Select_option(new_item_type_select_selector, item_type)
+    wait_for_ajaximations
+
+    # Select the item from the list
+    click_INSTUI_Select_option(add_existing_item_select_selector, item_title_text)
+
+    # Click Add Item
+    add_item_modal_add_item_button.click
+    wait_for_ajaximations
+  end
+
   def expand_all_modules
     expand_all_modules_button.click
     wait_for_ajaximations
@@ -809,5 +1026,33 @@ module Modules2IndexPage
 
   def external_tool_page_name_input
     f(external_tool_page_name_input_selector)
+  end
+
+  # method to scroll to the top of the modules page, especially for the canvas for elementary pages that
+  # have a collapsing head that hides content.
+  def scroll_to_the_top_of_modules_page
+    where_to_scroll = element_exists?("#student-view-btn") ? "#student-view-btn" : "#easy_student_view"
+    scroll_to(f(where_to_scroll))
+    wait_for_ajaximations
+  end
+
+  def module_item_action_menu_link_exists?(tool_text)
+    element_exists?(module_item_action_menu_link_selector(tool_text), true)
+  end
+
+  def input_text_in_text_header_input(text)
+    replace_content(text_header_input, text)
+  end
+
+  def input_text_in_url_input(text)
+    replace_content(url_input, text)
+  end
+
+  def input_text_in_url_title_input(text)
+    replace_content(url_title_input, text)
+  end
+
+  def scroll_to_module(module_id)
+    scroll_to(f("[data-testid='module-action-menu_#{module_id}']"))
   end
 end

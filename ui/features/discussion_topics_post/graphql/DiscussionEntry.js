@@ -38,6 +38,10 @@ export const DiscussionEntry = {
       ratingCount
       ratingSum
       subentriesCount
+      pinType
+      pinnedBy {
+        shortName
+      }
       editor {
         ...User
       }
@@ -111,6 +115,10 @@ export const DiscussionEntry = {
     ratingCount: number,
     ratingSum: number,
     subentriesCount: number,
+    pinType: string,
+    pinnedBy: shape({
+      shortName: string,
+    }),
     attachment: Attachment.shape,
     author: User.shape,
     anonymousAuthor: AnonymousUser.shape,
@@ -167,6 +175,8 @@ export const DiscussionEntry = {
     message = '<p>This is the parent reply</p>',
     ratingCount = null,
     ratingSum = null,
+    pinType = 'none',
+    pinnedBy = null,
     subentriesCount = 2,
     attachment = Attachment.mock(),
     author = User.mock(),
@@ -220,6 +230,8 @@ export const DiscussionEntry = {
     message,
     ratingCount,
     ratingSum,
+    pinType,
+    pinnedBy,
     subentriesCount,
     attachment,
     author,

@@ -43,6 +43,7 @@ export const ColorPickerWrapper = ({
       value={value}
       onChange={onChange}
       withAlpha
+      popoverMaxHeight="50vh"
       colorMixerSettings={{
         popoverAddButtonLabel: I18n.t('Apply'),
         popoverCloseButtonLabel: I18n.t('Close'),

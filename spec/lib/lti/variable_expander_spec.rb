@@ -1331,6 +1331,30 @@ module Lti
           new_assignment.update!(group_category:)
         end
 
+        describe "CourseGroup.id" do
+          let(:expansion) { "$CourseGroup.id" }
+
+          context "when assignment is blank" do
+            let(:variable_expander_opts) { { current_user: user, tool: } }
+
+            it "safely remains unexpanded" do
+              expect_unexpanded! expansion
+            end
+          end
+
+          context "when user is blank" do
+            let(:variable_expander_opts) { { tool:, assignment: new_assignment } }
+
+            it "safely remains unexpanded" do
+              expect_unexpanded! expansion
+            end
+          end
+
+          it "has a substitution for CourseGroup.id" do
+            expect(expand!(expansion)).to eq group.id
+          end
+        end
+
         describe "com.instructure.Group.id" do
           let(:expansion) { "$com.instructure.Group.id" }
 
@@ -2137,6 +2161,11 @@ module Lti
         it "has substitution for $Canvas.assignment.id" do
           allow(assignment).to receive(:id).and_return(2015)
           expect(expand!("$Canvas.assignment.id")).to eq 2015
+        end
+
+        it "returns empty string for CourseGroup.id when assignment is not group assignment" do
+          allow(assignment).to receive(:group_category).and_return(nil)
+          expect(expand!("$CourseGroup.id")).to eq ""
         end
 
         it "has substitution for $Canvas.assignment.description" do

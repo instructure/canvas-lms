@@ -1,0 +1,55 @@
+# frozen_string_literal: true
+
+#
+# Copyright (C) 2025 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
+class PeerReview::PeerReviewCreatorService < PeerReview::PeerReviewCommonService
+  def initialize(
+    parent_assignment: nil,
+    points_possible: nil,
+    grading_type: nil,
+    due_at: nil,
+    unlock_at: nil,
+    lock_at: nil
+  )
+    super
+  end
+
+  def call
+    run_validations
+    peer_review_sub_assignment = create_peer_review_sub_assignment
+    compute_due_dates_and_create_submissions(peer_review_sub_assignment)
+    peer_review_sub_assignment
+  end
+
+  private
+
+  def run_validations
+    validate_parent_assignment
+    validate_assignment_submission_types
+    validate_feature_enabled
+    validate_peer_review_sub_assignment_not_exist
+  end
+
+  def create_peer_review_sub_assignment
+    AbstractAssignment.suspend_due_date_caching do
+      peer_review_sub = PeerReviewSubAssignment.new(peer_review_attributes)
+      peer_review_sub.save!
+      peer_review_sub
+    end
+  end
+end

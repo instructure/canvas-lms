@@ -19,6 +19,7 @@
 
 require_relative "../../helpers/context_modules_common"
 require_relative "../page_objects/modules2_index_page"
+require_relative "../page_objects/modules2_action_tray"
 require_relative "../../helpers/items_assign_to_tray"
 require_relative "../../helpers/assignments_common"
 require_relative "../shared_examples/course_modules2_shared"
@@ -29,6 +30,7 @@ describe "context modules", :ignore_js_errors do
   include Modules2IndexPage
   include ItemsAssignToTray
   include AssignmentsCommon
+  include Modules2ActionTray
 
   before :once do
     modules2_teacher_setup
@@ -61,246 +63,6 @@ describe "context modules", :ignore_js_errors do
     module_header_expand_toggles.first.click
     item_indent = module_item_indent(indented_module_item.id)
     expect(item_indent).to match("padding: 0px 0px 0px 40px;")
-  end
-
-  context "module items action menu" do
-    before do
-      # Create a module with at least one item of each type
-      module_setup
-      # Create a module item of file type
-      file = @course.attachments.create!(display_name: "some file", uploaded_data: default_uploaded_data, locked: true)
-      @module.add_item(type: "file", id: file.id)
-    end
-
-    def validate_edit_item_form(item)
-      manage_module_item_button(item.id).click
-      module_item_action_menu_link("Edit").click
-
-      expect(edit_item_modal).to be_displayed
-      edit_item_modal.find_element(:css, "button[type='button']").click
-      wait_for_ajaximations
-    end
-
-    def validate_text_fields_has_right_value(item)
-      manage_module_item_button(item.id).click
-      module_item_action_menu_link("Edit").click
-      wait_for_ajaximations
-      item_title = item.title
-      title = edit_item_modal_title_input_value
-      expect(title).to eq(item_title)
-
-      # URL field is only present for ExternalTool, ExternalUrl, and ContextExternalTool items
-      if %w[External ExternalUrl ExternalTool ContextExternalTool].include?(item.content_type)
-        url_value = edit_item_modal_url_value
-        expect(url_value).to eq(item.url)
-
-        new_tab = edit_item_modal.find_element(:css, "input[data-testid='edit-modal-new-tab']")
-        new_tab_value = item.new_tab.nil? ? false : item.new_tab
-        expect(new_tab.selected?).to eq(new_tab_value)
-      end
-
-      edit_item_modal.find_element(:css, "button[type='button']").click
-      wait_for_ajaximations
-    end
-
-    def validate_update_module_item_title(item, new_title = "New Title")
-      manage_module_item_button(item.id).click
-      module_item_action_menu_link("Edit").click
-      wait_for_ajaximations
-
-      title = edit_item_modal.find_element(:css, "input[data-testid='edit-modal-title']")
-      replace_content(title, new_title)
-
-      edit_item_modal.find_element(:css, "button[type='submit']").click
-      wait_for_ajaximations
-      assignment_title = manage_module_item_container(item.id).find_element(:xpath, ".//*[text()='#{new_title}']")
-      expect(assignment_title.text).to eq(new_title)
-    end
-
-    context "edit module item kebab form" do
-      it "edit item form is shown" do
-        go_to_modules
-        module_header_expand_toggles.last.click
-        wait_for_ajaximations
-
-        @module.content_tags.each do |item|
-          validate_edit_item_form(item)
-        end
-      end
-
-      it "title fields has the right value" do
-        go_to_modules
-        module_header_expand_toggles.last.click
-        wait_for_ajaximations
-
-        @module.content_tags.each do |item|
-          validate_text_fields_has_right_value(item)
-        end
-      end
-
-      it "item is updated" do
-        go_to_modules
-        module_header_expand_toggles.last.click
-        wait_for_ajaximations
-
-        @module.content_tags.each do |item|
-          validate_update_module_item_title(item)
-        end
-      end
-    end
-
-    context "send to kebab form" do
-      before do
-        student_in_course
-        @first_user = @course.students.first
-        # First item of the module item list is the one used for testing
-        @item = @module1.content_tags[0]
-      end
-
-      it "send item form is shown" do
-        go_to_modules
-        module_header_expand_toggles.first.click
-        wait_for_ajaximations
-        manage_module_item_button(@item.id).click
-        module_item_action_menu_link("Send To...").click
-
-        expect(send_to_modal).to be_displayed
-      end
-
-      it "module item is correctly sent" do
-        go_to_modules
-        module_header_expand_toggles.first.click
-        wait_for_ajaximations
-        manage_module_item_button(@item.id).click
-        module_item_action_menu_link("Send To...").click
-
-        set_value(send_to_modal_input, "User")
-        option_list_id = send_to_modal_input.attribute("aria-controls")
-
-        expect(ff("##{option_list_id} [role='option']").count).to eq 1
-        fj("##{option_list_id} [role='option']:contains(#{@first_user.first_name})").click
-        selected_element = send_to_form_selected_elements.first
-
-        expect(selected_element.text).to eq("User")
-
-        fj("button:contains('Send')").click
-
-        wait_for_ajaximations
-        expect(f("body")).not_to contain_css(send_to_modal_modal_selector)
-      end
-    end
-
-    context "copy to kebab form" do
-      before do
-        course = @course
-        @other_course = course_factory(course_name: "Other Course Eh")
-        course_with_teacher(course: @other_course, user: @teacher, name: "Sharee", active_all: true)
-        @course = course
-        @quiz_item = @module3.content_tags[0]
-        @assignment_item = @module3.content_tags[1]
-        @discussion_item = @module3.content_tags[2]
-        @page_item = @module3.content_tags[3]
-      end
-
-      def copy_and_expect(item, expected_key)
-        manage_module_item_button(item.id).click
-        module_item_action_menu_link("Copy To...").click
-
-        set_value(copy_to_tray_course_select, "course")
-        option_list_id = copy_to_tray_course_select.attribute("aria-controls")
-        expect(option_list(option_list_id).count).to eq 1
-
-        option_list_course_option(option_list_id, @other_course.name).click
-        copy_button.click
-        wait_for_ajaximations
-
-        expect(@other_course.content_migrations.last.migration_settings["copy_options"].keys).to eq([expected_key])
-
-        close_copy_to_tray_button.click
-        wait_for_ajaximations
-      end
-
-      it "module item is correctly copied" do
-        go_to_modules
-        # Use the third module
-        module_header_expand_toggles[2].click
-        wait_for_ajaximations
-
-        copy_and_expect(@quiz_item, "quizzes")
-        copy_and_expect(@assignment_item, "assignments")
-        copy_and_expect(@discussion_item, "discussion_topics")
-        copy_and_expect(@page_item, "wiki_pages")
-      end
-    end
-
-    context "move module item kebab form" do
-      it "shows move item tray and close it" do
-        go_to_modules
-        module_header_expand_toggles.first.click
-        wait_for_ajaximations
-
-        manage_module_item_button(@module1.content_tags.first.id).click
-        module_item_action_menu_link("Move to...").click
-        expect(f("body")).to contain_css(move_item_tray_selector)
-        expect(cancel_tray_button).to be_displayed
-        cancel_tray_button.click
-        expect(f("body")).not_to contain_css(move_item_tray_selector)
-
-        manage_module_item_button(@module1.content_tags.first.id).click
-        module_item_action_menu_link("Move to...").click
-        expect(f("body")).to contain_css(move_item_tray_selector)
-        expect(close_tray_button).to be_displayed
-        close_tray_button.click
-        expect(f("body")).not_to contain_css(move_item_tray_selector)
-      end
-
-      it "moves module item to another module" do
-        go_to_modules
-        module_header_expand_toggles.first.click
-        module_header_expand_toggles.last.click
-        wait_for_ajaximations
-
-        moved_item = @module.content_tags.first
-        manage_module_item_button(moved_item.id).click
-        module_item_action_menu_link("Move to...").click
-        expect(move_item_tray_select_modules_listbox).to be_displayed
-        move_item_tray_select_modules_listbox.click
-
-        option_list_id = move_item_tray_select_modules_listbox.attribute("aria-controls")
-        option_list_course_option(option_list_id, @module1.name).click
-        move_item_tray_place_contents_listbox.click
-        place_item_at_bottom_option.click
-        submit_move_to_button.click
-        wait_for_ajaximations
-
-        item_titles_list = module_item_title_links.map(&:text)
-        expect(@module1.content_tags.last.title).to include(moved_item.title)
-        expect(item_titles_list.count(moved_item.title)).to eq(1)
-      end
-    end
-
-    context "duplicate module item" do
-      before :once do
-        @dup_assignment = @course.assignments.create!(title: "Dup me", submission_types: "online_text_entry")
-        @dup_item = @module1.add_item(type: "assignment", id: @dup_assignment.id)
-      end
-
-      it "duplicates the module item (UI shows new row and DB count increases)" do
-        go_to_modules
-        wait_for_ajaximations
-
-        context_module_expand_toggle(@module1.id).click
-        wait_for_ajaximations
-
-        ui_count_before = module_item_title_links.length
-        manage_module_item_button(@dup_item.id).click
-        module_item_action_menu_link("Duplicate").click
-        wait_for_ajaximations
-
-        expect(module_item_title_links.length).to eq(ui_count_before + 1)
-        expect(module_item_title_links.last.text).to eq("Dup me Copy")
-      end
-    end
   end
 
   context "mastery paths" do
@@ -355,8 +117,7 @@ describe "context modules", :ignore_js_errors do
 
     it "shows teacher and student dropdown with All Modules default" do
       go_to_modules
-      student_dropdown_input = f("input[role='combobox'][title='All Modules']")
-      expect(student_dropdown_input[:value]).to eq("All Modules")
+      expect(module_page_student_dropdown[:value]).to eq("All Modules")
 
       teacher_select = ff("label")[0]
       expect(teacher_select.text).to include("Teachers View")
@@ -367,10 +128,7 @@ describe "context modules", :ignore_js_errors do
 
     it "updates visible modules when selecting a specific module for teachers" do
       go_to_modules
-
-      teacher_dropdown_input = ff("input[role='combobox'][title='All Modules']")[0]
-      teacher_dropdown_input.click
-
+      module_page_teacher_dropdown.click
       wait_for_ajaximations
 
       first_module = ff("[role='option']")[1]
@@ -378,16 +136,13 @@ describe "context modules", :ignore_js_errors do
 
       first_module.click
       wait_for_ajaximations
-      visible_modules = ff("div[class*='context_module'] h2")[0]
+      visible_modules = visible_module_headers[0]
       expect(visible_modules.text).to include("module1")
     end
 
     it "does not update visible module when selecting a specific module for students" do
       go_to_modules
-
-      student_dropdown_input = ff("input[role='combobox'][title='All Modules']")[1]
-      student_dropdown_input.click
-
+      module_page_student_dropdown.click
       wait_for_ajaximations
 
       second_module = ff("[role='option']")[2]
@@ -396,7 +151,7 @@ describe "context modules", :ignore_js_errors do
       second_module.click
       wait_for_ajaximations
 
-      visible_modules = ff("div[class*='context_module'] h2")
+      visible_modules = visible_module_headers
       expect(visible_modules.length).to eq(3)
       expect(visible_modules.first.text).to include("module1")
       expect(visible_modules.last.text).to include("module3")
@@ -404,9 +159,7 @@ describe "context modules", :ignore_js_errors do
 
     it "displays selected module in students view when acting as student" do
       go_to_modules
-      student_dropdown_input = ff("input[role='combobox'][title='All Modules']")[1]
-      student_dropdown_input.click
-
+      module_page_student_dropdown.click
       wait_for_ajaximations
 
       second_module = ff("[role='option']")[2]
@@ -424,10 +177,7 @@ describe "context modules", :ignore_js_errors do
 
     it "persists selected module filter after reload" do
       go_to_modules
-
-      teacher_dropdown_input = f("input[role='combobox'][title='All Modules']")
-      teacher_dropdown_input.click
-
+      module_page_teacher_dropdown.click
       wait_for_ajaximations
 
       first_module = ff("[role='option']")[1]
@@ -437,9 +187,373 @@ describe "context modules", :ignore_js_errors do
       refresh_page
       wait_for_ajaximations
 
-      # Ensure the same module is still selected and shown
-      visible_modules = ff("div[class*='context_module'] h2")[0]
+      visible_modules = visible_module_headers[0]
       expect(visible_modules.text).to include("module1")
+    end
+
+    it "resets teacher dropdown to 'All Modules' when the selected module is deleted" do
+      go_to_modules
+      module_page_teacher_dropdown.click
+      wait_for_ajaximations
+
+      first_module = ff("[role='option']")[1]
+      expect(first_module.text).to eq("module1")
+
+      first_module.click
+      wait_for_ajaximations
+
+      module_action_menu(@module1.id).click
+      module_action_menu_deletetion(@module1.id).click
+      alert = driver.switch_to.alert
+      alert.accept
+      wait_for_ajaximations
+
+      expect(module_page_teacher_dropdown[:value]).to eq("All Modules")
+    end
+  end
+
+  context "create modules using tray" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+    end
+
+    before do
+      user_session(@teacher)
+
+      go_to_modules
+      wait_for_ajaximations
+    end
+
+    it "brings up the add module tray when Add Module button clicked" do
+      add_module_button.click
+      expect(add_module_tray).to be_displayed
+      expect(tray_header_label.text).to eq("Add Module")
+    end
+
+    it "can cancel creation of module" do
+      add_module_button.click
+      expect(input_module_name).to be_displayed
+      fill_in_module_name("Cancel module creation test")
+      cancel_tray_button.click
+      expect(@course.context_modules.count).to eq 0
+    end
+
+    it "can close creation of module" do
+      add_module_button.click
+      expect(input_module_name).to be_displayed
+      fill_in_module_name("Close module creation tray")
+      close_tray_button.click
+      expect(@course.context_modules.count).to eq 0
+    end
+
+    it "give error in add module tray if module name is not provided" do
+      add_module_button.click
+      expect(input_module_name).to be_displayed
+      submit_add_module_button.click
+      expect(add_module_tray.text).to include("Module name can’t be blank")
+    end
+
+    it_behaves_like "course_module2 add module tray", :context_modules
+    it_behaves_like "course_module2 add module tray", :course_homepage
+  end
+
+  context "update assign to settings using tray" do
+    before :once do
+      @section1 = @course.course_sections.create!(name: "section1")
+      @section2 = @course.course_sections.create!(name: "section2")
+      @student1 = user_factory(name: "user1", active_all: true, active_state: "active")
+      @student2 = user_factory(name: "user2", active_all: true, active_state: "active", section: @section2)
+      @course.enroll_user(@student1, "StudentEnrollment", enrollment_state: "active")
+      @course.enroll_user(@student2, "StudentEnrollment", enrollment_state: "active")
+    end
+
+    before do
+      user_session(@teacher)
+      go_to_modules
+    end
+
+    it "shows Everyone as default selection in Assign-To tray" do
+      module_action_menu(@module1.id).click
+      module_item_action_menu_link("Assign To...").click
+      expect(is_checked(everyone_radio_checked)).to be true
+    end
+
+    it "selects the custom radio button for module assign to when clicked" do
+      module_action_menu(@module1.id).click
+      module_item_action_menu_link("Assign To...").click
+
+      custom_access_radio_click.click
+      expect(is_checked(custom_access_radio_checked)).to be true
+    end
+
+    it "selects the custom radio button for module assign to and cancels" do
+      module_action_menu(@module1.id).click
+      module_item_action_menu_link("Assign To...").click
+
+      custom_access_radio_click.click
+      expect(module_settings_tray).to be_displayed
+      expect(cancel_tray_button).to be_displayed
+
+      cancel_tray_button.click
+      expect(settings_tray_exists?).to be_falsey
+    end
+
+    it "adds more than one name to the assign to list" do
+      module_action_menu(@module1.id).click
+      module_item_action_menu_link("Assign To...").click
+
+      custom_access_radio_click.click
+      assignee_selection.send_keys("user")
+      click_option(assignee_selection, "user1")
+      assignee_selection.send_keys("user")
+      click_option(assignee_selection, "user2")
+
+      assignee_list = assignee_selection_item.map(&:text)
+      expect(assignee_list.sort).to eq(%w[user1 user2])
+    end
+
+    it "adds a section to the list of assignees" do
+      module_action_menu(@module1.id).click
+      module_item_action_menu_link("Assign To...").click
+      custom_access_radio_click.click
+
+      assignee_selection.send_keys("section")
+      click_option(assignee_selection, "section1")
+      expect(assignee_selection_item[0].text).to eq("section1")
+      expect(assignee_selection_item.count).to eq(1)
+    end
+
+    it "adds a user to assign to and shows the user from View Assign To" do
+      module_action_menu(@module1.id).click
+      module_item_action_menu_link("Assign To...").click
+
+      custom_access_radio_click.click
+      expect(assignee_selection).to be_displayed
+      assignee_selection.send_keys("user")
+      click_option(assignee_selection, "user1")
+      submit_add_module_button.click
+
+      expect(view_assign_to_link_on_module(@module1.id)).to be_displayed
+      view_assign_to_link_on_module(@module1.id).click
+      expect(assignee_selection).to be_displayed
+      expect(assignee_selection_item[0].text).to eq("user1")
+      expect(assignee_selection_item.count).to eq(1)
+    end
+
+    it_behaves_like "course_module2 module tray assign to", :context_modules
+    it_behaves_like "course_module2 module tray assign to", :course_homepage
+
+    it "deletes added assignee by clicking on it" do
+      module_action_menu(@module1.id).click
+      module_item_action_menu_link("Assign To...").click
+      custom_access_radio_click.click
+
+      assignee_selection.send_keys("user")
+      click_option(assignee_selection, "user1")
+
+      assignee_selection_item_remove("user1").click
+      expect(element_exists?(assignee_selection_item_selector)).to be false
+    end
+
+    it "clears the assignee list when clear all is clicked" do
+      module_action_menu(@module1.id).click
+      module_item_action_menu_link("Assign To...").click
+      custom_access_radio_click.click
+
+      assignee_selection.send_keys("user")
+      click_option(assignee_selection, "user1")
+
+      clear_all.click
+      expect(element_exists?(assignee_selection_item_selector)).to be false
+    end
+
+    it "does not show the assign to buttons when the user does not have the manage_course_content_edit permission" do
+      skip("LX-3149")
+      @module1.assignment_overrides.create!
+
+      go_to_modules
+      module_action_menu(@module1.id).click
+
+      expect(f("body")).to contain_jqcss(module_index_menu_tool_link_selector("Assign To..."))
+      expect(f("body")).to contain_jqcss(context_module_view_assign_to_link_selector(@module1.id))
+
+      RoleOverride.create!(context: @course.account, permission: "manage_course_content_edit", role: teacher_role, enabled: false)
+      go_to_modules
+
+      module_action_menu(@module1.id).click
+      expect(f("body")).not_to contain_jqcss(module_index_menu_tool_link_selector("Assign To..."))
+      expect(f("body")).not_to contain_jqcss(context_module_view_assign_to_link_selector(@module1.id))
+    end
+
+    it "displays correct error message if assignee list is empty" do
+      module_action_menu(@module1.id).click
+      module_item_action_menu_link("Assign To...").click
+      custom_access_radio_click.click
+
+      assignee_selection.send_keys("user")
+      click_option(assignee_selection, "user1")
+
+      clear_all.click
+      expect(assign_to_error_message.text).to eq("A student or section must be selected")
+    end
+
+    context "differentiation tags" do
+      before :once do
+        @course.account.enable_feature!(:assign_to_differentiation_tags)
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = { value: true }
+          a.save!
+        end
+
+        @differentiation_tag_category = @course.group_categories.create!(name: "Differentiation Tag Category", non_collaborative: true)
+        @diff_tag1 = @course.groups.create!(name: "Differentiation Tag 1", group_category: @differentiation_tag_category, non_collaborative: true)
+        @diff_tag2 = @course.groups.create!(name: "Differentiation Tag 2", group_category: @differentiation_tag_category, non_collaborative: true)
+
+        @diff_tag1.add_user(@student1)
+        @diff_tag2.add_user(@student2)
+      end
+
+      it "can add differentiation tags as assignees to module overrides" do
+        go_to_modules
+        module_action_menu(@module1.id).click
+        module_item_action_menu_link("Assign To...").click
+        custom_access_radio_click.click
+
+        assignee_selection.send_keys("Differentiation")
+        click_option(assignee_selection, "Differentiation Tag 1")
+        expect(assignee_selection_item[0].text).to eq("Differentiation Tag 1")
+      end
+
+      it "differentiation tags will persist after saving" do
+        go_to_modules
+        module_action_menu(@module1.id).click
+        module_item_action_menu_link("Assign To...").click
+        custom_access_radio_click.click
+
+        assignee_selection.send_keys("Differentiation")
+        click_option(assignee_selection, "Differentiation Tag 1")
+
+        submit_add_module_button.click
+
+        module_action_menu(@module1.id).click
+        module_item_action_menu_link("Assign To...").click
+        expect(assignee_selection_item[0].text).to eq("Differentiation Tag 1")
+      end
+
+      it "differentiation tags will not show as assignee option if the account setting is disabled" do
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = { value: false }
+          a.save!
+        end
+
+        go_to_modules
+        module_action_menu(@module1.id).click
+        module_item_action_menu_link("Assign To...").click
+        custom_access_radio_click.click
+
+        assignee_selection.click
+        options = ff("[data-testid='assignee_selector_option']").map(&:text)
+        expect(options).not_to include("Differentiation")
+      end
+
+      it "displays correct error message if assignee list is empty" do
+        go_to_modules
+        module_action_menu(@module1.id).click
+        module_item_action_menu_link("Assign To...").click
+        custom_access_radio_click.click
+
+        assignee_selection.send_keys("Differentiation")
+        click_option(assignee_selection, "Differentiation Tag 1")
+
+        clear_all.click
+        expect(assign_to_error_message.text).to eq("A student, section, or tag must be selected")
+      end
+
+      context "differentiation tag rollback" do
+        it "displays error message and disables saving if differentiaiton tags exist after account setting is turned off" do
+          go_to_modules
+
+          module_action_menu(@module1.id).click
+          module_item_action_menu_link("Assign To...").click
+          custom_access_radio_click.click
+
+          assignee_selection.send_keys("Differentiation")
+          click_option(assignee_selection, "Differentiation Tag 1")
+          submit_add_module_button.click
+
+          # Turn off differentiaiton tags account setting
+          @course.account.tap do |a|
+            a.settings[:allow_assign_to_differentiation_tags] = { value: false }
+            a.save!
+          end
+
+          go_to_modules
+          module_action_menu(@module1.id).click
+          module_item_action_menu_link("Assign To...").click
+          custom_access_radio_click.click
+
+          expect(assign_to_error_message.text).to eq("Differentiation tag overrides must be removed")
+          expect(convert_differentiated_tag_button).to be_displayed
+        end
+
+        it "removes error message when user manually removes all differentiation tags from assignee selector" do
+          go_to_modules
+
+          module_action_menu(@module1.id).click
+          module_item_action_menu_link("Assign To...").click
+          custom_access_radio_click.click
+
+          assignee_selection.send_keys("Differentiation")
+          click_option(assignee_selection, "Differentiation Tag 1")
+          submit_add_module_button.click
+
+          # Turn off differentiaiton tags account setting
+          @course.account.tap do |a|
+            a.settings[:allow_assign_to_differentiation_tags] = { value: false }
+            a.save!
+          end
+
+          go_to_modules
+          module_action_menu(@module1.id).click
+          module_item_action_menu_link("Assign To...").click
+          custom_access_radio_click.click
+          expect(convert_differentiated_tag_button).to be_displayed
+
+          assignee_selection_item_remove("Differentiation Tag 1").click
+          expect(element_exists?(convert_differentiated_tag_button_selector)).to be_falsey
+          expect(assign_to_error_message.text).to eq("A student or section must be selected")
+        end
+
+        it "converts differentiation tags to ADHOC overrides when 'convert tags' button is clicked" do
+          go_to_modules
+          module_action_menu(@module1.id).click
+          module_item_action_menu_link("Assign To...").click
+          custom_access_radio_click.click
+
+          assignee_selection.send_keys("Differentiation")
+          click_option(assignee_selection, "Differentiation Tag 1")
+          assignee_selection.send_keys("Differentiation")
+          click_option(assignee_selection, "Differentiation Tag 2")
+          submit_add_module_button.click
+
+          # Turn off differentiaiton tags account setting
+          @course.account.tap do |a|
+            a.settings[:allow_assign_to_differentiation_tags] = { value: false }
+            a.save!
+          end
+
+          go_to_modules
+          module_action_menu(@module1.id).click
+          module_item_action_menu_link("Assign To...").click
+          custom_access_radio_click.click
+
+          convert_differentiated_tag_button.click
+          wait_for_ajaximations
+
+          expect(assignee_selection_item[0].text).to eq("user1")
+          expect(assignee_selection_item[1].text).to eq("user2")
+        end
+      end
     end
   end
 
@@ -518,22 +632,26 @@ describe "context modules", :ignore_js_errors do
       @empty_module = @course.context_modules.create!(name: "Multi File Module")
     end
 
-    context "when adding an external tool" do
-      before do
-        @external_tool = @course.context_external_tools.create!(
-          context_id: @course.id,
-          context_type: "Course",
-          url: "https://example.com",
-          shared_secret: "fake",
-          consumer_key: "fake",
-          name: "Test External Tool",
-          description: "An external tool for testing",
-          settings: { "platform" => "canvas.instructure.com" },
-          workflow_state: "active"
-        )
-      end
+    context "when adding a quiz" do
+      # Quiz LTI is used when creating new quizzes when quizzes_next flag is enabled
+      # and Quiz LTI is added to the course
+      it "new quiz engine enabled and Quiz LTI added" do
+        @course.root_account.settings[:provision] = { "lti" => "lti url" }
+        @course.root_account.save!
+        @course.root_account.enable_feature! :quizzes_next
+        @course.enable_feature! :quizzes_next
 
-      it "allows adding an external tool to the module" do
+        @course.context_external_tools.create!(
+          name: "Quizzes.Next",
+          consumer_key: "test_key",
+          shared_secret: "test_secret",
+          tool_id: "Quizzes 2",
+          url: "http://example.com/launch"
+        )
+
+        @course.root_account.enable_feature! :new_quizzes_by_default
+        @course.enable_feature! :new_quizzes_by_default
+
         go_to_modules
         wait_for_ajaximations
 
@@ -545,21 +663,139 @@ describe "context modules", :ignore_js_errors do
         wait_for_ajaximations
 
         # Select External Tool from the dropdown
-        click_INSTUI_Select_option(new_item_type_select_selector, "External Tool")
+        click_INSTUI_Select_option(new_item_type_select_selector, "Quiz")
         wait_for_ajaximations
 
-        # Select external tool from the dropdown
-        click_INSTUI_Select_option(add_existing_item_select_selector, @external_tool.name)
-        wait_for_ajaximations
+        tab_create_item.click
 
-        new_item_name = "External Tool Page Name"
+        # Verify that quiz engine selector is NOT shown
+        expect(quiz_engine_option_exists?).to be_falsey
 
-        replace_content(external_tool_page_name_input, new_item_name)
+        # Fill in the quiz details
+        new_item_name = "New Quizz"
+
+        replace_content(create_learning_object_name_input, new_item_name)
 
         # Click Add Item
         add_item_modal_add_item_button.click
+        wait_for_ajaximations
 
-        expect(module_item_title_links.last.text).to include(new_item_name)
+        # A quiz with new Quiz engine is created and found in Module Item list
+        expect(new_quiz_icon.count).to eq(1)
+      end
+
+      it "new quiz engine enabled but Quiz LTI is not added" do
+        @course.root_account.settings[:provision] = { "lti" => "lti url" }
+        @course.root_account.save!
+        @course.root_account.enable_feature! :quizzes_next
+        @course.enable_feature! :quizzes_next
+
+        go_to_modules
+        wait_for_ajaximations
+
+        # Expand the module to see its items
+        context_module_expand_toggle(@empty_module.id).click
+        wait_for_ajaximations
+
+        add_item_button(@empty_module.id).click
+        wait_for_ajaximations
+
+        # Select External Tool from the dropdown
+        click_INSTUI_Select_option(new_item_type_select_selector, "Quiz")
+        wait_for_ajaximations
+
+        tab_create_item.click
+
+        # Fill in the quiz details
+        new_item_name = "New Quizz"
+
+        replace_content(create_learning_object_name_input, new_item_name)
+
+        # Click Add Item
+        add_item_modal_add_item_button.click
+        wait_for_ajaximations
+
+        # A quiz with classic Quiz engine is created and found in Module Item list
+        expect(classic_quiz_icon.count).to eq(1)
+      end
+
+      it "new quiz engine disabled but Quiz LTI is added" do
+        @course.root_account.settings[:provision] = { "lti" => "lti url" }
+        @course.root_account.save!
+        @course.root_account.disable_feature! :quizzes_next
+        @course.disable_feature! :quizzes_next
+
+        @course.context_external_tools.create!(
+          name: "Quizzes.Next",
+          consumer_key: "test_key",
+          shared_secret: "test_secret",
+          tool_id: "Quizzes 2",
+          url: "http://example.com/launch"
+        )
+
+        go_to_modules
+        wait_for_ajaximations
+
+        # Expand the module to see its items
+        context_module_expand_toggle(@empty_module.id).click
+        wait_for_ajaximations
+
+        add_item_button(@empty_module.id).click
+        wait_for_ajaximations
+
+        # Select External Tool from the dropdown
+        click_INSTUI_Select_option(new_item_type_select_selector, "Quiz")
+        wait_for_ajaximations
+
+        tab_create_item.click
+
+        # Fill in the quiz details
+        new_item_name = "New Quizz"
+
+        replace_content(create_learning_object_name_input, new_item_name)
+
+        # Click Add Item
+        add_item_modal_add_item_button.click
+        wait_for_ajaximations
+
+        # A quiz with classic Quiz engine is created and found in Module Item list
+        expect(classic_quiz_icon.count).to eq(1)
+      end
+
+      it "shows quiz engine selector" do
+        @course.root_account.settings[:provision] = { "lti" => "lti url" }
+        @course.root_account.save!
+        @course.root_account.enable_feature! :quizzes_next
+        @course.enable_feature! :quizzes_next
+        @course.root_account.disable_feature! :new_quizzes_by_default
+        @course.disable_feature! :new_quizzes_by_default
+
+        @course.context_external_tools.create!(
+          name: "Quizzes.Next",
+          consumer_key: "test_key",
+          shared_secret: "test_secret",
+          tool_id: "Quizzes 2",
+          url: "http://example.com/launch"
+        )
+
+        go_to_modules
+        wait_for_ajaximations
+
+        # Expand the module to see its items
+        context_module_expand_toggle(@empty_module.id).click
+        wait_for_ajaximations
+
+        add_item_button(@empty_module.id).click
+        wait_for_ajaximations
+
+        # Select Quiz from the dropdown
+        click_INSTUI_Select_option(new_item_type_select_selector, "Quiz")
+        wait_for_ajaximations
+
+        tab_create_item.click
+
+        # Verify that quiz engine selector is shown
+        expect(quiz_engine_option_exists?).to be_truthy
       end
     end
   end
@@ -607,97 +843,6 @@ describe "context modules", :ignore_js_errors do
   context "module expanding and collapsing" do
     it_behaves_like "module collapse and expand", :context_modules
     it_behaves_like "module collapse and expand", :course_homepage
-  end
-
-  context "module item types" do
-    before(:once) do
-      course_module
-    end
-
-    it "displays the correct icon for assignment" do
-      new_assignment = @course.assignments.create!(title: "Week3 homework", submission_types: "online_text_entry")
-      module_item = @module.add_item(type: "assignment", id: new_assignment.id)
-      go_to_modules
-      wait_for_ajaximations
-      module_header_expand_toggles.last.click
-      assignment_icon = module_item_assignment_icon(module_item.id)
-      expect(assignment_icon).to be_displayed
-    end
-
-    it "displays the correct icon for classic Quiz" do
-      classic_quiz = @course.quizzes.create!(title: "Week3 Quiz", quiz_type: "survey")
-      module_item = @module.add_item(type: "quiz", id: classic_quiz.id)
-      go_to_modules
-      wait_for_ajaximations
-      module_header_expand_toggles.last.click
-      quiz_icon = module_item_quiz_icon(module_item.id)
-      expect(quiz_icon).to be_displayed
-    end
-
-    it "displays the correct icon for wiki page" do
-      wiki_page = @course.wiki_pages.create!(title: "week3 Page", body: "hi")
-      module_item = @module.add_item(type: "wiki_page", id: wiki_page.id)
-      go_to_modules
-      wait_for_ajaximations
-      module_header_expand_toggles.last.click
-      page_icon = module_item_page_icon(module_item.id)
-      expect(page_icon).to be_displayed
-    end
-
-    it "displays the correct icon for discussion" do
-      discussion = @course.discussion_topics.create!(title: "Week3 Discussion", message: "hi")
-      module_item = @module.add_item(type: "discussion_topic", id: discussion.id)
-      go_to_modules
-      wait_for_ajaximations
-      module_header_expand_toggles.last.click
-      discussion_icon = module_item_discussion_icon(module_item.id)
-      expect(discussion_icon).to be_displayed
-    end
-
-    it "displays the correct icon for text header" do
-      text_header = @module.add_item(type: "context_module_sub_header", title: "Created header")
-      go_to_modules
-      wait_for_ajaximations
-      module_header_expand_toggles.last.click
-      text_header_icon = module_item_text_header_icon(text_header.id)
-      expect(text_header_icon).to be_displayed
-    end
-
-    it "displays the correct icon for external URL" do
-      external_url = @module.add_item(type: "external_url", url: "http://example.com", title: "External URL")
-      go_to_modules
-      wait_for_ajaximations
-      module_header_expand_toggles.last.click
-      external_url_icon = module_item_url_icon(external_url.id)
-      expect(external_url_icon).to be_displayed
-    end
-
-    it "displays the correct icon for external tool" do
-      @course.context_external_tools.create!(name: "lti tool",
-                                             consumer_key: "key",
-                                             shared_secret: "secret",
-                                             url: "http://example.com")
-      external_tool = @module.add_item({
-                                         type: "context_external_tool",
-                                         title: "new external tool",
-                                         url: "http://example.com"
-                                       })
-      go_to_modules
-      wait_for_ajaximations
-      module_header_expand_toggles.last.click
-      external_tool_icon = module_item_url_icon(external_tool.id)
-      expect(external_tool_icon).to be_displayed
-    end
-
-    it "displays the correct icon for file upload" do
-      file = @course.attachments.create!(display_name: "file uploaded", uploaded_data: default_uploaded_data, locked: true)
-      uploaded_file = @module.add_item(type: "attachment", id: file.id)
-      go_to_modules
-      wait_for_ajaximations
-      module_header_expand_toggles.last.click
-      uploaded_file_icon = module_item_attachment_icon(uploaded_file.id)
-      expect(uploaded_file_icon).to be_displayed
-    end
   end
 
   context "module action menu deletion" do
@@ -930,6 +1075,27 @@ describe "context modules", :ignore_js_errors do
         expect(modules_published_icon_state?(published: false)).to be true
         expand_all_modules
         expect(module_items_published_icon_state?(published: true)).to be true
+      end
+    end
+
+    context "module item deletion" do
+      it "focuses on the next item when a module item is deleted" do
+        go_to_modules
+        module_header_expand_toggles.last.click
+        wait_for_ajaximations
+
+        first_module_item = @module3.content_tags[0]
+        second_module_item = @module3.content_tags[1]
+
+        manage_module_item_button(first_module_item.id).click
+        module_item_action_menu_link("Remove").click
+
+        alert = driver.switch_to.alert
+        expect(alert).not_to be_nil
+        alert.accept
+
+        wait_for_ajaximations
+        expect(module_item_title_by_id(second_module_item.id)).to eq(driver.switch_to.active_element)
       end
     end
   end

@@ -4772,7 +4772,7 @@ describe "Submissions API", type: :request do
       },
       { comment: { text_comment: "a comment!" } }
     )
-    expect(submission.submission_comments.order("id DESC").first).to be_hidden
+    expect(submission.submission_comments.order(id: :desc).first).to be_hidden
   end
 
   it "does not hide comments when the submission is already posted" do
@@ -4797,7 +4797,7 @@ describe "Submissions API", type: :request do
       },
       { comment: { text_comment: "a comment!" } }
     )
-    expect(submission.submission_comments.order("id DESC").first).not_to be_hidden
+    expect(submission.submission_comments.order(id: :desc).first).not_to be_hidden
   end
 
   it "does not hide student comments on muted assignments" do
@@ -4817,7 +4817,7 @@ describe "Submissions API", type: :request do
                assignment_id: assignment.to_param,
                user_id: student.to_param },
              { comment: { text_comment: "hidden comment" } })
-    expect(submission.submission_comments.order("id DESC").first).not_to be_hidden
+    expect(submission.submission_comments.order(id: :desc).first).not_to be_hidden
   end
 
   it "allows submitting points" do
@@ -6824,7 +6824,7 @@ describe "Submissions API", type: :request do
 
       json = api_call_as_user(@teacher, :get, @path + "?sort=name&order=asc", @params.merge(sort: "name", order: "asc"))
 
-      display_names = json.map { |student| student["display_name"] }
+      display_names = json.pluck("display_name")
 
       expect(display_names).to start_with("Alice Anderson", "Bob Brown", "Charlie Clark")
     end
@@ -6835,7 +6835,7 @@ describe "Submissions API", type: :request do
 
       json = api_call_as_user(@teacher, :get, @path + "?sort=name&order=desc", @params.merge(sort: "name", order: "desc"))
 
-      display_names = json.map { |student| student["display_name"] }
+      display_names = json.pluck("display_name")
 
       expect(display_names.last(2)).to eq(["Bob Brown", "Alice Anderson"])
     end
@@ -6846,7 +6846,7 @@ describe "Submissions API", type: :request do
 
       json_default = api_call_as_user(@teacher, :get, @path, @params)
 
-      student_ids = json_default.map { |s| s["id"] }
+      student_ids = json_default.pluck("id")
       expect(student_ids).to eq(student_ids.sort)
     end
 

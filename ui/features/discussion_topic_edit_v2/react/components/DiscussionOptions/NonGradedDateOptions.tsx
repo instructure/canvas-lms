@@ -24,6 +24,10 @@ import {DateTimeInput} from '@instructure/ui-date-time-input'
 
 import {validateAvailability} from '../../util/formValidation'
 import {Button} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
+import {Alert} from '@instructure/ui-alerts'
+import {View} from '@instructure/ui-view'
+import {InstUISettingsProvider} from '@instructure/emotion'
 
 const I18n = createI18nScope('discussion_create')
 
@@ -68,97 +72,142 @@ export const NonGradedDateOptions = ({
 
   return (
     <FormFieldGroup description="" width={inputWidth}>
-      <DateTimeInput
-        timezone={ENV.TIMEZONE}
-        description={I18n.t('Available from')}
-        dateRenderLabel={I18n.t('Date')}
-        timeRenderLabel={I18n.t('Time')}
-        prevMonthLabel={I18n.t('previous')}
-        nextMonthLabel={I18n.t('next')}
-        value={availableFrom}
-        onChange={(_event, newAvailableFrom = '') => {
-          if (newAvailableFrom === '') {
-            // @ts-expect-error
-            newAvailableFrom = null
-          }
-          validateAvailability(
-            newAvailableFrom,
-            availableUntil,
-            isGraded,
-            setAvailabilityValidationMessages,
-          )
-          // @ts-expect-error
-          setAvailableFrom(newAvailableFrom)
-        }}
-        datePlaceholder={I18n.t('Select Date')}
-        invalidDateTimeMessage={I18n.t('Invalid date and time')}
-        layout="columns"
-        allowNonStepInput={true}
-        dateInputRef={ref => {
-          setAvailableFromDateRef(ref)
-          setDateInputRef(ref)
-        }}
-        timeInputRef={ref => {
-          setAvailableFromTimeRef(ref)
-        }}
-      />
-      <Button
-        type="button"
-        color="secondary"
-        onClick={() => {
-          setAvailableFrom(null)
-        }}
-        aria-label={I18n.t('Reset available from')}
-        data-testid="reset-available-from-button"
-      >
-        {I18n.t('Reset')}
-      </Button>
-      <DateTimeInput
-        timezone={ENV.TIMEZONE}
-        description={I18n.t('Until')}
-        dateRenderLabel={I18n.t('Date')}
-        timeRenderLabel={I18n.t('Time')}
-        prevMonthLabel={I18n.t('Time')}
-        nextMonthLabel={I18n.t('next')}
-        value={availableUntil}
-        onChange={(_event, newAvailableUntil = '') => {
-          if (newAvailableUntil === '') {
-            // @ts-expect-error
-            newAvailableUntil = null
-          }
-          validateAvailability(
-            availableFrom,
-            newAvailableUntil,
-            isGraded,
-            setAvailabilityValidationMessages,
-          )
-          // @ts-expect-error
-          setAvailableUntil(newAvailableUntil)
-        }}
-        datePlaceholder={I18n.t('Select Date')}
-        invalidDateTimeMessage={I18n.t('Invalid date and time')}
-        messages={availabilityValidationMessages}
-        layout="columns"
-        allowNonStepInput={true}
-        dateInputRef={ref => {
-          setAvailableUntilDateRef(ref)
-          setDateInputRef(ref)
-        }}
-        timeInputRef={ref => {
-          setAvailableUntilTimeRef(ref)
-        }}
-      />
-      <Button
-        type="button"
-        color="secondary"
-        onClick={() => {
-          setAvailableUntil(null)
-        }}
-        aria-label={I18n.t('Reset available until')}
-        data-testid="reset-available-until-button"
-      >
-        {I18n.t('Reset')}
-      </Button>
+      <Flex gap="medium" alignItems="start">
+        <Flex.Item shouldGrow={true}>
+          <DateTimeInput
+            timezone={ENV.TIMEZONE}
+            description={I18n.t('Available from')}
+            dateRenderLabel={I18n.t('Date')}
+            timeRenderLabel={I18n.t('Time')}
+            prevMonthLabel={I18n.t('previous')}
+            nextMonthLabel={I18n.t('next')}
+            value={availableFrom}
+            onChange={(_event, newAvailableFrom = '') => {
+              if (newAvailableFrom === '') {
+                // @ts-expect-error
+                newAvailableFrom = null
+              }
+              validateAvailability(
+                newAvailableFrom,
+                availableUntil,
+                isGraded,
+                setAvailabilityValidationMessages,
+              )
+              // @ts-expect-error
+              setAvailableFrom(newAvailableFrom)
+            }}
+            datePlaceholder={I18n.t('Select Date')}
+            invalidDateTimeMessage={I18n.t('Invalid date and time')}
+            layout="columns"
+            allowNonStepInput={true}
+            dateInputRef={ref => {
+              setAvailableFromDateRef(ref)
+              setDateInputRef(ref)
+            }}
+            timeInputRef={ref => {
+              setAvailableFromTimeRef(ref)
+            }}
+          />
+        </Flex.Item>
+        <Flex.Item>
+          <InstUISettingsProvider
+            theme={{
+              componentOverrides: {
+                View: {marginLarge: '62.5px'},
+              },
+            }}
+          >
+            <View as="div" margin="large 0 0 0">
+              <Button
+                type="button"
+                color="secondary"
+                onClick={() => {
+                  setAvailableFrom(null)
+                }}
+                aria-label={I18n.t('Reset available from')}
+                data-testid="reset-available-from-button"
+              >
+                {I18n.t('Reset')}
+              </Button>
+            </View>
+          </InstUISettingsProvider>
+        </Flex.Item>
+      </Flex>
+      {isAnnouncement && availableFrom && !ENV.DISCUSSION_TOPIC?.ATTRIBUTES.course_published && (
+        <View as="div" minWidth="296px" maxWidth="815px">
+          <Alert
+            variant="info"
+            data-testid="schedule-info-alert"
+            variantScreenReaderLabel="Information, "
+          >
+            {I18n.t(
+              'Notifications will only be sent to students who have been enrolled. Please allow time for this process to finish after publishing your course before scheduling this announcement.',
+            )}
+          </Alert>
+        </View>
+      )}
+      <Flex gap="medium" alignItems="start">
+        <Flex.Item shouldGrow={true}>
+          <DateTimeInput
+            timezone={ENV.TIMEZONE}
+            description={I18n.t('Until')}
+            dateRenderLabel={I18n.t('Date')}
+            timeRenderLabel={I18n.t('Time')}
+            prevMonthLabel={I18n.t('Time')}
+            nextMonthLabel={I18n.t('next')}
+            value={availableUntil}
+            onChange={(_event, newAvailableUntil = '') => {
+              if (newAvailableUntil === '') {
+                // @ts-expect-error
+                newAvailableUntil = null
+              }
+              validateAvailability(
+                availableFrom,
+                newAvailableUntil,
+                isGraded,
+                setAvailabilityValidationMessages,
+              )
+              // @ts-expect-error
+              setAvailableUntil(newAvailableUntil)
+            }}
+            datePlaceholder={I18n.t('Select Date')}
+            invalidDateTimeMessage={I18n.t('Invalid date and time')}
+            messages={availabilityValidationMessages}
+            layout="columns"
+            allowNonStepInput={true}
+            dateInputRef={ref => {
+              setAvailableUntilDateRef(ref)
+              setDateInputRef(ref)
+            }}
+            timeInputRef={ref => {
+              setAvailableUntilTimeRef(ref)
+            }}
+          />
+        </Flex.Item>
+        <Flex.Item>
+          <InstUISettingsProvider
+            theme={{
+              componentOverrides: {
+                View: {marginLarge: '62.5px'},
+              },
+            }}
+          >
+            <View as="div" margin="large 0 0 0">
+              <Button
+                type="button"
+                color="secondary"
+                onClick={() => {
+                  setAvailableUntil(null)
+                }}
+                aria-label={I18n.t('Reset available until')}
+                data-testid="reset-available-until-button"
+              >
+                {I18n.t('Reset')}
+              </Button>
+            </View>
+          </InstUISettingsProvider>
+        </Flex.Item>
+      </Flex>
     </FormFieldGroup>
   )
 }

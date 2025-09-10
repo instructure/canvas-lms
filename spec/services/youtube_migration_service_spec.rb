@@ -69,7 +69,7 @@ RSpec.describe YoutubeMigrationService do
   before do
     allow(Lti::ContextToolFinder).to receive(:all_tools_for)
       .with(root_account)
-      .and_return(double(active: double(find_by: studio_tool)))
+      .and_return(class_double(ContextExternalTool, active: class_double(ContextExternalTool, find_by: studio_tool)))
   end
 
   describe "#queue_scan_course_for_embeds" do
@@ -80,6 +80,16 @@ RSpec.describe YoutubeMigrationService do
       progress = Progress.last
       expect(progress.tag).to eq("youtube_embed_scan")
       expect(progress.context).to eq(course)
+    end
+
+    it "uses n_strand for job processing" do
+      expect_any_instance_of(Progress).to receive(:process_job) do |_progress, klass, method, opts|
+        expect(klass).to eq(described_class)
+        expect(method).to eq(:scan)
+        expect(opts[:n_strand]).to eq("youtube_embed_scan_#{course.global_id}")
+      end
+
+      described_class.queue_scan_course_for_embeds(course)
     end
 
     it "returns existing progress if one is already running" do
@@ -139,7 +149,17 @@ RSpec.describe YoutubeMigrationService do
       Progress.create!(
         tag: "youtube_embed_scan",
         context: course,
-        workflow_state: "completed"
+        workflow_state: "completed",
+        results: {
+          resources: {
+            "WikiPage|#{wiki_page.id}" => {
+              name: "Test Page",
+              embeds: [youtube_embed],
+              count: 1
+            }
+          },
+          total_count: 1
+        }
       )
     end
 
@@ -181,6 +201,226 @@ RSpec.describe YoutubeMigrationService do
         end
 
         service.convert_embed(scan_progress.id, youtube_embed)
+      end
+    end
+
+    it "uses n_strand for job processing" do
+      expect_any_instance_of(Progress).to receive(:process_job) do |_progress, klass, method, opts, *_args|
+        expect(klass).to eq(YoutubeMigrationService)
+        expect(method).to eq(:perform_conversion)
+        expect(opts[:n_strand]).to match(/youtube_embed_convert_/)
+      end
+
+      service.convert_embed(scan_progress.id, youtube_embed)
+    end
+
+    context "validation errors" do
+      it "raises error when scan does not exist" do
+        expect { service.convert_embed(999_999, youtube_embed) }
+          .to raise_error(YoutubeMigrationService::EmbedNotFoundError, /Scan not found/)
+      end
+
+      it "raises error when embed does not exist in scan" do
+        non_existent_embed = youtube_embed.merge(src: "https://www.youtube.com/embed/nonexistent")
+        expect { service.convert_embed(scan_progress.id, non_existent_embed) }
+          .to raise_error(YoutubeMigrationService::EmbedNotFoundError, /Embed not found in scan/)
+      end
+
+      it "raises error for unsupported resource type" do
+        invalid_embed = youtube_embed.merge(resource_type: "UnsupportedResource")
+        expect { service.convert_embed(scan_progress.id, invalid_embed) }
+          .to raise_error(YoutubeMigrationService::UnsupportedResourceTypeError, /Unsupported resource type/)
+      end
+
+      it "raises error for invalid resource group key" do
+        invalid_embed = youtube_embed.merge(resource_group_key: "invalid_key")
+        expect { service.convert_embed(scan_progress.id, invalid_embed) }
+          .to raise_error(YoutubeMigrationService::UnsupportedResourceTypeError, /Invalid resource group key/)
+      end
+
+      it "raises error when resource does not exist" do
+        non_existent_embed = youtube_embed.merge(id: 999_999)
+        scan_progress.update!(
+          results: {
+            resources: {
+              "WikiPage|999_999" => {
+                name: "Non-existent Page",
+                embeds: [non_existent_embed],
+                count: 1
+              }
+            },
+            total_count: 1
+          }
+        )
+        expect { service.convert_embed(scan_progress.id, non_existent_embed) }
+          .to raise_error(YoutubeMigrationService::EmbedNotFoundError, /Resource not found/)
+      end
+    end
+  end
+
+  describe "validation methods" do
+    let(:scan_progress) do
+      Progress.create!(
+        tag: "youtube_embed_scan",
+        context: course,
+        workflow_state: "completed",
+        results: {
+          resources: {
+            "WikiPage|#{wiki_page.id}" => {
+              name: "Test Page",
+              embeds: [youtube_embed],
+              count: 1
+            }
+          },
+          total_count: 1
+        }
+      )
+    end
+
+    describe "#validate_scan_exists!" do
+      it "returns scan when it exists" do
+        result = service.validate_scan_exists!(scan_progress.id)
+        expect(result).to eq(scan_progress)
+      end
+
+      it "raises error when scan does not exist" do
+        expect { service.validate_scan_exists!(999_999) }
+          .to raise_error(YoutubeMigrationService::EmbedNotFoundError, /Scan not found/)
+      end
+    end
+
+    describe "#validate_embed_exists_in_scan!" do
+      it "passes when embed exists in scan" do
+        expect { service.validate_embed_exists_in_scan!(scan_progress.id, youtube_embed) }
+          .not_to raise_error
+      end
+
+      it "raises error when embed not in scan" do
+        different_embed = youtube_embed.merge(src: "https://www.youtube.com/embed/different")
+        expect { service.validate_embed_exists_in_scan!(scan_progress.id, different_embed) }
+          .to raise_error(YoutubeMigrationService::EmbedNotFoundError, /Embed not found in scan/)
+      end
+
+      it "returns early when scan has no results" do
+        empty_scan = Progress.create!(tag: "youtube_embed_scan", context: course, results: {})
+        expect { service.validate_embed_exists_in_scan!(empty_scan.id, youtube_embed) }
+          .not_to raise_error
+      end
+    end
+
+    describe "#validate_supported_resource!" do
+      it "passes for supported resource types" do
+        YoutubeMigrationService::SUPPORTED_RESOURCES.each do |resource_type|
+          expect { service.validate_supported_resource!(resource_type) }
+            .not_to raise_error
+        end
+      end
+
+      it "raises error for unsupported resource type" do
+        expect { service.validate_supported_resource!("InvalidResource") }
+          .to raise_error(YoutubeMigrationService::UnsupportedResourceTypeError, /Unsupported resource type/)
+      end
+    end
+
+    describe "#validate_resource_group_key!" do
+      it "passes for valid resource group key" do
+        expect { service.validate_resource_group_key!("WikiPage|123") }
+          .not_to raise_error
+      end
+
+      it "raises error for key without pipe separator" do
+        expect { service.validate_resource_group_key!("InvalidKey") }
+          .to raise_error(YoutubeMigrationService::UnsupportedResourceTypeError, /Invalid resource group key/)
+      end
+
+      it "raises error for key with empty parts" do
+        expect { service.validate_resource_group_key!("|123") }
+          .to raise_error(YoutubeMigrationService::UnsupportedResourceTypeError, /Invalid resource group key/)
+        expect { service.validate_resource_group_key!("WikiPage|") }
+          .to raise_error(YoutubeMigrationService::UnsupportedResourceTypeError, /Invalid resource group key/)
+      end
+
+      it "raises error for nil key" do
+        expect { service.validate_resource_group_key!(nil) }
+          .to raise_error(YoutubeMigrationService::UnsupportedResourceTypeError, /Invalid resource group key/)
+      end
+    end
+
+    describe "#validate_resource_exists!" do
+      it "passes when WikiPage exists" do
+        expect { service.validate_resource_exists!("WikiPage", wiki_page.id) }
+          .not_to raise_error
+      end
+
+      it "passes when Assignment exists" do
+        assignment = assignment_model(course:)
+        expect { service.validate_resource_exists!("Assignment", assignment.id) }
+          .not_to raise_error
+      end
+
+      it "passes when DiscussionTopic exists" do
+        topic = discussion_topic_model(context: course)
+        expect { service.validate_resource_exists!("DiscussionTopic", topic.id) }
+          .not_to raise_error
+      end
+
+      it "passes when Announcement exists" do
+        announcement = announcement_model(context: course)
+        expect { service.validate_resource_exists!("Announcement", announcement.id) }
+          .not_to raise_error
+      end
+
+      it "passes when DiscussionEntry exists" do
+        topic = discussion_topic_model(context: course)
+        entry = topic.discussion_entries.create!(message: "Test", user: user_model)
+        expect { service.validate_resource_exists!("DiscussionEntry", entry.id) }
+          .not_to raise_error
+      end
+
+      it "passes when CalendarEvent exists" do
+        event = course.calendar_events.create!(title: "Event", start_at: Time.zone.now)
+        expect { service.validate_resource_exists!("CalendarEvent", event.id) }
+          .not_to raise_error
+      end
+
+      it "passes when Quiz exists" do
+        quiz = course.quizzes.create!(title: "Quiz")
+        expect { service.validate_resource_exists!("Quizzes::Quiz", quiz.id) }
+          .not_to raise_error
+      end
+
+      it "passes when QuizQuestion exists" do
+        quiz = course.quizzes.create!(title: "Quiz")
+        question = quiz.quiz_questions.create!(question_data: { question_text: "Question" })
+        expect { service.validate_resource_exists!("Quizzes::QuizQuestion", question.id) }
+          .not_to raise_error
+      end
+
+      it "passes when AssessmentQuestion exists" do
+        bank = course.assessment_question_banks.create!(title: "Bank")
+        question = bank.assessment_questions.create!(question_data: { question_text: "Question" })
+        expect { service.validate_resource_exists!("AssessmentQuestion", question.id) }
+          .not_to raise_error
+      end
+
+      it "passes for CourseSyllabus when course id matches" do
+        expect { service.validate_resource_exists!("CourseSyllabus", course.id) }
+          .not_to raise_error
+      end
+
+      it "raises error for CourseSyllabus when course id does not match" do
+        expect { service.validate_resource_exists!("CourseSyllabus", 999_999) }
+          .to raise_error(YoutubeMigrationService::ResourceNotFoundError, /Course not found/)
+      end
+
+      it "raises error when resource does not exist" do
+        expect { service.validate_resource_exists!("WikiPage", 999_999) }
+          .to raise_error(YoutubeMigrationService::ResourceNotFoundError, /Resource not found/)
+      end
+
+      it "raises error for unhandled resource type" do
+        expect { service.validate_resource_exists!("UnhandledType", 123) }
+          .to raise_error(YoutubeMigrationService::ResourceNotFoundError, /Cannot validate existence/)
       end
     end
   end
@@ -354,7 +594,7 @@ RSpec.describe YoutubeMigrationService do
       expect(resources[aq_key]).to be_present
       expect(resources[aq_key][:name]).to eq("YouTube Question")
       expect(resources[aq_key][:count]).to eq(2)
-      expect(resources[aq_key][:embeds].map { |e| e[:src] }).to include(
+      expect(resources[aq_key][:embeds].pluck(:src)).to include(
         "https://www.youtube.com/embed/test123",
         "https://www.youtube.com/embed/comment456"
       )
@@ -394,7 +634,7 @@ RSpec.describe YoutubeMigrationService do
       quiz_key = "Quizzes::Quiz|#{quiz.id}"
       expect(resources[quiz_key]).to be_present
       expect(resources[quiz_key][:count]).to eq(3) # 1 from description, 2 from question
-      embeds_srcs = resources[quiz_key][:embeds].map { |e| e[:src] }
+      embeds_srcs = resources[quiz_key][:embeds].pluck(:src)
       expect(embeds_srcs).to include(
         "https://www.youtube.com/embed/quizdesc",
         "https://www.youtube.com/embed/quizq123",
@@ -417,7 +657,7 @@ RSpec.describe YoutubeMigrationService do
       topic_key = "DiscussionTopic|#{topic.id}"
       expect(resources[topic_key]).to be_present
       expect(resources[topic_key][:count]).to eq(2) # 1 from topic, 1 from entry
-      embeds_srcs = resources[topic_key][:embeds].map { |e| e[:src] }
+      embeds_srcs = resources[topic_key][:embeds].pluck(:src)
       expect(embeds_srcs).to include(
         "https://www.youtube.com/embed/topic123",
         "https://www.youtube.com/embed/entry456"
@@ -456,7 +696,7 @@ RSpec.describe YoutubeMigrationService do
       announcement_key = "Announcement|#{announcement.id}"
       expect(resources[announcement_key]).to be_present
       expect(resources[announcement_key][:count]).to eq(2) # 1 from announcement, 1 from entry
-      embeds_srcs = resources[announcement_key][:embeds].map { |e| e[:src] }
+      embeds_srcs = resources[announcement_key][:embeds].pluck(:src)
       expect(embeds_srcs).to include(
         "https://www.youtube.com/embed/main_video",
         "https://www.youtube.com/embed/reply_video"
@@ -755,7 +995,7 @@ RSpec.describe YoutubeMigrationService do
     end
   end
 
-  describe "#delete_embed_from_scan" do
+  describe "#mark_embed_as_converted" do
     let(:scan_progress) do
       embed_data = {
         path: youtube_embed[:path],
@@ -782,19 +1022,29 @@ RSpec.describe YoutubeMigrationService do
       )
     end
 
-    it "removes the embed from scan results" do
-      service.delete_embed_from_scan(scan_progress, youtube_embed)
+    it "marks the embed as converted in scan results" do
+      service.mark_embed_as_converted(scan_progress, youtube_embed)
 
       scan_progress.reload
       resource = scan_progress.results[:resources]["WikiPage|#{wiki_page.id}"]
 
-      expect(resource[:count]).to eq(1)
-      expect(resource[:embeds].length).to eq(1)
-      expect(resource[:embeds].first[:src]).to eq("https://www.youtube.com/embed/other")
-      expect(scan_progress.results[:total_count]).to eq(1)
+      expect(resource[:count]).to eq(2)
+      expect(resource[:embeds].length).to eq(2)
+      expect(resource[:converted_count]).to eq(1)
+
+      # Find the converted embed
+      converted_embed = resource[:embeds].find { |e| e[:src] == youtube_embed[:src] }
+      expect(converted_embed[:converted]).to be true
+      expect(converted_embed[:converted_at]).not_to be_nil
+
+      # Other embed remains unchanged
+      other_embed = resource[:embeds].find { |e| e[:src] == "https://www.youtube.com/embed/other" }
+      expect(other_embed[:converted]).to be_nil
+
+      expect(scan_progress.results[:total_converted]).to eq(1)
     end
 
-    it "removes entire resource if no embeds remain" do
+    it "marks all embeds as converted and keeps resource" do
       # Set up scan with only one embed
       embed_data = {
         path: youtube_embed[:path],
@@ -817,17 +1067,41 @@ RSpec.describe YoutubeMigrationService do
         }
       )
 
-      service.delete_embed_from_scan(scan_progress, youtube_embed)
+      service.mark_embed_as_converted(scan_progress, youtube_embed)
 
       scan_progress.reload
-      expect(scan_progress.results[:resources]).to be_empty
-      expect(scan_progress.results[:total_count]).to eq(0)
+      resource = scan_progress.results[:resources]["WikiPage|#{wiki_page.id}"]
+
+      expect(resource).not_to be_nil
+      expect(resource[:count]).to eq(1)
+      expect(resource[:converted_count]).to eq(1)
+      expect(resource[:embeds].first[:converted]).to be true
+      expect(scan_progress.results[:total_converted]).to eq(1)
+    end
+
+    it "decreases total count when embed is converted" do
+      initial_total_count = scan_progress.results[:total_count]
+
+      service.mark_embed_as_converted(scan_progress, youtube_embed)
+
+      scan_progress.reload
+      expect(scan_progress.results[:total_count]).to eq(initial_total_count - 1)
+    end
+
+    it "does not decrease total count when embed is already converted" do
+      service.mark_embed_as_converted(scan_progress, youtube_embed)
+      scan_progress.reload
+      first_count = scan_progress.results[:total_count]
+      service.mark_embed_as_converted(scan_progress, youtube_embed)
+      scan_progress.reload
+
+      expect(scan_progress.results[:total_count]).to eq(first_count)
     end
 
     it "raises error if embed not found" do
       nonexistent_embed = youtube_embed.merge(path: "//iframe[@src='https://www.youtube.com/embed/nonexistent']")
 
-      expect { service.delete_embed_from_scan(scan_progress, nonexistent_embed) }
+      expect { service.mark_embed_as_converted(scan_progress, nonexistent_embed) }
         .to raise_error(YoutubeMigrationService::EmbedNotFoundError)
     end
   end
@@ -966,6 +1240,30 @@ RSpec.describe YoutubeMigrationService do
       it "generates consistent resource key" do
         key = described_class.generate_resource_key("WikiPage", 123)
         expect(key).to eq("WikiPage|123")
+      end
+    end
+
+    describe "JWT token generation with user_uuid" do
+      let(:user) { user_factory(active_all: true) }
+      let(:user_uuid) { user.uuid }
+
+      before do
+        stub_request(:post, "https://arc.instructure.com/api/internal/youtube_embed")
+          .to_return(
+            status: 200,
+            body: studio_api_response.to_json,
+            headers: { "Content-Type" => "application/json" }
+          )
+      end
+
+      it "includes user_uuid in JWT token payload when converting YouTube to Studio" do
+        expect(CanvasSecurity::ServicesJwt).to receive(:generate) do |payload|
+          expect(payload[:sub]).to eq(course.account.uuid)
+          expect(payload[:user_uuid]).to eq(user_uuid)
+          "mock.jwt.token"
+        end
+
+        service.convert_youtube_to_studio(youtube_embed, studio_tool, user_uuid:)
       end
     end
   end

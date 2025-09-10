@@ -24,6 +24,7 @@ class AssessmentQuestion < ActiveRecord::Base
 
   has_many :quiz_questions, class_name: "Quizzes::QuizQuestion"
   has_many :attachments, as: :context, inverse_of: :context
+
   delegate :context, :context_id, :context_type, to: :assessment_question_bank
   attr_accessor :initial_context
 
@@ -53,6 +54,7 @@ class AssessmentQuestion < ActiveRecord::Base
   serialize :question_data
 
   include MasterCourses::CollectionRestrictor
+
   self.collection_owner_association = :assessment_question_bank
   restrict_columns :content, [:name, :question_data]
 
@@ -278,7 +280,7 @@ class AssessmentQuestion < ActiveRecord::Base
       aq.force_version_number(current_versions[aq.id] || 0)
       qq = existing_quiz_questions[aq.id].try(:first)
       if qq
-        qq.update_assessment_question!(aq, quiz_group_id, duplicate_index)
+        qq.update_from_assessment_question!(aq, quiz_group_id, duplicate_index)
       else
         begin
           Quizzes::QuizQuestion.transaction(requires_new: true) do
@@ -288,7 +290,7 @@ class AssessmentQuestion < ActiveRecord::Base
           qq = scope.where(assessment_question_id: aq,
                            quiz_group_id:,
                            duplicate_index:).take!
-          qq.update_assessment_question!(aq, quiz_group_id, duplicate_index)
+          qq.update_from_assessment_question!(aq, quiz_group_id, duplicate_index)
         end
       end
       qq
@@ -303,8 +305,9 @@ class AssessmentQuestion < ActiveRecord::Base
       qq.assessment_question = self
       qq.workflow_state = "generated"
       qq.duplicate_index = duplicate_index
-      Quizzes::QuizQuestion.suspend_callbacks(:validate_blank_questions, :infer_defaults, :update_quiz) do
+      Quizzes::QuizQuestion.suspend_callbacks(:validate_blank_questions, :infer_defaults, :update_quiz, :update_attachment_associations) do
         qq.save!
+        qq.copy_attachment_associations_from(self)
       end
     end
   end

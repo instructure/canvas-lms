@@ -27,6 +27,20 @@ module Types
              required: false
   end
 
+  class DiscussionParticipantFilterInputType < BaseInputObject
+    graphql_name "DiscussionParticipantFilter"
+    argument :is_announcement, Boolean, <<~MD, required: false
+      only return participants for discussions that are announcements (true) or
+      regular discussions (false). If not provided, returns both.
+    MD
+    argument :course_id, ID, <<~MD, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
+      only return participants for discussions in the specified course
+    MD
+    argument :read_state, String, <<~MD, required: false
+      only return participants with specific read state: 'read', 'unread', or 'all' (default)
+    MD
+  end
+
   class UserType < ApplicationObjectType
     #
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -220,6 +234,69 @@ module Types
             enrollment.grants_right?(context[:current_user], context[:session], :read)
         end
       end
+    end
+
+    field :enrollments_connection, EnrollmentType.connection_type, null: true do
+      argument :course_id,
+               ID,
+               "only return enrollments for this course",
+               required: false,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
+      argument :current_only,
+               Boolean,
+               "Whether or not to restrict results to `active` enrollments in `available` courses",
+               required: false
+      argument :exclude_concluded,
+               Boolean,
+               "Whether or not to exclude `completed` enrollments",
+               required: false
+      argument :horizon_courses,
+               Boolean,
+               "Whether or not to include or exclude Canvas Career courses",
+               required: false
+      argument :order_by,
+               [String],
+               "The fields to order the results by",
+               required: false,
+               validates: { all: { inclusion: { in: ALLOWED_ORDER_BY_VALUES } } }
+      argument :sort,
+               EnrollmentsSortInputType,
+               "The sort field and direction for the results. Secondary sort is by section name",
+               required: false
+    end
+    def enrollments_connection(course_id: nil, current_only: false, order_by: [], exclude_concluded: false, horizon_courses: nil, sort: {})
+      # Check basic permission - return empty instead of nil
+      unless object == current_user || object.grants_right?(current_user, session, :read_profile)
+        return Enrollment.none
+      end
+
+      # Start with user's enrollments, but only for courses where current_user has permission
+      enrollments = object.enrollments.joins(:course)
+
+      # If not viewing own enrollments, filter to only courses where current_user has read permissions
+      if object != current_user
+        # For GraphQL connections, we need to filter at SQL level. Use a subquery to find
+        # courses where the current user has enrollments (which grants read permission)
+        # TODO: This may be too restrictive - consider including completed courses where teacher had enrollment
+        permitted_course_ids = current_user.enrollments.select(:course_id)
+        enrollments = enrollments.where(course_id: permitted_course_ids)
+      end
+
+      # Apply filters similar to the loader logic
+      if course_id
+        enrollments = enrollments.where(course_id:)
+      end
+
+      if current_only
+        enrollments = enrollments.where(workflow_state: "active")
+                                 .where(courses: { workflow_state: "available" })
+      end
+
+      if exclude_concluded
+        enrollments = enrollments.where.not(workflow_state: "completed")
+      end
+
+      enrollments.order(:id)
     end
 
     field :notification_preferences_enabled, Boolean, null: false do
@@ -591,6 +668,78 @@ module Types
       end
 
       comments
+    end
+
+    field :discussion_participants_connection, Types::DiscussionParticipantType.connection_type, null: true do
+      description "All discussion topic participants for the user, optionally filtered by announcement status"
+      argument :filter, DiscussionParticipantFilterInputType, required: false
+    end
+    def discussion_participants_connection(filter: {})
+      return unless object == current_user
+
+      # Start with user's discussion topic participants, joining discussion_topic for filtering
+      participants = current_user.discussion_topic_participants
+                                 .joins(:discussion_topic)
+
+      # Filter by announcement status if specified
+      if filter[:is_announcement] == true
+        participants = participants.where(discussion_topics: { type: "Announcement" })
+      elsif filter[:is_announcement] == false
+        participants = participants.where(discussion_topics: { type: ["DiscussionTopic", nil] })
+      end
+
+      # Filter by course if specified
+      if filter[:course_id].present?
+        participants = participants.where(discussion_topics: { context_id: filter[:course_id], context_type: "Course" })
+      end
+
+      # Filter by read state if specified
+      if filter[:read_state] == "read"
+        participants = participants.where(workflow_state: "read")
+      elsif filter[:read_state] == "unread"
+        participants = participants.where(workflow_state: "unread")
+      end
+      # For 'all' or no filter, include both read and unread
+
+      # Apply visibility filtering - only active/unpublished discussions
+      participants = participants.where(
+        discussion_topics: {
+          workflow_state: ["active", "unpublished"]
+        }
+      )
+
+      # Filter to only discussions in courses where user has active enrollment
+      # Use a subquery to avoid loading all enrollment IDs into memory
+      enrollment_subquery = current_user.enrollments
+                                        .active_by_date
+                                        .joins(:course)
+                                        .where(courses: { workflow_state: "available" })
+                                        .select(:course_id)
+
+      participants = participants.where(
+        discussion_topics: {
+          context_id: enrollment_subquery,
+          context_type: "Course"
+        }
+      )
+
+      # Apply time-based filtering for announcements (similar to official announcements page)
+      if filter[:is_announcement] == true
+        current_time = Time.now.utc
+        participants = participants.where(
+          "(discussion_topics.unlock_at IS NULL OR discussion_topics.unlock_at < :current_time) AND
+           (discussion_topics.delayed_post_at IS NULL OR discussion_topics.delayed_post_at < :current_time) AND
+           (discussion_topics.lock_at IS NULL OR discussion_topics.lock_at > :current_time)",
+          current_time:
+        )
+      end
+
+      # Order by discussion topic creation date (newest first) for announcements
+      if filter[:is_announcement] == false
+        participants.order("discussion_topics.id ASC")
+      else
+        participants.order("discussion_topics.created_at DESC")
+      end
     end
 
     field :comment_bank_items_count, Integer, null: true

@@ -317,17 +317,15 @@ describe ProfileController do
     end
 
     it "lets you set visibility on user_services" do
-      @user.user_services.create! service: "skype", service_user_name: "user", service_user_id: "user", visible: true
       @user.user_services.create! service: "diigo", service_user_name: "user", service_user_id: "user", visible: false
 
       put "update_profile",
           params: { user_profile: { bio: "..." },
-                    user_services: { diigo: "1", skype: "false" } },
+                    user_services: { diigo: "1" } },
           format: "json"
       expect(response).to be_successful
 
       @user.reload
-      expect(@user.user_services.where(service: "skype").first.visible?).to be_falsey
       expect(@user.user_services.where(service: "diigo").first.visible?).to be_truthy
     end
 
@@ -444,6 +442,10 @@ describe ProfileController do
       end
     end
 
+    before do
+      allow(LoadAccount).to receive(:default_domain_root_account).and_return(@account)
+    end
+
     context "when rendering the full view" do
       render_views
 
@@ -479,6 +481,7 @@ describe ProfileController do
 
       context "is_default_account" do
         it "should be 'true' if the domain root account is the default" do
+          allow(LoadAccount).to receive(:default_domain_root_account).and_return(Account.default)
           user_session(@user)
 
           get "settings"
@@ -506,14 +509,14 @@ describe ProfileController do
       end
 
       it "sets discussions_reporting to falsey if discussions_reporting is off" do
-        Account.default.disable_feature! :discussions_reporting
+        @account.disable_feature! :discussions_reporting
         user_session(@user)
         get "communication"
         expect(assigns[:js_env][:discussions_reporting]).to be_falsey
       end
 
       it "sets discussions_reporting to truthy if discussions_reporting is on" do
-        Account.default.enable_feature! :discussions_reporting
+        @account.enable_feature! :discussions_reporting
         user_session(@user)
         get "communication"
         expect(assigns[:js_env][:discussions_reporting]).to be_truthy

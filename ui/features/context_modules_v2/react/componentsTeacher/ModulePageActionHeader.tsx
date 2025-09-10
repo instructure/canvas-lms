@@ -18,18 +18,19 @@
 
 import React, {useCallback} from 'react'
 import {queryClient} from '@canvas/query'
-import {handleOpeningModuleUpdateTray} from '../handlers/modulePageActionHandlers'
 import ContextModulesHeader from '@canvas/context-modules/react/ContextModulesHeader'
 import {useContextModule} from '../hooks/useModuleContext'
-import {useModules} from '../hooks/queries/useModules'
 import {MODULE_ITEMS, MODULES} from '../utils/constants'
-import {ModulesPageIconLegend} from './ModulesPageIconLegend'
+import {handleAddModule} from '../handlers/moduleActionHandlers'
+import {ModulesPageLegend} from '../components/ModulesPageLegend'
+import {useModules} from '../hooks/queries/useModules'
 
 interface ModulePageActionHeaderProps {
   onCollapseAll: () => void
   onExpandAll: () => void
   anyModuleExpanded?: boolean
   disabled?: boolean
+  hasModules?: boolean
 }
 
 const ModulePageActionHeader: React.FC<ModulePageActionHeaderProps> = ({
@@ -37,6 +38,7 @@ const ModulePageActionHeader: React.FC<ModulePageActionHeaderProps> = ({
   onExpandAll,
   anyModuleExpanded = true,
   disabled = false,
+  hasModules = false,
 }) => {
   const {courseId} = useContextModule()
   const {data} = useModules(courseId)
@@ -56,14 +58,11 @@ const ModulePageActionHeader: React.FC<ModulePageActionHeaderProps> = ({
     queryClient.invalidateQueries({queryKey: ['MODULE_ITEMS_ALL']})
   }, [courseId])
 
-  const handleAddModule = useCallback(() => {
-    handleOpeningModuleUpdateTray(data, courseId, undefined)
-  }, [data, courseId])
-
   return (
     <ContextModulesHeader
       {...ENV.CONTEXT_MODULES_HEADER_PROPS}
       overrides={{
+        hasModules: hasModules,
         publishMenu: {
           onPublishComplete: handlePublishComplete,
         },
@@ -72,9 +71,12 @@ const ModulePageActionHeader: React.FC<ModulePageActionHeaderProps> = ({
           anyModuleExpanded,
           disabled,
         },
-        handleAddModule: handleAddModule,
+        handleAddModule: () => handleAddModule(courseId, data),
         renderIconLegend: () => (
-          <ModulesPageIconLegend is_blueprint_course={!!ENV.MASTER_COURSE_SETTINGS} />
+          <ModulesPageLegend
+            is_student={false}
+            is_blueprint_course={!!ENV.MASTER_COURSE_SETTINGS}
+          />
         ),
       }}
     />

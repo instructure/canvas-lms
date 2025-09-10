@@ -1151,11 +1151,13 @@ class AssignmentsApiController < ApplicationController
 
   # @API Get a single assignment
   # Returns the assignment with the given id.
-  # @argument include[] [String, "submission"|"assignment_visibility"|"overrides"|"observed_users"|"can_edit"|"score_statistics"|"ab_guid"]
+  # @argument include[] [String, "submission"|"assignment_visibility"|"overrides"|"observed_users"|"can_edit"|"score_statistics"|"ab_guid"|"peer_review"]
   #   Associations to include with the assignment. The "assignment_visibility" option
   #   requires that the Differentiated Assignments course feature be turned on. If
   #   "observed_users" is passed, submissions for observed users will also be included.
   #   For "score_statistics" to be included, the "submission" option must also be set.
+  #   The "peer_review" option requires that the Peer Review Allocation and Grading
+  #   course feature be turned on.
   # @argument override_assignment_dates [Boolean]
   #   Apply assignment overrides to the assignment, defaults to true.
   # @argument needs_grading_count_by_section [Boolean]
@@ -1198,6 +1200,7 @@ class AssignmentsApiController < ApplicationController
         include_webhook_info: included_params.include?("webhook_info"),
         include_ab_guid: included_params.include?("ab_guid"),
         include_checkpoints: included_params.include?("checkpoints"),
+        include_peer_review: included_params.include?("peer_review"),
       }
 
       result_json = if use_quiz_json?
@@ -1390,6 +1393,25 @@ class AssignmentsApiController < ApplicationController
   #
   #   Only applies when submission_types includes "student_annotation".
   #
+  # @argument assignment[peer_review][points_possible] [Float]
+  #   The maximum points possible for peer reviews.
+  #
+  # @argument assignment[peer_review][grading_type] ["pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"|"not_graded"]
+  #  The strategy used for grading peer reviews.
+  #  Defaults to "points" if this field is omitted.
+  #
+  # @argument assignment[peer_review][due_at] [DateTime]
+  #   The day/time the peer reviews are due. Must be between the lock dates if there are lock dates.
+  #   Accepts times in ISO 8601 format, e.g. 2025-08-20T12:10:00Z.
+  #
+  # @argument assignment[peer_review][lock_at] [DateTime]
+  #   The day/time the peer reviews are locked after. Must be after the due date if there is a due date.
+  #   Accepts times in ISO 8601 format, e.g. 2025-08-25T12:10:00Z.
+  #
+  # @argument assignment[peer_review][unlock_at] [DateTime]
+  #   The day/time the peer reviews are unlocked. Must be before the due date if there is a due date.
+  #   Accepts times in ISO 8601 format, e.g. 2025-08-15T12:10:00Z.
+  #
   # @returns Assignment
   def create
     @assignment = @context.assignments.build
@@ -1402,7 +1424,12 @@ class AssignmentsApiController < ApplicationController
                                      @current_user,
                                      @context,
                                      calculate_grades: params.delete(:calculate_grades))
-      render_create_or_update_result(result)
+
+      opts = {
+        include_peer_review: @assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
+      }
+
+      render_create_or_update_result(result, opts)
     end
   rescue ActiveRecord::RecordNotUnique => e
     message = if e.message.include?("sis_source_id")
@@ -1602,6 +1629,25 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[force_updated_at] [Boolean]
   #   If true, updated_at will be set even if no changes were made.
   #
+  # @argument assignment[peer_review][points_possible] [Float]
+  #   The maximum points possible for peer reviews.
+  #
+  # @argument assignment[peer_review][grading_type] ["pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"|"not_graded"]
+  #  The strategy used for grading peer reviews.
+  #  Defaults to "points" if this field is omitted.
+  #
+  # @argument assignment[peer_review][due_at] [DateTime]
+  #   The day/time the peer reviews are due. Must be between the lock dates if there are lock dates.
+  #   Accepts times in ISO 8601 format, e.g. 2025-08-20T12:10:00Z.
+  #
+  # @argument assignment[peer_review][lock_at] [DateTime]
+  #   The day/time the peer reviews are locked after. Must be after the due date if there is a due date.
+  #   Accepts times in ISO 8601 format, e.g. 2025-08-25T12:10:00Z.
+  #
+  # @argument assignment[peer_review][unlock_at] [DateTime]
+  #   The day/time the peer reviews are unlocked. Must be before the due date if there is a due date.
+  #   Accepts times in ISO 8601 format, e.g. 2025-08-15T12:10:00Z.
+  #
   # @returns Assignment
   def update
     @assignment = api_find(@context.active_assignments, params[:id])
@@ -1620,6 +1666,8 @@ class AssignmentsApiController < ApplicationController
 
       @assignment.skip_downstream_changes! if params[:skip_downstream_changes].present?
       result = update_api_assignment(@assignment, params.require(:assignment), @current_user, @context, opts)
+
+      opts[:include_peer_review] = @assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
       render_create_or_update_result(result, opts)
     end
   end
@@ -1697,9 +1745,14 @@ class AssignmentsApiController < ApplicationController
     if [:created, :ok].include?(result)
       render json: assignment_json(@assignment, @current_user, session, opts), status: result
     else
-      status = (result == :forbidden) ? :forbidden : :bad_request
-      errors = @assignment.errors.as_json[:errors]
-      errors["published"] = errors.delete(:workflow_state) if errors.key?(:workflow_state)
+      if result == :peer_review_error
+        status = :bad_request
+        errors = I18n.t("Failed to create or update peer review sub assignment")
+      else
+        status = (result == :forbidden) ? :forbidden : :bad_request
+        errors = @assignment.errors.as_json[:errors]
+        errors["published"] = errors.delete(:workflow_state) if errors.key?(:workflow_state)
+      end
       render json: { errors: }, status:
     end
   end

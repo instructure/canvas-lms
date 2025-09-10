@@ -24,7 +24,7 @@ describe Accessibility::ResourceScannerService do
   let(:wiki_page) { wiki_page_model(course:, body: "<ul><li>foo</li></ul>") }
 
   describe "#call" do
-    let(:delay_mock) { double("delay") }
+    let(:delay_mock) { instance_double(described_class) }
 
     before do
       allow(subject).to receive(:delay).and_return(delay_mock)
@@ -85,6 +85,10 @@ describe Accessibility::ResourceScannerService do
   describe "#scan_resource" do
     let!(:scan) { accessibility_resource_scan_model(course:, context: wiki_page, workflow_state: "queued") }
 
+    before do
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+    end
+
     it "updates the scan to in progress" do
       expect_any_instance_of(AccessibilityResourceScan).to receive(:in_progress!)
 
@@ -101,6 +105,29 @@ describe Accessibility::ResourceScannerService do
           subject.scan_resource(scan:)
 
           expect(AccessibilityIssue.for_context(wiki_page)).not_to exist
+        end
+      end
+
+      context "when there are existing issues for the scan" do
+        before do
+          4.times { accessibility_issue_model(accessibility_resource_scan: scan, workflow_state: "active") }
+          3.times { accessibility_issue_model(accessibility_resource_scan: scan, workflow_state: "resolved") }
+          2.times { accessibility_issue_model(accessibility_resource_scan: scan, workflow_state: "dismissed") }
+        end
+
+        it "removes the active issues" do
+          subject.scan_resource(scan:)
+          expect(AccessibilityIssue.for_context(wiki_page).active.count).to be(0)
+        end
+
+        it "keeps the resolved issues" do
+          subject.scan_resource(scan:)
+          expect(AccessibilityIssue.for_context(wiki_page).resolved.count).to be(3)
+        end
+
+        it "keeps the dismissed issues" do
+          subject.scan_resource(scan:)
+          expect(AccessibilityIssue.for_context(wiki_page).dismissed.count).to be(2)
         end
       end
 
@@ -144,6 +171,19 @@ describe Accessibility::ResourceScannerService do
 
         expect(scan.reload.workflow_state).to eq("completed")
       end
+
+      it "logs the correct Datadog metrics for a completed scan" do
+        subject.scan_resource(scan:)
+
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
+          "accessibility.resources_scanned",
+          tags: { course_id: scan.course_id }
+        )
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
+          "accessibility.pages_scanned",
+          tags: { course_id: scan.course_id }
+        )
+      end
     end
 
     context "when the scan fails" do
@@ -161,6 +201,21 @@ describe Accessibility::ResourceScannerService do
         subject.scan_resource(scan:)
 
         expect(scan.reload.error_message).to eq("Failure")
+      end
+
+      it "logs the correct Datadog metrics for a failed scan" do
+        allow(subject).to receive(:scan_resource_for_issues).and_raise(StandardError, "Failure")
+
+        subject.scan_resource(scan:)
+
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
+          "accessibility.resources_scanned",
+          tags: { course_id: scan.course_id }
+        )
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
+          "accessibility.resource_scan_failed",
+          tags: { course_id: scan.course_id, scan_id: scan.id }
+        )
       end
     end
 

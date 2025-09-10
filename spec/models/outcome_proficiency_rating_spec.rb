@@ -43,4 +43,73 @@ describe OutcomeProficiencyRating do
 
     let(:creation_arguments) { [{ description: "A", points: 4, mastery: true, color: "00ff00", outcome_proficiency: proficiency }] }
   end
+
+  describe "rollup calculation integration" do
+    let_once(:account) { account_model }
+    let_once(:course) { course_model(account:) }
+    let(:course_proficiency) { outcome_proficiency_model(course) }
+    let(:account_proficiency) { outcome_proficiency_model(account) }
+
+    describe "#rollup_relevant_changes?" do
+      let(:rating) { OutcomeProficiencyRating.create!(description: "A", points: 4, mastery: true, color: "00ff00", outcome_proficiency: course_proficiency) }
+
+      it "returns true when points change" do
+        rating.update!(points: 3)
+        expect(rating.rollup_relevant_changes?).to be true
+      end
+
+      it "returns true when mastery changes" do
+        rating.update!(mastery: false)
+        expect(rating.rollup_relevant_changes?).to be true
+      end
+
+      it "returns false when other fields change" do
+        rating.update!(description: "New description")
+        expect(rating.rollup_relevant_changes?).to be false
+      end
+    end
+
+    describe "#rollup_calculation" do
+      context "with course context proficiency" do
+        before do
+          Account.site_admin.enable_feature!(:outcomes_rollup_propagation)
+        end
+
+        let(:rating) { OutcomeProficiencyRating.create!(description: "A", points: 4, mastery: true, color: "00ff00", outcome_proficiency: course_proficiency) }
+
+        it "enqueues rollup calculation for the course" do
+          expect(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_course)
+            .with(course_id: course.id)
+
+          rating.update!(points: 3)
+        end
+
+        it "does not enqueue rollup when non-relevant fields change" do
+          expect(Outcomes::StudentOutcomeRollupCalculationService).not_to receive(:calculate_for_course)
+
+          rating.update!(description: "New description")
+        end
+      end
+
+      context "with account context proficiency" do
+        let(:rating) { OutcomeProficiencyRating.create!(description: "A", points: 4, mastery: true, color: "00ff00", outcome_proficiency: account_proficiency) }
+
+        it "does not enqueue rollup calculation for account-level changes" do
+          expect(Outcomes::StudentOutcomeRollupCalculationService).not_to receive(:calculate_for_course)
+
+          rating.update!(points: 3)
+        end
+      end
+
+      context "without outcome proficiency" do
+        let(:rating) { OutcomeProficiencyRating.new(description: "A", points: 4, mastery: true, color: "00ff00") }
+
+        it "does not enqueue rollup calculation when outcome_proficiency is nil" do
+          expect(Outcomes::StudentOutcomeRollupCalculationService).not_to receive(:calculate_for_course)
+
+          rating.rollup_calculation
+        end
+      end
+    end
+  end
 end

@@ -29,7 +29,6 @@ import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.tree'
 import '@canvas/jquery/jquery.instructure_forms' /* ajaxJSONPreparedFiles, getFormData */
-import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* fragmentChange, showIf, /\.log\(/ */
 import '@canvas/util/templateData'
 import '@canvas/media-comments'
@@ -71,7 +70,7 @@ ready(function () {
   // variables for turnitin pledge validation
   const PLEDGE_TYPES = {
     TEXT: 'text_entry',
-    UPLOAD: 'online_upload'
+    UPLOAD: 'online_upload',
   }
   let shouldShowTextPledgeError = false
   let shouldShowUploadPledgeError = false
@@ -90,7 +89,7 @@ ready(function () {
     }
   }
 
-  const getShouldShowPledgeError = (type) => {
+  const getShouldShowPledgeError = type => {
     switch (type) {
       case PLEDGE_TYPES.TEXT:
         return shouldShowTextPledgeError
@@ -139,7 +138,7 @@ ready(function () {
         eulaUrl={eulaUrl}
         pledgeText={pledgeText}
         type={type}
-      />
+      />,
     )
   }
 
@@ -203,7 +202,7 @@ ready(function () {
             setShouldShowUrlError={setShouldShowUrlError}
           />
         </Flex.Item>
-      </Flex>
+      </Flex>,
     )
   }
 
@@ -234,12 +233,13 @@ ready(function () {
     }
   })
 
-  submissionForm.on('change', 'textarea[name="submission[body]"]', function(e) {
-    $('iframe#submission_body_ifr.tox-edit-area__iframe, #submission_body').css({
-      border: '',
-      borderRadius: '',
-    })
-    .removeAttr('aria-label')
+  submissionForm.on('change', 'textarea[name="submission[body]"]', function (e) {
+    $('iframe#submission_body_ifr.tox-edit-area__iframe, #submission_body')
+      .css({
+        border: '',
+        borderRadius: '',
+      })
+      .removeAttr('aria-label')
     errorRoot?.unmount()
     errorRoot = null
   })
@@ -247,7 +247,7 @@ ready(function () {
   const tabList = document.getElementById('submit_assignment_tabs')
   let submitting_online_url_form = false
 
-  const handleTabSelection = (mutationsList) => {
+  const handleTabSelection = mutationsList => {
     mutationsList.forEach(mutation => {
       if (mutation.type === 'attributes' && mutation.attributeName === 'aria-selected') {
         const li = mutation.target
@@ -264,14 +264,14 @@ ready(function () {
     })
   }
 
-  const disableSubmitButton = (form) => {
+  const disableSubmitButton = form => {
     $(form)
       .find("button[type='submit']")
       .text(I18n.t('messages.submitting', 'Submitting...'))
       .prop('disabled', true)
   }
 
-  const reenableSubmitButton = (form) => {
+  const reenableSubmitButton = form => {
     $(form)
       .find('button[type=submit]')
       .text(I18n.t('#button.submit_assignment', 'Submit Assignment'))
@@ -282,8 +282,8 @@ ready(function () {
     submitting_online_url_form = true
     submissionForm.formSubmit({
       formErrors: false,
-      processData: data => ({ ...data, should_redirect_to_assignment: true }),
-      beforeSubmit: (data) => {
+      processData: data => ({...data, should_redirect_to_assignment: true}),
+      beforeSubmit: data => {
         if (data['submission[url]']) {
           submitting = true
           disableSubmitButton(submissionForm)
@@ -292,13 +292,13 @@ ready(function () {
           return false
         }
       },
-      success: (data) => {
+      success: data => {
         const location = data['redirect_url']
         if (location) {
           window.location.href = location
         }
       },
-      error: (_data) => {
+      error: _data => {
         reenableSubmitButton(submissionForm)
         handleOnlineUrlSubmissionError()
       },
@@ -312,28 +312,34 @@ ready(function () {
       const self = this
       const parser = new DOMParser()
 
-      if($(this).is('#submit_online_text_entry_form')){
-        const textPledgeCheckbox = document.querySelector('#turnitin_pledge_container_text_entry [name="turnitin_pledge"]')
+      if ($(this).is('#submit_online_text_entry_form')) {
+        const textPledgeCheckbox = document.querySelector(
+          '#turnitin_pledge_container_text_entry [name="turnitin_pledge"]',
+        )
         const textEntryFormData = $(this).getFormData()
-        const doc = parser.parseFromString(textEntryFormData['submission[body]'], 'text/html');
+        const doc = parser.parseFromString(textEntryFormData['submission[body]'], 'text/html')
         const otherTags = doc.querySelectorAll('*:not(p):not(html):not(head):not(body)')
         const pTags = doc.querySelectorAll('p')
         let error = null
 
-        if(otherTags.length === 0 && ![...pTags].some(p => p.children.length > 0 || p.textContent.trim()))
+        if (
+          otherTags.length === 0 &&
+          ![...pTags].some(p => p.children.length > 0 || p.textContent.trim())
+        )
           error = I18n.t('Text entry must not be empty')
-        else if(textEntryFormData['submission[body]'].includes('data-placeholder-for'))
+        else if (textEntryFormData['submission[body]'].includes('data-placeholder-for'))
           error = I18n.t('File has not finished uploading')
         if (error) {
           $.screenReaderFlashMessage(error)
           const container = $('iframe#submission_body_ifr.tox-edit-area__iframe, #submission_body')
           const errorsContainer = document.getElementById('body_errors')
           if (container) {
-            container.css({
-              border: '1.9px solid red',
-              borderRadius: '3px',
-            })
-            .attr('aria-label', error)
+            container
+              .css({
+                border: '1.9px solid red',
+                borderRadius: '3px',
+              })
+              .attr('aria-label', error)
           }
           setTimeout(() => {
             // changing css property sometimes trigger internal textarea change event
@@ -343,17 +349,19 @@ ready(function () {
             errorRoot = root
             root.render(
               <FormattedErrorMessage
-                message= {I18n.t('%{errorText}',{errorText: error})}
+                message={I18n.t('%{errorText}', {errorText: error})}
                 margin="0 0 xx-small 0"
                 iconMargin="0 xx-small xxx-small 0"
-              />
+              />,
             )
           })
           checkPledgeCheck(textPledgeCheckbox, PLEDGE_TYPES.TEXT)
-          document.querySelectorAll('iframe#submission_body_ifr.tox-edit-area__iframe').forEach(function(iframe) {
-            const iframeBody = iframe.contentWindow.document.querySelector('body')
-            iframeBody.focus()
-          })
+          document
+            .querySelectorAll('iframe#submission_body_ifr.tox-edit-area__iframe')
+            .forEach(function (iframe) {
+              const iframeBody = iframe.contentWindow.document.querySelector('body')
+              iframeBody.focus()
+            })
           return false
         } else {
           if (!checkPledgeCheck(textPledgeCheckbox, PLEDGE_TYPES.TEXT)) return false
@@ -397,7 +405,9 @@ ready(function () {
                   valueNow={event.loaded}
                   meterColor="info"
                   formatScreenReaderValue={({valueNow, valueMax}) =>
-                    I18n.t('%{percent}% complete', {percent: Math.round((valueNow * 100) / valueMax)})
+                    I18n.t('%{percent}% complete', {
+                      percent: Math.round((valueNow * 100) / valueMax),
+                    })
                   }
                 />,
                 mountPoint,
@@ -407,7 +417,9 @@ ready(function () {
         }
 
         const fileDrop = findEmptyFileDrop()
-        const uploadPledgeCheckbox = document.querySelector('#turnitin_pledge_container_online_upload [name="turnitin_pledge"]')
+        const uploadPledgeCheckbox = document.querySelector(
+          '#turnitin_pledge_container_online_upload [name="turnitin_pledge"]',
+        )
         // warn user if they haven't uploaded any files
         if (fileElements.length === 0 && uploadedAttachmentIds === '') {
           setShouldShowFileRequiredError(true)
@@ -454,7 +466,9 @@ ready(function () {
         }
         $.ajaxJSONPreparedFiles.call(this, {
           handle_files(attachments, data) {
-            const ids = (data['submission[attachment_ids]'] || '').split(',').filter(id => id !== '')
+            const ids = (data['submission[attachment_ids]'] || '')
+              .split(',')
+              .filter(id => id !== '')
             for (const idx in attachments) {
               ids.push(attachments[idx].id)
             }
@@ -493,10 +507,10 @@ ready(function () {
 
   if (tabList) {
     const observer = new MutationObserver(handleTabSelection)
-    const config = { attributes: true, subtree: true, attributeFilter: ['aria-selected'] }
+    const config = {attributes: true, subtree: true, attributeFilter: ['aria-selected']}
 
     const tabItems = tabList.querySelectorAll('li')
-    tabItems.forEach((li) => observer.observe(li, config))
+    tabItems.forEach(li => observer.observe(li, config))
 
     window.addEventListener('unload', () => {
       observer.disconnect()
@@ -795,7 +809,9 @@ ready(() => {
       $('#media_media_recording_ready').show()
       $('#media_comment_submit_button').show()
       // Hide the record button
-      const recordMediaButton = document.querySelector('.button-container .record_media_comment_link')
+      const recordMediaButton = document.querySelector(
+        '.button-container .record_media_comment_link',
+      )
       recordMediaButton.style.display = 'none'
       // Show the submit button
       const submitMediaButton = document.getElementById('media_comment_submit_button')

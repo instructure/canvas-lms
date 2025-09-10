@@ -22,9 +22,9 @@ module Api::V1::DeveloperKey
   include Api::V1::Json
 
   DEVELOPER_KEY_JSON_ATTRS = %w[
-    name created_at email user_id user_name icon_url notes workflow_state scopes require_scopes client_credentials_audience
+    name created_at email user_id user_name icon_url notes workflow_state scopes require_scopes client_credentials_audience lti_registration_id
   ].freeze
-  INHERITED_DEVELOPER_KEY_JSON_ATTRS = %w[name created_at icon_url workflow_state].freeze
+  INHERITED_DEVELOPER_KEY_JSON_ATTRS = %w[name created_at icon_url workflow_state lti_registration_id].freeze
 
   def developer_keys_json(keys, user, session, context, inherited: false, include_tool_config: false)
     keys.map { |k| developer_key_json(k, user, session, context, inherited:, include_tool_config:) }

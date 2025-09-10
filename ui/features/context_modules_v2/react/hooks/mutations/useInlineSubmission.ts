@@ -19,6 +19,10 @@ import {submitModuleItem, createNewItem} from '../../handlers/addItemHandlers'
 import {queryClient} from '@canvas/query'
 import {useContextModule} from '../useModuleContext'
 import {MODULE_ITEMS, MODULES} from '../../utils/constants'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {useScope as createI18nScope} from '@canvas/i18n'
+
+const I18n = createI18nScope('context_modules_v2')
 
 export const submitItemData = async (
   courseId: string,
@@ -26,21 +30,17 @@ export const submitItemData = async (
   itemData: Record<string, string | number | string[] | undefined | boolean>,
   onRequestClose?: () => void,
 ) => {
-  try {
-    const response = await submitModuleItem(courseId, moduleId, itemData)
-    if (response) {
-      queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId || '']})
-      queryClient.invalidateQueries({queryKey: ['MODULE_ITEMS_ALL', moduleId || '']})
-      queryClient.invalidateQueries({queryKey: [MODULES, courseId]})
-      onRequestClose?.()
-    }
-  } catch (error) {
-    console.error('Error adding item to module:', error)
-  }
+  const response = await submitModuleItem(courseId, moduleId, itemData)
+  if (!response) showFlashError(I18n.t('Error adding item to module.'))()
+
+  queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId || '']})
+  queryClient.invalidateQueries({queryKey: ['MODULE_ITEMS_ALL', moduleId || '']})
+  queryClient.invalidateQueries({queryKey: [MODULES, courseId]})
+  onRequestClose?.()
 }
 
 export const useInlineSubmission = () => {
-  const {courseId, NEW_QUIZZES_BY_DEFAULT, DEFAULT_POST_TO_SIS} = useContextModule()
+  const {courseId, quizEngine, DEFAULT_POST_TO_SIS} = useContextModule()
 
   return async function ({
     moduleId,
@@ -67,7 +67,7 @@ export const useInlineSubmission = () => {
         courseId,
         newItemName,
         selectedAssignmentGroup,
-        NEW_QUIZZES_BY_DEFAULT,
+        quizEngine,
         DEFAULT_POST_TO_SIS,
       ] as const
 

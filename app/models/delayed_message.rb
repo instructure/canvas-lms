@@ -20,6 +20,7 @@
 
 class DelayedMessage < ActiveRecord::Base
   include NotificationPreloader
+
   belongs_to :notification_policy, inverse_of: :delayed_messages
   belongs_to :notification_policy_override, inverse_of: :delayed_messages
   belongs_to :context, polymorphic:

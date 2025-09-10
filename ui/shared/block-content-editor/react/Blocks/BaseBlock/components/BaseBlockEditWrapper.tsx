@@ -20,14 +20,17 @@ import {PropsWithChildren, useRef} from 'react'
 import {useNode} from '@craftjs/core'
 import {AddButton} from '../../../AddBlock/AddButton'
 import {useBlockContentEditorContext} from '../../../BlockContentEditorContext'
+import {useOpenSettingsTray} from '../../../hooks/useOpenSettingsTray'
 import {useDeleteNode} from '../../../hooks/useDeleteNode'
 import {useDuplicateNode} from '../../../hooks/useDuplicateNode'
+import {useMoveBlock} from '../../../hooks/useMoveBlock'
 import {BaseBlockLayout} from '../layout/BaseBlockLayout'
 import {useSetEditMode} from '../useSetEditMode'
 import {CopyButton} from './CopyButton'
 import {EditButton} from './EditButton'
 import {RemoveButton} from './RemoveButton'
 import {ApplyButton} from './ApplyButton'
+import {MoveButton} from './MoveButton'
 import {BackgroundColorApplier} from './BackgroundColorApplier'
 import {Flex} from '@instructure/ui-flex'
 
@@ -48,10 +51,24 @@ const DuplicateButton = () => {
 }
 
 const EditSettingsButton = () => {
-  const {settingsTray} = useBlockContentEditorContext()
-  const {id} = useNode()
+  const {openSettingsTray} = useOpenSettingsTray()
 
-  return <EditButton onClicked={() => settingsTray.open(id)} />
+  return <EditButton onClicked={openSettingsTray} />
+}
+
+const MoveBlockButton = () => {
+  const {canMoveUp, canMoveDown, moveToTop, moveUp, moveToBottom, moveDown} = useMoveBlock()
+
+  return (
+    <MoveButton
+      canMoveUp={canMoveUp}
+      canMoveDown={canMoveDown}
+      onMoveUp={moveUp}
+      onMoveDown={moveDown}
+      onMoveToTop={moveToTop}
+      onMoveToBottom={moveToBottom}
+    />
+  )
 }
 
 export const BaseBlockEditWrapper = (
@@ -81,6 +98,7 @@ export const BaseBlockEditWrapper = (
             <DuplicateButton key="menu-duplicate-button" />
             <EditSettingsButton key="menu-edit-settings-button" />
             <DeleteButton key="menu-delete-button" />
+            <MoveBlockButton key="menu-move-block-button" />
           </Flex>
         }
       >

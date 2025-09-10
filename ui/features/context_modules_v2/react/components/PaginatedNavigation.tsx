@@ -41,7 +41,13 @@ const PaginatedNavigation: React.FC<PaginatedNavigationProps> = ({
   if (visiblePageInfo.totalPages <= 1) return
 
   return (
-    <View as="div" padding="small 0" textAlign="center" data-testid="pagination-container">
+    <View
+      as="div"
+      padding="medium small"
+      margin="x-small"
+      textAlign="center"
+      data-testid="pagination-container"
+    >
       <Flex as="span" justifyItems="center" alignItems="center">
         <View as="span" display="flex" textAlign="end">
           {isLoading && <Spinner size="x-small" renderTitle="Loading module items..." />}
@@ -49,7 +55,7 @@ const PaginatedNavigation: React.FC<PaginatedNavigationProps> = ({
         <View as="span" display="block" textAlign="center">
           <Pagination
             as="nav"
-            margin="small"
+            margin="x-small"
             variant="compact"
             labelNext={I18n.t('Next page')}
             labelPrev={I18n.t('Previous page')}
@@ -60,7 +66,7 @@ const PaginatedNavigation: React.FC<PaginatedNavigationProps> = ({
           />
         </View>
       </Flex>
-      <View as="div" margin="small 0 0 0" textAlign="center" data-testid="pagination-info-text">
+      <View as="div" textAlign="center" data-testid="pagination-info-text">
         {I18n.t('Showing %{start}-%{end} of %{total} items', {
           start: visiblePageInfo.start,
           end: visiblePageInfo.end,

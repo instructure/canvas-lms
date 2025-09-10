@@ -26,7 +26,7 @@ describe Accessibility::Rule do
     end
 
     it "has values that are subclasses of Accessibility::Rule" do
-      expect(described_class.registry.values).to all(be < Accessibility::Rule)
+      expect(described_class.registry.values).to all(be_a(Accessibility::Rule))
     end
   end
 
@@ -36,7 +36,7 @@ describe Accessibility::Rule do
     end
 
     it "contains only subclasses of Accessibility::Rule" do
-      expect(described_class.pdf_registry).to all(be < Accessibility::Rule)
+      expect(described_class.pdf_registry).to all(be_a(Accessibility::Rule))
     end
   end
 
@@ -44,7 +44,7 @@ describe Accessibility::Rule do
     context "when not overridden" do
       it "raises NotImplementedError" do
         expect do
-          described_class.test(nil)
+          described_class.new.test(nil)
         end.to raise_error(NotImplementedError, "#{described_class} must implement/override test")
       end
     end
@@ -53,7 +53,7 @@ describe Accessibility::Rule do
   describe ".form" do
     context "by default" do
       it "returns an empty hash" do
-        expect(described_class.form(nil)).to eq({})
+        expect(described_class.new.form(nil)).to eq({})
       end
     end
   end
@@ -62,8 +62,16 @@ describe Accessibility::Rule do
     context "when not overridden" do
       it "raises NotImplementedError" do
         expect do
-          described_class.fix!(nil, nil)
+          described_class.new.fix!(nil, nil)
         end.to raise_error(NotImplementedError, "#{described_class} must implement fix")
+      end
+    end
+  end
+
+  describe ".generate_fix" do
+    context "when not overridden" do
+      it "returns nil" do
+        expect(described_class.new.generate_fix(nil)).to be_nil
       end
     end
   end
@@ -72,7 +80,7 @@ describe Accessibility::Rule do
     context "when not overridden" do
       it "raises NotImplementedError" do
         expect do
-          described_class.display_name
+          described_class.new.display_name
         end.to raise_error(NotImplementedError, "#{described_class} must implement display_name")
       end
     end
@@ -82,7 +90,7 @@ describe Accessibility::Rule do
     context "when not overridden" do
       it "raises NotImplementedError" do
         expect do
-          described_class.message
+          described_class.new.message
         end.to raise_error(NotImplementedError, "#{described_class} must implement message")
       end
     end
@@ -92,7 +100,7 @@ describe Accessibility::Rule do
     context "when not overridden" do
       it "raises NotImplementedError" do
         expect do
-          described_class.why
+          described_class.new.why
         end.to raise_error(NotImplementedError, "#{described_class} must implement/override why")
       end
     end

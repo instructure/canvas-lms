@@ -108,6 +108,7 @@ class Role < ActiveRecord::Base
   end
 
   include Workflow
+
   workflow do
     state :active do
       event :deactivate, transitions_to: :inactive

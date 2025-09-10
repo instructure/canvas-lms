@@ -196,6 +196,7 @@ describe Attachment do
 
   context "crocodoc" do
     include HmacHelper
+
     let_once(:user) { user_model }
     let_once(:course) { course_model }
     let_once(:student) do
@@ -866,7 +867,7 @@ describe Attachment do
         Attachment.class_variable_set :@@base_file_removed_uuids, nil if Attachment.class_variable_defined? :@@base_file_removed_uuids
       end
 
-      include_examples "destroy_content_and_replace"
+      it_behaves_like "destroy_content_and_replace"
 
       it "only uploads the replacement file to inst-fs once" do
         instfs_uuid = "1234-abcd"
@@ -942,14 +943,14 @@ describe Attachment do
     end
 
     context "s3 storage" do
-      include_examples "purgatory"
-      include_examples "destroy_content_and_replace"
+      it_behaves_like "purgatory"
+      it_behaves_like "destroy_content_and_replace"
       before { s3_storage! }
     end
 
     context "local storage" do
-      include_examples "purgatory"
-      include_examples "destroy_content_and_replace"
+      it_behaves_like "purgatory"
+      it_behaves_like "destroy_content_and_replace"
       before { local_storage! }
     end
   end
@@ -2882,7 +2883,7 @@ describe Attachment do
           end
         end
 
-        include_examples "non-streaming integrity_check"
+        it_behaves_like "non-streaming integrity_check"
       end
     end
 
@@ -2896,7 +2897,7 @@ describe Attachment do
           allow(@attachment).to receive(:full_filename).and_return(file_fixture("good_data.txt").to_s)
         end
 
-        include_examples "non-streaming integrity_check"
+        it_behaves_like "non-streaming integrity_check"
       end
     end
   end

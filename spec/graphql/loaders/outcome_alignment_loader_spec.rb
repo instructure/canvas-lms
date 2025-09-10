@@ -19,8 +19,11 @@
 #
 
 require_relative "../../outcome_alignments_spec_helper"
+require "feature_flag_helper"
 
 describe Loaders::OutcomeAlignmentLoader do
+  include FeatureFlagHelper
+
   before :once do
     course_model
     outcome_with_rubric
@@ -92,7 +95,7 @@ describe Loaders::OutcomeAlignmentLoader do
   end
 
   it "resolves to nil if improved outcomes management FF is disabled" do
-    @course.account.disable_feature!(:improved_outcomes_management)
+    mock_feature_flag_on_account(:improved_outcomes_management, false)
 
     GraphQL::Batch.batch do
       Loaders::OutcomeAlignmentLoader.for(

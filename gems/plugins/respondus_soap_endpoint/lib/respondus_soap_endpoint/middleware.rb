@@ -51,6 +51,7 @@ module RespondusSoapEndpoint
       remove_method :call # we'll just use soap4r-middleware's
       Bundler.require "respondus_soap_endpoint"
       include Soap4r::Middleware
+
       require "respondus_soap_endpoint"
       setup do
         self.endpoint = Endpoint

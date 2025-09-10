@@ -33,6 +33,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
   resolves_root_account through: :context
 
   include MasterCourses::Restrictor
+
   restrict_columns :content, [:title]
 
   workflow do

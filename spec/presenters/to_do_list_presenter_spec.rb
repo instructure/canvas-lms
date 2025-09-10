@@ -152,7 +152,7 @@ describe "ToDoListPresenter" do
       end
 
       it "returns the correct assignment_path for discussion checkpoints that need submitting" do
-        view_stub = double("view")
+        view_stub = instance_double(ApplicationController)
         allow(view_stub).to receive(:course_assignment_path).and_return("path/to/assignment")
         presenter = ToDoListPresenter.new(view_stub, @user, nil)
         expect(presenter.needs_submitting.last.assignment_path).to eq "path/to/assignment"
@@ -186,7 +186,7 @@ describe "ToDoListPresenter" do
     end
 
     it "returns the assignment path when the assessor has not submitted their assignment" do
-      view_stub = double("view")
+      view_stub = instance_double(ApplicationController)
       @assignment.update({ anonymous_peer_reviews: false })
       presenter = ToDoListPresenter.new(view_stub, reviewer, [course1])
       expect(presenter.needs_reviewing.last.submission_path).to eq "/courses/#{course1.id}/assignments/#{@assignment.id}?reviewee_id=#{reviewee.id}"
@@ -194,7 +194,7 @@ describe "ToDoListPresenter" do
 
     it "returns the submission path when the assessor has submitted their assignment" do
       @assignment.submit_homework(reviewer, body: "you say tomato...")
-      view_stub = double("view")
+      view_stub = instance_double(ApplicationController)
       @assignment.update({ anonymous_peer_reviews: false })
       presenter = ToDoListPresenter.new(view_stub, reviewer, [course1])
       expect(presenter.needs_reviewing.last.submission_path).to eq "/courses/#{course1.id}/assignments/#{@assignment.id}/submissions/#{reviewee.id}"
@@ -221,7 +221,7 @@ describe "ToDoListPresenter" do
       end
 
       it "returns the correct assignment path with reviewee_id for peer reviews" do
-        view_stub = double("view")
+        view_stub = instance_double(ApplicationController)
         course1.assignments.last.update({ anonymous_peer_reviews: false })
         presenter = ToDoListPresenter.new(view_stub, reviewer, [course1])
         expect(presenter.needs_reviewing.last.submission_path).to eq "/courses/#{course1.id}/assignments/#{course1.assignments.last.id}?reviewee_id=#{reviewee.id}"

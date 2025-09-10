@@ -16,33 +16,70 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {BaseBlock, useGetRenderMode} from '../BaseBlock'
-import {useSave} from '../BaseBlock/useSave'
+import {BaseBlockHOC} from '../BaseBlock'
+import {useSave2} from '../BaseBlock/useSave'
 import {ImageBlockSettings} from './ImageBlockSettings'
 import {ImageEdit, ImageView} from '../BlockItems/Image'
 import {ImageData} from '../BlockItems/Image/types'
 import {ImageBlockProps} from './types'
+import {TitleEdit} from '../BlockItems/Title/TitleEdit'
+import {TitleView} from '../BlockItems/Title/TitleView'
+import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
+import {Flex} from '@instructure/ui-flex'
 
 const I18n = createI18nScope('block_content_editor')
 
-const ImageContainer = (props: ImageBlockProps) => {
-  const {isEditMode} = useGetRenderMode()
-  const save = useSave<typeof ImageBlock>()
-  const onImageChange = (data: ImageData) => save(data)
+const ImageBlockView = (props: ImageBlockProps) => {
+  return (
+    <Flex direction="column" gap="mediumSmall">
+      {props.settings.includeBlockTitle && (
+        <TitleView contentColor={props.settings.textColor || ''} title={props.title} />
+      )}
+      <ImageView {...props} />
+    </Flex>
+  )
+}
 
-  return isEditMode ? (
-    <ImageEdit {...props} onImageChange={onImageChange} />
-  ) : (
-    <ImageView {...props} />
+const ImageBlockEditView = (props: ImageBlockProps) => {
+  return (
+    <>
+      {props.settings.includeBlockTitle && (
+        <TitleEditPreview contentColor={props.settings.textColor || ''} title={props.title} />
+      )}
+      <ImageView {...props} />
+    </>
+  )
+}
+
+const ImageBlockEdit = (props: ImageBlockProps) => {
+  const [title, setTitle] = useState(props.title || '')
+  const [imageData, setImageData] = useState<ImageData>(props)
+
+  useSave2(() => ({
+    title,
+    ...imageData,
+  }))
+
+  return (
+    <>
+      {props.settings.includeBlockTitle && <TitleEdit title={title} onTitleChange={setTitle} />}
+      <ImageEdit {...props} {...imageData} onImageChange={setImageData} />
+    </>
   )
 }
 
 export const ImageBlock = (props: ImageBlockProps) => {
   return (
-    <BaseBlock title={ImageBlock.craft.displayName} statefulProps={{}}>
-      <ImageContainer {...props} />
-    </BaseBlock>
+    <BaseBlockHOC
+      ViewComponent={ImageBlockView}
+      EditComponent={ImageBlockEdit}
+      EditViewComponent={ImageBlockEditView}
+      componentProps={props}
+      title={ImageBlock.craft.displayName}
+      backgroundColor={props.settings.backgroundColor}
+    />
   )
 }
 

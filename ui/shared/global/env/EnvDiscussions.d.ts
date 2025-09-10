@@ -21,4 +21,5 @@ export interface EnvDiscussions {
   DISCUSSION_TOPIC: {
     ATTRIBUTES: Record<string, any>
   }
+  discussion_pin_post: string
 }

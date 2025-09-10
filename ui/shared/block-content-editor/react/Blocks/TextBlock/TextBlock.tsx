@@ -16,55 +16,73 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useEffect, useState} from 'react'
+import {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {TextBlockEdit} from './TextBlockEdit'
-import {TextBlockEditPreview} from './TextBlockEditPreview'
 import {TextBlockSettings} from './TextBlockSettings'
-import {BaseBlock, useGetRenderMode} from '../BaseBlock'
-import {useSave} from '../BaseBlock/useSave'
+import {BaseBlockHOC} from '../BaseBlock'
+import {useSave2} from '../BaseBlock/useSave'
 import {TextBlockProps} from './types'
-
-export const TextBlockContent = (props: TextBlockProps) => {
-  const {isEditMode, isEditPreviewMode} = useGetRenderMode()
-  const save = useSave<typeof TextBlock>()
-
-  const [title, setTitle] = useState(props.title)
-  const [content, setContent] = useState(props.content)
-
-  useEffect(() => {
-    if (isEditPreviewMode) {
-      save({
-        title,
-        content,
-      })
-    }
-  }, [isEditPreviewMode, title, content, save])
-
-  return isEditMode ? (
-    <TextBlockEdit
-      title={title}
-      content={content}
-      settings={props.settings}
-      onTitleChange={(newTitle: string) => setTitle(newTitle)}
-      onContentChange={(newContent: string) => setContent(newContent)}
-    />
-  ) : (
-    <TextBlockEditPreview title={title} content={content} settings={props.settings} />
-  )
-}
+import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
+import {TextEditPreview} from '../BlockItems/Text/TextEditPreview'
+import {TitleEdit} from '../BlockItems/Title/TitleEdit'
+import {TextEdit} from '../BlockItems/Text/TextEdit'
+import {useFocusElement} from '../../hooks/useFocusElement'
+import {TextBlockLayout} from './TextBlockLayout'
 
 const I18n = createI18nScope('block_content_editor')
 
+const TextBlockView = (props: TextBlockProps) => {
+  return (
+    <TextBlockLayout
+      title={
+        props.settings.includeBlockTitle && (
+          <TitleEditPreview title={props.title} contentColor={props.settings.titleColor} />
+        )
+      }
+      text={<TextEditPreview content={props.content} />}
+    />
+  )
+}
+
+const TextBlockEdit = (props: TextBlockProps) => {
+  const {focusHandler} = useFocusElement()
+  const [title, setTitle] = useState(props.title)
+  const [content, setContent] = useState(props.content)
+
+  useSave2<typeof TextBlock>(() => ({
+    title,
+    content,
+  }))
+
+  return (
+    <TextBlockLayout
+      title={
+        props.settings.includeBlockTitle && (
+          <TitleEdit title={title} onTitleChange={setTitle} focusHandler={focusHandler} />
+        )
+      }
+      text={
+        <TextEdit
+          content={content}
+          onContentChange={setContent}
+          height={300}
+          focusHandler={props.settings.includeBlockTitle && focusHandler}
+        />
+      }
+    />
+  )
+}
+
 export const TextBlock = (props: TextBlockProps) => {
   return (
-    <BaseBlock<typeof TextBlock>
+    <BaseBlockHOC
+      ViewComponent={TextBlockView}
+      EditComponent={TextBlockEdit}
+      EditViewComponent={TextBlockView}
+      componentProps={props}
       title={TextBlock.craft.displayName}
       backgroundColor={props.settings.backgroundColor}
-      statefulProps={{title: props.title, content: props.content}}
-    >
-      <TextBlockContent {...props} />
-    </BaseBlock>
+    />
   )
 }
 

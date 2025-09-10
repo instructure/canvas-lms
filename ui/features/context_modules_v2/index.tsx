@@ -29,12 +29,21 @@ import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {queryClient} from '@canvas/query'
 import {ContextModuleProvider} from './react/hooks/useModuleContext'
+import {handleShortcutKey} from './react/utils/KBNavigator'
+import ObserverOptions from '@canvas/observer-picker'
+import {
+  getHandleChangeObservedUser,
+  autoFocusObserverPicker,
+} from '@canvas/observer-picker/util/pageReloadHelper'
+import {View} from '@instructure/ui-view'
+import ReactDOM from 'react-dom'
 
 const I18n = createI18nScope('context_modules_v2')
 
 ready(() => {
   const ENV = window.ENV as GlobalEnv
   const container = document.getElementById('content')
+  container?.addEventListener('keydown', handleShortcutKey)
 
   if (!ENV.course_id) {
     console.error(I18n.t('Course ID is required'))
@@ -62,6 +71,7 @@ ready(() => {
             isMasterCourse={ENV.MASTER_COURSE_SETTINGS?.IS_MASTER_COURSE ?? false}
             isChildCourse={ENV.MASTER_COURSE_SETTINGS?.IS_CHILD_COURSE ?? false}
             permissions={ENV.MODULES_PERMISSIONS}
+            NEW_QUIZZES_ENABLED={ENV.NEW_QUIZZES_ENABLED}
             NEW_QUIZZES_BY_DEFAULT={ENV.NEW_QUIZZES_BY_DEFAULT}
             DEFAULT_POST_TO_SIS={ENV.DEFAULT_POST_TO_SIS}
             teacherViewEnabled={!!ENV?.MODULE_FEATURES?.TEACHER_MODULE_SELECTION}
@@ -99,5 +109,24 @@ ready(() => {
         </QueryClientProvider>
       </ErrorBoundary>,
     )
+
+    // Mount observer dropdown to the ERB element if available
+    const observerPickerContainer = document.getElementById('observer-picker-mountpoint')
+    if (observerPickerContainer && ENV.OBSERVER_OPTIONS?.OBSERVED_USERS_LIST) {
+      ReactDOM.render(
+        <View as="div" maxWidth="12em">
+          <ObserverOptions
+            autoFocus={autoFocusObserverPicker()}
+            canAddObservee={!!ENV.OBSERVER_OPTIONS?.CAN_ADD_OBSERVEE}
+            currentUserRoles={ENV.current_user_roles}
+            currentUser={ENV.current_user}
+            handleChangeObservedUser={getHandleChangeObservedUser()}
+            observedUsersList={ENV.OBSERVER_OPTIONS?.OBSERVED_USERS_LIST}
+            renderLabel={I18n.t('Select a student to view. The page will refresh automatically.')}
+          />
+        </View>,
+        observerPickerContainer,
+      )
+    }
   }
 })

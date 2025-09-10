@@ -74,6 +74,7 @@ export type GradebookSettings = {
   student_column_display_as: 'last_first' | 'first_last'
   student_column_secondary_info: string
   view_ungraded_as_zero: 'false' | 'true'
+  view_hidden_grades_indicator: 'false' | 'true'
   colors?: StatusColors
 }
 
@@ -201,6 +202,7 @@ export type GradebookViewOptions = {
   hideAssignmentGroupTotals: boolean
   statusColors: StatusColors
   viewUngradedAsZero: boolean
+  viewHiddenGradesIndicator: boolean
 }
 
 export type LatePolicy = {

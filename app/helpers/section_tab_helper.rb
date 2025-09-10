@@ -211,6 +211,8 @@ module SectionTabHelper
         class: a_classes
       }.tap do |h|
         h[:target] = @tab.target if @tab.target?
+        # For security reasons only add the rel attribute if the link is for an external tool and target is "_blank"
+        h["rel"] = "opener" if @tab.target == "_blank" && @tab.path.include?("external_tools")
         if @tab.hide? || @tab.unused?
           h["data-tooltip"] = ""
           h["data-html-tooltip-title"] = a_title

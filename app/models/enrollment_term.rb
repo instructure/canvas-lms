@@ -40,6 +40,7 @@ class EnrollmentTerm < ActiveRecord::Base
   after_save :recompute_course_scores_later, if: :grading_period_group_id_has_changed?
 
   include StickySisFields
+
   are_sis_sticky :name, :start_at, :end_at
 
   def self.ensure_dummy_enrollment_term

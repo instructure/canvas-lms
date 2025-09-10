@@ -37,7 +37,7 @@ describe "BookmarkedCollection" do
           comparison = (pager.include_bookmark ? "id >= ?" : "id > ?")
           scope = scope.where(comparison, bookmark)
         end
-        scope.order("id ASC")
+        scope.order(:id)
       end
     end
   end
@@ -57,7 +57,7 @@ describe "BookmarkedCollection" do
           comparison = (pager.include_bookmark ? "name >= ?" : "name > ?")
           scope = scope.where(comparison, bookmark)
         end
-        scope.order("name ASC")
+        scope.order(:name)
       end
     end
   end

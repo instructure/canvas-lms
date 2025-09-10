@@ -75,6 +75,8 @@
   path: '/api/v1/accounts/:account_id/bounced_communication_channels.csv'
 - verb: POST
   path: '/api/v1/accounts/:account_id/bounced_communication_channels/reset'
+- verb: GET
+  path: '/api/v1/accounts/:account_id/brand_variables'
 - verb: POST
   path: /api/v1/accounts/:account_id/bulk_enrollment
 - verb: GET
@@ -325,6 +327,8 @@
   path: '/api/v1/accounts/:account_id/roles/:id'
 - verb: POST
   path: '/api/v1/accounts/:account_id/roles/:id/activate'
+- verb: GET
+  path: '/api/v1/accounts/:account_id/roles/permissions'
 - verb: GET
   path: '/api/v1/accounts/:account_id/root_outcome_group'
 - verb: GET
@@ -767,6 +771,8 @@
   path: '/api/v1/courses/:course_id/blueprint_templates/:template_id/unsynced_changes'
 - verb: PUT
   path: '/api/v1/courses/:course_id/blueprint_templates/:template_id/update_associations'
+- verb: GET
+  path: '/api/v1/courses/:course_id/brand_variables'
 - verb: GET
   path: '/api/v1/courses/:course_id/bulk_student_enrollments/student_bulk_pace_edit_view'
 - verb: GET

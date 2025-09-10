@@ -28,6 +28,7 @@ class AccountGradingSettingsController < ApplicationController
   before_action :require_user
 
   include HorizonMode
+
   before_action :load_canvas_career, only: [:index]
 
   def index

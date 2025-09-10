@@ -24,6 +24,7 @@ module LtiAdvantage::Claims
   # https://purl.imsglobal.org/spec/lti/claim/activity
   class Eulaservice
     include ActiveModel::Model
+
     attr_accessor :url, :scope
 
     validates_presence_of :url, :scope

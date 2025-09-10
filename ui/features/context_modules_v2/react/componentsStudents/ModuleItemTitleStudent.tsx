@@ -73,7 +73,7 @@ const ModuleItemTitleStudent = ({
     }
 
     return (
-      <View as="div" padding="xx-small">
+      <View as="div" padding="0 xx-small">
         <Link href={url} variant="standalone" onClick={onClick}>
           <Text weight="bold" color="primary" data-testid="module-item-title">
             {title || missingTitleText}

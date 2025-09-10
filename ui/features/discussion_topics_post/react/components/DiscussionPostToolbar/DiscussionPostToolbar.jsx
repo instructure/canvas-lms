@@ -143,6 +143,7 @@ export const DiscussionPostToolbar = props => {
         data-action-state={showTranslationControl ? 'disableTranslation' : 'enableTranslation'}
         renderIcon={showTranslationControl ? <IconXSolid /> : <IconAiColoredSolid />}
         color={showTranslationControl ? 'secondary' : 'ai-secondary'}
+        aria-expanded={showTranslationControl ? I18n.t('Expanded') : I18n.t('Collapsed')}
       >
         {ENV.ai_translation_improvements ? improvedText : text}
       </Button>
@@ -283,17 +284,20 @@ export const DiscussionPostToolbar = props => {
                     </Flex.Item>
                   )}
                   {/* Groups */}
-                  {props.childTopics?.length >= 0 && props.isAdmin && (
-                    <Flex.Item
-                      data-testid="groups-menu-button"
-                      margin={responsiveProps?.groupSelect?.margin}
-                      padding={responsiveProps?.padding}
-                    >
-                      <span className="discussions-post-toolbar-groupsMenu">
-                        <GroupsMenu width="10px" childTopics={props.childTopics} />
-                      </span>
-                    </Flex.Item>
-                  )}
+                  {!window.top.location.href.includes('speed_grader') &&
+                    props.childTopics?.length >= 0 &&
+                    props.canViewGroupPages &&
+                    !ENV.current_user_is_student && (
+                      <Flex.Item
+                        data-testid="groups-menu-button"
+                        margin={responsiveProps?.groupSelect?.margin}
+                        padding={responsiveProps?.padding}
+                      >
+                        <span className="discussions-post-toolbar-groupsMenu">
+                          <GroupsMenu width="10px" childTopics={props.childTopics} />
+                        </span>
+                      </Flex.Item>
+                    )}
                   {translationLanguages.current.length > 0 && !isSpeedGraderInTopUrl && (
                     <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
                       {renderTranslate()}
@@ -446,7 +450,7 @@ export const DiscussionPostToolbar = props => {
 export default DiscussionPostToolbar
 
 DiscussionPostToolbar.propTypes = {
-  isAdmin: PropTypes.bool,
+  canViewGroupPages: PropTypes.bool,
   canEdit: PropTypes.bool,
   isGraded: PropTypes.bool,
   childTopics: PropTypes.arrayOf(ChildTopic.shape),

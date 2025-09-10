@@ -29,22 +29,20 @@ module Interfaces
     field :assigned_to_dates,
           [Types::DateHashType],
           null: true,
-          description: "Standardized date hash visible to current user (when feature flag enabled)"
+          description: "Standardized date hash visible to current user"
 
     def assigned_to_dates
-      return nil unless Account.site_admin.feature_enabled?(:standardize_assignment_date_formatting)
-
       # For graded discussions, use the assignment's dates; for ungraded discussions, return nil
       if object.is_a?(DiscussionTopic)
         return nil unless object.graded?
 
         return Loaders::DatesOverridableLoader.for.load(object.assignment).then do |preloaded_assignment|
-          preloaded_assignment&.dates_hash_visible_to_v2(current_user)
+          preloaded_assignment&.dates_hash_visible_to(current_user)
         end
       end
 
       Loaders::DatesOverridableLoader.for.load(object).then do |preloaded_object|
-        preloaded_object.dates_hash_visible_to_v2(current_user)
+        preloaded_object.dates_hash_visible_to(current_user)
       end
     end
   end

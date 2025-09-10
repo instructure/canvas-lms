@@ -1891,7 +1891,7 @@ describe Submission do
     end
   end
 
-  include_examples "url validation tests"
+  include_context "url validation tests"
   it "checks url validity" do
     test_url_validation(submission_spec_model)
   end
@@ -3425,9 +3425,83 @@ describe Submission do
         expect(submission.originality_report_url(submission.asset_string, test_teacher)).to eq report_url
       end
 
+      context "when a report exists but for a different attempt" do
+        it "finds the report url even when queried with a different attempt number" do
+          first_submission = assignment.submit_homework(test_student, attachments: [attachment])
+          OriginalityReport.create!(attachment:, submission: first_submission, originality_report_url: report_url)
+          second_submission = assignment.submit_homework(test_student, body: "a newer submission")
+          # We are querying the *second* submission (latest version)
+          # but asking for the report for `attachment` while specifying attempt 2.
+          # The report truly belongs to attempt 1, but the method should find it as a fallback.
+          expect(second_submission.originality_report_url(attachment.asset_string, test_teacher, second_submission.attempt)).to eq(report_url)
+        end
+
+        it "finds the report when given no attempt number" do
+          # Create initial submission with report
+          originality_report
+
+          # Create a new attempt
+          Timecop.freeze(1.day.from_now) do
+            assignment.submit_homework(test_student, attachments: [attachment])
+          end
+
+          # Should still find the original report
+          expect(submission.reload.originality_report_url(attachment.asset_string, test_teacher))
+            .to eq(report_url)
+        end
+      end
+
+      context "with different workflow states" do
+        let(:pending_report) do
+          OriginalityReport.create!(attachment:,
+                                    submission:,
+                                    workflow_state: "pending",
+                                    originality_report_url: "http://pending-report.com")
+        end
+
+        let(:error_report) do
+          OriginalityReport.create!(attachment:,
+                                    submission:,
+                                    workflow_state: "error",
+                                    originality_report_url: "http://error-report.com")
+        end
+
+        it "returns URL for pending reports" do
+          pending_report
+          expect(submission.originality_report_url(attachment.asset_string, test_teacher)).to eq("http://pending-report.com")
+        end
+
+        it "returns URL for error reports" do
+          error_report
+          expect(submission.originality_report_url(attachment.asset_string, test_teacher)).to eq("http://error-report.com")
+        end
+
+        it "prefers scored reports over pending reports" do
+          originality_report # scored report
+          pending_report
+          expect(submission.originality_report_url(attachment.asset_string, test_teacher)).to eq(report_url)
+        end
+
+        it "prefers error reports over pending reports when no scored report exists" do
+          error_report
+          pending_report
+          expect(submission.originality_report_url(attachment.asset_string, test_teacher)).to eq("http://error-report.com")
+        end
+      end
+
       it "requires the :grade permission" do
         unauthorized_user = User.new
         expect(submission.originality_report_url(attachment.asset_string, unauthorized_user)).to be_nil
+      end
+
+      it "returns nil when given an invalid asset string" do
+        originality_report
+        expect(submission.originality_report_url("invalid_asset_string", test_teacher)).to be_nil
+      end
+
+      it "returns nil when given an empty asset string" do
+        originality_report
+        expect(submission.originality_report_url("", test_teacher)).to be_nil
       end
 
       context "when there are multiple originality reports" do

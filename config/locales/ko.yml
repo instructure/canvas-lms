@@ -5020,6 +5020,7 @@ ko:
       second: 초
       year: 년
   debugging_f98fcd74: 디버깅
+  decline_7eeb5ff4: 거부
   default_account_quotas_e34112fd: "기본 계정 할당량"
   default_canvas_setting_fa6e6f81: "기본 Canvas 설정"
   default_conference_title: "%{course_name} 회의"
@@ -14164,6 +14165,7 @@ ko:
   unaccepted_students_aa68ea98: "수락하지 않은 학생"
   unarchive_f245e2d6: "보관 해제"
   unauthorized: "권한이 없음"
+  unauthorized_5094f75c: "권한이 없음"
   underline_all_links_description: "링크 밑줄 치기는 탐색 메뉴, 대시보드, 페이지 사이드바에 있는 링크들을 *밑줄 친* 문자열로 표시합니다. 이 기능은  사용자가 서식 있는 내용 편집기에서 생성한 항목 링크들에 적용되는 기능이 아닙니다. 그것들은 모든 사용자에게 항상 밑줄 친 문자열로 표시합니다."
   underline_links_e7cf9b4f: "링크 밑줄 치기"
   ungraded_submissions_count_63fcf6d1: "평가 안 된 제출물 (개수)"

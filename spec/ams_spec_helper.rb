@@ -28,6 +28,7 @@ require "active_record"
 module ActiveModel
   class FakeController
     include Rails.application.routes.url_helpers
+
     def default_url_options
       { host: "example.com" }
     end

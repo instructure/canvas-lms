@@ -20,6 +20,7 @@
 
 class TestApiInstance
   include Api
+
   def initialize(root_account, current_user)
     @domain_root_account = root_account
     @current_user = current_user
@@ -1292,6 +1293,7 @@ describe Api do
     let(:test_controller) do
       Class.new(ApplicationController) do
         include Api
+
         attr_accessor :current_user, :context, :domain_root_account, :include_mobile, :native_app_user_agent
 
         def initialize
@@ -1368,6 +1370,7 @@ describe Api do
       let(:controller_without_mobile) do
         Class.new do
           include Api
+
           attr_accessor :current_user, :context, :domain_root_account
 
           def initialize

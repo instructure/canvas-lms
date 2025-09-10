@@ -27,7 +27,7 @@ class OutcomeProficiency < ApplicationRecord
   end
 
   has_many :outcome_proficiency_ratings,
-           -> { order "points DESC, id ASC" },
+           -> { order points: :desc, id: :asc },
            dependent: :destroy,
            inverse_of: :outcome_proficiency,
            autosave: true

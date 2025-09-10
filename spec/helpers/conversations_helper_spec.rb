@@ -57,6 +57,19 @@ describe ConversationsHelper do
     siteadmin_observer
   end
 
+  describe "normalize_recipients" do
+    it "handles UUID-based recipient identifiers" do
+      result = normalize_recipients(recipients: ["uuid:" + user_student.uuid], current_user: user_teacher)
+      expect(result.map(&:id)).to include(user_student.id)
+    end
+
+    it "preserves non-UUID recipients" do
+      result = normalize_recipients(recipients: [user_student.id.to_s, "uuid:" + user_teacher.uuid], current_user: user_ta)
+      expect(result.map(&:id)).to include(user_student.id)
+      expect(result.map(&:id)).to include(user_teacher.id)
+    end
+  end
+
   describe "inbox_settings_student?" do
     context "returns false for users considered non-students for inbox settings" do
       it "user who is active teacher" do

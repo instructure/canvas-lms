@@ -46,12 +46,12 @@ class AuditEventService
   private
 
   def audit_event_data(data:, role: nil, name_field: :name)
-    data.map do |it|
+    data.map do |datum|
       {
-        id: it.id,
-        name: it.public_send(name_field),
+        id: datum.id,
+        name: datum.public_send(name_field),
         role: role.presence || AnonymousOrModerationEvent.auditing_user_role(
-          user: it, submission: @submission, assignment: @submission.assignment
+          user: datum, submission: @submission, assignment: @submission.assignment
         ),
       }
     end

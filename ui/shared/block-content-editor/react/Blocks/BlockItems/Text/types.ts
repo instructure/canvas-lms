@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {FocusHandler} from '../../../hooks/useFocusElement'
+
 export type TextData = {
   content: string
 }
@@ -29,4 +31,5 @@ export type TextViewProps = TextData & TextColor
 export type TextEditProps = TextData & {
   onContentChange: (content: string) => void
   height: number
+  focusHandler?: FocusHandler | false
 }

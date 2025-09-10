@@ -18,33 +18,12 @@
 
 import {render, screen} from '@testing-library/react'
 import {AddBlock} from '../AddBlock'
-import {BlockContentEditorContextType} from '../../BlockContentEditorContext'
+import {mockBlockContentEditorContext} from '../../__tests__/mockBlockContentEditorContext'
 
 const openMock = jest.fn()
-const closeMock = jest.fn()
-
 jest.mock('../../BlockContentEditorContext', () => ({
   __esModule: true,
-  useBlockContentEditorContext: jest.fn(
-    () =>
-      ({
-        addBlockModal: {
-          isOpen: false,
-          insertAfterNodeId: undefined,
-          open: openMock,
-          close: closeMock,
-        },
-        settingsTray: {
-          isOpen: false,
-          open: jest.fn(),
-          close: jest.fn(),
-        },
-        editor: {
-          mode: 'default',
-          setMode: jest.fn(),
-        },
-      }) as BlockContentEditorContextType,
-  ),
+  useBlockContentEditorContext: jest.fn(() => mockBlockContentEditorContext({openMock})),
 }))
 
 jest.mock('../../hooks/useAddNode', () => ({

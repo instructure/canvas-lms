@@ -24,7 +24,7 @@ RSpec.describe GradeService do
   let(:assignment_text) { "Write an essay about your summer vacation" }
   let(:essay) { "I went to the beach and had a great time..." }
   let(:root_account_uuid) { "mock-root-uuid" }
-  let(:current_user) { double("User") }
+  let(:current_user) { instance_double(User) }
 
   # Sample rubric data with two criteria: Content and Grammar
   let(:rubric_data) do
@@ -426,7 +426,7 @@ RSpec.describe GradeService do
         filtered = service.send(:filter_repeating_keys, json_array)
 
         expect(filtered.length).to eq(2)
-        expect(filtered.map { |item| item["criterion"] }).to match_array(["Meets requirements", "Unique criterion"])
+        expect(filtered.pluck("criterion")).to match_array(["Meets requirements", "Unique criterion"])
       end
 
       it "keeps the first occurrence of duplicate criteria" do

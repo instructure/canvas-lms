@@ -202,7 +202,8 @@ const CourseSelect = props => {
     <Select
       renderLabel={
         <ScreenReaderContent>
-          {props.mainPage ? I18n.t('Filter messages by course') : I18n.t('Select course')}
+          {!props.mainPage && I18n.t('Select course')}
+          {props.mainPage && inputValue === '' && I18n.t('Filter messages by course')}
         </ScreenReaderContent>
       }
       assistiveText={I18n.t('Type or use arrow keys to navigate options')}
@@ -217,12 +218,21 @@ const CourseSelect = props => {
       onRequestSelectOption={handleSelectOption}
       renderAfterInput={
         inputValue !== '' ? (
-          <CloseButton
-            offset="small"
-            data-testid="delete-course-button"
-            screenReaderLabel={I18n.t('Clear Course Selection')}
-            onClick={handleReset}
-          />
+          <>
+            {props.mainPage && (
+              <ScreenReaderContent>
+                {I18n.t('Filtered by %{courseName}', {
+                  courseName: getCourseName(selectedOptionId, props.options),
+                })}
+              </ScreenReaderContent>
+            )}
+            <CloseButton
+              offset="small"
+              data-testid="delete-course-button"
+              screenReaderLabel={I18n.t('Clear Course Selection')}
+              onClick={handleReset}
+            />
+          </>
         ) : null
       }
       messages={props.courseMessages}

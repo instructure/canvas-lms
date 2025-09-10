@@ -23,6 +23,7 @@ describe BroadcastPolicy::InstanceMethods do
   let(:harness_class) do
     Class.new do
       include BroadcastPolicy::InstanceMethods
+
       attr_accessor :attributes, :changed_attributes
 
       def initialize

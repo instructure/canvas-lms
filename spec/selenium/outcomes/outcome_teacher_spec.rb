@@ -18,10 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../helpers/outcome_common"
+require "feature_flag_helper"
 
 describe "outcomes as a teacher" do
   include_context "in-process server selenium tests"
   include OutcomeCommon
+  include FeatureFlagHelper
 
   let(:who_to_login) { "teacher" }
   let(:outcome_url) { "/courses/#{@course.id}/outcomes" }
@@ -33,6 +35,10 @@ describe "outcomes as a teacher" do
     wait_for_ajaximations
     f(".ellipsis[title='Default Account']").click
     wait_for_ajaximations
+  end
+
+  before do
+    mock_feature_flag_on_account(:improved_outcomes_management, false)
   end
 
   context "account level outcomes" do

@@ -19,6 +19,7 @@
 
 class MediaTrack < ActiveRecord::Base
   include MasterCourses::CollectionRestrictor
+
   self.collection_owner_association = :attachment
 
   belongs_to :user

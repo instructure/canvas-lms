@@ -22,6 +22,7 @@
 class Lti::AssetReport < ApplicationRecord
   extend RootAccountResolver
   include Canvas::SoftDeletable
+
   self.ignored_columns += %i[score_given score_maximum]
 
   resolves_root_account through: :asset_processor

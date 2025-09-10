@@ -17,10 +17,12 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import type {QueryClient} from '@tanstack/react-query'
+import type {InfiniteData, QueryClient} from '@tanstack/react-query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {MODULE_ITEMS, MODULES} from '../utils/constants'
+import {handleOpeningModuleUpdateTray} from './modulePageActionHandlers'
+import {ModulesResponse} from '../utils/types'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -99,4 +101,11 @@ export const handleSendTo = (setIsDirectShareOpen: (isOpen: boolean) => void) =>
 
 export const handleCopyTo = (setIsDirectShareCourseOpen: (isOpen: boolean) => void) => {
   setIsDirectShareCourseOpen(true)
+}
+
+export const handleAddModule = (
+  courseId: string,
+  data: InfiniteData<ModulesResponse, unknown> | undefined,
+) => {
+  handleOpeningModuleUpdateTray(data, courseId, undefined)
 }

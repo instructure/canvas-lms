@@ -33,6 +33,7 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Mask, Overlay} from '@instructure/ui-overlays'
 import {Spinner} from '@instructure/ui-spinner'
 import PseudonymModel from '@canvas/pseudonyms/backbone/models/Pseudonym'
+import {assignLocation} from '@canvas/util/globalUtils'
 
 const I18n = createI18nScope('confirm_change_password')
 
@@ -142,7 +143,7 @@ const ConfirmChangePassword = ({
         },
       })
 
-      window.location.href = '/login/canvas?password_changed=1'
+      assignLocation('/login/canvas?password_changed=1')
     } catch (error: any) {
       const isJsonResponse = error?.response?.headers
         ?.get('Content-Type')
@@ -150,7 +151,7 @@ const ConfirmChangePassword = ({
       const errorResponse = isJsonResponse && (await error?.response?.json())
 
       if (errorResponse?.errors?.nonce) {
-        window.location.href = '/login/canvas'
+        assignLocation('/login/canvas')
       } else if (error?.response?.status === 400 && errorResponse) {
         const policy = passwordPoliciesAndPseudonyms[data.id]
           ? passwordPoliciesAndPseudonyms[data.id].policy

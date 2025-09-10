@@ -20,6 +20,7 @@
 module WikiPageVisibility
   class WikiPageVisibilityService
     extend VisibilityHelpers::Common
+
     class << self
       def wiki_pages_visible_to_students(course_ids: nil, user_ids: nil, wiki_page_ids: nil)
         unless course_ids || user_ids || wiki_page_ids

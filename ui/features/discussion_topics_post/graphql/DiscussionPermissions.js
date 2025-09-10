@@ -29,6 +29,7 @@ export const DiscussionPermissions = {
       rate
       read
       readAsAdmin
+      viewGroupPages
       manageCourseContentAdd
       manageCourseContentEdit
       manageCourseContentDelete

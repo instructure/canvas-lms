@@ -525,12 +525,21 @@ class UsersController < ApplicationController
       # things needed only for widget dashboard (students only)
       js_bundle :widget_dashboard
       css_bundle :dashboard_card
+
+      # Set up observer options if user has observer data
+      observed_users_list = observed_users(@current_user, session)
+
       js_env({
                PREFERENCES: {
                  dashboard_view: @current_user.dashboard_view(@domain_root_account),
                  hide_dashcard_color_overlays: @current_user.preferences[:hide_dashcard_color_overlays],
                  custom_colors: @current_user.custom_colors
-               }
+               },
+               OBSERVED_USERS_LIST: observed_users_list,
+               CAN_ADD_OBSERVEE: @current_user
+                                   .profile
+                                   .tabs_available(@current_user, root_account: @domain_root_account)
+                                   .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
              })
       return render html: "", layout: true
     end
@@ -908,7 +917,7 @@ class UsersController < ApplicationController
               else
                 @context.manageable_courses(include_concluded).limit(limit)
               end
-      @courses += scope.select("courses.*,#{Course.best_unicode_collation_key("name")} AS sort_key").order("sort_key").preload(:enrollment_term).to_a
+      @courses += scope.select("courses.*,#{Course.best_unicode_collation_key("name")} AS sort_key").order(:sort_key).preload(:enrollment_term).to_a
     end
 
     @courses = @courses.sort_by do |c|
@@ -951,6 +960,7 @@ class UsersController < ApplicationController
   end
 
   include Api::V1::TodoItem
+
   # @API List the TODO items
   # A paginated list of the current user's list of todo items.
   #
@@ -1333,11 +1343,8 @@ class UsersController < ApplicationController
     user_name = params[:user_service][:user_name]
     password = params[:user_service][:password]
     service = ServiceCredentials.new(user_name, password)
-    case params[:user_service][:service]
-    when "diigo"
+    if params[:user_service][:service] == "diigo"
       Diigo::Connection.diigo_get_bookmarks(service)
-    when "skype"
-      true
     else
       return render json: { errors: true }, status: :bad_request
     end
@@ -1771,7 +1778,16 @@ class UsersController < ApplicationController
     create_user
   end
 
-  BOOLEAN_PREFS = %i[manual_mark_as_read collapse_global_nav collapse_course_nav hide_dashcard_color_overlays release_notes_badge_disabled comment_library_suggestions_enabled elementary_dashboard_disabled default_to_block_editor].freeze
+  BOOLEAN_PREFS = %i[
+    manual_mark_as_read
+    collapse_global_nav
+    collapse_course_nav
+    hide_dashcard_color_overlays
+    release_notes_badge_disabled
+    comment_library_suggestions_enabled
+    elementary_dashboard_disabled
+    default_to_block_editor
+  ].freeze
 
   # @API Update user settings.
   # Update an existing user's settings.
@@ -3009,7 +3025,7 @@ class UsersController < ApplicationController
 
     # find last interactions
     last_comment_dates = SubmissionCommentInteraction.in_course_between(course, teacher.id, ids)
-    last_comment_dates.each do |(user_id, _author_id), date| # rubocop:disable Style/HashEachMethods
+    last_comment_dates.each do |(user_id, _author_id), date|
       next unless (student = data[user_id])
 
       student[:last_interaction] = [student[:last_interaction], date].compact.max
