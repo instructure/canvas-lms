@@ -16,7 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {forwardRef, useContext, useImperativeHandle, useMemo, useState} from 'react'
+import React, {
+  forwardRef,
+  useContext,
+  useImperativeHandle,
+  useMemo,
+  useState,
+  useRef,
+  useEffect,
+} from 'react'
 import CanvasMultiSelect from '@canvas/multi-select/react'
 import {View} from '@instructure/ui-view'
 import {DiscussionManagerUtilityContext} from '../../utils/constants'
@@ -30,6 +38,7 @@ export const TranslationControls = forwardRef((props, ref) => {
     DiscussionManagerUtilityContext,
   )
   const [input, setInput] = useState('')
+  const selectRef = useRef(null)
 
   const handleSelect = selectedArray => {
     const id = selectedArray[0]
@@ -74,6 +83,12 @@ export const TranslationControls = forwardRef((props, ref) => {
     messages.push({type: 'error', text: I18n.t('Already translated into the selected language.')})
   }
 
+  useEffect(() => {
+    if (props.isLanguageNotSelectedError || props.isLanguageAlreadyActiveError) {
+      selectRef.current?.focus()
+    }
+  }, [props.isLanguageNotSelectedError, props.isLanguageAlreadyActiveError])
+
   return (
     <View ref={ref} as="div">
       <CanvasMultiSelect
@@ -87,6 +102,9 @@ export const TranslationControls = forwardRef((props, ref) => {
         onInputChange={e => setInput(e.target.value)}
         placeholder={I18n.t('Select a language...')}
         messages={messages}
+        inputRef={el => {
+          selectRef.current = el
+        }}
       >
         {filteredLanguages.map(({id, name}) => (
           <CanvasMultiSelect.Option

@@ -42,6 +42,7 @@ const TranslationOptions: React.FC<Props> = ({asPrimary, onSetPrimary}) => {
   const languages = useRef<Language[]>(ENV?.inbox_translation_languages ?? [])
   const [input, setInput] = useState('')
   const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(null)
+  const selectRef = useRef<HTMLInputElement | null>(null)
 
   const {
     setTranslationTargetLanguage,
@@ -71,6 +72,7 @@ const TranslationOptions: React.FC<Props> = ({asPrimary, onSetPrimary}) => {
 
     if (!input) {
       setErrorMessages([{type: 'newError', text: I18n.t('Please select a language')}])
+      selectRef.current?.focus()
       return
     }
 
@@ -84,6 +86,7 @@ const TranslationOptions: React.FC<Props> = ({asPrimary, onSetPrimary}) => {
             text: I18n.t('There was an error selecting the language. Please try another language.'),
           },
         ])
+        selectRef.current?.focus()
         return
       }
 
@@ -147,6 +150,9 @@ const TranslationOptions: React.FC<Props> = ({asPrimary, onSetPrimary}) => {
                       inputValue={input}
                       onInputChange={e => setInput(e.target.value)}
                       messages={errorMessages}
+                      inputRef={el => {
+                        selectRef.current = el
+                      }}
                     >
                       {filteredLanguages.map(({id, name}) => (
                         <CanvasMultiSelect.Option
