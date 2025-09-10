@@ -67,10 +67,6 @@ describe('ViewOptionsTabPanel', () => {
         checked: false,
         onChange: jest.fn(),
       },
-      viewHiddenGradesIndicator: {
-        checked: false,
-        onChange: jest.fn(),
-      },
     }
   })
 
@@ -307,32 +303,6 @@ describe('ViewOptionsTabPanel', () => {
         showSeparateFirstLastNames: {allowed: false, checked: true, onChange: () => {}},
       })
       expect(queryByText('Split Student Names')).not.toBeInTheDocument()
-    })
-  })
-
-  describe('.viewHiddenGradesIndicator', () => {
-    it('is checked if .checked is true', () => {
-      const {getByLabelText} = renderPanel({
-        viewHiddenGradesIndicator: {checked: true, onChange: () => {}},
-      })
-      expect(getByLabelText('View hidden grades indicator')).toBeChecked()
-    })
-
-    it('is unchecked if .checked is false', () => {
-      const {getByLabelText} = renderPanel({
-        viewHiddenGradesIndicator: {checked: false, onChange: () => {}},
-      })
-      expect(getByLabelText('View hidden grades indicator')).not.toBeChecked()
-    })
-
-    it('calls .onChange when the user toggles the item', () => {
-      const onChange = jest.fn()
-      const {getByLabelText} = renderPanel({
-        viewHiddenGradesIndicator: {checked: false, onChange},
-      })
-
-      fireEvent.click(getByLabelText('View hidden grades indicator'))
-      expect(onChange).toHaveBeenCalledWith(true)
     })
   })
 
