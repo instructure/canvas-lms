@@ -89,7 +89,7 @@ class Pseudonym < ActiveRecord::Base
             uniqueness: {
               case_sensitive: false,
               scope: %i[account_id workflow_state authentication_provider_id],
-              if: ->(p) { (p.unique_id_changed? || p.workflow_state_changed?) && p.active? }
+              if: ->(p) { !p.unique_id.nil? && (p.unique_id_changed? || p.workflow_state_changed?) && p.active? }
             }
 
   validates :password, confirmation: true, if: :require_password?
