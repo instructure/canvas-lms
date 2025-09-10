@@ -28,6 +28,7 @@ export type ColorPickerWrapperProps = {
   baseColor: string
   onChange: (value: string) => void
   baseColorLabel: string
+  popoverButtonScreenReaderLabel: string
 }
 
 export const ColorPickerWrapper = ({
@@ -36,11 +37,13 @@ export const ColorPickerWrapper = ({
   baseColor,
   baseColorLabel,
   onChange,
+  popoverButtonScreenReaderLabel,
 }: ColorPickerWrapperProps) => {
   return (
     <ColorPicker
       label={label}
       placeholderText={I18n.t('Enter HEX')}
+      popoverButtonScreenReaderLabel={popoverButtonScreenReaderLabel}
       popoverScreenReaderLabel={I18n.t('Color picker popover')}
       value={value}
       onChange={onChange}

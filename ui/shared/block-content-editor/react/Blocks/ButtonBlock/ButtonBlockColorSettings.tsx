@@ -34,6 +34,7 @@ export const ButtonBlockColorSettings = ({
     <Flex direction="column" gap="medium">
       <ColorPickerWrapper
         label={I18n.t('Background color')}
+        popoverButtonScreenReaderLabel={I18n.t('Open background color picker popover')}
         value={backgroundColor}
         baseColor={titleColor}
         baseColorLabel={I18n.t('Title color')}
@@ -43,6 +44,7 @@ export const ButtonBlockColorSettings = ({
       {includeBlockTitle && (
         <ColorPickerWrapper
           label={I18n.t('Title color')}
+          popoverButtonScreenReaderLabel={I18n.t('Open title color picker popover')}
           value={titleColor}
           baseColor={backgroundColor}
           baseColorLabel={I18n.t('Background color')}

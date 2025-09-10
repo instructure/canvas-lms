@@ -172,6 +172,7 @@ export const ImageTextBlockSettings = () => {
         <View as="div" margin="0 0 medium 0">
           <ColorPickerWrapper
             label={I18n.t('Background color')}
+            popoverButtonScreenReaderLabel={I18n.t('Open background color picker popover')}
             value={backgroundColor}
             baseColor={titleColor}
             baseColorLabel={I18n.t('Title color')}
@@ -181,6 +182,7 @@ export const ImageTextBlockSettings = () => {
         <View as="div">
           <ColorPickerWrapper
             label={I18n.t('Title color')}
+            popoverButtonScreenReaderLabel={I18n.t('Open title color picker popover')}
             value={titleColor}
             baseColor={backgroundColor}
             baseColorLabel={I18n.t('Background color')}

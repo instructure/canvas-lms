@@ -96,7 +96,8 @@ export const ButtonBlockIndividualButtonSettings = ({
         </SimpleSelect.Option>
       </SimpleSelect>
       <ColorPickerWrapper
-        label={button.style === 'filled' ? I18n.t('Background color') : I18n.t('Button color')}
+        label={I18n.t('Button color')}
+        popoverButtonScreenReaderLabel={I18n.t('Open button color picker popover')}
         value={button.primaryColor}
         baseColor={button.style === 'filled' ? button.secondaryColor : backgroundColor}
         baseColorLabel={
@@ -107,6 +108,7 @@ export const ButtonBlockIndividualButtonSettings = ({
       {button.style === 'filled' && (
         <ColorPickerWrapper
           label={I18n.t('Text color')}
+          popoverButtonScreenReaderLabel={I18n.t('Open text color picker popover')}
           value={button.secondaryColor}
           baseColor={button.primaryColor}
           baseColorLabel={I18n.t('Background color')}
