@@ -17,24 +17,31 @@
  */
 
 import {useEffect, useState} from 'react'
-import {BlockData, BlockTypes} from '../AddBlock/block-data'
 import {GroupedSelectLayout} from './GroupedSelectLayout'
 import {GroupedSelectEntry} from './GroupedSelectEntry'
 import {useKeyboardNav} from './useKeyboardNav'
 
-export const GroupedSelect = (props: {
-  data: BlockData[]
-  onChange: (id: BlockTypes) => void
-}) => {
-  const [selectedGroup, setSelectedGroup] = useState<string>(props.data[0].groupName)
-  const [selectedItem, setSelectedItem] = useState<BlockTypes>(props.data[0].items[0].id)
+export type GroupedSelectData = {
+  groupName: string
+  items: {
+    itemName: string
+    id: string
+  }[]
+}
 
-  const handleGroupChange = (group: BlockData) => {
+export const GroupedSelect = (props: {
+  data: GroupedSelectData[]
+  onChange: (id: string) => void
+}) => {
+  const [selectedGroup, setSelectedGroup] = useState(props.data[0].groupName)
+  const [selectedItem, setSelectedItem] = useState(props.data[0].items[0].id)
+
+  const handleGroupChange = (group: GroupedSelectData) => {
     setSelectedGroup(group.groupName)
     handleItemChange(group.items[0].id)
   }
 
-  const handleItemChange = (id: BlockTypes) => {
+  const handleItemChange = (id: string) => {
     setSelectedItem(id)
     props.onChange(id)
   }
@@ -44,7 +51,7 @@ export const GroupedSelect = (props: {
     overrideFocus(0, groupIndex)
   }
 
-  const handleItemFocus = (id: BlockTypes) => {
+  const handleItemFocus = (id: string) => {
     const itemIndex =
       props.data
         .find(group => group.groupName === selectedGroup)
