@@ -82,10 +82,12 @@ export const RubricAssessmentContainer = ({
   onSubmit,
   onViewModeChange,
 }: RubricAssessmentContainerProps) => {
-  const [viewModeSelect, setViewModeSelect] = useLocalStorage<ViewMode>(
-    CONSTANTS.RUBRIC_VIEW_MODE_LOCALSTORAGE_KEY(currentUserId),
-    viewModeOverride ?? CONSTANTS.RUBRIC_VIEW_MODE_DEFAULT,
-  )
+  // Temporarily comment this code out for this release
+  // const [viewModeSelect, setViewModeSelect] = useLocalStorage<ViewMode>(
+  //   CONSTANTS.RUBRIC_VIEW_MODE_LOCALSTORAGE_KEY(currentUserId),
+  //   viewModeOverride ?? CONSTANTS.RUBRIC_VIEW_MODE_DEFAULT,
+  // )
+  const [viewModeSelect, setViewModeSelect] = useState<ViewMode>(viewModeOverride ?? 'traditional')
 
   const [rubricAssessmentDraftData, setRubricAssessmentDraftData] = useState<
     RubricAssessmentData[]
