@@ -29,6 +29,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import type {Announcement} from '../../../types'
 import {useToggleAnnouncementReadState} from '../../../hooks/useToggleAnnouncementReadState'
+import {CourseCode} from '../../shared/CourseCode'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -164,9 +165,11 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcement}) => {
 
                 {/* Row 2: Course code */}
                 <Flex.Item>
-                  <Text size="x-small" color="brand" weight="bold">
-                    {announcement.course?.courseCode || I18n.t('Unknown')}
-                  </Text>
+                  <CourseCode
+                    courseId={announcement.course?.id || ''}
+                    overrideCode={announcement.course?.courseCode || I18n.t('Unknown')}
+                    size="x-small"
+                  />
                 </Flex.Item>
 
                 {/* Row 3: Posted date */}
