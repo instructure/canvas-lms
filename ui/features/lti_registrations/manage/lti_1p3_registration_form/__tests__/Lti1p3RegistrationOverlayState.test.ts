@@ -22,8 +22,12 @@ import {
   type Lti1p3RegistrationOverlayStore,
 } from '../../registration_overlay/Lti1p3RegistrationOverlayStore'
 import {type Lti1p3RegistrationOverlayState} from '../../registration_overlay/Lti1p3RegistrationOverlayState'
-import {convertToLtiConfigurationOverlay} from '../../registration_overlay/Lti1p3RegistrationOverlayStateHelpers'
+import {
+  convertToLtiConfigurationOverlay,
+  initialOverlayStateFromInternalConfig,
+} from '../../registration_overlay/Lti1p3RegistrationOverlayStateHelpers'
 import {mockInternalConfiguration} from './helpers'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('Lti1p3RegistrationOverlayState', () => {
   describe('convertToLtiConfigurationOverlay', () => {
@@ -192,6 +196,96 @@ describe('Lti1p3RegistrationOverlayState', () => {
       expect(result.placements?.course_navigation?.default).toBe('disabled')
     })
 
+    describe('when increased_top_nav_pane_size FF is enabled', () => {
+      beforeEach(() => {
+        fakeENV.setup({
+          FEATURES: {
+            increased_top_nav_pane_size: true,
+          },
+        })
+      })
+
+      afterEach(() => {
+        fakeENV.teardown()
+      })
+
+      it('handles topNavigationAllowFullscreen defaults to false', () => {
+        state.getState().togglePlacement('top_navigation')
+        // Don't toggle allow fullscreen - should default to false/undefined
+
+        const {overlay: result} = convertToLtiConfigurationOverlay(
+          state.getState().state,
+          internalConfig,
+        )
+
+        expect(result.placements?.top_navigation?.allow_fullscreen).toBeUndefined()
+        expect(state.getState().state.placements.topNavigationAllowFullscreen).toBeUndefined()
+      })
+
+      it('handles topNavigationAllowFullscreen when explicitly disabled', () => {
+        state.getState().togglePlacement('top_navigation')
+        // Enable then disable to test explicit false state
+        state.getState().toggleTopNavigationAllowFullscreen() // true
+        state.getState().toggleTopNavigationAllowFullscreen() // false
+
+        const {overlay: result} = convertToLtiConfigurationOverlay(
+          state.getState().state,
+          internalConfig,
+        )
+
+        expect(result.placements?.top_navigation?.allow_fullscreen).toBe(false)
+        expect(state.getState().state.placements.topNavigationAllowFullscreen).toBe(false)
+      })
+
+      it('does not include topNavigationAllowFullscreen in overlay when same as internal config default', () => {
+        const configWithTopNav = mockInternalConfiguration({
+          placements: [{placement: 'top_navigation', allow_fullscreen: false}],
+        })
+
+        const testState = createLti1p3RegistrationOverlayStore(configWithTopNav, '')
+        testState.setState(prev => ({...prev, state: emptyState}), true)
+
+        testState.getState().togglePlacement('top_navigation')
+
+        const {overlay: result} = convertToLtiConfigurationOverlay(
+          testState.getState().state,
+          configWithTopNav,
+        )
+
+        expect(result.placements?.top_navigation?.allow_fullscreen).toBeUndefined()
+        expect('allow_fullscreen' in (result.placements?.top_navigation || {})).toBe(false)
+      })
+
+      it('ensures topNavigationAllowFullscreen only affects top_navigation placement', () => {
+        state.getState().togglePlacement('top_navigation')
+        state.getState().togglePlacement('course_navigation')
+        state.getState().togglePlacement('global_navigation')
+
+        state.getState().toggleTopNavigationAllowFullscreen()
+
+        const {overlay: result} = convertToLtiConfigurationOverlay(
+          state.getState().state,
+          internalConfig,
+        )
+
+        expect('allow_fullscreen' in (result.placements?.top_navigation || {})).toBe(true)
+        expect('allow_fullscreen' in (result.placements?.course_navigation || {})).toBe(false)
+        expect('allow_fullscreen' in (result.placements?.global_navigation || {})).toBe(false)
+      })
+
+      it('handles topNavigationAllowFullscreen properly', () => {
+        state.getState().togglePlacement('top_navigation')
+        state.getState().toggleTopNavigationAllowFullscreen()
+
+        const {overlay: result} = convertToLtiConfigurationOverlay(
+          state.getState().state,
+          internalConfig,
+        )
+
+        expect(result.placements?.top_navigation?.allow_fullscreen).toBe(true)
+      })
+    })
+
     it('handles scopes properly', () => {
       state.getState().toggleScope('https://purl.imsglobal.org/spec/lti-ags/scope/lineitem')
 
@@ -257,6 +351,112 @@ describe('Lti1p3RegistrationOverlayState', () => {
 
       expectedNonExistentProperties.forEach(property => {
         expect(Object.hasOwn(result, property as string)).toBeFalsy()
+      })
+    })
+  })
+
+  describe('initialOverlayStateFromInternalConfig', () => {
+    describe('when increased_top_nav_pane_size FF is enabled', () => {
+      beforeEach(() => {
+        fakeENV.setup({
+          FEATURES: {
+            increased_top_nav_pane_size: true,
+          },
+        })
+      })
+
+      afterEach(() => {
+        fakeENV.teardown()
+      })
+
+      it('loads existing configuration with allow_fullscreen: true and sets topNavigationAllowFullscreen to true', () => {
+        const configWithTopNavFullscreen = mockInternalConfiguration({
+          placements: [{placement: 'top_navigation', allow_fullscreen: true}],
+        })
+
+        const initialState = initialOverlayStateFromInternalConfig(configWithTopNavFullscreen)
+        expect(initialState.placements.topNavigationAllowFullscreen).toBe(true)
+      })
+
+      it('loads existing configuration with `allow_fullscreen: false` and sets topNavigationAllowFullscreen to false', () => {
+        const configWithTopNavNoFullscreen = mockInternalConfiguration({
+          placements: [{placement: 'top_navigation', allow_fullscreen: false}],
+        })
+
+        const initialState = initialOverlayStateFromInternalConfig(configWithTopNavNoFullscreen)
+        expect(initialState.placements.topNavigationAllowFullscreen).toBe(false)
+      })
+
+      it('loads existing configuration without allow_fullscreen and sets topNavigationAllowFullscreen to undefined', () => {
+        const configWithTopNavUndefined = mockInternalConfiguration({
+          placements: [{placement: 'top_navigation'}],
+        })
+
+        const initialState = initialOverlayStateFromInternalConfig(configWithTopNavUndefined)
+        expect(initialState.placements.topNavigationAllowFullscreen).toBeUndefined()
+      })
+
+      it('loads existing overlay with `allow_fullscreen: true` and sets topNavigationAllowFullscreen to true', () => {
+        const config = mockInternalConfiguration({
+          placements: [{placement: 'top_navigation'}],
+        })
+
+        const existingOverlay: LtiConfigurationOverlay = {
+          placements: {
+            top_navigation: {
+              allow_fullscreen: true,
+            },
+          },
+        }
+
+        const initialState = initialOverlayStateFromInternalConfig(
+          config,
+          undefined,
+          existingOverlay,
+        )
+        expect(initialState.placements.topNavigationAllowFullscreen).toBe(true)
+      })
+
+      it('loads existing overlay with `allow_fullscreen: false` and sets topNavigationAllowFullscreen to false', () => {
+        const config = mockInternalConfiguration({
+          placements: [{placement: 'top_navigation'}],
+        })
+
+        const existingOverlay: LtiConfigurationOverlay = {
+          placements: {
+            top_navigation: {
+              allow_fullscreen: false,
+            },
+          },
+        }
+
+        const initialState = initialOverlayStateFromInternalConfig(
+          config,
+          undefined,
+          existingOverlay,
+        )
+        expect(initialState.placements.topNavigationAllowFullscreen).toBe(false)
+      })
+
+      it('prioritizes existing overlay over internal config for allow_fullscreen', () => {
+        const configWithTopNavFullscreen = mockInternalConfiguration({
+          placements: [{placement: 'top_navigation', allow_fullscreen: true}],
+        })
+
+        const existingOverlay: LtiConfigurationOverlay = {
+          placements: {
+            top_navigation: {
+              allow_fullscreen: false,
+            },
+          },
+        }
+
+        const initialState = initialOverlayStateFromInternalConfig(
+          configWithTopNavFullscreen,
+          undefined,
+          existingOverlay,
+        )
+        expect(initialState.placements.topNavigationAllowFullscreen).toBe(false)
       })
     })
   })

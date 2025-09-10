@@ -204,5 +204,8 @@ const initialPlacementOverlayStateFromPlacementConfig =
         placementOverlay?.launch_width || placementConfig.launch_width?.toString(),
       ),
       default: toUndefined(placementOverlay?.default || placementConfig.default),
+      allow_fullscreen: toUndefined(
+        placementOverlay?.allow_fullscreen ?? placementConfig.allow_fullscreen,
+      ),
     }
   }
