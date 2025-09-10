@@ -16,18 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useMemo} from 'react'
+import React, {useState, useEffect, useMemo} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {Pagination} from '@instructure/ui-pagination'
 import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import AnnouncementItem from './AnnouncementItem'
-import type {BaseWidgetProps} from '../../../types'
+import type {BaseWidgetProps, Announcement} from '../../../types'
 import {usePaginatedAnnouncements} from '../../../hooks/useAnnouncements'
 import {useSharedCourses} from '../../../hooks/useSharedCourses'
+import {usePagination} from '../../../hooks/usePagination'
 import {COURSE_GRADES_WIDGET} from '../../../constants'
 
 const I18n = createI18nScope('widget_dashboard')
@@ -36,16 +36,24 @@ type FilterOption = 'unread' | 'read' | 'all'
 
 const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
   const [filter, setFilter] = useState<FilterOption>('unread')
-  const [currentPageIndex, setCurrentPageIndex] = useState(0)
 
   const {data, fetchNextPage, hasNextPage, isLoading, error, refetch} = usePaginatedAnnouncements({
-    limit: 3,
+    limit: 4,
     filter,
   })
 
+  const {currentPageIndex, paginationProps, resetPagination} = usePagination({
+    hasNextPage: !!hasNextPage,
+    totalPagesLoaded: data?.pages?.length || 0,
+    fetchNextPage,
+  })
+
+  useEffect(() => {
+    resetPagination()
+  }, [filter, resetPagination])
+
   const handleFilterChange = (newFilter: FilterOption) => {
     setFilter(newFilter)
-    setCurrentPageIndex(0)
   }
 
   const {data: courses = []} = useSharedCourses({
@@ -63,10 +71,12 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
   }, [courses])
 
   const enrichedAnnouncements = useMemo(() => {
-    const currentPageData = data?.pages[currentPageIndex]
+    const currentPageData = data?.pages[currentPageIndex] as
+      | {announcements: Announcement[]}
+      | undefined
     const filteredAnnouncements = currentPageData?.announcements || []
 
-    return filteredAnnouncements.map((announcement): typeof announcement => {
+    return filteredAnnouncements.map(announcement => {
       const courseId = announcement.course?.id
       const course = courseId ? coursesById[courseId] : null
 
@@ -81,25 +91,6 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
       }
     })
   }, [data?.pages, currentPageIndex, coursesById])
-
-  const handlePageChange = async (page: number) => {
-    const targetPageIndex = page - 1
-
-    if (targetPageIndex > currentPageIndex) {
-      // Moving forward - fetch next page if needed
-      if (!data?.pages[targetPageIndex] && hasNextPage) {
-        await fetchNextPage()
-      }
-      setCurrentPageIndex(targetPageIndex)
-    } else if (targetPageIndex < currentPageIndex) {
-      // Moving backward - always have previous pages loaded
-      setCurrentPageIndex(targetPageIndex)
-    }
-  }
-
-  // Calculate total pages: loaded pages + potential next page
-  const totalPages = (data?.pages.length || 1) + (hasNextPage ? 1 : 0)
-  const currentPage = currentPageIndex + 1
 
   const renderFilterSelect = () => (
     <SimpleSelect
@@ -146,23 +137,6 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
         {enrichedAnnouncements.map(announcement => (
           <AnnouncementItem key={announcement.id} announcement={announcement} />
         ))}
-
-        {totalPages > 1 && (
-          <View as="div" margin="small 0 0 0" textAlign="center">
-            <Pagination
-              as="nav"
-              margin="x-small"
-              variant="compact"
-              labelNext={I18n.t('Next')}
-              labelPrev={I18n.t('Previous')}
-              currentPage={currentPage}
-              totalPageNumber={totalPages}
-              onPageChange={handlePageChange}
-              aria-label={I18n.t('Announcements pagination')}
-              data-testid="announcements-pagination"
-            />
-          </View>
-        )}
       </View>
     )
   }
@@ -175,6 +149,10 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
       onRetry={refetch}
       loadingText={I18n.t('Loading announcements...')}
       headerActions={renderFilterSelect()}
+      pagination={{
+        ...paginationProps,
+        ariaLabel: I18n.t('Announcements pagination'),
+      }}
     >
       {renderContent()}
     </TemplateWidget>

@@ -18,12 +18,10 @@
 
 import React, {useState, useMemo} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Avatar} from '@instructure/ui-avatar'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {Pagination} from '@instructure/ui-pagination'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconMessageLine} from '@instructure/ui-icons'
 import TemplateWidget from '../TemplateWidget/TemplateWidget'
@@ -31,6 +29,7 @@ import type {BaseWidgetProps, CourseOption} from '../../../types'
 import {useSharedCourses} from '../../../hooks/useSharedCourses'
 import {useCourseInstructors} from '../../../hooks/useCourseInstructors'
 import {CourseCode} from '../../shared/CourseCode'
+import {usePagination} from '../../../hooks/usePagination'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -67,18 +66,26 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
   }, [selectedCourse])
 
   const {
-    data: instructors = [],
+    data,
+    fetchNextPage,
+    hasNextPage,
     isLoading: instructorsLoading,
     error: instructorsError,
-    hasNextPage,
-    hasPreviousPage,
-    currentPage,
-    totalPages,
-    goToPage,
   } = useCourseInstructors({
     courseIds: instructorCourseIds,
     limit: 5,
   })
+
+  const totalPagesLoaded = data?.pages.length || 0
+
+  const {currentPageIndex, paginationProps} = usePagination({
+    hasNextPage: !!hasNextPage,
+    totalPagesLoaded,
+    fetchNextPage: fetchNextPage,
+  })
+
+  const currentPage = data?.pages[currentPageIndex]
+  const instructors = totalPagesLoaded > 0 ? (currentPage?.data ?? []) : []
 
   const error =
     externalError ||
@@ -95,10 +102,6 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
     }
   }
 
-  const handlePageChange = (pageNumber: number) => {
-    goToPage(pageNumber)
-  }
-
   return (
     <TemplateWidget
       widget={widget}
@@ -106,6 +109,7 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
       error={error}
       onRetry={onRetry}
       loadingText={I18n.t('Loading people data...')}
+      pagination={{...paginationProps, ariaLabel: I18n.t('Instructors pagination')}}
     >
       <Flex direction="column" height="100%">
         <Flex.Item shouldGrow>
@@ -178,21 +182,6 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
             )}
           </View>
         </Flex.Item>
-        {(hasNextPage || hasPreviousPage) && (
-          <Flex.Item shouldShrink>
-            <View as="div" textAlign="center" padding="x-small 0">
-              <Pagination
-                as="nav"
-                margin="x-small"
-                variant="compact"
-                currentPage={currentPage}
-                totalPageNumber={totalPages}
-                onPageChange={handlePageChange}
-                aria-label={I18n.t('Instructors pagination')}
-              />
-            </View>
-          </Flex.Item>
-        )}
       </Flex>
     </TemplateWidget>
   )

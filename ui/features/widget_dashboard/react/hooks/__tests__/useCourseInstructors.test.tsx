@@ -52,56 +52,58 @@ const setup = (hookFn: any) => {
 }
 
 const mockInstructorsResponse = {
-  courseInstructorsConnection: {
-    nodes: [
-      {
-        user: {
-          _id: '101',
-          name: 'Professor Smith',
-          sortableName: 'Smith, Professor',
-          shortName: 'Prof Smith',
-          avatarUrl: 'https://example.com/avatar1.jpg',
-          email: 'prof.smith@example.com',
+  data: {
+    courseInstructorsConnection: {
+      nodes: [
+        {
+          user: {
+            _id: '101',
+            name: 'Professor Smith',
+            sortableName: 'Smith, Professor',
+            shortName: 'Prof Smith',
+            avatarUrl: 'https://example.com/avatar1.jpg',
+            email: 'prof.smith@example.com',
+          },
+          course: {
+            _id: '1',
+            name: 'Advanced Mathematics',
+            courseCode: 'MATH301',
+          },
+          type: 'TeacherEnrollment',
+          role: {
+            _id: '1',
+            name: 'Teacher',
+          },
+          enrollmentState: 'active',
         },
-        course: {
-          _id: '1',
-          name: 'Advanced Mathematics',
-          courseCode: 'MATH301',
+        {
+          user: {
+            _id: '102',
+            name: 'TA Johnson',
+            sortableName: 'Johnson, TA',
+            shortName: 'TA Johnson',
+            avatarUrl: 'https://example.com/avatar2.jpg',
+            email: 'ta.johnson@example.com',
+          },
+          course: {
+            _id: '1',
+            name: 'Advanced Mathematics',
+            courseCode: 'MATH301',
+          },
+          type: 'TaEnrollment',
+          role: {
+            _id: '2',
+            name: 'Teaching Assistant',
+          },
+          enrollmentState: 'active',
         },
-        type: 'TeacherEnrollment',
-        role: {
-          _id: '1',
-          name: 'Teacher',
-        },
-        enrollmentState: 'active',
+      ],
+      pageInfo: {
+        hasNextPage: false,
+        hasPreviousPage: false,
+        startCursor: null,
+        endCursor: null,
       },
-      {
-        user: {
-          _id: '102',
-          name: 'TA Johnson',
-          sortableName: 'Johnson, TA',
-          shortName: 'TA Johnson',
-          avatarUrl: 'https://example.com/avatar2.jpg',
-          email: 'ta.johnson@example.com',
-        },
-        course: {
-          _id: '1',
-          name: 'Advanced Mathematics',
-          courseCode: 'MATH301',
-        },
-        type: 'TaEnrollment',
-        role: {
-          _id: '2',
-          name: 'Teaching Assistant',
-        },
-        enrollmentState: 'active',
-      },
-    ],
-    pageInfo: {
-      hasNextPage: false,
-      hasPreviousPage: false,
-      startCursor: null,
-      endCursor: null,
     },
   },
 }
@@ -129,9 +131,7 @@ describe('useCourseInstructors', () => {
   beforeEach(() => {
     server.use(
       graphql.query('GetCourseInstructorsPaginated', () => {
-        return HttpResponse.json({
-          data: mockInstructorsResponse,
-        })
+        return HttpResponse.json(mockInstructorsResponse)
       }),
     )
   })
@@ -146,7 +146,7 @@ describe('useCourseInstructors', () => {
     const {result, cleanup} = setup(() => useCourseInstructors({courseIds: ['1']}))
 
     expect(result.current.isLoading).toBe(true)
-    expect(result.current.data).toEqual([])
+    expect(result.current.data).toBeUndefined()
     expect(result.current.error).toBeNull()
 
     cleanup()
@@ -159,10 +159,10 @@ describe('useCourseInstructors', () => {
       expect(result.current.isLoading).toBe(false)
     })
 
-    expect(result.current.data).toHaveLength(2)
     expect(result.current.error).toBeNull()
-    expect(result.current.data[0].name).toBe('Professor Smith')
-    expect(result.current.data[1].name).toBe('TA Johnson')
+    expect(result.current.data.pages[0].data).toHaveLength(2)
+    expect(result.current.data.pages[0].data[0].name).toBe('Professor Smith')
+    expect(result.current.data.pages[0].data[1].name).toBe('TA Johnson')
 
     cleanup()
   })
@@ -171,14 +171,14 @@ describe('useCourseInstructors', () => {
     const {result, cleanup} = setup(() => useCourseInstructors({courseIds: []}))
 
     expect(result.current.isLoading).toBe(true)
-    expect(result.current.data).toEqual([])
+    expect(result.current.data).toBeUndefined()
     expect(result.current.error).toBeNull()
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false)
     })
 
-    expect(result.current.data).toHaveLength(2)
+    expect(result.current.data.pages[0].data).toHaveLength(2)
     expect(result.current.error).toBeNull()
 
     cleanup()
@@ -188,7 +188,7 @@ describe('useCourseInstructors', () => {
     const {result, cleanup} = setup(() => useCourseInstructors({courseIds: ['1'], enabled: false}))
 
     expect(result.current.isLoading).toBe(false)
-    expect(result.current.data).toEqual([])
+    expect(result.current.data).toBeUndefined()
     expect(result.current.error).toBeNull()
 
     cleanup()
@@ -213,10 +213,8 @@ describe('useCourseInstructors', () => {
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false)
+      expect(result.current.error).toBeTruthy()
     })
-
-    expect(result.current.data).toEqual([])
-    expect(result.current.error).toBeTruthy()
 
     console.error = originalConsoleError
     cleanup()
@@ -231,8 +229,6 @@ describe('useCourseInstructors', () => {
 
     expect(typeof result.current.fetchNextPage).toBe('function')
     expect(typeof result.current.fetchPreviousPage).toBe('function')
-    expect(typeof result.current.goToPage).toBe('function')
-    expect(result.current.currentPage).toBe(1)
     expect(result.current.hasNextPage).toBe(false)
     expect(result.current.hasPreviousPage).toBe(false)
 

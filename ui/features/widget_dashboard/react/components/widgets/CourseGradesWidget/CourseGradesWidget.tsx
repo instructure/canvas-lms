@@ -22,7 +22,6 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Grid} from '@instructure/ui-grid'
 import {Checkbox} from '@instructure/ui-checkbox'
-import {Pagination} from '@instructure/ui-pagination'
 import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import CourseGradeCard from './CourseGradeCard'
 import type {BaseWidgetProps} from '../../../types'
@@ -40,8 +39,6 @@ const CourseGradesWidget: React.FC<BaseWidgetProps> = ({widget}) => {
     data: courseGrades,
     isLoading,
     error,
-    hasNextPage,
-    hasPreviousPage,
     goToPage,
     currentPage,
     totalPages,
@@ -78,8 +75,11 @@ const CourseGradesWidget: React.FC<BaseWidgetProps> = ({widget}) => {
     setGradeVisibilities(newVisibilities)
   }
 
-  const handlePageChange = (page: number) => {
-    goToPage(page)
+  const paginationProps = {
+    currentPage,
+    totalPages,
+    onPageChange: goToPage,
+    ariaLabel: I18n.t('Course grades pagination'),
   }
 
   return (
@@ -88,6 +88,7 @@ const CourseGradesWidget: React.FC<BaseWidgetProps> = ({widget}) => {
       isLoading={isLoading}
       error={error ? I18n.t('Failed to load course grades. Please try again.') : null}
       loadingText={I18n.t('Loading course grades...')}
+      pagination={paginationProps}
       headerActions={
         <Checkbox
           label={I18n.t('Show all grades')}
@@ -137,22 +138,6 @@ const CourseGradesWidget: React.FC<BaseWidgetProps> = ({widget}) => {
             </Grid>
           </View>
         </Flex.Item>
-
-        {(hasNextPage || hasPreviousPage) && (
-          <Flex.Item shouldShrink>
-            <View as="div" textAlign="center" padding="x-small 0">
-              <Pagination
-                as="nav"
-                margin="x-small"
-                variant="compact"
-                currentPage={currentPage}
-                totalPageNumber={totalPages}
-                onPageChange={handlePageChange}
-                aria-label={I18n.t('Course grades pagination')}
-              />
-            </View>
-          </Flex.Item>
-        )}
       </Flex>
     </TemplateWidget>
   )
