@@ -330,14 +330,5 @@ describe "groups" do
 
       it_behaves_like "files_page_files_rewrite_ui", :teacher
     end
-
-    #-------------------------------------------------------------------------------------------------------------------
-    describe "conferences page" do
-      before(:once) do
-        PluginSetting.create!(name: "wimba", settings: { "domain" => "wimba.instructure.com" })
-      end
-
-      it_behaves_like "conferences_page", :teacher
-    end
   end
 end

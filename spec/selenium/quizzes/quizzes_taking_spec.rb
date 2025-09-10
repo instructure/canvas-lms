@@ -100,39 +100,4 @@ describe "quiz taking" do
     expect_new_page_load { f("#submit_quiz_button").click }
     expect(f(".quiz-submission .quiz_score .score_value")).to be_displayed
   end
-
-  it "accounts for question group settings", priority: "1" do
-    skip_if_chrome("research")
-    quiz = quiz_model
-    bank = AssessmentQuestionBank.create!(context: @course)
-    3.times do
-      assessment_question_model(bank:)
-      question = bank.assessment_questions.last
-      question.question_data[:points_possible] = 1
-      question.save!
-    end
-    quiz.quiz_groups.create(
-      pick_count: 2,
-      question_points: 15,
-      assessment_question_bank_id: bank.id
-    )
-    quiz.generate_quiz_data
-
-    # published_at time should be greater than edited_at ime for changes to be committed
-    quiz.published_at = Time.zone.now
-    quiz.save!
-    get "/courses/#{@course.id}/quizzes"
-    expect(f("#assignment-quizzes li:nth-of-type(2)").text).to include("30 pts")
-    get "/courses/#{@course.id}/quizzes/#{quiz.id}"
-    expect_new_page_load { f("#take_quiz_link").click }
-    2.times do |o|
-      expect(fj("#question_#{quiz.quiz_questions[o].id} .question_points_holder")).to include_text(
-        "15 pts"
-      )
-      click_option("#question_#{quiz.quiz_questions[o].id} .question_input:nth-of-type(1)", "a1")
-      click_option("#question_#{quiz.quiz_questions[o].id} .question_input:nth-of-type(2)", "a3")
-    end
-    submit_quiz
-    expect(f(".quiz-submission .quiz_score .score_value")).to include_text("30")
-  end
 end

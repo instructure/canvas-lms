@@ -630,9 +630,6 @@ describe "people" do
       expect(f("#unauthorized_message")).to include_text("Access Denied")
     end
 
-    # TODO: reimplement per CNVS-29609, but make sure we're testing at the right level
-    it "should validate that a TA cannot rename a teacher"
-
     it "includes login id column if the user has :view_user_logins, even if they don't have :manage_students" do
       RoleOverride.create!(context: Account.default, permission: "manage_students", role: ta_role, enabled: false)
       get "/courses/#{@course.id}/users"

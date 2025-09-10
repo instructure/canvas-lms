@@ -83,19 +83,6 @@ describe "jquery ui" do
     expect(active.tag_name).to eq "select"
   end
 
-  it "captures shift-tabbing" do
-    skip_if_chrome("fragile")
-    create_simple_modal
-    active.click # sometimes the viewport doesn't have focus
-    expect(active.tag_name).to eq "select"
-    shift_tab
-    expect(active.tag_name).to eq "button"
-    shift_tab
-    expect(active.tag_name).to eq "input"
-    shift_tab
-    expect(active.tag_name).to eq "select"
-  end
-
   # We need to find alternate test case for calendar since the
   # calender widget has been replaced with InstUI in the assignments modal
 

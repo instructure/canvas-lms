@@ -80,9 +80,6 @@ describe "creating a quiz" do
         # check url
         expect(driver.current_url).to match %r{/courses/\d+/quizzes/#{Quizzes::Quiz.last.id}/edit}
       end
-
-      # TODO: remove this from test-rail, this test is redundant
-      it "creates and previews a new quiz", priority: "1"
     end
 
     it "inserts files using the rich content editor", priority: "1" do

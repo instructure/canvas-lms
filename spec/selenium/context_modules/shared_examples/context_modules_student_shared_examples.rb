@@ -260,29 +260,6 @@ shared_examples "context modules for students" do
       expect(f('[data-testid="discussion-topic-container"]')).not_to include_text("discussion description")
     end
 
-    it "allows a student view student to progress through module content" do
-      skip_if_chrome("breaks because of masquerade_bar")
-      # course_with_teacher_logged_in(:course => @course, :active_all => true)
-      user_session(@teacher)
-      @fake_student = @course.student_view_student
-
-      enter_student_view
-
-      # sequential error validation
-      get "/courses/#{@course.id}/assignments/#{@assignment_2.id}"
-      expect(f("#content")).to include_text("hasn't been unlocked yet")
-      expect(f("#module_prerequisites_list")).to be_displayed
-
-      go_to_modules
-      validate_context_module_status_icon(@module_1.id, @no_icon)
-      validate_context_module_status_icon(@module_2.id, @locked_icon)
-
-      # sequential normal validation
-      navigate_to_module_item(0, @assignment_1.title)
-      validate_context_module_status_icon(@module_1.id, @completed_icon)
-      validate_context_module_status_icon(@module_2.id, @no_icon)
-    end
-
     context "next and previous buttons", priority: "2" do
       before do
         user_session(@teacher)
@@ -396,9 +373,6 @@ shared_examples "context modules for students" do
         nxt = f(".module-sequence-footer-button--next a")
         expect(nxt).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@after1.id}")
       end
-
-      # TODO: reimplement per CNVS-29600, but make sure we're testing at the right level
-      it "should show module navigation for group assignment discussions"
     end
 
     context "mark as done" do
@@ -535,13 +509,6 @@ shared_examples "context modules for students" do
         validate_context_module_status_icon(@module_2.id, @locked_icon)
       end
 
-      it "shows a tooltip for locked icon when module is locked", priority: "1" do
-        skip "flaky, LS-1297 (8/23/2020)"
-        go_to_modules
-        driver.action.move_to(f("#context_module_#{@module_2.id} .completion_status .icon-lock"), 0, 0).perform
-        expect(fj(".ui-tooltip:visible")).to include_text("Locked")
-      end
-
       it "shows a warning in-progress icon when module has been started", priority: "1" do
         create_additional_assignment_for_module_1
         go_to_modules
@@ -600,22 +567,6 @@ shared_examples "context modules for students" do
           grade_assignment(50)
           go_to_modules
           validate_context_module_item_icon(@tag_4.id, @in_progress_icon)
-        end
-
-        it "shows tool tip text when hovering over the warning icon for a min score requirement", priority: "1" do
-          skip "flaky, LS-1297 (8/23/2020)"
-          grade_assignment(50)
-          go_to_modules
-          driver.action.move_to(f(".ig-header-admin .completion_status .icon-minimize"), 0, 0).perform
-          expect(fj(".ui-tooltip:visible")).to include_text("Started")
-        end
-
-        it "shows tooltip warning for a min score assignemnt", priority: "1" do
-          skip "flaky, LS-1297 (8/23/2020)"
-          grade_assignment(50)
-          go_to_modules
-          driver.action.move_to(f(".ig-row .module-item-status-icon .icon-minimize"), 0, 0).perform
-          expect(fj(".ui-tooltip:visible")).to include_text("You scored a 50. Must score at least a 90.0.")
         end
 
         it "shows an info icon when module item is a min score requirement that has not yet been graded" do

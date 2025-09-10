@@ -273,9 +273,6 @@ describe Lti::ContentItemSelectionRequest do
           )
         end
 
-        it "adds params for the link_selection placement"
-        it "adds params for the assignment_selection placement"
-
         it "adds params for the collaboration placement" do
           lti_launch = lti_request.generate_lti_launch(placement: "collaboration", opts: { launch_url: })
 
@@ -286,8 +283,6 @@ describe Lti::ContentItemSelectionRequest do
                                                  "auto_create" => "true",
                                                })
         end
-
-        it "substitutes collaboration variables in a collaboration launch"
 
         context "homework_submission" do
           it "adds params for an assignment that can accept an online_url submission" do

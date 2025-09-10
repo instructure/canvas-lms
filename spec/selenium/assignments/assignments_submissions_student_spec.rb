@@ -428,28 +428,6 @@ describe "submissions" do
       expect(submission.reload.body).to eq body_html
     end
 
-    it "does not allow a submission with only comments", priority: "1" do
-      skip_if_safari(:alert)
-      skip("flash alert is fragile, will be addressed in ADMIN-3015")
-      @assignment.update(submission_types: "online_text_entry")
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      f(".submit_assignment_link").click
-
-      expect(f("#submission_body_ifr")).to be_displayed
-      replace_content(f("#submit_online_text_entry_form").find_element(:id, "submission_comment"), "this should not be able to be submitted for grading")
-      submission = @assignment.submissions.find_by!(user_id: @student)
-
-      # it should not actually submit and pop up an error message
-      expect { submit_form("#submit_online_text_entry_form") }.not_to change { submission.reload.updated_at }
-      expect(f("#body_errors")).to include_text("Text entry must not be empty")
-
-      # navigate off the page and dismiss the alert box to avoid problems
-      # with other selenium tests
-      f("#section-tabs .home").click
-      driver.switch_to.alert.accept
-      driver.switch_to.default_content
-    end
-
     it "does not allow peer reviewers to see turnitin scores/reports", priority: "1" do
       skip("investigate in EVAL-2966")
       @student1 = @user

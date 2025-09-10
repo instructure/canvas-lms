@@ -169,20 +169,6 @@ describe "Theme Editor" do
     expect(f("div.progress-bar__bar-container")).to be
   end
 
-  it "has validation for every text field", priority: "2" do
-    skip("Broken after upgrade to webdriver 2.53 - seems to be a timing issue on jenkins, passes locally")
-    open_theme_editor(Account.default.id)
-
-    # input invalid text into every text field
-    create_theme("#xxxxxx")
-
-    # tab to trigger last validation
-    fj(".Theme__editor-color-block_input--has-error:last").send_keys(:tab)
-
-    # expect all 15 text fields to have working validation
-    expect(all_warning_messages.length).to eq 15
-  end
-
   it "allows fields to be changed after colors are unlinked", priority: 3 do
     bc = BrandConfig.create(variables: {
                               "ic-brand-primary" => "#999",

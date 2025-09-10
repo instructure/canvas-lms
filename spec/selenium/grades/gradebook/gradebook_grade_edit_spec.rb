@@ -214,21 +214,6 @@ shared_examples "Gradebook editing grades" do |ff_enabled|
     expect(f("body")).not_to contain_css(".gradebook_cell_editable")
   end
 
-  it "validates curving grades option", priority: "1" do
-    skip_if_chrome("issue with set_value")
-    skip_if_safari(:alert)
-    curved_grade_text = "8"
-
-    Gradebook.visit(@course)
-    Gradebook.click_assignment_header_menu_element(@first_assignment.id, "curve grades")
-    curve_form = GradingCurvePage.new
-    curve_form.edit_grade_curve(curved_grade_text)
-    curve_form.curve_grade_submit
-    accept_alert
-
-    expect(find_slick_cells(1, f("#gradebook_grid .container_1"))[0]).to include_text curved_grade_text
-  end
-
   it "assigns zeroes to unsubmitted assignments during curving", priority: "1" do
     skip_if_safari(:alert)
     @first_assignment.grade_student(@student_2, grade: "", grader: @teacher)

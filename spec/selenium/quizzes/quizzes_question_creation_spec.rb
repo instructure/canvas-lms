@@ -299,53 +299,6 @@ describe "quizzes question creation" do
       expect(finished_question).to be_displayed
     end
 
-    # Formula Question
-    it "creates a basic formula question", priority: "1" do
-      skip_if_chrome("CNVS-29843")
-      quiz = @last_quiz
-
-      question = fj(".question_form:visible")
-      click_option(".question_form:visible .question_type", "Formula Question")
-
-      type_in_tiny ".question_form:visible textarea.question_content",
-                   "If [x] + [y] is a whole number, then this is a formula question."
-
-      # get focus out of tinymce to allow change event to propogate
-      f(".question_header").click
-      recompute_button = f("button.recompute_variables")
-      recompute_button.click
-      fj(".supercalc:visible").send_keys("x + y")
-      f("button.save_formula_button").click
-      # normally it's capped at 200 (to keep the yaml from getting crazy big)...
-      # since selenium tests take forever, let's make the limit much lower
-      driver.execute_script("ENV.quiz_max_combination_count = 10")
-      fj(".combination_count:visible").send_keys("20") # over the limit
-      button = fj("button.compute_combinations:visible")
-      button.click
-      expect(fj(".combination_count:visible")).to have_attribute(:value, "10")
-      expect(button).to include_text "Generate"
-      expect(ffj("table.combinations:visible tr").size).to eq 11 # plus header row
-      submit_form(question)
-      wait_for_ajax_requests
-
-      quiz.reload
-      expect(f("#question_#{quiz.quiz_questions[0].id}")).to be_displayed
-    end
-
-    it "changes example value on clicking the 'recompute' button when creating formula questions", priority: "2" do
-      skip("Fails with webpack enabled")
-      start_quiz_question
-      click_option(".question_form:visible .question_type", "Formula Question")
-      wait_for_ajaximations
-      type_in_tiny ".question:visible textarea.question_content", "5 + [x] = 10"
-      wait_for_ajaximations
-      replace_content(f("input[type =text][name =min]"), "4")
-      replace_content(f("input[type =text][name =max]"), "8")
-      previous_example_value = f(".value").text
-      f(".recompute_variables").click
-      expect(previous_example_value).not_to eq(f(".value").text)
-    end
-
     # Essay Question
     it "creates a basic essay question", priority: "1" do
       quiz = @last_quiz

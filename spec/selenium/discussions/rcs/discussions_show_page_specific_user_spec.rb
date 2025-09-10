@@ -216,36 +216,6 @@ describe "discussions" do
         add_reply(message, "graded.png")
         expect(@last_entry.find_element(:css, '[data-resource-type="discussion_topic.reply"]').text).to eq message
       end
-
-      context "in student view" do
-        it "allows student view student to read/post", priority: "2" do
-          skip_if_chrome("Can not get to student view in Chrome")
-          enter_student_view
-          get url
-          expect(f("#content")).not_to contain_css("#discussion_subentries .discussion_entry")
-          add_reply
-          expect(get_all_replies.count).to eq 1
-        end
-      end
     end
-
-    it "should show only 10 root replies per page"
-    it "should paginate root entries"
-    it "should show only three levels deep"
-    it "should show only three children of a parent"
-    it "should display unrendered unread and total counts accurately"
-    it "should expand descendents"
-    it "should expand children"
-    it "should deep link to an entry rendered on the first page"
-    it "should deep link to an entry rendered on a different page"
-    it "should deep link to a non-rendered child entry of a rendered parent"
-    it "should deep link to a child entry of a non-rendered parent"
-    it "should allow users to 'go to parent'"
-    it "should collapse a thread"
-    it "should filter entries by user display name search term"
-    it "should filter entries by content search term"
-    it "should filter entries by unread"
-    it "should filter entries by unread and search term"
-    it "should link to an entry in context of the discussion when clicked in result view"
   end
 end

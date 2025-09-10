@@ -59,29 +59,6 @@ describe "add content box" do
     expect(f("#page_content .section_content")).to include_text("hello student")
   end
 
-  it "adds a user file" do
-    skip("this only worked with the legacy editor. make it work w/ canvas-rce CORE-2714")
-    expect(f(".add_file_link")).to be_displayed
-    f(".add_file_link").click
-    wait_for_ajaximations
-    fj(".file_list:visible .sign:visible").click
-    wait_for_ajaximations # my files
-    file = fj("li.file .text:visible")
-    expect(file).to include_text @attachment.filename
-    wait_for_ajaximations
-    file.click
-    f(".upload_file_button").click
-    wait_for_ajaximations
-    download = fj(".eportfolio_download:visible")
-    expect(download).to be_present
-    expect(download).to include_text @attachment.filename
-    f("[data-testid='save-page']").click
-    wait_for_ajaximations
-    expect(f(".section.read_only")).to include_text @attachment.filename
-    refresh_page
-    expect(f(".section.read_only")).to include_text @attachment.filename
-  end
-
   context "adding html content" do
     before do
       @html_content = "<strong>student</strong>"

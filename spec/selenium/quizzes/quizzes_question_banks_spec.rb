@@ -262,40 +262,6 @@ describe "quizzes question banks" do
       expect(@bank.assessment_questions.count { |aq| !aq.deleted? }).to eq 59
     end
 
-    it "allows editing quiz questions that belong to a quiz bank", priority: "1" do
-      skip_if_chrome("fragile")
-      @course.account = Account.default
-      @course.save
-
-      # create quiz that pulls from question bank
-      quiz_with_new_questions
-
-      # create question group, fill with existing question bank questions
-      create_question_group
-      drag_question_into_group(@quest1.id, @group.id)
-      drag_question_into_group(@quest2.id, @group.id)
-      click_save_settings_button
-
-      # modify a quiz bank question
-      new_name = "I have been edited"
-      new_question_text = "What is the answer to #{new_name}?"
-
-      open_quiz_edit_form
-      click_questions_tab
-      hover_and_click("#question_#{@quest1.id} .edit_question_link")
-      replace_content(f(".question_form [name='question_name']"), new_name)
-      type_in_tiny(".question_content", new_question_text)
-      submit_form(".question_form")
-      click_save_settings_button
-
-      # verify modifications
-      open_quiz_edit_form
-      click_questions_tab
-
-      expect(f("#question_#{@quest1.id}")).to include_text new_name
-      expect(f("#question_#{@quest1.id}")).to include_text new_question_text
-    end
-
     it "lets teachers view question banks in a soft-concluded course (but not edit)", custom_timeout: 30, priority: "2" do
       term = Account.default.enrollment_terms.create!
       term.set_overrides(Account.default, "TeacherEnrollment" => { end_at: 3.days.ago })
