@@ -257,6 +257,7 @@ class SubmissionLifecycleManager
         end
       end
 
+      # Keep in mind that the Submission updates below do NOT trigger any callbacks or validations!!!
       assignments_to_delete_all_submissions_for = []
       # Delete submissions for students who don't have visibility to this assignment anymore
       @assignment_ids.each do |assignment_id|

@@ -3056,8 +3056,8 @@ describe GradebooksController do
       before do
         @course.account.enable_feature!(:discussion_checkpoints)
         assignment = @course.assignments.create!(has_sub_assignments: true)
-        assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, due_at: 2.days.from_now)
-        assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, due_at: 3.days.from_now)
+        @sub1 = assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, due_at: 2.days.from_now)
+        @sub2 = assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, due_at: 3.days.from_now)
         @topic = @course.discussion_topics.create!(assignment:, reply_to_entry_required_count: 1)
       end
 
@@ -3109,6 +3109,49 @@ describe GradebooksController do
         expect(response).to be_successful
         expect(reply_to_topic_submission.score).to be_nil
         expect(@topic.assignment.submissions.find_by(user: @student).score).to eq 10
+      end
+
+      it "returns SubAssignment submissions for active submissions" do
+        user_session(@teacher)
+        post(
+          "update_submission",
+          params: post_params.merge(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC),
+          format: :json
+        )
+        expect(response).to be_successful
+        json = response.parsed_body
+        submission_json = json.first["submission"]
+        expect(submission_json["sub_assignment_submissions"]).to be_an(Array)
+        expect(submission_json["sub_assignment_submissions"].length).to eq 2
+      end
+
+      it "does return deleted sub assignment submissions" do
+        user_session(@teacher)
+        @sub1.destroy
+        post(
+          "update_submission",
+          params: post_params.merge(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY),
+          format: :json
+        )
+        expect(response).to be_successful
+        json = response.parsed_body
+        submission_json = json.first["submission"]
+        expect(submission_json["sub_assignment_submissions"].length).to eq 1
+      end
+
+      it "returns empty array when there are no sub assignment submissions" do
+        user_session(@teacher)
+        @sub1.destroy
+        @sub2.destroy
+        post(
+          "update_submission",
+          params: post_params.merge(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC),
+          format: :json
+        )
+        expect(response).to be_successful
+        json = response.parsed_body
+        submission_json = json.first["submission"]
+        expect(submission_json["sub_assignment_submissions"]).to eq []
       end
     end
   end
