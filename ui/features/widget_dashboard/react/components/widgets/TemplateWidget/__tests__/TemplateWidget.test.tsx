@@ -152,4 +152,31 @@ describe('TemplateWidget', () => {
     expect(screen.getByText('Paragraph 2')).toBeInTheDocument()
     expect(screen.getByTestId('child-button')).toBeInTheDocument()
   })
+
+  it('renders pagination controls when provided', () => {
+    const pagination = {
+      currentPage: 2,
+      totalPages: 5,
+      onPageChange: jest.fn(),
+      ariaLabel: 'Test Pagination',
+    }
+    const props = buildDefaultProps({pagination})
+    setup(props)
+
+    expect(screen.getByLabelText('Test Pagination')).toBeInTheDocument()
+    expect(screen.getByText('2')).toBeInTheDocument() // Current page button
+  })
+
+  it('does not render pagination when totalPages is 1', () => {
+    const pagination = {
+      currentPage: 1,
+      totalPages: 1,
+      onPageChange: jest.fn(),
+      ariaLabel: 'Test Pagination',
+    }
+    const props = buildDefaultProps({pagination})
+    setup(props)
+
+    expect(screen.queryByLabelText('Test Pagination')).not.toBeInTheDocument()
+  })
 })

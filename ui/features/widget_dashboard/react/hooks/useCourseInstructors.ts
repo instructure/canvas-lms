@@ -17,7 +17,6 @@
  */
 
 import {useInfiniteQuery} from '@tanstack/react-query'
-import {useState} from 'react'
 import {createUserQueryConfig} from '../utils/graphql'
 import {QUERY_CONFIG} from '../constants'
 import {fetchPaginatedCourseInstructors} from '../graphql/coursePeople'
@@ -49,27 +48,10 @@ interface UseCourseInstructorsOptions {
   enabled?: boolean
 }
 
-interface UseCourseInstructorsResult {
-  data: CourseInstructorForComponent[]
-  isLoading: boolean
-  error: Error | null
-  hasNextPage: boolean
-  hasPreviousPage: boolean
-  fetchNextPage: () => void
-  fetchPreviousPage: () => void
-  goToPage: (pageNumber: number) => void
-  currentPage: number
-  totalPages: number
-  refetch: () => void
-}
-
-export function useCourseInstructors(
-  options: UseCourseInstructorsOptions = {},
-): UseCourseInstructorsResult {
+export function useCourseInstructors(options: UseCourseInstructorsOptions = {}) {
   const {courseIds = [], limit = 5, enabled = true} = options
-  const [currentPageIndex, setCurrentPageIndex] = useState(0)
 
-  const query = useInfiniteQuery({
+  return useInfiniteQuery({
     ...createUserQueryConfig(
       ['courseInstructorsPaginated', courseIds.join(','), limit],
       QUERY_CONFIG.STALE_TIME.USERS,
@@ -94,51 +76,4 @@ export function useCourseInstructors(
     },
     enabled: enabled,
   })
-
-  const currentPage = query.data?.pages[currentPageIndex]
-  const totalPages = query.data?.pages.length || 1
-
-  const fetchNextPage = () => {
-    if (currentPageIndex < totalPages - 1) {
-      setCurrentPageIndex(currentPageIndex + 1)
-    } else if (query.hasNextPage) {
-      query.fetchNextPage().then(() => {
-        setCurrentPageIndex(currentPageIndex + 1)
-      })
-    }
-  }
-
-  const fetchPreviousPage = () => {
-    if (currentPageIndex > 0) {
-      setCurrentPageIndex(currentPageIndex - 1)
-    }
-  }
-
-  const goToPage = (pageNumber: number) => {
-    const targetIndex = pageNumber - 1
-
-    if (targetIndex < 0) return
-
-    if (targetIndex < totalPages) {
-      setCurrentPageIndex(targetIndex)
-    } else if (targetIndex === totalPages && query.hasNextPage) {
-      query.fetchNextPage().then(() => {
-        setCurrentPageIndex(targetIndex)
-      })
-    }
-  }
-
-  return {
-    data: currentPage?.data ?? [],
-    isLoading: query.isLoading,
-    error: query.error,
-    hasNextPage: currentPageIndex < totalPages - 1 || query.hasNextPage,
-    hasPreviousPage: currentPageIndex > 0,
-    fetchNextPage,
-    fetchPreviousPage,
-    goToPage,
-    currentPage: currentPageIndex + 1,
-    totalPages: query.hasNextPage ? totalPages + 1 : totalPages,
-    refetch: query.refetch,
-  }
 }
