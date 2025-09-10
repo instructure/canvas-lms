@@ -215,7 +215,7 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
       it "raises error for nil parent assignment" do
         invalid_service = described_class.new(parent_assignment: nil)
         expect { invalid_service.call }.to raise_error(
-          PeerReview::PeerReviewInvalidParentAssignmentError,
+          PeerReview::InvalidParentAssignmentError,
           "Invalid parent assignment"
         )
       end
@@ -229,7 +229,7 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
         invalid_service = described_class.new(parent_assignment: external_tool_assignment)
 
         expect { invalid_service.call }.to raise_error(
-          PeerReview::PeerReviewInvalidAssignmentSubmissionTypesError,
+          PeerReview::InvalidAssignmentSubmissionTypesError,
           "Peer reviews cannot be used with External Tool assignments"
         )
       end
@@ -237,7 +237,7 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
       it "raises error when feature is disabled" do
         course.disable_feature!(:peer_review_allocation_and_grading)
         expect { service.call }.to raise_error(
-          PeerReview::PeerReviewFeatureDisabledError,
+          PeerReview::FeatureDisabledError,
           "Peer Review Allocation and Grading feature flag is disabled"
         )
       end
@@ -245,7 +245,7 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
       it "raises error when peer review sub assignment already exists" do
         PeerReviewSubAssignment.create!(parent_assignment:)
         expect { service.call }.to raise_error(
-          PeerReview::PeerReviewSubAssignmentExistsError,
+          PeerReview::SubAssignmentExistsError,
           "Peer review sub assignment exists"
         )
       end
@@ -279,7 +279,7 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
       expect(service).not_to receive(:validate_feature_enabled)
       expect(service).not_to receive(:validate_peer_review_sub_assignment_not_exist)
 
-      expect { service.send(:run_validations) }.to raise_error(PeerReview::PeerReviewInvalidParentAssignmentError)
+      expect { service.send(:run_validations) }.to raise_error(PeerReview::InvalidParentAssignmentError)
     end
   end
 
