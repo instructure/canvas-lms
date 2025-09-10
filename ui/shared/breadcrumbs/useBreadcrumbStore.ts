@@ -43,11 +43,8 @@ const defaultBreadcrumbs = (): Breadcrumb[] => {
     return window.ENV.breadcrumbs
   }
 
-  const breadcrumbElement = document.querySelector('#breadcrumbs > ul')
-
-  if (!breadcrumbElement) {
-    return []
-  }
+  const breadcrumbElement = document.querySelector('#breadcrumbs > ol')
+  if (!breadcrumbElement) return []
 
   const crumbs = Array.from(breadcrumbElement.querySelectorAll('li'))
     // the first breadcrumb is a home icon, we don't want that. We're just going to leave it in place.
@@ -102,11 +99,9 @@ export const useBreadcrumbStore = create<{state: Breadcrumb[]} & BreadcrumbStore
  * @param crumbs The breadcrumbs to sync with the UI
  */
 const syncBreadcrumbs = (crumbs: Breadcrumb[]) => {
-  const breadcrumbElement = document.querySelector('#breadcrumbs > ul')
+  const breadcrumbElement = document.querySelector('#breadcrumbs > ol')
 
-  if (!breadcrumbElement) {
-    return
-  }
+  if (!breadcrumbElement) return
 
   // Clear the existing breadcrumbs, except for the very first, which is the home icon.
   // The store is now the source of truth (mostly)
@@ -131,6 +126,13 @@ const syncBreadcrumbs = (crumbs: Breadcrumb[]) => {
       li.appendChild(span)
     }
     breadcrumbElement.appendChild(li)
+  })
+
+  // Ensure only the last breadcrumb item has aria-current="page"
+  const allBreadcrumbItems = breadcrumbElement.querySelectorAll('li')
+  allBreadcrumbItems.forEach((item, idx) => {
+    if (idx < allBreadcrumbItems.length - 1) item.removeAttribute('aria-current')
+    else item.setAttribute('aria-current', 'page')
   })
 }
 
