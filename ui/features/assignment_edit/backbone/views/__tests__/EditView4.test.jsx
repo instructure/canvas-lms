@@ -455,7 +455,7 @@ describe('EditView', () => {
 
   // These started failing in master after Jan 1, 2025
   // cf. EGG-444
-  describe.skip('Quizzes 2', () => {
+  describe('Quizzes 2', () => {
     beforeEach(() => {
       window.ENV = {
         AVAILABLE_MODERATORS: [],
@@ -473,6 +473,8 @@ describe('EditView', () => {
         NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED: true,
         HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED: true,
         CANCEL_TO: currentOrigin + '/cancel',
+        SETTINGS: {},
+        FEATURES: {},
       }
     })
 
