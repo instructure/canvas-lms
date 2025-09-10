@@ -131,12 +131,14 @@ class RequestThrottle
           # Do not bother with exceptions when trying to get the access token
           # on a throttled response, just ignore any NotFound errors.
           begin
-            access_token = AccessToken.authenticate(token_string, load_pseudonym_from_access_token: true)
+            access_token = AccessToken.authenticate(token_string, load_pseudonym_from_access_token: true, eager_load_developer_key: true)
           rescue
             access_token = nil
           end
-          RequestContext::Generator.add_meta_header("at", access_token&.global_id) if access_token
-          RequestContext::Generator.add_meta_header("dk", access_token&.global_developer_key_id) if access_token&.developer_key_id
+          RequestContext::Generator.add_meta_header("at", access_token.global_id) if access_token
+          RequestContext::Generator.add_meta_header("dk", access_token.global_developer_key_id) if access_token&.developer_key_id
+          RequestContext::Generator.add_meta_header("utid", access_token.developer_key.unified_tool_id) if access_token&.developer_key&.unified_tool_id
+
           return false
         else
           Rails.logger.info("WOULD HAVE throttled request (config disabled), client id: #{client_identifier(request)} bucket: #{bucket.to_json}")
