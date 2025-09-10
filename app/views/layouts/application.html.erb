@@ -25,6 +25,8 @@
     js_bundle(:top_navigation_tools)
 end
 
+  add_ignite_agent_bundle
+
   load_blueprint_courses_ui
   @has_content_notices = load_content_notices
   provide :head, include_common_stylesheets
