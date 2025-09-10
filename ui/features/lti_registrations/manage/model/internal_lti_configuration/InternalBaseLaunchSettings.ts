@@ -53,6 +53,10 @@ export const ZInternalBaseLaunchSettings = z.object({
    * If this value is enabled, it will show the tool. If it's disabled, it will hide the tool.
    */
   default: z.enum(['disabled', 'enabled']).optional(),
+  /**
+   * This only applies to the top navigation placement. It allows the tool to be launched in fullscreen mode.
+   */
+  allow_fullscreen: z.boolean().optional(),
   accept_media_types: z.string().optional().nullable(),
   use_tray: z.boolean().optional().nullable(),
   eula: z

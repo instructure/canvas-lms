@@ -53,6 +53,7 @@ export interface Lti1p3RegistrationOverlayActions {
   setPrivacyLevel: (privacyLevel: LtiPrivacyLevel) => void
   togglePlacement: (placement: LtiPlacement) => void
   toggleCourseNavigationDefaultDisabled: () => void
+  toggleTopNavigationAllowFullscreen: () => void
 }
 
 const updateState =
@@ -196,6 +197,19 @@ export const createLti1p3RegistrationOverlayStore = (
             placements: {
               ...state.placements,
               courseNavigationDefaultDisabled: !state.placements.courseNavigationDefaultDisabled,
+            },
+          }
+        }),
+      )
+    },
+    toggleTopNavigationAllowFullscreen: () => {
+      set(
+        updateState(state => {
+          return {
+            ...state,
+            placements: {
+              ...state.placements,
+              topNavigationAllowFullscreen: !state.placements.topNavigationAllowFullscreen,
             },
           }
         }),

@@ -50,13 +50,17 @@ export const PlacementsConfirmationPerfWrapper = React.memo(
   ({overlayStore, registration, showAllSettings}: PlacementsConfirmationPerfWrapperProps) => {
     const {
       courseNavigationDefaultHidden,
+      topNavigationAllowFullscreen,
       onTogglePlacement,
       onToggleDefaultDisabled,
+      onToggleAllowFullscreen,
       enabledPlacements,
     } = overlayStore(s => ({
       courseNavigationDefaultHidden: s.state.placements.courseNavigationDefaultDisabled || false,
+      topNavigationAllowFullscreen: s.state.placements.topNavigationAllowFullscreen || false,
       onTogglePlacement: s.togglePlacement,
       onToggleDefaultDisabled: s.toggleCourseNavigationDefaultDisabled,
+      onToggleAllowFullscreen: s.toggleTopNavigationAllowFullscreen,
       enabledPlacements: s.state.placements.placements || [],
     }))
 
@@ -76,8 +80,10 @@ export const PlacementsConfirmationPerfWrapper = React.memo(
         appName={registration.name}
         availablePlacements={possiblePlacements}
         courseNavigationDefaultHidden={courseNavigationDefaultHidden}
+        topNavigationAllowFullscreen={topNavigationAllowFullscreen}
         enabledPlacements={enabledPlacements}
         onToggleDefaultDisabled={onToggleDefaultDisabled}
+        onToggleAllowFullscreen={onToggleAllowFullscreen}
         onTogglePlacement={onTogglePlacement}
       />
     )
