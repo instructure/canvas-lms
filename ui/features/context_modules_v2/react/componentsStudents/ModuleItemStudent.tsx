@@ -191,7 +191,13 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
                     primaryColor: 'white',
                   }}
                 >
-                  {I18n.t('%{count} Options', {count: masteryPaths?.assignmentSetCount})}
+                  {I18n.t(
+                    {
+                      one: '1 Option',
+                      other: '%{count} Options',
+                    },
+                    {count: masteryPaths?.assignmentSetCount},
+                  )}
                 </Pill>
               </Flex.Item>
             </Flex>
