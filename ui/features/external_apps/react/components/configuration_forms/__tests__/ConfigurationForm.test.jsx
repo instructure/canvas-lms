@@ -119,7 +119,7 @@ describe('ConfigurationForm', () => {
       await userEvent.clear(sharedSecretInput)
       await userEvent.type(sharedSecretInput, tool.sharedSecret)
 
-      const urlInput = screen.getByLabelText('Launch URL *')
+      const urlInput = screen.getByLabelText('Launch URL')
       await userEvent.clear(urlInput)
       await userEvent.type(urlInput, tool.url)
 
