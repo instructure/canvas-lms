@@ -259,15 +259,15 @@ describe('DiscussionPostToolbar', () => {
     })
 
     describe('when the user does not have student role', () => {
-      let originalRoles
+      let originalIsStudent
 
       beforeEach(() => {
-        originalRoles = [...ENV.current_user_roles]
-        ENV.current_user_roles = ENV.current_user_roles.filter(role => role !== 'student')
+        originalIsStudent = ENV.current_user_is_student
+        ENV.current_user_is_student = false
       })
 
       afterEach(() => {
-        ENV.current_user_roles = originalRoles
+        ENV.current_user_is_student = originalIsStudent
       })
 
       it('should render when there are no child topics and the user has permission', () => {

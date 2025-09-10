@@ -75,7 +75,7 @@ const DiscussionPostButtonsToolbar = props => {
   const renderGroup = () =>
     props.childTopics?.length &&
     props.canViewGroupPages &&
-    !ENV.current_user_roles?.includes('student') && (
+    !ENV.current_user_is_student && (
       <span className="discussions-post-toolbar-groupsMenu">
         <GroupsMenu width="10px" childTopics={props.childTopics} />
       </span>
