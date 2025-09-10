@@ -149,6 +149,22 @@ module Modules2ActionTray
     "//button[.//*[contains(text(), 'Remove #{content_name} Content Requirement')]]"
   end
 
+  def add_item_modal_selector
+    "[data-testid='add-item-modal']"
+  end
+
+  def add_item_create_new_item_form_tab_selector
+    "#tab-create-item-form"
+  end
+
+  def add_item_upload_file_form_selector
+    "[data-testid='module-file-drop'] input"
+  end
+
+  def add_item_indent_select_selector
+    "[data-testid='add-item-indent-selector']"
+  end
+
   #------------------------------ Elements ------------------------------
   def add_module_button
     f(add_module_button_selector)
@@ -289,6 +305,22 @@ module Modules2ActionTray
   def remove_requirement_button(content_name)
     fxpath(remove_requirement_button_selector(content_name))
   end
+
+  def add_item_create_new_item_form_tab
+    f(add_item_create_new_item_form_tab_selector)
+  end
+
+  def add_item_upload_file_form
+    f(add_item_upload_file_form_selector)
+  end
+
+  def add_item_modal
+    f(add_item_modal_selector)
+  end
+
+  def add_item_indent_select
+    f(add_item_indent_select_selector)
+  end
   #------------------------------ Actions -------------------------------
 
   def click_custom_access_radio
@@ -338,5 +370,10 @@ module Modules2ActionTray
   def click_save_module_tray_change
     submit_add_module_button.click
     wait_for_ajaximations
+  end
+
+  def click_add_item_create_new_item_tab
+    add_item_create_new_item_form_tab.click
+    expect(create_learning_object_name_input).to be_displayed
   end
 end

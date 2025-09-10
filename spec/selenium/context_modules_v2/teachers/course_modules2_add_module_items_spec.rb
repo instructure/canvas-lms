@@ -45,16 +45,6 @@ describe "selective_release module item assign to tray", :ignore_js_errors do
   before(:once) do
     course_with_teacher(active_all: true)
     set_rewrite_flag
-    @course.enable_feature! :quizzes_next
-    @course.context_external_tools.create!(
-      name: "Quizzes.Next",
-      consumer_key: "test_key",
-      shared_secret: "test_secret",
-      tool_id: "Quizzes 2",
-      url: "http://example.com/launch"
-    )
-    @course.root_account.settings[:provision] = { "lti" => "lti url" }
-    @course.root_account.save!
   end
 
   context "add module items with modal", :ignore_js_errors do
@@ -282,6 +272,212 @@ describe "selective_release module item assign to tray", :ignore_js_errors do
         expect(pagination_info_text_includes?("Showing 11-11 of 11 items")).to be true
         expect(pagination_page_current_page_button.text).to eq("2")
       end
+    end
+  end
+
+  context "create and add module items with modal", :ignore_js_errors do
+    new_item_name = "New course work"
+    before(:once) do
+      @module = @course.context_modules.create!(name: "first week")
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    it "cancels adding item to the module" do
+      go_to_modules
+      add_item_button(@module.id).click
+
+      expect(f("body")).to contain_css(add_item_modal_selector)
+      click_add_item_create_new_item_tab
+      replace_content(create_learning_object_name_input, new_item_name)
+      expect(close_tray_button).to be_displayed
+      expect(cancel_tray_button).to be_displayed
+      cancel_tray_button.click
+
+      expect(f("body")).not_to contain_css(add_item_modal_selector)
+      module_header_expand_toggles.first.click
+      expect(element_exists?(module_item_title_link_selector)).to be false
+    end
+
+    it "adds item to the module with indentation" do
+      go_to_modules
+      add_item_button(@module.id).click
+      click_add_item_create_new_item_tab
+
+      replace_content(create_learning_object_name_input, new_item_name)
+      click_INSTUI_Select_option(add_item_indent_select, "Indent 2 levels")
+      add_item_modal_add_item_button.click
+      wait_for_ajaximations
+
+      module_item = ContentTag.find_by(context_id: @course.id, context_module_id: @module.id, content_type: "Assignment", title: new_item_name)
+      module_header_expand_toggles.first.click
+      item_indent = module_item_indent(module_item.id)
+      expect(item_indent).to match("padding: 0px 0px 0px 40px;")
+    end
+
+    it "creates and adds a new assignment to the module" do
+      go_to_modules
+      add_item_button(@module.id).click
+      click_add_item_create_new_item_tab
+
+      replace_content(create_learning_object_name_input, new_item_name)
+      add_item_modal_add_item_button.click
+      wait_for_ajaximations
+
+      module_item = ContentTag.find_by(context_id: @course.id, context_module_id: @module.id, content_type: "Assignment", title: new_item_name)
+      module_header_expand_toggles.first.click
+      expect(element_exists?(module_item_title_by_id_selector(module_item.id))).to be true
+      expect(module_item_title_by_id(module_item.id).text).to eq(new_item_name)
+    end
+
+    it "creates and adds a classic Quiz to the module" do
+      go_to_modules
+      add_item_button(@module.id).click
+      click_INSTUI_Select_option(new_item_type_select_selector, "Quiz")
+
+      click_add_item_create_new_item_tab
+      replace_content(create_learning_object_name_input, new_item_name)
+      add_item_modal_add_item_button.click
+      wait_for_ajaximations
+
+      module_item = ContentTag.find_by(context_id: @course.id, context_module_id: @module.id, content_type: "Quizzes::Quiz", title: new_item_name)
+      module_header_expand_toggles.first.click
+      expect(element_exists?(module_item_title_by_id_selector(module_item.id))).to be true
+      expect(module_item_title_by_id(module_item.id).text).to eq(new_item_name)
+    end
+
+    it "creates and adds a new file to the module" do
+      filename, fullpath, _data = get_file("a_file.txt")
+
+      go_to_modules
+      add_item_button(@module.id).click
+      click_INSTUI_Select_option(new_item_type_select_selector, "File")
+      add_item_create_new_item_form_tab.click
+
+      add_item_upload_file_form.send_keys(fullpath)
+      add_item_modal_add_item_button.click
+      wait_for_ajaximations
+
+      module_item = ContentTag.find_by(context_id: @course.id, context_module_id: @module.id, content_type: "Attachment", title: filename)
+      module_header_expand_toggles.first.click
+      expect(element_exists?(module_item_title_by_id_selector(module_item.id))).to be true
+      expect(module_item_title_by_id(module_item.id).text).to eq(filename)
+    end
+
+    it "creates and adds a wiki page to the module" do
+      go_to_modules
+      add_item_button(@module.id).click
+      click_INSTUI_Select_option(new_item_type_select_selector, "Page")
+      click_add_item_create_new_item_tab
+
+      replace_content(create_learning_object_name_input, new_item_name)
+      add_item_modal_add_item_button.click
+      wait_for_ajaximations
+
+      module_item = ContentTag.find_by(context_id: @course.id, context_module_id: @module.id, content_type: "WikiPage", title: new_item_name)
+      module_header_expand_toggles.first.click
+      expect(element_exists?(module_item_title_by_id_selector(module_item.id))).to be true
+      expect(module_item_title_by_id(module_item.id).text).to eq(new_item_name)
+    end
+
+    it "creates and adds a discussion topic to the module" do
+      go_to_modules
+      add_item_button(@module.id).click
+      click_INSTUI_Select_option(new_item_type_select_selector, "Discussion")
+      click_add_item_create_new_item_tab
+
+      replace_content(create_learning_object_name_input, new_item_name)
+      add_item_modal_add_item_button.click
+      wait_for_ajaximations
+
+      module_item = ContentTag.find_by(context_id: @course.id, context_module_id: @module.id, content_type: "DiscussionTopic", title: new_item_name)
+      module_header_expand_toggles.first.click
+      expect(element_exists?(module_item_title_by_id_selector(module_item.id))).to be true
+      expect(module_item_title_by_id(module_item.id).text).to eq(new_item_name)
+    end
+  end
+
+  context "when new quizzes enabled", :ignore_js_errors do
+    new_item_name = "New quiz 1"
+
+    before(:once) do
+      @course.enable_feature! :quizzes_next
+      @course.root_account.settings[:provision] = { "lti" => "lti url" }
+      @course.root_account.save!
+
+      @course.context_external_tools.create!(
+        name: "Quizzes.Next",
+        consumer_key: "test_key",
+        shared_secret: "test_secret",
+        tool_id: "Quizzes 2",
+        url: "http://example.com/launch"
+      )
+      @module = @course.context_modules.create!(name: "quiz module")
+
+      # @new_quiz = @course.assignments.create!(title: new_item_name, points_possible: 0)
+      # @new_quiz.quiz_lti!
+      # @new_quiz.save!
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    it "adds a NQ quiz to the module" do
+      @new_quiz = @course.assignments.create!(title: "new quizzes assignment", points_possible: 0)
+      @new_quiz.quiz_lti!
+      @new_quiz.save!
+
+      go_to_modules
+      wait_for_ajaximations
+      module_header_expand_toggles.first.click
+      add_item_button(@module.id).click
+
+      click_INSTUI_Select_option(new_item_type_select_selector, "Quiz")
+      wait_for_ajaximations
+      click_INSTUI_Select_option(add_existing_item_select_selector, @new_quiz.title)
+
+      add_item_modal_add_item_button.click
+      wait_for_ajaximations
+
+      module_item = ContentTag.find_by(context_id: @course.id, context_module_id: @module.id, content_type: "Assignment", content_id: @new_quiz.id)
+      expect(module_item_title_by_id(module_item.id).text).to eq(@new_quiz.title)
+      expect(new_quiz_icon.count).to eq(1)
+    end
+
+    it "creates and adds a NQ quiz to the module" do
+      go_to_modules
+      module_header_expand_toggles.first.click
+      add_item_button(@module.id).click
+      click_INSTUI_Select_option(new_item_type_select_selector, "Quiz")
+
+      click_add_item_create_new_item_tab
+      replace_content(create_learning_object_name_input, new_item_name)
+      add_item_modal_add_item_button.click
+      wait_for_ajaximations
+
+      module_item = @module.content_tags.last
+      expect(module_item_title_by_id(module_item.id).text).to eq(new_item_name)
+      expect(new_quiz_icon.count).to eq(1)
+    end
+
+    it "creates and adds a classic quiz to the module when new quiz enabled" do
+      go_to_modules
+      module_header_expand_toggles.first.click
+      add_item_button(@module.id).click
+      click_INSTUI_Select_option(new_item_type_select_selector, "Quiz")
+
+      click_add_item_create_new_item_tab
+      replace_content(create_learning_object_name_input, new_item_name)
+      click_INSTUI_Select_option(quiz_engine_option_selector, "Quiz Classic")
+      add_item_modal_add_item_button.click
+      wait_for_ajaximations
+
+      module_item = ContentTag.find_by(context_id: @course.id, context_module_id: @module.id, content_type: "Quizzes::Quiz", title: new_item_name)
+      expect(module_item_title_by_id(module_item.id).text).to eq(new_item_name)
+      expect(classic_quiz_icon.count).to eq(1)
     end
   end
 end
