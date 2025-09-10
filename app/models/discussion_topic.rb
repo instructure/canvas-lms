@@ -592,7 +592,8 @@ class DiscussionTopic < ActiveRecord::Base
       result.assignment = assignment.duplicate({
                                                  duplicate_discussion_topic: false,
                                                  copy_title: result.title,
-                                                 discussion_topic_for_checkpoints: result
+                                                 discussion_topic_for_checkpoints: result,
+                                                 user: opts_with_default[:user]
                                                })
     end
 

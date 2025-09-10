@@ -602,8 +602,10 @@ class DiscussionTopicsApiController < ApplicationController
 
     return unless authorized_action(@topic, @current_user, :duplicate)
 
+    @topic.updating_user = @current_user
     new_topic = @topic.duplicate({ user: @current_user })
-    new_topic.saving_user = @current_user
+    new_topic.updating_user = @current_user
+
     if @topic.pinned
       new_topic.position = @topic.context.discussion_topics.maximum(:position) + 1
     end

@@ -427,7 +427,8 @@ class AbstractAssignment < ActiveRecord::Base
                      unlock_at: sub_assignment.unlock_at
                    }]
                  end,
-          replies_required: result.discussion_topic.reply_to_entry_required_count || nil
+          replies_required: result.discussion_topic.reply_to_entry_required_count || nil,
+          saving_user: opts[:user]
         )
         new_sub_assignment.duplicate_of = sub_assignment
         new_sub_assignment.save!
