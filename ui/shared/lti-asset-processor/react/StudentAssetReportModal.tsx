@@ -36,6 +36,17 @@ import TruncateWithTooltip from '../../lti-apps/components/common/TruncateWithTo
 import AssetReportStatus from './AssetReportStatus'
 import {View} from '@instructure/ui-view'
 
+/**
+ * STOP!
+ *
+ * This file is retained only for old code; it will be removed after
+ * the Asset Processors refactor is complete (INTEROP-9587 and
+ * INTEROP-9588 Do not use this file in new code, use
+ * ./LtiAssetReport.ts instead.
+ *
+ * TODO: remove this file after INTEROP-9588 is done
+ */
+
 interface Props {
   assetProcessors: ExistingAttachedAssetProcessor[]
   assignmentName: string

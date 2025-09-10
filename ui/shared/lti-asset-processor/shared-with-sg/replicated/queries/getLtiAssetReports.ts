@@ -22,31 +22,47 @@ import {gql, type GqlTemplateStringType} from '../../dependenciesShims'
 
 const I18n = createI18nScope('lti_asset_processor')
 
-// Exported for use in Canvas
+export const LTI_ASSET_REPORT_COMMON_FIELDS = gql`
+  fragment LtiAssetReportCommonFields on LtiAssetReport {
+    _id
+    comment
+    errorCode
+    indicationAlt
+    indicationColor
+    launchUrlPath
+    priority
+    processingProgress
+    processorId
+    reportType
+    resubmitAvailable
+    result
+    resultTruncated
+    title
+  }
+`
+
+// For Student views in Canvas.
+export const LTI_ASSET_REPORT_FOR_STUDENT_FRAGMENT = gql`
+  fragment LtiAssetReportForStudent on LtiAssetReport {
+    ...LtiAssetReportCommonFields
+    asset { attachmentId, attachmentName, submissionAttempt }
+  }
+  ${LTI_ASSET_REPORT_COMMON_FIELDS}
+`
+
+// Query used in SpeedGrader. Exported for use in Canvas.
 export const LTI_ASSET_REPORTS_QUERY: GqlTemplateStringType = gql`
   query SpeedGrader_LtiAssetReportsQuery($assignmentId: ID!, $studentUserId: ID, $studentAnonymousId: ID) {
     submission(assignmentId: $assignmentId, userId: $studentUserId, anonymousId: $studentAnonymousId) {
       ltiAssetReportsConnection(first: 20) {
         nodes {
-          _id
-          comment
-          errorCode
-          indicationAlt
-          indicationColor
-          launchUrlPath
-          priority
-          processingProgress
-          processorId
-          reportType
-          resubmitAvailable
-          result
-          resultTruncated
-          title
+          ...LtiAssetReportCommonFields
           asset { attachmentId, submissionAttempt }
         }
       }
     }
   }
+  ${LTI_ASSET_REPORT_COMMON_FIELDS}
 `
 
 // Disallows both studentUserId and studentAnonymousId being set

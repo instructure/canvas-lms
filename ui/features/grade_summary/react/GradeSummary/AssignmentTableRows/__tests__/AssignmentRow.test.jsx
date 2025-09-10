@@ -150,8 +150,21 @@ describe('AssignmentRow', () => {
   })
 
   describe('Document Processors', () => {
+    const ltiAssetProcessorsConnection = {
+      nodes: [
+        {
+          _id: '1',
+          externalTool: {
+            _id: '1',
+            name: 'the best tool',
+          },
+        },
+      ],
+    }
+
     it('does not render AssetProcessorCell when showDocumentProcessors is false', () => {
       const assignment = Assignment.mock({
+        ltiAssetProcessorsConnection,
         submissionsConnection: {
           nodes: [
             Submission.mock({
@@ -160,6 +173,14 @@ describe('AssignmentRow', () => {
                   {
                     _id: '1',
                     priority: 1,
+                    processingProgress: 'Processed',
+                    processorId: '1',
+                    reportType: 'originality',
+                    resubmitAvailable: false,
+                    asset: {
+                      attachmentId: '1',
+                      attachmentName: 'file1.pdf',
+                    },
                   },
                 ],
               },
@@ -176,6 +197,7 @@ describe('AssignmentRow', () => {
 
     it('render No result when showDocumentProcessors is true but asset reports array is empty', () => {
       const assignment = Assignment.mock({
+        ltiAssetProcessorsConnection,
         submissionsConnection: {
           nodes: [
             Submission.mock({
@@ -195,6 +217,7 @@ describe('AssignmentRow', () => {
 
     it('does not render AssetProcessorCell when showDocumentProcessors is true but asset reports array is null', () => {
       const assignment = Assignment.mock({
+        ltiAssetProcessorsConnection,
         submissionsConnection: {
           nodes: [
             Submission.mock({
@@ -214,6 +237,7 @@ describe('AssignmentRow', () => {
 
     it('renders AssetProcessorCell when showDocumentProcessors is true and asset reports exist', () => {
       const assignment = Assignment.mock({
+        ltiAssetProcessorsConnection,
         submissionsConnection: {
           nodes: [
             Submission.mock({
@@ -222,6 +246,14 @@ describe('AssignmentRow', () => {
                   {
                     _id: '1',
                     priority: 1,
+                    processingProgress: 'Processed',
+                    processorId: '1',
+                    reportType: 'originality',
+                    resubmitAvailable: false,
+                    asset: {
+                      attachmentId: '1',
+                      attachmentName: 'file1.pdf',
+                    },
                   },
                 ],
               },
@@ -238,6 +270,7 @@ describe('AssignmentRow', () => {
 
     it('does not render AssetProcessorCell when assignment has no submissions', () => {
       const assignment = Assignment.mock({
+        ltiAssetProcessorsConnection,
         submissionsConnection: {
           nodes: [],
         },
@@ -253,6 +286,7 @@ describe('AssignmentRow', () => {
 
     it('passes correct props to AssetProcessorCell', () => {
       const assignment = Assignment.mock({
+        ltiAssetProcessorsConnection,
         submissionsConnection: {
           nodes: [
             Submission.mock({
@@ -261,10 +295,26 @@ describe('AssignmentRow', () => {
                   {
                     _id: '1',
                     priority: 0,
+                    processingProgress: 'Processed',
+                    processorId: '1',
+                    reportType: 'originality',
+                    resubmitAvailable: false,
+                    asset: {
+                      attachmentId: '1',
+                      attachmentName: 'file1.pdf',
+                    },
                   },
                   {
                     _id: '2',
                     priority: 0,
+                    processingProgress: 'Processed',
+                    processorId: '1',
+                    reportType: 'originality2',
+                    resubmitAvailable: false,
+                    asset: {
+                      attachmentId: '1',
+                      attachmentName: 'file1.pdf',
+                    },
                   },
                 ],
               },

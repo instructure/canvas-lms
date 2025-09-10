@@ -16,29 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * STOP!
- *
- * This file is retained only for old code; it will be removed after
- * the Asset Processors refactor is complete (INTEROP-9587 and
- * INTEROP-9588 Do not use this file in new code, use
- * ./LtiAssetReport.ts instead.
- *
- * TODO: remove this file after INTEROP-9588 is done
- */
-
-import {LtiAssetReportWithAsset} from '@canvas/lti-asset-processor/model/AssetReport'
 import {colors} from '@instructure/canvas-theme'
 import {IconCompleteSolid, IconWarningSolid} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
+import {LtiAssetReport} from '../model/LtiAssetReport'
 
 const I18n = createI18nScope('submissions_show_preview_asset_report_status')
 
 interface Props {
-  reports: LtiAssetReportWithAsset[]
+  reports: LtiAssetReport[]
   openModal?: () => void
 }
 

@@ -16,6 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * STOP!
+ *
+ * This file is retained only for old code; it will be removed after
+ * the Asset Processors refactor for Grades Page is complete
+ * (INTEROP-9587). Do not use this file in new code, use
+ * ./LtiAssetProcessorCell.ts instead.
+ *
+ * TODO: remove this file after INTEROP-9588 is done
+ */
+
 import React, {useState} from 'react'
 import AssetReportStatus from '@canvas/lti-asset-processor/react/AssetReportStatus'
 import StudentAssetReportModal from '@canvas/lti-asset-processor/react/StudentAssetReportModal'
@@ -29,6 +40,10 @@ interface AssetProcessorCellProps {
   assignmentName: string
 }
 
+/**
+ * Represents the AssetReportStatus link with corresponding Modal showing the
+ * full information, used in Student Grades page (both old and new).
+ */
 export default function AssetProcessorCell({
   assetProcessors,
   assetReports,
