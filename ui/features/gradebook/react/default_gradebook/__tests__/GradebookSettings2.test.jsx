@@ -292,7 +292,6 @@ describe('Gradebook#handleViewOptionsUpdated', () => {
         showSeparateFirstLastNames: false,
         statusColors: gradebook.state.gridColors,
         viewUngradedAsZero: false,
-        viewHiddenGradesIndicator: false,
         ...overrides,
       })
 
@@ -302,7 +301,6 @@ describe('Gradebook#handleViewOptionsUpdated', () => {
             showUnpublishedAssignments: true,
             statusColors: {...gradebook.state.gridColors, dropped: '#000000'},
             viewUngradedAsZero: true,
-            viewHiddenGradesIndicator: true,
           }),
         )
 
@@ -312,7 +310,6 @@ describe('Gradebook#handleViewOptionsUpdated', () => {
         expect(params.colors.dropped).toBe('#000000')
         expect(params.show_unpublished_assignments).toBe('true')
         expect(params.view_ungraded_as_zero).toBe('true')
-        expect(params.view_hidden_grades_indicator).toBe('true')
       })
 
       test('does not call saveUserSettings if no value has changed', async () => {
@@ -428,21 +425,6 @@ describe('Gradebook#handleViewOptionsUpdated', () => {
           ).rejects.toThrow('STILL NO')
           expect(gradebook.updateAllTotalColumns).not.toHaveBeenCalled()
           expect(gradebook.gridDisplaySettings.viewUngradedAsZero).toBe(false)
-        })
-      })
-      describe('updating view hidden grades indicator', () => {
-        test('makes updates to the grid when the request completes', async () => {
-          await gradebook.handleViewOptionsUpdated(updateParams({viewHiddenGradesIndicator: true}))
-          expect(gradebook.gridDisplaySettings.viewHiddenGradesIndicator).toBe(true)
-        })
-
-        test('does not make updates to grid if the request fails', async () => {
-          GradebookApi.saveUserSettings.mockRejectedValue(new Error('STILL NO'))
-          await expect(
-            gradebook.handleViewOptionsUpdated({viewHiddenGradesIndicator: true}),
-          ).rejects.toThrow('STILL NO')
-          expect(gradebook.updateAllTotalColumns).not.toHaveBeenCalled()
-          expect(gradebook.gridDisplaySettings.viewHiddenGradesIndicator).toBe(false)
         })
       })
 
@@ -726,60 +708,6 @@ describe('Gradebook#toggleHideTotal', () => {
 
     expect(gradebook.saveSettings).toHaveBeenCalledWith({
       hideTotal: true,
-    })
-  })
-})
-
-describe('Gradebook#toggleViewHiddenGradesIndicator', () => {
-  let gradebook
-  let $fixtures
-
-  beforeEach(() => {
-    $fixtures = document.createElement('div')
-    $fixtures.id = 'fixtures'
-    document.body.appendChild($fixtures)
-
-    setFixtureHtml($fixtures)
-    gradebook = createGradebook({
-      grid: {
-        getColumns: () => [],
-        updateCell: jest.fn(),
-      },
-    })
-
-    jest.spyOn(gradebook, 'saveSettings').mockResolvedValue()
-  })
-
-  afterEach(() => {
-    ReactDOM.unmountComponentAtNode($fixtures)
-    document.body.removeChild($fixtures)
-    jest.restoreAllMocks()
-  })
-
-  test('toggles viewHiddenGradesIndicator to true when false', () => {
-    gradebook.gridDisplaySettings.viewHiddenGradesIndicator = false
-    // jest.spyOn(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
-    gradebook.toggleViewHiddenGradesIndicator()
-
-    expect(gradebook.gridDisplaySettings.viewHiddenGradesIndicator).toBe(true)
-  })
-
-  test('toggles viewHiddenGradesIndicator to false when true', () => {
-    gradebook.gridDisplaySettings.viewHiddenGradesIndicator = true
-    // jest.spyOn(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
-    gradebook.toggleViewHiddenGradesIndicator()
-
-    expect(gradebook.gridDisplaySettings.viewHiddenGradesIndicator).toBe(false)
-  })
-
-  test('calls saveSettings with the new value of the setting', () => {
-    gradebook.gridDisplaySettings.viewHiddenGradesIndicator = false
-    jest.spyOn(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
-
-    gradebook.toggleViewHiddenGradesIndicator()
-
-    expect(gradebook.saveSettings).toHaveBeenCalledWith({
-      viewHiddenGradesIndicator: true,
     })
   })
 })
