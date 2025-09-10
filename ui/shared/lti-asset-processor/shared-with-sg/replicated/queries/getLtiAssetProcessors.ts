@@ -22,24 +22,30 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('lti_asset_processor')
 
+// For use in Canvas
+export const LTI_ASSET_PROCESSORS_QUERY_NODES_FRAGMENT = gql`
+  fragment LtiAssetProcessorFragment on LtiAssetProcessor {
+    _id
+    title
+    iconOrToolIconUrl
+    externalTool {
+      _id
+      name
+      labelFor(placement: ActivityAssetProcessor)
+    }
+  }
+`
+
 // Exported for use in Canvas
 export const LTI_ASSET_PROCESSORS_QUERY: GqlTemplateStringType = gql`
   query SpeedGrader_LtiAssetProcessorsQuery($assignmentId: ID!) {
     assignment(id: $assignmentId) {
       ltiAssetProcessorsConnection {
-        nodes {
-          _id
-          title
-          iconOrToolIconUrl
-          externalTool {
-            _id
-            name
-            labelFor(placement: ActivityAssetProcessor)
-          }
-        }
+        nodes { ...LtiAssetProcessorFragment }
       }
     }
   }
+  ${LTI_ASSET_PROCESSORS_QUERY_NODES_FRAGMENT}
 `
 
 export const ZGetLtiAssetProcessorsParams: z.ZodSchema<{

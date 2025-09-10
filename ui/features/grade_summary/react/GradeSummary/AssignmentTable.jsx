@@ -71,29 +71,16 @@ const getCurrentOrFinalGrade = (
   }
 }
 
-const hasAssetReports = submission => {
-  const nodes = submission?.ltiAssetReportsConnection?.nodes
-  return nodes !== undefined && nodes !== null
-}
-
-const shouldShowDocumentProcessorsColumn = assignmentsData => {
-  if (!assignmentsData?.assignments) {
-    return false
-  }
-
-  if (
-    !assignmentsData.assignments.some(
-      assignment =>
-        assignment?.ltiAssetProcessorsConnection &&
-        assignment.ltiAssetProcessorsConnection.nodes.length > 0,
-    )
-  ) {
-    return false
-  }
-
-  return assignmentsData.assignments.some(assignment =>
-    assignment?.submissionsConnection?.nodes?.some(hasAssetReports),
+// Returns true if there if the assignment has at least one asset processor,
+// and if the assetReportsConnection.nodes is present (empty array counts as
+// present for determining whether to show the column -- see
+// AssetProcessorReportHelper#raw_asset_reports)
+function assignmentHasDocumentProcessorsDataToShow(assignment) {
+  const assignmentHasProcessors = !!assignment.ltiAssetProcessorsConnection?.nodes?.length
+  const assignmentHasMaybeEmptyAssetReports = assignment.submissionsConnection?.nodes?.some(
+    sub => !!sub?.ltiAssetReportsConnection?.nodes,
   )
+  return assignmentHasProcessors && assignmentHasMaybeEmptyAssetReports
 }
 
 const AssignmentTable = ({
@@ -125,7 +112,9 @@ const AssignmentTable = ({
   const overrideGrade =
     queryData?.usersConnection?.nodes[0]?.enrollments[0]?.grades?.overrideGrade || null
 
-  const showDocumentProcessors = shouldShowDocumentProcessorsColumn(assignmentsData)
+  const showDocumentProcessors = assignmentsData?.assignments?.some(
+    assignmentHasDocumentProcessorsDataToShow,
+  )
   const headers = createHeaders(showDocumentProcessors)
 
   useEffect(() => {

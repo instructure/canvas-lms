@@ -16,6 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * Types used by LTI Asset Report related code, see
+ * doc/lti/18_asset_reports.md for an overview of where LTI Asset Reports are
+ * shown in the app.
+ */
+
 import {z} from 'zod'
 
 const ZLtiAssetReportProcessingProgress = z.string()
@@ -34,6 +40,7 @@ export type LtiAsset = z.infer<typeof ZLtiAsset>
 
 /**
  * Asset Report information, as shown e.g. in Speedgrader
+ * Corresponds to object used in LTI_ASSET_REPORTS_QUERY
  */
 export const ZLtiAssetReport = z
   .object({
@@ -58,9 +65,20 @@ export const ZLtiAssetReport = z
 
 export type LtiAssetReport = z.infer<typeof ZLtiAssetReport>
 
+/**
+ * Corresponds to LTI_ASSET_REPORT_FOR_STUDENT_FRAGMENT
+ */
+export const ZLtiAssetReportForStudent = ZLtiAssetReport.extend({
+  asset: ZLtiAsset.extend({attachmentName: z.string().nullable().optional()}),
+})
+export type LtiAssetReportForStudent = z.infer<typeof ZLtiAssetReportForStudent>
+
 export const ZLtiAssetReports = z.array(ZLtiAssetReport.nullable())
 export type LtiAssetReports = z.infer<typeof ZLtiAssetReports>
 
+/**
+ * Corresponds to the result of LTI_ASSET_REPORTS_QUERY
+ */
 export const ZGetLtiAssetReportsResult = z
   .object({
     __typename: z.literal('Query').optional(),
@@ -84,46 +102,42 @@ export type GetLtiAssetReportsResult = z.infer<typeof ZGetLtiAssetReportsResult>
 /**
  * An LtiAssetProcessor as returned by our GraphQL query.
  */
-export const ZLtiAssetProcessor: z.ZodType<{
-  _id: string
-  title: string | null
-  iconOrToolIconUrl: string | null
-  externalTool: {
-    _id: string
-    name: string
-    labelFor: string | null
-  }
-}> = z
+export const ZLtiAssetProcessor = z
   .object({
+    __typename: z.literal('LtiAssetProcessor').optional(),
     _id: z.string(),
-    title: z.string().nullable(),
-    iconOrToolIconUrl: z.string().nullable(),
+    title: z.string().nullable().optional(),
+    iconOrToolIconUrl: z.string().nullable().optional(),
     externalTool: z.object({
+      __typename: z.literal('ExternalTool').optional(),
       _id: z.string(),
       name: z.string(),
-      labelFor: z.string().nullable(),
+      labelFor: z.string().nullable().optional(),
     }),
   })
   .strict()
 
 export type LtiAssetProcessor = z.infer<typeof ZLtiAssetProcessor>
 
-export const ZLtiAssetProcessors: z.ZodType<Array<LtiAssetProcessor>> = z.array(ZLtiAssetProcessor)
+export const ZLtiAssetProcessors = z.array(ZLtiAssetProcessor.nullable())
 export type LtiAssetProcessors = z.infer<typeof ZLtiAssetProcessors>
 
-export const ZGetLtiAssetProcessorsResult: z.ZodType<{
-  assignment: {
-    ltiAssetProcessorsConnection: {
-      nodes: LtiAssetProcessors
-    }
-  }
-}> = z
+export const ZGetLtiAssetProcessorsResult = z
   .object({
-    assignment: z.object({
-      ltiAssetProcessorsConnection: z.object({
-        nodes: ZLtiAssetProcessors,
-      }),
-    }),
+    __typename: z.literal('Query').optional(),
+    assignment: z
+      .object({
+        __typename: z.literal('Assignment').optional(),
+        ltiAssetProcessorsConnection: z
+          .object({
+            __typename: z.literal('LtiAssetProcessorConnection').optional(),
+            nodes: ZLtiAssetProcessors.nullable().optional(),
+          })
+          .nullable()
+          .optional(),
+      })
+      .nullable()
+      .optional(),
   })
   .strict()
 

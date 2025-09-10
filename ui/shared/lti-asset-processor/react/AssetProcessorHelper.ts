@@ -50,10 +50,11 @@ export function filterReportsByAttempt(
 }
 
 export function shouldRenderAssetProcessorData(): boolean {
-  if (ENV.ASSET_PROCESSORS && ENV.ASSET_PROCESSORS.length > 0 && ENV.ASSET_REPORTS != null) {
-    return true
-  }
-  return false
+  // See also assignmentHasDocumentProcessorsDataToShow, equivalent for new
+  // Grades Page
+  const assignmentHasProcessors = !!ENV.ASSET_PROCESSORS?.length
+  const assignmentHasMaybeEmptyAssetReports = !!ENV.ASSET_REPORTS
+  return assignmentHasProcessors && assignmentHasMaybeEmptyAssetReports
 }
 
 export function clearAssetProcessorReports() {

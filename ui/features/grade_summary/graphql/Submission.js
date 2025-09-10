@@ -17,10 +17,11 @@
  */
 
 import {gql} from '@apollo/client'
-import {arrayOf, float, string, bool, number} from 'prop-types'
+import {arrayOf, float, string, bool, object} from 'prop-types'
 
 import {RubricAssessment} from '@canvas/assignments/graphql/student/RubricAssessment'
 import {SubmissionComment} from './SubmissionComment'
+import {LTI_ASSET_REPORT_FOR_STUDENT_FRAGMENT} from '@canvas/lti-asset-processor/shared-with-sg/replicated/queries/getLtiAssetReports'
 
 export const Submission = {
   fragment: gql`
@@ -53,31 +54,13 @@ export const Submission = {
       }
       ltiAssetReportsConnection(first: 10, latest: true) {
         nodes {
-          _id
-          asset {
-            _id
-            attachmentId
-            attachmentName
-            submissionAttempt
-            submissionId
-          }
-          comment
-          errorCode
-          indicationAlt
-          indicationColor
-          launchUrlPath
-          priority
-          processingProgress
-          processorId
-          reportType
-          result
-          resultTruncated
-          title
+          ...LtiAssetReportForStudent
         }
       }
     }
     ${RubricAssessment.fragment}
     ${SubmissionComment.fragment}
+    ${LTI_ASSET_REPORT_FOR_STUDENT_FRAGMENT}
   `,
   shape: {
     _id: string,
@@ -108,28 +91,9 @@ export const Submission = {
     }),
     rubricAssessmentsConnection: {nods: arrayOf(RubricAssessment.shape)},
     ltiAssetReportsConnection: {
-      nodes: arrayOf({
-        _id: string,
-        asset: {
-          _id: string,
-          attachmentId: string,
-          attachmentName: string,
-          submissionAttempt: string,
-          submissionId: string,
-        },
-        comment: string,
-        errorCode: string,
-        indicationAlt: string,
-        indicationColor: string,
-        launchUrlPath: string,
-        priority: number,
-        processingProgress: string,
-        processorId: string,
-        reportType: string,
-        result: string,
-        resultTruncated: string,
-        title: string,
-      }),
+      // Lti Asset Processor types use Zod schemas, so there's not really a
+      // need to replicate the full shape here.
+      nodes: arrayOf(object),
     },
   },
   mock: ({
