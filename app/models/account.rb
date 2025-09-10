@@ -144,6 +144,7 @@ class Account < ActiveRecord::Base
            dependent: :destroy
   has_many :lti_registrations, class_name: "Lti::Registration", inverse_of: :account, dependent: :destroy
   has_many :block_editor_templates, class_name: "BlockEditorTemplate", as: :context, inverse_of: :context
+  has_many :oauth_client_configs, class_name: "OAuthClientConfig", inverse_of: :root_account
   belongs_to :course_template, class_name: "Course", inverse_of: :templated_accounts
   belongs_to :grading_standard
 
