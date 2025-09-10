@@ -3693,6 +3693,7 @@ class AbstractAssignment < ActiveRecord::Base
 
   def update_due_date_smart_alerts
     return unless context.active_now?
+    return if workflow_state != "published"
 
     unless saved_by == :migration
       if due_at.nil? || due_at < Time.zone.now
