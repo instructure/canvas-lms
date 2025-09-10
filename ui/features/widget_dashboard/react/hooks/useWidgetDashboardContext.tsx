@@ -41,7 +41,7 @@ export interface SharedCourseData {
   courseCode: string
   courseName: string
   currentGrade: number | null
-  gradingScheme: 'letter' | 'percentage'
+  gradingScheme: 'percentage' | Array<[string, number]>
   lastUpdated: string
 }
 

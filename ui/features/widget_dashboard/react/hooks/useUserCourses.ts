@@ -22,6 +22,14 @@ import {gql} from 'graphql-tag'
 import type {CourseGrade} from '../types'
 import {getCurrentUserId, executeGraphQLQuery, createUserQueryConfig} from '../utils/graphql'
 import {COURSE_GRADES_WIDGET, QUERY_CONFIG} from '../constants'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
+
+declare const ENV: GlobalEnv & {
+  SHARED_COURSE_DATA?: Array<{
+    courseId: string
+    gradingScheme: 'percentage' | Array<[string, number]>
+  }>
+}
 
 interface UsePaginatedCoursesWithGradesOptions {
   limit?: number
@@ -47,6 +55,12 @@ interface UserEnrollment {
     _id: string
     name: string
     courseCode?: string
+    gradingStandard?: {
+      data?: Array<{
+        letterGrade: string
+        baseValue: number
+      }> | null
+    } | null
   }
   updatedAt?: string
   grades?: {
@@ -85,6 +99,12 @@ const USER_COURSES_WITH_GRADES_CONNECTION_QUERY = gql`
               _id
               name
               courseCode
+              gradingStandard {
+                data {
+                  letterGrade
+                  baseValue
+                }
+              }
             }
             updatedAt
             grades {
@@ -111,7 +131,6 @@ const USER_COURSES_WITH_GRADES_CONNECTION_QUERY = gql`
 function transformEnrollmentToCourseGrade(enrollment: UserEnrollment): CourseGrade {
   const grades = enrollment.grades
 
-  // Determine the display grade - prioritize override, then final, then current
   let displayGrade: number | null = null
   let displayGradeString: string | null = null
 
@@ -126,14 +145,27 @@ function transformEnrollmentToCourseGrade(enrollment: UserEnrollment): CourseGra
     displayGradeString = grades.currentGrade || null
   }
 
+  let gradingScheme: 'percentage' | Array<[string, number]>
+
+  if (displayGradeString && enrollment.course.gradingStandard?.data) {
+    gradingScheme = enrollment.course.gradingStandard.data.map(item => [
+      item.letterGrade,
+      item.baseValue,
+    ])
+  } else if (displayGradeString) {
+    throw new Error(
+      `Letter grading scheme detected for course ${enrollment.course.name} but no grading standard data available`,
+    )
+  } else {
+    gradingScheme = 'percentage'
+  }
+
   return {
     courseId: enrollment.course._id,
     courseCode: enrollment.course.courseCode || COURSE_GRADES_WIDGET.DEFAULT_COURSE_CODE,
     courseName: enrollment.course.name,
     currentGrade: displayGrade,
-    gradingScheme: displayGradeString
-      ? COURSE_GRADES_WIDGET.GRADING_SCHEMES.LETTER
-      : COURSE_GRADES_WIDGET.GRADING_SCHEMES.PERCENTAGE,
+    gradingScheme,
     lastUpdated: new Date(enrollment.updatedAt || new Date().toISOString()),
   }
 }

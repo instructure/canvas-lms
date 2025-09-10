@@ -24,7 +24,7 @@ import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {Button} from '@instructure/ui-buttons'
 import type {CourseGradeCardProps} from '../../../types'
-import {formatUpdatedDate} from './utils'
+import {formatUpdatedDate, convertToLetterGrade} from './utils'
 import {COURSE_GRADES_WIDGET} from '../../../constants'
 import {CourseCode} from '../../shared/CourseCode'
 
@@ -35,6 +35,7 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
   courseCode,
   courseName,
   currentGrade,
+  gradingScheme,
   lastUpdated,
   gridIndex,
   globalGradeVisibility = true,
@@ -105,7 +106,11 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
             <Flex.Item>
               {isGradeVisible && (
                 <Text size="xx-large" weight="bold">
-                  {currentGrade !== null ? `${Math.floor(currentGrade)}%` : '--'}
+                  {currentGrade !== null
+                    ? gradingScheme === 'percentage'
+                      ? `${Math.floor(currentGrade)}%`
+                      : convertToLetterGrade(currentGrade, gradingScheme)
+                    : '--'}
                 </Text>
               )}
             </Flex.Item>

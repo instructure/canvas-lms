@@ -125,6 +125,7 @@ const CourseGradesWidget: React.FC<BaseWidgetProps> = ({widget}) => {
                         courseCode={grade.courseCode}
                         courseName={grade.courseName}
                         currentGrade={grade.currentGrade}
+                        gradingScheme={grade.gradingScheme}
                         lastUpdated={grade.lastUpdated}
                         onShowGradebook={createGradebookHandler(grade.courseId)}
                         gridIndex={gradeIndex}
@@ -152,6 +153,7 @@ const CourseGradesWidget: React.FC<BaseWidgetProps> = ({widget}) => {
                               courseCode={grade.courseCode}
                               courseName={grade.courseName}
                               currentGrade={grade.currentGrade}
+                              gradingScheme={grade.gradingScheme}
                               lastUpdated={grade.lastUpdated}
                               onShowGradebook={createGradebookHandler(grade.courseId)}
                               gridIndex={gradeIndex}

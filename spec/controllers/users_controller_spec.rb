@@ -3900,4 +3900,124 @@ describe UsersController do
       expect(json_parse["status"]).to eq("ok")
     end
   end
+
+  describe "dashboard with course grades" do
+    before do
+      Account.default.enable_feature!(:widget_dashboard)
+    end
+
+    context "when student accesses their own dashboard" do
+      before do
+        course_with_student(active_all: true)
+        user_session(@student)
+      end
+
+      it "shows course grades with percentage grading scheme when standard disabled" do
+        @course.grading_standard_enabled = false
+        @course.save!
+
+        get :user_dashboard
+        expect(response).to be_successful
+
+        course_data = assigns[:js_env][:SHARED_COURSE_DATA]
+        expect(course_data).to be_present
+        expect(course_data.first[:gradingScheme]).to eq("percentage")
+      end
+
+      it "shows course grades with grading standard data when letter grading enabled" do
+        @course.grading_standard_enabled = true
+        @course.grading_standard = @course.grading_standards.create!(
+          title: "Letter Grading Scheme",
+          data: { "A" => 0.9, "F" => 0 },
+          scaling_factor: 1.0,
+          points_based: false,
+          workflow_state: "active"
+        )
+        @course.save!
+
+        get :user_dashboard
+        expect(response).to be_successful
+
+        course_data = assigns[:js_env][:SHARED_COURSE_DATA]
+        expect(course_data).to be_present
+        expect(course_data.first[:gradingScheme]).to be_an(Array)
+        expect(course_data.first[:gradingScheme]).to include(["A", 0.9])
+      end
+
+      it "includes courses when hide_final_grades is false" do
+        @course.settings = @course.settings.merge(hide_final_grades: false)
+        @course.save!
+
+        get :user_dashboard
+        expect(response).to be_successful
+
+        course_data = assigns[:js_env][:SHARED_COURSE_DATA]
+        expect(course_data).to be_present
+        expect(course_data.first[:courseId]).to eq(@course.id.to_s)
+      end
+    end
+
+    context "when observer accesses observed student dashboard" do
+      before do
+        course_with_student(active_all: true)
+        @observer = user_with_pseudonym(active_all: true)
+        @course.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @student.id, enrollment_state: "active")
+        user_session(@observer)
+        session[:observed_user_id] = @student.id
+      end
+
+      it "shows observed student's course grades when enrollment grants read_grades permission" do
+        get :user_dashboard
+        expect(response).to be_successful
+
+        course_data = assigns[:js_env][:SHARED_COURSE_DATA]
+        expect(course_data).to be_present
+        expect(course_data.first[:courseId]).to eq(@course.id.to_s)
+      end
+
+      it "excludes courses when observer lacks all grade permissions" do
+        @course.enroll_user(@observer, "ObserverEnrollment", enrollment_state: "active")
+
+        get :user_dashboard
+        expect(response).to be_successful
+
+        course_data = assigns[:js_env][:SHARED_COURSE_DATA] || []
+        student_courses = course_data.select { |c| c[:courseId] == @course.id.to_s }
+        expect(student_courses).to be_empty
+      end
+    end
+
+    context "grade priority and display" do
+      before do
+        course_with_student(active_all: true)
+        user_session(@student)
+        @assignment = @course.assignments.create!(title: "Test", points_possible: 100)
+      end
+
+      it "displays override score when present" do
+        submission = @assignment.submit_homework(@student, body: "test")
+        submission.update_column(:score, 80)
+        @enrollment.find_score(course_score: true).update!(override_score: 95)
+
+        get :user_dashboard
+        expect(response).to be_successful
+
+        course_data = assigns[:js_env][:SHARED_COURSE_DATA]
+        expect(course_data.first[:currentGrade]).to eq(95.0)
+      end
+
+      it "displays current score when no override present" do
+        submission = @assignment.submit_homework(@student, body: "test")
+        submission.update_column(:score, 85)
+        score = @enrollment.find_score(course_score: true)
+        score.update!(current_score: 80, final_score: 85)
+
+        get :user_dashboard
+        expect(response).to be_successful
+
+        course_data = assigns[:js_env][:SHARED_COURSE_DATA]
+        expect(course_data.first[:currentGrade]).to eq(80.0)
+      end
+    end
+  end
 end
