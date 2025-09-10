@@ -998,11 +998,17 @@ class GradebooksController < ApplicationController
         ).map { |c| { submission_comment: c } }
 
         if assignment.context.discussion_checkpoints_enabled?
+          # TODO: has_sub_assignment_submissions value will be updated to reflect true/false based off submissions on the sub assignment
+          # Refer to EGG-1916
           submission_json[:has_sub_assignment_submissions] = assignment.has_sub_assignments
           submission_json[:sub_assignment_submissions] = (assignment.has_sub_assignments &&
-            assignment.sub_assignments&.map do |sub_assignment|
-              sub_assignment_submission = sub_assignment.submissions.active.find_by(user_id: submission.user_id)
-              sub_assignnment_submission_json(sub_assignment_submission, sub_assignment_submission.assignment, @current_user, @session, @context)
+            assignment.sub_assignments&.filter_map do |sub_assignment|
+              sub_assignment_submission = sub_assignment.submissions.find_by(user_id: submission.user_id)
+              # A Submission can be nil for two reasons:
+              # 1. The Submission was deleted due to the student no longer having access to the assignment (i.e. enrollment changes, assignment override removal)
+              # 2. The Submission was never created.
+              #    TODO: Older DiscussionTopic SubAssignments may fall into this category. In this case, we will throw a custom error so we can track. Refer to EGG-1916
+              sub_assignment_submission_json(sub_assignment_submission, sub_assignment_submission.assignment, @current_user, @session, @context) if sub_assignment_submission.present?
             end) || []
         end
       end
