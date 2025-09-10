@@ -37,9 +37,11 @@ module CanvasCrummy
 
       if crumbs.length > 1
         content_tag(:nav, :id => "breadcrumbs", :role => "navigation", "aria-label" => "breadcrumbs") do
-          content_tag(:ul, nil, nil, false) do
-            crumbs.collect do |crumb|
-              content_tag(:li, crumb_to_html(crumb), crumb[2])
+          content_tag(:ol, nil, nil, false) do
+            crumbs.each_with_index.map do |crumb, index|
+              options = crumb[2] || {}
+              options = options.merge("aria-current" => "page") if index == crumbs.length - 1
+              content_tag(:li, crumb_to_html(crumb), options)
             end.join.html_safe
           end
         end
@@ -60,9 +62,11 @@ module CanvasCrummy
       home_crumb = k5_crumbs.last
       home_crumb[0] = "<i class=\"icon-Solid icon-arrow-open-start\"></i> ".html_safe + @context.name
       content_tag(:nav, :id => "breadcrumbs", :role => "navigation", "aria-label" => "breadcrumbs", :class => "k5-breadcrumbs") do
-        content_tag(:ul, nil, nil, false) do
-          k5_crumbs.collect do |crumb|
-            content_tag(:li, crumb_to_html(crumb), crumb[2])
+        content_tag(:ol, nil, nil, false) do
+          k5_crumbs.each_with_index.map do |crumb, index|
+            options = crumb[2] || {}
+            options = options.merge("aria-current" => "page") if index == k5_crumbs.length - 1
+            content_tag(:li, crumb_to_html(crumb), options)
           end.join.html_safe
         end
       end
