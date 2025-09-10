@@ -176,4 +176,100 @@ describe('RubricAssessmentContainer Tests', () => {
       expect(queryByTestId('outcome-popover-title')).not.toBeInTheDocument()
     })
   })
+
+  describe('Assessment Status tests', () => {
+    it('should show the "incomplete" status when a rubric has not yet been completed', () => {
+      const {getByTestId} = renderComponent()
+
+      expect(getByTestId('rubric-assessment-status-pill')).toHaveTextContent('Incomplete')
+    })
+
+    it('should show the "complete" status when a rubric has been completed', () => {
+      const {getByTestId} = renderComponent({
+        rubricAssessmentData: [
+          {
+            id: '_1',
+            points: 4,
+            comments: 'Great Job!',
+            criterionId: '1',
+            description: 'Rating 10',
+          },
+          {
+            id: '_2',
+            points: 10,
+            comments: 'Great Job!',
+            criterionId: '2',
+            description: 'Rating 10',
+          },
+        ],
+      })
+
+      expect(getByTestId('rubric-assessment-status-pill')).toHaveTextContent('Complete')
+    })
+
+    it('should show as incomplete if not all criteria are filled out', () => {
+      const {getByTestId} = renderComponent({
+        rubricAssessmentData: [
+          {
+            id: '_1',
+            points: 4,
+            comments: 'Great Job!',
+            criterionId: '1',
+            description: 'Rating 10',
+          },
+        ],
+      })
+
+      expect(getByTestId('rubric-assessment-status-pill')).toHaveTextContent('Incomplete')
+    })
+
+    it('should show as incomplete if the rubric only has comments but points are not hidden', () => {
+      const {getByTestId} = renderComponent({
+        isFreeFormCriterionComments: true,
+        rubricAssessmentData: [
+          {
+            id: '_1',
+            points: undefined,
+            comments: 'Great Job!',
+            criterionId: '1',
+            description: 'Rating 10',
+          },
+          {
+            id: '_2',
+            points: undefined,
+            comments: 'Great Job!',
+            criterionId: '2',
+            description: 'Rating 10',
+          },
+        ],
+      })
+
+      expect(getByTestId('rubric-assessment-status-pill')).toHaveTextContent('Incomplete')
+    })
+
+    it('should show as complete if the rubric is free form and points are hidden with only comments', () => {
+      const {getByTestId} = renderComponent({
+        isFreeFormCriterionComments: true,
+        hidePoints: true,
+        rubricAssessmentData: [
+          {
+            id: '_1',
+            points: undefined,
+            comments: 'Great Job!',
+            criterionId: '1',
+            description: 'Rating 10',
+          },
+          {
+            id: '_2',
+            points: undefined,
+            comments: 'Great Job!',
+            criterionId: '2',
+            description: 'Rating 10',
+          },
+        ],
+      })
+
+      expect(getByTestId('rubric-assessment-status-pill')).toHaveTextContent('Complete')
+    })
+  })
 })
