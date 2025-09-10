@@ -3511,35 +3511,40 @@ class UsersController < ApplicationController
       enrollments = @current_user.enrollments.current.preload(:course, :scores)
     end
 
-    course_data = enrollments.map do |enrollment|
+    course_data = enrollments.filter_map do |enrollment|
       course = enrollment.course
 
-      # Get the grade data similar to how the GraphQL query does it
-      grades = enrollment.find_score(grading_period: nil)
+      can_read_grades = if (observed_user || @current_user).id == @current_user.id
+                          !course.hide_final_grades? || course.grants_any_right?(@current_user, :view_all_grades, :manage_grades)
+                        else
+                          enrollment.grants_right?(@current_user, :read_grades) || course.grants_any_right?(@current_user, :view_all_grades, :manage_grades)
+                        end
 
-      # Determine display grade - prioritize override, then final, then current
+      next unless can_read_grades
+
+      course_score = enrollment.find_score(course_score: true)
       display_grade = nil
-      display_grade_string = nil
 
-      if grades
-        if grades.override_score.present?
-          display_grade = grades.override_score
-          display_grade_string = grades.override_grade
-        elsif grades.final_score.present?
-          display_grade = grades.final_score
-          display_grade_string = grades.final_grade
-        elsif grades.current_score.present?
-          display_grade = grades.current_score
-          display_grade_string = grades.current_grade
+      if course_score
+        if course_score.override_score.present?
+          display_grade = course_score.override_score
+        elsif course_score.current_score.present?
+          display_grade = course_score.current_score
         end
       end
+
+      grading_scheme = if course.grading_standard_enabled? && course.grading_standard
+                         course.grading_standard.data
+                       else
+                         "percentage"
+                       end
 
       {
         courseId: course.id.to_s,
         courseCode: course.course_code || "N/A",
         courseName: course.name,
         currentGrade: display_grade,
-        gradingScheme: display_grade_string.present? ? "letter" : "percentage",
+        gradingScheme: grading_scheme,
         lastUpdated: enrollment.updated_at.iso8601
       }
     end
