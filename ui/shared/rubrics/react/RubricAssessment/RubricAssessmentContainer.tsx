@@ -29,7 +29,7 @@ import type {
 } from '../types/rubric'
 import {ModernView, type ModernViewModes} from './ModernView'
 import {TraditionalView} from './TraditionalView'
-import {findCriterionMatchingRatingIndex} from './utils/rubricUtils'
+import {findCriterionMatchingRatingIndex, isRubricComplete} from './utils/rubricUtils'
 import useLocalStorage from '@canvas/local-storage'
 import * as CONSTANTS from './constants'
 import {type ViewMode} from './ViewModeSelect'
@@ -304,6 +304,12 @@ export const RubricAssessmentContainer = ({
             <AssessmentFooter
               isPreviewMode={isPreviewMode}
               isStandAloneContainer={isStandaloneContainer}
+              isRubricComplete={isRubricComplete({
+                criteria,
+                isFreeFormCriterionComments,
+                hidePoints,
+                rubricAssessment: rubricAssessmentDraftData,
+              })}
               onDismiss={onDismiss}
               onSubmit={onSubmit ? () => validateOnSubmit(rubricAssessmentDraftData) : undefined}
             />

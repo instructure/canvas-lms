@@ -20,26 +20,34 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {AssessmentStatusPill} from './AssessmentStatusPill'
 
 const I18n = createI18nScope('rubrics-assessment-tray')
 
 type AssessmentFooterProps = {
   isPreviewMode: boolean
+  isRubricComplete: boolean
   isStandAloneContainer: boolean
   onDismiss: () => void
   onSubmit?: () => void
 }
 export const AssessmentFooter = ({
   isPreviewMode,
+  isRubricComplete,
   isStandAloneContainer,
   onDismiss,
   onSubmit,
 }: AssessmentFooterProps) => {
   return (
     <View as="div" data-testid="rubric-assessment-footer" overflowX="hidden" overflowY="hidden">
-      <Flex justifyItems="end" margin="small 0">
+      <Flex justifyItems="end" margin="small 0" wrap="wrap" gap="small">
+        {onSubmit && !isPreviewMode && (
+          <Flex.Item>
+            <AssessmentStatusPill isRubricComplete={isRubricComplete} />
+          </Flex.Item>
+        )}
         {isStandAloneContainer && (
-          <Flex.Item margin="0 small 0 0">
+          <Flex.Item>
             <Button
               color="secondary"
               onClick={() => onDismiss()}
