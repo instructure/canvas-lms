@@ -766,6 +766,10 @@
                   <%= settings.check_box :limit_parent_app_web_access, :checked => @account.settings[:limit_parent_app_web_access] %>
                   <%= settings.label :limit_parent_app_web_access, :en => "Limit access to Canvas web from the Canvas Parent app" %>
                 </div>
+                <div>
+                  <%= settings.check_box :suppress_assignments, :checked => @account.suppress_assignments? %>
+                  <%= settings.label :suppress_assignments, :en => "Allow assignments to be suppressed" %>
+                </div>
               <% end %>
               <%# end of :manage_site_settings %>
               <div>
@@ -863,10 +867,6 @@
               <div>
                 <%= settings.check_box :enable_turnitin, :checked => @account.settings[:enable_turnitin] %>
                 <%= settings.label :enable_turnitin, :en => "Turnitin" %>
-              </div>
-              <div>
-                <%= settings.check_box :suppress_assignments, :checked => @account.settings[:suppress_assignments] %>
-                <%= settings.label :suppress_assignments, :en => "Allow assignments to be suppressed" %>
               </div>
             <% end %>
           <% end %>
