@@ -15,14 +15,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-name: "rubric-regenerate-criteriaV1"
+name: "rubric-regenerate-criteriaV2"
 model_id: "anthropic.claude-3-haiku-20240307-v1:0"
 rate_limit:
   limit: 25
   period: day
 template: |
 
-  You are a text editor for Canvas LMS rubrics. Your job is to return the updated criteria in the given format keeping the IDs unchanged.
+  You are a text editor for Canvas LMS rubrics. Your job is to return an updated criteria in the given format keeping the IDs unchanged.
 
   # Input Context
   1) Assignment Details:
@@ -55,12 +55,20 @@ template: |
   - Maintain a tone that is encouraging and constructive at all performance levels.
 
   # Output Specification
-  - Keep all existing criterion and rating IDs unchanged - if there any.
-  - Generate new IDs only following the _new_c_X and _new_r_X pattern.
+  - Keep all existing criterion and rating IDs unchanged if they are provided.
+  - Only generate new IDs when a criterion or rating does not already have one.
+  - If the input criteria or ratings do not have IDs, you must generate them using the following format:
+      - Criteria: criterion:_new_c_X
+      - Ratings: rating:_new_r_X
+  - Never create hierarchical IDs such as rating:1:1 or criterion:1.
+  - IDs must always be either:
+      - The exact original ID (if provided), OR
+      - A new ID in the _new_c_X / _new_r_X format.
   - Ratings must always be listed in descending order of points (highest → lowest).
   - Criteria must appear in the same order as provided in the input.
+  - Always make at least one textual improvement to every criterion and every rating, even if the original text seems perfect.
 
-  - New criterion and rating ID format:
+  Example format for newly generated IDs (only when no ID exists):
   criterion:_new_c_1:description=
   criterion:_new_c_1:long_description=
   rating:_new_r_1:description=
@@ -83,3 +91,4 @@ template: |
 
 options:
   max_tokens: 5000
+  temperature: 1.0

@@ -983,6 +983,90 @@ describe Rubric do
     )
   end
 
+  describe "#build_structure_directives_for_llm" do
+    let(:rubric) { Rubric.new }
+
+    def rating(id, points = 0)
+      { id:, description: "Rating #{id}", points: }
+    end
+
+    it "returns instruction to create new criteria when fewer exist than required" do
+      existing = []
+      output = rubric.build_structure_directives_for_llm(
+        existing_criteria: existing,
+        required_criteria_count: 2,
+        required_rating_count: 3
+      )
+
+      expect(output).to include("Criteria count: current=0, required=2.")
+      expect(output).to include("You must create exactly the following 2 criteria")
+      expect(output).to include("- criterion:_new_c_1 (with exactly 3 ratings).")
+      expect(output).to include("- criterion:_new_c_2 (with exactly 3 ratings).")
+      expect(output).to include("Do not reorder existing criteria")
+    end
+
+    it "returns instruction to append criteria when some exist but fewer than required" do
+      existing = [{ id: "crit_1", ratings: [rating("r1"), rating("r2")] }]
+      output = rubric.build_structure_directives_for_llm(
+        existing_criteria: existing,
+        required_criteria_count: 2,
+        required_rating_count: 2
+      )
+
+      expect(output).to include("Criteria count: current=1, required=2.")
+      expect(output).to include("You must append exactly 1 new criteria at the end:")
+      expect(output).to include("- criterion:_new_c_2 (with exactly 2 ratings).")
+    end
+
+    it "returns instruction to remove criteria when more exist than required" do
+      existing = [
+        { id: "crit_1", ratings: [] },
+        { id: "crit_2", ratings: [] },
+        { id: "crit_3", ratings: [] }
+      ]
+      output = rubric.build_structure_directives_for_llm(
+        existing_criteria: existing,
+        required_criteria_count: 2,
+        required_rating_count: 0
+      )
+
+      expect(output).to include("Criteria count: current=3, required=2. Remove 1 criteria")
+    end
+
+    it "returns instruction to add ratings when a criterion has too few" do
+      existing = [{ id: "crit_1", ratings: [rating("r1")] }]
+      output = rubric.build_structure_directives_for_llm(
+        existing_criteria: existing,
+        required_criteria_count: 1,
+        required_rating_count: 3
+      )
+
+      expect(output).to include("Ratings for crit_1: current=1, required=3. Create 2 new ratings.")
+    end
+
+    it "returns instruction to remove ratings when a criterion has too many" do
+      existing = [{ id: "crit_1", ratings: [rating("r1"), rating("r2"), rating("r3"), rating("r4")] }]
+      output = rubric.build_structure_directives_for_llm(
+        existing_criteria: existing,
+        required_criteria_count: 1,
+        required_rating_count: 2
+      )
+
+      expect(output).to include("Ratings for crit_1: current=4, required=2. Remove 2 ratings.")
+    end
+
+    it "returns stable message when everything matches" do
+      existing = [{ id: "crit_1", ratings: [rating("r1"), rating("r2")] }]
+      output = rubric.build_structure_directives_for_llm(
+        existing_criteria: existing,
+        required_criteria_count: 1,
+        required_rating_count: 2
+      )
+
+      expect(output).to eq("Keep the structure, criterion count, rating count and order as given.")
+    end
+  end
+
   describe "#update_criteria" do
     context "populates blank titles" do
       before do
