@@ -170,26 +170,20 @@ describe('FrequencyPicker', () => {
 
     // Test error boundary cases by mocking console.error to prevent test output pollution
     describe('with errors', () => {
-      // Save original console.error
-      const originalConsoleError = console.error
-
-      beforeEach(() => {
-        // Mock console.error to prevent error output in test results
-        console.error = jest.fn()
-      })
-
-      afterEach(() => {
-        // Restore original console.error
-        console.error = originalConsoleError
-      })
-
       it('the error boundary fallback when enabled with no date', () => {
+        // Suppress JSDOM VirtualConsole errors for this specific test
+        const originalConsoleError = global.console.error
+        global.console.error = jest.fn()
+
         const props = defaultProps({date: undefined})
         const {getByText} = render(
           <FrequencyPickerErrorBoundary>
             <FrequencyPicker {...props} />
           </FrequencyPickerErrorBoundary>,
         )
+
+        global.console.error = originalConsoleError
+
         expect(getByText('There was an error rendering.')).toBeInTheDocument()
         expect(
           getByText('FrequencyPicker: date is required when interaction is enabled'),
@@ -197,6 +191,10 @@ describe('FrequencyPicker', () => {
       })
 
       it('the error boundary fallback with no date and a recurring frequency', () => {
+        // Suppress JSDOM VirtualConsole errors for this specific test
+        const originalConsoleError = global.console.error
+        global.console.error = jest.fn()
+
         const props = defaultProps({
           date: undefined,
           interaction: 'disabled',
@@ -207,6 +205,9 @@ describe('FrequencyPicker', () => {
             <FrequencyPicker {...props} />
           </FrequencyPickerErrorBoundary>,
         )
+
+        global.console.error = originalConsoleError
+
         expect(getByText('There was an error rendering.')).toBeInTheDocument()
         expect(
           getByText('FrequencyPicker: date is required when initialFrequency is not not-repeat'),
