@@ -2106,6 +2106,22 @@ describe AssignmentsController do
       end
     end
 
+    context "js_env PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED" do
+      it "sets PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED in js_env as true if enabled" do
+        user_session(@teacher)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        get :show, params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED]).to be(true)
+      end
+
+      it "sets PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED in js_env as false if disabled" do
+        user_session(@teacher)
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+        get :show, params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED]).to be(false)
+      end
+    end
+
     it "shows assignment was submitted successfully alert if submitted in url" do
       user_session(@student)
       get :show, params: { course_id: @course.id, id: @assignment.id, submitted: 0 }
