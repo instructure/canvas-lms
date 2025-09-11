@@ -159,7 +159,8 @@ export type GridDisplaySettings = {
   showUnpublishedAssignments: boolean
   showSeparateFirstLastNames: boolean
   hideAssignmentGroupTotals: boolean
-  viewHiddenGradesIndicator: boolean
+  hideAssignmentGroupTotals: boolean
+  hideTotal: boolean
 }
 
 export type GridLocation = {

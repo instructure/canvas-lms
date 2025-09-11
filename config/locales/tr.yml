@@ -2375,6 +2375,7 @@ tr:
   an_integer_value_is_required_e073bd46: "Bir tamsayı değeri gerekiyor"
   an_internal_error_occurred_83b8a685: "Dahili bir hata oluştu"
   an_item_named_name_already_exists_in_this_location_147b7312: "\"%{name}\" adına bir öğe zaten bu konumda mevcut. Var olan dosyayı değiştirmek ister misiniz?"
+  an_unexpected_error_occurred_15bae9ec: "Beklenmeyen bir hata oluştu"
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "Bilinmeyen sunucu hatası oluştu. Lütfen tekrar deneyin."
   an_update_is_available_for_toolname_bba3fa2: "%{toolName} aracı için güncelleme mevcut"
   analytics: 

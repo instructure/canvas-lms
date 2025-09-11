@@ -407,12 +407,6 @@ const GradebookSettingsModal = (props: GradebookSettingsModalProps) => {
                       })
                     },
                   }}
-                  viewHiddenGradesIndicator={{
-                    checked: viewOptions.viewHiddenGradesIndicator,
-                    onChange: (value: GradebookViewOptions['viewHiddenGradesIndicator']) => {
-                      setViewOptions({...viewOptions, viewHiddenGradesIndicator: value})
-                    },
-                  }}
                 />
               </Tabs.Panel>
             )}
