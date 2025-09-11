@@ -135,7 +135,7 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcement}) => {
       maxWidth="100%"
     >
       <Flex direction="column" gap="xxx-small">
-        <Flex.Item>
+        <Flex.Item overflowY="visible">
           <Flex direction="row" gap="x-small">
             {/* Avatar */}
             <Flex.Item shouldShrink>
@@ -150,7 +150,7 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcement}) => {
             <Flex.Item shouldGrow shouldShrink>
               <Flex direction="column" gap="xxx-small">
                 {/* Row 1: Title and read/unread indicator */}
-                <Flex.Item shouldShrink>
+                <Flex.Item shouldShrink overflowX="visible" overflowY="visible">
                   <Flex direction="row" justifyItems="space-between" alignItems="start" gap="small">
                     <Flex.Item shouldGrow shouldShrink>
                       <Link href={announcement.html_url} isWithinText={false}>
@@ -186,7 +186,7 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcement}) => {
             </Flex.Item>
           </Flex>
         </Flex.Item>
-        <Flex.Item>
+        <Flex.Item overflowX="visible" overflowY="visible">
           {/* Announcement Content */}
           {announcement.message && (
             <View padding="0 0 0 xxx-small">
