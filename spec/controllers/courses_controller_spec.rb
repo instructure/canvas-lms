@@ -3925,6 +3925,17 @@ describe CoursesController do
         expect(@course.csp_enabled?).to be_truthy
       end
 
+      it "does not update the csp setting when csp is locked" do
+        @account.lock_csp!
+        account_admin_user(active_all: true, account: @account)
+        user_session(@admin)
+
+        put "update", params: { id: @course.id, course: { disable_csp: "1" } }
+        @course.reload
+        expect(@course.csp_enabled?).to be_truthy
+        @account.unlock_csp!
+      end
+
       it "does not update the csp setting when not admin" do
         user_session(@teacher)
         # test for nil param
