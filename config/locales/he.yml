@@ -2232,6 +2232,7 @@ he:
   an_integer_value_is_required_e073bd46: "נדרש ערך של מספר שלם"
   an_internal_error_occurred_83b8a685: "אירעה תקלה פנימית"
   an_item_named_name_already_exists_in_this_location_147b7312: "פריט בשם  \"%{name}\"  כבר קיים במיקום זה. האם בכוונתך להחליף את הקובץ הקיים?"
+  an_unexpected_error_occurred_15bae9ec: "אירעה שגיאה לא צפויה"
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "אירעה שגיאת שרת לא ידועה. נא לנסות שוב."
   an_update_is_available_for_toolname_bba3fa2: "יש עדכון זמין עבור %{toolName}"
   analytics: 
