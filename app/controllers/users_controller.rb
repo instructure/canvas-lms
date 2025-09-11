@@ -1047,6 +1047,38 @@ class UsersController < ApplicationController
         ["submitting", submitting_collection]
       ]
 
+      # Add discussion checkpoint assignments for courses with checkpoints enabled
+      course_ids_with_checkpoints = @current_user.course_ids_with_checkpoints_enabled
+      unless course_ids_with_checkpoints.empty?
+        sub_assignment_bookmark = Plannable::Bookmarker.new(SubAssignment, false, [:due_at, :created_at], :id)
+
+        # Add checkpoint assignments needing grading
+        checkpoint_grading_scope = @current_user.assignments_needing_grading(scope_only: true, is_sub_assignment: true)
+                                                .reorder(:due_at, :id).preload(:external_tool_tag, :rubric_association, :rubric, :discussion_topic, :duplicate_of)
+        checkpoint_grading_collection = BookmarkedCollection.wrap(sub_assignment_bookmark, checkpoint_grading_scope)
+        checkpoint_grading_collection = BookmarkedCollection.filter(checkpoint_grading_collection) do |assignment|
+          assignment.context.grants_right?(@current_user, session, :manage_grades)
+        end
+        checkpoint_grading_collection = BookmarkedCollection.transform(checkpoint_grading_collection) do |a|
+          todo_item_json(a, @current_user, session, "grading")
+        end
+        collections << ["checkpoint_grading", checkpoint_grading_collection]
+
+        # Add checkpoint assignments needing submitting
+        checkpoint_submitting_scope = @current_user.assignments_needing_submitting(
+          include_ungraded: true,
+          scope_only: true,
+          course_ids: course_ids_with_checkpoints,
+          include_concluded: false,
+          is_sub_assignment: true
+        ).reorder(:due_at, :id).preload(:external_tool_tag, :rubric_association, :rubric, :discussion_topic).eager_load(:duplicate_of)
+        checkpoint_submitting_collection = BookmarkedCollection.wrap(sub_assignment_bookmark, checkpoint_submitting_scope)
+        checkpoint_submitting_collection = BookmarkedCollection.transform(checkpoint_submitting_collection) do |a|
+          todo_item_json(a, @current_user, session, "submitting")
+        end
+        collections << ["checkpoint_submitting", checkpoint_submitting_collection]
+      end
+
       if Array(params[:include]).include? "ungraded_quizzes"
         quizzes_bookmark = Plannable::Bookmarker.new(Quizzes::Quiz, false, [:due_at, :created_at], :id)
         quizzes_scope = @current_user

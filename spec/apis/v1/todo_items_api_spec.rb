@@ -737,4 +737,88 @@ describe UsersController, type: :request do
       expect(json["needs_grading_count"]).to eq 0
     end
   end
+
+  context "with discussion checkpoints" do
+    before :once do
+      @teacher_course.account.enable_feature!(:discussion_checkpoints)
+    end
+
+    it "includes discussion checkpoint assignments in todo list for grading" do
+      # Create checkpointed discussion topic
+      reply_to_topic_checkpoint, reply_to_entry_checkpoint = graded_discussion_topic_with_checkpoints(context: @teacher_course)
+      student = @teacher_course.students.first
+
+      # Submit to both checkpoints
+      reply_to_topic_checkpoint.submit_homework(student, body: "checkpoint submission for topic")
+      reply_to_entry_checkpoint.submit_homework(student, body: "checkpoint submission for entry")
+
+      json = api_call(:get,
+                      "/api/v1/users/self/todo",
+                      controller: "users",
+                      action: "todo_items",
+                      format: "json")
+
+      checkpoint_todos = json.select { |item| item["checkpoint_label"].present? }
+      expect(checkpoint_todos.length).to eq 2
+
+      # Verify checkpoint-specific data is included
+      reply_to_topic_todo = checkpoint_todos.find { |item| item["checkpoint_label"] == CheckpointLabels::REPLY_TO_TOPIC }
+      reply_to_entry_todo = checkpoint_todos.find { |item| item["checkpoint_label"] == CheckpointLabels::REPLY_TO_ENTRY }
+
+      expect(reply_to_topic_todo).to be_present
+      expect(reply_to_topic_todo["parent_assignment_id"]).to eq reply_to_topic_checkpoint.parent_assignment_id
+      expect(reply_to_topic_todo["type"]).to eq "grading"
+      expect(reply_to_topic_todo["needs_grading_count"]).to eq 1
+
+      expect(reply_to_entry_todo).to be_present
+      expect(reply_to_entry_todo["parent_assignment_id"]).to eq reply_to_entry_checkpoint.parent_assignment_id
+      expect(reply_to_entry_todo["type"]).to eq "grading"
+      expect(reply_to_entry_todo["needs_grading_count"]).to eq 1
+    end
+
+    it "includes discussion checkpoint assignments in todo list for submitting" do
+      @teacher_course.enroll_student(@user).accept!
+
+      # Create checkpointed discussion topic
+      reply_to_topic_checkpoint, reply_to_entry_checkpoint = graded_discussion_topic_with_checkpoints(context: @teacher_course)
+
+      json = api_call(:get,
+                      "/api/v1/users/self/todo",
+                      controller: "users",
+                      action: "todo_items",
+                      format: "json")
+
+      checkpoint_todos = json.select { |item| item["checkpoint_label"].present? && item["type"] == "submitting" }
+      expect(checkpoint_todos.length).to eq 2
+
+      # Verify checkpoint-specific data is included
+      reply_to_topic_todo = checkpoint_todos.find { |item| item["checkpoint_label"] == CheckpointLabels::REPLY_TO_TOPIC }
+      reply_to_entry_todo = checkpoint_todos.find { |item| item["checkpoint_label"] == CheckpointLabels::REPLY_TO_ENTRY }
+
+      expect(reply_to_topic_todo).to be_present
+      expect(reply_to_topic_todo["parent_assignment_id"]).to eq reply_to_topic_checkpoint.parent_assignment_id
+      expect(reply_to_topic_todo["type"]).to eq "submitting"
+
+      expect(reply_to_entry_todo).to be_present
+      expect(reply_to_entry_todo["parent_assignment_id"]).to eq reply_to_entry_checkpoint.parent_assignment_id
+      expect(reply_to_entry_todo["type"]).to eq "submitting"
+    end
+
+    it "only includes checkpoint assignments for courses with checkpoints enabled" do
+      # Create a course without checkpoints enabled
+      course_without_checkpoints = course_factory(active_course: true)
+      course_without_checkpoints.enroll_teacher(@user).accept!
+      graded_discussion_topic_with_checkpoints(context: course_without_checkpoints)
+
+      json = api_call(:get,
+                      "/api/v1/users/self/todo",
+                      controller: "users",
+                      action: "todo_items",
+                      format: "json")
+
+      # Should not include any checkpoint todos from the course without feature enabled
+      checkpoint_todos = json.select { |item| item["checkpoint_label"].present? }
+      expect(checkpoint_todos).to be_empty
+    end
+  end
 end

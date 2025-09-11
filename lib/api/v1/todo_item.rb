@@ -37,6 +37,13 @@ module Api::V1::TodoItem
       else
         assignment = assignment_or_quiz
         hash[:assignment] = assignment_json(assignment, user, session, include_all_dates: true)
+
+        # Add checkpoint-specific data for SubAssignments
+        if assignment.is_a?(SubAssignment)
+          hash[:checkpoint_label] = assignment.sub_assignment_tag
+          hash[:parent_assignment_id] = assignment.parent_assignment_id
+        end
+
         hash[:html_url] = if todo_type == "grading"
                             speed_grader_course_gradebook_url(assignment.context_id, assignment_id: assignment.id)
                           else
