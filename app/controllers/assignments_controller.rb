@@ -369,7 +369,8 @@ class AssignmentsController < ApplicationController
                        POST_TO_SIS: Assignment.sis_grade_export_enabled?(@context),
                        DUE_DATE_REQUIRED_FOR_ACCOUNT: AssignmentUtil.due_date_required_for_account?(@context),
                        ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
-                       CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
+                       CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS),
+                       PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED: @context.feature_enabled?(:peer_review_allocation_and_grading)
                      })
         set_section_list_js_env
         submission = @assignment.submissions.find_by(user: @current_user)
