@@ -1793,6 +1793,7 @@ hy:
   an_external_identity_provider_is_enabled_7859c6fb: "Արտաքին նույնականացման պրովայդերը միացված է"
   an_integer_value_is_required_e073bd46: "Պահանջվում է մուտքագրել ամբողջ թիվ"
   an_item_named_name_already_exists_in_this_location_147b7312: "\"%{name}\" անունը կրող տարր արդեն իսկ առկա է: Արդյո՚ք Դուք ցանկանում եք փոխարինել արդեն իսկ առկա ֆայլը նոր ֆայլով: "
+  an_unexpected_error_occurred_15bae9ec: "Անսպասելի սխալ է տեղի ունեցել:"
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "Սերվերի անհայտ սխալ: Կրկին փորձեք:"
   an_update_is_available_for_toolname_bba3fa2: "%{toolName} համար տեղի է ունեցել թարմացում"
   analytics: 
