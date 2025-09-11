@@ -18,7 +18,6 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import ReactDOM from 'react-dom'
 import {each, filter, map, isEmpty} from 'lodash'
 import $ from 'jquery'
 import {Button} from '@instructure/ui-buttons'

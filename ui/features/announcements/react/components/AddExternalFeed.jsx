@@ -78,7 +78,7 @@ export default class AddExternalFeed extends React.Component {
     this.clearAddRSS()
   }
 
-  toggleOpenState = (event, expanded) => {
+  toggleOpenState = (_event, expanded) => {
     $.screenReaderFlashMessage(I18n.t('dropdown changed state to %{expanded}.', {expanded}))
     this.setState(
       {
@@ -165,7 +165,7 @@ export default class AddExternalFeed extends React.Component {
       <View margin="small 0" display="block">
         <RadioInputGroup
           name="verbosity-selection"
-          onChange={(e, val) => this.handleRadioSelectionSetVerbosity(val)}
+          onChange={(_e, val) => this.handleRadioSelectionSetVerbosity(val)}
           defaultValue={this.state.verbosityType}
           layout="inline"
           description={

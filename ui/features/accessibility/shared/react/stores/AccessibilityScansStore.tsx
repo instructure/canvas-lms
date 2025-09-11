@@ -20,12 +20,7 @@ import {TableColHeaderProps} from '@instructure/ui-table'
 import {create} from 'zustand'
 import {devtools} from 'zustand/middleware'
 
-import {
-  AccessibilityIssuesSummaryData,
-  AccessibilityResourceScan,
-  Filters,
-  ParsedFilters,
-} from '../types'
+import {AccessibilityIssuesSummaryData, AccessibilityResourceScan, Filters} from '../types'
 
 export const USE_ACCESSIBILITY_SCANS_STORE = false
 

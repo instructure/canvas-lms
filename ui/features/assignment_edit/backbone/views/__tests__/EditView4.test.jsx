@@ -34,8 +34,6 @@ import EditView from '../EditView'
 import '@canvas/jquery/jquery.simulate'
 import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
 import fetchMock from 'fetch-mock'
-// ReactDOM might be required for dynamic rendering in certain scenarios.
-import ReactDOM from 'react-dom'
 import {waitFor} from '@testing-library/react'
 import {createRoot} from 'react-dom/client'
 import {setupServer} from 'msw/node'

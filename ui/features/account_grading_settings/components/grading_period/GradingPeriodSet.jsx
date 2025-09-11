@@ -164,7 +164,7 @@ export default class GradingPeriodSet extends React.Component {
     this.periodRefs = {}
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(_prevProps, prevState) {
     if (prevState.newPeriod.period && !this.state.newPeriod.period) {
       if (this.addPeriodButtonRef.current) {
         this.addPeriodButtonRef.current.focus()

@@ -22,7 +22,6 @@ import {func, bool, number} from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
-import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
@@ -71,7 +70,7 @@ export default class AnnouncementsIndex extends Component {
     }
   }
 
-  onManageAnnouncement = (e, {action, id, lock}) => {
+  onManageAnnouncement = (_e, {action, id, lock}) => {
     switch (action) {
       case 'delete':
         showConfirmDelete({

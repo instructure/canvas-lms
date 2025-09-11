@@ -25,8 +25,6 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('restore_content_pane')
 
-const accountId = ENV.ACCOUNT_ID
-
 export default class RestoreContentPaneView extends Backbone.View {
   static initClass() {
     this.child('courseSearchResultsView', '#courseSearchResults')

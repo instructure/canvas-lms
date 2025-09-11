@@ -24,7 +24,6 @@ import {
 } from '../titleConflicts'
 import fetchMock from 'fetch-mock'
 import {render} from '@testing-library/react'
-import type {FormMessage} from '@instructure/ui-form-field'
 
 describe('titleConflicts', () => {
   beforeEach(() => {

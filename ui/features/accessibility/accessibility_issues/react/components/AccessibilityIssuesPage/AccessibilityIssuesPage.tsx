@@ -34,7 +34,7 @@ type IssuesPageProps = {
   courseId: string
   issueId: string
 }
-const AccessibilityIssuesPage: React.FC<IssuesPageProps> = ({courseId, issueId}) => {
+const AccessibilityIssuesPage: React.FC<IssuesPageProps> = ({courseId: _courseId, issueId}) => {
   const [selectedItem, setSelectedItem] = useState<AccessibilityResourceScan | null>(null)
   const [loading, setLoading] = useState(true)
   const {selectIssue} = useAccessibilityIssueSelect()

@@ -37,21 +37,6 @@ import fetchMock from 'fetch-mock'
 const s_params = 'some super secure params'
 const currentOrigin = window.location.origin
 
-// Helper functions
-const nameLengthHelper = (
-  view,
-  length,
-  maxNameLengthRequiredForAccount,
-  maxNameLength,
-  postToSis,
-  gradingType,
-) => {
-  const name = 'a'.repeat(length)
-  ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT = maxNameLengthRequiredForAccount
-  ENV.MAX_NAME_LENGTH = maxNameLength
-  return view.validateBeforeSave({name, post_to_sis: postToSis, grading_type: gradingType}, {})
-}
-
 // Mock RCE initialization
 EditView.prototype._attachEditorToDescription = () => {}
 

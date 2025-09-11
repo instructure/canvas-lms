@@ -22,10 +22,6 @@ import UsersPane, {SEARCH_DEBOUNCE_TIME} from '../UsersPane'
 import UserActions from '../../actions/UserActions'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-const ok = value => expect(value).toBeTruthy()
-const notOk = value => expect(value).toBeFalsy()
-const equal = (value, expected) => expect(value).toEqual(expected)
-
 const fakeStore = () => ({
   state: {
     userList: {

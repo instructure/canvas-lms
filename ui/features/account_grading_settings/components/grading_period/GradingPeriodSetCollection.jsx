@@ -104,7 +104,7 @@ export default class GradingPeriodSetCollection extends React.Component {
     },
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(_prevProps, prevState) {
     if (prevState.editSet.id && prevState.editSet.id !== this.state.editSet.id) {
       const set = {id: prevState.editSet.id}
       const refKey = this.getShowGradingPeriodSetRef(set)
