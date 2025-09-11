@@ -24,8 +24,8 @@ import {
   handleOpeningEditItemModal,
 } from '../modulePageActionHandlers'
 import {dispatchCommandEvent} from '../dispatchCommandEvent'
-import {updateIndent} from '../moduleItemActionHandlers'
-import '../modulePageCommandEventHandlers'
+import {updateIndent, handleRemove} from '../moduleItemActionHandlers'
+import modulePageCommandEventHandlers from '../modulePageCommandEventHandlers'
 import {MODULE_ITEMS, MODULE_ITEM_TITLES, MODULES} from '../../utils/constants'
 
 // Mock the handlers
@@ -63,7 +63,31 @@ const mockItemsData = {
   ],
 }
 
+const mockItemsDataPage2 = {
+  moduleItems: [
+    {
+      _id: '4',
+      id: '4',
+      title: 'Test Item Page 2',
+      indent: 0,
+    },
+  ],
+}
+
+const mockItemsDataSingleItem = {
+  moduleItems: [
+    {
+      _id: '5',
+      id: '5',
+      title: 'Last Item on Page',
+      indent: 0,
+    },
+  ],
+}
+
 queryClient.setQueryData([MODULE_ITEMS, moduleId, null], mockItemsData)
+queryClient.setQueryData([MODULE_ITEMS, moduleId, btoa('10')], mockItemsDataPage2)
+queryClient.setQueryData([MODULE_ITEMS, moduleId, btoa('20')], mockItemsDataSingleItem)
 
 queryClient.setQueryData([MODULES, courseId], mockModulesData)
 
@@ -228,6 +252,189 @@ describe('modulePageCommandEventHandlers', () => {
           expect.anything(), // queryClient
         )
       })
+
+      it('calls handleRemove when action is remove', () => {
+        const setIsMenuOpen = jest.fn()
+        const onAfterSuccess = jest.fn()
+
+        const event = new CustomEvent('module-action', {
+          detail: {
+            action: 'remove',
+            courseId,
+            moduleId,
+            moduleItemId,
+            setIsMenuOpen,
+            onAfterSuccess,
+          },
+        })
+
+        document.dispatchEvent(event)
+
+        expect(handleRemove).toHaveBeenCalledWith(
+          moduleId,
+          moduleItemId,
+          'Test Item',
+          expect.anything(), // queryClient
+          courseId,
+          setIsMenuOpen,
+          expect.any(Function), // enhanced callback
+        )
+      })
+
+      it('handles remove action for item on page 2', () => {
+        const setIsMenuOpen = jest.fn()
+        const onAfterSuccess = jest.fn()
+
+        const event = new CustomEvent('module-action', {
+          detail: {
+            action: 'remove',
+            courseId,
+            moduleId,
+            moduleItemId: '4', // Item on page 2
+            setIsMenuOpen,
+            onAfterSuccess,
+          },
+        })
+
+        document.dispatchEvent(event)
+
+        expect(handleRemove).toHaveBeenCalledWith(
+          moduleId,
+          '4',
+          'Test Item Page 2',
+          expect.anything(), // queryClient
+          courseId,
+          setIsMenuOpen,
+          expect.any(Function), // enhanced callback
+        )
+      })
+
+      it('dispatches page navigation event when removing last item from non-first page', () => {
+        const dispatchSpy = jest.spyOn(document, 'dispatchEvent')
+        const setIsMenuOpen = jest.fn()
+        const onAfterSuccess = jest.fn()
+
+        const event = new CustomEvent('module-action', {
+          detail: {
+            action: 'remove',
+            courseId,
+            moduleId,
+            moduleItemId: '5', // Last item on page 3
+            setIsMenuOpen,
+            onAfterSuccess,
+          },
+        })
+
+        document.dispatchEvent(event)
+
+        // Get the enhanced callback that was passed to handleRemove
+        const handleRemoveCall = (handleRemove as jest.Mock).mock.calls.find(
+          call => call[1] === '5',
+        )
+        expect(handleRemoveCall).toBeDefined()
+        const enhancedCallback = handleRemoveCall[6]
+
+        // Clear previous dispatch calls
+        dispatchSpy.mockClear()
+
+        // Simulate successful removal by calling the enhanced callback
+        enhancedCallback()
+
+        // Should dispatch page navigation event
+        expect(dispatchSpy).toHaveBeenCalledWith(
+          expect.objectContaining({
+            type: 'module-page-navigation',
+            detail: {
+              moduleId,
+              pageNumber: 2, // Should go back to page 2 (from page 3)
+            },
+          }),
+        )
+
+        // Should also call original callback
+        expect(onAfterSuccess).toHaveBeenCalled()
+      })
+
+      it('does not dispatch page navigation when removing item from first page', () => {
+        const dispatchSpy = jest.spyOn(document, 'dispatchEvent')
+        const onAfterSuccess = jest.fn()
+
+        const event = new CustomEvent('module-action', {
+          detail: {
+            action: 'remove',
+            courseId,
+            moduleId,
+            moduleItemId, // Item on first page
+            onAfterSuccess,
+          },
+        })
+
+        document.dispatchEvent(event)
+
+        // Get the enhanced callback
+        const handleRemoveCall = (handleRemove as jest.Mock).mock.calls.find(
+          call => call[1] === moduleItemId,
+        )
+        const enhancedCallback = handleRemoveCall[6]
+
+        dispatchSpy.mockClear()
+
+        // Simulate successful removal
+        enhancedCallback()
+
+        // Should not dispatch page navigation event (first page)
+        const navigationEvents = dispatchSpy.mock.calls.filter(
+          call => call[0].type === 'module-page-navigation',
+        )
+        expect(navigationEvents).toHaveLength(0)
+
+        // Should still call original callback
+        expect(onAfterSuccess).toHaveBeenCalled()
+      })
+    })
+  })
+
+  describe('getModuleItemFromCache', () => {
+    it('finds module item from first page', () => {
+      const result = modulePageCommandEventHandlers.getModuleItemFromCache(moduleId, moduleItemId)
+
+      expect(result).toBeDefined()
+      expect(result?.moduleItem._id).toBe(moduleItemId)
+      expect(result?.moduleItem.title).toBe('Test Item')
+      expect(result?.queryKey).toEqual([MODULE_ITEMS, moduleId, null])
+    })
+
+    it('finds module item from second page', () => {
+      const result = modulePageCommandEventHandlers.getModuleItemFromCache(moduleId, '4')
+
+      expect(result).toBeDefined()
+      expect(result?.moduleItem._id).toBe('4')
+      expect(result?.moduleItem.title).toBe('Test Item Page 2')
+      expect(result?.queryKey).toEqual([MODULE_ITEMS, moduleId, btoa('10')])
+    })
+
+    it('finds module item from third page', () => {
+      const result = modulePageCommandEventHandlers.getModuleItemFromCache(moduleId, '5')
+
+      expect(result).toBeDefined()
+      expect(result?.moduleItem._id).toBe('5')
+      expect(result?.moduleItem.title).toBe('Last Item on Page')
+      expect(result?.queryKey).toEqual([MODULE_ITEMS, moduleId, btoa('20')])
+    })
+
+    it('returns undefined for non-existent module item', () => {
+      const result = modulePageCommandEventHandlers.getModuleItemFromCache(moduleId, 'non-existent')
+
+      expect(result).toBeUndefined()
+    })
+
+    it('returns undefined for non-existent module', () => {
+      const result = modulePageCommandEventHandlers.getModuleItemFromCache(
+        'non-existent',
+        moduleItemId,
+      )
+
+      expect(result).toBeUndefined()
     })
   })
 

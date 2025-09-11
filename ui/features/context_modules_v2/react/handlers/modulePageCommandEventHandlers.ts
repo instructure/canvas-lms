@@ -20,7 +20,13 @@ import {gql} from 'graphql-tag'
 import {executeQuery} from '@canvas/graphql'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {MODULE_ITEM_TITLES, MODULE_ITEMS, MODULE_ITEMS_QUERY_MAP, MODULES} from '../utils/constants'
+import {
+  MODULE_ITEM_TITLES,
+  MODULE_ITEMS,
+  MODULE_ITEMS_QUERY_MAP,
+  MODULES,
+  PAGE_SIZE,
+} from '../utils/constants'
 import {
   GraphQLResult,
   ModuleActionEventDetail,
@@ -108,14 +114,21 @@ class ModulePageCommandEventHandlers {
   // --------------- ModuleItems ---------------
 
   getModuleItemFromCache = (moduleId: string, moduleItemId: string) => {
-    const queryData = queryClient.getQueryData<PaginatedNavigationResponse>([
-      MODULE_ITEMS,
-      moduleId,
-      null,
-    ])
-    if (!queryData) return
-    const moduleItem = queryData.moduleItems.find((item: any) => item._id === moduleItemId)
-    return moduleItem
+    const queries = queryClient.getQueriesData<PaginatedNavigationResponse>({
+      queryKey: [MODULE_ITEMS, moduleId],
+      exact: false,
+    })
+
+    for (const [queryKey, queryData] of queries) {
+      if (queryData) {
+        const moduleItem = queryData.moduleItems.find((item: any) => item._id === moduleItemId)
+        if (moduleItem) {
+          return {moduleItem, queryKey}
+        }
+      }
+    }
+
+    return undefined
   }
 
   handleEditModuleItem = (courseId: string, moduleId: string, moduleItemId: string) => {
@@ -129,8 +142,42 @@ class ModulePageCommandEventHandlers {
     setIsMenuOpen?: (isOpen: boolean) => void,
     onAfterSuccess?: () => void,
   ) => {
-    const moduleItem = this.getModuleItemFromCache(moduleId, moduleItemId)
-    if (!moduleItem) return
+    const result = this.getModuleItemFromCache(moduleId, moduleItemId)
+    if (!result) return
+
+    const {moduleItem, queryKey} = result
+    const cursor = queryKey[2] as string | null
+    const currentPageData = queryClient.getQueryData<PaginatedNavigationResponse>(queryKey)
+    const isLastItemOnPage = currentPageData?.moduleItems.length === 1
+    const isNotFirstPage = cursor !== null
+
+    let currentPageNumber = 1
+    if (cursor) {
+      try {
+        const offset = parseInt(atob(cursor), 10)
+        currentPageNumber = Math.floor(offset / PAGE_SIZE) + 1
+      } catch {
+        currentPageNumber = 1
+      }
+    }
+
+    const enhancedOnAfterSuccess = () => {
+      if (isLastItemOnPage && isNotFirstPage && currentPageNumber > 1) {
+        const newPageNumber = currentPageNumber - 1
+        document.dispatchEvent(
+          new CustomEvent('module-page-navigation', {
+            detail: {
+              moduleId,
+              pageNumber: newPageNumber,
+            },
+          }),
+        )
+      }
+
+      if (onAfterSuccess) {
+        onAfterSuccess()
+      }
+    }
 
     handleRemove(
       moduleId,
@@ -139,13 +186,14 @@ class ModulePageCommandEventHandlers {
       queryClient,
       courseId,
       setIsMenuOpen,
-      onAfterSuccess,
+      enhancedOnAfterSuccess,
     )
   }
 
   handleIndentModuleItem = (courseId: string, moduleId: string, moduleItemId: string) => {
-    const moduleItem = this.getModuleItemFromCache(moduleId, moduleItemId)
-    if (!moduleItem) return
+    const result = this.getModuleItemFromCache(moduleId, moduleItemId)
+    if (!result) return
+    const {moduleItem} = result
     const indent = moduleItem.indent
     if (indent < 5) {
       const newIndent = indent + 1
@@ -154,8 +202,9 @@ class ModulePageCommandEventHandlers {
   }
 
   handleOutdentModuleItem = (courseId: string, moduleId: string, moduleItemId: string) => {
-    const moduleItem = this.getModuleItemFromCache(moduleId, moduleItemId)
-    if (!moduleItem) return
+    const result = this.getModuleItemFromCache(moduleId, moduleItemId)
+    if (!result) return
+    const {moduleItem} = result
     const indent = moduleItem.indent
     if (indent > 0) {
       const newIndent = indent - 1
@@ -215,3 +264,6 @@ class ModulePageCommandEventHandlers {
 const modulePageCommandEventHandlers = new ModulePageCommandEventHandlers()
 
 document.addEventListener('module-action', modulePageCommandEventHandlers.handleModuleAction)
+
+export {modulePageCommandEventHandlers}
+export default modulePageCommandEventHandlers
