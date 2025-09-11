@@ -39,6 +39,7 @@ interface Props {
   customIsLoading?: boolean
   customSetSearchTerm?: (term: string) => void
   onError?: () => void
+  onGroupCategoryNotFound?: () => void
 }
 
 const useFetchAssignees = ({
@@ -50,6 +51,7 @@ const useFetchAssignees = ({
   customAllOptions,
   customSetSearchTerm,
   onError = () => {},
+  onGroupCategoryNotFound = () => {},
 }: Props) => {
   // FIXME: This search term should be needs to be used
   const [searchTerm, setSearchTerm] = useState('')
@@ -78,6 +80,7 @@ const useFetchAssignees = ({
     shouldFetch,
     params,
     setHasErrors,
+    onGroupCategoryNotFound,
   })
 
   const baseDefaultOptions = useMemo(() => {

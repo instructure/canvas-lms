@@ -36,6 +36,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {IconAddLine} from '@instructure/ui-icons'
+import {Alert} from '@instructure/ui-alerts'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi, {type DoFetchApiOpts} from '@canvas/do-fetch-api-effect'
 import type {
@@ -86,6 +87,8 @@ export interface ItemAssignToTrayContentProps
   disabledOptionIdsRef: React.MutableRefObject<string[]>
   isTray: boolean
   setOverrides?: (overrides: exportedOverride[] | null) => void
+  showGroupCategoryDeletedAlert?: boolean
+  setShowGroupCategoryDeletedAlert?: (show: boolean) => void
 }
 
 const MAX_PAGES = 10
@@ -171,6 +174,8 @@ const ItemAssignToTrayContent = ({
   disabledOptionIdsRef,
   isTray,
   setOverrides = () => {},
+  showGroupCategoryDeletedAlert = false,
+  setShowGroupCategoryDeletedAlert = () => {},
 }: ItemAssignToTrayContentProps) => {
   const [initialCards, setInitialCards] = useState<ItemAssignToCardSpec[]>([])
   const [fetchInFlight, setFetchInFlight] = useState(false)
@@ -883,6 +888,18 @@ const ItemAssignToTrayContent = ({
 
   return (
     <Flex.Item padding="small medium" shouldGrow={true} shouldShrink={true}>
+      {showGroupCategoryDeletedAlert && (
+        <Alert
+          variant="warning"
+          margin="0 0 medium 0"
+          renderCloseButtonLabel={I18n.t('Close')}
+          onDismiss={() => setShowGroupCategoryDeletedAlert(false)}
+        >
+          {I18n.t(
+            'The group set for this assignment no longer exists. Groups will not be available for assignment.',
+          )}
+        </Alert>
+      )}
       {!ENV.ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS && hasDifferentiationTagOverrides && (
         <DifferentiationTagConverterMessage
           courseId={courseId}

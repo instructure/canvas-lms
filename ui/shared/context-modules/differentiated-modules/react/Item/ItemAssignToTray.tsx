@@ -233,6 +233,7 @@ export default function ItemAssignToTray({
   const [hasDifferentiationTagOverrides, setHasDifferentiationTagOverrides] = useState(false)
   const [moduleAssignees, setModuleAssignees] = useState<string[]>([])
   const [groupCategoryId, setGroupCategoryId] = useState<string | null>(defaultGroupCategoryId)
+  const [showGroupCategoryDeletedAlert, setShowGroupCategoryDeletedAlert] = useState(false)
   const [overridesFetched, setOverridesFetched] = useState(
     defaultCards !== undefined && defaultCards.length > 0,
   )
@@ -330,6 +331,10 @@ export default function ItemAssignToTray({
     checkMasteryPaths: masteryPathsAllowed,
     defaultValues: [],
     onError: handleDismiss,
+    onGroupCategoryNotFound: () => {
+      setGroupCategoryId(null)
+      setShowGroupCategoryDeletedAlert(true)
+    },
   })
 
   const focusErrors = useCallback(() => {
@@ -574,6 +579,8 @@ export default function ItemAssignToTray({
               onAddCard={onAddCard}
               onAssigneesChange={onAssigneesChange}
               onDatesChange={onDatesChange}
+              showGroupCategoryDeletedAlert={showGroupCategoryDeletedAlert}
+              setShowGroupCategoryDeletedAlert={setShowGroupCategoryDeletedAlert}
               onCardRemove={onCardRemove}
               setAssignToCards={setAssignToCards}
               blueprintDateLocks={blueprintDateLocks}
@@ -667,6 +674,8 @@ export default function ItemAssignToTray({
           disabledOptionIdsRef={disabledOptionIdsRef}
           isTray={isTray}
           setOverrides={setOverrides}
+          showGroupCategoryDeletedAlert={showGroupCategoryDeletedAlert}
+          setShowGroupCategoryDeletedAlert={setShowGroupCategoryDeletedAlert}
         />
       )}
     </View>
