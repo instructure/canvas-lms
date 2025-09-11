@@ -3065,6 +3065,7 @@ hu:
   an_outcome_import_is_currently_in_progress_11e6cb38: "Jelenleg folyamatban van a tanulási eredmény importálása."
   an_sftp_user_can_only_be_managed_from_a_root_accou_57d9d8e6: "Egy SFTP-felhasználó csak root fiókból kezelhető."
   an_unexpected_error_has_occurred_see_error_report__f20b878d: "Egy váratlan hiba történt: lásd a hibajelentést %{id}"
+  an_unexpected_error_occurred_15bae9ec: "Váratlan hiba történt"
   an_unexpected_error_occurred_please_try_again_late_c58da3e4: "Váratlan hiba történt, kérjük, próbálja meg később újra"
   an_unknown_error_has_occurred_verify_the_csv_file__96087ece: "Ismeretlen hiba lépett fel. Ellenőrizze a CSV-fájlt, vagy próbálja újra később."
   an_unknown_error_occurred_please_reach_out_in_canv_43a4da74: "Ismeretlen hiba történt. Kérjük, lépjen kapcsolatba velünk a Slackben, a #canvas-sre cím használatával."
@@ -16994,6 +16995,7 @@ hu:
   nightingale_student_activity_tracking_f7d7c4cf: "Nightingale Student Activity Nyomonkövetés"
   niles_student_activity_and_performance_eabf444d: "Niles hallgatótevékenység és teljesítmény"
   no_74e9b590: nem
+  no_accessibility_issues_were_detected_f8d3c875: "Nem észleltünk akadálymentességi problémákat."
   no_active_user_with_that_id_was_found_b8fb5e14: "Nem található aktív felhasználó ezzel az azonosítóval."
   no_additional_details_were_added_for_this_assignme_547c0de7: "Ehhez a feladathoz nem adtak további részleteket."
   no_alignments_are_available_for_this_outcome_7f8346f9: "Ehhez az eredményhez nem áll rendelkezésre összehangolás."
