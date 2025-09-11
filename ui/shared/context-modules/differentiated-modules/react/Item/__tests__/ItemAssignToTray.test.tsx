@@ -1105,4 +1105,51 @@ describe('ItemAssignToTray', () => {
       expect(cards).toHaveLength(5)
     })
   })
+
+  it('handles deleted group set gracefully without closing the tray', async () => {
+    fetchMock.get(
+      OVERRIDES_URL,
+      {
+        id: '23',
+        due_at: '2023-10-05T12:00:00Z',
+        unlock_at: '2023-10-01T12:00:00Z',
+        lock_at: '2023-11-01T12:00:00Z',
+        only_visible_to_overrides: false,
+        visible_to_everyone: true,
+        group_category_id: FIRST_GROUP_CATEGORY_ID,
+        overrides: [],
+      },
+      {
+        overwriteRoutes: true,
+      },
+    )
+
+    fetchMock.get(FIRST_GROUP_CATEGORY_URL, 404, {
+      overwriteRoutes: true,
+    })
+
+    const onCloseMock = jest.fn()
+    const onDismissMock = jest.fn()
+
+    const {findAllByTestId, queryByTestId} = renderComponent({
+      onClose: onCloseMock,
+      onDismiss: onDismissMock,
+      defaultGroupCategoryId: FIRST_GROUP_CATEGORY_ID,
+    })
+
+    await waitFor(() => {
+      expect(queryByTestId('cards-loading')).not.toBeInTheDocument()
+    })
+
+    const cards = await findAllByTestId('item-assign-to-card')
+    expect(cards).toHaveLength(1)
+
+    expect(onDismissMock).not.toHaveBeenCalled()
+    expect(onCloseMock).not.toHaveBeenCalled()
+
+    expect(screen.getByTestId('module-item-edit-tray')).toBeInTheDocument()
+
+    const alerts = screen.getAllByRole('alert')
+    expect(alerts.length).toBeGreaterThanOrEqual(1)
+  })
 })

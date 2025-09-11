@@ -34,6 +34,7 @@ type Props = {
   shouldFetch: boolean
   params: Record<string, string | number>
   setHasErrors: (value: boolean) => void
+  onGroupCategoryNotFound?: () => void
 }
 
 export const useGetAssigneeOptions = ({
@@ -44,6 +45,7 @@ export const useGetAssigneeOptions = ({
   shouldFetch,
   params,
   setHasErrors,
+  onGroupCategoryNotFound = () => {},
 }: Props) => {
   const {
     data: sectionsParsedResult,
@@ -105,10 +107,24 @@ export const useGetAssigneeOptions = ({
 
   useEffect(() => {
     if (groupsError) {
-      showFlashError(I18n.t('An error occurred while fetching groups'))
-      setHasErrors(true)
+      const isNotFound =
+        (groupsError as any)?.response?.status === 404 ||
+        (groupsError as any)?.status === 404 ||
+        groupsError?.message?.includes('not found')
+
+      if (isNotFound) {
+        showFlashError(
+          I18n.t(
+            'The group set for this assignment no longer exists. Groups will not be available for assignment.',
+          ),
+        )
+        onGroupCategoryNotFound()
+      } else {
+        showFlashError(I18n.t('An error occurred while fetching groups'))
+        setHasErrors(true)
+      }
     }
-  }, [groupsError, setHasErrors])
+  }, [groupsError, setHasErrors, onGroupCategoryNotFound])
 
   useEffect(() => {
     if (differentiationTagsError) {
@@ -151,6 +167,16 @@ export const useGetAssigneeOptions = ({
     [isSectionsLoading, isStudentsLoading, isGroupsLoading, isDifferentiationTagsLoading],
   )
 
+  const isGroupsNotFound =
+    groupsError &&
+    // @ts-expect-error: Error object may have response property
+    (groupsError?.response?.status === 404 ||
+      // @ts-expect-error: Error object may have status property
+      groupsError?.status === 404 ||
+      groupsError?.message?.includes('not found'))
+
+  const blockingGroupsError = groupsError && !isGroupsNotFound
+
   return {
     baseFetchedOptions,
     isLoading,
@@ -160,6 +186,11 @@ export const useGetAssigneeOptions = ({
       groupsError,
       differentiationTagsError,
     },
-    hasErrors: !!(sectionsError || studentsError || groupsError || differentiationTagsError),
+    hasErrors: !!(
+      sectionsError ||
+      studentsError ||
+      blockingGroupsError ||
+      differentiationTagsError
+    ),
   }
 }
