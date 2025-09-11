@@ -80,14 +80,14 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
           </View>
         </Flex.Item>
 
-        <Flex.Item shouldGrow padding="0 0 0 xx-small">
+        <Flex.Item shouldGrow padding="0 0 0 xx-small" overflowY="visible">
           <Flex direction="column" gap="0">
             <Flex.Item>
               <Text size="small" color="secondary">
                 {formatUpdatedDate(lastUpdated)}
               </Text>
             </Flex.Item>
-            <Flex.Item>
+            <Flex.Item overflowX="visible" overflowY="visible">
               <Link href={`/courses/${courseId}/grades`} isWithinText={false}>
                 <Text size="small">{I18n.t('Show gradebook')}</Text>
               </Link>
