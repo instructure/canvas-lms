@@ -75,7 +75,7 @@ const courseJSON = {
 
 describe('CourseRestore', () => {
   beforeAll(() => {
-    server.listen({onUnhandledRequest: 'bypass'})
+    server.listen({onUnhandledRequest: 'error'})
   })
 
   afterEach(() => {
@@ -94,6 +94,22 @@ describe('CourseRestore', () => {
     courseRestore = new CourseRestoreModel({account_id})
     jest.useFakeTimers()
     $('#fixtures').append($('<div id="flash_screenreader_holder" />'))
+
+    // Set up default handlers for all tests
+    server.use(
+      // Default handler for search requests
+      http.get('*/api/v1/accounts/*/courses/*', () => {
+        return new HttpResponse(null, {status: 404})
+      }),
+      // Default handler for restore requests
+      http.put('*/api/v1/accounts/*/courses/', () => {
+        return new HttpResponse(null, {status: 400})
+      }),
+      // Default handler for progress requests
+      http.get('*/api/v1/progress/*', () => {
+        return HttpResponse.json(progressCompletedJSON)
+      }),
+    )
   })
   test("triggers 'searching' when search is called", function () {
     const callback = jest.fn()
@@ -116,7 +132,14 @@ describe('CourseRestore', () => {
 
   test('set status when course not found', function (done) {
     server.use(
-      http.get('*/api/v1/accounts/*/courses/*', () => HttpResponse.json({}, {status: 404})),
+      http.get('*/api/v1/accounts/*/courses/*', () => {
+        return new HttpResponse('{}', {
+          status: 404,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+      }),
     )
 
     courseRestore.on('doneSearching', () => {
@@ -135,25 +158,30 @@ describe('CourseRestore', () => {
   test('restores a course after search finds a deleted course', function (done) {
     jest.useRealTimers() // Use real timers for this test
 
-    // Set up handlers with exact URL patterns
+    // Set up handlers with proper URL patterns to catch all requests
     server.use(
-      http.get(`/api/v1/accounts/${account_id}/courses/${course_id}`, ({request}) => {
+      // Handle search requests
+      http.get('*/api/v1/accounts/*/courses/*', ({request}) => {
         const url = new URL(request.url)
-        // Check for the include[] parameter
         if (url.searchParams.get('include[]') === 'all_courses') {
           return HttpResponse.json(courseJSON)
         }
         return new HttpResponse(null, {status: 404})
       }),
-      http.put(`/api/v1/accounts/${account_id}/courses/`, ({request}) => {
+      // Handle restore requests
+      http.put('*/api/v1/accounts/*/courses/', ({request}) => {
         const url = new URL(request.url)
-        // Check for proper parameters
-        if (url.searchParams.get('event') === 'undelete') {
+        if (url.searchParams.get('event') === 'undelete' && url.searchParams.get('course_ids[]')) {
           return HttpResponse.json(progressQueuedJSON)
         }
         return new HttpResponse(null, {status: 400})
       }),
-      http.get(progressQueuedJSON.url, () => {
+      // Handle progress polling
+      http.get('*/api/v1/progress/*', () => {
+        return HttpResponse.json(progressCompletedJSON)
+      }),
+      // Catch any localhost progress URLs
+      http.get('http://localhost:3000/api/v1/progress/*', () => {
         return HttpResponse.json(progressCompletedJSON)
       }),
     )
