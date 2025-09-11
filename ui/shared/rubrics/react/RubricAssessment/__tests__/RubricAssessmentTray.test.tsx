@@ -64,17 +64,10 @@ describe('RubricAssessmentTray Tests', () => {
     freeFormCriterionComments = false,
     props?: Partial<RubricAssessmentTrayProps>,
   ) => {
-    const component = freeFormCriterionComments
+    queryClient.setQueryData(['_1_eg_rubric_view_mode'], viewMode)
+    return freeFormCriterionComments
       ? renderFreeformComponent({isPeerReview, ...props})
       : renderComponent({isPeerReview, ...props})
-    const {getByTestId, queryByRole} = component
-    const viewModeSelect = getByTestId('rubric-assessment-view-mode-select') as HTMLSelectElement
-
-    fireEvent.click(viewModeSelect)
-    const roleOption = queryByRole('option', {name: viewMode}) as HTMLElement
-    fireEvent.click(roleOption)
-
-    return component
   }
 
   describe('View Mode Select tests', () => {
