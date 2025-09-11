@@ -1485,6 +1485,7 @@ ko:
   an_alert_is_generated_for_each_student_that_meets__fcd175ac: "알림은 모든 기준을 만족하는 각 학생에게 생성됩니다. 알림은 매일 체크해서 트리거한 문제가 해결될 때까지 학생, 교사에게 보냅니다."
   an_external_identity_provider_is_enabled_7859c6fb: "외부 ID 공급자를 사용"
   an_integer_value_is_required_e073bd46: "정수 값이 필요함"
+  an_unexpected_error_occurred_15bae9ec: "예기치 않은 오류가 발생했습니다."
   analytics: 
     course: 
       analytics: 분석
