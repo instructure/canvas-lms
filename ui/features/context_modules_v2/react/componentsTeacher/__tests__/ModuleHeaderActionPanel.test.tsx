@@ -169,19 +169,10 @@ const setUp = (
   )
 }
 
-beforeAll(() => {
-  server.listen({onUnhandledRequest: 'warn'})
-})
-
-afterEach(() => {
-  server.resetHandlers()
-})
-
-afterAll(() => {
-  server.close()
-})
-
 describe('ModuleHeaderActionPanel', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
   it('renders ViewAssignTo when hasActiveOverrides is true', () => {
     const {getByText} = setUp(buildDefaultProps({hasActiveOverrides: true}))
     expect(getByText('View Assign To')).toBeInTheDocument()

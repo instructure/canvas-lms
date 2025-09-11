@@ -19,9 +19,44 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {setupServer} from 'msw/node'
+import {graphql, HttpResponse} from 'msw'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 import ModuleHeader from '../ModuleHeader'
 import {PAGE_SIZE, MODULE_ITEMS, MODULES} from '../../utils/constants'
+
+const server = setupServer(
+  graphql.query('GetModuleItemsQuery', () => {
+    return HttpResponse.json({
+      data: {
+        legacyNode: {
+          moduleItemsConnection: {
+            edges: [],
+            pageInfo: {
+              hasNextPage: false,
+              endCursor: null,
+            },
+          },
+        },
+      },
+    })
+  }),
+  graphql.query('GetModulesQuery', () => {
+    return HttpResponse.json({
+      data: {
+        legacyNode: {
+          modulesConnection: {
+            edges: [],
+            pageInfo: {
+              hasNextPage: false,
+              endCursor: null,
+            },
+          },
+        },
+      },
+    })
+  }),
+)
 
 const createQueryClient = () =>
   new QueryClient({
@@ -119,6 +154,10 @@ const setUp = (props: ModuleHeaderProps, courseId = 'test-course-id') => {
 }
 
 describe('ModuleHeader', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     // @ts-expect-error
     window.ENV = {
