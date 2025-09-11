@@ -1018,6 +1018,14 @@ module Modules2IndexPage
     "[data-testid='add-item-content-select']"
   end
 
+  def search_and_select_existing_item(item_name)
+    search_chars = (item_name.length > 10) ? item_name[0..3] : item_name[0..1]
+    f(add_existing_item_select_selector).send_keys(search_chars)
+    wait_for_ajaximations
+    wait_for(method: nil, timeout: 5) { fj("[role='option']:contains('#{item_name}')") }
+    fj("[role='option']:contains('#{item_name}')").click
+  end
+
   def add_item_modal_add_item_button
     fj("button:contains('Add Item')", f("[data-testid='add-item-modal']"))
   end
@@ -1055,10 +1063,7 @@ module Modules2IndexPage
     click_INSTUI_Select_option(new_item_type_select_selector, item_type)
     wait_for_ajaximations
 
-    # Select the item from the list
-    click_INSTUI_Select_option(add_existing_item_select_selector, item_title_text)
-
-    # Click Add Item
+    search_and_select_existing_item(item_title_text)
     add_item_modal_add_item_button.click
     wait_for_ajaximations
   end

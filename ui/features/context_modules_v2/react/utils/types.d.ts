@@ -76,6 +76,7 @@ export type FormState = {
   externalTool: ExternalToolUrl
   newItem: NewItem
   selectedItemId: string
+  selectedItem: any | null
   tabIndex: number
   isLoading: boolean
 }
