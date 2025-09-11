@@ -714,9 +714,9 @@
                 <input type="checkbox" name="update_default_pages" id="update_default_pages"/>
                 <label for="update_default_pages"><%= t 'wiki_editing_roles_change_existing', %{Change pages currently editable by "%{current_setting}" to "%{new_setting}".}, :current_setting => content_tag('span', @context.readable_default_wiki_editing_roles), :new_setting => content_tag('span', nbsp, :class => 'default_wiki_editing_roles_change') %></label>
               </div>
-              <% if @context.root_account.feature_enabled?(:javascript_csp) %>
+              <% if @context.can_view_csp_settings? %>
                 <div class="checkbox-flex-container">
-                  <%= f.check_box :disable_csp, :checked => !@context.csp_enabled?, :disabled => !@context.account.grants_right?(@current_user, session, :manage_courses_admin) %>
+                  <%= f.check_box :disable_csp, :checked => @context.csp_disabled?, :disabled => !@context.can_update_csp_settings?(@current_user, session) %>
                   <%= f.label :disable_csp, :en => 'Disable Content Security Policy' %>
                 </div>
               <% end %>
