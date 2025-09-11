@@ -146,19 +146,6 @@ const DiscussionInsights: React.FC = () => {
     openEvaluationModal(entry.id, entry.relevance_human_feedback_notes)
   }
 
-  const handleSpeedGrader = (entry: InsightEntry) => {
-    const speedGraderUrl = SPEEDGRADER_URL_TEMPLATE?.replace(
-      /%3Astudent_id/,
-      String(entry.student_id),
-    ).concat(`&entry_id=${entry.id}`)
-    window.open(speedGraderUrl, '_blank')
-  }
-
-  const handleGoToOriginalReply = (entry: InsightEntry) => {
-    const replyUrl = `/courses/${contextId}/discussion_topics/${discussionId}?entry_id=${entry.entry_id}`
-    window.open(replyUrl, '_blank')
-  }
-
   const filteredEntries = useMemo(() => {
     if (!entries) return []
 
@@ -214,11 +201,12 @@ const DiscussionInsights: React.FC = () => {
             <IconButton
               size="small"
               data-testid="viewSpeedGraderReply"
-              screenReaderLabel={I18n.t('See reply in SpeedGrader from %{user} on %{date}', {
-                user: item.student_name,
-                date: formatDate(new Date(item.entry_updated_at)),
-              })}
-              onClick={() => handleSpeedGrader(item)}
+              screenReaderLabel={I18n.t('See in SpeedGrader')}
+              href={SPEEDGRADER_URL_TEMPLATE?.replace(
+                /%3Astudent_id/,
+                String(item.student_id),
+              ).concat(`&entry_id=${item.id}`)}
+              target="_blank"
               withBackground={false}
               withBorder={false}
               color="primary"
@@ -231,14 +219,13 @@ const DiscussionInsights: React.FC = () => {
           <IconButton
             size="small"
             data-testid="goToOriginalReply"
-            screenReaderLabel={I18n.t('See reply in context from %{user} on %{date}', {
-              user: item.student_name,
-              date: formatDate(new Date(item.entry_updated_at)),
-            })}
-            onClick={() => handleGoToOriginalReply(item)}
+            screenReaderLabel={I18n.t('Go to original reply')}
+            href={`/courses/${contextId}/discussion_topics/${discussionId}?entry_id=${item.entry_id}`}
+            target="_blank"
             withBackground={false}
             withBorder={false}
             color="primary"
+            as="a"
           >
             <IconMoveDownBottomLine />
           </IconButton>
