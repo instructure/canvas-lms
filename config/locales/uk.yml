@@ -2062,6 +2062,7 @@ uk:
   an_integer_value_is_required_e073bd46: "Вимагається ціле значення"
   an_internal_error_occurred_83b8a685: "Відбулася внутрішня помилка"
   an_item_named_name_already_exists_in_this_location_147b7312: "Елемент з ім'ям \"%{name}\" вже існує в цьому розташуванны. Ви хочете замінити існуючий файл?"
+  an_unexpected_error_occurred_15bae9ec: "Відбулася несподівана помилка."
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "Виникла невідома помилка сервера. Будь ласка спробуйте ще раз."
   an_update_is_available_for_toolname_bba3fa2: "Оновлення доступне для %{toolName}"
   analytics: 
