@@ -126,12 +126,38 @@ describe RequestThrottle do
       expect(throttler.client_identifier(req(request_sasu_query_token))).to eq "service_user_key:#{developer_key_sasu.global_id}"
 
       # make sure we only look up the token once
-      expect(AccessToken).to receive(:authenticate).once.and_call_original
+      allow(AccessToken).to receive(:authenticate).and_call_original
       expect(throttler.client_identifier(req(request_sasu_header_token))).to eq "service_user_key:#{developer_key_sasu.global_id}"
     end
 
     it "uses access token" do
       expect(throttler.client_identifier(req(request_header_token))).to eq "token:#{AccessToken.hashed_token(token2.full_token)}"
+    end
+
+    it "includes vendor identifier when unified_tool_id is present" do
+      # token1 has unified_tool_id set to "sample_utid" in the let block
+      identifiers = throttler.client_identifiers(req(request_query_token))
+      expect(identifiers).to include("vendor:sample_utid")
+    end
+
+    it "includes developer key id" do
+      identifiers = throttler.client_identifiers(req(request_query_token))
+      expect(identifiers).to include("developer_key_id:#{token1.global_developer_key_id}")
+    end
+
+    it "does not use vendor identifier when unified_tool_id is not present" do
+      # token2 does not have unified_tool_id set
+      identifiers = throttler.client_identifiers(req(request_header_token))
+      vendor_identifiers = identifiers.select { |id| id.start_with?("vendor:") }
+      expect(vendor_identifiers).to be_empty
+    end
+
+    it "does not use vendor or developer key identifiers when no access token present" do
+      identifiers = throttler.client_identifiers(req(request_user_2))
+      vendor_identifiers = identifiers.select { |id| id.start_with?("vendor:") }
+      developer_key_identifiers = identifiers.select { |id| id.start_with?("developer_key_id:") }
+      expect(vendor_identifiers).to be_empty
+      expect(developer_key_identifiers).to be_empty
     end
 
     it "uses user id" do

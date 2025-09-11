@@ -171,15 +171,23 @@ class RequestThrottle
   # This is cached on the request, so a theoretical change to the request
   # object won't be caught.
   def client_identifiers(request)
-    request.env["canvas.request_throttle.user_id"] ||= [
+    return request.env["canvas.request_throttle.user_id"] if request.env["canvas.request_throttle.user_id"]
+
+    token_string = AuthenticationMethods.access_token(request, :GET).presence
+    access_token = nil
+    access_token = AccessToken.authenticate(token_string, load_pseudonym_from_access_token: true, eager_load_developer_key: true) if token_string
+
+    request.env["canvas.request_throttle.user_id"] = [
       tag_identifier("lti_advantage", lti_advantage_client_id_and_cluster(request)),
       tag_identifier("service_user_key", site_admin_service_user_key(request)),
       tag_identifier("service_user_key", inst_access_token_authentication&.tag_identifier),
-      (token_string = AuthenticationMethods.access_token(request, :GET).presence) && "token:#{AccessToken.hashed_token(token_string)}",
+      token_string && "token:#{AccessToken.hashed_token(token_string)}",
       tag_identifier("user", AuthenticationMethods.user_id(request).presence),
       tag_identifier("session", session_id(request).presence),
       tag_identifier("tool", tool_id(request)),
-      tag_identifier("ip", request.ip)
+      tag_identifier("ip", request.ip),
+      tag_identifier("vendor", access_token&.developer_key&.unified_tool_id),
+      tag_identifier("developer_key_id", access_token&.global_developer_key_id),
     ].compact
   end
 
