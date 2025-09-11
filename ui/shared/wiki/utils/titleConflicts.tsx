@@ -82,7 +82,11 @@ export async function checkForTitleConflict(
 ) {
   try {
     const conflict = await fetchTitleAvailability(title, currentPageId)
-    conflict ? callback([conflictMessage()]) : callback([])
+    if (conflict) {
+      callback([conflictMessage()])
+    } else {
+      callback([])
+    }
   } catch (error) {
     console.log(error)
     callback([])

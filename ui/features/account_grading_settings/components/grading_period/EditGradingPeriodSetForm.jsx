@@ -18,7 +18,6 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import ReactDOM from 'react-dom'
 import {each, map, filter, isEmpty} from 'lodash'
 import $ from 'jquery'
 import {Button} from '@instructure/ui-buttons'
@@ -131,7 +130,11 @@ class GradingPeriodSetForm extends React.Component {
 
   renderSaveAndCancelButtons = () => (
     <div className="ic-Form-actions below-line">
-      <Button disabled={this.props.disabled} onClick={this.triggerCancel} ref={this.cancelButtonRef}>
+      <Button
+        disabled={this.props.disabled}
+        onClick={this.triggerCancel}
+        ref={this.cancelButtonRef}
+      >
         {I18n.t('Cancel')}
       </Button>
       &nbsp;

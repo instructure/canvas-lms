@@ -28,10 +28,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 
 import {AccessibilityIssue, FormValue, PreviewResponse, ResourceType} from '../../types'
 import {getAsContentItemType} from '../../utils/apiData'
-import {getCourseBasedPath, stripQueryString} from '../../utils/query'
-
-const SELECTOR_STYLE = 'outline:2px solid #273540; outline-offset:2px;'
-const A11Y_ISSUE_ATTR_NAME = 'data-a11y-issue-scroll-target'
+import {getCourseBasedPath} from '../../utils/query'
 
 export interface PreviewHandle {
   update: (formValue: FormValue, onSuccess?: () => void, onError?: (error?: string) => void) => void

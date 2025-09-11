@@ -76,14 +76,14 @@ const SubscriptionDropDown: React.FC<ComponentProps> = ({
     setSelectedOption(newSelectedOption)
   }, [autoSubscription])
 
-  const handleSelectOption: SelectProps['onRequestSelectOption'] = (e, {id}) => {
+  const handleSelectOption: SelectProps['onRequestSelectOption'] = (_e, {id}) => {
     const newSelectedOption =
       SUBSCRIPTION_OPTIONS.find(option => option.id === id) ?? SUBSCRIPTION_OPTIONS[1]
     setSelectedOption(newSelectedOption)
     onChange(accountId, newSelectedOption.value)
     setIsShowingOptions(false)
   }
-  const handleHighlightOption: SelectProps['onRequestHighlightOption'] = (e, {id}) => {
+  const handleHighlightOption: SelectProps['onRequestHighlightOption'] = (_e, {id}) => {
     setHighlightedOptionId(id)
   }
 

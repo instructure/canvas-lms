@@ -76,7 +76,7 @@ Object.assign(GradeChangeLoggingContentView.prototype, {
     return this.collection.fetch({error: this.onFail})
   },
 
-  onFail(collection, xhr) {
+  onFail(_collection, xhr) {
     // Received a 404, empty the collection and don't let the paginated
     // view try to fetch more.
 

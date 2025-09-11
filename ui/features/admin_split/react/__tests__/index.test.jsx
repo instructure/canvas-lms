@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import $ from 'jquery'
 import AdminSplit from '../index'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'

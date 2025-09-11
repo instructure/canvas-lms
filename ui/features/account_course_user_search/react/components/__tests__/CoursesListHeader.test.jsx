@@ -93,11 +93,6 @@ describe('CoursesListHeader', () => {
   })
 
   it('prevents default behavior on click', () => {
-    const mockEvent = {
-      preventDefault: jest.fn(),
-      currentTarget: document.createElement('button'),
-    }
-
     const {getByRole} = render(<CoursesListHeader {...defaultProps} />)
     const button = getByRole('button')
 

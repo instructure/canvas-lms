@@ -28,9 +28,7 @@ import GroupCategorySelector from '@canvas/groups/backbone/views/GroupCategorySe
 import SectionCollection from '@canvas/sections/backbone/collections/SectionCollection'
 import Section from '@canvas/sections/backbone/models/Section'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import userSettings from '@canvas/user-settings'
 import React from 'react'
-import ReactDOM from 'react-dom'
 import EditView from '../EditView'
 import '@canvas/jquery/jquery.simulate'
 

@@ -34,7 +34,6 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import preventDefault from '@canvas/util/preventDefault'
 import CreateOrUpdateUserModal from './CreateOrUpdateUserModal'
 import {Flex} from '@instructure/ui-flex'
 

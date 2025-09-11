@@ -140,7 +140,7 @@ describe('GradingPeriodSet - Form Validation and Accessibility', () => {
     })
 
     it('uses semantic HTML for form structure', async () => {
-      const {addPeriodButton} = renderComponent()
+      renderComponent()
 
       // Verify form uses proper HTML5 elements
       expect(screen.getByRole('button', {name: /add grading period/i})).toBeInTheDocument()
