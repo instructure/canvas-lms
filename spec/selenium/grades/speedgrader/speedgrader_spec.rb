@@ -417,13 +417,21 @@ describe "SpeedGrader" do
 
       it "displays correct status pill for each student submission" do
         expect(f(".submission-missing-pill")).to be_displayed
+
         Speedgrader.click_next_student_btn
+        wait_for_dom_ready
         expect(f(".submission-extended-pill")).to be_displayed
+
         Speedgrader.click_next_student_btn
+        wait_for_dom_ready
         expect(f(".submission-late-pill")).to be_displayed
+
         Speedgrader.click_next_student_btn
+        wait_for_dom_ready
         expect(f(".submission-excused-pill")).to be_displayed
+
         Speedgrader.click_next_student_btn
+        wait_for_dom_ready
         expect(f(".submission-custom-grade-status-pill-#{@custom_status.id}")).to be_displayed
       end
 
