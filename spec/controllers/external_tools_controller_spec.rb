@@ -3507,9 +3507,11 @@ describe ExternalToolsController do
   end
 
   describe "#sessionless_launch" do
+    let(:tool_override_settings) { {} }
     let(:tool) do
       new_valid_tool(@course).tap do |t|
         t.course_navigation = { enabled: true }
+        t.settings = t.settings.merge(tool_override_settings) if tool_override_settings.present?
         t.save!
       end
     end
@@ -3522,7 +3524,7 @@ describe ExternalToolsController do
     before do
       allow(BasicLTI::Sourcedid).to receive(:encryption_secret) { "encryption-secret-5T14NjaTbcYjc4" }
       allow(BasicLTI::Sourcedid).to receive(:signing_secret) { "signing-secret-vp04BNqApwdwUYPUI" }
-      user_session(@user)
+      user_session(@teacher)
     end
 
     it "generates a sessionless launch" do
@@ -3540,12 +3542,32 @@ describe ExternalToolsController do
       expect(Lti::LogService).to have_received(:new).with(
         tool:,
         context: @course,
-        user: @user,
+        user: @teacher,
         session_id: nil,
         placement: "course_navigation",
         launch_type: :direct_link,
         launch_url: "http://www.example.com/basic_lti"
       )
+    end
+
+    context "with environment overrides" do
+      let(:override_url) { "http://www.example-beta.com/basic_lti" }
+      let(:tool_override_settings) do
+        {
+          "environments" => {
+            "beta_launch_url" => override_url
+          }
+        }
+      end
+
+      before do
+        allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
+      end
+
+      it "uses the environment override URL for the launch" do
+        get :sessionless_launch, params: { course_id: @course.id, verifier: }
+        expect(assigns(:lti_launch).resource_url).to eq(override_url)
+      end
     end
   end
 
