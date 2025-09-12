@@ -1789,6 +1789,7 @@ el:
   an_integer_value_is_required_e073bd46: "Μια τιμή ακέραιου απαιτείται"
   an_internal_error_occurred_83b8a685: "Παρουσιάστηκε ένα εσωτερικό σφάλμα"
   an_item_named_name_already_exists_in_this_location_147b7312: "Ένα στοιχείο που ονομάζεται «%{name}» υπάρχει ήδη σε αυτή την τοποθεσία. Θέλετε να αντικαταστήσετε το υπάρχον αρχείο;"
+  an_unexpected_error_occurred_15bae9ec: "Παρουσιάστηκε μη αναμενόμενο σφάλμα."
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "Συνέβη ένα άγνωστο σφάλμα διακομιστή. Παρακαλούμε ξαναπροσπαθήστε."
   an_update_is_available_for_toolname_bba3fa2: "Μία ενημέρωση είνια διαθέσιμη για %{toolName}"
   analytics: 
