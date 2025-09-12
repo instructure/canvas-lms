@@ -793,39 +793,43 @@ describe AccessToken do
   end
 
   describe "#queue_developer_key_token_count_increment" do
-    let(:dk) { DeveloperKey.create!(account: account_model, name: "test_key_#{SecureRandom.hex(4)}") }
-    let(:access_token) { AccessToken.create!(user: user_model, developer_key: dk) }
-
-    it "increments the developer key token count" do
-      access_token = AccessToken.new(user: user_model, developer_key: dk)
-      expect { access_token.queue_developer_key_token_count_increment }.to change { dk.reload.access_token_count }.by(1)
+    it "returns early when developer_key is nil" do
+      token_without_key = AccessToken.new(user: user_model, purpose: "test")
+      expect(DeveloperKey).not_to receive(:increment_counter)
+      token_without_key.queue_developer_key_token_count_increment
     end
 
-    it "is called as an after create hook" do
-      access_token = AccessToken.new(user: user_model, developer_key: dk)
-      expect(access_token).to receive(:queue_developer_key_token_count_increment).and_call_original
+    it "returns early and does not increment for a default shard developer key" do
+      default_shard_key = DeveloperKey.create!(name: "test_key_#{SecureRandom.hex(4)}")
+      expect(default_shard_key.shard).to eq Shard.default
       expect do
-        access_token.save!
-      end.to change { dk.reload.access_token_count }.by(1)
+        AccessToken.create!(user: user_model, developer_key: default_shard_key, purpose: "test")
+      end.not_to change { default_shard_key.reload.access_token_count }
     end
 
-    it "enqueues using a strand that depends on global developer key id" do
-      expect(DeveloperKey).to \
-        receive(:delay_if_production)
-        .with(strand: "developer_key_token_count_increment_#{dk.id}")
-        .and_call_original
-      access_token
-    end
-
-    describe "in a sharded environment" do
+    context "with non-default shard developer key" do
       specs_require_sharding
 
-      let(:dk) { @shard1.activate { DeveloperKey.create!(account: account_model, name: "test_key_#{SecureRandom.hex(4)}") } }
+      let_once(:non_default_dk) do
+        @shard1.activate { DeveloperKey.create!(account: account_model, name: "test_key_#{SecureRandom.hex(4)}") }
+      end
 
-      it "increments the developer key token count in the correct shard" do
+      it "increments the token count when invoked directly" do
+        at = AccessToken.new(user: user_model, developer_key: non_default_dk, purpose: "test")
+        expect { at.queue_developer_key_token_count_increment }.to change { non_default_dk.reload.access_token_count }.by(1)
+      end
+
+      it "increments the token count via after_create hook" do
+        expect do
+          AccessToken.create!(user: user_model, developer_key: non_default_dk, purpose: "test")
+        end.to change { non_default_dk.reload.access_token_count }.by(1)
+      end
+
+      it "increments in the correct shard when token created on another shard" do
         @shard2.activate do
-          expect { AccessToken.create!(user: user_model, developer_key: dk) }.to \
-            change { dk.reload.access_token_count }.by(1)
+          expect do
+            AccessToken.create!(user: user_model, developer_key: non_default_dk, purpose: "test")
+          end.to change { non_default_dk.reload.access_token_count }.by(1)
         end
       end
     end

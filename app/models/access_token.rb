@@ -422,9 +422,19 @@ class AccessToken < ActiveRecord::Base
   end
 
   def queue_developer_key_token_count_increment
-    developer_key&.shard&.activate do
-      strand = "developer_key_token_count_increment_#{developer_key.global_id}"
-      DeveloperKey.delay_if_production(strand:).increment_counter(:access_token_count, developer_key.id)
+    return if developer_key.nil? || developer_key.shard == Shard.default
+
+    developer_key.shard.activate do
+      # Previously this enqueued a delayed job per token creation to increment
+      # the developer key's access_token_count. High-volume token creation was
+      # overwhelming the job shard(s) with many trivial increment jobs, especially
+      # when multiple shards created tokens referencing the same developer key.
+      #
+      # Using ActiveRecord.increment_counter here performs a single, atomic
+      # UPDATE statement (SET access_token_count = access_token_count + 1) on
+      # the developer key's shard, avoiding the background job overhead while
+      # still remaining contention-safe at the DB level.
+      DeveloperKey.increment_counter(:access_token_count, developer_key.id)
     end
   end
 end
