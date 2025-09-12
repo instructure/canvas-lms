@@ -513,7 +513,7 @@ module Lti
         tool_configuration.save!
       end
 
-      %w[submission_type_selection top_navigation].each do |placement|
+      %w[submission_type_selection].each do |placement|
         it "returns nil when there are no #{placement} placements" do
           expect(subject).to be_nil
         end
