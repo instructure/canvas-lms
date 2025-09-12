@@ -2807,25 +2807,6 @@ class Account < ActiveRecord::Base
     end
   end
 
-  def horizon_domain
-    settings[:horizon_domain]
-  end
-
-  def horizon_url(path)
-    return nil unless horizon_domain
-
-    protocol = horizon_domain.include?("localhost") ? "http" : "https"
-    Addressable::URI.parse("#{protocol}://#{horizon_domain}/#{path}")
-  end
-
-  def horizon_redirect_url(canvas_url, reauthenticate: false, preview: false)
-    return nil unless horizon_domain
-
-    uri = horizon_url("redirect")
-    uri.query_values = { canvas_url:, reauthenticate:, preview: }
-    uri.to_s
-  end
-
   def horizon_account_locked?
     horizon_account[:locked] && horizon_account[:inherited]
   end

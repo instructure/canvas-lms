@@ -365,7 +365,6 @@ class CoursesController < ApplicationController
   before_action :require_context, only: %i[roster locks create_file ping confirm_action copy effective_due_dates offline_web_exports link_validator settings start_offline_web_export statistics user_progress]
   skip_after_action :update_enrollment_last_activity_at, only: [:enrollment_invitation, :activity_stream_summary]
   before_action :check_limited_access_for_students, only: %i[create_file]
-  before_action :check_horizon_redirect, only: [:show]
 
   include HorizonMode
 
@@ -3930,24 +3929,6 @@ class CoursesController < ApplicationController
     return_to(return_url, request.referer || dashboard_url)
   end
 
-  def check_horizon_redirect
-    if params[:stop_acting_as_user] && @user != @real_current_user
-      session[:masquerade_return_to] = params[:stop_acting_as_user]
-      redirect_to user_masquerade_url(@real_current_user.id, stop_acting_as_user: true)
-      return
-    end
-
-    if @current_user&.fake_student?
-      if params[:leave_student_view]
-        session[:masquerade_return_to] = params[:leave_student_view]
-        leave_student_view
-      elsif params[:reset_test_student]
-        @context ||= api_find(Course.active, params[:id])
-        reset_test_student
-      end
-    end
-  end
-
   def reset_test_student
     get_context
     if @current_user.fake_student? && authorized_action(@context, @real_current_user, :use_student_view)
@@ -3981,18 +3962,11 @@ class CoursesController < ApplicationController
   def enter_student_view
     @fake_student = @context.student_view_student
     session[:become_user_id] = @fake_student.id
-    session.delete(:masquerade_return_to)
     return_url = course_path(@context)
-    is_preview = params[:preview] == "true" && @context.account.feature_enabled?(:horizon_course_setting)
+    session.delete(:masquerade_return_to)
+    return return_to(request.referer, return_url || dashboard_url) if value_to_boolean(params[:redirect_to_referer])
 
-    if @context.root_account.horizon_domain.present? && (is_preview || @context.horizon_course?)
-      canvas_url = params[:reset_test_student] || request.referer
-      redirect_to @context.root_account.horizon_redirect_url(canvas_url, reauthenticate: true, preview: is_preview)
-    elsif value_to_boolean(params[:redirect_to_referer])
-      return_to(request.referer, return_url || dashboard_url)
-    else
-      return_to(return_url, request.referer || dashboard_url)
-    end
+    return_to(return_url, request.referer || dashboard_url)
   end
   protected :enter_student_view
 

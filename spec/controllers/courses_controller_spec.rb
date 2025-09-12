@@ -1389,25 +1389,6 @@ describe CoursesController do
       expect(flash[:notice]).to match(/Course was successfully updated./)
     end
 
-    it "allows test student to leave student view from a Canvas Career course" do
-      user_session(@teacher)
-      @fake_student = @course.student_view_student
-      session[:become_user_id] = @fake_student.id
-
-      get "show", params: { id: @course.id, leave_student_view: "/courses/#{@course.id}/modules" }
-      expect(response).to redirect_to("#{course_url(@course)}/modules")
-      expect(session[:become_user_id]).to be_nil
-    end
-
-    it "allows admin to stop acting as user from a Canvas Career course" do
-      user_session(@teacher)
-      @user = @course.student_view_student
-      session[:become_user_id] = @user.id
-
-      get "show", params: { id: @course.id, stop_acting_as_user: "/courses/#{@course.id}/modules" }
-      expect(response).to redirect_to(user_masquerade_url(@teacher.id, stop_acting_as_user: true))
-    end
-
     it "does not redirect to modules page for horizon courses when invitation param is present" do
       user_session(@teacher)
       @course.account.enable_feature!(:horizon_course_setting)

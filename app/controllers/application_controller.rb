@@ -1098,7 +1098,6 @@ class ApplicationController < ActionController::Base
       # Allow iframing on all vanity domains as well as the canonical one
       unless @domain_root_account.nil?
         list.concat HostUrl.context_hosts(@domain_root_account, request.host)
-        list << @domain_root_account.horizon_domain if @domain_root_account.horizon_domain
       end
     end
   end

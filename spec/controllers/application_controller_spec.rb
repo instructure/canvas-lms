@@ -391,7 +391,6 @@ RSpec.describe ApplicationController do
                               cache_key: "key",
                               uuid: "bleh",
                               salesforce_id: "blah",
-                              horizon_domain: nil,
                               suppress_assignments?: false,
                               enable_content_a11y_checker?: true)
         allow(root_account).to receive(:kill_joy?).and_return(false)
@@ -416,7 +415,6 @@ RSpec.describe ApplicationController do
                               cache_key: "key",
                               uuid: "blah",
                               salesforce_id: "bleh",
-                              horizon_domain: nil,
                               enable_content_a11y_checker?: false,
                               suppress_assignments?: false)
         allow(root_account).to receive(:kill_joy?).and_return(true)
@@ -2602,7 +2600,6 @@ RSpec.describe ApplicationController do
           global_id: "account_global1",
           lti_guid: "lti1",
           feature_enabled?: false,
-          horizon_domain: nil
         }
       end
 
