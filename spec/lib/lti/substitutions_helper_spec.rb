@@ -731,6 +731,13 @@ module Lti
               end
             end
 
+            it "queries the secondary DB" do
+              allow(GuardRail).to receive(:activate)
+              expect(GuardRail).to receive(:activate).with(:secondary)
+
+              subject.recursively_fetch_previous_lti_context_ids
+            end
+
             context "when there are multiple content migrations pointing to the same source course" do
               before do
                 @c3.content_migrations.create!(
