@@ -244,8 +244,10 @@ module Api
       end
 
       describe "#add_youtube_banner_if_needed" do
+        let(:account) { Account.default }
+
         before do
-          Account.site_admin.enable_feature!(:youtube_overlay)
+          account.enable_feature!(:youtube_overlay)
         end
 
         let(:html_with_youtube) do
@@ -258,7 +260,7 @@ module Api
 
         context "when is_native_mobile_app is false" do
           it "does nothing and returns original HTML" do
-            content = Content.new(html_with_youtube, nil, is_native_mobile_app: false)
+            content = Content.new(html_with_youtube, account, is_native_mobile_app: false)
             result = content.add_youtube_banner_if_needed.to_s
             expect(result).to eq(html_with_youtube)
             expect(result).not_to include("embedded YouTube content")
@@ -268,7 +270,7 @@ module Api
         context "when is_native_mobile_app is true" do
           context "with YouTube embeds present" do
             it "injects banner at the top of the content" do
-              content = Content.new(html_with_youtube, nil, is_native_mobile_app: true)
+              content = Content.new(html_with_youtube, account, is_native_mobile_app: true)
               result = content.add_youtube_banner_if_needed.to_s
 
               expect(result).to include("This page has embedded YouTube content that may display advertisements.")
@@ -277,7 +279,7 @@ module Api
             end
 
             it "updates the HTML when banner is injected" do
-              content = Content.new(html_with_youtube, nil, is_native_mobile_app: true)
+              content = Content.new(html_with_youtube, account, is_native_mobile_app: true)
               result = content.add_youtube_banner_if_needed.to_s
 
               # Should have updated the HTML to include banner
@@ -289,7 +291,7 @@ module Api
 
           context "without YouTube embeds" do
             it "does nothing and returns original HTML" do
-              content = Content.new(html_without_youtube, nil, is_native_mobile_app: true)
+              content = Content.new(html_without_youtube, account, is_native_mobile_app: true)
               result = content.add_youtube_banner_if_needed.to_s
 
               expect(result).to eq(html_without_youtube)
@@ -297,7 +299,7 @@ module Api
             end
 
             it "does not modify the parsed HTML structure" do
-              content = Content.new(html_without_youtube, nil, is_native_mobile_app: true)
+              content = Content.new(html_without_youtube, account, is_native_mobile_app: true)
               # Force parsing by calling the method first
               original_html_string = content.add_youtube_banner_if_needed.to_s
 
@@ -313,7 +315,7 @@ module Api
           context "with banner already present" do
             it "does not inject duplicate banners" do
               html_with_existing_banner = '<div role="alert">This page has embedded YouTube content that may display advertisements.</div>' + html_with_youtube
-              content = Content.new(html_with_existing_banner, nil, is_native_mobile_app: true)
+              content = Content.new(html_with_existing_banner, account, is_native_mobile_app: true)
               result = content.add_youtube_banner_if_needed.to_s
 
               banner_count = result.scan("embedded YouTube content").length
@@ -325,7 +327,7 @@ module Api
         context "integration with rewritten_html" do
           it "includes YouTube banner in the final output for native mobile app" do
             url_helper = double(rewrite_api_urls: nil)
-            content = Content.new(html_with_youtube, nil, is_native_mobile_app: true)
+            content = Content.new(html_with_youtube, account, is_native_mobile_app: true)
             result = content.rewritten_html(url_helper)
 
             expect(result).to include("embedded YouTube content")
@@ -335,7 +337,7 @@ module Api
 
           it "does not include YouTube banner for non-native mobile app" do
             url_helper = double(rewrite_api_urls: nil)
-            content = Content.new(html_with_youtube, nil, is_native_mobile_app: false)
+            content = Content.new(html_with_youtube, account, is_native_mobile_app: false)
             result = content.rewritten_html(url_helper)
 
             expect(result).not_to include("embedded YouTube content")

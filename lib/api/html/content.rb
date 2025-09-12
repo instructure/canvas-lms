@@ -178,7 +178,7 @@ module Api
 
       def add_youtube_banner_if_needed
         return parsed_html unless @is_native_mobile_app
-        return parsed_html unless Account.site_admin.feature_enabled?(:youtube_overlay)
+        return parsed_html unless @account.feature_enabled?(:youtube_overlay)
 
         html_string = parsed_html.to_s
         updated_html = YoutubeBannerInjectionService.inject_banner_if_needed(html_string, mobile_device: true)
