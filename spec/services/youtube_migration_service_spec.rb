@@ -682,7 +682,7 @@ RSpec.describe YoutubeMigrationService do
           question_name: "Quiz Question",
           question_text: '<iframe src="https://www.youtube.com/embed/quizq123" width="560" height="315"></iframe>',
           neutral_comments_html: '<iframe src="https://www.youtube.com/embed/neutral789" width="560" height="315"></iframe>',
-          question_type: "multiple_choice_question",
+          question_type: "text_only_question", # To make sure during create! there will be no assesment question creation
           answers: []
         }
       )
@@ -698,6 +698,42 @@ RSpec.describe YoutubeMigrationService do
         "https://www.youtube.com/embed/quizq123",
         "https://www.youtube.com/embed/neutral789"
       )
+    end
+
+    it "skips quiz questions with assessment question association" do
+      quiz = quiz_model(course:, description: "description")
+      assessment_youtube_src = "https://www.youtube.com/embed/assessment123"
+
+      question_bank = assessment_question_bank_model(course:)
+      assessment_question = assessment_question_model(
+        bank: question_bank,
+        question_data: {
+          question_name: "Assessment Question",
+          question_text: "<iframe src=\"#{assessment_youtube_src}\" width=\"560\" height=\"315\"></iframe>",
+          question_type: "multiple_choice_question",
+          answers: []
+        }
+      )
+
+      quiz.quiz_questions.create!(
+        question_data: {
+          question_name: "Linked Quiz Question",
+          question_text: '<iframe src="https://www.youtube.com/embed/should_be_skipped" width="560" height="315"></iframe>',
+          question_type: "multiple_choice_question",
+          answers: []
+        },
+        assessment_question:
+      )
+
+      resources = service.scan_course_for_embeds
+
+      quiz_key = "Quizzes::Quiz|#{quiz.id}"
+      expect(resources[quiz_key]).to_not be_present
+
+      aq_key = "AssessmentQuestion|#{assessment_question.id}"
+      expect(resources[aq_key][:count]).to eq(1)
+      aq_embeds_srcs = resources[aq_key][:embeds].pluck(:src)
+      expect(aq_embeds_srcs).to include(assessment_youtube_src)
     end
 
     it "finds YouTube embeds in discussion entries" do
