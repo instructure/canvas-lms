@@ -26,6 +26,8 @@ module CanvasCareer
       ACADEMIC = "academic"
     end
 
+    CAREER_APPS = [App::CAREER_LEARNER, App::CAREER_LEARNING_PROVIDER].freeze
+
     module Experience
       CAREER = "career"
       ACADEMIC = "academic"

@@ -69,15 +69,6 @@ describe HorizonMode do
       end
     end
 
-    context "when force_classic cookie is present" do
-      before { cookies[:force_classic] = "1" }
-
-      it "does not redirect" do
-        get :show
-        expect(response).to have_http_status(:ok)
-      end
-    end
-
     context "when it's an API request" do
       before { allow(controller).to receive(:api_request?).and_return(true) }
 
@@ -124,34 +115,12 @@ describe HorizonMode do
         allow(resolver).to receive(:resolve).and_return(CanvasCareer::Constants::App::CAREER_LEARNER)
       end
 
-      context "when horizon_learner_app feature is enabled" do
-        before do
-          account.enable_feature!(:horizon_learner_app)
-        end
-
-        it "redirects to the career path without horizon parameters" do
-          get :show
-          expect(response.location).to include("/career/courses/#{course.id}")
-          expect(response.location).not_to include("content_only=true")
-          expect(response.location).not_to include("instui_theme=career")
-          expect(response.location).not_to include("force_classic=true")
-        end
-      end
-
-      context "when horizon_learner_app feature is disabled" do
-        it "redirects to the configured learner app URL with horizon parameters" do
-          get :show
-          expect(response.location).to include("https://canvasforcareer.com")
-          expect(response.location).to include("content_only=true")
-          expect(response.location).to include("instui_theme=career")
-          expect(response.location).to include("force_classic=true")
-        end
-
-        it "does nothing if course is not a horizon course" do
-          course.update!(horizon_course: false)
-          get :show
-          expect(response).to have_http_status(:ok)
-        end
+      it "redirects to the career path without horizon parameters" do
+        get :show
+        expect(response.location).to include("/career/courses/#{course.id}")
+        expect(response.location).not_to include("content_only=true")
+        expect(response.location).not_to include("instui_theme=career")
+        expect(response.location).not_to include("force_classic=true")
       end
     end
 

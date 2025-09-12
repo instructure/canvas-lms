@@ -27,19 +27,11 @@ module CanvasCareer
     end
 
     def learner_app_launch_url
-      if @root_account.feature_enabled?(:horizon_injected_config)
-        config["learner_launch_url"]
-      else
-        @root_account.horizon_url("remoteEntry.js").to_s
-      end
+      config["learner_launch_url"]
     end
 
     def learning_provider_app_launch_url
-      if @root_account.feature_enabled?(:horizon_injected_config)
-        config["learning_provider_launch_url"]
-      else
-        @root_account.horizon_url("learning-provider/remoteEntry.js").to_s
-      end
+      config["learning_provider_launch_url"]
     end
 
     # This is the account's url on *.canvasforcareer.com. The redirect strategy is legacy

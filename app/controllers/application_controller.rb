@@ -412,16 +412,8 @@ class ApplicationController < ActionController::Base
   def show_career_switch?
     return false unless @current_user
 
-    return false unless @domain_root_account&.feature_enabled?(:horizon_learner_app) ||
-                        @domain_root_account&.feature_enabled?(:horizon_learning_provider_app_on_contextless_routes)
-
-    career_apps = [
-      CanvasCareer::Constants::App::CAREER_LEARNER,
-      CanvasCareer::Constants::App::CAREER_LEARNING_PROVIDER
-    ]
-
     resolver = CanvasCareer::ExperienceResolver.new(@current_user, @context, @domain_root_account, session)
-    resolver.available_apps.intersect?(career_apps)
+    resolver.available_apps.intersect?(CanvasCareer::Constants::CAREER_APPS)
   end
   helper_method :show_career_switch?
 
@@ -488,8 +480,6 @@ class ApplicationController < ActionController::Base
     disable_iframe_sandbox_file_show
     extended_submission_state
     file_verifiers_for_quiz_links
-    horizon_learner_app
-    horizon_learning_provider_app_on_contextless_routes
     increased_top_nav_pane_size
     instui_nav
     login_registration_ui_identity

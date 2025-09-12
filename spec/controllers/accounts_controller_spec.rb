@@ -1278,7 +1278,6 @@ describe AccountsController do
         @root_account = @account
         @root_account.enable_feature!(:horizon_course_setting)
         @root_account.enable_feature!(:horizon_learning_provider_app_for_courses)
-        @root_account.enable_feature!(:horizon_learning_provider_app_on_contextless_routes)
 
         @career_subaccount = @root_account.sub_accounts.create!
         @career_subaccount.horizon_account = true
