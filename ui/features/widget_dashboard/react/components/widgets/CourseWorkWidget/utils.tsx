@@ -68,8 +68,8 @@ export function formatDueDate(dueAt: string | null): string {
   })
 }
 
-export function getTypeIcon(type: CourseWorkItem['type']) {
-  const iconSize = 'small'
+export function getTypeIcon(type: CourseWorkItem['type'], isMobile: boolean) {
+  const iconSize = isMobile ? 'x-small' : 'small'
   switch (type) {
     case 'assignment':
       return <IconAssignmentLine size={iconSize} data-testid="assignment-icon" />
