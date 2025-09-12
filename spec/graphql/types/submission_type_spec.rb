@@ -1330,6 +1330,16 @@ describe Types::SubmissionType do
         )
       ).to be_empty
     end
+
+    it "filters out soft-deleted enrollments" do
+      @course.enrollments.where(user: @submission.user).destroy_all
+      expect(
+        submission_type.resolve(
+          "enrollmentsConnection { nodes { _id } }",
+          current_user: @teacher
+        )
+      ).to be_empty
+    end
   end
 
   describe "lti_asset_reports_connection" do

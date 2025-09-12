@@ -54,6 +54,52 @@ module HorizonMode
     Canvas::Plugin.value_to_boolean(params[:force_classic]) || Canvas::Plugin.value_to_boolean(cookies[:force_classic])
   end
 
+  def add_career_params
+    yield
+
+    return unless should_add_horizon_params?
+
+    location = response.location
+    return unless location
+
+    response.location = add_horizon_params_to_url(location)
+  end
+
+  def redirect_to(options = {}, response_options = {})
+    if should_add_horizon_params?
+      if options.is_a?(String) && !options.include?("/career/")
+        options = add_horizon_params_to_url(options)
+      elsif options.is_a?(Hash) && !options.key?(:force_classic)
+        options = options.merge(horizon_params)
+      end
+    end
+
+    super
+  end
+
+  def should_add_horizon_params?
+    return false unless @context
+
+    if @context.is_a?(Account)
+      @context.horizon_account?
+    elsif @context.is_a?(Course)
+      @context.horizon_course?
+    else
+      false
+    end
+  end
+
+  def add_horizon_params_to_url(url)
+    uri = URI(url)
+    query = Rack::Utils.parse_query(uri.query).merge(horizon_params.stringify_keys)
+    uri.query = query.to_query
+    uri.to_s
+  end
+
+  def horizon_params
+    { content_only: "true", instui_theme: "career", force_classic: "true" }.symbolize_keys
+  end
+
   def rewrite_path_for_career
     "#{canvas_career_path}#{request.fullpath}"
   end
