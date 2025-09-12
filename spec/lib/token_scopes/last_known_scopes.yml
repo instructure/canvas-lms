@@ -1503,6 +1503,8 @@
   path: '/api/v1/courses/:course_id/youtube_migration/scan'
 - verb: POST
   path: '/api/v1/courses/:course_id/youtube_migration/scan'
+- verb: PUT
+  path: '/api/v1/courses/:course_id/youtube_migration/scan/:scan_id'
 - verb: DELETE
   path: '/api/v1/courses/:id'
 - verb: GET

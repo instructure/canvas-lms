@@ -4178,6 +4178,34 @@ class CoursesController < ApplicationController
     render json: { conversions: active_conversions }, status: :ok
   end
 
+  def update_youtube_migration_scan
+    get_context
+
+    unless @context.feature_enabled?(:youtube_migration)
+      return render status: :not_found, template: "shared/errors/404_message"
+    end
+
+    return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+
+    scan_id = params.require(:scan_id).to_i
+    required_params = update_youtube_migration_scan_params
+
+    begin
+      service = YoutubeMigrationService.new(@context)
+      service.process_new_quizzes_scan_update(
+        scan_id,
+        new_quizzes_scan_status: required_params[:new_quizzes_scan_status],
+        new_quizzes_scan_results: required_params[:new_quizzes_scan_results]
+      )
+
+      render json: { success: true }, status: :ok
+    rescue ActiveRecord::RecordNotFound
+      render json: { error: "Youtube Scan not found" }, status: :not_found
+    rescue
+      render json: { error: "An Error occured during updating the youtube scan results" }, status: :internal_server_error
+    end
+  end
+
   def start_link_validation
     get_context
     return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
@@ -4528,6 +4556,13 @@ class CoursesController < ApplicationController
       :horizon_course,
       :disable_csp
     )
+  end
+
+  def update_youtube_migration_scan_params
+    {
+      new_quizzes_scan_status: params.require(:new_quizzes_scan_status),
+      new_quizzes_scan_results: params[:new_quizzes_scan_results]&.to_unsafe_h || {}
+    }
   end
 
   def disable_conditional_release

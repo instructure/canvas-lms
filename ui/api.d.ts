@@ -791,7 +791,12 @@ export type YoutubeScanResource = Readonly<{
   embeds: Array<YoutubeEmbed>
 }>
 
-export type YoutubeScanWorkflowState = 'completed' | 'failed' | 'queued' | 'running'
+export type YoutubeScanWorkflowState =
+  | 'completed'
+  | 'failed'
+  | 'queued'
+  | 'running'
+  | 'waiting_for_external_tool'
 
 export type YoutubeScanResultReport = Readonly<{
   workflow_state: YoutubeScanWorkflowState | null

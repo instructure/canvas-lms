@@ -177,11 +177,12 @@ RSpec.describe YoutubeMigrationService do
         allow(course).to receive_messages(lti_context_id: "course_lti_context_123", id: 1)
 
         expect(Canvas::LiveEvents).to receive(:scan_youtube_links) do |payload|
-          expect(payload.scan_id).to eq(Progress.last.id)
+          expect(payload.scan_id).to eq(progress.id)
           expect(payload.course_id).to eq(course.id)
           expect(payload.external_context_id).to eq(course.lti_context_id)
         end
 
+        progress.start!
         described_class.scan(progress)
       end
     end
@@ -199,6 +200,28 @@ RSpec.describe YoutubeMigrationService do
       progress.reload
       expect(progress.results).to be_present
       expect(progress.results[:error_report_id]).to eq(12_345)
+    end
+
+    it "transitions to waiting_for_external_tool when new_quizzes? returns true" do
+      allow(described_class).to receive(:new_quizzes?).with(course).and_return(true)
+      allow(described_class).to receive(:call_external_tool)
+      progress.start!
+      described_class.scan(progress)
+
+      progress.reload
+      expect(progress.workflow_state).to eq("waiting_for_external_tool")
+      expect(progress.results).to be_present
+      expect(progress.results[:completed_at]).to be_blank
+    end
+
+    it "completes immediately when new_quizzes? returns false" do
+      allow(described_class).to receive(:new_quizzes?).with(course).and_return(false)
+      progress.start!
+      described_class.scan(progress)
+
+      progress.reload
+      expect(progress.results).to be_present
+      expect(progress.results[:completed_at]).to be_present
     end
   end
 
@@ -2234,6 +2257,162 @@ RSpec.describe YoutubeMigrationService do
       it "generates consistent resource key" do
         key = described_class.generate_resource_key("WikiPage", 123)
         expect(key).to eq("WikiPage|123")
+      end
+    end
+
+    describe "#process_new_quizzes_scan_update" do
+      let(:scan_progress) do
+        Progress.create!(
+          tag: "youtube_embed_scan",
+          context: course,
+          workflow_state: "waiting_for_external_tool",
+          results: {
+            resources: {
+              "WikiPage|123" => {
+                name: "Test Page",
+                id: 123,
+                type: "WikiPage",
+                content_url: "/courses/#{course.id}/pages/test-page",
+                count: 1,
+                embeds: [
+                  {
+                    path: "//iframe[@src='https://www.youtube.com/embed/abc123']",
+                    id: 123,
+                    resource_type: "WikiPage",
+                    field: "body",
+                    src: "https://www.youtube.com/embed/abc123"
+                  }
+                ]
+              }
+            },
+            total_count: 1,
+            completed_at: 2.hours.ago.utc
+          }
+        )
+      end
+
+      let(:new_quizzes_scan_results) do
+        {
+          resources: [
+            {
+              name: "New Quiz",
+              id: 456,
+              type: "Quiz",
+              content_url: "/courses/#{course.id}/quizzes/456",
+              count: 2,
+              embeds: [
+                {
+                  path: "//iframe[@src='https://www.youtube.com/embed/xyz789']",
+                  id: 456,
+                  resource_type: "Quiz",
+                  field: "instructions",
+                  src: "https://www.youtube.com/embed/xyz789"
+                }
+              ]
+            }
+          ],
+          total_count: 2
+        }
+      end
+
+      it "merges new quizzes results when status is completed" do
+        service.process_new_quizzes_scan_update(
+          scan_progress.id,
+          new_quizzes_scan_status: "completed",
+          new_quizzes_scan_results:
+        )
+
+        scan_progress.reload
+        expect(scan_progress.workflow_state).to eq("completed")
+        expect(scan_progress.results[:new_quizzes_scan_status]).to eq("completed")
+        expect(scan_progress.results[:total_count]).to eq(3)
+        expect(scan_progress.results[:resources].keys).to include("WikiPage|123", "Quiz|456")
+        expect(scan_progress.results[:resources]["Quiz|456"][:name]).to eq("New Quiz")
+        expect(scan_progress.results[:completed_at]).to be_present
+      end
+
+      it "handles failed status without merging results but still completes" do
+        original_resources = scan_progress.results[:resources].dup
+
+        service.process_new_quizzes_scan_update(
+          scan_progress.id,
+          new_quizzes_scan_status: "failed",
+          new_quizzes_scan_results:
+        )
+
+        scan_progress.reload
+        expect(scan_progress.workflow_state).to eq("completed")
+        expect(scan_progress.results[:new_quizzes_scan_status]).to eq("failed")
+        expect(scan_progress.results[:total_count]).to eq(1)
+        expect(scan_progress.results[:resources]).to eq(original_resources)
+        expect(scan_progress.results[:completed_at]).to be_present
+      end
+
+      it "handles processing errors gracefully and completes with failed status" do
+        allow(YoutubeMigrationService).to receive(:generate_resource_key).and_raise(StandardError, "Test error")
+        expect(Canvas::Errors).to receive(:capture).with(
+          :youtube_migration_new_quizzes_scan_error,
+          {
+            course_id: course.id,
+            scan_id: scan_progress.id,
+            error: "Test error",
+            message: "Error processing new quizzes scan update"
+          }
+        )
+
+        service.process_new_quizzes_scan_update(
+          scan_progress.id,
+          new_quizzes_scan_status: "completed",
+          new_quizzes_scan_results:
+        )
+
+        scan_progress.reload
+        expect(scan_progress.workflow_state).to eq("completed")
+        expect(scan_progress.results[:new_quizzes_scan_status]).to eq("failed")
+        expect(scan_progress.results[:completed_at]).to be_present
+      end
+
+      it "handles nil new_quizzes_scan_results with default empty hash" do
+        service.process_new_quizzes_scan_update(
+          scan_progress.id,
+          new_quizzes_scan_status: "completed"
+        )
+
+        scan_progress.reload
+        expect(scan_progress.results[:new_quizzes_scan_status]).to eq("completed")
+        expect(scan_progress.results[:total_count]).to eq(1)
+      end
+
+      it "raises error when scan is not found" do
+        expect do
+          service.process_new_quizzes_scan_update(
+            99_999,
+            new_quizzes_scan_status: "completed",
+            new_quizzes_scan_results:
+          )
+        end.to raise_error(ActiveRecord::RecordNotFound)
+      end
+
+      it "handles empty existing results gracefully" do
+        empty_progress = Progress.create!(
+          tag: "youtube_embed_scan",
+          context: course,
+          workflow_state: "waiting_for_external_tool"
+        )
+
+        service.process_new_quizzes_scan_update(
+          empty_progress.id,
+          new_quizzes_scan_status: "completed",
+          new_quizzes_scan_results:
+        )
+
+        empty_progress.reload
+        expect(empty_progress.workflow_state).to eq("completed")
+        expect(empty_progress.results[:total_count]).to eq(2)
+        expect(empty_progress.results[:resources]).to have_key("Quiz|456")
+        expect(empty_progress.results[:resources]["Quiz|456"][:name]).to eq("New Quiz")
+        expect(empty_progress.results[:resources]["Quiz|456"][:count]).to eq(2)
+        expect(empty_progress.results[:new_quizzes_scan_status]).to eq("completed")
       end
     end
 

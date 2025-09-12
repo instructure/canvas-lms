@@ -5639,6 +5639,191 @@ describe CoursesController do
         end
       end
     end
+
+    describe "update youtube migration scan" do
+      subject do
+        put :update_youtube_migration_scan, params: {
+          course_id: @course.id,
+          scan_id: defined?(scan_progress) ? scan_progress.id : default_scan_progress.id,
+          new_quizzes_scan_results: defined?(new_quizzes_scan_results) ? new_quizzes_scan_results : default_new_quizzes_scan_results,
+          new_quizzes_scan_status: defined?(new_quizzes_scan_status) ? new_quizzes_scan_status : "completed"
+        }
+      end
+
+      let(:default_scan_progress) do
+        Progress.create!(
+          tag: "youtube_embed_scan",
+          context: @course,
+          workflow_state: "waiting_for_external_tool",
+          results: {
+            resources: {},
+            total_count: 0,
+          }
+        )
+      end
+
+      let(:default_new_quizzes_scan_results) do
+        { resources: [], total_count: 0 }
+      end
+
+      let(:scan_progress) do
+        Progress.create!(
+          tag: "youtube_embed_scan",
+          context: @course,
+          workflow_state: "waiting_for_external_tool",
+          results: {
+            resources: {
+              "WikiPage|123" => {
+                name: "Test Page",
+                id: 123,
+                type: "WikiPage",
+                content_url: "/courses/#{@course.id}/pages/test-page",
+                count: 1,
+                embeds: [
+                  {
+                    path: "//iframe[@src='https://www.youtube.com/embed/abc123']",
+                    id: 123,
+                    resource_type: "WikiPage",
+                    field: "body",
+                    src: "https://www.youtube.com/embed/abc123"
+                  }
+                ]
+              }
+            },
+            total_count: 1,
+            canvas_scan_completed_at: 2.hours.ago.utc,
+            completed_at: 2.hours.ago.utc
+          }
+        )
+      end
+
+      let(:new_quizzes_scan_results) do
+        {
+          resources: [
+            {
+              name: "New Quiz",
+              id: 456,
+              type: "Quiz",
+              content_url: "/courses/#{@course.id}/quizzes/456",
+              count: 2,
+              embeds: [
+                {
+                  path: "//iframe[@src='https://www.youtube.com/embed/xyz789']",
+                  id: 456,
+                  resource_type: "Quiz",
+                  field: "instructions",
+                  src: "https://www.youtube.com/embed/xyz789"
+                },
+                {
+                  path: "//iframe[@src='https://www.youtube.com/embed/def456']",
+                  id: 456,
+                  resource_type: "Quiz",
+                  field: "instructions",
+                  src: "https://www.youtube.com/embed/def456"
+                }
+              ]
+            }
+          ],
+          total_count: 2,
+        }
+      end
+
+      let(:new_quizzes_scan_status) { "completed" }
+
+      include_examples "youtube migration protection"
+
+      context "when feature flag is disabled" do
+        before do
+          @course.disable_feature!(:youtube_migration)
+          @teacher = user_factory
+          @course.enroll_teacher(@teacher).accept!
+          user_session(@teacher)
+        end
+
+        it "returns not found" do
+          subject
+          expect(response).to have_http_status(:not_found)
+        end
+      end
+
+      context "when authorized" do
+        before do
+          @course.enable_feature!(:youtube_migration)
+          @teacher = user_factory
+          @course.enroll_teacher(@teacher).accept!
+          user_session(@teacher)
+        end
+
+        it "successfully updates scan with new quizzes results when status is completed" do
+          expect(scan_progress.results[:total_count]).to eq(1)
+          expect(scan_progress.results[:resources].keys).to eq(["WikiPage|123"])
+          expect(scan_progress.workflow_state).to eq("waiting_for_external_tool")
+
+          subject
+
+          expect(response).to have_http_status(:ok)
+          json = response.parsed_body
+          expect(json["success"]).to be true
+
+          scan_progress.reload
+          expect(scan_progress.workflow_state).to eq("completed")
+          expect(scan_progress.results[:total_count]).to eq(3)
+          expect(scan_progress.results[:resources].keys).to include("WikiPage|123", "Quiz|456")
+          expect(scan_progress.results[:resources]["Quiz|456"][:name]).to eq("New Quiz")
+          expect(scan_progress.results[:resources]["Quiz|456"][:count]).to eq("2")
+          expect(scan_progress.results[:new_quizzes_scan_status]).to eq("completed")
+        end
+
+        it "handles scan not found" do
+          put :update_youtube_migration_scan, params: {
+            course_id: @course.id,
+            scan_id: 99_999,
+            new_quizzes_scan_results:,
+            new_quizzes_scan_status: "completed"
+          }
+
+          expect(response).to have_http_status(:not_found)
+          json = response.parsed_body
+          expect(json["error"]).to eq("Youtube Scan not found")
+        end
+
+        it "handles failed new quizzes scan status but still completes" do
+          put :update_youtube_migration_scan, params: {
+            course_id: @course.id,
+            scan_id: scan_progress.id,
+            new_quizzes_scan_results: {},
+            new_quizzes_scan_status: "failed"
+          }
+
+          expect(response).to have_http_status(:ok)
+          scan_progress.reload
+          expect(scan_progress.workflow_state).to eq("completed")
+          expect(scan_progress.results[:new_quizzes_scan_status]).to eq("failed")
+          expect(scan_progress.results[:completed_at]).to be_present
+        end
+
+        it "handles service errors gracefully" do
+          allow_any_instance_of(YoutubeMigrationService).to receive(:process_new_quizzes_scan_update).and_raise(StandardError, "Test error")
+          subject
+
+          expect(response).to have_http_status(:internal_server_error)
+          json = response.parsed_body
+          expect(json["error"]).to eq("An Error occured during updating the youtube scan results")
+        end
+
+        it "handles nil new_quizzes_scan_results gracefully" do
+          put :update_youtube_migration_scan, params: {
+            course_id: @course.id,
+            scan_id: scan_progress.id,
+            new_quizzes_scan_status: "failed"
+          }
+
+          expect(response).to have_http_status(:ok)
+          scan_progress.reload
+          expect(scan_progress.results[:new_quizzes_scan_status]).to eq("failed")
+        end
+      end
+    end
   end
 
   context "attachments to syllabus body with location tagging" do

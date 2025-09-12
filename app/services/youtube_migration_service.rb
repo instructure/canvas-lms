@@ -72,9 +72,14 @@ class YoutubeMigrationService
     service = new(progress.context)
     resources_with_embeds = service.scan_course_for_embeds
     total_count = resources_with_embeds.values.sum { |resource| resource[:count] || 0 }
-    progress.set_results({ resources: resources_with_embeds, total_count:, completed_at: Time.now.utc })
 
-    call_external_tool(progress.context, progress.id) if new_quizzes?(progress.context)
+    if new_quizzes?(progress.context)
+      progress.set_results({ resources: resources_with_embeds, total_count: })
+      progress.wait_for_external_tool!
+      call_external_tool(progress.context, progress.id)
+    else
+      progress.set_results({ resources: resources_with_embeds, total_count:, completed_at: Time.now.utc })
+    end
   rescue
     report_id = Canvas::Errors.capture_exception(:youtube_embed_scan, $ERROR_INFO)[:error_report]
     progress.set_results({ error_report_id: report_id, completed_at: Time.now.utc })
@@ -663,6 +668,47 @@ class YoutubeMigrationService
       scan_progress.save!
     else
       raise EmbedNotFoundError, "Embed not found for resource type: #{embed[:resource_type]}, id: #{embed[:id]}, src: #{embed[:src]}"
+    end
+  end
+
+  def process_new_quizzes_scan_update(scan_id, new_quizzes_scan_status:, new_quizzes_scan_results: {})
+    progress = self.class.find_scan(course, scan_id)
+    results = progress.results || {}
+    results[:new_quizzes_scan_status] = new_quizzes_scan_status
+
+    begin
+      if new_quizzes_scan_status == "completed"
+        scan_results = (new_quizzes_scan_results || {}).deep_symbolize_keys
+        new_quizzes_resources = {}
+
+        resources_array = scan_results[:resources] || []
+        resources_array.each do |resource|
+          key = YoutubeMigrationService.generate_resource_key(resource[:type], resource[:id])
+          new_quizzes_resources[key] = resource
+        end
+
+        merged_resources = (results[:resources] || {}).merge(new_quizzes_resources)
+        merged_total_count = (results[:total_count] || 0).to_i + (scan_results[:total_count] || 0).to_i
+
+        results[:resources] = merged_resources
+        results[:total_count] = merged_total_count
+      end
+
+      results[:completed_at] = Time.now.utc
+      progress.set_results(results)
+      progress.complete! if progress.waiting_for_external_tool?
+    rescue => e
+      results[:new_quizzes_scan_status] = "failed"
+      results[:completed_at] = Time.now.utc
+      progress.set_results(results)
+      progress.complete! if progress.waiting_for_external_tool?
+
+      Canvas::Errors.capture(:youtube_migration_new_quizzes_scan_error, {
+                               course_id: course.id,
+                               scan_id: progress.id,
+                               error: e.message,
+                               message: "Error processing new quizzes scan update"
+                             })
     end
   end
 end
