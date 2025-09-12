@@ -22,7 +22,7 @@ require "aws-sdk-sns"
 
 class DeveloperKey < ActiveRecord::Base
   class CacheOnAssociation < ActiveRecord::Associations::BelongsToAssociation
-    def find_target
+    def find_target(...)
       if owner.instance_variable_get(:@skip_dev_key_cache)
         super
       else
