@@ -25,6 +25,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {getSubmissionStatus, getTypeIcon} from '../widgets/CourseWorkWidget/utils'
 import type {CourseWorkItem as CourseWorkItemType} from '../../hooks/useCourseWork'
 import {CourseCode} from './CourseCode'
+import {useResponsiveContext} from '../../hooks/useResponsiveContext'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -34,26 +35,28 @@ interface CourseWorkItemProps {
 
 export function CourseWorkItem({item}: CourseWorkItemProps) {
   const submissionStatus = getSubmissionStatus(item.late, item.missing, item.state, item.dueAt)
+  const {isMobile} = useResponsiveContext()
 
   return (
     <Flex.Item key={item.id} overflowY="hidden">
       <View as="div" margin="small" background="primary">
-        <Flex gap="small" alignItems="center">
-          <Flex.Item shouldShrink>
-            <View
-              as="div"
-              background="secondary"
-              borderRadius="medium"
-              padding="medium"
-              margin="0 0 x-small 0"
-              display="inline-block"
-              themeOverride={{
-                backgroundSecondary: submissionStatus.color.background,
-              }}
-            >
-              {getTypeIcon(item.type)}
-            </View>
-          </Flex.Item>
+        <Flex gap="small" alignItems="center" wrap={isMobile ? 'wrap' : 'no-wrap'}>
+          {!isMobile && (
+            <Flex.Item>
+              <View
+                as="div"
+                background="secondary"
+                borderRadius="medium"
+                padding={isMobile ? 'small' : 'medium'}
+                margin="0 0 x-small 0"
+                themeOverride={{
+                  backgroundSecondary: submissionStatus.color.background,
+                }}
+              >
+                {getTypeIcon(item.type, isMobile)}
+              </View>
+            </Flex.Item>
+          )}
           <Flex.Item shouldGrow shouldShrink>
             <Flex direction="column" gap="xx-small">
               <Link
@@ -65,11 +68,15 @@ export function CourseWorkItem({item}: CourseWorkItemProps) {
                   {item.title}
                 </Text>
               </Link>
-              <Flex gap="x-small" alignItems="center">
-                <CourseCode courseId={item.course.id} size="x-small" />
-                <Text size="x-small" color="secondary">
-                  {item.course.name}
-                </Text>
+              <Flex gap="x-small" alignItems="center" wrap="wrap">
+                <Flex.Item>
+                  <CourseCode courseId={item.course.id} size="x-small" />
+                </Flex.Item>
+                <Flex.Item>
+                  <Text size="x-small" color="secondary">
+                    {item.course.name}
+                  </Text>
+                </Flex.Item>
               </Flex>
               <Text size="x-small" color="secondary">
                 {item.points != null && `${I18n.t('%{points} pts', {points: item.points})}`}

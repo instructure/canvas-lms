@@ -22,6 +22,7 @@ import {Flex} from '@instructure/ui-flex'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import type {CourseOption} from '../../types'
+import {useResponsiveContext} from '../../hooks/useResponsiveContext'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -61,6 +62,7 @@ const CourseWorkFilters: React.FC<CourseWorkFiltersProps> = ({
   userCourses,
   statisticsOnly = false,
 }) => {
+  const {isMobile} = useResponsiveContext()
   const courseOptions: CourseOption[] = useMemo(
     () => [{id: 'all', name: I18n.t('All Courses')}, ...userCourses],
     [userCourses],
@@ -79,34 +81,40 @@ const CourseWorkFilters: React.FC<CourseWorkFiltersProps> = ({
       : options
   }, [statisticsOnly])
 
+  const filterMobilePadding = useMemo(() => 'xx-small', [])
+
   return (
-    <Flex gap="small">
-      <SimpleSelect
-        renderLabel={<ScreenReaderContent>{I18n.t('Filter by course')}</ScreenReaderContent>}
-        value={selectedCourse}
-        onChange={onCourseChange}
-        width="200px"
-        size="small"
-      >
-        {courseOptions.map(option => (
-          <SimpleSelect.Option key={option.id} id={option.id} value={option.id}>
-            {option.name}
-          </SimpleSelect.Option>
-        ))}
-      </SimpleSelect>
-      <SimpleSelect
-        renderLabel={<ScreenReaderContent>{I18n.t('Filter by due date')}</ScreenReaderContent>}
-        value={selectedDateFilter}
-        onChange={onDateFilterChange}
-        width="150px"
-        size="small"
-      >
-        {dateFilterOptions.map(option => (
-          <SimpleSelect.Option key={option.id} id={option.id} value={option.id}>
-            {option.label}
-          </SimpleSelect.Option>
-        ))}
-      </SimpleSelect>
+    <Flex direction={isMobile ? 'column' : 'row'}>
+      <Flex.Item shouldGrow={isMobile} padding={isMobile ? filterMobilePadding : undefined}>
+        <SimpleSelect
+          renderLabel={<ScreenReaderContent>{I18n.t('Filter by course')}</ScreenReaderContent>}
+          value={selectedCourse}
+          onChange={onCourseChange}
+          width={isMobile ? '100%' : '200px'}
+          size="small"
+        >
+          {courseOptions.map(option => (
+            <SimpleSelect.Option key={option.id} id={option.id} value={option.id}>
+              {option.name}
+            </SimpleSelect.Option>
+          ))}
+        </SimpleSelect>
+      </Flex.Item>
+      <Flex.Item shouldGrow={isMobile} padding={isMobile ? filterMobilePadding : undefined}>
+        <SimpleSelect
+          renderLabel={<ScreenReaderContent>{I18n.t('Filter by due date')}</ScreenReaderContent>}
+          value={selectedDateFilter}
+          onChange={onDateFilterChange}
+          width={isMobile ? '100%' : '150px'}
+          size="small"
+        >
+          {dateFilterOptions.map(option => (
+            <SimpleSelect.Option key={option.id} id={option.id} value={option.id}>
+              {option.label}
+            </SimpleSelect.Option>
+          ))}
+        </SimpleSelect>
+      </Flex.Item>
     </Flex>
   )
 }

@@ -20,6 +20,7 @@ import React, {useMemo} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import StatisticsCard from './StatisticsCard'
+import {useResponsiveContext} from '../../hooks/useResponsiveContext'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -38,6 +39,7 @@ const StatisticsCardsGrid: React.FC<StatisticsCardsGridProps> = ({
   summary,
   margin = 'small 0 0 xx-small',
 }) => {
+  const {isMobile} = useResponsiveContext()
   const statisticsData = useMemo(
     () => [
       {
@@ -63,9 +65,9 @@ const StatisticsCardsGrid: React.FC<StatisticsCardsGridProps> = ({
   )
 
   return (
-    <Flex gap="small" margin={margin}>
+    <Flex gap="small" margin={margin} direction={isMobile ? 'column' : 'row'}>
       {statisticsData.map(stat => (
-        <Flex.Item key={stat.key} shouldGrow shouldShrink>
+        <Flex.Item key={stat.key} shouldGrow={!isMobile} shouldShrink>
           <StatisticsCard
             count={stat.count}
             label={stat.label}
