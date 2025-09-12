@@ -34,12 +34,6 @@ module CanvasCareer
       config["learning_provider_launch_url"]
     end
 
-    # This is the account's url on *.canvasforcareer.com. The redirect strategy is legacy
-    # and will be removed once the MF approach is adopted.
-    def learner_app_redirect_url(path)
-      @root_account.horizon_redirect_url(path)
-    end
-
     def theme_url
       config["theme_url"]
     end

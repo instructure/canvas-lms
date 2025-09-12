@@ -44,7 +44,7 @@ describe HorizonMode do
   end
 
   let(:resolver) { instance_double(CanvasCareer::ExperienceResolver) }
-  let(:config) { instance_double(CanvasCareer::Config, learner_app_redirect_url: "https://canvasforcareer.com") }
+  let(:config) { instance_double(CanvasCareer::Config) }
 
   before do
     # Define route for the anonymous controller
