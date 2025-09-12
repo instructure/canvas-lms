@@ -20,7 +20,7 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {setupServer} from 'msw/node'
-import {graphql, HttpResponse} from 'msw'
+import {http, HttpResponse} from 'msw'
 import CourseWorkWidget from '../CourseWorkWidget'
 import type {BaseWidgetProps, Widget} from '../../../../types'
 import {defaultGraphQLHandlers} from '../../../../__tests__/testHelpers'
@@ -31,154 +31,6 @@ const dayAfterTomorrow = new Date()
 dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2)
 const threeDaysFromNow = new Date()
 threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3)
-
-const mockCourseWorkData = {
-  legacyNode: {
-    _id: '1',
-    enrollments: [
-      {
-        course: {
-          _id: '101',
-          name: 'Environmental Science',
-          assignmentsConnection: {
-            nodes: [
-              {
-                _id: '1',
-                name: 'Essay on Climate Change',
-                dueAt: threeDaysFromNow.toISOString(),
-                pointsPossible: 50,
-                htmlUrl: '/courses/101/assignments/1',
-                submissionTypes: ['online_text_entry'],
-                state: 'published',
-                published: true,
-                quiz: null,
-                discussion: null,
-                submissionsConnection: {
-                  nodes: [
-                    {
-                      _id: 'sub1',
-                      cachedDueDate: threeDaysFromNow.toISOString(),
-                      submittedAt: null,
-                      late: false,
-                      missing: false,
-                      excused: false,
-                      state: 'unsubmitted',
-                    },
-                  ],
-                },
-              },
-            ],
-          },
-        },
-      },
-      {
-        course: {
-          _id: '102',
-          name: 'Biology',
-          assignmentsConnection: {
-            nodes: [
-              {
-                _id: '2',
-                name: 'Chapter Quiz Assignment',
-                dueAt: tomorrow.toISOString(),
-                pointsPossible: 25,
-                htmlUrl: '/courses/102/assignments/2',
-                submissionTypes: ['online_quiz'],
-                state: 'published',
-                published: true,
-                quiz: {_id: '2', title: 'Chapter 5 Quiz'},
-                discussion: null,
-                submissionsConnection: {
-                  nodes: [
-                    {
-                      _id: 'sub2',
-                      cachedDueDate: tomorrow.toISOString(),
-                      submittedAt: null,
-                      late: false,
-                      missing: false,
-                      excused: false,
-                      state: 'unsubmitted',
-                    },
-                  ],
-                },
-              },
-            ],
-          },
-        },
-      },
-      {
-        course: {
-          _id: '103',
-          name: 'Art History',
-          assignmentsConnection: {
-            nodes: [
-              {
-                _id: '3',
-                name: 'Discussion Assignment',
-                dueAt: dayAfterTomorrow.toISOString(),
-                pointsPossible: 15,
-                htmlUrl: '/courses/103/assignments/3',
-                submissionTypes: ['discussion_topic'],
-                state: 'published',
-                published: true,
-                quiz: null,
-                discussion: {_id: '3', title: 'Discussion: Modern Art'},
-                submissionsConnection: {
-                  nodes: [
-                    {
-                      _id: 'sub3',
-                      cachedDueDate: dayAfterTomorrow.toISOString(),
-                      submittedAt: null,
-                      late: false,
-                      missing: false,
-                      excused: false,
-                      state: 'unsubmitted',
-                    },
-                  ],
-                },
-              },
-            ],
-          },
-        },
-      },
-      {
-        course: {
-          _id: '104',
-          name: 'Chemistry',
-          assignmentsConnection: {
-            nodes: [
-              {
-                _id: '4',
-                name: 'Lab Report: Chemical Reactions',
-                dueAt: null,
-                pointsPossible: 40,
-                htmlUrl: '/courses/104/assignments/4',
-                submissionTypes: ['online_upload'],
-                state: 'published',
-                published: true,
-                quiz: null,
-                discussion: null,
-                submissionsConnection: {
-                  nodes: [
-                    {
-                      _id: 'sub4',
-                      cachedDueDate: null,
-                      submittedAt: null,
-                      late: false,
-                      missing: false,
-                      excused: false,
-                      state: 'unsubmitted',
-                    },
-                  ],
-                },
-              },
-            ],
-          },
-        },
-      },
-    ],
-  },
-}
 
 const mockWidget: Widget = {
   id: 'course-work-widget',
@@ -197,10 +49,129 @@ const buildDefaultProps = (overrides: Partial<BaseWidgetProps> = {}): BaseWidget
 
 const server = setupServer(
   ...defaultGraphQLHandlers,
-  graphql.query('GetUserCourseWork', () => {
-    return HttpResponse.json({
-      data: mockCourseWorkData,
-    })
+  http.post('/api/graphql', async ({request}) => {
+    const body = (await request.json()) as {query: string; variables: any}
+    if (body.query.includes('GetUserCourseWork')) {
+      return HttpResponse.json({
+        data: {
+          legacyNode: {
+            _id: '1',
+            courseWorkSubmissionsConnection: {
+              nodes: [
+                {
+                  _id: 'sub1',
+                  cachedDueDate: threeDaysFromNow.toISOString(),
+                  submittedAt: null,
+                  late: false,
+                  missing: false,
+                  excused: false,
+                  state: 'unsubmitted',
+                  assignment: {
+                    _id: '1',
+                    name: 'Essay on Climate Change',
+                    dueAt: threeDaysFromNow.toISOString(),
+                    pointsPossible: 50,
+                    htmlUrl: '/courses/101/assignments/1',
+                    submissionTypes: ['online_text_entry'],
+                    state: 'published',
+                    published: true,
+                    quiz: null,
+                    discussion: null,
+                    course: {
+                      _id: '101',
+                      name: 'Environmental Science',
+                    },
+                  },
+                },
+                {
+                  _id: 'sub2',
+                  cachedDueDate: tomorrow.toISOString(),
+                  submittedAt: null,
+                  late: false,
+                  missing: false,
+                  excused: false,
+                  state: 'unsubmitted',
+                  assignment: {
+                    _id: '2',
+                    name: 'Chapter Quiz Assignment',
+                    dueAt: tomorrow.toISOString(),
+                    pointsPossible: 25,
+                    htmlUrl: '/courses/102/assignments/2',
+                    submissionTypes: ['online_quiz'],
+                    state: 'published',
+                    published: true,
+                    quiz: {_id: '2', title: 'Chapter 5 Quiz'},
+                    discussion: null,
+                    course: {
+                      _id: '102',
+                      name: 'Biology',
+                    },
+                  },
+                },
+                {
+                  _id: 'sub3',
+                  cachedDueDate: dayAfterTomorrow.toISOString(),
+                  submittedAt: null,
+                  late: false,
+                  missing: false,
+                  excused: false,
+                  state: 'unsubmitted',
+                  assignment: {
+                    _id: '3',
+                    name: 'Discussion Assignment',
+                    dueAt: dayAfterTomorrow.toISOString(),
+                    pointsPossible: 15,
+                    htmlUrl: '/courses/103/assignments/3',
+                    submissionTypes: ['discussion_topic'],
+                    state: 'published',
+                    published: true,
+                    quiz: null,
+                    discussion: {_id: '3', title: 'Discussion: Modern Art'},
+                    course: {
+                      _id: '103',
+                      name: 'Art History',
+                    },
+                  },
+                },
+                {
+                  _id: 'sub4',
+                  cachedDueDate: null,
+                  submittedAt: null,
+                  late: false,
+                  missing: false,
+                  excused: false,
+                  state: 'unsubmitted',
+                  assignment: {
+                    _id: '4',
+                    name: 'Lab Report: Chemical Reactions',
+                    dueAt: null,
+                    pointsPossible: 40,
+                    htmlUrl: '/courses/104/assignments/4',
+                    submissionTypes: ['online_upload'],
+                    state: 'published',
+                    published: true,
+                    quiz: null,
+                    discussion: null,
+                    course: {
+                      _id: '104',
+                      name: 'Chemistry',
+                    },
+                  },
+                },
+              ],
+              pageInfo: {
+                hasNextPage: false,
+                hasPreviousPage: false,
+                endCursor: null,
+                startCursor: null,
+              },
+            },
+          },
+        },
+      })
+    }
+    // Let other handlers from defaultGraphQLHandlers handle other queries
+    return new Response('Query not handled', {status: 404})
   }),
 )
 
@@ -233,7 +204,6 @@ describe('CourseWorkWidget', () => {
     renderWithProviders(<CourseWorkWidget {...buildDefaultProps()} />)
 
     expect(screen.getByText('Course Work')).toBeInTheDocument()
-    expect(screen.getByText('Filter by course')).toBeInTheDocument()
 
     // Wait for data to load
     await screen.findByText('Essay on Climate Change')
@@ -253,29 +223,16 @@ describe('CourseWorkWidget', () => {
     expect(screen.getByText('Art History')).toBeInTheDocument()
     expect(screen.getByText('Chemistry')).toBeInTheDocument()
 
-    // Check that assignment types are displayed (use getAllByText for multiple elements)
-    expect(screen.getAllByText('Assignment')).toHaveLength(2) // Two assignments in mock data
-    expect(screen.getByText('Quiz')).toBeInTheDocument()
-    expect(screen.getByText('Discussion')).toBeInTheDocument()
+    // Check that assignment type icons are displayed with correct data-testids
+    expect(screen.getAllByTestId('assignment-icon')).toHaveLength(2) // Two assignments in mock data
+    expect(screen.getByTestId('quiz-icon')).toBeInTheDocument()
+    expect(screen.getByTestId('discussion-icon')).toBeInTheDocument()
 
     // Check that points are displayed (they're combined with due date text)
     expect(screen.getByText(/50 pts/)).toBeInTheDocument()
     expect(screen.getByText(/25 pts/)).toBeInTheDocument()
     expect(screen.getByText(/15 pts/)).toBeInTheDocument()
     expect(screen.getByText(/40 pts/)).toBeInTheDocument()
-  })
-
-  it('displays due dates correctly', async () => {
-    renderWithProviders(<CourseWorkWidget {...buildDefaultProps()} />)
-
-    // Wait for data to load by looking for multiple due dates
-    const dueDates = await screen.findAllByText(/Due.*at/)
-
-    // Should display formatted due dates (use getAllByText for multiple matches)
-    expect(dueDates.length).toBeGreaterThan(0)
-
-    // The "No due date" text should be present for items without due dates
-    // Switch to "Missing" filter to see assignments without due dates\n    const dateFilterSelect = screen.getByDisplayValue('Next 3 days')\n    fireEvent.click(dateFilterSelect)\n    \n    const missingOption = await screen.findByText('Missing')\n    fireEvent.click(missingOption)\n\n    // Wait for filter to apply and check for "No due date" text\n    await waitFor(() => {\n      expect(screen.getByText(/No due date/)).toBeInTheDocument()\n    })
   })
 
   it('sorts items by due date with soonest first', async () => {
@@ -314,15 +271,27 @@ describe('CourseWorkWidget', () => {
 
   it('displays empty state when no items are found', async () => {
     server.use(
-      graphql.query('GetUserCourseWork', () => {
-        return HttpResponse.json({
-          data: {
-            legacyNode: {
-              _id: '1',
-              enrollments: [],
+      http.post('/api/graphql', async ({request}) => {
+        const body = (await request.json()) as {query: string; variables: any}
+        if (body.query.includes('GetUserCourseWork')) {
+          return HttpResponse.json({
+            data: {
+              legacyNode: {
+                _id: '1',
+                courseWorkSubmissionsConnection: {
+                  nodes: [],
+                  pageInfo: {
+                    hasNextPage: false,
+                    hasPreviousPage: false,
+                    endCursor: null,
+                    startCursor: null,
+                  },
+                },
+              },
             },
-          },
-        })
+          })
+        }
+        return new Response('Query not handled', {status: 404})
       }),
     )
 
@@ -332,23 +301,36 @@ describe('CourseWorkWidget', () => {
     expect(screen.getByDisplayValue('All Courses')).toBeInTheDocument()
   })
 
-  it('renders action link to view all courses', async () => {
-    renderWithProviders(<CourseWorkWidget {...buildDefaultProps()} />)
-
-    const viewAllLink = await screen.findByTestId('view-all-courses-link')
-    expect(viewAllLink).toBeInTheDocument()
-    expect(viewAllLink).toHaveAttribute('href', '/courses')
-  })
-
   it('handles loading state', () => {
     // Mock with a delayed response to test loading state
     server.use(
-      graphql.query('GetUserCourseWork', () => {
-        return new Promise(resolve => {
-          setTimeout(() => {
-            resolve(HttpResponse.json({data: mockCourseWorkData}))
-          }, 100)
-        })
+      http.post('/api/graphql', async ({request}) => {
+        const body = (await request.json()) as {query: string; variables: any}
+        if (body.query.includes('GetUserCourseWork')) {
+          return new Promise(resolve => {
+            setTimeout(() => {
+              resolve(
+                HttpResponse.json({
+                  data: {
+                    legacyNode: {
+                      _id: '1',
+                      courseWorkSubmissionsConnection: {
+                        nodes: [],
+                        pageInfo: {
+                          hasNextPage: false,
+                          hasPreviousPage: false,
+                          endCursor: null,
+                          startCursor: null,
+                        },
+                      },
+                    },
+                  },
+                }),
+              )
+            }, 100)
+          })
+        }
+        return new Response('Query not handled', {status: 404})
       }),
     )
 
@@ -359,8 +341,12 @@ describe('CourseWorkWidget', () => {
 
   it('handles error state', async () => {
     server.use(
-      graphql.query('GetUserCourseWork', () => {
-        return HttpResponse.json({errors: [{message: 'Internal Server Error'}]}, {status: 500})
+      http.post('/api/graphql', async ({request}) => {
+        const body = (await request.json()) as {query: string; variables: any}
+        if (body.query.includes('GetUserCourseWork')) {
+          return HttpResponse.json({errors: [{message: 'Internal Server Error'}]}, {status: 500})
+        }
+        return new Response('Query not handled', {status: 404})
       }),
     )
 
@@ -385,5 +371,131 @@ describe('CourseWorkWidget', () => {
 
     const labLink = screen.getByTestId('course-work-item-link-4')
     expect(labLink).toHaveAttribute('href', '/courses/104/assignments/4')
+  })
+
+  it('displays correct submission statuses based on submission data', async () => {
+    const yesterday = new Date()
+    yesterday.setDate(yesterday.getDate() - 1)
+    server.use(
+      http.post('/api/graphql', async ({request}) => {
+        const body = (await request.json()) as {query: string; variables: any}
+        if (body.query.includes('GetUserCourseWork')) {
+          return HttpResponse.json({
+            data: {
+              legacyNode: {
+                _id: '1',
+                courseWorkSubmissionsConnection: {
+                  nodes: [
+                    {
+                      _id: 'sub1',
+                      cachedDueDate: tomorrow.toISOString(),
+                      submittedAt: new Date().toISOString(),
+                      late: false,
+                      missing: false,
+                      excused: false,
+                      state: 'submitted',
+                      assignment: {
+                        _id: '1',
+                        name: 'Submitted Assignment',
+                        dueAt: tomorrow.toISOString(),
+                        pointsPossible: 50,
+                        htmlUrl: '/courses/101/assignments/1',
+                        submissionTypes: ['online_text_entry'],
+                        state: 'published',
+                        published: true,
+                        quiz: null,
+                        discussion: null,
+                        course: {_id: '101', name: 'Course 1'},
+                      },
+                    },
+                    {
+                      _id: 'sub2',
+                      cachedDueDate: yesterday.toISOString(),
+                      submittedAt: null,
+                      late: true,
+                      missing: false,
+                      excused: false,
+                      state: 'unsubmitted',
+                      assignment: {
+                        _id: '2',
+                        name: 'Late Assignment',
+                        dueAt: yesterday.toISOString(),
+                        pointsPossible: 25,
+                        htmlUrl: '/courses/102/assignments/2',
+                        submissionTypes: ['online_upload'],
+                        state: 'published',
+                        published: true,
+                        quiz: null,
+                        discussion: null,
+                        course: {_id: '102', name: 'Course 2'},
+                      },
+                    },
+                    {
+                      _id: 'sub3',
+                      cachedDueDate: yesterday.toISOString(),
+                      submittedAt: null,
+                      late: false,
+                      missing: true,
+                      excused: false,
+                      state: 'unsubmitted',
+                      assignment: {
+                        _id: '3',
+                        name: 'Missing Assignment',
+                        dueAt: yesterday.toISOString(),
+                        pointsPossible: 30,
+                        htmlUrl: '/courses/103/assignments/3',
+                        submissionTypes: ['online_text_entry'],
+                        state: 'published',
+                        published: true,
+                        quiz: null,
+                        discussion: null,
+                        course: {_id: '103', name: 'Course 3'},
+                      },
+                    },
+                    {
+                      _id: 'sub4',
+                      cachedDueDate: threeDaysFromNow.toISOString(),
+                      submittedAt: null,
+                      late: false,
+                      missing: false,
+                      excused: false,
+                      state: 'pending_review',
+                      assignment: {
+                        _id: '4',
+                        name: 'Pending Review Assignment',
+                        dueAt: threeDaysFromNow.toISOString(),
+                        pointsPossible: 40,
+                        htmlUrl: '/courses/105/assignments/4',
+                        submissionTypes: ['online_text_entry'],
+                        state: 'published',
+                        published: true,
+                        quiz: null,
+                        discussion: null,
+                        course: {_id: '105', name: 'Course 5'},
+                      },
+                    },
+                  ],
+                  pageInfo: {
+                    hasNextPage: false,
+                    hasPreviousPage: false,
+                    endCursor: null,
+                    startCursor: null,
+                  },
+                },
+              },
+            },
+          })
+        }
+        return new Response('Query not handled', {status: 404})
+      }),
+    )
+
+    renderWithProviders(<CourseWorkWidget {...buildDefaultProps()} />)
+
+    // Wait for data to load and check specific status labels
+    await screen.findByText('Submitted')
+    expect(screen.getByText('Late')).toBeInTheDocument()
+    expect(screen.getByText('Missing')).toBeInTheDocument()
+    expect(screen.getByText('Pending Review')).toBeInTheDocument()
   })
 })

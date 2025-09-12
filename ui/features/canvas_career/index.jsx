@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
 import {createRoot} from 'react-dom/client'
 
 import {captureException} from '@sentry/browser'
@@ -32,12 +31,12 @@ const I18n = createI18nScope('canvascareer')
 ready(() => {
   const body = document.querySelector('body')
   const mountPoint = document.createElement('div')
-  const fixed_bottom = document.querySelector('#fixed_bottom')
+  const fixedBottom = document.querySelector('#fixed_bottom')
+  const fixedBottomOffset = fixedBottom?.offsetHeight || 0
 
   mountPoint.id = 'canvascareer'
-  mountPoint.style.height = fixed_bottom
-    ? `calc(100vh - ${fixed_bottom.offsetHeight + 5}px)`
-    : '100vh'
+  mountPoint.style.height =
+    fixedBottomOffset > 0 ? `calc(100vh - ${fixedBottomOffset + 5}px)` : '100vh'
   mountPoint.style.width = '100%'
   mountPoint.style.position = 'relative'
 

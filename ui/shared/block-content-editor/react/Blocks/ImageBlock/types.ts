@@ -16,14 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Prettify} from '../../utilities/Prettify'
 import {ImageData} from '../BlockItems/Image/types'
 import {TitleData} from '../BlockItems/Title/types'
 
 type ImageBlockSettings = {
-  settings: {
-    includeBlockTitle: boolean
-    backgroundColor: string
-    textColor: string
-  }
+  includeBlockTitle: boolean
+  backgroundColor: string
+  titleColor: string
 }
-export type ImageBlockProps = ImageData & TitleData & ImageBlockSettings
+export type ImageBlockProps = Prettify<ImageData & TitleData & ImageBlockSettings>

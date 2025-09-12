@@ -2617,24 +2617,33 @@ class Course < ActiveRecord::Base
     end
 
     Course.unique_constraint_retry do
-      scope = all_enrollments.where(user_id: user,
-                                    type:,
-                                    role_id: role,
-                                    associated_user_id:)
+      course_scope = all_enrollments.where(user_id: user, type:, role_id: role, associated_user_id:)
+      section_scope = section.all_enrollments.where(user_id: user, type:, role_id: role, associated_user_id:)
+
       if root_account.feature_enabled?(:temporary_enrollments) && opts[:temporary_enrollment_source_user_id] &&
          opts[:temporary_enrollment_pairing_id]
         source_user_id = opts[:temporary_enrollment_source_user_id]
         pairing_id = opts[:temporary_enrollment_pairing_id]
       end
+
       e = if opts[:allow_multiple_enrollments]
-            scope.where(course_section_id: section.id).first
+            # For multiple enrollments, only look within current course
+            course_scope.where(course_section_id: section.id).first
           else
-            # order by course_section_id<>section.id so that if there *is* an existing
-            # enrollment for this section, we get it (false orders before true)
-            scope.order(Arel.sql("course_section_id<>#{section.id}")).first
+            # Try to find the enrollment in the current course, preferring the target section
+            course_scope.order(Arel.sql("course_section_id<>#{section.id}")).first ||
+              # Expand scope if needed to ALL courses for this section (handles cross-course constraint)
+              section_scope.where.not(course_id: id).first
           end
+
       if e && (!e.active? || opts[:force_update])
         e.already_enrolled = true
+        # If the enrollment is in a different course due to crosslisting,
+        # we need to transfer it to this course.
+        if e.course_id != id
+          e.course_id = id
+          e.course_section = section
+        end
         if e.workflow_state == "deleted"
           e.sis_batch_id = nil
         end

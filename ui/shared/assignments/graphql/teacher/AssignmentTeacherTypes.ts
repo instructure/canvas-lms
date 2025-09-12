@@ -25,6 +25,11 @@ export type ModuleType = {
   name: string
 }
 
+export type ModuleItemType = {
+  lid: string
+  title: string
+}
+
 export type AssignmentGroupType = {
   lid: string
   name: string
@@ -134,6 +139,7 @@ export type TeacherAssignmentType = {
   onlyVisibleToOverrides?: boolean
   assignmentGroup?: AssignmentGroupType
   modules?: ModuleType[]
+  moduleItems?: ModuleItemType[]
   course: CourseType
   lockInfo?: LockInfoType
   peerReviews?: peerReviewsType

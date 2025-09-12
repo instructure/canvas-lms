@@ -20,7 +20,6 @@ import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {IconAiColoredSolid} from '@instructure/ui-icons'
-import {Tooltip} from '@instructure/ui-tooltip'
 
 interface DiscussionInsightsButtonProps {
   isMobile: boolean
@@ -32,17 +31,16 @@ const I18n = createI18nScope('discussions_posts')
 export const DiscussionInsightsButton: React.FC<DiscussionInsightsButtonProps> = props => {
   const buttonText = I18n.t('Go to Insights')
   return (
-    <Tooltip renderTip={buttonText} width="48px" data-testid="discussionInsightsButtonTooltip">
-      <Button
-        onClick={props.onClick}
-        color="ai-secondary"
-        renderIcon={<IconAiColoredSolid />}
-        id="discussion-insights-button"
-        data-testid="discussion-insights-button"
-        display={props.isMobile ? 'block' : 'inline-block'}
-      >
-        {buttonText}
-      </Button>
-    </Tooltip>
+    <Button
+      onClick={props.onClick}
+      color="ai-secondary"
+      renderIcon={<IconAiColoredSolid />}
+      id="discussion-insights-button"
+      data-testid="discussion-insights-button"
+      display={props.isMobile ? 'block' : 'inline-block'}
+      aria-label={I18n.t('Ignite AI Go to Insights')}
+    >
+      {buttonText}
+    </Button>
   )
 }

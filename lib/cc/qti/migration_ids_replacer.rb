@@ -22,7 +22,7 @@ module CC
     class MigrationIdsReplacer
       REPLACEABLE_ATTRS = %w[identifier href ident].freeze
       REPLACEABLE_OBJECTS = %w[resource file quiz assessment].freeze
-      REPLACEABLE_CONTENTS = %w[quiz_identifierref assignment_group_identifierref].freeze
+      REPLACEABLE_CONTENTS = %w[quiz_identifierref assignment_group_identifierref workflow_state].freeze
 
       def initialize(manifest, new_quizzes_migration_ids_map)
         @manifest = manifest
@@ -78,7 +78,8 @@ module CC
         @migration_ids_map ||= @new_quizzes_migration_ids_map.filter_map do |mig_id, props|
           canvas_id =
             find_and_map_to_canvas_id(Assignment, props["external_assignment_id"]) ||
-            find_and_map_to_canvas_id(AssignmentGroup, props["external_assignment_group_id"])
+            find_and_map_to_canvas_id(AssignmentGroup, props["external_assignment_group_id"]) ||
+            find_and_map_to_canvas_id(Assignment, props["workflow_state"])
           { mig_id => canvas_id } if canvas_id
         end.reduce({}, :merge)
       end

@@ -16,74 +16,62 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ComponentProps, ElementType, PropsWithChildren, useState} from 'react'
-import {BlockContext} from './BaseBlockContext'
-import {useGetRenderMode} from './useGetRenderMode'
-import {BaseBlockViewLayout} from './layout/BaseBlockViewLayout'
-import {BaseBlockEditWrapper} from './components/BaseBlockEditWrapper'
-import {useGenHistoryKey} from '../../hooks/useGenHistoryKey'
+import {ComponentProps} from 'react'
 import {useIsInEditor} from '../../hooks/useIsInEditor'
-import {BaseBlockView} from './BaseBlockView'
-import {BaseBlockEdit} from './BaseBlockEdit'
 import {useIsEditingBlock} from '../../hooks/useIsEditingBlock'
+import {BaseBlockViewLayout} from './layout/BaseBlockViewLayout'
+import {useBlockContentEditorContext} from '../../BlockContentEditorContext'
+import {BaseBlockEditWrapper} from './components/BaseBlockEditWrapper'
+import {Mask} from './components/Mask/Mask'
+import {AccessibilityChecker} from './components/AccessibilityChecker'
+import type {AccessibilityRule} from '../../accessibilityChecker/types'
 
-const BaseBlockContent = (
-  props: ComponentProps<typeof BaseBlock> & {
-    setIsEditMode: (isEditMode: boolean) => void
-  },
-) => {
-  const {isViewMode, isEditMode} = useGetRenderMode()
-  return isViewMode ? (
-    <BaseBlockViewLayout backgroundColor={props.backgroundColor}>
-      {props.children}
-    </BaseBlockViewLayout>
-  ) : (
-    <BaseBlockEditWrapper {...props} isEditMode={isEditMode} />
-  )
-}
-
-type BaseBlockProps<T extends ElementType> = PropsWithChildren<{
-  title: string
-  backgroundColor?: string
-  statefulProps: Partial<ComponentProps<T>>
-}>
-
-export function BaseBlock<T extends ElementType>(props: BaseBlockProps<T>) {
-  const [isEditMode, setIsEditMode] = useState(false)
-  const historyKey = useGenHistoryKey(props.statefulProps)
-  return (
-    <BlockContext.Provider value={{isEditMode}}>
-      <BaseBlockContent key={historyKey} {...props} setIsEditMode={setIsEditMode} />
-    </BlockContext.Provider>
-  )
-}
-
-function BaseBlockViewerMode<T extends {}>(props: ComponentProps<typeof BaseBlockHOC<T>>) {
+function BaseBlockViewerMode<T extends {}>(props: ComponentProps<typeof BaseBlock<T>>) {
   const Component = props.ViewComponent
   return (
-    <BaseBlockView backgroundColor={props.backgroundColor ?? ''}>
+    <BaseBlockViewLayout backgroundColor={props.backgroundColor}>
       <Component {...props.componentProps} />
-    </BaseBlockView>
+    </BaseBlockViewLayout>
   )
 }
 
-function BaseBlockEditorMode<T extends {}>(props: ComponentProps<typeof BaseBlockHOC<T>>) {
-  const isEditing = useIsEditingBlock()
-  const Component = isEditing ? props.EditComponent : props.EditViewComponent
+function BaseBlockEditorMode<T extends {}>(props: ComponentProps<typeof BaseBlock<T>>) {
+  const {settingsTray} = useBlockContentEditorContext()
+  const {isEditingBlock} = useIsEditingBlock()
+
+  const renderBlockContent = () => {
+    const Component = isEditingBlock ? props.EditComponent : props.EditViewComponent
+
+    if (isEditingBlock) {
+      return <Component {...props.componentProps} />
+    }
+
+    return (
+      <AccessibilityChecker
+        componentProps={props.componentProps}
+        customAccessibilityCheckRules={props.customAccessibilityCheckRules}
+      >
+        <Component {...props.componentProps} />
+      </AccessibilityChecker>
+    )
+  }
+
   return (
-    <BaseBlockEdit title={props.title} backgroundColor={props.backgroundColor ?? ''}>
-      <Component {...props.componentProps} />
-    </BaseBlockEdit>
+    <BaseBlockEditWrapper title={props.title} backgroundColor={props.backgroundColor}>
+      {renderBlockContent()}
+      {settingsTray.isOpen && <Mask />}
+    </BaseBlockEditWrapper>
   )
 }
 
-export function BaseBlockHOC<T extends {}>(props: {
+export function BaseBlock<T extends {}>(props: {
   ViewComponent: React.ComponentType<T>
   EditViewComponent: React.ComponentType<T>
   EditComponent: React.ComponentType<T>
   componentProps: T
   title: string
   backgroundColor?: string
+  customAccessibilityCheckRules?: AccessibilityRule[]
 }) {
   const isInEditor = useIsInEditor()
   const Component = isInEditor ? BaseBlockEditorMode : BaseBlockViewerMode

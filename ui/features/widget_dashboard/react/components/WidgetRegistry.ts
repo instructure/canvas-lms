@@ -20,8 +20,10 @@ import type {WidgetRegistry, WidgetRenderer} from '../types'
 import {WIDGET_TYPES} from '../constants'
 import CourseWorkSummaryWidget from './widgets/CourseWorkSummaryWidget/CourseWorkSummaryWidget'
 import CourseWorkWidget from './widgets/CourseWorkWidget/CourseWorkWidget'
+import CourseWorkCombinedWidget from './widgets/CourseWorkCombinedWidget/CourseWorkCombinedWidget'
 import CourseGradesWidget from './widgets/CourseGradesWidget/CourseGradesWidget'
 import AnnouncementsWidget from './widgets/AnnouncementsWidget/AnnouncementsWidget'
+import PeopleWidget from './widgets/PeopleWidget/PeopleWidget'
 
 const widgetRegistry: WidgetRegistry = {
   [WIDGET_TYPES.COURSE_WORK_SUMMARY]: {
@@ -34,6 +36,11 @@ const widgetRegistry: WidgetRegistry = {
     displayName: 'Course Work',
     description: 'View and manage all your course assignments and tasks',
   },
+  [WIDGET_TYPES.COURSE_WORK_COMBINED]: {
+    component: CourseWorkCombinedWidget,
+    displayName: 'Course Work Combined',
+    description: 'View course work statistics and assignments in one comprehensive view',
+  },
   [WIDGET_TYPES.COURSE_GRADES]: {
     component: CourseGradesWidget,
     displayName: 'Course Grades',
@@ -43,6 +50,11 @@ const widgetRegistry: WidgetRegistry = {
     component: AnnouncementsWidget,
     displayName: 'Announcements',
     description: 'Stay updated with the latest announcements from your courses',
+  },
+  [WIDGET_TYPES.PEOPLE]: {
+    component: PeopleWidget,
+    displayName: 'People',
+    description: 'View and contact your course instructors and teaching assistants',
   },
 }
 

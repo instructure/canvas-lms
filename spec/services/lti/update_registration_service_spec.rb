@@ -27,7 +27,8 @@ describe Lti::UpdateRegistrationService do
       registration_params:,
       configuration_params:,
       overlay_params:,
-      binding_params:
+      binding_params:,
+      comment:
     )
   end
 
@@ -43,6 +44,7 @@ describe Lti::UpdateRegistrationService do
   let(:configuration_params) { {} }
   let(:overlay_params) { {} }
   let(:binding_params) { {} }
+  let(:comment) { nil }
 
   context "with valid registration_params" do
     let(:registration_params) do
@@ -65,6 +67,21 @@ describe Lti::UpdateRegistrationService do
       subject
       expect(developer_key.reload.name).to eq("new name")
     end
+
+    it "tracks the changes" do
+      expect { subject }.to change(Lti::RegistrationHistoryEntry, :count).by(1)
+
+      entry = Lti::RegistrationHistoryEntry.last
+
+      expect(entry.diff["registration"])
+        .to match_array([
+                          ["~", ["name"], registration.name, registration_params[:name]],
+                          ["~", ["admin_nickname"], registration.admin_nickname, registration_params[:admin_nickname]],
+                          ["~", ["vendor"], registration.vendor, registration_params[:vendor]]
+                        ])
+      expect(entry.diff["developer_key"])
+        .to match_array([["~", ["name"], developer_key.name, registration_params[:name]]])
+    end
   end
 
   context "with invalid registration_params" do
@@ -86,6 +103,13 @@ describe Lti::UpdateRegistrationService do
         expect(overlay.data).to eq(overlay_params)
         expect(overlay.updated_by).to eq(updated_by)
       end
+
+      it "tracks the changes" do
+        expect { subject }.to change(Lti::RegistrationHistoryEntry, :count).by(1)
+
+        expect(Lti::RegistrationHistoryEntry.last.diff["overlay"])
+          .to match_array([["~", [], nil, { "some" => "data" }]])
+      end
     end
 
     it "does not create an overlay" do
@@ -105,6 +129,13 @@ describe Lti::UpdateRegistrationService do
       subject
       expect(overlay.reload.data).to eq(overlay_params)
       expect(overlay.updated_by).to eq(updated_by)
+    end
+
+    it "tracks the changes" do
+      expect { subject }.to change(Lti::RegistrationHistoryEntry, :count).by(1)
+
+      expect(Lti::RegistrationHistoryEntry.last.diff["overlay"])
+        .to match_array([["-", ["hello"], "there"], ["+", ["some"], "data"]])
     end
   end
 
@@ -146,6 +177,51 @@ describe Lti::UpdateRegistrationService do
       expect_any_instance_of(DeveloperKey).to receive(:update_external_tools!).once
 
       subject
+    end
+
+    it "tracks the changes" do
+      registration.internal_lti_configuration(include_overlay: false)
+      expect { subject }.to change(Lti::RegistrationHistoryEntry, :count).by(1)
+
+      diff = Lti::RegistrationHistoryEntry.last.diff
+
+      expect(diff["internal_lti_configuration"])
+        .to match_array(
+          [
+            ["~", ["description"], "1.3 Tool", "new description"],
+            ["-", ["launch_settings", "selection_height"], 500],
+            ["-", ["launch_settings", "selection_width"], 500],
+            ["-", ["launch_settings", "text"], "LTI 1.3 Test Tool Extension text"],
+            ["~",
+             ["launch_settings", "icon_url"],
+             "https://static.thenounproject.com/png/131630-200.png",
+             "http://example.com/icon"],
+            ["-",
+             ["placements", 1],
+             { "text" => "LTI 1.3 Test Tool Course Navigation",
+               "enabled" => true,
+               "icon_url" => "https://static.thenounproject.com/png/131630-211.png",
+               "placement" => "course_navigation",
+               "message_type" => "LtiResourceLinkRequest",
+               "target_link_uri" =>
+               "http://lti13testtool.docker/launch?placement=course_navigation",
+               "canvas_icon_class" => "icon-pdf" }],
+            ["-",
+             ["placements", 0],
+             { "text" => "LTI 1.3 Test Tool Course Navigation",
+               "enabled" => true,
+               "icon_url" => "https://static.thenounproject.com/png/131630-211.png",
+               "placement" => "account_navigation",
+               "message_type" => "LtiResourceLinkRequest",
+               "target_link_uri" =>
+               "http://lti13testtool.docker/launch?placement=account_navigation",
+               "canvas_icon_class" => "icon-lti" }],
+            ["+", ["placements", 0], { "placement" => "course_navigation" }],
+            ["-", ["redirect_uris", 0], "http://lti13testtool.docker/launch"],
+            ["+", ["redirect_uris", 0], "http://example.com/redirect"],
+            ["~", ["title"], "LTI 1.3 Tool", "new title"]
+          ]
+        )
     end
   end
 

@@ -167,9 +167,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     }
     json.SHOW = {COURSE_ROLES: json.contextName === 'courses'}
 
-    if (!window.ENV.FEATURES.create_wiki_page_mastery_path_overrides) {
-      json.assignment = json.assignment != null ? json.assignment.toView() : undefined
-    }
+    json.assignment = json.assignment != null ? json.assignment.toView() : undefined
 
     json.content_is_locked = this.lockedItems.content
     json.show_assign_to = this.enableAssignTo
@@ -605,18 +603,16 @@ export default class WikiPageEditView extends ValidatedFormView {
   getFormData() {
     const page_data = super.getFormData(...arguments)
 
-    if (!window.ENV.FEATURES.create_wiki_page_mastery_path_overrides) {
-      const assign_data = page_data.assignment
+    const assign_data = page_data.assignment
 
-      if ((assign_data != null ? assign_data.set_assignment : undefined) === '1') {
-        assign_data.only_visible_to_overrides = true
-        page_data.assignment = this.model.get('assignment') || this.model.createAssignment()
-        page_data.assignment.set(assign_data)
-      } else {
-        page_data.assignment = this.model.createAssignment({set_assignment: '0'})
-      }
-      page_data.set_assignment = page_data.assignment.get('set_assignment')
+    if ((assign_data != null ? assign_data.set_assignment : undefined) === '1') {
+      assign_data.only_visible_to_overrides = true
+      page_data.assignment = this.model.get('assignment') || this.model.createAssignment()
+      page_data.assignment.set(assign_data)
+    } else {
+      page_data.assignment = this.model.createAssignment({set_assignment: '0'})
     }
+    page_data.set_assignment = page_data.assignment.get('set_assignment')
 
     page_data.student_planner_checkbox = this.$studentPlannerCheckbox?.is(':checked')
     if (page_data.student_planner_checkbox) {

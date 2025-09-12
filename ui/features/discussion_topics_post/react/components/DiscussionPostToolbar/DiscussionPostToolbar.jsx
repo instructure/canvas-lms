@@ -144,6 +144,7 @@ export const DiscussionPostToolbar = props => {
         renderIcon={showTranslationControl ? <IconXSolid /> : <IconAiColoredSolid />}
         color={showTranslationControl ? 'secondary' : 'ai-secondary'}
         aria-expanded={showTranslationControl ? I18n.t('Expanded') : I18n.t('Collapsed')}
+        aria-label={I18n.t('Ignite AI %{improvedText}', {improvedText})}
       >
         {ENV.ai_translation_improvements ? improvedText : text}
       </Button>

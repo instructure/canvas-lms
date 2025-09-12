@@ -51,6 +51,7 @@ export interface ModuleItemData {
   selectedItem?: {
     id: string
     name: string
+    quizType?: string
   } | null
   newItemName?: string
 }
@@ -85,6 +86,15 @@ export const prepareModuleItemData = (
     _method: 'POST',
   }
 
+  // Helper function to apply LTI quiz configuration
+  const applyLtiQuizConfig = (
+    result: Record<string, string | number | string[] | undefined | boolean>,
+  ) => {
+    result['item[type]'] = 'assignment'
+    result['type'] = 'assignment'
+    result['quiz_lti'] = true
+  }
+
   // Add type-specific data
   if (type === 'context_module_sub_header' && textHeaderValue) {
     result['item[id]'] = 'new'
@@ -103,14 +113,15 @@ export const prepareModuleItemData = (
     result['item[new_tab]'] = externalUrlNewTab ? '1' : '0'
     result['new_tab'] = externalUrlNewTab ? 1 : 0
   } else if (selectedItem && selectedTabIndex === 0) {
+    if (type === 'quiz' && selectedItem.quizType && selectedItem.quizType === 'assignment') {
+      applyLtiQuizConfig(result)
+    }
     // Using an existing item
     result['item[id]'] = selectedItem.id
     result['item[title]'] = selectedItem.name
     result['title'] = selectedItem.name
   } else if (type === 'quiz' && quizEngine && quizEngine === 'new') {
-    result['item[type]'] = 'assignment'
-    result['type'] = 'assignment'
-    result['quiz_lti'] = true
+    applyLtiQuizConfig(result)
   }
 
   return result
@@ -301,28 +312,29 @@ export const submitModuleItem = async (
   }
 }
 
-export const sharedHandleFileDrop = (
+export function sharedHandleFileDrop(
   accepted: ArrayLike<File | DataTransferItem>,
-  _rejected: ArrayLike<File | DataTransferItem>,
-  _event: React.DragEvent<Element>,
   {
-    setFile,
     onChange,
+    dispatch,
   }: {
-    setFile?: (file: File | null) => void
-    onChange?: (field: string, value: File) => void
+    onChange: (field: string, value: any) => void
+    dispatch?: React.Dispatch<{type: string; field?: string; value?: any}> | null
   },
-) => {
-  Array.from(accepted).forEach(item => {
-    if (item instanceof File) {
-      setFile?.(item)
-      onChange?.('file', item)
-    } else if (item.kind === 'file') {
-      const file = item.getAsFile()
-      if (file) {
-        setFile?.(file)
-        onChange?.('file', file)
-      }
+) {
+  const files: File[] = Array.from(accepted).flatMap(item => {
+    if (item instanceof File) return [item]
+    if (item instanceof DataTransferItem && item.kind === 'file') {
+      const fileItem = item.getAsFile()
+      return fileItem ? [fileItem] : []
     }
+    return []
+  })
+
+  if (files.length === 0) return
+
+  files.forEach(file => {
+    onChange('file', file)
+    dispatch?.({type: 'SET_NEW_ITEM', field: 'file', value: file})
   })
 }

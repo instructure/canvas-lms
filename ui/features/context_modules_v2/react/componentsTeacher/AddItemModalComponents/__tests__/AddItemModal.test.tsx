@@ -16,14 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {render, fireEvent, screen} from '@testing-library/react'
+import {render, screen, waitFor, within} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../../hooks/useModuleContext'
 import AddItemModal from '../AddItemModal'
 
-const setUp = (props = {}) => {
+const renderWithProviders = (props: Partial<React.ComponentProps<typeof AddItemModal>> = {}) => {
   const queryClient = new QueryClient()
+
   return render(
     <QueryClientProvider client={queryClient}>
       <ContextModuleProvider {...contextModuleDefaultProps}>
@@ -38,28 +39,37 @@ const setUp = (props = {}) => {
     </QueryClientProvider>,
   )
 }
-describe('CreateLearningObjectForm', () => {
-  describe('Title validation', () => {
-    beforeEach(() => {
-      setUp()
-    })
+describe('Title validation', () => {
+  it('shows error if name is empty in Create tab and prevents submit', async () => {
+    renderWithProviders()
 
-    it('shows error if name is empty in Create tab and prevents submit', () => {
-      fireEvent.click(screen.getByRole('tab', {name: /Create Item/i}))
-      const nameInput = screen.getByLabelText(/Name/i)
-      fireEvent.change(nameInput, {target: {value: ''}})
-      fireEvent.click(screen.getByRole('button', {name: /Add Item/i}))
-      expect(screen.getByText('Name is required')).toBeInTheDocument()
-    })
+    await userEvent.click(screen.getByRole('tab', {name: /create item/i}))
+    const nameInput = await screen.findByLabelText(/name/i)
+    await userEvent.clear(nameInput)
+    await userEvent.click(screen.getByRole('button', {name: /add item/i}))
+    const createPanel = await screen.findByRole('tabpanel', {name: /create item/i})
+    expect(
+      await within(createPanel).findByText('Assignment name is required', {exact: true}),
+    ).toBeInTheDocument()
+  })
 
-    it('removes error when valid name is entered', () => {
-      fireEvent.click(screen.getByRole('tab', {name: /Create Item/i}))
-      const nameInput = screen.getByLabelText(/Name/i)
-      fireEvent.change(nameInput, {target: {value: ''}})
-      fireEvent.click(screen.getByRole('button', {name: /Add Item/i}))
-      expect(screen.getByText('Name is required')).toBeInTheDocument()
-      fireEvent.change(nameInput, {target: {value: 'Valid Name'}})
-      expect(screen.queryByText('Name is required')).not.toBeInTheDocument()
+  it('removes error when a valid name is entered', async () => {
+    renderWithProviders()
+
+    await userEvent.click(screen.getByRole('tab', {name: /create item/i}))
+    const nameInput = await screen.findByLabelText(/name/i)
+    await userEvent.clear(nameInput)
+    await userEvent.click(screen.getByRole('button', {name: /add item/i}))
+    const createPanel = await screen.findByRole('tabpanel', {name: /create item/i})
+    expect(
+      await within(createPanel).findByText('Assignment name is required', {exact: true}),
+    ).toBeInTheDocument()
+
+    await userEvent.type(nameInput, 'Valid Name')
+    await waitFor(() => {
+      expect(
+        within(createPanel).queryByText('Assignment name is required', {exact: true}),
+      ).not.toBeInTheDocument()
     })
   })
 })

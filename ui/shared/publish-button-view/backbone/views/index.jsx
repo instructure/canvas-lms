@@ -158,83 +158,76 @@ export default (function (superClass) {
 
   PublishButton.prototype.renderOverlayLoadingSpinner = function (loadingSpinnerStatus) {
     const loadingSpinnerContainer = $('#overlay-loading-spinner')[0]
-    if (loadingSpinnerContainer){
+    if (loadingSpinnerContainer) {
       const root = createRoot(loadingSpinnerContainer)
-      this.loadingSpinnerRoot["root"] = root
+      this.loadingSpinnerRoot['root'] = root
       root.render(
-        <Overlay
-          open={true}
-          label={loadingSpinnerStatus}
-          shouldReturnFocus
-          shouldContainFocus
-        >
+        <Overlay open={true} label={loadingSpinnerStatus} shouldReturnFocus shouldContainFocus>
           <Mask>
-            <Spinner
-              renderTitle={I18n.t('Loading')}
-              size="large"
-              margin="0 0 0 medium"
-            />
+            <Spinner renderTitle={I18n.t('Loading')} size="large" margin="0 0 0 medium" />
           </Mask>
-        </Overlay>
+        </Overlay>,
       )
     }
   }
 
   PublishButton.prototype.hideOverlayLoadingSpinner = function () {
-    this.loadingSpinnerRoot["root"]?.unmount()
-    this.loadingSpinnerRoot["root"] = null
+    this.loadingSpinnerRoot['root']?.unmount()
+    this.loadingSpinnerRoot['root'] = null
   }
 
   // calling publish/unpublish on the model expects a deferred object
   PublishButton.prototype.publish = function (_event) {
     this.renderPublishing()
-    return this.model.publish().done(
-      (function (_this) {
-        return function () {
-          _this.hideOverlayLoadingSpinner()
-          let ref, ref1
-          _this.trigger('publish')
-          _this.enable()
-          _this.render()
-          _this.setFocusToElement()
-          if (
-            !['discussion_topic', 'quiz', 'assignment'].includes(
-              _this.model.attributes.module_type,
-            ) ||
-            (_this.model.attributes.module_type === 'discussion_topic' &&
-              !((ref = _this.$el[0]) != null
-                ? (ref1 = ref.dataset) != null
-                  ? ref1.assignmentId
-                  : void 0
-                : void 0))
-          ) {
-            return false
+    return this.model
+      .publish()
+      .done(
+        (function (_this) {
+          return function () {
+            _this.hideOverlayLoadingSpinner()
+            let ref, ref1
+            _this.trigger('publish')
+            _this.enable()
+            _this.render()
+            _this.setFocusToElement()
+            if (
+              !['discussion_topic', 'quiz', 'assignment'].includes(
+                _this.model.attributes.module_type,
+              ) ||
+              (_this.model.attributes.module_type === 'discussion_topic' &&
+                !((ref = _this.$el[0]) != null
+                  ? (ref1 = ref.dataset) != null
+                    ? ref1.assignmentId
+                    : void 0
+                  : void 0))
+            ) {
+              return false
+            }
+            const $sgLink = $(
+              '#speed-grader-container-' +
+                _this.model.attributes.module_type +
+                '-' +
+                _this.model.attributes.content_id,
+            )
+            return $sgLink.removeClass('hidden')
           }
-          const $sgLink = $(
-            '#speed-grader-container-' +
-              _this.model.attributes.module_type +
-              '-' +
-              _this.model.attributes.content_id,
-          )
-          return $sgLink.removeClass('hidden')
-        }
-      })(this),
-    )
-    .fail(
-      (function (_this) {
-        return function (error) {
-          _this.hideOverlayLoadingSpinner()
-          if (error.status === 403) {
-            $.flashError(_this.model.disabledMessage())
-          } else {
-            $.flashError(I18n.t('This assignment has failed to publish'))
+        })(this),
+      )
+      .fail(
+        (function (_this) {
+          return function (error) {
+            _this.hideOverlayLoadingSpinner()
+            if (error.status === 403) {
+              $.flashError(_this.model.disabledMessage())
+            } else {
+              $.flashError(I18n.t('This assignment has failed to publish'))
+            }
+            _this.disable()
+            _this.renderPublish()
+            return _this.setFocusToElement()
           }
-          _this.disable()
-          _this.renderPublish()
-          return _this.setFocusToElement()
-        }
-      })(this),
-    )
+        })(this),
+      )
   }
 
   PublishButton.prototype.unpublish = function (_event) {
@@ -265,7 +258,7 @@ export default (function (superClass) {
             _this.hideOverlayLoadingSpinner()
             if (error.status === 403) {
               $.flashError(_this.model.disabledMessage())
-            }else {
+            } else {
               $.flashError(I18n.t('This assignment has failed to unpublish'))
             }
             _this.disable()
@@ -371,6 +364,9 @@ export default (function (superClass) {
       this.renderPublish()
     }
     if (this.model.get('bulkPublishInFlight')) {
+      this.disable()
+    }
+    if (ENV.horizon_course && this.model.get('publishable') === false) {
       this.disable()
     }
     return this

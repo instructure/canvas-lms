@@ -147,6 +147,7 @@ export default function RubricsQuery({
       peerReviewModeEnabled={assignment.env.peerReviewModeEnabled}
       rubricExpanded={rubricExpanded}
       toggleRubricExpanded={toggleRubricExpanded}
+      isAiEvaluated={submission.autoGradeResultPresent && submission.state === 'graded'}
     />
   )
 }

@@ -1192,9 +1192,11 @@ describe('RubricForm Tests', () => {
         // Wait for the modal to close using waitFor for more reliability
         await waitForElementToBeRemoved(queryByText('Regenerate Criterion'))
 
-        expect(document.querySelector('#flashalert_message_holder')).toHaveTextContent(
-          'Failed to regenerate criteria',
-        )
+        await waitFor(() => {
+          expect(document.querySelector('#flashalert_message_holder')).toHaveTextContent(
+            'Failed to regenerate criteria',
+          )
+        })
       })
 
       it('replaces the criterions with the regenerated one', async () => {

@@ -21,35 +21,45 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Tag} from '@instructure/ui-tag'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
+import type {GetRubricOutcomeQuery} from '@canvas/graphql/codegen/graphql'
+import {OutcomePopover} from './OutcomePopover/OutcomePopover'
 
 const I18n = createI18nScope('rubrics-assessment-tray')
 
 type OutcomeTagProps = {
+  outcome?: GetRubricOutcomeQuery['learningOutcome']
   displayName: string
+  onClick: () => void
 }
-export const OutcomeTag = ({displayName}: OutcomeTagProps) => {
+export const OutcomeTag = ({displayName, outcome, onClick}: OutcomeTagProps) => {
   return (
-    <Tag
-      text={
-        <AccessibleContent
-          alt={I18n.t('Outcome: %{displayName}', {
-            displayName,
-          })}
-        >
-          <Text>
-            {I18n.t('%{displayName}', {
-              displayName,
-            })}
-          </Text>
-        </AccessibleContent>
+    <OutcomePopover
+      renderTrigger={
+        <Tag
+          text={
+            <AccessibleContent
+              alt={I18n.t('Outcome: %{displayName}', {
+                displayName,
+              })}
+            >
+              <Text>
+                {I18n.t('%{displayName}', {
+                  displayName,
+                })}
+              </Text>
+            </AccessibleContent>
+          }
+          size="small"
+          themeOverride={{
+            defaultBackground: 'white',
+            defaultBorderColor: 'rgb(3, 116, 181)',
+            defaultColor: 'rgb(3, 116, 181)',
+          }}
+          onClick={onClick}
+          data-testid="rubric-criteria-row-outcome-tag"
+        />
       }
-      size="small"
-      themeOverride={{
-        defaultBackground: 'white',
-        defaultBorderColor: 'rgb(3, 116, 181)',
-        defaultColor: 'rgb(3, 116, 181)',
-      }}
-      data-testid="rubric-criteria-row-outcome-tag"
+      outcome={outcome}
     />
   )
 }

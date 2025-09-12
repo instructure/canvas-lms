@@ -19,6 +19,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {renderLtiAssetReports} from '../speed_grader'
+import {Attachment, HistoricalSubmission, Submission} from '../speed_grader.d'
+import {LtiAssetReportsForSpeedgraderProps} from '@canvas/lti-asset-processor/shared-with-sg/replicated/components/LtiAssetReportsForSpeedgrader'
 
 const SPEED_GRADER_LTI_ASSET_REPORTS_MOUNT_POINT = 'speed_grader_lti_asset_reports_mount_point'
 
@@ -43,41 +45,65 @@ describe('renderLtiAssetReports', () => {
     document.body.removeChild(mountPoint)
   })
 
-  const submission = {
-    user_id: '1',
-    lti_asset_reports: [],
+  const submission: Submission = {
+    assignment_id: '12',
+    user_id: '123',
   }
+
   const jsonData = {
     lti_asset_processors: [],
   }
 
+  const attachment: Attachment = {
+    canvadoc_url: null,
+    comment_id: null,
+    content_type: '',
+    created_at: '',
+    crocodoc_url: null,
+    display_name: 'student-essay-doc',
+    filename: '',
+    hijack_crocodoc_session: null,
+    id: '456',
+    mime_class: '',
+    provisional_canvadoc_url: null,
+    provisional_crocodoc_url: null,
+    submitted_to_crocodoc: null,
+    submitter_id: '',
+    updated_at: '',
+    upload_status: 'pending',
+    url: null,
+    view_inline_ping_url: null,
+    viewed_at: '',
+    word_count: 0,
+    workflow_state: 'pending_upload',
+  }
+
   it('should render when there is a submission', () => {
-    const historicalSubmission = {
+    const historicalSubmission: HistoricalSubmission = {
       attempt: 1,
       submission_type: 'online_text_entry',
-      versioned_attachments: [],
+      versioned_attachments: [{attachment}],
     }
-    // @ts-expect-error
-    renderLtiAssetReports(submission, historicalSubmission, jsonData)
+    renderLtiAssetReports(submission, historicalSubmission)
     expect(ReactDOM.render).toHaveBeenCalled()
     expect(ReactDOM.unmountComponentAtNode).not.toHaveBeenCalled()
+
+    const component = (ReactDOM.render as jest.Mock).mock.calls[0][0] as React.Component
+    const expected: LtiAssetReportsForSpeedgraderProps = {
+      assignmentId: '12',
+      attachments: [{_id: '456', displayName: 'student-essay-doc'}],
+      attempt: 1,
+      studentAnonymousId: null,
+      studentUserId: '123',
+      submissionType: 'online_text_entry',
+    }
+    expect(component.props).toEqual(expected)
   })
 
   it('should unmount when there is no submission', () => {
     const historicalSubmission = {
       attempt: null,
       submission_type: null,
-    }
-    // @ts-expect-error
-    renderLtiAssetReports(submission, historicalSubmission, jsonData)
-    expect(ReactDOM.render).not.toHaveBeenCalled()
-    expect(ReactDOM.unmountComponentAtNode).toHaveBeenCalledWith(mountPoint)
-  })
-
-  it('should unmount when submission_type is not online_text_entry or online_upload', () => {
-    const historicalSubmission = {
-      attempt: 1,
-      submission_type: 'basic_lti_launch',
     }
     // @ts-expect-error
     renderLtiAssetReports(submission, historicalSubmission, jsonData)

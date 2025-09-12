@@ -732,7 +732,7 @@ class CoursePacesController < ApplicationController
   def load_calendar_event_blackout_dates
     account_codes = Account.multi_account_chain_ids([@context.account.id]).map { |id| "account_#{id}" }
     context_codes = account_codes.append("course_#{@context.id}")
-    @calendar_event_blackout_dates = CalendarEvent.with_blackout_date.active.for_context_codes(context_codes)
+    @calendar_event_blackout_dates = CalendarEvent.with_blackout_date.active.valid_ranges.for_context_codes(context_codes)
   end
 
   def update_params

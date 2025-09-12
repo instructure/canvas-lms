@@ -132,6 +132,39 @@ describe SIS::CSV::AdminImporter do
     expect(admin.workflow_state).to eq "active"
   end
 
+  it "adds and then deletes every roles" do
+    blueprint_role = @sub_account.roles.create(name: "Blueprint", base_role_type: "AccountMembership")
+    masquerade_role = @sub_account.roles.create(name: "Masquerade", base_role_type: "AccountMembership")
+    account_admin_role = Role.find_by name: "AccountAdmin"
+    admin = user_with_managed_pseudonym(account: @account, sis_user_id: "U001")
+
+    process_csv_data_cleanly(
+      "user_id,account_id,role,status",
+      "U001,sub1,AccountAdmin,active",
+      "U001,sub1,#{blueprint_role.name},active",
+      "U001,sub1,#{masquerade_role.name},active"
+    )
+
+    expect(admin.reload.account_users).to match_array([
+                                                        have_attributes(role_id: account_admin_role.id, workflow_state: "active"),
+                                                        have_attributes(role_id: blueprint_role.id, workflow_state: "active"),
+                                                        have_attributes(role_id: masquerade_role.id, workflow_state: "active")
+                                                      ])
+
+    process_csv_data_cleanly(
+      "user_id,account_id,role,status",
+      "U001,sub1,AccountAdmin,deleted",
+      "U001,sub1,#{blueprint_role.name},deleted",
+      "U001,sub1,#{masquerade_role.name},deleted"
+    )
+
+    expect(admin.reload.account_users).to match_array([
+                                                        have_attributes(role_id: account_admin_role.id, workflow_state: "deleted"),
+                                                        have_attributes(role_id: blueprint_role.id, workflow_state: "deleted"),
+                                                        have_attributes(role_id: masquerade_role.id, workflow_state: "deleted")
+                                                      ])
+  end
+
   describe "SIS::AdminImporter::Work#process_admin" do
     specs_require_cache
 

@@ -23,6 +23,7 @@ import {SettingsIncludeTitle} from '../BlockItems/SettingsIncludeTitle/SettingsI
 import {SettingsSectionToggle} from '../BlockItems/SettingsSectionToggle/SettingsSectionToggle'
 import {ColorPickerWrapper} from '../BlockItems/ColorPickerWrapper'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {defaultProps} from './defaultProps'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -33,26 +34,25 @@ export const TextBlockSettings = () => {
     backgroundColor,
     titleColor,
   } = useNode(node => ({
-    includeBlockTitle: node.data.props.settings.includeBlockTitle,
-    backgroundColor: node.data.props.settings.backgroundColor,
-    titleColor: node.data.props.settings.titleColor,
+    ...defaultProps,
+    ...node.data.props,
   }))
 
   const handleIncludeBlockTitleChange = () => {
     setProp((props: TextBlockProps) => {
-      props.settings.includeBlockTitle = !includeBlockTitle
+      props.includeBlockTitle = !includeBlockTitle
     })
   }
 
   const handleBackgroundColorChange = (color: string) => {
     setProp((props: TextBlockProps) => {
-      props.settings.backgroundColor = color
+      props.backgroundColor = color
     })
   }
 
   const handleTitleColorChange = (color: string) => {
     setProp((props: TextBlockProps) => {
-      props.settings.titleColor = color
+      props.titleColor = color
     })
   }
 
@@ -68,19 +68,21 @@ export const TextBlockSettings = () => {
       >
         <Flex direction="column" gap="medium">
           <ColorPickerWrapper
-            label={I18n.t('Background')}
+            label={I18n.t('Background color')}
+            popoverButtonScreenReaderLabel={I18n.t('Open background color picker popover')}
             value={backgroundColor}
             baseColor={titleColor}
-            baseColorLabel={I18n.t('Title')}
+            baseColorLabel={I18n.t('Title color')}
             onChange={handleBackgroundColorChange}
           />
 
           {includeBlockTitle && (
             <ColorPickerWrapper
-              label={I18n.t('Title')}
+              label={I18n.t('Title color')}
+              popoverButtonScreenReaderLabel={I18n.t('Open title color picker popover')}
               value={titleColor}
               baseColor={backgroundColor}
-              baseColorLabel={I18n.t('Background')}
+              baseColorLabel={I18n.t('Background color')}
               onChange={handleTitleColorChange}
             />
           )}

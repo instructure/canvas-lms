@@ -168,6 +168,10 @@ class Enrollment < ActiveRecord::Base
     "(enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND enrollments.workflow_state = 'active')"
   end
 
+  def self.active_or_completed_student_conditions
+    "(enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND enrollments.workflow_state IN ('active', 'completed'))"
+  end
+
   # see .active_student_conditions
   def active_student?(was = false)
     suffix = was ? "_before_last_save" : ""

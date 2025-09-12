@@ -16,3 +16,16 @@
   transform: translate(-50%, -50%);
   z-index: 1;
 }
+
+.base-block-layout [data-focus-reveal-button]:not(:focus) {
+  position: absolute;
+  left: -10000px;
+  top: auto;
+}
+
+.base-block-layout [data-focus-reveal-parent]:not(:focus-within) {
+  margin-bottom: 0 !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}

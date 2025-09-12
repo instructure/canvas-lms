@@ -106,7 +106,7 @@ PATH
       activesupport (>= 7.0)
       jira_ref_parser (= 1.0.1)
       outrigger (~> 3.0, >= 3.0.1)
-      railties (~> 7.0)
+      railties (>= 7.0, < 8.1)
       rubocop (~> 1.19)
       rubocop-rails (~> 2.19)
 
@@ -114,11 +114,11 @@ PATH
   remote: gems
   specs:
     activesupport-suspend_callbacks (0.0.1)
-      activesupport (>= 3.2, < 8.0)
+      activesupport (>= 3.2, < 8.1)
     acts_as_list (0.0.1)
       activerecord (>= 3.2)
     adheres_to_policy (0.0.1)
-      activesupport (< 8.0)
+      activesupport (< 8.1)
     attachment_fu (1.0.0)
       activerecord (>= 3.2)
       railties (>= 3.2)
@@ -172,7 +172,7 @@ PATH
       canvas_http
       json-jwt (~> 1.10)
     canvas_partman (2.0.0)
-      activerecord (>= 6.1, < 8.0)
+      activerecord (>= 6.1, < 8.1)
       activerecord-pg-extensions (~> 0.4)
       pg (>= 0.17, < 2.0)
     canvas_quiz_statistics (0.1.0)
@@ -273,7 +273,7 @@ PATH
       simple_oauth (~> 0.3)
     utf8_cleaner (0.0.1)
     workflow (0.0.1)
-      activesupport (>= 3.2, < 8.0)
+      activesupport (>= 3.2, < 8.1)
 
 GEM
   remote: https://rubygems.org/

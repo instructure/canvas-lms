@@ -40,12 +40,14 @@ import {findCriterionMatchingRatingId, htmlEscapeCriteriaLongDescription} from '
 import {possibleString} from '../Points'
 import {OutcomeTag} from './OutcomeTag'
 import {SelfAssessmentComment} from './SelfAssessmentComment'
+import {useGetRubricOutcome} from './queries/useGetRubricOutcome'
 
 const I18n = createI18nScope('rubrics-assessment-tray')
 
 export type ModernViewModes = 'horizontal' | 'vertical'
 
 type ModernViewProps = {
+  buttonDisplay: string
   criteria: RubricCriterion[]
   hidePoints: boolean
   isPreviewMode: boolean
@@ -62,6 +64,7 @@ type ModernViewProps = {
   validationErrors?: string[]
 }
 export const ModernView = ({
+  buttonDisplay,
   criteria,
   hidePoints,
   isPreviewMode,
@@ -77,6 +80,8 @@ export const ModernView = ({
   onUpdateAssessmentData,
   validationErrors,
 }: ModernViewProps) => {
+  const [selectedLearningOutcomeId, setSelectedLearningOutcomeId] = useState<string>()
+
   return (
     <View as="div" margin="0" overflowX="hidden">
       {criteria.map((criterion, index) => {
@@ -90,6 +95,7 @@ export const ModernView = ({
         return (
           <CriterionRow
             key={criterion.id}
+            buttonDisplay={buttonDisplay}
             criterion={criterion}
             displayHr={index < criteria.length - 1}
             hidePoints={hidePoints}
@@ -104,6 +110,8 @@ export const ModernView = ({
             rubricSavedComments={rubricSavedComments?.[criterion.id] ?? []}
             onUpdateAssessmentData={onUpdateAssessmentData}
             isFreeFormCriterionComments={isFreeFormCriterionComments}
+            selectedLearningOutcomeId={selectedLearningOutcomeId}
+            selectLearningOutcome={setSelectedLearningOutcomeId}
             validationErrors={validationErrors}
             submissionUser={submissionUser}
           />
@@ -114,6 +122,7 @@ export const ModernView = ({
 }
 
 type CriterionRowProps = {
+  buttonDisplay: string
   criterion: RubricCriterion
   displayHr: boolean
   hidePoints: boolean
@@ -127,11 +136,14 @@ type CriterionRowProps = {
   criterionSelfAssessment?: RubricAssessmentData
   selectedViewMode: ModernViewModes
   rubricSavedComments: string[]
+  selectedLearningOutcomeId?: string
+  selectLearningOutcome: (id: string | undefined) => void
   submissionUser?: RubricSubmissionUser
   onUpdateAssessmentData: (params: UpdateAssessmentData) => void
   validationErrors?: string[]
 }
 export const CriterionRow = ({
+  buttonDisplay,
   criterion,
   displayHr,
   hidePoints,
@@ -145,6 +157,8 @@ export const CriterionRow = ({
   criterionSelfAssessment,
   selectedViewMode,
   rubricSavedComments,
+  selectedLearningOutcomeId,
+  selectLearningOutcome,
   submissionUser,
   onUpdateAssessmentData,
   validationErrors,
@@ -186,6 +200,8 @@ export const CriterionRow = ({
       inputRef.current.focus()
     }
   }, [criterion.id, hasRatingValidationError, hasScoreValidationError, validationErrors])
+
+  const {data: outcome} = useGetRubricOutcome(selectedLearningOutcomeId)
 
   const updateAssessmentData = (params: Partial<UpdateAssessmentData>) => {
     const updatedCriterionAssessment: UpdateAssessmentData = {
@@ -229,6 +245,7 @@ export const CriterionRow = ({
     if (selectedViewMode === 'horizontal' && ratings.length <= 5) {
       return (
         <HorizontalButtonDisplay
+          buttonDisplay={buttonDisplay}
           hidePoints={hidePoints}
           isPreviewMode={isPreviewMode}
           isSelfAssessment={isSelfAssessment}
@@ -247,6 +264,7 @@ export const CriterionRow = ({
 
     return (
       <VerticalButtonDisplay
+        buttonDisplay={buttonDisplay}
         hidePoints={hidePoints}
         isPreviewMode={isPreviewMode}
         isSelfAssessment={isSelfAssessment}
@@ -294,7 +312,13 @@ export const CriterionRow = ({
         {!hidePoints && (
           <Flex data-testid="modern-view-out-of-points">
             <Flex.Item shouldGrow={true}>
-              {criterion.learningOutcomeId && <OutcomeTag displayName={criterion.description} />}
+              {criterion.learningOutcomeId && (
+                <OutcomeTag
+                  displayName={criterion.description}
+                  outcome={outcome}
+                  onClick={() => selectLearningOutcome(criterion.learningOutcomeId)}
+                />
+              )}
             </Flex.Item>
             <Flex.Item margin={isPreviewMode ? '0 0 0 x-small' : '0'}>
               {isPreviewMode ? (

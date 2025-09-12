@@ -31,9 +31,16 @@ module AssignmentUtil
   end
 
   def self.due_date_ok?(assignment)
-    !due_date_required?(assignment) ||
-      assignment.due_at.present? ||
-      assignment.grading_type == "not_graded"
+    return true unless due_date_required?(assignment)
+    return true if assignment.grading_type == "not_graded"
+
+    # For discussion checkpoints, use the reply_to_entry checkpoint's due date
+    if assignment.checkpoints_parent?
+      reply_to_entry_checkpoint = assignment.discussion_topic.reply_to_entry_checkpoint
+      return reply_to_entry_checkpoint&.due_at.present? if reply_to_entry_checkpoint
+    end
+
+    assignment.due_at.present?
   end
 
   def self.assignment_name_length_required?(assignment)

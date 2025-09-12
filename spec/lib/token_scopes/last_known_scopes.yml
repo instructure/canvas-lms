@@ -1087,6 +1087,8 @@
   path: '/api/v1/courses/:course_id/group_categories'
 - verb: POST
   path: '/api/v1/courses/:course_id/group_categories/bulk_manage_differentiation_tag'
+- verb: GET
+  path: '/api/v1/courses/:course_id/group_categories/export_tags'
 - verb: POST
   path: '/api/v1/courses/:course_id/group_categories/import_tags'
 - verb: GET
@@ -1521,6 +1523,8 @@
   path: '/api/v1/developer_keys/:id'
 - verb: PUT
   path: '/api/v1/developer_keys/:id'
+- verb: POST
+  path: '/api/v1/enqueue_outcome_rollup_calculation'
 - verb: PUT
   path: '/api/v1/eportfolios/:eportfolio_id/moderate'
 - verb: GET
@@ -1924,6 +1928,10 @@
 - verb: PUT
   path: '/api/v1/outcomes/:id'
 - verb: GET
+  path: '/api/v1/permissions/:context_type/:permission/help'
+- verb: GET
+  path: '/api/v1/permissions/groups'
+- verb: GET
   path: '/api/v1/planner/items'
 - verb: GET
   path: '/api/v1/planner/overrides'
@@ -2117,6 +2125,8 @@
   path: '/api/v1/show_k5_dashboard'
 - verb: PUT
   path: '/api/v1/submissions/:id/what_if_grades'
+- verb: POST
+  path: '/api/v1/support_helpers/asset_processor/bulk_resubmit'
 - verb: GET
   path: '/api/v1/support_helpers/asset_processor/submission_details'
 - verb: GET
@@ -2347,6 +2357,12 @@
   path: '/api/v1/users/:user_id/observers/:observer_id'
 - verb: GET
   path: '/api/v1/users/:user_id/page_views'
+- verb: POST
+  path: '/api/v1/users/:user_id/page_views/query'
+- verb: GET
+  path: '/api/v1/users/:user_id/page_views/query/:query_id'
+- verb: GET
+  path: '/api/v1/users/:user_id/page_views/query/:query_id/results'
 - verb: GET
   path: '/api/v1/users/:user_id/planner/items'
 - verb: GET
@@ -2441,4 +2457,3 @@
   path: '/api/v1/users/self/todo_item_count'
 - verb: GET
   path: '/api/v1/users/self/upcoming_events'
-

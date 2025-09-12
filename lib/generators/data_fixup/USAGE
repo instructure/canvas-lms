@@ -1,0 +1,10 @@
+Description:
+    Generate a data fixup operation that is run from a post-deploy migration. See `doc/canvas_operations_library.md` for more details.
+
+Example:
+    bin/rails generate data_fixup FixSomeDataProblem
+
+    This will create:
+        db/migrate/20250825161950_data_fixup_fix_some_data_problem.rb
+        lib/data_fixup/fix_some_data_problem.rb
+        spec/lib/data_fixup/fix_some_data_problem_spec.rb

@@ -57,6 +57,7 @@ class Types::MutationType < Types::ApplicationObjectType
     Sets the post policy for the course, with an option to override and delete
     existing assignment post policies.
   MD
+  field :accept_enrollment_invitation, mutation: Mutations::AcceptEnrollmentInvitation
   field :create_assignment, mutation: Mutations::CreateAssignment
   field :create_comment_bank_item, mutation: Mutations::CreateCommentBankItem
   field :create_discussion_entry, mutation: Mutations::CreateDiscussionEntry
@@ -84,10 +85,12 @@ class Types::MutationType < Types::ApplicationObjectType
   field :delete_submission_comment, mutation: Mutations::DeleteSubmissionComment
   field :delete_submission_draft, mutation: Mutations::DeleteSubmissionDraft
   field :delete_user_inbox_label, mutation: Mutations::DeleteUserInboxLabel
+  field :dismiss_account_notification, mutation: Mutations::DismissAccountNotification
   field :import_outcomes, mutation: Mutations::ImportOutcomes
   field :mark_submission_comments_read, mutation: Mutations::MarkSubmissionCommentsRead
   field :move_outcome_links, mutation: Mutations::MoveOutcomeLinks
   field :post_draft_submission_comment, mutation: Mutations::PostDraftSubmissionComment
+  field :reject_enrollment_invitation, mutation: Mutations::RejectEnrollmentInvitation
   field :restore_deleted_discussion_entry, mutation: Mutations::RestoreDeletedDiscussionEntry
   field :save_rubric_assessment, mutation: Mutations::SaveRubricAssessment
   field :set_friendly_description, mutation: Mutations::SetFriendlyDescription
@@ -136,5 +139,6 @@ class Types::MutationType < Types::ApplicationObjectType
   field :auto_grade_submission, mutation: Mutations::AutoGradeSubmission
   field :create_allocation_rule, mutation: Mutations::CreateAllocationRule
   field :reorder_module_items, mutation: Mutations::ReorderModuleItems
+  field :update_allocation_rule, mutation: Mutations::UpdateAllocationRule
   field :update_rubric_archived_state, mutation: Mutations::UpdateRubricArchivedState
 end

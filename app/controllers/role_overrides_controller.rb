@@ -226,12 +226,22 @@ class RoleOverridesController < ApplicationController
         role_json(@context, role, @current_user, session, preloaded_overrides:)
       end
 
+      permission_groups = Permissions.permission_groups.transform_values do |group_info|
+        {
+          label: group_info[:label].call,
+          subtitle: group_info[:subtitle].call
+        }.tap do |h|
+          h[:course_subtitle] = group_info[:course_subtitle].call if group_info[:course_subtitle]
+        end
+      end
+
       js_env({
                ACCOUNT_ROLES: account_role_data,
                COURSE_ROLES: course_role_data,
                ACCOUNT_PERMISSIONS: account_permissions(@context),
                COURSE_PERMISSIONS: course_permissions(@context),
-               ACCOUNT_ENABLE_ALERTS: @context.settings[:enable_alerts]
+               ACCOUNT_ENABLE_ALERTS: @context.settings[:enable_alerts],
+               PERMISSION_GROUPS: permission_groups
              })
 
       add_crumb t "Permissions"
@@ -522,11 +532,10 @@ class RoleOverridesController < ApplicationController
           available_to: info[:available_to],
           true_for: info[:true_for]
         }.tap do |h|
-          h[:group] = info[:group] if info[:group]
-          h[:group_label] = info[:group_label]&.call if info[:group_label]
+          h[:group] = info[:group].to_s if info[:group]
+          h[:group_label] = Permissions.group_label(info[:group]) if info[:group]
         end
       end
-
       if params[:search_term].present?
         search = params[:search_term].downcase
         perms.select! do |key, info|
@@ -709,8 +718,7 @@ class RoleOverridesController < ApplicationController
     RoleOverride.manageable_permissions(context).each do |p|
       hash = { label: p[1][:label].call, permission_name: p[0] }
       if p[1].key?(:group)
-        hash[:granular_permission_group] = p[1][:group] if p[1].key?(:group)
-        hash[:granular_permission_group_label] = p[1][:group_label].call
+        hash[:granular_permission_group] = p[1][:group]
       end
 
       # Check to see if the base role name is in the list of other base role names in p[1]
@@ -779,8 +787,7 @@ class RoleOverridesController < ApplicationController
 
       hash = { label: p[1][:label].call, permission_name: p[0] }
       if p[1].key?(:group)
-        hash[:granular_permission_group] = p[1][:group] if p[1].key?(:group)
-        hash[:granular_permission_group_label] = p[1][:group_label].call
+        hash[:granular_permission_group] = p[1][:group]
       end
 
       if p[1][:account_only]

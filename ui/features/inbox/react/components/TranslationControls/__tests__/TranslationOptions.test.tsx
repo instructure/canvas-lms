@@ -109,18 +109,6 @@ describe('TranslationOptions', () => {
     })
   })
 
-  it('disables translate button when translation is loading', () => {
-    // @ts-expect-error
-    mockUseTranslationContext.mockReturnValueOnce({
-      setTranslationTargetLanguage: jest.fn(),
-      translateBody: jest.fn(),
-      body: 'Hello',
-      translating: true,
-    })
-    render(<TranslationOptions asPrimary={null} onSetPrimary={jest.fn()} />)
-    expect(screen.getByText(/^Translate$/i).closest('button')).toBeDisabled()
-  })
-
   it('updates asPrimary state on radio input change', () => {
     const onSetPrimary = jest.fn()
     render(<TranslationOptions asPrimary={null} onSetPrimary={onSetPrimary} />)

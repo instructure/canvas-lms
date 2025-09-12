@@ -871,20 +871,14 @@ describe DiscussionTopicsController do
         expect(assigns[:js_env][:ASSET_PROCESSOR_EULA_LAUNCH_URLS]).to eq urls
       end
 
-      it "does set ASSET_PROCESSOR_EULA_LAUNCH_URLS if the user is a teacher" do
+      it "does not set ASSET_PROCESSOR_EULA_LAUNCH_URLS if the user is a teacher" do
         assignment = assignment_model(course: @course)
         discussion = discussion_topic_model(context: @course, assignment:)
         user_session(@teacher)
-        urls = [
-          { name: "test tool", url: "http://localhost/courses/#{@course.id}/external_tools/1/eula_launch" }
-        ]
-        allow(Lti::EulaUiService).to receive(:eula_launch_urls)
-          .with(user: @teacher, assignment:)
-          .and_return(urls)
 
         get :show, params: { course_id: @course.id, id: discussion.id }
 
-        expect(assigns[:js_env][:ASSET_PROCESSOR_EULA_LAUNCH_URLS]).to eq urls
+        expect(assigns[:js_env][:ASSET_PROCESSOR_EULA_LAUNCH_URLS]).to be_nil
       end
 
       it "does not set ASSET_PROCESSOR_EULA_LAUNCH_URLS for non-graded discussions" do

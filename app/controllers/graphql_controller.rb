@@ -18,12 +18,18 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# Synthetic exception class for consistent error_type tagging in GraphQL metrics
+
 class GraphQLController < ApplicationController
+  class GraphQLError < StandardError; end
+
   include Api::V1
+  include GradebookRequestMetricsTrackerHelper
 
   before_action :require_user, if: :require_auth?
   # This makes sure that the liveEvents context is set up for graphql requests
   before_action :get_context
+  around_action :track_request_timing, only: [:execute]
 
   def execute
     result = execute_on(CanvasSchema)
@@ -45,6 +51,9 @@ class GraphQLController < ApplicationController
         log_exceed_complexity_error(max_complexity_error["message"].to_s) if max_complexity_error.present?
       end
     end
+
+    # Store GraphQL error state for metrics
+    @graphql_has_errors = any_error_occured
 
     render json: result
   end
@@ -70,6 +79,29 @@ class GraphQLController < ApplicationController
   end
 
   private
+
+  def base_metric_tags
+    super.merge(operation_name:)
+  end
+
+  def should_send_metrics?
+    super && %w[getAssignments getAssignmentGroups getUsers getEnrollments getSubmissions].include?(operation_name)
+  end
+
+  # Override build_tags to capture GraphQL errors as failed requests.
+  # GraphQL returns HTTP 200 with errors in response body, not HTTP error codes.
+  # Parent helper only catches Ruby exceptions, not GraphQL structured errors.
+  def build_tags(status, exception = nil)
+    # Convert GraphQL requests with errors to error status for metrics
+    status = :error if @graphql_has_errors && status == :success
+
+    # Create synthetic exception for consistent error_type tagging
+    if @graphql_has_errors && exception.nil?
+      exception = GraphQLError.new
+    end
+
+    super
+  end
 
   def execute_on(schema)
     query = anonymous_call? ? persisted_query["query"] : params[:query]

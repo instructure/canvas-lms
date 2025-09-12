@@ -85,7 +85,7 @@ describe "users" do
       expect(page_view_url.text).to eq second_student.id.to_s
       expect_new_page_load { page_view_url.click }
       expect(f(".user_details .name").text).to eq second_student.name
-      expect(f(%([data-testid="page-views-table-body"]))).not_to contain_css("tr") # validate the second student has no page views
+      expect(f(%([data-testid="page-views-empty-state"]))).to be_displayed # validate the second student has no page views
     end
 
     # Validating behavior of infinite scrolling from Tanstack query probably does
@@ -115,8 +115,6 @@ describe "users" do
       driver.action.send_keys(:tab).perform
       wait_for_ajaximations
       expect(ff(%([data-testid="page-views-table-body"] tr)).first.text).to include "older"
-      match = f(%([data-testid="page-views-csv-link"]))["href"].match(/start_time=([^&]+)/)
-      expect(Time.zone.parse(match[1]).to_i).to eq old_date.to_i
     end
   end
 

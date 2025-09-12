@@ -108,6 +108,29 @@ describe SearchController do
       expect(response.body).to include(group.name)
     end
 
+    it "restricts recipients to teachers if restrict_student_access is enabled" do
+      course_with_student_logged_in(active_all: true)
+      # Enable the feature flag
+      @user.account.root_account.enable_feature!(:restrict_student_access)
+
+      # Create users
+      teacher = User.create!(name: "Teacher User")
+      @course.enroll_teacher(teacher).accept
+
+      other_student = User.create!(name: "Other Student")
+      @course.enroll_student(other_student).accept
+
+      get "recipients", params: {
+        search: "",
+        type: "user",
+        context: "course_#{@course.id}_all"
+      }
+
+      expect(response).to be_successful
+      expect(response.body).to include("Teacher User")
+      expect(response.body).not_to include("Other Student")
+    end
+
     context "with admin_context" do
       it "returns nothing if the user doesn't have rights" do
         user_session(user_factory)

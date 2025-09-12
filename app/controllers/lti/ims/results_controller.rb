@@ -21,7 +21,7 @@ module Lti::IMS
   # @API Result
   #
   # Result API for
-  # 1EdTech (IMS) <a href="/doc/api/file.assignment_tools.html">Assignment and Grade Services</a>.
+  # 1EdTech (IMS) <a href="file.assignment_tools.html">Assignment and Grade Services</a>.
   #
   # @model Result
   #     {

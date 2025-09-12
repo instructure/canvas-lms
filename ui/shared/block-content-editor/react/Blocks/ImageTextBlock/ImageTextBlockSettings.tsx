@@ -30,6 +30,7 @@ import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {Flex, FlexItem} from '@instructure/ui-flex'
 import React, {ReactNode} from 'react'
 import {SettingsImageInfos} from '../BlockItems/SettingsImageInfos/SettingsImageInfos'
+import {defaultProps} from './defaultProps'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -80,7 +81,7 @@ export const ImageTextBlockSettings = () => {
     actions: {setProp},
     includeBlockTitle,
     backgroundColor,
-    textColor,
+    titleColor,
     arrangement,
     textToImageRatio,
     url,
@@ -90,17 +91,8 @@ export const ImageTextBlockSettings = () => {
     altTextAsCaption,
     decorativeImage,
   } = useNode(node => ({
-    includeBlockTitle: node.data.props.includeBlockTitle,
-    backgroundColor: node.data.props.backgroundColor,
-    textColor: node.data.props.textColor,
-    arrangement: node.data.props.arrangement,
-    textToImageRatio: node.data.props.textToImageRatio,
-    url: node.data.props.url,
-    fileName: node.data.props.fileName,
-    altText: node.data.props.altText,
-    caption: node.data.props.caption,
-    altTextAsCaption: node.data.props.altTextAsCaption,
-    decorativeImage: node.data.props.decorativeImage,
+    ...defaultProps,
+    ...node.data.props,
   }))
 
   const handleIncludeBlockTitleChange = () => {
@@ -115,9 +107,9 @@ export const ImageTextBlockSettings = () => {
     })
   }
 
-  const handleTextColorChange = (color: string) => {
+  const handleTitleColorChange = (color: string) => {
     setProp((props: ImageTextBlockProps) => {
-      props.textColor = color
+      props.titleColor = color
     })
   }
 
@@ -158,20 +150,12 @@ export const ImageTextBlockSettings = () => {
   const handleAltTextAsCaptionChange = (newAltTextAsCaption: boolean) => {
     setProp((props: ImageTextBlockProps) => {
       props.altTextAsCaption = newAltTextAsCaption
-      if (newAltTextAsCaption) {
-        props.caption = props.altText
-      }
     })
   }
 
   const handleDecorativeImageChange = (newDecorativeImage: boolean) => {
     setProp((props: ImageTextBlockProps) => {
       props.decorativeImage = newDecorativeImage
-      if (props.decorativeImage) {
-        props.altText = ''
-        props.altTextAsCaption = false
-        props.caption = ''
-      }
     })
   }
 
@@ -182,25 +166,27 @@ export const ImageTextBlockSettings = () => {
         title={I18n.t('Color settings')}
         collapsedLabel={I18n.t('Expand color settings')}
         expandedLabel={I18n.t('Collapse color settings')}
-        defaultExpanded={false}
+        defaultExpanded={true}
         includeSeparator={true}
       >
         <View as="div" margin="0 0 medium 0">
           <ColorPickerWrapper
             label={I18n.t('Background color')}
+            popoverButtonScreenReaderLabel={I18n.t('Open background color picker popover')}
             value={backgroundColor}
-            baseColor={textColor}
-            baseColorLabel={I18n.t('Default text color')}
+            baseColor={titleColor}
+            baseColorLabel={I18n.t('Title color')}
             onChange={handleBackgroundColorChange}
           />
         </View>
         <View as="div">
           <ColorPickerWrapper
-            label={I18n.t('Default text color')}
-            value={textColor}
+            label={I18n.t('Title color')}
+            popoverButtonScreenReaderLabel={I18n.t('Open title color picker popover')}
+            value={titleColor}
             baseColor={backgroundColor}
             baseColorLabel={I18n.t('Background color')}
-            onChange={handleTextColorChange}
+            onChange={handleTitleColorChange}
           />
         </View>
       </SettingsSectionToggle>
@@ -246,6 +232,7 @@ export const ImageTextBlockSettings = () => {
           <SettingsImageInfos
             caption={caption}
             altText={altText}
+            disabled={!url}
             altTextAsCaption={altTextAsCaption}
             decorativeImage={decorativeImage}
             onCaptionChange={handleCaptionChange}

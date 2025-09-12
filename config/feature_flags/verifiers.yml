@@ -47,13 +47,13 @@ enable_file_access_with_api_tokens:
     ci:
       state: allowed_on
 allow_attachment_association_creation:
-    state: allowed
-    shadow: true
-    applies_to: RootAccount
-    display_name: Allow Attachment Association Creation
-    description: Allow attachment associations creation for any attachments on Canvas assets
-    environments:
-      development:
-        state: allowed_on
-      ci:
-        state: allowed_on
+  state: allowed
+  shadow: true
+  applies_to: RootAccount
+  display_name: Allow Attachment Association Creation
+  description: Allow attachment associations creation for any attachments on Canvas assets
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on

@@ -254,7 +254,7 @@ class FilesController < ApplicationController
     rescue Canvas::Security::TokenExpired
       # maybe their browser is being stupid and came to the files domain directly with an old verifier - try to go back and get a new one
       return redirect_to_fallback_url if files_domain?
-    rescue Users::AccessVerifier::InvalidVerifier, Users::AccessVerifier::JtiReused
+    rescue AccessVerifier::InvalidVerifier, AccessVerifier::JtiReused
       nil
     end
 
@@ -705,16 +705,17 @@ class FilesController < ApplicationController
         return
       end
 
+      @access_allowed = []
+      @attachment_authorization ||= {}
+      @attachment_authorization[:attachment] = @attachment
+      @attachment_authorization[:permission] = @access_allowed
       if access_allowed(attachment: @attachment, user: @current_user, access_type: :read)
+        @access_allowed << :read
         @attachment.ensure_media_object
 
         if params[:download]
-          if access_allowed(
-            attachment: @attachment,
-            user: @current_user,
-            access_type: :download,
-            no_error_on_failure: true
-          )
+          if access_allowed(attachment: @attachment, user: @current_user, access_type: :download, no_error_on_failure: true)
+            @access_allowed << :download
             disable_page_views if params[:preview]
             begin
               send_attachment(@attachment)
@@ -784,12 +785,9 @@ class FilesController < ApplicationController
 
         json[:attachment][:media_entry_id] = attachment.media_entry_id if attachment.media_entry_id
 
-        if access_allowed(
-          attachment: @attachment,
-          user: @current_user,
-          access_type: :download,
-          no_error_on_failure: true
-        )
+        if access_allowed(attachment: @attachment, user: @current_user, access_type: :download, no_error_on_failure: true)
+          @access_allowed ||= []
+          @access_allowed << :download
           # Right now we assume if they ask for json data on the attachment
           # then that means they have viewed or are about to view the file in
           # some form.
@@ -1677,7 +1675,7 @@ class FilesController < ApplicationController
       end
     end
 
-    thumb_opts = params.slice(:size)
+    thumb_opts = params.slice(:size, :location)
     thumb_opts[:fallback_url] = @access_verifier[:fallback_url] if @access_verifier
     url = authenticated_thumbnail_url(attachment, options: thumb_opts) if attachment && authed
     if url && attachment.instfs_hosted? && file_location_mode?
@@ -1696,7 +1694,9 @@ class FilesController < ApplicationController
 
       raise ActiveRecord::RecordNotFound unless thumbnail
 
-      return render_unauthorized_action unless authorized_action(thumbnail, @current_user, :download)
+      attachment = thumbnail.attachment
+
+      return render_unauthorized_action unless access_allowed(attachment:, user: @current_user, access_type: :download)
 
       safe_send_file thumbnail.full_filename, content_type: thumbnail.content_type
     end

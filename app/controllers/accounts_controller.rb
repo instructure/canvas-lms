@@ -313,6 +313,7 @@ class AccountsController < ApplicationController
   include HorizonMode
 
   before_action :load_canvas_career, only: %i[show users sis_import admin_tools settings]
+  around_action :add_career_params, only: [:update]
 
   include Api::V1::Account
   include CustomSidebarLinksHelper

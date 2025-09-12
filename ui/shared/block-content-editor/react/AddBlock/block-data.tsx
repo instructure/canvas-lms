@@ -18,129 +18,17 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {TextBlock} from '../Blocks/TextBlock'
-import {ReactElement} from 'react'
 import {ImageBlock} from '../Blocks/ImageBlock'
 import {MediaBlock} from '../Blocks/MediaBlock'
 import {SeparatorLineBlock} from '../Blocks/SeparatorLineBlock'
 import {ButtonBlock} from '../Blocks/ButtonBlock'
 import {HighlightBlock} from '../Blocks/HighlightBlock'
-import {colors} from '@instructure/canvas-theme'
 import {ImageTextBlock} from '../Blocks/ImageTextBlock'
+import {GroupedSelectData} from '../GroupedSelect'
 
 const I18n = createI18nScope('block_content_editor')
 
-type BlockFactory = {[key: string]: () => ReactElement}
-
-const defaultBackgroundColor = colors.primitives.white
-const defaultTextColor = colors.ui.textDescription
-
-export const blockFactory = {
-  [TextBlock.name]: () => (
-    <TextBlock
-      title=""
-      content=""
-      settings={{
-        includeBlockTitle: true,
-        backgroundColor: defaultBackgroundColor,
-        titleColor: defaultTextColor,
-      }}
-    />
-  ),
-  [ImageBlock.name]: () => (
-    <ImageBlock
-      title=""
-      url=""
-      altText=""
-      caption=""
-      altTextAsCaption={false}
-      decorativeImage={false}
-      settings={{
-        includeBlockTitle: true,
-        backgroundColor: defaultBackgroundColor,
-        textColor: defaultTextColor,
-      }}
-    />
-  ),
-  [SeparatorLineBlock.name]: () => (
-    <SeparatorLineBlock
-      thickness="medium"
-      settings={{separatorColor: colors.ui.lineDivider, backgroundColor: defaultBackgroundColor}}
-    />
-  ),
-  [ButtonBlock.name]: () => (
-    <ButtonBlock
-      settings={{
-        includeBlockTitle: true,
-        alignment: 'left',
-        layout: 'horizontal',
-        isFullWidth: false,
-        buttons: [
-          {
-            id: 1,
-            text: '',
-            url: '',
-            linkOpenMode: 'new-tab',
-            primaryColor: colors.primitives.blue45,
-            secondaryColor: colors.primitives.white,
-            style: 'filled',
-          },
-        ],
-        backgroundColor: defaultBackgroundColor,
-        textColor: defaultTextColor,
-      }}
-      title=""
-    />
-  ),
-  [HighlightBlock.name]: () => (
-    <HighlightBlock
-      content=""
-      settings={{
-        displayIcon: 'warning',
-        highlightColor: colors.additionalPrimitives.ocean12,
-        textColor: defaultTextColor,
-        backgroundColor: defaultBackgroundColor,
-      }}
-    />
-  ),
-  [ImageTextBlock.name]: () => (
-    <ImageTextBlock
-      url=""
-      altText=""
-      fileName=""
-      title=""
-      content=""
-      decorativeImage={false}
-      includeBlockTitle={true}
-      backgroundColor={defaultBackgroundColor}
-      textColor={defaultTextColor}
-      arrangement="left"
-      textToImageRatio="1:1"
-      altTextAsCaption={false}
-      caption=""
-    />
-  ),
-  [MediaBlock.name]: () => (
-    <MediaBlock
-      src=""
-      title=""
-      backgroundColor={defaultBackgroundColor}
-      titleColor={defaultTextColor}
-      includeBlockTitle={true}
-    />
-  ),
-} as const satisfies BlockFactory
-
-export type BlockTypes = keyof typeof blockFactory
-
-export type BlockData = {
-  groupName: string
-  items: {
-    itemName: string
-    id: BlockTypes
-  }[]
-}
-
-export const blockData: BlockData[] = [
+export const blockData: GroupedSelectData[] = [
   {
     groupName: I18n.t('Text'),
     items: [

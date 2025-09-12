@@ -19,16 +19,21 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import {QueryClient} from '@tanstack/react-query'
+import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import PeerReviewAllocationRulesTray from '../PeerReviewAllocationRulesTray'
 
 jest.mock('../images/pandasBalloon.svg', () => 'mock-pandas-balloon.svg')
+jest.mock('@canvas/graphql', () => ({
+  executeQuery: jest.fn(),
+}))
 
 describe('PeerReviewAllocationRulesTray', () => {
   const defaultProps = {
-    courseId: '123',
     assignmentId: '456',
     isTrayOpen: true,
     closeTray: jest.fn(),
+    canEdit: false,
   }
 
   let user: ReturnType<typeof userEvent.setup>
@@ -38,16 +43,28 @@ describe('PeerReviewAllocationRulesTray', () => {
     jest.clearAllMocks()
   })
 
+  const renderWithQueryClient = (ui: React.ReactElement) => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    })
+
+    return render(<MockedQueryClientProvider client={queryClient}>{ui}</MockedQueryClientProvider>)
+  }
+
   describe('Tray visibility', () => {
     it('renders the tray when isTrayOpen is true', () => {
-      render(<PeerReviewAllocationRulesTray {...defaultProps} />)
+      renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
 
       expect(screen.getByTestId('allocation-rules-tray')).toBeInTheDocument()
       expect(screen.getByText('Allocation Rules')).toBeInTheDocument()
     })
 
     it('does not render tray content when isTrayOpen is false', () => {
-      render(<PeerReviewAllocationRulesTray {...defaultProps} isTrayOpen={false} />)
+      renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} isTrayOpen={false} />)
 
       expect(screen.getByTestId('allocation-rules-tray')).toBeInTheDocument()
       expect(screen.queryByText('Allocation Rules')).not.toBeInTheDocument()
@@ -56,7 +73,7 @@ describe('PeerReviewAllocationRulesTray', () => {
 
   describe('Header section', () => {
     beforeEach(() => {
-      render(<PeerReviewAllocationRulesTray {...defaultProps} />)
+      renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
     })
 
     it('displays the correct heading', () => {
@@ -77,7 +94,8 @@ describe('PeerReviewAllocationRulesTray', () => {
 
   describe('Navigation section', () => {
     beforeEach(() => {
-      render(<PeerReviewAllocationRulesTray {...defaultProps} />)
+      ENV.COURSE_ID = '1'
+      renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
     })
 
     it('displays navigation text', () => {
@@ -89,27 +107,34 @@ describe('PeerReviewAllocationRulesTray', () => {
       expect(editLink).toBeInTheDocument()
       expect(editLink.closest('a')).toHaveAttribute(
         'href',
-        `/courses/${defaultProps.courseId}/assignments/${defaultProps.assignmentId}/edit?scrollTo=assignment_peer_reviews_fields`,
+        `/courses/${ENV.COURSE_ID}/assignments/${defaultProps.assignmentId}/edit?scrollTo=assignment_peer_reviews_fields`,
       )
     })
   })
 
   describe('Add Rule section', () => {
     beforeEach(() => {
-      render(<PeerReviewAllocationRulesTray {...defaultProps} />)
+      renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
     })
 
-    it('renders the Add Rule button', () => {
+    it('renders the Add Rule button if canEdit is true', () => {
+      renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} canEdit={true} />)
       const addRuleButton = screen.getByText('+ Rule')
       expect(addRuleButton).toBeInTheDocument()
       expect(addRuleButton.closest('button')).toBeInTheDocument()
+    })
+
+    it('Add Rule button is not rendered when canEdit is false', () => {
+      renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
+      const addRuleButton = screen.queryByText('+ Rule')
+      expect(addRuleButton).not.toBeInTheDocument()
     })
   })
 
   // TODO [EGG-1625]: Unskip when rules are fetched
   describe.skip('Empty state', () => {
     beforeEach(() => {
-      render(<PeerReviewAllocationRulesTray {...defaultProps} />)
+      renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
     })
 
     it('displays empty state when no rules exist', () => {

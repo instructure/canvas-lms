@@ -1,0 +1,4 @@
+span[data-mask] {
+  height: calc(100% + 20px);
+  background-color: unset;
+}

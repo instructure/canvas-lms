@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react'
+import React, {useCallback, useContext, useEffect, useState} from 'react'
 
 import {useMutation, useQuery} from '@apollo/client'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
@@ -106,10 +106,16 @@ function DiscussionTopicFormContainer({apolloClient, breakpoints}) {
   }
 
   function navigateToDiscussionTopic(context_type, discussion_topic_id) {
+    const queryParams = window.location.search
+
     if (context_type === 'Course') {
-      assignLocation(`/courses/${ENV.context_id}/discussion_topics/${discussion_topic_id}`)
+      assignLocation(
+        `/courses/${ENV.context_id}/discussion_topics/${discussion_topic_id}${queryParams}`,
+      )
     } else if (context_type === 'Group') {
-      assignLocation(`/groups/${ENV.context_id}/discussion_topics/${discussion_topic_id}`)
+      assignLocation(
+        `/groups/${ENV.context_id}/discussion_topics/${discussion_topic_id}${queryParams}`,
+      )
     } else {
       setOnFailure(I18n.t('Invalid context type'))
     }

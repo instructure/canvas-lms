@@ -39,13 +39,48 @@ horizon_injected_config:
     Injects config into the microfrontend at load time instead of fetching from the server.
 
 # Feature flags read by Horizon app
-horizon_program_management:
+horizon_root_experience:
   applies_to: RootAccount
   state: hidden
   shadow: true
-  display_name: "Canvas Career: Program Management"
+  display_name: "Canvas Career: Root Account Experience"
   description: |-
-    Enables Program Management in Canvas Career.
+    Enables the optimized root account experience in Canvas Career.
+horizon_dashboard_ai_widgets:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Data & Insights AI Widgets"
+  description: |-
+    Enables the AI widgets in the Canvas Career Data & Insights dashboard.
+horizon_hris_integrations:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: HRIS Integrations"
+  description: |-
+    Enables HRIS integrations in Canvas Career.
+horizon_user_profile_page:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: User Profile Page"
+  description: |-
+    Enables the refreshed user profile page in Canvas Career.
+horizon_bulk_metadata_import:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Bulk Metadata Import"
+  description: |-
+    Enables importing metadata in bulk in Canvas Career.
+horizon_manual_dashboard_builder:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Manual Dashboard Builder"
+  description: |-
+    Enables manual dashboard builder in Canvas Career.
 
 # Feature flags read by Canvas
 horizon_bulk_api_permission:

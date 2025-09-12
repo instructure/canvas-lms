@@ -61,14 +61,16 @@ import {
 
 const initialProgress = window.ENV.COURSE_PACE_PROGRESS
 
-export const initialState: CoursePacesState = ({
+export const initialState: CoursePacesState = {
   ...getInitialCoursePace(),
   course: window.ENV.COURSE,
   publishingProgress: initialProgress,
-}) as CoursePacesState
+} as CoursePacesState
 
 export const getModuleItems = (modules: Module[]) =>
-  ([] as CoursePaceItem[]).concat(...modules.map(m => m.items.sort((a, b) => a.position - b.position)))
+  ([] as CoursePaceItem[]).concat(
+    ...modules.map(m => m.items.sort((a, b) => a.position - b.position)),
+  )
 
 /* Selectors */
 
@@ -113,7 +115,8 @@ export const getPaceCompressedDates = (state: StoreState): CoursePaceItemDueDate
 export const getSearchTerm = (state: StoreState): string => state.paceContexts.searchTerm
 export const getCoursePaceItems = createSelector(getCoursePaceModules, getModuleItems)
 export const getWeightedAssignments = (state: StoreState) => state.coursePace.assignments_weighting
-export const getTimeToCompleteCalendarDays = (state: StoreState) => state.coursePace.time_to_complete_calendar_days
+export const getTimeToCompleteCalendarDays = (state: StoreState) =>
+  state.coursePace.time_to_complete_calendar_days
 
 export const getPaceName = (state: StoreState): string => {
   switch (state.coursePace.context_type) {
@@ -138,7 +141,14 @@ export const getSettingChanges = createDeepEqualSelector(
   getOriginalBlackoutDates,
   getBlackoutDates,
   getTimeToCompleteCalendarDays,
-  (excludeWeekends, selectedDaysToSkip, originalPace, originalBlackoutDates, blackoutDates, timeToCompleteCalendarDays) => {
+  (
+    excludeWeekends,
+    selectedDaysToSkip,
+    originalPace,
+    originalBlackoutDates,
+    blackoutDates,
+    timeToCompleteCalendarDays,
+  ) => {
     const changes: Change[] = []
 
     if (window.ENV.FEATURES.course_paces_skip_selected_days) {
@@ -159,8 +169,7 @@ export const getSettingChanges = createDeepEqualSelector(
         newValue: excludeWeekends,
       })
 
-      if (window.ENV.FEATURES.course_pace_weighted_assignments) {
-
+    if (window.ENV.FEATURES.course_pace_weighted_assignments) {
       if (timeToCompleteCalendarDays !== originalPace.time_to_complete_calendar_days) {
         changes.push({
           id: 'time_to_complete_calendar_days',
@@ -446,8 +455,11 @@ export const isPaceDueDateRight = createSelector(
   getCoursePace,
   getCoursePaceItems,
   getBlackoutDates,
-  (coursePace: CoursePace, coursePaceItem: CoursePaceItem[], blackoutDates: BlackoutDate[]): boolean => {
-
+  (
+    coursePace: CoursePace,
+    coursePaceItem: CoursePaceItem[],
+    blackoutDates: BlackoutDate[],
+  ): boolean => {
     return isTimeToCompleteCalendarDaysValid(coursePace, coursePaceItem, blackoutDates)
   },
 )
@@ -664,14 +676,14 @@ export default (
       return {...state, assignments_weighting: action.payload}
     case CoursePaceConstants.SET_TIME_TO_COMPLETE_CALENDAR_DAYS:
       return {...state, time_to_complete_calendar_days: action.payload}
-    case CoursePaceConstants.SET_PACE_ITEM_DURATION_TIME_TO_COMPLETE_CALENDAR_DAYS:{
+    case CoursePaceConstants.SET_PACE_ITEM_DURATION_TIME_TO_COMPLETE_CALENDAR_DAYS: {
       const modules = state.modules.map(module => {
         const newItems = module.items.map(item => {
           if (item.module_item_id === action.payload.paceItemId) {
-        return {
-          ...item,
-          duration: action.payload.duration,
-        }
+            return {
+              ...item,
+              duration: action.payload.duration,
+            }
           }
           return item
         })
@@ -682,29 +694,29 @@ export default (
 
       const timeToCompleteCalendarDays = getTimeToCompleteCalendarDaysFromItemsDuration(
         newState,
-        action.payload.blackOutDates
+        action.payload.blackOutDates,
       )
       return {...state, time_to_complete_calendar_days: timeToCompleteCalendarDays, modules}
     }
     case CoursePaceConstants.SET_TIME_TO_COMPLETE_CALENDAR_DAYS_FROM_ITEMS: {
       const timeToCompleteCalendarDays = getTimeToCompleteCalendarDaysFromItemsDuration(
         state,
-        action.payload.blackOutDates
+        action.payload.blackOutDates,
       )
       return {...state, time_to_complete_calendar_days: timeToCompleteCalendarDays}
     }
     case CoursePaceConstants.SET_PACE_ITEMS_DURATION_FROM_TIME_TO_COMPLETE: {
-      const itemsLength = state.modules.flatMap((module) => module.items).length
-      const { duration, remainder } = getItemsDurationFromTimeToComplete(
+      const itemsLength = state.modules.flatMap(module => module.items).length
+      const {duration, remainder} = getItemsDurationFromTimeToComplete(
         state,
         action.payload.blackOutDays,
         action.payload.calendarDays,
-        itemsLength
+        itemsLength,
       )
 
       let index = 0
-      const modules = state.modules.map((module) => {
-        const newItems = module.items.map((item) => {
+      const modules = state.modules.map(module => {
+        const newItems = module.items.map(item => {
           const itemDuration = index < remainder ? duration + 1 : duration
           index++
 
@@ -713,19 +725,19 @@ export default (
             duration: itemDuration,
           }
         })
-        return { ...module, items: newItems }
+        return {...module, items: newItems}
       })
 
-      return { ...state, modules }
+      return {...state, modules}
     }
-    case CoursePaceConstants.SET_PACE_ITEM_WEIGHTED_DURATION:{
+    case CoursePaceConstants.SET_PACE_ITEM_WEIGHTED_DURATION: {
       const modules = setItemsDurationFromWeightedAssignments(
         state,
         action.payload.blackOutDays,
-        action.payload.assignmentWeightedDuration
+        action.payload.assignmentWeightedDuration,
       )
 
-      return { ...state, modules }
+      return {...state, modules}
     }
     default:
       return {

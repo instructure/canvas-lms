@@ -258,6 +258,7 @@ class CalendarEvent < ActiveRecord::Base
 
   scope :with_important_dates, -> { where(important_dates: true) }
   scope :with_blackout_date, -> { where(blackout_date: true) }
+  scope :valid_ranges, -> { where.not(start_at: nil).where.not(end_at: nil) }
 
   def validate_context!
     @validate_context = true
@@ -562,8 +563,6 @@ class CalendarEvent < ActiveRecord::Base
       []
     end
   end
-
-  attr_reader :updating_user
 
   def updating_user=(user)
     self.user ||= user

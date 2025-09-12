@@ -17,12 +17,17 @@
  */
 
 import {useEditor, useNode} from '@craftjs/core'
+import {useBlockContentEditorContext} from '../BlockContentEditorContext'
 
 export const useDeleteNode = () => {
   const {id} = useNode()
   const {actions} = useEditor()
+  const {
+    accessibility: {removeA11yIssues},
+  } = useBlockContentEditorContext()
 
   const deleteNode = () => {
+    removeA11yIssues(id)
     actions.delete(id)
   }
 

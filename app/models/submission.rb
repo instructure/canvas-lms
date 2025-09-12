@@ -135,6 +135,7 @@ class Submission < ActiveRecord::Base
   attr_writer :regraded
   attr_writer :audit_grade_changes
   attr_writer :versioned_originality_reports
+  attr_writer :auto_grade_result_present
 
   belongs_to :attachment # this refers to the screenshot of the submission if it is a url submission
   belongs_to :assignment, inverse_of: :submissions, class_name: "AbstractAssignment"
@@ -152,6 +153,7 @@ class Submission < ActiveRecord::Base
   belongs_to :root_account, class_name: "Account"
 
   belongs_to :quiz_submission, class_name: "Quizzes::QuizSubmission"
+  belongs_to :real_submitter, class_name: "User", optional: true
   has_many :all_submission_comments, -> { order(:created_at) }, class_name: "SubmissionComment", dependent: :destroy
   has_many :all_submission_comments_for_groups, -> { for_groups.order(:created_at) }, class_name: "SubmissionComment"
   has_many :group_memberships, through: :assignment
@@ -192,6 +194,7 @@ class Submission < ActiveRecord::Base
            dependent: :destroy,
            inverse_of: :submission
   has_many :submission_texts, dependent: :destroy
+  has_many :auto_grade_results, dependent: :destroy
 
   serialize :turnitin_data, type: Hash
 
@@ -245,6 +248,24 @@ class Submission < ActiveRecord::Base
       .order(graded_at: :desc)
       .limit(limit)
   }
+
+  # Returns true if an AutoGradeResult exists for this submission and attempt.
+  # Used by GraphQL SubmissionInterface to surface AI-grading disclaimer flags.
+  def auto_grade_result_present?
+    return @auto_grade_result_present if defined?(@auto_grade_result_present)
+
+    auto_grade_results.where(attempt: attempt || 1).exists?
+  end
+
+  alias_method :auto_grade_result_present, :auto_grade_result_present?
+
+  def self.preload_auto_grade_result_present(submissions)
+    ids_with_auto_grade_results = Submission.joins(:auto_grade_results)
+                                            .where(submissions: { id: submissions })
+                                            .where("auto_grade_results.attempt = COALESCE(submissions.attempt, 1)")
+                                            .pluck("submissions.id")
+    submissions.each { |sub| sub.auto_grade_result_present = ids_with_auto_grade_results.include?(sub.id) }
+  end
 
   scope :for_course, ->(course) { where(course_id: course) }
   scope :for_assignment, ->(assignment) { where(assignment:) }
@@ -451,7 +472,7 @@ class Submission < ActiveRecord::Base
   before_save :clear_body_word_count, if: -> { body.nil? }
   before_save :set_lti_id
   after_save :update_body_word_count_later, if: -> { saved_change_to_body? && get_word_count_from_body? }
-  after_save :extract_text_later
+  after_save :extract_text_later, if: -> { need_to_extract_text? }
   after_save :touch_user
   after_save :clear_user_submissions_cache
   after_save :touch_graders
@@ -1071,6 +1092,10 @@ class Submission < ActiveRecord::Base
 
   def asset_processor_compatible?
     (submission_type == "online_upload" || text_entry_submission?) && root_account.feature_enabled?(:lti_asset_processor)
+  end
+
+  def asset_processor_for_discussions_compatible?
+    assignment.discussion_topic? && root_account.feature_enabled?(:lti_asset_processor) && root_account.feature_enabled?(:lti_asset_processor_discussions)
   end
 
   # VeriCite
@@ -3453,12 +3478,6 @@ class Submission < ActiveRecord::Base
     self.lti_id ||= SecureRandom.uuid
   end
 
-  # For internal use only.
-  # The lti_id field on its own is not enough to uniquely identify a submission; use lti_attempt_id instead.
-  def lti_id
-    read_attribute(:lti_id)
-  end
-
   def set_anonymous_id
     self.anonymous_id = Anonymity.generate_id(existing_ids: Submission.anonymous_ids_for(assignment))
   end
@@ -3565,6 +3584,21 @@ class Submission < ActiveRecord::Base
                              tags: { quiz_type: (submission_type == "online_quiz") ? "classic_quiz" : "new_quiz" })
   end
 
+  # we should only extract text when the content associated with the submission has changed, and is present.
+  def need_to_extract_text?
+    # the submission body or the attached files get updated in the same update that changes the attempt number
+    return false unless saved_change_to_attempt?
+
+    if extract_text_from_upload?
+      # the attachment_ids change when something new gets uploaded
+      # and we don't want to create a SubmissionText record when there's no attachment
+      saved_change_to_attachment_ids? && attachment_ids.present?
+    else
+      # we don't want to create a SubmissionText record when there's no attachment nor body
+      saved_change_to_body? && body.present?
+    end
+  end
+
   def extract_text_later
     return unless course&.feature_enabled?(:project_lhotse)
 
@@ -3576,8 +3610,10 @@ class Submission < ActiveRecord::Base
 
   def extract_text
     if extract_text_from_upload?
-      upsert_rows = attachments.map do |attachment|
+      upsert_rows = attachments.filter_map do |attachment|
         result = FileTextExtractionService.new(attachment:).call
+
+        next unless result && result.text.present?
 
         build_upsert_row(
           text: result.text,
@@ -3587,7 +3623,7 @@ class Submission < ActiveRecord::Base
       end
 
       SubmissionText.upsert_all(upsert_rows, unique_by: :index_on_sub_attempt_attach) if upsert_rows.any?
-    else
+    elsif body.present?
       upsert_rows = [
         build_upsert_row(
           text: body,

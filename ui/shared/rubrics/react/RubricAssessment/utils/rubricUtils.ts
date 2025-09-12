@@ -129,3 +129,34 @@ export const rubricSelectedAriaLabel = (isSelected: boolean, isSelfAssessmentSel
 
   return ''
 }
+
+export const isRubricComplete = ({
+  criteria,
+  isFreeFormCriterionComments,
+  hidePoints,
+  rubricAssessment,
+}: {
+  criteria: RubricCriterion[]
+  isFreeFormCriterionComments: boolean
+  hidePoints: boolean
+  rubricAssessment: RubricAssessmentData[]
+}): boolean => {
+  if (criteria.length !== rubricAssessment.length) {
+    return false
+  }
+
+  return rubricAssessment.every(criterion => {
+    const hasComments = criterion.comments?.trim().length
+
+    // If we're hiding points and using free-form comments,
+    // we need to ensure comments are present
+    if (hidePoints && isFreeFormCriterionComments) {
+      return hasComments
+    }
+
+    const points = criterion.points
+    const validPoints = typeof points === 'number' && !Number.isNaN(points)
+    const hasPoints = points !== undefined
+    return hasPoints && validPoints
+  })
+}

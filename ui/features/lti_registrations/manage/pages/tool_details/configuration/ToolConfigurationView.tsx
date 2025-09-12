@@ -238,10 +238,8 @@ export const ToolConfigurationView = () => {
             <Text fontStyle="italic">{I18n.t('This app has no permissions configured.')}</Text>
           ) : (
             registration.overlaid_configuration.scopes.map(scope => (
-              <Flex.Item>
-                <Text key={scope} as="div">
-                  {i18nLtiScope(scope)}
-                </Text>
+              <Flex.Item key={scope}>
+                <Text as="div">{i18nLtiScope(scope)}</Text>
               </Flex.Item>
             ))
           )}

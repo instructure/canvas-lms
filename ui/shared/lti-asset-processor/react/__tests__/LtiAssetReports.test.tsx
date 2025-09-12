@@ -25,7 +25,10 @@ import {
   LtiAssetReport,
   SpeedGraderLtiAssetReports,
 } from '@canvas/lti-asset-processor/model/AssetReport'
-import {LtiAssetReportsWrapper} from '../../react/LtiAssetReportsWrapper'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {LtiAssetReports} from '../LtiAssetReports'
+
+const queryClient = new QueryClient()
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashSuccess: jest.fn(),
@@ -77,7 +80,11 @@ describe('LtiAssetReports', () => {
       studentId,
       submissionType,
     }
-    return render(<LtiAssetReportsWrapper {...props} />)
+    return render(
+      <QueryClientProvider client={queryClient}>
+        <LtiAssetReports {...props} />
+      </QueryClientProvider>,
+    )
   }
 
   beforeEach(() => {
@@ -292,7 +299,11 @@ describe('LtiAssetReports', () => {
           studentId,
           submissionType,
         }
-        return render(<LtiAssetReportsWrapper {...props} />)
+        return render(
+          <QueryClientProvider client={queryClient}>
+            <LtiAssetReports {...props} />
+          </QueryClientProvider>,
+        )
       }
 
       beforeEach(() => {

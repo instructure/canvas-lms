@@ -92,12 +92,15 @@ export const getCourseGrades = (course, observedUserId) => {
   }
 }
 
-export const fetchGradesForGradingPeriod = (gradingPeriodId, userId = 'self') =>
-  asJson(
-    window.fetch(
-      `/api/v1/users/${userId}/enrollments?state[]=active&&type[]=StudentEnrollment&grading_period_id=${gradingPeriodId}`,
-      defaultFetchOptions(),
-    ),
+export const fetchGradesForGradingPeriod = gradingPeriodId => {
+  const params = new URLSearchParams({
+    'state[]': 'active',
+    'type[]': 'StudentEnrollment',
+    grading_period_id: gradingPeriodId,
+  })
+
+  return asJson(
+    window.fetch(`/api/v1/users/self/enrollments?${params.toString()}`, defaultFetchOptions()),
   ).then(enrollments =>
     enrollments.map(({course_id, grades}) => ({
       courseId: course_id,
@@ -105,6 +108,34 @@ export const fetchGradesForGradingPeriod = (gradingPeriodId, userId = 'self') =>
       grade: grades && grades.current_grade,
     })),
   )
+}
+
+export const fetchGradesForGradingPeriodAsObserver = (gradingPeriodId, userId) => {
+  const params = new URLSearchParams({
+    'state[]': 'active',
+    'type[]': 'ObserverEnrollment',
+    'include[]': 'observed_users',
+    grading_period_id: gradingPeriodId,
+  })
+
+  return asJson(
+    window.fetch(`/api/v1/users/self/enrollments?${params.toString()}`, defaultFetchOptions()),
+  ).then(enrollments => {
+    const enrollmentsForSelectedUser = enrollments.filter(({observed_user}) => {
+      return observed_user?.id === userId
+    })
+    return enrollmentsForSelectedUser.map(({observed_user, course_id}) => {
+      const studentEnrollment = observed_user.enrollments[0]
+      if (!studentEnrollment) return null
+      const grades = studentEnrollment.grades
+      return {
+        courseId: course_id,
+        score: grades && grades.current_score,
+        grade: grades && grades.current_grade,
+      }
+    })
+  })
+}
 
 export const fetchLatestAnnouncement = courseId =>
   asJson(
@@ -257,7 +288,7 @@ export const getAssignmentGrades = (data, observedUserId) => {
           ? 'letter_grade'
           : a.grading_type
         const rqdFormattedGrade = formatGradeToRQD(a, submission)
-        if (a.grading_type != "not_graded") {
+        if (a.grading_type != 'not_graded') {
           assignments.push({
             id: a.id,
             assignmentName: a.name,

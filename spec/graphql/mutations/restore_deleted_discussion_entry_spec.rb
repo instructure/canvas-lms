@@ -157,4 +157,15 @@ RSpec.describe Mutations::RestoreDeletedDiscussionEntry do
       end
     end
   end
+
+  context "LTI asset processor notifications" do
+    let(:graded_topic) { DiscussionTopic.create_graded_topic!(course: @course, title: "Graded Discussion") }
+    let(:graded_entry) { graded_topic.discussion_entries.create!(message: "Message to restore", user: @teacher, workflow_state: "deleted") }
+
+    it "calls notify_asset_processors_of_discussion for graded discussion restores" do
+      expect(Lti::AssetProcessorDiscussionNotifier).to receive(:notify_asset_processors_of_discussion)
+
+      run_mutation(discussion_entry_id: graded_entry.id)
+    end
+  end
 end

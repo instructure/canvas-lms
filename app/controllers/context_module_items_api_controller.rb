@@ -735,7 +735,8 @@ class ContextModuleItemsApiController < ApplicationController
     original_tag = @context.context_module_tags.not_deleted.find(params[:id])
     if authorized_action(original_tag.context_module, @current_user, :update)
       if original_tag.duplicate_able?
-        new_content = original_tag.content.duplicate
+        new_content = original_tag.content.duplicate({ user: @current_user })
+        new_content.saving_user = @current_user if new_content.respond_to?(:saving_user)
         new_content.save!
         new_tag = original_tag.context_module.add_item({
                                                          type: original_tag.content_type,

@@ -24,7 +24,18 @@ module Accessibility
     before_action :check_authorized_action
 
     def show
-      response = Accessibility::ContentLoader.new(context: @context, type: params[:content_type], id: params[:content_id]).content
+      content_loader = Accessibility::ContentLoader.new(
+        context: @context,
+        type: params[:content_type],
+        id: params[:content_id]
+      )
+
+      response = if params[:path].present?
+                   content_loader.extract_element_from_content(params[:path])
+                 else
+                   content_loader.content
+                 end
+
       render json: response[:json], status: response[:status]
     end
 

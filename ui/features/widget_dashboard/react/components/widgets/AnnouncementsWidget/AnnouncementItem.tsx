@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
@@ -29,6 +29,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import type {Announcement} from '../../../types'
 import {useToggleAnnouncementReadState} from '../../../hooks/useToggleAnnouncementReadState'
+import {CourseCode} from '../../shared/CourseCode'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -65,6 +66,17 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcement}) => {
       console.error('Failed to toggle read state:', error)
     }
   }
+
+  const decodeHtmlMessage = (html: string): string => {
+    const textarea = document.createElement('textarea')
+    textarea.innerHTML = html
+    return textarea.value
+  }
+
+  const decodedMessage = useMemo(
+    () => decodeHtmlMessage(announcement.message.replace(/<[^>]*>/g, '')),
+    [announcement.message],
+  )
 
   const renderReadUnreadButton = () => {
     if (toggleReadState.isPending) {
@@ -153,9 +165,11 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcement}) => {
 
                 {/* Row 2: Course code */}
                 <Flex.Item>
-                  <Text size="x-small" color="brand" weight="bold">
-                    {announcement.course?.courseCode || I18n.t('Unknown')}
-                  </Text>
+                  <CourseCode
+                    courseId={announcement.course?.id || ''}
+                    overrideCode={announcement.course?.courseCode || I18n.t('Unknown')}
+                    size="x-small"
+                  />
                 </Flex.Item>
 
                 {/* Row 3: Posted date */}
@@ -177,10 +191,8 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcement}) => {
           {announcement.message && (
             <View padding="0 0 0 xxx-small">
               <Text size="x-small">
-                <TruncatedText maxLength={60}>
-                  {announcement.message.replace(/<[^>]*>/g, '')}
-                </TruncatedText>{' '}
-                <Link href={announcement.html_url} isWithinText={true}>
+                <TruncatedText maxLength={60}>{decodedMessage}</TruncatedText>{' '}
+                <Link href={announcement.html_url} isWithinText={false}>
                   <Text size="x-small" color="brand">
                     {I18n.t('Read more')}
                   </Text>

@@ -84,7 +84,11 @@ describe('CreateAssignmentViewAdapter', () => {
 
   beforeEach(() => {
     window.ENV.FLAGS = {new_quizzes_by_default: false}
-    window.ENV.PERMISSIONS = {manage_assignments_edit: true, manage_assignments_delete: true}
+    window.ENV.PERMISSIONS = {
+      manage_assignments_edit: true,
+      manage_assignments_delete: true,
+      by_assignment_id: {},
+    }
     window.ENV.SETTINGS = {suppress_assignments: false}
     closeHandlerMock = jest.fn()
     jest.clearAllMocks()
@@ -184,6 +188,43 @@ describe('CreateAssignmentViewAdapter', () => {
 
       // Not controlled by blueprint course
       expect(getByTestId('points-input')).not.toBeDisabled()
+    })
+  })
+
+  it('sets manage_assign_to permission when assignment is saved successfully in create mode', async () => {
+    const ag = buildAssignmentGroup([])
+    const saveResponse = {
+      id: 456,
+      name: 'Test Assignment',
+      points_possible: 100,
+      assignment_group_id: ag.id,
+      submission_types: ['online_text_entry'],
+    }
+    const saveSpy = jest.spyOn(Backbone.Model.prototype, 'save').mockImplementation(function () {
+      this.set(saveResponse)
+      return Promise.resolve(saveResponse)
+    })
+
+    const {getByTestId} = renderComponent({
+      assignment: null,
+      assignmentGroup: ag,
+    })
+    const user = userEvent.setup()
+
+    await user.clear(getByTestId('assignment-name-input'))
+    await user.type(getByTestId('assignment-name-input'), 'Test Assignment')
+    await user.clear(getByTestId('points-input'))
+    await user.type(getByTestId('points-input'), '100')
+
+    await user.click(getByTestId('save-button'))
+    await waitFor(() => expect(saveSpy).toHaveBeenCalled())
+
+    await waitFor(() => {
+      expect(window.ENV.PERMISSIONS.by_assignment_id[456]).toEqual({
+        update: true,
+        delete: true,
+        manage_assign_to: true,
+      })
     })
   })
 })

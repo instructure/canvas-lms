@@ -202,6 +202,37 @@ describe FilesController do
     end
   end
 
+  it "allows access to files granted by attachment_association/location on the safe files domain" do
+    enable_cache do
+      course_with_teacher(active_all: true, user: @user, name: "Teacher 1")
+      @course.root_account.enable_feature!(:file_association_access)
+      host!("test.host")
+      attachment_model(uploaded_data: stub_png_data, content_type: "image/png", context: @teacher)
+      wiki_page_model(title: "Test Page", body: %(<p><a href="http://test.host/users/#{@teacher.id}/files/#{@attachment.id}/download">File 1</a></p>), saving_user: @teacher, context: @course)
+      allow(HostUrl).to receive(:file_host_with_shard).and_return(["files-test.host", Shard.default])
+
+      course_with_student_logged_in(course: @course, name: "Student 1")
+      get "http://test.host/users/#{@teacher.id}/files/#{@attachment.id}/download", params: { download_frd: "1", location: @page.asset_string }
+      expect(response).to be_redirect
+      uri = URI.parse response["Location"]
+      qs = Rack::Utils.parse_nested_query(uri.query).with_indifferent_access
+      path_match = uri.path.match(%r{/files/(?<id>\d+)})
+      qs[:file_id] = path_match[:id] if path_match
+      expect(uri.host).to eq "files-test.host"
+      expect(uri.path).to eq "/users/#{@teacher.id}/files/#{@attachment.id}/my%20files/test%20my%20file%3F%20hai!%26.png"
+      expect(qs["verifier"]).to be_nil
+      location = response["Location"]
+      remove_user_session
+
+      get location
+      # could be success or redirect, depending on S3 config
+      expect(response.status).to be_in [200, 302]
+      expect(session["file_access_user_id"]).to eq(@student.global_id)
+      # ensure that the user wasn't logged in by the normal means
+      expect(controller.instance_variable_get(:@current_user)).to be_nil
+    end
+  end
+
   it "falls back to try to get another verifier if we get an expired one for some reason" do
     course_with_teacher_logged_in(active_all: true, user: @user)
     host!("test.host")
@@ -219,7 +250,7 @@ describe FilesController do
     end
 
     allow_any_instance_of(ApplicationController).to receive(:files_domain?).and_return(true)
-    expect { Users::AccessVerifier.validate(@qs) }.to raise_exception(Canvas::Security::TokenExpired)
+    expect { AccessVerifier.validate(@qs) }.to raise_exception(Canvas::Security::TokenExpired)
     get @files_domain_location # try to use the expired verifier anyway because durr
 
     expect(response).to be_redirect
@@ -463,7 +494,7 @@ describe FilesController do
       user_factory(active_all: true)
       user_session(@user)
 
-      user_verifier = Users::AccessVerifier.generate(user: @user)
+      user_verifier = AccessVerifier.generate(user: @user)
       get "/files/#{att.id}", params: user_verifier # set the file access session tokens
       expect(session["file_access_user_id"]).to be_present
 

@@ -18,7 +18,6 @@
 
 import {gql} from 'graphql-tag'
 import {executeQuery} from '@canvas/graphql'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useQuery} from '@tanstack/react-query'
 import type {
@@ -73,7 +72,7 @@ export async function getModuleItems(
     }
   } catch (error: any) {
     const errorMessage = error instanceof Error ? error.message : String(error)
-    showFlashError(I18n.t('Failed to load module items: %{error}', {error: errorMessage}))
+    console.error('Failed to load module items:', errorMessage)
     throw error
   }
 }

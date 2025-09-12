@@ -16,24 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, RenderResult} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import {fireEvent} from '@testing-library/react'
 import {ButtonBlockSettings} from '../ButtonBlockSettings'
 import {renderBlock} from '../../__tests__/render-helper'
+import {ButtonBlockProps} from '../types'
 
-const defaultProps = {
-  settings: {
-    includeBlockTitle: false,
-    alignment: 'left',
-    layout: 'horizontal',
-    isFullWidth: false,
-    buttons: [{id: 1, text: 'Button1'}],
-  },
-}
-
-const toggleSection = async (component: RenderResult, name: RegExp | string) => {
-  const button = component.getByRole('button', {name})
-  await userEvent.click(button)
+const defaultProps: ButtonBlockProps = {
+  title: '',
+  includeBlockTitle: false,
+  alignment: 'left',
+  layout: 'horizontal',
+  isFullWidth: false,
+  backgroundColor: '#ffffff',
+  titleColor: '#000000',
+  buttons: [
+    {
+      id: 1,
+      text: 'Button1',
+      url: '',
+      linkOpenMode: 'new-tab',
+      primaryColor: '#ff0000',
+      secondaryColor: '#00ff00',
+      style: 'filled',
+    },
+  ],
 }
 
 describe('ButtonBlockSettings', () => {
@@ -50,25 +56,21 @@ describe('ButtonBlockSettings', () => {
   describe('Color settings', () => {
     it('integrates, changing the background color state', async () => {
       const component = renderBlock(ButtonBlockSettings, defaultProps)
-      await toggleSection(component, /Expand color settings/i)
-      const textBox = component.getByRole('textbox', {name: /background #/i})
-      expect(textBox).toHaveValue('')
+      const textBox = component.getByRole('textbox', {name: /background color #/i})
+      expect(textBox).toHaveValue('ffffff')
       fireEvent.change(textBox, {
         target: {value: '012345'},
       })
       expect(textBox).toHaveValue('012345')
     })
 
-    it('integrates, changing the text color state', async () => {
+    it('integrates, changing the title color state', async () => {
       const component = renderBlock(ButtonBlockSettings, {
-        settings: {
-          ...defaultProps.settings,
-          includeBlockTitle: true,
-        },
+        ...defaultProps,
+        includeBlockTitle: true,
       })
-      await toggleSection(component, /Expand color settings/i)
-      const textBox = component.getByRole('textbox', {name: /text #/i})
-      expect(textBox).toHaveValue('')
+      const textBox = component.getByRole('textbox', {name: /title color #/i})
+      expect(textBox).toHaveValue('000000')
       fireEvent.change(textBox, {
         target: {value: '012345'},
       })

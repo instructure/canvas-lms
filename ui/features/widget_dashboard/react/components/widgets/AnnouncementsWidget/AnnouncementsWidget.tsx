@@ -21,12 +21,14 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {SimpleSelect} from '@instructure/ui-simple-select'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Pagination} from '@instructure/ui-pagination'
 import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import AnnouncementItem from './AnnouncementItem'
 import type {BaseWidgetProps} from '../../../types'
 import {usePaginatedAnnouncements} from '../../../hooks/useAnnouncements'
-import {useUserCoursesWithGrades} from '../../../hooks/useUserCourses'
+import {useSharedCourses} from '../../../hooks/useSharedCourses'
+import {COURSE_GRADES_WIDGET} from '../../../constants'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -46,7 +48,9 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
     setCurrentPageIndex(0)
   }
 
-  const {data: courses = []} = useUserCoursesWithGrades()
+  const {data: courses = []} = useSharedCourses({
+    limit: COURSE_GRADES_WIDGET.MAX_GRID_ITEMS,
+  })
 
   const coursesById = useMemo(() => {
     return courses.reduce(
@@ -99,7 +103,9 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
 
   const renderFilterSelect = () => (
     <SimpleSelect
-      renderLabel=""
+      renderLabel={
+        <ScreenReaderContent>{I18n.t('Filter announcements by read status')}</ScreenReaderContent>
+      }
       value={filter}
       onChange={(_event, {value}) => handleFilterChange(value as FilterOption)}
       size="small"
@@ -168,10 +174,8 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
       error={error ? I18n.t('Failed to load announcements. Please try again.') : null}
       onRetry={refetch}
       loadingText={I18n.t('Loading announcements...')}
+      headerActions={renderFilterSelect()}
     >
-      <View as="div" margin="0 0 small 0">
-        {renderFilterSelect()}
-      </View>
       {renderContent()}
     </TemplateWidget>
   )

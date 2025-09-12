@@ -82,11 +82,66 @@ const mockCourseStatisticsResponse = {
   },
 }
 
+const mockCoursesWithGradesConnectionResponse = {
+  data: {
+    legacyNode: {
+      _id: '123',
+      enrollmentsConnection: {
+        nodes: [
+          {
+            course: {
+              _id: '1',
+              name: 'Introduction to Computer Science',
+              courseCode: 'CS101',
+            },
+            updatedAt: '2025-01-01T00:00:00Z',
+            grades: {
+              currentScore: 95,
+              currentGrade: 'A',
+              finalScore: 95,
+              finalGrade: 'A',
+              overrideScore: null,
+              overrideGrade: null,
+            },
+          },
+          {
+            course: {
+              _id: '2',
+              name: 'Advanced Mathematics',
+              courseCode: 'MATH301',
+            },
+            updatedAt: '2025-01-01T00:00:00Z',
+            grades: {
+              currentScore: 87,
+              currentGrade: 'B+',
+              finalScore: 87,
+              finalGrade: 'B+',
+              overrideScore: null,
+              overrideGrade: null,
+            },
+          },
+        ],
+        pageInfo: {
+          hasNextPage: false,
+          hasPreviousPage: false,
+          startCursor: null,
+          endCursor: null,
+        },
+      },
+    },
+  },
+}
+
 // Common GraphQL handlers that can be used across tests
 export const defaultGraphQLHandlers = [
   // Handle GetUserCoursesWithGrades query
   graphql.query('GetUserCoursesWithGrades', () => {
     return HttpResponse.json(mockCoursesWithGradesResponse)
+  }),
+
+  // Handle GetUserCoursesWithGradesConnection query
+  graphql.query('GetUserCoursesWithGradesConnection', () => {
+    return HttpResponse.json(mockCoursesWithGradesConnectionResponse)
   }),
 
   // Handle GetUserCourseStatistics query
@@ -99,6 +154,42 @@ export const defaultGraphQLHandlers = [
     return HttpResponse.json({
       data: {
         announcements: [],
+      },
+    })
+  }),
+
+  // Handle GetAccountNotifications query
+  graphql.query('GetAccountNotifications', () => {
+    return HttpResponse.json({
+      data: {
+        accountNotifications: [],
+      },
+    })
+  }),
+
+  // Handle GetDashboardNotifications query
+  graphql.query('GetDashboardNotifications', () => {
+    return HttpResponse.json({
+      data: {
+        accountNotifications: [],
+        enrollmentInvitations: [],
+      },
+    })
+  }),
+
+  // Handle GetCourseInstructorsPaginated query
+  graphql.query('GetCourseInstructorsPaginated', () => {
+    return HttpResponse.json({
+      data: {
+        courseInstructorsConnection: {
+          nodes: [],
+          pageInfo: {
+            hasNextPage: false,
+            hasPreviousPage: false,
+            startCursor: null,
+            endCursor: null,
+          },
+        },
       },
     })
   }),

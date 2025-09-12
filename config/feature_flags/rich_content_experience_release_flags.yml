@@ -213,6 +213,13 @@ rce_a11y_resize:
     Enable the Rich Content Editor to resize editor's size in a way that is accessible.
     This will allow users to resize editor without losing accessibility features.
 
+rce_studio_embed_improvements:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: RCE Studio Embed Improvements
+  description: |-
+    Enable RCE Studio Embed improvements to embedded content in the rich content editor.
+
 rce_find_replace:
   state: hidden
   display_name: Find and Replace RCE Plugin
@@ -289,7 +296,7 @@ youtube_migration_high_priority:
       state: allowed_on
 
 youtube_overlay:
-  applies_to: SiteAdmin
+  applies_to: Account
   state: hidden
   display_name: YouTube content overlay
   description: |-

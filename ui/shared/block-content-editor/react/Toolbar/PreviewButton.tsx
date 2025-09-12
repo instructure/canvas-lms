@@ -32,6 +32,7 @@ export const PreviewButton = (props: {
       color={props.active ? 'primary' : 'secondary'}
       renderIcon={<IconEyeLine />}
       onClick={props.onClick}
+      data-testid="preview-button"
     />
   )
 }

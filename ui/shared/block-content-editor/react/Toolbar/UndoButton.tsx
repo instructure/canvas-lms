@@ -32,6 +32,7 @@ export const UndoButton = (props: {
       screenReaderLabel={I18n.t('undo')}
       renderIcon={<IconDiscussionReply2Line />}
       onClick={props.onClick}
+      data-testid="undo-button"
     />
   )
 }

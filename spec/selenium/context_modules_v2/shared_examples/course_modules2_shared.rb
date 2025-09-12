@@ -230,6 +230,113 @@ shared_examples_for "course_module2 add module tray" do |context|
     expect(context_module_prerequisites(created_module.id).text).to eq("Prerequisite: #{first_module.name}")
     expect(context_module_name(new_module_name)[0]).to be_displayed
   end
+
+  it "adds module with lock until date on add module tray" do
+    future_date = format_date_for_view(Time.zone.today + 7.days)
+    get @mod_url
+    wait_for_ajaximations
+    add_module_button.click
+
+    click_lock_until_checkbox
+    update_lock_until_date(future_date)
+    update_lock_until_time("12:00 AM")
+    fill_in_module_name(new_module_name)
+    click_save_module_tray_change
+
+    created_module = @course.context_modules.last
+    expect(created_module.name).to eq(new_module_name)
+    expect(element_exists?(module_header_will_unlock_selector(created_module.id))).to be true
+    expect(module_header_will_unlock_label(created_module.id).text).to include "Will unlock"
+  end
+end
+
+shared_examples_for "course_module2 module tray lock until" do |context|
+  include ContextModulesCommon
+  include Modules2IndexPage
+  include Modules2ActionTray
+
+  before do
+    case context
+    when :context_modules
+      @mod_course = @course
+      @mod_url = "/courses/#{@mod_course.id}/modules"
+    when :course_homepage
+      @mod_course = @course
+      @mod_url = "/courses/#{@mod_course.id}"
+    end
+  end
+
+  it "adds lock until date on edit module tray" do
+    future_date = format_date_for_view(Time.zone.today + 7.days)
+    get @mod_url
+
+    module_action_menu(@module1.id).click
+    module_item_action_menu_link("Edit").click
+    click_lock_until_checkbox
+
+    update_lock_until_date(future_date)
+    update_lock_until_time("12:00 AM")
+    click_save_module_tray_change
+
+    will_unlock_at_label = module_header_will_unlock_label(@module1.id)
+    expect(element_exists?(module_header_will_unlock_selector(@module1.id))).to be true
+    expect(will_unlock_at_label.text).to include "Will unlock"
+  end
+
+  it "updates lock until date on edit module tray" do
+    @module2.unlock_at = 1.week.from_now
+    @module2.save!
+    current_due = format_date_for_view(@module2.unlock_at)
+    future_date = format_date_for_view(Time.zone.today + 2.days)
+
+    get @mod_url
+    expect(module_header_will_unlock_label(@module2.id).text).to include "Will unlock #{current_due}"
+
+    module_action_menu(@module2.id).click
+    module_item_action_menu_link("Edit").click
+
+    update_lock_until_date(future_date)
+    update_lock_until_time("12:00 AM")
+    click_save_module_tray_change
+    ignore_relock
+
+    expect(module_header_will_unlock_label(@module2.id).text).to include "Will unlock #{future_date}"
+  end
+end
+
+shared_examples_for "course_module2 module tray prerequisites" do |context|
+  include ContextModulesCommon
+  include Modules2IndexPage
+  include Modules2ActionTray
+
+  before do
+    case context
+    when :context_modules
+      @mod_course = @course
+      @mod_url = "/courses/#{@mod_course.id}/modules"
+    when :course_homepage
+      @mod_course = @course
+      @mod_url = "/courses/#{@mod_course.id}"
+    end
+  end
+
+  it "adds more than one prerequisite to a module", :ignore_js_errors do
+    get @mod_url
+    module_action_menu(@module3.id).click
+    module_item_action_menu_link("Edit").click
+
+    click_add_prerequisites_button
+    select_prerequisites_dropdown_option(0, @module2.name)
+    expect(prerequisites_dropdown_value(0)).to eq(@module2.name)
+
+    click_add_prerequisites_button
+    select_prerequisites_dropdown_option(1, @module1.name)
+    expect(prerequisites_dropdown_value(1)).to eq(@module1.name)
+
+    click_save_module_tray_change
+    ignore_relock
+    expect(context_module_prerequisites(@module3.id).text).to eq("Prerequisites: #{@module2.name}, #{@module1.name}")
+  end
 end
 
 shared_examples_for "course_module2 module tray requirements" do |context|

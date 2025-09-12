@@ -84,7 +84,6 @@ class AbstractAssignment < ActiveRecord::Base
   )
 
   attr_reader :assignment_changed, :posting_params_for_notifications
-  attr_writer :updating_user
 
   include MasterCourses::Restrictor
 
@@ -368,6 +367,7 @@ class AbstractAssignment < ActiveRecord::Base
     opts_with_default = default_opts.merge(opts)
 
     result = clone
+    result.saving_user = opts[:user]
     result.all_submissions.clear
     result.attachments.clear
     result.ignores.clear
@@ -394,7 +394,8 @@ class AbstractAssignment < ActiveRecord::Base
     if wiki_page && opts_with_default[:duplicate_wiki_page]
       result.wiki_page = wiki_page.duplicate({
                                                duplicate_assignment: false,
-                                               copy_title: result.title
+                                               copy_title: result.title,
+                                               user: opts_with_default[:user]
                                              })
     end
 
@@ -426,7 +427,8 @@ class AbstractAssignment < ActiveRecord::Base
                      unlock_at: sub_assignment.unlock_at
                    }]
                  end,
-          replies_required: result.discussion_topic.reply_to_entry_required_count || nil
+          replies_required: result.discussion_topic.reply_to_entry_required_count || nil,
+          saving_user: opts[:user]
         )
         new_sub_assignment.duplicate_of = sub_assignment
         new_sub_assignment.save!
@@ -2651,6 +2653,7 @@ class AbstractAssignment < ActiveRecord::Base
         homework.turnitin_data[:eula_agreement_timestamp] = eula_timestamp if eula_timestamp.present?
         homework.resource_link_lookup_uuid = opts[:resource_link_lookup_uuid]
         homework.proxy_submitter = current_user if should_add_proxy
+        homework.real_submitter = original_student if group.present?
 
         if webhook_info
           homework.turnitin_data[:webhook_info] = webhook_info
@@ -3689,6 +3692,8 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def update_due_date_smart_alerts
+    return unless context.active_now?
+
     unless saved_by == :migration
       if due_at.nil? || due_at < Time.zone.now
         ScheduledSmartAlert.find_by(context_type: self.class.name, context_id: id, alert_type: :due_date_reminder)&.destroy
@@ -4424,6 +4429,10 @@ class AbstractAssignment < ActiveRecord::Base
       errors.add(:due_at, I18n.t("must be between availability dates"))
       return false
     end
+
+    if checkpoints_parent? && sub_assignments.empty? && new_record?
+      @skip_sis_due_date_validation = true
+    end
     unless @skip_sis_due_date_validation || AssignmentUtil.due_date_ok?(self)
       errors.add(:due_at, I18n.t("due_at", "cannot be blank when Post to Sis is checked"))
     end
@@ -4433,7 +4442,11 @@ class AbstractAssignment < ActiveRecord::Base
     return true if @skip_sis_due_date_validation
 
     if AssignmentUtil.due_date_required?(self)
-      overrides = gather_override_data(overrides)
+      overrides = if checkpoints_parent?
+                    gather_override_data(sub_assignment_overrides)
+                  else
+                    gather_override_data(overrides)
+                  end
       if overrides.count { |o| !!o[:due_at_overridden] && o[:due_at].blank? && o[:workflow_state] != "deleted" } > 0
         errors.add(:due_at, I18n.t("cannot be blank for any assignees when Post to Sis is checked"))
         return false
@@ -4452,7 +4465,11 @@ class AbstractAssignment < ActiveRecord::Base
       o
     end
     override_ids = overrides.pluck(:id).to_set
-    assignment_overrides.reject { |o| override_ids.include? o[:id] } + overrides
+    if checkpoints_parent?
+      sub_assignment_overrides.reject { |o| override_ids.include? o[:id] } + overrides
+    else
+      assignment_overrides.reject { |o| override_ids.include? o[:id] } + overrides
+    end
   end
 
   def active_assignment_overrides?

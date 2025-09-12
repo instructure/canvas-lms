@@ -1,0 +1,48 @@
+PATH
+  remote: .
+  specs:
+    csv_diff (1.0.0)
+      csv
+      sqlite3
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    csv (3.3.5)
+    diff-lcs (1.6.2)
+    rake (13.2.1)
+    rspec (3.13.0)
+      rspec-core (~> 3.13.0)
+      rspec-expectations (~> 3.13.0)
+      rspec-mocks (~> 3.13.0)
+    rspec-core (3.13.3)
+      rspec-support (~> 3.13.0)
+    rspec-expectations (3.13.3)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-mocks (3.13.2)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-support (3.13.2)
+    sqlite3 (2.6.0-aarch64-linux-gnu)
+    sqlite3 (2.6.0-arm64-darwin)
+    sqlite3 (2.6.0-x86_64-darwin)
+    sqlite3 (2.6.0-x86_64-linux-gnu)
+
+PLATFORMS
+  aarch64-linux
+  arm64-darwin
+  ruby
+  x86_64-darwin
+  x86_64-linux
+
+DEPENDENCIES
+  csv_diff!
+  rake
+  rspec (~> 3.12)
+
+RUBY VERSION
+   ruby 3.4.1p0
+
+BUNDLED WITH
+   2.6.7

@@ -97,7 +97,7 @@
 #     }
 #
 class GroupCategoriesController < ApplicationController
-  before_action :require_context, only: %i[create index import_tags]
+  before_action :require_context, only: %i[create index import_tags export_tags]
   before_action :get_category_context, only: %i[show update destroy groups users assign_unassigned_members import export]
 
   include Api::V1::Attachment
@@ -739,6 +739,54 @@ class GroupCategoriesController < ApplicationController
     end
   end
 
+  # @API export tags and users in course
+  # @beta
+  #
+  # Returns a csv file of users in format ready to import.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/group_categories/export_tags \
+  #          -H 'Authorization: Bearer <token>'
+  def export_tags
+    GuardRail.activate(:secondary) do
+      return unless check_group_authorization(context: @context, current_user: @current_user, action_category: :manage, non_collaborative: true)
+
+      unless @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+        return render(json: { "status" => "unauthorized" }, status: :unauthorized)
+      end
+
+      include_sis_id = @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis)
+      csv_string = CSV.generate do |csv|
+        users = @context.participating_students
+                        .select(<<~SQL.squish)
+                          users.id, users.sortable_name,
+                          MAX (enrollments.sis_pseudonym_id) AS sis_pseudonym_id
+                        SQL
+                        .where("enrollments.type='StudentEnrollment'")
+                        .order("users.sortable_name").group(:id)
+        gms_by_user_id = GroupMembership.active.where(group_id: @context.differentiation_tags.select(:id))
+                                        .joins(group: :group_category)
+                                        .select(:user_id,
+                                                "groups.name",
+                                                "groups.sis_source_id",
+                                                "groups.id AS group_id",
+                                                "group_categories.name AS group_category_name",
+                                                "group_categories.sis_source_id AS group_category_sis_source_id",
+                                                "group_categories.id AS group_category_id")
+                                        .group_by(&:user_id)
+        csv << export_tags_headers(include_sis_id)
+        users.preload(:pseudonyms).find_each do |u|
+          rows = build_user_rows(u, gms_by_user_id, include_sis_id)
+          rows.each { |row| csv << row }
+        end
+      end
+
+      respond_to do |format|
+        format.csv { send_data csv_string, type: "text/csv", filename: "#{@context.name} Tags.csv", disposition: "attachment" }
+      end
+    end
+  end
+
   def build_row(user, section_names, gms_by_user_id, include_sis_id)
     row = []
     row << user.sortable_name
@@ -771,6 +819,56 @@ class GroupCategoriesController < ApplicationController
       headers << "canvas_group_id"
       headers << "group_id" if include_sis_id
     end
+    headers
+  end
+
+  def build_user_rows(user, gms_by_user_id, include_sis_id)
+    user_memberships = gms_by_user_id[user.id] || []
+    if user_memberships.count < 2
+      [build_tag_row(user, user_memberships.first, include_sis_id)]
+    else
+      user_memberships.map do |gm|
+        build_tag_row(user, gm, include_sis_id)
+      end
+    end
+  end
+
+  def build_tag_row(user, membership, include_sis_id)
+    row = []
+    row << user.sortable_name
+    row << user.id
+    e = Enrollment.new(user_id: user.id,
+                       root_account_id: @context.root_account_id,
+                       sis_pseudonym_id: user.sis_pseudonym_id,
+                       course_id: @context.id)
+    p = SisPseudonym.for(user, e, type: :trusted, require_sis: false, root_account: @context.root_account)
+    row << p&.sis_user_id if include_sis_id
+    row << p&.unique_id
+
+    if membership
+      row << membership.name
+      row << membership.group_id
+      row << membership.sis_source_id if include_sis_id
+      row << membership.group_category_name
+      row << membership.group_category_id
+      row << membership.group_category_sis_source_id if include_sis_id
+      row
+    end
+    row
+  end
+
+  def export_tags_headers(include_sis_id)
+    headers = []
+    headers << I18n.t("name")
+    headers << "canvas_user_id"
+    headers << "user_id" if include_sis_id
+    headers << "login_id"
+    headers << "tag_name"
+    headers << "canvas_tag_id"
+    headers << "tag_id" if include_sis_id
+    headers << "tag_set_name"
+    headers << "canvas_tag_set_id"
+    headers << "tag_set_id" if include_sis_id
     headers
   end
 

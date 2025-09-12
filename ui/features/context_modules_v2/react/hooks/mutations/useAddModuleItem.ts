@@ -23,45 +23,32 @@ import {useInlineSubmission, submitItemData} from './useInlineSubmission'
 import {useDefaultCourseFolder} from '../../hooks/mutations/useDefaultCourseFolder'
 import type {ContentItem} from '../queries/useModuleItemContent'
 import {useModules} from '../queries/useModules'
-
-type ExternalUrl = {
-  url: string
-  name: string
-  newTab: boolean
-  selectedToolId?: string
-  isUrlValid?: boolean
-}
-
-type NewItem = {
-  name: string
-  assignmentGroup: string
-  file: File | null
-  folder: string
-}
-
-type FormState = {
-  indentation: number
-  textHeader: string
-  external: ExternalUrl
-  newItem: NewItem
-  tabIndex: number
-  isLoading: boolean
-}
+import {ExternalToolUrl, ExternalUrl, FormState, NewItem} from '../../utils/types'
+import {navigateToLastPage} from '../../utils/pageNavigation'
 
 const initialState: FormState = {
   indentation: 0,
   textHeader: '',
-  external: {url: '', name: '', newTab: false, selectedToolId: '', isUrlValid: false},
+  externalUrl: {
+    url: '',
+    name: '',
+    newTab: false,
+    isUrlValid: false,
+  },
+  externalTool: {url: '', name: '', newTab: false, selectedToolId: '', isUrlValid: false},
   newItem: {name: '', assignmentGroup: '', file: null, folder: ''},
+  selectedItemId: '',
   tabIndex: 0,
   isLoading: false,
 }
 
-type Action =
+export type Action =
   | {type: 'SET_INDENTATION'; value: number}
   | {type: 'SET_TEXT_HEADER'; value: string}
-  | {type: 'SET_EXTERNAL'; field: keyof ExternalUrl; value: string | boolean}
+  | {type: 'SET_EXTERNAL_URL'; field: keyof ExternalUrl; value: string | boolean}
+  | {type: 'SET_EXTERNAL_TOOL'; field: keyof ExternalToolUrl; value: string | boolean}
   | {type: 'SET_NEW_ITEM'; field: keyof NewItem; value: string | File | null}
+  | {type: 'SET_SELECTED_ITEM_ID'; value: string}
   | {type: 'SET_TAB_INDEX'; value: number}
   | {type: 'SET_LOADING'; value: boolean}
   | {type: 'RESET'}
@@ -72,22 +59,34 @@ function reducer(state: FormState, action: Action): FormState {
       return {...state, indentation: action.value}
     case 'SET_TEXT_HEADER':
       return {...state, textHeader: action.value}
-    case 'SET_EXTERNAL':
+    case 'SET_EXTERNAL_URL':
+      if (state.externalUrl[action.field] === action.value) return state
       return {
         ...state,
-        external: {...state.external, [action.field]: action.value},
+        externalUrl: {...state.externalUrl, [action.field]: action.value},
+      }
+    case 'SET_EXTERNAL_TOOL':
+      if (state.externalTool[action.field] === action.value) return state
+      return {
+        ...state,
+        externalTool: {...state.externalTool, [action.field]: action.value},
       }
     case 'SET_NEW_ITEM':
       return {
         ...state,
         newItem: {...state.newItem, [action.field]: action.value},
       }
+    case 'SET_SELECTED_ITEM_ID':
+      return {...state, selectedItemId: action.value}
     case 'SET_TAB_INDEX':
       return {...state, tabIndex: action.value}
     case 'SET_LOADING':
       return {...state, isLoading: action.value}
     case 'RESET':
-      return initialState
+      return {
+        ...initialState,
+        tabIndex: state.tabIndex,
+      }
     default:
       return state
   }
@@ -98,13 +97,11 @@ export function useAddModuleItem({
   moduleId,
   onRequestClose,
   contentItems = [],
-  inputValue,
 }: {
   itemType: ModuleItemContentType
   moduleId: string
   onRequestClose?: () => void
   contentItems: ContentItem[]
-  inputValue: string
 }) {
   const [state, dispatch] = useReducer(reducer, initialState)
   const {courseId, quizEngine} = useContextModule()
@@ -119,15 +116,30 @@ export function useAddModuleItem({
   const handleSubmit = async () => {
     dispatch({type: 'SET_LOADING', value: true})
 
-    const {external, textHeader, indentation, tabIndex, newItem} = state
+    const {externalUrl, externalTool, textHeader, indentation, tabIndex, newItem} = state
 
-    if (itemType === 'external_url' && (!external.url || !external.name || !external.isUrlValid)) {
+    if (
+      itemType === 'external_url' &&
+      (!externalUrl.url || !externalUrl.name || !externalUrl.isUrlValid)
+    ) {
       dispatch({type: 'SET_LOADING', value: false})
       return
     }
 
-    const selectedItemId = itemType === 'external_tool' ? state.external.selectedToolId : inputValue
+    if (
+      itemType === 'external_tool' &&
+      (!externalTool.url || !externalTool.name || !externalTool.isUrlValid)
+    ) {
+      dispatch({type: 'SET_LOADING', value: false})
+      return
+    }
+
+    const selectedItemId =
+      itemType === 'external_tool' ? state.externalTool.selectedToolId : state.selectedItemId
+
     const selectedItem = contentItems.find(item => item.id === selectedItemId) || null
+
+    const {name, url, newTab} = itemType === 'external_tool' ? externalTool : externalUrl
 
     const itemData = prepareModuleItemData(moduleId, {
       type: itemType,
@@ -136,36 +148,40 @@ export function useAddModuleItem({
       quizEngine,
       selectedTabIndex: tabIndex,
       textHeaderValue: textHeader,
-      externalUrlName: external.name,
-      externalUrlValue: external.url,
-      externalUrlNewTab: external.newTab,
+      externalUrlName: name,
+      externalUrlValue: url,
+      externalUrlNewTab: newTab,
       selectedItem,
     })
 
-    const isSimple = ['context_module_sub_header', 'external_url'].includes(itemType)
+    const isSimple = ['context_module_sub_header', 'external_url', 'external_tool'].includes(
+      itemType,
+    )
     const isExistingItem = tabIndex === 0 && selectedItem
 
-    if (isSimple || isExistingItem) {
-      await submitItemData(courseId, moduleId, itemData, onRequestClose)
-    } else if (tabIndex === 1) {
-      if (itemType === 'file' && !newItem.file) {
-        dispatch({type: 'SET_LOADING', value: false})
-        return
+    try {
+      if (isSimple || isExistingItem) {
+        await submitItemData(courseId, moduleId, itemData, onRequestClose)
+      } else if (tabIndex === 1) {
+        if (itemType !== 'file' || newItem.file) {
+          await submitInlineItem({
+            moduleId,
+            itemType,
+            newItemName: newItem.name,
+            selectedAssignmentGroup: newItem.assignmentGroup,
+            selectedFile: newItem.file,
+            selectedFolder: newItem.folder || defaultFolder,
+            itemData,
+            onRequestClose,
+          })
+        }
       }
 
-      await submitInlineItem({
-        moduleId,
-        itemType,
-        newItemName: newItem.name,
-        selectedAssignmentGroup: newItem.assignmentGroup,
-        selectedFile: newItem.file,
-        selectedFolder: newItem.folder || defaultFolder,
-        itemData,
-        onRequestClose,
-      })
+      // Navigate to the last page after adding an item
+      navigateToLastPage(moduleId, totalCount + 1)
+    } finally {
+      dispatch({type: 'SET_LOADING', value: false})
     }
-
-    dispatch({type: 'SET_LOADING', value: false})
   }
 
   return {

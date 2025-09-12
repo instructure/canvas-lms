@@ -26,6 +26,7 @@ import {BlockContentViewerProps} from './BlockContentViewer'
 import {Editor} from '@craftjs/core'
 import {components} from './block-content-editor-components'
 import {BlockContentEditorContent} from './BlockContentEditorContent'
+import {BlockContentEditorErrorBoundary} from './BlockContentEditorErrorBoundary'
 
 const getEditorForMode = (mode: EditorMode, props: BlockContentEditorProps) => {
   switch (mode) {
@@ -56,8 +57,10 @@ export type BlockContentEditorProps = BlockContentViewerProps & {
 
 export const BlockContentEditor = (props: BlockContentEditorProps) => {
   return (
-    <BlockContentEditorContext data={props.data}>
-      <BlockContentEditorWrapper {...props} />
-    </BlockContentEditorContext>
+    <BlockContentEditorErrorBoundary>
+      <BlockContentEditorContext data={props.data}>
+        <BlockContentEditorWrapper {...props} />
+      </BlockContentEditorContext>
+    </BlockContentEditorErrorBoundary>
   )
 }

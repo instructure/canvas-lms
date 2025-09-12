@@ -19,19 +19,21 @@
 import {PropsWithChildren} from 'react'
 import CanvasTray from '@canvas/trays/react/Tray'
 
-export const SettingsTray = (
-  props: PropsWithChildren<{
-    title: string
-    open: boolean
-    onDismiss: () => void
-  }>,
-) => {
+export type SettingsTrayProps = PropsWithChildren<{
+  title: string
+  open: boolean
+  onDismiss: () => void
+  onClose: () => void
+}>
+
+export const SettingsTray = (props: SettingsTrayProps) => {
   return (
     <CanvasTray
       label={props.title}
       title={props.title}
       open={props.open}
       onDismiss={props.onDismiss}
+      onClose={props.onClose}
       headerPadding="small"
       contentPadding="small"
       placement="end"

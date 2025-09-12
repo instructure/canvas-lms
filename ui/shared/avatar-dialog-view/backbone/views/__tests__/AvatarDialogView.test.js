@@ -92,7 +92,9 @@ describe('AvatarDialogView#onPreflight', () => {
   })
 
   test('it should be accessible', function (done) {
-    isAccessible(avatarDialogView, done, {a11yReport: true})
+    isAccessible(avatarDialogView, done, {
+      ignores: ['document-title', 'html-has-lang', 'duplicate-id'],
+    })
   })
 
   test('calls flashError with base error message when errors are present', async () => {

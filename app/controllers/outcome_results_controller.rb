@@ -385,6 +385,42 @@ class OutcomeResultsController < ApplicationController
     end
   end
 
+  # @API Enqueue a delayed Outcome Rollup Calculation Job
+  #
+  # @argument course_id [String] The course ID for the rollup job
+  # @argument student_uuid [String] The student UUID for the rollup job. If provided, calculates for specific student.
+  #
+  # @returns RollupJob
+  def enqueue_outcome_rollup_calculation
+    unless Account.site_admin.feature_enabled?(:outcomes_rollup_propagation)
+      head :no_content
+      return
+    end
+
+    course_id = params[:course_id]
+    student_uuid = params[:student_uuid]
+
+    begin
+      if course_id.present? && student_uuid.present?
+        course = Course.find(course_id)
+        student = course.students.find_by(uuid: student_uuid) if student_uuid
+        raise ActiveRecord::RecordNotFound unless student
+
+        Outcomes::StudentOutcomeRollupCalculationService.calculate_for_student(
+          course_id:,
+          student_id: student.id
+        )
+        render json: { message: "Rollup calculation enqueued for student #{student.id} in course #{course_id}", type: "student" }
+      else
+        render json: { error: "course id and student uuid are required" }, status: :bad_request
+      end
+    rescue ActiveRecord::RecordNotFound
+      render json: { error: "Invalid course or student" }, status: :not_found
+    rescue => e
+      render json: { error: e.message }, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def find_new_quiz_assignments

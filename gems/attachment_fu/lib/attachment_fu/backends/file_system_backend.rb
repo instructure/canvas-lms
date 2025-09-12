@@ -71,9 +71,10 @@ module AttachmentFu # :nodoc:
           end
           user = args[0][:user] if args[0][:user]
           ttl = args[0][:ttl] if args[0][:ttl]
+          location = args[0][:location] if args[0][:location]
         end
         protocol ||= "#{HostUrl.protocol}://"
-        "#{protocol}#{local_storage_path(user:, ttl:)}"
+        "#{protocol}#{local_storage_path(user:, ttl:, location:)}"
       end
 
       def filename=(value)

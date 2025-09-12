@@ -190,6 +190,47 @@ describe Lti::AssetProcessorController do
         expect(response).to have_http_status(:not_found)
       end
     end
+
+    context "when assignment is a group assignment" do
+      let(:assignment) { assignment_model(course:, submission_types: "online_upload", group_category: "Group category 1") }
+      let(:group_category) { assignment.group_category }
+      let(:student2_enrollment) { student_in_course(course:, active_all: true) }
+      let(:student2) { student2_enrollment.user }
+      let(:group) { course.groups.create!(name: "Test Group", group_category:, context: course) }
+
+      before do
+        user_session(teacher)
+        group.add_user(student, "accepted")
+        group.add_user(student2, "accepted")
+        assignment.submissions.find_by(user: student).tap { |s| s.update!(group:) }
+        assignment.submissions.find_by(user: student2).tap { |s| s.update!(group:) }
+      end
+
+      it "notifies with the student's own submission when they are the real submitter" do
+        primary_submission = assignment.submit_homework(student, submission_type: "online_upload", attachments: [attachment])
+
+        expect(Lti::AssetProcessorNotifier).to receive(:notify_asset_processors).with(primary_submission, asset_processor)
+
+        post :resubmit_notice, params: { asset_processor_id: asset_processor.id, student_id: student.id, attempt: "latest" }
+        expect(response).to have_http_status(:no_content)
+      end
+
+      it "notifies with the real submitter's submission when targeting a groupmate" do
+        primary_submission = assignment.submit_homework(student, submission_type: "online_upload", attachments: [attachment])
+        groupmate_submission = assignment.submissions.find_by(user_id: student2.id)
+
+        expect(primary_submission.real_submitter_id).to eq(primary_submission.user_id)
+        expect(groupmate_submission).to be_present
+        expect(groupmate_submission.group_id).to be_present
+        expect(groupmate_submission.real_submitter_id).to eq(student.id)
+        expect(groupmate_submission.user_id).not_to eq(groupmate_submission.real_submitter_id)
+
+        expect(Lti::AssetProcessorNotifier).to receive(:notify_asset_processors).with(primary_submission, asset_processor)
+
+        post :resubmit_notice, params: { asset_processor_id: asset_processor.id, student_id: student2.id, attempt: "latest" }
+        expect(response).to have_http_status(:no_content)
+      end
+    end
   end
 
   describe "helper methods" do

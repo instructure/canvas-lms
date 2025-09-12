@@ -309,6 +309,11 @@ module Interfaces::SubmissionInterface
     end
   end
 
+  field :auto_grade_result_present, Boolean, null: false, description: "Indicates whether an auto-grading result exists for the submission."
+  def auto_grade_result_present
+    Loaders::HasAutoGradeResultsLoader.load(submission)
+  end
+
   field :sub_assignment_submissions, [Types::SubAssignmentSubmissionType], null: true
   def sub_assignment_submissions
     # TODO: remove this antipattern as soon as EGG-1372 is resolved

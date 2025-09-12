@@ -105,18 +105,22 @@ const validateGradedDiscussionFields = (
   assignedInfoList,
   postToSis,
   showPostToSisError,
+  isCheckpoints,
 ) => {
   if (!isGraded) {
     return true
   }
 
-  if (
-    ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT &&
-    assignedInfoList &&
-    postToSis
-  ) {
+  if (ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT && assignedInfoList && postToSis) {
+    const CheckpointDueDateMissing = assignedInfoList.some(
+      assignee => !assignee.replyToTopicDueDate || !assignee.requiredRepliesDueDate,
+    )
     const aDueDateMissing = assignedInfoList.some(assignee => !assignee.dueDate)
-    if (aDueDateMissing) {
+    if (aDueDateMissing && !isCheckpoints) {
+      showPostToSisError()
+      return false
+    }
+    if (CheckpointDueDateMissing && isCheckpoints) {
       showPostToSisError()
       return false
     }
@@ -159,6 +163,7 @@ export const validateFormFields = (
   assignedInfoList,
   postToSis,
   showPostToSisError,
+  isCheckpoints,
 ) => {
   let isValid = true
 
@@ -196,6 +201,7 @@ export const validateFormFields = (
         assignedInfoList,
         postToSis,
         showPostToSisError,
+        isCheckpoints,
       ),
       ref: gradedDiscussionRef.current,
     },

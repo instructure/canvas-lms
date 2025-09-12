@@ -75,12 +75,6 @@ blueprint_line_item_support:
   description: Allows blueprint courses to keep track of assignment's resource id changes.
   applies_to: SiteAdmin
 
-content_migration_asset_map_v2:
-  state: hidden
-  display_name: Content Migration Asset Map v2
-  description: Adds Additional Fields to the Content Migration Asset Map
-  applies_to: SiteAdmin
-
 instui_for_import_page:
   state: hidden
   display_name: Use InstUI for the course import page
@@ -191,13 +185,6 @@ modules_page_rewrite_student_view:
   description: |-
     If enabled, the modules page will use the new modules page rewrite on student view.
   applies_to: Course
-
-create_wiki_page_mastery_path_overrides:
-  state: hidden
-  display_name: In MasteryPaths Create AssignmentOverrides on WikiPages Instead of Creating a Hidden Assignment
-  description: |-
-    In Mastery Paths create AssignmentOverrides directly onto WikiPages instead of creating a hidden Assignment.
-  applies_to: SiteAdmin
 
 create_external_apps_side_tray_overrides:
   state: hidden

@@ -23,13 +23,13 @@ import LicenseHelpIcon from '../LicenseHelpIcon'
 const renderWithSelect = (selected: string) => {
   return (
     <>
-      <select id="course_license" data-testid="course_license">
-        <option value="private" selected={selected === 'private'}></option>
-        <option value="cc_by" selected={selected === 'cc_by'}></option>
-        <option value="cc_by_sa" selected={selected === 'cc_by_sa'}></option>
-        <option value="cc_by_nc" selected={selected === 'cc_by_nc'}></option>
-        <option value="cc_by_nc_sa" selected={selected === 'cc_by_nc_sa'}></option>
-        <option value="cc_by_nc_nd" selected={selected === 'cc_by_nc_nd'}></option>
+      <select id="course_license" data-testid="course_license" defaultValue={selected}>
+        <option value="private"></option>
+        <option value="cc_by"></option>
+        <option value="cc_by_sa"></option>
+        <option value="cc_by_nc"></option>
+        <option value="cc_by_nc_sa"></option>
+        <option value="cc_by_nc_nd"></option>
       </select>
       <LicenseHelpIcon />
     </>

@@ -28,6 +28,7 @@ import {possibleString, possibleStringRange} from '../Points'
 import {SelfAssessmentRatingButton} from '@canvas/rubrics/react/RubricAssessment/SelfAssessmentRatingButton'
 
 type HorizontalButtonDisplayProps = {
+  buttonDisplay: string
   hidePoints: boolean
   isPreviewMode: boolean
   isSelfAssessment: boolean
@@ -40,6 +41,7 @@ type HorizontalButtonDisplayProps = {
   shouldFocusFirstRating?: boolean
 }
 export const HorizontalButtonDisplay = ({
+  buttonDisplay,
   hidePoints,
   isPreviewMode,
   ratings,
@@ -79,6 +81,8 @@ export const HorizontalButtonDisplay = ({
     selectedRatingIndex >= 0 ? selectedRatingIndex : selectedSelfAssessmentRatingIndex
 
   const selectedRatingDescription = selectedRating ?? selectedSelfAssessmentRating
+
+  const isButtonDisplayPoints = buttonDisplay === 'points' && !hidePoints
 
   return (
     <View as="div" data-testid="rubric-assessment-horizontal-display">
@@ -121,14 +125,17 @@ export const HorizontalButtonDisplay = ({
       )}
       <Flex direction={ratingOrder === 'ascending' ? 'row-reverse' : 'row'}>
         {ratings.map((rating, index) => {
-          const buttonDisplay = (ratings.length - (index + 1)).toString()
+          const buttonLabel =
+            isButtonDisplayPoints && rating.points != null
+              ? rating.points.toString()
+              : (ratings.length - (index + 1)).toString()
           const buttonAriaLabel = `${rating.description} ${
             rating.longDescription
           } ${getPossibleText(rating.points)}`
 
           return (
             <Flex.Item
-              key={`${rating.id}-${buttonDisplay}`}
+              key={`${rating.id}-${buttonLabel}`}
               data-testid={`rating-button-${rating.id}-${index}`}
               aria-label={buttonAriaLabel}
               elementRef={ref => {
@@ -139,14 +146,14 @@ export const HorizontalButtonDisplay = ({
             >
               {isSelfAssessment ? (
                 <SelfAssessmentRatingButton
-                  buttonDisplay={buttonDisplay}
+                  buttonLabel={buttonLabel}
                   isSelected={selectedRatingIndex === index}
                   isPreviewMode={isPreviewMode}
                   onClick={() => onSelectRating(rating)}
                 />
               ) : (
                 <RatingButton
-                  buttonDisplay={buttonDisplay}
+                  buttonLabel={buttonLabel}
                   isSelected={selectedRatingIndex === index}
                   isSelfAssessmentSelected={selectedSelfAssessmentRatingIndex === index}
                   isPreviewMode={isPreviewMode}

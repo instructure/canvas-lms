@@ -58,6 +58,7 @@ import {RubricAssignmentSettings} from './components/RubricAssignmentSettings'
 import {RubricFormSettings} from './components/RubricFormSettings'
 import {EditConfirmModal} from '../RubricAssignment/components/EditConfirmModal'
 import {SaveRubricConfirmationModal} from './components/SaveRubricConfirmationModal'
+import {AssignmentPointsDifferenceModal} from './components/AssignmentPointsDifferenceModal'
 import {useGenerateCriteria} from './hooks/useGenerateCriteria'
 
 const I18n = createI18nScope('rubrics-form')
@@ -72,6 +73,7 @@ export type RubricFormComponentProp = {
   rubricId?: string
   accountId?: string
   assignmentId?: string
+  assignmentPointsPossible?: number
   courseId?: string
   canManageRubrics: boolean
   rootOutcomeGroup: GroupOutcome
@@ -82,13 +84,14 @@ export type RubricFormComponentProp = {
   rubricAssociation?: RubricAssociation
   showAdditionalOptions?: boolean
   onLoadRubric?: (rubricTitle: string) => void
-  onSaveRubric: (savedRubricResponse: SaveRubricResponse) => void
+  onSaveRubric: (savedRubricResponse: SaveRubricResponse, updatePointsPossible?: boolean) => void
   onCancel: () => void
 }
 
 export const RubricForm = ({
   rubricId,
   assignmentId,
+  assignmentPointsPossible,
   accountId,
   courseId,
   canManageRubrics,
@@ -121,6 +124,8 @@ export const RubricForm = ({
   const [generateCriteriaFormOptions, setGenerateCriteriaFormOptions] =
     useState<GenerateCriteriaFormProps>(defaultGenerateCriteriaForm)
   const [isSaveConfirmModalOpen, setIsSaveConfirmModalOpen] = useState(false)
+  const [isAssignmentPointsDifferenceModalOpen, setIsAssignmentPointsDifferenceModalOpen] =
+    useState(false)
   const hasAssignment = !!assignmentId && assignmentId !== ''
   const isNewRubric = !rubricId && !rubric?.id
 
@@ -136,7 +141,7 @@ export const RubricForm = ({
             typeof value === 'string' && value.trim().length > 0 && value.length <= 255
           const message = messageValidation
             ? undefined
-            : I18n.t('The Rubic Name must be between 1 and 255 characters.')
+            : I18n.t('The Rubric Name must be between 1 and 255 characters.')
           setValidationErrors(prevState => ({
             ...prevState,
             [key]: {message},
@@ -252,10 +257,20 @@ export const RubricForm = ({
     saveRubricMutation()
   }
 
-  const handleSave = () => {
+  const handleSave = (skipUpdatingPointsPossible?: boolean) => {
+    if (skipUpdatingPointsPossible !== undefined) {
+      setRubricFormField('skipUpdatingPointsPossible', skipUpdatingPointsPossible)
+    }
     setRubricFormField('workflowState', 'active')
     saveRubricMutation()
   }
+
+  const isAssignmentPointsDifferent =
+    !!assignmentPointsPossible &&
+    !!rubricForm.pointsPossible &&
+    !rubricForm.hidePoints &&
+    rubricForm.useForGrading &&
+    rubricForm.pointsPossible !== assignmentPointsPossible
 
   const handleDragEnd = (result: DropResult) => {
     const {source, destination} = result
@@ -314,7 +329,8 @@ export const RubricForm = ({
 
   useEffect(() => {
     if (saveSuccess && savedRubricResponse) {
-      onSaveRubric(savedRubricResponse)
+      const updatePointsPossible = rubricForm.skipUpdatingPointsPossible === false
+      onSaveRubric(savedRubricResponse, updatePointsPossible)
     }
   }, [saveSuccess, savedRubricResponse, onSaveRubric])
 
@@ -417,7 +433,9 @@ export const RubricForm = ({
         handlePreviewRubric={() => setIsPreviewTrayOpen(true)}
         handleSaveAsDraft={handleSaveAsDraft}
         handleSave={() => {
-          if (rubric && hasAssignment && hasRubricChanged(rubricForm, rubric)) {
+          if (rubric && hasAssignment && isAssignmentPointsDifferent) {
+            setIsAssignmentPointsDifferenceModalOpen(true)
+          } else if (rubric && hasAssignment && hasRubricChanged(rubricForm, rubric)) {
             setIsEditConfirmModalOpen(true)
           } else if (rubricForm.unassessed) {
             handleSave()
@@ -487,6 +505,22 @@ export const RubricForm = ({
           handleSave()
         }}
         onDismiss={() => setIsSaveConfirmModalOpen(false)}
+      />
+      <AssignmentPointsDifferenceModal
+        assignmentPoints={assignmentPointsPossible ?? 0}
+        rubricPoints={rubricForm.pointsPossible}
+        isOpen={isAssignmentPointsDifferenceModalOpen}
+        onChange={() => {
+          handleSave(false)
+          setIsAssignmentPointsDifferenceModalOpen(false)
+        }}
+        onDismiss={() => {
+          setIsAssignmentPointsDifferenceModalOpen(false)
+        }}
+        onLeaveDifferent={() => {
+          handleSave(true)
+          setIsAssignmentPointsDifferenceModalOpen(false)
+        }}
       />
     </View>
   )

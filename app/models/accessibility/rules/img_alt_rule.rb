@@ -58,6 +58,9 @@ module Accessibility
       def fix!(elem, value)
         if value == "" || value.nil?
           elem["role"] = "presentation"
+          elem.remove_attribute("alt") if elem.key?("alt")
+
+          return elem
         end
 
         return nil if elem["alt"] == value

@@ -26,6 +26,7 @@ import {getAllAssignments} from '../graphql/assignments/getAllAssignments'
 import {flatten} from 'lodash'
 import {getAllAssignmentGroups} from '../graphql/assignmentGroups/getAllAssignmentGroups'
 import {GetAssignmentsParams} from '../graphql/assignments/getAssignments'
+import {v4 as uuidv4} from 'uuid'
 
 jest.mock('../../Gradebook.utils', () => {
   const actual = jest.requireActual('../../Gradebook.utils')
@@ -230,8 +231,10 @@ describe('Gradebook', () => {
   })
 
   describe('fetchGrapqhlAssignmentGroups', () => {
+    let correlationId: string | undefined
     beforeEach(() => {
-      store.setState({courseId: '1201'})
+      correlationId = uuidv4()
+      store.setState({courseId: '1201', correlationId})
       ;(getAllAssignmentGroups as jest.Mock).mockResolvedValue({
         data: GET_ALL_ASSIGNMENT_GROUPS_RESPONSE,
       })
@@ -256,6 +259,7 @@ describe('Gradebook', () => {
       expect(getAllAssignmentGroups).toHaveBeenCalledTimes(1)
       expect(getAllAssignmentGroups).toHaveBeenCalledWith({
         queryParams: {courseId: '1201'},
+        headers: {'Correlation-Id': correlationId},
       })
     })
 
@@ -264,9 +268,11 @@ describe('Gradebook', () => {
       expect(getAllAssignments).toHaveBeenCalledTimes(2)
       expect((getAllAssignments as jest.Mock).mock.calls[0][0]).toEqual({
         queryParams: {assignmentGroupId: 'ag1', gradingPeriodId: null},
+        headers: {'Correlation-Id': correlationId},
       })
       expect((getAllAssignments as jest.Mock).mock.calls[1][0]).toEqual({
         queryParams: {assignmentGroupId: 'ag2', gradingPeriodId: null},
+        headers: {'Correlation-Id': correlationId},
       })
     })
 
@@ -275,15 +281,19 @@ describe('Gradebook', () => {
       expect(getAllAssignments).toHaveBeenCalledTimes(4)
       expect((getAllAssignments as jest.Mock).mock.calls[0][0]).toEqual({
         queryParams: {assignmentGroupId: 'ag1', gradingPeriodId: 'g1'},
+        headers: {'Correlation-Id': correlationId},
       })
       expect((getAllAssignments as jest.Mock).mock.calls[1][0]).toEqual({
         queryParams: {assignmentGroupId: 'ag1', gradingPeriodId: 'g2'},
+        headers: {'Correlation-Id': correlationId},
       })
       expect((getAllAssignments as jest.Mock).mock.calls[2][0]).toEqual({
         queryParams: {assignmentGroupId: 'ag2', gradingPeriodId: 'g1'},
+        headers: {'Correlation-Id': correlationId},
       })
       expect((getAllAssignments as jest.Mock).mock.calls[3][0]).toEqual({
         queryParams: {assignmentGroupId: 'ag2', gradingPeriodId: 'g2'},
+        headers: {'Correlation-Id': correlationId},
       })
     })
 

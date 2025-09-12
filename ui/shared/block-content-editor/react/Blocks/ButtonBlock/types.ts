@@ -17,6 +17,7 @@
  */
 
 import {FocusHandler} from '../../hooks/useFocusElement'
+import {Prettify} from '../../utilities/Prettify'
 import {TitleData} from '../BlockItems/Title/types'
 
 export type ButtonAlignment = 'left' | 'center' | 'right'
@@ -35,30 +36,24 @@ export type ButtonData = {
 }
 
 export type ButtonBlockSettings = {
-  settings: {
-    buttons: ButtonData[]
-    includeBlockTitle: boolean
-    alignment: ButtonAlignment
-    layout: ButtonLayout
-    isFullWidth: boolean
-    backgroundColor: string
-    textColor: string
+  buttons: ButtonData[]
+  includeBlockTitle: boolean
+  alignment: ButtonAlignment
+  layout: ButtonLayout
+  isFullWidth: boolean
+  backgroundColor: string
+  titleColor: string
+}
+
+export type ButtonBlockProps = Prettify<TitleData & ButtonBlockSettings>
+
+export type ButtonDisplayProps = Prettify<
+  ButtonBlockSettings & {
+    dataTestId: string
+    onButtonClick?: (buttonId: number) => void
+    focusHandler?: FocusHandler
   }
-}
-
-export type ButtonBlockBase = TitleData & ButtonBlockSettings
-export type ButtonBlockProps = ButtonBlockBase
-export type ButtonBlockViewProps = ButtonBlockBase
-export type ButtonBlockEditPreviewProps = ButtonBlockBase
-export type ButtonBlockEditProps = ButtonBlockBase & {
-  onTitleChange: (newTitle: string) => void
-}
-
-export type ButtonDisplayProps = ButtonBlockSettings & {
-  dataTestId: string
-  onButtonClick?: (buttonId: number) => void
-  focusHandler?: FocusHandler
-}
+>
 
 export type ButtonBlockIndividualButtonSettingsProps = {
   backgroundColor: string
@@ -78,9 +73,9 @@ export type ButtonBlockGeneralButtonSettingsProps = {
 export type ButtonBlockColorSettingsProps = {
   includeBlockTitle: boolean
   backgroundColor: string
-  textColor: string
+  titleColor: string
   onBackgroundColorChange: (color: string) => void
-  onTextColorChange: (color: string) => void
+  onTitleColorChange: (color: string) => void
 }
 
 export type SingleButtonProps = {

@@ -108,6 +108,17 @@ const buildDefaultProps = (overrides: Partial<ComponentProps> = {}): ComponentPr
   ...overrides,
 })
 
+const defaultPermissions = {
+  canAdd: true,
+  canEdit: true,
+  canDelete: true,
+  canView: true,
+  canViewUnpublished: true,
+  canDirectShare: true,
+  readAsAdmin: true,
+  canManageSpeedGrader: true,
+}
+
 const setUp = (
   props: ComponentProps,
   courseId = 'test-course-id',
@@ -179,6 +190,36 @@ describe('ModuleHeaderActionPanel', () => {
   it('does not render ViewAssignTo when hasActiveOverrides is false', () => {
     const {queryByText} = setUp(buildDefaultProps({hasActiveOverrides: false}))
     expect(queryByText('View Assign To')).not.toBeInTheDocument()
+  })
+
+  it('does not render ViewAssignTo when canEdit is false', () => {
+    const {queryByText} = setUp(buildDefaultProps(), 'test-course-id', 15, {
+      permissions: {
+        ...defaultPermissions,
+        canEdit: false,
+      },
+    })
+    expect(queryByText('View Assign To')).not.toBeInTheDocument()
+  })
+
+  it('does not render Add Module Item button when canAdd is false', () => {
+    const {queryByTestId} = setUp(buildDefaultProps(), 'test-course-id', 15, {
+      permissions: {
+        ...defaultPermissions,
+        canAdd: false,
+      },
+    })
+    expect(queryByTestId('add-item-button')).not.toBeInTheDocument()
+  })
+
+  it('does not render the publish button when canEdit is false', () => {
+    const {queryByTestId} = setUp(buildDefaultProps(), 'test-course-id', 15, {
+      permissions: {
+        ...defaultPermissions,
+        canEdit: false,
+      },
+    })
+    expect(queryByTestId('module-publish-button')).not.toBeInTheDocument()
   })
 
   it('does not show Show All button when module is not expanded', () => {

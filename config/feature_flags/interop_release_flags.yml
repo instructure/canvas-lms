@@ -183,6 +183,15 @@ lti_asset_processor:
       state: allowed_on
     ci:
       state: allowed_on
+lti_asset_processor_eap:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: Automatically set up Lti Asset Processor tools in Beta after refresh.
+  description: |-
+    When enabled, the TII beta tool will be automatically installed in a customer's 
+    beta instance on a regular basis, so they don't have to reinstall it after every beta refresh. 
+    This helps customers more easily test Asset Processor in beta.
 lti_asset_processor_discussions:
   state: hidden
   shadow: true

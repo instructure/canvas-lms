@@ -128,7 +128,6 @@ class StatusColorListItem extends React.Component<Props, State> {
                   nonModal={true}
                   hidePrompt={true}
                   withDarkCheck={true}
-                  animate={false}
                   withAnimation={false}
                   withArrow={false}
                   withBorder={false}

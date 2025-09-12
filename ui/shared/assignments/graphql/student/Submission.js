@@ -28,6 +28,7 @@ export const Submission = {
       ...SubmissionInterface
       _id
       id
+      autoGradeResultPresent
     }
     ${SubmissionInterface.fragment}
   `,

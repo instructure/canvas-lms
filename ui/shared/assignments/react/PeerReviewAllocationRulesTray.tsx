@@ -67,15 +67,15 @@ const EmptyState = () => (
 )
 
 const PeerReviewAllocationRulesTray = ({
-  courseId,
   assignmentId,
   isTrayOpen,
   closeTray,
+  canEdit = false,
 }: {
-  courseId: string
   assignmentId: string
   isTrayOpen: boolean
   closeTray: () => void
+  canEdit: boolean
 }): React.ReactElement => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const trayLabel = I18n.t('Allocation Rules')
@@ -84,24 +84,24 @@ const PeerReviewAllocationRulesTray = ({
   const rules: AllocationRuleType[] = [
     {
       id: '1',
-      reviewer: {id: '1', name: 'Student 1'},
-      reviewee: {id: '2', name: 'Student 2'},
+      reviewer: {_id: '1', name: 'Student 1'},
+      reviewee: {_id: '2', name: 'Student 2'},
       mustReview: true,
       reviewPermitted: true,
       appliesToReviewer: true,
     },
     {
       id: '2',
-      reviewer: {id: '3', name: 'Student 3'},
-      reviewee: {id: '2', name: 'Student 2'},
+      reviewer: {_id: '3', name: 'Student 3'},
+      reviewee: {_id: '2', name: 'Student 2'},
       mustReview: true,
       reviewPermitted: false,
       appliesToReviewer: false,
     },
     {
       id: '3',
-      reviewer: {id: '3', name: 'Student with an extremely long name that should wrap properly'},
-      reviewee: {id: '2', name: 'Student with a very long name'},
+      reviewer: {_id: '3', name: 'Student with an extremely long name that should wrap properly'},
+      reviewee: {_id: '2', name: 'Student with a very long name'},
       mustReview: false,
       reviewPermitted: true,
       appliesToReviewer: true,
@@ -137,30 +137,39 @@ const PeerReviewAllocationRulesTray = ({
               {I18n.t('For peer review configuration return to ')}
               <Link
                 isWithinText={false}
-                href={`/courses/${courseId}/assignments/${assignmentId}/edit?scrollTo=assignment_peer_reviews_fields`}
+                href={`/courses/${ENV.COURSE_ID}/assignments/${assignmentId}/edit?scrollTo=assignment_peer_reviews_fields`}
               >
                 {I18n.t('Edit Assignment')}
               </Link>
               .
             </Text>
           </Flex.Item>
-          <Flex.Item as="div" padding="x-small medium">
-            <Button color="primary" onClick={() => setIsCreateModalOpen(true)}>
-              {I18n.t('+ Rule')}
-            </Button>
-          </Flex.Item>
+
+          {canEdit && (
+            <Flex.Item as="div" padding="x-small medium">
+              <Button color="primary" onClick={() => setIsCreateModalOpen(true)}>
+                {I18n.t('+ Rule')}
+              </Button>
+            </Flex.Item>
+          )}
+
           {rules.length === 0 ? (
             <EmptyState />
           ) : (
             rules.map(rule => (
               <Flex.Item as="div" padding="x-small medium" key={rule.id}>
-                <AllocationRuleCard rule={rule} />
+                <AllocationRuleCard rule={rule} canEdit={canEdit} />
               </Flex.Item>
             ))
           )}
         </Flex>
       </Tray>
-      <CreateEditAllocationRuleModal isOpen={isCreateModalOpen} setIsOpen={setIsCreateModalOpen} />
+      <CreateEditAllocationRuleModal
+        isOpen={isCreateModalOpen}
+        setIsOpen={setIsCreateModalOpen}
+        assignmentId={assignmentId}
+        courseId={ENV.COURSE_ID}
+      />
     </View>
   )
 }

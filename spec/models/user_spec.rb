@@ -827,6 +827,22 @@ describe User do
     @assignment = @course.assignments.create title: "Test Assignment", points_possible: 10
   end
 
+  describe "group_submissions association" do
+    it "nullifies real_submitter_id on submissions when the user is permanently destroyed" do
+      create_course_with_student_and_assignment
+      real_submitter = user_model
+
+      submission = @assignment.submissions.find_by!(user: @student)
+      submission.update!(real_submitter:)
+      expect(submission.reload.real_submitter_id).to eq(real_submitter.id)
+
+      real_submitter.destroy_permanently!
+
+      expect(submission.reload.real_submitter_id).to be_nil
+      expect(Submission.exists?(submission.id)).to be true
+    end
+  end
+
   describe "#recent_feedback" do
     let_once(:post_policies_course) { Course.create!(workflow_state: :available) }
     let_once(:auto_posted_assignment) { post_policies_course.assignments.create!(points_possible: 10) }
@@ -2047,6 +2063,251 @@ describe User do
         @user.save!
         expect { @user.clear_avatar_image_url_with_uuid("something") }.not_to raise_error
         expect(@user.avatar_image_url).to be_nil
+      end
+    end
+
+    describe "#allow_avatar_access?" do
+      let(:user) { user_model }
+      let(:attachment) { attachment_model(context: user) }
+
+      it "returns false when avatar_image_source is not attachment or external" do
+        user.avatar_image_source = "gravatar"
+        user.avatar_image_url = "/images/thumbnails/123"
+        expect(user.allow_avatar_access?(attachment)).to be false
+      end
+
+      context "when avatar_image_source is attachment" do
+        before do
+          user.avatar_image_source = "attachment"
+        end
+
+        context "with thumbnail path" do
+          before do
+            user.avatar_image_url = "/images/thumbnails/#{attachment.id}"
+          end
+
+          it "returns true when attachment id matches" do
+            expect(user.allow_avatar_access?(attachment)).to be true
+          end
+
+          it "returns false when attachment id does not match" do
+            other_attachment = attachment_model(context: user)
+            expect(user.allow_avatar_access?(other_attachment)).to be false
+          end
+        end
+
+        context "with download path" do
+          before do
+            user.avatar_image_url = "/files/#{attachment.id}/download"
+          end
+
+          it "returns true when attachment id matches" do
+            expect(user.allow_avatar_access?(attachment)).to be true
+          end
+
+          it "returns true when attachment global id matches" do
+            user.avatar_image_url = "/files/#{attachment.global_id}/download"
+            expect(user.allow_avatar_access?(attachment)).to be true
+          end
+
+          it "returns false when attachment id does not match" do
+            other_attachment = attachment_model(context: user)
+            expect(user.allow_avatar_access?(other_attachment)).to be false
+          end
+        end
+
+        it "returns false with unrecognized path" do
+          user.avatar_image_url = "/some/other/path"
+          expect(user.allow_avatar_access?(attachment)).to be false
+        end
+      end
+
+      context "when avatar_image_source is external" do
+        before do
+          user.avatar_image_source = "external"
+          user.avatar_image_url = "/images/thumbnails/#{attachment.id}"
+        end
+
+        it "returns true when attachment id matches" do
+          expect(user.allow_avatar_access?(attachment)).to be true
+        end
+
+        it "returns true when attachment global id matches" do
+          user.avatar_image_url = "/images/thumbnails/#{attachment.global_id}"
+          expect(user.allow_avatar_access?(attachment)).to be true
+        end
+
+        it "returns false when attachment id does not match" do
+          other_attachment = attachment_model(context: user)
+          expect(user.allow_avatar_access?(other_attachment)).to be false
+        end
+      end
+
+      context "with complex URL containing query parameters" do
+        before do
+          user.avatar_image_source = "attachment"
+          user.avatar_image_url = "/images/thumbnails/#{attachment.id}?v=1&size=large"
+        end
+
+        it "returns true when attachment id matches despite query parameters" do
+          expect(user.allow_avatar_access?(attachment)).to be true
+        end
+      end
+
+      it "returns false when the user does not have permission to access that attachment" do
+        not_me = user_model
+        not_my_attachment = attachment_model(context: not_me)
+        user.avatar_image_source = "attachment"
+        user.avatar_image_url = "/images/thumbnails/#{not_my_attachment.id}"
+        expect(user.allow_avatar_access?(attachment)).to be false
+      end
+    end
+
+    describe "#avatar_location" do
+      let(:user) { user_model }
+      let(:base_url) { "/images/thumbnails/123" }
+
+      context "when user has no associated root accounts with file_association_access feature" do
+        before do
+          allow(user).to receive(:associated_root_accounts).and_return([])
+        end
+
+        it "returns the original image_url unchanged" do
+          expect(user.avatar_location(base_url)).to eq base_url
+        end
+
+        it "preserves query parameters in the original URL" do
+          url_with_params = "#{base_url}?size=large&v=1"
+          expect(user.avatar_location(url_with_params)).to eq url_with_params
+        end
+      end
+
+      context "when user has associated root accounts with file_association_access feature" do
+        let(:root_account) { double("Account", feature_enabled?: true) }
+
+        before do
+          allow(user).to receive(:associated_root_accounts).and_return([root_account])
+        end
+
+        it "returns the original image_url unchanged when avatar_image_source is not attachment or external" do
+          user.avatar_image_source = "gravatar"
+          expect(user.avatar_location(base_url)).to eq base_url
+        end
+
+        context "when avatar_image_source is attachment" do
+          before do
+            user.avatar_image_source = "attachment"
+          end
+
+          context "with thumbnail path" do
+            it "adds location parameter for thumbnail URLs" do
+              result = user.avatar_location(base_url)
+              expect(result).to eq "#{base_url}?location=avatar_#{user.id}"
+            end
+
+            it "appends location parameter to existing query parameters" do
+              url_with_params = "#{base_url}?size=large&v=1"
+              result = user.avatar_location(url_with_params)
+              expect(result).to eq "#{base_url}?size=large&v=1&location=avatar_#{user.id}"
+            end
+          end
+
+          context "with download path" do
+            let(:download_url) { "/files/123/download" }
+
+            it "adds location parameter for download URLs" do
+              result = user.avatar_location(download_url)
+              expect(result).to eq "#{download_url}?location=avatar_#{user.id}"
+            end
+
+            it "appends location parameter to existing query parameters" do
+              url_with_params = "#{download_url}?wrap=1"
+              result = user.avatar_location(url_with_params)
+              expect(result).to eq "#{download_url}?wrap=1&location=avatar_#{user.id}"
+            end
+          end
+
+          context "with unrecognized path" do
+            let(:unknown_url) { "/some/other/path" }
+
+            it "returns the original URL unchanged for unrecognized paths" do
+              result = user.avatar_location(unknown_url)
+              expect(result).to eq unknown_url
+            end
+          end
+        end
+
+        context "when avatar_image_source is external" do
+          before do
+            user.avatar_image_source = "external"
+          end
+
+          it "adds location parameter for thumbnail URLs" do
+            result = user.avatar_location(base_url)
+            expect(result).to eq "#{base_url}?location=avatar_#{user.id}"
+          end
+
+          it "adds location parameter for download URLs" do
+            download_url = "/files/123/download"
+            result = user.avatar_location(download_url)
+            expect(result).to eq "#{download_url}?location=avatar_#{user.id}"
+          end
+        end
+      end
+
+      context "edge cases" do
+        before do
+          user.avatar_image_source = "attachment"
+          root_account = double("Account", feature_enabled?: true)
+          allow(user).to receive(:associated_root_accounts).and_return([root_account])
+        end
+
+        it "handles empty query parameters correctly" do
+          url_with_empty_query = "#{base_url}?"
+          result = user.avatar_location(url_with_empty_query)
+          expect(result).to eq "#{base_url}?location=avatar_#{user.id}"
+        end
+
+        it "handles URLs with fragments" do
+          url_with_fragment = "#{base_url}#section1"
+          result = user.avatar_location(url_with_fragment)
+          expect(result).to eq "#{base_url}?location=avatar_#{user.id}#section1"
+        end
+      end
+    end
+
+    describe "#avatar_attachment" do
+      let(:user) { user_model }
+      let(:attachment) { attachment_model(context: user) }
+
+      before do
+        user.avatar_image_source = "attachment"
+        user.avatar_image_url = "/images/thumbnails/#{attachment.id}"
+      end
+
+      it "returns nil when avatar_image_source is not attachment or external" do
+        user.avatar_image_source = "gravatar"
+        expect(user.avatar_attachment).to be_nil
+      end
+
+      it "returns the attachment when avatar_image_source is 'attachment' and URL matches" do
+        expect(user.avatar_attachment).to eq attachment
+      end
+
+      it "returns the attachment when avatar_image_source is 'external' and URL matches" do
+        user.avatar_image_source = "external"
+        expect(user.avatar_attachment).to eq attachment
+      end
+
+      it "returns nil when the attachment does not exist" do
+        Attachment.find_by(id: 999_999)&.destroy
+        user.avatar_image_url = "/images/thumbnails/999999"
+        expect(user.avatar_attachment).to be_nil
+      end
+
+      it "returns nil if the path does not match a known path" do
+        user.avatar_image_url = "/some/other/path"
+        expect(user.avatar_attachment).to be_nil
       end
     end
   end
@@ -5126,6 +5387,60 @@ describe User do
       it "only includes non-collaborative groups with active memberships" do
         expect(@student1.current_differentiation_tags.pluck(:id)).to contain_exactly(@non_collab_group2.id)
       end
+    end
+  end
+
+  describe "#accessible_courses_by_ids" do
+    it "returns accessible courses for given ids" do
+      user = user_factory
+      enrolled_course = course_with_student(user:, active_all: true).course
+      public_course = course_factory(active_course: true, is_public: true)
+      private_course = course_factory
+
+      accessible_courses = user.accessible_courses_by_ids([enrolled_course.id, public_course.id, private_course.id])
+      expect(accessible_courses).to contain_exactly(enrolled_course, public_course)
+    end
+
+    it "returns empty array for blank input" do
+      user = user_factory
+      expect(user.accessible_courses_by_ids([])).to eq([])
+      expect(user.accessible_courses_by_ids(nil)).to eq([])
+    end
+
+    it "filters out courses user cannot read" do
+      user = user_factory
+      private_course = course_factory
+      expect(user.accessible_courses_by_ids([private_course.id])).to eq([])
+    end
+  end
+
+  describe "#accessible_courses_by_sis_ids" do
+    it "returns accessible courses for given sis ids" do
+      user = user_factory
+      enrolled_course = course_with_student(user:, active_all: true).course
+      enrolled_course.update!(sis_source_id: "enrolled_sis")
+
+      public_course = course_factory(active_course: true, is_public: true)
+      public_course.update!(sis_source_id: "public_sis")
+
+      private_course = course_factory
+      private_course.update!(sis_source_id: "private_sis")
+
+      accessible_courses = user.accessible_courses_by_sis_ids(%w[enrolled_sis public_sis private_sis])
+      expect(accessible_courses).to contain_exactly(enrolled_course, public_course)
+    end
+
+    it "returns empty array for blank input" do
+      user = user_factory
+      expect(user.accessible_courses_by_sis_ids([])).to eq([])
+      expect(user.accessible_courses_by_sis_ids(nil)).to eq([])
+    end
+
+    it "filters out courses user cannot read" do
+      user = user_factory
+      private_course = course_factory
+      private_course.update!(sis_source_id: "private_sis")
+      expect(user.accessible_courses_by_sis_ids(["private_sis"])).to eq([])
     end
   end
 end

@@ -951,29 +951,22 @@ RSpec.describe Lti::RegistrationsController do
     end
 
     let(:other_admin) { account_admin_user(account:) }
-    let(:registration) { developer_key.lti_registration }
+    let(:registration) { lti_registration_with_tool(account:, created_by: admin) }
     let(:developer_key) do
-      lti_developer_key_model(account:).tap do |dk|
-        lti_tool_configuration_model(developer_key: dk, lti_registration: dk.lti_registration)
-      end
+      registration.developer_key
     end
     let(:tool_configuration) { developer_key.tool_configuration }
     let(:admin_nickname) { "New Name" }
     let(:name) { "foo" }
     let(:vendor) { "vendor" }
 
-    it "is successful" do
-      expect(subject).to be_successful
-      expect(registration.reload.admin_nickname).to eq(admin_nickname)
-      expect(registration.description).to eq(params[:description])
-      expect(registration.updated_by).to eq(admin)
-    end
-
     it "updates the registration's attributes" do
       expect(subject).to be_successful
 
       registration.reload
 
+      expect(registration.description).to eq(params[:description])
+      expect(registration.updated_by).to eq(admin)
       expect(registration.admin_nickname).to eq(admin_nickname)
       expect(registration.vendor).to eq(vendor)
       expect(registration.name).to eq(name)
@@ -1026,6 +1019,70 @@ RSpec.describe Lti::RegistrationsController do
     it "doesn't create an unnecessary overlay" do
       expect { subject }.not_to change { Lti::Overlay.count }
       expect(subject).to be_successful
+    end
+
+    context "change-log tracking" do
+      # The update request above changes a TON of stuff and makes the diff
+      # rather large. We'll make targeted changes here instead.
+      let(:new_placement_config) do
+        {
+          placement: "file_index_menu",
+          message_type: "LtiResourceLinkRequest",
+          target_link_uri: "http://lti13testtool.docker/blti_launch",
+          title: "Test Placement",
+          icon_url: "http://lti13testtool.docker/blti_launch",
+          selection_height: 500,
+          selection_width: 500,
+        }
+      end
+      let(:new_internal_configuration) do
+        registration.internal_lti_configuration.dup.tap do |config|
+          config[:oidc_initiation_url] = "http://lti13testtool.docker/blti_launch"
+          config[:placements] << new_placement_config
+        end
+      end
+      let(:params) do
+        {
+          id: registration.id,
+          configuration: new_internal_configuration,
+          admin_nickname: "a neat nickname",
+          vendor: "totally different vendor"
+        }
+      end
+
+      it "tracks the changes" do
+        old_nickname = registration.admin_nickname
+        old_oidc_initiation_url = registration.internal_lti_configuration[:oidc_initiation_url]
+        old_placements = registration.internal_lti_configuration[:placements]
+        expect { subject }.to change { Lti::RegistrationHistoryEntry.count }.by(1)
+        expect(subject).to be_successful
+
+        entry = Lti::RegistrationHistoryEntry.last
+        expect(entry.created_by).to eq(admin)
+        expect(entry.lti_registration).to eq(registration)
+        expect(entry.diff["registration"])
+          .to match_array([
+                            [
+                              "~", ["admin_nickname"], old_nickname, "a neat nickname"
+                            ],
+                            [
+                              "~", ["vendor"], registration.vendor, "totally different vendor"
+                            ]
+                          ])
+        expect(entry.diff["internal_lti_configuration"])
+          .to match_array([
+                            [
+                              "~", ["oidc_initiation_url"], old_oidc_initiation_url, "http://lti13testtool.docker/blti_launch"
+                            ],
+                            [
+                              "+", ["placements", old_placements.length], new_placement_config.with_indifferent_access
+                            ]
+                          ])
+        expect(entry.diff["developer_key"])
+          .to match_array([
+                            ["~", ["oidc_initiation_url"], old_oidc_initiation_url, "http://lti13testtool.docker/blti_launch"]
+                          ])
+      end
     end
 
     context "attempting to update disallowed fields" do

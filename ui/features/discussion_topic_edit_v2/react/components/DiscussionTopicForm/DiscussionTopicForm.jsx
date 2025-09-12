@@ -694,6 +694,7 @@ function DiscussionTopicForm({
       assignedInfoList,
       postToSis,
       showPostToSisFlashAlert('manage-assign-to', false),
+      isCheckpoints,
     )
 
   const continueSubmitForm = (shouldPublish, shouldNotifyUsers = false) => {
@@ -710,7 +711,11 @@ function DiscussionTopicForm({
       // Not validate override dates for announcements or ungraded group discussions
       !(isAnnouncement || (isGroupDiscussion && !isGraded) || ENV?.context_type === 'Group')
     ) {
-      const aDueDateMissing = assignedInfoList.some(assignee => !assignee.dueDate)
+      const aDueDateMissing = isCheckpoints
+        ? assignedInfoList.some(
+            assignee => !assignee.replyToTopicDueDate && !assignee.requiredRepliesDueDate,
+          )
+        : assignedInfoList.some(assignee => !assignee.dueDate)
       const postToSisEnabled = isGraded && postToSis && ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT
 
       const isPacedDiscussion = ENV.IN_PACED_COURSE
@@ -719,8 +724,10 @@ function DiscussionTopicForm({
           'manage-assign-to-container',
         )?.reactComponentInstance
         // Runs custom validation for all cards with the current post to sis selection without re-renders
-        formIsValid =
-          formIsValid && sectionViewRef?.allCardsValidCustom({dueDateRequired: postToSisEnabled})
+        if (!isCheckpoints) {
+          formIsValid =
+            formIsValid && sectionViewRef?.allCardsValidCustom({dueDateRequired: postToSisEnabled})
+        }
       }
 
       // If hasAfterRenderIssue is true, a useEffect hook will be responsible to run the focus logic

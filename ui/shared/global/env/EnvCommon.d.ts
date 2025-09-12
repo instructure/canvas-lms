@@ -286,17 +286,16 @@ export interface EnvCommon {
  * From ApplicationController#JS_ENV_SITE_ADMIN_FEATURES
  */
 export type SiteAdminFeatureId =
+  | 'accessibility_issues_in_full_page'
   | 'account_calendar_events'
   | 'account_level_blackout_dates'
   | 'courses_popout_sisid'
   | 'create_external_apps_side_tray_overrides'
-  | 'create_wiki_page_mastery_path_overrides'
   | 'dashboard_graphql_integration'
   | 'enhanced_course_creation_account_fetching'
   | 'explicit_latex_typesetting'
   | 'files_a11y_rewrite'
   | 'files_a11y_rewrite_toggle'
-  | 'hide_legacy_course_analytics'
   | 'instui_for_import_page'
   | 'instui_header'
   | 'instui_nav'

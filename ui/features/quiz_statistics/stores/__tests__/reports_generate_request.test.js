@@ -61,10 +61,22 @@ describe('quizReports:generate', function () {
               id: '200',
               progress: {
                 workflow_state: 'foobar',
+                url: 'http://localhost/progress/123',
               },
             },
           ],
         })
+      }),
+      // Mock the progress URL that gets polled
+      http.get('http://localhost/progress/*', () => {
+        return HttpResponse.json({
+          workflow_state: 'completed',
+          completion: 100,
+        })
+      }),
+      // Mock any other report fetch requests
+      http.get('http://localhost/reports', () => {
+        return HttpResponse.json({quiz_reports: []})
       }),
     )
 

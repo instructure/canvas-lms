@@ -530,4 +530,194 @@ describe('DiscussionTopicForm', () => {
     const document = setup()
     expect(document.queryByTestId('discussion-topic-message-locked')).toBeTruthy()
   })
+
+  describe('Checkpoints Due Date Validation', () => {
+    const mockOnSubmit = jest.fn()
+
+    const createMockData = postToSis => ({
+      assignmentData: Assignment.mock({
+        pointsPossible: 10,
+        postToSis,
+      }),
+      topicData: null,
+    })
+
+    const setupWithCheckpointsValidation = (dueDateRequired, postToSis, restOptions = {}) => {
+      window.ENV.DISCUSSION_CHECKPOINTS_ENABLED = true
+      window.ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT = dueDateRequired
+
+      const {assignmentData} = createMockData(postToSis)
+      const topicData = DiscussionTopic.mock({
+        assignment: assignmentData,
+        ...restOptions.currentDiscussionTopic,
+      })
+
+      return setup({
+        currentDiscussionTopic: topicData,
+        onSubmit: mockOnSubmit,
+        ...restOptions,
+      })
+    }
+
+    beforeEach(() => {
+      mockOnSubmit.mockClear()
+    })
+
+    describe('When checkpoints and post to SIS are both enabled', () => {
+      it('blocks submission when checkpoint due dates are missing', () => {
+        const {queryByTestId, queryByRole, queryByLabelText} = setupWithCheckpointsValidation(
+          true,
+          true,
+        )
+
+        const titleInput = queryByLabelText('Topic Title')
+        titleInput.value = 'Test Checkpoint Discussion'
+        titleInput.dispatchEvent(new Event('change', {bubbles: true}))
+
+        const checkpointsCheckbox =
+          queryByTestId('checkpoints-checkbox').querySelector('input[type="checkbox"]')
+        checkpointsCheckbox.click()
+
+        const submitButton = queryByRole('button', {name: /save/i})
+        submitButton.click()
+
+        expect(mockOnSubmit).not.toHaveBeenCalled()
+      })
+
+      it('allows submission when both checkpoint due dates are provided', () => {
+        const setupWithoutRequiredDates = () => {
+          window.ENV.DISCUSSION_CHECKPOINTS_ENABLED = true
+          window.ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT = false
+
+          const {assignmentData} = createMockData(true)
+          const topicData = DiscussionTopic.mock({
+            assignment: assignmentData,
+          })
+
+          return setup({
+            currentDiscussionTopic: topicData,
+            onSubmit: mockOnSubmit,
+          })
+        }
+
+        const {queryByTestId, queryByRole, queryByLabelText} = setupWithoutRequiredDates()
+
+        const titleInput = queryByLabelText('Topic Title')
+        titleInput.value = 'Test Checkpoint Discussion'
+        titleInput.dispatchEvent(new Event('change', {bubbles: true}))
+
+        const checkpointsCheckbox =
+          queryByTestId('checkpoints-checkbox').querySelector('input[type="checkbox"]')
+        checkpointsCheckbox.click()
+
+        const submitButton = queryByRole('button', {name: /save/i})
+        submitButton.click()
+
+        expect(mockOnSubmit).toHaveBeenCalled()
+      })
+
+      it('allows submission when checkpoint due dates are properly configured', () => {
+        const {queryByTestId, queryByRole, queryByLabelText} = setupWithCheckpointsValidation(
+          true,
+          false,
+        )
+
+        const titleInput = queryByLabelText('Topic Title')
+        titleInput.value = 'Test Checkpoint Discussion'
+        titleInput.dispatchEvent(new Event('change', {bubbles: true}))
+
+        const checkpointsCheckbox =
+          queryByTestId('checkpoints-checkbox').querySelector('input[type="checkbox"]')
+        checkpointsCheckbox.click()
+
+        const submitButton = queryByRole('button', {name: /save/i})
+        submitButton.click()
+
+        expect(mockOnSubmit).toHaveBeenCalled()
+      })
+    })
+
+    describe('When post to SIS is disabled', () => {
+      it('does not require checkpoint due dates when post to SIS is disabled', async () => {
+        const {queryByTestId, queryByRole, queryByLabelText} = setupWithCheckpointsValidation(
+          true,
+          false,
+        )
+
+        const titleInput = queryByLabelText('Topic Title')
+        titleInput.value = 'Test Checkpoint Discussion'
+        titleInput.dispatchEvent(new Event('change', {bubbles: true}))
+
+        const checkpointsCheckbox =
+          queryByTestId('checkpoints-checkbox').querySelector('input[type="checkbox"]')
+        checkpointsCheckbox.click()
+
+        const submitButton = queryByRole('button', {name: /save/i})
+        submitButton.click()
+
+        expect(mockOnSubmit).toHaveBeenCalled()
+      })
+    })
+
+    describe('When due date requirement is disabled at account level', () => {
+      it('does not require checkpoint due dates when DUE_DATE_REQUIRED_FOR_ACCOUNT is false', () => {
+        const {queryByTestId, queryByRole, queryByLabelText} = setupWithCheckpointsValidation(
+          false,
+          true,
+        )
+
+        const titleInput = queryByLabelText('Topic Title')
+        titleInput.value = 'Test Checkpoint Discussion'
+        titleInput.dispatchEvent(new Event('change', {bubbles: true}))
+
+        const checkpointsCheckbox =
+          queryByTestId('checkpoints-checkbox').querySelector('input[type="checkbox"]')
+        checkpointsCheckbox.click()
+
+        const submitButton = queryByRole('button', {name: /save/i})
+        submitButton.click()
+
+        expect(mockOnSubmit).toHaveBeenCalled()
+      })
+    })
+
+    describe('When checkpoints are disabled', () => {
+      it('uses regular due date validation when checkpoints are disabled', () => {
+        const originalCheckpointsEnabled = window.ENV.DISCUSSION_CHECKPOINTS_ENABLED
+
+        const setupWithDisabledCheckpoints = (dueDateRequired, postToSis) => {
+          window.ENV.DISCUSSION_CHECKPOINTS_ENABLED = false
+          window.ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT = dueDateRequired
+
+          const {assignmentData} = createMockData(postToSis)
+          const topicData = DiscussionTopic.mock({
+            assignment: assignmentData,
+          })
+
+          return setup({
+            currentDiscussionTopic: topicData,
+            onSubmit: mockOnSubmit,
+          })
+        }
+
+        const {queryByTestId, queryByRole, queryByLabelText} = setupWithDisabledCheckpoints(
+          true,
+          true,
+        )
+
+        const titleInput = queryByLabelText('Topic Title')
+        titleInput.value = 'Test Checkpoint Discussion'
+        titleInput.dispatchEvent(new Event('change', {bubbles: true}))
+
+        expect(queryByTestId('checkpoints-checkbox')).not.toBeInTheDocument()
+
+        const submitButton = queryByRole('button', {name: /save/i})
+        submitButton.click()
+
+        expect(mockOnSubmit).not.toHaveBeenCalled()
+
+        window.ENV.DISCUSSION_CHECKPOINTS_ENABLED = originalCheckpointsEnabled
+      })
+    })
+  })
 })

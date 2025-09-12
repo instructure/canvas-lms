@@ -204,6 +204,7 @@ module Importers
             import_syllabus_from_migration(course, syllabus_body, migration) if syllabus_body
           end
 
+          course.saving_user = migration.user
           course.save! if course.changed?
 
           migration.resolve_content_links!

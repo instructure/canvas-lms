@@ -17,9 +17,11 @@
  */
 
 import {IconAddSolid} from '@instructure/ui-icons'
+import {FocusHandler} from '../../../hooks/useFocusElement'
 
 export const AddButton = (props: {
   onClick: () => void
+  focusHandler?: FocusHandler | false
 }) => {
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter' || event.key === ' ') {
@@ -35,6 +37,7 @@ export const AddButton = (props: {
       onClick={props.onClick}
       onKeyDown={handleKeyDown}
       className="image-block-container image-block-add-button"
+      ref={props.focusHandler || undefined}
     >
       <IconAddSolid size="medium" />
     </div>

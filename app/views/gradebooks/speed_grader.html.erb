@@ -540,7 +540,12 @@
         <span><%= before_label(:showing, "Showing") %> <span id="section_currently_showing"><%= t(:all_sections, "All Sections") %></span></span>
       </a>
       <ul>
-        <li><a class="selected" data-section-id="all" href="#"><%= t('links.show_all_sections', "Show All Sections") %></a></li>
+        <li>
+          <div class="sg-sections-menu-item">
+            <input type="checkbox" id="section-menu-box" name="section-menu" value="all" checked style="display:none;">
+            <a class="selected" data-section-id="all" href="#"><%= t('links.show_all_sections', "Show All Sections") %></a>
+          </div>
+        </li>
       </ul>
     </li>
   </ul>

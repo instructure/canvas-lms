@@ -21,6 +21,7 @@ export type SettingsImageProps = {
   caption?: string
   decorativeImage?: boolean
   altTextAsCaption?: boolean
+  disabled?: boolean
   onCaptionChange: (caption: string) => void
   onAltTextChange: (altText: string) => void
   onAltTextAsCaptionChange: (checked: boolean) => void

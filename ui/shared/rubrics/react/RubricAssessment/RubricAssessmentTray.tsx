@@ -39,7 +39,12 @@ export type RubricAssessmentTrayProps = {
   isSelfAssessment?: boolean
   rubric?: Pick<
     Rubric,
-    'title' | 'criteria' | 'ratingOrder' | 'freeFormCriterionComments' | 'pointsPossible'
+    | 'title'
+    | 'criteria'
+    | 'ratingOrder'
+    | 'freeFormCriterionComments'
+    | 'pointsPossible'
+    | 'buttonDisplay'
   >
   rubricAssessmentData: RubricAssessmentData[]
   rubricSavedComments?: Record<string, string[]>
@@ -49,7 +54,6 @@ export type RubricAssessmentTrayProps = {
   onSubmit?: (rubricAssessmentDraftData: RubricAssessmentData[]) => void
 }
 export const RubricAssessmentTray = ({
-  currentUserId,
   hidePoints = false,
   isOpen,
   isLoading = false,
@@ -64,10 +68,12 @@ export const RubricAssessmentTray = ({
   onDismiss,
   onSubmit,
 }: RubricAssessmentTrayProps) => {
-  const [viewMode, setViewMode] = useLocalStorage<ViewMode>(
-    CONSTANTS.RUBRIC_VIEW_MODE_LOCALSTORAGE_KEY(currentUserId),
-    viewModeOverride ?? CONSTANTS.RUBRIC_VIEW_MODE_DEFAULT,
-  )
+  // Temporarily comment out this code for the release
+  // const [viewMode, setViewMode] = useLocalStorage<ViewMode>(
+  //   CONSTANTS.RUBRIC_VIEW_MODE_LOCALSTORAGE_KEY(currentUserId),
+  //   viewModeOverride ?? CONSTANTS.RUBRIC_VIEW_MODE_DEFAULT,
+  // )
+  const [viewMode, setViewMode] = useState<ViewMode>(viewModeOverride ?? 'traditional')
 
   return (
     <Tray
@@ -85,6 +91,7 @@ export const RubricAssessmentTray = ({
       ) : (
         <View as="div" padding="medium medium 0 medium" themeOverride={{paddingMedium: '1rem'}}>
           <RubricAssessmentContainerWrapper
+            buttonDisplay={rubric.buttonDisplay ?? 'level'}
             criteria={rubric.criteria ?? []}
             currentUserId={ENV.current_user_id ?? ''}
             hidePoints={hidePoints}

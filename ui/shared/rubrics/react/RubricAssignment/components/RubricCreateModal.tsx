@@ -29,6 +29,8 @@ import type {SaveRubricResponse} from '../../../../../features/rubrics/queries/R
 const I18n = createI18nScope('rubrics-form')
 
 type RubricCreateModalProps = {
+  assignmentPointsPossible?: number
+  assignmentId?: string
   isOpen: boolean
   rubric?: Rubric
   rubricAssociation?: RubricAssociation
@@ -37,6 +39,8 @@ type RubricCreateModalProps = {
   onSaveRubric: (savedRubricResponse: SaveRubricResponse) => void
 }
 export const RubricCreateModal = ({
+  assignmentId,
+  assignmentPointsPossible,
   isOpen,
   rubric,
   rubricAssociation,
@@ -62,10 +66,11 @@ export const RubricCreateModal = ({
       <Modal.Body>
         <View as="div" width="80%" margin="0 auto">
           <RubricForm
+            assignmentPointsPossible={assignmentPointsPossible}
             rubric={rubric}
             rubricAssociation={rubricAssociation}
             courseId={ENV.COURSE_ID}
-            assignmentId={ENV.ASSIGNMENT_ID?.toString()}
+            assignmentId={assignmentId}
             onCancel={onDismiss}
             onSaveRubric={onSaveRubric}
             canManageRubrics={rubric?.canUpdateRubric ?? ENV.PERMISSIONS?.manage_rubrics ?? false}

@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     canvas_partman (2.0.0)
-      activerecord (>= 6.1, < 8.0)
+      activerecord (>= 6.1, < 8.1)
       activerecord-pg-extensions (~> 0.4)
       pg (>= 0.17, < 2.0)
 

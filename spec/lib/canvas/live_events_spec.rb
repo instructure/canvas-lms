@@ -127,6 +127,23 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe ".scan_youtube_links" do
+    it "includes the neccesary params in payload" do
+      payload = Struct.new(:scan_id, :course_id, :external_context_id).new(
+        "scan_123456",
+        "1",
+        "ext_context_789"
+      )
+      expect_event("scan_youtube_links",
+                   hash_including(
+                     scan_id: "scan_123456",
+                     course_id: "1",
+                     external_context_id: "ext_context_789"
+                   ))
+      Canvas::LiveEvents.scan_youtube_links(payload)
+    end
+  end
+
   describe ".conversation_created" do
     it "triggers a conversation live event with conversation details" do
       user1 = user_model
@@ -1480,7 +1497,6 @@ describe Canvas::LiveEvents do
 
     describe "resource map property" do
       before do
-        allow(migration).to receive(:asset_map_v2?).and_return(true)
         allow(source_course).to receive(:has_new_quizzes?).and_return(false)
       end
 

@@ -3316,6 +3316,21 @@ describe UsersController do
         expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:RESTRICT_TO_MCC_ACCOUNT]).to be_falsey
       end
     end
+
+    context "with widget_dashboard feature enabled" do
+      before do
+        Account.default.enable_feature!(:widget_dashboard)
+      end
+
+      it "includes each course once even for multiple enrollments" do
+        course_with_student_logged_in(active_all: true)
+        @section = @course.course_sections.create! name: "section 2"
+        multiple_student_enrollment(@user, @section)
+        @current_user = @user
+        get "user_dashboard"
+        expect(assigns[:js_env][:SHARED_COURSE_DATA].length).to eq 1
+      end
+    end
   end
 
   describe "#dashboard_stream_items" do

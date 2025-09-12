@@ -29,6 +29,7 @@ export const AddButton = (props: {
     <IconButton
       data-testid="add-block-button"
       data-addbutton
+      data-action-button
       shape="circle"
       color="primary"
       screenReaderLabel={I18n.t('Add a block')}

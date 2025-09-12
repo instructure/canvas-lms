@@ -1,0 +1,232 @@
+# frozen_string_literal: true
+
+#
+# Copyright (C) 2025 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
+describe Accessibility::Issue::HtmlFixer do
+  let(:course) { course_model }
+
+  describe "#apply_fix!" do
+    let(:wiki_page) { wiki_page_model(course:, title: "Test Page", body: "<div><h1>Page Title</h1></div>") }
+
+    context "when resource type is invalid" do
+      let(:html_fixer) do
+        described_class.new(
+          Accessibility::Rules::HeadingsStartAtH2Rule.id,
+          "invalid_resource",
+          "./div/h1",
+          "Change it to Heading 2"
+        )
+      end
+
+      it "raises an error" do
+        expect do
+          html_fixer.apply_fix!
+        end.to raise_error(ArgumentError, "Unsupported resource type: String")
+      end
+    end
+
+    context "when fix fails" do
+      let(:html_fixer) do
+        described_class.new(
+          Accessibility::Rules::HeadingsStartAtH2Rule.id,
+          wiki_page,
+          "invalid_path",
+          "Change it to Heading 2"
+        )
+      end
+
+      it "returns an error" do
+        result = html_fixer.apply_fix!
+
+        expect(result).to eq(
+          {
+            status: :bad_request,
+            json: {
+              error: "Element not found for path: invalid_path"
+            },
+          }
+        )
+      end
+    end
+
+    context "when fix succeeds" do
+      let(:html_fixer) do
+        described_class.new(
+          Accessibility::Rules::HeadingsStartAtH2Rule.id,
+          wiki_page,
+          "./div/h1",
+          "Change it to Heading 2"
+        )
+      end
+
+      it "updates the resource successfully" do
+        html_fixer.apply_fix!
+
+        expect(wiki_page.reload.body).to eq "<div><h2>Page Title</h2></div>"
+      end
+
+      it "returns the full document with the fix applied" do
+        result = html_fixer.apply_fix!
+
+        expect(result).to eq(
+          {
+            status: :ok,
+            json: {
+              success: true
+            },
+          }
+        )
+      end
+    end
+  end
+
+  describe "#preview_fix" do
+    context "with a wiki page" do
+      let(:wiki_page) { wiki_page_model(course:, title: "Test Page", body: "<div><h1>Page Title</h1></div>") }
+
+      context "with element_only: false (full document)" do
+        context "when fix fails" do
+          let(:html_fixer) do
+            described_class.new(
+              Accessibility::Rules::HeadingsStartAtH2Rule.id,
+              wiki_page,
+              "invalid_path",
+              "Change it to Heading 2"
+            )
+          end
+
+          it "returns an error" do
+            result = html_fixer.preview_fix(element_only: false)
+
+            expect(result).to eq(
+              {
+                status: :bad_request,
+                json: {
+                  error: "Element not found for path: invalid_path"
+                },
+              }
+            )
+          end
+        end
+
+        context "when fix succeeds" do
+          let(:html_fixer) do
+            described_class.new(
+              Accessibility::Rules::HeadingsStartAtH2Rule.id,
+              wiki_page,
+              "./div/h1",
+              "Change it to Heading 2"
+            )
+          end
+
+          it "returns the full document with the fix applied" do
+            result = html_fixer.preview_fix(element_only: false)
+
+            expect(result).to eq(
+              {
+                status: :ok,
+                json: {
+                  content: "<div><h2>Page Title</h2></div>",
+                  path: "./div/h2"
+                },
+              }
+            )
+          end
+        end
+      end
+
+      context "with element_only: true (element only)" do
+        context "when fix fails" do
+          let(:html_fixer) do
+            described_class.new(
+              Accessibility::Rules::HeadingsStartAtH2Rule.id,
+              wiki_page,
+              "invalid_path",
+              "Change it to Heading 2"
+            )
+          end
+
+          it "returns an error" do
+            result = html_fixer.preview_fix(element_only: true)
+
+            expect(result).to eq(
+              {
+                status: :bad_request,
+                json: {
+                  error: "Element not found for path: invalid_path"
+                },
+              }
+            )
+          end
+        end
+
+        context "when fix succeeds" do
+          let(:html_fixer) do
+            described_class.new(
+              Accessibility::Rules::HeadingsStartAtH2Rule.id,
+              wiki_page,
+              "./div/h1",
+              "Change it to Heading 2"
+            )
+          end
+
+          it "returns only the fixed element" do
+            result = html_fixer.preview_fix(element_only: true)
+
+            expect(result).to eq(
+              {
+                status: :ok,
+                json: {
+                  content: "<h2>Page Title</h2>",
+                  path: "./div/h2"
+                },
+              }
+            )
+          end
+        end
+      end
+    end
+
+    context "with an assignment" do
+      let(:assignment) { assignment_model(course:, description: "<div><h1>Assignment Title</h1></div>") }
+
+      let(:html_fixer) do
+        described_class.new(
+          Accessibility::Rules::HeadingsStartAtH2Rule.id,
+          assignment,
+          "./div/h1",
+          "Change it to Heading 2"
+        )
+      end
+
+      it "works with assignment descriptions" do
+        result = html_fixer.preview_fix
+
+        expect(result).to eq(
+          {
+            status: :ok,
+            json: {
+              content: "<div><h2>Assignment Title</h2></div>",
+              path: "./div/h2"
+            },
+          }
+        )
+      end
+    end
+  end
+end

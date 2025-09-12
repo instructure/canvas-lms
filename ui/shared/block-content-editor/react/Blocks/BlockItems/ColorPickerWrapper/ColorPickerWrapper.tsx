@@ -16,17 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ColorPicker} from '@instructure/ui-color-picker'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {ColorPicker} from '@instructure/ui-color-picker'
+import {ColorPickerPopover} from './ColorPickerPopover'
 
 const I18n = createI18nScope('block_content_editor')
 
-type ColorPickerWrapperProps = {
+export type ColorPickerWrapperProps = {
   label: string
   value: string
   baseColor: string
   onChange: (value: string) => void
   baseColorLabel: string
+  popoverButtonScreenReaderLabel: string
 }
 
 export const ColorPickerWrapper = ({
@@ -35,46 +37,32 @@ export const ColorPickerWrapper = ({
   baseColor,
   baseColorLabel,
   onChange,
+  popoverButtonScreenReaderLabel,
 }: ColorPickerWrapperProps) => {
   return (
     <ColorPicker
       label={label}
       placeholderText={I18n.t('Enter HEX')}
+      popoverButtonScreenReaderLabel={popoverButtonScreenReaderLabel}
+      popoverScreenReaderLabel={I18n.t('Color picker popover')}
       value={value}
       onChange={onChange}
       withAlpha
-      popoverMaxHeight="50vh"
-      colorMixerSettings={{
-        popoverAddButtonLabel: I18n.t('Apply'),
-        popoverCloseButtonLabel: I18n.t('Close'),
-        colorContrast: {
-          firstColor: baseColor,
-          label: I18n.t('Contrast Ratio'),
-          successLabel: I18n.t('PASS'),
-          failureLabel: I18n.t('FAIL'),
-          normalTextLabel: I18n.t('Normal text'),
-          largeTextLabel: I18n.t('Large text'),
-          graphicsTextLabel: I18n.t('Graphics text'),
-          firstColorLabel: baseColorLabel,
-          secondColorLabel: label,
-        },
-        colorMixer: {
-          withAlpha: true,
-          rgbRedInputScreenReaderLabel: I18n.t('Input field for red'),
-          rgbGreenInputScreenReaderLabel: I18n.t('Input field for green'),
-          rgbBlueInputScreenReaderLabel: I18n.t('Input field for blue'),
-          rgbAlphaInputScreenReaderLabel: I18n.t('Input field for alpha'),
-          colorSliderNavigationExplanationScreenReaderLabel: I18n.t(
-            `You are on a color slider. To navigate the slider left or right, use the 'A' and 'D' buttons respectively`,
-          ),
-          alphaSliderNavigationExplanationScreenReaderLabel: I18n.t(
-            `You are on an alpha slider. To navigate the slider left or right, use the 'A' and 'D' buttons respectively`,
-          ),
-          colorPaletteNavigationExplanationScreenReaderLabel: I18n.t(
-            `You are on a color palette. To navigate on the palette up, left, down or right, use the 'W', 'A', 'S' and 'D' buttons respectively`,
-          ),
-        },
+    >
+      {(value, onChange, onAdd, onClose) => {
+        return (
+          <ColorPickerPopover
+            value={value}
+            valueLabel={label}
+            onChange={onChange}
+            onAdd={onAdd}
+            onClose={onClose}
+            baseColor={baseColor}
+            baseColorLabel={baseColorLabel}
+            maxHeight="40vh"
+          />
+        )
       }}
-    />
+    </ColorPicker>
   )
 }

@@ -31,12 +31,20 @@ describe Thumbnail do
 
     before { allow(HostUrl).to receive(:context_host).with(context).and_return("http://host") }
 
-    it "when file_association_access feature is enabled returns the path without uuid" do
-      root_account.enable_feature!(:file_association_access)
-      expect(thumbnail.local_storage_path).to eq("http://host/images/thumbnails/show/#{thumbnail.id}")
+    context "when the file_association_access feature is enabled" do
+      before { root_account.enable_feature!(:file_association_access) }
+
+      it "returns the path without uuid" do
+        expect(thumbnail.local_storage_path).to eq("http://host/images/thumbnails/show/#{thumbnail.id}")
+      end
+
+      it "returns the path without uuid and with location when location is passed" do
+        url = thumbnail.local_storage_path(location: "avatar_1")
+        expect(url).to eq("http://host/images/thumbnails/show/#{thumbnail.id}?location=avatar_1")
+      end
     end
 
-    it "when file_association_access feature is disabled returns the path with uuid" do
+    it "returns the path with uuid when file_association_access feature is disabled" do
       root_account.disable_feature!(:file_association_access)
       expect(thumbnail.local_storage_path).to eq("http://host/images/thumbnails/show/#{thumbnail.id}/#{thumbnail.uuid}")
     end

@@ -19,8 +19,17 @@
 import React from 'react'
 import {fireEvent, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {TraditionalView} from '../TraditionalView'
 import type {RubricCriterion, RubricAssessmentData} from '../../types/rubric'
+
+// Mock AiUsageButton component
+jest.mock('../../components/AiUsageButton', () => {
+  return {
+    __esModule: true,
+    default: () => <button data-testid="ai-usage-button">AI Assisted</button>,
+  }
+})
 
 const defaultCriteria: RubricCriterion[] = [
   {
@@ -110,33 +119,41 @@ describe('TraditionalView', () => {
     onUpdateAssessmentData: jest.fn(),
   }
 
+  const renderTraditionalView = (props = {}) => {
+    return render(
+      <MockedQueryProvider>
+        <TraditionalView {...defaultProps} {...props} />
+      </MockedQueryProvider>,
+    )
+  }
+
   beforeEach(() => {
     jest.clearAllMocks()
   })
 
   it('renders the rubric title', () => {
-    render(<TraditionalView {...defaultProps} />)
+    renderTraditionalView()
     expect(screen.getAllByText('Test Rubric')).toHaveLength(2)
   })
 
   it('renders without points when hidePoints is true', () => {
-    render(<TraditionalView {...defaultProps} hidePoints={true} />)
+    renderTraditionalView({hidePoints: true})
     expect(screen.queryByText('5 pts')).not.toBeInTheDocument()
   })
 
   it('renders in preview mode correctly', () => {
-    render(<TraditionalView {...defaultProps} isPreviewMode={true} />)
+    renderTraditionalView({isPreviewMode: true})
     const view = screen.getByTestId('rubric-assessment-traditional-view')
     expect(view).toHaveAttribute('data-testid', 'rubric-assessment-traditional-view')
   })
 
   it('displays criterion descriptions', () => {
-    render(<TraditionalView {...defaultProps} />)
+    renderTraditionalView()
     expect(screen.getByText('First Criterion')).toBeInTheDocument()
   })
 
   it('displays rating descriptions', () => {
-    render(<TraditionalView {...defaultProps} />)
+    renderTraditionalView()
     expect(screen.getByText('Full Marks')).toBeInTheDocument()
     expect(screen.getByText('Partial Marks')).toBeInTheDocument()
   })
@@ -144,7 +161,7 @@ describe('TraditionalView', () => {
   it('handles assessment data updates', async () => {
     const user = userEvent.setup()
 
-    render(<TraditionalView {...defaultProps} isFreeFormCriterionComments={true} />)
+    renderTraditionalView({isFreeFormCriterionComments: true})
 
     const commentInput = screen.getByTestId('free-form-comment-area-criterion_1')
     await user.type(commentInput, 'Test comment')
@@ -159,7 +176,7 @@ describe('TraditionalView', () => {
   })
 
   it(`comment blur does not clear rating for criterion where ratings' points are different`, async () => {
-    render(<TraditionalView {...defaultProps} />)
+    renderTraditionalView()
 
     const commentInput = screen.getByTestId('comment-text-area-criterion_1')
     fireEvent.blur(commentInput)
@@ -172,7 +189,7 @@ describe('TraditionalView', () => {
   })
 
   it(`comment blur does not clear rating for criterion where ratings' points are equal`, async () => {
-    render(<TraditionalView {...defaultProps} />)
+    renderTraditionalView()
 
     const commentInput = screen.getByTestId('comment-text-area-criterion_2')
     fireEvent.blur(commentInput)
@@ -182,5 +199,22 @@ describe('TraditionalView', () => {
       ratingId: defaultAssessmentData[1].id,
     })
     expect(defaultProps.onUpdateAssessmentData).toHaveBeenCalledTimes(1)
+  })
+
+  describe('AiUsageButton rendering', () => {
+    it('renders AiUsageButton when isAiEvaluated is true', () => {
+      renderTraditionalView({isAiEvaluated: true})
+      expect(screen.getByTestId('ai-usage-button')).toBeInTheDocument()
+    })
+
+    it('does not render AiUsageButton when isAiEvaluated is false', () => {
+      renderTraditionalView({isAiEvaluated: false})
+      expect(screen.queryByTestId('ai-usage-button')).not.toBeInTheDocument()
+    })
+
+    it('does not render AiUsageButton when isAiEvaluated is not provided', () => {
+      renderTraditionalView()
+      expect(screen.queryByTestId('ai-usage-button')).not.toBeInTheDocument()
+    })
   })
 })

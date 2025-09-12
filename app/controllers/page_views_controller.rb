@@ -255,4 +255,78 @@ class PageViewsController < ApplicationController
     render json: { ok: true }
     # page view update happens in log_page_view after_action
   end
+
+  def query
+    @user = api_find(User, params[:user_id])
+    return unless authorized_action(@user, @current_user, :view_statistics)
+
+    query_id = pv5_enqueue_service.call(
+      params[:start_date],
+      params[:end_date],
+      @user,
+      params[:results_format]
+    )
+    poll_url = api_v1_page_views_poll_query_status_path(query_id:)
+    render json: { poll_url: }, status: :created
+  rescue ArgumentError => e
+    Canvas::Errors.capture_exception(:pv5, e, :warn)
+    render json: { error: t("Page Views received an invalid or malformed request.") }, status: :bad_request
+  end
+
+  def poll_query
+    validate_query_id!
+    result = pv5_poll_service.call(params[:query_id])
+    results_url = api_v1_page_views_get_query_results_path(params[:user_id], params[:query_id]) if result.status == :finished
+    render json: { query_id: params[:query_id], status: result.status, format: result.format, results_url: }
+  rescue PageViews::Common::NotFoundError => e
+    Canvas::Errors.capture_exception(:pv5, e, :warn)
+    render json: { error: t("The query was not found.") }, status: :not_found
+  rescue PageViews::Common::InvalidRequestError, ArgumentError => e
+    Canvas::Errors.capture_exception(:pv5, e, :warn)
+    render json: { error: e.message }, status: :bad_request
+  end
+
+  def query_results
+    validate_query_id!
+    result = pv5_fetch_result_service.call(params[:query_id])
+    response.set_header("Content-Encoding", "gzip") if result.compressed?
+    send_data(
+      result.content,
+      filename: result.filename,
+      type: PageViews::Common::CONTENT_TYPE_MAPPINGS.key(result.format),
+      disposition: "attachment"
+    )
+  rescue PageViews::Common::InvalidResultError => e
+    Canvas::Errors.capture_exception(:pv5, e, :warn)
+    render json: { error: e.message }, status: :bad_request
+  rescue PageViews::Common::NotFoundError => e
+    Canvas::Errors.capture_exception(:pv5, e, :warn)
+    render json: { error: t("The result for query was not found.") }, status: :not_found
+  rescue => e
+    Canvas::Errors.capture_exception(:pv5, e, :warn)
+    render json: { error: t("An unexpected error occurred.") }, status: :internal_server_error
+  end
+
+  private
+
+  def pv5_enqueue_service
+    PageViews::EnqueueQueryService.new(PageViews::Configuration.new)
+  end
+
+  def pv5_poll_service
+    PageViews::PollQueryService.new(PageViews::Configuration.new)
+  end
+
+  def pv5_fetch_result_service
+    PageViews::FetchResultService.new(PageViews::Configuration.new)
+  end
+
+  def validate_query_id!
+    query_id = params[:query_id]
+    raise ArgumentError, "Invalid query ID" unless uuid?(query_id)
+  end
+
+  def uuid?(string)
+    !!(string =~ /\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\Z/)
+  end
 end

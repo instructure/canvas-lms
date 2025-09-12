@@ -27,12 +27,11 @@ describe "Block Content Editor", :ignore_js_errors do
     course_with_teacher_logged_in
     @course.account.enable_feature!(:block_content_editor)
     @context = @course
+    create_wiki_page_with_block_content_editor(@course)
   end
 
   context "Create a new page" do
     it "displays Block Content Editor" do
-      create_wiki_page_with_block_content_editor(@course)
-
       expect(bce_container).to be_displayed
       expect(editor_area).to be_displayed
       expect(toolbar_area).to be_displayed
@@ -40,10 +39,6 @@ describe "Block Content Editor", :ignore_js_errors do
   end
 
   context "Add a block" do
-    before do
-      create_wiki_page_with_block_content_editor(@course)
-    end
-
     it "displays the add block modal" do
       add_block_button.click
       wait_for_ajaximations
@@ -74,7 +69,6 @@ describe "Block Content Editor", :ignore_js_errors do
 
   context "Block menu options" do
     before do
-      create_wiki_page_with_block_content_editor(@course)
       add_a_block("Image", "Image + text")
     end
 
@@ -89,20 +83,19 @@ describe "Block Content Editor", :ignore_js_errors do
       first_block.remove_button.click
       wait_for_ajaximations
 
-      expect(element_exists?(block_selector)).to be false
+      expect(blocks.size).to eq(0)
     end
 
     it "opens settings tray" do
-      first_block.edit_button.click
+      first_block.settings_button.click
       wait_for_ajaximations
 
       expect(settings_tray).to be_displayed
     end
   end
 
-  context "Moving blocks" do
+  context "Move blocks" do
     before do
-      create_wiki_page_with_block_content_editor(@course)
       add_a_block("Interactive element", "Button")
       add_a_block("Divider", "Separator line")
     end
@@ -126,5 +119,81 @@ describe "Block Content Editor", :ignore_js_errors do
     include_examples "block movement", :first_block, :down, [:last_block, :first_block]
     include_examples "block movement", :last_block, :to_top, [:last_block, :first_block]
     include_examples "block movement", :first_block, :to_bottom, [:last_block, :first_block]
+  end
+
+  context "Undo/Redo" do
+    it "has undo/redo buttons disabled initially" do
+      expect(toolbar_component.undo_button).to be_disabled
+      expect(toolbar_component.redo_button).to be_disabled
+    end
+
+    it "handles undo operation correctly" do
+      add_a_block("Text", "Text column")
+      expect(blocks.size).to eq(1)
+      expect(toolbar_component.undo_button).to be_enabled
+
+      toolbar_component.undo_button.click
+      wait_for_ajaximations
+      expect(blocks.size).to eq(0)
+      expect(toolbar_component.undo_button).to be_disabled
+    end
+
+    it "handles redo operation correctly" do
+      add_a_block("Text", "Text column")
+      expect(blocks.size).to eq(1)
+      expect(toolbar_component.redo_button).to be_disabled
+
+      toolbar_component.undo_button.click
+      wait_for_ajaximations
+      expect(blocks.size).to eq(0)
+      expect(toolbar_component.redo_button).to be_enabled
+
+      toolbar_component.redo_button.click
+      wait_for_ajaximations
+      expect(blocks.size).to eq(1)
+      expect(toolbar_component.redo_button).to be_disabled
+    end
+
+    it "has redo button disabled after a new action" do
+      add_a_block("Text", "Text column")
+
+      toolbar_component.undo_button.click
+      wait_for_ajaximations
+      expect(blocks.size).to eq(0)
+      expect(toolbar_component.redo_button).to be_enabled
+
+      add_a_block("Image", "Image + text")
+      expect(toolbar_component.redo_button).to be_disabled
+    end
+
+    it "maintains a history chain" do
+      add_a_block("Text", "Text column")
+      add_a_block("Image", "Image + text")
+      expect(blocks.size).to eq(2)
+      expect(first_block.block_type_label.text).to include("Text column")
+      expect(last_block.block_type_label.text).to include("Image + text")
+
+      toolbar_component.undo_button.click
+      wait_for_ajaximations
+      expect(blocks.size).to eq(1)
+      expect(first_block.block_type_label.text).to include("Text column")
+
+      toolbar_component.undo_button.click
+      wait_for_ajaximations
+      expect(blocks.size).to eq(0)
+      expect(toolbar_component.undo_button).to be_disabled
+
+      toolbar_component.redo_button.click
+      wait_for_ajaximations
+      expect(blocks.size).to eq(1)
+      expect(first_block.block_type_label.text).to include("Text column")
+
+      toolbar_component.redo_button.click
+      wait_for_ajaximations
+      expect(blocks.size).to eq(2)
+      expect(first_block.block_type_label.text).to include("Text column")
+      expect(last_block.block_type_label.text).to include("Image + text")
+      expect(toolbar_component.redo_button).to be_disabled
+    end
   end
 end

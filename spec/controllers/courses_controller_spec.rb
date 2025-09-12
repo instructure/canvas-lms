@@ -281,12 +281,13 @@ describe CoursesController do
 
       context "on accessibility column" do
         before do
-          skip("Flaky spec needs fixed in LMA-226") unless @course1.root_account.enable_content_a11y_checker?
+          account = Account.default
+          account.settings[:enable_content_a11y_checker] = true
+          account.save!
 
-          # For accessibility column
-          wiki_page = wiki_page_model(course: @course1)
-          scan = AccessibilityResourceScan.for_context(wiki_page).first_or_initialize
-          scan.assign_attributes(
+          wiki_page = wiki_page_model(course: @course1, title: "Wiki Page", body: "<div><h1>Document Title</h1></div>")
+          scan = AccessibilityResourceScan.for_context(wiki_page).first
+          scan.update!(
             course: @course1,
             workflow_state: "completed",
             resource_name: wiki_page.title,
@@ -294,19 +295,24 @@ describe CoursesController do
             resource_updated_at: wiki_page.updated_at,
             issue_count: 1
           )
-          scan.save!
+          accessibility_issue_model(
+            course: @course1,
+            accessibility_resource_scan: scan,
+            rule_type: Accessibility::Rules::HeadingsStartAtH2Rule.id,
+            node_path: "./div/h1"
+          )
         end
 
-        it "lists courses with accessibility issues first" do
+        it "lists courses with less accessibility issues first" do
           user_session(@student)
           get_index(index_params: { sort_column => "accessibility" })
-          expect(assigns["#{type}_enrollments"].map(&:course_id)).to eq [@course1.id, @course2.id]
+          expect(assigns["#{type}_enrollments"].map(&:course_id)).to eq [@course2.id, @course1.id]
         end
 
-        it "lists courses with accessibility issues last when descending order" do
+        it "lists courses with less accessibility issues last when descending order" do
           user_session(@student)
           get_index(index_params: { sort_column => "accessibility", order_column => "desc" })
-          expect(assigns["#{type}_enrollments"].map(&:course_id)).to eq [@course2.id, @course1.id]
+          expect(assigns["#{type}_enrollments"].map(&:course_id)).to eq [@course1.id, @course2.id]
         end
       end
     end
@@ -1889,6 +1895,27 @@ describe CoursesController do
         get "show", params: { id: @course.id }
         expect(response).to be_successful
         expect(assigns[:pending_enrollment]).to eq @enrollment
+      end
+
+      it "doesn't sticky `workflow_state` when changing from `created` to `claimed`" do
+        @course.update workflow_state: "created", stuck_sis_fields: []
+        user_session(@teacher)
+        get "show", params: { id: @course.id }
+        expect(response).to be_successful
+        @course.reload
+        expect(@course.workflow_state).to eq "claimed"
+        expect(@course.stuck_sis_fields).to be_empty
+      end
+
+      it "accepts all section invites on opening the course page" do
+        Account.default.settings[:allow_invitation_previews] = false
+        Account.default.save!
+
+        second_section = @course.course_sections.create!
+        course_with_student course: @course, section: second_section, user: @student, allow_multiple_enrollments: true
+        user_session(@student)
+
+        expect { get "show", params: { id: @course.id } }.to change { @student.enrollments.invited.count }.from(2).to(0)
       end
     end
 
@@ -5726,6 +5753,99 @@ describe CoursesController do
           get "show", params: file_params(@aa_test_data.attachment2), format: "json"
           expect(response).to have_http_status(:unauthorized)
         end
+      end
+    end
+  end
+
+  describe "request metrics tracking for users action" do
+    before do
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+      user_session(@teacher)
+      allow(InstStatsd::Statsd).to receive(:timing)
+    end
+
+    # Helper methods for consistent test setup
+    def set_gradebook_headers(correlation_id: "test-correlation-id")
+      request.env["HTTP_REFERER"] = "https://example.com/gradebook"
+      request.env["HTTP_CORRELATION_ID"] = correlation_id
+    end
+
+    def set_non_gradebook_headers(correlation_id: "test-correlation-id")
+      request.env["HTTP_REFERER"] = "https://example.com/other-page"
+      request.env["HTTP_CORRELATION_ID"] = correlation_id
+    end
+
+    def make_request
+      get :users, params: { course_id: @course.id }, format: :json
+    end
+
+    def expect_metrics_sent_with(expected_tags = {})
+      expect(InstStatsd::Statsd).to have_received(:timing).with(
+        "canvas.controller.request_time",
+        be_a(Float),
+        tags: {
+          controller: "courses",
+          action: "users",
+          method: "get",
+          referer: "/gradebook",
+          domain: be_a(String),
+          correlation_id: "test-correlation-id"
+        }.merge(expected_tags)
+      )
+    end
+
+    def expect_no_metrics_sent
+      expect(InstStatsd::Statsd).not_to have_received(:timing).with("canvas.controller.request_time", any_args)
+    end
+
+    context "when tracking conditions are met" do
+      it "sends success metrics with gradebook referer and correlation_id" do
+        set_gradebook_headers
+
+        make_request
+
+        expect_metrics_sent_with(status: "success")
+      end
+    end
+
+    context "when tracking conditions are not met" do
+      it "does not send metrics without gradebook referer" do
+        set_non_gradebook_headers
+
+        make_request
+
+        expect_no_metrics_sent
+      end
+
+      it "does not send metrics without correlation_id" do
+        request.env["HTTP_REFERER"] = "https://example.com/gradebook"
+
+        make_request
+
+        expect_no_metrics_sent
+      end
+    end
+
+    context "when request fails with exception" do
+      it "sends error metrics for Ruby exceptions" do
+        set_gradebook_headers
+        # Mock the users action itself to raise an exception
+        allow(@controller).to receive(:users) do
+          raise StandardError, "test error"
+        end
+
+        # The exception may be rescued by Rails, so we don't expect it to propagate
+        begin
+          make_request
+        rescue
+          # Exception may or may not propagate depending on Rails rescue handling
+        end
+
+        expect_metrics_sent_with(
+          status: "error",
+          error_type: "StandardError"
+        )
       end
     end
   end

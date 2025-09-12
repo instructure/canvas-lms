@@ -318,6 +318,10 @@ module Modules2IndexPage
     "#{pagination_container_selector} button"
   end
 
+  def pagination_page_current_page_button_selector
+    "#{pagination_container_selector} button[aria-current='page']"
+  end
+
   def send_to_modal_input_selector
     "#content-share-user-search"
   end
@@ -344,6 +348,10 @@ module Modules2IndexPage
 
   def context_module_item_selector(module_item_id)
     "#context_module_item_#{module_item_id}"
+  end
+
+  def bulk_publish_button_selector
+    "[data-testid='context-modules-publish-menu']"
   end
 
   def context_module_item_published_icon_selector(module_item_id)
@@ -755,6 +763,10 @@ module Modules2IndexPage
     ff(pagination_page_buttons_selector)
   end
 
+  def pagination_page_current_page_button
+    f(pagination_page_current_page_button_selector)
+  end
+
   def send_to_form_selected_elements
     ff("button[type='button']", send_to_modal_input_container)
   end
@@ -936,6 +948,10 @@ module Modules2IndexPage
 
   def add_item_button(module_id)
     fj("button:contains('Add Item')", context_module_selector(module_id))
+  end
+
+  def add_item_button_selector
+    "[data-testid='add-item-button']"
   end
 
   def new_item_type_select_selector

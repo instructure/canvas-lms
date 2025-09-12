@@ -134,7 +134,7 @@ export const DiscussionTranslationModuleContainer = ({isAnnouncement}) => {
         </label>
       </View>
       <Flex direction="row" alignItems="start" gap="small" wrap="wrap">
-        <Flex.Item>
+        <Flex.Item maxWidth="360px" shouldGrow>
           <TranslationControls
             ref={translationControlsRef}
             isLanguageNotSelectedError={isLanguageNotSelectedError}
@@ -152,6 +152,7 @@ export const DiscussionTranslationModuleContainer = ({isAnnouncement}) => {
             disabled={entryTranslatingSet.size > 0}
             margin="0 small 0 0"
             color="ai-primary"
+            aria-label={I18n.t('Ignite AI Translate')}
             renderIcon={IconAiSolid}
             data-testid="translate-discussion-button"
           >

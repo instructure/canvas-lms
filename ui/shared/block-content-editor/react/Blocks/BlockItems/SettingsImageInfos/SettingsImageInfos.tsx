@@ -34,6 +34,7 @@ export const SettingsImageInfos = ({
   caption,
   decorativeImage,
   altTextAsCaption,
+  disabled = false,
   onCaptionChange,
   onAltTextChange,
   onAltTextAsCaptionChange,
@@ -41,13 +42,11 @@ export const SettingsImageInfos = ({
 }: SettingsImageProps) => {
   const handleAltTextChange = (e: ChangeEvent<HTMLInputElement>) => {
     onAltTextChange(e.target.value)
-    if (altTextAsCaption) {
-      onCaptionChange(e.target.value)
-    }
   }
 
   const handleDecorativeImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     onDecorativeImageChange(e.target.checked)
+    onAltTextAsCaptionChange(false)
   }
 
   const handleCaptionChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -83,13 +82,14 @@ export const SettingsImageInfos = ({
           value={altText}
           onChange={handleAltTextChange}
           placeholder={I18n.t('Start typing...')}
-          disabled={decorativeImage}
+          disabled={disabled || decorativeImage}
         />
 
         <View as="div" margin="small 0 0 0">
           <Checkbox
             label={I18n.t('Decorative image')}
             checked={decorativeImage}
+            disabled={disabled || altTextAsCaption}
             onChange={handleDecorativeImageChange}
           />
         </View>
@@ -99,14 +99,14 @@ export const SettingsImageInfos = ({
         value={caption}
         onChange={handleCaptionChange}
         placeholder={I18n.t('Start typing...')}
-        disabled={decorativeImage || altTextAsCaption}
+        disabled={disabled || altTextAsCaption}
       />
       <View as="div" margin="small 0">
         <Checkbox
           label={I18n.t('Use alt text as caption')}
           checked={altTextAsCaption}
           onChange={handleAltTextAsCaptionChange}
-          disabled={decorativeImage}
+          disabled={disabled || decorativeImage}
         />
       </View>
     </>

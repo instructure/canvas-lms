@@ -75,7 +75,7 @@ RSpec.describe Loaders::ObserverCourseSubmissionDataLoader do
 
   it "loads submissions for the selected observed student when cookie is set" do
     # Mock a request with cookies selecting the second student
-    mock_request = double("request")
+    mock_request = instance_double(ActionDispatch::Request)
     mock_cookies = { "k5_observed_user_for_#{@observer.id}" => @student2.id.to_s }
     allow(mock_request).to receive(:cookies).and_return(mock_cookies)
 

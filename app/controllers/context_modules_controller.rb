@@ -331,6 +331,7 @@ class ContextModulesController < ApplicationController
           canAdd: @can_add,
           canEdit: @can_edit,
           canDelete: @can_delete,
+          canView: @can_view,
           canViewUnpublished: @can_view_unpublished,
           canDirectShare: can_do(@context, @current_user, :direct_share),
           readAsAdmin: @context.grants_right?(@current_user, session, :read_as_admin),

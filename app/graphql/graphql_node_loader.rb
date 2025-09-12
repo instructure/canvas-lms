@@ -27,6 +27,9 @@ module GraphQLNodeLoader
       Loaders::IDLoader.for(Account).load(id).then(check_read_permission)
     when "AccountBySis"
       Loaders::SISIDLoader.for(Account).load(id).then(check_read_permission)
+    when "AccountNotification"
+      # AccountNotification doesn't implement grants_any_right?, and they are visible to all users
+      Loaders::IDLoader.for(AccountNotification).load(id)
     when "Course"
       Loaders::IDLoader.for(Course).load(id).then(check_read_permission)
     when "CustomGradeStatus"

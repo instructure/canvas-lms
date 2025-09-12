@@ -8,6 +8,7 @@ query GetModuleItemsQuery($moduleId: ID!, $cursor: String, $first: Int) {
             _id
             id
             url
+            moduleItemUrl
             title
             published
             indent
@@ -229,7 +230,6 @@ query GetModuleItemsQuery($moduleId: ID!, $cursor: String, $first: Int) {
               ... on ExternalUrl {
                 title
                 type: __typename
-                url
                 canUnpublish
                 newTab
                 graded
@@ -237,13 +237,11 @@ query GetModuleItemsQuery($moduleId: ID!, $cursor: String, $first: Int) {
               ... on ModuleExternalTool {
                 title
                 type: __typename
-                url
                 canUnpublish
                 graded
               }
               ... on ExternalTool {
                 type: __typename
-                url
                 canUnpublish
                 graded
               }

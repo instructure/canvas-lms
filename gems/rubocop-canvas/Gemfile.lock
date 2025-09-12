@@ -5,7 +5,7 @@ PATH
       activesupport (>= 7.0)
       jira_ref_parser (= 1.0.1)
       outrigger (~> 3.0, >= 3.0.1)
-      railties (~> 7.0)
+      railties (>= 7.0, < 8.1)
       rubocop (~> 1.19)
       rubocop-rails (~> 2.19)
 

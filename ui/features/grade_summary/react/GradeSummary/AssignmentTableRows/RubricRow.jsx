@@ -25,6 +25,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {IconAiColoredSolid} from '@instructure/ui-icons'
 
 import Rubric from '@canvas/rubrics/react/Rubric'
 
@@ -142,6 +143,7 @@ export const rubricRow = (assignment, setOpenRubricDetailIds, openRubricDetailId
               )}
               rubricAssociation={transformToRubricAssociationShape(assignment.rubricAssociation)}
               isSummary={false}
+              isAiEvaluated={assignment?.submissionsConnection?.nodes?.[0]?.autoGradeResultPresent}
             >
               {null}
             </Rubric>

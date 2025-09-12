@@ -2179,4 +2179,29 @@ describe "assignments" do
       expect(module_item_assign_to_card.first).to contain_css(required_replies_due_date_input_selector)
     end
   end
+
+  context "Icelandic language pack" do
+    before do
+      @teacher = user_with_pseudonym
+      course_with_teacher_logged_in({ user: @teacher, active_course: true, active_enrollment: true })
+      @course.locale = "is"
+      @course.save!
+    end
+
+    it "creates/edit an assignment" do
+      get "/courses/#{@course.id}/assignments/new"
+      f("#assignment_name").send_keys("You can create an assignment")
+      click_option("#assignment_submission_type", "Online")
+      f("#assignment_text_entry").click
+      submit_assignment_form
+      assignment = @course.assignments.last
+
+      get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
+      f("#assignment_name").clear
+      f("#assignment_name").send_keys("You can edit an assignment")
+      submit_assignment_form
+
+      expect(assignment.reload.title).to eq("You can edit an assignment")
+    end
+  end
 end

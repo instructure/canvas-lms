@@ -212,7 +212,7 @@ describe('ButtonBlockIndividualButtonSettings', () => {
         )
         clickToggleButton(1)
 
-        const colorInput = screen.getByLabelText(/background color/i)
+        const colorInput = screen.getByLabelText(/button color/i)
 
         await userEvent.clear(colorInput)
         await userEvent.type(colorInput, newColor)
@@ -277,7 +277,7 @@ describe('ButtonBlockIndividualButtonSettings', () => {
         renderStyleTest()
         clickToggleButton(2)
 
-        expect(screen.getByText(/button color/i)).toBeInTheDocument()
+        expect(screen.getByLabelText(/button color/i)).toBeInTheDocument()
       })
 
       it('updates button style to filled', () => {
@@ -297,8 +297,8 @@ describe('ButtonBlockIndividualButtonSettings', () => {
         renderStyleTest()
         clickToggleButton(1)
 
-        expect(screen.getByText(/background color/i)).toBeInTheDocument()
-        expect(screen.getByText(/text color/i)).toBeInTheDocument()
+        expect(screen.getByLabelText(/button color/i)).toBeInTheDocument()
+        expect(screen.getByLabelText(/text color/i)).toBeInTheDocument()
       })
     })
 

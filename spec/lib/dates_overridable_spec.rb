@@ -213,6 +213,18 @@ shared_examples_for "learning object with due dates" do
       expect(dates_hash[1][:title]).to eq "value for name"
     end
 
+    context "course with no enrollments" do
+      it "returns the base dates for a course with no enrollments" do
+        override.destroy!
+        empty_course = Course.create!(name: "empty course")
+        Assignment.create!(course: empty_course, due_at: 1.week.from_now)
+        dates_hash = overridable.dates_hash_visible_to(@admin)
+        expect(dates_hash.size).to eq 1
+        expect(dates_hash[0][:title]).to eq "Everyone"
+        expect(dates_hash[0][:base]).to be true
+      end
+    end
+
     context "with module overrides" do
       before do
         student_in_course(course:)

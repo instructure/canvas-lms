@@ -551,4 +551,33 @@ describe Schemas::InternalLtiConfiguration do
       expect(subject).to eq(expected)
     end
   end
+
+  describe ".to_sorted" do
+    subject { Schemas::InternalLtiConfiguration.to_sorted(config) }
+
+    let(:config) do
+      c = internal_lti_configuration.deep_dup
+      c[:scopes] = ["second", "first"]
+      c[:redirect_uris] = ["https://second-url.com", "https://first-url.com"]
+      c[:placements] = [
+        {
+          "placement" => "course_navigation",
+          "enabled" => true
+        },
+        {
+          "placement" => "account_navigation",
+          "enabled" => true
+        }
+      ]
+      c.with_indifferent_access
+    end
+
+    it "sorts all necessary properties" do
+      result = subject
+
+      expect(result[:scopes]).to eq(["first", "second"])
+      expect(result[:redirect_uris]).to eq(["https://first-url.com", "https://second-url.com"])
+      expect(result[:placements].pluck(:placement)).to eq(["account_navigation", "course_navigation"])
+    end
+  end
 end

@@ -59,21 +59,21 @@ const ProductCard = (props: ProductCardProps) => {
               <Img src={product.logo_url} width={48} height={48} />
             </div>
             <div>
-              <TruncateWithTooltip
-                linesAllowed={1}
-                horizontalOffset={0}
-                backgroundColor="primary-inverse"
-              >
-                <Text weight="bold" size="medium">
-                  <Link
-                    isWithinText={false}
-                    themeOverride={{fontWeight: 700, color: 'black'}}
-                    href={productRoute(product.global_product_id)}
+              <Text weight="bold" size="medium" color="primary">
+                <Link
+                  isWithinText={false}
+                  themeOverride={{fontWeight: 700, color: 'black'}}
+                  href={productRoute(product.global_product_id)}
+                >
+                  <TruncateWithTooltip
+                    linesAllowed={1}
+                    horizontalOffset={0}
+                    backgroundColor="primary"
                   >
                     {product?.name}
-                  </Link>
-                </Text>
-              </TruncateWithTooltip>
+                  </TruncateWithTooltip>
+                </Link>
+              </Text>
               <div>
                 <span style={{fontSize: '14px'}}>by </span>
                 <Text weight="bold" color="secondary" size="small">

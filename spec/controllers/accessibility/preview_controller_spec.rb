@@ -173,5 +173,78 @@ RSpec.describe Accessibility::PreviewController do
         expect(response.parsed_body).to eq({ "error" => "Resource 'Assignment' with id '999999' was not found." })
       end
     end
+
+    context "with path parameter for element extraction" do
+      let!(:wiki_page) { course.wiki_pages.create!(title: "Test Page", body: "<div><h1>Page Title</h1><p>Page content</p></div>") }
+
+      context "when element exists" do
+        let(:params) do
+          {
+            course_id: course.id,
+            content_type: "Page",
+            content_id: wiki_page.id.to_s,
+            path: ".//h1"
+          }
+        end
+
+        it "returns only the specified element" do
+          get :show, params:, format: :json
+          expect(response).to have_http_status(:ok)
+          expect(response.parsed_body).to eq({ "content" => "<h1>Page Title</h1>" })
+        end
+      end
+
+      context "when element does not exist" do
+        let(:params) do
+          {
+            course_id: course.id,
+            content_type: "Page",
+            content_id: wiki_page.id.to_s,
+            path: ".//nonexistent"
+          }
+        end
+
+        it "returns element not found error" do
+          get :show, params:, format: :json
+          expect(response).to have_http_status(:not_found)
+          expect(response.parsed_body).to eq({ "error" => "Element not found" })
+        end
+      end
+
+      context "when path is empty string" do
+        let(:params) do
+          {
+            course_id: course.id,
+            content_type: "Page",
+            content_id: wiki_page.id.to_s,
+            path: ""
+          }
+        end
+
+        it "returns full content (treats empty path as no path)" do
+          get :show, params:, format: :json
+          expect(response).to have_http_status(:ok)
+          expect(response.parsed_body).to eq({ "content" => "<div><h1>Page Title</h1><p>Page content</p></div>" })
+        end
+      end
+
+      context "for assignment with path" do
+        let!(:assignment) { course.assignments.create!(description: "<div><h2>Assignment Title</h2><p>Assignment description</p></div>") }
+        let(:params) do
+          {
+            course_id: course.id,
+            content_type: "Assignment",
+            content_id: assignment.id.to_s,
+            path: ".//h2"
+          }
+        end
+
+        it "returns only the specified element from assignment" do
+          get :show, params:, format: :json
+          expect(response).to have_http_status(:ok)
+          expect(response.parsed_body).to eq({ "content" => "<h2>Assignment Title</h2>" })
+        end
+      end
+    end
   end
 end

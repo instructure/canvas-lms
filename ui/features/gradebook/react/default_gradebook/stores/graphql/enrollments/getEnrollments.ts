@@ -102,12 +102,11 @@ export type GetEnrollmentsParams = {
   userIds?: string[]
   after?: string
 }
-export const getEnrollments = async ({after, courseId, userIds}: GetEnrollmentsParams) => {
-  const data = await executeQuery<GetEnrollmentsResult>(GET_ENROLLMENTS_QUERY, {
-    courseId,
-    userIds,
-    after,
-  })
+export const getEnrollments = async (
+  params: GetEnrollmentsParams,
+  headers?: Record<string, string>,
+) => {
+  const data = await executeQuery<GetEnrollmentsResult>(GET_ENROLLMENTS_QUERY, params, headers)
 
   const validation = ZGetEnrollmentsResult.safeParse(data)
   if (!validation.success) {

@@ -1325,4 +1325,20 @@ describe CalendarEvent do
       end
     end
   end
+
+  describe "valid_ranges scope" do
+    it "filters out calendar events with unpopulated start_at or end_at fields" do
+      course_model
+      common_fields = { context_id: @course.id, context_type: "Course" }
+      @ce1 = CalendarEvent.create(common_fields.merge({ start_at: 1.day.ago, end_at: nil, description: "nil end_at" }))
+                          .update_columns(end_at: nil)
+      @ce2 = CalendarEvent.create(common_fields.merge({ start_at: nil, end_at: 1.day.from_now, description: "nil start_at" }))
+                          .update_columns(start_at: nil)
+      @ce3 = CalendarEvent.create(common_fields.merge({ start_at: nil, end_at: nil, description: "nil range" }))
+      @ce4 = CalendarEvent.create(common_fields.merge({ start_at: 1.day.ago, end_at: 1.day.from_now, description: "populated range" }))
+
+      expect(CalendarEvent.valid_ranges.length).to eq 1
+      expect(CalendarEvent.valid_ranges).to include(@ce4)
+    end
+  end
 end

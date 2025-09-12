@@ -1008,7 +1008,7 @@ class Attachment < ActiveRecord::Base
       (content_type == "text/css" && size < CSS_MAX_PROXY_SIZE)
   end
 
-  def local_storage_path(user: nil, ttl: nil)
+  def local_storage_path(user: nil, ttl: nil, location: nil)
     verifier_string = if root_account.feature_enabled?(:file_association_access)
                         Attachments::Verification.new(self).verifier_for_user(user, expires: ttl || 1.hour.from_now)
                       else
@@ -1122,7 +1122,7 @@ class Attachment < ActiveRecord::Base
     geometry = options[:size]
     if thumbnail || geometry.present?
       to_use = thumbnail_for_size(geometry) || thumbnail
-      to_use.cached_s3_url
+      to_use.cached_s3_url(options: { location: options[:location] })
     elsif media_object&.media_id
       CanvasKaltura::ClientV3.new.thumbnail_url(media_object.media_id,
                                                 width: options[:width] || 140,

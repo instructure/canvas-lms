@@ -337,7 +337,8 @@ class EnrollmentsApiController < ApplicationController
     inactive_role: "Cannot create an enrollment with this role because it is inactive.",
     base_type_mismatch: "The specified type must match the base type for the role",
     concluded_course: "Can't add an enrollment to a concluded course.",
-    insufficient_sis_permissions: "Insufficient permissions to filter by SIS fields"
+    insufficient_sis_permissions: "Insufficient permissions to filter by SIS fields",
+    no_open_section: "Course has no open sections"
   }
 
   include Api::V1::User
@@ -789,10 +790,25 @@ class EnrollmentsApiController < ApplicationController
     if MasterCourses::MasterTemplate.is_master_course?(@context)
       errors << "course is not open for self-enrollment"
     end
+
     return render_create_errors(errors) if errors.present?
+
+    section = nil
+    if params[:enrollment][:course_section_id].present?
+      section = @context.course_sections.active.find(params[:enrollment][:course_section_id])
+    end
+
+    if section.blank? && @context.default_section(no_create: true)&.concluded?
+      section = @context.course_sections.active.find { |course_section| !course_section.concluded? }
+
+      unless section.present?
+        return render_create_errors([@@errors[:no_open_section]])
+      end
+    end
 
     @current_user.validation_root_account = @domain_root_account
     @current_user.require_self_enrollment_code = true
+    @current_user.self_enrollment_section = section if section.present?
     @current_user.self_enrollment_code = code
 
     SubmissionLifecycleManager.with_executing_user(@current_user) do

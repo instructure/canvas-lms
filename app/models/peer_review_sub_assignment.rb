@@ -20,7 +20,7 @@
 
 class PeerReviewSubAssignment < AbstractAssignment
   belongs_to :parent_assignment, class_name: "Assignment", inverse_of: :peer_review_sub_assignment
-  has_many :assessment_requests
+  has_many :assessment_requests, dependent: :nullify
 
   validates :parent_assignment_id,
             presence: true,
@@ -28,7 +28,10 @@ class PeerReviewSubAssignment < AbstractAssignment
             comparison: { other_than: :id, message: ->(_object, _data) { I18n.t("cannot reference self") }, allow_blank: true }
   validates :has_sub_assignments, inclusion: { in: [false], message: I18n.t("cannot have sub assignments") }
   validates :sub_assignment_tag, absence: { message: ->(_object, _data) { I18n.t("cannot have sub assignment tag") } }
-  validate  :context_matches_parent_assignment
+  validate  :context_matches_parent_assignment, if: :context_explicitly_provided?
+
+  after_initialize :set_default_context
+  after_save :unlink_assessment_requests, if: :soft_deleted?
 
   # TODO: update broadcast policy (EGG-1672)
   set_broadcast_policy do |p|
@@ -55,9 +58,29 @@ class PeerReviewSubAssignment < AbstractAssignment
 
   private
 
+  def set_default_context
+    if context.nil?
+      self.context = parent_assignment&.context
+    else
+      @context_explicitly_provided = true
+    end
+  end
+
+  def context_explicitly_provided?
+    @context_explicitly_provided == true
+  end
+
   def context_matches_parent_assignment
     return true if context_id == parent_assignment&.context_id
 
     errors.add(:context, I18n.t("must match parent assignment context"))
+  end
+
+  def soft_deleted?
+    saved_change_to_workflow_state? && workflow_state == "deleted"
+  end
+
+  def unlink_assessment_requests
+    assessment_requests.update_all(peer_review_sub_assignment_id: nil)
   end
 end

@@ -71,16 +71,18 @@ module AttachmentHelper
     attrs.inject(+"") { |s, (attr, val)| s << "data-#{attr}=#{val} " }
   end
 
+  def sf_verifier_match?(attachment, access_type)
+    return false unless @access_verifier
+
+    access_permission = (@access_verifier[:permission] == "download") ? %w[download read] : Array(@access_verifier[:permission])
+    @sf_verifier_match ||= @access_verifier && access_permission.include?(access_type.to_s) && @access_verifier[:attachment_id] == attachment.global_id.to_s
+  end
+
   def jwt_resource_match(attachment)
     # If we're getting a JWT token from New Quizzes, the file might be in a an item
     # bank, which can be used in multiple contexts, and we need to give access to
     # it in all of them, even if the user doesn't have access to the context the file
     # original comes from.
-    # And also used in Lti Asset Processor Asset service to accept DeveloperKeys::AccessVerifier
-    @jwt_resource_match ||= if params[:sf_verifier]
-                              jwt_payload = Canvas::Security.decode_jwt(params[:sf_verifier], ignore_expiration: true)
-                              jwt_payload["permission"] == "download" && jwt_payload["attachment_id"] == attachment.global_id.to_s
-                            end
     @jwt_resource_match ||= ensure_token_resource_link(@token, attachment)
   end
 
@@ -159,13 +161,8 @@ module AttachmentHelper
     end
   end
 
-  def access_allowed(
-    attachment:,
-    user:,
-    access_type:,
-    no_error_on_failure: false
-  )
-    return true if jwt_resource_match(attachment) || access_via_location?(attachment, user, access_type)
+  def access_allowed(attachment:, user:, access_type:, no_error_on_failure: false)
+    return true if sf_verifier_match?(attachment, access_type) || jwt_resource_match(attachment) || access_via_location?(attachment, user, access_type)
 
     if params[:verifier]
       verifier_checker = Attachments::Verification.new(attachment)
@@ -184,8 +181,14 @@ module AttachmentHelper
   end
 
   def access_via_location?(attachment, user, access_type)
-    if params[:location] && [:read, :download].include?(access_type)
-      return AttachmentAssociation.verify_access(params[:location], attachment, user, session)
+    location = params[:location]
+    if location && [:read, :download].include?(access_type)
+      if location.start_with?("avatar_")
+        avatar_user = User.find_by(id: location.split("_").last)
+        return avatar_user&.allow_avatar_access?(attachment) || false
+      else
+        return AttachmentAssociation.verify_access(location, attachment, user, session)
+      end
     end
 
     false

@@ -38,6 +38,8 @@ import fetchMock from 'fetch-mock'
 import ReactDOM from 'react-dom'
 import {waitFor} from '@testing-library/react'
 import {createRoot} from 'react-dom/client'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 jest.mock('jquery-ui', () => {
   const $ = require('jquery')
@@ -52,19 +54,70 @@ jest.mock('jquery-ui', () => {
   return $
 })
 
-jest.mock('../../../react/AssetProcessorsForAssignment', () => ({
-  attach: ({container, initialAttachedProcessors, courseId, secureParams}) => {
-    const initialJson = JSON.stringify(initialAttachedProcessors)
-    const el = (
-      <div>
-        AssetProcessorsForAssignment initialAttachedProcessors={initialJson} courseId={courseId}{' '}
-        secureParams=
-        {secureParams}
-      </div>
-    )
-    createRoot(container).render(el)
-  },
-}))
+jest.mock('../../../react/AssetProcessorsForAssignment', () => {
+  const rootMap = new WeakMap()
+  return {
+    attach: ({container, initialAttachedProcessors, courseId, secureParams}) => {
+      const initialJson = JSON.stringify(initialAttachedProcessors)
+      const el = (
+        <div>
+          AssetProcessorsForAssignment initialAttachedProcessors={initialJson} courseId={courseId}{' '}
+          secureParams=
+          {secureParams}
+        </div>
+      )
+
+      // Reuse existing root or create new one
+      let root = rootMap.get(container)
+      if (!root) {
+        root = createRoot(container)
+        rootMap.set(container, root)
+      }
+      root.render(el)
+    },
+  }
+})
+
+// MSW server setup
+const server = setupServer(
+  // Mock all XMLHttpRequest calls to localhost to return empty responses
+  http.all('http://127.0.0.1:80/*', () => {
+    return HttpResponse.json([])
+  }),
+  http.all('http://localhost:80/*', () => {
+    return HttpResponse.json([])
+  }),
+  http.all('http://localhost/*', () => {
+    return HttpResponse.json([])
+  }),
+  // Mock specific API endpoints that might be called
+  http.get(/\/api\/v1\/courses\/\d+\/lti_apps\/launch_definitions/, () => {
+    return HttpResponse.json([])
+  }),
+  http.get(/\/api\/v1\/courses\/\d+\/assignments\/\d+/, () => {
+    return HttpResponse.json({})
+  }),
+  http.get(/\/api\/v1\/courses\/\d+\/settings/, () => {
+    return HttpResponse.json({})
+  }),
+  http.get(/\/api\/v1\/courses\/\d+\/sections/, () => {
+    return HttpResponse.json([])
+  }),
+  // Default handler for other API calls
+  http.all(/\/api\/.*/, () => {
+    return HttpResponse.json([])
+  }),
+)
+
+// Start server before all tests
+beforeAll(() => {
+  server.listen({onUnhandledRequest: 'bypass'})
+})
+
+// Clean up after all tests
+afterAll(() => {
+  server.close()
+})
 
 const s_params = 'some super secure params'
 const currentOrigin = window.location.origin
@@ -159,6 +212,11 @@ describe('EditView', () => {
     fetchMock.get('/api/v1/courses/1/sections?per_page=100', [])
     fetchMock.get(/\/api\/v1\/courses\/\d+\/lti_apps\/launch_definitions*/, [])
     fetchMock.post(/.*\/api\/graphql/, {})
+    // Catch-all for any unmocked requests to prevent XMLHttpRequest errors
+    fetchMock.get('*', {status: 404})
+    fetchMock.post('*', {status: 404})
+    fetchMock.put('*', {status: 404})
+    fetchMock.delete('*', {status: 404})
     RCELoader.RCE = null
     return RCELoader.loadRCE()
   })
@@ -169,6 +227,7 @@ describe('EditView', () => {
     $('ul[id^=ui-id-]').remove()
     $('.form-dialog').remove()
     fetchMock.reset()
+    server.resetHandlers()
     jest.resetModules()
     window.ENV = null
   })
@@ -335,6 +394,7 @@ describe('EditView', () => {
     it('attaches AssetProcessors component when FF is on', async () => {
       window.ENV.FEATURES = {lti_asset_processor: true}
       const view = createEditViewOnlineSubmission({onlineUpload: true})
+      view.afterRender()
       await waitFor(() => {
         expect(view.$assetProcessorsContainer.children()).toHaveLength(1)
       })
@@ -349,6 +409,7 @@ describe('EditView', () => {
       window.ENV.FEATURES = {lti_asset_processor: true}
       window.ENV.ASSET_PROCESSORS = [{id: 1}] // rest of the fields omitted here for brevity
       const view = createEditViewOnlineSubmission({onlineUpload: true})
+      view.afterRender()
       await waitFor(() => {
         expect(view.$assetProcessorsContainer.text()).toBe(
           'AssetProcessorsForAssignment initialAttachedProcessors=[{"id":1}] courseId=1 secureParams=some super secure params',
@@ -359,6 +420,7 @@ describe('EditView', () => {
     it('does not attach AssetProcessors component when FF is off', async () => {
       window.ENV.FEATURES = {lti_asset_processor: false}
       const view = createEditViewOnlineSubmission({onlineUpload: true})
+      view.afterRender()
       await waitFor(() => {
         expect(view.$assetProcessorsContainer.children()).toHaveLength(0)
       })
@@ -370,9 +432,11 @@ describe('EditView', () => {
     it('is hidden if submission type does not include online with a file upload', () => {
       window.ENV.FEATURES = {lti_asset_processor: true}
       let view = createEditViewOnlineSubmission({onlineUpload: true})
+      view.afterRender()
       expect(view.$assetProcessorsContainer.css('display')).toBe('block')
 
       view = createEditViewOnlineSubmission({onlineTextEntry: true, onlineUrl: true})
+      view.afterRender()
       expect(view.$assetProcessorsContainer.css('display')).toBe('none')
     })
   })
@@ -391,7 +455,7 @@ describe('EditView', () => {
 
   // These started failing in master after Jan 1, 2025
   // cf. EGG-444
-  describe.skip('Quizzes 2', () => {
+  describe('Quizzes 2', () => {
     beforeEach(() => {
       window.ENV = {
         AVAILABLE_MODERATORS: [],
@@ -409,6 +473,8 @@ describe('EditView', () => {
         NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED: true,
         HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED: true,
         CANCEL_TO: currentOrigin + '/cancel',
+        SETTINGS: {},
+        FEATURES: {},
       }
     })
 

@@ -26,7 +26,7 @@ module SIS
       end
 
       def self.identifying_fields
-        %w[user_id account_id].freeze
+        %w[user_id account_id role_id role].freeze
       end
 
       # possible columns:

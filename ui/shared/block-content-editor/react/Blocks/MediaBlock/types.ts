@@ -16,10 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Prettify} from '../../utilities/Prettify'
+
 export type MediaData = {
-  src: string
   title: string
-} & MediaSettings
+} & MediaSettings &
+  MediaSources
+
+export type MediaSources = {
+  src?: string
+  mediaId?: string
+  attachment_id?: string
+}
 
 export type MediaSettings = {
   titleColor: string
@@ -36,4 +44,4 @@ export type MediaBlockEditHandlers = {
 
 export type MediaBlockEditProps = MediaData & MediaBlockEditHandlers
 
-export type MediaBlockProps = BaseBlockSettings & MediaData
+export type MediaBlockProps = Prettify<BaseBlockSettings & MediaData>

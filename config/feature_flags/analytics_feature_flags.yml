@@ -10,15 +10,6 @@ analytics_2:
       to ON.
   after_state_change_proc: analytics_2_after_state_change_hook
   beta: false
-hide_legacy_course_analytics:
-  state: hidden
-  applies_to: Course
-  display_name: Hide Legacy Course Analytics
-  description:
-    hide_legacy_course_analytics_description: Hides the Legacy Course Analytics feature.
-  root_opt_in: true
-  beta: true
-  shadow: true
 
 # Admin Analytics - Provided through K20 LTI App
 admin_analytics_view_permission:

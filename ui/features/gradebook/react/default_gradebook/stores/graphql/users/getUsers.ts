@@ -64,8 +64,8 @@ export type GetUsersParams = {
   after?: string
   first?: number
 }
-export const getUsers = async (queryParams: GetUsersParams) => {
-  const data = await executeQuery<GetUsersResult>(GET_USERS_QUERY, queryParams)
+export const getUsers = async (params: GetUsersParams, headers?: Record<string, string>) => {
+  const data = await executeQuery<GetUsersResult>(GET_USERS_QUERY, params, headers)
 
   const validation = ZGetUsersResult.safeParse(data)
   if (!validation.success) {

@@ -280,4 +280,48 @@ describe('ModuleItemStudent', () => {
     expect(container.getByText('Complete')).toBeInTheDocument()
     expect(container.queryByText('Missing')).not.toBeInTheDocument()
   })
+
+  it('renders "Choose Assignment Group" pseudo module item when mastery path "awaitingChoice" property is truthy', () => {
+    const container = setUp(
+      buildDefaultProps({
+        masteryPaths: {
+          awaitingChoice: true,
+          chooseUrl: '/example/path',
+          assignmentSetCount: 2,
+        },
+      }),
+    )
+
+    const awaitingChoice = container.getByTestId('mastery-path-awaiting-choice')
+
+    expect(awaitingChoice).toBeInTheDocument()
+  })
+
+  it('renders "Locked" pseudo module item when mastery path "locked" property is truthy', () => {
+    const container = setUp(
+      buildDefaultProps({
+        masteryPaths: {
+          locked: true,
+        },
+      }),
+    )
+
+    const locked = container.getByTestId('mastery-path-locked')
+
+    expect(locked).toBeInTheDocument()
+  })
+
+  it('renders "Still processing" pseudo module item when mastery path "stillProcessing" property is truthy', () => {
+    const container = setUp(
+      buildDefaultProps({
+        masteryPaths: {
+          stillProcessing: true,
+        },
+      }),
+    )
+
+    const stillProcessing = container.getByTestId('mastery-path-still-processing')
+
+    expect(stillProcessing).toBeInTheDocument()
+  })
 })

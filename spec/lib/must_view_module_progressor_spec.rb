@@ -387,11 +387,11 @@ describe "MustViewModuleProgressor" do
       expect(progress[@module.id][:items][assign_item.id]).to be false
     end
 
-    it "does not create progressions for non-enrolled admins and allow view if appropriate" do
+    it "creates progressions for non-enrolled admins to track UI state and allows unrestricted view" do
       account_admin_user
       progress = MustViewModuleProgressor.new(@admin, @course).current_progress
       expect(progress[@module.id][:status]).to eq "unlocked"
-      expect(ContextModuleProgression.where(user: @admin, context_module: @module).count).to eq 0
+      expect(ContextModuleProgression.where(user: @admin, context_module: @module).count).to eq 1
     end
 
     it "does not create progressions for non-enrolled non-admins" do

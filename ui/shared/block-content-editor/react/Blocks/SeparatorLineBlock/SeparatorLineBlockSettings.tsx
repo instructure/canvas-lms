@@ -22,31 +22,50 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {ColorPickerWrapper} from '../BlockItems/ColorPickerWrapper'
 import {SeparatorLineBlockProps} from './SeparatorLineBlock'
 import {SettingsSectionToggle} from '../BlockItems/SettingsSectionToggle/SettingsSectionToggle'
+import {BorderWidthValues} from '@instructure/emotion'
+import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
+import {Flex} from '@instructure/ui-flex'
+import {defaultProps} from './defaultProps'
 
 const I18n = createI18nScope('block_content_editor')
+
+const THICKNESS_OPTIONS: {label: string; value: BorderWidthValues}[] = [
+  {label: I18n.t('Small'), value: 'small'},
+  {label: I18n.t('Medium'), value: 'medium'},
+  {label: I18n.t('Large'), value: 'large'},
+]
 
 export const SeparatorLineBlockSettings = () => {
   const {
     actions: {setProp},
-    settings,
+    separatorColor,
+    thickness,
+    backgroundColor,
   } = useNode(node => ({
-    settings: node.data.props.settings,
+    ...defaultProps,
+    ...node.data.props,
   }))
 
   const handleSeparatorColorChange = (value: string) => {
     setProp((props: SeparatorLineBlockProps) => {
-      props.settings.separatorColor = value
+      props.separatorColor = value
     })
   }
 
   const handleBackgroundColorChange = (value: string) => {
     setProp((props: SeparatorLineBlockProps) => {
-      props.settings.backgroundColor = value
+      props.backgroundColor = value
+    })
+  }
+
+  const handleThicknessChange = (value: BorderWidthValues) => {
+    setProp((props: SeparatorLineBlockProps) => {
+      props.thickness = value
     })
   }
 
   return (
-    <View as="div" padding="small">
+    <View as="div">
       <SettingsSectionToggle
         title={I18n.t('Color settings')}
         collapsedLabel={I18n.t('Expand color settings')}
@@ -55,20 +74,44 @@ export const SeparatorLineBlockSettings = () => {
         includeSeparator={true}
       >
         <ColorPickerWrapper
-          label={I18n.t('Background')}
-          value={settings.backgroundColor}
-          baseColor={settings.separatorColor}
+          label={I18n.t('Background color')}
+          popoverButtonScreenReaderLabel={I18n.t('Open background color picker popover')}
+          value={backgroundColor}
+          baseColor={separatorColor}
           onChange={handleBackgroundColorChange}
-          baseColorLabel={I18n.t('Background')}
+          baseColorLabel={I18n.t('Separator color')}
         />
       </SettingsSectionToggle>
-      <ColorPickerWrapper
-        label={I18n.t('Separator')}
-        value={settings.separatorColor}
-        baseColor={settings.backgroundColor}
-        onChange={handleSeparatorColorChange}
-        baseColorLabel={I18n.t('Background')}
-      />
+
+      <SettingsSectionToggle
+        title={I18n.t('Separator settings')}
+        collapsedLabel={I18n.t('Expand separator settings')}
+        expandedLabel={I18n.t('Collapse separator settings')}
+        defaultExpanded={true}
+        includeSeparator={false}
+      >
+        <Flex direction="column" gap="medium">
+          <ColorPickerWrapper
+            label={I18n.t('Separator color')}
+            popoverButtonScreenReaderLabel={I18n.t('Open separator color picker popover')}
+            value={separatorColor}
+            baseColor={backgroundColor}
+            onChange={handleSeparatorColorChange}
+            baseColorLabel={I18n.t('Background color')}
+          />
+
+          <RadioInputGroup
+            name="separator-line-block-settings-thickness"
+            description={I18n.t('Separator size')}
+            value={thickness}
+            onChange={(_event, value) => handleThicknessChange(value as BorderWidthValues)}
+          >
+            {THICKNESS_OPTIONS.map(option => (
+              <RadioInput key={option.value} label={option.label} value={option.value} />
+            ))}
+          </RadioInputGroup>
+        </Flex>
+      </SettingsSectionToggle>
     </View>
   )
 }

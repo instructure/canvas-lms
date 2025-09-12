@@ -18,9 +18,9 @@
 
 import {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {BaseBlockHOC} from '../BaseBlock'
+import {BaseBlock} from '../BaseBlock'
 import {ButtonBlockSettings} from './ButtonBlockSettings'
-import {useSave2} from '../BaseBlock/useSave'
+import {useSave} from '../BaseBlock/useSave'
 import {ButtonBlockProps} from './types'
 import {Flex} from '@instructure/ui-flex'
 import {TitleView} from '../BlockItems/Title/TitleView'
@@ -29,16 +29,16 @@ import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
 import {useFocusElement} from '../../hooks/useFocusElement'
 import {useOpenSettingsTray} from '../../hooks/useOpenSettingsTray'
 import {TitleEdit} from '../BlockItems/Title/TitleEdit'
+import {defaultProps} from './defaultProps'
+import {buttonBackgroundContrast} from '../../accessibilityChecker/rules/buttonBackgroundContrast'
 
 const I18n = createI18nScope('block_content_editor')
 
 const ButtonBlockView = (props: ButtonBlockProps) => {
   return (
     <Flex direction="column" gap="mediumSmall">
-      {props.settings.includeBlockTitle && (
-        <TitleView title={props.title} contentColor={props.settings.textColor} />
-      )}
-      <ButtonDisplay dataTestId="button-block-view" settings={props.settings} />
+      {props.includeBlockTitle && <TitleView title={props.title} contentColor={props.titleColor} />}
+      <ButtonDisplay dataTestId="button-block-view" {...props} />
     </Flex>
   )
 }
@@ -46,14 +46,10 @@ const ButtonBlockView = (props: ButtonBlockProps) => {
 const ButtonBlockEditView = (props: ButtonBlockProps) => {
   return (
     <Flex direction="column" gap="mediumSmall">
-      {props.settings.includeBlockTitle && (
-        <TitleEditPreview title={props.title} contentColor={props.settings.textColor} />
+      {props.includeBlockTitle && (
+        <TitleEditPreview title={props.title} contentColor={props.titleColor} />
       )}
-      <ButtonDisplay
-        dataTestId="button-block-edit-preview"
-        settings={props.settings}
-        onButtonClick={() => {}}
-      />
+      <ButtonDisplay dataTestId="button-block-edit-preview" {...props} onButtonClick={() => {}} />
     </Flex>
   )
 }
@@ -63,32 +59,34 @@ const ButtonBlockEdit = (props: ButtonBlockProps) => {
   const [title, setTitle] = useState(props.title)
 
   const {focusHandler} = useFocusElement()
-  useSave2(() => ({title}))
+  useSave(() => ({title}))
 
   return (
     <Flex direction="column" gap="mediumSmall">
-      {props.settings.includeBlockTitle && (
+      {props.includeBlockTitle && (
         <TitleEdit title={title} onTitleChange={setTitle} focusHandler={focusHandler} />
       )}
       <ButtonDisplay
         dataTestId="button-block-edit"
-        settings={props.settings}
-        focusHandler={props.settings.includeBlockTitle ? undefined : focusHandler}
+        {...props}
+        focusHandler={props.includeBlockTitle ? undefined : focusHandler}
         onButtonClick={openSettingsTray}
       />
     </Flex>
   )
 }
 
-export const ButtonBlock = (props: ButtonBlockProps) => {
+export const ButtonBlock = (props: Partial<ButtonBlockProps>) => {
+  const componentProps = {...defaultProps, ...props}
   return (
-    <BaseBlockHOC
+    <BaseBlock
       ViewComponent={ButtonBlockView}
       EditComponent={ButtonBlockEdit}
       EditViewComponent={ButtonBlockEditView}
-      componentProps={props}
+      componentProps={componentProps}
       title={ButtonBlock.craft.displayName}
-      backgroundColor={props.settings.backgroundColor}
+      backgroundColor={componentProps.backgroundColor}
+      customAccessibilityCheckRules={[buttonBackgroundContrast]}
     />
   )
 }

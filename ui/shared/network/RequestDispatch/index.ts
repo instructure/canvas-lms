@@ -82,11 +82,16 @@ export default class RequestDispatch {
     }
   }
 
+  /**
+   * Fetches paginated data and aggregates all pages into a single result
+   * @param headers - Optional custom headers to include in requests
+   */
   getDepaginated<T, D = T>(
     url: string,
     params: Record<string, unknown>,
     pageCallback: (data: D) => void = () => {},
     pagesEnqueuedCallback: (promises: Promise<D>[]) => void = () => {},
+    headers?: Record<string, string>,
   ): Promise<T> {
     const request: Request<T> = {
       deferred: deferPromise<T>(),
@@ -112,7 +117,7 @@ export default class RequestDispatch {
        */
       request.active = true
 
-      cheaterDepaginate(url, params, pageCallback, allEnqueued, this)
+      cheaterDepaginate(url, params, pageCallback, allEnqueued, this, headers)
         .then(data => request.deferred.resolve(data as T))
         .catch(request.deferred.reject)
         .finally(() => {
@@ -130,7 +135,15 @@ export default class RequestDispatch {
     return request.deferred.promise
   }
 
-  getJSON<T>(url: string, params?: Record<string, unknown>): Promise<T> {
+  /**
+   * Fetches JSON data from a URL
+   * @param headers - Optional custom headers to include in the request
+   */
+  getJSON<T>(
+    url: string,
+    params?: Record<string, unknown>,
+    headers?: Record<string, string>,
+  ): Promise<T> {
     const request = {
       deferred: deferPromise<T>(),
       start: () => {},
@@ -144,7 +157,7 @@ export default class RequestDispatch {
        */
       request.active = true
 
-      $.ajaxJSON(url, 'GET', params)
+      $.ajaxJSON(url, 'GET', params, undefined, undefined, {headers})
         .then(request.deferred.resolve)
         .fail(request.deferred.reject)
         .always(() => {
@@ -159,7 +172,7 @@ export default class RequestDispatch {
 
   // PRIVILEGED
 
-  _getJSON(url: string, params: Record<string, unknown>) {
+  _getJSON(url: string, params: Record<string, unknown>, headers?: Record<string, string>) {
     return new Promise((resolve, reject) => {
       $.ajaxJSON(
         url,
@@ -169,6 +182,7 @@ export default class RequestDispatch {
           resolve({data, xhr})
         },
         reject,
+        {headers},
       )
     })
   }

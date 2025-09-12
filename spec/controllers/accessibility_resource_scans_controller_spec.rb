@@ -249,6 +249,32 @@ describe AccessibilityResourceScansController do
           json = response.parsed_body
           expect(json.length).to eq(4)
         end
+
+        it "filters by search term" do
+          get :index, params: { course_id: course.id, search: "Tut" }, format: :json
+          expect(response).to have_http_status(:ok)
+
+          json = response.parsed_body
+          expect(json.length).to eq(1)
+          expect(json.first["resource_name"]).to eq("Tutorial")
+        end
+
+        it "filters by search term case insensitively" do
+          get :index, params: { course_id: course.id, search: "tutorial" }, format: :json
+          expect(response).to have_http_status(:ok)
+
+          json = response.parsed_body
+          expect(json.length).to eq(1)
+          expect(json.first["resource_name"]).to eq("Tutorial")
+        end
+
+        it "returns no results for non-matching search term" do
+          get :index, params: { course_id: course.id, search: "Nonexistent" }, format: :json
+          expect(response).to have_http_status(:ok)
+
+          json = response.parsed_body
+          expect(json).to be_empty
+        end
       end
     end
   end

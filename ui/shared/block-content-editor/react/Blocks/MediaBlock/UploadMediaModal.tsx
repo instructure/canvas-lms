@@ -20,6 +20,8 @@ import React, {useState} from 'react'
 import getRCSProps from '@canvas/rce/getRCSProps'
 import {UploadFile} from '@instructure/canvas-rce'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {handleMediaSubmit, panels, StoreProp, UploadData, UploadFilePanelIds} from './handleMedia'
+import {MediaSources} from './types'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -29,13 +31,27 @@ export function UploadMediaModal({
   onDismiss,
 }: {
   open: boolean
-  onSubmit: (iframe_url: string) => void
+  onSubmit: (data: MediaSources) => void
   onDismiss: () => void
 }) {
   const [isUploading, setIsUploading] = useState(false)
 
-  const handleSubmit = async () => {
-    // Handle media upload
+  const handleSubmit = async (
+    _editor: unknown,
+    _accept: unknown,
+    selectedPanel: UploadFilePanelIds,
+    uploadData: UploadData,
+    storeProps: StoreProp,
+  ) => {
+    setIsUploading(true)
+    try {
+      const result = await handleMediaSubmit(selectedPanel, uploadData, storeProps)
+      onSubmit(result)
+    } catch (error) {
+      console.error('Media upload error:', error)
+    } finally {
+      setIsUploading(false)
+    }
   }
 
   return open ? (
@@ -43,7 +59,7 @@ export function UploadMediaModal({
       accept={'video/*,audio/*'}
       trayProps={getRCSProps()!}
       label={I18n.t('Upload Media')}
-      panels={['COMPUTER', 'URL', 'course_media', 'user_media']}
+      panels={panels as any}
       onDismiss={onDismiss}
       onSubmit={handleSubmit}
       canvasOrigin={window.location?.origin}

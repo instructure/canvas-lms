@@ -285,11 +285,12 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
   it "updates the discussion topic" do
     delayed_post_at = 5.days.from_now.iso8601
     lock_at = 10.days.from_now.iso8601
+    aa_test_data = AttachmentAssociationsSpecHelper.new(@course.account, @course)
 
     updated_params = {
       id: @topic.id,
       title: "Updated Title",
-      message: "Updated Message",
+      message: aa_test_data.replaced_html.gsub('"', '\"'),
       require_initial_post: true,
       specific_sections: "all",
       delayed_post_at: delayed_post_at.to_s,
@@ -300,7 +301,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     expect(result["errors"]).to be_nil
     @topic.reload
     expect(@topic.title).to eq "Updated Title"
-    expect(@topic.message).to eq "Updated Message"
+    expect(@topic.message).to include "<p>Here is a link to the audio:"
     expect(@topic.require_initial_post).to be true
     expect(@topic.is_section_specific).to be false
     expect(@topic.delayed_post_at).to eq delayed_post_at
@@ -939,6 +940,14 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
         expect(reply_to_entry_checkpoint["pointsPossible"]).to eq 8
         expect(discussion_topic["replyToEntryRequiredCount"]).to eq 5
       end
+    end
+
+    it "successfully updates a discussion topic with checkpoints with a html content message with attachments" do
+      aa_test_data = AttachmentAssociationsSpecHelper.new(@course.account, @course)
+
+      run_mutation(id: @graded_topic.id, message: aa_test_data.replaced_html.gsub('"', '\"'))
+      @graded_topic.reload
+      expect(@graded_topic.message).to include "<p>Here is a link to the audio:"
     end
 
     it "successfully updates a discussion topic with checkpoints" do

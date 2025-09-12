@@ -516,15 +516,28 @@ module DatesOverridable
     end
 
     # if all sections have overrides, do not include the 'everyone' option
-    if !everyone_overrides.empty? && !(context.is_a?(Course) && section_override_ids.length == context.active_course_sections.count)
+    active_sections_count = context.active_course_sections.size
+
+    include_everyone =
+      if active_sections_count.positive?
+        !everyone_overrides.empty? &&
+          !(context.is_a?(Course) && section_override_ids.length == active_sections_count)
+      else
+        true
+      end
+
+    if include_everyone
       # if there is a course override and a base override, remove the base override
       if everyone_overrides.length > 1
         everyone_overrides.reject! { |o| o[:base] }
       end
 
       everyone_override = everyone_overrides.first
-      everyone_override[:title] = (result.empty? ? "Everyone" : "Everyone else")
-      result << everyone_override.slice(:id, :due_at, :unlock_at, :lock_at, :title, :base, :set_type, :set_id)
+      everyone_override[:title] = result.empty? ? "Everyone" : "Everyone else"
+
+      result << everyone_override.slice(
+        :id, :due_at, :unlock_at, :lock_at, :title, :base, :set_type, :set_id
+      )
     end
 
     result.sort_by do |date|

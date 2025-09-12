@@ -19,23 +19,24 @@
 import {TextBlock} from '../TextBlock'
 import {renderBlock} from '../../__tests__/render-helper'
 import {mockBlockContentEditorContext} from '../../../__tests__/mockBlockContentEditorContext'
+import {TextBlockProps} from '../types'
 
 jest.mock('../../../BlockContentEditorContext', () => ({
   __esModule: true,
   useBlockContentEditorContext: jest.fn(() => mockBlockContentEditorContext({})),
 }))
 
+const defaultProps: TextBlockProps = {
+  title: 'Test Title',
+  includeBlockTitle: true,
+  backgroundColor: '#ff0000',
+  titleColor: '#00ff00',
+  content: '',
+}
+
 describe('TextBlock', () => {
   it('should render without crashing', () => {
-    renderBlock(TextBlock, {
-      title: 'Test Title',
-      settings: {
-        includeBlockTitle: true,
-        backgroundColor: '#ff0000',
-        titleColor: '#00ff00',
-      },
-      content: '',
-    })
+    renderBlock(TextBlock, defaultProps)
     expect(true).toBe(true)
   })
 })

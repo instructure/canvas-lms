@@ -96,7 +96,11 @@ const defaultState = {
   today: new Date(),
 }
 
-const server = setupServer()
+const server = setupServer(
+  http.get('/api/v1/users/self/missing_submissions*', () =>
+    HttpResponse.json([], {headers: {link: 'url; rel="current"'}}),
+  ),
+)
 
 beforeAll(() => server.listen())
 afterEach(() => {

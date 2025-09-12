@@ -141,6 +141,9 @@ class SearchController < ApplicationController
         )
         recipients << known if known
       elsif params[:context] || params[:search]
+        if @current_user.has_student_enrollment? && @current_user.account.root_account.feature_enabled?(:restrict_student_access)
+          params[:restrict_to_teacher_recipients] = true
+        end
         collections = search_contexts_and_users(params)
 
         recipients = BookmarkedCollection.concat(*collections)

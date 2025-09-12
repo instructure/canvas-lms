@@ -139,6 +139,10 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   #   to be used as custom fields in the LTI launch.
   #   Example: foo=bar\ncourse=$Canvas.course.id
   #
+  # @argument comment [String | nil]
+  #   A comment explaining why this change was made, to be recorded in the change-log.
+  #   Must not exceed 2000 characters. Optional.
+  #
   # @returns ToolConfiguration
   def update
     settings = tool_configuration_params[:settings]&.to_unsafe_hash&.deep_merge(manual_custom_fields)
@@ -158,6 +162,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
       developer_key_params:,
       configuration_params:,
       account:,
+      comment: params[:comment]&.to_s
     }
     registration = Lti::UpdateRegistrationService.call(**update_params)
 

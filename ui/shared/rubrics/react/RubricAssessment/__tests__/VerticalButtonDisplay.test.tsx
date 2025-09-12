@@ -45,6 +45,7 @@ const mockRatings: RubricRating[] = [
 
 describe('VerticalButtonDisplay', () => {
   const defaultProps = {
+    buttonDisplay: 'numeric',
     isPreviewMode: false,
     ratings: mockRatings,
     ratingOrder: 'descending',

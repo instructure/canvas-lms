@@ -142,8 +142,10 @@ const ReviewModal = () => {
           <Pagination
             as="nav"
             variant="input"
-            labelNext="Next Page"
-            labelPrev="Previous Page"
+            labelNext={I18n.t('Next Review')}
+            labelPrev={I18n.t('Previous Review')}
+            labelFirst={I18n.t('First Review')}
+            labelLast={I18n.t('Last Review')}
             currentPage={currentPage}
             totalPageNumber={entries.length}
             onPageChange={handlePageChange}

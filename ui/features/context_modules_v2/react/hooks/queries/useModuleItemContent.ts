@@ -50,6 +50,8 @@ export interface ContentItem {
   domain?: string
   description?: string
   placements?: Record<string, placementContent>
+  // Applies for quizzes
+  quizType?: 'quiz' | 'assignment'
 }
 
 // Common response structure for all queries
@@ -69,6 +71,7 @@ export interface GraphQLResponse {
         _id: string
         name: string
         pointsPossible: number
+        submissionTypes?: string[]
         dueAt: string
         published: boolean
       }>
@@ -83,6 +86,7 @@ export interface GraphQLResponse {
         title: string
         pointsPossible: number
         published: boolean
+        type: 'assignment' | 'quiz'
       }>
       pageInfo: {
         hasNextPage: boolean
@@ -161,6 +165,7 @@ const ASSIGNMENTS_QUERY = gql`
             id
             name
             pointsPossible
+            submissionTypes
             dueAt
             published
           }
@@ -186,6 +191,7 @@ const QUIZZES_QUERY = gql`
             title
             pointsPossible
             published
+            quizType
           }
           pageInfo {
             hasNextPage
@@ -330,6 +336,14 @@ function getQueryForContentType(contentType: ModuleItemContentType) {
   }
 }
 
+const hasQuizSubmissionType = (submissionTypes: unknown): boolean =>
+  Array.isArray(submissionTypes) &&
+  submissionTypes.some(
+    (t: unknown) =>
+      typeof t === 'string' &&
+      (t.toLowerCase().includes('quiz') || t.toLowerCase() === 'external_tool'),
+  )
+
 // Function to transform the query result into a standardized format
 function transformQueryResult(
   contentType: ModuleItemContentType,
@@ -349,6 +363,7 @@ function transformQueryResult(
             id: node._id,
             name: node.name,
             pointsPossible: node.pointsPossible,
+            isQuiz: hasQuizSubmissionType(node?.submissionTypes),
             dueAt: node.dueAt,
             published: node.published,
           })) || [],
@@ -362,6 +377,7 @@ function transformQueryResult(
             name: node.title,
             pointsPossible: node.pointsPossible,
             published: node.published,
+            quizType: node.quizType,
           })) || [],
         pageInfo: course?.quizzesConnection?.pageInfo,
       }

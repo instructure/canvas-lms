@@ -44,10 +44,9 @@ import {useCourseTeacher} from '../hooks/queriesTeacher/useCourseTeacher'
 import {validateModuleTeacherRenderRequirements, ALL_MODULES} from '../utils/utils'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useHowManyModulesAreFetchingItems} from '../hooks/queries/useHowManyModulesAreFetchingItems'
-import {TEACHER, STUDENT, MODULE_ITEMS, PAGE_SIZE, SHOW_ALL_PAGE_SIZE} from '../utils/constants'
-import {IconModuleSolid} from '@instructure/ui-icons'
-import {handleAddModule} from '../handlers/moduleActionHandlers'
+import {TEACHER, STUDENT, MODULE_ITEMS, SHOW_ALL_PAGE_SIZE} from '../utils/constants'
 import CreateNewModule from '../components/CreateNewModule'
+import {useDefaultCourseFolder} from '../hooks/mutations/useDefaultCourseFolder'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -60,7 +59,9 @@ const ModulesList: React.FC = () => {
     courseId,
     moduleCursorState,
     setModuleCursorState,
+    permissions,
   } = useContextModule()
+  useDefaultCourseFolder()
   const reorderItemsMutation = useReorderModuleItemsGQL()
   const reorderModulesMutation = useReorderModules()
   const {data, isLoading, error} = useModules(courseId || '')
@@ -516,7 +517,13 @@ const ModulesList: React.FC = () => {
                 ) : null}
                 <View className="context_module_list">
                   {data?.pages[0]?.modules.length === 0 ? (
-                    <CreateNewModule courseId={courseId} data={data} />
+                    permissions.canAdd ? (
+                      <CreateNewModule courseId={courseId} data={data} />
+                    ) : (
+                      <View as="div" textAlign="center" padding="large" className="no_modules">
+                        <Text>{I18n.t('No modules found')}</Text>
+                      </View>
+                    )
                   ) : (
                     data?.pages
                       .flatMap(page => page.modules)

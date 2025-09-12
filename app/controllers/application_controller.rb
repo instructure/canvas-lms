@@ -436,11 +436,11 @@ class ApplicationController < ActionController::Base
   JS_ENV_SITE_ADMIN_FEATURES = %i[
     account_level_blackout_dates
     assignment_edit_placement_not_on_announcements
+    accessibility_issues_in_full_page
     commons_new_quizzes
     consolidated_media_player
     courses_popout_sisid
     create_external_apps_side_tray_overrides
-    create_wiki_page_mastery_path_overrides
     dashboard_graphql_integration
     disallow_threaded_replies_fix_alert
     disallow_threaded_replies_manage
@@ -451,7 +451,6 @@ class ApplicationController < ActionController::Base
     explicit_latex_typesetting
     files_a11y_rewrite
     files_a11y_rewrite_toggle
-    hide_legacy_course_analytics
     horizon_course_setting
     instui_for_import_page
     instui_header
@@ -461,6 +460,7 @@ class ApplicationController < ActionController::Base
     new_quizzes_navigation_updates
     permanent_page_links
     rce_a11y_resize
+    rce_studio_embed_improvements
     rce_find_replace
     render_both_to_do_lists
     scheduled_feedback_releases
@@ -3191,7 +3191,7 @@ class ApplicationController < ActionController::Base
 
   ASSIGNMENT_GROUPS_TO_FETCH_PER_PAGE_ON_ASSIGNMENTS_INDEX = 50
   def set_js_assignment_data
-    rights = [*RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS, :manage_grades, :read_grades, :manage]
+    rights = [*RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS, :manage_grades, :read_grades, :manage, :moderate_forum]
     permissions = @context.rights_status(@current_user, *rights)
     permissions[:manage_course] = permissions[:manage]
     permissions[:manage] = permissions[:manage_assignments_edit]

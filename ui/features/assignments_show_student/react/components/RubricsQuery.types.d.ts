@@ -107,6 +107,7 @@ export type Submission = {
   attachment?: SubmissionFile
   attachments?: SubmissionFile[]
   attempt: number
+  autoGradeResultPresent?: boolean
   body?: string
   deductedPoints?: number
   enteredGrade?: string

@@ -13,8 +13,14 @@ if [ "$GERRIT_PROJECT" == "canvas-lms" ] && git diff --name-only HEAD~1..HEAD | 
   YARN_LOCK_PID=$!
 fi
 
+if [ "$GERRIT_PROJECT" == "canvas-lms" ] && git diff --name-only HEAD~1..HEAD | grep -E "app/graphql|lib/.*graphql|schema\.graphql"; then
+  DOCKER_INPUTS=$DOCKER_INPUTS GERGICH_VOLUME=$GERGICH_VOLUME ./build/new-jenkins/linters/run-gergich-graphql-schema.sh &
+  GRAPHQL_SCHEMA_PID=$!
+fi
+
 wait $WEBPACK_BUILD_PID
 wait $LINTER_PID
 [ ! -z "${YARN_LOCK_PID-}" ] && wait $YARN_LOCK_PID
+[ ! -z "${GRAPHQL_SCHEMA_PID-}" ] && wait $GRAPHQL_SCHEMA_PID
 
 exit 0

@@ -196,11 +196,11 @@ RSpec.describe PeerReview::PeerReviewCommonService do
       expect(attributes[:anonymous_peer_reviews]).to eq(parent_assignment.anonymous_peer_reviews)
       expect(attributes[:automatic_peer_reviews]).to eq(parent_assignment.automatic_peer_reviews)
       expect(attributes[:intra_group_peer_reviews]).to eq(parent_assignment.intra_group_peer_reviews)
-      expect(attributes[:submission_types]).to eq(parent_assignment.submission_types)
       expect(attributes[:workflow_state]).to eq(parent_assignment.workflow_state)
 
       expect(attributes[:has_sub_assignments]).to be(false)
       expect(attributes[:title]).to eq("#{parent_assignment.title} Peer Review")
+      expect(attributes[:submission_types]).to eq("online_text_entry")
       expect(attributes[:parent_assignment_id]).to eq(parent_assignment.id)
       expect(attributes[:points_possible]).to eq(peer_review_points_possible)
       expect(attributes[:grading_type]).to eq(peer_review_grading_type)
@@ -226,7 +226,6 @@ RSpec.describe PeerReview::PeerReviewCommonService do
         anonymous_peer_reviews
         automatic_peer_reviews
         intra_group_peer_reviews
-        submission_types
         workflow_state
       ]
 
@@ -241,6 +240,7 @@ RSpec.describe PeerReview::PeerReviewCommonService do
 
         expect(specific[:has_sub_assignments]).to be(false)
         expect(specific[:title]).to eq("#{parent_assignment.title} Peer Review")
+        expect(specific[:submission_types]).to eq("online_text_entry")
         expect(specific[:parent_assignment_id]).to eq(parent_assignment.id)
         expect(specific[:points_possible]).to eq(peer_review_points_possible)
         expect(specific[:grading_type]).to eq(peer_review_grading_type)
@@ -258,6 +258,7 @@ RSpec.describe PeerReview::PeerReviewCommonService do
 
         expect(specific[:has_sub_assignments]).to be(false)
         expect(specific[:title]).to eq("#{parent_assignment.title} Peer Review")
+        expect(specific[:submission_types]).to eq("online_text_entry")
         expect(specific[:parent_assignment_id]).to eq(parent_assignment.id)
         expect(specific).not_to have_key(:points_possible)
         expect(specific).not_to have_key(:grading_type)
@@ -271,6 +272,75 @@ RSpec.describe PeerReview::PeerReviewCommonService do
       expected_title = I18n.t("%{title} Peer Review", title: parent_assignment.title)
       attributes = service.send(:specific_attributes)
       expect(attributes[:title]).to eq(expected_title)
+    end
+
+    context "submission types based on grading type" do
+      it "sets submission_types to 'not_graded' when grading_type is 'not_graded'" do
+        service_not_graded = described_class.new(
+          parent_assignment:,
+          grading_type: "not_graded"
+        )
+        attributes = service_not_graded.send(:specific_attributes)
+
+        expect(attributes[:submission_types]).to eq("not_graded")
+      end
+
+      it "sets submission_types to 'online_text_entry' when grading_type is 'points'" do
+        service_points = described_class.new(
+          parent_assignment:,
+          grading_type: "points"
+        )
+        attributes = service_points.send(:specific_attributes)
+
+        expect(attributes[:submission_types]).to eq("online_text_entry")
+      end
+
+      it "sets submission_types to 'online_text_entry' when grading_type is 'pass_fail'" do
+        service_pass_fail = described_class.new(
+          parent_assignment:,
+          grading_type: "pass_fail"
+        )
+        attributes = service_pass_fail.send(:specific_attributes)
+
+        expect(attributes[:submission_types]).to eq("online_text_entry")
+      end
+
+      it "sets submission_types to 'online_text_entry' when grading_type is 'percent'" do
+        service_percent = described_class.new(
+          parent_assignment:,
+          grading_type: "percent"
+        )
+        attributes = service_percent.send(:specific_attributes)
+
+        expect(attributes[:submission_types]).to eq("online_text_entry")
+      end
+
+      it "sets submission_types to 'online_text_entry' when grading_type is 'letter_grade'" do
+        service_letter = described_class.new(
+          parent_assignment:,
+          grading_type: "letter_grade"
+        )
+        attributes = service_letter.send(:specific_attributes)
+
+        expect(attributes[:submission_types]).to eq("online_text_entry")
+      end
+
+      it "sets submission_types to 'online_text_entry' when grading_type is 'gpa_scale'" do
+        service_gpa = described_class.new(
+          parent_assignment:,
+          grading_type: "gpa_scale"
+        )
+        attributes = service_gpa.send(:specific_attributes)
+
+        expect(attributes[:submission_types]).to eq("online_text_entry")
+      end
+
+      it "defaults to 'online_text_entry' when no grading_type is specified" do
+        service_default = described_class.new(parent_assignment:)
+        attributes = service_default.send(:specific_attributes)
+
+        expect(attributes[:submission_types]).to eq("online_text_entry")
+      end
     end
   end
 
@@ -288,7 +358,6 @@ RSpec.describe PeerReview::PeerReviewCommonService do
         anonymous_peer_reviews
         automatic_peer_reviews
         intra_group_peer_reviews
-        submission_types
         workflow_state
       ]
 
@@ -443,6 +512,84 @@ RSpec.describe PeerReview::PeerReviewCommonService do
         it "includes the updated title based on new parent title" do
           attributes = service.send(:peer_review_attributes_to_update)
           expect(attributes[:title]).to eq("Updated Parent Assignment Peer Review")
+        end
+      end
+    end
+
+    context "handling of submission_types changes" do
+      context "when peer review sub assignment submission_types differs from expected value" do
+        before do
+          peer_review_sub_assignment.update!(submission_types: "none")
+        end
+
+        it "includes submission_types set to online_text_entry in the attributes to update" do
+          attributes = service.send(:peer_review_attributes_to_update)
+          expect(attributes[:submission_types]).to eq("online_text_entry")
+        end
+      end
+
+      context "when peer review sub assignment submission_types already matches expected value" do
+        before do
+          peer_review_sub_assignment.update!(submission_types: "online_text_entry")
+        end
+
+        it "does not include submission_types in the attributes to update" do
+          attributes = service.send(:peer_review_attributes_to_update)
+          expect(attributes).not_to have_key(:submission_types)
+        end
+      end
+
+      context "when grading_type changes to 'not_graded'" do
+        let(:service) do
+          described_class.new(
+            parent_assignment:,
+            grading_type: "not_graded"
+          )
+        end
+
+        before do
+          peer_review_sub_assignment.update!(submission_types: "online_text_entry")
+        end
+
+        it "includes submission_types set to 'not_graded' in the attributes to update" do
+          attributes = service.send(:peer_review_attributes_to_update)
+          expect(attributes[:submission_types]).to eq("not_graded")
+        end
+      end
+
+      context "when grading_type changes from 'not_graded' to graded type" do
+        let(:service) do
+          described_class.new(
+            parent_assignment:,
+            grading_type: "points"
+          )
+        end
+
+        before do
+          peer_review_sub_assignment.update!(submission_types: "not_graded")
+        end
+
+        it "includes submission_types set to 'online_text_entry' in the attributes to update" do
+          attributes = service.send(:peer_review_attributes_to_update)
+          expect(attributes[:submission_types]).to eq("online_text_entry")
+        end
+      end
+
+      context "when grading_type stays the same" do
+        let(:service) do
+          described_class.new(
+            parent_assignment:,
+            grading_type: "points"
+          )
+        end
+
+        before do
+          peer_review_sub_assignment.update!(submission_types: "online_text_entry")
+        end
+
+        it "does not include submission_types in the attributes to update" do
+          attributes = service.send(:peer_review_attributes_to_update)
+          expect(attributes).not_to have_key(:submission_types)
         end
       end
     end

@@ -25,6 +25,7 @@ import {ButtonBlockColorSettings} from './ButtonBlockColorSettings'
 import {ButtonBlockProps, ButtonData, ButtonAlignment, ButtonLayout} from './types'
 import {SettingsSectionToggle} from '../BlockItems/SettingsSectionToggle/SettingsSectionToggle'
 import {SettingsIncludeTitle} from '../BlockItems/SettingsIncludeTitle/SettingsIncludeTitle'
+import {defaultProps} from './defaultProps'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -33,60 +34,55 @@ export const ButtonBlockSettings = () => {
     actions: {setProp},
     includeBlockTitle,
     backgroundColor,
-    textColor,
+    titleColor,
     alignment,
     layout,
     isFullWidth,
     buttons,
   } = useNode(node => ({
-    includeBlockTitle: node.data.props.settings.includeBlockTitle,
-    backgroundColor: node.data.props.settings.backgroundColor,
-    textColor: node.data.props.settings.textColor,
-    alignment: node.data.props.settings.alignment,
-    layout: node.data.props.settings.layout,
-    isFullWidth: node.data.props.settings.isFullWidth,
-    buttons: node.data.props.settings.buttons,
+    ...defaultProps,
+    ...node.data.props,
   }))
 
   const handleIncludeBlockTitleChange = () => {
     setProp((props: ButtonBlockProps) => {
-      props.settings.includeBlockTitle = !includeBlockTitle
+      props.includeBlockTitle = !includeBlockTitle
     })
   }
 
   const handleBackgroundColorChange = (color: string) => {
     setProp((props: ButtonBlockProps) => {
-      props.settings.backgroundColor = color
+      props.backgroundColor = color
     })
   }
 
-  const handleTextColorChange = (color: string) => {
+  const handleTitleColorChange = (color: string) => {
     setProp((props: ButtonBlockProps) => {
-      props.settings.textColor = color
+      props.titleColor = color
     })
   }
 
   const handleAlignmentChange = (alignment: ButtonAlignment) => {
     setProp((props: ButtonBlockProps) => {
-      props.settings.alignment = alignment
+      props.alignment = alignment
     })
   }
 
   const handleLayoutChange = (layout: ButtonLayout) => {
     setProp((props: ButtonBlockProps) => {
-      props.settings.layout = layout
+      props.layout = layout
     })
   }
 
   const handleIsFullWidthChange = (isFullWidth: boolean) => {
     setProp((props: ButtonBlockProps) => {
-      props.settings.isFullWidth = isFullWidth
+      props.isFullWidth = isFullWidth
     })
   }
 
   const handleButtonsChange = (buttons: ButtonData[]) => {
     setProp((props: ButtonBlockProps) => {
-      props.settings.buttons = buttons
+      props.buttons = buttons
     })
   }
 
@@ -97,15 +93,15 @@ export const ButtonBlockSettings = () => {
         title={I18n.t('Color settings')}
         collapsedLabel={I18n.t('Expand color settings')}
         expandedLabel={I18n.t('Collapse color settings')}
-        defaultExpanded={false}
+        defaultExpanded={true}
         includeSeparator={true}
       >
         <ButtonBlockColorSettings
           includeBlockTitle={includeBlockTitle}
           backgroundColor={backgroundColor}
-          textColor={textColor}
+          titleColor={titleColor}
           onBackgroundColorChange={handleBackgroundColorChange}
-          onTextColorChange={handleTextColorChange}
+          onTitleColorChange={handleTitleColorChange}
         />
       </SettingsSectionToggle>
 

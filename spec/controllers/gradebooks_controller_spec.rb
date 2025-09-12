@@ -87,6 +87,28 @@ describe GradebooksController do
         end
       end
 
+      it "includes auto_grade_result_present in submissions_json when auto grade result exists" do
+        @assignment.grade_student(@student, grade: 10, grader: @teacher)
+        allow_any_instance_of(Submission).to receive(:auto_grade_result_present?).and_return(true)
+
+        get "grade_summary", params: { course_id: @course.id, id: @student.id }
+
+        submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
+        expect(submission).to have_key(:auto_grade_result_present)
+        expect(submission[:auto_grade_result_present]).to be true
+      end
+
+      it "includes auto_grade_result_present as false in submissions_json when no auto grade result exists" do
+        @assignment.grade_student(@student, grade: 10, grader: @teacher)
+        allow_any_instance_of(Submission).to receive(:auto_grade_result_present).and_return(false)
+
+        get "grade_summary", params: { course_id: @course.id, id: @student.id }
+
+        submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
+        expect(submission).to have_key(:auto_grade_result_present)
+        expect(submission[:auto_grade_result_present]).to be false
+      end
+
       it "includes submission_comments of posted submissions" do
         @assignment.anonymous_peer_reviews = true
         @assignment.save!
@@ -1084,6 +1106,61 @@ describe GradebooksController do
             user_session(@teacher)
             get :show, params: { course_id: @course.id }
             expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:gradebook_score_to_ungraded_progress]).to eq(@progress)
+          end
+        end
+      end
+
+      describe "performance_improvements_for_gradebook" do
+        before do
+          user_session(@teacher)
+        end
+
+        context "when feature flag is disabled" do
+          before do
+            @course.disable_feature!(:performance_improvements_for_gradebook)
+          end
+
+          it "sets performance_improvements_for_gradebook to false in js_env" do
+            get :show, params: { course_id: @course.id }
+
+            expect(Services::PlatformServiceGradebook).not_to receive(:use_graphql?)
+            expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:performance_improvements_for_gradebook]).to be false
+          end
+        end
+
+        context "when feature flag is enabled" do
+          before do
+            @course.enable_feature!(:performance_improvements_for_gradebook)
+          end
+
+          context "and PlatformServiceGradebook.use_graphql? returns true" do
+            before do
+              allow(Services::PlatformServiceGradebook).to receive(:use_graphql?)
+                .with(@course.account.global_id, @course.global_id)
+                .and_return(true)
+            end
+
+            it "sets performance_improvements_for_gradebook to true in js_env" do
+              get :show, params: { course_id: @course.id }
+
+              expect(Services::PlatformServiceGradebook).not_to receive(:use_graphql?).with(@course.account.global_id, @course.global_id)
+              expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:performance_improvements_for_gradebook]).to be true
+            end
+          end
+
+          context "and PlatformServiceGradebook.use_graphql? returns false" do
+            before do
+              allow(Services::PlatformServiceGradebook).to receive(:use_graphql?)
+                .with(@course.account.global_id, @course.global_id)
+                .and_return(false)
+            end
+
+            it "sets performance_improvements_for_gradebook to false in js_env" do
+              get :show, params: { course_id: @course.id }
+
+              expect(Services::PlatformServiceGradebook).not_to receive(:use_graphql?).with(@course.account.global_id, @course.global_id)
+              expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:performance_improvements_for_gradebook]).to be false
+            end
           end
         end
       end
@@ -3055,6 +3132,37 @@ describe GradebooksController do
         allow(Services::PlatformServiceSpeedgrader).to receive(:launch_url).and_return("http://example.com")
       end
 
+      context "gradebook_section_filter_id when multiselect_gradebook_filters is enabled" do
+        before do
+          Account.site_admin.enable_feature!(:multiselect_gradebook_filters)
+          Account.site_admin.enable_feature!(:platform_service_speedgrader)
+          @assignment.publish
+          @section = @course.course_sections.create!(name: "A Section")
+        end
+
+        it "includes stringified ids of selected sections" do
+          @teacher.set_preference(:gradebook_settings, @course.global_id, {
+                                    "filter_rows_by" => { "section_ids" => [@section.id.to_s] }
+                                  })
+          get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+          expect(assigns[:js_env].dig(:gradebook_section_filter_id, 0)).to eql @section.id.to_s
+        end
+
+        it "filters out deleted saved sections" do
+          @teacher.set_preference(:gradebook_settings, @course.global_id, {
+                                    "filter_rows_by" => { "section_ids" => [@section.id.to_s] }
+                                  })
+          @section.destroy
+          get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+          expect(assigns[:js_env].fetch(:gradebook_section_filter_id)).to be_empty
+        end
+
+        it "returns nil when section filters have not been used" do
+          get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+          expect(assigns[:js_env].fetch(:gradebook_section_filter_id)).to be_nil
+        end
+      end
+
       it "loads the platform speedgrader when the feature flag is on and the platform_sg flag is passed" do
         @assignment.publish
         Account.site_admin.enable_feature!(:platform_service_speedgrader)
@@ -3618,6 +3726,69 @@ describe GradebooksController do
         }
 
         expect(course_settings.dig("filter_rows_by", "section_ids")).not_to include(other_course_section.id.to_s)
+      end
+    end
+
+    describe "checkboxed_selected_section_ids preference" do
+      let(:course_settings) { @teacher.reload.get_preference(:gradebook_settings, @course.global_id) }
+
+      before do
+        user_session(@teacher)
+      end
+
+      it "overwrites section IDs with the passed-in values" do
+        section1 = @course.course_sections.first.id
+        section2 = (@course.course_sections.second || @course.course_sections.create!).id
+
+        # First set a different selection
+        @teacher.set_preference(:gradebook_settings, @course.global_id, {
+                                  filter_rows_by: { section_ids: [section1.to_s] }
+                                })
+
+        # Overwrite with new selection
+        post "speed_grader_settings", params: {
+          course_id: @course.id,
+          checkboxed_selected_section_ids: [section2]
+        }
+
+        expect(course_settings.dig("filter_rows_by", "section_ids")).to eq [section2.to_s]
+        expect(course_settings["selected_view_options_filters"]).to include("sections")
+      end
+
+      it 'clears the selected sections if passed the value "all"' do
+        section1 = @course.course_sections.first.id
+        @teacher.set_preference(:gradebook_settings, @course.global_id, {
+                                  filter_rows_by: { section_ids: [section1.to_s] }
+                                })
+
+        post "speed_grader_settings", params: {
+          course_id: @course.id,
+          checkboxed_selected_section_ids: "all"
+        }
+
+        expect(course_settings.dig("filter_rows_by", "section_ids")).to be_nil
+      end
+
+      it "ignores invalid section IDs" do
+        invalid_id = "9999999"
+
+        post "speed_grader_settings", params: {
+          course_id: @course.id,
+          checkboxed_selected_section_ids: [invalid_id]
+        }
+
+        expect(course_settings.dig("filter_rows_by", "section_ids")).to be_empty
+      end
+
+      it "ignores section IDs that don't belong to the course" do
+        other_course_section = Course.create!.course_sections.create!
+
+        post "speed_grader_settings", params: {
+          course_id: @course.id,
+          checkboxed_selected_section_ids: [other_course_section.id]
+        }
+
+        expect(course_settings.dig("filter_rows_by", "section_ids")).to be_empty
       end
     end
   end

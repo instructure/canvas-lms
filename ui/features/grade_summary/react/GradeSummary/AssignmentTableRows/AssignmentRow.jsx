@@ -29,6 +29,7 @@ import {
   IconMutedLine,
   IconAnalyticsLine,
   IconRubricLine,
+  IconAiSolid,
 } from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
