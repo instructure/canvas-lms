@@ -524,6 +524,9 @@ export const AddressBook = ({
       if (onUserFilterSelect) {
         onUserFilterSelect(menuItem)
       }
+      setTimeout(() => {
+        setOnSuccess(I18n.t('Added %{menuItemName}', {menuItemName: menuItem.name}), true)
+      }, 100)
     } else {
       setIsSubMenuSelection(true)
       onSelect(menuItem, isContext, isBackButton, isSubmenu)
