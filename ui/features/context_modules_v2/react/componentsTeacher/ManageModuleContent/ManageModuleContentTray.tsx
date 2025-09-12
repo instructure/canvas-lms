@@ -270,6 +270,7 @@ const ManageModuleContentTray: React.FC<ManageModuleContentTrayProps> = ({
       if (moduleAction === MOVE_MODULE) {
         await submitReorderRequest(`${ENV.CONTEXT_URL_ROOT}/modules/reorder`, moduleOrder)
         showFlashSuccess(I18n.t('Module moved successfully'))
+        queryClient.invalidateQueries({queryKey: [MODULES, courseId]})
       }
 
       if (moduleAction != MOVE_MODULE) {
