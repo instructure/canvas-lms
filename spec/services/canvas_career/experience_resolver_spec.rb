@@ -24,7 +24,6 @@ module CanvasCareer
       @root_account = Account.default
       @root_account.enable_feature!(:horizon_course_setting)
       @root_account.enable_feature!(:horizon_learning_provider_app_for_courses)
-      @root_account.enable_feature!(:horizon_learning_provider_app_on_contextless_routes)
 
       @career_subaccount = @root_account.sub_accounts.create!
       @career_subaccount.horizon_account = true
@@ -208,12 +207,6 @@ module CanvasCareer
             expect(ExperienceResolver.new(@user, nil, @root_account, @session).resolve).to eq Constants::App::ACADEMIC
           end
 
-          it "returns ACADEMIC when horizon_learning_provider_app_on_contextless_routes flag is disabled" do
-            @course_career.enroll_teacher(@user, enrollment_state: "active")
-            @root_account.disable_feature!(:horizon_learning_provider_app_on_contextless_routes)
-            expect(ExperienceResolver.new(@user, nil, @root_account, @session).resolve).to eq Constants::App::ACADEMIC
-          end
-
           it "returns CAREER_LEARNING_PROVIDER when user is enrolled in only career courses" do
             @course_career.enroll_teacher(@user, enrollment_state: "active")
             expect(ExperienceResolver.new(@user, nil, @root_account, @session).resolve).to eq Constants::App::CAREER_LEARNING_PROVIDER
@@ -283,11 +276,6 @@ module CanvasCareer
 
           it "returns ACADEMIC when preferring academic experience" do
             allow(@user_preference).to receive(:prefers_academic?).and_return(true)
-            expect(ExperienceResolver.new(@user, nil, @root_account, @session).resolve).to eq Constants::App::ACADEMIC
-          end
-
-          it "returns ACADEMIC when learning provider feature flag is disabled" do
-            @root_account.disable_feature!(:horizon_learning_provider_app_on_contextless_routes)
             expect(ExperienceResolver.new(@user, nil, @root_account, @session).resolve).to eq Constants::App::ACADEMIC
           end
 
