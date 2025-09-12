@@ -243,8 +243,10 @@ class YoutubeMigrationService
 
       resource_group_key = YoutubeMigrationService.generate_resource_key(quiz.class.name, quiz.id)
 
-      # TODO: fine tune the queries with find_each to not eat all the memory
-      questions_embeds_with_errors = quiz.quiz_questions.active.flat_map do |question|
+      questions_embeds_with_errors = quiz.quiz_questions
+                                         .active
+                                         .without_assessment_question_association
+                                         .flat_map do |question|
         QUESTION_RCE_FIELDS.map do |field|
           embeds, error = scan_resource(question, field, question.question_data[field], resource_group_key)
           [embeds, error]
