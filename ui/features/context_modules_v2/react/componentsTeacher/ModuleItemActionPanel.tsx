@@ -321,9 +321,16 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
           </Flex.Item>
         )}
       </Flex>
-      {['assignment', 'attachment', 'discussion', 'page', 'quiz', 'module', 'module_item'].includes(
-        content?.type?.toLowerCase() || '',
-      ) && (
+      {[
+        'assignment',
+        'attachment',
+        'discussion',
+        'file',
+        'page',
+        'quiz',
+        'module',
+        'module_item',
+      ].includes(content?.type?.toLowerCase() || '') && (
         <>
           <DirectShareUserModal
             id={moduleId}

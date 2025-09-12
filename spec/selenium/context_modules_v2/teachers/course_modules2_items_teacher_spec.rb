@@ -325,6 +325,18 @@ describe "context module items", :ignore_js_errors do
         expect(send_to_modal).to be_displayed
       end
 
+      it "send item form is shown for file items" do
+        @file = @course.attachments.create!(display_name: "some file", uploaded_data: default_uploaded_data)
+        file_item = @module1.add_item(type: "file", id: @file.id)
+        go_to_modules
+        module_header_expand_toggles.first.click
+        wait_for_ajaximations
+        manage_module_item_button(file_item.id).click
+        module_item_action_menu_link("Send To...").click
+
+        expect(send_to_modal).to be_displayed
+      end
+
       it "module item is correctly sent" do
         go_to_modules
         module_header_expand_toggles.first.click
@@ -358,6 +370,8 @@ describe "context module items", :ignore_js_errors do
         @assignment_item = @module3.content_tags[1]
         @discussion_item = @module3.content_tags[2]
         @page_item = @module3.content_tags[3]
+        @file = @course.attachments.create!(display_name: "some file", uploaded_data: default_uploaded_data)
+        @file_item = @module3.add_item(type: "file", id: @file.id)
       end
 
       def copy_and_expect(item, expected_key)
@@ -388,6 +402,7 @@ describe "context module items", :ignore_js_errors do
         copy_and_expect(@assignment_item, "assignments")
         copy_and_expect(@discussion_item, "discussion_topics")
         copy_and_expect(@page_item, "wiki_pages")
+        copy_and_expect(@file_item, "attachments")
       end
     end
 
