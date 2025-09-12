@@ -1314,9 +1314,12 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
   }
 
   announcing = 0
+  _isMounted = false
 
   announceContextToolbars(editor: TinyMCEEditor) {
     editor.on('NodeChange', () => {
+      if (!this._isMounted) return
+
       const node = editor.selection.getNode()
       // @ts-expect-error
       if (isImageEmbed(node, editor)) {
@@ -1355,7 +1358,8 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
     })
 
     editor.on('ResizeEditor', ({deltaY}) => {
-      if (!deltaY) return
+      if (!this._isMounted || !deltaY) return
+
       if (deltaY < 0) {
         this.setState({
           announcement: formatMessage('The height of Rich Content Area is decreased.'),
@@ -1689,6 +1693,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
   }
 
   componentWillUnmount() {
+    this._isMounted = false
     if (this.state.shouldShowEditor) {
       window.clearTimeout(this.blurTimer)
       if (!this._destroyCalled) {
@@ -1906,6 +1911,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
   }
 
   componentDidMount() {
+    this._isMounted = true
     if (this.state.shouldShowEditor) {
       this.editorReallyDidMount()
     } else {
