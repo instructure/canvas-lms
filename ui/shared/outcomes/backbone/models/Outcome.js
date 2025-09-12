@@ -30,23 +30,26 @@ function Outcome() {
   return Outcome.__super__.constructor.apply(this, arguments)
 }
 
-Outcome.prototype.defaults = {
-  mastery_points: 3,
-  points_possible: 5,
-  ratings: [
-    {
-      description: I18n.t('criteria.exceeds_expectations', 'Exceeds Expectations'),
-      points: 5,
-    },
-    {
-      description: I18n.t('criteria.meets_expectations', 'Meets Expectations'),
-      points: 3,
-    },
-    {
-      description: I18n.t('criteria.does_not_meet_expectations', 'Does Not Meet Expectations'),
-      points: 0,
-    },
-  ],
+// note that Backbone automatically calls the default function upon model instantiation
+Outcome.prototype.defaults = function () {
+  return {
+    mastery_points: 3,
+    points_possible: 5,
+    ratings: [
+      {
+        description: I18n.t('criteria.exceeds_expectations', 'Exceeds Expectations'),
+        points: 5,
+      },
+      {
+        description: I18n.t('criteria.meets_expectations', 'Meets Expectations'),
+        points: 3,
+      },
+      {
+        description: I18n.t('criteria.does_not_meet_expectations', 'Does Not Meet Expectations'),
+        points: 0,
+      },
+    ],
+  }
 }
 
 Outcome.prototype.setMasteryScales = function () {
