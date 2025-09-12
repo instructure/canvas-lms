@@ -276,8 +276,11 @@ describe "SpeedGrader" do
     @assignment.submit_homework(s3, body: "Homework!?")
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_ajaximations
+    wait_for_dom_ready
+    wait_for_initializers
 
+    # Wait for the student selector to be fully loaded
+    expect(f("#students_selectmenu")).to be_displayed
     expect(fj("#students_selectmenu option[value=#{s3.id}]")[:selected]).to be_truthy
   end
 
