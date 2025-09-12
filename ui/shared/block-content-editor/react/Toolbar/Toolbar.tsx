@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {PreviewButton} from './PreviewButton'
 import {RedoButton} from './RedoButton'
@@ -24,6 +23,10 @@ import {UndoButton} from './UndoButton'
 import {AccessibilityCheckerButton} from './AccessibilityCheckerButton'
 import {useBlockContentEditorContext} from '../BlockContentEditorContext'
 import {useEditHistory} from '../hooks/useEditHistory'
+import {List} from '@instructure/ui-list'
+import {useScope as createI18nScope} from '@canvas/i18n'
+
+const I18n = createI18nScope('block_content_editor')
 
 export const Toolbar = () => {
   const {
@@ -37,19 +40,27 @@ export const Toolbar = () => {
 
   return (
     <View shadow="resting" display="block">
-      <Flex direction="column">
-        <PreviewButton
-          active={isPreviewMode}
-          onClick={() => setMode(isPreviewMode ? 'default' : 'preview')}
-        />
+      <List role="toolbar" aria-label={I18n.t('Editor toolbar')} isUnstyled margin="none">
+        <List.Item>
+          <PreviewButton
+            active={isPreviewMode}
+            onClick={() => setMode(isPreviewMode ? 'default' : 'preview')}
+          />
+        </List.Item>
         {!isPreviewMode && (
           <>
-            <UndoButton active={canUndo} onClick={undo} />
-            <RedoButton active={canRedo} onClick={redo} />
-            <AccessibilityCheckerButton count={a11yIssueCount} issues={allIssues} />
+            <List.Item>
+              <UndoButton active={canUndo} onClick={undo} />
+            </List.Item>
+            <List.Item>
+              <RedoButton active={canRedo} onClick={redo} />
+            </List.Item>
+            <List.Item>
+              <AccessibilityCheckerButton count={a11yIssueCount} issues={allIssues} />
+            </List.Item>
           </>
         )}
-      </Flex>
+      </List>
     </View>
   )
 }
