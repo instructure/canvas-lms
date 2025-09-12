@@ -1918,6 +1918,152 @@ describe ContentMigration do
     end
   end
 
+  context "syncing master deletions" do
+    context "deleting module item" do
+      def setup_master_course_deletion_test
+        # Setup master course and child course
+        master_course = course_factory
+        template = MasterCourses::MasterTemplate.set_as_master_course(master_course)
+        child_course = course_factory
+        subscription = template.add_child_course!(child_course)
+
+        # Create content migration for child course
+        cm = ContentMigration.new(context: child_course, migration_type: "master_course_import")
+        cm.child_subscription_id = subscription.id
+        cm.save!
+
+        # Create module
+        mod = child_course.context_modules.create!(name: "Test Module", migration_id: "#{MasterCourses::MIGRATION_ID_PREFIX}_test_module_mig_id")
+
+        [child_course, subscription, cm, mod]
+      end
+
+      def verify_deletion_test(content_item, mod, subscription, deletion_key)
+        initial_downstream_changes = subscription.content_tag_for(mod).downstream_changes
+        expect(initial_downstream_changes).to be_empty
+
+        deletions = {
+          deletion_key => [content_item.migration_id]
+        }
+
+        yield deletions if block_given?
+
+        expect(content_item.reload).to be_deleted
+        expect(mod.reload.completion_requirements).to be_empty
+        module_content_tag = subscription.content_tag_for(mod)
+        expect(module_content_tag.reload.downstream_changes).to be_empty
+      end
+
+      it "does not mark downstream changes in module when feature flag is enabled" do
+        Account.site_admin.enable_feature!(:skip_blueprint_module_downstream_changes)
+        child_course, subscription, cm, mod = setup_master_course_deletion_test
+
+        assignment = child_course.assignments.create!(name: "Test Assignment", points_possible: 10)
+        assignment.migration_id = "#{MasterCourses::MIGRATION_ID_PREFIX}_test_assignment_mig_id"
+        assignment.save!
+
+        tag = mod.add_item(type: "assignment", id: assignment.id)
+        mod.completion_requirements = [{ id: tag.id, type: "must_submit" }]
+        mod.save!
+
+        subscription.create_content_tag_for!(assignment)
+        subscription.create_content_tag_for!(mod)
+
+        verify_deletion_test(assignment, mod, subscription, "Assignment") do |deletions|
+          cm.process_master_deletions(deletions)
+        end
+      end
+
+      it "preserves old behavior when feature flag is disabled" do
+        Account.site_admin.disable_feature!(:skip_blueprint_module_downstream_changes)
+        child_course, subscription, cm, mod = setup_master_course_deletion_test
+
+        assignment = child_course.assignments.create!(name: "Test Assignment", points_possible: 10)
+        assignment.migration_id = "#{MasterCourses::MIGRATION_ID_PREFIX}_test_assignment_mig_id"
+        assignment.save!
+
+        tag = mod.add_item(type: "assignment", id: assignment.id)
+        mod.completion_requirements = [{ id: tag.id, type: "must_submit" }]
+        mod.save!
+
+        subscription.create_content_tag_for!(assignment)
+        subscription.create_content_tag_for!(mod)
+
+        initial_downstream_changes = subscription.content_tag_for(mod).downstream_changes
+        expect(initial_downstream_changes).to be_empty
+
+        deletions = {
+          "Assignment" => [assignment.migration_id]
+        }
+
+        cm.process_master_deletions(deletions)
+
+        expect(assignment.reload).to be_deleted
+        expect(subscription.content_tag_for(mod).downstream_changes).to eq(["completion_requirements"])
+      end
+
+      it "does not mark downstream changes in module for quiz deletion when feature flag is enabled" do
+        Account.site_admin.enable_feature!(:skip_blueprint_module_downstream_changes)
+        child_course, subscription, cm, mod = setup_master_course_deletion_test
+
+        quiz = child_course.quizzes.create!(title: "Test Quiz", quiz_type: "assignment")
+        quiz.migration_id = "#{MasterCourses::MIGRATION_ID_PREFIX}_test_quiz_mig_id"
+        quiz.save!
+
+        tag = mod.add_item(type: "quiz", id: quiz.id)
+        mod.completion_requirements = [{ id: tag.id, type: "must_submit" }]
+        mod.save!
+
+        subscription.create_content_tag_for!(quiz)
+        subscription.create_content_tag_for!(mod)
+
+        verify_deletion_test(quiz, mod, subscription, "Quizzes::Quiz") do |deletions|
+          cm.process_master_deletions(deletions)
+        end
+      end
+
+      it "does not mark downstream changes in module for wiki page deletion when feature flag is enabled" do
+        Account.site_admin.enable_feature!(:skip_blueprint_module_downstream_changes)
+        child_course, subscription, cm, mod = setup_master_course_deletion_test
+
+        wiki_page = child_course.wiki_pages.create!(title: "Test Page", body: "Test content")
+        wiki_page.migration_id = "#{MasterCourses::MIGRATION_ID_PREFIX}_test_page_mig_id"
+        wiki_page.save!
+
+        tag = mod.add_item(type: "wiki_page", id: wiki_page.id)
+        mod.completion_requirements = [{ id: tag.id, type: "must_view" }]
+        mod.save!
+
+        subscription.create_content_tag_for!(wiki_page)
+        subscription.create_content_tag_for!(mod)
+
+        verify_deletion_test(wiki_page, mod, subscription, "WikiPage") do |deletions|
+          cm.process_master_deletions(deletions)
+        end
+      end
+
+      it "does not mark downstream changes in module for discussion topic deletion when feature flag is enabled" do
+        Account.site_admin.enable_feature!(:skip_blueprint_module_downstream_changes)
+        child_course, subscription, cm, mod = setup_master_course_deletion_test
+
+        discussion_topic = child_course.discussion_topics.create!(title: "Test Discussion", message: "Test message")
+        discussion_topic.migration_id = "#{MasterCourses::MIGRATION_ID_PREFIX}_test_discussion_mig_id"
+        discussion_topic.save!
+
+        tag = mod.add_item(type: "discussion_topic", id: discussion_topic.id)
+        mod.completion_requirements = [{ id: tag.id, type: "must_contribute" }]
+        mod.save!
+
+        subscription.create_content_tag_for!(discussion_topic)
+        subscription.create_content_tag_for!(mod)
+
+        verify_deletion_test(discussion_topic, mod, subscription, "DiscussionTopic") do |deletions|
+          cm.process_master_deletions(deletions)
+        end
+      end
+    end
+  end
+
   context "outcomes" do
     def context_outcome(context, outcome_group = nil)
       outcome_group ||= context.root_outcome_group
