@@ -60,6 +60,8 @@ class CutyCapt
     setting = setting.symbolize_keys
     @@config = CUTYCAPT_DEFAULTS.merge(setting).with_indifferent_access
     process_config
+    creds = Rails.application.credentials.config[:screencap_service]
+    @@config[:screencap_service] = creds if creds
     @@config = nil unless @@config[:path] || @@config[:screencap_service]
     @@config
   end

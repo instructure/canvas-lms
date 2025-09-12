@@ -28,6 +28,25 @@ describe CutyCapt do
     ConfigFile.unstub
   end
 
+  context "credentials" do
+    it "applies credentials with an existing configuration file" do
+      ConfigFile.stub("cutycapt", { path: "not used", timeout: 1000, screencap_service: { url: "http://shouldbeoverridden", key: "oldkey" } })
+      creds = { url: "https://foo.bar/baz", key: "abcdefg" }
+      allow(Rails.application).to receive_message_chain(:credentials, :config).and_return({ screencap_service: creds })
+      expect(CutyCapt.config[:path]).to eq "not used"
+      expect(CutyCapt.config[:timeout]).to eq 1000
+      expect(CutyCapt.config[:screencap_service]).to eq(creds.stringify_keys)
+    end
+
+    it "uses credentials from the configuration file" do
+      creds = { url: "https://foo.bar/baz", key: "abcdefg" }
+      ConfigFile.stub("cutycapt", { path: "not used", timeout: 1000, screencap_service: creds })
+      expect(CutyCapt.config[:path]).to eq "not used"
+      expect(CutyCapt.config[:timeout]).to eq 1000
+      expect(CutyCapt.config[:screencap_service]).to eq(creds.stringify_keys)
+    end
+  end
+
   context "configuration" do
     it "looks up parameters specified by string keys in the config correctly" do
       ConfigFile.stub("cutycapt", { "path" => "not used", "timeout" => 1000 })
