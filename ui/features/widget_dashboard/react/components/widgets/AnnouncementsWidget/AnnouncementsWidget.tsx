@@ -29,10 +29,9 @@ import {usePaginatedAnnouncements} from '../../../hooks/useAnnouncements'
 import {useSharedCourses} from '../../../hooks/useSharedCourses'
 import {usePagination} from '../../../hooks/usePagination'
 import {COURSE_GRADES_WIDGET} from '../../../constants'
+import {FilterOption} from './utils'
 
 const I18n = createI18nScope('widget_dashboard')
-
-type FilterOption = 'unread' | 'read' | 'all'
 
 const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
   const [filter, setFilter] = useState<FilterOption>('unread')
@@ -135,7 +134,11 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
     return (
       <View as="div" height="100%" width="100%">
         {enrichedAnnouncements.map(announcement => (
-          <AnnouncementItem key={announcement.id} announcement={announcement} />
+          <AnnouncementItem
+            key={`${announcement.id}-${announcement.isRead ? 'read' : 'unread'}`}
+            announcementItem={announcement}
+            filter={filter}
+          />
         ))}
       </View>
     )
