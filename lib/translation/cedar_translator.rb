@@ -29,7 +29,6 @@ module Translation
       root_account_uuid = options[:root_account_uuid]
       feature_slug = options.fetch(:feature_slug)
       current_user = options.fetch(:current_user)
-      raise "Missing current user" unless current_user
 
       translation_response = CedarClient.translate_text(
         content: text,
@@ -42,6 +41,12 @@ module Translation
       check_same_language(translation_response.source_language, tgt_lang)
       collect_translation_stats(src_lang: translation_response.source_language, tgt_lang:, type: feature_slug)
       translation_response.translation
+    rescue InstructureMiscPlugin::Extensions::CedarClient::ContentTooLongError
+      raise TextTooLongError
+    rescue InstructureMiscPlugin::Extensions::CedarClient::UnsupportedLanguageError
+      raise UnsupportedLanguageError
+    rescue InstructureMiscPlugin::Extensions::CedarClient::ValidationError
+      raise ValidationError
     end
 
     def translate_html(html_string:, tgt_lang:, options: {})
@@ -51,7 +56,6 @@ module Translation
       root_account_uuid = options[:root_account_uuid]
       feature_slug = options.fetch(:feature_slug)
       current_user = options.fetch(:current_user)
-      raise "Missing current user" unless current_user
 
       translation_response = CedarClient.translate_html(
         content: html_string,
@@ -64,6 +68,12 @@ module Translation
       check_same_language(translation_response.source_language, tgt_lang)
       collect_translation_stats(src_lang: translation_response.source_language, tgt_lang:, type: feature_slug)
       translation_response.translation
+    rescue InstructureMiscPlugin::Extensions::CedarClient::ContentTooLongError
+      raise TextTooLongError
+    rescue InstructureMiscPlugin::Extensions::CedarClient::UnsupportedLanguageError
+      raise UnsupportedLanguageError
+    rescue InstructureMiscPlugin::Extensions::CedarClient::ValidationError
+      raise ValidationError
     end
 
     def self.languages
