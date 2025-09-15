@@ -57,10 +57,10 @@ export default class AddExternalFeed extends React.Component {
 
   state = {
     isOpen: this.props.defaultOpen,
-    feedURL: null,
+    feedURL: '',
     verbosityType: verbosityTypes[0].value,
     phraseChecked: false,
-    phrase: null,
+    phrase: '',
   }
 
   focusOnToggleHeader = () => {
@@ -91,10 +91,10 @@ export default class AddExternalFeed extends React.Component {
   clearAddRSS = () => {
     this.setState({
       isOpen: false,
-      feedURL: null,
+      feedURL: '',
       verbosityType: verbosityTypes[0].value,
       phraseChecked: false,
-      phrase: null,
+      phrase: '',
     })
   }
 
