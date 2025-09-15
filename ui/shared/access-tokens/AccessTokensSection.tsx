@@ -56,7 +56,12 @@ export const AccessTokensSection = ({userId}: AccessTokensTableProps) => {
 
   if (isError) {
     return (
-      <Alert variant="error" margin="x-small">
+      <Alert
+        variant="error"
+        margin="x-small"
+        liveRegion={() => document.getElementById('flash_screenreader_holder') as HTMLElement}
+        liveRegionPoliteness="assertive"
+      >
         {I18n.t('Failed to load access tokens')}
       </Alert>
     )
