@@ -21,7 +21,7 @@ config = ConfigFile.load("marginalia") || {}
 
 if config[:components].present?
   ActiveSupport.on_load(:active_record) do
-    ActiveRecord::QueryLogs.taggings.merge!(
+    ActiveRecord::QueryLogs.taggings = ActiveRecord::QueryLogs.taggings.merge(
       controller: ->(context) { context[:controller]&.controller_name },
       action: ->(context) { context[:controller]&.action_name },
       hostname: -> { Socket.gethostname },
