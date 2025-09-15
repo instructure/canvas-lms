@@ -17,7 +17,7 @@
  */
 
 import {ToolbarButton} from './ToolbarButton'
-import {IconForwardLine} from '@instructure/ui-icons'
+import {IconRedoLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('block_content_editor')
@@ -30,7 +30,7 @@ export const RedoButton = (props: {
     <ToolbarButton
       interaction={props.active ? 'enabled' : 'disabled'}
       screenReaderLabel={I18n.t('redo')}
-      renderIcon={<IconForwardLine />}
+      renderIcon={<IconRedoLine />}
       onClick={props.onClick}
       data-testid="redo-button"
     />
