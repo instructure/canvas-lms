@@ -70,7 +70,7 @@ module LtiAdvantage::Serializers
     end
 
     def serializable_hash
-      hash = @object.as_json(except: %w[validation_context errors])
+      hash = @object.as_json(except: %w[validation_context errors context_for_validation])
       promote_extensions(apply_claim_prefixes(hash.compact))
     end
 
