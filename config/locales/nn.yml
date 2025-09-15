@@ -7159,6 +7159,7 @@ nn:
       links: 
         view_services: "Vis registrerte tenester"
     roster_user: 
+      access_tokens: Tilgangsnøklar
       completed_enrollment: "fullført *%{completed_at}*"
       confirm: 
         conclude: "Er du sikker på at du vil fullføre påmeldinga?"
@@ -28850,6 +28851,7 @@ nn:
       current_conference_text: "Du er invitert til å delta på %{conference}. Den startar %{starts_at}."
     service_not_enabled: "Tenesta er ikkje aktivert"
     show: 
+      access_tokens: Tilgangsnøklar
       accounts: Kontoar
       buttons: 
         faculty_journal_for: "Faglærarprotokoll for %{user}"
