@@ -80,6 +80,22 @@ describe Translation::CedarTranslator do
           type: "discussion"
         )
       end
+
+      it "raises TextTooLongError if text is too long" do
+        long_text = "a" * 5001
+        allow(CedarClient).to receive(:translate_text).and_raise(InstructureMiscPlugin::Extensions::CedarClient::ContentTooLongError)
+        expect { translator.translate_text(text: long_text, tgt_lang:, options:) }.to raise_error(Translation::TextTooLongError)
+      end
+
+      it "raises UnsupportedLanguageError if language is not supported" do
+        allow(CedarClient).to receive(:translate_text).and_raise(InstructureMiscPlugin::Extensions::CedarClient::UnsupportedLanguageError)
+        expect { translator.translate_text(text: "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn", tgt_lang: "??", options:) }.to raise_error(Translation::UnsupportedLanguageError)
+      end
+
+      it "raises ValidationError if required parameter is missing or empty" do
+        allow(CedarClient).to receive(:translate_text).and_raise(InstructureMiscPlugin::Extensions::CedarClient::ValidationError)
+        expect { translator.translate_text(text: "", tgt_lang:, options:) }.to raise_error(Translation::ValidationError)
+      end
     end
 
     context "when not available" do
@@ -138,6 +154,22 @@ describe Translation::CedarTranslator do
           tgt_lang:,
           type: "discussion"
         )
+      end
+
+      it "raises TextTooLongError if html_string is too long" do
+        long_html = "<p>" + ("a" * 5000) + "</p>"
+        allow(CedarClient).to receive(:translate_html).and_raise(InstructureMiscPlugin::Extensions::CedarClient::ContentTooLongError, "Content too long")
+        expect { translator.translate_html(html_string: long_html, tgt_lang:, options:) }.to raise_error(Translation::TextTooLongError)
+      end
+
+      it "raises UnsupportedLanguageError if language is not supported" do
+        allow(CedarClient).to receive(:translate_html).and_raise(InstructureMiscPlugin::Extensions::CedarClient::UnsupportedLanguageError)
+        expect { translator.translate_html(html_string: "<p>Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn</p>", tgt_lang: "??", options:) }.to raise_error(Translation::UnsupportedLanguageError)
+      end
+
+      it "raises ValidationError if required parameter is missing or empty" do
+        allow(CedarClient).to receive(:translate_html).and_raise(InstructureMiscPlugin::Extensions::CedarClient::ValidationError)
+        expect { translator.translate_html(html_string: "", tgt_lang:, options:) }.to raise_error(Translation::ValidationError)
       end
     end
 
