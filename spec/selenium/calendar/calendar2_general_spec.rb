@@ -326,39 +326,6 @@ describe "calendar2" do
       refresh_page
       expect(f(".coming_up")).to include_text("Nothing for the next week")
     end
-
-    it "graded discussion appears on all calendars", priority: "1" do
-      skip("LS-3479 -- flay about 16% of the time for no apparent reason")
-      create_graded_discussion
-
-      # Even though graded discussion overwrites its assignment's title, less fragile to grab discussion's title
-      assert_views(@gd.title, @assignment.due_at)
-    end
-
-    it "event appears on all calendars", priority: "1" do
-      skip("LS-3421 -- flaky about 20% of the time")
-      title = "loom"
-      due_time = 5.minutes.from_now
-      @course.calendar_events.create!(title:, start_at: due_time)
-
-      assert_views(title, due_time)
-    end
-
-    it "assignment appears on all calendars", priority: "1" do
-      skip("LS-3626 -- flaky about 20% of the time -- probably related to the others above")
-      title = "Zak McKracken"
-      due_time = 5.minutes.from_now
-      @assignment = @course.assignments.create!(name: title, due_at: due_time)
-
-      assert_views(title, due_time)
-    end
-
-    it "quiz appears on all calendars", priority: "1" do
-      skip("LS-3626 -- flaky about 20% of the time -- probably related to the others above")
-      create_quiz
-
-      assert_views(@quiz.title, @quiz.due_at)
-    end
   end
 
   context "as a user" do

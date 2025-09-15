@@ -291,14 +291,6 @@ describe FilesController do
       assert_unauthorized
     end
 
-    it "respects user context" do
-      skip("investigate cause for failures beginning 05/05/21 FOO-1950")
-      user_session(@teacher)
-      assert_page_not_found do
-        get "show", params: { user_id: @user.id, id: @file.id }, format: "html"
-      end
-    end
-
     it "doesn't allow an assignment_id to bypass other auth checks" do
       assignment1 = @course.assignments.create!(name: "an assignment")
 

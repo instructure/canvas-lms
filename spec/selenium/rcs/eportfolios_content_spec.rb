@@ -41,24 +41,6 @@ describe "add content box" do
     expect(f("#wizard_box .wizard_options_list")).to be_displayed
   end
 
-  it "previews rich text content" do
-    skip("eportfolio still using old RCE, LS-1805")
-    f(".add_rich_content_link").click
-    type_in_tiny "textarea", "hello preview"
-    fj('button:contains("Preview")').click
-    expect(f(".preview_content.preview_section")).to include_text("hello preview")
-  end
-
-  it "adds rich text content" do
-    skip("eportfolio still using old RCE, LS-1805")
-    f(".add_rich_content_link").click
-    type_in_tiny "textarea", "hello student"
-    f("[data-testid='save-page']").click
-    wait_for_ajax_requests
-    entry_verifier({ section_type: "rich_text", content: "hello student" })
-    expect(f("#page_content .section_content")).to include_text("hello student")
-  end
-
   context "adding html content" do
     before do
       @html_content = "<strong>student</strong>"

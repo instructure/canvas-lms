@@ -259,21 +259,6 @@ describe "discussions" do
         )
         expect(f("span[data-testid='author_name']").text).to eq teacher.short_name
       end
-
-      it "disallows full_anonymity along with graded" do
-        skip("revert enable ungraded discussion")
-        get url
-        wait_for_ajaximations
-        replace_content(f("input[name=title]"), "my anonymous title")
-        expect(f("input[id='use_for_grading']").attribute("checked")).to be_nil
-        expect(f("span[data-testid=groups_grading_not_allowed]")).to_not be_displayed
-        f("input[id='use_for_grading']").click
-        expect(f("input[id='use_for_grading']").attribute("checked")).to eq "true"
-        f("input[value='full_anonymity']").click
-        expect(f("input[id='use_for_grading']").attribute("checked")).to be_nil # disabled
-        expect(f("span[data-testid=groups_grading_not_allowed]")).to be_displayed
-        expect_new_page_load { submit_form(".form-actions") }
-      end
     end
 
     context "as a student" do

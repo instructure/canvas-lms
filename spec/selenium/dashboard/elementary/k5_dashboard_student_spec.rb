@@ -227,23 +227,6 @@ describe "student k5 dashboard" do
       click_option(grading_period_dropdown_selector, "GP Current")
       expect(subject_grade("70%")).to be_displayed
     end
-
-    it "shows two dashes and empty progress bar if no grades are available for a course" do
-      skip "FOO-3525 (10/6/2023)"
-      get "/#grades"
-
-      expect(subject_grade("--")).to be_displayed
-      expect(grade_progress_bar("0")).to be_displayed
-    end
-
-    it "show the progress bar with the appropriate progress" do
-      skip "FOO-3525 (10/6/2023)"
-      assignment.grade_student(@student, grader: @homeroom_teacher, score: math_subject_grade, points_deducted: 0)
-
-      get "/#grades"
-
-      expect(grade_progress_bar(math_subject_grade)).to be_displayed
-    end
   end
 
   context "homeroom dashboard resource panel" do

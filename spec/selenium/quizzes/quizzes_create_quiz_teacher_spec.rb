@@ -123,13 +123,7 @@ describe "creating a quiz" do
     end
 
     describe "upon save" do
-      let(:title) { "My Title" }
-      let(:error_text) { "'Please add a due date'" }
-      let(:error) { fj(".error_box div:contains(#{error_text})") }
-      let(:due_date) { Time.zone.now }
-      let(:due_date_input_fields) { ff(".DueDateInput") }
       let(:sync_sis_button) { f("#quiz_post_to_sis") }
-      let(:section_to_set) { "Section B" }
 
       def new_quiz
         @quiz = course_quiz
@@ -139,18 +133,6 @@ describe "creating a quiz" do
         end
         @quiz.save!
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
-      end
-
-      def submit_blocked_with_errors
-        click_quiz_save_button
-        expect(error).not_to be_nil
-      end
-
-      def last_override(name)
-        select_last_override_section(name)
-        Timecop.freeze(5.days.from_now) do
-          last_due_at_element.send_keys(Time.zone.now)
-        end
       end
 
       before do
@@ -166,60 +148,11 @@ describe "creating a quiz" do
         end
 
         describe "with assign to cards embedded in page" do
-          it "blocks when enabled", :ignore_js_errors do
-            skip("LX-1858: Tray is not using the checkbox value")
-            @course.course_sections.create!(name: section_to_set)
-            new_quiz
-
-            expect(assign_to_date_and_time[0].text).to include("Please add a due date")
-
-            update_due_date(0, format_date_for_view(due_date, "%-m/%-d/%Y"))
-            update_due_time(0, "11:59 PM")
-
-            click_quiz_save_button
-            expect(driver.current_url).to include("edit")
-          end
-
           it "does not block when disabled" do
             new_quiz
             set_value(sync_sis_button, false)
 
             submit_page
-          end
-
-          it "blocks with base set with override not", :ignore_js_errors do
-            skip("LX-1858: Tray is not using the checkbox value")
-            @course.course_sections.create!(name: section_to_set)
-            new_quiz
-
-            expect(assign_to_date_and_time[0].text).to include("Please add a due date")
-
-            update_due_date(0, format_date_for_view(due_date, "%-m/%-d/%Y"))
-            update_due_time(0, "11:59 PM")
-
-            click_add_assign_to_card
-
-            expect(assign_to_date_and_time[3].text).to include("Please add a due date")
-
-            select_module_item_assignee(1, section_to_set)
-            update_due_date(0, format_date_for_view(due_date, "%-m/%-d/%Y"))
-            update_due_time(0, "11:59 PM")
-
-            click_quiz_save_button
-            expect(driver.current_url).to include("edit")
-          end
-
-          it "does not block with base set with override not when disabled", :ignore_js_errors do
-            skip("LX-1858: Tray is not using the checkbox value")
-            @course.course_sections.create!(name: section_to_set)
-            new_quiz
-            set_value(sync_sis_button, false)
-
-            click_add_assign_to_card
-            select_module_item_assignee(1, section_to_set)
-
-            click_quiz_save_button
-            expect(driver.current_url).to include("edit")
           end
         end
       end

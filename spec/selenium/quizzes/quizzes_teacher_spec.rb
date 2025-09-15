@@ -300,54 +300,6 @@ describe "quizzes" do
       user_session(@user)
     end
 
-    it "gives a student extra time if the time limit is extended", priority: "2" do
-      skip "Failing Crystalball DEMO-212"
-      @context = @course
-      bank = @course.assessment_question_banks.create!(title: "Test Bank")
-      q = quiz_model
-      a = bank.assessment_questions.create!
-      answers = [{ id: 1, answer_text: "A", weight: 100 }, { id: 2, answer_text: "B", weight: 0 }]
-      question = q.quiz_questions.create!(question_data: {
-                                            :name => "first question",
-                                            "question_type" => "multiple_choice_question",
-                                            "answers" => answers,
-                                            :points_possible => 1
-                                          },
-                                          assessment_question: a)
-
-      q.generate_quiz_data
-      q.time_limit = 10
-      q.save!
-
-      user_session(@student)
-      get "/courses/#{@course.id}/quizzes/#{q.id}/take"
-      f("#take_quiz_link").click
-      sleep 1
-
-      answer_one = f("#question_#{question.id}_answer_1")
-
-      # force a save to create a submission
-      answer_one.click
-      wait_for_ajaximations
-
-      # add time. this code replicates what happens in
-      # QuizSubmissions#extensions when a moderator extends a student's
-      # quiz time.
-
-      quiz_original_end_time = Quizzes::QuizSubmission.last.end_at
-      submission = Quizzes::QuizSubmission.last
-      submission.end_at = 20.minutes.from_now
-      submission.save!
-      expect(quiz_original_end_time).to be < Quizzes::QuizSubmission.last.end_at
-
-      # answer a question to force a quicker UI sync (so we don't have to
-      # wait ~15 seconds). need to wait 1 sec cuz updateSubmission :'(
-      sleep 1
-      f("#question_#{question.id}_answer_2").click
-
-      expect(f(".time_running")).to include_text "19 Minutes"
-    end
-
     def upload_attachment_answer
       f("input[type=file]").send_keys @fullpath
       wait_for_ajaximations

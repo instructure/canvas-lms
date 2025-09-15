@@ -146,22 +146,6 @@ describe "wiki pages show page assign to" do
     check_element_has_focus close_button
   end
 
-  it "focus button on close" do
-    skip("flakey test, runs in local LF-1387")
-    visit_course_wiki_index_page(@course.id)
-
-    manage_wiki_page_item_button(@page.title).click
-    wiki_page_assign_to_menu.click
-    wait_for_ajaximations
-    wait_for_assign_to_tray_spinner
-    keep_trying_until { expect(item_tray_exists?).to be_truthy }
-
-    click_cancel_button
-    keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
-
-    check_element_has_focus manage_wiki_page_item_button(@page.title)
-  end
-
   it "does not show assign to button for group pages" do
     group = @course.groups.create!(name: "Group 1")
     page = group.wiki_pages.create!(title: "group-page")

@@ -272,16 +272,6 @@ describe "course settings" do
       end
     end
 
-    it "allows selection of existing course grading standard" do
-      skip "FOO-4220" # TODO: re-enable this test before merging EVAL-3171
-      test_select_standard_for @course
-    end
-
-    it "allows selection of existing account grading standard" do
-      skip "FOO-4220" # TODO: re-enable this test before merging EVAL-3171
-      test_select_standard_for @course.root_account
-    end
-
     it "shows the self enrollment code and url once enabled" do
       a = Account.default
       a.courses << @course

@@ -102,22 +102,6 @@ describe "eportfolios" do
       expect(f("div[role='menu']")).not_to include_text("Delete")
     end
 
-    it "reorders a page", :ignore_js_errors, priority: "1" do
-      skip "FOO-3814 (10/6/2023)"
-      get "/eportfolios/#{@eportfolio.id}"
-
-      # add 3 pages
-      (1..3).each do |s|
-        add_eportfolio_page("page #{s}")
-      end
-
-      # move "page 1" to the bottom
-      organize_pages
-      page = pages[1]
-      move_page_to_bottom(page)
-      expect(pages.last.text).to eq page.text
-    end
-
     it "adds a section", priority: "1" do
       get "/eportfolios/#{@eportfolio.id}"
       wait_for_ajax_requests
@@ -145,22 +129,6 @@ describe "eportfolios" do
       last_section = sections.last
       last_section.find("button").click
       expect(f("div[role='menu']")).not_to include_text("Delete")
-    end
-
-    it "reorders a section", :ignore_js_errors, priority: "1" do
-      skip "FOO-3814 (10/6/2023)"
-      get "/eportfolios/#{@eportfolio.id}"
-
-      # add a 3 sections
-      (1..3).each do |s|
-        add_eportfolio_section("section #{s}")
-      end
-
-      # move "section 1" to the bottom
-      organize_sections
-      section = sections[1]
-      move_section_to_bottom(section)
-      expect(sections.last.text).to eq section.text
     end
 
     it "edits ePortfolio settings", priority: "2" do

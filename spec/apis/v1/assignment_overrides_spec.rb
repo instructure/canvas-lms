@@ -1434,26 +1434,6 @@ describe AssignmentOverridesController, type: :request do
                                  expected_status: 400)
         expect(json["errors"][0]).to eq ["may not specify an override id"]
       end
-
-      it "succeeds if formatted correctly" do
-        skip "DEMO-119 (1/27/2021)"
-        section = @course.course_sections.create!
-        student = student_in_section(section)
-        date = Time.zone.now.tomorrow
-        @user = @teacher
-
-        json = call_batch_create([
-                                   args_for(@a, nil, course_section_id: section.id, due_at: date),
-                                   args_for(@b, nil, course_section_id: section.id, unlock_at: date),
-                                   args_for(@a, nil, student_ids: [student.id], title: "foo")
-                                 ])
-        override1 = @a.assignment_overrides.find(json[0]["id"])
-        override2 = @b.assignment_overrides.find(json[1]["id"])
-        override3 = @a.assignment_overrides.find(json[2]["id"])
-        validate_override_json(override1, json[0])
-        validate_override_json(override2, json[1])
-        validate_override_json(override3, json[2])
-      end
     end
   end
 end
