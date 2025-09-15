@@ -16,13 +16,10 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
+class DropCustomDataData < ActiveRecord::Migration[7.2]
+  tag :postdeploy
 
-module DataFixup::CopyCustomDataToJsonb
-  def self.run
-    # Skip if data is empty or data_json has already been modified before this fixup runs
-    CustomData.where.not(data: [nil, {}]).where(data_json: {}).find_each(strategy: :id) do |custom_data|
-      custom_data.update_column(:data_json, custom_data["data"])
-    end
+  def change
+    remove_column :custom_data, :data, :text
   end
 end
