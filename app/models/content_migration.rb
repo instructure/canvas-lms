@@ -628,13 +628,13 @@ class ContentMigration < ActiveRecord::Base
             # ripped from copy_attachments_from_course
             root_folder_name = Folder.root_folders(context).first.name + "/"
             context.attachments.where(migration_id: file_mig_ids).each do |file|
-              add_attachment_path(file.full_display_path.gsub(/\A#{root_folder_name}/, ""), file.migration_id)
+              add_attachment_path(file.full_display_path.delete_prefix(root_folder_name), file.migration_id)
             end
           end
         end
         # sync the existing folders first in case someone did something weird like deleted and replaced a folder in the same sync
         MasterCourses::FolderHelper.update_folder_names_and_states(context, source_export)
-        context.copy_attachments_from_course(source_export.context, content_export: source_export, content_migration: self)
+        copy_attachments_from_course(source_export)
         MasterCourses::FolderHelper.recalculate_locked_folders(context)
       elsif for_course_template?
         data = JSON.parse(exported_attachment.open, max_nesting: 50)
@@ -827,6 +827,93 @@ class ContentMigration < ActiveRecord::Base
           Rails.logger.debug("syncing deletion of #{content.asset_string} from master course")
           content.skip_downstream_changes! if content.respond_to?(:skip_downstream_changes!)
           content.destroy
+        end
+      end
+    end
+  end
+
+  def map_merge(old_item, new_item)
+    @merge_mappings ||= {}
+    @merge_mappings[old_item.asset_string] = new_item && new_item.id
+  end
+
+  def merge_mapped_id(old_item)
+    @merge_mappings ||= {}
+    return nil unless old_item
+    return @merge_mappings[old_item] if old_item.is_a?(String)
+
+    @merge_mappings[old_item.asset_string]
+  end
+
+  def copy_attachments_from_course(source_export)
+    source_course = source_export.context
+    root_folder = Folder.root_folders(context).first
+    root_folder_name = root_folder.name + "/"
+
+    attachments = source_course.attachments.not_deleted.to_a
+    total = attachments.count + 1
+
+    Attachment.skip_media_object_creation do
+      attachments.each_with_index do |file, i|
+        update_import_progress((i.to_f / total) * 18.0) if i % 10 == 0
+
+        next unless !source_export || source_export.export_object?(file)
+
+        begin
+          migration_id = source_export&.create_key(file)
+          new_file = file.clone_for(context, nil, overwrite: true, migration_id:, migration: self, match_on_migration_id: for_master_course_import?)
+          add_attachment_path(file.full_display_path.delete_prefix(root_folder_name), new_file.migration_id)
+          new_folder_id = merge_mapped_id(file.folder)
+
+          if file.folder && file.folder.parent_folder_id.nil?
+            new_folder_id = root_folder.id
+          end
+          # make sure the file has somewhere to go
+          unless new_folder_id
+            # gather mapping of needed folders from old course to new course
+            old_folders = []
+            old_folders << file.folder
+            new_folders = []
+            new_folders << old_folders.last.clone_for(context, nil, { include_subcontent: false })
+            while old_folders.last.parent_folder&.parent_folder_id
+              old_folders << old_folders.last.parent_folder
+              new_folders << old_folders.last.clone_for(context, nil, { include_subcontent: false })
+            end
+            old_folders.reverse!
+            new_folders.reverse!
+            # try to use folders that already match if possible
+            final_new_folders = []
+            parent_folder = Folder.root_folders(context).first
+            old_folders.each_with_index do |folder, idx|
+              final_new_folders << if (f = parent_folder.active_sub_folders.where(name: folder.name).first)
+                                     f
+                                   else
+                                     new_folders[idx]
+                                   end
+              parent_folder = final_new_folders.last
+            end
+            # add or update the folder structure needed for the file
+            final_new_folders.first.parent_folder_id ||=
+              merge_mapped_id(old_folders.first.parent_folder) ||
+              Folder.root_folders(context).first.id
+            old_folders.each_with_index do |folder, idx|
+              final_new_folders[idx].save!
+              map_merge(folder, final_new_folders[idx])
+              final_new_folders[idx + 1].parent_folder_id ||= final_new_folders[idx].id if final_new_folders[idx + 1]
+            end
+            new_folder_id = merge_mapped_id(file.folder)
+          end
+          new_file.folder_id = new_folder_id
+          new_file.need_notify = false
+          new_file.save_without_broadcasting!
+          new_file.handle_duplicates(:rename)
+          add_imported_item(new_file)
+          add_imported_item(new_file.folder, key: new_file.folder.id)
+          map_merge(file, new_file)
+        rescue => e
+          Canvas::Errors.capture(e) unless e.message.include?("Cannot create attachments in deleted folders")
+          Rails.logger.error "Couldn't copy file: #{e}"
+          add_warning(t(:file_copy_error, "Couldn't copy file \"%{name}\"", name: file.display_name || file.path_name), $!)
         end
       end
     end
