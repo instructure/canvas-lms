@@ -2108,6 +2108,15 @@ class Course < ActiveRecord::Base
     end_at ? end_at < now : false
   end
 
+  def soft_concluded_for_all?(enrollment_types)
+    now = Time.zone.now
+    return end_at < now if end_at && restrict_enrollments_to_course_dates
+
+    override = enrollment_term.enrollment_dates_overrides.where(enrollment_type: enrollment_types).pluck(:end_at).compact.max
+    end_at = [enrollment_term.end_at, override].compact.max
+    end_at ? end_at < now : false
+  end
+
   def soft_conclude!
     self.conclude_at = Time.zone.now
     self.restrict_enrollments_to_course_dates = true

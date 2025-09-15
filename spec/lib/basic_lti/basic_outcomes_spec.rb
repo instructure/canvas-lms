@@ -124,6 +124,83 @@ describe BasicLTI::BasicOutcomes do
         it { is_expected.to be false }
       end
     end
+
+    describe "#course_concluded?" do
+      let(:lti_response) { BasicLTI::BasicOutcomes::LtiResponse.new(xml) }
+
+      context "when enrollment term has override dates in the future" do
+        before do
+          @course.enrollment_term.enrollment_dates_overrides.create!(
+            enrollment_type: "TeacherEnrollment",
+            enrollment_term: @course.enrollment_term,
+            end_at: 1.day.from_now,
+            context: @course.account
+          )
+        end
+
+        it "returns true" do
+          expect(lti_response.course_concluded?(@course)).to be false
+        end
+      end
+
+      context "when enrollment term has override dates in the past" do
+        before do
+          @course.enrollment_term.enrollment_dates_overrides.create!(
+            enrollment_type: "TeacherEnrollment",
+            enrollment_term: @course.enrollment_term,
+            end_at: 1.day.ago,
+            context: @course.account
+          )
+        end
+
+        it "returns false" do
+          expect(lti_response.course_concluded?(@course)).to be true
+        end
+      end
+
+      context "when enrollment term end date is in the future" do
+        before do
+          @course.enrollment_term.end_at = 1.day.from_now
+          @course.enrollment_term.save
+        end
+
+        it "returns true" do
+          expect(lti_response.course_concluded?(@course)).to be false
+        end
+      end
+
+      context "when enrollment term end date is in the past" do
+        before do
+          @course.enrollment_term.end_at = 1.day.ago
+          @course.enrollment_term.save
+        end
+
+        it "returns false" do
+          expect(lti_response.course_concluded?(@course)).to be true
+        end
+      end
+
+      context "when there are multiple override dates" do
+        before do
+          @course.enrollment_term.enrollment_dates_overrides.create!(
+            enrollment_type: "TeacherEnrollment",
+            enrollment_term: @course.enrollment_term,
+            end_at: 1.day.ago,
+            context: @course.account
+          )
+          @course.enrollment_term.enrollment_dates_overrides.create!(
+            enrollment_type: "TaEnrollment",
+            enrollment_term: @course.enrollment_term,
+            end_at: 1.day.from_now,
+            context: @course.account
+          )
+        end
+
+        it "returns true when the latest override date is in the future" do
+          expect(lti_response.course_concluded?(@course)).to be false
+        end
+      end
+    end
   end
 
   context "Exceptions" do
@@ -378,6 +455,32 @@ describe BasicLTI::BasicOutcomes do
 
         expect(request.code_major).to eq "success"
         expect(request.handle_request(tool)).to be_truthy
+      end
+
+      context "when teachers have extended access after course conclusion" do
+        before do
+          @course.start_at = 1.month.ago
+          @course.conclude_at = 1.day.ago
+          @course.restrict_enrollments_to_course_dates = false
+          @course.save
+          # Set up enrollment term with extended end date for teachers
+          @course.enrollment_term.enrollment_dates_overrides.create!(
+            enrollment_type: "TeacherEnrollment",
+            enrollment_term: @course.enrollment_term,
+            start_at: 1.month.ago,
+            end_at: 1.day.from_now,
+            context: @course.account
+          )
+        end
+
+        it "allows replace_result when course_concluded? returns false" do
+          xml.css("resultData").remove
+          request = BasicLTI::BasicOutcomes.process_request(tool, xml)
+
+          expect(request.code_major).to eq "success"
+          expect(request.body).to eq "<replaceResultResponse />"
+          expect(request.handle_request(tool)).to be_truthy
+        end
       end
     end
   end
