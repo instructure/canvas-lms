@@ -31,6 +31,7 @@ import GradingPeriodsHelper from '@canvas/grading/GradingPeriodsHelper'
 import * as tz from '@instructure/moment-utils'
 import numberHelper from '@canvas/i18n/numberHelper'
 import PandaPubPoller from '@canvas/panda-pub-poller'
+import {getUrlWithHorizonParams} from '@canvas/horizon/utils'
 import {matchingToolUrls} from './LtiAssignmentHelpers'
 
 const default_interval = 3000
@@ -994,15 +995,17 @@ Assignment.prototype.objectTypeDisplayName = function () {
 }
 
 Assignment.prototype.htmlUrl = function () {
+  let url
   if (this.isQuizLTIAssignment() && canManage()) {
-    return this.htmlEditUrl() + '?quiz_lti'
+    url = getUrlWithHorizonParams(this.get('html_url') + '/edit', {quiz_lti: true})
   } else {
-    return this.get('html_url')
+    url = getUrlWithHorizonParams(this.get('html_url'))
   }
+  return url
 }
 
 Assignment.prototype.htmlEditUrl = function () {
-  return this.get('html_url') + '/edit'
+  return getUrlWithHorizonParams(this.get('html_url') + '/edit')
 }
 
 Assignment.prototype.htmlBuildUrl = function () {
@@ -1011,9 +1014,9 @@ Assignment.prototype.htmlBuildUrl = function () {
     if (ENV.FEATURES.new_quizzes_navigation_updates) {
       displayType = 'full_width_with_nav'
     }
-    return this.get('html_url') + `?display=${displayType}`
+    return getUrlWithHorizonParams(this.get('html_url'), {display: displayType})
   } else {
-    return this.get('html_url')
+    return getUrlWithHorizonParams(this.get('html_url'))
   }
 }
 

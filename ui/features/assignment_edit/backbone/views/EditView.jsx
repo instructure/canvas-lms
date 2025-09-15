@@ -65,6 +65,7 @@ import {createRoot} from 'react-dom/client'
 import YAML from 'yaml'
 import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
 import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
+import {getUrlWithHorizonParams} from '@canvas/horizon/utils'
 
 const I18n = createI18nScope('assignment_editview')
 
@@ -2251,15 +2252,17 @@ EditView.prototype.locationAfterSave = function (params) {
   }
 
   const htmlUrl = this.model.get('html_url')
+
+  const additionalParams = {}
   if (this.assignment.showBuildButton()) {
     let displayType = 'full_width'
     if (ENV.FEATURES.new_quizzes_navigation_updates) {
       displayType = 'full_width_with_nav'
     }
-    return htmlUrl + `?display=${displayType}`
-  } else {
-    return htmlUrl
+    additionalParams.display = displayType
   }
+
+  return getUrlWithHorizonParams(htmlUrl, additionalParams)
 }
 
 EditView.prototype.redirectAfterCancel = function () {
