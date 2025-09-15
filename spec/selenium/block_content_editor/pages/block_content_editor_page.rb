@@ -56,7 +56,7 @@ module BlockContentEditorPage
   end
 
   def block_groups
-    ff("[data-testid='grouped-select-groups']>div")
+    ff("[data-testid='grouped-select-groups']>li")
   end
 
   def selected_block_group
@@ -64,7 +64,7 @@ module BlockContentEditorPage
   end
 
   def block_items
-    ff("[data-testid='grouped-select-items']>div")
+    ff("[data-testid='grouped-select-items']>li")
   end
 
   def selected_block_item
