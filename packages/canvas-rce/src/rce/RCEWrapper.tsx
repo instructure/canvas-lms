@@ -2207,12 +2207,10 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
                     />
                   </Suspense>
                 ) : null}
-                {this.state.announcement && (
-                  // @ts-expect-error
-                  <Alert screenReaderOnly={true} liveRegion={this.props.liveRegion}>
-                    {this.state.announcement}
-                  </Alert>
-                )}
+                {/* @ts-expect-error liveRegion prop type mismatch */}
+                <Alert screenReaderOnly={true} liveRegion={this.props.liveRegion}>
+                  {this.state.announcement || null}
+                </Alert>
               </div>
             )
           }}
