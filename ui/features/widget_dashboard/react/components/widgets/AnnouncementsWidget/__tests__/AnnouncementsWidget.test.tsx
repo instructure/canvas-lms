@@ -146,6 +146,23 @@ const mockUnreadAnnouncementsResponse = {
   },
 }
 
+const emptyAnnouncementsResponse = {
+  data: {
+    legacyNode: {
+      _id: '123',
+      discussionParticipantsConnection: {
+        nodes: [],
+        pageInfo: {
+          hasNextPage: false,
+          hasPreviousPage: false,
+          startCursor: null,
+          endCursor: null,
+        },
+      },
+    },
+  },
+}
+
 const mockReadAnnouncementsResponse = {
   data: {
     legacyNode: {
@@ -189,6 +206,8 @@ const getMockResponseForReadState = (readState?: string) => {
       return mockReadAnnouncementsResponse
     case 'unread':
       return mockUnreadAnnouncementsResponse
+    case 'empty':
+      return emptyAnnouncementsResponse
     case 'all':
     default:
       return mockAllAnnouncementsResponse
@@ -588,11 +607,18 @@ describe('AnnouncementsWidget', () => {
 
   it('toggles read/unread status when buttons are clicked', async () => {
     // Mock the mutation response
+    let announcementsResponse = getMockResponseForReadState('unread')
+
     server.use(
       graphql.query('GetUserAnnouncements', () => {
-        return HttpResponse.json(getMockResponseForReadState('unread'))
+        return HttpResponse.json(announcementsResponse)
       }),
-      graphql.mutation('UpdateDiscussionReadState', () => {
+      graphql.mutation('UpdateDiscussionReadState', ({variables}) => {
+        // When we mark 2 as read, remove it from the unread list
+        if (variables?.discussionTopicId === '2') {
+          announcementsResponse = getMockResponseForReadState('empty')
+        }
+
         return HttpResponse.json({
           data: {
             updateDiscussionReadState: {
@@ -614,15 +640,23 @@ describe('AnnouncementsWidget', () => {
       expect(screen.getByText('Test Announcement 2')).toBeInTheDocument()
     })
 
+    const announctmentItemContainer = screen.getByTestId('announcement-item-2')
+    expect(announctmentItemContainer).toBeInTheDocument()
+
     // Find and click the mark as read button for Test Announcement 2
     const markReadButton = screen.getByTestId('mark-read-2')
     expect(markReadButton).toBeInTheDocument()
 
     fireEvent.click(markReadButton)
-
+    // "mark as" button disabled when the request is in progress
+    expect(markReadButton).toBeDisabled()
     // The mutation should be called (we can't easily test the actual state change
-    // without more complex mocking, but we can verify the button exists and is clickable)
-    expect(markReadButton).toBeInTheDocument()
+    // without more complex mocking, but we can verify the annoucement is no longer
+    // in the unread page)
+
+    await waitFor(() => {
+      expect(announctmentItemContainer).not.toBeInTheDocument()
+    })
 
     cleanup()
   })
