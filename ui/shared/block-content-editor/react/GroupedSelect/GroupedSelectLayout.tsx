@@ -17,22 +17,49 @@
  */
 
 import {Flex} from '@instructure/ui-flex'
+import {List} from '@instructure/ui-list'
 import {ReactNode} from 'react'
+import {useScope as createI18nScope} from '@canvas/i18n'
+
+const I18n = createI18nScope('block_content_editor')
 
 export const GroupedSelectLayout = (props: {
-  groups: ReactNode
-  items: ReactNode
+  groups: ReactNode[]
+  items: ReactNode[]
+  selectedBlockGroup: string
   onKeyDown: (event: React.KeyboardEvent) => void
   onBlur?: (event: React.FocusEvent) => void
 }) => {
   return (
     <Flex alignItems="start" gap="medium" onKeyDown={props.onKeyDown} onBlur={props.onBlur}>
-      <Flex.Item direction="column" size="200px" data-testid="grouped-select-groups">
-        {props.groups}
-      </Flex.Item>
-      <Flex.Item direction="column" shouldGrow data-testid="grouped-select-items">
-        {props.items}
-      </Flex.Item>
+      <List
+        role="group"
+        width="50%"
+        itemSpacing="xx-small"
+        isUnstyled
+        margin="none"
+        data-testid="grouped-select-groups"
+        aria-label={I18n.t('Block groups')}
+      >
+        {props.groups?.map((group, index) => (
+          <List.Item key={index}>{group}</List.Item>
+        ))}
+      </List>
+      <List
+        role="group"
+        width="50%"
+        itemSpacing="xx-small"
+        isUnstyled
+        margin="none"
+        data-testid="grouped-select-items"
+        aria-label={I18n.t('%{selectedBlockGroup} group items', {
+          selectedBlockGroup: props.selectedBlockGroup,
+        })}
+      >
+        {props.items?.map((item, index) => (
+          <List.Item key={index}>{item}</List.Item>
+        ))}
+      </List>
     </Flex>
   )
 }
