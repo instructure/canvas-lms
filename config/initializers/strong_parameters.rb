@@ -30,29 +30,48 @@ module ArbitraryStrongishParams
   end
 
   # this is mostly copy-pasted
-  def hash_filter(params, filter)
-    filter = filter.with_indifferent_access
+  if Rails.version < "8.0"
+    def hash_filter(params, filter, **)
+      filter = filter.with_indifferent_access
+      # Slicing filters out non-declared keys.
+      slice(*filter.keys).each do |key, value|
+        next unless value
 
-    # Slicing filters out non-declared keys.
-    slice(*filter.keys).each do |key, value|
-      next unless value
-
-      case filter[key]
-      when ActionController::Parameters::EMPTY_ARRAY
-        # Declaration { comment_ids: [] }.
-        array_of_permitted_scalars?(self[key]) do |val|
-          params[key] = val
+        case filter[key]
+        when ActionController::Parameters::EMPTY_ARRAY
+          # Declaration { comment_ids: [] }.
+          array_of_permitted_scalars?(self[key]) do |val|
+            params[key] = val
+          end
+        when ANYTHING
+          if (filtered = recursive_arbitrary_filter(value))
+            params[key] = filtered
+            params.instance_variable_get(:@anythings)[key] = true
+          end
+        else
+          # Declaration { user: :name } or { user: [:name, :age, { address: ... }] }.
+          params[key] = each_element(value, filter[key]) do |element|
+            element.permit(*Array.wrap(filter[key]))
+          end
         end
-      when ANYTHING
-        if (filtered = recursive_arbitrary_filter(value))
-          params[key] = filtered
+      end
+    end
+  else
+    def hash_filter(params, filter, on_unpermitted: self.class.action_on_unpermitted_parameters, explicit_arrays: false)
+      filter = filter.with_indifferent_access
+
+      # Slicing filters out non-declared keys.
+      slice(*filter.keys).each do |key, value|
+        next unless value
+        next unless key? key
+
+        if filter[key] == ANYTHING
+          result = recursive_arbitrary_filter(value)
           params.instance_variable_get(:@anythings)[key] = true
+        else
+          result = permit_value(value, filter[key], on_unpermitted:, explicit_arrays:)
         end
-      else
-        # Declaration { user: :name } or { user: [:name, :age, { address: ... }] }.
-        params[key] = each_element(value, filter[key]) do |element|
-          element.permit(*Array.wrap(filter[key]))
-        end
+        params[key] = result unless result.nil?
       end
     end
   end
