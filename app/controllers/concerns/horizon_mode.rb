@@ -73,7 +73,7 @@ module HorizonMode
 
   def add_horizon_params_to_url(url)
     uri = URI(url)
-    query = Rack::Utils.parse_query(uri.query).merge(horizon_params.stringify_keys)
+    query = Rack::Utils.parse_query(uri.query).merge(CanvasCareer::Constants::QueryParams::ACADEMIC_CONTENT_ONLY_CAREER_THEME.stringify_keys)
     uri.query = query.to_query
     uri.to_s
   end

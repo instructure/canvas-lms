@@ -364,4 +364,34 @@ describe HorizonMode do
       it { is_expected.to be false }
     end
   end
+
+  describe "add_horizon_params_to_url" do
+    it "adds academic content only career theme params to the URL" do
+      url = "https://example.com/path"
+      result = controller.send(:add_horizon_params_to_url, url)
+
+      expect(result).to include("content_only=true")
+      expect(result).to include("instui_theme=career")
+      expect(result).to include("force_classic=true")
+    end
+
+    it "preserves existing query parameters" do
+      url = "https://example.com/path?existing=value"
+      result = controller.send(:add_horizon_params_to_url, url)
+
+      expect(result).to include("existing=value")
+      expect(result).to include("content_only=true")
+      expect(result).to include("instui_theme=career")
+      expect(result).to include("force_classic=true")
+    end
+
+    it "merges with existing horizon params" do
+      url = "https://example.com/path?content_only=false"
+      result = controller.send(:add_horizon_params_to_url, url)
+
+      expect(result).to include("content_only=true")
+      expect(result).to include("instui_theme=career")
+      expect(result).to include("force_classic=true")
+    end
+  end
 end
