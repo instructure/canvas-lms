@@ -29,37 +29,6 @@ describe "quiz taking" do
     @quiz = quiz_with_new_questions(goto_edit: false)
   end
 
-  it "toggles only the essay question that was toggled leaving others on the page alone",
-     custom_timeout: 30 do
-    skip "FOO-3812 (10/6/2023)"
-    @quiz = quiz_with_essay_questions(false)
-    get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-    expect_new_page_load { f("#take_quiz_link").click }
-    wait_for_ajaximations
-
-    links = ff('[data-btn-id="rce-edit-btn"]')
-
-    # the first RCE
-    expect(links[0].text).to include("Switch to the html editor")
-    expect(links[0]).to be_displayed
-
-    # the second RCE
-    expect(links[1].text).to include("Switch to the html editor")
-    expect(links[1]).to be_displayed
-    links[0].click
-
-    # Retrieve the links again
-    links = ff('[data-btn-id="rce-edit-btn"]')
-
-    # first rce is now html
-    expect(links[0].text).to include("Switch to the rich text editor")
-    expect(links[0]).to be_displayed
-
-    # second RCE is unchanged
-    expect(links[1].text).to include("Switch to the html editor")
-    expect(links[1]).to be_displayed
-  end
-
   it "allows to take the quiz as long as there are attempts left",
      :xbrowser,
      custom_timeout: 30,

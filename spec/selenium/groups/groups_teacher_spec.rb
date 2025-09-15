@@ -258,41 +258,6 @@ describe "new groups" do
       expect(f(".group-summary")).to include_text("0 / 2 students")
     end
 
-    it "Allows teacher to join students to groups in unpublished courses", priority: "1" do
-      skip "FOO-4220" # TODO: re-enable this test (or rewrite) after fixing FOO-4263
-      group_test_setup(3, 1, 2)
-      @course.workflow_state = "unpublished"
-      @course.save!
-      get "/courses/#{@course.id}/groups"
-      @group_category.first.update_attribute(:group_limit, 2)
-      2.times do |n|
-        add_user_to_group(@students[n], @testgroup[0], false)
-      end
-      add_user_to_group(@students.last, @testgroup[1], false)
-      get "/courses/#{@course.id}/groups"
-      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] span.show-group-full")).to be_displayed
-      ff(".group-name")[0].click
-      ff(".group-user-actions")[0].click
-      fln("Set as Leader").click
-      wait_for_ajaximations
-      f(".group-user-actions[data-user-id=\"user_#{@students[0].id}\"]").click
-      wait_for_ajaximations
-
-      # the remove as leader option doesn't appear immediately and can result
-      # in selenium clicking the wrong link. wait for it to appear before clicking
-      # "Move To" to work around the issue
-      wait_for(method: nil, timeout: 2) { f(".ui-menu-item .remove-as-leader").displayed? }
-
-      f(".ui-menu-item .edit-group-assignment").click
-      wait_for(method: nil, timeout: 2) { fxpath("//*[@data-cid='Tray']//*[@role='dialog']").displayed? }
-      ff(".move-select .move-select__group option").last.click
-      f('.move-select button[type="submit"]').click
-      wait_for_ajaximations
-      f(".group[data-id=\"#{@testgroup[1].id}\"] .toggle-group").click
-      expect(f("#content")).not_to contain_css(".group-leader .icon-user")
-      expect(f(".group[data-id=\"#{@testgroup[1].id}\"] .group-user")).to include_text("Test Student 1")
-    end
-
     it "updates student count when they're added to groups limited by group", priority: "1" do
       group_test_setup(3, 1, 0)
       create_group(group_category: @group_category.first, has_max_membership: true, member_limit: 2)
@@ -425,79 +390,6 @@ describe "new groups" do
 
       expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-user")).not_to include_text("Test Student 1")
       expect(f("#content")).not_to contain_css(".row-fluid .group-leader")
-    end
-
-    it "splits students into groups automatically", priority: "1" do
-      skip "FOO-3807 (10/7/2023)"
-      seed_students(4)
-
-      get "/courses/#{@course.id}/groups"
-
-      click_add_group_set
-      replace_and_proceed f("#new-group-set-name"), "Test Group Set"
-
-      force_click('[data-testid="group-structure-selector"]')
-      force_click('[data-testid="group-structure-num-groups"]')
-
-      expect(f('span[data-testid="group-leadership-controls"] input[data-testid="first"]')).not_to be_enabled
-      expect(f('span[data-testid="group-leadership-controls"] input[data-testid="random"]')).not_to be_enabled
-
-      fxpath("//span[@data-testid='group-leadership-controls']//input[@data-testid='enable-auto']/..").click
-
-      expect(f('span[data-testid="group-leadership-controls"] input[data-testid="first"]')).to be_enabled
-      expect(f('span[data-testid="group-leadership-controls"] input[data-testid="random"]')).to be_enabled
-
-      force_click('[data-testid="split-groups"]')
-
-      f('[data-testid="split-groups"]').send_keys("2")
-      f(%(button[data-testid="group-set-save"])).click
-      # Need to run delayed jobs for the random group assignments to work, and then refresh the page
-      run_jobs
-      get "/courses/#{@course.id}/groups"
-      2.times do |n|
-        expect(ffj(".toggle-group.group-summary:visible")[n]).to include_text("2 students")
-      end
-      expect(ffj(".group-name:visible").size).to eq 2
-    end
-
-    it "auto-splits students into groups by section" do
-      skip "FOO-3807 (10/7/2023)"
-      course = Course.create!(name: "Group by section")
-
-      course.enroll_teacher(@teacher)
-
-      course.course_sections.create!(name: "section 1")
-      course.course_sections.create!(name: "section 2")
-      course.course_sections.create!(name: "section 3")
-
-      s1 = User.create!(name: "First Student")
-      s2 = User.create!(name: "Second Student")
-      s3 = User.create!(name: "Third Student")
-      s4 = User.create!(name: "Fourth Student")
-      s5 = User.create!(name: "Fifth Student")
-
-      course.course_sections[0].enroll_user(s1, "StudentEnrollment")
-      course.course_sections[1].enroll_user(s2, "StudentEnrollment")
-      course.course_sections[2].enroll_user(s3, "StudentEnrollment")
-      course.course_sections[2].enroll_user(s4, "StudentEnrollment")
-      course.course_sections[2].enroll_user(s5, "StudentEnrollment")
-
-      Enrollment.last(6).each { |e| e.update!(workflow_state: "active") }
-
-      get "/courses/#{course.id}/groups"
-
-      f("#add-group-set").click
-      replace_and_proceed f("#new-group-set-name"), "auto_split"
-      force_click('[data-testid="group-structure-selector"]')
-      force_click('[data-testid="group-structure-num-groups"]')
-      f('[data-testid="split-groups"]').send_keys("3")
-      force_click(%(input[data-testid="require-same-section-auto-assign"]))
-      f(%(button[data-testid="group-set-save"])).click
-      run_jobs
-      wait_for_ajaximations
-      expect(GroupCategory.last.name).to eq "auto_split"
-      expect(Group.last(3).pluck(:name)).to match_array ["auto_split 1", "auto_split 2", "auto_split 3"]
-      expect(Group.last(3).map(&:members_count)).to match_array [3, 1, 1]
     end
 
     it "respects individual group member limits when randomly assigning", priority: "1" do

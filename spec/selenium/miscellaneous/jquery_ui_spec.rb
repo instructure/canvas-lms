@@ -179,35 +179,6 @@ describe "jquery ui" do
           .text();
       JS
     end
-
-    it "accepts jquery object dialog titles" do
-      skip("FOO-4258, might be able to re-enable this test after jquery-ui upgrade")
-      title = "<i>i want formatting <b>for realz</b></i>"
-      expect(driver.execute_script(<<~JS)).to eq title
-        return $('<div id="jqueryui_test">here we go</div>')
-          .dialog({
-            title: $(#{title.inspect}),
-            modal: true,
-            zIndex: 1000
-          })
-          .parent('.ui-dialog')
-          .find('.ui-dialog-title')
-          .html();
-      JS
-
-      new_title = "<i>i <b>still</b> want formatting</i>"
-      expect(driver.execute_script(<<~JS)).to eq new_title
-        return $('#jqueryui_test')
-          .dialog({
-            modal: true,
-            zIndex: 1000
-          })
-          .dialog('option', 'title', $(#{new_title.inspect}))
-          .parent('.ui-dialog')
-          .find('.ui-dialog-title')
-          .html();
-      JS
-    end
   end
 
   context "admin-links" do

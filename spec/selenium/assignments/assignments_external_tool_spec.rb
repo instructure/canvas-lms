@@ -135,27 +135,6 @@ describe "external tool assignments" do
     expect(a.external_tool_tag.url).to eq @t1.url
   end
 
-  it "shows module sequence even without module_item_id param" do
-    skip "EVAL-2593 (8/25/22)"
-
-    allow(BasicLTI::Sourcedid).to receive(:encryption_secret) { "encryption-secret-5T14NjaTbcYjc4" }
-    allow(BasicLTI::Sourcedid).to receive(:signing_secret) { "signing-secret-vp04BNqApwdwUYPUI" }
-    a = assignment_model(course: @course, title: "test2", submission_types: "external_tool")
-    a.create_external_tool_tag(url: @t1.url)
-    a.external_tool_tag.update_attribute(:content_type, "ContextExternalTool")
-
-    mod = @course.context_modules.create!
-    mod.add_item(id: a.id, type: "assignment")
-    page = @course.wiki_pages.create!(title: "wiki title")
-    mod.add_item(id: page.id, type: "wiki_page")
-
-    student_in_course(course: @course, active_all: true)
-    user_session(@student)
-
-    get "/courses/#{@course.id}/assignments/#{a.id}"
-    expect(f(".module-sequence-footer-button--next")).to be_displayed
-  end
-
   context "submission type selection placement" do
     before do
       [@t1, @t2].each do |tool|

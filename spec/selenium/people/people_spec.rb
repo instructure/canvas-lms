@@ -239,17 +239,6 @@ describe "people" do
       create_student_group
     end
 
-    # This just duplicates a test in the Jest spec for the modal
-    xit "tests self sign up functionality" do
-      get "/courses/#{@course.id}/users"
-      f("#people-options .Button").click
-      expect_new_page_load { fln("View User Groups").click }
-      dialog = open_student_group_dialog
-      dialog.find_element(:css, "#enable_self_signup").click
-      expect(dialog.find_element(:css, "#split_groups")).not_to be_displayed
-      expect(dialog).to include_text("groups now")
-    end
-
     it "tests self sign up / group structure functionality" do
       get "/courses/#{@course.id}/users"
       group_count = "4"
@@ -284,43 +273,6 @@ describe "people" do
       f(%(button[data-testid="group-set-save"])).click
       wait_for_ajaximations
       expect(fj("span:contains('If you are going to define a limit group members, it must be greater than 1.')")).to be_truthy
-    end
-
-    it "tests group structure functionality" do
-      skip "FOO-3810 (10/6/2023)"
-      get "/courses/#{@course.id}/users"
-      enroll_more_students
-
-      group_count = "4"
-      expect_new_page_load do
-        f("#people-options .Button").click
-        fln("View User Groups").click
-      end
-      open_student_group_dialog
-      replace_and_proceed f("#new-group-set-name"), "new group"
-      force_click('[data-testid="group-structure-selector"]')
-      force_click('[data-testid="group-structure-num-groups"]')
-      f('[data-testid="split-groups"]').send_keys(group_count)
-      expect(@course.groups.count).to eq 0
-      f(%(button[data-testid="group-set-save"])).click
-      run_jobs
-      wait_for_ajaximations
-      expect(@course.groups.count).to eq group_count.to_i
-      expect(f(".groups-with-count")).to include_text("Groups (#{group_count})")
-    end
-
-    it "auto-creates groups based on # of students" do
-      skip "FOO-3810 (10/6/2023)"
-      enroll_more_students
-      get "/courses/#{@course.id}/groups#new"
-      replace_and_proceed f("#new-group-set-name"), "Groups of 2"
-      force_click('[data-testid="group-structure-selector"]')
-      force_click('[data-testid="group-structure-students-per-group"]')
-      f('[data-testid="num-students-per-group"]').send_keys("2")
-      f('button[data-testid="group-set-save"]').click
-      run_jobs
-      wait_for_ajaximations
-      expect(ff("li.group").size).to eq 3
     end
 
     it "edits a student group" do

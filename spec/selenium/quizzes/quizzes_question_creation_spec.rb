@@ -357,20 +357,6 @@ describe "quizzes question creation" do
       expect(question).to be_displayed
       expect(ff(".error_text")[0]).to include_text("Must be zero or greater")
     end
-
-    it "shows an error when the quiz question exceeds character limit", priority: "2" do
-      skip "FOO-3869 - 9/21/2023 Flaky after the InstUI 8 -> 7 revert (also FOO-3811)"
-      start_quiz_question
-      chars = [*("a".."z")]
-      value = (0..16_385).map { chars.sample }.join
-      type_in_tiny "textarea#question_content_0", value
-      wait_for_ajaximations
-      f(".submit_button").click
-      wait_for_ajaximations
-      error_boxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
-      visboxes, _hidboxes = error_boxes.partition(&:displayed?)
-      expect(visboxes.first.text).to eq "question text is too long, max length is 16384 characters"
-    end
   end
 
   context "when a quiz has more than 25 questions" do

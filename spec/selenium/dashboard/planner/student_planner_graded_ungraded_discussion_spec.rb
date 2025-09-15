@@ -64,19 +64,6 @@ describe "student planner" do
       go_to_list_view
       validate_pill("Replies")
     end
-
-    it "shows the new activity button", priority: "1" do
-      skip("Flaky, throws a weird JS error 1/20 times. Needs to be addressed in LS-2041")
-      # create discussions in the future and in the past to be able to see the new activity button
-      past_discussion = graded_discussion_in_the_past
-      graded_discussion_in_the_future
-      go_to_list_view
-      # confirm the past discussion is not loaded
-      expect(planner_app_div).not_to contain_link(past_discussion.title.to_s)
-      expect(new_activity_button).to be_displayed
-      new_activity_button.click
-      expect(planner_app_div).to contain_link_partial_text(past_discussion.title.to_s)
-    end
   end
 
   context "ungraded discussion" do

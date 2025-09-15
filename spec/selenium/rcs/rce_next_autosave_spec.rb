@@ -60,79 +60,6 @@ describe "RCE Next autosave feature", :ignore_js_errors do
       edit_announcement
     end
 
-    it "autosaves encrypted content" do
-      skip "LF-716 (9/5/2023)"
-      create_and_edit_announcement
-      saved_content = driver.local_storage[autosave_key]
-      assert(saved_content)
-      expect(JSON.parse(saved_content)["content"]).to match("JvwYPc4X9emMRM+w6MEuRvGQiS7d9Vwtuu4=")
-      driver.local_storage.clear
-    end
-
-    it "autosaves encrypted content entered in htmlview" do
-      skip "LF-716 (9/5/2023)"
-      create_and_edit_announcement
-      switch_to_html_view
-      switch_to_raw_html_editor
-      f("textarea#discussion-topic-message10").send_keys("html text")
-      f("#discussion-title").send_keys("New Discussion Title")
-      driver.navigate.refresh
-      accept_alert
-      wait_for_rce
-      saved_content = driver.local_storage[autosave_key]
-      assert(saved_content)
-      expect(JSON.parse(saved_content)["content"]).to match("JvwYPc4X9emMRM+w6MEuRvGQiS7d9Vwtuu6HVbEatwZRIIPBEZFQNeZcVQ==")
-      driver.local_storage.clear
-    end
-
-    it "prompts to restore autosaved content" do
-      skip "LF-716 (9/5/2023)"
-      create_and_edit_announcement
-      saved_content = driver.local_storage[autosave_key]
-      assert(saved_content)
-
-      driver.navigate.refresh
-      accept_alert
-      wait_for_rce
-
-      expect(fj('h2:contains("Found auto-saved content")')).to be_present
-      fj('button:contains("Yes")').click
-      wait_for_animations
-
-      in_frame tiny_rce_ifr_id do
-        expect(f("body").text).to eql("hello")
-      end
-      driver.local_storage.clear
-    end
-
-    it "is scoped to the user" do
-      skip "LF-716 (9/5/2023)"
-      # Start with the first teacher creating an announcement and verify the data autosaved
-      create_and_edit_announcement
-      saved_content = driver.local_storage[autosave_key]
-      assert(saved_content)
-
-      # As another teacher, verify the previous teacher's autosave is not presented
-      @teacher2 = User.create!
-      @course.enroll_teacher(@teacher2)
-      user_session(@teacher2)
-      create_announcement
-      wait_for_rce
-      expect(f("body")).not_to contain_css('[data-testid="RCE_RestoreAutoSaveModal"]')
-
-      # As the original teacher, verify the autosave is present and working
-      user_session(@teacher)
-      create_announcement
-      expect(fj('h2:contains("Found auto-saved content")')).to be_present
-      fj('button:contains("Yes")').click
-      wait_for_animations
-
-      in_frame tiny_rce_ifr_id do
-        expect(f("body").text).to eql("hello")
-      end
-      driver.local_storage.clear
-    end
-
     # localStorage in chrome is limitedto 5120k, and that seems to include the key
     it "handles quota exceeded", :ignore_js_errors do
       skip("RCX-2600")
@@ -143,22 +70,6 @@ describe "RCE Next autosave feature", :ignore_js_errors do
       create_and_edit_announcement
       saved_content = driver.local_storage[autosave_key]
       expect(saved_content).to be_nil # though it didn't throw an exception
-      driver.local_storage.clear
-    end
-
-    # get '/' is emitting
-    # "Warning: [themeable] A theme registry has already been initialized. Ensure that you are importing only one copy of '@instructure/ui-themeable'."
-    # It's a warning but logged as an error. I don't believe it is, and I can't find it. Ignore it.
-    it "makes room if quota is exceeded due to other rce auto save data", :ignore_js_errors do
-      skip "LF-716 (9/5/2023)"
-      get "/"
-      driver.local_storage.clear
-      driver.local_storage[autosave_key(@teacher.id, "http://some/url", "id")] =
-        make_autosave_entry(("x" * 4_119 * 1_024) + ("x" * 921))
-      create_and_edit_announcement
-      saved_content = driver.local_storage[autosave_key]
-      saved_content = JSON.parse(saved_content)
-      expect(saved_content["content"]).to eql("JvwYPc4X9emMRM+w6MEuRvGQiS7d9Vwtuu4=")
       driver.local_storage.clear
     end
 
@@ -174,35 +85,6 @@ describe "RCE Next autosave feature", :ignore_js_errors do
       saved_content = driver.local_storage[autosave_key(@teacher.id, "http://some/url", "id")]
       expect(saved_content).to be_nil
       driver.local_storage.clear
-    end
-
-    it "removes placholder images from autosaved content" do
-      skip "LF-716 (9/5/2023)"
-      create_and_edit_announcement
-
-      # simulate a placeholder image
-      switch_to_html_view
-      switch_to_raw_html_editor
-      f("textarea#discussion-topic-message10").send_keys(
-        "<div data-placeholder-for='someimage.jpg' style='width: 200px; height: 50px;'>svg spinner here</div>"
-      )
-      switch_to_editor_view
-
-      f("#discussion-title").click
-      driver.navigate.refresh
-      accept_alert
-      wait_for_rce
-
-      # say "yes" to restore
-      expect(fj('h2:contains("Found auto-saved content")')).to be_present
-      fj('button:contains("Yes")').click
-      wait_for_animations
-
-      in_frame tiny_rce_ifr_id do
-        expect(f("body")).not_to contain_css("img")
-        expect(f("body").text).to eql("hello")
-      end
-      driver.local_storage.clear # blur tinymce to force autosave
     end
   end
 
