@@ -73,6 +73,7 @@ export const GroupedSelect = (props: {
 
   return (
     <GroupedSelectLayout
+      selectedBlockGroup={selectedGroup}
       onKeyDown={handleKeyDown}
       onBlur={handleBlur}
       groups={props.data.map(group => (
@@ -90,23 +91,25 @@ export const GroupedSelect = (props: {
           onFocus={() => handleGroupFocus(group.groupName)}
         />
       ))}
-      items={props.data
-        .find(group => group.groupName === selectedGroup)
-        ?.items.map(item => (
-          <GroupedSelectEntry
-            key={item.itemName}
-            variant="item"
-            title={item.itemName}
-            active={selectedItem === item.id}
-            ref={(el: HTMLDivElement | null) => {
-              elementsRef.current.set(item.id, el)
-            }}
-            onClick={() => {
-              handleItemChange(item.id)
-            }}
-            onFocus={() => handleItemFocus(item.id)}
-          />
-        ))}
+      items={
+        props.data
+          .find(group => group.groupName === selectedGroup)
+          ?.items.map(item => (
+            <GroupedSelectEntry
+              key={item.itemName}
+              variant="item"
+              title={item.itemName}
+              active={selectedItem === item.id}
+              ref={(el: HTMLDivElement | null) => {
+                elementsRef.current.set(item.id, el)
+              }}
+              onClick={() => {
+                handleItemChange(item.id)
+              }}
+              onFocus={() => handleItemFocus(item.id)}
+            />
+          )) || []
+      }
     />
   )
 }
