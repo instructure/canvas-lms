@@ -51,8 +51,8 @@ export const SingleButton = ({
       secondaryBorderColor: button.primaryColor,
       secondaryColor: button.secondaryColor,
       secondaryHoverBackground: adjustedPrimaryColor,
-      secondaryGhostColor: adjustedPrimaryColor,
-      secondaryGhostBorderColor: adjustedPrimaryColor,
+      secondaryGhostColor: button.primaryColor,
+      secondaryGhostBorderColor: button.primaryColor,
       secondaryGhostHoverBackground: `${alpha(adjustedPrimaryColor, 10)}`,
       secondaryGhostActiveBoxShadow: adjustedBoxShadow,
     }
