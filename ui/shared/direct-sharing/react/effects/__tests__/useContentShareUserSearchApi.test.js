@@ -48,8 +48,10 @@ describe('useContentShareUserSearchApi', () => {
   })
 
   it('throws if the courseId parameter is missing', () => {
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
     const {result} = renderHook(() => useContentShareUserSearchApi({params: {search_term: '123'}}))
     expect(result.error).toBeDefined()
     expect(result.error.message).toMatch(/courseId.*required/)
+    consoleSpy.mockRestore()
   })
 })
