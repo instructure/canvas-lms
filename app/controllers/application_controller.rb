@@ -385,6 +385,10 @@ class ApplicationController < ActionController::Base
                                     elsif @context.is_a?(Course)
                                       @context.account.horizon_account?
                                     end
+        if @context.is_a?(Course)
+          @js_env[:FEATURES][:youtube_overlay] = @context.account.feature_enabled?(:youtube_overlay)
+        end
+
         # partner context data
         if @context&.grants_any_right?(@current_user, session, :read, :read_as_admin)
           @js_env[:current_context] = {
@@ -466,7 +470,6 @@ class ApplicationController < ActionController::Base
     scheduled_feedback_releases
     speedgrader_studio_media_capture
     validate_call_to_action
-    youtube_overlay
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     account_level_mastery_scales
