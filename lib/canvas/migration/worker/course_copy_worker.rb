@@ -58,7 +58,7 @@ class Canvas::Migration::Worker::CourseCopyWorker < Canvas::Migration::Worker::B
           cm.workflow_state = :pre_processed
           cm.update_import_progress(10)
 
-          cm.context.copy_attachments_from_course(source, content_export: ce, content_migration: cm)
+          cm.copy_attachments_from_course(ce)
           cm.update_import_progress(20)
 
           cm.import_content
