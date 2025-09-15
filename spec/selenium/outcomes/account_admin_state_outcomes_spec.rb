@@ -142,8 +142,10 @@ describe "account admin outcomes" do
         create_outcome("Test Outcome")
 
         # Verify by titles that the outcomes are imported into current root account
-        account_outcomes = LearningOutcome.where(root_account_ids: [account.id])
-        expect(account_outcomes[0].short_description).to eq("Test Outcome")
+        keep_trying_until do
+          account_outcomes = LearningOutcome.where(root_account_ids: [account.id])
+          expect(account_outcomes[0].short_description).to eq("Test Outcome")
+        end
       end
 
       it "searches across state standards in the Find modal and aligns a result" do

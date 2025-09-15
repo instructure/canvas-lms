@@ -158,9 +158,11 @@ describe "outcomes" do
         select_drilldown_outcome_group_with_text("New group").click
         force_click(confirm_move_button)
         # Verify through AR to save time
-        new_group_children = LearningOutcomeGroup.find_by(title: "New group").child_outcome_links
-        expect(new_group_children.count).to eq(1)
-        expect(new_group_children.first.title).to eq("outcome 0")
+        keep_trying_until do
+          new_group_children = LearningOutcomeGroup.find_by(title: "New group").child_outcome_links
+          expect(new_group_children.count).to eq(1)
+          expect(new_group_children.first.title).to eq("outcome 0")
+        end
       end
 
       it "bulk removes outcomes at the course level as an admin" do
@@ -200,9 +202,9 @@ describe "outcomes" do
           get outcome_url
           create_outcome_with_friendly_desc("Outcome", "Standard Desc", "Friendly Desc")
           # Have to verify model creation with AR to save time since the creation => appearance flow is a little slow
-          outcome = LearningOutcome.find_by(context: account, short_description: "Outcome", description: "<p>Standard Desc</p>")
           # Small delay between button click and model population in db
           keep_trying_until do
+            outcome = LearningOutcome.find_by(context: account, short_description: "Outcome", description: "<p>Standard Desc</p>")
             fd = OutcomeFriendlyDescription.find_by(context: account, learning_outcome: outcome, description: "Friendly Desc")
             expect(fd).to be_truthy
           end
@@ -231,26 +233,28 @@ describe "outcomes" do
           get outcome_url
           create_outcome("Outcome with Individual Ratings")
           # Verify through AR to save time
-          outcome = LearningOutcome.find_by(context: account, short_description: "Outcome with Individual Ratings")
-          ratings = outcome.data[:rubric_criterion][:ratings]
-          mastery_points = outcome.data[:rubric_criterion][:mastery_points]
-          points_possible = outcome.data[:rubric_criterion][:points_possible]
-          expect(outcome.nil?).to be(false)
-          expect(ratings.length).to eq(5)
-          expect(ratings[0][:description]).to eq("Exceeds Mastery")
-          expect(ratings[0][:points]).to eq(4)
-          expect(ratings[1][:description]).to eq("Mastery")
-          expect(ratings[1][:points]).to eq(3)
-          expect(ratings[2][:description]).to eq("Near Mastery")
-          expect(ratings[2][:points]).to eq(2)
-          expect(ratings[3][:description]).to eq("Below Mastery")
-          expect(ratings[3][:points]).to eq(1)
-          expect(ratings[4][:description]).to eq("No Evidence")
-          expect(ratings[4][:points]).to eq(0)
-          expect(mastery_points).to eq(3)
-          expect(points_possible).to eq(4)
-          expect(outcome.calculation_method).to eq("decaying_average")
-          expect(outcome.calculation_int).to eq(65)
+          keep_trying_until do
+            outcome = LearningOutcome.find_by(context: account, short_description: "Outcome with Individual Ratings")
+            ratings = outcome.data[:rubric_criterion][:ratings]
+            mastery_points = outcome.data[:rubric_criterion][:mastery_points]
+            points_possible = outcome.data[:rubric_criterion][:points_possible]
+            expect(outcome.nil?).to be(false)
+            expect(ratings.length).to eq(5)
+            expect(ratings[0][:description]).to eq("Exceeds Mastery")
+            expect(ratings[0][:points]).to eq(4)
+            expect(ratings[1][:description]).to eq("Mastery")
+            expect(ratings[1][:points]).to eq(3)
+            expect(ratings[2][:description]).to eq("Near Mastery")
+            expect(ratings[2][:points]).to eq(2)
+            expect(ratings[3][:description]).to eq("Below Mastery")
+            expect(ratings[3][:points]).to eq(1)
+            expect(ratings[4][:description]).to eq("No Evidence")
+            expect(ratings[4][:points]).to eq(0)
+            expect(mastery_points).to eq(3)
+            expect(points_possible).to eq(4)
+            expect(outcome.calculation_method).to eq("decaying_average")
+            expect(outcome.calculation_int).to eq(65)
+          end
         end
 
         it "edits an outcome and changes calculation method" do

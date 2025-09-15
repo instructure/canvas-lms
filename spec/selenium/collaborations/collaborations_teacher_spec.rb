@@ -124,10 +124,13 @@ describe "collaborations" do
         f("input#collaboration_title").send_keys "created by admin while masquerading"
         force_click("button:contains('Start Collaborating')")
         wait_for_ajaximations
-        collab = Collaboration.last
-        expect(collab.user_id).to eq @user.id
-        expect(collab.user_id).not_to eq @teacher.id
-        expect(collab.users.count { |u| u.id == @teacher.id }).to eq 1
+
+        keep_trying_until do
+          collab = Collaboration.last
+          expect(collab.user_id).to eq @user.id
+          expect(collab.user_id).not_to eq @teacher.id
+          expect(collab.users.count { |u| u.id == @teacher.id }).to eq 1
+        end
       end
     end
   end
