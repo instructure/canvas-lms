@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, screen} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import PageViews, {type PageViewsProps} from '../PageViews'
 import * as PageViewsTableModule from '../PageViewsTable'
@@ -55,29 +55,60 @@ describe('PageViews', () => {
     render(<Subject userId={sent} />)
     const {userId, startDate, endDate} = MockPageViewsTable.mock.calls[0][0]
     expect(userId).toBe(sent)
-    expect(startDate).toBeUndefined()
-    expect(endDate).toBeUndefined()
+    // By default, start date must be today - 30 days, 00:00
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const bottom = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000)
+    expect(startDate).not.toBeUndefined()
+    expect(startDate?.valueOf()).toBe(bottom.valueOf())
+    // By default, end date must be today (inclusive)
+    const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000)
+    expect(endDate).not.toBeUndefined()
+    expect(endDate?.valueOf()).toBe(tomorrow.valueOf())
   })
 
-  it('passes the date range to the table when specified', async () => {
+  it('start date within cache properly passed to the table', async () => {
     const {getByTestId} = render(<Subject userId="1" />)
-    const dateText = '2024-12-01'
+    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000)
+    yesterday.setHours(0, 0, 0, 0)
+
+    const dateText = yesterday.toISOString().slice(0, 10)
     const date = new Date(dateText)
     const expectedDate = formatForDisplay(date)
-    const dateField: HTMLInputElement = getByTestId('page-views-date-filter') as HTMLInputElement
+    const dateField: HTMLInputElement = getByTestId(
+      'page-views-date-start-filter',
+    ) as HTMLInputElement
     fireEvent.change(dateField, {target: {value: dateText}})
     fireEvent.blur(dateField)
     expect(dateField.value).toBe(expectedDate) // UTC date
-    const {startDate, endDate} = MockPageViewsTable.mock.calls[1][0] // second call after rerender
+    const {startDate} = MockPageViewsTable.mock.calls[1][0] // second call after rerender
     const expectedStartDate = unfudgeDateForProfileTimezone(date) ?? new Date('1970-01-01')
-    const expectedEndDate = new Date(expectedStartDate.getTime() + 24 * 60 * 60 * 1000)
     expect(startDate?.toISOString()).toBe(expectedStartDate?.toISOString())
-    expect(endDate?.toISOString()).toBe(expectedEndDate?.toISOString())
   })
 
-  it('renders the correct label for the date input', () => {
+  it('start date outside cache must display error', async () => {
+    const {getByTestId} = render(<Subject userId="1" />)
+    const invalidDate = new Date(Date.now() - 40 * 24 * 60 * 60 * 1000)
+    invalidDate.setHours(0, 0, 0, 0)
+
+    const dateText = invalidDate.toISOString().slice(0, 10)
+    const date = new Date(dateText)
+    const expectedDate = formatForDisplay(date)
+    const dateField: HTMLInputElement = getByTestId(
+      'page-views-date-start-filter',
+    ) as HTMLInputElement
+    fireEvent.change(dateField, {target: {value: dateText}})
+    fireEvent.blur(dateField)
+    expect(dateField.value).toBe(expectedDate) // UTC date
+    const errorText = await screen.findByText('Start date must be within the last 30 days.')
+    expect(errorText).toBeInTheDocument()
+  })
+
+  it('renders the correct label for the date inputs', () => {
     const {getByLabelText} = render(<Subject userId="1" />)
-    const input = getByLabelText('Filter by date') as HTMLInputElement
+    const input = getByLabelText('Filter start date') as HTMLInputElement
     expect(input).toBeInTheDocument()
+    const endInput = getByLabelText('Filter end date') as HTMLInputElement
+    expect(endInput).toBeInTheDocument()
   })
 })
