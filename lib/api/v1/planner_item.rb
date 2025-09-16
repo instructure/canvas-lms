@@ -67,7 +67,7 @@ module Api::V1::PlannerItem
         hash[:plannable_date] = item.start_at || item.created_at
         hash[:plannable] = plannable_json(item.attributes, extra_fields: CALENDAR_PLANNABLE_FIELDS)
         hash[:html_url] = calendar_url_for(item.effective_context, event: item)
-      elsif item.is_a?(SubAssignment)
+      elsif item.is_a?(SubAssignment) && item.parent_assignment&.discussion_topic
         topic = item.parent_assignment&.discussion_topic
         unread_count, read_state = topics_status_for(user, topic.id, opts[:topics_status])[topic.id]
         unread_attributes = { unread_count:, read_state: }
@@ -281,9 +281,12 @@ module Api::V1::PlannerItem
     end
     if item.is_a?(SubAssignment)
       topic = item.parent_assignment&.discussion_topic
-      unread_count, read_state = opts.dig(:topics_status, topic.id)
-      ss = opts[:submission_statuses] || submission_statuses(item, user)
-      return true if ss.dig(item.id, :new_activity) || (unread_count && read_state && (read_state == "unread" || unread_count > 0)) || (topic && (topic.unread?(user) || topic.unread_count(user) > 0))
+
+      if topic
+        unread_count, read_state = opts.dig(:topics_status, topic.id)
+        ss = opts[:submission_statuses] || submission_statuses(item, user)
+        return true if ss.dig(item.id, :new_activity) || (unread_count && read_state && (read_state == "unread" || unread_count > 0)) || (topic && (topic.unread?(user) || topic.unread_count(user) > 0))
+      end
     end
     false
   end
