@@ -54,7 +54,6 @@ export const ZLtiAssetReport = z
     priority: ZLtiAssetReportPriority,
     processingProgress: ZLtiAssetReportProcessingProgress,
     processorId: z.string(),
-    reportType: z.string(),
     resubmitAvailable: z.boolean(),
     result: z.string().nullable().optional(),
     resultTruncated: z.string().nullable().optional(),

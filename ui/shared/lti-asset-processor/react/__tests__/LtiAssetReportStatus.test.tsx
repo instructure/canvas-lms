@@ -27,7 +27,6 @@ describe('LtiAssetReportStatus', () => {
   ): LtiAssetReport => ({
     _id: '123',
     priority,
-    reportType: 'plagiarism',
     resubmitAvailable: false,
     processingProgress: 'Processed',
     processorId: '1',

@@ -31,7 +31,6 @@ describe('StudentLtiAssetReportModal', () => {
   ): LtiAssetReportForStudent => ({
     _id: '123',
     priority,
-    reportType: 'plagiarism',
     resubmitAvailable: false,
     processingProgress: 'Processed',
     processorId: '1',
@@ -227,31 +226,26 @@ describe('StudentLtiAssetReportModal', () => {
       createUploadReport(0, '10', 'document.pdf', {
         processorId: '1',
         _id: '101',
-        reportType: 'plagiarism',
       }),
       createUploadReport(2, '10', 'document.pdf', {
         processorId: '1',
         _id: '102',
-        reportType: 'similarity',
       }),
 
       // Reports for second attachment (essay.docx)
       createUploadReport(1, '20', 'essay.docx', {
         processorId: '1',
         _id: '201',
-        reportType: 'plagiarism',
       }),
       createUploadReport(0, '20', 'essay.docx', {
         processorId: '1',
         _id: '202',
-        reportType: 'similarity',
       }),
 
       // Reports for third attachment (presentation.pptx)
       createUploadReport(3, '30', 'presentation.pptx', {
         processorId: '1',
         _id: '301',
-        reportType: 'plagiarism',
       }),
     ]
 
