@@ -33,7 +33,6 @@ export const LTI_ASSET_REPORT_COMMON_FIELDS = gql`
     priority
     processingProgress
     processorId
-    reportType
     resubmitAvailable
     result
     resultTruncated

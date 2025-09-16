@@ -175,7 +175,6 @@ describe('AssignmentRow', () => {
                     priority: 1,
                     processingProgress: 'Processed',
                     processorId: '1',
-                    reportType: 'originality',
                     resubmitAvailable: false,
                     asset: {
                       attachmentId: '1',
@@ -248,7 +247,6 @@ describe('AssignmentRow', () => {
                     priority: 1,
                     processingProgress: 'Processed',
                     processorId: '1',
-                    reportType: 'originality',
                     resubmitAvailable: false,
                     asset: {
                       attachmentId: '1',
@@ -297,7 +295,6 @@ describe('AssignmentRow', () => {
                     priority: 0,
                     processingProgress: 'Processed',
                     processorId: '1',
-                    reportType: 'originality',
                     resubmitAvailable: false,
                     asset: {
                       attachmentId: '1',
@@ -309,7 +306,6 @@ describe('AssignmentRow', () => {
                     priority: 0,
                     processingProgress: 'Processed',
                     processorId: '1',
-                    reportType: 'originality2',
                     resubmitAvailable: false,
                     asset: {
                       attachmentId: '1',
