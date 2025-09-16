@@ -123,3 +123,9 @@ new_quizzes_scanning_youtube_links:
   description: Enabling the YouTube Migration - New Quizzes feature adds the scanning ability and the convert option on Youtube embeddings in New Quizzes.
   state: hidden
   applies_to: SiteAdmin
+new_quizzes_surveys:
+  display_name: New Quizzes Surveys
+  description: If enabled, users can create and manage surveys in New Quizzes.
+  state: hidden
+  applies_to: SiteAdmin
+  shadow: true
