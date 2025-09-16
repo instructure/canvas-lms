@@ -69,6 +69,7 @@ class AbstractAssignment < ActiveRecord::Base
   QUIZ_SUBMISSION_VERSIONS_LIMIT = 65
   QUIZZES_NEXT_TIMEOUT = 15.minutes
   QUIZZES_NEXT_IMPORTING_TIMEOUT = 30.minutes
+  QUIZZES_NEXT_QUIZ_TYPES = %w[graded_quiz graded_survey ungraded_survey].freeze
 
   attr_accessor(
     :resource_map,
@@ -229,6 +230,10 @@ class AbstractAssignment < ActiveRecord::Base
     validates :grader_count, numericality: { greater_than: 0 }
     validate :grader_section_ok?
     validate :final_grader_ok?
+  end
+
+  with_options if: :quiz_lti? do
+    validate :new_quizzes_type_ok?, if: -> { Account.site_admin.feature_enabled?(:new_quizzes_surveys) }
   end
 
   accepts_nested_attributes_for :estimated_duration, allow_destroy: true
@@ -4382,6 +4387,15 @@ class AbstractAssignment < ActiveRecord::Base
     rubric_self_assessment_enabled
   end
 
+  def new_quizzes_type
+    settings&.dig("new_quizzes", "type") || "graded_quiz"
+  end
+
+  def new_quizzes_type=(type)
+    self.settings ||= {}
+    self.settings["new_quizzes"] = (settings["new_quizzes"] || {}).merge({ "type" => type })
+  end
+
   private
 
   def grading_type_requires_points?
@@ -4525,6 +4539,12 @@ class AbstractAssignment < ActiveRecord::Base
   def allowed_extensions_length_ok?
     if allowed_extensions.present? && allowed_extensions.to_yaml.length > Assignment.maximum_string_length
       errors.add(:allowed_extensions, I18n.t("Value too long, allowed length is %{length}", length: Assignment.maximum_string_length))
+    end
+  end
+
+  def new_quizzes_type_ok?
+    unless QUIZZES_NEXT_QUIZ_TYPES.include?(new_quizzes_type)
+      errors.add(:new_quizzes_type, I18n.t("is not a valid new quizzes type. Valid values are: %{types}", types: QUIZZES_NEXT_QUIZ_TYPES.join(", ")))
     end
   end
 
