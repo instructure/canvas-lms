@@ -142,3 +142,82 @@ describe('DiscussionInsights', () => {
     ).toBeInTheDocument()
   })
 })
+
+describe('Screen Reader Announcements', () => {
+  beforeEach(() => {
+    const mockState = {
+      context: 'test-context',
+      contextId: 'test-context-id',
+      discussionId: 'test-discussion-id',
+      filterType: 'all',
+      setModalOpen: jest.fn(),
+      genereteInsight: jest.fn(),
+      setEntryId: jest.fn(),
+      setEntries: jest.fn(),
+      setFeedbackNotes: jest.fn(),
+      setFilterType: jest.fn(),
+      setIsFilteredTable: jest.fn(),
+      openEvaluationModal: jest.fn(),
+    }
+    mockedUseInsightStore.mockImplementation(selector => selector(mockState))
+  })
+
+  it('announces when insights start loading', async () => {
+    mockedUseInsight.mockReturnValue({
+      loading: true,
+      insight: {workflow_state: 'created'},
+      insightError: null,
+      entries: null,
+    })
+
+    render(<DiscussionInsights />)
+
+    await waitFor(() => {
+      expect(screen.getByText('Insights loading')).toBeInTheDocument()
+    })
+  })
+
+  it('announces when insights are generated successfully', async () => {
+    mockedUseInsight.mockReturnValue({
+      loading: false,
+      insight: {workflow_state: 'completed'},
+      insightError: null,
+      entries: [{student_name: 'John Doe'}],
+    })
+    render(<DiscussionInsights />)
+
+    await waitFor(() => {
+      expect(screen.getByText('Insights generated')).toBeInTheDocument()
+    })
+  })
+
+  it('announces search results', async () => {
+    mockedUseInsight.mockReturnValue({
+      loading: false,
+      insight: {workflow_state: 'completed'},
+      insightError: null,
+      entries: [{student_name: 'John Doe'}, {student_name: 'Jane Smith'}],
+    })
+
+    render(<DiscussionInsights />)
+
+    const searchInput = screen.getByPlaceholderText('Search...')
+    fireEvent.change(searchInput, {target: {value: 'John'}})
+
+    await waitFor(() => {
+      expect(screen.getByText('1 result for "John"')).toBeInTheDocument()
+    })
+
+    fireEvent.change(searchInput, {target: {value: 'J'}})
+
+    await waitFor(() => {
+      expect(screen.getByText('2 results for "J"')).toBeInTheDocument()
+    })
+
+    fireEvent.change(searchInput, {target: {value: 'NonExistent'}})
+
+    await waitFor(() => {
+      expect(screen.getByText('No results found for "NonExistent"')).toBeInTheDocument()
+    })
+  })
+})
