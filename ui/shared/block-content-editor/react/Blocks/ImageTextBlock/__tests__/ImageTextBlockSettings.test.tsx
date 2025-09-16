@@ -22,6 +22,12 @@ import {waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {ImageTextBlockProps} from '../types'
 
+jest.mock('../../../BlockContentEditorContext', () => ({
+  useBlockContentEditorContext: () => ({
+    aiAltTextEnabled: false,
+  }),
+}))
+
 const color = '123456'
 
 const defaultProps: ImageTextBlockProps = {

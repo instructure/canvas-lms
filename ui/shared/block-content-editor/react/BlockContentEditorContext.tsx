@@ -30,10 +30,12 @@ export type BlockContentEditorContextType = {
   editor: ReturnType<typeof useEditorMode>
   editingBlock: ReturnType<typeof useEditingBlock>
   accessibility: ReturnType<typeof useAccessibilityChecker>
+  aiAltTextEnabled: boolean
 }
 
 export type BlockContentEditorContextProps = {
   data: SerializedNodes | null
+  aiAltTextEnabled: boolean
 }
 
 const Context = createContext<BlockContentEditorContextType>(null as any)
@@ -48,6 +50,7 @@ export const BlockContentEditorContext = (
   const editor = useEditorMode()
   const editingBlock = useEditingBlock()
   const accessibility = useAccessibilityChecker()
+  const aiAltTextEnabled = props.aiAltTextEnabled
 
   return (
     <Context.Provider
@@ -57,6 +60,7 @@ export const BlockContentEditorContext = (
         editor,
         editingBlock,
         accessibility,
+        aiAltTextEnabled,
       }}
     >
       {props.children}
