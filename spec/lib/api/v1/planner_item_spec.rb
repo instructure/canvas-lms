@@ -657,6 +657,12 @@ describe Api::V1::PlannerItem do
         expect(json[:plannable][:unread_count]).to eq 0
         expect(json[:plannable][:read_state]).to eq "unread"
       end
+
+      it "returns false for sub_assignments when topic is nil" do
+        @reply_to_topic.parent_assignment.update!(discussion_topic: nil)
+        json = api.planner_item_json(@reply_to_topic, @student, session)
+        expect(json[:new_activity]).to be false
+      end
     end
   end
 
