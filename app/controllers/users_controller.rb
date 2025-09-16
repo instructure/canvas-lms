@@ -526,18 +526,12 @@ class UsersController < ApplicationController
   end
 
   def user_dashboard
-    if !k5_user? && !@current_user.non_student_enrollment? && @domain_root_account.feature_enabled?(:widget_dashboard)
-      # things needed only for widget dashboard (students only)
+    observed_users_list = observed_users(@current_user, session)
+    if should_show_widget_dashboard?
       js_bundle :widget_dashboard
       css_bundle :dashboard_card
 
-      # Set up observer options if user has observer data
-      observed_users_list = observed_users(@current_user, session)
-
-      # Fetch course data with grades for shared context
-      # Use the first observed user if available, otherwise use current user
-      observed_user = observed_users_list.first if observed_users_list.present?
-      course_data_with_grades = fetch_courses_with_grades(@current_user, observed_user)
+      course_data_with_grades = fetch_courses_with_grades(@current_user, @selected_observed_user)
 
       js_env({
                PREFERENCES: {
@@ -577,7 +571,6 @@ class UsersController < ApplicationController
 
     # Reload user settings so we don't get a stale value for K5_USER when switching dashboards
     @current_user.reload
-    observed_users_list = observed_users(@current_user, session)
     k5_disabled = k5_disabled?
     k5_user = k5_user?(check_disabled: false)
     js_env({ K5_USER: k5_user && !k5_disabled }, true)
@@ -3551,5 +3544,18 @@ class UsersController < ApplicationController
     end
 
     course_data.compact.uniq { |c| c[:courseId] }
+  end
+
+  def should_show_widget_dashboard?
+    return false if k5_user?
+    return false unless @domain_root_account.feature_enabled?(:widget_dashboard)
+
+    if @current_user.observer_enrollments.active.any?
+      # only show widget dashboard if observer is actively observing a student
+      return true if @selected_observed_user && @selected_observed_user != @current_user
+    elsif !@current_user.non_student_enrollment?
+      return true
+    end
+    false
   end
 end

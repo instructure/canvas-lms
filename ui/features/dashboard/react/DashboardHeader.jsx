@@ -244,6 +244,13 @@ class DashboardHeader extends React.Component {
   }
 
   handleChangeObservedUser(id) {
+    if (ENV.FEATURES?.widget_dashboard) {
+      const isObservingSelf = id === ENV.current_user_id || id === null
+      if (!isObservingSelf) {
+        window.location.reload()
+        return
+      }
+    }
     if (id !== this.state.selectedObserveeId) {
       this.props.refetchDashboardCards && this.props.refetchDashboardCards()
       fetchShowK5Dashboard(id)
