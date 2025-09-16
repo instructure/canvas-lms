@@ -311,6 +311,7 @@ export default class WikiPageEditView extends ValidatedFormView {
             onInit={handler => {
               this.blockEditorHandler = handler
             }}
+            aiAltTextEnabled={ENV.FEATURES.block_content_editor_ai_alt_text}
           />,
         )
       })

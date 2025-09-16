@@ -53,12 +53,13 @@ const BlockContentEditorWrapper = (props: BlockContentEditorProps) => {
 
 export type BlockContentEditorProps = BlockContentViewerProps & {
   onInit: ((handler: BlockContentEditorHandler) => void) | null
+  aiAltTextEnabled: boolean
 }
 
 export const BlockContentEditor = (props: BlockContentEditorProps) => {
   return (
     <BlockContentEditorErrorBoundary>
-      <BlockContentEditorContext data={props.data}>
+      <BlockContentEditorContext data={props.data} aiAltTextEnabled={props.aiAltTextEnabled}>
         <BlockContentEditorWrapper {...props} />
       </BlockContentEditorContext>
     </BlockContentEditorErrorBoundary>
