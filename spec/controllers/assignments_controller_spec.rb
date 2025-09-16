@@ -1258,7 +1258,7 @@ describe AssignmentsController do
         it "sets ASSET_REPORTS js_env" do
           user_session(@student)
           student_submission = @assignment.submissions.find_by(user: @student)
-          allow_any_instance_of(AssignmentsController).to receive(:asset_reports)
+          allow_any_instance_of(AssignmentsController).to receive(:asset_reports_legacy_format)
             .with(submission: student_submission)
             .and_return([{ id: 1, name: "Report 1" }])
 

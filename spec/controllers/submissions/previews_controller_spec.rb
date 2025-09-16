@@ -141,10 +141,10 @@ describe Submissions::PreviewsController do
 
       it "renders show_preview with asset processor data in js ENV" do
         # Use random ids and display_names for the mock attachments
-        allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_reports).and_return([
-                                                                                                  { title: "Asset Report 1", asset: { id: 101, attachment_id: @attachment1.id, attachment_name: @attachment1.display_name } },
-                                                                                                  { title: "Asset Report 2", asset: { id: 102, attachment_id: @attachment2.id, attachment_name: @attachment2.display_name } }
-                                                                                                ])
+        allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_reports_legacy_format).and_return([
+                                                                                                                { title: "Asset Report 1", asset: { id: 101, attachment_id: @attachment1.id, attachment_name: @attachment1.display_name } },
+                                                                                                                { title: "Asset Report 2", asset: { id: 102, attachment_id: @attachment2.id, attachment_name: @attachment2.display_name } }
+                                                                                                              ])
         allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_processors).and_return([
                                                                                                      { title: "Live AP" }
                                                                                                    ])
@@ -162,7 +162,7 @@ describe Submissions::PreviewsController do
       end
 
       it "renders show_preview without Document Processors column if asset reports is nil" do
-        allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_reports).and_return(nil)
+        allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_reports_legacy_format).and_return(nil)
 
         get :show, params: { course_id: @context.id, assignment_id: @assignment.id, id: @student.id, preview: true }
 

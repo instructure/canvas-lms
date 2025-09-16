@@ -142,7 +142,7 @@ class GradebooksController < ApplicationController
 
       if submission.user_can_read_grade?(@presenter.student, for_plagiarism: true)
         json[:asset_processors] = asset_processors(assignment: submission.assignment)
-        json[:asset_reports] = @presenter.user_has_elevated_permissions? ? nil : asset_reports(submission:)
+        json[:asset_reports] = @presenter.user_has_elevated_permissions? ? nil : asset_reports_info_for_display(submission:)
         json[:submission_type] = submission.submission_type
       end
 

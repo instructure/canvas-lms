@@ -65,7 +65,7 @@ module Submissions
           redirect_to(named_context_url(@context, redirect_path_name, @assignment.quiz.id, redirect_params))
         else
           @anonymize_students = anonymize_students?
-          @asset_reports = asset_reports(submission: @submission)
+          @asset_reports = asset_reports_legacy_format(submission: @submission)
           @asset_processors = asset_processors(assignment: @assignment)
           flash.now[:notice] = flash_message if flash_message
           render template: "submissions/show_preview", locals: {

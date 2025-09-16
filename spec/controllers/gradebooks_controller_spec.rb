@@ -223,7 +223,7 @@ describe GradebooksController do
 
           it "includes processors and reports in submission data if user can read grade" do
             allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_processors).and_return([{ id: 1, title: "Test Processor" }])
-            allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_reports).and_return([{ id: 1, priority: 0 }])
+            allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_reports_info_for_display).and_return([{ id: 1, priority: 0 }])
 
             get "grade_summary", params: { course_id: @course.id, id: @student.id }
 
@@ -238,7 +238,7 @@ describe GradebooksController do
 
           it "includes processors and reports in submission data if grades are hidden" do
             allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_processors).and_return([{ id: 1, title: "Test Processor" }])
-            allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_reports).and_return([{ id: 1, priority: 0 }])
+            allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_reports_info_for_display).and_return([{ id: 1, priority: 0 }])
             # ensure the grades are hidden
             allow(@assignment).to receive(:user_can_read_grades?).and_return(false)
             submission = @assignment.grade_student(@student, grade: 10, grader: @teacher).first
@@ -257,7 +257,7 @@ describe GradebooksController do
 
           it "does not include processors and reports in submission data if user cannot read grades" do
             allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_processors).and_return([{ id: 1, title: "Test Processor" }])
-            allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_reports).and_return([{ id: 1, priority: 0 }])
+            allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_reports_info_for_display).and_return([{ id: 1, priority: 0 }])
             allow_any_instance_of(Submission).to receive(:user_can_read_grade?).and_return(false)
 
             get "grade_summary", params: { course_id: @course.id, id: @student.id }
@@ -325,7 +325,7 @@ describe GradebooksController do
       end
 
       it "returns nil for asset_reports" do
-        allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_reports).and_return([{ id: 1, priority: 0 }])
+        allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_reports_info_for_display).and_return([{ id: 1, priority: 0 }])
         get "grade_summary", params: { course_id: @course.id, id: @student.id }
         submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
         expect(submission[:asset_reports]).to be_nil

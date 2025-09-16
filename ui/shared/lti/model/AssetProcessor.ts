@@ -118,6 +118,12 @@ export type ExistingAttachedAssetProcessorGraphql = {
   } | null
 }
 
+/**
+ * TODO: ideally, we shouldn't need this, but rather change our REST endpoint
+ * (used in Edit Assignment page) to conform to the GraphQL shape. This would
+ * make it more compatible (with a few extra fields) with the types used in
+ * showing Asset Reports, too (which use GraphQL)
+ */
 export function existingAttachedAssetProcessorFromGraphql(
   processor: ExistingAttachedAssetProcessorGraphql,
 ): ExistingAttachedAssetProcessor {
@@ -145,4 +151,5 @@ export function existingAttachedAssetProcessorFromGraphql(
       : undefined,
   }
 }
+
 export type AssetProcessorType = 'ActivityAssetProcessor' | 'ActivityAssetProcessorContribution'

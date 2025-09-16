@@ -34,7 +34,7 @@ class Loaders::SubmissionLtiAssetReportsLoader < GraphQL::Batch::Loader
     reports_by_submission = raw_asset_reports(submission_ids:, for_student: @is_student)
 
     submission_ids.each do |sub_id|
-      fulfill(sub_id, reports_by_submission[sub_id] || [])
+      fulfill(sub_id, reports_by_submission[sub_id])
     end
   end
 end

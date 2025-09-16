@@ -98,7 +98,7 @@ describe('GradeSummary - Asset Processor functionality', () => {
         {
           assignment_id: '123',
           asset_reports: [{id: 1, priority: 0}],
-          asset_processors: [{id: 1, title: 'Test Processor'}],
+          asset_processors: [{id: 1, title: 'Test Processor', tool_id: 1, tool_name: 't1'}],
         },
       ]
 
