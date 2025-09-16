@@ -323,12 +323,9 @@ External tools can be configured to appear in the Top Navigation menu and will l
 To use the top navigation placement, the following requirements must be met:
 
 - The feature flag top_navigation_placement needs to be enabled.
-- The tool that will use the placement must be added to the allow list for the placement either by Global Developer Key ID or by the Launch Domain.
 - The tool is configured with a placement entry for top_navigation.
 
 The tool will then show up in the Top Navigation tool menu with both the icon_url and text properties. If no icon_url is provided, a default icon generated from the first letter of the tool title will be used instead. Up to two tools can also be "pinned" which promotes them from the Tool Menu to a dedicated button (icon only) alongside the menu. This pinning is done per Account and can be managed by a user with manage tools permission in the Apps tab of the account settings.
-
-Please contact your CSM (Customers) or [Developer Relations](mailto:dev-relations@instructure.com) (Partners) to inquire about adding your tool to the allow list.
 
 ### Settings
 
