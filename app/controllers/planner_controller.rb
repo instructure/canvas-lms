@@ -69,6 +69,9 @@ class PlannerController < ApplicationController
   # @argument filter [String, "new_activity"]
   #   Only return items that have new or unread activity
   #
+  # @argument filter [String, "assignments_needing_submission"]
+  #   Prioritize assignments that need submission, followed by other To Do items
+  #
   # @example_response
   #  [
   #   {
@@ -195,6 +198,8 @@ class PlannerController < ApplicationController
       ungraded_todo_items
     when "all_ungraded_todo_items"
       all_ungraded_todo_items
+    when "assignments_needing_submission"
+      assignments_needing_submission
     else
       planner_items
     end
@@ -240,6 +245,36 @@ class PlannerController < ApplicationController
     BookmarkedCollection.merge(*collections)
   end
 
+  def assignments_needing_submission
+    # Return assignments that need submission plus other relevant To Do items
+    # This ensures students see incomplete assignments first, followed by other items
+    submitting = @user.assignments_for_student("submitting", **default_opts)
+                      .preload(:quiz, :discussion_topic, :wiki_page)
+    collections = []
+
+    # Priority 1: Assignments that need submission
+    collections << item_collection("assignments_needing_submission",
+                                   submitting,
+                                   Assignment,
+                                   %i[user_due_date due_at created_at],
+                                   :id)
+
+    # Also include sub-assignments if they exist
+    if sub_assignment_collection_needing_submission.present?
+      collections << sub_assignment_collection_needing_submission
+    end
+
+    # Priority 2: Other important To Do items
+    collections << ungraded_quiz_collection
+    collections << planner_note_collection
+    collections << page_collection
+    collections << ungraded_discussion_collection
+    collections << calendar_events_collection
+    collections << peer_reviews_collection
+
+    BookmarkedCollection.merge(*collections)
+  end
+
   def assignment_collections
     # TODO: For Teacher Planner, we'll need to optimize & add
     # the below `grading` and `moderation` collections. Disabled
@@ -269,6 +304,14 @@ class PlannerController < ApplicationController
   def sub_assignment_collection
     item_collection("sub_assignment_viewing",
                     @user.assignments_for_student("viewing", is_sub_assignment: true, **default_opts).preload(:discussion_topic),
+                    SubAssignment,
+                    %i[user_due_date due_at created_at],
+                    :id)
+  end
+
+  def sub_assignment_collection_needing_submission
+    item_collection("sub_assignment_submitting",
+                    @user.assignments_for_student("submitting", is_sub_assignment: true, **default_opts).preload(:discussion_topic),
                     SubAssignment,
                     %i[user_due_date due_at created_at],
                     :id)
