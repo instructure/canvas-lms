@@ -510,6 +510,7 @@ class ApplicationController < ActionController::Base
     send_usage_metrics
     top_navigation_placement
     youtube_migration
+    widget_dashboard
   ].freeze
   JS_ENV_ROOT_ACCOUNT_SERVICES = %i[account_survey_notifications].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = %i[

@@ -3330,6 +3330,66 @@ describe UsersController do
         get "user_dashboard"
         expect(assigns[:js_env][:SHARED_COURSE_DATA].length).to eq 1
       end
+
+      describe "dashboard routing" do
+        before :once do
+          @observer = user_factory(active_all: true)
+          @student = user_factory(active_all: true)
+          @course = course_factory(active_all: true)
+          @course.enroll_student(@student)
+        end
+
+        before do
+          user_session(@observer)
+        end
+
+        it "shows widget dashboard if actively observing" do
+          @observer_enrollment = @course.enroll_user(@observer, "ObserverEnrollment", section: @course.course_sections.first, enrollment_state: "active")
+          @observer_enrollment.update_attribute(:associated_user_id, @student.id)
+          user_session(@observer)
+          get "user_dashboard"
+          expect(assigns[:js_bundles].flatten).to include :widget_dashboard
+          expect(assigns[:css_bundles].flatten).to include :dashboard_card
+        end
+
+        it "shows legacy dashboard if not actively observing" do
+          @observer_enrollment = @course.enroll_user(@observer, "ObserverEnrollment", section: @course.course_sections.first, enrollment_state: "active")
+          user_session(@observer)
+
+          get "user_dashboard"
+          expect(assigns[:js_bundles].flatten).to include :dashboard
+          expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
+          expect(assigns[:css_bundles].flatten).to include :dashboard
+        end
+
+        it "shows widget dashboard to students" do
+          user_session(@student)
+          get "user_dashboard"
+          expect(assigns[:js_bundles].flatten).to include :widget_dashboard
+          expect(assigns[:css_bundles].flatten).to include :dashboard_card
+        end
+
+        it "shows legacy dashboard to teachers" do
+          @teacher = user_factory(active_all: true)
+          @course.enroll_teacher(@teacher)
+          user_session(@teacher)
+          get "user_dashboard"
+          expect(assigns[:js_bundles].flatten).to include :dashboard
+          expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
+          expect(assigns[:css_bundles].flatten).to include :dashboard
+        end
+
+        it "shows legacy dashboard if user has at least one non student enrollment" do
+          @mixed_user = user_factory(active_all: true)
+          @course.enroll_student(@mixed_user)
+          @course.enroll_teacher(@mixed_user)
+          user_session(@mixed_user)
+          get "user_dashboard"
+          expect(assigns[:js_bundles].flatten).to include :dashboard
+          expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
+          expect(assigns[:css_bundles].flatten).to include :dashboard
+        end
+      end
     end
   end
 
