@@ -54,8 +54,9 @@ export const ImageBlockUploadModal = (props: {
       const metaData = await loadFileMetaData(url)
       fileName = metaData?.attachment.display_name
     }
+    const finalAltText = !altText && fileName ? fileName : altText
     setIsUploading(false)
-    props.onSelected({url, altText, decorativeImage, fileName})
+    props.onSelected({url, altText: finalAltText, decorativeImage, fileName})
   }
 
   return props.open ? (
