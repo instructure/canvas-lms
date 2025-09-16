@@ -240,4 +240,25 @@ describe Quizzes::QuizQuestion do
       expect(question.root_account_id).to eq Account.default.id
     end
   end
+
+  describe ".without_assessment_question_association" do
+    before do
+      course_with_teacher
+      @quiz = @course.quizzes.create!
+      @data = { question_name: "test question" }
+    end
+
+    it "returns questions without assessment_question_id" do
+      standalone_question = @quiz.quiz_questions.create!(question_data: @data.merge(question_type: "text_only_question"))
+
+      bank = @course.assessment_question_banks.create!
+      assessment_question = bank.assessment_questions.create!
+      linked_question = @quiz.quiz_questions.create!(question_data: @data.merge(question_type: "multiple_choice_question"), assessment_question:)
+
+      results = Quizzes::QuizQuestion.without_assessment_question_association
+
+      expect(results).to include(standalone_question)
+      expect(results).not_to include(linked_question)
+    end
+  end
 end
