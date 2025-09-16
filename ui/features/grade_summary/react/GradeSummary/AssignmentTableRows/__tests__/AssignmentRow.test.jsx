@@ -162,7 +162,7 @@ describe('AssignmentRow', () => {
       ],
     }
 
-    it('does not render AssetProcessorCell when showDocumentProcessors is false', () => {
+    it('does not render LtiAssetProcessorCell when showDocumentProcessors is false', () => {
       const assignment = Assignment.mock({
         ltiAssetProcessorsConnection,
         submissionsConnection: {
@@ -214,7 +214,7 @@ describe('AssignmentRow', () => {
       expect(queryByText('No result')).toBeInTheDocument()
     })
 
-    it('does not render AssetProcessorCell when showDocumentProcessors is true but asset reports array is null', () => {
+    it('does not render LtiAssetProcessorCell when showDocumentProcessors is true but asset reports array is null', () => {
       const assignment = Assignment.mock({
         ltiAssetProcessorsConnection,
         submissionsConnection: {
@@ -234,7 +234,7 @@ describe('AssignmentRow', () => {
       expect(queryByText('No result')).not.toBeInTheDocument()
     })
 
-    it('renders AssetProcessorCell when showDocumentProcessors is true and asset reports exist', () => {
+    it('renders LtiAssetProcessorCell when showDocumentProcessors is true and asset reports exist', () => {
       const assignment = Assignment.mock({
         ltiAssetProcessorsConnection,
         submissionsConnection: {
@@ -266,7 +266,7 @@ describe('AssignmentRow', () => {
       expect(getByText('Needs attention')).toBeInTheDocument()
     })
 
-    it('does not render AssetProcessorCell when assignment has no submissions', () => {
+    it('does not render LtiAssetProcessorCell when assignment has no submissions', () => {
       const assignment = Assignment.mock({
         ltiAssetProcessorsConnection,
         submissionsConnection: {
@@ -282,7 +282,7 @@ describe('AssignmentRow', () => {
       ).not.toBeInTheDocument()
     })
 
-    it('passes correct props to AssetProcessorCell', () => {
+    it('passes correct props to LtiAssetProcessorCell', () => {
       const assignment = Assignment.mock({
         ltiAssetProcessorsConnection,
         submissionsConnection: {

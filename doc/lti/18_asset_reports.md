@@ -18,8 +18,8 @@ Paths below are relative to `canvas-lms` or `canvas-lms/ui/shared/lti-asset-proc
 ### New Student Grades
 * Frontend:
   1. Non-AP component `ui/features/grade_summary/react/GradeSummary/AssignmentTableRows/AssignmentRow.jsx`, which uses --
-  2. AP component `ui/features/grade_summary/react/AssetProcessorCell.tsx`, which uses --
-  3. AP components `AssetReportStatus` and `StudentAssetReportModal`
+  2. AP component `ui/features/grade_summary/react/LtiAssetProcessorCell.tsx`, which uses --
+  3. AP components `LtiAssetReportStatus` and `LtiStudentAssetReportModal`
 
 * Data: part of Grades graphql query in
   `ui/features/grade_summary/graphql/Assignment.js` and
@@ -30,8 +30,8 @@ Paths below are relative to `canvas-lms` or `canvas-lms/ui/shared/lti-asset-proc
 * Full data flow:
   1. Controller `app/controllers/gradebooks_controller.rb` sets `js_env` `submissions`
   2. Non-AP, non-React `ui/features/grade_summary/jquery/index.jsx` uses ENV and renders --
-  3. AP component `ui/features/grade_summary/react/AssetProcessorCell.tsx` which uses --
-  4. AP components `AssetReportStatus` and `StudentAssetReportModal`
+  3. AP component `ui/features/grade_summary/react/LtiAssetProcessorCell.tsx` which uses --
+  4. AP components `LtiAssetReportStatus` and `LtiStudentAssetReportModal`
 
 ### New Student Submission
 * Full data flow 1 (multiple attachments):

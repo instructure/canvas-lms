@@ -75,18 +75,43 @@ describe AssetProcessorReportHelper do
     @ap_deleted.destroy
   end
 
-  describe "#asset_reports" do
+  describe "#raw_asset_reports" do
+    it "returns nil for submission with no reports when other submissions have reports" do
+      # Create second student and submission with reports
+      second_student = user_with_pseudonym(active_all: true)
+      second_attachment = attachment_with_context(second_student, { display_name: "second.txt", uploaded_data: StringIO.new("second") })
+      second_submission = @assignment.submit_homework(second_student, attachments: [second_attachment])
+      lti_asset_report_model(
+        asset_processor: @ap,
+        asset: Lti::Asset.find_by(attachment: second_attachment),
+        processing_progress: Lti::AssetReport::PROGRESS_PENDING,
+        visible_to_owner: true
+      )
+
+      # Create third submission with no reports
+      third_student = user_with_pseudonym(active_all: true)
+      third_submission = @assignment.submit_homework(third_student)
+
+      # Test multiple submissions where one has no reports
+      results = raw_asset_reports(submission_ids: [third_submission.id, second_submission.id], for_student: true)
+
+      expect(results[third_submission.id]).to be_nil
+      expect(results[second_submission.id]).to eq([])
+    end
+  end
+
+  describe "#asset_reports_info_for_display" do
     it "returns asset reports for a text_entry submission (no attachment, with submission_attempt)" do
-      reports = asset_reports(submission: @submission_text)
+      reports = asset_reports_info_for_display(submission: @submission_text)
       expect(reports).to be_a(Array)
       expect(reports.length).to eq(1)
       expect(reports.first[:title]).to eq("Text Entry Asset Report")
-      expect(reports.first[:asset][:attachment_id]).to be_nil
-      expect(reports.first[:asset][:submission_attempt]).to eq(@submission_text.attempt)
+      expect(reports.first[:asset][:attachmentId]).to be_nil
+      expect(reports.first[:asset][:submissionAttempt]).to eq(@submission_text.attempt)
     end
 
     it "returns asset reports for the submission" do
-      reports = asset_reports(submission: @submission)
+      reports = asset_reports_info_for_display(submission: @submission)
       expect(reports).to be_a(Array)
       expect(reports.length).to eq(2)
       expect(reports.pluck(:title)).to include("Asset Report 1", "Asset Report 2")
@@ -94,13 +119,13 @@ describe AssetProcessorReportHelper do
     end
 
     it "returns nil when submission is blank" do
-      reports = asset_reports(submission: nil)
+      reports = asset_reports_info_for_display(submission: nil)
       expect(reports).to be_nil
     end
 
     it "returns nil when no reports exist for the submission" do
       Lti::AssetReport.where(asset_processor: @ap).destroy_all
-      reports = asset_reports(submission: @submission)
+      reports = asset_reports_info_for_display(submission: @submission)
       expect(reports).to be_nil
     end
 
@@ -108,7 +133,7 @@ describe AssetProcessorReportHelper do
       # Set all visible reports to a non-processed status
       @apreport1.update!(processing_progress: Lti::AssetReport::PROGRESS_PENDING)
       @apreport2.update!(processing_progress: Lti::AssetReport::PROGRESS_FAILED)
-      reports = asset_reports(submission: @submission)
+      reports = asset_reports_info_for_display(submission: @submission)
       expect(reports).to eq([])
     end
 
@@ -116,7 +141,7 @@ describe AssetProcessorReportHelper do
       @apreport1.update!(visible_to_owner: false)
       @apreport2.update!(visible_to_owner: false)
 
-      reports = asset_reports(submission: @submission)
+      reports = asset_reports_info_for_display(submission: @submission)
       expect(reports).to be_nil
     end
 
@@ -131,7 +156,7 @@ describe AssetProcessorReportHelper do
         visible_to_owner: true
       )
 
-      reports = asset_reports(submission: @submission)
+      reports = asset_reports_info_for_display(submission: @submission)
       expect(reports).to be_a(Array)
       expect(reports.pluck(:title)).to include("Asset Report 1", "Asset Report 2")
       expect(reports.pluck(:title)).not_to include("Failed Report")
@@ -195,7 +220,7 @@ describe AssetProcessorReportHelper do
         visible_to_owner: true
       )
 
-      reports = asset_reports(submission: @submission)
+      reports = asset_reports_info_for_display(submission: @submission)
       expect(reports).to be_a(Array)
 
       # Should include our original processed reports and the new processed report
@@ -227,7 +252,7 @@ describe AssetProcessorReportHelper do
         report_type: "hidden_report_type"
       )
 
-      reports = asset_reports(submission: @submission)
+      reports = asset_reports_info_for_display(submission: @submission)
       expect(reports).to be_a(Array)
       expect(reports.pluck(:title)).to include("Asset Report 1", "Asset Report 2")
       expect(reports.pluck(:title)).not_to include("Hidden Report")
@@ -236,7 +261,185 @@ describe AssetProcessorReportHelper do
     it "returns nil if lti_asset_processor feature flag is disabled" do
       @submission.root_account.disable_feature!(:lti_asset_processor)
 
-      reports = asset_reports(submission: @submission)
+      reports = asset_reports_info_for_display(submission: @submission)
+      expect(reports).to be_nil
+    end
+
+    it "returns all ids as strings (For graphql compat and JSON max int limit safety)" do
+      reports = asset_reports_info_for_display(submission: @submission)
+      expect(reports).to be_a(Array)
+      expect(reports.length).to eq(2)
+
+      expect(reports.pluck(:_id)).to all(be_a(String))
+      expect(reports.pluck(:_id)).to match_array([@apreport1.id.to_s, @apreport2.id.to_s])
+      expect(reports.pluck(:processorId)).to all(be_a(String))
+      expect(reports.pluck(:asset).pluck(:attachmentId)).to all(be_a(String))
+    end
+  end
+
+  # TODO: remove after refactor (INTEROP-9588)
+  describe "#asset_reports_legacy_format" do
+    it "returns asset reports for a text_entry submission (no attachment, with submission_attempt)" do
+      reports = asset_reports_legacy_format(submission: @submission_text)
+      expect(reports).to be_a(Array)
+      expect(reports.length).to eq(1)
+      expect(reports.first[:title]).to eq("Text Entry Asset Report")
+      expect(reports.first[:asset][:attachment_id]).to be_nil
+      expect(reports.first[:asset][:submission_attempt]).to eq(@submission_text.attempt)
+    end
+
+    it "returns asset reports for the submission" do
+      reports = asset_reports_legacy_format(submission: @submission)
+      expect(reports).to be_a(Array)
+      expect(reports.length).to eq(2)
+      expect(reports.pluck(:title)).to include("Asset Report 1", "Asset Report 2")
+      expect(reports.pluck(:title)).not_to include("Deleted Asset Report")
+    end
+
+    it "returns nil when submission is blank" do
+      reports = asset_reports_legacy_format(submission: nil)
+      expect(reports).to be_nil
+    end
+
+    it "returns nil when no reports exist for the submission" do
+      Lti::AssetReport.where(asset_processor: @ap).destroy_all
+      reports = asset_reports_legacy_format(submission: @submission)
+      expect(reports).to be_nil
+    end
+
+    it "returns empty array when there are visible reports but none are processed" do
+      # Set all visible reports to a non-processed status
+      @apreport1.update!(processing_progress: Lti::AssetReport::PROGRESS_PENDING)
+      @apreport2.update!(processing_progress: Lti::AssetReport::PROGRESS_FAILED)
+      reports = asset_reports_legacy_format(submission: @submission)
+      expect(reports).to eq([])
+    end
+
+    it "returns nil when all reports for the submission are not visible to owner" do
+      @apreport1.update!(visible_to_owner: false)
+      @apreport2.update!(visible_to_owner: false)
+
+      reports = asset_reports_legacy_format(submission: @submission)
+      expect(reports).to be_nil
+    end
+
+    it "does not include reports with PROGRESS_FAILED status" do
+      failed_asset = Lti::Asset.find_by(attachment: @attachment1)
+      lti_asset_report_model(
+        asset_processor: @ap,
+        asset: failed_asset,
+        title: "Failed Report",
+        processing_progress: Lti::AssetReport::PROGRESS_FAILED,
+        report_type: "unique_failed_report_type",
+        visible_to_owner: true
+      )
+
+      reports = asset_reports_legacy_format(submission: @submission)
+      expect(reports).to be_a(Array)
+      expect(reports.pluck(:title)).to include("Asset Report 1", "Asset Report 2")
+      expect(reports.pluck(:title)).not_to include("Failed Report")
+    end
+
+    it "does not include reports with non-processed statuses" do
+      asset = Lti::Asset.find_by(attachment: @attachment1)
+
+      lti_asset_report_model(
+        asset_processor: @ap,
+        asset:,
+        title: "Processing Report",
+        processing_progress: Lti::AssetReport::PROGRESS_PROCESSING,
+        report_type: "processing_report_type",
+        visible_to_owner: true
+      )
+
+      lti_asset_report_model(
+        asset_processor: @ap,
+        asset:,
+        title: "Pending Report",
+        processing_progress: Lti::AssetReport::PROGRESS_PENDING,
+        report_type: "pending_report_type",
+        visible_to_owner: true
+      )
+
+      lti_asset_report_model(
+        asset_processor: @ap,
+        asset:,
+        title: "Pending Manual Report",
+        processing_progress: Lti::AssetReport::PROGRESS_PENDING_MANUAL,
+        report_type: "pending_manual_report_type",
+        visible_to_owner: true
+      )
+
+      lti_asset_report_model(
+        asset_processor: @ap,
+        asset:,
+        title: "Not Processed Report",
+        processing_progress: Lti::AssetReport::PROGRESS_NOT_PROCESSED,
+        report_type: "not_processed_report_type",
+        visible_to_owner: true
+      )
+
+      lti_asset_report_model(
+        asset_processor: @ap,
+        asset:,
+        title: "Not Ready Report",
+        processing_progress: Lti::AssetReport::PROGRESS_NOT_READY,
+        report_type: "not_ready_report_type",
+        visible_to_owner: true
+      )
+
+      # Create an additional processed report to test filtering
+      lti_asset_report_model(
+        asset_processor: @ap,
+        asset:,
+        title: "Processed Report",
+        processing_progress: Lti::AssetReport::PROGRESS_PROCESSED,
+        report_type: "processed_report_type",
+        visible_to_owner: true
+      )
+
+      reports = asset_reports_legacy_format(submission: @submission)
+      expect(reports).to be_a(Array)
+
+      # Should include our original processed reports and the new processed report
+      expect(reports.pluck(:title)).to include("Asset Report 1", "Asset Report 2", "Processed Report")
+
+      # Should not include any of the non-processed reports
+      filtered_titles = [
+        "Processing Report",
+        "Pending Report",
+        "Pending Manual Report",
+        "Not Processed Report",
+        "Not Ready Report"
+      ]
+      filtered_titles.each do |title|
+        expect(reports.map { |r| r[:title] }).not_to include(title)
+      end
+    end
+
+    it "does not include reports with visible_to_owner set to false" do
+      asset = Lti::Asset.find_by(attachment: @attachment1)
+
+      # Create a report with visible_to_owner: false
+      lti_asset_report_model(
+        asset_processor: @ap,
+        asset:,
+        title: "Hidden Report",
+        processing_progress: Lti::AssetReport::PROGRESS_PROCESSED,
+        visible_to_owner: false,
+        report_type: "hidden_report_type"
+      )
+
+      reports = asset_reports_legacy_format(submission: @submission)
+      expect(reports).to be_a(Array)
+      expect(reports.pluck(:title)).to include("Asset Report 1", "Asset Report 2")
+      expect(reports.pluck(:title)).not_to include("Hidden Report")
+    end
+
+    it "returns nil if lti_asset_processor feature flag is disabled" do
+      @submission.root_account.disable_feature!(:lti_asset_processor)
+
+      reports = asset_reports_legacy_format(submission: @submission)
       expect(reports).to be_nil
     end
   end
@@ -419,24 +622,22 @@ describe AssetProcessorReportHelper do
     end
   end
 
-  describe "#asset_reports with group assignments" do
+  describe "#asset_reports_info_for_display with group assignments" do
     include_context "group assignment setup"
 
     it "returns reports from group mate submissions" do
-      reports = asset_reports(submission: group1_sub2)
+      reports = asset_reports_info_for_display(submission: group1_sub2)
 
       expect(reports).to be_a(Array)
-      expect(reports.length).to eq(2)
-      expect(reports.pluck(:title)).to include("Group 1 Student 1 Report", "Group 1 Student 2 Report")
-      expect(reports.find { |r| r[:title] == "Group 1 Student 1 Report" }[:asset][:submission_id]).to eq(group1_sub1.id)
-      expect(reports.find { |r| r[:title] == "Group 1 Student 2 Report" }[:asset][:submission_id]).to eq(group1_sub2.id)
+      expect(reports.pluck(:title)).to \
+        match_array(["Group 1 Student 1 Report", "Group 1 Student 2 Report"])
     end
 
     it "returns nil when no group mate reports exist" do
       group1_student1_report.destroy!
       group1_student2_report.destroy!
 
-      reports = asset_reports(submission: group1_sub2)
+      reports = asset_reports_info_for_display(submission: group1_sub2)
       expect(reports).to be_nil
     end
 
@@ -444,7 +645,7 @@ describe AssetProcessorReportHelper do
       group1_student1_report.update!(processing_progress: Lti::AssetReport::PROGRESS_PENDING)
       group1_student2_report.update!(processing_progress: Lti::AssetReport::PROGRESS_PENDING)
 
-      reports = asset_reports(submission: group1_sub2)
+      reports = asset_reports_info_for_display(submission: group1_sub2)
       expect(reports).to eq([])
     end
 
@@ -452,8 +653,111 @@ describe AssetProcessorReportHelper do
       group1_student1_report.update!(visible_to_owner: false)
       group1_student2_report.update!(visible_to_owner: false)
 
-      reports = asset_reports(submission: group1_sub2)
+      reports = asset_reports_info_for_display(submission: group1_sub2)
       expect(reports).to be_nil
+    end
+  end
+
+  # TODO: remove after refactor (INTEROP-9588)
+  describe "#asset_reports_legacy_format with group assignments" do
+    include_context "group assignment setup"
+
+    it "returns reports from group mate submissions" do
+      reports = asset_reports_legacy_format(submission: group1_sub2)
+
+      expect(reports).to be_a(Array)
+      expect(reports.pluck(:title)).to \
+        match_array(["Group 1 Student 1 Report", "Group 1 Student 2 Report"])
+    end
+
+    it "returns nil when no group mate reports exist" do
+      group1_student1_report.destroy!
+      group1_student2_report.destroy!
+
+      reports = asset_reports_legacy_format(submission: group1_sub2)
+      expect(reports).to be_nil
+    end
+
+    it "returns empty array when group mate reports exist but are not processed" do
+      group1_student1_report.update!(processing_progress: Lti::AssetReport::PROGRESS_PENDING)
+      group1_student2_report.update!(processing_progress: Lti::AssetReport::PROGRESS_PENDING)
+
+      reports = asset_reports_legacy_format(submission: group1_sub2)
+      expect(reports).to eq([])
+    end
+
+    it "returns nil when group mate reports are not visible to owner" do
+      group1_student1_report.update!(visible_to_owner: false)
+      group1_student2_report.update!(visible_to_owner: false)
+
+      reports = asset_reports_legacy_format(submission: group1_sub2)
+      expect(reports).to be_nil
+    end
+  end
+
+  describe "text_entry submission after file_upload submission" do
+    it "returns reports for text_entry when there was previous file_upload submission" do
+      mixed_assignment = assignment_model(course: @course,
+                                          submission_types: "online_upload,online_text_entry")
+
+      attachment = attachment_with_context(@student,
+                                           display_name: "test.txt",
+                                           uploaded_data: StringIO.new("test content"))
+      ap = lti_asset_processor_model(tool: @tool, assignment: mixed_assignment, title: "Mixed AP")
+      mixed_assignment.submit_homework(@student, attachments: [attachment])
+
+      file_asset = Lti::Asset.find_by(attachment:)
+
+      lti_asset_report_model(
+        asset_processor: ap,
+        asset: file_asset,
+        title: "File Report",
+        processing_progress: Lti::AssetReport::PROGRESS_PROCESSED,
+        visible_to_owner: true
+      )
+
+      text_submission = mixed_assignment.submit_homework(
+        @student,
+        submission_type: "online_text_entry",
+        body: "New text entry"
+      )
+
+      expect(text_submission.attachment_associations.count).to be > 0
+      expect(text_submission.attachment_ids.to_s).to eq("")
+
+      reports = raw_asset_reports(submission_ids: [text_submission.id], for_student: true)[text_submission.id]
+
+      expect(reports).to be_nil
+    end
+
+    it "handles attachment_ids comparison correctly with string conversion" do
+      mixed_assignment = assignment_model(course: @course,
+                                          submission_types: "online_upload,online_text_entry")
+
+      attachment = attachment_with_context @student,
+                                           display_name: "test.txt",
+                                           uploaded_data: StringIO.new("test content")
+      ap = lti_asset_processor_model(tool: @tool, assignment: mixed_assignment, title: "String Test AP")
+
+      file_submission = mixed_assignment.submit_homework(@student, attachments: [attachment])
+
+      file_asset = Lti::Asset.find_by(attachment:)
+
+      lti_asset_report_model(
+        asset_processor: ap,
+        asset: file_asset,
+        title: "String Comparison Report",
+        processing_progress: Lti::AssetReport::PROGRESS_PROCESSED,
+        visible_to_owner: true
+      )
+
+      attachment_ids_array = file_submission.attachment_ids&.presence&.split(",") || []
+      expect(attachment_ids_array).to include(attachment.id.to_s)
+
+      reports = raw_asset_reports(submission_ids: [file_submission.id], for_student: true)[file_submission.id]
+      expect(reports).not_to be_nil
+      expect(reports.length).to eq(1)
+      expect(reports.first[:title]).to eq("String Comparison Report")
     end
   end
 end

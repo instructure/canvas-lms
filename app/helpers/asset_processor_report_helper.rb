@@ -41,8 +41,8 @@ module AssetProcessorReportHelper
         submission = report.asset.submission
         next false if submission.blank?
 
-        attachment_ids = submission.attachment_associations.pluck(:attachment_id)
-        attachment_ids.include?(report.asset.attachment_id) || report.asset.submission_attempt == submission.attempt
+        attachment_ids = submission.attachment_ids&.presence&.split(",") || []
+        attachment_ids.include?(report.asset.attachment_id.to_s) || report.asset.submission_attempt == submission.attempt
       end
     end
 
@@ -56,7 +56,7 @@ module AssetProcessorReportHelper
                       processed_visible_reports = reports.select { |r| r.processing_progress == Lti::AssetReport::PROGRESS_PROCESSED }
                       if processed_visible_reports.any?
                         processed_visible_reports
-                      elsif visible_reports.any?
+                      elsif reports.any?
                         # There are visible reports, but not processed yet -> Show "No results" on the UI
                         []
                       else
@@ -70,7 +70,32 @@ module AssetProcessorReportHelper
     ret
   end
 
-  def asset_reports(submission:, for_student: true)
+  # Generally, we should prefer using graphql query instead of REST endpoints that use this helper function
+  def asset_reports_info_for_display(submission:, for_student: true)
+    return nil if submission.blank?
+    return nil unless submission.root_account&.feature_enabled?(:lti_asset_processor)
+
+    raw_reports = raw_asset_reports(submission_ids: [submission.id], for_student:)[submission.id]
+
+    raw_reports&.map do |report|
+      report.info_for_display.merge(
+        {
+          # TODO: post refactor (INTEROP-9588), this should be the only usage
+          # of info_for_display, so we can safely move the _id conversion there
+          _id: report.id.to_s,
+          processorId: report.lti_asset_processor_id&.to_s,
+          asset: {
+            attachmentId: report.asset.attachment_id&.to_s,
+            attachmentName: report.asset.attachment&.name,
+            submissionAttempt: report.asset.submission_attempt
+          }
+        }
+      )
+    end
+  end
+
+  # TODO: remove after refactor (INTEROP-9588)
+  def asset_reports_legacy_format(submission:, for_student: true)
     return nil if submission.blank?
     return nil unless submission.root_account&.feature_enabled?(:lti_asset_processor)
 
