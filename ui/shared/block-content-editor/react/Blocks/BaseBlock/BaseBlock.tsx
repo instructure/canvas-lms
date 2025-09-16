@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ComponentProps} from 'react'
+import {ComponentProps, useEffect} from 'react'
+import {useNode} from '@craftjs/core'
 import {useIsInEditor} from '../../hooks/useIsInEditor'
 import {useIsEditingBlock} from '../../hooks/useIsEditingBlock'
 import {BaseBlockViewLayout} from './layout/BaseBlockViewLayout'
@@ -36,8 +37,18 @@ function BaseBlockViewerMode<T extends {}>(props: ComponentProps<typeof BaseBloc
 }
 
 function BaseBlockEditorMode<T extends {}>(props: ComponentProps<typeof BaseBlock<T>>) {
-  const {settingsTray} = useBlockContentEditorContext()
+  const {
+    settingsTray,
+    accessibility: {removeA11yIssues},
+  } = useBlockContentEditorContext()
   const {isEditingBlock} = useIsEditingBlock()
+  const {id} = useNode()
+
+  useEffect(() => {
+    return () => {
+      removeA11yIssues(id)
+    }
+  }, [])
 
   const renderBlockContent = () => {
     const Component = isEditingBlock ? props.EditComponent : props.EditViewComponent
