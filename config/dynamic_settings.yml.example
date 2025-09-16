@@ -147,6 +147,7 @@ development:
       #   region: 'us-west-2'
       # ams.yml: |
       #   launch_url: http://ams-ux.inseng.test:5173/src/remote-adapter.js
+      #   api_url: http://ams-ux-api.inseng.test:3000
       # canvas_career.yml: |
       #   learner_launch_url: "http://localhost:3002/remoteEntry.js"
       #   learning_provider_launch_url: "http://localhost:3003/remoteEntry.js"

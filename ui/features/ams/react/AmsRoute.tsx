@@ -35,6 +35,13 @@ export function Component(): JSX.Element | null {
 
     let stillMounting = true
 
+    // Set window variables for AMS to consume
+    if (REMOTES?.ams?.api_url) {
+      window.AMS_CONFIG = {
+        API_URL: REMOTES?.ams?.api_url,
+      }
+    }
+
     loadAmsModule()
       .then(module => {
         if (stillMounting && containerRef.current) {
