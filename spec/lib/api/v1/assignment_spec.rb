@@ -1415,4 +1415,96 @@ describe "Api::V1::Assignment" do
       end
     end
   end
+
+  describe "#update_new_quizzes_params" do
+    let(:assignment_params) { {} }
+
+    context "when new_quizzes_surveys feature flag is off" do
+      before do
+        allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(false)
+        allow(assignment).to receive(:quiz_lti?).and_return(true)
+      end
+
+      it "returns without modifying new quizzes type" do
+        assignment_params[:new_quizzes_quiz_type] = "graded_quiz"
+        expect(assignment).not_to receive(:new_quizzes_type=)
+        api.update_new_quizzes_params(assignment, assignment_params)
+      end
+    end
+
+    context "when new_quizzes_surveys feature flag is on" do
+      before do
+        allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(true)
+      end
+
+      context "when assignment is not a quiz_lti assignment" do
+        before do
+          allow(assignment).to receive(:quiz_lti?).and_return(false)
+        end
+
+        it "returns without modifying new quizzes type" do
+          expect(assignment).not_to receive(:new_quizzes_type=)
+          api.update_new_quizzes_params(assignment, assignment_params)
+        end
+
+        it "does not modify assignment new quizzes type even with valid type" do
+          assignment_params[:new_quizzes_quiz_type] = "graded_quiz"
+          expect(assignment).not_to receive(:new_quizzes_type=)
+          api.update_new_quizzes_params(assignment, assignment_params)
+        end
+      end
+
+      context "when assignment is a quiz_lti assignment" do
+        before do
+          allow(assignment).to receive(:quiz_lti?).and_return(true)
+        end
+
+        context "when new_quizzes_quiz_type param is not present" do
+          it "does not modify assignment settings" do
+            expect(assignment).not_to receive(:new_quizzes_type=)
+            api.update_new_quizzes_params(assignment, assignment_params)
+          end
+        end
+
+        context "when new_quizzes_quiz_type param is blank" do
+          it "does not modify assignment settings" do
+            assignment_params[:new_quizzes_quiz_type] = ""
+
+            expect(assignment).not_to receive(:new_quizzes_type=)
+            api.update_new_quizzes_params(assignment, assignment_params)
+          end
+        end
+
+        context "when new_quizzes_quiz_type param is nil" do
+          it "does not modify assignment settings" do
+            assignment_params[:new_quizzes_quiz_type] = nil
+
+            expect(assignment).not_to receive(:new_quizzes_type=)
+            api.update_new_quizzes_params(assignment, assignment_params)
+          end
+        end
+
+        context "when new_quizzes_quiz_type param has content" do
+          it "calls the #new_quizzes_type= method on assignment" do
+            assignment_params[:new_quizzes_quiz_type] = "quiz_type"
+
+            expect(assignment).to receive(:new_quizzes_type=).with("quiz_type")
+            api.update_new_quizzes_params(assignment, assignment_params)
+          end
+        end
+
+        context "edge cases" do
+          it "ignores string keys in assignment_params" do
+            assignment_params["new_quizzes_quiz_type"] = "ungraded_survey"
+
+            api.update_new_quizzes_params(assignment, assignment_params)
+
+            expect(assignment.settings).to be_nil
+          end
+        end
+      end
+    end
+  end
 end
