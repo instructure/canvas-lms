@@ -129,16 +129,14 @@ describe Canvas::LiveEvents do
 
   describe ".scan_youtube_links" do
     it "includes the neccesary params in payload" do
-      payload = Struct.new(:scan_id, :course_id, :external_context_id).new(
+      payload = Struct.new(:scan_id, :canvas_id).new(
         "scan_123456",
-        "1",
-        "ext_context_789"
+        "canvas_id_1000002"
       )
       expect_event("scan_youtube_links",
                    hash_including(
                      scan_id: "scan_123456",
-                     course_id: "1",
-                     external_context_id: "ext_context_789"
+                     canvas_id: "canvas_id_1000002"
                    ))
       Canvas::LiveEvents.scan_youtube_links(payload)
     end
