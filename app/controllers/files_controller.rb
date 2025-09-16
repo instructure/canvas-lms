@@ -142,7 +142,6 @@ class FilesController < ApplicationController
     assessment_question_show
     image_thumbnail
     show_thumbnail
-    image_thumbnail_plain
     create_pending
     show
     api_create
@@ -1634,43 +1633,24 @@ class FilesController < ApplicationController
   def image_thumbnail
     cancel_cache_buster
 
-    no_cache = !!Canvas::Plugin.value_to_boolean(params[:no_cache])
-
     # include authenticator fingerprint so we don't redirect to an
     # authenticated thumbnail url for the wrong user
-    cache_key = ["thumbnail_url2", params[:uuid], params[:size], file_authenticator.fingerprint].cache_key
-    url, instfs = Rails.cache.read(cache_key)
-    if !url || no_cache
-      attachment = Attachment.active.where(id: params[:id], uuid: params[:uuid]).first if params[:id].present?
-      thumb_opts = params.slice(:size)
-      thumb_opts[:fallback_url] = @access_verifier[:fallback_url] if @access_verifier
-      url = authenticated_thumbnail_url(attachment, options: thumb_opts)
-      if url
-        instfs = attachment.instfs_hosted?
-        # only cache for half the time because of use_consistent_iat
-        Rails.cache.write(cache_key, [url, instfs], expires_in: (attachment.url_ttl / 2))
-      end
-    end
-
-    if url && instfs && file_location_mode?
-      render_file_location(url)
-    else
-      redirect_to(url || "/images/no_pic.gif")
-    end
-  end
-
-  def image_thumbnail_plain
-    cancel_cache_buster
-
-    # include authenticator fingerprint so we don't redirect to an
-    # authenticated thumbnail url for the wrong user
-    cache_key = ["attachment_user_auth", params[:id], file_authenticator.fingerprint].cache_key
+    cache_key = if params[:uuid].present?
+                  ["attachment_user_auth_old", params[:uuid], file_authenticator.fingerprint].cache_key
+                else
+                  ["attachment_user_auth", params[:id], file_authenticator.fingerprint].cache_key
+                end
     authed, attachment = Rails.cache.read(cache_key)
     unless attachment
-      attachment = Attachment.active.find_by(id: params[:id]) if params[:id].present?
-      if attachment
+      if params[:uuid].present?
+        attachment = Attachment.active.where(id: params[:id], uuid: params[:uuid]).first if params[:id].present?
+        authed = attachment.present?
+      elsif params[:id].present?
+        attachment = Attachment.active.find_by(id: params[:id])
+        authed = access_allowed(attachment:, user: @current_user, access_type: :download, no_error_on_failure: true) if attachment
+      end
+      if attachment && authed
         # We assume that if you can see/download the attachment, you can see/download the thumbnail
-        authed = access_allowed(attachment:, user: @current_user, access_type: :download, no_error_on_failure: true)
         Rails.cache.write(cache_key, [authed, attachment], expires_in: 5.minutes)
       end
     end

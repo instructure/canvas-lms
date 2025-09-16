@@ -2394,17 +2394,7 @@ describe FilesController do
       expect(response).to be_redirect
     end
 
-    it "returns the same jwt if requested twice" do
-      enable_cache do
-        user_session @teacher
-        locations = Array.new(2) do
-          get("image_thumbnail", params: { uuid: image.uuid, id: image.id }).location
-        end
-        expect(locations[0]).to eq(locations[1])
-      end
-    end
-
-    it "returns the different jwts if no_cache is passed" do
+    it "returns different jwt if requested twice" do
       enable_cache do
         user_session @teacher
         locations = Array.new(2) do
@@ -2413,64 +2403,64 @@ describe FilesController do
         expect(locations[0]).not_to eq(locations[1])
       end
     end
-  end
 
-  describe "GET 'image_thumbnail_plain'" do
-    before :once do
-      @course.root_account.enable_feature!(:file_association_access)
-    end
-
-    context "without InstFS" do
-      let(:image) do
-        local_storage!
-        @teacher.attachments.create!(uploaded_data: stub_png_data)
+    context "with no UUID" do
+      before :once do
+        @course.root_account.enable_feature!(:file_association_access)
       end
 
-      it "returns a non-token url for local storage" do
-        local_storage!
-        user_session @teacher
-        location = get("image_thumbnail_plain", params: { id: image.id, no_cache: true }).location
-        expect(location).to match(%r{/images/thumbnails/show/#{image.thumbnail.id}$})
-      end
-    end
+      context "without InstFS" do
+        let(:image) do
+          local_storage!
+          @teacher.attachments.create!(uploaded_data: stub_png_data)
+        end
 
-    context "with InstFS enabled" do
-      let(:image) { @teacher.attachments.create!(uploaded_data: stub_png_data, instfs_uuid: "1234") }
-
-      it "returns default 'no_pic' thumbnail if attachment not found" do
-        user_session @teacher
-        get "image_thumbnail_plain", params: { id: image.id + 1 }
-        expect(response).to redirect_to("/images/no_pic.gif")
-      end
-
-      it "returns different jwts (because of JTI) if requested twice" do
-        enable_cache do
+        it "returns a non-token url for local storage" do
+          local_storage!
           user_session @teacher
-          locations = Array.new(2) do
-            get("image_thumbnail_plain", params: { id: image.id }).location
-          end
-          expect(locations[0]).not_to eq(locations[1])
+          location = get("image_thumbnail", params: { id: image.id, no_cache: true }).location
+          expect(location).to match(%r{/images/thumbnails/show/#{image.thumbnail.id}$})
         end
       end
 
-      it "returns a proper jwt token" do
-        user_session @teacher
-        token = get("image_thumbnail_plain", params: { id: image.id, no_cache: true }).location.split("?token=")[1]
-        expect { Canvas::Security.decode_jwt(token, [InstFS.jwt_secret]) }.not_to raise_error
-      end
+      context "with InstFS enabled" do
+        let(:image) { @teacher.attachments.create!(uploaded_data: stub_png_data, instfs_uuid: "1234") }
 
-      it "redirects to default no_pic thumbnail if access_allowed returns false" do
-        allow_any_instance_of(FilesController).to receive(:access_allowed).and_return(false)
-        user_session @teacher
-        get "image_thumbnail_plain", params: { id: image.id }
-        expect(response).to redirect_to("/images/no_pic.gif")
-      end
+        it "returns default 'no_pic' thumbnail if attachment not found" do
+          user_session @teacher
+          get "image_thumbnail", params: { id: image.id + 1 }
+          expect(response).to redirect_to("/images/no_pic.gif")
+        end
 
-      it "returns a 302 if access_allowed returns true" do
-        allow_any_instance_of(FilesController).to receive(:access_allowed).and_return(true)
-        user_session @teacher
-        get "image_thumbnail_plain", params: { id: image.id }
-        expect(response).to be_redirect
+        it "returns different jwts (because of JTI) if requested twice" do
+          enable_cache do
+            user_session @teacher
+            locations = Array.new(2) do
+              get("image_thumbnail", params: { id: image.id }).location
+            end
+            expect(locations[0]).not_to eq(locations[1])
+          end
+        end
+
+        it "returns a proper jwt token" do
+          user_session @teacher
+          token = get("image_thumbnail", params: { id: image.id, no_cache: true }).location.split("?token=")[1]
+          expect { Canvas::Security.decode_jwt(token, [InstFS.jwt_secret]) }.not_to raise_error
+        end
+
+        it "redirects to default no_pic thumbnail if access_allowed returns false" do
+          allow_any_instance_of(FilesController).to receive(:access_allowed).and_return(false)
+          user_session @teacher
+          get "image_thumbnail", params: { id: image.id }
+          expect(response).to redirect_to("/images/no_pic.gif")
+        end
+
+        it "returns a 302 if access_allowed returns true" do
+          allow_any_instance_of(FilesController).to receive(:access_allowed).and_return(true)
+          user_session @teacher
+          get "image_thumbnail", params: { id: image.id }
+          expect(response).to be_redirect
+        end
       end
     end
   end

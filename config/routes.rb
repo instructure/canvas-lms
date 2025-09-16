@@ -869,7 +869,7 @@ CanvasRails::Application.routes.draw do
   get "images/thumbnails/show/:id/:uuid" => "files#show_thumbnail", :as => :show_thumbnail_image
   get "images/thumbnails/show/:id" => "files#show_thumbnail", :as => :show_thumbnail_image_plain
   get "images/thumbnails/:id/:uuid" => "files#image_thumbnail", :as => :thumbnail_image
-  get "images/thumbnails/:id" => "files#image_thumbnail_plain", :as => :thumbnail_image_plain
+  get "images/thumbnails/:id" => "files#image_thumbnail", :as => :thumbnail_image_plain
   post "images/users/:user_id/report" => "users#report_avatar_image", :as => :report_avatar_image
   put "images/users/:user_id" => "users#update_avatar_image", :as => :update_avatar_image
   get "grades" => "users#grades"
