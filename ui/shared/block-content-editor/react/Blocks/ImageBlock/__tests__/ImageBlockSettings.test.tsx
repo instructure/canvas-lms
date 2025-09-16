@@ -21,6 +21,12 @@ import {renderBlock} from '../../__tests__/render-helper'
 import userEvent from '@testing-library/user-event'
 import {waitFor} from '@testing-library/react'
 
+jest.mock('../../../BlockContentEditorContext', () => ({
+  useBlockContentEditorContext: () => ({
+    aiAltTextEnabled: false,
+  }),
+}))
+
 const color = '123456'
 
 const defaultProps = {
