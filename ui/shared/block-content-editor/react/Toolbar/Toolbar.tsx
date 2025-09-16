@@ -36,30 +36,27 @@ export const Toolbar = () => {
   const {undo, redo, canUndo, canRedo} = useEditHistory()
   const isPreviewMode = mode === 'preview'
 
-  const allIssues = Array.from(a11yIssues.values()).flat()
+  const menuItems = [
+    <PreviewButton
+      active={isPreviewMode}
+      onClick={() => setMode(isPreviewMode ? 'default' : 'preview')}
+    />,
+  ]
+  if (!isPreviewMode) {
+    const allIssues = Array.from(a11yIssues.values()).flat()
+    menuItems.push(
+      <UndoButton active={canUndo} onClick={undo} />,
+      <RedoButton active={canRedo} onClick={redo} />,
+      <AccessibilityCheckerButton count={a11yIssueCount} issues={allIssues} />,
+    )
+  }
 
   return (
     <View shadow="resting" display="block">
       <List role="toolbar" aria-label={I18n.t('Editor toolbar')} isUnstyled margin="none">
-        <List.Item>
-          <PreviewButton
-            active={isPreviewMode}
-            onClick={() => setMode(isPreviewMode ? 'default' : 'preview')}
-          />
-        </List.Item>
-        {!isPreviewMode && (
-          <>
-            <List.Item>
-              <UndoButton active={canUndo} onClick={undo} />
-            </List.Item>
-            <List.Item>
-              <RedoButton active={canRedo} onClick={redo} />
-            </List.Item>
-            <List.Item>
-              <AccessibilityCheckerButton count={a11yIssueCount} issues={allIssues} />
-            </List.Item>
-          </>
-        )}
+        {menuItems.map((item, index) => (
+          <List.Item key={index}>{item}</List.Item>
+        ))}
       </List>
     </View>
   )
