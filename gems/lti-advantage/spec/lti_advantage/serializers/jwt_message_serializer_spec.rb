@@ -33,26 +33,12 @@ module LtiAdvantage::Serializers
     let(:serializer) { described_class.new(object) }
 
     describe "#serializable_hash" do
-      context "when without_validation_fields is true" do
-        it "applies claim prefixes and removes unwanted claims" do
-          result = serializer.serializable_hash(without_validation_fields: true)
-          expect(result).to eq({
-                                 "https://purl.imsglobal.org/spec/lti/claim/context" => "some_context",
-                                 "https://purl.imsglobal.org/spec/lti/claim/custom" => "some_custom"
-                               })
-        end
-      end
-
-      context "when without_validation_fields is false" do
-        it "applies claim prefixes without removing unwanted claims" do
-          result = serializer.serializable_hash(without_validation_fields: false)
-          expect(result).to eq({
-                                 "https://purl.imsglobal.org/spec/lti/claim/context" => "some_context",
-                                 "https://purl.imsglobal.org/spec/lti/claim/custom" => "some_custom",
-                                 "errors" => {},
-                                 "validation_context" => "ctx"
-                               })
-        end
+      it "applies claim prefixes and removes unwanted claims" do
+        result = serializer.serializable_hash
+        expect(result).to eq({
+                               "https://purl.imsglobal.org/spec/lti/claim/context" => "some_context",
+                               "https://purl.imsglobal.org/spec/lti/claim/custom" => "some_custom"
+                             })
       end
     end
   end
