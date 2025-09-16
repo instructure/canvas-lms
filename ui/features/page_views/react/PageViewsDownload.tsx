@@ -44,9 +44,8 @@ export interface PageViewsDownloadProps {
 }
 
 const locale = ENV?.LOCALE || navigator.language
-const timeZone = ENV?.TIMEZONE || Intl.DateTimeFormat().resolvedOptions().timeZone
 // For displaying selected months, we need a format with month and year only
-const formatter = new Intl.DateTimeFormat(locale, {year: 'numeric', month: 'long', timeZone})
+const formatter = new Intl.DateTimeFormat(locale, {year: 'numeric', month: 'long'})
 
 // Available dates are first day of each month for the last 12 months
 const availableDates = new Array(13).fill(0).map((_, i) => {
@@ -89,11 +88,19 @@ export function PageViewsDownload({userId}: PageViewsDownloadProps): React.JSX.E
     let timeoutId: ReturnType<typeof setTimeout> | null = null
     let isCancelled = false
 
-    pollAsyncJobs().then(stateUpdateNeeded => {
-      if (stateUpdateNeeded && !isCancelled) {
-        timeoutId = setTimeout(pollAsyncJobs, 5000)
-      }
-    })
+    pollAsyncJobs()
+      .then(stateUpdateNeeded => {
+        if (stateUpdateNeeded && !isCancelled) {
+          timeoutId = setTimeout(pollAsyncJobs, 5000)
+        }
+      })
+      .catch(_e => {
+        // A failing poll is considered an intermittent error, so we keep polling
+        if (!isCancelled) {
+          if (timeoutId) clearTimeout(timeoutId)
+          timeoutId = setTimeout(pollAsyncJobs, 5000)
+        }
+      })
     return () => {
       isCancelled = true
       if (timeoutId) clearTimeout(timeoutId)
@@ -119,7 +126,11 @@ export function PageViewsDownload({userId}: PageViewsDownloadProps): React.JSX.E
       `${formatter.format(new Date(startMonth))} - ${formatter.format(new Date(endMonth))}`,
       startMonth.toString(),
       endMonth.toString(),
-    )
+    ).catch(_e => {
+      setExportError(
+        I18n.t('There was a problem creating a new export job. Please try again later.'),
+      )
+    })
   }
 
   return (
