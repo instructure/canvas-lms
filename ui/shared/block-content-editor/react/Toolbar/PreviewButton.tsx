@@ -28,6 +28,7 @@ export const PreviewButton = (props: {
 }) => {
   return (
     <ToolbarButton
+      toggleButtonStatus={props.active}
       screenReaderLabel={I18n.t('preview')}
       color={props.active ? 'primary' : 'secondary'}
       renderIcon={<IconEyeLine />}

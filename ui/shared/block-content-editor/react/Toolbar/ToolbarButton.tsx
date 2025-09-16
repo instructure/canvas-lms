@@ -20,10 +20,14 @@ import {ComponentProps} from 'react'
 import {IconButton} from '@instructure/ui-buttons'
 import {colors} from '@instructure/canvas-theme'
 
-export const ToolbarButton = (props: ComponentProps<typeof IconButton>) => {
+export const ToolbarButton = (
+  props: ComponentProps<typeof IconButton> & {toggleButtonStatus?: boolean},
+) => {
+  const {toggleButtonStatus, ...restProps} = props
   return (
     <IconButton
-      {...props}
+      {...restProps}
+      {...(toggleButtonStatus === undefined ? {} : {'aria-pressed': toggleButtonStatus})}
       elementRef={el => {
         if (!el) {
           return
