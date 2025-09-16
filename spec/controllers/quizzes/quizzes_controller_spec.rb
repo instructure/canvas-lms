@@ -254,6 +254,8 @@ describe Quizzes::QuizzesController do
       get "index", params: { course_id: @course.id }
       expect(response).to be_successful
       expect(controller.remote_env[:ams]).to_not be_nil
+      expect(controller.remote_env[:ams][:launch_url]).to eq(Services::Ams.launch_url)
+      expect(controller.remote_env[:ams][:API_URL]).to eq(Services::Ams.api_url)
 
       expect(controller.js_env[:QUIZZES]).to be_nil
     end

@@ -1149,7 +1149,11 @@ class Quizzes::QuizzesController < ApplicationController
 
   def render_ams_service
     js_env(context_url: context_url(@context, :context_quizzes_url))
-    remote_env(ams: { launch_url: Services::Ams.launch_url })
+    remote_env(ams:
+      {
+        launch_url: Services::Ams.launch_url,
+        api_url: Services::Ams.api_url
+      })
     render html: '<div id="ams_container"></div>'.html_safe, layout: true
   end
 
