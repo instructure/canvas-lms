@@ -153,7 +153,7 @@ RSpec.describe YoutubeMigrationService do
         end
 
         it "does not emit a live event" do
-          allow(course).to receive_messages(lti_context_id: "course_lti_context_123", id: 1)
+          allow(course).to receive_messages(global_id: "course_global_id_123", id: 1)
           expect(Canvas::LiveEvents).not_to receive(:scan_youtube_links)
 
           described_class.scan(progress)
@@ -174,12 +174,11 @@ RSpec.describe YoutubeMigrationService do
         )
         allow(quiz_relation).to receive(:any?).and_return(true)
         allow(except_relation).to receive(:find_each).and_return([])
-        allow(course).to receive_messages(lti_context_id: "course_lti_context_123", id: 1)
+        allow(course).to receive_messages(global_id: "course_global_id_123", id: 1)
 
         expect(Canvas::LiveEvents).to receive(:scan_youtube_links) do |payload|
-          expect(payload.scan_id).to eq(progress.id)
+          expect(payload.scan_id).to eq(Progress.last.id)
           expect(payload.course_id).to eq(course.id)
-          expect(payload.external_context_id).to eq(course.lti_context_id)
         end
 
         progress.start!
