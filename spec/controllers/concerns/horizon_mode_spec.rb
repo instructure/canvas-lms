@@ -330,5 +330,38 @@ describe HorizonMode do
 
       it { is_expected.to be false }
     end
+
+    context "when entering student view for a horizon course" do
+      before do
+        allow(course).to receive(:horizon_course?).and_return(true)
+        controller.instance_variable_set(:@context, course)
+        allow(controller).to receive_messages(controller_name: "courses", action_name: "student_view")
+      end
+
+      it { is_expected.to be false }
+    end
+
+    context "when in student view session for a horizon course" do
+      let(:fake_student) { course.student_view_student }
+
+      before do
+        allow(course).to receive(:horizon_course?).and_return(true)
+        controller.instance_variable_set(:@context, course)
+        controller.instance_variable_set(:@current_user, fake_student)
+      end
+
+      it { is_expected.to be false }
+    end
+
+    context "when POST to student_view path for a horizon course" do
+      before do
+        allow(course).to receive(:horizon_course?).and_return(true)
+        controller.instance_variable_set(:@context, course)
+        allow(controller).to receive_messages(controller_name: "courses", action_name: "show")
+        allow(request).to receive_messages(path: "/courses/14/student_view/1", method: "POST")
+      end
+
+      it { is_expected.to be false }
+    end
   end
 end

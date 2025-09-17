@@ -3964,7 +3964,11 @@ class CoursesController < ApplicationController
     session[:become_user_id] = @fake_student.id
     return_url = course_path(@context)
     session.delete(:masquerade_return_to)
-    return return_to(request.referer, return_url || dashboard_url) if value_to_boolean(params[:redirect_to_referer])
+
+    if value_to_boolean(params[:redirect_to_referer])
+      referer_url = remove_horizon_params(request.referer)
+      return return_to(referer_url, return_url || dashboard_url)
+    end
 
     return_to(return_url, request.referer || dashboard_url)
   end
