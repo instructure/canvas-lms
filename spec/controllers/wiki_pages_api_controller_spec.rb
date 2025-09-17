@@ -96,7 +96,8 @@ describe WikiPagesApiController, type: :request do
 
     context "block_content_editor feature is disabled" do
       before do
-        @course.account.disable_feature!(:block_content_editor)
+        @course.account.enable_feature!(:block_content_editor)
+        @course.disable_feature!(:block_content_editor_eap)
       end
 
       it "returns a list of wiki pages" do
@@ -109,6 +110,7 @@ describe WikiPagesApiController, type: :request do
     context "block_content_editor feature is enabled" do
       before do
         @course.account.enable_feature!(:block_content_editor)
+        @course.enable_feature!(:block_content_editor_eap)
       end
 
       it "returns a list of wiki pages" do

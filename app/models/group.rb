@@ -1029,6 +1029,14 @@ class Group < ActiveRecord::Base
     end
   end
 
+  def block_content_editor_enabled?
+    if context.is_a?(Course)
+      context.block_content_editor_enabled?
+    else
+      false
+    end
+  end
+
   private
 
   def remove_active_overrides
