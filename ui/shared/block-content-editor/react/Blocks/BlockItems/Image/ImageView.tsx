@@ -20,7 +20,7 @@ import './image-block.css'
 import {ImageViewProps} from './types'
 import {DefaultPreviewImage} from '../DefaultPreviewImage/DefaultPreviewImage'
 import {ImageCaption} from './ImageCaption'
-import {Flex} from '@instructure/ui-flex'
+import {View} from '@instructure/ui-view'
 
 export const ImageView = ({
   url,
@@ -32,7 +32,7 @@ export const ImageView = ({
   const calculatedCaption = altTextAsCaption ? altText : caption
 
   return (
-    <Flex direction="column" gap="mediumSmall">
+    <View as="figure" margin="none">
       {url ? (
         <img
           src={url}
@@ -42,7 +42,11 @@ export const ImageView = ({
       ) : (
         <DefaultPreviewImage blockType="image" />
       )}
-      {!!calculatedCaption && <ImageCaption>{calculatedCaption}</ImageCaption>}
-    </Flex>
+      {!!calculatedCaption && (
+        <View as="figcaption" margin="mediumSmall 0 0 0">
+          <ImageCaption>{calculatedCaption}</ImageCaption>
+        </View>
+      )}
+    </View>
   )
 }
