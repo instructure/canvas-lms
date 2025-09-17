@@ -41,28 +41,17 @@ export const {
 
 export const ENOUGH_ITEMS_TO_SHOW_LIST = 7
 export const DESIRED_ITEMS_TO_HAVE_LOADED = 14
-export const MAX_TOTAL_ITEMS_TO_LOAD = 200 // Increased since we now only load incomplete assignments
 
 function incompleteItems(state) {
   return state.sidebar.items.filter(item => !item.completed)
 }
 
-function totalItemsLoaded(state) {
-  return state.sidebar.items.length
-}
-
 function enoughSidebarItemsAreLoaded(state) {
-  return (
-    incompleteItems(state).length >= ENOUGH_ITEMS_TO_SHOW_LIST ||
-    totalItemsLoaded(state) >= MAX_TOTAL_ITEMS_TO_LOAD
-  )
+  return incompleteItems(state).length >= ENOUGH_ITEMS_TO_SHOW_LIST
 }
 
 function desiredSidebarItemsAreLoaded(state) {
-  return (
-    incompleteItems(state).length >= DESIRED_ITEMS_TO_HAVE_LOADED ||
-    totalItemsLoaded(state) >= MAX_TOTAL_ITEMS_TO_LOAD
-  )
+  return incompleteItems(state).length >= DESIRED_ITEMS_TO_HAVE_LOADED
 }
 
 function handleSidebarLoadingResponse(response, dispatch, getState) {
@@ -84,7 +73,6 @@ export const sidebarLoadNextItems = identifiableThunk(() => (dispatch, getState)
     dispatch(sidebarItemsLoading())
     const params = {
       order: 'asc',
-      filter: 'assignments_needing_submission',
     }
     if (getState().sidebar.course_id) {
       params.context_codes = [
@@ -113,7 +101,6 @@ export const sidebarLoadInitialItems = (currentMoment, course_id) => (dispatch, 
       const params = {
         start_date: firstMomentDate.toISOString(),
         order: 'asc',
-        filter: 'assignments_needing_submission',
       }
       if (course_id) {
         params.context_codes = [`course_${course_id}`, `user_${ENV.current_user_id}`]
