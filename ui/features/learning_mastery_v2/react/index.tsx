@@ -31,8 +31,9 @@ import {Toolbar} from './components/toolbar/Toolbar'
 import {getSearchParams, setSearchParams} from './utils/ManageURLSearchParams'
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
-import {DEFAULT_GRADEBOOK_SETTINGS, GradebookSettings} from './utils/constants'
+import {GradebookSettings} from './utils/constants'
 import {saveLearningMasteryGradebookSettings} from './apiClient'
+import {useGradebookSettings} from './hooks/useGradebookSettings'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 
@@ -49,13 +50,17 @@ interface LearningMasteryProps {
 const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
   const contextValues = getLMGBContext() as LMGBContextType
   const {contextURL, accountLevelMasteryScalesFF} = contextValues.env
-  const [gradebookSettings, setGradebookSettings] = useState<GradebookSettings>(
-    DEFAULT_GRADEBOOK_SETTINGS,
-  )
+
+  const {
+    settings: gradebookSettings,
+    isLoading: isLoadingSettings,
+    updateSettings,
+  } = useGradebookSettings(courseId)
+
   const [isSavingSettings, setIsSavingSettings] = useState(false)
 
   const {
-    isLoading,
+    isLoading: isLoadingGradebook,
     error,
     students,
     outcomes,
@@ -69,6 +74,7 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
   } = useRollups({
     courseId,
     accountMasteryScalesEnabled: accountLevelMasteryScalesFF ?? false,
+    enabled: !isLoadingSettings,
     settings: gradebookSettings,
     ...getSearchParams(),
   })
@@ -87,7 +93,7 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
           throw new Error('Failed to save settings')
         }
 
-        setGradebookSettings(settings)
+        updateSettings(settings)
       } catch (_) {
         error = I18n.t('Failed to save settings')
       } finally {
@@ -96,7 +102,7 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
 
       return {success: error === null}
     },
-    [courseId],
+    [courseId, updateSettings],
   )
 
   const renderBody = () => {
@@ -109,7 +115,7 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
           errorCategory={I18n.t('Learning Mastery Gradebook Error Page')}
         />
       )
-    if (isLoading) return renderLoader()
+    if (isLoadingGradebook || isLoadingSettings) return renderLoader()
     return (
       <Gradebook
         courseId={courseId}
@@ -130,7 +136,7 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
       <Toolbar
         courseId={courseId}
         contextURL={contextURL}
-        showDataDependentControls={error === null}
+        showDataDependentControls={error === null && !isLoadingSettings}
         gradebookSettings={gradebookSettings}
         setGradebookSettings={handleGradebookSettingsChange}
         isSavingSettings={isSavingSettings}
