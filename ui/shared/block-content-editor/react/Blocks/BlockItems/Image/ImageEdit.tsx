@@ -70,7 +70,7 @@ export const ImageEdit = ({
               <IconButton
                 renderIcon={<IconUploadLine />}
                 onClick={openModal}
-                screenReaderLabel={I18n.t('Change image')}
+                screenReaderLabel={I18n.t('Replace image')}
                 size="small"
                 elementRef={
                   focusHandler ? element => focusHandler(element as HTMLElement) : undefined

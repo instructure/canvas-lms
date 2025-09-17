@@ -46,7 +46,7 @@ describe('SettingsUploadImage', () => {
       />,
     )
 
-    expect(component.getByText('Replace Image')).toBeInTheDocument()
+    expect(component.getByText('Replace image')).toBeInTheDocument()
   })
 
   it('displays filename when image has fileName', () => {
