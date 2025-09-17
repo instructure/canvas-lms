@@ -3934,6 +3934,7 @@ hy:
     errors: 
       cannot_shift_and_remove: "Հնարավոր չէ միաժամանակ որոշել shift_dates և remove_dates:"
       import_error: "Ներմուծման սխալ"
+    file_copy_error: "Հնարավոր չէ պատճենել \"%{name}\" ֆայլը"
     missing_content_links_message: "Հետևյալ հղումները հնարավոր չէ կատարել"
     missing_content_links_title: "Ներմուծված բովանդակության մեջ բացակայող հղումներ կան:"
     unexpected_error: "Անսպասելի սխալ է տեղի ունեցել, կապվեք օժանդակող ծառայության հետ:"
@@ -17892,6 +17893,8 @@ hy:
         anyone: "Ցանկացած անձ"
         only_teachers: "Միայն դասավանդողները"
         teachers_and_students: "Դասավանդողներ և ունկնդիրներ"
+      create_page_title: "Նոր էջ"
+      edit_page_title: "Խմբագրել %{title}"
       editing_roles: 
         anyone: "Ցանկացած անձ"
         can_edit_page: "կարող են խմբագրել այս էջը"
