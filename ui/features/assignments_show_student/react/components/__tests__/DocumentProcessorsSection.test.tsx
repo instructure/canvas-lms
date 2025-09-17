@@ -17,129 +17,65 @@
  */
 
 import {render, screen} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import React from 'react'
 import DocumentProcessorsSection from '../DocumentProcessorsSection'
-import {Submission} from '../../../assignments_show_student'
+import {useShouldShowLtiAssetReportsForStudent} from '@canvas/lti-asset-processor/react/hooks/useLtiAssetProcessorsAndReportsForStudent'
 
-function setupEnv(overrides = {}) {
-  // @ts-expect-error
-  global.ENV = {
-    ASSET_PROCESSORS: [{id: 'processor1', tool_name: 'Processor 1'}],
-    ASSET_REPORTS: [{asset: {_id: '1', attachment_id: '1'}, priority: 0}],
-    ASSIGNMENT_NAME: 'Test Assignment',
-    ...overrides,
+// Mock the hook
+jest.mock(
+  '@canvas/lti-asset-processor/react/hooks/useLtiAssetProcessorsAndReportsForStudent',
+  () => ({
+    useShouldShowLtiAssetReportsForStudent: jest.fn(),
+  }),
+)
+
+// Mock the component
+jest.mock('@canvas/lti-asset-processor/react/LtiAssetReportsForStudentSubmission', () => {
+  return {
+    LtiAssetReportsForStudentSubmission: jest.fn(({submissionId, submissionType}) => (
+      <div data-testid="lti-asset-reports">
+        Mock LTI Asset Reports for {submissionId} ({submissionType})
+      </div>
+    )),
   }
-}
+})
+
+const mockUseShouldShow = useShouldShowLtiAssetReportsForStudent as jest.MockedFunction<
+  typeof useShouldShowLtiAssetReportsForStudent
+>
 
 describe('DocumentProcessorsSection', () => {
-  it('renders AssetReportStatus and StudentAssetReportModal for single attachment', async () => {
-    setupEnv()
-    const user = userEvent.setup()
-    const submission = {
-      _id: 's1',
-      submissionType: 'online_upload',
-      attachments: [
-        {
-          _id: '1',
-          id: '1',
-          display_name: '',
-        },
-      ],
-    } as Submission
+  const mockSubmission = {
+    submissionId: 'test-submission-123',
+    submissionType: 'online_upload',
+    ifLastAttemptIsNumber: 1,
+  }
 
-    render(<DocumentProcessorsSection submission={submission} />)
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('renders LtiAssetReportsForStudentSubmission when there is data', () => {
+    mockUseShouldShow.mockReturnValue(true)
+
+    render(<DocumentProcessorsSection submission={mockSubmission} />)
 
     expect(screen.getByText('Document processors')).toBeInTheDocument()
-    expect(screen.getByText('All good')).toBeInTheDocument()
+    expect(screen.getByTestId('lti-asset-reports')).toBeInTheDocument()
+    expect(
+      screen.getByText('Mock LTI Asset Reports for test-submission-123 (online_upload)'),
+    ).toBeInTheDocument()
 
-    await user.click(screen.getByText('All good'))
-
-    await screen.findByText('Document Processors for Test Assignment')
+    expect(mockUseShouldShow).toHaveBeenCalledWith(mockSubmission)
   })
 
-  it('renders AssetReportStatus and StudentAssetReportModal for online_text_entry', async () => {
-    setupEnv({
-      ASSET_REPORTS: [{asset: {_id: '1', submission_attempt: 4}, priority: 0}],
-    })
-    const user = userEvent.setup()
-    const submission = {
-      _id: 's1',
-      submissionType: 'online_text_entry',
-      attachments: [],
-      attempt: 4,
-    } as Partial<Submission> as Submission
+  it('does not render when there is no data', () => {
+    mockUseShouldShow.mockReturnValue(false)
 
-    render(<DocumentProcessorsSection submission={submission} />)
+    const {container} = render(<DocumentProcessorsSection submission={mockSubmission} />)
 
-    expect(screen.getByText('Document processors')).toBeInTheDocument()
-    expect(screen.getByText('All good')).toBeInTheDocument()
-
-    await user.click(screen.getByText('All good'))
-
-    await screen.findByText('Document Processors for Test Assignment')
-    await screen.findByText('Text submitted to Canvas')
-  })
-
-  it('does not render AssetReportStatus if asset processor data is not available', async () => {
-    setupEnv({ASSET_PROCESSORS: [], ASSET_REPORTS: []})
-    const submission = {
-      _id: 's1',
-      submissionType: 'online_upload',
-      attachments: [
-        {
-          _id: '1',
-          id: '1',
-          display_name: '',
-        },
-      ],
-    } as Submission
-
-    render(<DocumentProcessorsSection submission={submission} />)
-
+    expect(container.firstChild).toBeNull()
     expect(screen.queryByText('Document processors')).not.toBeInTheDocument()
-    expect(screen.queryByText('All good')).not.toBeInTheDocument()
-  })
-
-  it('does not render AssetReportStatus if there is not exactly one attachment', async () => {
-    setupEnv()
-    const submission = {
-      _id: 's1',
-      submissionType: 'online_upload',
-      attachments: [
-        {
-          _id: '1',
-          id: '1',
-          display_name: '',
-        },
-        {
-          _id: '2',
-          id: '2',
-          display_name: '',
-        },
-      ],
-    } as Submission
-
-    render(<DocumentProcessorsSection submission={submission} />)
-
-    expect(screen.queryByText('Document processors')).not.toBeInTheDocument()
-  })
-
-  it('does not render StudentAssetReportModal without clicking on the status', async () => {
-    setupEnv()
-    const submission = {
-      _id: 's1',
-      submissionType: 'online_upload',
-      attachments: [
-        {
-          _id: '1',
-          id: '1',
-          display_name: '',
-        },
-      ],
-    } as Submission
-
-    render(<DocumentProcessorsSection submission={submission} />)
-
-    expect(screen.queryByText('Document Processors for Test Assignment')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('lti-asset-reports')).not.toBeInTheDocument()
   })
 })

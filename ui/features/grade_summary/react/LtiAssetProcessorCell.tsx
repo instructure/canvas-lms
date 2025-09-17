@@ -44,7 +44,6 @@ export default function LtiAssetProcessorCell({
   submissionType,
   assignmentName,
 }: AssetProcessorCellProps) {
-  console.log('LtiAssetProcessorCell render', {assetProcessors, assetReports})
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   function handleClose() {
@@ -75,7 +74,6 @@ export default function LtiAssetProcessorCell({
         <StudentLtiAssetReportModal
           assetProcessors={validatedProcessors}
           assignmentName={assignmentName}
-          open={isModalOpen}
           onClose={handleClose}
           reports={validatedReports}
           submissionType={submissionType}

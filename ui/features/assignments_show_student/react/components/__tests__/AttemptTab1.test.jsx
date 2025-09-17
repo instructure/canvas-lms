@@ -24,6 +24,7 @@ import TextEntry from '../AttemptType/TextEntry'
 import {render, waitFor} from '@testing-library/react'
 import {mockAssignmentAndSubmission} from '@canvas/assignments/graphql/studentMocks'
 import {MockedProvider} from '@apollo/client/testing'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import React, {createRef} from 'react'
 import StudentViewContext from '../Context'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
@@ -60,9 +61,11 @@ describe('ContentTabs', () => {
 
   const renderAttemptTab = async props => {
     const retval = render(
-      <MockedProvider mocks={defaultMocks()}>
-        <AttemptTab {...props} focusAttemptOnInit={false} />
-      </MockedProvider>,
+      <MockedQueryProvider>
+        <MockedProvider mocks={defaultMocks()}>
+          <AttemptTab {...props} focusAttemptOnInit={false} />
+        </MockedProvider>
+      </MockedQueryProvider>,
     )
 
     if (props.assignment.submissionTypes.includes('online_text_entry')) {
@@ -92,9 +95,11 @@ describe('ContentTabs', () => {
       })
       props.submitButtonRef = createSubmitButtonRef()
       const {findByText} = render(
-        <MockedProvider>
-          <AttemptTab {...props} focusAttemptOnInit={false} />
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <MockedProvider>
+            <AttemptTab {...props} focusAttemptOnInit={false} />
+          </MockedProvider>
+        </MockedQueryProvider>,
       )
 
       expect(await findByText('Availability Dates')).toBeInTheDocument()
@@ -110,9 +115,11 @@ describe('ContentTabs', () => {
       })
       props.submitButtonRef = createSubmitButtonRef()
       const {findByTestId} = render(
-        <MockedProvider>
-          <AttemptTab {...props} focusAttemptOnInit={false} />
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <MockedProvider>
+            <AttemptTab {...props} focusAttemptOnInit={false} />
+          </MockedProvider>
+        </MockedQueryProvider>,
       )
       await new Promise(resolve => setTimeout(resolve, CUSTOM_TIMEOUT_LIMIT))
       expect(await findByTestId('assignments_2_submission_preview')).toBeInTheDocument()
@@ -133,9 +140,11 @@ describe('ContentTabs', () => {
       props.submitButtonRef = createSubmitButtonRef()
 
       const {findByTestId} = render(
-        <MockedProvider>
-          <AttemptTab {...props} focusAttemptOnInit={false} />
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <MockedProvider>
+            <AttemptTab {...props} focusAttemptOnInit={false} />
+          </MockedProvider>
+        </MockedQueryProvider>,
       )
       await new Promise(resolve => setTimeout(resolve, CUSTOM_TIMEOUT_LIMIT))
       expect(await findByTestId('assignments_2_submission_preview')).toBeInTheDocument()
@@ -151,9 +160,11 @@ describe('ContentTabs', () => {
       })
       props.submitButtonRef = createSubmitButtonRef()
       const {findByTestId} = render(
-        <MockedProvider>
-          <AttemptTab {...props} focusAttemptOnInit={false} />
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <MockedProvider>
+            <AttemptTab {...props} focusAttemptOnInit={false} />
+          </MockedProvider>
+        </MockedQueryProvider>,
       )
       await new Promise(resolve => setTimeout(resolve, CUSTOM_TIMEOUT_LIMIT))
       expect(await findByTestId('assignments_2_submission_preview')).toBeInTheDocument()
@@ -166,9 +177,11 @@ describe('ContentTabs', () => {
       })
       props.submitButtonRef = createSubmitButtonRef()
       const {findByText} = render(
-        <MockedProvider>
-          <AttemptTab {...props} focusAttemptOnInit={false} />
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <MockedProvider>
+            <AttemptTab {...props} focusAttemptOnInit={false} />
+          </MockedProvider>
+        </MockedQueryProvider>,
       )
 
       expect(await findByText('Availability Dates')).toBeInTheDocument()
@@ -181,9 +194,11 @@ describe('ContentTabs', () => {
       })
       props.submitButtonRef = createSubmitButtonRef()
       const {findByText} = render(
-        <MockedProvider>
-          <AttemptTab {...props} focusAttemptOnInit={false} />
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <MockedProvider>
+            <AttemptTab {...props} focusAttemptOnInit={false} />
+          </MockedProvider>
+        </MockedQueryProvider>,
       )
 
       expect(await findByText('Availability Dates')).toBeInTheDocument()
@@ -198,9 +213,11 @@ describe('ContentTabs', () => {
       props.submitButtonRef = createSubmitButtonRef()
 
       const {getByTestId} = render(
-        <MockedProvider mocks={defaultMocks()}>
-          <AttemptTab {...props} focusAttemptOnInit={false} />
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <MockedProvider mocks={defaultMocks()}>
+            <AttemptTab {...props} focusAttemptOnInit={false} />
+          </MockedProvider>
+        </MockedQueryProvider>,
       )
       expect(await waitFor(() => getByTestId('upload-pane'))).toBeInTheDocument()
     })
@@ -245,9 +262,11 @@ describe('ContentTabs', () => {
       ]
 
       const {findByTestId} = render(
-        <MockedProvider mocks={mocks}>
-          <AttemptTab {...props} focusAttemptOnInit={false} />
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <MockedProvider mocks={mocks}>
+            <AttemptTab {...props} focusAttemptOnInit={false} />
+          </MockedProvider>
+        </MockedQueryProvider>,
       )
 
       // First wait for the loading spinner to appear
@@ -275,9 +294,11 @@ describe('ContentTabs', () => {
         props.submitButtonRef = createSubmitButtonRef()
 
         const {getAllByText} = render(
-          <MockedProvider mocks={defaultMocks()}>
-            <AttemptTab {...props} focusAttemptOnInit={false} />
-          </MockedProvider>,
+          <MockedQueryProvider>
+            <MockedProvider mocks={defaultMocks()}>
+              <AttemptTab {...props} focusAttemptOnInit={false} />
+            </MockedProvider>
+          </MockedQueryProvider>,
         )
         expect(await waitFor(() => getAllByText('test.jpg')[0])).toBeInTheDocument()
       })

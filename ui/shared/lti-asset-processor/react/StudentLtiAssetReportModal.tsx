@@ -29,11 +29,10 @@ import {LtiAssetProcessor, LtiAssetReportForStudent} from '../model/LtiAssetRepo
 import {LtiAssetReports} from '../shared-with-sg/replicated/components/LtiAssetReports'
 import {AssetReportCompatibleSubmissionType} from '../shared-with-sg/replicated/types/LtiAssetReports'
 
-interface Props {
+export interface StudentLtiAssetReportModalProps {
   assetProcessors: LtiAssetProcessor[]
   assignmentName: string
   onClose?: () => void
-  open?: boolean
   reports: LtiAssetReportForStudent[]
   submissionType: AssetReportCompatibleSubmissionType
 }
@@ -58,10 +57,9 @@ export default function StudentLtiAssetReportModal({
   assetProcessors,
   assignmentName,
   onClose,
-  open,
   reports,
   submissionType,
-}: Props) {
+}: StudentLtiAssetReportModalProps) {
   const assetProcessorsWithReports = assetProcessors.filter(assetProcessor =>
     reports.some(report => report.processorId === assetProcessor._id),
   )
@@ -74,7 +72,7 @@ export default function StudentLtiAssetReportModal({
   return (
     <Modal
       label={t('Document Processors for %{assignmentName}', {assignmentName})}
-      open={open}
+      open={true}
       onClose={onClose}
       onDismiss={onClose}
     >

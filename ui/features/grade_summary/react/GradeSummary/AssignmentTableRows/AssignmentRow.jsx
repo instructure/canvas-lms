@@ -266,18 +266,14 @@ export const assignmentRow = (
         )}
       </Table.Cell>
       <Table.Cell textAlign="start">
-        {
-          // If we make major changes to this code, we can consider using one
-          // LtiAssetProcessorCells component with Portals here.
-          showDocumentProcessors && (
-            <LtiAssetProcessorCell
-              assetProcessors={assignment?.ltiAssetProcessorsConnection?.nodes}
-              assetReports={submission?.ltiAssetReportsConnection?.nodes}
-              submissionType={submission?.submissionType}
-              assignmentName={assignment?.name}
-            />
-          )
-        }
+        {showDocumentProcessors && (
+          <LtiAssetProcessorCell
+            assetProcessors={assignment?.ltiAssetProcessorsConnection?.nodes}
+            assetReports={submission?.ltiAssetReportsConnection?.nodes}
+            submissionType={submission?.submissionType}
+            assignmentName={assignment?.name}
+          />
+        )}
       </Table.Cell>
       <Table.Cell textAlign="end">
         <Flex justifyItems="end">

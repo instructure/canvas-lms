@@ -40,6 +40,8 @@ import {
 } from '@canvas/lti-asset-processor/model/LtiAssetReport'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
+const STALE_TIME = 5 * 60 * 1000 // 5 minutes
+
 export const executeQueryAndValidate = async <T>(
   query: GqlTemplateStringType,
   params: any,
@@ -69,6 +71,8 @@ export function useLtiAssetProcessors(params: GetLtiAssetProcessorsParams) {
   return useQuery({
     queryKey: ['ltiAssetProcessors', params],
     queryFn: () => getLtiAssetProcessors(params),
+    staleTime: STALE_TIME,
+    refetchOnMount: false,
     enabled: !!ENV.FEATURES?.lti_asset_processor,
   })
 }
@@ -89,6 +93,8 @@ export function useLtiAssetReports(
   const query = useQuery({
     queryKey,
     queryFn: () => getLtiAssetReports(params),
+    staleTime: STALE_TIME,
+    refetchOnMount: false,
     enabled:
       ENV.FEATURES?.lti_asset_processor &&
       !cancel &&

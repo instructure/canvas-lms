@@ -121,7 +121,6 @@ describe('StudentLtiAssetReportModal', () => {
         assetProcessors={mockAssetProcessors}
         assignmentName={assignmentName}
         reports={reports}
-        open={true}
         submissionType="online_upload"
       />,
     )
@@ -129,7 +128,7 @@ describe('StudentLtiAssetReportModal', () => {
     expect(container.firstChild).toBeNull()
   })
 
-  it('renders the modal when open prop is true', () => {
+  it('renders the modal', () => {
     const reports = [createUploadReport()]
 
     render(
@@ -137,28 +136,11 @@ describe('StudentLtiAssetReportModal', () => {
         assetProcessors={mockAssetProcessors}
         assignmentName={assignmentName}
         reports={reports}
-        open={true}
         submissionType="online_upload"
       />,
     )
 
     expect(screen.getByText(`Document Processors for ${assignmentName}`)).toBeInTheDocument()
-  })
-
-  it('does not render the modal when open prop is false', () => {
-    const reports = [createUploadReport()]
-
-    render(
-      <StudentLtiAssetReportModal
-        assetProcessors={mockAssetProcessors}
-        assignmentName={assignmentName}
-        reports={reports}
-        open={false}
-        submissionType="online_upload"
-      />,
-    )
-
-    expect(screen.queryByText(`Document Processors for ${assignmentName}`)).not.toBeInTheDocument()
   })
 
   it('renders the attachment name', () => {
@@ -170,7 +152,6 @@ describe('StudentLtiAssetReportModal', () => {
         assetProcessors={mockAssetProcessors}
         assignmentName={assignmentName}
         reports={reports}
-        open={true}
         submissionType="online_upload"
       />,
     )
@@ -189,7 +170,6 @@ describe('StudentLtiAssetReportModal', () => {
         assetProcessors={mockAssetProcessors}
         assignmentName={assignmentName}
         reports={reports}
-        open={true}
         submissionType="online_upload"
       />,
     )
@@ -210,7 +190,6 @@ describe('StudentLtiAssetReportModal', () => {
         assetProcessors={mockAssetProcessors}
         assignmentName={assignmentName}
         reports={reports}
-        open={true}
         submissionType="online_upload"
       />,
     )
@@ -254,7 +233,6 @@ describe('StudentLtiAssetReportModal', () => {
         assetProcessors={mockAssetProcessors}
         assignmentName={assignmentName}
         reports={reports}
-        open={true}
         submissionType="online_upload"
       />,
     )
@@ -280,7 +258,6 @@ describe('StudentLtiAssetReportModal', () => {
           assetProcessors={mockAssetProcessors}
           assignmentName={assignmentName}
           reports={reports}
-          open={true}
           submissionType="online_text_entry"
         />,
       )
@@ -300,7 +277,6 @@ describe('StudentLtiAssetReportModal', () => {
           assetProcessors={mockAssetProcessors}
           assignmentName={assignmentName}
           reports={reports}
-          open={true}
           submissionType="online_text_entry"
         />,
       )
@@ -324,7 +300,6 @@ describe('StudentLtiAssetReportModal', () => {
           assetProcessors={mockAssetProcessors}
           assignmentName={assignmentName}
           reports={reports}
-          open={true}
           submissionType="online_text_entry"
         />,
       )

@@ -16,15 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
 import {LtiAssetReportWithAsset} from '@canvas/lti-asset-processor/model/AssetReport'
 
-declare const ENV: {
-  ASSET_REPORTS?: LtiAssetReportWithAsset[]
-  ASSET_PROCESSORS?: ExistingAttachedAssetProcessor[]
-  ASSIGNMENT_NAME?: string
-}
-
+// TODO should be removed after INTEROP-9588
 export function filterReports(
   reports: LtiAssetReportWithAsset[] | undefined,
   attachmentId?: string,
@@ -47,16 +41,4 @@ export function filterReportsByAttempt(
       report => report.asset && report.asset.submission_attempt?.toString() === attemptId,
     ) ?? []
   )
-}
-
-export function shouldRenderAssetProcessorData(): boolean {
-  // See also assignmentHasDocumentProcessorsDataToShow, equivalent for new
-  // Grades Page
-  const assignmentHasProcessors = !!ENV.ASSET_PROCESSORS?.length
-  const assignmentHasMaybeEmptyAssetReports = !!ENV.ASSET_REPORTS
-  return assignmentHasProcessors && assignmentHasMaybeEmptyAssetReports
-}
-
-export function clearAssetProcessorReports() {
-  ENV.ASSET_REPORTS = undefined
 }
