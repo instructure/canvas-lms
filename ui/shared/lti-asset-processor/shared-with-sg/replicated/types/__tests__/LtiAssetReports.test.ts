@@ -45,5 +45,13 @@ describe('LtiAssetReports types', () => {
       const result = ensureCompatibleSubmissionType('invalid_submission_type')
       expect(result).toBeUndefined()
     })
+
+    it('should return undefined for null input', () => {
+      expect(ensureCompatibleSubmissionType(null)).toBeUndefined()
+    })
+
+    it('should return undefined for undefined input', () => {
+      expect(ensureCompatibleSubmissionType(undefined)).toBeUndefined()
+    })
   })
 })

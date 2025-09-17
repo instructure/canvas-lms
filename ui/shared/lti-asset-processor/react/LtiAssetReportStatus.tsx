@@ -31,7 +31,10 @@ interface Props {
   openModal?: () => void
 }
 
-export default function AssetReportStatus({reports, openModal}: Props) {
+/**
+ * Stateless/presentational component to render the status of LTI Asset Reports for a student.
+ */
+export default function LtiAssetReportStatus({reports, openModal}: Props) {
   if (reports.length === 0) {
     return <Text>{I18n.t('No result')}</Text>
   }
