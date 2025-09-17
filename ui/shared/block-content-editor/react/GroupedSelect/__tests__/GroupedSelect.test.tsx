@@ -56,20 +56,20 @@ describe('GroupedSelect', () => {
 
   it('selects first item by default', () => {
     render(<GroupedSelect data={data} onChange={onChangeMock} />)
-    expect(onChangeMock).toHaveBeenCalledWith(data[0].items[0].id)
+    expect(onChangeMock).toHaveBeenCalledWith(data[0].items[0])
   })
 
   it('changes group and selects first item of that group', async () => {
     render(<GroupedSelect data={data} onChange={onChangeMock} />)
     const group = screen.getByText(data[1].groupName)
     await userEvent.click(group)
-    expect(onChangeMock).toHaveBeenCalledWith(data[1].items[0].id)
+    expect(onChangeMock).toHaveBeenCalledWith(data[1].items[0])
   })
 
   it('selects item on click and calls onChange', async () => {
     render(<GroupedSelect data={data} onChange={onChangeMock} />)
     const item = screen.getByText(data[0].items[1].itemName)
     await userEvent.click(item)
-    expect(onChangeMock).toHaveBeenCalledWith(data[0].items[1].id)
+    expect(onChangeMock).toHaveBeenCalledWith(data[0].items[1])
   })
 })
