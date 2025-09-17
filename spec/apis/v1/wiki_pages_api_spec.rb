@@ -134,6 +134,7 @@ describe WikiPagesApiController, type: :request do
           context "when block content editor feature flag is on" do
             before do
               Account.default.enable_feature!(:block_content_editor)
+              @course.enable_feature!(:block_content_editor_eap)
             end
 
             it "creates block_editor association" do
@@ -150,7 +151,8 @@ describe WikiPagesApiController, type: :request do
 
           context "when block content editor feature flag is off" do
             before do
-              Account.default.disable_feature!(:block_content_editor)
+              Account.default.enable_feature!(:block_content_editor)
+              @course.disable_feature!(:block_content_editor_eap)
             end
 
             it "does not create block_editor association" do

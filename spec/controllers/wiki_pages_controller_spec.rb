@@ -30,6 +30,7 @@ describe WikiPagesController do
     context "when 'block_content_editor' feature is enabled" do
       before do
         @course.account.enable_feature!(:block_content_editor)
+        @course.enable_feature!(:block_content_editor_eap)
       end
 
       it "renders new page" do
@@ -45,7 +46,8 @@ describe WikiPagesController do
 
     context "when 'block_content_editor' feature is disabled" do
       before do
-        @course.account.disable_feature!(:block_content_editor)
+        @course.account.enable_feature!(:block_content_editor)
+        @course.disable_feature!(:block_content_editor_eap)
       end
 
       it "renders error page" do
@@ -92,6 +94,7 @@ describe WikiPagesController do
       context "when the block content editor is enabled" do
         it "sets EDITOR_FEATURE to block_content_editor" do
           @course.account.enable_feature!(:block_content_editor)
+          @course.enable_feature!(:block_content_editor_eap)
           get "index", params: { course_id: @course.id }
           expect(assigns[:js_env][:EDITOR_FEATURE]).to eq :block_content_editor
         end
@@ -101,6 +104,7 @@ describe WikiPagesController do
         it "sets EDITOR_FEATURE to block_content_editor" do
           @course.account.enable_feature!(:block_editor)
           @course.account.enable_feature!(:block_content_editor)
+          @course.enable_feature!(:block_content_editor_eap)
           get "index", params: { course_id: @course.id }
           expect(assigns[:js_env][:EDITOR_FEATURE]).to eq :block_content_editor
         end
