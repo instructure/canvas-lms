@@ -4402,6 +4402,7 @@ uk:
     errors: 
       cannot_shift_and_remove: "не вдалося вказати shift_dates і remove_dates одночасно"
       import_error: "Помилка імпорту:"
+    file_copy_error: "НЕ вдалося скопіювати файл \"%{name}\""
     missing_content_links_message: "Не вдалося розпізнати наступні посилання:"
     missing_content_links_title: "Відсутні посилання знайдено в імпортованому вмісті"
     unexpected_error: "Сталася неочікувана помилка, зверніться до служби підтримки."
@@ -18986,6 +18987,8 @@ uk:
         anyone: Будь-хто
         only_teachers: "Тільки викладачі"
         teachers_and_students: "Викладачі та студенти"
+      create_page_title: "Нова сторінка"
+      edit_page_title: "Редагувати %{title}"
       editing_roles: 
         anyone: Будь-хто
         only_members: "Тільки учасники"
