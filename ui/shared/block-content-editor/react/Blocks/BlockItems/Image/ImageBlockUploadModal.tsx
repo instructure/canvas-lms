@@ -63,6 +63,7 @@ export const ImageBlockUploadModal = (props: {
     <UploadFile
       accept={'image/*'}
       trayProps={getRCSProps()!}
+      editor={undefined}
       label={'Upload Image'}
       panels={panels as any}
       onDismiss={props.onDismiss}
