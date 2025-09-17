@@ -5029,6 +5029,7 @@ tr:
     errors: 
       cannot_shift_and_remove: "Aynı anda shift_dates ve remove_dates belirlenemez"
       import_error: "İçeri Aktarma Hatası:"
+    file_copy_error: "\"%{name}\" dosyası kopyalanamıyor"
     missing_content_links_message: "Şu referanslar çözülemedi:"
     missing_content_links_title: "Alınan içerikte eksik bağlantılar bulundu"
     unexpected_error: "Beklenmeyen bir hata oluştur, lütfen destek birimi ile iletişime geçin."
@@ -20545,6 +20546,8 @@ tr:
         anyone: Herkes
         only_teachers: "Sadece öğretmenler"
         teachers_and_students: "Öğretmenler ve öğrenciler"
+      create_page_title: "Yeni Sayfa"
+      edit_page_title: "%{title}'yi düzenle"
       editing_roles: 
         anyone: Herkes
         can_edit_page: "bu sayfayı düzenle"
