@@ -84,6 +84,7 @@ export interface CourseCodeProps {
   overrideCode?: string
   overrideColor?: {background: string; textColor: string}
   useCustomColors?: boolean // Whether to use user's custom course colors
+  maxWidth?: string
 }
 
 export const CourseCode: React.FC<CourseCodeProps> = ({
@@ -94,6 +95,7 @@ export const CourseCode: React.FC<CourseCodeProps> = ({
   overrideCode,
   overrideColor,
   useCustomColors = true,
+  maxWidth = '15rem',
 }) => {
   const {preferences, sharedCourseData} = useWidgetDashboard()
 
@@ -142,6 +144,7 @@ export const CourseCode: React.FC<CourseCodeProps> = ({
       themeOverride={{
         background: courseCodeStyle.background,
         primaryColor: courseCodeStyle.textColor,
+        maxWidth,
       }}
     >
       {displayCode}
