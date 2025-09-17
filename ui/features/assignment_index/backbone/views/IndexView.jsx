@@ -26,7 +26,7 @@ import Backbone from '@canvas/backbone'
 import React from 'react'
 import {createRoot} from 'react-dom/client'
 import template from '../../jst/IndexView.handlebars'
-import NoAssignments from '../../jst/NoAssignmentsSearch.handlebars'
+import NoAssignmentsSearch from '../../react/NoAssignmentsSearch'
 import AssignmentKeyBindingsMixin from '../mixins/AssignmentKeyBindingsMixin'
 import userSettings from '@canvas/user-settings'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
@@ -199,7 +199,7 @@ IndexView.prototype.afterRender = function () {
           </ScreenReaderContent>
         }
         renderBeforeInput={() => <IconSearchLine />}
-      />
+      />,
     )
   }
   return this.selectGradingPeriod()
@@ -258,6 +258,15 @@ IndexView.prototype.hide_dnd_warning = function (event) {
   return this.$(event.currentTarget).addClass('screenreader-only')
 }
 
+IndexView.prototype.clearNoAssignments = function () {
+  if (this.noAssignmentsRoot) {
+    this.noAssignmentsRoot.unmount()
+    this.noAssignmentsRoot = null
+  }
+  $(this.noAssignments).remove()
+  return (this.noAssignments = null)
+}
+
 IndexView.prototype.filterResults = function () {
   let atleastoneGroup, gradingPeriod, gradingPeriodIndex, matchingAssignmentCount, regex, ul
   const term = $('#search_term').val()
@@ -278,8 +287,7 @@ IndexView.prototype.filterResults = function () {
       })(this),
     )
     if (this.noAssignments != null) {
-      this.noAssignments.remove()
-      return (this.noAssignments = null)
+      return this.clearNoAssignments()
     }
   } else {
     regex = new RegExp(this.cleanSearchTerm(term), 'ig')
@@ -291,17 +299,16 @@ IndexView.prototype.filterResults = function () {
     this.alertForMatchingGroups(matchingAssignmentCount)
     if (!atleastoneGroup) {
       if (!this.noAssignments) {
-        this.noAssignments = new Backbone.View({
-          template: NoAssignments,
-          tagName: 'li',
-          className: 'item-group-condensed',
-        })
+        const li = document.createElement('li')
+        li.className = 'item-group-condensed'
+        this.noAssignmentsRoot = createRoot(li)
+        this.noAssignmentsRoot.render(<NoAssignmentsSearch />)
+        this.noAssignments = li
         ul = this.assignmentGroupsView.$el.children('.collectionViewItems')
-        return ul.append(this.noAssignments.render().el)
+        return ul.append(this.noAssignments)
       }
     } else if (this.noAssignments != null) {
-      this.noAssignments.remove()
-      return (this.noAssignments = null)
+      return this.clearNoAssignments()
     }
   }
 }
