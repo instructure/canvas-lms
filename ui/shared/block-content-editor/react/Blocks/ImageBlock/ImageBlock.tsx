@@ -36,8 +36,8 @@ const I18n = createI18nScope('block_content_editor')
 const ImageBlockView = (props: ImageBlockProps) => {
   return (
     <Flex direction="column" gap="mediumSmall">
-      {props.includeBlockTitle && (
-        <TitleView contentColor={props.titleColor || ''} title={props.title} />
+      {props.includeBlockTitle && !!props.title && (
+        <TitleView title={props.title} contentColor={props.titleColor} />
       )}
       <ImageView {...props} />
     </Flex>
@@ -48,7 +48,7 @@ const ImageBlockEditView = (props: ImageBlockProps) => {
   return (
     <Flex direction="column" gap="mediumSmall">
       {props.includeBlockTitle && (
-        <TitleEditPreview contentColor={props.titleColor || ''} title={props.title} />
+        <TitleEditPreview title={props.title} contentColor={props.titleColor} />
       )}
       <ImageView {...props} />
     </Flex>
