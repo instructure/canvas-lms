@@ -38,6 +38,10 @@ module CanvasCareer
       config["theme_url"]
     end
 
+    def dark_theme_url
+      config["dark_theme_url"]
+    end
+
     # These values are passed to the frontend; they should not contain any secrets!
     def public_app_config(request)
       config["public_app_config"].tap do |c|
