@@ -41,7 +41,7 @@ export const {
 
 export const ENOUGH_ITEMS_TO_SHOW_LIST = 7
 export const DESIRED_ITEMS_TO_HAVE_LOADED = 14
-export const MAX_TOTAL_ITEMS_TO_LOAD = 200 // Increased since we now only load incomplete assignments
+export const MAX_TOTAL_ITEMS_TO_LOAD = 50
 
 function incompleteItems(state) {
   return state.sidebar.items.filter(item => !item.completed)
@@ -84,7 +84,6 @@ export const sidebarLoadNextItems = identifiableThunk(() => (dispatch, getState)
     dispatch(sidebarItemsLoading())
     const params = {
       order: 'asc',
-      filter: 'assignments_needing_submission',
     }
     if (getState().sidebar.course_id) {
       params.context_codes = [
@@ -113,7 +112,6 @@ export const sidebarLoadInitialItems = (currentMoment, course_id) => (dispatch, 
       const params = {
         start_date: firstMomentDate.toISOString(),
         order: 'asc',
-        filter: 'assignments_needing_submission',
       }
       if (course_id) {
         params.context_codes = [`course_${course_id}`, `user_${ENV.current_user_id}`]
