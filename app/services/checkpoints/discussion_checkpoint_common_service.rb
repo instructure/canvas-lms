@@ -88,8 +88,52 @@ class Checkpoints::DiscussionCheckpointCommonService < ApplicationService
     inherited_attributes.merge(specified_attributes)
   end
 
+  def checkpoint_attributes_for_update(existing_checkpoint)
+    # Only return attributes that have actually changed to avoid
+    # triggering Master Course validation on unchanged restricted columns
+    new_attributes = checkpoint_attributes
+    changed_attributes = {}
+
+    new_attributes.each do |key, new_value|
+      current_value = existing_checkpoint.send(key)
+      # Compare values, handling nil/empty cases appropriately
+      if attribute_changed?(current_value, new_value)
+        changed_attributes[key] = new_value
+      end
+    end
+
+    changed_attributes
+  end
+
+  def attribute_changed?(current_value, new_value)
+    # Handle cases where nil and empty string should be considered the same
+    # for certain attributes like description
+    return false if current_value == new_value
+    return false if current_value.blank? && new_value.blank?
+
+    # Special handling for User objects - compare by id
+    if current_value.is_a?(User) && new_value.is_a?(User)
+      return current_value.id != new_value.id
+    end
+
+    # Handle dates properly
+    if current_value.is_a?(Time) && new_value.is_a?(Time)
+      return current_value.to_i != new_value.to_i
+    end
+
+    true
+  end
+
   def inherited_attributes
-    @assignment.attributes.slice(*attributes_to_inherit_from_parent).symbolize_keys
+    attributes = @assignment.attributes.slice(*attributes_to_inherit_from_parent).symbolize_keys
+
+    # Don't inherit description if the assignment has content restrictions to avoid
+    # Blueprint validation errors when trying to set description on child content
+    if @assignment.respond_to?(:editing_restricted?) && @assignment.editing_restricted?(:content)
+      attributes.delete(:description)
+    end
+
+    attributes
   end
 
   def update_required_replies?
