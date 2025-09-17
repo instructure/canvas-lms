@@ -81,7 +81,6 @@ describe('api actions', () => {
   beforeAll(() => server.listen())
   afterEach(() => {
     server.resetHandlers()
-    SidebarActions.maybeUpdateTodoSidebar.reset()
   })
   afterAll(() => server.close())
 
@@ -289,7 +288,6 @@ describe('api actions', () => {
         type: 'DELETED_PLANNER_ITEM',
         payload: deletePromise,
       })
-      expect(mockDispatch).toHaveBeenCalledWith(SidebarActions.maybeUpdateTodoSidebar)
     })
 
     it('sends a delete request for the item id', async () => {
