@@ -17,15 +17,47 @@
  */
 import {ReactNode} from 'react'
 import {Flex} from '@instructure/ui-flex'
+import {View} from '@instructure/ui-view'
+import {Responsive} from '@instructure/ui-responsive'
 
 export const AddBlockModalBodyLayout = (props: {
   groupedSelect: ReactNode
   preview: ReactNode
 }) => {
   return (
-    <Flex direction="row" alignItems="start" gap="medium">
-      <Flex.Item shouldGrow>{props.groupedSelect}</Flex.Item>
-      <Flex.Item size="min-content">{props.preview}</Flex.Item>
-    </Flex>
+    <Responsive
+      match="media"
+      query={{small: {maxWidth: '767px'}, large: {minWidth: '768px'}}}
+      render={(_, matches) => {
+        if (matches?.includes('small')) {
+          return (
+            <Flex direction="column" gap="medium">
+              <View>{props.groupedSelect}</View>
+              <View borderWidth="small 0 0 0" borderColor="secondary" width="100%" />
+              <View display="block" height="auto">
+                {props.preview}
+              </View>
+            </Flex>
+          )
+        } else {
+          return (
+            <Flex direction="row" alignItems="start" gap="medium">
+              <Flex.Item width="50%">{props.groupedSelect}</Flex.Item>
+              <Flex.Item width="50%">
+                <View
+                  display="block"
+                  borderWidth="0 0 0 small"
+                  height="512px"
+                  padding="medium"
+                  borderColor="secondary"
+                >
+                  {props.preview}
+                </View>
+              </Flex.Item>
+            </Flex>
+          )
+        }
+      }}
+    />
   )
 }
