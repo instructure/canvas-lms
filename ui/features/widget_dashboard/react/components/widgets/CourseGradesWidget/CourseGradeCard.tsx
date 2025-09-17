@@ -64,12 +64,13 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
       overflowY="hidden"
     >
       <Flex direction="column" width="100%" height="100%">
-        <Flex.Item padding="0 0 0 xx-small" margin="0 0 small 0">
+        <Flex.Item padding="0" margin="0 0 small 0" overflowX="visible" overflowY="visible">
           <CourseCode
             courseId={courseId}
             overrideCode={courseCode}
             gridIndex={gridIndex}
             size="x-small"
+            maxWidth="14rem"
           />
         </Flex.Item>
 
