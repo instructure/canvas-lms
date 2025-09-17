@@ -295,7 +295,7 @@ def generate_data_services_markdown_pages
 end
 
 def generate_permissions_markdown_pages
-  PermissionsMarkdownCreator.run
+  PermissionsMarkdownCreator.run(:html)
 end
 
 def serialize_markdown_pages

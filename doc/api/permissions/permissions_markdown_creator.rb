@@ -51,7 +51,9 @@ class PermissionsMarkdownCreator
     end.join
   end
 
-  def self.run
+  def self.run(format)
+    raise ArgumentError, "format must be :html or :md" unless %i[html md].include?(format)
+
     require Rails.root.join("config/initializers/permissions_registry.rb")
 
     erb_renderer = ERB.new(Rails.root.join(TEMPLATE).read)
@@ -97,11 +99,11 @@ class PermissionsMarkdownCreator
     PERMISSION_GROUPS.each { |group, info| write_perm_docs.call(group, info) }
 
     group_name_with_link = lambda do |group|
-      documented_perms.include?(group) ? "[#{group_names[group]}](file.permissions_#{group})" : group_names[group]
+      documented_perms.include?(group) ? "[#{group_names[group]}](file.permissions_#{group}.#{format})" : group_names[group]
     end
 
     perm_name_with_link = lambda do |perm, name|
-      documented_perms.include?(perm) ? "[#{name}](file.permissions_#{perm})" : name
+      documented_perms.include?(perm) ? "[#{name}](file.permissions_#{perm}.#{format})" : name
     end
 
     Rails.root.join(OUTPUT_PATH, "permissions.md").binwrite(
