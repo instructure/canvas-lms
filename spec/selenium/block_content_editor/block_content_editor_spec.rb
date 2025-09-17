@@ -28,6 +28,7 @@ describe "Block Content Editor", :ignore_js_errors do
   before do
     course_with_teacher_logged_in
     @course.account.enable_feature!(:block_content_editor)
+    @course.enable_feature!(:block_content_editor_eap)
     @context = @course
     create_wiki_page_with_block_content_editor(@course)
   end

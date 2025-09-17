@@ -61,6 +61,14 @@ block_content_editor:
     Enable the new Block Content Editor for creating pages.
   shadow: true
 
+block_content_editor_eap:
+  applies_to: Course
+  state: allowed
+  display_name: Block Content Editor EAP
+  description: |-
+    Enable the new Block Content Editor for creating pages in EAP.
+  custom_transition_proc: only_admins_can_enable_block_content_editor_during_eap
+
 block_content_editor_ai_alt_text:
   applies_to: SiteAdmin
   state: hidden

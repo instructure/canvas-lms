@@ -8943,4 +8943,52 @@ describe Course do
       it { expect_active_now(false, start_at: now - 2.days, end_at: now - 1.day, restrict: false) }
     end
   end
+
+  describe "#block_content_editor_enabled?" do
+    let(:course) { Course.new(account: Account.default) }
+
+    context "when both features are enabled" do
+      before do
+        allow(course.account).to receive(:feature_enabled?).with(:block_content_editor).and_return(true)
+        allow(course).to receive(:feature_enabled?).with(:block_content_editor_eap).and_return(true)
+      end
+
+      it "returns true" do
+        expect(course.block_content_editor_enabled?).to be true
+      end
+    end
+
+    context "when account feature is enabled but course feature is disabled" do
+      before do
+        allow(course.account).to receive(:feature_enabled?).with(:block_content_editor).and_return(true)
+        allow(course).to receive(:feature_enabled?).with(:block_content_editor_eap).and_return(false)
+      end
+
+      it "returns false" do
+        expect(course.block_content_editor_enabled?).to be false
+      end
+    end
+
+    context "when account feature is disabled" do
+      before do
+        allow(course.account).to receive(:feature_enabled?).with(:block_content_editor).and_return(false)
+        allow(course).to receive(:feature_enabled?).with(:block_content_editor_eap).and_return(true)
+      end
+
+      it "returns false" do
+        expect(course.block_content_editor_enabled?).to be false
+      end
+    end
+
+    context "when both features are disabled" do
+      before do
+        allow(course.account).to receive(:feature_enabled?).with(:block_content_editor).and_return(false)
+        allow(course).to receive(:feature_enabled?).with(:block_content_editor_eap).and_return(false)
+      end
+
+      it "returns false" do
+        expect(course.block_content_editor_enabled?).to be false
+      end
+    end
+  end
 end
