@@ -488,6 +488,33 @@ describe "Common Cartridge exporting" do
       end
     end
 
+    it "includes user files" do
+      folder = Folder.create!(name: "hidden", context: @user, hidden: true, parent_folder: Folder.root_folders(@user).first)
+      att = Attachment.create!(context: @user, folder:, display_name: "cn_image.jpg", uploaded_data: fixture_file_upload("cn_image.jpg"))
+
+      body = <<~HTML
+        <p><img src="/users/#{@user.id}/files/#{att.id}/preview"></p>
+      HTML
+
+      wiki_page_model(course: @ce.context, body:, updating_user: @user)
+
+      @ce.update(export_type: ContentExport::COMMON_CARTRIDGE)
+      @ce.save!
+
+      run_export
+
+      check_resource_node(@page, CC::CCHelper::WEBCONTENT)
+
+      export_html = <<~HTML.strip
+        <p><img src="$IMS-CC-FILEBASE$/Uploaded%20Media/cn_image.jpg" loading="lazy"></p>
+      HTML
+
+      expect(@zip_file.read("wiki_content/some-page.html")).to include export_html
+      path = "web_resources/Uploaded Media/cn_image.jpg"
+      expect(@zip_file.find_entry(path)).not_to be_nil
+      expect(@manifest_doc.at_css("resource[identifier=#{mig_id(att)}]")).to_not be_nil
+    end
+
     it "includes media objects" do
       @q1 = @course.quizzes.create(title: "quiz1", saving_user: @user)
       folder = Folder.create!(name: "hidden", context: @course, hidden: true, parent_folder: Folder.root_folders(@course).first)

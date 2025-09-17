@@ -856,13 +856,9 @@ class ContentMigration < ActiveRecord::Base
     Attachment.skip_media_object_creation do
       attachments.each_with_index do |file, i|
         update_import_progress((i.to_f / total) * 18.0) if i % 10 == 0
-
-        next unless !source_export || source_export.export_object?(file)
+        next if source_export && !source_export.export_object?(file)
 
         begin
-          migration_id = source_export&.create_key(file)
-          new_file = file.clone_for(context, nil, overwrite: true, migration_id:, migration: self, match_on_migration_id: for_master_course_import?)
-          add_attachment_path(file.full_display_path.delete_prefix(root_folder_name), new_file.migration_id)
           new_folder_id = merge_mapped_id(file.folder)
 
           if file.folder && file.folder.parent_folder_id.nil?
@@ -903,13 +899,7 @@ class ContentMigration < ActiveRecord::Base
             end
             new_folder_id = merge_mapped_id(file.folder)
           end
-          new_file.folder_id = new_folder_id
-          new_file.need_notify = false
-          new_file.save_without_broadcasting!
-          new_file.handle_duplicates(:rename)
-          add_imported_item(new_file)
-          add_imported_item(new_file.folder, key: new_file.folder.id)
-          map_merge(file, new_file)
+          copy_attachment_to_destination_course(source_export, file, file.full_display_path.delete_prefix(root_folder_name), new_folder_id)
         rescue => e
           Canvas::Errors.capture(e) unless e.message.include?("Cannot create attachments in deleted folders")
           Rails.logger.error "Couldn't copy file: #{e}"
@@ -917,6 +907,20 @@ class ContentMigration < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def copy_attachment_to_destination_course(source_export, file, export_path, new_folder_id)
+    migration_id = source_export&.create_key(file)
+    new_file = file.clone_for(context, nil, overwrite: true, migration_id:, migration: self, match_on_migration_id: for_master_course_import?)
+    add_attachment_path(export_path, new_file.migration_id)
+
+    new_file.folder_id = new_folder_id
+    new_file.need_notify = false
+    new_file.save_without_broadcasting!
+    new_file.handle_duplicates(:rename)
+    add_imported_item(new_file)
+    add_imported_item(new_file.folder, key: new_file.folder.id)
+    map_merge(file, new_file)
   end
 
   def get_outcome_and_link(content, context)

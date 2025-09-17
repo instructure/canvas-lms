@@ -100,21 +100,23 @@ describe CC::CCHelper do
         expect(exported_html[2]).to eq(%(<a id="media_comment_abcde" class="instructure_inline_media_comment video_comment" href="$IMS-CC-FILEBASE$/Uploaded Media/some_media.mp4" data-media_comment_type="video" data-alt=""></a>))
       end
 
-      it "are not translated on export when pointing at user media" do
-        att = attachment_model(display_name: "lolcats.mp4", context: @user, uploaded_data: stub_file_data("lolcats_.mp4", "...", "video/mp4"))
+      it "are translated to Uploaded Media in new course files on export when pointing at user media" do
+        folder = folder_model({ context: @user, parent_folder: Folder.root_folders(@user).first })
+        att = attachment_model(display_name: "lolcats.mp4", context: @user, folder:, uploaded_data: stub_file_data("lolcats_.mp4", "...", "video/mp4"))
         att.save!
         @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
         orig = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{att.id}?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="zzzz"></iframe>)
         translated = @exporter.html_content(orig)
-        expect(translated).to include %(<source src="/media_attachments_iframe/#{att.id}?type=video" data-media-id="zzzz" data-media-type="video">)
+        expect(translated).to include %(<source src="$IMS-CC-FILEBASE$/Uploaded%20Media/lolcats.mp4?canvas_=1&amp;canvas_qs_type=video" data-media-id="zzzz" data-media-type="video">)
         expect(@exporter.media_object_infos.count).to eq 0
       end
 
       it "are not translated on export when pointing at media in another course" do
-        other_course = course_with_teacher
+        original_course = @course
+        other_course = course_with_teacher.course
         att = attachment_model(display_name: "lolcats.mp4", context: other_course, uploaded_data: stub_file_data("lolcats_.mp4", "...", "video/mp4"))
         att.save!
-        @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
+        @exporter = CC::CCHelper::HtmlContentExporter.new(original_course, @user)
         orig = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{att.id}?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="zzzz"></iframe>)
         translated = @exporter.html_content(orig)
         expect(translated).to include %(<source src="/media_attachments_iframe/#{att.id}?type=video" data-media-id="zzzz" data-media-type="video">)
