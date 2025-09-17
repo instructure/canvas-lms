@@ -41,28 +41,17 @@ export const {
 
 export const ENOUGH_ITEMS_TO_SHOW_LIST = 7
 export const DESIRED_ITEMS_TO_HAVE_LOADED = 14
-export const MAX_TOTAL_ITEMS_TO_LOAD = 50
 
 function incompleteItems(state) {
   return state.sidebar.items.filter(item => !item.completed)
 }
 
-function totalItemsLoaded(state) {
-  return state.sidebar.items.length
-}
-
 function enoughSidebarItemsAreLoaded(state) {
-  return (
-    incompleteItems(state).length >= ENOUGH_ITEMS_TO_SHOW_LIST ||
-    totalItemsLoaded(state) >= MAX_TOTAL_ITEMS_TO_LOAD
-  )
+  return incompleteItems(state).length >= ENOUGH_ITEMS_TO_SHOW_LIST
 }
 
 function desiredSidebarItemsAreLoaded(state) {
-  return (
-    incompleteItems(state).length >= DESIRED_ITEMS_TO_HAVE_LOADED ||
-    totalItemsLoaded(state) >= MAX_TOTAL_ITEMS_TO_LOAD
-  )
+  return incompleteItems(state).length >= DESIRED_ITEMS_TO_HAVE_LOADED
 }
 
 function handleSidebarLoadingResponse(response, dispatch, getState) {
