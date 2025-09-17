@@ -2576,12 +2576,12 @@ RSpec.describe Lti::RegistrationsController do
       end
 
       context "with limit exceeding maximum" do
-        let(:limit) { 102 }
+        let(:limit) { 101 }
 
         it "returns 422" do
           subject
           expect(response).to have_http_status(:unprocessable_entity)
-          expect(response_json["errors"].first["message"]).to include("limit cannot exceed 101")
+          expect(response_json["errors"].first["message"]).to include("limit cannot exceed 100")
         end
       end
 
@@ -2592,6 +2592,122 @@ RSpec.describe Lti::RegistrationsController do
           subject
           expect(response).to have_http_status(:unprocessable_entity)
           expect(response_json["errors"].first["message"]).to include("limit must be a positive integer")
+        end
+      end
+    end
+  end
+
+  describe "GET history", type: :request do
+    let(:account) { Account.default }
+    let(:user) { account_admin_user(account:) }
+    let(:registration) { lti_registration_model(account:) }
+    let(:history_entry) do
+      Lti::RegistrationHistoryEntry.create!(
+        lti_registration: registration,
+        created_by: user,
+        diff: { "registration" => [["~", "name", "Old Name", "New Name"]] },
+        comment: "Test update",
+        update_type: "manual_edit",
+        root_account: account
+      )
+    end
+
+    before do
+      user_session(user)
+      account.enable_feature!(:lti_registrations_page)
+      account.enable_feature!(:lti_registrations_history)
+    end
+
+    describe "GET history" do
+      it "returns the registration history entries in the correct format" do
+        history_entry
+
+        get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/history"
+
+        expect(response).to be_successful
+        json = response.parsed_body
+        expect(json.length).to eq(1)
+        expect(json.first["id"]).to eq(history_entry.id)
+        expect(json.first["diff"]).to eq({ "registration" => [["~", "name", "Old Name", "New Name"]] })
+        expect(json.first["update_type"]).to eq("manual_edit")
+        expect(json.first["comment"]).to eq("Test update")
+      end
+
+      it "returns empty array when no history entries exist" do
+        get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/history"
+
+        expect(response).to be_successful
+        json = response.parsed_body
+        expect(json).to eq([])
+      end
+
+      it "supports pagination with per_page parameter" do
+        5.times do |i|
+          Lti::RegistrationHistoryEntry.create!(
+            lti_registration: registration,
+            created_by: user,
+            diff: { "registration" => [["~", "name", "Old Name #{i}", "New Name #{i}"]] },
+            update_type: "manual_edit",
+            root_account: account
+          )
+        end
+
+        get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/history?per_page=3"
+
+        expect(response).to be_successful
+        json = response.parsed_body
+        expect(json.length).to eq(3)
+        expect(response.headers["Link"]).to be_present
+      end
+
+      it "requires the lti_registrations_history feature flag" do
+        account.disable_feature!(:lti_registrations_history)
+
+        get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/history"
+
+        expect(response).to be_not_found
+      end
+
+      it "requires manage_lti_registrations permission" do
+        account_admin_user_with_role_changes(account:, role_changes: { manage_lti_registrations: false })
+
+        get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/history"
+
+        expect(response).to be_forbidden
+      end
+
+      context "with a site admin registration and multiple accounts on the same shard" do
+        let(:registration) { lti_registration_with_tool(account: Account.site_admin) }
+        let(:other_account) { account_model }
+        let(:reg_history_entry) do
+          Lti::RegistrationHistoryEntry.create!(
+            lti_registration: registration,
+            root_account: account,
+            created_by: user,
+            diff: { "registration" => [["~", "name", "Old Name", "New Name"]] },
+            update_type: "manual_edit"
+          )
+        end
+        let(:other_reg_history_entry) do
+          Lti::RegistrationHistoryEntry.create!(
+            lti_registration: registration,
+            root_account: other_account,
+            created_by: user,
+            diff: { "registration" => [["~", "name", "Old Name", "New Name"]] },
+            update_type: "manual_edit"
+          )
+        end
+
+        it "only returns history entries for the specified root account" do
+          reg_history_entry
+          other_reg_history_entry
+          user_session(user)
+          get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/history"
+
+          expect(response).to be_successful
+
+          ids = response.parsed_body.pluck("id")
+          expect(ids).to eql([reg_history_entry.id])
         end
       end
     end

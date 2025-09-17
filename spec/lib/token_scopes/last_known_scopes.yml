@@ -230,6 +230,8 @@
 - verb: POST
   path: '/api/v1/accounts/:account_id/lti_registrations/:id/bind'
 - verb: GET
+  path: '/api/v1/accounts/:account_id/lti_registrations/:id/history'
+- verb: GET
   path: '/api/v1/accounts/:account_id/lti_registrations/:id/overlay_history'
 - verb: PUT
   path: '/api/v1/accounts/:account_id/lti_registrations/:id/reset'
