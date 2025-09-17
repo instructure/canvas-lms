@@ -4793,6 +4793,7 @@ he:
     errors: 
       cannot_shift_and_remove: "אין אפשרות להגדיר את shift_dates ואת remove_dates בעת ובעונה אחת"
       import_error: "שגיאת ייבוא:"
+    file_copy_error: "העתקת קובץ \"%{name}\" נכשלה"
     missing_content_links_message: "ההפניות הבאות אינן ניתנות לפענוח:"
     missing_content_links_title: "נמצאו קישורים חסרים בתוכן המיובא"
     unexpected_error: "אירעה שגיאה בלתי צפויה, ויש ליצור קשר עם צוות התמיכה."
@@ -20850,6 +20851,8 @@ he:
         anyone: "כל אחד"
         only_teachers: "רק מורים"
         teachers_and_students: "מורים ותלמידים"
+      create_page_title: "דף הבא"
+      edit_page_title: "עריכת %{title}"
       editing_roles: 
         anyone: "כל אחד"
         can_edit_page: "יכול/ה לערוך דף זה"

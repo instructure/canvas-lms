@@ -6159,6 +6159,7 @@ fa:
     errors: 
       cannot_shift_and_remove: "تاریخ های_تغییر و تاریخ های_حذف به طور همزمان قابل تعیین نیستند"
       import_error: "خطای وارد کردن:"
+    file_copy_error: "نمی توان فایل \"%{name}\" را کپی کرد"
     missing_content_links_message: "منابع زیر نمی تواند حل شود:"
     missing_content_links_title: "پیوندهای مفقود در محتوای وارد شده یافت شد"
     unexpected_error: "یک خطای پیش بینی نشده ای رخ داد، لطفا با پشتیبانی تماس بگیرید."
@@ -25933,6 +25934,8 @@ fa:
         anyone: همه
         only_teachers: "فقط اساتید"
         teachers_and_students: "اساتید و دانشجویان"
+      create_page_title: "صفحه جدید"
+      edit_page_title: "ویرایش %{title}"
       editing_roles: 
         anyone: همه
         can_edit_page: "می توان این صفحه را ویرایش کرد"

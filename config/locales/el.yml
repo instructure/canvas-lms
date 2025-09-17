@@ -16048,6 +16048,8 @@ el:
         anyone: Οποισδήποτε
         only_teachers: "Μόνο καθηγητές"
         teachers_and_students: "Καθηγητές και μαθητές"
+      create_page_title: "Νέα Σελίδα"
+      edit_page_title: "Επεξεργασία %{title}"
       editing_roles: 
         anyone: Οποισδήποτε
         only_members: "Μόνο μέλη"

@@ -6923,6 +6923,7 @@ nn:
     errors: 
       cannot_shift_and_remove: "kan ikkje oppgi shift_dates og remove_dates på same tid"
       import_error: "Importfeil:"
+    file_copy_error: "Kan ikkje kopiere fila \"%{name}\""
     missing_content_links_message: "Følgande referansar kan ikkje løysast:"
     missing_content_links_title: "Manglande lenker funne i importert innhald"
     unexpected_error: "Det oppstod ein uventa feil. Ta kontakt med brukarstøtte."
@@ -29377,6 +29378,8 @@ nn:
         anyone: "Kven som helst"
         only_teachers: "Berre faglærarar"
         teachers_and_students: "Faglærarar og studentar"
+      create_page_title: "Ny side"
+      edit_page_title: "Rediger %{title}"
       editing_roles: 
         anyone: "Kven som helst"
         can_edit_page: "kan redigere denne sida"
