@@ -19,6 +19,7 @@
 import {render, waitFor} from '@testing-library/react'
 import LearningMastery from '../index'
 import useRollups from '../hooks/useRollups'
+import {useGradebookSettings} from '../hooks/useGradebookSettings'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {Rating, Student, Outcome, StudentRollupData} from '../types/rollup'
 import {SortOrder, SortBy, DEFAULT_GRADEBOOK_SETTINGS} from '../utils/constants'
@@ -29,6 +30,7 @@ import {saveLearningMasteryGradebookSettings} from '../apiClient'
 jest.mock('../apiClient')
 
 jest.mock('../hooks/useRollups')
+jest.mock('../hooks/useGradebookSettings')
 
 jest.mock('../utils/ManageURLSearchParams', () => ({
   getSearchParams: jest.fn(),
@@ -100,6 +102,16 @@ describe('LearningMastery', () => {
         sortBy: SortBy.SortableName,
         setSortBy: jest.fn(),
       },
+    })
+
+    const mockUseGradebookSettings = useGradebookSettings as jest.MockedFunction<
+      typeof useGradebookSettings
+    >
+    mockUseGradebookSettings.mockReturnValue({
+      settings: DEFAULT_GRADEBOOK_SETTINGS,
+      isLoading: false,
+      error: null,
+      updateSettings: jest.fn(),
     })
   })
 
@@ -221,6 +233,7 @@ describe('LearningMastery', () => {
     expect(mockUseRollups).toHaveBeenCalledWith({
       courseId: props.courseId,
       accountMasteryScalesEnabled: true,
+      enabled: true,
       settings: DEFAULT_GRADEBOOK_SETTINGS,
     })
   })

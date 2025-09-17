@@ -102,6 +102,17 @@ export const exportCSV = (
 }
 
 /**
+ * Load learning mastery gradebook settings
+ * @param courseId - The ID of the course
+ * @returns A promise that resolves to the API response
+ */
+export const loadLearningMasteryGradebookSettings = (
+  courseId: string | number,
+): Promise<AxiosResponse> => {
+  return axios.get(`/api/v1/courses/${courseId}/learning_mastery_gradebook_settings`)
+}
+
+/**
  * Save learning mastery gradebook settings
  * @param courseId - The ID of the course
  * @param settings - The gradebook settings to save

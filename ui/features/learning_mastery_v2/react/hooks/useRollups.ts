@@ -45,6 +45,7 @@ interface UseRollupsProps {
   sortOrder?: SortOrder
   sortBy?: SortBy
   settings?: GradebookSettings | null
+  enabled?: boolean
 }
 
 interface UseRollupsReturn extends RollupData {
@@ -116,6 +117,7 @@ export default function useRollups({
   sortOrder: sortOrderProp = SortOrder.ASC,
   sortBy: sortByProp = SortBy.SortableName,
   settings = null,
+  enabled = true,
 }: UseRollupsProps): UseRollupsReturn {
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [error, setError] = useState<null | string>(null)
@@ -132,12 +134,16 @@ export default function useRollups({
   const needMasteryAndColorDefaults = !accountMasteryScalesEnabled
 
   useEffect(() => {
+    if (!enabled) {
+      setIsLoading(true)
+      return
+    }
     ;(async () => {
       try {
         setIsLoading(true)
         const {data} = (await loadRollups(
           courseId,
-          mapSettingsToFilters(settings),
+          settings ? mapSettingsToFilters(settings) : [],
           needMasteryAndColorDefaults,
           currentPage,
           studentsPerPage,
@@ -176,6 +182,7 @@ export default function useRollups({
     sortOrder,
     sortBy,
     settings,
+    enabled,
   ])
 
   return {
