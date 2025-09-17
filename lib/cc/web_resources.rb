@@ -37,6 +37,14 @@ module CC
         add_item_to_export("attachment_#{att_id}", "attachments")
       end
 
+      @html_exporter.referenced_files.each_value do |att|
+        next unless att.context_type == "User"
+
+        path = "#{CCHelper::WEB_RESOURCES_FOLDER}/#{Folder.media_folder(@course).name}/#{att.display_name}"
+        add_file_to_manifest(att, path, create_key(att))
+        content_zipper.add_attachment_to_zip(att, @zip_file, path)
+      end
+
       @html_exporter.referenced_assessment_question_files.each_value do |att|
         path = "#{CCHelper::WEB_RESOURCES_FOLDER}/assessment_questions#{att.full_display_path}"
         add_file_to_manifest(att, path, create_key(att))
