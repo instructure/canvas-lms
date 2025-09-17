@@ -24,12 +24,14 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {useSave} from '../BaseBlock/useSave'
 import {Flex} from '@instructure/ui-flex'
 import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
+import {TitleView} from '../BlockItems/Title/TitleView'
 import {View} from '@instructure/ui-view'
 import {DefaultPreviewImage} from '../BlockItems/DefaultPreviewImage/DefaultPreviewImage'
 import {TitleEdit} from '../BlockItems/Title/TitleEdit'
 import {AddButton} from '../BlockItems/AddButton/AddButton'
 import {UploadMediaModal} from './UploadMediaModal'
 import CanvasStudioPlayer from '@canvas/canvas-studio-player/react/CanvasStudioPlayer'
+import {useFocusElement} from '../../hooks/useFocusElement'
 import {defaultProps} from './defaultProps'
 import {getContrastingTextColorCached} from '../../utilities/getContrastingTextColor'
 
@@ -65,8 +67,8 @@ const Player = ({mediaId, src, attachment_id}: MediaSources) => {
 const MediaBlockView = (props: MediaBlockProps) => {
   return (
     <Flex gap="mediumSmall" direction="column">
-      {props.includeBlockTitle && (
-        <TitleEditPreview title={props.title} contentColor={props.titleColor} />
+      {props.includeBlockTitle && !!props.title && (
+        <TitleView title={props.title} contentColor={props.titleColor} />
       )}
       {props.src || props.mediaId || props.attachment_id ? (
         <View as="div" width="100%" height="400px">
@@ -109,6 +111,7 @@ const MediaBlockEdit = (props: MediaBlockProps) => {
   const [title, setTitle] = useState(props.title)
   const [showModal, setShowModal] = useState(false)
   const labelColor = getContrastingTextColorCached(props.backgroundColor)
+  const {focusHandler} = useFocusElement()
 
   const save = useSave(() => ({
     title,
@@ -124,14 +127,22 @@ const MediaBlockEdit = (props: MediaBlockProps) => {
   return (
     <Flex gap="mediumSmall" direction="column">
       {props.includeBlockTitle && (
-        <TitleEdit title={title} onTitleChange={setTitle} labelColor={labelColor} />
+        <TitleEdit
+          title={title}
+          onTitleChange={setTitle}
+          labelColor={labelColor}
+          focusHandler={focusHandler}
+        />
       )}
       {props.src || props.mediaId || props.attachment_id ? (
         <View as="div" width={'100%'} height={'400px'}>
           <Player mediaId={props.mediaId} src={props.src} attachment_id={props.attachment_id} />
         </View>
       ) : (
-        <AddButton onClick={() => setShowModal(true)} />
+        <AddButton
+          onClick={() => setShowModal(true)}
+          focusHandler={!props.includeBlockTitle && focusHandler}
+        />
       )}
       <UploadMediaModal
         open={showModal}

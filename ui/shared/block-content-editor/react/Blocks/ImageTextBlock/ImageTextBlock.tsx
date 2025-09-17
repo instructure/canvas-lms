@@ -51,7 +51,9 @@ const ImageTextBlockView = ({
 }: ImageTextBlockProps) => {
   return (
     <ImageTextBlockLayout
-      titleComponent={includeBlockTitle && <TitleView contentColor={titleColor} title={title} />}
+      titleComponent={
+        includeBlockTitle && !!title && <TitleView title={title} contentColor={titleColor} />
+      }
       imageComponent={
         <ImageView
           url={url}
@@ -85,7 +87,7 @@ const ImageTextBlockEditView = ({
   return (
     <ImageTextBlockLayout
       titleComponent={
-        includeBlockTitle && <TitleEditPreview contentColor={titleColor} title={title} />
+        includeBlockTitle && <TitleEditPreview title={title} contentColor={titleColor} />
       }
       imageComponent={
         <ImageView
