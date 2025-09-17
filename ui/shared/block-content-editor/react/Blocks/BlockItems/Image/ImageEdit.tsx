@@ -28,6 +28,7 @@ import {Flex} from '@instructure/ui-flex'
 import {useBlockContentEditorContext} from '../../../BlockContentEditorContext'
 import {useNode} from '@craftjs/core'
 import {ImageCaption} from './ImageCaption'
+import {View} from '@instructure/ui-view'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -53,14 +54,13 @@ export const ImageEdit = ({
   const calculatedCaption = altTextAsCaption ? altText : caption
 
   return (
-    <Flex direction="column" gap="mediumSmall">
+    <>
       <ImageBlockUploadModal open={isOpen} onDismiss={closeModal} onSelected={onSelected} />
-
-      <div className="image-actions-container">
+      <View as="figure" margin="none" className="image-actions-container">
         {url ? (
           <>
             <img src={url} alt={altText} />
-            <div className="image-actions">
+            <View as="div" className="image-actions">
               <IconButton
                 renderIcon={<IconUploadLine />}
                 onClick={openModal}
@@ -70,23 +70,25 @@ export const ImageEdit = ({
                   focusHandler ? element => focusHandler(element as HTMLElement) : undefined
                 }
               />
-            </div>
+            </View>
           </>
         ) : (
           <AddButton onClick={() => setIsOpen(true)} focusHandler={focusHandler} />
         )}
-      </div>
-      <Flex direction="row" gap="x-small">
-        <ImageCaption>{calculatedCaption || I18n.t('Image caption')}</ImageCaption>
-        <IconButton
-          data-testid="edit-block-image"
-          screenReaderLabel={I18n.t('Edit block')}
-          onClick={() => settingsTray.open(id)}
-          size="small"
-        >
-          <IconEditLine fontSize="small" />
-        </IconButton>
-      </Flex>
-    </Flex>
+        <View as="figcaption" margin="mediumSmall 0 0 0">
+          <Flex direction="row" gap="x-small">
+            <ImageCaption>{calculatedCaption || I18n.t('Image caption')}</ImageCaption>
+            <IconButton
+              data-testid="edit-block-image"
+              screenReaderLabel={I18n.t('Edit block')}
+              onClick={() => settingsTray.open(id)}
+              size="small"
+            >
+              <IconEditLine fontSize="small" />
+            </IconButton>
+          </Flex>
+        </View>
+      </View>
+    </>
   )
 }
