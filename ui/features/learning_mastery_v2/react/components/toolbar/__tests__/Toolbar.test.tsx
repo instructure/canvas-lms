@@ -21,7 +21,6 @@ import {DEFAULT_GRADEBOOK_SETTINGS} from '../../../utils/constants'
 
 const makeProps = (props = {}): ToolbarProps => ({
   courseId: '123',
-  gradebookFilters: ['filter1', 'filter2'],
   showDataDependentControls: true,
   gradebookSettings: DEFAULT_GRADEBOOK_SETTINGS,
   setGradebookSettings: jest.fn(),
@@ -53,5 +52,17 @@ describe('Toolbar', () => {
     await waitFor(() => expect(getByTestId('lmgb-settings-tray')).toBeInTheDocument())
     getByTestId('lmgb-close-settings-button').querySelector('button')!.click()
     await waitFor(() => expect(queryByTestId('lmgb-settings-tray')).toBeNull())
+  })
+
+  it('hides data-dependent controls when showDataDependentControls is false', () => {
+    const {queryByTestId} = render(<Toolbar {...makeProps({showDataDependentControls: false})} />)
+    expect(queryByTestId('export-button')).toBeNull()
+    expect(queryByTestId('lmgb-settings-button')).toBeNull()
+  })
+
+  it('shows data-dependent controls when showDataDependentControls is true', () => {
+    const {getByTestId} = render(<Toolbar {...makeProps({showDataDependentControls: true})} />)
+    expect(getByTestId('export-button')).toBeInTheDocument()
+    expect(getByTestId('lmgb-settings-button')).toBeInTheDocument()
   })
 })

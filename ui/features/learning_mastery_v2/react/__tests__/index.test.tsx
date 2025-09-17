@@ -21,9 +21,12 @@ import LearningMastery from '../index'
 import useRollups from '../hooks/useRollups'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {Rating, Student, Outcome, StudentRollupData} from '../types/rollup'
-import {SortOrder, SortBy} from '../utils/constants'
+import {SortOrder, SortBy, DEFAULT_GRADEBOOK_SETTINGS} from '../utils/constants'
 import {getSearchParams, setSearchParams} from '../utils/ManageURLSearchParams'
 import {MOCK_OUTCOMES, MOCK_RATINGS, MOCK_STUDENTS} from '../__fixtures__/rollups'
+import {saveLearningMasteryGradebookSettings} from '../apiClient'
+
+jest.mock('../apiClient')
 
 jest.mock('../hooks/useRollups')
 
@@ -36,6 +39,10 @@ describe('LearningMastery', () => {
   const ratings: Rating[] = MOCK_RATINGS
   const students: Student[] = MOCK_STUDENTS
   const outcomes: Outcome[] = MOCK_OUTCOMES
+  const mockSaveLearningMasteryGradebookSettings =
+    saveLearningMasteryGradebookSettings as jest.MockedFunction<
+      typeof saveLearningMasteryGradebookSettings
+    >
 
   const rollups: StudentRollupData[] = [
     {
@@ -81,8 +88,6 @@ describe('LearningMastery', () => {
       isLoading: false,
       error: null,
       students,
-      gradebookFilters: [],
-      setGradebookFilters: () => {},
       outcomes,
       rollups,
       currentPage: 1,
@@ -101,6 +106,7 @@ describe('LearningMastery', () => {
   afterEach(() => {
     const mockUseRollups = useRollups as jest.MockedFunction<typeof useRollups>
     mockUseRollups.mockClear()
+    mockSaveLearningMasteryGradebookSettings.mockClear()
     jest.clearAllMocks()
     jest.clearAllTimers()
     jest.useRealTimers()
@@ -124,8 +130,6 @@ describe('LearningMastery', () => {
       isLoading: false,
       error: null,
       students,
-      gradebookFilters: [],
-      setGradebookFilters: () => {},
       outcomes,
       rollups,
       currentPage: 1,
@@ -217,6 +221,7 @@ describe('LearningMastery', () => {
     expect(mockUseRollups).toHaveBeenCalledWith({
       courseId: props.courseId,
       accountMasteryScalesEnabled: true,
+      settings: DEFAULT_GRADEBOOK_SETTINGS,
     })
   })
 })

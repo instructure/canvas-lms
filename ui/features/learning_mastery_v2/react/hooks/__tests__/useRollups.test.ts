@@ -103,12 +103,11 @@ describe('useRollups', () => {
       const {result} = renderHook(() =>
         useRollups({courseId: '1', accountMasteryScalesEnabled: false}),
       )
-      const {isLoading, students, outcomes, rollups, gradebookFilters} = result.current
+      const {isLoading, students, outcomes, rollups} = result.current
       expect(isLoading).toEqual(true)
       expect(students).toEqual([])
       expect(outcomes).toEqual([])
       expect(rollups).toEqual([])
-      expect(gradebookFilters).toEqual([])
       await act(async () => jest.runAllTimers())
       expect(result.current.isLoading).toEqual(false)
     })
@@ -118,13 +117,12 @@ describe('useRollups', () => {
         useRollups({courseId: '1', accountMasteryScalesEnabled: false}),
       )
       await act(async () => jest.runAllTimers())
-      const {isLoading, error, students, outcomes, rollups, gradebookFilters} = result.current
+      const {isLoading, error, students, outcomes, rollups} = result.current
       expect(isLoading).toEqual(false)
       expect(error).toEqual(null)
       expect(axios.get).toHaveBeenCalled()
       expect(students).toEqual(mockedStudents)
       expect(outcomes).toEqual(mockedOutcomes)
-      expect(gradebookFilters).toEqual([])
 
       const expectedRollups = [
         {

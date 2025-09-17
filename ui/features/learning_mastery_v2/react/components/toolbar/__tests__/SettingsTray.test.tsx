@@ -15,13 +15,16 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {render} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import {SettingsTray, SettingsTrayProps} from '../SettingsTray'
 import {
   DEFAULT_GRADEBOOK_SETTINGS,
   DisplayFilter,
   SecondaryInfoDisplay,
 } from '../../../utils/constants'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+
+jest.mock('@canvas/alerts/react/FlashAlert')
 
 const makeProps = (props = {}): SettingsTrayProps => ({
   open: true,
@@ -32,6 +35,8 @@ const makeProps = (props = {}): SettingsTrayProps => ({
 })
 
 describe('SettingsTray', () => {
+  const mockShowFlashAlert = showFlashAlert as jest.MockedFunction<typeof showFlashAlert>
+
   beforeEach(() => {
     jest.clearAllMocks()
   })
@@ -62,10 +67,59 @@ describe('SettingsTray', () => {
     expect(props.onDismiss).toHaveBeenCalledTimes(1)
   })
 
-  it('calls onDismiss when Apply button is clicked', () => {
+  it('calls setGradebookSettings when Apply button is clicked', async () => {
     const props = makeProps({open: true})
     const {getByText} = render(<SettingsTray {...props} />)
     getByText('Apply').click()
+    await waitFor(() => {
+      expect(props.setGradebookSettings).toHaveBeenCalledWith(props.gradebookSettings)
+    })
+  })
+
+  it('disables Apply button when isSavingSettings is true', () => {
+    const props = makeProps({open: true, isSavingSettings: true})
+    const {getByText} = render(<SettingsTray {...props} />)
+    const applyButton = getByText('Apply').closest('button')
+    expect(applyButton).toBeDisabled()
+  })
+
+  it('shows flash alert when setGradebookSettings fails', async () => {
+    const props = makeProps({
+      open: true,
+      setGradebookSettings: jest.fn().mockReturnValue(Promise.resolve({success: false})),
+    })
+    const {getByText} = render(<SettingsTray {...props} />)
+    getByText('Apply').click()
+    await waitFor(() => {
+      expect(mockShowFlashAlert).toHaveBeenCalledWith({
+        type: 'error',
+        message: 'There was an error saving your settings. Please try again.',
+      })
+    })
+  })
+
+  it('shows flash alert when setGradebookSettings succeeds', async () => {
+    const props = makeProps({
+      open: true,
+      setGradebookSettings: jest.fn().mockReturnValue(Promise.resolve({success: true})),
+    })
+    const {getByText} = render(<SettingsTray {...props} />)
+    getByText('Apply').click()
+    await waitFor(() => {
+      expect(mockShowFlashAlert).toHaveBeenCalledWith({
+        type: 'success',
+        message: 'Your settings have been saved.',
+      })
+      expect(props.onDismiss).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  it('resets form and dismisses when Cancel button is clicked', () => {
+    const props = makeProps({
+      open: true,
+    })
+    const {getByText} = render(<SettingsTray {...props} />)
+    getByText('Cancel').click()
     expect(props.onDismiss).toHaveBeenCalledTimes(1)
   })
 
