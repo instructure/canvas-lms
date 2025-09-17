@@ -6384,6 +6384,7 @@ hu:
     errors: 
       cannot_shift_and_remove: "nem adhatja meg egyszerre a shift_dates és remove_dates értékeket"
       import_error: "Importálási hiba:"
+    file_copy_error: "A következő fájlt nem lehet másolni: \"%{name}\""
     missing_content_links_message: "Az alábbi hivatkozásokat nem sikerült feloldani:"
     missing_content_links_title: "Hiányzó linkek találhatók az importált tartalomban"
     unexpected_error: "Nem várt hiba lépett fel, kérjük, vegye fel a kapcsolatot az üzemeltetőkkel."
@@ -27542,6 +27543,8 @@ hu:
         anyone: Bárki
         only_teachers: "Csak oktatók"
         teachers_and_students: "Oktatók és hallgatók"
+      create_page_title: "Új oldal"
+      edit_page_title: "%{title} szerkesztése"
       editing_roles: 
         anyone: Bárki
         only_members: "Csak tagoknak"
