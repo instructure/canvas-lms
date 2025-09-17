@@ -3383,6 +3383,7 @@ ko:
     bad_attachment: "파일을 성공적으로 업로드하지 못했습니다."
     errors: 
       import_error: "가져오기 오류:"
+    file_copy_error: "\"%{name}\" 파일을 복사할 수 없음"
     missing_content_links_message: "다음 참조를 확인할 수 없습니다:"
     missing_content_links_title: "가져온 내용에 누락된 링크가 있음"
     unexpected_error: "예기치 않은 오류가 발생했습니다. 사용자 지원팀에 문의하시기 바랍니다."
@@ -14743,6 +14744,8 @@ ko:
         anyone: 누구나
         only_teachers: 교사만
         teachers_and_students: "교사와 학생"
+      create_page_title: "새 페이지"
+      edit_page_title: "%{title} 편집"
       editing_roles: 
         anyone: 누구나
         can_edit_page: "은(는) 이 페이지를 편집할 수 있음"
