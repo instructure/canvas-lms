@@ -28,7 +28,7 @@ vi.mock('@instructure/studio-player/dist/index.css', () => ({}))
 const uploadMediaTranslations = {
   UploadMediaStrings: {
     ADD_CLOSED_CAPTIONS_OR_SUBTITLES: 'Add CC/Subtitles',
-    CLEAR_FILE_TEXT: 'Clear selected file',
+    CLEAR_FILE_TEXT: 'Remove',
     CLOSE_TEXT: 'Close',
     CLOSED_CAPTIONS_CHOOSE_FILE: 'Choose caption file',
     CLOSED_CAPTIONS_SELECT_LANGUAGE: 'Select Language',
@@ -294,7 +294,7 @@ describe('UploadMedia: ComputerPanel', () => {
         setHasUploadedFile,
         hasUploadedFile: true,
       })
-      const clearButton = await waitFor(() => getByText('Clear selected file'))
+      const clearButton = await waitFor(() => getByText('Remove'))
       expect(clearButton).toBeInTheDocument()
       act(() => {
         fireEvent.click(clearButton)
