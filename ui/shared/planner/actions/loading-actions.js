@@ -475,7 +475,6 @@ function fetchParams(loadingOptions) {
     if (loadingOptions.extraParams) {
       Object.assign(params, loadingOptions.extraParams)
     }
-
     const observeeId = observedUserId(loadingOptions.getState())
     if (observeeId) {
       if (!loadingOptions.getState().singleCourse) {
