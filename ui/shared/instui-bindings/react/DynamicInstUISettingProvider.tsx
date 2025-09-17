@@ -33,11 +33,11 @@ export const DynamicInstUISettingsProvider = ({
   const [theme, setTheme] = useState<ThemeOrOverride>(initialTheme)
   const urlParams = new URLSearchParams(window.location.search)
   const themeParam = urlParams.get('instui_theme')
-  const isCareerTheme = themeParam === 'career'
+  const isCareerTheme = themeParam === 'career' || themeParam === 'career-dark'
 
   useEffect(() => {
     if (isCareerTheme) {
-      loadCareerTheme().then(careerTheme => {
+      loadCareerTheme(themeParam === 'career-dark').then(careerTheme => {
         if (careerTheme) {
           setTheme(careerTheme)
         }

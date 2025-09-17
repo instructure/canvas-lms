@@ -18,18 +18,30 @@
 
 import type {ThemeOrOverride} from '@instructure/emotion/types/EmotionTypes'
 
-export async function loadCareerTheme(): Promise<ThemeOrOverride | null> {
-  const themeUrl = window.ENV.CAREER_THEME_URL
+export async function loadCareerTheme(
+  preferDark: boolean = false,
+): Promise<ThemeOrOverride | null> {
+  const themeUrl = preferDark ? window.ENV.CAREER_DARK_THEME_URL : window.ENV.CAREER_THEME_URL
+  const fallbackUrl = preferDark ? window.ENV.CAREER_THEME_URL : null
+
   if (themeUrl) {
     try {
       const response = await fetch(themeUrl)
       if (!response.ok) {
         console.warn('Failed to load career theme:', response.statusText)
+        // If dark theme fails and we have a fallback, try the fallback
+        if (preferDark && fallbackUrl) {
+          return await loadCareerTheme(false)
+        }
         return null
       }
       return await response.json()
     } catch (e) {
       console.warn('Failed to load career theme:', e)
+      // If dark theme fails and we have a fallback, try the fallback
+      if (preferDark && fallbackUrl) {
+        return await loadCareerTheme(false)
+      }
       return null
     }
   }

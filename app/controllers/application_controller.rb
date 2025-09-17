@@ -286,6 +286,7 @@ class ApplicationController < ActionController::Base
           DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account&.global_id,
           DOMAIN_ROOT_ACCOUNT_UUID: @domain_root_account&.uuid,
           CAREER_THEME_URL: CanvasCareer::ExperienceResolver.career_affiliated_institution?(@domain_root_account) ? CanvasCareer::Config.new(@domain_root_account).theme_url : nil,
+          CAREER_DARK_THEME_URL: CanvasCareer::ExperienceResolver.career_affiliated_institution?(@domain_root_account) ? CanvasCareer::Config.new(@domain_root_account).dark_theme_url : nil,
           k12: k12?,
           help_link_name:,
           help_link_icon:,

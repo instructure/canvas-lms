@@ -623,6 +623,7 @@ RSpec.describe ApplicationController do
       describe "CAREER_THEME_URL" do
         before do
           allow_any_instance_of(CanvasCareer::Config).to receive(:theme_url).and_return("https://theme.url")
+          allow_any_instance_of(CanvasCareer::Config).to receive(:dark_theme_url).and_return("https://dark-theme.url")
         end
 
         it "is nil if career is not enabled" do
@@ -633,6 +634,23 @@ RSpec.describe ApplicationController do
         it "is set to the theme url if career is enabled" do
           allow(CanvasCareer::ExperienceResolver).to receive(:career_affiliated_institution?).and_return(true)
           expect(@controller.js_env[:CAREER_THEME_URL]).to eq "https://theme.url"
+        end
+      end
+
+      describe "CAREER_DARK_THEME_URL" do
+        before do
+          allow_any_instance_of(CanvasCareer::Config).to receive(:theme_url).and_return("https://theme.url")
+          allow_any_instance_of(CanvasCareer::Config).to receive(:dark_theme_url).and_return("https://dark-theme.url")
+        end
+
+        it "is nil if career is not enabled" do
+          allow(CanvasCareer::ExperienceResolver).to receive(:career_affiliated_institution?).and_return(false)
+          expect(@controller.js_env[:CAREER_DARK_THEME_URL]).to be_nil
+        end
+
+        it "is set to the dark theme url if career is enabled" do
+          allow(CanvasCareer::ExperienceResolver).to receive(:career_affiliated_institution?).and_return(true)
+          expect(@controller.js_env[:CAREER_DARK_THEME_URL]).to eq "https://dark-theme.url"
         end
       end
     end
