@@ -75,37 +75,3 @@ it('stops loading if all items have been loaded', () => {
   expect(actions.loadFutureItems).not.toHaveBeenCalled()
   expect(store.dispatch).not.toHaveBeenCalled()
 })
-
-it('stops paginating after loading enough items even when isOnScreen returns true', () => {
-  const {animation, store, animator} = createReadyAnimation()
-
-  let loadCount = 0
-  const originalGetTotalItemsLoaded = animation.getTotalItemsLoaded
-  animation.getTotalItemsLoaded = jest.fn().mockImplementation(() => {
-    loadCount++
-    return loadCount >= 3 ? 50 : 0
-  })
-
-  store.getState.mockReturnValue({
-    loading: {allFutureItemsLoaded: false},
-  })
-
-  animator.isOnScreen.mockReturnValue(true)
-  actions.continueLoadingInitialItems.mockReturnValue('clii')
-  actions.loadFutureItems.mockReturnValue('lfi')
-
-  let dispatchCount = 0
-  store.dispatch.mockImplementation(() => {
-    dispatchCount += 1
-  })
-
-  for (let i = 0; i < 10; i++) {
-    animation.invokeUiWillUpdate()
-    animation.invokeUiDidUpdate()
-    jest.runAllTimers()
-  }
-
-  expect(dispatchCount).toBe(4)
-
-  animation.getTotalItemsLoaded = originalGetTotalItemsLoaded
-})

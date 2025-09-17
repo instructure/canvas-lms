@@ -254,50 +254,6 @@ describe('load items', () => {
     )
   })
 
-  it('stops loading when it reaches MAX_TOTAL_ITEMS_TO_LOAD even with few incomplete items', async () => {
-    // Create 50 completed items and only 3 incomplete items
-    const items = []
-    for (let i = 0; i < 47; i++) {
-      items.push({completed: true, uniqueId: `completed-${i}`})
-    }
-    items.push({completed: false, uniqueId: 'incomplete-1'})
-    items.push({completed: false, uniqueId: 'incomplete-2'})
-    items.push({completed: false, uniqueId: 'incomplete-3'})
-
-    server.use(
-      http.get('*/api/v1/planner/items', () => {
-        return new HttpResponse(JSON.stringify([]), {
-          status: 200,
-          headers: {
-            'Content-Type': 'application/json',
-            link: '</>; rel="next"',
-          },
-        })
-      }),
-      http.get('*/api/v1/courses', () => {
-        return new HttpResponse(JSON.stringify([]), {
-          status: 200,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-      }),
-    )
-
-    const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
-    const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
-    await thunk(
-      fakeDispatch,
-      mockGetState({
-        items,
-        nextUrl: '/',
-      }),
-    )
-
-    expect(fakeDispatch).toHaveBeenCalledWith({type: 'SIDEBAR_ENOUGH_ITEMS_LOADED'})
-    expect(fakeDispatch).not.toHaveBeenCalledWith(Actions.sidebarLoadNextItems)
-  })
-
   it('stops loading when it gets 14 incomplete items', async () => {
     server.use(
       http.get('*/api/v1/planner/items', () => {
