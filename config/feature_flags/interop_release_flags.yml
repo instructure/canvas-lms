@@ -331,6 +331,19 @@ lti_registrations_discover_page:
     ci:
       state: allowed_on
   custom_transition_proc: lti_registrations_discover_page_hook
+lti_registrations_history:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: LTI Apps Page Improved History
+  description: |-
+    When enabled, the History tab on the Tool Details page will provide a more comprehensive view of changes
+    to an LTI registration and its availability.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 lti_registrations_next:
   state: hidden
   shadow: true

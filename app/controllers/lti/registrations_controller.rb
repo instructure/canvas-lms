@@ -1044,6 +1044,7 @@ class Lti::RegistrationsController < ApplicationController
   before_action :require_root_account_instrumented
   before_action :require_feature_flag
   before_action :require_lti_registrations_next_feature_flag, only: %i[reset context_search overlay_history]
+  before_action :require_lti_registrations_history_feature_flag, only: [:history]
   before_action :require_manage_lti_registrations
   before_action :validate_workflow_state, only: %i[bind create update]
   before_action :validate_list_params, only: :list
@@ -1052,6 +1053,7 @@ class Lti::RegistrationsController < ApplicationController
   before_action :require_registration_params, only: :create
 
   include Api::V1::Lti::Registration
+  include Api::V1::Lti::RegistrationHistoryEntry
 
   def index
     set_active_tab "apps"
@@ -1066,6 +1068,11 @@ class Lti::RegistrationsController < ApplicationController
                dynamicRegistrationUrl: temp_dr_url
              })
     end
+
+    # Inject feature flags for LTI registrations
+    js_env({
+             LTI_REGISTRATIONS_HISTORY: @account.feature_enabled?(:lti_registrations_history)
+           })
 
     render :index
   end
@@ -1621,7 +1628,7 @@ class Lti::RegistrationsController < ApplicationController
   # @API Get LTI Registration Overlay History
   # Returns the overlay history items for the specified LTI registration.
   #
-  # @argument limit [Optional, Integer] The maximum number of history items to return. Defaults to 101. Maximum allowed is 500.
+  # @argument limit [Optional, Integer] The maximum number of history items to return. Defaults to 10. Maximum allowed is 100.
   #
   # @returns [Lti::OverlayVersion]
   #
@@ -1637,13 +1644,41 @@ class Lti::RegistrationsController < ApplicationController
 
       if overlay
         limit = validate_limit_param(params[:limit])
-        history_items = overlay.lti_overlay_versions.limit(limit)
-        render json: history_items.map { |version|
-          lti_overlay_version_json(version, @current_user, session, @context)
-        }
+        history_items = overlay.lti_overlay_versions.preload(:created_by).limit(limit)
+        render json: lti_overlay_versions_json(history_items, @current_user, session, @context)
       else
         render json: []
       end
+    end
+  rescue => e
+    report_error(e)
+    raise e
+  end
+
+  # @API Get LTI Registration History
+  # Returns the history entries for the specified LTI registration.
+  # This endpoint provides comprehensive change tracking for all fields associated
+  # with the registration, including registration fields, developer key changes,
+  # internal configuration changes, and overlay changes. Supports pagination using the `page` and `per_page` parameters.
+  # The default page size is 10.
+  #
+  # @returns [Lti::RegistrationHistoryEntry]
+  #
+  # @example_request
+  #
+  #   This would return the history for the specified LTI registration
+  #   curl -X GET 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/<registration_id>/history' \
+  #        -H "Authorization: Bearer <token>"
+  def history
+    GuardRail.activate(:secondary) do
+      base_scope = Lti::RegistrationHistoryEntry.where(lti_registration: registration, root_account: @account)
+                                                .order(created_at: :desc, id: :desc).preload(:created_by)
+      bookmarker = BookmarkedCollection::SimpleBookmarker.new(Lti::RegistrationHistoryEntry, :created_at, :id)
+      bookmarked_collection = BookmarkedCollection.wrap(bookmarker, base_scope)
+      params[:per_page] = Api.per_page_for(self)
+      paginated_items = Api.paginate(bookmarked_collection, self, api_v1_lti_registration_history_url, params)
+
+      render json: lti_registration_history_entries_json(paginated_items, @current_user, session, @context)
     end
   rescue => e
     report_error(e)
@@ -1784,6 +1819,15 @@ class Lti::RegistrationsController < ApplicationController
     end
   end
 
+  def require_lti_registrations_history_feature_flag
+    unless @account.feature_enabled?(:lti_registrations_history)
+      respond_to do |format|
+        format.html { render "shared/errors/404_message", status: :not_found }
+        format.json { render_error(:not_found, "The specified resource does not exist.", status: :not_found) }
+      end
+    end
+  end
+
   def require_manage_lti_registrations
     require_context_with_permission(@context, :manage_lti_registrations)
   end
@@ -1831,17 +1875,15 @@ class Lti::RegistrationsController < ApplicationController
   end
 
   def validate_limit_param(limit_param)
-    return 101 if limit_param.blank?
+    return Api::PER_PAGE if limit_param.blank?
 
     limit = limit_param.to_i
     if limit <= 0
-      render_error(:invalid_limit, "limit must be a positive integer")
-      return
+      return render_error(:invalid_limit, "limit must be a positive integer")
     end
 
-    if limit > 101
-      render_error(:invalid_limit, "limit cannot exceed 101")
-      return
+    if limit > Api::MAX_PER_PAGE
+      return render_error(:invalid_limit, "limit cannot exceed #{Api::MAX_PER_PAGE}")
     end
 
     limit
