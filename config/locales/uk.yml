@@ -7179,6 +7179,7 @@ uk:
     roles: 
       designer: Конструктор
       designer_with_indefinite_article: Конструктор
+      instructors: Інструктори
       observer: Спостерігач
       observer_with_indefinite_article: Спостерігач
       student: Студент
@@ -15514,6 +15515,8 @@ uk:
   role_successfully_updated_4317e6a4: "Роль успішно оновлена"
   roles: 
     based_on_type: "На основі %{base_type}"
+    designer: Конструктор
+    designers: Дизайнери
     edit_role: 
       role_name_label: "Ім'я ролі"
     new_role: 
@@ -15522,6 +15525,8 @@ uk:
       role_type: "Базовий тип:"
       save: Зберегти
       saving: Збереження...
+    observer: Спостерігач
+    observers: Спостерігачі
     permission_button: 
       rolebutton: 
         disable: Відключити
@@ -15538,6 +15543,12 @@ uk:
       account_roles: "Ролі облікового запису"
       course_roles: "Ролі курсу"
       page_header_title: "Права облікового запису"
+    student: Студент
+    students: Студенти
+    ta: TA
+    tas: TA
+    teacher: Викладач
+    teachers: Викладачі
   rootFoldersFinder: 
     course_files: "Файли курсу"
     group_files: "Файли групи"

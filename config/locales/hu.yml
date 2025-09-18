@@ -10079,6 +10079,7 @@ hu:
     roles: 
       designer: Tervező
       designer_with_indefinite_article: "Egy tervező"
+      instructors: Oktatók
       observer: Megfigyelő
       observer_with_indefinite_article: "Egy megfigyelő"
       student: Hallgató
@@ -21572,6 +21573,8 @@ hu:
   role_successfully_updated_4317e6a4: "A szerep sikeresen frissítve"
   roles: 
     based_on_type: "%{base_type} alapján"
+    designer: Tervező
+    designers: Tervezők
     edit_role: 
       role_name_label: "Szerepkör neve"
     new_role: 
@@ -21580,6 +21583,8 @@ hu:
       role_type: "Alaptípus:"
       save: Mentés
       saving: Mentés...
+    observer: Megfigyelő
+    observers: Megfigyelők
     permission_button: 
       rolebutton: 
         disable: Letiltás
@@ -21596,6 +21601,12 @@ hu:
       account_roles: "Felhasználói szerepek"
       course_roles: Kurzusszerepek
       page_header_title: Fiókengedélyek
+    student: Hallgató
+    students: Hallgatók
+    ta: Segédoktató
+    tas: Segédoktatók
+    teacher: Oktató
+    teachers: Oktatók
   roles_730b879e: Szerepek
   romanian_13670c1e: Román
   rootFoldersFinder: 

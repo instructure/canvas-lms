@@ -8126,6 +8126,7 @@ tr:
     roles: 
       designer: Tasarımcı
       designer_with_indefinite_article: Tasarımcı
+      instructors: Eğitmenler
       observer: Gözlemci
       observer_with_indefinite_article: Gözlemci
       student: Öğrenci
@@ -17269,6 +17270,8 @@ tr:
   role_successfully_updated_4317e6a4: "Rol başarılı bir şekilde güncellendi"
   roles: 
     based_on_type: "%{base_type} tabanlı"
+    designer: Tasarımcı
+    designers: Tasarımcılar
     edit_role: 
       role_name_label: "Rol İsmi"
     new_role: 
@@ -17277,6 +17280,8 @@ tr:
       role_type: "Baz Türü:"
       save: Kaydet
       saving: Kaydediliyor...
+    observer: Gözlemci
+    observers: Gözlemciler
     permission_button: 
       rolebutton: 
         disable: "Devre Dışı"
@@ -17293,6 +17298,12 @@ tr:
       account_roles: "Hesap Rolleri"
       course_roles: "Ders Rolleri"
       page_header_title: "Hesap İzinleri"
+    student: Öğrenci
+    students: Öğrenciler
+    ta: "Asistan Öğretmen"
+    tas: "Asistan Öğretmenler"
+    teacher: Öğretmen
+    teachers: Öğretmenler
   rootFoldersFinder: 
     course_files: "Ders dosyaları"
     group_files: "Grup dosyaları"
