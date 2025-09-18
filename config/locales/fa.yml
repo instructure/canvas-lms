@@ -9797,6 +9797,7 @@ fa:
     roles: 
       designer: طراح
       designer_with_indefinite_article: "یک طراح"
+      instructors: اساتید
       observer: بیننده
       observer_with_indefinite_article: "یک بیننده"
       student: دانشجو
@@ -20887,6 +20888,8 @@ fa:
   role_successfully_updated_4317e6a4: "نقش با موفقیت بهنگام سازی شد."
   roles: 
     based_on_type: "بر اساس %{base_type}"
+    designer: طراح
+    designers: طراحان
     edit_role: 
       role_name_label: "نام نقش"
     new_role: 
@@ -20895,6 +20898,8 @@ fa:
       role_type: "نوع پایه:"
       save: "ذخیره سازی"
       saving: "در حال ذخیره سازی..."
+    observer: بیننده
+    observers: "بیننده ها"
     permission_button: 
       rolebutton: 
         disable: "غیر فعال سازی"
@@ -20912,6 +20917,12 @@ fa:
       account_roles: "نقش های حساب"
       course_roles: "نقش های درس"
       page_header_title: "مجوزهای حساب"
+    student: Student
+    students: دانشجویان
+    ta: "دستیار آموزشی"
+    tas: "دستیارهای آموزشی"
+    teacher: استاد
+    teachers: اساتید
   roles_730b879e: نقش‌ها
   romanian_13670c1e: رومانیایی
   rootFoldersFinder: 
