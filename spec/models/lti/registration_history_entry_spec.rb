@@ -23,12 +23,19 @@ describe Lti::RegistrationHistoryEntry do
   describe "validations" do
     let(:history_entry) do
       Lti::RegistrationHistoryEntry.new(lti_registration:,
+                                        root_account: account,
                                         diff: [["+", "foo.bar", "stuff"]],
                                         update_type: "manual_edit",
                                         created_by: user)
     end
 
     it "doesn't require a comment" do
+      history_entry.comment = nil
+      expect(history_entry).to be_valid
+    end
+
+    it "doesn't require a created_by" do
+      history_entry.created_by = nil
       expect(history_entry).to be_valid
     end
 
@@ -46,11 +53,6 @@ describe Lti::RegistrationHistoryEntry do
       history_entry.update_type = "invalid type"
       expect(history_entry).not_to be_valid
     end
-
-    it "requires a created_by" do
-      history_entry.created_by = nil
-      expect(history_entry).not_to be_valid
-    end
   end
 
   describe "cross-shard associations" do
@@ -64,15 +66,20 @@ describe Lti::RegistrationHistoryEntry do
         registration = lti_registration_with_tool(account: shard1_account)
       end
 
-      # Create history entry on default shard referencing shard1 registration
-      history_entry = Lti::RegistrationHistoryEntry.create!(
-        lti_registration: registration,
-        diff: [["+", "foo.bar", "stuff"]],
-        update_type: "manual_edit",
-        created_by: user
-      )
+      history_entry = @shard2.activate do
+        shard2_account = account_model
+        created_by = user_model
+        Lti::RegistrationHistoryEntry.create!(
+          lti_registration: registration,
+          root_account: shard2_account,
+          diff: [["+", "foo.bar", "stuff"]],
+          update_type: "manual_edit",
+          created_by:
+        )
+      end
 
       expect(history_entry).to be_persisted
+      expect(history_entry.shard).to eq @shard2
       expect(history_entry.lti_registration).to eq registration
       expect(history_entry.lti_registration.shard).to eq @shard1
     end
@@ -86,6 +93,8 @@ describe Lti::RegistrationHistoryEntry do
       let(:tool_configuration) { registration.manual_configuration }
 
       it "creates no history entry when no changes are made" do
+        # Ensure we create everything before running the test itself.
+        registration
         expect do
           Lti::RegistrationHistoryEntry.track_changes(
             lti_registration: registration,

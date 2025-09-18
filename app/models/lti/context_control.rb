@@ -17,6 +17,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Lti::ContextControl < ActiveRecord::Base
+  # While id, account_id, course_id, and deployment_id are tracked, they don't really change
+  # (deployment_id & id literally can't), but it makes it easier in the UI to associate a
+  # changed control with a specific context and deployment.
+  TRACKED_ATTRIBUTES = %i[id account_id course_id deployment_id available workflow_state].freeze
+
   extend RootAccountResolver
 
   resolves_root_account through: ->(cc) { cc.account&.resolved_root_account_id || cc.course&.root_account_id }
