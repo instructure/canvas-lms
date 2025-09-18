@@ -49,6 +49,7 @@ module Schemas::Lti
           additionalProperties: false,
           properties: Lti::ResourcePlacement::PLACEMENTS.index_with { PLACEMENT_SCHEMA }
         },
+        message_settings: Schemas::InternalLtiConfiguration.message_settings_schema,
       }
     }.freeze
     SPECIALLY_OVERLAID_KEYS = %i[placements disabled_scopes disabled_placements].freeze

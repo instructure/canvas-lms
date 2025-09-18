@@ -490,11 +490,12 @@ module Lti::IMS
         describe "when the tool does not support LtiEulaRequest" do
           let(:eula_message) { nil }
 
-          it "does not add a eula object to the ActivityAssetProcessor placement" do
+          it "does not add EULA to message_settings" do
             expect(registration.canvas_configuration["extensions"][0]["settings"]["placements"]).to match_array([
                                                                                                                   deep_linking_placement("ActivityAssetProcessor"),
                                                                                                                   deep_linking_placement("course_navigation")
                                                                                                                 ])
+            expect(registration.canvas_configuration["extensions"][0]["settings"]).not_to have_key("message_settings")
           end
         end
 
@@ -507,12 +508,17 @@ module Lti::IMS
             registration.canvas_configuration["extensions"][0]["settings"]["placements"]
           end
 
-          it "adds eula: {enabled: true} to the ActivityAssetProcessor placement" do
-            eula = { enabled: true }
+          it "adds EULA to message_settings" do
             expect(actual_placements).to match_array([
-                                                       deep_linking_placement("ActivityAssetProcessor", eula:),
+                                                       deep_linking_placement("ActivityAssetProcessor"),
                                                        deep_linking_placement("course_navigation")
                                                      ])
+            expect(registration.canvas_configuration["extensions"][0]["settings"]["message_settings"]).to match_array([
+                                                                                                                        {
+                                                                                                                          type: "LtiEulaRequest",
+                                                                                                                          enabled: true
+                                                                                                                        }
+                                                                                                                      ])
           end
 
           describe "when eula_message has custom_parameters and target_link_uri" do
@@ -524,16 +530,19 @@ module Lti::IMS
               }
             end
 
-            it "adds those settings to the ActivityAssetProcessor's eula settings" do
-              eula = {
-                enabled: true,
-                target_link_uri: "http://example.com/eula",
-                custom_fields: { "this_is_a_eula" => "yes" },
-              }
+            it "adds those settings to message_settings" do
               expect(actual_placements).to match_array([
-                                                         deep_linking_placement("ActivityAssetProcessor", eula:),
+                                                         deep_linking_placement("ActivityAssetProcessor"),
                                                          deep_linking_placement("course_navigation")
                                                        ])
+              expect(registration.canvas_configuration["extensions"][0]["settings"]["message_settings"]).to match_array([
+                                                                                                                          {
+                                                                                                                            type: "LtiEulaRequest",
+                                                                                                                            enabled: true,
+                                                                                                                            target_link_uri: "http://example.com/eula",
+                                                                                                                            custom_fields: { "this_is_a_eula" => "yes" }
+                                                                                                                          }
+                                                                                                                        ])
             end
           end
         end

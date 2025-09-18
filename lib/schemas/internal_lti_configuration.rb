@@ -106,7 +106,7 @@ module Schemas
           privacy_level: { type: "string", enum: ::Lti::PrivacyLevelExpander::SUPPORTED_LEVELS },
           launch_settings: {
             type: "object",
-            properties: base_settings_properties
+            properties: launch_settings_properties,
           },
           placements: placements_schema,
           # vendor_extensions: extensions with platform != "canvas.instructure.com", only currently copied during content migration. not present on 1.3 tools.
@@ -156,6 +156,13 @@ module Schemas
       }.freeze
     end
 
+    def self.launch_settings_properties
+      {
+        message_settings: message_settings_schema,
+        **base_settings_properties
+      }
+    end
+
     def self.make_placement_specific_properties(**placement_properties_hash)
       placement_properties_hash.map do |placement, properties|
         {
@@ -190,24 +197,28 @@ module Schemas
             submission_type_selection: {
               description: { type: "string", maxLength: 255, errorMessage: "description must be a string with a maximum length of 255" },
               require_resource_selection: { type: "boolean" },
-            },
-            ActivityAssetProcessor: {
-              eula: asset_processor_eula_schema,
             }
           )
         }
       }.freeze
     end
 
-    def self.asset_processor_eula_schema
+    def self.message_settings_schema
       {
-        type: "object",
-        properties: {
-          enabled: { type: "boolean" },
-          target_link_uri: { type: "string" },
-          custom_fields: { type: "object", additionalProperties: { type: "string" } },
-        },
-        required: %w[enabled]
+        type: "array",
+        items: {
+          type: "object",
+          required: %w[type enabled],
+          properties: {
+            type: {
+              type: "string",
+              enum: ::Lti::ResourcePlacement::PLACEMENTLESS_MESSAGE_TYPES
+            },
+            enabled: { type: "boolean" },
+            target_link_uri: { type: "string" },
+            custom_fields: { type: "object", additionalProperties: { type: "string" } },
+          }
+        }
       }
     end
 

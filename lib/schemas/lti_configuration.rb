@@ -46,7 +46,7 @@ module Schemas
                 type: "object",
                 required: %w[placements],
                 properties: {
-                  **InternalLtiConfiguration.base_settings_properties,
+                  **InternalLtiConfiguration.launch_settings_properties,
                   placements: InternalLtiConfiguration.placements_schema,
                 }
               },

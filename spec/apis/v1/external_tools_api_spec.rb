@@ -971,6 +971,7 @@ describe ExternalToolsController, type: :request do
     et.allow_membership_service_access = opts[:allow_membership_service_access] if opts[:allow_membership_service_access]
     et.conference_selection = { url: "http://www.example.com/ims/lti/conference", icon_url: "/images/delete.png", text: "conference selection" }
     et.unified_tool_id = "utid_12345"
+    et.message_settings = [{ type: "LtiEulaRequest", enabled: true, target_link_uri: "http://www.example.com/ims/lti/eula" }]
     et.save!
     et
   end
@@ -1041,6 +1042,7 @@ describe ExternalToolsController, type: :request do
       "workflow_state" => "public",
       "version" => "1.1",
       "unified_tool_id" => "utid_12345",
+      "message_settings" => [{ "type" => "LtiEulaRequest", "enabled" => true, "target_link_uri" => "http://www.example.com/ims/lti/eula" }],
       "deployment_id" => et&.deployment_id,
       "resource_selection" => {
         "enabled" => true,
