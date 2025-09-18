@@ -18,20 +18,32 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {TextArea} from '@instructure/ui-text-area'
+import {Text} from '@instructure/ui-text'
 import {useFocusElement} from '../../../hooks/useFocusElement'
+import {Tag} from '@instructure/ui-tag'
 
 const I18n = createI18nScope('block_content_editor')
 
 export const HighlightTextEdit = ({
   content,
   setContent,
-}: {content: string; setContent: (value: string) => void}) => {
+  labelColor,
+}: {content: string; setContent: (value: string) => void; labelColor: string | null}) => {
   const {focusHandler} = useFocusElement()
+  const labelText = I18n.t('Highlight text')
 
   return (
     <TextArea
       textareaRef={element => focusHandler(element)}
-      label={''}
+      label={
+        labelColor ? (
+          <Text weight="weightImportant" color="primary" themeOverride={{primaryColor: labelColor}}>
+            {labelText}
+          </Text>
+        ) : (
+          <Tag size="medium" text={labelText} />
+        )
+      }
       placeholder={I18n.t('Start typing...')}
       value={content}
       onChange={e => setContent(e.target.value)}
