@@ -1,0 +1,8 @@
+{
+  "name": "@canvas/nutrition-facts",
+  "private": true,
+  "version": "0.0.1",
+  "author": "collaboration",
+  "main": "./index.tsx",
+  "module": "./index.tsx"
+}
