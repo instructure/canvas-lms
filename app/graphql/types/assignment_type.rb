@@ -749,6 +749,15 @@ module Types
       end
     end
 
+    field :scheduled_post, ScheduledPostType, null: true
+    def scheduled_post
+      load_association(:context).then do |course|
+        if course.grants_right?(current_user, :manage_grades)
+          load_association(:scheduled_post)
+        end
+      end
+    end
+
     field :score_statistic, AssignmentScoreStatisticType, null: true
     def score_statistic
       load_association(:context).then do |course|

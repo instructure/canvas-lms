@@ -855,12 +855,30 @@ describe Types::AssignmentType do
     let(:student) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
     let(:teacher) { course.enroll_user(User.create!, "TeacherEnrollment", enrollment_state: "active").user }
 
+    before do
+      post_policy = assignment.post_policy
+      post_policy.update!(post_manually: true)
+      @scheduled_post = ScheduledPost.new(
+        assignment:,
+        post_policy:,
+        root_account_id: assignment.root_account_id,
+        post_comments_at: 2.days.from_now,
+        post_grades_at: 2.days.from_now
+      )
+      @scheduled_post.save!
+    end
+
     context "when user has manage_grades permission" do
       let(:context) { { current_user: teacher } }
 
       it "returns the PostPolicy related to the assignment" do
         resolver = GraphQLTypeTester.new(assignment, context)
         expect(resolver.resolve("postPolicy {_id}").to_i).to eql assignment.post_policy.id
+      end
+
+      it "returns the ScheduledPost when it exists" do
+        resolver = GraphQLTypeTester.new(assignment, context)
+        expect(resolver.resolve("scheduledPost { _id }")).to eq @scheduled_post.id.to_s
       end
     end
 
@@ -870,6 +888,11 @@ describe Types::AssignmentType do
       it "returns null in place of the PostPolicy" do
         resolver = GraphQLTypeTester.new(assignment, context)
         expect(resolver.resolve("postPolicy {_id}")).to be_nil
+      end
+
+      it "returns null in place of the ScheduledPost" do
+        resolver = GraphQLTypeTester.new(assignment, context)
+        expect(resolver.resolve("scheduledPost { _id }")).to be_nil
       end
     end
   end
