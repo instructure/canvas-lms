@@ -970,4 +970,30 @@ describe "Discussion Topic Show" do
       expect(first_entry_text_after).to include("First")
     end
   end
+
+  context "nutrition facts functionality" do
+    context "when cedar_translation feature flag is enabled" do
+      before do
+        Account.site_admin.enable_feature!(:cedar_translation)
+      end
+
+      it "loads nutrition facts element with content in the DOM" do
+        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+        wait_for_ajaximations
+        expect(element_exists?("#nutrition_facts_trigger")).to be_truthy
+      end
+    end
+
+    context "when cedar_translation feature flag is disabled" do
+      before do
+        Account.site_admin.disable_feature!(:cedar_translation)
+      end
+
+      it "does not mount nutrition facts content" do
+        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+        wait_for_ajaximations
+        expect(element_exists?("#nutrition_facts_trigger")).to be_falsey
+      end
+    end
+  end
 end
