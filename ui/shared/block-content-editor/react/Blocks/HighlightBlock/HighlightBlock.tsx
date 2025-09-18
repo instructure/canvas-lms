@@ -27,6 +27,7 @@ import {useSave} from '../BaseBlock/useSave'
 import {BaseBlock} from '../BaseBlock'
 import {defaultProps} from './defaultProps'
 import {highlightBlockContrast} from '../../accessibilityChecker/rules/highlightBlockContrast'
+import {getContrastingTextColorCached} from '../../utilities/getContrastingTextColor'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -47,6 +48,7 @@ const HighlightBlockEditView = (props: HighlightBlockProps) => {
 
 const HighlightBlockEdit = (props: HighlightBlockProps) => {
   const [content, setContent] = useState(props.content)
+  const labelColor = getContrastingTextColorCached(props.highlightColor)
 
   useSave<typeof HighlightBlock>(() => ({
     content,
@@ -55,7 +57,9 @@ const HighlightBlockEdit = (props: HighlightBlockProps) => {
   return (
     <HighlightBlockLayout
       icon={getIcon(props.displayIcon, props.textColor)}
-      content={<HighlightTextEdit content={content} setContent={setContent} />}
+      content={
+        <HighlightTextEdit content={content} setContent={setContent} labelColor={labelColor} />
+      }
       backgroundColor={props.highlightColor}
     />
   )
