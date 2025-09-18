@@ -22,7 +22,7 @@ import {SettingsTray, SettingsTrayProps} from '../SettingsTray'
 
 describe('SettingsTray', () => {
   const defaultProps: SettingsTrayProps = {
-    title: 'Settings',
+    blockDisplayName: 'Text column',
     open: true,
     onDismiss: () => {},
     onClose: () => {},
@@ -34,9 +34,9 @@ describe('SettingsTray', () => {
   }
 
   describe('when tray is open', () => {
-    it('renders with the given title', async () => {
+    it('renders with the given blockDisplayName', async () => {
       await renderSettingsTray({})
-      expect(screen.getByText(defaultProps.title)).toBeInTheDocument()
+      expect(screen.getByText(defaultProps.blockDisplayName)).toBeInTheDocument()
     })
 
     it('renders the children content', async () => {
@@ -58,7 +58,7 @@ describe('SettingsTray', () => {
   describe('when tray is closed', () => {
     it('does not render the tray content', async () => {
       await renderSettingsTray({open: false})
-      expect(screen.queryByText(defaultProps.title)).not.toBeInTheDocument()
+      expect(screen.queryByText(defaultProps.blockDisplayName)).not.toBeInTheDocument()
     })
   })
 })
