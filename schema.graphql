@@ -448,27 +448,7 @@ type Assignment implements AssignedDates & LegacyIDInterface & ModuleItemInterfa
   """
   Allocation rules if peer review is enabled
   """
-  allocationRulesConnection(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
-    after: String
-
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: String
-
-    """
-    Returns the first _n_ elements from the list.
-    """
-    first: Int
-
-    """
-    Returns the last _n_ elements from the list.
-    """
-    last: Int
-  ): AllocationRuleConnection
+  allocationRules: AssignmentAllocationRules
   allowGoogleDocsSubmission: Boolean
 
   """
@@ -903,6 +883,41 @@ type Assignment implements AssignedDates & LegacyIDInterface & ModuleItemInterfa
   specifies all other variables that can determine visiblity.
   """
   visibleToEveryone: Boolean!
+}
+
+"""
+Allocation rules for peer review assignments
+"""
+type AssignmentAllocationRules {
+  """
+  Total count of allocation rules
+  """
+  count: Int
+
+  """
+  Paginated list of allocation rules
+  """
+  rulesConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): AllocationRuleConnection
 }
 
 """

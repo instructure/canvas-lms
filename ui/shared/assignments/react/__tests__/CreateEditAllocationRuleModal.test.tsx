@@ -43,6 +43,7 @@ describe('CreateEditAllocationRuleModal', () => {
   const defaultProps = {
     isOpen: true,
     setIsOpen: mockSetIsOpen,
+    refetchRules: jest.fn(),
   }
 
   const reviewer: CourseStudent = {

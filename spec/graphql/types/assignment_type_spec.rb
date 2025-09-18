@@ -1901,7 +1901,7 @@ describe Types::AssignmentType do
     end
   end
 
-  describe "allocation_rules_connection" do
+  describe "allocation_rules" do
     let(:assignment_with_peer_reviews) do
       course.assignments.create!(
         title: "Peer Review Assignment",
@@ -1940,6 +1940,7 @@ describe Types::AssignmentType do
         review_permitted: true,
         applies_to_assessor: true
       )
+
       @teacher_assignment_type = GraphQLTypeTester.new(assignment_with_peer_reviews, current_user: teacher)
       @ta_assignment_type = GraphQLTypeTester.new(assignment_with_peer_reviews, current_user: ta)
       @student_assignment_type = GraphQLTypeTester.new(assignment_with_peer_reviews, current_user: student1)
@@ -1947,44 +1948,57 @@ describe Types::AssignmentType do
     end
 
     context "when user has grading permissions" do
-      it "returns allocation rules connection for teachers" do
-        result = @teacher_assignment_type.resolve("allocationRulesConnection { nodes { _id } }")
-
+      it "returns allocation rules for teachers" do
+        result = @teacher_assignment_type.resolve("allocationRules { rulesConnection { nodes { _id } } }")
         expect(result).to eq([@allocation_rule_1.id.to_s, @allocation_rule_2.id.to_s])
       end
 
+      it "returns allocation rules count for teachers" do
+        result = @teacher_assignment_type.resolve("allocationRules { count }")
+        expect(result).to eq 2
+      end
+
       it "allows access to nested assessor and assessee information" do
-        assessors = @teacher_assignment_type.resolve("allocationRulesConnection { nodes { assessor { _id } } }")
-        assessees = @teacher_assignment_type.resolve("allocationRulesConnection { nodes { assessee { _id } } }")
+        assessors = @teacher_assignment_type.resolve("allocationRules { rulesConnection { nodes { assessor { _id } } } }")
+        assessees = @teacher_assignment_type.resolve("allocationRules { rulesConnection { nodes { assessee { _id } } } }")
 
         expect(assessors).to eq([@allocation_rule_1.assessor.id.to_s, @allocation_rule_2.assessor.id.to_s])
         expect(assessees).to eq([@allocation_rule_1.assessee.id.to_s, @allocation_rule_2.assessee.id.to_s])
       end
 
       it "allows TAs with grading permissions to access allocation rules" do
-        result = @ta_assignment_type.resolve("allocationRulesConnection { nodes { _id } }")
-
+        result = @ta_assignment_type.resolve("allocationRules { rulesConnection { nodes { _id } } }")
         expect(result).to eq([@allocation_rule_1.id.to_s, @allocation_rule_2.id.to_s])
       end
 
-      it "paginates results" do
-        expect(@teacher_assignment_type.resolve("allocationRulesConnection (first: 1) { edges { node { _id } } }").length).to eq 1
-        expect(@teacher_assignment_type.resolve("allocationRulesConnection (first: 1) { pageInfo { hasNextPage } }")).to be true
-        expect(@teacher_assignment_type.resolve("allocationRulesConnection (first: 2) { edges { node { _id } } }").length).to eq 2
-        expect(@teacher_assignment_type.resolve("allocationRulesConnection (first: 2) { pageInfo { hasNextPage } }")).to be false
+      it "returns 0 when there are no allocation rules" do
+        AllocationRule.destroy_all
+        result = @teacher_assignment_type.resolve("allocationRules { count }")
+        expect(result).to eq 0
+      end
+
+      it "only counts active allocation rules" do
+        @allocation_rule_1.destroy
+        result = @teacher_assignment_type.resolve("allocationRules { count }")
+        expect(result).to eq 1
+      end
+
+      it "paginates rules connection results" do
+        expect(@teacher_assignment_type.resolve("allocationRules { rulesConnection(first: 1) { edges { node { _id } } } }").length).to eq 1
+        expect(@teacher_assignment_type.resolve("allocationRules { rulesConnection(first: 1) { pageInfo { hasNextPage } } }")).to be true
+        expect(@teacher_assignment_type.resolve("allocationRules { rulesConnection(first: 2) { edges { node { _id } } } }").length).to eq 2
+        expect(@teacher_assignment_type.resolve("allocationRules { rulesConnection(first: 2) { pageInfo { hasNextPage } } }")).to be false
       end
     end
 
     context "when user lacks grading permissions" do
       it "returns nil for students" do
-        result = @student_assignment_type.resolve("allocationRulesConnection { nodes { _id } }")
-
+        result = @student_assignment_type.resolve("allocationRules { rulesConnection { nodes { _id } } }")
         expect(result).to be_nil
       end
 
       it "returns nil for observers" do
-        result = @observer_assignment_type.resolve("allocationRulesConnection { nodes { _id } }")
-
+        result = @observer_assignment_type.resolve("allocationRules { rulesConnection { nodes { _id } } }")
         expect(result).to be_nil
       end
     end
@@ -1995,8 +2009,7 @@ describe Types::AssignmentType do
       end
 
       it "returns nil even for teachers" do
-        result = @teacher_assignment_type.resolve("allocationRulesConnection { nodes { _id } }")
-
+        result = @teacher_assignment_type.resolve("allocationRules { rulesConnection { nodes { _id } } }")
         expect(result).to be_nil
       end
     end
@@ -2013,8 +2026,7 @@ describe Types::AssignmentType do
 
       it "returns nil even for teachers" do
         peer_reviews_disabled_type = GraphQLTypeTester.new(assignment_without_peer_reviews, current_user: teacher)
-        result = peer_reviews_disabled_type.resolve("allocationRulesConnection { nodes { _id } }")
-
+        result = peer_reviews_disabled_type.resolve("allocationRules { rulesConnection { nodes { _id } } }")
         expect(result).to be_nil
       end
     end
@@ -2029,21 +2041,25 @@ describe Types::AssignmentType do
         )
       end
 
-      it "returns empty connection" do
+      it "returns empty connection but valid count" do
         empty_type = GraphQLTypeTester.new(empty_assignment, current_user: teacher)
-        result = empty_type.resolve("allocationRulesConnection { nodes { _id } }")
+        result = empty_type.resolve("allocationRules { rulesConnection { nodes { _id } } }")
+        count_result = empty_type.resolve("allocationRules { count }")
 
         expect(result).to be_empty
+        expect(count_result).to eq 0
       end
     end
 
     context "with deleted allocation rules" do
       it "only returns active allocation rules" do
         AllocationRule.first.destroy
-        result = @teacher_assignment_type.resolve("allocationRulesConnection { nodes { workflowState } }")
+        result = @teacher_assignment_type.resolve("allocationRules { rulesConnection { nodes { workflowState } } }")
+        count_result = @teacher_assignment_type.resolve("allocationRules { count }")
 
         expect(result.size).to eq 1
         expect(result.first).to eq "active"
+        expect(count_result).to eq 1
       end
     end
   end
