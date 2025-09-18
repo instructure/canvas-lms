@@ -19,9 +19,10 @@
 
 describe PageViews::EnqueueQueryService do
   let(:configuration) { instance_double(PageViews::Configuration, uri: URI.parse("http://pv5.instructure.com"), access_token: "token") }
-  let(:service) { PageViews::EnqueueQueryService.new(configuration) }
   let(:account) { instance_double(Account, id: 1, uuid: "abc") }
-  let(:user) { instance_double(User, global_id: 1, shard: Shard.default, root_account_ids: [account.id]) }
+  let(:admin) { instance_double(User, global_id: 1, shard: Shard.default, root_account_ids: [account.id]) }
+  let(:user) { instance_double(User, global_id: 2, shard: Shard.default, root_account_ids: [account.id]) }
+  let(:service) { PageViews::EnqueueQueryService.new(configuration, requestor_user: admin) }
 
   before do
     allow(Account).to receive(:find_cached).with(1).and_return(account)
@@ -79,6 +80,16 @@ describe PageViews::EnqueueQueryService do
     end
   end
 
+  it "raises TooManyRequestsError when PV5 API rate limit is exceeded" do
+    response = double(code: 429)
+    allow(CanvasHttp).to receive(:post).and_yield(response)
+    expect do
+      service.call("2024-12-01", "2025-01-01", user, "csv")
+    end.to raise_error(PageViews::Common::TooManyRequestsError) do |error|
+      expect(error.message).to eq("Rate limit exceeded")
+    end
+  end
+
   it "raises InternalServerError when PV5 API returns internal server error" do
     response = double(code: 500)
     allow(CanvasHttp).to receive(:post).and_yield(response)
@@ -98,5 +109,13 @@ describe PageViews::EnqueueQueryService do
     service.call("2025-03-01", "2025-06-01", user, "csv")
 
     expect(CanvasHttp).to have_received(:post).with(anything, hash_including("X-Request-Context-Id" => expected_request_id), anything)
+  end
+
+  it "includes requestor's global user ID in headers when provided" do
+    allow(CanvasHttp).to receive(:post).and_yield(double(code: 201, header: { "Location" => "http://pv5.instructure.com/api/v5/pageviews/query/123456" }))
+
+    service.call("2025-03-01", "2025-06-01", user, "csv")
+
+    expect(CanvasHttp).to have_received(:post).with(anything, hash_including("X-Canvas-User-Id" => "1"), anything)
   end
 end
