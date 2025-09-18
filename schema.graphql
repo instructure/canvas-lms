@@ -8059,6 +8059,11 @@ type Query {
     Returns the last _n_ elements from the list.
     """
     last: Int
+
+    """
+    ID of the observed user
+    """
+    observedUserId: ID
   ): EnrollmentConnection
 
   """
@@ -11006,6 +11011,11 @@ type User implements LegacyIDInterface & Node & Timestamped {
     last: Int
 
     """
+    ID of the observed user
+    """
+    observedUserId: ID
+
+    """
     Show only submitted assignments
     """
     onlySubmitted: Boolean
@@ -11063,6 +11073,11 @@ type User implements LegacyIDInterface & Node & Timestamped {
     Returns the last _n_ elements from the list.
     """
     last: Int
+
+    """
+    ID of the observed user
+    """
+    observedUserId: ID
   ): DiscussionParticipantConnection
   discussionsSplitscreenView: Boolean!
   email: String

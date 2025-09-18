@@ -50,6 +50,7 @@ ready(() => {
             observedUsersList={ENV.OBSERVED_USERS_LIST}
             canAddObservee={ENV.CAN_ADD_OBSERVEE}
             currentUser={ENV.current_user}
+            observedUserId={ENV.OBSERVED_USER_ID}
             currentUserRoles={ENV.current_user_roles}
             sharedCourseData={ENV.SHARED_COURSE_DATA}
           >

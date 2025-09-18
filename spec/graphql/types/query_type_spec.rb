@@ -579,4 +579,111 @@ describe Types::QueryType do
       end
     end
   end
+
+  context "courseInstructorsConnection" do
+    before(:once) do
+      @course1 = Course.create!(name: "Course 1", workflow_state: "available")
+      @course2 = Course.create!(name: "Course 2", workflow_state: "available")
+      @course3 = Course.create!(name: "Course 3", workflow_state: "available")
+
+      @instructor1 = user_factory(name: "Instructor 1")
+      @instructor2 = user_factory(name: "Instructor 2")
+
+      @teacher_enrollment1 = @course1.enroll_teacher(@instructor1)
+      @teacher_enrollment1.accept!
+      @teacher_enrollment2 = @course2.enroll_teacher(@instructor2)
+      @teacher_enrollment2.accept!
+      @teacher_enrollment3 = @course3.enroll_teacher(@instructor1)
+      @teacher_enrollment3.accept!
+
+      @student = user_factory(name: "Student")
+      @course1.enroll_student(@student, active_all: true)
+      @course2.enroll_student(@student, active_all: true)
+
+      @observer = user_factory(name: "Observer")
+      @observed_user = user_factory(name: "Observed Student")
+      @course1.enroll_student(@observed_user, active_all: true)
+      @course2.enroll_student(@observed_user, active_all: true)
+      @course3.enroll_student(@observed_user, active_all: true)
+      @course1.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @observed_user.id, active_all: true)
+      @course2.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @observed_user.id, active_all: true)
+    end
+
+    let(:query) do
+      <<~GQL
+        query($courseIds: [ID!]!, $observedUserId: ID) {
+          courseInstructorsConnection(courseIds: $courseIds, observedUserId: $observedUserId) {
+            nodes {
+              user {
+                _id
+                name
+              }
+              course {
+                _id
+                name
+              }
+            }
+          }
+        }
+      GQL
+    end
+
+    it "returns instructors for current user's courses" do
+      result = CanvasSchema.execute(
+        query,
+        variables: { courseIds: [@course1.id.to_s, @course2.id.to_s] },
+        context: { current_user: @student }
+      )
+
+      instructors = result.dig("data", "courseInstructorsConnection", "nodes")
+      expect(instructors.length).to eq(2)
+      instructor_names = instructors.pluck("user").pluck("name").sort
+      expect(instructor_names).to eq(["Instructor 1", "Instructor 2"])
+    end
+
+    it "returns instructors for observed user's courses when observer" do
+      result = CanvasSchema.execute(
+        query,
+        variables: {
+          courseIds: [@course1.id.to_s, @course2.id.to_s, @course3.id.to_s],
+          observedUserId: @observed_user.id.to_s
+        },
+        context: { current_user: @observer }
+      )
+
+      instructors = result.dig("data", "courseInstructorsConnection", "nodes")
+      expect(instructors.length).to eq(2)
+      instructor_names = instructors.pluck("user").pluck("name").sort
+      expect(instructor_names).to eq(["Instructor 1", "Instructor 2"])
+    end
+
+    it "returns empty result for invalid observed user id" do
+      result = CanvasSchema.execute(
+        query,
+        variables: {
+          courseIds: [@course1.id.to_s],
+          observedUserId: "999999"
+        },
+        context: { current_user: @observer }
+      )
+
+      instructors = result.dig("data", "courseInstructorsConnection", "nodes")
+      expect(instructors).to be_empty
+    end
+
+    it "only returns instructors for courses observer is authorized to see" do
+      result = CanvasSchema.execute(
+        query,
+        variables: {
+          courseIds: [@course1.id.to_s, @course2.id.to_s, @course3.id.to_s],
+          observedUserId: @observed_user.id.to_s
+        },
+        context: { current_user: @observer }
+      )
+
+      course_ids = result.dig("data", "courseInstructorsConnection", "nodes")
+                         .pluck("course").pluck("_id").sort
+      expect(course_ids).to eq([@course1.id.to_s, @course2.id.to_s])
+    end
+  end
 end

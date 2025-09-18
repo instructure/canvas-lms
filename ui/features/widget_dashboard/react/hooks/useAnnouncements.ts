@@ -21,6 +21,7 @@ import {executeQuery} from '@canvas/graphql'
 import {gql} from 'graphql-tag'
 import type {Announcement} from '../types'
 import {ANNOUNCEMENTS_PAGINATED} from '../constants'
+import {useWidgetDashboard} from './useWidgetDashboardContext'
 
 interface UseAnnouncementsOptions {
   limit?: number
@@ -63,11 +64,11 @@ interface GraphQLResponse {
 }
 
 const USER_ANNOUNCEMENTS_QUERY = gql`
-  query GetUserAnnouncements($userId: ID!, $first: Int!, $after: String, $readState: String) {
+  query GetUserAnnouncements($userId: ID!, $first: Int!, $after: String, $readState: String, $observedUserId: ID) {
     legacyNode(_id: $userId, type: User) {
       ... on User {
         _id
-        discussionParticipantsConnection(first: $first, after: $after, filter: { isAnnouncement: true, readState: $readState }) {
+        discussionParticipantsConnection(first: $first, after: $after, filter: { isAnnouncement: true, readState: $readState }, observedUserId: $observedUserId) {
           nodes {
             id
             read
@@ -101,9 +102,10 @@ const USER_ANNOUNCEMENTS_QUERY = gql`
 export function usePaginatedAnnouncements(options: UseAnnouncementsOptions = {}) {
   const {limit = 10, filter = 'all'} = options
   const currentUserId = window.ENV?.current_user_id
+  const {observedUserId} = useWidgetDashboard()
 
   return useInfiniteQuery({
-    queryKey: [ANNOUNCEMENTS_PAGINATED, currentUserId, limit, filter],
+    queryKey: [ANNOUNCEMENTS_PAGINATED, currentUserId, limit, filter, observedUserId],
     queryFn: async ({pageParam}): Promise<{announcements: Announcement[]; pageInfo: any}> => {
       if (!currentUserId) {
         throw new Error('No current user ID found - please ensure you are logged in')
@@ -114,6 +116,7 @@ export function usePaginatedAnnouncements(options: UseAnnouncementsOptions = {})
         first: limit,
         after: pageParam,
         readState: filter,
+        observedUserId,
       })
 
       if (result.errors) {
