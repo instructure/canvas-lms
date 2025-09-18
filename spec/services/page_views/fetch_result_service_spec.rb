@@ -135,6 +135,11 @@ describe PageViews::FetchResultService do
     expect { service.call("123456") }.to raise_error(PageViews::Common::NotFoundError)
   end
 
+  it "raises no content error when no content is available yet" do
+    allow(CanvasHttp).to receive(:get).and_yield(instance_double(Net::HTTPResponse, code: 204))
+    expect { service.call("123456") }.to raise_error(PageViews::Common::NoContentError)
+  end
+
   it "includes request id in headers" do
     expected_request_id = SecureRandom.uuid
     allow(RequestContext::Generator).to receive(:request_id).and_return(expected_request_id)

@@ -271,6 +271,9 @@ class PageViewsController < ApplicationController
   rescue ArgumentError => e
     Canvas::Errors.capture_exception(:pv5, e, :warn)
     render json: { error: t("Page Views received an invalid or malformed request.") }, status: :bad_request
+  rescue PageViews::Common::TooManyRequestsError => e
+    Canvas::Errors.capture_exception(:pv5, e, :warn)
+    render json: { error: t("Page Views rate limit exceeded. Please wait and try again.") }, status: :too_many_requests
   end
 
   def poll_query
@@ -302,6 +305,9 @@ class PageViewsController < ApplicationController
   rescue PageViews::Common::NotFoundError => e
     Canvas::Errors.capture_exception(:pv5, e, :warn)
     render json: { error: t("The result for query was not found.") }, status: :not_found
+  rescue PageViews::Common::NoContentError => e
+    Canvas::Errors.capture_exception(:pv5, e, :info)
+    head :no_content
   rescue => e
     Canvas::Errors.capture_exception(:pv5, e, :warn)
     render json: { error: t("An unexpected error occurred.") }, status: :internal_server_error
@@ -310,7 +316,7 @@ class PageViewsController < ApplicationController
   private
 
   def pv5_enqueue_service
-    PageViews::EnqueueQueryService.new(PageViews::Configuration.new)
+    PageViews::EnqueueQueryService.new(PageViews::Configuration.new, requestor_user: @current_user)
   end
 
   def pv5_poll_service

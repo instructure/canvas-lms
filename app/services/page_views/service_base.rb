@@ -19,8 +19,9 @@
 
 module PageViews
   class ServiceBase
-    def initialize(configuration)
+    def initialize(configuration, requestor_user: nil)
       @configuration = configuration
+      @requestor_user = requestor_user
     end
 
     protected
@@ -29,8 +30,10 @@ module PageViews
 
     def request_headers
       request_id = RequestContext::Generator.request_id
-      { "Authorization" => "Bearer #{@configuration.access_token}",
-        "X-Request-Context-Id" => request_id }
+      headers = { "Authorization" => "Bearer #{@configuration.access_token}",
+                  "X-Request-Context-Id" => request_id }
+      headers["X-Canvas-User-Id"] = @requestor_user.global_id.to_s if @requestor_user
+      headers
     end
 
     def handle_generic_errors(response)
@@ -42,6 +45,10 @@ module PageViews
         raise Common::AccessDeniedError, "Access denied to the requested resource"
       when 404
         raise Common::NotFoundError, "Resource not found"
+      when 429
+        raise Common::TooManyRequestsError, "Rate limit exceeded"
+      when 204
+        raise Common::NoContentError, "Empty result, no content available"
       when 500
         raise Common::InternalServerError, "Internal server error"
       else
