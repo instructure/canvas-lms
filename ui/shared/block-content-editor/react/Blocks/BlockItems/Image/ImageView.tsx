@@ -35,6 +35,7 @@ export const ImageView = ({
     <View as="figure" margin="none">
       {url ? (
         <img
+          width="100%"
           src={url}
           alt={decorativeImage ? '' : altText}
           role={decorativeImage ? 'presentation' : undefined}
