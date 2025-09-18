@@ -87,7 +87,8 @@ const AllocationRuleCard = ({
             <Flex>
               <Flex.Item padding="small none x-small small">
                 <IconButton
-                  data-testid="edit-allocation-rule-button"
+                  id={`edit-rule-button-${rule.id}`}
+                  data-testid={`edit-rule-button-${rule.id}`}
                   renderIcon={<IconEditLine color="brand" />}
                   withBackground={false}
                   withBorder={false}

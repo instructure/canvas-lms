@@ -184,7 +184,7 @@ describe('AllocationRuleCard', () => {
     describe('when user can edit allocation rules', () => {
       it('renders the edit button with correct accessibility label', () => {
         render(<AllocationRuleCard rule={defaultRule} canEdit={true} />)
-        const editButton = screen.getByTestId('edit-allocation-rule-button')
+        const editButton = screen.getByTestId(`edit-rule-button-${defaultRule.id}`)
 
         expect(editButton).toBeInTheDocument()
         expect(screen.getByText(/^Edit Allocation Rule:/)).toBeInTheDocument()
@@ -202,7 +202,7 @@ describe('AllocationRuleCard', () => {
     describe('when user cannot edit allocation rules', () => {
       it('does not render the edit button', () => {
         render(<AllocationRuleCard rule={defaultRule} canEdit={false} />)
-        const editButton = screen.queryByTestId('edit-allocation-rule-button')
+        const editButton = screen.queryByTestId(`edit-rule-button-${defaultRule.id}`)
 
         expect(editButton).not.toBeInTheDocument()
       })

@@ -46,6 +46,7 @@ const CreateEditAllocationRuleModal = ({
   courseId,
   setIsOpen,
   rule,
+  refetchRules,
   isOpen = false,
   isEdit = false,
 }: {
@@ -53,6 +54,7 @@ const CreateEditAllocationRuleModal = ({
   courseId?: string
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
+  refetchRules: (ruleId: string) => void
   isEdit?: boolean
   rule?: AllocationRuleType
 }): React.ReactElement => {
@@ -85,8 +87,8 @@ const CreateEditAllocationRuleModal = ({
   const [showErrorAlert, setShowErrorAlert] = useState(false)
 
   const createAllocationRuleMutation = useCreateAllocationRule(
-    (_data: CreateAllocationRuleResponse) => {
-      // TODO: [EGG-1589] Handle success (refresh rules displayed in the tray)
+    (data: CreateAllocationRuleResponse) => {
+      refetchRules(data.createAllocationRule.allocationRules[0]._id)
       handleClose()
     },
     (allocationErrors: any[]) => {

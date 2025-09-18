@@ -206,6 +206,24 @@ module Types
       end
     end
 
+    class AssignmentAllocationRules < ApplicationObjectType
+      description "Allocation rules for peer review assignments"
+
+      field :rules_connection, AllocationRuleType.connection_type, null: true do
+        description "Paginated list of allocation rules"
+      end
+      def rules_connection
+        load_association(:allocation_rules).then { |rules| rules.active.order(:id) }
+      end
+
+      field :count, Int, null: true do
+        description "Total count of allocation rules"
+      end
+      def count
+        load_association(:allocation_rules).then { |rules| rules.active.count }
+      end
+    end
+
     global_id_field :id
 
     field :name, String, null: true
@@ -835,15 +853,15 @@ module Types
       end
     end
 
-    field :allocation_rules_connection, AllocationRuleType.connection_type, null: true do
+    field :allocation_rules, AssignmentAllocationRules, null: true do
       description "Allocation rules if peer review is enabled"
     end
-    def allocation_rules_connection
+    def allocation_rules
       return nil unless assignment.grants_right?(current_user, :grade) &&
                         assignment.context.feature_enabled?(:peer_review_allocation_and_grading) &&
                         assignment.peer_reviews
 
-      load_association(:allocation_rules).then(&:active)
+      assignment
     end
   end
 end
