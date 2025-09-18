@@ -32,4 +32,5 @@ export interface EnvWidgetDashboard {
     gradingScheme: 'letter' | 'percentage'
     lastUpdated: string
   }>
+  OBSERVED_USER_ID: string | null
 }

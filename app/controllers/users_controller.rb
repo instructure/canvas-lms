@@ -531,7 +531,8 @@ class UsersController < ApplicationController
       js_bundle :widget_dashboard
       css_bundle :dashboard_card
 
-      course_data_with_grades = fetch_courses_with_grades(@current_user, @selected_observed_user)
+      observed_user = (@selected_observed_user && @selected_observed_user != @current_user) ? @selected_observed_user : nil
+      course_data_with_grades = fetch_courses_with_grades(observed_user)
 
       js_env({
                PREFERENCES: {
@@ -540,6 +541,7 @@ class UsersController < ApplicationController
                  custom_colors: @current_user.custom_colors
                },
                OBSERVED_USERS_LIST: observed_users_list,
+               OBSERVED_USER_ID: observed_user&.id,
                CAN_ADD_OBSERVEE: @current_user
                                    .profile
                                    .tabs_available(@current_user, root_account: @domain_root_account)
@@ -3500,15 +3502,14 @@ class UsersController < ApplicationController
     end
   end
 
-  def fetch_courses_with_grades(user, observed_user = nil)
-    # Use the observed user if provided and it's a User object, otherwise use the current user
-    target_user = (observed_user.is_a?(User) ? observed_user : user)
-
-    # Return empty array if no target user
-    return [] unless target_user.is_a?(User)
-
+  def fetch_courses_with_grades(observed_user = nil)
     # Get current enrollments for the user
-    enrollments = target_user.enrollments.current.preload(:course, :scores)
+    if observed_user
+      observer_courses = @current_user.cached_course_ids_for_observed_user(observed_user)
+      enrollments = observed_user.enrollments.current.preload(:course, :scores).where(course_id: observer_courses)
+    else
+      enrollments = @current_user.enrollments.current.preload(:course, :scores)
+    end
 
     course_data = enrollments.map do |enrollment|
       course = enrollment.course

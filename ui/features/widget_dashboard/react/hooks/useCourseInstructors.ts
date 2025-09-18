@@ -20,6 +20,7 @@ import {useInfiniteQuery} from '@tanstack/react-query'
 import {createUserQueryConfig} from '../utils/graphql'
 import {QUERY_CONFIG} from '../constants'
 import {fetchPaginatedCourseInstructors} from '../graphql/coursePeople'
+import {useWidgetDashboard} from './useWidgetDashboardContext'
 
 export interface CourseInstructorForComponent {
   id: string
@@ -51,9 +52,11 @@ interface UseCourseInstructorsOptions {
 export function useCourseInstructors(options: UseCourseInstructorsOptions = {}) {
   const {courseIds = [], limit = 5, enabled = true} = options
 
+  const {observedUserId} = useWidgetDashboard()
+
   return useInfiniteQuery({
     ...createUserQueryConfig(
-      ['courseInstructorsPaginated', courseIds.join(','), limit],
+      ['courseInstructorsPaginated', courseIds.join(','), limit, observedUserId ?? undefined],
       QUERY_CONFIG.STALE_TIME.USERS,
     ),
     queryFn: async ({
@@ -65,7 +68,12 @@ export function useCourseInstructors(options: UseCourseInstructorsOptions = {}) 
       endCursor: string | null
       startCursor: string | null
     }> => {
-      return fetchPaginatedCourseInstructors(courseIds, limit, pageParam)
+      return fetchPaginatedCourseInstructors(
+        courseIds,
+        limit,
+        pageParam,
+        observedUserId ?? undefined,
+      )
     },
     initialPageParam: undefined as string | undefined,
     getNextPageParam: lastPage => {

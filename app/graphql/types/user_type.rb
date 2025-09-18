@@ -635,19 +635,27 @@ module Types
       argument :end_date, GraphQL::Types::ISO8601DateTime, required: false, description: "End date for due date range filter"
       argument :include_no_due_date, Boolean, required: false, description: "Include assignments with no due date"
       argument :include_overdue, Boolean, required: false, description: "Include overdue assignments"
+      argument :observed_user_id, ID, required: false, description: "ID of the observed user"
       argument :only_submitted, Boolean, required: false, description: "Show only submitted assignments"
       argument :start_date, GraphQL::Types::ISO8601DateTime, required: false, description: "Start date for due date range filter"
     end
-    def course_work_submissions_connection(course_filter: nil, start_date: nil, end_date: nil, include_overdue: false, include_no_due_date: false, only_submitted: false)
+    def course_work_submissions_connection(course_filter: nil, start_date: nil, end_date: nil, include_overdue: false, include_no_due_date: false, only_submitted: false, observed_user_id: nil)
       return [] unless object == current_user
 
       # Get active course enrollments
-      active_course_ids = object.enrollments
-                                .joins(:course)
-                                .where(courses: { workflow_state: "available" })
-                                .where(workflow_state: ["active", "invited"])
-                                .pluck(:course_id)
-                                .uniq
+      active_course_ids = if observed_user_id.present?
+                            observed_user = User.find_by(id: observed_user_id)
+                            return [] unless observed_user
+
+                            object.cached_course_ids_for_observed_user(observed_user)
+                          else
+                            object.enrollments
+                                  .joins(:course)
+                                  .where(courses: { workflow_state: "available" })
+                                  .where(workflow_state: ["active", "invited"])
+                                  .pluck(:course_id)
+                                  .uniq
+                          end
 
       if active_course_ids.empty?
         return []
@@ -661,9 +669,12 @@ module Types
 
       # Build a more efficient query for submissions instead of loading everything
       # Start with submissions for the user
+      user_for_submissions = observed_user_id.present? ? User.find_by(id: observed_user_id) : object
+      return [] unless user_for_submissions
+
       submissions_query = Submission
                           .joins(assignment: :course)
-                          .where(user: object)
+                          .where(user: user_for_submissions)
                           .where(assignments: { context_id: active_course_ids, context_type: "Course" })
                           .where(assignments: { workflow_state: "published" })
                           .where(courses: { workflow_state: "available" })
@@ -801,13 +812,17 @@ module Types
     field :discussion_participants_connection, Types::DiscussionParticipantType.connection_type, null: true do
       description "All discussion topic participants for the user, optionally filtered by announcement status"
       argument :filter, DiscussionParticipantFilterInputType, required: false
+      argument :observed_user_id, ID, "ID of the observed user", required: false
     end
-    def discussion_participants_connection(filter: {})
+    def discussion_participants_connection(filter: {}, observed_user_id: nil)
       return unless object == current_user
 
+      user_for_participants = observed_user_id.present? ? User.find_by(id: observed_user_id) : object
+      return DiscussionTopicParticipant.none unless user_for_participants
+
       # Start with user's discussion topic participants, joining discussion_topic for filtering
-      participants = current_user.discussion_topic_participants
-                                 .joins(:discussion_topic)
+      participants = user_for_participants.discussion_topic_participants
+                                          .joins(:discussion_topic)
 
       # Filter by announcement status if specified
       if filter[:is_announcement] == true
@@ -838,11 +853,18 @@ module Types
 
       # Filter to only discussions in courses where user has active enrollment
       # Use a subquery to avoid loading all enrollment IDs into memory
-      enrollment_subquery = current_user.enrollments
-                                        .active_by_date
-                                        .joins(:course)
-                                        .where(courses: { workflow_state: "available" })
-                                        .select(:course_id)
+      enrollment_subquery = if observed_user_id.present?
+                              observed_user = User.find_by(id: observed_user_id)
+                              return DiscussionTopicParticipant.none unless observed_user
+
+                              current_user.cached_course_ids_for_observed_user(observed_user)
+                            else
+                              current_user.enrollments
+                                          .active_by_date
+                                          .joins(:course)
+                                          .where(courses: { workflow_state: "available" })
+                                          .select(:course_id)
+                            end
 
       participants = participants.where(
         discussion_topics: {

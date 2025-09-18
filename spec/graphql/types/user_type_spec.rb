@@ -2515,6 +2515,104 @@ describe Types::UserType do
     end
   end
 
+  context "discussionParticipantsConnection with observed user" do
+    before(:once) do
+      @course1 = Course.create!(name: "Course 1", workflow_state: "available")
+      @course2 = Course.create!(name: "Course 2", workflow_state: "available")
+
+      @observer = user_factory(name: "Observer")
+      @observed_student = user_factory(name: "Observed Student")
+
+      @course1.enroll_student(@observed_student, active_all: true)
+      @course2.enroll_student(@observed_student, active_all: true)
+      @course1.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @observed_student.id, active_all: true)
+      @course2.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @observed_student.id, active_all: true)
+
+      # Create discussions and announcements
+      @discussion1 = @course1.discussion_topics.create!(title: "Discussion 1", message: "Test discussion", workflow_state: "active")
+      @announcement1 = @course1.announcements.create!(title: "Announcement 1", message: "Test announcement", workflow_state: "active")
+      @discussion2 = @course2.discussion_topics.create!(title: "Discussion 2", message: "Another discussion", workflow_state: "active")
+
+      # Create participation records for observed student
+      @discussion1.discussion_topic_participants.create!(user: @observed_student)
+      @announcement1.discussion_topic_participants.create!(user: @observed_student)
+      @discussion2.discussion_topic_participants.create!(user: @observed_student)
+    end
+
+    let(:observer_user_type) do
+      GraphQLTypeTester.new(
+        @observer,
+        current_user: @observer,
+        domain_root_account: @course1.account.root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+    end
+
+    it "returns discussion participants for observed student" do
+      result = observer_user_type.resolve(
+        "discussionParticipantsConnection(observedUserId: \"#{@observed_student.id}\") {
+          nodes {
+            discussionTopic {
+              title
+            }
+          }
+        }"
+      )
+
+      expect(result.length).to eq(3)
+      topic_titles = result.flatten.sort
+      expect(topic_titles).to eq(["Announcement 1", "Discussion 1", "Discussion 2"])
+    end
+
+    it "returns empty result for invalid observed user id" do
+      result = observer_user_type.resolve(
+        "discussionParticipantsConnection(observedUserId: \"999999\") {
+          nodes {
+            discussionTopic { title }
+          }
+        }"
+      )
+
+      expect(result).to be_empty
+    end
+
+    it "filters by announcement status" do
+      result = observer_user_type.resolve(
+        "discussionParticipantsConnection(
+          observedUserId: \"#{@observed_student.id}\",
+          filter: { isAnnouncement: true }
+        ) {
+          nodes {
+            discussionTopic { title }
+          }
+        }"
+      )
+
+      expect(result.length).to eq(1)
+      expect(result.flatten.first).to eq("Announcement 1")
+    end
+
+    it "only returns participants from courses observer can access" do
+      # Create a course the observer can't see
+      other_course = Course.create!(name: "Other Course")
+      other_discussion = other_course.discussion_topics.create!(title: "Other Discussion", message: "Hidden")
+      other_course.enroll_student(@observed_student, active_all: true)
+      other_discussion.discussion_topic_participants.create!(user: @observed_student)
+
+      result = observer_user_type.resolve(
+        "discussionParticipantsConnection(observedUserId: \"#{@observed_student.id}\") {
+          nodes {
+            discussionTopic { title }
+          }
+        }"
+      )
+
+      topic_titles = result.flatten.sort
+      expect(topic_titles).to eq(["Announcement 1", "Discussion 1", "Discussion 2"])
+      expect(topic_titles).not_to include("Other Discussion")
+    end
+  end
+
   context "course_work_submissions_connection" do
     before(:once) do
       @frozen_time = Time.zone.parse("2024-01-15 12:00:00")
@@ -2627,6 +2725,106 @@ describe Types::UserType do
         expect(result).not_to be_empty, "Should include submissions with NULL excused values"
         expect(result.first).to eq("Test Assignment")
       end
+    end
+  end
+
+  context "courseWorkSubmissionsConnection with observed user" do
+    before(:once) do
+      @course1 = Course.create!(name: "Course 1", workflow_state: "available")
+      @course2 = Course.create!(name: "Course 2", workflow_state: "available")
+
+      @assignment1 = @course1.assignments.create!(title: "Assignment 1", due_at: 1.day.from_now, workflow_state: "published")
+      @assignment2 = @course2.assignments.create!(title: "Assignment 2", due_at: 2.days.from_now, workflow_state: "published")
+
+      @observer = user_factory(name: "Observer")
+      @observed_student = user_factory(name: "Observed Student")
+
+      @course1.enroll_student(@observed_student, active_all: true)
+      @course2.enroll_student(@observed_student, active_all: true)
+      @course1.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @observed_student.id, active_all: true)
+      @course2.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @observed_student.id, active_all: true)
+
+      @submission1 = @assignment1.submissions.find_by(user: @observed_student)
+      @submission2 = @assignment2.submissions.find_by(user: @observed_student)
+    end
+
+    let(:observer_user_type) do
+      GraphQLTypeTester.new(
+        @observer,
+        current_user: @observer,
+        domain_root_account: @course1.account.root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+    end
+
+    it "returns course work for observed student" do
+      result = observer_user_type.resolve(
+        "courseWorkSubmissionsConnection(observedUserId: \"#{@observed_student.id}\") {
+          edges {
+            node {
+              assignment {
+                name
+              }
+            }
+          }
+        }"
+      )
+
+      expect(result.length).to eq(2)
+      assignment_names = result.sort
+      expect(assignment_names).to eq(["Assignment 1", "Assignment 2"])
+    end
+
+    it "returns empty result for invalid observed user id" do
+      result = observer_user_type.resolve(
+        "courseWorkSubmissionsConnection(observedUserId: \"999999\") {
+          edges {
+            node {
+              assignment { name }
+            }
+          }
+        }"
+      )
+
+      expect(result).to be_empty
+    end
+
+    it "filters by course when specified" do
+      result = observer_user_type.resolve(
+        "courseWorkSubmissionsConnection(observedUserId: \"#{@observed_student.id}\", courseFilter: \"#{@course1.id}\") {
+          edges {
+            node {
+              assignment {
+                name
+              }
+            }
+          }
+        }"
+      )
+
+      expect(result.length).to eq(1)
+      expect(result.first).to eq("Assignment 1")
+    end
+
+    it "only returns submissions from courses observer can access" do
+      # Create a course the observer can't see
+      other_course = Course.create!(name: "Other Course")
+      other_course.assignments.create!(title: "Other Assignment")
+      other_course.enroll_student(@observed_student, active_all: true)
+
+      result = observer_user_type.resolve(
+        "courseWorkSubmissionsConnection(observedUserId: \"#{@observed_student.id}\") {
+          edges {
+            node {
+              assignment { name }
+            }
+          }
+        }"
+      )
+
+      assignment_names = result.sort
+      expect(assignment_names).to eq(["Assignment 1", "Assignment 2"])
+      expect(assignment_names).not_to include("Other Assignment")
     end
   end
 end

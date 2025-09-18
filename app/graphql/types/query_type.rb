@@ -167,11 +167,20 @@ module Types
                "Course IDs to get instructors for",
                required: true,
                prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Course")
+      argument :observed_user_id, ID, "ID of the observed user", required: false
     end
-    def course_instructors_connection(course_ids:, **_args)
+    def course_instructors_connection(course_ids:, observed_user_id: nil, **_args)
       return Enrollment.none unless current_user
 
-      user_course_ids = current_user.enrollments.pluck(:course_id).uniq.map(&:to_s)
+      user_course_ids = if observed_user_id.present?
+                          observed_user = User.find_by(id: observed_user_id)
+                          return Enrollment.none unless observed_user
+
+                          current_user.cached_course_ids_for_observed_user(observed_user).map(&:to_s)
+                        else
+                          current_user.enrollments.pluck(:course_id).uniq.map(&:to_s)
+                        end
+
       course_ids = if course_ids.blank?
                      user_course_ids
                    else
