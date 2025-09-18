@@ -99,8 +99,9 @@ class Lti::IMS::Registration < ApplicationRecord
           text: client_name,
           icon_url: logo_uri,
           platform: "canvas.instructure.com",
-          placements:
-        }
+          placements:,
+          message_settings:
+        }.compact
       }]
     }.with_indifferent_access
   end
@@ -122,7 +123,8 @@ class Lti::IMS::Registration < ApplicationRecord
         logo_uri: source["logo_uri"],
         tool_id: config[TOOL_ID_EXTENSION],
         privacy_level: source[PRIVACY_LEVEL_EXTENSION],
-        placements: ims_lti_config_to_internal_placement_config(config)
+        placements: ims_lti_config_to_internal_placement_config(config),
+        message_settings: ims_lti_config_to_internal_message_settings(config)
       }.compact.with_indifferent_access
     else
       config = source.lti_tool_configuration
@@ -136,7 +138,8 @@ class Lti::IMS::Registration < ApplicationRecord
         logo_uri: source.logo_uri,
         tool_id: source.tool_id,
         privacy_level: source.privacy_level,
-        placements: source.placements
+        placements: source.placements,
+        message_settings: source.message_settings
       }.compact.with_indifferent_access
     end
   end
@@ -165,26 +168,43 @@ class Lti::IMS::Registration < ApplicationRecord
         icon_url: normalized[:logo_uri],
         text: normalized[:client_name],
         content_migration: normalized.dig(:config, CONTENT_MIGRATION_EXTENSION),
+        message_settings: normalized[:message_settings],
       }.compact
     }.compact.with_indifferent_access
   end
 
   def self.ims_lti_config_to_internal_placement_config(lti_tool_configuration)
     messages = lti_tool_configuration["messages"]
-    eula_message = messages.find { it["type"] == LtiAdvantage::Messages::EulaRequest::MESSAGE_TYPE }
 
     messages.map do |message|
       if Lti::ResourcePlacement::PLACEMENTLESS_MESSAGE_TYPES.include?(message["type"])
-        [] # EULA -- handled with eula_message variable
+        [] # Skip placementless messages like EULA - they're handled in message_settings
       elsif message["placements"].blank?
         # default to link_selection if no placements are specified
         [build_placement_for("link_selection", message)]
       else
         message["placements"].flat_map do |placement|
-          build_placement_for(placement, message, eula_message:)
+          build_placement_for(placement, message)
         end
       end
     end.flatten.uniq { |p| p[:placement] }
+  end
+
+  def self.ims_lti_config_to_internal_message_settings(lti_tool_configuration)
+    messages = lti_tool_configuration["messages"] || []
+
+    messages.filter_map do |message|
+      if Lti::ResourcePlacement::PLACEMENTLESS_MESSAGE_TYPES.include?(message["type"])
+        {
+          type: message["type"],
+          enabled: true,
+          target_link_uri: message["target_link_uri"],
+          custom_fields: message["custom_parameters"]
+        }.compact
+      else
+        nil
+      end
+    end.presence
   end
 
   # This method converts an IMS Registration into an "InternalLtiConfiguration",
@@ -213,7 +233,7 @@ class Lti::IMS::Registration < ApplicationRecord
   # Builds a placement object for a given message and placement type
   # returns a list with one item, or an empty list if the placement
   # type is not supported by Canvas
-  def self.build_placement_for(placement_type, message, eula_message: nil)
+  def self.build_placement_for(placement_type, message)
     placement_name = canvas_placement_name(placement_type)
 
     # Return no placement if the placement type is not supported by Canvas
@@ -234,7 +254,6 @@ class Lti::IMS::Registration < ApplicationRecord
         target_link_uri: message["target_link_uri"],
         visibility: placement_visibility(message),
         default: fetch_default_enabled_setting(message, placement_name),
-        eula: placement_eula(placement_name:, eula_message:),
         **placement_display_settings(message),
         **placement_width_and_height_settings(message, placement_name)
       }.compact
@@ -353,6 +372,10 @@ class Lti::IMS::Registration < ApplicationRecord
     }
   end
 
+  def message_settings
+    self.class.ims_lti_config_to_internal_message_settings(lti_tool_configuration)
+  end
+
   private
 
   def target_link_uri_is_uri
@@ -404,5 +427,53 @@ class Lti::IMS::Registration < ApplicationRecord
     else
       "anonymous"
     end
+  end
+
+  def canvas_placement_name(placement)
+    # IMS placement names that have different names in Canvas
+    return "link_selection" if placement == "ContentArea"
+    return "editor_button" if placement == "RichTextEditor"
+
+    # Otherwise, remove our URL prefix from the Canvas-specific placements
+    canvas_extension = CANVAS_EXTENSION_PREFIX + "/"
+    placement.start_with?(canvas_extension) ? placement.sub(canvas_extension, "") : placement
+  end
+
+  # placement_* Methods used to construct placement in build_placement_for:
+
+  def placement_display_settings(message)
+    display_type = message[DISPLAY_TYPE_EXTENSION]
+    if display_type == "new_window"
+      { display_type: "default", windowTarget: "_blank" }
+    else
+      { display_type: }
+    end
+  end
+
+  def placement_visibility(message)
+    availability = message[PLACEMENT_VISIBILITY_EXTENSION]
+    if availability
+      PLACEMENT_VISIBILITY_OPTIONS.include?(availability) ? availability : nil
+    else
+      nil
+    end
+  end
+
+  def placement_width_and_height_settings(message, placement)
+    keys = ["selection_width", "selection_height"]
+    # placements that use launch_width and launch_height
+    # instead of selection_width and selection_height
+    uses_launch_width = ["assignment_edit", "post_grades"]
+    keys = ["launch_width", "launch_height"] if uses_launch_width.include?(placement)
+
+    values = [
+      message[LAUNCH_WIDTH_EXTENSION]&.to_i,
+      message[LAUNCH_HEIGHT_EXTENSION]&.to_i,
+    ]
+
+    {
+      keys[0].to_sym => values[0],
+      keys[1].to_sym => values[1],
+    }
   end
 end

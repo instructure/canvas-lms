@@ -72,13 +72,34 @@ describe Lti::Messages::EulaRequest do
 
   it "includes custom params claim" do
     tool.custom_fields = { "field1" => "$Canvas.user.id", "field2" => "$Canvas.user.id" }
-    tool.settings["ActivityAssetProcessor"] = {
-      "eula" => { "custom_fields" => { "field1" => "$Canvas.user.id" } }
-    }
+    tool.settings["message_settings"] = [
+      {
+        type: "LtiEulaRequest",
+        enabled: true,
+        custom_fields: { "field1" => "$Canvas.user.id" }
+      }
+    ]
     tool.save!
     expect(subject["#{IMS_CLAIM_PREFIX}/custom"]).to eq({
                                                           "field1" => user.id.to_s,
                                                           "field2" => user.id.to_s,
+                                                        })
+  end
+
+  it "merges global custom fields with EULA-specific custom fields" do
+    tool.custom_fields = { "global_field" => "$Canvas.user.id", "shared_field" => "global_value" }
+    tool.settings["message_settings"] = [
+      {
+        type: "LtiEulaRequest",
+        enabled: true,
+        custom_fields: { "eula_field" => "$Canvas.course.id", "shared_field" => "eula_override" }
+      }
+    ]
+    tool.save!
+    expect(subject["#{IMS_CLAIM_PREFIX}/custom"]).to eq({
+                                                          "global_field" => user.id.to_s,
+                                                          "shared_field" => "eula_override",
+                                                          "eula_field" => context.id.to_s,
                                                         })
   end
 end

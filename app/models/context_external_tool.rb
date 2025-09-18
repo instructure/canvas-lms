@@ -121,7 +121,6 @@ class ContextExternalTool < ActiveRecord::Base
   CUSTOM_EXTENSION_KEYS = {
     file_menu: [:accept_media_types].freeze,
     editor_button: [:use_tray].freeze,
-    ActivityAssetProcessor: [:eula].freeze,
     submission_type_selection: [:description, :require_resource_selection].freeze,
   }.freeze
 
@@ -1400,8 +1399,29 @@ class ContextExternalTool < ActiveRecord::Base
     ).delete_suffix("/deployment")
   end
 
+  def message_settings
+    settings[:message_settings]
+  end
+
+  def message_settings=(value)
+    if value.is_a?(Array)
+      value = value.map(&:with_indifferent_access)
+      value.each do |setting|
+        setting["enabled"] = Canvas::Plugin.value_to_boolean(setting["enabled"]) if setting.is_a?(Hash) && setting.key?("enabled")
+      end
+    elsif value.present?
+      raise ArgumentError, "message_settings must be an Array if present"
+    end
+    settings[:message_settings] = value
+  end
+
+  def message_settings_for(message_type)
+    ms = (message_settings || []).select { |ms| ms["type"] == message_type.to_s }
+    ms.is_a?(Array) ? ms.map(&:with_indifferent_access) : ms
+  end
+
   def eula_settings
-    extension_setting(:ActivityAssetProcessor, :eula)
+    message_settings_for(LtiAdvantage::Messages::EulaRequest::MESSAGE_TYPE).first || {}
   end
 
   def eula_enabled?

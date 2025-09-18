@@ -29,7 +29,7 @@ module Api::V1::ExternalTools
   end
 
   def external_tool_json(tool, context, user, session, extension_types = Lti::ResourcePlacement.valid_placements(@domain_root_account))
-    methods = %w[privacy_level custom_fields workflow_state]
+    methods = %w[privacy_level custom_fields workflow_state message_settings]
     methods += extension_types
     only = %w[id name description url domain consumer_key created_at updated_at description]
     only << "allow_membership_service_access" if tool.context.root_account.feature_enabled?(:membership_service_for_lti_tools)
