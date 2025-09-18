@@ -5529,6 +5529,7 @@ ko:
     roles: 
       designer: 디자이너
       designer_with_indefinite_article: 디자이너
+      instructors: 교사
       observer: 감독자
       observer_with_indefinite_article: 감독자
       student: 학생
@@ -12330,10 +12331,14 @@ ko:
     update_failed_notice: "역할 만들기 실패"
   roles: 
     based_on_type: "%{base_type}을 바탕으로 함"
+    designer: "과목 디자이너"
+    designers: 디자이너
     new_role: 
       cancel: 취소
       save: 저장
       saving: "저장 중..."
+    observer: 감독자
+    observers: 감독자
     permission_button: 
       rolebutton: 
         disable: "사용 안 함"
@@ -12346,6 +12351,12 @@ ko:
       remove_role_confirmation: "이 역할을 가진 사용자가 있다면 현재 사용 권한을 유지하지만 이 역할로 새 사용자를 추가할 수 없습니다. 이 역할을 삭제하려면 확인을 클릭하십시오."
     roles_override_index: 
       page_header_title: "계정 권한"
+    student: 학생
+    students: 학생
+    ta: 조교
+    tas: 조교
+    teacher: 교사
+    teachers: 교사
   rootFoldersFinder: 
     course_files: "과목 파일"
     group_files: "그룹 파일"
