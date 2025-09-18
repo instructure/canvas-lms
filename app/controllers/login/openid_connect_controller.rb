@@ -21,7 +21,7 @@
 class Login::OpenidConnectController < Login::OAuth2Controller
   OIDC_BACKCHANNEL_LOGOUT_EVENT_URN = "http://schemas.openid.net/event/backchannel-logout"
 
-  protect_from_forgery except: :new, with: :exception
+  protect_from_forgery except: %i[new destroy], with: :exception
 
   def new
     Login::Shared.set_return_to_from_provider(request, session, nil, @domain_root_account, params[:target_link_uri])
