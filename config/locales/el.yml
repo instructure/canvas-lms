@@ -13306,6 +13306,8 @@ el:
   role_successfully_updated_4317e6a4: "Ο ρόλος ενημερώθηκε επιτυχώς"
   roles: 
     based_on_type: "Με βάση %{base_type}"
+    designer: "Εγγεγραμμένος ως σχεδιαστής"
+    designers: Σχεδιαστές
     edit_role: 
       role_name_label: "Όνομα Ρόλου"
     new_role: 
@@ -13314,6 +13316,7 @@ el:
       role_type: "Τύπος Βάσης:"
       save: Αποθήκευση
       saving: Αποθήκευση...
+    observers: Παρατηρητές
     permission_button: 
       rolebutton: 
         disable: Απενεργοποίηση
@@ -13330,6 +13333,9 @@ el:
       account_roles: "Ρόλοι Λογαριασμού"
       course_roles: "Ρόλοι Μαθήματος"
       page_header_title: "Άδειες Λογαριασμού"
+    student: "Μαθητής "
+    students: Μαθητές
+    tas: "Βοηθοί διδασκαλίας"
   roles_730b879e: Ρόλοι
   rootFoldersFinder: 
     course_files: "Αρχεία μαθήματος"
