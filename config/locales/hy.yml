@@ -6576,6 +6576,7 @@ hy:
     roles: 
       designer: Դիզայներ
       designer_with_indefinite_article: Դիզայներ
+      instructors: Դասավանդողներ
       observer: Դիտորդ
       observer_with_indefinite_article: Դիտորդ
       student: Ունկնդիր
@@ -14845,6 +14846,8 @@ hy:
   role_successfully_updated_4317e6a4: "Դերը հաջողությամբ թարմացվել է"
   roles: 
     based_on_type: "Հիմնված է %{base_type} վրա"
+    designer: Դիզայներ
+    designers: Դիզայներներ
     edit_role: 
       role_name_label: "Դերի անունը"
     new_role: 
@@ -14853,6 +14856,8 @@ hy:
       role_type: "Բազային տեսակ"
       save: Պահպանել
       saving: "Պահպանվում է..."
+    observer: Դիտորդ
+    observers: Դիտորդներ
     permission_button: 
       rolebutton: 
         disable: Անջատել
@@ -14870,6 +14875,12 @@ hy:
       account_roles: "Հաշվի դերերը"
       course_roles: "Դասընթացի դերեր"
       page_header_title: "Հաշվի թույլտվություններ"
+    student: Ունկնդիր
+    students: Ունկնդիրներ
+    ta: Ասիստենտ
+    tas: Ասիստենտներ
+    teacher: Դասավանդող
+    teachers: Դասավանդողներ
   rootFoldersFinder: 
     course_files: "Դասընթացի ֆայլեր"
     group_files: "Խմբի ֆայլեր"
