@@ -15,14 +15,14 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
-module Factories
-  def lti_registration_history_entry_model(**params)
-    params[:lti_registration] ||= lti_registration_with_tool
-    params[:root_account] ||= params[:lti_registration].root_account
-    params[:update_type] ||= "manual_edit"
-    params[:created_by] ||= user_model
 
-    Lti::RegistrationHistoryEntry.create!(**params)
+class RemoveNotNullConstraintFromCreatedByIdOnLtiRegistrationHistoryEntries < ActiveRecord::Migration[7.2]
+  tag :predeploy
+
+  def change
+    # It's possible for a Lti::RegistrationHistoryEntry to be created without a created_by user,
+    # (mainly when a default tool is installed by the system)
+    # so we need to make the column nullable.
+    change_column_null :lti_registration_history_entries, :created_by_id, true
   end
 end

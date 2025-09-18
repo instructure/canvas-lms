@@ -246,6 +246,7 @@ module Lti
     #   If that is not present, this request will fail.
     # @argument available [boolean] The state of this tool in this context. `true` shows the tool in this context and all contexts
     #   below it. `false` disables the tool for this context and all contexts below it. Defaults to true.
+    # @argument comment [Optional, String] A comment to add the to the change-log entry explaining why the changes were made.
     #
     # @returns Lti::ContextControl
     #
@@ -275,7 +276,7 @@ module Lti
         return render_errors("A context control for this deployment and context already exists.")
       end
 
-      control = Lti::ContextControlService.create_or_update(control_params)
+      control = Lti::ContextControlService.create_or_update(control_params, comment: params[:comment])
 
       render json: lti_context_control_json(control, @current_user, session, @account, include_users: true), status: :created
     rescue Lti::ContextControlErrors => e
@@ -291,6 +292,7 @@ module Lti
     # Control parameters are sent as a JSON array of objects, each with the same parameters as the Create LTI Context Control endpoint.
     # Note that if a control already exists for the specified context and deployment, it will be updated instead of created.
     #
+    # @argument comment [Optional, String] A comment to add the to the change-log entry explaining why the changes were made.
     # @argument []account_id [integer] The Canvas ID of the Account that owns this. One of account_id or course_id must be present. Can also be a string.
     # @argument []course_id [integer] The Canvas ID of the Course that owns this. One of account_id or course_id must be present. Can also be a string.
     # @argument []deployment_id [integer] The Canvas ID of the ContextExternalTool that owns this, representing an LTI deployment.
@@ -403,10 +405,17 @@ module Lti
       controls += anchor_controls
 
       ids = Lti::ContextControl.transaction do
-        # Postgres's ON CONFLICT <conflict_target> can only handle a single unique index at a time, hence the split
-        # upsert needed here to restore any previously deleted controls
-        control_ids = Lti::ContextControl.upsert_all(controls.filter { |c| c[:course_id].present? }, unique_by: [:course_id, :deployment_id], returning: :id).rows.flatten
-        control_ids + Lti::ContextControl.upsert_all(controls.filter { |c| c[:account_id].present? }, unique_by: [:account_id, :deployment_id], returning: :id).rows.flatten
+        Lti::RegistrationHistoryEntry
+          .track_bulk_control_changes(control_params: controls,
+                                      lti_registration: registration,
+                                      root_account: @account,
+                                      current_user: @current_user,
+                                      comment: params[:comment]) do
+          # Postgres's ON CONFLICT <conflict_target> can only handle a single unique index at a time, hence the split
+          # upsert needed here to restore any previously deleted controls
+          control_ids = Lti::ContextControl.upsert_all(controls.filter { |c| c[:course_id].present? }, unique_by: [:course_id, :deployment_id], returning: :id).rows.flatten
+          control_ids + Lti::ContextControl.upsert_all(controls.filter { |c| c[:account_id].present? }, unique_by: [:account_id, :deployment_id], returning: :id).rows.flatten
+        end
       end
 
       controls = Lti::ContextControl.where(id: ids).preload(:account, :course, :created_by, :updated_by).order(id: :asc)
@@ -430,6 +439,7 @@ module Lti
     # Returns the context control with its new availability value applied.
     #
     # @argument available [Required, boolean] the new value for this control's availability
+    # @argument comment [Optional, String] A comment to add the to the change-log entry explaining why the changes were made.
     # @returns Lti::ContextControl
     #
     # @example_request
@@ -440,7 +450,10 @@ module Lti
     #        -H "Authorization: Bearer <token>"
     def update
       available = value_to_boolean(params.require(:available))
-      control.update!(available:)
+      Lti::RegistrationHistoryEntry
+        .track_control_changes(control:, current_user: @current_user, comment: params[:comment]) do
+        control.update!(available:)
+      end
 
       render json: lti_context_control_json(control, @current_user, session, @account, include_users: true)
     rescue => e
@@ -464,10 +477,13 @@ module Lti
     #        -X DELETE \
     #        -H "Authorization: Bearer <token>"
     def delete
-      if control.destroy
-        render json: lti_context_control_json(control, @current_user, session, @account, include_users: true)
-      else
-        render_errors(control.errors.full_messages, status: :unprocessable_entity)
+      Lti::RegistrationHistoryEntry
+        .track_control_changes(control:, current_user: @current_user, comment: params[:comment]) do
+        if control.destroy
+          render json: lti_context_control_json(control, @current_user, session, @account, include_users: true)
+        else
+          render_errors(control.errors.full_messages, status: :unprocessable_entity)
+        end
       end
     rescue => e
       report_error(e)

@@ -39,7 +39,7 @@ module Lti
     # ```
     #
     # @return Lti::ContextControl the created or updated Lti::ContextControl.
-    def self.create_or_update(control_params)
+    def self.create_or_update(control_params, comment: nil)
       unique_checks = control_params.slice(*unique_check_attrs)
 
       control = Lti::ContextControl.find_or_initialize_by(unique_checks)
@@ -55,9 +55,27 @@ module Lti
         control_params[:course_id]
       )
 
+      control_params = [control, anchor_control].compact.map do |c|
+        {
+          deployment_id: c.deployment_id,
+          account_id: c.account_id,
+          course_id: c.course_id,
+          available: c.available
+        }
+      end
+
       Lti::ContextControl.transaction do
-        control.save!
-        anchor_control&.save!
+        Lti::RegistrationHistoryEntry
+          .track_bulk_control_changes(control_params:,
+                                      lti_registration: control.registration,
+                                      # We have to do this because the control might not be persisted yet,
+                                      # so the root account might not be set yet.
+                                      root_account: control.account&.root_account || control.course&.root_account,
+                                      current_user: control.updated_by,
+                                      comment:) do
+          control.save!
+          anchor_control&.save!
+        end
       end
 
       control

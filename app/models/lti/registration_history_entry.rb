@@ -19,25 +19,24 @@
 require "hashdiff"
 
 class Lti::RegistrationHistoryEntry < ApplicationRecord
-  extend RootAccountResolver
-
-  VALID_UPDATE_TYPES = %w[manual_edit registration_update].freeze
+  VALID_UPDATE_TYPES = %w[manual_edit registration_update bulk_control_create control_edit].freeze
 
   # Account will always be on the same shard as the entry, but not necessarily
   # the registration (think Site Admin registrations)
   belongs_to :root_account, class_name: "Account", inverse_of: :lti_registration_history_entries
   # The registration can be cross-shard
   belongs_to :lti_registration, class_name: "Lti::Registration", inverse_of: :lti_registration_history_entries
-  belongs_to :created_by, class_name: "User", inverse_of: :lti_registration_history_entries
+  # It is possible for created_by to be nil, such as when a change is made
+  # by Instructure or at the system level (think default tool installs) or if this was
+  # backfilled from Lti::OverlayVersion's and we didn't have a created_by then
+  belongs_to :created_by, class_name: "User", inverse_of: :lti_registration_history_entries, optional: true
 
   # @see Lti::RegistrationHistoryEntry.track_changes
-  validates :lti_registration, :created_by, :diff, presence: true
+  validates :lti_registration, :diff, :root_account, presence: true
 
   validates :update_type, presence: true, inclusion: { in: VALID_UPDATE_TYPES }
 
   validates :comment, if: -> { comment.present? }, length: { maximum: 2000 }
-
-  resolves_root_account through: :lti_registration
 
   class << self
     # Track all changes made to an Lti::Registration and its associated models to create
@@ -112,6 +111,7 @@ class Lti::RegistrationHistoryEntry < ApplicationRecord
         Lti::RegistrationHistoryEntry.create!(
           lti_registration:,
           created_by: current_user,
+          root_account: context.root_account,
           comment:,
           update_type:,
           diff:
@@ -119,6 +119,155 @@ class Lti::RegistrationHistoryEntry < ApplicationRecord
       end
 
       result
+    end
+
+    # Track all changes made to an Lti::ContextControl. This can and should be used whenever any changes are being
+    # made to a singular Lti::ContextControl.
+    #
+    # @param [Lti::ContextControl] control The control to track
+    # @param [User] current_user The user making any changes
+    # @param [String | nil] comment A possible comment to add to the entry, such as why the change was made
+    # @param [String | nil] update_type The type of update being made.
+    # Must be one of Lti::RegistrationHistoryEntry::VALID_UPDATE_TYPES
+    # @param [Proc] block
+    # @returns The value returned by the block
+    def track_control_changes(control:, current_user:, comment: nil, update_type: "control_edit", &)
+      raise ArgumentError, "control is required" if control.blank?
+      raise ArgumentError, "current_user is required" if current_user.blank?
+
+      old_control_values = control.attributes.with_indifferent_access.slice(*Lti::ContextControl::TRACKED_ATTRIBUTES)
+      result = yield
+      new_control_values = control.reload.attributes.with_indifferent_access.slice(*Lti::ContextControl::TRACKED_ATTRIBUTES)
+
+      diff = {}
+      # Purposefully mimic the format of the bulk control changes diff
+      diff[:context_controls] = Hashdiff.diff({ control.id => old_control_values },
+                                              { control.id => new_control_values },
+                                              array_path: true,
+                                              preserve_key_order: true)
+
+      if diff.present?
+        Lti::RegistrationHistoryEntry.create!(
+          lti_registration: control.registration,
+          created_by: current_user,
+          root_account: control.root_account,
+          comment:,
+          update_type:,
+          diff:
+        )
+      end
+
+      result
+    end
+
+    # Track all changes made to an Lti::ContextControl and its associated models to create
+    # an accurate change-log entry. This can and should be used whenever any changes are being
+    # made to one or many Lti::ContextControls. Note that this does not support tracking changes
+    # to controls that are associated with multiple registrations.
+    #
+    # @param [Array<Hash>] control_params The controls to track. Each hash must contain the following keys:
+    #   - :deployment_id
+    #   - :account_id
+    #   - :course_id
+    # @see Lti::ContextControlsController#create_many for more information on the expected format of the control_params
+    # @param [Lti::Registration] lti_registration The registration these controls are associated with.
+    # @param [Account] root_account The root account for the change. Might differ from the registration's account due to Site Admin registrations.
+    # @param [User] current_user The user making any changes. Can be nil if the changes are being made by the system,
+    # but should be provided whenever possible, to ensure an accurate change-log entry.
+    # @param [String | nil] comment A possible comment to add to the entry, such as why the change was made
+    # @param [String | nil] update_type The type of update being made.
+    # Must be one of Lti::RegistrationHistoryEntry::VALID_UPDATE_TYPES
+    def track_bulk_control_changes(control_params:, lti_registration:, root_account:, current_user:, comment: nil, update_type: "bulk_control_create", &)
+      raise ArgumentError, "lti_registration is required" if lti_registration.blank?
+      raise ArgumentError, "root_account is required" if root_account.blank?
+      raise ArgumentError, "control_params is required" if control_params.blank?
+
+      params = control_params.map(&:with_indifferent_access)
+
+      account_pairs = params.select { |p| p[:account_id].present? }
+                            .map { |p| [p[:account_id], p[:deployment_id]] }
+
+      course_pairs = params.select { |p| p[:course_id].present? }
+                           .map { |p| [p[:course_id], p[:deployment_id]] }
+
+      union_query = build_context_controls_union_query(account_pairs, course_pairs)
+
+      old_controls = union_query.pluck(*Lti::ContextControl::TRACKED_ATTRIBUTES)
+                                .map { |values| Lti::ContextControl::TRACKED_ATTRIBUTES.zip(values).to_h }
+
+      result = yield
+
+      new_controls = Lti::RegistrationHistoryEntry.uncached do
+        union_query.pluck(*Lti::ContextControl::TRACKED_ATTRIBUTES)
+                   .map { |values| Lti::ContextControl::TRACKED_ATTRIBUTES.zip(values).to_h }
+      end
+
+      diff = {}
+      diff[:context_controls] = Hashdiff.diff(old_controls.index_by { |c| c[:id] },
+                                              new_controls.index_by { |c| c[:id] },
+                                              array_path: true,
+                                              preserve_key_order: true)
+
+      if diff.present?
+        Lti::RegistrationHistoryEntry.create!(
+          lti_registration:,
+          root_account:,
+          created_by: current_user,
+          comment:,
+          update_type:,
+          diff:
+        )
+      end
+
+      result
+    end
+
+    private
+
+    # Builds a single UNION ALL query to fetch context controls matching either account or course pairs
+    # @param account_pairs [Array<Array>] Array of [account_id, deployment_id] pairs
+    # @param course_pairs [Array<Array>] Array of [course_id, deployment_id] pairs
+    # @return [ActiveRecord::Relation] Query to fetch matching controls, or empty relation if no pairs provided
+    def build_context_controls_union_query(account_pairs, course_pairs)
+      return Lti::ContextControl.none if account_pairs.empty? && course_pairs.empty?
+
+      queries = []
+
+      if account_pairs.any?
+        account_values_clause = account_pairs.map { |account_id, deployment_id| "(#{account_id.to_i}, #{deployment_id.to_i})" }.join(", ")
+        account_join = Lti::ContextControl.sanitize_sql(
+          <<~SQL.squish
+            INNER JOIN (VALUES #{account_values_clause}) AS account_pairs(account_id, deployment_id)
+            ON #{Lti::ContextControl.quoted_table_name}.account_id = account_pairs.account_id::integer
+            AND #{Lti::ContextControl.quoted_table_name}.deployment_id = account_pairs.deployment_id::integer
+          SQL
+        )
+        queries << Lti::ContextControl.joins(account_join)
+      end
+
+      if course_pairs.any?
+        course_values_clause = course_pairs.map { |course_id, deployment_id| "(#{course_id.to_i}, #{deployment_id.to_i})" }.join(", ")
+        course_join = Lti::ContextControl.sanitize_sql(
+          <<~SQL.squish
+            INNER JOIN (VALUES #{course_values_clause}) AS course_pairs(course_id, deployment_id)
+            ON #{Lti::ContextControl.quoted_table_name}.course_id = course_pairs.course_id::integer
+            AND #{Lti::ContextControl.quoted_table_name}.deployment_id = course_pairs.deployment_id::integer
+          SQL
+        )
+        queries << Lti::ContextControl.joins(course_join)
+      end
+
+      case queries.size
+      when 1
+        queries.first
+      when 2
+        # UNION ALL here is faster than running each query in sequence
+        # and avoids Postgres needing to do sorting and deduplication
+        union_sql = "(#{queries[0].to_sql}) UNION ALL (#{queries[1].to_sql})"
+        Lti::ContextControl.from("(#{union_sql}) AS lti_context_controls")
+      else
+        Lti::ContextControl.none
+      end
     end
   end
 end

@@ -69,12 +69,15 @@ module Importers
 
         registration_id = matching_tool.lti_registration.id || matching_tool.developer_key.lti_registration.id
 
-        Lti::ContextControlService.create_or_update(course_id: context.id,
-                                                    deployment_id: matching_tool.id,
-                                                    registration_id:,
-                                                    workflow_state: "active",
-                                                    available: hash["available"],
-                                                    updated_by: migration.user)
+        Lti::ContextControlService.create_or_update({
+                                                      course_id: context.id,
+                                                      deployment_id: matching_tool.id,
+                                                      registration_id:,
+                                                      workflow_state: "active",
+                                                      available: hash["available"],
+                                                      updated_by: migration.user,
+                                                    },
+                                                    comment: "Imported from migration")
       end
 
       def import_control?(control, migration)
