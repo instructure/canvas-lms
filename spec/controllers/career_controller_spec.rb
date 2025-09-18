@@ -71,7 +71,8 @@ describe CareerController do
             horizon_hris_integrations: false,
             horizon_user_profile_page: false,
             horizon_bulk_metadata_import: false,
-            horizon_manual_dashboard_builder: false
+            horizon_manual_dashboard_builder: false,
+            horizon_dark_career_theme_in_learning_provider: false
           )
         end
 
