@@ -2459,7 +2459,12 @@ type Course implements AssetString & AssignmentsConnectionInterface & Discussion
   """
   Returns submission-related statistics for the current user
   """
-  submissionStatistics: SubmissionStatistics
+  submissionStatistics(
+    """
+    Optional observed user ID for observer statistics
+    """
+    observedUserId: ID
+  ): SubmissionStatistics
 
   """
   all the submissions for assignments in this course

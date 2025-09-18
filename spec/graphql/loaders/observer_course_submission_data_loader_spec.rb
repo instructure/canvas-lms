@@ -131,4 +131,14 @@ RSpec.describe Loaders::ObserverCourseSubmissionDataLoader do
     expect(assignment_ids).not_to include(unpublished_assignment.id)
     expect(assignment_ids).to include(@assignment1.id, @assignment2.id)
   end
+
+  it "does not return deleted submissions" do
+    @submission1_student1.update(workflow_state: "deleted")
+
+    submissions = with_batch_loader(@observer) { |loader| loader.load(@course) }
+
+    submission_ids = submissions.map(&:id)
+    expect(submission_ids).not_to include(@submission1_student1.id)
+    expect(submission_ids).to include(@submission2_student1.id)
+  end
 end
