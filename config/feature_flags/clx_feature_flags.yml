@@ -60,6 +60,13 @@ horizon_manual_dashboard_builder:
   display_name: "Canvas Career: Manual Dashboard Builder"
   description: |-
     Enables manual dashboard builder in Canvas Career.
+horizon_dark_career_theme_in_learning_provider:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Dark theme in Learning Provider"
+  description: |-
+    Enables dark theme in Learning Provider.
 
 # Feature flags read by Canvas
 horizon_bulk_api_permission:
