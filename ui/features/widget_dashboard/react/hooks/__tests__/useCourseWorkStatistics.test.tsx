@@ -23,6 +23,7 @@ import {waitFor} from '@testing-library/react'
 import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
 import {useCourseWorkStatistics} from '../useCourseWorkStatistics'
+import {WidgetDashboardProvider} from '../useWidgetDashboardContext'
 
 const mockStatisticsData = {
   submissionsDueCount: 5,
@@ -56,7 +57,7 @@ const buildDefaultProps = (overrides = {}) => ({
   ...overrides,
 })
 
-const setup = (props = {}, envOverrides = {}) => {
+const setup = (props = {}, envOverrides = {}, dashboardProps = {}) => {
   // Set up Canvas ENV with current_user_id
   const originalEnv = window.ENV
   window.ENV = {
@@ -77,7 +78,9 @@ const setup = (props = {}, envOverrides = {}) => {
   const hookParams = buildDefaultProps(props)
   const result = renderHook(() => useCourseWorkStatistics(hookParams), {
     wrapper: ({children}: {children: React.ReactNode}) => (
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        <WidgetDashboardProvider {...dashboardProps}>{children}</WidgetDashboardProvider>
+      </QueryClientProvider>
     ),
   })
 
@@ -328,5 +331,151 @@ describe('useCourseWorkStatistics', () => {
     expect(result.current.error).toBeNull()
 
     cleanup()
+  })
+
+  describe('enrollment deduplication', () => {
+    it('should deduplicate multiple enrollments for same course', async () => {
+      const duplicateEnrollmentResponse = {
+        data: {
+          legacyNode: {
+            _id: '123',
+            enrollments: [
+              {
+                course: {
+                  _id: '123',
+                  name: 'Test Course',
+                  submissionStatistics: mockStatisticsData,
+                },
+              },
+              {
+                course: {
+                  _id: '123', // Same course ID
+                  name: 'Test Course',
+                  submissionStatistics: mockStatisticsData,
+                },
+              },
+            ],
+          },
+        },
+      }
+
+      server.use(
+        graphql.query('GetUserCourseStatistics', () => {
+          return HttpResponse.json(duplicateEnrollmentResponse)
+        }),
+      )
+
+      const {result, cleanup} = setup()
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false)
+        expect(result.current.data).toEqual({
+          due: mockStatisticsData.submissionsDueCount,
+          missing: mockStatisticsData.missingSubmissionsCount,
+          submitted: mockStatisticsData.submissionsSubmittedCount,
+        })
+      })
+
+      cleanup()
+    })
+
+    it('should aggregate statistics from different courses correctly', async () => {
+      const multiCourseResponse = {
+        data: {
+          legacyNode: {
+            _id: '123',
+            enrollments: [
+              {
+                course: {
+                  _id: '123',
+                  name: 'Course 1',
+                  submissionStatistics: {
+                    submissionsDueCount: 3,
+                    missingSubmissionsCount: 1,
+                    submissionsSubmittedCount: 2,
+                  },
+                },
+              },
+              {
+                course: {
+                  _id: '456',
+                  name: 'Course 2',
+                  submissionStatistics: {
+                    submissionsDueCount: 2,
+                    missingSubmissionsCount: 1,
+                    submissionsSubmittedCount: 3,
+                  },
+                },
+              },
+            ],
+          },
+        },
+      }
+
+      server.use(
+        graphql.query('GetUserCourseStatistics', () => {
+          return HttpResponse.json(multiCourseResponse)
+        }),
+      )
+
+      const {result, cleanup} = setup({courseId: undefined}) // Test all courses
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false)
+        expect(result.current.data).toEqual({
+          due: 5, // 3 + 2
+          missing: 2, // 1 + 1
+          submitted: 5, // 2 + 3
+        })
+      })
+
+      cleanup()
+    })
+
+    it('should handle null submissionStatistics gracefully', async () => {
+      const nullStatsResponse = {
+        data: {
+          legacyNode: {
+            _id: '123',
+            enrollments: [
+              {
+                course: {
+                  _id: '123',
+                  name: 'Course 1',
+                  submissionStatistics: null,
+                },
+              },
+              {
+                course: {
+                  _id: '456',
+                  name: 'Course 2',
+                  submissionStatistics: mockStatisticsData,
+                },
+              },
+            ],
+          },
+        },
+      }
+
+      server.use(
+        graphql.query('GetUserCourseStatistics', () => {
+          return HttpResponse.json(nullStatsResponse)
+        }),
+      )
+
+      const {result, cleanup} = setup({courseId: undefined})
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false)
+        // Should only count statistics from Course 2
+        expect(result.current.data).toEqual({
+          due: mockStatisticsData.submissionsDueCount,
+          missing: mockStatisticsData.missingSubmissionsCount,
+          submitted: mockStatisticsData.submissionsSubmittedCount,
+        })
+      })
+
+      cleanup()
+    })
   })
 })

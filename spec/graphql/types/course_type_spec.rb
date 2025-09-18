@@ -2647,4 +2647,64 @@ describe Types::CourseType do
       end
     end
   end
+
+  describe "submission_statistics with observed_user_id" do
+    before do
+      course_with_teacher(active_all: true)
+
+      @observer = user_factory(name: "Observer")
+      @observed_student = user_factory(name: "Observed Student")
+
+      @course.enroll_student(@observed_student, active_all: true)
+      @course.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @observed_student.id, active_all: true)
+
+      @assignment = @course.assignments.create!(
+        title: "Test Assignment",
+        points_possible: 10,
+        workflow_state: "published",
+        submission_types: "online_text_entry",
+        due_at: 1.day.from_now
+      )
+
+      # Create unsubmitted submission for observed student
+      @observed_submission = @assignment.submissions.find_by(user: @observed_student)
+      @observed_submission.update!(cached_due_date: 1.day.from_now)
+    end
+
+    context "as observer with observed_user_id" do
+      let(:observer_type) { GraphQLTypeTester.new(@course, current_user: @observer) }
+
+      it "returns statistics for the specified observed user" do
+        due_count = observer_type.resolve(<<~GQL)
+          submissionStatistics(observedUserId: "#{@observed_student.id}") {
+            submissionsDueCount(startDate: "#{1.week.ago.iso8601}", endDate: "#{1.week.from_now.iso8601}")
+          }
+        GQL
+
+        submitted_count = observer_type.resolve(<<~GQL)
+          submissionStatistics(observedUserId: "#{@observed_student.id}") {
+            submissionsSubmittedCount
+          }
+        GQL
+
+        expect(due_count).to eq(1)
+        expect(submitted_count).to eq(0)
+      end
+
+      it "returns nil when observed_user_id is provided but user is not an observer in this course" do
+        # Enroll observer as student in another course
+        other_course = course_factory
+        other_course.enroll_student(@observer, enrollment_state: "active")
+        other_course_type = GraphQLTypeTester.new(other_course, current_user: @observer)
+
+        result = other_course_type.resolve(<<~GQL)
+          submissionStatistics(observedUserId: "#{@observed_student.id}") {
+            submissionsDueCount(startDate: "#{1.week.ago.iso8601}", endDate: "#{1.week.from_now.iso8601}")
+          }
+        GQL
+
+        expect(result).to be_nil
+      end
+    end
+  end
 end
