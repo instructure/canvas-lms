@@ -22,6 +22,4 @@
   preload_modules_content(modules_to_show)
 %>
 
-<% modules_to_show.each do |m| %>
-  <%= render :partial => 'context_modules/context_module_next', :object => m, :as => :context_module %>
-<% end %>
+<%= render partial: 'context_modules/context_module_next', collection: modules_to_show, as: :context_module %>
