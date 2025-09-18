@@ -20,21 +20,40 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {FormMessage} from '@instructure/ui-form-field'
 import {View} from '@instructure/ui-view'
-import {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('assignment_scheduled_release_policy')
 
-export const SharedScheduledRelease = () => {
-  const [value, setValue] = useState<string>()
-  const [messages, setMessages] = useState<FormMessage[]>([])
+type SharedScheduledReleaseProps = {
+  errorMessages: FormMessage[]
+  postGradesAt?: string | null
+  handleChange: (value?: string) => void
+  handleErrorMessages: (messages: FormMessage[]) => void
+}
 
+export const SharedScheduledRelease = ({
+  errorMessages,
+  postGradesAt,
+  handleChange,
+  handleErrorMessages,
+}: SharedScheduledReleaseProps) => {
   const onChange = (_e: React.SyntheticEvent, isoDate?: string) => {
-    setValue(isoDate)
+    const messages: FormMessage[] = []
+
+    if (!isoDate) {
+      messages.push({text: I18n.t('Please enter a valid date'), type: 'error'})
+    }
+
+    if (isoDate && new Date(isoDate) < new Date()) {
+      messages.push({text: I18n.t('Date must be in the future'), type: 'error'})
+    }
+
+    handleErrorMessages(messages)
+    handleChange(isoDate)
   }
 
   return (
-    <View as="div" margin="medium medium 0">
+    <View as="div" margin="medium medium 0" data-testid="shared-scheduled-post-datetime">
       <DateTimeInput
         description={<ScreenReaderContent>{I18n.t('Pick a date and time')}</ScreenReaderContent>}
         datePlaceholder={I18n.t('Choose release date')}
@@ -44,9 +63,9 @@ export const SharedScheduledRelease = () => {
         nextMonthLabel={I18n.t('Next month')}
         onChange={onChange}
         layout="stacked"
-        value={value}
+        value={postGradesAt ?? undefined}
         invalidDateTimeMessage={I18n.t('Invalid date!')}
-        messages={messages}
+        messages={errorMessages}
         allowNonStepInput={true}
         timeStep={15}
         isRequired

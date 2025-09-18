@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect} from 'react'
+import _ from 'lodash'
 import {bool, func} from 'prop-types'
 import {Button, type ButtonProps} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
@@ -25,7 +26,12 @@ import {Text} from '@instructure/ui-text'
 import {List} from '@instructure/ui-list'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {ScheduledReleasePolicy} from './ScheduledReleasePolicy/ScheduledReleasePolicy'
+import {
+  ScheduledRelease,
+  ScheduledReleasePolicy,
+} from './ScheduledReleasePolicy/ScheduledReleasePolicy'
+import {useGetAssignmentScheduledPost} from './queries/useGetAssignmentScheduledPost'
+import {FormMessage} from 'features/account_admin_tools/react/CommMessages/types'
 
 const I18n = createI18nScope('assignment_posting_policy_tray')
 
@@ -36,14 +42,41 @@ export interface LayoutProps {
   allowAutomaticPosting: boolean
   allowCanceling: boolean
   allowSaving: boolean
+  assignmentId: string
   onDismiss: ButtonProps['onClick']
   onPostPolicyChanged: ({postManually}: {postManually: boolean}) => void
+  onScheduledReleaseChange: (changes: Partial<ScheduledRelease>) => void
   onSave: ButtonProps['onClick']
   selectedPostManually: boolean
 }
 
 export default function Layout(props: LayoutProps) {
   const {scheduled_feedback_releases: scheduledFeedbackReleasesEnabled} = ENV.FEATURES
+  const [updatedScheduledPost, setUpdatedScheduledPost] = React.useState<ScheduledRelease | null>(
+    null,
+  )
+  const [scheduledReleaseErrorMessages, setScheduledReleaseErrorMessages] = React.useState<{
+    [key in 'grades' | 'comments']: FormMessage[]
+  }>({
+    grades: [],
+    comments: [],
+  })
+
+  const {data: scheduledPost} = useGetAssignmentScheduledPost(props.assignmentId)
+
+  useEffect(() => {
+    const scheduledPostMode = !scheduledPost
+      ? undefined
+      : scheduledPost.postCommentsAt === scheduledPost.postGradesAt
+        ? 'shared'
+        : 'separate'
+
+    setUpdatedScheduledPost({
+      postCommentsAt: scheduledPost?.postCommentsAt || null,
+      postGradesAt: scheduledPost?.postGradesAt || null,
+      scheduledPostMode,
+    })
+  }, [scheduledPost])
 
   const automaticallyPostLabel = (
     <View as="div">
@@ -101,6 +134,29 @@ export default function Layout(props: LayoutProps) {
     props.onPostPolicyChanged({postManually: event.target.value === MANUAL_POST})
   }
 
+  const handleScheduledReleaseChange = (changes: Partial<ScheduledRelease>) => {
+    const newScheduledRelease = {...updatedScheduledPost, ...changes}
+    setUpdatedScheduledPost(newScheduledRelease)
+    props.onScheduledReleaseChange(newScheduledRelease)
+  }
+
+  const scheduledReleaseErrors =
+    updatedScheduledPost?.scheduledPostMode === 'shared'
+      ? scheduledReleaseErrorMessages.grades
+      : [...scheduledReleaseErrorMessages.grades, ...scheduledReleaseErrorMessages.comments]
+
+  const hasScheduledReleaseChanged =
+    !_.isEqual(
+      {
+        postCommentsAt: updatedScheduledPost?.postCommentsAt ?? undefined,
+        postGradesAt: updatedScheduledPost?.postGradesAt ?? undefined,
+      },
+      {
+        postCommentsAt: scheduledPost?.postCommentsAt ?? undefined,
+        postGradesAt: scheduledPost?.postGradesAt ?? undefined,
+      },
+    ) && !scheduledReleaseErrors.length
+
   return (
     <>
       <View
@@ -116,6 +172,7 @@ export default function Layout(props: LayoutProps) {
           value={props.selectedPostManually ? MANUAL_POST : AUTOMATIC_POST}
         >
           <RadioInput
+            data-testid="assignment-posting-policy-automatic-radio"
             className="AssignmentPostingPolicyTray__RadioInput"
             disabled={!props.allowAutomaticPosting}
             name="postPolicy"
@@ -124,6 +181,7 @@ export default function Layout(props: LayoutProps) {
           />
 
           <RadioInput
+            data-testid="assignment-posting-policy-manual-radio"
             className="AssignmentPostingPolicyTray__RadioInput"
             name="postPolicy"
             label={manuallyPostLabel}
@@ -131,7 +189,16 @@ export default function Layout(props: LayoutProps) {
           />
         </RadioInputGroup>
         {scheduledFeedbackReleasesEnabled && props.selectedPostManually && (
-          <ScheduledReleasePolicy />
+          <ScheduledReleasePolicy
+            errorMessages={scheduledReleaseErrorMessages}
+            postCommentsAt={updatedScheduledPost?.postCommentsAt}
+            postGradesAt={updatedScheduledPost?.postGradesAt}
+            scheduledPostMode={updatedScheduledPost?.scheduledPostMode}
+            handleChange={handleScheduledReleaseChange}
+            handleErrorMessages={(grades, comments) =>
+              setScheduledReleaseErrorMessages({grades, comments})
+            }
+          />
         )}
       </View>
 
@@ -145,13 +212,18 @@ export default function Layout(props: LayoutProps) {
       >
         <Flex justifyItems="end">
           <Flex.Item margin="0 small 0 0">
-            <Button onClick={props.onDismiss} disabled={!props.allowCanceling}>
+            <Button data-testid="assignment-posting-policy-cancel-button" onClick={props.onDismiss} disabled={!props.allowCanceling}>
               {I18n.t('Cancel')}
             </Button>
           </Flex.Item>
 
           <Flex.Item>
-            <Button onClick={props.onSave} disabled={!props.allowSaving} color="primary">
+            <Button
+              data-testid="assignment-posting-policy-save-button"
+              onClick={props.onSave}
+              disabled={!props.allowSaving && !hasScheduledReleaseChanged}
+              color="primary"
+            >
               {I18n.t('Save')}
             </Button>
           </Flex.Item>

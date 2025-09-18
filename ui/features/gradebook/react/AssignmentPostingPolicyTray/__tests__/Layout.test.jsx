@@ -20,6 +20,8 @@ import {render, cleanup} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import {MockedProvider} from '@apollo/client/testing'
+import {MockedQueryClientProvider} from '@canvas/test-utils/query'
+import {queryClient} from '@canvas/query'
 import Layout from '../Layout'
 
 jest.mock('@canvas/apollo-v3', () => ({
@@ -75,8 +77,10 @@ describe('AssignmentPostingPolicyTray Layout', () => {
     }
     const utils = render(
       <MockedProvider mocks={[]} addTypename={false}>
-        <Layout {...context} />
-      </MockedProvider>
+        <MockedQueryClientProvider client={queryClient}>
+          <Layout {...context} />
+        </MockedQueryClientProvider>
+      </MockedProvider>,
     )
     container = utils.container
     getByRole = utils.getByRole
@@ -104,8 +108,10 @@ describe('AssignmentPostingPolicyTray Layout', () => {
     const newContext = {...context, allowCanceling: false}
     const utils = render(
       <MockedProvider mocks={[]} addTypename={false}>
-        <Layout {...newContext} />
-      </MockedProvider>
+        <MockedQueryClientProvider client={queryClient}>
+          <Layout {...newContext} />
+        </MockedQueryClientProvider>
+      </MockedProvider>,
     )
     getByRole = utils.getByRole
     expect(getCancelButton().disabled).toBe(true)
@@ -125,8 +131,10 @@ describe('AssignmentPostingPolicyTray Layout', () => {
     const newContext = {...context, allowSaving: false}
     const utils = render(
       <MockedProvider mocks={[]} addTypename={false}>
-        <Layout {...newContext} />
-      </MockedProvider>
+        <MockedQueryClientProvider client={queryClient}>
+          <Layout {...newContext} />
+        </MockedQueryClientProvider>
+      </MockedProvider>,
     )
     getByRole = utils.getByRole
     expect(getSaveButton().disabled).toBe(true)
@@ -148,8 +156,10 @@ describe('AssignmentPostingPolicyTray Layout', () => {
       const newContext = {...context, allowAutomaticPosting: false}
       const utils = render(
         <MockedProvider mocks={[]} addTypename={false}>
-          <Layout {...newContext} />
-        </MockedProvider>
+          <MockedQueryClientProvider client={queryClient}>
+            <Layout {...newContext} />
+          </MockedQueryClientProvider>
+        </MockedProvider>,
       )
       getByRole = utils.getByRole
     })
@@ -169,8 +179,10 @@ describe('AssignmentPostingPolicyTray Layout', () => {
       const newContext = {...context, selectedPostManually: true}
       const utils = render(
         <MockedProvider mocks={[]} addTypename={false}>
-          <Layout {...newContext} />
-        </MockedProvider>
+          <MockedQueryClientProvider client={queryClient}>
+            <Layout {...newContext} />
+          </MockedQueryClientProvider>
+        </MockedProvider>,
       )
       getByRole = utils.getByRole
       getByText = utils.getByText
@@ -210,8 +222,10 @@ describe('AssignmentPostingPolicyTray Layout', () => {
     const newContext = {...context, selectedPostManually: true}
     const utils = render(
       <MockedProvider mocks={[]} addTypename={false}>
-        <Layout {...newContext} />
-      </MockedProvider>
+        <MockedQueryClientProvider client={queryClient}>
+          <Layout {...newContext} />
+        </MockedQueryClientProvider>
+      </MockedProvider>,
     )
     getByRole = utils.getByRole
     await user.click(getAutomaticallyPostInput())
@@ -223,8 +237,10 @@ describe('AssignmentPostingPolicyTray Layout', () => {
     const newContext = {...context, selectedPostManually: true}
     const utils = render(
       <MockedProvider mocks={[]} addTypename={false}>
-        <Layout {...newContext} />
-      </MockedProvider>
+        <MockedQueryClientProvider client={queryClient}>
+          <Layout {...newContext} />
+        </MockedQueryClientProvider>
+      </MockedProvider>,
     )
     getByRole = utils.getByRole
     await user.click(getAutomaticallyPostInput())

@@ -24,11 +24,14 @@ import {TruncateText} from '@instructure/ui-truncate-text'
 import {Heading} from '@instructure/ui-heading'
 import {Tray} from '@instructure/ui-tray'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {queryClient} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
 
 import Layout from './Layout'
 import {setAssignmentPostPolicy} from './Api'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import type {CamelizedAssignment} from '@canvas/grading/grading.d'
+import {ScheduledRelease} from './ScheduledReleasePolicy/ScheduledReleasePolicy'
 
 const I18n = createI18nScope('post_grades_tray')
 
@@ -40,6 +43,12 @@ type State = {
   requestInProgress?: boolean
 
   selectedPostManually?: boolean
+
+  postGradesAt?: string | null
+
+  postCommentsAt?: string | null
+
+  scheduledPostMode?: string | null
 
   open: boolean
 
@@ -70,6 +79,7 @@ export default class AssignmentPostingPolicyTray extends PureComponent<Props, St
 
     this.handlePostPolicyChanged = this.handlePostPolicyChanged.bind(this)
     this.handleSave = this.handleSave.bind(this)
+    this.handleScheduleReleasePolicyChange = this.handleScheduleReleasePolicyChange.bind(this)
   }
 
   handleDismiss() {
@@ -91,17 +101,30 @@ export default class AssignmentPostingPolicyTray extends PureComponent<Props, St
     this.setState({selectedPostManually: postManually})
   }
 
+  handleScheduleReleasePolicyChange({
+    scheduledPostMode,
+    postCommentsAt,
+    postGradesAt,
+  }: ScheduledRelease) {
+    this.setState({scheduledPostMode, postCommentsAt, postGradesAt})
+  }
+
   handleSave() {
     const name = this.state.assignment?.name
     const assignmentId = this.state.assignment?.id
-    const {selectedPostManually} = this.state
+    const {selectedPostManually, postCommentsAt, postGradesAt} = this.state
 
     if (!name || !assignmentId) {
       throw new Error('Assignment name and id are required')
     }
 
     this.setState({requestInProgress: true})
-    setAssignmentPostPolicy({assignmentId, postManually: selectedPostManually})
+    setAssignmentPostPolicy({
+      assignmentId,
+      postManually: selectedPostManually,
+      postCommentsAt,
+      postGradesAt,
+    })
       // @ts-expect-error
       .then(response => {
         const message = I18n.t('Success! The post policy for %{name} has been updated.', {name})
@@ -136,6 +159,7 @@ export default class AssignmentPostingPolicyTray extends PureComponent<Props, St
 
     return (
       <Tray
+        data-testid="assignment-posting-policy-tray"
         label={I18n.t('Grade posting policy tray')}
         onDismiss={this.handleDismiss}
         onExited={onExited}
@@ -145,7 +169,7 @@ export default class AssignmentPostingPolicyTray extends PureComponent<Props, St
         <View as="div" padding="small">
           <Flex as="div" alignItems="start" margin="0 0 medium 0">
             <Flex.Item>
-              <CloseButton onClick={this.handleDismiss} screenReaderLabel={I18n.t('Close')} />
+              <CloseButton data-testid="assignment-posting-policy-close-button" onClick={this.handleDismiss} screenReaderLabel={I18n.t('Close')} />
             </Flex.Item>
 
             <Flex.Item margin="0 0 0 small" shouldShrink={true}>
@@ -158,15 +182,19 @@ export default class AssignmentPostingPolicyTray extends PureComponent<Props, St
           </Flex>
         </View>
 
-        <Layout
-          allowAutomaticPosting={allowAutomaticPosting}
-          allowCanceling={!requestInProgress}
-          allowSaving={allowSaving}
-          onPostPolicyChanged={this.handlePostPolicyChanged}
-          onDismiss={this.handleDismiss}
-          onSave={this.handleSave}
-          selectedPostManually={Boolean(selectedPostManually)}
-        />
+        <QueryClientProvider client={queryClient}>
+          <Layout
+            allowAutomaticPosting={allowAutomaticPosting}
+            allowCanceling={!requestInProgress}
+            allowSaving={allowSaving}
+            assignmentId={assignment.id}
+            onPostPolicyChanged={this.handlePostPolicyChanged}
+            onDismiss={this.handleDismiss}
+            onSave={this.handleSave}
+            onScheduledReleaseChange={this.handleScheduleReleasePolicyChange}
+            selectedPostManually={Boolean(selectedPostManually)}
+          />
+        </QueryClientProvider>
       </Tray>
     )
   }
