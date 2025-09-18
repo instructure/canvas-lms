@@ -7847,6 +7847,7 @@ he:
     roles: 
       designer: מתכנן
       designer_with_indefinite_article: מתכנן
+      instructors: מנחים
       observer: משקיף
       observer_with_indefinite_article: משקיף
       student: תלמיד
@@ -17206,6 +17207,8 @@ he:
   role_successfully_updated_4317e6a4: "תפקיד עודכן בהצלחה"
   roles: 
     based_on_type: "מבוסס על %{base_type}"
+    designer: מתכנן
+    designers: מתכננים
     edit_role: 
       role_name_label: "שם תפקיד"
     new_role: 
@@ -17214,6 +17217,8 @@ he:
       role_type: "סוג בסיסי"
       save: שמירה
       saving: שומר...
+    observer: משקיף
+    observers: "משקיפים "
     permission_button: 
       rolebutton: 
         disable: ניטרול
@@ -17231,6 +17236,12 @@ he:
       account_roles: "תפקידי חשבון"
       course_roles: "תפקידי קורס"
       page_header_title: "הרשאות חשבון "
+    student: תלמיד
+    students: תלמידים
+    ta: "עוזר הוראה"
+    tas: "עוזרי הוראה"
+    teacher: מורה
+    teachers: מורים
   rootFoldersFinder: 
     course_files: "קבצי קורס"
     group_files: "קבצי קבוצה"
