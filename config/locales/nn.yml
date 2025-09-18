@@ -10905,6 +10905,7 @@ nn:
     roles: 
       designer: Designar
       designer_with_indefinite_article: "Ein designar"
+      instructors: Faglærarar
       observer: Observatør
       observer_with_indefinite_article: "Ein observatør"
       student: Student
@@ -23025,6 +23026,8 @@ nn:
   role_successfully_updated_4317e6a4: "Rolla er oppdatert"
   roles: 
     based_on_type: "Basert på %{base_type}"
+    designer: Designar
+    designers: Designarar
     edit_role: 
       role_name_label: Rollenamn
     new_role: 
@@ -23033,6 +23036,8 @@ nn:
       role_type: "Basistype:"
       save: Lagre
       saving: Lagrar...
+    observer: Observatør
+    observers: Observatørar
     permission_button: 
       rolebutton: 
         disable: Deaktiver
@@ -23050,6 +23055,12 @@ nn:
       account_roles: Kontoroller
       course_roles: Emneroller
       page_header_title: "Løyve for kontoar"
+    student: Student
+    students: Studentar
+    ta: Undervisingsassistent
+    tas: Undervisingsassistentar
+    teacher: Faglærar
+    teachers: Faglærarar
   roles_730b879e: Roller
   romanian_13670c1e: Rumensk
   rootFoldersFinder: 
