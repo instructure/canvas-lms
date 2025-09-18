@@ -19,13 +19,14 @@
 import {TextInput} from '@instructure/ui-text-input'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {IconButton} from '@instructure/ui-buttons'
-import {IconInfoLine} from '@instructure/ui-icons'
+import {Button, IconButton} from '@instructure/ui-buttons'
+import {IconAiColoredSolid, IconInfoLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Text} from '@instructure/ui-text'
 import {ChangeEvent} from 'react'
 import {SettingsImageProps} from './types'
+import {useBlockContentEditorContext} from '../../../BlockContentEditorContext'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -40,6 +41,8 @@ export const SettingsImageInfos = ({
   onAltTextAsCaptionChange,
   onDecorativeImageChange,
 }: SettingsImageProps) => {
+  const {aiAltTextEnabled} = useBlockContentEditorContext()
+
   const handleAltTextChange = (e: ChangeEvent<HTMLInputElement>) => {
     onAltTextChange(e.target.value)
   }
@@ -84,6 +87,21 @@ export const SettingsImageInfos = ({
           placeholder={I18n.t('Start typing...')}
           disabled={disabled || decorativeImage}
         />
+
+        {aiAltTextEnabled && (
+          <View as="div" margin="small 0 0 0">
+            <Button
+              color="ai-secondary"
+              display="block"
+              renderIcon={<IconAiColoredSolid />}
+              margin="0"
+              disabled={disabled || decorativeImage}
+              onClick={() => onAltTextChange('AI generated ALT text')}
+            >
+              {I18n.t('Regenerate Alt Text')}
+            </Button>
+          </View>
+        )}
 
         <View as="div" margin="small 0 0 0">
           <Checkbox

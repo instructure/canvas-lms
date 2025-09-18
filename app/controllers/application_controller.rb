@@ -470,6 +470,7 @@ class ApplicationController < ActionController::Base
     scheduled_feedback_releases
     speedgrader_studio_media_capture
     validate_call_to_action
+    block_content_editor_ai_alt_text
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     account_level_mastery_scales

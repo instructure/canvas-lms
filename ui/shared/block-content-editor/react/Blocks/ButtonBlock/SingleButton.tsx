@@ -17,6 +17,7 @@
  */
 
 import {Button} from '@instructure/ui-buttons'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {SingleButtonProps} from './types'
 import {alpha} from '@instructure/ui-color-utils'
@@ -51,8 +52,8 @@ export const SingleButton = ({
       secondaryBorderColor: button.primaryColor,
       secondaryColor: button.secondaryColor,
       secondaryHoverBackground: adjustedPrimaryColor,
-      secondaryGhostColor: adjustedPrimaryColor,
-      secondaryGhostBorderColor: adjustedPrimaryColor,
+      secondaryGhostColor: button.primaryColor,
+      secondaryGhostBorderColor: button.primaryColor,
       secondaryGhostHoverBackground: `${alpha(adjustedPrimaryColor, 10)}`,
       secondaryGhostActiveBoxShadow: adjustedBoxShadow,
     }
@@ -66,7 +67,7 @@ export const SingleButton = ({
         rel: isNewTabLink ? 'noopener noreferrer' : undefined,
       }
 
-  return (
+  const buttonElement = (
     <Button
       elementRef={el => focusHandler?.(el as HTMLElement)}
       display={isFullWidth ? 'block' : 'inline-block'}
@@ -78,4 +79,10 @@ export const SingleButton = ({
       {buttonText}
     </Button>
   )
+
+  if (!onButtonClick && isNewTabLink && url) {
+    return <Tooltip renderTip={I18n.t('Opens in new window')}>{buttonElement}</Tooltip>
+  }
+
+  return buttonElement
 }

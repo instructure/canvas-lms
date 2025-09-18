@@ -33,7 +33,6 @@ export const GroupedSelectEntry = forwardRef<
 >((props, ref) => {
   const isItem = props.variant === 'item'
   const className = isItem ? 'grouped-select-item' : 'grouped-select-group'
-  const role = isItem ? 'option' : 'listbox'
 
   const handleElementRef = (element: Element | null) => {
     if (typeof ref === 'function') {
@@ -45,11 +44,15 @@ export const GroupedSelectEntry = forwardRef<
 
   return (
     <View
-      as="div"
+      as="button"
+      type="button"
+      background="transparent"
+      borderColor="transparent"
+      borderWidth="none"
+      textAlign="start"
+      width="100%"
       elementRef={handleElementRef}
-      role={role}
       aria-selected={props.active}
-      aria-label={props.title}
       className={`${className} ${props.active ? 'selected' : ''}`}
       onClick={props.onClick}
       onFocus={props.onFocus}

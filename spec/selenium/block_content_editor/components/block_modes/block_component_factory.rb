@@ -1,5 +1,7 @@
-<%
-# Copyright (C) 2011 - present Instructure, Inc.
+# frozen_string_literal: true
+
+#
+# Copyright (C) 2024 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,10 +16,19 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-%>
 
-<%
-  provide :page_title, join_title(@page.title.to_s, @context.name)
-  css_bundle :tinymce
-  js_bundle :wiki_page_edit
-%>
+require_relative "edit_block_component"
+require_relative "preview_block_component"
+
+class BlockComponentFactory
+  def self.create(block, mode:)
+    case mode
+    when :edit
+      EditBlockComponent.new(block)
+    when :preview
+      PreviewBlockComponent.new(block)
+    else
+      raise ArgumentError, "Invalid mode: #{mode}. Valid modes: :edit, :preview"
+    end
+  end
+end

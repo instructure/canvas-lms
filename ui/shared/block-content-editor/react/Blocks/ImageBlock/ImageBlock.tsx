@@ -29,14 +29,15 @@ import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
 import {Flex} from '@instructure/ui-flex'
 import {useFocusElement} from '../../hooks/useFocusElement'
 import {defaultProps} from './defaultProps'
+import {getContrastingTextColorCached} from '../../utilities/getContrastingTextColor'
 
 const I18n = createI18nScope('block_content_editor')
 
 const ImageBlockView = (props: ImageBlockProps) => {
   return (
     <Flex direction="column" gap="mediumSmall">
-      {props.includeBlockTitle && (
-        <TitleView contentColor={props.titleColor || ''} title={props.title} />
+      {props.includeBlockTitle && !!props.title && (
+        <TitleView title={props.title} contentColor={props.titleColor} />
       )}
       <ImageView {...props} />
     </Flex>
@@ -47,7 +48,7 @@ const ImageBlockEditView = (props: ImageBlockProps) => {
   return (
     <Flex direction="column" gap="mediumSmall">
       {props.includeBlockTitle && (
-        <TitleEditPreview contentColor={props.titleColor || ''} title={props.title} />
+        <TitleEditPreview title={props.title} contentColor={props.titleColor} />
       )}
       <ImageView {...props} />
     </Flex>
@@ -57,13 +58,19 @@ const ImageBlockEditView = (props: ImageBlockProps) => {
 const ImageBlockEdit = (props: ImageBlockProps) => {
   const {focusHandler} = useFocusElement()
   const [title, setTitle] = useState(props.title || '')
+  const labelColor = getContrastingTextColorCached(props.backgroundColor)
 
   const save = useSave(() => ({title}))
 
   return (
     <Flex direction="column" gap="mediumSmall">
       {props.includeBlockTitle && (
-        <TitleEdit title={title} onTitleChange={setTitle} focusHandler={focusHandler} />
+        <TitleEdit
+          title={title}
+          onTitleChange={setTitle}
+          focusHandler={focusHandler}
+          labelColor={labelColor}
+        />
       )}
       <ImageEdit
         {...props}
