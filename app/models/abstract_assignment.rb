@@ -70,6 +70,7 @@ class AbstractAssignment < ActiveRecord::Base
   QUIZZES_NEXT_TIMEOUT = 15.minutes
   QUIZZES_NEXT_IMPORTING_TIMEOUT = 30.minutes
   QUIZZES_NEXT_QUIZ_TYPES = %w[graded_quiz graded_survey ungraded_survey].freeze
+  QUIZZES_NEXT_SURVEY_TYPES = %w[graded_survey ungraded_survey].freeze
   ROLLCALL_ASSIGNMENT_TITLE = "Roll Call Attendance"
 
   attr_accessor(

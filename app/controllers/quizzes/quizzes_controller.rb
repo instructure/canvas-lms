@@ -108,6 +108,11 @@ class Quizzes::QuizzesController < ApplicationController
 
       practice_quizzes   = scoped_quizzes_index.select { |q| q.quiz_type == QUIZ_TYPE_PRACTICE }
       surveys            = scoped_quizzes_index.select { |q| QUIZ_TYPE_SURVEYS.include?(q.quiz_type) }
+      if @context.root_account.feature_enabled?(:newquizzes_on_quiz_page) && Account.site_admin.feature_enabled?(:new_quizzes_surveys)
+        surveys += scoped_new_quizzes_index.select do |q|
+          Assignment::QUIZZES_NEXT_SURVEY_TYPES.include?(q.settings&.dig("new_quizzes", "type"))
+        end
+      end
       if scoped_new_quizzes_index.any? && @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
         mc_status = setup_master_course_restrictions(scoped_new_quizzes_index, @context)
       end
@@ -131,7 +136,7 @@ class Quizzes::QuizzesController < ApplicationController
         QUIZZES: {
           assignment: assignment_quizzes_json(serializer_options),
           open: quizzes_json(practice_quizzes, *serializer_options),
-          surveys: quizzes_json(surveys, *serializer_options),
+          surveys: quizzes_next_json(sort_quizzes(surveys), *serializer_options),
           options: quiz_options
         },
         URLS: {
@@ -1125,8 +1130,14 @@ class Quizzes::QuizzesController < ApplicationController
       return quizzes_json(old_quizzes, *serializer_options)
     end
 
+    new_quizzes = if Account.site_admin.feature_enabled?(:new_quizzes_surveys)
+                    scoped_new_quizzes_index.reject { |q| Assignment::QUIZZES_NEXT_SURVEY_TYPES.include?(q.settings&.dig("new_quizzes", "type")) }
+                  else
+                    scoped_new_quizzes_index
+                  end
+
     quizzes_next_json(
-      sort_quizzes(old_quizzes + scoped_new_quizzes_index),
+      sort_quizzes(old_quizzes + new_quizzes),
       *serializer_options
     )
   end
