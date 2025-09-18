@@ -59,7 +59,7 @@ export const ImageEdit = ({
       <View as="figure" margin="none" className="image-actions-container">
         {url ? (
           <>
-            <img src={url} alt={altText} />
+            <img width="100%" src={url} alt={altText} />
             <View as="div" className="image-actions">
               <IconButton
                 renderIcon={<IconUploadLine />}
