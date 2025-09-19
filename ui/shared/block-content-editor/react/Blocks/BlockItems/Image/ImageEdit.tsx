@@ -36,8 +36,9 @@ export const ImageEdit = ({
   onImageChange,
   url,
   altText,
-  caption,
+  decorativeImage,
   altTextAsCaption,
+  caption,
   focusHandler,
 }: ImageEditProps) => {
   const [isOpen, setIsOpen] = useState(false)
@@ -59,7 +60,12 @@ export const ImageEdit = ({
       <View as="figure" margin="none" className="image-actions-container">
         {url ? (
           <>
-            <img width="100%" src={url} alt={altText} />
+            <img
+              width="100%"
+              src={url}
+              alt={decorativeImage ? '' : altText}
+              role={decorativeImage ? 'presentation' : undefined}
+            />
             <View as="div" className="image-actions">
               <IconButton
                 renderIcon={<IconUploadLine />}
