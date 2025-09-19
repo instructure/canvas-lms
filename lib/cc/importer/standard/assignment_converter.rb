@@ -113,6 +113,11 @@ module CC::Importer::Standard
         similarity_settings = node.attributes.transform_values(&:value)
         assignment[:similarity_detection_tool] = similarity_settings
       end
+      if meta_doc.at_css("lti_context_id")
+        node = meta_doc.at_css("lti_context_id")
+        lti_context_id = node.text.strip
+        assignment[:lti_context_id] = lti_context_id if lti_context_id.present?
+      end
 
       %w[title allowed_extensions grading_type submission_types external_tool_url external_tool_data_json external_tool_link_settings_json turnitin_settings time_zone_edited].each do |string_type|
         val = get_node_val(meta_doc, string_type)
