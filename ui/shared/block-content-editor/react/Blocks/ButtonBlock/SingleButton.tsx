@@ -31,6 +31,7 @@ export const SingleButton = ({
   isFullWidth,
   onButtonClick,
   focusHandler,
+  viewMode,
 }: SingleButtonProps) => {
   const buttonText = button.text.trim() || I18n.t('Button')
 
@@ -80,8 +81,26 @@ export const SingleButton = ({
     </Button>
   )
 
-  if (!onButtonClick && isNewTabLink && url) {
-    return <Tooltip renderTip={I18n.t('Opens in new window')}>{buttonElement}</Tooltip>
+  const getTooltipText = () => {
+    if (viewMode === 'edit') {
+      return I18n.t('Opens block settings')
+    }
+
+    if (viewMode === 'editview') {
+      return I18n.t('Opens edit mode')
+    }
+
+    if (isNewTabLink && url && !onButtonClick) {
+      return I18n.t('Opens in new window')
+    }
+
+    return null
+  }
+
+  const tooltipText = getTooltipText()
+
+  if (tooltipText) {
+    return <Tooltip renderTip={tooltipText}>{buttonElement}</Tooltip>
   }
 
   return buttonElement
