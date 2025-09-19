@@ -10555,7 +10555,16 @@ describe Assignment do
           }
         end
 
-        it "broadcasts a notification for teachers" do
+        it "does not broadcast a notification for instructors that are not actively participating" do
+          teacher_enrollment.enrollment_state.update!(state: "inactive")
+          expect do
+            assignment.post_submissions(posting_params: { graded_only: false })
+          end.not_to change {
+            submissions_posted_messages.where(communication_channel: teacher.communication_channels).count
+          }
+        end
+
+        it "broadcasts a notification for actively participating instructors" do
           expect do
             assignment.post_submissions(posting_params: { graded_only: false })
           end.to change {
