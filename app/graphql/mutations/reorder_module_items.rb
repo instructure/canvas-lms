@@ -68,102 +68,23 @@ class Mutations::ReorderModuleItems < Mutations::BaseMutation
 
   def reorder_items(course:, target_module:, source_module:, item_ids:, target_position: nil)
     ContentTag.transaction do
-      # Validate all items exist and belong to the course
       items = ContentTag.where(id: item_ids, context: course)
+      return { success: false, error: "One or more items not found" } unless items.count == item_ids.length
 
-      unless items.count == item_ids.length
-        return { success: false, error: "One or more items not found" }
-      end
-
-      # Check that items belong to source module
       source_items = items.where(context_module_id: source_module.id)
-      unless source_items.count == items.count
-        return { success: false, error: "Items do not belong to source module" }
-      end
+      return { success: false, error: "Items do not belong to source module" } unless source_items.count == items.count
 
-      # Get items in the order they were specified - use hash for O(1) lookup
-      items_by_id = items.index_by(&:id)
-      ordered_items = item_ids.filter_map { |item_id| items_by_id[item_id.to_i] }
+      items_by_id   = items.index_by(&:id)
+      ordered_items = item_ids.filter_map { |id| items_by_id[id.to_i] }
 
-      affected_module_ids = Set.new
+      affected_items, affected_module_ids =
+        apply_reordering(ordered_items, target_module, source_module, target_position)
 
-      affected_items = []
+      touched_module_ids = ([target_module.id] + affected_module_ids.to_a).uniq
+      touched_module_ids.each { |mid| reindex_module_items(mid) }
 
-      if source_module == target_module
-        # Same module reordering - need to handle position conflicts properly
-        if target_position
-          # Use provided target position and shift existing items
-          ordered_items.each_with_index do |item, index|
-            position_to_use = target_position + index
-
-            # Shift existing items that need to move down
-            source_module.content_tags.active.where(position: position_to_use..).where.not(id: item_ids).update_all("position = position + 1")
-
-            item.position = position_to_use
-            next unless item.changed?
-
-            item.skip_touch = true
-            item.save!
-            affected_items << item
-          end
-        else
-          # No target position - place specified items at the beginning and shift remaining items
-          ordered_items.each_with_index do |item, index|
-            new_position = index + 1
-            item.position = new_position
-            next unless item.changed?
-
-            item.skip_touch = true
-            item.save!
-            affected_items << item
-          end
-
-          # Shift remaining items that are not being reordered to positions after the reordered items
-          remaining_items = source_module.content_tags.active.where.not(id: item_ids).order(:position)
-          next_position = ordered_items.length + 1
-
-          remaining_items.each do |item|
-            if item.position != next_position
-              item.position = next_position
-              item.skip_touch = true
-              item.save!
-              affected_items << item
-            end
-            next_position += 1
-          end
-        end
-      else
-        # Cross-module move - manually handle position management to ensure correct ordering
-
-        ordered_items.each_with_index do |item, index|
-          old_module_id = item.context_module_id
-          # Use provided target_position or default to array index + 1
-          position_to_use = target_position ? target_position + index : index + 1
-
-          # First, shift existing items that need to move down
-          # We need to do this BEFORE moving the new item to avoid position conflicts
-          target_module.content_tags.active.where(position: position_to_use..).update_all("position = position + 1")
-
-          # Then move item to target module at the desired position
-          item.context_module_id = target_module.id
-          item.position = position_to_use
-          item.skip_touch = true
-          item.save!
-
-          affected_items << item
-          affected_module_ids << old_module_id if old_module_id != target_module.id
-        end
-
-        # Reindex remaining items in affected source modules to close gaps
-        affected_module_ids.each do |module_id|
-          reindex_module_items(module_id)
-        end
-      end
-
-      # Update content tag contexts and touch modules (handles cache invalidation)
       ContentTag.update_could_be_locked(affected_items)
-      module_ids_to_touch = [target_module.id] + affected_module_ids.to_a
-      ContentTag.touch_context_modules(module_ids_to_touch.uniq)
+      ContentTag.touch_context_modules(touched_module_ids)
       course.touch
 
       { success: true }
@@ -172,9 +93,65 @@ class Mutations::ReorderModuleItems < Mutations::BaseMutation
     { success: false, error: e.message }
   end
 
+  def apply_reordering(ordered_items, target_module, source_module, target_position)
+    affected_items      = []
+    affected_module_ids = Set.new
+
+    ordered_items.each_with_index do |item, index|
+      old_module_id = item.context_module_id
+
+      position = final_position_for(
+        item,
+        index,
+        target_module:,
+        source_module:,
+        target_position:
+      )
+
+      item.update!(context_module_id: target_module.id, position:, skip_touch: true)
+      affected_items << item
+      affected_module_ids << old_module_id if old_module_id != target_module.id
+    end
+
+    [affected_items, affected_module_ids]
+  end
+
+  def final_position_for(item, index, target_module:, source_module:, target_position:)
+    # baseline position
+    position =
+      if target_position == 1 && index.zero?
+        0
+      else
+        target_position ? target_position + index : index + 1
+      end
+
+    # decide whether to bump
+    should_bump =
+      if source_module == target_module
+        item.position > position || (target_position && item.position < target_position)
+      else
+        true
+      end
+
+    position_scope = target_module.content_tags.where.not(workflow_state: "deleted")
+    if should_bump
+      position_scope.where(position: position..).update_all("position = position + 1")
+    elsif target_position && item.position < target_position
+      max_position = target_module.content_tags.active.maximum(:position) || 0
+      position -= 1 unless target_position >= max_position
+    end
+
+    position
+  end
+
   def reindex_module_items(module_id)
-    ContextModule.find(module_id).content_tags.active.order(:position).each_with_index do |item, index|
-      item.update_column(:position, index + 1)
+    items = ContentTag.where(context_module_id: module_id)
+                      .where.not(workflow_state: "deleted")
+                      .order(:position, :id)
+
+    items.each_with_index do |item, idx|
+      desired = idx + 1
+      item.update_columns(position: desired, updated_at: Time.current) if item.position != desired
     end
   end
 end
