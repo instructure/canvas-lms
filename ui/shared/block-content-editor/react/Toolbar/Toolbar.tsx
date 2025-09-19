@@ -24,9 +24,6 @@ import {AccessibilityCheckerButton} from './AccessibilityCheckerButton'
 import {useBlockContentEditorContext} from '../BlockContentEditorContext'
 import {useEditHistory} from '../hooks/useEditHistory'
 import {List} from '@instructure/ui-list'
-import {useScope as createI18nScope} from '@canvas/i18n'
-
-const I18n = createI18nScope('block_content_editor')
 
 export const Toolbar = () => {
   const {
@@ -53,7 +50,7 @@ export const Toolbar = () => {
 
   return (
     <View shadow="resting" display="block">
-      <List role="toolbar" aria-label={I18n.t('Editor toolbar')} isUnstyled margin="none">
+      <List isUnstyled margin="none">
         {menuItems.map((item, index) => (
           <List.Item key={index}>{item}</List.Item>
         ))}

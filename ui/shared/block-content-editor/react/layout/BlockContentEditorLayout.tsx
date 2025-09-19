@@ -16,17 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import './block-content-editor-layout.css'
 import {ReactNode} from 'react'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import './block-content-editor-layout.css'
+
+const I18n = createI18nScope('block_content_editor')
 
 export const BlockContentEditorLayout = (props: {
   toolbar: ReactNode
   editor: ReactNode
+  mode: 'default' | 'preview'
 }) => {
+  const ariaLabel = props.mode === 'default' ? I18n.t('Content Area') : I18n.t('Preview')
+
   return (
-    <div className="block-content-editor-container">
-      <div className="toolbar-area">{props.toolbar}</div>
-      <div className="editor-area">{props.editor}</div>
-    </div>
+    <section aria-label={I18n.t('Block Content Editor')} className="block-content-editor-container">
+      <div role="toolbar" aria-label={I18n.t('Editor toolbar')} className="toolbar-area">
+        {props.toolbar}
+      </div>
+      <div aria-label={ariaLabel} className="editor-area">
+        {props.editor}
+      </div>
+    </section>
   )
 }
