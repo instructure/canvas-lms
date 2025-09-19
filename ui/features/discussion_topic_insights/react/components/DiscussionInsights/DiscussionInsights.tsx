@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useMemo} from 'react'
+import React, {useState, useMemo, useEffect} from 'react'
 import {Text} from '@instructure/ui-text'
 import InsightsTable from '../InsightsTable/InsightsTable'
 import {View} from '@instructure/ui-view'
@@ -150,20 +150,25 @@ const DiscussionInsights: React.FC = () => {
     if (!entries) return []
 
     const relevanceFilteredValues = filterEntriesbyRelevance(relevanceFilterType, entries)
-    if (relevanceFilteredValues != entries) {
-      setIsFilteredTable(true)
-    }
+
     if (!query) {
-      setEntries(relevanceFilteredValues)
       return relevanceFilteredValues
     }
-    const filteredValues = relevanceFilteredValues.filter(row =>
+    return relevanceFilteredValues.filter(row =>
       row.student_name.toLowerCase().includes(query.toLowerCase()),
     )
-    setIsFilteredTable(true)
-    setEntries(filteredValues)
-    return filteredValues
-  }, [entries, query, setEntries, relevanceFilterType, setIsFilteredTable])
+  }, [entries, query, relevanceFilterType])
+
+  useEffect(() => {
+    if (!entries) return
+
+    const relevanceFilteredValues = filterEntriesbyRelevance(relevanceFilterType, entries)
+    const hasRelevanceFilter = relevanceFilteredValues !== entries
+    const hasSearchFilter = !!query
+
+    setIsFilteredTable(hasRelevanceFilter || hasSearchFilter)
+    setEntries(filteredEntries)
+  }, [filteredEntries, entries, query, relevanceFilterType, setEntries, setIsFilteredTable])
 
   const searchResultsText = I18n.t(
     {

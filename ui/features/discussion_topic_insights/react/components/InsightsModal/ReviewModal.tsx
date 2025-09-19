@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useState, useEffect, useMemo} from 'react'
-import {Button, CloseButton} from '@instructure/ui-buttons'
+import React, {useState, useEffect, useMemo, useRef} from 'react'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -28,6 +28,7 @@ import {Pagination} from '@instructure/ui-pagination'
 import DisagreeFeedback from './DisagreeFeedback'
 import useInsightStore from '../../hooks/useInsightStore'
 import {View} from '@instructure/ui-view'
+import {IconXSolid} from '@instructure/ui-icons'
 
 const I18n = createI18nScope('discussion_insights')
 
@@ -41,6 +42,7 @@ const ReviewModal = () => {
   const discussionId = useInsightStore(state => state.discussionId)
 
   const [currentPage, setCurrentPage] = useState(1)
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     if (entries && entryId) {
@@ -93,17 +95,25 @@ const ReviewModal = () => {
       label={I18n.t('Review Evaluation')}
       data-testid="reviewModal"
       shouldCloseOnDocumentClick
+      shouldReturnFocus={true}
+      defaultFocusElement={() => closeButtonRef.current}
     >
       <Modal.Header>
-        <Flex justifyItems="center" alignItems="center">
-          <CloseButton
+        <Flex justifyItems="space-between" alignItems="center">
+          <Heading>{I18n.t('Review Evaluation')}</Heading>
+          <IconButton
+            // @ts-expect-error
+            ref={closeButtonRef}
             placement="end"
             offset="medium"
             onClick={handleClose}
             screenReaderLabel={I18n.t('Close')}
-          />
+            withBackground={false}
+            withBorder={false}
+          >
+            <IconXSolid />
+          </IconButton>
         </Flex>
-        <Heading>{I18n.t('Review Evaluation')}</Heading>
       </Modal.Header>
       <Modal.Body>
         <Flex direction="column" gap="medium">
