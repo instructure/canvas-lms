@@ -388,6 +388,10 @@ module Importers
         item.turnitin_settings = settings
       end
 
+      if item.context.root_account.feature_enabled?(:lti_asset_processor) && hash[:lti_context_id].present?
+        update_lti_import_histories(item, hash[:lti_context_id])
+      end
+
       set_annotatable_attachment(item, hash, context)
 
       migration.add_imported_item(item)
@@ -681,6 +685,12 @@ module Importers
         item.assignment_group = context.assignment_groups.active.where(migration_id: hash[:assignment_group_migration_id]).first
       end
       item.assignment_group ||= context.assignment_groups.active.where(name: t(:imported_assignments_group, "Imported Assignments")).first_or_create
+    end
+
+    def self.update_lti_import_histories(assignment, lti_context_id)
+      return if Lti::ImportHistory.where(source_lti_id: lti_context_id, target_lti_id: assignment.lti_context_id).exists?
+
+      Lti::ImportHistory.create!(source_lti_id: lti_context_id, target_lti_id: assignment.lti_context_id, root_account: assignment.root_account)
     end
   end
 end
