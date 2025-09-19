@@ -38,12 +38,14 @@ export const OutcomePopoverDisplay = ({outcome}: OutcomePopoverDisplayProps) => 
   const hasDisplayName = outcome.displayName && outcome.displayName.length > 0
   const displayName = hasDisplayName ? outcome.displayName : outcome.title
 
-  const {friendlyCalculationMethod, exampleText} = new CalculationMethodContent({
+  const calculationMethodContent = new CalculationMethodContent({
     calculation_method: outcome.calculationMethod,
     calculation_int: outcome.calculationInt,
     is_individual_outcome: true,
     mastery_points: outcome.masteryPoints,
   }).present()
+
+  const {friendlyCalculationMethod, exampleText} = calculationMethodContent ?? {}
 
   return (
     <Responsive
@@ -78,30 +80,37 @@ export const OutcomePopoverDisplay = ({outcome}: OutcomePopoverDisplayProps) => 
               data-testid="outcome-popover-display-content-description"
               dangerouslySetInnerHTML={{__html: outcome.description ?? ''}}
             />
-            <View as="hr" />
-            <Flex as="div" width="100%" gap="medium" wrap={isFullWidth ? 'no-wrap' : 'wrap'}>
-              <Flex.Item align="start">
-                <Heading level="h4" as="h4">
-                  {I18n.t('Calculation Method')}
-                </Heading>
+            {friendlyCalculationMethod && exampleText && (
+              <>
+                <View as="hr" />
+                <Flex as="div" width="100%" gap="medium" wrap={isFullWidth ? 'no-wrap' : 'wrap'}>
+                  <Flex.Item align="start">
+                    <Heading level="h4" as="h4">
+                      {I18n.t('Calculation Method')}
+                    </Heading>
 
-                <Text data-testid="outcome-popover-display-content-calculation-method">
-                  {friendlyCalculationMethod}
-                </Text>
-              </Flex.Item>
-              <Flex.Item shouldGrow shouldShrink align="start">
-                <View as="div">
-                  <Heading level="h4" as="h4">
-                    {I18n.t('Example')}
-                  </Heading>
-                  <View as="div">
-                    <Text wrap="break-word" data-testid="outcome-popover-display-content-example">
-                      {exampleText}
+                    <Text data-testid="outcome-popover-display-content-calculation-method">
+                      {friendlyCalculationMethod}
                     </Text>
-                  </View>
-                </View>
-              </Flex.Item>
-            </Flex>
+                  </Flex.Item>
+                  <Flex.Item shouldGrow shouldShrink align="start">
+                    <View as="div">
+                      <Heading level="h4" as="h4">
+                        {I18n.t('Example')}
+                      </Heading>
+                      <View as="div">
+                        <Text
+                          wrap="break-word"
+                          data-testid="outcome-popover-display-content-example"
+                        >
+                          {exampleText}
+                        </Text>
+                      </View>
+                    </View>
+                  </Flex.Item>
+                </Flex>
+              </>
+            )}
           </View>
         )
       }}
