@@ -474,6 +474,136 @@ describe "context module items", :ignore_js_errors do
         expect(@module.content_tags.last.title).to include(moved_item.title)
         expect(item_titles_list.count(moved_item.title)).to eq(1)
       end
+
+      context "with pagination" do
+        before :once do
+          Setting.set("module_perf_threshold", -1) # force pagination
+
+          @source_module = @course.context_modules.create!(name: "Source Module")
+          @target_module = @course.context_modules.create!(name: "Target Module")
+
+          first_source_assignment = @course.assignments.create!(title: "Source Assignment First", position: 0)
+          @moved_item = @source_module.add_item(type: "assignment", id: first_source_assignment.id)
+
+          (1..15).each do |i|
+            a = @course.assignments.create!(title: "Target Assignment #{i}", position: i)
+            @target_module.add_item(type: "assignment", id: a.id)
+            b = @course.assignments.create!(title: "Source Assignment #{i}", position: i)
+            @source_module.add_item(type: "assignment", id: b.id)
+          end
+
+          last_source_assignment = @course.assignments.create!(title: "Source Assignment Last", position: 15)
+          @moved_item_last = @source_module.add_item(type: "assignment", id: last_source_assignment.id)
+        end
+
+        before do
+          user_session(@teacher)
+          go_to_modules
+          wait_for_ajaximations
+          context_module_expand_toggle(@source_module.id).click
+          context_module_expand_toggle(@target_module.id).click
+          wait_for_ajaximations
+        end
+
+        it "moves item to top of target module" do
+          open_move_item_tray(@moved_item.id, @target_module.name)
+          place_item_at_top_option.click
+          submit_move_to_button.click
+          wait_for_ajaximations
+          expect(@target_module.reload.content_tags.first.title).to eq("Source Assignment First")
+        end
+
+        it "moves item to bottom of target module" do
+          open_move_item_tray(@moved_item.id, @target_module.name)
+          place_item_at_bottom_option.click
+          submit_move_to_button.click
+          wait_for_ajaximations
+          expect(@target_module.reload.content_tags.last.title).to eq("Source Assignment First")
+        end
+
+        it "moves last item to the top of same module" do
+          pagination_page_buttons[1].click
+          open_move_item_tray(@moved_item_last.id, @source_module.name)
+          place_item_at_top_option.click
+          submit_move_to_button.click
+          wait_for_ajaximations
+          expect(@source_module.reload.content_tags.first.title).to eq("Source Assignment Last")
+        end
+
+        it "moves item to bottom of same module" do
+          open_move_item_tray(@moved_item.id, @source_module.name)
+          place_item_at_bottom_option.click
+          submit_move_to_button.click
+          wait_for_ajaximations
+          expect(@source_module.reload.content_tags.last.title).to eq("Source Assignment First")
+        end
+
+        it "moves a module item before another item in a different module" do
+          open_move_item_tray(@moved_item.id, @target_module.name)
+          place_item_before_option.click
+          move_item_tray_select_page_listbox.click
+          page_option(1).click
+          move_item_tray_reference_listbox.click
+          reference_item = "Target Assignment 1"
+          reference_item_option(reference_item).click
+          submit_move_to_button.click
+          wait_for_ajaximations
+          module2_titles = @target_module.content_tags.map(&:title)
+          moved_index    = module2_titles.index { |t| t.include?("Source Assignment First") }
+          ref_index      = module2_titles.index { |t| t.include?(reference_item) }
+          expect(moved_index).to eq(0)
+          expect(ref_index).to eq(1)
+        end
+
+        it "moves a module item after another item in a different module" do
+          open_move_item_tray(@moved_item.id, @target_module.name)
+          place_item_after_option.click
+          move_item_tray_select_page_listbox.click
+          page_option(1).click
+          move_item_tray_reference_listbox.click
+          reference_item = "Target Assignment 1"
+          reference_item_option(reference_item).click
+          submit_move_to_button.click
+          wait_for_ajaximations
+          module2_titles = @target_module.content_tags.map(&:title)
+          moved_index    = module2_titles.index { |t| t.include?("Source Assignment First") }
+          ref_index      = module2_titles.index { |t| t.include?(reference_item) }
+          expect(moved_index).to eq(1)
+          expect(ref_index).to eq(0)
+        end
+
+        it "moves a module item before another item in the same module" do
+          open_move_item_tray(@moved_item.id, @source_module.name)
+          place_item_before_option.click
+          move_item_tray_select_page_listbox.click
+          page_option(1).click
+          move_item_tray_reference_listbox.click
+          reference_item = "Source Assignment 2"
+          reference_item_option(reference_item).click
+          submit_move_to_button.click
+          wait_for_ajaximations
+          module1_titles = @source_module.content_tags.map(&:title)
+          moved_index    = module1_titles.index { |t| t.include?("Source Assignment First") }
+          ref_index      = module1_titles.index { |t| t.include?(reference_item) }
+          expect(moved_index).to eq(ref_index - 1)
+        end
+
+        it "moves a module item after another item in the same module" do
+          open_move_item_tray(@moved_item.id, @source_module.name)
+          place_item_after_option.click
+          move_item_tray_select_page_listbox.click
+          page_option(1).click
+          move_item_tray_reference_listbox.click
+          reference_item = "Source Assignment 2"
+          reference_item_option(reference_item).click
+          submit_move_to_button.click
+          wait_for_ajaximations
+          module1_titles = @source_module.content_tags.map(&:title)
+          moved_index    = module1_titles.index { |t| t.include?("Source Assignment First") }
+          ref_index      = module1_titles.index { |t| t.include?(reference_item) }
+          expect(moved_index).to eq(ref_index + 1)
+        end
+      end
     end
 
     context "duplicate module item" do

@@ -399,5 +399,29 @@ describe Mutations::ReorderModuleItems do
       large_module.reload
       expect(large_module.content_tags.ordered.map(&:id)).to eq reversed_ids
     end
+
+    it "moves an item down within the same module using target_position" do
+      reordered_ids = [item1.id]
+      result = CanvasSchema.execute(
+        mutation_str(item_ids: reordered_ids, target_position: 3),
+        context: { current_user: teacher }
+      )
+
+      expect(result.dig("data", "reorderModuleItems", "errors")).to be_nil
+      module1.reload
+      expect(module1.content_tags.ordered.map(&:id)).to eq [item2.id, item1.id, item3.id]
+    end
+
+    it "inserts an item at the very top with target_position = 1" do
+      reordered_ids = [item2.id]
+      result = CanvasSchema.execute(
+        mutation_str(item_ids: reordered_ids, target_position: 1),
+        context: { current_user: teacher }
+      )
+
+      expect(result.dig("data", "reorderModuleItems", "errors")).to be_nil
+      module1.reload
+      expect(module1.content_tags.ordered.first.id).to eq item2.id
+    end
   end
 end

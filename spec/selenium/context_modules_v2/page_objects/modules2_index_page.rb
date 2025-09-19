@@ -839,8 +839,36 @@ module Modules2IndexPage
     f("[data-testid='select_position_listbox']")
   end
 
+  def move_item_tray_select_page_listbox
+    f("[id^='Select_'][data-testid='select_module_listbox'][title*='Page']")
+  end
+
+  def page_option(page_number)
+    fj("[role='option']:contains('Page #{page_number}')")
+  end
+
+  def reference_item_option(title)
+    fj("[role='option']:contains('#{title}')")
+  end
+
+  def move_item_tray_reference_listbox
+    fxpath("//label[span[text()='Select Reference Item']]//input[@role='combobox']")
+  end
+
+  def place_item_at_top_option
+    fj("[role='option']:contains('At the top')")
+  end
+
   def place_item_at_bottom_option
     fj("[role='option']:contains('At the bottom')")
+  end
+
+  def place_item_before_option
+    fj("[role='option']:contains('Before...')")
+  end
+
+  def place_item_after_option
+    fj("[role='option']:contains('After...')")
   end
 
   def cancel_tray_button
@@ -1094,5 +1122,18 @@ module Modules2IndexPage
 
   def scroll_to_module(module_id)
     scroll_to(f("[data-testid='module-action-menu_#{module_id}']"))
+  end
+
+  def open_move_item_tray(moved_item_id, target_module_name)
+    manage_module_item_button(moved_item_id).click
+    module_item_action_menu_link("Move to...").click
+
+    # select destination module
+    move_item_tray_select_modules_listbox.click
+    option_list_id = move_item_tray_select_modules_listbox.attribute("aria-controls")
+    option_list_course_option(option_list_id, target_module_name).click
+
+    # open the "Place ..." dropdown
+    move_item_tray_place_contents_listbox.click
   end
 end
