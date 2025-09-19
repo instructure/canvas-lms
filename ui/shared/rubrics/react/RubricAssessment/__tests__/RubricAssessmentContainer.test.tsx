@@ -176,6 +176,44 @@ describe('RubricAssessmentContainer Tests', () => {
       expect(getByTestId('outcome-popover-display-name')).toHaveTextContent(OUTCOME_DATA.title)
       expect(queryByTestId('outcome-popover-title')).not.toBeInTheDocument()
     })
+
+    it('displays outcome tag without calculation method and example if not present', () => {
+      queryClient.setQueryData(['rubric_outcome_', '1'], {
+        ...OUTCOME_DATA,
+        calculationMethod: null,
+        calculationInt: null,
+      })
+      const outcomeCriteria: RubricCriterion = {
+        ...RUBRIC_DATA.criteria[0],
+        outcome: {
+          displayName: 'Test Outcome',
+          title: 'Outcome 1',
+        },
+        learningOutcomeId: '1',
+      }
+
+      const criteria = [outcomeCriteria]
+
+      const {getByTestId, queryByTestId} = renderComponent({criteria})
+
+      const outcomeTag = getByTestId('rubric-criteria-row-outcome-tag')
+      expect(outcomeTag).toBeInTheDocument()
+
+      fireEvent.click(outcomeTag)
+
+      expect(getByTestId('outcome-popover-display')).toBeInTheDocument()
+      expect(getByTestId('outcome-popover-display-name')).toHaveTextContent(
+        OUTCOME_DATA.displayName,
+      )
+      expect(getByTestId('outcome-popover-title')).toHaveTextContent(OUTCOME_DATA.title)
+      expect(getByTestId('outcome-popover-display-content-description')).toHaveTextContent(
+        OUTCOME_DATA.description,
+      )
+      expect(
+        queryByTestId('outcome-popover-display-content-calculation-method'),
+      ).not.toBeInTheDocument()
+      expect(queryByTestId('outcome-popover-display-content-example')).not.toBeInTheDocument()
+    })
   })
 
   describe('Assessment Status tests', () => {
