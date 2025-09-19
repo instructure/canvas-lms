@@ -2563,6 +2563,14 @@ describe Types::UserType do
       end
     end
 
+    it "does not return deleted submissions" do
+      Timecop.freeze(@frozen_time) do
+        @submission.update!(workflow_state: "deleted")
+        result = student_user_type.resolve("courseWorkSubmissionsConnection { edges { node { _id } } }")
+        expect(result).to eq([])
+      end
+    end
+
     it "only returns data for current user" do
       Timecop.freeze(@frozen_time) do
         result = user_type.resolve("courseWorkSubmissionsConnection { edges { node { _id } } }")
