@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useMemo} from 'react'
+import {ReactNode, useMemo} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {parse} from '@instructure/moment-utils'
@@ -42,8 +42,11 @@ interface TimestampsProps {
   published?: boolean
   isAnnouncement?: boolean
   showCreatedAsTooltip?: boolean
-  isPinned: boolean
-  pinnedBy: UserType
+  isPinned?: boolean
+  pinnedBy?: UserType
+  withoutPadding?: boolean
+  container?: 'reply' | 'topic' | 'pinned' // only the pinned container is required at the moment
+  replyNode?: ReactNode
 }
 
 const Timestamps = (props: TimestampsProps) => {
@@ -94,11 +97,23 @@ const Timestamps = (props: TimestampsProps) => {
     }
   }, [props.editedTimingDisplay, props.delayedPostAt, props.editor, props.author, isTeacher])
 
-  const timestampsPadding = props.mobileOnly ? '0 xx-small 0 0' : 'xx-small xx-small xx-small 0'
+  const timestampsPadding = useMemo(() => {
+    if (props.withoutPadding) {
+      return '0 xx-small 0 0'
+    }
+
+    return props.mobileOnly ? '0 xx-small 0 0' : 'xx-small xx-small xx-small 0'
+  }, [props.mobileOnly, props.withoutPadding])
 
   const createdAtText = useMemo(() => {
     // show basic date for replies
-    if (!props.isTopic) return props.createdAt
+    if (!props.isTopic) {
+      if (props.container === 'pinned') {
+        return I18n.t('Posted on %{createdAt}', {createdAt: props.createdAt})
+      } else {
+        return props.createdAt
+      }
+    }
     // show the original created date for teachers
     if (isTeacher) {
       return I18n.t('Created %{createdAt}', {createdAt: props.createdAt})
@@ -108,7 +123,7 @@ const Timestamps = (props: TimestampsProps) => {
         ? null
         : I18n.t('Posted %{createdAt}', {createdAt: props.createdAt})
     }
-  }, [isTeacher, props.createdAt, props.delayedPostAt, props.isTopic])
+  }, [isTeacher, props.createdAt, props.delayedPostAt, props.isTopic, props.container])
 
   const pinnedPostText = useMemo(() => {
     if (!ENV?.discussion_pin_post) return null
@@ -145,6 +160,18 @@ const Timestamps = (props: TimestampsProps) => {
     props.published,
   ])
 
+  const lastReplyAtText = useMemo(() => {
+    if (props.container === 'pinned') {
+      return I18n.t('Last reply on %{lastReplyAtDisplay}', {
+        lastReplyAtDisplay: props.lastReplyAtDisplay,
+      })
+    }
+
+    return I18n.t('Last reply %{lastReplyAtDisplay}', {
+      lastReplyAtDisplay: props.lastReplyAtDisplay,
+    })
+  }, [props.lastReplyAtDisplay, props.container])
+
   return (
     <Flex wrap="wrap">
       {pinnedPostText && (
@@ -180,14 +207,13 @@ const Timestamps = (props: TimestampsProps) => {
       )}
       {props.lastReplyAtDisplay && (
         <Flex.Item overflowX="hidden" padding="0 xx-small 0 0">
-          {' | '}
-          <Text size={props.timestampTextSize as any}>
-            {I18n.t('Last reply %{lastReplyAtDisplay}', {
-              lastReplyAtDisplay: props.lastReplyAtDisplay,
-            })}
+          <Text size={props.timestampTextSize as any} data-testid="last-reply-at-text">
+            {' | '}
+            {lastReplyAtText}
           </Text>
         </Flex.Item>
       )}
+      {props.container === 'pinned' && props.replyNode}
     </Flex>
   )
 }
