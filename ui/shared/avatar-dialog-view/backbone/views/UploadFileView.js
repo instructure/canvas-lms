@@ -22,6 +22,10 @@ import template from '../../jst/uploadFileView.handlebars'
 import CropperMaker from '../../react/cropperMaker'
 
 export default class UploadFileView extends BaseView {
+  constructor(options) {
+    super(options)
+  }
+
   static initClass() {
     this.optionProperty('avatarSize')
 

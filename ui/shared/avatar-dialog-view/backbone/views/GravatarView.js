@@ -23,6 +23,10 @@ import md5 from 'md5'
 import '@canvas/jquery/jquery.ajaxJSON'
 
 export default class GravatarView extends AvatarUploadBaseView {
+  constructor(options) {
+    super(options)
+  }
+
   static initClass() {
     this.optionProperty('avatarSize')
 
