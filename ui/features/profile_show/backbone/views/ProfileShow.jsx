@@ -18,17 +18,18 @@
 
 import $ from 'jquery'
 import addLinkRow from '../../jst/addLinkRow.handlebars'
-import AvatarWidget from '@canvas/avatar-dialog-view'
+import AvatarModal from '@canvas/avatar-dialog-view/react/AvatarModal'
 import Backbone from '@canvas/backbone'
 import '@canvas/jquery/jquery.instructure_forms'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
 import React from 'react'
-import ReactDOM from 'react-dom'
-import {Alert} from '@instructure/ui-alerts'
+import {createRoot} from 'react-dom/client'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('user_profile')
 
+let avatarRoot = null
 export default class ProfileShow extends Backbone.View {
   static initClass() {
     this.prototype.el = document.body
@@ -46,22 +47,28 @@ export default class ProfileShow extends Backbone.View {
   initialize() {
     super.initialize(...arguments)
     this.displayAlertOnSave()
-    return new AvatarWidget('.profile-edit-link')
+
+    const avatarModalMount = document.getElementById('avatar-modal-mount')
+    let profilePicLinks = [
+      document.getElementById('profile-edit-link'),
+      document.querySelector('#main .profile_pic_link'), // don't add event handler to side nav avatar
+    ]
+    profilePicLinks = profilePicLinks.filter(link => link !== null)
+    if (avatarModalMount && profilePicLinks.length > 0) {
+      profilePicLinks.forEach(profilePicLink => {
+        profilePicLink.addEventListener('click', event => {
+          event.preventDefault()
+          if (avatarRoot === null) {
+            avatarRoot = createRoot(avatarModalMount)
+          }
+          avatarRoot.render(<AvatarModal onClose={() => avatarRoot.render(null)} />)
+        })
+      })
+    }
   }
 
-  renderAlert(message, container, variant) {
-    ReactDOM.render(
-      <Alert
-        variant={variant}
-        liveRegionPoliteness="assertive"
-        liveRegion={() => document.getElementById('flash_screenreader_holder')}
-        margin="small"
-        timeout={5000}
-      >
-        {message}
-      </Alert>,
-      this.$el.find(container)[0],
-    )
+  renderAlert(message, variant) {
+    showFlashAlert({message, type: variant, timeout: 5000, politeness: 'assertive'})
   }
 
   displayAlertOnSave() {
@@ -71,13 +78,9 @@ export default class ProfileShow extends Backbone.View {
     const saveFailedDiv = this.$el.find(saveFailedContainer)
 
     if (saveSuccessDiv.length > 0) {
-      this.renderAlert(
-        I18n.t('Profile has been saved successfully'),
-        saveSuccessContainer,
-        'success',
-      )
+      this.renderAlert(I18n.t('Profile has been saved successfully'), 'success')
     } else if (saveFailedDiv.length > 0) {
-      this.renderAlert(I18n.t('Profile save was unsuccessful'), saveFailedContainer, 'error')
+      this.renderAlert(I18n.t('Profile save was unsuccessful'), 'error')
     }
   }
 
