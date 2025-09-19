@@ -437,6 +437,7 @@ class DeveloperKeysController < ApplicationController
       :client_credentials_audience,
       :require_scopes,
       :allow_includes,
+      redirect_uris: [],
       scopes: []
     )
   end
