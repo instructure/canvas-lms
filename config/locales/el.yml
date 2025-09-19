@@ -6091,6 +6091,7 @@ el:
     roles: 
       designer: Σχεδιαστής
       designer_with_indefinite_article: "Ένας Σχεδιαστής/ια"
+      instructors: Εκπαιδευτές
       observer: Παρατηρητής
       observer_with_indefinite_article: Παρατηρητής
       student: Μαθητής
@@ -13316,6 +13317,7 @@ el:
       role_type: "Τύπος Βάσης:"
       save: Αποθήκευση
       saving: Αποθήκευση...
+    observer: "Εγγεγραμμένος ως παρατηρητής"
     observers: Παρατηρητές
     permission_button: 
       rolebutton: 
@@ -13335,7 +13337,10 @@ el:
       page_header_title: "Άδειες Λογαριασμού"
     student: "Μαθητής "
     students: Μαθητές
+    ta: "Εγγεγραμμένος ως βοηθός διδασκαλίας"
     tas: "Βοηθοί διδασκαλίας"
+    teacher: Δάσκαλος
+    teachers: Καθηγητές
   roles_730b879e: Ρόλοι
   rootFoldersFinder: 
     course_files: "Αρχεία μαθήματος"
