@@ -22,7 +22,6 @@
 # An API for managing files and folders
 # See the File Upload Documentation for details on the file upload workflow.
 #
-# @deprecated_response_field uuid NOTICE 2025-05-07 EFFECTIVE 2025-08-05
 #
 # @model File
 #     {
@@ -32,10 +31,6 @@
 #         "id": {
 #           "example": 569,
 #           "type": "integer"
-#         },
-#         "uuid": {
-#           "example": "SUj23659sdfASF35h265kf352YTdnC4",
-#           "type": "string"
 #         },
 #         "folder_id": {
 #           "example": 4207,
@@ -54,7 +49,7 @@
 #           "type": "string"
 #         },
 #         "url": {
-#           "example": "http://www.example.com/files/569/download?download_frd=1&verifier=c6HdZmxOZa0Fiin2cbvZeI8I5ry7yqD7RChQzb6P",
+#           "example": "http://www.example.com/files/569/download?download_frd=1",
 #           "type": "string"
 #         },
 #         "size": {

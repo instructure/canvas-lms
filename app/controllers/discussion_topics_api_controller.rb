@@ -699,7 +699,7 @@ class DiscussionTopicsApiController < ApplicationController
   #       "created_at": "2011-11-03T21:33:29Z",
   #       "attachment": {
   #         "content-type": "unknown/unknown",
-  #         "url": "http://www.example.com/files/681/download?verifier=JDG10Ruitv8o6LjGXWlxgOb5Sl3ElzVYm9cBKUT3",
+  #         "url": "http://www.example.com/files/681/download",
   #         "filename": "content.txt",
   #         "display_name": "content.txt" } },
   #     {
