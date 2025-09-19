@@ -24,6 +24,7 @@ export type ButtonAlignment = 'left' | 'center' | 'right'
 export type ButtonLayout = 'horizontal' | 'vertical'
 export type ButtonLinkOpenMode = 'new-tab' | 'same-tab'
 export type ButtonStyle = 'filled' | 'outlined'
+export type ButtonViewMode = 'view' | 'editview' | 'edit'
 
 export type ButtonData = {
   id: number
@@ -52,6 +53,7 @@ export type ButtonDisplayProps = Prettify<
     dataTestId: string
     onButtonClick?: (buttonId: number) => void
     focusHandler?: FocusHandler
+    viewMode?: ButtonViewMode
   }
 >
 
@@ -83,4 +85,5 @@ export type SingleButtonProps = {
   isFullWidth: boolean
   onButtonClick?: (buttonId: number) => void
   focusHandler?: FocusHandler
+  viewMode?: ButtonViewMode
 }
