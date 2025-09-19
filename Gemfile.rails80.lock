@@ -674,7 +674,7 @@ GEM
       json-jwt (~> 1.16.6)
       rexml
       simple_oauth (~> 0.3.1)
-    inst-jobs (3.3.0)
+    inst-jobs (3.3.1)
       activerecord (>= 7.1)
       activerecord-pg-extensions (~> 0.4)
       activesupport (>= 7.1)
