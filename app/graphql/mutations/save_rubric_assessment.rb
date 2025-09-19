@@ -39,12 +39,14 @@ class Mutations::SaveRubricAssessment < Mutations::BaseMutation
 
     assessment = association.rubric_assessments.find(input[:rubric_assessment_id]) if input[:rubric_assessment_id].present?
 
-    verify_authorized_action!(assessment, :update) if assessment.present?
+    if assessment.present? && !authorized_action(assessment, current_user, :update)
+      raise GraphQL::ExecutionError, "Authorization failed - existing assessment cannot be updated by current user"
+    end
 
     # only check if there's no assessment object, since that's the only time
     # this param matters (find_asset_for_assessment)
     user_id = assessment.present? ? assessment.user_id : submission.user_id
-    raise ActiveRecord::RecordNotFound if user_id.blank?
+    raise GraphQL::ExecutionError, "User ID blank - unable to determine user for assessment" if user_id.blank?
 
     # For a moderated assignment, submitting an assessment claims a grading
     # slot for the submitting provisional grader (or throws an error if no
