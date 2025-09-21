@@ -17,29 +17,18 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../../common"
+require_relative "../../../../common"
+require_relative "../settings_group_component"
+require_relative "shared/block_title_toggle"
+require_relative "shared/color_settings"
 
-class UploadModalComponent
+class TextBlockSettings
   include SeleniumDependencies
 
-  def initialize(modal_title)
-    @modal_title = modal_title
-    @upload_modal = upload_modal
-  end
+  attr_reader :block_title_toggle, :color_settings
 
-  def upload_modal
-    f(%(form[aria-label="#{@modal_title}"]))
-  end
-
-  def url_tab
-    fj('[role="tab"]:contains("URL")', @upload_modal)
-  end
-
-  def url_input
-    f('input[name$="url"]', @upload_modal)
-  end
-
-  def submit_button
-    fj('button:contains("Submit")', @upload_modal)
+  def initialize
+    @block_title_toggle = BlockTitleToggle.new
+    @color_settings = ColorSettings.new
   end
 end

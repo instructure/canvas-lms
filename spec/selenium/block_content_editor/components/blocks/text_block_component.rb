@@ -17,29 +17,30 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../../common"
+require_relative "block_component"
+require_relative "../settings_tray/block_settings/text_block_settings"
 
-class UploadModalComponent
-  include SeleniumDependencies
+class TextBlockComponent < BlockComponent
+  attr_reader :block_title
 
-  def initialize(modal_title)
-    @modal_title = modal_title
-    @upload_modal = upload_modal
+  def initialize(block)
+    super
+    @block_title = BlockTitleComponent.new(@block)
   end
 
-  def upload_modal
-    f(%(form[aria-label="#{@modal_title}"]))
+  def settings
+    @settings ||= TextBlockSettings.new
   end
 
-  def url_tab
-    fj('[role="tab"]:contains("URL")', @upload_modal)
+  def rce_controller_selector
+    "textarea"
   end
 
-  def url_input
-    f('input[name$="url"]', @upload_modal)
+  def text_content
+    f("p", @block)
   end
 
-  def submit_button
-    fj('button:contains("Submit")', @upload_modal)
+  def type(text)
+    type_in_tiny(rce_controller_selector, text)
   end
 end
