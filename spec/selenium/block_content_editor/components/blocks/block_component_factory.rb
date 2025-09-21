@@ -21,6 +21,7 @@ require_relative "../../../common"
 require_relative "block_component"
 require_relative "separator_block_component"
 require_relative "highlight_block_component"
+require_relative "media_block_component"
 
 class BlockComponentFactory
   extend SeleniumDependencies
@@ -33,6 +34,7 @@ class BlockComponentFactory
   def self.create_by_type(element, block_type)
     case block_type
     when "Separator line" then SeparatorBlockComponent.new(element)
+    when "Media" then MediaBlockComponent.new(element)
     when "Highlight" then HighlightBlockComponent.new(element)
     else BlockComponent.new(element)
     end
