@@ -17,14 +17,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../block_component"
+require_relative "block_component"
+require_relative "../settings_tray/block_settings/separator_block_settings"
 
-class PreviewBlockComponent < BlockComponent
-  def block_title
-    f("h2", @block)
+class SeparatorBlockComponent < BlockComponent
+  def settings
+    @settings ||= SeparatorBlockSettings.new
   end
 
-  def block_content
-    f("h2 + *", @block)
+  def separator_line
+    f("[data-testid='separator-line']", @block)
   end
 end
