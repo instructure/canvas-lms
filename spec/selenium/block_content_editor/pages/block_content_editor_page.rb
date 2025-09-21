@@ -100,8 +100,8 @@ module BlockContentEditorPage
     find_all_with_jquery(block_selector).map { |element| BlockComponentFactory.create(element) }
   end
 
-  def edit_blocks
-    blocks
+  def blocks_with_title
+    blocks.select { |block| block.respond_to?(:block_title) }
   end
 
   def toolbar_component

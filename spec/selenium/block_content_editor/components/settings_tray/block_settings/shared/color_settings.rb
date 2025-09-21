@@ -27,46 +27,50 @@ class ColorSettings
     @background_color_label = "Background color"
     @title_color_label = has_block_title ? "Title color" : nil
     @color_settings = SettingsGroupComponent.new("Color settings")
-    @background_color_setting = find_background_color_setting
-    @title_color_setting = find_title_color_setting
   end
 
-  def find_background_color_setting
+  def title_color_setting_selector
+    return nil unless @title_color_label
+
+    "//*[contains(@class, 'colorPicker') and descendant::*[contains(text(), '#{@title_color_label}')]]"
+  end
+
+  def background_color_setting
     fj("[class$='colorPicker']:contains('#{@background_color_label}')", @color_settings.settings_group)
   end
 
   def background_color_hex_input
-    f("input", @background_color_setting)
+    f("input", background_color_setting)
   end
 
   def background_color_popover_button
-    f("button", @background_color_setting)
+    f("button", background_color_setting)
   end
 
   def background_color_mixer
     f('[data-testid="color-mixer"]')
   end
 
-  def find_title_color_setting
+  def title_color_setting
     return nil unless @title_color_label
 
-    fj("[class$='colorPicker']:contains('#{@title_color_label}')", @color_settings.settings_group)
+    fxpath(title_color_setting_selector, @color_settings.settings_group)
   end
 
   def title_color_hex_input
-    return nil unless @title_color_setting
+    return nil unless title_color_setting
 
-    f("input", @title_color_setting)
+    f("input", title_color_setting)
   end
 
   def title_color_popover_button
-    return nil unless @title_color_setting
+    return nil unless title_color_setting
 
-    f("button", @title_color_setting)
+    f("button", title_color_setting)
   end
 
   def title_color_mixer
-    return nil unless @title_color_setting
+    return nil unless title_color_setting
 
     f('[data-testid="color-mixer"]')
   end
@@ -79,7 +83,7 @@ class ColorSettings
   end
 
   def change_title_color(hex_color)
-    return nil unless @title_color_setting
+    return nil unless title_color_setting
 
     title_color_hex_input.click
     title_color_hex_input.send_keys([:control, "a"])
