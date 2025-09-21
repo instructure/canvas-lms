@@ -179,10 +179,10 @@ class CutyCapt
   def self.snapshot_attachment_for_url(url, **attachment_opts)
     attachment = nil
     snapshot_url(url) do |file_path|
-      # this is a really odd way to get Attachment the data it needs, which
-      # should probably be remedied at some point
-      attachment = Attachment.create!(uploaded_data: Canvas::UploadedFile.new(file_path, "image/png"),
-                                      **attachment_opts)
+      attachment = Attachment.build(**attachment_opts)
+      uploaded_data = Canvas::UploadedFile.new(file_path, "image/png")
+      Attachments::Storage.store_for_attachment(attachment, uploaded_data)
+      attachment.save!
     end
     attachment
   end

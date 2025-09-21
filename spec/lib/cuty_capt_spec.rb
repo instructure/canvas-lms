@@ -108,5 +108,19 @@ describe CutyCapt do
       attachment = CutyCapt.snapshot_attachment_for_url("blah", context: user)
       expect(attachment).not_to be_nil
     end
+
+    it "returns an attachment with an instfs_uuid if enabled" do
+      secret = "secret"
+      uuid = SecureRandom.uuid
+      allow(InstFS).to receive_messages(enabled?: true, jwt_secrets: [secret], app_host: "http://instfs.test")
+      allow(InstFS).to receive(:direct_upload).and_return(uuid)
+
+      path = file_fixture("instructure.png")
+      expect(CutyCapt).to receive(:snapshot_url).and_yield(path)
+      user = User.create!
+      attachment = CutyCapt.snapshot_attachment_for_url("blah", context: user)
+      expect(attachment).not_to be_nil
+      expect(attachment.instfs_uuid).to eq uuid
+    end
   end
 end
