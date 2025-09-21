@@ -17,18 +17,16 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "edit_block_component"
-require_relative "preview_block_component"
+require_relative "../../../common"
 
-class BlockComponentFactory
-  def self.create(block, mode:)
-    case mode
-    when :edit
-      EditBlockComponent.new(block)
-    when :preview
-      PreviewBlockComponent.new(block)
-    else
-      raise ArgumentError, "Invalid mode: #{mode}. Valid modes: :edit, :preview"
-    end
+class SettingsTrayComponent
+  include SeleniumDependencies
+
+  def settings_tray
+    f("[data-testid='settings-tray']")
+  end
+
+  def close_button
+    f("[class$='closeButton']")
   end
 end

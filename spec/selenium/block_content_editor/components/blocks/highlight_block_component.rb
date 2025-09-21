@@ -17,43 +17,27 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../block_component"
-require_relative "../move_component"
+require_relative "block_component"
+require_relative "../settings_tray/block_settings/highlight_block_settings"
 
-class EditBlockComponent < BlockComponent
-  def block_menu_selector
-    "[data-testid='block-menu']"
+class HighlightBlockComponent < BlockComponent
+  def settings
+    @settings ||= HighlightBlockSettings.new
   end
 
-  def rce_controller_selector
-    "textarea"
+  def highlight_icon_selector
+    "[data-testid='highlight-icon']"
   end
 
-  def block_type_label_selector
-    "[data-testid='block-type-label']"
+  def highlight
+    f("[data-testid='highlight-block']", @block)
   end
 
-  def block_menu
-    f(block_menu_selector, @block)
+  def highlight_icon
+    f(highlight_icon_selector, highlight)
   end
 
-  def duplicate_button
-    f("[data-testid='copy-block-button']", @block)
-  end
-
-  def settings_button
-    f("[data-testid='block-settings-button']", @block)
-  end
-
-  def remove_button
-    f("[data-testid='remove-block-button']", @block)
-  end
-
-  def block_type_label
-    f(block_type_label_selector, @block)
-  end
-
-  def move_component
-    MoveComponent.new(@block)
+  def input
+    f("input", highlight)
   end
 end

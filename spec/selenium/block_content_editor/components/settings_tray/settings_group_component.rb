@@ -17,13 +17,18 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../../common"
-require_relative "move_component"
+require_relative "../../../common"
 
-class BlockComponent
+class SettingsGroupComponent
   include SeleniumDependencies
 
-  def initialize(block)
-    @block = block
+  attr_reader :settings_group
+
+  def initialize(name)
+    @settings_group = fj("[data-settingssectiontoggle]:contains('#{name}')")
+  end
+
+  def expand_button
+    f("[direction='row'] button", @settings_group)
   end
 end

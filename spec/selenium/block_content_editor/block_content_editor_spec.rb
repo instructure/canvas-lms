@@ -76,24 +76,24 @@ describe "Block Content Editor", :ignore_js_errors do
     end
 
     it "duplicates a block" do
-      first_block.duplicate_button.click
+      blocks.first.duplicate_button.click
       wait_for_ajaximations
 
       expect(blocks.size).to eq(2)
     end
 
     it "removes a block" do
-      first_block.remove_button.click
+      blocks.first.remove_button.click
       wait_for_ajaximations
 
       expect(blocks.size).to eq(0)
     end
 
     it "opens settings tray" do
-      first_block.settings_button.click
+      blocks.first.settings_button.click
       wait_for_ajaximations
 
-      expect(settings_tray).to be_displayed
+      expect(blocks.first.settings_tray).to be_displayed
     end
   end
 
@@ -104,6 +104,9 @@ describe "Block Content Editor", :ignore_js_errors do
     end
 
     shared_examples "block movement" do |block_selector, move_direction, expected_order|
+      let(:first_block) { blocks.first }
+      let(:last_block) { blocks.last }
+
       it "moves a block #{move_direction}" do
         expected_labels = expected_order.map { |block_name| send(block_name).block_type_label.text }
         target_block = send(block_selector)
@@ -173,13 +176,13 @@ describe "Block Content Editor", :ignore_js_errors do
       add_a_block("Text", "Text column")
       add_a_block("Image", "Image + text")
       expect(blocks.size).to eq(2)
-      expect(first_block.block_type_label.text).to eq("Text column")
-      expect(last_block.block_type_label.text).to eq("Image + text")
+      expect(blocks.first.block_type_label.text).to eq("Text column")
+      expect(blocks.last.block_type_label.text).to eq("Image + text")
 
       toolbar_component.undo_button.click
       wait_for_ajaximations
       expect(blocks.size).to eq(1)
-      expect(first_block.block_type_label.text).to eq("Text column")
+      expect(blocks.first.block_type_label.text).to eq("Text column")
 
       toolbar_component.undo_button.click
       wait_for_ajaximations
@@ -189,13 +192,13 @@ describe "Block Content Editor", :ignore_js_errors do
       toolbar_component.redo_button.click
       wait_for_ajaximations
       expect(blocks.size).to eq(1)
-      expect(first_block.block_type_label.text).to eq("Text column")
+      expect(blocks.first.block_type_label.text).to eq("Text column")
 
       toolbar_component.redo_button.click
       wait_for_ajaximations
       expect(blocks.size).to eq(2)
-      expect(first_block.block_type_label.text).to eq("Text column")
-      expect(last_block.block_type_label.text).to eq("Image + text")
+      expect(blocks.first.block_type_label.text).to eq("Text column")
+      expect(blocks.last.block_type_label.text).to eq("Image + text")
       expect(toolbar_component.redo_button).to be_disabled
     end
   end
@@ -208,7 +211,7 @@ describe "Block Content Editor", :ignore_js_errors do
     end
 
     it "toggles preview mode when preview button is clicked" do
-      expect(element_exists?(block_selector)).to be false
+      expect(element_exists?(base_block_edit_layout_selector)).to be false
       expect(preview_component.preview_layout).to be_displayed
     end
 
@@ -273,6 +276,132 @@ describe "Block Content Editor", :ignore_js_errors do
       blocks.each do |block|
         expect(element_exists?(block.block_menu_selector)).to be false
         expect(element_exists?(block.block_type_label_selector)).to be false
+      end
+    end
+  end
+
+  shared_examples "editing background color" do
+    it "changes background color" do
+      blocks.first.settings_button.click
+      wait_for_ajaximations
+
+      color_settings = blocks.first.settings.color_settings
+      color_settings.change_background_color("ff0000")
+      wait_for_ajaximations
+      expect(blocks.first.block.css_value("background-color")).to eq("rgba(255, 0, 0, 1)")
+
+      blocks.first.settings_tray_component.close_button.click
+      wait_for_ajaximations
+      expect(blocks.first.block.css_value("background-color")).to eq("rgba(255, 0, 0, 1)")
+    end
+  end
+
+  context "Editing blocks" do
+    context "Separator block" do
+      before do
+        add_a_block("Divider", "Separator line")
+      end
+
+      include_examples "editing background color"
+
+      it "changes separator color" do
+        blocks.first.settings_button.click
+        wait_for_ajaximations
+
+        blocks.first.settings.change_separator_color("00ff00")
+        wait_for_ajaximations
+        expect(blocks.first.separator_line.css_value("border-color")).to eq("rgb(0, 255, 0)")
+
+        blocks.first.settings_tray_component.close_button.click
+        wait_for_ajaximations
+        expect(blocks.first.separator_line.css_value("border-color")).to eq("rgb(0, 255, 0)")
+      end
+
+      it "changes separator thickness" do
+        blocks.first.settings_button.click
+        wait_for_ajaximations
+
+        settings = blocks.first.settings
+        separator_line = blocks.first.separator_line
+        thicknesses = {}
+
+        %w[Small Medium Large].each do |size|
+          settings.separator_size_radio_option(size).click
+          wait_for_ajaximations
+          thicknesses[size] = separator_line.css_value("border-bottom-width").to_f
+        end
+
+        aggregate_failures "separator thickness relationships" do
+          thicknesses.each_value do |thickness|
+            expect(thickness).to be > 0
+          end
+
+          expect(thicknesses["Small"]).to be < thicknesses["Medium"]
+          expect(thicknesses["Medium"]).to be < thicknesses["Large"]
+          expect(thicknesses["Small"]).to be < thicknesses["Large"]
+        end
+
+        blocks.first.settings_tray_component.close_button.click
+        wait_for_ajaximations
+
+        aggregate_failures "separator thickness relationships" do
+          thicknesses.each_value do |thickness|
+            expect(thickness).to be > 0
+          end
+
+          expect(thicknesses["Small"]).to be < thicknesses["Medium"]
+          expect(thicknesses["Medium"]).to be < thicknesses["Large"]
+          expect(thicknesses["Small"]).to be < thicknesses["Large"]
+        end
+      end
+    end
+
+    context "Highlight block" do
+      before do
+        add_a_block("Text", "Highlight")
+      end
+
+      include_examples "editing background color"
+
+      it "toggles highlight icon display" do
+        blocks.first.settings_button.click
+        wait_for_ajaximations
+
+        toggle = blocks.first.settings.display_icon_toggle
+        expect(blocks.first.highlight_icon).to be_displayed
+
+        toggle.click
+        wait_for_ajaximations
+        expect(element_exists?(blocks.first.highlight_icon_selector)).to be false
+
+        blocks.first.settings_tray_component.close_button.click
+        wait_for_ajaximations
+        expect(element_exists?(blocks.first.highlight_icon_selector)).to be false
+
+        blocks.first.settings_button.click
+        wait_for_ajaximations
+
+        toggle = blocks.first.settings.display_icon_toggle
+        toggle.click
+        wait_for_ajaximations
+        expect(blocks.first.highlight_icon).to be_displayed
+
+        blocks.first.settings_tray_component.close_button.click
+        wait_for_ajaximations
+        expect(blocks.first.highlight_icon).to be_displayed
+      end
+
+      it "changes highlight color" do
+        blocks.first.settings_button.click
+        wait_for_ajaximations
+
+        blocks.first.settings.change_highlight_color("00ff00")
+        wait_for_ajaximations
+        expect(blocks.first.highlight.css_value("background-color")).to eq("rgba(0, 255, 0, 1)")
+
+        blocks.first.settings_tray_component.close_button.click
+        wait_for_ajaximations
+        expect(blocks.first.highlight.css_value("background-color")).to eq("rgba(0, 255, 0, 1)")
       end
     end
   end
