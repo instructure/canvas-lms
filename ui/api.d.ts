@@ -303,15 +303,11 @@ export type Attachment = {
   comment_id?: string
   content_type: string
   created_at: string
-  crocodoc_url?: string
   display_name: string
   filename: string
-  hijack_crocodoc_session?: boolean
   id: string
   mime_class: string
   provisional_canvadoc_url?: null | string
-  provisional_crocodoc_url?: null | string
-  submitted_to_crocodoc?: boolean
   submitter_id: string
   updated_at: string
   upload_status: 'pending' | 'failed' | 'success'

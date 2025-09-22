@@ -125,7 +125,6 @@ declare global {
       id: string
       mimeType: string
       submission_id: string
-      crocodoc_session_url?: string
     }) => void
     mediaComment: any
     mediaCommentThumbnail: (size?: 'normal' | 'small') => void

@@ -2798,10 +2798,7 @@ EG = {
     $vericiteInfoContainer = $('#submission_files_container .turnitin_info_container').empty()
     $.each(submission.versioned_attachments || [], (_i, a) => {
       const attachment: Attachment = a.attachment
-      if (
-        (attachment.crocodoc_url || attachment.canvadoc_url) &&
-        EG.currentStudent.provisional_crocodoc_urls
-      ) {
+      if (attachment.canvadoc_url && EG.currentStudent.provisional_crocodoc_urls) {
         const urlInfo = find(
           EG.currentStudent.provisional_crocodoc_urls,
           (url: ProvisionalCrocodocUrl) => url.attachment_id === attachment.id,
@@ -2814,11 +2811,7 @@ EG = {
         attachment.provisional_crocodoc_url = null
         attachment.provisional_canvadoc_url = null
       }
-      if (
-        attachment.crocodoc_url ||
-        attachment.canvadoc_url ||
-        isPreviewable(attachment.content_type)
-      ) {
+      if (attachment.canvadoc_url || isPreviewable(attachment.content_type)) {
         inlineableAttachments.push(attachment)
       }
 
@@ -3361,7 +3354,7 @@ EG = {
   },
 
   renderAttachment(attachment: Attachment) {
-    // show the crocodoc doc if there is one
+    // show the canvadoc doc if there is one
     // then show the google attachment if there is one
     // then show the first browser viewable attachment if there is one
     this.emptyIframeHolder()
@@ -3378,41 +3371,13 @@ EG = {
         attachment.workflow_state === 'processing',
     }
 
-    if (
-      !attachment.hijack_crocodoc_session &&
-      attachment.submitted_to_crocodoc &&
-      !attachment.crocodoc_url
-    ) {
-      $('#crocodoc_pending').show()
-    }
     const canvadocMessage = I18n.t(
       'canvadoc_expiring',
       'Your Canvas DocViewer session is expiring soon.  Please ' +
         'reload the window to avoid losing any work.',
     )
 
-    if (attachment.crocodoc_url) {
-      if (!attachment.hijack_crocodoc_session) {
-        const crocodocMessage = I18n.t(
-          'crocodoc_expiring',
-          'Your Crocodoc session is expiring soon.  Please reload ' +
-            'the window to avoid losing any work.',
-        )
-        const aggressiveWarnings = this.generateWarningTimings(1)
-        this.displayExpirationWarnings(aggressiveWarnings, 1, crocodocMessage)
-      } else {
-        const aggressiveWarnings = this.generateWarningTimings(10)
-        this.displayExpirationWarnings(aggressiveWarnings, 10, canvadocMessage)
-      }
-
-      $iframe_holder.show()
-      loadDocPreview(
-        $iframe_holder[0],
-        $.extend(previewOptions, {
-          crocodoc_session_url: attachment.provisional_crocodoc_url || attachment.crocodoc_url,
-        }),
-      )
-    } else if (attachment.canvadoc_url) {
+    if (attachment.canvadoc_url) {
       const aggressiveWarnings = this.generateWarningTimings(10)
       this.displayExpirationWarnings(aggressiveWarnings, 10, canvadocMessage)
 

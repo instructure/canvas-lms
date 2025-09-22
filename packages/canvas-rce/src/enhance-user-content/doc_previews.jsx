@@ -143,20 +143,7 @@ export function loadDocPreview($container, options) {
     }
   }
 
-  if (opts.crocodoc_session_url) {
-    const sanitizedUrl = sanitizeUrl(opts.crocodoc_session_url)
-    const iframe = document.createElement('iframe')
-    iframe.setAttribute('src', sanitizedUrl)
-    iframe.setAttribute('width', opts.width)
-    iframe.setAttribute('height', opts.height)
-    iframe.setAttribute('allowfullscreen', '1')
-    iframe.id = opts.id
-    $container.appendChild(iframe)
-    iframe.load(() => {
-      tellAppIViewedThisInline('crocodoc')
-      if (typeof opts.ready === 'function') opts.ready()
-    })
-  } else if (opts.canvadoc_session_url) {
+  if (opts.canvadoc_session_url) {
     const canvadocWrapper = document.createElement('div')
     canvadocWrapper.setAttribute(
       'style',

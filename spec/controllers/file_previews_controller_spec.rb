@@ -102,16 +102,7 @@ describe FilePreviewsController do
     expect(assigns["show_left_side"]).to be false
   end
 
-  it "redirects to crododoc_url if available and params[:annotate] is given" do
-    allow_any_instance_of(Attachment).to receive(:crocodoc_url).and_return("http://example.com/fake_crocodoc_url")
-    allow_any_instance_of(Attachment).to receive(:canvadoc_url).and_return("http://example.com/fake_canvadoc_url")
-    attachment_model content_type: "application/msword"
-    get :show, params: { course_id: @course.id, file_id: @attachment.id, annotate: 1 }
-    expect(response).to redirect_to @attachment.crocodoc_url
-  end
-
   it "redirects to canvadocs_url if available" do
-    allow_any_instance_of(Attachment).to receive(:crocodoc_url).and_return("http://example.com/fake_crocodoc_url")
     allow_any_instance_of(Attachment).to receive(:canvadoc_url).and_return("http://example.com/fake_canvadoc_url")
     attachment_model content_type: "application/msword"
     get :show, params: { course_id: @course.id, file_id: @attachment.id }
@@ -119,7 +110,6 @@ describe FilePreviewsController do
   end
 
   it "redirects to a google doc preview if available" do
-    allow_any_instance_of(Attachment).to receive(:crocodoc_url).and_return(nil)
     allow_any_instance_of(Attachment).to receive(:canvadoc_url).and_return(nil)
     attachment_model content_type: "application/msword"
     get :show, params: { course_id: @course.id, file_id: @attachment.id }
@@ -128,7 +118,6 @@ describe FilePreviewsController do
   end
 
   it "redirects to file if it's html" do
-    allow_any_instance_of(Attachment).to receive(:crocodoc_url).and_return(nil)
     allow_any_instance_of(Attachment).to receive(:canvadoc_url).and_return(nil)
     attachment_model content_type: "text/html"
     get :show, params: { course_id: @course.id, file_id: @attachment.id }
@@ -137,7 +126,6 @@ describe FilePreviewsController do
   end
 
   it "renders a download link if no previews are available" do
-    allow_any_instance_of(Attachment).to receive(:crocodoc_url).and_return(nil)
     allow_any_instance_of(Attachment).to receive(:canvadoc_url).and_return(nil)
     @account.disable_service(:google_docs_previews)
     @account.save!

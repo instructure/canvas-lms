@@ -2517,10 +2517,6 @@ class Account < ActiveRecord::Base
     end
   end
 
-  def migrate_to_canvadocs?
-    Canvadocs.hijack_crocodoc_sessions?
-  end
-
   def update_terms_of_service(terms_params, saving_user = nil)
     terms = TermsOfService.ensure_terms_for_account(self)
     terms.terms_type = terms_params[:terms_type] if terms_params[:terms_type]
