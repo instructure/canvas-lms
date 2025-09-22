@@ -100,7 +100,7 @@ const CourseWorkFilters: React.FC<CourseWorkFiltersProps> = ({
           ))}
         </SimpleSelect>
       </Flex.Item>
-      <Flex.Item shouldGrow={isMobile} padding={isMobile ? filterMobilePadding : undefined}>
+      <Flex.Item shouldGrow={isMobile} padding={isMobile ? filterMobilePadding : '0 0 0 small'}>
         <SimpleSelect
           renderLabel={<ScreenReaderContent>{I18n.t('Filter by due date')}</ScreenReaderContent>}
           value={selectedDateFilter}

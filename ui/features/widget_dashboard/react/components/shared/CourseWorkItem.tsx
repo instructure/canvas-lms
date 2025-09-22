@@ -24,7 +24,6 @@ import {Link} from '@instructure/ui-link'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {getSubmissionStatus, getTypeIcon} from '../widgets/CourseWorkWidget/utils'
 import type {CourseWorkItem as CourseWorkItemType} from '../../hooks/useCourseWork'
-import {CourseCode} from './CourseCode'
 import {useResponsiveContext} from '../../hooks/useResponsiveContext'
 
 const I18n = createI18nScope('widget_dashboard')
@@ -40,7 +39,11 @@ export function CourseWorkItem({item}: CourseWorkItemProps) {
   return (
     <Flex.Item key={item.id} overflowY="hidden">
       <View as="div" margin="small" background="primary">
-        <Flex gap="small" alignItems="center" wrap={isMobile ? 'wrap' : 'no-wrap'}>
+        <Flex
+          gap="small"
+          alignItems={isMobile ? 'start' : 'center'}
+          direction={isMobile ? 'column' : 'row'}
+        >
           {!isMobile && (
             <Flex.Item>
               <View
@@ -68,16 +71,9 @@ export function CourseWorkItem({item}: CourseWorkItemProps) {
                   {item.title}
                 </Text>
               </Link>
-              <Flex gap="x-small" alignItems="center" wrap="wrap">
-                <Flex.Item>
-                  <CourseCode courseId={item.course.id} size="x-small" />
-                </Flex.Item>
-                <Flex.Item>
-                  <Text size="x-small" color="secondary">
-                    {item.course.name}
-                  </Text>
-                </Flex.Item>
-              </Flex>
+              <Text size="x-small" color="secondary">
+                {item.course.name}
+              </Text>
               <Text size="x-small" color="secondary">
                 {item.points != null && `${I18n.t('%{points} pts', {points: item.points})}`}
               </Text>
