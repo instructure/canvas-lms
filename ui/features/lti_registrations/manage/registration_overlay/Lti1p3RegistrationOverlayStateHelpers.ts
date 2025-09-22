@@ -63,6 +63,7 @@ export const initialOverlayStateFromInternalConfig = (
       customFields: formatCustomFields(
         existingOverlay?.custom_fields || internalConfig.custom_fields,
       ),
+      message_settings: internalConfig.launch_settings?.message_settings || [],
     },
     permissions: {
       scopes: internalConfig.scopes.filter(s => !existingOverlay?.disabled_scopes?.includes(s)),
@@ -170,7 +171,6 @@ export const convertToLtiConfigurationOverlay = (
         topNavAllowFullscreenValue === internalPlacement?.allow_fullscreen
           ? undefined
           : topNavAllowFullscreenValue,
-      eula: internalPlacement?.eula,
     })
     return {
       ...acc,
@@ -198,6 +198,10 @@ export const convertToLtiConfigurationOverlay = (
       state.launchSettings.JwkMethod === 'public_jwk_url' ? state.launchSettings.JwkURL : null,
     oidc_initiation_url:
       state.launchSettings.openIDConnectInitiationURL || internalConfig.oidc_initiation_url,
+    launch_settings: {
+      ...internalConfig.launch_settings,
+      message_settings: state.launchSettings.message_settings,
+    },
   }
 
   return {

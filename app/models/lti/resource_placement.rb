@@ -126,6 +126,7 @@ module Lti
 
     PLACEMENTS = PLACEMENTS_BY_MESSAGE_TYPE.values.flatten.uniq.freeze
 
+    # Should match with LtiPlacementlessMessageType in frontend lti_registration/manage/model/LtiMessageType.ts
     PLACEMENTLESS_MESSAGE_TYPES = [
       LtiAdvantage::Messages::EulaRequest::MESSAGE_TYPE,
     ].freeze
