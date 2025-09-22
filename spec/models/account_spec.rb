@@ -2090,22 +2090,6 @@ describe Account do
     end
   end
 
-  describe "#migrate_to_canvadocs?" do
-    before(:once) do
-      @account = Account.create!
-    end
-
-    it "is true if hijack_crocodoc_sessions is true" do
-      allow(Canvadocs).to receive(:hijack_crocodoc_sessions?).and_return(true)
-      expect(@account).to be_migrate_to_canvadocs
-    end
-
-    it "is false if hijack_crocodoc_sessions is false" do
-      allow(Canvadocs).to receive(:hijack_crocodoc_sessions?).and_return(false)
-      expect(@account).not_to be_migrate_to_canvadocs
-    end
-  end
-
   it "clears special account cache on updates to special accounts" do
     expect(Account.default.settings[:blah]).to be_nil
 

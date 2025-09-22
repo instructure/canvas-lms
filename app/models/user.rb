@@ -3346,6 +3346,8 @@ class User < ActiveRecord::Base
     end
   end
 
+  # despite the name being crocodoc_id, this is still used for DocViewer. It's also sometimes used for moderated grading
+  # ids as well. Renaming it would be too much work for now.
   def crocodoc_id!
     cid = crocodoc_id
     return cid if cid

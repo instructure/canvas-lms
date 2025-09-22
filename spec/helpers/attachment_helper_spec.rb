@@ -27,15 +27,6 @@ describe AttachmentHelper do
     @att = attachment_model(context: @user)
   end
 
-  it "returns a valid crocodoc session url" do
-    @current_user = @student
-    allow(@att).to receive(:crocodoc_available?).and_return(true)
-    attrs = doc_preview_attributes(@att)
-    expect(attrs).to match(/crocodoc_session/)
-    expect(attrs).to match(/#{@current_user.id}/)
-    expect(attrs).to match(/#{@att.id}/)
-  end
-
   it "returns a valid canvadoc session url" do
     @current_user = @student
     allow(@att).to receive(:canvadocable?).and_return(true)
@@ -222,10 +213,6 @@ describe AttachmentHelper do
     shared_examples_for "scenarios when the file is not locked for the user" do
       let(:preview_json) { raise "set in examples" }
 
-      it "adds the crocodoc session url" do
-        expect(preview_json.keys).to include(:crocodoc_session_url)
-      end
-
       it "adds the canvadoc session url" do
         expect(preview_json.keys).to include(:canvadoc_session_url)
       end
@@ -247,10 +234,6 @@ describe AttachmentHelper do
 
     context "when 'locked_for_user' is false" do
       let(:locked_for_user) { true }
-
-      it "does not add the crocodoc session url" do
-        expect(subject.keys).not_to include(:crocodoc_session_url)
-      end
 
       it "does not add the canvadoc session url" do
         expect(subject.keys).not_to include(:canvadoc_session_url)

@@ -19,6 +19,7 @@
 
 class CanvadocsSubmission < ActiveRecord::Base
   belongs_to :canvadoc
-  belongs_to :crocodoc_document
   belongs_to :submission
+
+  self.ignored_columns += %w[crocodoc_document_id]
 end

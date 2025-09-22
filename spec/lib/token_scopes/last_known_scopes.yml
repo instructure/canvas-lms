@@ -1524,8 +1524,6 @@
 - verb: PUT
   path: '/api/v1/courses/:id/quizzes'
 - verb: GET
-  path: '/api/v1/crocodoc_session'
-- verb: GET
   path: '/api/v1/dashboard/dashboard_cards'
 - verb: DELETE
   path: '/api/v1/developer_keys/:id'
@@ -2139,10 +2137,6 @@
   path: '/api/v1/support_helpers/asset_processor/bulk_resubmit'
 - verb: GET
   path: '/api/v1/support_helpers/asset_processor/submission_details'
-- verb: GET
-  path: '/api/v1/support_helpers/crocodoc/shard'
-- verb: GET
-  path: '/api/v1/support_helpers/crocodoc/submission'
 - verb: GET
   path: '/api/v1/support_helpers/plagiarism_platform/add_service'
 - verb: GET

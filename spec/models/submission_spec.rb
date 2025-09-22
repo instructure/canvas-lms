@@ -6001,7 +6001,7 @@ describe Submission do
     context "canvadocs_submissions records" do
       before(:once) do
         @student1, @student2 = n_students_in_course(2)
-        @attachment = crocodocable_attachment_model(context: @student1)
+        @attachment = canvadocable_attachment_model(context: @student1)
         @assignment = @course.assignments.create! name: "A1",
                                                   submission_types: "online_upload"
       end
@@ -6026,8 +6026,7 @@ describe Submission do
           job = Delayed::Job.where(strand: "canvadocs").last
           expect(job.payload_object.kwargs[:preferred_plugins]).to eq [
             Canvadocs::RENDER_PDFJS,
-            Canvadocs::RENDER_BOX,
-            Canvadocs::RENDER_CROCODOC
+            Canvadocs::RENDER_BOX
           ]
         end
 
@@ -6042,8 +6041,7 @@ describe Submission do
           expect(job.payload_object.kwargs[:preferred_plugins]).to eq [
             Canvadocs::RENDER_O365,
             Canvadocs::RENDER_PDFJS,
-            Canvadocs::RENDER_BOX,
-            Canvadocs::RENDER_CROCODOC
+            Canvadocs::RENDER_BOX
           ]
         end
       end
@@ -6515,12 +6513,6 @@ describe Submission do
 
     it "returns nil when the user is not present" do
       expect(@submission.moderated_grading_allow_list(nil)).to be_nil
-    end
-
-    it "can be passed a collection of attachments for checking if crocodoc is available" do
-      attachment = double
-      expect(attachment).to receive(:crocodoc_available?).and_return(true)
-      @submission.moderated_grading_allow_list(loaded_attachments: [attachment])
     end
 
     it "returns a collection of moderated grading ids" do

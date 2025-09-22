@@ -44,15 +44,12 @@ export const ZAttachment = z.object({
   comment_id: z.string().nullable(),
   content_type: z.string(),
   created_at: z.string(),
-  crocodoc_url: z.string().nullable(),
   display_name: z.string(),
   filename: z.string(),
-  hijack_crocodoc_session: z.boolean().nullable(),
   id: z.string(),
   mime_class: z.string(),
   provisional_canvadoc_url: z.string().nullable(),
   provisional_crocodoc_url: z.string().nullable(),
-  submitted_to_crocodoc: z.boolean().nullable(),
   submitter_id: z.string(),
   updated_at: z.string(),
   upload_status: z.union([z.literal('pending'), z.literal('failed'), z.literal('success')]),
@@ -443,7 +440,6 @@ interface Window {
 
 export const ZProvisionalCrocodocUrl = z.object({
   attachment_id: z.string(),
-  crocodoc_url: z.string().nullable(),
   canvadoc_url: z.string().nullable(),
 })
 
@@ -502,11 +498,7 @@ export type SpeedGrader = {
   resetReassignButton: () => void
   updateHistoryForCurrentStudent: (behavior: 'push' | 'replace') => void
   fetchProvisionalGrades: () => void
-  displayExpirationWarnings: (
-    aggressiveWarnings: number[],
-    count: number,
-    crocodocMessage: string,
-  ) => void
+  displayExpirationWarnings: (aggressiveWarnings: number[], count: number, message: string) => void
   setGradeReadOnly: (readOnly: boolean) => void
   showStudent: () => void
   initialVersion?: number
@@ -841,7 +833,6 @@ export type DocumentPreviewOptions = {
   attachment_id: string
   attachment_preview_processing: boolean
   attachment_view_inline_ping_url: string | null
-  crocodoc_session_url?: string
   height: string
   id: string
   mimeType: string

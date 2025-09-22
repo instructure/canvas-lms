@@ -2384,11 +2384,6 @@ CanvasRails::Application.routes.draw do
       get "support_helpers/plagiarism_platform/resubmit_for_assignment/:assignment_id", action: :resubmit_for_assignment
     end
 
-    scope(controller: "support_helpers/crocodoc") do
-      get "support_helpers/crocodoc/shard", action: :shard
-      get "support_helpers/crocodoc/submission", action: :submission
-    end
-
     scope(controller: "support_helpers/submission_lifecycle_manage") do
       get "support_helpers/submission_lifecycle_manage/course", action: :course
     end
@@ -2570,7 +2565,6 @@ CanvasRails::Application.routes.draw do
       delete "accounts/:account_id/grading_standards/:grading_standard_id", action: :destroy
     end
 
-    get "/crocodoc_session", controller: "crocodoc_sessions", action: "show", as: :crocodoc_session
     get "/canvadoc_session", controller: "canvadoc_sessions", action: "show", as: :canvadoc_session
     post "/canvadoc_session", controller: "canvadoc_sessions", action: "create"
 
