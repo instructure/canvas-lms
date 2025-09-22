@@ -10174,6 +10174,7 @@ el:
   no_active_user_with_that_id_was_found_b8fb5e14: "Δεν βρέθηκε ενεργός χρήστης με το συγκεκριμένο ID."
   no_assignment_name_adbb215b: "Δεν Υπάρχει Όνομα Εργασίας"
   no_assignment_selected_65d9e422: "Δεν έχει επιλεγεί Εργασία"
+  no_assignments_found_2097cfc1: "Δεν βρέθηκαν εργασίες"
   no_content_5dbc9acf: "Κανένα Περιεχόμενο"
   no_content_has_been_added_f36bab43: "* Δεν έχει προστεθεί περιεχόμενο"
   no_conversations_selected_ebcd9226: "Δεν έχουν επιλεγεί συνομιλίες"
