@@ -60,6 +60,7 @@ const ImageTextBlockView = ({
           altText={altText}
           decorativeImage={decorativeImage}
           caption={caption}
+          captionColor={titleColor}
           altTextAsCaption={altTextAsCaption}
         />
       }
@@ -95,6 +96,7 @@ const ImageTextBlockEditView = ({
           altText={altText}
           decorativeImage={decorativeImage}
           caption={caption}
+          captionColor={titleColor}
           altTextAsCaption={altTextAsCaption}
         />
       }
@@ -132,6 +134,7 @@ const ImageTextBlockEdit = (props: ImageTextBlockProps) => {
       imageComponent={
         <ImageEdit
           {...props}
+          captionColor={props.titleColor}
           onImageChange={data => save({...data})}
           focusHandler={!props.includeBlockTitle && focusHandler}
         />

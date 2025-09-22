@@ -19,9 +19,15 @@
 import React from 'react'
 import {Text} from '@instructure/ui-text'
 
-export const ImageCaption = ({children}: React.PropsWithChildren) => {
+export const ImageCaption = ({children, color}: React.PropsWithChildren<{color: string}>) => {
   return (
-    <Text variant="contentQuote" color="secondary">
+    <Text
+      variant="contentQuote"
+      color="primary"
+      themeOverride={{
+        primaryColor: color,
+      }}
+    >
       {children}
     </Text>
   )
