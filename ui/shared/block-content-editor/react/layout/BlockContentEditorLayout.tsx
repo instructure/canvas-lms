@@ -34,9 +34,9 @@ export const BlockContentEditorLayout = (props: {
       <div role="toolbar" aria-label={I18n.t('Editor toolbar')} className="toolbar-area">
         {props.toolbar}
       </div>
-      <div aria-label={ariaLabel} className="editor-area">
+      <section aria-label={ariaLabel} className="editor-area">
         {props.editor}
-      </div>
+      </section>
     </section>
   )
 }
