@@ -87,7 +87,7 @@ describe "student planner" do
     end
 
     it "shows the date in the show page" do
-      skip "Will be fixed in VICE-5401"
+      skip "Will be fixed in VICE-5401 2025-07-11"
       get "/courses/#{@course.id}/discussion_topics/#{@ungraded_discussion.id}/"
       todo_date = discussion_show_page_detail.text.split("To-Do Date: ")[1]
       expect(todo_date).to eq(format_time_for_view(@ungraded_discussion.todo_date))

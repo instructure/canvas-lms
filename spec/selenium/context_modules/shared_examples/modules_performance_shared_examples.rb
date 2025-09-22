@@ -268,7 +268,7 @@ shared_examples_for "add module items to list" do |context|
     end
 
     it "paginated list created after refresh when item is added to initiate pagination" do
-      skip "not a valid test now that we save the show all/less state"
+      skip "2025-05-22 not a valid test now that we save the show all/less state LX-3350"
       get @mod_url
       wait_for_dom_ready
 

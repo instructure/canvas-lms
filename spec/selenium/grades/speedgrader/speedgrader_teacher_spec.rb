@@ -69,7 +69,7 @@ describe "SpeedGrader" do
 
   context "alerts" do
     it "alerts the teacher before leaving the page if comments are not saved", priority: "1" do
-      skip "QE Team will revisit due to chrome update TESTOPS-232"
+      skip "QE Team will revisit due to chrome update TESTOPS-232 2025-07-23"
       student_in_course(active_user: true).user
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       comment_textarea = f("#speed_grader_comment_textarea")

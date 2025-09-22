@@ -401,7 +401,7 @@ describe "announcements" do
       end
 
       it "removes the Reply section" do
-        skip "Should be fixed by VICE-5399"
+        skip "Should be fixed by VICE-5399 2025-07-22"
         create_announcement
         get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}"
 

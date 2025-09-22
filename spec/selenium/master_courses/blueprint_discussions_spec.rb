@@ -79,7 +79,7 @@ describe "blueprint courses discussions" do
       end
 
       it "locks down the associated course's discussion fields", priority: 2 do
-        skip "Will be fixed in VICE-5431"
+        skip "Will be fixed in VICE-5431 2025-07-15"
         change_blueprint_settings(@master, points: true, due_dates: true, availability_dates: true)
         get "/courses/#{@master.id}/discussion_topics/#{@original_disc.id}"
         f(".bpc-lock-toggle button").click

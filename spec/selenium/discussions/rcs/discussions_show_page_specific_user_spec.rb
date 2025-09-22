@@ -94,7 +94,7 @@ describe "discussions" do
         end
 
         it "displays the subscribe button after an initial post", priority: "1" do
-          skip "Will be fixed in VICE-5427"
+          skip "Will be fixed in VICE-5427 2025-07-15"
           topic.unsubscribe(student)
           topic.require_initial_post = true
           topic.save!

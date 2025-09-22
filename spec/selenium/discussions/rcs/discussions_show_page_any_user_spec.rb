@@ -55,7 +55,7 @@ describe "discussions" do
           let(:topic) { student_topic }
 
           it "updates subscribed button when user posts to a topic", priority: "2" do
-            skip "Will be fixed in VICE-5427"
+            skip "Will be fixed in VICE-5427 2025-07-15"
             get url
             expect(f('[data-action-state="subscribeButton"]')).to be_displayed
             add_reply "student posting"

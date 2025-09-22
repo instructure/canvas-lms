@@ -79,7 +79,7 @@ describe "master courses - child courses - module item locking for React modules
     end
 
     it "disables the title edit input for locked items" do
-      skip "title input is not disabled: LX-2962"
+      skip "2025-07-24 title input is not disabled: LX-2962"
       go_to_modules
 
       # Expand the module to see its items

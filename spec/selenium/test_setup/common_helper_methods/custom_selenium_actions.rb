@@ -39,7 +39,7 @@ module CustomSeleniumActions
     when :alert
       additional_error_text = "SafariDriver doesn't support alerts"
     end
-    skip("skipping test, fails in Safari: #{additional_error_text}")
+    skip("skipping test, fails in Safari: #{additional_error_text}") # rubocop:disable Specs/NoSkipWithoutDate,Specs/NoSkipWithoutTicket
   end
 
   def find_radio_button_by_value(value, scope = nil)
