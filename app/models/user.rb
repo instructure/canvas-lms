@@ -275,7 +275,7 @@ class User < ActiveRecord::Base
   has_many :lti_overlay_versions, class_name: "Lti::OverlayVersion", inverse_of: :created_by, dependent: :destroy
   has_many :lti_asset_processor_eula_acceptances, class_name: "Lti::AssetProcessorEulaAcceptance", inverse_of: :user, dependent: :destroy
 
-  has_many :comment_bank_items, -> { where("workflow_state<>'deleted'") }
+  has_many :comment_bank_items, -> { where("workflow_state<>'deleted'") }, multishard: true
   has_many :microsoft_sync_partial_sync_changes, class_name: "MicrosoftSync::PartialSyncChange", dependent: :destroy, inverse_of: :user
 
   has_many :gradebook_filters, inverse_of: :user, dependent: :destroy

@@ -790,8 +790,7 @@ module Types
     def comment_bank_items_connection(query: nil, course_id: nil, assignment_id: nil, limit: nil)
       return unless object == current_user
 
-      comments = current_user.comment_bank_items.shard(object)
-
+      comments = current_user.comment_bank_items
       comments = comments.where(ActiveRecord::Base.wildcard("comment", query.strip)) if query&.strip.present?
       comments = comments.where(course_id:) if course_id.present?
       comments = comments.where(assignment_id:) if assignment_id.present?
