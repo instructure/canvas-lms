@@ -17008,6 +17008,7 @@ hu:
   no_assignment_group_assigned_8f1cdb9b: "Nincs hozzárendelés Hozzárendelt csoport"
   no_assignment_name_adbb215b: "Nincs feladatnév"
   no_assignment_selected_65d9e422: "Nincs kiválasztva feladat"
+  no_assignments_found_2097cfc1: "Nem található feladat"
   no_assignments_with_that_name_found_1d7be1: "Ezen a néven nem található feladat"
   no_associated_terms_13bacefc: "Nincsenek társított félévek"
   no_attachments_found_for_the_following_ids_ids_49c9192f: "Nem található a következő azonosítókhoz tartozó csatolmány: %{ids}"
