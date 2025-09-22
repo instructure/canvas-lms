@@ -11997,6 +11997,7 @@ uk:
   no_active_user_with_that_id_was_found_b8fb5e14: "Жодного активного користувача з цим ідентифікатором не знайдено."
   no_assignment_name_adbb215b: "Відсутня назва завдання"
   no_assignment_selected_65d9e422: "Не вибрано завдання"
+  no_assignments_found_2097cfc1: "Завдань не знайдено"
   no_assignments_with_that_name_found_1d7be1: "Не знайдено завдань з такою назвою"
   no_associated_terms_13bacefc: "Відсутні пов'язані терміни"
   no_attributes_locked_611c5cc: "немає заблокованих атрибутів"
