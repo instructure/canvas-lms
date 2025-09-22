@@ -39,6 +39,7 @@ export const ImageEdit = ({
   decorativeImage,
   altTextAsCaption,
   caption,
+  captionColor,
   focusHandler,
 }: ImageEditProps) => {
   const [isOpen, setIsOpen] = useState(false)
@@ -83,7 +84,9 @@ export const ImageEdit = ({
         )}
         <View as="figcaption" margin="mediumSmall 0 0 0">
           <Flex direction="row" gap="x-small">
-            <ImageCaption>{calculatedCaption || I18n.t('Image caption')}</ImageCaption>
+            <ImageCaption color={captionColor}>
+              {calculatedCaption || I18n.t('Image caption')}
+            </ImageCaption>
             <IconButton
               data-testid="edit-block-image"
               screenReaderLabel={I18n.t('Edit block')}

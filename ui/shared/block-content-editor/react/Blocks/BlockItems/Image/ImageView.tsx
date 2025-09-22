@@ -28,6 +28,7 @@ export const ImageView = ({
   decorativeImage,
   altTextAsCaption,
   caption,
+  captionColor,
 }: ImageViewProps) => {
   const calculatedCaption = altTextAsCaption ? altText : caption
 
@@ -45,7 +46,7 @@ export const ImageView = ({
       )}
       {!!calculatedCaption && (
         <View as="figcaption" margin="mediumSmall 0 0 0">
-          <ImageCaption>{calculatedCaption}</ImageCaption>
+          <ImageCaption color={captionColor}>{calculatedCaption}</ImageCaption>
         </View>
       )}
     </View>
