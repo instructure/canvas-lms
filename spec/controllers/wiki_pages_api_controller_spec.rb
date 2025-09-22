@@ -222,4 +222,171 @@ describe WikiPagesApiController, type: :request do
       end
     end
   end
+
+  describe "POST #ai_generate_alt_text" do
+    def ai_generate_alt_text_request(user, params = {})
+      url = "/api/v1/courses/#{@course.id}/pages_ai/alt_text"
+      path = {
+        controller: "wiki_pages_api",
+        action: "ai_generate_alt_text",
+        format: "json",
+        course_id: @course.id.to_s
+      }
+      api_call_as_user(user, :post, url, path, params)
+    end
+
+    context "when block content editor is disabled" do
+      before do
+        @course.account.enable_feature!(:block_content_editor)
+        @course.disable_feature!(:block_content_editor_eap)
+      end
+
+      it "returns forbidden even for teachers" do
+        ai_generate_alt_text_request(@teacher)
+        expect(response).to have_http_status(:forbidden)
+        expect(response.parsed_body["error"]).to eq("The feature is not available")
+      end
+
+      it "returns forbidden for students" do
+        student_in_course(active_all: true)
+        ai_generate_alt_text_request(@student)
+        expect(response).to have_http_status(:forbidden)
+        expect(response.parsed_body["error"]).to eq("The feature is not available")
+      end
+    end
+
+    context "when block content editor is enabled" do
+      before do
+        @course.account.enable_feature!(:block_content_editor)
+        @course.enable_feature!(:block_content_editor_eap)
+      end
+
+      context "when site admin AI alt text feature is disabled" do
+        before do
+          Account.site_admin.disable_feature!(:block_content_editor_ai_alt_text)
+        end
+
+        it "returns forbidden even for teachers" do
+          ai_generate_alt_text_request(@teacher)
+          expect(response).to have_http_status(:forbidden)
+          expect(response.parsed_body["error"]).to eq("The feature is not available")
+        end
+
+        it "returns forbidden for students" do
+          student_in_course(active_all: true)
+          ai_generate_alt_text_request(@student)
+          expect(response).to have_http_status(:forbidden)
+          expect(response.parsed_body["error"]).to eq("The feature is not available")
+        end
+      end
+
+      context "when site admin AI alt text feature is enabled" do
+        before do
+          Account.site_admin.enable_feature!(:block_content_editor_ai_alt_text)
+        end
+
+        context "when CedarClient is disabled" do
+          before do
+            allow(CedarClient).to receive(:enabled?).and_return(false)
+          end
+
+          it "returns forbidden for teachers when CedarClient is not available" do
+            ai_generate_alt_text_request(@teacher)
+            expect(response).to have_http_status(:forbidden)
+            expect(response.parsed_body["error"]).to eq("AI client is not available")
+          end
+
+          it "returns forbidden for students when CedarClient is not available" do
+            student_in_course(active_all: true)
+            ai_generate_alt_text_request(@student)
+            expect(response).to have_http_status(:forbidden)
+            expect(response.parsed_body["errors"][0]["message"]).to eq("user not authorized to perform that action")
+          end
+        end
+
+        context "when CedarClient is enabled" do
+          before do
+            stub_const("CedarClient", Class.new do
+              def enabled?
+                true
+              end
+
+              def self.generate_alt_text(*)
+                Struct.new(:image, keyword_init: true).new(image: { "altText" => "AI generated text." })
+              end
+            end)
+            allow(CedarClient).to receive(:enabled?).and_return(true)
+          end
+
+          context "with invalid parameters" do
+            it "returns 400 when image parameter is missing" do
+              ai_generate_alt_text_request(@teacher, {})
+              expect(response).to have_http_status(:bad_request)
+              expect(response.parsed_body).to eq({})
+            end
+
+            it "returns 400 when image is not an object" do
+              ai_generate_alt_text_request(@teacher, { image: "not_an_object" })
+              expect(response).to have_http_status(:bad_request)
+              expect(response.parsed_body).to eq({})
+            end
+
+            it "returns 400 when image.base64_source is missing" do
+              ai_generate_alt_text_request(@teacher, { image: { type: "Base64" } })
+              expect(response).to have_http_status(:bad_request)
+              expect(response.parsed_body).to eq({})
+            end
+
+            it "returns 400 when image.type is missing" do
+              ai_generate_alt_text_request(@teacher, { image: { base64_source: "test" } })
+              expect(response).to have_http_status(:bad_request)
+              expect(response.parsed_body).to eq({})
+            end
+
+            it "returns 400 when image.type is not 'Base64'" do
+              ai_generate_alt_text_request(@teacher, { image: { base64_source: "test", type: "Invalid" } })
+              expect(response).to have_http_status(:bad_request)
+              expect(response.parsed_body).to eq({})
+            end
+          end
+
+          context "with valid parameters" do
+            it "returns unauthorized when user lacks granular manage course content permissions" do
+              student_in_course(active_all: true)
+              ai_generate_alt_text_request(@student)
+              expect(response).to have_http_status(:forbidden)
+              expect(response.parsed_body["errors"][0]["message"]).to eq("user not authorized to perform that action")
+            end
+
+            it "calls CedarClient.generate_alt_text with correct parameters when lang is provided" do
+              params = { lang: "en-us", image: { base64_source: "dGVzdA==", type: "Base64" } }
+
+              expect(CedarClient).to receive(:generate_alt_text).with({
+                                                                        image: { base64_source: "dGVzdA==", type: "Base64" },
+                                                                        feature_slug: "alttext",
+                                                                        root_account_uuid: @course.root_account.uuid,
+                                                                        current_user: @teacher,
+                                                                        max_length: 120,
+                                                                        target_language: "en"
+                                                                      })
+
+              ai_generate_alt_text_request(@teacher, params)
+            end
+
+            it "returns the generation result in the response" do
+              params = { image: { base64_source: "dGVzdA==", type: "Base64" } }
+
+              ai_generate_alt_text_request(@teacher, params)
+              expect(response).to have_http_status(:ok)
+
+              response_body = response.parsed_body
+              expect(response_body).to have_key("image")
+              expect(response_body["image"]).to have_key("altText")
+              expect(response_body["image"]["altText"]).to eq("AI generated text.")
+            end
+          end
+        end
+      end
+    end
+  end
 end
