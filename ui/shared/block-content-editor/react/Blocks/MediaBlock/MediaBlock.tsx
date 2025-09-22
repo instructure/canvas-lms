@@ -142,6 +142,7 @@ const MediaBlockEdit = (props: MediaBlockProps) => {
         <AddButton
           onClick={() => setShowModal(true)}
           focusHandler={!props.includeBlockTitle && focusHandler}
+          ariaLabel={I18n.t('Add media')}
         />
       )}
       <UploadMediaModal

@@ -80,7 +80,11 @@ export const ImageEdit = ({
             </View>
           </>
         ) : (
-          <AddButton onClick={() => setIsOpen(true)} focusHandler={focusHandler} />
+          <AddButton
+            onClick={() => setIsOpen(true)}
+            focusHandler={focusHandler}
+            ariaLabel={I18n.t('Add image')}
+          />
         )}
         <View as="figcaption" margin="mediumSmall 0 0 0">
           <Flex direction="row" gap="x-small">

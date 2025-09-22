@@ -39,6 +39,8 @@ export const MediaBlockSettings = () => {
     titleColor,
     backgroundColor,
     src,
+    mediaId,
+    attachment_id,
   } = useNode(node => ({
     ...defaultProps,
     ...node.data.props,
@@ -112,7 +114,10 @@ export const MediaBlockSettings = () => {
         defaultExpanded={true}
         includeSeparator={false}
       >
-        <SettingsUploadMedia onMediaChange={handleMediaChange} url={src!} />
+        <SettingsUploadMedia
+          onMediaChange={handleMediaChange}
+          mediaSource={{src, mediaId, attachment_id}}
+        />
       </SettingsSectionToggle>
     </>
   )
