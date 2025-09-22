@@ -16542,6 +16542,7 @@ fa:
   no_assignment_group_assigned_8f1cdb9b: "هیچ گروه تکلیفی اختصاص نیافته است"
   no_assignment_name_adbb215b: "نام تکلیف موجود نیست"
   no_assignment_selected_65d9e422: "هیچ تکلیفی انتخاب نشده است"
+  no_assignments_found_2097cfc1: "تکلیفی یافت نشد"
   no_assignments_with_that_name_found_1d7be1: "تکلیفی با آن نام یافت نشد"
   no_associated_terms_13bacefc: "نیمسال مرتبط موجود نیست"
   no_attachments_found_for_the_following_ids_ids_49c9192f: "هیچ پیوستی برای شناسه‌های زیر یافت نشد: %{ids}"
