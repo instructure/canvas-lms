@@ -1,0 +1,47 @@
+# to use this add docker-compose.localstack.yml
+# to your COMPOSE_FILE var in .env
+#
+# Setup steps:
+# Create config/vault_contents.yml (if it doesn't exist) based on config/vault_contents.yml.example
+# Add the following to the development > 'app-canvas/data/secrets' > data section:
+#
+# event_bridge_creds:
+#   access_key_id: test
+#   secret_access_key: test
+#   region: us-east-1
+#   endpoint: http://localstack:4566
+#
+# This configures Canvas DNS updater to use LocalStack EventBridge
+# for testing CloudFront domain events locally.
+
+services:
+  web:
+    depends_on:
+      - localstack
+
+  localstack:
+    image: localstack/localstack:4.3
+    container_name: canvas-localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=events
+      - DEBUG=1
+      - TMPDIR=/var/lib/localstack
+      - DATA_DIR=/var/lib/localstack
+    volumes:
+      - localstack_data:/var/lib/localstack
+    labels:
+      - traefik.enable=true
+    networks:
+      default:
+        aliases:
+          - canvas-localstack.$INST_DOMAIN
+
+volumes:
+  localstack_data:
+
+networks:
+  default:
+    external: true
+    name: "inst_shared"
