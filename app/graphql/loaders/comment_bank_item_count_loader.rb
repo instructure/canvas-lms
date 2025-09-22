@@ -20,7 +20,7 @@
 
 class Loaders::CommentBankItemCountLoader < GraphQL::Batch::Loader
   def perform(users)
-    counts = CommentBankItem.active.where(user: users).group(:user_id).count
+    counts = CommentBankItem.active.where(user: users).group(:user_id).shard(users).count
     users.each { |user| fulfill(user, counts.fetch(user.id, 0)) }
   end
 end

@@ -1914,6 +1914,8 @@ describe Types::UserType do
   end
 
   context "commentBankItemsCount" do
+    specs_require_sharding
+
     before do
       @comment_bank_item_one = comment_bank_item_model(user: @teacher, context: @course, comment: "great comment!")
       @comment_bank_item_two = comment_bank_item_model(user: @teacher, context: @course, comment: "another comment!")
@@ -1935,6 +1937,17 @@ describe Types::UserType do
     it "ignores deleted comment bank items" do
       @comment_bank_item_one.destroy
       expect(type.resolve("commentBankItemsCount")).to eq 1
+    end
+
+    it "accounts for comment bank items on different shards" do
+      @shard1.activate do
+        account = Account.create!(name: "new shard account")
+        @course2 = course_factory(account:)
+        @course2.enroll_user(@teacher)
+        @comment_bank_item_three = comment_bank_item_model(user: @teacher, context: @course2, comment: "shard 2 comment")
+      end
+
+      expect(type.resolve("commentBankItemsCount")).to eq 3
     end
   end
 
