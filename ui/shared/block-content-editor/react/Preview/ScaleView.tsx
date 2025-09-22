@@ -65,6 +65,7 @@ export const ScaleView = (
   return (
     <View
       width={props.containerWidth}
+      display="block"
       borderWidth="small"
       borderRadius="medium"
       overflowX="hidden"
