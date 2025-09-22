@@ -477,8 +477,8 @@ describe "context module items", :ignore_js_errors do
 
         option_list_id = move_item_tray_select_modules_listbox.attribute("aria-controls")
         option_list_course_option(option_list_id, @module1.name).click
-        move_item_tray_place_contents_listbox.click
-        place_item_at_bottom_option.click
+        move_tray_place_contents_listbox.click
+        place_item_at_option("At the bottom").click
         submit_move_to_button.click
         wait_for_ajaximations
 
@@ -501,8 +501,8 @@ describe "context module items", :ignore_js_errors do
 
         option_list_id = move_item_tray_select_modules_listbox.attribute("aria-controls")
         option_list_course_option(option_list_id, @module3.name).click
-        move_item_tray_place_contents_listbox.click
-        place_item_at_bottom_option.click
+        move_tray_place_contents_listbox.click
+        place_item_at_option("At the bottom").click
         submit_move_to_button.click
         wait_for_ajaximations
 
@@ -543,7 +543,7 @@ describe "context module items", :ignore_js_errors do
 
         it "moves item to top of target module" do
           open_move_item_tray(@moved_item.id, @target_module.name)
-          place_item_at_top_option.click
+          place_item_at_option("At the top").click
           submit_move_to_button.click
           wait_for_ajaximations
           expect(@target_module.reload.content_tags.first.title).to eq("Source Assignment First")
@@ -551,7 +551,7 @@ describe "context module items", :ignore_js_errors do
 
         it "moves item to bottom of target module" do
           open_move_item_tray(@moved_item.id, @target_module.name)
-          place_item_at_bottom_option.click
+          place_item_at_option("At the bottom").click
           submit_move_to_button.click
           wait_for_ajaximations
           expect(@target_module.reload.content_tags.last.title).to eq("Source Assignment First")
@@ -560,7 +560,7 @@ describe "context module items", :ignore_js_errors do
         it "moves last item to the top of same module" do
           pagination_page_buttons[1].click
           open_move_item_tray(@moved_item_last.id, @source_module.name)
-          place_item_at_top_option.click
+          place_item_at_option("At the top").click
           submit_move_to_button.click
           wait_for_ajaximations
           expect(@source_module.reload.content_tags.first.title).to eq("Source Assignment Last")
@@ -568,7 +568,7 @@ describe "context module items", :ignore_js_errors do
 
         it "moves item to bottom of same module" do
           open_move_item_tray(@moved_item.id, @source_module.name)
-          place_item_at_bottom_option.click
+          place_item_at_option("At the bottom").click
           submit_move_to_button.click
           wait_for_ajaximations
           expect(@source_module.reload.content_tags.last.title).to eq("Source Assignment First")
@@ -576,7 +576,7 @@ describe "context module items", :ignore_js_errors do
 
         it "moves a module item before another item in a different module" do
           open_move_item_tray(@moved_item.id, @target_module.name)
-          place_item_before_option.click
+          place_item_at_option("Before...").click
           move_item_tray_select_page_listbox.click
           page_option(1).click
           move_item_tray_reference_listbox.click
@@ -593,7 +593,7 @@ describe "context module items", :ignore_js_errors do
 
         it "moves a module item after another item in a different module" do
           open_move_item_tray(@moved_item.id, @target_module.name)
-          place_item_after_option.click
+          place_item_at_option("After...").click
           move_item_tray_select_page_listbox.click
           page_option(1).click
           move_item_tray_reference_listbox.click
@@ -610,7 +610,7 @@ describe "context module items", :ignore_js_errors do
 
         it "moves a module item before another item in the same module" do
           open_move_item_tray(@moved_item.id, @source_module.name)
-          place_item_before_option.click
+          place_item_at_option("Before...").click
           move_item_tray_select_page_listbox.click
           page_option(1).click
           move_item_tray_reference_listbox.click
@@ -626,7 +626,7 @@ describe "context module items", :ignore_js_errors do
 
         it "moves a module item after another item in the same module" do
           open_move_item_tray(@moved_item.id, @source_module.name)
-          place_item_after_option.click
+          place_item_at_option("After...").click
           move_item_tray_select_page_listbox.click
           page_option(1).click
           move_item_tray_reference_listbox.click

@@ -229,4 +229,77 @@ describe "context modules", :ignore_js_errors do
     it_behaves_like "course_module2 module tray lock until", :context_modules
     it_behaves_like "course_module2 module tray lock until", :course_homepage
   end
+
+  context "modules action menu move" do
+    before do
+      @module4 = @course.context_modules.create!(name: "module4")
+      go_to_modules
+      wait_for_ajaximations
+    end
+
+    it "shows move module tray and close it" do
+      open_move_tray(@module1.id)
+      expect(cancel_tray_button).to be_displayed
+      cancel_tray_button.click
+      expect(f("body")).not_to contain_css(move_module_tray_selector)
+
+      open_move_tray(@module1.id)
+      expect(close_tray_button).to be_displayed
+      close_tray_button.click
+      expect(f("body")).not_to contain_css(move_module_tray_selector)
+    end
+
+    it "moves module down after second module" do
+      open_move_tray(@module4.id)
+      expect(move_tray_place_contents_listbox).to be_displayed
+      move_tray_place_contents_listbox.click
+      place_item_at_option("After...").click
+      expect(move_module_tray_reference_listbox).to be_displayed
+      move_module_tray_reference_listbox.click
+
+      option_list_id = move_module_tray_reference_listbox.attribute("aria-controls")
+      option_list_course_option(option_list_id, @module2.name).click
+      submit_move_to_button.click
+      wait_for_ajaximations
+
+      expect(list_all_module_ids[2]).to eq(@module4.id.to_s)
+      expect(list_all_module_ids.count).to eq(4)
+    end
+
+    it "moves module to bottom" do
+      open_move_tray(@module1.id)
+      expect(move_tray_place_contents_listbox).to be_displayed
+      move_tray_place_contents_listbox.click
+      place_item_at_option("At the bottom").click
+      submit_move_to_button.click
+      wait_for_ajaximations
+
+      expect(list_all_module_ids.last).to eq(@module1.id.to_s)
+      expect(list_all_module_ids.count).to eq(4)
+    end
+
+    it "moves module to top" do
+      open_move_tray(@module3.id)
+      expect(move_tray_place_contents_listbox).to be_displayed
+      move_tray_place_contents_listbox.click
+      place_item_at_option("At the top").click
+      submit_move_to_button.click
+      wait_for_ajaximations
+
+      expect(list_all_module_ids.first).to eq(@module3.id.to_s)
+      expect(list_all_module_ids.count).to eq(4)
+    end
+
+    it "moves module before first module" do
+      open_move_tray(@module4.id)
+      expect(move_tray_place_contents_listbox).to be_displayed
+      move_tray_place_contents_listbox.click
+      place_item_at_option("Before...").click
+      submit_move_to_button.click
+      wait_for_ajaximations
+
+      expect(list_all_module_ids.first).to eq(@module4.id.to_s)
+      expect(list_all_module_ids.count).to eq(4)
+    end
+  end
 end
