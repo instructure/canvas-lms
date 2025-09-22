@@ -855,34 +855,6 @@ module Modules2IndexPage
     fxpath("//label[span[text()='Select Reference Item']]//input[@role='combobox']")
   end
 
-  def place_item_at_top_option
-    fj("[role='option']:contains('At the top')")
-  end
-
-  def place_item_at_bottom_option
-    fj("[role='option']:contains('At the bottom')")
-  end
-
-  def place_item_before_option
-    fj("[role='option']:contains('Before...')")
-  end
-
-  def place_item_after_option
-    fj("[role='option']:contains('After...')")
-  end
-
-  def cancel_tray_button
-    fxpath("//button[.//span[text()='Cancel']]")
-  end
-
-  def submit_move_to_button
-    fxpath("//button[.//span[text()='Move']]")
-  end
-
-  def close_tray_button
-    fxpath("//button[.//span[text()='Close']]")
-  end
-
   def tab_create_item
     f(tab_create_item_selector)
   end
@@ -915,7 +887,15 @@ module Modules2IndexPage
     element_exists?(quiz_engine_option_selector)
   end
 
+  def all_modules
+    ff('[data-rbd-droppable-id="modules-list"] [data-module-id]')
+  end
+
   #------------------------------ Actions -------------------------------
+
+  def list_all_module_ids
+    @module_ids = all_modules.map { |module_element| module_element.attribute("data-module-id") }
+  end
 
   def assignments_due_button_exists?
     element_exists?(assignments_due_button_selector)
