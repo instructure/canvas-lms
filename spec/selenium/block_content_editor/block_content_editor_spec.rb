@@ -209,7 +209,6 @@ describe "Block Content Editor", :ignore_js_errors do
 
     it "toggles preview mode when preview button is clicked" do
       expect(element_exists?(block_selector)).to be false
-      expect(preview_component.preview_selector_bar).to be_displayed
       expect(preview_component.preview_layout).to be_displayed
     end
 

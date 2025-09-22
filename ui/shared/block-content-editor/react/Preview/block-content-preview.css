@@ -1,0 +1,12 @@
+.block-content-preview-container div[class$="-view-tabs"] > div {
+  padding-bottom: 24px;
+  justify-content: center;
+}
+
+.block-content-preview-container div[role="tabpanel"] > :first-child {
+  display: flex;
+  justify-content: center;
+  background-color: transparent;
+  border: none !important;
+  padding: 0 !important;
+}
