@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import saveMediaRecording from '@instructure/canvas-media/es/saveMediaRecording'
+import {getRCSOriginFromHost} from '@instructure/canvas-rce'
 import {MediaSources} from './types'
 
 export type StoreProp = {
@@ -46,7 +47,7 @@ const handleComputerUpload = async (uploadData: UploadData, storeProps: StorePro
     const rcsConfig = {
       contextId,
       contextType,
-      origin: host,
+      origin: getRCSOriginFromHost(host),
       headers: {Authorization: `Bearer ${jwt}`},
     }
 
