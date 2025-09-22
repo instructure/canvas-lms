@@ -39,6 +39,24 @@ const I18n = createI18nScope('block-editor')
 
 type EditorChoices = 'rce' | 'block_editor' | 'block_content_editor' | ''
 
+const BlockContentEditorContents = {
+  title: I18n.t('New Way to Create Pages'),
+  mainText: I18n.t(
+    'We are introducing a new page editor to give you more flexibility and save time and effort. Choose the editor that best suits your workflow.',
+  ),
+  linkText: I18n.t('Discover what you can create using the Block Content Editor.'),
+}
+
+const BlockEditorContents = {
+  title: I18n.t('New Way to Create'),
+  mainText: I18n.t(
+    "We've introduced a new editor to give you more flexibility and power in content creation. Choose the editor that best suits your workflow.",
+  ),
+  linkText: I18n.t(
+    'Read about key features and discover what you can create using the Block Editor.',
+  ),
+}
+
 const ChooseEditorModal = (props: ChooseEditorModalProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(true)
   const [rememberMyChoice, setRememberMyChoice] = useState<boolean>(!!ENV.text_editor_preference)
@@ -70,6 +88,11 @@ const ChooseEditorModal = (props: ChooseEditorModalProps) => {
     }
   }
 
+  const content =
+    props.editorFeature === 'block_content_editor'
+      ? BlockContentEditorContents
+      : BlockEditorContents
+
   return (
     <Modal
       label="New Way To Create"
@@ -80,7 +103,7 @@ const ChooseEditorModal = (props: ChooseEditorModalProps) => {
       shouldCloseOnDocumentClick={true}
     >
       <Modal.Header>
-        <Heading>{I18n.t('New Way to Create')}</Heading>
+        <Heading>{content.title}</Heading>
         <CloseButton placement="end" onClick={close} screenReaderLabel="Close" />
       </Modal.Header>
       <Modal.Body>
@@ -88,11 +111,7 @@ const ChooseEditorModal = (props: ChooseEditorModalProps) => {
           {I18n.t('Try the New Block Editor')}
         </Heading>
         <Text lineHeight="condensed">
-          <div>
-            {I18n.t(
-              "We've introduced a new editor to give you more flexibility and power in content creation. Choose the editor that best suits your workflow.",
-            )}
-          </div>
+          <div>{content.mainText}</div>
         </Text>
         <View
           as="div"
@@ -104,21 +123,19 @@ const ChooseEditorModal = (props: ChooseEditorModalProps) => {
           <Flex gap="small" justifyItems="space-between">
             <Flex.Item shouldShrink={true}>
               <Text size="x-small" lineHeight="condensed">
-                <div>
-                  {I18n.t(
-                    'Read about key features and discover what you can create using the Block Editor.',
-                  )}
-                </div>
+                <div>{content.linkText}</div>
               </Text>
             </Flex.Item>
-            <Flex.Item>
-              <Link
-                href="https://productmarketing.instructuremedia.com/embed/464a6c68-1de4-4821-bc0c-08101a5bc819"
-                target="_blank"
-              >
-                <IconExternalLinkLine />
-              </Link>
-            </Flex.Item>
+            {props.editorFeature === 'block_editor' && (
+              <Flex.Item>
+                <Link
+                  href="https://productmarketing.instructuremedia.com/embed/464a6c68-1de4-4821-bc0c-08101a5bc819"
+                  target="_blank"
+                >
+                  <IconExternalLinkLine />
+                </Link>
+              </Flex.Item>
+            )}
           </Flex>
         </View>
         <SimpleSelect
@@ -147,16 +164,18 @@ const ChooseEditorModal = (props: ChooseEditorModalProps) => {
             {I18n.t('Use the RCE')}
           </SimpleSelect.Option>
         </SimpleSelect>
-        <View as="div" padding="small 0 medium 0">
-          <Checkbox
-            checked={rememberMyChoice}
-            onChange={() => {
-              setRememberMyChoice(!rememberMyChoice)
-            }}
-            label={I18n.t('Remember my choice')}
-            value="remember_my_choice"
-          />
-        </View>
+        {props.editorFeature === 'block_editor' && (
+          <View as="div" padding="small 0 medium 0">
+            <Checkbox
+              checked={rememberMyChoice}
+              onChange={() => {
+                setRememberMyChoice(!rememberMyChoice)
+              }}
+              label={I18n.t('Remember my choice')}
+              value="remember_my_choice"
+            />
+          </View>
+        )}
       </Modal.Body>
       <Modal.Footer>
         <Button margin="0 x-small 0 0" onClick={close}>
