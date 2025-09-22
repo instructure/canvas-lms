@@ -17,6 +17,7 @@
  */
 
 import {FocusHandler} from '../../../hooks/useFocusElement'
+import {Prettify} from '../../../utilities/Prettify'
 
 type ImageMetadata = {
   url?: string
@@ -41,8 +42,10 @@ export type ModalImageData = ImageMetadata & ImageFileData
 export type ImageChangeHandler = {
   onImageChange: (data: ImageData) => void
 }
-export type ImageEditProps = ImageData &
-  ImageChangeHandler & {
-    focusHandler?: FocusHandler | false
-  }
-export type ImageViewProps = ImageData
+export type ImageEditProps = Prettify<
+  ImageData &
+    ImageChangeHandler & {
+      focusHandler?: FocusHandler | false
+    } & {captionColor: string}
+>
+export type ImageViewProps = Prettify<ImageData & {captionColor: string}>

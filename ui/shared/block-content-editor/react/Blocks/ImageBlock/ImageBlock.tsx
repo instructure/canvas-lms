@@ -34,23 +34,21 @@ import {getContrastingTextColorCached} from '../../utilities/getContrastingTextC
 const I18n = createI18nScope('block_content_editor')
 
 const ImageBlockView = (props: ImageBlockProps) => {
+  const {includeBlockTitle, title, titleColor, ...imageProps} = props
   return (
     <Flex direction="column" gap="mediumSmall">
-      {props.includeBlockTitle && !!props.title && (
-        <TitleView title={props.title} contentColor={props.titleColor} />
-      )}
-      <ImageView {...props} />
+      {includeBlockTitle && !!title && <TitleView title={title} contentColor={titleColor} />}
+      <ImageView {...imageProps} captionColor={titleColor} />
     </Flex>
   )
 }
 
 const ImageBlockEditView = (props: ImageBlockProps) => {
+  const {includeBlockTitle, title, titleColor, ...imageProps} = props
   return (
     <Flex direction="column" gap="mediumSmall">
-      {props.includeBlockTitle && (
-        <TitleEditPreview title={props.title} contentColor={props.titleColor} />
-      )}
-      <ImageView {...props} />
+      {includeBlockTitle && <TitleEditPreview title={title} contentColor={titleColor} />}
+      <ImageView {...imageProps} captionColor={titleColor} />
     </Flex>
   )
 }
@@ -74,6 +72,7 @@ const ImageBlockEdit = (props: ImageBlockProps) => {
       )}
       <ImageEdit
         {...props}
+        captionColor={props.titleColor}
         onImageChange={data => save({...data})}
         focusHandler={!props.includeBlockTitle && focusHandler}
       />
