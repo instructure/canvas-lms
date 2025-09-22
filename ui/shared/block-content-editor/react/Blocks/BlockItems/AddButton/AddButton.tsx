@@ -30,6 +30,7 @@ const I18n = createI18nScope('block_content_editor')
 type AddButtonOwnProps = {
   onClick: () => void
   focusHandler?: FocusHandler | false
+  ariaLabel: string
 }
 
 type AddButtonStyleProps = ContrastingColors
@@ -58,7 +59,7 @@ class ThemedAddButton extends Component<AddButtonProps> {
         background="primary"
         borderWidth="small"
         borderColor="primary"
-        aria-label={I18n.t('Select to initiate file upload')}
+        aria-label={this.props.ariaLabel}
         elementRef={element => this.props.focusHandler && this.props.focusHandler(element)}
         onKeyDown={this.handleKeyDown}
         onClick={this.props.onClick}

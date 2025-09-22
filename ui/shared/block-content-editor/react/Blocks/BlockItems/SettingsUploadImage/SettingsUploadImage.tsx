@@ -49,7 +49,7 @@ export const SettingsUploadImage = ({url, fileName, onImageChange}: SettingsUplo
     })
   }
 
-  const buttonText = url?.trim() ? I18n.t('Replace image') : I18n.t('Upload image')
+  const buttonText = url?.trim() ? I18n.t('Replace image') : I18n.t('Add image')
 
   return (
     <>

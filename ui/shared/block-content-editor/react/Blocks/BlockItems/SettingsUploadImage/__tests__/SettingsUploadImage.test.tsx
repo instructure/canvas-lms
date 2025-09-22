@@ -33,7 +33,7 @@ describe('SettingsUploadImage', () => {
       <SettingsUploadImage url="" fileName="" onImageChange={mockOnImageChange} />,
     )
 
-    expect(component.getByText('Upload image')).toBeInTheDocument()
+    expect(component.getByText('Add image')).toBeInTheDocument()
     expect(component.queryByTestId('remove-image-button')).not.toBeInTheDocument()
   })
 
@@ -105,7 +105,7 @@ describe('SettingsUploadImage', () => {
 
     expect(component.queryByText('my-image.jpg')).not.toBeInTheDocument()
     expect(component.queryByTestId('remove-image-button')).not.toBeInTheDocument()
-    expect(component.getByText('Upload image')).toBeInTheDocument()
+    expect(component.getByText('Add image')).toBeInTheDocument()
   })
 
   it('does not render image info when URL is only whitespace', () => {
@@ -115,6 +115,6 @@ describe('SettingsUploadImage', () => {
 
     expect(component.queryByText('my-image.jpg')).not.toBeInTheDocument()
     expect(component.queryByTestId('remove-image-button')).not.toBeInTheDocument()
-    expect(component.getByText('Upload image')).toBeInTheDocument()
+    expect(component.getByText('Add image')).toBeInTheDocument()
   })
 })
