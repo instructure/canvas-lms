@@ -963,14 +963,16 @@ module AccountReports
         headers << "created_by_sis"
       end
 
-      observers = root_account.pseudonyms
+      is_inst_id = Pseudonym.column_names.include?("is_inst_id")
+      observers = root_account.pseudonyms.not_instructure_identity
                               .select("pseudonyms.*,
                 p2.sis_user_id AS observer_sis_id,
                 p2.user_id AS observer_id,
                 user_observers.workflow_state AS ob_state,
                 user_observers.sis_batch_id AS o_batch_id")
                               .joins("INNER JOIN #{UserObservationLink.quoted_table_name} ON pseudonyms.user_id=user_observers.user_id
-               INNER JOIN #{Pseudonym.quoted_table_name} AS p2 ON p2.user_id=user_observers.observer_id")
+               INNER JOIN #{Pseudonym.quoted_table_name} AS p2 ON p2.user_id=user_observers.observer_id
+                 #{"AND p2.is_inst_id = false" if is_inst_id}")
                               .where("p2.account_id=pseudonyms.account_id")
                               .where(user_observers: { root_account_id: root_account })
 
