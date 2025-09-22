@@ -24,7 +24,9 @@ const I18n = createI18nScope('page_editor')
 
 export const HighlightBlockPreview = () => (
   <BlockPreviewLayout
-    image={<SVGWrapper url="/images/block-content-editor/page-highlight-no-icon.svg" />}
+    image={
+      <SVGWrapper ariaHidden={true} url="/images/block-content-editor/page-highlight-no-icon.svg" />
+    }
     title={I18n.t('Page highlight')}
     description={[
       I18n.t(
