@@ -20,6 +20,7 @@ import type {LtiMessageType} from '../model/LtiMessageType'
 import {type LtiPlacement, type LtiPlacementWithIcon} from '../model/LtiPlacement'
 import type {LtiPrivacyLevel} from '../model/LtiPrivacyLevel'
 import type {LtiScope} from '@canvas/lti/model/LtiScope'
+import type {MessageSetting} from '../model/internal_lti_configuration/InternalBaseLaunchSettings'
 import type {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
 import {create} from 'zustand'
 import type {LtiConfigurationOverlay} from '../model/internal_lti_configuration/LtiConfigurationOverlay'
@@ -43,6 +44,7 @@ export interface Lti1p3RegistrationOverlayActions {
   setJwk: (jwk: string) => void
   setDomain: (domain: string) => void
   setCustomFields: (customFields: string) => void
+  setMessageSettings: (messageSettings: MessageSetting[]) => void
   setOverrideURI: (placement: LtiPlacement, uri: string) => void
   setPlacementIconUrl: (placement: LtiPlacementWithIcon, iconUrl: string) => void
   setMessageType: (placement: LtiPlacement, messageType: LtiMessageType) => void
@@ -135,6 +137,8 @@ export const createLti1p3RegistrationOverlayStore = (
     setDomain: domain => set(updateLaunchSetting('domain', filterEmptyString(domain))),
     setCustomFields: customFields =>
       set(updateLaunchSetting('customFields', filterEmptyString(customFields))),
+    setMessageSettings: messageSettings =>
+      set(updateLaunchSetting('message_settings', messageSettings)),
     setOverrideURI: (placement, uri) => set(updateOverrideURI(placement, uri)),
     setMessageType: (placement, messageType) => set(updateMessageType(placement, messageType)),
     setAdminNickname: nickname =>

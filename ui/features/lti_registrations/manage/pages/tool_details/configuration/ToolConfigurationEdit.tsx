@@ -35,6 +35,7 @@ import {
   validateLti1p3RegistrationOverlayState,
 } from '../../../registration_overlay/validateLti1p3RegistrationOverlayState'
 import {LaunchSettingsConfirmation} from '../../../registration_wizard_forms/LaunchSettingsConfirmation'
+import {LaunchTypeSpecificSettingsConfirmation} from '../../../registration_wizard_forms/LaunchTypeSpecificSettingsConfirmation'
 import type {ToolDetailsOutletContext} from '../ToolDetails'
 import {IconConfirmationPerfWrapper} from './IconConfirmationPerfWrapper'
 import {NamingConfirmationPerfWrapper} from './NamingConfirmationPerfWrapper'
@@ -42,6 +43,8 @@ import {PermissionConfirmationPerfWrapper} from './PermissionConfirmationPerfWra
 import {PlacementsConfirmationPerfWrapper} from './PlacementsConfirmationPerfWrapper'
 import {PrivacyConfirmationPerfWrapper} from './PrivacyConfirmationPerfWrapper'
 import {ToolConfigurationFooter} from './ToolConfigurationFooter'
+import {LtiScopes} from '@canvas/lti/model/LtiScope'
+import {LtiPlacements} from '../../../model/LtiPlacement'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -119,6 +122,17 @@ export const ToolConfigurationEdit = () => {
   )
 
   const isDirty = useOverlayState(s => s.state.dirty)
+
+  // Show EULA if configured already or if tool has permissions and one of the asset processor placements
+  const shouldShowEulaSection = useOverlayState(
+    s =>
+      s.state.launchSettings?.message_settings?.some(m => m.type === 'LtiEulaRequest') ||
+      (s.state.permissions.scopes?.includes(LtiScopes.EulaUser) &&
+        (s.state.placements.placements?.includes(LtiPlacements.ActivityAssetProcessor) ||
+          s.state.placements.placements?.includes(
+            LtiPlacements.ActivityAssetProcessorContribution,
+          ))),
+  )
   const unloadHandler = React.useCallback(onBeforeUnload(isDirty), [isDirty])
   React.useEffect(() => {
     window.addEventListener('beforeunload', unloadHandler)
@@ -217,6 +231,16 @@ export const ToolConfigurationEdit = () => {
         ) : null}
       </Section>
 
+      {showAllSettings && shouldShowEulaSection ? (
+        <Section>
+          <LaunchTypeSpecificSettingsConfirmation
+            overlayStore={useOverlayState}
+            internalConfig={registration.configuration}
+            settingType="LtiEulaRequest"
+          />
+        </Section>
+      ) : null}
+
       {showAllSettings ? (
         <Section>
           <OverrideURIsConfirmation
@@ -237,6 +261,7 @@ export const ToolConfigurationEdit = () => {
       <Section>
         <IconConfirmationPerfWrapper overlayStore={useOverlayState} registration={registration} />
       </Section>
+
       <Footer save={save} isSaving={updateMutation.isPending} />
     </div>
   )
