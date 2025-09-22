@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-name: "rubric-regenerate-criterionV1"
+name: "rubric-regenerate-criterionV2"
 model_id: "anthropic.claude-3-haiku-20240307-v1:0"
 rate_limit:
   limit: 25
@@ -32,7 +32,7 @@ template: |
   <EXISTING_CRITERIA_PLACEHOLDER>
 
   3) Regeneration Target:
-  Criteria ID(s): <REGENERATION_TARGET_PLACEHOLDER>
+  Criteria ID: <REGENERATION_TARGET_PLACEHOLDER>
 
   4) Target Grade Level / Complexity:
   <GRADE_LEVEL_PLACEHOLDER>
@@ -59,6 +59,7 @@ template: |
   - Keep the existing criterion ID and all rating IDs exactly as provided.
   - Keep the number of ratings exactly the same as in the input. Do not add or remove rating levels.
   - Do not generate any new IDs.
+  - Always make at least one textual improvement to the criterion and every rating, even if the original text seems perfect.
 
   The criterion must be in the same language as the assignment description.
   Response must include only the complete updated criterion with its ratings, wrapped in <RUBRIC_DATA></RUBRIC_DATA>.
@@ -66,3 +67,4 @@ template: |
 
 options:
   max_tokens: 5000
+  temperature: 1.0

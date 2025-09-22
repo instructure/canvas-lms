@@ -948,11 +948,23 @@ class Rubric < ActiveRecord::Base
     required_criteria_count = required_criteria_count.to_i
     required_rating_count   = required_rating_count.to_i
 
-    # Criteria count
     current_criteria_count = existing_criteria.size
     if current_criteria_count < required_criteria_count
       missing = required_criteria_count - current_criteria_count
-      lines << "- Criteria count: current=#{current_criteria_count}, required=#{required_criteria_count}. Create #{missing} new criteria with #{required_rating_count} ratings (append at the end, do not reorder; IDs must remain stable)."
+      start_index = current_criteria_count + 1
+      end_index   = required_criteria_count
+      new_ids = (start_index..end_index).map { |i| "criterion:_new_c_#{i}" }
+      lines << "- Criteria count: current=#{current_criteria_count}, required=#{required_criteria_count}."
+      lines << if current_criteria_count.zero?
+                 "  You must create exactly the following #{missing} criteria (and no others):"
+               else
+                 "  You must append exactly #{missing} new criteria at the end:"
+               end
+      new_ids.each do |cid|
+        lines << "  - #{cid} (with exactly #{required_rating_count} ratings)."
+      end
+      lines << "  Do not reorder existing criteria. Keep all IDs stable."
+      lines << "  Do not invent criteria with other IDs. Do not use hierarchical IDs like criterion:1."
     elsif current_criteria_count > required_criteria_count
       extra = current_criteria_count - required_criteria_count
       lines << "- Criteria count: current=#{current_criteria_count}, required=#{required_criteria_count}. Remove #{extra} criteria (IDs must remain stable for the rest)."
@@ -966,10 +978,10 @@ class Rubric < ActiveRecord::Base
 
       if current_rating_count < required_rating_count
         missing = required_rating_count - current_rating_count
-        lines << "- Ratings for criterion #{crit_id}: current=#{current_rating_count}, required=#{required_rating_count}. Create #{missing} new ratings."
+        lines << "- Ratings for #{crit_id}: current=#{current_rating_count}, required=#{required_rating_count}. Create #{missing} new ratings."
       elsif current_rating_count > required_rating_count
         extra = current_rating_count - required_rating_count
-        lines << "- Ratings for criterion #{crit_id}: current=#{current_rating_count}, required=#{required_rating_count}. Remove #{extra} ratings."
+        lines << "- Ratings for #{crit_id}: current=#{current_rating_count}, required=#{required_rating_count}. Remove #{extra} ratings."
       end
     end
 

@@ -299,7 +299,7 @@ export const RubricCriteriaRow = ({
             )}
 
             {!freeFormCriterionComments && (
-              <View position="relative">
+              <View as="div" position="relative">
                 <RatingScaleAccordion
                   hidePoints={hidePoints}
                   ratings={criterion.ratings}
