@@ -99,6 +99,11 @@ Available sections:
   typescript      - TypeScript suppressions
   outdated        - Outdated packages
   react-compiler  - React Compiler Rule Violations
+
+Examples:
+  node techdebt_stats.js -s skipped                    # Show only skipped tests
+  node techdebt_stats.js -s proptypes,defaultprops     # Show multiple sections
+  node techdebt_stats.js -s typescript -v              # Show TypeScript suppressions with verbose output
 `)
   process.exit(0)
 }
