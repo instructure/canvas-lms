@@ -1273,6 +1273,8 @@
   path: '/api/v1/courses/:course_id/pages/:url_or_id/revisions/:revision_id'
 - verb: GET
   path: '/api/v1/courses/:course_id/pages/:url_or_id/revisions/latest'
+- verb: POST
+  path: '/api/v1/courses/:course_id/pages_ai/alt_text'
 - verb: GET
   path: '/api/v1/courses/:course_id/permissions'
 - verb: POST
@@ -1835,6 +1837,8 @@
   path: '/api/v1/groups/:group_id/pages/:url_or_id/revisions/:revision_id'
 - verb: GET
   path: '/api/v1/groups/:group_id/pages/:url_or_id/revisions/latest'
+- verb: POST
+  path: '/api/v1/groups/:group_id/pages_ai/alt_text'
 - verb: GET
   path: '/api/v1/groups/:group_id/permissions'
 - verb: GET

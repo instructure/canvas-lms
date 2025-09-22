@@ -304,6 +304,8 @@ export default class WikiPageEditView extends ValidatedFormView {
     if (this.isBlockContentEditor()) {
       const data = this.model.get('block_editor_attributes')?.['blocks'] ?? null
       import('@canvas/block-content-editor').then(({BlockContentEditor}) => {
+        const aiAltTextGenerationURL = ENV?.ai_alt_text_generation_url ?? null
+
         const root = createRoot(document.getElementById('block_editor'))
         root.render(
           <BlockContentEditor
@@ -311,7 +313,7 @@ export default class WikiPageEditView extends ValidatedFormView {
             onInit={handler => {
               this.blockEditorHandler = handler
             }}
-            aiAltTextEnabled={ENV.FEATURES.block_content_editor_ai_alt_text}
+            aiAltTextGenerationURL={aiAltTextGenerationURL}
           />,
         )
       })

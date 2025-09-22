@@ -73,7 +73,13 @@ describe('BlockContentEditor', () => {
 
   it('does not break when onInit is null', () => {
     expect(() => {
-      render(<BlockContentEditor data={null} onInit={null} aiAltTextEnabled={false} />)
+      render(
+        <BlockContentEditor
+          data={null}
+          onInit={null}
+          aiAltTextGenerationURL="/api/v1/courses/1/pages/ai/alt_text"
+        />,
+      )
     }).not.toThrow()
   })
 
@@ -83,7 +89,7 @@ describe('BlockContentEditor', () => {
     })
 
     it('renders the BlockContentEditorContent component', () => {
-      render(<BlockContentEditor data={null} onInit={null} aiAltTextEnabled={false} />)
+      render(<BlockContentEditor data={null} onInit={null} aiAltTextGenerationURL={null} />)
       expect(mockEditorContentComponent).toHaveBeenCalled()
     })
   })
@@ -94,7 +100,7 @@ describe('BlockContentEditor', () => {
     })
 
     it('renders the BlockContentPreview component', () => {
-      render(<BlockContentEditor data={null} onInit={null} aiAltTextEnabled={false} />)
+      render(<BlockContentEditor data={null} onInit={null} aiAltTextGenerationURL={null} />)
       expect(mockPreviewComponent).toHaveBeenCalled()
     })
   })

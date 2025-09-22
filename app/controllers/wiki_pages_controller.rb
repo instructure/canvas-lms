@@ -234,6 +234,28 @@ class WikiPagesController < ApplicationController
       @wiki_pages_env[:TITLE_AVAILABILITY_PATH] = title_availability_path
     end
     js_env(@wiki_pages_env)
+    set_block_content_editor_ai_alt_text_js_env
     @wiki_pages_env
+  end
+
+  def set_block_content_editor_ai_alt_text_js_env
+    ai_enabled = Account.site_admin.feature_enabled?(:block_content_editor_ai_alt_text) &&
+                 !!@context.try(:block_content_editor_enabled?) &&
+                 !!CedarClient.try(:enabled?)
+
+    ai_alt_text_generation_url = ai_enabled ? ai_alt_text_generation_url_for_context(@context) : nil
+
+    js_env(ai_alt_text_generation_url:)
+  end
+
+  def ai_alt_text_generation_url_for_context(context)
+    case context
+    when Course
+      "/api/v1/courses/#{context.id}/pages_ai/alt_text"
+    when Group
+      "/api/v1/groups/#{context.id}/pages_ai/alt_text"
+    else
+      nil
+    end
   end
 end

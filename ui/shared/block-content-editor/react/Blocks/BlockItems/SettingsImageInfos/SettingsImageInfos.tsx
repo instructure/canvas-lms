@@ -27,6 +27,8 @@ import {Text} from '@instructure/ui-text'
 import {ChangeEvent} from 'react'
 import {SettingsImageProps} from './types'
 import {useBlockContentEditorContext} from '../../../BlockContentEditorContext'
+import {useGenerateAiAltText} from '../../../hooks/useGenerateAiAltText'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -36,12 +38,18 @@ export const SettingsImageInfos = ({
   decorativeImage,
   altTextAsCaption,
   disabled = false,
+  imageUrl,
+  fileName,
   onCaptionChange,
   onAltTextChange,
   onAltTextAsCaptionChange,
   onDecorativeImageChange,
 }: SettingsImageProps) => {
-  const {aiAltTextEnabled} = useBlockContentEditorContext()
+  const {aiAltTextGenerationURL} = useBlockContentEditorContext()
+
+  const generateAltTextMutation = useGenerateAiAltText({
+    url: aiAltTextGenerationURL,
+  })
 
   const handleAltTextChange = (e: ChangeEvent<HTMLInputElement>) => {
     onAltTextChange(e.target.value)
@@ -59,6 +67,25 @@ export const SettingsImageInfos = ({
   const handleAltTextAsCaptionChange = (e: ChangeEvent<HTMLInputElement>) => {
     onAltTextAsCaptionChange(e.target.checked)
   }
+
+  const handleGenerateAltText = async () => {
+    if (imageUrl) {
+      try {
+        const altText = await generateAltTextMutation.generate(imageUrl)
+        if (!altText) {
+          showFlashError(I18n.t('Failed to generate alt text.'))()
+          console.error('Failed to generate alt text: generated text is missing')
+          return
+        }
+        onAltTextChange(altText)
+      } catch (error) {
+        console.error('Failed to generate alt text:', error)
+        showFlashError(I18n.t('Failed to generate alt text.'))()
+      }
+    }
+  }
+
+  const isAIEnabled = !!aiAltTextGenerationURL
 
   return (
     <>
@@ -85,20 +112,28 @@ export const SettingsImageInfos = ({
           value={altText}
           onChange={handleAltTextChange}
           placeholder={I18n.t('Start typing...')}
-          disabled={disabled || decorativeImage}
+          disabled={disabled || decorativeImage || generateAltTextMutation.isPending}
         />
 
-        {aiAltTextEnabled && (
+        {isAIEnabled && (
           <View as="div" margin="small 0 0 0">
             <Button
-              color="ai-secondary"
+              color="secondary"
               display="block"
               renderIcon={<IconAiColoredSolid />}
               margin="0"
-              disabled={disabled || decorativeImage}
-              onClick={() => onAltTextChange('AI generated ALT text')}
+              disabled={
+                disabled ||
+                decorativeImage ||
+                !imageUrl ||
+                !fileName ||
+                generateAltTextMutation.isPending
+              }
+              onClick={handleGenerateAltText}
             >
-              {I18n.t('Regenerate Alt Text')}
+              {generateAltTextMutation.isPending
+                ? I18n.t('Generating...')
+                : I18n.t('Regenerate Alt Text')}
             </Button>
           </View>
         )}
