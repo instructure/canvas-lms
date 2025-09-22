@@ -113,14 +113,7 @@
       <i class="icon-end"></i>
       <%= t('links.drop_course', %{Drop this Course}) %>
     </a>
-    <div id="self_unenrollment_dialog" style="display: none;">
-      <h2><i class="icon-warning"></i> <%= t('headings.confirm_unenroll', %{Confirm Unenrollment}) %></h2>
-      <%= t('details.confirm_unenroll', %{Are you sure you want to unenroll in this course?  You will no longer be able to see the course roster or communicate directly with the teachers, and you will no longer see course events in your stream and as notifications.}) %>
-      <div class="button-container">
-        <a href="<%= course_self_unenrollment_path(@context, @context_enrollment.uuid) %>" class="btn btn-primary action"><i class="icon-end"></i> <span><%= t('links.drop_course', %{Drop this Course}) %></span></a>
-        <a href="#" class="btn dialog_closer"><%= t('#buttons.cancel', %{Cancel}) %></a>
-      </div>
-    </div>
+    <div id="self_unenrollment_modal_mount_point" data-api-url="<%= course_self_unenrollment_path(@context, @context_enrollment.uuid) %>"></div>
     <% end %>
 
     <% if @context_enrollment&.student? %>
