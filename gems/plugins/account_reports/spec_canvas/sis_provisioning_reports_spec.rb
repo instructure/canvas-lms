@@ -2569,6 +2569,22 @@ describe "Default Account Reports" do
         expect(parsed).to match_array [%w[observer_id student_id status],
                                        %w[user_sis_id_02 user_sis_id_01 active]]
       end
+
+      it "does not duplicate user rows for instructure identity pseudonyms" do
+        skip unless Pseudonym.column_names.include?("is_inst_id")
+
+        @account.pseudonyms.create!(user: @user1, unique_id: "inst_id_student", is_inst_id: true)
+        @account.pseudonyms.create!(user: @user2, unique_id: "inst_id_observer", is_inst_id: true)
+
+        parameters = {}
+        parameters["user_observers"] = true
+        parsed = read_report("provisioning_csv", { params: parameters, order: 0, header: true })
+
+        # Should still only have one row per observer relationship, not duplicated for each pseudonym combination
+        student_rows = parsed.select { |row| row[3] == "user_sis_id_01" }
+        expect(student_rows.length).to eq 1
+        expect(student_rows[0][1]).to eq "user_sis_id_02" # should be the regular SIS ID, not the Identity ID
+      end
     end
 
     describe "admins" do
