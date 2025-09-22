@@ -172,10 +172,13 @@
 # To explicitly request by ID, you can use the form `/api/v1/courses/:course_id/pages/page_id:7`.
 #
 class WikiPagesApiController < ApplicationController
+  AI_ALT_TEXT_MAX_LENGTH = 120
+  AI_ALT_TEXT_FEATURE_FLAG_SLUG = "alttext"
+
   before_action :require_context
-  before_action :get_wiki_page, except: %i[create index check_title_availability]
-  before_action :require_wiki_page, except: %i[create update update_front_page index check_title_availability]
-  before_action :was_front_page, except: [:index, :check_title_availability]
+  before_action :get_wiki_page, except: %i[create index check_title_availability ai_generate_alt_text]
+  before_action :require_wiki_page, except: %i[create update update_front_page index check_title_availability ai_generate_alt_text]
+  before_action :was_front_page, except: %i[index check_title_availability ai_generate_alt_text]
   before_action only: %i[show update destroy revisions show_revision revert] do
     check_differentiated_assignments(@page)
   end
@@ -627,6 +630,35 @@ class WikiPagesApiController < ApplicationController
     end
   end
 
+  def ai_generate_alt_text
+    feature_flag = Account.site_admin.feature_enabled?(:block_content_editor_ai_alt_text) && @context.try(:block_content_editor_enabled?)
+    return render json: { error: "The feature is not available" }, status: :forbidden unless feature_flag
+    return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+    return render json: { error: "AI client is not available" }, status: :forbidden unless CedarClient.enabled?
+    return render json: {}, status: :bad_request unless ai_alt_text_params_valid?
+
+    image_params = params[:image]
+    base64_source = image_params[:base64_source]
+    type = image_params[:type]
+
+    context_hash = {
+      context: @context,
+      user: @current_user,
+      root_account: @domain_root_account
+    }
+
+    generation_result = CedarClient.generate_alt_text(
+      image: { base64_source:, type: },
+      feature_slug: AI_ALT_TEXT_FEATURE_FLAG_SLUG,
+      root_account_uuid: @context.root_account.uuid,
+      current_user: @current_user,
+      max_length: AI_ALT_TEXT_MAX_LENGTH,
+      target_language: infer_locale(context_hash)
+    )
+
+    render json: { image: { altText: generation_result.image["altText"] } }
+  end
+
   protected
 
   def is_front_page_action?
@@ -809,6 +841,18 @@ class WikiPagesApiController < ApplicationController
   end
 
   private
+
+  def ai_alt_text_params_valid?
+    return false if params[:image].blank?
+    return false unless params[:image].is_a?(ActionController::Parameters) || params[:image].is_a?(Hash)
+
+    image_params = params[:image]
+    return false if image_params[:base64_source].blank?
+    return false if image_params[:type].blank?
+    return false if image_params[:type] != "Base64"
+
+    true
+  end
 
   def rescue_unparsable_content(error)
     @page.errors.add(:body, error.message) if @page.present?

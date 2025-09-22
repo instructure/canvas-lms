@@ -2193,6 +2193,8 @@ CanvasRails::Application.routes.draw do
       delete "groups/:group_id/pages/:url_or_id", action: :destroy
       get "courses/:course_id/page_title_availability", action: :check_title_availability, as: "course_page_title_availability"
       get "groups/:group_id/page_title_availability", action: :check_title_availability, as: "group_page_title_availability"
+      post "courses/:course_id/pages_ai/alt_text", action: :ai_generate_alt_text
+      post "groups/:group_id/pages_ai/alt_text", action: :ai_generate_alt_text
     end
 
     scope(controller: :context_modules_api) do

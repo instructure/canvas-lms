@@ -235,6 +235,8 @@ export const ImageTextBlockSettings = () => {
             disabled={!url}
             altTextAsCaption={altTextAsCaption}
             decorativeImage={decorativeImage}
+            imageUrl={url}
+            fileName={fileName}
             onCaptionChange={handleCaptionChange}
             onAltTextChange={handleAltTextChange}
             onAltTextAsCaptionChange={handleAltTextAsCaptionChange}
