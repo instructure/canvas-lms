@@ -13549,6 +13549,7 @@ tr:
   no_announcements_280df147: "Duyuru Yok"
   no_assignment_name_adbb215b: "Ödev Adı Yok"
   no_assignment_selected_65d9e422: "Seçili Ödev Yok"
+  no_assignments_found_2097cfc1: "Ödev bulunamadı"
   no_broken_links_found_38d951e3: "Bozuk Bağlantı Bulunamadı"
   no_content_5dbc9acf: "İçerik Yok"
   no_content_has_been_added_f36bab43: "* Hiçbir içerik eklenmedi"
