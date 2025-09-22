@@ -11420,6 +11420,7 @@ hy:
   no_active_user_with_that_id_was_found_b8fb5e14: "Այդպիսի  ID ունեցող ակտիվ օգտատեր չի գտնվել:"
   no_assignment_name_adbb215b: "Հանձնարարության անվանում չկա"
   no_assignment_selected_65d9e422: "Ոչ մի հանձնարարություն ընտրված չէ"
+  no_assignments_found_2097cfc1: "Հանձնարարություններ չեն գտնվել"
   no_content_5dbc9acf: "Բովանդակություն չկա"
   no_content_has_been_added_f36bab43: "* Բովանդակություն չի ավելացվել"
   no_conversations_selected_ebcd9226: "Խոսակցություններ չեն ընտրվել"
