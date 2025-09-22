@@ -38,6 +38,7 @@ export const SeparatorLineBlockView = (props: SeparatorLineBlockProps) => {
   return (
     <View
       as="hr"
+      aria-hidden="true"
       data-testid="separator-line"
       borderWidth={borderWidth}
       borderColor="primary"
