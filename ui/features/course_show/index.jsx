@@ -16,34 +16,43 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-
+import {createRoot} from 'react-dom/client'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import htmlEscape from '@instructure/html-escape'
 import './react/show'
 import '@canvas/jquery/jquery.ajaxJSON'
-import 'jqueryui/dialog'
-import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/loading-image'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
-import './jquery/behaviors/openAsDialog'
+import SelfUnenrollmentModal from './react/SelfUnenrollmentModal'
 
 const I18n = createI18nScope('courses.show')
 
 $(document).ready(() => {
-  const $selfUnenrollmentDialog = $('#self_unenrollment_dialog')
-  $('.self_unenrollment_link').click(_event =>
-    $selfUnenrollmentDialog
-      .dialog({
-        title: I18n.t('titles.drop_course', 'Drop this Course'),
-        modal: true,
-        zIndex: 1000,
-      })
-      .fixDialogButtons(),
-  )
+  let unenrollmentRoot = null
 
-  $selfUnenrollmentDialog.on('click', '.action', function () {
-    $selfUnenrollmentDialog.disableWhileLoading($.Deferred())
-    $.ajaxJSON($(this).attr('href'), 'POST', {}, () => window.location.reload())
+  $('.self_unenrollment_link').click(_event => {
+    const mountPoint = document.getElementById('self_unenrollment_modal_mount_point')
+    if (!mountPoint) {
+      console.error('Mount point for self unenrollment modal not found')
+      return
+    }
+
+    const apiUrl = mountPoint.getAttribute('data-api-url')
+    if (!apiUrl) {
+      console.error('API URL for self unenrollment not found')
+      return
+    }
+
+    if (!unenrollmentRoot) {
+      unenrollmentRoot = createRoot(mountPoint)
+    }
+
+    unenrollmentRoot.render(
+      <SelfUnenrollmentModal
+        unenrollmentApiUrl={apiUrl}
+        onClose={() => unenrollmentRoot.render(null)}
+      />,
+    )
   })
 
   $('.re_send_confirmation_link').click(function (event) {
