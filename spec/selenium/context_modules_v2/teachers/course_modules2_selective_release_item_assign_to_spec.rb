@@ -80,7 +80,7 @@ describe "selective_release module item assign to tray", :ignore_js_errors do
     end
 
     it "shows the correct icon type and title for a classic quiz" do
-      skip("only new quizzes are being made right now")
+      skip("2025-08-22 only new quizzes are being made right now LX-3351")
       go_to_modules
       module_header_expand_toggles.first.click
 
@@ -97,7 +97,7 @@ describe "selective_release module item assign to tray", :ignore_js_errors do
     end
 
     it "shows the correct icon type and title for an NQ quiz" do
-      skip("only new quizzes are being made right now")
+      skip("2025-08-22 only new quizzes are being made right now LX-3351")
       go_to_modules
       module_header_expand_toggles.first.click
 

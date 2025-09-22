@@ -141,22 +141,10 @@ describe "Excuse an Assignment" do
     end
   end
 
-  shared_examples "Basic Behavior" do |view|
+  shared_examples "Basic Behavior" do
     it "formats excused grade like dropped assignment", priority: "1" do
       assignment = @course.assignments.create! title: "Excuse Me", points_possible: 20
-
-      if view == "srgb"
-        skip "Skipped because this spec fails if not run in foreground\n" \
-             "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
-        get "/courses/#{@course.id}/gradebook/change_gradebook_version?version=srgb"
-        click_option f("#assignment_select"), assignment.title
-        click_option f("#student_select"), @student.name
-        replace_content f("#student_and_assignment_grade"), "EX", tab_out: true
-        wait_for_ajaximations
-      else
-        assignment.grade_student(@student, excuse: true, grader: @teacher)
-      end
-
+      assignment.grade_student(@student, excuse: true, grader: @teacher)
       user_session(@student)
       get "/courses/#{@course.id}/grades"
 
@@ -183,29 +171,13 @@ describe "Excuse an Assignment" do
           a2.grade_student(@student, grade: "100%", grader: @teacher)
         end
 
-        total = ""
-        if view == "srgb"
-          skip "Skipped because this spec fails if not run in foreground\n" \
-               "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
-          get "/courses/#{@course.id}/gradebook/change_gradebook_version?version=srgb"
-          click_option f("#student_select"), @student.name
-          total = f("span.total-grade").text[/\d+(\.\d+)?%/]
-          expect(total).to eq "83%"
+        get "/courses/#{@course.id}/gradebook/"
+        total = Gradebook::Cells.get_total_grade(@course.students[0])
+        expect(total).to eq "83%"
 
-          click_option f("#assignment_select"), a1.title
-          replace_content f("#student_and_assignment_grade"), "EX", tab_out: true
-          wait_for_ajaximations
-          total = f("span.total-grade").text[/\d+(\.\d+)?%/]
-        else
-          get "/courses/#{@course.id}/gradebook/"
-
-          total = Gradebook::Cells.get_total_grade(@course.students[0])
-          expect(total).to eq "83%"
-
-          Gradebook::Cells.edit_grade(@course.students[0], a1, "EX")
-          wait_for_ajaximations
-          total = Gradebook::Cells.get_total_grade(@course.students[0])
-        end
+        Gradebook::Cells.edit_grade(@course.students[0], a1, "EX")
+        wait_for_ajaximations
+        total = Gradebook::Cells.get_total_grade(@course.students[0])
         expect(total).to eq "100%"
       end
     end
@@ -237,9 +209,5 @@ describe "Excuse an Assignment" do
         expect { Gradebook::Cells.get_grade(@course.students[0], assignment) }.to become "Excused"
       end
     end
-  end
-
-  context "Individual View" do
-    it_behaves_like "Basic Behavior", "srgb"
   end
 end

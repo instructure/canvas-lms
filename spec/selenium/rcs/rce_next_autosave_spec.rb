@@ -62,7 +62,7 @@ describe "RCE Next autosave feature", :ignore_js_errors do
 
     # localStorage in chrome is limitedto 5120k, and that seems to include the key
     it "handles quota exceeded", :ignore_js_errors do
-      skip("RCX-2600")
+      skip("RCX-2600 2024-10-28")
       # remove ignore_js_errors in LS-1163
       get "/"
       driver.local_storage.clear
@@ -74,7 +74,7 @@ describe "RCE Next autosave feature", :ignore_js_errors do
     end
 
     it "cleans up expired autosaved entries", :ignore_js_errors do
-      skip("RCX-2600")
+      skip("RCX-2600 2024-10-28")
       get "/"
       driver.local_storage.clear
       Timecop.freeze(2.hours.ago) do
@@ -102,7 +102,7 @@ describe "RCE Next autosave feature", :ignore_js_errors do
     end
 
     it "does not prompt to restore autosaved content if the RCE is hidden", :ignore_js_errors do
-      skip("RCX-2600")
+      skip("RCX-2600 2024-10-28")
       get "/accounts/#{@account.id}/settings#tab-announcements"
       fj('button:contains("New Announcement")').click
       wait_for_rce

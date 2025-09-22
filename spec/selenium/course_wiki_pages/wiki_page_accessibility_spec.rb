@@ -250,7 +250,7 @@ describe "Wiki Pages" do
       end
 
       it "alerts user if navigating away from page with unsaved RCE changes", priority: "1" do
-        skip "QE Team will revisit due to chrome update TESTOPS-232"
+        skip "QE Team will revisit due to chrome update TESTOPS-232 2025-07-23"
         add_text_to_tiny("derp")
         course_home_nav_menu.click
         expect(driver.switch_to.alert).to be_present
@@ -258,7 +258,7 @@ describe "Wiki Pages" do
       end
 
       it "alerts user if navigating away from page with unsaved html changes", priority: "1" do
-        skip "QE Team will revisit due to chrome update TESTOPS-232"
+        skip "QE Team will revisit due to chrome update TESTOPS-232 2025-07-23"
         skip_if_safari(:alert)
         switch_editor_views
         wiki_page_body.send_keys("derp")
@@ -279,7 +279,7 @@ describe "Wiki Pages" do
       end
 
       it "alerts user if navigating away from page after title change", priority: "1" do
-        skip "QE Team will revisit due to chrome update TESTOPS-232"
+        skip "QE Team will revisit due to chrome update TESTOPS-232 2025-07-23"
         skip_if_safari(:alert)
         switch_editor_views
         edit_page_title_input.clear

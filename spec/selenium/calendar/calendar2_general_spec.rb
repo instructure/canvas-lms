@@ -192,7 +192,7 @@ describe "calendar2" do
       end
 
       it "does not allow saving events without participants" do
-        skip("VICE-5309 - flaky")
+        skip("VICE-5309 - flaky 2025-05-30")
         create_appointment_group
         ag = AppointmentGroup.first
         student_in_course(course: @course, active_all: true)
