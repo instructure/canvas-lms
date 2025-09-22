@@ -2726,6 +2726,149 @@ describe Types::UserType do
         expect(result.first).to eq("Test Assignment")
       end
     end
+
+    it "excludes assignments with no submission requirements from includeOverdue filter" do
+      Timecop.freeze(@frozen_time) do
+        no_submission_assignment = @course.assignments.create!(
+          title: "No Submission Assignment",
+          due_at: (@frozen_time - 2.days).end_of_day,
+          workflow_state: "published",
+          submission_types: "none"
+        )
+        no_submission_assignment.submissions.find_or_create_by(user: @student) do |s|
+          s.submitted_at = nil
+          s.workflow_state = "unsubmitted"
+        end
+
+        regular_overdue_assignment = @course.assignments.create!(
+          title: "Regular Overdue Assignment",
+          due_at: (@frozen_time - 2.days).end_of_day,
+          workflow_state: "published",
+          submission_types: "online_text_entry"
+        )
+        regular_overdue_assignment.submissions.find_or_create_by(user: @student) do |s|
+          s.submitted_at = nil
+          s.workflow_state = "unsubmitted"
+        end
+
+        result = student_user_type.resolve("courseWorkSubmissionsConnection(includeOverdue: true) { edges { node { assignment { title } } } }")
+
+        expect(result).to include("Regular Overdue Assignment")
+        expect(result).not_to include("No Submission Assignment")
+
+        no_sub_submission = no_submission_assignment.submissions.find_by(user: @student)
+        regular_sub_submission = regular_overdue_assignment.submissions.find_by(user: @student)
+
+        expect(no_sub_submission.missing?).to be false
+        expect(regular_sub_submission.missing?).to be true
+      end
+    end
+
+    it "excludes assignments with not_graded submission types from includeOverdue filter" do
+      Timecop.freeze(@frozen_time) do
+        not_graded_assignment = @course.assignments.create!(
+          title: "Not Graded Assignment",
+          due_at: (@frozen_time - 2.days).end_of_day,
+          workflow_state: "published",
+          submission_types: "not_graded"
+        )
+        not_graded_assignment.submissions.find_or_create_by(user: @student) do |s|
+          s.submitted_at = nil
+          s.workflow_state = "unsubmitted"
+        end
+
+        result = student_user_type.resolve("courseWorkSubmissionsConnection(includeOverdue: true) { edges { node { assignment { title } } } }")
+        expect(result).not_to include("Not Graded Assignment")
+
+        submission = not_graded_assignment.submissions.find_by(user: @student)
+        expect(submission.missing?).to be false
+      end
+    end
+
+    it "excludes assignments with wiki_page submission types from includeOverdue filter" do
+      Timecop.freeze(@frozen_time) do
+        wiki_assignment = @course.assignments.create!(
+          title: "Wiki Page Assignment",
+          due_at: (@frozen_time - 2.days).end_of_day,
+          workflow_state: "published",
+          submission_types: "wiki_page"
+        )
+        wiki_assignment.submissions.find_or_create_by(user: @student) do |s|
+          s.submitted_at = nil
+          s.workflow_state = "unsubmitted"
+        end
+
+        result = student_user_type.resolve("courseWorkSubmissionsConnection(includeOverdue: true) { edges { node { assignment { title } } } }")
+        expect(result).not_to include("Wiki Page Assignment")
+
+        submission = wiki_assignment.submissions.find_by(user: @student)
+        expect(submission.missing?).to be false
+      end
+    end
+
+    it "excludes submitted assignments from includeOverdue filter" do
+      Timecop.freeze(@frozen_time) do
+        submitted_overdue_assignment = @course.assignments.create!(
+          title: "Submitted Overdue Assignment",
+          due_at: (@frozen_time - 2.days).end_of_day,
+          workflow_state: "published",
+          submission_types: "online_text_entry"
+        )
+        submitted_submission = submitted_overdue_assignment.submissions.find_or_create_by(user: @student)
+        submitted_submission.update!(
+          submitted_at: @frozen_time - 1.day,
+          workflow_state: "submitted",
+          submission_type: "online_text_entry",
+          body: "My submission content"
+        )
+
+        unsubmitted_overdue_assignment = @course.assignments.create!(
+          title: "Unsubmitted Overdue Assignment",
+          due_at: (@frozen_time - 2.days).end_of_day,
+          workflow_state: "published",
+          submission_types: "online_text_entry"
+        )
+        unsubmitted_overdue_assignment.submissions.find_or_create_by(user: @student) do |s|
+          s.submitted_at = nil
+          s.workflow_state = "unsubmitted"
+        end
+
+        result = student_user_type.resolve("courseWorkSubmissionsConnection(includeOverdue: true) { edges { node { assignment { title } } } }")
+
+        expect(result).to include("Unsubmitted Overdue Assignment")
+        expect(result).not_to include("Submitted Overdue Assignment")
+
+        submitted_sub = submitted_overdue_assignment.submissions.find_by(user: @student)
+        unsubmitted_sub = unsubmitted_overdue_assignment.submissions.find_by(user: @student)
+
+        expect(submitted_sub.missing?).to be false
+        expect(unsubmitted_sub.missing?).to be true
+      end
+    end
+
+    it "excludes graded assignments from includeOverdue filter" do
+      Timecop.freeze(@frozen_time) do
+        graded_overdue_assignment = @course.assignments.create!(
+          title: "Graded Overdue Assignment",
+          due_at: (@frozen_time - 2.days).end_of_day,
+          workflow_state: "published",
+          submission_types: "online_text_entry"
+        )
+        graded_submission = graded_overdue_assignment.submissions.find_or_create_by(user: @student)
+        graded_submission.update!(
+          submitted_at: nil,
+          workflow_state: "graded",
+          grader_id: @teacher.id,
+          score: 85
+        )
+
+        result = student_user_type.resolve("courseWorkSubmissionsConnection(includeOverdue: true) { edges { node { assignment { title } } } }")
+        expect(result).not_to include("Graded Overdue Assignment")
+
+        submission = graded_overdue_assignment.submissions.find_by(user: @student)
+        expect(submission.missing?).to be false
+      end
+    end
   end
 
   context "courseWorkSubmissionsConnection with observed user" do

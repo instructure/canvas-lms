@@ -690,7 +690,6 @@ module Types
 
       # Apply date filtering using flexible date parameters (skip for submitted items)
       unless only_submitted
-        today = Time.zone.now.beginning_of_day
         conditions = []
         params = []
 
@@ -708,8 +707,7 @@ module Types
 
         # Add overdue filter if requested
         if include_overdue
-          conditions << "(cached_due_date < ?) OR (cached_due_date IS NULL AND assignments.due_at < ?)"
-          params += [today, today]
+          submissions_query = submissions_query.merge(Submission.missing)
         end
 
         # Add no due date filter if requested
