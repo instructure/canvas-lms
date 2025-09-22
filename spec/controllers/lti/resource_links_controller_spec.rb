@@ -566,6 +566,36 @@ describe Lti::ResourceLinksController, type: :request do
     end
   end
 
+  describe "the scope of resource links that should be searched" do
+    context "when teacher tries to access resource links from a different course" do
+      # Teacher has enrollment in "course"
+      let!(:teacher) { teacher_in_course(course:, account:).user }
+      let!(:other_course) { course_model(account:) }
+      let!(:resource_link_in_other_course) { resource_link_model(context: other_course) }
+
+      before do
+        user_session(teacher)
+      end
+
+      it "cannot get a resource link in different course (should return 404)" do
+        # URL here is using "course" for the course ID, but the resource link ID
+        # of a resource link in "other_course."
+        get "/api/v1/courses/#{course.id}/lti_resource_links/#{resource_link_in_other_course.id}"
+        expect(response).to be_not_found
+      end
+
+      it "cannot modify a resource link in different course (should return 404)" do
+        put "/api/v1/courses/#{course.id}/lti_resource_links/#{resource_link_in_other_course.id}", params: { custom: { "test" => "value" } }
+        expect(response).to be_not_found
+      end
+
+      it "cannot delete a resource link in different course (should return 404)" do
+        delete "/api/v1/courses/#{course.id}/lti_resource_links/#{resource_link_in_other_course.id}"
+        expect(response).to be_not_found
+      end
+    end
+  end
+
   describe "DELETE #destroy" do
     subject { delete "/api/v1/courses/#{course.id}/lti_resource_links/#{id}" }
 
