@@ -19,7 +19,11 @@
 import './base-block-layout.css'
 import {Flex} from '@instructure/ui-flex'
 import {Tag} from '@instructure/ui-tag'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {PropsWithChildren, ReactNode} from 'react'
+import {useScope as createI18nScope} from '@canvas/i18n'
+
+const I18n = createI18nScope('block_content_editor')
 
 export const BaseBlockLayout = (
   props: PropsWithChildren<{
@@ -36,6 +40,7 @@ export const BaseBlockLayout = (
       <Flex direction="column" padding="paddingCardLarge">
         <Flex justifyItems="space-between" margin="0 0 mediumSmall 0">
           <Flex data-header>
+            <ScreenReaderContent>{I18n.t('Block type')}</ScreenReaderContent>
             <Tag text={props.title} size="medium" data-testid="block-type-label" />
           </Flex>
           <Flex data-testid="block-menu">{props.menu}</Flex>
