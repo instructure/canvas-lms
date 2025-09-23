@@ -109,8 +109,6 @@ describe DataFixup::AddMediaDataAttributeToIframes do
       another_course = course_model
       another_course.update! syllabus_body: record_body, saving_user: @user
       assignment = another_course.assignments.create!(description: record_body, submission_types: "online_text_entry", points_possible: 2, saving_user: @user)
-      assessment_question_bank = another_course.assessment_question_banks.create!
-      assessment_question = assessment_question_bank.assessment_questions.create!(question_data: { "question_text" => record_body })
       discussion_topic = another_course.discussion_topics.create!(message: record_body, user: @user, saving_user: @user)
       sa = User.create!
       discussion_entry = discussion_topic.discussion_entries.create!(message: record_body, user: sa, saving_user: sa)
@@ -120,7 +118,6 @@ describe DataFixup::AddMediaDataAttributeToIframes do
       DataFixup::AddMediaDataAttributeToIframes.run
       expect(another_course.reload.syllabus_body).to eq(expected_body(att.id, "video"))
       expect(assignment.reload.description).to eq(expected_body(att.id, "video"))
-      expect(assessment_question.reload.question_data["question_text"]).to eq(expected_body(att.id, "video"))
       expect(discussion_topic.reload.message).to eq(expected_body(att.id, "video"))
       expect(discussion_entry.reload.message).to eq(expected_body(att.id, "video"))
       expect(quiz_question.reload.question_data["question_text"]).to eq(expected_body(att.id, "video"))

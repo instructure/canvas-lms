@@ -270,7 +270,8 @@ describe Quizzes::QuizQuestionsController do
       aq = bank.assessment_questions.create!(question_data: {
                                                question_type: "essay_question",
                                                question_text: "File ref:<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/download\">"
-                                             })
+                                             },
+                                             current_user: @teacher)
 
       translated_text = aq.reload.question_data["question_text"]
       expect(translated_text).to match %r{/assessment_questions/\d+/files/\d+}

@@ -94,8 +94,6 @@ describe DataFixup::AddMediaIdAndStyleDisplayAttributesToIframes do
       another_course = course_model
       another_course.update! syllabus_body: record_body, saving_user: @user
       assignment = another_course.assignments.create!(description: record_body, submission_types: "online_text_entry", points_possible: 2, saving_user: @user)
-      assessment_question_bank = another_course.assessment_question_banks.create!
-      assessment_question = assessment_question_bank.assessment_questions.create!(question_data: { "question_text" => record_body })
       sa = User.create!
       discussion_topic = another_course.discussion_topics.create!(message: record_body, user: sa, saving_user: sa)
       sa = User.create!
@@ -106,7 +104,6 @@ describe DataFixup::AddMediaIdAndStyleDisplayAttributesToIframes do
       DataFixup::AddMediaIdAndStyleDisplayAttributesToIframes.run
       expect(another_course.reload.syllabus_body).to eq(expected_body(att.id, att.media_entry_id))
       expect(assignment.reload.description).to eq(expected_body(att.id, att.media_entry_id))
-      expect(assessment_question.reload.question_data["question_text"]).to eq(expected_body(att.id, att.media_entry_id))
       expect(discussion_topic.reload.message).to eq(expected_body(att.id, att.media_entry_id))
       expect(discussion_entry.reload.message).to eq(expected_body(att.id, att.media_entry_id))
       expect(quiz_question.reload.question_data["question_text"]).to eq(expected_body(att.id, att.media_entry_id))

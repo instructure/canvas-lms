@@ -314,7 +314,7 @@ describe "Common Cartridge exporting" do
         "points_possible" => 10,
         "answers" => [{ "id" => 1 }, { "id" => 2 }],
       }
-      question = @bank.assessment_questions.create!(question_data:)
+      question = @bank.assessment_questions.create!(question_data:, current_user: @user)
       question.question_data = question_data.merge("question_text" => %(<p><img src="/courses/#{@course.id}/files/#{@attachment.id}/download"></p>))
       question.save!
       att = question.attachments.take
@@ -428,7 +428,7 @@ describe "Common Cartridge exporting" do
         answers: [{ "migration_id" => "QUE_1018_A1", "text" => "True" }, { "migration_id" => "QUE_1019_A2", "text" => "False" }],
         question_text: %(<img src="/courses/#{@course.id}/files/#{@attachment.id}/download">)
       }
-      question = @bank.assessment_questions.create!(question_data:)
+      question = @bank.assessment_questions.create!(question_data:, current_user: @user)
       question.question_data = question_data
       question.save!
       quiz.add_assessment_questions([question])
