@@ -66,6 +66,16 @@ module Canvas::LiveEvents
                            })
   end
 
+  def self.convert_new_quiz_youtube_link(payload)
+    post_event_stringified("convert_new_quiz_youtube_link", {
+                             resource_id: payload.resource_id,
+                             resource_type: payload.resource_type,
+                             src: payload.src,
+                             field: payload.field,
+                             new_html: payload.new_html
+                           })
+  end
+
   def self.conversation_created(conversation)
     post_event_stringified("conversation_created", {
                              conversation_id: conversation.id,
