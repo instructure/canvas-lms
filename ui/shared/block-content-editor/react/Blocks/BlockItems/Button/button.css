@@ -1,6 +1,6 @@
-[data-singlebutton] {
+[data-button] {
   text-decoration: none !important;
 }
-[data-singlebutton] > .external_link_icon {
+[data-button] > .external_link_icon {
   display: none !important;
 }

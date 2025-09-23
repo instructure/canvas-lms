@@ -17,9 +17,7 @@
  */
 
 import {Flex} from '@instructure/ui-flex'
-import {SingleButton} from './SingleButton'
-import {ButtonDisplayProps} from './types'
-import './button-display.css'
+import {ButtonBlockLayoutProps} from './types'
 
 const alignmentMap = {
   left: 'start',
@@ -27,16 +25,15 @@ const alignmentMap = {
   right: 'end',
 } as const
 
-export const ButtonDisplay = ({
+export const ButtonBlockLayout = ({
   buttons,
   alignment,
   layout,
   isFullWidth,
   dataTestId,
-  onButtonClick,
   focusHandler,
-  viewMode,
-}: ButtonDisplayProps) => {
+  ButtonComponent,
+}: ButtonBlockLayoutProps) => {
   const flexDirection = layout === 'vertical' ? 'column' : 'row'
   const justifyItems = !isFullWidth && layout === 'horizontal' ? alignmentMap[alignment] : undefined
   const alignItems = !isFullWidth && layout === 'vertical' ? alignmentMap[alignment] : undefined
@@ -53,12 +50,16 @@ export const ButtonDisplay = ({
     >
       {buttons.map((button, i) => (
         <Flex.Item key={button.id} shouldGrow={isFullWidth} overflowX="visible" overflowY="visible">
-          <SingleButton
+          <ButtonComponent
+            id={button.id}
+            text={button.text}
+            url={button.url}
+            linkOpenMode={button.linkOpenMode}
+            primaryColor={button.primaryColor}
+            secondaryColor={button.secondaryColor}
+            style={button.style}
             isFullWidth={isFullWidth}
-            button={button}
-            onButtonClick={onButtonClick}
             focusHandler={i === 0 ? focusHandler : undefined}
-            viewMode={viewMode}
           />
         </Flex.Item>
       ))}

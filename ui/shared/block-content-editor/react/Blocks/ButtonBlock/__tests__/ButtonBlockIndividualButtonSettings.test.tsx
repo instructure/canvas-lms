@@ -19,7 +19,8 @@
 import {render, screen, fireEvent, act} from '@testing-library/react'
 import {userEvent} from '@testing-library/user-event'
 import {ButtonBlockIndividualButtonSettings} from '../ButtonBlockIndividualButtonSettings'
-import {ButtonData, ButtonBlockIndividualButtonSettingsProps} from '../types'
+import {ButtonBlockIndividualButtonSettingsProps} from '../types'
+import {ButtonData} from '../../BlockItems/Button/types'
 
 const createButton = (id: number, options: Partial<ButtonData> = {}): ButtonData => ({
   id,
