@@ -21,9 +21,10 @@ import {Avatar} from '@instructure/ui-avatar'
 import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
 import {TruncateText} from '@instructure/ui-truncate-text'
-import {Student} from '../../types/rollup'
+import {Outcome, Student, StudentRollupData} from '../../types/rollup'
 import {SecondaryInfoDisplay, NameDisplayFormat} from '../../utils/constants'
 import {Text} from '@instructure/ui-text'
+import {StudentCellPopover} from './StudentCellPopover'
 
 export interface StudentCellProps {
   courseId: string
@@ -31,6 +32,8 @@ export interface StudentCellProps {
   secondaryInfoDisplay?: SecondaryInfoDisplay
   showStudentAvatar?: boolean
   nameDisplayFormat?: NameDisplayFormat
+  outcomes?: Outcome[]
+  rollups?: StudentRollupData[]
 }
 
 const getSecondaryInfo = (student: Student, secondaryInfoDisplay?: SecondaryInfoDisplay) => {
@@ -54,6 +57,8 @@ export const StudentCell: React.FC<StudentCellProps> = ({
   secondaryInfoDisplay,
   showStudentAvatar = true,
   nameDisplayFormat,
+  outcomes,
+  rollups,
 }) => {
   const studentGradesUrl = `/courses/${courseId}/grades/${student.id}#tab-outcomes`
   const shouldShowStudentStatus = student.status === 'inactive' || student.status === 'concluded'
@@ -80,9 +85,15 @@ export const StudentCell: React.FC<StudentCellProps> = ({
       )}
       <Flex.Item as="div" size={displayNameWidth} padding="none x-small">
         <Flex direction="column">
-          <Link isWithinText={false} href={studentGradesUrl} data-testid="student-cell-link">
-            <TruncateText>{studentName}</TruncateText>
-          </Link>
+          <StudentCellPopover
+            key={student.id}
+            student={student}
+            studentName={studentName}
+            studentGradesUrl={studentGradesUrl}
+            courseId={courseId}
+            outcomes={outcomes}
+            rollups={rollups}
+          />
           {secondaryInfo !== null && (
             <Text size="legend" color="secondary" data-testid="student-secondary-info">
               {secondaryInfo}

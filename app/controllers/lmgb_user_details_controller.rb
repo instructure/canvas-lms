@@ -62,7 +62,8 @@ class LmgbUserDetailsController < ApplicationController
 
     # Get user's sections in this course
     sections = @context.course_sections.joins(:enrollments)
-                       .where(enrollments: { user_id: user.id, workflow_state: "active" })
+                       .where.not(enrollments: { workflow_state: "deleted" })
+                       .where(enrollments: { user_id: user.id })
                        .distinct
                        .order(:name)
 

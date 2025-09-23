@@ -132,6 +132,8 @@ export const Gradebook: React.FC<GradebookProps> = ({
                   DisplayFilter.SHOW_STUDENT_AVATARS,
                 )}
                 nameDisplayFormat={gradebookSettings.nameDisplayFormat}
+                outcomes={outcomes}
+                rollups={rollups}
               />
             </View>
           ))}
