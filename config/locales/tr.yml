@@ -17080,6 +17080,7 @@ tr:
   remove_dates_5a5a8df2: "Tarihleri sil"
   remove_edf2b8a7: (Kaldır)
   remove_f47dc62a: Kaldır
+  remove_filename_1b74ef2a: "%{fileName}'ı kaldır"
   remove_filter_68de01d4: "Filtreyi Kaldır"
   remove_from_course_6fb47aee: "Dersten Sil"
   remove_image_341340b3: "Görseli sil"
