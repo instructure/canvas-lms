@@ -26,9 +26,8 @@ import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import AnnouncementItem from './AnnouncementItem'
 import type {BaseWidgetProps, Announcement} from '../../../types'
 import {usePaginatedAnnouncements} from '../../../hooks/useAnnouncements'
-import {useSharedCourses} from '../../../hooks/useSharedCourses'
 import {usePagination} from '../../../hooks/usePagination'
-import {COURSE_GRADES_WIDGET} from '../../../constants'
+import {useWidgetDashboard} from '../../../hooks/useWidgetDashboardContext'
 import {FilterOption} from './utils'
 
 const I18n = createI18nScope('widget_dashboard')
@@ -55,19 +54,7 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
     setFilter(newFilter)
   }
 
-  const {data: courses = []} = useSharedCourses({
-    limit: COURSE_GRADES_WIDGET.MAX_GRID_ITEMS,
-  })
-
-  const coursesById = useMemo(() => {
-    return courses.reduce(
-      (acc, course) => {
-        acc[course.courseId] = course
-        return acc
-      },
-      {} as Record<string, (typeof courses)[0]>,
-    )
-  }, [courses])
+  const {sharedCourseData} = useWidgetDashboard()
 
   const enrichedAnnouncements = useMemo(() => {
     const currentPageData = data?.pages[currentPageIndex] as
@@ -76,20 +63,22 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
     const filteredAnnouncements = currentPageData?.announcements || []
 
     return filteredAnnouncements.map(announcement => {
-      const courseId = announcement.course?.id
-      const course = courseId ? coursesById[courseId] : null
+      if (!announcement.course) return announcement
+
+      const courseId = announcement.course.id
+      const matchedCourse = sharedCourseData.find(
+        course => course.courseId === courseId || course.courseId === String(courseId),
+      )
 
       return {
         ...announcement,
-        course: announcement.course
-          ? {
-              ...announcement.course,
-              courseCode: course?.courseCode || I18n.t('Unknown'),
-            }
-          : undefined,
+        course: {
+          ...announcement.course,
+          courseCode: matchedCourse?.courseCode || undefined,
+        },
       }
     })
-  }, [data?.pages, currentPageIndex, coursesById])
+  }, [data?.pages, currentPageIndex, sharedCourseData])
 
   const renderFilterSelect = () => (
     <SimpleSelect

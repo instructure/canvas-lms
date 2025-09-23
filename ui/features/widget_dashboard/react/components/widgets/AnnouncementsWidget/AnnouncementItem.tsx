@@ -174,13 +174,15 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcementItem, fi
                 </Flex.Item>
 
                 {/* Row 2: Course code */}
-                <Flex.Item>
-                  <CourseCode
-                    courseId={announcement.course?.id || ''}
-                    overrideCode={announcement.course?.courseCode || I18n.t('Unknown')}
-                    size="x-small"
-                  />
-                </Flex.Item>
+                {announcement.course?.courseCode && (
+                  <Flex.Item>
+                    <CourseCode
+                      courseId={announcement.course.id}
+                      overrideCode={announcement.course.courseCode}
+                      size="x-small"
+                    />
+                  </Flex.Item>
+                )}
 
                 {/* Row 3: Posted date */}
                 <Flex.Item>
