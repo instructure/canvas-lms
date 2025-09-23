@@ -39,7 +39,7 @@ class Mutations::SaveRubricAssessment < Mutations::BaseMutation
 
     assessment = association.rubric_assessments.find(input[:rubric_assessment_id]) if input[:rubric_assessment_id].present?
 
-    if assessment.present? && !authorized_action(assessment, current_user, :update)
+    if assessment.present? && !assessment.grants_right?(current_user, session, :update)
       raise GraphQL::ExecutionError, "Authorization failed - existing assessment cannot be updated by current user"
     end
 
