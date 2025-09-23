@@ -143,6 +143,7 @@ class AbstractAssignment < ActiveRecord::Base
   has_one :external_tool_tag, class_name: "ContentTag", as: :context, inverse_of: :context, dependent: :destroy
   has_one :score_statistic, dependent: :destroy, inverse_of: :assignment, foreign_key: :assignment_id
   has_one :post_policy, dependent: :destroy, inverse_of: :assignment, foreign_key: :assignment_id
+  has_one :scheduled_post, dependent: :destroy, inverse_of: :assignment, foreign_key: :assignment_id
 
   has_many :moderation_graders, inverse_of: :assignment, foreign_key: :assignment_id
   has_many :moderation_grader_users, through: :moderation_graders, source: :user
@@ -1612,6 +1613,8 @@ class AbstractAssignment < ActiveRecord::Base
     lti_asset_processors.find_each(&:destroy)
 
     comment_bank_items.destroy_all
+
+    scheduled_post&.destroy
 
     ScheduledSmartAlert.where(context_type: "Assignment", context_id: id).destroy_all
     ScheduledSmartAlert.where(context_type: "AssignmentOverride", context_id: assignment_override_ids).destroy_all
