@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class PeerReview::SectionOverrideCreatorService < PeerReview::SectionOverrideCommonService
+class PeerReview::AdhocOverrideCreatorService < PeerReview::AdhocOverrideCommonService
   def initialize(
     peer_review_sub_assignment: nil,
     override: nil
@@ -28,25 +28,33 @@ class PeerReview::SectionOverrideCreatorService < PeerReview::SectionOverrideCom
   def call
     validate_override_dates(@override)
 
-    section_id = fetch_set_id
-    validate_set_id_required(section_id)
+    provided_student_ids = fetch_student_ids
+    validate_student_ids_required(provided_student_ids)
 
-    section = course_section(section_id)
-    validate_section_exists(section)
+    provided_student_ids_in_course = find_student_ids_in_course(provided_student_ids)
+    validate_student_ids_in_course(provided_student_ids_in_course)
 
-    create_override(section)
+    ActiveRecord::Base.transaction do
+      override = build_override(provided_student_ids_in_course)
+      build_override_students(override, provided_student_ids_in_course)
+
+      override.save!
+      override
+    end
   end
 
   private
 
-  def create_override(section)
+  def build_override(student_ids)
     override = @peer_review_sub_assignment.assignment_overrides.build(
-      set: section,
+      set_id: nil,
+      set_type: AssignmentOverride::SET_TYPE_ADHOC,
+      dont_touch_assignment: true,
+      title: override_title(student_ids),
       unassign_item: fetch_unassign_item
     )
     apply_overridden_dates(override, @override)
 
-    override.save!
     override
   end
 end

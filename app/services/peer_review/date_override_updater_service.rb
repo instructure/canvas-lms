@@ -23,6 +23,7 @@ class PeerReview::DateOverrideUpdaterService < PeerReview::DateOverrideCommonSer
 
   def services
     {
+      "ADHOC" => PeerReview::AdhocOverrideUpdaterService,
       "CourseSection" => PeerReview::SectionOverrideUpdaterService,
     }
   end
