@@ -312,7 +312,7 @@ export default function CanvasDateInput2({
       disabledDates={disabledDates}
       data-testid={dataTestid}
       placeholder={placeholder}
-      dateFormat={{formatter: formatDate, parser: parseDate(timezone)}}
+      dateFormat={{formatter: d => d.toISOString(), parser: parseDate(timezone)}}
       screenReaderLabels={{
         calendarIcon: I18n.t('Choose a date'),
         prevMonthButton: I18n.t('Previous month'),
