@@ -314,12 +314,6 @@
     "clear_image_3213fe62": {
         "message": "छवि साफ़ करें"
     },
-    "clear_selected_file_82388e50": {
-        "message": "चयनित फ़ाइल साफ़ करें"
-    },
-    "clear_selected_file_filename_2fe8a58e": {
-        "message": "चयनित फ़ाइल साफ़ करें: { filename }"
-    },
     "click_or_shift_click_for_the_html_editor_25d70bb4": {
         "message": "HTML संपादक के लिए क्लिक या Shift-क्लिक करें।"
     },

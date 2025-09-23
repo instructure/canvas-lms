@@ -314,12 +314,6 @@
     "clear_image_3213fe62": {
         "message": "Удалить изображение"
     },
-    "clear_selected_file_82388e50": {
-        "message": "Очистить выбранный файл"
-    },
-    "clear_selected_file_filename_2fe8a58e": {
-        "message": "Удалить выбранный файл: { filename }"
-    },
     "click_or_shift_click_for_the_html_editor_25d70bb4": {
         "message": "Щелкнуть или щелкнуть с нажатием на клавишу shift, чтобы обратиться к редактору html."
     },
