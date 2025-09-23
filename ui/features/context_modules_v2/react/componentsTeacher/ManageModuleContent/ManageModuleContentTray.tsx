@@ -30,7 +30,6 @@ import {getModuleItems, useModuleItems} from '../../hooks/queries/useModuleItems
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useContextModule} from '../../hooks/useModuleContext'
 import {
-  createModuleItemOrder,
   createModuleContentsOrder,
   createModuleOrder,
   getTrayTitle,
@@ -380,23 +379,25 @@ const ManageModuleContentTray: React.FC<ManageModuleContentTrayProps> = ({
             itemTitle={itemTitle || ''}
           />
         )}
-        {['before', 'after'].includes(selectedPosition) && destinationModuleHasItems && (
-          <View as="div" margin="medium 0 0 0">
-            <SimpleSelect
-              renderLabel={I18n.t('Select a Destination Page')}
-              assistiveText={I18n.t('Select a destination page')}
-              value={selectedPage}
-              onChange={(_, data) => setSelectedPage(Number(data.value))}
-              data-testid="select_module_listbox"
-            >
-              {destinationPages.map(page => (
-                <SimpleSelect.Option key={page} id={String(page)} value={page}>
-                  {I18n.t('Page %{page}', {page})}
-                </SimpleSelect.Option>
-              ))}
-            </SimpleSelect>
-          </View>
-        )}
+        {['before', 'after'].includes(selectedPosition) &&
+          destinationModuleHasItems &&
+          moduleAction !== MOVE_MODULE && (
+            <View as="div" margin="medium 0 0 0">
+              <SimpleSelect
+                renderLabel={I18n.t('Select a Destination Page')}
+                assistiveText={I18n.t('Select a destination page')}
+                value={selectedPage}
+                onChange={(_, data) => setSelectedPage(Number(data.value))}
+                data-testid="select_module_listbox"
+              >
+                {destinationPages.map(page => (
+                  <SimpleSelect.Option key={page} id={String(page)} value={page}>
+                    {I18n.t('Page %{page}', {page})}
+                  </SimpleSelect.Option>
+                ))}
+              </SimpleSelect>
+            </View>
+          )}
         {/* Reference Selection - only show for before/after positions */}
         {/* Reference Selection - this is used for both modules and items */}
         {selectedModule &&

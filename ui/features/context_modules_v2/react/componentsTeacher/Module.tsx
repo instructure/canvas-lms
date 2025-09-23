@@ -43,6 +43,7 @@ export interface ModuleProps {
   setIsManageModuleContentTrayOpen?: React.Dispatch<React.SetStateAction<boolean>>
   setSelectedModuleItem?: (item: {id: string; title: string} | null) => void
   setSourceModule?: React.Dispatch<React.SetStateAction<{id: string; title: string} | null>>
+  setModulesShowAll: React.Dispatch<React.SetStateAction<Record<string, boolean>>>
 }
 
 const Module: React.FC<ModuleProps> = ({
@@ -62,6 +63,7 @@ const Module: React.FC<ModuleProps> = ({
   setIsManageModuleContentTrayOpen,
   setSelectedModuleItem,
   setSourceModule,
+  setModulesShowAll,
 }) => {
   const [isExpanded, setIsExpanded] = useState(propExpanded !== undefined ? propExpanded : false)
   const [showAll, setShowAll] = useShowAllState(id)
@@ -84,6 +86,13 @@ const Module: React.FC<ModuleProps> = ({
       setIsExpanded(propExpanded)
     }
   }, [propExpanded])
+
+  useEffect(() => {
+    setModulesShowAll(prev => ({
+      ...prev,
+      [id]: showAll,
+    }))
+  }, [id, showAll, setModulesShowAll])
 
   return (
     <View
