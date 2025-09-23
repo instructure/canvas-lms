@@ -165,6 +165,8 @@ RSpec.describe YoutubeMigrationService do
         active_relation = double("active_relation")
         quiz_relation = double("quiz_relation")
         except_relation = double("except_relation")
+        last_assignment = double("last_assignment")
+        external_tool_tag = double("external_tool_tag")
 
         allow(course).to receive(:assignments).and_return(assignment_relation)
         allow(assignment_relation).to receive(:active).and_return(active_relation)
@@ -172,13 +174,19 @@ RSpec.describe YoutubeMigrationService do
           type_quiz_lti: quiz_relation,
           except: except_relation
         )
-        allow(quiz_relation).to receive(:any?).and_return(true)
+        allow(quiz_relation).to receive_messages(
+          any?: true,
+          last: last_assignment
+        )
+        allow(last_assignment).to receive(:external_tool_tag).and_return(external_tool_tag)
+        allow(external_tool_tag).to receive(:content_id).and_return("external_tool_123")
         allow(except_relation).to receive(:find_each).and_return([])
         allow(course).to receive_messages(global_id: "course_global_id_123", id: 1)
 
         expect(Canvas::LiveEvents).to receive(:scan_youtube_links) do |payload|
           expect(payload.scan_id).to eq(Progress.last.id)
           expect(payload.course_id).to eq(course.id)
+          expect(payload.external_tool_id).to eq("external_tool_123")
         end
 
         progress.start!
