@@ -22612,6 +22612,7 @@ nn:
   remove_empty_attachment_b2aea632: "fjern tomt vedlegg"
   remove_f47dc62a: Fjern
   remove_file_cbf3f40f: "Fjern fil"
+  remove_filename_1b74ef2a: "Fjern %{fileName}"
   remove_filename_87f3781e: "fjern %{filename}"
   remove_filename_dab5c02e: "Fjern %{filename}"
   remove_filter_68de01d4: "Fjern filter"

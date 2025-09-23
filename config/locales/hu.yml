@@ -21179,6 +21179,7 @@ hu:
   remove_empty_attachment_b2aea632: "üres melléklet eltávolítása"
   remove_f47dc62a: Eltávolítás
   remove_file_cbf3f40f: "fájl  eltávolítása"
+  remove_filename_1b74ef2a: "%{fileName} eltávolítása"
   remove_filename_87f3781e: "%{filename} eltávolítása"
   remove_filename_dab5c02e: "%{filename}eltávolítása"
   remove_filter_68de01d4: "Szűrő eltávolítása"
