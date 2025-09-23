@@ -88,30 +88,14 @@ describe "users" do
       expect(f(%([data-testid="page-views-empty-state"]))).to be_displayed # validate the second student has no page views
     end
 
-    # Validating behavior of infinite scrolling from Tanstack query probably does
-    # not belong in an integration test like this. Instead, it should be in a unit
-    # test for the component that handles the infinite scrolling.
-    skip "validates all page views were loaded FOO-4949" do
-      page_views_count = 100
-      page_views_count.times { |i| page_view(user: @student, course: @course, url: ("%03d" % i).to_s) }
-      get "/users/#{@student.id}"
-      wait_for_ajaximations
-      scroll_page_to_bottom
-      driver.execute_script("$('#page_views_table').scrollTop($('#page_views_table')[0].scrollHeight);")
-      # wait for loading spinner to finish
-      wait_for(method: nil, timeout: 0.5) { f(".paginatedView-loading").displayed? }
-      wait_for_no_such_element { f(".paginatedView-loading") }
-      expect(ff(%([data-testid="page-views-table-body"] tr)).length).to eq page_views_count
-    end
-
-    it "filters by date" do
+    it "end date filter" do
       old_date = 2.days.ago.beginning_of_day
       page_view(user: @student, course: @course, url: "recent", created_at: 5.minutes.ago)
       page_view(user: @student, course: @course, url: "older", created_at: old_date + 1.minute)
       get "/users/#{@student.id}"
       wait_for_ajaximations
       expect(ff(%([data-testid="page-views-table-body"] tr)).first.text).to include "recent"
-      replace_content(f(%([data-testid="page-views-date-filter"])), format_date_for_view(old_date, "%Y-%m-%d"))
+      replace_content(f(%([data-testid="page-views-date-end-filter"])), format_date_for_view(old_date + 1.day, "%Y-%m-%d"))
       driver.action.send_keys(:tab).perform
       wait_for_ajaximations
       expect(ff(%([data-testid="page-views-table-body"] tr)).first.text).to include "older"

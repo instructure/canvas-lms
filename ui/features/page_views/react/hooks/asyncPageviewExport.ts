@@ -100,8 +100,8 @@ export function useAsyncPageviewJobs(
         path: `${BASE_URL}/query/${job.query_id}`,
         method: 'GET',
       })
-      if (json?.status && json?.status !== job.status) {
-        // Update the status of the record
+      if (json?.status) {
+        // Update the status and the timestamp of the record
         const updatedJobs = jobs.map(record =>
           record.query_id === job.query_id
             ? {...record, status: json.status, updatedAt: new Date()}

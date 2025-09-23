@@ -43,6 +43,7 @@ export interface PageViewsTableProps {
   startDate?: Date
   endDate?: Date
   onEmpty?: () => void
+  pageSize?: number
 }
 
 type APIQueryParams = {
@@ -92,12 +93,11 @@ export function PageViewsTable(props: PageViewsTableProps): React.JSX.Element {
   const formatDate = useDateTimeFormat('time.formats.short')
 
   const [visiblePage, setVisiblePage] = useState(0)
-  // This may be promoted to a component prop
-  const visiblePageSize = 10
+  const visiblePageSize = props.pageSize ?? 10
 
   async function fetchPageViews({
     pageParam = '1',
-  }: QueryFunctionContext<[string, string, Date?], string>): Promise<{
+  }: QueryFunctionContext<[string, string, Date?, Date?], string>): Promise<{
     views: Array<PageView>
     nextPage: string | null
   }> {
@@ -132,10 +132,10 @@ export function PageViewsTable(props: PageViewsTableProps): React.JSX.Element {
       {views: Array<PageView>; nextPage: string | null},
       Error,
       InfiniteData<{views: Array<PageView>; nextPage: string | null}>,
-      [string, string, Date?],
+      [string, string, Date?, Date?],
       string
     >({
-      queryKey: ['page_views', props.userId, props.startDate],
+      queryKey: ['page_views', props.userId, props.startDate, props.endDate],
       queryFn: fetchPageViews,
       staleTime: 10 * 60 * 1000, // 10 minutes
       getNextPageParam: lastPage => lastPage.nextPage,
@@ -199,9 +199,9 @@ export function PageViewsTable(props: PageViewsTableProps): React.JSX.Element {
     void fetchNextPage()
   }
 
-  if (viewKeys.length === 0 && !props.startDate) {
+  if (viewKeys.length === 0 && props.onEmpty) {
     // We bubble this up so the parent can hide any sub filtering controls, which would again return nothing
-    if (props.onEmpty) props.onEmpty()
+    props.onEmpty()
     return <EmptyState />
   }
 
