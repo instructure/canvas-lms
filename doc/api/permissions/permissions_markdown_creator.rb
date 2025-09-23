@@ -51,6 +51,29 @@ class PermissionsMarkdownCreator
     end.join
   end
 
+  def self.details
+    get_perm_docs = lambda do |perm_or_group, info|
+      details = info.values_at(*DETAILS_KEYS).find(&:present?)&.map { it.transform_values(&:call) }
+      considerations = info.values_at(*CONSIDERATIONS_KEYS).find(&:present?)&.map { it.transform_values(&:call) }
+      if details || considerations
+        {
+          perm_or_group => {
+            label: info[:label].call,
+            details:,
+            considerations:
+          }
+        }
+      else
+        {}
+      end
+    end
+
+    h = {}
+    BASE_PERMISSIONS.each { |perm, info| h.merge!(get_perm_docs.call(perm, info)) }
+    PERMISSION_GROUPS.each { |group, info| h.merge!(get_perm_docs.call(group, info)) }
+    h.sort_by { |_, v| v[:label] }.to_h
+  end
+
   def self.run(format)
     raise ArgumentError, "format must be :html or :md" unless %i[html md].include?(format)
 
@@ -84,26 +107,19 @@ class PermissionsMarkdownCreator
                    .sort_by { |entry| [group_names[entry[:group]] || "", entry[:key]] }
                    .group_by { |entry| entry[:group] }
 
-    documented_perms = Set.new
-    write_perm_docs = lambda do |perm_or_group, info|
-      details = info.values_at(*DETAILS_KEYS).find(&:present?)&.map { it.transform_values(&:call) }
-      considerations = info.values_at(*CONSIDERATIONS_KEYS).find(&:present?)&.map { it.transform_values(&:call) }
-      if details || considerations
-        documented_perms << perm_or_group
-        Rails.root.join(OUTPUT_PATH, "permissions_#{perm_or_group}.md").binwrite(
-          details_renderer.result_with_hash(name: info[:label].call, details:, considerations:)
-        )
-      end
+    details_hash = details
+    details_hash.each do |perm_or_group, info|
+      Rails.root.join(OUTPUT_PATH, "permissions_#{perm_or_group}.md").binwrite(
+        details_renderer.result_with_hash(info)
+      )
     end
-    BASE_PERMISSIONS.each { |perm, info| write_perm_docs.call(perm, info) }
-    PERMISSION_GROUPS.each { |group, info| write_perm_docs.call(group, info) }
 
     group_name_with_link = lambda do |group|
-      documented_perms.include?(group) ? "[#{group_names[group]}](file.permissions_#{group}.#{format})" : group_names[group]
+      details_hash.include?(group) ? "[#{group_names[group]}](file.permissions_#{group}.#{format})" : group_names[group]
     end
 
     perm_name_with_link = lambda do |perm, name|
-      documented_perms.include?(perm) ? "[#{name}](file.permissions_#{perm}.#{format})" : name
+      details_hash.include?(perm) ? "[#{name}](file.permissions_#{perm}.#{format})" : name
     end
 
     Rails.root.join(OUTPUT_PATH, "permissions.md").binwrite(

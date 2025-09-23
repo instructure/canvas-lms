@@ -9,7 +9,6 @@
     * [File Uploads](file.file_uploads.md)
     * [API Endpoint Attributes](file.endpoint_attributes.md)
     * [Masquerading](file.masquerading.md)
-    * [Permissions](file.permissions.md)
   * OAuth2
     * [OAuth2 Overview](file.oauth.md)
     * [OAuth2 Endpoints](file.oauth_endpoints.md)
@@ -81,3 +80,9 @@
           <% DataServicesCaliperLoader.data.each do |content| %>
           * [<%= content[:page_title] %>](file.data_service_caliper_<%= content[:event_category] %>.md)
           <% end %>
+  * Permissions
+    * [List of Permissions](file.permissions.md)
+    * Details
+      <% PermissionsMarkdownCreator.details.each do |key, info| %>
+      * [<%= info[:label] %>](file.permissions_<%= key %>.md)
+      <% end %>
