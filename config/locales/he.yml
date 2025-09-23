@@ -17006,6 +17006,7 @@ he:
   remove_email_address_b1820820: "הסרת כתובת דוא\"ל"
   remove_empty_attachment_b2aea632: "הסרת תצריף ריק"
   remove_f47dc62a: הסרה
+  remove_filename_1b74ef2a: "הסרת %{fileName}"
   remove_filename_87f3781e: "הסרת %{filename}"
   remove_filter_68de01d4: "ביטול מסנן"
   remove_from_course_6fb47aee: "הסרה מהקורס"
