@@ -266,7 +266,8 @@ Rails.configuration.after_initialize do
       Delayed::Periodic.cron "AuthenticationProvider::SAML::#{federation.class_name}.refresh_providers", "45 0 * * *" do
         DatabaseServer.send_in_each_region(federation,
                                            :refresh_providers,
-                                           { singleton: "AuthenticationProvider::SAML::#{federation.class_name}.refresh_providers" })
+                                           { singleton: "AuthenticationProvider::SAML::#{federation.class_name}.refresh_providers" },
+                                           shard_scope: Shard.in_current_region.where(jobs_held: false))
       end
     end
   end
