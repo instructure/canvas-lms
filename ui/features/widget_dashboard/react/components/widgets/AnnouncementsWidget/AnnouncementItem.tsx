@@ -46,9 +46,9 @@ interface TruncatedTextProps {
 }
 
 const TruncatedText: React.FC<TruncatedTextProps> = ({children, maxLength = 80}) => (
-  <span title={children.length > maxLength ? children : undefined}>
+  <Text title={children.length > maxLength ? children : undefined} wrap="break-word" size="x-small">
     {truncateText(children, maxLength)}
-  </span>
+  </Text>
 )
 
 interface AnnouncementItemProps {
@@ -201,10 +201,15 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcementItem, fi
         <Flex.Item overflowX="visible" overflowY="visible">
           {/* Announcement Content */}
           {announcement.message && (
-            <View padding="0 0 0 xxx-small">
+            <View>
               <Text size="x-small">
                 <TruncatedText maxLength={60}>{decodedMessage}</TruncatedText>{' '}
-                <Link href={announcement.html_url} isWithinText={false}>
+                <Link
+                  href={announcement.html_url}
+                  isWithinText={false}
+                  display="block"
+                  margin="xxx-small 0 0"
+                >
                   <Text size="x-small" color="brand">
                     {I18n.t('Read more')}
                   </Text>
