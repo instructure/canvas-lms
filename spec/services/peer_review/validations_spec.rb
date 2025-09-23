@@ -353,9 +353,9 @@ RSpec.describe PeerReview::Validations do
       it "handles string dates correctly" do
         base_time = Time.zone.now
         override_params = {
-          due_at: (base_time + 3.days).to_s,
-          unlock_at: (base_time + 1.day).to_s,
-          lock_at: (base_time + 1.week).to_s
+          due_at: (base_time + 3.days).iso8601,
+          unlock_at: (base_time + 1.day).iso8601,
+          lock_at: (base_time + 1.week).iso8601
         }
         expect { service.validate_override_dates(override_params) }.not_to raise_error
       end
@@ -363,12 +363,118 @@ RSpec.describe PeerReview::Validations do
       it "raises error when string dates are in wrong order" do
         base_time = Time.zone.now
         override_params = {
-          due_at: (base_time + 1.day).to_s,
-          unlock_at: (base_time + 2.days).to_s
+          due_at: (base_time + 1.day).iso8601,
+          unlock_at: (base_time + 2.days).iso8601
         }
         expect { service.validate_override_dates(override_params) }.to raise_error(
           PeerReview::InvalidOverrideDatesError,
           "Due date cannot be before unlock date"
+        )
+      end
+
+      it "handles mixed Time objects and string dates correctly" do
+        base_time = Time.zone.now
+        override_params = {
+          due_at: base_time + 3.days, # Time object
+          unlock_at: (base_time + 1.day).iso8601, # String
+          lock_at: base_time + 1.week # Time object
+        }
+        expect { service.validate_override_dates(override_params) }.not_to raise_error
+      end
+
+      it "validates string format even when mixed with Time objects" do
+        override_params = {
+          due_at: 3.days.from_now, # Time object
+          unlock_at: "invalid_date" # Invalid string
+        }
+        expect { service.validate_override_dates(override_params) }.to raise_error(
+          PeerReview::InvalidOverrideDatesError,
+          "Invalid datetime format for unlock_at"
+        )
+      end
+    end
+
+    context "with invalid date format validation" do
+      it "does not raise an error for valid ISO8601 date strings" do
+        override_params = {
+          due_at: "2025-10-10T12:00:00-06:00",
+          unlock_at: "2025-10-01T10:00:00-06:00",
+          lock_at: "2025-10-15T23:59:59-06:00"
+        }
+        expect { service.validate_override_dates(override_params) }.not_to raise_error
+      end
+
+      it "raises an error for invalid due_at date format" do
+        override_params = { due_at: "2025-10-01" }
+        expect { service.validate_override_dates(override_params) }.to raise_error(
+          PeerReview::InvalidOverrideDatesError,
+          "Invalid datetime format for due_at"
+        )
+      end
+
+      it "raises an error for invalid unlock_at date format" do
+        override_params = { unlock_at: "10/01/2025" }
+        expect { service.validate_override_dates(override_params) }.to raise_error(
+          PeerReview::InvalidOverrideDatesError,
+          "Invalid datetime format for unlock_at"
+        )
+      end
+
+      it "raises an error for invalid lock_at date format" do
+        override_params = { lock_at: "bad_date" }
+        expect { service.validate_override_dates(override_params) }.to raise_error(
+          PeerReview::InvalidOverrideDatesError,
+          "Invalid datetime format for lock_at"
+        )
+      end
+
+      it "raises format error before date relationship validation" do
+        override_params = {
+          due_at: "invalid_date",
+          unlock_at: "2025-10-15T12:00:00-06:00"
+        }
+        expect { service.validate_override_dates(override_params) }.to raise_error(
+          PeerReview::InvalidOverrideDatesError,
+          "Invalid datetime format for due_at"
+        )
+      end
+
+      it "does not raise format error for nil date values" do
+        override_params = {
+          due_at: nil,
+          unlock_at: nil,
+          lock_at: nil
+        }
+        expect { service.validate_override_dates(override_params) }.not_to raise_error
+      end
+
+      it "does not raise format error for Time objects" do
+        override_params = {
+          due_at: 3.days.from_now,
+          unlock_at: 1.day.from_now,
+          lock_at: 1.week.from_now
+        }
+        expect { service.validate_override_dates(override_params) }.not_to raise_error
+      end
+
+      it "does not raise format error for empty string values" do
+        override_params = {
+          due_at: "",
+          unlock_at: "",
+          lock_at: ""
+        }
+        expect { service.validate_override_dates(override_params) }.not_to raise_error
+      end
+
+      it "raises error for multiple invalid date formats, checking due_at first" do
+        override_params = {
+          due_at: "invalid_date",
+          unlock_at: "also_invalid",
+          lock_at: "bad_format"
+        }
+        expect { service.validate_override_dates(override_params) }.to raise_error(
+          PeerReview::InvalidOverrideDatesError,
+          "Invalid datetime format for due_at"
         )
       end
     end
@@ -437,60 +543,69 @@ RSpec.describe PeerReview::Validations do
         PeerReview::InvalidOverrideDatesError
       )
     end
+
+    it "calls I18n.t for invalid date format errors" do
+      override_params = { due_at: "invalid_date" }
+      expect(I18n).to receive(:t).with("Invalid datetime format for %{attribute}", { attribute: "due_at" }).and_call_original
+
+      expect { service.validate_override_dates(override_params) }.to raise_error(
+        PeerReview::InvalidOverrideDatesError
+      )
+    end
   end
 
-  describe "#validate_set_type_present" do
+  describe "#validate_set_type_required" do
     it "does not raise an error when set_type is present" do
-      expect { service.validate_set_type_present("CourseSection") }.not_to raise_error
+      expect { service.validate_set_type_required("CourseSection") }.not_to raise_error
     end
 
     it "raises an error when set_type is nil" do
-      expect { service.validate_set_type_present(nil) }.to raise_error(
+      expect { service.validate_set_type_required(nil) }.to raise_error(
         PeerReview::SetTypeRequiredError,
         "Set type is required"
       )
     end
 
     it "raises an error when set_type is empty string" do
-      expect { service.validate_set_type_present("") }.to raise_error(
+      expect { service.validate_set_type_required("") }.to raise_error(
         PeerReview::SetTypeRequiredError,
         "Set type is required"
       )
     end
 
     it "raises an error when set_type is blank" do
-      expect { service.validate_set_type_present("   ") }.to raise_error(
+      expect { service.validate_set_type_required("   ") }.to raise_error(
         PeerReview::SetTypeRequiredError,
         "Set type is required"
       )
     end
   end
 
-  describe "#validate_set_id_present" do
+  describe "#validate_set_id_required" do
     it "does not raise an error when set_id is present" do
-      expect { service.validate_set_id_present(123) }.not_to raise_error
+      expect { service.validate_set_id_required(123) }.not_to raise_error
     end
 
     it "does not raise an error when set_id is a string" do
-      expect { service.validate_set_id_present("123") }.not_to raise_error
+      expect { service.validate_set_id_required("123") }.not_to raise_error
     end
 
     it "raises an error when set_id is nil" do
-      expect { service.validate_set_id_present(nil) }.to raise_error(
+      expect { service.validate_set_id_required(nil) }.to raise_error(
         PeerReview::SetIdRequiredError,
         "Set id is required"
       )
     end
 
     it "raises an error when set_id is empty string" do
-      expect { service.validate_set_id_present("") }.to raise_error(
+      expect { service.validate_set_id_required("") }.to raise_error(
         PeerReview::SetIdRequiredError,
         "Set id is required"
       )
     end
 
     it "raises an error when set_id is blank" do
-      expect { service.validate_set_id_present("   ") }.to raise_error(
+      expect { service.validate_set_id_required("   ") }.to raise_error(
         PeerReview::SetIdRequiredError,
         "Set id is required"
       )
@@ -605,38 +720,38 @@ RSpec.describe PeerReview::Validations do
     end
   end
 
-  describe "#validate_student_ids" do
+  describe "#validate_student_ids_required" do
     it "does not raise an error when student_ids is a non-empty array" do
-      expect { service.validate_student_ids([1, 2, 3]) }.not_to raise_error
+      expect { service.validate_student_ids_required([1, 2, 3]) }.not_to raise_error
     end
 
     it "does not raise an error when student_ids is a single element array" do
-      expect { service.validate_student_ids([1]) }.not_to raise_error
+      expect { service.validate_student_ids_required([1]) }.not_to raise_error
     end
 
     it "raises an error when student_ids is nil" do
-      expect { service.validate_student_ids(nil) }.to raise_error(
+      expect { service.validate_student_ids_required(nil) }.to raise_error(
         PeerReview::StudentIdsRequiredError,
         "Student ids are required"
       )
     end
 
     it "raises an error when student_ids is empty array" do
-      expect { service.validate_student_ids([]) }.to raise_error(
+      expect { service.validate_student_ids_required([]) }.to raise_error(
         PeerReview::StudentIdsRequiredError,
         "Student ids are required"
       )
     end
 
     it "raises an error when student_ids is empty string" do
-      expect { service.validate_student_ids("") }.to raise_error(
+      expect { service.validate_student_ids_required("") }.to raise_error(
         PeerReview::StudentIdsRequiredError,
         "Student ids are required"
       )
     end
 
     it "raises an error when student_ids is blank string" do
-      expect { service.validate_student_ids("   ") }.to raise_error(
+      expect { service.validate_student_ids_required("   ") }.to raise_error(
         PeerReview::StudentIdsRequiredError,
         "Student ids are required"
       )
@@ -652,11 +767,11 @@ RSpec.describe PeerReview::Validations do
       expect(service).to respond_to(:validate_peer_review_sub_assignment_exists)
       expect(service).to respond_to(:validate_peer_review_sub_assignment_not_exist)
       expect(service).to respond_to(:validate_override_exists)
-      expect(service).to respond_to(:validate_set_type_present)
+      expect(service).to respond_to(:validate_set_type_required)
       expect(service).to respond_to(:validate_set_type_supported)
-      expect(service).to respond_to(:validate_set_id_present)
+      expect(service).to respond_to(:validate_set_id_required)
       expect(service).to respond_to(:validate_section_exists)
-      expect(service).to respond_to(:validate_student_ids)
+      expect(service).to respond_to(:validate_student_ids_required)
     end
 
     it "properly accesses instance variables set in the including class" do

@@ -57,9 +57,27 @@ module PeerReview::Validations
   end
 
   def validate_override_dates(override)
-    due_at = override.fetch(:due_at, nil)
-    unlock_at = override.fetch(:unlock_at, nil)
-    lock_at = override.fetch(:lock_at, nil)
+    parsed_dates = {}
+
+    %w[due_at unlock_at lock_at].each do |date_field|
+      date_value = override.fetch(date_field.to_sym, nil)
+      next unless date_value.present?
+
+      # Accept both Time objects and ISO8601 strings for API compatibility
+      if date_value.is_a?(String)
+        unless Api::ISO8601_REGEX.match?(date_value)
+          raise PeerReview::InvalidOverrideDatesError, I18n.t("Invalid datetime format for %{attribute}", attribute: date_field)
+        end
+
+        parsed_dates[date_field.to_sym] = Time.zone.parse(date_value)
+      else
+        parsed_dates[date_field.to_sym] = date_value
+      end
+    end
+
+    due_at = parsed_dates[:due_at]
+    unlock_at = parsed_dates[:unlock_at]
+    lock_at = parsed_dates[:lock_at]
 
     if due_at && unlock_at && due_at < unlock_at
       raise PeerReview::InvalidOverrideDatesError, I18n.t("Due date cannot be before unlock date")
@@ -74,11 +92,11 @@ module PeerReview::Validations
     end
   end
 
-  def validate_set_type_present(set_type)
+  def validate_set_type_required(set_type)
     raise PeerReview::SetTypeRequiredError, I18n.t("Set type is required") unless set_type.present?
   end
 
-  def validate_set_id_present(set_id)
+  def validate_set_id_required(set_id)
     raise PeerReview::SetIdRequiredError, I18n.t("Set id is required") unless set_id.present?
   end
 
@@ -90,8 +108,14 @@ module PeerReview::Validations
     raise PeerReview::SectionNotFoundError, I18n.t("Section does not exist") unless section.present?
   end
 
-  def validate_student_ids(student_ids)
-    raise PeerReview::StudentIdsRequiredError, I18n.t("Student ids are required") unless student_ids.present?
+  def validate_student_ids_required(student_ids)
+    if student_ids.nil? || student_ids == "" || student_ids.to_s.strip.empty? || (student_ids.is_a?(Array) && student_ids.empty?)
+      raise PeerReview::StudentIdsRequiredError, I18n.t("Student ids are required")
+    end
+  end
+
+  def validate_student_ids_in_course(student_ids)
+    raise PeerReview::StudentIdsNotInCourseError, I18n.t("Student ids are not in course") if student_ids.blank?
   end
 
   def validate_set_type_supported(set_type, services)
