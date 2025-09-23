@@ -356,6 +356,48 @@ describe Announcement do
       end
     end
 
+    it "does not create participants for course students when delayed_post_at is set" do
+      announcement = @course.announcements.create!(valid_announcement_attributes.merge(user: @teacher, delayed_post_at: 1.day.from_now, workflow_state: "post_delayed"))
+
+      # Author should have participant record
+      author_participant = announcement.discussion_topic_participants.find_by(user: @teacher)
+      expect(author_participant).to be_present
+      expect(author_participant.workflow_state).to eq("read")
+      expect(author_participant.unread_entry_count).to eq(0)
+
+      # Students should not have participant records yet for delayed announcements
+      [@student1, @student2, @student3].each do |student|
+        participant = announcement.discussion_topic_participants.find_by(user: student)
+        expect(participant).to be_nil
+      end
+    end
+
+    it "creates participants for course students when delayed announcement becomes active" do
+      announcement = @course.announcements.create!(valid_announcement_attributes.merge(user: @teacher, delayed_post_at: 1.day.from_now, workflow_state: "post_delayed"))
+
+      # Initially, students should NOT have participant records
+      [@student1, @student2, @student3].each do |student|
+        participant = announcement.discussion_topic_participants.find_by(user: student)
+        expect(participant).to be_nil
+      end
+
+      # Simulate time passing and the delayed job running
+      Timecop.travel(2.days.from_now) do
+        announcement.delayed_post
+        announcement.save!
+      end
+
+      # Now students should have participant records
+      [@student1, @student2, @student3].each do |student|
+        participant = announcement.discussion_topic_participants.find_by(user: student)
+        expect(participant).to be_present
+        expect(participant.workflow_state).to eq("unread")
+        expect(participant.unread_entry_count).to eq(1)
+        expect(participant.subscribed).to be_falsey
+        expect(participant.root_account_id).to eq(announcement.root_account_id)
+      end
+    end
+
     it "does not create duplicate participants if called multiple times" do
       announcement = @course.announcements.create!(valid_announcement_attributes.merge(user: @teacher))
       initial_count = announcement.discussion_topic_participants.count
@@ -475,6 +517,91 @@ describe Announcement do
           expect(participant.subscribed).to be_falsey
           expect(participant.root_account_id).to eq(@announcement.root_account_id)
         end
+      end
+    end
+  end
+
+  describe "section-specific participant creation and updates" do
+    before do
+      course_with_teacher(active_all: true)
+
+      # Create two sections
+      @section1 = @course.course_sections.create!(name: "Section 1")
+      @section2 = @course.course_sections.create!(name: "Section 2")
+
+      # Create students in each section
+      @student1 = user_model(name: "Student 1")
+      @student2 = user_model(name: "Student 2")
+
+      @course.enroll_student(@student1, enrollment_state: "active", section: @section1)
+      @course.enroll_student(@student2, enrollment_state: "active", section: @section2)
+    end
+
+    it "creates participants only for users in specified sections when section-specific" do
+      announcement = @course.announcements.build(valid_announcement_attributes.merge(user: @teacher))
+      announcement.is_section_specific = true
+      announcement.course_sections = [@section1]
+      announcement.save!
+
+      # Should only create participants for teacher + section1 students
+      expected_users = [@teacher, @student1]
+
+      expected_users.each do |user|
+        participant = announcement.discussion_topic_participants.find_by(user:)
+        expect(participant).to be_present
+      end
+
+      # Student2 should not have participants
+      participant = announcement.discussion_topic_participants.find_by(user: @student2)
+      expect(participant).to be_nil
+    end
+
+    describe "Phase 2: participant updates on section changes" do
+      before do
+        @announcement = @course.announcements.build(valid_announcement_attributes.merge(user: @teacher))
+        @announcement.is_section_specific = true
+        @announcement.course_sections = [@section1]
+        @announcement.save!
+      end
+
+      it "adds participants when sections are added" do
+        initial_participant_count = @announcement.discussion_topic_participants.count
+
+        @announcement.instance_variable_set(:@sections_changed, true)
+        @announcement.discussion_topic_section_visibilities.create!(course_section: @section2)
+        @announcement.save!
+
+        new_participant_count = @announcement.discussion_topic_participants.count
+        expect(new_participant_count).to be > initial_participant_count
+
+        participant = @announcement.discussion_topic_participants.find_by(user: @student2)
+        expect(participant).to be_present
+      end
+
+      it "removes participants when sections are removed" do
+        @announcement.instance_variable_set(:@sections_changed, true)
+        @announcement.discussion_topic_section_visibilities.create!(course_section: @section2)
+        @announcement.save!
+
+        expect(@announcement.discussion_topic_participants.where(user: [@student1, @student2]).count).to eq(2)
+
+        # Remove section2 visibility
+        @announcement.discussion_topic_section_visibilities.find_by(course_section: @section2).destroy
+        @announcement.save!
+        @announcement.instance_variable_set(:@sections_changed, true)
+
+        # Should only have participants for section1
+        expect(@announcement.discussion_topic_participants.find_by(user: @student1)).to be_present
+        expect(@announcement.discussion_topic_participants.find_by(user: @student2)).to be_nil
+      end
+
+      it "adds participants when is_section_specific is changed to false" do
+        @announcement.discussion_topic_section_visibilities.find_by(course_section: @section1).destroy
+        @announcement.is_section_specific = false
+        @announcement.course_sections = []
+        @announcement.save!
+
+        expect(@announcement.discussion_topic_participants.where(user: [@student1, @student2]).count).to eq(2)
       end
     end
   end

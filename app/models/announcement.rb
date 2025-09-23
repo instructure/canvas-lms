@@ -29,6 +29,8 @@ class Announcement < DiscussionTopic
 
   before_save :infer_content
   before_save :respect_context_lock_rules
+  after_update :update_participants_for_section_changes
+  after_update :create_participants_on_activation
   after_save :create_observer_alerts_job
   validates :context_id, presence: true
   validates :context_type, presence: true
@@ -212,35 +214,68 @@ class Announcement < DiscussionTopic
 
   private
 
-  def create_participant
-    super # Create participant for author (from DiscussionTopic)
-    create_participants_for_course # Create participants for all course students
+  def create_participants_on_activation
+    return unless context.is_a?(Course)
+
+    # Check if transitioning from post_delayed to active
+    became_active = workflow_state_before_last_save == "post_delayed" && workflow_state == "active"
+    if became_active && should_send_to_stream
+      delay_if_production.create_participants_for_course
+    end
   end
 
-  # Creates participant records for all enrolled users who don't already have them
+  def update_participants_for_section_changes
+    return unless context.is_a?(Course)
+    # Skip section changes for delayed announcements
+    return unless should_send_to_stream
+
+    section_changed = is_section_specific? ? @sections_changed : is_section_specific_before_last_save
+
+    if section_changed
+      delay_if_production.sync_participants_with_visibility
+    end
+  end
+
+  def sync_participants_with_visibility
+    ActiveRecord::Base.transaction do
+      participants = context.participants(include_observers: false, by_date: true)
+      current_valid_user_ids = users_with_section_visibility(
+        participants.compact
+      ).pluck(:id)
+
+      # Remove participants who no longer have visibility
+      discussion_topic_participants.where.not(user_id: current_valid_user_ids).destroy_all
+
+      # Add participants for users who gained visibility
+      existing_participant_ids = discussion_topic_participants.pluck(:user_id)
+      new_user_ids = current_valid_user_ids - existing_participant_ids
+
+      bulk_insert_participants(new_user_ids) if new_user_ids.any?
+    end
+  end
+
+  def create_participant
+    super # Create participant for author (from DiscussionTopic)
+    delay_if_production.create_participants_for_course if should_send_to_stream
+  end
+
+  # Creates participant records for all users who have visibility and don't already have them
   # This ensures proper read/unread tracking for announcements
   def create_participants_for_course
     return unless context.is_a?(Course)
 
-    # Use query builder to efficiently find users without participant records
-    # This avoids loading all participants into memory and uses SQL for filtering
-    users_without_participants = User.joins(:enrollments)
-                                     .where(enrollments: { course_id: context.id, workflow_state: "active" })
-                                     .where.not(id: discussion_topic_participants.select(:user_id))
-                                     .distinct
-                                     .pluck(:id)
+    participants = context.participants(include_observers: false, by_date: true)
+    visible_user_ids = users_with_section_visibility(
+      participants.compact
+    ).pluck(:id)
+
+    return if visible_user_ids.empty?
+
+    existing_participant_ids = discussion_topic_participants.pluck(:user_id)
+    users_without_participants = visible_user_ids - existing_participant_ids
 
     return if users_without_participants.empty?
 
     bulk_insert_participants(users_without_participants)
-  end
-
-  def new_announcement_recipients
-    potential_recipients = active_participants_include_tas_and_teachers(true).without(user)
-    recipients = users_with_permissions(potential_recipients)
-    recipients.reject do |u|
-      locked_for = locked_for?(u, check_policies: true)
-      locked_for && !locked_for[:can_view]
-    end
   end
 end
