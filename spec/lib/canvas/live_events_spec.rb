@@ -144,6 +144,28 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe ".convert_new_quiz_youtube_link" do
+    it "includes the neccesary params in payload" do
+      payload = Struct.new(:resource_id, :resource_type, :src, :field, :new_html).new(
+        "quiz_123456",
+        "Quiz",
+        "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        "description",
+        "<p>https://www.youtube.com/watch?v=dQw4w9WgXcQ</p>"
+      )
+
+      expect_event("convert_new_quiz_youtube_link",
+                   hash_including(
+                     resource_id: "quiz_123456",
+                     resource_type: "Quiz",
+                     src: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                     field: "description",
+                     new_html: "<p>https://www.youtube.com/watch?v=dQw4w9WgXcQ</p>"
+                   ))
+      Canvas::LiveEvents.convert_new_quiz_youtube_link(payload)
+    end
+  end
+
   describe ".conversation_created" do
     it "triggers a conversation live event with conversation details" do
       user1 = user_model
