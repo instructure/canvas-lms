@@ -29,6 +29,10 @@ class TestableApiQuizQuestion
     def api_v1_course_attachment_url(_arg)
       "some url"
     end
+
+    def api_v1_attachment_url(_arg)
+      "api/v1/files/somefile/download"
+    end
   end
 end
 
@@ -36,7 +40,7 @@ describe Api::V1::QuizQuestion do
   describe ".question_json" do
     subject do
       TestableApiQuizQuestion.question_json(
-        question, user, session, context, includes, censored, quiz_data, opts
+        question, user, session, context:, includes:, censored:, quiz_data:, shuffle_answers:
       )
     end
 
@@ -51,7 +55,7 @@ describe Api::V1::QuizQuestion do
     let(:includes) { [] }
     let(:censored) { false }
     let(:quiz_data) { nil }
-    let(:opts) { {} }
+    let(:shuffle_answers) { false }
 
     before do
       TestableApiQuizQuestion.instance_variable_set(:@context, course)
@@ -100,6 +104,87 @@ describe Api::V1::QuizQuestion do
       it { is_expected.to include("position" => 4) }
     end
 
+    describe "with location tagging" do
+      before do
+        course_with_teacher
+        @course.root_account.enable_feature!(:file_association_access)
+        quiz_model(course: @course)
+        @q_attachment = attachment_model(context: @course)
+        image_tag = "<img src='/courses/#{@course.id}/files/#{@q_attachment.id}/preview'>"
+        @question = @quiz.quiz_questions.create!(
+          question_data: multiple_choice_question_data.merge(
+            question_text: "Baz #{image_tag}",
+            correct_comments_html: "<b>corr</b> #{image_tag}",
+            incorrect_comments_html: "<i>inco</i> #{image_tag}",
+            neutral_comments_html: "<i>neut</i> #{image_tag}",
+            answers: [
+              { comments: "", comments_html: "<b>tag</b> #{image_tag}", weight: 100, text: "", html: "das text #{image_tag}", id: 1658 },
+              { comments: "", comments_html: "<i>tag</i> #{image_tag}", weight: 0, text: "", html: "<b>no image</b>", id: 2903 }
+            ]
+          ),
+          saving_user: @teacher
+        )
+        @quiz.generate_quiz_data
+        @quiz.save
+        @submission = @quiz.generate_submission(@pupil)
+        TestableApiQuizQuestion.instance_variable_set(:@context, @course)
+        TestableApiQuizQuestion.instance_variable_set(:@domain_root_account, @course.root_account)
+        @correct_location = "location=quiz_question_#{@question.id}"
+        @correct_aq_location = "location=assessment_question_#{@question.assessment_question.id}"
+        @correct_submission_location = "location=quiz_submission_#{@submission.id}"
+      end
+
+      it "sets location tag on texts where necessary" do
+        subject = TestableApiQuizQuestion.question_json(
+          @question, @teacher, session, context: @course, includes: [:assessment_question], censored: false, quiz_data: @quiz.quiz_data, location: "quiz_question_#{@question.id}"
+        )
+        expect(subject["question_text"]).to include(@correct_location)
+        expect(subject["correct_comments_html"]).to include(@correct_location)
+        expect(subject["incorrect_comments_html"]).to include(@correct_location)
+        expect(subject["neutral_comments_html"]).to include(@correct_location)
+        subject["answers"].each do |a|
+          expect(a["comments_html"]).to include(@correct_location)
+          expect(a["html"]).to include(@correct_location) if a["id"] == 1658
+          expect(a["html"]).not_to include(@correct_location) if a["id"] == 2903
+        end
+        expect(subject["assessment_question"]["question_data"]["question_text"]).to include(@correct_aq_location)
+        expect(subject["assessment_question"]["question_data"]["correct_comments_html"]).to include(@correct_aq_location)
+        expect(subject["assessment_question"]["question_data"]["incorrect_comments_html"]).to include(@correct_aq_location)
+        expect(subject["assessment_question"]["question_data"]["neutral_comments_html"]).to include(@correct_aq_location)
+        subject["assessment_question"]["question_data"]["answers"].each do |a|
+          expect(a["comments_html"]).to include(@correct_aq_location)
+          expect(a["html"]).to include(@correct_aq_location) if a["id"] == 1658
+          expect(a["html"]).not_to include(@correct_aq_location) if a["id"] == 2903
+        end
+      end
+
+      it "sets location tag for student" do
+        subject = TestableApiQuizQuestion.question_json(
+          @question, @pupil, session, context: @course, censored: true, quiz_data: @quiz.quiz_data, location: "quiz_submission_#{@submission.id}"
+        )
+        expect(subject["question_text"]).to include(@correct_submission_location)
+        subject["answers"].each do |a|
+          expect(a["html"]).to include(@correct_submission_location) if a["id"] == 1658
+        end
+      end
+
+      it "does not set location tag if FF is off" do
+        @correct_location = "location="
+        @course.root_account.disable_feature!(:file_association_access)
+        subject = TestableApiQuizQuestion.question_json(
+          @question, @teacher, session, context: @course, includes: [:assessment_question], censored: false, quiz_data: @quiz.quiz_data, location: "quiz_question_#{@question.id}"
+        )
+        expect(subject["question_text"]).not_to include(@correct_location)
+        expect(subject["correct_comments_html"]).not_to include(@correct_location)
+        expect(subject["incorrect_comments_html"]).not_to include(@correct_location)
+        expect(subject["neutral_comments_html"]).not_to include(@correct_location)
+        subject["answers"].each do |a|
+          expect(a["comments_html"]).not_to include(@correct_location)
+          expect(a["html"]).not_to include(@correct_location)
+        end
+      end
+    end
+
     describe "when verifiers and asset location should be set" do
       let(:account) { Account.create! }
       let(:user) { User.create }
@@ -123,7 +208,7 @@ describe Api::V1::QuizQuestion do
         double_testing_with_disable_adding_uuid_verifier_in_api_ff do
           it "checks verifier string on attachment urls" do
             subject = TestableApiQuizQuestion.question_json(
-              @question, user, session, context, includes, censored, quiz_data, opts
+              @question, user, session, context:, includes:, censored:, quiz_data:, shuffle_answers:
             )
             if disable_adding_uuid_verifier_in_api
               expect(subject["question_text"]).not_to include("verifier=#{@attachment.uuid}")
@@ -137,7 +222,7 @@ describe Api::V1::QuizQuestion do
   end
 
   describe "as a student" do
-    subject { TestableApiQuizQuestion.question_json(question, user, session, nil, [], true) }
+    subject { TestableApiQuizQuestion.question_json(question, user, session, context: nil, includes: [], censored: true) }
 
     let(:answers) { [] }
     let(:question) { Quizzes::QuizQuestion.new(question_data:) }

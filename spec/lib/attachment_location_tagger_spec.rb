@@ -50,13 +50,13 @@ describe AttachmentLocationTagger do
     end
 
     context "with past-ID particles" do
-      it "tags file URLs with past-ID particles" do
+      it "tags file URLs with past-ID suffixes" do
         url = "<p><a href='/files/123/download'/>Link</p>"
         result = AttachmentLocationTagger.tag_url(url, @location)
         expect(result).to include("/files/123/download?location=account_notification_1")
       end
 
-      it "tags file URLs with past-ID particles and query strings" do
+      it "tags file URLs with past-ID suffixes and query strings" do
         url = "<p><a href='/files/123/download?foo=bar'/>Link</p>"
         result = AttachmentLocationTagger.tag_url(url, @location)
         expect(result).to include("/files/123/download?foo=bar&location=account_notification_1")

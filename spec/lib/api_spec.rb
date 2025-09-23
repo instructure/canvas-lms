@@ -838,6 +838,35 @@ describe Api do
     end
   end
 
+  context "SHARDID_REGEX" do
+    let(:regex) { /\A#{Api::SHARDID_REGEX}\z/o }
+
+    it "matches simple numeric IDs" do
+      expect(regex).to match "123"
+      expect(regex).to match "1"
+      expect(regex).to match "999999"
+    end
+
+    it "matches shard-prefixed IDs" do
+      expect(regex).to match "2~123"
+      expect(regex).to match "10~456"
+      expect(regex).to match "1~1"
+    end
+
+    it "does not match invalid formats" do
+      expect(regex).to_not match "abc"
+      expect(regex).to_not match "~123"
+      expect(regex).to_not match "123~"
+      expect(regex).to_not match "a~b"
+      expect(regex).to_not match "123~abc"
+    end
+
+    it "does not match negative numbers" do
+      expect(regex).to_not match "-123"
+      expect(regex).to_not match "2~-123"
+    end
+  end
+
   describe ".api_user_content" do
     let(:klass) do
       Class.new do

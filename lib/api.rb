@@ -198,7 +198,7 @@ module Api
   MAX_ID_LENGTH = MAX_ID.to_s.length
   MAX_ID_RANGE = (-MAX_ID...MAX_ID)
   ID_REGEX = /\A\d{1,#{MAX_ID_LENGTH}}\z/
-  SHARDID_REGEX = /\d+~?\d*/
+  SHARDID_REGEX = /\d+(?:~\d+)?/
   UUID_REGEX = /\Auuid:([\w|-]{36,})\z/
 
   def self.not_scoped_to_account?(columns, sis_mapping)
@@ -644,6 +644,7 @@ module Api
       protocol = HostUrl.protocol
     end
     domain_root_account = @domain_root_account || options[:domain_root_account]
+
     no_verifiers = domain_root_account&.feature_enabled?(:disable_adding_uuid_verifier_in_api) || (params[:no_verifiers] if defined?(params))
     html = context.shard.activate do
       rewriter = UserContent::HtmlRewriter.new(context, user)
@@ -661,7 +662,6 @@ module Api
       end
       rewriter.set_handler("files", &file_handler)
       rewriter.set_handler("media_attachments_iframe", &file_handler)
-
       rewriter.translate_content(html)
     end
 
