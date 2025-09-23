@@ -246,6 +246,6 @@ describe('AddImageModal', () => {
         files: [aFile],
       },
     })
-    expect(screen.getByText(/clear selected file: foo\.png/i)).toBeInTheDocument()
+    expect(screen.getByText(/remove foo\.png/i)).toBeInTheDocument()
   })
 })

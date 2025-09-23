@@ -111,7 +111,7 @@ describe('ImageBlockSettings', () => {
 
       expect(component.getByText('my-image.jpg')).toBeInTheDocument()
       await userEvent.click(component.getByTestId('remove-image-button'))
-      expect(component.getByText('Upload image')).toBeInTheDocument()
+      expect(component.getByText('Add image')).toBeInTheDocument()
       expect(component.queryByText('my-image.jpg')).not.toBeInTheDocument()
     })
   })

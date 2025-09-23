@@ -158,5 +158,14 @@ module FeatureFlags
       cxt = context.is_a?(Course) ? "course" : "account"
       InstStatsd::Statsd.distributed_increment("speedgrader.modernized.flag.#{state}.#{cxt}")
     end
+
+    def self.only_admins_can_enable_block_content_editor_during_eap(user, context, _from_state, transitions)
+      if context.is_a?(Course) && (!context.account.feature_enabled?(:block_content_editor) || !context.account_membership_allows(user))
+        transitions["on"] ||= {}
+        transitions["off"] ||= {}
+        transitions["on"]["locked"] = true
+        transitions["off"]["locked"] = true
+      end
+    end
   end
 end

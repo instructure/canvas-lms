@@ -24,7 +24,7 @@ const I18n = createI18nScope('page_editor')
 
 export const VideoBlockPreview = () => (
   <BlockPreviewLayout
-    image={<SVGWrapper url="/images/block-content-editor/video.svg" />}
+    image={<SVGWrapper ariaHidden={true} url="/images/block-content-editor/video.svg" />}
     title={I18n.t('Video')}
     description={[
       I18n.t('Add an embedded video to your page. This either can be YouTube or Studio embedding.'),

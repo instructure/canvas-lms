@@ -28,6 +28,10 @@ const WCAG_Options: WCAG2Options = {
 }
 
 export const getContrastingTextColor = (backgroundColor: string): string | null => {
+  if (!tinycolor(backgroundColor).isValid()) {
+    return null
+  }
+
   const textColor = tinycolor.mostReadable(backgroundColor, GRAY_COLORS, {
     includeFallbackColors: true,
     ...WCAG_Options,

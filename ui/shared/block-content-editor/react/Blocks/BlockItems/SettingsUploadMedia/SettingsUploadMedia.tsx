@@ -28,11 +28,11 @@ import {MediaSources} from '../../MediaBlock/types'
 const I18n = createI18nScope('block_content_editor')
 
 type SettingsUploadMediaProps = {
-  url: string
+  mediaSource: MediaSources
   onMediaChange: (data: MediaSources) => void
 }
 
-export const SettingsUploadMedia = ({url, onMediaChange}: SettingsUploadMediaProps) => {
+export const SettingsUploadMedia = ({mediaSource, onMediaChange}: SettingsUploadMediaProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const closeModal = () => setIsOpen(false)
   const openModal = () => setIsOpen(true)
@@ -42,7 +42,8 @@ export const SettingsUploadMedia = ({url, onMediaChange}: SettingsUploadMediaPro
     onMediaChange(data)
   }
 
-  const buttonText = url?.trim() ? I18n.t('Replace media') : I18n.t('Choose media')
+  const hasMedia = mediaSource.src?.trim() || mediaSource.mediaId || mediaSource.attachment_id
+  const buttonText = hasMedia ? I18n.t('Replace media') : I18n.t('Add media')
 
   return (
     <>

@@ -18,9 +18,14 @@
 
 import {PropsWithChildren} from 'react'
 import CanvasTray from '@canvas/trays/react/Tray'
+import {Text} from '@instructure/ui-text'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {View} from '@instructure/ui-view'
+
+const I18n = createI18nScope('block_content_editor')
 
 export type SettingsTrayProps = PropsWithChildren<{
-  title: string
+  blockDisplayName: string
   open: boolean
   onDismiss: () => void
   onClose: () => void
@@ -29,19 +34,22 @@ export type SettingsTrayProps = PropsWithChildren<{
 export const SettingsTray = (props: SettingsTrayProps) => {
   return (
     <CanvasTray
-      label={props.title}
-      title={props.title}
+      label={props.blockDisplayName}
+      title={props.blockDisplayName}
       open={props.open}
       onDismiss={props.onDismiss}
       onClose={props.onClose}
-      headerPadding="small"
+      headerPadding="small small 0 small"
       contentPadding="small"
       placement="end"
       size="regular"
       data-testid="settings-tray"
       shouldCloseOnDocumentClick={true}
     >
-      {props.children}
+      <Text variant="contentImportant">{I18n.t('Settings')}</Text>
+      <View as="div" margin="medium 0 0 0">
+        {props.children}
+      </View>
     </CanvasTray>
   )
 }

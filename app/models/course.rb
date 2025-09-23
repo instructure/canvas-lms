@@ -3889,6 +3889,10 @@ class Course < ActiveRecord::Base
   add_setting :show_student_only_module_id
   add_setting :show_teacher_only_module_id
 
+  def block_content_editor_enabled?
+    account.feature_enabled?(:block_content_editor) && feature_enabled?(:block_content_editor_eap)
+  end
+
   def elementary_enabled?
     account.enable_as_k5_account?
   end

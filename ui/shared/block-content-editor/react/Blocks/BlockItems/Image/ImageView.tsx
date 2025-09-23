@@ -28,6 +28,7 @@ export const ImageView = ({
   decorativeImage,
   altTextAsCaption,
   caption,
+  captionColor,
 }: ImageViewProps) => {
   const calculatedCaption = altTextAsCaption ? altText : caption
 
@@ -35,6 +36,7 @@ export const ImageView = ({
     <View as="figure" margin="none">
       {url ? (
         <img
+          width="100%"
           src={url}
           alt={decorativeImage ? '' : altText}
           role={decorativeImage ? 'presentation' : undefined}
@@ -44,7 +46,7 @@ export const ImageView = ({
       )}
       {!!calculatedCaption && (
         <View as="figcaption" margin="mediumSmall 0 0 0">
-          <ImageCaption>{calculatedCaption}</ImageCaption>
+          <ImageCaption color={captionColor}>{calculatedCaption}</ImageCaption>
         </View>
       )}
     </View>

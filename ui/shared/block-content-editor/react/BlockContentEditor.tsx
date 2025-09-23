@@ -46,7 +46,7 @@ const BlockContentEditorWrapper = (props: BlockContentEditorProps) => {
   const editor = getEditorForMode(mode, props)
   return (
     <Editor enabled={mode === 'default'} resolver={components}>
-      <BlockContentEditorLayout toolbar={<Toolbar />} editor={editor} />
+      <BlockContentEditorLayout toolbar={<Toolbar />} editor={editor} mode={mode} />
     </Editor>
   )
 }

@@ -27,10 +27,6 @@
   position: relative;
 }
 
-.image-actions-container img {
-  width: 100%;
-}
-
 .image-actions-container .image-actions {
   position: absolute;
   top: 12px;

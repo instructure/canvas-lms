@@ -49,7 +49,7 @@ export const SettingsUploadImage = ({url, fileName, onImageChange}: SettingsUplo
     })
   }
 
-  const buttonText = url?.trim() ? I18n.t('Replace Image') : I18n.t('Upload image')
+  const buttonText = url?.trim() ? I18n.t('Replace image') : I18n.t('Add image')
 
   return (
     <>
@@ -74,7 +74,7 @@ export const SettingsUploadImage = ({url, fileName, onImageChange}: SettingsUplo
             <Flex.Item>
               <IconButton
                 data-testid="remove-image-button"
-                screenReaderLabel={I18n.t('Remove Image')}
+                screenReaderLabel={I18n.t('Remove %{fileName}', {fileName})}
                 withBackground={false}
                 withBorder={false}
                 onClick={onDeleteImage}

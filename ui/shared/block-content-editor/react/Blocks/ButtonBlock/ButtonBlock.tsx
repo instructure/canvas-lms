@@ -52,7 +52,12 @@ const ButtonBlockEditView = (props: ButtonBlockProps) => {
       {props.includeBlockTitle && (
         <TitleEditPreview title={props.title} contentColor={props.titleColor} />
       )}
-      <ButtonDisplay dataTestId="button-block-edit-preview" {...props} onButtonClick={() => {}} />
+      <ButtonDisplay
+        dataTestId="button-block-edit-preview"
+        {...props}
+        onButtonClick={() => {}}
+        viewMode="editview"
+      />
     </Flex>
   )
 }
@@ -80,6 +85,7 @@ const ButtonBlockEdit = (props: ButtonBlockProps) => {
         {...props}
         focusHandler={props.includeBlockTitle ? undefined : focusHandler}
         onButtonClick={openSettingsTray}
+        viewMode="edit"
       />
     </Flex>
   )

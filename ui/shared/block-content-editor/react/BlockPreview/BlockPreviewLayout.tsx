@@ -18,6 +18,8 @@
 import {ReactNode} from 'react'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
+import {Heading} from '@instructure/ui-heading'
+import './block-preview-layout.css'
 
 export const BlockPreviewLayout = (props: {
   image: ReactNode
@@ -26,16 +28,14 @@ export const BlockPreviewLayout = (props: {
   legend: string
 }) => {
   return (
-    <View
-      display="block"
-      borderWidth="0 0 0 small"
-      padding="medium"
-      borderColor="secondary"
-      height="512px"
-    >
-      <View>{props.image}</View>
+    <>
+      <div className="preview-image-wrapper">
+        <View display="block">{props.image}</View>
+      </div>
       <View display="block" margin="small 0">
-        <Text variant="contentImportant">{props.title}</Text>
+        <Heading variant="titleCardMini" level="h3">
+          {props.title}
+        </Heading>
       </View>
       <View display="block">
         {props.description.map((line: string, index: number) => (
@@ -49,6 +49,6 @@ export const BlockPreviewLayout = (props: {
           {props.legend}
         </Text>
       </View>
-    </View>
+    </>
   )
 }

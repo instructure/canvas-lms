@@ -35,6 +35,7 @@ export const ButtonDisplay = ({
   dataTestId,
   onButtonClick,
   focusHandler,
+  viewMode,
 }: ButtonDisplayProps) => {
   const flexDirection = layout === 'vertical' ? 'column' : 'row'
   const justifyItems = !isFullWidth && layout === 'horizontal' ? alignmentMap[alignment] : undefined
@@ -57,6 +58,7 @@ export const ButtonDisplay = ({
             button={button}
             onButtonClick={onButtonClick}
             focusHandler={i === 0 ? focusHandler : undefined}
+            viewMode={viewMode}
           />
         </Flex.Item>
       ))}

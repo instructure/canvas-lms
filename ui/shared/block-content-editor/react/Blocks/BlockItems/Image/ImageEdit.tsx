@@ -36,8 +36,10 @@ export const ImageEdit = ({
   onImageChange,
   url,
   altText,
-  caption,
+  decorativeImage,
   altTextAsCaption,
+  caption,
+  captionColor,
   focusHandler,
 }: ImageEditProps) => {
   const [isOpen, setIsOpen] = useState(false)
@@ -59,12 +61,17 @@ export const ImageEdit = ({
       <View as="figure" margin="none" className="image-actions-container">
         {url ? (
           <>
-            <img src={url} alt={altText} />
+            <img
+              width="100%"
+              src={url}
+              alt={decorativeImage ? '' : altText}
+              role={decorativeImage ? 'presentation' : undefined}
+            />
             <View as="div" className="image-actions">
               <IconButton
                 renderIcon={<IconUploadLine />}
                 onClick={openModal}
-                screenReaderLabel={I18n.t('Change image')}
+                screenReaderLabel={I18n.t('Replace image')}
                 size="small"
                 elementRef={
                   focusHandler ? element => focusHandler(element as HTMLElement) : undefined
@@ -73,11 +80,17 @@ export const ImageEdit = ({
             </View>
           </>
         ) : (
-          <AddButton onClick={() => setIsOpen(true)} focusHandler={focusHandler} />
+          <AddButton
+            onClick={() => setIsOpen(true)}
+            focusHandler={focusHandler}
+            ariaLabel={I18n.t('Add image')}
+          />
         )}
         <View as="figcaption" margin="mediumSmall 0 0 0">
           <Flex direction="row" gap="x-small">
-            <ImageCaption>{calculatedCaption || I18n.t('Image caption')}</ImageCaption>
+            <ImageCaption color={captionColor}>
+              {calculatedCaption || I18n.t('Image caption')}
+            </ImageCaption>
             <IconButton
               data-testid="edit-block-image"
               screenReaderLabel={I18n.t('Edit block')}
