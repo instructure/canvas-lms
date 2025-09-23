@@ -84,7 +84,7 @@ const CourseWorkFilters: React.FC<CourseWorkFiltersProps> = ({
   const filterMobilePadding = useMemo(() => 'xx-small', [])
 
   return (
-    <Flex direction={isMobile ? 'column' : 'row'}>
+    <Flex direction={isMobile ? 'column' : 'row'} gap="x-small">
       <Flex.Item shouldGrow={isMobile} padding={isMobile ? filterMobilePadding : undefined}>
         <SimpleSelect
           renderLabel={<ScreenReaderContent>{I18n.t('Filter by course')}</ScreenReaderContent>}
