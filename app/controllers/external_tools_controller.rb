@@ -24,7 +24,7 @@
 #
 # For a definitive list of all supported placements for external tools and more information
 # on configuring them,
-# see the <a href="file.placements_overview">Placements Documentation</a>.
+# see the <a href="file.placements_overview.html">Placements Documentation</a>.
 #
 # @model ContextExternalTool
 #     {
