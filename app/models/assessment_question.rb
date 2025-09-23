@@ -118,7 +118,7 @@ class AssessmentQuestion < ActiveRecord::Base
   end
 
   def translate_link_regex
-    @regex ||= Regexp.new(%{/((courses)/(#{context_id})|(users)/([0-9~]+))/(?:files/((\\d+(?:~\\d+)?))(?:/(?:download|preview))?|file_contents/(course%20files/[^'"?]*))(?:\\?([^'"]*))?})
+    @translate_link_regex ||= Regexp.new(%{/(courses/#{context_id}/(files/(?<course_attachment_id>\\d+~?\\d*)|file_contents/course%20files/(?<course_file_path>[A-Za-z0-9/_,.%+-]+))|users/(?<user_id>\\d+~?\\d*)/files/(?<user_attachment_id>\\d+~?\\d*)|media_attachments_iframe/(?<media_attachment_id>\\d+~?\\d*))(?<rest>[^"']+)?})
   end
 
   def file_substitutions
@@ -129,53 +129,57 @@ class AssessmentQuestion < ActiveRecord::Base
     match_data ||= link.match(translate_link_regex)
     return link unless match_data
 
-    context_type = (match_data[2] || match_data[4]).singularize.capitalize
-    context_id = if context_type == "User"
-                   match_data[5]
-                 else
-                   match_data[3]
-                 end
-
-    id = match_data[7]
-    path = match_data[8]
-    id_or_path = id || path
+    id_or_path = match_data[:media_attachment_id] || match_data[:course_attachment_id] || match_data[:user_attachment_id] || match_data[:course_file_path]
 
     unless file_substitutions[id_or_path]
-      if id
-        file = Attachment.where(context_type:, context_id:, id: id_or_path).first
-      elsif path
-        path = URI::DEFAULT_PARSER.unescape(id_or_path)
-        file = Folder.find_attachment_in_context_with_path(assessment_question_bank.context, path)
-      end
+      file = find_file_for_translation(match_data, id_or_path)
+
       if file&.replacement_attachment_id
         file = file.replacement_attachment
       end
+
       begin
-        if context_type == "User"
+        unless Current.in_migration?
           raise "User does not have access to file" unless current_user && file&.grants_right?(current_user, nil, :create)
         end
-
         new_file = file.try(:clone_for, self)
       rescue => e
         new_file = nil
-        er_id = Canvas::Errors.capture_exception(:file_clone_during_translate_links, e)[:error_report]
-        logger.error("Error while cloning attachment during " \
-                     "AssessmentQuestion#translate_links: " \
-                     "id: #{self.id} error_report: #{er_id}")
+        err_id = Canvas::Errors.capture_exception(:file_clone_during_translate_links, e)[:error_report]
+        logger.error("Error while cloning attachment during AssessmentQuestion#translate_links: id: #{id} error_report: #{err_id}")
       end
       new_file&.save
       file_substitutions[id_or_path] = new_file
     end
+
     if (sub = file_substitutions[id_or_path])
-      query_rest = match_data[9] ? match_data[9].to_s : ""
-      query_rest = if context.root_account.feature_enabled?(:disable_file_verifier_access)
-                     query_rest.blank? ? "" : "?#{query_rest}"
-                   else
-                     query_rest.blank? ? "?verifier=#{sub.uuid}" : "?verifier=#{sub.uuid}&#{query_rest}"
-                   end
-      "/assessment_questions/#{self.id}/files/#{sub.id}/download#{query_rest}"
+      # Split rest into path part (e.g., /download) and query string
+      rest = match_data[:rest].to_s
+      _, query_rest = rest.split("?", 2)
+      query_rest ||= ""
+      # TODO: GROW-146
+      query_params = if context.root_account.feature_enabled?(:disable_file_verifier_access)
+                       query_rest.blank? ? "" : "?#{query_rest}"
+                     else
+                       query_rest.blank? ? "?verifier=#{sub.uuid}" : "?verifier=#{sub.uuid}&#{query_rest}"
+                     end
+
+      if match_data[:media_attachment_id]
+        "/media_attachments_iframe/#{sub.id}#{query_params}"
+      else
+        "/assessment_questions/#{id}/files/#{sub.id}/download#{query_params}"
+      end
     else
       link
+    end
+  end
+
+  def find_file_for_translation(match_data, id_or_path)
+    if match_data[:course_attachment_id] || match_data[:user_attachment_id] || match_data[:media_attachment_id]
+      Attachment.find_by(id: id_or_path)
+    elsif match_data[:course_file_path]
+      path = URI::DEFAULT_PARSER.unescape("course%20files/#{id_or_path}")
+      Folder.find_attachment_in_context_with_path(assessment_question_bank.context, path)
     end
   end
 

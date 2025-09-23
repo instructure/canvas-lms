@@ -258,6 +258,13 @@ class CanvasImportedHtmlConverter < CanvasLinkMigrator::ImportedHtmlConverter
     # basically just moving them to the question context
     links.each do |link|
       next unless link[:new_value]
+      # media objects link are full html links and get handled in the regular replacement
+      # and since `translate_file_link` returns only the altered url, we want to skip media object links
+      # course/user files are passed in only with the file urls.
+      # and for the clarity:
+      # link[:new_value] = node.name === 'text' ? new_url : node.to_s
+      # from gems/canvas_link_migrator-1.0.18/lib/canvas_link_migrator/link_resolver.rb#121
+      next if link[:link_type] == :media_object
 
       link[:new_value] = aq.translate_file_link(link[:new_value])
     end

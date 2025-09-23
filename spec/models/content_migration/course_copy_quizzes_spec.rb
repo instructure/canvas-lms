@@ -500,7 +500,7 @@ describe ContentMigration do
         link to some other course: <a href="/courses/#{@copy_from.id + @copy_to.id}">Cool Course</a>
         canvas image: <img style="max-width: 723px;" src="/images/preview.png" alt="">
       HTML
-      @question = @bank.assessment_questions.create!(question_data: data)
+      @question = @bank.assessment_questions.create!(question_data: data, current_user: @user)
       expect(@question.reload.question_data["question_text"]).to match %r{/assessment_questions/}
 
       run_course_copy
@@ -519,7 +519,7 @@ describe ContentMigration do
         media comment: <a id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" href="/media_objects/0_l4l5n0wt">this is a media comment</a>
         media object: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_objects_iframe/0_l4l5n0wt?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="0_l4l5n0wt"></iframe>
       HTML
-      @question = @bank.assessment_questions.create!(question_data: data)
+      @question = @bank.assessment_questions.create!(question_data: data, current_user: @user)
 
       run_course_copy
 
@@ -527,10 +527,10 @@ describe ContentMigration do
       expect(bank.assessment_questions.count).to eq 1
       aq = bank.assessment_questions.first
       # TODO: fix media attachments not being copied to assessment question context like other attachments
-      new_att = @copy_to.attachments.take
+      new_att = bank.assessment_questions.first.attachments.take
       translated_body = <<~HTML.strip
-        media comment: <iframe id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" style="width: 320px; height: 240px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{new_att.id}?embedded=true&amp;type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="0_l4l5n0wt"></iframe>
-        media object: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="0_l4l5n0wt" src="/media_attachments_iframe/#{new_att.id}?embedded=true&amp;type=video"></iframe>
+        media comment: <iframe id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" style="width: 320px; height: 240px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{new_att.id}?verifier=#{new_att.uuid}&embedded=true&amp;type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="0_l4l5n0wt"></iframe>
+        media object: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="0_l4l5n0wt" src="/media_attachments_iframe/#{new_att.id}?verifier=#{new_att.uuid}&embedded=true&amp;type=video"></iframe>
       HTML
 
       expect(aq.question_data["question_text"]).to match_ignoring_whitespace(translated_body)
@@ -1232,9 +1232,18 @@ describe ContentMigration do
         "answers" => [{ "id" => 1, "text" => "Correct", "weight" => 100 },
                       { "id" => 2, "text" => "inorrect", "weight" => 0 }],
       }
-      aq = bank1.assessment_questions.create!(question_data: data)
+      aq = bank1.assessment_questions.create!(question_data: data, current_user: @user)
 
       run_course_copy
+
+      @cm = ContentMigration.create!(
+        context: @copy_to,
+        user: @user,
+        source_course: @copy_from,
+        migration_type: "course_copy_importer",
+        copy_options: { everything: "1" },
+        migration_settings: { import_immediately: true }
+      )
 
       run_course_copy # run it twice
 
