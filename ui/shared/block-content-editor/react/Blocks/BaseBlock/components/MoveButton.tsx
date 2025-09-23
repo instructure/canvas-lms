@@ -44,6 +44,7 @@ export const MoveButton = (props: {
   onMoveDown: () => void
   onMoveToTop: () => void
   onMoveToBottom: () => void
+  title: string
 }) => {
   if (!props.canMoveUp && !props.canMoveDown) return null
 
@@ -52,9 +53,14 @@ export const MoveButton = (props: {
       key: 'move-to-top',
       onClick: props.onMoveToTop,
       icon: <IconMoveUpTopLine />,
-      label: I18n.t('Move to top'),
+      label: I18n.t('Move to top: %{title}', {title: props.title}),
     },
-    {key: 'move-up', onClick: props.onMoveUp, icon: <IconMoveUpLine />, label: I18n.t('Move up')},
+    {
+      key: 'move-up',
+      onClick: props.onMoveUp,
+      icon: <IconMoveUpLine />,
+      label: I18n.t('Move up: %{title}', {title: props.title}),
+    },
   ]
 
   const moveDownMenuItems: MenuItem[] = [
@@ -62,13 +68,13 @@ export const MoveButton = (props: {
       key: 'move-down',
       onClick: props.onMoveDown,
       icon: <IconMoveDownLine />,
-      label: I18n.t('Move down'),
+      label: I18n.t('Move down: %{title}', {title: props.title}),
     },
     {
       key: 'move-to-bottom',
       onClick: props.onMoveToBottom,
       icon: <IconMoveDownBottomLine />,
-      label: I18n.t('Move to bottom'),
+      label: I18n.t('Move to bottom: %{title}', {title: props.title}),
     },
   ]
 
@@ -83,7 +89,7 @@ export const MoveButton = (props: {
         <IconButton
           data-testid="move-block-button"
           data-action-button
-          screenReaderLabel={I18n.t('Move block')}
+          screenReaderLabel={I18n.t('Move block: %{title}', {title: props.title})}
         >
           <IconSortLine />
         </IconButton>

@@ -178,10 +178,10 @@ describe('BaseBlockEditWrapper', () => {
 
         fireEvent.click(moveButton)
 
-        expect(component.getByText(/move up/i)).toBeInTheDocument()
-        expect(component.getByText(/move down/i)).toBeInTheDocument()
-        expect(component.getByText(/move to top/i)).toBeInTheDocument()
-        expect(component.getByText(/move to bottom/i)).toBeInTheDocument()
+        expect(component.getByText(/move up: test block title/i)).toBeInTheDocument()
+        expect(component.getByText(/move down: test block title/i)).toBeInTheDocument()
+        expect(component.getByText(/move to top: test block title/i)).toBeInTheDocument()
+        expect(component.getByText(/move to bottom: test block title/i)).toBeInTheDocument()
       })
 
       it('does not render when moving is not possible', () => {
@@ -208,10 +208,10 @@ describe('BaseBlockEditWrapper', () => {
 
         fireEvent.click(moveButton)
 
-        expect(component.getByText(/move up/i)).toBeInTheDocument()
-        expect(component.getByText(/move to top/i)).toBeInTheDocument()
-        expect(component.queryByText(/move down/i)).not.toBeInTheDocument()
-        expect(component.queryByText(/move to bottom/i)).not.toBeInTheDocument()
+        expect(component.getByText(/move up: test block title/i)).toBeInTheDocument()
+        expect(component.getByText(/move to top: test block title/i)).toBeInTheDocument()
+        expect(component.queryByText(/move down: test block title/i)).not.toBeInTheDocument()
+        expect(component.queryByText(/move to bottom: test block title/i)).not.toBeInTheDocument()
       })
 
       it('only shows move down options when moving up is not possible', () => {
@@ -226,17 +226,17 @@ describe('BaseBlockEditWrapper', () => {
 
         fireEvent.click(moveButton)
 
-        expect(component.queryByText(/move up/i)).not.toBeInTheDocument()
-        expect(component.queryByText(/move to top/i)).not.toBeInTheDocument()
-        expect(component.getByText(/move down/i)).toBeInTheDocument()
-        expect(component.getByText(/move to bottom/i)).toBeInTheDocument()
+        expect(component.queryByText(/move up: test block title/i)).not.toBeInTheDocument()
+        expect(component.queryByText(/move to top: test block title/i)).not.toBeInTheDocument()
+        expect(component.getByText(/move down: test block title/i)).toBeInTheDocument()
+        expect(component.getByText(/move to bottom: test block title/i)).toBeInTheDocument()
       })
 
       it.each([
-        ['Move Up', /move up/i, mockMoveUp],
-        ['Move Down', /move down/i, mockMoveDown],
-        ['Move to Top', /move to top/i, mockMoveToTop],
-        ['Move to Bottom', /move to bottom/i, mockMoveToBottom],
+        ['Move Up', /move up: test block title/i, mockMoveUp],
+        ['Move Down', /move down: test block title/i, mockMoveDown],
+        ['Move to Top', /move to top: test block title/i, mockMoveToTop],
+        ['Move to Bottom', /move to bottom: test block title/i, mockMoveToBottom],
       ])('moves block when %s menu item is clicked', (_name, matcher, mockFunction) => {
         const component = renderBlock(BaseBlockEditWrapper, getDefaultProps())
         const moveButton = component.getByTestId('move-block-button')

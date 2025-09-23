@@ -24,12 +24,13 @@ const I18n = createI18nScope('block_content_editor')
 
 export const SettingsButton = (props: {
   onClicked: () => void
+  title: string
 }) => {
   return (
     <IconButton
       data-testid="block-settings-button"
       data-action-button
-      screenReaderLabel={I18n.t('Block settings')}
+      screenReaderLabel={I18n.t('Block settings: %{title}', {title: props.title})}
       onClick={props.onClicked}
     >
       <IconEditLine />
