@@ -20,6 +20,7 @@
 class PostPolicy < ActiveRecord::Base
   belongs_to :course, optional: false, inverse_of: :post_policies
   belongs_to :assignment, optional: true, touch: true, inverse_of: :post_policy, class_name: "AbstractAssignment"
+  has_one :scheduled_post, dependent: :destroy, inverse_of: :post_policy
 
   validates :post_manually, inclusion: [true, false]
 
@@ -27,6 +28,7 @@ class PostPolicy < ActiveRecord::Base
   before_save :set_root_account_id
 
   after_update :update_owning_course, if: -> { assignment.blank? }
+  after_update :remove_scheduled_post, if: -> { saved_change_to_post_manually? && !post_manually && scheduled_post.present? }
 
   # These methods allow callers to check whether Post Policies is enabled
   # without needing to reference the specific setting every time. Note that, in
@@ -34,6 +36,21 @@ class PostPolicy < ActiveRecord::Base
   # have post policies be active.
   def self.feature_enabled?
     true
+  end
+
+  def create_or_update_scheduled_post(post_comments_at, post_grades_at)
+    return unless Account.site_admin.feature_enabled?(:scheduled_feedback_releases)
+    return unless post_manually && assignment.present?
+
+    sp = scheduled_post || build_scheduled_post(assignment:, root_account_id: assignment.root_account_id)
+    sp.post_comments_at = post_comments_at
+    sp.post_grades_at = post_grades_at
+    sp.save! if sp.changed?
+    sp
+  end
+
+  def remove_scheduled_post
+    scheduled_post&.destroy
   end
 
   private
