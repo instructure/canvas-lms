@@ -42,23 +42,23 @@ const InsertButton = () => {
   return <AddButton onClicked={() => addBlockModal.open(id)} />
 }
 
-const DeleteButton = () => {
+const DeleteButton = ({title}: {title: string}) => {
   const deleteNode = useDeleteNode()
-  return <RemoveButton onClicked={deleteNode} />
+  return <RemoveButton onClicked={deleteNode} title={title} />
 }
 
-const DuplicateButton = () => {
+const DuplicateButton = ({title}: {title: string}) => {
   const duplicateNode = useDuplicateNode()
-  return <CopyButton onClicked={duplicateNode} />
+  return <CopyButton onClicked={duplicateNode} title={title} />
 }
 
-const EditSettingsButton = () => {
+const EditSettingsButton = ({title}: {title: string}) => {
   const {openSettingsTray} = useOpenSettingsTray()
 
-  return <SettingsButton onClicked={openSettingsTray} />
+  return <SettingsButton onClicked={openSettingsTray} title={title} />
 }
 
-const MoveBlockButton = () => {
+const MoveBlockButton = ({title}: {title: string}) => {
   const {canMoveUp, canMoveDown, moveToTop, moveUp, moveToBottom, moveDown} = useMoveBlock()
 
   return (
@@ -69,6 +69,7 @@ const MoveBlockButton = () => {
       onMoveDown={moveDown}
       onMoveToTop={moveToTop}
       onMoveToBottom={moveToBottom}
+      title={title}
     />
   )
 }
@@ -79,10 +80,19 @@ export const BaseBlockEditWrapper = (
     backgroundColor?: string
   }>,
 ) => {
-  const {id} = useNode()
+  const {id, customTitle, includeBlockTitle} = useNode(node => ({
+    id: node.id,
+    customTitle: node.data.props?.title,
+    includeBlockTitle: node.data.props?.includeBlockTitle,
+  }))
   const {editingBlock} = useBlockContentEditorContext()
   const {isEditingBlock, isEditedViaEditButton, setIsEditedViaEditButton} = useIsEditingBlock()
   const [editButtonRef, setEditButtonRef] = useInstUIRef<HTMLButtonElement>()
+
+  const blockTitle =
+    includeBlockTitle !== false && typeof customTitle === 'string' && customTitle.trim() !== ''
+      ? customTitle
+      : props.title
 
   const handleSave = () => {
     editingBlock.setId(null)
@@ -111,10 +121,10 @@ export const BaseBlockEditWrapper = (
         }
         menu={
           <Flex gap="mediumSmall">
-            <DuplicateButton key="menu-duplicate-button" />
-            <EditSettingsButton key="menu-edit-settings-button" />
-            <DeleteButton key="menu-delete-button" />
-            <MoveBlockButton key="menu-move-block-button" />
+            <DuplicateButton key="menu-duplicate-button" title={blockTitle} />
+            <EditSettingsButton key="menu-edit-settings-button" title={blockTitle} />
+            <DeleteButton key="menu-delete-button" title={blockTitle} />
+            <MoveBlockButton key="menu-move-block-button" title={blockTitle} />
           </Flex>
         }
         topA11yActionMenu={
