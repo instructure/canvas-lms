@@ -86,9 +86,11 @@ class YoutubeMigrationService
   end
 
   def self.call_external_tool(course, scan_id)
-    payload = Struct.new(:scan_id, :canvas_id).new(
+    external_tool_id = course.assignments.active.type_quiz_lti.last.external_tool_tag.content_id
+    payload = Struct.new(:scan_id, :canvas_id, :external_tool_id).new(
       scan_id,
-      course.global_id
+      course.global_id,
+      external_tool_id
     )
     Canvas::LiveEvents.scan_youtube_links(payload)
   end
