@@ -66,7 +66,7 @@ RSpec.describe CommentsService, type: :service do
       expect(result[1]["comments"]).to eq("Review your essay for subject-verb agreement and punctuation.")
     end
 
-    it "raises CedarAIGraderError on invalid JSON response" do
+    it "raises CedarAi::Errors::GraderError on invalid JSON response" do
       stub_const("CedarClient", Class.new do
         def self.prompt(*)
           Struct.new(:response, keyword_init: true).new(response: "not-json")
@@ -74,7 +74,7 @@ RSpec.describe CommentsService, type: :service do
       end)
 
       service = described_class.new(assignment:, grade_data: grade_data.deep_dup, root_account_uuid:, current_user:)
-      expect { service.call }.to raise_error(CedarAIGraderError, /Invalid JSON response/)
+      expect { service.call }.to raise_error(CedarAi::Errors::GraderError, /Invalid JSON response/)
     end
   end
 
