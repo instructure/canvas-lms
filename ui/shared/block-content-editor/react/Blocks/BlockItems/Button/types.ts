@@ -15,19 +15,27 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {lighten, darken} from '@instructure/ui-color-utils'
-import tinyColor from 'tinycolor2'
 
-export const getAdjustedColor = (color: string): string => {
-  const tinyColorObj = tinyColor(color)
-  const isLight = tinyColorObj.isLight()
-  const luminosity = tinyColorObj.getLuminance()
-  const baseAmount = 10
+import {FocusHandler} from '../../../hooks/useFocusElement'
 
-  if (isLight) {
-    return darken(color, baseAmount)
-  } else {
-    const adjustedAmount = baseAmount + (0.5 - luminosity) * 20
-    return lighten(color, adjustedAmount)
-  }
+export type ButtonLinkOpenMode = 'new-tab' | 'same-tab'
+export type ButtonStyle = 'filled' | 'outlined'
+
+export type ButtonData = {
+  id: number
+  text: string
+  url: string
+  linkOpenMode: ButtonLinkOpenMode
+  primaryColor: string
+  secondaryColor: string
+  style: ButtonStyle
 }
+
+export type ButtonBaseProps = ButtonData & {
+  isFullWidth: boolean
+  focusHandler?: FocusHandler
+}
+
+export type ButtonViewProps = ButtonBaseProps
+export type ButtonEditProps = ButtonBaseProps
+export type ButtonEditViewProps = ButtonBaseProps

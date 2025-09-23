@@ -19,8 +19,15 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {SingleButton} from '../SingleButton'
+import {ButtonEdit} from '../ButtonEdit'
 import {ButtonData} from '../types'
+
+const mockOpenSettingsTray = jest.fn()
+jest.mock('../../../../hooks/useOpenSettingsTray', () => ({
+  useOpenSettingsTray: () => ({
+    openSettingsTray: mockOpenSettingsTray,
+  }),
+}))
 
 const defaultButtonData: ButtonData = {
   id: 1,
@@ -33,35 +40,30 @@ const defaultButtonData: ButtonData = {
 }
 
 const defaultProps = {
-  button: defaultButtonData,
+  ...defaultButtonData,
   isFullWidth: false,
 }
 
-describe('SingleButton tooltip', () => {
-  it('shows tooltip for new-tab links with URL', async () => {
+beforeEach(() => {
+  jest.clearAllMocks()
+})
+
+describe('ButtonEdit', () => {
+  it('shows "Opens block settings" tooltip', async () => {
     const user = userEvent.setup()
-    render(<SingleButton {...defaultProps} />)
+    render(<ButtonEdit {...defaultProps} />)
 
-    const button = screen.getByRole('link')
+    const button = screen.getByRole('button')
     await user.hover(button)
-    expect(screen.getByText('Opens in new window')).toBeInTheDocument()
+    expect(screen.getByText('Opens block settings')).toBeInTheDocument()
   })
 
-  it('does not show tooltip when URL is empty', () => {
-    const buttonWithoutUrl = {...defaultButtonData, url: ''}
-    render(<SingleButton {...defaultProps} button={buttonWithoutUrl} />)
-    expect(screen.queryByText('Opens in new window')).not.toBeInTheDocument()
-  })
+  it('calls openSettingsTray when clicked', async () => {
+    const user = userEvent.setup()
+    render(<ButtonEdit {...defaultProps} />)
 
-  it('does not show tooltip for same-tab links', () => {
-    const sameTabButton = {...defaultButtonData, linkOpenMode: 'same-tab' as const}
-    render(<SingleButton {...defaultProps} button={sameTabButton} />)
-    expect(screen.queryByText('Opens in new window')).not.toBeInTheDocument()
-  })
-
-  it('does not show tooltip when onButtonClick is provided', () => {
-    const onButtonClick = jest.fn()
-    render(<SingleButton {...defaultProps} onButtonClick={onButtonClick} />)
-    expect(screen.queryByText('Opens in new window')).not.toBeInTheDocument()
+    const button = screen.getByRole('button')
+    await user.click(button)
+    expect(mockOpenSettingsTray).toHaveBeenCalled()
   })
 })

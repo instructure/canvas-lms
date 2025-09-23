@@ -18,7 +18,7 @@
 
 import {renderHook, act} from '@testing-library/react-hooks'
 import {useButtonManager} from '../useButtonManager'
-import {ButtonData} from '../types'
+import {ButtonData} from '../../BlockItems/Button/types'
 
 const createButton = (id: number, text: string = ''): ButtonData => ({
   id,

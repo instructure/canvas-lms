@@ -17,7 +17,7 @@
  */
 
 import {useState, useRef, useCallback, useEffect} from 'react'
-import {ButtonData} from './types'
+import {ButtonData} from '../BlockItems/Button/types'
 import {colors} from '@instructure/canvas-theme'
 
 const MAX_BUTTONS = 5
