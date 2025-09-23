@@ -163,7 +163,6 @@ describe('usePaginatedAnnouncements', () => {
       course: {
         id: '1',
         name: 'Test Course 1',
-        courseCode: '',
       },
       author: {
         _id: 'user1',

@@ -141,7 +141,6 @@ export function usePaginatedAnnouncements(options: UseAnnouncementsOptions = {})
         course: {
           id: participant.discussionTopic.contextId,
           name: participant.discussionTopic.contextName,
-          courseCode: '',
         },
         author: participant.discussionTopic.author,
         isRead: participant.read,

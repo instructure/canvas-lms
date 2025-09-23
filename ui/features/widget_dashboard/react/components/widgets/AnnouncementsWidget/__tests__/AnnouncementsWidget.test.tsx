@@ -745,13 +745,10 @@ describe('AnnouncementsWidget', () => {
     cleanup()
   })
 
-  it('enriches announcements with course codes from course data', async () => {
+  it('renders course code pills from shared course data lookup', async () => {
     server.use(
       graphql.query('GetUserAnnouncements', ({variables}) => {
         return HttpResponse.json(getMockResponseForReadState(variables.readState))
-      }),
-      graphql.query('GetUserCoursesWithGradesConnection', () => {
-        return HttpResponse.json(mockCourseGradesResponse)
       }),
     )
 
@@ -759,12 +756,11 @@ describe('AnnouncementsWidget', () => {
 
     await waitForLoadingToComplete()
 
-    // Wait for the component to render and data to be enriched
     await waitFor(() => {
-      expect(screen.getByText('Test Announcement 2')).toBeInTheDocument() // Default unread filter
+      expect(screen.getByText('Test Announcement 2')).toBeInTheDocument()
     })
 
-    expect(screen.getByText('ENG 201')).toBeInTheDocument() // Course code should be enriched
+    expect(screen.getByText('ENG 201')).toBeInTheDocument()
 
     cleanup()
   })
