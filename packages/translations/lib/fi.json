@@ -314,12 +314,6 @@
     "clear_image_3213fe62": {
         "message": "Tyhjennä kuva"
     },
-    "clear_selected_file_82388e50": {
-        "message": "Tyhjennä valittu tiedosto"
-    },
-    "clear_selected_file_filename_2fe8a58e": {
-        "message": "Tyhjennä valittu tiedosto: { filename }"
-    },
     "click_or_shift_click_for_the_html_editor_25d70bb4": {
         "message": "Napsauta ja valitse shift ja napsautus, niin saat html-editorin esiin."
     },

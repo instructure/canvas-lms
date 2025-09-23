@@ -284,12 +284,6 @@
     "clear_image_3213fe62": {
         "message": "Tøm bilde"
     },
-    "clear_selected_file_82388e50": {
-        "message": "Fjern vald fil"
-    },
-    "clear_selected_file_filename_2fe8a58e": {
-        "message": "Fjern vald fil: { filename }"
-    },
     "click_or_shift_click_for_the_html_editor_25d70bb4": {
         "message": "Klikk eller shift+klikk for å gå til html-editoren."
     },
