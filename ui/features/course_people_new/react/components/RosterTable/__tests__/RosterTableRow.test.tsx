@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
+import {Table} from '@instructure/ui-table'
 import RosterTableRow, {type RosterTableRowProps} from '../RosterTableRow'
 import useCoursePeopleContext from '../../../hooks/useCoursePeopleContext'
 import {
@@ -53,7 +54,26 @@ describe('RosterTableRow', () => {
   }
 
   const renderRosterTableRow = (props: Partial<RosterTableRowProps> = {}) =>
-    render(<RosterTableRow {...defaultProps} {...props} />)
+    render(
+      <Table caption="Test table">
+        <Table.Head>
+          <Table.Row>
+            <Table.ColHeader id="select">Select</Table.ColHeader>
+            <Table.ColHeader id="name">Name</Table.ColHeader>
+            <Table.ColHeader id="login">Login ID</Table.ColHeader>
+            <Table.ColHeader id="sis">SIS ID</Table.ColHeader>
+            <Table.ColHeader id="section">Section</Table.ColHeader>
+            <Table.ColHeader id="role">Role</Table.ColHeader>
+            <Table.ColHeader id="activity">Last Activity</Table.ColHeader>
+            <Table.ColHeader id="total">Total Activity</Table.ColHeader>
+            <Table.ColHeader id="options">Options</Table.ColHeader>
+          </Table.Row>
+        </Table.Head>
+        <Table.Body>
+          <RosterTableRow {...defaultProps} {...props} />
+        </Table.Body>
+      </Table>,
+    )
 
   beforeEach(() => {
     ;(useCoursePeopleContext as jest.Mock).mockReturnValue(defaultContextValues)

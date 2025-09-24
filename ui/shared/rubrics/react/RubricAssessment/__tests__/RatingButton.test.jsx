@@ -23,7 +23,7 @@ import {RatingButton} from '../RatingButton'
 
 describe('RatingButton', () => {
   const defaultProps = {
-    buttonDisplay: '5',
+    buttonLabel: '5',
     isPreviewMode: false,
     isSelected: false,
     selectedArrowDirection: 'right',

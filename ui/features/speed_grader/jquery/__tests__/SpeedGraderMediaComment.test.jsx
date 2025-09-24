@@ -64,6 +64,24 @@ describe('SpeedGrader Media Comments', () => {
     document.body.appendChild(fixtures)
     fixtures.innerHTML = `${requiredDOMFixtures}${commentBlankHtml}`
 
+    window.INST = {
+      kalturaSettings: {
+        resource_domain: 'example.com',
+        partner_id: 'asdf',
+      },
+    }
+
+    window.jsonData = {
+      id: 27,
+      GROUP_GRADING_MODE: false,
+      points_possible: 10,
+      context: {
+        students: [],
+        enrollments: [],
+      },
+      submissions: [],
+    }
+
     fakeENV.setup({
       assignment_id: '17',
       course_id: '29',
@@ -87,21 +105,9 @@ describe('SpeedGrader Media Comments', () => {
         return HttpResponse.json({})
       }),
     )
-    // No need to mock getJSON since we're already using MSW for all network requests
     jest.spyOn(SpeedGrader.EG, 'domReady').mockImplementation(() => {})
-
-    window.INST = {
-      kalturaSettings: {
-        resource_domain: 'example.com',
-        partner_id: 'asdf',
-      },
-    }
-
-    window.jsonData = {
-      id: 27,
-      GROUP_GRADING_MODE: false,
-      points_possible: 10,
-    }
+    jest.spyOn(SpeedGrader.EG, 'jsonReady').mockImplementation(() => {})
+    jest.spyOn(SpeedGrader.EG, 'setInitiallyLoadedStudent').mockImplementation(() => {})
 
     SpeedGrader.EG.currentStudent = {
       id: 4,

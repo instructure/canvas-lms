@@ -6159,6 +6159,7 @@ fa:
     errors: 
       cannot_shift_and_remove: "تاریخ های_تغییر و تاریخ های_حذف به طور همزمان قابل تعیین نیستند"
       import_error: "خطای وارد کردن:"
+    file_copy_error: "نمی توان فایل \"%{name}\" را کپی کرد"
     missing_content_links_message: "منابع زیر نمی تواند حل شود:"
     missing_content_links_title: "پیوندهای مفقود در محتوای وارد شده یافت شد"
     unexpected_error: "یک خطای پیش بینی نشده ای رخ داد، لطفا با پشتیبانی تماس بگیرید."
@@ -9796,6 +9797,7 @@ fa:
     roles: 
       designer: طراح
       designer_with_indefinite_article: "یک طراح"
+      instructors: اساتید
       observer: بیننده
       observer_with_indefinite_article: "یک بیننده"
       student: دانشجو
@@ -16540,6 +16542,7 @@ fa:
   no_assignment_group_assigned_8f1cdb9b: "هیچ گروه تکلیفی اختصاص نیافته است"
   no_assignment_name_adbb215b: "نام تکلیف موجود نیست"
   no_assignment_selected_65d9e422: "هیچ تکلیفی انتخاب نشده است"
+  no_assignments_found_2097cfc1: "تکلیفی یافت نشد"
   no_assignments_with_that_name_found_1d7be1: "تکلیفی با آن نام یافت نشد"
   no_associated_terms_13bacefc: "نیمسال مرتبط موجود نیست"
   no_attachments_found_for_the_following_ids_ids_49c9192f: "هیچ پیوستی برای شناسه‌های زیر یافت نشد: %{ids}"
@@ -20580,6 +20583,7 @@ fa:
   remove_empty_attachment_b2aea632: "حذف پیوست خالی"
   remove_f47dc62a: حذف
   remove_file_cbf3f40f: "حذف فایل"
+  remove_filename_1b74ef2a: "حذف %{fileName}"
   remove_filename_87f3781e: "حذف %{filename}"
   remove_filename_dab5c02e: "حذف %{filename}"
   remove_filter_68de01d4: "حذف فیلتر"
@@ -20886,6 +20890,8 @@ fa:
   role_successfully_updated_4317e6a4: "نقش با موفقیت بهنگام سازی شد."
   roles: 
     based_on_type: "بر اساس %{base_type}"
+    designer: طراح
+    designers: طراحان
     edit_role: 
       role_name_label: "نام نقش"
     new_role: 
@@ -20894,6 +20900,8 @@ fa:
       role_type: "نوع پایه:"
       save: "ذخیره سازی"
       saving: "در حال ذخیره سازی..."
+    observer: بیننده
+    observers: "بیننده ها"
     permission_button: 
       rolebutton: 
         disable: "غیر فعال سازی"
@@ -20911,6 +20919,12 @@ fa:
       account_roles: "نقش های حساب"
       course_roles: "نقش های درس"
       page_header_title: "مجوزهای حساب"
+    student: Student
+    students: دانشجویان
+    ta: "دستیار آموزشی"
+    tas: "دستیارهای آموزشی"
+    teacher: استاد
+    teachers: اساتید
   roles_730b879e: نقش‌ها
   romanian_13670c1e: رومانیایی
   rootFoldersFinder: 
@@ -25933,6 +25947,8 @@ fa:
         anyone: همه
         only_teachers: "فقط اساتید"
         teachers_and_students: "اساتید و دانشجویان"
+      create_page_title: "صفحه جدید"
+      edit_page_title: "ویرایش %{title}"
       editing_roles: 
         anyone: همه
         can_edit_page: "می توان این صفحه را ویرایش کرد"

@@ -924,6 +924,8 @@ class AssignmentsApiController < ApplicationController
       end
       target_assignment.migration_id = nil
       target_assignment.save!
+
+      target_assignment.restore_module_content_tags_to(new_assignment:)
     end
     positions_in_group = Assignment.active.where(
       assignment_group_id: target_assignment.assignment_group_id

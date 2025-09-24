@@ -79,9 +79,21 @@ describe HorizonController do
       )
     end
 
-    it "returns error when course has classic quizzes" do
+    it "allows unpublished classic quizzes" do
       course_factory(active_all: true)
-      quiz = @course.quizzes.create!(title: "Quiz 1")
+      @course.quizzes.create!(title: "Unpublished Quiz", workflow_state: "unpublished")
+      account_admin_user
+      user_session(@admin)
+
+      get "validate_course", format: :json, params: { course_id: @course.id }
+
+      json = json_parse(response.body)
+      expect(json["errors"]["quizzes"]).to be_blank
+    end
+
+    it "returns error when course has published classic quizzes" do
+      course_factory(active_all: true)
+      quiz = @course.quizzes.create!(title: "Quiz 1", workflow_state: "available")
 
       account_admin_user
       user_session(@admin)
@@ -133,7 +145,7 @@ describe HorizonController do
     it "returns errors when multiple items have errors" do
       course_factory(active_all: true)
       @course.discussion_topics.create!(title: "Discussion 1")
-      @course.quizzes.create!(title: "Problem Quiz")
+      @course.quizzes.create!(title: "Problem Quiz", workflow_state: "available")
 
       account_admin_user
       user_session(@admin)

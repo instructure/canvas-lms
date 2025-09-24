@@ -104,5 +104,13 @@ class TeacherViewPageV2
     def download_submissions_button
       f("a[data-testid='download_button']")
     end
+
+    def previous_assignment_button
+      f("[data-testid='previous-assignment-button']")
+    end
+
+    def next_assignment_button
+      f("[data-testid='next-assignment-button']")
+    end
   end
 end

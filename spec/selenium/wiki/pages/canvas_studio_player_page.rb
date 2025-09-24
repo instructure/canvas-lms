@@ -37,7 +37,7 @@ module CanvasStudioPlayerPage
   end
 
   def data_media_player
-    f('div[data-testid="canvas-studio-player"] div')
+    f('div[data-testid="canvas-studio-player"] [data-media-player]')
   end
 
   def kebab_menu_button
@@ -56,60 +56,61 @@ module CanvasStudioPlayerPage
     f('div[aria-label="Keyboard Shortcuts"] button[aria-label="Close"]')
   end
 
-  def left_control
-    f("div._left-controls_5cfhx_36")
-  end
-
   def play_button
-    f('div._left-controls_5cfhx_36 button[aria-label="Play"]')
+    f('button[aria-label="Play"]')
   end
 
   def pause_button
-    f('div._left-controls_5cfhx_36 button[aria-label="Pause"]')
+    f('button[aria-label="Pause"]')
   end
 
   def mute_button
-    f('div._left-controls_5cfhx_36 button[aria-label="Mute"]')
+    f('button[aria-label="Mute"]')
   end
 
   def unmute_button
-    f('div._left-controls_5cfhx_36 button[aria-label="Volume"]')
+    f('button[aria-label="Volume"]')
   end
 
   def volume_slider
     f('div[role="slider"][aria-label="Volume"]')
   end
 
-  def time_indicator
-    ff("div._time-indicator_1uygf_1 div")
+  def time_indicator_current
+    f("[data-testid='controls-layout'] [data-type='current']")
+  end
+
+  def time_indicator_duration
+    f("[data-testid='controls-layout'] [data-type='duration']")
   end
 
   def right_control_buttons
-    ff("div._right-controls_5cfhx_42 button")
+    # right now we don't place any special attribute on right-control div but it'll be always the last div
+    ff("[data-testid='controls-layout'] > div:last-child button")
   end
 
   def disable_caption_button
-    f("div._right-controls_5cfhx_42 button[aria-label='Disable Captions']")
+    f("button[aria-label='Disable Captions']")
   end
 
   def enable_caption_button
-    f("div._right-controls_5cfhx_42 button[aria-label='Enable Captions']")
+    f("button[aria-label='Enable Captions']")
   end
 
   def settings_button
-    f("div._right-controls_5cfhx_42 button[aria-label='Settings']")
+    f("button[aria-label='Settings']")
   end
 
   def fullscreen_button
-    f("div._right-controls_5cfhx_42 button[aria-label='Enter Fullscreen']")
+    f("button[aria-label='Enter Fullscreen']")
   end
 
   def exit_fullscreen_button
-    f("div._right-controls_5cfhx_42 button[aria-label='Exit Fullscreen']")
+    f("button[aria-label='Exit Fullscreen']")
   end
 
   def video_setting_menu_buttons
-    ff("div._right-controls_5cfhx_42 div[role='menu'] button")
+    ff("div[role='menu'] button")
   end
 
   def setting_menu_heading_captions

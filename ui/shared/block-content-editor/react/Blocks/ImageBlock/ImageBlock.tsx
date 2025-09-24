@@ -18,67 +18,78 @@
 
 import {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {BaseBlockHOC} from '../BaseBlock'
-import {useSave2} from '../BaseBlock/useSave'
+import {BaseBlock} from '../BaseBlock'
+import {useSave} from '../BaseBlock/useSave'
 import {ImageBlockSettings} from './ImageBlockSettings'
 import {ImageEdit, ImageView} from '../BlockItems/Image'
-import {ImageData} from '../BlockItems/Image/types'
 import {ImageBlockProps} from './types'
 import {TitleEdit} from '../BlockItems/Title/TitleEdit'
 import {TitleView} from '../BlockItems/Title/TitleView'
 import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
 import {Flex} from '@instructure/ui-flex'
+import {useFocusElement} from '../../hooks/useFocusElement'
+import {defaultProps} from './defaultProps'
+import {getContrastingTextColorCached} from '../../utilities/getContrastingTextColor'
 
 const I18n = createI18nScope('block_content_editor')
 
 const ImageBlockView = (props: ImageBlockProps) => {
+  const {includeBlockTitle, title, titleColor, ...imageProps} = props
   return (
     <Flex direction="column" gap="mediumSmall">
-      {props.settings.includeBlockTitle && (
-        <TitleView contentColor={props.settings.textColor || ''} title={props.title} />
-      )}
-      <ImageView {...props} />
+      {includeBlockTitle && !!title && <TitleView title={title} contentColor={titleColor} />}
+      <ImageView {...imageProps} captionColor={titleColor} />
     </Flex>
   )
 }
 
 const ImageBlockEditView = (props: ImageBlockProps) => {
+  const {includeBlockTitle, title, titleColor, ...imageProps} = props
   return (
-    <>
-      {props.settings.includeBlockTitle && (
-        <TitleEditPreview contentColor={props.settings.textColor || ''} title={props.title} />
-      )}
-      <ImageView {...props} />
-    </>
+    <Flex direction="column" gap="mediumSmall">
+      {includeBlockTitle && <TitleEditPreview title={title} contentColor={titleColor} />}
+      <ImageView {...imageProps} captionColor={titleColor} />
+    </Flex>
   )
 }
 
 const ImageBlockEdit = (props: ImageBlockProps) => {
+  const {focusHandler} = useFocusElement()
   const [title, setTitle] = useState(props.title || '')
-  const [imageData, setImageData] = useState<ImageData>(props)
+  const labelColor = getContrastingTextColorCached(props.backgroundColor)
 
-  useSave2(() => ({
-    title,
-    ...imageData,
-  }))
+  const save = useSave(() => ({title}))
 
   return (
-    <>
-      {props.settings.includeBlockTitle && <TitleEdit title={title} onTitleChange={setTitle} />}
-      <ImageEdit {...props} {...imageData} onImageChange={setImageData} />
-    </>
+    <Flex direction="column" gap="mediumSmall">
+      {props.includeBlockTitle && (
+        <TitleEdit
+          title={title}
+          onTitleChange={setTitle}
+          focusHandler={focusHandler}
+          labelColor={labelColor}
+        />
+      )}
+      <ImageEdit
+        {...props}
+        captionColor={props.titleColor}
+        onImageChange={data => save({...data})}
+        focusHandler={!props.includeBlockTitle && focusHandler}
+      />
+    </Flex>
   )
 }
 
-export const ImageBlock = (props: ImageBlockProps) => {
+export const ImageBlock = (props: Partial<ImageBlockProps>) => {
+  const componentProps = {...defaultProps, ...props}
   return (
-    <BaseBlockHOC
+    <BaseBlock
       ViewComponent={ImageBlockView}
       EditComponent={ImageBlockEdit}
       EditViewComponent={ImageBlockEditView}
-      componentProps={props}
+      componentProps={componentProps}
       title={ImageBlock.craft.displayName}
-      backgroundColor={props.settings.backgroundColor}
+      backgroundColor={componentProps.backgroundColor}
     />
   )
 }

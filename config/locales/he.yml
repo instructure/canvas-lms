@@ -4793,6 +4793,7 @@ he:
     errors: 
       cannot_shift_and_remove: "אין אפשרות להגדיר את shift_dates ואת remove_dates בעת ובעונה אחת"
       import_error: "שגיאת ייבוא:"
+    file_copy_error: "העתקת קובץ \"%{name}\" נכשלה"
     missing_content_links_message: "ההפניות הבאות אינן ניתנות לפענוח:"
     missing_content_links_title: "נמצאו קישורים חסרים בתוכן המיובא"
     unexpected_error: "אירעה שגיאה בלתי צפויה, ויש ליצור קשר עם צוות התמיכה."
@@ -7846,6 +7847,7 @@ he:
     roles: 
       designer: מתכנן
       designer_with_indefinite_article: מתכנן
+      instructors: מנחים
       observer: משקיף
       observer_with_indefinite_article: משקיף
       student: תלמיד
@@ -13440,6 +13442,7 @@ he:
   no_active_user_with_that_id_was_found_b8fb5e14: "לא נמצא משתמש פעיל עם מזהה זה."
   no_assignment_name_adbb215b: "חסר שם משימה"
   no_assignment_selected_65d9e422: "לא נבחרה אף משימה"
+  no_assignments_found_2097cfc1: "לא נמצאו משימות"
   no_associated_terms_13bacefc: "תקופות לימודים לא שויכו"
   no_broken_links_found_38d951e3: "לא נמצאו קישורים שגויים"
   no_collaboration_apps_3bbd30ce: "אין אפליקציות שיתופי פעולה"
@@ -17003,6 +17006,7 @@ he:
   remove_email_address_b1820820: "הסרת כתובת דוא\"ל"
   remove_empty_attachment_b2aea632: "הסרת תצריף ריק"
   remove_f47dc62a: הסרה
+  remove_filename_1b74ef2a: "הסרת %{fileName}"
   remove_filename_87f3781e: "הסרת %{filename}"
   remove_filter_68de01d4: "ביטול מסנן"
   remove_from_course_6fb47aee: "הסרה מהקורס"
@@ -17205,6 +17209,8 @@ he:
   role_successfully_updated_4317e6a4: "תפקיד עודכן בהצלחה"
   roles: 
     based_on_type: "מבוסס על %{base_type}"
+    designer: מתכנן
+    designers: מתכננים
     edit_role: 
       role_name_label: "שם תפקיד"
     new_role: 
@@ -17213,6 +17219,8 @@ he:
       role_type: "סוג בסיסי"
       save: שמירה
       saving: שומר...
+    observer: משקיף
+    observers: "משקיפים "
     permission_button: 
       rolebutton: 
         disable: ניטרול
@@ -17230,6 +17238,12 @@ he:
       account_roles: "תפקידי חשבון"
       course_roles: "תפקידי קורס"
       page_header_title: "הרשאות חשבון "
+    student: תלמיד
+    students: תלמידים
+    ta: "עוזר הוראה"
+    tas: "עוזרי הוראה"
+    teacher: מורה
+    teachers: מורים
   rootFoldersFinder: 
     course_files: "קבצי קורס"
     group_files: "קבצי קבוצה"
@@ -20850,6 +20864,8 @@ he:
         anyone: "כל אחד"
         only_teachers: "רק מורים"
         teachers_and_students: "מורים ותלמידים"
+      create_page_title: "דף הבא"
+      edit_page_title: "עריכת %{title}"
       editing_roles: 
         anyone: "כל אחד"
         can_edit_page: "יכול/ה לערוך דף זה"

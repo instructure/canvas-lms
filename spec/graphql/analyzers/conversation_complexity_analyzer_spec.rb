@@ -19,20 +19,20 @@
 #
 
 describe Analyzers::ConversationComplexityAnalyzer do
-  let(:current_user) { double("User", uuid: "user-123") }
+  let(:current_user) { instance_double(User, uuid: "user-123") }
 
   let(:query_context) { { current_user: } }
 
   let(:subject_double) do
-    double("GraphQL::Query",
-           selected_operation_name: operation_name,
-           context: query_context)
+    instance_double(GraphQL::Query,
+                    selected_operation_name: operation_name,
+                    context: query_context)
   end
 
   let(:analyzer) { described_class.new(subject_double) }
 
   before do
-    analyzer.instance_variable_set(:@query, double("Query", operation_name: "TestOp"))
+    analyzer.instance_variable_set(:@query, instance_double(GraphQL::Query, operation_name: "TestOp"))
     allow(Account.site_admin).to receive(:feature_enabled?).with(:create_conversation_graphql_rate_limit).and_return(true)
   end
 
@@ -47,9 +47,9 @@ describe Analyzers::ConversationComplexityAnalyzer do
 
   describe "#on_enter_field" do
     let(:operation_name) { "CreateConversation" }
-    let(:node) { double("Node", name: "createConversation") }
+    let(:node) { instance_double(GraphQL::Language::Nodes::OperationDefinition, name: "createConversation") }
     let(:visitor) { instance_double(GraphQL::Analysis::AST::Visitor) }
-    let(:field_defn) { double("FieldDefn") }
+    let(:field_defn) { instance_double(GraphQL::Schema::Field) }
 
     before do
       allow(visitor).to receive(:field_definition).and_return(field_defn)
@@ -71,7 +71,7 @@ describe Analyzers::ConversationComplexityAnalyzer do
     it "logs to Sentry if recipients is not an array" do
       allow(analyzer).to receive(:argument_value).and_return("bad input")
 
-      expect(Sentry).to receive(:with_scope).and_yield(double("Scope", set_context: nil))
+      expect(Sentry).to receive(:with_scope).and_yield(instance_double(Sentry::Scope, set_context: nil))
       expect(Sentry).to receive(:capture_message).with("Conversation Complexity Analyzer: unable to process recipients", level: :warning)
 
       analyzer.on_enter_field(node, nil, visitor)
@@ -116,7 +116,7 @@ describe Analyzers::ConversationComplexityAnalyzer do
       allow(redis).to receive(:ttl).with(key).and_return(500)
 
       expect(Rails.logger).to receive(:info)
-      expect(Sentry).to receive(:with_scope).and_yield(double("Scope", set_context: nil))
+      expect(Sentry).to receive(:with_scope).and_yield(instance_double(Sentry::Scope, set_context: nil))
       expect(Sentry).to receive(:capture_message).with(
         "GraphQL: CreateConversation rate limit exceeded",
         level: :warning

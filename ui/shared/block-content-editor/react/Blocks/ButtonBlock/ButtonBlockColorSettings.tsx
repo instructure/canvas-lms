@@ -26,27 +26,29 @@ const I18n = createI18nScope('block_content_editor')
 export const ButtonBlockColorSettings = ({
   includeBlockTitle,
   backgroundColor,
-  textColor,
+  titleColor,
   onBackgroundColorChange,
-  onTextColorChange,
+  onTitleColorChange,
 }: ButtonBlockColorSettingsProps) => {
   return (
     <Flex direction="column" gap="medium">
       <ColorPickerWrapper
-        label={I18n.t('Background')}
+        label={I18n.t('Background color')}
+        popoverButtonScreenReaderLabel={I18n.t('Open background color picker popover')}
         value={backgroundColor}
-        baseColor={textColor}
-        baseColorLabel={I18n.t('Text')}
+        baseColor={titleColor}
+        baseColorLabel={I18n.t('Title color')}
         onChange={onBackgroundColorChange}
       />
 
       {includeBlockTitle && (
         <ColorPickerWrapper
-          label={I18n.t('Text')}
-          value={textColor}
+          label={I18n.t('Title color')}
+          popoverButtonScreenReaderLabel={I18n.t('Open title color picker popover')}
+          value={titleColor}
           baseColor={backgroundColor}
-          baseColorLabel={I18n.t('Background')}
-          onChange={onTextColorChange}
+          baseColorLabel={I18n.t('Background color')}
+          onChange={onTitleColorChange}
         />
       )}
     </Flex>

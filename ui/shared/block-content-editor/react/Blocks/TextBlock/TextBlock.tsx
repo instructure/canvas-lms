@@ -19,15 +19,19 @@
 import {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {TextBlockSettings} from './TextBlockSettings'
-import {BaseBlockHOC} from '../BaseBlock'
-import {useSave2} from '../BaseBlock/useSave'
+import {BaseBlock} from '../BaseBlock'
+import {useSave} from '../BaseBlock/useSave'
 import {TextBlockProps} from './types'
-import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
 import {TextEditPreview} from '../BlockItems/Text/TextEditPreview'
 import {TitleEdit} from '../BlockItems/Title/TitleEdit'
 import {TextEdit} from '../BlockItems/Text/TextEdit'
 import {useFocusElement} from '../../hooks/useFocusElement'
 import {TextBlockLayout} from './TextBlockLayout'
+import {TitleView} from '../BlockItems/Title/TitleView'
+import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
+import {TextView} from '../BlockItems/Text/TextView'
+import {defaultProps} from './defaultProps'
+import {getContrastingTextColorCached} from '../../utilities/getContrastingTextColor'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -35,8 +39,20 @@ const TextBlockView = (props: TextBlockProps) => {
   return (
     <TextBlockLayout
       title={
-        props.settings.includeBlockTitle && (
-          <TitleEditPreview title={props.title} contentColor={props.settings.titleColor} />
+        props.includeBlockTitle &&
+        !!props.title && <TitleView title={props.title} contentColor={props.titleColor} />
+      }
+      text={<TextView content={props.content} />}
+    />
+  )
+}
+
+const TextBlockEditView = (props: TextBlockProps) => {
+  return (
+    <TextBlockLayout
+      title={
+        props.includeBlockTitle && (
+          <TitleEditPreview title={props.title} contentColor={props.titleColor} />
         )
       }
       text={<TextEditPreview content={props.content} />}
@@ -48,8 +64,9 @@ const TextBlockEdit = (props: TextBlockProps) => {
   const {focusHandler} = useFocusElement()
   const [title, setTitle] = useState(props.title)
   const [content, setContent] = useState(props.content)
+  const labelColor = getContrastingTextColorCached(props.backgroundColor)
 
-  useSave2<typeof TextBlock>(() => ({
+  useSave<typeof TextBlock>(() => ({
     title,
     content,
   }))
@@ -57,8 +74,13 @@ const TextBlockEdit = (props: TextBlockProps) => {
   return (
     <TextBlockLayout
       title={
-        props.settings.includeBlockTitle && (
-          <TitleEdit title={title} onTitleChange={setTitle} focusHandler={focusHandler} />
+        props.includeBlockTitle && (
+          <TitleEdit
+            title={title}
+            onTitleChange={setTitle}
+            focusHandler={focusHandler}
+            labelColor={labelColor}
+          />
         )
       }
       text={
@@ -66,22 +88,23 @@ const TextBlockEdit = (props: TextBlockProps) => {
           content={content}
           onContentChange={setContent}
           height={300}
-          focusHandler={props.settings.includeBlockTitle && focusHandler}
+          focusHandler={props.includeBlockTitle && focusHandler}
         />
       }
     />
   )
 }
 
-export const TextBlock = (props: TextBlockProps) => {
+export const TextBlock = (props: Partial<TextBlockProps>) => {
+  const componentProps = {...defaultProps, ...props}
   return (
-    <BaseBlockHOC
+    <BaseBlock
       ViewComponent={TextBlockView}
       EditComponent={TextBlockEdit}
-      EditViewComponent={TextBlockView}
-      componentProps={props}
+      EditViewComponent={TextBlockEditView}
+      componentProps={componentProps}
       title={TextBlock.craft.displayName}
-      backgroundColor={props.settings.backgroundColor}
+      backgroundColor={componentProps.backgroundColor}
     />
   )
 }

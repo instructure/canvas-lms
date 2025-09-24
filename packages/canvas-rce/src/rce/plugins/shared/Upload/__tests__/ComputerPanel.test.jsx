@@ -168,7 +168,7 @@ describe('UploadFile: ComputerPanel', () => {
           label="Upload File"
         />,
       )
-      const clearButton = await waitFor(() => getByText(`Clear selected file: ${aFile.name}`))
+      const clearButton = await waitFor(() => getByText(`Remove ${aFile.name}`))
       expect(clearButton).toBeInTheDocument()
       act(() => {
         fireEvent.click(clearButton)

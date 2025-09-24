@@ -249,10 +249,10 @@ class ContextModule < ActiveRecord::Base
   # Intended for taking a content_tag in this module and duplicating it
   # into a new module.  Not intended for duplicating a content tag to be
   # kept in the same module.
-  def duplicate_content_tag(original_content_tag)
+  def duplicate_content_tag(original_content_tag, opts = {})
     new_tag = duplicate_content_tag_base_model(original_content_tag)
     if original_content_tag.content.respond_to?(:duplicate)
-      new_tag.content = original_content_tag.content.duplicate
+      new_tag.content = original_content_tag.content.duplicate(opts)
       # If we have multiple assignments (e.g.) make sure they each get unused titles.
       # A title isn't marked used if the assignment hasn't been saved yet.
       new_tag.content.save!
@@ -274,12 +274,12 @@ class ContextModule < ActiveRecord::Base
     !only_visible_to_overrides
   end
 
-  def duplicate
+  def duplicate(opts = {})
     copy_title = get_copy_title(self, t("Copy"), name)
     new_module = duplicate_base_model(copy_title)
     living_tags = content_tags.reject(&:deleted?)
     new_module.content_tags = living_tags.map do |content_tag|
-      duplicate_content_tag(content_tag)
+      duplicate_content_tag(content_tag, opts)
     end
     new_module
   end
@@ -959,7 +959,8 @@ class ContextModule < ActiveRecord::Base
         existing_progression = ContextModuleProgression.find_by(user:, context_module: self)
         return existing_progression if existing_progression
 
-        if context.enrollments.except(:preload).where(user_id: user).exists?
+        # Create progression for enrolled users or admins
+        if context.enrollments.except(:preload).where(user_id: user).exists? || grants_right?(user, :read_as_admin)
           ContextModuleProgression.create_and_ignore_on_duplicate(user:, context_module: self)
         end
       end

@@ -160,7 +160,7 @@ describe('CourseWorkSummaryWidget', () => {
     const {cleanup} = setup(buildDefaultProps())
 
     await waitFor(() => {
-      expect(screen.getByDisplayValue('Next 3 Days')).toBeInTheDocument()
+      expect(screen.getByDisplayValue('Next 3 days')).toBeInTheDocument()
     })
 
     cleanup()
@@ -352,20 +352,6 @@ describe('CourseWorkSummaryWidget', () => {
 
     await waitFor(() => {
       expect(screen.getByDisplayValue('All Courses')).toBeInTheDocument() // Should still show "All Courses" option
-    })
-
-    cleanup()
-  })
-
-  it('displays single info icon with tooltip explaining all counts', async () => {
-    const {cleanup} = setup(buildDefaultProps())
-
-    await waitFor(() => {
-      // Check that the single info icon is present next to the title using screen reader text
-      expect(screen.getByText('Information about course work counts')).toBeInTheDocument()
-
-      // Verify the title is still there
-      expect(screen.getByText("Today's course work")).toBeInTheDocument()
     })
 
     cleanup()

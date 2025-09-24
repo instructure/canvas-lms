@@ -16,6 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {FocusHandler} from '../../../hooks/useFocusElement'
+import {Prettify} from '../../../utilities/Prettify'
+
 type ImageMetadata = {
   url?: string
   altText?: string
@@ -39,5 +42,10 @@ export type ModalImageData = ImageMetadata & ImageFileData
 export type ImageChangeHandler = {
   onImageChange: (data: ImageData) => void
 }
-export type ImageEditProps = ImageData & ImageChangeHandler
-export type ImageViewProps = ImageData
+export type ImageEditProps = Prettify<
+  ImageData &
+    ImageChangeHandler & {
+      focusHandler?: FocusHandler | false
+    } & {captionColor: string}
+>
+export type ImageViewProps = Prettify<ImageData & {captionColor: string}>

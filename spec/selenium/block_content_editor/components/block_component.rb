@@ -26,24 +26,4 @@ class BlockComponent
   def initialize(block)
     @block = block
   end
-
-  def block_type_label
-    f("[data-testid='block-type-label']", @block)
-  end
-
-  def duplicate_button
-    f("[data-testid='copy-block-button']", @block)
-  end
-
-  def edit_button
-    f("[data-testid='edit-block-button']", @block)
-  end
-
-  def remove_button
-    f("[data-testid='remove-block-button']", @block)
-  end
-
-  def move_component
-    MoveComponent.new(@block)
-  end
 end

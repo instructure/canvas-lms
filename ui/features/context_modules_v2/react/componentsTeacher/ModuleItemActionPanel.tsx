@@ -55,6 +55,7 @@ import BlueprintLockIcon from './BlueprintLockIcon'
 import PublishCloud from '@canvas/files/react/components/PublishCloud'
 import ModuleFile from '@canvas/files/backbone/models/ModuleFile'
 import {dispatchCommandEvent} from '../handlers/dispatchCommandEvent'
+import {MODULE_ITEMS} from '../utils/constants'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -100,7 +101,8 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   const [isDirectShareCourseOpen, setIsDirectShareCourseOpen] = useState(false)
   const [isPublishButtonEnabled, setIsPublishButtonEnabled] = useState(true)
 
-  const {courseId, isMasterCourse, isChildCourse, setMenuItemLoadingState} = useContextModule()
+  const {courseId, isMasterCourse, isChildCourse, setMenuItemLoadingState, permissions} =
+    useContextModule()
 
   const renderMasteryPathsInfo = () => {
     if (!masteryPathsData || (!masteryPathsData.isTrigger && !masteryPathsData.releasedLabel)) {
@@ -237,6 +239,10 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
       userCanEditFilesForContext: ENV.MODULE_FILE_PERMISSIONS?.manage_files_edit ?? false,
       usageRightsRequiredForContext: ENV.MODULE_FILE_PERMISSIONS?.usage_rights_required,
       fileName: content?.displayName,
+      onPublishChange: () => {
+        queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId || '']})
+        queryClient.invalidateQueries({queryKey: ['MODULE_ITEMS_ALL', moduleId || '']})
+      },
     }
 
     return <PublishCloud {...props} model={file} disabled={false} />
@@ -280,31 +286,34 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
           />
         )}
         {/* Publish Icon */}
-        <Flex.Item>{renderPublishButton(content?.type)}</Flex.Item>
+        {permissions.canEdit && <Flex.Item>{renderPublishButton(content?.type)}</Flex.Item>}
         {/* Kebab Menu */}
-        <Flex.Item data-testid={`module-item-action-menu_${itemId}`}>
-          <ModuleItemActionMenu
-            moduleId={moduleId}
-            itemType={content?.type || ''}
-            content={content}
-            canDuplicate={content?.canDuplicate || false}
-            isMenuOpen={isMenuOpen}
-            setIsMenuOpen={setIsMenuOpen}
-            indent={indent}
-            handleEdit={handleEditRef}
-            handleSpeedGrader={handleSpeedGraderRef}
-            handleAssignTo={handleAssignToRef}
-            handleDuplicate={handleDuplicateRef}
-            handleMoveTo={handleMoveToRef}
-            handleDecreaseIndent={handleDecreaseIndentRef}
-            handleIncreaseIndent={handleIncreaseIndentRef}
-            handleSendTo={handleSendToRef}
-            handleCopyTo={handleCopyToRef}
-            handleRemove={handleRemoveRef}
-            masteryPathsData={masteryPathsData}
-            handleMasteryPaths={handleMasteryPathsRef}
-          />
-        </Flex.Item>
+        {(permissions.canView || permissions.canDirectShare) && (
+          <Flex.Item data-testid={`module-item-action-menu_${itemId}`}>
+            <ModuleItemActionMenu
+              moduleId={moduleId}
+              itemType={content?.type || ''}
+              content={content}
+              published={published}
+              canDuplicate={content?.canDuplicate || false}
+              isMenuOpen={isMenuOpen}
+              setIsMenuOpen={setIsMenuOpen}
+              indent={indent}
+              handleEdit={handleEditRef}
+              handleSpeedGrader={handleSpeedGraderRef}
+              handleAssignTo={handleAssignToRef}
+              handleDuplicate={handleDuplicateRef}
+              handleMoveTo={handleMoveToRef}
+              handleDecreaseIndent={handleDecreaseIndentRef}
+              handleIncreaseIndent={handleIncreaseIndentRef}
+              handleSendTo={handleSendToRef}
+              handleCopyTo={handleCopyToRef}
+              handleRemove={handleRemoveRef}
+              masteryPathsData={masteryPathsData}
+              handleMasteryPaths={handleMasteryPathsRef}
+            />
+          </Flex.Item>
+        )}
       </Flex>
       {['assignment', 'attachment', 'discussion', 'page', 'quiz', 'module', 'module_item'].includes(
         content?.type?.toLowerCase() || '',

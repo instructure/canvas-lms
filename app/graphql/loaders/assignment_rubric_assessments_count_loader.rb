@@ -27,7 +27,11 @@ class Loaders::AssignmentRubricAssessmentsCountLoader < GraphQL::Batch::Loader
     rubric_association = assignment.rubric_association
     return 0 unless rubric_association
 
-    students = User.where(id: Submission.where(assignment_id: assignment.id).select(:user_id))
+    students_with_submissions = Submission.where(assignment_id: assignment.id).select(:user_id)
+    active_enrollments = Enrollment.where(user_id: students_with_submissions)
+                                   .where(course_id: assignment.context_id)
+                                   .where(Enrollment.active_or_completed_student_conditions)
+    students = User.where(id: active_enrollments.pluck(:user_id))
     return 0 unless students
 
     RubricAssessment.where(rubric_association:, user_id: students.pluck(:id)).count

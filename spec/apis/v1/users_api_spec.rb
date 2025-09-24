@@ -1558,6 +1558,42 @@ describe "Users API", type: :request do
                         page: next_link["page"] })
       expect(json.pluck("name")).to eq ["testuser 1"]
     end
+
+    context "user profile preloading" do
+      before(:once) do
+        @account = Account.default
+        @user1 = user_with_pseudonym(active_all: true, account: @account, name: "User One")
+        @user2 = user_with_pseudonym(active_all: true, account: @account, name: "User Two")
+        @user3 = user_with_pseudonym(active_all: true, account: @account, name: "User Three")
+      end
+
+      before do
+        account_admin_user(account: @account, active_all: true)
+        user_session(@user)
+      end
+
+      it "avoids N+1 queries when profiles are enabled" do
+        @account.settings[:enable_profiles] = true
+        @account.save!
+
+        [@user1, @user2, @user3].each do |user|
+          user.profile || user.build_profile
+          user.profile.update!(bio: "Bio for #{user.name}", title: "Title for #{user.name}")
+        end
+
+        # Since profiles are preloaded, we expect 0 individual user_profile queries
+        expect do
+          api_call(:get,
+                   "/api/v1/accounts/#{@account.id}/users",
+                   { controller: "users", action: "api_index", format: "json", account_id: @account.id.to_param })
+        end.not_to make_database_queries(matching: /SELECT.*user_profiles.*WHERE.*user_id.*=/)
+
+        expect(response).to be_successful
+        json = JSON.parse(response.body)
+        expect(json).to be_an(Array)
+        expect(json.length).to be >= 3
+      end
+    end
   end
 
   describe "user account creation" do
@@ -3807,7 +3843,6 @@ describe "Users API", type: :request do
         course3.enroll_user(@observer, "ObserverEnrollment", { associated_user_id: @student.id })
 
         json = api_call(:get, @path, @params.merge(observed_user_id: @student.id, course_ids: [course1.id, course2.id]))
-        p json
         expect(json.length).to be(3)
         assignment_names = json.pluck("name")
         expect(assignment_names).to include("A2")

@@ -73,7 +73,7 @@ describe('BlockContentEditor', () => {
 
   it('does not break when onInit is null', () => {
     expect(() => {
-      render(<BlockContentEditor data={null} onInit={null} />)
+      render(<BlockContentEditor data={null} onInit={null} aiAltTextEnabled={false} />)
     }).not.toThrow()
   })
 
@@ -83,7 +83,7 @@ describe('BlockContentEditor', () => {
     })
 
     it('renders the BlockContentEditorContent component', () => {
-      render(<BlockContentEditor data={null} onInit={null} />)
+      render(<BlockContentEditor data={null} onInit={null} aiAltTextEnabled={false} />)
       expect(mockEditorContentComponent).toHaveBeenCalled()
     })
   })
@@ -94,7 +94,7 @@ describe('BlockContentEditor', () => {
     })
 
     it('renders the BlockContentPreview component', () => {
-      render(<BlockContentEditor data={null} onInit={null} />)
+      render(<BlockContentEditor data={null} onInit={null} aiAltTextEnabled={false} />)
       expect(mockPreviewComponent).toHaveBeenCalled()
     })
   })

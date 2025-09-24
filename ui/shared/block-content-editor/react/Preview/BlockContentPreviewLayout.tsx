@@ -24,7 +24,12 @@ export const BlockContentPreviewLayout = (props: {
   preview: React.ReactNode
 }) => {
   return (
-    <View background="secondary" padding="medium large" height="100%">
+    <View
+      background="secondary"
+      padding="medium large"
+      height="100%"
+      data-testid="block-content-preview-layout"
+    >
       <Flex direction="column" gap="medium" alignItems="center">
         {props.selectorbar}
         {props.preview}

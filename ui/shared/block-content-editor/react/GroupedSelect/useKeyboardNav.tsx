@@ -16,23 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useRef, useMemo, useEffect, useCallback} from 'react'
-import {BlockData, BlockTypes} from '../AddBlock/block-data'
+import {useRef, useEffect, useCallback} from 'react'
+import {GroupedSelectData, GroupedSelectItem} from './GroupedSelect'
 
 export const useKeyboardNav = (
-  data: BlockData[],
-  selectedItem: BlockTypes,
+  data: GroupedSelectData[],
+  selectedItem: string,
   selectedGroup: string,
-  onGroupChange: (group: BlockData) => void,
-  onItemChange: (id: BlockTypes) => void,
+  selectedGroupItems: GroupedSelectItem[],
+  onGroupChange: (group: GroupedSelectData) => void,
+  onItemChange: (item: GroupedSelectItem) => void,
 ) => {
   const focusedPositionRef = useRef<{column: number; row: number}>({column: 0, row: 0})
   const elementsRef = useRef<Map<string | number, HTMLDivElement | null>>(new Map())
-
-  const selectedGroupItems = useMemo(
-    () => data.find(group => group.groupName === selectedGroup)?.items || [],
-    [data, selectedGroup],
-  )
 
   const updateTabIndexes = useCallback(() => {
     elementsRef.current.forEach(element => {
@@ -79,7 +75,7 @@ export const useKeyboardNav = (
         onGroupChange(data[row])
         updateFocus(0, row)
       } else {
-        onItemChange(selectedGroupItems[row].id)
+        onItemChange(selectedGroupItems[row])
         updateFocus(1, row)
       }
     } else if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {

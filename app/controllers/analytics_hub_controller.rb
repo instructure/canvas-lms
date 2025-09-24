@@ -42,13 +42,8 @@ class AnalyticsHubController < ApplicationController
     env = {
       ANALYTICS_HUB: {
         ACCOUNT_ID: @account.id.to_s,
-        PERMISSIONS: @context.granted_rights(@current_user, :view_ask_questions_analytics, :view_students_in_need, :view_course_readiness, :view_lti_usage),
-        FEATURE_FLAGS: {
-          ADVANCED_ANALYTICS_ASK_QUESTIONS_ENABLED: @account.feature_enabled?(:advanced_analytics_ask_questions),
-          K20_STUDENTS_IN_NEED_OF_ATTENTION_ENABLED: @account.feature_enabled?(:k20_students_in_need_of_attention),
-          K20_COURSE_READINESS_ENABLED: @account.feature_enabled?(:k20_course_readiness),
-          MONITOR_LTI_USAGE_ENABLED: @account.feature_enabled?(:lti_registrations_usage_data)
-        }
+        SF_BILLING_COUNTRY_CODE: @context&.root_account&.external_integration_keys&.find_by(key_type: "salesforce_billing_country_code")&.key_value,
+        SF_ORG_TYPE: @context&.root_account&.external_integration_keys&.find_by(key_type: "salesforce_org_type")&.key_value
       }
     }
 

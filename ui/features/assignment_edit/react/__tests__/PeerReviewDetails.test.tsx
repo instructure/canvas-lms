@@ -19,8 +19,14 @@
 import React from 'react'
 import {render, screen, fireEvent, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import {QueryClient} from '@tanstack/react-query'
+import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import PeerReviewDetails from '../PeerReviewDetails'
+
+jest.mock('@canvas/graphql', () => ({
+  executeQuery: jest.fn(),
+}))
 
 // @ts-expect-error
 global.ENV = {
@@ -33,6 +39,11 @@ const createMockAssignment = (overrides = {}) => ({
   getId: jest.fn(() => '456'),
   ...overrides,
 })
+
+function renderWithQueryClient(ui: React.ReactElement) {
+  const client = new QueryClient()
+  return render(<MockedQueryClientProvider client={client}>{ui}</MockedQueryClientProvider>)
+}
 
 describe('PeerReviewDetails', () => {
   let assignment: Assignment
@@ -53,19 +64,19 @@ describe('PeerReviewDetails', () => {
 
   describe('Initial rendering', () => {
     it('renders the peer review checkbox', () => {
-      render(<PeerReviewDetails assignment={assignment} />)
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
       expect(screen.getByLabelText('Require Peer Reviews')).toBeInTheDocument()
     })
 
     it('renders checkbox as checked when assignment has peer reviews enabled', () => {
       assignment.peerReviews = jest.fn(() => true)
-      render(<PeerReviewDetails assignment={assignment} />)
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
       expect(screen.getByTestId('peer-review-checkbox')).toBeChecked()
     })
 
     it('does not show settings when peer reviews are unchecked', () => {
-      render(<PeerReviewDetails assignment={assignment} />)
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
       expect(screen.queryByText('Review Settings')).not.toBeInTheDocument()
       expect(screen.queryByText('Advanced Peer Review Configurations')).not.toBeInTheDocument()
@@ -73,7 +84,7 @@ describe('PeerReviewDetails', () => {
 
     it('renders checkbox as disabled when assignment is moderated', () => {
       assignment.moderatedGrading = jest.fn(() => true)
-      render(<PeerReviewDetails assignment={assignment} />)
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
       const checkbox = screen.getByTestId('peer-review-checkbox')
       expect(checkbox).toBeDisabled()
@@ -82,7 +93,7 @@ describe('PeerReviewDetails', () => {
 
   describe('Checkbox interactions', () => {
     it('shows settings when checkbox is checked', async () => {
-      render(<PeerReviewDetails assignment={assignment} />)
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
       const checkbox = screen.getByTestId('peer-review-checkbox')
       await user.click(checkbox)
 
@@ -93,7 +104,7 @@ describe('PeerReviewDetails', () => {
 
     it('hides settings when checkbox is unchecked', async () => {
       assignment.peerReviews = jest.fn(() => true)
-      render(<PeerReviewDetails assignment={assignment} />)
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
       const checkbox = screen.getByTestId('peer-review-checkbox')
       expect(checkbox).toBeChecked()
@@ -107,7 +118,7 @@ describe('PeerReviewDetails', () => {
 
     it('closes allocation rules tray when checkbox is unchecked', async () => {
       assignment.peerReviews = jest.fn(() => true)
-      render(<PeerReviewDetails assignment={assignment} />)
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
       const advancedSettingsToggle = screen.getByText('Advanced Peer Review Configurations')
       await user.click(advancedSettingsToggle)
 
@@ -124,7 +135,7 @@ describe('PeerReviewDetails', () => {
 
   describe('Advanced configurations', () => {
     beforeEach(async () => {
-      render(<PeerReviewDetails assignment={assignment} />)
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
       const checkbox = screen.getByTestId('peer-review-checkbox')
       await user.click(checkbox)
       const advancedSettingsToggle = screen.getByText('Advanced Peer Review Configurations')
@@ -146,7 +157,7 @@ describe('PeerReviewDetails', () => {
 
   describe('PostMessage event handling', () => {
     it('disables checkbox when receiving disabled message', async () => {
-      render(<PeerReviewDetails assignment={assignment} />)
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
       const checkbox = screen.getByTestId('peer-review-checkbox')
       expect(checkbox).not.toBeDisabled()
@@ -167,7 +178,7 @@ describe('PeerReviewDetails', () => {
     })
 
     it('enables checkbox when receiving enabled message', async () => {
-      render(<PeerReviewDetails assignment={assignment} />)
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
       fireEvent(
         window,
@@ -201,7 +212,7 @@ describe('PeerReviewDetails', () => {
 
     it('unchecks checkbox and closes tray when disabled', async () => {
       assignment.peerReviews = jest.fn(() => true)
-      render(<PeerReviewDetails assignment={assignment} />)
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
       const advancedSettingsToggle = screen.getByText('Advanced Peer Review Configurations')
       await user.click(advancedSettingsToggle)
 
@@ -226,7 +237,7 @@ describe('PeerReviewDetails', () => {
     })
 
     it('ignores messages with different subjects', async () => {
-      render(<PeerReviewDetails assignment={assignment} />)
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
 
       const checkbox = screen.getByTestId('peer-review-checkbox')
       expect(checkbox).not.toBeDisabled()

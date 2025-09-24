@@ -2284,6 +2284,10 @@ describe AssignmentsApiController, type: :request do
           url = "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json" \
                 "?target_assignment_id=#{failed_blueprint_assignment.id}&target_course_id=#{course_copied.id}"
 
+          expect_any_instance_of(Assignment).to receive(:restore_module_content_tags_to).once do |instance|
+            expect(instance.id).to eq(failed_blueprint_assignment.id)
+          end
+
           json = api_call_as_user(
             @teacher,
             :post,

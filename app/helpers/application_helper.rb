@@ -1156,31 +1156,21 @@ module ApplicationHelper
   end
 
   def generate_access_verifier(return_url: nil, fallback_url: nil, authorization: nil)
-    if @advantage_token_developer_key.present?
-      DeveloperKeys::AccessVerifier.generate(
-        authorization:,
-        developer_key: @advantage_token_developer_key,
-        root_account: @domain_root_account,
-        oauth_host: request.host_with_port,
-        return_url:,
-        fallback_url:
-      )
-    else
-      Users::AccessVerifier.generate(
-        authorization:,
-        user: @current_user,
-        real_user: logged_in_user,
-        developer_key: @access_token&.developer_key,
-        root_account: @domain_root_account,
-        oauth_host: request.host_with_port,
-        return_url:,
-        fallback_url:
-      )
-    end
+    developer_key = @advantage_token_developer_key || @access_token&.developer_key
+    AccessVerifier.generate(
+      authorization:,
+      user: @current_user,
+      real_user: logged_in_user,
+      developer_key:,
+      root_account: @domain_root_account,
+      oauth_host: request.host_with_port,
+      return_url:,
+      fallback_url:
+    )
   end
 
   def validate_access_verifier
-    Users::AccessVerifier.validate(params)
+    AccessVerifier.validate(params)
   end
 
   def file_access_user

@@ -28,6 +28,7 @@ class SVGWrapper extends React.Component {
     url: PropTypes.string.isRequired,
     fillColor: PropTypes.string,
     style: PropTypes.any,
+    ariaHidden: PropTypes.bool,
   }
 
   componentDidMount() {
@@ -57,6 +58,10 @@ class SVGWrapper extends React.Component {
           throw new Error(
             `SVGWrapper: SVG Element must be returned by request to ${this.props.url}`,
           )
+        }
+
+        if (this.props.ariaHidden !== undefined) {
+          this.svg.setAttribute('aria-hidden', this.props.ariaHidden)
         }
 
         this.setSVGFillColor(this.props.fillColor)

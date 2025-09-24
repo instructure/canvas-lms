@@ -1789,6 +1789,7 @@ el:
   an_integer_value_is_required_e073bd46: "Μια τιμή ακέραιου απαιτείται"
   an_internal_error_occurred_83b8a685: "Παρουσιάστηκε ένα εσωτερικό σφάλμα"
   an_item_named_name_already_exists_in_this_location_147b7312: "Ένα στοιχείο που ονομάζεται «%{name}» υπάρχει ήδη σε αυτή την τοποθεσία. Θέλετε να αντικαταστήσετε το υπάρχον αρχείο;"
+  an_unexpected_error_occurred_15bae9ec: "Παρουσιάστηκε μη αναμενόμενο σφάλμα."
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "Συνέβη ένα άγνωστο σφάλμα διακομιστή. Παρακαλούμε ξαναπροσπαθήστε."
   an_update_is_available_for_toolname_bba3fa2: "Μία ενημέρωση είνια διαθέσιμη για %{toolName}"
   analytics: 
@@ -6090,6 +6091,7 @@ el:
     roles: 
       designer: Σχεδιαστής
       designer_with_indefinite_article: "Ένας Σχεδιαστής/ια"
+      instructors: Εκπαιδευτές
       observer: Παρατηρητής
       observer_with_indefinite_article: Παρατηρητής
       student: Μαθητής
@@ -10172,6 +10174,7 @@ el:
   no_active_user_with_that_id_was_found_b8fb5e14: "Δεν βρέθηκε ενεργός χρήστης με το συγκεκριμένο ID."
   no_assignment_name_adbb215b: "Δεν Υπάρχει Όνομα Εργασίας"
   no_assignment_selected_65d9e422: "Δεν έχει επιλεγεί Εργασία"
+  no_assignments_found_2097cfc1: "Δεν βρέθηκαν εργασίες"
   no_content_5dbc9acf: "Κανένα Περιεχόμενο"
   no_content_has_been_added_f36bab43: "* Δεν έχει προστεθεί περιεχόμενο"
   no_conversations_selected_ebcd9226: "Δεν έχουν επιλεγεί συνομιλίες"
@@ -13130,6 +13133,7 @@ el:
   remove_email_address_b1820820: "Αφαίρεση ηλεκτρονικής διεύθυνσης"
   remove_empty_attachment_b2aea632: "αφαίρεση κενής επισύναψης"
   remove_f47dc62a: Αφαίρεση
+  remove_filename_1b74ef2a: "Αφαίρεση %{fileName}"
   remove_filename_87f3781e: "αφαίρεση %{filename}"
   remove_filter_68de01d4: "Αφαίρεση Φίλτου"
   remove_from_course_6fb47aee: "Αφαίρεση από το Μάθημα"
@@ -13305,6 +13309,8 @@ el:
   role_successfully_updated_4317e6a4: "Ο ρόλος ενημερώθηκε επιτυχώς"
   roles: 
     based_on_type: "Με βάση %{base_type}"
+    designer: "Εγγεγραμμένος ως σχεδιαστής"
+    designers: Σχεδιαστές
     edit_role: 
       role_name_label: "Όνομα Ρόλου"
     new_role: 
@@ -13313,6 +13319,8 @@ el:
       role_type: "Τύπος Βάσης:"
       save: Αποθήκευση
       saving: Αποθήκευση...
+    observer: "Εγγεγραμμένος ως παρατηρητής"
+    observers: Παρατηρητές
     permission_button: 
       rolebutton: 
         disable: Απενεργοποίηση
@@ -13329,6 +13337,12 @@ el:
       account_roles: "Ρόλοι Λογαριασμού"
       course_roles: "Ρόλοι Μαθήματος"
       page_header_title: "Άδειες Λογαριασμού"
+    student: "Μαθητής "
+    students: Μαθητές
+    ta: "Εγγεγραμμένος ως βοηθός διδασκαλίας"
+    tas: "Βοηθοί διδασκαλίας"
+    teacher: Δάσκαλος
+    teachers: Καθηγητές
   roles_730b879e: Ρόλοι
   rootFoldersFinder: 
     course_files: "Αρχεία μαθήματος"
@@ -16047,6 +16061,8 @@ el:
         anyone: Οποισδήποτε
         only_teachers: "Μόνο καθηγητές"
         teachers_and_students: "Καθηγητές και μαθητές"
+      create_page_title: "Νέα Σελίδα"
+      edit_page_title: "Επεξεργασία %{title}"
       editing_roles: 
         anyone: Οποισδήποτε
         only_members: "Μόνο μέλη"

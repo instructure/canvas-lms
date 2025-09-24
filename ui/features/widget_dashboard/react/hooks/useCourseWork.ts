@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useQuery} from '@tanstack/react-query'
+import {useInfiniteQuery} from '@tanstack/react-query'
 import {gql} from 'graphql-tag'
 import {getCurrentUserId, executeGraphQLQuery, createUserQueryConfig} from '../utils/graphql'
 import {QUERY_CONFIG} from '../constants'
@@ -33,6 +33,20 @@ export interface CourseWorkItem {
   points: number | null
   htmlUrl: string
   type: 'assignment' | 'quiz' | 'discussion'
+  late: boolean
+  missing: boolean
+  state: string
+}
+
+interface Submission {
+  _id: string
+  cachedDueDate?: string | null
+  submittedAt?: string | null
+  late?: boolean
+  missing?: boolean
+  excused?: boolean
+  state?: string
+  assignment: Assignment
 }
 
 interface Assignment {
@@ -52,83 +66,82 @@ interface Assignment {
     _id: string
     title: string
   } | null
-  submissionsConnection: {
-    nodes: {
-      _id?: string
-      cachedDueDate?: string | null
-      submittedAt?: string | null
-      late?: boolean
-      missing?: boolean
-      excused?: boolean
-      state?: string
-    }[]
+  course: {
+    _id: string
+    name: string
   }
 }
 
-interface Course {
-  _id: string
-  name: string
-  assignmentsConnection: {
-    nodes: Assignment[]
-  }
-}
-
-interface UserEnrollment {
-  course: Course
+interface PageInfo {
+  hasNextPage: boolean
+  hasPreviousPage: boolean
+  endCursor: string | null
+  startCursor: string | null
 }
 
 interface GraphQLResponse {
   legacyNode: {
     _id: string
-    enrollments: UserEnrollment[]
+    courseWorkSubmissionsConnection: {
+      nodes: Submission[]
+      pageInfo: PageInfo
+    }
   }
 }
 
 const USER_COURSE_WORK_QUERY = gql`
-  query GetUserCourseWork($userId: ID!) {
+  query GetUserCourseWork($userId: ID!, $first: Int, $after: String, $last: Int, $before: String, $courseFilter: String, $startDate: ISO8601DateTime, $endDate: ISO8601DateTime, $includeOverdue: Boolean, $includeNoDueDate: Boolean, $onlySubmitted: Boolean) {
     legacyNode(_id: $userId, type: User) {
       ... on User {
         _id
-        enrollments {
-          course {
+        courseWorkSubmissionsConnection(
+          first: $first
+          after: $after
+          last: $last
+          before: $before
+          courseFilter: $courseFilter
+          startDate: $startDate
+          endDate: $endDate
+          includeOverdue: $includeOverdue
+          includeNoDueDate: $includeNoDueDate
+          onlySubmitted: $onlySubmitted
+        ) {
+          nodes {
             _id
-            name
-            assignmentsConnection(
-              first: 50
-            ) {
-              nodes {
+            cachedDueDate
+            submittedAt
+            late
+            missing
+            excused
+            state
+            assignment {
+              _id
+              name
+              dueAt
+              pointsPossible
+              htmlUrl
+              submissionTypes
+              state
+              published
+              quiz {
+                _id
+                title
+              }
+              discussion {
+                _id
+                title
+              }
+              course {
                 _id
                 name
-                dueAt
-                pointsPossible
-                htmlUrl
-                submissionTypes
-                state
-                published
-                quiz {
-                  _id
-                  title
-                }
-                discussion {
-                  _id
-                  title
-                }
-                submissionsConnection(
-                  first: 1
-                  filter: { userId: $userId }
-                ) {
-                  nodes {
-                    _id
-                    cachedDueDate
-                    submittedAt
-                    late
-                    missing
-                    excused
-                    state
-                  }
-                }
               }
             }
+          }
+          pageInfo {
+            hasNextPage
+            hasPreviousPage
+            endCursor
+            startCursor
           }
         }
       }
@@ -166,64 +179,146 @@ function getItemTitle(assignment: Assignment): string {
   return assignment.name
 }
 
-export function useCourseWork() {
-  return useQuery({
-    ...createUserQueryConfig(['courseWork'], QUERY_CONFIG.STALE_TIME.STATISTICS),
-    queryFn: async (): Promise<CourseWorkItem[]> => {
+export interface CourseWorkPaginationInfo {
+  hasNextPage: boolean
+  hasPreviousPage: boolean
+  endCursor: string | null
+  startCursor: string | null
+}
+
+export interface CourseWorkResult {
+  items: CourseWorkItem[]
+  pageInfo: CourseWorkPaginationInfo
+}
+
+interface UseCourseWorkOptions {
+  pageSize?: number
+  courseFilter?: string
+  startDate?: string
+  endDate?: string
+  includeOverdue?: boolean
+  includeNoDueDate?: boolean
+  onlySubmitted?: boolean
+}
+
+type PaginationParams =
+  | {
+      first: number
+      after?: string
+    }
+  | {
+      last: number
+      before?: string
+    }
+
+export function useCourseWork(options: UseCourseWorkOptions = {}) {
+  const {
+    pageSize = 4,
+    courseFilter,
+    startDate,
+    endDate,
+    includeOverdue,
+    includeNoDueDate,
+    onlySubmitted,
+  } = options
+
+  return useInfiniteQuery({
+    ...createUserQueryConfig(
+      [
+        'courseWork',
+        pageSize,
+        courseFilter,
+        startDate,
+        endDate,
+        includeOverdue?.toString(),
+        includeNoDueDate?.toString(),
+        onlySubmitted?.toString(),
+      ],
+      QUERY_CONFIG.STALE_TIME.STATISTICS,
+    ),
+    initialPageParam: null,
+    queryFn: async ({
+      pageParam,
+    }: {pageParam: PaginationParams | null}): Promise<CourseWorkResult> => {
       const currentUserId = getCurrentUserId()
+
+      // Determine pagination parameters
+      const paginationParams = pageParam || {first: pageSize}
 
       const response = await executeGraphQLQuery<GraphQLResponse>(USER_COURSE_WORK_QUERY, {
         userId: currentUserId,
+        ...paginationParams,
+        courseFilter,
+        startDate,
+        endDate,
+        includeOverdue,
+        includeNoDueDate,
+        onlySubmitted,
       })
 
-      if (!response?.legacyNode?.enrollments) {
-        return []
+      if (!response?.legacyNode?.courseWorkSubmissionsConnection) {
+        return {
+          items: [],
+          pageInfo: {
+            hasNextPage: false,
+            hasPreviousPage: false,
+            endCursor: null,
+            startCursor: null,
+          },
+        }
       }
 
-      const allItems: CourseWorkItem[] = []
+      const {nodes: submissions, pageInfo} = response.legacyNode.courseWorkSubmissionsConnection
 
-      response.legacyNode.enrollments.forEach(enrollment => {
-        const course = enrollment.course
+      // Transform submissions to CourseWorkItems
+      const items: CourseWorkItem[] = submissions.map(submission => {
+        const assignment = submission.assignment
+        const effectiveDueDate = submission.cachedDueDate || assignment.dueAt || null
 
-        course.assignmentsConnection.nodes
-          .filter(assignment => {
-            const submission = assignment.submissionsConnection?.nodes?.[0]
-            const due = submission?.cachedDueDate ? new Date(submission.cachedDueDate) : null
-            const today = startOfToday()
-
-            return (
-              assignment.published &&
-              !(submission?.submittedAt || submission?.excused) &&
-              (!due || due >= today)
-            )
-          })
-          .forEach(assignment => {
-            const submission = assignment.submissionsConnection.nodes[0]
-            const cachedDueDate = submission?.cachedDueDate
-            const effectiveDueDate = cachedDueDate || assignment.dueAt || null
-
-            allItems.push({
-              id: assignment._id,
-              title: getItemTitle(assignment),
-              course: {
-                id: course._id,
-                name: course.name,
-              },
-              dueAt: effectiveDueDate,
-              points: assignment.pointsPossible || null,
-              htmlUrl: assignment.htmlUrl,
-              type: determineItemType(assignment),
-            })
-          })
+        return {
+          id: assignment._id,
+          title: getItemTitle(assignment),
+          course: {
+            id: assignment.course._id,
+            name: assignment.course.name,
+          },
+          dueAt: effectiveDueDate,
+          points: assignment.pointsPossible || null,
+          htmlUrl: assignment.htmlUrl,
+          type: determineItemType(assignment),
+          late: submission.late || false,
+          missing: submission.missing || false,
+          state: submission.state || 'not_submitted',
+        }
       })
 
-      // Sort by due date (soonest first, null dates last)
-      return allItems.sort((a, b) => {
-        if (a.dueAt === null && b.dueAt === null) return 0
-        if (a.dueAt === null) return 1
-        if (b.dueAt === null) return -1
-        return new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime()
-      })
+      return {
+        items,
+        pageInfo: {
+          hasNextPage: pageInfo.hasNextPage,
+          hasPreviousPage: pageInfo.hasPreviousPage,
+          endCursor: pageInfo.endCursor,
+          startCursor: pageInfo.startCursor,
+        },
+      }
+    },
+    getNextPageParam: (lastPage): PaginationParams | null => {
+      if (lastPage.pageInfo.hasNextPage && lastPage.pageInfo.endCursor) {
+        return {
+          first: pageSize,
+          after: lastPage.pageInfo.endCursor,
+        }
+      }
+      return null
+    },
+    getPreviousPageParam: (firstPage): PaginationParams | null => {
+      if (firstPage.pageInfo.hasPreviousPage && firstPage.pageInfo.startCursor) {
+        return {
+          last: pageSize,
+          before: firstPage.pageInfo.startCursor,
+        }
+      }
+      return null
     },
   })
 }

@@ -180,7 +180,7 @@ describe GraphQLHelpers::AutoGradeEligibilityHelper do
           attachments: []
         )
 
-        bad_attachment = double("Attachment", mimetype: "text/plain")
+        bad_attachment = instance_double(Attachment, mimetype: "text/plain")
         allow(submission).to receive_messages(attachments: [bad_attachment], extract_text_from_upload?: true, attachment_contains_images: false, word_count: 50)
 
         issues = described_class.validate_submission(submission:)
@@ -196,7 +196,7 @@ describe GraphQLHelpers::AutoGradeEligibilityHelper do
           attachments: []
         )
 
-        bad_attachment = double("Attachment", mimetype: "text/plain")
+        bad_attachment = instance_double(Attachment, mimetype: "text/plain")
         allow(submission).to receive_messages(attachments: [bad_attachment], extract_text_from_upload?: true, attachment_contains_images: false, word_count: 50)
 
         issues = described_class.validate_submission(submission:)
@@ -214,7 +214,7 @@ describe GraphQLHelpers::AutoGradeEligibilityHelper do
           attachments: []
         )
 
-        bad_attachment = double("Attachment", mimetype: "application/pdf")
+        bad_attachment = instance_double(Attachment, mimetype: "application/pdf")
         allow(submission).to receive_messages(attachments: [bad_attachment], extract_text_from_upload?: true, attachment_contains_images: true, word_count: 50)
         allow(submission).to receive(:contains_images).and_return(true)
 

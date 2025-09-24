@@ -17,7 +17,7 @@
  */
 
 import {ToolbarButton} from './ToolbarButton'
-import {IconDiscussionReply2Line} from '@instructure/ui-icons'
+import {IconUndoLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('block_content_editor')
@@ -30,8 +30,9 @@ export const UndoButton = (props: {
     <ToolbarButton
       interaction={props.active ? 'enabled' : 'disabled'}
       screenReaderLabel={I18n.t('undo')}
-      renderIcon={<IconDiscussionReply2Line />}
+      renderIcon={<IconUndoLine />}
       onClick={props.onClick}
+      data-testid="undo-button"
     />
   )
 }

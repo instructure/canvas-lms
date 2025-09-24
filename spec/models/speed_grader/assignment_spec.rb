@@ -1834,68 +1834,6 @@ describe SpeedGrader::Assignment do
     end
   end
 
-  describe "asset reports" do
-    let(:assignment) do
-      @assignment = Assignment.create!(
-        title: "title",
-        context: @course,
-        submission_types: ["online_upload"]
-      )
-    end
-    let(:ap1) { lti_asset_processor_model(title: "ap 1", assignment:) }
-    let(:ap2) { lti_asset_processor_model(title: "ap 2", assignment:) }
-
-    before do
-      [ap1, ap2]
-      @teacher = teacher_in_course(course: assignment.course, active_all: true).user
-      @student1 = student_in_course(course: assignment.course, active_all: true).user
-      @student2 = student_in_course(course: assignment.course, active_all: true).user
-      @submission1 = assignment.submit_homework(@student1, submission_type: "online_upload", attachments: [attachment_model])
-      @submission2 = assignment.submit_homework(@student2, submission_type: "online_upload", attachments: [attachment_model])
-    end
-
-    it "returns reports' info_for_display_by_submission and processors' info_for_display" do
-      rep1 = { "processing_progress" => "Processing" }
-      rep2 = { "processing_progress" => "Failed", "error_code" => "EULA_NOT_ACCEPTED" }
-
-      expect(Lti::AssetReport).to receive(:info_for_display_by_submission) do |submission_ids:|
-        expect(submission_ids).to include(@submission1.id, @submission2.id)
-        {
-          @submission1.id => { by_attachment: { 123 => { ap1.id => [rep1] } } },
-          @submission2.id => { by_attachment: { 67 => { ap2.id => [rep2] } } }
-        }
-      end
-
-      json = SpeedGrader::Assignment.new(@assignment, @teacher).json
-      json = JSON.parse(json.to_json)
-
-      aps_json = json["lti_asset_processors"]
-      expect(aps_json).to match([
-                                  a_hash_including("id" => ap1.id.to_s, "title" => "ap 1", "tool_name" => ap1.context_external_tool.name),
-                                  a_hash_including("id" => ap2.id.to_s, "title" => "ap 2", "tool_name" => ap2.context_external_tool.name)
-                                ])
-
-      sub1 = json["submissions"].find { it["id"] == @submission1.id.to_s }
-      sub2 = json["submissions"].find { it["id"] == @submission2.id.to_s }
-      expect(sub1["lti_asset_reports"]).to eq({
-                                                "by_attachment" => { "123" => { ap1.id.to_s => [rep1] } }
-                                              })
-      expect(sub2["lti_asset_reports"]).to eq({
-                                                "by_attachment" => { "67" => { ap2.id.to_s => [rep2] } }
-                                              })
-    end
-
-    context "when info_for_display_by_submission returns no reports" do
-      it "doesn't not include lti_asset_reports or lti_asset_processors" do
-        expect(Lti::AssetReport).to receive(:info_for_display_by_submission).and_return({})
-        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
-        expect(json).not_to have_key("lti_asset_reports")
-        expect(json["submissions"].first).not_to have_key("lti_asset_reports")
-        expect(json["submissions"].last).not_to have_key("lti_asset_reports")
-      end
-    end
-  end
-
   describe "honoring gradebook preferences" do
     let_once(:test_course) do
       test_course = course_factory(active_course: true)

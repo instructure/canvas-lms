@@ -34,6 +34,19 @@ class DeveloperKey < ActiveRecord::Base
   CONFIDENTIAL_CLIENT_TYPE = "confidential"
   PUBLIC_CLIENT_TYPE = "public"
   ALLOWED_AUTHORIZED_FLOWS = ["service_user_client_credentials"].freeze
+  TRACKED_ATTRIBUTES = %w[
+    email
+    user_name
+    name
+    redirect_uri
+    redirect_uris
+    icon_url
+    vendor_code
+    public_jwk
+    oidc_initiation_url
+    public_jwk_url
+    scopes
+  ].freeze
 
   include CustomValidations
   include Workflow
@@ -219,6 +232,10 @@ class DeveloperKey < ActiveRecord::Base
     ims_registration&.destroy
     lti_registration&.destroy
     developer_key_account_bindings&.find_each(&:destroy)
+  end
+
+  def current_tracked_attributes
+    attributes.with_indifferent_access.slice(*TRACKED_ATTRIBUTES)
   end
 
   class << self

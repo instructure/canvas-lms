@@ -68,46 +68,54 @@ const mockAnnouncementsData = {
 }
 
 const server = setupServer(
-  // Handle GetUserCoursesWithGrades query with default handler
-  graphql.query('GetUserCoursesWithGrades', () => {
+  // Handle GetUserCoursesWithGradesConnection query (used by useUserCourses)
+  graphql.query('GetUserCoursesWithGradesConnection', () => {
     return HttpResponse.json({
       data: {
         legacyNode: {
           _id: '123',
-          enrollments: [
-            {
-              course: {
-                _id: '1',
-                name: 'Introduction to Computer Science',
-                courseCode: 'CS101',
+          enrollmentsConnection: {
+            nodes: [
+              {
+                course: {
+                  _id: '1',
+                  name: 'Introduction to Computer Science',
+                  courseCode: 'CS101',
+                },
+                updatedAt: '2025-01-01T00:00:00Z',
+                grades: {
+                  currentScore: 95,
+                  currentGrade: 'A',
+                  finalScore: 95,
+                  finalGrade: 'A',
+                  overrideScore: null,
+                  overrideGrade: null,
+                },
               },
-              updatedAt: '2025-01-01T00:00:00Z',
-              grades: {
-                currentScore: 95,
-                currentGrade: 'A',
-                finalScore: 95,
-                finalGrade: 'A',
-                overrideScore: null,
-                overrideGrade: null,
+              {
+                course: {
+                  _id: '2',
+                  name: 'Advanced Mathematics',
+                  courseCode: 'MATH301',
+                },
+                updatedAt: '2025-01-01T00:00:00Z',
+                grades: {
+                  currentScore: 87,
+                  currentGrade: 'B+',
+                  finalScore: 87,
+                  finalGrade: 'B+',
+                  overrideScore: null,
+                  overrideGrade: null,
+                },
               },
+            ],
+            pageInfo: {
+              hasNextPage: false,
+              hasPreviousPage: false,
+              startCursor: null,
+              endCursor: null,
             },
-            {
-              course: {
-                _id: '2',
-                name: 'Advanced Mathematics',
-                courseCode: 'MATH301',
-              },
-              updatedAt: '2025-01-01T00:00:00Z',
-              grades: {
-                currentScore: 87,
-                currentGrade: 'B+',
-                finalScore: 87,
-                finalGrade: 'B+',
-                overrideScore: null,
-                overrideGrade: null,
-              },
-            },
-          ],
+          },
         },
       },
     })
@@ -136,6 +144,22 @@ const server = setupServer(
     return HttpResponse.json({
       data: {
         announcements: [],
+      },
+    })
+  }),
+  // Handle GetCourseInstructorsPaginated query
+  graphql.query('GetCourseInstructorsPaginated', () => {
+    return HttpResponse.json({
+      data: {
+        courseInstructorsConnection: {
+          nodes: [],
+          pageInfo: {
+            hasNextPage: false,
+            hasPreviousPage: false,
+            startCursor: null,
+            endCursor: null,
+          },
+        },
       },
     })
   }),
@@ -207,12 +231,12 @@ describe('DashboardTab', () => {
     cleanup()
   })
 
-  it('should render widget grid with course work summary widget', async () => {
+  it('should render widget grid with course work widget', async () => {
     const {getByTestId, cleanup} = setup()
 
     await waitFor(() => {
       expect(getByTestId('widget-grid')).toBeInTheDocument()
-      expect(getByTestId('widget-course-work-widget')).toBeInTheDocument()
+      expect(getByTestId('widget-course-work-combined-widget')).toBeInTheDocument()
     })
 
     cleanup()
@@ -222,28 +246,7 @@ describe('DashboardTab', () => {
     const {getByText, cleanup} = setup()
 
     await waitFor(() => {
-      expect(getByText("Today's course work")).toBeInTheDocument()
-    })
-
-    cleanup()
-  })
-
-  it('should handle course statistics loading state', async () => {
-    // Override server to return delayed response
-    server.use(
-      graphql.query('GetUserCourseStatistics', () => {
-        return new Promise(resolve => {
-          setTimeout(() => {
-            resolve(HttpResponse.json(mockStatisticsData))
-          }, 100)
-        })
-      }),
-    )
-
-    const {getByText, cleanup} = setup()
-
-    await waitFor(() => {
-      expect(getByText('Loading course work data...')).toBeInTheDocument()
+      expect(getByText('Course Work')).toBeInTheDocument()
     })
 
     cleanup()

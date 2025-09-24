@@ -17,6 +17,7 @@
  */
 
 import {BlockContentEditorContextType} from '../BlockContentEditorContext'
+import {AccessibilityIssue} from '../accessibilityChecker/types'
 
 export type Mocks = {
   openMock: jest.Mock
@@ -42,7 +43,15 @@ export const mockBlockContentEditorContext = ({openMock = jest.fn()}: Partial<Mo
     editingBlock: {
       id: null,
       setId: jest.fn(),
+      idRef: {current: null},
       addSaveCallback: jest.fn(),
       deleteSaveCallback: jest.fn(),
     },
+    accessibility: {
+      addA11yIssues: jest.fn(),
+      removeA11yIssues: jest.fn(),
+      a11yIssueCount: 0,
+      a11yIssues: new Map<string, AccessibilityIssue[]>(),
+    },
+    aiAltTextEnabled: false,
   }) as BlockContentEditorContextType

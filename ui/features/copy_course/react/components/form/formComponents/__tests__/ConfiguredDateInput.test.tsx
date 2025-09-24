@@ -26,7 +26,6 @@ import {getI18nFormats} from '@canvas/datetime/configureDateTime'
 import tz from 'timezone'
 import chicago from 'timezone/America/Chicago'
 import detroit from 'timezone/America/Detroit'
-// @ts-expect-error
 import denver from 'timezone/America/Denver'
 import fakeENV from '@canvas/test-utils/fakeENV'
 

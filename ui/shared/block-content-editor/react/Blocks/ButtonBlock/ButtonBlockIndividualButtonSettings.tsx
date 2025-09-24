@@ -24,6 +24,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {IconTrashLine, IconAddLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {TruncateText} from '@instructure/ui-truncate-text'
 import './individual-button-settings.css'
 import {ButtonData, ButtonBlockIndividualButtonSettingsProps, ButtonStyle} from './types'
 import {useButtonManager} from './useButtonManager'
@@ -96,7 +97,8 @@ export const ButtonBlockIndividualButtonSettings = ({
         </SimpleSelect.Option>
       </SimpleSelect>
       <ColorPickerWrapper
-        label={button.style === 'filled' ? I18n.t('Background color') : I18n.t('Button color')}
+        label={I18n.t('Button color')}
+        popoverButtonScreenReaderLabel={I18n.t('Open button color picker popover')}
         value={button.primaryColor}
         baseColor={button.style === 'filled' ? button.secondaryColor : backgroundColor}
         baseColorLabel={
@@ -107,6 +109,7 @@ export const ButtonBlockIndividualButtonSettings = ({
       {button.style === 'filled' && (
         <ColorPickerWrapper
           label={I18n.t('Text color')}
+          popoverButtonScreenReaderLabel={I18n.t('Open text color picker popover')}
           value={button.secondaryColor}
           baseColor={button.primaryColor}
           baseColorLabel={I18n.t('Background color')}
@@ -137,6 +140,7 @@ export const ButtonBlockIndividualButtonSettings = ({
 
   const renderButtonSettings = (button: ButtonData, buttonIndex: number) => {
     const isExpanded = expandedButtonId === button.id
+    const buttonTitle = button.text || I18n.t('Button')
     return (
       <View
         key={button.id}
@@ -148,12 +152,16 @@ export const ButtonBlockIndividualButtonSettings = ({
         <ToggleGroup
           summary={
             <Flex justifyItems="space-between" alignItems="center">
-              <Text>{I18n.t('Button')}</Text>
+              <Flex.Item shouldGrow shouldShrink>
+                <TruncateText>{buttonTitle}</TruncateText>
+              </Flex.Item>
               <IconButton
                 onClick={() => handleButtonRemove(button.id, buttonIndex)}
                 withBackground={false}
                 withBorder={false}
-                screenReaderLabel={I18n.t('Delete button')}
+                screenReaderLabel={I18n.t('Delete %{buttonTitle}', {
+                  buttonTitle: buttonTitle,
+                })}
                 disabled={!canDeleteButton}
                 margin="0 medium"
                 data-testid={`button-settings-delete-${button.id}`}
@@ -164,9 +172,7 @@ export const ButtonBlockIndividualButtonSettings = ({
           }
           expanded={isExpanded}
           onToggle={() => handleButtonToggle(button.id)}
-          toggleLabel={
-            isExpanded ? I18n.t('Collapse button settings') : I18n.t('Expand button settings')
-          }
+          toggleLabel={I18n.t('%{buttonTitle} settings', {buttonTitle})}
           data-buttonsettingstoggle
           data-testid={`button-settings-toggle-${button.id}`}
           ref={(el: ToggleGroup | null) => {

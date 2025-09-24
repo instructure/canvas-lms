@@ -8,4 +8,5 @@ owned_globs:
   - ui/features/course_link_validator/**/*
   - ui/features/files/**/*
   - ui/features/files_v2/**/*
+  - ui/shared/block-content-editor/**/*
   - ui/shared/immersive-reader/**/*

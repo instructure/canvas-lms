@@ -82,7 +82,7 @@ export const MoveButton = (props: {
       trigger={
         <IconButton
           data-testid="move-block-button"
-          data-copybutton
+          data-action-button
           screenReaderLabel={I18n.t('Move block')}
         >
           <IconSortLine />

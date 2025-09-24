@@ -544,11 +544,12 @@ CanvasRails::Application.routes.draw do
         get "preview" => "accessibility/preview#show"
         post "generate" => "accessibility/generate#create"
         post "scan" => "accessibility/scan#create"
+        get "issue_summary" => "accessibility/issue_summary#show"
       end
     end
 
     resources :accessibility_resource_scans, only: [:index]
-    resources :accessibility_issues, only: [:update]
+    resources :accessibility_issues, only: [:update, :show]
   end
 
   get "quiz_statistics/:quiz_statistics_id/files/:file_id/download" => "files#show", :as => :quiz_statistics_download, :download => "1"
@@ -868,7 +869,7 @@ CanvasRails::Application.routes.draw do
   get "images/thumbnails/show/:id/:uuid" => "files#show_thumbnail", :as => :show_thumbnail_image
   get "images/thumbnails/show/:id" => "files#show_thumbnail", :as => :show_thumbnail_image_plain
   get "images/thumbnails/:id/:uuid" => "files#image_thumbnail", :as => :thumbnail_image
-  get "images/thumbnails/:id" => "files#image_thumbnail_plain", :as => :thumbnail_image_plain
+  get "images/thumbnails/:id" => "files#image_thumbnail", :as => :thumbnail_image_plain
   post "images/users/:user_id/report" => "users#report_avatar_image", :as => :report_avatar_image
   put "images/users/:user_id" => "users#update_avatar_image", :as => :update_avatar_image
   get "grades" => "users#grades"
@@ -1861,6 +1862,11 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/permissions/:permission", action: :check_account_permission
     end
 
+    scope(controller: :permissions_help) do
+      get "permissions/groups", action: :groups
+      get "permissions/:context_type/:permission/help", action: :help
+    end
+
     scope(controller: :account_reports) do
       get "accounts/:account_id/reports/:report", action: :index
       get "accounts/:account_id/reports", action: :available_reports
@@ -1895,7 +1901,13 @@ CanvasRails::Application.routes.draw do
       put "accounts/:account_id/authentication_providers/:id/restore", action: :restore, as: "account_restore_ap"
     end
 
-    get "users/:user_id/page_views", controller: :page_views, action: :index, as: "user_page_views"
+    scope(controller: :page_views) do
+      get "users/:user_id/page_views", action: :index, as: "user_page_views"
+      post "users/:user_id/page_views/query", action: :query, as: "user_page_views_enqueue_query"
+      get "users/:user_id/page_views/query/:query_id", action: :poll_query, as: "page_views_poll_query_status"
+      get "users/:user_id/page_views/query/:query_id/results", action: :query_results, as: "page_views_get_query_results"
+    end
+
     get "users/:user_id/profile", controller: :profile, action: :settings
     get "users/:user_id/avatars", controller: :profile, action: :profile_pics
 
@@ -2379,6 +2391,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: "support_helpers/asset_processor") do
       get "support_helpers/asset_processor/submission_details", action: :submission_details
+      post "support_helpers/asset_processor/bulk_resubmit", action: :bulk_resubmit
     end
 
     scope(controller: :outcome_groups_api) do
@@ -2416,6 +2429,7 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/outcome_rollups", action: :rollups, as: "course_outcome_rollups"
       get "courses/:course_id/outcome_results", action: :index, as: "course_outcome_results"
       post "courses/:course_id/assign_outcome_order", action: :outcome_order, as: "course_outcomes_order"
+      post "enqueue_outcome_rollup_calculation", action: :enqueue_outcome_rollup_calculation
     end
 
     scope(controller: :outcomes_academic_benchmark_import_api) do
@@ -2442,6 +2456,7 @@ CanvasRails::Application.routes.draw do
       post "group_categories/:group_category_id/assign_unassigned_members", action: "assign_unassigned_members", as: "group_category_assign_unassigned_members"
       post "courses/:course_id/group_categories/bulk_manage_differentiation_tag", action: :bulk_manage_differentiation_tag
       post "courses/:course_id/group_categories/import_tags", action: :import_tags
+      get "courses/:course_id/group_categories/export_tags", action: :export_tags, as: "differentiation_tags_export", defaults: { format: :csv }
     end
 
     scope(controller: :progress) do

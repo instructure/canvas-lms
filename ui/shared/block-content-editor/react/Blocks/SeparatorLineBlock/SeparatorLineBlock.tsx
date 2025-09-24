@@ -19,17 +19,17 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {BorderWidth, BorderWidthValues} from '@instructure/emotion'
-import {BaseBlockHOC} from '../BaseBlock'
+import {BaseBlock} from '../BaseBlock'
 import {SeparatorLineBlockSettings} from './SeparatorLineBlockSettings'
+import {defaultProps} from './defaultProps'
+import {separatorLineContrast} from '../../accessibilityChecker/rules/separatorLineContrast'
 
 const I18n = createI18nScope('block_content_editor')
 
 export type SeparatorLineBlockProps = {
   thickness: BorderWidthValues
-  settings: {
-    separatorColor: string
-    backgroundColor: string
-  }
+  separatorColor: string
+  backgroundColor: string
 }
 
 export const SeparatorLineBlockView = (props: SeparatorLineBlockProps) => {
@@ -38,26 +38,29 @@ export const SeparatorLineBlockView = (props: SeparatorLineBlockProps) => {
   return (
     <View
       as="hr"
+      aria-hidden="true"
       data-testid="separator-line"
       borderWidth={borderWidth}
       borderColor="primary"
       margin="none"
       themeOverride={{
-        borderColorPrimary: props.settings.separatorColor,
+        borderColorPrimary: props.separatorColor,
       }}
     />
   )
 }
 
-export const SeparatorLineBlock = (props: SeparatorLineBlockProps) => {
+export const SeparatorLineBlock = (props: Partial<SeparatorLineBlockProps>) => {
+  const componentProps = {...defaultProps, ...props}
   return (
-    <BaseBlockHOC
+    <BaseBlock
       ViewComponent={SeparatorLineBlockView}
       EditViewComponent={SeparatorLineBlockView}
       EditComponent={SeparatorLineBlockView}
-      componentProps={props}
+      componentProps={componentProps}
       title={SeparatorLineBlock.craft.displayName}
-      backgroundColor={props.settings.backgroundColor}
+      backgroundColor={componentProps.backgroundColor}
+      customAccessibilityCheckRules={[separatorLineContrast]}
     />
   )
 }

@@ -19,17 +19,17 @@
 #
 
 describe Analyzers::CanvasAntiabuseAnalyzer do
-  let(:subject_double) { double("GraphQL::Query") }
+  let(:subject_double) { instance_double(GraphQL::Query) }
   let(:analyzer) { described_class.new(subject_double) }
 
   before do
-    analyzer.instance_variable_set(:@query, double("Query", operation_name: "TestOp"))
+    analyzer.instance_variable_set(:@query, instance_double(GraphQL::Query, operation_name: "TestOp"))
   end
 
   describe "#on_leave_field" do
     let(:node) do
-      double(
-        "Node",
+      instance_double(
+        GraphQL::Language::Nodes::Field,
         alias: node_alias,
         directives:
       )
@@ -37,7 +37,10 @@ describe Analyzers::CanvasAntiabuseAnalyzer do
 
     context "when node has an alias and directives" do
       let(:node_alias) { "myAlias" }
-      let(:directives) { [double("Directive1"), double("Directive2")] }
+      let(:directives) do
+        [instance_double(GraphQL::Language::Nodes::Directive),
+         instance_double(GraphQL::Language::Nodes::Directive)]
+      end
 
       it "increments alias and directive counts" do
         analyzer.on_leave_field(node, nil, nil)
@@ -71,7 +74,7 @@ describe Analyzers::CanvasAntiabuseAnalyzer do
       end
 
       it "returns an alias limit analysis error and logs to Sentry" do
-        expect(Sentry).to receive(:with_scope).and_yield(double("Scope", set_context: nil))
+        expect(Sentry).to receive(:with_scope).and_yield(instance_double(Sentry::Scope, set_context: nil))
         expect(Sentry).to receive(:capture_message).with(
           "GraphQL: max query aliases exceeded",
           level: :warning
@@ -89,7 +92,7 @@ describe Analyzers::CanvasAntiabuseAnalyzer do
       end
 
       it "returns a directive limit analysis error and logs to Sentry" do
-        expect(Sentry).to receive(:with_scope).and_yield(double("Scope", set_context: nil))
+        expect(Sentry).to receive(:with_scope).and_yield(instance_double(Sentry::Scope, set_context: nil))
         expect(Sentry).to receive(:capture_message).with(
           "GraphQL: max query directives exceeded",
           level: :warning

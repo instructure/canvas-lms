@@ -39,7 +39,12 @@ export type RubricAssessmentTrayProps = {
   isSelfAssessment?: boolean
   rubric?: Pick<
     Rubric,
-    'title' | 'criteria' | 'ratingOrder' | 'freeFormCriterionComments' | 'pointsPossible'
+    | 'title'
+    | 'criteria'
+    | 'ratingOrder'
+    | 'freeFormCriterionComments'
+    | 'pointsPossible'
+    | 'buttonDisplay'
   >
   rubricAssessmentData: RubricAssessmentData[]
   rubricSavedComments?: Record<string, string[]>
@@ -85,6 +90,7 @@ export const RubricAssessmentTray = ({
       ) : (
         <View as="div" padding="medium medium 0 medium" themeOverride={{paddingMedium: '1rem'}}>
           <RubricAssessmentContainerWrapper
+            buttonDisplay={rubric.buttonDisplay ?? 'level'}
             criteria={rubric.criteria ?? []}
             currentUserId={ENV.current_user_id ?? ''}
             hidePoints={hidePoints}

@@ -23,6 +23,10 @@ import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
 import AnnouncementsWidget from '../AnnouncementsWidget'
 import type {BaseWidgetProps, Widget} from '../../../../types'
+import {
+  WidgetDashboardProvider,
+  type SharedCourseData,
+} from '../../../../hooks/useWidgetDashboardContext'
 
 const mockWidget: Widget = {
   id: 'test-announcements-widget',
@@ -31,6 +35,25 @@ const mockWidget: Widget = {
   size: {width: 1, height: 1},
   title: 'Announcements',
 }
+
+const mockSharedCourseData: SharedCourseData[] = [
+  {
+    courseId: '1',
+    courseCode: 'CS 101',
+    courseName: 'Test Course 1',
+    currentGrade: 95,
+    gradingScheme: 'letter',
+    lastUpdated: '2025-01-01T00:00:00Z',
+  },
+  {
+    courseId: '2',
+    courseCode: 'ENG 201',
+    courseName: 'Test Course 2',
+    currentGrade: 88,
+    gradingScheme: 'percentage',
+    lastUpdated: '2025-01-02T00:00:00Z',
+  },
+]
 
 // Mock responses for different read states
 const mockAllAnnouncementsResponse = {
@@ -179,7 +202,11 @@ const buildDefaultProps = (overrides: Partial<BaseWidgetProps> = {}): BaseWidget
   }
 }
 
-const setup = (props: BaseWidgetProps = buildDefaultProps(), envOverrides = {}) => {
+const setup = (
+  props: BaseWidgetProps = buildDefaultProps(),
+  envOverrides = {},
+  sharedCourseData: SharedCourseData[] = mockSharedCourseData,
+) => {
   // Set up Canvas ENV with current_user_id
   const originalEnv = window.ENV
   window.ENV = {
@@ -199,7 +226,11 @@ const setup = (props: BaseWidgetProps = buildDefaultProps(), envOverrides = {}) 
 
   const result = render(<AnnouncementsWidget {...props} />, {
     wrapper: ({children}: {children: React.ReactNode}) => (
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        <WidgetDashboardProvider sharedCourseData={sharedCourseData}>
+          {children}
+        </WidgetDashboardProvider>
+      </QueryClientProvider>
     ),
   })
 
@@ -218,38 +249,46 @@ const mockCourseGradesResponse = {
   data: {
     legacyNode: {
       _id: '123',
-      enrollments: [
-        {
-          course: {
-            _id: '1',
-            name: 'Test Course 1',
-            courseCode: 'MATH 101',
+      enrollmentsConnection: {
+        nodes: [
+          {
+            course: {
+              _id: '1',
+              name: 'Test Course 1',
+              courseCode: 'MATH 101',
+            },
+            grades: {
+              currentScore: 85,
+              currentGrade: 'B',
+              finalScore: null,
+              finalGrade: null,
+              overrideScore: null,
+              overrideGrade: null,
+            },
           },
-          grades: {
-            currentScore: 85,
-            currentGrade: 'B',
-            finalScore: null,
-            finalGrade: null,
-            overrideScore: null,
-            overrideGrade: null,
+          {
+            course: {
+              _id: '2',
+              name: 'Test Course 2',
+              courseCode: 'ENG 201',
+            },
+            grades: {
+              currentScore: 92,
+              currentGrade: 'A-',
+              finalScore: null,
+              finalGrade: null,
+              overrideScore: null,
+              overrideGrade: null,
+            },
           },
+        ],
+        pageInfo: {
+          hasNextPage: false,
+          hasPreviousPage: false,
+          startCursor: null,
+          endCursor: null,
         },
-        {
-          course: {
-            _id: '2',
-            name: 'Test Course 2',
-            courseCode: 'ENG 201',
-          },
-          grades: {
-            currentScore: 92,
-            currentGrade: 'A-',
-            finalScore: null,
-            finalGrade: null,
-            overrideScore: null,
-            overrideGrade: null,
-          },
-        },
-      ],
+      },
     },
   },
 }
@@ -664,7 +703,7 @@ describe('AnnouncementsWidget', () => {
       graphql.query('GetUserAnnouncements', ({variables}) => {
         return HttpResponse.json(getMockResponseForReadState(variables.readState))
       }),
-      graphql.query('GetUserCoursesWithGrades', () => {
+      graphql.query('GetUserCoursesWithGradesConnection', () => {
         return HttpResponse.json(mockCourseGradesResponse)
       }),
     )
@@ -679,6 +718,64 @@ describe('AnnouncementsWidget', () => {
     })
 
     expect(screen.getByText('ENG 201')).toBeInTheDocument() // Course code should be enriched
+
+    cleanup()
+  })
+
+  it('decodes HTML entities in announcement messages', async () => {
+    const htmlEntitiesResponse = {
+      data: {
+        legacyNode: {
+          _id: '123',
+          discussionParticipantsConnection: {
+            nodes: [
+              {
+                id: 'participant1',
+                read: false,
+                discussionTopic: {
+                  _id: '1',
+                  title: 'Test Announcement with Entities',
+                  message:
+                    '<p>Test&nbsp;with&nbsp;non-breaking&nbsp;spaces&amp;ampersands&lt;brackets&gt;</p>',
+                  createdAt: '2025-01-15T10:00:00Z',
+                  contextName: 'Test Course',
+                  contextId: '1',
+                  isAnnouncement: true,
+                  author: {
+                    _id: 'user1',
+                    name: 'Test Teacher',
+                    avatarUrl: 'https://example.com/avatar.jpg',
+                  },
+                },
+              },
+            ],
+            pageInfo: {
+              hasNextPage: false,
+              hasPreviousPage: false,
+              startCursor: null,
+              endCursor: null,
+            },
+          },
+        },
+      },
+    }
+
+    server.use(
+      graphql.query('GetUserAnnouncements', () => {
+        return HttpResponse.json(htmlEntitiesResponse)
+      }),
+    )
+
+    const {cleanup} = setup()
+
+    await waitForLoadingToComplete()
+
+    await waitFor(() => {
+      // Should show decoded entities: non-breaking spaces, ampersands, and brackets
+      expect(
+        screen.getByText(/Test with non-breaking spaces&ampersands<brackets>/),
+      ).toBeInTheDocument()
+    })
 
     cleanup()
   })

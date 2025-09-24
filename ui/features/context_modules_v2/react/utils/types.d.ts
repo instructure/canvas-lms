@@ -17,6 +17,7 @@
  */
 
 import {type Root} from 'react-dom/client'
+import {NEW_ITEM_FIELDS} from '../utils/constants'
 
 export interface MasteryPathsData {
   isCyoeAble: boolean
@@ -44,6 +45,39 @@ export interface StandardizedDateHash {
     id?: string
     type?: string
   }
+}
+
+export type ExternalUrl = {
+  url: string
+  name: string
+  newTab: boolean
+  isUrlValid?: boolean
+}
+
+export type ExternalToolUrl = {
+  url: string
+  name: string
+  newTab: boolean
+  selectedToolId?: string
+  isUrlValid?: boolean
+}
+
+export type NewItem = {
+  name: string
+  assignmentGroup: string
+  file: File | null
+  folder: string
+}
+
+export type FormState = {
+  indentation: number
+  textHeader: string
+  externalUrl: ExternalUrl
+  externalTool: ExternalToolUrl
+  newItem: NewItem
+  selectedItemId: string
+  tabIndex: number
+  isLoading: boolean
 }
 
 // Add new menu actions here (e.g., 'delete', 'sendTo', 'copyTo')
@@ -270,6 +304,7 @@ export interface ModuleItem {
   id: string
   _id: string
   url: string
+  moduleItemUrl: string | null
   title: string
   indent: number
   position: number
@@ -277,6 +312,15 @@ export interface ModuleItem {
   masterCourseRestrictions: ModuleItemMasterCourseRestrictionType | null
   newTab?: boolean
   published?: boolean
+  masteryPaths?: ModuleItemMasteryPath
+}
+
+export interface ModuleItemMasteryPath {
+  awaitingChoice?: boolean
+  chooseUrl?: string
+  locked?: boolean
+  stillProcessing?: boolean
+  assignmentSetCount?: number
 }
 
 export type ModuleAction = 'move_module' | 'move_module_item' | 'move_module_contents'
@@ -395,6 +439,12 @@ export interface ModuleActionEventDetail {
   [key: string]: unknown
 }
 
+export type ModulePageNavigationEvent = 'module-page-navigation'
+export interface ModulePageNavigationDetail {
+  moduleId: string
+  pageNumber: number
+}
+
 export interface HTMLElementWithRoot extends HTMLElement {
   reactRoot?: Root
 }
@@ -411,12 +461,20 @@ declare global {
       listener: (event: CustomEvent<ModuleActionEventDetail>) => void,
     ): void
     addEventListener(
+      type: ModulePageNavigationEvent,
+      listener: (event: CustomEvent<ModulePageNavigationDetail>) => void,
+    ): void
+    addEventListener(
       type: DragStateChangeEvent,
       listener: (event: CustomEvent<DragStateChangeDetail>) => void,
     ): void
     removeEventListener(
       type: ModuleKBActionEvent,
       listener: (event: CustomEvent<ModuleActionEventDetail>) => void,
+    ): void
+    removeEventListener(
+      type: ModulePageNavigationEvent,
+      listener: (event: CustomEvent<ModulePageNavigationDetail>) => void,
     ): void
     removeEventListener(
       type: DragStateChangeEvent,

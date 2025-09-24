@@ -195,6 +195,7 @@ describe('ModuleItemList duplicate loading banner', () => {
               id: 'itm-9',
               _id: 'itm-9',
               url: '#',
+              moduleItemUrl: null,
               title: 'Dup me',
               indent: 0,
               content: {id: 'c-1', _id: 'c-1', published: true, canUnpublish: true} as any,

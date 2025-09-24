@@ -131,6 +131,33 @@ describe('Shared > Network > RequestDispatch', () => {
       const results = await Promise.all(requests)
       expect(results).toHaveLength(4)
     })
+
+    it('includes custom headers in the request', async () => {
+      const customHeaders = {'X-Custom-Header': 'test-value', Authorization: 'Bearer token'}
+
+      server.use(
+        http.get(TEST_URL, ({request}) => {
+          expect(request.headers.get('X-Custom-Header')).toBe('test-value')
+          expect(request.headers.get('Authorization')).toBe('Bearer token')
+          return HttpResponse.json({})
+        }),
+      )
+
+      await dispatch.getJSON(TEST_URL, {}, customHeaders)
+    })
+
+    it('ignores invalid headers', async () => {
+      server.use(
+        http.get(TEST_URL, ({request}) => {
+          expect(request.headers.get('X-Invalid-Header')).toBeNull()
+          return HttpResponse.json({})
+        }),
+      )
+
+      await dispatch.getJSON(TEST_URL, {}, null as any)
+      await dispatch.getJSON(TEST_URL, {}, 'invalid' as any)
+      await dispatch.getJSON(TEST_URL, {}, undefined)
+    })
   })
 
   describe('#getDepaginated()', () => {
@@ -207,6 +234,26 @@ describe('Shared > Network > RequestDispatch', () => {
         ),
       )
       const result = await getDepaginated()
+      expect(result).toEqual([{example: true}])
+    })
+
+    it('includes custom headers in paginated requests', async () => {
+      const customHeaders = {'X-Custom-Header': 'test-value'}
+
+      server.use(
+        http.get(TEST_URL, ({request}) => {
+          expect(request.headers.get('X-Custom-Header')).toBe('test-value')
+          return HttpResponse.json([{example: true}])
+        }),
+      )
+
+      const result = await dispatch.getDepaginated(
+        TEST_URL,
+        {},
+        undefined,
+        undefined,
+        customHeaders,
+      )
       expect(result).toEqual([{example: true}])
     })
   })

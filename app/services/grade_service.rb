@@ -158,7 +158,7 @@ class GradeService
       next unless criterion_data
 
       matched_rating = (criterion_data[:ratings] || []).find do |r|
-        normalize_quotes(r[:long_description].to_s.strip) == normalize_quotes(selected_description.to_s.strip)
+        TextNormalizerHelper.normalize(r[:long_description]) == TextNormalizerHelper.normalize(selected_description)
       end
       next unless matched_rating
 
@@ -173,10 +173,6 @@ class GradeService
         }
       }
     end
-  end
-
-  def normalize_quotes(str)
-    str.gsub(/[‘’]/, "'").gsub(/[“”]/, '"')
   end
 
   def filter_repeating_keys(json_array)

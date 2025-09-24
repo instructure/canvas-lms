@@ -74,10 +74,13 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   scope :active, -> { where("workflow_state='active' OR workflow_state IS NULL") }
   scope :generated, -> { where(workflow_state: "generated") }
   scope :not_deleted, -> { where.not(workflow_state: "deleted").or(where(workflow_state: nil)) }
+  scope :without_assessment_question_association, -> { where(assessment_question_id: nil) }
+
+  attr_accessor :force_attachment_associations_update
 
   def update_attachment_associations
     return unless attachment_associations_enabled?
-    return unless saved_change_to_attribute?(:question_data)
+    return if !saved_change_to_attribute?(:question_data) && !force_attachment_associations_update
 
     all_html = [
       question_data[:question_text],
@@ -96,7 +99,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
       end
     end
 
-    associate_attachments_to_rce_object(all_html.compact.join("\n"), actual_saving_user)
+    associate_attachments_to_rce_object(all_html.compact.join("\n"), updating_user)
   end
 
   def access_for_attachment_association?(user, session, _association, _location_param)

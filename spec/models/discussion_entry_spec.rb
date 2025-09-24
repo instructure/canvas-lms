@@ -41,6 +41,174 @@ describe DiscussionEntry do
     it "sets the root_account_id using topic" do
       expect(entry.root_account_id).to eq topic.root_account_id
     end
+
+    it "generates an lti_id if not provided" do
+      expect(entry.lti_id).to be_present
+    end
+
+    it "does not overwrite a provided lti_id" do
+      custom_id = SecureRandom.uuid
+      e = topic.discussion_entries.create!(user: @teacher, lti_id: custom_id)
+      expect(e.lti_id).to eq custom_id
+    end
+
+    it "cannot update lti_id once set" do
+      entry # trigger creation
+      original = entry.lti_id
+      expect(original).to be_present
+      # attempt update
+      expect do
+        entry.update(lti_id: SecureRandom.uuid)
+      end.not_to change { entry.reload.lti_id }
+      expect(entry.errors[:lti_id]).to include("Cannot change lti_id!")
+    end
+
+    context "LTI asset processor notifications" do
+      before do
+        course_with_teacher(active_all: true)
+        course_with_student(active_all: true, course: @course)
+      end
+
+      let(:graded_topic) { DiscussionTopic.create_graded_topic!(course: @course, title: "Graded Discussion") }
+      let(:regular_topic) { discussion_topic_model(course: @course) }
+
+      def expect_notification(expected_user:, expected_status: Lti::Pns::LtiAssetProcessorContributionNoticeBuilder::SUBMITTED)
+        expect(Lti::AssetProcessorDiscussionNotifier).to receive(:notify_asset_processors_of_discussion) do |current_user:, discussion_entry_version:, assignment:, contribution_status:, **|
+          expect(current_user).to eq expected_user
+          expect(discussion_entry_version).to be_a(DiscussionEntryVersion)
+          expect(assignment).to eq graded_topic.assignment
+          expect(contribution_status).to eq expected_status
+        end
+      end
+
+      def expect_no_notification
+        expect(Lti::AssetProcessorDiscussionNotifier).not_to receive(:notify_asset_processors_of_discussion)
+      end
+
+      shared_examples "does not send notifications" do
+        it "does not send notification for non-graded discussions" do
+          expect_no_notification
+          perform_action_on_regular_topic
+        end
+
+        it "does not send notification when user context is missing" do
+          expect_no_notification
+          perform_action_without_user_context
+        end
+      end
+
+      describe "on create" do
+        def perform_action_on_regular_topic
+          entry = regular_topic.discussion_entries.build(user: @student, message: "test message")
+          entry.saving_user = @student
+          entry.save!
+        end
+
+        def perform_action_without_user_context
+          graded_topic.discussion_entries.create!(user: @student, message: "test message")
+        end
+
+        it "sends notification for graded discussion entries when saving_user is set" do
+          expect_notification(expected_user: @student)
+          entry = graded_topic.discussion_entries.build(user: @student, message: "test message")
+          entry.saving_user = @student
+          entry.save!
+        end
+
+        include_examples "does not send notifications"
+      end
+
+      describe "on update" do
+        def perform_action_on_regular_topic
+          entry = regular_topic.discussion_entries.create!(user: @student, message: "original message")
+          entry.saving_user = @student
+          entry.update!(message: "updated message")
+        end
+
+        def perform_action_without_user_context
+          entry = graded_topic.discussion_entries.create!(user: @student, message: "original message")
+          entry.update!(message: "updated message")
+        end
+
+        it "sends notification for graded discussion entries when saving_user is set" do
+          entry = graded_topic.discussion_entries.create!(user: @student, message: "original message")
+          expect_notification(expected_user: @student)
+          entry.saving_user = @student
+          entry.update!(message: "updated message")
+        end
+
+        it "sends notification for teacher updates" do
+          entry = graded_topic.discussion_entries.create!(user: @teacher, message: "original message")
+          expect_notification(expected_user: @teacher)
+          entry.saving_user = @teacher
+          entry.update!(message: "updated message")
+        end
+
+        it "does not send notification when no relevant fields change" do
+          entry = graded_topic.discussion_entries.create!(user: @student, message: "test message")
+          expect_no_notification
+          entry.saving_user = @student
+          entry.update!(edited_at: Time.current)
+        end
+
+        it "sends notification when attachment changes" do
+          attachment = Attachment.create!(context: @course, user: @student, filename: "test.txt", uploaded_data: StringIO.new("test"))
+          entry = graded_topic.discussion_entries.create!(user: @student, message: "test message")
+          expect_notification(expected_user: @student)
+          entry.saving_user = @student
+          entry.update!(attachment:)
+        end
+
+        include_examples "does not send notifications"
+      end
+
+      describe "on destroy" do
+        def perform_action_on_regular_topic
+          entry = regular_topic.discussion_entries.create!(user: @student, message: "test message")
+          entry.editor_id = @teacher.id
+          entry.destroy
+        end
+
+        def perform_action_without_user_context
+          entry = graded_topic.discussion_entries.create!(user: @student, message: "test message")
+          entry.destroy
+        end
+
+        it "sends notification for graded discussion entries when editor_id is set" do
+          entry = graded_topic.discussion_entries.create!(user: @student, message: "test message")
+          expect_notification(expected_user: @teacher, expected_status: Lti::Pns::LtiAssetProcessorContributionNoticeBuilder::DELETED)
+          entry.editor_id = @teacher.id
+          entry.destroy
+        end
+
+        include_examples "does not send notifications"
+      end
+
+      describe "on restore" do
+        def perform_action_on_regular_topic
+          entry = regular_topic.discussion_entries.create!(user: @student, message: "test message")
+          entry.destroy
+          entry.saving_user = @teacher
+          entry.restore
+        end
+
+        def perform_action_without_user_context
+          entry = graded_topic.discussion_entries.create!(user: @student, message: "test message")
+          entry.destroy
+          entry.restore
+        end
+
+        it "sends notification for graded discussion entries when saving_user is set" do
+          entry = graded_topic.discussion_entries.create!(user: @student, message: "test message")
+          entry.destroy
+          expect_notification(expected_user: @teacher)
+          entry.saving_user = @teacher
+          entry.restore
+        end
+
+        include_examples "does not send notifications"
+      end
+    end
   end
 
   it "is not marked as deleted when parent is deleted" do

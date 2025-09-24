@@ -25,10 +25,12 @@ import {getI18nFormats} from '@canvas/datetime/configureDateTime'
 import type {default as Timezone} from 'timezone'
 import type {default as ChicagoTz} from 'timezone/America/Chicago'
 import type {default as DetroitTz} from 'timezone/America/Detroit'
+import type {default as DenverTz} from 'timezone/America/Denver'
 
 const tz = require('timezone') as typeof Timezone
 const chicago = require('timezone/America/Chicago') as typeof ChicagoTz
 const detroit = require('timezone/America/Detroit') as typeof DetroitTz
+const denver = require('timezone/America/Denver') as typeof DenverTz
 
 describe('CourseCopyForm', () => {
   const currentYear = new Date().getFullYear()
@@ -98,6 +100,7 @@ describe('CourseCopyForm', () => {
   beforeEach(() => {
     // Set timezone and mock current date
     const timezone = 'America/Denver'
+    tzInTest.changeZone(denver, timezone)
     moment.tz.setDefault(timezone)
     window.ENV = window.ENV || {}
     window.ENV.TIMEZONE = timezone
@@ -109,6 +112,7 @@ describe('CourseCopyForm', () => {
 
   afterEach(() => {
     jest.useRealTimers()
+    tzInTest.restore()
   })
 
   const renderCopyCourseForm = (props = {}) =>

@@ -24,6 +24,7 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import {enhanceUserContent} from '@instructure/canvas-rce'
 import {makeAllExternalLinksExternalLinks} from '@instructure/canvas-rce/es/enhance-user-content/external_links'
+import {getMountPoint} from '@canvas/top-navigation/react/TopNavPortalBase'
 import './instructure_helper'
 import 'jqueryui/draggable'
 import '@canvas/jquery/jquery.ajaxJSON'
@@ -138,7 +139,7 @@ function enhanceUserJQueryWidgetContent() {
 
 function ellipsifyBreadcrumbs() {
   const breadcrumbs = document.getElementById('breadcrumbs')
-  if (breadcrumbs === null) return
+  if (breadcrumbs === null || getMountPoint() !== null) return // if page uses InstUI top nav
   let breadcrumbEllipsis
   let addedEllipsisClass = false
   const heightOfOneBreadcrumb = 27 * 1.5
@@ -163,7 +164,6 @@ function ellipsifyBreadcrumbs() {
   }
   resizeBreadcrumb() // force it to run once right now
   window.addEventListener('resize', resizeBreadcrumb)
-  // end breadcrumb ellipsis
 }
 
 function bindKeyboardShortcutsHelpPanel() {
@@ -367,44 +367,75 @@ function showDiscussionTopicSubMessagesWhenClicked() {
 
 // app/views/discussion_topics/_entry.html.erb
 function addDiscussionTopicEntryWhenClicked() {
-  $('.communication_message .add_entry_link').click(function (event) {
-    event.preventDefault()
-    const $message = $(this).parents('.communication_message')
-    const $reply = $message.find('.reply_message').hide()
-    const $response = $message
-      .find('.communication_sub_message.blank')
-      .clone(true)
-      .removeClass('blank')
-    $reply.before($response.show())
-    const id = uniqueId('textarea_')
-    $response.find('textarea.rich_text').attr('id', id)
-    $(document).triggerHandler('richTextStart', $('#' + id))
-    $response.find('textarea:first').focus().select()
+  document.querySelectorAll('.communication_message').forEach(message => {
+    message.addEventListener('click', e => {
+      const entry = e.target.closest('.add_entry_link')
+      if (!entry) return
+      e.preventDefault()
+
+      // Find and hide reply message
+      const reply = message.querySelector('.reply_message')
+      if (reply) reply.style.display = 'none'
+
+      // Clone the blank response template
+      const blankResponse = message.querySelector('.communication_sub_message.blank')
+      if (blankResponse === null) return
+
+      const response = blankResponse.cloneNode(true)
+      response.classList.remove('blank')
+      response.style.display = 'block'
+
+      // Insert the response before the reply element
+      if (reply) reply.parentNode.insertBefore(response, reply)
+
+      // Unfortunately we still need jQuery for the RCE launch because
+      // the RCE uses the jQuery event system
+      const textarea = response.querySelector('textarea.rich_text')
+      if (textarea) {
+        const id = uniqueId('textarea_')
+        textarea.id = id
+        $(document).triggerHandler('richTextStart', $('#' + id))
+      }
+
+      // Focus and select the first textarea
+      const firstTextarea = response.querySelector('textarea')
+      if (firstTextarea) {
+        firstTextarea.focus()
+        firstTextarea.select()
+      }
+    })
   })
 }
 
 function showAndHideRCEWhenAsked() {
-  $(document)
-    .bind('richTextStart', (event, $editor) => {
-      if (!$editor || $editor.length === 0) {
-        return
-      }
-      $editor = $($editor)
-      if (!$editor || $editor.length === 0) {
-        return
-      }
-      RichContentEditor.loadNewEditor($editor, {focus: true})
-    })
-    .bind('richTextEnd', (event, $editor) => {
-      if (!$editor || $editor.length === 0) {
-        return
-      }
-      $editor = $($editor)
-      if (!$editor || $editor.length === 0) {
-        return
-      }
-      RichContentEditor.destroyRCE($editor)
-    })
+  // Note: We're keeping jQuery event handling here because:
+  // 1. Custom events with data like 'richTextStart' are handled differently in jQuery vs native
+  // 2. Much of the existing code uses triggerHandler() to pass jQuery elements
+  // 3. RichContentEditor expects jQuery elements
+  //
+  // TODO: Implement a way to handle rich text editing without relying on jQuery, but
+  // that will require native event handling that can handle complex data, and also
+  // modifying the RCE to match.
+
+  const $document = $(document)
+
+  $document.on('richTextStart', (_e, $editor) => {
+    if (!$editor || $editor.length === 0) return
+
+    // Ensure we're working with a jQuery object as RichContentEditor expects
+    if (!($editor instanceof $)) $editor = $($editor)
+    if (!$editor || $editor.length === 0) return
+    RichContentEditor.loadNewEditor($editor, {focus: true})
+  })
+
+  $document.on('richTextEnd', (_e, $editor) => {
+    if (!$editor || $editor.length === 0) return
+
+    // Ensure we're working with a jQuery object as RichContentEditor expects
+    if (!($editor instanceof $)) $editor = $($editor)
+    if (!$editor || $editor.length === 0) return
+    RichContentEditor.destroyRCE($editor)
+  })
 }
 
 function doThingsWhenDiscussionTopicSubMessageIsPosted() {
@@ -545,7 +576,7 @@ function doThingsToModuleSequenceFooter() {
   }
 }
 
-function showHideRemoveThingsToRightSideMoreLinksWhenClicked() {
+function showRightSideHiddenItemsWhenClicked() {
   // this is for things like the to-do, recent items and upcoming, it
   // happened a lot so rather than duplicating it everywhere I stuck it here
   const rightSide = document.getElementById('right-side')
@@ -631,7 +662,7 @@ function confirmAndDeleteRightSideTodoItemsWhenClicked() {
         // Use jQuery for animation for now (slideUp with callback)
         $(this).slideUp(function () {
           this.remove()
-          if (toFocus) toFocus.focus()
+          toFocus?.focus()
         })
       },
     })
@@ -693,7 +724,7 @@ export function enhanceTheEntireUniverse() {
     highlightDiscussionTopicMessagesOnHover,
     makeDatesPretty,
     doThingsToModuleSequenceFooter,
-    showHideRemoveThingsToRightSideMoreLinksWhenClicked,
+    showRightSideHiddenItemsWhenClicked,
     confirmAndDeleteRightSideTodoItemsWhenClicked,
     makeAllExternalLinksExternalLinks,
     wireUpFilePreview,

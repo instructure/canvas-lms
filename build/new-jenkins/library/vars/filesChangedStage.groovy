@@ -72,7 +72,7 @@ def preBuild(stageConfig) {
   stageConfig.value('featureFlagFiles', git.changedFiles(['config/feature_flags'], 'HEAD^'))
   stageConfig.value('groovyFiles', git.changedFiles(['.*.groovy', 'Jenkinsfile.*'], 'HEAD^'))
   stageConfig.value('yarnFiles', git.changedFiles(['package.json', 'yarn.lock'], 'HEAD^'))
-  stageConfig.value('graphqlFiles', git.changedFiles(['app/graphql'], 'HEAD^'))
+  stageConfig.value('graphqlFiles', git.changedFiles(['app/graphql', 'schema.graphql'], 'HEAD^'))
   stageConfig.value('erbFiles', git.changedFiles(['.erb'], 'HEAD^'))
   stageConfig.value('addedOrDeletedSpecFiles', sh(script: 'git diff --name-only --diff-filter=AD HEAD^..HEAD | grep "_spec.rb"', returnStatus: true) == 0)
 

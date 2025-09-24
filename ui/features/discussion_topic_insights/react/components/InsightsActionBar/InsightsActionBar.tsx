@@ -55,6 +55,7 @@ const InsightsActionBar: React.FC<InsightsActionBarProps> = ({
           onClick={onGenerateInsights}
           disabled={loading || entryCount === 0}
           data-testid="discussion-insights-generate-button"
+          aria-label={I18n.t('Ignite AI Generate Insights')}
         >
           <Text>{I18n.t('Generate Insights')}</Text>
         </Button>

@@ -105,7 +105,19 @@ class RubricAssessmentExport
   end
 
   def students
-    @students ||= User.where(id: Submission.where(assignment_id: association_object.id).select(:user_id))
+    return @students if @students
+
+    unless association_object.is_a?(Assignment)
+      @students = []
+      return @students
+    end
+
+    students_with_submissions = Submission.where(assignment_id: association_object.id).select(:user_id)
+    active_enrollments = Enrollment.where(user_id: students_with_submissions)
+                                   .where(course_id: association_object.context_id)
+                                   .where(Enrollment.active_or_completed_student_conditions)
+
+    @students ||= User.where(id: active_enrollments.pluck(:user_id)).to_a
   end
 
   def rating_visible?

@@ -41,13 +41,15 @@ const flattenPages = (pages: GetSubmissionsResult[]): Submission[] => {
 }
 type GetAllSubmissionsParams = {
   queryParams: Pick<GetSubmissionsParams, 'courseId' | 'userIds'>
+  headers?: Record<string, string>
 } & GetAllPagesCallbacks<GetSubmissionsResult>
 export const getAllSubmissions = ({
   queryParams,
+  headers,
   ...params
 }: GetAllSubmissionsParams): GetAllPagesReturnValue<Submission[]> =>
   getAllPages({
-    query: after => getSubmissions({...queryParams, after}),
+    query: after => getSubmissions({...queryParams, after}, headers),
     getPageInfo: page => mapValues(page.course, it => it.pageInfo),
     flattenPages,
     isMulti: true,

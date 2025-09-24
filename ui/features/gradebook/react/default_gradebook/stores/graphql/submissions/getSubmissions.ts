@@ -222,7 +222,10 @@ export type GetSubmissionsParams = {
   after?: Record<string, string | null>
 }
 
-export const getSubmissions = async ({courseId, userIds, after}: GetSubmissionsParams) => {
+export const getSubmissions = async (
+  {courseId, userIds, after}: GetSubmissionsParams,
+  headers?: Record<string, string>,
+) => {
   const courseNode = {
     name: 'course',
     args: {id: '$courseId'},
@@ -239,10 +242,14 @@ export const getSubmissions = async ({courseId, userIds, after}: GetSubmissionsP
     'getSubmissions',
     '$courseId: ID!, $states: [SubmissionState!]',
   )
-  const data = await executeQuery<GetSubmissionsResult>(query, {
-    courseId,
-    states: ['graded', 'pending_review', 'submitted', 'ungraded', 'unsubmitted'],
-  })
+  const data = await executeQuery<GetSubmissionsResult>(
+    query,
+    {
+      courseId,
+      states: ['graded', 'pending_review', 'submitted', 'ungraded', 'unsubmitted'],
+    },
+    headers,
+  )
 
   const validation = ZGetSubmissionsResult.safeParse(data)
   if (!validation.success) {

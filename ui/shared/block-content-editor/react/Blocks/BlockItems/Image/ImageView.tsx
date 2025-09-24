@@ -20,7 +20,7 @@ import './image-block.css'
 import {ImageViewProps} from './types'
 import {DefaultPreviewImage} from '../DefaultPreviewImage/DefaultPreviewImage'
 import {ImageCaption} from './ImageCaption'
-import {Flex} from '@instructure/ui-flex'
+import {View} from '@instructure/ui-view'
 
 export const ImageView = ({
   url,
@@ -28,22 +28,27 @@ export const ImageView = ({
   decorativeImage,
   altTextAsCaption,
   caption,
+  captionColor,
 }: ImageViewProps) => {
   const calculatedCaption = altTextAsCaption ? altText : caption
 
   return (
-    <Flex direction="column" gap="mediumSmall">
+    <View as="figure" margin="none">
       {url ? (
-        // eslint-disable-next-line jsx-a11y/alt-text
         <img
+          width="100%"
           src={url}
-          alt={decorativeImage ? undefined : altText}
+          alt={decorativeImage ? '' : altText}
           role={decorativeImage ? 'presentation' : undefined}
         />
       ) : (
         <DefaultPreviewImage blockType="image" />
       )}
-      {!!calculatedCaption && <ImageCaption>{calculatedCaption}</ImageCaption>}
-    </Flex>
+      {!!calculatedCaption && (
+        <View as="figcaption" margin="mediumSmall 0 0 0">
+          <ImageCaption color={captionColor}>{calculatedCaption}</ImageCaption>
+        </View>
+      )}
+    </View>
   )
 }

@@ -160,6 +160,60 @@ module Types
                   end&.map(&:course)
     end
 
+    field :course_instructors_connection, EnrollmentType.connection_type, null: true do
+      description "Paginated instructor enrollments across multiple courses"
+      argument :course_ids,
+               [ID],
+               "Course IDs to get instructors for",
+               required: true,
+               prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Course")
+    end
+    def course_instructors_connection(course_ids:, **_args)
+      return Enrollment.none unless current_user
+
+      user_course_ids = current_user.enrollments.pluck(:course_id).uniq.map(&:to_s)
+      course_ids = if course_ids.blank?
+                     user_course_ids
+                   else
+                     course_ids & user_course_ids
+                   end
+
+      # Get unique instructor enrollments grouped by user, ordered by course name
+      # to ensure consistent pagination and grouping by course
+      Enrollment.joins(:course, :user)
+                .where(course_id: course_ids)
+                .where(type: ["TeacherEnrollment", "TaEnrollment"])
+                .where(workflow_state: "active")
+                .where(courses: { workflow_state: "available" })
+                .order("courses.name ASC")
+    end
+
+    field :courses,
+          [Types::CourseType],
+          "Courses by IDs that are viewable by the current user",
+          null: true do
+      argument :ids, [ID], "graphql or legacy course IDs", required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Course")
+      argument :sis_ids, [String], "ids from the original SIS system", required: false
+    end
+    def courses(ids: nil, sis_ids: nil)
+      raise GraphQL::ExecutionError, "Must specify exactly one of ids or sisIds" if (ids && sis_ids) || !(ids || sis_ids)
+
+      course_ids = ids || sis_ids
+      raise GraphQL::ExecutionError, "Cannot request more than 100 courses at once" if course_ids&.length.to_i > 100
+
+      courses = if ids
+                  current_user&.accessible_courses_by_ids(ids, preload_courses: true)
+                elsif sis_ids
+                  current_user&.accessible_courses_by_sis_ids(sis_ids, preload_courses: true)
+                end
+
+      courses&.index_by(&:id)
+             &.values
+             &.sort_by! do |course|
+               Canvas::ICU.collation_key(course.nickname_for(current_user))
+             end
+    end
+
     field :module_item, Types::ModuleItemType, null: true do
       description "ModuleItem"
       argument :id,
@@ -249,6 +303,38 @@ module Types
       return [] unless Account.site_admin.grants_right?(context[:current_user], context[:session], :manage_internal_settings)
 
       Setting.all
+    end
+
+    field :account_notifications, [Types::AccountNotificationType], null: false do
+      description "Account notifications for the current user"
+      argument :account_id, ID, "Account ID to fetch notifications for", required: false
+    end
+    def account_notifications(account_id: nil)
+      return [] unless context[:current_user]
+
+      account = if account_id
+                  Account.find_by(id: account_id)
+                else
+                  # Use root account from domain
+                  context[:domain_root_account]
+                end
+
+      return [] unless account
+
+      AccountNotification.for_user_and_account(context[:current_user], account)
+    end
+
+    field :enrollment_invitations, [Types::EnrollmentType], null: false do
+      description "Pending enrollment invitations for the current user"
+      argument :include_enrollment_uuid, String, required: false
+    end
+    def enrollment_invitations(include_enrollment_uuid: nil)
+      return [] unless context[:current_user]
+
+      context[:current_user].cached_invitations(
+        include_enrollment_uuid:,
+        preload_course: true
+      )
     end
 
     field :rubric, Types::RubricType, null: true do

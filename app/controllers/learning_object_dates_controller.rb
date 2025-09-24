@@ -204,11 +204,10 @@ class LearningObjectDatesController < ApplicationController
         prefer_assignment_availability_dates(asset, overridable)
       end
     when "WikiPage"
-      if Account.site_admin.feature_enabled?(:create_wiki_page_mastery_path_overrides) || (asset == overridable && !wiki_page_needs_assignment?)
-
-        update_ungraded_object(asset, object_update_params)
-      elsif wiki_page_needs_assignment?
+      if wiki_page_needs_assignment?
         apply_assignment_parameters(object_update_params.merge(set_assignment: true), asset)
+      elsif asset == overridable
+        update_ungraded_object(asset, object_update_params)
       else
         update_assignment(overridable, object_update_params)
       end

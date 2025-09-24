@@ -16,6 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * STOP!
+ *
+ * This file is retained only for old code; it will be removed after
+ * the Asset Processors refactor is complete (INTEROP-9587 and
+ * INTEROP-9588 Do not use this file in new code, use
+ * ./LtiAssetReport.ts instead.
+ *
+ * TODO: remove this file after INTEROP-9588 is done
+ */
+
 import {z} from 'zod'
 
 // For new Speedgrader, corresponding type is in its repo in

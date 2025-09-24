@@ -27,7 +27,7 @@ import {rubricSelectedAriaLabel} from './utils/rubricUtils'
 const I18n = createI18nScope('rubrics-assessment-tray')
 
 type RatingButtonProps = {
-  buttonDisplay: string
+  buttonLabel: string
   isPreviewMode: boolean
   isSelected: boolean
   isSelfAssessmentSelected: boolean
@@ -35,7 +35,7 @@ type RatingButtonProps = {
   onClick: () => void
 }
 export const RatingButton = ({
-  buttonDisplay,
+  buttonLabel,
   isPreviewMode,
   isSelected,
   isSelfAssessmentSelected,
@@ -56,15 +56,15 @@ export const RatingButton = ({
     >
       <View as="div" position="relative">
         <IconButton
-          screenReaderLabel={I18n.t('Rating Button %{buttonDisplay} %{selectedText}', {
-            buttonDisplay,
+          screenReaderLabel={I18n.t('Rating Button %{buttonLabel} %{selectedText}', {
+            buttonLabel,
             selectedText,
           })}
           size="large"
           color="primary-inverse"
           onClick={onClick}
           readOnly={isPreviewMode}
-          data-testid={`rubric-rating-button-${buttonDisplay}`}
+          data-testid={`rubric-rating-button-${buttonLabel}`}
           cursor={isPreviewMode ? 'not-allowed' : 'pointer'}
           themeOverride={{
             largeFontSize: '1rem',
@@ -75,8 +75,10 @@ export const RatingButton = ({
             primaryInverseColor: isSelected ? colors.contrasts.green4570 : unselectedColor,
           }}
         >
-          <Text size="medium">{buttonDisplay}</Text>
-          {isSelfAssessmentSelected && <SelectedSelfAssessment buttonDisplay={buttonDisplay} />}
+          <Text size="medium" data-testid={`rubric-rating-button-label`}>
+            {buttonLabel}
+          </Text>
+          {isSelfAssessmentSelected && <SelectedSelfAssessment buttonLabel={buttonLabel} />}
         </IconButton>
         {isSelected && <SelectedRatingArrow direction={selectedArrowDirection} />}
       </View>
@@ -136,10 +138,10 @@ const SelectedRatingArrow = ({direction}: SelectedRatingArrowProps) => {
   )
 }
 
-const SelectedSelfAssessment = ({buttonDisplay}: {buttonDisplay: string}) => {
+const SelectedSelfAssessment = ({buttonLabel}: {buttonLabel: string}) => {
   return (
     <div
-      data-testid={`rubric-rating-button-self-assessment-selected-${buttonDisplay}`}
+      data-testid={`rubric-rating-button-self-assessment-selected-${buttonLabel}`}
       style={{
         position: 'absolute',
         inset: '6px',

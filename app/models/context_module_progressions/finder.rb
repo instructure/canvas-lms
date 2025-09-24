@@ -40,12 +40,7 @@ module ContextModuleProgressions
     end
 
     def self.create_module_progression(mod, user)
-      GuardRail.activate(:primary) do
-        ContextModuleProgression.unique_constraint_retry do |retry_count|
-          progression = mod.context_module_progressions.where(user_id: user).first if retry_count > 0
-          progression || mod.context_module_progressions.create!(user:)
-        end
-      end
+      mod.find_or_create_progression(user)
     end
   end
 end

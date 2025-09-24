@@ -28,7 +28,7 @@ export const RemoveButton = (props: {
   return (
     <IconButton
       data-testid="remove-block-button"
-      data-removebutton
+      data-action-button
       screenReaderLabel={I18n.t('Remove block')}
       onClick={props.onClicked}
     >

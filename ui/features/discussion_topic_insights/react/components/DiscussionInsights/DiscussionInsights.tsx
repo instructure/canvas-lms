@@ -32,6 +32,7 @@ import {IconButton} from '@instructure/ui-buttons'
 import NewActivityInfo from '../NewActivityInfo/NewActivityInfo'
 import {IconEyeLine, IconMoveDownBottomLine, IconSpeedGraderLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 const I18n = createI18nScope('discussion_insights')
 
@@ -192,41 +193,56 @@ const DiscussionInsights: React.FC = () => {
     date: formatDate(new Date(item.entry_updated_at)),
     actions: (
       <Flex gap="x-small" justifyItems="center">
-        <IconButton
-          size="small"
-          data-testid="viewOriginalReply"
-          screenReaderLabel="See reply"
-          onClick={() => handleSeeReply(item)}
-          withBackground={false}
-          withBorder={false}
-          color="primary"
-        >
-          <IconEyeLine />
-        </IconButton>
-        {SPEEDGRADER_URL_TEMPLATE != null && (
+        <Tooltip renderTip={I18n.t('See reply')}>
           <IconButton
             size="small"
-            data-testid="viewSpeedGraderReply"
-            screenReaderLabel="See in SpeedGrader"
-            onClick={() => handleSpeedGrader(item)}
+            data-testid="viewOriginalReply"
+            screenReaderLabel={I18n.t('See reply from %{user} on %{date}', {
+              user: item.student_name,
+              date: formatDate(new Date(item.entry_updated_at)),
+            })}
+            onClick={() => handleSeeReply(item)}
             withBackground={false}
             withBorder={false}
             color="primary"
           >
-            <IconSpeedGraderLine />
+            <IconEyeLine />
           </IconButton>
+        </Tooltip>
+        {SPEEDGRADER_URL_TEMPLATE != null && (
+          <Tooltip renderTip={I18n.t('See in SpeedGrader')}>
+            <IconButton
+              size="small"
+              data-testid="viewSpeedGraderReply"
+              screenReaderLabel={I18n.t('See reply in SpeedGrader from %{user} on %{date}', {
+                user: item.student_name,
+                date: formatDate(new Date(item.entry_updated_at)),
+              })}
+              onClick={() => handleSpeedGrader(item)}
+              withBackground={false}
+              withBorder={false}
+              color="primary"
+            >
+              <IconSpeedGraderLine />
+            </IconButton>
+          </Tooltip>
         )}
-        <IconButton
-          size="small"
-          data-testid="goToOriginalReply"
-          screenReaderLabel="Go to original reply"
-          onClick={() => handleGoToOriginalReply(item)}
-          withBackground={false}
-          withBorder={false}
-          color="primary"
-        >
-          <IconMoveDownBottomLine />
-        </IconButton>
+        <Tooltip renderTip={I18n.t('See reply in context')}>
+          <IconButton
+            size="small"
+            data-testid="goToOriginalReply"
+            screenReaderLabel={I18n.t('See reply in context from %{user} on %{date}', {
+              user: item.student_name,
+              date: formatDate(new Date(item.entry_updated_at)),
+            })}
+            onClick={() => handleGoToOriginalReply(item)}
+            withBackground={false}
+            withBorder={false}
+            color="primary"
+          >
+            <IconMoveDownBottomLine />
+          </IconButton>
+        </Tooltip>
       </Flex>
     ),
   }))

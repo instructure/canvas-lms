@@ -28,6 +28,7 @@ import {Flex} from '@instructure/ui-flex'
 import {useBlockContentEditorContext} from '../../../BlockContentEditorContext'
 import {useNode} from '@craftjs/core'
 import {ImageCaption} from './ImageCaption'
+import {View} from '@instructure/ui-view'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -35,8 +36,11 @@ export const ImageEdit = ({
   onImageChange,
   url,
   altText,
-  caption,
+  decorativeImage,
   altTextAsCaption,
+  caption,
+  captionColor,
+  focusHandler,
 }: ImageEditProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const {settingsTray} = useBlockContentEditorContext()
@@ -46,46 +50,58 @@ export const ImageEdit = ({
   const openModal = () => setIsOpen(true)
   const onSelected = (modalImageData: ModalImageData) => {
     closeModal()
-    const imageCaption = altTextAsCaption ? modalImageData.altText : caption
-    onImageChange({
-      ...modalImageData,
-      altText: modalImageData.decorativeImage ? '' : modalImageData.altText,
-      caption: modalImageData.decorativeImage ? '' : imageCaption,
-    })
+    onImageChange(modalImageData)
   }
 
-  return (
-    <Flex direction="column" gap="mediumSmall">
-      <ImageBlockUploadModal open={isOpen} onDismiss={closeModal} onSelected={onSelected} />
+  const calculatedCaption = altTextAsCaption ? altText : caption
 
-      <div className="image-actions-container">
+  return (
+    <>
+      <ImageBlockUploadModal open={isOpen} onDismiss={closeModal} onSelected={onSelected} />
+      <View as="figure" margin="none" className="image-actions-container">
         {url ? (
           <>
-            <img src={url} alt={altText} />
-            <div className="image-actions">
+            <img
+              width="100%"
+              src={url}
+              alt={decorativeImage ? '' : altText}
+              role={decorativeImage ? 'presentation' : undefined}
+            />
+            <View as="div" className="image-actions">
               <IconButton
                 renderIcon={<IconUploadLine />}
                 onClick={openModal}
-                screenReaderLabel={I18n.t('Change image')}
+                screenReaderLabel={I18n.t('Replace image')}
                 size="small"
+                elementRef={
+                  focusHandler ? element => focusHandler(element as HTMLElement) : undefined
+                }
               />
-            </div>
+            </View>
           </>
         ) : (
-          <AddButton onClick={() => setIsOpen(true)} />
+          <AddButton
+            onClick={() => setIsOpen(true)}
+            focusHandler={focusHandler}
+            ariaLabel={I18n.t('Add image')}
+          />
         )}
-      </div>
-      <Flex direction="row" gap="x-small">
-        <ImageCaption>{caption || I18n.t('Image caption')}</ImageCaption>
-        <IconButton
-          data-testid="edit-block-image"
-          screenReaderLabel={I18n.t('Edit block')}
-          onClick={() => settingsTray.open(id)}
-          size="small"
-        >
-          <IconEditLine fontSize="small" />
-        </IconButton>
-      </Flex>
-    </Flex>
+        <View as="figcaption" margin="mediumSmall 0 0 0">
+          <Flex direction="row" gap="x-small">
+            <ImageCaption color={captionColor}>
+              {calculatedCaption || I18n.t('Image caption')}
+            </ImageCaption>
+            <IconButton
+              data-testid="edit-block-image"
+              screenReaderLabel={I18n.t('Edit block')}
+              onClick={() => settingsTray.open(id)}
+              size="small"
+            >
+              <IconEditLine fontSize="small" />
+            </IconButton>
+          </Flex>
+        </View>
+      </View>
+    </>
   )
 }

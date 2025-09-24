@@ -30,14 +30,16 @@ import type {EnvCommon} from '@canvas/global/env/EnvCommon'
 
 type Crumb = NonNullable<EnvCommon['breadcrumbs']>[0]
 
+const linkColor = ENV.use_high_contrast ? 'blue82' : 'blue57'
+
 const overrides = {
   componentOverrides: {
     Link: {
-      color: canvas.colors.contrasts.blue5782,
+      color: canvas.colors.primitives[linkColor],
     },
     [TopNavBar.Layout.componentId]: {
-      desktopBackgroundInverse: canvas.colors.contrasts?.grey1111 ?? 'white',
-      smallViewportBackgroundInverse: canvas.colors.contrasts?.grey1111 ?? 'white',
+      desktopBackgroundInverse: canvas.colors.primitives?.grey11 ?? 'white',
+      smallViewportBackgroundInverse: canvas.colors.primitives?.grey11 ?? 'white',
       desktopZIndex: 99,
       smallViewportZIndex: 99,
       smallViewportTrayZIndex: 99,

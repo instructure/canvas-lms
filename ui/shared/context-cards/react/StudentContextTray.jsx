@@ -173,24 +173,6 @@ export default class StudentContextTray extends React.Component {
 
           () => course.permissions.manage_grades || course.permissions.view_all_grades,
         )}
-        {
-          // only include analytics 1 link if analytics 2 is not among the external tool links and hide_legacy_course_analytics is not enabled
-          (this.props.externalTools &&
-            this.props.externalTools.some(
-              t =>
-                t.tool_id === 'fd75124a-140e-470f-944c-114d2d93bb40' ||
-                t.tool_id === 'admin-analytics',
-            )) ||
-          window.ENV.FEATURES.hide_legacy_course_analytics
-            ? null
-            : StudentContextTray.renderQuickLink(
-                'analytics',
-                I18n.t('Analytics'),
-                I18n.t('View analytics for %{name}', {name: user.short_name}),
-                `/courses/${this.props.courseId}/analytics/users/${this.props.studentId}`,
-                () => course.permissions.view_analytics && user.analytics,
-              )
-        }
         {this.props.externalTools
           ? this.props.externalTools.map((tool, i) => {
               return StudentContextTray.renderQuickLink(

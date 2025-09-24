@@ -26,7 +26,7 @@ import {find} from 'lodash'
 import template from '../jst/ModuleSequenceFooter.handlebars'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import htmlEscape from '@instructure/html-escape'
-import '@canvas/jquery/jquery.ajaxJSON'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
 const I18n = createI18nScope('sequence_footer')
 
@@ -74,78 +74,85 @@ $.fn.moduleSequenceFooter = function (options = {}) {
     // @next : Object
     this.msfInstance = new $.fn.moduleSequenceFooter.MSFClass(options)
     this.data('msfInstance', this.msfInstance)
-    this.msfInstance.fetch().done(() => {
-      if (this.msfInstance.hide) {
+    this.msfInstance
+      .fetch()
+      .then(() => {
+        if (this.msfInstance.hide) {
+          this.hide()
+          return
+        }
+
+        this.html(
+          template({
+            instanceNumber: this.msfInstance.instanceNumber,
+            previous: this.msfInstance.previous,
+            next: this.msfInstance.next,
+          }),
+        )
+        if (options && options.animation !== undefined) {
+          this.msfAnimation(options.animation)
+        }
+
+        const previousButton = document.querySelector('.module-sequence-footer-button--previous')
+        if (previousButton instanceof HTMLElement) {
+          const label = `Previous Module Item${
+            this.msfInstance.previous.externalItem ? ` - ${I18n.t('opens in new window')}` : ''
+          }`
+
+          ReactDOM.render(
+            <Tooltip
+              aria-label={label}
+              as={Button}
+              href={this.msfInstance.previous.url}
+              renderTip={this.msfInstance.previous.tooltip}
+              placement="end"
+              offsetX={5}
+              disabled={Boolean(this.msfInstance.previous.modules_tab_disabled)}
+            >
+              <Flex alignItems="center">
+                <IconMiniArrowStartLine /> {I18n.t('Previous')}
+              </Flex>
+            </Tooltip>,
+            previousButton,
+          )
+        }
+
+        const nextButton = document.querySelector('.module-sequence-footer-button--next')
+        if (nextButton instanceof HTMLElement) {
+          const label = `Next Module Item${
+            this.msfInstance.next.externalItem ? ` - ${I18n.t('opens in new window')}` : ''
+          }`
+
+          ReactDOM.render(
+            <Tooltip
+              aria-label={label}
+              as={Button}
+              href={this.msfInstance.next.url}
+              renderTip={this.msfInstance.next.tooltip}
+              placement="start"
+              offsetX={5}
+              disabled={Boolean(this.msfInstance.next.modules_tab_disabled)}
+            >
+              <Flex alignItems="center">
+                {I18n.t('Next')} <IconMiniArrowEndLine />
+              </Flex>
+            </Tooltip>,
+            nextButton,
+          )
+        }
+
+        this.show()
+        $(window).triggerHandler('resize')
+
+        if (options.onFetchSuccess) {
+          options.onFetchSuccess()
+        }
+      })
+      .catch(error => {
+        // Handle fetch errors gracefully - hide the footer on error
+        console.error('Module sequence footer initialization failed:', error)
         this.hide()
-        return
-      }
-
-      this.html(
-        template({
-          instanceNumber: this.msfInstance.instanceNumber,
-          previous: this.msfInstance.previous,
-          next: this.msfInstance.next,
-        }),
-      )
-      if (options && options.animation !== undefined) {
-        this.msfAnimation(options.animation)
-      }
-
-      const previousButton = document.querySelector('.module-sequence-footer-button--previous')
-      if (previousButton instanceof HTMLElement) {
-        const label = `Previous Module Item${
-          this.msfInstance.previous.externalItem ? ` - ${I18n.t('opens in new window')}` : ''
-        }`
-
-        ReactDOM.render(
-          <Tooltip
-            aria-label={label}
-            as={Button}
-            href={this.msfInstance.previous.url}
-            renderTip={this.msfInstance.previous.tooltip}
-            placement="end"
-            offsetX={5}
-            disabled={Boolean(this.msfInstance.previous.modules_tab_disabled)}
-          >
-            <Flex alignItems="center">
-              <IconMiniArrowStartLine /> {I18n.t('Previous')}
-            </Flex>
-          </Tooltip>,
-          previousButton,
-        )
-      }
-
-      const nextButton = document.querySelector('.module-sequence-footer-button--next')
-      if (nextButton instanceof HTMLElement) {
-        const label = `Next Module Item${
-          this.msfInstance.next.externalItem ? ` - ${I18n.t('opens in new window')}` : ''
-        }`
-
-        ReactDOM.render(
-          <Tooltip
-            aria-label={label}
-            as={Button}
-            href={this.msfInstance.next.url}
-            renderTip={this.msfInstance.next.tooltip}
-            placement="start"
-            offsetX={5}
-            disabled={Boolean(this.msfInstance.next.modules_tab_disabled)}
-          >
-            <Flex alignItems="center">
-              {I18n.t('Next')} <IconMiniArrowEndLine />
-            </Flex>
-          </Tooltip>,
-          nextButton,
-        )
-      }
-
-      this.show()
-      $(window).triggerHandler('resize')
-
-      if (options.onFetchSuccess) {
-        options.onFetchSuccess()
-      }
-    })
+      })
   }
   return this
 }
@@ -200,33 +207,32 @@ export default class ModuleSequenceFooter {
 
   fetch() {
     const params = this.getQueryParams(this.location.search)
-    if (params.module_item_id) {
-      return $.ajaxJSON(
-        this.url,
-        'GET',
-        {
+
+    const fetchParams = params.module_item_id
+      ? {
           asset_type: 'ModuleItem',
           asset_id: params.module_item_id,
           frame_external_urls: true,
-        },
-        this.success,
-        null,
-        {},
-      )
-    } else {
-      return $.ajaxJSON(
-        this.url,
-        'GET',
-        {
+        }
+      : {
           asset_type: this.assetType,
           asset_id: this.assetID,
           frame_external_urls: true,
-        },
-        this.success,
-        null,
-        {},
-      )
-    }
+        }
+
+    const promise = doFetchApi({
+      path: `${this.url}?${new URLSearchParams(fetchParams).toString()}`,
+      method: 'GET',
+    })
+      .then(({json}) => {
+        this.success(json)
+      })
+      .catch(error => {
+        console.error('Module sequence footer fetch failed:', error)
+        this.hide = true
+      })
+
+    return promise
   }
 
   // Determines if the data retrieved should be used to generate a buttom bar or hide it. We

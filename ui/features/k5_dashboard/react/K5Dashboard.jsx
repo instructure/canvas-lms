@@ -36,7 +36,6 @@ import {
 } from '@canvas/k5/react/utils'
 import {mapStateToProps} from '@canvas/k5/redux/redux-helpers'
 import ObserverOptions, {ObservedUsersListShape} from '@canvas/observer-picker'
-import {savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
 import {fetchShowK5Dashboard} from '@canvas/observer-picker/react/utils'
 import {responsiviser, store} from '@canvas/planner'
 import useFetchApi from '@canvas/use-fetch-api-hook'
@@ -65,6 +64,7 @@ import {GradesPage} from './GradesPage'
 import HomeroomPage from './HomeroomPage'
 import ImportantDates from './ImportantDates'
 import {TodosPage} from './TodosPage'
+import {isUserObservingStudent, getObservedUserId} from './utils'
 
 const componentOverrides = getK5ThemeOverrides()
 
@@ -123,22 +123,32 @@ const K5DashboardOptionsMenu = ({onDisableK5Dashboard}) => {
   )
 }
 
-const toRenderTabs = (currentUserRoles, hideGradesTabForStudents, selectedSelfUser) =>
-  DASHBOARD_TABS.filter(({id}) => {
+const toRenderTabs = (currentUserRoles, hideGradesTabForStudents, userIsObservingStudent) => {
+  const roles = new Set(currentUserRoles)
+
+  const isTeacher = roles.has('teacher')
+  const isAdmin = roles.has('admin')
+  const isStudent = roles.has('student')
+  const isObserver = roles.has('observer')
+
+  const canSeeTodo = isTeacher
+  const canSeeGrades =
+    isTeacher ||
+    isAdmin ||
+    (isStudent && !hideGradesTabForStudents) ||
+    (isObserver && userIsObservingStudent)
+
+  return DASHBOARD_TABS.filter(({id}) => {
     switch (id) {
       case TAB_IDS.TODO:
-        return currentUserRoles.includes('teacher')
+        return canSeeTodo
       case TAB_IDS.GRADES:
-        return (
-          currentUserRoles.includes('teacher') ||
-          currentUserRoles.includes('admin') ||
-          (currentUserRoles.includes('student') && !hideGradesTabForStudents) ||
-          (currentUserRoles.includes('observer') && !selectedSelfUser)
-        )
+        return canSeeGrades
       default:
         return true
     }
   })
+}
 
 const getWindowSize = () => ({
   width: window.innerWidth,
@@ -166,14 +176,12 @@ const K5Dashboard = ({
   loadingOpportunities,
   accountCalendarContexts,
 }) => {
-  const initialObservedId = observedUsersList.find(o => o.id === savedObservedId(currentUser.id))
-    ? savedObservedId(currentUser.id)
-    : undefined
+  const initialObservedId = getObservedUserId(observedUsersList)
   const [observedUserId, setObservedUserId] = useState(initialObservedId)
   const observerMode = currentUserRoles.includes('observer')
-  const selectedSelfUser = observerMode && currentUser.id === observedUserId
+  const isObservingStudent = isUserObservingStudent(observedUserId, currentUserRoles)
 
-  const availableTabs = toRenderTabs(currentUserRoles, hideGradesTabForStudents, selectedSelfUser)
+  const availableTabs = toRenderTabs(currentUserRoles, hideGradesTabForStudents, isObservingStudent)
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, availableTabs)
   const [cards, setCards] = useState(null)
   const [cardsSettled, setCardsSettled] = useState(false)

@@ -285,15 +285,15 @@ export default (
   fetchCompositeAssignmentGroups: ({params}) => {
     const path = `/api/v1/courses/${get().courseId}/assignment_groups`
 
-    return get().dispatch.getDepaginated<AssignmentGroup[]>(path, {
-      ...params,
-      correlation_id: get().correlationId, // Enables request correlation for performance monitoring and analysis
+    return get().dispatch.getDepaginated<AssignmentGroup[]>(path, params, undefined, undefined, {
+      'Correlation-Id': get().correlationId, // Enables request correlation for performance monitoring and analysis
     })
   },
 
   fetchGrapqhlAssignmentGroups: async ({gradingPeriodIds = null}) => {
     const {data: assignmentGroups} = await getAllAssignmentGroups({
       queryParams: {courseId: get().courseId},
+      headers: {'Correlation-Id': get().correlationId},
     })
     const assignmentGroupIds = assignmentGroups.map(group => group._id)
     const limit = pLimit(GRADEBOOK_GRAPHQL_CONFIG.maxAssignmentRequestCount)
@@ -306,7 +306,12 @@ export default (
             : [gradingPeriodIds]
 
           return gradingPeriodIdsArray.map(gradingPeriodId =>
-            limit(() => getAllAssignments({queryParams: {assignmentGroupId, gradingPeriodId}})),
+            limit(() =>
+              getAllAssignments({
+                queryParams: {assignmentGroupId, gradingPeriodId},
+                headers: {'Correlation-Id': get().correlationId},
+              }),
+            ),
           )
         }),
       ),

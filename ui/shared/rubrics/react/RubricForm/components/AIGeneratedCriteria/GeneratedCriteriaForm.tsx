@@ -43,21 +43,55 @@ export const defaultGenerateCriteriaForm: GenerateCriteriaFormProps = {
   standard: '',
 }
 
-const gradeLevels = {
-  ['higher-ed']: I18n.t('Higher Education'),
-  twelfth: I18n.t('12th Grade'),
-  eleventh: I18n.t('11th Grade'),
-  tenth: I18n.t('10th Grade'),
-  ninth: I18n.t('9th Grade'),
-  eighth: I18n.t('8th Grade'),
-  seventh: I18n.t('7th Grade'),
-  sixth: I18n.t('6th Grade'),
-  fifth: I18n.t('5th Grade'),
-  fourth: I18n.t('4th Grade'),
-  third: I18n.t('3rd Grade'),
-  second: I18n.t('2nd Grade'),
-  first: I18n.t('1st Grade'),
-  kindergarten: I18n.t('Kindergarten'),
+const GRADE_LEVEL_KEYS = [
+  'higher-ed',
+  'twelfth',
+  'eleventh',
+  'tenth',
+  'ninth',
+  'eighth',
+  'seventh',
+  'sixth',
+  'fifth',
+  'fourth',
+  'third',
+  'second',
+  'first',
+  'kindergarten',
+] as const
+type GradeLevel = (typeof GRADE_LEVEL_KEYS)[number]
+
+const gradeLevelLabel = (k: GradeLevel) => {
+  switch (k) {
+    case 'higher-ed':
+      return I18n.t('Higher Education')
+    case 'twelfth':
+      return I18n.t('12th Grade')
+    case 'eleventh':
+      return I18n.t('11th Grade')
+    case 'tenth':
+      return I18n.t('10th Grade')
+    case 'ninth':
+      return I18n.t('9th Grade')
+    case 'eighth':
+      return I18n.t('8th Grade')
+    case 'seventh':
+      return I18n.t('7th Grade')
+    case 'sixth':
+      return I18n.t('6th Grade')
+    case 'fifth':
+      return I18n.t('5th Grade')
+    case 'fourth':
+      return I18n.t('4th Grade')
+    case 'third':
+      return I18n.t('3rd Grade')
+    case 'second':
+      return I18n.t('2nd Grade')
+    case 'first':
+      return I18n.t('1st Grade')
+    case 'kindergarten':
+      return I18n.t('Kindergarten')
+  }
 }
 
 type GeneratedCriteriaFormProps = {
@@ -120,13 +154,11 @@ export const GeneratedCriteriaForm = ({
               }
             }}
           >
-            {Object.entries(gradeLevels).map(([key, value]) => {
-              return (
-                <SimpleSelectOption key={key} id={`criteria-count-${key}`} value={key}>
-                  {value}
-                </SimpleSelectOption>
-              )
-            })}
+            {GRADE_LEVEL_KEYS.map(key => (
+              <SimpleSelectOption key={key} id={`grade-level-${key}`} value={key}>
+                {gradeLevelLabel(key)}
+              </SimpleSelectOption>
+            ))}
           </SimpleSelect>
         </Flex.Item>
         <Flex.Item shouldShrink={true}>

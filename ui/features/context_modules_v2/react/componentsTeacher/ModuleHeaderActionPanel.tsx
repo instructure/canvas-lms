@@ -72,7 +72,7 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
   const [isDirectShareCourseOpen, setIsDirectShareCourseOpen] = useState(false)
   const [isAddItemOpen, setIsAddItemOpen] = useState(false)
   const [isPublishing, setIsPublishing] = useState(false)
-  const {courseId, modulesArePaginated, pageSize} = useContextModule()
+  const {courseId, modulesArePaginated, pageSize, permissions} = useContextModule()
   const {getModuleItemsTotalCount} = useModules(courseId, 'teacher')
   const totalCount = getModuleItemsTotalCount(id) || 0
 
@@ -120,43 +120,50 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
             </Button>
           </Flex.Item>
         )}
-        <Flex.Item>
-          <ContextModulesPublishIcon
-            courseId={courseId}
-            moduleId={id}
-            moduleName={name}
-            published={published}
-            isPublishing={isPublishing}
-            setIsPublishing={setIsPublishing}
-            onPublishComplete={onPublishCompleteRef}
-          />
-        </Flex.Item>
-        <Flex.Item>
-          <IconButton
-            size="small"
-            screenReaderLabel={I18n.t('Add Item')}
-            renderIcon={IconPlusLine}
-            withBorder={false}
-            withBackground={true}
-            onClick={() => {
-              setIsAddItemOpen(true)
-            }}
-          />
-        </Flex.Item>
-        <Flex.Item>
-          <ModuleActionMenu
-            expanded={expanded}
-            isMenuOpen={isMenuOpen}
-            setIsMenuOpen={setIsMenuOpen}
-            id={id}
-            name={name}
-            setIsDirectShareOpen={setIsDirectShareOpen}
-            setIsDirectShareCourseOpen={setIsDirectShareCourseOpen}
-            setModuleAction={setModuleAction}
-            setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}
-            setSourceModule={setSourceModule}
-          />
-        </Flex.Item>
+        {permissions.canEdit && (
+          <Flex.Item data-testid="module-publish-button">
+            <ContextModulesPublishIcon
+              courseId={courseId}
+              moduleId={id}
+              moduleName={name}
+              published={published}
+              isPublishing={isPublishing}
+              setIsPublishing={setIsPublishing}
+              onPublishComplete={onPublishCompleteRef}
+            />
+          </Flex.Item>
+        )}
+        {permissions.canAdd && (
+          <Flex.Item>
+            <IconButton
+              size="small"
+              data-testid="add-item-button"
+              screenReaderLabel={I18n.t('Add Item')}
+              renderIcon={IconPlusLine}
+              withBorder={false}
+              withBackground={true}
+              onClick={() => {
+                setIsAddItemOpen(true)
+              }}
+            />
+          </Flex.Item>
+        )}
+        {(permissions.canView || permissions.canDirectShare) && (
+          <Flex.Item>
+            <ModuleActionMenu
+              expanded={expanded}
+              isMenuOpen={isMenuOpen}
+              setIsMenuOpen={setIsMenuOpen}
+              id={id}
+              name={name}
+              setIsDirectShareOpen={setIsDirectShareOpen}
+              setIsDirectShareCourseOpen={setIsDirectShareCourseOpen}
+              setModuleAction={setModuleAction}
+              setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}
+              setSourceModule={setSourceModule}
+            />
+          </Flex.Item>
+        )}
       </Flex>
       <DirectShareUserModal
         id={id}
@@ -183,7 +190,7 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
         moduleName={name}
         moduleId={id}
       />
-      {hasActiveOverrides ? (
+      {hasActiveOverrides && permissions.canEdit ? (
         <ViewAssignTo expanded={expanded} isMenuOpen={isMenuOpen} moduleId={id} moduleName={name} />
       ) : null}
     </>

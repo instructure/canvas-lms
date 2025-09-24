@@ -25,7 +25,7 @@
 # from their use, making things harder to find
 
 begin
-  require "debug"
+  require "debug/prelude"
 rescue LoadError
   nil
 end

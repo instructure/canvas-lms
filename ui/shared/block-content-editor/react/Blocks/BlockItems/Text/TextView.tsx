@@ -18,6 +18,6 @@
 
 import {TextViewProps} from './types'
 
-export const TextView = ({content, contentColor}: TextViewProps) => {
-  return <div style={{color: contentColor}} dangerouslySetInnerHTML={{__html: content}}></div>
+export const TextView = ({content}: TextViewProps) => {
+  return <div dangerouslySetInnerHTML={{__html: content}}></div>
 }

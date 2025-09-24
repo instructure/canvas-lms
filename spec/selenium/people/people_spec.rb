@@ -894,19 +894,22 @@ describe "people" do
 
       open_role_dialog(@teacher)
 
-      expect(fj("#edit_roles #role_id option:selected")).to include_text("Teacher")
-      expect(f("#edit_roles #role_id option[value='#{student_role.id}']")).to be_present
-      expect(f("#edit_roles #role_id option[value='#{observer_role.id}']")).to be_present
+      f("[data-testid='edit-roles-select']").click
+      teacher_option = f("[data-testid='Teacher-option']")
+      expect(teacher_option.attribute("aria-selected")).to eq "true"
+      expect(f("[data-testid='Observer-option']")).to be_present
+      expect(f("[data-testid='Student-option']")).to be_present
     end
 
     it "does not let users change to a type they don't have permission to manage" do
-      @course.root_account.role_overrides.create!(role: admin_role, permission: "manage_students", enabled: false)
+      @course.root_account.role_overrides.create!(role: admin_role, permission: "add_student_to_course", enabled: false)
 
       get "/courses/#{@course.id}/users"
 
       open_role_dialog(@teacher)
-      expect(f("#edit_roles #role_id option[value='#{ta_role.id}']")).to be_present
-      expect(f("#content")).not_to contain_css("#edit_roles #role_id option[value='#{student_role.id}']")
+      f("[data-testid='edit-roles-select']").click
+      expect(f("[data-testid='TA-option']")).to be_present
+      expect(f("body")).not_to contain_css("[data-testid='Student-option']")
     end
 
     it "retains the same enrollment state" do
@@ -919,10 +922,10 @@ describe "people" do
       get "/courses/#{@course.id}/users"
 
       open_role_dialog(@teacher)
-      click_option("#edit_roles #role_id", role.id.to_s, :value)
-      f(".ui-dialog-buttonpane .btn-primary").click
+      click_option("[data-testid='edit-roles-select']", role.id.to_s, :value)
+      f("[data-testid='update-roles']").click
       wait_for_ajaximations
-      assert_flash_notice_message "Role successfully updated"
+      expect_instui_flash_message "Successfully updated roles"
 
       expect(f("#user_#{@teacher.id}")).to include_text(role_name)
       @enrollment.reload
@@ -939,10 +942,10 @@ describe "people" do
       get "/courses/#{@course.id}/users"
 
       open_role_dialog(@teacher)
-      click_option("#edit_roles #role_id", ta_role.id.to_s, :value)
-      f(".ui-dialog-buttonpane .btn-primary").click
+      click_option("[data-testid='edit-roles-select']", ta_role.id.to_s, :value)
+      f("[data-testid='update-roles']").click
       wait_for_ajaximations
-      assert_flash_notice_message "Role successfully updated"
+      expect_instui_flash_message "Successfully updated roles"
 
       expect(@enrollment.reload).to be_deleted
       expect(enrollment2.reload).to be_deleted
@@ -960,10 +963,10 @@ describe "people" do
       get "/courses/#{@course.id}/users"
 
       open_role_dialog(@teacher)
-      click_option("#edit_roles #role_id", ta_role.id.to_s, :value)
-      f(".ui-dialog-buttonpane .btn-primary").click
+      click_option("[data-testid='edit-roles-select']", ta_role.id.to_s, :value)
+      f("[data-testid='update-roles']").click
       wait_for_ajaximations
-      assert_flash_notice_message "Role successfully updated"
+      expect_instui_flash_message "Successfully updated roles"
 
       expect(@enrollment.reload).to be_deleted
       expect(enrollment2.reload).to_not be_deleted
@@ -977,10 +980,10 @@ describe "people" do
 
       open_role_dialog(@teacher)
       expect(f("#edit_roles")).to include_text("This user has multiple roles") # warn them that both roles will be removed
-      click_option("#edit_roles #role_id", student_role.id.to_s, :value)
-      f(".ui-dialog-buttonpane .btn-primary").click
+      click_option("[data-testid='edit-roles-select']", student_role.id.to_s, :value)
+      f("[data-testid='update-roles']").click
       wait_for_ajaximations
-      assert_flash_notice_message "Role successfully updated"
+      expect_instui_flash_message "Successfully updated roles"
 
       expect(@enrollment.reload).to be_deleted
       expect(enrollment2.reload).to be_deleted

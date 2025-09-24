@@ -20,7 +20,7 @@
 class Checkpoints::DiscussionCheckpointCommonService < ApplicationService
   require_relative "discussion_checkpoint_error"
 
-  def initialize(discussion_topic:, checkpoint_label:, dates:, points_possible: nil, replies_required: 1, saved_by: nil)
+  def initialize(discussion_topic:, checkpoint_label:, dates:, points_possible: nil, replies_required: 1, saved_by: nil, saving_user: nil)
     super()
     @discussion_topic = discussion_topic
     @assignment = discussion_topic.assignment
@@ -29,6 +29,7 @@ class Checkpoints::DiscussionCheckpointCommonService < ApplicationService
     @points_possible = points_possible
     @replies_required = replies_required
     @saved_by = saved_by
+    @saving_user = saving_user
   end
 
   private
@@ -75,6 +76,7 @@ class Checkpoints::DiscussionCheckpointCommonService < ApplicationService
 
   def update_assignment
     @assignment.assign_attributes(assignment_attributes)
+    @assignment.saving_user = @saving_user
     @assignment.save! if @assignment.changed?
   end
 
@@ -102,6 +104,7 @@ class Checkpoints::DiscussionCheckpointCommonService < ApplicationService
   def specified_attributes
     attrs = { sub_assignment_tag: @checkpoint_label }
     attrs[:points_possible] = @points_possible if @points_possible
+    attrs[:saving_user] = @saving_user
     attrs.merge(date_fields)
   end
 

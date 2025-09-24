@@ -5029,6 +5029,7 @@ tr:
     errors: 
       cannot_shift_and_remove: "Aynı anda shift_dates ve remove_dates belirlenemez"
       import_error: "İçeri Aktarma Hatası:"
+    file_copy_error: "\"%{name}\" dosyası kopyalanamıyor"
     missing_content_links_message: "Şu referanslar çözülemedi:"
     missing_content_links_title: "Alınan içerikte eksik bağlantılar bulundu"
     unexpected_error: "Beklenmeyen bir hata oluştur, lütfen destek birimi ile iletişime geçin."
@@ -8125,6 +8126,7 @@ tr:
     roles: 
       designer: Tasarımcı
       designer_with_indefinite_article: Tasarımcı
+      instructors: Eğitmenler
       observer: Gözlemci
       observer_with_indefinite_article: Gözlemci
       student: Öğrenci
@@ -13547,6 +13549,7 @@ tr:
   no_announcements_280df147: "Duyuru Yok"
   no_assignment_name_adbb215b: "Ödev Adı Yok"
   no_assignment_selected_65d9e422: "Seçili Ödev Yok"
+  no_assignments_found_2097cfc1: "Ödev bulunamadı"
   no_broken_links_found_38d951e3: "Bozuk Bağlantı Bulunamadı"
   no_content_5dbc9acf: "İçerik Yok"
   no_content_has_been_added_f36bab43: "* Hiçbir içerik eklenmedi"
@@ -17077,6 +17080,7 @@ tr:
   remove_dates_5a5a8df2: "Tarihleri sil"
   remove_edf2b8a7: (Kaldır)
   remove_f47dc62a: Kaldır
+  remove_filename_1b74ef2a: "%{fileName}'ı kaldır"
   remove_filter_68de01d4: "Filtreyi Kaldır"
   remove_from_course_6fb47aee: "Dersten Sil"
   remove_image_341340b3: "Görseli sil"
@@ -17268,6 +17272,8 @@ tr:
   role_successfully_updated_4317e6a4: "Rol başarılı bir şekilde güncellendi"
   roles: 
     based_on_type: "%{base_type} tabanlı"
+    designer: Tasarımcı
+    designers: Tasarımcılar
     edit_role: 
       role_name_label: "Rol İsmi"
     new_role: 
@@ -17276,6 +17282,8 @@ tr:
       role_type: "Baz Türü:"
       save: Kaydet
       saving: Kaydediliyor...
+    observer: Gözlemci
+    observers: Gözlemciler
     permission_button: 
       rolebutton: 
         disable: "Devre Dışı"
@@ -17292,6 +17300,12 @@ tr:
       account_roles: "Hesap Rolleri"
       course_roles: "Ders Rolleri"
       page_header_title: "Hesap İzinleri"
+    student: Öğrenci
+    students: Öğrenciler
+    ta: "Asistan Öğretmen"
+    tas: "Asistan Öğretmenler"
+    teacher: Öğretmen
+    teachers: Öğretmenler
   rootFoldersFinder: 
     course_files: "Ders dosyaları"
     group_files: "Grup dosyaları"
@@ -20545,6 +20559,8 @@ tr:
         anyone: Herkes
         only_teachers: "Sadece öğretmenler"
         teachers_and_students: "Öğretmenler ve öğrenciler"
+      create_page_title: "Yeni Sayfa"
+      edit_page_title: "%{title}'yi düzenle"
       editing_roles: 
         anyone: Herkes
         can_edit_page: "bu sayfayı düzenle"

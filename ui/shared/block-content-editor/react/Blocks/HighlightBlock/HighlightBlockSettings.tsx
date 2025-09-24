@@ -24,15 +24,20 @@ import {ColorPickerWrapper} from '../BlockItems/ColorPickerWrapper'
 import {SettingsSectionToggle} from '../BlockItems/SettingsSectionToggle/SettingsSectionToggle'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
+import {defaultProps} from './defaultProps'
 
 const I18n = createI18nScope('block_content_editor')
 
 export const HighlightBlockSettings = () => {
   const {
     actions: {setProp},
-    settings,
+    backgroundColor,
+    highlightColor,
+    textColor,
+    displayIcon,
   } = useNode(node => ({
-    settings: node.data.props.settings,
+    ...defaultProps,
+    ...node.data.props,
   }))
 
   return (
@@ -45,13 +50,14 @@ export const HighlightBlockSettings = () => {
         includeSeparator={true}
       >
         <ColorPickerWrapper
-          label={I18n.t('Background')}
-          value={settings.backgroundColor}
-          baseColor={settings.highlightColor}
-          baseColorLabel={I18n.t('Highlight')}
+          label={I18n.t('Background color')}
+          popoverButtonScreenReaderLabel={I18n.t('Open background color picker popover')}
+          value={backgroundColor}
+          baseColor={highlightColor}
+          baseColorLabel={I18n.t('Highlight color')}
           onChange={color =>
             setProp((props: HighlightBlockProps) => {
-              props.settings.backgroundColor = color
+              props.backgroundColor = color
             })
           }
         />
@@ -67,32 +73,34 @@ export const HighlightBlockSettings = () => {
           <Checkbox
             label={I18n.t('Display icon')}
             variant="toggle"
-            checked={settings.displayIcon === 'warning'}
+            checked={displayIcon === 'warning'}
             onChange={e =>
               setProp((props: HighlightBlockProps) => {
-                props.settings.displayIcon = e.target.checked ? 'warning' : null
+                props.displayIcon = e.target.checked ? 'warning' : null
               })
             }
           />
           <ColorPickerWrapper
-            label={I18n.t('Highlight')}
-            value={settings.highlightColor}
-            baseColor={settings.textColor}
-            baseColorLabel={I18n.t('Text')}
+            label={I18n.t('Highlight color')}
+            popoverButtonScreenReaderLabel={I18n.t('Open highlight color picker popover')}
+            value={highlightColor}
+            baseColor={textColor}
+            baseColorLabel={I18n.t('Text color')}
             onChange={color =>
               setProp((props: HighlightBlockProps) => {
-                props.settings.highlightColor = color
+                props.highlightColor = color
               })
             }
           />
           <ColorPickerWrapper
-            label={I18n.t('Text')}
-            value={settings.textColor}
-            baseColor={settings.highlightColor}
-            baseColorLabel={I18n.t('Highlight')}
+            label={I18n.t('Text color')}
+            popoverButtonScreenReaderLabel={I18n.t('Open text color picker popover')}
+            value={textColor}
+            baseColor={highlightColor}
+            baseColorLabel={I18n.t('Highlight color')}
             onChange={color =>
               setProp((props: HighlightBlockProps) => {
-                props.settings.textColor = color
+                props.textColor = color
               })
             }
           />

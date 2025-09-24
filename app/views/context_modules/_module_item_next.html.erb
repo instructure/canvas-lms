@@ -273,7 +273,7 @@
             data-assignment-id="<%= module_item && module_item.assignment.try(:id) %>"
             data-is-cyoeable="<%= module_item && cyoe_able?(module_item) %>"
             data-published="<%= module_item && item_data[:published_status] == 'published' %>"
-            data-publishable="<%= module_item_publishable?(module_item) %>"
+            data-publishable="<%= module_item_publishable?(module_item) && !(@context.horizon_course? && module_item&.content_type == 'Quizzes::Quiz') %>"
             data-unpublishable="<%= module_item_unpublishable?(module_item) %>"
             data-publish-at="<%= module_item_publish_at(module_item) %>"
             data-publish-title="<%= module_item && module_item.title ? module_item.title : '' %>"
@@ -467,7 +467,7 @@
           <span class="ig-type-icon" aria-hidden="true" style="display: inline-block; max-width: 1.75rem; font-size: 1.125rem; padding-left: <%= left_padding %>">
             <i class='icon-arrow-nest'></i>
           </span>
-          <% status = checkpoint.submission_for_student(@current_user)&.submission_status %>
+          <% status = checkpoint.try(:submission_for_student, @current_user).try(:submission_status) %>
           <% if status && [:submitted, :resubmitted].include?(status) %>
             <span class="ig-type-icon" aria-hidden="true" style="display: inline-block; max-width: 1rem; font-size: 1.125rem;">
               <i class='icon-complete'></i>

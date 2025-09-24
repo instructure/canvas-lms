@@ -34,7 +34,7 @@ describe('FilePreviewIframe', () => {
     const {getByTitle} = render(<FilePreviewIframe item={item} />)
     const iframe = getByTitle('Preview for file: test.html')
 
-    expect(iframe).toHaveAttribute('sandbox', 'allow-same-origin')
+    expect(iframe).toHaveAttribute('sandbox', 'allow-downloads allow-same-origin')
     expect(iframe).toHaveAttribute('src', 'https://example.com')
     expect(iframe).toHaveStyle('background-color: #F2F4F4')
     expect(iframe).toHaveStyle('height: 100%')
@@ -52,7 +52,7 @@ describe('FilePreviewIframe', () => {
     const {getByTitle} = render(<FilePreviewIframe item={item} />)
     const iframe = getByTitle('Preview for file: test.pdf')
 
-    expect(iframe).toHaveAttribute('sandbox', 'allow-scripts allow-same-origin')
+    expect(iframe).toHaveAttribute('sandbox', 'allow-downloads allow-same-origin allow-scripts')
     expect(iframe).toHaveAttribute('src', 'https://example.com')
     expect(iframe).not.toHaveStyle('background-color: #F2F4F4')
     expect(iframe).toHaveStyle('height: 100%')

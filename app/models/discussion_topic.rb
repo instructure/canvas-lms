@@ -38,10 +38,6 @@ class DiscussionTopic < ActiveRecord::Base
     %w[message]
   end
 
-  def actual_saving_user
-    user
-  end
-
   REQUIRED_CHECKPOINT_COUNT = 2
   MAX_ENTRIES_PINNED = 10
 
@@ -454,6 +450,7 @@ class DiscussionTopic < ActiveRecord::Base
       if saved_change_to_group_category_id?
         assignment.validate_assignment_overrides(force_override_destroy: true)
       end
+      assignment.updating_user = updating_user
       assignment.save
     end
 
@@ -595,7 +592,8 @@ class DiscussionTopic < ActiveRecord::Base
       result.assignment = assignment.duplicate({
                                                  duplicate_discussion_topic: false,
                                                  copy_title: result.title,
-                                                 discussion_topic_for_checkpoints: result
+                                                 discussion_topic_for_checkpoints: result,
+                                                 user: opts_with_default[:user]
                                                })
     end
 
@@ -1337,6 +1335,7 @@ class DiscussionTopic < ActiveRecord::Base
       shard.activate do
         entry = discussion_entries.new(message:, user:)
         if entry.grants_right?(user, :create) && !comments_disabled? && !locked_announcement?
+          entry.saving_user = user
           entry.save!
           entry
         else
@@ -2280,5 +2279,26 @@ class DiscussionTopic < ActiveRecord::Base
     if !expanded && expanded_locked
       errors.add(:expanded_locked, t("Cannot lock a collapsed discussion"))
     end
+  end
+
+  # Bulk insert participants for announcements - called from Announcement model
+  def bulk_insert_participants(user_ids)
+    return if user_ids.empty?
+
+    current_time = Time.zone.now
+    participants_data = user_ids.map do |user_id|
+      {
+        discussion_topic_id: id,
+        user_id:,
+        workflow_state: "unread",
+        unread_entry_count: 1,
+        subscribed: false, # Default for bulk creation of announcements
+        root_account_id: self.root_account_id,
+        created_at: current_time,
+        updated_at: current_time
+      }
+    end
+
+    DiscussionTopicParticipant.bulk_insert(participants_data)
   end
 end

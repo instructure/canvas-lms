@@ -17,7 +17,7 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {COURSE_GRADES_WIDGET, URL_PATTERNS} from '../../../constants'
+import {URL_PATTERNS} from '../../../constants'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -67,12 +67,3 @@ export const getCourseCodeColor = (gridIndex?: number, code?: string): CourseCod
 export const createGradebookHandler = (courseId: string) => () => {
   window.open(URL_PATTERNS.GRADEBOOK.replace('{courseId}', courseId), '_blank')
 }
-
-export const createShowAllGradesHandler = () => () => {
-  window.open(URL_PATTERNS.ALL_GRADES, '_blank')
-}
-
-export const limitToGrid = <T>(
-  items: T[],
-  maxItems: number = COURSE_GRADES_WIDGET.MAX_GRID_ITEMS,
-): T[] => items.slice(0, maxItems)

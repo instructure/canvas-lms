@@ -3934,6 +3934,7 @@ hy:
     errors: 
       cannot_shift_and_remove: "Հնարավոր չէ միաժամանակ որոշել shift_dates և remove_dates:"
       import_error: "Ներմուծման սխալ"
+    file_copy_error: "Հնարավոր չէ պատճենել \"%{name}\" ֆայլը"
     missing_content_links_message: "Հետևյալ հղումները հնարավոր չէ կատարել"
     missing_content_links_title: "Ներմուծված բովանդակության մեջ բացակայող հղումներ կան:"
     unexpected_error: "Անսպասելի սխալ է տեղի ունեցել, կապվեք օժանդակող ծառայության հետ:"
@@ -6575,6 +6576,7 @@ hy:
     roles: 
       designer: Դիզայներ
       designer_with_indefinite_article: Դիզայներ
+      instructors: Դասավանդողներ
       observer: Դիտորդ
       observer_with_indefinite_article: Դիտորդ
       student: Ունկնդիր
@@ -11418,6 +11420,7 @@ hy:
   no_active_user_with_that_id_was_found_b8fb5e14: "Այդպիսի  ID ունեցող ակտիվ օգտատեր չի գտնվել:"
   no_assignment_name_adbb215b: "Հանձնարարության անվանում չկա"
   no_assignment_selected_65d9e422: "Ոչ մի հանձնարարություն ընտրված չէ"
+  no_assignments_found_2097cfc1: "Հանձնարարություններ չեն գտնվել"
   no_content_5dbc9acf: "Բովանդակություն չկա"
   no_content_has_been_added_f36bab43: "* Բովանդակություն չի ավելացվել"
   no_conversations_selected_ebcd9226: "Խոսակցություններ չեն ընտրվել"
@@ -14667,6 +14670,7 @@ hy:
   remove_contact_method_ca890ba3: "Ջնջել կապ հաստատելու միջոցը"
   remove_dates_5a5a8df2: "Հանել ամսաթվերը"
   remove_f47dc62a: Հանել
+  remove_filename_1b74ef2a: "Հանել  %{fileName}"
   remove_filter_68de01d4: "Հեռացնել ֆիլտրները"
   remove_from_course_6fb47aee: "Հանել դասընթացից"
   remove_icon_a4646413: "հանել պատկերը"
@@ -14844,6 +14848,8 @@ hy:
   role_successfully_updated_4317e6a4: "Դերը հաջողությամբ թարմացվել է"
   roles: 
     based_on_type: "Հիմնված է %{base_type} վրա"
+    designer: Դիզայներ
+    designers: Դիզայներներ
     edit_role: 
       role_name_label: "Դերի անունը"
     new_role: 
@@ -14852,6 +14858,8 @@ hy:
       role_type: "Բազային տեսակ"
       save: Պահպանել
       saving: "Պահպանվում է..."
+    observer: Դիտորդ
+    observers: Դիտորդներ
     permission_button: 
       rolebutton: 
         disable: Անջատել
@@ -14869,6 +14877,12 @@ hy:
       account_roles: "Հաշվի դերերը"
       course_roles: "Դասընթացի դերեր"
       page_header_title: "Հաշվի թույլտվություններ"
+    student: Ունկնդիր
+    students: Ունկնդիրներ
+    ta: Ասիստենտ
+    tas: Ասիստենտներ
+    teacher: Դասավանդող
+    teachers: Դասավանդողներ
   rootFoldersFinder: 
     course_files: "Դասընթացի ֆայլեր"
     group_files: "Խմբի ֆայլեր"
@@ -17892,6 +17906,8 @@ hy:
         anyone: "Ցանկացած անձ"
         only_teachers: "Միայն դասավանդողները"
         teachers_and_students: "Դասավանդողներ և ունկնդիրներ"
+      create_page_title: "Նոր էջ"
+      edit_page_title: "Խմբագրել %{title}"
       editing_roles: 
         anyone: "Ցանկացած անձ"
         can_edit_page: "կարող են խմբագրել այս էջը"

@@ -375,6 +375,10 @@ class CoursesController < ApplicationController
   include Api::V1::Progress
   include K5Mode
 
+  include GradebookRequestMetricsTrackerHelper
+
+  around_action :track_request_timing, only: [:users]
+
   # @API List your courses
   # Returns the paginated list of active courses for the current user.
   #
@@ -1925,7 +1929,15 @@ class CoursesController < ApplicationController
     if params[:reject]
       reject_enrollment(@pending_enrollment)
     elsif params[:accept]
-      accept_enrollment(@pending_enrollment)
+      if params[:action] == "show"
+        # If a user has invites to multiple sections in a course, accept all of them
+        Enrollment.invited_by_date.where(
+          user_id: @pending_enrollment.user_id,
+          course_id: @pending_enrollment.course_id
+        ).find_each { |e| accept_enrollment(e) }
+      else
+        accept_enrollment(@pending_enrollment)
+      end
     else
       redirect_to course_url(@context.id)
     end
@@ -2298,8 +2310,10 @@ class CoursesController < ApplicationController
 
       @unauthorized_message = t("unauthorized.invalid_link", "The enrollment link you used appears to no longer be valid.  Please contact the course instructor and make sure you're still correctly enrolled.") if params[:invitation]
       GuardRail.activate(:primary) do
-        claim_course if session[:claim_course_uuid] || params[:verification]
-        @context.claim if @context.created?
+        Course.process_as_sis do
+          claim_course if session[:claim_course_uuid] || params[:verification]
+          @context.claim if @context.created?
+        end
       end
       return if check_enrollment
 
@@ -2501,6 +2515,7 @@ class CoursesController < ApplicationController
               canAdd: @can_add,
               canEdit: @can_edit,
               canDelete: @can_delete,
+              canView: @can_view,
               canViewUnpublished: @can_view_unpublished,
               canDirectShare: can_do(@context, @current_user, :direct_share),
               readAsAdmin: @context.grants_right?(@current_user, session, :read_as_admin),

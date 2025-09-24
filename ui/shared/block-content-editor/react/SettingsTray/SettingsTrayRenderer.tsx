@@ -17,31 +17,53 @@
  */
 
 import {useEditor} from '@craftjs/core'
-import {useScope as createI18nScope} from '@canvas/i18n'
 import {SettingsTray} from './SettingsTray'
 import {useBlockContentEditorContext} from '../BlockContentEditorContext'
-import React from 'react'
-
-const I18n = createI18nScope('block_content_editor')
+import React, {ReactElement, useEffect, useState} from 'react'
 
 export const SettingsTrayRenderer = () => {
   const {query} = useEditor()
   const {settingsTray} = useBlockContentEditorContext()
 
-  let title = ''
-  let settingComponent = null
+  const [currentSettings, setCurrentSettings] = useState<{
+    blockDisplayName: string
+    settings: ReactElement | null
+  }>({
+    blockDisplayName: '',
+    settings: null,
+  })
 
-  if (settingsTray.isOpen) {
-    const node = query.node(settingsTray.blockId).get()
-    title = I18n.t('%{blockDisplayName} block settings', {
-      blockDisplayName: node.data.displayName,
+  useEffect(() => {
+    if (settingsTray.isOpen && settingsTray.blockId) {
+      const node = query.node(settingsTray.blockId).get()
+      const blockDisplayName = node.data.displayName
+
+      setCurrentSettings({
+        blockDisplayName,
+        settings: React.createElement(node.related.settings),
+      })
+    }
+  }, [settingsTray.isOpen, settingsTray.isOpen && settingsTray.blockId, query])
+
+  const onDismiss = () => {
+    settingsTray.close()
+  }
+
+  const onClose = () => {
+    setCurrentSettings({
+      blockDisplayName: '',
+      settings: null,
     })
-    settingComponent = React.createElement(node.related.settings)
   }
 
   return (
-    <SettingsTray title={title} open={settingsTray.isOpen} onDismiss={settingsTray.close}>
-      {settingComponent}
+    <SettingsTray
+      blockDisplayName={currentSettings.blockDisplayName}
+      open={settingsTray.isOpen}
+      onDismiss={onDismiss}
+      onClose={onClose}
+    >
+      {currentSettings.settings}
     </SettingsTray>
   )
 }

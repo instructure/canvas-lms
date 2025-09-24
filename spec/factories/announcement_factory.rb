@@ -27,7 +27,8 @@ module Factories
   def valid_announcement_attributes
     {
       title: "value for title",
-      message: "value for message"
+      message: "value for message",
+      saving_user: @user || user_model
     }
   end
 end

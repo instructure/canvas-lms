@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     adheres_to_policy (0.0.1)
-      activesupport (< 8.0)
+      activesupport (< 8.1)
 
 GEM
   remote: https://rubygems.org/

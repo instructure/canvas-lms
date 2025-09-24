@@ -23,17 +23,20 @@ import {HighlightBlockLayout} from './HighlightBlockLayout'
 import {getIcon} from './components/getIcon'
 import {HighlightText} from './components/HighlightText'
 import {HighlightTextEdit} from './components/HighlightTextEdit'
-import {useSave2} from '../BaseBlock/useSave'
-import {BaseBlockHOC} from '../BaseBlock'
+import {useSave} from '../BaseBlock/useSave'
+import {BaseBlock} from '../BaseBlock'
+import {defaultProps} from './defaultProps'
+import {highlightBlockContrast} from '../../accessibilityChecker/rules/highlightBlockContrast'
+import {getContrastingTextColorCached} from '../../utilities/getContrastingTextColor'
 
 const I18n = createI18nScope('block_content_editor')
 
 const HighlightBlockView = (props: HighlightBlockProps) => {
   return (
     <HighlightBlockLayout
-      icon={getIcon(props.settings.displayIcon, props.settings.textColor)}
-      content={<HighlightText content={props.content} color={props.settings.textColor} />}
-      backgroundColor={props.settings.highlightColor}
+      icon={getIcon(props.displayIcon, props.textColor)}
+      content={<HighlightText content={props.content} color={props.textColor} />}
+      backgroundColor={props.highlightColor}
     />
   )
 }
@@ -45,39 +48,42 @@ const HighlightBlockEditView = (props: HighlightBlockProps) => {
 
 const HighlightBlockEdit = (props: HighlightBlockProps) => {
   const [content, setContent] = useState(props.content)
+  const labelColor = getContrastingTextColorCached(props.highlightColor)
 
-  useSave2<typeof HighlightBlock>(() => ({
+  useSave<typeof HighlightBlock>(() => ({
     content,
   }))
 
   return (
     <HighlightBlockLayout
-      icon={getIcon(props.settings.displayIcon, props.settings.textColor)}
-      content={<HighlightTextEdit content={content} setContent={setContent} />}
-      backgroundColor={props.settings.highlightColor}
+      icon={getIcon(props.displayIcon, props.textColor)}
+      content={
+        <HighlightTextEdit content={content} setContent={setContent} labelColor={labelColor} />
+      }
+      backgroundColor={props.highlightColor}
     />
   )
 }
 
 export type HighlightBlockProps = {
   content: string
-  settings: {
-    displayIcon: string | null
-    highlightColor: string
-    textColor: string
-    backgroundColor: string
-  }
+  displayIcon: string | null
+  highlightColor: string
+  textColor: string
+  backgroundColor: string
 }
 
-export const HighlightBlock = (props: HighlightBlockProps) => {
+export const HighlightBlock = (props: Partial<HighlightBlockProps>) => {
+  const componentProps = {...defaultProps, ...props}
   return (
-    <BaseBlockHOC
+    <BaseBlock
       ViewComponent={HighlightBlockView}
       EditViewComponent={HighlightBlockEditView}
       EditComponent={HighlightBlockEdit}
-      componentProps={props}
+      componentProps={componentProps}
       title={HighlightBlock.craft.displayName}
-      backgroundColor={props.settings.backgroundColor}
+      backgroundColor={componentProps.backgroundColor}
+      customAccessibilityCheckRules={[highlightBlockContrast]}
     />
   )
 }

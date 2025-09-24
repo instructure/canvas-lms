@@ -108,9 +108,10 @@ export function getStudentsChunk(
     include: ['avatar_url', 'enrollments', 'group_ids', 'last_name', 'first_name'],
     per_page: studentIds.length,
     user_ids: studentIds,
-    correlation_id: correlationId, // Enables request correlation for performance monitoring and analysis
   }
-  return dispatch.getJSON<Student[]>(`/api/v1/courses/${courseId}/users`, params)
+  return dispatch.getJSON<Student[]>(`/api/v1/courses/${courseId}/users`, params, {
+    'Correlation-Id': correlationId, // Enables request correlation for performance monitoring and analysis
+  })
 }
 
 export function getSubmissionsForStudents(
@@ -128,11 +129,12 @@ export function getSubmissionsForStudents(
       ...submissionsParams,
       student_ids: studentIds,
       per_page: submissionsPerPage,
-      correlation_id: correlationId, // Enables request correlation for performance monitoring and analysis
     }
 
     dispatch
-      .getDepaginated<UserSubmissionGroup[]>(url, params, undefined, allEnqueued)
+      .getDepaginated<UserSubmissionGroup[]>(url, params, undefined, allEnqueued, {
+        'Correlation-Id': correlationId, // Enables request correlation for performance monitoring and analysis
+      })
       .then(resolve)
       .catch(() => {
         flashSubmissionLoadError()

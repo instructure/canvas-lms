@@ -27,6 +27,7 @@ import {SettingsIncludeTitle} from '../BlockItems/SettingsIncludeTitle/SettingsI
 import {SettingsSectionToggle} from '../BlockItems/SettingsSectionToggle/SettingsSectionToggle'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ColorPickerWrapper} from '../BlockItems/ColorPickerWrapper'
+import {defaultProps} from './defaultProps'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -35,7 +36,7 @@ export const ImageBlockSettings = () => {
     actions: {setProp},
     includeBlockTitle,
     backgroundColor,
-    textColor,
+    titleColor,
     caption,
     altText,
     altTextAsCaption,
@@ -43,32 +44,25 @@ export const ImageBlockSettings = () => {
     url,
     fileName,
   } = useNode(node => ({
-    includeBlockTitle: !!node.data.props.settings?.includeBlockTitle,
-    backgroundColor: node.data.props.settings?.backgroundColor,
-    textColor: node.data.props.settings?.textColor,
-    caption: node.data.props.caption,
-    altText: node.data.props.altText,
-    altTextAsCaption: node.data.props.altTextAsCaption,
-    decorativeImage: node.data.props.decorativeImage,
-    url: node.data.props.url,
-    fileName: node.data.props.fileName,
+    ...defaultProps,
+    ...node.data.props,
   }))
 
   const handleIncludeBlockTitleChange = () => {
     setProp((props: ImageBlockProps) => {
-      props.settings.includeBlockTitle = !includeBlockTitle
+      props.includeBlockTitle = !includeBlockTitle
     })
   }
 
   const handleBackgroundColorChange = (color: string) => {
     setProp((props: ImageBlockProps) => {
-      props.settings.backgroundColor = color
+      props.backgroundColor = color
     })
   }
 
-  const handleTextColorChange = (color: string) => {
+  const handleTitleColorChange = (color: string) => {
     setProp((props: ImageBlockProps) => {
-      props.settings.textColor = color
+      props.titleColor = color
     })
   }
 
@@ -87,20 +81,12 @@ export const ImageBlockSettings = () => {
   const handleAltTextAsCaptionChange = (newAltTextAsCaption: boolean) => {
     setProp((props: ImageBlockProps) => {
       props.altTextAsCaption = newAltTextAsCaption
-      if (newAltTextAsCaption) {
-        props.caption = props.altText
-      }
     })
   }
 
   const handleDecorativeImageChange = (newDecorativeImage: boolean) => {
     setProp((props: ImageBlockProps) => {
       props.decorativeImage = newDecorativeImage
-      if (newDecorativeImage) {
-        props.altText = ''
-        props.altTextAsCaption = false
-        props.caption = ''
-      }
     })
   }
 
@@ -120,25 +106,27 @@ export const ImageBlockSettings = () => {
         title={I18n.t('Color settings')}
         collapsedLabel={I18n.t('Expand color settings')}
         expandedLabel={I18n.t('Collapse color settings')}
-        defaultExpanded={false}
+        defaultExpanded={true}
         includeSeparator={true}
       >
         <View as="div" margin="0 0 medium 0">
           <ColorPickerWrapper
             label={I18n.t('Background color')}
+            popoverButtonScreenReaderLabel={I18n.t('Open background color picker popover')}
             value={backgroundColor}
-            baseColor={textColor}
-            baseColorLabel={I18n.t('Default text color')}
+            baseColor={titleColor}
+            baseColorLabel={I18n.t('Title color')}
             onChange={handleBackgroundColorChange}
           />
         </View>
         <View as="div">
           <ColorPickerWrapper
-            label={I18n.t('Default text color')}
-            value={textColor}
+            label={I18n.t('Title color')}
+            popoverButtonScreenReaderLabel={I18n.t('Open title color picker popover')}
+            value={titleColor}
             baseColor={backgroundColor}
             baseColorLabel={I18n.t('Background color')}
-            onChange={handleTextColorChange}
+            onChange={handleTitleColorChange}
           />
         </View>
       </SettingsSectionToggle>
@@ -160,6 +148,7 @@ export const ImageBlockSettings = () => {
           <SettingsImageInfos
             caption={caption}
             altText={altText}
+            disabled={!url}
             altTextAsCaption={altTextAsCaption}
             decorativeImage={decorativeImage}
             onCaptionChange={handleCaptionChange}

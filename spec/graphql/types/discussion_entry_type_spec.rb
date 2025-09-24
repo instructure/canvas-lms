@@ -116,10 +116,11 @@ describe Types::DiscussionEntryType do
         title: "Welcome whoever you are",
         message: "anonymous discussion",
         context: @course,
-        user: @teacher
+        user: @teacher,
+        saving_user: @teacher
       )
 
-      entry_to_translate = discussion_for_translating_tags.discussion_entries.create!(message: %(Hi <img src="/courses/#{@course.id}/files/12/download"<h1>Content</h1>), user: @teacher, editor: @teacher)
+      entry_to_translate = discussion_for_translating_tags.discussion_entries.create!(message: %(Hi <img src="/courses/#{@course.id}/files/12/download"<h1>Content</h1>), user: @teacher, editor: @teacher, saving_user: @teacher)
       type = GraphQLTypeTester.new(entry_to_translate, current_user: @teacher)
 
       expect(
@@ -134,7 +135,7 @@ describe Types::DiscussionEntryType do
       attachment.root_account.enable_feature!(:file_association_access)
 
       message = "<img src='/users/#{@teacher.id}/files/#{attachment.id}/download'>"
-      new_entry = discussion_entry.discussion_topic.discussion_entries.create!(message:, user: @teacher, parent_id: discussion_entry.id, editor: @teacher)
+      new_entry = discussion_entry.discussion_topic.discussion_entries.create!(message:, user: @teacher, parent_id: discussion_entry.id, editor: @teacher, saving_user: @teacher)
       discussion_entry.attachment = attachment
       discussion_entry.save!
 

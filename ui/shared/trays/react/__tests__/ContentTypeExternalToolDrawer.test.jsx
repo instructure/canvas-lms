@@ -24,6 +24,7 @@ import {fallbackIframeAllowances} from '../constants'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 import '@testing-library/jest-dom/extend-expect'
 import useBreakpoints from '@canvas/lti-apps/hooks/useBreakpoints'
+import useGlobalNavWidth from '../hooks/useGlobalNavWidth'
 
 // Mock the useBreakpoints hook
 jest.mock('../../../lti-apps/hooks/useBreakpoints', () => ({
@@ -33,6 +34,12 @@ jest.mock('../../../lti-apps/hooks/useBreakpoints', () => ({
     isMaxMobile: false,
     isMaxTablet: false,
   })),
+}))
+
+// Mock the useGlobalNavWidth hook
+jest.mock('../hooks/useGlobalNavWidth', () => ({
+  __esModule: true,
+  default: jest.fn(() => '50px'),
 }))
 
 describe('ContentTypeExternalToolDrawer', () => {
@@ -56,6 +63,8 @@ describe('ContentTypeExternalToolDrawer', () => {
   beforeEach(() => {
     onDismiss.mockClear()
     onExternalContentReady.mockClear()
+    useBreakpoints.mockClear()
+    useGlobalNavWidth.mockClear()
   })
 
   afterAll(() => {
@@ -207,6 +216,11 @@ describe('ContentTypeExternalToolDrawer', () => {
         })
 
         it('resets fullscreen state when the drawer is closed and reopened', async () => {
+          useBreakpoints.mockReturnValue({
+            isMaxMobile: false,
+            isMaxTablet: false,
+            isDesktop: true,
+          })
           const {getByTestId, queryByTestId, rerender} = renderTray({
             tool: toolWithFullscreen,
             open: true,

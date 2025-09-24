@@ -1,0 +1,136 @@
+PATH
+  remote: .
+  specs:
+    google_drive (1.0.0)
+      google-apis-drive_v3 (~> 0.43)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    addressable (2.8.7)
+      public_suffix (>= 2.0.2, < 7.0)
+    base64 (0.3.0)
+    bigdecimal (3.2.2)
+    crack (1.0.0)
+      bigdecimal
+      rexml
+    date (3.4.1)
+    debug (1.11.0)
+      irb (~> 1.10)
+      reline (>= 0.3.8)
+    declarative (0.0.20)
+    diff-lcs (1.6.2)
+    erb (5.0.2)
+    faraday (2.13.2)
+      faraday-net_http (>= 2.0, < 3.5)
+      json
+      logger
+    faraday-net_http (3.4.1)
+      net-http (>= 0.5.0)
+    google-apis-core (0.17.0)
+      addressable (~> 2.5, >= 2.5.1)
+      googleauth (~> 1.9)
+      httpclient (>= 2.8.3, < 3.a)
+      mini_mime (~> 1.0)
+      mutex_m
+      representable (~> 3.0)
+      retriable (>= 2.0, < 4.a)
+    google-apis-drive_v3 (0.63.0)
+      google-apis-core (>= 0.15.0, < 2.a)
+    google-cloud-env (2.3.0)
+      base64 (~> 0.2)
+      faraday (>= 1.0, < 3.a)
+    google-logging-utils (0.2.0)
+    googleauth (1.14.0)
+      faraday (>= 1.0, < 3.a)
+      google-cloud-env (~> 2.2)
+      google-logging-utils (~> 0.1)
+      jwt (>= 1.4, < 3.0)
+      multi_json (~> 1.11)
+      os (>= 0.9, < 2.0)
+      signet (>= 0.16, < 2.a)
+    hashdiff (1.1.2)
+    httpclient (2.9.0)
+      mutex_m
+    io-console (0.8.1)
+    irb (1.15.2)
+      pp (>= 0.6.0)
+      rdoc (>= 4.0.0)
+      reline (>= 0.4.2)
+    json (2.13.2)
+    jwt (2.10.1)
+      base64
+    logger (1.7.0)
+    mini_mime (1.1.5)
+    multi_json (1.15.0)
+    mutex_m (0.3.0)
+    net-http (0.6.0)
+      uri
+    os (1.1.4)
+    pp (0.6.2)
+      prettyprint
+    prettyprint (0.2.0)
+    psych (5.2.6)
+      date
+      stringio
+    public_suffix (6.0.2)
+    rake (13.2.1)
+    rdoc (6.14.2)
+      erb
+      psych (>= 4.0.0)
+    reline (0.6.2)
+      io-console (~> 0.5)
+    representable (3.2.0)
+      declarative (< 0.1.0)
+      trailblazer-option (>= 0.1.1, < 0.2.0)
+      uber (< 0.2.0)
+    retriable (3.1.2)
+    rexml (3.4.1)
+    rspec (3.13.0)
+      rspec-core (~> 3.13.0)
+      rspec-expectations (~> 3.13.0)
+      rspec-mocks (~> 3.13.0)
+    rspec-core (3.13.3)
+      rspec-support (~> 3.13.0)
+    rspec-expectations (3.13.3)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-mocks (3.13.2)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-support (3.13.2)
+    signet (0.20.0)
+      addressable (~> 2.8)
+      faraday (>= 0.17.5, < 3.a)
+      jwt (>= 1.5, < 3.0)
+      multi_json (~> 1.10)
+    stringio (3.1.7)
+    timecop (0.9.10)
+    trailblazer-option (0.1.2)
+    uber (0.1.0)
+    uri (1.0.3)
+    webmock (3.25.1)
+      addressable (>= 2.8.0)
+      crack (>= 0.3.2)
+      hashdiff (>= 0.4.0, < 2.0.0)
+
+PLATFORMS
+  aarch64-linux
+  arm64-darwin
+  ruby
+  x86_64-darwin
+  x86_64-linux
+
+DEPENDENCIES
+  debug
+  google_drive!
+  rake
+  rspec (~> 3.12)
+  timecop
+  webmock
+
+RUBY VERSION
+   ruby 3.4.1p0
+
+BUNDLED WITH
+   2.6.7

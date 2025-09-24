@@ -24,8 +24,9 @@ import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {Button} from '@instructure/ui-buttons'
 import type {CourseGradeCardProps} from '../../../types'
-import {formatUpdatedDate, getCourseCodeColor} from './utils'
+import {formatUpdatedDate} from './utils'
 import {COURSE_GRADES_WIDGET} from '../../../constants'
+import {CourseCode} from '../../shared/CourseCode'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -47,8 +48,6 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
     onGradeVisibilityChange?.(newVisibility)
   }
 
-  const courseCodeStyle = useMemo(() => getCourseCodeColor(gridIndex), [gridIndex])
-
   return (
     <View
       as="div"
@@ -64,28 +63,13 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
       overflowY="hidden"
     >
       <Flex direction="column" width="100%" height="100%">
-        <Flex.Item padding="0 0 0 xx-small">
-          <View
-            as="span"
-            background="primary"
-            borderRadius="large"
-            padding="xxx-small x-small"
-            margin="0 0 small 0"
-            display="inline-block"
-            themeOverride={{backgroundPrimary: courseCodeStyle.background}}
-          >
-            <Text
-              size="x-small"
-              weight="bold"
-              color="primary"
-              lineHeight="fit"
-              themeOverride={{
-                primaryColor: courseCodeStyle.textColor,
-              }}
-            >
-              {courseCode}
-            </Text>
-          </View>
+        <Flex.Item padding="0 0 0 xx-small" margin="0 0 small 0">
+          <CourseCode
+            courseId={courseId}
+            overrideCode={courseCode}
+            gridIndex={gridIndex}
+            size="x-small"
+          />
         </Flex.Item>
 
         <Flex.Item height="3rem" padding="0 0 0 xx-small">

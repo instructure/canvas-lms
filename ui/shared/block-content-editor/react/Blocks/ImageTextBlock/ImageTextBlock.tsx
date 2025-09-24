@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {BaseBlockHOC} from '../BaseBlock'
+import {BaseBlock} from '../BaseBlock'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ImageTextBlockSettings} from './ImageTextBlockSettings'
 import {ImageTextBlockProps} from './types'
-import {useSave2} from '../BaseBlock/useSave'
+import {useSave} from '../BaseBlock/useSave'
 import {useState} from 'react'
 import {ImageTextBlockLayout} from './ImageTextBlockLayout'
 import {TitleView} from '../BlockItems/Title/TitleView'
@@ -30,6 +30,9 @@ import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
 import {TextEditPreview} from '../BlockItems/Text/TextEditPreview'
 import {TitleEdit} from '../BlockItems/Title/TitleEdit'
 import {TextEdit} from '../BlockItems/Text/TextEdit'
+import {useFocusElement} from '../../hooks/useFocusElement'
+import {defaultProps} from './defaultProps'
+import {getContrastingTextColorCached} from '../../utilities/getContrastingTextColor'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -39,7 +42,7 @@ const ImageTextBlockView = ({
   url,
   altText,
   decorativeImage,
-  textColor,
+  titleColor,
   includeBlockTitle,
   arrangement,
   textToImageRatio,
@@ -48,17 +51,20 @@ const ImageTextBlockView = ({
 }: ImageTextBlockProps) => {
   return (
     <ImageTextBlockLayout
-      titleComponent={includeBlockTitle && <TitleView contentColor={textColor} title={title} />}
+      titleComponent={
+        includeBlockTitle && !!title && <TitleView title={title} contentColor={titleColor} />
+      }
       imageComponent={
         <ImageView
           url={url}
           altText={altText}
           decorativeImage={decorativeImage}
           caption={caption}
+          captionColor={titleColor}
           altTextAsCaption={altTextAsCaption}
         />
       }
-      textComponent={<TextView contentColor={textColor} content={content} />}
+      textComponent={<TextView content={content} />}
       arrangement={arrangement}
       textToImageRatio={textToImageRatio}
       dataTestId="imagetext-block-view"
@@ -72,7 +78,7 @@ const ImageTextBlockEditView = ({
   url,
   altText,
   decorativeImage,
-  textColor,
+  titleColor,
   arrangement,
   textToImageRatio,
   includeBlockTitle,
@@ -82,7 +88,7 @@ const ImageTextBlockEditView = ({
   return (
     <ImageTextBlockLayout
       titleComponent={
-        includeBlockTitle && <TitleEditPreview contentColor={textColor} title={title} />
+        includeBlockTitle && <TitleEditPreview title={title} contentColor={titleColor} />
       }
       imageComponent={
         <ImageView
@@ -90,10 +96,11 @@ const ImageTextBlockEditView = ({
           altText={altText}
           decorativeImage={decorativeImage}
           caption={caption}
+          captionColor={titleColor}
           altTextAsCaption={altTextAsCaption}
         />
       }
-      textComponent={<TextEditPreview contentColor={textColor} content={content} />}
+      textComponent={<TextEditPreview content={content} />}
       arrangement={arrangement}
       textToImageRatio={textToImageRatio}
       dataTestId="imagetext-block-editpreview"
@@ -102,10 +109,12 @@ const ImageTextBlockEditView = ({
 }
 
 const ImageTextBlockEdit = (props: ImageTextBlockProps) => {
+  const {focusHandler} = useFocusElement()
   const [title, setTitle] = useState(props.title)
   const [content, setContent] = useState(props.content)
+  const labelColor = getContrastingTextColorCached(props.backgroundColor)
 
-  const save = useSave2(() => ({
+  const save = useSave(() => ({
     title,
     content,
   }))
@@ -113,9 +122,23 @@ const ImageTextBlockEdit = (props: ImageTextBlockProps) => {
   return (
     <ImageTextBlockLayout
       titleComponent={
-        props.includeBlockTitle && <TitleEdit title={title} onTitleChange={setTitle} />
+        props.includeBlockTitle && (
+          <TitleEdit
+            title={title}
+            onTitleChange={setTitle}
+            focusHandler={focusHandler}
+            labelColor={labelColor}
+          />
+        )
       }
-      imageComponent={<ImageEdit {...props} onImageChange={data => save({...data})} />}
+      imageComponent={
+        <ImageEdit
+          {...props}
+          captionColor={props.titleColor}
+          onImageChange={data => save({...data})}
+          focusHandler={!props.includeBlockTitle && focusHandler}
+        />
+      }
       textComponent={<TextEdit content={content} onContentChange={setContent} height={300} />}
       arrangement={props.arrangement}
       textToImageRatio={props.textToImageRatio}
@@ -124,15 +147,16 @@ const ImageTextBlockEdit = (props: ImageTextBlockProps) => {
   )
 }
 
-export const ImageTextBlock = (props: ImageTextBlockProps) => {
+export const ImageTextBlock = (props: Partial<ImageTextBlockProps>) => {
+  const componentProps = {...defaultProps, ...props}
   return (
-    <BaseBlockHOC
+    <BaseBlock
       ViewComponent={ImageTextBlockView}
       EditComponent={ImageTextBlockEdit}
       EditViewComponent={ImageTextBlockEditView}
-      componentProps={props}
+      componentProps={componentProps}
       title={ImageTextBlock.craft.displayName}
-      backgroundColor={props.backgroundColor}
+      backgroundColor={componentProps.backgroundColor}
     />
   )
 }

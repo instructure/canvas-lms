@@ -138,3 +138,38 @@ describe('$.ajaxJSON.abortRequest', () => {
     expect(mockCallback).not.toHaveBeenCalled()
   })
 })
+
+describe('$.ajaxJSON headers option', () => {
+  it('includes headers in ajax params when provided', () => {
+    const mockAjax = jest.fn().mockReturnValue({then: () => ({fail: () => ({always: () => {}})})})
+    const originalAjax = $.ajax
+    $.ajax = mockAjax
+
+    const customHeaders = {'X-Custom-Header': 'test-value'}
+    $.ajaxJSON('/test', 'GET', {}, undefined, undefined, {headers: customHeaders})
+
+    expect(mockAjax).toHaveBeenCalledWith(
+      expect.objectContaining({
+        headers: customHeaders,
+      }),
+    )
+
+    $.ajax = originalAjax
+  })
+
+  it('ignores invalid headers', () => {
+    const mockAjax = jest.fn().mockReturnValue({then: () => ({fail: () => ({always: () => {}})})})
+    const originalAjax = $.ajax
+    $.ajax = mockAjax
+
+    $.ajaxJSON('/test', 'GET', {}, undefined, undefined, {headers: null})
+
+    expect(mockAjax).toHaveBeenCalledWith(
+      expect.not.objectContaining({
+        headers: expect.anything(),
+      }),
+    )
+
+    $.ajax = originalAjax
+  })
+})

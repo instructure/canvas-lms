@@ -36,7 +36,7 @@ export const AddBlockModal = (props: {
 
   return (
     <Modal
-      label={I18n.t('Add new block')}
+      label={I18n.t('Add a block')}
       size="large"
       open={props.open}
       onDismiss={props.onDismiss}
@@ -45,7 +45,7 @@ export const AddBlockModal = (props: {
     >
       <Modal.Header>
         <Flex justifyItems="space-between">
-          <Heading variant="titleSection">{I18n.t('Add new block')}</Heading>
+          <Heading variant="titleSection">{I18n.t('Add a block')}</Heading>
           <CloseButton
             screenReaderLabel={I18n.t('Close')}
             onClick={props.onDismiss}

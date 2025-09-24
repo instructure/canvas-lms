@@ -48,6 +48,49 @@ jest.mock('@canvas/observer-picker/react/utils', () => ({
   fetchShowK5Dashboard: jest.fn(),
 }))
 
+// Set up MSW server to handle unmocked requests and prevent console errors
+const globalServer = setupServer(
+  // Mock announcements endpoint that's called by K5Dashboard
+  http.get('/api/v1/announcements', () => HttpResponse.json([])),
+  // Mock dashboard cards endpoint
+  http.get('/api/v1/dashboard/dashboard_cards', () => HttpResponse.json([])),
+  // Mock missing submissions endpoint
+  http.get('/api/v1/users/self/missing_submissions', () =>
+    HttpResponse.json([], {headers: {link: 'url; rel="current"'}}),
+  ),
+  // Mock calendar events for important dates (assignments)
+  http.get('/api/v1/calendar_events', ({request}) => {
+    const url = new URL(request.url)
+    const type = url.searchParams.get('type')
+    const importantDates = url.searchParams.get('important_dates')
+
+    if (importantDates === 'true') {
+      return HttpResponse.json([])
+    }
+    return HttpResponse.json([])
+  }),
+  // Mock observer calendar events for important dates
+  http.get('/api/v1/users/*/calendar_events', ({request}) => {
+    const url = new URL(request.url)
+    const importantDates = url.searchParams.get('important_dates')
+
+    if (importantDates === 'true') {
+      return HttpResponse.json([])
+    }
+    return HttpResponse.json([])
+  }),
+  // Mock planner items endpoint
+  http.get('/api/v1/planner/items', () =>
+    HttpResponse.json([], {headers: {link: 'url; rel="current"'}}),
+  ),
+  // Catch-all handler to silently handle any remaining unmocked requests
+  http.get('*', () => HttpResponse.json({})),
+)
+
+beforeAll(() => globalServer.listen({onUnhandledRequest: 'bypass'}))
+afterEach(() => globalServer.resetHandlers())
+afterAll(() => globalServer.close())
+
 const render = children =>
   testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
 
@@ -97,13 +140,12 @@ describe('K5Dashboard Parent Support', () => {
   // LF-1141
   it.skip('prefetches dashboard cards with the correct url param', async () => {
     let requestUrl = null
-    const server = setupServer(
+    globalServer.use(
       http.get('/api/v1/dashboard/dashboard_cards', ({request}) => {
         requestUrl = request.url
         return HttpResponse.json(MOCK_CARDS)
       }),
     )
-    server.listen()
 
     render(
       <K5Dashboard
@@ -121,12 +163,11 @@ describe('K5Dashboard Parent Support', () => {
       {timeout: 5000},
     )
     expect(requestUrl).toContain('observed_user_id=4')
-    server.close()
   })
 
   it.skip('does not make a request if the user has been already requested (flaky)', async () => {
     const requestUrls = []
-    const server = setupServer(
+    globalServer.use(
       http.get('/api/v1/dashboard/dashboard_cards', ({request}) => {
         requestUrls.push(request.url)
         const url = request.url
@@ -137,7 +178,6 @@ describe('K5Dashboard Parent Support', () => {
         }
       }),
     )
-    server.listen()
 
     const {findByText, getByTestId, getByText, queryByText} = render(
       <K5Dashboard
@@ -164,12 +204,11 @@ describe('K5Dashboard Parent Support', () => {
     // Should not fetch student 4's cards again; they've been cached
     expect(requestUrls[requestUrls.length - 1]).toContain('observed_user_id=2')
     // 2 total requests - one for student 4, one for student 2
-    expect(requestUrls.length).toBe(2)
-    server.close()
+    expect(requestUrls).toHaveLength(2)
   })
 
   it.skip('shows the observee missing items on dashboard cards (flaky)', async () => {
-    const server = setupServer(
+    globalServer.use(
       http.get('/api/v1/dashboard/dashboard_cards', ({request}) => {
         const url = request.url
         if (url.includes('observed_user_id=4')) {
@@ -191,7 +230,6 @@ describe('K5Dashboard Parent Support', () => {
         }
       }),
     )
-    server.listen()
     createPlannerMocks()
 
     const {getByText, findByTestId, getByTestId} = render(
@@ -227,7 +265,6 @@ describe('K5Dashboard Parent Support', () => {
       )
     })
     expect(getByTestId('number-missing')).toBeInTheDocument()
-    server.close()
   })
 
   it('does not show options to disable k5 dashboard if student is selected', async () => {

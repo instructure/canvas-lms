@@ -30,7 +30,7 @@ export default function UrlPanel({fileUrl, setFileUrl, urlHasError, urlRef}) {
         type="url"
         value={fileUrl}
         onChange={(_e, val) => setFileUrl(val)}
-        messages={urlHasError ? [{ text: formatMessage('Invalid URL'), type: 'error' }] : []}
+        messages={urlHasError ? [{text: formatMessage('Invalid URL'), type: 'error'}] : []}
         ref={urlRef}
       />
     </>
@@ -41,5 +41,5 @@ UrlPanel.propTypes = {
   fileUrl: string.isRequired,
   setFileUrl: func.isRequired,
   urlHasError: bool,
-  urlRef: object
+  urlRef: object,
 }

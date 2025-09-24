@@ -139,6 +139,47 @@ module SupportHelpers
       end
     end
 
+    # @API Trigger Asset Processor Notice Resubmission
+    # @internal
+    # Go through all the submissions in the context (assignment or course)
+    # and trigger asset processor notices for each submission.
+    # One of assignment_id or course_id is required, and the optional tool_id
+    # can be used to send notices only to a specific tool's Asset Processors.
+    #
+    # Example Request:
+    # curl -X POST 'http://canvas-web.inseng.test/api/v1/support_helpers/asset_processor/bulk_resubmit' \
+    # -H "Authorization: Bearer $Canvas-User-Token" \
+    # -H "Content-Type: application/json" \
+    # -d '{"assignment_id":123}'
+    #
+    # @argument assignment_id [Optional, Integer]
+    #   The ID of the assignment we want to resubmit notices for
+    # @argument course_id [Optional, Integer]
+    #   The ID of the course containing assignments we want to resubmit notices for
+    # @argument tool_id [Optional, Integer]
+    #   The ID of the external tool to filter asset processors we want to resend notices
+    def bulk_resubmit
+      permitted = params.permit(:assignment_id, :course_id, :tool_id)
+      assignment_id = permitted[:assignment_id].presence
+      course_id = permitted[:course_id].presence
+      tool_id = permitted[:tool_id].presence
+
+      if assignment_id.present?
+        context = Assignment.find(assignment_id)
+      elsif course_id.present?
+        context = Course.find(course_id)
+      else
+        render json: { error: "assignment_id or course_id is required" }, status: :bad_request
+        return
+      end
+
+      run_fixer(
+        SupportHelpers::AssetProcessorNoticeResubmission,
+        context,
+        tool_id
+      )
+    end
+
     private
 
     def generate_graphviz_dot(assignment:, submission:, asset_processors:, context_external_tools:, notice_handlers:, assets:, asset_reports:)

@@ -3383,6 +3383,7 @@ ko:
     bad_attachment: "파일을 성공적으로 업로드하지 못했습니다."
     errors: 
       import_error: "가져오기 오류:"
+    file_copy_error: "\"%{name}\" 파일을 복사할 수 없음"
     missing_content_links_message: "다음 참조를 확인할 수 없습니다:"
     missing_content_links_title: "가져온 내용에 누락된 링크가 있음"
     unexpected_error: "예기치 않은 오류가 발생했습니다. 사용자 지원팀에 문의하시기 바랍니다."
@@ -5528,6 +5529,7 @@ ko:
     roles: 
       designer: 디자이너
       designer_with_indefinite_article: 디자이너
+      instructors: 교사
       observer: 감독자
       observer_with_indefinite_article: 감독자
       student: 학생
@@ -9653,6 +9655,7 @@ ko:
   next_student_79955068: "다음 학생"
   no_active_user_with_that_id_was_found_b8fb5e14: "해당 ID를 가진 활성 사용자를 찾을 수 없습니다."
   no_assignment_selected_65d9e422: "선택한 과제 없음"
+  no_assignments_found_2097cfc1: "과제를 찾을 수 없음"
   no_content_5dbc9acf: "내용 없음"
   no_conversations_selected_ebcd9226: "선택한 대화 없음"
   no_date_set_25edf0c1: "날짜 설정 안 됨"
@@ -12329,10 +12332,14 @@ ko:
     update_failed_notice: "역할 만들기 실패"
   roles: 
     based_on_type: "%{base_type}을 바탕으로 함"
+    designer: "과목 디자이너"
+    designers: 디자이너
     new_role: 
       cancel: 취소
       save: 저장
       saving: "저장 중..."
+    observer: 감독자
+    observers: 감독자
     permission_button: 
       rolebutton: 
         disable: "사용 안 함"
@@ -12345,6 +12352,12 @@ ko:
       remove_role_confirmation: "이 역할을 가진 사용자가 있다면 현재 사용 권한을 유지하지만 이 역할로 새 사용자를 추가할 수 없습니다. 이 역할을 삭제하려면 확인을 클릭하십시오."
     roles_override_index: 
       page_header_title: "계정 권한"
+    student: 학생
+    students: 학생
+    ta: 조교
+    tas: 조교
+    teacher: 교사
+    teachers: 교사
   rootFoldersFinder: 
     course_files: "과목 파일"
     group_files: "그룹 파일"
@@ -14743,6 +14756,8 @@ ko:
         anyone: 누구나
         only_teachers: 교사만
         teachers_and_students: "교사와 학생"
+      create_page_title: "새 페이지"
+      edit_page_title: "%{title} 편집"
       editing_roles: 
         anyone: 누구나
         can_edit_page: "은(는) 이 페이지를 편집할 수 있음"

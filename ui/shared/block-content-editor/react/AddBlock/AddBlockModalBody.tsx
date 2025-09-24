@@ -17,25 +17,35 @@
  */
 
 import {ReactElement, useState} from 'react'
-import {GroupedSelect} from '../GroupedSelect'
-import {blockData, blockFactory, BlockTypes} from './block-data'
+import {GroupedSelect, GroupedSelectItem} from '../GroupedSelect'
+import {blockData} from './block-data'
 import {previewFactory} from '../BlockPreview'
 import {AddBlockModalBodyLayout} from './AddBlockModalBodyLayout'
+import {components} from '../block-content-editor-components'
+
+const componentsByName = Object.values(components).reduce(
+  (acc, key) => {
+    acc[key.name] = key
+    return acc
+  },
+  {} as Record<string, React.FC>,
+)
 
 export const AddBlockModalBody = (props: {
   onBlockSelected: (block: ReactElement) => void
 }) => {
-  const [selectedItem, setSelectedItem] = useState<BlockTypes>(blockData[0].items[0].id)
-  const PreviewComponent = previewFactory[selectedItem]
+  const [selectedItem, setSelectedItem] = useState(blockData[0].items[0])
+  const PreviewComponent = previewFactory[selectedItem.id]
 
   return (
     <AddBlockModalBodyLayout
       groupedSelect={
         <GroupedSelect
           data={blockData}
-          onChange={(id: BlockTypes) => {
-            setSelectedItem(id)
-            props.onBlockSelected(blockFactory[id]())
+          onChange={(item: GroupedSelectItem) => {
+            setSelectedItem(item)
+            const Component = componentsByName[item.id]
+            props.onBlockSelected(<Component />)
           }}
         />
       }

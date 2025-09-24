@@ -17,16 +17,12 @@
  */
 
 import {render} from '@testing-library/react'
-import {ColorPickerWrapper} from '../ColorPickerWrapper'
-
-const mockColorPicker = jest.fn()
-jest.mock('@instructure/ui-color-picker', () => ({
-  ColorPicker: (props: any) => mockColorPicker(props),
-}))
+import {ColorPickerWrapper, ColorPickerWrapperProps} from '../ColorPickerWrapper'
 
 describe('ColorPickerWrapper', () => {
-  const defaultProps = {
+  const defaultProps: ColorPickerWrapperProps = {
     label: 'Test Color Picker',
+    popoverButtonScreenReaderLabel: 'Open color picker popover',
     value: '#FF0000',
     baseColor: '#FFFFFF',
     onChange: jest.fn(),
@@ -37,77 +33,31 @@ describe('ColorPickerWrapper', () => {
     jest.clearAllMocks()
   })
 
-  it('passes correct props to ColorPicker', () => {
-    render(<ColorPickerWrapper {...defaultProps} />)
-
-    expect(mockColorPicker).toHaveBeenCalledWith({
-      label: 'Test Color Picker',
-      placeholderText: 'Enter HEX',
-      value: '#FF0000',
-      onChange: defaultProps.onChange,
-      withAlpha: true,
-      popoverMaxHeight: '50vh',
-      colorMixerSettings: {
-        popoverAddButtonLabel: 'Apply',
-        popoverCloseButtonLabel: 'Close',
-        colorContrast: {
-          firstColor: '#FFFFFF',
-          label: 'Contrast Ratio',
-          successLabel: 'PASS',
-          failureLabel: 'FAIL',
-          normalTextLabel: 'Normal text',
-          largeTextLabel: 'Large text',
-          graphicsTextLabel: 'Graphics text',
-          firstColorLabel: 'Background Color',
-          secondColorLabel: 'Test Color Picker',
-        },
-        colorMixer: {
-          withAlpha: true,
-          rgbRedInputScreenReaderLabel: 'Input field for red',
-          rgbGreenInputScreenReaderLabel: 'Input field for green',
-          rgbBlueInputScreenReaderLabel: 'Input field for blue',
-          rgbAlphaInputScreenReaderLabel: 'Input field for alpha',
-          colorSliderNavigationExplanationScreenReaderLabel: `You are on a color slider. To navigate the slider left or right, use the 'A' and 'D' buttons respectively`,
-          alphaSliderNavigationExplanationScreenReaderLabel: `You are on an alpha slider. To navigate the slider left or right, use the 'A' and 'D' buttons respectively`,
-          colorPaletteNavigationExplanationScreenReaderLabel: `You are on a color palette. To navigate on the palette up, left, down or right, use the 'W', 'A', 'S' and 'D' buttons respectively`,
-        },
-      },
-    })
-  })
-
-  it('calls onChange when ColorPicker onChange is triggered', () => {
-    const mockOnChange = jest.fn()
-    render(<ColorPickerWrapper {...defaultProps} onChange={mockOnChange} />)
-
-    const colorPickerProps = mockColorPicker.mock.calls[0][0]
-    colorPickerProps.onChange('#00FF00')
-
-    expect(mockOnChange).toHaveBeenCalledWith('#00FF00')
-  })
-
-  it('uses different baseColor for contrast checking', () => {
+  it('uses different baseColor for contrast checking', async () => {
     const propsWithDifferentBaseColor = {
       ...defaultProps,
       baseColor: '#000000',
     }
 
-    render(<ColorPickerWrapper {...propsWithDifferentBaseColor} />)
+    const {findByText, getByRole} = render(<ColorPickerWrapper {...propsWithDifferentBaseColor} />)
+    const colorPickerButton = getByRole('button')
+    colorPickerButton.click()
 
-    const colorPickerProps = mockColorPicker.mock.calls[0][0]
-    expect(colorPickerProps.colorMixerSettings.colorContrast.firstColor).toBe('#000000')
+    const color = await findByText('#000000')
+    expect(color).toBeInTheDocument()
   })
 
-  it('uses custom baseColorLabel', () => {
+  it('uses custom baseColorLabel', async () => {
     const propsWithCustomLabel = {
       ...defaultProps,
       baseColorLabel: 'Custom Base Label',
     }
 
-    render(<ColorPickerWrapper {...propsWithCustomLabel} />)
+    const {findByText, getByRole} = render(<ColorPickerWrapper {...propsWithCustomLabel} />)
+    const colorPickerButton = getByRole('button')
+    colorPickerButton.click()
 
-    const colorPickerProps = mockColorPicker.mock.calls[0][0]
-    expect(colorPickerProps.colorMixerSettings.colorContrast.firstColorLabel).toBe(
-      'Custom Base Label',
-    )
+    const label = await findByText('Custom Base Label')
+    expect(label).toBeInTheDocument()
   })
 })

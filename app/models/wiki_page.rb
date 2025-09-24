@@ -637,6 +637,7 @@ class WikiPage < ActiveRecord::Base
                             body:,
                             workflow_state: "unpublished",
                             user_id:,
+                            saving_user: opts[:user],
                             protected_editing:,
                             editing_roles:,
                             todo_date:,
@@ -650,7 +651,8 @@ class WikiPage < ActiveRecord::Base
     if assignment && opts_with_default[:duplicate_assignment]
       result.assignment = assignment.duplicate({
                                                  duplicate_wiki_page: false,
-                                                 copy_title: result.title
+                                                 copy_title: result.title,
+                                                 user: opts[:user]
                                                })
     end
 

@@ -28,6 +28,7 @@ import ready from '@instructure/ready'
 
 ready(() => {
   const root = document.querySelector('#content')
+  const permissionGroups = ENV.PERMISSION_GROUPS
 
   // The ENV variables containing the permissions are an array of:
   // { group_name: "foo" group_permissions: [array of permissions] }
@@ -55,7 +56,7 @@ ready(() => {
 
     Object.entries(groups).forEach(([group_name, group_permissions]) => {
       permissionsList.push({
-        label: group_permissions[0].granular_permission_group_label,
+        label: permissionGroups[group_name].label,
         permission_name: group_name,
         granular_permissions: group_permissions,
       })
@@ -100,6 +101,7 @@ ready(() => {
     ),
     roles: getSortedRoles(roles, accountAdmin),
     selectedRoles: [{value: ALL_ROLES_VALUE, label: ALL_ROLES_LABEL}],
+    permissionGroups,
   }
 
   const app = createPermissionsIndex(root, initialState)

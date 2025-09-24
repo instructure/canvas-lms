@@ -19,6 +19,7 @@
 #
 
 require_relative "../graphql_spec_helper"
+require_relative "../../conditional_release_spec_helper"
 
 describe Types::ModuleItemType do
   let_once(:course) do
@@ -371,6 +372,41 @@ describe Types::ModuleItemType do
     end
   end
 
+  context "module_item_url" do
+    it "returns the external URL for external URL module items" do
+      external_url = "https://example.com/test"
+      module_item = module1.content_tags.create!(
+        tag_type: "context_module",
+        content_type: "ExternalUrl",
+        context_id: course.id,
+        context_type: "Course",
+        title: "Test External URL",
+        url: external_url
+      )
+
+      resolver = GraphQLTypeTester.new(module_item, current_user: @teacher)
+      expect(resolver.resolve("moduleItemUrl")).to eq external_url
+    end
+
+    it "returns the external tool URL for external tool module items" do
+      external_tool = external_tool_model(context: course, opts: { url: "https://tool.example.com/launch" })
+      module_item_url = "https://different.example.com/custom"
+      module_item = module1.content_tags.create!(
+        tag_type: "context_module",
+        content_type: "ContextExternalTool",
+        context_id: course.id,
+        context_type: "Course",
+        title: "Test External Tool",
+        url: module_item_url,
+        content_id: external_tool.id
+      )
+
+      resolver = GraphQLTypeTester.new(module_item, current_user: @teacher)
+      expect(resolver.resolve("moduleItemUrl")).to eq module_item_url
+      expect(module_item_url).not_to eq external_tool.url
+    end
+  end
+
   context "blueprint courses" do
     before do
       @course_1 = Course.create!(name: "Course 1")
@@ -440,6 +476,21 @@ describe Types::ModuleItemType do
           expect(resolver.resolve("content { isLockedByMasterCourse }")).to be true
         end
       end
+    end
+  end
+
+  context "mastery path triggers" do
+    before :once do
+      setup_course_with_native_conditional_release
+      @course.context_modules.first.add_item({ type: "Assignment", id: @trigger_assmt.id }, nil, position: 2)
+      course_with_student(course: @course)
+    end
+
+    it "includes mastery_path property" do
+      module_item = @course.context_modules.first.content_tags.last
+      resolver = GraphQLTypeTester.new(module_item, current_user: @student)
+
+      expect(resolver.resolve("masteryPaths { locked chooseUrl awaitingChoice stillProcessing assignmentSetCount }")).not_to be_nil
     end
   end
 end

@@ -24,7 +24,7 @@ const I18n = createI18nScope('page_editor')
 
 export const ImageBlockPreview = () => (
   <BlockPreviewLayout
-    image={<SVGWrapper url="/images/block-content-editor/full-width-image.svg" />}
+    image={<SVGWrapper ariaHidden={true} url="/images/block-content-editor/full-width-image.svg" />}
     title={I18n.t('Full width image')}
     description={[
       I18n.t('Add a standalone image to your page with customisable size and caption options.'),

@@ -27,14 +27,16 @@ import {
 
 type GetAllAssignmentGroupsParams = {
   queryParams: Pick<GetAssignmentGroupsParams, 'courseId'>
+  headers?: Record<string, string>
 } & GetAllPagesCallbacks<GetAssignmentGroupsResult>
 
 export const getAllAssignmentGroups = ({
   queryParams,
+  headers,
   ...params
 }: GetAllAssignmentGroupsParams): GetAllPagesReturnValue<AssignmentGroup[]> =>
   getAllPages({
-    query: (after: string) => getAssignmentGroups({...queryParams, after}),
+    query: (after: string) => getAssignmentGroups({...queryParams, after}, headers),
     getPageInfo: page => page.course.assignmentGroupsConnection.pageInfo,
     flattenPages: pages => flatten(pages.map(page => page.course.assignmentGroupsConnection.nodes)),
     ...params,

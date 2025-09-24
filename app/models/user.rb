@@ -159,12 +159,14 @@ class User < ActiveRecord::Base
   has_many :notification_endpoints, -> { merge(AccessToken.active) }, through: :access_tokens, multishard: true
   has_many :context_external_tools, -> { order(:name) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :lti_results, inverse_of: :user, class_name: "Lti::Result", dependent: :destroy
+  has_many :lti_registration_history_entries, inverse_of: :created_by, class_name: "Lti::RegistrationHistoryEntry", foreign_key: "created_by_id"
 
   has_many :student_enrollments
   has_many :ta_enrollments
   has_many :teacher_enrollments, -> { where(enrollments: { type: "TeacherEnrollment" }) }, class_name: "TeacherEnrollment"
   has_many :all_submissions, -> { preload(:assignment, :submission_comments).order(updated_at: :desc) }, class_name: "Submission", dependent: :destroy
   has_many :submissions, -> { active.preload(:assignment, :submission_comments, :grading_period).order(updated_at: :desc) }
+  has_many :group_submissions, inverse_of: :real_submitter, class_name: "Submission", foreign_key: :real_submitter_id, dependent: :nullify
   has_many :pseudonyms, -> { ordered }, dependent: :destroy
   has_many :active_pseudonyms, -> { where("pseudonyms.workflow_state<>'deleted'") }, class_name: "Pseudonym"
   has_many :pseudonym_accounts, source: :account, through: :pseudonyms
@@ -506,6 +508,7 @@ class User < ActiveRecord::Base
                 :require_self_enrollment_code,
                 :self_enrollment_code,
                 :self_enrollment_course,
+                :self_enrollment_section,
                 :validation_root_account,
                 :sortable_name_explicitly_set
   attr_reader :self_enrollment
@@ -1711,13 +1714,56 @@ class User < ActiveRecord::Base
     avatar_setting ||= "enabled"
     fallback = use_fallback ? self.class.avatar_fallback_url(fallback, request) : nil
     if avatar_setting == "enabled" || (avatar_setting == "enabled_pending" && avatar_approved?) || (avatar_setting == "sis_only")
-      @avatar_url ||= avatar_image_url
+      @avatar_url ||= avatar_location(avatar_image_url)
     end
     @avatar_url ||= fallback if avatar_image_source == "no_pic"
     if (avatar_setting == "enabled") && (avatar_image_source == "gravatar")
       @avatar_url ||= gravatar_url(size, fallback, request)
     end
     @avatar_url ||= fallback
+  end
+
+  def avatar_location(image_url)
+    url = image_url
+    if associated_root_accounts.any? { |a| a.feature_enabled?(:file_association_access) } &&
+       %w[attachment external].include?(avatar_image_source)
+      uri = URI.parse(image_url)
+      attachment_id = get_attachment_id_from_known_avatar_paths(uri.path)
+      if attachment_id
+        params = URI.decode_www_form(uri.query || "")
+        params << ["location", "avatar_#{id}"]
+        uri.query = URI.encode_www_form(params)
+        url = uri.to_s
+      end
+    end
+    url
+  end
+
+  # returns the attachment id specified in the path, or nil if there is no match
+  def get_attachment_id_from_known_avatar_paths(uri_path)
+    md = %r{/images/thumbnails/(\d+(?:~\d+)?)$}.match(uri_path)
+    md ||= %r{/files/(\d+(?:~\d+)?)/download$}.match(uri_path)
+    Shard.integral_id_for(md[1]) if md
+  end
+  private :get_attachment_id_from_known_avatar_paths
+
+  def allow_avatar_access?(attachment)
+    return false unless attachment
+    return false unless %w[attachment external].include?(avatar_image_source)
+
+    avatar_attachment == attachment && avatar_attachment.grants_any_right?(self, :read, :download)
+  end
+
+  # Returns the Attachment record for the file in user's avatar, or nil if the user does not have an avatar. It does no
+  # permission checking, it just goes and finds the attachment.
+  def avatar_attachment
+    return nil unless %w[attachment external].include?(avatar_image_source) && avatar_image_url
+
+    uri = URI.parse(avatar_image_url)
+    attachment_id = get_attachment_id_from_known_avatar_paths(uri.path)
+    return nil unless attachment_id
+
+    Attachment.find_by(id: attachment_id)
   end
 
   def avatar_path
@@ -2088,7 +2134,9 @@ class User < ActiveRecord::Base
     return if @self_enrolling # avoid infinite recursion when enrolling across shards (pseudonym creation + shard association stuff)
 
     @self_enrolling = true
-    @self_enrollment = @self_enrollment_course.self_enroll_student(self, skip_pseudonym: @just_created, skip_touch_user: true)
+    enrollment_options = { skip_pseudonym: @just_created, skip_touch_user: true }
+    enrollment_options[:section] = @self_enrollment_section if @self_enrollment_section
+    @self_enrollment = @self_enrollment_course.self_enroll_student(self, enrollment_options)
     @self_enrolling = false
   end
 
@@ -2427,6 +2475,59 @@ class User < ActiveRecord::Base
       end
   end
   private :cached_course_ids
+
+  # Returns courses the user can read via Canvas permissions:
+  # public courses, institution-public courses, enrolled courses, or admin access.
+  # All courses must be published to be accessible.
+  def accessible_courses_by_ids(course_ids, opts = {})
+    return [] if course_ids.blank?
+
+    @accessible_courses_by_ids ||= {}
+    cache_key = course_ids.sort.join(",")
+
+    courses = @accessible_courses_by_ids[cache_key] ||= shard.activate do
+      Rails.cache.fetch_with_batched_keys(
+        ["accessible_courses", cache_key].cache_key,
+        batch_object: self,
+        batched_keys: [:enrollments, :account_users],
+        expires_in: 1.hour
+      ) do
+        courses = Course.where(id: course_ids)
+        courses.select { |course| course.grants_right?(self, :read) }
+      end
+    end
+
+    if opts[:preload_courses]
+      ActiveRecord::Associations.preload(courses, :enrollment_term)
+    end
+
+    courses
+  end
+
+  def accessible_courses_by_sis_ids(sis_ids, opts = {})
+    return [] if sis_ids.blank?
+
+    @accessible_courses_by_sis_ids ||= {}
+    cache_key = sis_ids.sort.join(",")
+
+    courses = @accessible_courses_by_sis_ids[cache_key] ||= shard.activate do
+      Rails.cache.fetch_with_batched_keys(
+        ["accessible_courses_by_sis", cache_key].cache_key,
+        batch_object: self,
+        batched_keys: [:enrollments, :account_users],
+        expires_in: 1.hour
+      ) do
+        courses = Course.where(sis_source_id: sis_ids).to_a
+        courses.select { |course| course.grants_right?(self, :read) }
+      end
+    end
+
+    if opts[:preload_courses]
+      ActiveRecord::Associations.preload(courses, :enrollment_term)
+    end
+
+    courses
+  end
 
   def participating_enrollments
     @participating_enrollments ||= shard.activate do

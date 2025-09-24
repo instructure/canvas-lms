@@ -71,6 +71,21 @@ module Schemas
         .with_indifferent_access.compact
     end
 
+    # Standardizes and sorts all necessary values in a InternalLtiConfiguration.
+    # Useful for performing any kind of diffing and ensuring consistency.
+    def self.to_sorted(config)
+      config = config.deep_dup.with_indifferent_access
+
+      config[:scopes].sort!
+      config[:redirect_uris].sort!
+      config[:placements].sort_by! { it[:placement] }
+
+      config
+    end
+
+    # The JSON schema for the InternalLtiConfiguration.
+    # Note that this does not include overlays, which are applied separately.
+
     def self.schema
       {
         type: "object",

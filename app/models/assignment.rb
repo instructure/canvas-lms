@@ -166,6 +166,36 @@ class Assignment < AbstractAssignment
     assignments.each { |a| a.can_unpublish = !assmnt_ids_with_subs.include?(a.id) }
   end
 
+  # Duplicates the course module content tags for the assignment to the new assignment.
+  # @param new_assignment [Assignment] the assignment to duplicate the content tags for
+  #
+  # @return [void]
+  def restore_module_content_tags_to(new_assignment:)
+    return if new_assignment.nil? || new_assignment.duplicate_of_id != duplicate_of_id || context_type != "Course"
+
+    # The original assignment is the one that the current assignment was copied from.
+    original_assignment = Assignment.unscoped.find_by(id: duplicate_of_id)
+    return if original_assignment.nil?
+
+    # The current assignment is the one that was copied, but got into a "failed" state.
+    # It has the context module tags that we want to restore
+    current_context_module_tags = ContentTag.where(
+      content_id: id,
+      content_type: "Assignment",
+      context_id:,
+      context_type:,
+      tag_type: "context_module"
+    )
+
+    # We need to duplicate the tags
+    # from the current assignment for the new assignment.
+    current_context_module_tags.each do |current_context_module_tag|
+      current_context_module_tag.content_id = new_assignment.id
+      current_context_module_tag.workflow_state = original_assignment.published? ? "active" : "unpublished"
+      current_context_module_tag.save!
+    end
+  end
+
   private
 
   def before_soft_delete

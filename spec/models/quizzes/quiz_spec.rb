@@ -2717,7 +2717,7 @@ describe Quizzes::Quiz do
   describe "Horizon course" do
     it "does not allow classic quiz creation" do
       allow(@course).to receive(:horizon_course?).and_return(true)
-      expect { @course.quizzes.create!(title: "test") }.to raise_error(ActiveRecord::RecordInvalid)
+      expect { @course.quizzes.create!(title: "test", workflow_state: "available") }.to raise_error(ActiveRecord::RecordInvalid)
     end
   end
 end

@@ -6384,6 +6384,7 @@ hu:
     errors: 
       cannot_shift_and_remove: "nem adhatja meg egyszerre a shift_dates és remove_dates értékeket"
       import_error: "Importálási hiba:"
+    file_copy_error: "A következő fájlt nem lehet másolni: \"%{name}\""
     missing_content_links_message: "Az alábbi hivatkozásokat nem sikerült feloldani:"
     missing_content_links_title: "Hiányzó linkek találhatók az importált tartalomban"
     unexpected_error: "Nem várt hiba lépett fel, kérjük, vegye fel a kapcsolatot az üzemeltetőkkel."
@@ -10078,6 +10079,7 @@ hu:
     roles: 
       designer: Tervező
       designer_with_indefinite_article: "Egy tervező"
+      instructors: Oktatók
       observer: Megfigyelő
       observer_with_indefinite_article: "Egy megfigyelő"
       student: Hallgató
@@ -17006,6 +17008,7 @@ hu:
   no_assignment_group_assigned_8f1cdb9b: "Nincs hozzárendelés Hozzárendelt csoport"
   no_assignment_name_adbb215b: "Nincs feladatnév"
   no_assignment_selected_65d9e422: "Nincs kiválasztva feladat"
+  no_assignments_found_2097cfc1: "Nem található feladat"
   no_assignments_with_that_name_found_1d7be1: "Ezen a néven nem található feladat"
   no_associated_terms_13bacefc: "Nincsenek társított félévek"
   no_attachments_found_for_the_following_ids_ids_49c9192f: "Nem található a következő azonosítókhoz tartozó csatolmány: %{ids}"
@@ -21176,6 +21179,7 @@ hu:
   remove_empty_attachment_b2aea632: "üres melléklet eltávolítása"
   remove_f47dc62a: Eltávolítás
   remove_file_cbf3f40f: "fájl  eltávolítása"
+  remove_filename_1b74ef2a: "%{fileName} eltávolítása"
   remove_filename_87f3781e: "%{filename} eltávolítása"
   remove_filename_dab5c02e: "%{filename}eltávolítása"
   remove_filter_68de01d4: "Szűrő eltávolítása"
@@ -21571,6 +21575,8 @@ hu:
   role_successfully_updated_4317e6a4: "A szerep sikeresen frissítve"
   roles: 
     based_on_type: "%{base_type} alapján"
+    designer: Tervező
+    designers: Tervezők
     edit_role: 
       role_name_label: "Szerepkör neve"
     new_role: 
@@ -21579,6 +21585,8 @@ hu:
       role_type: "Alaptípus:"
       save: Mentés
       saving: Mentés...
+    observer: Megfigyelő
+    observers: Megfigyelők
     permission_button: 
       rolebutton: 
         disable: Letiltás
@@ -21595,6 +21603,12 @@ hu:
       account_roles: "Felhasználói szerepek"
       course_roles: Kurzusszerepek
       page_header_title: Fiókengedélyek
+    student: Hallgató
+    students: Hallgatók
+    ta: Segédoktató
+    tas: Segédoktatók
+    teacher: Oktató
+    teachers: Oktatók
   roles_730b879e: Szerepek
   romanian_13670c1e: Román
   rootFoldersFinder: 
@@ -27542,6 +27556,8 @@ hu:
         anyone: Bárki
         only_teachers: "Csak oktatók"
         teachers_and_students: "Oktatók és hallgatók"
+      create_page_title: "Új oldal"
+      edit_page_title: "%{title} szerkesztése"
       editing_roles: 
         anyone: Bárki
         only_members: "Csak tagoknak"

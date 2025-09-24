@@ -51,6 +51,7 @@ ready(() => {
             canAddObservee={ENV.CAN_ADD_OBSERVEE}
             currentUser={ENV.current_user}
             currentUserRoles={ENV.current_user_roles}
+            sharedCourseData={ENV.SHARED_COURSE_DATA}
           >
             <WidgetDashboardContainer />
           </WidgetDashboardProvider>

@@ -22,21 +22,29 @@ import {View} from '@instructure/ui-view'
 import {SettingsIncludeTitle} from '../BlockItems/SettingsIncludeTitle/SettingsIncludeTitle'
 import {Text} from '@instructure/ui-text'
 import {ColorPickerWrapper} from '../BlockItems/ColorPickerWrapper'
-import {MediaSettings} from './types'
+import {MediaData, MediaSettings, MediaSources} from './types'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {SettingsSectionToggle} from '../BlockItems/SettingsSectionToggle/SettingsSectionToggle'
+import {SettingsUploadMedia} from '../BlockItems/SettingsUploadMedia/SettingsUploadMedia'
+import {Flex} from '@instructure/ui-flex'
+import {defaultProps} from './defaultProps'
 
 const I18n = createI18nScope('block-editor')
 
 export const MediaBlockSettings = () => {
   const {
     actions: {setProp},
-    props,
+    includeBlockTitle,
+    titleColor,
+    backgroundColor,
+    src,
+    mediaId,
+    attachment_id,
   } = useNode(node => ({
-    props: node.data.props,
+    ...defaultProps,
+    ...node.data.props,
   }))
-
-  const includeBlockTitle = props.includeBlockTitle !== false
 
   const handleIncludeBlockTitleChange = () => {
     setProp((props: MediaSettings) => {
@@ -56,6 +64,14 @@ export const MediaBlockSettings = () => {
     })
   }
 
+  const handleMediaChange = (data: MediaSources) => {
+    setProp((props: MediaData) => {
+      props.src = data.src
+      props.mediaId = data.mediaId
+      props.attachment_id = data.attachment_id
+    })
+  }
+
   return (
     <>
       <View as="div" margin="0 0 medium 0">
@@ -65,26 +81,44 @@ export const MediaBlockSettings = () => {
       </View>
 
       <SettingsIncludeTitle checked={includeBlockTitle} onChange={handleIncludeBlockTitleChange} />
-
-      <View as="div" margin="0 0 medium 0">
-        <ColorPickerWrapper
-          label={I18n.t('Background Color')}
-          value={props.backgroundColor}
-          baseColor={props.titleColor}
-          baseColorLabel={I18n.t('Title Color')}
-          onChange={handleBackgroundColorChange}
+      <SettingsSectionToggle
+        title={I18n.t('Color settings')}
+        collapsedLabel={I18n.t('Expand color settings')}
+        expandedLabel={I18n.t('Collapse color settings')}
+        defaultExpanded={true}
+        includeSeparator={true}
+      >
+        <Flex direction="column" gap="medium">
+          <ColorPickerWrapper
+            label={I18n.t('Background color')}
+            popoverButtonScreenReaderLabel={I18n.t('Open background color picker popover')}
+            value={backgroundColor}
+            baseColor={titleColor}
+            baseColorLabel={I18n.t('Title color')}
+            onChange={handleBackgroundColorChange}
+          />
+          <ColorPickerWrapper
+            label={I18n.t('Title color')}
+            popoverButtonScreenReaderLabel={I18n.t('Open title color picker popover')}
+            value={titleColor}
+            baseColor={backgroundColor}
+            baseColorLabel={I18n.t('Background color')}
+            onChange={handleTitleColorChange}
+          />
+        </Flex>
+      </SettingsSectionToggle>
+      <SettingsSectionToggle
+        title={I18n.t('Media settings')}
+        collapsedLabel={I18n.t('Expand media settings')}
+        expandedLabel={I18n.t('Collapse media settings')}
+        defaultExpanded={true}
+        includeSeparator={false}
+      >
+        <SettingsUploadMedia
+          onMediaChange={handleMediaChange}
+          mediaSource={{src, mediaId, attachment_id}}
         />
-      </View>
-
-      <View as="div" margin="0 0 medium 0">
-        <ColorPickerWrapper
-          label={I18n.t('Title Color')}
-          value={props.titleColor}
-          baseColor={props.backgroundColor}
-          baseColorLabel={I18n.t('Background Color')}
-          onChange={handleTitleColorChange}
-        />
-      </View>
+      </SettingsSectionToggle>
     </>
   )
 }

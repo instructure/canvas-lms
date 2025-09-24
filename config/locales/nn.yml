@@ -6923,6 +6923,7 @@ nn:
     errors: 
       cannot_shift_and_remove: "kan ikkje oppgi shift_dates og remove_dates på same tid"
       import_error: "Importfeil:"
+    file_copy_error: "Kan ikkje kopiere fila \"%{name}\""
     missing_content_links_message: "Følgande referansar kan ikkje løysast:"
     missing_content_links_title: "Manglande lenker funne i importert innhald"
     unexpected_error: "Det oppstod ein uventa feil. Ta kontakt med brukarstøtte."
@@ -7159,6 +7160,7 @@ nn:
       links: 
         view_services: "Vis registrerte tenester"
     roster_user: 
+      access_tokens: Tilgangsnøklar
       completed_enrollment: "fullført *%{completed_at}*"
       confirm: 
         conclude: "Er du sikker på at du vil fullføre påmeldinga?"
@@ -10903,6 +10905,7 @@ nn:
     roles: 
       designer: Designar
       designer_with_indefinite_article: "Ein designar"
+      instructors: Faglærarar
       observer: Observatør
       observer_with_indefinite_article: "Ein observatør"
       student: Student
@@ -18305,6 +18308,7 @@ nn:
   no_assignment_group_assigned_8f1cdb9b: "Ingen oppgåvegrupper er tilordna"
   no_assignment_name_adbb215b: "Ingen oppgåvenamn"
   no_assignment_selected_65d9e422: "Ingen valde oppgåver"
+  no_assignments_found_2097cfc1: "Finn ikkje oppgåver"
   no_assignments_with_that_name_found_1d7be1: "Finn ikkje oppgåver med det namnet"
   no_associated_terms_13bacefc: "Ingen tilknytte filer"
   no_attachments_found_for_the_following_ids_ids_49c9192f: "Ingen vedlegg funne for følgande ID'ar: %{ids}"
@@ -22608,6 +22612,7 @@ nn:
   remove_empty_attachment_b2aea632: "fjern tomt vedlegg"
   remove_f47dc62a: Fjern
   remove_file_cbf3f40f: "Fjern fil"
+  remove_filename_1b74ef2a: "Fjern %{fileName}"
   remove_filename_87f3781e: "fjern %{filename}"
   remove_filename_dab5c02e: "Fjern %{filename}"
   remove_filter_68de01d4: "Fjern filter"
@@ -23023,6 +23028,8 @@ nn:
   role_successfully_updated_4317e6a4: "Rolla er oppdatert"
   roles: 
     based_on_type: "Basert på %{base_type}"
+    designer: Designar
+    designers: Designarar
     edit_role: 
       role_name_label: Rollenamn
     new_role: 
@@ -23031,6 +23038,8 @@ nn:
       role_type: "Basistype:"
       save: Lagre
       saving: Lagrar...
+    observer: Observatør
+    observers: Observatørar
     permission_button: 
       rolebutton: 
         disable: Deaktiver
@@ -23048,6 +23057,12 @@ nn:
       account_roles: Kontoroller
       course_roles: Emneroller
       page_header_title: "Løyve for kontoar"
+    student: Student
+    students: Studentar
+    ta: Undervisingsassistent
+    tas: Undervisingsassistentar
+    teacher: Faglærar
+    teachers: Faglærarar
   roles_730b879e: Roller
   romanian_13670c1e: Rumensk
   rootFoldersFinder: 
@@ -28850,6 +28865,7 @@ nn:
       current_conference_text: "Du er invitert til å delta på %{conference}. Den startar %{starts_at}."
     service_not_enabled: "Tenesta er ikkje aktivert"
     show: 
+      access_tokens: Tilgangsnøklar
       accounts: Kontoar
       buttons: 
         faculty_journal_for: "Faglærarprotokoll for %{user}"
@@ -29375,6 +29391,8 @@ nn:
         anyone: "Kven som helst"
         only_teachers: "Berre faglærarar"
         teachers_and_students: "Faglærarar og studentar"
+      create_page_title: "Ny side"
+      edit_page_title: "Rediger %{title}"
       editing_roles: 
         anyone: "Kven som helst"
         can_edit_page: "kan redigere denne sida"

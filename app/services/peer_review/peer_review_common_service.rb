@@ -86,7 +86,6 @@ class PeerReview::PeerReviewCommonService < ApplicationService
       anonymous_peer_reviews
       automatic_peer_reviews
       intra_group_peer_reviews
-      submission_types
       workflow_state
     ]
   end
@@ -99,13 +98,16 @@ class PeerReview::PeerReviewCommonService < ApplicationService
     attrs = {
       title: I18n.t("%{title} Peer Review", title: @parent_assignment.title),
       parent_assignment_id: @parent_assignment.id,
-      has_sub_assignments: false
+      has_sub_assignments: false,
+      submission_types: expected_submission_types
     }
+
     attrs[:points_possible] = @points_possible if @points_possible
     attrs[:grading_type] = @grading_type if @grading_type
     attrs[:due_at] = @due_at if @due_at
     attrs[:unlock_at] = @unlock_at if @unlock_at
     attrs[:lock_at] = @lock_at if @lock_at
+
     attrs
   end
 
@@ -135,11 +137,24 @@ class PeerReview::PeerReviewCommonService < ApplicationService
       attrs[:title] = expected_title
     end
 
+    if expected_submission_types != peer_review_sub.submission_types
+      attrs[:submission_types] = expected_submission_types
+    end
+
     attrs
   end
 
   def compute_due_dates_and_create_submissions(peer_review_sub_assignment)
     PeerReviewSubAssignment.clear_cache_keys(peer_review_sub_assignment, :availability)
     SubmissionLifecycleManager.recompute(peer_review_sub_assignment, update_grades: true, create_sub_assignment_submissions: false)
+  end
+
+  def expected_submission_types
+    if @grading_type == "not_graded"
+      "not_graded"
+    else
+      # for compatibility with assignment grading workflows
+      "online_text_entry"
+    end
   end
 end

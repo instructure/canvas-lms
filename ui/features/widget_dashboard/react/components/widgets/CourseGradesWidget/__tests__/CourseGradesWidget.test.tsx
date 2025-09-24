@@ -17,12 +17,14 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
-import {setupServer} from 'msw/node'
 import CourseGradesWidget from '../CourseGradesWidget'
 import type {BaseWidgetProps, Widget} from '../../../../types'
-import {defaultGraphQLHandlers} from '../../../../__tests__/testHelpers'
+import {
+  WidgetDashboardProvider,
+  type SharedCourseData,
+} from '../../../../hooks/useWidgetDashboardContext'
 
 const mockWidget: Widget = {
   id: 'test-course-grades-widget',
@@ -39,48 +41,61 @@ const buildDefaultProps = (overrides: Partial<BaseWidgetProps> = {}): BaseWidget
   }
 }
 
-const renderWithQueryClient = (component: React.ReactElement) => {
+const mockSharedCourseData: SharedCourseData[] = [
+  {
+    courseId: '1',
+    courseCode: 'CS101',
+    courseName: 'Course 1',
+    currentGrade: 95,
+    gradingScheme: 'letter',
+    lastUpdated: '2025-01-01T00:00:00Z',
+  },
+  {
+    courseId: '2',
+    courseCode: 'MATH201',
+    courseName: 'Course 2',
+    currentGrade: 88,
+    gradingScheme: 'percentage',
+    lastUpdated: '2025-01-02T00:00:00Z',
+  },
+]
+
+const setup = (
+  props: Partial<BaseWidgetProps> = {},
+  sharedCourseData: SharedCourseData[] = mockSharedCourseData,
+) => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
         retry: false,
+        staleTime: 0,
       },
     },
   })
-  return render(<QueryClientProvider client={queryClient}>{component}</QueryClientProvider>)
+  const defaultProps = buildDefaultProps(props)
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <WidgetDashboardProvider sharedCourseData={sharedCourseData}>
+        <CourseGradesWidget {...defaultProps} />
+      </WidgetDashboardProvider>
+    </QueryClientProvider>,
+  )
 }
 
-const server = setupServer(...defaultGraphQLHandlers)
-
 describe('CourseGradesWidget', () => {
-  let originalEnv: any
-
-  beforeAll(() => {
-    // Set up Canvas ENV with current_user_id
-    originalEnv = window.ENV
-    window.ENV = {
-      ...originalEnv,
-      current_user_id: '123',
-    }
-
-    server.listen({
-      onUnhandledRequest: 'error',
-    })
-  })
-
-  afterEach(() => {
-    server.resetHandlers()
-  })
-
-  afterAll(() => {
-    server.close()
-    // Restore original ENV
-    window.ENV = originalEnv
-  })
-
-  it('renders basic widget', () => {
-    renderWithQueryClient(<CourseGradesWidget {...buildDefaultProps()} />)
+  it('renders basic widget', async () => {
+    setup({}, [])
 
     expect(screen.getByText('Course Grades')).toBeInTheDocument()
+    expect(screen.queryByText('Loading course grades...')).not.toBeInTheDocument()
+  })
+
+  it('displays courses with shared data', async () => {
+    setup()
+
+    await waitFor(() => {
+      expect(screen.getByText('Course 1')).toBeInTheDocument()
+      expect(screen.getByText('Course 2')).toBeInTheDocument()
+    })
   })
 })

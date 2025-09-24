@@ -24,7 +24,9 @@ const I18n = createI18nScope('page_editor')
 
 export const SeparatorLineBlockPreview = () => (
   <BlockPreviewLayout
-    image={<SVGWrapper url="/images/block-content-editor/separator-line-thin.svg" />}
+    image={
+      <SVGWrapper ariaHidden={true} url="/images/block-content-editor/separator-line-thin.svg" />
+    }
     title={I18n.t('Separation line')}
     description={[I18n.t('Add a horizontal line to visually separate content.')]}
     legend={I18n.t(

@@ -37,26 +37,34 @@ jest.mock('../../../hooks/useIsEditingBlock', () => ({
   useIsEditingBlock: () => useIsEditingBlockMock(),
 }))
 
+const setIsEditedViaEditButtonMock = jest.fn()
+const getUseIsEditingBlockMock = ({
+  isEditingBlock,
+  isEditedViaEditButton,
+}: {isEditingBlock: boolean; isEditedViaEditButton: boolean}) => ({
+  isEditingBlock,
+  isEditedViaEditButton,
+  setIsEditedViaEditButton: setIsEditedViaEditButtonMock,
+})
+
 const defaultProps: ButtonBlockProps = {
-  settings: {
-    includeBlockTitle: false,
-    alignment: 'left',
-    layout: 'horizontal',
-    isFullWidth: false,
-    buttons: [
-      {
-        id: 1,
-        text: '',
-        url: '',
-        linkOpenMode: 'new-tab',
-        primaryColor: '#000000',
-        secondaryColor: '#FFFFFF',
-        style: 'filled',
-      },
-    ],
-    backgroundColor: '#FF0000',
-    textColor: '#000000',
-  },
+  includeBlockTitle: false,
+  alignment: 'left',
+  layout: 'horizontal',
+  isFullWidth: false,
+  buttons: [
+    {
+      id: 1,
+      text: '',
+      url: '',
+      linkOpenMode: 'new-tab',
+      primaryColor: '#000000',
+      secondaryColor: '#FFFFFF',
+      style: 'filled',
+    },
+  ],
+  backgroundColor: '#FF0000',
+  titleColor: '#000000',
   title: '',
 }
 
@@ -67,14 +75,18 @@ describe('ButtonBlock', () => {
 
   it('renders ButtonBlockEdit in edit mode', () => {
     useIsInEditorMock.mockReturnValue(true)
-    useIsEditingBlockMock.mockReturnValue(true)
+    useIsEditingBlockMock.mockReturnValue(
+      getUseIsEditingBlockMock({isEditingBlock: true, isEditedViaEditButton: false}),
+    )
     renderBlock(ButtonBlock, defaultProps)
     expect(screen.getByTestId('button-block-edit')).toBeInTheDocument()
   })
 
   it('renders ButtonBlockEditPreview in editPreview mode', () => {
     useIsInEditorMock.mockReturnValue(true)
-    useIsEditingBlockMock.mockReturnValue(false)
+    useIsEditingBlockMock.mockReturnValue(
+      getUseIsEditingBlockMock({isEditingBlock: false, isEditedViaEditButton: false}),
+    )
     renderBlock(ButtonBlock, defaultProps)
     expect(screen.getByTestId('button-block-edit-preview')).toBeInTheDocument()
   })

@@ -28,6 +28,7 @@ import {
 type ENVType = {
   ACCOUNT_LEVEL_MASTERY_SCALES: boolean
   ASSIGNMENT_ID: string
+  ASSIGNMENT_POINTS?: number
   COURSE_ID: string
   PERMISSIONS: {
     manage_rubrics: boolean
@@ -79,6 +80,7 @@ export const renderEnhancedRubrics = () => {
       'enhanced-rubric-assignment-edit-mount-point',
       <RubricAssignmentContainer
         assignmentId={ENV.ASSIGNMENT_ID}
+        assignmentPointsPossible={ENV.ASSIGNMENT_POINTS}
         assignmentRubric={assignmentRubric}
         assignmentRubricAssociation={assignmentRubricAssociation}
         canManageRubrics={ENV.PERMISSIONS?.manage_rubrics}

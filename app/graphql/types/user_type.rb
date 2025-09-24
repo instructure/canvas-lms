@@ -242,9 +242,18 @@ module Types
                "only return enrollments for this course",
                required: false,
                prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
+      argument :course_ids,
+               [ID],
+               "only return enrollments for these courses",
+               required: false,
+               prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Course")
       argument :current_only,
                Boolean,
                "Whether or not to restrict results to `active` enrollments in `available` courses",
+               required: false
+      argument :enrollment_types,
+               [EnrollmentTypeType],
+               "Filter by enrollment types (e.g., TeacherEnrollment, TaEnrollment)",
                required: false
       argument :exclude_concluded,
                Boolean,
@@ -264,7 +273,7 @@ module Types
                "The sort field and direction for the results. Secondary sort is by section name",
                required: false
     end
-    def enrollments_connection(course_id: nil, current_only: false, order_by: [], exclude_concluded: false, horizon_courses: nil, sort: {})
+    def enrollments_connection(course_id: nil, course_ids: nil, current_only: false, order_by: [], exclude_concluded: false, horizon_courses: nil, sort: {}, enrollment_types: nil)
       # Check basic permission - return empty instead of nil
       unless object == current_user || object.grants_right?(current_user, session, :read_profile)
         return Enrollment.none
@@ -282,9 +291,11 @@ module Types
         enrollments = enrollments.where(course_id: permitted_course_ids)
       end
 
-      # Apply filters similar to the loader logic
+      # Apply course filtering - support both single course_id and multiple course_ids
       if course_id
         enrollments = enrollments.where(course_id:)
+      elsif course_ids.present?
+        enrollments = enrollments.where(course_id: course_ids)
       end
 
       if current_only
@@ -294,6 +305,11 @@ module Types
 
       if exclude_concluded
         enrollments = enrollments.where.not(workflow_state: "completed")
+      end
+
+      # Filter by enrollment types if specified
+      if enrollment_types.present?
+        enrollments = enrollments.where(type: enrollment_types.map(&:to_s))
       end
 
       enrollments.order(:id)
@@ -589,6 +605,95 @@ module Types
           get_favorite_groups(final_scope)
         end
       end
+    end
+
+    field :course_work_submissions_connection, Types::SubmissionType.connection_type, null: true do
+      description "All actionable submissions for the current user across enrolled courses, for course work widget"
+      argument :course_filter, String, required: false
+      argument :end_date, GraphQL::Types::ISO8601DateTime, required: false, description: "End date for due date range filter"
+      argument :include_no_due_date, Boolean, required: false, description: "Include assignments with no due date"
+      argument :include_overdue, Boolean, required: false, description: "Include overdue assignments"
+      argument :only_submitted, Boolean, required: false, description: "Show only submitted assignments"
+      argument :start_date, GraphQL::Types::ISO8601DateTime, required: false, description: "Start date for due date range filter"
+    end
+    def course_work_submissions_connection(course_filter: nil, start_date: nil, end_date: nil, include_overdue: false, include_no_due_date: false, only_submitted: false)
+      return [] unless object == current_user
+
+      # Get active course enrollments
+      active_course_ids = object.enrollments
+                                .joins(:course)
+                                .where(courses: { workflow_state: "available" })
+                                .where(workflow_state: ["active", "invited"])
+                                .pluck(:course_id)
+                                .uniq
+
+      if active_course_ids.empty?
+        return []
+      end
+
+      # Apply course filter if provided
+      if course_filter.present?
+        active_course_ids = [course_filter.to_i] & active_course_ids
+        return [] if active_course_ids.empty?
+      end
+
+      # Build a more efficient query for submissions instead of loading everything
+      # Start with submissions for the user
+      submissions_query = Submission
+                          .joins(assignment: :course)
+                          .where(user: object)
+                          .where(assignments: { context_id: active_course_ids, context_type: "Course" })
+                          .where(assignments: { workflow_state: "published" })
+                          .where(courses: { workflow_state: "available" })
+
+      # Filter by submission status
+      submissions_query = if only_submitted
+                            submissions_query.where.not(submitted_at: nil)
+                          else
+                            # Default: show unsubmitted, non-excused assignments (actionable items)
+                            submissions_query.where(submitted_at: nil).where("excused = FALSE OR excused IS NULL")
+                          end
+
+      # Apply date filtering using flexible date parameters (skip for submitted items)
+      unless only_submitted
+        today = Time.zone.now.beginning_of_day
+        conditions = []
+        params = []
+
+        # Add date range filter if provided
+        if start_date.present? && end_date.present?
+          conditions << "((cached_due_date IS NOT NULL AND cached_due_date BETWEEN ? AND ?) OR (cached_due_date IS NULL AND assignments.due_at IS NOT NULL AND assignments.due_at BETWEEN ? AND ?))"
+          params += [start_date, end_date, start_date, end_date]
+        elsif start_date.present?
+          conditions << "((cached_due_date IS NOT NULL AND cached_due_date >= ?) OR (cached_due_date IS NULL AND assignments.due_at IS NOT NULL AND assignments.due_at >= ?))"
+          params += [start_date, start_date]
+        elsif end_date.present?
+          conditions << "((cached_due_date IS NOT NULL AND cached_due_date <= ?) OR (cached_due_date IS NULL AND assignments.due_at IS NOT NULL AND assignments.due_at <= ?))"
+          params += [end_date, end_date]
+        end
+
+        # Add overdue filter if requested
+        if include_overdue
+          conditions << "(cached_due_date < ?) OR (cached_due_date IS NULL AND assignments.due_at < ?)"
+          params += [today, today]
+        end
+
+        # Add no due date filter if requested
+        if include_no_due_date
+          conditions << "(cached_due_date IS NULL AND assignments.due_at IS NULL)"
+        end
+
+        # Apply the combined conditions
+        if conditions.any?
+          submissions_query = submissions_query.where(conditions.join(" OR "), *params)
+        end
+      end
+
+      # Order by cached_due_date first (nulls last), then by assignment due_at (nulls last)
+      submissions_query = submissions_query.order(:cached_due_date, assignments: { due_at: :asc })
+
+      # Use eager_load for essential associations to avoid N+1 queries
+      submissions_query.eager_load(assignment: :course)
     end
 
     field :viewable_submissions_connection, Types::SubmissionType.connection_type, null: true do

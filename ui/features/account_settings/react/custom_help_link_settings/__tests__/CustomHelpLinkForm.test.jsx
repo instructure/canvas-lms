@@ -19,13 +19,14 @@
 import React from 'react'
 
 import CustomHelpLinkForm from '../CustomHelpLinkForm'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, waitFor} from '@testing-library/react'
 
 function makeProps(overrides = {}) {
   const linkOverride = overrides.link || {}
   delete overrides.link
   return {
     link: {
+      index: 0,
       available_to: ['student'],
       text: 'Ask Your Instructor a Question',
       subtext: 'Questions are submitted to your instructor',
@@ -108,5 +109,61 @@ describe('<CustomHelpLinkForm/>', () => {
     expect(getByLabelText('Featured').checked).toBe(true)
     expect(getByLabelText('New').checked).toBe(false)
     expect(getByDisplayValue('This is my headline')).toBeInTheDocument()
+  })
+
+  it('submits the form with the correct values', async () => {
+    const props = makeProps()
+    const submitSpy = jest.fn()
+    const {getByLabelText, getByText} = render(<CustomHelpLinkForm {...props} />, {
+      wrapper: ({children}) => (
+        <form
+          onSubmit={e => {
+            e.preventDefault()
+            submitSpy(e)
+          }}
+        >
+          {children}
+          <button type="submit">Submit</button>
+        </form>
+      ),
+    })
+    const linkName = getByLabelText('Link name')
+    const linkDescriptions = getByLabelText('Link description')
+    const availableToTeachersOption = getByLabelText('Teachers')
+    const featuresFeaturedOption = getByLabelText('Featured')
+    const featureHeadline = getByLabelText('Feature headline')
+    const submitButton = getByText('Submit')
+
+    fireEvent.change(linkName, {target: {value: 'New Link Name'}})
+    fireEvent.change(linkDescriptions, {target: {value: 'New Link Description'}})
+    fireEvent.click(availableToTeachersOption)
+    fireEvent.click(featuresFeaturedOption)
+    fireEvent.change(featureHeadline, {target: {value: 'New Feature Headline'}})
+    fireEvent.click(submitButton)
+
+    await waitFor(() => {
+      const [event] = submitSpy.mock.calls[0]
+      const elements = event.target.elements
+      expect(elements['account[custom_help_links][0][state]'].value).toBe('active')
+      expect(elements['account[custom_help_links][0][text]'].value).toBe('New Link Name')
+      expect(elements['account[custom_help_links][0][subtext]'].value).toBe('New Link Description')
+      const availableTo = Array.from(elements['account[custom_help_links][0][available_to][]'])
+        .filter(el => el.name && el.checked)
+        .map(el => ({
+          [el.name]: el.value,
+        }))
+      expect(availableTo).toEqual(
+        expect.arrayContaining([
+          {['account[custom_help_links][0][available_to][]']: 'student'},
+          {['account[custom_help_links][0][available_to][]']: 'teacher'},
+        ]),
+      )
+      expect(elements['account[custom_help_links][0][is_featured]'].checked).toBe(true)
+      expect(elements['account[custom_help_links][0][is_new]'].checked).toBe(false)
+      expect(elements['account[custom_help_links][0][feature_headline]'].value).toBe(
+        'New Feature Headline',
+      )
+      expect(elements['account[custom_help_links][0][type]'].value).toBe('default')
+    })
   })
 })

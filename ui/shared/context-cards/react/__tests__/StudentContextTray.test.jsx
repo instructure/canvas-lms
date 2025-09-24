@@ -75,7 +75,6 @@ describe('StudentContextTray', () => {
     const container = document.createElement('div')
     container.id = 'fixtures'
     document.body.appendChild(container)
-    window.ENV.FEATURES = {hide_legacy_course_analytics: false}
     window.ENV.permissions = {can_manage_differentiation_tags: false}
   })
 
@@ -209,9 +208,9 @@ describe('StudentContextTray', () => {
     it('renders with analytics data', () => {
       const userWithAnalytics = {...user, analytics}
       props.data = {loading: false, user: userWithAnalytics, course}
-      const {getByText} = render(<StudentContextTray {...props} />)
-      const analyticsButton = getByText('Analytics')
-      expect(analyticsButton).toBeTruthy()
+      const {queryByText} = render(<StudentContextTray {...props} />)
+      const analyticsButton = queryByText('Analytics')
+      expect(analyticsButton).not.toBeTruthy()
     })
 
     it('renders analytics 2 button (only) if the tool is installed', () => {
@@ -242,8 +241,7 @@ describe('StudentContextTray', () => {
       expect(analyticsLinks).toHaveLength(0)
     })
 
-    it('does not render if analytics feature is disabled', () => {
-      window.ENV.FEATURES = {hide_legacy_course_analytics: true}
+    it('does not render legacy analytics entrypoint', () => {
       props.data = {loading: false, user, course}
       const {container} = render(<StudentContextTray {...props} />)
       const analyticsLinks = container.querySelectorAll('a[href*="analytics"]')

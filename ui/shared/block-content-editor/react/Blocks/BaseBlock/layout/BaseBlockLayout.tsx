@@ -19,34 +19,45 @@
 import './base-block-layout.css'
 import {Flex} from '@instructure/ui-flex'
 import {Tag} from '@instructure/ui-tag'
-import React, {PropsWithChildren, ReactNode} from 'react'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {PropsWithChildren, ReactNode} from 'react'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-export const BaseBlockLayout = React.forwardRef<
-  HTMLDivElement,
-  PropsWithChildren<{
+const I18n = createI18nScope('block_content_editor')
+
+export const BaseBlockLayout = (
+  props: PropsWithChildren<{
     title: string
     menu: ReactNode
-    actionButtons: ReactNode
     addButton: ReactNode
-  }>
->((props, ref) => {
+    topA11yActionMenu: ReactNode
+    bottomA11yActionMenu: ReactNode
+    nodeId: string
+  }>,
+) => {
   return (
-    <div ref={ref} className="base-block-layout">
-      <Flex direction="column" padding="paddingCardLarge" gap="mediumSmall">
-        <Flex justifyItems="space-between">
+    <div data-bce-node-id={props.nodeId} className="base-block-layout">
+      <Flex direction="column" padding="paddingCardLarge">
+        <Flex justifyItems="space-between" margin="0 0 mediumSmall 0">
           <Flex data-header>
+            <ScreenReaderContent>{I18n.t('Block type')}</ScreenReaderContent>
             <Tag text={props.title} size="medium" data-testid="block-type-label" />
           </Flex>
-          <Flex>{props.menu}</Flex>
+          <Flex data-testid="block-menu">{props.menu}</Flex>
         </Flex>
-        <Flex direction="column" gap="small" width={'100%'}>
-          {props.children}
+        <Flex data-focus-reveal-parent margin="0 0 mediumSmall 0">
+          {props.topA11yActionMenu}
         </Flex>
-        <Flex direction="row-reverse" width={'100%'} justifyItems="space-between">
-          <Flex.Item>{props.actionButtons}</Flex.Item>
+        <Flex direction="column" gap="mediumSmall">
+          <Flex direction="column" gap="small" width={'100%'}>
+            {props.children}
+          </Flex>
+          <Flex width={'100%'} justifyItems="end" gap="small">
+            {props.bottomA11yActionMenu}
+          </Flex>
         </Flex>
       </Flex>
       {props.addButton}
     </div>
   )
-})
+}

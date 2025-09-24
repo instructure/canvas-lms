@@ -20,35 +20,51 @@
 # An Lti::Asset is something an AssetProcessor can create a report for. It is a
 # generalization of an attachment. Examples include:
 # - an attachment used in a submission
-# - (future) RCE content submitted by a student as part of a submission
-# - (future) possibly RCE content or attachments used other places, e.g. discussions
+# - RCE content submitted by a student as part of a submission
+# - discussion entry (comment) submitted by a student
+# - submission_id is always present, except when the submission is deleted. In that case,
+#   the submission_id is set to null to not break the foreign key constraint.
+# - when attachment id deleted, the asset is soft-deleted. There is no foreign key constraint for attachment,
+#   because it can be on a different shard. So the attachment_id remains set, but the attachment may not exist anymore.
+#   This helps up to satisfy the asset locator constraint below.
+# - asset locator constraint: exactly one of attachment_id, submission_attempt or discussion_entry_version_id must be present
+# - if submission_attempt is set, it's RCE content
+# - if attachment_id is set, it's a file attachment of a submission
+# - if discussion_entry_version_id is set, it's a discussion entry (comment)
+# - uuid is generated on creation and never changes
 class Lti::Asset < ApplicationRecord
   extend RootAccountResolver
   include Canvas::SoftDeletable
 
-  resolves_root_account through: :submission
+  # Raised when we cannot determine the asset type from the locator columns.
+  class UnknownTypeError < StandardError; end
 
-  # For now, there is no dependent: destroy from attachment to report,
-  # so we should check the assignment is not (soft-)deleted when using
-  # the report, if we care in the scenario.
+  resolves_root_account through: :submission
 
   has_many :asset_reports, class_name: "Lti::AssetReport", inverse_of: :asset, foreign_key: :lti_asset_id, dependent: :destroy
 
-  # We support other types of assets,
-  # for instance RCE content stored in a Submission attempt,
-  # so attachment is optional
   belongs_to :attachment,
              inverse_of: :lti_assets,
-             class_name: "Attachment"
+             class_name: "Attachment",
+             optional: true
 
   belongs_to :submission,
              inverse_of: :lti_assets,
              class_name: "Submission",
              optional: false
 
-  validate :attachment_id_or_submission_attempt_present
+  belongs_to :discussion_entry_version,
+             inverse_of: :lti_asset,
+             class_name: "DiscussionEntryVersion",
+             optional: true
+
+  validate :exactly_one_locator_present
 
   before_validation :generate_uuid, on: :create
+
+  TYPE_TEXT_ENTRY = "text_entry"
+  TYPE_DISCUSSION_ENTRY = "discussion_entry"
+  TYPE_ATTACHMENT = "attachment"
 
   def compatible_with_processor?(processor)
     !!submission&.assignment && submission.assignment == processor&.assignment
@@ -64,6 +80,8 @@ class Lti::Asset < ApplicationRecord
     digester = Digest::SHA256.new
     if text_entry?
       digester << submission.body_for_attempt(submission_attempt)
+    elsif discussion_entry?
+      digester << discussion_entry_version.message
     else
       attachment.open do |chunk|
         digester << chunk
@@ -77,12 +95,40 @@ class Lti::Asset < ApplicationRecord
     update(sha256_checksum: digest)
   end
 
+  def asset_type
+    unless submission_id.present?
+      # In theory, submissions can be deleted, to not break the foreign key constraint we set the submission_id to null
+      # when the submission is hard deleted with dependent: :nullify in the Submission model.
+      return "deleted"
+    end
+
+    # if submission_attempt is set, it's RCE content
+    if submission_attempt.present?
+      TYPE_TEXT_ENTRY
+    # if attachment_id is set, it's a file attachment of a submission
+    elsif attachment_id.present?
+      TYPE_ATTACHMENT
+    # if discussion_entry_version_id is set, it's a discussion entry (comment)
+    elsif discussion_entry_version_id.present?
+      TYPE_DISCUSSION_ENTRY
+    else
+      Rails.logger.error(
+        "Lti::Asset unknown type id=#{id}, submission_id=#{submission_id}, attachment_id=#{attachment_id}, submission_attempt=#{submission_attempt}, discussion_entry_version_id=#{discussion_entry_version_id}"
+      )
+      raise UnknownTypeError, "Unable to determine asset type for Lti::Asset id=#{id}. The referred discussion_entry_version or the submission has been probably deleted."
+    end
+  end
+
   def text_entry?
-    attachment_id.blank?
+    asset_type == TYPE_TEXT_ENTRY
+  end
+
+  def discussion_entry?
+    asset_type == "discussion_entry"
   end
 
   def content_type
-    if text_entry?
+    if text_entry? || discussion_entry?
       "text/html"
     else
       attachment.content_type
@@ -92,6 +138,8 @@ class Lti::Asset < ApplicationRecord
   def content_size
     if text_entry?
       submission.body_for_attempt(submission_attempt).bytesize
+    elsif discussion_entry?
+      discussion_entry_version.message.bytesize
     else
       attachment.size
     end
@@ -103,9 +151,10 @@ class Lti::Asset < ApplicationRecord
     self.uuid ||= SecureRandom.uuid
   end
 
-  def attachment_id_or_submission_attempt_present
-    if attachment_id.present? == submission_attempt.present?
-      errors.add(:base, "Exactly one of attachment_id or submission_attempt must be present")
-    end
+  def exactly_one_locator_present
+    present = [attachment_id.present?, submission_attempt.present?, discussion_entry_version_id.present?]
+    return if present.count(true) == 1
+
+    errors.add(:base, "Exactly one of attachment_id, submission_attempt or discussion_entry_version_id must be present")
   end
 end

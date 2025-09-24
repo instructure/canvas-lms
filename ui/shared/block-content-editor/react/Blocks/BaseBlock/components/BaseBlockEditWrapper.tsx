@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {PropsWithChildren, useRef} from 'react'
+import {PropsWithChildren} from 'react'
 import {useNode} from '@craftjs/core'
 import {AddButton} from '../../../AddBlock/AddButton'
 import {useBlockContentEditorContext} from '../../../BlockContentEditorContext'
@@ -24,15 +24,17 @@ import {useOpenSettingsTray} from '../../../hooks/useOpenSettingsTray'
 import {useDeleteNode} from '../../../hooks/useDeleteNode'
 import {useDuplicateNode} from '../../../hooks/useDuplicateNode'
 import {useMoveBlock} from '../../../hooks/useMoveBlock'
+import {useIsEditingBlock} from '../../../hooks/useIsEditingBlock'
 import {BaseBlockLayout} from '../layout/BaseBlockLayout'
-import {useSetEditMode} from '../useSetEditMode'
 import {CopyButton} from './CopyButton'
-import {EditButton} from './EditButton'
+import {SettingsButton} from './SettingsButton'
 import {RemoveButton} from './RemoveButton'
-import {ApplyButton} from './ApplyButton'
 import {MoveButton} from './MoveButton'
 import {BackgroundColorApplier} from './BackgroundColorApplier'
 import {Flex} from '@instructure/ui-flex'
+import {A11yDoneEditingButton} from './A11yDoneEditingButton'
+import {A11yEditButton} from './A11yEditButton'
+import {useInstUIRef} from '../useInstUIRef'
 
 const InsertButton = () => {
   const {addBlockModal} = useBlockContentEditorContext()
@@ -53,7 +55,7 @@ const DuplicateButton = () => {
 const EditSettingsButton = () => {
   const {openSettingsTray} = useOpenSettingsTray()
 
-  return <EditButton onClicked={openSettingsTray} />
+  return <SettingsButton onClicked={openSettingsTray} />
 }
 
 const MoveBlockButton = () => {
@@ -74,24 +76,38 @@ const MoveBlockButton = () => {
 export const BaseBlockEditWrapper = (
   props: PropsWithChildren<{
     title: string
-    setIsEditMode: (isEditMode: boolean) => void
-    isEditMode: boolean
     backgroundColor?: string
   }>,
 ) => {
-  const ref = useRef<HTMLDivElement>(null)
-  useSetEditMode(ref, props.setIsEditMode)
+  const {id} = useNode()
+  const {editingBlock} = useBlockContentEditorContext()
+  const {isEditingBlock, isEditedViaEditButton, setIsEditedViaEditButton} = useIsEditingBlock()
+  const [editButtonRef, setEditButtonRef] = useInstUIRef<HTMLButtonElement>()
+
+  const handleSave = () => {
+    editingBlock.setId(null)
+    setIsEditedViaEditButton(false)
+    setTimeout(() => editButtonRef?.current?.focus(), 0)
+  }
+
+  const handleEdit = () => {
+    setIsEditedViaEditButton(true)
+    editingBlock.setId(id)
+  }
 
   return (
     <BackgroundColorApplier backgroundColor={props.backgroundColor || 'white'}>
       <BaseBlockLayout
-        ref={ref}
+        nodeId={id}
         title={props.title}
         addButton={<InsertButton />}
-        actionButtons={
-          props.isEditMode
-            ? [<ApplyButton key="action-save-button" onClick={() => props.setIsEditMode(false)} />]
-            : []
+        bottomA11yActionMenu={
+          isEditingBlock && (
+            <A11yDoneEditingButton
+              onUserAction={handleSave}
+              isFullyVisible={isEditedViaEditButton}
+            />
+          )
         }
         menu={
           <Flex gap="mediumSmall">
@@ -100,6 +116,13 @@ export const BaseBlockEditWrapper = (
             <DeleteButton key="menu-delete-button" />
             <MoveBlockButton key="menu-move-block-button" />
           </Flex>
+        }
+        topA11yActionMenu={
+          !isEditingBlock ? (
+            <A11yEditButton onUserAction={handleEdit} elementRef={setEditButtonRef} />
+          ) : (
+            <A11yDoneEditingButton onUserAction={handleSave} isFullyVisible={false} />
+          )
         }
       >
         {props.children}

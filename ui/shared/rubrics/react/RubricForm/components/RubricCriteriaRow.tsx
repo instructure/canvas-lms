@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {RubricCriterion, RubricRating} from '@canvas/rubrics/react/types/rubric'
 import {possibleString, possibleStringRange} from '@canvas/rubrics/react/Points'
@@ -41,6 +41,7 @@ import {
 import {Draggable} from 'react-beautiful-dnd'
 import RegenerateCriteria from './AIGeneratedCriteria/RegenerateCriteria'
 import '../drag-and-drop/styles.css'
+import {useGetRubricOutcome} from '../../RubricAssessment/queries/useGetRubricOutcome'
 
 const I18n = createI18nScope('rubrics-criteria-row')
 
@@ -52,6 +53,8 @@ type RubricCriteriaRowProps = {
   isGenerated?: boolean
   isRegenerating?: boolean
   nextIsGenerated?: boolean
+  selectedLearningOutcomeId?: string
+  selectLearningOutcome: (id: string | undefined) => void
   showCriteriaRegeneration?: boolean
   onDeleteCriterion: () => void
   onDuplicateCriterion: () => void
@@ -67,12 +70,16 @@ export const RubricCriteriaRow = ({
   isGenerated,
   isRegenerating = false,
   nextIsGenerated,
+  selectedLearningOutcomeId,
+  selectLearningOutcome,
   showCriteriaRegeneration = false,
   onDeleteCriterion,
   onDuplicateCriterion,
   onEditCriterion,
   onRegenerateCriterion,
 }: RubricCriteriaRowProps) => {
+  const {data: outcomeTagData} = useGetRubricOutcome(selectedLearningOutcomeId)
+
   const {
     description,
     longDescription,
@@ -117,7 +124,11 @@ export const RubricCriteriaRow = ({
                 {learningOutcomeId ? (
                   <>
                     <View as="div">
-                      <OutcomeTag displayName={criterion.description} />
+                      <OutcomeTag
+                        displayName={criterion.description}
+                        outcome={outcomeTagData}
+                        onClick={() => selectLearningOutcome(criterion.learningOutcomeId)}
+                      />
                       <Tooltip
                         renderTip={I18n.t("An outcome can't be edited")}
                         data-testid={`outcome-tooltip-${criterion.id}`}
@@ -288,7 +299,7 @@ export const RubricCriteriaRow = ({
             )}
 
             {!freeFormCriterionComments && (
-              <View position="relative">
+              <View as="div" position="relative">
                 <RatingScaleAccordion
                   hidePoints={hidePoints}
                   ratings={criterion.ratings}

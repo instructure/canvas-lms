@@ -28,6 +28,8 @@ import React, {createRef} from 'react'
 import StudentViewContext from '../Context'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 jest.mock('@canvas/upload-file')
 jest.mock('@canvas/util/globalUtils', () => ({
@@ -41,6 +43,24 @@ jest.mock('@canvas/util/globalUtils', () => ({
   windowPathname: jest.fn(() => '/'),
 }))
 
+const server = setupServer(
+  http.get('*', () => {
+    return HttpResponse.json({})
+  }),
+  http.post('*', () => {
+    return HttpResponse.json({})
+  }),
+  http.put('*', () => {
+    return HttpResponse.json({})
+  }),
+  http.patch('*', () => {
+    return HttpResponse.json({})
+  }),
+  http.delete('*', () => {
+    return HttpResponse.json({})
+  }),
+)
+
 const defaultMocks = (result = {data: {course: {externalToolsConnection: {nodes: []}}}}) => [
   {
     request: {
@@ -53,6 +73,8 @@ const defaultMocks = (result = {data: {course: {externalToolsConnection: {nodes:
 const CUSTOM_TIMEOUT_LIMIT = 1000
 describe('ContentTabs', () => {
   beforeAll(() => {
+    server.listen()
+
     window.INST = window.INST || {}
     window.INST.editorButtons = []
 
@@ -80,6 +102,11 @@ describe('ContentTabs', () => {
 
   afterEach(() => {
     fakeENV.teardown()
+    server.resetHandlers()
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   const renderAttemptTab = async props => {

@@ -33,10 +33,6 @@ class DiscussionEntry < ActiveRecord::Base
     %w[message]
   end
 
-  def actual_saving_user
-    user
-  end
-
   attr_readonly :discussion_topic_id, :user_id, :parent_id, :is_anonymous_author
   has_many :discussion_entry_drafts, inverse_of: :discussion_entry
   has_many :discussion_entry_versions, -> { order(version: :desc) }, inverse_of: :discussion_entry, dependent: :destroy
@@ -63,24 +59,27 @@ class DiscussionEntry < ActiveRecord::Base
   has_one :external_feed_entry, as: :asset
   has_many :attachment_associations, as: :context, inverse_of: :context
 
+  before_validation :set_depth, on: :create
   before_save :set_edited_at
   before_create :infer_root_entry_id
   before_create :set_root_account_id
-  after_save :update_discussion
-  after_save :context_module_action_later
-  after_save :create_discussion_entry_versions
+  before_create :set_lti_id
   after_create :create_participants
   after_create :log_discussion_entry_metrics
   after_create :clear_planner_cache_for_participants
   after_create :update_topic
   after_destroy :remove_pin
+  after_save :update_discussion
+  after_save :context_module_action_later
+  after_save :create_discussion_entry_versions
+  after_save :send_lti_asset_processor_notification
   validates :message, length: { maximum: maximum_text_length, allow_blank: true }
   validates :discussion_topic_id, presence: true
-  before_validation :set_depth, on: :create
   validate :validate_depth, on: :create
   validate :discussion_not_deleted, on: :create
   validate :must_be_reply_to_same_discussion, on: :create
   validate :validate_pin_type
+  validate :preserve_lti_id
 
   scope :pinned, -> { where.not(pin_type: nil) }
 
@@ -226,6 +225,7 @@ class DiscussionEntry < ActiveRecord::Base
                                                         user:,
                                                         parent_entry: self)
         if entry.grants_right?(user, :create)
+          entry.saving_user = user
           entry.save!
           entry
         else
@@ -287,7 +287,7 @@ class DiscussionEntry < ActiveRecord::Base
       updated_at_old = saved_changes.key?("updated_at") ? saved_changes["updated_at"][0] : 1.minute.ago
       updated_at_new = saved_changes.key?("updated_at") ? saved_changes["updated_at"][1] : Time.zone.now
 
-      if discussion_entry_versions.count == 0 && !message_old.nil?
+      if discussion_entry_versions.none? && !message_old.nil?
         discussion_entry_versions.create!(root_account:, user:, version: 1, message: message_old, created_at: updated_at_old, updated_at: updated_at_old)
       end
 
@@ -763,6 +763,14 @@ class DiscussionEntry < ActiveRecord::Base
     self.root_account_id ||= discussion_topic.root_account_id
   end
 
+  def set_lti_id
+    self.lti_id ||= SecureRandom.uuid
+  end
+
+  def preserve_lti_id
+    errors.add(:lti_id, "Cannot change lti_id!") if lti_id_changed? && !lti_id_was.nil?
+  end
+
   def author_name(current_user = nil)
     current_user ||= self.current_user
 
@@ -827,5 +835,37 @@ class DiscussionEntry < ActiveRecord::Base
     errors.add(:pin_type, I18n.t("Invalid pin type")) unless DiscussionEntry::PinningTypes::TYPES.include?(pin_type)
     errors.add(:base, I18n.t("Discussion topic has too many pinned entries")) if discussion_topic.pinned_entries.count >= DiscussionTopic::MAX_ENTRIES_PINNED
     errors.add(:pin_type, I18n.t("Pin type 'thread' can only be used for top-level entries")) if pin_type == DiscussionEntry::PinningTypes::THREAD && !parent_entry.nil?
+  end
+
+  private
+
+  def send_lti_asset_processor_notification
+    return unless discussion_topic&.graded?
+    return unless saved_change_to_message? || saved_change_to_workflow_state? || saved_change_to_attachment_id?
+    return unless root_account.feature_enabled?(:lti_asset_processor_discussions) && root_account.feature_enabled?(:lti_asset_processor)
+
+    submission = discussion_topic.assignment&.submissions&.active&.find_by(user_id:)
+    if saved_change_to_workflow_state? && workflow_state == "deleted"
+      current_user = editor_id ? User.find_by(id: editor_id) : nil
+      return unless current_user
+
+      Lti::AssetProcessorDiscussionNotifier.delay_if_production.notify_asset_processors_of_discussion(
+        assignment: discussion_topic.assignment,
+        submission:,
+        discussion_entry_version: discussion_entry_versions.first,
+        contribution_status: Lti::Pns::LtiAssetProcessorContributionNoticeBuilder::DELETED,
+        current_user:
+      )
+    else
+      return unless saving_user
+
+      Lti::AssetProcessorDiscussionNotifier.delay_if_production.notify_asset_processors_of_discussion(
+        assignment: discussion_topic.assignment,
+        submission:,
+        discussion_entry_version: discussion_entry_versions.first,
+        contribution_status: Lti::Pns::LtiAssetProcessorContributionNoticeBuilder::SUBMITTED,
+        current_user: saving_user
+      )
+    end
   end
 end

@@ -17,6 +17,7 @@
  */
 
 import {Button} from '@instructure/ui-buttons'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {SingleButtonProps} from './types'
 import {alpha} from '@instructure/ui-color-utils'
@@ -30,6 +31,7 @@ export const SingleButton = ({
   isFullWidth,
   onButtonClick,
   focusHandler,
+  viewMode,
 }: SingleButtonProps) => {
   const buttonText = button.text.trim() || I18n.t('Button')
 
@@ -51,8 +53,8 @@ export const SingleButton = ({
       secondaryBorderColor: button.primaryColor,
       secondaryColor: button.secondaryColor,
       secondaryHoverBackground: adjustedPrimaryColor,
-      secondaryGhostColor: adjustedPrimaryColor,
-      secondaryGhostBorderColor: adjustedPrimaryColor,
+      secondaryGhostColor: button.primaryColor,
+      secondaryGhostBorderColor: button.primaryColor,
       secondaryGhostHoverBackground: `${alpha(adjustedPrimaryColor, 10)}`,
       secondaryGhostActiveBoxShadow: adjustedBoxShadow,
     }
@@ -66,7 +68,7 @@ export const SingleButton = ({
         rel: isNewTabLink ? 'noopener noreferrer' : undefined,
       }
 
-  return (
+  const buttonElement = (
     <Button
       elementRef={el => focusHandler?.(el as HTMLElement)}
       display={isFullWidth ? 'block' : 'inline-block'}
@@ -78,4 +80,28 @@ export const SingleButton = ({
       {buttonText}
     </Button>
   )
+
+  const getTooltipText = () => {
+    if (viewMode === 'edit') {
+      return I18n.t('Opens block settings')
+    }
+
+    if (viewMode === 'editview') {
+      return I18n.t('Opens edit mode')
+    }
+
+    if (isNewTabLink && url && !onButtonClick) {
+      return I18n.t('Opens in new window')
+    }
+
+    return null
+  }
+
+  const tooltipText = getTooltipText()
+
+  if (tooltipText) {
+    return <Tooltip renderTip={tooltipText}>{buttonElement}</Tooltip>
+  }
+
+  return buttonElement
 }

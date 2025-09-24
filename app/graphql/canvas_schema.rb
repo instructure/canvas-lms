@@ -60,6 +60,7 @@ class CanvasSchema < GraphQL::Schema
   def self.resolve_type(abstract_type, obj, _ctx)
     case obj
     when Account then Types::AccountType
+    when AccountNotification then Types::AccountNotificationType
     when Course then Types::CourseType
     when AllocationRule then Types::AllocationRuleType
     when Assignment then Types::AssignmentType

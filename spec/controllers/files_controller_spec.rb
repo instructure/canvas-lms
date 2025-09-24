@@ -743,11 +743,11 @@ describe FilesController do
         enable_cache do
           user1 = user_factory(active_all: true)
           file1 = user_file
-          verifier1 = Users::AccessVerifier.generate(user: user1)
+          verifier1 = AccessVerifier.generate(user: user1)
 
           user2 = user_factory(active_all: true)
           file2 = user_file
-          verifier2 = Users::AccessVerifier.generate(user: user2)
+          verifier2 = AccessVerifier.generate(user: user2)
 
           # first verifier
           user_session(user1)
@@ -782,7 +782,7 @@ describe FilesController do
         enable_cache do
           user = user_factory(active_all: true)
           file = user_file
-          verifier = Users::AccessVerifier.generate(user:)
+          verifier = AccessVerifier.generate(user:)
 
           # first use to establish session
           get "show", params: verifier.merge(id: file.id)
@@ -791,7 +791,7 @@ describe FilesController do
 
           # second use after verifier expiration but before session expiration.
           # expired verifier should be ignored but session should still be extended
-          Timecop.freeze((Users::AccessVerifier::TTL_MINUTES + 1).minutes.from_now) do
+          Timecop.freeze((AccessVerifier::TTL_MINUTES + 1).minutes.from_now) do
             get "show", params: verifier.merge(id: file.id)
           end
           expect(response).to be_successful
@@ -804,7 +804,7 @@ describe FilesController do
           user = user_factory(active_all: true)
           file = user_file
           authorization = { permission: ["download", "read"], attachment: file }
-          verifier = Users::AccessVerifier.generate(user:, authorization:)
+          verifier = AccessVerifier.generate(user:, authorization:)
           get "show", params: verifier.merge(id: file.id)
           expect(response).to be_successful
           session.delete(:permissions_key)
@@ -1428,7 +1428,7 @@ describe FilesController do
       it "skips verification for an account-context file" do
         account_js_file
         file_verifier = Attachments::Verification.new(@file).verifier_for_user(nil)
-        user_verifier = Users::AccessVerifier.generate(user: @teacher)
+        user_verifier = AccessVerifier.generate(user: @teacher)
         other_params = { download: 1, inline: 1, verifier: file_verifier, account_id: @account.id, file_id: @file.id, file_path: @file.full_path }
         get "show_relative", params: user_verifier.merge(other_params)
         expect(response).to be_successful
@@ -1437,7 +1437,7 @@ describe FilesController do
       it "enforces verification for contexts other than account" do
         course_file
         file_verifier = Attachments::Verification.new(@file).verifier_for_user(nil)
-        user_verifier = Users::AccessVerifier.generate(user: @teacher)
+        user_verifier = AccessVerifier.generate(user: @teacher)
         other_params = { download: 1, inline: 1, verifier: file_verifier, account_id: @account.id, file_id: @file.id, file_path: @file.full_path }
         get "show_relative", params: user_verifier.merge(other_params)
         assert_unauthorized
@@ -1454,7 +1454,7 @@ describe FilesController do
 
       it "does not allow access if the user can't see the file" do
         enable_cache do
-          sf_verifier = Users::AccessVerifier.generate(
+          sf_verifier = AccessVerifier.generate(
             user: @user,
             real_user: @user,
             root_account: Account.last,
@@ -1469,7 +1469,7 @@ describe FilesController do
 
       it "allows access if the sf_verifier includes the file authorization information" do
         enable_cache do
-          sf_verifier = Users::AccessVerifier.generate(
+          sf_verifier = AccessVerifier.generate(
             authorization: { attachment: @file, permission: "download" },
             user: @user,
             real_user: @user,
@@ -1481,6 +1481,25 @@ describe FilesController do
           get "show_relative", params: { course_id: @course.id, file_id: @file.id, file_path: @file.full_display_path, **sf_verifier }
           expect(response).to be_redirect
           expect(response.location).to include "/files/stuff/doc.doc?download=1&token="
+        end
+      end
+
+      context "Asset Processor Asset download" do
+        before do
+          @dk = developer_key_model
+        end
+
+        it "allows access if the sf_verifier includes the file authorization information" do
+          enable_cache do
+            sf_verifier = AccessVerifier.generate(
+              developer_key: @dk,
+              authorization: { attachment: @file, permission: "download" },
+              root_account: @dk.root_account
+            )
+            get "show_relative", params: { course_id: @course.id, file_id: @file.id, file_path: @file.full_display_path, **sf_verifier }
+            expect(response).to be_redirect
+            expect(response.location).to include "/files/stuff/doc.doc?download=1&token="
+          end
         end
       end
     end
@@ -2375,17 +2394,7 @@ describe FilesController do
       expect(response).to be_redirect
     end
 
-    it "returns the same jwt if requested twice" do
-      enable_cache do
-        user_session @teacher
-        locations = Array.new(2) do
-          get("image_thumbnail", params: { uuid: image.uuid, id: image.id }).location
-        end
-        expect(locations[0]).to eq(locations[1])
-      end
-    end
-
-    it "returns the different jwts if no_cache is passed" do
+    it "returns different jwt if requested twice" do
       enable_cache do
         user_session @teacher
         locations = Array.new(2) do
@@ -2394,64 +2403,64 @@ describe FilesController do
         expect(locations[0]).not_to eq(locations[1])
       end
     end
-  end
 
-  describe "GET 'image_thumbnail_plain'" do
-    before :once do
-      @course.root_account.enable_feature!(:file_association_access)
-    end
-
-    context "without InstFS" do
-      let(:image) do
-        local_storage!
-        @teacher.attachments.create!(uploaded_data: stub_png_data)
+    context "with no UUID" do
+      before :once do
+        @course.root_account.enable_feature!(:file_association_access)
       end
 
-      it "returns a non-token url for local storage" do
-        local_storage!
-        user_session @teacher
-        location = get("image_thumbnail_plain", params: { id: image.id, no_cache: true }).location
-        expect(location).to match(%r{/images/thumbnails/show/#{image.thumbnail.id}$})
-      end
-    end
+      context "without InstFS" do
+        let(:image) do
+          local_storage!
+          @teacher.attachments.create!(uploaded_data: stub_png_data)
+        end
 
-    context "with InstFS enabled" do
-      let(:image) { @teacher.attachments.create!(uploaded_data: stub_png_data, instfs_uuid: "1234") }
-
-      it "returns default 'no_pic' thumbnail if attachment not found" do
-        user_session @teacher
-        get "image_thumbnail_plain", params: { id: image.id + 1 }
-        expect(response).to redirect_to("/images/no_pic.gif")
-      end
-
-      it "returns different jwts (because of JTI) if requested twice" do
-        enable_cache do
+        it "returns a non-token url for local storage" do
+          local_storage!
           user_session @teacher
-          locations = Array.new(2) do
-            get("image_thumbnail_plain", params: { id: image.id }).location
-          end
-          expect(locations[0]).not_to eq(locations[1])
+          location = get("image_thumbnail", params: { id: image.id, no_cache: true }).location
+          expect(location).to match(%r{/images/thumbnails/show/#{image.thumbnail.id}$})
         end
       end
 
-      it "returns a proper jwt token" do
-        user_session @teacher
-        token = get("image_thumbnail_plain", params: { id: image.id, no_cache: true }).location.split("?token=")[1]
-        expect { Canvas::Security.decode_jwt(token, [InstFS.jwt_secret]) }.not_to raise_error
-      end
+      context "with InstFS enabled" do
+        let(:image) { @teacher.attachments.create!(uploaded_data: stub_png_data, instfs_uuid: "1234") }
 
-      it "redirects to default no_pic thumbnail if access_allowed returns false" do
-        allow_any_instance_of(FilesController).to receive(:access_allowed).and_return(false)
-        user_session @teacher
-        get "image_thumbnail_plain", params: { id: image.id }
-        expect(response).to redirect_to("/images/no_pic.gif")
-      end
+        it "returns default 'no_pic' thumbnail if attachment not found" do
+          user_session @teacher
+          get "image_thumbnail", params: { id: image.id + 1 }
+          expect(response).to redirect_to("/images/no_pic.gif")
+        end
 
-      it "returns a 302 if access_allowed returns true" do
-        allow_any_instance_of(FilesController).to receive(:access_allowed).and_return(true)
-        user_session @teacher
-        get "image_thumbnail_plain", params: { id: image.id }
-        expect(response).to be_redirect
+        it "returns different jwts (because of JTI) if requested twice" do
+          enable_cache do
+            user_session @teacher
+            locations = Array.new(2) do
+              get("image_thumbnail", params: { id: image.id }).location
+            end
+            expect(locations[0]).not_to eq(locations[1])
+          end
+        end
+
+        it "returns a proper jwt token" do
+          user_session @teacher
+          token = get("image_thumbnail", params: { id: image.id, no_cache: true }).location.split("?token=")[1]
+          expect { Canvas::Security.decode_jwt(token, [InstFS.jwt_secret]) }.not_to raise_error
+        end
+
+        it "redirects to default no_pic thumbnail if access_allowed returns false" do
+          allow_any_instance_of(FilesController).to receive(:access_allowed).and_return(false)
+          user_session @teacher
+          get "image_thumbnail", params: { id: image.id }
+          expect(response).to redirect_to("/images/no_pic.gif")
+        end
+
+        it "returns a 302 if access_allowed returns true" do
+          allow_any_instance_of(FilesController).to receive(:access_allowed).and_return(true)
+          user_session @teacher
+          get "image_thumbnail", params: { id: image.id }
+          expect(response).to be_redirect
+        end
       end
     end
   end
@@ -2528,12 +2537,12 @@ describe FilesController do
       Thumbnail.create!(filename: "tmp/test_thumb.png", content_type: "image/png", attachment: image, size: "200x50")
     end
 
-    it "sends the thumbnail file if authorized" do
+    it "sends the thumbnail file if authorized as user" do
       local_storage!
       user_session(@teacher)
       expect_any_instance_of(FilesController).to receive(:safe_send_file)
         .with(thumbnail.full_filename, content_type: thumbnail.content_type).and_return(nil)
-      get :show_thumbnail, params: { id: thumbnail.id }
+      expect { get :show_thumbnail, params: { id: thumbnail.id, location: "avatar_#{@teacher.id}" } }.not_to raise_error
     end
 
     it "returns unauthorized if not authorized" do
@@ -2542,6 +2551,18 @@ describe FilesController do
       user_session(user)
       get :show_thumbnail, params: { id: thumbnail.id }
       expect(response).to have_http_status(:unauthorized)
+    end
+
+    it "sends the thumbnail file if authorized by location" do
+      local_storage!
+      @teacher.avatar_image_source = "attachment"
+      @teacher.avatar_image_url =
+        "http://host.instructure.com/images/thumbnails/#{image.id}?location=avatar_#{@teacher.id}"
+      @teacher.save!
+      user_session(user)
+      expect_any_instance_of(FilesController).to receive(:safe_send_file)
+        .with(thumbnail.full_filename, content_type: thumbnail.content_type).and_return(nil)
+      expect { get :show_thumbnail, params: { id: thumbnail.id, location: "avatar_#{@teacher.id}" } }.not_to raise_error
     end
   end
 end

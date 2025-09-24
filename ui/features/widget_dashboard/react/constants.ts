@@ -17,6 +17,7 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {gql} from 'graphql-tag'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -30,8 +31,10 @@ export type TabId = (typeof TAB_IDS)[keyof typeof TAB_IDS]
 export const WIDGET_TYPES = {
   COURSE_WORK_SUMMARY: 'course_work_summary',
   COURSE_WORK: 'course_work',
+  COURSE_WORK_COMBINED: 'course_work_combined',
   COURSE_GRADES: 'course_grades',
   ANNOUNCEMENTS: 'announcements',
+  PEOPLE: 'people',
 } as const
 
 export type WidgetType = (typeof WIDGET_TYPES)[keyof typeof WIDGET_TYPES]
@@ -40,11 +43,11 @@ export const DEFAULT_WIDGET_CONFIG = {
   columns: 3,
   widgets: [
     {
-      id: 'course-work-summary-widget',
-      type: WIDGET_TYPES.COURSE_WORK_SUMMARY,
+      id: 'course-work-combined-widget',
+      type: WIDGET_TYPES.COURSE_WORK_COMBINED,
       position: {col: 1, row: 1},
-      size: {width: 2, height: 1},
-      title: I18n.t("Today's course work"),
+      size: {width: 2, height: 3},
+      title: I18n.t('Course Work'),
     },
     {
       id: 'announcements-widget',
@@ -56,16 +59,16 @@ export const DEFAULT_WIDGET_CONFIG = {
     {
       id: 'course-grades-widget',
       type: WIDGET_TYPES.COURSE_GRADES,
-      position: {col: 1, row: 2},
+      position: {col: 1, row: 4},
       size: {width: 2, height: 2},
       title: I18n.t('Course Grades'),
     },
     {
-      id: 'course-work-widget',
-      type: WIDGET_TYPES.COURSE_WORK,
-      position: {col: 1, row: 4},
-      size: {width: 2, height: 2},
-      title: I18n.t('Course Work'),
+      id: 'people-widget',
+      type: WIDGET_TYPES.PEOPLE,
+      position: {col: 3, row: 3},
+      size: {width: 1, height: 2},
+      title: I18n.t('People'),
     },
   ],
 }
@@ -90,6 +93,7 @@ export const QUERY_CONFIG = {
     COURSES: 10, // minutes
     GRADES: 5, // minutes
     STATISTICS: 5, // minutes
+    USERS: 10, // minutes
   },
   RETRY: {
     DISABLED: false,
@@ -102,3 +106,36 @@ export const URL_PATTERNS = {
   GRADEBOOK: '/courses/{courseId}/gradebook',
   ALL_GRADES: '/grades',
 } as const
+
+// GraphQL mutations
+export const ACCEPT_ENROLLMENT_INVITATION = gql`
+  mutation AcceptEnrollmentInvitation($enrollmentUuid: String!) {
+    acceptEnrollmentInvitation(input: {enrollmentUuid: $enrollmentUuid}) {
+      success
+      enrollment {
+        id
+        course {
+          id
+          name
+        }
+      }
+      errors {
+        message
+      }
+    }
+  }
+`
+
+export const REJECT_ENROLLMENT_INVITATION = gql`
+  mutation RejectEnrollmentInvitation($enrollmentUuid: String!) {
+    rejectEnrollmentInvitation(input: {enrollmentUuid: $enrollmentUuid}) {
+      success
+      enrollment {
+        id
+      }
+      errors {
+        message
+      }
+    }
+  }
+`

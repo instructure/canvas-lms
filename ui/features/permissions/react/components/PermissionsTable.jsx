@@ -32,7 +32,6 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
 import actions from '../actions'
-import {GROUP_PERMISSION_DESCRIPTIONS} from '../templates/groupPermissionDescriptions'
 import PermissionButton from './PermissionButton'
 import GranularCheckbox from './GranularCheckbox'
 import propTypes from '@canvas/permissions/react/propTypes'
@@ -45,6 +44,7 @@ export default class PermissionsTable extends Component {
   static propTypes = {
     roles: arrayOf(propTypes.role).isRequired,
     permissions: arrayOf(propTypes.permission).isRequired,
+    permissionGroups: propTypes.permissionGroups.isRequired,
     setAndOpenRoleTray: func.isRequired,
     setAndOpenPermissionTray: func.isRequired,
   }
@@ -167,6 +167,7 @@ export default class PermissionsTable extends Component {
     const granulars = perm.granular_permissions
     const hasGranulars = granulars?.length > 0
     const isGranular = perm.granular_permission_group
+    const {permissionGroups} = this.props
 
     const toggleExpanded = () => {
       this.setState(prevState => {
@@ -188,13 +189,14 @@ export default class PermissionsTable extends Component {
     }
 
     function renderGroupDescription() {
-      const description = GROUP_PERMISSION_DESCRIPTIONS[name]
-      if (typeof description !== 'function') return null
+      const description =
+        (perm.contextType == 'Course' && permissionGroups[name].course_subtitle) ||
+        permissionGroups[name].subtitle
 
       return [
         <br key="group-description-br" />,
         <Text key="group-description-text" weight="light" size="small">
-          {description(perm.contextType)}
+          {description}
         </Text>,
       ]
     }
@@ -305,6 +307,7 @@ function mapStateToProps(state, ownProps) {
   const stateProps = {
     roles: state.roles.filter(r => r.displayed),
     permissions: state.permissions.filter(p => p.displayed),
+    permissionGroups: state.permissionGroups,
   }
   return {...ownProps, ...stateProps}
 }

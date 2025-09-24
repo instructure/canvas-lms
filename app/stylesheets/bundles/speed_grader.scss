@@ -1211,3 +1211,28 @@ body.is-masquerading-or-student-view {
   flex-direction: column;
   margin-top: -10px;
 }
+
+.sg-sections-menu-item {
+  display: flex;
+  align-items: center;
+  :hover {
+    cursor: pointer;
+  }
+  span {
+    flex: 1;
+  }
+
+  a {
+    flex: 1;
+  }
+
+  input[type="checkbox"] {
+    margin: 0 0.5em;
+    accent-color: #273540;
+  }
+}
+
+#sg-section-filter-apply-container {
+  padding: 0.5em 1em;
+  border-top: 1px solid $ic-border-light;
+}

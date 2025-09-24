@@ -4402,6 +4402,7 @@ uk:
     errors: 
       cannot_shift_and_remove: "не вдалося вказати shift_dates і remove_dates одночасно"
       import_error: "Помилка імпорту:"
+    file_copy_error: "НЕ вдалося скопіювати файл \"%{name}\""
     missing_content_links_message: "Не вдалося розпізнати наступні посилання:"
     missing_content_links_title: "Відсутні посилання знайдено в імпортованому вмісті"
     unexpected_error: "Сталася неочікувана помилка, зверніться до служби підтримки."
@@ -7178,6 +7179,7 @@ uk:
     roles: 
       designer: Конструктор
       designer_with_indefinite_article: Конструктор
+      instructors: Інструктори
       observer: Спостерігач
       observer_with_indefinite_article: Спостерігач
       student: Студент
@@ -11995,6 +11997,7 @@ uk:
   no_active_user_with_that_id_was_found_b8fb5e14: "Жодного активного користувача з цим ідентифікатором не знайдено."
   no_assignment_name_adbb215b: "Відсутня назва завдання"
   no_assignment_selected_65d9e422: "Не вибрано завдання"
+  no_assignments_found_2097cfc1: "Завдань не знайдено"
   no_assignments_with_that_name_found_1d7be1: "Не знайдено завдань з такою назвою"
   no_associated_terms_13bacefc: "Відсутні пов'язані терміни"
   no_attributes_locked_611c5cc: "немає заблокованих атрибутів"
@@ -15303,6 +15306,7 @@ uk:
   remove_email_address_b1820820: "Видалити адресу електронної пошти"
   remove_empty_attachment_b2aea632: "видалити порожнє вкладення"
   remove_f47dc62a: Видалити
+  remove_filename_1b74ef2a: "Видалити %{fileName}"
   remove_filename_87f3781e: "видалити %{filename}"
   remove_filter_68de01d4: "Видалити фільтр"
   remove_from_course_6fb47aee: "Видалити з курсу"
@@ -15513,6 +15517,8 @@ uk:
   role_successfully_updated_4317e6a4: "Роль успішно оновлена"
   roles: 
     based_on_type: "На основі %{base_type}"
+    designer: Конструктор
+    designers: Дизайнери
     edit_role: 
       role_name_label: "Ім'я ролі"
     new_role: 
@@ -15521,6 +15527,8 @@ uk:
       role_type: "Базовий тип:"
       save: Зберегти
       saving: Збереження...
+    observer: Спостерігач
+    observers: Спостерігачі
     permission_button: 
       rolebutton: 
         disable: Відключити
@@ -15537,6 +15545,12 @@ uk:
       account_roles: "Ролі облікового запису"
       course_roles: "Ролі курсу"
       page_header_title: "Права облікового запису"
+    student: Студент
+    students: Студенти
+    ta: TA
+    tas: TA
+    teacher: Викладач
+    teachers: Викладачі
   rootFoldersFinder: 
     course_files: "Файли курсу"
     group_files: "Файли групи"
@@ -18986,6 +19000,8 @@ uk:
         anyone: Будь-хто
         only_teachers: "Тільки викладачі"
         teachers_and_students: "Викладачі та студенти"
+      create_page_title: "Нова сторінка"
+      edit_page_title: "Редагувати %{title}"
       editing_roles: 
         anyone: Будь-хто
         only_members: "Тільки учасники"

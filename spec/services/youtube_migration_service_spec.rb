@@ -128,6 +128,64 @@ RSpec.describe YoutubeMigrationService do
       expect(progress.results[:resources]).to be_present
     end
 
+    describe "when new_quizzes_scanning_youtube_links feature flag is enabled" do
+      before do
+        allow(Account.site_admin).to receive(:feature_enabled?).and_return(false)
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_scanning_youtube_links).and_return(true)
+        allow(Course).to receive(:find).with(course.id).and_return(course)
+      end
+
+      describe "if there are no new quizzes" do
+        before do
+          assignment_relation = double("assignment_relation")
+          active_relation = double("active_relation")
+          quiz_relation = double("quiz_relation")
+          except_relation = double("except_relation")
+
+          allow(course).to receive(:assignments).and_return(assignment_relation)
+          allow(assignment_relation).to receive(:active).and_return(active_relation)
+          allow(active_relation).to receive_messages(
+            type_quiz_lti: quiz_relation,
+            except: except_relation
+          )
+          allow(quiz_relation).to receive(:any?).and_return(false)
+          allow(except_relation).to receive(:find_each).and_return([])
+        end
+
+        it "does not emit a live event" do
+          allow(course).to receive_messages(lti_context_id: "course_lti_context_123", id: 1)
+          expect(Canvas::LiveEvents).not_to receive(:scan_youtube_links)
+
+          described_class.scan(progress)
+        end
+      end
+
+      it "emits a live event with the right parameters" do
+        assignment_relation = double("assignment_relation")
+        active_relation = double("active_relation")
+        quiz_relation = double("quiz_relation")
+        except_relation = double("except_relation")
+
+        allow(course).to receive(:assignments).and_return(assignment_relation)
+        allow(assignment_relation).to receive(:active).and_return(active_relation)
+        allow(active_relation).to receive_messages(
+          type_quiz_lti: quiz_relation,
+          except: except_relation
+        )
+        allow(quiz_relation).to receive(:any?).and_return(true)
+        allow(except_relation).to receive(:find_each).and_return([])
+        allow(course).to receive_messages(lti_context_id: "course_lti_context_123", id: 1)
+
+        expect(Canvas::LiveEvents).to receive(:scan_youtube_links) do |payload|
+          expect(payload.scan_id).to eq(Progress.last.id)
+          expect(payload.course_id).to eq(course.id)
+          expect(payload.external_context_id).to eq(course.lti_context_id)
+        end
+
+        described_class.scan(progress)
+      end
+    end
+
     it "handles scan errors gracefully" do
       allow_any_instance_of(described_class).to receive(:scan_course_for_embeds)
         .and_raise(StandardError, "Scan failed")
@@ -624,7 +682,7 @@ RSpec.describe YoutubeMigrationService do
           question_name: "Quiz Question",
           question_text: '<iframe src="https://www.youtube.com/embed/quizq123" width="560" height="315"></iframe>',
           neutral_comments_html: '<iframe src="https://www.youtube.com/embed/neutral789" width="560" height="315"></iframe>',
-          question_type: "multiple_choice_question",
+          question_type: "text_only_question", # To make sure during create! there will be no assesment question creation
           answers: []
         }
       )
@@ -640,6 +698,42 @@ RSpec.describe YoutubeMigrationService do
         "https://www.youtube.com/embed/quizq123",
         "https://www.youtube.com/embed/neutral789"
       )
+    end
+
+    it "skips quiz questions with assessment question association" do
+      quiz = quiz_model(course:, description: "description")
+      assessment_youtube_src = "https://www.youtube.com/embed/assessment123"
+
+      question_bank = assessment_question_bank_model(course:)
+      assessment_question = assessment_question_model(
+        bank: question_bank,
+        question_data: {
+          question_name: "Assessment Question",
+          question_text: "<iframe src=\"#{assessment_youtube_src}\" width=\"560\" height=\"315\"></iframe>",
+          question_type: "multiple_choice_question",
+          answers: []
+        }
+      )
+
+      quiz.quiz_questions.create!(
+        question_data: {
+          question_name: "Linked Quiz Question",
+          question_text: '<iframe src="https://www.youtube.com/embed/should_be_skipped" width="560" height="315"></iframe>',
+          question_type: "multiple_choice_question",
+          answers: []
+        },
+        assessment_question:
+      )
+
+      resources = service.scan_course_for_embeds
+
+      quiz_key = "Quizzes::Quiz|#{quiz.id}"
+      expect(resources[quiz_key]).to_not be_present
+
+      aq_key = "AssessmentQuestion|#{assessment_question.id}"
+      expect(resources[aq_key][:count]).to eq(1)
+      aq_embeds_srcs = resources[aq_key][:embeds].pluck(:src)
+      expect(aq_embeds_srcs).to include(assessment_youtube_src)
     end
 
     it "finds YouTube embeds in discussion entries" do

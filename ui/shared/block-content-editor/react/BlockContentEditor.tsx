@@ -26,6 +26,7 @@ import {BlockContentViewerProps} from './BlockContentViewer'
 import {Editor} from '@craftjs/core'
 import {components} from './block-content-editor-components'
 import {BlockContentEditorContent} from './BlockContentEditorContent'
+import {BlockContentEditorErrorBoundary} from './BlockContentEditorErrorBoundary'
 
 const getEditorForMode = (mode: EditorMode, props: BlockContentEditorProps) => {
   switch (mode) {
@@ -45,19 +46,22 @@ const BlockContentEditorWrapper = (props: BlockContentEditorProps) => {
   const editor = getEditorForMode(mode, props)
   return (
     <Editor enabled={mode === 'default'} resolver={components}>
-      <BlockContentEditorLayout toolbar={<Toolbar />} editor={editor} />
+      <BlockContentEditorLayout toolbar={<Toolbar />} editor={editor} mode={mode} />
     </Editor>
   )
 }
 
 export type BlockContentEditorProps = BlockContentViewerProps & {
   onInit: ((handler: BlockContentEditorHandler) => void) | null
+  aiAltTextEnabled: boolean
 }
 
 export const BlockContentEditor = (props: BlockContentEditorProps) => {
   return (
-    <BlockContentEditorContext data={props.data}>
-      <BlockContentEditorWrapper {...props} />
-    </BlockContentEditorContext>
+    <BlockContentEditorErrorBoundary>
+      <BlockContentEditorContext data={props.data} aiAltTextEnabled={props.aiAltTextEnabled}>
+        <BlockContentEditorWrapper {...props} />
+      </BlockContentEditorContext>
+    </BlockContentEditorErrorBoundary>
   )
 }

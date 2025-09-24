@@ -37,7 +37,7 @@ export const ImageTextBlockLayout = ({
   const textSize = isTextRatio1to1 ? '50%' : '67%'
 
   return (
-    <>
+    <Flex direction="column" gap="mediumSmall">
       {titleComponent}
       <Flex direction={direction} data-testid={dataTestId}>
         <Flex.Item size={imageSize} align="start" padding={imagePadding}>
@@ -47,6 +47,6 @@ export const ImageTextBlockLayout = ({
           {textComponent}
         </Flex.Item>
       </Flex>
-    </>
+    </Flex>
   )
 }

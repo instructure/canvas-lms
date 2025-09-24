@@ -24,7 +24,7 @@ const I18n = createI18nScope('page_editor')
 
 export const TextBlockPreview = () => (
   <BlockPreviewLayout
-    image={<SVGWrapper url="/images/block-content-editor/text-column-1.svg" />}
+    image={<SVGWrapper ariaHidden={true} url="/images/block-content-editor/text-column-1.svg" />}
     title={I18n.t('Text column')}
     description={[
       I18n.t(

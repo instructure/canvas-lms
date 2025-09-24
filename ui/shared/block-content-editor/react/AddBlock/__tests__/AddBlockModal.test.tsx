@@ -48,13 +48,13 @@ describe('AddBlockModal', () => {
 
   it('does not renders when open is false', () => {
     renderModal({open: false})
-    expect(screen.queryByText('Add new block')).not.toBeInTheDocument()
+    expect(screen.queryByText('Add a block')).not.toBeInTheDocument()
     expect(screen.queryByText('Add to page')).not.toBeInTheDocument()
   })
 
   it('renders', async () => {
     renderModal({})
-    expect(await screen.findByText('Add new block')).toBeInTheDocument()
+    expect(await screen.findByText('Add a block')).toBeInTheDocument()
     expect(await screen.findByText('Add to page')).toBeInTheDocument()
   })
 

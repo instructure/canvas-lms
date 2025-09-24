@@ -21,14 +21,40 @@ import {waitFor} from '@testing-library/dom'
 import Outcome from '@canvas/grade-summary/backbone/models/Outcome'
 import OutcomeDialogView from '../OutcomeDialogView'
 import OutcomeLineGraphView from '../OutcomeLineGraphView'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
+import fakeEnv from '@canvas/test-utils/fakeENV'
+
+const server = setupServer(
+  http.get('*/api/v1/courses/:courseId/outcome_results', () => {
+    return HttpResponse.json({
+      outcome_results: [],
+      linked: {
+        alignments: [],
+      },
+    })
+  }),
+)
 
 describe('OutcomeDialogView', () => {
+  beforeAll(() => server.listen({onUnhandledRequest: 'bypass'}))
+  afterAll(() => server.close())
+
   let outcomeDialogView
   let mockEvent
   let $dialog
   let dialogSpy
 
   beforeEach(async () => {
+    // Set up ENV object for OutcomeResultCollection
+    fakeEnv.setup({
+      context_asset_string: 'course_123',
+      student_id: '456',
+      current_user: {
+        display_name: 'Test User',
+      },
+    })
+
     const readyCallback = jest.fn()
     $(document).ready(readyCallback)
     $(document).trigger('ready')
@@ -51,6 +77,8 @@ describe('OutcomeDialogView', () => {
   afterEach(() => {
     outcomeDialogView.remove()
     jest.restoreAllMocks()
+    server.resetHandlers()
+    fakeEnv.teardown()
   })
 
   it('creates an instance of OutcomeLineGraphView on initialization', () => {

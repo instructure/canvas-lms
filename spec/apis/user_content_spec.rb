@@ -51,7 +51,7 @@ describe UserContent, type: :request do
       double_testing_with_disable_adding_uuid_verifier_in_api_ff do
         it "translates group file download links to directly-downloadable urls" do
           @group.add_user(@teacher)
-          @group_topic = @group.discussion_topics.create!(title: "group topic", user: @teacher, message: "<img src=\"/groups/#{@group.id}/files/#{@attachment1.id}/download\" alt=\"important\">")
+          @group_topic = @group.discussion_topics.create!(title: "group topic", user: @teacher, saving_user: @teacher, message: "<img src=\"/groups/#{@group.id}/files/#{@attachment1.id}/download\" alt=\"important\">")
           json = api_call(:get,
                           "/api/v1/groups/#{@group.id}/discussion_topics/#{@group_topic.id}",
                           { controller: "discussion_topics_api",
@@ -310,7 +310,7 @@ describe UserContent, type: :request do
 
     context "user context" do
       it "processes links to each type of object" do
-        @topic = @course.discussion_topics.create!(message: <<~HTML, user: @teacher)
+        @topic = @course.discussion_topics.create!(message: <<~HTML, user: @teacher, saving_user: @teacher)
           <a href='/users/#{@teacher.id}/files'>file index</a>
           <a href='/users/#{@teacher.id}/files/789/preview'>file</a>
         HTML

@@ -122,7 +122,7 @@ const ModuleItemList: React.FC<ModuleItemListProps> = ({
                             ? '0 2px 8px rgba(0,0,0,0.15)'
                             : 'none',
                           overflowX: 'hidden',
-                          borderWidth: item.content?.published ? '0 0 0 large' : '0',
+                          borderWidth: item.published ? '0 0 0 large' : '0',
                           borderColor: 'success',
                         }}
                         data-item-id={item._id}
@@ -131,7 +131,7 @@ const ModuleItemList: React.FC<ModuleItemListProps> = ({
                           <View
                             as="div"
                             borderWidth="0 0 0 large"
-                            borderColor={item.content?.published ? 'success' : 'transparent'}
+                            borderColor={item.published ? 'success' : 'transparent'}
                           >
                             <MemoizedModuleItem
                               key={`memoized-module-item-${item._id}`}

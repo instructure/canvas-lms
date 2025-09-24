@@ -6,5 +6,5 @@ gemspec
 
 eval_gemfile("../gemfile_prefix.rb")
 
-gem "activerecord", ">= 3.2", "< 8.0"
+gem "activerecord", ">= 3.2", "< 8.1"
 gem "rake"

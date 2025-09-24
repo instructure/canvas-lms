@@ -58,6 +58,14 @@ module Canvas::LiveEvents
     )
   end
 
+  def self.scan_youtube_links(payload)
+    post_event_stringified("scan_youtube_links", {
+                             scan_id: payload.scan_id,
+                             course_id: payload.course_id,
+                             external_context_id: payload.external_context_id
+                           })
+  end
+
   def self.conversation_created(conversation)
     post_event_stringified("conversation_created", {
                              conversation_id: conversation.id,
@@ -720,7 +728,7 @@ module Canvas::LiveEvents
     context = content_migration.context
     import_quizzes_next = content_migration.migration_settings&.[](:import_quizzes_next) == true
     quiz_next_imported = content_migration.migration_settings&.[](:quiz_next_imported) == true
-    link_migration_during_import = import_quizzes_next && content_migration.asset_map_v2?
+    link_migration_during_import = import_quizzes_next
     need_resource_map = content_migration.source_course&.has_new_quizzes? || link_migration_during_import || quiz_next_imported
 
     payload = {

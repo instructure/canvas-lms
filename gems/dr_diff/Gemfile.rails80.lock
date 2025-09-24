@@ -1,0 +1,80 @@
+PATH
+  remote: .
+  specs:
+    dr_diff (0.0.1)
+      gergich (~> 2.1)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    bigdecimal (3.2.2)
+    csv (3.3.5)
+    date (3.4.1)
+    debug (1.11.0)
+      irb (~> 1.10)
+      reline (>= 0.3.8)
+    diff-lcs (1.6.2)
+    erb (5.0.2)
+    gergich (2.2.1)
+      httparty (~> 0.17)
+      sqlite3 (>= 1.4, < 3.0)
+    httparty (0.23.1)
+      csv
+      mini_mime (>= 1.0.0)
+      multi_xml (>= 0.5.2)
+    io-console (0.8.1)
+    irb (1.15.2)
+      pp (>= 0.6.0)
+      rdoc (>= 4.0.0)
+      reline (>= 0.4.2)
+    mini_mime (1.1.5)
+    multi_xml (0.7.2)
+      bigdecimal (~> 3.1)
+    pp (0.6.2)
+      prettyprint
+    prettyprint (0.2.0)
+    psych (5.2.6)
+      date
+      stringio
+    rdoc (6.14.2)
+      erb
+      psych (>= 4.0.0)
+    reline (0.6.2)
+      io-console (~> 0.5)
+    rspec (3.13.0)
+      rspec-core (~> 3.13.0)
+      rspec-expectations (~> 3.13.0)
+      rspec-mocks (~> 3.13.0)
+    rspec-core (3.13.3)
+      rspec-support (~> 3.13.0)
+    rspec-expectations (3.13.3)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-mocks (3.13.2)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-support (3.13.2)
+    sqlite3 (2.6.0-aarch64-linux-gnu)
+    sqlite3 (2.6.0-arm64-darwin)
+    sqlite3 (2.6.0-x86_64-darwin)
+    sqlite3 (2.6.0-x86_64-linux-gnu)
+    stringio (3.1.7)
+
+PLATFORMS
+  aarch64-linux
+  arm64-darwin
+  ruby
+  x86_64-darwin
+  x86_64-linux
+
+DEPENDENCIES
+  debug
+  dr_diff!
+  rspec (~> 3.12)
+  rspec-mocks
+
+RUBY VERSION
+   ruby 3.4.1p0
+
+BUNDLED WITH
+   2.6.7

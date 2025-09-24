@@ -114,6 +114,17 @@ describe "settings tabs" do
       expect(notification.end_at).not_to eq initial_notification_end
     end
 
+    it "stays on the Announcements tab when navigating" do
+      11.times { account_notification(user: @user) }
+      get "/accounts/#{Account.default.id}/settings"
+
+      f("#tab-announcements").click
+      expect(f("a.next_page")).to have_attribute("href", /page=2#tab-announcements/)
+
+      f("a.next_page").click
+      expect(f("a.previous_page")).to have_attribute("href", /page=1#tab-announcements/)
+    end
+
     it "copies and saves an announcement" do
       notification = account_notification(user: @user)
       get "/accounts/#{Account.default.id}/settings"

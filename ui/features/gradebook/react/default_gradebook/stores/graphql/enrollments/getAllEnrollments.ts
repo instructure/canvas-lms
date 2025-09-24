@@ -27,14 +27,16 @@ import {
 
 type GetAllEnrollmentsParams = {
   queryParams: Pick<GetEnrollmentsParams, 'courseId' | 'userIds'>
+  headers?: Record<string, string>
 } & GetAllPagesCallbacks<GetEnrollmentsResult>
 
 export const getAllEnrollments = ({
   queryParams,
+  headers,
   ...params
 }: GetAllEnrollmentsParams): GetAllPagesReturnValue<Enrollment[]> =>
   getAllPages({
-    query: (after: string) => getEnrollments({...queryParams, after}),
+    query: (after: string) => getEnrollments({...queryParams, after}, headers),
     getPageInfo: page => page.course.enrollmentsConnection.pageInfo,
     flattenPages: pages => flatten(pages.map(page => page.course.enrollmentsConnection.nodes)),
     ...params,

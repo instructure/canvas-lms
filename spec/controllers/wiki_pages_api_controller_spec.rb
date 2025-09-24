@@ -40,6 +40,31 @@ describe WikiPagesApiController, type: :request do
     api_call_as_user(user, :put, url, path, params, {}, { expected_status: })
   end
 
+  def revert_wiki_page(user, page, revision_id, expected_status: 200)
+    url = "/api/v1/courses/#{@course.id}/pages/#{page.url}/revisions/#{revision_id}"
+    path = {
+      controller: "wiki_pages_api",
+      action: "revert",
+      format: "json",
+      course_id: @course.id.to_s,
+      url_or_id: page.url,
+      revision_id:
+    }
+    api_call_as_user(user, :post, url, path, {}, {}, { expected_status: })
+  end
+
+  def revisions_of_wiki_page(user, page)
+    url = "/api/v1/courses/#{@course.id}/pages/#{page.url}/revisions"
+    path = {
+      controller: "wiki_pages_api",
+      action: "revisions",
+      format: "json",
+      course_id: @course.id.to_s,
+      url_or_id: page.url
+    }
+    api_call_as_user(user, :get, url, path, {}, {}, { expected_status: 200 })
+  end
+
   def create_wiki_page(user, wiki_params = {}, expected_status: 200)
     url = "/api/v1/courses/#{@course.id}/pages"
     path = {
@@ -71,7 +96,8 @@ describe WikiPagesApiController, type: :request do
 
     context "block_content_editor feature is disabled" do
       before do
-        @course.account.disable_feature!(:block_content_editor)
+        @course.account.enable_feature!(:block_content_editor)
+        @course.disable_feature!(:block_content_editor_eap)
       end
 
       it "returns a list of wiki pages" do
@@ -84,6 +110,7 @@ describe WikiPagesApiController, type: :request do
     context "block_content_editor feature is enabled" do
       before do
         @course.account.enable_feature!(:block_content_editor)
+        @course.enable_feature!(:block_content_editor_eap)
       end
 
       it "returns a list of wiki pages" do
@@ -133,6 +160,16 @@ describe WikiPagesApiController, type: :request do
       expect(id_occurences.values).to all eq 1
       expect(att_occurences.keys).to match_array [@aa_test_data.attachment1.id]
       expect(att_occurences.values).to all eq 1
+    end
+
+    it "reverts as expected" do
+      wiki_response = create_wiki_page(@teacher, { title: "Pläcëhöldër", body: @aa_test_data.base_html }, expected_status: 200)
+      @wiki_page = WikiPage.find(wiki_response["page_id"])
+      update_wiki_page(@teacher, @wiki_page, { body: @aa_test_data.added_html })
+      revisions = revisions_of_wiki_page(@teacher, @wiki_page)
+      expect do
+        revert_wiki_page(@teacher, @wiki_page, revisions.last["revision_id"])
+      end.not_to raise_error
     end
   end
 

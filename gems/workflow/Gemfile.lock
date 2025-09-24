@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     workflow (0.0.1)
-      activesupport (>= 3.2, < 8.0)
+      activesupport (>= 3.2, < 8.1)
 
 GEM
   remote: https://rubygems.org/
@@ -49,7 +49,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  activerecord (>= 3.2, < 8.0)
+  activerecord (>= 3.2, < 8.1)
   rake
   workflow!
 

@@ -423,6 +423,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
       explicit_latex_typesetting = false,
       rce_transform_loaded_content = false,
       rce_find_replace = false,
+      rce_studio_embed_improvements = false,
       file_verifiers_for_quiz_links = false,
       consolidated_media_player = false,
     } = this.props.features
@@ -431,6 +432,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
       new_math_equation_handling,
       explicit_latex_typesetting,
       rce_transform_loaded_content,
+      rce_studio_embed_improvements,
       file_verifiers_for_quiz_links,
       rce_find_replace,
       consolidated_media_player,
@@ -1312,9 +1314,12 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
   }
 
   announcing = 0
+  _isMounted = false
 
   announceContextToolbars(editor: TinyMCEEditor) {
     editor.on('NodeChange', () => {
+      if (!this._isMounted) return
+
       const node = editor.selection.getNode()
       // @ts-expect-error
       if (isImageEmbed(node, editor)) {
@@ -1353,7 +1358,8 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
     })
 
     editor.on('ResizeEditor', ({deltaY}) => {
-      if (!deltaY) return
+      if (!this._isMounted || !deltaY) return
+
       if (deltaY < 0) {
         this.setState({
           announcement: formatMessage('The height of Rich Content Area is decreased.'),
@@ -1687,6 +1693,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
   }
 
   componentWillUnmount() {
+    this._isMounted = false
     if (this.state.shouldShowEditor) {
       window.clearTimeout(this.blurTimer)
       if (!this._destroyCalled) {
@@ -1839,6 +1846,8 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
           'a11y_checker',
           'wordcount',
           'instructure_wordcount',
+          'instructure_wordcount_header',
+          'instructure_keyboard_shortcuts_header',
           'instructure_studio_media_options',
           'instructure_rce_external_tools',
           ...pastePlugins,
@@ -1904,6 +1913,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
   }
 
   componentDidMount() {
+    this._isMounted = true
     if (this.state.shouldShowEditor) {
       this.editorReallyDidMount()
     } else {

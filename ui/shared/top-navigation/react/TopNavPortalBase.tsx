@@ -33,14 +33,13 @@ export interface WithProps extends ITopNavProps {
   courseId?: number
 }
 
-export const getMountPoint = (): HTMLElement | null =>
-  document.getElementById('react-instui-topnav')
+export function getMountPoint() {
+  return document.getElementById('react-instui-topnav')
+}
 
-export const TopNavPortalBase: React.FC<ITopNavProps> = props => {
+export function TopNavPortalBase(props: ITopNavProps): React.ReactElement | null {
   const mountPoint = getMountPoint()
-  if (!mountPoint) {
-    return null
-  }
+  if (!mountPoint) return null
 
   return (
     <Portal open={true} mountNode={mountPoint}>

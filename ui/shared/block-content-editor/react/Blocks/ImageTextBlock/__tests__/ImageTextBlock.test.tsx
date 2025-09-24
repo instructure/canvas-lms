@@ -36,6 +36,16 @@ jest.mock('../../../hooks/useIsEditingBlock', () => ({
   useIsEditingBlock: () => useIsEditingBlockMock(),
 }))
 
+const setIsEditedViaEditButtonMock = jest.fn()
+const getUseIsEditingBlockMock = ({
+  isEditingBlock,
+  isEditedViaEditButton,
+}: {isEditingBlock: boolean; isEditedViaEditButton: boolean}) => ({
+  isEditingBlock,
+  isEditedViaEditButton,
+  setIsEditedViaEditButton: setIsEditedViaEditButtonMock,
+})
+
 const defaultProps: ImageTextBlockProps = {
   title: '',
   content: '',
@@ -43,7 +53,7 @@ const defaultProps: ImageTextBlockProps = {
   altText: '',
   includeBlockTitle: false,
   backgroundColor: '',
-  textColor: '',
+  titleColor: '',
   arrangement: 'left',
   textToImageRatio: '1:1',
   fileName: '',
@@ -60,7 +70,9 @@ describe('ImageTextBlock', () => {
   describe('when block in edit mode', () => {
     beforeEach(() => {
       useIsInEditorMock.mockReturnValue(true)
-      useIsEditingBlockMock.mockReturnValue(true)
+      useIsEditingBlockMock.mockReturnValue(
+        getUseIsEditingBlockMock({isEditingBlock: true, isEditedViaEditButton: false}),
+      )
     })
 
     it('does render in edit mode', () => {
@@ -72,7 +84,9 @@ describe('ImageTextBlock', () => {
   describe('when block in preview mode', () => {
     beforeEach(() => {
       useIsInEditorMock.mockReturnValue(true)
-      useIsEditingBlockMock.mockReturnValue(false)
+      useIsEditingBlockMock.mockReturnValue(
+        getUseIsEditingBlockMock({isEditingBlock: false, isEditedViaEditButton: false}),
+      )
     })
 
     it('does render in preview mode', () => {

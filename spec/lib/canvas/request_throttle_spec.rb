@@ -255,6 +255,35 @@ describe RequestThrottle do
       set_blocklist("user:2")
       expect(throttler.call(request_header_token)).to eq rate_limit_exceeded
     end
+
+    describe "rate limit status codes" do
+      it "returns a 429 when request_throttle.send_429_response is enabled" do
+        Setting.set("request_throttle.send_429_response", "true")
+        set_blocklist("user:1")
+
+        result = throttler.call(request_user_1)
+        expect(result[0]).to eq 429
+        expect(result[2]).to eq ["429 Too Many Requests (Rate Limit Exceeded)\n"]
+      end
+
+      it "returns a 403 when request_throttle.send_429_response is disabled" do
+        Setting.set("request_throttle.send_429_response", "false")
+        set_blocklist("user:1")
+
+        result = throttler.call(request_user_1)
+        expect(result[0]).to eq 403
+        expect(result[2]).to eq ["403 Forbidden (Rate Limit Exceeded)\n"]
+      end
+
+      it "returns a 403 when request_throttle.send_429_response is not set" do
+        Setting.remove("request_throttle.send_429_response")
+        set_blocklist("user:1")
+
+        result = throttler.call(request_user_1)
+        expect(result[0]).to eq 403
+        expect(result[2]).to eq ["403 Forbidden (Rate Limit Exceeded)\n"]
+      end
+    end
   end
 
   describe ".list_from_setting" do

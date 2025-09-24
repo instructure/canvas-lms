@@ -1078,6 +1078,7 @@ describe "ZipPackage" do
         file = add_file(fixture_file_upload("cn_image.jpg", "image/jpg"), @course, "cn_image.jpg", folder)
         disc = @course.discussion_topics.create!(title: "Discussion 1",
                                                  user: @student,
+                                                 saving_user: @student,
                                                  message: "<img src=\"/courses/#{@course.id}/files/#{file.id}\" />")
         @module.content_tags.create!(content: disc, context: @course, indent: 0)
         course_data = create_zip_package.parse_course_data

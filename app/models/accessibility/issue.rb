@@ -63,7 +63,7 @@ module Accessibility
 
     def update_preview(rule_id, resource_type, resource_id, path, value)
       resource = find_resource(resource_type, resource_id)
-      HtmlFixer.new(rule_id, resource, path, value).preview_fix
+      HtmlFixer.new(rule_id, resource, path, value).preview_fix(element_only: path.present?)
     end
 
     def generate_fix(rule_id, resource_type, resource_id, path, value)

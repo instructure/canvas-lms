@@ -34,15 +34,13 @@ describe "analytics in Canvas" do
       user_session(@admin)
     end
 
-    it "with Analytics 1 enabled, displays the account analytics nav menu item" do
-      skip "Until analytics removing merged EAX-2072"
+    it "does not show analytics nav menu item even with Analytics 1 enabled" do
       skip unless defined? Analytics
       # enable Analytics 1
       @admin.account.update(allowed_services: "+analytics")
       visit_admin_settings_tab(@admin.account.id)
 
-      expect(admin_left_nav_menu.text.split("\n")).to include("Analytics")
-      expect(analytics_menu_item.attribute("href")).to include("/accounts/#{@admin.account.id}/analytics")
+      expect(admin_left_nav_menu.text.split("\n")).not_to include("Analytics")
     end
 
     it "with Analytics 1 disabled, does not display account analytics nav menu item" do
@@ -114,15 +112,13 @@ describe "analytics in Canvas" do
           @course.root_account.disable_feature!(:analytics_2)
         end
 
-        it "displays Analytics 1 link in manage user menu" do
-          skip "Until analytics removing merged EAX-2072"
+        it "does not displays Analytics 1 link in manage user menu" do
           skip unless defined? Analytics
           visit_course_people_page(@course.id)
           manage_user_link(@student.name).click
 
-          expect(manage_user_options_list.text).to include("Analytics")
+          expect(manage_user_options_list.text).not_to include("Analytics")
           expect(manage_user_options_list.text).not_to include("Admin Analytics")
-          expect(manage_user_analytics_1_link.attribute("href")).to include("/courses/#{@course.id}/analytics/users/#{@student.id}")
         end
       end
     end

@@ -385,6 +385,10 @@ class ApplicationController < ActionController::Base
                                     elsif @context.is_a?(Course)
                                       @context.account.horizon_account?
                                     end
+        if @context.is_a?(Course)
+          @js_env[:FEATURES][:youtube_overlay] = @context.account.feature_enabled?(:youtube_overlay)
+        end
+
         # partner context data
         if @context&.grants_any_right?(@current_user, session, :read, :read_as_admin)
           @js_env[:current_context] = {
@@ -436,11 +440,11 @@ class ApplicationController < ActionController::Base
   JS_ENV_SITE_ADMIN_FEATURES = %i[
     account_level_blackout_dates
     assignment_edit_placement_not_on_announcements
+    accessibility_issues_in_full_page
     commons_new_quizzes
     consolidated_media_player
     courses_popout_sisid
     create_external_apps_side_tray_overrides
-    create_wiki_page_mastery_path_overrides
     dashboard_graphql_integration
     disallow_threaded_replies_fix_alert
     disallow_threaded_replies_manage
@@ -451,7 +455,6 @@ class ApplicationController < ActionController::Base
     explicit_latex_typesetting
     files_a11y_rewrite
     files_a11y_rewrite_toggle
-    hide_legacy_course_analytics
     horizon_course_setting
     instui_for_import_page
     instui_header
@@ -461,12 +464,13 @@ class ApplicationController < ActionController::Base
     new_quizzes_navigation_updates
     permanent_page_links
     rce_a11y_resize
+    rce_studio_embed_improvements
     rce_find_replace
     render_both_to_do_lists
     scheduled_feedback_releases
     speedgrader_studio_media_capture
     validate_call_to_action
-    youtube_overlay
+    block_content_editor_ai_alt_text
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     account_level_mastery_scales
@@ -3191,7 +3195,7 @@ class ApplicationController < ActionController::Base
 
   ASSIGNMENT_GROUPS_TO_FETCH_PER_PAGE_ON_ASSIGNMENTS_INDEX = 50
   def set_js_assignment_data
-    rights = [*RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS, :manage_grades, :read_grades, :manage]
+    rights = [*RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS, :manage_grades, :read_grades, :manage, :moderate_forum]
     permissions = @context.rights_status(@current_user, *rights)
     permissions[:manage_course] = permissions[:manage]
     permissions[:manage] = permissions[:manage_assignments_edit]

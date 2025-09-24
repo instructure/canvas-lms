@@ -1,0 +1,4 @@
+.text-edit-wrapper .rce-wrapper,
+.tox .tox-edit-area > iframe.tox-edit-area__iframe {
+  background-color: transparent;
+}

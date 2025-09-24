@@ -16,35 +16,45 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {PreviewButton} from './PreviewButton'
 import {RedoButton} from './RedoButton'
 import {UndoButton} from './UndoButton'
+import {AccessibilityCheckerButton} from './AccessibilityCheckerButton'
 import {useBlockContentEditorContext} from '../BlockContentEditorContext'
 import {useEditHistory} from '../hooks/useEditHistory'
+import {List} from '@instructure/ui-list'
 
 export const Toolbar = () => {
   const {
     editor: {mode, setMode},
+    accessibility: {a11yIssueCount, a11yIssues},
   } = useBlockContentEditorContext()
   const {undo, redo, canUndo, canRedo} = useEditHistory()
   const isPreviewMode = mode === 'preview'
 
+  const menuItems = [
+    <PreviewButton
+      active={isPreviewMode}
+      onClick={() => setMode(isPreviewMode ? 'default' : 'preview')}
+    />,
+  ]
+  if (!isPreviewMode) {
+    const allIssues = Array.from(a11yIssues.values()).flat()
+    menuItems.push(
+      <UndoButton active={canUndo} onClick={undo} />,
+      <RedoButton active={canRedo} onClick={redo} />,
+      <AccessibilityCheckerButton count={a11yIssueCount} issues={allIssues} />,
+    )
+  }
+
   return (
     <View shadow="resting" display="block">
-      <Flex direction="column">
-        <PreviewButton
-          active={isPreviewMode}
-          onClick={() => setMode(isPreviewMode ? 'default' : 'preview')}
-        />
-        {!isPreviewMode && (
-          <>
-            <UndoButton active={canUndo} onClick={undo} />
-            <RedoButton active={canRedo} onClick={redo} />
-          </>
-        )}
-      </Flex>
+      <List isUnstyled margin="none">
+        {menuItems.map((item, index) => (
+          <List.Item key={index}>{item}</List.Item>
+        ))}
+      </List>
     </View>
   )
 }

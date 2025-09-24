@@ -27,15 +27,24 @@ module Lti
     before_action :require_submission
 
     def resubmit_notice
-      if submission.group_id.present?
-        return render status: :bad_request,
-                      json: { error: "Group Assignment resubmission not supported" }
-      end
+      submission_to_notify = if submission.group_id.present?
+                               Lti::AssetProcessorNotifier.get_original_submission_for_group(submission)
+                             else
+                               submission
+                             end
       Lti::AssetProcessorNotifier.notify_asset_processors(
-        submission,
+        submission_to_notify,
         asset_processor
       )
       head :no_content
+    rescue Lti::AssetProcessorNotifier::MissingGroupmateSubmissionError
+      render json: {
+               errors: {
+                 error_code: "groupmate_submission_not_found",
+                 message: "Groupmate submission could not be found"
+               }
+             },
+             status: :not_found
     end
 
     def assignment

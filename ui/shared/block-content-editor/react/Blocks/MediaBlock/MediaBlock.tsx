@@ -16,37 +16,88 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import {useState} from 'react'
 import {MediaBlockSettings} from './MediaBlockSettings'
-import {BaseBlockHOC} from '../BaseBlock'
-import {MediaBlockProps} from './types'
+import {BaseBlock} from '../BaseBlock'
+import {MediaBlockProps, MediaSources} from './types'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {useSave2} from '../BaseBlock/useSave'
+import {useSave} from '../BaseBlock/useSave'
 import {Flex} from '@instructure/ui-flex'
 import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
+import {TitleView} from '../BlockItems/Title/TitleView'
 import {View} from '@instructure/ui-view'
 import {DefaultPreviewImage} from '../BlockItems/DefaultPreviewImage/DefaultPreviewImage'
 import {TitleEdit} from '../BlockItems/Title/TitleEdit'
 import {AddButton} from '../BlockItems/AddButton/AddButton'
 import {UploadMediaModal} from './UploadMediaModal'
+import CanvasStudioPlayer from '@canvas/canvas-studio-player/react/CanvasStudioPlayer'
+import {useFocusElement} from '../../hooks/useFocusElement'
+import {defaultProps} from './defaultProps'
+import {getContrastingTextColorCached} from '../../utilities/getContrastingTextColor'
 
 const I18n = createI18nScope('block_content_editor')
 
+const Player = ({mediaId, src, attachment_id}: MediaSources) => {
+  if (!!mediaId || !!attachment_id) {
+    return (
+      <CanvasStudioPlayer
+        media_id={mediaId || ''}
+        attachment_id={attachment_id || ''}
+        explicitSize={{width: '100%', height: 400}}
+      />
+    )
+  }
+
+  return (
+    <iframe
+      src={src}
+      title={'Media content'}
+      width="100%"
+      height="100%"
+      style={{
+        border: 'none',
+        borderRadius: '4px',
+      }}
+      allow="fullscreen"
+      data-media-type="video"
+    />
+  )
+}
+
 const MediaBlockView = (props: MediaBlockProps) => {
+  return (
+    <Flex gap="mediumSmall" direction="column">
+      {props.includeBlockTitle && !!props.title && (
+        <TitleView title={props.title} contentColor={props.titleColor} />
+      )}
+      {props.src || props.mediaId || props.attachment_id ? (
+        <View as="div" width="100%" height="400px">
+          <Player mediaId={props.mediaId} src={props.src} attachment_id={props.attachment_id} />
+        </View>
+      ) : (
+        <DefaultPreviewImage blockType="media" />
+      )}
+    </Flex>
+  )
+}
+
+const MediaBlockEditView = (props: MediaBlockProps) => {
   return (
     <Flex gap="mediumSmall" direction="column">
       {props.includeBlockTitle && (
         <TitleEditPreview title={props.title} contentColor={props.titleColor} />
       )}
-      {props.src ? (
-        <View as="div" width="100%" height="400px">
-          <iframe
-            src={props.src}
-            title={props.title || 'Media content'}
-            width="100%"
-            height="100%"
-            allow="fullscreen"
-            data-media-type="video"
+      {props.src || props.mediaId || props.attachment_id ? (
+        <View as="div" width="100%" height="400px" position="relative">
+          <Player mediaId={props.mediaId} src={props.src} attachment_id={props.attachment_id} />
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+            }}
           />
         </View>
       ) : (
@@ -59,50 +110,60 @@ const MediaBlockView = (props: MediaBlockProps) => {
 const MediaBlockEdit = (props: MediaBlockProps) => {
   const [title, setTitle] = useState(props.title)
   const [showModal, setShowModal] = useState(false)
+  const labelColor = getContrastingTextColorCached(props.backgroundColor)
+  const {focusHandler} = useFocusElement()
 
-  const save = useSave2(() => ({
+  const save = useSave(() => ({
     title,
+    src: props.src,
+    mediaId: props.mediaId,
   }))
+
+  const onSubmit = (mediaSources: MediaSources) => {
+    save(mediaSources)
+    setShowModal(false)
+  }
 
   return (
     <Flex gap="mediumSmall" direction="column">
-      {props.includeBlockTitle && <TitleEdit title={title} onTitleChange={setTitle} />}
-      {props.src ? (
+      {props.includeBlockTitle && (
+        <TitleEdit
+          title={title}
+          onTitleChange={setTitle}
+          labelColor={labelColor}
+          focusHandler={focusHandler}
+        />
+      )}
+      {props.src || props.mediaId || props.attachment_id ? (
         <View as="div" width={'100%'} height={'400px'}>
-          <iframe
-            src={props.src}
-            title={title || 'Media content'}
-            width="100%"
-            height="100%"
-            style={{
-              border: 'none',
-              borderRadius: '4px',
-            }}
-            allow="fullscreen"
-            data-media-type="video"
-          />
+          <Player mediaId={props.mediaId} src={props.src} attachment_id={props.attachment_id} />
         </View>
       ) : (
-        <AddButton onClick={() => setShowModal(true)} />
+        <AddButton
+          onClick={() => setShowModal(true)}
+          focusHandler={!props.includeBlockTitle && focusHandler}
+          ariaLabel={I18n.t('Add media')}
+        />
       )}
       <UploadMediaModal
         open={showModal}
-        onSubmit={(src: string) => save({src})}
+        onSubmit={onSubmit}
         onDismiss={() => setShowModal(false)}
       />
     </Flex>
   )
 }
 
-export const MediaBlock = (props: MediaBlockProps) => {
+export const MediaBlock = (props: Partial<MediaBlockProps>) => {
+  const componentProps = {...defaultProps, ...props}
   return (
-    <BaseBlockHOC
+    <BaseBlock
       ViewComponent={MediaBlockView}
       EditComponent={MediaBlockEdit}
-      EditViewComponent={MediaBlockView}
-      componentProps={props}
+      EditViewComponent={MediaBlockEditView}
+      componentProps={componentProps}
       title={MediaBlock.craft.displayName}
-      backgroundColor={props.backgroundColor}
+      backgroundColor={componentProps.backgroundColor}
     />
   )
 }

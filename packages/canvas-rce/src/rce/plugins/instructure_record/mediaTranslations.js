@@ -25,7 +25,7 @@ import formatMessage from '../../../format-message'
 const uploadMediaTranslations = {
   UploadMediaStrings: {
     ADD_CLOSED_CAPTIONS_OR_SUBTITLES: formatMessage('Add CC/Subtitles'),
-    CLEAR_FILE_TEXT: formatMessage('Clear selected file'),
+    CLEAR_FILE_TEXT: formatMessage('Remove'),
     CLOSE_TEXT: formatMessage('Close'),
     CLOSED_CAPTIONS_CHOOSE_FILE: formatMessage('Choose caption file'),
     CLOSED_CAPTIONS_SELECT_LANGUAGE: formatMessage('Select Language'),

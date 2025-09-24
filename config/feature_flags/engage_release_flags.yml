@@ -44,6 +44,12 @@ peer_review_allocation_and_grading:
   shadow: true
   display_name: Peer Review Allocation and Grading
   description: Enable dynamic peer review allocation and separate due dates and grading for a streamlined, flexible review experience.
+llm_assignments:
+  state: hidden
+  applies_to: Course
+  shadow: true
+  display_name: LLM Assignments
+  description: Enable LLM-powered assignments for enhanced learning experiences.
 updated_mastery_connect_icon:
   state: hidden
   applies_to: SiteAdmin

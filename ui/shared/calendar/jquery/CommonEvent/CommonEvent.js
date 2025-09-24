@@ -125,11 +125,7 @@ Object.assign(CommonEvent.prototype, {
       // No groups because planner notes don't support groups
       if (!assetString || assetString.startsWith('group_')) return false
 
-      return (
-        assetString === this.contextCode() ||
-        assetString.startsWith('user_') ||
-        !managedContexts.includes(assetString)
-      )
+      return assetString.startsWith('user_') || !managedContexts.includes(assetString)
     })
   },
 

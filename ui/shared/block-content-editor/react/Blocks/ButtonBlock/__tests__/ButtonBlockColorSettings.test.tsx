@@ -23,9 +23,9 @@ import {ButtonBlockColorSettingsProps} from '../types'
 const defaultProps: ButtonBlockColorSettingsProps = {
   includeBlockTitle: false,
   backgroundColor: '#FFFFFF',
-  textColor: '#000000',
+  titleColor: '#000000',
   onBackgroundColorChange: jest.fn(),
-  onTextColorChange: jest.fn(),
+  onTitleColorChange: jest.fn(),
 }
 
 describe('ButtonBlockColorSettings', () => {
@@ -37,19 +37,19 @@ describe('ButtonBlockColorSettings', () => {
     it('renders background color picker', () => {
       render(<ButtonBlockColorSettings {...defaultProps} />)
 
-      expect(screen.getByText('Background')).toBeInTheDocument()
+      expect(screen.getByText('Background color')).toBeInTheDocument()
     })
 
-    it('does not render text color picker when includeBlockTitle is false', () => {
+    it('does not render title color picker when includeBlockTitle is false', () => {
       render(<ButtonBlockColorSettings {...defaultProps} includeBlockTitle={false} />)
 
-      expect(screen.queryByText('Text')).not.toBeInTheDocument()
+      expect(screen.queryByText('Title color')).not.toBeInTheDocument()
     })
 
-    it('renders text color picker when includeBlockTitle is true', () => {
+    it('renders title color picker when includeBlockTitle is true', () => {
       render(<ButtonBlockColorSettings {...defaultProps} includeBlockTitle={true} />)
 
-      expect(screen.getByText('Text')).toBeInTheDocument()
+      expect(screen.getByText('Title color')).toBeInTheDocument()
     })
   })
 })

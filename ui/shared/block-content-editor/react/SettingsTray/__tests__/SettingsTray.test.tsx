@@ -18,24 +18,25 @@
 
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {SettingsTray} from '../SettingsTray'
+import {SettingsTray, SettingsTrayProps} from '../SettingsTray'
 
 describe('SettingsTray', () => {
-  const defaultProps = {
-    title: 'Settings',
+  const defaultProps: SettingsTrayProps = {
+    blockDisplayName: 'Text column',
     open: true,
     onDismiss: () => {},
+    onClose: () => {},
     children: <p>Settings content</p>,
   }
 
-  const renderSettingsTray = async (props: Partial<React.ComponentProps<typeof SettingsTray>>) => {
+  const renderSettingsTray = async (props: Partial<SettingsTrayProps>) => {
     return render(<SettingsTray {...defaultProps} {...props} />)
   }
 
   describe('when tray is open', () => {
-    it('renders with the given title', async () => {
+    it('renders with the given blockDisplayName', async () => {
       await renderSettingsTray({})
-      expect(screen.getByText(defaultProps.title)).toBeInTheDocument()
+      expect(screen.getByText(defaultProps.blockDisplayName)).toBeInTheDocument()
     })
 
     it('renders the children content', async () => {
@@ -57,7 +58,7 @@ describe('SettingsTray', () => {
   describe('when tray is closed', () => {
     it('does not render the tray content', async () => {
       await renderSettingsTray({open: false})
-      expect(screen.queryByText(defaultProps.title)).not.toBeInTheDocument()
+      expect(screen.queryByText(defaultProps.blockDisplayName)).not.toBeInTheDocument()
     })
   })
 })

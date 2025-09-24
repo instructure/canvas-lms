@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useRef, useEffect} from 'react'
-import {AllocationRuleType, PeerReviewStudentType} from './AllocationRuleCard'
+import React, {useState, useRef} from 'react'
+import {AllocationRuleType} from './AllocationRuleCard'
 import {Button, CloseButton, CondensedButton, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {FormMessage} from '@instructure/ui-form-field'
@@ -25,8 +25,9 @@ import {Heading} from '@instructure/ui-heading'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {Modal} from '@instructure/ui-modal'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
-import {Select} from '@instructure/ui-select'
+import StudentSelect from './StudentSelect'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {CourseStudent} from '../graphql/hooks/useAssignedStudents'
 
 const I18n = createI18nScope('peer_review_allocation_rule_card')
 const TARGET_TYPES = {
@@ -38,17 +39,20 @@ const REQUIRED_REVIEW_TYPE = ['permit', 'prohibit']
 const SUGGESTED_REVIEW_TYPE = ['should', 'should_not']
 
 const CreateEditAllocationRuleModal = ({
+  assignmentId,
+  courseId,
   setIsOpen,
   rule,
   isOpen = false,
   isEdit = false,
 }: {
+  assignmentId?: string
+  courseId?: string
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
   isEdit?: boolean
   rule?: AllocationRuleType
 }): React.ReactElement => {
-  const [assignedStudents, setAssignedStudents] = useState<PeerReviewStudentType[]>([])
   const [targetType, setTargetType] = useState(
     rule
       ? rule.appliesToReviewer
@@ -58,82 +62,25 @@ const CreateEditAllocationRuleModal = ({
   )
   const [permitReview, setPermitReview] = useState(rule?.reviewPermitted ?? true)
   const [mustReview, setMustReview] = useState(rule?.mustReview ?? true)
+
   const [target, setTarget] = useState(rule?.appliesToReviewer ? rule?.reviewer : rule?.reviewee)
-  const [targetSearch, setTargetSearch] = useState(
-    (targetType === TARGET_TYPES.REVIEWEE ? rule?.reviewee?.name : rule?.reviewer?.name) || '',
-  )
-  const [showTargetOptions, setShowTargetOptions] = useState(false)
   const [targetErrors, setTargetErrors] = useState<FormMessage[]>([])
+  const targetSelectRef = useRef<HTMLElement | null>(null)
+
   const [subject, setSubject] = useState(rule?.reviewee)
-  const [additionalSubjects, setAdditionalSubjects] = useState<{
-    [key: string]: PeerReviewStudentType
-  }>({})
   const [subjectErrors, setSubjectErrors] = useState<FormMessage[]>([])
+  const subjectSelectRef = useRef<HTMLElement | null>(null)
+
+  const [additionalSubjects, setAdditionalSubjects] = useState<{
+    [key: string]: CourseStudent
+  }>({})
   const [additionalSubjectsErrors, setAdditionalSubjectsErrors] = useState<{
     [key: string]: FormMessage[]
   }>({})
-  const [subjectSearch, setSubjectSearch] = useState(
-    (targetType === TARGET_TYPES.REVIEWEE ? rule?.reviewer?.name : rule?.reviewee?.name) || '',
-  )
-  const [additionalSubjectSearch, setAdditionalSubjectSearch] = useState<{[key: string]: string}>(
-    {},
-  )
-  const [showSubjectOptions, setShowSubjectOptions] = useState(false)
-  const [showAdditionalSubjectOptions, setShowAdditionalSubjectOptions] = useState<{
-    [key: string]: boolean
-  }>({})
-  const [additionalSubjectCount, setAdditionalSubjectCount] = useState(0)
-
-  const targetSelectRef = useRef<HTMLElement | null>(null)
-  const subjectSelectRef = useRef<HTMLElement | null>(null)
   const [additionalSubjectSelectRefs, setAdditionalSubjectSelectRefs] = useState<{
     [key: string]: HTMLElement | null
   }>({})
-
-  useEffect(() => {
-    // TODO: [EGG-1386] Replace with actual data fetching logic
-    const fetchAssignedStudents = async () => {
-      const students: PeerReviewStudentType[] = [
-        {id: '1', name: 'Student 1'},
-        {id: '2', name: 'Student 2'},
-        {id: '3', name: 'Student 3'},
-      ]
-      setAssignedStudents(students)
-    }
-    fetchAssignedStudents()
-  }, [])
-
-  const renderStudentOption = (
-    student: PeerReviewStudentType,
-    isTargetOption: boolean,
-    subjectKey?: string,
-  ) => {
-    const filterStudents = []
-    if (isTargetOption) {
-      filterStudents.push(subject)
-    } else if (subjectKey) {
-      filterStudents.push(target)
-      filterStudents.push(subject)
-    } else {
-      filterStudents.push(target)
-    }
-
-    Object.keys(additionalSubjects).forEach(addSubjectKey => {
-      if (addSubjectKey !== subjectKey) {
-        filterStudents.push(additionalSubjects[addSubjectKey])
-      }
-    })
-
-    filterStudents.push(...Object.values(additionalSubjects))
-    if (!filterStudents.some(s => s?.id === student.id)) {
-      const id = `${isTargetOption ? 'target' : 'subject'}-${student.id}`
-      return (
-        <Select.Option id={id} key={id}>
-          {student.name}
-        </Select.Option>
-      )
-    }
-  }
+  const [additionalSubjectCount, setAdditionalSubjectCount] = useState(0)
 
   const handleSave = () => {
     let shouldFocus = true
@@ -170,7 +117,7 @@ const CreateEditAllocationRuleModal = ({
     const additionalSubjectKeys = Object.keys(additionalSubjects)
     if (additionalSubjectKeys.length > 0) {
       additionalSubjectKeys.forEach(subjectKey => {
-        if (!additionalSubjects[subjectKey].id) {
+        if (!additionalSubjects[subjectKey]._id) {
           setAdditionalSubjectsErrors(prev => ({
             ...prev,
             [subjectKey]: [
@@ -202,90 +149,50 @@ const CreateEditAllocationRuleModal = ({
     handleClose()
   }
 
-  const clearErrors = () => {
+  const clearErrors = (isSubject: boolean, subjectKey?: string) => {
+    if (isSubject) {
+      if (subjectKey) {
+        setAdditionalSubjectsErrors(prev => ({
+          ...prev,
+          [subjectKey]: [],
+        }))
+      } else {
+        setSubjectErrors([])
+      }
+    } else {
+      setTargetErrors([])
+    }
+  }
+
+  const clearAllErrors = () => {
     setTargetErrors([])
     setSubjectErrors([])
+    setAdditionalSubjectsErrors(prev => {
+      const cleared: {[key: string]: FormMessage[]} = {}
+      Object.keys(prev).forEach(key => {
+        cleared[key] = []
+      })
+      return cleared
+    })
+  }
+
+  const clearContents = () => {
+    setTarget(undefined)
+    setSubject(undefined)
+    setAdditionalSubjects({})
+    setAdditionalSubjectSelectRefs({})
+    setAdditionalSubjectCount(0)
   }
 
   const handleClose = () => {
     // TODO: [EGG-1387] Handle opening and reopening the modal after submitting is implemented
-    clearErrors()
+    clearContents()
+    clearAllErrors()
     setIsOpen(false)
   }
 
-  const handleInputChange = (value: string, isTarget: boolean, subjectKey?: string) => {
-    if (isTarget) {
-      setTarget(undefined)
-      setTargetSearch(value.trim())
-      setShowTargetOptions(true)
-      setTargetErrors([])
-    } else {
-      if (subjectKey) {
-        setAdditionalSubjects({...additionalSubjects, [subjectKey]: {id: '', name: ''}})
-        setAdditionalSubjectSearch({...additionalSubjectSearch, [subjectKey]: value.trim()})
-        setShowAdditionalSubjectOptions({...showAdditionalSubjectOptions, [subjectKey]: true})
-      } else {
-        setSubject(undefined)
-        setSubjectSearch(value.trim())
-        setShowSubjectOptions(true)
-      }
-      setSubjectErrors([])
-    }
-  }
-
-  const handleInputBlur = (isTarget: boolean, subjectKey?: string) => {
-    isTarget
-      ? setShowTargetOptions(false)
-      : subjectKey
-        ? setShowAdditionalSubjectOptions(prev => ({
-            ...prev,
-            [subjectKey]: false,
-          }))
-        : setShowSubjectOptions(false)
-  }
-
-  const handleSelection = (id: string, isTarget: boolean, subjectKey?: string) => {
-    if (id) {
-      const studentId = id.split('-')[1]
-      const student = assignedStudents.find(student => student.id === studentId)
-      if (!student) return
-
-      if (isTarget) {
-        setTarget(student)
-        setTargetSearch(student?.name || '')
-        setShowTargetOptions(false)
-        setTargetErrors([])
-      } else {
-        if (subjectKey) {
-          setAdditionalSubjects(prev => ({
-            ...prev,
-            [subjectKey]: student,
-          }))
-          setAdditionalSubjectSearch(prev => ({
-            ...prev,
-            [subjectKey]: student?.name || '',
-          }))
-          setShowAdditionalSubjectOptions(prev => ({
-            ...prev,
-            [subjectKey]: false,
-          }))
-          setAdditionalSubjectsErrors(prev => {
-            const newErrors = {...prev}
-            delete newErrors[subjectKey]
-            return newErrors
-          })
-        } else {
-          setSubject(student)
-          setSubjectSearch(student?.name || '')
-          setShowSubjectOptions(false)
-          setSubjectErrors([])
-        }
-      }
-    }
-  }
-
   const handleTargetSelection = (_event: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    clearErrors()
+    clearAllErrors()
     setTargetType(value)
   }
 
@@ -352,48 +259,54 @@ const CreateEditAllocationRuleModal = ({
     handleAddSubjectField()
   }
 
-  const reviewType = getReviewType()
+  const getFilterStudents = (isSubject: boolean, subjectKey?: string) => {
+    const filterStudents = new Set<CourseStudent>()
+    if (target && isSubject) filterStudents.add(target)
+    if (subject && (subjectKey || !isSubject)) filterStudents.add(subject)
+    Object.keys(additionalSubjects).forEach(addSubjectKey => {
+      if (addSubjectKey !== subjectKey) {
+        if (additionalSubjects[addSubjectKey]) filterStudents.add(additionalSubjects[addSubjectKey])
+      }
+    })
+    return filterStudents
+  }
 
   // index = -1 for the main subject select, otherwise it will be the index of additional subjects
-  const renderSubjectSelect = (index = -1, subjectKey: string | undefined = undefined) => {
-    const numericKey = subjectKey ? parseInt(subjectKey) : -1
+  const renderSubjectSelect = (index = -1, subjectKey: string | undefined = undefined) => (
+    <StudentSelect
+      label={
+        targetType === TARGET_TYPES.REVIEWEE ? I18n.t('Reviewer Name') : I18n.t('Recipient Name')
+      }
+      errors={index === -1 ? subjectErrors : (additionalSubjectsErrors[subjectKey || ''] ?? [])}
+      initialSelected={index === -1 ? subject : additionalSubjects[subjectKey || '']}
+      assignmentId={assignmentId}
+      courseId={courseId}
+      filterStudents={getFilterStudents(true, subjectKey)}
+      onOptionSelect={
+        !subjectKey
+          ? setSubject
+          : (student: CourseStudent) => {
+              setAdditionalSubjects(prev => ({
+                ...prev,
+                [subjectKey]: student,
+              }))
+            }
+      }
+      handleInputRef={ref => {
+        if (index === -1) {
+          if (subjectSelectRef) subjectSelectRef.current = ref
+        } else if (subjectKey) {
+          setAdditionalSubjectSelectRefs(prev => ({
+            ...prev,
+            [subjectKey]: ref,
+          }))
+        }
+      }}
+      clearErrors={() => clearErrors(true, subjectKey)}
+    />
+  )
 
-    return (
-      <Select
-        renderLabel={
-          targetType === TARGET_TYPES.REVIEWEE ? I18n.t('Reviewer Name') : I18n.t('Recipient Name')
-        }
-        messages={index === -1 ? subjectErrors : (additionalSubjectsErrors[subjectKey || ''] ?? [])}
-        inputRef={ref => {
-          if (index === -1) {
-            if (subjectSelectRef) subjectSelectRef.current = ref
-          } else if (subjectKey) {
-            setAdditionalSubjectSelectRefs(prev => ({
-              ...prev,
-              [subjectKey]: ref,
-            }))
-          }
-        }}
-        inputValue={
-          index === -1 ? subjectSearch : (additionalSubjectSearch[subjectKey || ''] ?? '')
-        }
-        onInputChange={(_event: React.ChangeEvent<HTMLInputElement>, value: string) =>
-          handleInputChange(value, false, subjectKey)
-        }
-        onBlur={() => handleInputBlur(false, subjectKey)}
-        isShowingOptions={
-          index === -1 ? showSubjectOptions : (showAdditionalSubjectOptions[numericKey] ?? false)
-        }
-        onRequestSelectOption={(_event: React.SyntheticEvent, {id}) => {
-          if (id) handleSelection(id, false, subjectKey)
-        }}
-        isRequired
-        data-testid={index === -1 ? 'subject-select' : `additional-subject-select-${subjectKey}`}
-      >
-        {assignedStudents.map(student => renderStudentOption(student, false, subjectKey))}
-      </Select>
-    )
-  }
+  const reviewType = getReviewType()
 
   return (
     <Modal
@@ -442,32 +355,23 @@ const CreateEditAllocationRuleModal = ({
             </RadioInputGroup>
           </Flex.Item>
           <Flex.Item padding="small">
-            <Select
-              renderLabel={
+            <StudentSelect
+              label={
                 targetType === TARGET_TYPES.REVIEWEE
                   ? I18n.t('Recipient Name')
                   : I18n.t('Reviewer Name')
               }
-              messages={targetErrors}
-              inputRef={ref => {
+              handleInputRef={ref => {
                 if (targetSelectRef) targetSelectRef.current = ref
               }}
-              inputValue={targetSearch}
-              onInputChange={(_event: React.ChangeEvent<HTMLInputElement>, value: string) =>
-                handleInputChange(value, true)
-              }
-              onBlur={() => handleInputBlur(true)}
-              isShowingOptions={showTargetOptions}
-              onRequestSelectOption={(_event: React.SyntheticEvent, {id}) => {
-                if (id) {
-                  handleSelection(id, true)
-                }
-              }}
-              isRequired
-              data-testid="target-select"
-            >
-              {assignedStudents.map(student => renderStudentOption(student, true))}
-            </Select>
+              errors={targetErrors}
+              initialSelected={target}
+              assignmentId={assignmentId}
+              courseId={courseId}
+              filterStudents={getFilterStudents(false)}
+              onOptionSelect={setTarget}
+              clearErrors={() => clearErrors(false)}
+            />
           </Flex.Item>
           <Flex.Item padding="small">
             <Flex direction="row">
