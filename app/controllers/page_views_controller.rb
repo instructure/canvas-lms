@@ -154,6 +154,99 @@
 #        }
 #     }
 #   }
+#
+# @model AsyncApiErrorResponse
+#     {
+#       "id": "AsyncApiErrorResponse",
+#       "description": "Error response structure returned by the API when validation or processing failures occur",
+#       "properties": {
+#          "errors": {
+#            "description": "Array of error messages describing what went wrong with the request",
+#            "example": ["start_date and end_date must be the first day of the month", "end_date must be after start_date", "end_date cannot be in a future month", "The requested data cannot be older than %d months"],
+#            "type": "array",
+#            "items": {
+#              "type": "string"
+#            }
+#          }
+#       }
+#     }
+#
+# @model AsyncQueryResponse
+#     {
+#       "id": "AsyncQueryResponse",
+#       "description": "Response returned when successfully initiating a page views query",
+#       "required": ["poll_url"],
+#       "properties": {
+#         "poll_url": {
+#           "description": "URL endpoint to poll for query status updates",
+#           "example": "/api/v1/users/123/page_views/query/550e8400-e29b-41d4-a716-446655440000",
+#           "type": "string",
+#           "format": "uri"
+#         }
+#       }
+#     }
+#
+# @model AsyncQueryStatusResponse
+#     {
+#       "id": "AsyncQueryStatusResponse",
+#       "description": "Response containing the current status of a page views query",
+#       "required": ["query_id", "status", "format"],
+#       "properties": {
+#         "query_id": {
+#           "description": "The UUID of the query being polled",
+#           "example": "550e8400-e29b-41d4-a716-446655440000",
+#           "type": "string",
+#           "format": "uuid"
+#         },
+#         "status": {
+#           "description": "Current processing status of the query",
+#           "example": "finished",
+#           "type": "string",
+#           "enum": ["queued", "processing", "finished", "failed"]
+#         },
+#         "format": {
+#           "description": "The format that results will be returned in",
+#           "example": "csv",
+#           "type": "string",
+#           "enum": ["csv", "json"]
+#         },
+#         "results_url": {
+#           "description": "URL to retrieve query results. Only present when status is 'finished'",
+#           "example": "/api/v1/users/123/page_views/query/550e8400-e29b-41d4-a716-446655440000/results",
+#           "type": "string",
+#           "format": "uri"
+#         }
+#       }
+#     }
+#
+# @model AsyncQueryResultsResponse
+#     {
+#       "id": "AsyncQueryResultsResponse",
+#       "description": "File download response containing page views query results",
+#       "properties": {
+#         "content": {
+#           "description": "The query results data in the requested format (CSV or JSON)",
+#           "type": "string",
+#           "format": "binary"
+#         },
+#         "filename": {
+#           "description": "Suggested filename for the downloaded results",
+#           "example": "550e8400-e29b-41d4-a716-446655440000.csv",
+#           "type": "string"
+#         },
+#         "content_type": {
+#           "description": "MIME type of the response content",
+#           "example": "text/csv",
+#           "type": "string",
+#           "enum": ["text/csv", "application/jsonl"]
+#         },
+#         "content_encoding": {
+#           "description": "Content encoding if the response is compressed",
+#           "example": "gzip",
+#           "type": "string"
+#         }
+#       }
+#     }
 
 class PageViewsController < ApplicationController
   before_action :require_user, only: [:index]
@@ -256,6 +349,50 @@ class PageViewsController < ApplicationController
     # page view update happens in log_page_view after_action
   end
 
+  # @API BETA - Initiate page views query
+  # Initiates an asynchronous query for user page views data within a specified date range.
+  # This method enqueues a background job to process the page views query and returns
+  # a polling URL that can be used to check the query status and retrieve results when ready.
+  #
+  # As this is a beta endpoint, it is subject to change or removal at any time without the standard notice periods outlined in the API policy.
+  #
+  # @argument start_date [String]
+  #   The start date for the page views query in YYYY-MM-DD format. Must be the first day of a month.
+  #
+  # @argument end_date [String]
+  #   The end date for the page views query in YYYY-MM-DD format. Must be the first day of a month and after start_date.
+  #
+  # @argument results_format [String]
+  #   The desired format for the query results. Supported formats: "csv", "json"
+  #
+  # @returns AsyncQueryResponse
+  # @returns AsyncApiErrorResponse
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/users/:user_id/page_views/query \
+  #     -X POST \
+  #     -H 'Authorization: Bearer <token>' \
+  #     -H 'Content-Type: application/json' \
+  #     -d '{
+  #       "start_date": "2023-01-01",
+  #       "end_date": "2023-02-01",
+  #       "results_format": "csv"
+  #     }'
+  #
+  # @example_response 201
+  #   {
+  #     "poll_url": "/api/v1/users/123/page_views/query/550e8400-e29b-41d4-a716-446655440000"
+  #   }
+  #
+  # @example_response 400
+  #   {
+  #     "error": "Page Views received an invalid or malformed request."
+  #   }
+  #
+  # @example_response 429
+  #   {
+  #     "error": "Page Views rate limit exceeded. Please wait and try again."
+  #   }
   def query
     @user = api_find(User, params[:user_id])
     return unless authorized_action(@user, @current_user, :view_statistics)
@@ -276,6 +413,47 @@ class PageViewsController < ApplicationController
     render json: { error: t("Page Views rate limit exceeded. Please wait and try again.") }, status: :too_many_requests
   end
 
+  # @API BETA - Poll query status
+  # Checks the status of a previously initiated page views query. Returns the current
+  # processing status and provides a result URL when the query is complete.
+  #
+  # As this is a beta endpoint, it is subject to change or removal at any time without the standard notice periods outlined in the API policy.
+  #
+  # @argument query_id [String]
+  #   The UUID of the query to check status for
+  #
+  # @returns AsyncQueryStatusResponse
+  # @returns AsyncApiErrorResponse
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/users/:user_id/page_views/query/:query_id \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @example_response 200
+  #   {
+  #     "query_id": "550e8400-e29b-41d4-a716-446655440000",
+  #     "status": "finished",
+  #     "format": "csv",
+  #     "results_url": "/api/v1/users/123/page_views/query/550e8400-e29b-41d4-a716-446655440000/results"
+  #   }
+  #
+  # @example_response 200
+  #   {
+  #     "query_id": "550e8400-e29b-41d4-a716-446655440000",
+  #     "status": "processing",
+  #     "format": "csv",
+  #     "results_url": null
+  #   }
+  #
+  # @example_response 400
+  #   {
+  #     "error": "Invalid query ID"
+  #   }
+  #
+  # @example_response 404
+  #   {
+  #     "error": "The query was not found."
+  #   }
   def poll_query
     validate_query_id!
     result = pv5_poll_service.call(params[:query_id])
@@ -289,6 +467,47 @@ class PageViewsController < ApplicationController
     render json: { error: e.message }, status: :bad_request
   end
 
+  # @API BETA - Get query results
+  # Retrieves the results of a completed page views query. Returns the data in the
+  # format specified when the query was initiated (CSV or JSON). The response may
+  # be compressed with gzip encoding.
+  #
+  # As this is a beta endpoint, it is subject to change or removal at any time without the standard notice periods outlined in the API policy.
+  #
+  # @argument query_id [String]
+  #   The UUID of the completed query to retrieve results for
+  #
+  # @returns QueryResultsResponse
+  # @returns AsyncApiErrorResponse
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/users/:user_id/page_views/query/:query_id/results \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @example_response 200
+  #   # Returns file download with appropriate Content-Type header
+  #   # Content-Type: text/csv (for CSV format)
+  #   # Content-Type: application/jsonl (for JSON lines format)
+  #   # Content-Encoding: gzip (if compressed)
+  #   # Content-Disposition: attachment; filename="550e8400-e29b-41d4-a716-446655440000.csv"
+  #
+  # @example_response 204
+  #   # No Content - Query completed but produced no results
+  #
+  # @example_response 400
+  #   {
+  #     "error": "Query results are not in a valid state for download"
+  #   }
+  #
+  # @example_response 404
+  #   {
+  #     "error": "The result for query was not found."
+  #   }
+  #
+  # @example_response 500
+  #   {
+  #     "error": "An unexpected error occurred."
+  #   }
   def query_results
     validate_query_id!
     result = pv5_fetch_result_service.call(params[:query_id])
