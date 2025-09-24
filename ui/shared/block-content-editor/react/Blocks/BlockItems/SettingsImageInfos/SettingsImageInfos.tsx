@@ -74,12 +74,11 @@ export const SettingsImageInfos = ({
         const altText = await generateAltTextMutation.generate(imageUrl)
         if (!altText) {
           showFlashError(I18n.t('Failed to generate alt text.'))()
-          console.error('Failed to generate alt text: generated text is missing')
           return
         }
         onAltTextChange(altText)
-      } catch (error) {
-        console.error('Failed to generate alt text:', error)
+      } catch (error: any) {
+        if (error?.name === 'AbortError') return
         showFlashError(I18n.t('Failed to generate alt text.'))()
       }
     }

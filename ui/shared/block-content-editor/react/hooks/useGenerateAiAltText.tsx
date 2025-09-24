@@ -48,12 +48,6 @@ export const useGenerateAiAltText = (options: UseGenerateAiAltTextOptions) => {
         signal,
       })
     },
-    onSuccess: response => {
-      // Success is handled in the promise returned by generate()
-    },
-    onError: (error: Error) => {
-      // Error is handled in the promise returned by generate()
-    },
   })
 
   const generate = async (imageUrl: string): Promise<string> => {
