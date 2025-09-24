@@ -15,20 +15,30 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import React from 'react'
+import {createRoot} from 'react-dom/client'
 import {useScope as createI18nScope} from '@canvas/i18n'
-
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import {JobDialog} from '../react/components'
+import ready from '@instructure/ready'
 import $ from 'jquery'
 import Slick from 'slickgrid'
-import '@canvas/jquery/jquery.ajaxJSON'
-import 'jqueryui/dialog'
 
 const I18n = createI18nScope('jobs')
 /*
 xsslint safeString.identifier klass d out_of runtime_string
 */
 
+function __range__(left, right, inclusive) {
+  const range = []
+  const ascending = left < right
+  const end = !inclusive ? right : ascending ? right + 1 : right - 1
+  for (let i = left; ascending ? i < end : i > end; ascending ? i++ : i--) range.push(i)
+  return range
+}
+
 function fillin_job_data(job) {
-  $('#show-job .show-field').each((idx, field) => {
+  $('#show-job .show-field').each((_idx, field) => {
     const field_name = field.id.replace('job-', '')
     $(field).text(job[field_name] || '')
   })
@@ -44,10 +54,8 @@ class FlavorGrid {
     this.grid_name = grid_name
     this.data = []
     this.$element = $(this.grid_name)
-    setTimeout(this.refresh, 0)
-    if (this.options.refresh_rate) {
-      this.setTimer()
-    }
+    requestAnimationFrame(this.refresh)
+    if (this.options.refresh_rate) this.setTimer()
     this.query = ''
   }
 
@@ -79,40 +87,48 @@ class FlavorGrid {
   }
 
   refresh = cb => {
-    return this.$element.queue(() =>
-      $.ajaxJSON(this.options.url, 'GET', {flavor: this.options.flavor, q: this.query}, data => {
-        this.saveSelection()
-        this.data.length = 0
-        this.loading = {}
-        for (const item of data[this.type_name]) {
-          this.data.push(item)
-        }
-        if (data.total && data.total > this.data.length) {
-          for (
-            let i = this.data.length, end = data.total, asc = this.data.length <= end;
-            asc ? i < end : i > end;
-            asc ? i++ : i--
-          ) {
-            this.data.push({})
+    return this.$element.queue(() => {
+      doFetchApi({
+        path: this.options.url,
+        params: {
+          flavor: this.options.flavor,
+          q: this.query,
+        },
+      })
+        .then(({json}) => {
+          this.saveSelection()
+          this.data.length = 0
+          this.loading = {}
+          for (const item of json[this.type_name]) {
+            this.data.push(item)
           }
-        }
+          if (json.total && json.total > this.data.length) {
+            for (
+              let i = this.data.length, end = json.total, asc = this.data.length <= end;
+              asc ? i < end : i > end;
+              asc ? i++ : i--
+            ) {
+              this.data.push({})
+            }
+          }
 
-        if (this.sortData) {
-          this.sort(null, this.sortData)
-        } else {
-          this.grid.invalidate()
-          this.restoreSelection()
-        }
+          if (this.sortData) {
+            this.sort(null, this.sortData)
+          } else {
+            this.grid.invalidate()
+            this.restoreSelection()
+          }
 
-        if (typeof cb === 'function') {
-          cb()
-        }
-        if (typeof this.updated === 'function') {
-          this.updated()
-        }
-        return this.$element.dequeue()
-      }),
-    )
+          // eslint-disable-next-line promise/no-callback-in-promise
+          if (typeof cb === 'function') cb()
+          if (typeof this.updated === 'function') this.updated()
+          this.$element.dequeue()
+        })
+        .catch(error => {
+          console.info('Error fetching data:', error)
+          this.$element.dequeue()
+        })
+    })
   }
 
   change_flavor(flavor) {
@@ -142,7 +158,7 @@ class Jobs extends FlavorGrid {
     if (options.starting_query) {
       this.query = options.starting_query
     }
-    this.show_search($('#jobs-flavor').val())
+    this.show_search(document.getElementById('jobs-flavor').value)
   }
 
   search(query) {
@@ -151,15 +167,16 @@ class Jobs extends FlavorGrid {
   }
 
   show_search(flavor) {
+    const jobsSearch = document.getElementById('jobs-search')
     switch (flavor) {
       case 'id':
       case 'strand':
       case 'tag':
-        $('#jobs-search').show()
-        $('#jobs-search').attr('placeholder', flavor)
+        jobsSearch.style.display = ''
+        jobsSearch.setAttribute('placeholder', flavor)
         break
       default:
-        $('#jobs-search').hide()
+        jobsSearch.style.display = 'none'
     }
   }
 
@@ -168,22 +185,16 @@ class Jobs extends FlavorGrid {
     return super.change_flavor(flavor)
   }
 
-  attempts_formatter(r, c, d) {
+  attempts_formatter(r, _c, d) {
     let klass
-    if (!this.data[r].id) {
-      return ''
-    }
+    if (!this.data[r].id) return ''
     const max = this.data[r].max_attempts || Jobs.max_attempts
-    if (d === 0) {
-      klass = ''
-    } else if (d < max) {
-      klass = 'has-failed-attempts'
-    } else if (d === this.options.on_hold_attempt_count) {
+    if (d === 0) klass = ''
+    else if (d < max) klass = 'has-failed-attempts'
+    else if (d === this.options.on_hold_attempt_count) {
       klass = 'on-hold'
       d = 'hold'
-    } else {
-      klass = 'has-failed-max-attempts'
-    }
+    } else klass = 'has-failed-max-attempts'
     const out_of = d === 'hold' ? '' : `/ ${max}`
     return `<span class='${klass}'>${d}${out_of}</span>`
   }
@@ -196,20 +207,27 @@ class Jobs extends FlavorGrid {
         return
       }
       this.loading[row] = true
-      return $.ajaxJSON(
-        this.options.url,
-        'GET',
-        {flavor: this.options.flavor, q: this.query, offset: row},
-        data => {
+      doFetchApi({
+        path: this.options.url,
+        params: {
+          flavor: this.options.flavor,
+          q: this.query,
+          offset: row,
+        },
+      })
+        .then(({json}) => {
           this.data.splice(
             row,
-            row + data[this.type_name].length - row,
-            ...[].concat(data[this.type_name]),
+            row + json[this.type_name].length - row,
+            ...[].concat(json[this.type_name]),
           )
           this.grid.invalidate()
-          return this.$element.dequeue()
-        },
-      )
+          this.$element.dequeue()
+        })
+        .catch(error => {
+          console.info('Error loading data:', error)
+          this.$element.dequeue()
+        })
     })
   }
 
@@ -335,36 +353,45 @@ class Jobs extends FlavorGrid {
       params.job_ids = this.grid.getSelectedRows().map(row => this.data[row].id)
     }
 
-    $.ajaxJSON(this.options.batch_update_url, 'POST', params, this.refresh)
+    doFetchApi({
+      path: this.options.batch_update_url,
+      method: 'POST',
+      body: params,
+    })
+      .then(() => this.refresh())
+      .catch(error => console.error('Error updating jobs:', error))
+
     return this.grid.setSelectedRows([])
   }
 
   updated() {
-    $('#jobs-total').text(this.data.length)
+    const jobsTotal = document.getElementById('jobs-total')
+    if (jobsTotal) jobsTotal.textContent = this.data.length
     if (this.data.length === 1 && this.type_name === 'jobs') {
       this.grid.setSelectedRows([0])
       return this.grid.onSelectedRowsChanged.notify()
     }
   }
 
-  getFullJobDetails(cb) {
-    if (!selected_job || selected_job.handler) {
-      return cb()
-    } else {
-      return $.ajaxJSON(
-        `${this.options.job_url}/${selected_job.id}`,
-        'GET',
-        {flavor: this.options.flavor},
-        data => {
-          selected_job.handler = data.handler
-          selected_job.last_error = data.last_error
-          fillin_job_data(selected_job)
-          return cb()
-        },
-      )
+  async getFullJobDetails() {
+    if (!selected_job || selected_job.handler) return Promise.resolve(selected_job)
+
+    try {
+      const {json} = await doFetchApi({
+        path: `${this.options.job_url}/${selected_job.id}`,
+        params: {flavor: this.options.flavor},
+      })
+      selected_job.handler = json.handler
+      selected_job.last_error = json.last_error
+      fillin_job_data(selected_job)
+      return selected_job
+    } catch (error) {
+      console.info('Error fetching job details:', error)
+      return selected_job
     }
   }
 }
+
 window.Jobs = Jobs
 
 class Workers extends Jobs {
@@ -372,24 +399,16 @@ class Workers extends Jobs {
     super(options, 'running', '#running-grid')
   }
 
-  runtime_formatter(r, c, d) {
+  runtime_formatter(_r, _c, d) {
     let klass
     const runtime = (new Date() - Date.parse(d)) / 1000
-    if (runtime >= this.options.super_slow_threshold) {
-      klass = 'super-slow'
-    } else if (runtime > this.options.slow_threshold) {
-      klass = 'slow'
-    } else {
-      klass = ''
-    }
+    if (runtime >= this.options.super_slow_threshold) klass = 'super-slow'
+    else if (runtime > this.options.slow_threshold) klass = 'slow'
+    else klass = ''
     let format = 'HH:mm:ss'
-    if (runtime > 86400) {
-      format = 'd\\dHH:mm:ss'
-    }
+    if (runtime > 86400) format = 'd\\dHH:mm:ss'
     let runtime_string = new Date(null, null, null, null, null, runtime).toString(format)
-    if (runtime > 86400 * 28) {
-      runtime_string = 'FOREVA'
-    }
+    if (runtime > 86400 * 28) runtime_string = 'FOREVA'
     return `<span class='${klass}'>${runtime_string}</span>`
   }
 
@@ -410,9 +429,7 @@ class Workers extends Jobs {
       width: 85,
       formatter: this.runtime_formatter.bind(this),
     })
-    for (const col of cols) {
-      col.sortable = true
-    }
+    for (const col of cols) col.sortable = true
     return cols
   }
 
@@ -495,72 +512,55 @@ class Tags extends FlavorGrid {
   }
 }
 
-$.extend(window, {
-  Jobs,
-  Workers,
-  Tags,
-})
+$.extend(window, {Jobs, Workers, Tags})
 
-$(document).ready(() => {
-  $('#tags-flavor').change(function () {
+ready(() => {
+  $('#tags-flavor').on('change', function () {
     return window.tags.change_flavor($(this).val())
   })
-  $('#jobs-flavor').change(function () {
+  $('#jobs-flavor').on('change', function () {
     return window.jobs.change_flavor($(this).val())
   })
 
-  $('#jobs-refresh').click(() => window.jobs.refresh())
+  $('#jobs-refresh').on('click', () => window.jobs.refresh())
 
   const search_event = $('#jobs-search')[0].onsearch === undefined ? 'change' : 'search'
-  $('#jobs-search').bind(search_event, function () {
+  $('#jobs-search').on(search_event, function () {
     return window.jobs.search($(this).val())
   })
 
-  $('#select-all-jobs').click(() => window.jobs.selectAll())
+  $('#select-all-jobs').on('click', () => window.jobs.selectAll())
+  $('#hold-jobs').on('click', () => window.jobs.onSelected('hold'))
+  $('#un-hold-jobs').on('click', () => window.jobs.onSelected('unhold'))
+  $('#delete-jobs').on('click', () => window.jobs.onSelected('destroy'))
 
-  $('#hold-jobs').click(() => window.jobs.onSelected('hold'))
-  $('#un-hold-jobs').click(() => window.jobs.onSelected('unhold'))
-  $('#delete-jobs').click(() => window.jobs.onSelected('destroy'))
-
-  $('#job-handler-show').click(() => {
-    window.jobs.getFullJobDetails(() =>
-      $('#job-handler-wrapper')
-        .clone()
-        .dialog({
-          title: I18n.t('titles.job_handler', 'Job Handler'),
-          width: 900,
-          height: 700,
-          modal: true,
-          zIndex: 1000,
-        }),
+  const jobHandlerContainer = document.getElementById('job-handler-wrapper')
+  if (jobHandlerContainer) {
+    const root = createRoot(jobHandlerContainer)
+    root.render(
+      <JobDialog
+        label={I18n.t('Job Handler')}
+        retrieveValue={async () => {
+          const job = await window.jobs.getFullJobDetails()
+          return job.handler || ''
+        }}
+      />,
     )
-    return false
-  })
+  }
 
-  $('#job-last_error-show').click(() => {
-    window.jobs.getFullJobDetails(() =>
-      $('#job-last_error-wrapper')
-        .clone()
-        .dialog({
-          title: I18n.t('titles.last_error', 'Last Error'),
-          width: 900,
-          height: 700,
-          modal: true,
-          zIndex: 1000,
-        }),
+  const jobLastErrorContainer = document.getElementById('job-last_error-wrapper')
+  if (jobLastErrorContainer) {
+    const root = createRoot(jobLastErrorContainer)
+    root.render(
+      <JobDialog
+        label={I18n.t('Last Error')}
+        retrieveValue={async () => {
+          const job = await window.jobs.getFullJobDetails()
+          return job.last_error || ''
+        }}
+      />,
     )
-    return false
-  })
+  }
 })
 
 export default {Jobs, Workers, Tags}
-
-function __range__(left, right, inclusive) {
-  const range = []
-  const ascending = left < right
-  const end = !inclusive ? right : ascending ? right + 1 : right - 1
-  for (let i = left; ascending ? i < end : i > end; ascending ? i++ : i--) {
-    range.push(i)
-  }
-  return range
-}
