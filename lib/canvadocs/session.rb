@@ -34,7 +34,7 @@ module Canvadocs
       opts[:is_launch_token] = Account.site_admin.feature_enabled?(:enhanced_docviewer_url_security)
 
       Canvas.timeout_protection("canvadocs", raise_on_timeout: true) do
-        session = canvadocs_api.session(document_id, opts)
+        session = canvadocs_api.session(document_id, StringifyIds.recursively_stringify_ids(opts))
         canvadocs_api.view(session["id"])
       end
     end
