@@ -597,16 +597,16 @@ describe Types::QueryType do
       @teacher_enrollment3.accept!
 
       @student = user_factory(name: "Student")
-      @course1.enroll_student(@student, active_all: true)
-      @course2.enroll_student(@student, active_all: true)
+      @course1.enroll_student(@student, enrollment_state: "active")
+      @course2.enroll_student(@student, enrollment_state: "active")
 
       @observer = user_factory(name: "Observer")
       @observed_user = user_factory(name: "Observed Student")
-      @course1.enroll_student(@observed_user, active_all: true)
-      @course2.enroll_student(@observed_user, active_all: true)
-      @course3.enroll_student(@observed_user, active_all: true)
-      @course1.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @observed_user.id, active_all: true)
-      @course2.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @observed_user.id, active_all: true)
+      @course1.enroll_student(@observed_user, enrollment_state: "active")
+      @course2.enroll_student(@observed_user, enrollment_state: "active")
+      @course3.enroll_student(@observed_user, enrollment_state: "active")
+      @course1.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @observed_user.id, enrollment_state: "active")
+      @course2.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @observed_user.id, enrollment_state: "active")
     end
 
     let(:query) do
@@ -639,6 +639,22 @@ describe Types::QueryType do
       expect(instructors.length).to eq(2)
       instructor_names = instructors.pluck("user").pluck("name").sort
       expect(instructor_names).to eq(["Instructor 1", "Instructor 2"])
+    end
+
+    it "does not return instructors for pending enrollments" do
+      @course4 = Course.create!(name: "Course 4", workflow_state: "available")
+      @instructor4 = user_factory(name: "Instructor 4")
+      @teacher_enrollment4 = @course4.enroll_teacher(@instructor4)
+      @teacher_enrollment4.accept!
+      @course4.enroll_student(@student, enrollment_state: "invited")
+      result = CanvasSchema.execute(
+        query,
+        variables: { courseIds: [@course4.id.to_s] },
+        context: { current_user: @student }
+      )
+
+      instructors = result.dig("data", "courseInstructorsConnection", "nodes")
+      expect(instructors).to be_empty
     end
 
     it "returns instructors for observed user's courses when observer" do

@@ -652,7 +652,7 @@ module Types
                             object.enrollments
                                   .joins(:course)
                                   .where(courses: { workflow_state: "available" })
-                                  .where(workflow_state: ["active", "invited"])
+                                  .active_by_date
                                   .pluck(:course_id)
                                   .uniq
                           end
