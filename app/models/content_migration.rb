@@ -818,6 +818,22 @@ class ContentMigration < ActiveRecord::Base
           Rails.logger.debug { "skipping deletion sync for #{content.asset_string} due to there are active Alignments to Content" }
           add_skipped_item(child_tag)
         else
+          if Account.site_admin.feature_enabled?(:skip_blueprint_module_downstream_changes)
+            ContentTag.not_deleted.where(
+              content_type: klass,
+              content_id: content.id,
+              context_id: context.id,
+              context_type: context.class.name,
+              tag_type: "context_module"
+            ).find_each do |tag|
+              if tag.context_module.present?
+                mod = tag.context_module
+                mod.skip_downstream_changes!
+                mod.remove_completion_requirement(tag.id)
+              end
+            end
+          end
+
           if content.is_a?(Attachment)
             Attachment.not_deleted_content_tags_for_attachments([content.id]).find_each do |tag|
               tag.skip_downstream_changes!
