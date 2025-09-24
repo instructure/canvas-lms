@@ -6425,6 +6425,44 @@ describe Assignment do
     end
   end
 
+  describe "#rollcall_assignment?" do
+    it "returns true when submission_types is external_tool and title is Roll Call Attendance" do
+      assignment_model(
+        submission_types: "external_tool",
+        title: "Roll Call Attendance",
+        course: @course
+      )
+      expect(@a.rollcall_assignment?).to be true
+    end
+
+    it "returns false when submission_types is external_tool but title is not Roll Call Attendance" do
+      assignment_model(
+        submission_types: "external_tool",
+        title: "Some Other Title",
+        course: @course
+      )
+      expect(@a.rollcall_assignment?).to be false
+    end
+
+    it "returns false when title is Roll Call Attendance but submission_types is not external_tool" do
+      assignment_model(
+        submission_types: "online_upload",
+        title: "Roll Call Attendance",
+        course: @course
+      )
+      expect(@a.rollcall_assignment?).to be false
+    end
+
+    it "returns false when neither condition is met" do
+      assignment_model(
+        submission_types: "online_upload",
+        title: "Regular Assignment",
+        course: @course
+      )
+      expect(@a.rollcall_assignment?).to be false
+    end
+  end
+
   describe "#quiz_lti?" do
     before :once do
       assignment_model(submission_types: "external_tool", course: @course)
