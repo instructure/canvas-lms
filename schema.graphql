@@ -175,6 +175,7 @@ type Account implements LegacyIDInterface & Node {
     """
     last: Int
   ): AccountConnection
+  workflowState: String!
 }
 
 """

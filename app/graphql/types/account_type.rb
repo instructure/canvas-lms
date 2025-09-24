@@ -28,6 +28,7 @@ module Types
     global_id_field :id
 
     field :name, String, null: true
+    field :workflow_state, String, null: false
 
     field :outcome_proficiency, OutcomeProficiencyType, null: true
     def outcome_proficiency
