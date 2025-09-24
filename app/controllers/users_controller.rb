@@ -3581,7 +3581,7 @@ class UsersController < ApplicationController
       }
     end
 
-    course_data.compact.uniq { |c| c[:courseId] }
+    course_data.compact.uniq { |c| c[:courseId] }.sort_by { |course| course[:courseName].downcase }
   end
 
   def should_show_widget_dashboard?

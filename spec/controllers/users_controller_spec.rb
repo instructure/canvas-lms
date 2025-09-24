@@ -4018,6 +4018,21 @@ describe UsersController do
         course_data = assigns[:js_env][:SHARED_COURSE_DATA]
         expect(course_data.first[:currentGrade]).to eq(80.0)
       end
+
+      it "sorts courses alphabetically by name" do
+        course_with_student_logged_in(active_all: true)
+        @course.update!(name: "Zebra Course")
+
+        @course2 = course_factory(active_all: true)
+        @course2.update!(name: "Apple Course")
+        @course2.enroll_student(@user, enrollment_state: "active")
+
+        get :user_dashboard
+        course_data = assigns[:js_env][:SHARED_COURSE_DATA]
+        course_names = course_data.pluck(:courseName)
+
+        expect(course_names).to eq(["Apple Course", "Zebra Course"])
+      end
     end
   end
 end
