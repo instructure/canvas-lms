@@ -764,5 +764,13 @@ describe GradingStandard do
                                   submission_types: ["online_text_entry"])
       expect(@grading_standard.used_as_default?).to be false
     end
+
+    it "returns false if used as a course default grading scheme for a concluded course" do
+      @course.grading_standard = @grading_standard
+      @course.save!
+      @course.complete!
+
+      expect(@grading_standard.used_as_default?).to be false
+    end
   end
 end
