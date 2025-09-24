@@ -123,7 +123,7 @@ export function* loadPastUntilNewActivitySaga() {
 }
 
 export function* peekIntoPastSaga() {
-  yield* loadingLoop(fromMomentPast, consumePeekIntoPast, {mode: 'past', perPage: 1})
+  yield* loadingLoop(fromMomentPast, consumePeekIntoPast, {mode: 'past', perPage: 3})
 }
 
 export function* loadGradesSaga(action) {

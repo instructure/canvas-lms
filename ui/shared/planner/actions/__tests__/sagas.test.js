@@ -150,7 +150,7 @@ describe('peekIntoPastSaga', () => {
         getState: expect.any(Function),
         fromMoment: moment.tz(TZ).startOf('day'),
         mode: 'past',
-        perPage: 1,
+        perPage: 3,
       }),
     )
     expect(generator.next({transformedItems: ['some items'], response: 'response'}).value).toEqual(
