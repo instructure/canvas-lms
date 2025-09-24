@@ -35,7 +35,7 @@ interface AssetProcessorCellProps {
 }
 
 /**
- * Represents the AssetReportStatus link with corresponding Modal showing the
+ * Represents the LtiAssetReportStatus link with corresponding Modal showing the
  * full information, used in Student Grades page (both old and new).
  */
 export default function LtiAssetProcessorCell({

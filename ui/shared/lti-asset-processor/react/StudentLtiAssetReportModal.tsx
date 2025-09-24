@@ -37,7 +37,7 @@ export interface StudentLtiAssetReportModalProps {
   submissionType: AssetReportCompatibleSubmissionType
 }
 
-const I18n = createI18nScope('submissions_show_preview_asset_report_status')
+const I18n = createI18nScope('lti_asset_reports_for_student')
 const t = I18n.t.bind(I18n)
 
 function attachmentsFromReports(
@@ -90,19 +90,21 @@ export default function StudentLtiAssetReportModal({
       </Modal.Header>
       <Modal.Body>
         <Flex justifyItems="space-between" alignItems="center" margin="0 0 medium 0" gap="medium">
-          <FlexItem>
-            <View maxWidth="30em" as="div">
-              <Text size="descriptionPage" weight="weightImportant">
-                <TruncateWithTooltip
-                  linesAllowed={1}
-                  horizontalOffset={0}
-                  backgroundColor="primary-inverse"
-                >
-                  {mainTitle}
-                </TruncateWithTooltip>
-              </Text>
-            </View>
-          </FlexItem>
+          {mainTitle && (
+            <FlexItem>
+              <View maxWidth="30em" as="div">
+                <Text size="descriptionPage" weight="weightImportant">
+                  <TruncateWithTooltip
+                    linesAllowed={1}
+                    horizontalOffset={0}
+                    backgroundColor="primary-inverse"
+                  >
+                    {mainTitle}
+                  </TruncateWithTooltip>
+                </Text>
+              </View>
+            </FlexItem>
+          )}
           <FlexItem>
             <LtiAssetReportStatus reports={reports} />
           </FlexItem>

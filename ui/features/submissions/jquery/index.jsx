@@ -40,11 +40,17 @@ import '@canvas/rubrics/jquery/rubric_assessment'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
 import CheckpointGradeRoot from '../react/CheckpointGradeRoot'
-import StudentAssetReportModalWrapper from '../react/StudentAssetReportModalWrapper'
+import StudentAssetReportModalWrapper from '@canvas/lti-asset-processor/react/StudentAssetReportModalWrapper'
 import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
 import theme from '@instructure/canvas-theme'
 import ready from '@instructure/ready'
-import TextEntryAssetReportStatusLink from '../react/TextEntryAssetReportStatusLink'
+import TextEntryAssetReportStatusLink, {
+  ZTextEntryAssetReportStatusLinkProps,
+} from '../react/TextEntryAssetReportStatusLink'
+import {
+  renderAPComponent,
+  renderAPComponentNoQC,
+} from '@canvas/lti-asset-processor/react/util/renderToElements'
 
 const I18n = createI18nScope('submissions')
 /* global rubricAssessment */
@@ -740,35 +746,12 @@ $(document).ready(() => {
   )
 })
 
-ready(() => {
-  const mountPoint = document.getElementById('asset_report_modal')
-  if (mountPoint) {
-    const root = createRoot(mountPoint)
-    root.render(<StudentAssetReportModalWrapper />)
-  }
-})
+ready(() => renderAPComponentNoQC('#asset_report_modal', StudentAssetReportModalWrapper))
 
-ready(() => {
-  const reports = ENV['ASSET_REPORTS']
-  const assetProcessors = ENV['ASSET_PROCESSORS'] || []
-  const assignmentName = ENV['ASSIGNMENT_NAME'] || ''
-  const mountPoint = document.getElementById('asset_report_text_entry_status_container')
-
-  // if lti_asset_processor FF is off, reports will be undefined
-  if (!mountPoint || !reports || !assetProcessors || !assetProcessors.length) {
-    return
-  }
-
-  if (mountPoint) {
-    const root = createRoot(mountPoint)
-    const attempt = mountPoint.dataset['attempt']
-    root.render(
-      <TextEntryAssetReportStatusLink
-        reports={reports}
-        assetProcessors={assetProcessors}
-        assignmentName={assignmentName}
-        attempt={attempt}
-      />,
-    )
-  }
-})
+ready(() =>
+  renderAPComponent(
+    '#asset_report_text_entry_status_container',
+    TextEntryAssetReportStatusLink,
+    ZTextEntryAssetReportStatusLinkProps,
+  ),
+)

@@ -80,37 +80,11 @@ module AssetProcessorReportHelper
     raw_reports&.map do |report|
       report.info_for_display.merge(
         {
-          # TODO: post refactor (INTEROP-9588), this should be the only usage
-          # of info_for_display, so we can safely move the _id conversion there
-          _id: report.id.to_s,
           processorId: report.lti_asset_processor_id&.to_s,
           asset: {
             attachmentId: report.asset.attachment_id&.to_s,
             attachmentName: report.asset.attachment&.name,
             submissionAttempt: report.asset.submission_attempt
-          }
-        }
-      )
-    end
-  end
-
-  # TODO: remove after refactor (INTEROP-9588)
-  def asset_reports_legacy_format(submission:, for_student: true)
-    return nil if submission.blank?
-    return nil unless submission.root_account&.feature_enabled?(:lti_asset_processor)
-
-    raw_reports = raw_asset_reports(submission_ids: [submission.id], for_student:)[submission.id]
-
-    raw_reports&.map do |report|
-      report.info_for_display.merge(
-        {
-          asset_processor_id: report.lti_asset_processor_id,
-          asset: {
-            id: report.asset.id,
-            attachment_id: report.asset.attachment_id,
-            attachment_name: report.asset.attachment&.name,
-            submission_id: report.asset.submission_id,
-            submission_attempt: report.asset.submission_attempt
           }
         }
       )

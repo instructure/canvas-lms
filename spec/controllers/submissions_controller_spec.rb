@@ -1191,27 +1191,6 @@ describe SubmissionsController do
       end
     end
 
-    it "includes asset reports and asset processors data when available" do
-      user_session(@student)
-
-      # Mock data for asset reports and processors
-      asset_reports_data = [
-        { title: "Asset Report 1", asset: { id: 101, attachmentId: 1, attachmentName: "test_attachment.pdf" } }
-      ]
-      asset_processors_data = [
-        { title: "Test Processor", icon_url: "https://example.com/icon.png" }
-      ]
-
-      # Mock helper methods
-      allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_reports_legacy_format).and_return(asset_reports_data)
-      allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_processors).and_return(asset_processors_data)
-
-      get :show, params: { course_id: @course.id, assignment_id: @assignment.id, id: @student.id }
-
-      expect(assigns(:asset_reports)).to eq(asset_reports_data)
-      expect(assigns(:asset_processors)).to eq(asset_processors_data)
-    end
-
     it "shows rubric assessments to peer reviewers" do
       @course.account.enable_service(:avatars)
       @assessor = @student

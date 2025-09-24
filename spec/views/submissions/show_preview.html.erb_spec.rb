@@ -171,4 +171,88 @@ describe "submissions/show_preview" do
       end
     end
   end
+
+  describe "asset report status containers" do
+    let(:course) { Course.create! }
+    let(:student) { course.enroll_student(User.create!, active_all: true).user }
+
+    before do
+      assign(:context, course)
+      assign(:current_user, student)
+    end
+
+    context "when submission is online_upload" do
+      let(:assignment) { course.assignments.create!(title: "upload assignment", submission_types: "online_upload") }
+      let(:attachment) { Attachment.create!(context: student, uploaded_data: stub_png_data, filename: "homework.png") }
+      let(:submission) { assignment.submit_homework(student, submission_type: "online_upload", attachments: [attachment]) }
+
+      before do
+        assign(:assignment, assignment)
+        assign(:submission, submission)
+      end
+
+      it "renders asset report status table header with correct data attributes" do
+        render template: "submissions/show_preview", locals: { anonymize_students: false }
+
+        expect(response.body).to include('class="asset-report-status-header"')
+        expect(response.body).to match(/class="[^"]*asset-report-status-header[^"]*"[^>]*data-submission-id="#{submission.id}"/)
+        expect(response.body).to match(/class="[^"]*asset-report-status-header[^"]*"[^>]*data-submission-type="online_upload"/)
+      end
+
+      it "renders asset report status container for each attachment with correct data attributes" do
+        render template: "submissions/show_preview", locals: { anonymize_students: false }
+
+        expect(response.body.scan(/class="[^"]*asset-report-status-container[^"]*"/).size).to eq(1)
+        expect(response.body).to match(/class="[^"]*asset-report-status-container[^"]*"[^>]*data-attachment-id="#{attachment.id}"/)
+        expect(response.body).to match(/class="[^"]*asset-report-status-container[^"]*"[^>]*data-submission-id="#{submission.id}"/)
+        expect(response.body).to match(/class="[^"]*asset-report-status-container[^"]*"[^>]*data-submission-type="online_upload"/)
+      end
+
+      it "renders asset report status containers for multiple attachments" do
+        another_attachment = Attachment.create!(context: student, uploaded_data: stub_png_data, filename: "homework2.png")
+        multi_submission = assignment.submit_homework(student, submission_type: "online_upload", attachments: [attachment, another_attachment])
+        assign(:submission, multi_submission)
+
+        render template: "submissions/show_preview", locals: { anonymize_students: false }
+
+        expect(response.body.scan(/class="[^"]*asset-report-status-container[^"]*"/).size).to eq(2)
+        expect(response.body).to include("data-attachment-id=\"#{attachment.id}\"")
+        expect(response.body).to include("data-attachment-id=\"#{another_attachment.id}\"")
+      end
+    end
+
+    context "when submission is online_text_entry" do
+      let(:assignment) { course.assignments.create!(title: "text assignment", submission_types: "online_text_entry") }
+      let(:submission) { assignment.submit_homework(student, submission_type: "online_text_entry", body: "my text") }
+
+      before do
+        assign(:assignment, assignment)
+        assign(:submission, submission)
+      end
+
+      it "does not render asset report status containers" do
+        render template: "submissions/show_preview", locals: { anonymize_students: false }
+
+        expect(response.body).not_to include('class="asset-report-status-header"')
+        expect(response.body).not_to include('class="asset-report-status-container"')
+      end
+    end
+
+    context "when submission has no attachments" do
+      let(:assignment) { course.assignments.create!(title: "upload assignment", submission_types: "online_upload") }
+      let(:submission) { assignment.submit_homework(student, submission_type: "online_upload", attachments: []) }
+
+      before do
+        assign(:assignment, assignment)
+        assign(:submission, submission)
+      end
+
+      it "renders empty table with header but no containers" do
+        render template: "submissions/show_preview", locals: { anonymize_students: false }
+
+        expect(response.body).not_to include('class="asset-report-status-header"')
+        expect(response.body.scan(/class="[^"]*asset-report-status-container[^"]*"/).size).to eq(0)
+      end
+    end
+  end
 end

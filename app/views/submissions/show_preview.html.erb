@@ -227,19 +227,12 @@
       </span>
     </div>
   <% else %>
-    <%
-        js_env ASSET_REPORTS: @asset_reports
-        js_env ASSET_PROCESSORS: @asset_processors
-        js_env ASSIGNMENT_NAME: @assignment.title
-    %>
     <table class="file-upload-submission-table">
       <thead>
         <tr>
           <th class="file-info-header"><%= t('Files') %></th>
           <th class="originality-header"></th>
-          <th class="asset-status-header">
-            <%= @asset_processors.blank? || @asset_reports.nil? ? '' : t('Document Processors') %>
-          </th>
+          <th class="asset-report-status-header" data-submission-id="<%= @submission.id %>" data-submission-type="<%= @submission.submission_type %>"></th>
           <th class="preview-header"></th>
         </tr>
       </thead>
@@ -279,7 +272,11 @@
                 }
               %>
             </td>
-            <td class="asset_report_status_container" data-attachment-id="<%= attachment.id %>"></td>
+            <td class="asset-report-status-container"
+              data-attachment-id="<%= attachment.id %>"
+              data-submission-id="<%= @submission.id %>"
+              data-submission-type="<%= @submission.submission_type %>"
+            ></td>
             <td class="file-upload-submission-attachment">
               <% unread_annotations = @current_user&.unread_submission_annotations?(@submission) %>
               <% if attachment.crocodoc_available? || attachment.canvadoc.try(:has_annotations?) %>
