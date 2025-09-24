@@ -523,7 +523,7 @@ is:
     tab_plugins: Viðbætur
     tab_question_banks: Spurningabankar
     tab_root_accounts: Rótarreikningar
-    tab_rubrics: Matskvarði
+    tab_rubrics: Matskvarðar
     tab_settings: Stillingar
     tab_sis_import: "SIS innflutningur"
     tab_statistics: Tölfræði
@@ -4357,7 +4357,7 @@ is:
   arabic_c5c87acd: Arabíska
   arc_a935e585: ARC
   arc_media_recorder_in_rce_cf900c6: "Arc margmiðlunarupptaka í RCE"
-  archive_3f794d7e: Safn
+  archive_3f794d7e: "Setja í safn"
   archive_grading_scheme_cbbf4264: "Setja einkunnakvarða í safn"
   archive_operation_failed_5504706: "Ekki tókst að setja í geymslu"
   archive_outcomes_20b869b6: "Setja niðurstöður í safn"
@@ -8828,7 +8828,7 @@ is:
         more_courses: "Fleiri námskeið"
     hide: Fela
     index_new: 
-      archive: Safn
+      archive: "Setja í safn"
       archived: "Sett í safn"
       clear_search: "Hreinsa leitarniðurstöður"
       compose_new_message: "Semja ný skilaboð"
@@ -8963,8 +8963,8 @@ is:
   copy_list_of_shard_ids_d51cd846: "Afrita lista yfir brotaauðkenni"
   copy_numeric_lti_custom_params_as_strings_on_impor_db25102c: "Afritaðu tölulegar lti sérsniðnar breytur sem strengi við innflutning."
   copy_operation_failed_10d8df62: "Afritunaraðgerð mistókst."
-  copy_operation_started_successfully_b2f236a1: "Afritunaraðgerðin byrjaði giftusamlega"
-  copy_operation_started_successfully_e25f836d: "Afritunaraðgerðin byrjaði giftusamlega."
+  copy_operation_started_successfully_b2f236a1: "Aðgerð hafin"
+  copy_operation_started_successfully_e25f836d: "Aðgerð hafin."
   copy_page_to_another_course_405cc07c: "Afrita síðu til annars námskeiðs"
   copy_quiz_to_course_74f9c8c1: "Afrita próf til námskeiðs"
   copy_the_video_url_dd509606: "Afrita URL myndbands"
@@ -8973,10 +8973,10 @@ is:
   copy_this_token_down_now_once_you_leave_this_page__3f850f41: "*Afrita þetta tákn núna*. Þegar þú yfirgefur síðuna geturðu ekki endurheimt táknið að fullu og verður að endurskapa það til að fá nýtt gildi."
   copy_title_to_course_2a41a2f4: "Afrita %{title} til námskeiðs"
   copy_title_to_course_ac71981a: "Afrita {%title} til námskeiðs"
-  copy_to_64f8456b: "Afrita til…"
-  copy_to_a5396a6f: "Afrita til…"
+  copy_to_64f8456b: "Afrita yfir á…"
+  copy_to_a5396a6f: "Afrita yfir á…"
   copy_to_clipboard_493be1b: "Afrita á klemmuspjald"
-  copy_to_e06789cb: "Afrita á"
+  copy_to_e06789cb: "Afrita yfir á"
   copy_to_folder_32ecc3c3: "Afrita í möppu"
   copying_628a9607: Afrita...
   copying_file_cf8fab45: "Afritar %{file}"
@@ -10483,7 +10483,7 @@ is:
   create_new_attempt_19c96c03: "Búa til nýja tilraun"
   create_new_calendar_event_f933f209: "Búðu til nýjan dagatalsviðburð"
   create_new_course_e3ef9cd0: "Búa til nýjan kúrs"
-  create_new_criterion_1a4efd4: "Búðu til nýja viðmiðun"
+  create_new_criterion_1a4efd4: "Búðu til nýjan matsþátt"
   create_new_differentiation_tags_5a91fe13: "Búa til ný aðgreind merki"
   create_new_discussions_6ab69da2: "Búa til nýjar umræður"
   create_new_e0946c49: "Stofna nýtt"
@@ -10494,7 +10494,7 @@ is:
   create_new_group_set_13b1f62a: "Búa til nýtt hópasett"
   create_new_group_set_ab5e6d9f: "[ Búa til nýtt hópasett ]"
   create_new_question_bank_86f2afc6: "Stofna nýjan spurningabanka..."
-  create_new_rubric_dd44f4e3: "Búa til nýtt matsviðmið"
+  create_new_rubric_dd44f4e3: "Búa til nýjan matskvarða"
   create_new_rules_5bcfbc2d: "Búa til nýjar reglur"
   create_new_submission_e6b7c18d: "Búa til ný skil"
   create_new_tag_4c89a5dd: "Búa til nýtt merki"
@@ -10569,8 +10569,8 @@ is:
   creatorname_performed_actions_while_anonymous_was__c2124eca: "%{creatorName} framkvæmdi aðgerðir á meðan slökkt var á nafnleysi"
   criteria_9fac648: Viðmiðun
   criteria_auto_generated_37cfd05e: "Myndað sjálfgefið viðmið"
-  criteria_builder_b214069e: Viðmiðunarsmiður
-  criterion_5f0b62f8: Viðmiðun
+  criteria_builder_b214069e: "Uppsetning matsþátta"
+  criterion_5f0b62f8: Matsþættir
   criterion_comment_642f7747: Viðmiðunarathugasemd
   criterion_comments_for_23123707: "Athugasemdir við viðmið fyrir"
   criterion_created_42669293: "Viðmið stofnað"
@@ -10620,7 +10620,7 @@ is:
     quizzes: Próf
     registered_services: "Skráðar þjónustur"
     revisions: Endurskoðanir
-    rubrics: Matskvarði
+    rubrics: Matskvarðar
     search: Snjall-leit
     settings: ~
     site_admin: Svæðisstjórnandi
@@ -12169,7 +12169,7 @@ is:
   draft_comment_b2376ea4: "Drög að athugasemd"
   draft_comment_warning_modal_in_speedgrader_ded232c1: "Viðvörunarstaðfestingargluggi athugasemdauppkasts í SpeedGrader"
   draft_discussion_entries_98d93a9d: "Drög að umræðum"
-  draft_new_criterion_95ed3c89: "Drög að nýrri viðmiðun"
+  draft_new_criterion_95ed3c89: "Búa til nýjan matsþátt"
   draft_saved_eba9cfeb: "Uppkast vistað"
   drag_a_file_here_39357b48: "Draga skrá hingað"
   drag_a_file_here_or_1aaf19c1: "Dragðu skrá hingað eða"
@@ -18186,7 +18186,7 @@ is:
         groups: Nemendahópar
         learning_outcomes: Námsniðurstöður
         quizzes: Próf
-        rubrics: Matskvarði
+        rubrics: Matskvarðar
         syllabus_body: "Stofn kennsluáætlun"
         tool_profiles: "Lýsingar verkfæra"
         wikis: Síður
@@ -18536,7 +18536,7 @@ is:
   local_datetime_ce5ffddd: "Staðbundið: %{datetime}"
   location_3b6ff307: "Staðsetning:"
   location_e17bd402: Staðsetning
-  location_used_8909c9af: "Staðsetning notuð"
+  location_used_8909c9af: "Hvar notaður"
   locations_used_1c050e8e: "Staðsetningar notaðar"
   lock_at_time_3c8a044e: "Læst: %{time}"
   lock_c341af13: Læsa
@@ -24447,7 +24447,7 @@ is:
   points_possible_1c0b3445: "Mögulegir punktar"
   points_possible_44cb4190: "/ %{points_possible}"
   points_possible_720fc8fd: "%{points} / %{possible}"
-  points_possible_76044222: " Mögulegir punktar"
+  points_possible_76044222: " Möguleg stig"
   points_possible_additional_replies_d84680b8: "Mögulegir punktar: Viðbótarsvör"
   points_possible_e57d5613: "Mögulegir punktar"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Mögulegir punktar verða að vera 0 eða hærri fyrir valdar einkunnategundir"
@@ -26532,7 +26532,7 @@ is:
   rating_min_score_3d35a762: "Lágmarkseinkunn mats"
   rating_name_6f633d52: "Nafn einkunninnar"
   rating_options_6c51fc9a: "Valkostir fyrir einkunnagjöf"
-  rating_order_e57f63ed: Einkunnaröð
+  rating_order_e57f63ed: "Röðun stiga"
   rating_points_be3e8682: Einkunnagjöf
   rating_scale_fc10d5f1: Einkunnakvarði
   rating_scale_ratingslength_25100b7a: "Einkunnakvarði: %{ratingsLength}"
@@ -27620,7 +27620,7 @@ is:
       course_rubrics: "Matskvarði námskeiðs"
       delete_rubric: "Eyða matsviðmiði"
       edit_rubric: "Breyta matsviðmiði"
-      page_title: Matskvarði
+      page_title: Matskvarðar
       points_possible: 
         one: "1 punktur mögulegur"
         other: "%{count} punktar mögulegir"
@@ -27642,7 +27642,7 @@ is:
       delete_rubric: "Eyða matskvarða"
       headings: 
         user_rubrics: "Matskvarði notanda"
-      page_title: Matskvarði
+      page_title: Matskvarðar
       points_possible: 
         one: "1 punktur mögulegur"
         other: "%{count} punktar mögulegir"
@@ -27652,7 +27652,7 @@ is:
   rubrics_assessments_export_report_6e639a7b: "Útflutningsskýrsla um mat á matsviðmiði"
   rubrics_assessments_were_successfully_imported_63499972: "möt matskvarða voru flutt inn"
   rubrics_associations_export_report_77da1b31: "Útflutningsskýrsla um tengsl matsviðmiðs"
-  rubrics_b5ef369b: Matskvarði
+  rubrics_b5ef369b: Matskvarðar
   rubrics_can_show_students_your_expectations_for_as_3382da64: |-
       Matskvarði geta sýnt nemendum væntingar þínar til gæða verkefnis
           og hvernig einkunnagjöf verður stillt í samræmi við það. Matskvarði má tengja við
@@ -27836,7 +27836,7 @@ is:
   score_to_ungraded_process_finished_successfully_6689b418: "Einkunn í ómetið ferli lauk"
   score_type_dad6326d: "Tegund einkunnar"
   score_yourself_the_way_you_think_your_instructor_w_5c5bbd8f: "Gefðu þér einkunn á þann máta sem þú telur að kennarinn muni gera."
-  scored_187e6983: "Fékk einkunn"
+  scored_187e6983: "Með einkunn"
   scored_at_least_score_c46b1a41: "Náði minnst %{score}%"
   scored_at_least_score_e2272f6d: "Náði minnst %{score}"
   scored_at_least_score_points_1e1fab00: "Fékk í einkunn minnst %{score} punkta"
@@ -29134,7 +29134,7 @@ is:
       labels: 
         custom_rating: "Ég skrifa lausar athugasemdir við mat á nemendum"
         grading_rubric: "Nota þennan matskvarða fyrir einkunnagjöf verkefnis"
-        total_points: Heildarpunktar
+        total_points: Heildarstig
         totallying_rubric: "Fela heildareinkunn fyrir matsniðurstöður"
       links: 
         delete: "Eyða matskvarða"
@@ -29210,7 +29210,7 @@ is:
         assessment: Mat
         criteria: Viðmiðun
       labels: 
-        total_points: Heildarpunktar
+        total_points: Heildarstig
       rubric: Matskvarði
     rubric_summary_criterion: 
       defaults: 
@@ -31011,7 +31011,7 @@ is:
     people: Fólk
     qr_mobile_login: "QR fyrir innskráningu með snjalltæki"
     quizzes: Próf
-    rubrics: Matskvarði
+    rubrics: Matskvarðar
     schedule: Áætlun
     search: Snjall-leit
     settings: Stillingar
@@ -33574,7 +33574,7 @@ is:
     zero: "Heildarfjöldi vandamála"
   total_messages_af025be6: "Öll skilaboð"
   total_options_351e2682: Heildarkostir
-  total_points_44d76792: Heildarpunktar
+  total_points_44d76792: Heildarstig
   total_points_possible_totalpoints_afe246a1: "Mögulegir heildarpunktar: %{totalPoints}"
   total_points_total_f41b2cff: "Heildar punktar: %{total}"
   total_points_total_out_of_possible_9056fdb4: "Heildar punktar: %{total} af %{possible}"
@@ -34186,7 +34186,7 @@ is:
   unsafe_file_link_8a18eceb: "ótraustur skráarhlekkur"
   unsaved_change_eb23d452: "Óvistuð breyting"
   unsaved_changes_d69b2ed8: "Óvistaðar breytingar"
-  unscored_d0bf39d6: "Ekki með einkunn"
+  unscored_d0bf39d6: "Án einkunnar"
   unselect_locked_items_first_b7a8661d: "Afvelja læst atriði fyrst."
   unselected_all_courses_99a9d35c: "Afvaldi öll námskeið"
   unselected_course_course_89995a83: "Afvalið námskeið %{course}"
