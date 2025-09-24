@@ -388,8 +388,13 @@ module Importers
         item.turnitin_settings = settings
       end
 
-      if item.context.root_account.feature_enabled?(:lti_asset_processor) && hash[:lti_context_id].present?
-        update_lti_import_histories(item, hash[:lti_context_id])
+      if item.context.root_account.feature_enabled?(:lti_asset_processor)
+        if hash[:lti_context_id].present?
+          Lti::ImportHistory.register(source_lti_id: hash[:lti_context_id], target_lti_id: item.lti_context_id, root_account: item.root_account)
+        end
+        if hash[:asset_processors].present?
+          import_asset_processors(item, hash[:asset_processors], migration)
+        end
       end
 
       set_annotatable_attachment(item, hash, context)
@@ -687,10 +692,56 @@ module Importers
       item.assignment_group ||= context.assignment_groups.active.where(name: t(:imported_assignments_group, "Imported Assignments")).first_or_create
     end
 
-    def self.update_lti_import_histories(assignment, lti_context_id)
-      return if Lti::ImportHistory.where(source_lti_id: lti_context_id, target_lti_id: assignment.lti_context_id).exists?
+    def self.import_asset_processors(assignment, asset_processors_data, migration)
+      asset_processors_data.each do |ap_data|
+        # Skip already existing APs: asset processors are immutable, so there's no need to update existing ones
+        next if assignment.lti_asset_processors.where(migration_id: ap_data[:migration_id]).exists?
 
-      Lti::ImportHistory.create!(source_lti_id: lti_context_id, target_lti_id: assignment.lti_context_id, root_account: assignment.root_account)
+        tool_id = ap_data[:context_external_tool_global_id]
+        tool_url = ap_data[:context_external_tool_url]
+        tool = Lti::ToolFinder.from_url(tool_url, migration.context, preferred_tool_id: tool_id, only_1_3: true)
+        unless tool
+          migration.add_warning(t("Document Processor settings won't be copied for assignment '%{assignment_name}' because the specified tool is not configured.", assignment_name: assignment.title))
+          next
+        end
+
+        # Check if tool is Asset Processor compatible
+        unless tool.use_1_3? && (tool.has_placement?(Lti::ResourcePlacement::ASSET_PROCESSOR) || tool.has_placement?(Lti::ResourcePlacement::ASSET_PROCESSOR_CONTRIBUTION))
+          migration.add_warning(t("Document Processor settings won't be copied for assignment '%{assignment_name}' because the selected tool is not Document Processor compatible.", assignment_name: assignment.title))
+          next
+        end
+
+        begin
+          wrap = ->(val) { val.is_a?(Hash) ? ActionController::Parameters.new(val) : nil }
+
+          raw_content_item = {
+            "context_external_tool_id" => tool.id,
+            "url" => ap_data[:url],
+            "title" => ap_data[:title],
+            "text" => ap_data[:text],
+            "custom" => wrap.call(parse_json_field(ap_data[:custom])),
+            "icon" => wrap.call(parse_json_field(ap_data[:icon])),
+            "window" => wrap.call(parse_json_field(ap_data[:window])),
+            "iframe" => wrap.call(parse_json_field(ap_data[:iframe])),
+            "report" => wrap.call(parse_json_field(ap_data[:report]))
+          }
+          content_item = ActionController::Parameters.new(raw_content_item)
+
+          asset_processor = Lti::AssetProcessor.build_for_assignment_and_tool(content_item:, tool:)
+          asset_processor.assignment = assignment
+          asset_processor.migration_id = ap_data[:migration_id]
+          asset_processor.save!
+        rescue JSON::ParserError, ActiveRecord::RecordInvalid => e
+          migration.add_warning(t("Document Processor won't be copied for assignment '%{assignment_name}': %{error}", assignment_name: assignment.title, error: e.message), e)
+        end
+      end
+    end
+
+    def self.parse_json_field(field_value)
+      return nil if field_value.blank?
+      return field_value if field_value.is_a?(Hash)
+
+      JSON.parse(field_value)
     end
   end
 end

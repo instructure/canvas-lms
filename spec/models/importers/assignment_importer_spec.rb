@@ -158,6 +158,197 @@ describe "Importing assignments" do
     end
   end
 
+  describe "import_asset_processors" do
+    let(:course) { course_model }
+    let(:migration) { course.content_migrations.create! }
+    let(:tool) do
+      lti_registration_with_tool(
+        account: course.root_account,
+        configuration_params: {
+          placements: [
+            {
+              placement: "ActivityAssetProcessor",
+              enabled: true,
+              message_type: "LtiDeepLinkingRequest",
+              target_link_uri: "http://lti13testtool.docker/process"
+            }
+          ]
+        }
+      ).deployments.first
+    end
+    let(:base_assignment_hash) { default_input_assignment_hash.merge("asset_processors" => asset_processors_payload) }
+
+    context "when feature flag disabled" do
+      before { course.root_account.disable_feature!(:lti_asset_processor) }
+
+      let(:asset_processors_payload) do
+        [
+          {
+            migration_id: "ap_mig_1",
+            context_external_tool_global_id: tool.id,
+            context_external_tool_url: tool.url,
+            url: "https://example.com/process",
+            title: "Processor 1",
+            text: "AP Text",
+            custom: { foo: "bar" }.to_json
+          }
+        ]
+      end
+
+      it "does not create asset processors" do
+        Importers::AssignmentImporter.import_from_migration(base_assignment_hash, course, migration)
+        assignment = course.assignments.find_by(migration_id: base_assignment_hash["migration_id"])
+        expect(assignment.lti_asset_processors.count).to eq 0
+      end
+    end
+
+    context "when feature flag enabled" do
+      context "with valid payload" do
+        let(:asset_processors_payload) do
+          [
+            {
+              migration_id: "ap_mig_1",
+              context_external_tool_global_id: tool.id,
+              context_external_tool_url: tool.url,
+              url: "https://example.com/process",
+              title: "Processor 1",
+              text: "AP Text",
+              custom: { foo: "bar" }.to_json,
+              icon: { url: "https://example.com/icon.png", width: 100 }.to_json,
+              window: { targetName: "_blank", width: 800 }.to_json,
+              iframe: { width: 640, height: 480 }.to_json,
+              report: { url: "https://example.com/report", custom: { r: "v" } }.to_json
+            },
+            {
+              migration_id: "ap_mig_2",
+              context_external_tool_global_id: tool.id,
+              context_external_tool_url: tool.url,
+              title: "Processor 2",
+              text: nil,
+              custom: { alpha: "beta" },
+              icon: nil,
+              window: nil,
+              iframe: nil,
+              report: nil
+            }
+          ]
+        end
+
+        it "creates all provided asset processors with parsed JSON fields" do
+          Importers::AssignmentImporter.import_from_migration(base_assignment_hash, course, migration)
+          assignment = course.assignments.find_by(migration_id: base_assignment_hash["migration_id"])
+          expect(assignment.lti_asset_processors.count).to eq 2
+          ap1 = assignment.lti_asset_processors.find_by(migration_id: "ap_mig_1")
+          ap2 = assignment.lti_asset_processors.find_by(migration_id: "ap_mig_2")
+          aggregate_failures do
+            expect(ap1.context_external_tool_id).to eq tool.id
+            expect(ap1.url).to eq "https://example.com/process"
+            expect(ap1.title).to eq "Processor 1"
+            expect(ap1.text).to eq "AP Text"
+            expect(ap1.custom).to eq({ "foo" => "bar" })
+            expect(ap1.icon).to eq({ "url" => "https://example.com/icon.png", "width" => 100 })
+            expect(ap1.window).to eq({ "targetName" => "_blank", "width" => 800 })
+            expect(ap1.iframe).to eq({ "width" => 640, "height" => 480 })
+            expect(ap1.report).to eq({ "url" => "https://example.com/report", "custom" => { "r" => "v" } })
+            expect(ap2.title).to eq "Processor 2"
+            expect(ap2.text).to be_nil
+            expect(ap2.custom).to eq({ "alpha" => "beta" })
+            expect(ap2.icon).to be_nil
+          end
+          expect(migration.warnings).to be_empty
+        end
+
+        it "is idempotent on re-import (skips existing migration_ids)" do
+          Importers::AssignmentImporter.import_from_migration(base_assignment_hash, course, migration)
+          expect do
+            Importers::AssignmentImporter.import_from_migration(base_assignment_hash, course, migration)
+          end.not_to change { course.assignments.find_by(migration_id: base_assignment_hash["migration_id"]).lti_asset_processors.count }
+        end
+      end
+
+      context "when tool cannot be found" do
+        let(:asset_processors_payload) do
+          [
+            {
+              migration_id: "ap_missing_tool",
+              context_external_tool_global_id: 999_999, # non-existent
+              context_external_tool_url: "https://not-real.example.com/tool",
+              title: "Won't Import"
+            }
+          ]
+        end
+
+        it "skips creation for entries with no matching tool" do
+          Importers::AssignmentImporter.import_from_migration(base_assignment_hash, course, migration)
+          assignment = course.assignments.find_by(migration_id: base_assignment_hash["migration_id"])
+          expect(assignment.lti_asset_processors.count).to eq 0
+          expect(migration.warnings).to_not be_empty
+        end
+      end
+
+      context "with tool missing ActivityAssetProcessor placement" do
+        let(:tool_without_placement) do
+          lti_registration_with_tool(
+            account: course.root_account,
+            configuration_params: {
+              placements: [
+                {
+                  placement: "course_navigation",
+                  enabled: true,
+                  message_type: "LtiResourceLinkRequest",
+                  target_link_uri: "http://lti13testtool.docker/launch"
+                }
+              ]
+            }
+          ).deployments.first
+        end
+
+        let(:asset_processors_payload) do
+          [
+            {
+              migration_id: "ap_no_placement",
+              context_external_tool_global_id: tool_without_placement.id,
+              context_external_tool_url: tool_without_placement.url,
+              title: "No AP Placement"
+            }
+          ]
+        end
+
+        it "skips creation for tools without proper placement" do
+          Importers::AssignmentImporter.import_from_migration(base_assignment_hash, course, migration)
+          assignment = course.assignments.find_by(migration_id: base_assignment_hash["migration_id"])
+          expect(assignment.lti_asset_processors.count).to eq 0
+          expect(migration.warnings).to_not be_empty
+        end
+      end
+
+      context "with invalid JSON fields" do
+        let(:asset_processors_payload) do
+          [
+            {
+              migration_id: "ap_bad_json",
+              context_external_tool_global_id: tool.id,
+              context_external_tool_url: tool.url,
+              title: "Bad JSON",
+              custom: "{not json}",
+              icon: "{also:bad}",
+              window: "<xml>nope</xml>",
+              iframe: "[unclosed",
+              report: "123notjson"
+            }
+          ]
+        end
+
+        it "do not import APs with unparsable JSON fields" do
+          Importers::AssignmentImporter.import_from_migration(base_assignment_hash, course, migration)
+          assignment = course.assignments.find_by(migration_id: base_assignment_hash["migration_id"])
+          expect(assignment.lti_asset_processors.count).to eq 0
+          expect(migration.warnings).to_not be_empty
+        end
+      end
+    end
+  end
+
   SYSTEMS.each do |system|
     next unless import_data_exists? system, "assignment"
 
@@ -1848,7 +2039,7 @@ describe "Importing assignments" do
   end
 
   context "LTI import histories" do
-    describe "import_from_migration calls update_lti_import_histories" do
+    describe "import_from_migration updates lti import history" do
       let(:course) { course_model }
       let(:migration) { course.content_migrations.create! }
       let(:assignment_hash) do
@@ -1860,47 +2051,10 @@ describe "Importing assignments" do
         }
       end
 
-      it "invokes update_lti_import_histories with the assignment and source id" do
-        expect(Importers::AssignmentImporter)
-          .to receive(:update_lti_import_histories)
-          .with(instance_of(Assignment), "source-lti-abc")
-          .and_call_original
-
-        Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
-      end
-
       it "creates a history row via the import path" do
         Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
         a = course.assignments.find_by(migration_id: "mig123")
         expect(Lti::ImportHistory.where(target_lti_id: a.lti_context_id).pluck(:source_lti_id)).to eq(["source-lti-abc"])
-      end
-    end
-
-    describe "update_lti_import_histories" do
-      let(:course) { course_model }
-      let(:assignment) { course.assignments.create!(title: "History Test", submission_types: "none", lti_context_id: "target-1") }
-
-      it "creates a new history row for a previously unseen source id" do
-        expect do
-          Importers::AssignmentImporter.update_lti_import_histories(assignment, "source-1")
-        end.to change { Lti::ImportHistory.where(target_lti_id: assignment.lti_context_id).count }.by(1)
-
-        history = Lti::ImportHistory.where(target_lti_id: assignment.lti_context_id).first
-        expect(history.source_lti_id).to eq "source-1"
-        expect(history.target_lti_id).to eq "target-1"
-      end
-
-      it "does not create a duplicate history row when the source id already exists" do
-        Importers::AssignmentImporter.update_lti_import_histories(assignment, "source-1")
-        expect do
-          Importers::AssignmentImporter.update_lti_import_histories(assignment, "source-1")
-        end.not_to change { Lti::ImportHistory.where(target_lti_id: assignment.lti_context_id).count }
-      end
-
-      it "creates multiple history rows for distinct source ids" do
-        Importers::AssignmentImporter.update_lti_import_histories(assignment, "source-1")
-        Importers::AssignmentImporter.update_lti_import_histories(assignment, "source-2")
-        expect(Lti::ImportHistory.where(target_lti_id: assignment.lti_context_id).pluck(:source_lti_id)).to match_array(%w[source-1 source-2])
       end
     end
   end

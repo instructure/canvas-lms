@@ -37,6 +37,12 @@ class Lti::ImportHistory < ApplicationRecord
     ["lti_activity_id_history", lti_id].cache_key
   end
 
+  def self.register(source_lti_id:, target_lti_id:, root_account:)
+    Lti::ImportHistory.find_or_create_by!(source_lti_id:,
+                                          target_lti_id:,
+                                          root_account:)
+  end
+
   # Recursively collects all ancestor source_lti_ids for a given target_lti_id.
   def self.recursive_import_history(target_lti_id, limit: 1000)
     return [] unless target_lti_id

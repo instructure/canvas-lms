@@ -290,6 +290,29 @@
         </xs:complexType>
       </xs:element>
       <xs:element name="lti_context_id" type="xs:string" minOccurs="0"/>
+      <xs:element name="asset_processors" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="asset_processor" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:all>
+                  <xs:element name="url" type="xs:string"/>
+                  <xs:element name="title" type="xs:string" minOccurs="0"/>
+                  <xs:element name="text" type="xs:string" minOccurs="0"/>
+                  <xs:element name="custom" type="xs:string" minOccurs="0"/>
+                  <xs:element name="icon" type="xs:string" minOccurs="0"/>
+                  <xs:element name="window" type="xs:string" minOccurs="0"/>
+                  <xs:element name="iframe" type="xs:string" minOccurs="0"/>
+                  <xs:element name="report" type="xs:string" minOccurs="0"/>
+                  <xs:element name="context_external_tool_global_id" type="xs:integer"/>
+                  <xs:element name="context_external_tool_url" type="xs:string" />
+                </xs:all>
+                <xs:attribute name="identifier" type="xs:ID" use="required"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
     </xs:all>
     <xs:attribute name="identifier" type="xs:ID" use="required"/>
   </xs:complexType>
