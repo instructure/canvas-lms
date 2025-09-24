@@ -20,8 +20,11 @@ import React from 'react'
 import {createRoot} from 'react-dom/client'
 import ready from '@instructure/ready'
 import DiscussionInsightsApp from './react/index'
+import {mountNutritionFacts} from '@canvas/nutrition-facts'
+import {DISCUSSION_INSIGHT_NUTRITION_DATA} from './discussionInsightsNutritionData'
 
 ready(() => {
+  mountNutritionFacts(DISCUSSION_INSIGHT_NUTRITION_DATA)
   document.querySelector('body')?.classList.add('full-width')
   const contentElement = document.getElementById('discussion-insights-container')
   const root = createRoot(contentElement)
