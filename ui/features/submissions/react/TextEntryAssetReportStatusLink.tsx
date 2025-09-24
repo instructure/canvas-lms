@@ -16,61 +16,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {useShouldShowLtiAssetReportsForStudent} from '@canvas/lti-asset-processor/react/hooks/useLtiAssetProcessorsAndReportsForStudent'
+import {LtiAssetReportsForStudentSubmission} from '@canvas/lti-asset-processor/react/LtiAssetReportsForStudentSubmission'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
-import {LtiAssetReportWithAsset} from '@canvas/lti-asset-processor/model/AssetReport'
-import {filterReportsByAttempt} from '@canvas/lti-asset-processor/react/AssetProcessorHelper'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import {useMemo, useState} from 'react'
-import AssetReportStatus from '@canvas/lti-asset-processor/react/AssetReportStatus'
-import StudentAssetReportModal from '@canvas/lti-asset-processor/react/StudentAssetReportModal'
+import {z} from 'zod'
 
-export const ASSET_REPORT_MODAL_EVENT = 'openAssetReportModal'
-const I18n = createI18nScope('text_entry_asset_report_status_link')
+const I18n = createI18nScope('submissions')
 
-interface Props {
-  reports: LtiAssetReportWithAsset[]
-  assetProcessors: ExistingAttachedAssetProcessor[]
-  attempt: string
-  assignmentName: string
-}
+// Props passed in via data- attributes on the div this component is rendered into
+export const ZTextEntryAssetReportStatusLinkProps = z.object({
+  submissionId: z.string(),
+  submissionType: z.string(),
+})
 
-/**
- * Asset Processor report status link in old student submission view for online text entry submissions.
- */
-export default function TextEntryAssetReportStatusLink({
-  reports,
-  assetProcessors,
-  attempt,
-  assignmentName,
-}: Props) {
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const filteredReports = useMemo(
-    () => filterReportsByAttempt(reports, attempt),
-    [reports, attempt],
-  )
-
-  function handleClose() {
-    setIsModalOpen(false)
-  }
+export default function TextEntryAssetReportStatusLink(
+  props: z.infer<typeof ZTextEntryAssetReportStatusLinkProps>,
+) {
+  const shouldShow = useShouldShowLtiAssetReportsForStudent(props)
+  if (!shouldShow) return null
 
   return (
-    <>
-      <Flex gap="x-small" alignItems="end">
-        <Text weight="bold">{I18n.t('Document Processors:')}</Text>
-        <AssetReportStatus reports={filteredReports} openModal={() => setIsModalOpen(true)} />
-      </Flex>
-      {isModalOpen && (
-        <StudentAssetReportModal
-          assetProcessors={assetProcessors}
-          assignmentName={assignmentName}
-          open={isModalOpen}
-          onClose={handleClose}
-          reports={filteredReports}
-          submissionType="online_text_entry"
-        />
-      )}
-    </>
+    <Flex gap="x-small" alignItems="end">
+      <Text weight="bold">{I18n.t('Document Processors:')}</Text>
+      <LtiAssetReportsForStudentSubmission {...props} />
+    </Flex>
   )
 }

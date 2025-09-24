@@ -139,35 +139,17 @@ describe Submissions::PreviewsController do
         user_session(@student)
       end
 
-      it "renders show_preview with asset processor data in js ENV" do
-        # Use random ids and display_names for the mock attachments
-        allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_reports_legacy_format).and_return([
-                                                                                                                { title: "Asset Report 1", asset: { id: 101, attachment_id: @attachment1.id, attachment_name: @attachment1.display_name } },
-                                                                                                                { title: "Asset Report 2", asset: { id: 102, attachment_id: @attachment2.id, attachment_name: @attachment2.display_name } }
-                                                                                                              ])
-        allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_processors).and_return([
-                                                                                                     { title: "Live AP" }
-                                                                                                   ])
-
+      it "renders show_preview with asset processor data attributes for uploaded files" do
         get :show, params: { course_id: @context.id, assignment_id: @assignment.id, id: @student.id, preview: true }
 
         body = response.body
-        # The page includes Asset Processor data js ENV
-        expect(body).to include("ASSET_PROCESSORS")
-        expect(body).to include("ASSIGNMENT_NAME")
-        expect(body).to include("ASSET_REPORTS")
 
-        expect(body).to include('data-attachment-id="' + @attachment1.id.to_s + '"')
-        expect(body).to include('data-attachment-id="' + @attachment2.id.to_s + '"')
-      end
-
-      it "renders show_preview without Document Processors column if asset reports is nil" do
-        allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_reports_legacy_format).and_return(nil)
-
-        get :show, params: { course_id: @context.id, assignment_id: @assignment.id, id: @student.id, preview: true }
-
-        body = response.body
-        expect(body).not_to include("Document Processors")
+        # Verify asset report status containers have all required data attributes
+        [@attachment1, @attachment2].each do |attachment|
+          expect(body).to include('data-attachment-id="' + attachment.id.to_s + '"')
+          expect(body).to include('data-submission-id="' + @submission.id.to_s + '"')
+          expect(body).to include('data-submission-type="online_upload"')
+        end
       end
     end
   end

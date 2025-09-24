@@ -20,7 +20,6 @@ import {useState} from 'react'
 import LtiAssetReportStatus from './LtiAssetReportStatus'
 import {useLtiAssetProcessorsAndReportsForStudent} from './hooks/useLtiAssetProcessorsAndReportsForStudent'
 import StudentLtiAssetReportModal from './StudentLtiAssetReportModal'
-import {ensureCompatibleSubmissionType} from '../shared-with-sg/replicated/types/LtiAssetReports'
 
 /**
  * LtiAssetReports component is also used for Speedgrader (one assignment, but for a teacher)
@@ -41,20 +40,12 @@ export function LtiAssetReportsForStudentSubmission(props: {
   const data = useLtiAssetProcessorsAndReportsForStudent(props)
   const [showModal, setShowModal] = useState(false)
 
-  const compatibleSubmissionType = ensureCompatibleSubmissionType(props.submissionType)
-
-  if (!data || compatibleSubmissionType === undefined) return null
+  if (!data) return null
 
   return (
     <>
       <LtiAssetReportStatus reports={data.reports} openModal={() => setShowModal(true)} />
-      {showModal && (
-        <StudentLtiAssetReportModal
-          submissionType={compatibleSubmissionType}
-          {...data}
-          onClose={() => setShowModal(false)}
-        />
-      )}
+      {showModal && <StudentLtiAssetReportModal {...data} onClose={() => setShowModal(false)} />}
     </>
   )
 }
