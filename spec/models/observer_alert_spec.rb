@@ -641,4 +641,87 @@ describe ObserverAlert do
       expect(ObserverAlert.where(student: @student).count).to eq 0
     end
   end
+
+  describe "belongs_to_enrolled scope" do
+    let_once(:course) { course_factory(active_all: true) }
+    let_once(:student) { student_in_course(active_all: true, course:).user }
+    let_once(:observer) { course_with_observer(course: @course, associated_user_id: @student.id, active_all: true).user }
+    let_once(:threshold) { ObserverAlertThreshold.create!(student:, observer:, alert_type: "assignment_missing") }
+    let_once(:assignment) { course.assignments.create!(title: "ordinary assignment", submission_types: "online_text_entry") }
+
+    shared_examples "includes alert for context" do |context_description|
+      it "includes alerts for students enrolled in the course when the context is #{context_description}" do
+        alert = ObserverAlert.create!(
+          student:,
+          observer:,
+          observer_alert_threshold: threshold,
+          context: test_context,
+          alert_type: "assignment_missing",
+          action_date: Time.zone.now,
+          title: "Alert"
+        )
+
+        results = ObserverAlert.belongs_to_enrolled(student, observer)
+        expect(results).to include(alert)
+      end
+    end
+
+    describe "when context is an assignment" do
+      let(:test_context) { assignment }
+
+      include_examples "includes alert for context", "an assignment"
+    end
+
+    describe "when context is a sub-assignment" do
+      let(:test_context) { assignment.sub_assignments.create!(context: course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC) }
+
+      include_examples "includes alert for context", "a sub-assignment"
+    end
+
+    describe "when context is a course" do
+      let(:test_context) { course }
+
+      include_examples "includes alert for context", "a course"
+    end
+
+    describe "when context is a discussion topic" do
+      let(:test_context) { DiscussionTopic.create!(context: course, title: "discussion") }
+
+      include_examples "includes alert for context", "a discussion topic"
+    end
+
+    describe "when context is a submission" do
+      let(:test_context) { assignment.submit_homework(student, submission_type: "online_text_entry", body: "done") }
+
+      include_examples "includes alert for context", "a submission"
+    end
+
+    describe "when there are multiple alerts for the same course" do
+      it "only queries enrollments once per course" do
+        3.times do |index|
+          ObserverAlert.create!(
+            student:,
+            observer:,
+            observer_alert_threshold: threshold,
+            context: course.assignments.create!(title: "assignment #{index + 1}", submission_types: "online_text_entry"),
+            alert_type: "assignment_missing",
+            action_date: Time.zone.now,
+            title: "Alert #{index + 1}"
+          )
+        end
+
+        enrollment_scope = double("enrollment_scope")
+        allow(Enrollment).to receive(:active_or_pending_by_date).and_return(enrollment_scope)
+        allow(enrollment_scope).to receive(:where).with(user_id: student.id, course_id: course.id).and_return(enrollment_scope)
+        allow(enrollment_scope).to receive(:shard).with(observer).and_return(enrollment_scope)
+        allow(enrollment_scope).to receive(:exists?).and_return(true)
+
+        ObserverAlert.belongs_to_enrolled(student, observer)
+
+        # Verify that the enrollment query was only called once for the course
+        # even though there are multiple alerts for that course
+        expect(enrollment_scope).to have_received(:exists?).once
+      end
+    end
+  end
 end
