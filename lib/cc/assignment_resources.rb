@@ -334,6 +334,11 @@ module CC
 
       if assignment.root_account.feature_enabled?(:lti_asset_processor) && assignment.lti_asset_processors.any?
         node.lti_context_id assignment.lti_context_id
+        node.asset_processors do |asset_processors_node|
+          assignment.lti_asset_processors.active.find_each do |asset_processor|
+            add_asset_processor(asset_processors_node, asset_processor, key_generator)
+          end
+        end
       end
     end
 
@@ -356,6 +361,21 @@ module CC
         if line_item.score_maximum != assignment.points_possible
           li_node.score_maximum line_item.score_maximum
         end
+      end
+    end
+
+    def self.add_asset_processor(asset_processors_node, asset_processor, key_generator)
+      asset_processors_node.asset_processor(identifier: key_generator.create_key(asset_processor)) do |ap_node|
+        ap_node.url asset_processor.url
+        ap_node.title asset_processor.title if asset_processor.title.present?
+        ap_node.text asset_processor.text if asset_processor.text.present?
+        ap_node.custom asset_processor.custom.to_json if asset_processor.custom.present?
+        ap_node.icon asset_processor.icon.to_json if asset_processor.icon.present?
+        ap_node.window asset_processor.window.to_json if asset_processor.window.present?
+        ap_node.iframe asset_processor.iframe.to_json if asset_processor.iframe.present?
+        ap_node.report asset_processor.report.to_json if asset_processor.report.present?
+        ap_node.context_external_tool_global_id asset_processor.context_external_tool.global_id
+        ap_node.context_external_tool_url asset_processor.context_external_tool.url
       end
     end
   end

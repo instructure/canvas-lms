@@ -1894,6 +1894,53 @@ describe Assignment do
         expect(subject.tool_resource_type_code).to eq resource_handler.resource_type_code
       end
     end
+
+    context "with asset processors" do
+      let(:assignment) { @course.assignments.create!(assignment_valid_attributes) }
+      let(:tool) { external_tool_1_3_model(context: @course.account) }
+
+      before do
+        @course.root_account.enable_feature!(:lti_asset_processor)
+        lti_asset_processor_model(tool:, assignment:)
+        assignment.reload
+      end
+
+      it "duplicates asset processors when feature is enabled" do
+        duplicated = assignment.duplicate
+        duplicated.save!
+
+        expect(duplicated.lti_asset_processors.count).to eq(1)
+        original_processor = assignment.lti_asset_processors.first
+        duplicated_processor = duplicated.lti_asset_processors.first
+
+        expect(duplicated_processor.id).not_to eq(original_processor.id)
+        expect(duplicated_processor.url).to eq(original_processor.url)
+        expect(duplicated_processor.title).to eq(original_processor.title)
+        expect(duplicated_processor.text).to eq(original_processor.text)
+        expect(duplicated_processor.custom).to eq(original_processor.custom)
+        expect(duplicated_processor.context_external_tool_id).to eq(original_processor.context_external_tool_id)
+      end
+
+      it "updates lti_import_history when duplicating asset processors" do
+        duplicated = assignment.duplicate
+        duplicated.save!
+
+        # Check that LTI import history was created
+        import_history = Lti::ImportHistory.find_by(
+          source_lti_id: assignment.lti_context_id,
+          target_lti_id: duplicated.lti_context_id
+        )
+        expect(import_history).to be_present
+        expect(import_history.root_account).to eq(assignment.root_account)
+      end
+
+      it "does not duplicate asset processors when option is disabled" do
+        duplicated = assignment.duplicate(duplicate_asset_processors: false)
+        duplicated.save!
+
+        expect(duplicated.lti_asset_processors.count).to eq(0)
+      end
+    end
   end
 
   describe "#can_duplicate?" do

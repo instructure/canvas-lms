@@ -369,6 +369,7 @@ class AbstractAssignment < ActiveRecord::Base
       duplicate_wiki_page: true,
       duplicate_discussion_topic: true,
       duplicate_plagiarism_tool_association: true,
+      duplicate_asset_processors: true,
       copy_title: nil,
       user: nil
     }
@@ -456,6 +457,21 @@ class AbstractAssignment < ActiveRecord::Base
     if active_rubric_association?
       result.rubric_association = rubric_association.clone
       result.rubric_association.skip_updating_points_possible = true
+    end
+
+    if context.root_account.feature_enabled?(:lti_asset_processor) &&
+       opts_with_default[:duplicate_asset_processors] &&
+       lti_asset_processors.active.any?
+
+      result.save!
+
+      Lti::ImportHistory.register(source_lti_id: lti_context_id, target_lti_id: result.lti_context_id, root_account:)
+
+      lti_asset_processors.active.find_each do |asset_processor|
+        new_ap = asset_processor.dup
+        new_ap.assignment = result
+        new_ap.save!
+      end
     end
 
     # Link the duplicated assignment to this assignment

@@ -47,9 +47,12 @@ class Lti::AssetProcessor < ApplicationRecord
   def self.build_for_assignment(content_item:, context:)
     # Check tool is in the course or account:
     tool = Lti::ToolFinder.from_id(content_item["context_external_tool_id"], context)
-
     return nil unless tool
 
+    build_for_assignment_and_tool(content_item:, tool:)
+  end
+
+  def self.build_for_assignment_and_tool(content_item:, tool:)
     # TODO: add thumbnail to asset_processor model and add it here as well
     new(
       context_external_tool: tool,
