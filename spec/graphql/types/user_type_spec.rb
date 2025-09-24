@@ -2669,6 +2669,15 @@ describe Types::UserType do
       end
     end
 
+    it "does not return submissions for pending enrollments" do
+      Timecop.freeze(@frozen_time) do
+        enrollment = @student.enrollments.where(course: @course).first
+        enrollment.update!(workflow_state: "invited")
+        result = student_user_type.resolve("courseWorkSubmissionsConnection { edges { node { _id } } }")
+        expect(result).to eq([])
+      end
+    end
+
     it "only returns data for current user" do
       Timecop.freeze(@frozen_time) do
         result = user_type.resolve("courseWorkSubmissionsConnection { edges { node { _id } } }")

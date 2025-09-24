@@ -178,7 +178,7 @@ module Types
 
                           current_user.cached_course_ids_for_observed_user(observed_user).map(&:to_s)
                         else
-                          current_user.enrollments.pluck(:course_id).uniq.map(&:to_s)
+                          current_user.enrollments.active_by_date.pluck(:course_id).uniq.map(&:to_s)
                         end
 
       course_ids = if course_ids.blank?
