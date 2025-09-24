@@ -20,7 +20,8 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import AttemptSelect from '../AttemptSelect'
 import {mockSubmission} from '@canvas/assignments/graphql/studentMocks'
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 
 type Submission = any // Using any since mockSubmission returns an unknown shape
 
@@ -58,8 +59,8 @@ describe('Attempt', () => {
 
   it('renders correctly', async () => {
     const props = await createProps({attempt: 1})
-    const {getByDisplayValue} = render(mockContext(<AttemptSelect {...props} />))
-    expect(getByDisplayValue('Attempt 1')).toBeInTheDocument()
+    render(mockContext(<AttemptSelect {...props} />))
+    expect(screen.getByDisplayValue('Attempt 1')).toBeInTheDocument()
   })
 
   it('renders attempt 0 as attempt 1', async () => {
@@ -69,8 +70,8 @@ describe('Attempt', () => {
       allSubmissions: [submission],
       onChangeSubmission: mockedOnChangeSubmission,
     }
-    const {getByDisplayValue} = render(mockContext(<AttemptSelect {...props} />))
-    expect(getByDisplayValue('Attempt 1')).toBeInTheDocument()
+    render(mockContext(<AttemptSelect {...props} />))
+    expect(screen.getByDisplayValue('Attempt 1')).toBeInTheDocument()
   })
 
   it('only renders a single "Attempt 1" option when there is attempt 0 and attempt 1', async () => {
@@ -81,16 +82,54 @@ describe('Attempt', () => {
       allSubmissions: [submission, submission2],
       onChangeSubmission: mockedOnChangeSubmission,
     }
-    const {getAllByText, getByTestId} = render(mockContext(<AttemptSelect {...props} />))
-    const select = getByTestId('attemptSelect')
-    fireEvent.click(select) // open select dropdown
-    expect(getAllByText('Attempt 1')).toHaveLength(1)
+    render(mockContext(<AttemptSelect {...props} />))
+    const select = screen.getByTestId('attemptSelect')
+    await userEvent.click(select)
+    expect(screen.getAllByText('Attempt 1')).toHaveLength(1)
+  })
+
+  it('nothing happens when user clicks on Attempt 1 when there is only one submission', async () => {
+    const submission = (await mockSubmission([{Submission: {attempt: 1}}])) as Submission
+    const props = {
+      submission,
+      allSubmissions: [submission],
+      onChangeSubmission: mockedOnChangeSubmission,
+    }
+    render(mockContext(<AttemptSelect {...props} />))
+    const select = screen.getByTestId('attemptSelect')
+    await userEvent.click(select)
+    const attempt1 = screen.getByText('Attempt 1')
+    await userEvent.click(attempt1)
+
+    // Verify the callback was called with the correct attempt number
+    expect(mockedOnChangeSubmission).toHaveBeenCalledWith(1)
+    // Verify no error was thrown (component didn't crash)
+    expect(screen.getByTestId('attemptSelect')).toBeInTheDocument()
+  })
+
+  it('handles clicking on Attempt 1 when submission has attempt 0 (unsubmitted)', async () => {
+    const submission = (await mockSubmission([{Submission: {attempt: 0}}])) as Submission
+    const props = {
+      submission,
+      allSubmissions: [submission],
+      onChangeSubmission: mockedOnChangeSubmission,
+    }
+    render(mockContext(<AttemptSelect {...props} />))
+    const select = screen.getByTestId('attemptSelect')
+    await userEvent.click(select)
+    const attempt1 = screen.getByText('Attempt 1')
+    await userEvent.click(attempt1)
+
+    // Verify the callback was called with attempt 0 (the actual submission attempt)
+    expect(mockedOnChangeSubmission).toHaveBeenCalledWith(0)
+    // Verify no error was thrown (component didn't crash)
+    expect(screen.getByTestId('attemptSelect')).toBeInTheDocument()
   })
 
   it('renders the current submission attempt', async () => {
     const props = await createProps({attempt: 3})
-    const {getByDisplayValue} = render(mockContext(<AttemptSelect {...props} />))
-    expect(getByDisplayValue('Attempt 3')).toBeInTheDocument()
+    render(mockContext(<AttemptSelect {...props} />))
+    expect(screen.getByDisplayValue('Attempt 3')).toBeInTheDocument()
   })
 
   it('alerts the screenreader of the current displayed attempt', async () => {
@@ -101,11 +140,12 @@ describe('Attempt', () => {
 
   it('changes the current attempt correctly', async () => {
     global.event = undefined // workaround bug in SimpleSelect that accesses the global event
+    const user = userEvent.setup()
     const props = await createProps({attempt: 1})
-    const {getByText, getByTestId} = render(mockContext(<AttemptSelect {...props} />))
-    const select = getByTestId('attemptSelect')
-    fireEvent.click(select)
-    fireEvent.click(getByText('Attempt 2'))
+    render(mockContext(<AttemptSelect {...props} />))
+    const select = screen.getByTestId('attemptSelect')
+    await user.click(select)
+    await user.click(screen.getByText('Attempt 2'))
     expect(mockedOnChangeSubmission).toHaveBeenCalledWith(2)
   })
 })

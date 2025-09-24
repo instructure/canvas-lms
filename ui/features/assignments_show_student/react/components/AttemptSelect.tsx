@@ -92,11 +92,11 @@ export default function AttemptSelect({
 
   const attemptList = orderBy(uniqBy(filteredSubmissions, 'attempt'), 'attempt').map(sub => {
     const attemptNumber = sub.attempt || 1
-    return [I18n.t('Attempt %{attempt}', {attempt: attemptNumber}), attemptNumber]
+    return [I18n.t('Attempt %{attempt}', {attempt: attemptNumber}), sub.attempt]
   })
 
   function handleSubmissionChange(
-    e: React.SyntheticEvent,
+    _e: React.SyntheticEvent,
     selectedOption: {value?: string | number; id?: string},
   ) {
     const attempt = Number(selectedOption.value)
@@ -108,7 +108,7 @@ export default function AttemptSelect({
       <SimpleSelect
         renderLabel={<ScreenReaderContent>{I18n.t('Attempt')}</ScreenReaderContent>}
         width="15rem"
-        value={`${submission.attempt || 1}`}
+        value={`${submission.attempt}`}
         onChange={handleSubmissionChange}
         data-testid="attemptSelect"
       >
