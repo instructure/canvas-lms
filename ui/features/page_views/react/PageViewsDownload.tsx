@@ -36,6 +36,7 @@ import {
 } from './hooks/asyncPageviewExport'
 import {Pill} from '@instructure/ui-pill'
 import {Link} from '@instructure/ui-link'
+import {FetchApiError} from '@canvas/do-fetch-api-effect'
 
 const I18n = i18nScope('page_views')
 
@@ -126,10 +127,16 @@ export function PageViewsDownload({userId}: PageViewsDownloadProps): React.JSX.E
       `${formatter.format(new Date(startMonth))} - ${formatter.format(new Date(endMonth))}`,
       startMonth.toString(),
       endMonth.toString(),
-    ).catch(_e => {
-      setExportError(
-        I18n.t('There was a problem creating a new export job. Please try again later.'),
-      )
+    ).catch(e => {
+      if (e instanceof FetchApiError && e.response.status === 429) {
+        setExportError(
+          I18n.t('You must wait for your running jobs to finish before starting a new one.'),
+        )
+      } else {
+        setExportError(
+          I18n.t('There was a problem creating a new export job. Please try again later.'),
+        )
+      }
     })
   }
 
