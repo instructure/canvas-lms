@@ -221,7 +221,10 @@ class Lti::Registration < ActiveRecord::Base
                 .to_lti_overlay(ims_registration.registration_overlay)
     end
 
-    Lti::Overlay.apply_to(overlay, internal_config)
+    # IMS registrations should not allow adding new placements via overlay
+    # Only manual/legacy registrations can have additional placements added
+    additive = ims_registration.blank?
+    Lti::Overlay.apply_to(overlay, internal_config, additive:)
   end
 
   # Returns a Hash that's usable with the ContextExternalToolImporter to create a new ContextExternalTool.

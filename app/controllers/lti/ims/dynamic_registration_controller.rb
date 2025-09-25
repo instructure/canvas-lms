@@ -35,6 +35,7 @@ module Lti
       skip_before_action :load_user, only: [:create, :update]
 
       include Api::V1::Lti::Registration
+      include Api::V1::Lti::RegistrationUpdateRequest
 
       def require_account
         require_context_with_permission(account_context, :manage_developer_keys)
@@ -95,7 +96,7 @@ module Lti
 
       def lti_registration_update_request_by_uuid
         registration_update_request = Lti::RegistrationUpdateRequest.find_by!(uuid: params[:registration_uuid])
-        render json: registration_update_request.as_json
+        render json: lti_registration_update_request_json(registration_update_request, @current_user, session, @context)
       end
 
       def ims_registration_by_uuid
