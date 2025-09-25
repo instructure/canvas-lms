@@ -243,7 +243,12 @@ const createYoutubeConvertMutation = async ({
   scanId,
   embed,
   embedIndex,
-}: {courseId: string; scanId: number; embed: YoutubeEmbed; embedIndex: number}): Promise<{
+}: {
+  courseId: string
+  scanId: number
+  embed: YoutubeEmbed
+  embedIndex: number
+}): Promise<{
   progress: CanvasProgress
   embedIndex: number
 }> => {
@@ -392,6 +397,15 @@ const EmbedsModal: React.FC<{
   })
 
   const handleEmbedConvert = (courseId: string, embed: YoutubeEmbed, index: number) => {
+    if (embed.src.includes('/embed/videoseries')) {
+      showFlashError(
+        I18n.t(
+          "This content was added as a YouTube playlist, which can't be converted. Please resolve it manually.",
+        ),
+      )()
+      return
+    }
+
     handleEmbedConvertStatus(index, ConvertStatus.Converting)
     mutation.mutate({courseId, scanId, embed, embedIndex: index})
   }
@@ -828,7 +842,9 @@ const youtubeScanQuery = async ({
 
 const createYoutubeScanMutation = async ({
   courseId,
-}: {courseId: string}): Promise<YoutubeScanResultReport> => {
+}: {
+  courseId: string
+}): Promise<YoutubeScanResultReport> => {
   const {json, response} = await doFetchApi<YoutubeScanResultReport>({
     path: `/api/v1/courses/${courseId}/youtube_migration/scan`,
     method: 'POST',
