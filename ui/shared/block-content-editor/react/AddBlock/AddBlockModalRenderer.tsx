@@ -21,13 +21,22 @@ import {AddBlockModal} from './AddBlockModal'
 import {useAddNode} from '../hooks/useAddNode'
 import {useAddBlockModal} from '../hooks/useAddBlockModal'
 import {useAppSelector} from '../store'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {showScreenReaderAlert} from '../utilities/accessibility'
+
+const I18n = createI18nScope('block_content_editor')
 
 export const AddBlockModalRenderer = () => {
   const {isOpen, insertAfterNodeId} = useAppSelector(state => state.addBlockModal)
   const {close} = useAddBlockModal()
   const addNode = useAddNode()
+
   const onAddBlock = (block: ReactElement) => {
-    addNode(block, insertAfterNodeId)
+    const addedNode = addNode(block, insertAfterNodeId)
+    const alertMessage = I18n.t('Block added: %{blockType}', {
+      blockType: addedNode.data.displayName,
+    })
+    showScreenReaderAlert(alertMessage)
   }
 
   return <AddBlockModal open={isOpen} onDismiss={close} onAddBlock={onAddBlock} />
