@@ -185,6 +185,7 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
               )}
               {deployment.context_type !== 'Course' ? (
                 <Button
+                  data-pendo="lti-registrations-open-add-exception-modal"
                   onClick={() => {
                     setExceptionModalOpenState({
                       open: true,
