@@ -1052,11 +1052,19 @@ class AccountsController < ApplicationController
 
             enable_horizon = params.dig(:account, :settings, :horizon_account, :value)
             unless enable_horizon.nil?
+              horizon_enabled = value_to_boolean(enable_horizon)
               existing_account_ids = @account.root_account.settings[:horizon_account_ids] || []
-              if value_to_boolean(enable_horizon) && existing_account_ids.length + 1 > HORIZON_MAX_ACCOUNTS
+
+              if horizon_enabled && existing_account_ids.length + 1 > HORIZON_MAX_ACCOUNTS
                 @account.errors.add(:horizon_account, t("You cannot enable horizon_account on more than %{max_accounts} accounts", max_accounts: HORIZON_MAX_ACCOUNTS))
               else
-                @account.horizon_account = value_to_boolean(enable_horizon)
+                @account.horizon_account = horizon_enabled
+
+                if horizon_enabled && existing_account_ids.empty?
+                  @account.delay(singleton: "provision_horizon_tenants:#{@domain_root_account.uuid}").provision_horizon_tenants(@domain_root_account, @current_user)
+                elsif !horizon_enabled && existing_account_ids.length == 1
+                  @account.delay(singleton: "delete_horizon_tenants:#{@domain_root_account.uuid}").delete_horizon_tenants(@domain_root_account, @current_user)
+                end
               end
             end
 
