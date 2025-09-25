@@ -835,7 +835,12 @@ self.user,
   def notification_targets
     case path_type
     when "push"
-      user.notification_endpoints.select("DISTINCT ON (token, arn) *").map(&:arn)
+      # get all unique tokens/arns for the user, preferring the most recently updated ones
+      # without the order_by, DISTINCT ON would be non-deterministic
+      user.notification_endpoints
+          .select("DISTINCT ON (token, arn) *")
+          .order(:token, :arn, updated_at: :desc)
+          .map(&:arn)
     when "slack"
       [
         "recipient" => to,
