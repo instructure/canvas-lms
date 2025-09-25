@@ -38,6 +38,9 @@ import type {LtiScope} from '@canvas/lti/model/LtiScope'
 import type {LtiPrivacyLevel} from '../model/LtiPrivacyLevel'
 import {RegistrationModalBody} from '../registration_wizard/RegistrationModalBody'
 import {Link} from '@instructure/ui-link'
+import {MessageSetting} from '../model/internal_lti_configuration/InternalBaseLaunchSettings'
+import {launchTypeSpecificSettingsLabels} from './LaunchTypeSpecificSettingsConfirmation'
+import {LtiPlacementlessMessageType} from '../model/LtiMessageType'
 
 const I18n = createI18nScope('lti_registration.wizard')
 
@@ -62,6 +65,7 @@ export type ReviewScreenProps = {
   iconUrls: Partial<Record<LtiPlacementWithIcon, string>>
   defaultPlacementIconUrls: Partial<Record<LtiPlacementWithIcon, string>>
   launchSettings?: LaunchSettings
+  eulaSettings?: MessageSetting
   defaultIconUrl?: string
   onEditScopes: () => void
   onEditPrivacyLevel: () => void
@@ -69,10 +73,12 @@ export type ReviewScreenProps = {
   onEditNaming: () => void
   onEditIconUrls: () => void
   onEditLaunchSettings?: () => void
+  onEditMessageSettings?: (type: LtiPlacementlessMessageType) => void
 }
 
 export const ReviewScreen = ({
   launchSettings,
+  eulaSettings,
   scopes,
   privacyLevel,
   placements,
@@ -84,6 +90,7 @@ export const ReviewScreen = ({
   defaultPlacementIconUrls = {},
   onEditScopes,
   onEditLaunchSettings,
+  onEditMessageSettings,
   onEditPrivacyLevel,
   onEditPlacements,
   onEditNaming,
@@ -97,6 +104,13 @@ export const ReviewScreen = ({
       </View>
       {launchSettings && onEditLaunchSettings && (
         <LaunchSettingsSection {...launchSettings} onEditLaunchSettings={onEditLaunchSettings} />
+      )}
+      {eulaSettings && onEditMessageSettings && (
+        <MessageSettingsSection
+          messageSetting={eulaSettings}
+          type="LtiEulaRequest"
+          onEditMessageSettings={onEditMessageSettings}
+        />
       )}
       <ReviewSection>
         <View>
@@ -344,6 +358,71 @@ export const LaunchSettingsSection = React.memo(
           renderIcon={IconEditLine}
           screenReaderLabel={I18n.t('Edit Launch Settings')}
           onClick={onEditLaunchSettings}
+        />
+      </ReviewSection>
+    )
+  },
+)
+
+export const MessageSettingsSection = React.memo(
+  ({
+    messageSetting,
+    type,
+    onEditMessageSettings,
+  }: {
+    messageSetting: MessageSetting | undefined
+    type: LtiPlacementlessMessageType
+    onEditMessageSettings: (type: LtiPlacementlessMessageType) => void
+  }) => {
+    const labels = launchTypeSpecificSettingsLabels[type]
+    return (
+      <ReviewSection>
+        <View>
+          <Heading level="h4">{labels.title}</Heading>
+          <List
+            margin="small 0 0 0"
+            isUnstyled={true}
+            delimiter="none"
+            itemSpacing="small"
+            size="small"
+          >
+            <List.Item key="enabled">
+              <LaunchSettingsHeader>{labels.enableLabel}</LaunchSettingsHeader>
+              <Text size="small">{messageSetting?.enabled ? I18n.t('Yes') : I18n.t('No')}</Text>
+            </List.Item>
+            {messageSetting?.target_link_uri && (
+              <List.Item key="target_link_uri">
+                <LaunchSettingsHeader>{labels.targetLinkUriLabel}</LaunchSettingsHeader>
+                <Text size="small">{messageSetting.target_link_uri}</Text>
+              </List.Item>
+            )}
+            {messageSetting?.custom_fields &&
+              Object.keys(messageSetting.custom_fields).length > 0 && (
+                <List.Item key="custom_fields">
+                  <LaunchSettingsHeader>{labels.customFieldsLabel}:</LaunchSettingsHeader>
+                  <List
+                    margin="x-small 0 0 0"
+                    isUnstyled={true}
+                    delimiter="none"
+                    itemSpacing="small"
+                    size="small"
+                  >
+                    {Object.entries(messageSetting.custom_fields).map(([key, value]) => (
+                      <List.Item key={key}>
+                        <Text size="small">
+                          {key}={value}
+                        </Text>
+                      </List.Item>
+                    ))}
+                  </List>
+                </List.Item>
+              )}
+          </List>
+        </View>
+        <IconButton
+          renderIcon={IconEditLine}
+          screenReaderLabel={I18n.t('Edit %{title}', {title: labels.title})}
+          onClick={() => onEditMessageSettings(type)}
         />
       </ReviewSection>
     )

@@ -64,6 +64,9 @@ export const ReviewScreenWrapper = ({
       ? Object.entries(internalConfig.custom_fields).map(([key, value]) => `${key}=${value}`)
       : undefined)
 
+  const messageSettings = state.launchSettings.message_settings
+  const eulaSettings = messageSettings?.find(ms => ms.type === 'LtiEulaRequest')
+
   return (
     <ReviewScreen
       launchSettings={{
@@ -81,6 +84,7 @@ export const ReviewScreenWrapper = ({
         jwk: jwkValue,
         domain: state.launchSettings.domain ?? toUndefined(internalConfig.domain),
       }}
+      eulaSettings={eulaSettings}
       description={description}
       placements={placements}
       scopes={scopes}
@@ -96,6 +100,13 @@ export const ReviewScreenWrapper = ({
       onEditScopes={() => transitionTo('Permissions')}
       onEditIconUrls={() => transitionTo('Icons')}
       onEditPrivacyLevel={() => transitionTo('DataSharing')}
+      onEditMessageSettings={type => {
+        switch (type) {
+          case 'LtiEulaRequest':
+            transitionTo('EulaSettings')
+            break
+        }
+      }}
     />
   )
 }

@@ -56,6 +56,7 @@ export interface Lti1p3RegistrationWizardActions {
 
 export type Lti1p3RegistrationWizardStep =
   | 'LaunchSettings'
+  | 'EulaSettings'
   | 'Permissions'
   | 'DataSharing'
   | 'Placements'
