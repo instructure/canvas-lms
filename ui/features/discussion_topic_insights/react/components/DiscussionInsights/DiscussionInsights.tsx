@@ -259,7 +259,7 @@ const DiscussionInsights: React.FC = () => {
               href={SPEEDGRADER_URL_TEMPLATE?.replace(
                 /%3Astudent_id/,
                 String(item.student_id),
-              ).concat(`&entry_id=${item.id}`)}
+              ).concat(`&entry_id=${item.entry_id}&insight_entry_id=${item.id}`)}
               target="_blank"
               withBackground={false}
               withBorder={false}
