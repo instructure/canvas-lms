@@ -61,7 +61,7 @@ describe Mutations::SaveRubricAssessment do
       )
       result = CanvasSchema.execute(mutation, context: student_context)
       expect(result["errors"]).to be_present
-      expect(result["errors"].first["message"]).to eq("Authorization failed - existing assessment cannot be updated by current user")
+      expect(result["errors"].first["message"]).to eq("Not authorized to assess user")
     end
 
     it "allows authorized user to update existing assessment" do
