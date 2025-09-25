@@ -245,7 +245,7 @@ describe('ExceptionModal', () => {
     expect(select).toHaveDisplayValue(/not available/i)
   })
 
-  it('calls onConfirm with selected controls when Done is clicked', async () => {
+  it('calls onConfirm with selected controls when Save is clicked', async () => {
     const accountId = ZAccountId.parse('1')
     const openState = {open: true, deployment: mockDeployment({})}
     const onClose = jest.fn()
@@ -268,9 +268,9 @@ describe('ExceptionModal', () => {
     await userEvent.click(subaccount_1)
     expect(screen.getByText('Subaccount 101')).toBeInTheDocument()
 
-    // Click Done
-    const doneBtn = screen.getByRole('button', {name: /done/i})
-    await userEvent.click(doneBtn)
+    // Click Save
+    const saveBtn = screen.getByRole('button', {name: /save/i})
+    await userEvent.click(saveBtn)
 
     expect(onConfirm).toHaveBeenCalledTimes(1)
     // Should be called with an array of controls, containing the selected context
@@ -335,9 +335,9 @@ describe('ExceptionModal', () => {
     // The exception should be added
     expect(screen.getByText('Course 201')).toBeInTheDocument()
 
-    // Click Done and assert onConfirm is called with both contexts
-    const doneBtn = screen.getByRole('button', {name: /done/i})
-    await userEvent.click(doneBtn)
+    // Click Save and assert onConfirm is called with both contexts
+    const saveBtn = screen.getByRole('button', {name: /save/i})
+    await userEvent.click(saveBtn)
 
     expect(onConfirm).toHaveBeenCalledTimes(1)
     const calledArgs = onConfirm.mock.calls[0][0]
@@ -357,7 +357,7 @@ describe('ExceptionModal', () => {
     )
   })
 
-  it('does not call onConfirm when Done is clicked with no selected exceptions, but does call onClose', async () => {
+  it('does not call onConfirm when Save is clicked with no selected exceptions, but does call onClose', async () => {
     const accountId = ZAccountId.parse('1')
     const openState = {open: true, deployment: mockDeployment({})}
     const onClose = jest.fn()
@@ -372,8 +372,8 @@ describe('ExceptionModal', () => {
       />,
     )
 
-    const doneBtn = screen.getByRole('button', {name: /done/i})
-    await userEvent.click(doneBtn)
+    const saveBtn = screen.getByRole('button', {name: /save/i})
+    await userEvent.click(saveBtn)
 
     expect(onConfirm).not.toHaveBeenCalled()
     expect(onClose).toHaveBeenCalled()
