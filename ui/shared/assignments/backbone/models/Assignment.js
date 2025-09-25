@@ -1770,4 +1770,21 @@ Assignment.prototype.getId = function () {
   return this.get('id')
 }
 
+Assignment.prototype.sortingDueAt = function () {
+  if (this.hasSubAssignments()) {
+    const checkpoints = this.getCheckpoints()
+    if (checkpoints && checkpoints.length > 0) {
+      const dueDates = checkpoints
+        .map(checkpoint => checkpoint.due_at)
+        .filter(date => date !== null)
+      if (dueDates.length > 0) {
+        return dueDates.reduce((earliest, current) => {
+          return Date.parse(current) < Date.parse(earliest) ? current : earliest
+        })
+      }
+    }
+  }
+  return this.dueAt()
+}
+
 export default Assignment
