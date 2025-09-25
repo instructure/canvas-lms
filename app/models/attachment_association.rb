@@ -25,6 +25,7 @@ class AttachmentAssociation < ActiveRecord::Base
   belongs_to :context, polymorphic: [
     :account,
     :account_notification,
+    :assessment_question,
     :assignment,
     :calendar_event,
     :course,
@@ -38,6 +39,8 @@ class AttachmentAssociation < ActiveRecord::Base
     :wiki_page,
     {
       quiz: "Quizzes::Quiz",
+      quiz_question: "Quizzes::QuizQuestion",
+      quiz_submission: "Quizzes::QuizSubmission"
     }
   ]
   belongs_to :user
@@ -70,6 +73,8 @@ class AttachmentAssociation < ActiveRecord::Base
       context_type = "Quizzes::Quiz"
     elsif context_type == "QuizQuestion"
       context_type = "Quizzes::QuizQuestion"
+    elsif context_type == "QuizSubmission"
+      context_type = "Quizzes::QuizSubmission"
     end
 
     association = Shard.shard_for(context_id).activate do

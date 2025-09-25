@@ -24,6 +24,29 @@ import FilesCollection from '@canvas/files/backbone/collections/FilesCollection'
 import Folder from '@canvas/files/backbone/models/Folder'
 import SearchResults from '../SearchResults'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
+
+// MSW server for this test suite
+const server = setupServer(
+  // Files API endpoints
+  http.get('*/api/v1/courses/:courseId/files', () => {
+    return HttpResponse.json([])
+  }),
+  http.get('*/api/v1/users/:userId/files', () => {
+    return HttpResponse.json([])
+  }),
+  http.get('*/api/v1/groups/:groupId/files', () => {
+    return HttpResponse.json([])
+  }),
+  // Generic Canvas API catch-all
+  http.get('*/api/v1/*', () => {
+    return HttpResponse.json({})
+  }),
+  http.post('*/api/v1/*', () => {
+    return HttpResponse.json({})
+  }),
+)
 
 const defaultProps = (props = {}) => {
   const ref = document.createElement('div')
@@ -63,6 +86,18 @@ const defaultProps = (props = {}) => {
 }
 
 describe('SearchResults', () => {
+  beforeAll(() => {
+    // Start MSW server before all tests
+    server.listen({
+      onUnhandledRequest: 'bypass',
+    })
+  })
+
+  afterAll(() => {
+    // Clean up MSW server after all tests
+    server.close()
+  })
+
   beforeEach(() => {
     userEvent.setup()
     fakeENV.setup({
@@ -74,6 +109,8 @@ describe('SearchResults', () => {
 
   afterEach(() => {
     fakeENV.teardown()
+    // Reset MSW handlers after each test
+    server.resetHandlers()
   })
 
   describe('accessibility message', () => {

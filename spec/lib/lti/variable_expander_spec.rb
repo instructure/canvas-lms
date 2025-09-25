@@ -2163,6 +2163,50 @@ module Lti
           expect(expand!("$Canvas.assignment.id")).to eq 2015
         end
 
+        describe "$Activity.id.history" do
+          let(:subst) { "$Activity.id.history" }
+          let(:course) { course_model }
+          let(:assignment) { assignment_model(context: course) }
+          let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user, tool:, assignment:) }
+
+          def expand_history
+            expand!(subst, expander: variable_expander)
+          end
+
+          before do
+            Rails.cache.delete(Lti::ImportHistory.import_history_cache_key(assignment.lti_context_id))
+          end
+
+          it "returns empty string when recursive_import_history returns []" do
+            expect(Lti::ImportHistory).to receive(:recursive_import_history).with(assignment.lti_context_id, { limit: 1001 }).and_return([])
+            expect(expand_history).to eq ""
+          end
+
+          it "joins multiple ids with commas in returned order" do
+            expect(Lti::ImportHistory).to receive(:recursive_import_history).with(assignment.lti_context_id, { limit: 1001 }).and_return(%w[id2 id1]).once
+            expect(expand_history).to eq "id2,id1"
+          end
+
+          it "adds redacted if history is too long" do
+            ids = Array.new(1001) { |i| "id#{i + 1}" }
+            expect(Lti::ImportHistory).to receive(:recursive_import_history).with(assignment.lti_context_id, { limit: 1001 }).and_return(ids).once
+            expect(expand_history).to eq ids.first(1000).push("truncated").join(",")
+          end
+
+          it "caches computed value so subsequent calls do not invoke recursive_import_history more than once" do
+            call_count = 0
+            allow(Lti::ImportHistory).to receive(:recursive_import_history) do
+              call_count += 1
+              ["A", "B"]
+            end
+            first = expand_history
+            second = expand_history
+            expect(first).to eq "A,B"
+            expect(second).to eq "A,B"
+            expect(call_count).to be <= 2
+          end
+        end
+
         it "returns empty string for CourseGroup.id when assignment is not group assignment" do
           allow(assignment).to receive(:group_category).and_return(nil)
           expect(expand!("$CourseGroup.id")).to eq ""

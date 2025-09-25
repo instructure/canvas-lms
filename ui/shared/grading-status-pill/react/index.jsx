@@ -23,6 +23,18 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('gradingStatusPill')
 
+// Store roots to prevent multiple createRoot calls on same element
+const rootMap = new WeakMap()
+
+function getOrCreateRoot(element) {
+  if (rootMap.has(element)) {
+    return rootMap.get(element)
+  }
+  const root = createRoot(element)
+  rootMap.set(element, root)
+  return root
+}
+
 function forEachNode(nodeList, fn) {
   for (let i = 0; i < nodeList.length; i += 1) {
     fn(nodeList[i])
@@ -46,22 +58,22 @@ export default {
     )
 
     forEachNode(missMountPoints, mountPoint => {
-      const root = createRoot(mountPoint)
+      const root = getOrCreateRoot(mountPoint)
       root.render(<Pill color="danger">{I18n.t('missing')}</Pill>)
     })
 
     forEachNode(lateMountPoints, mountPoint => {
-      const root = createRoot(mountPoint)
+      const root = getOrCreateRoot(mountPoint)
       root.render(<Pill color="info">{I18n.t('late')}</Pill>)
     })
 
     forEachNode(excusedMountPoints, mountPoint => {
-      const root = createRoot(mountPoint)
+      const root = getOrCreateRoot(mountPoint)
       root.render(<Pill color="danger">{I18n.t('excused')}</Pill>)
     })
 
     forEachNode(extendedMountPoints, mountPoint => {
-      const root = createRoot(mountPoint)
+      const root = getOrCreateRoot(mountPoint)
       root.render(<Pill color="alert">{I18n.t('extended')}</Pill>)
     })
 
@@ -69,7 +81,7 @@ export default {
       const status =
         statusMap[mountPoint.classList[0].substring('submission-custom-grade-status-pill-'.length)]
       if (status) {
-        const root = createRoot(mountPoint)
+        const root = getOrCreateRoot(mountPoint)
         root.render(<Pill>{status.name}</Pill>)
       }
     })

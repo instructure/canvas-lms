@@ -21,7 +21,7 @@ config = ConfigFile.load("marginalia") || {}
 
 if config[:components].present?
   ActiveSupport.on_load(:active_record) do
-    ActiveRecord::QueryLogs.taggings.merge!(
+    ActiveRecord::QueryLogs.taggings = ActiveRecord::QueryLogs.taggings.merge(
       controller: ->(context) { context[:controller]&.controller_name },
       action: ->(context) { context[:controller]&.action_name },
       hostname: -> { Socket.gethostname },
@@ -38,10 +38,11 @@ if config[:components].present?
 
   module ActiveRecord::QueryLogs::Migrator
     def execute_migration_in_transaction(migration)
-      old_migration_name, ActiveRecord::QueryLogs.taggings[:migration] = ActiveRecord::QueryLogs.taggings[:migration], migration.name
+      previous = ActiveRecord::QueryLogs.taggings
+      ActiveRecord::QueryLogs.taggings = { **previous, migration: migration.name }
       super
     ensure
-      ActiveRecord::QueryLogs.taggings[:migration] = old_migration_name
+      ActiveRecord::QueryLogs.taggings = previous
     end
   end
 
@@ -49,10 +50,11 @@ if config[:components].present?
 
   module ActiveRecord::QueryLogs::RakeTask
     def execute(args = nil)
-      previous, ActiveRecord::QueryLogs.taggings[:rake_task] = ActiveRecord::QueryLogs.taggings[:rake_task], name
+      previous = ActiveRecord::QueryLogs.taggings
+      ActiveRecord::QueryLogs.taggings = { **previous, rake_task: name }
       super
     ensure
-      ActiveRecord::QueryLogs.taggings[:rake_task] = previous
+      ActiveRecord::QueryLogs.taggings = previous
     end
   end
 

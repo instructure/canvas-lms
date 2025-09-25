@@ -38,7 +38,8 @@ import {getContrastingTextColorCached} from '../../utilities/getContrastingTextC
 const I18n = createI18nScope('block_content_editor')
 
 const Player = ({mediaId, src, attachment_id}: MediaSources) => {
-  if (!!mediaId || !!attachment_id) {
+  const enableStudioPlayer = false // CanvasStudioPlayer disabled for now
+  if ((!!mediaId || !!attachment_id) && enableStudioPlayer) {
     return (
       <CanvasStudioPlayer
         media_id={mediaId || ''}

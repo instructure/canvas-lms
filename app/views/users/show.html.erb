@@ -167,8 +167,16 @@
     <% end %>
 
     </div>
+
   </fieldset>
+  <% if Account.site_admin.feature_enabled?(:student_access_token_management) && @user.grants_right?(@current_user, :view_user_generated_access_tokens) %>
+  <fieldset id="access_tokens">
+    <legend><%= t('access_tokens', 'Access Tokens') %></legend>
+    <div id="user_access_tokens_react_mount_point"></div>
+  </fieldset>
+  <% end %>
   </div>
+
 
   <% if @show_page_views %>
     <h3>

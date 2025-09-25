@@ -40,9 +40,7 @@ import {View} from '@instructure/ui-view'
 
 import WhatIfGrade from '../WhatIfGrade'
 import {getDisplayStatus, getDisplayScore, submissionCommentsPresent} from '../utils'
-import AssetProcessorCell from '../../AssetProcessorCell'
-import {convertGraphqlLtiAssetReportToLtiAssetReportWithAsset} from '@canvas/lti-asset-processor/model/AssetReport'
-import {existingAttachedAssetProcessorFromGraphql} from '@canvas/lti/model/AssetProcessor'
+import LtiAssetProcessorCell from '../../LtiAssetProcessorCell'
 
 const I18n = createI18nScope('grade_summary')
 
@@ -162,13 +160,6 @@ export const assignmentRow = (
     )
   }
 
-  const reports = submission?.ltiAssetReportsConnection?.nodes?.map(
-    convertGraphqlLtiAssetReportToLtiAssetReportWithAsset,
-  )
-  const assetProcessors = (assignment?.ltiAssetProcessorsConnection?.nodes || []).map(
-    existingAttachedAssetProcessorFromGraphql,
-  )
-
   return (
     <Table.Row
       data-testid="assignment-row"
@@ -275,10 +266,10 @@ export const assignmentRow = (
         )}
       </Table.Cell>
       <Table.Cell textAlign="start">
-        {showDocumentProcessors && Array.isArray(reports) && (
-          <AssetProcessorCell
-            assetProcessors={assetProcessors}
-            assetReports={reports}
+        {showDocumentProcessors && (
+          <LtiAssetProcessorCell
+            assetProcessors={assignment?.ltiAssetProcessorsConnection?.nodes}
+            assetReports={submission?.ltiAssetReportsConnection?.nodes}
             submissionType={submission?.submissionType}
             assignmentName={assignment?.name}
           />

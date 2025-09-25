@@ -102,20 +102,6 @@ describe "calendar2" do
         create_middle_day_assignment
       end
 
-      it "translates am/pm time strings in assignment event datepicker", priority: "2" do
-        skip("CNVS-28437")
-        @user.locale = "fa"
-        @user.save!
-        load_month_view
-        calendar_create_event_button.click
-        f("#edit_event .edit_assignment_option").click
-        f("#assignment_title").send_keys("test assignment")
-        f("#edit_assignment_form .ui-datepicker-trigger.btn").click
-        wait_for_ajaximations
-        expect(f("#ui-datepicker-div .ui-datepicker-time-ampm")).to include_text("قبل از ظهر")
-        expect(f("#ui-datepicker-div .ui-datepicker-time-ampm")).to include_text("بعد از ظهر")
-      end
-
       context "drag and drop" do
         def element_location
           driver.execute_script("return $('#calendar-app .fc-content-skeleton:first')
@@ -235,22 +221,6 @@ describe "calendar2" do
           # Event time should stay at 9:00am
           event1.reload
           expect(event1.start_at).to eql(@three_days_earlier)
-        end
-
-        it "extends event to multiple days by dragging", priority: "2" do
-          skip("dragging events are flaky and need more research FOO-4335")
-
-          create_middle_day_event
-          date_of_middle_day = find_middle_day.attribute("data-date")
-          date_of_next_day = (Time.zone.parse(date_of_middle_day) + 1.day).strftime("%Y-%m-%d")
-          f(".fc-content-skeleton .fc-event-container .fc-resizer")
-          next_day = fj("[data-date=#{date_of_next_day}]")
-          drag_and_drop_element(f(".fc-content-skeleton .fc-event-container .fc-resizer"), next_day)
-          fj(".fc-event:visible").click
-          # observe the event details show date range from event start to date to end date
-          original_day_text = format_time_for_view(Time.zone.parse(date_of_middle_day))
-          extended_day_text = format_time_for_view(Time.zone.parse(date_of_next_day) + 1.day)
-          expect(f(".event-details-timestring .date-range").text).to eq("#{original_day_text} - #{extended_day_text}")
         end
 
         it "prevents drag and drop for discussion checkpoints", priority: "1" do
@@ -821,7 +791,7 @@ describe "calendar2" do
       end
 
       it "does not include the module override in the assignment list" do
-        skip "FOO-5060"
+        skip "FOO-5060 2025-01-26"
         @section1 = CourseSection.create!(name: "Section 1", course: @course)
         student_in_section(@section1, user: @student)
         @assignment = @course.assignments.create!(title: "new assignment")

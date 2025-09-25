@@ -27,6 +27,7 @@ export const MODULES_ARE_PAGINATED = !!ENV.MODULE_FEATURES?.MODULES_ARE_PAGINATE
 export const STUDENT = 'student'
 export const TEACHER = 'teacher'
 export const MODULE_ITEMS = 'moduleItems'
+export const MODULE_ITEMS_ALL = 'moduleItemsAll'
 export const MODULE_ITEMS_STUDENT = 'moduleItemsStudent'
 export const MODULE_ITEM_TITLES = 'moduleItemTitles'
 export const MODULES = 'modules'

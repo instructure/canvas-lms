@@ -33,6 +33,7 @@ class ApplicationController < ActionController::Base
   include Api::V1::WikiPage
   include LegalInformationHelper
   include ObserverEnrollmentsHelper
+  include IgniteAgentHelper
 
   helper :all
 
@@ -286,6 +287,7 @@ class ApplicationController < ActionController::Base
           DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account&.global_id,
           DOMAIN_ROOT_ACCOUNT_UUID: @domain_root_account&.uuid,
           CAREER_THEME_URL: CanvasCareer::ExperienceResolver.career_affiliated_institution?(@domain_root_account) ? CanvasCareer::Config.new(@domain_root_account).theme_url : nil,
+          CAREER_DARK_THEME_URL: CanvasCareer::ExperienceResolver.career_affiliated_institution?(@domain_root_account) ? CanvasCareer::Config.new(@domain_root_account).dark_theme_url : nil,
           k12: k12?,
           help_link_name:,
           help_link_icon:,
@@ -412,16 +414,8 @@ class ApplicationController < ActionController::Base
   def show_career_switch?
     return false unless @current_user
 
-    return false unless @domain_root_account&.feature_enabled?(:horizon_learner_app) ||
-                        @domain_root_account&.feature_enabled?(:horizon_learning_provider_app_on_contextless_routes)
-
-    career_apps = [
-      CanvasCareer::Constants::App::CAREER_LEARNER,
-      CanvasCareer::Constants::App::CAREER_LEARNING_PROVIDER
-    ]
-
     resolver = CanvasCareer::ExperienceResolver.new(@current_user, @context, @domain_root_account, session)
-    resolver.available_apps.intersect?(career_apps)
+    resolver.available_apps.intersect?(CanvasCareer::Constants::CAREER_APPS)
   end
   helper_method :show_career_switch?
 
@@ -469,6 +463,7 @@ class ApplicationController < ActionController::Base
     render_both_to_do_lists
     scheduled_feedback_releases
     speedgrader_studio_media_capture
+    student_access_token_management
     validate_call_to_action
     block_content_editor_ai_alt_text
   ].freeze
@@ -488,8 +483,6 @@ class ApplicationController < ActionController::Base
     disable_iframe_sandbox_file_show
     extended_submission_state
     file_verifiers_for_quiz_links
-    horizon_learner_app
-    horizon_learning_provider_app_on_contextless_routes
     increased_top_nav_pane_size
     instui_nav
     login_registration_ui_identity
@@ -519,6 +512,7 @@ class ApplicationController < ActionController::Base
     send_usage_metrics
     top_navigation_placement
     youtube_migration
+    widget_dashboard
   ].freeze
   JS_ENV_ROOT_ACCOUNT_SERVICES = %i[account_survey_notifications].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = %i[
@@ -1108,7 +1102,6 @@ class ApplicationController < ActionController::Base
       # Allow iframing on all vanity domains as well as the canonical one
       unless @domain_root_account.nil?
         list.concat HostUrl.context_hosts(@domain_root_account, request.host)
-        list << @domain_root_account.horizon_domain if @domain_root_account.horizon_domain
       end
     end
   end
@@ -3509,4 +3502,6 @@ class ApplicationController < ActionController::Base
   def inject_ai_feedback_link
     js_env(AI_FEEDBACK_LINK: Setting.get("ai_feedback_link", "https://inst.bid/ai/feedback"))
   end
+
+  helper_method :add_ignite_agent_bundle
 end

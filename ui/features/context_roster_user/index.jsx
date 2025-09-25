@@ -28,6 +28,9 @@ import '@canvas/loading-image'
 import '@canvas/rails-flash-notifications'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import ready from '@instructure/ready'
+import {AccessTokensSection} from '@canvas/access-tokens/AccessTokensSection'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 
 const I18n = createI18nScope('context.roster_user')
 
@@ -129,5 +132,20 @@ ready(() => {
       <GeneratePairingCode userId={ENV.USER_ID} name={ENV.CONTEXT_USER_DISPLAY_NAME} />,
       container,
     )
+  }
+
+  if (
+    ENV.FEATURES.student_access_token_management &&
+    ENV.PERMISSIONS?.can_view_user_generated_access_tokens
+  ) {
+    const accessTokensContainer = document.getElementById('user_access_tokens_react_mount_point')
+    if (accessTokensContainer) {
+      const accessTokensRoot = ReactDOM.createRoot(accessTokensContainer)
+      accessTokensRoot.render(
+        <QueryClientProvider client={queryClient}>
+          <AccessTokensSection userId={ENV.USER_ID} />
+        </QueryClientProvider>,
+      )
+    }
   }
 })

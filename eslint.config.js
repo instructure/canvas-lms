@@ -21,6 +21,9 @@ module.exports = [
       '**/ui/shared/jquery/**',
       '**/*.config.*',
       '**/jest/**',
+      'ui/shared/graphql/codegen/**',
+      'ui/shared/bundles/extensions.ts',
+      '**/ui/ext/custom_moment_locales/**',
     ],
   },
   {

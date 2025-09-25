@@ -106,22 +106,6 @@ shared_examples "filter SpeedGrader by student group" do |ff_enabled|
       expect(Gradebook::GradeDetailTray.speedgrader_link.attribute("href")).to include(speedgrader_link_text)
     end
 
-    it "loads speedgrader when group selected" do
-      skip("Unskip in EVAL-2501")
-      # select group from gradebook setting
-      @teacher.preferences[:gradebook_settings] = {
-        @course.id => {
-          filter_rows_by: {
-            student_group_id: @category.groups.second.id
-          }
-        }
-      }
-      Speedgrader.visit(@course.id, @assignment.id)
-      # verify
-      Speedgrader.click_students_dropdown
-      expect(Speedgrader.fetch_student_names).to contain_exactly(@group2_students)
-    end
-
     it "disables speedgrader from tray" do
       Gradebook.visit(@course)
       # verify link is disabled and message

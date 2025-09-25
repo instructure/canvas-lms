@@ -138,7 +138,7 @@ describe Canvas::ICU do
         raise "ICU appears to be installed, but we didn't load it correctly"
       end
     rescue NameError
-      skip "ICU is not installed"
+      skip "ICU is not installed" # rubocop:disable Specs/NoSkipWithoutDate,Specs/NoSkipWithoutTicket
     end
 
     def collate(values)

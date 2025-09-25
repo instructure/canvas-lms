@@ -2392,7 +2392,7 @@ describe Attachment do
       expect(att.thumbnail.width).not_to be_nil
     end
 
-    it "does not create thumbnails for larger images" do
+    it "does not create thumbnails for larger images", skip: "RCX-3996 2025-09-12" do
       att = @course.attachments.create! uploaded_data: one_hundred_megapixels_of_highly_compressed_png_data, filename: "3vil.png"
       expect(att.thumbnail).to be_nil
     end
@@ -2583,13 +2583,6 @@ describe Attachment do
       @course.save!
       Timecop.freeze(10.minutes.from_now) { Attachment.do_notifications }
       expect(Message.where(user_id: @student, notification_name: "New File Added").first).to be_nil
-    end
-
-    it "doesn't send notifications for a concluded section in an active course" do
-      skip("This test was not accurate, should be fixed in VICE-4138")
-      attachment_model(uploaded_data: stub_file_data("file.txt", nil, "text/html"), content_type: "text/html")
-      Timecop.freeze(10.minutes.from_now) { Attachment.do_notifications }
-      expect(Message.where(user_id: @student_ended, notification_name: "New File Added").first).to be_nil
     end
   end
 

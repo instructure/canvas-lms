@@ -1846,4 +1846,62 @@ describe "Importing assignments" do
       expect(assignment.assignment_group.name).to eq("Imported Assignments")
     end
   end
+
+  context "LTI import histories" do
+    describe "import_from_migration calls update_lti_import_histories" do
+      let(:course) { course_model }
+      let(:migration) { course.content_migrations.create! }
+      let(:assignment_hash) do
+        {
+          migration_id: "mig123",
+          title: "With LTI context",
+          submission_types: "none",
+          lti_context_id: "source-lti-abc" # this is what triggers the call
+        }
+      end
+
+      it "invokes update_lti_import_histories with the assignment and source id" do
+        expect(Importers::AssignmentImporter)
+          .to receive(:update_lti_import_histories)
+          .with(instance_of(Assignment), "source-lti-abc")
+          .and_call_original
+
+        Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+      end
+
+      it "creates a history row via the import path" do
+        Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+        a = course.assignments.find_by(migration_id: "mig123")
+        expect(Lti::ImportHistory.where(target_lti_id: a.lti_context_id).pluck(:source_lti_id)).to eq(["source-lti-abc"])
+      end
+    end
+
+    describe "update_lti_import_histories" do
+      let(:course) { course_model }
+      let(:assignment) { course.assignments.create!(title: "History Test", submission_types: "none", lti_context_id: "target-1") }
+
+      it "creates a new history row for a previously unseen source id" do
+        expect do
+          Importers::AssignmentImporter.update_lti_import_histories(assignment, "source-1")
+        end.to change { Lti::ImportHistory.where(target_lti_id: assignment.lti_context_id).count }.by(1)
+
+        history = Lti::ImportHistory.where(target_lti_id: assignment.lti_context_id).first
+        expect(history.source_lti_id).to eq "source-1"
+        expect(history.target_lti_id).to eq "target-1"
+      end
+
+      it "does not create a duplicate history row when the source id already exists" do
+        Importers::AssignmentImporter.update_lti_import_histories(assignment, "source-1")
+        expect do
+          Importers::AssignmentImporter.update_lti_import_histories(assignment, "source-1")
+        end.not_to change { Lti::ImportHistory.where(target_lti_id: assignment.lti_context_id).count }
+      end
+
+      it "creates multiple history rows for distinct source ids" do
+        Importers::AssignmentImporter.update_lti_import_histories(assignment, "source-1")
+        Importers::AssignmentImporter.update_lti_import_histories(assignment, "source-2")
+        expect(Lti::ImportHistory.where(target_lti_id: assignment.lti_context_id).pluck(:source_lti_id)).to match_array(%w[source-1 source-2])
+      end
+    end
+  end
 end

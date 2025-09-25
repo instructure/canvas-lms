@@ -46,9 +46,6 @@ describe "calendar2" do
         expect(fj(".fc-agendaWeek-view:visible")).to be_present
       end
 
-      # TODO: reimplement per CNVS-29592, but make sure we're testing at the right level
-      it "should render assignments due just before midnight"
-
       it "shows manual assignment event due saturday after 6pm", priority: "1" do
         load_week_view
         calendar_create_event_button.click
@@ -106,19 +103,6 @@ describe "calendar2" do
         expect(elt_lefts.size).to eql(elts.size)
       end
 
-      it "does not change duration when dragging a short event", priority: "2" do
-        skip("dragging events doesn't seem to work FOO-4335")
-        noon = Time.zone.now.at_beginning_of_day + 12.hours
-        event = @course.calendar_events.create! title: "ohai", start_at: noon, end_at: noon + 5.minutes
-        load_week_view
-
-        elt = fj(".fc-event:visible")
-        driver.action.drag_and_drop_by(elt, 0, 50)
-        wait_for_ajax_requests
-        expect(event.reload.start_at).to eql(noon + 1.hour)
-        expect(event.reload.end_at).to eql(noon + 1.hour + 5.minutes)
-      end
-
       it "doesn't change the time when dragging an event close to midnight", priority: "2" do
         # Choose a fixed date to avoid periodic end-of-week failures
         close_to_midnight = Time.zone.parse("2015-1-1").beginning_of_day + 1.day - 20.minutes
@@ -166,7 +150,7 @@ describe "calendar2" do
     end
 
     it "creates event by clicking on week calendar", priority: "1" do
-      skip("fickle VICE-5319")
+      skip("2025-06-06 fickle VICE-5319")
       title = "from clicking week calendar"
       load_week_view
 
@@ -231,56 +215,6 @@ describe "calendar2" do
       expect(f(".ui-datepicker-calendar")).to include_text("Mo")
     end
 
-    it "extends event time by dragging", priority: "1" do
-      skip("dragging events are flaky and need more research FOO-4335")
-
-      # Create event on current day at 9:00 AM in current time zone
-      midnight = Time.zone.now.beginning_of_day
-      event1 = make_event(start: midnight + 9.hours, end_at: midnight + 10.hours)
-
-      # Create an assignment at noon to be the drag target
-      #   This is a workaround because the rows do not have usable unique identifiers
-      @course.assignments.create!(name: "Title", due_at: midnight + 12.hours)
-
-      # Drag and drop event resizer from first event onto assignment icon
-      load_week_view
-      expect(ff(".fc-view-container .icon-calendar-month")).to have_size(1)
-
-      # Calendar currently has post loading javascript that places the calendar event
-      # In the correct place, however we don't have a wait_ajax_animation that waits
-      # Long enough for this spec to pass given that we drag too soon causing it to fail
-      disable_implicit_wait do
-        keep_trying_until(10) do
-          # Verify Event now ends at assignment start time + 30 minutes
-          drag_and_drop_element(f(".fc-end-resizer"), f(".icon-assignment"))
-          expect(event1.reload.end_at).to eql(midnight + 12.hours + 30.minutes)
-        end
-      end
-    end
-
-    it "makes event all-day by dragging", priority: "1" do
-      skip "drag event isn't happening, might be a :timezone: :bomb:"
-
-      # Create an all-day event to act as drag target
-      #   This is a workaround because the all-day row is positioned absolutely
-      midnight = Time.zone.now.beginning_of_day
-      make_event(title: "Event1", start: midnight, all_day: true)
-
-      # Create a second event, starting at noon, to be drag object
-      event2 = make_event(title: "Event2", start: midnight + 12.hours)
-
-      # Drag object event onto target event using calendar icons
-      load_week_view
-      expect(ff(".fc-view-container .icon-calendar-month")).to have_size(2)
-      icon_array = ff(".fc-view-container .icon-calendar-month")
-      drag_and_drop_element(icon_array[1], icon_array[0])
-      wait_for_ajaximations
-
-      # Verify object event is now all-day
-      expect(event2.reload.all_day).to be(true)
-      expect(event2.start_at).to eql(midnight)
-    end
-
     context "drag and drop" do
       before do
         @saturday = 8
@@ -333,18 +267,6 @@ describe "calendar2" do
         # Calendar item time should stay at 9:00am
         event1.reload
         expect(event1.start_at).to eql(@two_days_later)
-      end
-
-      it "extends all day event by dragging", priority: "2" do
-        skip("dragging events are flaky and need more research FOO-4335")
-
-        start_at_time = Time.zone.today.at_beginning_of_week(:sunday).beginning_of_day
-        event = make_event(title: "Event1", start: start_at_time, all_day: true)
-        load_week_view
-        drag_and_drop_element(f(".fc-resizer"),
-                              f(".fc-row .fc-content-skeleton td:nth-of-type(4)"))
-        event.reload
-        expect(event.end_at).to eq(start_at_time + 3.days)
       end
     end
   end

@@ -18,8 +18,6 @@
 
 import {useContext} from 'react'
 import {HorizonToggleContext} from '../HorizonToggleContext'
-import {Text} from '@instructure/ui-text'
-import {Heading} from '@instructure/ui-heading'
 import {ContentItems} from './ContentItems'
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'

@@ -122,23 +122,6 @@ shared_examples "New Gradebook" do |ff_enabled|
       expect(Gradebook.assignment_menu_selector("No grades to post")).to be_displayed
     end
 
-    it "allows posting grades after they are released", priority: "1" do
-      skip("FOO-2695, probably relates to having to implement browser confirms asynchronously")
-      user_session(@teacher1)
-      ModeratePage.visit(@course.id, @moderated_assignment.id)
-      ModeratePage.select_provisional_grade_for_student_by_position(@student1, 1)
-
-      ModeratePage.click_release_grades_button
-      accept_alert
-      wait_for_ajaximations
-
-      Gradebook.visit(@course)
-      Gradebook.click_assignment_header_menu(@moderated_assignment.id)
-      wait_for_ajaximations
-
-      expect(Gradebook.assignment_menu_selector("Post grades")).to be_displayed
-    end
-
     context "causes editing grades to be" do
       before do
         user_session(@teacher1)

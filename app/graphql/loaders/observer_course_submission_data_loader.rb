@@ -67,6 +67,7 @@ class Loaders::ObserverCourseSubmissionDataLoader < GraphQL::Batch::Loader
                           assignments: { context: course, has_sub_assignments: false },
                           user_id: selected_student.id
                         )
+                        .where.not(workflow_state: "deleted")
                     end
 
       fulfill(course, submissions.is_a?(Array) ? submissions : submissions.to_a)

@@ -24,6 +24,10 @@ module Services
       config["launch_url"]
     end
 
+    def self.api_url
+      config["api_url"]
+    end
+
     class << self
       private
 

@@ -24,7 +24,11 @@ describe RequestThrottle do
   let(:base_req) { { "QUERY_STRING" => "", "PATH_INFO" => "/", "REQUEST_METHOD" => "GET" } }
   let(:request_user_1) { base_req.merge({ "REMOTE_ADDR" => "1.2.3.4", "rack.session" => { user_id: 1 } }) }
   let(:request_user_2) { base_req.merge({ "REMOTE_ADDR" => "4.3.2.1", "rack.session" => { user_id: 2 } }) }
-  let(:token1) { AccessToken.create!(user: user_factory, purpose: "token1") }
+  let(:token1) do
+    AccessToken.create!(user: user_factory, purpose: "token1").tap do |token|
+      token.developer_key.update(unified_tool_id: "sample_utid")
+    end
+  end
   let(:token2) { AccessToken.create!(user: user_factory, purpose: "token2") }
   let(:token_sasu) { AccessToken.create!(developer_key: developer_key_sasu, user: site_admin_service_user) }
   let(:request_query_token) { request_user_1.merge({ "REMOTE_ADDR" => "1.2.3.4", "QUERY_STRING" => "access_token=#{token1.full_token}" }) }
@@ -52,6 +56,13 @@ describe RequestThrottle do
   # not a let so that actual and expected aren't the same object that get modified together
   def response
     [200, { "Content-Type" => "text/plain" }, ["Hello"]]
+  end
+
+  def req(hash)
+    r = ActionDispatch::Request.new(hash).tap(&:fullpath)
+    throttler.inst_access_token_authentication = AuthenticationMethods::InstAccessToken::Authentication.new(r)
+    allow(r).to receive(:user_agent).and_return(hash["USER_AGENT"]) if hash.key?("USER_AGENT")
+    r
   end
 
   before { RequestThrottle.reload! }
@@ -111,23 +122,42 @@ describe RequestThrottle do
       end
     end
 
-    def req(hash)
-      r = ActionDispatch::Request.new(hash).tap(&:fullpath)
-      throttler.inst_access_token_authentication = AuthenticationMethods::InstAccessToken::Authentication.new(r)
-      allow(r).to receive(:user_agent).and_return(hash["USER_AGENT"]) if hash.key?("USER_AGENT")
-      r
-    end
-
     it "uses site admin service user id" do
       expect(throttler.client_identifier(req(request_sasu_query_token))).to eq "service_user_key:#{developer_key_sasu.global_id}"
 
       # make sure we only look up the token once
-      expect(AccessToken).to receive(:authenticate).once.and_call_original
+      allow(AccessToken).to receive(:authenticate).and_call_original
       expect(throttler.client_identifier(req(request_sasu_header_token))).to eq "service_user_key:#{developer_key_sasu.global_id}"
     end
 
     it "uses access token" do
       expect(throttler.client_identifier(req(request_header_token))).to eq "token:#{AccessToken.hashed_token(token2.full_token)}"
+    end
+
+    it "includes vendor identifier when unified_tool_id is present" do
+      # token1 has unified_tool_id set to "sample_utid" in the let block
+      identifiers = throttler.client_identifiers(req(request_query_token))
+      expect(identifiers).to include("vendor:sample_utid")
+    end
+
+    it "includes developer key id" do
+      identifiers = throttler.client_identifiers(req(request_query_token))
+      expect(identifiers).to include("developer_key_id:#{token1.global_developer_key_id}")
+    end
+
+    it "does not use vendor identifier when unified_tool_id is not present" do
+      # token2 does not have unified_tool_id set
+      identifiers = throttler.client_identifiers(req(request_header_token))
+      vendor_identifiers = identifiers.select { |id| id.start_with?("vendor:") }
+      expect(vendor_identifiers).to be_empty
+    end
+
+    it "does not use vendor or developer key identifiers when no access token present" do
+      identifiers = throttler.client_identifiers(req(request_user_2))
+      vendor_identifiers = identifiers.select { |id| id.start_with?("vendor:") }
+      developer_key_identifiers = identifiers.select { |id| id.start_with?("developer_key_id:") }
+      expect(vendor_identifiers).to be_empty
+      expect(developer_key_identifiers).to be_empty
     end
 
     it "uses user id" do
@@ -356,11 +386,11 @@ describe RequestThrottle do
       end
     end
 
-    def throttled_request
+    def throttled_request(client_identifier = "user:1")
       allow(RequestThrottle).to receive(:enabled?).and_return(true)
       allow(Canvas).to receive(:redis_enabled?).and_return(true)
       bucket = double("Bucket")
-      expect(RequestThrottle::LeakyBucket).to receive(:new).with("user:1").and_return(bucket)
+      expect(RequestThrottle::LeakyBucket).to receive(:new).with(client_identifier).and_return(bucket)
       expect(bucket).to receive(:reserve_capacity).and_yield.and_return(1)
       expect(bucket).to receive(:full?).and_return(true)
       expect(bucket).to receive(:to_json) # in the logger.info line
@@ -374,6 +404,21 @@ describe RequestThrottle do
       expected = rate_limit_exceeded
       expected[1]["X-Rate-Limit-Remaining"] = "-2"
       expect(throttler.call(request_user_1)).to eq expected
+    end
+
+    it "logs the access token when a request is throttled" do
+      request = req(request_query_token)
+      client_identifier = throttler.client_identifier(request)
+      bucket = throttled_request(client_identifier)
+      expect(bucket).to receive(:get_up_front_cost_for_path).and_return(1)
+      expect(bucket).to receive(:remaining).and_return(-2)
+
+      allow(RequestContext::Generator).to receive(:add_meta_header).with(any_args)
+      expect(RequestContext::Generator).to receive(:add_meta_header).with("at", token1.global_id)
+      expect(RequestContext::Generator).to receive(:add_meta_header).with("dk", token1.global_developer_key_id)
+      expect(RequestContext::Generator).to receive(:add_meta_header).with("utid", token1.developer_key.unified_tool_id)
+
+      throttler.call(request_query_token)
     end
 
     it "does not throttle if disabled" do

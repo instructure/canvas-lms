@@ -100,7 +100,8 @@ if (ENV.use_dyslexic_font) {
 // Check for high contrast mode from either ENV variable or URL query parameter
 const urlParams = new URLSearchParams(window.location.search)
 const hasHighContrastQueryParam = urlParams.get('instui_theme') === 'canvas_high_contrast'
-const hasCareerQueryParam = urlParams.get('instui_theme') === 'career'
+const hasCareerQueryParam =
+  urlParams.get('instui_theme') === 'career' || urlParams.get('instui_theme') === 'career-dark'
 
 if (ENV.use_high_contrast || hasHighContrastQueryParam) {
   canvasHighContrastTheme.use({overrides: {typography}})
@@ -125,7 +126,7 @@ if (hasCareerQueryParam) {
     window.ENV.use_high_contrast || hasHighContrastQueryParam
       ? canvasHighContrastTheme
       : canvasBaseTheme
-  loadCareerTheme().then(careerTheme => {
+  loadCareerTheme(urlParams.get('instui_theme') === 'career-dark').then(careerTheme => {
     if (careerTheme !== null) {
       baseTheme.use({overrides: careerTheme})
     }

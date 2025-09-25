@@ -82,9 +82,54 @@ module Lti
         end
 
         context "with user not active in context" do
+          before { user.enrollments.first.update!(workflow_state: "inactive") }
+
           it "fails to process the request" do
             get :index, params: valid_params
             expect(response).to have_http_status :unprocessable_entity
+          end
+        end
+
+        context "with course term ended, but not for teachers" do
+          it "processes the request" do
+            term = context.enrollment_term
+            term.update!(end_at: 1.day.ago)
+            term.set_overrides(
+              context.account,
+              "TeacherEnrollment" => { end_at: 1.day.from_now }
+            )
+
+            get :index, params: valid_params
+            expect(response).to be_successful
+          end
+        end
+
+        context "with course term ended, but not for TAs" do
+          it "processes the request" do
+            term = context.enrollment_term
+            term.update!(end_at: 1.day.ago)
+            term.set_overrides(
+              context.account,
+              "TaEnrollment" => { end_at: 1.day.from_now }
+            )
+
+            get :index, params: valid_params
+            expect(response).to be_successful
+          end
+        end
+
+        context "with course term ended for both teachers and TAs" do
+          it "fails to process the request" do
+            term = context.enrollment_term
+            term.update!(end_at: 1.day.ago)
+            term.set_overrides(
+              context.account,
+              "TeacherEnrollment" => { end_at: 1.day.ago },
+              "TaEnrollment" => { end_at: 1.day.ago }
+            )
+
+            get :index, params: valid_params
+            expect(response).to have_http_status(:unprocessable_entity)
           end
         end
 

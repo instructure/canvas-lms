@@ -116,9 +116,9 @@ shared_context "in-process server selenium tests" do
   after do |example|
     if example.exception&.message&.include?("disconnected: not connected to DevTools")
       # exit this process to avoid further exceptions
-      puts "Exiting due to browser crash!"
-      puts example.exception.full_message
-      exit!
+      Rails.logger.error "Exiting due to browser crash!"
+      Rails.logger.error example.exception.full_message
+      raise SystemExit
     end
   end
 
@@ -173,7 +173,7 @@ shared_context "in-process server selenium tests" do
       deprecations = browser_logs.select { |l| l.message =~ /\[.*deprecated./ }.map do |l|
         ">>> #{spec_file}: \"#{example.description}\": #{driver.current_url}: #{l.message.gsub(/.*Warning/, "Warning")}"
       end
-      puts "\n", deprecations.uniq
+      Rails.logger.warn deprecations.uniq.join("\n")
     end
 
     if !example.metadata[:ignore_js_errors] && browser_logs.present?
@@ -231,6 +231,7 @@ shared_context "in-process server selenium tests" do
         "Found a 'popup' attribute. If you are testing the popup API, you must enable Experimental Web Platform Features.",
         "Uncaught DOMException: play() failed because the user didn't interact with the document first.",
         "security - Refused to frame 'https://drive.google.com/' because an ancestor violates the following Content Security Policy directive: \"frame-ancestors https://docs.google.com\".",
+        "security - [Report Only] Refused to frame 'https://drive.google.com/' because an ancestor violates the following Content Security Policy directive: \"frame-ancestors 'self'\".",
         "This file should be served over HTTPS.", # tests are not run over https, this error is expected
         "Uncaught DOMException: signal is aborted without reason", # Investigate as part of LX-2075
         "Support for string refs",

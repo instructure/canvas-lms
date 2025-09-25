@@ -27,29 +27,19 @@ module CanvasCareer
     end
 
     def learner_app_launch_url
-      if @root_account.feature_enabled?(:horizon_injected_config)
-        config["learner_launch_url"]
-      else
-        @root_account.horizon_url("remoteEntry.js").to_s
-      end
+      config["learner_launch_url"]
     end
 
     def learning_provider_app_launch_url
-      if @root_account.feature_enabled?(:horizon_injected_config)
-        config["learning_provider_launch_url"]
-      else
-        @root_account.horizon_url("learning-provider/remoteEntry.js").to_s
-      end
-    end
-
-    # This is the account's url on *.canvasforcareer.com. The redirect strategy is legacy
-    # and will be removed once the MF approach is adopted.
-    def learner_app_redirect_url(path)
-      @root_account.horizon_redirect_url(path)
+      config["learning_provider_launch_url"]
     end
 
     def theme_url
       config["theme_url"]
+    end
+
+    def dark_theme_url
+      config["dark_theme_url"]
     end
 
     # These values are passed to the frontend; they should not contain any secrets!

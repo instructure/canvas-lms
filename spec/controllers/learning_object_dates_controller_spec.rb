@@ -2225,4 +2225,152 @@ describe LearningObjectDatesController do
       end
     end
   end
+
+  describe "peer review sub assignment functionality" do
+    before :once do
+      @assignment_with_peer_review = @course.assignments.create!(
+        title: "Assignment with Peer Review",
+        due_at: "2025-09-10T18:00:00Z",
+        peer_reviews: true,
+        peer_review_count: 2
+      )
+    end
+
+    context "when peer_review_allocation_and_grading feature flag is enabled" do
+      before :once do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        @peer_review_sub_assignment = PeerReviewSubAssignment.create!(
+          title: "Peer Review Sub Assignment",
+          parent_assignment: @assignment_with_peer_review,
+          due_at: "2025-09-15T18:00:00Z",
+          unlock_at: "2025-09-10T08:00:00Z",
+          lock_at: "2025-09-30T18:00:00Z",
+          only_visible_to_overrides: false
+        )
+        @assignment_with_peer_review.reload
+      end
+
+      context "without peer review sub assignment overrides" do
+        it "includes peer_review_sub_assignment when include_peer_review=true is specified" do
+          get :show, params: { course_id: @course.id, assignment_id: @assignment_with_peer_review.id, include_peer_review: true }
+          expect(response).to be_successful
+
+          json = json_parse
+          expect(json).to have_key("peer_review_sub_assignment")
+
+          peer_review_data = json["peer_review_sub_assignment"]
+          expect(peer_review_data["id"]).to eq(@peer_review_sub_assignment.id)
+          expect(peer_review_data["due_at"]).to eq("2025-09-15T18:00:00Z")
+          expect(peer_review_data["unlock_at"]).to eq("2025-09-10T08:00:00Z")
+          expect(peer_review_data["lock_at"]).to eq("2025-09-30T18:00:00Z")
+          expect(peer_review_data["only_visible_to_overrides"]).to be false
+          expect(peer_review_data["visible_to_everyone"]).to be true
+          expect(peer_review_data["overrides"]).to eq([])
+        end
+
+        it "does not include peer_review_sub_assignment when include_peer_review is not specified" do
+          get :show, params: { course_id: @course.id, assignment_id: @assignment_with_peer_review.id }
+          expect(response).to be_successful
+
+          json = json_parse
+          expect(json).not_to have_key("peer_review_sub_assignment")
+        end
+      end
+
+      context "with peer review sub assignment overrides" do
+        before :once do
+          @section = @course.course_sections.create!(name: "Test Section")
+          @peer_review_override = @peer_review_sub_assignment.assignment_overrides.create!(
+            course_section: @section,
+            due_at: "2025-09-12T18:00:00Z",
+            unlock_at: "2025-09-07T08:00:00Z",
+            lock_at: "2025-09-17T18:00:00Z",
+            due_at_overridden: true,
+            unlock_at_overridden: true,
+            lock_at_overridden: true
+          )
+        end
+
+        it "includes peer review sub assignment with overrides in response when include_peer_review=true is specified" do
+          get :show, params: { course_id: @course.id, assignment_id: @assignment_with_peer_review.id, include_peer_review: true }
+          expect(response).to be_successful
+
+          json = json_parse
+          expect(json).to have_key("peer_review_sub_assignment")
+
+          peer_review_data = json["peer_review_sub_assignment"]
+          expect(peer_review_data["id"]).to eq(@peer_review_sub_assignment.id)
+          expect(peer_review_data["overrides"]).to have(1).item
+
+          override_data = peer_review_data["overrides"][0]
+          expect(override_data["id"]).to eq(@peer_review_override.id)
+          expect(override_data["assignment_id"]).to eq(@peer_review_sub_assignment.id)
+          expect(override_data["course_section_id"]).to eq(@section.id)
+          expect(override_data["title"]).to eq("Test Section")
+          expect(override_data["due_at"]).to eq("2025-09-12T18:00:00Z")
+          expect(override_data["unlock_at"]).to eq("2025-09-07T08:00:00Z")
+          expect(override_data["lock_at"]).to eq("2025-09-17T18:00:00Z")
+        end
+
+        it "includes both main assignment overrides and peer review sub assignment overrides when include_peer_review=true is specified" do
+          main_override = @assignment_with_peer_review.assignment_overrides.create!(
+            course_section: @section,
+            due_at: "2025-09-05T18:00:00Z",
+            due_at_overridden: true
+          )
+
+          get :show, params: { course_id: @course.id, assignment_id: @assignment_with_peer_review.id, include_peer_review: true }
+          expect(response).to be_successful
+
+          json = json_parse
+
+          expect(json["overrides"]).to have(1).item
+          expect(json["overrides"][0]["id"]).to eq(main_override.id)
+          expect(json["overrides"][0]["assignment_id"]).to eq(@assignment_with_peer_review.id)
+          expect(json["peer_review_sub_assignment"]["overrides"]).to have(1).item
+          expect(json["peer_review_sub_assignment"]["overrides"][0]["id"]).to eq(@peer_review_override.id)
+          expect(json["peer_review_sub_assignment"]["overrides"][0]["assignment_id"]).to eq(@peer_review_sub_assignment.id)
+        end
+      end
+    end
+
+    context "when peer_review_allocation_and_grading feature flag is disabled" do
+      before :once do
+        # Peer review sub assignment that exists but should not be shown
+        @hidden_peer_review_sub_assignment = PeerReviewSubAssignment.create!(
+          title: "Hidden Peer Review Sub Assignment",
+          parent_assignment: @assignment_with_peer_review
+        )
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+        @assignment_with_peer_review.reload
+      end
+
+      it "does not include peer_review_sub_assignment in response" do
+        get :show, params: { course_id: @course.id, assignment_id: @assignment_with_peer_review.id }
+        expect(response).to be_successful
+
+        json = json_parse
+        expect(json).not_to have_key("peer_review_sub_assignment")
+      end
+    end
+
+    context "when assignment does not have peer reviews enabled" do
+      before :once do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        @assignment_without_peer_review = @course.assignments.create!(
+          title: "Assignment without Peer Review",
+          due_at: "2025-09-12T00:00:00Z",
+          peer_reviews: false
+        )
+      end
+
+      it "does not include peer_review_sub_assignment" do
+        get :show, params: { course_id: @course.id, assignment_id: @assignment_without_peer_review.id }
+        expect(response).to be_successful
+
+        json = json_parse
+        expect(json).not_to have_key("peer_review_sub_assignment")
+      end
+    end
+  end
 end

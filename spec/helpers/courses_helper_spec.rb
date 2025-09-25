@@ -359,4 +359,83 @@ describe CoursesHelper do
       expect(recent_event_url(@assignment)).to eq "/courses/#{@course.id}/assignments/#{@assignment.id}"
     end
   end
+
+  describe "#copy_course_authorized?" do
+    let(:root_account) { Account.default }
+    let(:mcc_account) { root_account.manually_created_courses_account }
+    let(:other_account) { account_model(parent_account: root_account) }
+    let(:user) { user_model }
+    let(:course_in_mcc) { course_model(account: mcc_account) }
+    let(:course_in_other) { course_model(account: other_account) }
+
+    before do
+      @domain_root_account = root_account
+    end
+
+    context "when show_user_create_course_button returns false" do
+      it "returns false immediately" do
+        allow(self).to receive(:show_user_create_course_button).and_return(false)
+
+        result = copy_course_authorized?(user, course_in_mcc)
+
+        expect(result).to be false
+      end
+    end
+
+    context "when show_user_create_course_button returns true" do
+      before do
+        allow(self).to receive(:show_user_create_course_button).and_return(true)
+      end
+
+      context "when teachers_can_create_courses_anywhere is true" do
+        before do
+          allow(root_account).to receive(:teachers_can_create_courses_anywhere?).and_return(true)
+        end
+
+        it "returns true regardless of other conditions" do
+          course_in_other.enroll_teacher(user, enrollment_state: "active")
+
+          result = copy_course_authorized?(user, course_in_other)
+
+          expect(result).to be true
+        end
+      end
+
+      context "when course is in manually created courses account" do
+        before do
+          allow(root_account).to receive(:teachers_can_create_courses_anywhere?).and_return(false)
+        end
+
+        it "returns true" do
+          result = copy_course_authorized?(user, course_in_mcc)
+
+          expect(result).to be true
+        end
+      end
+
+      context "when teachers_can_create_courses_anywhere is false and course is not in MCC account" do
+        before do
+          allow(root_account).to receive(:teachers_can_create_courses_anywhere?).and_return(false)
+        end
+
+        it "returns false" do
+          result = copy_course_authorized?(user, course_in_other)
+
+          expect(result).to be false
+        end
+      end
+
+      context "when all restrictions allow" do
+        before do
+          allow(root_account).to receive(:teachers_can_create_courses_anywhere?).and_return(false)
+        end
+
+        it "returns true when course is in MCC account" do
+          result = copy_course_authorized?(user, course_in_mcc)
+
+          expect(result).to be true
+        end
+      end
+    end
+  end
 end

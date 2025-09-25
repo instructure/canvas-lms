@@ -141,24 +141,27 @@ export default function HistoryList() {
                     <Link
                       href={entry.visited_url}
                       aria-label={`${entry.asset_name}, ${entry.asset_readable_category}`}
+                      aria-describedby={`history_list_${entry.asset_code}`}
                     >
                       {entry.asset_name}
                     </Link>
-                    <Text as="div" transform="uppercase" size="x-small" lineHeight="condensed">
-                      {entry.context_name}
-                    </Text>
-                    <Text
-                      data-testid={`${entry.asset_code}_time_ago`}
-                      as="div"
-                      size="x-small"
-                      color="secondary"
-                      lineHeight="condensed"
-                      className="time_ago_date"
-                      data-timestamp={entry.visited_at}
-                      title={formatTimeAgoTitle(entry.visited_at)}
-                    >
-                      {formatTimeAgoDate(entry.visited_at)}
-                    </Text>
+                    <div id={`history_list_${entry.asset_code}`}>
+                      <Text as="div" transform="uppercase" size="x-small" lineHeight="condensed">
+                        {entry.context_name}
+                      </Text>
+                      <Text
+                        data-testid={`${entry.asset_code}_time_ago`}
+                        as="div"
+                        size="x-small"
+                        color="secondary"
+                        lineHeight="condensed"
+                        className="time_ago_date"
+                        data-timestamp={entry.visited_at}
+                        title={formatTimeAgoTitle(entry.visited_at)}
+                      >
+                        {formatTimeAgoDate(entry.visited_at)}
+                      </Text>
+                    </div>
                   </Flex.Item>
                 </Flex>
               </List.Item>

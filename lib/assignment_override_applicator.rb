@@ -407,7 +407,7 @@ module AssignmentOverrideApplicator
         %i[due_at all_day all_day_date unlock_at lock_at].each do |field|
           next unless learning_object.respond_to?(field)
 
-          value = send(:"overridden_#{field}", learning_object, overrides)
+          value = send(:"overridden_#{field}", learning_object, overrides, user)
           # force times to un-zoned UTC -- this will be a cached value and should
           # not care about the TZ of the user that cached it. the user's TZ will
           # be applied before it's returned.
@@ -426,26 +426,26 @@ module AssignmentOverrideApplicator
   end
 
   # perform overrides of specific fields
-  def self.override_for_due_at(learning_object, overrides)
+  def self.override_for_due_at(learning_object, overrides, user = nil)
     due_at_overrides = if overrides.all? { |o| !o.context_module_id.nil? }
                          overrides
                        else
                          overrides.select(&:due_at_overridden)
                        end
-    select_override_by_attribute(learning_object, due_at_overrides, :due_at, :max)
+    select_override_by_attribute(learning_object, due_at_overrides, :due_at, :max, user)
   end
 
-  def self.override_for_unlock_at(learning_object, overrides)
+  def self.override_for_unlock_at(learning_object, overrides, user = nil)
     unlock_at_overrides = overrides.select(&:unlock_at_overridden)
     # CNVS-24849 if the override has been locked it's unlock_at no longer applies
     unlock_at_overrides.reject!(&:availability_expired?)
-    select_override_by_attribute(learning_object, unlock_at_overrides, :unlock_at, :min)
+    select_override_by_attribute(learning_object, unlock_at_overrides, :unlock_at, :min, user)
   end
   private_class_method :override_for_unlock_at
 
-  def self.override_for_lock_at(learning_object, overrides)
+  def self.override_for_lock_at(learning_object, overrides, user = nil)
     lock_at_overrides = overrides.select(&:lock_at_overridden)
-    select_override_by_attribute(learning_object, lock_at_overrides, :lock_at, :max)
+    select_override_by_attribute(learning_object, lock_at_overrides, :lock_at, :max, user)
   end
   private_class_method :override_for_lock_at
 
@@ -460,12 +460,12 @@ module AssignmentOverrideApplicator
   # * Individual and Group overrides are always considered "active".
   #   A Section override that applies to an enrollment that has a state that is not "active" is
   #   considered an "inactive override" for that enrollment's user.
-  def self.select_override_by_attribute(learning_object, overrides, attribute, comparison)
+  def self.select_override_by_attribute(learning_object, overrides, attribute, comparison, user = nil)
     nonactive_overrides, applicable_overrides = overrides.partition(&:for_nonactive_enrollment?)
     selected = if applicable_overrides.any?
-                 select_override(applicable_overrides, attribute, comparison)
+                 select_override(applicable_overrides, attribute, comparison, user, learning_object)
                elsif learning_object.only_visible_to_overrides && nonactive_overrides.any?
-                 select_override(nonactive_overrides, attribute, comparison)
+                 select_override(nonactive_overrides, attribute, comparison, user, learning_object)
                end
     if !selected || selected.unassign_item
       learning_object
@@ -475,8 +475,12 @@ module AssignmentOverrideApplicator
   end
   private_class_method :select_override_by_attribute
 
-  def self.select_override(overrides, attribute, comparison)
-    if (adhoc_override = overrides.detect(&:adhoc?))
+  def self.select_override(overrides, attribute, comparison, user = nil, learning_object = nil)
+    context = learning_object&.context
+    is_admin = user && context && (context.user_has_been_admin?(user) || context.user_has_no_enrollments?(user))
+    adhoc_override = overrides.detect(&:adhoc?)
+
+    if adhoc_override && !(attribute == :lock_at && is_admin)
       adhoc_override
     elsif (override = overrides.detect { |o| o.public_send(attribute).nil? })
       override
@@ -488,24 +492,24 @@ module AssignmentOverrideApplicator
   end
   private_class_method :select_override
 
-  def self.overridden_due_at(learning_object, overrides)
-    override_for_due_at(learning_object, overrides).due_at
+  def self.overridden_due_at(learning_object, overrides, user = nil)
+    override_for_due_at(learning_object, overrides, user).due_at
   end
 
-  def self.overridden_all_day(assignment, overrides)
-    override_for_due_at(assignment, overrides).all_day
+  def self.overridden_all_day(assignment, overrides, user = nil)
+    override_for_due_at(assignment, overrides, user).all_day
   end
 
-  def self.overridden_all_day_date(assignment, overrides)
-    override_for_due_at(assignment, overrides).all_day_date
+  def self.overridden_all_day_date(assignment, overrides, user = nil)
+    override_for_due_at(assignment, overrides, user).all_day_date
   end
 
-  def self.overridden_unlock_at(learning_object, overrides)
-    override_for_unlock_at(learning_object, overrides).unlock_at
+  def self.overridden_unlock_at(learning_object, overrides, user = nil)
+    override_for_unlock_at(learning_object, overrides, user).unlock_at
   end
 
-  def self.overridden_lock_at(learning_object, overrides)
-    override_for_lock_at(learning_object, overrides).lock_at
+  def self.overridden_lock_at(learning_object, overrides, user = nil)
+    override_for_lock_at(learning_object, overrides, user).lock_at
   end
 
   def self.should_preload_override_students?(assignments, user, endpoint_key)

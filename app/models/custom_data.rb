@@ -46,10 +46,8 @@ class CustomData < ActiveRecord::Base
 
   validates :user, :namespace, presence: true
 
-  before_save :synchronize_data_fields
-
   def get_data(scope)
-    hash_data_from_scope(data, "d/#{scope}")
+    hash_data_from_scope(data_json, "d/#{scope}")
   end
 
   def lock_and_save
@@ -61,37 +59,11 @@ class CustomData < ActiveRecord::Base
   end
 
   def set_data(scope, val)
-    set_hash_data_from_scope(data, "d/#{scope}", val)
+    set_hash_data_from_scope(data_json, "d/#{scope}", val)
   end
 
   def delete_data(scope)
-    delete_hash_data_from_scope(data, "d/#{scope}")
-  end
-
-  # Temporary methods to synchronize data_json and data until the legacy `data` is
-  # removed in a subsequent release
-  def data
-    data_json.presence || super || {}
-  end
-
-  def data=(value)
-    self.data_json = super
-  end
-
-  # rubocop:disable Lint/UselessMethodDefinition
-  def data_json=(value)
-    super
-  end
-  # rubocop:enable Lint/UselessMethodDefinition
-
-  private :data_json=
-
-  def synchronize_data_fields
-    if (changed.include?("data_json") && !changed.include?("data")) || (self["data_json"].present? && self["data"].blank?)
-      self["data"] = self["data_json"]
-    elsif (changed.include?("data") && !changed.include?("data_json")) || (self["data"].present? && self["data_json"].blank?)
-      self["data_json"] = self["data"]
-    end
+    delete_hash_data_from_scope(data_json, "d/#{scope}")
   end
 
   private

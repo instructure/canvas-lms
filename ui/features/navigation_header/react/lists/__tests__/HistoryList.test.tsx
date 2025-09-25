@@ -103,6 +103,13 @@ describe('HistoryList', () => {
     expect(discussionLink).toHaveAttribute('href', historyPage1[0].visited_url)
   })
 
+  it('links descriptive text to the link', () => {
+    const {getByText, container} = renderWithClient(<HistoryList />)
+    const discussionLink = getByText('Longitude vs Latitude')
+    expect(discussionLink).toHaveAttribute('aria-describedby', 'history_list_discussion_topic_1')
+    expect(container.querySelector('#history_list_discussion_topic_1')).toBeInTheDocument()
+  })
+
   it('renders context', () => {
     const {getByText} = renderWithClient(<HistoryList />)
     expect(getByText('Cartography 100')).toBeInTheDocument()

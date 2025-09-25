@@ -137,10 +137,10 @@ module Types
             # This is used when the student Grades is visited by a grader. Not implemented yet.
             next
           else
-            Loaders::SubmissionLtiAssetReportsLoader.load(object.id)
+            Loaders::SubmissionLtiAssetReportsLoader.for(is_student: false).load(object.id)
           end
-        elsif object.user_can_read_grade?(current_user)
-          Loaders::SubmissionLtiAssetReportsStudentLoader.load(object.id)
+        elsif object.user_can_read_grade?(current_user, for_plagiarism: true)
+          Loaders::SubmissionLtiAssetReportsLoader.for(is_student: true).load(object.id)
         end
       end
     end

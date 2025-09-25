@@ -33,6 +33,8 @@ class AccessToken < ActiveRecord::Base
   attr_reader :full_token
   attr_reader :plaintext_refresh_token
 
+  scope :user_generated, -> { where(developer_key_id: DeveloperKey.default.id) }
+
   belongs_to :developer_key
   belongs_to :user, inverse_of: :access_tokens
   belongs_to :real_user, inverse_of: :masquerade_tokens, class_name: "User"
@@ -105,16 +107,19 @@ class AccessToken < ActiveRecord::Base
     end
     can :create and can :update
 
+    given { |user| user.id == user_id }
+    can :read and can :delete
+
     given do |user|
       self.user.check_accounts_right?(user, :create_access_tokens)
     end
     can :create and can :update
 
-    given { |user| user.id == user_id }
-    can :read and can :delete
-
     given { |user| self.user.check_accounts_right?(user, :delete_access_tokens) }
     can :delete
+
+    given { |user| self.user.check_accounts_right?(user, :view_user_generated_access_tokens) && developer_key_id == DeveloperKey.default.id }
+    can :read
   end
 
   # For user-generated tokens, purpose should always be set.
@@ -141,7 +146,7 @@ class AccessToken < ActiveRecord::Base
     run_callbacks(:destroy) { save! }
   end
 
-  def self.authenticate(token_string, token_key = :crypted_token, access_token = nil, load_pseudonym_from_access_token: false)
+  def self.authenticate(token_string, token_key = :crypted_token, access_token = nil, load_pseudonym_from_access_token: false, eager_load_developer_key: false)
     # hash the user supplied token with all of our known keys
     # attempt to find a token that matches one of the hashes
     hashed_tokens = all_hashed_tokens(token_string)
@@ -150,7 +155,9 @@ class AccessToken < ActiveRecord::Base
         access_token
       else
         scope = load_pseudonym_from_access_token ? self : not_deleted
-        scope.where(token_key => hashed_tokens).order(Arel.sql("workflow_state = 'active' DESC, workflow_state")).first
+        scope = scope.where(token_key => hashed_tokens).order(Arel.sql("#{AccessToken.table_name}.workflow_state = 'active' DESC, #{AccessToken.table_name}.workflow_state"))
+        scope = scope.eager_load(:developer_key) if eager_load_developer_key
+        scope.first
       end
     if token && token.send(token_key) != hashed_tokens.first
       # we found the token but, its hashed using an old key. save the updated hash
@@ -393,6 +400,7 @@ class AccessToken < ActiveRecord::Base
     developer_key.account_id
   end
 
+  # If you have a relation, please use the `user_generated` scope instead of this method.
   def manually_created?
     developer_key_id == DeveloperKey.default.id || developer_key&.name == DeveloperKey::DEFAULT_KEY_NAME
   end
@@ -416,9 +424,19 @@ class AccessToken < ActiveRecord::Base
   end
 
   def queue_developer_key_token_count_increment
-    developer_key&.shard&.activate do
-      strand = "developer_key_token_count_increment_#{developer_key.global_id}"
-      DeveloperKey.delay_if_production(strand:).increment_counter(:access_token_count, developer_key.id)
+    return if developer_key.nil? || developer_key.shard == Shard.default
+
+    developer_key.shard.activate do
+      # Previously this enqueued a delayed job per token creation to increment
+      # the developer key's access_token_count. High-volume token creation was
+      # overwhelming the job shard(s) with many trivial increment jobs, especially
+      # when multiple shards created tokens referencing the same developer key.
+      #
+      # Using ActiveRecord.increment_counter here performs a single, atomic
+      # UPDATE statement (SET access_token_count = access_token_count + 1) on
+      # the developer key's shard, avoiding the background job overhead while
+      # still remaining contention-safe at the DB level.
+      DeveloperKey.increment_counter(:access_token_count, developer_key.id)
     end
   end
 end

@@ -126,6 +126,7 @@ export interface EnvCommon {
   current_user_roles: string[]
   current_user_is_student: boolean
   current_user_is_admin: boolean
+  user_is_only_student: boolean
   current_user_types: string[]
   current_user_disabled_inbox: boolean
   current_user_visited_tabs: null | string[]
@@ -153,6 +154,7 @@ export interface EnvCommon {
   LTI_TOOL_SCOPES?: {[key: string]: string[]}
   DEEP_LINKING_POST_MESSAGE_ORIGIN: string
   CAREER_THEME_URL?: string
+  CAREER_DARK_THEME_URL?: string
   comment_library_suggestions_enabled: boolean
   INCOMPLETE_REGISTRATION: boolean
   SETTINGS: Record<Setting, boolean>
@@ -307,6 +309,7 @@ export type SiteAdminFeatureId =
   | 'render_both_to_do_lists'
   | 'scheduled_feedback_releases'
   | 'speedgrader_studio_media_capture'
+  | 'student_access_token_management'
   | 'validate_call_to_action'
   | 'youtube_migration'
   | 'youtube_overlay'
@@ -328,8 +331,6 @@ export type RootAccountFeatureId =
   | 'create_course_subaccount_picker'
   | 'disable_iframe_sandbox_file_show'
   | 'extended_submission_state'
-  | 'horizon_learner_app'
-  | 'horizon_learning_provider_app_on_contextless_routes'
   | 'increased_top_nav_pane_size'
   | 'instui_nav'
   | 'login_registration_ui_identity'

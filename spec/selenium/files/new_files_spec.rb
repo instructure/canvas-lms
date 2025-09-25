@@ -265,41 +265,6 @@ describe "better_file_browsing" do
         expect(fln(file)).to be_displayed
       end
     end
-
-    context "Search Results" do
-      def search_and_move(file_name: "", destination: "My Files")
-        f("input[type='search']").send_keys file_name, :return
-        expect(f(".ef-item-row")).to include_text file_name
-        move(file_name, 0, :cog_icon, destination)
-        final_destination = destination.split("/").pop
-        expect(f("#flash_message_holder")).to include_text "#{file_name} moved to #{final_destination}"
-        fj("a.treeLabel span:contains('#{final_destination}')").click
-        expect(fln(file_name)).to be_displayed
-      end
-
-      before(:once) do
-        user_files = ["a_file.txt", "b_file.txt"]
-        user_files.map { |text_file| add_file(fixture_file_upload(text_file.to_s, "text/plain"), @teacher, text_file) }
-        # Course file
-        add_file(fixture_file_upload("c_file.txt", "text/plain"), @course, "c_file.txt")
-      end
-
-      let(:folder_name) { "destination_folder" }
-
-      it "moves a file to a destination if contexts are different", upgrade_files_v2: "done" do
-        skip_if_chrome("research")
-        folder_model(name: folder_name)
-        get "/files"
-        search_and_move(file_name: "a_file.txt", destination: "#{@course.name}/#{folder_name}")
-      end
-
-      it "moves a file to a destination if the contexts are the same", upgrade_files_v2: "done" do
-        skip_if_chrome("research")
-        folder_model(name: folder_name, context: @user)
-        get "/files"
-        search_and_move(file_name: "a_file.txt", destination: folder_name)
-      end
-    end
   end
 
   context "Publish Cloud Dialog" do

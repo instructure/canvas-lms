@@ -196,4 +196,30 @@ describe AccountUser do
       end
     end
   end
+
+  describe "#destroy" do
+    it "allows deleting account users" do
+      user_model
+      au = Account.default.account_users.create!(user: @user)
+      expect(au.destroy).to be(true)
+      expect(au).to be_deleted
+    end
+
+    it "records an audit log record" do
+      user_model
+      au = Account.default.account_users.create!(user: @user)
+      au.destroy
+      expect(au.auditor_records.where(action: "deleted")).to exist
+    end
+
+    context "with current_user specified" do
+      it "records an audit log with the current_user" do
+        performing_user = user_model
+        au = Account.default.account_users.create!(user: user_model)
+        au.current_user = performing_user
+        au.destroy
+        expect(au.auditor_records.where(action: "deleted", performing_user: performing_user.id)).to exist
+      end
+    end
+  end
 end

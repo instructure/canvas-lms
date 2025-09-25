@@ -457,30 +457,6 @@ describe "LTI integration tests" do
   context "sharding" do
     specs_require_sharding
 
-    # TODO: Replace this once we have LTIInbound
-    it "roundtrips source ids from mixed shards", :skip do
-      @shard1.activate do
-        @account = Account.create!
-        course_with_teacher(active_all: true, account: @account)
-        @tool = @course.context_external_tools.create!(domain: "example.com", consumer_key: "12345", shared_secret: "secret", privacy_level: "anonymous", name: "tool")
-        assignment_model(submission_types: "external_tool", course: @course)
-        tag = @assignment.build_external_tool_tag(url: "http://example.com/one")
-        tag.content_type = "ContextExternalTool"
-        tag.save!
-      end
-      user_factory
-      @course.enroll_student(@user)
-
-      source_id = @tool.shard.activate do
-        payload = [@tool.id, @course.id, @assignment.id, @user.id].join("-")
-        "#{payload}-#{Canvas::Security.hmac_sha1(payload, @tool.shard.settings[:encryption_key])}"
-      end
-
-      assignment, user = BasicLTI::BasicOutcomes.decode_source_id(@tool, source_id)
-      expect(assignment).to eq @assignment
-      expect(user).to eq @user
-    end
-
     it "provides different user ids for users with the same local id from different shards" do
       user1 = @shard1.activate do
         user_with_managed_pseudonym(sis_user_id: "testfun", name: "A Name")

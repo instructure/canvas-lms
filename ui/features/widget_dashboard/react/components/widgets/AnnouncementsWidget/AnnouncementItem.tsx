@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useMemo} from 'react'
+import React, {useMemo, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
@@ -30,6 +30,8 @@ import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime
 import type {Announcement} from '../../../types'
 import {useToggleAnnouncementReadState} from '../../../hooks/useToggleAnnouncementReadState'
 import {CourseCode} from '../../shared/CourseCode'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {FilterOption} from './utils'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -44,25 +46,43 @@ interface TruncatedTextProps {
 }
 
 const TruncatedText: React.FC<TruncatedTextProps> = ({children, maxLength = 80}) => (
-  <span title={children.length > maxLength ? children : undefined}>
+  <Text title={children.length > maxLength ? children : undefined} wrap="break-word" size="x-small">
     {truncateText(children, maxLength)}
-  </span>
+  </Text>
 )
 
 interface AnnouncementItemProps {
-  announcement: Announcement
+  announcementItem: Announcement
+  filter: FilterOption
 }
 
-const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcement}) => {
+const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcementItem, filter}) => {
   const toggleReadState = useToggleAnnouncementReadState()
+  const [announcement, setAnnouncement] = useState(announcementItem)
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleToggleReadState = async () => {
+    setIsLoading(true)
     try {
       await toggleReadState.mutateAsync({
         discussionTopicId: announcement.id,
         read: !announcement.isRead,
       })
+      if (filter === 'all') {
+        // No need to set isLoading to false on `finally` or `success` as the item will
+        // be removed from the list, unless filtering by all
+        setAnnouncement(prev => ({
+          ...prev,
+          isRead: !prev.isRead,
+        }))
+        setIsLoading(false)
+      }
     } catch (error) {
+      showFlashAlert({
+        message: I18n.t("An error ocurred while changing the announcement's read state"),
+        type: 'error',
+      })
+      setIsLoading(false)
       console.error('Failed to toggle read state:', error)
     }
   }
@@ -79,50 +99,39 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcement}) => {
   )
 
   const renderReadUnreadButton = () => {
-    if (toggleReadState.isPending) {
-      return (
-        <IconButton
-          size="small"
-          withBackground={false}
-          withBorder={false}
-          screenReaderLabel={I18n.t('Updating...')}
-          disabled={true}
-          data-testid={`updating-${announcement.id}`}
-        >
-          <Spinner size="x-small" renderTitle={I18n.t('Updating read status')} />
-        </IconButton>
-      )
-    }
+    const isRead = announcement.isRead
 
-    if (announcement.isRead) {
-      return (
-        <IconButton
-          size="small"
-          withBackground={false}
-          withBorder={false}
-          screenReaderLabel={I18n.t('Mark as unread')}
-          onClick={handleToggleReadState}
-          disabled={toggleReadState.isPending}
-          data-testid={`mark-unread-${announcement.id}`}
-        >
-          <IconCheckMarkSolid color="success" size="x-small" />
-        </IconButton>
-      )
-    } else {
-      return (
-        <IconButton
-          size="small"
-          withBackground={false}
-          withBorder={false}
-          screenReaderLabel={I18n.t('Mark as read')}
-          onClick={handleToggleReadState}
-          disabled={toggleReadState.isPending}
-          data-testid={`mark-read-${announcement.id}`}
-        >
-          <IconEmptyLine color="secondary" size="x-small" />
-        </IconButton>
-      )
-    }
+    const label = isLoading
+      ? I18n.t('Updating...')
+      : isRead
+        ? I18n.t('Mark as unread')
+        : I18n.t('Mark as read')
+
+    const testId = isLoading
+      ? `updating-${announcement.id}`
+      : `${isRead ? 'mark-unread' : 'mark-read'}-${announcement.id}`
+
+    const content = isLoading ? (
+      <Spinner size="x-small" renderTitle={I18n.t('Updating read status')} />
+    ) : isRead ? (
+      <IconCheckMarkSolid color="success" size="x-small" />
+    ) : (
+      <IconEmptyLine color="secondary" size="x-small" />
+    )
+
+    return (
+      <IconButton
+        size="small"
+        withBackground={false}
+        withBorder={false}
+        onClick={isLoading ? undefined : handleToggleReadState}
+        disabled={isLoading}
+        screenReaderLabel={label}
+        data-testid={testId}
+      >
+        {content}
+      </IconButton>
+    )
   }
 
   return (
@@ -133,9 +142,10 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcement}) => {
       borderColor="primary"
       width="100%"
       maxWidth="100%"
+      data-testid={`announcement-item-${announcement.id}`}
     >
       <Flex direction="column" gap="xxx-small">
-        <Flex.Item>
+        <Flex.Item overflowY="visible">
           <Flex direction="row" gap="x-small">
             {/* Avatar */}
             <Flex.Item shouldShrink>
@@ -150,7 +160,7 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcement}) => {
             <Flex.Item shouldGrow shouldShrink>
               <Flex direction="column" gap="xxx-small">
                 {/* Row 1: Title and read/unread indicator */}
-                <Flex.Item shouldShrink>
+                <Flex.Item shouldShrink overflowX="visible" overflowY="visible">
                   <Flex direction="row" justifyItems="space-between" alignItems="start" gap="small">
                     <Flex.Item shouldGrow shouldShrink>
                       <Link href={announcement.html_url} isWithinText={false}>
@@ -164,13 +174,15 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcement}) => {
                 </Flex.Item>
 
                 {/* Row 2: Course code */}
-                <Flex.Item>
-                  <CourseCode
-                    courseId={announcement.course?.id || ''}
-                    overrideCode={announcement.course?.courseCode || I18n.t('Unknown')}
-                    size="x-small"
-                  />
-                </Flex.Item>
+                {announcement.course?.courseCode && (
+                  <Flex.Item>
+                    <CourseCode
+                      courseId={announcement.course.id}
+                      overrideCode={announcement.course.courseCode}
+                      size="x-small"
+                    />
+                  </Flex.Item>
+                )}
 
                 {/* Row 3: Posted date */}
                 <Flex.Item>
@@ -186,13 +198,18 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcement}) => {
             </Flex.Item>
           </Flex>
         </Flex.Item>
-        <Flex.Item>
+        <Flex.Item overflowX="visible" overflowY="visible">
           {/* Announcement Content */}
           {announcement.message && (
-            <View padding="0 0 0 xxx-small">
+            <View>
               <Text size="x-small">
                 <TruncatedText maxLength={60}>{decodedMessage}</TruncatedText>{' '}
-                <Link href={announcement.html_url} isWithinText={false}>
+                <Link
+                  href={announcement.html_url}
+                  isWithinText={false}
+                  display="block"
+                  margin="xxx-small 0 0"
+                >
                   <Text size="x-small" color="brand">
                     {I18n.t('Read more')}
                   </Text>

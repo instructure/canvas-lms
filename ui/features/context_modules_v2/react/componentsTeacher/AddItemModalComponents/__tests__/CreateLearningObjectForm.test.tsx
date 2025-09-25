@@ -41,6 +41,9 @@ const buildProps = (
   dispatch: jest.fn(),
   state: makeState(),
   ...overrides,
+  indentValue: 0,
+  onIndentChange: () => {},
+  moduleName: 'Test Module',
 })
 
 const renderWithContext = (

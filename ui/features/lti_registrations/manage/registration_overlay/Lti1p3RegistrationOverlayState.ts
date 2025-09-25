@@ -42,6 +42,7 @@ export type Lti1p3RegistrationOverlayState = {
   placements: {
     placements?: LtiPlacement[]
     courseNavigationDefaultDisabled?: boolean
+    topNavigationAllowFullscreen?: boolean
   }
   override_uris: {
     placements: Partial<

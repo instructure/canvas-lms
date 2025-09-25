@@ -168,7 +168,6 @@ export default createReactClass({
       })
       return
     }
-
     if (this.props.app.requires_secret) {
       newTool.set('consumer_key', this.state.fields.consumer_key.value)
       newTool.set('shared_secret', this.state.fields.shared_secret.value)

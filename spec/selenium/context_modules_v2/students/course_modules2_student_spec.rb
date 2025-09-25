@@ -416,7 +416,7 @@ describe "context modules", :ignore_js_errors do
         submission_types: "online_text_entry",
         points_possible: 10,
         workflow_state: "published",
-        due_at: 2.days
+        due_at: 2.days.from_now
       )
       go_to_modules
       module_header_expand_toggles[0].click

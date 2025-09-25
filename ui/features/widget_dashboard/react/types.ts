@@ -82,12 +82,14 @@ export interface WidgetRenderer {
 
 export type WidgetRegistry = Record<string, WidgetRenderer>
 
+export type GradingStandardData = Array<[string, number]>
+
 export interface CourseGrade {
   courseId: string
   courseCode: string
   courseName: string
   currentGrade: number | null
-  gradingScheme: string
+  gradingScheme: 'percentage' | GradingStandardData
   lastUpdated: Date
 }
 
@@ -96,6 +98,7 @@ export interface CourseGradeCardProps {
   courseCode: string
   courseName: string
   currentGrade: number | null
+  gradingScheme: 'percentage' | GradingStandardData
   lastUpdated: Date
   onShowGradebook: () => void
   gridIndex?: number

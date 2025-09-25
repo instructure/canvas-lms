@@ -31,7 +31,7 @@ describe RuboCop::Cop::Specs::NoSkipWithoutTicket do
     })
     expect(offenses.size).to eq(1)
     expect(offenses.first.message).to match(/Reference a ticket if skipping/)
-    expect(offenses.first.severity.name).to eq(:warning)
+    expect(offenses.first.severity.name).to eq(:error)
   end
 
   it "allows skipping if referencing a ticket" do

@@ -22,6 +22,17 @@ import {setupServer} from 'msw/node'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 import ModuleItemActionPanel from '../ModuleItemActionPanel'
 import {http, HttpResponse} from 'msw'
+import * as publishingModule from '@canvas/context-modules/react/publishing/publishingContext'
+
+jest.mock('@canvas/context-modules/react/publishing/publishingContext', () => {
+  const actual = jest.requireActual('@canvas/context-modules/react/publishing/publishingContext')
+  return {
+    ...actual,
+    usePublishing: jest.fn(() => ({
+      publishingInProgress: false,
+    })),
+  }
+})
 
 type ComponentProps = React.ComponentProps<typeof ModuleItemActionPanel>
 
@@ -146,5 +157,50 @@ describe('ModuleItemActionPanel', () => {
     await waitFor(() => {
       expect(button).not.toBeDisabled()
     })
+  })
+
+  it('toggles disabled state based on publishingContext (mocked)', () => {
+    const props = buildDefaultProps()
+
+    const mockUsePublishing = publishingModule.usePublishing as jest.Mock
+
+    // Initial state is not publishing
+    mockUsePublishing.mockReturnValue({
+      publishingInProgress: false,
+      startPublishing: jest.fn(),
+      stopPublishing: jest.fn(),
+    })
+
+    const {rerender} = setUp(props)
+
+    const btn = screen.getByTestId(`module-item-publish-button-${props.itemId}`)
+    expect(btn).toBeInTheDocument()
+    expect(btn).not.toBeDisabled()
+
+    // Mock publishing in progress
+    mockUsePublishing.mockReturnValue({
+      publishingInProgress: true,
+    })
+
+    rerender(
+      <ContextModuleProvider {...contextModuleDefaultProps} courseId={DEFAULT_COURSE_ID}>
+        <ModuleItemActionPanel {...props} />
+      </ContextModuleProvider>,
+    )
+
+    expect(btn).toBeDisabled()
+
+    // Mock publishing finished
+    mockUsePublishing.mockReturnValue({
+      publishingInProgress: false,
+    })
+
+    rerender(
+      <ContextModuleProvider {...contextModuleDefaultProps} courseId={DEFAULT_COURSE_ID}>
+        <ModuleItemActionPanel {...props} />
+      </ContextModuleProvider>,
+    )
+
+    expect(btn).not.toBeDisabled()
   })
 })

@@ -22,9 +22,19 @@ import {waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {ImageTextBlockProps} from '../types'
 
+const mockUseBlockContentEditorContext = jest.fn()
+
 jest.mock('../../../BlockContentEditorContext', () => ({
-  useBlockContentEditorContext: () => ({
-    aiAltTextEnabled: false,
+  useBlockContentEditorContext: () => mockUseBlockContentEditorContext(),
+}))
+
+jest.mock('../../../utilities/imageUtils', () => ({
+  convertImageUrlToBase64: jest.fn().mockResolvedValue('base64data'),
+}))
+
+jest.mock('../../../utilities/aiAltTextApi', () => ({
+  generateAiAltText: jest.fn().mockResolvedValue({
+    image: {altText: 'AI generated alt text'},
   }),
 }))
 
@@ -40,13 +50,18 @@ const defaultProps: ImageTextBlockProps = {
   titleColor: '',
   arrangement: 'left',
   textToImageRatio: '1:1',
-  fileName: '',
+  fileName: 'name',
   altTextAsCaption: false,
   decorativeImage: false,
   caption: '',
 }
 
 describe('ImageTextBlockSettings', () => {
+  beforeEach(() => {
+    mockUseBlockContentEditorContext.mockReturnValue({
+      aiAltTextGenerationURL: null,
+    })
+  })
   describe('include title', () => {
     it('integrates, changing the state', async () => {
       const component = renderBlock(ImageTextBlockSettings, {
@@ -174,6 +189,123 @@ describe('ImageTextBlockSettings', () => {
       expect(checkbox).not.toBeChecked()
       await userEvent.click(checkbox)
       expect(checkbox).toBeChecked()
+    })
+  })
+
+  describe('regenerate alt text', () => {
+    it('does not show when AI alt text URL is not provided', () => {
+      mockUseBlockContentEditorContext.mockReturnValue({
+        aiAltTextGenerationURL: null,
+      })
+      const component = renderBlock(ImageTextBlockSettings, defaultProps)
+      expect(component.queryByText(/Regenerate Alt Text/i)).not.toBeInTheDocument()
+    })
+
+    it('does not show when AI alt text URL is empty string', () => {
+      mockUseBlockContentEditorContext.mockReturnValue({
+        aiAltTextGenerationURL: '',
+      })
+      const component = renderBlock(ImageTextBlockSettings, defaultProps)
+      expect(component.queryByText(/Regenerate Alt Text/i)).not.toBeInTheDocument()
+    })
+
+    it('shows when AI alt text URL is provided', () => {
+      mockUseBlockContentEditorContext.mockReturnValue({
+        aiAltTextGenerationURL: '/api/v1/courses/1/pages_ai/alt_text',
+      })
+      const component = renderBlock(ImageTextBlockSettings, defaultProps)
+      expect(component.getByText(/Regenerate Alt Text/i)).toBeInTheDocument()
+    })
+
+    it('is disabled when image is decorative', () => {
+      mockUseBlockContentEditorContext.mockReturnValue({
+        aiAltTextGenerationURL: '/api/v1/courses/1/pages_ai/alt_text',
+      })
+      const component = renderBlock(ImageTextBlockSettings, {
+        ...defaultProps,
+        decorativeImage: true,
+      })
+      const button = component.getByRole('button', {name: /Regenerate Alt Text/i})
+      expect(button).toBeDisabled()
+    })
+
+    it('is disabled when no image URL is provided', () => {
+      mockUseBlockContentEditorContext.mockReturnValue({
+        aiAltTextGenerationURL: '/api/v1/courses/1/pages_ai/alt_text',
+      })
+      const component = renderBlock(ImageTextBlockSettings, {...defaultProps, url: ''})
+      const button = component.getByRole('button', {name: /Regenerate Alt Text/i})
+      expect(button).toBeDisabled()
+    })
+
+    it('is disabled when no fileName is provided', () => {
+      mockUseBlockContentEditorContext.mockReturnValue({
+        aiAltTextGenerationURL: '/api/v1/courses/1/pages_ai/alt_text',
+      })
+      const component = renderBlock(ImageTextBlockSettings, {...defaultProps, fileName: ''})
+      const button = component.getByRole('button', {name: /Regenerate Alt Text/i})
+      expect(button).toBeDisabled()
+    })
+
+    it('generates alt text when clicked', async () => {
+      const {generateAiAltText} = require('../../../utilities/aiAltTextApi')
+      mockUseBlockContentEditorContext.mockReturnValue({
+        aiAltTextGenerationURL: '/api/v1/courses/1/pages_ai/alt_text',
+      })
+
+      const component = renderBlock(ImageTextBlockSettings, {
+        ...defaultProps,
+        altText: 'Original alt text',
+      })
+      const button = component.getByRole('button', {name: /Regenerate Alt Text/i})
+      const altTextInput = component.getByRole('textbox', {name: /Alt text/i}) as HTMLInputElement
+
+      expect(altTextInput.value).toBe('Original alt text')
+
+      await userEvent.click(button)
+
+      await waitFor(() => {
+        expect(generateAiAltText).toHaveBeenCalledWith({
+          url: '/api/v1/courses/1/pages_ai/alt_text',
+          requestData: {
+            image: {
+              base64_source: 'base64data',
+              type: 'Base64',
+            },
+          },
+          signal: expect.any(AbortSignal),
+        })
+      })
+
+      await waitFor(() => {
+        expect(altTextInput.value).toBe('AI generated alt text')
+      })
+    })
+
+    it('shows generating state while processing', async () => {
+      mockUseBlockContentEditorContext.mockReturnValue({
+        aiAltTextGenerationURL: '/api/v1/courses/1/pages_ai/alt_text',
+      })
+
+      // Make the API call take longer to resolve
+      const {generateAiAltText} = require('../../../utilities/aiAltTextApi')
+      generateAiAltText.mockImplementation(
+        () =>
+          new Promise(resolve =>
+            setTimeout(() => resolve({image: {altText: 'AI generated alt text'}}), 100),
+          ),
+      )
+
+      const component = renderBlock(ImageTextBlockSettings, defaultProps)
+      const button = component.getByRole('button', {name: /Regenerate Alt Text/i})
+
+      await userEvent.click(button)
+
+      expect(component.getByText(/Generating\.\.\./i)).toBeInTheDocument()
+
+      await waitFor(() => {
+        expect(component.getByText(/Regenerate Alt Text/i)).toBeInTheDocument()
+      })
     })
   })
 })

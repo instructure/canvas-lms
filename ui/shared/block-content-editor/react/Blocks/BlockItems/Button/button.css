@@ -1,0 +1,6 @@
+[data-button] {
+  text-decoration: none !important;
+}
+[data-button] > .external_link_icon {
+  display: none !important;
+}

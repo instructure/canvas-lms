@@ -19,6 +19,7 @@
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {executeQuery} from '@canvas/graphql'
 import {gql} from 'graphql-tag'
+import {ANNOUNCEMENTS_PAGINATED} from '../constants'
 
 interface UpdateDiscussionReadStateVariables {
   discussionTopicId: string
@@ -69,16 +70,14 @@ export function useToggleAnnouncementReadState() {
     onMutate: async (variables: UpdateDiscussionReadStateVariables) => {
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
       await queryClient.cancelQueries({
-        queryKey: ['announcements', currentUserId],
+        queryKey: [ANNOUNCEMENTS_PAGINATED, currentUserId],
       })
 
       // Snapshot the previous value
-      const previousData = queryClient.getQueryData(['announcements', currentUserId])
-
+      const previousData = queryClient.getQueryData([ANNOUNCEMENTS_PAGINATED, currentUserId])
       // Optimistically update the cache
-      queryClient.setQueryData(['announcements', currentUserId], (old: any) => {
+      queryClient.setQueryData([ANNOUNCEMENTS_PAGINATED, currentUserId], (old: any) => {
         if (!old) return old
-
         return old.map((announcement: any) => {
           if (announcement.id === variables.discussionTopicId) {
             return {
@@ -97,13 +96,13 @@ export function useToggleAnnouncementReadState() {
     onError: (_err, _variables, context) => {
       // If the mutation fails, use the context returned from onMutate to roll back
       if (context?.previousData) {
-        queryClient.setQueryData(['announcements', currentUserId], context.previousData)
+        queryClient.setQueryData([ANNOUNCEMENTS_PAGINATED, currentUserId], context.previousData)
       }
     },
     onSettled: () => {
       // Always refetch after error or success to ensure consistency
       queryClient.invalidateQueries({
-        queryKey: ['announcements', currentUserId],
+        queryKey: [ANNOUNCEMENTS_PAGINATED, currentUserId],
       })
     },
   })

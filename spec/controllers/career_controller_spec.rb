@@ -25,7 +25,7 @@ describe CareerController do
     @course.update!(horizon_course: true)
   end
 
-  let(:config) { double("Config", learning_provider_app_launch_url: "https://example.com/lp", learner_app_launch_url: "https://example.com/learner") }
+  let(:config) { double("Config", learning_provider_app_launch_url: "https://example.com/lp", learner_app_launch_url: "https://example.com/learner", public_app_config: { some: "config" }) }
   let(:resolver) { instance_double(CanvasCareer::ExperienceResolver) }
 
   before do
@@ -71,7 +71,8 @@ describe CareerController do
             horizon_hris_integrations: false,
             horizon_user_profile_page: false,
             horizon_bulk_metadata_import: false,
-            horizon_manual_dashboard_builder: false
+            horizon_manual_dashboard_builder: false,
+            horizon_dark_career_theme_in_learning_provider: false
           )
         end
 
@@ -125,24 +126,11 @@ describe CareerController do
         end
       end
 
-      context "when injecting canvas_career_config" do
-        before do
-          allow(resolver).to receive(:resolve).and_return(CanvasCareer::Constants::App::CAREER_LEARNER)
-          @public_config = { some: "config" }
-          allow(config).to receive(:public_app_config).and_return(@public_config)
-        end
+      it "injects canvas_career_config" do
+        allow(resolver).to receive(:resolve).and_return(CanvasCareer::Constants::App::CAREER_LEARNER)
 
-        it "injects canvas_career_config when horizon_injected_config feature is enabled" do
-          @account.enable_feature!(:horizon_injected_config)
-          get :show, params: { course_id: @course.id }
-          expect(controller).to have_received(:remote_env).with(canvas_career_config: @public_config)
-        end
-
-        it "does not inject canvas_career_config when horizon_injected_config feature is disabled" do
-          @account.disable_feature!(:horizon_injected_config)
-          get :show, params: { course_id: @course.id }
-          expect(controller).not_to have_received(:remote_env).with(canvas_career_config: @public_config)
-        end
+        get :show, params: { course_id: @course.id }
+        expect(controller).to have_received(:remote_env).with(canvas_career_config: { some: "config" })
       end
     end
   end

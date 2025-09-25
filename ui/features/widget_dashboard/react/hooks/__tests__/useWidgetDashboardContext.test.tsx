@@ -29,6 +29,7 @@ const TestConsumer: React.FC = () => {
       <div data-testid="can-add-observee">{String(context.canAddObservee)}</div>
       <div data-testid="current-user">{JSON.stringify(context.currentUser)}</div>
       <div data-testid="current-user-roles">{JSON.stringify(context.currentUserRoles)}</div>
+      <div data-testid="observed-user-id">{context.observedUserId || 'null'}</div>
     </div>
   )
 }
@@ -52,6 +53,7 @@ describe('useWidgetDashboardContext', () => {
     expect(getByTestId('can-add-observee')).toHaveTextContent('false')
     expect(getByTestId('current-user')).toHaveTextContent('null')
     expect(getByTestId('current-user-roles')).toHaveTextContent('[]')
+    expect(getByTestId('observed-user-id')).toHaveTextContent('null')
   })
 
   it('should provide custom values when props are passed', () => {
@@ -78,6 +80,7 @@ describe('useWidgetDashboardContext', () => {
         canAddObservee={true}
         currentUser={currentUser}
         currentUserRoles={currentUserRoles}
+        observedUserId="123"
       >
         <TestConsumer />
       </WidgetDashboardProvider>,
@@ -88,6 +91,7 @@ describe('useWidgetDashboardContext', () => {
     expect(getByTestId('can-add-observee')).toHaveTextContent('true')
     expect(getByTestId('current-user')).toHaveTextContent(JSON.stringify(currentUser))
     expect(getByTestId('current-user-roles')).toHaveTextContent(JSON.stringify(currentUserRoles))
+    expect(getByTestId('observed-user-id')).toHaveTextContent('123')
   })
 
   it('should memoize context value and not recreate when props are unchanged', () => {

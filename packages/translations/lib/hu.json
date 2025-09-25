@@ -287,12 +287,6 @@
     "clear_image_3213fe62": {
         "message": "Üres kép"
     },
-    "clear_selected_file_82388e50": {
-        "message": "Kiválasztott fájl törlése"
-    },
-    "clear_selected_file_filename_2fe8a58e": {
-        "message": "Kiválasztott fájl törlése: { filename }"
-    },
     "click_or_shift_click_for_the_html_editor_25d70bb4": {
         "message": "Kattintson vagy a Shift billentyűt lenyomva tartva kattintson a html-szerkesztőhöz."
     },
@@ -1777,6 +1771,9 @@
     },
     "religion_icon_246e0be1": {
         "message": "Vallás ikon"
+    },
+    "remove_f47dc62a": {
+        "message": "Eltávolítás"
     },
     "remove_heading_style_5fdc8855": {
         "message": "Címsorstílus eltávolítása"

@@ -64,7 +64,7 @@ it('indicates if a course is a blueprint course', () => {
 
 it('filters addable roles by blueprint and permissions', () => {
   const ref = React.createRef()
-  const wrapper = renderRow(
+  renderRow(
     <CoursesListRow
       ref={ref}
       {...props}
@@ -108,7 +108,7 @@ it('shows add-enrollment if it makes sense', () => {
 
 it('does not show add-enrollment when not allowed', () => {
   const tooltip = 'Add Users to A'
-  const {queryByText, rerender} = renderRow(
+  const {queryByText} = renderRow(
     <CoursesListRow
       {...props}
       can_create_enrollments={false}

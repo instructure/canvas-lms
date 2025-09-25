@@ -38,6 +38,7 @@ describe Types::DiscussionParticipantType do
       hasUnreadPinnedEntry
       showPinnedEntries
       discussionTopic
+      preferredLanguage
     ]
     expect(Types::DiscussionParticipantType.fields.keys).to match_array(expected_fields)
   end

@@ -160,11 +160,6 @@ describe Translation do
       expect(described_class.translate_text(text:, tgt_lang: "es", flags: translation_flags, options: { feature_slug: "inbox", current_user: })).to eq(result)
     end
 
-    it "raises TextTooLongError if html_string is too long" do
-      text = "a" * Translation::CHARACTER_LIMIT
-      expect { described_class.translate_text(text:, tgt_lang: "es", flags: translation_flags) }.to raise_error(Translation::TextTooLongError)
-    end
-
     it "provides default feature_slug if not received from parameters" do
       client = instance_double("TranslationClient")
       allow(described_class).to receive(:translation_client).and_return(client)
@@ -290,11 +285,6 @@ describe Translation do
         flags: translation_flags,
         options: { current_user:, feature_slug: "unknown-feature" }
       )
-    end
-
-    it "raises TextTooLongError if html_string is too long" do
-      long_html = "<p>" + ("a" * Translation::CHARACTER_LIMIT) + "</p>"
-      expect { described_class.translate_html(html_string: long_html, tgt_lang: "es", flags: translation_flags) }.to raise_error(Translation::TextTooLongError)
     end
   end
 end

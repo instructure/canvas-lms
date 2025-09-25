@@ -26,6 +26,37 @@ describe SubmissionLifecycleManager do
     assignment_model(course: @course)
   end
 
+  def create_checkpoints_and_submissions
+    @course.account.enable_feature!(:discussion_checkpoints)
+    topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpoint discussion")
+    @checkpoint1 = Checkpoints::DiscussionCheckpointCreatorService.call(
+      discussion_topic: topic,
+      checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+      dates: [{ type: "everyone", due_at: 1.week.from_now }],
+      points_possible: 5
+    )
+
+    @checkpoint2 = Checkpoints::DiscussionCheckpointCreatorService.call(
+      discussion_topic: topic,
+      checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+      dates: [{ type: "everyone", due_at: 2.weeks.from_now }],
+      points_possible: 10,
+      replies_required: 2
+    )
+    @parent_assignment = topic.assignment
+
+    @student1 = @student
+    @student2 = student_in_course(active_all: true, course: @course).user
+
+    # Create submissions for both students
+    @parent_assignment.submissions.find_or_create_by!(user: @student1)
+    @parent_assignment.submissions.find_or_create_by!(user: @student2)
+    @checkpoint1.submissions.find_or_create_by!(user: @student1)
+    @checkpoint1.submissions.find_or_create_by!(user: @student2)
+    @checkpoint2.submissions.find_or_create_by!(user: @student1)
+    @checkpoint2.submissions.find_or_create_by!(user: @student2)
+  end
+
   describe ".recompute" do
     before do
       @instance = double("instance", recompute: nil)
@@ -106,33 +137,33 @@ describe SubmissionLifecycleManager do
 
     context "discussion_checkpoints" do
       before do
-        @course.account.enable_feature!(:discussion_checkpoints)
-        topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
-        @c1 = Checkpoints::DiscussionCheckpointCreatorService.call(
-          discussion_topic: topic,
-          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
-          dates: [{ type: "everyone", due_at: 1.week.from_now }],
-          points_possible: 5
-        )
-
-        @c2 = Checkpoints::DiscussionCheckpointCreatorService.call(
-          discussion_topic: topic,
-          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
-          dates: [{ type: "everyone", due_at: 2.weeks.from_now }],
-          points_possible: 10,
-          replies_required: 2
-        )
-        @topic_assignment = topic.assignment
+        create_checkpoints_and_submissions
       end
 
       it "makes singletons use SubAssignment for sub_assignments" do
-        expect(SubmissionLifecycleManager).to receive(:new).with(@course, [@c1.id], hash_including(update_grades: true))
+        expect(SubmissionLifecycleManager).to receive(:new).with(@course, [@checkpoint1.id], hash_including(update_grades: true))
                                                            .and_return(@instance)
         expect(@instance).to receive(:delay_if_production)
-          .with(singleton: "cached_due_date:calculator:SubAssignment:#{@c1.global_id}:UpdateGrades:1",
+          .with(singleton: "cached_due_date:calculator:SubAssignment:#{@checkpoint1.global_id}:UpdateGrades:1",
                 strand: "cached_due_date:calculator:Course:#{@course.global_id}",
                 max_attempts: 10).and_return(@instance)
-        SubmissionLifecycleManager.recompute(@c1, update_grades: true)
+        SubmissionLifecycleManager.recompute(@checkpoint1, update_grades: true)
+      end
+
+      it "preserves sub-assignment submissions when processing parent with create_sub_assignment_submissions: true" do
+        SubmissionLifecycleManager.recompute(@parent_assignment, create_sub_assignment_submissions: true)
+
+        expect(@parent_assignment.submissions.active.count).to eq 2
+        expect(@checkpoint1.submissions.active.count).to eq 2
+        expect(@checkpoint2.submissions.active.count).to eq 2
+      end
+
+      it "preserves all submissions when processing singular checkpoint assignment" do
+        SubmissionLifecycleManager.recompute(@checkpoint1)
+
+        expect(@parent_assignment.submissions.active.count).to eq 2
+        expect(@checkpoint1.submissions.active.count).to eq 2
+        expect(@checkpoint2.submissions.active.count).to eq 2
       end
     end
   end
@@ -245,6 +276,124 @@ describe SubmissionLifecycleManager do
         .with(@course, match_array(@assignments.map(&:id)), hash_including(executing_user: nil))
         .and_return(@instance)
       SubmissionLifecycleManager.recompute_course(@course, run_immediately: true)
+    end
+
+    describe "checkpoints" do
+      before do
+        create_checkpoints_and_submissions
+      end
+
+      it "handles recompute for a full course" do
+        SubmissionLifecycleManager.recompute_course(@course, run_immediately: true)
+
+        expect(@parent_assignment.submissions.active.count).to eq 2
+        expect(@checkpoint1.submissions.active.count).to eq 2
+        expect(@checkpoint2.submissions.active.count).to eq 2
+      end
+
+      it "handles sub-assignment creation through parent when create_sub_assignment_submissions: true" do
+        @checkpoint1.submissions.update_all(workflow_state: "deleted")
+        @checkpoint2.submissions.update_all(workflow_state: "deleted")
+
+        expect(@checkpoint1.submissions.active.count).to eq 0
+        expect(@checkpoint2.submissions.active.count).to eq 0
+
+        SubmissionLifecycleManager.recompute_course(@course, assignments: [@parent_assignment.id], create_sub_assignment_submissions: true, run_immediately: true)
+
+        expect(@checkpoint1.submissions.active.count).to eq 2
+        expect(@checkpoint2.submissions.active.count).to eq 2
+      end
+
+      it "does not create sub-assignment submissions when create_sub_assignment_submissions: false" do
+        @checkpoint1.submissions.update_all(workflow_state: "deleted")
+        @checkpoint2.submissions.update_all(workflow_state: "deleted")
+
+        expect(@checkpoint1.submissions.active.count).to eq 0
+        expect(@checkpoint2.submissions.active.count).to eq 0
+
+        SubmissionLifecycleManager.recompute_course(@course, assignments: [@parent_assignment.id], create_sub_assignment_submissions: false, run_immediately: true)
+
+        expect(@checkpoint1.submissions.active.count).to eq 0
+        expect(@checkpoint2.submissions.active.count).to eq 0
+        expect(@parent_assignment.submissions.active.count).to eq 2
+      end
+
+      it "handles student enrollment deletion" do
+        @course.enrollments.where(user: @student2).update_all(workflow_state: "deleted")
+
+        all_assignment_ids = [@parent_assignment.id, @checkpoint1.id, @checkpoint2.id]
+        SubmissionLifecycleManager.recompute_course(@course, assignments: all_assignment_ids, run_immediately: true)
+
+        # Student1 should still have access to all submissions
+        expect(@parent_assignment.submissions.active.where(user: @student1)).to exist
+        expect(@checkpoint1.submissions.active.where(user: @student1)).to exist
+        expect(@checkpoint2.submissions.active.where(user: @student1)).to exist
+
+        # Student2's submissions should be deleted
+        expect(@parent_assignment.submissions.active.where(user: @student2)).not_to exist
+        expect(@checkpoint1.submissions.active.where(user: @student2)).not_to exist
+        expect(@checkpoint2.submissions.active.where(user: @student2)).not_to exist
+      end
+
+      it "handles assignment override changes that exclude previously assigned students" do
+        # Make parent assignment and checkpoints only visible to students with overrides
+        @parent_assignment.update!(only_visible_to_overrides: true)
+        @checkpoint1.update!(only_visible_to_overrides: true)
+        @checkpoint2.update!(only_visible_to_overrides: true)
+
+        # Create ADHOC override for parent assignment for both students initially
+        parent_override = @parent_assignment.assignment_overrides.create!(
+          set_type: "ADHOC",
+          due_at: 1.day.from_now
+        )
+        parent_override.assignment_override_students.create!(user: @student1)
+        parent_override.assignment_override_students.create!(user: @student2)
+
+        # Create ADHOC overrides for checkpoint assignments linked to parent override
+        checkpoint1_override = @checkpoint1.assignment_overrides.create!(
+          set_type: "ADHOC",
+          due_at: 1.day.from_now,
+          parent_override:
+        )
+        checkpoint1_override.assignment_override_students.create!(user: @student1)
+        checkpoint1_override.assignment_override_students.create!(user: @student2)
+
+        checkpoint2_override = @checkpoint2.assignment_overrides.create!(
+          set_type: "ADHOC",
+          due_at: 2.days.from_now,
+          parent_override:
+        )
+        checkpoint2_override.assignment_override_students.create!(user: @student1)
+        checkpoint2_override.assignment_override_students.create!(user: @student2)
+
+        # Refresh submissions to ensure they exist
+        SubmissionLifecycleManager.recompute_course(@course, assignments: [@parent_assignment.id], create_sub_assignment_submissions: true, run_immediately: true)
+
+        # Verify both students initially have access
+        expect(@parent_assignment.submissions.active.where(user: @student1)).to exist
+        expect(@parent_assignment.submissions.active.where(user: @student2)).to exist
+        expect(@checkpoint1.submissions.active.where(user: @student1)).to exist
+        expect(@checkpoint1.submissions.active.where(user: @student2)).to exist
+
+        # Remove student2 from all ADHOC overrides (they lose access due to only_visible_to_overrides)
+        parent_override.assignment_override_students.where(user: @student2).destroy_all
+        checkpoint1_override.assignment_override_students.where(user: @student2).destroy_all
+        checkpoint2_override.assignment_override_students.where(user: @student2).destroy_all
+
+        # Process all assignments including checkpoints
+        all_assignment_ids = [@parent_assignment.id, @checkpoint1.id, @checkpoint2.id]
+        SubmissionLifecycleManager.recompute_course(@course, assignments: all_assignment_ids, run_immediately: true)
+
+        # Student1 should still have access (still in the section with override)
+        expect(@parent_assignment.submissions.active.where(user: @student1)).to exist
+        expect(@checkpoint1.submissions.active.where(user: @student1)).to exist
+        expect(@checkpoint2.submissions.active.where(user: @student1)).to exist
+
+        # Student2 should lose access - parent assignment submission should be deleted
+        expect(@parent_assignment.submissions.active.where(user: @student2)).not_to exist
+        expect(@checkpoint1.submissions.active.where(user: @student2)).not_to exist
+        expect(@checkpoint2.submissions.active.where(user: @student2)).not_to exist
+      end
     end
   end
 

@@ -87,7 +87,7 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
       end
 
       case entry
-      when SubmissionDraft
+      when SubmissionDraft, ModeratedGrading::ProvisionalGrade
         [Shard.global_id_for(entry.submission.root_account_id, entry.shard)]
       else
         raise "don't know how to resolve root_account for #{entry.inspect}"

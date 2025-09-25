@@ -47,6 +47,7 @@ import {
   isExternalNewItemField,
   isExternalToolNewItemField,
 } from '../../utils/utils'
+import AddItemFormFieldGroup from './AddItemFormFieldGroup'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -246,12 +247,17 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
   )
 
   const handleCreateChange = useCallback(
-    (field: string, value: 'string | File | null') => {
+    (field: string, value: string | File | null) => {
       if ((NEW_ITEM_FIELDS as readonly string[]).includes(field)) {
         dispatch({type: 'SET_NEW_ITEM', field: field as NewItemField, value})
         setFormErrors(prev => (prev.name ? {...prev, name: undefined} : prev))
       }
     },
+    [dispatch],
+  )
+
+  const onIndentChange = useCallback(
+    (value: number) => dispatch({type: 'SET_INDENTATION', value}),
     [dispatch],
   )
 
@@ -326,16 +332,10 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
       <ScreenReaderContent aria-live="polite" aria-atomic="true">
         {screenReaderMessage}
       </ScreenReaderContent>
-      <View as="div" margin="0 0 medium 0">
+      <View as="div" margin="small small">
         <AddItemTypeSelector itemType={itemType} onChange={value => setItemType(value)} />
       </View>
-      <FormFieldGroup
-        description={
-          <ScreenReaderContent>
-            {I18n.t('Add an item to %{module}', {module: moduleName})}
-          </ScreenReaderContent>
-        }
-      >
+      <View padding="small">
         {TYPES_WITH_TABS.includes(itemType) && (
           <Tabs
             onRequestTabChange={(_event, tabData) => {
@@ -351,8 +351,15 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
                 addPanelRef.current = el
                 if (el) el.setAttribute('tabindex', '-1')
               }}
+              padding="medium none"
             >
-              {renderContentItems()}
+              <AddItemFormFieldGroup
+                indentValue={state.indentation}
+                onIndentChange={onIndentChange}
+                moduleName={moduleName}
+              >
+                {renderContentItems()}
+              </AddItemFormFieldGroup>
             </Tabs.Panel>
             <Tabs.Panel
               id="create-item-form"
@@ -362,6 +369,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
                 createPanelRef.current = el
                 if (el) el.setAttribute('tabindex', '-1')
               }}
+              padding="medium none"
             >
               <CreateLearningObjectForm
                 itemType={itemType}
@@ -369,12 +377,19 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
                 state={state}
                 onChange={handleCreateChange}
                 nameError={formErrors.name || ''}
+                moduleName={moduleName}
+                indentValue={state.indentation}
+                onIndentChange={onIndentChange}
               />
             </Tabs.Panel>
           </Tabs>
         )}
         {itemType === ITEM_TYPE.CONTEXT_MODULE_SUB_HEADER && (
-          <View as="div" margin="medium 0">
+          <AddItemFormFieldGroup
+            indentValue={state.indentation}
+            onIndentChange={onIndentChange}
+            moduleName={moduleName}
+          >
             <TextInput
               renderLabel={I18n.t('Header text')}
               placeholder={I18n.t('Enter header text')}
@@ -382,7 +397,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
               messages={formErrors.name ? [{text: formErrors.name, type: 'newError'}] : []}
               onChange={(_e, value) => dispatch({type: 'SET_TEXT_HEADER', value})}
             />
-          </View>
+          </AddItemFormFieldGroup>
         )}
         {itemType === ITEM_TYPE.EXTERNAL_URL && (
           <ExternalItemForm
@@ -398,6 +413,9 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
             itemType={itemType}
             contentItems={contentItems}
             formErrors={formErrors}
+            moduleName={moduleName}
+            indentValue={state.indentation}
+            onIndentChange={onIndentChange}
           />
         )}
 
@@ -415,13 +433,12 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
             itemType={itemType}
             contentItems={contentItems}
             formErrors={formErrors}
+            moduleName={moduleName}
+            indentValue={state.indentation}
+            onIndentChange={onIndentChange}
           />
         )}
-        <IndentSelector
-          value={state.indentation}
-          onChange={value => dispatch({type: 'SET_INDENTATION', value})}
-        />
-      </FormFieldGroup>
+      </View>
     </CanvasModal>
   )
 }

@@ -29,6 +29,7 @@ import {View} from '@instructure/ui-view'
 import {ExportCSVButton} from './ExportCSVButton'
 import {SettingsTray} from './SettingsTray'
 import {GradebookSettings} from '../../utils/constants'
+import {mapSettingsToFilters} from '../../utils/filter'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 
@@ -41,19 +42,19 @@ const componentOverrides = {
 export interface ToolbarProps {
   courseId: string
   contextURL?: string
-  gradebookFilters?: string[]
   showDataDependentControls?: boolean
   gradebookSettings: GradebookSettings
-  setGradebookSettings: (settings: GradebookSettings) => void
+  setGradebookSettings: (settings: GradebookSettings) => Promise<{success: boolean}>
+  isSavingSettings?: boolean
 }
 
 export const Toolbar: React.FC<ToolbarProps> = ({
   courseId,
   contextURL,
-  gradebookFilters,
   showDataDependentControls,
   gradebookSettings,
   setGradebookSettings,
+  isSavingSettings,
 }) => {
   const [isSettingsTrayOpen, setSettingsTrayOpen] = useState<boolean>(false)
 
@@ -90,7 +91,10 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         </Flex>
         {showDataDependentControls && (
           <Flex gap="small" alignItems="stretch" direction="row">
-            <ExportCSVButton courseId={courseId} gradebookFilters={gradebookFilters} />
+            <ExportCSVButton
+              courseId={courseId}
+              gradebookFilters={mapSettingsToFilters(gradebookSettings)}
+            />
             <View as="div" borderWidth="none small none none" width="0px" />
             <IconButton
               withBorder={false}
@@ -106,6 +110,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
               onDismiss={() => setSettingsTrayOpen(false)}
               gradebookSettings={gradebookSettings}
               setGradebookSettings={setGradebookSettings}
+              isSavingSettings={isSavingSettings}
             />
           </Flex>
         )}

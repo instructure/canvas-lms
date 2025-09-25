@@ -102,27 +102,6 @@ describe "teacher k5 dashboard important dates" do
     end
   end
 
-  context "mark important dates for classic quizzes" do
-    it "sets the mark important dates checkbox for quiz", custom_timeout: 25 do
-      skip("LX-1740: needs Mark as Important Date button when Diff Mod ON")
-      quiz_title = "Elec Quiz"
-      due_at = 2.days.from_now(Time.zone.now)
-      quiz = quiz_model(course: @subject_course, title: quiz_title)
-      quiz.generate_quiz_data
-      quiz.due_at = due_at
-      quiz.save!
-      quiz_assignment = Assignment.last
-      quiz_assignment.update!(important_dates: true)
-
-      get "/courses/#{@subject_course.id}/quizzes/#{quiz.id}/edit"
-      expect(mark_important_dates).to be_displayed
-      scroll_to_element(mark_important_dates)
-      click_mark_important_dates
-
-      expect_new_page_load { submit_form(edit_quiz_submit_selector) }
-    end
-  end
-
   context "mark important dates for graded discussions" do
     it "sets the mark important dates checkbox for discussion", custom_timeout: 25 do
       discussion_title = "Elec Disc"

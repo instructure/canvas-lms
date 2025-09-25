@@ -368,6 +368,7 @@ export const prepareAssignmentPayload = (
   existingAssignment,
   suppressedAssignment,
   assetProcessors,
+  secureParams,
 ) => {
   /*
   Return null if the assignment is not graded and there is no existing assignment.
@@ -401,6 +402,7 @@ export const prepareAssignmentPayload = (
     assetProcessors: assetProcessors.map(
       attachedAssetProcessorGraphqlMutationFromStateAttachedProcessor,
     ),
+    secureParams: secureParams,
   }
   if (abGuid) {
     payload = {

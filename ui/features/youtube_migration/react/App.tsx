@@ -61,6 +61,7 @@ enum YoutubeScanWorkflowState {
   Failed = 'failed',
   Queued = 'queued',
   Running = 'running',
+  WaitingForExternalTool = 'waiting_for_external_tool',
 }
 
 const I18n = createI18nScope('youtube_migration')
@@ -352,7 +353,8 @@ const EmbedsModal: React.FC<{
             showFlashError(progress.results?.error || I18n.t('Conversion failed'))()
           } else if (
             progress.workflow_state === 'queued' ||
-            progress.workflow_state === 'running'
+            progress.workflow_state === 'running' ||
+            progress.workflow_state === 'waiting_for_external_tool'
           ) {
             // Continue polling
             const timeoutId = window.setTimeout(pollProgress, 2000)
@@ -890,14 +892,16 @@ export const App: React.FC<AppProps> = ({courseId}) => {
     if (
       !isPollingRunning.current &&
       (data?.workflow_state === YoutubeScanWorkflowState.Running ||
-        data?.workflow_state === YoutubeScanWorkflowState.Queued)
+        data?.workflow_state === YoutubeScanWorkflowState.Queued ||
+        data?.workflow_state === YoutubeScanWorkflowState.WaitingForExternalTool)
     ) {
       isPollingRunning.current = true
       const pollRefetch = async () => {
         const {data} = await refetch()
         if (
           data?.workflow_state === YoutubeScanWorkflowState.Queued ||
-          data?.workflow_state === YoutubeScanWorkflowState.Running
+          data?.workflow_state === YoutubeScanWorkflowState.Running ||
+          data?.workflow_state === YoutubeScanWorkflowState.WaitingForExternalTool
         ) {
           setTimeout(pollRefetch, 1000)
         } else {
@@ -953,6 +957,7 @@ export const App: React.FC<AppProps> = ({courseId}) => {
   if (
     data.workflow_state === YoutubeScanWorkflowState.Queued ||
     data.workflow_state === YoutubeScanWorkflowState.Running ||
+    data.workflow_state === YoutubeScanWorkflowState.WaitingForExternalTool ||
     mutationInProgress
   ) {
     return <ScanningInProgressView />

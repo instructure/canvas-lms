@@ -27,9 +27,8 @@ import type {BaseWidgetProps, CourseOption} from '../../../types'
 import {useSharedCourses} from '../../../hooks/useSharedCourses'
 import {useCourseWork} from '../../../hooks/useCourseWork'
 import {useCourseWorkStatistics} from '../../../hooks/useCourseWorkStatistics'
+import {usePagination} from '../../../hooks/usePagination'
 import StatisticsCardsGrid from '../../shared/StatisticsCardsGrid'
-import {Pagination} from '@instructure/ui-pagination'
-import {Spinner} from '@instructure/ui-spinner'
 import {
   convertDateFilterToParams,
   convertDateFilterToStatisticsRange,
@@ -46,7 +45,6 @@ const CourseWorkCombinedWidget: React.FC<BaseWidgetProps> = ({
 }) => {
   const [selectedCourse, setSelectedCourse] = useState<string>('all')
   const [selectedDateFilter, setSelectedDateFilter] = useState<DateFilterOption>('next3days')
-  const [currentPageIndex, setCurrentPageIndex] = useState<number>(0)
 
   const {data: courseGrades = []} = useSharedCourses({limit: 1000})
   const userCourses: CourseOption[] = courseGrades.map(courseGrade => ({
@@ -73,6 +71,14 @@ const CourseWorkCombinedWidget: React.FC<BaseWidgetProps> = ({
     ...dateParams,
   })
 
+  const {currentPageIndex, paginationProps, resetPagination} = usePagination({
+    hasNextPage: !!hasNextPage,
+    totalPagesLoaded: data?.pages?.length || 0,
+    fetchNextPage,
+    isFetchingNextPage,
+    isFetchingPreviousPage,
+  })
+
   const {
     data: summary = {due: 0, missing: 0, submitted: 0},
     isLoading: statisticsLoading,
@@ -85,57 +91,34 @@ const CourseWorkCombinedWidget: React.FC<BaseWidgetProps> = ({
 
   const currentPage = data?.pages?.[currentPageIndex]
   const filteredItems = currentPage?.items || []
-  const totalPagesLoaded = data?.pages?.length || 0
-
-  const effectiveHasNextPage = currentPageIndex < totalPagesLoaded - 1 || hasNextPage
-  const effectiveHasPreviousPage = currentPageIndex > 0
-  const effectiveTotalPages = hasNextPage ? totalPagesLoaded + 1 : totalPagesLoaded
-  const effectiveCurrentPage = currentPageIndex + 1
 
   const isLoading = externalIsLoading || courseWorkLoading || statisticsLoading
   const error = externalError || courseWorkError?.message || statisticsError?.message || null
   const handleRetry = onRetry || (() => refetch())
 
-  const resetPagination = useCallback(() => {
-    setCurrentPageIndex(0)
+  const handleResetPagination = useCallback(() => {
+    resetPagination()
     refetch()
-  }, [refetch])
+  }, [resetPagination, refetch])
 
   const handleCourseChange = useCallback(
     (_event: React.SyntheticEvent, data: {value?: string | number; id?: string}) => {
       if (data.value && typeof data.value === 'string') {
         setSelectedCourse(data.value)
-        resetPagination()
+        handleResetPagination()
       }
     },
-    [resetPagination],
+    [handleResetPagination],
   )
 
   const handleDateFilterChange = useCallback(
     (_event: React.SyntheticEvent, data: {value?: string | number; id?: string}) => {
       if (data.value && typeof data.value === 'string') {
         setSelectedDateFilter(data.value as DateFilterOption)
-        resetPagination()
+        handleResetPagination()
       }
     },
-    [resetPagination],
-  )
-
-  const goToPage = useCallback(
-    (pageNumber: number) => {
-      const targetIndex = pageNumber - 1
-
-      if (targetIndex < 0) return
-
-      if (targetIndex < totalPagesLoaded) {
-        setCurrentPageIndex(targetIndex)
-      } else if (targetIndex === totalPagesLoaded && hasNextPage) {
-        fetchNextPage().then(() => {
-          setCurrentPageIndex(targetIndex)
-        })
-      }
-    },
-    [totalPagesLoaded, hasNextPage, fetchNextPage],
+    [handleResetPagination],
   )
 
   return (
@@ -144,6 +127,10 @@ const CourseWorkCombinedWidget: React.FC<BaseWidgetProps> = ({
       isLoading={isLoading}
       error={error ? I18n.t('Failed to load course work. Please try again.') : null}
       onRetry={handleRetry}
+      pagination={{
+        ...paginationProps,
+        ariaLabel: I18n.t('Course work pagination'),
+      }}
       headerActions={
         <CourseWorkFilters
           selectedCourse={selectedCourse}
@@ -177,25 +164,6 @@ const CourseWorkCombinedWidget: React.FC<BaseWidgetProps> = ({
                   <CourseWorkItemComponent key={item.id} item={item} />
                 ))}
               </Flex>
-              {(effectiveHasNextPage || effectiveHasPreviousPage) && (
-                <View textAlign="center">
-                  <Flex direction="row" justifyItems="center" alignItems="center" gap="small">
-                    {(isFetchingNextPage || isFetchingPreviousPage) && (
-                      <Spinner size="x-small" renderTitle={I18n.t('Loading course work...')} />
-                    )}
-                    <Pagination
-                      variant="compact"
-                      margin="small"
-                      labelNext={I18n.t('Next page')}
-                      labelPrev={I18n.t('Previous page')}
-                      currentPage={effectiveCurrentPage}
-                      totalPageNumber={effectiveTotalPages}
-                      onPageChange={goToPage}
-                      aria-label={I18n.t('Course work pagination')}
-                    />
-                  </Flex>
-                </View>
-              )}
             </View>
           )}
         </Flex.Item>

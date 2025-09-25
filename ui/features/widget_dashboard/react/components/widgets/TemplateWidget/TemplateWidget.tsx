@@ -24,10 +24,19 @@ import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {Button} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
+import {Pagination} from '@instructure/ui-pagination'
 import type {BaseWidgetProps} from '../../../types'
 import {useResponsiveContext} from '../../../hooks/useResponsiveContext'
 
 const I18n = createI18nScope('widget_dashboard')
+
+export interface PaginationProps {
+  currentPage: number
+  totalPages: number
+  onPageChange: (page: number) => void
+  ariaLabel: string
+  isLoading?: boolean
+}
 
 export interface TemplateWidgetProps extends BaseWidgetProps {
   title?: string
@@ -36,6 +45,7 @@ export interface TemplateWidgetProps extends BaseWidgetProps {
   showHeader?: boolean
   headerActions?: React.ReactNode
   loadingText?: string
+  pagination?: PaginationProps
 }
 
 const TemplateWidget: React.FC<TemplateWidgetProps> = ({
@@ -49,6 +59,7 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
   error = null,
   onRetry,
   loadingText,
+  pagination,
 }) => {
   const {isMobile} = useResponsiveContext()
   const widgetTitle = title || widget.title
@@ -135,6 +146,25 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
         {actions && !isLoading && !error && (
           <View as="div" margin="small 0 0">
             {actions}
+          </View>
+        )}
+
+        {pagination && !isLoading && !error && pagination.totalPages > 1 && (
+          <View as="div" textAlign="center" padding="x-small 0" data-testid="pagination-container">
+            <Flex direction="row" justifyItems="center" alignItems="center" gap="small">
+              {pagination.isLoading && (
+                <Spinner size="x-small" renderTitle={I18n.t('Loading...')} />
+              )}
+              <Pagination
+                as="nav"
+                margin="x-small"
+                variant="compact"
+                currentPage={pagination.currentPage}
+                totalPageNumber={pagination.totalPages}
+                onPageChange={pagination.onPageChange}
+                aria-label={pagination.ariaLabel}
+              />
+            </Flex>
           </View>
         )}
       </Flex>

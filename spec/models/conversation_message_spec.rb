@@ -181,8 +181,6 @@ describe ConversationMessage do
       message.destroy
       expect(StreamItem.count).to eql(old_count + 1)
     end
-
-    it "should delete the stream_item if the conversation is deleted" # not yet implemented
   end
 
   context "sharding" do

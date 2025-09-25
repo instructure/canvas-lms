@@ -793,4 +793,262 @@ describe RoleOverride do
       RoleOverride.permission_for(account, :moderate_forum, role, account, true)
     end
   end
+
+  describe "enrollment_type_labels" do
+    let(:regular_account) { account_model }
+    let(:horizon_account) { account_model }
+
+    before do
+      allow(horizon_account).to receive(:horizon_account?).and_return(true)
+      allow(regular_account).to receive(:horizon_account?).and_return(false)
+    end
+
+    context "without CanvasCareer::LabelOverrides" do
+      it "returns default enrollment type labels" do
+        labels = RoleOverride.enrollment_type_labels(regular_account)
+
+        expect(labels).to be_an(Array)
+        expect(labels.length).to eq(5) # Number of enrollment types
+
+        student_label = labels.find { |l| l[:name] == "StudentEnrollment" }
+        expect(student_label[:label].call).to eq("Student")
+        expect(student_label[:plural_label].call).to eq("Students")
+
+        teacher_label = labels.find { |l| l[:name] == "TeacherEnrollment" }
+        expect(teacher_label[:label].call).to eq("Teacher")
+        expect(teacher_label[:plural_label].call).to eq("Teachers")
+      end
+
+      it "returns default labels when context is nil" do
+        labels = RoleOverride.enrollment_type_labels(nil)
+
+        student_label = labels.find { |l| l[:name] == "StudentEnrollment" }
+        expect(student_label[:label].call).to eq("Student")
+        expect(student_label[:plural_label].call).to eq("Students")
+      end
+    end
+
+    context "with CanvasCareer::LabelOverrides" do
+      before do
+        # Mock the CanvasCareer::LabelOverrides module behavior
+        allow(CanvasCareer::LabelOverrides).to receive(:enrollment_type_overrides).with(horizon_account).and_return({
+                                                                                                                      "StudentEnrollment" => {
+                                                                                                                        label: -> { "Learner" },
+                                                                                                                        plural_label: -> { "Learners" }
+                                                                                                                      },
+                                                                                                                      "TeacherEnrollment" => {
+                                                                                                                        label: -> { "Instructor" },
+                                                                                                                        plural_label: -> { "Instructors" }
+                                                                                                                      }
+                                                                                                                    })
+
+        allow(CanvasCareer::LabelOverrides).to receive(:enrollment_type_overrides).with(regular_account).and_return({})
+      end
+
+      it "applies label overrides for horizon accounts" do
+        labels = RoleOverride.enrollment_type_labels(horizon_account)
+
+        student_label = labels.find { |l| l[:name] == "StudentEnrollment" }
+        expect(student_label[:label].call).to eq("Learner")
+        expect(student_label[:plural_label].call).to eq("Learners")
+
+        teacher_label = labels.find { |l| l[:name] == "TeacherEnrollment" }
+        expect(teacher_label[:label].call).to eq("Instructor")
+        expect(teacher_label[:plural_label].call).to eq("Instructors")
+      end
+
+      it "applies partial overrides and keeps defaults for non-overridden fields" do
+        allow(CanvasCareer::LabelOverrides).to receive(:enrollment_type_overrides).with(horizon_account).and_return({
+                                                                                                                      "StudentEnrollment" => {
+                                                                                                                        label: -> { "Learner" }
+                                                                                                                        # plural_label not overridden
+                                                                                                                      }
+                                                                                                                    })
+
+        labels = RoleOverride.enrollment_type_labels(horizon_account)
+
+        student_label = labels.find { |l| l[:name] == "StudentEnrollment" }
+        expect(student_label[:label].call).to eq("Learner")
+        expect(student_label[:plural_label].call).to eq("Students") # Default value
+      end
+
+      it "leaves non-overridden enrollment types unchanged" do
+        labels = RoleOverride.enrollment_type_labels(horizon_account)
+
+        ta_label = labels.find { |l| l[:name] == "TaEnrollment" }
+        expect(ta_label[:label].call).to eq("TA")
+        expect(ta_label[:plural_label].call).to eq("TAs")
+
+        designer_label = labels.find { |l| l[:name] == "DesignerEnrollment" }
+        expect(designer_label[:label].call).to eq("Designer")
+        expect(designer_label[:plural_label].call).to eq("Designers")
+      end
+    end
+  end
+
+  describe "manageable_permissions" do
+    let(:regular_account) { account_model }
+    let(:horizon_account) { account_model }
+    let(:mock_permissions) do
+      {
+        manage_account_memberships: {
+          label: -> { "Admins - add / remove" },
+          group: "Account",
+          available_to: ["AccountAdmin", "AccountMembership"],
+          true_for: ["AccountAdmin"]
+        },
+        read_course_content: {
+          label: -> { "Course Content - view" },
+          group: "Course",
+          available_to: %w[AccountAdmin AccountMembership TeacherEnrollment],
+          true_for: ["AccountAdmin"]
+        }
+      }
+    end
+
+    before do
+      allow(horizon_account).to receive(:horizon_account?).and_return(true)
+      allow(regular_account).to receive(:horizon_account?).and_return(false)
+    end
+
+    context "without CanvasCareer::LabelOverrides" do
+      before do
+        allow(Permissions).to receive(:retrieve).and_return(mock_permissions)
+        allow(CanvasCareer::LabelOverrides).to receive(:permission_label_overrides).with(regular_account).and_return({})
+      end
+
+      it "returns default permission labels" do
+        permissions = RoleOverride.manageable_permissions(regular_account)
+
+        expect(permissions[:manage_account_memberships][:label].call).to eq("Admins - add / remove")
+        expect(permissions[:read_course_content][:label].call).to eq("Course Content - view")
+      end
+    end
+
+    context "with CanvasCareer::LabelOverrides" do
+      before do
+        allow(Permissions).to receive(:retrieve).and_call_original
+        allow(CanvasCareer::LabelOverrides).to receive(:permission_label_overrides).with(horizon_account).and_return({
+                                                                                                                       manage_account_memberships: {
+                                                                                                                         label: -> { "Manage Instructors" }
+                                                                                                                       },
+                                                                                                                       read_course_content: {
+                                                                                                                         label: -> { "View Program Content" }
+                                                                                                                       }
+                                                                                                                     })
+        allow(CanvasCareer::LabelOverrides).to receive(:permission_label_overrides).with(regular_account).and_return({})
+      end
+
+      it "applies label overrides for horizon accounts" do
+        permissions = RoleOverride.manageable_permissions(horizon_account)
+
+        expect(permissions[:manage_account_memberships][:label].call).to eq("Manage Instructors")
+        expect(permissions[:read_course_content][:label].call).to eq("View Program Content")
+      end
+
+      it "applies partial overrides and keeps defaults for non-overridden fields" do
+        allow(CanvasCareer::LabelOverrides).to receive(:permission_label_overrides).with(horizon_account).and_return({
+                                                                                                                       manage_account_memberships: {
+                                                                                                                         label: -> { "Manage Instructors" }
+                                                                                                                       }
+                                                                                                                     })
+
+        permissions = RoleOverride.manageable_permissions(horizon_account)
+
+        expect(permissions[:manage_account_memberships][:label].call).to eq("Manage Instructors")
+        expect(permissions[:manage_account_memberships][:account_only]).to be(true)
+        expect(permissions[:manage_account_memberships]).not_to have_key(:group_label)
+      end
+
+      it "leaves non-overridden permissions unchanged" do
+        allow(CanvasCareer::LabelOverrides).to receive(:permission_label_overrides).with(horizon_account).and_return({
+                                                                                                                       manage_account_memberships: {
+                                                                                                                         label: -> { "Manage Instructors" }
+                                                                                                                       }
+                                                                                                                     })
+
+        permissions = RoleOverride.manageable_permissions(horizon_account)
+
+        expect(permissions[:read_course_content][:label].call).to eq("Course Content - view")
+      end
+
+      it "does not modify original permission definitions" do
+        original_permissions = RoleOverride.permissions
+        original_manage_account_memberships_label = original_permissions[:manage_account_memberships][:label]
+
+        RoleOverride.manageable_permissions(horizon_account)
+
+        # Original permissions should not be modified
+        expect(original_permissions[:manage_account_memberships][:label]).to eq(original_manage_account_memberships_label)
+      end
+    end
+
+    context "with base_role_type filtering" do
+      before do
+        allow(Permissions).to receive(:retrieve).and_call_original
+      end
+
+      it "respects base_role_type parameter with label overrides" do
+        allow(CanvasCareer::LabelOverrides).to receive(:permission_label_overrides).with(horizon_account).and_return({
+                                                                                                                       read_sis: {
+                                                                                                                         label: -> { "View SIS Data" }
+                                                                                                                       }
+                                                                                                                     })
+
+        permissions = RoleOverride.manageable_permissions(horizon_account, "TeacherEnrollment")
+
+        expect(permissions[:read_sis][:label].call).to eq("View SIS Data")
+        expect(permissions).to have_key(:read_sis)
+      end
+    end
+
+    context "integration with existing filtering logic" do
+      let(:site_admin_account) { Account.site_admin }
+      let(:root_account) { Account.default }
+      let(:sub_account) { account_model(parent_account: root_account) }
+
+      before do
+        allow(site_admin_account).to receive(:site_admin?).and_return(true)
+        allow(root_account).to receive(:root_account?).and_return(true)
+        allow(sub_account).to receive_messages(site_admin?: false, root_account?: false)
+
+        # Mock permissions with different account restrictions
+        allow(Permissions).to receive(:retrieve).and_return({
+                                                              site_admin_only: {
+                                                                label: -> { "Site Admin Only" },
+                                                                account_only: :site_admin,
+                                                                available_to: ["AccountAdmin"],
+                                                                true_for: ["AccountAdmin"]
+                                                              },
+                                                              root_only: {
+                                                                label: -> { "Root Only" },
+                                                                account_only: :root,
+                                                                available_to: ["AccountAdmin"],
+                                                                true_for: ["AccountAdmin"]
+                                                              },
+                                                              read_course_content: {
+                                                                label: -> { "Course Content - view" },
+                                                                available_to: ["AccountAdmin"],
+                                                                true_for: ["AccountAdmin"]
+                                                              }
+                                                            })
+      end
+
+      it "applies label overrides while respecting account restrictions" do
+        allow(Permissions).to receive(:retrieve).and_call_original
+
+        allow(CanvasCareer::LabelOverrides).to receive(:permission_label_overrides).with(sub_account).and_return({
+                                                                                                                   read_course_content: {
+                                                                                                                     label: -> { "Override Course Content" }
+                                                                                                                   }
+                                                                                                                 })
+
+        permissions = RoleOverride.manageable_permissions(sub_account)
+
+        expect(permissions).not_to have_key(:site_admin_only)
+        expect(permissions).not_to have_key(:root_only)
+        expect(permissions[:read_course_content][:label].call).to eq("Override Course Content")
+      end
+    end
+  end
 end

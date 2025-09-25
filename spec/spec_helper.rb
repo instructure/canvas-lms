@@ -1009,7 +1009,7 @@ RSpec.configure do |config|
   end
 
   def skip_if_prepended_class_method_stubs_broken
-    skip("stubbing prepended class methods is broken in new versions of ruby")
+    skip("stubbing prepended class methods is broken in new versions of ruby") # rubocop:disable Specs/NoSkipWithoutDate,Specs/NoSkipWithoutTicket
   end
 end
 

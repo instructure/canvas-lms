@@ -79,7 +79,7 @@ export default combineReducers({
   atomFeedUrl: identity(null),
   isToggleLocking: handleActions(
     {
-      [actionTypes.SET_ANNOUNCEMENTS_IS_LOCKING]: (state, action) => action.payload,
+      [actionTypes.SET_ANNOUNCEMENTS_IS_LOCKING]: (_state, action) => action.payload,
     },
     false,
   ),

@@ -176,21 +176,11 @@ class Lti::ResourceLinksController < ApplicationController
   #
   # @returns [Lti::ResourceLink]
   def index
-    course_assignment_ids = base_scope(@context.assignments).ids
-    # preload Assignment -> Course, used for launch_url
-    assignment_links = base_scope.where(context_type: "Assignment", context_id: course_assignment_ids).preload(context: :context)
-
-    # includes Module Items, Collaborations, and Rich Content
-    all_other_links = base_scope.where(context: @context).preload(:context)
-
     bookmarker = BookmarkedCollection::SimpleBookmarker.new(Lti::ResourceLink, :created_at, :id)
-    all_links = BookmarkedCollection.merge(
-      ["assignment", BookmarkedCollection.wrap(bookmarker, assignment_links)],
-      ["course", BookmarkedCollection.wrap(bookmarker, all_other_links)]
-    )
+    bookmarked_links = BookmarkedCollection.wrap(bookmarker, base_scope)
 
     per_page = Api.per_page_for(self, default: 50)
-    paginated_links = Api.paginate(all_links, self, url_for, { per_page: })
+    paginated_links = Api.paginate(bookmarked_links, self, url_for, { per_page: })
 
     render json: paginated_links.map { |link| resource_link_json(link) }
   rescue => e
@@ -396,6 +386,10 @@ class Lti::ResourceLinksController < ApplicationController
   private
 
   def base_scope(scope = Lti::ResourceLink)
+    # Since the URL for this API endpoint has /course/:course_id in it,
+    # the @context will be a course. We should also search where the context
+    # is an assignment in this course.
+    scope = scope.where(context: [@context, @context.assignments]).preload(:context)
     return scope if params[:include_deleted]
 
     scope.active

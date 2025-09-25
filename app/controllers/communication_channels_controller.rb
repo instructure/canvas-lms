@@ -152,7 +152,7 @@ class CommunicationChannelsController < ApplicationController
   def create
     @user = api_request? ? api_find(User, params[:user_id]) : @current_user
 
-    if !has_api_permissions? && params[:communication_channel][:type] != CommunicationChannel::TYPE_PUSH
+    unless can_edit_own_comm_channels? || can_manage_user_details? || params[:communication_channel][:type] == CommunicationChannel::TYPE_PUSH
       return render_unauthorized_action
     end
 
@@ -384,7 +384,7 @@ class CommunicationChannelsController < ApplicationController
       else
         # Open registration and admin-created users are pre-registered, and have already claimed a CC, but haven't
         # set up a password yet
-        @pseudonym = @root_account.pseudonyms.active_only.where(password_auto_generated: true, user_id: @user).first if @user.pre_registered? || @user.creation_pending?
+        @pseudonym = @root_account.pseudonyms.not_instructure_identity.active_only.where(password_auto_generated: true, user_id: @user).first if @user.pre_registered? || @user.creation_pending?
         # Users implicitly created via course enrollment or account admin creation are creation pending, and don't have a pseudonym yet
         @pseudonym ||= @root_account.pseudonyms.build(user: @user, unique_id: cc.path) if @user.creation_pending?
         # We create the pseudonym with unique_id = cc.path, but if that unique_id is taken, just nil it out and make the user come
@@ -560,10 +560,9 @@ class CommunicationChannelsController < ApplicationController
       @cc = @user.communication_channels.unretired.find(params[:id])
     end
 
-    return render_unauthorized_action unless has_api_permissions?
-    if @cc.imported? && !@domain_root_account.edit_institution_email?
-      return render_unauthorized_action
-    end
+    return render_unauthorized_action unless can_manage_user_details? ||
+                                             (can_edit_own_comm_channels? &&
+                                             (!@cc.imported? || @domain_root_account.edit_institution_email?))
 
     if @cc.destroy
       @user.touch
@@ -653,9 +652,12 @@ class CommunicationChannelsController < ApplicationController
     end
   end
 
-  def has_api_permissions?
-    (@user == @current_user && @current_user&.user_can_edit_comm_channels?) ||
-      @user.grants_right?(@current_user, session, :manage_user_details)
+  def can_edit_own_comm_channels?
+    @user == @current_user && @current_user&.user_can_edit_comm_channels?
+  end
+
+  def can_manage_user_details?
+    @user.grants_right?(@current_user, session, :manage_user_details)
   end
 
   def add_additional_email_if_allowed

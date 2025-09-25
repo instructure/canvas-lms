@@ -48,17 +48,12 @@ const mockedUseSwitchExperience = useSwitchExperience as jest.MockedFunction<
 describe('MobileGlobalMenu', () => {
   beforeEach(() => {
     mockedUseSwitchExperience.mockReturnValue({mutate: jest.fn()} as any)
-    fakeENV.setup({
-      FEATURES: {
-        horizon_learner_app: true,
-        horizon_learning_provider_app_on_contextless_routes: true,
-      },
-    })
   })
+
   afterEach(() => {
     cleanup()
-    fakeENV.teardown()
   })
+
   const setup = (
     processedTools: ProcessedTool[] = [],
     externalTools: ExternalTool[] = [],
@@ -255,20 +250,6 @@ describe('MobileGlobalMenu', () => {
     await userEvent.click(link)
     await waitFor(() => {
       expect(mutateMock).toHaveBeenCalled()
-    })
-  })
-  describe('when career feature flags are not enabled', () => {
-    beforeEach(() => {
-      fakeENV.setup({
-        FEATURES: {
-          horizon_learner_app: false,
-          horizon_learning_provider_app_on_contextless_routes: false,
-        },
-      })
-    })
-    it('should not render Career menu item', async () => {
-      setup([], [], false)
-      expect(await screen.queryByText('Canvas Career')).not.toBeInTheDocument()
     })
   })
 })

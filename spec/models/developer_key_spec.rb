@@ -1497,16 +1497,6 @@ describe DeveloperKey do
     expect(developer_key_not_saved).not_to be_valid
   end
 
-  it "returns the correct count of access_tokens" do
-    expect(developer_key_saved.access_token_count).to eq 0
-
-    AccessToken.create!(user: user_model, developer_key: developer_key_saved)
-    AccessToken.create!(user: user_model, developer_key: developer_key_saved)
-    AccessToken.create!(user: user_model, developer_key: developer_key_saved)
-
-    expect(developer_key_saved.reload.access_token_count).to eq 3
-  end
-
   it "returns the last_used_at value for a key" do
     expect(developer_key_saved.last_used_at).to be_nil
     at = AccessToken.create!(user: user_model, developer_key: developer_key_saved)
@@ -1742,6 +1732,22 @@ describe DeveloperKey do
         it "finds keys in the current shard" do
           local_key = DeveloperKey.create!(vendor_code:, account: account_model)
           expect(DeveloperKey.by_cached_vendor_code(vendor_code)).to include local_key
+        end
+      end
+
+      describe "#access_token_count" do
+        let_once(:developer_key) do
+          @shard1.activate { DeveloperKey.create!(account: account_model, name: "dk") }
+        end
+
+        it "returns the correct count of access_tokens" do
+          expect(developer_key.access_token_count).to eq 0
+
+          AccessToken.create!(user: user_model, developer_key:)
+          AccessToken.create!(user: user_model, developer_key:)
+          AccessToken.create!(user: user_model, developer_key:)
+
+          expect(developer_key.reload.access_token_count).to eq 3
         end
       end
     end

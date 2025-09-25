@@ -216,28 +216,57 @@ describe GradebooksController do
       end
 
       describe "asset processor functionality" do
-        it "includes asset_processors in submission data" do
-          allow_any_instance_of(AssetProcessorStudentHelper).to receive(:asset_processors).and_return([{ id: 1, title: "Test Processor" }])
-          get "grade_summary", params: { course_id: @course.id, id: @student.id }
-          submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
-          expect(submission).to have_key(:asset_processors)
-          expect(submission[:asset_processors]).to eq([{ id: 1, title: "Test Processor" }])
-        end
+        context "with online_text_entry submission" do
+          before do
+            @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "test submission")
+          end
 
-        it "includes asset_reports in submission data" do
-          allow_any_instance_of(AssetProcessorStudentHelper).to receive(:asset_reports).and_return([{ id: 1, priority: 0 }])
-          get "grade_summary", params: { course_id: @course.id, id: @student.id }
-          submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
-          expect(submission).to have_key(:asset_reports)
-          expect(submission[:asset_reports]).to eq([{ id: 1, priority: 0 }])
-        end
+          it "includes processors and reports in submission data if user can read grade" do
+            allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_processors).and_return([{ id: 1, title: "Test Processor" }])
+            allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_reports_info_for_display).and_return([{ id: 1, priority: 0 }])
 
-        it "includes submission_type in submission data" do
-          @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "test submission")
-          get "grade_summary", params: { course_id: @course.id, id: @student.id }
-          submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
-          expect(submission).to have_key(:submission_type)
-          expect(submission[:submission_type]).to eq("online_text_entry")
+            get "grade_summary", params: { course_id: @course.id, id: @student.id }
+
+            submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
+            expect(submission).to have_key(:asset_processors)
+            expect(submission[:asset_processors]).to eq([{ id: 1, title: "Test Processor" }])
+            expect(submission).to have_key(:asset_reports)
+            expect(submission[:asset_reports]).to eq([{ id: 1, priority: 0 }])
+            expect(submission).to have_key(:submission_type)
+            expect(submission[:submission_type]).to eq("online_text_entry")
+          end
+
+          it "includes processors and reports in submission data if grades are hidden" do
+            allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_processors).and_return([{ id: 1, title: "Test Processor" }])
+            allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_reports_info_for_display).and_return([{ id: 1, priority: 0 }])
+            # ensure the grades are hidden
+            allow(@assignment).to receive(:user_can_read_grades?).and_return(false)
+            submission = @assignment.grade_student(@student, grade: 10, grader: @teacher).first
+            submission.update(posted_at: nil)
+
+            get "grade_summary", params: { course_id: @course.id, id: @student.id }
+
+            submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
+            expect(submission).to have_key(:asset_processors)
+            expect(submission[:asset_processors]).to eq([{ id: 1, title: "Test Processor" }])
+            expect(submission).to have_key(:asset_reports)
+            expect(submission[:asset_reports]).to eq([{ id: 1, priority: 0 }])
+            expect(submission).to have_key(:submission_type)
+            expect(submission[:submission_type]).to eq("online_text_entry")
+          end
+
+          it "does not include processors and reports in submission data if user cannot read grades" do
+            allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_processors).and_return([{ id: 1, title: "Test Processor" }])
+            allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_reports_info_for_display).and_return([{ id: 1, priority: 0 }])
+            allow_any_instance_of(Submission).to receive(:user_can_read_grade?).and_return(false)
+
+            get "grade_summary", params: { course_id: @course.id, id: @student.id }
+
+            submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
+            expect(submission).not_to have_key(:asset_processors)
+            expect(submission).not_to have_key(:asset_reports)
+            expect(submission).not_to have_key(:submission_type)
+          end
         end
       end
     end
@@ -296,7 +325,7 @@ describe GradebooksController do
       end
 
       it "returns nil for asset_reports" do
-        allow_any_instance_of(AssetProcessorStudentHelper).to receive(:asset_reports).and_return([{ id: 1, priority: 0 }])
+        allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_reports_info_for_display).and_return([{ id: 1, priority: 0 }])
         get "grade_summary", params: { course_id: @course.id, id: @student.id }
         submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
         expect(submission[:asset_reports]).to be_nil
@@ -3027,8 +3056,8 @@ describe GradebooksController do
       before do
         @course.account.enable_feature!(:discussion_checkpoints)
         assignment = @course.assignments.create!(has_sub_assignments: true)
-        assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, due_at: 2.days.from_now)
-        assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, due_at: 3.days.from_now)
+        @sub1 = assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, due_at: 2.days.from_now)
+        @sub2 = assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, due_at: 3.days.from_now)
         @topic = @course.discussion_topics.create!(assignment:, reply_to_entry_required_count: 1)
       end
 
@@ -3080,6 +3109,49 @@ describe GradebooksController do
         expect(response).to be_successful
         expect(reply_to_topic_submission.score).to be_nil
         expect(@topic.assignment.submissions.find_by(user: @student).score).to eq 10
+      end
+
+      it "returns SubAssignment submissions for active submissions" do
+        user_session(@teacher)
+        post(
+          "update_submission",
+          params: post_params.merge(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC),
+          format: :json
+        )
+        expect(response).to be_successful
+        json = response.parsed_body
+        submission_json = json.first["submission"]
+        expect(submission_json["sub_assignment_submissions"]).to be_an(Array)
+        expect(submission_json["sub_assignment_submissions"].length).to eq 2
+      end
+
+      it "does return deleted sub assignment submissions" do
+        user_session(@teacher)
+        @sub1.destroy
+        post(
+          "update_submission",
+          params: post_params.merge(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY),
+          format: :json
+        )
+        expect(response).to be_successful
+        json = response.parsed_body
+        submission_json = json.first["submission"]
+        expect(submission_json["sub_assignment_submissions"].length).to eq 1
+      end
+
+      it "returns empty array when there are no sub assignment submissions" do
+        user_session(@teacher)
+        @sub1.destroy
+        @sub2.destroy
+        post(
+          "update_submission",
+          params: post_params.merge(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC),
+          format: :json
+        )
+        expect(response).to be_successful
+        json = response.parsed_body
+        submission_json = json.first["submission"]
+        expect(submission_json["sub_assignment_submissions"]).to eq []
       end
     end
   end

@@ -100,7 +100,9 @@ describe('TranslationOptions', () => {
       rerender(<TranslationOptions asPrimary={asPrimary} onSetPrimary={setPrimaryMock} />)
 
       const input = screen.getByPlaceholderText(/Select a language.../i)
-      fireEvent.change(input, {target: {value: 'Spanish'}})
+      fireEvent.click(input)
+      const option = screen.getByText(/Spanish/i)
+      fireEvent.click(option)
       const translateButton = screen.getByText(/^Translate$/i).closest('button')
       fireEvent.click(translateButton!)
 

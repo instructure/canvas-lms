@@ -314,12 +314,6 @@
     "clear_image_3213fe62": {
         "message": "Limpar imagem"
     },
-    "clear_selected_file_82388e50": {
-        "message": "Apagar o ficheiro selecionado"
-    },
-    "clear_selected_file_filename_2fe8a58e": {
-        "message": "Apagar o ficheiro selecionado: { filename }"
-    },
     "click_or_shift_click_for_the_html_editor_25d70bb4": {
         "message": "Clicar ou clicar com o shift para o editor html."
     },

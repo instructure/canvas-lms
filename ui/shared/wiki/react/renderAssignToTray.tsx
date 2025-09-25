@@ -18,7 +18,6 @@
 
 import React, {useEffect, useState} from 'react'
 import {View} from '@instructure/ui-view'
-import {useScope as createI18nScope} from '@canvas/i18n'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
 import {createRoot} from 'react-dom/client'
 import type {
@@ -29,8 +28,6 @@ import {
   generateDateDetailsPayload,
   generateDefaultCard,
 } from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
-
-const I18n = createI18nScope('pages_edit')
 
 interface Props {
   pageName?: string

@@ -341,16 +341,6 @@ shared_examples "Gradebook" do |ff_enabled|
     expect(ff(".late")).to have_size(1)
   end
 
-  it "hides the speedgrader link for large courses", priority: "2" do
-    pending("TODO: Refactor this and add it back as part of CNVS-32440")
-    allow(@course).to receive(:large_roster?).and_return(true)
-
-    Gradebook.visit(@course)
-
-    f(".Gradebook__ColumnHeaderAction button").click
-    expect(f(".gradebook-header-menu")).not_to include_text("SpeedGrader")
-  end
-
   context "grading quiz submissions" do
     # set up course and users
     let(:test_course) { course_factory }

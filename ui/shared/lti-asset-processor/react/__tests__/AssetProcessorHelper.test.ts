@@ -16,22 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  clearAssetProcessorReports,
-  filterReports,
-  filterReportsByAttempt,
-  shouldRenderAssetProcessorData,
-} from '../AssetProcessorHelper'
+import {filterReports, filterReportsByAttempt} from '../AssetProcessorHelper'
 import {LtiAssetReportWithAsset} from '@canvas/lti-asset-processor/model/AssetReport'
-
-declare const window: {
-  ENV: {
-    ASSET_REPORTS?: LtiAssetReportWithAsset[] | null
-    ASSET_PROCESSORS?: object[]
-    ASSIGNMENT_NAME?: string
-    SUBMISSION_TYPE?: string
-  }
-}
 
 /**
  * Helper function to create a mock LtiAssetReportWithAsset
@@ -58,30 +44,15 @@ const createMockReport = (
 }
 
 describe('AssetProcessorHelper', () => {
-  let oldEnv: typeof window.ENV
-
-  beforeEach(() => {
-    oldEnv = window.ENV
-    window.ENV = {}
-  })
-
-  afterEach(() => {
-    window.ENV = oldEnv
-  })
-
   describe('filterReports', () => {
-    it('returns an empty array when ASSET_REPORTS is undefined', () => {
-      window.ENV.ASSET_REPORTS = undefined
-
-      const result = filterReports(window.ENV.ASSET_REPORTS, '123')
+    it('returns an empty array when asset reports is undefined', () => {
+      const result = filterReports(undefined, '123')
 
       expect(result).toEqual([])
     })
 
     it('returns an empty array when attachmentId is undefined', () => {
-      window.ENV.ASSET_REPORTS = [createMockReport()]
-
-      const result = filterReports(window.ENV.ASSET_REPORTS, undefined)
+      const result = filterReports([createMockReport()], undefined)
 
       expect(result).toEqual([])
     })
@@ -100,27 +71,22 @@ describe('AssetProcessorHelper', () => {
       })
 
       const reports = [mockReport1, mockReport2]
-      window.ENV.ASSET_REPORTS = reports
 
-      const result = filterReports(window.ENV.ASSET_REPORTS, '123')
+      const result = filterReports(reports, '123')
 
       expect(result).toEqual([reports[0]])
     })
   })
 
   describe('filterReportsByAttempt', () => {
-    it('returns an empty array when ASSET_REPORTS is undefined', () => {
-      window.ENV.ASSET_REPORTS = undefined
-
-      const result = filterReportsByAttempt(window.ENV.ASSET_REPORTS, '1')
+    it('returns an empty array when reports is undefined', () => {
+      const result = filterReportsByAttempt(undefined, '1')
 
       expect(result).toEqual([])
     })
 
     it('returns an empty array when attemptId is undefined', () => {
-      window.ENV.ASSET_REPORTS = [createMockReport()]
-
-      const result = filterReportsByAttempt(window.ENV.ASSET_REPORTS, undefined)
+      const result = filterReportsByAttempt([createMockReport()], undefined)
 
       expect(result).toEqual([])
     })
@@ -140,59 +106,10 @@ describe('AssetProcessorHelper', () => {
       })
 
       const reports = [mockReport1, mockReport2]
-      window.ENV.ASSET_REPORTS = reports
 
-      const result = filterReportsByAttempt(window.ENV.ASSET_REPORTS, '1')
+      const result = filterReportsByAttempt(reports, '1')
 
       expect(result).toEqual([reports[0]])
-    })
-  })
-
-  describe('shouldRenderAssetProcessorData', () => {
-    it('returns false when there are no asset processors', () => {
-      window.ENV.ASSET_PROCESSORS = []
-      window.ENV.ASSET_REPORTS = []
-
-      const result = shouldRenderAssetProcessorData()
-
-      expect(result).toBe(false)
-    })
-
-    it('returns false when asset processors is undefined', () => {
-      window.ENV.ASSET_PROCESSORS = undefined
-      window.ENV.ASSET_REPORTS = []
-
-      const result = shouldRenderAssetProcessorData()
-
-      expect(result).toBe(false)
-    })
-
-    it('returns false when asset reports is undefined', () => {
-      window.ENV.ASSET_PROCESSORS = [{}]
-      window.ENV.ASSET_REPORTS = null
-
-      const result = shouldRenderAssetProcessorData()
-
-      expect(result).toBe(false)
-    })
-
-    it('returns true when both asset processors and reports exist', () => {
-      window.ENV.ASSET_PROCESSORS = [{}]
-      window.ENV.ASSET_REPORTS = []
-
-      const result = shouldRenderAssetProcessorData()
-
-      expect(result).toBe(true)
-    })
-  })
-
-  describe('clearAssetProcessorReports', () => {
-    it('clears the ASSET_REPORTS property', () => {
-      window.ENV.ASSET_REPORTS = [createMockReport()]
-
-      clearAssetProcessorReports()
-
-      expect(window.ENV.ASSET_REPORTS).toBeUndefined()
     })
   })
 })

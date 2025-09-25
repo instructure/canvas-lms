@@ -382,23 +382,6 @@ describe "announcements" do
       expect(announcement.find_element(:css, ".ic-announcement-row__content")).to include_text(@announcement.message)
     end
 
-    it "always sees student replies when 'initial post required' is turned on", priority: "1" do
-      skip_if_chrome("Student view breaks this test")
-      student_entry = "this is my reply"
-
-      create_announcement_initial
-
-      # Create reply as a student
-      enter_student_view
-      reply_to_announcement(@announcement.id, student_entry)
-      leave_student_view
-
-      # As a teacher, verify that you can see the student's reply even though
-      # you have not responded
-      get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}"
-      expect(ff(".discussion_entry .message")[1]).to include_text(student_entry)
-    end
-
     it "creates an announcement that requires an initial post", priority: "1" do
       get "/courses/#{@course.id}/discussion_topics/new?is_announcement=true"
       replace_content(f("input[name=title]"), "title")
@@ -418,7 +401,7 @@ describe "announcements" do
       end
 
       it "removes the Reply section" do
-        skip "Should be fixed by VICE-5399"
+        skip "Should be fixed by VICE-5399 2025-07-22"
         create_announcement
         get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}"
 

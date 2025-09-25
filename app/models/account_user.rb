@@ -19,6 +19,8 @@
 #
 
 class AccountUser < ActiveRecord::Base
+  attr_writer :current_user # used for audit logging
+
   extend RootAccountResolver
 
   belongs_to :account
@@ -26,12 +28,17 @@ class AccountUser < ActiveRecord::Base
   belongs_to :role
 
   has_many :role_overrides, as: :context, inverse_of: :context
+  has_many :auditor_records,
+           class_name: "Auditors::ActiveRecord::AccountUserRecord",
+           dependent: :destroy,
+           inverse_of: :account_user
   has_a_broadcast_policy
   before_validation :infer_defaults
-  after_save :clear_user_cache
   after_destroy :clear_user_cache
-  after_save :update_account_associations_if_changed
   after_destroy :update_account_associations_later
+  after_save :clear_user_cache
+  after_save :update_account_associations_if_changed
+  after_update_commit :audit_log_deletion, if: -> { saved_change_to_workflow_state? && workflow_state == "deleted" }
 
   validate :valid_role?, unless: :deleted?
   validates :account_id, :user_id, :role_id, presence: true
@@ -67,6 +74,11 @@ class AccountUser < ActiveRecord::Base
 
     self.workflow_state = "deleted"
     save!
+  end
+
+  def audit_log_deletion
+    performing_user = @current_user || Canvas.infer_user
+    Auditors::AccountUser.record(self, performing_user, action: "deleted")
   end
 
   def update_account_associations_if_changed

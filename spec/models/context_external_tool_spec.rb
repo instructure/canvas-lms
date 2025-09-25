@@ -3184,7 +3184,7 @@ describe ContextExternalTool do
     let(:domain) { "http://www.example.com" }
     let(:tool) { external_tool_1_3_model(developer_key:, opts: { domain: }) }
 
-    %w[submission_type_selection top_navigation].each do |restricted_placement|
+    %w[submission_type_selection].each do |restricted_placement|
       context "when the tool has a #{restricted_placement} placement" do
         let(:placement) { restricted_placement.to_sym }
 

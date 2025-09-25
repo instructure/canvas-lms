@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useRef, useMemo} from 'react'
+import React, {useState, useRef} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import CanvasMultiSelect from '@canvas/multi-select/react'
+import {SimpleSelect} from '@instructure/ui-simple-select'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Language} from './TranslationControls'
 import {Button} from '@instructure/ui-buttons'
@@ -40,57 +40,35 @@ interface Props {
 const TranslationOptions: React.FC<Props> = ({asPrimary, onSetPrimary}) => {
   // @ts-expect-error
   const languages = useRef<Language[]>(ENV?.inbox_translation_languages ?? [])
-  const [input, setInput] = useState('')
   const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(null)
-  const selectRef = useRef<HTMLInputElement | null>(null)
+  const inputRef = useRef<HTMLInputElement>()
 
+  const translationContext = useTranslationContext()
+
+  const errorMessages = translationContext.errorMessages ?? []
   const {
     setTranslationTargetLanguage,
     translateBody,
     translating: translationLoading,
-    errorMessages,
     setErrorMessages,
-  } = useTranslationContext()
+  } = translationContext
 
-  const handleChange = (selectedArray: string[]) => {
-    const id = selectedArray[0]
-    const result = languages.current.find(({id: _id}) => id === _id)
+  const handleSelectOption = (_event: React.ChangeEvent<HTMLSelectElement>, value: string) => {
+    const result = languages.current.find(lang => lang.id === value)
 
-    if (!result) {
-      return
-    }
+    if (!result) return
 
-    if (selectedLanguage?.id !== result.id) {
-      setInput(result.name)
-      setSelectedLanguage(result)
-      setTranslationTargetLanguage(result.id)
-    }
+    setSelectedLanguage(result)
+    setTranslationTargetLanguage(result.id)
   }
 
   const handleSubmit = () => {
     if (translationLoading) return
 
-    if (!input) {
-      setErrorMessages([{type: 'newError', text: I18n.t('Please select a language')}])
-      selectRef.current?.focus()
-      return
-    }
-
     if (!selectedLanguage) {
-      const result = languages.current.find(({name}) => name === input)
-
-      if (!result) {
-        setErrorMessages([
-          {
-            type: 'newError',
-            text: I18n.t('There was an error selecting the language. Please try another language.'),
-          },
-        ])
-        selectRef.current?.focus()
-        return
-      }
-
-      setSelectedLanguage(result)
+      setErrorMessages([{type: 'newError', text: I18n.t('Please select a language.')}])
+      inputRef.current?.focus()
+      return
     }
 
     if (asPrimary === null) {
@@ -98,16 +76,8 @@ const TranslationOptions: React.FC<Props> = ({asPrimary, onSetPrimary}) => {
     }
 
     setErrorMessages([])
-    translateBody(asPrimary === null ? false : asPrimary)
+    translateBody(asPrimary ?? false)
   }
-
-  const filteredLanguages: Language[] = useMemo(() => {
-    if (!input) {
-      return languages.current
-    }
-
-    return languages.current.filter(({name}) => name.toLowerCase().startsWith(input.toLowerCase()))
-  }, [languages, input])
 
   return (
     <Responsive
@@ -122,18 +92,13 @@ const TranslationOptions: React.FC<Props> = ({asPrimary, onSetPrimary}) => {
         desktop: {
           direction: 'row',
           width: 'auto',
-          display: 'flex',
+          display: 'inline-block',
         },
       }}
       render={(responsiveProps: any) => {
         return (
           <View>
             <Flex direction="column">
-              <View as="div" margin="xx-small 0 0 xx-small">
-                <label id="langauge-selector-label">
-                  <Text weight="bold">{I18n.t('Translate To')}</Text>
-                </label>
-              </View>
               <Flex.Item overflowY="visible" padding="small small 0 small">
                 <Flex
                   margin="0 0 medium 0"
@@ -141,33 +106,40 @@ const TranslationOptions: React.FC<Props> = ({asPrimary, onSetPrimary}) => {
                   alignItems="start"
                   direction={responsiveProps.direction}
                 >
-                  <Flex.Item shouldGrow width={responsiveProps.width} overflowY="hidden">
-                    <CanvasMultiSelect
-                      label=""
+                  <Flex.Item
+                    shouldGrow
+                    width={responsiveProps.width}
+                    overflowY="hidden"
+                    overflowX="hidden"
+                  >
+                    <SimpleSelect
+                      renderLabel={I18n.t('Translate To')}
                       aria-labelledby="langauge-selector-label"
                       placeholder={I18n.t('Select a language...')}
-                      onChange={handleChange}
-                      inputValue={input}
-                      onInputChange={e => setInput(e.target.value)}
+                      value={selectedLanguage?.id}
+                      defaultValue={''}
+                      onChange={(_event, {value}) =>
+                        handleSelectOption(
+                          _event as React.ChangeEvent<HTMLSelectElement>,
+                          value as string,
+                        )
+                      }
                       messages={errorMessages}
                       inputRef={el => {
-                        selectRef.current = el
+                        inputRef.current = el ?? undefined
                       }}
                     >
-                      {filteredLanguages.map(({id, name}) => (
-                        <CanvasMultiSelect.Option
-                          key={id}
-                          label={name}
-                          id={id}
-                          value={name}
-                          isSelected={id === selectedLanguage?.id}
-                        >
+                      {languages.current.map(({id, name}) => (
+                        <SimpleSelect.Option key={id} id={id} value={id}>
                           {name}
-                        </CanvasMultiSelect.Option>
+                        </SimpleSelect.Option>
                       ))}
-                    </CanvasMultiSelect>
+                    </SimpleSelect>
                   </Flex.Item>
-                  <Flex.Item width={responsiveProps.width}>
+                  <Flex.Item
+                    width={responsiveProps.width}
+                    align={errorMessages.length > 0 ? 'center' : 'end'}
+                  >
                     <Button
                       color="ai-primary"
                       aria-label={I18n.t('Ignite AI Translate')}

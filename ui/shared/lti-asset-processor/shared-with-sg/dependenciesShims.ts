@@ -32,6 +32,8 @@
  * You can use the asset-processors-code-copy script in interop-team-scripts
  * to easily copy the replicated directory from one repo to another (and patch
  * the I18n import, see script for details)
+ *
+ * See also canvas-lms/doc/lti/18_asset_reports.md
  */
 
 import {gql} from '@apollo/client'

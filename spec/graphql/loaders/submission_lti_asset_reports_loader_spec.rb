@@ -21,19 +21,20 @@
 describe Loaders::SubmissionLtiAssetReportsLoader do
   subject do
     # Ensure the factory objects are created
-    [rep1aIi, rep1aIii, rep1bIi, rep2aIi, rep2aIIi]
+    [rep1a11, rep1a12, rep1b11, rep2a11, rep2a21]
 
-    obj = described_class.new
     result = {}
+    GraphQL::Batch.batch do
+      obj = described_class.for(is_student: false)
 
-    allow(obj).to receive(:fulfill) do |submission_id, reports|
-      raise "called multiple times for the same submission_id" if result.key?(submission_id)
+      allow(obj).to receive(:fulfill) do |submission_id, reports|
+        raise "called multiple times for the same submission_id" if result.key?(submission_id)
 
-      result[submission_id] = reports
+        result[submission_id] = reports
+      end
+
+      obj.perform([sub1.id, sub2.id])
     end
-
-    obj.perform([sub1.id, sub2.id])
-
     result
   end
 
@@ -41,8 +42,8 @@ describe Loaders::SubmissionLtiAssetReportsLoader do
   # could DRY up but probably not worth it
   let(:course) { course_factory }
   let(:assignment) { assignment_model(course:) }
-  let(:processorI) { lti_asset_processor_model(assignment:) }
-  let(:processorII) { lti_asset_processor_model(assignment:) }
+  let(:processor1) { lti_asset_processor_model(assignment:) }
+  let(:processor2) { lti_asset_processor_model(assignment:) }
 
   # Student 1
   let(:student1) { student_in_course(course:).user }
@@ -60,23 +61,23 @@ describe Loaders::SubmissionLtiAssetReportsLoader do
 
   # Student 1 (submission 1) reports:
   # Student 1, attachment a (1a), processor I, report type i
-  let(:rep1aIi) { lti_asset_report_model(asset: asset1a, asset_processor: processorI, report_type: "type_i") }
-  let(:rep1aIii) { lti_asset_report_model(asset: asset1a, asset_processor: processorI, report_type: "type_ii") }
-  let(:rep1bIi) { lti_asset_report_model(asset: asset1b, asset_processor: processorI) }
+  let(:rep1a11) { lti_asset_report_model(asset: asset1a, asset_processor: processor1, report_type: "type_i") }
+  let(:rep1a12) { lti_asset_report_model(asset: asset1a, asset_processor: processor1, report_type: "type_ii") }
+  let(:rep1b11) { lti_asset_report_model(asset: asset1b, asset_processor: processor1) }
 
   # Student 2 (submission 2) reports:
-  let(:rep2aIi) { lti_asset_report_model(asset: asset2a, asset_processor: processorI) }
-  let(:rep2aIIi) { lti_asset_report_model(asset: asset2a, asset_processor: processorII, visible_to_owner: true) }
+  let(:rep2a11) { lti_asset_report_model(asset: asset2a, asset_processor: processor1) }
+  let(:rep2a21) { lti_asset_report_model(asset: asset2a, asset_processor: processor2, visible_to_owner: true) }
 
   it "returns report by submission" do
     expect(subject.keys).to match_array([sub1.id, sub2.id])
-    expect(subject[sub1.id]).to match_array([rep1aIi, rep1aIii, rep1bIi])
-    expect(subject[sub2.id]).to match_array([rep2aIi, rep2aIIi])
+    expect(subject[sub1.id]).to match_array([rep1a11, rep1a12, rep1b11])
+    expect(subject[sub2.id]).to match_array([rep2a11, rep2a21])
   end
 
   it "sends empty array if the submission has no active reports" do
-    rep2aIi.destroy!
-    rep2aIIi.destroy!
+    rep2a11.destroy!
+    rep2a21.destroy!
     expect(subject[sub2.id]).to be_empty
   end
 
@@ -85,10 +86,10 @@ describe Loaders::SubmissionLtiAssetReportsLoader do
   end
 
   context "when a processor is deleted" do
-    before { processorII.destroy! }
+    before { processor2.destroy! }
 
     it "does not include their reports" do
-      expect(subject.values.flatten).to match_array([rep1aIi, rep1aIii, rep1bIi, rep2aIi])
+      expect(subject.values.flatten).to match_array([rep1a11, rep1a12, rep1b11, rep2a11])
     end
   end
 
@@ -98,17 +99,18 @@ describe Loaders::SubmissionLtiAssetReportsLoader do
       [group1_sub1, group1_sub2, group2_sub1, group2_sub2, group3_sub1, group3_sub2]
       [group1_student1_rep1, group2_student1_rep1, group3_student1_rep1]
 
-      obj = described_class.new
       result = {}
+      GraphQL::Batch.batch do
+        obj = described_class.for(is_student: false)
 
-      allow(obj).to receive(:fulfill) do |submission_id, reports|
-        raise "called multiple times for the same submission_id" if result.key?(submission_id)
+        allow(obj).to receive(:fulfill) do |submission_id, reports|
+          raise "called multiple times for the same submission_id" if result.key?(submission_id)
 
-        result[submission_id] = reports
+          result[submission_id] = reports
+        end
+
+        obj.perform([group1_sub2.id, group2_sub2.id])
       end
-
-      obj.perform([group1_sub2.id, group2_sub2.id])
-
       result
     end
 
@@ -174,6 +176,56 @@ describe Loaders::SubmissionLtiAssetReportsLoader do
       # Test that we don't get duplicate reports
       all_reports = subject.values.flatten
       expect(all_reports).not_to include(group3_student1_rep1)
+    end
+  end
+
+  context "when used for student access" do
+    subject do
+      result = {}
+      GraphQL::Batch.batch do
+        obj = described_class.for(is_student: true)
+
+        allow(obj).to receive(:fulfill) do |submission_id, reports|
+          raise "called multiple times for the same submission_id" if result.key?(submission_id)
+
+          result[submission_id] = reports
+        end
+
+        obj.perform([1, 2])
+      end
+      result
+    end
+
+    before do
+      allow_any_instance_of(described_class).to receive(:raw_asset_reports)
+        .with(submission_ids: [1, 2], for_student: true)
+        .and_return({ 1 => [1, 2], 2 => [3, 4] })
+    end
+
+    it "returns report by submission using student filtering" do
+      expect(subject.keys).to match_array([1, 2])
+      expect(subject[1]).to match_array([1, 2])
+      expect(subject[2]).to match_array([3, 4])
+    end
+
+    it "handles empty submission ID array" do
+      result = {}
+
+      allow_any_instance_of(described_class).to receive(:raw_asset_reports)
+        .with(submission_ids: [], for_student: true)
+        .and_return({})
+
+      GraphQL::Batch.batch do
+        obj = described_class.for(is_student: true)
+
+        allow(obj).to receive(:fulfill) do |submission_id, reports|
+          result[submission_id] = reports
+        end
+
+        obj.perform([])
+      end
+
+      expect(result).to be_empty
     end
   end
 end

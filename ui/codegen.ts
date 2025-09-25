@@ -30,6 +30,12 @@ const config: CodegenConfig = {
   generates: {
     './ui/shared/graphql/codegen/': {
       preset: 'client',
+      presetConfig: {
+        fragmentMasking: false,
+      },
+      config: {
+        enumsAsTypes: true,
+      },
     },
   },
 }

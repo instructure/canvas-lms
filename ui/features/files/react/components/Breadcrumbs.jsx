@@ -47,7 +47,7 @@ Breadcrumbs.renderSingleCrumb = function (folder, isLastCrumb, isRootCrumb) {
       : folder && (folder.get('custom_name') || folder.get('name'))
 
   return (
-    <li key={name}>
+    <li key={name} aria-current={isLastCrumb ? 'page' : undefined}>
       <a
         href={
           isRootCrumb && isContextRoot
@@ -71,7 +71,7 @@ Breadcrumbs.renderSingleCrumb = function (folder, isLastCrumb, isRootCrumb) {
 Breadcrumbs.renderDynamicCrumbs = function () {
   if (this.props.showingSearchResults) {
     return [
-      this.renderSingleCrumb(null, !'isLastCrumb', !!'isRootCrumb'),
+      this.renderSingleCrumb(null, false, true),
       <li key="searchLink">
         <a href="/search">
           <span className="ellipsis">
@@ -101,7 +101,7 @@ Breadcrumbs.renderDynamicCrumbs = function () {
     } else {
       return [
         <BreadcrumbCollapsedContainer foldersToContain={foldersInMiddle} />,
-        this.renderSingleCrumb(lastFolder, true),
+        this.renderSingleCrumb(lastFolder, true, false),
       ]
     }
   }
@@ -110,7 +110,7 @@ Breadcrumbs.renderDynamicCrumbs = function () {
 Breadcrumbs.render = function () {
   return (
     <nav aria-label="breadcrumbs" role="navigation" id="breadcrumbs" ref={this.breadcrumbsRef}>
-      <ul>
+      <ol>
         <li className="home">
           <a href="/">
             <i className="icon-home standalone-icon" title={this.state.homeName}>
@@ -124,7 +124,7 @@ Breadcrumbs.render = function () {
           </a>
         </li>
         {this.renderDynamicCrumbs()}
-      </ul>
+      </ol>
     </nav>
   )
 }

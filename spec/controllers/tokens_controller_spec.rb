@@ -36,6 +36,184 @@ describe TokensController do
         get "show", params: { user_id: "self", id: 5 }
         expect(response).to be_redirect
       end
+
+      it "requires being logged in to list manually generated access tokens" do
+        get :user_generated_tokens, params: { user_id: "self" }
+        expect(response).to be_redirect
+      end
+    end
+
+    describe "#user_generated_tokens" do
+      let_once(:admin_user) { account_admin_user }
+      let_once(:target_user) { user_factory(active_user: true) }
+      let_once(:other_user) { user_factory(active_user: true) }
+
+      context "with admin privileges" do
+        before do
+          user_session(admin_user)
+        end
+
+        it "returns manually generated tokens for the specified user" do
+          token1 = target_user.access_tokens.create!(purpose: "test token 1", developer_key: DeveloperKey.default)
+          token2 = target_user.access_tokens.create!(purpose: "test token 2", developer_key: DeveloperKey.default)
+
+          get :user_generated_tokens, params: { user_id: target_user.id }
+
+          expect(response).to be_successful
+          json = response.parsed_body
+          expect(json.length).to eq 2
+          expect(json.pluck("id")).to contain_exactly(token1.id, token2.id)
+          expect(json.pluck("purpose")).to contain_exactly("test token 1", "test token 2")
+        end
+
+        it "excludes non-manually generated tokens" do
+          manual_token = target_user.access_tokens.create!(purpose: "manual token", developer_key: DeveloperKey.default)
+          external_key = DeveloperKey.create!(name: "external_app")
+          target_user.access_tokens.create!(developer_key: external_key)
+
+          get :user_generated_tokens, params: { user_id: target_user.id }
+
+          expect(response).to be_successful
+          json = response.parsed_body
+          expect(json.length).to eq 1
+          expect(json.first["id"]).to eq manual_token.id
+        end
+
+        it "supports pagination" do
+          (1..15).map do |i|
+            target_user.access_tokens.create!(purpose: "token #{i}", developer_key: DeveloperKey.default)
+          end
+
+          get :user_generated_tokens, params: { user_id: target_user.id, per_page: 10 }
+
+          expect(response).to be_successful
+          json = response.parsed_body
+          expect(json.length).to eq 10
+
+          # Check that pagination headers are present
+          expect(response.headers["Link"]).to be_present
+          expect(response.headers["Link"]).to include("next")
+        end
+
+        it "orders tokens by created_at and id" do
+          Timecop.freeze(1.hour.ago) do
+            @token1 = target_user.access_tokens.create!(purpose: "older token", developer_key: DeveloperKey.default)
+          end
+          @token2 = target_user.access_tokens.create!(purpose: "newer token", developer_key: DeveloperKey.default)
+
+          get :user_generated_tokens, params: { user_id: target_user.id }
+
+          expect(response).to be_successful
+          json = response.parsed_body
+          expect(json.length).to eq 2
+          expect(json.first["id"]).to eq @token1.id
+          expect(json.second["id"]).to eq @token2.id
+        end
+
+        it "includes proper token attributes in response" do
+          token = target_user.access_tokens.create!(
+            purpose: "test token",
+            developer_key: DeveloperKey.default,
+            permanent_expires_at: 1.week.from_now
+          )
+
+          get :user_generated_tokens, params: { user_id: target_user.id }
+
+          expect(response).to be_successful
+          json = response.parsed_body
+          token_json = json.first
+
+          expect(token_json).to include(
+            "id" => token.id,
+            "purpose" => "test token",
+            "user_id" => target_user.id,
+            "created_at" => token.created_at.iso8601,
+            "expires_at" => token.permanent_expires_at.iso8601,
+            "workflow_state" => "active",
+            "scopes" => []
+          )
+        end
+
+        context "with cross-shard tokens" do
+          specs_require_sharding
+
+          it "returns tokens from all shards" do
+            target_user.associate_with_shard(@shard1)
+            target_user.associate_with_shard(@shard2)
+            @shard1.activate do
+              AccessToken.create!(user: target_user, developer_key: DeveloperKey.default, purpose: "shard 1 token")
+            end
+
+            @shard2.activate do
+              AccessToken.create!(user: target_user, developer_key: DeveloperKey.default, purpose: "shard 2 token")
+            end
+
+            get :user_generated_tokens, params: { user_id: target_user.id }
+
+            expect(response).to be_successful
+            json = response.parsed_body
+            expect(json.length).to eq 2
+            expect(json.pluck("purpose").sort).to contain_exactly("shard 1 token",
+                                                                  "shard 2 token")
+          end
+        end
+      end
+
+      context "without admin privileges" do
+        before do
+          user_session(other_user)
+        end
+
+        it "returns unauthorized when user lacks permission" do
+          get :user_generated_tokens, params: { user_id: target_user.id }
+
+          expect(response).to have_http_status(:unauthorized)
+        end
+
+        it "allows users to view their own tokens when they have appropriate permissions" do
+          user_session(target_user)
+
+          get :user_generated_tokens, params: { user_id: target_user.id }
+
+          expect(response).to have_http_status(:ok)
+        end
+      end
+
+      context "with teacher privileges" do
+        let_once(:course) { course_model }
+        let_once(:teacher) { teacher_in_course(course:, active_all: true).user }
+        let_once(:student) { student_in_course(course:, active_all: true).user }
+
+        before do
+          user_session(teacher)
+        end
+
+        it "returns unauthorized when teacher tries to view student tokens" do
+          student.access_tokens.create!(purpose: "student token", developer_key: DeveloperKey.default)
+
+          get :user_generated_tokens, params: { user_id: student.id }
+
+          expect(response).to have_http_status(:unauthorized)
+        end
+      end
+
+      context "with student privileges" do
+        let_once(:course) { course_model }
+        let_once(:student1) { student_in_course(course:, active_all: true).user }
+        let_once(:student2) { student_in_course(course:, active_all: true).user }
+
+        before do
+          user_session(student1)
+        end
+
+        it "returns unauthorized when student tries to view other student tokens" do
+          student2.access_tokens.create!(purpose: "other student token", developer_key: DeveloperKey.default)
+
+          get :user_generated_tokens, params: { user_id: student2.id }
+
+          expect(response).to have_http_status(:unauthorized)
+        end
+      end
     end
 
     context "logged in" do
@@ -91,14 +269,18 @@ describe TokensController do
         expect(token.reload).to be_deleted
       end
 
-      it "does not allow deleting an access token while masquerading" do
-        Account.site_admin.account_users.create!(user: @user)
-        session[:become_user_id] = user_with_pseudonym(active_all: true).id
-        token = @user.access_tokens.create!(purpose: "test")
-        expect(token.user_id).to eq @user.id
+      context "with student_access_token_management disabled" do
+        before { Account.site_admin.disable_feature!(:student_access_token_management) }
 
-        delete "destroy", params: { user_id: "self", id: token.id }
-        assert_status(401)
+        it "does not allow deleting an access token while masquerading" do
+          Account.site_admin.account_users.create!(user: @user)
+          session[:become_user_id] = user_with_pseudonym(active_all: true).id
+          token = @user.access_tokens.create!(purpose: "test")
+          expect(token.user_id).to eq @user.id
+
+          delete "destroy", params: { user_id: "self", id: token.id }
+          assert_status(401)
+        end
       end
 
       it "does not allow deleting someone else's access token" do
@@ -264,7 +446,10 @@ describe TokensController do
         before(:once) { Account.default.root_account.enable_feature!(:admin_manage_access_tokens) }
 
         context "with limit_personal_access_tokens setting on" do
-          before(:once) { Account.default.change_root_account_setting!(:limit_personal_access_tokens, true) }
+          before(:once) do
+            Account.default.change_root_account_setting!(:limit_personal_access_tokens, true)
+            Account.site_admin.disable_feature!(:student_access_token_management)
+          end
 
           context "as non-admin" do
             it "does not allow creating an access token" do
@@ -367,7 +552,10 @@ describe TokensController do
         end
 
         context "with restrict_personal_access_tokens_from_students setting on" do
-          before(:once) { Account.default.change_root_account_setting!(:restrict_personal_access_tokens_from_students, true) }
+          before(:once) do
+            Account.default.change_root_account_setting!(:restrict_personal_access_tokens_from_students, true)
+            Account.site_admin.disable_feature!(:student_access_token_management)
+          end
 
           shared_examples_for "access token creation and update denied" do
             it "does not allow creating an access token" do
@@ -425,6 +613,82 @@ describe TokensController do
               token = @user.access_tokens.create!(purpose: "test")
               put "update", params: { user_id: "self", id: token.id, token: { regenerate: "1" } }
               assert_status(200)
+            end
+          end
+        end
+
+        context "with student_access_token_management flag" do
+          context "when flag is off" do
+            before(:once) { Account.site_admin.disable_feature!(:student_access_token_management) }
+
+            it "doesn't enforce expiry for any user" do
+              post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
+              expect(response).to be_successful
+              expect(assigns[:token].permanent_expires_at).to be_nil
+            end
+          end
+
+          context "when flag is on" do
+            before(:once) { Account.site_admin.enable_feature!(:student_access_token_management) }
+
+            context "as an admin" do
+              before(:once) { @admin = account_admin_user }
+              before { user_session(@admin) }
+
+              it "doesn't enforce expiry for an admin" do
+                post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
+                expect(response).to be_successful
+                expect(assigns[:token].permanent_expires_at).to be_nil
+              end
+            end
+
+            context "as a teacher" do
+              before do
+                course_with_teacher(active_all: true, user: @user)
+              end
+
+              it "doesn't enforce expiry for a teacher" do
+                post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
+                expect(response).to be_successful
+                expect(assigns[:token].permanent_expires_at).to be_nil
+              end
+            end
+
+            context "as a teacher with student enrollments" do
+              before do
+                course_with_teacher(active_all: true, user: @user)
+                course_with_student(active_all: true, user: @user)
+              end
+
+              it "doesn't enforce expiry for a teacher with some student enrollments" do
+                post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
+                expect(response).to be_successful
+                expect(assigns[:token].permanent_expires_at).to be_nil
+              end
+            end
+
+            context "as a user with only student enrollments" do
+              before do
+                course_with_student(active_all: true, user: @user)
+              end
+
+              it "rejects tokens without expiry" do
+                post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
+                # expect response to not be successful
+                expect(response).not_to be_successful
+              end
+
+              it "rejects tokens with an expiry past the maximum" do
+                expires_at = (TokensController::MAXIMUM_EXPIRATION_DURATION + 1.day).from_now
+                post "create", params: { user_id: "self", token: { purpose: "test", expires_at: } }
+                expect(response).not_to be_successful
+              end
+
+              it "allows tokens with an expiry" do
+                expires_at = (TokensController::MAXIMUM_EXPIRATION_DURATION - 1.day).from_now
+                post "create", params: { user_id: "self", token: { purpose: "test", expires_at: } }
+                expect(response).to be_successful
+              end
             end
           end
         end

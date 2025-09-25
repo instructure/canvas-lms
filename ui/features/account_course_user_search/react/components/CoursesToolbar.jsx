@@ -28,7 +28,6 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import SearchableSelect from './SearchableSelect'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import preventDefault from '@canvas/util/preventDefault'
 import {propType as termsPropType, termType} from '../store/TermsStore'
 import NewCourseModal from './NewCourseModal'
 

@@ -326,11 +326,14 @@ class AuthenticationProvider < ActiveRecord::Base
     end
   end
 
-  def apply_federated_attributes(pseudonym, provider_attributes, purpose: :login)
+  def apply_federated_attributes(pseudonym, provider_attributes, purpose: :login, translate_attributes: true)
     user = pseudonym.user
 
-    canvas_attributes = translate_provider_attributes(provider_attributes,
-                                                      purpose:)
+    canvas_attributes = translate_attributes ? translate_provider_attributes(provider_attributes) : provider_attributes.dup
+    # Only should matter when translate_attributes == false, but safe regardless
+    canvas_attributes.delete_if { |k, _| !federated_attributes[k] }
+    canvas_attributes.delete_if { |k, _| federated_attributes[k]["provisioning_only"] } if purpose != :provisioning
+
     given_name = canvas_attributes.delete("given_name")
     surname = canvas_attributes.delete("surname")
     if given_name || surname
@@ -413,7 +416,7 @@ class AuthenticationProvider < ActiveRecord::Base
       if user.changed? && !user.save
         Rails.logger.warn("Unable to save federated user: #{user.errors.to_hash}")
       end
-      try(:post_federated_attribute_application, pseudonym:, provider_attributes:)
+      try(:post_federated_attribute_application, pseudonym:, provider_attributes:, purpose:)
     end
   end
 
@@ -505,11 +508,9 @@ class AuthenticationProvider < ActiveRecord::Base
     end
   end
 
-  def translate_provider_attributes(provider_attributes, purpose:)
+  def translate_provider_attributes(provider_attributes)
     result = {}
     federated_attributes.each do |(canvas_attribute_name, provider_attribute_config)|
-      next if purpose != :provisioning && provider_attribute_config["provisioning_only"]
-
       provider_attribute_name = provider_attribute_config["attribute"]
 
       if provider_attributes.key?(provider_attribute_name)

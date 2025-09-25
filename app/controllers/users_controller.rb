@@ -526,18 +526,13 @@ class UsersController < ApplicationController
   end
 
   def user_dashboard
-    if !k5_user? && !@current_user.non_student_enrollment? && @domain_root_account.feature_enabled?(:widget_dashboard)
-      # things needed only for widget dashboard (students only)
+    observed_users_list = observed_users(@current_user, session)
+    if should_show_widget_dashboard?
       js_bundle :widget_dashboard
       css_bundle :dashboard_card
 
-      # Set up observer options if user has observer data
-      observed_users_list = observed_users(@current_user, session)
-
-      # Fetch course data with grades for shared context
-      # Use the first observed user if available, otherwise use current user
-      observed_user = observed_users_list.first if observed_users_list.present?
-      course_data_with_grades = fetch_courses_with_grades(@current_user, observed_user)
+      observed_user = (@selected_observed_user && @selected_observed_user != @current_user) ? @selected_observed_user : nil
+      course_data_with_grades = fetch_courses_with_grades(observed_user)
 
       js_env({
                PREFERENCES: {
@@ -546,6 +541,7 @@ class UsersController < ApplicationController
                  custom_colors: @current_user.custom_colors
                },
                OBSERVED_USERS_LIST: observed_users_list,
+               OBSERVED_USER_ID: observed_user&.id,
                CAN_ADD_OBSERVEE: @current_user
                                    .profile
                                    .tabs_available(@current_user, root_account: @domain_root_account)
@@ -577,7 +573,6 @@ class UsersController < ApplicationController
 
     # Reload user settings so we don't get a stale value for K5_USER when switching dashboards
     @current_user.reload
-    observed_users_list = observed_users(@current_user, session)
     k5_disabled = k5_disabled?
     k5_user = k5_user?(check_disabled: false)
     js_env({ K5_USER: k5_user && !k5_disabled }, true)
@@ -1052,6 +1047,38 @@ class UsersController < ApplicationController
         ["submitting", submitting_collection]
       ]
 
+      # Add discussion checkpoint assignments for courses with checkpoints enabled
+      course_ids_with_checkpoints = @current_user.course_ids_with_checkpoints_enabled
+      unless course_ids_with_checkpoints.empty?
+        sub_assignment_bookmark = Plannable::Bookmarker.new(SubAssignment, false, [:due_at, :created_at], :id)
+
+        # Add checkpoint assignments needing grading
+        checkpoint_grading_scope = @current_user.assignments_needing_grading(scope_only: true, is_sub_assignment: true)
+                                                .reorder(:due_at, :id).preload(:external_tool_tag, :rubric_association, :rubric, :discussion_topic, :duplicate_of)
+        checkpoint_grading_collection = BookmarkedCollection.wrap(sub_assignment_bookmark, checkpoint_grading_scope)
+        checkpoint_grading_collection = BookmarkedCollection.filter(checkpoint_grading_collection) do |assignment|
+          assignment.context.grants_right?(@current_user, session, :manage_grades)
+        end
+        checkpoint_grading_collection = BookmarkedCollection.transform(checkpoint_grading_collection) do |a|
+          todo_item_json(a, @current_user, session, "grading")
+        end
+        collections << ["checkpoint_grading", checkpoint_grading_collection]
+
+        # Add checkpoint assignments needing submitting
+        checkpoint_submitting_scope = @current_user.assignments_needing_submitting(
+          include_ungraded: true,
+          scope_only: true,
+          course_ids: course_ids_with_checkpoints,
+          include_concluded: false,
+          is_sub_assignment: true
+        ).reorder(:due_at, :id).preload(:external_tool_tag, :rubric_association, :rubric, :discussion_topic).eager_load(:duplicate_of)
+        checkpoint_submitting_collection = BookmarkedCollection.wrap(sub_assignment_bookmark, checkpoint_submitting_scope)
+        checkpoint_submitting_collection = BookmarkedCollection.transform(checkpoint_submitting_collection) do |a|
+          todo_item_json(a, @current_user, session, "submitting")
+        end
+        collections << ["checkpoint_submitting", checkpoint_submitting_collection]
+      end
+
       if Array(params[:include]).include? "ungraded_quizzes"
         quizzes_bookmark = Plannable::Bookmarker.new(Quizzes::Quiz, false, [:due_at, :created_at], :id)
         quizzes_scope = @current_user
@@ -1431,6 +1458,7 @@ class UsersController < ApplicationController
           @body_classes << "full-width"
 
           js_permissions = {
+            can_view_user_generated_access_tokens: @user.grants_right?(@current_user, :view_user_generated_access_tokens),
             can_manage_sis_pseudonyms: @context_account.root_account.grants_right?(@current_user, :manage_sis),
             can_manage_user_details: @user.grants_right?(@current_user, :manage_user_details),
             can_manage_dsr_requests: @context_account.grants_right?(@current_user, :manage_dsr_requests)
@@ -1460,7 +1488,7 @@ class UsersController < ApplicationController
                    PERMISSIONS: js_permissions,
                    ROOT_ACCOUNT_ID: @context_account.root_account.id,
                    TIMEZONES: timezones,
-                   DEFAULT_TIMEZONE_NAME: default_timezone_name
+                   DEFAULT_TIMEZONE_NAME: default_timezone_name,
                  })
           render status:
         end
@@ -3506,49 +3534,66 @@ class UsersController < ApplicationController
     end
   end
 
-  def fetch_courses_with_grades(user, observed_user = nil)
-    # Use the observed user if provided and it's a User object, otherwise use the current user
-    target_user = (observed_user.is_a?(User) ? observed_user : user)
-
-    # Return empty array if no target user
-    return [] unless target_user.is_a?(User)
-
+  def fetch_courses_with_grades(observed_user = nil)
     # Get current enrollments for the user
-    enrollments = target_user.enrollments.current.preload(:course, :scores)
+    if observed_user
+      observer_courses = @current_user.cached_course_ids_for_observed_user(observed_user)
+      enrollments = observed_user.enrollments.current.preload(:course, :scores).where(course_id: observer_courses)
+    else
+      enrollments = @current_user.enrollments.current.preload(:course, :scores)
+    end
 
-    course_data = enrollments.map do |enrollment|
+    course_data = enrollments.filter_map do |enrollment|
       course = enrollment.course
 
-      # Get the grade data similar to how the GraphQL query does it
-      grades = enrollment.find_score(grading_period: nil)
+      can_read_grades = if (observed_user || @current_user).id == @current_user.id
+                          !course.hide_final_grades? || course.grants_any_right?(@current_user, :view_all_grades, :manage_grades)
+                        else
+                          enrollment.grants_right?(@current_user, :read_grades) || course.grants_any_right?(@current_user, :view_all_grades, :manage_grades)
+                        end
 
-      # Determine display grade - prioritize override, then final, then current
+      next unless can_read_grades
+
+      course_score = enrollment.find_score(course_score: true)
       display_grade = nil
-      display_grade_string = nil
 
-      if grades
-        if grades.override_score.present?
-          display_grade = grades.override_score
-          display_grade_string = grades.override_grade
-        elsif grades.final_score.present?
-          display_grade = grades.final_score
-          display_grade_string = grades.final_grade
-        elsif grades.current_score.present?
-          display_grade = grades.current_score
-          display_grade_string = grades.current_grade
+      if course_score
+        if course_score.override_score.present?
+          display_grade = course_score.override_score
+        elsif course_score.current_score.present?
+          display_grade = course_score.current_score
         end
       end
+
+      grading_scheme = if course.grading_standard_enabled? && course.grading_standard
+                         course.grading_standard.data
+                       else
+                         "percentage"
+                       end
 
       {
         courseId: course.id.to_s,
         courseCode: course.course_code || "N/A",
         courseName: course.name,
         currentGrade: display_grade,
-        gradingScheme: display_grade_string.present? ? "letter" : "percentage",
+        gradingScheme: grading_scheme,
         lastUpdated: enrollment.updated_at.iso8601
       }
     end
 
     course_data.compact.uniq { |c| c[:courseId] }
+  end
+
+  def should_show_widget_dashboard?
+    return false if k5_user?
+    return false unless @domain_root_account.feature_enabled?(:widget_dashboard)
+
+    if @current_user.observer_enrollments.active.any?
+      # only show widget dashboard if observer is actively observing a student
+      return true if @selected_observed_user && @selected_observed_user != @current_user
+    elsif !@current_user.non_student_enrollment?
+      return true
+    end
+    false
   end
 end

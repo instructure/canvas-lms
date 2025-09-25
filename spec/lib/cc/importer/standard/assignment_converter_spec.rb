@@ -167,5 +167,53 @@ describe CC::Importer::Standard::AssignmentConverter do
         end
       end
     end
+
+    describe "lti_context_id" do
+      context "when lti_context_id element is present with a value" do
+        let(:mock_html_meta) do
+          xml_str = <<-XML
+            <assignment identifier="mock-id">
+              <lti_context_id>context-123</lti_context_id>
+            </assignment>
+          XML
+
+          Nokogiri::XML(xml_str)
+        end
+
+        it "sets the lti_context_id string" do
+          expect(subject[:lti_context_id]).to eq "context-123"
+        end
+      end
+
+      context "when lti_context_id element is present but empty" do
+        let(:mock_html_meta) do
+          xml_str = <<-XML
+            <assignment identifier="mock-id">
+              <lti_context_id></lti_context_id>
+            </assignment>
+          XML
+          Nokogiri::XML(xml_str)
+        end
+
+        it "sets lti_context_id to an empty string" do
+          expect(subject).not_to have_key(:lti_context_id)
+        end
+      end
+
+      context "when lti_context_id element is missing" do
+        let(:mock_html_meta) do
+          xml_str = <<-XML
+            <assignment identifier="mock-id">
+            </assignment>
+          XML
+
+          Nokogiri::XML(xml_str)
+        end
+
+        it "does not include the key" do
+          expect(subject).not_to have_key(:lti_context_id)
+        end
+      end
+    end
   end
 end

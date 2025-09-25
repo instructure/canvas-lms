@@ -18,6 +18,19 @@
 
 module Loaders
   module AssignmentLoaders
+    class FinalGraderAnonymousIdLoader < GraphQL::Batch::Loader
+      def perform(assignment_ids)
+        moderation_graders = ModerationGrader
+                             .joins("INNER JOIN #{Assignment.quoted_table_name} ON moderation_graders.assignment_id = assignments.id
+                                          AND moderation_graders.user_id = assignments.final_grader_id")
+                             .where(assignment_id: assignment_ids)
+                             .pluck(:assignment_id, :anonymous_id)
+                             .to_h
+
+        assignment_ids.each { fulfill(it, moderation_graders[it]) }
+      end
+    end
+
     class HasRubricLoader < GraphQL::Batch::Loader
       def perform(assignment_ids)
         # Preload rubric associations for all assignments in the batch, using the 'active' scope

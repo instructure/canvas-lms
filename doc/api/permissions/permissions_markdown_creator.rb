@@ -22,7 +22,14 @@ require_relative "../../../config/initializers/permissions_groups"
 
 class PermissionsMarkdownCreator
   TEMPLATE = "doc/api/permissions/permissions.md.erb"
-  OUTPUT_FILE = "doc/api/permissions/md/dynamic/permissions.md"
+  DETAILS_TEMPLATE = "doc/api/permissions/permission_details.md.erb"
+  OUTPUT_PATH = "doc/api/permissions/md/dynamic"
+  DETAILS_KEYS = %i[account_details
+                    course_details
+                    details].freeze
+  CONSIDERATIONS_KEYS = %i[account_considerations
+                           course_considerations
+                           considerations].freeze
 
   AVAILABLE_TO_ABBREVIATIONS = {
     "StudentEnrollment" => "s",
@@ -44,34 +51,79 @@ class PermissionsMarkdownCreator
     end.join
   end
 
-  def self.run
+  def self.details
+    get_perm_docs = lambda do |perm_or_group, info|
+      details = info.values_at(*DETAILS_KEYS).find(&:present?)&.map { it.transform_values(&:call) }
+      considerations = info.values_at(*CONSIDERATIONS_KEYS).find(&:present?)&.map { it.transform_values(&:call) }
+      if details || considerations
+        {
+          perm_or_group => {
+            label: info[:label].call,
+            details:,
+            considerations:
+          }
+        }
+      else
+        {}
+      end
+    end
+
+    h = {}
+    BASE_PERMISSIONS.each { |perm, info| h.merge!(get_perm_docs.call(perm, info)) }
+    PERMISSION_GROUPS.each { |group, info| h.merge!(get_perm_docs.call(group, info)) }
+    h.sort_by { |_, v| v[:label] }.to_h
+  end
+
+  def self.run(format)
+    raise ArgumentError, "format must be :html or :md" unless %i[html md].include?(format)
+
     require Rails.root.join("config/initializers/permissions_registry.rb")
+
+    erb_renderer = ERB.new(Rails.root.join(TEMPLATE).read)
+    details_renderer = ERB.new(Rails.root.join(DETAILS_TEMPLATE).read)
+
+    group_names = PERMISSION_GROUPS.transform_values { |g| g[:label].call }.sort_by(&:last).to_h
 
     account_perms, course_perms = BASE_PERMISSIONS.partition do |_, info|
       (info[:available_to] - %w[AccountAdmin AccountMembership]).empty?
     end
-
     account_perms = account_perms
                     .reject { |_, info| info[:account_only] == :site_admin }
                     .map do |key, info|
                       { key:,
-                        group: (info[:group] && PERMISSION_GROUPS.dig(info[:group], :label)&.call) || "",
+                        group: info[:group],
                         label: info[:label].call }
                     end
-                    .sort_by { |entry| [entry[:group], entry[:key]] }
+                    .sort_by { |entry| [group_names[entry[:group]] || "", entry[:key]] }
                     .group_by { |entry| entry[:group] }
 
     course_perms = course_perms
                    .map do |key, info|
                      { key:,
-                       group: (info[:group] && PERMISSION_GROUPS.dig(info[:group], :label)&.call) || "",
+                       group: info[:group],
                        label: info[:label].call,
                        available_to: available_defaults(info) }
                    end
-                   .sort_by { |entry| [entry[:group], entry[:key]] }
+                   .sort_by { |entry| [group_names[entry[:group]] || "", entry[:key]] }
                    .group_by { |entry| entry[:group] }
 
-    erb_renderer = ERB.new(Rails.root.join(TEMPLATE).read)
-    Rails.root.join(OUTPUT_FILE).binwrite(erb_renderer.result(binding))
+    details_hash = details
+    details_hash.each do |perm_or_group, info|
+      Rails.root.join(OUTPUT_PATH, "permissions_#{perm_or_group}.md").binwrite(
+        details_renderer.result_with_hash(info)
+      )
+    end
+
+    group_name_with_link = lambda do |group|
+      details_hash.include?(group) ? "[#{group_names[group]}](file.permissions_#{group}.#{format})" : group_names[group]
+    end
+
+    perm_name_with_link = lambda do |perm, name|
+      details_hash.include?(perm) ? "[#{name}](file.permissions_#{perm}.#{format})" : name
+    end
+
+    Rails.root.join(OUTPUT_PATH, "permissions.md").binwrite(
+      erb_renderer.result_with_hash(course_perms:, account_perms:, group_name_with_link:, perm_name_with_link:)
+    )
   end
 end

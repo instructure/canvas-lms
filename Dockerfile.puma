@@ -1,10 +1,10 @@
 # GENERATED FILE, DO NOT MODIFY!
 # To update this file please edit the relevant template and run the generation
-# task `build/dockerfile_writer.rb --env development --compose-file docker-compose.yml,docker-compose.override.yml,docker-compose/puma.override.yml --in build/Dockerfile.puma.template --out Dockerfile.puma`
+# task `build/dockerfile_writer.rb --env development --compose-file docker-compose.yml,docker-compose.local.dev.yml,docker-compose/puma.override.yml --in build/Dockerfile.puma.template --out Dockerfile.puma`
 
 ARG RUBY=3.4
 
-FROM instructure/ruby:$RUBY
+FROM instructure/ruby:$RUBY-jammy
 LABEL maintainer="Instructure"
 
 ARG RUBY
@@ -52,6 +52,7 @@ RUN mkdir -p /etc/apt/keyrings \
        libidn11-dev \
        parallel \
        postgresql-client-$POSTGRES_CLIENT \
+       tzdata \
        unzip \
        pbzip2 \
        fontforge \
@@ -63,6 +64,7 @@ RUN mkdir -p /etc/apt/keyrings \
 RUN gem install bundler --no-document -v 2.5.10 \
   && find $GEM_HOME ! -user docker | xargs chown docker:docker
 RUN npm install -g npm@9.8.1 && npm cache clean --force
+
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 RUN corepack enable && corepack prepare yarn@1.19.1 --activate
 
@@ -81,7 +83,6 @@ RUN set -eux; \
     packages/js-utils/node_modules \
     pacts \
     public/dist \
-    public/doc/api \
     public/javascripts/translations \
     reports \
     tmp \

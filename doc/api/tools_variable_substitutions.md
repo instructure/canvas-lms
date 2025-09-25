@@ -418,7 +418,7 @@ If the context is a Course, returns sourced Id of the context.
 ```
 ## Context.id.history
 With respect to the current course, recursively returns the context ids of the courses from which content has been copied (excludes cartridge imports).
-Will show a limit of 1000 context ids.  When the number passes 1000, 'truncated' will show at the end of the list.
+Will show a limit of 1000 context ids. When the number passes 1000, 'truncated' will show at the end of the list.
 
 This is an alias of `Canvas.course.previousContextIds.recursive`.
 
@@ -427,6 +427,19 @@ This is an alias of `Canvas.course.previousContextIds.recursive`.
 
 ```
 "1234,4567"
+```
+## Activity.id.history
+With respect to the current assignment, recursively returns the activity (assignment)
+LTI ids of the assignments from which the current assignment was copied or imported.
+The value of this variable is updated only if the source assignment has at least one asset processor attached.
+Tools can use this to detect copies and automatically import related resources.
+The result is limited to 1000 ids. When the number passes 1000, 'truncated' will show at the end of the list.
+
+**Availability**: *when launched as an assignment*  
+
+
+```
+"25de3090-de71-4419-9a7c-53b509945710,057361e2-87f9-4597-b072-4b7464bdefde"
 ```
 ## Message.documentTarget
 communicates the kind of browser window/frame where the Canvas has launched a tool.

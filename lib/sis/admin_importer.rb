@@ -101,6 +101,7 @@ module SIS
           admin = @account.account_users.where(user:, role: @role).where.not(sis_batch_id: nil).take
           return unless admin
 
+          admin.current_user = @batch.user if @batch&.user
           admin.workflow_state = state
         end
 

@@ -717,6 +717,8 @@ class DiscussionTopicsController < ApplicationController
       end
     end
 
+    js_hash[:ASSIGNMENT_SECURE_PARAMS] = AbstractAssignment.secure_params if @topic.new_record? || @topic.assignment_id.nil?
+
     js_env(js_hash)
 
     set_master_course_js_env_data(@topic, @context)
@@ -906,7 +908,6 @@ class DiscussionTopicsController < ApplicationController
                discussion_anonymity_enabled: @context.feature_enabled?(:react_discussions_post),
                user_can_summarize: @topic.user_can_summarize?(@current_user),
                user_can_access_insights: @topic.user_can_access_insights?(@current_user),
-               user_can_insights: user_can_moderate,
                discussion_pin_post: @context.feature_enabled?(:discussion_pin_post),
                discussion_summary_enabled: participant.nil? ? @topic.summary_enabled : participant.summary_enabled,
                should_show_deeply_nested_alert: @current_user&.should_show_deeply_nested_alert?,

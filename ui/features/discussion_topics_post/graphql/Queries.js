@@ -75,6 +75,7 @@ export const DISCUSSION_QUERY = gql`
             ...Group
           }
         }
+        ${ENV.discussion_pin_post ? 'pinnedEntries { ...DiscussionEntry }' : ''}
       }
     }
   }

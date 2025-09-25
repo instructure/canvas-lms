@@ -42,10 +42,11 @@ import GradeSummaryManager from '../react/GradeSummary/GradeSummaryManager'
 import SelectMenuGroup from '../react/SelectMenuGroup'
 import SubmissionCommentsTray from '../react/SubmissionCommentsTray'
 import ClearBadgeCountsButton from '../react/ClearBadgeCountsButton'
-import AssetProcessorCell from '../react/AssetProcessorCell'
+import LtiAssetProcessorCell from '../react/LtiAssetProcessorCell'
 import {scoreToPercentage, scoreToScaledPoints} from '@canvas/grading/GradeCalculationHelper'
 import useStore from '../react/stores'
 import replaceTags from '@canvas/util/replaceTags'
+import {existingAttachedAssetProcessorToGraphql} from '@canvas/lti-asset-processor/model/restGraphqlConversions'
 
 const I18n = createI18nScope('gradingGradeSummary')
 
@@ -823,6 +824,8 @@ function addAssetProcessorToLegacyTable() {
       return map
     }, {})
   const shouldShow = Object.keys(submissionsWithReportsByAssignmentId).length > 0
+  // Legacy gradebook graphql-format (camelCase) asset reports, but
+  // snake-case assetProcessors, so the latter need to be converted.
 
   if (!shouldShow) {
     return
@@ -830,7 +833,7 @@ function addAssetProcessorToLegacyTable() {
 
   tableHeader.textContent = I18n.t('Document Processors')
 
-  // Render AssetProcessorCell component in each asset processor cell
+  // Render LtiAssetProcessorCell component in each asset processor cell
   const assetProcessorCells = document.querySelectorAll('.asset_processors_cell')
   assetProcessorCells.forEach(cell => {
     const assignmentId = cell.dataset.assignmentId
@@ -842,13 +845,17 @@ function addAssetProcessorToLegacyTable() {
         return
       }
 
+      const assetProcessors = submission.asset_processors?.map(
+        existingAttachedAssetProcessorToGraphql,
+      )
+
       if (!assetProcessorCellRoots.has(cell)) {
         assetProcessorCellRoots.set(cell, ReactDOM.createRoot(cell))
       }
       const root = assetProcessorCellRoots.get(cell)
       root.render(
-        <AssetProcessorCell
-          assetProcessors={submission.asset_processors}
+        <LtiAssetProcessorCell
+          assetProcessors={assetProcessors}
           assetReports={submission.asset_reports}
           submissionType={submission.submission_type}
           assignmentName={assignmentName}

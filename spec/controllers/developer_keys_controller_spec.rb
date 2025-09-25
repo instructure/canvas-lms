@@ -359,6 +359,51 @@ describe DeveloperKeysController do
         end
       end
 
+      context "redirect URIs" do
+        let(:developer_key) { DeveloperKey.create! }
+        let(:valid_uris) { ["https://example.com/callback", "https://another-url.org/redirect"] }
+
+        before do
+          user_session(@admin)
+        end
+
+        it "allows updating a list of redirect URIs" do
+          put :update, params: { id: developer_key.id, account_id: Account.site_admin.id, developer_key: { redirect_uris: valid_uris } }
+          expect(response).to be_successful
+          expect(developer_key.reload.redirect_uris).to match_array(valid_uris)
+        end
+
+        it "replaces existing URIs with the new array" do
+          developer_key.update!(redirect_uris: ["https://old-uri.com"])
+          put :update, params: { id: developer_key.id, account_id: Account.site_admin.id, developer_key: { redirect_uris: valid_uris } }
+          expect(response).to be_successful
+          expect(developer_key.reload.redirect_uris).to match_array(valid_uris)
+        end
+
+        it "ignores the deprecated redirect_uri when redirect_uris is present" do
+          initial_uri = "https://old-uri.com"
+          developer_key.update!(redirect_uris: [initial_uri])
+          put :update, params: { id: developer_key.id, account_id: Account.site_admin.id, developer_key: { redirect_uri: "http://deprecated.com", redirect_uris: valid_uris } }
+          expect(response).to be_successful
+          # Expect redirect_uris to be updated and redirect_uri to be ignored
+          expect(developer_key.reload.redirect_uris).to match_array(valid_uris)
+        end
+
+        it "accepts space-separated string of redirect URIs" do
+          space_separated_uris = "https://example.com/callback https://another-url.org/redirect"
+          put :update, params: { id: developer_key.id, account_id: Account.site_admin.id, developer_key: { redirect_uris: space_separated_uris } }
+          expect(response).to be_successful
+          expect(developer_key.reload.redirect_uris).to match_array(valid_uris)
+        end
+
+        it "accepts newline-separated string of redirect URIs" do
+          newline_separated_uris = "https://example.com/callback\nhttps://another-url.org/redirect"
+          put :update, params: { id: developer_key.id, account_id: Account.site_admin.id, developer_key: { redirect_uris: newline_separated_uris } }
+          expect(response).to be_successful
+          expect(developer_key.reload.redirect_uris).to match_array(valid_uris)
+        end
+      end
+
       describe "scopes" do
         let(:valid_scopes) do
           %w[url:POST|/api/v1/courses/:course_id/quizzes/:id/validate_access_code

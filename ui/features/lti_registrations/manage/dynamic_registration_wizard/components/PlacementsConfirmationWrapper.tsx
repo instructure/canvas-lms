@@ -41,6 +41,15 @@ export const PlacementsConfirmationWrapper = ({
     )
     .map(p => p.placement)
 
+  const handleToggleAllowFullscreen = () => {
+    return actions.updatePlacement('top_navigation')(prevState => {
+      return {
+        ...prevState,
+        allow_fullscreen: !prevState.allow_fullscreen,
+      }
+    })
+  }
+
   return (
     <PlacementsConfirmation
       appName={registration.name}
@@ -51,6 +60,10 @@ export const PlacementsConfirmationWrapper = ({
       courseNavigationDefaultHidden={
         overlayState.overlay.placements?.course_navigation?.default === 'disabled'
       }
+      topNavigationAllowFullscreen={
+        overlayState.overlay.placements?.top_navigation?.allow_fullscreen ?? false
+      }
+      onToggleAllowFullscreen={handleToggleAllowFullscreen}
       onToggleDefaultDisabled={() =>
         actions.updatePlacement('course_navigation')(prevState => {
           return {

@@ -712,7 +712,7 @@ describe "Discussion Topic Show" do
       end
 
       it "shows lock indication for discussions locked by discussion's unlock_at date" do
-        skip("EGG-73")
+        skip("EGG-73 2025-07-15")
         Checkpoints::DiscussionCheckpointCreatorService.call(
           discussion_topic: @topic,
           checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
@@ -733,7 +733,7 @@ describe "Discussion Topic Show" do
       end
 
       it "shows lock indication for discussions locked by discussion's lock_at date" do
-        skip("EGG-73")
+        skip("EGG-73 2025-07-15")
         @topic.update!(lock_at: 1.day.ago)
         Checkpoints::DiscussionCheckpointCreatorService.call(
           discussion_topic: @topic,

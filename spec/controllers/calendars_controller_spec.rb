@@ -298,25 +298,6 @@ describe CalendarEventsApiController do
       expect(assigns[:events][0]).to eql(@event)
     end
 
-    it "uses the relevant event for that section, in the course feed" do
-      skip "requires changing the format of the course feed url to include user information"
-      s2 = @course.course_sections.create!(name: "s2")
-      c1 = @event.child_events.create!(description: @event.description,
-                                       title: @event.title,
-                                       context: @course.default_section,
-                                       start_at: 2.hours.ago,
-                                       end_at: 1.hour.ago)
-      @event.child_events.create!(description: @event.description,
-                                  title: @event.title,
-                                  context: s2,
-                                  start_at: 3.hours.ago,
-                                  end_at: 2.hours.ago)
-      get "public_feed", params: { feed_code: "course_#{@course.uuid}", format: "ics" }
-      expect(response).to be_successful
-      expect(assigns[:events]).to be_present
-      expect(assigns[:events]).to eq [c1]
-    end
-
     context "for a user context" do
       it "uses the relevant event for that section" do
         s2 = @course.course_sections.create!(name: "s2")

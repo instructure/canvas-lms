@@ -20,6 +20,7 @@ import {defaultEveryoneElseOption, defaultEveryoneOption, masteryPathsOption} fr
 import {
   prepareUngradedDiscussionOverridesPayload,
   convertToCheckpointsData,
+  prepareAssignmentPayload,
 } from '../payloadPreparations'
 
 describe('prepareUngradedDiscussionOverridesPayload', () => {
@@ -278,5 +279,65 @@ describe('convertToCheckpointsData', () => {
 
     const payload = convertToCheckpointsData(assignedInfoList)
     expect(payload).toEqual(expected_result)
+  })
+})
+
+describe('prepareAssignmentPayload', () => {
+  const mockAssignedInfoList = [
+    {
+      assignedList: ['everyone'],
+      dueDate: '2024-04-15T00:00:00.000Z',
+      availableFrom: '2024-04-10T00:00:00.000Z',
+      availableUntil: '2024-04-20T00:00:00.000Z',
+    },
+  ]
+
+  // Mock ENV
+  beforeEach(() => {
+    global.ENV = {
+      context_id: '123',
+    }
+  })
+
+  afterEach(() => {
+    delete global.ENV
+  })
+
+  it('includes secureParams when creating new assignment', () => {
+    const secureParams = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.test'
+
+    const payload = prepareAssignmentPayload(
+      'abguid', // abGuid
+      false, // isEditing
+      'Test Discussion', // title
+      '10', // pointsPossible
+      'points', // displayGradeAs
+      '1', // assignmentGroup
+      null, // gradingSchemeId
+      true, // isGraded
+      mockAssignedInfoList, // assignedInfoList
+      defaultEveryoneOption, // defaultEveryoneOption
+      defaultEveryoneElseOption, // defaultEveryoneElseOption
+      false, // postToSis
+      null, // peerReviewAssignment
+      null, // peerReviewsPerStudent
+      null, // peerReviewDueDate
+      false, // intraGroupPeerReviews
+      masteryPathsOption, // masteryPathsOption
+      false, // importantDates
+      false, // isCheckpoints
+      null, // existingAssignment
+      null, // suppressedAssignment
+      [], // assetProcessors
+      secureParams, // secureParams
+    )
+
+    expect(payload).toEqual(
+      expect.objectContaining({
+        secureParams,
+        courseId: '123',
+        name: 'Test Discussion',
+      }),
+    )
   })
 })

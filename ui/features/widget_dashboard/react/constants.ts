@@ -101,6 +101,9 @@ export const QUERY_CONFIG = {
   },
 } as const
 
+// Query keys
+export const ANNOUNCEMENTS_PAGINATED = 'announcements-paginated'
+
 // URL patterns
 export const URL_PATTERNS = {
   GRADEBOOK: '/courses/{courseId}/gradebook',

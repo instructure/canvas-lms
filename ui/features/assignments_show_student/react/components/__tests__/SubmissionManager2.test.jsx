@@ -23,10 +23,11 @@ import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import {assignLocation} from '@canvas/util/globalUtils'
 import {MockedProviderWithPossibleTypes as MockedProvider} from '@canvas/util/react/testing/MockedProviderWithPossibleTypes'
-import {act, fireEvent, render, screen, within} from '@testing-library/react'
+import {act, fireEvent, render, screen, waitFor, within} from '@testing-library/react'
 import ContextModuleApi from '../../apis/ContextModuleApi'
 import SubmissionManager from '../SubmissionManager'
 import {availableReviewCount} from '../../helpers/PeerReviewHelpers'
+import {queryClient} from '@canvas/query'
 
 jest.mock('@canvas/util/globalUtils', () => ({
   assignLocation: jest.fn(),
@@ -50,6 +51,7 @@ describe('SubmissionManager', () => {
 
   beforeEach(() => {
     ContextModuleApi.getContextModuleData.mockResolvedValue({})
+    jest.clearAllMocks()
   })
 
   describe('Peer Review modal after clicking the "Submit Assignment" button', () => {
@@ -66,7 +68,6 @@ describe('SubmissionManager', () => {
       window.ENV = {
         ASSIGNMENT_ID: '1',
         COURSE_ID: '1',
-        ASSET_REPORTS: [],
       }
 
       createSubmissionResult = await mockQuery(CREATE_SUBMISSION, {}, variables)
@@ -127,7 +128,6 @@ describe('SubmissionManager', () => {
         jest.runOnlyPendingTimers()
       })
 
-      expect(window.ENV.ASSET_REPORTS).not.toBeDefined()
       const peerReviewButton = getByRole('button', {name: 'Peer Review'})
       expect(peerReviewButton).toBeInTheDocument()
       expect(await findByText('Your work has been submitted.')).toBeTruthy()

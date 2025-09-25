@@ -411,5 +411,53 @@ describe('CreateEditAllocationRuleModal', () => {
         })
       }
     })
+
+    it('shows network error alert when rule creation fails', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          assignedStudents: {
+            nodes: mockStudents,
+          },
+        },
+      })
+
+      mockExecuteQuery.mockRejectedValueOnce(new Error('NetworkError: Failed to fetch'))
+
+      const reviewerInput = screen.getAllByText('Reviewer Name')[0].querySelector('input')
+      const recipientInput = screen.getAllByText('Recipient Name')[0].querySelector('input')
+
+      if (reviewerInput && recipientInput) {
+        await user.type(reviewerInput, 'Student 1')
+        await user.click(screen.getByText('Student 1'))
+
+        await user.type(recipientInput, 'Student 2')
+        await user.click(screen.getByText('Student 2'))
+
+        const saveButton = screen.getByTestId('save-button')
+        await user.click(saveButton)
+
+        await waitFor(() => {
+          expect(screen.getByText(/An error occurred while creating the rule/i)).toBeInTheDocument()
+        })
+
+        expect(mockSetIsOpen).not.toHaveBeenCalledWith(false)
+      }
+    })
+  })
+
+  describe('Additional subject field limits', () => {
+    beforeEach(() => {
+      renderWithProviders()
+    })
+
+    it('hides add subject button for reciprocal target type', async () => {
+      const reciprocalRadio = screen.getByTestId('target-type-reciprocal')
+
+      await user.click(reciprocalRadio)
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('add-subject-button')).not.toBeInTheDocument()
+      })
+    })
   })
 })

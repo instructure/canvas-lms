@@ -234,24 +234,6 @@ shared_examples "Gradebook - post grades to SIS" do |ff_enabled|
 
       expect(f("iframe.post-grades-frame")).to be_displayed
     end
-
-    # flakey; passes locally
-    xit "shows post grades lti button when only one section available" do
-      course = Course.new(name: "Math 201", account: @account, sis_source_id: "xyz")
-      course.save
-      course.enroll_teacher(@user).accept!
-      course.assignments.create!(name: "Assignment1", post_to_sis: true)
-      create_post_grades_tool(course:)
-
-      Gradebook.visit(@course)
-      Gradebook.select_sync
-
-      expect(Gradebook.action_menu_item_selector(tool_name)).to be_displayed
-
-      Gradebook.action_menu_item_selector(tool_name).click
-
-      expect(f("iframe.post-grades-frame")).to be_displayed
-    end
   end
 end
 

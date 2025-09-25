@@ -53,5 +53,5 @@ export const mockBlockContentEditorContext = ({openMock = jest.fn()}: Partial<Mo
       a11yIssueCount: 0,
       a11yIssues: new Map<string, AccessibilityIssue[]>(),
     },
-    aiAltTextEnabled: false,
+    aiAltTextGenerationURL: '/api/v1/courses/1/pages_ai/alt_text',
   }) as BlockContentEditorContextType

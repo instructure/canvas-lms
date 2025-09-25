@@ -166,7 +166,7 @@ describe Types::SubmissionStatisticsType do
 
     describe "submissions_submitted_count with date filtering" do
       it "counts submitted assignments in the specified date range" do
-        skip "Very flaky in Jenkins, needs investigation FOO-5719"
+        skip "2025-08-14 Very flaky in Jenkins, needs investigation FOO-5719"
         result = course_type.resolve(
           "submissionStatistics { submissionsSubmittedCount(startDate: \"#{today.iso8601}\", endDate: \"#{tomorrow.iso8601}\") }"
         )

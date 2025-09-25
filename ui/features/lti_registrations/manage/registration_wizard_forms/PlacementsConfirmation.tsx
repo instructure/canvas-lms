@@ -51,6 +51,11 @@ export type PlacementsConfirmationProps = {
   courseNavigationDefaultHidden: boolean
 
   /**
+   * A boolean that determines if the top navigation placement is allowed to toggle fullscreen.
+   */
+  topNavigationAllowFullscreen: boolean
+
+  /**
    * A callback for whenever a placement's checkbox is toggled.
    */
   onTogglePlacement: (placement: LtiPlacement) => void
@@ -58,6 +63,10 @@ export type PlacementsConfirmationProps = {
    * A callback for whenever the default hidden checkbox is toggled. This is only applicable to the course navigation placement.
    */
   onToggleDefaultDisabled: () => void
+  /**
+   * A callback for whenever the top navigation allow fullscreen checkbox is toggled. This is only applicable to the top navigation placement.
+   */
+  onToggleAllowFullscreen: () => void
 }
 
 const I18n = createI18nScope('lti_registration.wizard')
@@ -76,9 +85,11 @@ export const PlacementsConfirmation = React.memo(
     appName,
     enabledPlacements,
     courseNavigationDefaultHidden,
+    topNavigationAllowFullscreen,
     availablePlacements,
     onTogglePlacement,
     onToggleDefaultDisabled,
+    onToggleAllowFullscreen,
   }: PlacementsConfirmationProps) => {
     return (
       <>
@@ -115,7 +126,17 @@ export const PlacementsConfirmation = React.memo(
                   enabled={enabledPlacements.includes(p)}
                   onTogglePlacement={onTogglePlacement}
                   courseNavigationDefaultHidden={courseNavigationDefaultHidden}
+                  topNavigationAllowFullscreen={
+                    window.ENV.FEATURES?.increased_top_nav_pane_size
+                      ? topNavigationAllowFullscreen
+                      : false
+                  }
                   onToggleDefaultDisabled={onToggleDefaultDisabled}
+                  onToggleAllowFullscreen={
+                    window.ENV.FEATURES?.increased_top_nav_pane_size
+                      ? onToggleAllowFullscreen
+                      : () => {}
+                  }
                 />
               )
             })}
@@ -132,6 +153,8 @@ type PlacementCheckboxProps = {
   onTogglePlacement: (placement: LtiPlacement) => void
   courseNavigationDefaultHidden: boolean
   onToggleDefaultDisabled: () => void
+  topNavigationAllowFullscreen: boolean
+  onToggleAllowFullscreen: () => void
 }
 
 const PlacementCheckbox = React.memo(
@@ -141,6 +164,8 @@ const PlacementCheckbox = React.memo(
     onTogglePlacement,
     courseNavigationDefaultHidden,
     onToggleDefaultDisabled,
+    topNavigationAllowFullscreen,
+    onToggleAllowFullscreen,
   }: PlacementCheckboxProps) => {
     const checkbox = (
       <Flex direction="row" gap="x-small" justifyItems="start" alignItems="center" key={placement}>
@@ -188,6 +213,39 @@ const PlacementCheckbox = React.memo(
                 label={I18n.t('Default to Hidden')}
                 onChange={() => {
                   onToggleDefaultDisabled()
+                }}
+              />
+            </View>
+          )}
+        </FormFieldGroup>
+      )
+    }
+    if (
+      placement === LtiPlacements.TopNavigation &&
+      window.ENV.FEATURES?.increased_top_nav_pane_size
+    ) {
+      return (
+        <FormFieldGroup
+          rowSpacing="medium"
+          key={placement}
+          name={`${placement}-toggle`}
+          description={
+            <ScreenReaderContent>
+              {I18n.t('Modify the %{placement} placement', {
+                placement: i18nLtiPlacement(placement),
+              })}
+            </ScreenReaderContent>
+          }
+        >
+          {checkbox}
+          {enabled && (
+            <View padding="0 0 0 medium" display="block" as="div">
+              <Checkbox
+                data-pendo="lti-top-navigation-fullscreen-checkbox"
+                checked={topNavigationAllowFullscreen}
+                label={I18n.t('Allow Fullscreen')}
+                onChange={() => {
+                  onToggleAllowFullscreen()
                 }}
               />
             </View>

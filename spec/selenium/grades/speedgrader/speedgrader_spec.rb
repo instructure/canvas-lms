@@ -27,6 +27,7 @@ require_relative "../pages/student_grades_page"
 require_relative "../pages/gradebook_page"
 require_relative "../../assignments/page_objects/assignment_page"
 require_relative "../../assignments/page_objects/submission_detail_page"
+require_relative "../pages/gradebook_cells_page"
 
 describe "SpeedGrader" do
   include_context "in-process server selenium tests"
@@ -417,13 +418,21 @@ describe "SpeedGrader" do
 
       it "displays correct status pill for each student submission" do
         expect(f(".submission-missing-pill")).to be_displayed
+
         Speedgrader.click_next_student_btn
+        wait_for_dom_ready
         expect(f(".submission-extended-pill")).to be_displayed
+
         Speedgrader.click_next_student_btn
+        wait_for_dom_ready
         expect(f(".submission-late-pill")).to be_displayed
+
         Speedgrader.click_next_student_btn
+        wait_for_dom_ready
         expect(f(".submission-excused-pill")).to be_displayed
+
         Speedgrader.click_next_student_btn
+        wait_for_dom_ready
         expect(f(".submission-custom-grade-status-pill-#{@custom_status.id}")).to be_displayed
       end
 
@@ -921,9 +930,7 @@ describe "SpeedGrader" do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}#"
 
-      # menu needs to be expanded for this to work
       options = ff("#students_selectmenu-menu li")
-      # driver.execute_script("$('#students_selectmenu-menu li').focus()")
 
       options.each_with_index do |option, i|
         f("#students_selectmenu-button").click
@@ -932,17 +939,12 @@ describe "SpeedGrader" do
       end
 
       get "/courses/#{@course.id}/gradebook"
-      cells = ff("#gradebook_grid .container_1 .slick-cell")
 
-      # For whatever reason, this spec fails occasionally.
-      # Expected "10"
-      # Got "-"
-
-      expect(cells[0]).to include_text "10"
-      expect(cells[3]).to include_text "10"
-      expect(cells[6]).to include_text "10"
-      expect(cells[9]).to include_text "5"
-      expect(cells[12]).to include_text "7"
+      expect(f(Gradebook::Cells.grading_cell_selector(@students[0], assignment).to_s)).to include_text "10"
+      expect(f(Gradebook::Cells.grading_cell_selector(@students[1], assignment).to_s)).to include_text "10"
+      expect(f(Gradebook::Cells.grading_cell_selector(@students[2], assignment).to_s)).to include_text "10"
+      expect(f(Gradebook::Cells.grading_cell_selector(@students[3], assignment).to_s)).to include_text "5"
+      expect(f(Gradebook::Cells.grading_cell_selector(@students[4], assignment).to_s)).to include_text "7"
     end
   end
 

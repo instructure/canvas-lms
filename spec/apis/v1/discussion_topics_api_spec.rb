@@ -3897,11 +3897,6 @@ describe DiscussionTopicsController, type: :request do
         expect(json.pluck("parent_id")).to eq [@sub2.id, @entry.id, @sub2.id, @sub1.id, @entry.id]
       end
 
-      it "sets and return editor_id if editing another user's post" do
-        pending "WIP: Not implemented"
-        raise
-      end
-
       it "fails if the max entry depth is reached" do
         entry = @entry
         (DiscussionEntry::MAX_DEPTH - 1).times do

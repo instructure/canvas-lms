@@ -699,7 +699,7 @@ class DiscussionTopicsApiController < ApplicationController
   #       "created_at": "2011-11-03T21:33:29Z",
   #       "attachment": {
   #         "content-type": "unknown/unknown",
-  #         "url": "http://www.example.com/files/681/download?verifier=JDG10Ruitv8o6LjGXWlxgOb5Sl3ElzVYm9cBKUT3",
+  #         "url": "http://www.example.com/files/681/download",
   #         "filename": "content.txt",
   #         "display_name": "content.txt" } },
   #     {
@@ -1099,8 +1099,8 @@ class DiscussionTopicsApiController < ApplicationController
     to_not_threaded_update_count = to_not_threaded.in_batches.update_all(discussion_type: DiscussionTopic::DiscussionTypes::NOT_THREADED, updated_at: Time.now.utc)
 
     InstStatsd::Statsd.distributed_increment("discussion_topic.migrate_disallow_manage.count")
-    InstStatsd::Statsd.gauge("discussion_topic.migrate_disallow_manage.discussions_updated", to_threaded_update_count, tags: { type: DiscussionTopic::DiscussionTypes::THREADED })
-    InstStatsd::Statsd.gauge("discussion_topic.migrate_disallow_manage.discussions_updated", to_not_threaded_update_count, tags: { type: DiscussionTopic::DiscussionTypes::NOT_THREADED })
+    InstStatsd::Statsd.distributed_increment("discussion_topic.migrate_disallow_manage.discussions_updated_count", to_threaded_update_count, tags: { type: DiscussionTopic::DiscussionTypes::THREADED })
+    InstStatsd::Statsd.distributed_increment("discussion_topic.migrate_disallow_manage.discussions_updated_count", to_not_threaded_update_count, tags: { type: DiscussionTopic::DiscussionTypes::NOT_THREADED })
 
     render json: { success: "true" }
   end

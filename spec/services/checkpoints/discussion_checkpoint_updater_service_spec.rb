@@ -709,4 +709,156 @@ describe Checkpoints::DiscussionCheckpointUpdaterService do
       end
     end
   end
+
+  describe "blueprint courses functionality" do
+    before(:once) do
+      @child_course = course_factory
+      @child_course.account.enable_feature!(:discussion_checkpoints)
+
+      # Create the discussion in the child course (simulating blueprint sync result)
+      @child_topic = DiscussionTopic.create_graded_topic!(course: @child_course, title: "Child Discussion")
+      @child_assignment = @child_topic.assignment
+
+      # Simulate blueprint content with migration_id
+      @child_assignment.migration_id = "master_course_migration_abc123"
+      @child_assignment.save!
+
+      # Create checkpoints in child course without due dates
+      Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: @child_topic,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [{ type: "everyone", due_at: nil }],
+        points_possible: 5
+      )
+
+      Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: @child_topic,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        dates: [{ type: "everyone", due_at: nil }],
+        points_possible: 10
+      )
+
+      # Set migration_id on sub-assignments to simulate blueprint sync
+      @child_assignment.sub_assignments.each do |sub|
+        sub.migration_id = "#{@child_assignment.migration_id}_#{sub.sub_assignment_tag}"
+        sub.save!
+      end
+    end
+
+    it "allows updating due dates in child course checkpoints" do
+      new_due_date = 3.days.from_now
+
+      expect do
+        updated_checkpoint = Checkpoints::DiscussionCheckpointUpdaterService.call(
+          discussion_topic: @child_topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: new_due_date }],
+          points_possible: 5
+        )
+        expect(updated_checkpoint.due_at).to be_within(1.second).of(new_due_date)
+      end.not_to raise_error
+    end
+
+    it "properly compares different attribute types for changes in checkpoint_attributes_for_update" do
+      # Test the new method that only returns changed attributes
+      service = Checkpoints::DiscussionCheckpointCommonService.new(
+        discussion_topic: @child_topic,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [{ type: "everyone", due_at: 1.day.from_now }],
+        points_possible: 5
+      )
+
+      checkpoint = @child_assignment.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+
+      # Test that changed attributes are returned
+      changed_attributes = service.send(:checkpoint_attributes_for_update, checkpoint)
+
+      # Should only include attributes that have changed (due_at in this case)
+      expect(changed_attributes).to have_key(:due_at)
+      # Should not include unchanged attributes like points_possible
+      expect(changed_attributes).not_to have_key(:points_possible)
+    end
+
+    it "excludes description from inherited attributes when content is restricted" do
+      # Mock the assignment to simulate blueprint restrictions
+      allow(@child_assignment).to receive(:editing_restricted?).with(:content).and_return(true)
+
+      service = Checkpoints::DiscussionCheckpointCommonService.new(
+        discussion_topic: @child_topic,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [{ type: "everyone", due_at: 1.day.from_now }],
+        points_possible: 5
+      )
+
+      inherited_attrs = service.send(:inherited_attributes)
+
+      # Description should be excluded due to content restrictions
+      expect(inherited_attrs).not_to have_key(:description)
+      expect(inherited_attrs).to have_key(:title)
+    end
+
+    it "includes description when content is not restricted" do
+      # Mock the assignment to simulate no blueprint restrictions
+      allow(@child_assignment).to receive(:editing_restricted?).with(:content).and_return(false)
+
+      service = Checkpoints::DiscussionCheckpointCommonService.new(
+        discussion_topic: @child_topic,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [{ type: "everyone", due_at: 1.day.from_now }],
+        points_possible: 5
+      )
+
+      inherited_attrs = service.send(:inherited_attributes)
+
+      # Description should be included when not restricted
+      expect(inherited_attrs).to have_key(:description)
+      expect(inherited_attrs).to have_key(:title)
+    end
+
+    it "handles nil and blank values correctly in attribute comparison" do
+      service = Checkpoints::DiscussionCheckpointCommonService.new(
+        discussion_topic: @child_topic,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [{ type: "everyone", due_at: nil }],
+        points_possible: 5
+      )
+
+      # Test nil vs nil
+      expect(service.send(:attribute_changed?, nil, nil)).to be_falsey
+
+      # Test nil vs empty string
+      expect(service.send(:attribute_changed?, nil, "")).to be_falsey
+
+      # Test empty string vs nil
+      expect(service.send(:attribute_changed?, "", nil)).to be_falsey
+
+      # Test nil vs actual value
+      expect(service.send(:attribute_changed?, nil, "something")).to be_truthy
+
+      # Test same values
+      expect(service.send(:attribute_changed?, "same", "same")).to be_falsey
+    end
+
+    context "with assignment overrides" do
+      before do
+        @student = student_in_course(course: @child_course, active_all: true).user
+      end
+
+      it "allows updating due dates via assignment overrides" do
+        override_due_date = 1.week.from_now
+
+        updated_checkpoint = Checkpoints::DiscussionCheckpointUpdaterService.call(
+          discussion_topic: @child_topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "override", set_type: "ADHOC", student_ids: [@student.id], due_at: override_due_date }],
+          points_possible: 5
+        )
+
+        expect(updated_checkpoint.assignment_overrides.count).to eq(1)
+        override = updated_checkpoint.assignment_overrides.first
+        expect(override.due_at).to be_within(1.second).of(override_due_date)
+        expect(override.assignment_override_students.pluck(:user_id)).to include(@student.id)
+      end
+    end
+  end
 end

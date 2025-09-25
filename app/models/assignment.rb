@@ -81,7 +81,7 @@ class Assignment < AbstractAssignment
 
     p.dispatch :submissions_posted
     p.to do |assignment|
-      assignment.course.participating_instructors
+      assignment.course.participating_instructors_by_date
     end
     p.whenever do |assignment|
       BroadcastPolicies::AssignmentPolicy.new(assignment)

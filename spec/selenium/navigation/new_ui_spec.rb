@@ -157,21 +157,6 @@ describe "new ui" do
       expect(menu_link.css_value("border-left")).to eq("2px solid rgb(39, 53, 64)")
       expect(menu_link.css_value("color")).to eq("rgba(39, 53, 64, 1)")
     end
-
-    it "does not break tiny mce css", priority: "2" do
-      skip_if_chrome("Chrome does not get these values properly")
-      get "/courses/#{@course.id}/discussion_topics/new?is_announcement=true"
-      mce_icons = f(".mce-ico")
-      expect(mce_icons.css_value("font-family")).to eq("tinymce,Arial")
-      expect(mce_icons.css_value("font-style")).to eq("normal")
-      expect(mce_icons.css_value("font-weight")).to eq("400")
-      expect(mce_icons.css_value("font-size")).to eq("16px")
-      expect(mce_icons.css_value("vertical-align")).to eq("text-top")
-      expect(mce_icons.css_value("display")).to eq("inline-block")
-      expect(mce_icons.css_value("background-size")).to eq("cover")
-      expect(mce_icons.css_value("width")).to eq("16px")
-      expect(mce_icons.css_value("height")).to eq("16px")
-    end
   end
 
   context "as student" do

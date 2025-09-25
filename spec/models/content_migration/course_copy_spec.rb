@@ -847,6 +847,21 @@ describe ContentMigration do
       expect(@copy_to.reload.syllabus_body).to include "/courses/#{@copy_to.id}/pages/#{page2.url}"
     end
 
+    it "changes user linked files to course linked files" do
+      image = attachment_model(context: @teacher, display_name: "cn_image.jpg", uploaded_data: fixture_file_upload("cn_image.jpg"))
+      body = <<~HTML
+        <p><img src="/users/#{@teacher.id}/files/#{image.id}/preview"></p>
+      HTML
+      page = @copy_from.wiki_pages.create!(title: "some page", body:, updating_user: @teacher)
+
+      run_course_copy
+
+      image_to = @copy_to.attachments.find_by(context: @copy_to, migration_id: mig_id(image))
+      page_to = @copy_to.wiki_pages.find_by(migration_id: mig_id(page))
+      expect(page_to.body).to include "/courses/#{@copy_to.id}/files/#{image_to.id}/preview"
+      expect(image_to.folder).to eq Folder.media_folder(@copy_to)
+    end
+
     context "media objects" do
       before do
         kaltura_double = double("kaltura")
@@ -1068,14 +1083,15 @@ describe ContentMigration do
         expect(@copy_to.syllabus_body.gsub("&amp;", "&")).to eq @copy_from.syllabus_body
       end
 
-      it "does not update media attachment links from user media" do
+      it "updates media attachment links from user media to become course media" do
         media_id = "0_deadbeef"
-        att = attachment_model(display_name: "lolcats.mp4", context: @user, media_entry_id: media_id)
-        @copy_from.syllabus_body = %(<p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="#{media_id}" allowfullscreen="allowfullscreen" allow="fullscreen" loading="lazy" src="/media_attachments_iframe/#{att.id}?type=video&amp;embedded=true"></iframe></p>)
+        media = attachment_model(display_name: "lolcats.mp4", context: @user, media_entry_id: media_id)
+        @copy_from.syllabus_body = %(<p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="#{media_id}" allowfullscreen="allowfullscreen" allow="fullscreen" loading="lazy" src="/media_attachments_iframe/#{media.id}?type=video&amp;embedded=true"></iframe></p>)
         run_course_copy
-        expect(@copy_to.attachments.count).to eq 0
+        media_to = @copy_to.attachments.find_by(context: @copy_to, migration_id: mig_id(media))
         expect(@copy_to.media_objects.count).to eq 0
-        expect(@copy_to.syllabus_body).to eq @copy_from.syllabus_body
+        expect(@copy_to.syllabus_body).to include "/media_attachments_iframe/#{media_to.id}?type=video&amp;embedded=true"
+        expect(@copy_to.attachment_associations.pluck(:attachment_id)).to include(media_to.id)
       end
 
       it "copies media attachments linked in HTML for an object copied selectively" do

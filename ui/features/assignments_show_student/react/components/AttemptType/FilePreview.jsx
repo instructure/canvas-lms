@@ -20,13 +20,7 @@ import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {getOriginalityData} from '@canvas/grading/originalityReportHelper'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
-import AssetReportStatus from '@canvas/lti-asset-processor/react/AssetReportStatus'
-import StudentAssetReportModal from '@canvas/lti-asset-processor/react/StudentAssetReportModal'
 import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
-import {
-  filterReports,
-  shouldRenderAssetProcessorData,
-} from '@canvas/lti-asset-processor/react/AssetProcessorHelper'
 import {colors, spacing} from '@instructure/canvas-theme'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button, IconButton} from '@instructure/ui-buttons'
@@ -40,12 +34,18 @@ import {useEffect, useState} from 'react'
 import previewUnavailable from '../../../images/PreviewUnavailable.svg'
 import elideString from '../../helpers/elideString'
 import OriginalityReport from '../OriginalityReport'
+import {LtiAssetReportsForStudentSubmission} from '@canvas/lti-asset-processor/react/LtiAssetReportsForStudentSubmission'
+import {useShouldShowLtiAssetReportsForStudent} from '@canvas/lti-asset-processor/react/hooks/useLtiAssetProcessorsAndReportsForStudent'
 
 const I18n = createI18nScope('assignments_2')
 
 export default function FilePreview({submission, isOriginalityReportVisible}) {
   const [selectedFileIndex, setSelectedFileIndex] = useState(0)
-  const [apModalAttachmentId, setApModalAttachmentId] = useState(null)
+  const showDocumentProcessorsColumn = useShouldShowLtiAssetReportsForStudent({
+    submissionId: submission._id,
+    submissionType: submission.submissionType,
+    ifLastAttemptIsNumber: submission.attempt,
+  })
 
   useEffect(() => {
     setSelectedFileIndex(0)
@@ -92,83 +92,69 @@ export default function FilePreview({submission, isOriginalityReportVisible}) {
 
   const renderFileDetailsTable = () => {
     const cellTheme = {background: colors.contrasts.grey1111}
-    const showDocumentProcessorsColumn = shouldRenderAssetProcessorData()
 
     return (
-      <>
-        {showDocumentProcessorsColumn && (
-          <StudentAssetReportModal
-            assetProcessors={ENV.ASSET_PROCESSORS}
-            assignmentName={ENV.ASSIGNMENT_NAME}
-            open={apModalAttachmentId !== null}
-            reports={filterReports(ENV.ASSET_REPORTS, apModalAttachmentId)}
-            onClose={() => setApModalAttachmentId(null)}
-            submissionType={submission.submissionType}
-          />
-        )}
-        <Table caption={I18n.t('Uploaded files')} data-testid="uploaded_files_table">
-          <Table.Head>
-            <Table.Row>
-              <Table.ColHeader id="thumbnail" width="1rem" themeOverride={cellTheme} />
-              <Table.ColHeader id="filename" themeOverride={cellTheme}>
-                {I18n.t('File Name')}
+      <Table caption={I18n.t('Uploaded files')} data-testid="uploaded_files_table">
+        <Table.Head>
+          <Table.Row>
+            <Table.ColHeader id="thumbnail" width="1rem" themeOverride={cellTheme} />
+            <Table.ColHeader id="filename" themeOverride={cellTheme}>
+              {I18n.t('File Name')}
+            </Table.ColHeader>
+            <Table.ColHeader id="size" themeOverride={cellTheme}>
+              {I18n.t('Size')}
+            </Table.ColHeader>
+            <Table.ColHeader id="originality_report" themeOverride={cellTheme} />
+            {showDocumentProcessorsColumn && (
+              <Table.ColHeader id="document_processors" themeOverride={cellTheme}>
+                {I18n.t('Document Processors')}
               </Table.ColHeader>
-              <Table.ColHeader id="size" themeOverride={cellTheme}>
-                {I18n.t('Size')}
-              </Table.ColHeader>
-              <Table.ColHeader id="originality_report" themeOverride={cellTheme} />
+            )}
+            <Table.ColHeader id="upload-success" width="1rem" themeOverride={cellTheme} />
+          </Table.Row>
+        </Table.Head>
+        <Table.Body>
+          {submission.attachments.map((file, index) => (
+            <Table.Row key={file._id}>
+              <Table.Cell themeOverride={cellTheme}>
+                {shouldDisplayThumbnail(file)
+                  ? renderThumbnail(file, index)
+                  : renderIcon(file, index)}
+              </Table.Cell>
+              <Table.Cell themeOverride={cellTheme}>
+                <Link onClick={() => selectFile(index)}>
+                  {elideString(file.displayName || file.name)}
+                </Link>
+                <ScreenReaderContent>{file.displayName || file.name}</ScreenReaderContent>
+              </Table.Cell>
+              <Table.Cell themeOverride={cellTheme} data-testid="file-size">
+                {file.size}
+              </Table.Cell>
+              <Table.Cell themeOverride={cellTheme}>
+                {submission.originalityData &&
+                  isOriginalityReportVisible &&
+                  getOriginalityData(submission, index) && (
+                    <Flex.Item>
+                      <OriginalityReport originalityData={getOriginalityData(submission, index)} />
+                    </Flex.Item>
+                  )}
+              </Table.Cell>
               {showDocumentProcessorsColumn && (
-                <Table.ColHeader id="document_processors" themeOverride={cellTheme}>
-                  {I18n.t('Document Processors')}
-                </Table.ColHeader>
+                <Table.Cell themeOverride={cellTheme}>
+                  <LtiAssetReportsForStudentSubmission
+                    submissionId={submission._id}
+                    submissionType={submission.submissionType}
+                    attachmentId={file._id}
+                  />
+                </Table.Cell>
               )}
-              <Table.ColHeader id="upload-success" width="1rem" themeOverride={cellTheme} />
+              <Table.Cell themeOverride={cellTheme}>
+                <IconCompleteSolid color="success" />
+              </Table.Cell>
             </Table.Row>
-          </Table.Head>
-          <Table.Body>
-            {submission.attachments.map((file, index) => (
-              <Table.Row key={file._id}>
-                <Table.Cell themeOverride={cellTheme}>
-                  {shouldDisplayThumbnail(file)
-                    ? renderThumbnail(file, index)
-                    : renderIcon(file, index)}
-                </Table.Cell>
-                <Table.Cell themeOverride={cellTheme}>
-                  <Link onClick={() => selectFile(index)}>
-                    {elideString(file.displayName || file.name)}
-                  </Link>
-                  <ScreenReaderContent>{file.displayName || file.name}</ScreenReaderContent>
-                </Table.Cell>
-                <Table.Cell themeOverride={cellTheme} data-testid="file-size">
-                  {file.size}
-                </Table.Cell>
-                <Table.Cell themeOverride={cellTheme}>
-                  {submission.originalityData &&
-                    isOriginalityReportVisible &&
-                    getOriginalityData(submission, index) && (
-                      <Flex.Item>
-                        <OriginalityReport
-                          originalityData={getOriginalityData(submission, index)}
-                        />
-                      </Flex.Item>
-                    )}
-                </Table.Cell>
-                {showDocumentProcessorsColumn && (
-                  <Table.Cell themeOverride={cellTheme}>
-                    <AssetReportStatus
-                      reports={filterReports(ENV.ASSET_REPORTS, file._id)}
-                      openModal={() => setApModalAttachmentId(file._id)}
-                    />
-                  </Table.Cell>
-                )}
-                <Table.Cell themeOverride={cellTheme}>
-                  <IconCompleteSolid color="success" />
-                </Table.Cell>
-              </Table.Row>
-            ))}
-          </Table.Body>
-        </Table>
-      </>
+          ))}
+        </Table.Body>
+      </Table>
     )
   }
 

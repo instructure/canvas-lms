@@ -55,7 +55,8 @@ import BlueprintLockIcon from './BlueprintLockIcon'
 import PublishCloud from '@canvas/files/react/components/PublishCloud'
 import ModuleFile from '@canvas/files/backbone/models/ModuleFile'
 import {dispatchCommandEvent} from '../handlers/dispatchCommandEvent'
-import {MODULE_ITEMS} from '../utils/constants'
+import {MODULE_ITEMS, MODULE_ITEMS_ALL} from '../utils/constants'
+import {usePublishing} from '@canvas/context-modules/react/publishing/publishingContext'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -101,8 +102,17 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   const [isDirectShareCourseOpen, setIsDirectShareCourseOpen] = useState(false)
   const [isPublishButtonEnabled, setIsPublishButtonEnabled] = useState(true)
 
-  const {courseId, isMasterCourse, isChildCourse, setMenuItemLoadingState, permissions} =
-    useContextModule()
+  const {
+    courseId,
+    isMasterCourse,
+    isChildCourse,
+    setMenuItemLoadingState,
+    permissions,
+    moduleCursorState,
+  } = useContextModule()
+
+  const publishingContext = usePublishing()
+  const publishingInProgress = !!publishingContext?.publishingInProgress
 
   const renderMasteryPathsInfo = () => {
     if (!masteryPathsData || (!masteryPathsData.isTrigger && !masteryPathsData.releasedLabel)) {
@@ -141,7 +151,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   }, [content, courseId, setIsMenuOpen])
 
   const handleAssignToRef = useCallback(() => {
-    handleAssignTo(content, courseId, title, setIsMenuOpen, moduleId)
+    handleAssignTo(content, courseId, title, moduleCursorState[moduleId], setIsMenuOpen, moduleId)
   }, [content, courseId, title, moduleId])
 
   const handleDuplicateRef = useCallback(() => {
@@ -241,11 +251,11 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
       fileName: content?.displayName,
       onPublishChange: () => {
         queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId || '']})
-        queryClient.invalidateQueries({queryKey: ['MODULE_ITEMS_ALL', moduleId || '']})
+        queryClient.invalidateQueries({queryKey: [MODULE_ITEMS_ALL, moduleId || '']})
       },
     }
 
-    return <PublishCloud {...props} model={file} disabled={false} />
+    return <PublishCloud {...props} model={file} disabled={publishingInProgress} />
   }
 
   const renderItemPublishButton = () => {
@@ -258,7 +268,11 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
         withBorder={false}
         color={published ? 'success' : 'secondary'}
         size="small"
-        interaction={canBeUnpublished && isPublishButtonEnabled ? 'enabled' : 'disabled'}
+        interaction={
+          canBeUnpublished && isPublishButtonEnabled && !publishingInProgress
+            ? 'enabled'
+            : 'disabled'
+        }
         onClick={publishIconOnClickRef}
       />
     )
@@ -315,9 +329,16 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
           </Flex.Item>
         )}
       </Flex>
-      {['assignment', 'attachment', 'discussion', 'page', 'quiz', 'module', 'module_item'].includes(
-        content?.type?.toLowerCase() || '',
-      ) && (
+      {[
+        'assignment',
+        'attachment',
+        'discussion',
+        'file',
+        'page',
+        'quiz',
+        'module',
+        'module_item',
+      ].includes(content?.type?.toLowerCase() || '') && (
         <>
           <DirectShareUserModal
             id={moduleId}

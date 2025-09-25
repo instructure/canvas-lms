@@ -111,6 +111,10 @@ class Account < ActiveRecord::Base
   has_many :rubric_imports, inverse_of: :root_account, foreign_key: :root_account_id
   has_many :rubric_assessment_imports, inverse_of: :root_account, foreign_key: :root_account_id
 
+  has_many :auditor_account_user_records,
+           class_name: "Auditors::ActiveRecord::AccountUserRecord",
+           dependent: :destroy,
+           inverse_of: :account
   has_many :auditor_authentication_records,
            class_name: "Auditors::ActiveRecord::AuthenticationRecord",
            dependent: :destroy,
@@ -144,6 +148,7 @@ class Account < ActiveRecord::Base
            dependent: :destroy
   has_many :lti_registrations, class_name: "Lti::Registration", inverse_of: :account, dependent: :destroy
   has_many :block_editor_templates, class_name: "BlockEditorTemplate", as: :context, inverse_of: :context
+  has_many :oauth_client_configs, class_name: "OAuthClientConfig", inverse_of: :root_account
   belongs_to :course_template, class_name: "Course", inverse_of: :templated_accounts
   belongs_to :grading_standard
 
@@ -2804,25 +2809,6 @@ class Account < ActiveRecord::Base
     sub_accounts.where(grading_standard: nil).find_each do |sub_account|
       sub_account.recompute_assignments_using_account_default(grading_standard)
     end
-  end
-
-  def horizon_domain
-    settings[:horizon_domain]
-  end
-
-  def horizon_url(path)
-    return nil unless horizon_domain
-
-    protocol = horizon_domain.include?("localhost") ? "http" : "https"
-    Addressable::URI.parse("#{protocol}://#{horizon_domain}/#{path}")
-  end
-
-  def horizon_redirect_url(canvas_url, reauthenticate: false, preview: false)
-    return nil unless horizon_domain
-
-    uri = horizon_url("redirect")
-    uri.query_values = { canvas_url:, reauthenticate:, preview: }
-    uri.to_s
   end
 
   def horizon_account_locked?

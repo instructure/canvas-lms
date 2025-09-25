@@ -1196,15 +1196,15 @@ describe SubmissionsController do
 
       # Mock data for asset reports and processors
       asset_reports_data = [
-        { title: "Asset Report 1", asset: { id: 101, attachment_id: 1, attachment_name: "test_attachment.pdf" } }
+        { title: "Asset Report 1", asset: { id: 101, attachmentId: 1, attachmentName: "test_attachment.pdf" } }
       ]
       asset_processors_data = [
         { title: "Test Processor", icon_url: "https://example.com/icon.png" }
       ]
 
       # Mock helper methods
-      allow_any_instance_of(AssetProcessorStudentHelper).to receive(:asset_reports).and_return(asset_reports_data)
-      allow_any_instance_of(AssetProcessorStudentHelper).to receive(:asset_processors).and_return(asset_processors_data)
+      allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_reports_legacy_format).and_return(asset_reports_data)
+      allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_processors).and_return(asset_processors_data)
 
       get :show, params: { course_id: @course.id, assignment_id: @assignment.id, id: @student.id }
 

@@ -127,6 +127,11 @@ module Types
       def final_grader
         Loaders::IDLoader.for(User).load(object.final_grader_id)
       end
+
+      field :final_grader_anonymous_id, String, "The anonymous ID of the final grader", null: true
+      def final_grader_anonymous_id
+        Loaders::AssignmentLoaders::FinalGraderAnonymousIdLoader.load(object.id)
+      end
     end
 
     class AssignmentRubricAssessmentType < ApplicationObjectType
@@ -670,7 +675,7 @@ module Types
         if course.grants_right?(current_user, :manage_grades)
           load_association(:lti_asset_processors)
         elsif current_user && (submission = assignment.submissions.find_by(user: current_user))
-          if submission.user_can_read_grade?(current_user)
+          if submission.user_can_read_grade?(current_user, for_plagiarism: true)
             load_association(:lti_asset_processors)
           end
         end

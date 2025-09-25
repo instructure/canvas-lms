@@ -1,10 +1,10 @@
 # GENERATED FILE, DO NOT MODIFY!
 # To update this file please edit the relevant template and run the generation
-# task `build/dockerfile_writer.rb --env development --compose-file docker-compose.yml,docker-compose.override.yml --in build/Dockerfile.template --out Dockerfile`
+# task `build/dockerfile_writer.rb --env development --compose-file inst-cli/docker-compose/docker-compose.local.dev.yml --in build/Dockerfile.template --out Dockerfile`
 
 ARG RUBY=3.4
 
-FROM instructure/ruby-passenger:$RUBY
+FROM instructure/ruby-passenger:$RUBY-jammy
 LABEL maintainer="Instructure"
 
 ARG RUBY
@@ -40,7 +40,7 @@ RUN mkdir -p /etc/apt/keyrings \
   && curl -fsSL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor -o /etc/apt/keyrings/yarn.gpg \
   && echo "deb [signed-by=/etc/apt/keyrings/yarn.gpg] https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
   && printf 'path-exclude /usr/share/doc/*\npath-exclude /usr/share/man/*' > /etc/dpkg/dpkg.cfg.d/01_nodoc \
-  && echo "deb http://apt-archive.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
+  && echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
   && curl -sS https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
   && add-apt-repository ppa:git-core/ppa -ny \
   && apt-get update -qq \
@@ -53,6 +53,7 @@ RUN mkdir -p /etc/apt/keyrings \
        libidn11-dev \
        parallel \
        postgresql-client-$POSTGRES_CLIENT \
+       tzdata \
        unzip \
        pbzip2 \
        fontforge \
@@ -83,7 +84,6 @@ RUN set -eux; \
     packages/js-utils/node_modules \
     pacts \
     public/dist \
-    public/doc/api \
     public/javascripts/translations \
     reports \
     tmp \

@@ -24,7 +24,7 @@
 #
 # For a definitive list of all supported placements for external tools and more information
 # on configuring them,
-# see the <a href="file.placements_overview">Placements Documentation</a>.
+# see the <a href="file.placements_overview.html">Placements Documentation</a>.
 #
 # @model ContextExternalTool
 #     {
@@ -852,17 +852,22 @@ class ExternalToolsController < ApplicationController
       launch_settings = JSON.parse(launch_settings)
       @lti_launch = Lti::Launch.new
       @lti_launch.params = launch_settings["tool_settings"]
-      @lti_launch.resource_url = launch_settings["launch_url"]
       @lti_launch.link_text =  launch_settings["tool_name"]
       @lti_launch.analytics_id = launch_settings["analytics_id"]
 
       tool = Lti::ToolFinder.find_by(id: launch_settings.dig("metadata", "tool_id")) ||
              Lti::ToolFinder.from_url(launch_settings["launch_url"], @context)
       if tool
+        # Use domain-specific URL for environment overrides
+        launch_url_with_overrides = tool.url_with_environment_overrides(launch_settings["launch_url"])
+        @lti_launch.resource_url = launch_url_with_overrides
+
         placement = launch_settings.dig("metadata", "placement")
         launch_type = launch_settings.dig("metadata", "launch_type")&.to_sym
-        Lti::LogService.new(tool:, context: @context, user: @current_user, session_id: session[:session_id], placement:, launch_type:, launch_url: launch_settings["launch_url"]).call
+        Lti::LogService.new(tool:, context: @context, user: @current_user, session_id: session[:session_id], placement:, launch_type:, launch_url: launch_url_with_overrides).call
         log_asset_access(tool, "external_tools", "external_tools", overwrite: false)
+      else
+        @lti_launch.resource_url = launch_settings["launch_url"]
       end
 
       render Lti::AppUtil.display_template("borderless")

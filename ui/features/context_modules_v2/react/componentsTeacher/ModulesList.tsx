@@ -44,7 +44,13 @@ import {useCourseTeacher} from '../hooks/queriesTeacher/useCourseTeacher'
 import {validateModuleTeacherRenderRequirements, ALL_MODULES} from '../utils/utils'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useHowManyModulesAreFetchingItems} from '../hooks/queries/useHowManyModulesAreFetchingItems'
-import {TEACHER, STUDENT, MODULE_ITEMS, SHOW_ALL_PAGE_SIZE} from '../utils/constants'
+import {
+  TEACHER,
+  STUDENT,
+  MODULE_ITEMS,
+  MODULE_ITEMS_ALL,
+  SHOW_ALL_PAGE_SIZE,
+} from '../utils/constants'
 import CreateNewModule from '../components/CreateNewModule'
 import {useDefaultCourseFolder} from '../hooks/mutations/useDefaultCourseFolder'
 
@@ -84,6 +90,7 @@ const ModulesList: React.FC = () => {
   const {data: courseStudentData} = useCourseTeacher(courseId || '')
   const [isDisabled, setIsDisabled] = useState(false)
   const [isExpanding, setIsExpanding] = useState(false)
+  const [modulesShowAll, setModulesShowAll] = useState<Record<string, boolean>>({})
 
   function resetIfInvalid(allModules: any[], value: any, setValue: (arg0: string) => void) {
     if (!allModules.some((m: {_id: any}) => m._id === value)) {
@@ -203,188 +210,92 @@ const ModulesList: React.FC = () => {
   ) => {
     const dragCursor = moduleCursorState[dragModuleId]
     const hoverCursor = moduleCursorState[hoverModuleId]
-    const view = TEACHER // Always use TEACHER view since DnD is only available in teacher view
 
     // In "show all" mode, prioritize the complete data over paginated data
     let sourceModuleData = queryClient.getQueryData([
-      'MODULE_ITEMS_ALL',
+      MODULE_ITEMS_ALL,
       dragModuleId,
-      view,
+      TEACHER,
       SHOW_ALL_PAGE_SIZE,
     ]) as {
       moduleItems: ModuleItem[]
     }
 
     // Fallback to paginated cache if show all not available
-    if (!sourceModuleData?.moduleItems?.length) {
+    if (!modulesShowAll[dragModuleId]) {
       sourceModuleData = queryClient.getQueryData([MODULE_ITEMS, dragModuleId, dragCursor]) as {
         moduleItems: ModuleItem[]
       }
     }
 
-    // Get the item being moved
-    const movedItem = sourceModuleData.moduleItems[dragIndex]
+    // Item being moved based on its index in the source module
+    const movedItem = sourceModuleData?.moduleItems[dragIndex]
     if (!movedItem) return
 
-    // Helper to update cache and call the mutation
-    const updateAndMutate = (
-      moduleId: string,
-      oldModuleId: string,
-      updatedItems: ModuleItem[],
-      targetPosition?: number,
-    ) => {
-      // Update cache
-      const cursor = moduleCursorState[moduleId]
+    // Decode the hover module's cursor to get the starting index of the current page
+    const pageIndex = modulesShowAll[hoverModuleId]
+      ? 0
+      : (hoverCursor && Number(atob(hoverCursor))) || 0
 
-      // Try to update paginated cache first
-      const paginatedData = queryClient.getQueryData([MODULE_ITEMS, moduleId, cursor])
-      if (paginatedData) {
-        queryClient.setQueryData([MODULE_ITEMS, moduleId, cursor], {
-          ...(moduleId === dragModuleId ? sourceModuleData : paginatedData),
-          moduleItems: updatedItems,
-        })
+    // This gets the position of an item in a module
+    // - pageIndex = (page - 1) * pageSize
+    // - hoverIndex = position on the page
+    // - indexAdjustment is +1 if moved between modules or +1/+2 if moved up/down within the same module
+    const indexAdjustment = hoverIndex > dragIndex && dragModuleId === hoverModuleId ? 2 : 1
+    const absoluteTargetPosition = pageIndex + hoverIndex + indexAdjustment
+    const movedItemIds = [movedItem._id].filter(Boolean)
+
+    if (!movedItemIds?.length) return
+
+    // Construct cache keys for source and target module queries, depending on mode (show all vs paginated)
+    const sourceCacheKey = modulesShowAll[dragModuleId]
+      ? [MODULE_ITEMS_ALL, dragModuleId, TEACHER, SHOW_ALL_PAGE_SIZE]
+      : [MODULE_ITEMS, dragModuleId, dragCursor]
+
+    const targetCacheKey = modulesShowAll[hoverModuleId]
+      ? [MODULE_ITEMS_ALL, hoverModuleId, TEACHER, SHOW_ALL_PAGE_SIZE]
+      : [MODULE_ITEMS, hoverModuleId, hoverCursor]
+
+    // Optimistically update source module cache:
+    // Remove the moved item so it disappears immediately from the drag origin
+    queryClient.setQueryData(sourceCacheKey, (old: any) => {
+      if (!old) return old
+      return {
+        ...old,
+        moduleItems: old.moduleItems.filter((item: ModuleItem) => item._id !== movedItem._id),
       }
+    })
 
-      // Also try to update "show all" cache if it exists with correct key
-      const showAllData = queryClient.getQueryData([
-        'MODULE_ITEMS_ALL',
-        moduleId,
-        view,
-        SHOW_ALL_PAGE_SIZE,
-      ])
-      if (showAllData) {
-        queryClient.setQueryData(['MODULE_ITEMS_ALL', moduleId, view, SHOW_ALL_PAGE_SIZE], {
-          ...(moduleId === dragModuleId ? sourceModuleData : showAllData),
-          moduleItems: updatedItems,
-        })
+    // Optimistically update target module cache:
+    // Insert the moved item into the new position with updated `position`
+    queryClient.setQueryData(targetCacheKey, (old: any) => {
+      const oldItems = old?.moduleItems ?? []
+      // Remove the moved item if already present in the target (prevents duplicates)
+      const filteredItems = oldItems.filter((item: {_id: string}) => item._id !== movedItem._id)
+
+      const newItems = [
+        ...filteredItems.slice(0, hoverIndex),
+        {
+          ...movedItem,
+          position: absoluteTargetPosition,
+        },
+        ...filteredItems.slice(hoverIndex),
+      ]
+
+      return {
+        ...old,
+        moduleItems: newItems,
       }
+    })
 
-      // Get item IDs and call mutation if needed
-      const itemIds = getItemIds(updatedItems)
-
-      if (itemIds.length > 0) {
-        reorderItemsMutation.mutate({
-          courseId,
-          moduleId,
-          itemIds,
-          oldModuleId,
-          targetPosition,
-        })
-      }
-    }
-
-    // ---------- STEP 1: OPTIMISTIC UI UPDATE ----------
-    // For same-module reordering
-    if (dragModuleId === hoverModuleId) {
-      // Clone and update the module items
-      const updatedItems = [...sourceModuleData.moduleItems]
-
-      updatedItems.splice(dragIndex, 1) // Remove from old position
-      updatedItems.splice(hoverIndex, 0, movedItem) // Insert at new position
-
-      // Update all indexes and update cache
-      updateAndMutate(dragModuleId, dragModuleId, updateIndexes(updatedItems))
-      // For cross-module movement
-    } else {
-      // Try to get destination data from either paginated cache or "show all" cache
-      let destModuleData = queryClient.getQueryData([MODULE_ITEMS, hoverModuleId, hoverCursor]) as {
-        moduleItems: ModuleItem[]
-      }
-
-      // If not found in paginated cache, try the "show all" cache with correct key
-      if (!destModuleData?.moduleItems) {
-        destModuleData = queryClient.getQueryData([
-          'MODULE_ITEMS_ALL',
-          hoverModuleId,
-          view,
-          SHOW_ALL_PAGE_SIZE,
-        ]) as {
-          moduleItems: ModuleItem[]
-        }
-      }
-
-      if (!destModuleData?.moduleItems) return
-
-      // Calculate absolute target position for cross-module moves
-      // For cross-module moves, we want to place the item at the precise drop location
-      const absoluteTargetPosition = hoverIndex + 1
-
-      // Prepare source module update (remove the item)
-      const updatedSourceItems = updateIndexes(
-        sourceModuleData.moduleItems.filter((_: any, i: number) => i !== dragIndex),
-      )
-
-      // Prepare destination module update (add the item)
-      const updatedItem = {
-        ...movedItem,
-        moduleId: hoverModuleId,
-        index: hoverIndex,
-      }
-      const updatedDestItems = [...destModuleData.moduleItems]
-      updatedDestItems.splice(hoverIndex, 0, updatedItem)
-      const updatedDestWithIndexes = updateIndexes(updatedDestItems)
-
-      // Update source module cache (optimistic update only)
-      const sourceCursor = moduleCursorState[dragModuleId]
-      const sourcePaginatedData = queryClient.getQueryData([
-        MODULE_ITEMS,
-        dragModuleId,
-        sourceCursor,
-      ])
-      if (sourcePaginatedData) {
-        queryClient.setQueryData([MODULE_ITEMS, dragModuleId, sourceCursor], {
-          ...sourcePaginatedData,
-          moduleItems: updatedSourceItems,
-        })
-      }
-      const sourceShowAllData = queryClient.getQueryData([
-        'MODULE_ITEMS_ALL',
-        dragModuleId,
-        view,
-        SHOW_ALL_PAGE_SIZE,
-      ])
-      if (sourceShowAllData) {
-        queryClient.setQueryData(['MODULE_ITEMS_ALL', dragModuleId, view, SHOW_ALL_PAGE_SIZE], {
-          ...sourceShowAllData,
-          moduleItems: updatedSourceItems,
-        })
-      }
-
-      // Update destination module cache
-      const destCursor = moduleCursorState[hoverModuleId]
-      const destPaginatedData = queryClient.getQueryData([MODULE_ITEMS, hoverModuleId, destCursor])
-      if (destPaginatedData) {
-        queryClient.setQueryData([MODULE_ITEMS, hoverModuleId, destCursor], {
-          ...destPaginatedData,
-          moduleItems: updatedDestWithIndexes,
-        })
-      }
-      const destShowAllData = queryClient.getQueryData([
-        'MODULE_ITEMS_ALL',
-        hoverModuleId,
-        view,
-        SHOW_ALL_PAGE_SIZE,
-      ])
-      if (destShowAllData) {
-        queryClient.setQueryData(['MODULE_ITEMS_ALL', hoverModuleId, view, SHOW_ALL_PAGE_SIZE], {
-          ...destShowAllData,
-          moduleItems: updatedDestWithIndexes,
-        })
-      }
-
-      // For cross-module moves, send only the moved item ID
-      const movedItemIds = [movedItem._id].filter(Boolean)
-
-      if (movedItemIds.length > 0) {
-        reorderItemsMutation.mutate({
-          courseId,
-          moduleId: hoverModuleId,
-          itemIds: movedItemIds,
-          oldModuleId: dragModuleId,
-          targetPosition: absoluteTargetPosition,
-        })
-      }
-    }
+    // Trigger backend mutation to persist the reordering
+    reorderItemsMutation.mutate({
+      courseId,
+      moduleId: hoverModuleId,
+      itemIds: movedItemIds,
+      oldModuleId: dragModuleId,
+      targetPosition: absoluteTargetPosition,
+    })
   }
 
   const handleDragStart = useCallback(() => {
@@ -395,14 +306,7 @@ const ModulesList: React.FC = () => {
   const handleDragEnd = (result: DropResult) => {
     document.dispatchEvent(new CustomEvent('drag-state-change', {detail: {isDragging: false}}))
 
-    // Check for no destination or no movement first
-    if (
-      !result.destination ||
-      (result.source.droppableId === result.destination.droppableId &&
-        result.source.index === result.destination.index)
-    ) {
-      return
-    }
+    if (!result.destination) return
 
     // Use the shared utility function
     dndHandleDragEnd(
@@ -563,6 +467,7 @@ const ModulesList: React.FC = () => {
                                 setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}
                                 setSelectedModuleItem={setSelectedModuleItem}
                                 setSourceModule={setSourceModule}
+                                setModulesShowAll={setModulesShowAll}
                               />
                             </div>
                           )}

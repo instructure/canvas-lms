@@ -62,14 +62,14 @@ module Lti::IMS::Concerns
 
     def verify_course_not_concluded
       # If context is nil, the verify_context will handle rendering a 404.
-      if context&.concluded?
+      if context&.completed? || context&.soft_concluded_for_all?(["TeacherEnrollment", "TaEnrollment"])
         render_error("This course has concluded. AGS requests will no longer be accepted for this course.",
                      :unprocessable_entity)
       end
     end
 
     def verify_user_in_context
-      return if context.user_is_student?(user, include_fake_student: true)
+      return if context.user_is_student?(user, include_fake_student: true, include_all: true)
 
       render_error("User not found in course or is not a student", :unprocessable_entity)
     end

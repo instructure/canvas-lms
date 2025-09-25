@@ -19,9 +19,17 @@
 
 module PeerReview
   class PeerReviewError < StandardError; end
-  class PeerReviewInvalidParentAssignmentError < PeerReviewError; end
-  class PeerReviewFeatureDisabledError < PeerReviewError; end
-  class PeerReviewInvalidAssignmentSubmissionTypesError < PeerReviewError; end
-  class PeerReviewSubAssignmentExistsError < PeerReviewError; end
-  class PeerReviewSubAssignmentNotExistError < PeerReviewError; end
+  class InvalidParentAssignmentError < PeerReviewError; end
+  class FeatureDisabledError < PeerReviewError; end
+  class InvalidAssignmentSubmissionTypesError < PeerReviewError; end
+  class SubAssignmentExistsError < PeerReviewError; end
+  class SubAssignmentNotExistError < PeerReviewError; end
+  class InvalidOverrideDatesError < PeerReviewError; end
+  class SetTypeRequiredError < PeerReviewError; end
+  class SetIdRequiredError < PeerReviewError; end
+  class OverrideNotFoundError < PeerReviewError; end
+  class SectionNotFoundError < PeerReviewError; end
+  class StudentIdsRequiredError < PeerReviewError; end
+  class SetTypeNotSupportedError < PeerReviewError; end
+  class PeerReviewsNotEnabledError < PeerReviewError; end
 end

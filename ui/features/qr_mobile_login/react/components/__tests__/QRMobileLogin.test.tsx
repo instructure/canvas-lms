@@ -17,7 +17,7 @@
 
 import React from 'react'
 import fetchMock from 'fetch-mock'
-import {render, act, fireEvent} from '@testing-library/react'
+import {render, act, fireEvent, waitFor} from '@testing-library/react'
 import {QRMobileLogin} from '../QRMobileLogin'
 
 const MINUTES = 1000 * 60
@@ -76,42 +76,51 @@ describe('QRMobileLogin', () => {
     }
 
     it('renders the image in the response, and the right expiration time', async () => {
-      const {findByTestId, getByText} = render(<QRMobileLogin />)
+      const {findByTestId, getAllByText, getByText} = render(<QRMobileLogin />)
       const image = (await findByTestId('qr-code-image')) as HTMLImageElement
       expect(image.src).toBe(`data:image/png;base64, ${loginImageJsons[0].png}`)
-      expect(getByText(/will expire in 10 minutes/i)).toBeInTheDocument()
+      await waitFor(() => {
+        expect(getAllByText(/will expire in 10 minutes/i)).toHaveLength(2) // once in body, once in sr-only
+        expect(getByText(/has been successfully generated/i)).toBeInTheDocument() // screen reader success msg
+      })
     })
 
     it('updates the expiration as time elapses', async () => {
-      const {findByText} = render(<QRMobileLogin />)
-      await findByText(/will expire in 10 minutes/i)
+      const {findAllByText, getAllByText} = render(<QRMobileLogin />)
+      await findAllByText(/will expire in 10 minutes/i)
       advance(1 * MINUTES)
-      const expiresIn = await findByText(/will expire in 9 minutes/i)
-      expect(expiresIn).toBeInTheDocument()
+      await waitFor(() => {
+        expect(getAllByText(/will expire in 9 minutes/i)).toHaveLength(2)
+      })
     })
 
     it('shows the right thing when the token has expired', async () => {
       const refreshInterval = 15 * MINUTES
       const pollInterval = 3 * MINUTES
-      const {findByText} = render(
+      const {findAllByText, getAllByText} = render(
         <QRMobileLogin refreshInterval={refreshInterval} pollInterval={pollInterval} />,
       )
-      await findByText(/will expire in 10 minutes/)
+      await findAllByText(/will expire in 10 minutes/)
       advance(11 * MINUTES) // code is only good for 10
-      const expiresIn = await findByText(/code has expired/i)
-      expect(expiresIn).toBeInTheDocument()
+      await waitFor(() => {
+        expect(getAllByText(/code has expired/i)).toHaveLength(2)
+      })
     })
 
     it('refreshes the code at the right time', async () => {
       const refreshInterval = 2 * MINUTES
-      const {findByText, findByTestId} = render(<QRMobileLogin refreshInterval={refreshInterval} />)
+      const {findAllByText, findByTestId, getAllByText} = render(
+        <QRMobileLogin refreshInterval={refreshInterval} />,
+      )
       const image = (await findByTestId('qr-code-image')) as HTMLImageElement
       expect(image.src).toBe(`data:image/png;base64, ${loginImageJsons[0].png}`)
       expect(fetchMock.calls(route)).toHaveLength(1)
       advance(1 * MINUTES)
-      await findByText(/will expire in 9 minutes/)
+      await findAllByText(/will expire in 9 minutes/)
       advance(1 * MINUTES)
-      await findByText(/will expire in 10 minutes/)
+      await waitFor(() => {
+        expect(getAllByText(/will expire in 10 minutes/)).toHaveLength(2)
+      })
       expect(fetchMock.calls(route)).toHaveLength(2)
       expect(image.src).toBe(`data:image/png;base64, ${loginImageJsons[1].png}`)
     })
@@ -132,19 +141,21 @@ describe('QRMobileLogin', () => {
 
     it('displays the code when the modal is confirmed', async () => {
       fetchMock.post(route, loginImageJsons[0], {overwriteRoutes: true})
-      const {getByTestId, findByText} = render(<QRMobileLogin withWarning={true} />)
+      const {getByTestId, findAllByText} = render(<QRMobileLogin withWarning={true} />)
       const proceedButton = getByTestId('qr-proceed-button')
       fireEvent.click(proceedButton)
-      await findByText(/will expire in 10 minutes/)
+      await findAllByText(/will expire in 10 minutes/)
       expect(getByTestId('qr-code-image')).toBeInTheDocument()
     })
 
     it('displays a message instead of a code when modal is canceled', async () => {
       fetchMock.post(route, loginImageJsons[0], {overwriteRoutes: true})
-      const {getByTestId, findByText, queryByTestId} = render(<QRMobileLogin withWarning={true} />)
+      const {getByTestId, findAllByText, queryByTestId} = render(
+        <QRMobileLogin withWarning={true} />,
+      )
       const cancelButton = getByTestId('qr-cancel-button')
       fireEvent.click(cancelButton)
-      await findByText(/qr code display was canceled/i)
+      await findAllByText(/qr code display was canceled/i)
       expect(queryByTestId('qr-code-image')).toBeNull()
     })
 

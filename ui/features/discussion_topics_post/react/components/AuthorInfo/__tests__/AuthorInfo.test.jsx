@@ -268,11 +268,11 @@ describe('AuthorInfo', () => {
 
     it('renders the last reply at date', () => {
       const container = setup()
-      expect(
-        container.getByText(
-          `Last reply ${new Date('2025-01-16T18:42:00').toLocaleString('en-US', {month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true})}`,
-        ),
-      ).toBeInTheDocument()
+
+      const lastReplyContainer = container.getByTestId('last-reply-at-text')
+      expect(lastReplyContainer.textContent).toContain(
+        `Last reply ${new Date('2025-01-16T18:42:00').toLocaleString('en-US', {month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true})}`,
+      )
     })
 
     it('render the last edited date if it is in the past for teachers', () => {
