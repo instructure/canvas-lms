@@ -224,10 +224,6 @@ class SubmissionsApiController < ApplicationController
   include Api::V1::Submission
   include Submissions::ShowHelper
 
-  include GradebookRequestMetricsTrackerHelper
-
-  around_action :track_request_timing, only: [:for_students]
-
   # @API List assignment submissions
   #
   # A paginated list of all existing submissions for an assignment.
