@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import './color-picker-wrapper.css'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ColorPicker} from '@instructure/ui-color-picker'
 import {ColorPickerPopover} from './ColorPickerPopover'
@@ -48,6 +49,7 @@ export const ColorPickerWrapper = ({
       value={value}
       onChange={onChange}
       withAlpha
+      data-colorpicker-fix
     >
       {(value, onChange, onAdd, onClose) => {
         return (
