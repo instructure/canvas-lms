@@ -17,14 +17,18 @@
  */
 
 import {View} from '@instructure/ui-view'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {PreviewButton} from './PreviewButton'
 import {RedoButton} from './RedoButton'
 import {UndoButton} from './UndoButton'
 import {AccessibilityCheckerButton} from './AccessibilityCheckerButton'
 import {useEditHistory} from '../hooks/useEditHistory'
+import {showScreenReaderAlert} from '../utilities/accessibility'
 import {List} from '@instructure/ui-list'
 import {useEditorMode} from '../hooks/useEditorMode'
 import {useAppSelector} from '../store'
+
+const I18n = createI18nScope('block_content_editor')
 
 export const Toolbar = () => {
   const {a11yIssueCount, a11yIssues} = useAppSelector(state => ({
@@ -33,6 +37,16 @@ export const Toolbar = () => {
   const {mode, setMode} = useEditorMode()
   const {undo, redo, canUndo, canRedo} = useEditHistory()
   const isPreviewMode = mode === 'preview'
+
+  const handleUndo = () => {
+    undo()
+    showScreenReaderAlert(I18n.t('Last change undone'))
+  }
+
+  const handleRedo = () => {
+    redo()
+    showScreenReaderAlert(I18n.t('Last change redone'))
+  }
 
   const menuItems = [
     <PreviewButton
@@ -43,8 +57,8 @@ export const Toolbar = () => {
   if (!isPreviewMode) {
     const allIssues = Array.from(a11yIssues.values()).flat()
     menuItems.push(
-      <UndoButton active={canUndo} onClick={undo} />,
-      <RedoButton active={canRedo} onClick={redo} />,
+      <UndoButton active={canUndo} onClick={handleUndo} />,
+      <RedoButton active={canRedo} onClick={handleRedo} />,
       <AccessibilityCheckerButton count={a11yIssueCount} issues={allIssues} />,
     )
   }

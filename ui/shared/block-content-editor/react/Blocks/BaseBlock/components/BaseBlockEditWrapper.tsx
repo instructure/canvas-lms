@@ -18,12 +18,14 @@
 
 import {PropsWithChildren} from 'react'
 import {useNode} from '@craftjs/core'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {AddButton} from '../../../AddBlock/AddButton'
 import {useDeleteNode} from '../../../hooks/useDeleteNode'
 import {useDuplicateNode} from '../../../hooks/useDuplicateNode'
 import {useMoveBlock} from '../../../hooks/useMoveBlock'
 import {useIsEditingBlock} from '../../../hooks/useIsEditingBlock'
 import {useBlockTitle} from '../../../hooks/useBlockTitle'
+import {showScreenReaderAlert} from '../../../utilities/accessibility'
 import {BaseBlockLayout} from '../layout/BaseBlockLayout'
 import {CopyButton} from './CopyButton'
 import {SettingsButton} from './SettingsButton'
@@ -38,6 +40,8 @@ import {useAddBlockModal} from '../../../hooks/useAddBlockModal'
 import {useSettingsTray} from '../../../hooks/useSettingsTray'
 import {useEditingBlock} from '../../../hooks/useEditingBlock'
 
+const I18n = createI18nScope('block_content_editor')
+
 const InsertButton = () => {
   const {id} = useNode()
   const {open} = useAddBlockModal()
@@ -46,12 +50,22 @@ const InsertButton = () => {
 
 const DeleteButton = ({title}: {title: string}) => {
   const deleteNode = useDeleteNode()
-  return <RemoveButton onClicked={deleteNode} title={title} />
+  const handleDelete = () => {
+    deleteNode()
+    const alertMessage = I18n.t('Block removed: %{blockType}', {blockType: title})
+    showScreenReaderAlert(alertMessage)
+  }
+  return <RemoveButton onClicked={handleDelete} title={title} />
 }
 
 const DuplicateButton = ({title}: {title: string}) => {
   const duplicateNode = useDuplicateNode()
-  return <CopyButton onClicked={duplicateNode} title={title} />
+  const handleDuplicate = () => {
+    duplicateNode()
+    const alertMessage = I18n.t('Block duplicated: %{blockType}', {blockType: title})
+    showScreenReaderAlert(alertMessage)
+  }
+  return <CopyButton onClicked={handleDuplicate} title={title} />
 }
 
 const EditSettingsButton = ({title}: {title: string}) => {
