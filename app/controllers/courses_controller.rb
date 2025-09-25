@@ -375,10 +375,6 @@ class CoursesController < ApplicationController
   include Api::V1::Progress
   include K5Mode
 
-  include GradebookRequestMetricsTrackerHelper
-
-  around_action :track_request_timing, only: [:users]
-
   # @API List your courses
   # Returns the paginated list of active courses for the current user.
   #

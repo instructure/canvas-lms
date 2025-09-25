@@ -23,20 +23,20 @@ import {withStyle, WithStyleProps} from '@instructure/emotion'
 import type {Theme} from '@instructure/ui-themes'
 import {Text} from '@instructure/ui-text'
 
-type BarIconStyleProps = {
+type TabIconStyleProps = {
   selectedColor: string
   secondaryColor: string
 }
 
-type BarIconOwnProps = {
+type TabIconOwnProps = {
   svgPath: React.ReactNode
   title: string
   selected: boolean
 }
 
-export type BarIconProps = BarIconOwnProps & WithStyleProps<BarIconStyleProps, BarIconStyleProps>
+export type TabIconProps = TabIconOwnProps & WithStyleProps<TabIconStyleProps, TabIconStyleProps>
 
-class BarIcon extends Component<BarIconProps> {
+class TabIcon extends Component<TabIconProps> {
   componentDidMount() {
     this.props.makeStyles!()
   }
@@ -55,18 +55,18 @@ class BarIcon extends Component<BarIconProps> {
   }
 }
 
-const generateStyles = (componentTheme: BarIconStyleProps) =>
+const generateStyles = (componentTheme: TabIconStyleProps) =>
   ({
     ...componentTheme,
-  }) as BarIconStyleProps
+  }) as TabIconStyleProps
 
 const generateComponentTheme = (theme: Theme) =>
   ({
     selectedColor: theme['ic-brand-primary']!,
     secondaryColor: theme['ic-brand-font-color-dark']!,
-  }) as BarIconStyleProps
+  }) as TabIconStyleProps
 
-export const BlockContentPreviewSelectorBarIcon = withStyle(
+export const BlockContentPreviewTabIcon = withStyle(
   generateStyles,
   generateComponentTheme,
-)(BarIcon) as React.ComponentType<BarIconProps>
+)(TabIcon) as React.ComponentType<TabIconProps>

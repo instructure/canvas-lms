@@ -31,10 +31,6 @@ class PreviewComponent
     f(preview_layout_selector)
   end
 
-  def preview_selector_bar
-    f(".preview-selector-bar-container")
-  end
-
   def tabs
     ff("[role='tablist'] > *", preview_layout)
   end

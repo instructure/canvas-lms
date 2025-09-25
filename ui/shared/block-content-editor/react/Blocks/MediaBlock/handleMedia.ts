@@ -58,7 +58,9 @@ const handleComputerUpload = async (uploadData: UploadData, storeProps: StorePro
     if (!result.mediaObject?.embedded_iframe_url) {
       throw new Error('No iframe media URL given')
     }
-    return result.mediaObject.media_object.media_id
+    const mediaId = result.mediaObject.media_object.media_id
+    const src = result.mediaObject.embedded_iframe_url
+    return {mediaId, src}
   } catch (error) {
     console.error('Media upload error details:', error)
     throw new Error('Failed to upload the media file, please try again')
@@ -82,13 +84,13 @@ export const handleMediaSubmit = async (
 ): Promise<MediaSources> => {
   switch (selectedPanel) {
     case 'COMPUTER': {
-      const mediaId = await handleComputerUpload(uploadData, storeProps)
-      return {mediaId}
+      const {mediaId, src} = await handleComputerUpload(uploadData, storeProps)
+      return {mediaId, src} // save both mediaId and src for now
     }
     case 'user_media':
     case 'course_media': {
       const attachment_id = await handleCourseMediaUpload(uploadData)
-      return {attachment_id}
+      return {attachment_id, src: uploadData.fileUrl} // save both attachment_id and src for now
     }
     default: {
       if (!uploadData.fileUrl) {

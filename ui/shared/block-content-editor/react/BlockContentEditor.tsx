@@ -27,6 +27,8 @@ import {Editor} from '@craftjs/core'
 import {components} from './block-content-editor-components'
 import {BlockContentEditorContent} from './BlockContentEditorContent'
 import {BlockContentEditorErrorBoundary} from './BlockContentEditorErrorBoundary'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 
 const getEditorForMode = (mode: EditorMode, props: BlockContentEditorProps) => {
   switch (mode) {
@@ -53,15 +55,20 @@ const BlockContentEditorWrapper = (props: BlockContentEditorProps) => {
 
 export type BlockContentEditorProps = BlockContentViewerProps & {
   onInit: ((handler: BlockContentEditorHandler) => void) | null
-  aiAltTextEnabled: boolean
+  aiAltTextGenerationURL: string | null
 }
 
 export const BlockContentEditor = (props: BlockContentEditorProps) => {
   return (
-    <BlockContentEditorErrorBoundary>
-      <BlockContentEditorContext data={props.data} aiAltTextEnabled={props.aiAltTextEnabled}>
-        <BlockContentEditorWrapper {...props} />
-      </BlockContentEditorContext>
-    </BlockContentEditorErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <BlockContentEditorErrorBoundary>
+        <BlockContentEditorContext
+          data={props.data}
+          aiAltTextGenerationURL={props.aiAltTextGenerationURL}
+        >
+          <BlockContentEditorWrapper {...props} />
+        </BlockContentEditorContext>
+      </BlockContentEditorErrorBoundary>
+    </QueryClientProvider>
   )
 }

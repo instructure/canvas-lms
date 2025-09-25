@@ -21,4 +21,5 @@
  */
 export interface EnvWikiPages {
   TITLE_AVAILABILITY_PATH?: string
+  ai_alt_text_generation_url?: string
 }
