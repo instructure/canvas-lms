@@ -228,4 +228,57 @@ describe('ToggleShowByView', function () {
     assignments = upcoming.get('assignments').models
     equal(assignments.length, 2)
   })
+
+  test('should sort checkpointed discussions by earliest checkpoint due date', async function () {
+    ENV.PERMISSIONS = {manage: false, read_grades: true}
+    const course = new Course({id: 1})
+
+    const assignments = [
+      {
+        id: 1,
+        name: 'Regular Assignment',
+        due_at: new Date(2023, 5, 15),
+        position: 1,
+      },
+      {
+        id: 2,
+        name: 'Checkpointed Discussion',
+        due_at: new Date(2023, 5, 20),
+        has_sub_assignments: true,
+        checkpoints: [
+          {
+            tag: 'reply_to_topic',
+            due_at: new Date(2023, 5, 12).toISOString(),
+          },
+          {
+            tag: 'reply_to_entry',
+            due_at: new Date(2023, 5, 18).toISOString(),
+          },
+        ],
+        position: 2,
+      },
+      {
+        id: 3,
+        name: 'Another Assignment',
+        due_at: new Date(2023, 5, 14),
+        position: 3,
+      },
+    ]
+
+    const group = new AssignmentGroup({assignments})
+    const collection = new AssignmentGroupCollection([group], {
+      courseSubmissionsURL: COURSE_SUBMISSIONS_URL,
+      course,
+    })
+
+    const view = new ToggleShowByView({course, assignmentGroups: collection})
+    await getGrades(view.assignmentGroups)
+
+    const past = view.assignmentGroups.findWhere({id: 'past'})
+    const sortedAssignments = past.get('assignments').models
+
+    equal(sortedAssignments[0].get('id'), 1)
+    equal(sortedAssignments[1].get('id'), 3)
+    equal(sortedAssignments[2].get('id'), 2)
+  })
 })
