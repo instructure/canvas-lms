@@ -3726,11 +3726,12 @@ describe UsersController do
     let(:admin) { account_admin_user(active_all: true)  }
 
     def add_mobile_access_token(user)
-      user.access_tokens.create!(purpose: "mobile")
+      user.access_tokens.create!(purpose: "active mobile token")
+      user.access_tokens.create!(purpose: "expired mobile token", permanent_expires_at: 1.day.ago)
 
       @sns_client = double
       allow(DeveloperKey).to receive(:sns).and_return(@sns_client)
-      expect(@sns_client).to receive(:create_platform_endpoint).and_return(endpoint_arn: "arn")
+      allow(@sns_client).to receive(:create_platform_endpoint).and_return(endpoint_arn: "arn")
       user.access_tokens.each_with_index { |ac, i| ac.notification_endpoints.create!(token: "token #{i}") }
     end
 
@@ -3768,7 +3769,7 @@ describe UsersController do
 
       expect(response).to have_http_status :ok
       expect(user.reload.access_tokens.take.permanent_expires_at).to be <= Time.zone.now
-      expect(user.reload.notification_endpoints.count).to be < starting_notification_endpoints_count
+      expect(user.reload.notification_endpoints.count).to eq(starting_notification_endpoints_count)
     end
 
     it "allows admin to expire mobile sessions for one user" do
