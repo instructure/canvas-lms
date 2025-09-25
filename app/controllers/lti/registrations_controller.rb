@@ -1685,6 +1685,71 @@ class Lti::RegistrationsController < ApplicationController
     raise e
   end
 
+  # @API Apply LTI Registration Update Requst
+  # Applies a registration update request to an existing registration,
+  # replacing the existing configuration and overlay with the new values.
+  # If the request is rejected, marks it as rejected without applying changes.
+  #
+  # @argument id [Integer] The id of the registration to update.
+  # @argument update_request_id [Integer] The id of the registration update request to apply.
+  # @argument accepted [Required, Boolean] Whether to accept (true) or reject (false) the registration update request.
+  # @argument overlay [LtiConfigurationOverlay] Optional overlay data to apply on top of the new configuration.
+  # @argument comment [String] Optional comment explaining the reason for applying this update.
+  # @returns Lti::Registration
+  #
+  # @example_request
+  #
+  #   curl -X POST 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/configuration/validate' \
+  #        -d '{"overlay": <LtiConfigurationOverlay>, "accepted": boolean}' \
+  #        -H "Content-Type: application/json" \
+  #        -H "Authorization: Bearer <token>"
+  def apply_registration_update_request
+    # ensure this rur is not already applied or rejected
+    registration_update_request = Lti::RegistrationUpdateRequest.active.find_by(id: params[:update_request_id])
+    raise ActiveRecord::RecordNotFound unless registration && registration_update_request
+
+    unless registration.account == @context
+      return render json: { errors: "registration does not belong to account" }, status: :bad_request
+    end
+
+    unless params.key?(:accepted)
+      return render json: { errors: "accepted parameter is required" }, status: :bad_request
+    end
+
+    accepted = params[:accepted]
+
+    if accepted
+      Lti::ApplyRegistrationUpdateRequestService.call(
+        registration_update_request:,
+        applied_by: @current_user,
+        overlay_data: params[:overlay]&.to_unsafe_h,
+        comment: params[:comment]
+      ) => { lti_registration: }
+    else
+      # Reject the registration update request
+      registration_update_request.update!(rejected_at: Time.current)
+      lti_registration = registration
+    end
+
+    render json: lti_registration_json(
+      lti_registration,
+      @current_user,
+      session,
+      @context,
+      includes: %i[
+        account_binding
+        configuration
+        overlay
+        overlay_versions
+      ],
+      account_binding: lti_registration.account_binding_for(@context),
+      overlay: lti_registration.overlay_for(@context)
+    )
+  rescue => e
+    report_error(e)
+    raise e
+  end
+
   private
 
   def render_configuration_errors(errors)
