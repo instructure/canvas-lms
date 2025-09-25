@@ -26,6 +26,7 @@ class Account < ActiveRecord::Base
 
   INSTANCE_GUID_SUFFIX = "canvas-lms"
   CALENDAR_SUBSCRIPTION_TYPES = %w[manual auto].freeze
+  HORIZON_FEATURE_SLUG = "horizon"
 
   include Workflow
   include BrandConfigHelpers
@@ -2843,6 +2844,26 @@ class Account < ActiveRecord::Base
 
     # If this is the root account, it'll be saved shortly since this is called as a before_save
     root_account.save! unless root_account?
+  end
+
+  def provision_horizon_tenants(root_account, current_user)
+    return unless horizon_account?
+
+    [PineClient, RedwoodClient].each do |client|
+      next unless client.enabled?
+
+      client.provision_tenant(root_account_uuid: root_account.uuid, feature_slug: HORIZON_FEATURE_SLUG, current_user:)
+    end
+  end
+
+  def delete_horizon_tenants(root_account, current_user)
+    return if horizon_account?
+
+    [PineClient, RedwoodClient].each do |client|
+      next unless client.enabled?
+
+      client.delete_tenant(root_account_uuid: root_account.uuid, feature_slug: HORIZON_FEATURE_SLUG, current_user:)
+    end
   end
 
   def enqueue_a11y_scan_if_enabled
