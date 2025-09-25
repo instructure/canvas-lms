@@ -6092,6 +6092,11 @@ type ModeratedGrading {
   finalGrader: User
 
   """
+  The anonymous ID of the final grader
+  """
+  finalGraderAnonymousId: String
+
+  """
   Boolean indicating if provisional graders' comments are visible to other provisional graders.
   """
   graderCommentsVisibleToGraders: Boolean

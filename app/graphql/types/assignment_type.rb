@@ -127,6 +127,11 @@ module Types
       def final_grader
         Loaders::IDLoader.for(User).load(object.final_grader_id)
       end
+
+      field :final_grader_anonymous_id, String, "The anonymous ID of the final grader", null: true
+      def final_grader_anonymous_id
+        Loaders::AssignmentLoaders::FinalGraderAnonymousIdLoader.load(object.id)
+      end
     end
 
     class AssignmentRubricAssessmentType < ApplicationObjectType
