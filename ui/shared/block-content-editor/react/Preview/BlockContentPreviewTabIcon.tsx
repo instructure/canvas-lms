@@ -48,6 +48,7 @@ class TabIcon extends Component<TabIconProps> {
         <SVGWrapper
           fillColor={this.props.selected ? selectedColor : secondaryColor}
           url={this.props.svgPath}
+          ariaHidden
         />
         <Text color={this.props.selected ? 'brand' : 'primary'}>{this.props.title}</Text>
       </Flex>
