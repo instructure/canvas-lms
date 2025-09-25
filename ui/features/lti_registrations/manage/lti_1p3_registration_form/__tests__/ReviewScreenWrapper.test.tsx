@@ -228,4 +228,180 @@ describe('Review Screen Wrapper', () => {
       screen.getByText(i18nLtiScope('https://purl.imsglobal.org/spec/lti-ags/scope/lineitem')),
     ).toBeInTheDocument()
   })
+
+  describe('EULA Settings', () => {
+    it('renders EULA Settings section when enabled', () => {
+      renderComponent(
+        {
+          launch_settings: {
+            message_settings: [
+              {
+                type: 'LtiEulaRequest',
+                enabled: true,
+                target_link_uri: 'https://example.com/eula',
+                custom_fields: {
+                  eula_field1: 'value1',
+                  eula_field2: 'value2',
+                },
+              },
+            ],
+          },
+        },
+        {},
+      )
+
+      expect(screen.getByText('EULA Settings')).toBeInTheDocument()
+      expect(screen.getByText('Enable EULA Request')).toBeInTheDocument()
+      expect(screen.getByText('Yes')).toBeInTheDocument()
+    })
+
+    it('renders EULA target link URI when provided', () => {
+      renderComponent(
+        {
+          launch_settings: {
+            message_settings: [
+              {
+                type: 'LtiEulaRequest',
+                enabled: true,
+                target_link_uri: 'https://example.com/eula',
+              },
+            ],
+          },
+        },
+        {},
+      )
+
+      expect(screen.getByText('EULA Target Link URI')).toBeInTheDocument()
+      expect(screen.getByText('https://example.com/eula')).toBeInTheDocument()
+    })
+
+    it('renders EULA custom fields when provided', () => {
+      renderComponent(
+        {
+          launch_settings: {
+            message_settings: [
+              {
+                type: 'LtiEulaRequest',
+                enabled: true,
+                custom_fields: {
+                  eula_field1: 'value1',
+                  eula_field2: 'value2',
+                  eula_field3: 'value3',
+                },
+              },
+            ],
+          },
+        },
+        {},
+      )
+
+      expect(screen.getByText('EULA Custom Fields:')).toBeInTheDocument()
+      expect(screen.getByText('eula_field1=value1')).toBeInTheDocument()
+      expect(screen.getByText('eula_field2=value2')).toBeInTheDocument()
+      expect(screen.getByText('eula_field3=value3')).toBeInTheDocument()
+    })
+
+    it('shows disabled state when EULA is not enabled', () => {
+      renderComponent(
+        {
+          launch_settings: {
+            message_settings: [
+              {
+                type: 'LtiEulaRequest',
+                enabled: false,
+                target_link_uri: 'https://example.com/eula',
+              },
+            ],
+          },
+        },
+        {},
+      )
+
+      expect(screen.getByText('EULA Settings')).toBeInTheDocument()
+      expect(screen.getByText('Enable EULA Request')).toBeInTheDocument()
+      expect(screen.getByText('No')).toBeInTheDocument()
+    })
+
+    it('does not render EULA Settings section when no message settings exist', () => {
+      renderComponent({}, {})
+
+      expect(screen.queryByText('EULA Settings')).not.toBeInTheDocument()
+      expect(screen.queryByText('Enable EULA Request')).not.toBeInTheDocument()
+    })
+
+    it('does not render EULA Settings section when message settings array is empty', () => {
+      renderComponent(
+        {
+          launch_settings: {
+            message_settings: [],
+          },
+        },
+        {},
+      )
+
+      expect(screen.queryByText('EULA Settings')).not.toBeInTheDocument()
+      expect(screen.queryByText('Enable EULA Request')).not.toBeInTheDocument()
+    })
+
+    it('does not render target link URI section when not provided', () => {
+      renderComponent(
+        {
+          launch_settings: {
+            message_settings: [
+              {
+                type: 'LtiEulaRequest',
+                enabled: true,
+              },
+            ],
+          },
+        },
+        {},
+      )
+
+      expect(screen.getByText('EULA Settings')).toBeInTheDocument()
+      expect(screen.queryByText('EULA Target Link URI')).not.toBeInTheDocument()
+    })
+
+    it('does not render custom fields section when empty', () => {
+      renderComponent(
+        {
+          launch_settings: {
+            message_settings: [
+              {
+                type: 'LtiEulaRequest',
+                enabled: true,
+                custom_fields: {},
+              },
+            ],
+          },
+        },
+        {},
+      )
+
+      expect(screen.getByText('EULA Settings')).toBeInTheDocument()
+      expect(screen.queryByText('EULA Custom Fields:')).not.toBeInTheDocument()
+    })
+
+    it('includes edit button for EULA Settings and transitions correctly', async () => {
+      const {transitionTo} = renderComponent(
+        {
+          launch_settings: {
+            message_settings: [
+              {
+                type: 'LtiEulaRequest',
+                enabled: true,
+                target_link_uri: 'https://example.com/eula',
+              },
+            ],
+          },
+        },
+        {},
+      )
+
+      const editButton = screen.getByRole('button', {name: /Edit EULA Settings/i})
+      await userEvent.click(editButton)
+
+      expect(transitionTo).toHaveBeenCalledWith('EulaSettings')
+    })
+  })
 })

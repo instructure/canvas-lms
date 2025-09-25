@@ -23,6 +23,8 @@ import {mockRegistration} from '../../pages/manage/__tests__/helpers'
 import {mockInternalConfiguration} from './helpers'
 import {mockLti1p3RegistrationWizardService} from '../../dynamic_registration_wizard/__tests__/helpers'
 import {ZAccountId} from '../../model/AccountId'
+import {LtiScopes} from '@canvas/lti/model/LtiScope'
+import {LtiPlacements} from '../../model/LtiPlacement'
 
 // NOTE: The registration wizard creates it's own store during render, so testing it is currently
 // quite slow. Hopefully, we can refactor it to make testing easier in the future, but for now,
@@ -158,5 +160,179 @@ describe('Lti1p3RegistrationWizard', () => {
 
     await userEvent.click(screen.getByText(/^Previous$/i).closest('button')!)
     expect(screen.getByText(/^Nickname$/i)).toBeInTheDocument()
+  })
+
+  it('includes EULA Settings step when tool has EulaUser scope and asset processor placements', async () => {
+    render(
+      <Lti1p3RegistrationWizard
+        {...defaultProps}
+        internalConfiguration={mockInternalConfiguration({
+          scopes: [LtiScopes.EulaUser],
+          placements: [
+            {
+              placement: LtiPlacements.ActivityAssetProcessor,
+              enabled: true,
+              text: 'Activity Asset Processor',
+            },
+          ],
+        })}
+      />,
+    )
+
+    await userEvent.click(findNextButton())
+    expect(screen.getByText('Permissions')).toBeInTheDocument()
+
+    await userEvent.click(findNextButton())
+    expect(screen.getByText('Data Sharing')).toBeInTheDocument()
+
+    await userEvent.click(findNextButton())
+    expect(screen.getByText('Placements')).toBeInTheDocument()
+
+    await userEvent.click(findNextButton())
+    expect(screen.getByText('EULA Settings')).toBeInTheDocument()
+
+    await userEvent.click(findNextButton())
+    expect(screen.getByText('Override URIs')).toBeInTheDocument()
+  })
+
+  it('skips EULA Settings step when tool lacks EulaUser scope', async () => {
+    render(
+      <Lti1p3RegistrationWizard
+        {...defaultProps}
+        internalConfiguration={mockInternalConfiguration({
+          scopes: ['https://canvas.instructure.com/lti-ags/progress/scope/show'],
+          placements: [
+            {
+              placement: LtiPlacements.ActivityAssetProcessor,
+              enabled: true,
+              text: 'Activity Asset Processor',
+            },
+          ],
+        })}
+      />,
+    )
+
+    await userEvent.click(findNextButton())
+    await userEvent.click(findNextButton())
+    await userEvent.click(findNextButton())
+
+    await userEvent.click(findNextButton())
+    expect(screen.getByText('Override URIs')).toBeInTheDocument()
+    expect(screen.queryByText('EULA Settings')).not.toBeInTheDocument()
+  })
+
+  it('skips EULA Settings step when tool lacks asset processor placements', async () => {
+    render(
+      <Lti1p3RegistrationWizard
+        {...defaultProps}
+        internalConfiguration={mockInternalConfiguration({
+          scopes: [LtiScopes.EulaUser],
+          placements: [
+            {
+              placement: 'course_navigation',
+              enabled: true,
+              text: 'Course Navigation',
+            },
+          ],
+        })}
+      />,
+    )
+
+    await userEvent.click(findNextButton())
+    await userEvent.click(findNextButton())
+    await userEvent.click(findNextButton())
+
+    await userEvent.click(findNextButton())
+    expect(screen.getByText('Override URIs')).toBeInTheDocument()
+    expect(screen.queryByText('EULA Settings')).not.toBeInTheDocument()
+  })
+
+  it('includes EULA Settings step when tool has existing LtiEulaRequest message settings', async () => {
+    render(
+      <Lti1p3RegistrationWizard
+        {...defaultProps}
+        internalConfiguration={mockInternalConfiguration({
+          launch_settings: {
+            message_settings: [
+              {
+                type: 'LtiEulaRequest',
+                enabled: true,
+                target_link_uri: 'https://example.com/eula',
+                custom_fields: {
+                  eula_field1: 'value1',
+                },
+              },
+            ],
+          },
+        })}
+      />,
+    )
+
+    await userEvent.click(findNextButton())
+    await userEvent.click(findNextButton())
+    await userEvent.click(findNextButton())
+
+    await userEvent.click(findNextButton())
+    expect(screen.getByText('EULA Settings')).toBeInTheDocument()
+
+    await userEvent.click(findNextButton())
+    expect(screen.getByText('Override URIs')).toBeInTheDocument()
+  })
+
+  it('correctly navigates back from EULA Settings step', async () => {
+    render(
+      <Lti1p3RegistrationWizard
+        {...defaultProps}
+        internalConfiguration={mockInternalConfiguration({
+          scopes: [LtiScopes.EulaUser],
+          placements: [
+            {
+              placement: LtiPlacements.ActivityAssetProcessor,
+              enabled: true,
+              text: 'Activity Asset Processor',
+            },
+          ],
+        })}
+      />,
+    )
+
+    await userEvent.click(findNextButton())
+    await userEvent.click(findNextButton())
+    await userEvent.click(findNextButton())
+    await userEvent.click(findNextButton())
+
+    expect(screen.getByText('EULA Settings')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByText('Previous').closest('button')!)
+    expect(screen.getByText('Placements')).toBeInTheDocument()
+  })
+
+  it('correctly skips EULA Settings when navigating back if not applicable', async () => {
+    render(
+      <Lti1p3RegistrationWizard
+        {...defaultProps}
+        internalConfiguration={mockInternalConfiguration({
+          scopes: ['https://canvas.instructure.com/lti-ags/progress/scope/show'],
+          placements: [
+            {
+              placement: 'course_navigation',
+              enabled: true,
+              text: 'Course Navigation',
+            },
+          ],
+        })}
+      />,
+    )
+
+    await userEvent.click(findNextButton())
+    await userEvent.click(findNextButton())
+    await userEvent.click(findNextButton())
+    await userEvent.click(findNextButton())
+
+    expect(screen.getByText('Override URIs')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByText('Previous').closest('button')!)
+    expect(screen.getByText('Placements')).toBeInTheDocument()
+    expect(screen.queryByText('EULA Settings')).not.toBeInTheDocument()
   })
 })

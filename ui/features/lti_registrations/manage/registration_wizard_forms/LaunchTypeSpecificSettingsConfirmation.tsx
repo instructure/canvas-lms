@@ -40,6 +40,7 @@ export const launchTypeSpecificSettingsLabels: Record<
     enableLabel: string
     targetLinkUriLabel: string
     customFieldsLabel: string
+    description?: string
   }
 > = {
   LtiEulaRequest: {
@@ -47,6 +48,7 @@ export const launchTypeSpecificSettingsLabels: Record<
     enableLabel: I18n.t('Enable EULA Request'),
     targetLinkUriLabel: I18n.t('EULA Target Link URI'),
     customFieldsLabel: I18n.t('EULA Custom Fields'),
+    description: I18n.t('Settings for EULA request, used by Document Processors.'),
   },
 }
 
@@ -72,6 +74,7 @@ export const LaunchTypeSpecificSettingsConfirmation = (
 
   // Track custom fields text separately for better UX
   const [customFieldsTexts, setCustomFieldsTexts] = React.useState<Record<string, string>>({})
+  const [disabledSetting, setDisabledSetting] = React.useState<MessageSetting | null>(null)
 
   // Get the specific setting for this type, or create a default one
   const setting: MessageSetting = messageSettings.find(s => s.type === settingType) || {
@@ -85,8 +88,14 @@ export const LaunchTypeSpecificSettingsConfirmation = (
     const newMessageSettings = (messageSettings || []).filter(
       (setting: MessageSetting) => setting.type !== updatedSetting.type,
     )
-    if (updatedSetting.enabled) {
-      newMessageSettings.push(updatedSetting)
+    const oldMessageSetting = messageSettings.find(
+      (setting: MessageSetting) => setting.type === updatedSetting.type,
+    )
+    if (!updatedSetting.enabled && oldMessageSetting?.enabled) {
+      setDisabledSetting(oldMessageSetting)
+    } else if (updatedSetting.enabled) {
+      newMessageSettings.push({...updatedSetting, ...disabledSetting})
+      setDisabledSetting(null)
     }
     setMessageSettings(newMessageSettings)
   }
@@ -125,10 +134,10 @@ export const LaunchTypeSpecificSettingsConfirmation = (
 
   return (
     <View as="div" key={setting.type} style={{overflow: 'visible'}}>
-      <Heading level="h3" margin="0 0 small 0">
-        {labels?.title || setting.type}
-      </Heading>
-
+      <View as="div" margin="0 0 small 0">
+        <Heading level="h3">{labels?.title || setting.type}</Heading>
+        {labels?.description && <Text size="small">{labels.description}</Text>}
+      </View>
       <Flex direction="column" gap="medium">
         <Flex.Item>
           <View as="div" padding="xx-small">

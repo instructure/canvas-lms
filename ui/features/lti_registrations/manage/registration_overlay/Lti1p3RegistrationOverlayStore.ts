@@ -17,9 +17,9 @@
  */
 
 import type {LtiMessageType} from '../model/LtiMessageType'
-import {type LtiPlacement, type LtiPlacementWithIcon} from '../model/LtiPlacement'
+import {type LtiPlacement, type LtiPlacementWithIcon, LtiPlacements} from '../model/LtiPlacement'
 import type {LtiPrivacyLevel} from '../model/LtiPrivacyLevel'
-import type {LtiScope} from '@canvas/lti/model/LtiScope'
+import {type LtiScope, LtiScopes} from '@canvas/lti/model/LtiScope'
 import type {MessageSetting} from '../model/internal_lti_configuration/InternalBaseLaunchSettings'
 import type {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
 import {create} from 'zustand'
@@ -56,6 +56,10 @@ export interface Lti1p3RegistrationOverlayActions {
   togglePlacement: (placement: LtiPlacement) => void
   toggleCourseNavigationDefaultDisabled: () => void
   toggleTopNavigationAllowFullscreen: () => void
+}
+
+export interface Lti1p3RegistrationOverlayGetters {
+  isEulaCapable: () => boolean
 }
 
 const updateState =
@@ -121,7 +125,10 @@ export const createLti1p3RegistrationOverlayStore = (
   adminNickname?: string,
   existingOverlay?: LtiConfigurationOverlay,
 ) =>
-  create<{state: Lti1p3RegistrationOverlayState} & Lti1p3RegistrationOverlayActions>(set => ({
+  create<
+    {state: Lti1p3RegistrationOverlayState} & Lti1p3RegistrationOverlayActions &
+      Lti1p3RegistrationOverlayGetters
+  >((set, get) => ({
     state: initialOverlayStateFromInternalConfig(internalConfig, adminNickname, existingOverlay),
     setDirty: dirty => set(s => ({...set, state: {...s.state, dirty}})),
     setHasSubmitted: hasSubmitted => set(s => ({...set, state: {...s.state, hasSubmitted}})),
@@ -254,6 +261,17 @@ export const createLti1p3RegistrationOverlayStore = (
             },
           }
         }),
+      )
+    },
+    isEulaCapable: () => {
+      const state = get().state
+      return !!(
+        state.launchSettings?.message_settings?.some(m => m.type === 'LtiEulaRequest') ||
+        (state.permissions.scopes?.includes(LtiScopes.EulaUser) &&
+          (state.placements.placements?.includes(LtiPlacements.ActivityAssetProcessor) ||
+            state.placements.placements?.includes(
+              LtiPlacements.ActivityAssetProcessorContribution,
+            )))
       )
     },
   }))
