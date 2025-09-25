@@ -97,9 +97,6 @@ class AssignmentGroupsController < ApplicationController
   before_action :require_context
 
   include Api::V1::AssignmentGroup
-  include GradebookRequestMetricsTrackerHelper
-
-  around_action :track_request_timing, only: [:index]
 
   # @API List assignment groups
   #
