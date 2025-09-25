@@ -33,8 +33,8 @@ describe Types::MediaObjectType do
   let(:media_object_type) { GraphQLTypeTester.new(@media_object, current_user: @teacher) }
 
   context "with a valid media object" do
-    def resolve_media_object_field(field, current_user: @teacher)
-      media_object_type.resolve(field, current_user:)
+    def resolve_media_object_field(field, current_user: @teacher, request: nil)
+      media_object_type.resolve(field, current_user:, request:)
     end
 
     [
@@ -106,13 +106,47 @@ describe Types::MediaObjectType do
     end
 
     it "returns media download url" do
-      opts = {
-        download: "1",
-        download_frd: "1",
-        only_path: true
-      }
-      expected_url = GraphQLHelpers::UrlHelpers.file_download_url(@media_object, opts)
-      expect(expected_url.end_with?("/download?download_frd=1")).to be_truthy
+      mock_request = double("request",
+                            host_with_port: "test.example.com",
+                            protocol: "https://")
+      media_download_url = resolve_media_object_field("mediaDownloadUrl", request: mock_request)
+
+      expect(media_download_url).to include("/download?download_frd=1")
+      expect(media_download_url).to include("https://test.example.com")
+    end
+
+    it "returns nil for media download url if there is no attachment" do
+      @media_object.attachment = nil
+      @media_object.save!
+
+      mock_request = double("request",
+                            host_with_port: "test.example.com",
+                            protocol: "https://")
+      media_download_url = resolve_media_object_field("mediaDownloadUrl", request: mock_request)
+
+      expect(media_download_url).to be_nil
+    end
+
+    it "returns nil for media download url if request is not defined" do
+      expect(resolve_media_object_field("mediaDownloadUrl")).to be_nil
+    end
+
+    it "returns nil for media download url if request is defined but host_with_port is missing" do
+      mock_request = double("request",
+                            host_with_port: nil,
+                            protocol: "https://")
+      media_download_url = resolve_media_object_field("mediaDownloadUrl", request: mock_request)
+
+      expect(media_download_url).to be_nil
+    end
+
+    it "returns nil for media download url if request is defined but protocol is missing" do
+      mock_request = double("request",
+                            host_with_port: "test.example.com",
+                            protocol: nil)
+      media_download_url = resolve_media_object_field("mediaDownloadUrl", request: mock_request)
+
+      expect(media_download_url).to be_nil
     end
   end
 end
