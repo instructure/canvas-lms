@@ -22,8 +22,8 @@ export type SettingsImageProps = {
   decorativeImage?: boolean
   altTextAsCaption?: boolean
   disabled?: boolean
-  imageUrl?: string
   fileName?: string
+  attachmentId?: string | number
   onCaptionChange: (caption: string) => void
   onAltTextChange: (altText: string) => void
   onAltTextAsCaptionChange: (checked: boolean) => void

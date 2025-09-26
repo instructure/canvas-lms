@@ -28,10 +28,6 @@ jest.mock('../../../BlockContentEditorContext', () => ({
   useBlockContentEditorContext: () => mockUseBlockContentEditorContext(),
 }))
 
-jest.mock('../../../utilities/imageUtils', () => ({
-  convertImageUrlToBase64: jest.fn().mockResolvedValue('base64data'),
-}))
-
 jest.mock('../../../utilities/aiAltTextApi', () => ({
   generateAiAltText: jest.fn().mockResolvedValue({
     image: {altText: 'AI generated alt text'},
@@ -54,6 +50,7 @@ const defaultProps: ImageTextBlockProps = {
   altTextAsCaption: false,
   decorativeImage: false,
   caption: '',
+  attachmentId: '123',
 }
 
 describe('ImageTextBlockSettings', () => {
@@ -233,7 +230,10 @@ describe('ImageTextBlockSettings', () => {
       mockUseBlockContentEditorContext.mockReturnValue({
         aiAltTextGenerationURL: '/api/v1/courses/1/pages_ai/alt_text',
       })
-      const component = renderBlock(ImageTextBlockSettings, {...defaultProps, url: ''})
+      const component = renderBlock(ImageTextBlockSettings, {
+        ...defaultProps,
+        attachmentId: undefined,
+      })
       const button = component.getByRole('button', {name: /Regenerate Alt Text/i})
       expect(button).toBeDisabled()
     })
@@ -268,10 +268,7 @@ describe('ImageTextBlockSettings', () => {
         expect(generateAiAltText).toHaveBeenCalledWith({
           url: '/api/v1/courses/1/pages_ai/alt_text',
           requestData: {
-            image: {
-              base64_source: 'base64data',
-              type: 'Base64',
-            },
+            attachment_id: '123',
           },
           signal: expect.any(AbortSignal),
         })
