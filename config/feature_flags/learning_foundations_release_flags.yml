@@ -234,7 +234,7 @@ blueprint_support_sync_for_folder_movement_to_root_folder:
 
 widget_dashboard:
   state: hidden
-  display_name: Widget Dashboard
+  display_name: Widget Dashboard [In Dev - DO NOT TURN IT ON]
   description: |-
     When enabled, this allows learners to add, remove, and rearrange dashboard widgets.
   applies_to: RootAccount
