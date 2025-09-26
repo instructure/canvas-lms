@@ -174,6 +174,9 @@
 class WikiPagesApiController < ApplicationController
   AI_ALT_TEXT_MAX_LENGTH = 120
   AI_ALT_TEXT_FEATURE_FLAG_SLUG = "alttext"
+  AI_ALT_TEXT_TYPE = "Base64"
+  AI_ALT_TEXT_MAX_IMAGE_SIZE = 3.megabytes
+  AI_ALT_TEXT_SUPPORTED_IMAGE_TYPES = Attachment.valid_content_types_hash.select { |_, type| type == "image" }.keys.freeze
 
   before_action :require_context
   before_action :get_wiki_page, except: %i[create index check_title_availability ai_generate_alt_text]
@@ -631,15 +634,20 @@ class WikiPagesApiController < ApplicationController
   end
 
   def ai_generate_alt_text
-    feature_flag = Account.site_admin.feature_enabled?(:block_content_editor_ai_alt_text) && @context.try(:block_content_editor_enabled?)
-    return render json: { error: "The feature is not available" }, status: :forbidden unless feature_flag
     return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+    return render json: { error: "The feature is not available" }, status: :forbidden unless ai_alt_text_feature_enabled?
     return render json: { error: "AI client is not available" }, status: :forbidden unless CedarClient.enabled?
     return render json: {}, status: :bad_request unless ai_alt_text_params_valid?
 
-    image_params = params[:image]
-    base64_source = image_params[:base64_source]
-    type = image_params[:type]
+    attachment = Attachment.find(params.require(:attachment_id))
+    return unless authorized_action(attachment, @current_user, :read)
+    return render json: { error: "Image too large" }, status: :bad_request if attachment.size > AI_ALT_TEXT_MAX_IMAGE_SIZE
+
+    unless AI_ALT_TEXT_SUPPORTED_IMAGE_TYPES.include?(attachment.content_type)
+      return render json: { error: "Unsupported image type" }, status: :bad_request
+    end
+
+    base64_source = Base64.strict_encode64(attachment.open.read)
 
     context_hash = {
       context: @context,
@@ -648,7 +656,7 @@ class WikiPagesApiController < ApplicationController
     }
 
     generation_result = CedarClient.generate_alt_text(
-      image: { base64_source:, type: },
+      image: { base64_source:, type: AI_ALT_TEXT_TYPE },
       feature_slug: AI_ALT_TEXT_FEATURE_FLAG_SLUG,
       root_account_uuid: @context.root_account.uuid,
       current_user: @current_user,
@@ -660,6 +668,10 @@ class WikiPagesApiController < ApplicationController
   end
 
   protected
+
+  def ai_alt_text_feature_enabled?
+    Account.site_admin.feature_enabled?(:block_content_editor_ai_alt_text) && @context.try(:block_content_editor_enabled?)
+  end
 
   def is_front_page_action?
     !!action_name.match(/_front_page$/)
@@ -843,13 +855,7 @@ class WikiPagesApiController < ApplicationController
   private
 
   def ai_alt_text_params_valid?
-    return false if params[:image].blank?
-    return false unless params[:image].is_a?(ActionController::Parameters) || params[:image].is_a?(Hash)
-
-    image_params = params[:image]
-    return false if image_params[:base64_source].blank?
-    return false if image_params[:type].blank?
-    return false if image_params[:type] != "Base64"
+    return false if params[:attachment_id].blank?
 
     true
   end

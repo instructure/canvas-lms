@@ -90,6 +90,7 @@ export const ImageTextBlockSettings = () => {
     caption,
     altTextAsCaption,
     decorativeImage,
+    attachmentId,
   } = useNode(node => ({
     ...defaultProps,
     ...node.data.props,
@@ -132,6 +133,7 @@ export const ImageTextBlockSettings = () => {
       props.url = imageData.url
       props.altText = imageData.altText
       props.fileName = imageData.fileName
+      props.attachmentId = imageData.attachmentId
     })
   }
 
@@ -235,7 +237,7 @@ export const ImageTextBlockSettings = () => {
             disabled={!url}
             altTextAsCaption={altTextAsCaption}
             decorativeImage={decorativeImage}
-            imageUrl={url}
+            attachmentId={attachmentId}
             fileName={fileName}
             onCaptionChange={handleCaptionChange}
             onAltTextChange={handleAltTextChange}
