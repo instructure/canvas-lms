@@ -5808,7 +5808,7 @@ is:
   belarusian_b2f19c76: Hvítrússneska
   belgium_32_e5f5b598: "Belgía (+32)"
   bell_97c77ba4: bjalla
-  below_81d4dceb: Undir
+  below_81d4dceb: "Þarf að bæta"
   below_is_an_example_of_how_students_will_see_their_8f7e7971: "Fyrir neðan er dæmi um hvernig nemendur sjá stundatöflurnar sínar"
   below_mastery_abd1dca5: "Fyrir neðan tileinkun"
   below_min_rating_78a742c3: "Undir lágmarkseinkunn"
@@ -9981,8 +9981,8 @@ is:
       loading: "Sæki nemendur..."
       select_student: "Velja nemanda"
     link_validator: 
-      link_validator: "Staðfesting á tengli námskeiðs"
-      page_title: "Staðfesting á tengli námskeiðs"
+      link_validator: "Tenglaprófun námskeiðs"
+      page_title: "Tenglaprófun námskeiðs"
     links: 
       student_progress: "Skoða framvindu"
     master_course_restrictions: 
@@ -10575,9 +10575,9 @@ is:
   criterion_comments_for_23123707: "Athugasemdir við viðmið fyrir"
   criterion_created_42669293: "Viðmið stofnað"
   criterion_ddfae05b: viðmið
-  criterion_description_757741c3: "Lýsing viðmiðunar"
+  criterion_description_757741c3: "Lýsing matsþáttar"
   criterion_long_description_e9a97247: "Löng lýsing á viðmiðun"
-  criterion_name_92e1c426: "Heiti viðmiðunar"
+  criterion_name_92e1c426: "Heiti matsþáttar"
   criterion_points_8ccd2913: viðmiðunarpunktar
   criterion_ratings_3eed22e2: Viðmiðunarmat
   criterion_ratings_dff32984: viðmiðunarmat
@@ -12661,7 +12661,7 @@ is:
   enable_platform_notification_services_421105da: "Virkja tilkynningaþjónustu vettvangs"
   enable_podcast_feed_e67c49ac: "Heimila hlaðvarpsstreymi"
   enable_quiz_visibility_after_course_conclusion_2dff3534: "Virkja sýnileika prófs eftir lok námskeiðs"
-  enable_range_fec198ac: "Virkja tímabil"
+  enable_range_fec198ac: "Virkja bil stiga"
   enable_rce_studio_embed_improvements_to_embedded_c_dd4d60b0: "Virkjaðu RCE Studio Embed úrbætur á innfelldu efni í Rich Content ritilinn."
   enable_recaptcha_by_default_for_self_registration_af9d50bd: "Virkja Recaptcha sjálfgefið fyrir sjálfsskráningu"
   enable_recording_for_this_conference_b8adff6: "Heimila upptöku á ráðstefnunni"
@@ -13690,7 +13690,7 @@ is:
   exceeded_the_maximum_length_number_characters_2d25611e: "Fór yfir hámarkslengd (%{number} stafi)"
   exceeded_the_maximum_length_purposemaxlength_chara_2e44ee2b: "Fór yfir hámarkslengd (%{purposeMaxLength} stafi)."
   exceeded_the_maximum_length_usernamemaxlength_char_54781244: "Fór yfir hámarkslengd (%{usernameMaxLength} stafi)."
-  exceeds_1dfdae30: "Farið yfir"
+  exceeds_1dfdae30: Framúrskarandi
   exceeds_expectations_5910fc3a: "Fer fram úr væntingum"
   exceeds_mastery_1f995dce: "Fer fram úr tileinkun"
   exceeds_max_events_28f19b04: "Fer yfir %{max} viðburði."
@@ -18990,7 +18990,7 @@ is:
   masquerade_fdbc9594: Dyljast
   master_lock_590266b6: "Master læsing"
   mastered_34d4c857: Fullnumið
-  mastery_7ec348b5: Tileinkun
+  mastery_7ec348b5: "Í góðu lagi"
   mastery_at_cf0c477b: "Tileinkun í"
   mastery_at_e804b49: "Tileinkun í:"
   mastery_calculation_5fd5f5fe: Tileinkunarútreikningur
@@ -21624,7 +21624,7 @@ is:
   navigation_menu_is_now_closed_a68b6eed: "Leiðarstýringarvalmynd er nú lokuð"
   navigation_menu_is_now_open_7dec2725: "Leiðarstýringarvalmynd er nú opin"
   navigation_sections_help_visitors_move_around_the__5ea18acf: "Leiðsöguhlutar hjálpa gestum að fara á skilvirkan hátt um námskeiðið. Góð leiðsögn skiptir sköpum til að auka notendaupplifunina, sem gerir það auðvelt að finna upplýsingarnar fljótt og án gremju."
-  near_3282280c: Nálægt
+  near_3282280c: Viðunandi
   near_mastery_f25174a4: "Nálægt tileinkun"
   need_a_canvas_account_221d18ed: "Þarftu Canvas-reikning?"
   needs_attention_e292fb37: "Þarfnast athygli"
@@ -21920,7 +21920,7 @@ is:
   no_errors_1ac47724: "Engar villur"
   no_essay_submission_found_1865f9a: "Engin ritgerðarskil fundust."
   no_events_were_found_to_update_22604f3a: "Engir viðburðir fundust til að uppfæra."
-  no_evidence_75853352: "Engin sönnunargögn"
+  no_evidence_75853352: "Engin skil"
   no_existing_user_provided_for_login_with_sis_id_us_6bcde71f: "Enginn núverandi notandi gefinn fyrir innskráningu með SIS auðkenni %{user_id}"
   no_explainer_text_available_9d9a2f3c: "Enginn útskýringartexti í boði"
   no_exports_to_display_7f1b630b: "Enginn útflutningur til að sýna"
@@ -24417,9 +24417,9 @@ is:
         user_severity: Notandastig
         username: Notandanafn
   png_55cbb586: PNG
-  point_range_258f423b: Punktasvið
+  point_range_258f423b: Stigabil
   points_based_letter_grading_schemes_e65127d5: "Stigamiðaður bókstafa eiknunnakvarði"
-  points_bb475533: Punktar
+  points_bb475533: Stig
   points_bceb5005: punktar
   points_cannot_exceed_num_4b9445b9: "Punktar mega ekki fara yfir %{num}."
   points_changed_exceptions_b0c771f7: "Undantekningar frá breytingu punkta:"
@@ -24500,7 +24500,7 @@ is:
   possible_matches_for_key_select_the_desired_one_be_fd878b4b: "Mögulegar samsvaranir fyrir „%{key}“. Veldu það æskilega hér að neðan."
   possible_matches_for_searchtype_select_the_desired_14af33f9: "Mögulegar samsvaranir fyrir „%{searchType}“. Veldu það æskilega hér að neðan."
   possible_points_b1df0a5c: "Mögulegir punktar"
-  possible_pts_b63dff4c: "%{possible} Punktar"
+  possible_pts_b63dff4c: "%{possible} stig"
   possible_pts_f4681c49: "/ %{possible} punktar"
   possible_score_5e0a328e: "Mögulegt: %{score}"
   possiblepoints_points_possible_5217ce4a: "%{possiblePoints} Mögulegir punktar"
@@ -24595,7 +24595,7 @@ is:
   preview_files_linked_in_the_rce_in_an_overlay_rath_92ef91d1: "Forskoða skrár sem tengdar eru í RCE í yfirlögn frekar en nýjum vafraflipa."
   preview_for_file_name_17488a7a: "Forskoðun fyrir skrá: %{name}"
   preview_removal_998101a9: "Forskoðun fjarlæging"
-  preview_rubric_267b2a9d: "Forskoða matsviðmið"
+  preview_rubric_267b2a9d: "Forskoða matskvarða"
   preview_unavailable_aacd459a: "Forskoðun ótiltæk"
   preview_ungraded_as_0_e3b97df6: "Forskoðun óbreytt sem 0"
   preview_website_url_eb5b8a5f: "Forskoða vefsíðu-url"
@@ -26530,12 +26530,12 @@ is:
   rating_display_b0b574be: "Sýna einkunn"
   rating_max_score_eade1523: "Hámarkseinkunn mats"
   rating_min_score_3d35a762: "Lágmarkseinkunn mats"
-  rating_name_6f633d52: "Nafn einkunninnar"
+  rating_name_6f633d52: "Heiti mats"
   rating_options_6c51fc9a: "Valkostir fyrir einkunnagjöf"
   rating_order_e57f63ed: "Röðun stiga"
   rating_points_be3e8682: Einkunnagjöf
   rating_scale_fc10d5f1: Einkunnakvarði
-  rating_scale_ratingslength_25100b7a: "Einkunnakvarði: %{ratingsLength}"
+  rating_scale_ratingslength_25100b7a: "Matsþrep: %{ratingsLength}"
   rating_score_22cfc724: Matseinkunn
   rating_selected_85c31e4c: "Einkunn valin"
   rating_tier_index_threshold_3f02a6d7: "Þröskuldur %{index} einkunnaþreps"
@@ -27704,7 +27704,7 @@ is:
   save_as_template_489ed7fd: "Vista sem sniðmát"
   save_as_template_b1e8b5ab: "Vista sem sniðmát"
   save_changes_698abe77: "Vista breytingar"
-  save_criterion_cce60085: "Vista viðmiðun"
+  save_criterion_cce60085: "Vista matsþátt"
   save_customizations_dde779d8: "Vista sérsnið"
   save_don_t_send_ba59fa2b: "Vista og ekki senda"
   save_failed_463cb2a8: "Vistun mistókst."
@@ -29989,7 +29989,7 @@ is:
       aria_record: "Smelltu til að taka upp"
       aria_record_reset: "Smelltu til að taka upp"
       aria_stop: "Ýttu á \"Stop\" til að hætta upptöku."
-    edit_view_rubric: "Skoða matskvarði"
+    edit_view_rubric: "Skoða matskvarða"
     group: Hópur
     late_input: 
       days: 
@@ -30148,7 +30148,7 @@ is:
   start_entry_4b491f60: "Hefja færslu"
   start_from_a_blank_page_or_select_a_pre_designed_l_306c1c28: "Byrjaðu á auðri síðu eða veldu fyrirfram hannað skipulag sem er tilbúið til að fylla það með innihaldi þínu."
   start_from_scratch_ea99d7e6: "Byrja frá upphafi"
-  start_link_validation_dc0ac99c: "Staðfesting upphafstengils"
+  start_link_validation_dc0ac99c: "Hefja tenglaprófun"
   start_month_2f1fbd12: Upphafsmánuður
   start_over_183a8647: "Byrja aftur frá byrjun"
   start_over_f7552aa9: "Byrja aftur frá byrjun"
@@ -30727,7 +30727,7 @@ is:
   submit_a3cc6859: Skila
   submit_a_comment_7edbf648: "Skila athugasemd"
   submit_a_feature_idea_2d4baa3d: "Leggja fram hugmynd um eiginleika"
-  submit_assessment_900ecd29: "Senda mat"
+  submit_assessment_900ecd29: "Skila námsmati"
   submit_assignment: 
     buttons: 
       submit_assignment: "Skila verkefni"
@@ -31407,7 +31407,7 @@ is:
   the_course_id_to_report_on_eb4ad5d2: "Námskeiðsauðkenni til að segja frá"
   the_course_id_to_run_the_export_for_b826069a: "Námskeiðsauðkenni til að keyra útflutning gagna."
   the_course_is_associated_with_an_archived_or_delet_43b836a9: "Námskeiðið tengist geymslu eða eyddum einkunnakvarða og ekki er víst að einkunnakvarðinn sé fluttur út."
-  the_course_link_validator_searches_course_content__563fa215: "Tenglastaðfestari námskeiðs leitar í efni námskeiðsins fyrir ógilda eða ósækjanlega tengla og myndir."
+  the_course_link_validator_searches_course_content__563fa215: "Tenglaprófunin leitar í efni námskeiðsins að dauðum eða óaðgengilegum tenglum og myndum."
   the_course_link_validator_searches_through_course__76f0bc63: "Með staðfestingu á tengli námskeiðs er leitað í efni námskeiðs og allir ógildir eða óvirkir tenglar sem finnast eru sýndir. Athugaðu að sumir tenglar sem taldir eru óvirkir eru aðeins óaðgengilegir frá netþjónum okkar og munu áfram virka ágætlega fyrir nemendur."
   the_course_pace_download_encountered_an_error_3b1298fa: "Villa kom upp við niðurhal námskeiðsáætlunar."
   the_course_pace_download_is_complete_5dc2a1d3: "Niðurhali á námskeiðsáætlun er lokið."
@@ -35056,7 +35056,7 @@ is:
   validate: 
     is_required: "Fylla þarf í þennan reit"
   validate_call_to_action_buttons_instead_of_disabli_28b2ce0b: "Staðfestu sjálfgefna aðgerðahnappa í stað þess að slökkva á þeim"
-  validate_links_in_content_b1630fba: "Staðfesta tengla í efni"
+  validate_links_in_content_b1630fba: "Tenglaprófun á innihaldi"
   validated_service_ticket_20d1fcec: "Staðfestur þjónustumiði"
   validated_ticket_for_username_c6c7722f: "Staðfestur miði fyrir %{username}"
   validation_error_3b943100: Fullgildingarvilla
@@ -35195,7 +35195,7 @@ is:
   view_replies_8565a729: "Skoða svör"
   view_report_73f7b8f8: "Skoða skýrslu"
   view_rubric_assessment_in_speedgrader_984576d: "Skoða mat matskvarða í SpeedGrader"
-  view_rubric_d71cce10: "Skoða matsviðmið"
+  view_rubric_d71cce10: "Skoða matskvarða"
   view_score_ccaf3c40: "Skoða einkunn"
   view_size_f143709f: "Skoða stærð"
   view_split_screen_ca35b78a: "Skoða skiptan skjá"
