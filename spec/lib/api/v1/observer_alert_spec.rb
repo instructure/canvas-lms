@@ -76,6 +76,14 @@ describe "Api::V1::ObserverAlert" do
         expect(json["html_url"]).to eq api.course_assignment_url(@course.id, asg)
       end
 
+      it "for sub assignment" do
+        assignment = assignment_model(course: @course)
+        sub_assignment = assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+        alert = observer_alert_model(observer: user, course: @course, active_all: true, alert_type: "assignment_grade_high", context: sub_assignment)
+        json = api.observer_alert_json(alert, user, session)
+        expect(json["html_url"]).to eq api.course_assignment_url(@course.id, sub_assignment.parent_assignment)
+      end
+
       it "for course" do
         alert = observer_alert_model(observer: user, course: @course, active_all: true, alert_type: "course_grade_high", context: @course)
         json = api.observer_alert_json(alert, user, session)
