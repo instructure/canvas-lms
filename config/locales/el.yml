@@ -825,6 +825,10 @@ el:
             start: 
               parameters: 
                 header: "Αρχίζει στις:"
+    edp_student_activity_csv_parameters: 
+      custom_reports: 
+        edp: 
+          all_terms: "Όλες οι Ακαδημαϊκές Χρονικές Περίοδοι "
     find_not_authorized: "Δεν είστε εξουσιοδοτημένοι για να προσπελάσετε αυτό το %{type}"
     find_not_found: "Δεν ήταν δυνατό να βρεθεί κάποιο %{type} με αυτό το ID"
     grade_export_csv_description: 
@@ -1866,6 +1870,7 @@ el:
     podcast_title_course: "Τροφοδοσία Podcast Ανακοινώσεων Μαθήματος"
     podcast_title_group: "Τροφοδοσία Podcast Ανακοινώσεων Ομάδας"
   announcements_a4b8ed4a: Ανακοινώσεις
+  anonymity_1cfb09ca: Ανωνυμία
   anonymous_e1b8ad27: Ανώνυμο
   anonymous_grading_ccb5045c: "Ανώνυμη Βαθμολόγηση"
   anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Η ανώνυμη βαθμολόγηση συνεπάγεται την υποχρεωτική απόκρυψη ονομάτων φοιτητών/τριών στο SpeedGrader"
