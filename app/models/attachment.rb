@@ -996,12 +996,10 @@ class Attachment < ActiveRecord::Base
   end
 
   HTML_MAX_PROXY_SIZE = 510.kilobytes
-  FLASH_MAX_PROXY_SIZE = 1.megabyte
   CSS_MAX_PROXY_SIZE = 255.kilobytes
 
   def can_be_proxied?
     (mime_class == "html" && size < HTML_MAX_PROXY_SIZE) ||
-      (mime_class == "flash" && size < FLASH_MAX_PROXY_SIZE) ||
       (content_type == "text/css" && size < CSS_MAX_PROXY_SIZE)
   end
 
