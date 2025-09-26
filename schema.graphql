@@ -385,6 +385,26 @@ input AllocationRulesFilterInput {
 }
 
 """
+Indicates whether a submission requires a provisional grade
+"""
+enum AllowProvisionalGradingType {
+  """
+  User can provide a provisional grade
+  """
+  allowed
+
+  """
+  User is not allowed to provide a provisional grade
+  """
+  not_allowed
+
+  """
+  Assignment does not use moderated grading or grades are already published
+  """
+  not_applicable
+}
+
+"""
 An anonymous student identity
 """
 type AnonymousStudentIdentity {
@@ -454,6 +474,11 @@ type Assignment implements AssignedDates & LegacyIDInterface & ModuleItemInterfa
   """
   allocationRules: AssignmentAllocationRules
   allowGoogleDocsSubmission: Boolean
+
+  """
+  Whether the current user can provide a provisional grade for this assignment
+  """
+  allowProvisionalGrading: AllowProvisionalGradingType!
 
   """
   The number of submission attempts a student can make for this assignment. null implies unlimited.
@@ -9439,6 +9464,11 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
   groupId: ID
   hasOriginalityReport: Boolean!
   hasPostableComments: Boolean!
+
+  """
+  Whether the current user has provided a provisional grade with a non-null score for this submission
+  """
+  hasProvisionalGradeByCurrentUser: Boolean!
   hasSubAssignmentSubmissions: Boolean
   hasUnreadRubricAssessment: Boolean!
 
@@ -9823,6 +9853,11 @@ type SubmissionHistory implements SubmissionInterface & Timestamped {
   groupId: ID
   hasOriginalityReport: Boolean!
   hasPostableComments: Boolean!
+
+  """
+  Whether the current user has provided a provisional grade with a non-null score for this submission
+  """
+  hasProvisionalGradeByCurrentUser: Boolean!
   hasSubAssignmentSubmissions: Boolean
   hasUnreadRubricAssessment: Boolean!
 
@@ -10043,6 +10078,11 @@ interface SubmissionInterface {
   groupId: ID
   hasOriginalityReport: Boolean!
   hasPostableComments: Boolean!
+
+  """
+  Whether the current user has provided a provisional grade with a non-null score for this submission
+  """
+  hasProvisionalGradeByCurrentUser: Boolean!
   hasSubAssignmentSubmissions: Boolean
   hasUnreadRubricAssessment: Boolean!
 

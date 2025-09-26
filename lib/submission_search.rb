@@ -165,7 +165,7 @@ class SubmissionSearch
   end
 
   def order_by_needs_grading(search_scope:, direction:)
-    ComputedSubmissionColumnBuilder.add_needs_grading_column(search_scope) => { scope:, column: needs_grading_column }
+    ComputedSubmissionColumnBuilder.add_needs_grading_column(search_scope, @searcher) => { scope:, column: needs_grading_column }
     # students needing grading come first when sorting ascending, last when sorting descending
     direction = reverse_direction(direction)
     scope.order(Arel.sql("#{needs_grading_column} #{direction}"))
