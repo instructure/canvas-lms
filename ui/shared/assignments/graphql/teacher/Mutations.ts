@@ -55,3 +55,28 @@ export const CREATE_ALLOCATION_RULE_MUTATION = gql`
     }
   }
 `
+
+export const UPDATE_ALLOCATION_RULE_MUTATION = gql`
+  mutation UpdateAllocationRule($input: UpdateAllocationRuleInput!) {
+    updateAllocationRule(input: $input) {
+      allocationRules {
+        _id
+        mustReview
+        reviewPermitted
+        appliesToAssessor
+        assessor {
+          _id
+          name
+        }
+        assessee {
+          _id
+          name
+        }
+      }
+      allocationErrors {
+        attributeId
+        message
+      }
+    }
+  }
+`
