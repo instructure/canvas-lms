@@ -2228,6 +2228,15 @@ module Lti
           expect(expand!("$Canvas.assignment.title")).to eq "Buy as many ducks as you can"
         end
 
+        it "has substitution for $Canvas.assignment.new_quizzes_type" do
+          expect(expand!("$Canvas.assignment.new_quizzes_type")).to eq "graded_quiz"
+        end
+
+        it "has substitution for $Canvas.assignment.new_quizzes_type with custom type" do
+          allow(assignment).to receive(:new_quizzes_type).and_return("ungraded_survey")
+          expect(expand!("$Canvas.assignment.new_quizzes_type")).to eq "ungraded_survey"
+        end
+
         describe "$Canvas.assignment.pointsPossible" do
           it "has substitution for $Canvas.assignment.pointsPossible" do
             allow(assignment).to receive(:points_possible).and_return(10.0)

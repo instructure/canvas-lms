@@ -1301,6 +1301,15 @@ Returns the assignment_id of the assignment that was launched.
 ```
 1234
 ```
+## Canvas.assignment.new_quizzes_type
+Returns the new_quizzes type of the assignment that was launched.
+
+**Availability**: *when launched as an assignment*  
+
+
+```
+"graded_quiz"
+```
 ## Canvas.assignment.description
 Returns the assignment_description of the assignment that was launched.
 

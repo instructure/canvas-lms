@@ -1744,6 +1744,17 @@ module Lti
                        -> { @assignment.id },
                        ASSIGNMENT_GUARD
 
+    # Returns the new_quizzes type of the assignment that was launched
+    #
+    # @example
+    #   ```
+    #   "graded_quiz"
+    #   ```
+    register_expansion "Canvas.assignment.new_quizzes_type",
+                       [],
+                       -> { @assignment.new_quizzes_type },
+                       ASSIGNMENT_GUARD
+
     # Returns the assignment_description of the assignment that was launched.
     #
     # @example
