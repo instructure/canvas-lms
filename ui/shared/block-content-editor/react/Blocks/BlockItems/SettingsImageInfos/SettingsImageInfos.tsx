@@ -38,8 +38,8 @@ export const SettingsImageInfos = ({
   decorativeImage,
   altTextAsCaption,
   disabled = false,
-  imageUrl,
   fileName,
+  attachmentId,
   onCaptionChange,
   onAltTextChange,
   onAltTextAsCaptionChange,
@@ -69,9 +69,9 @@ export const SettingsImageInfos = ({
   }
 
   const handleGenerateAltText = async () => {
-    if (imageUrl) {
+    if (attachmentId) {
       try {
-        const altText = await generateAltTextMutation.generate(imageUrl)
+        const altText = await generateAltTextMutation.generate(attachmentId)
         if (!altText) {
           showFlashError(I18n.t('Failed to generate alt text.'))()
           return
@@ -124,7 +124,7 @@ export const SettingsImageInfos = ({
               disabled={
                 disabled ||
                 decorativeImage ||
-                !imageUrl ||
+                !attachmentId ||
                 !fileName ||
                 generateAltTextMutation.isPending
               }
