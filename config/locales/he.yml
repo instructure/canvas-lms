@@ -979,6 +979,10 @@ he:
             start: 
               parameters: 
                 header: "התחלה ב:"
+    edp_student_activity_csv_parameters: 
+      custom_reports: 
+        edp: 
+          all_terms: "כל התקופות/תנאים"
     embry_riddle_activity_report_csv_parameters: 
       account_reports: 
         embry_riddle: 
@@ -2322,6 +2326,7 @@ he:
   announcements_a4b8ed4a: הכרזות
   announcements_loaded_e9335d5f: "הכרזות נטענו"
   announcements_tutorial_tray_994287d6: "מגש מדריך ההכרזות"
+  anonymity_1cfb09ca: אנונימיות
   anonymize_all_annotations_made_by_instructors_on_s_4f2b70a5: "הפוך לאנונימי את כל ההערות שבוצעו ע\"י מנחים על הגשות של מטלה זו ב SpeedGrader"
   anonymous_e1b8ad27: אנונימי
   anonymous_grading_ccb5045c: "מתן ציונים אנונימי"
