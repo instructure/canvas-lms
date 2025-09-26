@@ -187,7 +187,6 @@ describe('ModuleItemActionMenu', () => {
     assertMenuItems({
       itemType: 'Discussion',
       content: {
-        published: true,
         canManageAssignTo: false,
       },
       visibleItems: [
@@ -201,6 +200,7 @@ describe('ModuleItemActionMenu', () => {
         'Remove',
       ],
       hiddenItems: ['Assign To...', 'SpeedGrader'],
+      published: true,
     })
   })
 
