@@ -3033,6 +3033,7 @@ class UsersController < ApplicationController
     user = api_find(User, params[:id])
     if user && authorized_action(@domain_root_account, @current_user, :manage_site_settings)
       user.clear_caches
+      user.update_account_associations
       render json: { status: "ok" }
     end
   end
