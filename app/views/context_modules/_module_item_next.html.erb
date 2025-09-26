@@ -130,6 +130,7 @@
               title="<%= title %>"
               class="ig-title title item_link"
               href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>"
+              aria-describedby="module-item-<%= module_item ? module_item.id : "{{ id }}" %>-details"
               <% if item_data[:mastery_paths] && item_data[:mastery_paths][:locked] %>
               aria-describedby="module-item-locked-<%= module_item && module_item.id %>"
               <% end %>
@@ -166,16 +167,16 @@
         <span class="graded" style="display: none;"><%= module_item && module_item.graded? ? '1' : '0' %></span>
       </div>
 
-      <div class="ig-details">
+      <div id="module-item-<%= module_item ? module_item.id : "{{ id }}" %>-details" class="ig-details">
         <% if !@is_student && show_checkpoints %>
             <div class="ig-details__item reply_to_topic_display"></div>
             <div class="ig-details__item reply_to_entry_display"></div>
         <%end%>
-        <div class="due_date_display ig-details__item"></div>
+        <div id="module-item-<%= module_item ? module_item.id : "{{ id }}" %>-due-date" class="due_date_display ig-details__item"></div>
         <% if module_item&.graded? && (!module_item.try_rescue(:assignment).restrict_quantitative_data?(@current_user, check_extra_permissions: true))%>
-          <div class="points_possible_display ig-details__item"></div>
+          <div id="module-item-<%= module_item ? module_item.id : "{{ id }}" %>-points" class="points_possible_display ig-details__item"></div>
         <%end%>
-        <div class="requirement-description ig-details__item">
+        <div id="module-item-<%= module_item ? module_item.id : "{{ id }}" %>-requirement" class="requirement-description ig-details__item">
           <span class="completion_requirement">
             <span class="requirement_type min_score_requirement">
               <% score_display = content_tag(:span, criterion && criterion[:min_score] || nbsp, class: 'min_score') %>
