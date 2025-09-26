@@ -861,6 +861,10 @@ hy:
             start: 
               parameters: 
                 header: "Սկսված է՝"
+    edp_student_activity_csv_parameters: 
+      custom_reports: 
+        edp: 
+          all_terms: "Բոլոր ժամանակահատվածները"
     find_not_authorized: "Ձեզ թույլատրված չէ մուտք գործել դեպի %{type}"
     find_not_found: "Նշված նույնականացուցիչով %{type} հնարավոր չէր գտնել"
     grade_export_csv_description: 
@@ -1874,6 +1878,7 @@ hy:
     podcast_title_course: "Դասընթացների հայտարարությունների ձայնային հոսք"
     podcast_title_group: "Խմբային հայտարարությունների ձայնային հոսք"
   announcements_a4b8ed4a: Հայտարարություններ
+  anonymity_1cfb09ca: Անանունություն
   anonymous_e1b8ad27: Անանուն
   anonymous_grading_ccb5045c: "Անանուն գնահատում"
   anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Անանուն գնահատումը անտեսանելի է դարձնում ունկնդիրների անունները «Արագ գնահատման համակարգ»-ում"
