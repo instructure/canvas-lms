@@ -17,7 +17,6 @@
  */
 
 import {useMutation} from '@tanstack/react-query'
-import {convertImageUrlToBase64} from '../utilities/imageUtils'
 import {generateAiAltText, AiAltTextRequest} from '../utilities/aiAltTextApi'
 import {useRef, useEffect} from 'react'
 
@@ -29,17 +28,16 @@ export const useGenerateAiAltText = (options: UseGenerateAiAltTextOptions) => {
   const abortControllerRef = useRef<AbortController | null>(null)
 
   const mutation = useMutation({
-    mutationFn: async ({imageUrl, signal}: {imageUrl: string; signal?: AbortSignal}) => {
+    mutationFn: async ({
+      attachmentId,
+      signal,
+    }: {attachmentId: string | number; signal?: AbortSignal}) => {
       if (!options.url) {
         throw Error('URL is missing for alt text generation')
       }
 
-      const base64Data = await convertImageUrlToBase64(imageUrl)
       const requestData: AiAltTextRequest = {
-        image: {
-          base64_source: base64Data,
-          type: 'Base64',
-        },
+        attachment_id: attachmentId,
       }
 
       return generateAiAltText({
@@ -50,15 +48,15 @@ export const useGenerateAiAltText = (options: UseGenerateAiAltTextOptions) => {
     },
   })
 
-  const generate = async (imageUrl: string): Promise<string> => {
-    if (!imageUrl) {
-      throw new Error('Image URL is required')
+  const generate = async (attachmentId: string | number): Promise<string> => {
+    if (!attachmentId) {
+      throw new Error('Attachment ID is required')
     }
 
     abortControllerRef.current = new AbortController()
 
     const response = await mutation.mutateAsync({
-      imageUrl,
+      attachmentId,
       signal: abortControllerRef.current.signal,
     })
 

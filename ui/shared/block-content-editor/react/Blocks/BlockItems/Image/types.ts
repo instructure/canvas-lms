@@ -23,6 +23,7 @@ type ImageMetadata = {
   url?: string
   altText?: string
   decorativeImage?: boolean
+  attachmentId?: string | number
 }
 
 type ImageCaption = {
