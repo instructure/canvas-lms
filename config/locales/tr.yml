@@ -1056,6 +1056,10 @@ tr:
             start: 
               parameters: 
                 header: "Başlangıç:"
+    edp_student_activity_csv_parameters: 
+      custom_reports: 
+        edp: 
+          all_terms: "Tüm Dönemler"
     embry_riddle_activity_report_csv_parameters: 
       account_reports: 
         embry_riddle: 
@@ -2472,6 +2476,7 @@ tr:
   announcements_tutorial_tray_994287d6: "Duyurular Yönerge Yan Menüsü"
   announcements_unlocked_successfully_1432da9d: "Duyuruların kilidi başarılı bir şekilde kaldırıldı"
   announcements_view_1019d00d: "Duyurular -göster"
+  anonymity_1cfb09ca: "İsmin Bilinmemezliği"
   anonymize_all_annotations_made_by_instructors_on_s_4f2b70a5: "Eğitmenler tarafından bu ödevdeki tüm gönderilerde yapılan tüm ek notları SpeedGrader'da isimsiz yap"
   anonymize_all_instructor_comments_and_annotations__713924c9: "DocViewer'daki tüm eğitmen yorumlarını ve ek açıklamalarını anonimleştirir."
   anonymous_e1b8ad27: Anonim
