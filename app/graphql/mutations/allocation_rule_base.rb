@@ -153,12 +153,18 @@ module Mutations
     def create_or_find_new_rule(assignment, course, opts)
       return unless assignment && course && opts[:assessor_id] && opts[:assessee_id]
 
-      existing_rule = assignment.allocation_rules.find_by(
+      existing_rule = AllocationRule.find_by(
+        assignment:,
         assessor_id: opts[:assessor_id],
         assessee_id: opts[:assessee_id],
         must_review: opts[:must_review],
         review_permitted: opts[:review_permitted]
       )
+
+      if existing_rule&.deleted?
+        # Record will be saved during processing if validation passes
+        existing_rule.workflow_state = "active"
+      end
 
       existing_rule || create_new_rule(assignment, course, opts)
     end

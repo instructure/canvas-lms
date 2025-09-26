@@ -17,7 +17,7 @@
  */
 
 import React, {useState, useRef, useEffect, useCallback} from 'react'
-import AllocationRuleCard, {AllocationRuleType} from './AllocationRuleCard'
+import AllocationRuleCard from './AllocationRuleCard'
 import CreateEditAllocationRuleModal from './CreateEditAllocationRuleModal'
 import {Alert} from '@instructure/ui-alerts'
 import {useAllocationRules} from '../graphql/hooks/useAllocationRules'
@@ -33,6 +33,7 @@ import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import pandasBalloonUrl from './images/pandasBalloon.svg'
+import {AllocationRuleType} from '../graphql/teacher/AssignmentTeacherTypes'
 
 const I18n = createI18nScope('peer_review_allocation_rules_tray')
 
@@ -93,6 +94,7 @@ const PeerReviewAllocationRulesTray = ({
   const [shouldRefetch, setShouldRefetch] = useState(false)
   const [preCreationTotalCount, setPreCreationTotalCount] = useState<number | null>(null)
   const [isUserNavigating, setIsUserNavigating] = useState(false)
+  const [ruleToFocus, setRuleToFocus] = useState<string | null>(null)
 
   const containerRef = useRef<Element | null>(null)
 
@@ -103,22 +105,6 @@ const PeerReviewAllocationRulesTray = ({
   )
 
   const totalPages = totalCount ? Math.ceil(totalCount / itemsPerPage) : 0
-  const formattedRules: AllocationRuleType[] = rules.map(
-    (rule): AllocationRuleType => ({
-      id: rule._id,
-      reviewer: {
-        _id: rule.assessor._id,
-        name: rule.assessor.name,
-      },
-      reviewee: {
-        _id: rule.assessee._id,
-        name: rule.assessee.name,
-      },
-      mustReview: rule.mustReview,
-      reviewPermitted: rule.reviewPermitted,
-      appliesToReviewer: rule.appliesToAssessor,
-    }),
-  )
 
   const handlePageChange = useCallback((newPage: number) => {
     setIsUserNavigating(true)
@@ -128,18 +114,25 @@ const PeerReviewAllocationRulesTray = ({
     }, 1000)
   }, [])
 
-  const handleRuleCreated = useCallback(() => {
-    if (preCreationTotalCount !== null) {
-      const firstNewRulePage = Math.floor(preCreationTotalCount / itemsPerPage) + 1
+  const handleRuleSave = useCallback(
+    (ruleId?: string) => {
       setShouldRefetch(true)
-      if (firstNewRulePage !== currentPage) {
-        handlePageChange(firstNewRulePage)
+      if (!containerRef.current || isUserNavigating || loading) {
+        if (!ruleId && preCreationTotalCount !== null) {
+          const firstNewRulePage = Math.floor(preCreationTotalCount / itemsPerPage) + 1
+          if (firstNewRulePage !== currentPage) {
+            handlePageChange(firstNewRulePage)
+          }
+        } else if (ruleId) {
+          setRuleToFocus(ruleId)
+        }
       }
-    }
-  }, [itemsPerPage, preCreationTotalCount, currentPage, handlePageChange])
+    },
+    [itemsPerPage, preCreationTotalCount, currentPage, handlePageChange],
+  )
 
   const calculateItemsPerPage = useCallback(() => {
-    if (!containerRef.current || isUserNavigating || loading) {
+    if (!containerRef.current || rules.length === 0) {
       return
     }
 
@@ -221,7 +214,12 @@ const PeerReviewAllocationRulesTray = ({
         setShouldRefetch(false)
         await refetch(currentPage)
         setTimeout(() => {
-          if (preCreationTotalCount !== null) {
+          if (ruleToFocus) {
+            const editButton = document.getElementById(`edit-rule-button-${ruleToFocus}`)
+            if (editButton) {
+              editButton.focus()
+            }
+          } else if (preCreationTotalCount !== null) {
             const ruleIndexOnPage = preCreationTotalCount % itemsPerPage
             const ruleCards = document.querySelectorAll(
               '[data-testid="allocation-rule-card-wrapper"]',
@@ -258,19 +256,24 @@ const PeerReviewAllocationRulesTray = ({
       )
     }
 
-    if (formattedRules.length === 0) return <EmptyState />
+    if (rules.length === 0) return <EmptyState />
 
     return (
       <Flex direction="column" height="100%" elementRef={setContainerRef}>
         <Flex.Item shouldGrow shouldShrink>
-          {formattedRules.map(rule => (
+          {rules.map(rule => (
             <Flex.Item
               as="div"
               padding="x-small medium"
-              key={rule.id}
+              key={rule._id}
               data-testid="allocation-rule-card-wrapper"
             >
-              <AllocationRuleCard rule={rule} canEdit={canEdit} />
+              <AllocationRuleCard
+                rule={rule}
+                canEdit={canEdit}
+                assignmentId={assignmentId}
+                refetchRules={handleRuleSave}
+              />
             </Flex.Item>
           ))}
         </Flex.Item>
@@ -349,7 +352,7 @@ const PeerReviewAllocationRulesTray = ({
         setIsOpen={setIsCreateModalOpen}
         assignmentId={assignmentId}
         courseId={ENV.COURSE_ID}
-        refetchRules={handleRuleCreated}
+        refetchRules={handleRuleSave}
       />
     </View>
   )

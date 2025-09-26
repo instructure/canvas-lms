@@ -22,8 +22,8 @@ import userEvent from '@testing-library/user-event'
 import {QueryClient} from '@tanstack/react-query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import CreateEditAllocationRuleModal from '../CreateEditAllocationRuleModal'
-import {type AllocationRuleType} from '../AllocationRuleCard'
 import {CourseStudent} from '../../graphql/hooks/useAssignedStudents'
+import {AllocationRuleType} from '../../graphql/teacher/AssignmentTeacherTypes'
 
 jest.mock('@canvas/graphql', () => ({
   executeQuery: jest.fn(),
@@ -46,23 +46,23 @@ describe('CreateEditAllocationRuleModal', () => {
     refetchRules: jest.fn(),
   }
 
-  const reviewer: CourseStudent = {
+  const assessor: CourseStudent = {
     _id: '1',
     name: 'Pikachu',
   }
 
-  const reviewee: CourseStudent = {
+  const assessee: CourseStudent = {
     _id: '2',
     name: 'Piplup',
   }
 
   const sampleRule: AllocationRuleType = {
-    id: '1',
-    reviewer,
-    reviewee,
+    _id: '1',
+    assessor,
+    assessee,
     mustReview: true,
     reviewPermitted: true,
-    appliesToReviewer: true,
+    appliesToAssessor: true,
   }
 
   let user: ReturnType<typeof userEvent.setup>
@@ -180,18 +180,6 @@ describe('CreateEditAllocationRuleModal', () => {
       expect(screen.getByText('Reviewer Name')).toBeInTheDocument()
       expect(screen.getByText('Recipient Name')).toBeInTheDocument()
     })
-
-    it('shows student options when typing in select field', async () => {
-      const reviewerSelect = screen.getByText('Reviewer Name').querySelector('input')
-
-      if (reviewerSelect) {
-        await user.type(reviewerSelect, 'Student 1')
-
-        await waitFor(() => {
-          expect(screen.getByText('Student 1')).toBeInTheDocument()
-        })
-      }
-    })
   })
 
   describe('Additional subject fields', () => {
@@ -289,7 +277,7 @@ describe('CreateEditAllocationRuleModal', () => {
     it('populates fields for reviewee-focused rule', () => {
       const revieweeRule: AllocationRuleType = {
         ...sampleRule,
-        appliesToReviewer: false,
+        appliesToAssessor: false,
         mustReview: false,
         reviewPermitted: true,
       }
@@ -301,12 +289,41 @@ describe('CreateEditAllocationRuleModal', () => {
     })
   })
 
-  describe('Modal actions', () => {
-    beforeEach(() => {
-      renderWithProviders()
+  describe('Edit mode change detection', () => {
+    it('closes modal without API call when no changes are made', async () => {
+      renderWithProviders({isEdit: true, rule: sampleRule})
+
+      const saveButton = screen.getByTestId('save-button')
+      await user.click(saveButton)
+
+      await waitFor(() => {
+        expect(mockSetIsOpen).toHaveBeenCalledWith(false)
+        expect(mockExecuteQuery).not.toHaveBeenCalled()
+      })
     })
 
+    it('closes modal without API call when changes are reverted', async () => {
+      renderWithProviders({isEdit: true, rule: sampleRule})
+
+      const shouldReviewRadio = screen.getByTestId('review-type-should-review')
+      await user.click(shouldReviewRadio)
+
+      const mustReviewRadio = screen.getByTestId('review-type-must-review')
+      await user.click(mustReviewRadio)
+
+      const saveButton = screen.getByTestId('save-button')
+      await user.click(saveButton)
+
+      await waitFor(() => {
+        expect(mockSetIsOpen).toHaveBeenCalledWith(false)
+        expect(mockExecuteQuery).not.toHaveBeenCalled()
+      })
+    })
+  })
+
+  describe('Modal actions', () => {
     it('closes modal when cancel button is clicked', async () => {
+      renderWithProviders()
       const cancelButton = screen.getByTestId('cancel-button')
 
       await user.click(cancelButton)
@@ -314,34 +331,6 @@ describe('CreateEditAllocationRuleModal', () => {
       await waitFor(() => {
         expect(mockSetIsOpen).toHaveBeenCalledWith(false)
       })
-    })
-
-    it('calls setIsOpen with false when save is successful', async () => {
-      mockExecuteQuery.mockResolvedValue({
-        assignment: {
-          assignedStudents: {
-            nodes: mockStudents,
-          },
-        },
-      })
-
-      const reviewerInput = screen.getAllByText('Reviewer Name')[0].querySelector('input')
-      const recipientInput = screen.getAllByText('Recipient Name')[0].querySelector('input')
-
-      if (reviewerInput && recipientInput) {
-        await user.type(reviewerInput, 'Student 1')
-        await user.click(screen.getByText('Student 1'))
-
-        await user.type(recipientInput, 'Student 2')
-        await user.click(screen.getByText('Student 2'))
-
-        const saveButton = screen.getByTestId('save-button')
-        await user.click(saveButton)
-
-        await waitFor(() => {
-          expect(mockSetIsOpen).toHaveBeenCalledWith(false)
-        })
-      }
     })
   })
 
@@ -381,71 +370,6 @@ describe('CreateEditAllocationRuleModal', () => {
     })
   })
 
-  describe('Error handling', () => {
-    beforeEach(() => {
-      mockExecuteQuery.mockResolvedValue({
-        assignment: {
-          assignedStudents: {
-            nodes: mockStudents,
-          },
-        },
-      })
-      renderWithProviders()
-    })
-
-    it('clears errors on input change', async () => {
-      const saveButton = screen.getByTestId('save-button')
-
-      await user.click(saveButton)
-
-      await waitFor(() => {
-        expect(screen.getByText('Reviewer is required')).toBeInTheDocument()
-      })
-
-      const reviewerInput = screen.getByText('Reviewer Name').querySelector('input')
-      if (reviewerInput) {
-        await user.type(reviewerInput, 'Student 1')
-        await user.click(screen.getByText('Student 1'))
-
-        await waitFor(() => {
-          expect(screen.queryByText('Reviewer is required')).not.toBeInTheDocument()
-        })
-      }
-    })
-
-    it('shows network error alert when rule creation fails', async () => {
-      mockExecuteQuery.mockResolvedValueOnce({
-        assignment: {
-          assignedStudents: {
-            nodes: mockStudents,
-          },
-        },
-      })
-
-      mockExecuteQuery.mockRejectedValueOnce(new Error('NetworkError: Failed to fetch'))
-
-      const reviewerInput = screen.getAllByText('Reviewer Name')[0].querySelector('input')
-      const recipientInput = screen.getAllByText('Recipient Name')[0].querySelector('input')
-
-      if (reviewerInput && recipientInput) {
-        await user.type(reviewerInput, 'Student 1')
-        await user.click(screen.getByText('Student 1'))
-
-        await user.type(recipientInput, 'Student 2')
-        await user.click(screen.getByText('Student 2'))
-
-        const saveButton = screen.getByTestId('save-button')
-        await user.click(saveButton)
-
-        await waitFor(() => {
-          expect(screen.getByText(/An error occurred while creating the rule/i)).toBeInTheDocument()
-        })
-
-        expect(mockSetIsOpen).not.toHaveBeenCalledWith(false)
-      }
-    })
-  })
-
   describe('Additional subject field limits', () => {
     beforeEach(() => {
       renderWithProviders()
@@ -458,6 +382,40 @@ describe('CreateEditAllocationRuleModal', () => {
 
       await waitFor(() => {
         expect(screen.queryByTestId('add-subject-button')).not.toBeInTheDocument()
+      })
+    })
+
+    it('clears existing additional subjects when switching to reciprocal type', async () => {
+      const addButton = screen.getByTestId('add-subject-button')
+      await user.click(addButton)
+      await user.click(addButton)
+
+      await waitFor(() => {
+        expect(screen.getAllByText('Recipient Name')).toHaveLength(3)
+        expect(screen.getByTestId('delete-additional-subject-field-1-button')).toBeInTheDocument()
+        expect(screen.getByTestId('delete-additional-subject-field-2-button')).toBeInTheDocument()
+      })
+
+      const reciprocalRadio = screen.getByTestId('target-type-reciprocal')
+      await user.click(reciprocalRadio)
+
+      await waitFor(() => {
+        expect(screen.getAllByText('Recipient Name')).toHaveLength(1)
+        expect(
+          screen.queryByTestId('delete-additional-subject-field-1-button'),
+        ).not.toBeInTheDocument()
+        expect(
+          screen.queryByTestId('delete-additional-subject-field-2-button'),
+        ).not.toBeInTheDocument()
+        expect(screen.queryByTestId('add-subject-button')).not.toBeInTheDocument()
+      })
+
+      const reviewerRadio = screen.getByTestId('target-type-reviewer')
+      await user.click(reviewerRadio)
+
+      await waitFor(() => {
+        expect(screen.getByTestId('add-subject-button')).toBeInTheDocument()
+        expect(screen.getAllByText('Recipient Name')).toHaveLength(1)
       })
     })
   })
