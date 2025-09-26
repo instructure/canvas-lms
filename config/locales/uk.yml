@@ -906,6 +906,10 @@ uk:
             start: 
               parameters: 
                 header: "Початок:"
+    edp_student_activity_csv_parameters: 
+      custom_reports: 
+        edp: 
+          all_terms: "Усі періоди"
     embry_riddle_activity_report_csv_parameters: 
       account_reports: 
         embry_riddle: 
@@ -2143,6 +2147,7 @@ uk:
   announcements_a4b8ed4a: Оголошення
   announcements_list_c75fc413: "Перелік оголошень"
   announcements_tutorial_tray_994287d6: "Вказівки до оголошень"
+  anonymity_1cfb09ca: Анонімність
   anonymize_all_annotations_made_by_instructors_on_s_4f2b70a5: "Зробити анонімними всі коментарі, зроблені інструкторами, або подання на завдання у SpeedGrader"
   anonymous_e1b8ad27: Анонімний
   anonymous_grading_ccb5045c: "Анонімне оцінювання "
