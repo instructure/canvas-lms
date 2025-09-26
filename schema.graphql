@@ -4289,6 +4289,7 @@ type DiscussionParticipant {
   expanded: Boolean
   hasUnreadPinnedEntry: Boolean
   id: ID!
+  posted: Boolean!
   preferredLanguage: PreferredLanguageType
   read: Boolean!
   showPinnedEntries: Boolean
