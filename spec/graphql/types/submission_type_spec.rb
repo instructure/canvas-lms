@@ -1650,6 +1650,36 @@ describe Types::SubmissionType do
         @moderated_assignment.provisional_grades.where(scorer: @teacher1).map { |x| x.id.to_s }
       )
     end
+
+    describe "provisional grading fields" do
+      it "returns true for hasProvisionalGradeByCurrentUser when user has provided a provisional grade with non-null score" do
+        submission_type = GraphQLTypeTester.new(@moderated_submission, current_user: @teacher1)
+        expect(submission_type.resolve("hasProvisionalGradeByCurrentUser")).to be true
+      end
+
+      it "returns false for hasProvisionalGradeByCurrentUser when user has not provided a provisional grade" do
+        submission_type = GraphQLTypeTester.new(@moderated_submission, current_user: @moderator)
+        expect(submission_type.resolve("hasProvisionalGradeByCurrentUser")).to be false
+      end
+
+      it "returns false for hasProvisionalGradeByCurrentUser when provisional grade has null score" do
+        @moderated_submission.provisional_grades.destroy_all
+        @moderated_submission.provisional_grades.create!(scorer: @teacher1, score: nil)
+        submission_type = GraphQLTypeTester.new(@moderated_submission, current_user: @teacher1)
+        expect(submission_type.resolve("hasProvisionalGradeByCurrentUser")).to be false
+      end
+
+      it "returns false for hasProvisionalGradeByCurrentUser on non-moderated assignments" do
+        submission_type = GraphQLTypeTester.new(@submission, current_user: @teacher1)
+        expect(submission_type.resolve("hasProvisionalGradeByCurrentUser")).to be false
+      end
+
+      it "returns false for hasProvisionalGradeByCurrentUser after grades are published" do
+        @moderated_assignment.update!(grades_published_at: Time.zone.now)
+        submission_type = GraphQLTypeTester.new(@moderated_submission, current_user: @teacher1)
+        expect(submission_type.resolve("hasProvisionalGradeByCurrentUser")).to be false
+      end
+    end
   end
 
   describe "hasOriginalityReport" do

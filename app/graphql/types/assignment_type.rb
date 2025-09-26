@@ -610,6 +610,16 @@ module Types
       assignment.moderated_grading?
     end
 
+    field :allow_provisional_grading, Types::AllowProvisionalGradingType, null: false, description: "Whether the current user can provide a provisional grade for this assignment"
+    def allow_provisional_grading
+      return "not_applicable" unless assignment.moderated_grading?
+      # Once grades are published, moderation is over - treat as normal assignment
+      return "not_applicable" if assignment.grades_published_at.present?
+
+      can_grade = assignment.can_be_moderated_grader?(current_user)
+      can_grade ? "allowed" : "not_allowed"
+    end
+
     field :post_manually, Boolean, null: true
     def post_manually
       Loaders::AssignmentLoaders::PostManuallyLoader.load(object.id)

@@ -36,5 +36,27 @@ module Loaders
         end
       end
     end
+
+    class HasProvisionalGradeByCurrentUserLoader < GraphQL::Batch::Loader
+      def initialize(current_user_id)
+        super()
+        @current_user_id = current_user_id
+      end
+
+      def perform(submission_ids)
+        return if submission_ids.empty? || @current_user_id.nil?
+
+        provisional_grades = ModeratedGrading::ProvisionalGrade
+                             .where(submission_id: submission_ids, scorer_id: @current_user_id)
+                             .where.not(score: nil)
+                             .distinct
+                             .pluck(:submission_id)
+                             .to_set
+
+        submission_ids.each do |submission_id|
+          fulfill(submission_id, provisional_grades.include?(submission_id))
+        end
+      end
+    end
   end
 end
