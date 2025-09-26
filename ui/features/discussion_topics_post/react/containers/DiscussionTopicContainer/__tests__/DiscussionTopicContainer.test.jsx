@@ -631,6 +631,62 @@ describe('DiscussionTopicContainer', () => {
       expect(queryByText('eer review for Morty Smith Due: Mar 31, 2021 5:59am')).toBeNull()
     })
 
+    it('passes disabled=true to PeerReview when user has not posted', () => {
+      const {container} = setup({
+        discussionTopic: Discussion.mock({
+          participant: {posted: false},
+          assignment: {
+            assessmentRequestsForCurrentUser: [
+              {
+                _id: 'assessment1',
+                user: {
+                  _id: 'user1',
+                  displayName: 'Test User',
+                },
+                workflowState: 'assigned',
+              },
+            ],
+          },
+        }),
+      })
+
+      const peerReviewElements = container.querySelectorAll('.discussions-peer-review')
+      expect(peerReviewElements.length).toBeGreaterThan(0)
+
+      const links = container.querySelectorAll(
+        'a[aria-disabled="true"], button[disabled], [data-interaction="disabled"]',
+      )
+      expect(links.length).toBeGreaterThan(0)
+    })
+
+    it('passes disabled=false to PeerReview when user has posted', () => {
+      const {container} = setup({
+        discussionTopic: Discussion.mock({
+          participant: {posted: true},
+          assignment: {
+            assessmentRequestsForCurrentUser: [
+              {
+                _id: 'assessment1',
+                user: {
+                  _id: 'user1',
+                  displayName: 'Test User',
+                },
+                workflowState: 'assigned',
+              },
+            ],
+          },
+        }),
+      })
+
+      const peerReviewElements = container.querySelectorAll('.discussions-peer-review')
+      expect(peerReviewElements.length).toBeGreaterThan(0)
+
+      const enabledLinks = container.querySelectorAll(
+        '.discussions-peer-review a:not([aria-disabled="true"]):not([disabled])',
+      )
+      expect(enabledLinks.length).toBeGreaterThan(0)
+    })
+
     describe('PodcastFeed Button', () => {
       afterEach(() => {
         // Clean up any podcast feed links added to document head

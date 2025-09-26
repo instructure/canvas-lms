@@ -39,6 +39,7 @@ describe Types::DiscussionParticipantType do
       showPinnedEntries
       discussionTopic
       preferredLanguage
+      posted
     ]
     expect(Types::DiscussionParticipantType.fields.keys).to match_array(expected_fields)
   end
@@ -52,6 +53,17 @@ describe Types::DiscussionParticipantType do
     it "returns true when workflow_state is read" do
       @participant.update!(workflow_state: "read")
       expect(@participant.workflow_state == "read").to be true
+    end
+  end
+
+  describe "posted" do
+    it "returns false when the participant has not posted" do
+      expect(@participant.posted?).to be false
+    end
+
+    it "returns true when the participant has posted" do
+      @discussion.discussion_entries.create!(user: @teacher, message: "A post")
+      expect(@participant.posted?).to be true
     end
   end
 

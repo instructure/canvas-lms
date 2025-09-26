@@ -37,6 +37,10 @@ class DiscussionTopicParticipant < ActiveRecord::Base
     state :read
   end
 
+  def posted?
+    discussion_topic.discussion_entries.top_level_for_user(user).exists?
+  end
+
   private
 
   # Internal: Ensure unread count never drops below 0.
