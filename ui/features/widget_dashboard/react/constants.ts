@@ -102,7 +102,11 @@ export const QUERY_CONFIG = {
 } as const
 
 // Query keys
-export const ANNOUNCEMENTS_PAGINATED = 'announcements-paginated'
+export const ANNOUNCEMENTS_PAGINATED_KEY = 'announcementsPaginated'
+export const DASHBOARD_NOTIFICATIONS_KEY = 'dashboardNotifications'
+export const COURSE_WORK_KEY = 'courseWork'
+export const COURSE_STATISTICS_KEY = 'courseStatistics'
+export const COURSE_INSTRUCTORS_PAGINATED_KEY = 'courseInstructorsPaginated'
 
 // URL patterns
 export const URL_PATTERNS = {
