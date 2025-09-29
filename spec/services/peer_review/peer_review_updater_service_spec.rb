@@ -175,6 +175,15 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
 
         expect(result.title).to eq("Parent Assignment Peer Review")
       end
+
+      it "updates group_category_id when parent assignment group_category_id changes" do
+        group_category = course.group_categories.create!(name: "Test Group Category")
+        parent_assignment.update!(group_category_id: group_category.id)
+
+        result = service.call
+
+        expect(result.group_category_id).to eq(group_category.id)
+      end
     end
 
     context "with partial updates" do

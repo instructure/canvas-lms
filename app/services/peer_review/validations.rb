@@ -124,4 +124,14 @@ module PeerReview::Validations
       raise PeerReview::SetTypeNotSupportedError, I18n.t("Set type '%{set_type}' is not supported. Supported types are: %{supported_types}", set_type:, supported_types:)
     end
   end
+
+  def validate_group_assignment_required(assignment)
+    unless assignment.group_category_id
+      raise PeerReview::GroupAssignmentRequiredError, I18n.t("Must be a group assignment to create group overrides")
+    end
+  end
+
+  def validate_group_exists(group)
+    raise PeerReview::GroupNotFoundError, I18n.t("Group does not exist") unless group.present?
+  end
 end

@@ -758,6 +758,87 @@ RSpec.describe PeerReview::Validations do
     end
   end
 
+  describe "#validate_group_assignment_required" do
+    context "when parent assignment has group_category_id" do
+      let(:group_category) { course.group_categories.create!(name: "Project Groups") }
+      let(:group_assignment) do
+        assignment_model(
+          course:,
+          title: "Group Assignment",
+          group_category:
+        )
+      end
+      let(:peer_review_sub_assignment_for_group_assignment) do
+        peer_review_model(parent_assignment: group_assignment)
+      end
+
+      it "does not raise an error" do
+        expect { service.validate_group_assignment_required(peer_review_sub_assignment_for_group_assignment) }.not_to raise_error
+      end
+
+      it "does not raise an error when group_category_id is set" do
+        peer_review_sub_assignment_for_group_assignment.group_category_id = group_category.id
+        expect { service.validate_group_assignment_required(peer_review_sub_assignment_for_group_assignment) }.not_to raise_error
+      end
+    end
+
+    context "when parent assignment does not have group_category_id" do
+      let(:non_group_assignment) { assignment_model(course:, title: "Non-group Assignment") }
+      let(:peer_review_sub_assignment_for_non_group_assignment) do
+        peer_review_model(parent_assignment: non_group_assignment)
+      end
+
+      it "raises GroupAssignmentRequiredError" do
+        expect { service.validate_group_assignment_required(peer_review_sub_assignment_for_non_group_assignment) }.to raise_error(
+          PeerReview::GroupAssignmentRequiredError,
+          "Must be a group assignment to create group overrides"
+        )
+      end
+
+      it "raises GroupAssignmentRequiredError when group_category_id is explicitly nil" do
+        peer_review_sub_assignment_for_non_group_assignment.group_category_id = nil
+        expect { service.validate_group_assignment_required(peer_review_sub_assignment_for_non_group_assignment) }.to raise_error(
+          PeerReview::GroupAssignmentRequiredError,
+          "Must be a group assignment to create group overrides"
+        )
+      end
+    end
+
+    it "uses I18n.t for error message" do
+      non_group_assignment = assignment_model(course:, title: "Non-group Assignment")
+      peer_review_sub_assignment_for_non_group_assignment = peer_review_model(parent_assignment: non_group_assignment)
+      expect(I18n).to receive(:t).with("Must be a group assignment to create group overrides").and_call_original
+
+      expect { service.validate_group_assignment_required(peer_review_sub_assignment_for_non_group_assignment) }.to raise_error(
+        PeerReview::GroupAssignmentRequiredError
+      )
+    end
+  end
+
+  describe "#validate_group_exists" do
+    let(:group_category) { course.group_categories.create!(name: "Project Groups") }
+    let(:group) { group_category.groups.create!(context: course, name: "Group 1") }
+
+    it "does not raise an error when group is present" do
+      expect { service.validate_group_exists(group) }.not_to raise_error
+    end
+
+    it "raises an error when group is nil" do
+      expect { service.validate_group_exists(nil) }.to raise_error(
+        PeerReview::GroupNotFoundError,
+        "Group does not exist"
+      )
+    end
+
+    it "uses I18n.t for error message" do
+      expect(I18n).to receive(:t).with("Group does not exist").and_call_original
+
+      expect { service.validate_group_exists(nil) }.to raise_error(
+        PeerReview::GroupNotFoundError
+      )
+    end
+  end
+
   describe "integration with module inclusion" do
     it "includes the validation methods in the service class" do
       expect(service).to respond_to(:validate_parent_assignment)
@@ -772,6 +853,8 @@ RSpec.describe PeerReview::Validations do
       expect(service).to respond_to(:validate_set_id_required)
       expect(service).to respond_to(:validate_section_exists)
       expect(service).to respond_to(:validate_student_ids_required)
+      expect(service).to respond_to(:validate_group_assignment_required)
+      expect(service).to respond_to(:validate_group_exists)
     end
 
     it "properly accesses instance variables set in the including class" do
