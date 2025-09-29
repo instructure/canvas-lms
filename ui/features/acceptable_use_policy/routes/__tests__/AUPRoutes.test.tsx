@@ -17,18 +17,12 @@
  */
 
 import React from 'react'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {AUPLayout} from '../../layouts/AUPLayout'
 import {AUPRoutes} from '../AUPRoutes'
 import {MemoryRouter, Route, Routes} from 'react-router-dom'
-import {render, screen, waitFor} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
 
 jest.mock('@canvas/do-fetch-api-effect')
-
-// Mock API response with the structure expected by useAUPContent hook
-const mockApiResponse = {
-  content: '<p>Test Acceptable Use Policy Content</p>',
-}
 
 describe('AUPRoutes', () => {
   beforeEach(() => {
@@ -41,38 +35,6 @@ describe('AUPRoutes', () => {
         <Routes>{AUPRoutes}</Routes>
       </MemoryRouter>,
     )
-  })
-
-  // Skip this test as it's flaky - the content doesn't consistently render within the timeout period
-  // TODO: Revisit this test to make it more reliable
-  it.skip('renders the AcceptableUsePolicy component within AUPLayout', async () => {
-    // Mock the API response with the correct structure
-    ;(doFetchApi as jest.Mock).mockResolvedValueOnce({
-      json: mockApiResponse,
-      response: {ok: true},
-    })
-
-    render(
-      <MemoryRouter initialEntries={['/acceptable_use_policy']}>
-        <Routes>{AUPRoutes}</Routes>
-      </MemoryRouter>,
-    )
-
-    // Verify loading state is shown initially
-    expect(screen.getByTitle('Loading page')).toBeInTheDocument()
-
-    // Wait for content to be rendered with a longer timeout
-    await waitFor(
-      () => {
-        const renderedContent = screen.getByTestId('aup-content')
-        expect(renderedContent).not.toBeNull()
-        expect(renderedContent?.innerHTML).toContain('Test Acceptable Use Policy Content')
-      },
-      {timeout: 3000}, // Increase timeout to 3 seconds
-    )
-
-    // Verify loading state is removed
-    expect(screen.queryByTitle('Loading page')).not.toBeInTheDocument()
   })
 
   it('renders the AUPLayout component', () => {

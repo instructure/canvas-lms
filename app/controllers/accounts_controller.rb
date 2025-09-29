@@ -1471,17 +1471,21 @@ class AccountsController < ApplicationController
 
   def acceptable_use_policy
     TermsOfService.ensure_terms_for_account(@domain_root_account)
-    if request.format.html?
-      # disable navigation_header JavaScript bundle (in _head.html.erb) to
-      # prevent console errors caused by missing DOM elements in this bare layout
-      @headers = false
-      # disable custom js/css
-      @exclude_account_css = @exclude_account_js = true
-    end
+    external_url = TermsOfService.external_url(@domain_root_account)
     respond_to do |format|
-      format.html { render html: "", layout: "bare" }
+      format.html do
+        if external_url
+          redirect_to external_url, allow_other_host: true, status: :found # HTTP 302
+        else
+          # disable navigation_header JavaScript bundle (in _head.html.erb) to
+          # prevent console errors caused by missing DOM elements in this bare layout
+          @headers = false
+          # disable custom js/css
+          @exclude_account_css = @exclude_account_js = true
+          render html: "", layout: "bare"
+        end
+      end
       format.json do
-        external_url = TermsOfService.external_url(@domain_root_account)
         if external_url
           render json: { redirectUrl: external_url }, status: :ok
         else
