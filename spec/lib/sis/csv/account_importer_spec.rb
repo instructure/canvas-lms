@@ -19,7 +19,7 @@
 #
 
 describe SIS::CSV::AccountImporter do
-  before { account_model }
+  before(:once) { account_model }
 
   it "skips bad content" do
     before_count = Account.where.not(sis_source_id: nil).count
@@ -262,5 +262,31 @@ describe SIS::CSV::AccountImporter do
     expect(@account.all_accounts.find_by(sis_source_id: "A2").workflow_state).to eq "deleted"
     batch2.restore_states_for_batch
     expect(@account.all_accounts.find_by(sis_source_id: "A2").workflow_state).to eq "active"
+  end
+
+  it "sets integration IDs" do
+    process_csv_data_cleanly(
+      "account_id,parent_account_id,name,status,integration_id",
+      "A001,,Humanities,active,AINT-001"
+    )
+
+    account = @account.sub_accounts.find_by(sis_source_id: "A001")
+    expect(account.integration_id).to eq "AINT-001"
+  end
+
+  it "doesn't remove integration IDs when not specified" do
+    account = @account.sub_accounts.create!(root_account: @account,
+                                            sis_source_id: "A1001",
+                                            integration_id: "AINT-1001",
+                                            name: "Humanities")
+    account.stuck_sis_fields = Set.new
+    account.save!
+
+    process_csv_data_cleanly(
+      "account_id,parent_account_id,name,status",
+      "A1001,,Vulcanities,active"
+    )
+    expect(account.reload.integration_id).to eq "AINT-1001"
+    expect(account.name).to eq "Vulcanities"
   end
 end

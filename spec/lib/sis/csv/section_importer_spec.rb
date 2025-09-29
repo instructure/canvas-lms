@@ -19,7 +19,7 @@
 #
 
 describe SIS::CSV::SectionImporter do
-  before { account_model }
+  before(:once) { account_model }
 
   it "skips bad content" do
     before_count = CourseSection.count
@@ -884,5 +884,27 @@ describe SIS::CSV::SectionImporter do
       expect(Course.where(sis_source_id: "X001").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: "A001").first.id, @account.id].sort
       expect(CourseSection.where(sis_source_id: "S001").first.course_account_associations.map(&:account_id).sort).to eq [@account.id, Account.where(sis_source_id: "A001").first.id, Account.where(sis_source_id: "A002").first.id].sort
     end
+  end
+
+  it "sets integration IDs" do
+    course = @account.courses.create! sis_source_id: "C001"
+
+    process_csv_data_cleanly(
+      "section_id,course_id,name,start_date,end_date,status,integration_id",
+      "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active,SINT-001"
+    )
+    section = course.course_sections.where(sis_source_id: "S001").first
+    expect(section.integration_id).to eq "SINT-001"
+  end
+
+  it "doesn't remove integration IDs when not specified" do
+    course = @account.courses.create! sis_source_id: "C001"
+    section = course.course_sections.create! sis_source_id: "S001", integration_id: "SINT-001"
+    process_csv_data_cleanly(
+      "section_id,course_id,name,start_date,end_date,status",
+      "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
+    )
+    expect(section.reload.integration_id).to eq "SINT-001"
+    expect(section.start_at).not_to be_nil
   end
 end

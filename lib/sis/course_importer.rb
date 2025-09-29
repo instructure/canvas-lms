@@ -113,7 +113,7 @@ module SIS
             course.friendly_name = friendly_name
           end
 
-          course.integration_id = integration_id
+          course.integration_id = integration_id if integration_id.present?
           course.sis_source_id = course_id
           active_state = status.casecmp?("published") ? "available" : "claimed"
           unless course.stuck_sis_fields.include?(:workflow_state)
