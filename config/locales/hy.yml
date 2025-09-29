@@ -8769,6 +8769,7 @@ hy:
   items_selected_have_different_usage_rights_52b325cc: "Ընտրված տարրերը օգտագործման տարբեր իրավունքներ ունեն:"
   j_5226008a: j
   javascript_24e6a9d3: JavaScript
+  job_handler_9d3d1007: "Հանձնարարության մշակող"
   jobs: 
     columns: 
       attempt: Փորձ
@@ -16077,6 +16078,7 @@ hy:
   show_concluded_enrollments_6a05544c: "Ցույց տալ ավարտված գրանցումները"
   show_correct_answers_at_a5475aa3: "Ցույց տալ ճիշտ պատասխանները"
   show_current_grade_5bf4e0d9: "Ցույց տալ ընթացիկ գնահատականը"
+  show_d6f24222: "ցույց տալ"
   show_final_grade_a95e14dc: "Ցույց տալ վերջնական գնահատականը"
   show_less_f778dab5: "Ավելի քիչ ցուցադրել "
   show_links_to_unpublished_content_30c0450d: "Ցույց տալ չհրապարակված բովանդակության հղումները"
