@@ -1298,7 +1298,7 @@ class AbstractAssignment < ActiveRecord::Base
       quiz.saved_by = :assignment
       quiz.workflow_state = published? ? "available" : "unpublished"
       quiz.save if quiz.changed?
-    elsif self.submission_types == "discussion_topic" && @saved_by != :discussion_topic
+    elsif self.submission_types == "discussion_topic" && !%i[discussion_topic sub_assignment].include?(@saved_by)
       topic = discussion_topic || context.discussion_topics.build(user: @updating_user)
       topic.message = description
       save_submittable(topic)

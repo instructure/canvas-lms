@@ -132,12 +132,19 @@ class SubAssignment < AbstractAssignment
     # in such case we want to wait until both checkpoints are updated before syncing with the parent assignment to avoid date validation errors
     return if %i[parent_assignment discussion_topic transaction].include?(saved_by)
 
+    # Don't sync newly created sub_assignments - DiscussionCheckpointCreatorService handles initial sync
+    return if just_created?
+
     changed_attributes = previous_changes.slice(*SUB_ASSIGNMENT_SYNC_ATTRIBUTES)
-    parent_assignment.update_from_sub_assignment(changed_attributes)
+    parent_assignment.update_from_sub_assignment(changed_attributes) if changed_attributes.present?
   end
 
   def should_sync_with_parent?
     sync_attributes_changed? && saved_by != :parent_assignment
+  end
+
+  def just_created?
+    previous_changes.key?("id")
   end
 
   def sync_attributes_changed?
