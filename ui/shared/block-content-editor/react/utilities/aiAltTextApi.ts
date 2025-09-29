@@ -19,11 +19,7 @@
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 export interface AiAltTextRequest {
-  image: {
-    base64_source: string
-    type: 'Base64'
-  }
-  lang?: string
+  attachment_id: string | number
 }
 
 export interface AiAltTextResponse {

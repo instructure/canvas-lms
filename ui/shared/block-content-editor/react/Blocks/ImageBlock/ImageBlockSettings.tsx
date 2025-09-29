@@ -43,6 +43,7 @@ export const ImageBlockSettings = () => {
     decorativeImage,
     url,
     fileName,
+    attachmentId,
   } = useNode(node => ({
     ...defaultProps,
     ...node.data.props,
@@ -96,6 +97,7 @@ export const ImageBlockSettings = () => {
       props.altText = imageData.altText
       props.fileName = imageData.fileName
       props.decorativeImage = imageData.decorativeImage
+      props.attachmentId = imageData.attachmentId
     })
   }
 
@@ -151,8 +153,8 @@ export const ImageBlockSettings = () => {
             disabled={!url}
             altTextAsCaption={altTextAsCaption}
             decorativeImage={decorativeImage}
-            imageUrl={url}
             fileName={fileName}
+            attachmentId={attachmentId}
             onCaptionChange={handleCaptionChange}
             onAltTextChange={handleAltTextChange}
             onAltTextAsCaptionChange={handleAltTextAsCaptionChange}
