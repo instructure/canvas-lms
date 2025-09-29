@@ -16,23 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useCallback, useState} from 'react'
+import {useCallback} from 'react'
+import {useAppSelector, useAppSetStore} from '../store'
 
 export type EditorMode = 'default' | 'preview'
 
 export const useEditorMode = () => {
-  const [mode, setMode] = useState<EditorMode>('default')
+  const mode = useAppSelector(state => state.editor.mode)
+  const set = useAppSetStore()
 
-  // Defer mode changes to next event loop cycle to prevent interference
-  // with save operations when blocks are transitioning out of edit mode
-  const setModeWrapper = useCallback((mode: EditorMode) => {
+  const setMode = useCallback((mode: EditorMode) => {
+    // Defer mode changes to next event loop cycle to prevent interference
+    // with save operations when blocks are transitioning out of edit mode
     window.setTimeout(() => {
-      setMode(mode)
+      set(state => {
+        state.editor.mode = mode
+      })
     }, 0)
   }, [])
 
   return {
     mode,
-    setMode: setModeWrapper,
+    setMode,
   }
 }

@@ -16,36 +16,36 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useState} from 'react'
 import type {AccessibilityIssue, AccessibilityIssuesMap} from '../accessibilityChecker/types'
+import {useAppSetStore} from '../store'
+
+const sumIssues = (issues: AccessibilityIssuesMap) => {
+  // Only explicit iteration is supported by immer's Draft type
+  let sum = 0
+  for (const issueList of issues.values()) {
+    sum += issueList.length
+  }
+  return sum
+}
 
 export const useAccessibilityChecker = () => {
-  const [a11yIssues, setA11yIssues] = useState<AccessibilityIssuesMap>(new Map())
+  const set = useAppSetStore()
 
   const addA11yIssues = (editorId: string, issues: AccessibilityIssue[]) => {
-    setA11yIssues(prev => {
-      const newMap = new Map(prev)
-      newMap.set(editorId, issues)
-      return newMap
+    set(state => {
+      state.accessibility.a11yIssues.set(editorId, issues)
+      state.accessibility.a11yIssueCount = sumIssues(state.accessibility.a11yIssues)
     })
   }
 
   const removeA11yIssues = (editorId: string) => {
-    setA11yIssues(prev => {
-      const newMap = new Map(prev)
-      newMap.delete(editorId)
-      return newMap
+    set(state => {
+      state.accessibility.a11yIssues.delete(editorId)
+      state.accessibility.a11yIssueCount = sumIssues(state.accessibility.a11yIssues)
     })
   }
 
-  const a11yIssueCount = Array.from(a11yIssues.values()).reduce(
-    (total, issues) => total + issues.length,
-    0,
-  )
-
   return {
-    a11yIssueCount,
-    a11yIssues,
     addA11yIssues,
     removeA11yIssues,
   }

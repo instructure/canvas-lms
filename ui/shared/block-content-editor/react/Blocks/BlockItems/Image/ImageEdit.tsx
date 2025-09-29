@@ -25,10 +25,10 @@ import {IconButton} from '@instructure/ui-buttons'
 import {IconEditLine, IconProgressLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
-import {useBlockContentEditorContext} from '../../../BlockContentEditorContext'
 import {useNode} from '@craftjs/core'
 import {ImageCaption} from './ImageCaption'
 import {View} from '@instructure/ui-view'
+import {useSettingsTray} from '../../../hooks/useSettingsTray'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -43,7 +43,7 @@ export const ImageEdit = ({
   focusHandler,
 }: ImageEditProps) => {
   const [isOpen, setIsOpen] = useState(false)
-  const {settingsTray} = useBlockContentEditorContext()
+  const {open} = useSettingsTray()
   const {id} = useNode()
 
   const closeModal = () => setIsOpen(false)
@@ -94,7 +94,7 @@ export const ImageEdit = ({
             <IconButton
               data-testid="edit-block-image"
               screenReaderLabel={I18n.t('Edit block')}
-              onClick={() => settingsTray.open(id)}
+              onClick={() => open(id)}
               size="small"
             >
               <IconEditLine fontSize="small" />

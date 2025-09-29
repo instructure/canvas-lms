@@ -16,16 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useNode} from '@craftjs/core'
-import {useBlockContentEditorContext} from '../BlockContentEditorContext'
+import {useAppSelector} from '../store'
+import {Mask} from './Mask'
 
-export const useOpenSettingsTray = () => {
-  const {id} = useNode()
-  const {settingsTray} = useBlockContentEditorContext()
-
-  const openSettingsTray = () => {
-    settingsTray.open(id)
-  }
-
-  return {openSettingsTray}
+export const SettingsTrayMaskRenderer = () => {
+  const isSettingsTrayOpen = useAppSelector(state => state.settingsTray.isOpen)
+  return isSettingsTrayOpen ? <Mask /> : null
 }

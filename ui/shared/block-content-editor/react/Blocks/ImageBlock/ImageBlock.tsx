@@ -19,7 +19,7 @@
 import {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {BaseBlock} from '../BaseBlock'
-import {useSave} from '../BaseBlock/useSave'
+import {useSave} from '../../hooks/useSave'
 import {ImageBlockSettings} from './ImageBlockSettings'
 import {ImageEdit, ImageView} from '../BlockItems/Image'
 import {ImageBlockProps} from './types'

@@ -19,8 +19,6 @@
 import {PropsWithChildren} from 'react'
 import {useNode} from '@craftjs/core'
 import {AddButton} from '../../../AddBlock/AddButton'
-import {useBlockContentEditorContext} from '../../../BlockContentEditorContext'
-import {useOpenSettingsTray} from '../../../hooks/useOpenSettingsTray'
 import {useDeleteNode} from '../../../hooks/useDeleteNode'
 import {useDuplicateNode} from '../../../hooks/useDuplicateNode'
 import {useMoveBlock} from '../../../hooks/useMoveBlock'
@@ -34,12 +32,15 @@ import {BackgroundColorApplier} from './BackgroundColorApplier'
 import {Flex} from '@instructure/ui-flex'
 import {A11yDoneEditingButton} from './A11yDoneEditingButton'
 import {A11yEditButton} from './A11yEditButton'
-import {useInstUIRef} from '../useInstUIRef'
+import {useInstUIRef} from '../../../hooks/useInstUIRef'
+import {useAddBlockModal} from '../../../hooks/useAddBlockModal'
+import {useSettingsTray} from '../../../hooks/useSettingsTray'
+import {useEditingBlock} from '../../../hooks/useEditingBlock'
 
 const InsertButton = () => {
-  const {addBlockModal} = useBlockContentEditorContext()
   const {id} = useNode()
-  return <AddButton onClicked={() => addBlockModal.open(id)} />
+  const {open} = useAddBlockModal()
+  return <AddButton onClicked={() => open(id)} />
 }
 
 const DeleteButton = ({title}: {title: string}) => {
@@ -53,9 +54,9 @@ const DuplicateButton = ({title}: {title: string}) => {
 }
 
 const EditSettingsButton = ({title}: {title: string}) => {
-  const {openSettingsTray} = useOpenSettingsTray()
-
-  return <SettingsButton onClicked={openSettingsTray} title={title} />
+  const {id} = useNode()
+  const {open} = useSettingsTray()
+  return <SettingsButton onClicked={() => open(id)} title={title} />
 }
 
 const MoveBlockButton = ({title}: {title: string}) => {
@@ -85,8 +86,8 @@ export const BaseBlockEditWrapper = (
     customTitle: node.data.props?.title,
     includeBlockTitle: node.data.props?.includeBlockTitle,
   }))
-  const {editingBlock} = useBlockContentEditorContext()
-  const {isEditingBlock, isEditedViaEditButton, setIsEditedViaEditButton} = useIsEditingBlock()
+  const {setId} = useEditingBlock()
+  const {isEditing, isEditingViaEditButton: isEditingByKeyboard} = useIsEditingBlock()
   const [editButtonRef, setEditButtonRef] = useInstUIRef<HTMLButtonElement>()
 
   const blockTitle =
@@ -95,14 +96,12 @@ export const BaseBlockEditWrapper = (
       : props.title
 
   const handleSave = () => {
-    editingBlock.setId(null)
-    setIsEditedViaEditButton(false)
+    setId(null)
     setTimeout(() => editButtonRef?.current?.focus(), 0)
   }
 
-  const handleEdit = () => {
-    setIsEditedViaEditButton(true)
-    editingBlock.setId(id)
+  const handleEditByKeyboard = () => {
+    setId(id, true)
   }
 
   return (
@@ -112,11 +111,8 @@ export const BaseBlockEditWrapper = (
         title={props.title}
         addButton={<InsertButton />}
         bottomA11yActionMenu={
-          isEditingBlock && (
-            <A11yDoneEditingButton
-              onUserAction={handleSave}
-              isFullyVisible={isEditedViaEditButton}
-            />
+          isEditing && (
+            <A11yDoneEditingButton onUserAction={handleSave} isFullyVisible={isEditingByKeyboard} />
           )
         }
         menu={
@@ -128,8 +124,8 @@ export const BaseBlockEditWrapper = (
           </Flex>
         }
         topA11yActionMenu={
-          !isEditingBlock ? (
-            <A11yEditButton onUserAction={handleEdit} elementRef={setEditButtonRef} />
+          !isEditing ? (
+            <A11yEditButton onUserAction={handleEditByKeyboard} elementRef={setEditButtonRef} />
           ) : (
             <A11yDoneEditingButton onUserAction={handleSave} isFullyVisible={false} />
           )

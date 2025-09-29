@@ -26,9 +26,9 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {Text} from '@instructure/ui-text'
 import {ChangeEvent} from 'react'
 import {SettingsImageProps} from './types'
-import {useBlockContentEditorContext} from '../../../BlockContentEditorContext'
 import {useGenerateAiAltText} from '../../../hooks/useGenerateAiAltText'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {useAppSelector} from '../../../store'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -45,8 +45,7 @@ export const SettingsImageInfos = ({
   onAltTextAsCaptionChange,
   onDecorativeImageChange,
 }: SettingsImageProps) => {
-  const {aiAltTextGenerationURL} = useBlockContentEditorContext()
-
+  const aiAltTextGenerationURL = useAppSelector(state => state.aiAltTextGenerationURL)
   const generateAltTextMutation = useGenerateAiAltText({
     url: aiAltTextGenerationURL,
   })

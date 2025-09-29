@@ -16,14 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React, {ReactElement, useEffect, useState} from 'react'
 import {useEditor} from '@craftjs/core'
 import {SettingsTray} from './SettingsTray'
-import {useBlockContentEditorContext} from '../BlockContentEditorContext'
-import React, {ReactElement, useEffect, useState} from 'react'
+import {useSettingsTray} from '../hooks/useSettingsTray'
+import {useAppSelector} from '../store'
 
 export const SettingsTrayRenderer = () => {
   const {query} = useEditor()
-  const {settingsTray} = useBlockContentEditorContext()
+  const {isOpen, blockId} = useAppSelector(state => ({...state.settingsTray}))
+  const {close} = useSettingsTray()
 
   const [currentSettings, setCurrentSettings] = useState<{
     blockDisplayName: string
@@ -34,8 +36,8 @@ export const SettingsTrayRenderer = () => {
   })
 
   useEffect(() => {
-    if (settingsTray.isOpen && settingsTray.blockId) {
-      const node = query.node(settingsTray.blockId).get()
+    if (isOpen && blockId) {
+      const node = query.node(blockId).get()
       const blockDisplayName = node.data.displayName
 
       setCurrentSettings({
@@ -43,11 +45,9 @@ export const SettingsTrayRenderer = () => {
         settings: React.createElement(node.related.settings),
       })
     }
-  }, [settingsTray.isOpen, settingsTray.isOpen && settingsTray.blockId, query])
+  }, [isOpen, blockId, query])
 
-  const onDismiss = () => {
-    settingsTray.close()
-  }
+  const onDismiss = () => close()
 
   const onClose = () => {
     setCurrentSettings({
@@ -59,7 +59,7 @@ export const SettingsTrayRenderer = () => {
   return (
     <SettingsTray
       blockDisplayName={currentSettings.blockDisplayName}
-      open={settingsTray.isOpen}
+      open={isOpen}
       onDismiss={onDismiss}
       onClose={onClose}
     >

@@ -29,17 +29,24 @@ const mockMoveDown = jest.fn()
 const mockMoveToTop = jest.fn()
 const mockMoveToBottom = jest.fn()
 const mockUseMoveBlock = jest.fn()
-const mockEditingBlockSetId = jest.fn()
 const mockUseIsEditingBlock = jest.fn()
-const mockSetIsEditedViaEditButton = jest.fn()
 
-jest.mock('../../../../BlockContentEditorContext', () => ({
-  useBlockContentEditorContext: () => ({
-    addBlockModal: {open: mockAddBlockModalOpen},
-    settingsTray: {open: mockSettingsTrayOpen},
-    editingBlock: {setId: mockEditingBlockSetId},
-    initialAddBlockHandler: jest.fn(),
-    editor: jest.fn(),
+jest.mock('../../../../store', () => ({
+  ...jest.requireActual('../../../../store'),
+  useAppSetStore: jest.fn().mockReturnValue(jest.fn()),
+}))
+
+jest.mock('../../../../hooks/useAddBlockModal', () => ({
+  useAddBlockModal: () => ({
+    open: mockAddBlockModalOpen,
+    close: jest.fn(),
+  }),
+}))
+
+jest.mock('../../../../hooks/useSettingsTray', () => ({
+  useSettingsTray: () => ({
+    open: mockSettingsTrayOpen,
+    close: jest.fn(),
   }),
 }))
 
@@ -48,12 +55,14 @@ jest.mock('../../../../hooks/useIsEditingBlock', () => ({
 }))
 
 const getUseIsEditingBlockMock = ({
-  isEditingBlock,
-  isEditedViaEditButton,
-}: {isEditingBlock: boolean; isEditedViaEditButton: boolean}) => ({
-  isEditingBlock,
-  isEditedViaEditButton,
-  setIsEditedViaEditButton: mockSetIsEditedViaEditButton,
+  isEditing,
+  isEditingViaEditButton,
+}: {
+  isEditing: boolean
+  isEditingViaEditButton: boolean
+}) => ({
+  isEditing,
+  isEditingViaEditButton,
 })
 
 jest.mock('../../../../hooks/useDeleteNode', () => ({
@@ -71,7 +80,10 @@ jest.mock('../../../../hooks/useMoveBlock', () => ({
 const getMoveBlockMock = ({
   canMoveUp,
   canMoveDown,
-}: {canMoveUp: boolean; canMoveDown: boolean}) => ({
+}: {
+  canMoveUp: boolean
+  canMoveDown: boolean
+}) => ({
   canMoveUp,
   canMoveDown,
   moveUp: mockMoveUp,
@@ -89,7 +101,7 @@ describe('BaseBlockEditWrapper', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockUseIsEditingBlock.mockReturnValue(
-      getUseIsEditingBlockMock({isEditingBlock: false, isEditedViaEditButton: false}),
+      getUseIsEditingBlockMock({isEditing: false, isEditingViaEditButton: false}),
     )
     mockUseMoveBlock.mockReturnValue(
       getMoveBlockMock({

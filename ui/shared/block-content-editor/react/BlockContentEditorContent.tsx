@@ -25,6 +25,7 @@ import {BlockContentEditorProps} from './BlockContentEditor'
 import {useGetSerializedNodes} from './hooks/useGetSerializedNodes'
 import {useEditHistory} from './hooks/useEditHistory'
 import {useEditClickHandler} from './hooks/useEditClickHandler'
+import {SettingsTrayMaskRenderer} from './Mask/SettingsTrayMaskRenderer'
 
 export const BlockContentEditorContent = (props: BlockContentEditorProps) => {
   const {isEdited} = useEditHistory()
@@ -42,6 +43,7 @@ export const BlockContentEditorContent = (props: BlockContentEditorProps) => {
       <Frame data={frameData}>
         <Element canvas is="div" className="content-wrapper"></Element>
       </Frame>
+      <SettingsTrayMaskRenderer />
     </>
   )
 }

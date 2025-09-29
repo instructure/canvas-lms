@@ -17,22 +17,18 @@
  */
 
 import {ReactElement} from 'react'
-import {useBlockContentEditorContext} from '../BlockContentEditorContext'
 import {AddBlockModal} from './AddBlockModal'
 import {useAddNode} from '../hooks/useAddNode'
+import {useAddBlockModal} from '../hooks/useAddBlockModal'
+import {useAppSelector} from '../store'
 
 export const AddBlockModalRenderer = () => {
-  const {addBlockModal} = useBlockContentEditorContext()
+  const {isOpen, insertAfterNodeId} = useAppSelector(state => state.addBlockModal)
+  const {close} = useAddBlockModal()
   const addNode = useAddNode()
   const onAddBlock = (block: ReactElement) => {
-    addNode(block, addBlockModal.insertAfterNodeId)
+    addNode(block, insertAfterNodeId)
   }
 
-  return (
-    <AddBlockModal
-      open={addBlockModal.isOpen}
-      onDismiss={addBlockModal.close}
-      onAddBlock={onAddBlock}
-    />
-  )
+  return <AddBlockModal open={isOpen} onDismiss={close} onAddBlock={onAddBlock} />
 }
