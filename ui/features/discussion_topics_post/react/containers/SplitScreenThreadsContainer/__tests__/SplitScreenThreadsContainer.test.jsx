@@ -26,6 +26,7 @@ import {MockedProvider} from '@apollo/client/testing'
 import {PageInfo} from '../../../../graphql/PageInfo'
 import React from 'react'
 import {updateDiscussionEntryParticipantMock} from '../../../../graphql/Mocks'
+import {ObserverContext} from '../../../utils/ObserverContext'
 
 jest.mock('../../../utils/constants', () => ({
   ...jest.requireActual('../../../utils/constants'),
@@ -96,9 +97,13 @@ describe('SplitScreenThreadsContainer', () => {
   const setup = (props, mocks) => {
     return render(
       <MockedProvider mocks={mocks}>
-        <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
-          <SplitScreenThreadsContainer {...props} />
-        </AlertManagerContext.Provider>
+        <ObserverContext.Provider
+          value={{observerRef: {current: undefined}, nodesRef: {current: new Map()}}}
+        >
+          <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
+            <SplitScreenThreadsContainer {...props} />
+          </AlertManagerContext.Provider>
+        </ObserverContext.Provider>
       </MockedProvider>,
     )
   }

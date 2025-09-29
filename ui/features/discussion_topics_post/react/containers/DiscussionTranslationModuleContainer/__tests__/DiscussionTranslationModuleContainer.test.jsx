@@ -23,6 +23,7 @@ import {DiscussionTranslationModuleContainer} from '../DiscussionTranslationModu
 import {DiscussionManagerUtilityContext} from '../../../utils/constants'
 import {MockedProvider} from '@apollo/client/testing'
 import {useTranslationStore} from '../../../hooks/useTranslationStore'
+import {ObserverContext} from '../../../utils/ObserverContext'
 
 const mockContextValue = {
   setTranslateTargetLanguage: jest.fn(),
@@ -55,11 +56,20 @@ const defaultMocks = []
 const setup = (overrideContextValue = {}) =>
   render(
     <MockedProvider mocks={defaultMocks}>
-      <DiscussionManagerUtilityContext.Provider
-        value={{...mockContextValue, ...overrideContextValue}}
+      <ObserverContext.Provider
+        value={{
+          observerRef: {current: undefined},
+          nodesRef: {current: new Map()},
+          startObserving: jest.fn(),
+          stopObserving: jest.fn(),
+        }}
       >
-        <DiscussionTranslationModuleContainer />
-      </DiscussionManagerUtilityContext.Provider>
+        <DiscussionManagerUtilityContext.Provider
+          value={{...mockContextValue, ...overrideContextValue}}
+        >
+          <DiscussionTranslationModuleContainer />
+        </DiscussionManagerUtilityContext.Provider>
+      </ObserverContext.Provider>
     </MockedProvider>,
   )
 

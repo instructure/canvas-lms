@@ -19,7 +19,7 @@
 import {DiscussionEdit} from '../DiscussionEdit/DiscussionEdit'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
-import React, {useContext, useEffect} from 'react'
+import React, {useContext, useEffect, useCallback, useState} from 'react'
 import {getDisplayName, responsiveQuerySizes} from '../../utils'
 import {SearchContext} from '../../utils/constants'
 import {SearchSpan} from '../SearchSpan/SearchSpan'
@@ -32,11 +32,14 @@ import theme from '@instructure/canvas-theme'
 import {View} from '@instructure/ui-view'
 import {TranslationLoader} from './Translation/TranslationLoader'
 import {Translation} from './Translation/Translation'
+import {useObserverContext} from '../../utils/ObserverContext'
 
 const I18n = createI18nScope('discussion_posts')
 
 export function PostMessage({...props}) {
   const {searchTerm} = useContext(SearchContext)
+  const {observerRef, nodesRef} = useObserverContext()
+  const [node, setNode] = useState(null)
 
   useEffect(() => {
     if (ENV.SEQUENCE !== undefined && props.isTopic) {
@@ -54,6 +57,30 @@ export function PostMessage({...props}) {
   }
 
   const id = props.discussionEntry?.id || 'topic'
+
+  useEffect(() => {
+    const currentObserver = observerRef.current
+    const currentNodesRef = nodesRef?.current
+
+    if (node) {
+      if (currentObserver) {
+        currentObserver.observe(node)
+      }
+
+      currentNodesRef.set(id, node)
+    }
+
+    return () => {
+      if (currentObserver && node) {
+        currentObserver.unobserve(node)
+      }
+      currentNodesRef.delete(id)
+    }
+  }, [node, observerRef, nodesRef, id])
+
+  const ref = useCallback(node => {
+    setNode(node)
+  }, [])
 
   return (
     <Responsive
@@ -81,7 +108,7 @@ export function PostMessage({...props}) {
         },
       }}
       render={responsiveProps => (
-        <View>
+        <View elementRef={ref} data-id={props.isTopic ? 'topic' : props.discussionEntry?.id}>
           {props.title ? (
             <View margin={responsiveProps.titleMargin} display={responsiveProps.titleDisplay}>
               <Heading level="h2" size={responsiveProps.titleTextSize} data-testid="message_title">
