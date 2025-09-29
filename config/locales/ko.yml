@@ -7326,6 +7326,7 @@ ko:
   is_invalid_702840b6: "올바르지 않습니다"
   is_reserved_5f0516e4: 예약되었습니다
   items_items_selected_5b55e566: "%{items}개의 항목 선택됨"
+  job_handler_9d3d1007: "작업 처리기"
   jobs: 
     columns: 
       attempt: 시도
@@ -13342,6 +13343,7 @@ ko:
   show_by_type_c5d61732: "종류별로 정렬"
   show_calendar_events_in_the_month_view_on_multiple_e94c33ae: "달력 월별 보기에서 행사 제목이 한 줄에 들어가지 않는 경우 여러 줄로 나타내기"
   show_concluded_enrollments_6a05544c: "종결된 등록 표시"
+  show_d6f24222: 표시
   show_less_f778dab5: "간단히 표시"
   show_more_fae1328: "자세히 표시"
   showing_cceab2d9: "표시 중"
