@@ -1019,7 +1019,7 @@ class ExternalToolsController < ApplicationController
           named_context_url(@context, :context_external_content_success_url, "external_tool_dialog", include_host: true)
         end
 
-      @lti_launch = lti_launch(tool: @tool, selection_type:, launch_token: params[:launch_token])
+      @lti_launch = lti_launch(tool: @tool, selection_type:, launch_token: params[:launch_token], secure_params: params[:secure_params])
       unless @lti_launch
         timing_meta.tags = { error: true, lti_version: @tool&.lti_version }.compact
         return
@@ -1143,10 +1143,14 @@ class ExternalToolsController < ApplicationController
     end
   end
 
-  def assignment_from_assignment_id
-    return nil unless params[:assignment_id].present?
+  def assignment_from_assignment_id(lti_assignment_id: nil)
+    if params[:assignment_id].present?
+      assignment = api_find(@context.assignments.active, params[:assignment_id])
+    elsif lti_assignment_id.present?
+      assignment = @context.assignments.active.find_by(lti_context_id: lti_assignment_id)
+    end
+    return nil unless assignment
 
-    assignment = api_find(@context.assignments.active, params[:assignment_id])
     raise Lti::Errors::UnauthorizedError unless assignment.grants_right?(@current_user, :read)
 
     assignment
@@ -1167,7 +1171,7 @@ class ExternalToolsController < ApplicationController
     opts = default_opts.merge(opts)
     opts[:launch_url] = tool.url_with_environment_overrides(opts[:launch_url])
 
-    assignment = assignment_from_assignment_id
+    assignment = assignment_from_assignment_id(lti_assignment_id: opts.dig(:link_params, :ext, :lti_assignment_id))
 
     if assignment.present? && @current_user.present?
       assignment = AssignmentOverrideApplicator.assignment_overridden_for(assignment, @current_user)

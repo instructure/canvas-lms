@@ -1649,7 +1649,7 @@ describe ExternalToolsController do
       tool.save!
       lti_assignment_id = SecureRandom.uuid
       jwt = Canvas::Security.create_jwt({ lti_assignment_id: })
-      get :retrieve, params: { url: tool.url, account_id: account.id, secure_params: jwt }
+      get :retrieve, params: { url: tool.url, course_id: @course.id, secure_params: jwt }
       expect(assigns[:lti_launch].params["ext_lti_assignment_id"]).to eq lti_assignment_id
     end
 
@@ -2168,7 +2168,7 @@ describe ExternalToolsController do
           reg = lti_registration_with_tool(account: @course.account)
           t = reg.new_external_tool(@course)
           t.editor_button = { message_type:, icon_url: "http://example.com/icon" }
-          t.custom_fields = { contents: "$com.instructure.Editor.contents", selection: "$com.instructure.Editor.selection" }
+          t.custom_fields = { contents: "$com.instructure.Editor.contents", selection: "$com.instructure.Editor.selection", assignment_history: "$Activity.id.history" }
           t.save!
           t
         end
@@ -2210,6 +2210,16 @@ describe ExternalToolsController do
           it_behaves_like "includes editor variables" do
             let(:selection_launch_param) { launch_params["post_payload"].dig("https://purl.imsglobal.org/spec/lti/claim/custom", "selection") }
             let(:contents_launch_param) { launch_params["post_payload"].dig("https://purl.imsglobal.org/spec/lti/claim/custom", "contents") }
+          end
+
+          it "handles secure_params with lti_assignment_id" do
+            assignment = assignment_model(course: @course, title: "Test Assignment")
+
+            jwt = Canvas::Security.create_jwt({ lti_assignment_id: assignment.lti_context_id })
+            post "resource_selection", params: { course_id: @course.id, external_tool_id: tool.id, secure_params: jwt, editor: true }
+
+            expect(response).to be_successful
+            expect(launch_params["post_payload"]["https://purl.imsglobal.org/spec/lti/claim/custom"]["assignment_history"]).to eq ""
           end
 
           context "when the parent_frame_context param is sent" do
