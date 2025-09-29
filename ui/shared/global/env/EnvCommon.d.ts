@@ -308,6 +308,7 @@ export type SiteAdminFeatureId =
   | 'validate_call_to_action'
   | 'youtube_migration'
   | 'youtube_overlay'
+  | 'ux_list_concluded_courses_in_bp'
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES
  */
