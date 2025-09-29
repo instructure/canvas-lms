@@ -28,12 +28,14 @@ module ContextModuleProgressions
                               .where(context_module_id: modules)
                               .index_by(&:context_module_id)
 
-      modules.map do |mod|
+      modules.filter_map do |mod|
         progression = if existing_progressions.include?(mod.id)
                         existing_progressions[mod.id]
                       else
                         create_module_progression(mod, user)
                       end
+        next unless progression
+
         progression.context_module = mod
         progression
       end
