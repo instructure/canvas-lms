@@ -1121,7 +1121,7 @@ describe MediaObjectsController do
       end
 
       it "allows access" do
-        get "iframe_media_player", params: { attachment_id: @media_object.attachment_id, access_token: @token_string, instfs_id: "stuff" }, format: "json"
+        get "iframe_media_player", params: { attachment_id: @media_object.attachment_id, access_token: @token_string, instfs_id: "stuff" }
         expect(response).to be_successful
       end
 
@@ -1250,6 +1250,23 @@ describe MediaObjectsController do
 
       expect(response).to be_redirect
       expect(response.location).to eq "http://test.host/thumbnail_redirect"
+    end
+  end
+
+  describe "GET '/media_attachments/:id/immersive_view" do
+    before do
+      @media_object = @course.media_objects.create! media_id: "0_deadbeef", user_entered_title: "blah.flv"
+      allow_any_instance_of(MediaObject).to receive(:media_sources).and_return(
+        [{ url: "whatever man", bitrate: 12_345 }]
+      )
+    end
+
+    it "loads fine" do
+      user_session(@student)
+      attachment = @media_object.attachment
+
+      get "immersive_view", params: { attachment_id: attachment.id }
+      expect(response).to be_successful
     end
   end
 

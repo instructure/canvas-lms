@@ -322,6 +322,28 @@ class MediaObjectsController < ApplicationController
            layout: "layouts/bare"
   end
 
+  def immersive_view
+    media_api_json = if @attachment && @media_object
+                       media_attachment_api_json(
+                         @attachment,
+                         @media_object,
+                         @current_user,
+                         session,
+                         verifier: params[:verifier],
+                         access_token: params[:access_token],
+                         instfs_id: params[:instfs_id],
+                         location: params[:location]
+                       )
+                     elsif @media_object
+                       media_object_api_json(@media_object, @current_user, session)
+                     end
+
+    js_env media_object: media_api_json if media_api_json
+    deferred_js_bundle :media_immersive_view
+    render html: '<div id="immersive_view_container"></div>'.html_safe,
+           layout: "layouts/application"
+  end
+
   private
 
   def load_media_object_from_service
