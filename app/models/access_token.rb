@@ -155,9 +155,7 @@ class AccessToken < ActiveRecord::Base
         access_token
       else
         scope = load_pseudonym_from_access_token ? self : not_deleted
-        scope = scope.where(token_key => hashed_tokens).order(Arel.sql("#{AccessToken.table_name}.workflow_state = 'active' DESC, #{AccessToken.table_name}.workflow_state"))
-        scope = scope.eager_load(:developer_key) if eager_load_developer_key
-        scope.first
+        scope.where(token_key => hashed_tokens).order(Arel.sql("workflow_state = 'active' DESC, workflow_state")).first
       end
     if token && token.send(token_key) != hashed_tokens.first
       # we found the token but, its hashed using an old key. save the updated hash
