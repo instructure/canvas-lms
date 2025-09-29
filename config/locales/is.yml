@@ -4988,7 +4988,7 @@ is:
     incomplete: Ólokið
     index_view: 
       add_assignment: Verkefni
-      add_group: Hópur
+      add_group: Verkefnaflokkur
       add_quiz_lti: Próf/Próf
       assignments: Verkefni
       search_for_assignment: "Leita að verkefni"
@@ -6364,7 +6364,7 @@ is:
     edit_assignment: 
       calendar: "Dagatal:"
       due: "Skil:"
-      group: "Hópur:"
+      group: "Verkefnaflokkur:"
       links: 
         more_options: "Fleiri kostir"
       title: "Titill:"
@@ -10289,13 +10289,13 @@ is:
         drop_course: "Sleppa þessu námskeiði"
         recent_feedback: "Nýleg endurgjöf"
     sidebar_weighting: 
-      default_name: Hópur
+      default_name: Verkefnaflokkur
       headings: 
-        group: Hópur
+        group: Verkefnaflokkur
         total: Alls
         weight: Vægi
       labels: 
-        assignments_weighting: "Verkefni eru vegin eftir hópum"
+        assignments_weighting: "Verkefni hafa mismunandi vægi eftir flokkum"
       no_groups: "Engir hópar settir upp"
       not_weighted: "Námskeiðsverkefni eru ekki vegin."
     statistics: 
@@ -15545,7 +15545,7 @@ is:
       home: Heim
       pages: Síður
       people: Fólk
-  group_a8f5ed9c: Hópur
+  group_a8f5ed9c: Verkefnaflokkur
   group_add_permission_is_needed_to_create_a_new_gro_3cd0d1b5: "Hópur Bæta við heimildar er þörf til að búta til Nýjan Hóp flokk"
   group_announcements_f6e0fc8c: "Tilkynningar hóps"
   group_assignment_7060989f: Hópverkefni
@@ -15787,7 +15787,7 @@ is:
         category_settings: Stillingar
         delete_category_option: Eyða
         edit_category_option: Breyta
-        group: Hópur
+        group: Verkefnaflokkur
         group_limit_blurb: "Takmarka hópa við *%{group_limit}* meðlimi"
         import: "Flytja inn"
         message_all_unassigned_option: "Senda skilaboð til allra óúthlutaðra nemenda"
@@ -19381,7 +19381,7 @@ is:
           click_to_see_appointment: "Smella hér til að sjá fundinn"
           date_and_time: Dagur/tími
           details: "Upplýsingar um fund"
-          group: Hópur
+          group: Verkefnaflokkur
           message: "%{user} aflýsti pöntun fyrir %{appointment_name}."
           no_reason_given: "ekkert gefið"
           slots_remaining: "Tiltækar tímaraufar"
@@ -19394,7 +19394,7 @@ is:
           course: Námskeið
           date_and_time: Dagur/tími
           details: "Upplýsingar um fund"
-          group: Hópur
+          group: Verkefnaflokkur
           slots_remaining: "Tiltækar tímaraufar"
         message: "%{user} aflýsti pöntun fyrir „%{appointment_name}“."
         no_reason_given: "ekkert gefið"
@@ -19413,7 +19413,7 @@ is:
           course: Námskeið
           date_and_time: Dagur/tími
           details: "Upplýsingar um fund"
-          group: Hópur
+          group: Verkefnaflokkur
           link_text: "Smelltu hér til að skrá þig í aðra tímarauf"
           message: "%{user} aflýsti tímarauf þinni fyrir  %{appointment_name}."
           no_reason_given: "ekkert gefið"
@@ -19426,7 +19426,7 @@ is:
           course: Námskeið
           date_and_time: Dagur/tími
           details: "Upplýsingar um fund"
-          group: Hópur
+          group: Verkefnaflokkur
         message: "%{user} aflýsti tímarauf þinni fyrir  \"%{appointment_name}\"."
         no_reason_given: "ekkert gefið"
         subject: "Tímarauf þinni fyrir „%{appointment_name}“ hefur verið aflýst (%{course})"
@@ -19461,12 +19461,12 @@ is:
         message: "Canvas -tilkynning- Öllum fundum fyrir \"%{appointment_name} hefur verið aflýst\"."
     appointment_group_published: 
       email: 
-        group_signup: "Hópur (%{group_category})"
+        group_signup: "Verkefnaflokkur (%{group_category})"
         html: 
           course: Námskeið
           dates: Dagsetning(ar)
           details: "Upplýsingar um fund"
-          group_signup: "Hópur (%{group_category})"
+          group_signup: "Verkefnaflokkur (%{group_category})"
           individual_signup: Einstaklingur
           link_text: "Skráning á aðra tímarauf"
           message: "Tímaraufar fyrir \"%{appointment_name}“ eru tiltækar fyrir skráningu."
@@ -19493,12 +19493,12 @@ is:
         message: "Canvas-tilkynning - Skráningar eru opnar fyrir \"%{appointment_name}\"."
     appointment_group_updated: 
       email: 
-        group_signup: "Hópur (%{group_category})"
+        group_signup: "Verkefnaflokkur (%{group_category})"
         html: 
           course: Námskeið
           dates: Dagsetning(ar)
           details: "Upplýsingar um fund"
-          group_signup: "Hópur (%{group_category})"
+          group_signup: "Verkefnaflokkur (%{group_category})"
           individual_signup: Einstaklingur
           link_text: "Skráning á aðra tímarauf"
           message: "Tímaraufum hefur verið bætt við \"%{appointment_name}“ og eru tiltækar fyrir skráningu"
@@ -19530,7 +19530,7 @@ is:
           course: Námskeið
           date_and_time: Dagur/tími
           details: "Upplýsingar um fund"
-          group: Hópur
+          group: Verkefnaflokkur
           link_text: "Skoða fundinn"
           message: "%{user} hefur skráð sig á \"%{appointment_name}\"."
           slots_remaining: "Tiltækar tímaraufar"
@@ -19542,7 +19542,7 @@ is:
           course: Námskeið
           date_and_time: Dagur/tími
           details: "Upplýsingar um fund"
-          group: Hópur
+          group: Verkefnaflokkur
           slots_remaining: "Tiltækar tímaraufar"
         message: "%{user} hefur skráð sig á \"%{appointment_name}\"."
         subject: "Notandi skráði sig á \"%{appointment_name}\" (%{course})"
@@ -19559,7 +19559,7 @@ is:
           course: Námskeið
           date_and_time: Dagur/tími
           details: "Upplýsingar um fund"
-          group: Hópur
+          group: Verkefnaflokkur
           link_text: "Skráning á aðra tímarauf"
           message: "%{user} hefur skráð þig á \"%{appointment_name}\"."
           slots_remaining: "Tiltækar tímaraufar"
@@ -19571,7 +19571,7 @@ is:
           course: Námskeið
           date_and_time: Dagur/tími
           details: "Upplýsingar um fund"
-          group: Hópur
+          group: Verkefnaflokkur
           slots_remaining: "Tiltækar tímaraufar"
         message: "%{user} hefur skráð þig á \"%{appointment_name}\"."
         subject: "Þú ert skráð(ur) á „%{appointment_name}“"
@@ -21009,7 +21009,7 @@ is:
     external_tool_type: "Ytra tæki"
     file_type: Skrá
     grading_standard_type: Einkunnaviðmið
-    group_type: Hópur
+    group_type: Verkefnaflokkur
     learning_outcome_type: Námsniðurstaða
     lti_context_control_exists: "Samhengisstýring fyrir tólið með tilgreindri vefslóð er þegar til staðar. Sleppi innflutningi fyrir þessa stýringu."
     lti_context_control_no_tool: "Ekki tókst að finna samsvarandi tól fyrir samhengisstýringuna. Gættu þess að tól með samsvarandi vefslóð sé tiltækt í námskeiðinu."
@@ -26032,7 +26032,7 @@ is:
       question_group: 
         buttons: 
           update: Uppfæra
-        default_group_name: Hópur
+        default_group_name: Verkefnaflokkur
         edit_questions_and_points: "Veldu *%{num_questions}* spurningar, #%{num_points}# punktar fyrir spurningu"
         labels: 
           group_name: "Heiti hóps:"
@@ -29268,7 +29268,7 @@ is:
         indentation: Inndrag
         page_name: Síðuheiti
         quiz_engine: Prófvél
-        quiz_group: Hópur
+        quiz_group: Verkefnaflokkur
         quiz_name: "Heiti prófs"
         topic_name: "Heiti umræðuefnis"
         url: Vefslóð
@@ -29990,7 +29990,7 @@ is:
       aria_record_reset: "Smelltu til að taka upp"
       aria_stop: "Ýttu á \"Stop\" til að hætta upptöku."
     edit_view_rubric: "Skoða matskvarða"
-    group: Hópur
+    group: Verkefnaflokkur
     late_input: 
       days: 
         one: Dagur
@@ -30051,9 +30051,9 @@ is:
   speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: Skipta
   split_merged_users_6b81c595: "Skipta sameinuðum notendum"
-  split_number_of_students_per_group_4a05f76f: "Skipta fjölda nemenda í hverjum hóp"
+  split_number_of_students_per_group_4a05f76f: "Fjöldi nemenda í hverjum hóp"
   split_student_names_df0ef806: "Skipta nöfnum nemenda"
-  split_students_by_number_of_groups_5ace5a6a: "Skipta fjölda nemenda eftir fjölda hópa"
+  split_students_by_number_of_groups_5ace5a6a: "Fjöldi hópa sem á að skipta nemendum í"
   split_students_into_groups_with_num_members_studen_c49d5136: "Skipta nemendum í hópa með %{num_members} nemendum í hverjum hópi"
   split_students_into_num_groups_groups_e9854f16: "Skipta nemendum í %{num_groups} hópa"
   splitscreen_entry_post_error_page_75be199e: "Skiptur skjár villusíðu fyrir birta færslu"
