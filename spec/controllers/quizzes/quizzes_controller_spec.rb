@@ -247,8 +247,9 @@ describe Quizzes::QuizzesController do
       expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to be(false)
     end
 
-    it "uses the ams service logic when the ams_service is enabled" do
-      @course.root_account.enable_feature!(:ams_service)
+    it "uses the ams service logic when the ams_root_account_integration and integrations are enabled" do
+      @course.root_account.enable_feature!(:ams_root_account_integration)
+      @course.enable_feature!(:ams_course_integration)
       user_session(@teacher)
 
       get "index", params: { course_id: @course.id }
@@ -709,9 +710,10 @@ describe Quizzes::QuizzesController do
       expect(attach[:display_name]).to eq attachment.display_name
     end
 
-    context "when the ams_service is enabled" do
+    context "when the ams_root_account_integration and ams_course_integration are enabled" do
       before do
-        @course.root_account.enable_feature!(:ams_service)
+        @course.root_account.enable_feature!(:ams_root_account_integration)
+        @course.enable_feature!(:ams_course_integration)
         user_session(@teacher)
         course_quiz(true)
       end

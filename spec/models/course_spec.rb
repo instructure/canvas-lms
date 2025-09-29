@@ -3054,22 +3054,56 @@ describe Course do
         expect(available_tabs.select { |t| t[:hidden] }).to be_empty
       end
 
-      it "includes item banks tab for active external tools" do
-        @course.context_external_tools.create!(
-          url: "http://example.com/ims/lti",
-          consumer_key: "asdf",
-          shared_secret: "hjkl",
-          name: "external tool 1",
-          course_navigation: {
-            text: "Item Banks",
+      context "with an active external tool" do
+        let!(:quiz_lti_tool) do
+          @course.context_external_tools.create!(
             url: "http://example.com/ims/lti",
-            default: false,
-          }
-        )
+            consumer_key: "asdf",
+            shared_secret: "hjkl",
+            name: "external tool 1",
+            course_navigation: {
+              text: "Item Banks",
+              url: "http://example.com/ims/lti",
+              default: false,
+            }
+          )
+        end
 
-        tabs = @course.tabs_available(@user, include_external: true).pluck(:label)
+        it "includes item banks tab for active external tools" do
+          tabs = @course.tabs_available(@user, include_external: true).pluck(:label)
 
-        expect(tabs).to include("Item Banks")
+          expect(tabs).to include("Item Banks")
+        end
+
+        context "and the ams_root_account_integration is enabled" do
+          before do
+            @course.root_account.enable_feature!(:ams_root_account_integration)
+          end
+
+          context "and the ams_course_integration is disabled" do
+            before do
+              @course.disable_feature!(:ams_course_integration)
+            end
+
+            it "does not replace the context external tool tab" do
+              available_tabs = @course.tabs_available(@user, include_external: true).pluck(:id)
+              expect(available_tabs).not_to include(Course::TAB_ITEM_BANKS)
+              expect(available_tabs).to include("context_external_tool_#{quiz_lti_tool.id}")
+            end
+          end
+
+          context "and the ams_course_integration is enabled" do
+            before do
+              @course.enable_feature!(:ams_course_integration)
+            end
+
+            it "replaces the content external tool tab with the ams_service Item Banks tab" do
+              available_tabs = @course.tabs_available(@user, include_external: true).pluck(:id)
+              expect(available_tabs).to include(Course::TAB_ITEM_BANKS)
+              expect(available_tabs).not_to include("context_external_tool_#{quiz_lti_tool.id}")
+            end
+          end
+        end
       end
 
       describe "with canvas_for_elementary account setting on" do
@@ -3450,18 +3484,6 @@ describe Course do
 
           available_tabs = @course.tabs_available(@user, include_external: true).pluck(:label)
           expect(available_tabs).not_to include("Item Banks")
-        end
-
-        context "and the ams_service is enabled" do
-          before do
-            @course.root_account.enable_feature!(:ams_service)
-          end
-
-          it "replaces the content external tool tab with the ams_service Item Banks tab" do
-            available_tabs = @course.tabs_available(@user, include_external: true).pluck(:id)
-            expect(available_tabs).to include(Course::TAB_ITEM_BANKS)
-            expect(available_tabs).not_to include("context_external_tool_#{quiz_lti_tool.id}")
-          end
         end
       end
 

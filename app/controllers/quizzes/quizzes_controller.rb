@@ -59,7 +59,7 @@ class Quizzes::QuizzesController < ApplicationController
                   submission_versions
                   submission_html
                 ],
-                unless: -> { @context.root_account.feature_enabled?(:ams_service) }
+                unless: -> { ams_integration_enabled? }
   before_action :set_download_submission_dialog_title, only: [:show, :statistics]
   after_action :lock_results, only: [:show, :submission_html]
   # The number of questions that can display "details". After this number, the "Show details" option is disabled
@@ -72,7 +72,7 @@ class Quizzes::QuizzesController < ApplicationController
   QUIZ_TYPE_SURVEYS = ["survey", "graded_survey"].freeze
 
   def index
-    if @context.root_account.feature_enabled?(:ams_service)
+    if ams_integration_enabled?
       render_ams_service
       return
     end
@@ -198,7 +198,7 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def show
-    if @context.root_account.feature_enabled?(:ams_service)
+    if ams_integration_enabled?
       render_ams_service
       return
     end
@@ -1166,6 +1166,12 @@ class Quizzes::QuizzesController < ApplicationController
         api_url: Services::Ams.api_url
       })
     render html: '<div id="ams_container"></div>'.html_safe, layout: true
+  end
+
+  def ams_integration_enabled?
+    @context.root_account.feature_enabled?(:ams_root_account_integration) &&
+      @context.is_a?(Course) &&
+      @context.feature_enabled?(:ams_course_integration)
   end
 
   protected
