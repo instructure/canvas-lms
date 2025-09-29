@@ -52,6 +52,10 @@ class PeerReviewSubAssignment < AbstractAssignment
     false
   end
 
+  def effective_group_category_id
+    group_category_id
+  end
+
   def governs_submittable?
     false
   end

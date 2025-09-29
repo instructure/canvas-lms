@@ -20,17 +20,26 @@
 
 module Factories
   def peer_review_model(opts = {})
-    course = opts.delete(:course) || opts[:context] || course_model(reusable: true)
-    course.enable_feature!(:peer_review_allocation_and_grading)
-    @parent_assignment = opts.delete(:parent_assignment) || assignment_model(
+    @parent_assignment = opts.delete(:parent_assignment)
+    course = if @parent_assignment
+               opts.delete(:course)
+               @parent_assignment.course
+             else
+               opts.delete(:course) || opts[:context] || course_model(reusable: true)
+             end
+
+    @parent_assignment ||= assignment_model(
       course:,
       title: "Parent Assignment",
       points_possible: 20,
       peer_reviews: true,
       submission_types: "online_text_entry"
     )
+
     @parent_assignment.peer_reviews = true unless @parent_assignment.peer_reviews?
     @parent_assignment.save!
+
+    course.enable_feature!(:peer_review_allocation_and_grading)
 
     @peer_review_sub_assignment = PeerReview::PeerReviewCreatorService.call(
       parent_assignment: @parent_assignment,

@@ -52,13 +52,14 @@ RSpec.describe PeerReview::DateOverrideCreatorService do
     it "returns the expected services configuration" do
       expect(services).to eq({
                                "ADHOC" => PeerReview::AdhocOverrideCreatorService,
-                               "CourseSection" => PeerReview::SectionOverrideCreatorService
+                               "CourseSection" => PeerReview::SectionOverrideCreatorService,
+                               "Group" => PeerReview::GroupOverrideCreatorService
                              })
     end
 
     it "includes supported set types" do
-      expect(services.keys).to contain_exactly("ADHOC", "CourseSection")
-      expect(services.values).to contain_exactly(PeerReview::AdhocOverrideCreatorService, PeerReview::SectionOverrideCreatorService)
+      expect(services.keys).to contain_exactly("ADHOC", "CourseSection", "Group")
+      expect(services.values).to contain_exactly(PeerReview::AdhocOverrideCreatorService, PeerReview::SectionOverrideCreatorService, PeerReview::GroupOverrideCreatorService)
     end
   end
 
@@ -162,6 +163,42 @@ RSpec.describe PeerReview::DateOverrideCreatorService do
       end
     end
 
+    context "with Group overrides" do
+      let(:group_category) { course.group_categories.create!(name: "Project Groups") }
+      let(:parent_assignment) do
+        assignment_model(
+          course:,
+          title: "Group Assignment",
+          group_category:
+        )
+      end
+      let(:peer_review_sub_assignment_with_groups) { peer_review_model(parent_assignment:) }
+      let(:group) { course.groups.create!(group_category:, name: "Group 1") }
+      let(:override_data) do
+        [{
+          set_type: "Group",
+          set_id: group.id,
+          due_at: 2.weeks.from_now
+        }]
+      end
+
+      let(:service) do
+        described_class.new(
+          peer_review_sub_assignment: peer_review_sub_assignment_with_groups,
+          overrides: override_data
+        )
+      end
+
+      it "calls GroupOverrideCreatorService for Group override" do
+        expect(PeerReview::GroupOverrideCreatorService).to receive(:call).with(
+          peer_review_sub_assignment: peer_review_sub_assignment_with_groups,
+          override: override_data[0]
+        )
+
+        service.call
+      end
+    end
+
     context "with unsupported set_type" do
       let(:unsupported_override) do
         [{
@@ -180,7 +217,7 @@ RSpec.describe PeerReview::DateOverrideCreatorService do
       it "raises error for unsupported set_type" do
         expect { service.call }.to raise_error(
           PeerReview::SetTypeNotSupportedError,
-          "Set type 'UnsupportedType' is not supported. Supported types are: ADHOC, CourseSection"
+          "Set type 'UnsupportedType' is not supported. Supported types are: ADHOC, CourseSection, Group"
         )
       end
     end
