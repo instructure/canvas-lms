@@ -473,5 +473,57 @@ describe Checkpoints::DiscussionCheckpointCreatorService do
         end
       end
     end
+
+    describe "date synchronization" do
+      it "syncs parent dates when creating first checkpoint with nil dates" do
+        checkpoint = service.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: 2.days.from_now, unlock_at: nil, lock_at: nil }],
+          points_possible: 5
+        )
+
+        parent_assignment = checkpoint.parent_assignment.reload
+
+        aggregate_failures do
+          expect(parent_assignment.unlock_at).to be_nil
+          expect(parent_assignment.lock_at).to be_nil
+        end
+      end
+
+      it "syncs parent dates from checkpoint even when dates are the same" do
+        now = Time.zone.now.change(usec: 0)
+        unlock_at = 1.day.from_now(now)
+        lock_at = 3.days.from_now(now)
+
+        first_checkpoint = service.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: 2.days.from_now(now), unlock_at:, lock_at: }],
+          points_possible: 5
+        )
+
+        second_checkpoint = service.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: 3.days.from_now(now), unlock_at:, lock_at: }],
+          points_possible: 5
+        )
+
+        parent_assignment = first_checkpoint.parent_assignment.reload
+        first_checkpoint.reload
+        second_checkpoint.reload
+
+        aggregate_failures do
+          # All should have the same dates
+          expect(parent_assignment.unlock_at).to eq unlock_at
+          expect(parent_assignment.lock_at).to eq lock_at
+          expect(first_checkpoint.unlock_at).to eq unlock_at
+          expect(first_checkpoint.lock_at).to eq lock_at
+          expect(second_checkpoint.unlock_at).to eq unlock_at
+          expect(second_checkpoint.lock_at).to eq lock_at
+        end
+      end
+    end
   end
 end
