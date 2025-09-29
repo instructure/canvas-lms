@@ -472,6 +472,7 @@ class ApplicationController < ActionController::Base
     top_navigation_placement_a11y_fixes
     validate_call_to_action
     block_content_editor_ai_alt_text
+    ux_list_concluded_courses_in_bp
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     account_level_mastery_scales

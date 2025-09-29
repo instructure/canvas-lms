@@ -361,3 +361,16 @@ a11y_checker_eap:
     Enable the new Accessibility Checker in EAP. The flag is allowed only for root account admins.
   visible_on: a11y_checker_flag_enabled
   custom_transition_proc: only_admins_can_enable_a11y_checker_during_eap
+
+ux_list_concluded_courses_in_bp:
+  state: hidden
+  display_name: List concluded courses with Concluded pill in blueprint association modal
+  description: |-
+    List concluded courses with Concluded pill in blueprint association modal
+  applies_to: SiteAdmin
+  shadow: true
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
