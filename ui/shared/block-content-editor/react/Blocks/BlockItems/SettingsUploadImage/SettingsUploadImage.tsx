@@ -18,7 +18,12 @@
 
 import {SettingsUploadImageProps} from './types'
 import {CondensedButton, IconButton} from '@instructure/ui-buttons'
-import {IconExternalLinkLine, IconTrashLine, IconUploadLine} from '@instructure/ui-icons'
+import {
+  IconExternalLinkLine,
+  IconProgressLine,
+  IconTrashLine,
+  IconUploadLine,
+} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useState} from 'react'
 import {ImageBlockUploadModal} from '../Image/ImageBlockUploadModal'
@@ -50,6 +55,7 @@ export const SettingsUploadImage = ({url, fileName, onImageChange}: SettingsUplo
   }
 
   const buttonText = url?.trim() ? I18n.t('Replace image') : I18n.t('Add image')
+  const buttonIcon = url?.trim() ? <IconProgressLine /> : <IconUploadLine />
 
   return (
     <>
@@ -85,7 +91,7 @@ export const SettingsUploadImage = ({url, fileName, onImageChange}: SettingsUplo
           </Flex>
         )}
         <View display="block">
-          <CondensedButton renderIcon={<IconUploadLine />} onClick={openModal}>
+          <CondensedButton renderIcon={buttonIcon} onClick={openModal}>
             {buttonText}
           </CondensedButton>
         </View>

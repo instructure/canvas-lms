@@ -22,7 +22,7 @@ import {ImageBlockUploadModal} from './ImageBlockUploadModal'
 import {AddButton} from '../AddButton/AddButton'
 import {ImageEditProps, ModalImageData} from './types'
 import {IconButton} from '@instructure/ui-buttons'
-import {IconEditLine, IconUploadLine} from '@instructure/ui-icons'
+import {IconEditLine, IconProgressLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {useBlockContentEditorContext} from '../../../BlockContentEditorContext'
@@ -69,7 +69,7 @@ export const ImageEdit = ({
             />
             <View as="div" className="image-actions">
               <IconButton
-                renderIcon={<IconUploadLine />}
+                renderIcon={<IconProgressLine />}
                 onClick={openModal}
                 screenReaderLabel={I18n.t('Replace image')}
                 size="small"
