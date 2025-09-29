@@ -13144,6 +13144,7 @@ fa:
   job_category_f8e4dfe7: "طبقه بندی مشاغل"
   job_details_b33137dc: "جزئیات شغل"
   job_grouping_f652413e: "گروه بندی مشاغل"
+  job_handler_9d3d1007: "گرداننده کار"
   jobs: 
     columns: 
       attempt: تلاش
@@ -22510,6 +22511,7 @@ fa:
   show_courses_from_8a087f63: "نمایش درسها از"
   show_courses_navigation_menu_7ad1a8d4: "نمایش منوی پیمایش درس ها"
   show_current_grade_5bf4e0d9: "نمایش نمره فعلی"
+  show_d6f24222: نمایش
   show_dashboard_card_view_41ebd6c6: "نمایش نمای کارت داشبورد"
   show_deleted_replies_a2e0a36f: "نمایش پاسخ های حذف شده"
   show_details_194cf390: "نمایش جزئیات"
