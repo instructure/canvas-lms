@@ -18,7 +18,7 @@
 
 import {useInfiniteQuery} from '@tanstack/react-query'
 import {createUserQueryConfig} from '../utils/graphql'
-import {QUERY_CONFIG} from '../constants'
+import {COURSE_INSTRUCTORS_PAGINATED_KEY, QUERY_CONFIG} from '../constants'
 import {fetchPaginatedCourseInstructors} from '../graphql/coursePeople'
 import {useWidgetDashboard} from './useWidgetDashboardContext'
 
@@ -56,7 +56,7 @@ export function useCourseInstructors(options: UseCourseInstructorsOptions = {}) 
 
   return useInfiniteQuery({
     ...createUserQueryConfig(
-      ['courseInstructorsPaginated', courseIds.join(','), limit, observedUserId ?? undefined],
+      [COURSE_INSTRUCTORS_PAGINATED_KEY, courseIds.join(','), limit, observedUserId ?? undefined],
       QUERY_CONFIG.STALE_TIME.USERS,
     ),
     queryFn: async ({

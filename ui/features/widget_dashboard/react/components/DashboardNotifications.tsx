@@ -25,6 +25,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {executeQuery} from '@canvas/graphql'
 import NotificationAlert, {AccountNotificationData} from './NotificationAlert'
 import EnrollmentInvitation, {EnrollmentInvitationData} from './EnrollmentInvitation'
+import {DASHBOARD_NOTIFICATIONS_KEY} from '../constants'
 
 interface DashboardNotificationsResponse {
   accountNotifications?: AccountNotificationData[]
@@ -85,7 +86,7 @@ const DashboardNotifications: React.FC = () => {
     isLoading: loading,
     error,
   } = useQuery<DashboardNotificationsResponse>({
-    queryKey: ['dashboardNotifications'],
+    queryKey: [DASHBOARD_NOTIFICATIONS_KEY],
     queryFn: () => executeQuery(DASHBOARD_NOTIFICATIONS_QUERY, {}),
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,

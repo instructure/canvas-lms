@@ -19,7 +19,7 @@
 import {useInfiniteQuery} from '@tanstack/react-query'
 import {gql} from 'graphql-tag'
 import {getCurrentUserId, executeGraphQLQuery, createUserQueryConfig} from '../utils/graphql'
-import {QUERY_CONFIG} from '../constants'
+import {COURSE_WORK_KEY, QUERY_CONFIG} from '../constants'
 import {useWidgetDashboard} from './useWidgetDashboardContext'
 
 export interface CourseWorkItem {
@@ -228,7 +228,7 @@ export function useCourseWork(options: UseCourseWorkOptions = {}) {
   return useInfiniteQuery({
     ...createUserQueryConfig(
       [
-        'courseWork',
+        COURSE_WORK_KEY,
         pageSize,
         courseFilter,
         startDate,
@@ -243,7 +243,9 @@ export function useCourseWork(options: UseCourseWorkOptions = {}) {
     initialPageParam: null,
     queryFn: async ({
       pageParam,
-    }: {pageParam: PaginationParams | null}): Promise<CourseWorkResult> => {
+    }: {
+      pageParam: PaginationParams | null
+    }): Promise<CourseWorkResult> => {
       const currentUserId = getCurrentUserId()
 
       // Determine pagination parameters
