@@ -20,44 +20,62 @@ import {Editor} from '@craftjs/core'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {Toolbar} from '../Toolbar'
-import {useBlockContentEditorContext} from '../../BlockContentEditorContext'
+import {Provider} from '../../utilities/fastContext'
+import {createStore} from '../../store'
+import {useEditorMode} from '../../hooks/useEditorMode'
 
 const mockSetMode = jest.fn()
 
-jest.mock('../../BlockContentEditorContext', () => ({
-  __esModule: true,
-  useBlockContentEditorContext: jest.fn(),
-}))
-
 function renderToolbar() {
   return render(
-    <Editor>
-      <Toolbar />
-    </Editor>,
+    <Provider store={createStore({aiAltTextGenerationURL: null})}>
+      <Editor>
+        <Toolbar />
+      </Editor>
+    </Provider>,
   )
 }
 
-function setupMockContext(mode: string = 'default') {
-  ;(useBlockContentEditorContext as jest.Mock).mockReturnValue({
-    editor: {
-      mode,
-      setMode: mockSetMode,
+const mockStore = jest.fn()
+jest.mock('react', () => {
+  const ActualReact = jest.requireActual('react')
+  return {
+    ...ActualReact,
+    useContext: (context: React.Context<any>) => {
+      const result = ActualReact.useContext(context)
+      if (context.displayName === 'FastContext') {
+        return {
+          ...result,
+          get: () => mockStore(),
+        }
+      }
+      return result
     },
-    accessibility: {
-      a11yIssueCount: 0,
-      a11yIssues: [],
-    },
-  })
-}
+  }
+})
+
+jest.mock('../../hooks/useEditorMode', () => ({
+  useEditorMode: () => {
+    return {mode: mockStore().editor.mode, setMode: mockSetMode}
+  },
+}))
 
 describe('Toolbar', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
 
   describe('when toolbar is in default mode', () => {
     beforeEach(() => {
-      setupMockContext('default')
+      mockStore.mockReturnValue({
+        editor: {mode: 'default'},
+        accessibility: {
+          a11yIssues: new Map(),
+        },
+      })
     })
 
     it('should switch to preview mode when clicked', async () => {
@@ -73,7 +91,9 @@ describe('Toolbar', () => {
 
   describe('when toolbar is in preview mode', () => {
     beforeEach(() => {
-      setupMockContext('preview')
+      mockStore.mockReturnValue({
+        editor: {mode: 'preview'},
+      })
     })
 
     it('should switch to default mode when clicked', async () => {

@@ -16,16 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useNode} from '@craftjs/core'
-import {useAppSelector} from '../store'
+import {BlockContentEditorStore, createStore} from '../store'
 
-export const useIsEditingBlock = () => {
-  const {id} = useNode()
-  return useAppSelector(state => {
-    const isEditing = state.editingBlock.id === id
-    return {
-      isEditing,
-      isEditingViaEditButton: isEditing && state.editingBlock.viaEditButton,
-    }
-  })
-}
+export const createMockStore = (defaults: Partial<BlockContentEditorStore>) =>
+  ({
+    ...createStore({aiAltTextGenerationURL: null}).get(),
+    ...defaults,
+  }) as BlockContentEditorStore

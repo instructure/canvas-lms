@@ -16,11 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useEffect} from 'react'
-import {useBlockContentEditorContext} from '../BlockContentEditorContext'
+import {useEffect, useRef} from 'react'
+import {useEditingBlock} from './useEditingBlock'
+import {useAppSelector} from '../store'
 
 export const useEditClickHandler = () => {
-  const {editingBlock} = useBlockContentEditorContext()
+  const {setId} = useEditingBlock()
+  const id = useAppSelector(state => state.editingBlock.id)
+  const idRef = useRef(id)
+  idRef.current = id
 
   useEffect(() => {
     const clickHandler = (ev: MouseEvent | TouchEvent) => {
@@ -38,13 +42,17 @@ export const useEditClickHandler = () => {
       const block = target.closest('[data-bce-node-id]')
       const blockClicked = block !== null
       if (!blockClicked || addButtonClicked) {
-        editingBlock.setId(null)
+        setId(null)
         return
       }
 
-      const nodeId = block.getAttribute('data-bce-node-id')
-      if (nodeId !== editingBlock.idRef.current) {
-        editingBlock.setId(actionButton ? null : nodeId)
+      const nodeId = block.getAttribute('data-bce-node-id')!
+      if (nodeId !== idRef.current) {
+        if (actionButton) {
+          setId(null)
+        } else {
+          setId(nodeId, false)
+        }
       }
     }
 
@@ -52,5 +60,5 @@ export const useEditClickHandler = () => {
     return () => {
       document.removeEventListener('click', clickHandler)
     }
-  })
+  }, [])
 }

@@ -18,13 +18,13 @@
 
 import {useNode} from '@craftjs/core'
 import {ComponentProps, ElementType, useCallback, useEffect, useRef} from 'react'
-import {useBlockContentEditorContext} from '../../BlockContentEditorContext'
+import {useEditingBlock} from './useEditingBlock'
 
 export const useSave = <T extends ElementType>(fn: () => Partial<ComponentProps<T>>) => {
   const {
     actions: {setProp},
   } = useNode()
-  const {editingBlock} = useBlockContentEditorContext()
+  const {addSaveCallback, deleteSaveCallback} = useEditingBlock()
   const fnRef = useRef(fn)
   fnRef.current = fn
 
@@ -34,8 +34,8 @@ export const useSave = <T extends ElementType>(fn: () => Partial<ComponentProps<
         Object.assign(props, fnRef.current())
       })
     }
-    editingBlock.addSaveCallback(saveHandler)
-    return () => editingBlock.deleteSaveCallback(saveHandler)
+    addSaveCallback(saveHandler)
+    return () => deleteSaveCallback(saveHandler)
   }, [])
 
   return useCallback((newProps: Partial<ComponentProps<T>>) => {

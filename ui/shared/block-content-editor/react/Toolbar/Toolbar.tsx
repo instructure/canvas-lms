@@ -21,15 +21,16 @@ import {PreviewButton} from './PreviewButton'
 import {RedoButton} from './RedoButton'
 import {UndoButton} from './UndoButton'
 import {AccessibilityCheckerButton} from './AccessibilityCheckerButton'
-import {useBlockContentEditorContext} from '../BlockContentEditorContext'
 import {useEditHistory} from '../hooks/useEditHistory'
 import {List} from '@instructure/ui-list'
+import {useEditorMode} from '../hooks/useEditorMode'
+import {useAppSelector} from '../store'
 
 export const Toolbar = () => {
-  const {
-    editor: {mode, setMode},
-    accessibility: {a11yIssueCount, a11yIssues},
-  } = useBlockContentEditorContext()
+  const {a11yIssueCount, a11yIssues} = useAppSelector(state => ({
+    ...state.accessibility,
+  }))
+  const {mode, setMode} = useEditorMode()
   const {undo, redo, canUndo, canRedo} = useEditHistory()
   const isPreviewMode = mode === 'preview'
 

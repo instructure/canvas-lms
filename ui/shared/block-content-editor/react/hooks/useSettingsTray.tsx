@@ -16,50 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useCallback, useState} from 'react'
+import {useCallback} from 'react'
+import {useAppSetStore} from '../store'
 
-type SettingsTrayOpen = {
-  isOpen: true
-  blockId: string
-}
-
-type SettingsTrayClosed = {
-  isOpen: false
-}
-
-type SettingsTrayFunctions = {
-  open: (editedBlockId: string) => void
-  close: () => void
-}
-
-export type SettingsTray = (SettingsTrayOpen | SettingsTrayClosed) & SettingsTrayFunctions
-
-export const useSettingsTray = (): SettingsTray => {
-  const [blockId, setBlockId] = useState<string | null>(null)
-
-  const isOpen = blockId !== null
+export const useSettingsTray = () => {
+  const set = useAppSetStore()
 
   const open = useCallback(
-    (blockId: string) => {
-      setBlockId(blockId)
+    (id: string) => {
+      set(state => {
+        state.settingsTray = {isOpen: true, blockId: id}
+      })
     },
-    [setBlockId],
+    [set],
   )
 
   const close = useCallback(() => {
-    setBlockId(null)
-  }, [setBlockId])
+    set(state => {
+      state.settingsTray = {isOpen: false, blockId: undefined}
+    })
+  }, [set])
 
-  return isOpen
-    ? {
-        isOpen: true,
-        blockId,
-        open,
-        close,
-      }
-    : {
-        isOpen: false,
-        open,
-        close,
-      }
+  return {open, close}
 }

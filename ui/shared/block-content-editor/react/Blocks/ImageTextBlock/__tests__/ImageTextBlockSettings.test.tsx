@@ -22,11 +22,23 @@ import {waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {ImageTextBlockProps} from '../types'
 
-const mockUseBlockContentEditorContext = jest.fn()
-
-jest.mock('../../../BlockContentEditorContext', () => ({
-  useBlockContentEditorContext: () => mockUseBlockContentEditorContext(),
-}))
+const mockStore = jest.fn()
+jest.mock('react', () => {
+  const ActualReact = jest.requireActual('react')
+  return {
+    ...ActualReact,
+    useContext: (context: React.Context<any>) => {
+      const result = ActualReact.useContext(context)
+      if (context.displayName === 'FastContext') {
+        return {
+          ...result,
+          get: () => mockStore(),
+        }
+      }
+      return result
+    },
+  }
+})
 
 jest.mock('../../../utilities/aiAltTextApi', () => ({
   generateAiAltText: jest.fn().mockResolvedValue({
@@ -55,9 +67,12 @@ const defaultProps: ImageTextBlockProps = {
 
 describe('ImageTextBlockSettings', () => {
   beforeEach(() => {
-    mockUseBlockContentEditorContext.mockReturnValue({
+    mockStore.mockReturnValue({
       aiAltTextGenerationURL: null,
     })
+  })
+  afterEach(() => {
+    jest.clearAllMocks()
   })
   describe('include title', () => {
     it('integrates, changing the state', async () => {
@@ -191,7 +206,7 @@ describe('ImageTextBlockSettings', () => {
 
   describe('regenerate alt text', () => {
     it('does not show when AI alt text URL is not provided', () => {
-      mockUseBlockContentEditorContext.mockReturnValue({
+      mockStore.mockReturnValue({
         aiAltTextGenerationURL: null,
       })
       const component = renderBlock(ImageTextBlockSettings, defaultProps)
@@ -199,7 +214,7 @@ describe('ImageTextBlockSettings', () => {
     })
 
     it('does not show when AI alt text URL is empty string', () => {
-      mockUseBlockContentEditorContext.mockReturnValue({
+      mockStore.mockReturnValue({
         aiAltTextGenerationURL: '',
       })
       const component = renderBlock(ImageTextBlockSettings, defaultProps)
@@ -207,7 +222,7 @@ describe('ImageTextBlockSettings', () => {
     })
 
     it('shows when AI alt text URL is provided', () => {
-      mockUseBlockContentEditorContext.mockReturnValue({
+      mockStore.mockReturnValue({
         aiAltTextGenerationURL: '/api/v1/courses/1/pages_ai/alt_text',
       })
       const component = renderBlock(ImageTextBlockSettings, defaultProps)
@@ -215,7 +230,7 @@ describe('ImageTextBlockSettings', () => {
     })
 
     it('is disabled when image is decorative', () => {
-      mockUseBlockContentEditorContext.mockReturnValue({
+      mockStore.mockReturnValue({
         aiAltTextGenerationURL: '/api/v1/courses/1/pages_ai/alt_text',
       })
       const component = renderBlock(ImageTextBlockSettings, {
@@ -227,7 +242,7 @@ describe('ImageTextBlockSettings', () => {
     })
 
     it('is disabled when no image URL is provided', () => {
-      mockUseBlockContentEditorContext.mockReturnValue({
+      mockStore.mockReturnValue({
         aiAltTextGenerationURL: '/api/v1/courses/1/pages_ai/alt_text',
       })
       const component = renderBlock(ImageTextBlockSettings, {
@@ -239,7 +254,7 @@ describe('ImageTextBlockSettings', () => {
     })
 
     it('is disabled when no fileName is provided', () => {
-      mockUseBlockContentEditorContext.mockReturnValue({
+      mockStore.mockReturnValue({
         aiAltTextGenerationURL: '/api/v1/courses/1/pages_ai/alt_text',
       })
       const component = renderBlock(ImageTextBlockSettings, {...defaultProps, fileName: ''})
@@ -249,7 +264,7 @@ describe('ImageTextBlockSettings', () => {
 
     it('generates alt text when clicked', async () => {
       const {generateAiAltText} = require('../../../utilities/aiAltTextApi')
-      mockUseBlockContentEditorContext.mockReturnValue({
+      mockStore.mockReturnValue({
         aiAltTextGenerationURL: '/api/v1/courses/1/pages_ai/alt_text',
       })
 
@@ -280,7 +295,7 @@ describe('ImageTextBlockSettings', () => {
     })
 
     it('shows generating state while processing', async () => {
-      mockUseBlockContentEditorContext.mockReturnValue({
+      mockStore.mockReturnValue({
         aiAltTextGenerationURL: '/api/v1/courses/1/pages_ai/alt_text',
       })
 

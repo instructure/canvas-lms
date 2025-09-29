@@ -20,18 +20,19 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
-import {useBlockContentEditorContext} from '../BlockContentEditorContext'
 import {AddButton} from './AddButton'
 import {useGetBlocksCount} from '../hooks/useGetBlocksCount'
+import {useAddBlockModal} from '../hooks/useAddBlockModal'
 
 const I18n = createI18nScope('block_content_editor')
 
 export const AddBlock = () => {
-  const {addBlockModal} = useBlockContentEditorContext()
+  const {open} = useAddBlockModal()
   const {blocksCount} = useGetBlocksCount()
   if (blocksCount > 0) {
     return null
   }
+
   return (
     <View borderWidth="small" borderRadius="medium">
       <Flex direction="column" padding="large" gap="large" alignItems="center">
@@ -48,7 +49,7 @@ export const AddBlock = () => {
             )}
           </span>
         </Flex>
-        <AddButton onClicked={addBlockModal.open} />
+        <AddButton onClicked={open} />
       </Flex>
     </View>
   )
