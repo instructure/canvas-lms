@@ -16,17 +16,24 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-class PeerReview::DateOverrideUpdaterService < PeerReview::DateOverrideCommonService
+class PeerReview::CourseOverrideCommonService < ApplicationService
+  include PeerReview::Validations
+  include PeerReview::DateOverrider
+
+  def initialize(
+    peer_review_sub_assignment: nil,
+    override: nil
+  )
+    super()
+
+    @peer_review_sub_assignment = peer_review_sub_assignment
+    @override = override || {}
+  end
+
   private
 
-  def services
-    {
-      "ADHOC" => PeerReview::AdhocOverrideUpdaterService,
-      "CourseSection" => PeerReview::SectionOverrideUpdaterService,
-      "Group" => PeerReview::GroupOverrideUpdaterService,
-      "Course" => PeerReview::CourseOverrideUpdaterService,
-    }
+  def fetch_id
+    @override.fetch(:id, nil)
   end
 end
