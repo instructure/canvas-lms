@@ -1405,6 +1405,8 @@
   path: '/api/v1/courses/:course_id/reports/:report_type/:id'
 - verb: POST
   path: '/api/v1/courses/:course_id/reset_content'
+- verb: POST
+  path: '/api/v1/courses/:course_id/restore/:version_id'
 - verb: GET
   path: '/api/v1/courses/:course_id/root_outcome_group'
 - verb: POST

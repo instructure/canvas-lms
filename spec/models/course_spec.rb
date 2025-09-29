@@ -9253,4 +9253,37 @@ describe Course do
       end
     end
   end
+
+  describe "syllabus versioning" do
+    let(:course) { Course.create!(name: "Test Course") }
+
+    context "when syllabus_versioning feature flag is enabled" do
+      before { Account.site_admin.enable_feature!(:syllabus_versioning) }
+
+      it "creates version when syllabus_body changes and excludes specified fields" do
+        expect do
+          course.update!(syllabus_body: "Initial syllabus content", name: "Updated Course Name")
+        end.to change { course.versions.count }.by(1)
+
+        version = course.versions.last
+        versioned_data = YAML.safe_load(version.yaml, permitted_classes: [Time, Date, Symbol, ActiveSupport::TimeWithZone, ActiveSupport::TimeZone])
+        expect(versioned_data["syllabus_body"]).to eq("Initial syllabus content")
+        expect(versioned_data).to have_key("syllabus_body")
+        expect(versioned_data).to have_key("name")
+        Course::SIMPLY_VERSIONED_EXCLUDE_FIELDS.each do |excluded_field|
+          expect(versioned_data).not_to have_key(excluded_field)
+        end
+      end
+    end
+
+    context "when syllabus_versioning feature flag is disabled" do
+      before { Account.site_admin.disable_feature!(:syllabus_versioning) }
+
+      it "does not create versions when syllabus_body changes" do
+        expect do
+          course.update!(syllabus_body: "Initial syllabus content", name: "Updated Course Name")
+        end.not_to change { course.versions.count }
+      end
+    end
+  end
 end
