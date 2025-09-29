@@ -26,6 +26,7 @@ import React from 'react'
 import {updateDiscussionEntryParticipantMock} from '../../../../graphql/Mocks'
 import {waitFor} from '@testing-library/dom'
 import {AnonymousUser} from '../../../../graphql/AnonymousUser'
+import {ObserverContext} from '../../../utils/ObserverContext'
 
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),
@@ -58,11 +59,15 @@ describe('SplitScreenParent', () => {
   const setup = (props, mocks) => {
     return render(
       <MockedProvider mocks={mocks}>
-        <AlertManagerContext.Provider
-          value={{setOnFailure: onFailureStub, setOnSuccess: onSuccessStub}}
+        <ObserverContext.Provider
+          value={{observerRef: {current: undefined}, nodesRef: {current: new Map()}}}
         >
-          <SplitScreenParent {...props} />
-        </AlertManagerContext.Provider>
+          <AlertManagerContext.Provider
+            value={{setOnFailure: onFailureStub, setOnSuccess: onSuccessStub}}
+          >
+            <SplitScreenParent {...props} />
+          </AlertManagerContext.Provider>
+        </ObserverContext.Provider>
       </MockedProvider>,
     )
   }

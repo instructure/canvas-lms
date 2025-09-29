@@ -21,6 +21,7 @@ import {DiscussionManagerUtilityContext, SearchContext} from '../../../utils/con
 import {User} from '../../../../graphql/User'
 import {responsiveQuerySizes} from '../../../utils'
 import {useTranslationStore} from '../../../hooks/useTranslationStore'
+import {ObserverContext} from '../../../utils/ObserverContext'
 
 jest.mock('../../../utils')
 
@@ -72,20 +73,29 @@ const defaultProviderProps = {
 
 const setup = (props: any = {}, providerProps: any = {}) =>
   render(
-    <DiscussionManagerUtilityContext.Provider
-      value={{...defaultProviderProps, ...providerProps} as any}
+    <ObserverContext.Provider
+      value={{
+        observerRef: {current: undefined},
+        nodesRef: {current: new Map()},
+        startObserving: () => {},
+        stopObserving: () => {},
+      }}
     >
-      <SearchContext.Provider value={{searchTerm: ''} as any}>
-        <PostMessage
-          discussionEntry={{id: '1'}}
-          author={User.mock()}
-          timingDisplay="Jan 1 2000"
-          message="Posts are fun"
-          title="Thoughts"
-          {...props}
-        />
-      </SearchContext.Provider>
-    </DiscussionManagerUtilityContext.Provider>,
+      <DiscussionManagerUtilityContext.Provider
+        value={{...defaultProviderProps, ...providerProps} as any}
+      >
+        <SearchContext.Provider value={{searchTerm: ''} as any}>
+          <PostMessage
+            discussionEntry={{id: '1'}}
+            author={User.mock()}
+            timingDisplay="Jan 1 2000"
+            message="Posts are fun"
+            title="Thoughts"
+            {...props}
+          />
+        </SearchContext.Provider>
+      </DiscussionManagerUtilityContext.Provider>
+    </ObserverContext.Provider>,
   )
 
 describe('PostMessage AI translation', () => {
@@ -306,5 +316,122 @@ describe('PostMessage AI translation', () => {
 
     expect(queryByTestId('post-title-translated')).not.toBeInTheDocument()
     expect(queryByTestId('post-message-translated')).not.toBeInTheDocument()
+  })
+})
+
+describe('PostMessage intersection observer registration', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    useTranslationStoreMock.mockImplementation((selector: any) => {
+      return selector({...initalMockState})
+    })
+  })
+
+  it('should register the component with the observer during mount', () => {
+    const observeMock = jest.fn()
+    const unobserveMock = jest.fn()
+    const observerMock = {
+      observe: observeMock,
+      unobserve: unobserveMock,
+      disconnect: jest.fn(),
+    }
+    const nodesRefMock = {current: new Map()}
+
+    render(
+      <ObserverContext.Provider
+        value={{
+          observerRef: {current: observerMock as unknown as IntersectionObserver},
+          nodesRef: nodesRefMock,
+          startObserving: () => {},
+          stopObserving: () => {},
+        }}
+      >
+        <DiscussionManagerUtilityContext.Provider value={{...defaultProviderProps} as any}>
+          <SearchContext.Provider value={{searchTerm: ''} as any}>
+            <PostMessage
+              discussionEntry={{id: '1'}}
+              author={User.mock()}
+              timingDisplay="Jan 1 2000"
+              message="Posts are fun"
+              title="Thoughts"
+            />
+          </SearchContext.Provider>
+        </DiscussionManagerUtilityContext.Provider>
+      </ObserverContext.Provider>,
+    )
+
+    expect(observeMock).toHaveBeenCalledTimes(1)
+    expect(observeMock).toHaveBeenCalledWith(expect.any(Object))
+    expect(nodesRefMock.current.has('1')).toBe(true)
+  })
+
+  it('should unobserve and remove from nodesRef on unmount', () => {
+    const observeMock = jest.fn()
+    const unobserveMock = jest.fn()
+    const observerMock = {
+      observe: observeMock,
+      unobserve: unobserveMock,
+      disconnect: jest.fn(),
+    }
+    const nodesRefMock = {current: new Map()}
+
+    const {unmount} = render(
+      <ObserverContext.Provider
+        value={{
+          observerRef: {current: observerMock as unknown as IntersectionObserver},
+          nodesRef: nodesRefMock,
+          startObserving: () => {},
+          stopObserving: () => {},
+        }}
+      >
+        <DiscussionManagerUtilityContext.Provider value={{...defaultProviderProps} as any}>
+          <SearchContext.Provider value={{searchTerm: ''} as any}>
+            <PostMessage
+              discussionEntry={{id: '1'}}
+              author={User.mock()}
+              timingDisplay="Jan 1 2000"
+              message="Posts are fun"
+              title="Thoughts"
+            />
+          </SearchContext.Provider>
+        </DiscussionManagerUtilityContext.Provider>
+      </ObserverContext.Provider>,
+    )
+
+    expect(nodesRefMock.current.has('1')).toBe(true)
+
+    unmount()
+
+    expect(unobserveMock).toHaveBeenCalledTimes(1)
+    expect(nodesRefMock.current.has('1')).toBe(false)
+  })
+
+  it('should not observe if observer is not available', () => {
+    const nodesRefMock = {current: new Map()}
+
+    render(
+      <ObserverContext.Provider
+        value={{
+          observerRef: {current: undefined},
+          nodesRef: nodesRefMock,
+          startObserving: () => {},
+          stopObserving: () => {},
+        }}
+      >
+        <DiscussionManagerUtilityContext.Provider value={{...defaultProviderProps} as any}>
+          <SearchContext.Provider value={{searchTerm: ''} as any}>
+            <PostMessage
+              discussionEntry={{id: '1'}}
+              author={User.mock()}
+              timingDisplay="Jan 1 2000"
+              message="Posts are fun"
+              title="Thoughts"
+            />
+          </SearchContext.Provider>
+        </DiscussionManagerUtilityContext.Provider>
+      </ObserverContext.Provider>,
+    )
+
+    expect(nodesRefMock.current.has('1')).toBe(true)
   })
 })

@@ -27,9 +27,9 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {IconRefreshLine, IconEndLine, IconAiSolid} from '@instructure/ui-icons'
 import {DiscussionManagerUtilityContext} from '../../utils/constants'
 import {TranslationTriggerModal} from '../../components/TranslationTriggerModal/TranslationTriggerModal'
-import {useTranslationAll} from '../../hooks/useTranslationAll'
 import {useTranslationStore} from '../../hooks/useTranslationStore'
 import {useTranslation} from '../../hooks/useTranslation'
+import {useObserverContext} from '../../utils/ObserverContext'
 
 export const DiscussionTranslationModuleContainer = ({isAnnouncement}) => {
   const I18n = useI18nScope('discussions_posts')
@@ -39,20 +39,21 @@ export const DiscussionTranslationModuleContainer = ({isAnnouncement}) => {
 
   const activeLanguage = useTranslationStore(state => state.activeLanguage)
   const setActiveLangauge = useTranslationStore(state => state.setActiveLanguage)
+  const setTranslateAll = useTranslationStore(state => state.setTranslateAll)
   const isTranslateAll = useTranslationStore(state => state.translateAll)
   const clearTranslateAll = useTranslationStore(state => state.clearTranslateAll)
   const entries = useTranslationStore(state => state.entries)
 
   const translationControlsRef = React.createRef()
-  const {setTranslateTargetLanguage, setShowTranslationControl, enqueueTranslation} = useContext(
+  const {setTranslateTargetLanguage, setShowTranslationControl} = useContext(
     DiscussionManagerUtilityContext,
   )
+  const {startObserving} = useObserverContext()
 
   const isLoading = useMemo(() => {
     return Object.values(entries).some(entry => entry.loading)
   }, [entries])
 
-  const {translateAll} = useTranslationAll(enqueueTranslation)
   const {preferredLanguage, savePreferredLanguage} = useTranslation()
 
   const [selectedLanguage, setSelectedLanguage] = useState(
@@ -103,7 +104,8 @@ export const DiscussionTranslationModuleContainer = ({isAnnouncement}) => {
       savePreferredLanguage(selectedLanguage, ENV?.discussion_topic_id)
     }
     setActiveLangauge(selectedLanguage)
-    translateAll(selectedLanguage)
+    setTranslateAll(true)
+    startObserving(selectedLanguage)
   }
 
   const title = isAnnouncement ? I18n.t('Translate Announcement') : I18n.t('Translate Discussion')
