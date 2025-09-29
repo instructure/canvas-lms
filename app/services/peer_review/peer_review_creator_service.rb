@@ -18,17 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class PeerReview::PeerReviewCreatorService < PeerReview::PeerReviewCommonService
-  def initialize(
-    parent_assignment: nil,
-    points_possible: nil,
-    grading_type: nil,
-    due_at: nil,
-    unlock_at: nil,
-    lock_at: nil
-  )
-    super
-  end
-
   def call
     run_validations
     peer_review_sub_assignment = create_peer_review_sub_assignment

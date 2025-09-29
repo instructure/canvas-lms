@@ -26,6 +26,7 @@ class PeerReview::DateOverrideCreatorService < PeerReview::DateOverrideCommonSer
       "ADHOC" => PeerReview::AdhocOverrideCreatorService,
       "CourseSection" => PeerReview::SectionOverrideCreatorService,
       "Group" => PeerReview::GroupOverrideCreatorService,
+      "Course" => PeerReview::CourseOverrideCreatorService,
     }
   end
 end

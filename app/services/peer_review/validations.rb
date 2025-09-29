@@ -108,6 +108,10 @@ module PeerReview::Validations
     raise PeerReview::SectionNotFoundError, I18n.t("Section does not exist") unless section.present?
   end
 
+  def validate_course_exists(course)
+    raise PeerReview::CourseNotFoundError, I18n.t("Course does not exist") unless course.present?
+  end
+
   def validate_student_ids_required(student_ids)
     if student_ids.nil? || student_ids == "" || student_ids.to_s.strip.empty? || (student_ids.is_a?(Array) && student_ids.empty?)
       raise PeerReview::StudentIdsRequiredError, I18n.t("Student ids are required")

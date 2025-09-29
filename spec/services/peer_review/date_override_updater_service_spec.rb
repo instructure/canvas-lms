@@ -53,13 +53,14 @@ RSpec.describe PeerReview::DateOverrideUpdaterService do
       expect(services).to eq({
                                "ADHOC" => PeerReview::AdhocOverrideUpdaterService,
                                "CourseSection" => PeerReview::SectionOverrideUpdaterService,
-                               "Group" => PeerReview::GroupOverrideUpdaterService
+                               "Group" => PeerReview::GroupOverrideUpdaterService,
+                               "Course" => PeerReview::CourseOverrideUpdaterService
                              })
     end
 
     it "includes supported set types" do
-      expect(services.keys).to contain_exactly("ADHOC", "CourseSection", "Group")
-      expect(services.values).to contain_exactly(PeerReview::AdhocOverrideUpdaterService, PeerReview::SectionOverrideUpdaterService, PeerReview::GroupOverrideUpdaterService)
+      expect(services.keys).to contain_exactly("ADHOC", "CourseSection", "Group", "Course")
+      expect(services.values).to contain_exactly(PeerReview::AdhocOverrideUpdaterService, PeerReview::SectionOverrideUpdaterService, PeerReview::GroupOverrideUpdaterService, PeerReview::CourseOverrideUpdaterService)
     end
   end
 
@@ -226,7 +227,7 @@ RSpec.describe PeerReview::DateOverrideUpdaterService do
       it "raises SetTypeNotSupportedError" do
         expect { service.call }.to raise_error(
           PeerReview::SetTypeNotSupportedError,
-          "Set type 'UnsupportedType' is not supported. Supported types are: ADHOC, CourseSection, Group"
+          "Set type 'UnsupportedType' is not supported. Supported types are: ADHOC, CourseSection, Group, Course"
         )
       end
     end

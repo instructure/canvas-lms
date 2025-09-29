@@ -35,4 +35,5 @@ module PeerReview
   class StudentIdsNotInCourseError < PeerReviewError; end
   class GroupAssignmentRequiredError < PeerReviewError; end
   class GroupNotFoundError < PeerReviewError; end
+  class CourseNotFoundError < PeerReviewError; end
 end
