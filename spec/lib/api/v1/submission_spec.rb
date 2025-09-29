@@ -121,13 +121,16 @@ describe Api::V1::Submission do
         Account.site_admin.enable_feature!(:discussion_checkpoints)
       end
 
-      it "includes sub_assignment_submissions for checkpointed assignments" do
+      it "includes sub_assignment_submissions for checkpointed assignments with active submissions" do
         student = course_with_user("StudentEnrollment", course:, active_all: true, name: "Student").user
 
         parent_assignment = course.assignments.create!(title: "Assignment 1", has_sub_assignments: true)
         parent_submission = parent_assignment.submissions.find_by(user_id: student.id)
-        parent_assignment.sub_assignments.create!(context: parent_assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
-        parent_assignment.sub_assignments.create!(context: parent_assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
+        sub1 = parent_assignment.sub_assignments.create!(context: parent_assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
+        sub2 = parent_assignment.sub_assignments.create!(context: parent_assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
+
+        sub1.submissions.find_by(user_id: student.id) || sub1.submissions.create!(user: student, workflow_state: "unsubmitted")
+        sub2.submissions.find_by(user_id: student.id) || sub2.submissions.create!(user: student, workflow_state: "unsubmitted")
 
         json = fake_controller.submission_json(parent_submission, parent_assignment, teacher, session, parent_assignment.context, field, params)
         expect(json["has_sub_assignment_submissions"]).to be true
@@ -155,6 +158,65 @@ describe Api::V1::Submission do
         expect(sas.pluck("workflow_state")).to match_array([nil, nil])
         expect(sas.pluck("assignment_id")).to match_array([nil, nil])
         expect(sas.pluck("redo_request")).to match_array([nil, nil])
+      end
+
+      it "throws MissingSubAssignmentSubmissionError when sub-assignment submissions never existed" do
+        student = course_with_user("StudentEnrollment", course:, active_all: true, name: "Student").user
+
+        parent_assignment = course.assignments.create!(title: "Assignment 1", has_sub_assignments: true)
+        parent_submission = parent_assignment.submissions.find_by(user_id: student.id)
+        sub1 = parent_assignment.sub_assignments.create!(context: parent_assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
+        submission_to_be_deleted = sub1.find_or_create_submission(student)
+        submission_to_be_deleted.delete
+
+        expect(Submission.unscoped.find_by(user_id: student.id, assignment_id: sub1.id)).to be_nil
+
+        expect do
+          fake_controller.submission_json(parent_submission, parent_assignment, teacher, session, parent_assignment.context, field, params)
+        end.to raise_error(Checkpoints::SubAssignmentSubmissionSerializer::MissingSubAssignmentSubmissionError, /Submission is missing for SubAssignment/)
+      end
+
+      it "handles deleted sub-assignment submissions without throwing error" do
+        student = course_with_user("StudentEnrollment", course:, active_all: true, name: "Student").user
+
+        parent_assignment = course.assignments.create!(title: "Assignment 1", has_sub_assignments: true)
+        parent_submission = parent_assignment.submissions.find_by(user_id: student.id)
+        sub1 = parent_assignment.sub_assignments.create!(context: parent_assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
+        sub2 = parent_assignment.sub_assignments.create!(context: parent_assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
+
+        deleted_submission_1 = sub1.find_or_create_submission(student)
+        deleted_submission_2 = sub2.find_or_create_submission(student)
+        deleted_submission_1.update!(workflow_state: "deleted")
+        deleted_submission_2.update!(workflow_state: "deleted")
+
+        expect(Submission.unscoped.find_by(user_id: student.id, assignment_id: sub1.id)).not_to be_nil
+        expect(Submission.unscoped.find_by(user_id: student.id, assignment_id: sub2.id)).not_to be_nil
+
+        expect do
+          json = fake_controller.submission_json(parent_submission, parent_assignment, teacher, session, parent_assignment.context, field, params)
+          expect(json["has_sub_assignment_submissions"]).to be false
+          expect(json["sub_assignment_submissions"]).to be_empty
+        end.not_to raise_error
+      end
+
+      it "correctly sets has_sub_assignment_submissions based on active submissions only" do
+        student = course_with_user("StudentEnrollment", course:, active_all: true, name: "Student").user
+
+        parent_assignment = course.assignments.create!(title: "Assignment 1", has_sub_assignments: true)
+        parent_submission = parent_assignment.submissions.find_by(user_id: student.id)
+        sub1 = parent_assignment.sub_assignments.create!(context: parent_assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
+        sub2 = parent_assignment.sub_assignments.create!(context: parent_assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
+
+        sub1.find_or_create_submission(student)
+        deleted_submission = sub2.find_or_create_submission(student)
+        deleted_submission.update!(workflow_state: "deleted")
+
+        expect(Submission.unscoped.find_by(user_id: student.id, assignment_id: sub2.id)).not_to be_nil
+
+        json = fake_controller.submission_json(parent_submission, parent_assignment, teacher, session, parent_assignment.context, field, params)
+        expect(json["has_sub_assignment_submissions"]).to be true
+        expect(json["sub_assignment_submissions"].length).to eq(1)
+        expect(json["sub_assignment_submissions"].first["sub_assignment_tag"]).to eq(CheckpointLabels::REPLY_TO_TOPIC)
       end
 
       it "has false sub_assignment_submissions info for non-checkpointed assignments" do

@@ -1409,6 +1409,100 @@ describe Types::SubmissionType do
     end
   end
 
+  describe "hasSubAssignmentSubmissions" do
+    before do
+      @checkpoint_assignment = @course.assignments.create!(
+        name: "checkpoint assignment",
+        has_sub_assignments: true
+      )
+      @sub_assignment = @checkpoint_assignment.sub_assignments.create!(
+        name: "sub assignment",
+        context: @course,
+        sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
+        points_possible: 5
+      )
+      @checkpoint_submission = @checkpoint_assignment.submissions.find_by!(user: @student)
+    end
+
+    it "returns true when assignment has active sub assignment submissions" do
+      checkpoint_submission_type = GraphQLTypeTester.new(@checkpoint_submission, current_user: @teacher)
+      expect(checkpoint_submission_type.resolve("hasSubAssignmentSubmissions")).to be true
+    end
+
+    it "returns false when assignment has no active sub assignment submissions" do
+      @sub_assignment.submissions.update_all(workflow_state: "deleted")
+      checkpoint_submission_type = GraphQLTypeTester.new(@checkpoint_submission, current_user: @teacher)
+      expect(checkpoint_submission_type.resolve("hasSubAssignmentSubmissions")).to be false
+    end
+
+    it "returns false for non-checkpoint assignments" do
+      expect(submission_type.resolve("hasSubAssignmentSubmissions")).to be false
+    end
+  end
+
+  describe "subAssignmentSubmissions" do
+    before do
+      @checkpoint_assignment = @course.assignments.create!(
+        name: "checkpoint assignment",
+        has_sub_assignments: true
+      )
+      @sub_assignment1 = @checkpoint_assignment.sub_assignments.create!(
+        name: "sub assignment 1",
+        context: @course,
+        sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
+        points_possible: 5
+      )
+      @sub_assignment2 = @checkpoint_assignment.sub_assignments.create!(
+        name: "sub assignment 2",
+        context: @course,
+        sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY,
+        points_possible: 5
+      )
+      @checkpoint_submission = @checkpoint_assignment.submissions.find_by!(user: @student)
+      @sub_submission1 = @sub_assignment1.find_or_create_submission(@student)
+      @sub_submission2 = @sub_assignment2.find_or_create_submission(@student)
+    end
+
+    it "returns sub assignment submissions when they exist" do
+      checkpoint_submission_type = GraphQLTypeTester.new(@checkpoint_submission, current_user: @teacher)
+      result = checkpoint_submission_type.resolve("subAssignmentSubmissions { assignmentId }")
+      expect(result).to contain_exactly(@sub_assignment1.id.to_s, @sub_assignment2.id.to_s)
+    end
+
+    it "does not return sub assignment submissions with deleted workflow state" do
+      @sub_submission2.update(workflow_state: "deleted")
+
+      checkpoint_submission_type = GraphQLTypeTester.new(@checkpoint_submission, current_user: @teacher)
+      result = checkpoint_submission_type.resolve("subAssignmentSubmissions { assignmentId }")
+      expect(result).to eq [@sub_assignment1.id.to_s]
+    end
+
+    it "returns nil for non-checkpoint assignments" do
+      result = submission_type.resolve("subAssignmentSubmissions { assignmentId }")
+      expect(result).to be_nil
+    end
+
+    it "returns empty array when checkpoint assignment has no sub assignments" do
+      assignment_without_subs = @course.assignments.create!(
+        name: "checkpoint without subs",
+        has_sub_assignments: true
+      )
+      submission_without_subs = assignment_without_subs.submissions.find_by!(user: @student)
+
+      submission_type_without_subs = GraphQLTypeTester.new(submission_without_subs, current_user: @teacher)
+      result = submission_type_without_subs.resolve("subAssignmentSubmissions { assignmentId }")
+      expect(result).to eq []
+    end
+
+    it "returns error when no submission existed ever" do
+      @sub_submission1.delete
+      checkpoint_submission_type = GraphQLTypeTester.new(@checkpoint_submission, current_user: @teacher)
+      expect do
+        checkpoint_submission_type.resolve("subAssignmentSubmissions { assignmentId }")
+      end.to raise_error(Checkpoints::SubAssignmentSubmissionSerializer::MissingSubAssignmentSubmissionError, /Submission is missing for SubAssignment/)
+    end
+  end
+
   describe "provisionalGradesConnection" do
     before(:once) do
       @teacher1 = user_factory(active_all: true)
