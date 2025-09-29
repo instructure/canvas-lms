@@ -469,7 +469,7 @@ class ApplicationController < ActionController::Base
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     account_level_mastery_scales
-    ams_service
+    ams_root_account_integration
     buttons_and_icons_root_account
     course_pace_allow_bulk_pace_assign
     course_pace_download_document

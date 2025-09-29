@@ -3521,7 +3521,9 @@ class Course < ActiveRecord::Base
       tabs += default_tabs
       tabs += external_tabs
 
-      if root_account.feature_enabled?(:ams_service) && tabs.any? { |t| t[:label] == "Item Banks" }
+      if root_account.feature_enabled?(:ams_root_account_integration) &&
+         feature_enabled?(:ams_course_integration) &&
+         tabs.any? { |t| t[:label] == "Item Banks" }
         ams_item_banks_tab = {
           id: TAB_ITEM_BANKS,
           label: t("#tabs.item_banks", "Item Banks"),
