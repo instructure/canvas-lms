@@ -33,6 +33,7 @@ import {
 } from '../../../../graphql/Mocks'
 import {User} from '../../../../graphql/User'
 import {waitFor} from '@testing-library/dom'
+import {ObserverContext} from '../../../utils/ObserverContext'
 
 jest.mock('@canvas/util/globalUtils')
 
@@ -85,7 +86,11 @@ describe('DiscussionThreadContainer', () => {
         <AlertManagerContext.Provider
           value={{setOnFailure: onFailureStub, setOnSuccess: onSuccessStub}}
         >
-          <DiscussionThreadContainer {...props} />
+          <ObserverContext.Provider
+            value={{observerRef: {current: undefined}, nodesRef: {current: new Map()}}}
+          >
+            <DiscussionThreadContainer {...props} />
+          </ObserverContext.Provider>
         </AlertManagerContext.Provider>
       </MockedProvider>,
     )

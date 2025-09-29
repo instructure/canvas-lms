@@ -234,6 +234,7 @@ const useTranslation = () => {
     updateLoading,
     tryTranslate,
     forceTranslate,
+    translateEntry,
   }
 }
 

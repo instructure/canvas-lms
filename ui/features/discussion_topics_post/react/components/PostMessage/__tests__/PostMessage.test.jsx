@@ -22,6 +22,7 @@ import {render, screen, act, cleanup} from '@testing-library/react'
 import {SearchContext} from '../../../utils/constants'
 import {User} from '../../../../graphql/User'
 import {responsiveQuerySizes} from '../../../utils'
+import {ObserverContext} from '../../../utils/ObserverContext'
 
 jest.mock('../../../utils')
 
@@ -53,15 +54,19 @@ beforeEach(() => {
 
 const setup = (props, {searchTerm = ''} = {}) => {
   return render(
-    <SearchContext.Provider value={{searchTerm}}>
-      <PostMessage
-        author={User.mock()}
-        timingDisplay="Jan 1 2000"
-        message="Posts are fun"
-        title="Thoughts"
-        {...props}
-      />
-    </SearchContext.Provider>,
+    <ObserverContext.Provider
+      value={{observerRef: {current: undefined}, nodesRef: {current: new Map()}}}
+    >
+      <SearchContext.Provider value={{searchTerm}}>
+        <PostMessage
+          author={User.mock()}
+          timingDisplay="Jan 1 2000"
+          message="Posts are fun"
+          title="Thoughts"
+          {...props}
+        />
+      </SearchContext.Provider>
+    </ObserverContext.Provider>,
   )
 }
 
@@ -127,14 +132,18 @@ describe('PostMessage', () => {
       // Rerender with new props
       await act(async () => {
         rerender(
-          <SearchContext.Provider value={{searchTerm: ''}}>
-            <PostMessage
-              author={User.mock()}
-              timingDisplay="Jan 1 2000"
-              message="Updated message"
-              title="Thoughts"
-            />
-          </SearchContext.Provider>,
+          <ObserverContext.Provider
+            value={{observerRef: {current: undefined}, nodesRef: {current: new Map()}}}
+          >
+            <SearchContext.Provider value={{searchTerm: ''}}>
+              <PostMessage
+                author={User.mock()}
+                timingDisplay="Jan 1 2000"
+                message="Updated message"
+                title="Thoughts"
+              />
+            </SearchContext.Provider>
+          </ObserverContext.Provider>,
         )
       })
 
