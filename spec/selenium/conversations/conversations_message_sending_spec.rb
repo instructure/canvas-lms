@@ -502,14 +502,18 @@ describe "conversations new" do
           expect(f("input[data-testid='individual-message-checkbox']")).not_to be_disabled
           fj("div[data-testid='address-book-item']:contains('Students')").click
           wait_for_ajaximations
-
           fj("div[data-testid='address-book-item']:contains('All in Students')").click
+          wait_for_ajaximations
           expect(fj("span[data-testid='address-book-tag']:contains('All in Students')")).to be_present
 
+          f("#address-book-form").click
+          wait_for_ajaximations
           force_click(checkbox_selector)
+          wait_for_ajaximations
           expect(f(checkbox_selector).attribute("checked")).to eq "true"
 
           force_click(checkbox_selector)
+          wait_for_ajaximations
           expect(f(checkbox_selector).attribute("checked")).to be_nil
 
           f("textarea[data-testid='message-body']").send_keys "sent to everyone in the account level group"
