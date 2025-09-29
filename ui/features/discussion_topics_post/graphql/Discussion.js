@@ -223,6 +223,7 @@ export const Discussion = {
       sortOrder: 'desc',
       expanded: false,
       summaryEnabled: false,
+      preferredLanguage: null,
       __typename: 'DiscussionParticipant',
     },
     sortOrderLocked = false,

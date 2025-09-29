@@ -35,6 +35,7 @@ import {
 import {PeerReviews} from '../../../../graphql/PeerReviews'
 import {getSpeedGraderUrl, responsiveQuerySizes} from '../../../utils'
 import {DiscussionTopicContainer} from '../DiscussionTopicContainer'
+import {ObserverContext} from '../../../utils/ObserverContext'
 
 // mock assignLocation
 jest.mock('@canvas/util/globalUtils', () => ({
@@ -117,7 +118,11 @@ describe('DiscussionTopicContainer', () => {
     return render(
       <MockedProvider mocks={mocks}>
         <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
-          <DiscussionTopicContainer {...props} />
+          <ObserverContext.Provider
+            value={{observerRef: {current: undefined}, nodesRef: {current: new Map()}}}
+          >
+            <DiscussionTopicContainer {...props} />
+          </ObserverContext.Provider>
         </AlertManagerContext.Provider>
       </MockedProvider>,
     )

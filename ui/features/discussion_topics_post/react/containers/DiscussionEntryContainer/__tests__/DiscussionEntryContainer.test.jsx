@@ -23,6 +23,7 @@ import {render} from '@testing-library/react'
 import {User} from '../../../../graphql/User'
 import {Attachment} from '../../../../graphql/Attachment'
 import {MockedProvider} from '@apollo/client/testing'
+import {ObserverContext} from '../../../utils/ObserverContext'
 
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),
@@ -103,7 +104,11 @@ describe('DiscussionEntryContainer', () => {
   const setup = props => {
     return render(
       <MockedProvider mocks={[]}>
-        <DiscussionEntryContainer {...props} />
+        <ObserverContext.Provider
+          value={{observerRef: {current: undefined}, nodesRef: {current: new Map()}}}
+        >
+          <DiscussionEntryContainer {...props} />
+        </ObserverContext.Provider>
       </MockedProvider>,
     )
   }
