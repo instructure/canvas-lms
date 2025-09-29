@@ -4300,6 +4300,115 @@ describe CoursesController, type: :request do
       end
     end
 
+    it "does not return syllabus_versions when feature flag is disabled" do
+      Account.site_admin.disable_feature!(:syllabus_versioning)
+      6.times do |i|
+        @course1.update(syllabus_body: "Version #{i + 1}")
+      end
+
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course1.id}.json?include[]=syllabus_versions",
+                      { controller: "courses", action: "show", id: @course1.to_param, format: "json", include: ["syllabus_versions"] })
+      expect(json).not_to have_key("syllabus_versions")
+    end
+
+    it "returns syllabus_versions when feature flag is enabled and param is present" do
+      Account.site_admin.enable_feature!(:syllabus_versioning)
+      6.times do |i|
+        @course1.update(syllabus_body: "Version #{i + 1}")
+      end
+
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course1.id}.json?include[]=syllabus_versions",
+                      { controller: "courses", action: "show", id: @course1.to_param, format: "json", include: ["syllabus_versions"] })
+      expect(json).to have_key("syllabus_versions")
+      expect(json["syllabus_versions"]).to be_an(Array)
+      expect(json["syllabus_versions"].length).to eq(5)
+      expect(json["syllabus_versions"].first["syllabus_body"]).to include("Version 6")
+    end
+
+    it "does not return syllabus_versions when param is not present" do
+      Account.site_admin.enable_feature!(:syllabus_versioning)
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course1.id}.json",
+                      { controller: "courses", action: "show", id: @course1.to_param, format: "json" })
+      expect(json).not_to have_key("syllabus_versions")
+    end
+
+    it "does not return syllabus_versions when user lacks manage_course_content_edit permission" do
+      Account.site_admin.enable_feature!(:syllabus_versioning)
+      student_in_course(active_all: true, course: @course1)
+      SimplyVersioned::Version.create!(
+        versionable: @course1,
+        versionable_type: "Course",
+        number: 1,
+        yaml: { syllabus_body: "Version 1" }.to_yaml,
+        created_at: 1.day.ago
+      )
+      json = api_call_as_user(@student,
+                              :get,
+                              "/api/v1/courses/#{@course1.id}.json?include[]=syllabus_versions",
+                              { controller: "courses", action: "show", id: @course1.to_param, format: "json", include: ["syllabus_versions"] })
+      expect(json).not_to have_key("syllabus_versions")
+    end
+
+    describe "#restore_version" do
+      before do
+        Account.site_admin.enable_feature!(:syllabus_versioning)
+        @course1.update!(syllabus_body: "Previous content")
+        @version = @course1.versions.last
+        @course1.update!(syllabus_body: "Current content")
+      end
+
+      it "restores a previous version" do
+        api_call(:post,
+                 "/api/v1/courses/#{@course1.id}/restore/#{@version.number}",
+                 { controller: "courses", action: "restore_version", course_id: @course1.to_param, version_id: @version.number.to_s, format: "json" })
+
+        @course1.reload
+        expect(@course1.syllabus_body).to eq("Previous content")
+      end
+
+      it "returns course json after successful restore" do
+        json = api_call(:post,
+                        "/api/v1/courses/#{@course1.id}/restore/#{@version.number}",
+                        { controller: "courses", action: "restore_version", course_id: @course1.to_param, version_id: @version.number.to_s, format: "json" })
+
+        expect(json).to have_key("id")
+        expect(json["id"]).to eq(@course1.id)
+      end
+
+      it "returns 404 when version does not exist" do
+        api_call(:post,
+                 "/api/v1/courses/#{@course1.id}/restore/999",
+                 { controller: "courses", action: "restore_version", course_id: @course1.to_param, version_id: "999", format: "json" },
+                 {},
+                 {},
+                 { expected_status: 404 })
+      end
+
+      it "requires manage_course_content_edit permission" do
+        student_in_course(active_all: true, course: @course1)
+        api_call_as_user(@student,
+                         :post,
+                         "/api/v1/courses/#{@course1.id}/restore/#{@version.number}",
+                         { controller: "courses", action: "restore_version", course_id: @course1.to_param, version_id: @version.number.to_s, format: "json" },
+                         {},
+                         {},
+                         { expected_status: 403 })
+      end
+
+      it "requires feature flag to be enabled" do
+        Account.site_admin.disable_feature!(:syllabus_versioning)
+        api_call(:post,
+                 "/api/v1/courses/#{@course1.id}/restore/#{@version.number}",
+                 { controller: "courses", action: "restore_version", course_id: @course1.to_param, version_id: @version.number.to_s, format: "json" },
+                 {},
+                 {},
+                 { expected_status: 404 })
+      end
+    end
+
     describe "#show" do
       it "gets individual course data" do
         @course1.root_account.update(default_time_zone: "America/Los_Angeles")

@@ -36,6 +36,7 @@ module Api::V1
 
     INCLUDE_CHECKERS = { grading: "needs_grading_count",
                          syllabus: "syllabus_body",
+                         syllabus_versions: "syllabus_versions",
                          url: "html_url",
                          description: "public_description",
                          permissions: "permissions" }.freeze

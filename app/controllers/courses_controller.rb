@@ -4466,6 +4466,38 @@ class CoursesController < ApplicationController
   end
   helper_method :accessibility_issues_count
 
+  # @API Restore course version
+  #
+  # Restore a course to a prior version.
+  #
+  # @argument version_id [Required, Integer]
+  #   The version to restore to (use the syllabus_versions include parameter
+  #   in the course show API to see available versions)
+  #
+  # @example_request
+  #    curl -X POST -H 'Authorization: Bearer <token>' \
+  #    https://<canvas>/api/v1/courses/123/restore/4
+  #
+  # @returns Course
+  def restore_version
+    not_found unless Account.site_admin&.feature_enabled?(:syllabus_versioning)
+
+    get_context
+    return unless authorized_action(@context, @current_user, :manage_course_content_edit)
+
+    version_id = params[:version_id].to_i
+    @version = @context.versions.find_by!(number: version_id).model
+
+    @context.syllabus_body = @version.syllabus_body
+    @context.saving_user = @current_user
+
+    if @context.save
+      render json: course_json(@context, @current_user, session, [], nil)
+    else
+      render json: @context.errors, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def validate_assignment_ids(assignment_ids)

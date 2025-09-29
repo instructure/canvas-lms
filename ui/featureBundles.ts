@@ -209,6 +209,7 @@ const featureBundles: {
   submissions: () => import('./features/submissions/index'),
   submit_assignment: () => import('./features/submit_assignment/index'),
   syllabus: () => import('./features/syllabus/index'),
+  syllabus_revisions: () => import('./features/syllabus_revisions/index'),
   take_quiz: () => import('./features/take_quiz/index'),
   teacher_activity_report: () => import('./features/teacher_activity_report/index'),
   terms_index: () => import('./features/terms_index/index'),

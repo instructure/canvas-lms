@@ -38,6 +38,35 @@ class Course < ActiveRecord::Base
 
   alias_attribute :short_name, :course_code
 
+  SIMPLY_VERSIONED_EXCLUDE_FIELDS = %w[
+    id
+    account_id
+    root_account_id
+    wiki_id
+    enrollment_term_id
+    abstract_course_id
+    grading_standard_id
+    template_course_id
+    replacement_course_id
+    latest_outcome_import_id
+    homeroom_course_id
+    sis_source_id
+    sis_batch_id
+    stuck_sis_fields
+    integration_id
+    lti_context_id
+    turnitin_id
+    workflow_state
+    uuid
+    indexed
+    delete_me_frd
+    deleted_at
+    archived_at
+    storage_quota
+    created_at
+    updated_at
+  ].freeze
+
   time_zone_attribute :time_zone
   def time_zone
     super || RequestCache.cache("account_time_zone", root_account_id) do
@@ -347,6 +376,19 @@ class Course < ActiveRecord::Base
   validates_locale allow_nil: true
 
   sanitize_field :syllabus_body, CanvasSanitize::SANITIZE
+
+  simply_versioned exclude: SIMPLY_VERSIONED_EXCLUDE_FIELDS,
+                   keep: 5,
+                   when: lambda { |course|
+                     return false unless course.syllabus_body_changed?
+
+                     begin
+                       !!Account.site_admin&.feature_enabled?(:syllabus_versioning)
+                     rescue => e
+                       Rails.logger.warn("Error checking syllabus_versioning flag: #{e.message}")
+                       false
+                     end
+                   }
 
   include StickySisFields
 

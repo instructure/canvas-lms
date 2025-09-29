@@ -154,6 +154,19 @@ ready(() => {
   // so this must be done on dom ready
   SyllabusBehaviors.bindToEditSyllabus(true)
   SyllabusBehaviors.bindToMiniCalendar()
+
+  const syllabusRevisionsBtn = document.getElementById('syllabus_revisions_btn')
+  if (syllabusRevisionsBtn) {
+    const contextInfo = ENV.context_asset_string.split('_')
+    const courseId = contextInfo[0] === 'course' ? contextInfo[1] : undefined
+    if (courseId) {
+      import(/* webpackChunkName: "syllabus_revisions" */ '../syllabus_revisions/index').then(
+        module => {
+          module.initSyllabusRevisionsTray(courseId, syllabusRevisionsBtn)
+        },
+      )
+    }
+  }
 })
 
 function renderCoursePacingNotice() {
