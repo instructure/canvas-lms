@@ -2096,6 +2096,24 @@ describe ContextModule do
     m2.evaluate_for(@student)
   end
 
+  describe "ContextModuleProgressions::Finder" do
+    before :once do
+      course_with_student(active_all: true)
+      @module = @course.context_modules.create!(name: "Test Module", workflow_state: "active")
+      @user = user_factory
+    end
+
+    it "handles nil progressions without raising NoMethodError for non-enrolled users" do
+      allow_any_instance_of(ContextModule).to receive(:find_or_create_progression).and_return(nil)
+
+      expect { ContextModuleProgressions::Finder.find_or_create_for_context_and_user(@course, @user) }
+        .not_to raise_error
+
+      result = ContextModuleProgressions::Finder.find_or_create_for_context_and_user(@course, @user)
+      expect(result).to eq([])
+    end
+  end
+
   describe "only_visible_to_overrides" do
     before :once do
       course_factory
