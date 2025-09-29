@@ -17,7 +17,6 @@
  */
 
 import {Button} from '@instructure/ui-buttons'
-import {IconEditLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('block_content_editor')
@@ -25,9 +24,10 @@ const I18n = createI18nScope('block_content_editor')
 type A11yEditButtonProps = {
   onUserAction: () => void
   elementRef?: (element: Element | null) => void
+  title: string
 }
 
-export const A11yEditButton = ({onUserAction, elementRef}: A11yEditButtonProps) => {
+export const A11yEditButton = ({onUserAction, elementRef, title}: A11yEditButtonProps) => {
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault()
@@ -38,9 +38,9 @@ export const A11yEditButton = ({onUserAction, elementRef}: A11yEditButtonProps) 
   return (
     <Button
       data-focus-reveal-button
+      data-testid="a11y-edit-button"
       color="primary"
-      renderIcon={<IconEditLine />}
-      aria-label={I18n.t('Edit block content')}
+      aria-label={I18n.t('Edit content for %{title}', {title})}
       onKeyDown={handleKeyDown}
       onClick={onUserAction}
       elementRef={elementRef}

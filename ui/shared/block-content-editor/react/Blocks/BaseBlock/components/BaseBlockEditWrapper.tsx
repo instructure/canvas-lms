@@ -23,6 +23,7 @@ import {useDeleteNode} from '../../../hooks/useDeleteNode'
 import {useDuplicateNode} from '../../../hooks/useDuplicateNode'
 import {useMoveBlock} from '../../../hooks/useMoveBlock'
 import {useIsEditingBlock} from '../../../hooks/useIsEditingBlock'
+import {useBlockTitle} from '../../../hooks/useBlockTitle'
 import {BaseBlockLayout} from '../layout/BaseBlockLayout'
 import {CopyButton} from './CopyButton'
 import {SettingsButton} from './SettingsButton'
@@ -81,19 +82,11 @@ export const BaseBlockEditWrapper = (
     backgroundColor?: string
   }>,
 ) => {
-  const {id, customTitle, includeBlockTitle} = useNode(node => ({
-    id: node.id,
-    customTitle: node.data.props?.title,
-    includeBlockTitle: node.data.props?.includeBlockTitle,
-  }))
+  const {id} = useNode()
   const {setId} = useEditingBlock()
   const {isEditing, isEditingViaEditButton: isEditingByKeyboard} = useIsEditingBlock()
   const [editButtonRef, setEditButtonRef] = useInstUIRef<HTMLButtonElement>()
-
-  const blockTitle =
-    includeBlockTitle !== false && typeof customTitle === 'string' && customTitle.trim() !== ''
-      ? customTitle
-      : props.title
+  const blockTitle = useBlockTitle()
 
   const handleSave = () => {
     setId(null)
@@ -112,22 +105,34 @@ export const BaseBlockEditWrapper = (
         addButton={<InsertButton />}
         bottomA11yActionMenu={
           isEditing && (
-            <A11yDoneEditingButton onUserAction={handleSave} isFullyVisible={isEditingByKeyboard} />
+            <A11yDoneEditingButton
+              onUserAction={handleSave}
+              isFullyVisible={isEditingByKeyboard}
+              title={blockTitle}
+            />
           )
         }
         menu={
           <Flex gap="mediumSmall">
             <DuplicateButton key="menu-duplicate-button" title={blockTitle} />
-            <EditSettingsButton key="menu-edit-settings-button" title={blockTitle} />
+            <EditSettingsButton key="menu-edit-block-settings-button" title={blockTitle} />
             <DeleteButton key="menu-delete-button" title={blockTitle} />
             <MoveBlockButton key="menu-move-block-button" title={blockTitle} />
           </Flex>
         }
         topA11yActionMenu={
           !isEditing ? (
-            <A11yEditButton onUserAction={handleEditByKeyboard} elementRef={setEditButtonRef} />
+            <A11yEditButton
+              onUserAction={handleEditByKeyboard}
+              elementRef={setEditButtonRef}
+              title={blockTitle}
+            />
           ) : (
-            <A11yDoneEditingButton onUserAction={handleSave} isFullyVisible={false} />
+            <A11yDoneEditingButton
+              onUserAction={handleSave}
+              isFullyVisible={false}
+              title={blockTitle}
+            />
           )
         }
       >
