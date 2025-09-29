@@ -35,6 +35,13 @@ jest.mock('../../../../store', () => ({
   ...jest.requireActual('../../../../store'),
   useAppSetStore: jest.fn().mockReturnValue(jest.fn()),
 }))
+const mockUseBlockTitle = jest.fn()
+
+jest.mock('../../../../hooks/useBlockTitle', () => ({
+  useBlockTitle: () => mockUseBlockTitle(),
+}))
+
+const getUseBlockTitleMock = (title: string) => title
 
 jest.mock('../../../../hooks/useAddBlockModal', () => ({
   useAddBlockModal: () => ({
@@ -109,6 +116,7 @@ describe('BaseBlockEditWrapper', () => {
         canMoveDown: true,
       }),
     )
+    mockUseBlockTitle.mockReturnValue(getUseBlockTitleMock('Test Block Title'))
   })
 
   it('renders the title', () => {
@@ -176,7 +184,7 @@ describe('BaseBlockEditWrapper', () => {
 
     it('opens Settings Tray when Edit button is clicked', () => {
       const component = renderBlock(BaseBlockEditWrapper, getDefaultProps())
-      const editButton = component.getByText(/block settings/i)
+      const editButton = component.getByTestId('edit-block-settings-button')
 
       fireEvent.click(editButton)
 
@@ -260,6 +268,140 @@ describe('BaseBlockEditWrapper', () => {
 
         expect(mockFunction).toHaveBeenCalled()
       })
+    })
+  })
+
+  describe('A11yEditButton', () => {
+    it('is rendered when block is not in edit mode', () => {
+      const component = renderBlock(BaseBlockEditWrapper, getDefaultProps())
+      const editButton = component.getByTestId('a11y-edit-button')
+
+      expect(editButton).toBeInTheDocument()
+    })
+
+    it('is not rendered when block is in edit mode', () => {
+      mockUseIsEditingBlock.mockReturnValue(
+        getUseIsEditingBlockMock({isEditing: true, isEditingViaEditButton: true}),
+      )
+      const component = renderBlock(BaseBlockEditWrapper, getDefaultProps())
+      const editButton = component.queryByTestId('a11y-edit-button')
+
+      expect(editButton).not.toBeInTheDocument()
+    })
+
+    it('renders with block title as an aria-label', () => {
+      const component = renderBlock(BaseBlockEditWrapper, {
+        ...getDefaultProps(),
+      })
+      const editButton = component.getByTestId('a11y-edit-button')
+
+      expect(editButton).toHaveAttribute(
+        'aria-label',
+        `Edit content for ${getDefaultProps().title}`,
+      )
+    })
+
+    it('renders with custom title as an aria-label', () => {
+      const customTitle = 'Custom Title'
+      mockUseBlockTitle.mockReturnValue(getUseBlockTitleMock(customTitle))
+
+      const component = renderBlock(BaseBlockEditWrapper, {
+        ...getDefaultProps(),
+      })
+      const editButton = component.getByTestId('a11y-edit-button')
+      expect(editButton).toHaveAttribute('aria-label', `Edit content for ${customTitle}`)
+    })
+  })
+
+  describe('A11yDoneEditingButton', () => {
+    it('renders twice when block is in edit mode', () => {
+      mockUseIsEditingBlock.mockReturnValue(
+        getUseIsEditingBlockMock({isEditing: true, isEditingViaEditButton: true}),
+      )
+      const component = renderBlock(BaseBlockEditWrapper, getDefaultProps())
+      const doneButtons = component.queryAllByTestId('a11y-done-editing-button')
+
+      expect(doneButtons).toHaveLength(2)
+    })
+
+    it('not renders twice when block is not in edit mode', () => {
+      const component = renderBlock(BaseBlockEditWrapper, getDefaultProps())
+      const doneButtons = component.queryAllByTestId('a11y-done-editing-button')
+
+      expect(doneButtons).toHaveLength(0)
+    })
+
+    describe('Focus behavior', () => {
+      it('renders 1st Done editing button only focusable when edited via edit button', () => {
+        mockUseIsEditingBlock.mockReturnValue(
+          getUseIsEditingBlockMock({isEditing: true, isEditingViaEditButton: true}),
+        )
+        const component = renderBlock(BaseBlockEditWrapper, getDefaultProps())
+        const doneButtons = component.queryAllByTestId('a11y-done-editing-button')
+
+        expect(doneButtons[0]).toHaveAttribute('data-focus-reveal-button', 'true')
+      })
+
+      it('renders 1st Done editing button only focusable when not edited via edit button', () => {
+        mockUseIsEditingBlock.mockReturnValue(
+          getUseIsEditingBlockMock({isEditing: true, isEditingViaEditButton: false}),
+        )
+        const component = renderBlock(BaseBlockEditWrapper, getDefaultProps())
+        const doneButtons = component.queryAllByTestId('a11y-done-editing-button')
+
+        expect(doneButtons[0]).toHaveAttribute('data-focus-reveal-button', 'true')
+      })
+
+      it('renders 2nd Done editing button visible when edited via edit button', () => {
+        mockUseIsEditingBlock.mockReturnValue(
+          getUseIsEditingBlockMock({isEditing: true, isEditingViaEditButton: true}),
+        )
+        const component = renderBlock(BaseBlockEditWrapper, getDefaultProps())
+        const doneButtons = component.queryAllByTestId('a11y-done-editing-button')
+
+        expect(doneButtons[1]).not.toHaveAttribute('data-focus-reveal-button')
+      })
+
+      it('renders 2nd Done editing button only focusable when not edited via edit button', () => {
+        mockUseIsEditingBlock.mockReturnValue(
+          getUseIsEditingBlockMock({isEditing: true, isEditingViaEditButton: false}),
+        )
+        const component = renderBlock(BaseBlockEditWrapper, getDefaultProps())
+        const doneButtons = component.queryAllByTestId('a11y-done-editing-button')
+
+        expect(doneButtons[1]).toHaveAttribute('data-focus-reveal-button', 'true')
+      })
+    })
+
+    it('renders both buttons with block title in aria-label', () => {
+      mockUseIsEditingBlock.mockReturnValue(
+        getUseIsEditingBlockMock({isEditing: true, isEditingViaEditButton: true}),
+      )
+      const component = renderBlock(BaseBlockEditWrapper, {
+        ...getDefaultProps(),
+      })
+      const expectedAriaLabel = `Done editing for ${getDefaultProps().title}`
+      const doneButtons = component.queryAllByTestId('a11y-done-editing-button')
+
+      expect(doneButtons[0]).toHaveAttribute('aria-label', expectedAriaLabel)
+      expect(doneButtons[1]).toHaveAttribute('aria-label', expectedAriaLabel)
+    })
+
+    it('renders both buttons with custom title in aria-label', () => {
+      mockUseIsEditingBlock.mockReturnValue(
+        getUseIsEditingBlockMock({isEditing: true, isEditingViaEditButton: true}),
+      )
+      const customTitle = 'Custom Title'
+      mockUseBlockTitle.mockReturnValue(getUseBlockTitleMock(customTitle))
+
+      const component = renderBlock(BaseBlockEditWrapper, {
+        ...getDefaultProps(),
+      })
+      const expectedAriaLabel = `Done editing for ${customTitle}`
+      const doneButtons = component.queryAllByTestId('a11y-done-editing-button')
+
+      expect(doneButtons[0]).toHaveAttribute('aria-label', expectedAriaLabel)
+      expect(doneButtons[1]).toHaveAttribute('aria-label', expectedAriaLabel)
     })
   })
 })

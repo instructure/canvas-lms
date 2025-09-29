@@ -47,7 +47,7 @@ class BlockComponent
   end
 
   def settings_button
-    f("[data-testid='block-settings-button']", @block)
+    f("[data-testid='edit-block-settings-button']", @block)
   end
 
   def remove_button

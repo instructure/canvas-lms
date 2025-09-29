@@ -16,21 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as createI18nScope} from '@canvas/i18n'
-import {IconButton} from '@instructure/ui-buttons'
-import {IconEditLine} from '@instructure/ui-icons'
+import {useNode} from '@craftjs/core'
 
-const I18n = createI18nScope('block_content_editor')
+export const useBlockTitle = (): string => {
+  const {customTitle, includeBlockTitle, title} = useNode(node => ({
+    customTitle: node.data.props?.title,
+    includeBlockTitle: node.data.props?.includeBlockTitle,
+    title: node.data.displayName,
+  }))
 
-export const SettingsButton = (props: {onClicked: () => void; title: string}) => {
-  return (
-    <IconButton
-      data-testid="edit-block-settings-button"
-      data-action-button
-      screenReaderLabel={I18n.t('Edit settings for %{title}', {title: props.title})}
-      onClick={props.onClicked}
-    >
-      <IconEditLine />
-    </IconButton>
-  )
+  return includeBlockTitle !== false && typeof customTitle === 'string' && customTitle.trim() !== ''
+    ? customTitle
+    : title
 }

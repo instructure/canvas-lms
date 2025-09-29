@@ -26,6 +26,7 @@ import {IconEditLine, IconProgressLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {useNode} from '@craftjs/core'
+import {useBlockTitle} from '../../../hooks/useBlockTitle'
 import {ImageCaption} from './ImageCaption'
 import {View} from '@instructure/ui-view'
 import {useSettingsTray} from '../../../hooks/useSettingsTray'
@@ -45,6 +46,7 @@ export const ImageEdit = ({
   const [isOpen, setIsOpen] = useState(false)
   const {open} = useSettingsTray()
   const {id} = useNode()
+  const blockTitle = useBlockTitle()
 
   const closeModal = () => setIsOpen(false)
   const openModal = () => setIsOpen(true)
@@ -93,7 +95,7 @@ export const ImageEdit = ({
             </ImageCaption>
             <IconButton
               data-testid="edit-block-image"
-              screenReaderLabel={I18n.t('Edit block')}
+              screenReaderLabel={I18n.t('Edit settings for %{title}', {title: blockTitle})}
               onClick={() => open(id)}
               size="small"
             >
