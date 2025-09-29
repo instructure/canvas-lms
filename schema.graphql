@@ -9383,6 +9383,7 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
   groupId: ID
   hasOriginalityReport: Boolean!
   hasPostableComments: Boolean!
+  hasSubAssignmentSubmissions: Boolean
   hasUnreadRubricAssessment: Boolean!
 
   """
@@ -9774,6 +9775,7 @@ type SubmissionHistory implements SubmissionInterface & Timestamped {
   groupId: ID
   hasOriginalityReport: Boolean!
   hasPostableComments: Boolean!
+  hasSubAssignmentSubmissions: Boolean
   hasUnreadRubricAssessment: Boolean!
 
   """
@@ -9993,6 +9995,7 @@ interface SubmissionInterface {
   groupId: ID
   hasOriginalityReport: Boolean!
   hasPostableComments: Boolean!
+  hasSubAssignmentSubmissions: Boolean
   hasUnreadRubricAssessment: Boolean!
 
   """

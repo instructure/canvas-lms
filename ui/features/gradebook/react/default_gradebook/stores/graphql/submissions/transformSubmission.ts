@@ -112,6 +112,6 @@ export const transformSubmission = (it: Submission): ApiSubmission => {
     word_count: null,
     hidden: undefined as unknown as boolean,
     submission_comments: undefined as unknown as [],
-    has_sub_assignment_submissions: it.assignment.hasSubAssignments,
+    has_sub_assignment_submissions: it.hasSubAssignmentSubmissions,
   }
 }

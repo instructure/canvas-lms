@@ -875,7 +875,7 @@ describe "Submissions API", type: :request do
     end
 
     it "does not return deleted sub assignment submissions" do
-      @sub1.destroy
+      @sub1.update(workflow_state: "deleted")
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student1.id}.json",
                       { controller: "submissions_api",
@@ -890,8 +890,8 @@ describe "Submissions API", type: :request do
     end
 
     it "returns empty array for sub_assignment_submissions when there are none" do
-      @sub1.destroy
-      @sub2.destroy
+      @sub1.update(workflow_state: "deleted")
+      @sub2.update(workflow_state: "deleted")
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student1.id}.json",
                       { controller: "submissions_api",
