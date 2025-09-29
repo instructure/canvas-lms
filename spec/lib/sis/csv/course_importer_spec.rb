@@ -19,7 +19,7 @@
 #
 
 describe SIS::CSV::CourseImporter do
-  before { account_model }
+  before(:once) { account_model }
 
   it "skips bad content" do
     before_count = Course.count
@@ -1024,5 +1024,27 @@ describe SIS::CSV::CourseImporter do
     course = @account.all_courses.where(sis_source_id: "test_1").first
     expect(course.name).to eq "Test Course 101"
     expect(course.friendly_name).to be_nil
+  end
+
+  it "sets integration IDs" do
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status,integration_id",
+      "test_1,TC 101,Test Course 101,,,active,CINT-001"
+    )
+    course = Course.find_by(sis_source_id: "test_1")
+    expect(course.integration_id).to eq "CINT-001"
+  end
+
+  it "doesn't remove integration IDs when not specified" do
+    course = @account.courses.create!(sis_source_id: "test_1", integration_id: "CINT-001")
+    course.stuck_sis_fields = Set.new
+    course.save!
+
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101.9,,,active"
+    )
+    expect(course.reload.integration_id).to eq "CINT-001"
+    expect(course.name).to eq "Test Course 101.9"
   end
 end
