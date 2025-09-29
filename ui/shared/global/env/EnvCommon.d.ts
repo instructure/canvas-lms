@@ -349,6 +349,7 @@ export type RootAccountFeatureId =
   | 'open_tools_in_new_tab'
   | 'product_tours'
   | 'rce_lite_enabled_speedgrader_comments'
+  | 'rce_studio_embed_improvements'
   | 'rce_transform_loaded_content'
   | 'restrict_student_access'
   | 'rubric_criterion_range'

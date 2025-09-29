@@ -143,6 +143,7 @@ const featureBundles: {
   lti_collaborations: () => import('./features/lti_collaborations/index'),
   manage_avatars: () => import('./features/manage_avatars/index'),
   manage_groups: () => import('./features/manage_groups/index'),
+  media_immersive_view: () => import('./features/media_immersive_view/index'),
   media_player_iframe_content: () => import('./features/media_player_iframe_content/index'),
   mobile_login: () => import('./features/mobile_login/index'),
   moderate_quiz: () => import('./features/moderate_quiz/index'),
