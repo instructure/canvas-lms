@@ -357,6 +357,50 @@ describe('DiscussionTopicForm', () => {
     )
   })
 
+  it('sets the default time to EOD for end time ', async () => {
+    window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
+    window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.course_published = false
+    window.ENV.TIMEZONE = 'America/Denver'
+
+    const document = setup()
+
+    const dateInput = document.getByTestId('announcement-available-until-date')
+
+    await userEvent.click(dateInput)
+    await userEvent.type(dateInput, '09/30/2025')
+
+    // Trigger blur to ensure the date change is processed
+    fireEvent.blur(dateInput)
+
+    const timeInput = await document.findByTestId('announcement-available-until-time')
+
+    await waitFor(() => {
+      expect(timeInput.value).toBe('11:59 PM')
+    })
+  })
+
+  it('sets the default time to BOD for start time ', async () => {
+    window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
+    window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.course_published = false
+    window.ENV.TIMEZONE = 'America/Denver'
+
+    const document = setup()
+
+    const dateInput = document.getByTestId('announcement-available-from-date')
+
+    await userEvent.click(dateInput)
+    await userEvent.type(dateInput, '09/30/2025')
+
+    // Trigger blur to ensure the date change is processed
+    fireEvent.blur(dateInput)
+
+    const timeInput = await document.findByTestId('announcement-available-from-time')
+
+    await waitFor(() => {
+      expect(timeInput.value).toBe('12:00 AM')
+    })
+  })
+
   it('does not show info alert when creating a scheduled announcement in a published course', async () => {
     window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
     window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.course_published = true
