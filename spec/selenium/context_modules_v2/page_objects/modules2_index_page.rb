@@ -58,6 +58,18 @@ module Modules2IndexPage
     "[data-testid='edit-item-modal']"
   end
 
+  def edit_item_submit_button_selector
+    "form[data-testid='edit-item-modal'] button[type='submit']"
+  end
+
+  def edit_item_modal_title_selector
+    "form[data-testid='edit-item-modal'] input[data-testid='edit-modal-title']"
+  end
+
+  def edit_item_modal_new_tab_checkbox_selector
+    "form[data-testid='edit-item-modal'] input[data-testid='edit-modal-new-tab']"
+  end
+
   def expand_all_modules_button_selector
     "button[aria-label='Expand All Modules']"
   end
@@ -513,6 +525,18 @@ module Modules2IndexPage
 
   def edit_item_modal_url_value
     edit_item_modal.find_element(:css, "input[data-testid='edit-modal-url']").attribute("value")
+  end
+
+  def edit_item_modal_submit_button
+    f(edit_item_submit_button_selector)
+  end
+
+  def edit_item_modal_title_input
+    f(edit_item_modal_title_selector)
+  end
+
+  def edit_item_modal_new_tab_checkbox
+    f(edit_item_modal_new_tab_checkbox_selector)
   end
 
   def expand_all_modules_button

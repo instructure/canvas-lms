@@ -31,6 +31,7 @@ describe "context module items", :ignore_js_errors do
   include Modules2ActionTray
   include ItemsAssignToTray
   include AssignmentsCommon
+  include Modules2ActionTray
 
   before :once do
     modules2_teacher_setup
@@ -87,15 +88,16 @@ describe "context module items", :ignore_js_errors do
       wait_for_ajaximations
 
       module_header_expand_toggles.first.click
-
       expect(module_item_publish_button(@module_item1.id).text).to include "Published"
 
       # Unpublish the first module item
       module_item_publish_button(@module_item1.id).click
+      wait_for_ajaximations
       expect(module_item_publish_button(@module_item1.id).text).to include "Unpublished"
 
       # Republish the first module item
       module_item_publish_button(@module_item1.id).click
+      wait_for_ajaximations
       expect(module_item_publish_button(@module_item1.id).text).to include "Published"
     end
 
@@ -256,7 +258,7 @@ describe "context module items", :ignore_js_errors do
         module_item_action_menu_link("Edit").click
 
         expect(edit_item_modal).to be_displayed
-        edit_item_modal.find_element(:css, "button[type='button']").click
+        edit_item_modal_submit_button.click
         wait_for_ajaximations
       end
 
@@ -273,12 +275,11 @@ describe "context module items", :ignore_js_errors do
           url_value = edit_item_modal_url_value
           expect(url_value).to eq(item.url)
 
-          new_tab = edit_item_modal.find_element(:css, "input[data-testid='edit-modal-new-tab']")
           new_tab_value = item.new_tab.nil? ? false : item.new_tab
-          expect(new_tab.selected?).to eq(new_tab_value)
+          expect(edit_item_modal_new_tab_checkbox.selected?).to eq(new_tab_value)
         end
 
-        edit_item_modal.find_element(:css, "button[type='button']").click
+        edit_item_modal_submit_button.click
         wait_for_ajaximations
       end
 
@@ -287,15 +288,13 @@ describe "context module items", :ignore_js_errors do
         module_item_action_menu_link("Edit").click
         wait_for_ajaximations
 
-        title = edit_item_modal.find_element(:css, "input[data-testid='edit-modal-title']")
-        replace_content(title, new_title)
+        replace_content(edit_item_modal_title_input, new_title)
 
-        edit_item_modal.find_element(:css, "button[type='submit']").click
+        edit_item_modal_submit_button.click
         wait_for_ajaximations
         assignment_title = manage_module_item_container(item.id).find_element(:xpath, ".//*[text()='#{new_title}']")
         expect(assignment_title.text).to eq(new_title)
       end
-
       it "edit item form is shown" do
         go_to_modules
         module_header_expand_toggles[2].click
@@ -324,6 +323,108 @@ describe "context module items", :ignore_js_errors do
         @module3.content_tags.each do |item|
           validate_update_module_item_title(item)
         end
+      end
+    end
+
+    context "link to speedgrader" do
+      it "can redirects to speedgrader page" do
+        student_in_course(course: @course, name: "student", active_all: true).user
+
+        go_to_modules
+        module_header_expand_toggles.first.click
+        wait_for_ajaximations
+
+        manage_module_item_button(@module_item1.id).click
+        module_item_action_menu_link("SpeedGrader").click
+
+        expect(driver.current_url).to include(
+          "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+        )
+      end
+    end
+
+    context "indent module items" do
+      before(:once) do
+        @indented_item1 = @module1.add_item(
+          type: "assignment",
+          id: @assignment3.id,
+          indent: 3 # Indent level 3 = 60px
+        )
+
+        @indented_item2 = @module2.add_item(
+          type: "quiz",
+          id: @quiz2.id,
+          indent: 1 # Indent level 1 = 20px
+        )
+      end
+
+      it "can increase indent with edit modal" do
+        go_to_modules
+        module_header_expand_toggles.first.click
+        wait_for_ajaximations
+
+        manage_module_item_button(@module_item1.id).click # First item in the first module
+        module_item_action_menu_link("Edit").click
+        click_INSTUI_Select_option(add_item_indent_select, "Indent 2 levels")
+        edit_item_modal_submit_button.click
+
+        wait_for_ajaximations
+        item_indent = module_item_indent(@module_item1.id)
+        expect(item_indent).to match("padding: 0px 0px 0px 40px;")
+      end
+
+      it "can decrease indent with edit modal" do
+        go_to_modules
+        module_header_expand_toggles.first.click
+        wait_for_ajaximations
+
+        manage_module_item_button(@indented_item1.id).click
+        module_item_action_menu_link("Edit").click
+        click_INSTUI_Select_option(add_item_indent_select, "Indent 1 level")
+        edit_item_modal_submit_button.click
+
+        wait_for_ajaximations
+        item_indent = module_item_indent(@indented_item1.id)
+        expect(item_indent).to match("padding: 0px 0px 0px 20px;")
+      end
+
+      it "can increase indent" do
+        go_to_modules
+        module_header_expand_toggles[1].click
+        wait_for_ajaximations
+
+        manage_module_item_button(@indented_item2.id).click # Last item in second module, already indented 1 level
+        module_item_action_menu_link("Increase indent").click
+
+        wait_for_ajaximations
+        item_indent = module_item_indent(@indented_item2.id)
+        expect(item_indent).to match("padding: 0px 0px 0px 40px;")
+      end
+
+      it "can decrease indent" do
+        go_to_modules
+        module_header_expand_toggles[1].click
+        wait_for_ajaximations
+
+        manage_module_item_button(@indented_item2.id).click
+        module_item_action_menu_link("Decrease indent").click
+
+        wait_for_ajaximations
+        item_indent = module_item_indent(@indented_item2.id)
+        expect(item_indent).to match("padding: 0px;")
+      end
+
+      it "shows correct indent options depending on item position" do
+        go_to_modules
+        module_header_expand_toggles.first.click
+        wait_for_ajaximations
+
+        manage_module_item_button(@module_item1.id).click
+        expect(module_item_action_menu_link_exists?("Decrease indent")).to be_falsey # Can't decrease indent at level 0
+        expect(module_item_action_menu_link_exists?("Increase indent")).to be_truthy
+        manage_module_item_button(@indented_item1.id).click
+        expect(module_item_action_menu_link_exists?("Decrease indent")).to be_truthy
+        expect(module_item_action_menu_link_exists?("Increase indent")).to be_truthy
       end
     end
 
@@ -662,6 +763,51 @@ describe "context module items", :ignore_js_errors do
 
         expect(module_item_title_links.length).to eq(ui_count_before + 1)
         expect(module_item_title_links.last.text).to eq("Dup me Copy")
+      end
+    end
+
+    context "remove module item" do
+      before :once do
+        @test_module = @course.context_modules.create!(name: "module_remove_item")
+        @remove_assignment = @course.assignments.create!(title: "Remove me", submission_types: "online_text_entry")
+        @remove_item = @test_module.add_item(type: "assignment", id: @remove_assignment.id)
+      end
+
+      it "removes last module item displays initial module state" do
+        go_to_modules
+        wait_for_ajaximations
+
+        context_module_expand_toggle(@test_module.id).click
+        wait_for_ajaximations
+
+        manage_module_item_button(@remove_item.id).click
+        module_item_action_menu_link("Remove").click
+        expect(driver.switch_to.alert).not_to be_nil
+        driver.switch_to.alert.accept
+        wait_for_ajaximations
+
+        expect(module_file_drop_element_exists?(@test_module.id)).to be true
+        expect(f("body")).not_to contain_css(manage_module_item_container_selector(@remove_item.id))
+      end
+
+      it "removes a module item" do
+        go_to_modules
+        wait_for_ajaximations
+
+        context_module_expand_toggle(@test_module.id).click
+        wait_for_ajaximations
+
+        removed_item = @test_module.content_tags.last
+        expect(removed_item.workflow_state).to eq("active")
+
+        manage_module_item_button(@remove_item.id).click
+        module_item_action_menu_link("Remove").click
+        expect(driver.switch_to.alert).not_to be_nil
+        driver.switch_to.alert.accept
+        wait_for_ajaximations
+
+        expect(removed_item.reload.workflow_state).to eq("deleted")
+        expect(f("body")).not_to contain_css(manage_module_item_container_selector(@remove_item.id))
       end
     end
   end
