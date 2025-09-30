@@ -380,6 +380,10 @@ type AllocationRuleEdge {
   node: AllocationRule
 }
 
+input AllocationRulesFilterInput {
+  searchTerm: String
+}
+
 """
 An anonymous student identity
 """
@@ -890,9 +894,9 @@ Allocation rules for peer review assignments
 """
 type AssignmentAllocationRules {
   """
-  Total count of allocation rules
+  Total count of allocation rules (filtered if search is applied)
   """
-  count: Int
+  count(filter: AllocationRulesFilterInput): Int
 
   """
   Paginated list of allocation rules
@@ -907,6 +911,7 @@ type AssignmentAllocationRules {
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
+    filter: AllocationRulesFilterInput
 
     """
     Returns the first _n_ elements from the list.

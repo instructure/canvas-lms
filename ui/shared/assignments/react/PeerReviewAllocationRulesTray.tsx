@@ -16,26 +16,39 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useRef, useEffect, useCallback} from 'react'
+import React, {useState, useRef, useEffect, useCallback, useMemo} from 'react'
 import AllocationRuleCard from './AllocationRuleCard'
 import CreateEditAllocationRuleModal from './CreateEditAllocationRuleModal'
 import {Alert} from '@instructure/ui-alerts'
 import {useAllocationRules} from '../graphql/hooks/useAllocationRules'
-import {Button, CloseButton} from '@instructure/ui-buttons'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
+import {FormMessage} from '@instructure/ui-form-field'
 import {Heading} from '@instructure/ui-heading'
+import {IconSearchLine, IconTroubleLine} from '@instructure/ui-icons'
 import {Img} from '@instructure/ui-img'
 import {Link} from '@instructure/ui-link'
 import {Pagination} from '@instructure/ui-pagination'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
+import {TextInput} from '@instructure/ui-text-input'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
+import {debounce} from 'lodash'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import pandasBalloonUrl from './images/pandasBalloon.svg'
 import {AllocationRuleType} from '../graphql/teacher/AssignmentTeacherTypes'
 
 const I18n = createI18nScope('peer_review_allocation_rules_tray')
+
+const NoResultsFound = ({searchTerm}: {searchTerm: string}) => (
+  <Flex.Item as="div" padding="x-small medium">
+    <Text as="p" size="content">
+      {I18n.t('No matching results where found for "%{searchTerm}"', {searchTerm})}
+    </Text>
+  </Flex.Item>
+)
 
 const EmptyState = () => (
   <Flex
@@ -95,13 +108,16 @@ const PeerReviewAllocationRulesTray = ({
   const [preCreationTotalCount, setPreCreationTotalCount] = useState<number | null>(null)
   const [isUserNavigating, setIsUserNavigating] = useState(false)
   const [ruleToFocus, setRuleToFocus] = useState<string | null>(null)
-
+  const [searchInputValue, setSearchInputValue] = useState('')
+  const [searchInputErrors, setSearchInputErrors] = useState<FormMessage[]>([])
+  const [searchTerm, setSearchTerm] = useState('')
   const containerRef = useRef<Element | null>(null)
 
   const {rules, totalCount, loading, error, refetch} = useAllocationRules(
     assignmentId,
     currentPage,
     itemsPerPage,
+    searchTerm,
   )
 
   const totalPages = totalCount ? Math.ceil(totalCount / itemsPerPage) : 0
@@ -256,7 +272,9 @@ const PeerReviewAllocationRulesTray = ({
       )
     }
 
-    if (rules.length === 0) return <EmptyState />
+    if (rules.length === 0) {
+      return searchTerm ? <NoResultsFound searchTerm={searchTerm} /> : <EmptyState />
+    }
 
     return (
       <Flex direction="column" height="100%" elementRef={setContainerRef}>
@@ -280,6 +298,56 @@ const PeerReviewAllocationRulesTray = ({
       </Flex>
     )
   }
+
+  const handleSearchInputChange = (_e: React.ChangeEvent<HTMLInputElement>, value: string) => {
+    setSearchInputErrors([])
+    setSearchInputValue(value)
+  }
+
+  const clearSearchInput = () => {
+    setSearchInputValue('')
+    setSearchTerm('')
+  }
+
+  const clearSearchButton = () => {
+    if (!searchTerm) return null
+
+    return (
+      <IconButton
+        type="button"
+        size="small"
+        withBackground={false}
+        withBorder={false}
+        screenReaderLabel={I18n.t('Clear allocation rules search')}
+        onClick={clearSearchInput}
+        data-testid="clear-search-button"
+      >
+        <IconTroubleLine />
+      </IconButton>
+    )
+  }
+
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((value: string) => {
+        if (value.length === 1) {
+          setSearchInputErrors(prev => [
+            ...prev,
+            {text: I18n.t('Search term must be at least 2 characters long'), type: 'newError'},
+          ])
+        } else {
+          setSearchTerm(value)
+        }
+      }, 300),
+    [setSearchTerm],
+  )
+
+  useEffect(() => {
+    debouncedSearch(searchInputValue)
+    return () => {
+      debouncedSearch.cancel()
+    }
+  }, [searchInputValue, debouncedSearch])
 
   return (
     <View data-testid="allocation-rules-tray">
@@ -324,6 +392,24 @@ const PeerReviewAllocationRulesTray = ({
                 >
                   {I18n.t('+ Rule')}
                 </Button>
+              </Flex.Item>
+            )}
+            {(rules.length > 0 || searchInputValue) && (
+              <Flex.Item as="div" padding="x-small medium">
+                <TextInput
+                  renderLabel={
+                    <ScreenReaderContent>
+                      {I18n.t('Type to search for allocation rules')}
+                    </ScreenReaderContent>
+                  }
+                  placeholder={I18n.t('Type to search')}
+                  value={searchInputValue}
+                  onChange={handleSearchInputChange}
+                  renderBeforeInput={<IconSearchLine inline={false} />}
+                  renderAfterInput={clearSearchButton}
+                  messages={searchInputErrors}
+                  shouldNotWrap
+                />
               </Flex.Item>
             )}
           </Flex.Item>

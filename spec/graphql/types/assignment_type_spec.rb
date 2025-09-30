@@ -2062,5 +2062,173 @@ describe Types::AssignmentType do
         expect(count_result).to eq 1
       end
     end
+
+    context "search functionality" do
+      before do
+        @search_assignment = course.assignments.create!(
+          title: "Search Test Assignment",
+          points_possible: 10,
+          submission_types: ["online_text_entry"],
+          peer_reviews: true,
+          peer_review_count: 2
+        )
+
+        @frodo = student_in_course(course:, name: "Frodo Baggins", active_all: true).user
+        @legolas = student_in_course(course:, name: "Legolas Greenleaf", active_all: true).user
+        @bilbo = student_in_course(course:, name: "Bilbo Baggins", active_all: true).user
+        @sam = student_in_course(course:, name: "Samwise Gamgee", active_all: true).user
+
+        @rule_frodo_legolas = AllocationRule.create!(
+          course:,
+          assignment: @search_assignment,
+          assessor: @frodo,
+          assessee: @legolas,
+          must_review: true,
+          review_permitted: true,
+          applies_to_assessor: true
+        )
+
+        @rule_legolas_bilbo = AllocationRule.create!(
+          course:,
+          assignment: @search_assignment,
+          assessor: @legolas,
+          assessee: @bilbo,
+          must_review: true,
+          review_permitted: true,
+          applies_to_assessor: true
+        )
+
+        @rule_bilbo_sam = AllocationRule.create!(
+          course:,
+          assignment: @search_assignment,
+          assessor: @bilbo,
+          assessee: @sam,
+          must_review: true,
+          review_permitted: true,
+          applies_to_assessor: true
+        )
+
+        @search_teacher_assignment_type = GraphQLTypeTester.new(@search_assignment, current_user: teacher)
+        @search_student_assignment_type = GraphQLTypeTester.new(@search_assignment, current_user: student1)
+      end
+
+      it "returns rules for specific assessor name" do
+        result = @search_teacher_assignment_type.resolve(
+          'allocationRules { rulesConnection(filter: { searchTerm: "Frodo" }) { nodes { _id } } }'
+        )
+        expect(result).to contain_exactly(@rule_frodo_legolas.id.to_s)
+      end
+
+      it "returns rules for specific assessee name" do
+        result = @search_teacher_assignment_type.resolve(
+          'allocationRules { rulesConnection(filter: { searchTerm: "Bilbo" }) { nodes { _id } } }'
+        )
+        expect(result).to contain_exactly(@rule_legolas_bilbo.id.to_s, @rule_bilbo_sam.id.to_s)
+      end
+
+      it "returns rules matching full name" do
+        result = @search_teacher_assignment_type.resolve(
+          'allocationRules { rulesConnection(filter: { searchTerm: "Legolas Greenleaf" }) { nodes { _id } } }'
+        )
+        expect(result).to contain_exactly(@rule_frodo_legolas.id.to_s, @rule_legolas_bilbo.id.to_s)
+      end
+
+      it "is case insensitive" do
+        result_lower = @search_teacher_assignment_type.resolve(
+          'allocationRules { rulesConnection(filter: { searchTerm: "frodo" }) { nodes { _id } } }'
+        )
+        result_upper = @search_teacher_assignment_type.resolve(
+          'allocationRules { rulesConnection(filter: { searchTerm: "FRODO" }) { nodes { _id } } }'
+        )
+        result_mixed = @search_teacher_assignment_type.resolve(
+          'allocationRules { rulesConnection(filter: { searchTerm: "FrOdo" }) { nodes { _id } } }'
+        )
+
+        expect(result_lower).to eq([@rule_frodo_legolas.id.to_s])
+        expect(result_upper).to eq([@rule_frodo_legolas.id.to_s])
+        expect(result_mixed).to eq([@rule_frodo_legolas.id.to_s])
+      end
+
+      it "returns empty result for no matches" do
+        result = @search_teacher_assignment_type.resolve(
+          'allocationRules { rulesConnection(filter: { searchTerm: "NonExistentName" }) { nodes { _id } } }'
+        )
+        expect(result).to be_empty
+      end
+
+      it "returns partial matches in names" do
+        result = @search_teacher_assignment_type.resolve(
+          'allocationRules { rulesConnection(filter: { searchTerm: "Baggins" }) { nodes { _id } } }'
+        )
+        expect(result).to contain_exactly(@rule_frodo_legolas.id.to_s, @rule_legolas_bilbo.id.to_s, @rule_bilbo_sam.id.to_s)
+      end
+
+      it "works with common prefixes" do
+        result = @search_teacher_assignment_type.resolve(
+          'allocationRules { rulesConnection(filter: { searchTerm: "Bag" }) { nodes { _id } } }'
+        )
+        expect(result).to contain_exactly(@rule_frodo_legolas.id.to_s, @rule_legolas_bilbo.id.to_s, @rule_bilbo_sam.id.to_s)
+      end
+
+      it "raises error for search term too short" do
+        expect do
+          @search_teacher_assignment_type.resolve(
+            'allocationRules { rulesConnection(filter: { searchTerm: "a" }) { nodes { _id } } }'
+          )
+        end.to raise_error(GraphQLTypeTester::Error, /search term must be at least/)
+      end
+
+      it "works with minimum valid search term length" do
+        min_length_term = "a" * SearchTermHelper::MIN_SEARCH_TERM_LENGTH
+        expect do
+          @search_teacher_assignment_type.resolve(
+            "allocationRules { rulesConnection(filter: { searchTerm: \"#{min_length_term}\" }) { nodes { _id } } }"
+          )
+        end.not_to raise_error
+      end
+
+      it "combines search with pagination" do
+        result = @search_teacher_assignment_type.resolve(
+          'allocationRules { rulesConnection(filter: { searchTerm: "Bilbo" }, first: 1) { nodes { _id } } }'
+        )
+        expect(result.length).to eq 1
+        expect([@rule_legolas_bilbo.id.to_s, @rule_bilbo_sam.id.to_s]).to include(result.first)
+
+        has_next_page = @search_teacher_assignment_type.resolve(
+          'allocationRules { rulesConnection(filter: { searchTerm: "Bilbo" }, first: 1) { pageInfo { hasNextPage } } }'
+        )
+        expect(has_next_page).to be true
+      end
+
+      it "excludes deleted rules from search results" do
+        @rule_frodo_legolas.destroy
+
+        result = @search_teacher_assignment_type.resolve(
+          'allocationRules { rulesConnection(filter: { searchTerm: "Frodo" }) { nodes { _id } } }'
+        )
+        expect(result).to be_empty
+
+        result_legolas = @search_teacher_assignment_type.resolve(
+          'allocationRules { rulesConnection(filter: { searchTerm: "Legolas" }) { nodes { _id } } }'
+        )
+        expect(result_legolas).to contain_exactly(@rule_legolas_bilbo.id.to_s)
+      end
+
+      it "returns all results when no search term provided" do
+        result_with_filter = @search_teacher_assignment_type.resolve(
+          "allocationRules { rulesConnection(filter: {}) { nodes { _id } } }"
+        )
+        result_without_filter = @search_teacher_assignment_type.resolve(
+          "allocationRules { rulesConnection { nodes { _id } } }"
+        )
+
+        expect(result_with_filter).to match_array([
+                                                    @rule_frodo_legolas.id.to_s,
+                                                    @rule_legolas_bilbo.id.to_s,
+                                                    @rule_bilbo_sam.id.to_s
+                                                  ])
+        expect(result_without_filter).to eq(result_with_filter)
+      end
+    end
   end
 end
