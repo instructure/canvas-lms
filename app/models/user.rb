@@ -3655,7 +3655,7 @@ class User < ActiveRecord::Base
     end
     roles << "student" if enrollment_types.intersect?(%w[StudentEnrollment StudentViewEnrollment])
     roles << "fake_student" if fake_student?
-    roles << "observer" if enrollment_types.intersect?(%w[ObserverEnrollment])
+    roles << "observer" if enrollment_types.include?("ObserverEnrollment")
     roles << "teacher" if enrollment_types.intersect?(%w[TeacherEnrollment TaEnrollment DesignerEnrollment])
     account_users = GuardRail.activate(:secondary) do
       root_account.cached_all_account_users_for(self)

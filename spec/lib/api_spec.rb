@@ -343,7 +343,7 @@ describe Api do
     end
 
     it "does not find a missing record" do
-      expect(@api.api_find_all(User, [(User.all.map(&:id).max + 1)])).to eq []
+      expect(@api.api_find_all(User, [User.all.map(&:id).max + 1])).to eq []
     end
 
     it "finds an existing sis_id record" do
