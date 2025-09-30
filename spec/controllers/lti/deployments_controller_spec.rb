@@ -410,6 +410,30 @@ RSpec.describe Lti::DeploymentsController do
         expect(ContextExternalTool.last.context.id).to eql(course.id)
       end
     end
+
+    context "with available parameter" do
+      context "when available is false" do
+        let(:params) { { available: false } }
+
+        it "creates a deployment with context control available set to false" do
+          subject
+          deployment = ContextExternalTool.last
+          context_control = deployment.primary_context_control
+          expect(context_control.available).to be(false)
+        end
+      end
+
+      context "when available is true" do
+        let(:params) { { available: true } }
+
+        it "creates a deployment with context control available set to true" do
+          subject
+          deployment = ContextExternalTool.last
+          context_control = deployment.primary_context_control
+          expect(context_control.available).to be(true)
+        end
+      end
+    end
   end
 
   describe "DELETE destroy", type: :request do

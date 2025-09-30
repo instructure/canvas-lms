@@ -20,6 +20,7 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {confirm} from '@canvas/instui-bindings/react/Confirm'
 import {LinkInfo} from '@canvas/parse-link-header/parseLinkHeader'
+import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {List} from '@instructure/ui-list'
@@ -63,6 +64,7 @@ export const ToolAvailability = (props: ToolAvailabilityProps) => {
   const {registration} = useOutletContext<ToolDetailsOutletContext>()
 
   const [debug, setDebug] = React.useState(false)
+  const [creatingDeployment, setCreatingDeployment] = React.useState(false)
 
   // TODO: Remove this when debug mode is no longer needed
   // Add keyboard shortcut for CMD+d to toggle debug mode
@@ -142,9 +144,45 @@ export const ToolAvailability = (props: ToolAvailabilityProps) => {
                 ))}
               </List>
             ) : (
-              <Text fontStyle="italic">
-                {I18n.t('This tool has not been deployed to any sub-accounts or courses.')}
-              </Text>
+              <Alert variant="info" margin="0" renderCloseButtonLabel="">
+                <Text>
+                  {I18n.t(
+                    "This tool hasn't been deployed to any sub-accounts or courses. To add availability and exceptions, first create a root account–level deployment. By default, the root account level deployment won’t be available to users, but you can adjust this after creation if needed.",
+                  )}
+                </Text>
+                <Button
+                  color="primary"
+                  size="small"
+                  margin="small 0 0 0"
+                  interaction={creatingDeployment ? 'disabled' : 'enabled'}
+                  onClick={async () => {
+                    setCreatingDeployment(true)
+                    try {
+                      const result = await createDeployment({
+                        registrationId: registration.id,
+                        accountId: props.accountId,
+                        available: false,
+                      })
+                      if (result._type === 'Success') {
+                        controlsQuery.refetch()
+                        showFlashAlert({
+                          type: 'success',
+                          message: I18n.t('Root-level deployment created'),
+                        })
+                      } else {
+                        showFlashAlert({
+                          type: 'error',
+                          message: I18n.t('There was an error when creating the deployment'),
+                        })
+                      }
+                    } finally {
+                      setCreatingDeployment(false)
+                    }
+                  }}
+                >
+                  {I18n.t('Create Deployment')}
+                </Button>
+              </Alert>
             )}
             {hasNextPage && (
               <Flex as="div" margin="medium 0 0 0" alignItems="center" justifyItems="center">
