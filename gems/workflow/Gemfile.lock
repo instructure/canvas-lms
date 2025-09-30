@@ -29,7 +29,7 @@ GEM
     benchmark (0.4.1)
     bigdecimal (3.2.2)
     concurrent-ruby (1.3.5)
-    connection_pool (2.5.3)
+    connection_pool (2.5.4)
     drb (2.2.3)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)

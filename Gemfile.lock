@@ -478,7 +478,7 @@ GEM
     colored (1.2)
     colorize (1.1.0)
     concurrent-ruby (1.3.5)
-    connection_pool (2.5.3)
+    connection_pool (2.5.4)
     crack (1.0.0)
       bigdecimal
       rexml
