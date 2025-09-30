@@ -53,7 +53,7 @@ GEM
     minitest (5.25.5)
     net-http (0.6.0)
       uri
-    rake (13.2.1)
+    rake (13.3.0)
     redcarpet (3.6.1)
     rspec (3.13.1)
       rspec-core (~> 3.13.0)
