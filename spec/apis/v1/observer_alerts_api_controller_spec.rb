@@ -214,6 +214,18 @@ describe ObserverAlertsApiController, type: :request do
       json = api_call_as_user(@observer, :get, path, params)
       expect(json["unread_count"]).to eq 1
     end
+
+    it "returns 403 when supplying a different user's id" do
+      other_user = user_model
+      path = "/api/v1/users/#{other_user.id}/observer_alerts/unread_count"
+      params = { user_id: other_user.to_param,
+                 controller: "observer_alerts_api",
+                 action: "alerts_count",
+                 format: "json" }
+
+      api_call_as_user(@observer, :get, path, params)
+      expect(response).to have_http_status :forbidden
+    end
   end
 
   describe "#update" do
