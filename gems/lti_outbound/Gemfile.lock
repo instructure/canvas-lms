@@ -61,12 +61,12 @@ GEM
       simplecov_json_formatter (~> 0.1)
     simplecov-html (0.13.2)
     simplecov_json_formatter (0.1.4)
-    snaky_hash (2.0.1)
-      hashie
-      version_gem (~> 1.1, >= 1.1.1)
+    snaky_hash (2.0.3)
+      hashie (>= 0.1.0, < 6)
+      version_gem (>= 1.1.8, < 3)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
-    version_gem (1.1.7)
+    version_gem (1.1.9)
 
 PLATFORMS
   aarch64-linux
