@@ -78,6 +78,17 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
     onToggleExpand(id)
   }, [onToggleExpand, id])
 
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault()
+        event.stopPropagation()
+        onToggleExpandRef()
+      }
+    },
+    [onToggleExpandRef],
+  )
+
   const {courseId, modulesArePaginated, pageSize} = useContextModule()
   const {getModuleItemsTotalCount} = useModules(courseId, 'student')
   const totalCount = getModuleItemsTotalCount(id) || 0
@@ -95,7 +106,20 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
   const shouldShowToggle = (totalCount || 0) > pageSize
 
   return (
-    <View as="div" background="transparent">
+    <View
+      data-testid="module-header-expand-toggle"
+      id={`module-header-expand-toggle-${id}`}
+      as="div"
+      background="transparent"
+      cursor="pointer"
+      onClick={onToggleExpandRef}
+      onKeyDown={handleKeyDown}
+      focusPosition="inset"
+      tabIndex={0}
+      aria-label={screenReaderLabel}
+      aria-expanded={expanded}
+      focusWithin
+    >
       <Flex padding="small" justifyItems="space-between" direction="row">
         <Flex.Item shouldGrow shouldShrink margin="0 0 0 small">
           <Flex justifyItems="space-between" direction="column">
@@ -211,17 +235,9 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
           </Flex>
         </Flex.Item>
         <Flex.Item>
-          <IconButton
-            data-testid="module-header-expand-toggle"
-            id={`module-header-expand-toggle-${id}`}
-            size="small"
-            withBorder={false}
-            screenReaderLabel={screenReaderLabel}
-            renderIcon={expanded ? IconArrowOpenDownLine : IconArrowOpenUpLine}
-            withBackground={false}
-            onClick={onToggleExpandRef}
-            aria-expanded={expanded}
-          />
+          <View margin="0 small 0 0">
+            {expanded ? <IconArrowOpenDownLine /> : <IconArrowOpenUpLine />}
+          </View>
         </Flex.Item>
       </Flex>
     </View>
