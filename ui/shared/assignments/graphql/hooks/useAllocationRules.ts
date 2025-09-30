@@ -69,10 +69,10 @@ export interface UseAllocationRulesResult {
 }
 
 const ALLOCATION_RULES_QUERY = gql`
-  query GetAllocationRules($assignmentId: ID!, $after: String) {
+  query GetAllocationRules($assignmentId: ID!, $after: String, $searchTerm: String) {
     assignment(id: $assignmentId) {
       allocationRules {
-        rulesConnection(first: 20, after: $after) {
+        rulesConnection(first: 20, after: $after, filter: { searchTerm: $searchTerm }) {
           nodes {
             _id
             mustReview
@@ -92,7 +92,7 @@ const ALLOCATION_RULES_QUERY = gql`
             endCursor
           }
         }
-        count
+        count(filter: { searchTerm: $searchTerm })
       }
     }
   }
@@ -101,12 +101,14 @@ const ALLOCATION_RULES_QUERY = gql`
 async function fetchGraphQLPage(
   assignmentId: string,
   cursor: string | null = null,
+  searchTerm: string = '',
 ): Promise<GraphQLPageData> {
   const result: AllocationRulesData = await executeQuery<AllocationRulesData>(
     ALLOCATION_RULES_QUERY,
     {
       assignmentId,
       after: cursor,
+      searchTerm: searchTerm || undefined,
     },
   )
 
@@ -149,6 +151,7 @@ async function getAllocationRulesPage(
   page: number,
   itemsPerPage: number,
   queryClient: QueryClient,
+  searchTerm: string = '',
   forceRefresh: boolean = false,
 ): Promise<{rules: AllocationRule[]; totalCount: number | null}> {
   const graphQLPageSize = 20
@@ -167,20 +170,19 @@ async function getAllocationRulesPage(
   )
 
   for (let i = 0; i <= endGraphQLPage; i++) {
-    const queryKey = ['allocationRules', assignmentId, 'graphql-page', i]
-
+    const queryKey = ['allocationRules', assignmentId, 'graphql-page', i, searchTerm]
     let pageData = queryClient.getQueryData<GraphQLPageData>(queryKey)
 
     if (!pageData || forceRefresh) {
       if (i > 0) {
-        const prevPageKey = ['allocationRules', assignmentId, 'graphql-page', i - 1]
+        const prevPageKey = ['allocationRules', assignmentId, 'graphql-page', i - 1, searchTerm]
         const prevPageData = queryClient.getQueryData<GraphQLPageData>(prevPageKey)
         cursor = prevPageData?.endCursor || null
       }
 
       pageData = await queryClient.fetchQuery({
         queryKey,
-        queryFn: () => fetchGraphQLPage(assignmentId, cursor),
+        queryFn: () => fetchGraphQLPage(assignmentId, cursor, searchTerm),
         staleTime: forceRefresh ? 0 : 5 * 60 * 1000,
       })
     }
@@ -215,15 +217,19 @@ export const useAllocationRules = (
   assignmentId: string,
   page: number = 1,
   itemsPerPage: number = 20,
+  searchTerm: string = '',
 ): UseAllocationRulesResult => {
   const queryClient = useQueryClient()
+  const trimmedSearchTerm = searchTerm.trim()
+  const finalSearchTerm = trimmedSearchTerm || undefined
 
   const {data, isLoading, error} = useQuery<
     {rules: AllocationRule[]; totalCount: number | null},
     Error
   >({
-    queryKey: ['allocationRules', assignmentId, page, itemsPerPage],
-    queryFn: () => getAllocationRulesPage(assignmentId, page, itemsPerPage, queryClient),
+    queryKey: ['allocationRules', assignmentId, page, itemsPerPage, finalSearchTerm],
+    queryFn: () =>
+      getAllocationRulesPage(assignmentId, page, itemsPerPage, queryClient, finalSearchTerm),
     enabled: !!assignmentId,
     staleTime: 5 * 60 * 1000,
   })
@@ -243,7 +249,14 @@ export const useAllocationRules = (
       const result = await queryClient.fetchQuery({
         queryKey: ['allocationRules', assignmentId, targetPage, itemsPerPage],
         queryFn: () =>
-          getAllocationRulesPage(assignmentId, targetPage, itemsPerPage, queryClient, true),
+          getAllocationRulesPage(
+            assignmentId,
+            targetPage,
+            itemsPerPage,
+            queryClient,
+            finalSearchTerm,
+            true,
+          ),
         staleTime: 0,
       })
 

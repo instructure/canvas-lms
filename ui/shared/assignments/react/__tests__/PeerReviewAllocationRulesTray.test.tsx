@@ -477,4 +477,172 @@ describe('PeerReviewAllocationRulesTray', () => {
       })
     })
   })
+
+  describe('Search functionality', () => {
+    beforeEach(() => {
+      Object.defineProperty(HTMLElement.prototype, 'clientHeight', {
+        configurable: true,
+        get() {
+          if (this.dataset?.testid === 'allocation-rule-card-wrapper') {
+            return 120
+          }
+          return 600
+        },
+      })
+    })
+
+    it('displays search input when rules exist', async () => {
+      mockExecuteQuery.mockResolvedValue({
+        assignment: {
+          allocationRules: {
+            rulesConnection: {
+              nodes: mockAllocationRules,
+              pageInfo: {hasNextPage: false, endCursor: null},
+            },
+            count: mockAllocationRules.length,
+          },
+        },
+      })
+
+      renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(screen.getByPlaceholderText('Type to search')).toBeInTheDocument()
+      })
+    })
+
+    it('does not display search input when no rules exist and no search value', async () => {
+      mockExecuteQuery.mockResolvedValue({
+        assignment: {
+          allocationRules: {
+            rulesConnection: {
+              nodes: [],
+              pageInfo: {hasNextPage: false, endCursor: null},
+            },
+            count: 0,
+          },
+        },
+      })
+
+      renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(screen.getByText('Create New Rules')).toBeInTheDocument()
+      })
+
+      expect(screen.queryByPlaceholderText('Type to search')).not.toBeInTheDocument()
+    })
+
+    it('handles search input changes with debounce', async () => {
+      mockExecuteQuery.mockResolvedValue({
+        assignment: {
+          allocationRules: {
+            rulesConnection: {
+              nodes: mockAllocationRules,
+              pageInfo: {hasNextPage: false, endCursor: null},
+            },
+            count: mockAllocationRules.length,
+          },
+        },
+      })
+
+      renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(screen.getByPlaceholderText('Type to search')).toBeInTheDocument()
+      })
+
+      const searchInput = screen.getByPlaceholderText('Type to search')
+      await user.type(searchInput, 'John')
+
+      expect(searchInput).toHaveValue('John')
+    })
+
+    it('shows error message for single character search', async () => {
+      mockExecuteQuery.mockResolvedValue({
+        assignment: {
+          allocationRules: {
+            rulesConnection: {
+              nodes: mockAllocationRules,
+              pageInfo: {hasNextPage: false, endCursor: null},
+            },
+            count: mockAllocationRules.length,
+          },
+        },
+      })
+
+      renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(screen.getByPlaceholderText('Type to search')).toBeInTheDocument()
+      })
+
+      const searchInput = screen.getByPlaceholderText('Type to search')
+      await user.type(searchInput, 'J')
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Search term must be at least 2 characters long'),
+        ).toBeInTheDocument()
+      })
+    })
+
+    it('displays clear search button when search term exists', async () => {
+      mockExecuteQuery.mockResolvedValue({
+        assignment: {
+          allocationRules: {
+            rulesConnection: {
+              nodes: mockAllocationRules,
+              pageInfo: {hasNextPage: false, endCursor: null},
+            },
+            count: mockAllocationRules.length,
+          },
+        },
+      })
+
+      renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(screen.getByPlaceholderText('Type to search')).toBeInTheDocument()
+      })
+
+      const searchInput = screen.getByPlaceholderText('Type to search')
+      await user.type(searchInput, 'John')
+
+      await waitFor(() => {
+        expect(screen.getByTestId('clear-search-button')).toBeInTheDocument()
+      })
+    })
+
+    it('clears search when clear button is clicked', async () => {
+      mockExecuteQuery.mockResolvedValue({
+        assignment: {
+          allocationRules: {
+            rulesConnection: {
+              nodes: mockAllocationRules,
+              pageInfo: {hasNextPage: false, endCursor: null},
+            },
+            count: mockAllocationRules.length,
+          },
+        },
+      })
+
+      renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(screen.getByPlaceholderText('Type to search')).toBeInTheDocument()
+      })
+
+      const searchInput = screen.getByPlaceholderText('Type to search')
+      await user.type(searchInput, 'John')
+
+      await waitFor(() => {
+        expect(screen.getByTestId('clear-search-button')).toBeInTheDocument()
+      })
+
+      await user.click(screen.getByTestId('clear-search-button'))
+
+      expect(searchInput).toHaveValue('')
+    })
+  })
 })

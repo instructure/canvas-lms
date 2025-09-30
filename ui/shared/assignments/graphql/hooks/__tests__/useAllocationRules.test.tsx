@@ -300,4 +300,117 @@ describe('useAllocationRules', () => {
     expect(refetchResult.totalCount).toBe(3)
     expect(mockExecuteQuery).toHaveBeenCalledTimes(1)
   })
+
+  describe('search term handling', () => {
+    it('passes undefined for empty search term', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          allocationRules: {
+            rulesConnection: {
+              nodes: mockAllocationRules,
+              pageInfo: {
+                hasNextPage: false,
+                endCursor: null,
+              },
+            },
+            count: 2,
+          },
+        },
+      })
+
+      const {result} = renderHook(() => useAllocationRules('assignment-123', 1, 10, ''), {
+        wrapper: createWrapper(),
+      })
+
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false)
+      })
+
+      expect(result.current.rules).toEqual(mockAllocationRules)
+      expect(result.current.totalCount).toBe(2)
+      expect(result.current.error).toBe(null)
+
+      expect(mockExecuteQuery).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.objectContaining({
+          assignmentId: 'assignment-123',
+          after: null,
+          searchTerm: undefined,
+        }),
+      )
+    })
+
+    it('passes search term when provided', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          allocationRules: {
+            rulesConnection: {
+              nodes: [mockAllocationRules[0]],
+              pageInfo: {
+                hasNextPage: false,
+                endCursor: null,
+              },
+            },
+            count: 1,
+          },
+        },
+      })
+
+      const {result} = renderHook(() => useAllocationRules('assignment-123', 1, 10, 'Mudkip'), {
+        wrapper: createWrapper(),
+      })
+
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false)
+      })
+
+      expect(result.current.rules).toEqual([mockAllocationRules[0]])
+      expect(result.current.totalCount).toBe(1)
+      expect(result.current.error).toBe(null)
+
+      expect(mockExecuteQuery).toHaveBeenCalledWith(expect.any(Object), {
+        assignmentId: 'assignment-123',
+        after: null,
+        searchTerm: 'Mudkip',
+      })
+    })
+
+    it('handles whitespace-only search term as undefined', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          allocationRules: {
+            rulesConnection: {
+              nodes: mockAllocationRules,
+              pageInfo: {
+                hasNextPage: false,
+                endCursor: null,
+              },
+            },
+            count: 2,
+          },
+        },
+      })
+
+      const {result} = renderHook(() => useAllocationRules('assignment-123', 1, 10, '   '), {
+        wrapper: createWrapper(),
+      })
+
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false)
+      })
+
+      expect(result.current.rules).toEqual(mockAllocationRules)
+      expect(result.current.totalCount).toBe(2)
+      expect(result.current.error).toBe(null)
+
+      expect(mockExecuteQuery).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.objectContaining({
+          assignmentId: 'assignment-123',
+          after: null,
+          searchTerm: undefined,
+        }),
+      )
+    })
+  })
 })
