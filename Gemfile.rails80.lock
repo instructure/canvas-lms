@@ -1281,6 +1281,7 @@ DEPENDENCIES
   authlogic!
   autoextend!
   aws-sdk-bedrockruntime (~> 1.7)
+  aws-sdk-core (= 3.218.1)
   aws-sdk-kinesis (~> 1.45)
   aws-sdk-s3 (~> 1.119)
   aws-sdk-sagemakerruntime (~> 1.61)
@@ -1426,7 +1427,7 @@ DEPENDENCIES
   rrule (~> 0.5)
   rspec (~> 3.12)
   rspec-collection_matchers (~> 1.2)
-  rspec-openapi
+  rspec-openapi (= 0.16.1)
   rspec-rails (~> 7.0)
   rspec_around_all (= 0.2.0)
   rspecq!
