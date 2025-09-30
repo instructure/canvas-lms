@@ -2,6 +2,7 @@
   <div id="event-details-trap-focus">
   <a href="#" class="popover_close x-close-link close" role="button" aria-label="{{#t "close"}}Close{{/t}}">×</a>
   <div class='event-details-header'>
+    <div class="event-type">{{eventType}}</div>
     <h2 class="details_title title">
       {{#if showEventLink}}
         <a href="{{fullDetailsURL}}" class="view_event_link">{{title}}</a>
@@ -20,7 +21,7 @@
     <table cellspacing="0" role="presentation">
       {{#if contextInfo}}
         <tr>
-          <th scope="row">{{#t "calendar"}}Calendar{{/t}}</th>
+          <th scope="row">{{#t "calendar"}}Source Calendar{{/t}}</th>
           <td>
             {{#if contextInfo.can_view_context}}
               <a href="{{contextInfo.url}}">{{contextInfo.name}}</a>

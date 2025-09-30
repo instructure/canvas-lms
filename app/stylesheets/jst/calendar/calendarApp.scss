@@ -74,6 +74,8 @@
   th {
     padding-bottom: 3px;
     padding-#{direction(right)}: 8px;
+    min-width: 150px;
+    text-align: left;
   }
   td,th {
     vertical-align: top;
@@ -115,6 +117,13 @@
 .event-details-header {
   max-width: 460px;
   overflow: auto;
+  .event-type {
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .title {
+    margin: 0;
+  }
 }
 
 .event-details-content table {
