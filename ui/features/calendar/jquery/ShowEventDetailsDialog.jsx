@@ -75,6 +75,15 @@ export default class ShowEventDetailsDialog {
     new EditEventDetailsDialog(this.event).show()
   }
 
+  getEventType = () => {
+    if (this.event.isAppointmentGroupEvent()) return I18n.t('Appointment')
+    if (/assignment/.test(this.event.eventType)) return I18n.t('Assignment')
+    if (this.event.eventType === 'planner_note') return I18n.t('Planner')
+    if (this.event.eventType === 'todo_item') return I18n.t('To Do')
+
+    return I18n.t('Event')
+  }
+
   deleteChildrenEvents = (deletedEvent, context) => {
     const eventsInContext = this.dataSource.cache.contexts[context].events
     const eventsToBeDeleted = []
@@ -415,6 +424,7 @@ export default class ShowEventDetailsDialog {
         .filter(context => context.length > 0)
     }
 
+    params.eventType = this.getEventType()
     params.use_new_scheduler = ENV.CALENDAR.SHOW_SCHEDULER
     params.is_appointment_group = !!this.event.isAppointmentGroupEvent() // this returns the actual url so make it boolean for clarity
     params.reserve_comments =

@@ -274,7 +274,7 @@ describe "calendar2" do
         fj(calendar_event_selector).click
         expect(event_popover).to be_displayed
         expect(event_popover_title).to be_displayed
-        expect(event_popover_title.text).to eq "account event"
+        expect(event_popover_title.text).to include("account event")
         expect(event_popover_title).not_to contain_css(event_link_selector)
       end
 
