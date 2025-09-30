@@ -512,7 +512,7 @@ GEM
     diff-lcs (1.6.2)
     dig_rb (1.0.1)
     digest-murmurhash (1.1.1)
-    diplomat (2.6.4)
+    diplomat (2.6.5)
       deep_merge (~> 1.2)
       faraday (>= 0.9, < 3.0, != 2.0.0)
     docile (1.4.1)
