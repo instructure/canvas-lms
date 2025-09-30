@@ -132,10 +132,10 @@ GEM
     drb (2.2.3)
     erb (5.0.2)
     erubi (1.13.1)
-    et-orbi (1.2.11)
+    et-orbi (1.4.0)
       tzinfo
-    fugit (1.11.1)
-      et-orbi (~> 1, >= 1.2.11)
+    fugit (1.12.0)
+      et-orbi (~> 1.4)
       raabro (~> 1.4)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)

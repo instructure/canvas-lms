@@ -533,7 +533,7 @@ GEM
     erb (5.0.2)
     erubi (1.13.1)
     escape_code (0.2)
-    et-orbi (1.2.11)
+    et-orbi (1.4.0)
       tzinfo
     expgen (0.1.1)
       parslet
@@ -568,8 +568,8 @@ GEM
       rspec (~> 3.10)
       timecop (~> 0.9)
     folio-pagination (0.0.12)
-    fugit (1.11.1)
-      et-orbi (~> 1, >= 1.2.11)
+    fugit (1.12.0)
+      et-orbi (~> 1.4)
       raabro (~> 1.4)
     gepub (1.0.17)
       nokogiri (>= 1.8.2, < 2.0)
