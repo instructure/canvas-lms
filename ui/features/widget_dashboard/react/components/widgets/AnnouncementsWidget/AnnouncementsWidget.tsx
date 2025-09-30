@@ -36,7 +36,7 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
   const [filter, setFilter] = useState<FilterOption>('unread')
 
   const {data, fetchNextPage, hasNextPage, isLoading, error, refetch} = usePaginatedAnnouncements({
-    limit: 4,
+    limit: 3,
     filter,
   })
 
