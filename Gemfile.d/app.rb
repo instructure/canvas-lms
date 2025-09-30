@@ -35,6 +35,7 @@ gem "addressable", "~> 2.8", require: false
 gem "authlogic", github: "binarylogic/authlogic", ref: "d155fff4672595af99cb3488d9731f1efc595049"
   gem "scrypt", "~> 3.0"
 gem "aws-sdk-bedrockruntime", "~> 1.7", require: false
+gem "aws-sdk-core", "3.218.1", require: false # pinned for now, because it breaks one of our specs
 gem "aws-sdk-kinesis", "~> 1.45", require: false
 gem "aws-sdk-s3", "~> 1.119", require: false
 gem "aws-sdk-sns", "~> 1.60", require: false
