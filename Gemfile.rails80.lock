@@ -455,7 +455,7 @@ GEM
     canvas_connect (0.3.16)
       adobe_connect (~> 1.0.0)
       rake (>= 0.9.6)
-    canvas_link_migrator (1.0.17)
+    canvas_link_migrator (1.0.18)
       activesupport
       addressable
       nokogiri
