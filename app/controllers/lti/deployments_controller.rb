@@ -112,6 +112,7 @@ module Lti
     #
     # @argument for_subaccount_id [Integer] (optional) If provided, the deployment will be created in the specified subaccount.
     # @argument for_course_id [Integer] (optional) If provided, the deployment will be created in the specified course.
+    # @argument available [Boolean] (optional) If provided, sets the availability of the created deployment. Defaults to true.
     #
     # @returns Lti::Deployment
     #
@@ -137,7 +138,7 @@ module Lti
       end
 
       lti_registration = Lti::Registration.find(params[:registration_id])
-      deployment = lti_registration.new_external_tool(context, current_user: @current_user)
+      deployment = lti_registration.new_external_tool(context, current_user: @current_user, available: params[:available])
 
       ContextExternalTool.invalidate_nav_tabs_cache(deployment, @domain_root_account)
       render json: lti_deployment_json(deployment, @current_user, session, @context)

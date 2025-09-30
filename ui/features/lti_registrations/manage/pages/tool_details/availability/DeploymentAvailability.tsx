@@ -84,8 +84,8 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
   } = props
 
   const controls_with_ids = React.useMemo(
-    () => buildControlsByPath(deployment.context_controls),
-    [deployment.context_controls],
+    () => buildControlsByPath(deployment.context_controls || []),
+    [deployment.context_controls || []],
   )
 
   // Every deployment must have a root control.
@@ -263,7 +263,7 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
         </Text>
       </View>
       <List itemSpacing="small" isUnstyled margin="0">
-        {deployment.context_controls
+        {(deployment.context_controls || [])
           .filter(cc => cc.id !== rootControl.id)
           .map(control => {
             // We know that we'll always find a parent control, because the root control is always present.
@@ -332,7 +332,7 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
                                 availableInParentContext: closestParent.available,
                                 toolName: registration.name,
                                 accountControl: control,
-                                childControls: deployment.context_controls.filter(
+                                childControls: (deployment.context_controls || []).filter(
                                   c => c.path.startsWith(control.path) && c.path !== control.path,
                                 ),
                               })
