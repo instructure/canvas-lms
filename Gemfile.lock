@@ -1196,8 +1196,8 @@ GEM
     syslog (0.3.0)
       logger
     table_print (1.5.7)
-    term-ansicolor (1.11.2)
-      tins (~> 1.0)
+    term-ansicolor (1.11.3)
+      tins (~> 1)
     testrail_client (0.0.1)
     testrailtagging (0.3.8.7)
       parser
