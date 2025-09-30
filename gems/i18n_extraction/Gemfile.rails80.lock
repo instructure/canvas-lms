@@ -76,7 +76,7 @@ GEM
       racc (~> 1.5)
       sexp_processor (~> 4.16)
     securerandom (0.4.1)
-    sexp_processor (4.17.3)
+    sexp_processor (4.17.4)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     uri (1.0.3)
