@@ -14,6 +14,7 @@
 .mutagen
 .swc
 .idea/
+/.claude/
 /.yardoc/
 /.ruby-version
 /app/views/info/styleguide.html.erb
