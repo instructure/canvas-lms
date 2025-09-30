@@ -111,7 +111,7 @@ GEM
       aws-eventstream (~> 1, >= 1.0.2)
     base64 (0.3.0)
     benchmark (0.4.1)
-    bigdecimal (3.2.2)
+    bigdecimal (3.2.3)
     builder (3.3.0)
     code_ownership (1.39.0)
       code_teams (~> 1.0)
