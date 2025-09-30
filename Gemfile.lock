@@ -368,7 +368,7 @@ GEM
       nokogiri (>= 1.14.3)
       rake (>= 0.9.2)
     aes_key_wrap (1.1.0)
-    afm (0.2.2)
+    afm (1.0.0)
     after_transaction_commit (2.2.2)
       activerecord (>= 5.2)
     aroi (1.0.0)
@@ -882,9 +882,9 @@ GEM
       racc
     parslet (2.0.0)
     pdf-core (0.10.0)
-    pdf-reader (2.14.1)
+    pdf-reader (2.15.0)
       Ascii85 (>= 1.0, < 3.0, != 2.0.0)
-      afm (~> 0.2.1)
+      afm (>= 0.2.1, < 2)
       hashery (~> 2.0)
       ruby-rc4
       ttfunk
