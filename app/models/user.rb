@@ -1409,6 +1409,7 @@ class User < ActiveRecord::Base
       view_user_generated_access_tokens
       generate_observer_pairing_code
       update_speed_grader_settings
+      read_observer_alerts
     ]
 
     given { |user| user == self && user.user_can_edit_name? }
