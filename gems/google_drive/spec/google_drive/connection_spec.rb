@@ -59,7 +59,7 @@ describe GoogleDrive::Connection do
         allow(connection).to receive(:force_token_update)
         stub_request(:post, "https://www.googleapis.com/drive/v3/files?fields=id,webViewLink")
           .to_return do
-            raise HTTPClient::ReceiveTimeoutError
+            raise Faraday::TimeoutError
           end
         expect { connection.create_doc("Docname") }.to(
           raise_error(GoogleDrive::ConnectionException) do |e|
