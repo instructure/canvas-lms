@@ -122,7 +122,7 @@ module GoogleDrive
     private
 
     def exception_message(exception)
-      return "Google Drive connection timed out" if exception.cause.is_a?(HTTPClient::TimeoutError)
+      return "Google Drive connection timed out" if exception.cause.is_a?(Faraday::TimeoutError)
 
       JSON.parse(exception.body).dig("error", "message")
     rescue JSON::ParserError, TypeError
