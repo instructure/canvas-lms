@@ -6662,6 +6662,19 @@ describe Course do
         expect(result_enrollment.course_id).to eq @course1.id
         expect(result_enrollment.course_section_id).to eq @section.id
       end
+
+      context "when multiple enrollments are allowed" do
+        it "reuses enrollment from original course when section is cross-listed to new course" do
+          enrollment = @course1.enroll_user(@user, "TeacherEnrollment", section: @section)
+          enrollment.destroy
+          @section.crosslist_to_course(@course2)
+          @section.reload
+
+          expect { @course2.enroll_user(@user, "TeacherEnrollment", section: @section, allow_multiple_enrollments: true) }
+            .not_to raise_error
+          expect(@user.enrollments.find_by(course: @course2).id).to eq enrollment.id
+        end
+      end
     end
 
     describe "already_enrolled" do
