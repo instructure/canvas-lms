@@ -992,7 +992,7 @@ GEM
       redis-cluster-client (>= 0.10.0)
     redis-scripting (1.0.1)
       redis (>= 3.0)
-    regexp_parser (2.11.2)
+    regexp_parser (2.11.3)
     reline (0.6.2)
       io-console (~> 0.5)
     representable (3.2.0)
