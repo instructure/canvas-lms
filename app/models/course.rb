@@ -2635,32 +2635,28 @@ class Course < ActiveRecord::Base
         pairing_id = opts[:temporary_enrollment_pairing_id]
       end
 
-      e = if opts[:allow_multiple_enrollments]
-            # For multiple enrollments, only look within current course
-            course_scope.where(course_section_id: section.id).first
-          else
-            # Try to find the enrollment in the current course, preferring the target section
-            course_scope.order(Arel.sql("course_section_id<>#{section.id}")).first ||
-              # Expand scope if needed to ALL courses for this section (handles cross-course constraint)
-              section_scope.where.not(course_id: id).first
-          end
+      # Try to find an existing enrollment for this user/role in the target section.
+      # If not found AND allow_multiple_enrollments is NOT set, fall back to any enrollment in this course.
+      # If still not found, check for an enrollment in the same physical section, but tied
+      # to another course via cross‑listing
+      e = course_scope.find_by(course_section_id: section.id)
+      e ||= course_scope.first unless opts[:allow_multiple_enrollments]
+      e ||= section_scope.where.not(course_id: id).first
 
       if e && (!e.active? || opts[:force_update])
         e.already_enrolled = true
-        # If the enrollment is in a different course due to crosslisting,
-        # we need to transfer it to this course.
-        if e.course_id != id
-          e.course_id = id
+        e.course_id = id if e.course_id != id # in case we found it via section_scope
+        e.sis_batch_id = nil if e.workflow_state == "deleted" # clear sis_batch_id so it can be reimported
+
+        desired_workflow_state = e.is_a?(StudentViewEnrollment) ? "active" : enrollment_state
+        needs_state_change = e.completed? || e.rejected? || e.deleted? || e.workflow_state != desired_workflow_state
+
+        if e.course_section_id != section.id && (needs_state_change || e.saved_change_to_course_id?)
           e.course_section = section
         end
-        if e.workflow_state == "deleted"
-          e.sis_batch_id = nil
-        end
-        if e.completed? || e.rejected? || e.deleted? || e.workflow_state != enrollment_state
-          e.attributes = {
-            course_section: section,
-            workflow_state: e.is_a?(StudentViewEnrollment) ? "active" : enrollment_state
-          }
+
+        if needs_state_change && e.workflow_state != desired_workflow_state
+          e.workflow_state = desired_workflow_state
         end
       end
       # if we're reusing an enrollment and +limit_privileges_to_course_section+ was supplied, apply it
