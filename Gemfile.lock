@@ -927,7 +927,7 @@ GEM
     raabro (1.4.0)
     racc (1.8.1)
     rack (3.1.16)
-    rack-session (2.1.0)
+    rack-session (2.1.1)
       base64 (>= 0.1.0)
       rack (>= 3.0.0)
     rack-test (2.2.0)
@@ -1261,7 +1261,7 @@ GEM
     yard (0.9.37)
     yard-appendix (0.1.8)
       yard (>= 0.8.0)
-    zeitwerk (2.7.2)
+    zeitwerk (2.7.3)
 
 PLATFORMS
   aarch64-linux
@@ -1413,7 +1413,7 @@ DEPENDENCIES
   pstore (~> 0.2)
   puma (~> 6.3)
   qti_exporter!
-  rack (~> 3.1)
+  rack (~> 3.1.0)
   rack3-brotli (~> 1.0)
   rails (~> 7.2.0)
   rails-controller-testing (= 1.0.5)

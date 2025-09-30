@@ -79,7 +79,7 @@ GEM
       stringio
     racc (1.8.1)
     rack (3.1.16)
-    rack-session (2.1.0)
+    rack-session (2.1.1)
       base64 (>= 0.1.0)
       rack (>= 3.0.0)
     rack-test (2.2.0)
@@ -126,7 +126,7 @@ GEM
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     useragent (0.16.11)
-    zeitwerk (2.7.2)
+    zeitwerk (2.7.3)
 
 PLATFORMS
   aarch64-linux
