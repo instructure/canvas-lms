@@ -18,113 +18,252 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe FeatureFlags::Hooks do
-  describe ".only_admins_can_enable_block_content_editor_during_eap" do
+  describe "only_admins_can_enable_block_content_editor_during_eap" do
     let(:transitions) { {} }
     let(:user) { user_model }
-    let(:course) { course_model }
-    let(:account) { account_model }
+    let(:root_account) { account_model }
+    let(:course) do
+      c = course_model
+      allow(c).to receive(:root_account).and_return(root_account)
+      c
+    end
+    let(:account) do
+      a = account_model
+      allow(a).to receive(:root_account).and_return(root_account)
+      a
+    end
 
-    context "when context is a Course" do
-      context "when block_content_editor feature is disabled" do
+    def stub_root_account_membership(root_account, is_member)
+      where_relation = double("where_relation", exists?: is_member)
+      active_relation = double("active_relation", where: where_relation)
+      account_users = double("account_users", active: active_relation)
+      allow(root_account).to receive(:account_users).and_return(account_users)
+    end
+
+    def expect_all_transitions_locked(transitions)
+      expect(transitions["on"]).to be_present
+      expect(transitions["off"]).to be_present
+      expect(transitions["allowed"]).to be_present
+      expect(transitions["allowed_on"]).to be_present
+      expect(transitions["on"]["locked"]).to be true
+      expect(transitions["off"]["locked"]).to be true
+      expect(transitions["allowed"]["locked"]).to be true
+      expect(transitions["allowed_on"]["locked"]).to be true
+    end
+
+    context "when block_content_editor feature is enabled" do
+      before do
+        allow(course.account).to receive(:feature_enabled?).with(:block_content_editor).and_return(true)
+      end
+
+      context "when user is site admin" do
         before do
-          allow(course.account).to receive(:feature_enabled?).with(:block_content_editor).and_return(false)
+          allow(Account.site_admin).to receive(:grants_right?).with(user, :read).and_return(true)
+          stub_root_account_membership(root_account, false)
         end
 
-        it "locks both on and off transitions regardless of user permissions" do
-          allow(course).to receive(:account_membership_allows).with(user).and_return(true)
-
+        it "does not lock transitions" do
           FeatureFlags::Hooks.only_admins_can_enable_block_content_editor_during_eap(user, course, nil, transitions)
 
-          expect(transitions["on"]).to be_present
-          expect(transitions["off"]).to be_present
-          expect(transitions["on"]["locked"]).to be true
-          expect(transitions["off"]["locked"]).to be true
+          expect(transitions).to be_empty
         end
       end
 
-      context "when block_content_editor feature is enabled" do
+      context "when user is root account admin" do
         before do
-          allow(course.account).to receive(:feature_enabled?).with(:block_content_editor).and_return(true)
+          allow(Account.site_admin).to receive(:grants_right?).with(user, :read).and_return(false)
+          stub_root_account_membership(root_account, true)
         end
 
-        context "when user is admin" do
-          before do
-            allow(course).to receive(:account_membership_allows).with(user).and_return(true)
-          end
+        it "does not lock transitions for Course context" do
+          FeatureFlags::Hooks.only_admins_can_enable_block_content_editor_during_eap(user, course, nil, transitions)
 
-          it "does not lock transitions" do
-            FeatureFlags::Hooks.only_admins_can_enable_block_content_editor_during_eap(user, course, nil, transitions)
-
-            expect(transitions).to be_empty
-          end
+          expect(transitions).to be_empty
         end
 
-        context "when user is not admin" do
-          before do
-            allow(course).to receive(:account_membership_allows).with(user).and_return(false)
-          end
+        it "does not lock transitions for Account context" do
+          allow(account).to receive(:feature_enabled?).with(:block_content_editor).and_return(true)
+          allow(account).to receive(:root_account).and_return(root_account)
 
-          it "locks both on and off transitions" do
-            FeatureFlags::Hooks.only_admins_can_enable_block_content_editor_during_eap(user, course, nil, transitions)
+          FeatureFlags::Hooks.only_admins_can_enable_block_content_editor_during_eap(user, account, nil, transitions)
 
-            expect(transitions["on"]).to be_present
-            expect(transitions["off"]).to be_present
-            expect(transitions["on"]["locked"]).to be true
-            expect(transitions["off"]["locked"]).to be true
-          end
+          expect(transitions).to be_empty
+        end
+      end
+
+      context "when user is not root account admin or site admin" do
+        before do
+          allow(Account.site_admin).to receive(:grants_right?).with(user, :read).and_return(false)
+          stub_root_account_membership(root_account, false)
+        end
+
+        it "locks all transitions for Course context" do
+          FeatureFlags::Hooks.only_admins_can_enable_block_content_editor_during_eap(user, course, nil, transitions)
+
+          expect_all_transitions_locked(transitions)
+        end
+
+        it "locks all transitions for Account context" do
+          allow(account).to receive(:feature_enabled?).with(:block_content_editor).and_return(true)
+          allow(account).to receive(:root_account).and_return(root_account)
+
+          FeatureFlags::Hooks.only_admins_can_enable_block_content_editor_during_eap(user, account, nil, transitions)
+
+          expect_all_transitions_locked(transitions)
         end
       end
     end
 
-    context "when context is not a Course" do
-      it "does not lock transitions for Account context" do
-        allow(account).to receive(:account_membership_allows).with(user).and_return(false)
-        allow(account).to receive(:feature_enabled?).with(:block_content_editor).and_return(false)
-
-        FeatureFlags::Hooks.only_admins_can_enable_block_content_editor_during_eap(user, account, nil, transitions)
-
-        expect(transitions).to be_empty
+    context "when block_content_editor feature is disabled" do
+      before do
+        allow(course.account).to receive(:feature_enabled?).with(:block_content_editor).and_return(false)
       end
 
-      it "does not lock transitions for other context types" do
+      context "when user is site admin" do
+        before do
+          allow(Account.site_admin).to receive(:grants_right?).with(user, :read).and_return(true)
+          stub_root_account_membership(root_account, false)
+        end
+
+        it "locks all transitions" do
+          FeatureFlags::Hooks.only_admins_can_enable_block_content_editor_during_eap(user, course, nil, transitions)
+
+          expect_all_transitions_locked(transitions)
+        end
+      end
+
+      context "when user is root account admin" do
+        before do
+          allow(Account.site_admin).to receive(:grants_right?).with(user, :read).and_return(false)
+          stub_root_account_membership(root_account, true)
+        end
+
+        it "locks all transitions for Course context" do
+          FeatureFlags::Hooks.only_admins_can_enable_block_content_editor_during_eap(user, course, nil, transitions)
+
+          expect_all_transitions_locked(transitions)
+        end
+
+        it "locks all transitions for Account context" do
+          allow(account).to receive(:feature_enabled?).with(:block_content_editor).and_return(false)
+          allow(account).to receive(:root_account).and_return(root_account)
+
+          FeatureFlags::Hooks.only_admins_can_enable_block_content_editor_during_eap(user, account, nil, transitions)
+
+          expect_all_transitions_locked(transitions)
+        end
+      end
+
+      context "when user is not root account admin or site admin" do
+        before do
+          allow(Account.site_admin).to receive(:grants_right?).with(user, :read).and_return(false)
+          stub_root_account_membership(root_account, false)
+        end
+
+        it "locks all transitions for Course context" do
+          FeatureFlags::Hooks.only_admins_can_enable_block_content_editor_during_eap(user, course, nil, transitions)
+
+          expect_all_transitions_locked(transitions)
+        end
+
+        it "locks all transitions for Account context" do
+          allow(account).to receive(:feature_enabled?).with(:block_content_editor).and_return(false)
+          allow(account).to receive(:root_account).and_return(root_account)
+
+          FeatureFlags::Hooks.only_admins_can_enable_block_content_editor_during_eap(user, account, nil, transitions)
+
+          expect_all_transitions_locked(transitions)
+        end
+      end
+    end
+
+    context "when context is not a Course or Account" do
+      it "locks all transitions for other context types" do
         user_context = user_model
 
         FeatureFlags::Hooks.only_admins_can_enable_block_content_editor_during_eap(user, user_context, nil, transitions)
 
-        expect(transitions).to be_empty
-      end
-    end
-
-    context "when context is nil" do
-      it "does not lock transitions" do
-        FeatureFlags::Hooks.only_admins_can_enable_block_content_editor_during_eap(user, nil, nil, transitions)
-
-        expect(transitions).to be_empty
+        expect_all_transitions_locked(transitions)
       end
     end
 
     context "edge cases" do
-      it "handles nil user gracefully when feature is disabled" do
-        allow(course).to receive(:account_membership_allows).with(nil).and_return(false)
+      it "handles nil user gracefully when feature is disabled and user is not root admin" do
         allow(course.account).to receive(:feature_enabled?).with(:block_content_editor).and_return(false)
+        allow(Account.site_admin).to receive(:grants_right?).with(nil, :read).and_return(false)
+        stub_root_account_membership(root_account, false)
 
         FeatureFlags::Hooks.only_admins_can_enable_block_content_editor_during_eap(nil, course, nil, transitions)
 
-        expect(transitions["on"]["locked"]).to be true
-        expect(transitions["off"]["locked"]).to be true
+        expect_all_transitions_locked(transitions)
+      end
+    end
+  end
+
+  describe "block_content_editor_flag_enabled" do
+    let(:account) { account_model }
+    let(:course) { course_model }
+
+    context "when context is an Account" do
+      context "when block_content_editor feature is enabled" do
+        before do
+          allow(account).to receive(:feature_enabled?).with(:block_content_editor).and_return(true)
+        end
+
+        it "returns true" do
+          result = FeatureFlags::Hooks.block_content_editor_flag_enabled(account)
+
+          expect(result).to be true
+        end
       end
 
-      it "handles nil user gracefully when feature is enabled but user lacks permissions" do
-        allow(course).to receive(:account_membership_allows).with(nil).and_return(false)
-        allow(course.account).to receive(:feature_enabled?).with(:block_content_editor).and_return(true)
+      context "when block_content_editor feature is disabled" do
+        before do
+          allow(account).to receive(:feature_enabled?).with(:block_content_editor).and_return(false)
+        end
 
-        FeatureFlags::Hooks.only_admins_can_enable_block_content_editor_during_eap(nil, course, nil, transitions)
+        it "returns false" do
+          result = FeatureFlags::Hooks.block_content_editor_flag_enabled(account)
 
-        expect(transitions["on"]["locked"]).to be true
-        expect(transitions["off"]["locked"]).to be true
+          expect(result).to be false
+        end
+      end
+    end
+
+    context "when context is a Course" do
+      context "when block_content_editor feature is enabled on account" do
+        before do
+          allow(course.account).to receive(:feature_enabled?).with(:block_content_editor).and_return(true)
+        end
+
+        it "returns true" do
+          result = FeatureFlags::Hooks.block_content_editor_flag_enabled(course)
+
+          expect(result).to be true
+        end
+      end
+
+      context "when block_content_editor feature is disabled on account" do
+        before do
+          allow(course.account).to receive(:feature_enabled?).with(:block_content_editor).and_return(false)
+        end
+
+        it "returns false" do
+          result = FeatureFlags::Hooks.block_content_editor_flag_enabled(course)
+
+          expect(result).to be false
+        end
+      end
+    end
+
+    context "when context is neither Account nor Course" do
+      let(:user_context) { user_model }
+
+      it "returns false" do
+        result = FeatureFlags::Hooks.block_content_editor_flag_enabled(user_context)
+
+        expect(result).to be false
       end
     end
   end
