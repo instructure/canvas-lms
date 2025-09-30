@@ -128,7 +128,7 @@ GEM
       reline (>= 0.3.8)
     debug_inspector (1.2.0)
     diff-lcs (1.6.2)
-    dogstatsd-ruby (5.7.0)
+    dogstatsd-ruby (5.7.1)
     drb (2.2.3)
     erb (5.0.2)
     erubi (1.13.1)
