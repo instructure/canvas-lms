@@ -72,7 +72,7 @@ GEM
       uri
     public_suffix (6.0.2)
     rake (13.3.0)
-    rexml (3.4.1)
+    rexml (3.4.4)
     rspec (3.13.1)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
