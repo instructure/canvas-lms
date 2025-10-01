@@ -1480,7 +1480,14 @@ class AccountsController < ApplicationController
     end
     respond_to do |format|
       format.html { render html: "", layout: "bare" }
-      format.json { render json: { content: @domain_root_account.terms_of_service.terms_of_service_content&.content }, status: :ok }
+      format.json do
+        external_url = TermsOfService.external_url(@domain_root_account)
+        if external_url
+          render json: { redirectUrl: external_url }, status: :ok
+        else
+          render json: { content: @domain_root_account.terms_of_service.terms_of_service_content&.content }, status: :ok
+        end
+      end
     end
   end
 
