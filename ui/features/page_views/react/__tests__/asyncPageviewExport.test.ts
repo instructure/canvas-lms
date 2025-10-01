@@ -26,10 +26,21 @@ import {
   AsyncPageviewJob,
   AsyncPageViewJobStatus,
 } from '../hooks/asyncPageviewExport'
+import {FetchApiError} from '@canvas/do-fetch-api-effect'
 
 // Mock doFetchApi
-jest.mock('@canvas/do-fetch-api-effect', () => jest.fn())
-const doFetchApi = require('@canvas/do-fetch-api-effect')
+jest.mock('@canvas/do-fetch-api-effect', () => ({
+  __esModule: true,
+  default: jest.fn(),
+  FetchApiError: class FetchApiError extends Error {
+    response: Response
+    constructor(message: string, response: Response) {
+      super(message)
+      this.response = response
+    }
+  },
+}))
+const doFetchApi = require('@canvas/do-fetch-api-effect').default
 
 describe('useAsyncPageviewJobs', () => {
   const key = 'test_jobs'
@@ -75,11 +86,50 @@ describe('useAsyncPageviewJobs', () => {
     expect(updatedJobs[0].name).toBe('JobName')
   })
 
-  it('getDownloadUrl returns correct url', () => {
-    const {result} = renderHook(() => useAsyncPageviewJobs(key, userid))
-    const [, , , , getDownloadUrl] = result.current
-    const url = getDownloadUrl(job)
-    expect(url).toContain(job.query_id)
+  describe('getDownloadUrl', () => {
+    it('returns correct url when status is 200', async () => {
+      doFetchApi.mockResolvedValue({json: null, response: {status: 200} as Response})
+
+      const {result} = renderHook(() => useAsyncPageviewJobs(key, userid))
+      const [, , , , getDownloadUrl] = result.current
+      const url = await getDownloadUrl(job)
+      expect(url).toContain(job.query_id)
+      expect(url).toContain('/query/abc123/results')
+    })
+
+    it('throws error and updates job status on 204', async () => {
+      const mockResponse = {status: 204} as Response
+      doFetchApi.mockResolvedValue({json: null, response: mockResponse})
+
+      const {result} = renderHook(() => useAsyncPageviewJobs(key, userid))
+      const [, setJobs, , , getDownloadUrl] = result.current
+
+      // Set initial job
+      act(() => {
+        setJobs([job])
+      })
+
+      await expect(getDownloadUrl(job)).rejects.toThrow(FetchApiError)
+      const error = await getDownloadUrl(job).catch(e => e)
+      expect(error.response.status).toBe(204)
+    })
+
+    it('throws error and removes job on 404', async () => {
+      const mockResponse = {status: 404} as Response
+      doFetchApi.mockRejectedValue(new FetchApiError('Not Found', mockResponse))
+
+      const {result} = renderHook(() => useAsyncPageviewJobs(key, userid))
+      const [, setJobs, , , getDownloadUrl] = result.current
+
+      // Set initial job
+      act(() => {
+        setJobs([job])
+      })
+
+      await expect(getDownloadUrl(job)).rejects.toThrow(FetchApiError)
+      const error = await getDownloadUrl(job).catch(e => e)
+      expect(error.response.status).toBe(404)
+    })
   })
 })
 
@@ -127,6 +177,17 @@ describe('displayTTL', () => {
     }
     expect(displayTTL(job)).toBe('-')
   })
+
+  it('shows - for empty', () => {
+    const job: AsyncPageviewJob = {
+      query_id: 'id',
+      name: 'name',
+      status: AsyncPageViewJobStatus.Empty,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }
+    expect(displayTTL(job)).toBe('-')
+  })
   it('shows Expired for expired', () => {
     const job: AsyncPageviewJob = {
       query_id: 'id',
@@ -152,8 +213,12 @@ describe('isInProgress', () => {
       expect(isInProgress(job)).toBe(true)
     })
   })
-  it('returns false for complete/failed', () => {
-    ;[AsyncPageViewJobStatus.Finished, AsyncPageViewJobStatus.Failed].forEach(status => {
+  it('returns false for complete/failed/empty', () => {
+    ;[
+      AsyncPageViewJobStatus.Finished,
+      AsyncPageViewJobStatus.Failed,
+      AsyncPageViewJobStatus.Empty,
+    ].forEach(status => {
       const job: AsyncPageviewJob = {
         query_id: 'id',
         name: 'name',
@@ -170,6 +235,7 @@ describe('statusColor', () => {
   it('returns correct color', () => {
     expect(statusColor({status: AsyncPageViewJobStatus.Finished} as any)).toBe('success')
     expect(statusColor({status: AsyncPageViewJobStatus.Failed} as any)).toBe('warning')
+    expect(statusColor({status: AsyncPageViewJobStatus.Empty} as any)).toBe('success')
     expect(statusColor({status: AsyncPageViewJobStatus.Queued} as any)).toBe('info')
     expect(statusColor({status: AsyncPageViewJobStatus.Running} as any)).toBe('info')
   })
@@ -178,11 +244,11 @@ describe('statusColor', () => {
 describe('statusDisplayName', () => {
   it('returns correct display name', () => {
     expect(statusDisplayName({status: AsyncPageViewJobStatus.Queued} as any)).toMatch(/In progress/)
-    expect(statusDisplayName({status: AsyncPageViewJobStatus.Queued} as any)).toMatch(/In progress/)
     expect(statusDisplayName({status: AsyncPageViewJobStatus.Running} as any)).toMatch(
       /In progress/,
     )
     expect(statusDisplayName({status: AsyncPageViewJobStatus.Finished} as any)).toMatch(/Completed/)
     expect(statusDisplayName({status: AsyncPageViewJobStatus.Failed} as any)).toMatch(/Failed/)
+    expect(statusDisplayName({status: AsyncPageViewJobStatus.Empty} as any)).toMatch(/Empty/)
   })
 })
