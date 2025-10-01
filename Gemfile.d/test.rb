@@ -47,7 +47,7 @@ group :test do
   # pinned to 1.72 due to contract tests breaking with the following versions
   gem "pact_broker-client", "1.72"
   gem "database_cleaner", "~> 2.0"
-  gem "json-schema", "~> 5.0"
+  gem "json-schema", "~> 6.0"
 
   gem "rspecq", github: "instructure/rspecq"
   gem "flakey_spec_catcher", "~> 0.12", require: false
