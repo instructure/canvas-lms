@@ -13,5 +13,5 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "activesupport"
   spec.add_dependency "canvas_mimetype_fu"
-  spec.add_dependency "rubyzip", "~> 2.0"
+  spec.add_dependency "rubyzip"
 end

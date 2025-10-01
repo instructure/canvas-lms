@@ -50,7 +50,7 @@ module Canvas::Migration::Worker
     att = nil
 
     begin
-      Zip::File.open(zip_file, Zip::File::CREATE) do |zipfile|
+      Zip::File.open(zip_file, create: true) do |zipfile|
         Dir["#{folder}/**/**"].each do |file|
           next if File.basename(file) == file_name
 
