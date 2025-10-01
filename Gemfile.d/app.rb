@@ -96,7 +96,7 @@ gem "pragmatic_segmenter", "~> 0.3"
 gem "prawn-emoji", "~> 6.0", require: false
 gem "prawn-rails", "~> 1.4"
 gem "prosopite", "~> 2.1"
-gem "puma", "~> 6.3", require: false
+gem "puma", "~> 7.0", require: false
 gem "rack3-brotli", "~> 1.0", require: "rack/brotli"
 gem "rails-observers", "0.1.5"
 gem "feedjira", "~> 4.0", require: false
