@@ -18,6 +18,7 @@
 
 import {useInfiniteQuery} from '@tanstack/react-query'
 import {gql} from 'graphql-tag'
+import {useState, useCallback, useEffect, useRef} from 'react'
 import {getCurrentUserId, executeGraphQLQuery, createUserQueryConfig} from '../utils/graphql'
 import {COURSE_WORK_KEY, QUERY_CONFIG} from '../constants'
 import {useWidgetDashboard} from './useWidgetDashboardContext'
@@ -77,6 +78,7 @@ interface PageInfo {
   hasPreviousPage: boolean
   endCursor: string | null
   startCursor: string | null
+  totalCount: number | null
 }
 
 interface GraphQLResponse {
@@ -143,6 +145,7 @@ const USER_COURSE_WORK_QUERY = gql`
             hasPreviousPage
             endCursor
             startCursor
+            totalCount
           }
         }
       }
@@ -185,6 +188,7 @@ export interface CourseWorkPaginationInfo {
   hasPreviousPage: boolean
   endCursor: string | null
   startCursor: string | null
+  totalCount: number | null
 }
 
 export interface CourseWorkResult {
@@ -192,7 +196,7 @@ export interface CourseWorkResult {
   pageInfo: CourseWorkPaginationInfo
 }
 
-interface UseCourseWorkOptions {
+export interface UseCourseWorkOptions {
   pageSize?: number
   courseFilter?: string
   startDate?: string
@@ -212,6 +216,95 @@ type PaginationParams =
       before?: string
     }
 
+/**
+ * Calculate a GraphQL cursor for a specific page
+ * Cursor represents the starting offset for the page (0-indexed position)
+ */
+export function calculateCursorForPage(pageIndex: number, pageSize: number): string | undefined {
+  if (pageIndex === 0) return undefined
+  const offset = pageIndex * pageSize
+  return btoa(String(offset))
+}
+
+/**
+ * Fetch a specific page of course work directly by calculating its cursor
+ */
+export async function fetchCourseWorkPage(
+  pageIndex: number,
+  options: UseCourseWorkOptions = {},
+): Promise<CourseWorkResult> {
+  const {
+    pageSize = 4,
+    courseFilter,
+    startDate,
+    endDate,
+    includeOverdue,
+    includeNoDueDate,
+    onlySubmitted,
+  } = options
+
+  const currentUserId = getCurrentUserId()
+  const cursor = calculateCursorForPage(pageIndex, pageSize)
+
+  const response = await executeGraphQLQuery<GraphQLResponse>(USER_COURSE_WORK_QUERY, {
+    userId: currentUserId,
+    first: pageSize,
+    after: cursor,
+    courseFilter,
+    startDate,
+    endDate,
+    includeOverdue,
+    includeNoDueDate,
+    onlySubmitted,
+  })
+
+  if (!response?.legacyNode?.courseWorkSubmissionsConnection) {
+    return {
+      items: [],
+      pageInfo: {
+        hasNextPage: false,
+        hasPreviousPage: false,
+        endCursor: null,
+        startCursor: null,
+        totalCount: null,
+      },
+    }
+  }
+
+  const {nodes: submissions, pageInfo} = response.legacyNode.courseWorkSubmissionsConnection
+
+  const items: CourseWorkItem[] = submissions.map(submission => {
+    const assignment = submission.assignment
+    // Prioritize cachedDueDate for due date overrides before using assignment.dueAt
+    const effectiveDueDate = submission.cachedDueDate || assignment.dueAt || null
+
+    return {
+      id: assignment._id,
+      title: getItemTitle(assignment),
+      course: {
+        id: assignment.course._id,
+        name: assignment.course.name,
+      },
+      dueAt: effectiveDueDate,
+      points: assignment.pointsPossible || null,
+      htmlUrl: assignment.htmlUrl,
+      type: determineItemType(assignment),
+      late: submission.late || false,
+      missing: submission.missing || false,
+      state: submission.state || 'not_submitted',
+    }
+  })
+
+  return {
+    items,
+    pageInfo: {...pageInfo},
+  }
+}
+
+/**
+ * Original infinite query hook for sequential pagination
+ * Used by widgets that load pages sequentially (e.g., CourseWorkSummaryWidget)
+ */
 export function useCourseWork(options: UseCourseWorkOptions = {}) {
   const {
     pageSize = 4,
@@ -271,6 +364,7 @@ export function useCourseWork(options: UseCourseWorkOptions = {}) {
             hasPreviousPage: false,
             endCursor: null,
             startCursor: null,
+            totalCount: null,
           },
         }
       }
@@ -280,6 +374,7 @@ export function useCourseWork(options: UseCourseWorkOptions = {}) {
       // Transform submissions to CourseWorkItems
       const items: CourseWorkItem[] = submissions.map(submission => {
         const assignment = submission.assignment
+        // Prioritize cachedDueDate for due date overrides before using assignment.dueAt
         const effectiveDueDate = submission.cachedDueDate || assignment.dueAt || null
 
         return {
@@ -306,6 +401,7 @@ export function useCourseWork(options: UseCourseWorkOptions = {}) {
           hasPreviousPage: pageInfo.hasPreviousPage,
           endCursor: pageInfo.endCursor,
           startCursor: pageInfo.startCursor,
+          totalCount: pageInfo.totalCount,
         },
       }
     },
@@ -328,4 +424,115 @@ export function useCourseWork(options: UseCourseWorkOptions = {}) {
       return null
     },
   })
+}
+
+interface PageCache {
+  [pageIndex: number]: CourseWorkResult
+}
+
+/**
+ * Enhanced hook for direct page jumping with caching
+ * Manages its own page state and provides navigation
+ * Used by widgets that need to jump directly to any page (e.g., CourseWorkWidget, CourseWorkCombinedWidget)
+ */
+export function useCourseWorkPaginated(options: UseCourseWorkOptions = {}) {
+  const [currentPageIndex, setCurrentPageIndex] = useState<number>(0)
+  const [pageCache, setPageCache] = useState<PageCache>({})
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<Error | null>(null)
+  const [totalCount, setTotalCount] = useState<number | null>(null)
+  const optionsRef = useRef(options)
+  const isFetchingRef = useRef<{[key: number]: boolean}>({})
+
+  useEffect(() => {
+    optionsRef.current = options
+  }, [options])
+
+  const pageSize = options.pageSize || 4
+
+  const fetchPage = useCallback(
+    async (pageIndex: number) => {
+      if (pageCache[pageIndex]) {
+        return pageCache[pageIndex]
+      }
+
+      if (isFetchingRef.current[pageIndex]) {
+        return
+      }
+
+      isFetchingRef.current[pageIndex] = true
+      setIsLoading(true)
+      setError(null)
+
+      try {
+        const result = await fetchCourseWorkPage(pageIndex, optionsRef.current)
+
+        setPageCache(prev => ({
+          ...prev,
+          [pageIndex]: result,
+        }))
+
+        if (result.pageInfo.totalCount !== null) {
+          setTotalCount(result.pageInfo.totalCount)
+        }
+
+        return result
+      } catch (err) {
+        setError(err as Error)
+      } finally {
+        setIsLoading(false)
+        isFetchingRef.current[pageIndex] = false
+      }
+    },
+    [pageCache],
+  )
+
+  useEffect(() => {
+    if (window.ENV?.current_user_id) {
+      fetchPage(currentPageIndex)
+    }
+  }, [currentPageIndex, fetchPage])
+
+  useEffect(() => {
+    setPageCache({})
+    setTotalCount(null)
+    setCurrentPageIndex(0)
+    isFetchingRef.current = {}
+  }, [options.courseFilter, options.startDate, options.endDate])
+
+  const resetAndRefetch = useCallback(() => {
+    setPageCache({})
+    setTotalCount(null)
+    isFetchingRef.current = {}
+    return fetchPage(currentPageIndex)
+  }, [fetchPage, currentPageIndex])
+
+  const totalPages =
+    totalCount !== null && totalCount !== undefined ? Math.ceil(totalCount / pageSize) : 0
+
+  const goToPage = useCallback((pageNumber: number) => {
+    const targetIndex = pageNumber - 1
+    if (targetIndex >= 0) {
+      setCurrentPageIndex(targetIndex)
+    }
+  }, [])
+
+  const resetPagination = useCallback(() => {
+    setCurrentPageIndex(0)
+  }, [])
+
+  const currentPage = pageCache[currentPageIndex]
+
+  return {
+    currentPage,
+    currentPageIndex,
+    totalPages,
+    totalCount,
+    goToPage,
+    resetPagination,
+    refetch: resetAndRefetch,
+    isLoading,
+    error,
+    pageSize,
+  }
 }

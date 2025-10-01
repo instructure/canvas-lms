@@ -59,6 +59,8 @@ module Types
     implements Interfaces::TimestampInterface
     implements Interfaces::LegacyIDInterface
 
+    connection_type_class TotalCountConnection
+
     global_id_field :id
 
     field :first_name, HtmlEncodedStringType, null: true

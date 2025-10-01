@@ -24,6 +24,8 @@ export interface UsePaginationOptions {
   fetchNextPage: () => Promise<any>
   isFetchingNextPage?: boolean
   isFetchingPreviousPage?: boolean
+  totalCount?: number | null
+  pageSize?: number
 }
 
 export interface UsePaginationReturn {
@@ -43,27 +45,53 @@ export const usePagination = ({
   fetchNextPage,
   isFetchingNextPage,
   isFetchingPreviousPage,
+  totalCount,
+  pageSize,
 }: UsePaginationOptions): UsePaginationReturn => {
   const [currentPageIndex, setCurrentPageIndex] = useState<number>(0)
 
-  const totalPages = hasNextPage ? totalPagesLoaded + 1 : totalPagesLoaded
+  // Calculate total pages from totalCount if available and pageSize is provided
+  const totalPages =
+    totalCount !== undefined && totalCount !== null && pageSize && pageSize > 0
+      ? Math.ceil(totalCount / pageSize)
+      : hasNextPage
+        ? totalPagesLoaded + 1
+        : totalPagesLoaded
   const currentPage = currentPageIndex + 1
 
   const goToPage = useCallback(
-    (pageNumber: number) => {
+    async (pageNumber: number) => {
       const targetIndex = pageNumber - 1
 
+      // Validate page number
       if (targetIndex < 0) return
+      if (pageNumber < 1) return
 
-      if (targetIndex < totalPagesLoaded) {
+      // If we have totalCount and pageSize, validate against total pages
+      if (totalCount !== undefined && totalCount !== null && pageSize && pageSize > 0) {
+        const maxPages = Math.ceil(totalCount / pageSize)
+        if (pageNumber > maxPages) return
+      }
+
+      // For direct page jumping with totalCount, just update the index immediately
+      // The data fetching hook will react to this change
+      if (totalCount !== undefined && totalCount !== null && pageSize && pageSize > 0) {
         setCurrentPageIndex(targetIndex)
-      } else if (targetIndex === totalPagesLoaded && hasNextPage) {
-        fetchNextPage().then(() => {
-          setCurrentPageIndex(targetIndex)
-        })
+      } else if (targetIndex < totalPagesLoaded) {
+        // Page already loaded, just navigate to it
+        setCurrentPageIndex(targetIndex)
+      } else if (hasNextPage) {
+        // Fallback: fetch pages sequentially (required for cursor-based pagination without calculated cursors)
+        const pagesToFetch = targetIndex - totalPagesLoaded + 1
+
+        for (let i = 0; i < pagesToFetch; i++) {
+          await fetchNextPage()
+        }
+
+        setCurrentPageIndex(targetIndex)
       }
     },
-    [totalPagesLoaded, hasNextPage, fetchNextPage],
+    [totalPagesLoaded, hasNextPage, fetchNextPage, totalCount, pageSize],
   )
 
   const resetPagination = useCallback(() => {

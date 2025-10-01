@@ -25,15 +25,15 @@ import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import CourseWorkFilters, {type DateFilterOption} from '../../shared/CourseWorkFilters'
 import type {BaseWidgetProps, CourseOption} from '../../../types'
 import {useSharedCourses} from '../../../hooks/useSharedCourses'
-import {useCourseWork} from '../../../hooks/useCourseWork'
+import {useCourseWorkPaginated} from '../../../hooks/useCourseWork'
 import {useCourseWorkStatistics} from '../../../hooks/useCourseWorkStatistics'
-import {usePagination} from '../../../hooks/usePagination'
 import StatisticsCardsGrid from '../../shared/StatisticsCardsGrid'
 import {
   convertDateFilterToParams,
   convertDateFilterToStatisticsRange,
 } from '../../../utils/dateUtils'
 import {CourseWorkItem as CourseWorkItemComponent} from '../../shared/CourseWorkItem'
+import {DEFAULT_PAGE_SIZE} from '../../../constants/pagination'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -56,27 +56,22 @@ const CourseWorkCombinedWidget: React.FC<BaseWidgetProps> = ({
   const dateParams = convertDateFilterToParams(selectedDateFilter)
   const statisticsDateRange = convertDateFilterToStatisticsRange(selectedDateFilter)
 
+  const pageSize = DEFAULT_PAGE_SIZE.COURSE_WORK_COMBINED
+
+  // Fetch course work with pagination
   const {
-    data,
+    currentPage: currentPageData,
+    currentPageIndex,
+    totalPages,
+    goToPage,
+    resetPagination,
+    refetch,
     isLoading: courseWorkLoading,
     error: courseWorkError,
-    refetch,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isFetchingPreviousPage,
-  } = useCourseWork({
-    pageSize: 6,
+  } = useCourseWorkPaginated({
+    pageSize,
     courseFilter,
     ...dateParams,
-  })
-
-  const {currentPageIndex, paginationProps, resetPagination} = usePagination({
-    hasNextPage: !!hasNextPage,
-    totalPagesLoaded: data?.pages?.length || 0,
-    fetchNextPage,
-    isFetchingNextPage,
-    isFetchingPreviousPage,
   })
 
   const {
@@ -89,11 +84,14 @@ const CourseWorkCombinedWidget: React.FC<BaseWidgetProps> = ({
     courseId: courseFilter,
   })
 
-  const currentPage = data?.pages?.[currentPageIndex]
-  const filteredItems = currentPage?.items || []
+  const filteredItems = currentPageData?.items || []
 
   const isLoading = externalIsLoading || courseWorkLoading || statisticsLoading
-  const error = externalError || courseWorkError?.message || statisticsError?.message || null
+  const error =
+    externalError ||
+    (courseWorkError ? courseWorkError.message : null) ||
+    statisticsError?.message ||
+    null
   const handleRetry = onRetry || (() => refetch())
 
   const handleResetPagination = useCallback(() => {
@@ -128,7 +126,10 @@ const CourseWorkCombinedWidget: React.FC<BaseWidgetProps> = ({
       error={error ? I18n.t('Failed to load course work. Please try again.') : null}
       onRetry={handleRetry}
       pagination={{
-        ...paginationProps,
+        currentPage: currentPageIndex + 1,
+        totalPages,
+        onPageChange: goToPage,
+        isLoading: courseWorkLoading,
         ariaLabel: I18n.t('Course work pagination'),
       }}
       headerActions={

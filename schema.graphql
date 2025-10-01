@@ -4524,11 +4524,7 @@ type EnrollmentConnection {
   A list of nodes.
   """
   nodes: [Enrollment]
-
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
+  pageInfo: TotalCountPageInfo!
 }
 
 """
@@ -11471,11 +11467,7 @@ type UserConnection {
   A list of nodes.
   """
   nodes: [User]
-
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
+  pageInfo: TotalCountPageInfo!
 }
 
 """
