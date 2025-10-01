@@ -10199,6 +10199,11 @@ enum SubmissionOrderField {
   gradedAt
 }
 
+enum SubmissionPostingStatus {
+  hideable
+  postable
+}
+
 input SubmissionRubricAssessmentFilterInput {
   """
   it will return all rubric assessments for the current submission
@@ -10262,6 +10267,12 @@ input SubmissionSearchFilterInput {
   Limit results to submissions that are late
   """
   late: Boolean
+
+  """
+  Filter submissions by their posting status. Valid values: postable, hideable.
+  Ignored if the current user cannot manage or view all grades for the assignment.
+  """
+  postingStatus: SubmissionPostingStatus
 
   """
   For group assignments, include submissions for group representatives only.

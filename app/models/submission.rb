@@ -231,11 +231,11 @@ class Submission < ActiveRecord::Base
 
   scope :postable, lambda {
     all.primary_shard.activate do
-      graded.union(with_hidden_comments)
+      graded.union(with_hidden_comments).union(with_sticker)
     end
   }
   scope :with_hidden_comments, lambda {
-    where(SubmissionComment.where("submission_id = submissions.id AND hidden = true").arel.exists)
+    where(SubmissionComment.where("submission_id = submissions.id").where(hidden: true, draft: false).arel.exists)
   }
 
   # This should only be used in the course drop down to show assignments recently graded.
@@ -2332,6 +2332,7 @@ class Submission < ActiveRecord::Base
   scope :with_assignment, -> { joins(:assignment).merge(Assignment.active) }
 
   scope :graded, -> { where("(submissions.score IS NOT NULL AND submissions.workflow_state = 'graded') or submissions.excused = true") }
+  scope :with_sticker, -> { where.not(sticker: nil) }
   scope :not_submitted_or_graded, -> { where(submission_type: nil).where("(submissions.score IS NULL OR submissions.workflow_state <> 'graded') AND submissions.excused IS NOT TRUE") }
 
   scope :ungraded, -> { where(grade: nil).preload(:assignment) }
