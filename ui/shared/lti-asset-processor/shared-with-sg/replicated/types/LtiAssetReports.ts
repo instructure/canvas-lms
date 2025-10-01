@@ -25,12 +25,21 @@ type LtiAssetReportsConnection = NonNullable<
 
 export type LtiAssetReportsNodes = NonNullable<LtiAssetReportsConnection['nodes']>
 export type LtiAssetReport = NonNullable<LtiAssetReportsNodes[number]>
+export type LtiDiscussionAssetReport = LtiAssetReport & {
+  asset: LtiAsset & {
+    discussionEntryVersion: NonNullable<LtiAsset['discussionEntryVersion']>
+  }
+}
 export type LtiAsset = LtiAssetReport['asset']
 
-const COMPATIBLE_SUBMISSION_TYPES = ['online_text_entry', 'online_upload'] as const
+const COMPATIBLE_SUBMISSION_TYPES = [
+  'online_text_entry',
+  'online_upload',
+  'discussion_topic',
+] as const
 
 export const ZAssetReportCompatibleSubmissionType: z.ZodEnum<
-  ['online_text_entry', 'online_upload']
+  ['online_text_entry', 'online_upload', 'discussion_topic']
 > = z.enum(COMPATIBLE_SUBMISSION_TYPES)
 
 export type AssetReportCompatibleSubmissionType = z.infer<

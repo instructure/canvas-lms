@@ -29,7 +29,18 @@ module AssetProcessorReportHelper
                       .for_active_processors
                       .for_submissions(all_submission_ids)
                       .preload(:asset)
-                      .preload(asset: :attachment)
+                      .preload(asset: :attachment) # TODO: we can just get fields available thru lti asset
+
+    # Filter to only latest discussion_entry_versions
+    visible_reports = visible_reports
+                      .joins("LEFT JOIN #{DiscussionEntryVersion.quoted_table_name} ON #{DiscussionEntryVersion.quoted_table_name}.id = #{Lti::Asset.quoted_table_name}.discussion_entry_version_id")
+                      .where(
+                        "#{Lti::Asset.quoted_table_name}.discussion_entry_version_id IS NULL OR NOT EXISTS (
+                          SELECT 1 FROM #{DiscussionEntryVersion.quoted_table_name} dev2
+                          WHERE dev2.discussion_entry_id = #{DiscussionEntryVersion.quoted_table_name}.discussion_entry_id
+                          AND dev2.version > #{DiscussionEntryVersion.quoted_table_name}.version
+                        )"
+                      )
 
     if for_student
       visible_reports = visible_reports.preload(asset: :submission)
@@ -42,6 +53,10 @@ module AssetProcessorReportHelper
         next false if submission.blank?
 
         attachment_ids = submission.attachment_ids&.presence&.split(",") || []
+
+        # Include discussion entry assets (already filtered to latest version above)
+        next true if report.asset.discussion_entry_version_id.present?
+
         attachment_ids.include?(report.asset.attachment_id.to_s) || report.asset.submission_attempt == submission.attempt
       end
     end
@@ -77,6 +92,15 @@ module AssetProcessorReportHelper
 
     raw_reports = raw_asset_reports(submission_ids: [submission.id], for_student:)[submission.id]
 
+    discussion_entry_version_ids = raw_reports&.map(&:asset)&.filter_map(&:discussion_entry_version_id)&.uniq
+    if discussion_entry_version_ids&.any?
+      discussion_entry_versions =
+        DiscussionEntryVersion
+        .where(id: discussion_entry_version_ids)
+        .select(:id, :created_at, :message)
+        .index_by(&:id)
+    end
+
     raw_reports&.map do |report|
       report.info_for_display.merge(
         {
@@ -84,7 +108,15 @@ module AssetProcessorReportHelper
           asset: {
             attachmentId: report.asset.attachment_id&.to_s,
             attachmentName: report.asset.attachment&.name,
-            submissionAttempt: report.asset.submission_attempt
+            submissionAttempt: report.asset.submission_attempt,
+            discussionEntryVersion:
+              discussion_entry_versions&.dig(report.asset.discussion_entry_version_id)&.then do |dev|
+                {
+                  _id: dev.id.to_s,
+                  createdAt: dev.created_at,
+                  messageIntro: dev.message_intro,
+                }
+              end,
           }
         }
       )

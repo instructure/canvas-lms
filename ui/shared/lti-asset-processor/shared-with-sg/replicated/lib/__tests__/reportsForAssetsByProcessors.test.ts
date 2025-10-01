@@ -307,6 +307,220 @@ describe('reportsForAssetsByProcessors', () => {
     })
   })
 
+  describe('with discussion_topic submission type', () => {
+    const reportsAssetSelector = {
+      submissionType: 'discussion_topic' as const,
+      attachments: [],
+      attempt: '1',
+    }
+
+    it('groups reports by discussion entry version ID', () => {
+      const reports: LtiAssetReport[] = [
+        makeMockReport({
+          _id: 'report1',
+          title: 'Discussion Report 1',
+          processorId: mockProcessors[0]?._id || 'oops',
+          asset: {
+            discussionEntryVersion: {
+              _id: 'entry1',
+              createdAt: '2025-01-15T16:45:00Z',
+              messageIntro: 'This is a test discussion entry message that is quite long',
+            },
+          },
+        }),
+        makeMockReport({
+          _id: 'report2',
+          title: 'Discussion Report 2',
+          processorId: mockProcessors[0]?._id || 'oops',
+          asset: {
+            discussionEntryVersion: {
+              _id: 'entry1',
+              createdAt: '2025-01-15T16:45:00Z',
+              messageIntro: 'This is a test discussion entry message that is quite long',
+            },
+          },
+        }),
+        makeMockReport({
+          _id: 'report3',
+          title: 'Discussion Report 3',
+          processorId: mockProcessors[1]?._id || 'oops',
+          asset: {
+            discussionEntryVersion: {
+              _id: 'entry2',
+              createdAt: '2025-02-20T09:30:00Z',
+              messageIntro: 'Another discussion entry',
+            },
+          },
+        }),
+      ]
+
+      const result = reportsForAssetsByProcessors(reports, mockProcessors, reportsAssetSelector)
+
+      expect(result).toHaveLength(2)
+
+      // First processor - should have one group with two reports
+      expect(result[0]?.processor).toEqual(mockProcessors[0])
+      expect(result[0]?.reportGroups).toHaveLength(1)
+      expect(result[0]?.reportGroups[0]?.key).toBe('entry1')
+      expect(result[0]?.reportGroups[0]?.reports).toHaveLength(2)
+
+      // Second processor - should have one group with one report
+      expect(result[1]?.processor).toEqual(mockProcessors[1])
+      expect(result[1]?.reportGroups).toHaveLength(1)
+      expect(result[1]?.reportGroups[0]?.key).toBe('entry2')
+      expect(result[1]?.reportGroups[0]?.reports).toHaveLength(1)
+    })
+
+    it('formats display name with localized date and quoted messageIntro', () => {
+      const reports: LtiAssetReport[] = [
+        makeMockReport({
+          _id: 'report1',
+          title: 'Discussion Report',
+          processorId: mockProcessors[0]?._id || 'oops',
+          asset: {
+            discussionEntryVersion: {
+              _id: 'entry1',
+              createdAt: '2025-01-15T16:45:00Z',
+              messageIntro: 'This is a test discussion entry message',
+            },
+          },
+        }),
+      ]
+
+      const result = reportsForAssetsByProcessors(reports, mockProcessors, reportsAssetSelector)
+
+      // Display name should contain formatted date, colon, and quoted messageIntro
+      const displayName = result[0]?.reportGroups[0]?.displayName
+      expect(displayName).toContain(':')
+      expect(displayName).toContain('"This is a test discussion entry message"')
+      // Date format will depend on locale, but should be formatted (not raw ISO string)
+      expect(displayName).not.toContain('2025-01-15T16:45:00Z')
+      // Should not contain the old format
+      expect(displayName).not.toContain('--')
+    })
+
+    it('handles reports with no discussion entry version', () => {
+      const reports: LtiAssetReport[] = [
+        makeMockReport({
+          _id: 'report1',
+          title: 'Report without discussion',
+          processorId: mockProcessors[0]?._id || 'oops',
+          asset: {submissionAttempt: 1},
+        }),
+      ]
+
+      const result = reportsForAssetsByProcessors(reports, mockProcessors, reportsAssetSelector)
+
+      // Should return empty report groups since no discussion entries
+      expect(result[0]?.reportGroups).toHaveLength(0)
+      expect(result[1]?.reportGroups).toHaveLength(0)
+    })
+
+    it('includes both attachment assets and discussion entry assets', () => {
+      const attachments = [
+        {_id: 'attachment1', displayName: 'Document.pdf'},
+        {_id: 'attachment2', displayName: 'Spreadsheet.xlsx'},
+      ]
+
+      const reportsAssetSelectorWithAttachments = {
+        submissionType: 'discussion_topic' as const,
+        attachments,
+        attempt: '1',
+      }
+
+      const reports: LtiAssetReport[] = [
+        // Attachment reports
+        makeMockReport({
+          _id: 'report1',
+          title: 'Attachment Report 1',
+          processorId: mockProcessors[0]?._id || 'oops',
+          asset: {attachmentId: 'attachment1'},
+        }),
+        makeMockReport({
+          _id: 'report2',
+          title: 'Attachment Report 2',
+          processorId: mockProcessors[0]?._id || 'oops',
+          asset: {attachmentId: 'attachment2'},
+        }),
+        // Discussion entry reports
+        makeMockReport({
+          _id: 'report3',
+          title: 'Discussion Report 1',
+          processorId: mockProcessors[0]?._id || 'oops',
+          asset: {
+            discussionEntryVersion: {
+              _id: 'entry1',
+              createdAt: '2025-01-15T16:45:00Z',
+              messageIntro: 'This is a discussion entry',
+            },
+          },
+        }),
+        makeMockReport({
+          _id: 'report4',
+          title: 'Discussion Report 2',
+          processorId: mockProcessors[1]?._id || 'oops',
+          asset: {
+            discussionEntryVersion: {
+              _id: 'entry2',
+              createdAt: '2025-02-20T09:30:00Z',
+              messageIntro: 'Another discussion entry',
+            },
+          },
+        }),
+      ]
+
+      const result = reportsForAssetsByProcessors(
+        reports,
+        mockProcessors,
+        reportsAssetSelectorWithAttachments,
+      )
+
+      expect(result).toHaveLength(2)
+
+      // First processor should have attachment groups + discussion groups
+      expect(result[0]?.processor).toEqual(mockProcessors[0])
+      expect(result[0]?.reportGroups).toHaveLength(3) // 2 attachments + 1 discussion entry
+
+      // Check attachment groups
+      expect(result[0]?.reportGroups[0]).toEqual({
+        key: 'attachment1',
+        displayName: 'Document.pdf',
+        reports: [reports[0]],
+      })
+      expect(result[0]?.reportGroups[1]).toEqual({
+        key: 'attachment2',
+        displayName: 'Spreadsheet.xlsx',
+        reports: [reports[1]],
+      })
+
+      // Check discussion entry group
+      expect(result[0]?.reportGroups[2]?.key).toBe('entry1')
+      expect(result[0]?.reportGroups[2]?.reports).toHaveLength(1)
+      expect(result[0]?.reportGroups[2]?.reports[0]).toEqual(reports[2])
+
+      // Second processor should have attachment groups (empty) + discussion groups
+      expect(result[1]?.processor).toEqual(mockProcessors[1])
+      expect(result[1]?.reportGroups).toHaveLength(3) // 2 attachments + 1 discussion entry
+
+      // Check attachment groups (should be empty for second processor)
+      expect(result[1]?.reportGroups[0]).toEqual({
+        key: 'attachment1',
+        displayName: 'Document.pdf',
+        reports: [],
+      })
+      expect(result[1]?.reportGroups[1]).toEqual({
+        key: 'attachment2',
+        displayName: 'Spreadsheet.xlsx',
+        reports: [],
+      })
+
+      // Check discussion entry group
+      expect(result[1]?.reportGroups[2]?.key).toBe('entry2')
+      expect(result[1]?.reportGroups[2]?.reports).toHaveLength(1)
+      expect(result[1]?.reportGroups[2]?.reports[0]).toEqual(reports[3])
+    })
+  })
+
   describe('edge cases', () => {
     it('handles null/undefined asset properties', () => {
       const reports: LtiAssetReport[] = [

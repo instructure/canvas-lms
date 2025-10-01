@@ -268,6 +268,49 @@ describe GradebooksController do
             expect(submission).not_to have_key(:submission_type)
           end
         end
+
+        context "with discussion_topic submission" do
+          before do
+            @assignment.update!(submission_types: "discussion_topic")
+            @discussion_topic = @assignment.discussion_topic || @course.discussion_topics.create!(
+              title: "Test Discussion",
+              assignment: @assignment
+            )
+            @discussion_topic.discussion_entries.create!(
+              user: @student,
+              message: "Test entry"
+            )
+          end
+
+          it "does not include processors and reports without feature flag" do
+            @course.root_account.disable_feature!(:lti_asset_processor_discussions)
+
+            allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_processors).and_return([{ id: 1, title: "Test Processor" }])
+            allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_reports_info_for_display).and_return([{ id: 1, priority: 0 }])
+
+            get "grade_summary", params: { course_id: @course.id, id: @student.id }
+
+            submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
+
+            expect(submission).not_to have_key(:asset_processors)
+            expect(submission).not_to have_key(:asset_reports)
+          end
+
+          it "includes processors and reports with feature flag enabled" do
+            allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_processors).and_return([{ id: 1, title: "Test Processor" }])
+            allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_reports_info_for_display).and_return([{ id: 1, priority: 0 }])
+
+            get "grade_summary", params: { course_id: @course.id, id: @student.id }
+
+            submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
+            expect(submission).to have_key(:asset_processors)
+            expect(submission[:asset_processors]).to eq([{ id: 1, title: "Test Processor" }])
+            expect(submission).to have_key(:asset_reports)
+            expect(submission[:asset_reports]).to eq([{ id: 1, priority: 0 }])
+            expect(submission).to have_key(:submission_type)
+            expect(submission[:submission_type]).to eq("discussion_topic")
+          end
+        end
       end
     end
 

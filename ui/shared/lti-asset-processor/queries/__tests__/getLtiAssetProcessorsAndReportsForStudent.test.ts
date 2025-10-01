@@ -23,7 +23,6 @@ import {
   GetLtiAssetProcessorsAndReportsForStudentResult,
   ZGetLtiAssetProcessorsAndReportsForStudentResult,
 } from '../getLtiAssetProcessorsAndReportsForStudent'
-import {defaultGetLtiAssetProcessorsAndReportsForStudentResult} from '../__fixtures__/LtiAssetProcessorsAndReportsForStudent'
 
 type DeepNonNullable<T> = T extends object
   ? {[K in keyof T]-?: DeepNonNullable<NonNullable<T[K]>>}
@@ -61,6 +60,12 @@ describe('GetLtiAssetProcessorsAndReportsForStudentResult', () => {
               attachmentId: '',
               attachmentName: '',
               submissionAttempt: 1,
+              discussionEntryVersion: {
+                __typename: 'DiscussionEntryVersion',
+                _id: 'dev-3',
+                messageIntro: 'Test discussion entry message for student processor',
+                createdAt: '2023-01-01T00:00:00Z',
+              },
             },
           },
         ],

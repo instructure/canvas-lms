@@ -308,4 +308,80 @@ describe('StudentLtiAssetReportModal', () => {
       expect(screen.getByText(`Document Processors for ${assignmentName}`)).toBeInTheDocument()
     })
   })
+
+  describe('with discussion_topic submission type', () => {
+    it('renders the modal with "All comments" label for single report', () => {
+      const reports = [createUploadReport(0, '10', 'attachment.pdf')]
+
+      render(
+        <StudentLtiAssetReportModal
+          assetProcessors={mockAssetProcessors}
+          assignmentName={assignmentName}
+          reports={reports}
+          submissionType="discussion_topic"
+        />,
+      )
+
+      expect(screen.getByText('All comments')).toBeInTheDocument()
+      expect(screen.getByText(`Document Processors for ${assignmentName}`)).toBeInTheDocument()
+    })
+
+    it('renders the modal for multiple reports', () => {
+      const reports = [
+        createUploadReport(0, '10', 'comment1.pdf', {processorId: '1'}),
+        createUploadReport(1, '20', 'comment2.pdf', {processorId: '1'}),
+      ]
+
+      render(
+        <StudentLtiAssetReportModal
+          assetProcessors={mockAssetProcessors}
+          assignmentName={assignmentName}
+          reports={reports}
+          submissionType="discussion_topic"
+        />,
+      )
+
+      expect(screen.getByText(`Document Processors for ${assignmentName}`)).toBeInTheDocument()
+      expect(screen.getByText('Test Processor · Test Processor Title')).toBeInTheDocument()
+    })
+
+    it('filters asset processors for discussion topics same as for uploads', () => {
+      const reports = [
+        createUploadReport(0, '10', 'test.pdf', {processorId: '1'}),
+        createUploadReport(1, '10', 'test.pdf', {processorId: '2'}),
+      ]
+
+      render(
+        <StudentLtiAssetReportModal
+          assetProcessors={mockAssetProcessors}
+          assignmentName={assignmentName}
+          reports={reports}
+          submissionType="discussion_topic"
+        />,
+      )
+
+      expect(screen.getByText('Test Processor · Test Processor Title')).toBeInTheDocument()
+      expect(screen.getByText('Another Processor · Another Processor Title')).toBeInTheDocument()
+      expect(
+        screen.queryByText('Unused Processor · Unused Processor Title'),
+      ).not.toBeInTheDocument()
+    })
+
+    it('renders correctly with reports containing attachments', () => {
+      const reports = [createUploadReport(0, '10', 'discussion_attachment.pdf')]
+
+      render(
+        <StudentLtiAssetReportModal
+          assetProcessors={mockAssetProcessors}
+          assignmentName={assignmentName}
+          reports={reports}
+          submissionType="discussion_topic"
+        />,
+      )
+
+      // Verify the modal renders without crashing when attachments are present
+      expect(screen.getByText(`Document Processors for ${assignmentName}`)).toBeInTheDocument()
+      expect(screen.getByText('All comments')).toBeInTheDocument()
+    })
+  })
 })

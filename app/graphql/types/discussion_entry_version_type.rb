@@ -27,6 +27,8 @@ module Types
     global_id_field :id
 
     field :message, String, null: false
+    field :message_intro, String, null: false
+
     field :version, Integer, null: false
   end
 end
