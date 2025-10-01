@@ -99,7 +99,7 @@ gem "prosopite", "~> 2.1"
 gem "puma", "~> 6.3", require: false
 gem "rack3-brotli", "~> 1.0", require: "rack/brotli"
 gem "rails-observers", "0.1.5"
-gem "feedjira", "~> 3.2.3", require: false
+gem "feedjira", "~> 4.0", require: false
 gem "redcarpet", "~> 3.6", require: false
 gem "retriable", "~> 3.1"
 gem "ritex", "1.0.1", require: false
