@@ -23,6 +23,11 @@ require "nokogiri"
 describe CC::LtiResourceLinks do
   include CC::LtiResourceLinks
 
+  # Provide create_key method for testing (mimics CC::Resource delegation)
+  def create_key(obj, prepend = "")
+    CC::CCHelper.create_key(obj, prepend, global: true)
+  end
+
   let(:assignment) do
     Assignment.create!(
       course: tool.context,

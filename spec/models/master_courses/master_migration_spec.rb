@@ -3687,4 +3687,81 @@ describe MasterCourses::MasterMigration do
       end
     end
   end
+
+  describe "blueprint sync with LTI resource links and custom_params" do
+    it "syncs resource links with same lookup_uuid but different custom parameters" do
+      registration = lti_registration_with_tool(account: @course.root_account, created_by: @admin)
+      tool = registration.deployments.first
+      lookup_uuid = "1b302c1e-c0a2-42dc-88b6-c029699a7c7a"
+
+      # Create first assignment with resource link
+      assignment1 = @course.assignments.create!(
+        title: "Assignment 1",
+        submission_types: "external_tool",
+        external_tool_tag_attributes: { content: tool,
+                                        url: tool.url, },
+        points_possible: 10
+      )
+      resource_link1 = assignment1.lti_resource_links.first
+      resource_link1.update!(
+        lookup_uuid:,
+        custom: { "param1" => "value1", "assignment" => "first" }
+      )
+
+      # Create second assignment with resource link using same lookup_uuid
+      assignment2 = @course.assignments.create!(
+        title: "Assignment 2",
+        submission_types: "external_tool",
+        external_tool_tag_attributes: { content: tool,
+                                        url: tool.url, },
+        points_possible: 15
+      )
+      resource_link2 = assignment2.lti_resource_links.first
+      resource_link2.update!(
+        lookup_uuid:,
+        custom: { "param1" => "value2", "assignment" => "second" }
+      )
+
+      # Add child course and run initial sync
+      @copy_to = course_factory
+      @template.add_child_course!(@copy_to)
+      run_master_migration
+
+      # Verify assignments were synced
+      synced_assignment1 = @copy_to.assignments.where(migration_id: mig_id(assignment1)).first
+      synced_assignment2 = @copy_to.assignments.where(migration_id: mig_id(assignment2)).first
+      expect(synced_assignment1).not_to be_nil
+      expect(synced_assignment2).not_to be_nil
+
+      # Verify resource links were synced with correct custom parameters
+      synced_resource_link1 = synced_assignment1.lti_resource_links.first
+      synced_resource_link2 = synced_assignment2.lti_resource_links.first
+
+      expect(synced_resource_link1.lookup_uuid).to eq lookup_uuid
+      expect(synced_resource_link1.custom).to eq({ "param1" => "value1", "assignment" => "first" })
+
+      expect(synced_resource_link2.lookup_uuid).to eq lookup_uuid
+      expect(synced_resource_link2.custom).to eq({ "param1" => "value2", "assignment" => "second" })
+
+      # Update custom params in master course
+      Timecop.freeze(2.minutes.from_now) do
+        resource_link1.update!(
+          custom: { "param1" => "updated1", "assignment" => "first", "new" => "param" }
+        )
+        resource_link2.update!(
+          custom: { "param1" => "updated2", "assignment" => "second" }
+        )
+      end
+
+      # Run second sync
+      run_master_migration
+
+      # Verify resource links were updated with correct custom parameters
+      synced_resource_link1.reload
+      synced_resource_link2.reload
+
+      expect(synced_resource_link1.custom).to eq({ "param1" => "updated1", "assignment" => "first", "new" => "param" })
+      expect(synced_resource_link2.custom).to eq({ "param1" => "updated2", "assignment" => "second" })
+    end
+  end
 end
