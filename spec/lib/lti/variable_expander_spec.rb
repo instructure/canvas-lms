@@ -1264,6 +1264,39 @@ module Lti
         end
       end
 
+      context "com.instructure.Course.rce_studio_embed_improvements expansion" do
+        let(:subst_name) { "$com.instructure.Course.rce_studio_embed_improvements" }
+
+        it "returns 'true' when the feature flag is enabled for the course" do
+          course.save!
+          course.enable_feature!(:rce_studio_embed_improvements)
+
+          expander = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:
+          )
+
+          expect(expand!(subst_name, expander:)).to eq "true"
+        end
+
+        it "returns 'false' when the feature flag is not enabled for the course" do
+          course.save!
+
+          expander = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:
+          )
+
+          expect(expand!(subst_name, expander:)).to eq "false"
+        end
+      end
+
       context "modules resources expansion" do
         let(:available_canvas_resources) { [{ "course_id" => course.id, "type" => "module" }] }
 
