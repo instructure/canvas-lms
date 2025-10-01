@@ -2315,6 +2315,10 @@ describe AssignmentsApiController, type: :request do
       student_in_course(active_all: true)
     end
 
+    before do
+      allow(OutcomesService::Service).to receive(:start_outcome_alignment_service_clone)
+    end
+
     it "retries the alignment cloning process successfully" do
       assignment = @course.assignments.create(
         title: "some assignment",
@@ -2322,6 +2326,15 @@ describe AssignmentsApiController, type: :request do
         due_at: 1.week.from_now
       )
       assignment.update_attribute(:workflow_state, "failed_to_clone_outcome_alignment")
+
+      expect(OutcomesService::Service).to receive(:start_outcome_alignment_service_clone).with(
+        @course,
+        original_assignment_id: assignment.id,
+        copied_assignment_id: assignment.id,
+        new_context_id: @course.id,
+        original_context_id: @course.id
+      )
+
       api_call_as_user(@user,
                        :post,
                        "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/retry_alignment_clone",
@@ -2337,12 +2350,45 @@ describe AssignmentsApiController, type: :request do
                        { expected_status: 200 })
     end
 
+    it "handles outcomes service error gracefully" do
+      assignment = @course.assignments.create(
+        title: "some assignment",
+        assignment_group: @group,
+        due_at: 1.week.from_now
+      )
+      assignment.update_attribute(:workflow_state, "failed_to_clone_outcome_alignment")
+
+      expect(OutcomesService::Service).to receive(:start_outcome_alignment_service_clone)
+        .and_raise(StandardError.new("Service error"))
+      expect(Rails.logger).to receive(:error).with("Failed to retry outcome alignment service clone: Service error")
+
+      api_call_as_user(@user,
+                       :post,
+                       "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/retry_alignment_clone",
+                       { controller: "assignments_api",
+                         action: "retry_alignment_clone",
+                         format: "json",
+                         course_id: @course.id.to_s,
+                         assignment_id: assignment.id.to_s,
+                         target_course_id: @course.id.to_s,
+                         target_assignment_id: assignment.id.to_s },
+                       {},
+                       {},
+                       { expected_status: 200 })
+
+      assignment.reload
+      expect(assignment.workflow_state).to eq("failed_to_clone_outcome_alignment")
+    end
+
     it "returns 400 when the state is incorrect" do
       assignment = @course.assignments.create(
         title: "some assignment",
         assignment_group: @group,
         due_at: 1.week.from_now
       )
+
+      expect(OutcomesService::Service).not_to receive(:start_outcome_alignment_service_clone)
+
       api_call_as_user(@user,
                        :post,
                        "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/retry_alignment_clone",
@@ -2356,6 +2402,33 @@ describe AssignmentsApiController, type: :request do
                        {},
                        {},
                        { expected_status: 400 })
+    end
+
+    it "sets assignment to outcome_alignment_cloning state before calling service" do
+      assignment = @course.assignments.create(
+        title: "some assignment",
+        assignment_group: @group,
+        due_at: 1.week.from_now
+      )
+      assignment.update_attribute(:workflow_state, "failed_to_clone_outcome_alignment")
+
+      api_call_as_user(@user,
+                       :post,
+                       "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/retry_alignment_clone",
+                       { controller: "assignments_api",
+                         action: "retry_alignment_clone",
+                         format: "json",
+                         course_id: @course.id.to_s,
+                         assignment_id: assignment.id.to_s,
+                         target_course_id: @course.id.to_s,
+                         target_assignment_id: assignment.id.to_s },
+                       {},
+                       {},
+                       { expected_status: 200 })
+
+      assignment.reload
+      expect(assignment.workflow_state).to eq("outcome_alignment_cloning")
+      expect(assignment.duplication_started_at).to be_present
     end
   end
 

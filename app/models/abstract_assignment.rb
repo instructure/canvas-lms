@@ -499,11 +499,12 @@ class AbstractAssignment < ActiveRecord::Base
   def finish_duplicating
     return unless ["duplicating", "failed_to_duplicate"].include?(workflow_state)
 
-    self.workflow_state = if root_account.feature_enabled?(:course_copy_alignments)
-                            "outcome_alignment_cloning"
-                          else
-                            (duplicate_of&.workflow_state == "published" || !can_unpublish?) ? "published" : "unpublished"
-                          end
+    if root_account.feature_enabled?(:course_copy_alignments)
+      self.workflow_state = "outcome_alignment_cloning"
+      start_outcome_alignment_service_clone
+    else
+      self.workflow_state = (duplicate_of&.workflow_state == "published" || !can_unpublish?) ? "published" : "unpublished"
+    end
   end
 
   def finish_alignment_cloning
@@ -4644,5 +4645,27 @@ class AbstractAssignment < ActiveRecord::Base
     progressions = ContextModuleProgression.for_course(context).where(current: true)
     progressions.in_batches(of: 10_000).update_all(current: false)
     User.where(id: progressions.pluck(:user_id)).touch_all
+  end
+
+  def start_outcome_alignment_service_clone
+    return unless duplicate_of && context
+
+    begin
+      delay_if_production(priority: Delayed::LOW_PRIORITY).call_outcome_alignment_service_clone
+    rescue => e
+      Rails.logger.error("Failed to start outcome alignment service clone: #{e.message}")
+      self.workflow_state = "failed_to_clone_outcome_alignment"
+      save
+    end
+  end
+
+  def call_outcome_alignment_service_clone
+    OutcomesService::Service.start_outcome_alignment_service_clone(
+      context,
+      original_assignment_id: duplicate_of.id,
+      copied_assignment_id: id,
+      new_context_id: context.id,
+      original_context_id: duplicate_of.course.id
+    )
   end
 end

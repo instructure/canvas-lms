@@ -2191,6 +2191,36 @@ describe Assignment do
         duplicating_assignment.finish_duplicating
         expect(duplicating_assignment.workflow_state).to eq "unpublished"
       end
+
+      context "with course_copy_alignments feature flag enabled" do
+        before do
+          @course.root_account.enable_feature!(:course_copy_alignments)
+        end
+
+        it "sets workflow_state to outcome_alignment_cloning" do
+          expect(duplicating_assignment.workflow_state).to eq "duplicating"
+          expect(duplicating_assignment).to receive(:start_outcome_alignment_service_clone)
+          duplicating_assignment.finish_duplicating
+          expect(duplicating_assignment.workflow_state).to eq "outcome_alignment_cloning"
+        end
+
+        it "calls start_outcome_alignment_service_clone" do
+          expect(duplicating_assignment).to receive(:start_outcome_alignment_service_clone)
+          duplicating_assignment.finish_duplicating
+        end
+      end
+
+      context "with course_copy_alignments feature flag disabled" do
+        before do
+          @course.root_account.disable_feature!(:course_copy_alignments)
+        end
+
+        it "sets workflow_state to unpublished without calling outcomes service" do
+          expect(duplicating_assignment).not_to receive(:start_outcome_alignment_service_clone)
+          duplicating_assignment.finish_duplicating
+          expect(duplicating_assignment.workflow_state).to eq "unpublished"
+        end
+      end
     end
 
     describe ".fail_to_duplicate" do
@@ -2209,6 +2239,86 @@ describe Assignment do
         duplicating_assignment.finish_duplicating
         expect(duplicating_assignment.workflow_state).to eq "unpublished"
       end
+    end
+  end
+
+  describe "#start_outcome_alignment_service_clone" do
+    let(:original_course) { course_factory }
+    let(:original_assignment) { original_course.assignments.create!(assignment_valid_attributes) }
+    let(:new_course) { course_factory }
+    let(:duplicated_assignment) do
+      new_course.assignments.create!(
+        workflow_state: "outcome_alignment_cloning",
+        duplicate_of: original_assignment,
+        **assignment_valid_attributes
+      )
+    end
+
+    before do
+      allow(OutcomesService::Service).to receive(:start_outcome_alignment_service_clone)
+    end
+
+    context "when duplicate_of and context are present" do
+      it "calls delay_if_production with LOW_PRIORITY and call_outcome_alignment_service_clone" do
+        delayed_object = double("delayed")
+        expect(duplicated_assignment).to receive(:delay_if_production).with(priority: Delayed::LOW_PRIORITY).and_return(delayed_object)
+        expect(delayed_object).to receive(:call_outcome_alignment_service_clone)
+        duplicated_assignment.send(:start_outcome_alignment_service_clone)
+      end
+
+      it "logs error and sets failed state when exception occurs" do
+        allow(duplicated_assignment).to receive(:delay_if_production).and_raise(StandardError.new("API Error"))
+        expect(Rails.logger).to receive(:error).with("Failed to start outcome alignment service clone: API Error")
+        expect(duplicated_assignment).to receive(:save)
+
+        duplicated_assignment.send(:start_outcome_alignment_service_clone)
+        expect(duplicated_assignment.workflow_state).to eq "failed_to_clone_outcome_alignment"
+      end
+    end
+
+    context "when duplicate_of is missing" do
+      let(:assignment_without_duplicate) { new_course.assignments.create!(assignment_valid_attributes) }
+
+      it "does not call outcomes service" do
+        expect(assignment_without_duplicate).not_to receive(:delay_if_production)
+        assignment_without_duplicate.send(:start_outcome_alignment_service_clone)
+      end
+    end
+
+    context "when context is missing" do
+      let(:assignment_without_context) do
+        Assignment.new(duplicate_of: original_assignment, **assignment_valid_attributes)
+      end
+
+      it "does not call outcomes service" do
+        expect(assignment_without_context).not_to receive(:delay_if_production)
+        assignment_without_context.send(:start_outcome_alignment_service_clone)
+      end
+    end
+  end
+
+  describe "#call_outcome_alignment_service_clone" do
+    let(:original_course) { course_factory }
+    let(:original_assignment) { original_course.assignments.create!(assignment_valid_attributes) }
+    let(:new_course) { course_factory }
+    let(:duplicated_assignment) do
+      new_course.assignments.create!(
+        workflow_state: "outcome_alignment_cloning",
+        duplicate_of: original_assignment,
+        **assignment_valid_attributes
+      )
+    end
+
+    it "calls OutcomesService::Service.start_outcome_alignment_service_clone with correct parameters" do
+      expect(OutcomesService::Service).to receive(:start_outcome_alignment_service_clone).with(
+        duplicated_assignment.context,
+        original_assignment_id: original_assignment.id,
+        copied_assignment_id: duplicated_assignment.id,
+        new_context_id: new_course.id,
+        original_context_id: original_course.id
+      )
+
+      duplicated_assignment.send(:call_outcome_alignment_service_clone)
     end
   end
 
