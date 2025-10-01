@@ -135,7 +135,7 @@ module CC
           if resource_link.context_type == "Assignment"
             extensions.lticm(
               :property,
-              CCHelper.create_key(resource_link.context, global: true),
+              create_key(resource_link.context),
               name: "assignment_migration_id"
             )
           end
