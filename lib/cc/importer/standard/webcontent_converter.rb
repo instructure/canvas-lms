@@ -94,7 +94,7 @@ module CC::Importer::Standard
 
       return if file_map.empty?
 
-      Zip::File.open(zip_file, Zip::File::CREATE) do |zipfile|
+      Zip::File.open(zip_file, create: true) do |zipfile|
         file_map.each_value do |val|
           next if zipfile.entries.include?(val[:path_name])
 

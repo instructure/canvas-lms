@@ -36,7 +36,7 @@ describe SisBatch do
         File.write(path, data.first)
       else
         path = "#{tmpdir}/sisfile.zip"
-        Zip::File.open(path, Zip::File::CREATE) do |z|
+        Zip::File.open(path, create: true) do |z|
           Array(data).each do |dat|
             z.get_output_stream("csv_#{i}.csv") { |f| f.puts(dat) }
             i += 1

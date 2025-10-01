@@ -56,7 +56,7 @@ gem "code_ownership", "~> 1.33"
 gem "datadog", "~> 2.1", require: false
 gem "docx", "~> 0.8"
 gem "encrypted_cookie_store-instructure", "~> 1.2", require: "encrypted_cookie_store"
-gem "gepub", "~> 1.0"
+gem "gepub", "~> 2.0"
 gem "graphql", "~> 2.3"
 gem "graphql-batch", "~> 0.5"
 gem "hashdiff", "~> 1.1", require: false
@@ -109,7 +109,7 @@ gem "ruby-duration", "3.2.3", require: false
 gem "rubycas-client", "2.3.9", require: false
   gem "pstore", "~> 0.2", require: false
 gem "ruby-rtf", "0.0.5"
-gem "rubyzip", "~> 2.3", require: "zip"
+gem "rubyzip", "~> 3.0", require: "zip"
 gem "saml2", "~> 3.1"
 gem "sanitize", "~> 7.0", require: false
 gem "stackprof", github: "instructure/stackprof", branch: "switch-d3-data-to-iterative"

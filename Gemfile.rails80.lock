@@ -76,7 +76,7 @@ PATH
   remote: gems/plugins/moodle_importer
   specs:
     moodle_importer (1.0.0)
-      moodle2cc (= 0.2.46)
+      moodle2cc (~> 0.2)
       rails (>= 3.2)
 
 PATH
@@ -198,7 +198,7 @@ PATH
     canvas_unzip (0.0.1)
       activesupport
       canvas_mimetype_fu
-      rubyzip (~> 2.0)
+      rubyzip
     config_file (0.1.0)
       railties (>= 5.0)
     csv_diff (1.0.0)
@@ -572,9 +572,9 @@ GEM
     fugit (1.12.0)
       et-orbi (~> 1.4)
       raabro (~> 1.4)
-    gepub (1.0.17)
+    gepub (2.0.0)
       nokogiri (>= 1.8.2, < 2.0)
-      rubyzip (> 1.1.1, < 2.4)
+      rubyzip (>= 3.0, < 3.1)
     gergich (2.2.1)
       httparty (~> 0.17)
       sqlite3 (>= 1.4, < 3.0)
@@ -771,12 +771,12 @@ GEM
     mini_mime (1.1.5)
     minitest (5.25.5)
     mize (0.6.1)
-    moodle2cc (0.2.46)
+    moodle2cc (0.2.47)
       builder
       instructure-happymapper (~> 0.5.10)
       nokogiri
       rdiscount
-      rubyzip (>= 1.0.0)
+      rubyzip (>= 2.4.1)
       thor
     msgpack (1.8.0)
     multi_json (1.15.0)
@@ -1104,7 +1104,7 @@ GEM
       sexp_processor (~> 4.16)
     rubycas-client (2.3.9)
       activesupport
-    rubyzip (2.3.2)
+    rubyzip (3.0.2)
     saml2 (3.2.3)
       activesupport (>= 3.2, < 8.2)
       nokogiri (>= 1.5.8, < 2.0)
@@ -1341,7 +1341,7 @@ DEPENDENCIES
   feedjira (~> 4.0)
   ffi-icu (~> 0.5)
   flakey_spec_catcher (~> 0.12)
-  gepub (~> 1.0)
+  gepub (~> 2.0)
   gergich (~> 2.1)
   google_drive!
   graphql (~> 2.3)
@@ -1439,7 +1439,7 @@ DEPENDENCIES
   ruby-lsp-rspec (~> 0.1.18)
   ruby-rtf (= 0.0.5)
   rubycas-client (= 2.3.9)
-  rubyzip (~> 2.3)
+  rubyzip (~> 3.0)
   saml2 (~> 3.1)
   sanitize (~> 7.0)
   scrypt (~> 3.0)

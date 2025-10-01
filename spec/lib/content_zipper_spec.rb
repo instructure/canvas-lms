@@ -581,7 +581,7 @@ describe ContentZipper do
       attachment.context = eportfolio
       attachment.save!
       expect(Dir).to receive(:mktmpdir).once.and_yield("/tmp")
-      expect(Zip::File).to receive(:open).once.with("/tmp/etcpasswd.zip", Zip::File::CREATE)
+      expect(Zip::File).to receive(:open).once.with("/tmp/etcpasswd.zip", create: true)
       ContentZipper.process_attachment(attachment, user)
     end
   end

@@ -97,7 +97,7 @@ module Canvas::Migration
       root_files = Dir.glob("#{path}/**/**", File::FNM_DOTMATCH)
       return if root_files.empty?
 
-      Zip::File.open(zip_file, Zip::File::CREATE) do |zipfile|
+      Zip::File.open(zip_file, create: true) do |zipfile|
         root_files.each do |file|
           next if File.directory?(file)
 
