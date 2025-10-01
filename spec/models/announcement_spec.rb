@@ -299,6 +299,40 @@ describe Announcement do
         @a.delayed_post
       end.to change { @a.messages_sent[notification_name] }
     end
+
+    context "with different locked_for states" do
+      it "does not broadcast on update if announcement is locked_for user" do
+        course_with_student(active_all: true)
+        notification_name = "New Announcement"
+        Notification.create(name: notification_name, category: "TestImmediately")
+        pseudo_teacher_role = @course.account.roles.create!(
+          name: "Pseudo Teacher",
+          base_role_type: "TeacherEnrollment"
+        )
+        @course.account.role_overrides.create!(permission: "moderate_forum", role: pseudo_teacher_role, enabled: false)
+
+        pseudo_teacher = user_factory(active_all: true)
+        # pseudo teacher have been enrolled as a teacher but only has read permissions
+        # hence they should not receive announcements that are locked (unlock_at in future)
+        @course.enroll_user(pseudo_teacher, "TeacherEnrollment", role: pseudo_teacher_role, enrollment_state: "active")
+        communication_channel(pseudo_teacher)
+        announcement = @course.announcements.create!(user: @teacher, message: "Test", title: "Test", unlock_at: 1.week.from_now)
+        to_users = announcement.messages_sent[notification_name]&.map(&:user) || []
+        expect(to_users).not_to include(pseudo_teacher)
+      end
+
+      it "does broadcast if announcement is locked for comments" do
+        # the locked_for? method returns a hash if the user is only able to see the announcement but not comment
+        course_with_student(active_all: true)
+        notification_name = "New Announcement"
+        Notification.create(name: notification_name, category: "TestImmediately")
+        second_teacher = user_factory(active_all: true)
+        @course.enroll_teacher(second_teacher, enrollment_state: "active")
+        announcement_model(user: @teacher, context: @course, locked: true)
+        expect(@a.messages_sent[notification_name].map(&:user)).to include(@student)
+        expect(@a.messages_sent[notification_name].map(&:user)).to include(second_teacher)
+      end
+    end
   end
 
   describe "show_in_search_for_user?" do
