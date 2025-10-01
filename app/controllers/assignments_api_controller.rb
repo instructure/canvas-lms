@@ -968,23 +968,27 @@ class AssignmentsApiController < ApplicationController
     target_assignment.workflow_state = "outcome_alignment_cloning"
     target_assignment.duplication_started_at = Time.zone.now
     target_assignment.save!
+
+    begin
+      OutcomesService::Service.start_outcome_alignment_service_clone(
+        target_course,
+        original_assignment_id: old_assignment.id,
+        copied_assignment_id: target_assignment.id,
+        new_context_id: target_course.id,
+        original_context_id: old_assignment.context.id
+      )
+    rescue => e
+      Rails.logger.error("Failed to retry outcome alignment service clone: #{e.message}")
+      target_assignment.workflow_state = "failed_to_clone_outcome_alignment"
+      target_assignment.save!
+    end
+
     result_json = if use_quiz_json?
                     quiz_json(target_assignment, @context, @current_user, session, {}, QuizzesNext::QuizSerializer)
                   else
                     assignment_json(target_assignment, @current_user, session)
                   end
     result_json["new_positions"] = { target_assignment.id => target_assignment.position }
-    Canvas::LiveEvents.outcomes_retry_outcome_alignment_clone(
-      {
-        original_course_uuid: old_assignment.context.uuid,
-        new_course_uuid: target_course.uuid,
-        new_course_resource_link_id: target_course.lti_context_id,
-        domain: target_course.root_account&.domain(ApplicationController.test_cluster_name),
-        original_assignment_resource_link_id: old_assignment.lti_resource_link_id,
-        new_assignment_resource_link_id: target_assignment.lti_resource_link_id,
-        status: "outcome_alignment_cloning"
-      }
-    )
     render json: result_json
   end
 
