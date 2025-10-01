@@ -27,6 +27,7 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Table} from '@instructure/ui-table'
 import {
   AsyncPageViewJobStatus,
+  AsyncPageviewJob,
   displayTTL,
   isInProgress,
   notExpired,
@@ -37,6 +38,8 @@ import {
 import {Pill} from '@instructure/ui-pill'
 import {Link} from '@instructure/ui-link'
 import {FetchApiError} from '@canvas/do-fetch-api-effect'
+import {Alert} from '@instructure/ui-alerts'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = i18nScope('page_views')
 
@@ -81,6 +84,33 @@ export function PageViewsDownload({userId}: PageViewsDownloadProps): React.JSX.E
   const [exportError, setExportError] = useState<string | null>(null)
   const [asyncJobs, _setAsyncJobs, pollAsyncJobs, postAsyncJob, getDownloadUrl] =
     useAsyncPageviewJobs(`pv-export-${userId}`, userId)
+
+  const handleDownload = async (record: AsyncPageviewJob) => {
+    try {
+      const url = await getDownloadUrl(record)
+      window.open(url, '_self')
+    } catch (error) {
+      if (
+        error instanceof FetchApiError &&
+        (error.response.status === 410 || error.response.status === 404)
+      ) {
+        showFlashAlert({
+          message: I18n.t(
+            'The requested export is no longer available and is removed from the list. Please create a new export.',
+          ),
+          type: 'info',
+          err: undefined,
+        })
+      }
+      if (error instanceof FetchApiError && error.response.status === 204) {
+        showFlashAlert({
+          message: I18n.t('The requested export is empty.'),
+          type: 'info',
+          err: undefined,
+        })
+      }
+    }
+  }
 
   const jobsInProgress = asyncJobs.some(isInProgress)
 
@@ -217,7 +247,13 @@ export function PageViewsDownload({userId}: PageViewsDownloadProps): React.JSX.E
                 <Table.Row key={record.query_id}>
                   <Table.Cell id={`export-name-${record.query_id}`}>
                     {record.status === AsyncPageViewJobStatus.Finished ? (
-                      <Link href={getDownloadUrl(record)}>{record.name}</Link>
+                      <Link
+                        onClick={() => handleDownload(record)}
+                        data-testid={`download-${record.query_id}`}
+                        isWithinText={false}
+                      >
+                        {record.name}
+                      </Link>
                     ) : (
                       record.name
                     )}
