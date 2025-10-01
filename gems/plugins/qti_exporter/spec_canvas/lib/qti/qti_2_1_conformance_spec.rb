@@ -151,11 +151,6 @@ if Qti.migration_executable
       expect(q.question_data["answers"].count).to eq 0
     end
 
-    it "imports VE_IP_06" do
-      skip("hotspot questions")
-      import_fixture("VE_IP_06.zip")
-    end
-
     it "imports VE_IP_07" do
       import_fixture("VE_IP_07.zip")
       expect(@course.quizzes.count).to eq 0
