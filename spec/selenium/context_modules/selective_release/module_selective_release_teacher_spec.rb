@@ -85,7 +85,7 @@ describe "selective_release module set up" do
       expect(prerequisites_dropdown_value(0)).to eq("module2")
 
       click_settings_tray_update_module_button
-
+      ignore_relock
       expect(prerequisite_message(@module3).text).to eq("Prerequisites: module2")
     end
 

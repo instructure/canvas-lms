@@ -169,6 +169,10 @@ module Modules2ActionTray
     "div[role='dialog'][aria-label='Move Module']"
   end
 
+  def pre_save_relock_modal_selector
+    "[data-testid='pre-save-relock-modal']"
+  end
+
   #------------------------------ Elements ------------------------------
   def add_module_button
     f(add_module_button_selector)

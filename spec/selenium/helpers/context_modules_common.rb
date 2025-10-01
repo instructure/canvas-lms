@@ -91,8 +91,11 @@ module ContextModulesCommon
   def ignore_relock
     scroll_to_the_top_of_modules_page
     continue_button_selector = "//*[contains(@class, 'ui-dialog') and not(contains(@style, 'display: none')) and ./*[@id = 'relock_modules_dialog']]//button[. = 'Continue']"
+    presave_continue_button_selector = "[data-testid='continue-without-relock-button']"
     if element_exists?(continue_button_selector, true)
       fxpath(continue_button_selector).click
+    elsif element_exists?(presave_continue_button_selector)
+      f(presave_continue_button_selector).click
     end
   end
 

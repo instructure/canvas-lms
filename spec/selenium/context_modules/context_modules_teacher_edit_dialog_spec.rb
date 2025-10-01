@@ -85,6 +85,29 @@ describe "context modules" do
         ignore_relock
       end
 
+      it "prompts relock when adding a prerequisite" do
+        @course.context_modules.create!(name: "name")
+        module2 = @course.context_modules.create!(name: "name2")
+        go_to_modules
+        manage_module_button(module2).click
+        module_index_menu_tool_link("Edit").click
+        click_add_prerequisites_button
+        click_settings_tray_update_module_button
+        expect(element_exists?("#relock_modules_dialog")).to be_truthy
+        ignore_relock
+      end
+
+      it "prompts relock when adding a requirement" do
+        add_existing_module_item("AssignmentModule", @assignment)
+        go_to_modules
+        manage_module_button(@course.context_modules.first).click
+        module_index_menu_tool_link("Edit").click
+        click_add_requirement_button
+        click_settings_tray_update_module_button
+        expect(element_exists?("#relock_modules_dialog")).to be_truthy
+        ignore_relock
+      end
+
       it "only displays out-of on an assignment min score restriction when the assignment has a total with differentiated modules enabled" do
         ag = @course.assignment_groups.create!
         a1 = ag.assignments.create!(context: @course)
@@ -141,10 +164,8 @@ describe "context modules" do
         select_requirement_item_option(0, @assignment.title)
         select_requirement_type_option(0, "Submit the assignment")
         click_settings_tray_update_module_button
-        expect(settings_tray_exists?).to be_falsey
-
-        # there will be a form for relock eventually
         ignore_relock
+        expect(settings_tray_exists?).to be_falsey
 
         # verify it was added
         smodule.reload

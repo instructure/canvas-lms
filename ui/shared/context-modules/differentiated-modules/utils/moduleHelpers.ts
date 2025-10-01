@@ -99,6 +99,8 @@ export async function parseModule(element: HTMLDivElement) {
   const moduleList = parseModuleList()
   const requirements = parseRequirements(element)
   const moduleItems = await parseModuleItems(element)
+  const published =
+    element.querySelector('.module-publish-icon')?.getAttribute('data-published') === 'true'
 
   return {
     moduleId,
@@ -111,6 +113,7 @@ export async function parseModule(element: HTMLDivElement) {
     moduleList,
     requirements,
     moduleItems,
+    published,
   }
 }
 

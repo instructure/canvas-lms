@@ -277,6 +277,7 @@ shared_examples_for "course_module2 module tray lock until" do |context|
     update_lock_until_date(future_date)
     update_lock_until_time("12:00 AM")
     click_save_module_tray_change
+    ignore_relock
 
     will_unlock_at_label = module_header_will_unlock_label(@module1.id)
     expect(element_exists?(module_header_will_unlock_selector(@module1.id))).to be true
