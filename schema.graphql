@@ -4251,6 +4251,7 @@ type DiscussionEntryVersion implements LegacyIDInterface & Timestamped {
   createdAt: DateTime
   id: ID!
   message: String!
+  messageIntro: String!
   updatedAt: DateTime
   version: Int!
 }
@@ -5709,6 +5710,7 @@ type LtiAsset implements LegacyIDInterface {
   _id: ID!
   attachmentId: ID
   attachmentName: String
+  discussionEntryVersion: DiscussionEntryVersion
   submissionAttempt: Int
   submissionId: ID
 }

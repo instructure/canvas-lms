@@ -49,7 +49,10 @@ export function makeMockReport(
 export function defaultLtiAssetReports({
   attachmentId,
   submissionAttempt,
-}: {attachmentId?: string; submissionAttempt?: number}): LtiAssetReport[] {
+}: {
+  attachmentId?: string
+  submissionAttempt?: number
+}): LtiAssetReport[] {
   return [
     makeMockReport({
       _id: '1234',
@@ -76,6 +79,57 @@ export function defaultLtiAssetReports({
   ]
 }
 
+export function defaultLtiAssetReportsForDiscussion({
+  discussionEntryVersionId,
+  createdAt,
+  messageIntro,
+}: {
+  discussionEntryVersionId?: string
+  createdAt?: string
+  messageIntro?: string
+} = {}): LtiAssetReport[] {
+  return [
+    makeMockReport({
+      _id: '1237',
+      title: 'Discussion Analysis Report',
+      processorId: defaultLtiAssetProcessors[0]?._id || 'oops1',
+      asset: {
+        discussionEntryVersion: {
+          _id: discussionEntryVersionId || 'entry_123',
+          createdAt: createdAt || '2025-01-15T16:45:00Z',
+          messageIntro: messageIntro || 'This is a test discussion entry message',
+        },
+      },
+    }),
+    makeMockReport({
+      _id: '1238',
+      title: 'Discussion Content Check',
+      processorId: defaultLtiAssetProcessors[1]?._id || 'oops2',
+      asset: {
+        discussionEntryVersion: {
+          _id: discussionEntryVersionId || 'entry_123',
+          createdAt: createdAt || '2025-01-15T16:45:00Z',
+          messageIntro: messageIntro || 'This is a test discussion entry message',
+        },
+      },
+    }),
+    makeMockReport({
+      _id: '1239',
+      title: 'Discussion Failed Report',
+      errorCode: 'ASSET_TOO_LARGE',
+      processingProgress: 'Failed',
+      processorId: defaultLtiAssetProcessors[1]?._id || 'oops3',
+      asset: {
+        discussionEntryVersion: {
+          _id: discussionEntryVersionId || 'entry_123',
+          createdAt: createdAt || '2025-01-15T16:45:00Z',
+          messageIntro: messageIntro || 'This is a test discussion entry message',
+        },
+      },
+    }),
+  ]
+}
+
 export function defaultGetLtiAssetReportsResult({
   attachmentId,
   submissionAttempt,
@@ -87,6 +141,28 @@ export function defaultGetLtiAssetReportsResult({
     submission: {
       ltiAssetReportsConnection: {
         nodes: defaultLtiAssetReports({attachmentId, submissionAttempt}),
+      },
+    },
+  }
+}
+
+export function defaultGetLtiAssetReportsResultForDiscussion({
+  discussionEntryVersionId,
+  createdAt,
+  messageIntro,
+}: {
+  discussionEntryVersionId?: string
+  createdAt?: string
+  messageIntro?: string
+} = {}): GetLtiAssetReportsResult {
+  return {
+    submission: {
+      ltiAssetReportsConnection: {
+        nodes: defaultLtiAssetReportsForDiscussion({
+          discussionEntryVersionId,
+          createdAt,
+          messageIntro,
+        }),
       },
     },
   }

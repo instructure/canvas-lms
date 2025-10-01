@@ -51,8 +51,8 @@ Paths below are relative to `canvas-lms` or `canvas-lms/ui/shared/lti-asset-proc
     GraphQL to fetch data
 
 ### Old Student Submission
-* Frontend 1 -- Text Entry
-  1. View `app/views/submissions/show.html.erb` renders container div `asset_report_text_entry_status_container`
+* Frontend 1 -- Text Entry or Discussion Entry
+  1. View `app/views/submissions/show.html.erb` renders container div `asset_report_status_container`
   2. `ui/features/submissions/jquery/index.jsx` (non-React) renders `TextEntryAssetReportStatusLink` into that container div.
 
 * Frontend 2 -- Attachment

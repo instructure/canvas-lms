@@ -99,7 +99,15 @@ function LtiAssetReportsCardGroup({
 }: LtiAssetReportsCardGroupProps) {
   return (
     <Flex direction="column" gap="x-small">
-      {showDisplayName && displayName && <Heading level="h4">{displayName}</Heading>}
+      {showDisplayName && displayName && (
+        <View as="div" maxWidth="80%">
+          <Heading level="h4">
+            <TruncateWithTooltip linesAllowed={1} backgroundColor={undefined} horizontalOffset={0}>
+              {displayName}
+            </TruncateWithTooltip>
+          </Heading>
+        </View>
+      )}
       {reports.length ? (
         reports.map(r => <LtiAssetReportsCard key={r._id} report={r} />)
       ) : (

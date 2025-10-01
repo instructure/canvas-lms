@@ -140,7 +140,9 @@ class GradebooksController < ApplicationController
         json[:custom_grade_status_id] = submission.custom_grade_status_id if custom_gradebook_statuses_enabled
       end
 
-      if submission.user_can_read_grade?(@presenter.student, for_plagiarism: true)
+      if submission.user_can_read_grade?(@presenter.student, for_plagiarism: true) && (
+        submission.submission_type != "discussion_topic" || @context.root_account.feature_enabled?(:lti_asset_processor_discussions)
+      )
         json[:asset_processors] = asset_processors(assignment: submission.assignment)
         json[:asset_reports] = @presenter.user_has_elevated_permissions? ? nil : asset_reports_info_for_display(submission:)
         json[:submission_type] = submission.submission_type

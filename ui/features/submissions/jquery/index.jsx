@@ -750,7 +750,7 @@ ready(() => renderAPComponentNoQC('#asset_report_modal', StudentAssetReportModal
 
 ready(() =>
   renderAPComponent(
-    '#asset_report_text_entry_status_container',
+    '#asset_report_status_container',
     TextEntryAssetReportStatusLink,
     ZTextEntryAssetReportStatusLinkProps,
   ),

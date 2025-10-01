@@ -50,7 +50,6 @@ function renderStatus(status: 'high' | 'ok', openModal?: () => void) {
   if (openModal) {
     return (
       <Link
-        href="#"
         onClick={event => {
           event.preventDefault()
           openModal()
