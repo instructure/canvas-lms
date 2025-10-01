@@ -884,6 +884,17 @@ With respect to the current course, returns the course ids of the courses from w
 ```
 1234
 ```
+## com.instructure.Course.rce_studio_embed_improvements
+Returns "true" if the RCE Studio embed improvements feature is enabled
+for the current course, or account context "false" otherwise.
+This allows LTI tools to adapt their UI based on Canvas feature flags.
+
+**Availability**: *always*  
+
+
+```
+"true"
+```
 ## Person.name.full
 Returns the full name of the launching user.
 
