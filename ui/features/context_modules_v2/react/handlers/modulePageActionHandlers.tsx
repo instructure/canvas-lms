@@ -241,6 +241,7 @@ export const handleOpeningModuleUpdateTray = (
     requireSequentialProgress: currentModule?.requireSequentialProgress || false,
     publishFinalGrade: false,
     unlockAt: currentModule?.unlockAt,
+    published: currentModule?.published || false,
   }
 
   root.render(<DifferentiatedModulesTray {...(trayProps as any)} />)

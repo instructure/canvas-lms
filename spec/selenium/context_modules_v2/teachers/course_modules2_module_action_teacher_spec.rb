@@ -66,6 +66,18 @@ describe "context modules", :ignore_js_errors do
       expect(element_exists?(add_prerequisite_button_selector)).to be false
     end
 
+    it "prompts relock when adding a prerequisite" do
+      @course.context_modules.create!(name: "name")
+      module2 = @course.context_modules.create!(name: "name2")
+      go_to_modules
+      module_action_menu(module2.id).click
+      module_index_menu_tool_link("Edit").click
+      click_add_prerequisites_button
+      click_save_module_tray_change
+      expect(element_exists?(pre_save_relock_modal_selector)).to be_truthy
+      ignore_relock
+    end
+
     it "accesses prerequisites dropdown for module and assigns prerequisites" do
       go_to_modules
       module_action_menu(@module3.id).click
@@ -133,6 +145,7 @@ describe "context modules", :ignore_js_errors do
       expect(sequential_order_checkbox).to be_displayed
       sequential_order_checkbox.click
       click_save_module_tray_change
+      ignore_relock
       expect(context_module_completion_requirement(@module1.id).text).to include("Complete All Items")
     end
 
@@ -194,6 +207,15 @@ describe "context modules", :ignore_js_errors do
       expect(is_checked(complete_one_radio_checked)).to be true
     end
 
+    it "prompts relock when adding a requirement" do
+      module_action_menu(@module2.id).click
+      module_index_menu_tool_link("Edit").click
+      click_add_requirement_button
+      click_save_module_tray_change
+      expect(element_exists?(pre_save_relock_modal_selector)).to be_truthy
+      ignore_relock
+    end
+
     it_behaves_like "course_module2 module tray requirements", :context_modules
     it_behaves_like "course_module2 module tray requirements", :course_homepage
   end
@@ -210,6 +232,19 @@ describe "context modules", :ignore_js_errors do
       update_lock_until_time("12:00 AM")
       click_save_module_tray_change
       expect(element_exists?(module_header_will_unlock_selector(@module1.id))).to be false
+    end
+
+    it "prompts relock when adding an unlock_at date" do
+      lock_until = format_date_for_view(Time.zone.today + 2.days)
+      module1 = @course.context_modules.create!(name: "name")
+      go_to_modules
+      module_action_menu(module1.id).click
+      module_index_menu_tool_link("Edit").click
+      click_lock_until_checkbox
+      update_lock_until_date(lock_until)
+      click_save_module_tray_change
+      expect(element_exists?(pre_save_relock_modal_selector)).to be_truthy
+      ignore_relock
     end
 
     it "shows error if lock until date and time are empty on edit module tray" do

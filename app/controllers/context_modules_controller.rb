@@ -112,6 +112,7 @@ class ContextModulesController < ApplicationController
 
       hash = {
         course_id: @context.id,
+        CONTEXT_IS_AVAILABLE: @context.available?,
         CONTEXT_URL_ROOT: polymorphic_path([@context]),
         FILES_CONTEXTS: [{ asset_string: @context.asset_string }],
         MODULE_FILE_DETAILS: module_file_details,

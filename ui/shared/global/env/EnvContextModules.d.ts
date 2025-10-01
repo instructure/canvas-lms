@@ -23,6 +23,7 @@
  */
 export interface EnvContextModules {
   course_id: string
+  CONTEXT_IS_AVAILABLE: boolean
   PAGE_TITLE: string | null
   CONTEXT_URL_ROOT: string
   ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: boolean
