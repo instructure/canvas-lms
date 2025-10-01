@@ -570,7 +570,7 @@ module Types
           # do this shard-id stuff
           course.shard.global_id_for(Integer(course.image_id))
         ).then do |attachment|
-          attachment&.public_download_url(1.week)
+          attachment&.public_download_url(expires_in: 1.week, no_jti: true)
         end
       end
     end

@@ -181,6 +181,12 @@ describe InstFS do
           expect(Canvas::Security.decode_jwt(token, [secret])).to have_key(:jti)
         end
 
+        it "does not include a jti in the token if instructed to" do
+          url = InstFS.authenticated_url(@attachment, expires_in: 1.hour, no_jti: true)
+          token = url.split("token=").last
+          expect(Canvas::Security.decode_jwt(token, [secret])).not_to have_key(:jti)
+        end
+
         describe "legacy api claims" do
           let(:root_account) { Account.default }
           let(:access_token) { instance_double(AccessToken, global_developer_key_id: 106) }
