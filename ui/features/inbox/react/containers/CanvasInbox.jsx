@@ -621,16 +621,6 @@ const CanvasInbox = ({breakpoints}) => {
     onCompleted(data) {
       if (data.updateConversationParticipants.errors) {
         setOnFailure(I18n.t('Read state change operation failed'))
-      } else {
-        setOnSuccess(
-          I18n.t(
-            {
-              one: 'Read state Changed!',
-              other: 'Read states Changed!',
-            },
-            {count: '1000'},
-          ),
-        )
       }
     },
     onError() {
