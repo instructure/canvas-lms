@@ -919,7 +919,7 @@ GEM
       date
       stringio
     public_suffix (6.0.2)
-    puma (6.6.1)
+    puma (7.0.4)
       nio4r (~> 2.0)
     pygments.rb (3.0.0)
     raabro (1.4.0)
@@ -1407,7 +1407,7 @@ DEPENDENCIES
   prawn-rails (~> 1.4)
   prosopite (~> 2.1)
   pstore (~> 0.2)
-  puma (~> 6.3)
+  puma (~> 7.0)
   qti_exporter!
   rack (~> 3.1.0)
   rack3-brotli (~> 1.0)
