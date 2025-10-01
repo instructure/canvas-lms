@@ -67,6 +67,7 @@ export function useCourseInstructors(options: UseCourseInstructorsOptions = {}) 
       hasPreviousPage: boolean
       endCursor: string | null
       startCursor: string | null
+      totalCount: number | null
     }> => {
       return fetchPaginatedCourseInstructors(
         courseIds,

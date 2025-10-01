@@ -25,10 +25,10 @@ import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import CourseWorkFilters, {type DateFilterOption} from '../../shared/CourseWorkFilters'
 import type {BaseWidgetProps, CourseOption} from '../../../types'
 import {useSharedCourses} from '../../../hooks/useSharedCourses'
-import {useCourseWork} from '../../../hooks/useCourseWork'
-import {usePagination} from '../../../hooks/usePagination'
+import {useCourseWorkPaginated} from '../../../hooks/useCourseWork'
 import {convertDateFilterToParams} from '../../../utils/dateUtils'
 import {CourseWorkItem as CourseWorkItemComponent} from '../../shared/CourseWorkItem'
+import {DEFAULT_PAGE_SIZE} from '../../../constants/pagination'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -52,33 +52,26 @@ const CourseWorkWidget: React.FC<BaseWidgetProps> = ({
   const courseFilter = selectedCourse === 'all' ? undefined : selectedCourse.replace('course_', '')
   const dateParams = convertDateFilterToParams(selectedDateFilter)
 
-  // Fetch course work items with infinite pagination
+  const pageSize = DEFAULT_PAGE_SIZE.COURSE_WORK
+
+  // Fetch course work with pagination
   const {
-    data,
+    currentPage: currentPageData,
+    currentPageIndex,
+    totalPages,
+    goToPage,
+    resetPagination,
+    refetch,
     isLoading: courseWorkLoading,
     error: courseWorkError,
-    refetch,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isFetchingPreviousPage,
-  } = useCourseWork({
-    pageSize: 4,
+  } = useCourseWorkPaginated({
+    pageSize,
     courseFilter,
     ...dateParams,
   })
 
-  const {currentPageIndex, paginationProps, resetPagination} = usePagination({
-    hasNextPage: !!hasNextPage,
-    totalPagesLoaded: data?.pages?.length || 0,
-    fetchNextPage,
-    isFetchingNextPage,
-    isFetchingPreviousPage,
-  })
-
-  // Get current page data from infinite query
-  const currentPage = data?.pages?.[currentPageIndex]
-  const allCourseWorkItems = currentPage?.items || []
+  // Get current page data
+  const allCourseWorkItems = currentPageData?.items || []
 
   // Use external loading/error states if provided, otherwise use hook states
   const isLoading = externalIsLoading || courseWorkLoading
@@ -120,7 +113,10 @@ const CourseWorkWidget: React.FC<BaseWidgetProps> = ({
       error={error ? I18n.t('Failed to load course work. Please try again.') : null}
       onRetry={handleRetry}
       pagination={{
-        ...paginationProps,
+        currentPage: currentPageIndex + 1,
+        totalPages,
+        onPageChange: goToPage,
+        isLoading: courseWorkLoading,
         ariaLabel: I18n.t('Course work pagination'),
       }}
       headerActions={

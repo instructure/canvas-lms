@@ -196,4 +196,128 @@ describe('usePagination', () => {
       expect(typeof paginationProps.onPageChange).toBe('function')
     })
   })
+
+  describe('totalCount-based pagination', () => {
+    it('should calculate total pages from totalCount when available', () => {
+      const {result} = renderHook(() =>
+        usePagination({
+          hasNextPage: true,
+          totalPagesLoaded: 2,
+          fetchNextPage: mockFetchNextPage,
+          totalCount: 50,
+          pageSize: 10,
+        }),
+      )
+
+      expect(result.current.paginationProps.totalPages).toBe(5)
+    })
+
+    it('should handle totalCount with non-exact division', () => {
+      const {result} = renderHook(() =>
+        usePagination({
+          hasNextPage: true,
+          totalPagesLoaded: 1,
+          fetchNextPage: mockFetchNextPage,
+          totalCount: 23,
+          pageSize: 10,
+        }),
+      )
+
+      expect(result.current.paginationProps.totalPages).toBe(3)
+    })
+
+    it('should fallback to legacy calculation when totalCount is null', () => {
+      const {result} = renderHook(() =>
+        usePagination({
+          hasNextPage: true,
+          totalPagesLoaded: 3,
+          fetchNextPage: mockFetchNextPage,
+          totalCount: null,
+          pageSize: 10,
+        }),
+      )
+
+      expect(result.current.paginationProps.totalPages).toBe(4)
+    })
+
+    it('should fallback to legacy calculation when pageSize is not provided', () => {
+      const {result} = renderHook(() =>
+        usePagination({
+          hasNextPage: true,
+          totalPagesLoaded: 3,
+          fetchNextPage: mockFetchNextPage,
+          totalCount: 50,
+        }),
+      )
+
+      expect(result.current.paginationProps.totalPages).toBe(4)
+    })
+
+    it('should immediately update currentPageIndex when totalCount and pageSize are provided', async () => {
+      const {result} = renderHook(() =>
+        usePagination({
+          hasNextPage: true,
+          totalPagesLoaded: 2,
+          fetchNextPage: mockFetchNextPage,
+          totalCount: 50,
+          pageSize: 10,
+        }),
+      )
+
+      await act(async () => {
+        result.current.paginationProps.onPageChange(5)
+      })
+
+      // Should immediately update currentPageIndex without calling fetch functions
+      // The data fetching hook will react to this change
+      expect(mockFetchNextPage).not.toHaveBeenCalled()
+      expect(result.current.currentPageIndex).toBe(4)
+    })
+
+    it('should fallback to sequential fetching when totalCount is not provided', async () => {
+      const {result} = renderHook(() =>
+        usePagination({
+          hasNextPage: true,
+          totalPagesLoaded: 2,
+          fetchNextPage: mockFetchNextPage,
+        }),
+      )
+
+      await act(async () => {
+        result.current.paginationProps.onPageChange(5)
+      })
+
+      // Should fetch 3 pages sequentially (pages 3, 4, and 5)
+      expect(mockFetchNextPage).toHaveBeenCalledTimes(3)
+      expect(result.current.currentPageIndex).toBe(4)
+    })
+
+    it('should handle totalCount of 0', () => {
+      const {result} = renderHook(() =>
+        usePagination({
+          hasNextPage: false,
+          totalPagesLoaded: 0,
+          fetchNextPage: mockFetchNextPage,
+          totalCount: 0,
+          pageSize: 10,
+        }),
+      )
+
+      expect(result.current.paginationProps.totalPages).toBe(0)
+    })
+
+    it('should handle small totalCount (less than pageSize)', () => {
+      const {result} = renderHook(() =>
+        usePagination({
+          hasNextPage: false,
+          totalPagesLoaded: 1,
+          fetchNextPage: mockFetchNextPage,
+          totalCount: 5,
+          pageSize: 10,
+        }),
+      )
+
+      expect(result.current.paginationProps.totalPages).toBe(1)
+    })
+  })
 })
