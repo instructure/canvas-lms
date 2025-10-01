@@ -405,9 +405,9 @@ module InstFS
         iat:,
         user_id: options[:user]&.global_id&.to_s,
         resource:,
-        jti: SecureRandom.uuid,
         host: options[:oauth_host]
       }
+      claims[:jti] = SecureRandom.uuid unless options[:no_jti]
       claims[:tenant_auth] = @token.tenant_auth if @token&.tenant_auth.present?
       claims[:fallback_url] = options[:fallback_url] if options[:fallback_url].present?
       if options[:acting_as] && options[:acting_as] != options[:user]
