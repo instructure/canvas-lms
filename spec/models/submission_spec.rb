@@ -4861,7 +4861,7 @@ describe Submission do
       assignment.ensure_post_policy(post_manually: true)
     end
 
-    it "does not include submissions that neither have grades nor hidden comments" do
+    it "does not include submissions that neither have grades nor hidden comments nor stickers" do
       submission.add_comment(author: @teacher, comment: "good job!", hidden: false)
       expect(subject).not_to include(submission)
     end
@@ -4871,6 +4871,11 @@ describe Submission do
       expect(subject).to include(submission)
     end
 
+    it "does not include submissions with only draft hidden comments" do
+      submission.add_comment(author: @teacher, comment: "draft comment", hidden: true, draft_comment: true)
+      expect(subject).not_to include(submission)
+    end
+
     it "includes submissions with a grade" do
       assignment.grade_student(@student, grader: @teacher, grade: 10)
       expect(subject).to include(submission)
@@ -4878,6 +4883,11 @@ describe Submission do
 
     it "includes submissions that are excused" do
       assignment.grade_student(@student, grader: @teacher, excused: true)
+      expect(subject).to include(submission)
+    end
+
+    it "includes submissions with a sticker" do
+      submission.update!(sticker: "star")
       expect(subject).to include(submission)
     end
   end
