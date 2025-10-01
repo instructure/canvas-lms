@@ -4209,6 +4209,29 @@ class AbstractAssignment < ActiveRecord::Base
     !!effective_post_policy&.post_manually?
   end
 
+  def post_scheduled_comments(run_at:, progress: nil)
+    return if scheduled_post.nil?
+    return if scheduled_post.post_comments_at != run_at
+
+    update_time = Time.zone.now
+
+    all_user_ids = []
+    submissions.in_batches do |submissions_batch|
+      user_ids = submissions_batch.pluck(:user_id)
+      all_user_ids.concat(user_ids)
+      User.clear_cache_keys(user_ids, :submissions)
+      submissions_batch.update_all(posted_comments_at: update_time, updated_at: update_time)
+    end
+    progress.set_results(assignment_id: id, posted_comments_at: update_time, user_ids: all_user_ids) if progress.present? && all_user_ids.any?
+  end
+
+  def post_scheduled_submissions(run_at:, **)
+    return if scheduled_post.nil?
+    return if scheduled_post.post_grades_at != run_at
+
+    post_submissions(**)
+  end
+
   def post_submissions(progress: nil, submission_ids: nil, skip_updating_timestamp: false, posting_params: nil, skip_muted_changed: false, skip_content_participation_refresh: true)
     submissions = if submission_ids.nil?
                     self.submissions.active

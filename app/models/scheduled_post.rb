@@ -26,4 +26,105 @@ class ScheduledPost < ActiveRecord::Base
   validates :root_account_id, presence: true
   validates :post_comments_at, presence: true
   validates :post_grades_at, presence: true
+
+  scope :pending_comments_posting, ->(time) { where(post_comments_ran_at: nil, post_comments_at: ..time) }
+  scope :pending_grades_posting, ->(time) { where(post_grades_ran_at: nil, post_grades_at: ..time) }
+
+  def should_post_comments_and_grades?
+    post_comments_at.to_i == post_grades_at.to_i
+  end
+
+  def should_post_grades?(max_run_time)
+    post_grades_at <= max_run_time && post_grades_ran_at.nil?
+  end
+
+  def should_post_comments?(max_run_time)
+    post_comments_at <= max_run_time && post_comments_ran_at.nil?
+  end
+
+  def self.process_scheduled_posts
+    thirty_minutes_from_now = 30.minutes.from_now
+    run_time = Time.current
+
+    scheduled_posts_to_process = pending_comments_posting(thirty_minutes_from_now).or(pending_grades_posting(thirty_minutes_from_now))
+
+    scheduled_posts_to_process
+      .preload(
+        :post_policy,
+        assignment: :context
+      ).find_each do |scheduled_post|
+      post_policy = scheduled_post.post_policy
+      assignment = scheduled_post.assignment
+      course = assignment.context
+
+      # If post_manually is false, skip processing this scheduled post
+      unless post_policy&.post_manually
+        scheduled_post.update(post_grades_ran_at: run_time, post_comments_ran_at: run_time)
+        raise "PostPolicy is missing or does not respond to post_manually" if post_policy.nil? || !post_policy.respond_to?(:post_manually)
+      end
+
+      if scheduled_post.should_post_comments_and_grades?
+        # If both are set to the same time, then call process_assignment_posting only
+        progress = course.progresses.new(tag: "scheduled_post_assignment_grades_and_comments:#{assignment.id}")
+        process_assignment_posting(assignment:, progress:, run_at: scheduled_post.post_grades_at)
+        scheduled_post.update(post_grades_ran_at: run_time, post_comments_ran_at: run_time)
+        next
+      end
+
+      if scheduled_post.should_post_grades?(thirty_minutes_from_now)
+        progress = course.progresses.new(tag: "scheduled_post_assignment_grades:#{assignment.id}")
+        process_assignment_posting(assignment:, progress:, run_at: scheduled_post.post_grades_at)
+        scheduled_post.update(post_grades_ran_at: run_time)
+      end
+
+      next unless scheduled_post.should_post_comments?(thirty_minutes_from_now)
+
+      progress = course.progresses.new(tag: "scheduled_post_assignment_comments:#{assignment.id}")
+      process_comments_posting(assignment:, progress:, run_at: scheduled_post.post_comments_at)
+      scheduled_post.update(post_comments_ran_at: run_time)
+    rescue => e
+      Canvas::Errors.capture_exception(:scheduled_post, e, :info)
+    end
+  end
+
+  class << self
+    private
+
+    def process_assignment_posting(assignment:, progress:, run_at:)
+      progress.save!
+      progress.process_job(
+        assignment,
+        :post_scheduled_submissions,
+        {
+          preserve_method_args: true,
+          run_at:,
+          on_conflict: :overwrite,
+          priority: Delayed::HIGH_PRIORITY,
+          n_strand: ["Assignment#post_scheduled_grades", assignment.context.global_id],
+          singleton: "scheduled_post_assignment_grades:#{assignment.global_id}"
+        },
+        run_at:,
+        progress:,
+        skip_content_participation_refresh: false
+      )
+    end
+
+    def process_comments_posting(assignment:, progress:, run_at:)
+      progress.save!
+      progress.process_job(
+        assignment,
+        :post_scheduled_comments,
+        {
+          preserve_method_args: true,
+          run_at:,
+          on_conflict: :overwrite,
+          priority: Delayed::HIGH_PRIORITY,
+          n_strand: ["Assignment#post_scheduled_comments", assignment.context.global_id],
+          singleton: "scheduled_post_assignment_comments:#{assignment.global_id}"
+        },
+        run_at:,
+        progress:
+      )
+    end
+  end
 end
