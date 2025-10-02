@@ -116,7 +116,7 @@ const CanvasRce = forwardRef(function CanvasRce(
       editorOptions={tinymceConfig}
       highContrastCSS={
         window.ENV?.url_for_high_contrast_tinymce_editor_css
-          ? [window.ENV?.url_for_high_contrast_tinymce_editor_css]
+          ? window.ENV?.url_for_high_contrast_tinymce_editor_css
           : []
       }
       instRecordDisabled={window.ENV?.RICH_CONTENT_INST_RECORD_TAB_DISABLED}

@@ -116,7 +116,7 @@ export interface EnvCommon {
   }
   confetti_branding_enabled: boolean
   url_to_what_gets_loaded_inside_the_tinymce_editor_css: string
-  url_for_high_contrast_tinymce_editor_css: string
+  url_for_high_contrast_tinymce_editor_css: string[]
   csp?: string
   current_user_id: string | null
   current_user_global_id: string
