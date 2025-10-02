@@ -158,10 +158,7 @@ export const transformRequirementsForTray = (
       id: req.id,
       name: moduleItem?.name || '',
       type: mappedType,
-      resource:
-        rawModuleItem?.content?.isNewQuiz || rawModuleItem?.content?.type == 'Quiz'
-          ? 'quiz'
-          : 'assignment',
+      resource: moduleItem?.resource || 'assignment',
       graded: rawModuleItem?.content?.graded,
       pointsPossible:
         moduleItem?.pointsPossible || String(rawModuleItem?.content?.pointsPossible || 0),
