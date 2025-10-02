@@ -29,6 +29,7 @@ export interface DashboardTab {
 export interface WidgetPosition {
   col: number
   row: number
+  relative: number
 }
 
 export interface WidgetSize {
@@ -40,7 +41,6 @@ export interface Widget {
   id: string
   type: string
   position: WidgetPosition
-  size: WidgetSize
   title: string
 }
 

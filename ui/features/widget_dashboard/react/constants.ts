@@ -40,34 +40,30 @@ export const WIDGET_TYPES = {
 export type WidgetType = (typeof WIDGET_TYPES)[keyof typeof WIDGET_TYPES]
 
 export const DEFAULT_WIDGET_CONFIG = {
-  columns: 3,
+  columns: 2,
   widgets: [
     {
       id: 'course-work-combined-widget',
       type: WIDGET_TYPES.COURSE_WORK_COMBINED,
-      position: {col: 1, row: 1},
-      size: {width: 2, height: 3},
+      position: {col: 1, row: 1, relative: 1},
       title: I18n.t('Course Work'),
     },
     {
       id: 'announcements-widget',
       type: WIDGET_TYPES.ANNOUNCEMENTS,
-      position: {col: 3, row: 1},
-      size: {width: 1, height: 2},
+      position: {col: 2, row: 1, relative: 2},
       title: I18n.t('Announcements'),
     },
     {
       id: 'course-grades-widget',
       type: WIDGET_TYPES.COURSE_GRADES,
-      position: {col: 1, row: 4},
-      size: {width: 2, height: 2},
+      position: {col: 1, row: 2, relative: 4},
       title: I18n.t('Course Grades'),
     },
     {
       id: 'people-widget',
       type: WIDGET_TYPES.PEOPLE,
-      position: {col: 3, row: 3},
-      size: {width: 1, height: 2},
+      position: {col: 2, row: 2, relative: 3},
       title: I18n.t('People'),
     },
   ],
@@ -76,7 +72,7 @@ export const DEFAULT_WIDGET_CONFIG = {
 // Course Grades Widget Constants
 export const COURSE_GRADES_WIDGET = {
   MAX_GRID_ITEMS: 6,
-  CARD_HEIGHT: '14rem',
+  // CARD_HEIGHT: '14rem',
   GRID_COLUMNS: 3,
   GRID_COL_SPACING: 'small',
   GRID_ROW_SPACING: 'small',

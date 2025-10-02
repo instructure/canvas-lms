@@ -31,8 +31,7 @@ import {
 const mockWidget: Widget = {
   id: 'test-announcements-widget',
   type: 'announcements',
-  position: {col: 1, row: 1},
-  size: {width: 1, height: 1},
+  position: {col: 1, row: 1, relative: 1},
   title: 'Announcements',
 }
 

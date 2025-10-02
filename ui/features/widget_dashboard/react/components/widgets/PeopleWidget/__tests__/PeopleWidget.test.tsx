@@ -105,8 +105,7 @@ const server = setupServer(
 const mockWidget: Widget = {
   id: 'test-people-widget',
   type: 'people',
-  position: {col: 1, row: 1},
-  size: {width: 1, height: 1},
+  position: {col: 1, row: 1, relative: 1},
   title: 'Test People Widget',
 }
 

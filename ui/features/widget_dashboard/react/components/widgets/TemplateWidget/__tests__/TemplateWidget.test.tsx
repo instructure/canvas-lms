@@ -25,8 +25,7 @@ import type {Widget} from '../../../../types'
 const mockWidget: Widget = {
   id: 'test-widget',
   type: 'test',
-  position: {col: 1, row: 1},
-  size: {width: 2, height: 1},
+  position: {col: 1, row: 1, relative: 1},
   title: 'Test Widget',
 }
 
