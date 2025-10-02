@@ -490,7 +490,6 @@ class ApplicationController < ActionController::Base
     lti_apps_page_instructors
     lti_asset_processor
     lti_asset_processor_discussions
-    lti_deep_linking_module_index_menu_modal
     lti_link_to_apps_from_developer_keys
     lti_registrations_discover_page
     lti_registrations_next

@@ -91,12 +91,6 @@ export default class Placement extends React.Component {
   }
 
   messageTypeSelectable(placementName) {
-    if (
-      placementName === 'module_index_menu_modal' &&
-      !ENV.FEATURES.lti_deep_linking_module_index_menu_modal
-    ) {
-      return false
-    }
     return this.canBeEither.includes(placementName)
   }
 
