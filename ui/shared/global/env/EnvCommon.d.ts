@@ -337,7 +337,6 @@ export type RootAccountFeatureId =
   | 'lti_apps_page_ai_translation'
   | 'lti_asset_processor'
   | 'lti_asset_processor_discussions'
-  | 'lti_deep_linking_module_index_menu_modal'
   | 'lti_link_to_apps_from_developer_keys'
   | 'lti_registrations_next'
   | 'lti_registrations_page'

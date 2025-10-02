@@ -248,16 +248,6 @@ lti_context_copy_notice:
       state: allowed_on
     ci:
       state: allowed_on
-lti_deep_linking_line_items:
-  state: hidden
-  display_name: LTI Deep Linking Line Items
-  description: If enabled, creates assignments from LineItems in deep link messages.
-  applies_to: RootAccount
-lti_deep_linking_module_index_menu_modal:
-  state: hidden
-  display_name: LTI Deep Linking for Module Index Menu
-  description: If enabled, allows deep linking from the module index via a modal.
-  applies_to: RootAccount
 lti_deployment_id_in_login_request:
   state: hidden
   applies_to: RootAccount
