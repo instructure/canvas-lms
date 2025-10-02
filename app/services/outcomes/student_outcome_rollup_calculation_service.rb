@@ -22,11 +22,7 @@ module Outcomes
   #
   # Usage:
   #   Outcomes::StudentOutcomeRollupCalculationService.call(course_id: course.id, student_id: student.id)
-  class StudentOutcomeRollupCalculationService < ApplicationService
-    include Outcomes::ResultAnalytics
-    include OutcomesServiceAuthoritativeResultsHelper
-    include CanvasOutcomesHelper
-
+  class StudentOutcomeRollupCalculationService < RollupCommonService
     attr_reader :course, :student
 
     class << self
@@ -135,75 +131,22 @@ module Outcomes
 
     private
 
-    # Generates student outcome rollups from the provided results
-    # @param combined_results [Array<LearningOutcomeResult>]
-    # @return [Array<Rollup>]
-    def generate_student_rollups(combined_results)
-      return [] if combined_results.empty?
-
-      ActiveRecord::Associations.preload(combined_results, :learning_outcome)
-      outcome_results_rollups(
-        results: combined_results,
-        users: [student],
-        context: course
-      )
-    end
-
     # @return [ActiveRecord::Relation<LearningOutcomeResult>]
     def fetch_canvas_results
-      find_outcome_results(
-        student,
-        users: [student],
-        context: course,
-        outcomes: course.linked_learning_outcomes
-      )
+      # Override to query for a specific student
+      super(course:, users: [student])
     end
 
     # @return [Array<LearningOutcomeResult>]
     def fetch_outcomes_service_results
-      # May be Array (in tests stub) or Relation
-      new_quiz_assignments = Assignment.active.where(context: course).quiz_lti
-      return [] if new_quiz_assignments.blank?
-
-      outcomes = course.linked_learning_outcomes
-      return [] if outcomes.blank?
-
-      os_results_json = find_outcomes_service_outcome_results(
-        users: [student],
-        context: course,
-        outcomes:,
-        assignments: new_quiz_assignments
-      )
-      return [] if os_results_json.blank?
-
-      handle_outcomes_service_results(
-        os_results_json,
-        course,
-        outcomes,
-        [student],
-        new_quiz_assignments
-      )
+      super(course:, users: [student])
     end
 
-    # Combines and deduplicates results from two sources
-    # @param canvas_results [ActiveRecord::Relation<LearningOutcomeResult>, Array<LearningOutcomeResult>]
-    # @param outcomes_service_results [Array<LearningOutcomeResult>]
-    # @return [Array<LearningOutcomeResult>]
-    def combine_results(canvas_results = [], outcomes_results = [])
-      return canvas_results.to_a if outcomes_results.blank?
-      return outcomes_results if canvas_results.blank?
-
-      # Merge into one array
-      all_results = canvas_results.to_a + outcomes_results
-
-      # Deduplicate
-      all_results.uniq do |result|
-        [
-          result.learning_outcome_id,
-          result.user_uuid || result.user_id,
-          result.associated_asset_id || result.artifact_id
-        ]
-      end
+    # Generates student outcome rollups from the provided results
+    # @param combined_results [Array<LearningOutcomeResult>]
+    # @return [Array<Rollup>]
+    def generate_student_rollups(combined_results)
+      generate_rollups(combined_results, [student], course)
     end
 
     # @param rollups [Array<Rollup>]
@@ -225,7 +168,7 @@ module Outcomes
         raise ArgumentError, "Expected rollups for exactly one student, got #{rollups.size} students"
       end
 
-      rows = build_rollup_rows(student_rollup)
+      rows = build_rollup_rows(student_rollup, course, student)
       outcome_ids = student_rollup.scores.map { |s| s.outcome.id }
 
       upserted_ids = []
@@ -257,24 +200,6 @@ module Outcomes
 
       # Reload persisted records to ensure ActiveRecord objects
       OutcomeRollup.where(id: upserted_ids)
-    end
-
-    def build_rollup_rows(rollup)
-      rollup.scores.filter_map do |score|
-        # Skip scores that are nil (e.g., from n_mastery calculations with insufficient attempts)
-        next if score.score.nil?
-
-        {
-          root_account_id: course.root_account_id,
-          course_id: course.id,
-          user_id: student.id,
-          outcome_id: score.outcome.id,
-          calculation_method: score.outcome.calculation_method,
-          aggregate_score: score.score,
-          workflow_state: "active",
-          last_calculated_at: Time.current,
-        }
-      end
     end
 
     # Helper method to delete all active rollups for the student
