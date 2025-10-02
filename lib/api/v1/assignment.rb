@@ -635,30 +635,34 @@ module Api::V1::Assignment
     return false unless prepared_create[:valid]
 
     response = :created
+    has_peer_reviews = prepared_create[:assignment].peer_reviews && prepared_create[:assignment].context.feature_enabled?(:peer_review_grading)
 
     Assignment.suspend_due_date_caching do
       assignment.quiz_lti! if assignment_params.key?(:quiz_lti) || assignment&.quiz_lti?
 
       update_new_quizzes_params(assignment, assignment_params)
 
-      response = if prepared_create[:overrides].present?
-                   create_api_assignment_with_overrides(prepared_create, user)
-                 else
-                   prepared_create[:assignment].save!
-                   :created
-                 end
-    end
+      if has_peer_reviews
+        Assignment.transaction do
+          response = if prepared_create[:overrides].present?
+                       create_api_assignment_with_overrides(prepared_create, user)
+                     else
+                       prepared_create[:assignment].save!
+                       :created
+                     end
 
-    if [:created, :ok].include?(response) &&
-       prepared_create[:assignment].peer_reviews &&
-       prepared_create[:assignment].context.feature_enabled?(:peer_review_grading)
-
-      begin
-        create_api_peer_review_sub_assignment(prepared_create[:assignment], assignment_params[:peer_review])
-        prepared_create[:assignment].association(:peer_review_sub_assignment).reload
-      rescue
-        prepared_create[:assignment].destroy
-        return :peer_review_error
+          if [:created, :ok].include?(response)
+            create_api_peer_review_sub_assignment(prepared_create[:assignment], assignment_params[:peer_review])
+            prepared_create[:assignment].association(:peer_review_sub_assignment).reload
+          end
+        end
+      else
+        response = if prepared_create[:overrides].present?
+                     create_api_assignment_with_overrides(prepared_create, user)
+                   else
+                     prepared_create[:assignment].save!
+                     :created
+                   end
       end
     end
 
@@ -1471,7 +1475,10 @@ module Api::V1::Assignment
       { "ab_guid" => strong_anything },
       ({ "suppress_assignment" => strong_anything } if assignment.root_account.suppress_assignments?),
       ({ "estimated_duration_attributes" => strong_anything } if estimated_duration_enabled?(assignment)),
-      ({ "peer_review" => %w[points_possible grading_type due_at unlock_at lock_at] } if assignment.context.feature_enabled?(:peer_review_grading)),
+      (if assignment.context.feature_enabled?(:peer_review_grading)
+         { "peer_review" => (%w[points_possible grading_type due_at unlock_at lock_at] +
+                             [{ "peer_review_overrides" => strong_anything }]) }
+       end),
     ].compact
   end
 
@@ -1530,7 +1537,7 @@ module Api::V1::Assignment
     end
   end
 
-  def peer_review_params(params)
+  def prepare_peer_review_params(params)
     peer_review_params = {}
 
     unless params.nil?
@@ -1539,16 +1546,32 @@ module Api::V1::Assignment
       peer_review_params[:due_at] = params[:due_at] if params[:due_at].present?
       peer_review_params[:unlock_at] = params[:unlock_at] if params[:unlock_at].present?
       peer_review_params[:lock_at] = params[:lock_at] if params[:lock_at].present?
+      peer_review_params[:peer_review_overrides] = params[:peer_review_overrides] if params[:peer_review_overrides].present?
     end
 
     peer_review_params
   end
 
   def create_api_peer_review_sub_assignment(parent_assignment, params)
-    PeerReview::PeerReviewCreatorService.call(parent_assignment:, **peer_review_params(params))
+    peer_review_params = prepare_peer_review_params(params)
+    overrides = peer_review_params.delete(:peer_review_overrides)
+    peer_review_sub_assignment = PeerReview::PeerReviewCreatorService.call(
+      parent_assignment:,
+      **peer_review_params
+    )
+
+    if overrides.present?
+      PeerReview::DateOverriderService.call(
+        peer_review_sub_assignment:,
+        overrides:
+      )
+    end
+
+    peer_review_sub_assignment
   end
 
   def update_api_peer_review_sub_assignment(parent_assignment, params)
-    PeerReview::PeerReviewUpdaterService.call(parent_assignment:, **peer_review_params(params))
+    peer_review_params = prepare_peer_review_params(params)
+    PeerReview::PeerReviewUpdaterService.call(parent_assignment:, **peer_review_params)
   end
 end

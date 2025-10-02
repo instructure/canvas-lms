@@ -1418,6 +1418,9 @@ class AssignmentsApiController < ApplicationController
   #   The day/time the peer reviews are unlocked. Must be before the due date if there is a due date.
   #   Accepts times in ISO 8601 format, e.g. 2025-08-15T12:10:00Z.
   #
+  # @argument assignment[peer_review][peer_review_overrides][] [AssignmentOverride]
+  #   List of overrides for the peer reviews.
+  #
   # @returns Assignment
   def create
     @assignment = @context.assignments.build
