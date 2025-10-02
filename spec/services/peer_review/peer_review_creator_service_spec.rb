@@ -242,6 +242,20 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
         )
       end
 
+      it "raises error for discussion topic assignment" do
+        discussion_topic_assignment = assignment_model(
+          course:,
+          title: "Discussion Topic Assignment",
+          submission_types: "discussion_topic"
+        )
+        invalid_service = described_class.new(parent_assignment: discussion_topic_assignment)
+
+        expect { invalid_service.call }.to raise_error(
+          PeerReview::InvalidAssignmentSubmissionTypesError,
+          "Peer reviews cannot be used with Discussion Topic assignments"
+        )
+      end
+
       it "raises error when feature is disabled" do
         course.disable_feature!(:peer_review_grading)
         expect { service.call }.to raise_error(
