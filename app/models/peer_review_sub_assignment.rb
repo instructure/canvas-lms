@@ -29,6 +29,7 @@ class PeerReviewSubAssignment < AbstractAssignment
   validates :has_sub_assignments, inclusion: { in: [false], message: I18n.t("cannot have sub assignments") }
   validates :sub_assignment_tag, absence: { message: ->(_object, _data) { I18n.t("cannot have sub assignment tag") } }
   validate  :context_matches_parent_assignment, if: :context_explicitly_provided?
+  validate  :parent_assignment_not_discussion_topic_or_external_tool
 
   after_initialize :set_default_context
   after_save :unlink_assessment_requests, if: :soft_deleted?
@@ -78,6 +79,17 @@ class PeerReviewSubAssignment < AbstractAssignment
     return true if context_id == parent_assignment&.context_id
 
     errors.add(:context, I18n.t("must match parent assignment context"))
+  end
+
+  def parent_assignment_not_discussion_topic_or_external_tool
+    assignment = parent_assignment
+    return unless assignment
+
+    if assignment.submission_types == "discussion_topic"
+      errors.add(:parent_assignment, I18n.t("cannot be a discussion topic"))
+    elsif assignment.external_tool?
+      errors.add(:parent_assignment, I18n.t("cannot be an external tool"))
+    end
   end
 
   def soft_deleted?
