@@ -89,6 +89,7 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
       onChange={(_event, {value}) => handleFilterChange(value as FilterOption)}
       size="small"
       width="6rem"
+      data-testid="announcement-filter-select"
     >
       <SimpleSelect.Option id="unread" value="unread">
         {I18n.t('Unread')}
