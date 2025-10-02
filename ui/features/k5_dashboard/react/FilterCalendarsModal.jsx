@@ -38,32 +38,35 @@ const I18n = createI18nScope('filter_calendars_modal')
 
 export const ContextCheckbox = ({
   assetString,
-  color = DEFAULT_COURSE_COLOR,
+  color,
   maxContextsReached,
   name,
   onChange,
   selected,
-}) => (
-  <InstUISettingsProvider
-    theme={{
-      componentOverrides: {
-        [CheckboxFacade.componentId]: {
-          checkedBackground: color,
-          checkedBorderColor: color,
+}) => {
+  const checkboxColor = color || DEFAULT_COURSE_COLOR
+  return (
+    <InstUISettingsProvider
+      theme={{
+        componentOverrides: {
+          [CheckboxFacade.componentId]: {
+            checkedBackground: checkboxColor,
+            checkedBorderColor: checkboxColor,
+          },
         },
-      },
-    }}
-  >
-    <Checkbox
-      data-testid="subject-calendars"
-      label={name}
-      value={`${assetString}_selected`}
-      checked={selected}
-      disabled={maxContextsReached && !selected}
-      onChange={() => onChange(assetString)}
-    />
-  </InstUISettingsProvider>
-)
+      }}
+    >
+      <Checkbox
+        data-testid="subject-calendars"
+        label={name}
+        value={`${assetString}_selected`}
+        checked={selected}
+        disabled={maxContextsReached && !selected}
+        onChange={() => onChange(assetString)}
+      />
+    </InstUISettingsProvider>
+  )
+}
 
 const FilterCalendarsModal = ({
   closeModal,
@@ -88,11 +91,10 @@ const FilterCalendarsModal = ({
     setPendingSelectedContexts(currentlySelected => {
       const contextIndex = currentlySelected.indexOf(assetString)
       if (contextIndex === -1) {
-        currentlySelected.push(assetString)
+        return [...currentlySelected, assetString]
       } else {
-        currentlySelected.splice(contextIndex, 1)
+        return currentlySelected.filter(context => context !== assetString)
       }
-      return [...currentlySelected]
     })
   }
 
