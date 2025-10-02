@@ -160,12 +160,30 @@ module FeatureFlags
     end
 
     def self.only_admins_can_enable_block_content_editor_during_eap(user, context, _from_state, transitions)
-      if context.is_a?(Course) && (!context.account.feature_enabled?(:block_content_editor) || !context.account_membership_allows(user))
-        transitions["on"] ||= {}
-        transitions["off"] ||= {}
-        transitions["on"]["locked"] = true
-        transitions["off"]["locked"] = true
-      end
+      flag_enabled = false
+      flag_enabled = true if context.is_a?(Course) && context.account.feature_enabled?(:block_content_editor)
+      flag_enabled = true if context.is_a?(Account) && context.feature_enabled?(:block_content_editor)
+      user_is_site_admin = Account.site_admin.grants_right?(user, :read)
+      user_is_root_admin = (context.is_a?(Course) || context.is_a?(Account)) && context.root_account.account_users.active.where(user_id: user&.id).exists?
+
+      return if (user_is_site_admin || user_is_root_admin) && flag_enabled
+
+      transitions["on"] ||= {}
+      transitions["off"] ||= {}
+      transitions["allowed"] ||= {}
+      transitions["allowed_on"] ||= {}
+      transitions["on"]["locked"] = true
+      transitions["off"]["locked"] = true
+      transitions["allowed"]["locked"] = true
+      transitions["allowed_on"]["locked"] = true
+    end
+
+    def self.block_content_editor_flag_enabled(context)
+      bce_shadow_flag_enabled = false
+      bce_shadow_flag_enabled = context.feature_enabled?(:block_content_editor) if context.is_a?(Account)
+      bce_shadow_flag_enabled = context.account.feature_enabled?(:block_content_editor) if context.is_a?(Course)
+
+      bce_shadow_flag_enabled
     end
   end
 end

@@ -110,7 +110,7 @@ const getUrl = async (
 
 export const loadFileMetaData = async (url: string) => {
   const cleanUrl = url.endsWith('/preview') ? url.slice(0, -8) : url
-  const {json} = await doFetchApi<{attachment: {display_name: string}}>({
+  const {json} = await doFetchApi<{attachment: {display_name: string; id: string | number}}>({
     path: cleanUrl,
     method: 'GET',
   })
