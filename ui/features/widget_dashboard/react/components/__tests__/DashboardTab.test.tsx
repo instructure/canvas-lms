@@ -231,11 +231,11 @@ describe('DashboardTab', () => {
     cleanup()
   })
 
-  it('should render widget grid with course work widget', async () => {
+  it('should render widget columns with course work widget', async () => {
     const {getByTestId, cleanup} = setup()
 
     await waitFor(() => {
-      expect(getByTestId('widget-grid')).toBeInTheDocument()
+      expect(getByTestId('widget-columns')).toBeInTheDocument()
       expect(getByTestId('widget-course-work-combined-widget')).toBeInTheDocument()
     })
 

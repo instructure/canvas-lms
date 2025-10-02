@@ -47,11 +47,22 @@ const responsiveQuerySizes = ({
 
 const sortWidgetsForStacking = (widgets: Widget[]): Widget[] => {
   return [...widgets].sort((a, b) => {
-    if (a.position.row !== b.position.row) {
-      return a.position.row - b.position.row
-    }
-    return a.position.col - b.position.col
+    return a.position.relative - b.position.relative
   })
+}
+
+const widgetsAsColumns = (widgets: Widget[]): Widget[][] => {
+  const inColumns = widgets.reduce((acc, val) => {
+    const column = val.position.col || 1
+    acc[column - 1].push(val)
+    return acc
+  }, [[] as Widget[], [] as Widget[]] as Widget[][])
+
+  inColumns.forEach((column, idx) => {
+    inColumns[idx] = column.sort((a, b) => a.position.row = b.position.row)
+  })
+
+  return inColumns
 }
 
 interface WidgetGridProps {
@@ -60,6 +71,7 @@ interface WidgetGridProps {
 
 const WidgetGrid: React.FC<WidgetGridProps> = ({config}) => {
   const sortedWidgets = useMemo(() => sortWidgetsForStacking(config.widgets), [config.widgets])
+  const widgetsByColumn = useMemo(() => widgetsAsColumns(config.widgets), [config.widgets])
 
   const renderWidget = (widget: Widget) => {
     const widgetRenderer = getWidget(widget.type)
@@ -74,25 +86,12 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config}) => {
     return <WidgetComponent widget={widget} />
   }
 
-  const calculateGridColumn = (widget: Widget) => {
-    const startCol = widget.position.col
-    const endCol = startCol + widget.size.width - 1
-    return `${startCol} / ${endCol + 1}`
-  }
-
-  const calculateGridRow = (widget: Widget) => {
-    const startRow = widget.position.row
-    const endRow = startRow + widget.size.height - 1
-    return `${startRow} / ${endRow + 1}`
-  }
-
-  const maxRows =
-    config.widgets.length > 0
-      ? Math.max(...config.widgets.map(widget => widget.position.row + widget.size.height - 1))
-      : 1
-
   const renderWidgetInView = (widget: Widget, key?: string) => (
-    <div key={key || widget.id} data-testid={`widget-container-${widget.id}`}>
+    <div
+      key={key || widget.id}
+      data-testid={`widget-container-${widget.id}`}
+      style={{ marginBottom: '1rem' }}
+    >
       <View height="100%" style={{overflow: 'hidden'}}>
         {renderWidget(widget)}
       </View>
@@ -101,68 +100,61 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config}) => {
 
   const renderDesktopGrid = () => (
     <div
-      data-testid="widget-grid"
+      data-testid="widget-columns"
       style={{
-        display: 'grid',
-        gridTemplateColumns: `repeat(${config.columns}, 1fr)`,
-        gridTemplateRows: `repeat(${maxRows}, 20rem)`,
-        gap: '1rem',
         width: '100%',
         overflow: 'visible',
+        display: 'flex'
       }}
     >
-      {config.widgets.map(widget => (
-        <div
-          key={widget.id}
-          data-testid={`widget-container-${widget.id}`}
-          style={{
-            gridColumn: calculateGridColumn(widget),
-            gridRow: calculateGridRow(widget),
-          }}
-        >
-          <View height="100%" style={{overflow: 'hidden'}}>
-            {renderWidget(widget)}
-          </View>
-        </div>
-      ))}
+      <div
+        data-testid="widget-column-1"
+        style={{
+          flexGrow: 2,
+          marginRight: '1rem',
+        }}
+      >
+        {widgetsByColumn[0].map(widget => (
+          <div
+            key={widget.id}
+            data-testid={`widget-container-${widget.id}`}
+            style={{
+              marginBottom: '1rem'
+            }}
+          >
+            <View height="100%" style={{overflow: 'hidden'}}>
+              {renderWidget(widget)}
+            </View>
+          </div>
+        ))}
+      </div>
+      <div
+        data-testid="widget-column-1"
+        style={{
+          flexGrow: 1
+        }}
+      >
+        {widgetsByColumn[1].map(widget => (renderWidgetInView(widget)))}
+      </div>
     </div>
   )
 
-  const renderTabletStack = () => {
-    return (
-      <div
-        data-testid="widget-grid"
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '1rem',
-          width: '100%',
-          maxWidth: '800px',
-          margin: '0 auto',
-          overflow: 'visible',
-        }}
-      >
-        {sortedWidgets.map(widget => renderWidgetInView(widget))}
+  const renderTabletStack = () => (
+    <div
+      data-testid="widget-columns"
+      style={{
+        width: '100%',
+        overflow: 'visible',
+        display: 'flex'
+      }}
+    >
+      <div data-testid="widget-column-tablet">
+        {sortedWidgets.map((widget) => renderWidgetInView(widget))}
       </div>
-    )
-  }
+    </div>
+  )
 
-  const renderMobileStack = () => {
-    return (
-      <div
-        data-testid="widget-grid"
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '1rem',
-          width: '100%',
-          overflow: 'visible',
-        }}
-      >
-        {sortedWidgets.map(widget => renderWidgetInView(widget))}
-      </div>
-    )
-  }
+  const renderMobileStack = renderTabletStack
 
   return (
     <Responsive

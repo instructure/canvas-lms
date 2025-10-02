@@ -25,7 +25,6 @@ import {Link} from '@instructure/ui-link'
 import {Button} from '@instructure/ui-buttons'
 import type {CourseGradeCardProps} from '../../../types'
 import {formatUpdatedDate, convertToLetterGrade} from './utils'
-import {COURSE_GRADES_WIDGET} from '../../../constants'
 import {CourseCode} from '../../shared/CourseCode'
 
 const I18n = createI18nScope('widget_dashboard')
@@ -57,7 +56,6 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
       borderColor="secondary"
       padding="x-small"
       width="100%"
-      height={COURSE_GRADES_WIDGET.CARD_HEIGHT}
       shadow="resting"
       display="flex"
       overflowX="hidden"

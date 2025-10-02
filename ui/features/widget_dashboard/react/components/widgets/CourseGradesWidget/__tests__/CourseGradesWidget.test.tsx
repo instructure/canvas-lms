@@ -29,8 +29,7 @@ import {
 const mockWidget: Widget = {
   id: 'test-course-grades-widget',
   type: 'course_grades',
-  position: {col: 1, row: 1},
-  size: {width: 1, height: 1},
+  position: {col: 1, row: 1, relative: 1},
   title: 'Course Grades',
 }
 
