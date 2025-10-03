@@ -558,13 +558,10 @@ class Account < ActiveRecord::Base
   end
 
   def allow_assign_to_differentiation_tags?
-    allow_assign_to_differentiation_tags[:value] && feature_enabled?(:assign_to_differentiation_tags)
+    allow_assign_to_differentiation_tags[:value]
   end
 
   def allow_assign_to_differentiation_tags_unlocked?
-    # First, the feature flag must be enabled. If not, always false.
-    return false unless feature_allowed?(:assign_to_differentiation_tags)
-
     dt = allow_assign_to_differentiation_tags
 
     # If the current value is true, then it's allowed.

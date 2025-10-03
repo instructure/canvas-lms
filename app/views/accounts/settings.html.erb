@@ -659,7 +659,7 @@
               </div>
             <% end %>
 
-            <% if !@account.site_admin? && @account.feature_enabled?(:assign_to_differentiation_tags) %>
+            <% if !@account.site_admin? %>
               <div>
                 <% diff_tags = @account.allow_assign_to_differentiation_tags %>
                 <% disabled = diff_tags[:locked] && diff_tags[:inherited] %>

@@ -279,7 +279,6 @@ describe AssignmentVisibility::AssignmentVisibilityService do
 
           context "user is non-collaborative group" do
             before do
-              @course.account.enable_feature!(:assign_to_differentiation_tags)
               @course.account.settings = { allow_assign_to_differentiation_tags: { value: true } }
               @course.account.save
 
@@ -303,13 +302,6 @@ describe AssignmentVisibility::AssignmentVisibilityService do
 
             it "does not see the assignment if the override is deleted" do
               @assignment.assignment_overrides.each(&:destroy)
-
-              visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @student.id, course_ids: @course.id).map { |x| x.assignment_id.to_i }
-              expect(visible_assignment_ids.include?(@assignment.id)).to be_falsy
-            end
-
-            it "does not see the assignment if the feature flag is disabled" do
-              @course.account.disable_feature!(:assign_to_differentiation_tags)
 
               visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @student.id, course_ids: @course.id).map { |x| x.assignment_id.to_i }
               expect(visible_assignment_ids.include?(@assignment.id)).to be_falsy
@@ -561,7 +553,6 @@ describe AssignmentVisibility::AssignmentVisibilityService do
           end
 
           it "applies context module tags overrides" do
-            @course.account.enable_feature!(:assign_to_differentiation_tags)
             @course.account.settings = { allow_assign_to_differentiation_tags: { value: true } }
             @course.account.save
             assignment_with_false_only_visible_to_overrides
@@ -579,7 +570,6 @@ describe AssignmentVisibility::AssignmentVisibilityService do
           end
 
           it "does not show Assignment in the module if user does not belong to the tag" do
-            @course.account.enable_feature!(:assign_to_differentiation_tags)
             @course.account.settings = { allow_assign_to_differentiation_tags: { value: true } }
             @course.account.save
 

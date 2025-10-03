@@ -82,7 +82,6 @@ module Loaders
         course = Course.active.find_by(id: @course_id) if @course_id.present?
 
         if course.present? &&
-           course.account.feature_enabled?(:assign_to_differentiation_tags) &&
            course.account.allow_assign_to_differentiation_tags? &&
            course.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
 

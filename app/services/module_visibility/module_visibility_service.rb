@@ -64,7 +64,7 @@ module ModuleVisibility
         account_ids = Course.where(id: course_ids).distinct.pluck(:account_id).uniq
         accounts = Account.where(id: account_ids).to_a
 
-        accounts.any? { |account| account.feature_enabled?(:assign_to_differentiation_tags) }
+        accounts.any?(&:allow_assign_to_differentiation_tags?)
       end
     end
   end
