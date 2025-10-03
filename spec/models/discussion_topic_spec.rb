@@ -18,7 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_relative "../helpers/notifications/notification_spec_helpers"
+
 describe DiscussionTopic do
+  include NotificationSpecHelpers
+
   before :once do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
@@ -3110,16 +3114,25 @@ describe DiscussionTopic do
       NotificationPolicy.create!(notification: n, communication_channel: @user.communication_channel, frequency: "immediately")
     end
 
+    before do
+      clear_all_notifications
+    end
+
     it "sends a message for a published course" do
       @course.offer!
-      topic = @course.discussion_topics.create!(title: "title")
-      expect(topic.messages_sent["New Discussion Topic"].map(&:user)).to include(@user)
-      expect(topic.messages_sent["New Discussion Topic"].first.from_name).to eq @course.name
+
+      expect_notification(:new_discussion_topic) do |n|
+        n.sent_to @user
+        n.from_name @course.name
+      end.when do
+        @course.discussion_topics.create!(title: "title")
+      end
     end
 
     it "does not send a message for an unpublished course" do
-      topic = @course.discussion_topics.create!(title: "title")
-      expect(topic.messages_sent["New Discussion Topic"]).to be_blank
+      expect_no_notifications.when do
+        @course.discussion_topics.create!(title: "title")
+      end
     end
 
     context "group discussions" do
@@ -3131,12 +3144,117 @@ describe DiscussionTopic do
       it "sends a message for a group discussion in a published course" do
         @course.offer!
         topic = @group.discussion_topics.create!(title: "title")
-        expect(topic.messages_sent["New Discussion Topic"].map(&:user)).to include(@user)
+        expect(topic).to have_sent_notification(:new_discussion_topic).to(@user)
       end
 
       it "does not send a message for a group discussion in an unpublished course" do
-        topic = @group.discussion_topics.create!(title: "title")
-        expect(topic.messages_sent["New Discussion Topic"]).to be_blank
+        expect_no_notifications.when do
+          @group.discussion_topics.create!(title: "title")
+        end
+      end
+    end
+
+    context "with multiple personas" do
+      before :once do
+        @course.offer!
+        @teacher = @user # Save the teacher from outer context
+
+        # Active student 1
+        @student1 = student_in_course(active_all: true, active_cc: true, course: @course).user
+
+        # Active student 2
+        @student2 = student_in_course(active_all: true, active_cc: true, course: @course).user
+
+        # Teaching assistant
+        @ta = ta_in_course(active_all: true, active_cc: true, course: @course).user
+
+        # Second teacher
+        @teacher2 = teacher_in_course(active_all: true, active_cc: true, course: @course).user
+
+        # Observer
+        @observer = observer_in_course(active_all: true, active_cc: true, course: @course).user
+
+        # Designer
+        @designer = designer_in_course(active_all: true, active_cc: true, course: @course).user
+
+        # Inactive student
+        @inactive_student = student_in_course(active_all: true, active_cc: true, course: @course).user
+        @course.enrollments.where(user: @inactive_student).first.deactivate
+
+        # Concluded student
+        @concluded_student = student_in_course(active_all: true, active_cc: true, course: @course).user
+        @course.enrollments.where(user: @concluded_student).first.conclude
+
+        # Student with notification preference set to never
+        @no_notification_student = student_in_course(active_all: true, active_cc: true, course: @course).user
+
+        @user = @teacher.reload # Restore and reload @user to be the teacher
+      end
+
+      before do
+        clear_all_notifications
+
+        n = Notification.where(name: "New Discussion Topic").first
+
+        np = NotificationPolicy.find_or_initialize_by(notification: n, communication_channel: @student1.communication_channel)
+        np.frequency = "immediately"
+        np.save!
+
+        np = NotificationPolicy.find_or_initialize_by(notification: n, communication_channel: @student2.communication_channel)
+        np.frequency = "immediately"
+        np.save!
+
+        np = NotificationPolicy.find_or_initialize_by(notification: n, communication_channel: @ta.communication_channel)
+        np.frequency = "immediately"
+        np.save!
+
+        np = NotificationPolicy.find_or_initialize_by(notification: n, communication_channel: @teacher2.communication_channel)
+        np.frequency = "immediately"
+        np.save!
+
+        np = NotificationPolicy.find_or_initialize_by(notification: n, communication_channel: @observer.communication_channel)
+        np.frequency = "immediately"
+        np.save!
+
+        np = NotificationPolicy.find_or_initialize_by(notification: n, communication_channel: @designer.communication_channel)
+        np.frequency = "immediately"
+        np.save!
+
+        np = NotificationPolicy.find_or_initialize_by(notification: n, communication_channel: @inactive_student.communication_channel)
+        np.frequency = "immediately"
+        np.save!
+
+        np = NotificationPolicy.find_or_initialize_by(notification: n, communication_channel: @concluded_student.communication_channel)
+        np.frequency = "immediately"
+        np.save!
+
+        np = NotificationPolicy.find_or_initialize_by(notification: n, communication_channel: @no_notification_student.communication_channel)
+        np.frequency = "never"
+        np.save!
+      end
+
+      it "sends notifications to active participants and not to inactive ones" do
+        users_to_send = [@user, @student1, @student2, @ta, @teacher2, @designer]
+        users_not_to_send = [@observer, @inactive_student, @concluded_student, @no_notification_student]
+
+        expect_notification(:new_discussion_topic) do |n|
+          n.sent_to(*users_to_send)
+          n.not_sent_to(*users_not_to_send)
+          n.from_name @course.name
+          n.allowing_other_recipients
+        end.when do
+          @course.discussion_topics.create!(title: "Discussion for all active users")
+        end
+      end
+
+      it "sends to admins only when course is unpublished" do
+        @course.claim!
+
+        expect_no_notifications.when do
+          @course.discussion_topics.create!(title: "Admin only discussion")
+        end
+
+        @course.offer!
       end
     end
   end
