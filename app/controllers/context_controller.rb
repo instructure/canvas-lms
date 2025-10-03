@@ -90,7 +90,7 @@ class ContextController < ApplicationController
       load_all_contexts(context: @context)
       manage_students = @context.grants_right?(@current_user, session, :manage_students) && !MasterCourses::MasterTemplate.is_master_course?(@context)
       can_add_enrollments = @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_COURSE_ENROLLMENT_PERMISSIONS)
-      allow_assign_to_differentiation_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+      allow_assign_to_differentiation_tags = @context.account.allow_assign_to_differentiation_tags?
       js_permissions = {
         read_sis: @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis),
         view_user_logins: @context.grants_right?(@current_user, session, :view_user_logins),

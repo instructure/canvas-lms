@@ -868,7 +868,6 @@ describe "Group Categories API", type: :request do
 
     before :once do
       course_with_teacher(active_all: true)
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -1024,12 +1023,6 @@ describe "Group Categories API", type: :request do
       expect(student_row[9]).to eq("sis_category_789")
     end
 
-    it "fails when differentiation tags feature is disabled" do
-      @course.account.disable_feature! :assign_to_differentiation_tags
-      raw_api_call(:get, api_url, api_route)
-      assert_unauthorized
-    end
-
     it "fails when account settings disallow differentiation tags" do
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: false }
       @course.account.save!
@@ -1060,8 +1053,8 @@ describe "Group Categories API", type: :request do
       student_rows = data_rows.select { |row| row[1] == @student.id.to_s }
       expect(student_rows.length).to eq(2)
 
-      expect(student_rows.first[4]).to eq("Tag 1")
-      expect(student_rows.last[4]).to eq("Tag 2")
+      tag_names = student_rows.pluck(4).sort
+      expect(tag_names).to eq(["Tag 1", "Tag 2"])
     end
   end
 end
