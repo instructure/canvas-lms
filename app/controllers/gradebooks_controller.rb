@@ -1114,6 +1114,22 @@ class GradebooksController < ApplicationController
         show_inactive_enrollments: gradebook_settings(@context.global_id)&.[]("show_inactive_enrollments") == "true",
         show_concluded_enrollments: @context.completed? || gradebook_settings(@context.global_id)&.[]("show_concluded_enrollments") == "true",
       }
+
+      if @current_user && @real_current_user && @real_current_user != @current_user
+        masquerade_data = { is_fake_student: @current_user.fake_student? }
+
+        if @current_user.fake_student?
+          student_view_course = @current_user.all_courses.first
+          masquerade_data[:reset_student_url] = course_test_student_path(student_view_course) if student_view_course
+          masquerade_data[:leave_student_view_url] = course_student_view_path(student_view_course) if student_view_course
+        else
+          masquerade_data[:stop_masquerading_url] = user_masquerade_path(@real_current_user.id)
+          masquerade_data[:acting_as_user_name] = @current_user.short_name
+          masquerade_data[:acting_as_avatar_url] = @current_user.avatar_url if service_enabled?(:avatars)
+        end
+
+        env[:masquerade] = masquerade_data
+      end
       js_env(env)
 
       deferred_js_bundle :platform_speedgrader

@@ -89,6 +89,7 @@ ready(() => {
           Intl.DateTimeFormat().resolvedOptions().timeZone ||
           window.ENV.CONTEXT_TIMEZONE ||
           'UTC',
+        masquerade: window.ENV.masquerade ?? null,
       },
       features: {
         a2StudentEnabled: window.ENV.A2_STUDENT_ENABLED ?? false,
