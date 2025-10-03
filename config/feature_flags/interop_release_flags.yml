@@ -518,3 +518,17 @@ tune_lti_context_id_history_query:
     improve performance. Caution: for some accounts where this query
     doesn't already time out, enabling this may cause the query to take
     much longer and even time out.
+use_jwt_auth_for_utid_sync:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: "Use JWTs for UTID Syncing"
+  description: >-
+    If enabled, Canvas will use JWTs signed by a shared secret to authenticate with LearnPlatform
+    when syncing unified tool IDs (UTIDs).
+  environments:
+    development:
+      state: allowed_on
+    test:
+      state: allowed_on
+    ci:
+      state: allowed_on
