@@ -276,4 +276,99 @@ describe('ManageOutcomeItem', () => {
       })
     })
   })
+
+  describe('context tag', () => {
+    it('displays Institution tag when outcome is from an Account context', () => {
+      const {getByText} = render(
+        <ManageOutcomeItem
+          {...defaultProps({
+            outcomeContextType: 'Account',
+            outcomeContextId: '1',
+          })}
+        />,
+        {
+          contextType: 'Course',
+          contextId: '2',
+        },
+      )
+      expect(getByText('Institution')).toBeInTheDocument()
+    })
+
+    it('displays Course tag when outcome is from a Course context', () => {
+      const {getByText} = render(
+        <ManageOutcomeItem
+          {...defaultProps({
+            outcomeContextType: 'Course',
+            outcomeContextId: '3',
+          })}
+        />,
+        {
+          contextType: 'Course',
+          contextId: '2',
+        },
+      )
+      expect(getByText('Course')).toBeInTheDocument()
+    })
+
+    it('displays tag even when outcome is from the same context', () => {
+      const {getByText} = render(
+        <ManageOutcomeItem
+          {...defaultProps({
+            outcomeContextType: 'Account',
+            outcomeContextId: '2',
+          })}
+        />,
+        {
+          contextType: 'Account',
+          contextId: '2',
+        },
+      )
+      expect(getByText('Institution')).toBeInTheDocument()
+    })
+
+    it('provides proper screen reader context for Account tag', () => {
+      const {getByLabelText} = render(
+        <ManageOutcomeItem
+          {...defaultProps({
+            outcomeContextType: 'Account',
+            outcomeContextId: '1',
+          })}
+        />,
+        {
+          contextType: 'Course',
+          contextId: '2',
+        },
+      )
+      expect(getByLabelText('This is an institution-level outcome')).toBeInTheDocument()
+    })
+
+    it('provides proper screen reader context for Course tag', () => {
+      const {getByLabelText} = render(
+        <ManageOutcomeItem
+          {...defaultProps({
+            outcomeContextType: 'Course',
+            outcomeContextId: '3',
+          })}
+        />,
+        {
+          contextType: 'Course',
+          contextId: '2',
+        },
+      )
+      expect(getByLabelText('This is a course-level outcome')).toBeInTheDocument()
+    })
+
+    it('does not display tag when outcomeContextType is null', () => {
+      const {queryByText} = render(
+        <ManageOutcomeItem
+          {...defaultProps({
+            outcomeContextType: null,
+            outcomeContextId: null,
+          })}
+        />,
+      )
+      expect(queryByText('Institution')).not.toBeInTheDocument()
+      expect(queryByText('Course')).not.toBeInTheDocument()
+    })
+  })
 })
