@@ -5907,6 +5907,119 @@ describe Course do
     end
   end
 
+  describe "#sync_with_homeroom" do
+    before :once do
+      @account = Account.default
+      toggle_k5_setting(@account, true)
+
+      @homeroom_course1 = course_factory(active_course: true, account: @account)
+      @homeroom_course1.homeroom_course = true
+      @homeroom_course1.save!
+
+      @homeroom_course2 = course_factory(active_course: true, account: @account)
+      @homeroom_course2.homeroom_course = true
+      @homeroom_course2.save!
+
+      @teacher = user_factory(active_all: true)
+      @homeroom_course1.enroll_teacher(@teacher, enrollment_state: "active")
+      @homeroom_course2.enroll_teacher(@teacher, enrollment_state: "active")
+
+      @course_1 = course_factory(active_course: true, account: @account)
+      @course_1.sync_enrollments_from_homeroom = true
+      @course_1.homeroom_course_id = @homeroom_course1.id
+      @course_1.save!
+
+      @course_2 = course_factory(active_course: true, account: @account)
+      @course_2.sync_enrollments_from_homeroom = true
+      @course_2.homeroom_course_id = @homeroom_course2.id
+      @course_2.save!
+
+      @course_2.destroy
+    end
+
+    it "does not raise an error when processing courses with deleted linked courses" do
+      expect { Course.sync_with_homeroom }.not_to raise_error
+    end
+
+    it "syncs enrollments from homeroom to the active regular course" do
+      Course.sync_with_homeroom
+      @course_1.reload
+
+      homeroom_teacher_ids = @homeroom_course1.teacher_enrollments.map(&:user_id)
+      regular_teacher_ids = @course_1.teacher_enrollments.map(&:user_id)
+
+      expect(regular_teacher_ids).to match_array(homeroom_teacher_ids)
+    end
+
+    it "does not process the deleted regular course" do
+      Course.sync_with_homeroom
+      @course_2.reload
+
+      expect(@course_2.teacher_enrollments).to be_empty
+    end
+  end
+
+  describe ".syncing_subjects" do
+    before :once do
+      @account = Account.default
+      toggle_k5_setting(@account, true)
+
+      @homeroom_course1 = course_factory(active_course: true, account: @account)
+      @homeroom_course1.homeroom_course = true
+      @homeroom_course1.save!
+
+      @homeroom_course2 = course_factory(active_course: true, account: @account)
+      @homeroom_course2.homeroom_course = true
+      @homeroom_course2.save!
+
+      @course_1 = course_factory(active_course: true, account: @account)
+      @course_1.sync_enrollments_from_homeroom = true
+      @course_1.homeroom_course_id = @homeroom_course1.id
+      @course_1.save!
+
+      @course_2 = course_factory(active_course: true, account: @account)
+      @course_2.sync_enrollments_from_homeroom = true
+      @course_2.homeroom_course_id = @homeroom_course2.id
+      @course_2.save!
+
+      @course_2.destroy
+    end
+
+    it "returns only non-deleted regular courses linked to homerooms" do
+      syncing_courses = Course.syncing_subjects
+
+      expect(syncing_courses).to include(@course_1)
+      expect(syncing_courses).not_to include(@course_2)
+    end
+
+    it "excludes courses with deleted homerooms" do
+      @homeroom_course1.destroy
+
+      syncing_courses = Course.syncing_subjects
+
+      expect(syncing_courses).not_to include(@course_1)
+    end
+
+    it "excludes courses with sis_batch_id" do
+      batch = @account.sis_batches.create!
+      @course_1.sis_batch_id = batch.id
+      @course_1.save!
+
+      syncing_courses = Course.syncing_subjects
+
+      expect(syncing_courses).not_to include(@course_1)
+    end
+
+    it "excludes courses not syncing from homeroom" do
+      @course_1.sync_enrollments_from_homeroom = false
+      @course_1.save!
+
+      syncing_courses = Course.syncing_subjects
+
+      expect(syncing_courses).not_to include(@course_1)
+    end
+  end
+
   describe "#user_is_instructor?" do
     before :once do
       @course = Course.create
