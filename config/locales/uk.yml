@@ -16003,6 +16003,7 @@ uk:
   select_one_of_the_options_c8b0c6e4: "Виберіть один із варіантів:"
   select_prerequisite_module_57894963: "Виберіть необхідний модуль"
   select_prerequite_module_e9042bb0: "Виберіть необхідний модуль"
+  select_profile_picture_172176b6: "Виберіть фото профілю"
   select_question_bank_508e5c08: "Вибрати банк запитань"
   select_specific_content_5382e7ea: "Виберіть конкретний вміст"
   select_student_name_caaff244: "Вибрати студента %{name}"
