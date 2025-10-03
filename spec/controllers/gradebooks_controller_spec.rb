@@ -3276,6 +3276,13 @@ describe GradebooksController do
         expect(assigns[:js_env].fetch(:MANAGE_GRADES)).to be true
       end
 
+      it "includes VIEW_ALL_GRADES in js_env for platform speedgrader" do
+        Account.site_admin.enable_feature!(:platform_service_speedgrader)
+        @assignment.publish
+        get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+        expect(assigns[:js_env].fetch(:VIEW_ALL_GRADES)).to be true
+      end
+
       it "sets MANAGE_GRADES to false for users without manage_grades permission" do
         @assignment.publish
         Account.site_admin.enable_feature!(:platform_service_speedgrader)
@@ -3290,6 +3297,22 @@ describe GradebooksController do
         user_session(ta)
         get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
         expect(assigns[:js_env].fetch(:MANAGE_GRADES)).to be false
+      end
+
+      it "sets VIEW_ALL_GRADES to false for users without view_all_grades permission" do
+        Account.site_admin.enable_feature!(:platform_service_speedgrader)
+        @assignment.publish
+
+        # Create a user with only manage_grades permission
+        ta = User.create!
+        @course.enroll_ta(ta)
+        role = ta.enrollments.first.role
+        @course.root_account.role_overrides.create!(permission: :view_all_grades, enabled: false, role:)
+        @course.root_account.role_overrides.create!(permission: :manage_grades, enabled: true, role:)
+
+        user_session(ta)
+        get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+        expect(assigns[:js_env].fetch(:VIEW_ALL_GRADES)).to be false
       end
     end
 
