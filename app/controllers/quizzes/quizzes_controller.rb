@@ -130,7 +130,7 @@ class Quizzes::QuizzesController < ApplicationController
       due_date_required_for_account = AssignmentUtil.due_date_required_for_account?(@context)
       max_name_length_required_for_account = AssignmentUtil.name_length_required_for_account?(@context)
       sis_integration_settings_enabled = AssignmentUtil.sis_integration_settings_enabled?(@context)
-      assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+      assign_to_tags = @context.account.allow_assign_to_differentiation_tags?
 
       hash = {
         QUIZZES: {
@@ -280,7 +280,7 @@ class Quizzes::QuizzesController < ApplicationController
       setup_attachments
       submission_counts if @quiz.grants_right?(@current_user, session, :grade) || @quiz.grants_right?(@current_user, session, :read_statistics)
 
-      assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+      assign_to_tags = @context.account.allow_assign_to_differentiation_tags?
 
       @stored_params = @submission.temporary_data if params[:take] && @submission && (@submission.untaken? || @submission.preview?)
       @stored_params ||= {}
@@ -379,7 +379,7 @@ class Quizzes::QuizzesController < ApplicationController
       max_name_length_required_for_account = AssignmentUtil.name_length_required_for_account?(@context)
       max_name_length = AssignmentUtil.assignment_max_name_length(@context)
 
-      assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+      assign_to_tags = @context.account.allow_assign_to_differentiation_tags?
 
       hash = {
         ASSIGNMENT_ID: @assignment.present? ? @assignment.id : nil,

@@ -3130,17 +3130,17 @@ describe Account do
   describe "allow_assign_to_differentiation_tags?" do
     before :once do
       @account = Account.default
-      Account.site_admin.enable_feature!(:assign_to_differentiation_tags)
       @account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @account.save!
     end
 
-    it "returns true if the setting is enabled and the observer_appointment_groups flag is enabled" do
+    it "returns true if the setting is enabled" do
       expect(@account.allow_assign_to_differentiation_tags?).to be true
     end
 
-    it "returns false if the observer_appointment_groups flag is disabled" do
-      Account.site_admin.disable_feature!(:assign_to_differentiation_tags)
+    it "returns false if the setting is disabled" do
+      @account.settings[:allow_assign_to_differentiation_tags] = { value: false }
+      @account.save!
       expect(@account.allow_assign_to_differentiation_tags?).to be false
     end
   end

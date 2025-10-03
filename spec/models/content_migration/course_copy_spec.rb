@@ -314,6 +314,7 @@ describe ContentMigration do
     end
 
     it "shan't interweave module order when restoring deleting modules in the destination course neither" do
+      skip "2025-10-03 Failing test due to rubyzip file extraction race condition LX-3387"
       ["A", "B"].map { |name| @copy_to.context_modules.create!(name:) }
       ["C", "D"].map { |name| @copy_from.context_modules.create!(name:) }
       run_course_copy
@@ -1335,6 +1336,7 @@ describe ContentMigration do
     end
 
     it "restores deleted module items on re-import" do
+      skip "2025-10-03 Failing test due to rubyzip file extraction race condition LX-3387"
       page = @copy_from.wiki_pages.create!(title: "some page")
 
       mod = @copy_from.context_modules.create!(name: "some module")

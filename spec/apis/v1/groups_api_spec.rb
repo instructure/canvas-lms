@@ -1047,7 +1047,6 @@ describe "Groups API", type: :request do
 
     it "bulks add users to non collaborative groups" do
       course_with_teacher(active_all: true)
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -1063,9 +1062,8 @@ describe "Groups API", type: :request do
       expect(user2.differentiation_tag_memberships.pluck(:group_id)).to include @group.id
     end
 
-    it "calls SLM when assignmnets are assigned to the non-collaborative group" do
+    it "calls SLM when assignments are assigned to the non-collaborative group" do
       course_with_teacher(active_all: true)
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -1094,7 +1092,6 @@ describe "Groups API", type: :request do
     describe "POST /api/v1/groups/:group_id/memberships (Differentiation Tag Membership)" do
       before do
         course_with_teacher(active_all: true)
-        @course.account.enable_feature! :assign_to_differentiation_tags
         @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
         @course.account.save!
         @course.account.reload

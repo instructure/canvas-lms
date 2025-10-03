@@ -455,7 +455,7 @@ class DiscussionTopicsController < ApplicationController
                               nil
                             end
 
-        assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+        assign_to_tags = @context.account.allow_assign_to_differentiation_tags?
 
         hash = {
           USER_SETTINGS_URL: api_v1_user_settings_url(@current_user),
@@ -637,7 +637,7 @@ class DiscussionTopicsController < ApplicationController
       hash[:ATTRIBUTES][:assignment][:has_student_submissions] = @topic.assignment.has_student_submissions?
     end
 
-    assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+    assign_to_tags = @context.account.allow_assign_to_differentiation_tags?
 
     js_hash = {
       ASSIGNMENT_ID: @topic.assignment_id,
@@ -883,7 +883,7 @@ class DiscussionTopicsController < ApplicationController
       edit_url = context_url(@topic.context, :edit_context_discussion_topic_url, @topic)
       edit_url += "?embed=true" if params[:embed] == "true"
 
-      assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+      assign_to_tags = @context.account.allow_assign_to_differentiation_tags?
       participant = @topic.participant(@current_user)
       translation_flags = Translation.get_translation_flags(@context.feature_enabled?(:translation), @domain_root_account)
       js_env({

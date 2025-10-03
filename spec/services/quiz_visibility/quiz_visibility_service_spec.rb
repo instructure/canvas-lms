@@ -86,8 +86,7 @@ describe "differentiated_assignments" do
     non_collaborative_group.add_user(@user)
   end
 
-  def configure_differentiation_tags(setting_enabled: true, feature_flag_enabled: true)
-    feature_flag_enabled ? @course.account.enable_feature!(:assign_to_differentiation_tags) : @course.account.disable_feature!(:assign_to_differentiation_tags)
+  def configure_differentiation_tags(setting_enabled: true)
     @course.account.settings[:allow_assign_to_differentiation_tags] = { value: setting_enabled }
     @course.account.save!
   end
@@ -299,30 +298,6 @@ describe "differentiated_assignments" do
         ensure_user_does_not_see_quiz
       end
 
-      it "applies existing non collaborative group overrides when account setting is disabled" do
-        create_diff_tags_category_with_groups
-        diff_tag_group_1 = @diff_tag_category.groups[0]
-        user_in_non_collaborative_group(diff_tag_group_1)
-
-        @quiz.assignment_overrides.create!(set: diff_tag_group_1)
-        ensure_user_sees_quiz
-
-        configure_differentiation_tags(setting_enabled: false, feature_flag_enabled: true)
-        ensure_user_sees_quiz
-      end
-
-      it "does not apply non collaborative group overrides when feature flag is disabled" do
-        create_diff_tags_category_with_groups
-        diff_tag_group_1 = @diff_tag_category.groups[0]
-        user_in_non_collaborative_group(diff_tag_group_1)
-
-        @quiz.assignment_overrides.create!(set: diff_tag_group_1)
-        ensure_user_sees_quiz
-
-        configure_differentiation_tags(setting_enabled: false, feature_flag_enabled: false)
-        ensure_user_does_not_see_quiz
-      end
-
       it "does not include quiz if course_ids is not present" do
         create_diff_tags_category_with_groups
         diff_tag_group_1 = @diff_tag_category.groups[0]
@@ -431,36 +406,6 @@ describe "differentiated_assignments" do
           @quiz.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
 
           module1.assignment_overrides.create!(set_type: "Group", set_id: diff_tag_group_no_users.id)
-          ensure_user_does_not_see_quiz
-        end
-
-        it "applies existing context module non collaborative group overrides when account setting is disabled" do
-          create_diff_tags_category_with_groups
-          diff_tag_group_1 = @diff_tag_category.groups[0]
-          user_in_non_collaborative_group(diff_tag_group_1)
-
-          module1 = @course.context_modules.create!(name: "Module 1")
-          @quiz.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
-
-          module1.assignment_overrides.create!(set_type: "Group", set_id: diff_tag_group_1.id)
-          ensure_user_sees_quiz
-
-          configure_differentiation_tags(setting_enabled: false, feature_flag_enabled: true)
-          ensure_user_sees_quiz
-        end
-
-        it "does not apply context module non collaborative group overrides when feature flag is disabled" do
-          create_diff_tags_category_with_groups
-          diff_tag_group_1 = @diff_tag_category.groups[0]
-          user_in_non_collaborative_group(diff_tag_group_1)
-
-          module1 = @course.context_modules.create!(name: "Module 1")
-          @quiz.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
-
-          module1.assignment_overrides.create!(set_type: "Group", set_id: diff_tag_group_1.id)
-          ensure_user_sees_quiz
-
-          configure_differentiation_tags(setting_enabled: false, feature_flag_enabled: false)
           ensure_user_does_not_see_quiz
         end
 

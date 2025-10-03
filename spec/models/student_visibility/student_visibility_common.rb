@@ -72,7 +72,6 @@ module StudentVisibilityCommon
 
       context "non-collaborative group" do
         before do
-          @course.account.enable_feature!(:assign_to_differentiation_tags)
           @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
           @course.account.save!
 
@@ -92,15 +91,6 @@ module StudentVisibilityCommon
           expect(ids_visible_to_user(@student1, learning_object_type)).to contain_exactly(learning_object1.id, learning_object2.id)
           expect(ids_visible_to_user(@student2, learning_object_type)).to contain_exactly(learning_object2.id)
           expect(ids_visible_to_user(@student3, learning_object_type)).to contain_exactly(learning_object1.id, learning_object2.id)
-        end
-
-        it "does not include object with a non collaborative group if feature flag is disabled" do
-          @differentiation_tag_group_1.add_user(@student1)
-          learning_object1.assignment_overrides.create!(set: @differentiation_tag_group_1)
-          @course.account.disable_feature!(:assign_to_differentiation_tags)
-          expect(ids_visible_to_user(@student1, learning_object_type)).to contain_exactly(learning_object2.id)
-          expect(ids_visible_to_user(@student2, learning_object_type)).to contain_exactly(learning_object2.id)
-          expect(ids_visible_to_user(@student3, learning_object_type)).to contain_exactly(learning_object2.id)
         end
 
         it "does include object with non collaborative group if course_ids is not present" do
@@ -203,7 +193,6 @@ module StudentVisibilityCommon
 
       context "non-collaborative group" do
         before do
-          @course.account.enable_feature!(:assign_to_differentiation_tags)
           @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
           @course.account.save!
 
@@ -223,15 +212,6 @@ module StudentVisibilityCommon
           @module1.assignment_overrides.create!(set: @differentiation_tag_group_1)
           expect(ids_visible_to_user(@student3, learning_object_type)).to contain_exactly(learning_object1.id, learning_object2.id)
           expect(ids_visible_to_user(@student1, learning_object_type)).to contain_exactly(learning_object2.id)
-        end
-
-        it "does not include module with a non collaborative group if feature flag is disabled" do
-          @differentiation_tag_group_1.add_user(@student1)
-          @module1.assignment_overrides.create!(set: @differentiation_tag_group_1)
-          @course.account.disable_feature!(:assign_to_differentiation_tags)
-          expect(ids_visible_to_user(@student1, learning_object_type)).to contain_exactly(learning_object2.id)
-          expect(ids_visible_to_user(@student2, learning_object_type)).to contain_exactly(learning_object2.id)
-          expect(ids_visible_to_user(@student3, learning_object_type)).to contain_exactly(learning_object2.id)
         end
 
         it "does include module with a non collaborative group if account setting is disabled" do

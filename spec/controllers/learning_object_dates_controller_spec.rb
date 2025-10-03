@@ -756,7 +756,6 @@ describe LearningObjectDatesController do
 
     context "with non-collaborative groups overrides" do
       before do
-        @course.account.enable_feature!(:assign_to_differentiation_tags)
         @course.account.settings = { allow_assign_to_differentiation_tags: { value: true } }
         @course.account.save
 
@@ -1058,7 +1057,6 @@ describe LearningObjectDatesController do
       end
 
       it "allows removing differentiation tag overrides when account setting is disabled" do
-        @course.account.enable_feature!(:assign_to_differentiation_tags)
         @course.account.settings = { allow_assign_to_differentiation_tags: { value: true } }
         @course.account.save
 
@@ -1169,7 +1167,6 @@ describe LearningObjectDatesController do
 
       context "with non-collaborative groups overrides" do
         before do
-          @course.account.enable_feature!(:assign_to_differentiation_tags)
           @course.account.settings = { allow_assign_to_differentiation_tags: { value: true } }
           @course.account.save
 

@@ -68,7 +68,6 @@ describe GroupCategoriesController do
     end
 
     it "allows teachers to create both types of group categories by default" do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -98,7 +97,6 @@ describe GroupCategoriesController do
     end
 
     it "prevents creating non-collaborative groups when manage_tags_add permission is revoked" do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -236,7 +234,6 @@ describe GroupCategoriesController do
 
     context "differentiation_tags" do
       before do
-        @course.account.enable_feature! :assign_to_differentiation_tags
         @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
         @course.account.save!
         @course.account.reload
@@ -268,7 +265,6 @@ describe GroupCategoriesController do
     end
 
     it "allows teachers to update both types of group categories by default" do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -295,7 +291,6 @@ describe GroupCategoriesController do
     end
 
     it "prevents updating non-collaborative groups when manage_tags_manage permission is revoked" do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -416,7 +411,6 @@ describe GroupCategoriesController do
 
   describe "POST bulk_manage_differentiation_tag" do
     before :once do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -758,7 +752,6 @@ describe GroupCategoriesController do
     end
 
     it "allows teachers to delete both types of group categories by default" do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -783,7 +776,6 @@ describe GroupCategoriesController do
     end
 
     it "prevents deleting non-collaborative groups when manage_tags_delete permission is revoked" do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -852,7 +844,6 @@ describe GroupCategoriesController do
     end
 
     it "allows teachers to view users in both types of group categories by default" do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -875,7 +866,6 @@ describe GroupCategoriesController do
     end
 
     it "prevents viewing non-collaborative group users when manage_tags_manage permission is revoked" do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -940,7 +930,6 @@ describe GroupCategoriesController do
     end
 
     it "allows teachers to import to both types of group categories by default" do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -964,7 +953,6 @@ describe GroupCategoriesController do
     end
 
     it "prevents importing to non-collaborative groups when manage_tags_add permission is revoked" do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -1051,7 +1039,6 @@ describe GroupCategoriesController do
 
   describe "POST import_tags" do
     before :once do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -1131,18 +1118,6 @@ describe GroupCategoriesController do
       expect_imported_tags
     end
 
-    it "fails if the feature flag is disabled" do
-      @course.account.disable_feature! :assign_to_differentiation_tags
-      user_session(@teacher)
-
-      post "import_tags", params: {
-        course_id: @course.id,
-        attachment: fixture_file_upload("group_categories/test_tag_import.csv", "text/csv")
-      }
-
-      assert_unauthorized
-    end
-
     it "fails if the account settings is disabled" do
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: false }
       @course.account.save!
@@ -1199,7 +1174,6 @@ describe GroupCategoriesController do
 
   context "Differentiation Tags" do
     before do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -1343,61 +1317,6 @@ describe GroupCategoriesController do
           response.parsed_body
 
           expect(response).to be_forbidden
-        end
-      end
-
-      context "with differentiation tags disabled with existing hidden groups" do
-        before do
-          @course.account.disable_feature! :assign_to_differentiation_tags
-          @course.account.settings[:allow_assign_to_differentiation_tags] = { value: false }
-          @course.account.save!
-          @course.account.reload
-        end
-
-        it "prevents teachers from creating non_collaborative groups if differentiation_tags is disabled" do
-          @course.account.role_overrides.create!({
-                                                   role: teacher_role,
-                                                   permission: :manage_tags_add,
-                                                   enabled: true
-                                                 })
-          user_session(@teacher)
-
-          post "create", params: { course_id: @course.id, category: { name: "Hidden GC", non_collaborative: true } }
-
-          expect(response).to be_unauthorized
-        end
-
-        it "does not allow viewing non-collaborative group category" do
-          user_session(@teacher)
-          get "users", params: {
-            course_id: @course.id,
-            group_category_id: @non_collaborative_category.id
-          }
-          assert_unauthorized
-        end
-
-        it "does not allow adding non-collaborative group category" do
-          user_session(@teacher)
-          post "create", params: {
-            course_id: @course.id,
-            category: {
-              name: "New Non-Collaborative Group",
-              non_collaborative: "1"
-            }
-          }
-          assert_unauthorized
-        end
-
-        it "does not allow updating non-collaborative group category" do
-          user_session(@teacher)
-          put "update", params: { course_id: @course.id, id: @non_collaborative_category.id, category: { name: "Updated Non-Collaborative Group" } }
-          assert_unauthorized
-        end
-
-        it "does not allow deleting non-collaborative group category" do
-          user_session(@teacher)
-          delete "destroy", params: { course_id: @course.id, id: @non_collaborative_category.id }
-          assert_unauthorized
         end
       end
     end

@@ -331,7 +331,6 @@ module UserSearch
 
       return users_scope unless differentiation_tag_ids&.any? &&
                                 context.is_a?(Course) &&
-                                context.account.feature_enabled?(:assign_to_differentiation_tags) &&
                                 context.account.allow_assign_to_differentiation_tags? &&
                                 context.grants_any_right?(searcher, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
 
