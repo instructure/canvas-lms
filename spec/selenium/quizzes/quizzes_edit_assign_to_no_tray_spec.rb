@@ -112,9 +112,8 @@ describe "quiz edit page assign to" do
     expect(selected_assignee_options.count).to be(1)
   end
 
-  context "assign to differentiaiton tags" do
+  context "assign to differentiation tags" do
     before :once do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.tap do |a|
         a.settings[:allow_assign_to_differentiation_tags] = { value: true }
         a.save!

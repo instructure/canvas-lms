@@ -27,7 +27,6 @@ describe "User Tagged Modal" do
     course_with_teacher(active_all: true)
     @student = student_in_course(active_all: true, name: "Test Student").user
 
-    Account.default.enable_feature!(:assign_to_differentiation_tags)
     @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
     @course.account.save!
 

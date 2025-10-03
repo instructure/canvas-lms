@@ -471,7 +471,6 @@ describe "root account basic settings" do
 
       describe "allow_assign_to_differentiation_tags originally enabled" do
         before do
-          account.enable_feature!(:assign_to_differentiation_tags)
           account.settings[:allow_assign_to_differentiation_tags] = true
           account.save!
           get account_settings_url

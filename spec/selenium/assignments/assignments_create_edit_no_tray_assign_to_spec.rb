@@ -103,9 +103,8 @@ shared_examples_for "item assign to on page during assignment creation/update" d
     check_element_has_focus(assign_to_card_delete_button[1])
   end
 
-  context "differentiaiton tags" do
+  context "differentiation tags" do
     before :once do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.tap do |a|
         a.settings[:allow_assign_to_differentiation_tags] = { value: true }
         a.save!
