@@ -628,10 +628,10 @@ pipeline {
 
                       callableWithDelegate(lintersStage.bundleStage(nestedStages, buildConfig))()
                       callableWithDelegate(lintersStage.gergichLintersStage(nestedStages))()
-                      callableWithDelegate(lintersStage.miscJsChecksStage(nestedStages))()
-                      callableWithDelegate(lintersStage.eslintStage(nestedStages))()
+                      callableWithDelegate(lintersStage.miscJsChecksStage(nestedStages, buildConfig))()
+                      callableWithDelegate(lintersStage.eslintStage(nestedStages, buildConfig))()
                       callableWithDelegate(lintersStage.biomeStage(nestedStages, buildConfig))()
-                      callableWithDelegate(lintersStage.typescriptStage(nestedStages))()
+                      callableWithDelegate(lintersStage.typescriptStage(nestedStages, buildConfig))()
                       callableWithDelegate(lintersStage.masterBouncerStage(nestedStages))()
                       callableWithDelegate(lintersStage.yarnStage(nestedStages, buildConfig))()
                       callableWithDelegate(lintersStage.graphqlSchemaStage(nestedStages, buildConfig))()
