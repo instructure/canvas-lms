@@ -407,7 +407,6 @@ describe AssignmentsController do
 
     context "assign to differentiation tags" do
       before :once do
-        @course.account.enable_feature! :assign_to_differentiation_tags
         @course.account.tap do |a|
           a.settings[:allow_assign_to_differentiation_tags] = { value: true }
           a.save!
@@ -1676,7 +1675,6 @@ describe AssignmentsController do
 
           context "differentiation tags" do
             before do
-              Account.default.enable_feature! :assign_to_differentiation_tags
               Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
               Account.default.save!
               Account.default.reload
@@ -2038,7 +2036,6 @@ describe AssignmentsController do
 
     context "assign to differentiation tags" do
       before :once do
-        @course.account.enable_feature! :assign_to_differentiation_tags
         @course.account.tap do |a|
           a.settings[:allow_assign_to_differentiation_tags] = { value: true }
           a.save!
@@ -3168,10 +3165,6 @@ describe AssignmentsController do
     end
 
     context "assign to differentiation tags" do
-      before :once do
-        @course.account.enable_feature! :assign_to_differentiation_tags
-      end
-
       it "is true if account setting is on" do
         @course.account.tap do |a|
           a.settings[:allow_assign_to_differentiation_tags] = { value: true }

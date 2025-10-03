@@ -516,7 +516,6 @@ class ApplicationController < ActionController::Base
   ].freeze
   JS_ENV_ROOT_ACCOUNT_SERVICES = %i[account_survey_notifications].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = %i[
-    assign_to_differentiation_tags
     discussion_checkpoints
     embedded_release_notes
   ].freeze

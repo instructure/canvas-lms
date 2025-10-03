@@ -2531,7 +2531,6 @@ describe Assignment do
       include GroupsCommon
 
       before do
-        @course.account.enable_feature!(:assign_to_differentiation_tags)
         @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
         @course.account.save!
         @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
