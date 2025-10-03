@@ -27,11 +27,9 @@ describe SIS::CSV::DifferentiationTagSetImporter do
       "A002,,No Diff Tags,active"
     )
     @tags_account = Account.find_by(sis_source_id: "A001")
-    @tags_account.enable_feature!(:assign_to_differentiation_tags)
     @tags_account.settings[:allow_assign_to_differentiation_tags] = { value: true }
     @tags_account.save!
     @no_tags_account = Account.find_by(sis_source_id: "A002")
-    @no_tags_account.disable_feature!(:assign_to_differentiation_tags)
     @no_tags_account.settings[:allow_assign_to_differentiation_tags] = { value: false }
     @no_tags_account.save!
     process_csv_data_cleanly(
