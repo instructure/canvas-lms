@@ -78,6 +78,7 @@ ready(() => {
         permissions: {
           canViewAuditTrail: window.ENV.can_view_audit_trail ?? false,
           canManageGrades: window.ENV.MANAGE_GRADES ?? false,
+          canViewAllGrades: window.ENV.VIEW_ALL_GRADES ?? false,
         },
         gradebookGroupFilterId: window.ENV.gradebook_group_filter_id ?? null,
         gradebookSectionFilters: window.ENV.gradebook_section_filter_id ?? null,
