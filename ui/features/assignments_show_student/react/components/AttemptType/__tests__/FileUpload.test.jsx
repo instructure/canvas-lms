@@ -658,10 +658,7 @@ describe('FileUpload', () => {
     expect(uploadRender).toContainElement(container.querySelector('svg[name="IconComplete"]'))
   })
 
-  // Fails at InstUI 10 for an unknown reason (possibly asynchronous rendering, possibly
-  // some DOM issue with InstUI 10's ProgressBar component). Seems low risk
-  // FOO-5276 is the JIRA ticket for this issue
-  it.skip('FOO-5276 skipped: renders a loading indicator for each file in the process of uploading', async () => {
+  it('renders a loading indicator for each file in the process of uploading', async () => {
     const mocks = await createGraphqlMocks()
     const props = await makeProps()
     props.filesToUpload = [
@@ -678,21 +675,15 @@ describe('FileUpload', () => {
     const progressBars = getAllByRole('progressbar')
     expect(progressBars).toHaveLength(2)
 
-    expect(progressBars[0]).toHaveAttribute('aria-valuenow', '10')
-    expect(progressBars[0]).toHaveAttribute('aria-valuemax', '100')
+    expect(progressBars[0].value).toBe(10)
+    expect(progressBars[0].max).toBe(100)
     expect(progressBars[0]).toHaveAttribute('aria-valuetext', '10 percent')
-    expect(progressBars[0]).toHaveAttribute(
-      'aria-label',
-      'Upload progress for file1.pdf 10 percent',
-    )
+    expect(progressBars[0]).toHaveAttribute('aria-label', 'Upload progress for file1.pdf')
 
-    expect(progressBars[1]).toHaveAttribute('aria-valuenow', '50')
-    expect(progressBars[1]).toHaveAttribute('aria-valuemax', '250')
+    expect(progressBars[1].value).toBe(50)
+    expect(progressBars[1].max).toBe(250)
     expect(progressBars[1]).toHaveAttribute('aria-valuetext', '20 percent')
-    expect(progressBars[1]).toHaveAttribute(
-      'aria-label',
-      'Upload progress for file2.pdf 20 percent',
-    )
+    expect(progressBars[1]).toHaveAttribute('aria-label', 'Upload progress for file2.pdf')
   })
 
   describe('webcam photo upload', () => {
