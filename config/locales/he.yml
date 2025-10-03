@@ -17705,6 +17705,7 @@ he:
   select_one_of_the_options_c8b0c6e4: "בחירת אחת האפשרויות:"
   select_prerequisite_module_57894963: "בחירת מודול המהווה דרישה מוקדמת"
   select_prerequite_module_e9042bb0: "בחירת מודול המהווה דרישה מוקדמת"
+  select_profile_picture_172176b6: "בחירת תמונת פרופיל"
   select_question_bank_508e5c08: "בחירת בנק שאלות"
   select_specific_content_5382e7ea: "בחירת תוכן ספציפי"
   select_student_name_caaff244: "בחירת התלמיד %{name}"
