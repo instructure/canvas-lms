@@ -55,21 +55,21 @@ test('does not show cancel button when tray is closed', () => {
 test('shows submit button when tray is open', () => {
   const props = defaultProps()
   props.defaultOpen = true
-  const {getByRole} = renderWithProvider(<AddExternalFeed {...props} />)
-  expect(getByRole('button', {name: /add feed/i})).toBeInTheDocument()
+  const {getByTestId} = renderWithProvider(<AddExternalFeed {...props} />)
+  expect(getByTestId('add-external-feed-button')).toBeInTheDocument()
 })
 
 test('closes the tray when cancel button is clicked', async () => {
   const user = userEvent.setup()
   const props = defaultProps()
   props.defaultOpen = true
-  const {getByRole, queryByRole} = renderWithProvider(<AddExternalFeed {...props} />)
+  const {getByTestId, queryByTestId} = renderWithProvider(<AddExternalFeed {...props} />)
 
-  const cancelButton = getByRole('button', {name: /cancel/i})
+  const cancelButton = getByTestId('cancel-external-feed-button')
   await user.click(cancelButton)
 
   // Check that the Add Feed button is no longer visible (tray is closed)
-  expect(queryByRole('button', {name: /add feed/i})).not.toBeInTheDocument()
+  expect(queryByTestId('add-external-feed-button')).not.toBeInTheDocument()
 })
 
 test('submits feed with correct data when form is filled and submitted', async () => {
@@ -79,7 +79,7 @@ test('submits feed with correct data when form is filled and submitted', async (
   props.defaultOpen = true
   props.addExternalFeed = addFeedSpy
 
-  const {getByRole, getByLabelText, getByPlaceholderText} = renderWithProvider(
+  const {getByTestId, getByLabelText, getByPlaceholderText} = renderWithProvider(
     <AddExternalFeed {...props} />,
   )
 
@@ -100,7 +100,7 @@ test('submits feed with correct data when form is filled and submitted', async (
   await user.click(fullArticleRadio)
 
   // Submit the form
-  const addButton = getByRole('button', {name: /add feed/i})
+  const addButton = getByTestId('add-external-feed-button')
   await user.click(addButton)
 
   expect(addFeedSpy).toHaveBeenCalledWith({
@@ -114,11 +114,11 @@ test('enables submit button when required fields are filled', async () => {
   const user = userEvent.setup()
   const props = defaultProps()
   props.defaultOpen = true
-  const {getByRole, getByLabelText, getByPlaceholderText} = renderWithProvider(
+  const {getByTestId, getByLabelText, getByPlaceholderText} = renderWithProvider(
     <AddExternalFeed {...props} />,
   )
 
-  const addButton = getByRole('button', {name: /add feed/i})
+  const addButton = getByTestId('add-external-feed-button')
   expect(addButton).toBeDisabled()
 
   // Fill out the required URL field
@@ -143,9 +143,9 @@ test('enables submit button when required fields are filled', async () => {
 test('keeps submit button disabled when URL is missing', async () => {
   const props = defaultProps()
   props.defaultOpen = true
-  const {getByRole} = renderWithProvider(<AddExternalFeed {...props} />)
+  const {getByTestId} = renderWithProvider(<AddExternalFeed {...props} />)
 
-  const addButton = getByRole('button', {name: /add feed/i})
+  const addButton = getByTestId('add-external-feed-button')
   expect(addButton).toBeDisabled()
 })
 
@@ -153,7 +153,7 @@ test('keeps submit button disabled when phrase is required but missing', async (
   const user = userEvent.setup()
   const props = defaultProps()
   props.defaultOpen = true
-  const {getByRole, getByLabelText, getByPlaceholderText} = renderWithProvider(
+  const {getByTestId, getByLabelText, getByPlaceholderText} = renderWithProvider(
     <AddExternalFeed {...props} />,
   )
 
@@ -165,6 +165,6 @@ test('keeps submit button disabled when phrase is required but missing', async (
   const phraseCheckbox = getByLabelText(/only add posts with a specific phrase/i)
   await user.click(phraseCheckbox)
 
-  const addButton = getByRole('button', {name: /add feed/i})
+  const addButton = getByTestId('add-external-feed-button')
   expect(addButton).toBeDisabled()
 })

@@ -76,6 +76,7 @@ export default class FindAppointment extends React.Component {
             onClick={() => this.endAppointmentMode()}
             id="FindAppointmentButton"
             className="Button"
+            data-testid="find-appointment-close-button"
           >
             {I18n.t('Close')}
           </button>
@@ -85,6 +86,7 @@ export default class FindAppointment extends React.Component {
             onClick={() => this.openModal()}
             id="FindAppointmentButton"
             className="Button"
+            data-testid="find-appointment-button"
           >
             {I18n.t('Find Appointment')}
           </button>

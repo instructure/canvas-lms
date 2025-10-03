@@ -96,6 +96,7 @@ export const SearchField: React.FC<Props> = ({
       onChange={handleSearch}
       name={name}
       id={id}
+      data-testid={id}
     />
   )
 }

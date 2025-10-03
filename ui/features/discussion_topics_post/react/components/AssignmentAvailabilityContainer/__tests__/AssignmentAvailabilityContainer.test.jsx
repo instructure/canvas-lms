@@ -191,7 +191,7 @@ describe('AssignmentAvailabilityContainer', () => {
   })
   describe('in a paced course', () => {
     it('always uses the multiple due dates UI even with 1 due dat', async () => {
-      const {findByTestId, getByRole} = render(
+      const {findByTestId, getByTestId} = render(
         <AssignmentAvailabilityContainer
           assignment={Assignment.mock({assignmentOverrides: {nodes: []}})}
           isAdmin={true}
@@ -200,17 +200,17 @@ describe('AssignmentAvailabilityContainer', () => {
         />,
       )
       act(() => {
-        getByRole('button', {name: 'View Due Dates'}).click()
+        getByTestId('show-due-dates-button').click()
       })
 
       expect(await findByTestId('CoursePacingNotice')).toBeInTheDocument()
-      const pacingLink = getByRole('link', {name: 'Course Pacing'})
+      const pacingLink = getByTestId('course-pacing-link')
       expect(pacingLink).toBeInTheDocument()
       expect(pacingLink.href).toMatch(/\/courses\/17\/course_pacing/)
     })
 
     it('shows the course pacing notice', async () => {
-      const {findByTestId, getByRole} = render(
+      const {findByTestId, getByTestId} = render(
         <AssignmentAvailabilityContainer
           assignment={Assignment.mock({assignmentOverrides: {nodes: mockOverrides}})}
           isAdmin={true}
@@ -219,11 +219,11 @@ describe('AssignmentAvailabilityContainer', () => {
         />,
       )
       act(() => {
-        getByRole('button', {name: 'View Due Dates'}).click()
+        getByTestId('show-due-dates-button').click()
       })
 
       expect(await findByTestId('CoursePacingNotice')).toBeInTheDocument()
-      const pacingLink = getByRole('link', {name: 'Course Pacing'})
+      const pacingLink = getByTestId('course-pacing-link')
       expect(pacingLink).toBeInTheDocument()
       expect(pacingLink.href).toMatch(/\/courses\/17\/course_pacing/)
     })

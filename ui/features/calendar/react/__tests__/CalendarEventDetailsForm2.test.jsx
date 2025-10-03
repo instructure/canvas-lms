@@ -131,7 +131,7 @@ describe('CalendarEventDetailsForm', () => {
   it('cannot submit with an empty title', () => {
     const event = {...defaultProps.event, title: ''}
     const component = render(<CalendarEventDetailsForm {...defaultProps} event={event} />)
-    expect(component.getByRole('button', {name: 'Submit'})).toBeDisabled()
+    expect(component.getByTestId('edit-calendar-event-submit-button')).toBeDisabled()
     expect(component.queryByText('You must enter a title.')).not.toBeInTheDocument()
   })
 
@@ -139,11 +139,11 @@ describe('CalendarEventDetailsForm', () => {
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
     changeValue(component, 'edit-calendar-event-form-title', 'avocado')
 
-    expect(component.getByRole('button', {name: 'Submit'})).toBeEnabled()
+    expect(component.getByTestId('edit-calendar-event-submit-button')).toBeEnabled()
 
     changeValue(component, 'edit-calendar-event-form-title', '')
 
-    expect(component.getByRole('button', {name: 'Submit'})).toBeDisabled()
+    expect(component.getByTestId('edit-calendar-event-submit-button')).toBeDisabled()
     expect(component.getByText('You must enter a title.')).toBeInTheDocument()
   })
 
@@ -157,7 +157,7 @@ describe('CalendarEventDetailsForm', () => {
 
     const errMessage = component.queryByText('This date is invalid.')
     expect(errMessage).not.toBeInTheDocument()
-    expect(component.getByRole('button', {name: 'Submit'})).toBeEnabled()
+    expect(component.getByTestId('edit-calendar-event-submit-button')).toBeEnabled()
   })
 
   it('does not show error with when choosing another date time format', async () => {
@@ -172,6 +172,6 @@ describe('CalendarEventDetailsForm', () => {
 
     const errMessage = component.queryByText('This date is invalid.')
     expect(errMessage).not.toBeInTheDocument()
-    expect(component.getByRole('button', {name: 'Submit'})).toBeEnabled()
+    expect(component.getByTestId('edit-calendar-event-submit-button')).toBeEnabled()
   })
 })

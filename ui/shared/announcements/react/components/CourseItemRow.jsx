@@ -287,6 +287,7 @@ export default class CourseItemRow extends Component {
                         screenReaderLabel={I18n.t('Manage options for %{name}', {
                           name: this.props.title,
                         })}
+                        data-testid="manage-announcement-options"
                       >
                         <IconMoreLine />
                       </IconButton>

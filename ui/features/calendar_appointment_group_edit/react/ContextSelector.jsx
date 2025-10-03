@@ -280,6 +280,7 @@ class ContextSelector extends React.Component {
             <div key={context.asset_string} className="CourseListItem">
               <div className="CourseListItem-horizontal">
                 <IconButton
+                  data-testid={`expand-course-${context.id}`}
                   screenReaderLabel={
                     expanded
                       ? I18n.t('Collapse %{name}', {name: context.name})
@@ -332,6 +333,7 @@ class ContextSelector extends React.Component {
           ref={c => {
             this.dropdownButton = c
           }}
+          data-testid="select-calendars-button"
           aria-expanded={this.state.showDropdown}
           aria-controls="context-selector-dropdown"
           onClick={this.handleContextSelectorButtonClick}

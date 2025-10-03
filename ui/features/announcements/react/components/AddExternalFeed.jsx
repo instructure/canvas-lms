@@ -188,7 +188,11 @@ export default class AddExternalFeed extends React.Component {
         textAlign="end"
         display="block"
       >
-        <Button onClick={this.clearAddRSS} margin="0 x-small 0 0">
+        <Button
+          onClick={this.clearAddRSS}
+          margin="0 x-small 0 0"
+          data-testid="cancel-external-feed-button"
+        >
           {I18n.t('Cancel')}
         </Button>
         <Button
@@ -198,6 +202,7 @@ export default class AddExternalFeed extends React.Component {
           color="primary"
           onClick={this.addRssSelection}
           margin="0 x-small 0 0"
+          data-testid="add-external-feed-button"
         >
           {I18n.t('Add Feed')}
         </Button>

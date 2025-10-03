@@ -83,7 +83,8 @@ test('renders the RSSFeedList component with 5 rows for 5 feeds', () => {
   feeds.forEach(feed => {
     expect(tree.getByText(feed.display_name)).toBeInTheDocument()
   })
-  expect(tree.getAllByRole('button')).toHaveLength(5)
+  const deleteButtons = tree.getByTestId('rss-feed-list').querySelectorAll('button')
+  expect(deleteButtons).toHaveLength(5)
 })
 
 test('calls getExternalFeeds when feed has not been loaded', () => {
@@ -133,7 +134,7 @@ test('calls deleteExternalFeed with correct feed ID when deleting feed', async (
     hasLoadedFeed: true,
     deleteExternalFeed: mockDeleteExternalFeed,
   })
-  await userEvent.click(tree.getByRole('button', {name: 'Delete felix'}))
+  await userEvent.click(tree.getByTestId('delete-rss-feed-22'))
 
   expect(mockDeleteExternalFeed).toHaveBeenCalledTimes(1)
   expect(mockDeleteExternalFeed).toHaveBeenCalledWith({feedId: '22'})

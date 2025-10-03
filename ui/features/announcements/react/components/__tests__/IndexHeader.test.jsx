@@ -61,12 +61,12 @@ describe('IndexHeader', () => {
 
   it('does not render icon dropdown next to title', () => {
     render(<IndexHeader {...defaultProps()} />)
-    expect(screen.queryByRole('button', {name: 'Announcement Filter'})).not.toBeInTheDocument()
+    expect(screen.queryByTestId('toggle-filter-menu')).not.toBeInTheDocument()
   })
 
   it('renders filter dropdown', () => {
     render(<IndexHeader {...defaultProps()} />)
-    expect(screen.getByRole('combobox', {name: 'Announcement Filter'})).toBeInTheDocument()
+    expect(screen.getByTestId('announcement-filter')).toBeInTheDocument()
   })
 
   it('lets me add an announcement when I have the permission', () => {
@@ -131,20 +131,18 @@ describe('IndexHeader', () => {
 
     it('renders icon dropdown next to title', () => {
       render(<IndexHeader {...defaultProps()} />)
-      expect(screen.getByRole('button', {name: 'Announcement Filter'})).toBeInTheDocument()
+      expect(screen.getByTestId('toggle-filter-menu')).toBeInTheDocument()
     })
 
     it('renders different title when another filter is selected from dropdown', async () => {
       render(<IndexHeader {...defaultProps()} />)
       expect(screen.queryByText('Unread Announcements')).not.toBeInTheDocument()
 
-      const filterButton = screen.getByRole('button', {name: 'Announcement Filter'})
+      const filterButton = screen.getByTestId('toggle-filter-menu')
       await user.click(filterButton)
 
-      const allKeys = screen.getAllByRole('menuitemradio')
-      expect(allKeys).toHaveLength(2)
-
-      await user.click(allKeys[1])
+      const unreadFilter = screen.getByTestId('menu-filter-unread')
+      await user.click(unreadFilter)
       expect(screen.getByText('Unread Announcements')).toBeInTheDocument()
     })
   })

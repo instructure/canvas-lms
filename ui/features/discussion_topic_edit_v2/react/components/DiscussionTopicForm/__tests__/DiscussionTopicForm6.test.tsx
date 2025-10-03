@@ -138,7 +138,7 @@ describe('DiscussionTopicForm', () => {
       const mockDiscussionTopic = DiscussionTopic.mock({assignment})
       const mockOnSubmit = jest.fn()
 
-      const {getByRole} = setup({
+      const {getByTestId} = setup({
         isEditing: true,
         currentDiscussionTopic: mockDiscussionTopic,
         onSubmit: mockOnSubmit,
@@ -154,7 +154,7 @@ describe('DiscussionTopicForm', () => {
 
       expect(useAssetProcessorsState.getState().attachedProcessors).toHaveLength(2)
 
-      getByRole('button', {name: 'Save'}).click()
+      getByTestId('save-button').click()
 
       await waitFor(() => {
         expect(mockOnSubmit).toHaveBeenCalled()
@@ -179,7 +179,7 @@ describe('DiscussionTopicForm', () => {
 
     it('adds a new discussion topic with AssetProcessors', async () => {
       const mockOnSubmit = jest.fn()
-      const {getByRole, getByLabelText, getByPlaceholderText} = setup({
+      const {getByTestId, getByLabelText, getByPlaceholderText} = setup({
         isEditing: false,
         onSubmit: mockOnSubmit,
       })
@@ -198,7 +198,7 @@ describe('DiscussionTopicForm', () => {
       })
 
       expect(useAssetProcessorsState.getState().attachedProcessors).toHaveLength(1)
-      getByRole('button', {name: 'Save'}).click()
+      getByTestId('save-button').click()
 
       await waitFor(() => {
         expect(mockOnSubmit).toHaveBeenCalled()
