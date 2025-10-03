@@ -17,13 +17,15 @@
  */
 
 import React, {useState} from 'react'
+import PeerReviewDetailsView from './PeerReviewDetailsView'
 import {Tabs} from '@instructure/ui-tabs'
+import {TeacherAssignmentType} from '@canvas/assignments/graphql/teacher/AssignmentTeacherTypes'
 import {type ViewOwnProps} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('assignment_tabs')
 
-export default function AssignmentTabs() {
+export default function AssignmentTabs({assignment}: {assignment: TeacherAssignmentType}) {
   const [selectedIndex, setSelectedIndex] = useState(0)
 
   const handleTabChange = (
@@ -44,7 +46,12 @@ export default function AssignmentTabs() {
         data-testid="peer-review-tab"
         renderTitle={I18n.t('Peer Review')}
         isSelected={selectedIndex === 1}
-      ></Tabs.Panel>
+      >
+        <PeerReviewDetailsView
+          assignment={assignment}
+          canEdit={ENV.CAN_EDIT_ASSIGNMENTS || false}
+        />
+      </Tabs.Panel>
     </Tabs>
   )
 }

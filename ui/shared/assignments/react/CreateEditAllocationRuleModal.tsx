@@ -482,7 +482,6 @@ const CreateEditAllocationRuleModal = ({
       errors={index === -1 ? subjectErrors : (additionalSubjectsErrors[subjectKey || ''] ?? [])}
       selectedStudent={index === -1 ? subject : additionalSubjects[subjectKey || '']}
       assignmentId={assignmentId}
-      courseId={courseId}
       filteredStudents={getFilterStudents(true, subjectKey)}
       onOptionSelect={
         !subjectKey
@@ -587,7 +586,6 @@ const CreateEditAllocationRuleModal = ({
               errors={targetErrors}
               selectedStudent={target}
               assignmentId={assignmentId}
-              courseId={courseId}
               filteredStudents={getFilterStudents(false)}
               onOptionSelect={setTarget}
               clearErrors={() => clearErrors(false)}

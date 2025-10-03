@@ -21,8 +21,6 @@ import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
-import {IconExternalLinkLine} from '@instructure/ui-icons'
-import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {NumberInput} from '@instructure/ui-number-input'
@@ -31,7 +29,6 @@ import {canvasHighContrast, canvas} from '@instructure/ui-themes'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {createRoot} from 'react-dom/client'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import PeerReviewAllocationRulesTray from '@canvas/assignments/react/PeerReviewAllocationRulesTray'
 import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
 import {usePeerReviewSettings} from './hooks/usePeerReviewSettings'
 
@@ -158,7 +155,6 @@ const SectionHeader = ({title, padding = 'small'}: {title: string; padding?: str
 const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
   const [peerReviewChecked, setPeerReviewChecked] = useState(assignment.peerReviews() || false)
   const [peerReviewEnabled, setPeerReviewEnabled] = useState(!assignment.moderatedGrading())
-  const [showRuleTray, setShowRuleTray] = useState(false)
 
   const {
     reviewsRequired,
@@ -190,7 +186,6 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
 
         if (!event.data.enabled) {
           setPeerReviewChecked(false)
-          setShowRuleTray(false)
         }
       }
     }
@@ -205,7 +200,6 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
   const handlePeerReviewCheck = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPeerReviewChecked(e.target.checked)
     if (!e.target.checked) {
-      setShowRuleTray(false)
       resetFields()
     }
   }
@@ -317,7 +311,7 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
               }}
             >
               <Flex direction="column">
-                <hr style={{margin: '0.5rem 0 1rem'}} aria-hidden="true" />
+                <hr style={{margin: '0.5rem 0 1rem'}} aria-hidden="true"></hr>
 
                 <SectionHeader title={I18n.t('Allocations')} padding="0" />
 
@@ -342,16 +336,6 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
                     label={I18n.t('Allow peer reviews within groups')}
                     srLabel={I18n.t('Allow peer reviews within student groups')}
                   />
-                </Flex.Item>
-                <Flex.Item padding="small 0 small medium">
-                  <Link
-                    variant="standalone"
-                    href="#"
-                    onClick={() => setShowRuleTray(true)}
-                    renderIcon={<IconExternalLinkLine />}
-                  >
-                    <Text size="content">{I18n.t('Customize Allocations')}</Text>
-                  </Link>
                 </Flex.Item>
 
                 <SectionHeader title={I18n.t('Grading')} padding="small 0 0 0" />
@@ -399,17 +383,6 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
                 </Flex.Item>
               </Flex>
             </ToggleDetails>
-          </Flex.Item>
-          <Flex.Item>
-            <PeerReviewAllocationRulesTray
-              assignmentId={assignment.getId()}
-              // For now, always allow editing of allocation rules from the details view.
-              // Once we expose proper permissions in the API, we can use that to determine if editing
-              // https://instructure.atlassian.net/browse/EGG-1709
-              canEdit={true}
-              isTrayOpen={showRuleTray}
-              closeTray={() => setShowRuleTray(false)}
-            />
           </Flex.Item>
         </>
       )}
