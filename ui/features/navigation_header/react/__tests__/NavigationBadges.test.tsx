@@ -125,14 +125,27 @@ describe('GlobalNavigation', () => {
       expect(shareRequestMade).toBe(false)
     })
 
-    // FOO-4218 - remove or rewrite to remove spies on imports
-    it.skip('fetches inbox count when user has not opted out of notifications', async () => {
+    it('fetches inbox count when user has not opted out of notifications', async () => {
       ENV.current_user_disabled_inbox = false
+      let inboxRequestMade = false
+      server.use(
+        http.get('/api/v1/conversations/unread_count', () => {
+          inboxRequestMade = true
+          return HttpResponse.json({unread_count: '0'})
+        }),
+      )
+
       await act(async () => {
         render(<NavigationBadges />)
       })
-      // Verify the request was made
-      expect(ENV.current_user_disabled_inbox).toBe(false)
+
+      // Wait for React Query to settle
+      await act(async () => {
+        await queryClient.invalidateQueries({queryKey: ['unread_count', 'conversations']})
+        await queryClient.refetchQueries({queryKey: ['unread_count', 'conversations']})
+      })
+
+      expect(inboxRequestMade).toBe(true)
     })
 
     it('does not fetch inbox count when user has opted out of notifications', async () => {
