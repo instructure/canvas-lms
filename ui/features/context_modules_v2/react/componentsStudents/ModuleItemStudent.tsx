@@ -99,23 +99,31 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
   }
 
   const moduleItemWrapContent = (content: JSX.Element, otherProps = {}) => (
-    <View
-      as="div"
-      className="context_module_item"
-      padding="paddingCardMedium"
-      background="primary"
-      borderWidth="0"
-      borderRadius="large"
-      overflowX="hidden"
-      margin="paddingCardMedium"
-      minHeight="5.125rem"
-      display="flex"
-      {...otherProps}
+    <Link
+      href={url}
+      isWithinText={false}
+      themeOverride={{
+        hoverTextDecorationOutsideText: 'none',
+      }}
     >
-      <Flex wrap="wrap" width="100%" gap="x-small" direction={smallScreen ? 'column' : 'row'}>
-        {content}
-      </Flex>
-    </View>
+      <View
+        as="div"
+        className="context_module_item"
+        padding="paddingCardMedium"
+        background="primary"
+        borderWidth="0"
+        borderRadius="large"
+        overflowX="hidden"
+        margin="paddingCardMedium 0"
+        minHeight="5.125rem"
+        display="flex"
+        {...otherProps}
+      >
+        <Flex wrap="wrap" width="100%" gap="x-small" direction={smallScreen ? 'column' : 'row'}>
+          {content}
+        </Flex>
+      </View>
+    </Link>
   )
 
   const moduleItemMainContent = moduleItemWrapContent(

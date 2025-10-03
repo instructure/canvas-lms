@@ -87,7 +87,7 @@ const ModuleItemListStudent: React.FC<ModuleItemListStudentProps> = ({
   }
 
   return (
-    <View as="div" overflowX="hidden">
+    <View as="div" overflowX="hidden" padding="0 small">
       {moduleItems.map((item, index) => (
         <View as="div" key={item._id}>
           <MemoizedModuleItemStudent
