@@ -21,6 +21,12 @@ import Backbone from '@canvas/backbone'
 import NeverDropCollection from '../../collections/NeverDropCollection'
 import NeverDropCollectionView from '../NeverDropCollectionView'
 
+// Mock debounce to make it synchronous for testing
+jest.mock('lodash', () => ({
+  ...jest.requireActual('lodash'),
+  debounce: fn => fn,
+}))
+
 class AssignmentStub extends Backbone.Model {
   name() {
     return this.get('name')
@@ -52,10 +58,8 @@ const addNeverDrop = function () {
   })
 }
 
-// EVAL-3815
 describe('NeverDropCollectionView', () => {
   beforeEach(() => {
-    jest.useFakeTimers()
     assignments = new Assignments([1, 2, 3].map(i => ({id: `${i}`, name: `Assignment ${i}`})))
     never_drops = new NeverDropCollection([], {
       assignments,
@@ -69,176 +73,150 @@ describe('NeverDropCollectionView', () => {
     $('#fixtures').empty().append(view.render().el)
   })
 
-  afterEach(() => {
-    jest.useRealTimers()
+  it('possibleValues is set to the range of assignment ids', function () {
+    expect(never_drops.possibleValues).toEqual(assignments.map(a => a.id))
   })
 
-  it.skip('possibleValues is set to the range of assignment ids', function () {
-    expect(never_drops.possibleValues).toBe(assignments.map(a => a.id))
-  })
-
-  it.skip('adding a NeverDrop to the collection reduces availableValues by one', function () {
+  it('adding a NeverDrop to the collection reduces availableValues by one', function () {
     const start_length = never_drops.availableValues.length
-    addNeverDrop.call(this)
-    expect(start_length - 1).toBe(never_drops.availableValues.length)
+    addNeverDrop()
+    expect(never_drops.availableValues).toHaveLength(start_length - 1)
   })
 
-  it.skip('needs rewrite due to debounce hack', () => {
-    test('adding a NeverDrop renders a <select> with the value from the front of the availableValues collection', function () {
-      const expected_val = never_drops.availableValues.slice(0)[0].id
-      addNeverDrop.call(this)
-      jest.advanceTimersByTime(101)
-      const view = $('#fixtures').find('select')
-      // 'a select was rendered'
-      expect(view.length).toBeGreaterThan(1)
-      // 'the selects value is the same as the last available value'
-      expect(expected_val).toBe(view.val())
-    })
+  // TODO: Rewrite for React - needs @testing-library/react utilities
+  it.skip('adding a NeverDrop renders a <select> with the value from the front of the availableValues collection', function () {
+    const expected_val = never_drops.availableValues.slice(0)[0].id
+    addNeverDrop()
+    const select = $('#fixtures').find('select')
+    expect(select.length).toBeGreaterThan(0)
+    expect(select.val()).toBe(expected_val)
+  })
 
-    test('the number of <option>s with the value the same as availableValue should equal the number of selects', function () {
-      addNeverDrop.call(this)
-      addNeverDrop.call(this)
-      jest.advanceTimersByTime(101)
-      const available_val = never_drops.availableValues.at(0).id
-      expect($('#fixtures').find(`option[value=${available_val}]`)).toHaveLength(2)
-    })
+  // TODO: Rewrite for React - needs @testing-library/react utilities
+  it.skip('the number of <option>s with the value the same as availableValue should equal the number of selects', function () {
+    addNeverDrop()
+    addNeverDrop()
+    const available_val = never_drops.availableValues.at(0).id
+    expect($('#fixtures').find(`option[value=${available_val}]`)).toHaveLength(2)
+  })
 
-    test('removing a NeverDrop from the collection increases availableValues by one', function () {
-      addNeverDrop.call(this)
-      jest.advanceTimersByTime(101)
-      const current_size = never_drops.availableValues.length
-      const model = never_drops.at(0)
-      never_drops.remove(model)
-      expect(current_size + 1).toBe(never_drops.availableValues.length)
-    })
+  it('removing a NeverDrop from the collection increases availableValues by one', function () {
+    addNeverDrop()
+    const current_size = never_drops.availableValues.length
+    const model = never_drops.at(0)
+    never_drops.remove(model)
+    expect(never_drops.availableValues).toHaveLength(current_size + 1)
+  })
 
-    test('removing a NeverDrop from the collection removes the view', function () {
-      addNeverDrop.call(this)
-      const model = never_drops.at(0)
-      never_drops.remove(model)
+  it('removing a NeverDrop from the collection removes the view', function () {
+    addNeverDrop()
+    const model = never_drops.at(0)
+    never_drops.remove(model)
+    const select = $('#fixtures').find('select')
+    expect(select).toHaveLength(0)
+  })
 
-      jest.advanceTimersByTime(101)
-      const view = $('#fixtures').find('select')
-      expect(view).toHaveLength(0)
-    })
+  // TODO: Rewrite for React - jQuery .trigger() doesn't work with React synthetic events
+  it.skip('changing a <select> will remove all <option>s with that value from other selects', function () {
+    addNeverDrop()
+    addNeverDrop()
+    const target_id = '1'
 
-    test('changing a <select> will remove all <option>s with that value from other selects', function () {
-      addNeverDrop.call(this)
-      addNeverDrop.call(this)
-      const target_id = '1'
+    expect($('#fixtures').find(`option[value=${target_id}]`)).toHaveLength(2)
+    $('#fixtures').find('select:first').val(target_id).trigger('change')
+    expect($('#fixtures').find(`option[value=${target_id}]`)).toHaveLength(1)
+    expect(never_drops.takenValues.find(nd => nd.id === target_id)).toBeTruthy()
+  })
 
-      jest.advanceTimersByTime(101)
-      expect($('#fixtures').find(`option[value=${target_id}]`)).toHaveLength(2)
-      // change one of the selects
-      $('#fixtures').find('select:first').val(target_id).trigger('change')
+  // TODO: Rewrite for React - jQuery .trigger() doesn't work with React synthetic events
+  it.skip('changing a <select> will add all <option>s with the previous value to other selects', function () {
+    addNeverDrop()
+    addNeverDrop()
+    const change_id = '1'
+    const target_id = '3'
 
-      jest.advanceTimersByTime(101)
-      // should only be one now
-      expect($('#fixtures').find(`option[value=${target_id}]`)).toHaveLength(1)
-      // target_id is now taken
-      expect(never_drops.takenValues.find(nd => nd.id === target_id)).toBeTruthy()
-    })
+    expect($('#fixtures').find(`option[value=${target_id}]`)).toHaveLength(1)
+    $('#fixtures').find('select:first').val(change_id).trigger('change')
+    expect($('#fixtures').find(`option[value=${target_id}]`)).toHaveLength(2)
+    expect(never_drops.availableValues.find(nd => nd.id === target_id)).toBeTruthy()
+  })
 
-    test('changing a <select> will add all <option>s with the previous value to other selects', function () {
-      addNeverDrop.call(this)
-      addNeverDrop.call(this)
-      const change_id = '1'
-      const target_id = '3'
+  // TODO: Rewrite for React - needs @testing-library/react utilities
+  it.skip('resetting NeverDrops with a chosen assignment renders a <span>', function () {
+    const target_id = '1'
+    never_drops.reset([
+      {
+        id: never_drops.length,
+        label_id: 'new',
+        chosen: 'Assignment 1',
+        chosen_id: target_id,
+      },
+    ])
 
-      jest.advanceTimersByTime(101)
-      // should just have the selected one
-      expect($('#fixtures').find(`option[value=${target_id}]`)).toHaveLength(1)
-      // change one of the selects
-      $('#fixtures').find('select:first').val(change_id).trigger('change')
+    expect($('#fixtures').find('span')).toHaveLength(1)
+    expect(never_drops.takenValues.find(nd => nd.id === target_id)).toBeTruthy()
+  })
 
-      jest.advanceTimersByTime(101)
-      // should now be more than one
-      expect($('#fixtures').find(`option[value=${target_id}]`)).toHaveLength(2)
+  it('when there are no availableValues, the add assignment link is not rendered', function () {
+    addNeverDrop()
+    addNeverDrop()
+    addNeverDrop()
+    expect($('#fixtures').find('.add_never_drop')).toHaveLength(0)
+  })
 
-      // target_id is now available
-      expect(never_drops.availableValues.find(nd => nd.id === target_id)).toBeTruthy()
-    })
+  // TODO: Rewrite for React - handlebars i18n helpers not rendering in test
+  it.skip("when there is at least one takenValue, the add assignment says 'add another assignment'", function () {
+    addNeverDrop()
+    const text = $('#fixtures').find('.add_never_drop').text()
+    expect($.trim(text)).toBeTruthy()
+  })
 
-    test('resetting NeverDrops with a chosen assignment renders a <span>', function () {
-      const target_id = '1'
-      never_drops.reset([
-        {
-          id: never_drops.length,
-          label_id: 'new',
-          chosen: 'Assignment 1',
-          chosen_id: target_id,
-        },
-      ])
+  // TODO: Rewrite for React - jQuery .trigger() doesn't work with React synthetic events
+  it.skip('allows adding never_drop items when canChangeDropRules is true', function () {
+    expect($('#fixtures').find('.add_never_drop').hasClass('disabled')).not.toBeTruthy()
+    $('#fixtures').find('.add_never_drop').trigger('click')
+    expect(never_drops).toHaveLength(1)
+  })
 
-      jest.advanceTimersByTime(101)
-      expect($('#fixtures').find('span')).toHaveLength(1)
-      expect(never_drops.takenValues.find(nd => nd.id === target_id)).toBeTruthy()
-    })
+  // TODO: Rewrite for React - jQuery .trigger() doesn't work with React synthetic events
+  it.skip('allows removing never_drop items when canChangeDropRules is true', function () {
+    addNeverDrop()
+    $('#fixtures').find('.remove_never_drop').trigger('click')
+    expect(never_drops).toHaveLength(0)
+  })
 
-    test('when there are no availableValues, the add assignment link is not rendered', function () {
-      addNeverDrop.call(this)
-      addNeverDrop.call(this)
-      addNeverDrop.call(this)
+  // TODO: Rewrite for React - jQuery .trigger() doesn't work with React synthetic events
+  it.skip('disables adding never_drop items when canChangeDropRules is false', function () {
+    view.canChangeDropRules = false
+    view.render()
+    expect($('#fixtures').find('.add_never_drop').hasClass('disabled')).toBeTruthy()
+    $('#fixtures').find('.add_never_drop').trigger('click')
+    expect(never_drops).toHaveLength(0)
+  })
 
-      jest.advanceTimersByTime(101)
-      expect($('#fixtures').find('.add_never_drop')).toHaveLength(0)
-    })
+  // TODO: Rewrite for React - jQuery .trigger() doesn't work with React synthetic events
+  it.skip('disables removing never_drop items when canChangeDropRules is false', function () {
+    addNeverDrop()
+    view.canChangeDropRules = false
+    view.render()
+    expect($('#fixtures').find('.remove_never_drop').hasClass('disabled')).toBeTruthy()
+    $('#fixtures').find('.remove_never_drop').trigger('click')
+    expect(never_drops).toHaveLength(1)
+  })
 
-    test("when there is at least one takenValue, the add assignment says 'add another assignment'", function () {
-      addNeverDrop.call(this)
-      jest.advanceTimersByTime(101)
-      const text = $('#fixtures').find('.add_never_drop').text()
-      // 'Add another assignment'
-      expect($.trim(text)).toBeTruthy()
-    })
+  // TODO: Rewrite for React - jQuery .trigger() doesn't work with React synthetic events
+  it.skip('disables changing assignment options when canChangeDropRules is false', function () {
+    addNeverDrop()
+    view.canChangeDropRules = false
+    view.render()
+    expect($('#fixtures').find('select:first').attr('disabled')).toBeTruthy()
+    $('#fixtures').find('select:first').val('2').trigger('change')
+    expect(never_drops.takenValues.find(nd => nd.id === '2')).not.toBeTruthy()
+  })
 
-    test('allows adding never_drop items when canChangeDropRules is true', function () {
-      expect($('#fixtures').find('.add_never_drop').hasClass('disabled')).not.toBeTruthy()
-      $('#fixtures').find('.add_never_drop').trigger('click')
-      jest.advanceTimersByTime(101)
-      expect(never_drops).toHaveLength(1)
-    })
-
-    test('allows removing never_drop items when canChangeDropRules is true', function () {
-      addNeverDrop.call(this)
-      jest.advanceTimersByTime(101)
-      $('#fixtures').find('.remove_never_drop').trigger('click')
-      jest.advanceTimersByTime(101)
-      expect(never_drops).toHaveLength(0)
-    })
-
-    test('disables adding never_drop items when canChangeDropRules is false', function () {
-      view.canChangeDropRules = false
-      view.render() // force re-render
-      expect($('#fixtures').find('.add_never_drop').hasClass('disabled')).toBeTruthy()
-      $('#fixtures').find('.add_never_drop').trigger('click')
-      jest.advanceTimersByTime(101)
-      expect(never_drops).toHaveLength(0)
-    })
-
-    test('disables removing never_drop items when canChangeDropRules is false', function () {
-      addNeverDrop.call(this)
-      view.canChangeDropRules = false
-      jest.advanceTimersByTime(101)
-      expect($('#fixtures').find('.remove_never_drop').hasClass('disabled')).toBeTruthy()
-      $('#fixtures').find('.remove_never_drop').trigger('click')
-      jest.advanceTimersByTime(101)
-      expect(never_drops).toHaveLength(1)
-    })
-
-    test('disables changing assignment options when canChangeDropRules is false', function () {
-      addNeverDrop.call(this)
-      view.canChangeDropRules = false
-      jest.advanceTimersByTime(101)
-      expect($('#fixtures').find('select:first').attr('readonly')).toBeTruthy()
-      $('#fixtures').find('select:first').val('2').trigger('change')
-      jest.advanceTimersByTime(101)
-      expect(never_drops.takenValues.find(nd => nd.id === '2')).not.toBeTruthy()
-    })
-
-    test("when there are no takenValues, the add assignment says 'add an assignment'", () => {
-      const text = $('#fixtures').find('.add_never_drop').text()
-      expect($.trim(text)).toBe('Add an assignment')
-    })
+  // TODO: Rewrite for React - handlebars i18n helpers not rendering in test
+  it.skip("when there are no takenValues, the add assignment says 'add an assignment'", () => {
+    const text = $('#fixtures').find('.add_never_drop').text()
+    expect($.trim(text)).toBe('Add an assignment')
   })
 })

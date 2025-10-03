@@ -20,7 +20,7 @@ import $ from 'jquery'
 import {extend} from '@canvas/backbone/utils'
 import {debounce} from 'lodash'
 import CollectionView from '@canvas/backbone-collection-view'
-import NeverDropView from './NeverDropView'
+import NeverDropView from './NeverDropView.jsx'
 import template from '../../jst/NeverDropCollection.handlebars'
 
 extend(NeverDropCollectionView, CollectionView)
