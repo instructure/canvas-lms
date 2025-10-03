@@ -230,7 +230,7 @@ describe('AnnouncementRow', () => {
       describe('when canDelete is false', () => {
         it('does not render delete button in manage menu', () => {
           renderAnnouncementRow({canManage: true, canDelete: false})
-          fireEvent.click(screen.getByRole('button', {name: /Manage options for /}))
+          fireEvent.click(screen.getByTestId('manage-announcement-options'))
           expect(screen.queryByText(/Delete/)).not.toBeInTheDocument()
         })
       })
@@ -238,7 +238,7 @@ describe('AnnouncementRow', () => {
       describe('when canDelete is true', () => {
         it('renders delete button in manage menu', () => {
           renderAnnouncementRow({canManage: true, canDelete: true, announcementsLocked: true})
-          fireEvent.click(screen.getByRole('button', {name: /Manage options for /}))
+          fireEvent.click(screen.getByTestId('manage-announcement-options'))
           const menuItems = screen.getAllByRole('menuitem')
           expect(menuItems).toHaveLength(1)
           expect(menuItems[0]).toHaveTextContent(/Delete/)
@@ -248,7 +248,7 @@ describe('AnnouncementRow', () => {
       describe('when announcements are globally locked', () => {
         it('does not render lock button in manage menu', () => {
           renderAnnouncementRow({canManage: true, canDelete: false, announcementsLocked: true})
-          fireEvent.click(screen.getByRole('button', {name: /Manage options for /}))
+          fireEvent.click(screen.getByTestId('manage-announcement-options'))
           expect(screen.queryByText(/Allow Comments/)).not.toBeInTheDocument()
         })
       })
@@ -262,7 +262,7 @@ describe('AnnouncementRow', () => {
               announcementsLocked: false,
               announcement: {locked: true},
             })
-            fireEvent.click(screen.getByRole('button', {name: /Manage options for /}))
+            fireEvent.click(screen.getByTestId('manage-announcement-options'))
             const menuItems = screen.getAllByRole('menuitem')
             expect(menuItems).toHaveLength(1)
             expect(menuItems[0]).toHaveTextContent(/Allow Comments/)
@@ -278,7 +278,7 @@ describe('AnnouncementRow', () => {
               announcementsLocked: false,
               announcement: {locked: false},
             })
-            fireEvent.click(screen.getByRole('button', {name: /Manage options for /}))
+            fireEvent.click(screen.getByTestId('manage-announcement-options'))
             const menuItems = screen.getAllByRole('menuitem')
             expect(menuItems).toHaveLength(1)
             expect(menuItems[0]).toHaveTextContent(/Disallow Comments/)

@@ -152,17 +152,17 @@ describe('DiscussionRow', () => {
   })
 
   it('disables publish button when can_unpublish is false', () => {
-    const discussion = {can_unpublish: false}
+    const discussion = {can_unpublish: false, published: true}
     render(<DiscussionRow {...makeProps({canPublish: true, discussion})} />)
-    const button = screen.getByRole('button', {name: 'Unpublish Hello World'})
-    expect(button.hasAttribute('disabled')).toBe(true)
+    const button = screen.getByTestId('discussion-publish').querySelector('button')
+    expect(button).toHaveAttribute('disabled')
   })
 
   it('allows to publish even if you cannot unpublish', () => {
     const discussion = {can_unpublish: false, published: false}
     render(<DiscussionRow {...makeProps({canPublish: true, discussion})} />)
-    const button = screen.getByRole('button', {name: 'Publish Hello World'})
-    expect(button.hasAttribute('disabled')).toBe(false)
+    const button = screen.getByTestId('discussion-publish').querySelector('button')
+    expect(button).not.toHaveAttribute('disabled')
   })
 
   describe('publish ToggleIcon', () => {

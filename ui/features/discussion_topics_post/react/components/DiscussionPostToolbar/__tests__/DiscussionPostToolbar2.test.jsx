@@ -117,11 +117,11 @@ describe('DiscussionPostToolbar', () => {
 
   describe('Assign To', () => {
     it('renders the Assign To button if user can manageAssignTo and in a course discussion', () => {
-      const {getByRole} = setup({
+      const {getByTestId} = setup({
         manageAssignTo: true,
         showAssignTo: true,
       })
-      expect(getByRole('button', {name: 'Assign To'})).toBeInTheDocument()
+      expect(getByTestId('manage-assign-to')).toBeInTheDocument()
     })
 
     it('does not render the Assign To button if in speedGrader', () => {
