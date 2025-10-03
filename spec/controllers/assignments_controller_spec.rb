@@ -2072,6 +2072,21 @@ describe AssignmentsController do
       end
     end
 
+    context "js_env CAN_EDIT_ASSIGNMENTS" do
+      it "sets CAN_EDIT_ASSIGNMENTS in js_env as true if current user has assignment edit permissions" do
+        user_session(@teacher)
+        get :show, params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:CAN_EDIT_ASSIGNMENTS]).to be(true)
+      end
+
+      it "sets CAN_EDIT_ASSIGNMENTS in js_env as false if current user does not have assignment edit permissions" do
+        user_session(@teacher)
+        @course.account.role_overrides.create! role: teacher_role, permission: "manage_assignments_edit", enabled: false
+        get :show, params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:CAN_EDIT_ASSIGNMENTS]).to be(false)
+      end
+    end
+
     context "js_env PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED" do
       it "sets PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED in js_env as true if enabled" do
         user_session(@teacher)

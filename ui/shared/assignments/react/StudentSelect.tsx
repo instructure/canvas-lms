@@ -34,7 +34,6 @@ interface StudentSelectProps {
   errors: FormMessage[]
   selectedStudent?: CourseStudent | null
   assignmentId?: string
-  courseId?: string
   filteredStudents: CourseStudent[]
   onOptionSelect: (student?: CourseStudent) => void
   handleInputRef: (ref: HTMLElement | null) => void
@@ -48,7 +47,6 @@ const StudentSelect = ({
   errors,
   selectedStudent = null,
   assignmentId = '',
-  courseId = '',
   filteredStudents = [],
   onOptionSelect,
   handleInputRef,
@@ -60,11 +58,7 @@ const StudentSelect = ({
   const [showOptions, setShowOptions] = useState(false)
   const [highlightIndex, setHighlightIndex] = useState<number | null>(null)
   const [inputErrors, setInputErrors] = useState<FormMessage[]>(errors)
-  const {students, loading, error} = useAssignedStudents(
-    assignmentId,
-    assignmentId ? '' : courseId,
-    searchTerm,
-  )
+  const {students, loading, error} = useAssignedStudents(assignmentId, searchTerm)
 
   useEffect(() => {
     setInputErrors(errors)
@@ -155,7 +149,7 @@ const StudentSelect = ({
   )
 
   const loadingOption = (
-    <Select.Option id="loading-option" key="loading-option" data-testId="loading-option">
+    <Select.Option id="loading-option" key="loading-option" data-testid="loading-option">
       <Spinner renderTitle={I18n.t('Loading')} size="x-small" />
     </Select.Option>
   )

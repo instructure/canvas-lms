@@ -260,50 +260,6 @@ describe('StudentSelect', () => {
     })
   })
 
-  describe('Course student search', () => {
-    it('displays course students when courseId is provided', async () => {
-      mockUseAssignedStudents.mockReturnValue({
-        students: [mockStudents[1]],
-        loading: false,
-        error: null,
-      })
-
-      renderWithMocks({courseId: 'course-456'})
-
-      const input = document.getElementById('test-student-select')
-      expect(input).not.toBeNull()
-
-      await user.type(input!, 'Squirtle')
-
-      await waitFor(() => {
-        expect(screen.getByText('Squirtle')).toBeInTheDocument()
-      })
-    })
-
-    it('allows selection of course student', async () => {
-      mockUseAssignedStudents.mockReturnValue({
-        students: [mockStudents[1]],
-        loading: false,
-        error: null,
-      })
-
-      renderWithMocks({courseId: 'course-456'})
-
-      const input = document.getElementById('test-student-select')
-      expect(input).not.toBeNull()
-
-      await user.type(input!, 'Squirtle')
-
-      await waitFor(() => {
-        expect(screen.getByText('Squirtle')).toBeInTheDocument()
-      })
-
-      await user.click(screen.getByText('Squirtle'))
-
-      expect(mockOnOptionSelect).toHaveBeenCalledWith(mockStudents[1])
-    })
-  })
-
   describe('Input interactions', () => {
     it('hides options when input loses focus', async () => {
       mockUseAssignedStudents.mockReturnValue({

@@ -122,7 +122,7 @@ type SubmissionsType = {
 
 export type TeacherAssignmentType = {
   __typename?: string
-  id?: string
+  id: string
   gid?: string
   lid?: string
   name?: string

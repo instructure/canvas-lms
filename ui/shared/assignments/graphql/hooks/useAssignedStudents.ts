@@ -69,19 +69,6 @@ export const ASSIGNED_STUDENTS_QUERY = gql`
   }
 `
 
-export const COURSE_STUDENTS_QUERY = gql`
-  query GetCourseStudents($courseId: ID!, $filter: CourseUsersFilter) {
-    course(id: $courseId) {
-      usersConnection(filter: $filter) {
-        nodes {
-          _id
-          name
-        }
-      }
-    }
-  }
-`
-
 async function getAssignedStudents(
   assignmentId: string,
   searchTerm?: string,
@@ -96,19 +83,7 @@ async function getAssignedStudents(
   return result.assignment?.assignedStudents?.nodes || []
 }
 
-async function getCourseStudents(courseId: string, searchTerm?: string): Promise<CourseStudent[]> {
-  const result = await executeQuery<CourseStudentsData>(COURSE_STUDENTS_QUERY, {
-    courseId,
-    filter: {
-      searchTerm,
-      excludeTestStudents: true,
-    },
-  })
-
-  return result.course?.usersConnection?.nodes || []
-}
-
-export const useAssignedStudents = (assignmentId: string, courseId: string, searchTerm = '') => {
+export const useAssignedStudents = (assignmentId: string, searchTerm = '') => {
   const trimmedSearchTerm = searchTerm.trim()
   const finalSearchTerm = trimmedSearchTerm || undefined
 
@@ -119,23 +94,11 @@ export const useAssignedStudents = (assignmentId: string, courseId: string, sear
     networkMode: 'always',
   })
 
-  const courseStudentsQuery = useQuery<CourseStudent[], Error>({
-    queryKey: ['courseStudents', courseId, finalSearchTerm],
-    queryFn: () => getCourseStudents(courseId, finalSearchTerm),
-    enabled: !!courseId && !assignmentId,
-  })
-
   if (assignmentId) {
     return {
       students: assignedStudentsQuery.data || [],
       loading: assignedStudentsQuery.isLoading,
       error: assignedStudentsQuery.error,
-    }
-  } else if (courseId) {
-    return {
-      students: courseStudentsQuery.data || [],
-      loading: courseStudentsQuery.isLoading,
-      error: courseStudentsQuery.error,
     }
   }
 

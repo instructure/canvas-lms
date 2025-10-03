@@ -119,22 +119,6 @@ describe('PeerReviewDetails', () => {
       expect(screen.queryByText('Review Settings')).not.toBeInTheDocument()
     })
 
-    it('closes allocation rules tray when checkbox is unchecked', async () => {
-      assignment.peerReviews = jest.fn(() => true)
-      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
-      const advancedSettingsToggle = screen.getByText('Advanced Peer Review Configurations')
-      await user.click(advancedSettingsToggle)
-
-      const trayLink = screen.getByText('Customize Allocations')
-      await user.click(trayLink)
-      expect(screen.getByTestId('allocation-rules-tray')).toBeInTheDocument()
-
-      const checkbox = screen.getByTestId('peer-review-checkbox')
-      await user.click(checkbox)
-
-      expect(screen.queryByTestId('allocation-rules-tray')).not.toBeInTheDocument()
-    })
-
     it('resets all field values and clears error messages when checkbox is unchecked', async () => {
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
       const checkbox = screen.getByTestId('peer-review-checkbox')
@@ -319,33 +303,10 @@ describe('PeerReviewDetails', () => {
 
     it('shows allocations section in toggle details', () => {
       expect(screen.getByText('Allocations')).toBeInTheDocument()
-      expect(screen.getByText('Customize Allocations')).toBeInTheDocument()
       expect(screen.getByText('Allow peer reviews across sections')).toBeInTheDocument()
       expect(screen.getByTestId('across-sections-checkbox')).toBeInTheDocument()
       expect(screen.getByText('Allow peer reviews within groups')).toBeInTheDocument()
       expect(screen.getByTestId('within-groups-checkbox')).toBeInTheDocument()
-    })
-
-    it('opens allocation rules tray when customize link is clicked', async () => {
-      const trayLink = screen.getByText('Customize Allocations')
-      await user.click(trayLink)
-
-      expect(screen.getByTestId('allocation-rules-tray')).toBeInTheDocument()
-    })
-
-    it('shows grading option in toggle details', () => {
-      expect(screen.getByText('Grading')).toBeInTheDocument()
-      expect(screen.getByTestId('pass-fail-grading-checkbox')).toBeInTheDocument()
-    })
-
-    it('shows anonymity option in toggle details', () => {
-      expect(screen.getByText('Anonymity')).toBeInTheDocument()
-      expect(screen.getByTestId('anonymity-checkbox')).toBeInTheDocument()
-    })
-
-    it('shows submission requirement option in toggle details', () => {
-      expect(screen.getByText('Submission required')).toBeInTheDocument()
-      expect(screen.getByTestId('submission-required-checkbox')).toBeInTheDocument()
     })
   })
 
@@ -404,15 +365,11 @@ describe('PeerReviewDetails', () => {
       })
     })
 
-    it('unchecks checkbox and closes tray when disabled', async () => {
+    it('unchecks checkbox when disabled', async () => {
       assignment.peerReviews = jest.fn(() => true)
       renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
       const advancedSettingsToggle = screen.getByText('Advanced Peer Review Configurations')
       await user.click(advancedSettingsToggle)
-
-      const trayLink = screen.getByText('Customize Allocations')
-      await user.click(trayLink)
-      expect(screen.getByTestId('allocation-rules-tray')).toBeInTheDocument()
 
       fireEvent(
         window,
@@ -426,7 +383,6 @@ describe('PeerReviewDetails', () => {
 
       await waitFor(() => {
         expect(screen.getByTestId('peer-review-checkbox')).not.toBeChecked()
-        expect(screen.queryByTestId('allocation-rules-tray')).not.toBeInTheDocument()
       })
     })
 
