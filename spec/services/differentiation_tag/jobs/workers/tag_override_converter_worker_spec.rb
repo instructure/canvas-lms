@@ -24,7 +24,6 @@ describe DifferentiationTag::Jobs::Workers::TagOverrideConverterWorker do
   let(:second_student) { student_in_course(active_all: true, course:).user }
 
   def enable_differentiation_tags_for_context
-    course.account.enable_feature!(:assign_to_differentiation_tags)
     course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
     course.account.save!
   end

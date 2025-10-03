@@ -106,7 +106,7 @@ class ContextModulesController < ApplicationController
       @allow_menu_tools = @context.grants_right?(@current_user, session, :manage_course_content_add) &&
                           (@menu_tools[:module_index_menu].present? || @menu_tools[:module_index_menu_modal].present?)
 
-      assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+      assign_to_tags = @context.account.allow_assign_to_differentiation_tags?
 
       new_quizzes_enabled = NewQuizzesFeaturesHelper.new_quizzes_enabled?(@context)
 
