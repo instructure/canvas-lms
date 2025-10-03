@@ -97,12 +97,25 @@ module Api::V1::DiscussionTopics
       [
         { assignment: %i[external_tool_tag post_policy rubric_association] },
         :attachment,
-        :discussion_topic_participants,
         :context,
         :root_topic,
         :user
       ]
     )
+
+    # we're gonna preload only the current user's discussion_topic_participant
+    if user
+      participants_by_topic = DiscussionTopicParticipant
+                              .where(discussion_topic_id: topics.map(&:id), user_id: user)
+                              .index_by(&:discussion_topic_id)
+
+      topics.each do |topic|
+        participant = participants_by_topic[topic.id]
+        # we're manually injecting user's participant
+        topic.association(:discussion_topic_participants).target = participant ? [participant] : []
+        topic.association(:discussion_topic_participants).loaded!
+      end
+    end
 
     DiscussionTopic.preload_subentry_counts(topics)
     DatesOverridable.preload_override_data_for_objects([*topics, *topics.filter_map(&:assignment)])
