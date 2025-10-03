@@ -17,8 +17,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require "json/jwt"
+
 module LearnPlatform
   module GlobalApi
+    class InvalidLearnPlatformConfiguration < StandardError; end
+
     GET_UNIFIED_TOOL_ID_ENDPOINT = "/api/v2/lti/global_products/unified_tool_id"
     POST_UNIFIED_TOOL_ID_BULK_LOAD_CALLBACK_ENDPOINT = "/api/v2/lti/unified_tool_id_bulk_load"
 
@@ -39,7 +43,32 @@ module LearnPlatform
     end
 
     def self.auth_headers
-      { Authorization: "Basic #{credentials[:learn_platform_basic_token]}" }
+      if Account.site_admin.feature_enabled?(:use_jwt_auth_for_utid_sync)
+        { Authorization: "Bearer #{jwt}" }
+      else
+        { Authorization: "Basic #{credentials[:learn_platform_basic_token]}" }
+      end
+    end
+
+    def self.generate_jwt
+      service_name = credentials[:service_name] || "interop"
+      service_secret = credentials[:service_secret]
+
+      raise InvalidLearnPlatformConfiguration, "service_secret is blank" if service_secret.blank?
+
+      payload = {
+        iss: service_name,
+        exp: 5.minutes.from_now.to_i
+      }
+
+      JSON::JWT.new(payload).sign(service_secret, :HS256)
+    end
+    private_class_method :generate_jwt
+
+    def self.jwt
+      return @jwt if @jwt.present? && @jwt["exp"] > 1.minute.from_now.to_i
+
+      @jwt = generate_jwt
     end
 
     def self.get_unified_tool_id(lti_name:, lti_tool_id:, lti_domain:, lti_version:, lti_url:, integration_type: nil, lti_redirect_url: nil)
