@@ -1011,7 +1011,6 @@ describe Group do
     context "permissions" do
       before do
         @group = Group.create!(context: @course, group_category: @non_collaborative_category, name: "Test Group", non_collaborative: true)
-        @course.account.enable_feature! :assign_to_differentiation_tags
         @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
         @course.account.save!
         @course.account.reload

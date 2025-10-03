@@ -101,8 +101,7 @@ module Lti
       course.save!
       user.save!
 
-      # Enable differentiation tags feature flag and setting on course account
-      course.account.enable_feature!(:assign_to_differentiation_tags)
+      # Enable differentiation tags setting on course account
       course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       course.account.save!
 
@@ -153,8 +152,7 @@ module Lti
 
     before do
       root_account.disable_feature!(:refactor_custom_variables)
-      # Enable the differentiation tags feature
-      course.account.enable_feature!(:assign_to_differentiation_tags)
+      # Enable the differentiation tags
       root_account.settings = { allow_assign_to_differentiation_tags: { value: true } }
       course.account.save!
     end
@@ -2997,8 +2995,7 @@ module Lti
           course.save!
           user.save!
 
-          # Enable differentiation tags feature flag and setting on course account
-          course.account.enable_feature!(:assign_to_differentiation_tags)
+          # Enable differentiation tags setting on course account
           course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
           course.account.save!
 
@@ -3052,8 +3049,7 @@ module Lti
           course.save!
           user.save!
 
-          # Enable differentiation tags feature flag and setting
-          course.account.enable_feature!(:assign_to_differentiation_tags)
+          # Enable differentiation tags setting
           course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
           course.account.save!
 
@@ -3175,8 +3171,7 @@ module Lti
           course.save!
           user.save!
 
-          # Enable differentiation tags feature flag and setting
-          course.account.enable_feature!(:assign_to_differentiation_tags)
+          # Enable differentiation tags setting
           course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
           course.account.save!
 
@@ -3230,8 +3225,7 @@ module Lti
           course.save!
           user.save!
 
-          # Enable differentiation tags feature flag and setting
-          course.account.enable_feature!(:assign_to_differentiation_tags)
+          # Enable differentiation tags setting
           course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
           course.account.save!
 

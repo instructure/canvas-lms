@@ -70,10 +70,6 @@ describe CC::TopicResources do
   end
 
   describe "#create_canvas_topic" do
-    before do
-      allow(mock_course.account).to receive(:feature_enabled?).with(:assign_to_differentiation_tags).and_return(false)
-    end
-
     context "reply_to_entry_required_count" do
       context "when discussion_checkpoints is enabled" do
         before do
