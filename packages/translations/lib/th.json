@@ -1823,6 +1823,9 @@
     "please_enter_a_file_name_f159edc1": {
         "message": "กรุณากรอกชื่อไฟล์"
     },
+    "please_enter_a_valid_video_url_from_a_supported_pl_30dc0596": {
+        "message": "กรุณากรอก URL วิดีโอที่ถูกต้องจากแพลตฟอร์มที่รองรับ"
+    },
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "กรุณาเลือกประเภทไฟล์ที่รองรับ"
     },
@@ -1945,6 +1948,12 @@
     },
     "religion_icon_246e0be1": {
         "message": "ไอคอนศาสนา"
+    },
+    "remove_f47dc62a": {
+        "message": "ลบ"
+    },
+    "remove_filename_3ea029f6": {
+        "message": "ลบ { filename }"
     },
     "remove_heading_style_5fdc8855": {
         "message": "ลบรูปแบบหัวเรื่อง"
@@ -2699,6 +2708,9 @@
     "video_player_for_title_ffd9fbc4": {
         "message": "เครื่องเล่นวิดีโอสำหรับ { title }"
     },
+    "video_url_889d3263": {
+        "message": "URL วิดีโอ"
+    },
     "vietnamese_e7a76583": {
         "message": "เวียดนาม"
     },
@@ -2824,6 +2836,9 @@
     },
     "your_webcam_may_already_be_in_use_6cd64c25": {
         "message": "เว็บแคมของคุณอาจใช้งานอยู่"
+    },
+    "youtube_embed_url_5c1018d4": {
+        "message": "URL ผนวกกับ YouTube"
     },
     "zeta_5ef24f0e": {
         "message": "ซีตา"
