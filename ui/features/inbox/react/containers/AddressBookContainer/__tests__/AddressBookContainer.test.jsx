@@ -227,5 +227,19 @@ describe('AddressBookContainer', () => {
       await user.click(userItems[1]) // Click the first user item
       expect(onSelectedIdsChange).toHaveBeenCalled()
     })
+
+    it('calls onInputValueChange when search term changes', async () => {
+      const onInputValueChange = jest.fn()
+      const rendered = setup({onInputValueChange})
+      const input = await rendered.findByTestId('-address-book-input')
+
+      // Type in the search input which updates searchTerm
+      await user.type(input, 'test')
+
+      // The useEffect (line 129-132) should call onInputValueChange with the search term
+      await waitFor(() => {
+        expect(onInputValueChange).toHaveBeenCalled()
+      })
+    })
   })
 })

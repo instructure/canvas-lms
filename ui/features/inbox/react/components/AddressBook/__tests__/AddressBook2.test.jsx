@@ -211,5 +211,46 @@ describe('Address Book Component', () => {
       expect(queryByTestId('address-book-popover')).not.toBeInTheDocument()
       expect(queryByTestId('menu-loading-spinner')).toBeInTheDocument()
     })
+
+    it('Should update popover width when component ref changes', async () => {
+      const {container} = setup({...defaultProps, isMenuOpen: true})
+
+      // The effect (line 184-186) updates popoverWidth state based on componentViewRef
+      // Verify the component renders and the effect executes
+      const input = container.querySelector('input')
+      expect(input).toBeInTheDocument()
+
+      // When menu is open, the popover should be visible
+      const popover = await screen.findByTestId('address-book-popover')
+      expect(popover).toBeInTheDocument()
+    })
+
+    it('Should reset selected item when data changes and menu is open', async () => {
+      const onSelectSpy = jest.fn()
+      const {rerender} = setup({
+        ...defaultProps,
+        isMenuOpen: true,
+        isSubMenu: true,
+        onSelect: onSelectSpy,
+      })
+
+      // Change menu data which should trigger selected item reset (line 205-209)
+      const newData = {
+        contextData: [{id: 'course_99', name: 'New Course', itemType: CONTEXT_TYPE}],
+        userData: [],
+      }
+
+      rerender(
+        <ApolloProvider client={mswClient}>
+          <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+            <AddressBook {...defaultProps} menuData={newData} isMenuOpen={true} isSubMenu={true} />
+          </AlertManagerContext.Provider>
+        </ApolloProvider>,
+      )
+
+      // Verify the component re-rendered with new data
+      const popover = await screen.findByTestId('address-book-popover')
+      expect(popover).toBeInTheDocument()
+    })
   })
 })

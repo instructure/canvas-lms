@@ -169,4 +169,19 @@ describe('ManageUserLabels', () => {
 
     expect(getAllByTestId('label')).toHaveLength(2)
   })
+
+  it('initializes internal labels from props when labels change', () => {
+    const props = createProps({labels: ['Label A', 'Label B']})
+    const {getAllByTestId, rerender} = render(<ManageUserLabels {...props} />)
+
+    // Verify initial labels are rendered
+    expect(getAllByTestId('label')).toHaveLength(2)
+
+    // Update labels prop to trigger useEffect (line 61-63)
+    const updatedProps = createProps({labels: ['Label A', 'Label B', 'Label C']})
+    rerender(<ManageUserLabels {...updatedProps} />)
+
+    // Verify updated labels are rendered
+    expect(getAllByTestId('label')).toHaveLength(3)
+  })
 })
