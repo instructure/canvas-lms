@@ -116,6 +116,11 @@ module Context
     Canvas::ICU.collate_by(contexts) { |r| r[:name] }
   end
 
+  def ams_integration_enabled?
+    respond_to?(:root_account) && root_account.feature_enabled?(:ams_root_account_integration) &&
+      is_a?(Course) && feature_enabled?(:ams_course_integration)
+  end
+
   def active_record_types(only_check: nil)
     only_check = only_check.sort if only_check.present? # so that we always have consistent cache keys
     @active_record_types ||= {}
@@ -126,7 +131,8 @@ module Context
       modules: -> { respond_to?(:context_modules) && context_modules.active.exists? },
       quizzes: lambda do
                  (respond_to?(:quizzes) && quizzes.active.exists?) ||
-                   (respond_to?(:assignments) && assignments.active.quiz_lti.exists?)
+                   (respond_to?(:assignments) && assignments.active.quiz_lti.exists?) ||
+                   ams_integration_enabled?
                end,
       assignments: -> { respond_to?(:assignments) && assignments.active.exists? },
       pages: -> { respond_to?(:wiki_pages) && wiki_pages.active.exists? },
