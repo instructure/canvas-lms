@@ -66,7 +66,6 @@ const makeProps = async overrides => {
   }
 }
 
-// LS-1339  created to figure out why these are failing
 describe('MediaAttempt', () => {
   beforeEach(() => {
     global.ENV = {current_user: {id: '1'}}
@@ -80,6 +79,17 @@ describe('MediaAttempt', () => {
       const {getByTestId} = render(<MediaAttempt {...props} />)
       expect(getByTestId('open-record-media-modal-button')).toBeInTheDocument()
       expect(getByTestId('open-upload-media-modal-button')).toBeInTheDocument()
+    })
+
+    it('renders images without alt text', async () => {
+      const props = await makeProps()
+      const {getByTestId} = render(<MediaAttempt {...props} />)
+
+      const pandaImage = getByTestId('record-media-image')
+      expect(pandaImage).toHaveAttribute('alt', '')
+
+      const rockImage = getByTestId('upload-media-image')
+      expect(rockImage).toHaveAttribute('alt', '')
     })
 
     it('moves focus to the record media modal button after render if focusOnInit is true', async () => {
