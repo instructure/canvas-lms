@@ -82,16 +82,6 @@ describe "ModuleVisibility" do
         @override = @module3.assignment_overrides.create!(set: @group)
       end
 
-      it "does not consider differentiation tags when the feature is disabled" do
-        @course.account.settings[:allow_assign_to_differentiation_tags] = { value: false }
-        @course.account.save!
-        @course.account.reload
-
-        expect(module_ids_visible_to_user(@student1)).to contain_exactly(@module1.id, @module2.id)
-        expect(module_ids_visible_to_user(@student2)).to contain_exactly(@module1.id, @module2.id)
-        expect(module_ids_visible_to_user(@student3)).to contain_exactly(@module1.id, @module2.id)
-      end
-
       it "does not include modules unless the user is in the group" do
         expect(module_ids_visible_to_user(@student1)).to contain_exactly(@module1.id, @module2.id)
         expect(module_ids_visible_to_user(@student2)).to contain_exactly(@module1.id, @module2.id)

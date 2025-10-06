@@ -298,17 +298,6 @@ describe "differentiated_assignments" do
         ensure_user_does_not_see_quiz
       end
 
-      it "does not include quiz if course_ids is not present" do
-        create_diff_tags_category_with_groups
-        diff_tag_group_1 = @diff_tag_category.groups[0]
-        user_in_non_collaborative_group(diff_tag_group_1)
-
-        @quiz.assignment_overrides.create!(set: diff_tag_group_1)
-
-        visible_quiz_ids = QuizVisibility::QuizVisibilityService.quizzes_visible_to_students(user_ids: @user.id, quiz_ids: @quiz.id, course_ids: nil).map(&:quiz_id)
-        expect(visible_quiz_ids.map(&:to_i).include?(@quiz.id)).to be_falsey
-      end
-
       it "does not apply non collaborative group overrides when override is deleted" do
         create_diff_tags_category_with_groups
         diff_tag_group_1 = @diff_tag_category.groups[0]

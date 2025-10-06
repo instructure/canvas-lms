@@ -53,7 +53,7 @@ module AssignmentVisibility
             #{assignment_module_items_join_sql}
 
             /* join assignment group overrides */
-            #{VisibilitySqlHelper.assign_to_differentiation_tags_enabled?(course_ids) ? assignment_group_override_join_sql : assignment_group_override_join_sql(collaborative_group_filter: "AND g.non_collaborative = FALSE")}
+            #{assignment_group_override_join_sql}
 
             /* filtered to course_id, user_id, assignment_id, and additional conditions */
             #{assignment_group_override_filter_sql(filter_condition_sql:)}

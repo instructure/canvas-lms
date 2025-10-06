@@ -93,14 +93,6 @@ module StudentVisibilityCommon
           expect(ids_visible_to_user(@student3, learning_object_type)).to contain_exactly(learning_object1.id, learning_object2.id)
         end
 
-        it "does include object with non collaborative group if course_ids is not present" do
-          @differentiation_tag_group_1.add_user(@student1)
-          learning_object1.assignment_overrides.create!(set: @differentiation_tag_group_1)
-          expect(ids_visible_to_user_without_course_ids(@student1, learning_object_type)).to contain_exactly(learning_object2.id)
-          expect(ids_visible_to_user_without_course_ids(@student2, learning_object_type)).to contain_exactly(learning_object2.id)
-          expect(ids_visible_to_user_without_course_ids(@student3, learning_object_type)).to contain_exactly(learning_object2.id)
-        end
-
         it "does include object with a non collaborative group if account setting is disabled" do
           # Once a learning object is assigned to a non-collaborative group, it should be visible
           # to all students in that group.  If the account setting is disabled, these learning objects should still be visible
