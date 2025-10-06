@@ -172,7 +172,6 @@ class FilesController < ApplicationController
   before_action :check_limited_access_contexts, only: %i[index]
   before_action :check_limited_access_for_students, only: %i[api_index]
   before_action :forbid_api_calls_for_limited_access_students, only: :api_show
-  before_action :check_restricted_file_access_for_students, only: %i[show]
 
   def forbid_api_calls_for_limited_access_students
     if @current_user&.student_in_limited_access_account? && request.referer.nil?
