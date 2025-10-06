@@ -11,17 +11,6 @@ assignment_edit_enhancements_teacher_view:
   shadow: true
   display_name: Assignment Enhancements Teacher View (Create/Edit)
   description: Updates to the Teacher create/edit view of assignments.
-assign_to_differentiation_tags:
-  state: hidden
-  applies_to: Account
-  beta: true
-  display_name: Differentiation Tags
-  description: Let instructors tag enrolled users and assign course content based on those tags, supporting more personalized learning experiences.
-  environments:
-    ci:
-      state: allowed_on
-    development:
-      state: allowed_on
 self_signup_deadline:
   state: hidden
   applies_to: Account
@@ -49,7 +38,7 @@ ai_experiences:
   applies_to: Course
   shadow: true
   display_name: AI Experiences
-  description: Introduces AI Experiences - a new Canvas Learning Object. 
+  description: Introduces AI Experiences - a new Canvas Learning Object.
 updated_mastery_connect_icon:
   state: hidden
   applies_to: SiteAdmin
