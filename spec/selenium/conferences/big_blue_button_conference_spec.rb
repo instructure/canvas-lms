@@ -229,7 +229,6 @@ describe "BigBlueButton conferences" do
   end
 
   it "persists selected settings" do
-    skip "2025-07-16 - 1/10 failure rate when clicking 'Edit' FOO-5836"
     get conferences_index_page
     f("button[title='New Conference']").click
 
@@ -249,11 +248,14 @@ describe "BigBlueButton conferences" do
     wait_for_ajaximations
 
     fj("li.conference a:contains('Settings')").click
+    wait_for_ajaximations
     fj("a:contains('Edit')").click
+    wait_for_ajaximations
 
     expect(f("input[value='no_time_limit']").attribute("checked")).to be_truthy
 
     f("div#tab-attendees").click
+    wait_for_ajaximations
     expect(f("input[value='share_webcam']").attribute("checked")).to be_falsey
     expect(f("input[value='share_other_webcams']").attribute("checked")).to be_falsey
     expect(f("input[value='share_microphone']").attribute("checked")).to be_falsey
