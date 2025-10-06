@@ -44,6 +44,25 @@ module DataFixup::NormalizePseudonyms
       dedup(Pseudonym.where(authentication_provider_id: nil))
     end
 
+    def normalize(unique_id)
+      unique_id = unique_id.dup
+      # invalid characters are not allowed in normalized pseudonyms.
+      # during normal pseudonym creation, they'll fail, but we can't fail
+      # this migration so just replace them. these pseudonyms will no
+      # longer work to log in if the user tries their original characters.
+      # the most common case of this is emojis that didn't exist in Unicode 3.2.
+      # Note that we can't use the regular Unicode replacement character, as
+      # that is not allowed in a normalized id either.
+      [Net::IMAP::StringPrep::Tables::IN_A_1,
+       Net::IMAP::StringPrep::Tables::IN_C_3,
+       Net::IMAP::StringPrep::Tables::IN_C_4,
+       Net::IMAP::StringPrep::Tables::IN_C_5,
+       "\ufffd"].each do |table|
+        unique_id.gsub!(table, "\u25a1")
+      end
+      Pseudonym.normalize(unique_id)
+    end
+
     private
 
     def dedup(scope, *additional_group_by)
@@ -169,25 +188,6 @@ module DataFixup::NormalizePseudonyms
       Canvas::Reloader.reload
       sleep_interval_per_batch = Setting.get("sleep_interval_per_backfill_nulls_batch", nil).presence&.to_f
       sleep(sleep_interval_per_batch) if sleep_interval_per_batch # rubocop:disable Lint/NoSleep
-    end
-
-    def normalize(unique_id)
-      unique_id = unique_id.dup
-      # invalid characters are not allowed in normalized pseudonyms.
-      # during normal pseudonym creation, they'll fail, but we can't fail
-      # this migration so just replace them. these pseudonyms will no
-      # longer work to log in if the user tries their original characters.
-      # the most common case of this is emojis that didn't exist in Unicode 3.2.
-      # Note that we can't use the regular Unicode replacement character, as
-      # that is not allowed in a normalized id either.
-      [Net::IMAP::StringPrep::Tables::IN_A_1,
-       Net::IMAP::StringPrep::Tables::IN_C_3,
-       Net::IMAP::StringPrep::Tables::IN_C_4,
-       Net::IMAP::StringPrep::Tables::IN_C_5,
-       "\ufffd"].each do |table|
-        unique_id.gsub!(table, "\u25a1")
-      end
-      Pseudonym.normalize(unique_id)
     end
   end
 end
