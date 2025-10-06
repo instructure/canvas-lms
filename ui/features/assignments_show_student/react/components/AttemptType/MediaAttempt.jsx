@@ -292,8 +292,9 @@ class MediaAttempt extends React.Component {
                       <Flex.Item>
                         <Img
                           src={PhotographerPandaSVG}
-                          alt={I18n.t('panda taking photograph')}
+                          alt=""
                           height="180px"
+                          data-testid="record-media-image"
                         />
                       </Flex.Item>
                       <Flex.Item overflowY="visible">
@@ -360,8 +361,9 @@ class MediaAttempt extends React.Component {
                       <Flex.Item>
                         <Img
                           src={UploadFileSVG}
-                          alt={I18n.t('rocketship on launchpad')}
+                          alt=""
                           height="180px"
+                          data-testid="upload-media-image"
                         />
                       </Flex.Item>
                       <Flex.Item overflowY="visible">
