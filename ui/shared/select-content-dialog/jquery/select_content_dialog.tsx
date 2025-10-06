@@ -439,7 +439,11 @@ export const Events = {
         'id',
         tool.definition_id,
       )
-      url = url + '?placement=' + placement_type + '&secure_params=' + $('#secure_params').val()
+      url = url + '?placement=' + placement_type
+      const secureParamsValue = $('#secure_params').val()
+      if (secureParamsValue) {
+        url += '&secure_params=' + secureParamsValue
+      }
       if ($('#select_context_content_dialog').data('context_module_id')) {
         url += '&context_module_id=' + $('#select_context_content_dialog').data('context_module_id')
         url += '&com_instructure_course_canvas_resource_type=context_module.external_tool'
