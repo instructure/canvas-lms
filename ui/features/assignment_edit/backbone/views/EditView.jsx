@@ -1714,6 +1714,20 @@ EditView.prototype.showErrors = function (errors) {
   errors = this.sortErrorsByVerticalScreenPosition(errors)
   let shouldFocus = true
   Object.entries(errors).forEach(([key, value]) => {
+    if (key === 'peer_review_details') {
+      if ((ENV.PEER_REVIEW_GRADING_ENABLED || ENV.PEER_REVIEW_ALLOCATION_ENABLED) && shouldFocus) {
+        const peerReviewDetailsEl = document.getElementById(
+          'peer_reviews_allocation_and_grading_details',
+        )
+        if (peerReviewDetailsEl && typeof peerReviewDetailsEl.focusOnFirstError === 'function') {
+          peerReviewDetailsEl.focusOnFirstError()
+          shouldFocus = false
+        }
+      }
+      delete errors[key]
+      return
+    }
+
     // For this to function properly
     // the error containers must have an ID formatted as ${key}_errors.
     const errorsContainerID = `${key}_errors`
@@ -1798,7 +1812,12 @@ EditView.prototype.showErrors = function (errors) {
 EditView.prototype.sortErrorsByVerticalScreenPosition = function (errors) {
   return Object.entries(errors)
     .map(([errorKey, errorMessage]) => {
-      const errorElement = this.getElement(errorKey)
+      let errorElement = this.getElement(errorKey)
+
+      if (!errorElement && errorKey === 'peer_review_details') {
+        errorElement = document.getElementById('peer_reviews_allocation_and_grading_details')
+      }
+
       if (!errorElement) return null
 
       const elementRect = errorElement.getBoundingClientRect()
@@ -1906,6 +1925,25 @@ EditView.prototype.validateBeforeSave = function (data, errors) {
   } else {
     delete errors.invalid_card
   }
+
+  if (ENV.PEER_REVIEW_GRADING_ENABLED || ENV.PEER_REVIEW_ALLOCATION_ENABLED) {
+    const peerReviewCheckbox = document.getElementById('assignment_peer_reviews_checkbox')
+    if (peerReviewCheckbox && peerReviewCheckbox.checked) {
+      const peerReviewDetailsEl = document.getElementById(
+        'peer_reviews_allocation_and_grading_details',
+      )
+      if (
+        peerReviewDetailsEl &&
+        typeof peerReviewDetailsEl.validatePeerReviewDetails === 'function'
+      ) {
+        const isValid = peerReviewDetailsEl.validatePeerReviewDetails()
+        if (!isValid) {
+          errors.peer_review_details = true
+        }
+      }
+    }
+  }
+
   return errors
 }
 
