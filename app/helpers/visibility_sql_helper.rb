@@ -221,13 +221,6 @@ module VisibilitySqlHelper
       SQL
     end
 
-    def assign_to_differentiation_tags_enabled?(course_ids)
-      # With the feature flag removed, non-collaborative group overrides are always enabled.
-      # The account setting only controls the UI for creating new overrides, but existing
-      # overrides should always be respected for visibility.
-      course_ids.present?
-    end
-
     def full_section_with_left_joins_sql(filter_condition_sql:, id_column_name:, content_tag_type:)
       <<~SQL.squish
         /* join context modules */

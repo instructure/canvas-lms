@@ -306,11 +306,6 @@ describe AssignmentVisibility::AssignmentVisibilityService do
               visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @student.id, course_ids: @course.id).map { |x| x.assignment_id.to_i }
               expect(visible_assignment_ids.include?(@assignment.id)).to be_falsy
             end
-
-            it "does not show the assignment if course_ids is not present" do
-              visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @user.id, assignment_ids: @assignment.id, course_ids: nil).map(&:assignment_id)
-              expect(visible_assignment_ids.map(&:to_i).include?(@assignment.id)).to be_falsy
-            end
           end
         end
 
