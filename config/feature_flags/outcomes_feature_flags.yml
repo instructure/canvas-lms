@@ -187,3 +187,9 @@ outcomes_rollup_read:
   description: When enabled, LMGB reads from rollup table instead of calculating. Only Site Admins can toggle.
   applies_to: SiteAdmin
   shadow: true
+account_outcome_rollup_orchestrator:
+  state: hidden
+  display_name: Account Outcome Rollup Orchestrator
+  description: Uses batch processing orchestrator when account-level outcomes are updated to recalculate rollups for affected courses.
+  applies_to: SiteAdmin
+  shadow: true
