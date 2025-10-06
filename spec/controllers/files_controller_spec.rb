@@ -305,7 +305,7 @@ describe FilesController do
       expect(response).not_to be_ok
     end
 
-    it "renders files with limited access flag" do
+    it "allows file access even when limited access for students is enabled" do
       enable_limited_access_for_students
 
       user_session(@student)
@@ -1119,12 +1119,12 @@ describe FilesController do
         expect(assigns[:show_left_side]).to be false
       end
 
-      it "renders unauthorized when account restricts file access for user" do
+      it "allows access even when account restricts file access for user" do
         user_session(@student)
         @course.account.root_account.enable_feature!(:restrict_student_access)
         allow(@course.account).to receive(:restricted_file_access_for_user?).with(@student).and_return(true)
         get "show", params: { course_id: @course.id, id: @file.id }
-        expect(response).to be_unauthorized
+        expect(response).to be_successful
       end
 
       it "allows access when account does not restrict file access for user" do
