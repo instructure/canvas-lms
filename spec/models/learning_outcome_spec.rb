@@ -18,7 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_relative "../feature_flag_helper"
+
 describe LearningOutcome do
+  include FeatureFlagHelper
+
   let(:calc_method_no_int) { %w[highest latest average] }
 
   def outcome_errors(prop)
@@ -1686,12 +1690,106 @@ describe LearningOutcome do
       end
 
       context "with account context" do
-        it "does not enqueue rollup calculation for account-level changes" do
-          outcome = account.created_learning_outcomes.create!(title: "Test Outcome", calculation_method: "highest")
+        before do
+          Account.site_admin.enable_feature!(:outcomes_rollup_propagation)
+        end
 
-          expect(Outcomes::StudentOutcomeRollupCalculationService).not_to receive(:calculate_for_course)
+        context "with account_outcome_rollup_orchestrator feature disabled" do
+          before do
+            mock_feature_flag_on_account(:account_outcome_rollup_orchestrator, false)
+          end
 
-          outcome.update!(calculation_method: "latest")
+          it "does not enqueue rollup calculation for account-level changes" do
+            outcome = account.created_learning_outcomes.create!(title: "Test Outcome", calculation_method: "highest")
+
+            expect(Outcomes::AccountOutcomeRollupOrchestrator).not_to receive(:process_account_outcome_change)
+            expect(Outcomes::StudentOutcomeRollupCalculationService).not_to receive(:calculate_for_course)
+
+            outcome.update!(calculation_method: "latest")
+          end
+        end
+
+        context "with account_outcome_rollup_orchestrator feature enabled" do
+          before do
+            mock_feature_flag_on_account(:account_outcome_rollup_orchestrator, true)
+          end
+
+          it "uses orchestrator for account-level changes when calculation_method changes" do
+            outcome = account.created_learning_outcomes.create!(title: "Test Outcome", calculation_method: "highest")
+
+            expect(Outcomes::AccountOutcomeRollupOrchestrator).to receive(:process_account_outcome_change)
+              .with(account_id: account.id, outcome_id: outcome.id)
+
+            outcome.update!(calculation_method: "latest")
+          end
+
+          it "uses orchestrator for account-level changes when calculation_int changes" do
+            outcome = account.created_learning_outcomes.create!(title: "Test Outcome", calculation_method: "decaying_average", calculation_int: 65)
+
+            expect(Outcomes::AccountOutcomeRollupOrchestrator).to receive(:process_account_outcome_change)
+              .with(account_id: account.id, outcome_id: outcome.id)
+
+            outcome.update!(calculation_int: 75)
+          end
+
+          it "uses orchestrator when rubric criterion changes" do
+            outcome = account.created_learning_outcomes.create!(
+              title: "Test Outcome",
+              data: {
+                rubric_criterion: {
+                  ratings: [
+                    { description: "Excellent", points: 4 },
+                    { description: "Good", points: 3 }
+                  ],
+                  mastery_points: 3,
+                  points_possible: 4
+                }
+              }
+            )
+
+            expect(Outcomes::AccountOutcomeRollupOrchestrator).to receive(:process_account_outcome_change)
+              .with(account_id: account.id, outcome_id: outcome.id)
+
+            outcome.update!(
+              data: {
+                rubric_criterion: {
+                  ratings: [
+                    { description: "Excellent", points: 5 },
+                    { description: "Good", points: 3 }
+                  ],
+                  mastery_points: 3,
+                  points_possible: 5
+                }
+              }
+            )
+          end
+
+          it "does not enqueue course-level calculation for account outcomes" do
+            outcome = account.created_learning_outcomes.create!(title: "Test Outcome", calculation_method: "highest")
+
+            expect(Outcomes::StudentOutcomeRollupCalculationService).not_to receive(:calculate_for_course)
+
+            outcome.update!(calculation_method: "latest")
+          end
+
+          it "handles errors gracefully" do
+            outcome = account.created_learning_outcomes.create!(title: "Test Outcome", calculation_method: "highest")
+
+            allow(Outcomes::AccountOutcomeRollupOrchestrator).to receive(:process_account_outcome_change)
+              .and_raise(StandardError.new("Test error"))
+
+            expect(Canvas::Errors).to receive(:capture_exception).with(
+              :outcome_rollup_callback,
+              instance_of(StandardError),
+              hash_including(
+                context_type: "Account",
+                context_id: account.id,
+                learning_outcome_id: outcome.id
+              )
+            )
+
+            expect { outcome.update!(calculation_method: "latest") }.not_to raise_error
+          end
         end
       end
 
