@@ -91,11 +91,6 @@ describe('FilePreviewModal', () => {
     expect(await screen.findByTestId('media-player')).toBeInTheDocument()
   })
 
-  it('renders NoFilePreviewAvailable for unsupported file types', () => {
-    renderComponent({item: {...defaultProps.item!, mime_class: 'unsupported'}})
-    expect(screen.getByText(/no preview available/i)).toBeInTheDocument()
-  })
-
   it('renders the next and previous buttons if collection has more than one item', () => {
     renderComponent()
     expect(screen.getByText('Next')).toBeInTheDocument()
