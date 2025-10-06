@@ -232,6 +232,7 @@ module Api::V1::Assignment
       hash["is_quiz_lti_assignment"] = true
       hash["frozen_attributes"] ||= []
       hash["frozen_attributes"] << "submission_types"
+      hash["settings"] = assignment.settings
     end
 
     if assignment.external_tool? && assignment.external_tool_tag.present?
@@ -636,6 +637,8 @@ module Api::V1::Assignment
 
     Assignment.suspend_due_date_caching do
       assignment.quiz_lti! if assignment_params.key?(:quiz_lti) || assignment&.quiz_lti?
+
+      update_new_quizzes_params(assignment, assignment_params)
 
       response = if prepared_create[:overrides].present?
                    create_api_assignment_with_overrides(prepared_create, user)
@@ -1260,8 +1263,6 @@ module Api::V1::Assignment
       assignment.line_item_resource_id = line_item[:resourceId]
       assignment.line_item_tag = line_item[:tag]
     end
-
-    update_new_quizzes_params(assignment, assignment_params)
 
     assignment.saving_user = user
 

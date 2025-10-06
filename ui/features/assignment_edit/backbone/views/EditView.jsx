@@ -71,8 +71,10 @@ const I18n = createI18nScope('assignment_editview')
 const slice = [].slice
 
 const ASSIGNMENT_GROUP_SELECTOR = '#assignment_group_selector'
+const QUIZ_TYPE_SELECTOR = '#quiz_type_selector'
 const DESCRIPTION = '[name="description"]'
 const SUBMISSION_TYPE = '[name="submission_type"]'
+const SUBMISSION_TYPE_FIELDS = '#submission_type_fields'
 const ONLINE_SUBMISSION_TYPES = '#assignment_online_submission_types'
 const NAME = '[name="name"]'
 const ALLOW_FILE_UPLOADS = '#assignment_online_upload'
@@ -186,6 +188,7 @@ function EditView() {
   this.handleRemoveResource = this.handleRemoveResource.bind(this)
   this.handleSubmissionTypeChange = this.handleSubmissionTypeChange.bind(this)
   this.handleGradingTypeChange = this.handleGradingTypeChange.bind(this)
+  this.handleQuizTypeChange = this.handleQuizTypeChange.bind(this)
   this.handleRestrictFileUploadsChange = this.handleRestrictFileUploadsChange.bind(this)
   this.renderDefaultExternalTool = this.renderDefaultExternalTool.bind(this)
   this.renderAssignmentSubmissionTypeContainer =
@@ -238,6 +241,7 @@ EditView.prototype.els = {
     els['' + ASSIGNMENT_GROUP_SELECTOR] = '$assignmentGroupSelector'
     els['' + DESCRIPTION] = '$description'
     els['' + SUBMISSION_TYPE] = '$submissionType'
+    els['' + SUBMISSION_TYPE_FIELDS] = '$submissionTypeFields'
     els['' + ONLINE_SUBMISSION_TYPES] = '$onlineSubmissionTypes'
     els['' + NAME] = '$name'
     els['' + ALLOW_FILE_UPLOADS] = '$allowFileUploads'
@@ -327,6 +331,8 @@ EditView.prototype.events = {
 
 EditView.child('assignmentGroupSelector', '' + ASSIGNMENT_GROUP_SELECTOR)
 
+EditView.child('quizTypeSelector', '' + QUIZ_TYPE_SELECTOR)
+
 EditView.child('gradingTypeSelector', '' + GRADING_TYPE_SELECTOR)
 
 EditView.child('groupCategorySelector', '' + GROUP_CATEGORY_SELECTOR)
@@ -376,6 +382,9 @@ EditView.prototype.initialize = function (options) {
   this.gradingTypeSelector.on('change:gradingType', this.handleGradingTypeChange)
   if (ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED) {
     this.gradingTypeSelector.on('change:gradingType', this.onChange)
+  }
+  if (this.quizTypeSelector) {
+    this.quizTypeSelector.on('change:quizType', this.handleQuizTypeChange)
   }
   this.lockedItems = options.lockedItems || {}
   return (this.cannotEditGrades = !options.canEditGrades)
@@ -1045,6 +1054,30 @@ EditView.prototype.handleGradingTypeChange = function (gradingType) {
   return this.handleSubmissionTypeChange(null)
 }
 
+EditView.prototype.handleQuizTypeChange = function (quizType) {
+  // Hide points field when ungraded survey is selected
+  const shouldHidePoints = quizType === 'ungraded_survey'
+  this.$assignmentPointsPossible.closest('.control-group').toggleAccessibly(!shouldHidePoints)
+
+  // Set points to 0 for ungraded surveys
+  if (shouldHidePoints) {
+    this.$assignmentPointsPossible.val('0')
+  }
+
+  // Hide Assignment Group, Display Grade as, and Submission Type for surveys
+  const isSurvey = quizType === 'graded_survey' || quizType === 'ungraded_survey'
+  this.$assignmentGroupSelector.toggleAccessibly(!isSurvey)
+  this.$gradingTypeSelector.toggleAccessibly(!isSurvey)
+  this.$submissionTypeFields.toggleAccessibly(!isSurvey)
+
+  // Hide graded assignment fields and related checkboxes for surveys
+  if (isSurvey) {
+    this.$gradedAssignmentFields.toggleAccessibly(false)
+  } else {
+    this.$gradedAssignmentFields.toggleAccessibly(true)
+  }
+}
+
 EditView.prototype.hasMasteryConnectData = function () {
   // Some places check for this data before clearing/overwriting...
   // It's not clear the reasoning behind this, but I'm for leaving as-is for now.
@@ -1351,11 +1384,35 @@ EditView.prototype.afterRender = function () {
   if (this.defaultExternalToolEnabled()) {
     this.renderDefaultExternalTool()
   }
+
+  // Hide Assignment Group, Display Grade as, and Submission Type for surveys on initial load
+  if (this.quizTypeSelector) {
+    const currentQuizType = this.assignment.newQuizzesType() || 'graded_quiz'
+    const isSurvey = currentQuizType === 'graded_survey' || currentQuizType === 'ungraded_survey'
+    const isUngradedSurvey = currentQuizType === 'ungraded_survey'
+
+    if (isSurvey) {
+      this.$assignmentGroupSelector.toggleAccessibly(false)
+      this.$gradingTypeSelector.toggleAccessibly(false)
+      this.$submissionTypeFields.toggleAccessibly(false)
+      // Hide graded assignment fields for surveys
+      this.$gradedAssignmentFields.toggleAccessibly(false)
+    }
+
+    if (isUngradedSurvey) {
+      this.$assignmentPointsPossible.closest('.control-group').toggleAccessibly(false)
+      this.$assignmentPointsPossible.val('0')
+    }
+  }
+
   return this
 }
 
 EditView.prototype.toJSON = function () {
   const data = this.assignment.toView()
+  const newQuizzesSurveysFFEnabled =
+    typeof ENV !== 'undefined' && ENV !== null && ENV.FEATURES && ENV.FEATURES.new_quizzes_surveys
+
   return Object.assign(data, {
     assignment_attempts:
       typeof ENV !== 'undefined' && ENV !== null ? ENV.assignment_attempts_enabled : void 0,
@@ -1389,6 +1446,7 @@ EditView.prototype.toJSON = function () {
         ? ENV.ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED
         : void 0) || false,
     is_horizon_course: !!ENV.horizon_course,
+    showQuizTypeSelector: newQuizzesSurveysFFEnabled && this.assignment.isQuizLTIAssignment(),
   })
 }
 

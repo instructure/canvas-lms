@@ -458,6 +458,7 @@ class ApplicationController < ActionController::Base
     multiselect_gradebook_filters
     new_quizzes_media_type
     new_quizzes_navigation_updates
+    new_quizzes_surveys
     permanent_page_links
     rce_a11y_resize
     rce_find_replace

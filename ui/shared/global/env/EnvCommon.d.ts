@@ -295,6 +295,7 @@ export type SiteAdminFeatureId =
   | 'media_links_use_attachment_id'
   | 'multiselect_gradebook_filters'
   | 'new_quizzes_navigation_updates'
+  | 'new_quizzes_surveys'
   | 'permanent_page_links'
   | 'render_both_to_do_lists'
   | 'scheduled_feedback_releases'
