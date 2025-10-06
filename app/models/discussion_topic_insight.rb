@@ -187,9 +187,11 @@ class DiscussionTopicInsight < ActiveRecord::Base
     entries = entries.to_a
 
     pretty_locale = available_locales[locale] || "English"
+    prompt_presenter = DiscussionTopic::PromptPresenter.new(discussion_topic)
+
     hashes = entries.map do |entry|
       DiscussionTopicInsight::Entry.hash_for_dynamic_content(
-        content: DiscussionTopic::PromptPresenter.new(discussion_topic).content_for_insight(entries: [entry]),
+        content: prompt_presenter.content_for_insight(entries: [entry]),
         pretty_locale:
       )
     end
