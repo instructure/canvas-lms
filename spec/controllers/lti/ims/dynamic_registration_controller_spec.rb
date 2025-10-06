@@ -105,6 +105,7 @@ describe Lti::IMS::DynamicRegistrationController do
           user_id: User.create!.id,
           initiated_at: 1.minute.ago,
           root_account_global_id: Account.default.global_id,
+          root_account_domain: Account.default.domain,
           uuid: SecureRandom.uuid,
           unified_tool_id: "asdf",
           registration_url: "https://example.com/registration",
@@ -263,6 +264,7 @@ describe Lti::IMS::DynamicRegistrationController do
                 user_id: user.id,
                 initiated_at: 1.minute.ago,
                 root_account_global_id: account.global_id,
+                root_account_domain: account.domain,
                 uuid: SecureRandom.uuid,
                 unified_tool_id: "asdf",
                 registration_url: "https://example.com/registration",
@@ -415,6 +417,7 @@ describe Lti::IMS::DynamicRegistrationController do
             user_id: User.create!.id,
             initiated_at: 1.minute.ago,
             root_account_global_id: account.global_id,
+            root_account_domain: account.domain,
             uuid: SecureRandom.uuid,
             unified_tool_id: "asdf",
             registration_url: "https://example.com/registration",
@@ -454,6 +457,7 @@ describe Lti::IMS::DynamicRegistrationController do
               user_id: User.create!.id,
               initiated_at: 1.minute.ago,
               root_account_global_id: account.global_id,
+              root_account_domain: account.domain,
               uuid: SecureRandom.uuid,
               unified_tool_id: "asdf",
               registration_url: "https://example.com/registration",
@@ -836,19 +840,29 @@ describe Lti::IMS::DynamicRegistrationController do
 
   describe "#registration_token" do
     subject do
-      get :registration_token, params: { account_id: Account.default.id }
+      get :registration_token, params: { account_id: account.id }, format: :json
     end
 
+    let(:account) { Account.default }
     let(:token) { JSON::JWT.decode(response.parsed_body["token"], :skip_verification) }
 
     before do
-      account_admin_user(account: Account.default)
+      account_admin_user(account:)
       user_session(@admin)
     end
 
     it "returns a 200" do
       subject
       expect(response).to have_http_status(:ok)
+    end
+
+    it "includes expected fields in token" do
+      subject
+      expect(token[:user_id]).to eq(@admin.id)
+      expect(token[:root_account_global_id]).to eq(Account.default.global_id)
+      expect(token[:root_account_domain]).to eq(Account.default.domain)
+      expect(token[:uuid]).not_to be_nil
+      expect(token[:registration_url]).to be_nil
     end
 
     it "uses iss domain in config url" do

@@ -104,6 +104,7 @@ class SecurityController < ApplicationController
     token = Canvas::Security.decode_jwt(access_token)
 
     account = Account.find_by(id: token["root_account_global_id"])
+    account_domain = token["root_account_domain"]
     unless account
       render json: { error: "Account #{token["root_account_global_id"]} not found." }, status: :not_found
       return
@@ -127,7 +128,7 @@ class SecurityController < ApplicationController
       claims_supported: %w[sub picture email name given_name family_name locale],
       subject_types_supported: ["public"],
       authorization_server: host,
-      "https://purl.imsglobal.org/spec/lti-platform-configuration": lti_platform_configuration(account)
+      "https://purl.imsglobal.org/spec/lti-platform-configuration": lti_platform_configuration(account, account_domain)
     }
   end
 
@@ -135,7 +136,7 @@ class SecurityController < ApplicationController
     "OpenSource"
   end
 
-  def lti_platform_configuration(account)
+  def lti_platform_configuration(account, account_domain)
     notice_types_supported = SecurityController.notice_types_supported
     {
       product_family_code: "canvas",
@@ -144,7 +145,8 @@ class SecurityController < ApplicationController
       notice_types_supported:,
       variables: Lti::VariableExpander.expansion_keys,
       "https://canvas.instructure.com/lti/account_name": account.name,
-      "https://canvas.instructure.com/lti/account_lti_guid": account.lti_guid
+      "https://canvas.instructure.com/lti/account_lti_guid": account.lti_guid,
+      "https://canvas.instructure.com/lti/account_domain": account_domain
     }.with_indifferent_access.compact
   end
 end

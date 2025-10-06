@@ -57,6 +57,7 @@ module Lti
         current_time = Time.zone.now.iso8601
         user_id = @current_user.id
         root_account_global_id = account_context.global_id
+        root_account_domain = account_context.domain(request.host)
         unified_tool_id = params[:unified_tool_id].presence
         registration_url = params[:registration_url]
         existing_registration = Lti::Registration.find(params[:registration_id]) if params[:registration_id].present? && account_context.feature_enabled?(:lti_dr_registrations_update)
@@ -68,6 +69,7 @@ module Lti
             user_id:,
             unified_tool_id:,
             root_account_global_id:,
+            root_account_domain:,
             registration_url:,
             existing_registration: existing_registration&.id
           }.compact,
@@ -161,7 +163,7 @@ module Lti
         access_token = AuthenticationMethods.access_token(request)
         jwt = Canvas::Security.decode_jwt(access_token)
 
-        required_jwt_keys = %w[user_id initiated_at root_account_global_id exp uuid registration_url]
+        required_jwt_keys = %w[user_id initiated_at root_account_global_id root_account_domain exp uuid registration_url]
         unless required_jwt_keys.all? { |key| jwt.key?(key) }
           respond_with_error(:unauthorized, "JWT did not include expected contents")
           return
