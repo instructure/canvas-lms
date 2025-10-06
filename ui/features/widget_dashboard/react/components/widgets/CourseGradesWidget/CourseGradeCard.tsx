@@ -111,7 +111,7 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
                     ? gradingScheme === 'percentage'
                       ? `${Math.floor(currentGrade)}%`
                       : convertToLetterGrade(currentGrade, gradingScheme)
-                    : '--'}
+                    : 'N/A'}
                 </Text>
               )}
             </Flex.Item>
