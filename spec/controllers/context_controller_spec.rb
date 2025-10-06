@@ -468,6 +468,23 @@ describe ContextController do
       expect(assigns[:deleted_items]).to include(@assignment)
     end
 
+    it "sorts by deleted_at/updated_at descending" do
+      assignment = assignment_model(course: @course)
+      page = wiki_page_model(course: @course)
+      file = attachment_model(context: @course)
+      discussion = discussion_topic_model(course: @course)
+
+      discussion.update_columns(updated_at: 1.day.ago, workflow_state: "deleted")
+      file.update_columns(deleted_at: 2.days.ago, file_state: "deleted")
+      page.update_columns(updated_at: 3.days.ago, workflow_state: "deleted")
+      assignment.update_columns(updated_at: 4.days.ago, workflow_state: "deleted")
+
+      user_session(@teacher)
+      get :undelete_index, params: { course_id: @course.id }
+      expect(response).to be_successful
+      expect(assigns[:deleted_items]).to eq([discussion, file, page, assignment])
+    end
+
     it "shows group_categories" do
       user_session(@teacher)
       category = GroupCategory.student_organized_for(@course)

@@ -372,6 +372,7 @@ class ContextController < ApplicationController
                       wiki_pages
                       rubric_associations_with_deleted].freeze
   ITEM_TYPES = WORKFLOW_TYPES + [:attachments, :combined_group_and_differentiation_tag_categories].freeze
+  MAX_ITEMS_PER_TYPE = 50
   def undelete_index
     if authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
       @item_types =
@@ -382,10 +383,16 @@ class ContextController < ApplicationController
         end
 
       @deleted_items = @item_types.reduce([]) do |acc, scope|
-        acc + scope.where(workflow_state: "deleted").limit(25).to_a
+        acc + scope.where(workflow_state: "deleted")
+                   .order(updated_at: :desc)
+                   .limit(MAX_ITEMS_PER_TYPE)
+                   .to_a
       end.reject { |item| item.is_a?(DiscussionTopic) && !item.restorable? }
 
-      @deleted_items += @context.attachments.where(file_state: "deleted").limit(25).to_a
+      @deleted_items += @context.attachments.where(file_state: "deleted")
+                                .order(deleted_at: :desc)
+                                .limit(MAX_ITEMS_PER_TYPE)
+                                .to_a
 
       can_delete_group_categories = @context.grants_right?(@current_user, :manage_groups_delete)
       can_delete_differentiation_tag_categories = @context.grants_right?(@current_user, :manage_tags_delete)
@@ -399,10 +406,13 @@ class ContextController < ApplicationController
                          nil
                        end
       if undelete_scope.present?
-        @deleted_items += undelete_scope.where.not(deleted_at: nil).limit(25).to_a
+        @deleted_items += undelete_scope.where.not(deleted_at: nil)
+                                        .order(deleted_at: :desc)
+                                        .limit(MAX_ITEMS_PER_TYPE)
+                                        .to_a
       end
 
-      @deleted_items.sort_by { |item| item.read_attribute(:deleted_at) || item.created_at }.reverse
+      @deleted_items = @deleted_items.sort_by { |item| item.read_attribute(:deleted_at) || item.updated_at }.reverse
     end
   end
 
