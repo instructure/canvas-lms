@@ -116,7 +116,7 @@ const LibraryManager = ({
         variables: {
           userId,
           query: searchTerm,
-          maxResults: 5,
+          first: 5,
         },
         context: {fetchOptions: {signal: controller.signal}},
       })

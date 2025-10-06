@@ -305,7 +305,7 @@ describe('LibraryManager', () => {
       const mocks = [
         ...commentBankItemMocks(),
         ...searchMocks({query: 'search'}),
-        ...searchMocks({query: 'search results 0', maxResults: 1}),
+        ...searchMocks({query: 'search results 0', first: 1}),
       ]
       const props = defaultProps({commentAreaText: 'search'})
       const {getByText, queryByText, rerender} = render({props, mocks})

@@ -800,7 +800,6 @@ module Types
       # .to_a gets around the .shard() bug documented in FOO-1989 so that it can be properly limited.
       # After that bug is fixed and Switchman is upgraded in Canvas, we can remove the block below
       # and use the 'first' argument on the connection instead of 'limit'.
-      # Note that limit: 5 is currently being used by the Comment Library.
       if limit.present?
         comments = comments.limit(limit).to_a.first(limit)
       end
