@@ -154,7 +154,8 @@ RSpec.describe SecurityController, type: :request do
       time ||= 5.minutes.from_now
       body = {
         user_id: 1,
-        root_account_global_id: Account.default.global_id
+        root_account_global_id: Account.default.global_id,
+        root_account_domain: Account.default.domain
       }
       Canvas::Security.create_jwt(body, time)
     end
@@ -183,6 +184,7 @@ RSpec.describe SecurityController, type: :request do
       lti_platform_configuration = parsed_body["https://purl.imsglobal.org/spec/lti-platform-configuration"]
       expect(lti_platform_configuration["product_family_code"]).to eq "canvas"
       expect(lti_platform_configuration["https://canvas.instructure.com/lti/account_name"]).to eq "Default Account"
+      expect(lti_platform_configuration["https://canvas.instructure.com/lti/account_domain"]).to eq Account.default.domain
       expect(lti_platform_configuration["messages_supported"]).to eq messages
       expect(lti_platform_configuration["notice_types_supported"]).to eq notice_types
     end
