@@ -68,7 +68,7 @@ module CanvasOperations
 
         settings_key = settings_key(name, cluster:)
         value = Setting.get(settings_key, default)
-        log_message("Fetched setting #{settings_key} with value `#{value.inspect}` before type casting")
+        log_message("Fetched setting #{settings_key} with value `#{value.inspect}` before type casting", level: :debug)
 
         value
       end
