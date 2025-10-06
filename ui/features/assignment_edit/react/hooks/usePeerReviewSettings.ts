@@ -70,16 +70,13 @@ export const usePeerReviewSettings = ({
     let errorMessage
 
     const inputElement = event.target
-    const numReviewsRequired = stringToNumber(reviewsRequired)
+    const value = inputElement?.value !== undefined ? inputElement.value : reviewsRequired
+    const numReviewsRequired = stringToNumber(value)
 
     // Check if input is empty but user had entered invalid value (e.g. "-1e")
-    if (reviewsRequired === '' && inputElement.validity && !inputElement.validity.valid) {
+    if (value === '' && inputElement?.validity && !inputElement.validity.valid) {
       errorMessage = I18n.t('Please enter a valid number.')
-    } else if (
-      numReviewsRequired === undefined ||
-      reviewsRequired === '' ||
-      reviewsRequired === '0'
-    ) {
+    } else if (numReviewsRequired === undefined || value === '' || value === '0') {
       errorMessage = I18n.t('Number of peer reviews is required.')
     } else if (!Number.isInteger(numReviewsRequired)) {
       errorMessage = I18n.t('Number of peer reviews must be a whole number.')
@@ -92,6 +89,7 @@ export const usePeerReviewSettings = ({
     }
 
     setErrorMessageReviewsRequired(errorMessage)
+    return errorMessage
   }
 
   const handlePointsPerReviewChange = (
@@ -110,15 +108,17 @@ export const usePeerReviewSettings = ({
     let errorMessage
 
     const inputElement = event.target
-    const numPoints = stringToNumber(pointsPerReview)
+    const value = inputElement?.value !== undefined ? inputElement.value : pointsPerReview
+    const numPoints = stringToNumber(value)
 
-    if (pointsPerReview === '' && inputElement.validity && !inputElement.validity.valid) {
+    if (value === '' && inputElement?.validity && !inputElement.validity.valid) {
       errorMessage = I18n.t('Please enter a valid number.')
     } else if (numPoints !== undefined && numPoints < 0) {
       errorMessage = I18n.t('Points per review cannot be negative.')
     }
 
     setErrorMessagePointsPerReview(errorMessage)
+    return errorMessage
   }
 
   const calculateTotalPoints = () => {
