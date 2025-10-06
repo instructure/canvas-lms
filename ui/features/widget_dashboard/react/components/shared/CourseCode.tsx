@@ -21,10 +21,9 @@ import {Pill} from '@instructure/ui-pill'
 import {getCourseCodeColor} from '../widgets/CourseGradesWidget/utils'
 import {useWidgetDashboard} from '../../hooks/useWidgetDashboardContext'
 
-// Helper function to determine appropriate text and border colors for accessibility
-const getAccessibleColorsForBackground = (
-  backgroundColor: string,
-): {textColor: string; borderColor: string} => {
+// Helper function to determine appropriate text color for accessibility
+// Uses white (#FFFFFF) by default, but switches to black (#000000) for light backgrounds
+const getAccessibleTextColor = (backgroundColor: string): string => {
   // Remove # if present and convert to lowercase
   const color = backgroundColor.replace('#', '').toLowerCase()
 
@@ -33,7 +32,7 @@ const getAccessibleColorsForBackground = (
   const g = parseInt(color.substring(2, 4), 16)
   const b = parseInt(color.substring(4, 6), 16)
 
-  // Calculate luminance for contrast checking
+  // Calculate relative luminance using WCAG formula
   const getLuminance = (r: number, g: number, b: number) => {
     const [rs, gs, bs] = [r, g, b].map(c => {
       c = c / 255
@@ -44,36 +43,10 @@ const getAccessibleColorsForBackground = (
 
   const backgroundLuminance = getLuminance(r, g, b)
 
-  let textColor: string
-  let borderColor: string
-
-  if (backgroundLuminance > 0.5) {
-    // Light background - create darker shades of the same color family
-    const darkR = Math.max(0, Math.round(r * 0.3)) // Much darker for good contrast
-    const darkG = Math.max(0, Math.round(g * 0.3))
-    const darkB = Math.max(0, Math.round(b * 0.3))
-    textColor = `#${darkR.toString(16).padStart(2, '0')}${darkG.toString(16).padStart(2, '0')}${darkB.toString(16).padStart(2, '0')}`
-
-    // Border: slightly darker than background but lighter than text
-    const borderR = Math.max(0, Math.round(r * 0.7))
-    const borderG = Math.max(0, Math.round(g * 0.7))
-    const borderB = Math.max(0, Math.round(b * 0.7))
-    borderColor = `#${borderR.toString(16).padStart(2, '0')}${borderG.toString(16).padStart(2, '0')}${borderB.toString(16).padStart(2, '0')}`
-  } else {
-    // Dark background - create lighter shades of the same color family
-    const lightR = Math.min(255, Math.round(r + (255 - r) * 0.8)) // Much lighter for good contrast
-    const lightG = Math.min(255, Math.round(g + (255 - g) * 0.8))
-    const lightB = Math.min(255, Math.round(b + (255 - b) * 0.8))
-    textColor = `#${lightR.toString(16).padStart(2, '0')}${lightG.toString(16).padStart(2, '0')}${lightB.toString(16).padStart(2, '0')}`
-
-    // Border: slightly lighter than background but darker than text
-    const borderR = Math.min(255, Math.round(r + (255 - r) * 0.4))
-    const borderG = Math.min(255, Math.round(g + (255 - g) * 0.4))
-    const borderB = Math.min(255, Math.round(b + (255 - b) * 0.4))
-    borderColor = `#${borderR.toString(16).padStart(2, '0')}${borderG.toString(16).padStart(2, '0')}${borderB.toString(16).padStart(2, '0')}`
-  }
-
-  return {textColor, borderColor}
+  // Calculate contrast ratio with white (luminance = 1)
+  // WCAG AA requires 4.5:1 for normal text
+  const contrastWithWhite = 1.05 / (backgroundLuminance + 0.05)
+  return contrastWithWhite >= 4.5 ? '#FFFFFF' : '#000000'
 }
 
 export interface CourseCodeProps {
@@ -114,11 +87,10 @@ export const CourseCode: React.FC<CourseCodeProps> = ({
 
       if (customColor) {
         // Convert custom color to course code style format with accessibility-compliant colors
-        const {textColor, borderColor} = getAccessibleColorsForBackground(customColor)
+        const textColor = getAccessibleTextColor(customColor)
         return {
           background: customColor,
           textColor,
-          borderColor,
         }
       }
     }
