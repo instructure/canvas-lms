@@ -90,8 +90,12 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
               </Text>
             </Flex.Item>
             <Flex.Item overflowX="visible" overflowY="visible">
-              <Link href={`/courses/${courseId}/grades`} isWithinText={false}>
-                <Text size="small">{I18n.t('Show gradebook')}</Text>
+              <Link
+                href={`/courses/${courseId}/grades`}
+                isWithinText={false}
+                aria-label={I18n.t('View %{courseName} gradebook', {courseName})}
+              >
+                <Text size="small">{I18n.t('View gradebook')}</Text>
               </Link>
             </Flex.Item>
           </Flex>
@@ -100,7 +104,17 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
         <Flex.Item width="100%" height="5rem">
           <Flex direction="row" justifyItems="start" alignItems="center" height="100%">
             <Flex.Item shouldGrow padding="0 0 0 xx-small">
-              <Button color="secondary" size="small" onClick={handleToggleGrade}>
+              <Button
+                color="secondary"
+                size="small"
+                onClick={handleToggleGrade}
+                aria-pressed={!isGradeVisible}
+                aria-label={
+                  isGradeVisible
+                    ? I18n.t('Hide grades for %{courseName}', {courseName})
+                    : I18n.t('Show grades for %{courseName}', {courseName})
+                }
+              >
                 {isGradeVisible ? I18n.t('Hide grade') : I18n.t('Show grade')}
               </Button>
             </Flex.Item>
