@@ -23,6 +23,7 @@ import userEvent from '@testing-library/user-event'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import AssignmentGroupSelector from '@canvas/assignments/backbone/views/AssignmentGroupSelector'
 import GradingTypeSelector from '@canvas/assignments/backbone/views/GradingTypeSelector'
+import QuizTypeSelector from '@canvas/assignments/backbone/views/QuizTypeSelector'
 import PeerReviewsSelector from '@canvas/assignments/backbone/views/PeerReviewsSelector'
 import DueDateOverrideView from '@canvas/due-dates'
 import DueDateList from '@canvas/due-dates/backbone/models/DueDateList'
@@ -162,16 +163,22 @@ const createEditView = (assignmentOpts = {}) => {
     parentModel: assignment,
     canEditGrades: window.ENV?.PERMISSIONS?.can_edit_grades,
   })
+
+  const quizTypeSelector = new QuizTypeSelector({
+    parentModel: assignment,
+  })
   const groupCategorySelector = new GroupCategorySelector({
     parentModel: assignment,
     groupCategories: window.ENV?.GROUP_CATEGORIES || [],
     inClosedGradingPeriod: assignment.inClosedGradingPeriod(),
   })
   const peerReviewsSelector = new PeerReviewsSelector({parentModel: assignment})
+
   const app = new EditView({
     model: assignment,
     assignmentGroupSelector,
     gradingTypeSelector,
+    quizTypeSelector,
     groupCategorySelector,
     peerReviewsSelector,
     views: {
@@ -183,7 +190,7 @@ const createEditView = (assignmentOpts = {}) => {
     canEditGrades: window.ENV.PERMISSIONS.can_edit_grades || !assignment.gradedSubmissionsExist(),
   })
 
-  return app.render()
+  return app
 }
 
 const checkCheckbox = id => {
@@ -254,12 +261,15 @@ describe('EditView#handleModeratedGradingChanged', () => {
         <div id="annotated_document_chooser_container"></div>
         <div id="assignment_annotated_document_info" style="display: none;"></div>
         <input type="checkbox" id="assignment_annotated_document" />
+        <input type="hidden" id="annotatable_attachment_input" value="" />
         <div id="annotated_document_usage_rights_container"></div>
         <div id="assignment_graded_assignment_fields"></div>
         <div id="assignment_external_tools"></div>
         <div id="assignment_peer_reviews_fields"></div>
         <div id="assignment_group_selector"></div>
         <div id="grading_type_selector"></div>
+        <fieldset id="submission_type_fields"></fieldset>
+        <div id="quiz_type_selector"></div>
         <div id="group_category_selector"></div>
         <input type="checkbox" id="assignment_graders_anonymous_to_graders" />
         <label for="assignment_graders_anonymous_to_graders" style="display: none;">Graders Anonymous to Graders</label>
@@ -289,6 +299,8 @@ describe('EditView#handleModeratedGradingChanged', () => {
     })
 
     view = createEditView()
+    view.$el.appendTo($('#fixtures'))
+    view.render()
   })
 
   afterEach(() => {
@@ -313,12 +325,15 @@ describe('EditView#handleGraderCommentsVisibleToGradersChanged', () => {
         <div id="annotated_document_chooser_container"></div>
         <div id="assignment_annotated_document_info" style="display: none;"></div>
         <input type="checkbox" id="assignment_annotated_document" />
+        <input type="hidden" id="annotatable_attachment_input" value="" />
         <div id="annotated_document_usage_rights_container"></div>
         <div id="assignment_graded_assignment_fields"></div>
         <div id="assignment_external_tools"></div>
         <div id="assignment_peer_reviews_fields"></div>
         <div id="assignment_group_selector"></div>
         <div id="grading_type_selector"></div>
+        <fieldset id="submission_type_fields"></fieldset>
+        <div id="quiz_type_selector"></div>
         <div id="group_category_selector"></div>
         <input type="checkbox" id="assignment_graders_anonymous_to_graders" />
         <label for="assignment_graders_anonymous_to_graders" style="display: none;">Graders Anonymous to Graders</label>
@@ -348,6 +363,8 @@ describe('EditView#handleGraderCommentsVisibleToGradersChanged', () => {
     })
 
     view = createEditView()
+    view.$el.appendTo($('#fixtures'))
+    view.render()
   })
 
   afterEach(() => {
@@ -380,6 +397,20 @@ describe('EditView#uncheckAndHideGraderAnonymousToGraders', () => {
     document.body.innerHTML = `
       <div id="fixtures">
         <div data-component="ModeratedGradingFormFieldGroup"></div>
+        <div id="editor_tabs"></div>
+        <div id="annotated_document_chooser_container"></div>
+        <div id="assignment_annotated_document_info" style="display: none;"></div>
+        <input type="checkbox" id="assignment_annotated_document" />
+        <input type="hidden" id="annotatable_attachment_input" value="" />
+        <div id="annotated_document_usage_rights_container"></div>
+        <div id="assignment_graded_assignment_fields"></div>
+        <div id="assignment_external_tools"></div>
+        <div id="assignment_peer_reviews_fields"></div>
+        <div id="assignment_group_selector"></div>
+        <div id="grading_type_selector"></div>
+        <fieldset id="submission_type_fields"></fieldset>
+        <div id="quiz_type_selector"></div>
+        <div id="group_category_selector"></div>
         <input type="checkbox" id="assignment_graders_anonymous_to_graders" />
         <label for="assignment_graders_anonymous_to_graders" style="display: none;">Graders Anonymous to Graders</label>
       </div>
@@ -412,8 +443,8 @@ describe('EditView#uncheckAndHideGraderAnonymousToGraders', () => {
       grader_comments_visible_to_graders: true,
       grader_anonymous_to_graders: true,
     })
-    view.render()
     view.$el.appendTo($('#fixtures'))
+    view.render()
   })
 
   afterEach(() => {
@@ -460,6 +491,8 @@ describe('EditView student annotation submission', () => {
         <div id="assignment_peer_reviews_fields"></div>
         <div id="assignment_group_selector"></div>
         <div id="grading_type_selector"></div>
+        <fieldset id="submission_type_fields"></fieldset>
+        <div id="quiz_type_selector"></div>
         <div id="group_category_selector"></div>
         <input type="checkbox" id="assignment_graders_anonymous_to_graders" />
         <label for="assignment_graders_anonymous_to_graders" style="display: none;">Graders Anonymous to Graders</label>
@@ -493,8 +526,8 @@ describe('EditView student annotation submission', () => {
       annotatable_attachment_id: '1',
       group_category_id: '1',
     })
-    view.render()
     view.$el.appendTo($('#fixtures'))
+    view.render()
   })
 
   afterEach(() => {
@@ -569,5 +602,280 @@ describe('EditView student annotation submission', () => {
     container.innerHTML = '<div class="usage-rights-content"></div>'
     expect(container).not.toBeNull()
     expect(container.children).toHaveLength(1)
+  })
+})
+
+describe('EditView - Quiz Type Handling', () => {
+  let view
+
+  beforeEach(() => {
+    fakeENV.setup({
+      FEATURES: {
+        new_quizzes_surveys: true,
+      },
+      PERMISSIONS: {
+        can_edit_grades: true,
+      },
+      SETTINGS: {
+        suppress_assignments: false,
+      },
+      ASSIGNMENT_GROUPS: [],
+      GROUP_CATEGORIES: [],
+      ANNOTATED_DOCUMENT: false,
+      COURSE_ID: 1,
+      VALID_DATE_RANGE: {},
+    })
+
+    // Setup DOM structure before creating the view
+    document.body.innerHTML = '<div id="fixtures"></div>'
+    $('#fixtures').html(`
+      <div>
+        <form id="edit_assignment_form">
+          <div class="control-group" style="display: block;">
+            <label for="assignment_points_possible">Points</label>
+            <input type="text" id="assignment_points_possible" value="10" />
+          </div>
+          <div id="assignment_group_selector"></div>
+          <div id="grading_type_selector"></div>
+          <fieldset id="submission_type_fields"></fieldset>
+          <div id="quiz_type_selector"></div>
+          <div id="group_category_selector"></div>
+          <div id="peer_reviews_fields"></div>
+          <div class="js-assignment-overrides"></div>
+          <div id="assignment_external_tools"></div>
+        </form>
+      </div>
+    `)
+
+    const assignment = new Assignment({
+      name: 'Test Assignment',
+      secure_params: 'secure',
+      assignment_overrides: [],
+      submission_types: ['external_tool'],
+      is_quiz_lti_assignment: true,
+    })
+
+    const sectionList = new SectionCollection([Section.defaultDueDateSection()])
+    const dueDateList = new DueDateList(
+      assignment.get('assignment_overrides'),
+      sectionList,
+      assignment,
+    )
+
+    const assignmentGroupSelector = new AssignmentGroupSelector({
+      parentModel: assignment,
+      assignmentGroups: [],
+    })
+    const gradingTypeSelector = new GradingTypeSelector({
+      parentModel: assignment,
+      canEditGrades: true,
+    })
+    const quizTypeSelector = new QuizTypeSelector({
+      parentModel: assignment,
+    })
+    const groupCategorySelector = new GroupCategorySelector({
+      parentModel: assignment,
+      groupCategories: [],
+    })
+    const peerReviewsSelector = new PeerReviewsSelector({parentModel: assignment})
+    const dueDateOverrideView = new DueDateOverrideView({
+      model: dueDateList,
+      views: {},
+    })
+
+    view = new EditView({
+      model: assignment,
+      assignmentGroupSelector,
+      gradingTypeSelector,
+      quizTypeSelector,
+      groupCategorySelector,
+      peerReviewsSelector,
+      views: {
+        'js-assignment-overrides': dueDateOverrideView,
+      },
+      canEditGrades: true,
+    })
+
+    view.$el.appendTo($('#fixtures'))
+    view.render()
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+    view.remove()
+    $('#fixtures').empty()
+  })
+
+  describe('toJSON', () => {
+    test('includes showQuizTypeSelector when feature flag is enabled and assignment is quiz LTI', () => {
+      const data = view.toJSON()
+      expect(data.showQuizTypeSelector).toBe(true)
+    })
+
+    test('does not include showQuizTypeSelector when feature flag is disabled', () => {
+      ENV.FEATURES.new_quizzes_surveys = false
+      const data = view.toJSON()
+      expect(data.showQuizTypeSelector).toBe(false)
+    })
+
+    test('does not include showQuizTypeSelector when assignment is not quiz LTI', () => {
+      view.assignment.set('is_quiz_lti_assignment', false)
+      const data = view.toJSON()
+      expect(data.showQuizTypeSelector).toBe(false)
+    })
+  })
+
+  describe('handleQuizTypeChange', () => {
+    beforeEach(() => {
+      // Setup additional DOM elements for tests
+      $('#fixtures').append(`
+        <div id="graded_assignment_fields" style="display: block;">
+          <div id="omit-from-final-grade" style="display: block;">
+            <input type="checkbox" id="assignment_omit_from_final_grade" />
+          </div>
+          <div id="assignment_hide_in_gradebook_option" style="display: block;">
+            <input type="checkbox" id="assignment_hide_in_gradebook" />
+          </div>
+        </div>
+      `)
+      // Re-cache the elements in the view
+      view.$gradedAssignmentFields = $('#graded_assignment_fields')
+    })
+
+    test('hides points field when ungraded_survey is selected', () => {
+      const $pointsGroup = view.$assignmentPointsPossible.closest('.control-group')
+
+      expect($pointsGroup.css('display')).not.toBe('none')
+      view.handleQuizTypeChange('ungraded_survey')
+      expect($pointsGroup.css('display')).toBe('none')
+    })
+
+    test('shows points field when graded_quiz is selected', () => {
+      const $pointsGroup = view.$assignmentPointsPossible.closest('.control-group')
+
+      view.handleQuizTypeChange('ungraded_survey')
+      expect($pointsGroup.css('display')).toBe('none')
+
+      view.handleQuizTypeChange('graded_quiz')
+      expect($pointsGroup.css('display')).not.toBe('none')
+    })
+
+    test('shows points field when graded_survey is selected', () => {
+      const $pointsGroup = view.$assignmentPointsPossible.closest('.control-group')
+
+      view.handleQuizTypeChange('ungraded_survey')
+      expect($pointsGroup.css('display')).toBe('none')
+
+      view.handleQuizTypeChange('graded_survey')
+      expect($pointsGroup.css('display')).not.toBe('none')
+    })
+
+    test('sets points to 0 when ungraded_survey is selected', () => {
+      view.$assignmentPointsPossible.val('10')
+
+      view.handleQuizTypeChange('ungraded_survey')
+      expect(view.$assignmentPointsPossible.val()).toBe('0')
+    })
+
+    test('hides graded assignment fields when ungraded_survey is selected', () => {
+      const $gradedFields = $('#graded_assignment_fields')
+
+      expect($gradedFields.css('display')).not.toBe('none')
+      view.handleQuizTypeChange('ungraded_survey')
+      expect($gradedFields.css('display')).toBe('none')
+    })
+
+    test('hides graded assignment fields when graded_survey is selected', () => {
+      const $gradedFields = $('#graded_assignment_fields')
+
+      expect($gradedFields.css('display')).not.toBe('none')
+      view.handleQuizTypeChange('graded_survey')
+      expect($gradedFields.css('display')).toBe('none')
+    })
+
+    test('shows graded assignment fields when graded_quiz is selected', () => {
+      const $gradedFields = $('#graded_assignment_fields')
+
+      view.handleQuizTypeChange('ungraded_survey')
+      expect($gradedFields.css('display')).toBe('none')
+
+      view.handleQuizTypeChange('graded_quiz')
+      expect($gradedFields.css('display')).not.toBe('none')
+    })
+  })
+
+  describe('Disabled State', () => {
+    test('quiz type selector is not disabled for new assignments', async () => {
+      const assignment = new Assignment({
+        name: 'New Assignment',
+        secure_params: 'secure',
+        assignment_overrides: [],
+        submission_types: ['external_tool'],
+        is_quiz_lti_assignment: true,
+      })
+
+      const sectionList = new SectionCollection([Section.defaultDueDateSection()])
+      const dueDateList = new DueDateList(
+        assignment.get('assignment_overrides'),
+        sectionList,
+        assignment,
+      )
+
+      const assignmentGroupSelector = new AssignmentGroupSelector({
+        parentModel: assignment,
+        assignmentGroups: [],
+      })
+      const gradingTypeSelector = new GradingTypeSelector({
+        parentModel: assignment,
+        canEditGrades: true,
+      })
+      const quizTypeSelector = new QuizTypeSelector({
+        parentModel: assignment,
+      })
+      const groupCategorySelector = new GroupCategorySelector({
+        parentModel: assignment,
+        groupCategories: [],
+      })
+      const peerReviewsSelector = new PeerReviewsSelector({parentModel: assignment})
+      const dueDateOverrideView = new DueDateOverrideView({
+        model: dueDateList,
+        views: {},
+      })
+
+      const newView = new EditView({
+        model: assignment,
+        assignmentGroupSelector,
+        gradingTypeSelector,
+        quizTypeSelector,
+        groupCategorySelector,
+        peerReviewsSelector,
+        views: {
+          'js-assignment-overrides': dueDateOverrideView,
+        },
+        canEditGrades: true,
+      })
+
+      newView.$el.appendTo($('#fixtures'))
+      newView.render()
+
+      // Wait for the quiz type selector to be rendered in the DOM
+      await waitFor(
+        () => {
+          const $quizTypeSelect = $('#assignment_quiz_type')
+          expect($quizTypeSelect.length).toBeGreaterThan(0)
+        },
+        {
+          timeout: 5000,
+          interval: 100,
+        },
+      )
+
+      // Check the disabled property - we don't check visibility because
+      // jQuery's :visible check can be unreliable in test environments
+      const $quizTypeSelect = $('#assignment_quiz_type')
+      expect($quizTypeSelect.prop('disabled')).toBe(false)
+
+      newView.remove()
+    })
   })
 })

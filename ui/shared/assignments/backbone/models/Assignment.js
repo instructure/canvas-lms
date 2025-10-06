@@ -165,6 +165,7 @@ function Assignment() {
   this.newQuizzesAssignmentBuildButtonEnabled =
     this.newQuizzesAssignmentBuildButtonEnabled.bind(this)
   this.newMasteryConnectIconEnabled = this.newMasteryConnectIconEnabled.bind(this)
+  this.newQuizzesType = this.newQuizzesType.bind(this)
   this.nonBaseDates = this.nonBaseDates.bind(this)
   this.notifyOfUpdate = this.notifyOfUpdate.bind(this)
   this.objectType = this.objectType.bind(this)
@@ -1054,6 +1055,21 @@ Assignment.prototype.newMasteryConnectIconEnabled = function () {
 
 Assignment.prototype.hideZeroPointQuizzesOptionEnabled = function () {
   return ENV.HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED
+}
+
+Assignment.prototype.newQuizzesType = function (type) {
+  const settings = this.get('settings') || {}
+  const newQuizzes = settings.new_quizzes || {}
+  if (!(arguments.length > 0)) {
+    return newQuizzes.type || 'graded_quiz'
+  }
+  return this.set('settings', {
+    ...settings,
+    new_quizzes: {
+      ...newQuizzes,
+      type,
+    },
+  })
 }
 
 Assignment.prototype.showBuildButton = function () {
