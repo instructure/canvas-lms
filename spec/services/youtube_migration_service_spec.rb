@@ -66,12 +66,6 @@ RSpec.describe YoutubeMigrationService do
     )
   end
 
-  before do
-    allow(Lti::ContextToolFinder).to receive(:all_tools_for)
-      .with(root_account)
-      .and_return(class_double(ContextExternalTool, active: class_double(ContextExternalTool, find_by: studio_tool)))
-  end
-
   describe "#queue_scan_course_for_embeds" do
     it "creates a new progress when none exists" do
       expect { described_class.queue_scan_course_for_embeds(course) }
@@ -527,6 +521,10 @@ RSpec.describe YoutubeMigrationService do
   end
 
   describe "#perform_conversion" do
+    before do
+      studio_tool
+    end
+
     let(:scan_progress) do
       Progress.create!(
         tag: "youtube_embed_scan",
@@ -1401,6 +1399,10 @@ RSpec.describe YoutubeMigrationService do
   end
 
   describe "#perform_all_conversions" do
+    before do
+      studio_tool
+    end
+
     let(:scan_progress) do
       Progress.create!(
         tag: "youtube_embed_scan",
@@ -1810,6 +1812,10 @@ RSpec.describe YoutubeMigrationService do
   end
 
   describe "#perform_selected_conversions" do
+    before do
+      studio_tool
+    end
+
     let(:embed1) do
       {
         src: "https://www.youtube.com/embed/selected1",
@@ -2196,17 +2202,8 @@ RSpec.describe YoutubeMigrationService do
   end
 
   describe "#find_studio_tool" do
-    let(:course_studio_tool) do
-      external_tool_model(
-        context: sub_account,
-        opts: {
-          domain: "arc.instructure.com",
-          url: "https://arc.instructure.com",
-          consumer_key: "course_key",
-          shared_secret: "course_secret",
-          name: "Course Studio"
-        }
-      )
+    before do
+      studio_tool
     end
 
     context "when Studio tool exists in root account" do
@@ -2230,50 +2227,47 @@ RSpec.describe YoutubeMigrationService do
       end
     end
 
-    context "when Studio tool exists in course account" do
-      let(:sub_account) { account_model(parent_account: root_account) }
-      let(:sub_course) { course_model(account: sub_account) }
-      let(:sub_service) { described_class.new(sub_course) }
+    context "when Studio tool exist on one of the parent account" do
+      it "finds tool from higher level in hierarchy" do
+        mid_account = account_model(parent_account: root_account)
+        leaf_account = account_model(parent_account: mid_account)
+        leaf_course = course_model(account: leaf_account)
 
-      before do
-        # Remove root account tool to test course account tool
         studio_tool.destroy
-        course_studio_tool
-      end
 
-      it "finds Studio tool in course account" do
-        result = sub_service.find_studio_tool
-        expect(result).to eq(course_studio_tool)
-      end
+        mid_account_tool = external_tool_model(
+          context: mid_account,
+          opts: {
+            domain: "arc.instructure.com",
+            url: "https://arc.instructure.com",
+            consumer_key: "mid_account_tool_key",
+            shared_secret: "mid_account_tool_secret",
+            name: "mid_account_tool studio"
+          }
+        )
 
-      it "does not return disabled course account tools" do
-        course_studio_tool.update(workflow_state: "disabled")
-
-        result = sub_service.find_studio_tool
-        expect(result).to be_nil
+        result = described_class.new(leaf_course).find_studio_tool
+        expect(result).to eq(mid_account_tool)
       end
     end
 
-    context "when Studio tools exist in both root account and course account" do
-      let(:sub_account) { account_model(parent_account: root_account) }
-      let(:sub_course) { course_model(account: sub_account) }
-      let(:sub_service) { described_class.new(sub_course) }
+    context "when Studio tool exist on root account" do
+      it "finds tool from higher level in hierarchy" do
+        studio_tool.destroy
 
-      before do
-        course_studio_tool
-      end
+        root_account_tool = external_tool_model(
+          context: root_account,
+          opts: {
+            domain: "arc.instructure.com",
+            url: "https://arc.instructure.com",
+            consumer_key: "root_account_tool_key",
+            shared_secret: "root_account_tool_secret",
+            name: "root_account_tool studio"
+          }
+        )
 
-      it "prioritizes root account tool over course account tool" do
-        result = sub_service.find_studio_tool
-        expect(result).to eq(studio_tool)
-        expect(result).not_to eq(course_studio_tool)
-      end
-
-      it "falls back to course account tool if root account tool is disabled" do
-        studio_tool.update(workflow_state: "disabled")
-
-        result = sub_service.find_studio_tool
-        expect(result).to eq(course_studio_tool)
+        result = described_class.new(course).find_studio_tool
+        expect(result).to eq(root_account_tool)
       end
     end
 
