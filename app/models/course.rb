@@ -3237,6 +3237,7 @@ class Course < ActiveRecord::Base
   TAB_ACCESSIBILITY = 22
   TAB_ITEM_BANKS = 23
   TAB_YOUTUBE_MIGRATION = 24
+  TAB_AI_EXPERIENCES = 25
 
   CANVAS_K6_TAB_IDS = [TAB_HOME, TAB_ANNOUNCEMENTS, TAB_GRADES, TAB_MODULES].freeze
   COURSE_SUBJECT_TAB_IDS = [TAB_HOME, TAB_SCHEDULE, TAB_MODULES, TAB_GRADES, TAB_GROUPS].freeze
@@ -3662,6 +3663,20 @@ class Course < ActiveRecord::Base
             # can't do any of the additional things required
             (!additional_checks[t[:id]] || !check_for_permission.call(*additional_checks[t[:id]]))
         end
+      end
+
+      # Add AI Experiences tab before Settings if feature flag is enabled
+      # AI Experiences is currently using assignment permissions until granular ai experiences permissions are created
+      if feature_enabled?(:ai_experiences) && check_for_permission.call(*RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+        settings_index = tabs.index { |t| t[:id] == TAB_SETTINGS }
+        settings_index ||= tabs.length
+        tabs.insert(settings_index, {
+                      id: TAB_AI_EXPERIENCES,
+                      label: t("#tabs.ai_experiences", "AI Experiences"),
+                      css_class: "ai_experiences",
+                      # TODO: Update to :course_ai_experiences_path once the route and controller are implemented
+                      href: :course_settings_path
+                    })
       end
 
       # Add YouTube migration tab before Settings if conditions are met
