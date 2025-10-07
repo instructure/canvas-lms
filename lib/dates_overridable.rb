@@ -523,7 +523,7 @@ module DatesOverridable
         !everyone_overrides.empty? &&
           !(context.is_a?(Course) && section_override_ids.length == active_sections_count)
       else
-        true
+        !everyone_overrides.empty?
       end
 
     if include_everyone
