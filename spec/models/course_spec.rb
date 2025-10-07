@@ -2891,6 +2891,82 @@ describe Course do
         end
       end
 
+      describe "TAB_AI_EXPERIENCES" do
+        before do
+          @course.enable_feature!(:ai_experiences)
+        end
+
+        after do
+          @course.disable_feature!(:ai_experiences)
+        end
+
+        it "includes AI Experiences tab when feature flag is enabled and user has permissions" do
+          tabs = @course.tabs_available(@user)
+          ai_tab = tabs.find { |t| t[:id] == Course::TAB_AI_EXPERIENCES }
+
+          expect(ai_tab).not_to be_nil
+          expect(ai_tab[:label]).to eq("AI Experiences")
+          expect(ai_tab[:css_class]).to eq("ai_experiences")
+          expect(ai_tab[:href]).to eq(:course_settings_path)
+        end
+
+        it "positions AI Experiences tab before Settings tab" do
+          tabs = @course.tabs_available(@user)
+          settings_tab_index = tabs.pluck(:id).index(Course::TAB_SETTINGS)
+          ai_tab_index = tabs.pluck(:id).index(Course::TAB_AI_EXPERIENCES)
+
+          expect(ai_tab_index).not_to be_nil
+          expect(settings_tab_index).not_to be_nil
+          expect(ai_tab_index).to be < settings_tab_index
+        end
+
+        it "does not include AI Experiences tab when feature flag is disabled" do
+          @course.disable_feature!(:ai_experiences)
+          tabs = @course.tabs_available(@user)
+          ai_tab = tabs.find { |t| t[:id] == Course::TAB_AI_EXPERIENCES }
+
+          expect(ai_tab).to be_nil
+        end
+
+        it "does not include AI Experiences tab when user lacks permissions" do
+          student = user_factory(active_all: true)
+          @course.enroll_student(student, enrollment_state: "active")
+
+          tabs = @course.tabs_available(student)
+          ai_tab = tabs.find { |t| t[:id] == Course::TAB_AI_EXPERIENCES }
+
+          expect(ai_tab).to be_nil
+        end
+
+        it "includes AI Experiences tab for users with manage_course_content permissions" do
+          ta = user_factory(active_all: true)
+          @course.enroll_ta(ta, enrollment_state: "active")
+
+          tabs = @course.tabs_available(ta)
+          ai_tab = tabs.find { |t| t[:id] == Course::TAB_AI_EXPERIENCES }
+
+          expect(ai_tab).not_to be_nil
+        end
+
+        it "includes AI Experiences tab for users with manage_assignments permissions" do
+          # Create a custom role with only assignment permissions
+          role = @course.account.roles.create!(name: "Grader", base_role_type: "TaEnrollment")
+          @course.account.role_overrides.create!(
+            role:,
+            permission: "manage_assignments_add",
+            enabled: true
+          )
+
+          grader = user_factory(active_all: true)
+          @course.enroll_user(grader, "TaEnrollment", role:, enrollment_state: "active")
+
+          tabs = @course.tabs_available(grader)
+          ai_tab = tabs.find { |t| t[:id] == Course::TAB_AI_EXPERIENCES }
+
+          expect(ai_tab).not_to be_nil
+        end
+      end
+
       describe "TAB_SEARCH" do
         before do
           allow(SmartSearch).to receive(:bedrock_client).and_return(double)
