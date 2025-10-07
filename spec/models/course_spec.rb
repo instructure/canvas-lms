@@ -2907,7 +2907,7 @@ describe Course do
           expect(ai_tab).not_to be_nil
           expect(ai_tab[:label]).to eq("AI Experiences")
           expect(ai_tab[:css_class]).to eq("ai_experiences")
-          expect(ai_tab[:href]).to eq(:course_settings_path)
+          expect(ai_tab[:href]).to eq(:course_ai_experiences_path)
         end
 
         it "positions AI Experiences tab before Settings tab" do
