@@ -16,4 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import './jquery/index'
+import '@canvas/jquery/jquery.ajaxJSON'
+import 'jqueryui/dialog'
+import OverTimeModal from './OverTimeModal'
+import React from 'react'
+import {Portal} from '@instructure/ui-portal'
+import {useParams} from 'react-router-dom'
+
+export function Component(): JSX.Element | null {
+  const {accountId} = useParams()
+  const mountPoint = document.getElementById('over-time-modal')
+  if (mountPoint === null) {
+    console.error('Cannot render AccountStatisticsRoute, container is missing')
+    return null
+  }
+
+  return (
+    <Portal open={true} mountNode={mountPoint}>
+      <OverTimeModal accountId={accountId!} />
+    </Portal>
+  )
+}

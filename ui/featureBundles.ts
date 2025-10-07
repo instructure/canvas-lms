@@ -26,7 +26,6 @@ const featureBundles: {
   account_notification_settings: () => import('./features/account_notification_settings/index'),
   account_search: () => import('./features/account_search/index'),
   account_settings: () => import('./features/account_settings/index'),
-  account_statistics: () => import('./features/account_statistics/index'),
   accessibility_checker: () => import('./features/accessibility/accessibility_checker/index'),
   accessibility_issues: () => import('./features/accessibility/accessibility_issues/index'),
   admin_split: () => import('./features/admin_split/index'),
