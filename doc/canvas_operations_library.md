@@ -134,6 +134,7 @@ end
 | `scope`                 | The ActiveRecord scope that defines the set of records to be processed by the fixup. |
 | `process_record(record)` | (For `:individual_record` mode) Define this method to specify how to process each individual record. |
 | `process_batch(records)` | (For `:batch` mode) Define this method to specify how to process a batch of records. |
+| `run_on_default_shard` | If true, the data fixup will run on the default shard. If false, the default shard is skipped. Defaults to true. |
 
 #### DataFixup Settings
 
