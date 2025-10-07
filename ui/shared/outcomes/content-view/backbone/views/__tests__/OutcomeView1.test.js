@@ -207,4 +207,75 @@ describe('OutcomeView', () => {
       expect(view.$('#calculation_int').val()).toBe('65')
     })
   })
+
+  describe('Context Tag Rendering', () => {
+    it('_getOutcomeContext returns context from model attributes', () => {
+      const model = newOutcome({context_type: 'Account', context_id: 123})
+      const view = createView({model})
+
+      const result = view._getOutcomeContext()
+
+      expect(result.contextType).toBe('Account')
+      expect(result.contextId).toBe(123)
+    })
+
+    it('_getOutcomeContext falls back to outcomeLink when model lacks context data', () => {
+      const model = newOutcome(
+        {context_type: null, context_id: null},
+        {context_type: 'Course', context_id: 456},
+      )
+      const view = createView({model})
+
+      const result = view._getOutcomeContext()
+
+      expect(result.contextType).toBe('Course')
+      expect(result.contextId).toBe(456)
+    })
+
+    it('_getOutcomeContext returns falsy values when no context data available', () => {
+      const model = newOutcome(
+        {context_type: null, context_id: null},
+        {context_type: null, context_id: null},
+      )
+      const view = createView({model})
+
+      const result = view._getOutcomeContext()
+
+      expect(result.contextType).toBeFalsy()
+      expect(result.contextId).toBeFalsy()
+    })
+
+    it('renders Institution tag for Account outcomes', async () => {
+      const model = newOutcome({context_type: 'Account', context_id: 123})
+      const view = createView({model})
+      await waitFrames(10)
+
+      expect(view.$('#outcome_context_tag_container')).toHaveLength(1)
+      expect(view.$el.hasClass('has-outcome-context-tag')).toBe(true)
+      expect(view.$('#outcome_context_tag_container').text()).toContain('Institution')
+    })
+
+    it('renders Course tag for Course outcomes', async () => {
+      const model = newOutcome({context_type: 'Course', context_id: 456})
+      const view = createView({model})
+      await waitFrames(10)
+
+      expect(view.$('#outcome_context_tag_container')).toHaveLength(1)
+      expect(view.$el.hasClass('has-outcome-context-tag')).toBe(true)
+      expect(view.$('#outcome_context_tag_container').text()).toContain('Course')
+    })
+
+    it('does not render tag when context data is missing', async () => {
+      const model = newOutcome(
+        {context_type: null, context_id: null},
+        {context_type: null, context_id: null},
+      )
+      const view = createView({model})
+      await waitFrames(10)
+
+      expect(view.$('#outcome_context_tag_container')).toHaveLength(1)
+      expect(view.$('#outcome_context_tag_container').children()).toHaveLength(0)
+      expect(view.$el.hasClass('has-outcome-context-tag')).toBe(false)
+    })
+  })
 })
