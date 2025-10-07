@@ -34,7 +34,7 @@ import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {ratingsShape} from './shapes'
 import {REMOVE_PENDING} from '@canvas/outcomes/react/hooks/useOutcomesRemove'
 import descriptionType from '../shared/descriptionType'
-import OutcomeContextTag from '../shared/OutcomeContextTag'
+import OutcomeContextTag from '@canvas/outcome-context-tag'
 
 const I18n = createI18nScope('OutcomeManagement')
 

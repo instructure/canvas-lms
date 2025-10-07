@@ -80,4 +80,40 @@ describe('OutcomeContextTag', () => {
     const tag = getByTestId('outcome-context-tag')
     expect(tag.getAttribute('aria-label')).toBe('This is a course-level outcome')
   })
+
+  it('does not render tag when outcomeContextType is only whitespace', () => {
+    const {queryByTestId} = render(
+      <OutcomeContextTag outcomeContextType="   " outcomeContextId="2" />,
+    )
+
+    expect(queryByTestId('outcome-context-tag')).not.toBeInTheDocument()
+  })
+
+  it('does not render tag when outcomeContextId is only whitespace', () => {
+    const {queryByTestId} = render(
+      <OutcomeContextTag outcomeContextType="Account" outcomeContextId="   " />,
+    )
+
+    expect(queryByTestId('outcome-context-tag')).not.toBeInTheDocument()
+  })
+
+  it('renders tag when outcomeContextType has surrounding whitespace', () => {
+    const {getByTestId} = render(
+      <OutcomeContextTag outcomeContextType="  Account  " outcomeContextId="2" />,
+    )
+
+    const tag = getByTestId('outcome-context-tag')
+    expect(tag).toBeInTheDocument()
+    expect(tag.textContent).toBe('Institution')
+  })
+
+  it('renders tag when outcomeContextId has surrounding whitespace', () => {
+    const {getByTestId} = render(
+      <OutcomeContextTag outcomeContextType="Course" outcomeContextId="  2  " />,
+    )
+
+    const tag = getByTestId('outcome-context-tag')
+    expect(tag).toBeInTheDocument()
+    expect(tag.textContent).toBe('Course')
+  })
 })

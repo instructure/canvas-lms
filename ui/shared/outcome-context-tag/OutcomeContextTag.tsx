@@ -33,11 +33,14 @@ interface OutcomeContextTagProps {
 }
 
 const OutcomeContextTag = ({outcomeContextType, outcomeContextId}: OutcomeContextTagProps) => {
-  if (!outcomeContextType || !outcomeContextId) {
+  const trimmedContextType = outcomeContextType?.trim() || ''
+  const trimmedContextId = outcomeContextId?.trim() || ''
+
+  if (!trimmedContextType || !trimmedContextId) {
     return null
   }
 
-  const isAccount = outcomeContextType === 'Account'
+  const isAccount = trimmedContextType === 'Account'
   const contextLabel = isAccount ? I18n.t('Institution') : I18n.t('Course')
 
   const ariaLabel = isAccount
