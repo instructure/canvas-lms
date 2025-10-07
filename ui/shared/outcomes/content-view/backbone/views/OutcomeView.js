@@ -37,6 +37,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import OutcomeContextTag from '@canvas/outcome-context-tag'
 
 const I18n = createI18nScope('OutcomeView')
 
@@ -380,7 +381,14 @@ export default class OutcomeView extends OutcomeContentBase {
       return createRoot(container)
     })()
 
+    this._outcomeContextTagContainer = (() => {
+      const container = this.$('#outcome_context_tag_container')[0]
+      if (!container) return
+      return createRoot(container)
+    })()
+
     this._renderOutcomeMasteryAtInput()
+    this._renderOutcomeContextTag()
 
     return this
   }
@@ -427,6 +435,32 @@ export default class OutcomeView extends OutcomeContentBase {
         }),
       ),
     )
+  }
+
+  _getOutcomeContext() {
+    const contextType = this.model.get('context_type') || this.model.outcomeLink?.context_type
+    const contextId = this.model.get('context_id') || this.model.outcomeLink?.context_id
+    return {contextType, contextId}
+  }
+
+  _renderOutcomeContextTag() {
+    if (!this._outcomeContextTagContainer) return
+
+    const {contextType, contextId} = this._getOutcomeContext()
+
+    if (contextType && contextId) {
+      this._outcomeContextTagContainer.render(
+        createElement(
+          View,
+          {as: 'div'},
+          createElement(OutcomeContextTag, {
+            outcomeContextType: contextType,
+            outcomeContextId: String(contextId),
+          }),
+        ),
+      )
+      this.$el.addClass('has-outcome-context-tag')
+    }
   }
 
   validateOutcomeMasteryAtInput() {
