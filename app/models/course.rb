@@ -3675,8 +3675,7 @@ class Course < ActiveRecord::Base
                       id: TAB_AI_EXPERIENCES,
                       label: t("#tabs.ai_experiences", "AI Experiences"),
                       css_class: "ai_experiences",
-                      # TODO: Update to :course_ai_experiences_path once the route and controller are implemented
-                      href: :course_settings_path
+                      href: :course_ai_experiences_path
                     })
       end
 
