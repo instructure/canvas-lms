@@ -846,6 +846,30 @@ describe "Common Cartridge exporting" do
       expect(ccc_schema.validate(doc)).to be_empty
     end
 
+    it "does not crash on file that is not found" do
+      att = attachment_model(uploaded_data: stub_png_data)
+      att_id = att.id
+      att.destroy_permanently!
+      body = <<~HTML
+        <p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="audio" src="/media_attachments_iframe/#{att_id}?embedded=true&type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="some-kaltura-id"></iframe></p>
+        <p><img src="/users/#{@user.id}/files/#{att_id}/preview" width="150" height="150" /></p>
+        <p><a id="0" href="/courses/#{@ce.context.id}/files/#{att_id}?wrap=1">file.pdf</a></p>
+      HTML
+
+      wiki_page_model(course: @ce.context, body:, updating_user: @user)
+      @ce.update(export_type: ContentExport::COMMON_CARTRIDGE)
+      @ce.save!
+
+      expect { run_export }.not_to raise_error
+
+      check_resource_node(@page, CC::CCHelper::WEBCONTENT)
+
+      export_body = @zip_file.read("wiki_content/some-page.html")
+      expect(export_body).to include "/media_attachments_iframe/#{att_id}"
+      expect(export_body).to include "/users/#{@user.id}/files/#{att_id}/preview"
+      expect(export_body).to include "/courses/#{@ce.context.id}/files/#{att_id}?wrap=1"
+    end
+
     it "has valid course settings XML" do
       # include all possible settings, not just changed ones
       # (if this test fails, you need to add your setting to lib/cc/xsd/cccv1p0.xsd)

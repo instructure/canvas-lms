@@ -251,7 +251,7 @@ module CC
             current_referenced_files = @referenced_files
             obj = match.obj_class.find_by(id: match.obj_id)
             # find the object in the context in case it's deleted and we need to find the active attachment
-            obj = obj.context.attachments.find_by(id: obj)
+            obj = obj.context.attachments.find_by(id: obj) if obj
             next(match.url) unless obj
             next(match.url) if obj.context_type == "Course" && obj.context_id != @course.id
             next(match.url) if obj.context_type == "AssessmentQuestion" && @for_course_copy
