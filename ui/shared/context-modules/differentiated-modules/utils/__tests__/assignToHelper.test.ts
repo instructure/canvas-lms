@@ -365,6 +365,204 @@ describe('assitnToHelper', () => {
       )
     })
 
+    it('reuses existing unassigned override IDs for deleted module assignees', () => {
+      const cards: ItemAssignToCardSpec[] = [
+        {
+          overrideId: '1',
+          isValid: true,
+          hasAssignees: true,
+          selectedAssigneeIds: ['section-1'] as string[],
+          defaultOptions: ['student-1'],
+          due_at: '2021-01-01T00:00:00Z',
+        } as ItemAssignToCardSpec,
+      ]
+
+      const existingUnassignedOverrides: DateDetailsOverride[] = [
+        {
+          id: '100',
+          student_ids: ['1'],
+          due_at: null,
+          unlock_at: null,
+          lock_at: null,
+          reply_to_topic_due_at: null,
+          required_replies_due_at: null,
+          unassign_item: true,
+        },
+        {
+          id: '200',
+          course_section_id: '2',
+          due_at: null,
+          unlock_at: null,
+          lock_at: null,
+          reply_to_topic_due_at: null,
+          required_replies_due_at: null,
+          unassign_item: true,
+        },
+      ]
+
+      const expectedPayload = <DateDetailsPayload>{
+        assignment_overrides: [
+          {
+            due_at: '2021-01-01T00:00:00Z',
+            id: undefined,
+            lock_at: undefined,
+            reply_to_topic_due_at: undefined,
+            required_replies_due_at: undefined,
+            course_section_id: '1',
+            unlock_at: undefined,
+            unassign_item: false,
+          },
+          {
+            due_at: null,
+            id: '100',
+            lock_at: null,
+            reply_to_topic_due_at: null,
+            required_replies_due_at: null,
+            student_ids: ['1'],
+            unlock_at: null,
+            unassign_item: true,
+          },
+          {
+            due_at: null,
+            id: '200',
+            lock_at: null,
+            reply_to_topic_due_at: null,
+            required_replies_due_at: null,
+            course_section_id: '2',
+            unlock_at: null,
+            unassign_item: true,
+          },
+        ] as unknown as DateDetailsOverride[],
+        only_visible_to_overrides: true,
+      }
+      expect(
+        generateDateDetailsPayload(
+          cards,
+          true,
+          ['section-2', 'student-1'], // unassigned module assignees
+          existingUnassignedOverrides,
+        ),
+      ).toEqual(expectedPayload)
+    })
+
+    it('creates new unassigned overrides when no matching existing override is found', () => {
+      const cards: ItemAssignToCardSpec[] = [
+        {
+          overrideId: '1',
+          isValid: true,
+          hasAssignees: true,
+          selectedAssigneeIds: ['section-1'] as string[],
+          defaultOptions: ['student-1'],
+          due_at: '2021-01-01T00:00:00Z',
+        } as ItemAssignToCardSpec,
+      ]
+
+      const existingUnassignedOverrides: DateDetailsOverride[] = [
+        {
+          id: '100',
+          student_ids: ['999'],
+          due_at: null,
+          unlock_at: null,
+          lock_at: null,
+          reply_to_topic_due_at: null,
+          required_replies_due_at: null,
+          unassign_item: true,
+        },
+        {
+          id: '200',
+          course_section_id: '999',
+          due_at: null,
+          unlock_at: null,
+          lock_at: null,
+          reply_to_topic_due_at: null,
+          required_replies_due_at: null,
+          unassign_item: true,
+        },
+      ]
+
+      const expectedPayload = <DateDetailsPayload>{
+        assignment_overrides: [
+          {
+            due_at: '2021-01-01T00:00:00Z',
+            id: undefined,
+            lock_at: undefined,
+            reply_to_topic_due_at: undefined,
+            required_replies_due_at: undefined,
+            course_section_id: '1',
+            unlock_at: undefined,
+            unassign_item: false,
+          },
+          {
+            due_at: null,
+            id: undefined, // No matching override
+            lock_at: null,
+            reply_to_topic_due_at: null,
+            required_replies_due_at: null,
+            student_ids: ['1'],
+            unlock_at: null,
+            unassign_item: true,
+          },
+          {
+            due_at: null,
+            id: undefined, // No matching override
+            lock_at: null,
+            reply_to_topic_due_at: null,
+            required_replies_due_at: null,
+            course_section_id: '2',
+            unlock_at: null,
+            unassign_item: true,
+          },
+        ] as unknown as DateDetailsOverride[],
+        only_visible_to_overrides: true,
+      }
+      expect(
+        generateDateDetailsPayload(
+          cards,
+          true,
+          ['section-2', 'student-1'], // unassigned module assignees
+          existingUnassignedOverrides,
+        ),
+      ).toEqual(expectedPayload)
+    })
+
+    it('matches student unassigned overrides regardless of array order', () => {
+      const cards: ItemAssignToCardSpec[] = [
+        {
+          overrideId: '1',
+          isValid: true,
+          hasAssignees: true,
+          selectedAssigneeIds: ['section-1'] as string[],
+          defaultOptions: ['student-1'],
+          due_at: '2021-01-01T00:00:00Z',
+        } as ItemAssignToCardSpec,
+      ]
+
+      const existingUnassignedOverrides: DateDetailsOverride[] = [
+        {
+          id: '100',
+          student_ids: ['3', '2', '1'],
+          due_at: null,
+          unlock_at: null,
+          lock_at: null,
+          reply_to_topic_due_at: null,
+          required_replies_due_at: null,
+          unassign_item: true,
+        },
+      ]
+
+      const result = generateDateDetailsPayload(
+        cards,
+        true,
+        ['student-1', 'student-2', 'student-3'],
+        existingUnassignedOverrides,
+      )
+
+      const unassignedStudentOverride = result.assignment_overrides.find(
+        o => o.unassign_item && o.student_ids,
+      )
+      expect(unassignedStudentOverride?.id).toBe('100') // Should match despite different order
+    })
+
     it('only_visible_to_overrides is false if there are only module overrides', () => {
       const cards: ItemAssignToCardSpec[] = []
       const expectedPayload = <DateDetailsPayload>{

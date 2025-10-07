@@ -109,6 +109,7 @@ export const generateDateDetailsPayload = (
   cards: ItemAssignToCardSpec[],
   hasModuleOverrides: boolean,
   deletedModuleAssignees: string[],
+  existingUnassignedOverrides: DateDetailsOverride[] = [],
 ) => {
   const overrideCards = getOverrideCards(cards)
   const everyoneCard = getEveryoneCard(cards)
@@ -118,6 +119,7 @@ export const generateDateDetailsPayload = (
     everyoneCard,
     hasModuleOverrides,
     deletedModuleAssignees,
+    existingUnassignedOverrides,
   )
 
   return payload
@@ -152,6 +154,7 @@ const createAssignmentOverrides = (
   everyoneCard: ItemAssignToCardSpec | undefined,
   hasModuleOverrides: boolean,
   deletedModuleAssignees: string[],
+  existingUnassignedOverrides: DateDetailsOverride[] = [],
 ) => {
   let overrides: DateDetailsOverride[] = []
   overrideCards.forEach(card => {
@@ -184,8 +187,8 @@ const createAssignmentOverrides = (
 
   // add any unassign_item overrides if present
   if (deletedModuleAssignees.length > 0) {
-    addUnassignStudentOverrides(overrides, deletedModuleAssignees)
-    addUnassignSectionOverrides(overrides, deletedModuleAssignees)
+    addUnassignStudentOverrides(overrides, deletedModuleAssignees, existingUnassignedOverrides)
+    addUnassignSectionOverrides(overrides, deletedModuleAssignees, existingUnassignedOverrides)
   }
 
   return overrides.flat()
@@ -351,16 +354,39 @@ const addMasteryPathsOverrideIfApplicable = (
   }
 }
 
+const findMatchingUnassignedStudentOverride = (
+  existingUnassignedOverrides: DateDetailsOverride[],
+  studentIds: string[],
+): DateDetailsOverride | undefined => {
+  return existingUnassignedOverrides.find(override => {
+    if (!override.student_ids) {
+      return false
+    }
+
+    const existingIds = [...override.student_ids].sort()
+    const newIds = [...studentIds].sort()
+    return (
+      existingIds.length === newIds.length && existingIds.every((id, index) => id === newIds[index])
+    )
+  })
+}
+
 const addUnassignStudentOverrides = (
   overrides: DateDetailsOverride[],
   deletedModuleAssignees: string[],
+  existingUnassignedOverrides: DateDetailsOverride[] = [],
 ) => {
   const studentIds = getAssigneesByType(deletedModuleAssignees, 'student').map(
     id => id.split('-')[1],
   )
   if (studentIds.length > 0) {
+    // Check if there's an existing unassigned override with matching student_ids
+    const existingOverride = findMatchingUnassignedStudentOverride(
+      existingUnassignedOverrides,
+      studentIds,
+    )
     const studentOverride = {
-      id: undefined,
+      id: existingOverride?.id,
       due_at: null,
       reply_to_topic_due_at: null,
       required_replies_due_at: null,
@@ -376,13 +402,18 @@ const addUnassignStudentOverrides = (
 const addUnassignSectionOverrides = (
   overrides: DateDetailsOverride[],
   deletedModuleAssignees: string[],
+  existingUnassignedOverrides: DateDetailsOverride[] = [],
 ) => {
   const sectionIds = getAssigneesByType(deletedModuleAssignees, 'section').map(
     id => id.split('-')[1],
   )
   sectionIds.forEach(section => {
+    // Check if there's an existing unassigned override for this section
+    const existingOverride = existingUnassignedOverrides.find(
+      override => override.unassign_item && override.course_section_id === section,
+    )
     const sectionOverride = {
-      id: undefined,
+      id: existingOverride?.id,
       due_at: null,
       reply_to_topic_due_at: null,
       required_replies_due_at: null,
