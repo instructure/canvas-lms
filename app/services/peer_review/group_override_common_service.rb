@@ -53,7 +53,7 @@ class PeerReview::GroupOverrideCommonService < ApplicationService
   end
 
   def differentiation_tags_enabled_for_context?
-    account.feature_enabled?(:assign_to_differentiation_tags) && account.allow_assign_to_differentiation_tags?
+    account.allow_assign_to_differentiation_tags?
   end
 
   def course

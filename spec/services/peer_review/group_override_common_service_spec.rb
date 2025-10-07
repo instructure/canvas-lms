@@ -174,7 +174,6 @@ RSpec.describe PeerReview::GroupOverrideCommonService do
       end
 
       before do
-        account.enable_feature!(:assign_to_differentiation_tags)
         account.settings[:allow_assign_to_differentiation_tags] = true
         account.save!
       end
@@ -203,20 +202,8 @@ RSpec.describe PeerReview::GroupOverrideCommonService do
       end
     end
 
-    context "when differentiation tags are disabled" do
-      before do
-        account.disable_feature!(:assign_to_differentiation_tags)
-      end
-
-      it "returns false" do
-        result = service.send(:differentiation_tag_override?, 123)
-        expect(result).to be(false)
-      end
-    end
-
     context "when account does not allow differentiation tags" do
       before do
-        account.enable_feature!(:assign_to_differentiation_tags)
         account.settings[:allow_assign_to_differentiation_tags] = false
         account.save!
       end
@@ -286,9 +273,8 @@ RSpec.describe PeerReview::GroupOverrideCommonService do
   describe "#differentiation_tags_enabled_for_context?" do
     let(:service) { described_class.new(peer_review_sub_assignment:) }
 
-    context "when both feature and permission are enabled" do
+    context "when account setting allows differentiation tags" do
       before do
-        account.enable_feature!(:assign_to_differentiation_tags)
         account.settings[:allow_assign_to_differentiation_tags] = true
         account.save!
       end
@@ -299,35 +285,8 @@ RSpec.describe PeerReview::GroupOverrideCommonService do
       end
     end
 
-    context "when feature is disabled" do
+    context "when account setting does not allow differentiation tags" do
       before do
-        account.disable_feature!(:assign_to_differentiation_tags)
-        account.settings[:allow_assign_to_differentiation_tags] = true
-        account.save!
-      end
-
-      it "returns false" do
-        result = service.send(:differentiation_tags_enabled_for_context?)
-        expect(result).to be(false)
-      end
-    end
-
-    context "when permission is disabled" do
-      before do
-        account.enable_feature!(:assign_to_differentiation_tags)
-        account.settings[:allow_assign_to_differentiation_tags] = false
-        account.save!
-      end
-
-      it "returns false" do
-        result = service.send(:differentiation_tags_enabled_for_context?)
-        expect(result).to be(false)
-      end
-    end
-
-    context "when both are disabled" do
-      before do
-        account.disable_feature!(:assign_to_differentiation_tags)
         account.settings[:allow_assign_to_differentiation_tags] = false
         account.save!
       end

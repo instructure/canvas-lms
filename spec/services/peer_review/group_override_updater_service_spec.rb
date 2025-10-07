@@ -353,7 +353,6 @@ RSpec.describe PeerReview::GroupOverrideUpdaterService do
       end
 
       before do
-        account.enable_feature!(:assign_to_differentiation_tags)
         account.settings[:allow_assign_to_differentiation_tags] = true
         account.save!
       end
