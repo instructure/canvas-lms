@@ -38,7 +38,6 @@ import {
 import {Pill} from '@instructure/ui-pill'
 import {Link} from '@instructure/ui-link'
 import {FetchApiError} from '@canvas/do-fetch-api-effect'
-import {Alert} from '@instructure/ui-alerts'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = i18nScope('page_views')
@@ -152,9 +151,11 @@ export function PageViewsDownload({userId}: PageViewsDownloadProps): React.JSX.E
       return
     }
     setExportError(null)
+    // endDisplayDate must be one month earlier than the submitted endMonth (which is exclusive)
+    const endDisplayDate = new Date(new Date(endMonth).setMonth(new Date(endMonth).getMonth() - 1))
     postAsyncJob(
       userId,
-      `${formatter.format(new Date(startMonth))} - ${formatter.format(new Date(endMonth))}`,
+      `${formatter.format(new Date(startMonth))} - ${formatter.format(endDisplayDate)}`,
       startMonth.toString(),
       endMonth.toString(),
     ).catch(e => {
