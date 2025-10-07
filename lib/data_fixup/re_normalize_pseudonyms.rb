@@ -22,6 +22,7 @@ module DataFixup
     self.mode = :individual_record
     self.record_changes = true
     self.progress_tracking = Rails.env.production?
+    self.run_on_default_shard = false
 
     scope { Pseudonym.all }
 

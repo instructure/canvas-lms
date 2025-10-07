@@ -38,6 +38,22 @@ RSpec.describe CanvasOperations::DataFixup do
     end
   end
 
+  shared_context "batch data fixup that skips the default shard" do
+    before do
+      stub_const("BatchDataFixup", Class.new(described_class) do
+        self.mode = :batch
+        self.progress_tracking = false
+        self.run_on_default_shard = false
+
+        scope { User.all }
+
+        def process_batch(records)
+          records.update_all(name: "Fixed User")
+        end
+      end)
+    end
+  end
+
   shared_context "batch data fixup with recording" do
     before do
       stub_const("BatchDataFixup", Class.new(described_class) do
@@ -137,10 +153,20 @@ RSpec.describe CanvasOperations::DataFixup do
     before { BatchDataFixup.range_batch_size = 1 }
 
     context "when the current shard is the default shard" do
-      it "does not execute the fixup" do
-        expect(fixup_instance).not_to receive(:execute)
+      it "does execute the fixup by default" do
+        expect(fixup_instance).to receive(:execute)
 
         run_fixup
+      end
+
+      context "but the fixup is set to skip the default shard" do
+        include_context "batch data fixup that skips the default shard"
+
+        it "does not execute the fixup" do
+          expect(fixup_instance).not_to receive(:execute)
+
+          run_fixup
+        end
       end
     end
 
