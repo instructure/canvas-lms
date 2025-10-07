@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState, useRef, useCallback} from 'react'
+import React, {useEffect, useState, useCallback, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {useQuery, useMutation, useLazyQuery} from '@apollo/client'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -82,26 +82,10 @@ const LibraryManager = ({
     const pageInfo = data?.legacyNode?.commentBankItemsConnection?.pageInfo
     if (pageInfo?.hasNextPage && pageInfo?.endCursor && !loading) {
       fetchMore({
-        variables: {userId, after: pageInfo.endCursor},
-        updateQuery: (prev, {fetchMoreResult}) => {
-          const prevNodes = prev?.legacyNode?.commentBankItemsConnection?.nodes || []
-          const newNodes = fetchMoreResult?.legacyNode?.commentBankItemsConnection?.nodes || []
-          const newPageInfo = fetchMoreResult?.legacyNode?.commentBankItemsConnection?.pageInfo
-
-          return {
-            legacyNode: {
-              ...prev.legacyNode,
-              commentBankItemsConnection: {
-                ...prev.legacyNode.commentBankItemsConnection,
-                nodes: [...prevNodes, ...newNodes],
-                pageInfo: newPageInfo,
-              },
-            },
-          }
-        },
+        variables: {after: pageInfo.endCursor},
       })
     }
-  }, [data, fetchMore, loading, userId])
+  }, [data, fetchMore, loading])
 
   useEffect(() => {
     if (error) {
