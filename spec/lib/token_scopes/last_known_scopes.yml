@@ -584,6 +584,20 @@
 - verb: GET
   path: '/api/v1/courses/:course_id/activity_stream/summary'
 - verb: GET
+  path: '/api/v1/courses/:course_id/ai_experiences'
+- verb: POST
+  path: '/api/v1/courses/:course_id/ai_experiences'
+- verb: DELETE
+  path: '/api/v1/courses/:course_id/ai_experiences/:id'
+- verb: GET
+  path: '/api/v1/courses/:course_id/ai_experiences/:id'
+- verb: PUT
+  path: '/api/v1/courses/:course_id/ai_experiences/:id'
+- verb: GET
+  path: '/api/v1/courses/:course_id/ai_experiences/:id/edit'
+- verb: GET
+  path: '/api/v1/courses/:course_id/ai_experiences/new'
+- verb: GET
   path: '/api/v1/courses/:course_id/all_quizzes'
 - verb: GET
   path: '/api/v1/courses/:course_id/app_center/apps'

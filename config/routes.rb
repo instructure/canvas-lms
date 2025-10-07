@@ -1242,6 +1242,16 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/student_view_student", action: :student_view_student
     end
 
+    scope(controller: :ai_experiences) do
+      get "courses/:course_id/ai_experiences", action: :index, as: "course_ai_experiences"
+      post "courses/:course_id/ai_experiences", action: :create, as: "course_ai_experiences_create"
+      get "courses/:course_id/ai_experiences/new", action: :new, as: "course_ai_experiences_new"
+      get "courses/:course_id/ai_experiences/:id", action: :show, as: "course_ai_experience"
+      get "courses/:course_id/ai_experiences/:id/edit", action: :edit, as: "course_ai_experience_edit"
+      put "courses/:course_id/ai_experiences/:id", action: :update, as: "course_ai_experience_update"
+      delete "courses/:course_id/ai_experiences/:id", action: :destroy, as: "course_ai_experience_destroy"
+    end
+
     scope(controller: :account_calendars_api) do
       get "account_calendars", action: :index, as: :account_calendars
       get "account_calendars/:account_id", action: :show, as: :account_calendar

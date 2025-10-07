@@ -181,6 +181,7 @@ class Course < ActiveRecord::Base
   has_many :combined_groups_and_differentiation_tags, class_name: "Group", as: :context, inverse_of: :context
   has_many :assignment_groups, -> { order("assignment_groups.position", AssignmentGroup.best_unicode_collation_key("assignment_groups.name")) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :assignments, -> { order("assignments.created_at") }, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :ai_experiences, dependent: :destroy
   has_many :calendar_events, -> { where("calendar_events.workflow_state<>'cancelled'") }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :submissions, -> { active.order("submissions.updated_at DESC") }, inverse_of: :course, dependent: :destroy
   has_many :submission_comments, -> { published }, as: :context, inverse_of: :context
