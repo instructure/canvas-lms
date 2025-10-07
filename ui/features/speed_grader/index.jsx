@@ -31,6 +31,7 @@ import {executeQuery} from '@canvas/graphql'
 import {initializePendo} from '@canvas/pendo'
 import speedGrader from './jquery/speed_grader'
 import SGUploader from './sg_uploader'
+import getRCSProps from '@canvas/rce/getRCSProps'
 
 const I18n = createI18nScope('speed_grader')
 
@@ -90,6 +91,7 @@ ready(() => {
           window.ENV.CONTEXT_TIMEZONE ||
           'UTC',
         masquerade: window.ENV.masquerade ?? null,
+        rceTrayProps: getRCSProps(),
       },
       features: {
         a2StudentEnabled: window.ENV.A2_STUDENT_ENABLED ?? false,
