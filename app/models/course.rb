@@ -4592,10 +4592,12 @@ class Course < ActiveRecord::Base
     total > MAX_ACCESSIBILITY_SCAN_RESOURCES
   end
 
+  def self.find_studio_tool(course)
+    Lti::ContextToolFinder.all_tools_for(course).find_by(domain: "arc.instructure.com")
+  end
+
   def has_studio_integration?
-    domain = "arc.instructure.com"
-    root_account.context_external_tools.active.where(domain:).exists? ||
-      account.context_external_tools.active.where(domain:).exists?
+    !!Course.find_studio_tool(self)
   end
 
   private

@@ -2889,6 +2889,18 @@ describe Course do
 
           expect(youtube_tab).to be_nil
         end
+
+        it "includes YouTube migration tab when Studio tool is on a higher level account" do
+          sub_account = @course.root_account.sub_accounts.create!(name: "Sub Account")
+          @course.update!(account: sub_account)
+          sub_account.context_external_tools.where(domain: "arc.instructure.com").destroy_all
+
+          tabs = @course.tabs_available(@user)
+          youtube_tab = tabs.find { |t| t[:id] == Course::TAB_YOUTUBE_MIGRATION }
+
+          expect(youtube_tab).not_to be_nil
+          expect(youtube_tab[:label]).to eq("YouTube Migration")
+        end
       end
 
       describe "TAB_AI_EXPERIENCES" do
