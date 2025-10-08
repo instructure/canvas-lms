@@ -32,6 +32,7 @@ const featureBundles: {
   analytics_hub: () => import('./features/analytics_hub/index'),
   announcements_on_home_page: () => import('./features/announcements_on_home_page/index'),
   announcements: () => import('./features/announcements/index'),
+  ai_experiences_edit: () => import('./features/ai_experiences_edit/index'),
   assignment_grade_summary: () => import('./features/assignment_grade_summary/index'),
   assignment_index: () => import('./features/assignment_index/index'),
   assignment_show: () => import('./features/assignment_show/index'),

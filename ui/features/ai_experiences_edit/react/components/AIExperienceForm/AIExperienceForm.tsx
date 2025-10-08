@@ -38,7 +38,7 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({aiExperience, onSubm
   const [formData, setFormData] = useState<AIExperienceFormData>({
     title: '',
     description: '',
-    prompt: '',
+    facts: '',
     learning_objective: '',
     scenario: '',
   })
@@ -48,7 +48,7 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({aiExperience, onSubm
       setFormData({
         title: aiExperience.title || '',
         description: aiExperience.description || '',
-        prompt: aiExperience.prompt || '',
+        facts: aiExperience.facts || '',
         learning_objective: aiExperience.learning_objective || '',
         scenario: aiExperience.scenario || '',
       })
@@ -98,8 +98,8 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({aiExperience, onSubm
 
           <TextArea
             label={I18n.t('Facts students should know')}
-            value={formData.prompt}
-            onChange={handleInputChange('prompt')}
+            value={formData.facts}
+            onChange={handleInputChange('facts')}
             placeholder={I18n.t('List key facts or information students should be aware of')}
             resize="vertical"
             height="120px"

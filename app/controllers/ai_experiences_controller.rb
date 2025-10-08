@@ -105,24 +105,25 @@ class AiExperiencesController < ApplicationController
   #
   # @returns AiExperience
   def show
-    # For now this endpoint is not accesible for the MTP
-    render_404
+    respond_to do |format|
+      format.json { render json: ai_experience_json(@experience, @current_user, session) }
+    end
   end
 
   # @API Show new AI experience form
   #
   # Display the form for creating a new AI experience
   def new
-    # For now this endpoint is not accessible for the MTP
-    render_404
+    @experience = @context.ai_experiences.build
+    @experience.workflow_state = "unpublished"
+    js_env({ COURSE_ID: @context.id })
   end
 
   # @API Show edit AI experience form
   #
   # Display the form for editing an existing AI experience
   def edit
-    # For now this endpoint is not accessible for the MTP
-    render_404
+    js_env({ COURSE_ID: @context.id, AI_EXPERIENCE_ID: params[:id] })
   end
 
   # @API Create an AI experience
@@ -237,7 +238,7 @@ class AiExperiencesController < ApplicationController
   end
 
   def experience_params
-    params.permit(:title, :description, :facts, :learning_objective, :scenario, :workflow_state)
+    params.require(:ai_experience).permit(:title, :description, :facts, :learning_objective, :scenario, :workflow_state)
   end
 
   def render_404

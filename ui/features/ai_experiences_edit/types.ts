@@ -20,7 +20,7 @@ export interface AIExperience {
   id?: string
   title: string
   description: string
-  prompt: string
+  facts: string
   learning_objective: string
   scenario: string
 }
@@ -28,7 +28,7 @@ export interface AIExperience {
 export interface AIExperienceFormData {
   title: string
   description: string
-  prompt: string
+  facts: string
   learning_objective: string
   scenario: string
 }

@@ -16,8 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {View} from '@instructure/ui-view'
+import LoadingIndicator from '@canvas/loading-indicator'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {AIExperience, AIExperienceFormData} from '../types'
 import AIExperienceForm from './components/AIExperienceForm/AIExperienceForm'
@@ -32,18 +33,52 @@ const AIExperienceManager: React.FC<AIExperienceManagerProps> = ({
 }) => {
   const [aiExperience, setAIExperience] = useState<AIExperience | null>(initialAIExperience || null)
   const [isLoading, setIsLoading] = useState(false)
+  const [isInitialLoading, setIsInitialLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchAIExperience = async () => {
+      const aiExperienceId = (window as any).ENV?.AI_EXPERIENCE_ID
+      const courseId = (window as any).ENV?.COURSE_ID
+
+      if (aiExperienceId && courseId && !aiExperience) {
+        try {
+          const {json} = await doFetchApi({
+            path: `/courses/${courseId}/ai_experiences/${aiExperienceId}`,
+            method: 'GET',
+          })
+          setAIExperience(json as AIExperience)
+        } catch (error) {
+          console.error('Error fetching AI Experience:', error)
+        } finally {
+          setIsInitialLoading(false)
+        }
+      } else {
+        // No data to fetch (new experience), stop loading immediately
+        setIsInitialLoading(false)
+      }
+    }
+
+    fetchAIExperience()
+  }, [])
 
   const handleSubmit = async (formData: AIExperienceFormData) => {
     setIsLoading(true)
     try {
-      const courseId = ENV.COURSE_ID || ENV.COURSE?.id
+      const courseId = ENV.COURSE_ID
       const isEdit = !!aiExperience?.id
 
       const path = isEdit
-        ? `/api/v1/courses/${courseId}/ai_experiences/${aiExperience.id}`
-        : `/api/v1/courses/${courseId}/ai_experiences`
+        ? `/courses/${courseId}/ai_experiences/${aiExperience.id}`
+        : `/courses/${courseId}/ai_experiences`
 
       const method = isEdit ? 'PUT' : 'POST'
+
+      console.log(`${isEdit ? 'Updating' : 'Creating'} AI experience:`, {
+        path,
+        method,
+        formData,
+        courseId,
+      })
 
       const {json} = await doFetchApi({
         path,
@@ -64,6 +99,10 @@ const AIExperienceManager: React.FC<AIExperienceManagerProps> = ({
     } finally {
       setIsLoading(false)
     }
+  }
+
+  if (isInitialLoading) {
+    return <LoadingIndicator />
   }
 
   return (

@@ -550,6 +550,8 @@ CanvasRails::Application.routes.draw do
 
     resources :accessibility_resource_scans, only: [:index]
     resources :accessibility_issues, only: [:update, :show]
+
+    resources :ai_experiences
   end
 
   get "quiz_statistics/:quiz_statistics_id/files/:file_id/download" => "files#show", :as => :quiz_statistics_download, :download => "1"
@@ -1244,10 +1246,10 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :ai_experiences) do
       get "courses/:course_id/ai_experiences", action: :index, as: "course_ai_experiences"
+      get "courses/:course_id/ai_experiences/new", action: :new, as: "new_course_ai_experience"
       post "courses/:course_id/ai_experiences", action: :create, as: "course_ai_experiences_create"
-      get "courses/:course_id/ai_experiences/new", action: :new, as: "course_ai_experiences_new"
       get "courses/:course_id/ai_experiences/:id", action: :show, as: "course_ai_experience"
-      get "courses/:course_id/ai_experiences/:id/edit", action: :edit, as: "course_ai_experience_edit"
+      get "courses/:course_id/ai_experiences/:id/edit", action: :edit, as: "edit_course_ai_experience"
       put "courses/:course_id/ai_experiences/:id", action: :update, as: "course_ai_experience_update"
       delete "courses/:course_id/ai_experiences/:id", action: :destroy, as: "course_ai_experience_destroy"
     end
