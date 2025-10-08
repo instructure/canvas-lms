@@ -31,7 +31,11 @@ const responsiveQuerySizes = ({
   mobile = false,
   tablet = false,
   desktop = false,
-}: {mobile?: boolean; tablet?: boolean; desktop?: boolean} = {}) => {
+}: {
+  mobile?: boolean
+  tablet?: boolean
+  desktop?: boolean
+} = {}) => {
   const querySizes: Record<string, {minWidth?: string; maxWidth?: string}> = {}
   if (mobile) {
     querySizes.mobile = {maxWidth: '639px'}

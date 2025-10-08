@@ -22,6 +22,8 @@ module Types
   class DiscussionParticipantType < ApplicationObjectType
     graphql_name "DiscussionParticipant"
 
+    connection_type_class TotalCountConnection
+
     global_id_field :id
 
     field :expanded, Boolean, null: true
