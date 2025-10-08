@@ -301,4 +301,23 @@ RSpec.describe Lti::Pns::LtiAssetProcessorContributionNoticeBuilder do
       )
     end
   end
+
+  describe "#info_log" do
+    let(:notice_builder) { described_class.new(param_hash) }
+
+    it "returns relevant log information" do
+      log_info = notice_builder.info_log(tool)
+      expect(log_info).to include(
+        notice_type: "LtiAssetProcessorContributionNotice",
+        tool_id: tool.id,
+        user_id: @teacher.id,
+        assignment_id: assignment.id,
+        discussion_entry_id: reply.id,
+        contribution_status: "Submitted",
+        asset_count: 1,
+        asset_uuids: ["333"]
+      )
+      expect(log_info).to have_key(:notice_id)
+    end
+  end
 end

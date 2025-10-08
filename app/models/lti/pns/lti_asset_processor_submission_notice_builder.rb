@@ -110,6 +110,15 @@ module Lti
           assignment: @params[:assignment]
         }
       end
+
+      def info_log(tool)
+        super.merge(
+          assignment_id: @params[:assignment].id,
+          submission_lti_id: @params[:submission_lti_id],
+          asset_count: @params[:assets].length,
+          asset_uuids: @params[:assets].pluck(:asset_id)
+        )
+      end
     end
   end
 end
