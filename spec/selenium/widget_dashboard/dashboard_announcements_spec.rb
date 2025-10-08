@@ -60,11 +60,13 @@ describe "student dashboard announcements widget", :ignore_js_errors do
       expect(announcement_item(@announcement3.id)).to be_displayed
 
       filter_announcements_list_by("Read")
+      wait_for_ajaximations
       expect(all_announcement_items.size).to eq(2)
       expect(announcement_item(@announcement6.id)).to be_displayed
       expect(announcement_item(@announcement5.id)).to be_displayed
 
       filter_announcements_list_by("All")
+      wait_for_ajaximations
       expect(announcement_item(@announcement7.id)).to be_displayed
       expect(announcement_item(@announcement6.id)).to be_displayed
       expect(announcement_item(@announcement5.id)).to be_displayed
@@ -79,6 +81,7 @@ describe "student dashboard announcements widget", :ignore_js_errors do
       expect(element_exists?(announcement_item_selector(@announcement7.id))).to be_falsey
 
       filter_announcements_list_by("Read")
+      wait_for_ajaximations
       expect(announcement_item_mark_unread(@announcement7.id)).to be_displayed
     end
 
@@ -86,6 +89,7 @@ describe "student dashboard announcements widget", :ignore_js_errors do
       go_to_dashboard
 
       filter_announcements_list_by("Read")
+      wait_for_ajaximations
       expect(announcement_item_mark_unread(@announcement6.id)).to be_displayed
       announcement_item_mark_unread(@announcement6.id).click
       wait_for_ajaximations

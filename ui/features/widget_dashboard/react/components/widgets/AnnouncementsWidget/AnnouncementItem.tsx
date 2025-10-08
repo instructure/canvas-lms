@@ -69,21 +69,19 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcementItem, fi
         read: !announcement.isRead,
       })
       if (filter === 'all') {
-        // No need to set isLoading to false on `finally` or `success` as the item will
-        // be removed from the list, unless filtering by all
         setAnnouncement(prev => ({
           ...prev,
           isRead: !prev.isRead,
         }))
-        setIsLoading(false)
       }
     } catch (error) {
       showFlashAlert({
         message: I18n.t("An error ocurred while changing the announcement's read state"),
         type: 'error',
       })
-      setIsLoading(false)
       console.error('Failed to toggle read state:', error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
