@@ -26,8 +26,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import AnnouncementItem from './AnnouncementItem'
 import type {BaseWidgetProps, Announcement} from '../../../types'
-import {usePaginatedAnnouncements} from '../../../hooks/useAnnouncements'
-import {usePagination} from '../../../hooks/usePagination'
+import {useAnnouncementsPaginated} from '../../../hooks/useAnnouncements'
 import {useWidgetDashboard} from '../../../hooks/useWidgetDashboardContext'
 import {FilterOption} from './utils'
 
@@ -36,15 +35,18 @@ const I18n = createI18nScope('widget_dashboard')
 const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
   const [filter, setFilter] = useState<FilterOption>('unread')
 
-  const {data, fetchNextPage, hasNextPage, isLoading, error, refetch} = usePaginatedAnnouncements({
+  const {
+    currentPage,
+    currentPageIndex,
+    totalPages,
+    goToPage,
+    resetPagination,
+    isLoading,
+    error,
+    refetch,
+  } = useAnnouncementsPaginated({
     limit: 3,
     filter,
-  })
-
-  const {currentPageIndex, paginationProps, resetPagination} = usePagination({
-    hasNextPage: !!hasNextPage,
-    totalPagesLoaded: data?.pages?.length || 0,
-    fetchNextPage,
   })
 
   useEffect(() => {
@@ -58,10 +60,7 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
   const {sharedCourseData} = useWidgetDashboard()
 
   const enrichedAnnouncements = useMemo(() => {
-    const currentPageData = data?.pages[currentPageIndex] as
-      | {announcements: Announcement[]}
-      | undefined
-    const filteredAnnouncements = currentPageData?.announcements || []
+    const filteredAnnouncements = currentPage?.announcements || []
 
     return filteredAnnouncements.map(announcement => {
       if (!announcement.course) return announcement
@@ -79,7 +78,7 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
         },
       }
     })
-  }, [data?.pages, currentPageIndex, sharedCourseData])
+  }, [currentPage, sharedCourseData])
 
   const renderFilterSelect = () => (
     <SimpleSelect
@@ -154,7 +153,10 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
       loadingText={I18n.t('Loading announcements...')}
       headerActions={renderFilterSelect()}
       pagination={{
-        ...paginationProps,
+        currentPage: currentPageIndex + 1,
+        totalPages,
+        onPageChange: goToPage,
+        isLoading,
         ariaLabel: I18n.t('Announcements pagination'),
       }}
     >

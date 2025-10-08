@@ -29,9 +29,8 @@ import MessageStudents from '@canvas/message-students-modal/react'
 import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import type {BaseWidgetProps, CourseOption} from '../../../types'
 import {useSharedCourses} from '../../../hooks/useSharedCourses'
-import {useCourseInstructors} from '../../../hooks/useCourseInstructors'
+import {useCourseInstructorsPaginated} from '../../../hooks/useCourseInstructors'
 import {CourseCode} from '../../shared/CourseCode'
-import {usePagination} from '../../../hooks/usePagination'
 import {DEFAULT_PAGE_SIZE} from '../../../constants/pagination'
 
 const I18n = createI18nScope('widget_dashboard')
@@ -76,31 +75,18 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
   }, [selectedCourse])
 
   const {
-    data,
-    fetchNextPage,
-    hasNextPage,
+    currentPage,
+    currentPageIndex,
+    totalPages,
+    goToPage,
     isLoading: instructorsLoading,
     error: instructorsError,
-  } = useCourseInstructors({
+  } = useCourseInstructorsPaginated({
     courseIds: instructorCourseIds,
     limit: DEFAULT_PAGE_SIZE.PEOPLE,
   })
 
-  const totalPagesLoaded = data?.pages.length || 0
-
-  // Get totalCount from the first page (it's the same across all pages)
-  const totalCount = data?.pages?.[0]?.totalCount ?? null
-
-  const {currentPageIndex, paginationProps} = usePagination({
-    hasNextPage: !!hasNextPage,
-    totalPagesLoaded,
-    fetchNextPage: fetchNextPage,
-    totalCount,
-    pageSize: DEFAULT_PAGE_SIZE.PEOPLE,
-  })
-
-  const currentPage = data?.pages[currentPageIndex]
-  const instructors = totalPagesLoaded > 0 ? (currentPage?.data ?? []) : []
+  const instructors = currentPage?.data ?? []
 
   const error =
     externalError ||
@@ -130,7 +116,13 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
       error={error}
       onRetry={onRetry}
       loadingText={I18n.t('Loading people data...')}
-      pagination={{...paginationProps, ariaLabel: I18n.t('Instructors pagination')}}
+      pagination={{
+        currentPage: currentPageIndex + 1,
+        totalPages,
+        onPageChange: goToPage,
+        isLoading: instructorsLoading,
+        ariaLabel: I18n.t('Instructors pagination'),
+      }}
     >
       <Flex direction="column" height="100%">
         <Flex.Item shouldGrow>
