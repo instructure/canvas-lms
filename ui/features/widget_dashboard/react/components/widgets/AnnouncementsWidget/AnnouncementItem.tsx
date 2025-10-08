@@ -144,6 +144,8 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcementItem, fi
       width="100%"
       maxWidth="100%"
       data-testid={`announcement-item-${announcement.id}`}
+      role="group"
+      aria-label={announcement.title}
     >
       <Flex direction="column" gap="xxx-small">
         <Flex.Item overflowY="visible">

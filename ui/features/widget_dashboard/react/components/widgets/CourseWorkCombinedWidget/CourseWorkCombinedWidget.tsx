@@ -21,6 +21,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
+import {List} from '@instructure/ui-list'
 import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import CourseWorkFilters, {type DateFilterOption} from '../../shared/CourseWorkFilters'
 import type {BaseWidgetProps, CourseOption} from '../../../types'
@@ -161,9 +162,13 @@ const CourseWorkCombinedWidget: React.FC<BaseWidgetProps> = ({
           ) : (
             <View height="100%">
               <Flex direction="column">
-                {filteredItems.map(item => (
-                  <CourseWorkItemComponent key={item.id} item={item} />
-                ))}
+                <List isUnstyled margin="0">
+                  {filteredItems.map(item => (
+                    <List.Item key={item.id} margin="0">
+                      <CourseWorkItemComponent item={item} />
+                    </List.Item>
+                  ))}
+                </List>
               </Flex>
             </View>
           )}

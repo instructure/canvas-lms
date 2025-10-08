@@ -22,6 +22,7 @@ import {Avatar} from '@instructure/ui-avatar'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
+import {List} from '@instructure/ui-list'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconMessageLine} from '@instructure/ui-icons'
 import MessageStudents from '@canvas/message-students-modal/react'
@@ -138,66 +139,75 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
               <Text color="secondary">{I18n.t('No instructors found')}</Text>
             ) : (
               <View as="div">
-                {instructors.map(instructor => (
-                  <Flex key={instructor.id} gap="small" padding="xxx-small 0">
-                    <Flex.Item>
-                      <Avatar
-                        name={instructor.name}
-                        src={instructor.avatar_url}
-                        size="medium"
-                        data-testid={`instructor-avatar-${instructor.id}`}
-                      />
-                    </Flex.Item>
-                    <Flex.Item shouldGrow shouldShrink>
-                      <View as="div">
-                        <Text size="medium" weight="bold" lineHeight="condensed">
-                          {instructor.name}
-                        </Text>
-                        {instructor.course_code && (
-                          <View as="div" margin="xxx-small 0 0 0">
-                            <CourseCode
-                              courseId={instructor.enrollments[0]?.course_id}
-                              overrideCode={instructor.course_code}
-                              size="x-small"
-                            />
-                          </View>
-                        )}
-                        <View as="div">
-                          <Text size="x-small" color="secondary">
-                            {instructor.enrollments
-                              .map(enrollment => {
-                                const role =
-                                  enrollment.type === 'TeacherEnrollment'
-                                    ? I18n.t('Teacher')
-                                    : I18n.t('Teaching Assistant')
-                                return role
-                              })
-                              .join(', ')}
-                          </Text>
-                        </View>
-                        {instructor.email && (
+                <List isUnstyled margin="0">
+                  {instructors.map(instructor => (
+                    <List.Item key={instructor.id} margin="0">
+                      <Flex
+                        gap="small"
+                        padding="xxx-small 0"
+                        role="group"
+                        aria-label={instructor.name}
+                      >
+                        <Flex.Item>
+                          <Avatar
+                            name={instructor.name}
+                            src={instructor.avatar_url}
+                            size="medium"
+                            data-testid={`instructor-avatar-${instructor.id}`}
+                          />
+                        </Flex.Item>
+                        <Flex.Item shouldGrow shouldShrink>
                           <View as="div">
-                            <Text size="x-small" color="secondary">
-                              {instructor.email}
+                            <Text size="medium" weight="bold" lineHeight="condensed">
+                              {instructor.name}
                             </Text>
+                            {instructor.course_code && (
+                              <View as="div" margin="xxx-small 0 0 0">
+                                <CourseCode
+                                  courseId={instructor.enrollments[0]?.course_id}
+                                  overrideCode={instructor.course_code}
+                                  size="x-small"
+                                />
+                              </View>
+                            )}
+                            <View as="div">
+                              <Text size="x-small" color="secondary">
+                                {instructor.enrollments
+                                  .map(enrollment => {
+                                    const role =
+                                      enrollment.type === 'TeacherEnrollment'
+                                        ? I18n.t('Teacher')
+                                        : I18n.t('Teaching Assistant')
+                                    return role
+                                  })
+                                  .join(', ')}
+                              </Text>
+                            </View>
+                            {instructor.email && (
+                              <View as="div">
+                                <Text size="x-small" color="secondary">
+                                  {instructor.email}
+                                </Text>
+                              </View>
+                            )}
                           </View>
-                        )}
-                      </View>
-                    </Flex.Item>
-                    <Flex.Item>
-                      <View as="div" margin="0 small">
-                        <IconButton
-                          onClick={() => handleOpenMessageModal(instructor)}
-                          screenReaderLabel={I18n.t('Send a message to %{instructor}', {
-                            instructor: instructor.name,
-                          })}
-                        >
-                          <IconMessageLine />
-                        </IconButton>
-                      </View>
-                    </Flex.Item>
-                  </Flex>
-                ))}
+                        </Flex.Item>
+                        <Flex.Item>
+                          <View as="div" margin="0 small">
+                            <IconButton
+                              onClick={() => handleOpenMessageModal(instructor)}
+                              screenReaderLabel={I18n.t('Send a message to %{instructor}', {
+                                instructor: instructor.name,
+                              })}
+                            >
+                              <IconMessageLine />
+                            </IconButton>
+                          </View>
+                        </Flex.Item>
+                      </Flex>
+                    </List.Item>
+                  ))}
+                </List>
               </View>
             )}
           </View>

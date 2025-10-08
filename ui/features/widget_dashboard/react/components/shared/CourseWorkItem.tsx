@@ -37,7 +37,7 @@ export function CourseWorkItem({item}: CourseWorkItemProps) {
   const {isMobile} = useResponsiveContext()
 
   return (
-    <Flex.Item key={item.id} overflowY="hidden">
+    <Flex.Item key={item.id} overflowY="hidden" role="group" aria-label={item.title}>
       <View as="div" margin="small" background="primary">
         <Flex
           gap="small"
