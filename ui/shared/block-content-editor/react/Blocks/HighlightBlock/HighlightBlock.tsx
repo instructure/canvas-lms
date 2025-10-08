@@ -30,11 +30,13 @@ import {highlightBlockContrast} from '../../accessibilityChecker/rules/highlight
 import {getContrastingTextColorCached} from '../../utilities/getContrastingTextColor'
 
 const I18n = createI18nScope('block_content_editor')
+const screenReaderContent = I18n.t('Important information')
 
 const HighlightBlockView = (props: HighlightBlockProps) => {
   return (
     <HighlightBlockLayout
       icon={getIcon(props.displayIcon, props.textColor)}
+      screenReaderContent={screenReaderContent}
       content={<HighlightText content={props.content} color={props.textColor} />}
       backgroundColor={props.highlightColor}
     />
@@ -57,6 +59,7 @@ const HighlightBlockEdit = (props: HighlightBlockProps) => {
   return (
     <HighlightBlockLayout
       icon={getIcon(props.displayIcon, props.textColor)}
+      screenReaderContent={screenReaderContent}
       content={
         <HighlightTextEdit content={content} setContent={setContent} labelColor={labelColor} />
       }
