@@ -2862,6 +2862,14 @@ describe CoursesController do
       expect(assigns[:course]).to eql(@course)
     end
 
+    it "transforms a unix timestamp to nil" do
+      user_session(@teacher)
+      put "update", params: { id: @course.id, course: { start_at: 1.day.from_now.to_i, name: "Updated" } }, as: :json
+      expect(response).to be_successful
+      @course.reload
+      expect(@course.start_at).to be_nil
+    end
+
     it "updates some settings and stuff" do
       user_session(@teacher)
       put "update", params: { id: @course.id, course: { show_announcements_on_home_page: true, home_page_announcement_limit: 2 } }
