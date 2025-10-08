@@ -35,6 +35,19 @@ describe "dashcards" do
       course_with_student_logged_in(active_all: true)
     end
 
+    it "loads prefetched dashcards (instead of redoing the API call)", priority: "1" do
+      dashboard_card_requests = 0
+      allow_any_instance_of(UsersController).to receive(:dashboard_cards).and_wrap_original do |original, *args|
+        dashboard_card_requests += 1
+        original.call(*args)
+      end
+
+      get "/"
+      wait_for_ajaximations
+
+      expect(dashboard_card_requests).to eq(1)
+    end
+
     it "shows the trigger button for dashboard options menu in new UI", priority: "1" do
       get "/"
       # verify features of new UI
