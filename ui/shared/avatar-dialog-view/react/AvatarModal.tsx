@@ -150,9 +150,9 @@ export default function AvatarModal(props: Props) {
     setLoading(true)
     if (imageType === fromGravatar) {
       try {
-        const response = await gravatarView.current?.updateAvatar()
+        const gravatarUrl = await gravatarView.current?.updateAvatar()
         setImageType(null)
-        updateAvatarInDom(response?.avatar_url)
+        updateAvatarInDom(gravatarUrl)
         props.onClose()
       } catch (error) {
         handleError(error as Error)

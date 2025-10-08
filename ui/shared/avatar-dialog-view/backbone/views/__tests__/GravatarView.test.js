@@ -74,10 +74,10 @@ describe('GravatarView', () => {
     equal($preview.attr('src'), `https://secure.gravatar.com/avatar/${md5}?s=200&d=identicon`)
   })
 
-  test('calls avatar url with specified size', function () {
-    $.ajaxJSON = jest.fn()
+  test('calls avatar url with specified size and returns gravatarURL', async function () {
+    $.ajaxJSON = jest.fn(() => Promise.resolve())
 
-    view.updateAvatar()
+    const gravatarURL = view.updateAvatar()
 
     expect($.ajaxJSON).toHaveBeenCalledWith(
       '/api/v1/users/self',
@@ -86,6 +86,8 @@ describe('GravatarView', () => {
         'user[avatar][url]': expect.stringContaining('s=42'),
       }),
     )
+    // just validate that the returned URL looks like a gravatar URL
+    expect(await gravatarURL).toMatch(/^https:\/\/secure\.gravatar\.com\/avatar\//)
 
     const avatarUrl = $.ajaxJSON.mock.calls[0][2]['user[avatar][url]']
     ok(avatarUrl.includes('s=42'), 'did not specify correct size')
