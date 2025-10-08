@@ -80,7 +80,6 @@ export const SeparateScheduledRelease = ({
     }
 
     validateReleaseDates(isoDate, postCommentsAt || null)
-    handleChange({postGradesAt: isoDate})
   }
 
   const onChangeCommentReleaseDate = (_e: React.SyntheticEvent, isoDate?: string) => {
@@ -94,7 +93,6 @@ export const SeparateScheduledRelease = ({
     }
 
     validateReleaseDates(postGradesAt || null, isoDate)
-    handleChange({postCommentsAt: isoDate})
   }
 
   return (

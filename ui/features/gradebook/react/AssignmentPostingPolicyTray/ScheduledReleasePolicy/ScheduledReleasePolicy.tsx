@@ -69,7 +69,8 @@ export const ScheduledReleasePolicy = ({
   }
   const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedValue(event.target.value)
-    handleChange({scheduledPostMode: event.target.value, postCommentsAt, postGradesAt})
+    const postCommentsAtDate = event.target.value === 'shared' ? postGradesAt : postCommentsAt 
+    handleChange({scheduledPostMode: event.target.value, postCommentsAt: postCommentsAtDate, postGradesAt})
   }
   return (
     <View as="div" margin="medium 0 0 medium" data-testid="scheduled-release-policy">
