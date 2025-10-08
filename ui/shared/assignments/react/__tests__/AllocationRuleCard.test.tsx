@@ -24,6 +24,13 @@ import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import AllocationRuleCard from '../AllocationRuleCard'
 import {AllocationRuleType} from '../../graphql/teacher/AssignmentTeacherTypes'
 
+jest.mock('@canvas/graphql', () => ({
+  executeQuery: jest.fn(),
+}))
+
+const {executeQuery} = require('@canvas/graphql')
+const mockExecuteQuery = executeQuery as jest.MockedFunction<typeof executeQuery>
+
 describe('AllocationRuleCard', () => {
   const assessor = {
     _id: '1',
@@ -42,6 +49,11 @@ describe('AllocationRuleCard', () => {
   beforeEach(() => {
     user = userEvent.setup()
     jest.clearAllMocks()
+    mockExecuteQuery.mockResolvedValue({
+      deleteAllocationRule: {
+        allocationRuleId: '1',
+      },
+    })
   })
 
   const defaultRule: AllocationRuleType = {
@@ -250,6 +262,49 @@ describe('AllocationRuleCard', () => {
 
         expect(deleteButton).not.toBeInTheDocument()
       })
+    })
+  })
+
+  describe('Delete functionality', () => {
+    it('calls handleRuleDelete on successful delete', async () => {
+      const mockHandleRuleDelete = jest.fn()
+
+      mockExecuteQuery.mockResolvedValueOnce({
+        deleteAllocationRule: {
+          allocationRuleId: '1',
+        },
+      })
+
+      renderWithProviders({canEdit: true, handleRuleDelete: mockHandleRuleDelete})
+
+      const deleteButton = screen.getByTestId('delete-allocation-rule-button')
+      await user.click(deleteButton)
+
+      await screen.findByText('Pikachu')
+
+      expect(mockExecuteQuery).toHaveBeenCalledWith(expect.any(Object), {
+        input: {ruleId: '1'},
+      })
+      expect(mockHandleRuleDelete).toHaveBeenCalledWith('1')
+    })
+
+    it('calls handleRuleDelete with error on delete failure', async () => {
+      const mockHandleRuleDelete = jest.fn()
+      const mockError = new Error('Allocation rule not found')
+
+      mockExecuteQuery.mockRejectedValueOnce(mockError)
+
+      renderWithProviders({canEdit: true, handleRuleDelete: mockHandleRuleDelete})
+
+      const deleteButton = screen.getByTestId('delete-allocation-rule-button')
+      await user.click(deleteButton)
+
+      await screen.findByText('Pikachu')
+
+      expect(mockExecuteQuery).toHaveBeenCalledWith(expect.any(Object), {
+        input: {ruleId: '1'},
+      })
+      expect(mockHandleRuleDelete).toHaveBeenCalledWith('1', mockError)
     })
   })
 })

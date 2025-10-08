@@ -28,6 +28,10 @@ class TeacherViewPageV2
       fj("div[role='tab']:contains('Details')")
     end
 
+    def peer_review_tab
+      fj("div[role='tab']:contains('Peer Review')")
+    end
+
     def assignment_type
       f("#AssignmentType")
     end
@@ -111,6 +115,38 @@ class TeacherViewPageV2
 
     def next_assignment_button
       f("[data-testid='next-assignment-button']")
+    end
+
+    def peer_review_allocation_rules_link
+      f("a[data-testid='peer-review-allocation-rules-link']")
+    end
+
+    def allocation_rules_tray
+      fj("h2:contains('Allocation Rules')")
+    end
+
+    def allocation_rules_tray_close_button
+      f("span[data-testid='allocation-rules-tray-close-button'] button")
+    end
+
+    def allocation_rule_cards
+      ff("div[data-testid='allocation-rule-card-wrapper']")
+    end
+
+    def delete_allocation_rule_button(rule_card)
+      f("button[data-testid='delete-allocation-rule-button']", rule_card)
+    end
+
+    def delete_error_alert
+      f("div[data-testid='delete-error-alert']")
+    end
+
+    def add_rule_button
+      f("button[data-testid='add-rule-button']")
+    end
+
+    def edit_rule_button(rule_card)
+      f("button[id^='edit-rule-button-']", rule_card)
     end
   end
 end

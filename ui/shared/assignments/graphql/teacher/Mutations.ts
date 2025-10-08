@@ -80,3 +80,11 @@ export const UPDATE_ALLOCATION_RULE_MUTATION = gql`
     }
   }
 `
+
+export const DELETE_ALLOCATION_RULE_MUTATION = gql`
+  mutation DeleteAllocationRule($input: DeleteAllocationRuleInput!) {
+    deleteAllocationRule(input: $input) {
+      allocationRuleId
+    }
+  }
+`
