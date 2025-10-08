@@ -120,6 +120,9 @@ module Lti
       notice_objects = builders.map { |builder| builder.build(tool) }
       webhook_body = { notices: notice_objects }.to_json
 
+      log_info = builders.map { |builder| builder.info_log(tool) }
+      Rails.logger.info("[PNS] handler_url=#{notice_handler.url} notices=#{log_info.to_json}")
+
       if Rails.env.development? && !Services::NotificationService.configured?
         CanvasHttp
           .delay(strand: "lti_platform_notification_service_development")

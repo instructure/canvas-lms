@@ -223,6 +223,19 @@ describe Lti::PlatformNotificationService do
       end
       Lti::PlatformNotificationService.notify_tools_in_account(tool.account, *builders)
     end
+
+    it "logs the notice info with [PNS] prefix" do
+      handler = make_notice_handler!
+      allow(builder).to receive_messages(
+        build: { jwt: "jwt" },
+        info_log: { notice_type: "LtiHelloWorldNotice", notice_id: "test-id", tool_id: tool.id, user_id: nil }
+      )
+      allow(SecureRandom).to receive(:uuid).and_return("uuid")
+      allow(Services::NotificationService).to receive(:process)
+      expected_log_message = "[PNS] handler_url=#{handler.url} notices=[{\"notice_type\":\"LtiHelloWorldNotice\",\"notice_id\":\"test-id\",\"tool_id\":#{tool.id},\"user_id\":null}]"
+      expect(Rails.logger).to receive(:info).with(expected_log_message)
+      Lti::PlatformNotificationService.notify_tools_in_account(tool.account, builder)
+    end
   end
 
   describe "notify_tools_in_course" do
