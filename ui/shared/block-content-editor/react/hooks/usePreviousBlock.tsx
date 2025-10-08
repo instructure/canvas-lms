@@ -16,26 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as createI18nScope} from '@canvas/i18n'
-import {IconButton} from '@instructure/ui-buttons'
-import {IconDuplicateLine} from '@instructure/ui-icons'
+import {useNode} from '@craftjs/core'
+import {useGetRootNode} from './useGetRootNode'
 
-const I18n = createI18nScope('block_content_editor')
+export const usePreviousBlock = () => {
+  const {id} = useNode()
+  const {rootNode} = useGetRootNode()
 
-export const CopyButton = (props: {
-  onClicked: () => void
-  title: string
-  elementRef?: (element: Element | null) => void
-}) => {
-  return (
-    <IconButton
-      elementRef={props.elementRef}
-      data-testid="copy-block-button"
-      data-action-button
-      screenReaderLabel={I18n.t('Duplicate block: %{title}', {title: props.title})}
-      onClick={props.onClicked}
-    >
-      <IconDuplicateLine />
-    </IconButton>
-  )
+  const getPreviousBlockId = (): string | null => {
+    const siblings = rootNode.data.nodes
+    const currentIndex = siblings.indexOf(id)
+
+    if (currentIndex > 0) {
+      return siblings[currentIndex - 1]
+    }
+
+    return null
+  }
+
+  return {getPreviousBlockId}
 }

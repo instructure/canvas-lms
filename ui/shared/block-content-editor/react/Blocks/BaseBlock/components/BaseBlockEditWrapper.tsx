@@ -39,33 +39,62 @@ import {useInstUIRef} from '../../../hooks/useInstUIRef'
 import {useAddBlockModal} from '../../../hooks/useAddBlockModal'
 import {useSettingsTray} from '../../../hooks/useSettingsTray'
 import {useEditingBlock} from '../../../hooks/useEditingBlock'
+import {useFocusManagement} from '../../../hooks/useFocusManagement'
+import {useGetBlocksCount} from '../../../hooks/useGetBlocksCount'
+import {usePreviousBlock} from '../../../hooks/usePreviousBlock'
+import {useNextBlock} from '../../../hooks/useNextBlock'
 
 const I18n = createI18nScope('block_content_editor')
 
 const InsertButton = () => {
   const {id} = useNode()
   const {open} = useAddBlockModal()
-  return <AddButton onClicked={() => open(id)} />
+  const {elementRef} = useFocusManagement({buttonType: 'insertButton', nodeId: id})
+  return <AddButton onClicked={() => open(id)} elementRef={elementRef} />
 }
 
 const DeleteButton = ({title}: {title: string}) => {
   const deleteNode = useDeleteNode()
+  const {blocksCount} = useGetBlocksCount()
+  const {getPreviousBlockId} = usePreviousBlock()
+  const {getNextBlockId} = useNextBlock()
+  const {focusAddBlockButton, focusInsertButton, focusCopyButton} = useFocusManagement()
+
   const handleDelete = () => {
+    const isLastBlock = blocksCount === 1
+    const previousBlockId = getPreviousBlockId()
+    const nextBlockId = getNextBlockId()
+    const isFirstBlock = !previousBlockId
+
     deleteNode()
     const alertMessage = I18n.t('Block removed: %{blockType}', {blockType: title})
     showScreenReaderAlert(alertMessage)
+
+    if (isLastBlock) {
+      focusAddBlockButton()
+    } else if (isFirstBlock && nextBlockId) {
+      focusCopyButton(nextBlockId)
+    } else if (previousBlockId) {
+      focusInsertButton(previousBlockId)
+    }
   }
   return <RemoveButton onClicked={handleDelete} title={title} />
 }
 
-const DuplicateButton = ({title}: {title: string}) => {
+const DuplicateButton = ({
+  title,
+  elementRef,
+}: {
+  title: string
+  elementRef?: (element: Element | null) => void
+}) => {
   const duplicateNode = useDuplicateNode()
   const handleDuplicate = () => {
     duplicateNode()
     const alertMessage = I18n.t('Block duplicated: %{blockType}', {blockType: title})
     showScreenReaderAlert(alertMessage)
   }
-  return <CopyButton onClicked={handleDuplicate} title={title} />
+  return <CopyButton onClicked={handleDuplicate} title={title} elementRef={elementRef} />
 }
 
 const EditSettingsButton = ({title}: {title: string}) => {
@@ -101,6 +130,7 @@ export const BaseBlockEditWrapper = (
   const {isEditing, isEditingViaEditButton: isEditingByKeyboard} = useIsEditingBlock()
   const [editButtonRef, setEditButtonRef] = useInstUIRef<HTMLButtonElement>()
   const blockTitle = useBlockTitle()
+  const {elementRef: copyButtonRef} = useFocusManagement({buttonType: 'copyButton', nodeId: id})
 
   const handleSave = () => {
     setId(null)
@@ -128,7 +158,11 @@ export const BaseBlockEditWrapper = (
         }
         menu={
           <Flex gap="mediumSmall">
-            <DuplicateButton key="menu-duplicate-button" title={blockTitle} />
+            <DuplicateButton
+              key="menu-duplicate-button"
+              title={blockTitle}
+              elementRef={copyButtonRef}
+            />
             <EditSettingsButton key="menu-edit-block-settings-button" title={blockTitle} />
             <DeleteButton key="menu-delete-button" title={blockTitle} />
             <MoveBlockButton key="menu-move-block-button" title={blockTitle} />

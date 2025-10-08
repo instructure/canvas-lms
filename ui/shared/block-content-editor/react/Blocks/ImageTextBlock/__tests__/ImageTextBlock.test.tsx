@@ -24,7 +24,6 @@ jest.mock('../../../store', () => ({
   __esModule: true,
   ...jest.requireActual('../../../store'),
   useAppSetStore: jest.fn().mockReturnValue(jest.fn()),
-  useAppSelector: jest.fn(),
 }))
 
 const useIsInEditorMock = jest.fn()
