@@ -92,8 +92,6 @@ export const ButtonBlockSettings = () => {
       <SettingsIncludeTitle checked={includeBlockTitle} onChange={handleIncludeBlockTitleChange} />
       <SettingsSectionToggle
         title={I18n.t('Color settings')}
-        collapsedLabel={I18n.t('Expand color settings')}
-        expandedLabel={I18n.t('Collapse color settings')}
         defaultExpanded={true}
         includeSeparator={true}
       >
@@ -108,8 +106,6 @@ export const ButtonBlockSettings = () => {
 
       <SettingsSectionToggle
         title={I18n.t('General button settings')}
-        collapsedLabel={I18n.t('Expand general button settings')}
-        expandedLabel={I18n.t('Collapse general button settings')}
         defaultExpanded={true}
         includeSeparator={true}
       >
@@ -125,8 +121,6 @@ export const ButtonBlockSettings = () => {
 
       <SettingsSectionToggle
         title={I18n.t('Individual button settings')}
-        collapsedLabel={I18n.t('Expand individual button settings')}
-        expandedLabel={I18n.t('Collapse individual button settings')}
         defaultExpanded={true}
         includeSeparator={false}
       >
