@@ -314,6 +314,14 @@ class Lti::RegistrationHistoryEntry < ApplicationRecord
     end
   end
 
+  def availability_update?
+    ["bulk_control_create", "control_edit"].include?(update_type)
+  end
+
+  def configuration_update?
+    ["bulk_control_create", "control_edit"].include?(update_type)
+  end
+
   private
 
   def valid_columns_for_update_type
