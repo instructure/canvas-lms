@@ -556,7 +556,35 @@ describe Announcement do
       expect(participant).to be_nil
     end
 
-    describe "Phase 2: participant updates on section changes" do
+    describe "#sync_participants_with_visibility" do
+      before do
+        @announcement = @course.announcements.build(valid_announcement_attributes.merge(user: @teacher))
+        @announcement.is_section_specific = true
+        @announcement.course_sections = [@section1]
+        @announcement.save!
+      end
+
+      it "does not fail when a participant already exists" do
+        expect(@announcement.discussion_topic_participants.find_by(user: @student1)).to be_present
+
+        expect { @announcement.send(:sync_participants_with_visibility) }.not_to raise_error
+
+        expect(@announcement.discussion_topic_participants.where(user: @student1).count).to eq(1)
+      end
+
+      it "handles race conditions where participant is created between check and insert" do
+        expect(@announcement.discussion_topic_participants.find_by(user: @student1)).to be_present
+
+        allow(@announcement.discussion_topic_participants).to receive(:pluck).and_call_original
+        allow(@announcement.discussion_topic_participants).to receive(:pluck).with(:user_id).and_return([])
+        expect { @announcement.send(:sync_participants_with_visibility) }.not_to raise_error
+
+        # Should still have exactly one participant for @student1
+        expect(@announcement.discussion_topic_participants.where(user: @student1).count).to eq(1)
+      end
+    end
+
+    describe "participant updates on section changes" do
       before do
         @announcement = @course.announcements.build(valid_announcement_attributes.merge(user: @teacher))
         @announcement.is_section_specific = true
