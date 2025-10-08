@@ -90,6 +90,18 @@ const LoadingState = () => (
   </Flex>
 )
 
+enum DeleteFocusType {
+  CREATE_BUTTON = 'create-button',
+  NEXT_RULE = 'next-rule',
+  PREVIOUS_RULE = 'previous-rule',
+  LAST_RULE_AFTER_PAGE_CHANGE = 'last-rule-after-page-change',
+}
+
+interface DeleteFocusInfo {
+  type: DeleteFocusType
+  ruleId?: string
+}
+
 const PeerReviewAllocationRulesTray = ({
   assignmentId,
   isTrayOpen,
@@ -111,7 +123,11 @@ const PeerReviewAllocationRulesTray = ({
   const [searchInputValue, setSearchInputValue] = useState('')
   const [searchInputErrors, setSearchInputErrors] = useState<FormMessage[]>([])
   const [searchTerm, setSearchTerm] = useState('')
+  const [deleteError, setDeleteError] = useState<string | null>(null)
+  const [deleteFocusInfo, setDeleteFocusInfo] = useState<DeleteFocusInfo | null>(null)
+
   const containerRef = useRef<Element | null>(null)
+  const createRuleButtonRef = useRef<HTMLButtonElement | null>(null)
 
   const {rules, totalCount, loading, error, refetch} = useAllocationRules(
     assignmentId,
@@ -144,11 +160,73 @@ const PeerReviewAllocationRulesTray = ({
         }
       }
     },
-    [itemsPerPage, preCreationTotalCount, currentPage, handlePageChange],
+    [itemsPerPage, preCreationTotalCount, currentPage, handlePageChange, isUserNavigating, loading],
+  )
+
+  const handleRuleDelete = useCallback(
+    async (ruleId: string, error?: any) => {
+      if (error) {
+        const errorMessage =
+          error?.message || I18n.t('An error occurred while deleting the allocation rule')
+        setDeleteError(errorMessage)
+        return
+      }
+
+      const deletedRuleIndex = rules.findIndex(rule => rule._id === ruleId)
+      const isOnlyRule = totalCount === 1
+      const isFirstRuleOnPage = deletedRuleIndex === 0
+
+      if (isOnlyRule) {
+        setDeleteFocusInfo({type: DeleteFocusType.CREATE_BUTTON})
+      } else if (isFirstRuleOnPage) {
+        if (rules.length > 1) {
+          setDeleteFocusInfo({type: DeleteFocusType.NEXT_RULE, ruleId: rules[1]._id})
+        } else {
+          setDeleteFocusInfo({type: DeleteFocusType.LAST_RULE_AFTER_PAGE_CHANGE})
+        }
+      } else {
+        setDeleteFocusInfo({
+          type: DeleteFocusType.PREVIOUS_RULE,
+          ruleId: rules[deletedRuleIndex - 1]._id,
+        })
+      }
+
+      if (!isOnlyRule && isFirstRuleOnPage && rules.length === 1 && currentPage > 1) {
+        handlePageChange(currentPage - 1)
+      }
+
+      setShouldRefetch(true)
+    },
+    [rules, currentPage, totalCount, handlePageChange],
+  )
+
+  const handleSearchInputChange = (_e: React.ChangeEvent<HTMLInputElement>, value: string) => {
+    setSearchInputErrors([])
+    setSearchInputValue(value)
+  }
+
+  const clearSearchInput = () => {
+    setSearchInputValue('')
+    setSearchTerm('')
+  }
+
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((value: string) => {
+        if (value.length === 1) {
+          setSearchInputErrors(prev => [
+            ...prev,
+            {text: I18n.t('Search term must be at least 2 characters long'), type: 'newError'},
+          ])
+        } else {
+          setSearchTerm(value)
+        }
+      }, 300),
+    [setSearchTerm],
   )
 
   const calculateItemsPerPage = useCallback(() => {
-    if (!containerRef.current || rules.length === 0) {
+    if (!containerRef.current || (rules.length === 0 && loading)) {
       return
     }
 
@@ -171,26 +249,7 @@ const PeerReviewAllocationRulesTray = ({
         setCurrentPage(newTotalPages)
       }
     }
-  }, [itemsPerPage, totalCount, currentPage, isUserNavigating, loading])
-
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
-
-    const resizeObserver = new ResizeObserver(() => {
-      setTimeout(() => {
-        if (!isUserNavigating) {
-          calculateItemsPerPage()
-        }
-      }, 100)
-    })
-
-    resizeObserver.observe(container)
-
-    return () => {
-      resizeObserver.disconnect()
-    }
-  }, [calculateItemsPerPage, isUserNavigating])
+  }, [itemsPerPage, totalCount, currentPage, isUserNavigating, loading, rules.length])
 
   const setContainerRef = useCallback(
     (el: Element | null) => {
@@ -198,10 +257,36 @@ const PeerReviewAllocationRulesTray = ({
 
       if (el && !isUserNavigating) {
         calculateItemsPerPage()
+        const resizeObserver = new ResizeObserver(entries => {
+          setTimeout(() => {
+            if (!isUserNavigating) {
+              calculateItemsPerPage()
+            }
+          }, 100)
+        })
+
+        resizeObserver.observe(el)
+
+        ;(el as any)._resizeObserver = resizeObserver
+      }
+
+      if (containerRef.current && containerRef.current !== el) {
+        const prevObserver = (containerRef.current as any)._resizeObserver
+        if (prevObserver) {
+          prevObserver.disconnect()
+          delete (containerRef.current as any)._resizeObserver
+        }
       }
     },
     [calculateItemsPerPage, isUserNavigating],
   )
+
+  useEffect(() => {
+    debouncedSearch(searchInputValue)
+    return () => {
+      debouncedSearch.cancel()
+    }
+  }, [searchInputValue, debouncedSearch])
 
   useEffect(() => {
     if (totalCount !== null) {
@@ -219,8 +304,12 @@ const PeerReviewAllocationRulesTray = ({
       containerRef.current &&
       !isUserNavigating
     ) {
-      const timer = setTimeout(calculateItemsPerPage, 300)
-      return () => clearTimeout(timer)
+      const timer = setTimeout(() => {
+        calculateItemsPerPage()
+      }, 300)
+      return () => {
+        clearTimeout(timer)
+      }
     }
   }, [isTrayOpen, loading, totalCount, calculateItemsPerPage, isUserNavigating])
 
@@ -228,12 +317,44 @@ const PeerReviewAllocationRulesTray = ({
     const doRefetch = async () => {
       if (shouldRefetch) {
         setShouldRefetch(false)
-        await refetch(currentPage)
+        const refetchResult = await refetch(currentPage)
         setTimeout(() => {
           if (ruleToFocus) {
             const editButton = document.getElementById(`edit-rule-button-${ruleToFocus}`)
             if (editButton) {
               editButton.focus()
+              setRuleToFocus(null)
+            }
+          } else if (deleteFocusInfo) {
+            if (deleteFocusInfo.type === DeleteFocusType.CREATE_BUTTON) {
+              createRuleButtonRef.current?.focus()
+              setDeleteFocusInfo(null)
+            } else if (
+              deleteFocusInfo.type === DeleteFocusType.NEXT_RULE &&
+              deleteFocusInfo.ruleId
+            ) {
+              const editButton = document.getElementById(
+                `edit-rule-button-${deleteFocusInfo.ruleId}`,
+              )
+              editButton?.focus()
+              setDeleteFocusInfo(null)
+            } else if (
+              deleteFocusInfo.type === DeleteFocusType.PREVIOUS_RULE &&
+              deleteFocusInfo.ruleId
+            ) {
+              const editButton = document.getElementById(
+                `edit-rule-button-${deleteFocusInfo.ruleId}`,
+              )
+              editButton?.focus()
+              setDeleteFocusInfo(null)
+            } else if (
+              deleteFocusInfo.type === DeleteFocusType.LAST_RULE_AFTER_PAGE_CHANGE &&
+              refetchResult?.rules.length > 0
+            ) {
+              const lastRule = refetchResult.rules[refetchResult.rules.length - 1]
+              const editButton = document.getElementById(`edit-rule-button-${lastRule._id}`)
+              editButton?.focus()
+              setDeleteFocusInfo(null)
             }
           } else if (preCreationTotalCount !== null) {
             const ruleIndexOnPage = preCreationTotalCount % itemsPerPage
@@ -252,7 +373,61 @@ const PeerReviewAllocationRulesTray = ({
       }
     }
     doRefetch()
-  }, [currentPage, shouldRefetch, refetch, rules, preCreationTotalCount, itemsPerPage])
+  }, [
+    currentPage,
+    shouldRefetch,
+    refetch,
+    rules,
+    preCreationTotalCount,
+    itemsPerPage,
+    ruleToFocus,
+    deleteFocusInfo,
+  ])
+
+  useEffect(() => {
+    return () => {
+      if (containerRef.current) {
+        const observer = (containerRef.current as any)._resizeObserver
+        if (observer) {
+          observer.disconnect()
+        }
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    if (deleteError) {
+      const errorAlert = document.querySelector('[data-testid="delete-error-alert"]')
+      if (errorAlert) {
+        ;(errorAlert as HTMLElement).focus()
+      }
+      calculateItemsPerPage()
+    }
+  }, [deleteError, calculateItemsPerPage])
+
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(1)
+    }
+  }, [currentPage, totalPages])
+
+  const clearSearchButton = () => {
+    if (!searchTerm) return null
+
+    return (
+      <IconButton
+        type="button"
+        size="small"
+        withBackground={false}
+        withBorder={false}
+        screenReaderLabel={I18n.t('Clear allocation rules search')}
+        onClick={clearSearchInput}
+        data-testid="clear-search-button"
+      >
+        <IconTroubleLine />
+      </IconButton>
+    )
+  }
 
   const renderContent = () => {
     if (loading) return <LoadingState />
@@ -278,7 +453,7 @@ const PeerReviewAllocationRulesTray = ({
 
     return (
       <Flex direction="column" height="100%" elementRef={setContainerRef}>
-        <Flex.Item shouldGrow shouldShrink>
+        <Flex.Item overflowY="hidden" shouldGrow shouldShrink>
           {rules.map(rule => (
             <Flex.Item
               as="div"
@@ -291,6 +466,7 @@ const PeerReviewAllocationRulesTray = ({
                 canEdit={canEdit}
                 assignmentId={assignmentId}
                 refetchRules={handleRuleSave}
+                handleRuleDelete={handleRuleDelete}
               />
             </Flex.Item>
           ))}
@@ -298,56 +474,6 @@ const PeerReviewAllocationRulesTray = ({
       </Flex>
     )
   }
-
-  const handleSearchInputChange = (_e: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    setSearchInputErrors([])
-    setSearchInputValue(value)
-  }
-
-  const clearSearchInput = () => {
-    setSearchInputValue('')
-    setSearchTerm('')
-  }
-
-  const clearSearchButton = () => {
-    if (!searchTerm) return null
-
-    return (
-      <IconButton
-        type="button"
-        size="small"
-        withBackground={false}
-        withBorder={false}
-        screenReaderLabel={I18n.t('Clear allocation rules search')}
-        onClick={clearSearchInput}
-        data-testid="clear-search-button"
-      >
-        <IconTroubleLine />
-      </IconButton>
-    )
-  }
-
-  const debouncedSearch = useMemo(
-    () =>
-      debounce((value: string) => {
-        if (value.length === 1) {
-          setSearchInputErrors(prev => [
-            ...prev,
-            {text: I18n.t('Search term must be at least 2 characters long'), type: 'newError'},
-          ])
-        } else {
-          setSearchTerm(value)
-        }
-      }, 300),
-    [setSearchTerm],
-  )
-
-  useEffect(() => {
-    debouncedSearch(searchInputValue)
-    return () => {
-      debouncedSearch.cancel()
-    }
-  }, [searchInputValue, debouncedSearch])
 
   return (
     <View data-testid="allocation-rules-tray">
@@ -389,6 +515,7 @@ const PeerReviewAllocationRulesTray = ({
                   color="primary"
                   onClick={() => setIsCreateModalOpen(true)}
                   data-testid="add-rule-button"
+                  elementRef={ref => (createRuleButtonRef.current = ref as HTMLButtonElement)}
                 >
                   {I18n.t('+ Rule')}
                 </Button>
@@ -412,8 +539,23 @@ const PeerReviewAllocationRulesTray = ({
                 />
               </Flex.Item>
             )}
+            {deleteError && (
+              <Flex.Item as="div" padding="x-small medium">
+                <Alert
+                  variant="error"
+                  renderCloseButtonLabel={I18n.t('Close error alert for deleting allocation rule')}
+                  data-testid="delete-error-alert"
+                  liveRegion={() =>
+                    document.getElementById('flash_screenreader_holder') as HTMLElement
+                  }
+                  onDismiss={() => setDeleteError(null)}
+                >
+                  {I18n.t('An error occurred while deleting the allocation rule')}
+                </Alert>
+              </Flex.Item>
+            )}
           </Flex.Item>
-          <Flex.Item shouldGrow shouldShrink>
+          <Flex.Item overflowY="hidden" shouldGrow shouldShrink>
             {renderContent()}
           </Flex.Item>
           <Flex.Item as="div" padding="small medium">

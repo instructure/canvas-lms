@@ -183,6 +183,7 @@ async function getAllocationRulesPage(
       pageData = await queryClient.fetchQuery({
         queryKey,
         queryFn: () => fetchGraphQLPage(assignmentId, cursor, searchTerm),
+        networkMode: 'always',
         staleTime: forceRefresh ? 0 : 5 * 60 * 1000,
       })
     }
@@ -231,6 +232,7 @@ export const useAllocationRules = (
     queryFn: () =>
       getAllocationRulesPage(assignmentId, page, itemsPerPage, queryClient, finalSearchTerm),
     enabled: !!assignmentId,
+    networkMode: 'always',
     staleTime: 5 * 60 * 1000,
   })
 
@@ -257,6 +259,7 @@ export const useAllocationRules = (
             finalSearchTerm,
             true,
           ),
+        networkMode: 'always',
         staleTime: 0,
       })
 
