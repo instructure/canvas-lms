@@ -46,7 +46,10 @@ const I18n = createI18nScope('asset_processors_selection')
 export type AssetProcessorsAddModalOnProcessorResponseFn = ({
   tool,
   data,
-}: {tool: LtiLaunchDefinition; data: DeepLinkResponse}) => void
+}: {
+  tool: LtiLaunchDefinition
+  data: DeepLinkResponse
+}) => void
 
 export type AssetProcessorsAddModalProps = {
   courseId: number
@@ -142,14 +145,17 @@ function AssetProcessorsAddModalBody(props: AssetProcessorsAddModalProps) {
 function AssetProcessorsAddModalBodyToolList({
   toolList,
   type,
-}: {toolList: LtiLaunchDefinition[]; type: AssetProcessorType}) {
+}: {
+  toolList: LtiLaunchDefinition[]
+  type: AssetProcessorType
+}) {
   const {launchTool} = useAssetProcessorsAddModalState(s => s.actions)
 
   // With the default tool size in launch_definitions (from context_external_tool.rb#extension_default_value)
-  // make tool list width 800px and the height 523px as calculated from
-  // 400px from tool + 60px from "Configure..." heading + 63px modal.footer
+  // make tool list width 800px and the height 463px as calculated from
+  // 400px from tool + 63px modal.footer
   return (
-    <View as="div" padding="0" width="800px" height="523px" overflowY="auto">
+    <View as="div" padding="0" width="800px" height="463px" overflowY="auto">
       <Flex direction="column">
         <Flex.Item padding="small">
           <Text weight="bold" size="medium">
@@ -193,7 +199,6 @@ function AssetProcessorsAddModalBodyToolLaunch(
   const {close, showInvlidDeepLinkingResponse} = useAssetProcessorsAddModalState(s => s.actions)
 
   const placement = getPlacementDataForType(tool, props.type)
-  const toolName = placement?.title || tool.name
   const width = placement?.selection_width || '800px'
   const height = placement?.selection_height || '400px'
   const iframeRef = useRef<HTMLIFrameElement>(null)
@@ -223,24 +228,15 @@ function AssetProcessorsAddModalBodyToolLaunch(
   }, [close])
 
   return (
-    <>
-      <View padding="small small medium small" as="div" width={width}>
-        <Text weight="bold" size="medium">
-          {I18n.t('Configure settings for %{toolName}.', {toolName})}
-        </Text>
-      </View>
-      <div>
-        <iframe
-          src={
-            `/courses/${courseId}/external_tools/${tool.definition_id}/resource_selection` +
-            `?display=borderless&launch_type=${props.type}&secure_params=${secureParams}`
-          }
-          style={{width, height, border: '0', display: 'block'}}
-          title={I18n.t('Configure new document processing app')}
-          ref={iframeRef}
-        />
-      </div>
-    </>
+    <iframe
+      src={
+        `/courses/${courseId}/external_tools/${tool.definition_id}/resource_selection` +
+        `?display=borderless&launch_type=${props.type}&secure_params=${secureParams}`
+      }
+      style={{width, height, border: '0', display: 'block'}}
+      title={I18n.t('Configure new document processing app')}
+      ref={iframeRef}
+    />
   )
 }
 
