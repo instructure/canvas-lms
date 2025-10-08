@@ -113,18 +113,24 @@ describe AiExperiencesController do
     context "as teacher" do
       before { user_session(@teacher) }
 
-      it "returns 404 for JSON format" do
+      it "returns the AI experience" do
         get :show, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
-        expect(response).to have_http_status(:not_found)
+        expect(response).to have_http_status(:ok)
+        experience_data = json_parse(response.body)
+        expect(experience_data["id"]).to eq(@ai_experience.id)
+        expect(experience_data["title"]).to eq(@ai_experience.title)
       end
     end
 
     context "as student" do
       before { user_session(@student) }
 
-      it "returns 404 for JSON format" do
+      it "returns the AI experience" do
         get :show, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
-        expect(response).to have_http_status(:not_found)
+        expect(response).to have_http_status(:ok)
+        experience_data = json_parse(response.body)
+        expect(experience_data["id"]).to eq(@ai_experience.id)
+        expect(experience_data["title"]).to eq(@ai_experience.title)
       end
     end
   end
@@ -143,7 +149,7 @@ describe AiExperiencesController do
         }
 
         initial_count = AiExperience.count
-        post :create, params: { course_id: @course.id }.merge(experience_params), format: :json
+        post :create, params: { course_id: @course.id, ai_experience: experience_params }, format: :json
         expect(AiExperience.count).to eq(initial_count + 1)
 
         expect(response).to have_http_status(:created)
@@ -163,7 +169,7 @@ describe AiExperiencesController do
         }
 
         initial_count = AiExperience.count
-        post :create, params: { course_id: @course.id }.merge(invalid_params), format: :json
+        post :create, params: { course_id: @course.id, ai_experience: invalid_params }, format: :json
         expect(AiExperience.count).to eq(initial_count)
 
         expect(response).to have_http_status(:bad_request)
@@ -175,7 +181,7 @@ describe AiExperiencesController do
           facts: "Test prompt"
         }
 
-        post :create, params: { course_id: @course.id }.merge(experience_params), format: :json
+        post :create, params: { course_id: @course.id, ai_experience: experience_params }, format: :json
 
         created_experience = AiExperience.last
         expect(created_experience.course).to eq(@course)
@@ -193,7 +199,7 @@ describe AiExperiencesController do
           facts: "Test prompt"
         }
 
-        post :create, params: { course_id: @course.id }.merge(experience_params), format: :json
+        post :create, params: { course_id: @course.id, ai_experience: experience_params }, format: :json
         assert_forbidden
       end
     end
@@ -212,7 +218,7 @@ describe AiExperiencesController do
           scenario: "Updated scenario"
         }
 
-        put :update, params: { course_id: @course.id, id: @ai_experience.id }.merge(update_params), format: :json
+        put :update, params: { course_id: @course.id, id: @ai_experience.id, ai_experience: update_params }, format: :json
 
         expect(response).to have_http_status(:ok)
 
@@ -230,7 +236,7 @@ describe AiExperiencesController do
           facts: "" # facts is required
         }
 
-        put :update, params: { course_id: @course.id, id: @ai_experience.id }.merge(invalid_params), format: :json
+        put :update, params: { course_id: @course.id, id: @ai_experience.id, ai_experience: invalid_params }, format: :json
 
         expect(response).to have_http_status(:bad_request)
 
@@ -247,7 +253,7 @@ describe AiExperiencesController do
           title: "Student Updated Experience"
         }
 
-        put :update, params: { course_id: @course.id, id: @ai_experience.id }.merge(update_params), format: :json
+        put :update, params: { course_id: @course.id, id: @ai_experience.id, ai_experience: update_params }, format: :json
         assert_forbidden
       end
     end
@@ -284,18 +290,9 @@ describe AiExperiencesController do
     context "as teacher" do
       before { user_session(@teacher) }
 
-      it "returns 404 for JSON format" do
-        get :new, params: { course_id: @course.id }, format: :json
-        expect(response).to have_http_status(:not_found)
-      end
-    end
-
-    context "as student" do
-      before { user_session(@student) }
-
-      it "returns forbidden for JSON format" do
-        get :new, params: { course_id: @course.id }, format: :json
-        assert_forbidden
+      it "sets COURSE_ID in js_env" do
+        get :new, params: { course_id: @course.id }
+        expect(assigns[:js_env][:COURSE_ID]).to eq(@course.id)
       end
     end
   end
@@ -304,18 +301,10 @@ describe AiExperiencesController do
     context "as teacher" do
       before { user_session(@teacher) }
 
-      it "returns 404 for JSON format" do
-        get :edit, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
-        expect(response).to have_http_status(:not_found)
-      end
-    end
-
-    context "as student" do
-      before { user_session(@student) }
-
-      it "returns forbidden for JSON format" do
-        get :edit, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
-        assert_forbidden
+      it "sets COURSE_ID and AI_EXPERIENCE_ID in js_env" do
+        get :edit, params: { course_id: @course.id, id: @ai_experience.id }
+        expect(assigns[:js_env][:COURSE_ID]).to eq(@course.id)
+        expect(assigns[:js_env][:AI_EXPERIENCE_ID]).to eq(@ai_experience.id.to_s)
       end
     end
   end
@@ -340,12 +329,12 @@ describe AiExperiencesController do
         end
 
         it "returns 404 for create" do
-          post :create, params: { course_id: @course.id, title: "Test", facts: "Test" }, format: :json
+          post :create, params: { course_id: @course.id, ai_experience: { title: "Test", facts: "Test" } }, format: :json
           expect(response).to have_http_status(:not_found)
         end
 
         it "returns 404 for update" do
-          put :update, params: { course_id: @course.id, id: @ai_experience.id, title: "Updated" }, format: :json
+          put :update, params: { course_id: @course.id, id: @ai_experience.id, ai_experience: { title: "Updated" } }, format: :json
           expect(response).to have_http_status(:not_found)
         end
 
