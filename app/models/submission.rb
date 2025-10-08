@@ -3613,10 +3613,12 @@ class Submission < ActiveRecord::Base
   end
 
   def extract_text
+    upsert_rows = []
+    unique_index = nil
+
     if extract_text_from_upload?
       upsert_rows = attachments.filter_map do |attachment|
         result = FileTextExtractionService.new(attachment:).call
-
         next unless result && result.text.present?
 
         build_upsert_row(
@@ -3625,8 +3627,7 @@ class Submission < ActiveRecord::Base
           attachment_id: attachment.id
         )
       end
-
-      SubmissionText.upsert_all(upsert_rows, unique_by: :index_on_sub_attempt_attach) if upsert_rows.any?
+      unique_index = :index_on_sub_attempt_attach
     elsif body.present?
       upsert_rows = [
         build_upsert_row(
@@ -3634,8 +3635,14 @@ class Submission < ActiveRecord::Base
           contains_images: contains_rce_file_link?(body)
         )
       ]
+      unique_index = :index_on_sub_attempt
+    end
+    return unless upsert_rows.any?
 
-      SubmissionText.upsert_all(upsert_rows, unique_by: :index_on_sub_attempt) if upsert_rows.any?
+    begin
+      SubmissionText.upsert_all(upsert_rows, unique_by: unique_index)
+    rescue => e
+      Rails.logger.error("Failed to upsert SubmissionText records (#{unique_index}): #{e.message}")
     end
   end
 
