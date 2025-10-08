@@ -33,7 +33,7 @@ module Lti::Messages
     end
 
     def generate_post_payload_message
-      add_activity_claim!
+      add_activity_claim!(submission.assignment)
       add_submissions_claim!
       add_assetreport_type_claim!
       add_for_user_claim!
@@ -42,11 +42,6 @@ module Lti::Messages
     end
 
     private
-
-    def add_activity_claim!
-      @message.activity.id = submission.assignment.lti_context_id
-      @message.activity.title = submission.assignment.title
-    end
 
     def add_submissions_claim!
       @message.submission.id =  submission.lti_attempt_id(@opts[:submission_attempt])

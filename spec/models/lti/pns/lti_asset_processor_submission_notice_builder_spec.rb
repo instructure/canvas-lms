@@ -134,7 +134,7 @@ RSpec.describe Lti::Pns::LtiAssetProcessorSubmissionNoticeBuilder do
           "aud" => developer_key.global_id.to_s,
           "azp" => developer_key.global_id.to_s,
           "exp" => now.to_i + 3600,
-          "https://purl.imsglobal.org/spec/lti/claim/activity" => { id: "random_uuid" },
+          "https://purl.imsglobal.org/spec/lti/claim/activity" => { id: "random_uuid", title: assignment.title },
           "https://purl.imsglobal.org/spec/lti/claim/assetservice" =>
           {
             assets: [{

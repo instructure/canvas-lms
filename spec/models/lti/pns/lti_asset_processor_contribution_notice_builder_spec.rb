@@ -211,7 +211,7 @@ RSpec.describe Lti::Pns::LtiAssetProcessorContributionNoticeBuilder do
 
       expect(LtiAdvantage::Messages::JwtMessage).to have_received(:create_jws).with(
         hash_including(
-          "https://purl.imsglobal.org/spec/lti/claim/activity" => { id: assignment.lti_context_id },
+          "https://purl.imsglobal.org/spec/lti/claim/activity" => { id: assignment.lti_context_id, title: assignment.title },
           "https://purl.imsglobal.org/spec/lti/claim/assetservice" =>
           {
             assets: [],
@@ -242,7 +242,7 @@ RSpec.describe Lti::Pns::LtiAssetProcessorContributionNoticeBuilder do
         hash_including(
           "aud" => developer_key.global_id.to_s,
           "azp" => developer_key.global_id.to_s,
-          "https://purl.imsglobal.org/spec/lti/claim/activity" => { id: assignment.lti_context_id },
+          "https://purl.imsglobal.org/spec/lti/claim/activity" => { id: assignment.lti_context_id, title: assignment.title },
           "https://purl.imsglobal.org/spec/lti/claim/assetservice" =>
           {
             assets: [{
