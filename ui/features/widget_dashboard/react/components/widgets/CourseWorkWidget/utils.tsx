@@ -72,13 +72,31 @@ export function getTypeIcon(type: CourseWorkItem['type'], isMobile: boolean) {
   const iconSize = isMobile ? 'x-small' : 'small'
   switch (type) {
     case 'assignment':
-      return <IconAssignmentLine size={iconSize} data-testid="assignment-icon" />
+      return (
+        <IconAssignmentLine
+          title={I18n.t('Assignment')}
+          size={iconSize}
+          data-testid="assignment-icon"
+        />
+      )
     case 'quiz':
-      return <IconQuizLine size={iconSize} data-testid="quiz-icon" />
+      return <IconQuizLine title={I18n.t('Quiz')} size={iconSize} data-testid="quiz-icon" />
     case 'discussion':
-      return <IconDiscussionLine size={iconSize} data-testid="discussion-icon" />
+      return (
+        <IconDiscussionLine
+          title={I18n.t('Discussion')}
+          size={iconSize}
+          data-testid="discussion-icon"
+        />
+      )
     default:
-      return <IconDocumentLine size={iconSize} data-testid="document-icon" />
+      return (
+        <IconDocumentLine
+          title={I18n.t('Course Work Item')}
+          size={iconSize}
+          data-testid="document-icon"
+        />
+      )
   }
 }
 
