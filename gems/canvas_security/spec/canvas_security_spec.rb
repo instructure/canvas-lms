@@ -33,7 +33,7 @@ describe CanvasSecurity do
 
             expected_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9." \
                              "eyJhIjoxLCJleHAiOjEzNjMxNjk1MjB9." \
-                             "VwDKl46gfjFLPAIDwlkVPze1UwC6H_ApdyWYoUXFT8M"
+                             "5n8PzbRU3Ejb3EuhcI3vCCGurwXQzuZ2U65jcgNWb8k"
             expect(token).to eq(expected_token)
           end
         end
@@ -42,13 +42,13 @@ describe CanvasSecurity do
           token = CanvasSecurity.create_jwt({ a: 1 })
           expected_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9." \
                            "eyJhIjoxfQ." \
-                           "Pr4RQfnytL0LMwQ0pJXiKoHmEGAYw2OW3pYJTQM4d9I"
+                           "h9l6iD7t8inSVex5Z1v19AlLcTqds6ufvlow9eqGGdM"
           expect(token).to eq(expected_token)
         end
 
         it "encodes with configured encryption key" do
           jwt = double
-          expect(jwt).to receive(:sign).with(CanvasSecurity.encryption_key, :autodetect).and_return("sometoken")
+          expect(jwt).to receive(:sign).with(CanvasSecurity.jwt_encryption_key, :autodetect).and_return("sometoken")
           allow(JSON::JWT).to receive_messages(new: jwt)
           CanvasSecurity.create_jwt({ a: 1 })
         end
@@ -124,6 +124,10 @@ describe CanvasSecurity do
         JSON::JWT.new({ a: 1 }.merge(claims)).sign(key, :HS256).to_s
       end
 
+      def test_legacy_jwt(claims = {})
+        JSON::JWT.new({ b: 2 }.merge(claims)).sign(CanvasSecurity.encryption_key, :HS256).to_s
+      end
+
       around do |example|
         Timecop.freeze(Time.utc(2013, 3, 13, 9, 12), &example)
       end
@@ -142,6 +146,11 @@ describe CanvasSecurity do
       it "checks using past keys" do
         body = CanvasSecurity.decode_jwt(test_jwt, ["newkey", key])
         expect(body).to eq({ "a" => 1 })
+      end
+
+      it "checks using legacy encryption key" do
+        body = CanvasSecurity.decode_jwt(test_legacy_jwt)
+        expect(body).to eq({ "b" => 2 })
       end
 
       it "raises on an expired token" do
@@ -208,18 +217,27 @@ describe CanvasSecurity do
     after  { described_class.instance_variable_set(:@config, nil) }
 
     it "loads config as erb from config/security.yml" do
-      config = "test:\n  encryption_key: <%= ENV['ENCRYPTION_KEY'] %>"
+      config = <<~YAML
+        test:
+          encryption_key: <%= ENV['ENCRYPTION_KEY'] %>
+          jwt_encryption_keys:
+          - <%= ENV['JWT_ENCRYPTION_KEY'] %>
+      YAML
       expect(File).to receive(:read).with(Rails.root.join("config/security.yml").to_s).and_return(config)
       expect(ENV).to receive(:[]).with("ENCRYPTION_KEY").and_return("secret")
-      expect(CanvasSecurity.config).to eq("encryption_key" => "secret")
+      expect(ENV).to receive(:[]).with("JWT_ENCRYPTION_KEY").and_return("secret2")
+      expect(CanvasSecurity.config).to eq("encryption_key" => "secret", "jwt_encryption_keys" => ["secret2"])
     end
 
     it "falls back to Vault for the encryption key if not defined in the config file" do
-      config = "test:\n  another_key: true"
+      config = <<~YAML
+        test:
+          another_key: true
+      YAML
       expect(File).to receive(:read).with(Rails.root.join("config/security.yml").to_s).and_return(config)
-      credentials = double(security_encryption_key: "secret")
-      expect(Rails).to receive(:application).and_return(instance_double(Rails::Application, credentials:))
-      expect(CanvasSecurity.config).to eq("encryption_key" => "secret", "another_key" => true)
+      credentials = double(security_encryption_key: "secret", security_jwt_encryption_keys: ["secret2"])
+      expect(Rails).to receive(:application).twice.and_return(instance_double(Rails::Application, credentials:))
+      expect(CanvasSecurity.config).to eq("encryption_key" => "secret", "jwt_encryption_keys" => ["secret2"], "another_key" => true)
     end
   end
 end
