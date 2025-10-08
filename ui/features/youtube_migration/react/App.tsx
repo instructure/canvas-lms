@@ -61,6 +61,7 @@ enum YoutubeScanWorkflowState {
   Failed = 'failed',
   Queued = 'queued',
   Running = 'running',
+  WaitingForExternalTool = 'waiting_for_external_tool',
 }
 
 const I18n = createI18nScope('youtube_migration')
@@ -242,7 +243,12 @@ const createYoutubeConvertMutation = async ({
   scanId,
   embed,
   embedIndex,
-}: {courseId: string; scanId: number; embed: YoutubeEmbed; embedIndex: number}): Promise<{
+}: {
+  courseId: string
+  scanId: number
+  embed: YoutubeEmbed
+  embedIndex: number
+}): Promise<{
   progress: CanvasProgress
   embedIndex: number
 }> => {
@@ -352,7 +358,8 @@ const EmbedsModal: React.FC<{
             showFlashError(progress.results?.error || I18n.t('Conversion failed'))()
           } else if (
             progress.workflow_state === 'queued' ||
-            progress.workflow_state === 'running'
+            progress.workflow_state === 'running' ||
+            progress.workflow_state === 'waiting_for_external_tool'
           ) {
             // Continue polling
             const timeoutId = window.setTimeout(pollProgress, 2000)
@@ -390,6 +397,15 @@ const EmbedsModal: React.FC<{
   })
 
   const handleEmbedConvert = (courseId: string, embed: YoutubeEmbed, index: number) => {
+    if (embed.src.includes('/embed/videoseries')) {
+      showFlashError(
+        I18n.t(
+          "This content was added as a YouTube playlist, which can't be converted. Please resolve it manually.",
+        ),
+      )()
+      return
+    }
+
     handleEmbedConvertStatus(index, ConvertStatus.Converting)
     mutation.mutate({courseId, scanId, embed, embedIndex: index})
   }
@@ -826,7 +842,9 @@ const youtubeScanQuery = async ({
 
 const createYoutubeScanMutation = async ({
   courseId,
-}: {courseId: string}): Promise<YoutubeScanResultReport> => {
+}: {
+  courseId: string
+}): Promise<YoutubeScanResultReport> => {
   const {json, response} = await doFetchApi<YoutubeScanResultReport>({
     path: `/api/v1/courses/${courseId}/youtube_migration/scan`,
     method: 'POST',
@@ -890,14 +908,16 @@ export const App: React.FC<AppProps> = ({courseId}) => {
     if (
       !isPollingRunning.current &&
       (data?.workflow_state === YoutubeScanWorkflowState.Running ||
-        data?.workflow_state === YoutubeScanWorkflowState.Queued)
+        data?.workflow_state === YoutubeScanWorkflowState.Queued ||
+        data?.workflow_state === YoutubeScanWorkflowState.WaitingForExternalTool)
     ) {
       isPollingRunning.current = true
       const pollRefetch = async () => {
         const {data} = await refetch()
         if (
           data?.workflow_state === YoutubeScanWorkflowState.Queued ||
-          data?.workflow_state === YoutubeScanWorkflowState.Running
+          data?.workflow_state === YoutubeScanWorkflowState.Running ||
+          data?.workflow_state === YoutubeScanWorkflowState.WaitingForExternalTool
         ) {
           setTimeout(pollRefetch, 1000)
         } else {
@@ -953,6 +973,7 @@ export const App: React.FC<AppProps> = ({courseId}) => {
   if (
     data.workflow_state === YoutubeScanWorkflowState.Queued ||
     data.workflow_state === YoutubeScanWorkflowState.Running ||
+    data.workflow_state === YoutubeScanWorkflowState.WaitingForExternalTool ||
     mutationInProgress
   ) {
     return <ScanningInProgressView />

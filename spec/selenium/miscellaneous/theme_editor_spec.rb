@@ -160,8 +160,6 @@ describe "Theme Editor" do
     expect(f('[id="warning-message"]')).to include_text "'#{invalid_color}' is not a valid color."
   end
 
-  it "K12 Theme should be automatically set when K12 Feature Flag is turned on", priority: "1"
-
   it "previews should display a progress bar when generating preview", priority: "1" do
     open_theme_editor(Account.default.id)
     f(".Theme__editor-color-block_input-text").send_keys(random_hex_color)
@@ -169,20 +167,6 @@ describe "Theme Editor" do
     expect(f("body")).not_to contain_css("div.progress-bar__bar-container")
     preview_your_changes
     expect(f("div.progress-bar__bar-container")).to be
-  end
-
-  it "has validation for every text field", priority: "2" do
-    skip("Broken after upgrade to webdriver 2.53 - seems to be a timing issue on jenkins, passes locally")
-    open_theme_editor(Account.default.id)
-
-    # input invalid text into every text field
-    create_theme("#xxxxxx")
-
-    # tab to trigger last validation
-    fj(".Theme__editor-color-block_input--has-error:last").send_keys(:tab)
-
-    # expect all 15 text fields to have working validation
-    expect(all_warning_messages.length).to eq 15
   end
 
   it "allows fields to be changed after colors are unlinked", priority: 3 do

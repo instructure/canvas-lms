@@ -25,6 +25,7 @@ import ExternalToolSelector from './ExternalToolSelector'
 import {ContentItem, ModuleItemContentType} from '../../hooks/queries/useModuleItemContent'
 import {ExternalToolModalItem} from '../../utils/types'
 import {ITEM_TYPE} from '../../utils/constants'
+import AddItemFormFieldGroup, {AddItemFormFieldGroupData} from './AddItemFormFieldGroup'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -40,7 +41,7 @@ const validateUrl = (url: string, shouldValidateEmpty: boolean = false): string 
   return ''
 }
 
-interface ExternalItemFormProps {
+interface ExternalItemFormProps extends AddItemFormFieldGroupData {
   onChange: (field: string, value: any) => void
   externalUrlValue?: string
   externalUrlName?: string
@@ -58,7 +59,10 @@ export const ExternalItemForm: React.FC<ExternalItemFormProps> = ({
   itemType = 'external_url',
   contentItems = [],
   formErrors = {},
-}) => {
+  indentValue,
+  onIndentChange,
+  moduleName,
+}: ExternalItemFormProps) => {
   const [url, setUrl] = useState(externalUrlValue)
   const [pageName, setPageName] = useState(externalUrlName)
   const [loadInNewTab, setLoadInNewTab] = useState(newTab)
@@ -124,7 +128,11 @@ export const ExternalItemForm: React.FC<ExternalItemFormProps> = ({
   const isExternalTool = itemType === 'external_tool'
 
   return (
-    <View as="form" padding="small" display="block">
+    <AddItemFormFieldGroup
+      indentValue={indentValue}
+      onIndentChange={onIndentChange}
+      moduleName={moduleName}
+    >
       {isExternalTool && (
         <View margin="0 0 medium 0">
           <ExternalToolSelector
@@ -189,7 +197,7 @@ export const ExternalItemForm: React.FC<ExternalItemFormProps> = ({
           }
         }}
       />
-    </View>
+    </AddItemFormFieldGroup>
   )
 }
 

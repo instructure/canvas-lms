@@ -50,6 +50,7 @@ const featureBundles: {
   calendar_appointment_group_edit: () => import('./features/calendar_appointment_group_edit/index'),
   calendar: () => import('./features/calendar/index'),
   change_password: () => import('./features/change_password/index'),
+  ignite_agent: () => import('./features/ignite_agent/index'),
   choose_mastery_path: () => import('./features/choose_mastery_path/index'),
   collaborations: () => import('./features/collaborations/index'),
   conferences: () => import('./features/conferences/index'),

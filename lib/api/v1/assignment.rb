@@ -1085,6 +1085,13 @@ module Api::V1::Assignment
     assignment
   end
 
+  def update_new_quizzes_params(assignment, assignment_params)
+    return unless Account.site_admin.feature_enabled?(:new_quizzes_surveys) && assignment.quiz_lti?
+
+    type = assignment_params[:new_quizzes_quiz_type]
+    assignment.new_quizzes_type = type if type.present?
+  end
+
   def turnitin_settings_hash(assignment_params)
     turnitin_settings = assignment_params.delete("turnitin_settings").permit(*API_ALLOWED_TURNITIN_SETTINGS)
     turnitin_settings["exclude_type"] = case turnitin_settings["exclude_small_matches_type"]
@@ -1228,6 +1235,8 @@ module Api::V1::Assignment
       assignment.line_item_resource_id = line_item[:resourceId]
       assignment.line_item_tag = line_item[:tag]
     end
+
+    update_new_quizzes_params(assignment, assignment_params)
 
     assignment.saving_user = user
 

@@ -35,12 +35,12 @@ module Canvas
       unless old_keys.empty?
         deprecator.warn(
           "Configuration options #{old_keys.join(", ")} for #{source} are no longer supported; just configure endpoint with a full URI and/or use region to form regional endpoints",
-          caller(1)
+          caller_locations(1)
         )
         config = config.except(*OLD_KEYS)
       end
       unless config.key?(:region) || config.key?("region")
-        deprecator.warn("Please supply region for #{source}; for now defaulting to us-east-1", caller(1))
+        deprecator.warn("Please supply region for #{source}; for now defaulting to us-east-1", caller_locations(1))
         config = config.dup
         config[:region] = "us-east-1"
       end

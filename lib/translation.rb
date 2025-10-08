@@ -31,7 +31,11 @@ module Translation
   class TextTooLongError < TranslationError
   end
 
-  CHARACTER_LIMIT = 5000
+  class UnsupportedLanguageError < TranslationError
+  end
+
+  class ValidationError < TranslationError
+  end
 
   module TranslationType
     AWS_TRANSLATE = :aws_translate
@@ -103,10 +107,6 @@ module Translation
     def translate_text(text:, tgt_lang:, options: {}, flags: {})
       return nil unless translation_client(flags)&.available?
 
-      if text.length >= CHARACTER_LIMIT
-        raise TextTooLongError
-      end
-
       unless options[:feature_slug] && TranslationSlugs::TYPES.include?(options[:feature_slug])
         options[:feature_slug] = TranslationSlugs::DEFAULT
       end
@@ -116,10 +116,6 @@ module Translation
 
     def translate_html(html_string:, tgt_lang:, options: {}, flags: {})
       return nil unless translation_client(flags)&.available?
-
-      if html_string.length >= CHARACTER_LIMIT
-        raise TextTooLongError
-      end
 
       unless options[:feature_slug] && TranslationSlugs::TYPES.include?(options[:feature_slug])
         options[:feature_slug] = TranslationSlugs::DEFAULT

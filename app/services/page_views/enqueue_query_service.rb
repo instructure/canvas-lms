@@ -19,6 +19,10 @@
 
 module PageViews
   class EnqueueQueryService < PageViews::ServiceBase
+    def initialize(configuration, requestor_user: nil)
+      super
+    end
+
     def call(start_date, end_date, user, format)
       raise ArgumentError, "Invalid user" unless user.is_a?(User)
 

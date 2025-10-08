@@ -34,6 +34,7 @@
 - [Plagiarism](./15_plagiarism.md)
 - [Privacy Level](./16_privacy_level.md)
 - [Platform Storage](./17_platform_storage.md)
+- [Asset Reports](./18_asset_reports.md)
 
 **Other Docs**
 

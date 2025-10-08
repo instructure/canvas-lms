@@ -59,7 +59,7 @@ module Lti
     NON_PUBLIC_PLACEMENTS = %i[submission_type_selection].freeze
 
     # These placements require tools to be on an allow list
-    RESTRICTED_PLACEMENTS = %i[submission_type_selection top_navigation].freeze
+    RESTRICTED_PLACEMENTS = %i[submission_type_selection].freeze
 
     # These placements don't need the CANVAS_PLACEMENT_EXTENSION_PREFIX
     STANDARD_PLACEMENTS = %i[ActivityAssetProcessor ActivityAssetProcessorContribution].freeze

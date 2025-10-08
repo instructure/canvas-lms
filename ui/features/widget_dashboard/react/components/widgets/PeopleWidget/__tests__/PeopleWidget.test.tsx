@@ -18,11 +18,29 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
 import PeopleWidget from '../PeopleWidget'
 import type {BaseWidgetProps, Widget} from '../../../../types'
+
+jest.mock('@canvas/message-students-modal/react', () => {
+  return function MockMessageStudents({onRequestClose, title, recipients, contextCode}: any) {
+    return (
+      <div data-testid="message-students-modal">
+        <h2>{title}</h2>
+        <div data-testid="modal-context-code">{contextCode}</div>
+        <div data-testid="modal-recipients">
+          {recipients.map((r: any) => r.displayName).join(', ')}
+        </div>
+        <button onClick={onRequestClose} data-testid="close-modal">
+          Close
+        </button>
+      </div>
+    )
+  }
+})
 
 const server = setupServer(
   // Mock useSharedCourses query
@@ -49,7 +67,29 @@ const server = setupServer(
     return HttpResponse.json({
       data: {
         courseInstructorsConnection: {
-          nodes: [],
+          nodes: [
+            {
+              user: {
+                _id: '123',
+                name: 'John Doe',
+                sortableName: 'Doe, John',
+                shortName: 'John',
+                avatarUrl: 'https://example.com/avatar.jpg',
+                email: 'john@example.com',
+              },
+              course: {
+                _id: '789',
+                name: 'Computer Science 101',
+                courseCode: 'CS101',
+              },
+              type: 'TeacherEnrollment',
+              role: {
+                _id: '1',
+                name: 'TeacherEnrollment',
+              },
+              enrollmentState: 'active',
+            },
+          ],
           pageInfo: {
             hasNextPage: false,
             hasPreviousPage: false,
@@ -136,5 +176,57 @@ describe('PeopleWidget', () => {
   it('has correct data-testid', () => {
     renderWithQueryClient(<PeopleWidget {...buildDefaultProps()} />)
     expect(screen.getByTestId('widget-test-people-widget')).toBeInTheDocument()
+  })
+
+  describe('Message Students Modal Integration', () => {
+    it('opens message modal when message button is clicked', async () => {
+      const user = userEvent.setup()
+      renderWithQueryClient(<PeopleWidget {...buildDefaultProps()} />)
+
+      await screen.findByText('John Doe')
+
+      const messageButton = screen.getByRole('button', {name: /send a message to john doe/i})
+      await user.click(messageButton)
+
+      expect(screen.getByTestId('message-students-modal')).toBeInTheDocument()
+      expect(screen.getByText('Send Message to John Doe')).toBeInTheDocument()
+      expect(screen.getByTestId('modal-context-code')).toHaveTextContent('course_789')
+      expect(screen.getByTestId('modal-recipients')).toHaveTextContent('John Doe')
+    })
+
+    it('closes message modal when close button is clicked', async () => {
+      const user = userEvent.setup()
+      renderWithQueryClient(<PeopleWidget {...buildDefaultProps()} />)
+
+      await screen.findByText('John Doe')
+      const messageButton = screen.getByRole('button', {name: /send a message to john doe/i})
+      await user.click(messageButton)
+
+      expect(screen.getByTestId('message-students-modal')).toBeInTheDocument()
+
+      const closeButton = screen.getByTestId('close-modal')
+      await user.click(closeButton)
+
+      expect(screen.queryByTestId('message-students-modal')).not.toBeInTheDocument()
+    })
+
+    it('passes correct recipient data to modal', async () => {
+      const user = userEvent.setup()
+      renderWithQueryClient(<PeopleWidget {...buildDefaultProps()} />)
+
+      await screen.findByText('John Doe')
+
+      const messageButton = screen.getByRole('button', {name: /send a message to john doe/i})
+      await user.click(messageButton)
+
+      expect(screen.getByTestId('modal-context-code')).toHaveTextContent('course_789')
+      expect(screen.getByTestId('modal-recipients')).toHaveTextContent('John Doe')
+      expect(screen.getByText('Send Message to John Doe')).toBeInTheDocument()
+    })
+
+    it('does not render modal when closed', () => {
+      renderWithQueryClient(<PeopleWidget {...buildDefaultProps()} />)
+      expect(screen.queryByTestId('message-students-modal')).not.toBeInTheDocument()
+    })
   })
 })

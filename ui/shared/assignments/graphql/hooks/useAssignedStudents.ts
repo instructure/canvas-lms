@@ -116,6 +116,7 @@ export const useAssignedStudents = (assignmentId: string, courseId: string, sear
     queryKey: ['assignedStudents', assignmentId, finalSearchTerm],
     queryFn: () => getAssignedStudents(assignmentId, finalSearchTerm),
     enabled: !!assignmentId,
+    networkMode: 'always',
   })
 
   const courseStudentsQuery = useQuery<CourseStudent[], Error>({

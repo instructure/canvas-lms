@@ -314,12 +314,6 @@
     "clear_image_3213fe62": {
         "message": "画像を消す"
     },
-    "clear_selected_file_82388e50": {
-        "message": "選択したファイルを消去する"
-    },
-    "clear_selected_file_filename_2fe8a58e": {
-        "message": "選択されたファイルを削除：{ filename }"
-    },
     "click_or_shift_click_for_the_html_editor_25d70bb4": {
         "message": "クリックまたはシフトクリックでHTMLエディタに移動します。"
     },

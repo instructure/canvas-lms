@@ -51,5 +51,7 @@ module PageViews
     class InternalServerError < StandardError; end
     class AccessDeniedError < StandardError; end
     class InvalidResultError < StandardError; end
+    class TooManyRequestsError < StandardError; end
+    class NoContentError < StandardError; end
   end
 end

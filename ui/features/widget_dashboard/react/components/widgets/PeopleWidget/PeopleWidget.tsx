@@ -18,19 +18,19 @@
 
 import React, {useState, useMemo} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Avatar} from '@instructure/ui-avatar'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {Pagination} from '@instructure/ui-pagination'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconMessageLine} from '@instructure/ui-icons'
+import MessageStudents from '@canvas/message-students-modal/react'
 import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import type {BaseWidgetProps, CourseOption} from '../../../types'
 import {useSharedCourses} from '../../../hooks/useSharedCourses'
 import {useCourseInstructors} from '../../../hooks/useCourseInstructors'
 import {CourseCode} from '../../shared/CourseCode'
+import {usePagination} from '../../../hooks/usePagination'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -41,6 +41,13 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
   onRetry,
 }) => {
   const [selectedCourse, setSelectedCourse] = useState<string>('all')
+  const [selectedRecipient, setSelectedRecipient] = useState<{
+    id: string
+    displayName: string
+    email?: string
+    contextCode: string
+  } | null>(null)
+  const [modalKey, setModalKey] = useState(0)
 
   const {
     data: courseGrades = [],
@@ -67,18 +74,26 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
   }, [selectedCourse])
 
   const {
-    data: instructors = [],
+    data,
+    fetchNextPage,
+    hasNextPage,
     isLoading: instructorsLoading,
     error: instructorsError,
-    hasNextPage,
-    hasPreviousPage,
-    currentPage,
-    totalPages,
-    goToPage,
   } = useCourseInstructors({
     courseIds: instructorCourseIds,
     limit: 5,
   })
+
+  const totalPagesLoaded = data?.pages.length || 0
+
+  const {currentPageIndex, paginationProps} = usePagination({
+    hasNextPage: !!hasNextPage,
+    totalPagesLoaded,
+    fetchNextPage: fetchNextPage,
+  })
+
+  const currentPage = data?.pages[currentPageIndex]
+  const instructors = totalPagesLoaded > 0 ? (currentPage?.data ?? []) : []
 
   const error =
     externalError ||
@@ -86,17 +101,19 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
     (instructorsError ? I18n.t('Failed to load instructor data. Please try again.') : null)
   const isLoading = !error && (externalIsLoading || coursesLoading || instructorsLoading)
 
-  const handleCourseChange = (
-    _event: React.SyntheticEvent,
-    data: {value?: string | number; id?: string},
-  ) => {
-    if (data.value && typeof data.value === 'string') {
-      setSelectedCourse(data.value)
-    }
+  const handleOpenMessageModal = (instructor: any) => {
+    const courseId = instructor.enrollments?.[0]?.course_id
+    setSelectedRecipient({
+      id: instructor.id.split('-')[0],
+      displayName: instructor.name,
+      email: instructor.email,
+      contextCode: courseId ? `course_${courseId}` : '',
+    })
+    setModalKey(prev => prev + 1)
   }
 
-  const handlePageChange = (pageNumber: number) => {
-    goToPage(pageNumber)
+  const handleCloseMessageModal = () => {
+    setSelectedRecipient(null)
   }
 
   return (
@@ -106,6 +123,7 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
       error={error}
       onRetry={onRetry}
       loadingText={I18n.t('Loading people data...')}
+      pagination={{...paginationProps, ariaLabel: I18n.t('Instructors pagination')}}
     >
       <Flex direction="column" height="100%">
         <Flex.Item shouldGrow>
@@ -163,7 +181,7 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
                     <Flex.Item>
                       <View as="div" margin="0 small">
                         <IconButton
-                          href={`/conversations?user_name=${encodeURIComponent(instructor.name)}&user_id=${instructor.id.split('-')[0]}`}
+                          onClick={() => handleOpenMessageModal(instructor)}
                           screenReaderLabel={I18n.t('Send a message to %{instructor}', {
                             instructor: instructor.name,
                           })}
@@ -178,22 +196,16 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
             )}
           </View>
         </Flex.Item>
-        {(hasNextPage || hasPreviousPage) && (
-          <Flex.Item shouldShrink>
-            <View as="div" textAlign="center" padding="x-small 0">
-              <Pagination
-                as="nav"
-                margin="x-small"
-                variant="compact"
-                currentPage={currentPage}
-                totalPageNumber={totalPages}
-                onPageChange={handlePageChange}
-                aria-label={I18n.t('Instructors pagination')}
-              />
-            </View>
-          </Flex.Item>
-        )}
       </Flex>
+      {selectedRecipient && (
+        <MessageStudents
+          key={modalKey}
+          contextCode={selectedRecipient.contextCode}
+          recipients={[selectedRecipient]}
+          title={I18n.t('Send Message to %{name}', {name: selectedRecipient.displayName})}
+          onRequestClose={handleCloseMessageModal}
+        />
+      )}
     </TemplateWidget>
   )
 }

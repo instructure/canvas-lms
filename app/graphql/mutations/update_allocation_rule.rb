@@ -36,9 +36,6 @@ class Mutations::UpdateAllocationRule < Mutations::AllocationRuleBase
                       update_regular_rules(allocation_rule, input, assignment, course)
                     end
 
-    excluded_rule_ids = get_related_rule_ids(allocation_rule, input[:reciprocal])
-    validate_peer_review_counts!(updated_rules, assignment, excluded_rule_ids)
-
     process_allocation_rules(updated_rules)
   end
 

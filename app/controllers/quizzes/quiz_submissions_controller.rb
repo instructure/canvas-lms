@@ -66,6 +66,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
         params_hash = hash.deep_merge(sanitized_params)
         @submission.submission_data = params_hash unless @submission.overdue?
         @submission.record_answer(params_hash.dup)
+        @submission.updating_user = @current_user
         flash[:notice] = t("errors.late_quiz", "You submitted this quiz late, and your answers may not have been recorded.") if @submission.overdue?
         Quizzes::SubmissionGrader.new(@submission).grade_submission
 

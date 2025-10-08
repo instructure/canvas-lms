@@ -20,10 +20,11 @@ import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {IconAiColoredSolid} from '@instructure/ui-icons'
+import './discussion-insights-button.css'
 
 interface DiscussionInsightsButtonProps {
   isMobile: boolean
-  onClick: () => void
+  href: string
 }
 
 const I18n = createI18nScope('discussions_posts')
@@ -32,13 +33,15 @@ export const DiscussionInsightsButton: React.FC<DiscussionInsightsButtonProps> =
   const buttonText = I18n.t('Go to Insights')
   return (
     <Button
-      onClick={props.onClick}
       color="ai-secondary"
       renderIcon={<IconAiColoredSolid />}
       id="discussion-insights-button"
       data-testid="discussion-insights-button"
       display={props.isMobile ? 'block' : 'inline-block'}
       aria-label={I18n.t('Ignite AI Go to Insights')}
+      as="a"
+      href={props.href}
+      data-insights-button
     >
       {buttonText}
     </Button>

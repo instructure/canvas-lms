@@ -117,7 +117,7 @@ store.save = function (configurationType, data, success, error) {
   const params = this._generateParams(configurationType, data)
 
   // Don't send shared secret if it hasn't changed //
-  if (params.shared_secret === 'N/A') {
+  if (params.shared_secret === 'N/A' && data.app_id) {
     delete params.shared_secret
   }
 

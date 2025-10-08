@@ -38,11 +38,6 @@ describe "viewing a quiz with variable due dates on the quiz show page" do
       validate_quiz_show_page("Due Multiple Due Dates")
     end
 
-    it "indicates various availability dates", priority: "2" do
-      skip("Bug ticket created: CNVS-22549")
-      validate_quiz_show_page("Available Various Availability Dates")
-    end
-
     it "prevents taking the quiz", priority: "2" do
       expect(f("#content")).not_to contain_css(".take_quiz_button")
     end

@@ -38,8 +38,11 @@ export type AssetReportCompatibleSubmissionType = z.infer<
 >
 
 export function ensureCompatibleSubmissionType(
-  submissionType: string,
+  submissionType: string | null | undefined,
 ): AssetReportCompatibleSubmissionType | undefined {
+  if (!submissionType) {
+    return undefined
+  }
   const result = ZAssetReportCompatibleSubmissionType.safeParse(submissionType)
   if (result.success) {
     return result.data

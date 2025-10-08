@@ -3400,6 +3400,10 @@ class Submission < ActiveRecord::Base
     "#{lti_id}:#{attempt || self.attempt}"
   end
 
+  def skip_broadcasts
+    super || assignment.rollcall_assignment?
+  end
+
   private
 
   def checkpoint_changes?

@@ -18,8 +18,8 @@
 
 import {useQuery} from '@tanstack/react-query'
 import type {ModuleItem, PaginatedNavigationResponse} from '../../utils/types'
-import {SHOW_ALL_PAGE_SIZE} from '../../utils/constants'
 import {getModuleItems} from './useModuleItems'
+import {SHOW_ALL_PAGE_SIZE, MODULE_ITEMS_ALL} from '../../utils/constants'
 
 export async function getAllModuleItems(
   moduleId: string,
@@ -43,7 +43,7 @@ export async function getAllModuleItems(
 
 export function useAllModuleItems(moduleId: string, enabled: boolean, view: string = 'teacher') {
   return useQuery<PaginatedNavigationResponse, Error>({
-    queryKey: ['MODULE_ITEMS_ALL', moduleId, view, SHOW_ALL_PAGE_SIZE],
+    queryKey: [MODULE_ITEMS_ALL, moduleId, view, SHOW_ALL_PAGE_SIZE],
     queryFn: () => getAllModuleItems(moduleId, view),
     enabled,
     staleTime: 15 * 60 * 1000,

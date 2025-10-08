@@ -44,7 +44,7 @@ describe HorizonMode do
   end
 
   let(:resolver) { instance_double(CanvasCareer::ExperienceResolver) }
-  let(:config) { instance_double(CanvasCareer::Config, learner_app_redirect_url: "https://canvasforcareer.com") }
+  let(:config) { instance_double(CanvasCareer::Config) }
 
   before do
     # Define route for the anonymous controller
@@ -65,15 +65,6 @@ describe HorizonMode do
     context "when force_classic param is present" do
       it "does not redirect" do
         get :show, params: { force_classic: "1" }
-        expect(response).to have_http_status(:ok)
-      end
-    end
-
-    context "when force_classic cookie is present" do
-      before { cookies[:force_classic] = "1" }
-
-      it "does not redirect" do
-        get :show
         expect(response).to have_http_status(:ok)
       end
     end
@@ -124,34 +115,12 @@ describe HorizonMode do
         allow(resolver).to receive(:resolve).and_return(CanvasCareer::Constants::App::CAREER_LEARNER)
       end
 
-      context "when horizon_learner_app feature is enabled" do
-        before do
-          account.enable_feature!(:horizon_learner_app)
-        end
-
-        it "redirects to the career path without horizon parameters" do
-          get :show
-          expect(response.location).to include("/career/courses/#{course.id}")
-          expect(response.location).not_to include("content_only=true")
-          expect(response.location).not_to include("instui_theme=career")
-          expect(response.location).not_to include("force_classic=true")
-        end
-      end
-
-      context "when horizon_learner_app feature is disabled" do
-        it "redirects to the configured learner app URL with horizon parameters" do
-          get :show
-          expect(response.location).to include("https://canvasforcareer.com")
-          expect(response.location).to include("content_only=true")
-          expect(response.location).to include("instui_theme=career")
-          expect(response.location).to include("force_classic=true")
-        end
-
-        it "does nothing if course is not a horizon course" do
-          course.update!(horizon_course: false)
-          get :show
-          expect(response).to have_http_status(:ok)
-        end
+      it "redirects to the career path without horizon parameters" do
+        get :show
+        expect(response.location).to include("/career/courses/#{course.id}")
+        expect(response.location).not_to include("content_only=true")
+        expect(response.location).not_to include("instui_theme=career")
+        expect(response.location).not_to include("force_classic=true")
       end
     end
 
@@ -357,6 +326,39 @@ describe HorizonMode do
 
       before do
         controller.instance_variable_set(:@context, other_context)
+      end
+
+      it { is_expected.to be false }
+    end
+
+    context "when entering student view for a horizon course" do
+      before do
+        allow(course).to receive(:horizon_course?).and_return(true)
+        controller.instance_variable_set(:@context, course)
+        allow(controller).to receive_messages(controller_name: "courses", action_name: "student_view")
+      end
+
+      it { is_expected.to be false }
+    end
+
+    context "when in student view session for a horizon course" do
+      let(:fake_student) { course.student_view_student }
+
+      before do
+        allow(course).to receive(:horizon_course?).and_return(true)
+        controller.instance_variable_set(:@context, course)
+        controller.instance_variable_set(:@current_user, fake_student)
+      end
+
+      it { is_expected.to be false }
+    end
+
+    context "when POST to student_view path for a horizon course" do
+      before do
+        allow(course).to receive(:horizon_course?).and_return(true)
+        controller.instance_variable_set(:@context, course)
+        allow(controller).to receive_messages(controller_name: "courses", action_name: "show")
+        allow(request).to receive_messages(path: "/courses/14/student_view/1", method: "POST")
       end
 
       it { is_expected.to be false }

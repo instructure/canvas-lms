@@ -85,8 +85,10 @@ describe "Platform Notification Service" do
 
     # After clicking the mock tool's notification_button, this LTI registration
     # should have an lti_notice_handler created on it.
-    tool_deployment = registration.deployments.first
-    expect(tool_deployment.lti_notice_handlers.first.url)
-      .to eq("#{base_url}/subscription_handler")
+    keep_trying_until do
+      tool_deployment = registration.deployments.first
+      expect(tool_deployment.lti_notice_handlers.first.url)
+        .to eq("#{base_url}/subscription_handler")
+    end
   end
 end

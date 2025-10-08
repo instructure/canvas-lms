@@ -29,35 +29,36 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 const I18n = createI18nScope('peer_review_student_select')
 
 interface StudentSelectProps {
+  inputId: string
   label: string
   errors: FormMessage[]
-  initialSelected?: CourseStudent | null
+  selectedStudent?: CourseStudent | null
   assignmentId?: string
   courseId?: string
-  filterStudents: Set<CourseStudent>
-  onOptionSelect: (student: CourseStudent) => void
+  filteredStudents: CourseStudent[]
+  onOptionSelect: (student?: CourseStudent) => void
   handleInputRef: (ref: HTMLElement | null) => void
   clearErrors: () => void
   delay?: number
 }
 
 const StudentSelect = ({
+  inputId,
   label,
   errors,
-  initialSelected = null,
+  selectedStudent = null,
   assignmentId = '',
   courseId = '',
-  filterStudents,
+  filteredStudents = [],
   onOptionSelect,
   handleInputRef,
   clearErrors,
   delay = 300,
 }: StudentSelectProps) => {
-  const [inputValue, setInputValue] = useState(initialSelected ? initialSelected.name : '')
+  const [inputValue, setInputValue] = useState(selectedStudent?.name || '')
   const [searchTerm, setSearchTerm] = useState(inputValue)
   const [showOptions, setShowOptions] = useState(false)
   const [highlightIndex, setHighlightIndex] = useState<number | null>(null)
-  const [selectedStudent, setSelectedStudent] = useState<CourseStudent | null>(initialSelected)
   const [inputErrors, setInputErrors] = useState<FormMessage[]>(errors)
   const {students, loading, error} = useAssignedStudents(
     assignmentId,
@@ -75,7 +76,7 @@ const StudentSelect = ({
         if (value.length === 1) {
           setInputErrors(prev => [
             ...prev,
-            {text: I18n.t('Search term must be at least 2 characters long'), type: 'error'},
+            {text: I18n.t('Search term must be at least 2 characters long'), type: 'newError'},
           ])
         } else {
           setSearchTerm(value)
@@ -97,7 +98,7 @@ const StudentSelect = ({
   }
 
   const handleInputChange = (value: string) => {
-    if (!loading && value.length !== 1) {
+    if (value.length !== 1) {
       setShowOptions(true)
       if (highlightIndex === null) {
         setHighlightIndex(0)
@@ -105,15 +106,18 @@ const StudentSelect = ({
     } else {
       setShowOptions(false)
     }
+    // Clear selection when user types
+    if (selectedStudent && value !== selectedStudent.name) {
+      onOptionSelect(undefined)
+    }
     clearInputErrors()
     setInputValue(value)
   }
 
   const handleSelection = (id: string) => {
-    const selectedStudent = students.find(student => student._id === id)
+    const selectedStudent = availableStudents.find(student => student._id === id)
     if (selectedStudent) {
       onOptionSelect(selectedStudent)
-      setSelectedStudent(selectedStudent)
       setInputValue(selectedStudent?.name || '')
       setShowOptions(false)
     }
@@ -122,16 +126,16 @@ const StudentSelect = ({
   const handleArrowKeys = (event: React.KeyboardEvent) => {
     if (showOptions) {
       if (event.key === 'ArrowDown') {
-        if (highlightIndex == students.length - 1) {
+        if (highlightIndex == availableStudents.length - 1) {
           setHighlightIndex(0)
         } else {
           setHighlightIndex(prev => (prev !== null ? prev + 1 : 0))
         }
       } else if (event.key === 'ArrowUp') {
         if (highlightIndex == 0) {
-          setHighlightIndex(students.length - 1)
+          setHighlightIndex(availableStudents.length - 1)
         } else {
-          setHighlightIndex(prev => (prev !== null ? prev - 1 : students.length - 1))
+          setHighlightIndex(prev => (prev !== null ? prev - 1 : availableStudents.length - 1))
         }
       }
     }
@@ -144,18 +148,14 @@ const StudentSelect = ({
     }
   }
 
-  const renderStudentOption = (student: CourseStudent, index: number) => {
-    if (!filterStudents.has(student)) {
-      return (
-        <Select.Option id={student._id} key={student._id} isHighlighted={highlightIndex == index}>
-          {student.name}
-        </Select.Option>
-      )
-    }
-  }
+  const renderStudentOption = (student: CourseStudent, index: number) => (
+    <Select.Option id={student._id} key={student._id} isHighlighted={highlightIndex == index}>
+      {student.name}
+    </Select.Option>
+  )
 
   const loadingOption = (
-    <Select.Option id="loading-option" key="loading-option">
+    <Select.Option id="loading-option" key="loading-option" data-testId="loading-option">
       <Spinner renderTitle={I18n.t('Loading')} size="x-small" />
     </Select.Option>
   )
@@ -166,9 +166,13 @@ const StudentSelect = ({
     </Select.Option>
   )
 
+  const availableStudents = useMemo(() => {
+    return students.filter(student => !filteredStudents.map(s => s._id).includes(student._id))
+  }, [students, filteredStudents])
+
   return (
     <Flex as="div" direction="column">
-      {error && (
+      {error && searchTerm.length > 1 && (
         <Alert
           variant="error"
           renderCloseButtonLabel={I18n.t('Close error alert for %{label} search input', {
@@ -181,6 +185,7 @@ const StudentSelect = ({
         </Alert>
       )}
       <Select
+        id={inputId}
         isRequired={true}
         renderLabel={label}
         inputRef={ref => handleInputRef(ref)}
@@ -198,8 +203,8 @@ const StudentSelect = ({
       >
         {loading
           ? loadingOption
-          : students.length > 0 && inputValue === searchTerm
-            ? students.map((student, index) => renderStudentOption(student, index))
+          : availableStudents.length > 0 && inputValue === searchTerm
+            ? availableStudents.map((student, index) => renderStudentOption(student, index))
             : inputValue.length > 1
               ? emptyOption
               : null}

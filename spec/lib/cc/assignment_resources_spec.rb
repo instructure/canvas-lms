@@ -142,5 +142,26 @@ describe CC::AssignmentResources do
         end
       end
     end
+
+    context "export lti_context_id if Asset Processor is attached" do
+      let(:root_account) { assignment.root_account }
+
+      it "does not export anything when lti_asset_processor FF is off" do
+        root_account.disable_feature!(:lti_asset_processor)
+        expect(subject.at("lti_context_id")).to be_nil
+      end
+
+      it "does not export anything if no Asset Processor is attached to the assignment" do
+        expect(subject.at("lti_context_id")).to be_nil
+      end
+
+      it "exports lti_context_id" do
+        tool = external_tool_model(context: assignment.context.root_account)
+        lti_asset_processor_model(tool:, assignment:, title: "Text Entry AP")
+
+        # Should export lti_context_id tag only
+        expect(subject.at("lti_context_id").text).to eq assignment.lti_context_id
+      end
+    end
   end
 end

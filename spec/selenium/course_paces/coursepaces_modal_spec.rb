@@ -350,10 +350,6 @@ describe "course pace page" do
       expect(pace_info.text).to include("2")
     end
 
-    it "shows the actual number of students in published default pace" do
-      skip("LS-3608 this is broken right now")
-    end
-
     it "shows the actual number of students in a section pace" do
       create_published_course_pace("Course Pace 1", "Module Assignment 1")
       create_section_pace(@new_section_1)

@@ -979,6 +979,10 @@ he:
             start: 
               parameters: 
                 header: "התחלה ב:"
+    edp_student_activity_csv_parameters: 
+      custom_reports: 
+        edp: 
+          all_terms: "כל התקופות/תנאים"
     embry_riddle_activity_report_csv_parameters: 
       account_reports: 
         embry_riddle: 
@@ -2322,6 +2326,7 @@ he:
   announcements_a4b8ed4a: הכרזות
   announcements_loaded_e9335d5f: "הכרזות נטענו"
   announcements_tutorial_tray_994287d6: "מגש מדריך ההכרזות"
+  anonymity_1cfb09ca: אנונימיות
   anonymize_all_annotations_made_by_instructors_on_s_4f2b70a5: "הפוך לאנונימי את כל ההערות שבוצעו ע\"י מנחים על הגשות של מטלה זו ב SpeedGrader"
   anonymous_e1b8ad27: אנונימי
   anonymous_grading_ccb5045c: "מתן ציונים אנונימי"
@@ -10562,6 +10567,7 @@ he:
   j_5226008a: j
   japan_81_d1832e9d: "יפן (+81)"
   javascript_file_fc27c32b: "קובץ JavaScript "
+  job_handler_9d3d1007: "מנהל תהליכי עיבוד"
   jobs: 
     columns: 
       attempt: ניסיון
@@ -17699,6 +17705,7 @@ he:
   select_one_of_the_options_c8b0c6e4: "בחירת אחת האפשרויות:"
   select_prerequisite_module_57894963: "בחירת מודול המהווה דרישה מוקדמת"
   select_prerequite_module_e9042bb0: "בחירת מודול המהווה דרישה מוקדמת"
+  select_profile_picture_172176b6: "בחירת תמונת פרופיל"
   select_question_bank_508e5c08: "בחירת בנק שאלות"
   select_specific_content_5382e7ea: "בחירת תוכן ספציפי"
   select_student_name_caaff244: "בחירת התלמיד %{name}"
@@ -18577,6 +18584,7 @@ he:
   show_course_sections_for_course_name_5f715702: "הצגת הקבצות של קורס %{name}"
   show_courses_navigation_menu_7ad1a8d4: "הצגת תפריט ניווט קורסים"
   show_current_grade_5bf4e0d9: "הצגת ההערכה הנוכחית"
+  show_d6f24222: הצג/י
   show_dashboard_card_view_41ebd6c6: "הצגה בתצוגת כרטיס לוח המחוונים"
   show_dashcard_view_76078ecb: "הצגה בתצוגה גליון גרפי"
   show_deleted_replies_a2e0a36f: "הצגת תשובות שבוטלו"

@@ -154,41 +154,18 @@ describe AllocationRule do
       it "prevents conflicting review_permitted values" do
         conflicting_rule = AllocationRule.new(valid_attributes.merge(review_permitted: false))
         expect(conflicting_rule).not_to be_valid
-        expect(conflicting_rule.errors[:assessee_id]).to include("conflicts with rule \"#{@student1.name} must review #{@student2.name}\"")
+        expect(conflicting_rule.errors[:assessee_id]).to include("This rule conflicts with rule \"#{@student1.name} must review #{@student2.name}\"")
       end
 
       it "prevents conflicting must_review values" do
         conflicting_rule = AllocationRule.new(valid_attributes.merge(must_review: false))
         expect(conflicting_rule).not_to be_valid
-        expect(conflicting_rule.errors[:assessee_id]).to include("conflicts with rule \"#{@student1.name} must review #{@student2.name}\"")
+        expect(conflicting_rule.errors[:assessee_id]).to include("This rule conflicts with rule \"#{@student1.name} must review #{@student2.name}\"")
       end
 
       it "allows updating the existing rule" do
         @existing_rule.must_review = false
         expect(@existing_rule).to be_valid
-      end
-    end
-
-    context "with peer review count limits" do
-      it "prevents exceeding peer review count" do
-        # Create 2 existing "must review" rules for student1
-        AllocationRule.create!(valid_attributes)
-        AllocationRule.create!(valid_attributes.merge(assessee_id: @student3.id))
-
-        # Try to create a third one
-        extra_rule = AllocationRule.new(valid_attributes.merge(
-                                          assessee_id: user_factory.tap { |u| @course.enroll_student(u, enrollment_state: "active") }.id
-                                        ))
-        expect(extra_rule).not_to be_valid
-        expect(extra_rule.errors[:must_review]).to include("would exceed the maximum number of required peer reviews (2) for this assessor")
-      end
-
-      it "allows creating rules up to the peer review count" do
-        rule1 = AllocationRule.create!(valid_attributes)
-        rule2 = AllocationRule.create!(valid_attributes.merge(assessee_id: @student3.id))
-
-        expect(rule1).to be_valid
-        expect(rule2).to be_valid
       end
     end
   end
@@ -198,37 +175,6 @@ describe AllocationRule do
       @submission1 = @assignment.submit_homework(@student2)
       @submission2 = @assignment.submit_homework(@student3)
       @submission_assessor = @assignment.submit_homework(@student1)
-    end
-
-    context "when assessor has completed maximum reviews" do
-      before(:once) do
-        AssessmentRequest.create!(
-          assessor: @student1,
-          user: @student2,
-          asset: @submission1,
-          assessor_asset: @submission_assessor,
-          workflow_state: "completed"
-        )
-        AssessmentRequest.create!(
-          assessor: @student1,
-          user: @student3,
-          asset: @submission2,
-          assessor_asset: @submission_assessor,
-          workflow_state: "completed"
-        )
-      end
-
-      it "prevents adding new must_review rules" do
-        new_student = user_factory
-        @course.enroll_student(new_student, enrollment_state: "active")
-
-        rule = AllocationRule.new(valid_attributes.merge(
-                                    assessee_id: new_student.id,
-                                    must_review: true
-                                  ))
-        expect(rule).not_to be_valid
-        expect(rule.errors[:assessor_id]).to include("conflicts with completed peer reviews. #{@student1.name} has already completed 2 peer review(s) for: #{@student2.name}, #{@student3.name}")
-      end
     end
 
     context "when trying to prohibit a completed review" do
@@ -245,7 +191,7 @@ describe AllocationRule do
       it "prevents creating review_permitted: false rules" do
         rule = AllocationRule.new(valid_attributes.merge(review_permitted: false))
         expect(rule).not_to be_valid
-        expect(rule.errors[:assessee_id]).to include("conflicts with completed peer review. #{@student1.name} has already reviewed #{@student2.name}")
+        expect(rule.errors[:assessee_id]).to include("This rule conflicts with completed peer review. #{@student1.name} has already reviewed #{@student2.name}")
       end
     end
   end

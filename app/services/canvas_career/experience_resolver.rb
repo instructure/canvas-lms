@@ -94,8 +94,7 @@ module CanvasCareer
           learning_provider_in_context? &&
           (user_preference.prefers_learning_provider? || !learner_in_context?)
       else # contextless
-        @domain_root_account.feature_enabled?(:horizon_learning_provider_app_on_contextless_routes) &&
-          has_career_associations? &&
+        has_career_associations? &&
           (user_preference.prefers_career? || !has_academic_associations?) &&
           has_career_learning_provider_roles? &&
           (user_preference.prefers_learning_provider? || !has_career_learner_roles?)

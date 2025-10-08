@@ -389,24 +389,6 @@ describe "RCE next tests", :ignore_js_errors do
         end
       end
 
-      it "clicks on sidebar course navigation page to create link in body", :ignore_js_errors do
-        skip("RCX-1964")
-
-        title = "Files"
-        visit_front_page_edit(@course)
-
-        # Selenium::WebDriver::Error::ElementClickInterceptedError:
-        # element click intercepted: Element is not clickable at point (1112, 906)
-        click_course_links_toolbar_menuitem
-
-        click_navigation_accordion
-        click_course_item_link(title)
-
-        in_frame rce_page_body_ifr_id do
-          expect(wiki_body_anchor.attribute("href")).to include course_file_path(@course)
-        end
-      end
-
       it "clicks on assignment in sidebar to create link to it in announcement page", :ignore_js_errors do
         title = "Assignment-Title"
         @assignment = @course.assignments.create!(name: title)
@@ -498,41 +480,6 @@ describe "RCE next tests", :ignore_js_errors do
             @assignment
           )
         end
-      end
-
-      it "closes links tray if open when opening link options" do
-        skip("still flakey. Needs to be addressed in LS-1814")
-        visit_front_page_edit(@course)
-
-        switch_to_html_view
-        html_view = f("textarea#wiki_page_body")
-        html_view.send_keys('<h2>This is plain text</h2><a href="http://example.com">edit me</a>')
-        switch_to_editor_view
-
-        def switch_trays
-          click_course_links_toolbar_menuitem
-          wait_for_ajaximations
-          expect(course_links_tray).to be_displayed
-
-          begin
-            click_link_for_options
-            click_link_options_button
-
-            expect(link_options_tray).to be_displayed
-            validate_course_links_tray_closed
-          rescue Selenium::WebDriver::Error::NoSuchElementError
-            puts "Failed finding the link options button. Bailing out on this spec."
-            expect(true).to be_truthy
-          ensure
-            driver.switch_to.frame("wiki_page_body_ifr")
-            f("h2").click
-            driver.switch_to.default_content
-          end
-        end
-
-        # Duplicate trays only appear sporadically, so repeat this several times to make sure
-        # we aren't getting multiple trays open at once.
-        3.times { switch_trays }
       end
 
       it "displays assignment publish status in links accordion" do
@@ -841,43 +788,6 @@ describe "RCE next tests", :ignore_js_errors do
       end
     end
 
-    it "closes links tray if open when opening image options" do
-      skip("still flakey. Needs to be addressed in LS-1814")
-      page_title = "Page1"
-      image = add_embedded_image("email.png")
-      @course.wiki_pages.create!(
-        title: page_title,
-        body: "<h2>This is plain text</h2><img src=\"/courses/#{@course.id}/files/#{image.id}\">"
-      )
-
-      visit_existing_wiki_edit(@course, page_title)
-
-      def switch_trays
-        click_course_links_toolbar_menuitem
-        wait_for_ajaximations
-        expect(course_links_tray).to be_displayed
-
-        begin
-          click_embedded_image_for_options
-          click_image_options_button
-
-          expect(image_options_tray).to be_displayed
-          validate_course_links_tray_closed
-        rescue Selenium::WebDriver::Error::NoSuchElementError
-          puts "Failed finding the image options button. Bailing out on this spec."
-          expect(true).to be_truthy
-        ensure
-          driver.switch_to.frame("wiki_page_body_ifr")
-          f("h2").click
-          driver.switch_to.default_content
-        end
-      end
-
-      # Duplicate trays only appear sporadically, so run this several times to make sure
-      # we aren't getting multiple trays open at once.
-      3.times { switch_trays }
-    end
-
     it "changes embedded image to link when selecting option" do
       page_title = "Page1"
       create_wiki_page_with_embedded_image(page_title)
@@ -916,30 +826,6 @@ describe "RCE next tests", :ignore_js_errors do
 
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_image.attribute("alt")).to include alt_text
-        end
-      rescue Selenium::WebDriver::Error::NoSuchElementError
-        puts "Failed finding the image options button. Bailing out on this spec."
-        expect(true).to be_truthy
-      end
-    end
-
-    it "guaranteeses an alt text when selecting decorative" do
-      skip("Cannot get this to pass flakey spec catcher in jenkins, though is fine locally MAT-154")
-      page_title = "Page1"
-      create_wiki_page_with_embedded_image(page_title)
-
-      visit_existing_wiki_edit(@course, page_title)
-
-      begin
-        click_embedded_image_for_options
-        click_image_options_button
-
-        click_decorative_options_checkbox
-        click_image_options_done_button
-
-        in_frame rce_page_body_ifr_id do
-          expect(wiki_body_image.attribute("alt")).to eq("")
-          expect(wiki_body_image.attribute("role")).to eq("presentation")
         end
       rescue Selenium::WebDriver::Error::NoSuchElementError
         puts "Failed finding the image options button. Bailing out on this spec."
@@ -1119,23 +1005,6 @@ describe "RCE next tests", :ignore_js_errors do
       end
     end
 
-    it "closes sidebar after drag and drop" do
-      skip("kills many selenium tests. Address in CORE-3147")
-      title = "Assignment-Title"
-      @assignment = @course.assignments.create!(name: title)
-
-      visit_front_page_edit(@course)
-
-      click_course_links_toolbar_menuitem
-      click_assignments_accordion
-
-      source = course_item_link(title)
-      dest = f("iframe.tox-edit-area__iframe")
-      driver.action.drag_and_drop(source, dest).perform
-
-      expect(f("body")).not_to contain_css('[data-testid="CanvasContentTray"]')
-    end
-
     it "adds a title attribute to an inserted iframe" do
       # as typically happens when embedding media, like a youtube video
       instance_double(CanvasKaltura::ClientV3)
@@ -1259,58 +1128,6 @@ describe "RCE next tests", :ignore_js_errors do
           }
         )
         @tool.save!
-      end
-
-      it "displays lti icon with a tool enabled for the course", :ignore_js_errors do
-        skip("INTEROP-8846")
-        page_title = "Page1"
-        create_wiki_page_with_embedded_image(page_title)
-
-        visit_existing_wiki_edit(@course, page_title)
-
-        expect(lti_tools_button_with_mru).to be_displayed
-      end
-
-      # we are now only using the menu button regardless of presence/absence
-      # of mru data in local storage
-      it "displays the lti tool modal", :ignore_js_errors do
-        skip("INTEROP-8846")
-        page_title = "Page1"
-        create_wiki_page_with_embedded_image(page_title)
-
-        # have to visit the page before we can interact with local storage
-        visit_existing_wiki_edit(@course, page_title)
-        driver.local_storage.clear
-
-        visit_existing_wiki_edit(@course, page_title)
-        driver.local_storage.delete("ltimru")
-
-        wait_for_tiny(edit_wiki_css)
-        lti_tools_button_with_mru.click
-        menu_item_by_name("View All").click
-
-        expect(lti_tools_modal).to be_displayed
-      end
-
-      it "displays the lti tool modal, reprise", :ignore_js_errors do
-        skip("INTEROP-8846")
-        page_title = "Page1"
-        create_wiki_page_with_embedded_image(page_title)
-
-        visit_existing_wiki_edit(@course, page_title)
-
-        # value doesn't matter, its existance triggers the menu button
-        driver.local_storage["ltimru"] = [999]
-
-        # ltimru has to be in local storage when the page loads to get the menu button
-        driver.navigate.refresh
-        wait_for_tiny(edit_wiki_css)
-
-        lti_tools_button_with_mru.click
-        menu_item_by_name("View All").click
-
-        expect(lti_tools_modal).to be_displayed
-        driver.local_storage.clear
       end
 
       it "shows favorited LTI tool icon when a tool is favorited", :ignore_js_errors do
@@ -1490,43 +1307,6 @@ describe "RCE next tests", :ignore_js_errors do
         driver.execute_script("if (document.fullscreenElement) document.exitFullscreen()")
       end
 
-      it "switches between wysiwyg and pretty html view" do
-        skip("Cannot get this to pass flakey spec catcher in jenkins, though is fine locally MAT-29")
-        rce_wysiwyg_state_setup(@course)
-        expect(f('[aria-label="Rich Content Editor"]')).to be_displayed
-
-        # click edit button -> fancy editor
-        click_editor_view_button
-
-        # it's lazy loaded
-        expect(f(".RceHtmlEditor")).to be_displayed
-
-        # click edit button -> back to the rce
-        click_editor_view_button
-        expect(f('[aria-label="Rich Content Editor"]')).to be_displayed
-
-        # shift-o edit button -> raw editor
-        shift_O_combination('[data-btn-id="rce-edit-btn"]')
-        expect(f("textarea#wiki_page_body")).to be_displayed
-
-        # click "Pretty HTML Editor" status bar button -> fancy editor
-        fj('button:contains("Pretty HTML Editor")').click
-        expect(f(".RceHtmlEditor")).to be_displayed
-      end
-
-      it "displays the editor in fullscreen" do
-        skip("Cannot get this to pass flakey spec catcher in jenkins, though is fine locally MAT-29")
-        rce_wysiwyg_state_setup(@course)
-
-        click_editor_view_button
-        expect(f(".RceHtmlEditor")).to be_displayed
-
-        click_full_screen_button
-        wait_for(method: nil, timeout: 5) do
-          expect(fullscreen_element).to eq(f(".RceHtmlEditor"))
-        end
-      end
-
       it "remembers preferred html editor" do
         get "/"
         rce_wysiwyg_state_setup(@course)
@@ -1536,28 +1316,6 @@ describe "RCE next tests", :ignore_js_errors do
         visit_front_page_edit(@course)
         click_editor_view_button
         expect(f("textarea#wiki_page_body")).to be_displayed
-      end
-
-      it "saves pretty HTML editor text on submit" do
-        skip(
-          "Cannot get this to pass flakey spec catcher in jenkins, though is fine locally MAT-35"
-        )
-        quiz_content = "<p>test</p>"
-        @quiz = @course.quizzes.create!
-        open_quiz_edit_form
-        click_questions_tab
-        click_new_question_button
-        create_essay_question
-        expect_new_page_load { f(".save_quiz_button").click }
-        open_quiz_show_page
-        expect_new_page_load { f("#preview_quiz_button").click }
-        switch_to_html_view
-        expect(f(".RceHtmlEditor")).to be_displayed
-        f(".RceHtmlEditor div[role=\"textbox\"]").send_keys(quiz_content)
-        expect_new_page_load { submit_quiz }
-        expect(f("#questions .essay_question .quiz_response_text").attribute("innerHTML")).to eq(
-          quiz_content
-        )
       end
 
       it "sanitizes the HTML set in the HTML editor" do
@@ -1580,38 +1338,8 @@ describe "RCE next tests", :ignore_js_errors do
       end
     end
 
-    context "Icon Maker Tray" do
-      it "can add image" do
-        skip("Works IRL but fails in selenium. Fix with MAT-1127")
-        rce_wysiwyg_state_setup(@course)
-        create_icon_toolbar_menuitem.click
-        iconmaker_addimage_menu.click
-        iconmaker_singlecolor_option.click
-        iconmaker_singlecolor_articon.click
-        expect(iconmaker_image_preview).to be_displayed
-      end
-    end
-
     # rubocop:disable Specs/NoSeleniumWebDriverWait
     describe "fullscreen" do
-      it "restores the rce to its original size on exiting fullscreen" do
-        skip "FOO-3817 (10/7/2023)"
-        visit_front_page_edit(@course)
-
-        rce_wrapper = f(".rce-wrapper")
-        orig_height = rce_wrapper.css_value("height")
-
-        full_screen_button.click
-        fs_elem = driver.execute_script("return document.fullscreenElement")
-        expect(fs_elem).to eq f(".rce-wrapper")
-
-        exit_full_screen_button.click
-        rce_wrapper = f(".rce-wrapper")
-        Selenium::WebDriver::Wait.new(timeout: 1.0).until do
-          expect(orig_height).to eql(rce_wrapper.css_value("height"))
-        end
-      end
-
       it "restores the rce to its original size after switching to pretty html view" do
         visit_front_page_edit(@course)
 
@@ -1623,26 +1351,6 @@ describe "RCE next tests", :ignore_js_errors do
         expect(fs_elem).to eq f(".rce-wrapper")
 
         switch_to_html_view
-        exit_full_screen_button.click
-        rce_wrapper = f(".rce-wrapper")
-        new_height = rce_wrapper.css_value("height").to_i
-        Selenium::WebDriver::Wait.new(timeout: 1.0).until do
-          expect((orig_height - new_height).abs).to be < 3
-        end
-      end
-
-      it "restores the rce to its original while in pretty html view" do
-        skip("Flaky. addressed in LF-746")
-        visit_front_page_edit(@course)
-        switch_to_html_view
-
-        rce_wrapper = f(".rce-wrapper")
-        orig_height = rce_wrapper.css_value("height").to_i
-
-        full_screen_button.click
-        fs_elem = driver.execute_script("return document.fullscreenElement")
-        expect(fs_elem).to eq f(".rce-wrapper")
-
         exit_full_screen_button.click
         rce_wrapper = f(".rce-wrapper")
         new_height = rce_wrapper.css_value("height").to_i

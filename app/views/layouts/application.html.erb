@@ -25,6 +25,8 @@
     js_bundle(:top_navigation_tools)
 end
 
+  add_ignite_agent_bundle
+
   load_blueprint_courses_ui
   @has_content_notices = load_content_notices
   provide :head, include_common_stylesheets
@@ -147,6 +149,7 @@ end
           <% end %>
 
           <div class="right-of-crumbs">
+            <div id="ai-information-mount"></div>
             <% if tutorials_enabled? %>
               <div class="TutorialToggleHolder"></div>
             <% end %>

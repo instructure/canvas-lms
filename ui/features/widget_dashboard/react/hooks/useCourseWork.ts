@@ -20,7 +20,7 @@ import {useInfiniteQuery} from '@tanstack/react-query'
 import {gql} from 'graphql-tag'
 import {getCurrentUserId, executeGraphQLQuery, createUserQueryConfig} from '../utils/graphql'
 import {QUERY_CONFIG} from '../constants'
-import {startOfToday} from '../utils/dateUtils'
+import {useWidgetDashboard} from './useWidgetDashboardContext'
 
 export interface CourseWorkItem {
   id: string
@@ -90,7 +90,7 @@ interface GraphQLResponse {
 }
 
 const USER_COURSE_WORK_QUERY = gql`
-  query GetUserCourseWork($userId: ID!, $first: Int, $after: String, $last: Int, $before: String, $courseFilter: String, $startDate: ISO8601DateTime, $endDate: ISO8601DateTime, $includeOverdue: Boolean, $includeNoDueDate: Boolean, $onlySubmitted: Boolean) {
+  query GetUserCourseWork($userId: ID!, $first: Int, $after: String, $last: Int, $before: String, $courseFilter: String, $startDate: ISO8601DateTime, $endDate: ISO8601DateTime, $includeOverdue: Boolean, $includeNoDueDate: Boolean, $onlySubmitted: Boolean, $observedUserId: ID) {
     legacyNode(_id: $userId, type: User) {
       ... on User {
         _id
@@ -105,6 +105,7 @@ const USER_COURSE_WORK_QUERY = gql`
           includeOverdue: $includeOverdue
           includeNoDueDate: $includeNoDueDate
           onlySubmitted: $onlySubmitted
+          observedUserId: $observedUserId
         ) {
           nodes {
             _id
@@ -222,6 +223,8 @@ export function useCourseWork(options: UseCourseWorkOptions = {}) {
     onlySubmitted,
   } = options
 
+  const {observedUserId} = useWidgetDashboard()
+
   return useInfiniteQuery({
     ...createUserQueryConfig(
       [
@@ -233,6 +236,7 @@ export function useCourseWork(options: UseCourseWorkOptions = {}) {
         includeOverdue?.toString(),
         includeNoDueDate?.toString(),
         onlySubmitted?.toString(),
+        observedUserId ?? undefined,
       ],
       QUERY_CONFIG.STALE_TIME.STATISTICS,
     ),
@@ -254,6 +258,7 @@ export function useCourseWork(options: UseCourseWorkOptions = {}) {
         includeOverdue,
         includeNoDueDate,
         onlySubmitted,
+        observedUserId,
       })
 
       if (!response?.legacyNode?.courseWorkSubmissionsConnection) {

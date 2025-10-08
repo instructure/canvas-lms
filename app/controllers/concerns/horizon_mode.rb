@@ -23,35 +23,16 @@ module HorizonMode
     return if params[:invitation].present?
     return unless @current_user
 
-    case CanvasCareer::ExperienceResolver.new(@current_user, @context, @domain_root_account, session).resolve
-    when CanvasCareer::Constants::App::CAREER_LEARNING_PROVIDER
-      load_career_learning_provider
-    when CanvasCareer::Constants::App::CAREER_LEARNER
-      load_career_learner
+    app = CanvasCareer::ExperienceResolver.new(@current_user, @context, @domain_root_account, session).resolve
+    if CanvasCareer::Constants::CAREER_APPS.include?(app)
+      redirect_to "#{canvas_career_path}#{request.fullpath}"
     end
   end
 
   private
 
-  def load_career_learning_provider
-    redirect_to rewrite_path_for_career
-  end
-
-  def load_career_learner
-    if @domain_root_account.feature_enabled?(:horizon_learner_app)
-      redirect_to rewrite_path_for_career
-    elsif @context.is_a?(Course) && @context.horizon_course?
-      # Redirect to the separate career domain - this will be removed once transition to MF is completed
-      redirect_url = CanvasCareer::Config.new(@domain_root_account).learner_app_redirect_url(request.path)
-      redirect_to redirect_url if redirect_url.present?
-    end
-  end
-
   def force_academic?
-    # The query param allows breaking out of career for a single request
-    # The cookie allows it for an entire session (i.e., set in an iframe and forget); needed to support
-    # form post in iframed Canvas academic
-    Canvas::Plugin.value_to_boolean(params[:force_classic]) || Canvas::Plugin.value_to_boolean(cookies[:force_classic])
+    Canvas::Plugin.value_to_boolean(params[:force_classic])
   end
 
   def add_career_params
@@ -79,6 +60,7 @@ module HorizonMode
 
   def should_add_horizon_params?
     return false unless @context
+    return false if entering_student_view? || in_student_view?
 
     if @context.is_a?(Account)
       @context.horizon_account?
@@ -100,7 +82,24 @@ module HorizonMode
     { content_only: "true", instui_theme: "career", force_classic: "true" }.symbolize_keys
   end
 
-  def rewrite_path_for_career
-    "#{canvas_career_path}#{request.fullpath}"
+  def entering_student_view?
+    (controller_name == "courses" && action_name == "student_view") ||
+      (request.path.include?("/student_view") && request.method == "POST")
+  end
+
+  def in_student_view?
+    @current_user&.fake_student?
+  end
+
+  def remove_horizon_params(url)
+    return url unless url&.include?("instui_theme=career") && url.include?("force_classic=true")
+
+    uri = URI.parse(url)
+    query_params = Rack::Utils.parse_query(uri.query || "")
+    query_params.delete("instui_theme")
+    query_params.delete("force_classic")
+    query_params.delete("content_only")
+    uri.query = query_params.empty? ? nil : query_params.to_query
+    uri.to_s
   end
 end

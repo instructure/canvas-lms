@@ -563,30 +563,6 @@ describe Mutations::UpdateAssignment do
     ]
   end
 
-  xit "validate errors return correctly with override instrumenter (ADMIN-2407)" do
-    mutation_command = <<~GQL
-      mutation {
-        updateAssignment(input: {
-          id: "#{@assignment_id}"
-          submissionTypes: [ wiki_page ]
-        }) {
-          assignment {
-            _id dueAt lockAt unlockAt
-          }
-          errors {
-            attribute
-            message
-          }
-        }
-      }
-    GQL
-    context = { current_user: @teacher, request: ActionDispatch::TestRequest.create, session: {} }
-    result = CanvasSchema.execute(mutation_command, context:)
-    expect(result["errors"]).to be_nil
-    expect(result.dig("data", "updateAssignment", "assignment")).to be_nil
-    expect(result.dig("data", "updateAssignment", "errors")).to_not be_nil
-  end
-
   it "cannot update without correct permissions" do
     # bad student! dont delete the assignment
     result = execute_with_input(<<~GQL, @student)

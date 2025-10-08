@@ -1111,6 +1111,10 @@ hu:
             start: 
               parameters: 
                 header: "Kezdés ekkor:"
+    edp_student_activity_csv_parameters: 
+      custom_reports: 
+        edp: 
+          all_terms: "Összes félév"
     embry_riddle_activity_report_csv_parameters: 
       account_reports: 
         embry_riddle: 
@@ -3176,6 +3180,7 @@ hu:
   announcements_unlocked_successfully_1432da9d: "A hirdetmények zárolása sikeresen feloldva"
   announcements_view_1019d00d: "Hirdetmények - áttekintés"
   announcment_itemtitle_c0fe1c06: "Hirdetmény, %{itemTitle}"
+  anonymity_1cfb09ca: Anonimitás
   anonymity_settings_are_locked_due_to_a_posted_repl_54e2c2d1: "Nem frissítheti a fórum névtelen állapotát"
   anonymize_all_annotations_made_by_instructors_on_s_5540bc09: "Anonimizálja az oktatók által az ehhez a feladathoz benyújtott összes megjegyzést a DocViewerben"
   anonymize_all_instructor_comments_and_annotations__713924c9: "Tegyen névtelenné minden oktatói megjegyzést és kommentárt a DocViewer fájlkezelőn belül"
@@ -13442,6 +13447,7 @@ hu:
   job_count_9cb9298b: "Job számláló"
   job_details_b33137dc: "Job részletek"
   job_grouping_f652413e: "Job csoportosítása"
+  job_handler_9d3d1007: Jobkezelő
   job_lookup_1d980054: "Job keresés"
   job_stats_4e270a43: "Job statisztikák"
   job_stats_by_cluster_32872c13: "Job statisztikák klaszterenként"
@@ -18412,6 +18418,7 @@ hu:
   pick_an_endpoint_we_ll_post_your_error_reports_the_71610f47: "válasszon végpontot, ahova a hibariportokat küldjük"
   pick_dd033b86: Választás
   pick_the_date_and_time_for_the_following_conferenc_e9f91edd: "Dátum és idő választása a következő konferenciabeállításhoz:"
+  picture_options_1b93accc: "Kép opciók"
   pin_cdbc9f8f: Rögzítés
   pin_discussion_title_67c84658: "fórum %{title} rögzítése"
   pin_of_discussion_title_failed_6c2c32a5: "A fórum rögzítése %{title} sikertelen"
@@ -22284,6 +22291,7 @@ hu:
   select_prerequisite_3b049b02: "Előfeltétel kiválasztása"
   select_prerequisite_module_57894963: "Előfeltétel modul kiválasztása"
   select_prerequite_module_e9042bb0: "Előfeltétel modul kiválasztása"
+  select_profile_picture_172176b6: "Profilkép kiválasztása"
   select_question_bank_508e5c08: "Kérdésbank kiválasztása"
   select_requirement_count_e0948936: "Válassza ki a követelményszámot"
   select_requirement_type_bf9a39d9: "Válassza ki a követelménytípust"
@@ -23215,6 +23223,7 @@ hu:
   show_courses_and_assignments_87e26057: "kurzusok és feladatok megjelenítése"
   show_courses_from_8a087f63: "Mutasd a kurzusokat a"
   show_courses_navigation_menu_7ad1a8d4: "Kurzusok navigációs menü megjelenítése"
+  show_d6f24222: megjelenít
   show_deleted_replies_a2e0a36f: "Törölt válaszok mutatása"
   show_details_194cf390: "Részletek megjelenítése"
   show_due_dates_duedatecount_5e0b056c: "Határidők megjelenítése (%{dueDateCount})"

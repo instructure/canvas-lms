@@ -287,6 +287,42 @@ describe Lti::ContextControlsController, type: :request do
       end
     end
 
+    context "with inherited registration shared across multiple root accounts" do
+      subject { get "/api/v1/accounts/#{account.id}/lti_registrations/#{site_admin_registration.id}/controls", params: }
+
+      let(:site_admin) { Account.site_admin }
+      let(:site_admin_user) { account_admin_user(account: site_admin) }
+      let(:site_admin_registration) do
+        Lti::CreateRegistrationService.call(
+          account: site_admin,
+          created_by: site_admin_user,
+          registration_params:,
+          configuration_params:
+        )
+      end
+      let(:other_root_account) { account_model }
+      let(:account_deployment) { site_admin_registration.new_external_tool(account) }
+      let(:other_deployment) { site_admin_registration.new_external_tool(other_root_account) }
+      let(:account_control) { account_deployment.primary_context_control }
+      let(:other_control) { other_deployment.primary_context_control }
+
+      before do
+        site_admin.enable_feature!(:lti_registrations_next)
+        other_root_account.enable_feature!(:lti_registrations_next)
+        account_control
+        other_control
+      end
+
+      it "only returns controls from the current root account" do
+        subject
+        expect(response).to be_successful
+
+        # Should only see controls from current account, not other_root_account
+        all_control_ids = response_json.flat_map { |d| d["context_controls"].pluck("id") }
+        expect(all_control_ids).to eql([account_control.id])
+      end
+    end
+
     context "with no deployments" do
       before do
         registration.deployments.each(&:destroy)

@@ -232,7 +232,7 @@ module SIS
       def update_progress
         completed_count = @batch.parallel_importers.where(workflow_state: "completed").count
         current_progress = [(completed_count.to_f * 100 / @parallel_importers.values.sum(&:count)).round, 99].min
-        SisBatch.where(id: @batch).where("progress IS NULL or progress < ?", current_progress).update_all(progress: current_progress)
+        SisBatch.where(id: @batch).where("progress IS NULL or progress < ?", current_progress).update_all(progress: current_progress, updated_at: Time.now.utc)
       end
 
       def run_parallel_importer(id, csv: nil, attempt: 0)

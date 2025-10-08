@@ -74,7 +74,7 @@ class TermsOfService < ActiveRecord::Base
   end
 
   class CacheTermsOfServiceContentOnAssociation < ActiveRecord::Associations::BelongsToAssociation
-    def find_target
+    def find_target(...)
       Shard.default.activate do
         key = ["terms_of_service_content", owner.attribute(reflection.foreign_key)].cache_key
         MultiCache.fetch(key) { super }

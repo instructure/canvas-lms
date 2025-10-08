@@ -20,7 +20,7 @@
 
 class GradebooksController < ApplicationController
   include ActionView::Helpers::NumberHelper
-  include AssetProcessorStudentHelper
+  include AssetProcessorReportHelper
   include GradebooksHelper
   include SubmissionCommentsHelper
   include KalturaHelper
@@ -134,12 +134,16 @@ class GradebooksController < ApplicationController
                       excused: submission.excused?,
                       score: submission.score,
                       workflow_state: submission.workflow_state,
-                      asset_processors: asset_processors(assignment: submission.assignment),
-                      asset_reports: @presenter.user_has_elevated_permissions? ? nil : asset_reports(submission:),
                       submission_type: submission.submission_type,
                       auto_grade_result_present: submission.auto_grade_result_present?
                     })
         json[:custom_grade_status_id] = submission.custom_grade_status_id if custom_gradebook_statuses_enabled
+      end
+
+      if submission.user_can_read_grade?(@presenter.student, for_plagiarism: true)
+        json[:asset_processors] = asset_processors(assignment: submission.assignment)
+        json[:asset_reports] = @presenter.user_has_elevated_permissions? ? nil : asset_reports_info_for_display(submission:)
+        json[:submission_type] = submission.submission_type
       end
 
       json[:submission_comments] = submission.visible_submission_comments.map do |comment|
@@ -994,11 +998,17 @@ class GradebooksController < ApplicationController
         ).map { |c| { submission_comment: c } }
 
         if assignment.context.discussion_checkpoints_enabled?
+          # TODO: has_sub_assignment_submissions value will be updated to reflect true/false based off submissions on the sub assignment
+          # Refer to EGG-1916
           submission_json[:has_sub_assignment_submissions] = assignment.has_sub_assignments
           submission_json[:sub_assignment_submissions] = (assignment.has_sub_assignments &&
-            assignment.sub_assignments&.map do |sub_assignment|
-              sub_assignment_submission = sub_assignment.submissions.active.find_by(user_id: submission.user_id)
-              sub_assignnment_submission_json(sub_assignment_submission, sub_assignment_submission.assignment, @current_user, @session, @context)
+            assignment.sub_assignments&.filter_map do |sub_assignment|
+              sub_assignment_submission = sub_assignment.submissions.find_by(user_id: submission.user_id)
+              # A Submission can be nil for two reasons:
+              # 1. The Submission was deleted due to the student no longer having access to the assignment (i.e. enrollment changes, assignment override removal)
+              # 2. The Submission was never created.
+              #    TODO: Older DiscussionTopic SubAssignments may fall into this category. In this case, we will throw a custom error so we can track. Refer to EGG-1916
+              sub_assignment_submission_json(sub_assignment_submission, sub_assignment_submission.assignment, @current_user, @session, @context) if sub_assignment_submission.present?
             end) || []
         end
       end
@@ -1100,6 +1110,8 @@ class GradebooksController < ApplicationController
         MULTISELECT_FILTERS_ENABLED: multiselect_filters_enabled?,
         gradebook_section_filter_id: filtered_sections,
         COMMENT_BANK_PER_ASSIGNMENT_ENABLED: Account.site_admin.feature_enabled?(:comment_bank_per_assignment),
+        show_inactive_enrollments: gradebook_settings(@context.global_id)&.[]("show_inactive_enrollments") == "true",
+        show_concluded_enrollments: @context.completed? || gradebook_settings(@context.global_id)&.[]("show_concluded_enrollments") == "true",
       }
       js_env(env)
 

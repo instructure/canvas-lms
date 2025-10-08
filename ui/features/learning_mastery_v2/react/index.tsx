@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useState, useCallback} from 'react'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -31,7 +31,9 @@ import {Toolbar} from './components/toolbar/Toolbar'
 import {getSearchParams, setSearchParams} from './utils/ManageURLSearchParams'
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
-import {DEFAULT_GRADEBOOK_SETTINGS, DisplayFilter, GradebookSettings} from './utils/constants'
+import {GradebookSettings} from './utils/constants'
+import {saveLearningMasteryGradebookSettings} from './apiClient'
+import {useGradebookSettings} from './hooks/useGradebookSettings'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 
@@ -48,18 +50,21 @@ interface LearningMasteryProps {
 const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
   const contextValues = getLMGBContext() as LMGBContextType
   const {contextURL, accountLevelMasteryScalesFF} = contextValues.env
-  const [gradebookSettings, setGradebookSettings] = useState<GradebookSettings>(
-    DEFAULT_GRADEBOOK_SETTINGS,
-  )
 
   const {
-    isLoading,
+    settings: gradebookSettings,
+    isLoading: isLoadingSettings,
+    updateSettings,
+  } = useGradebookSettings(courseId)
+
+  const [isSavingSettings, setIsSavingSettings] = useState(false)
+
+  const {
+    isLoading: isLoadingGradebook,
     error,
     students,
     outcomes,
     rollups,
-    gradebookFilters,
-    setGradebookFilters,
     pagination,
     currentPage,
     setCurrentPage,
@@ -69,34 +74,36 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
   } = useRollups({
     courseId,
     accountMasteryScalesEnabled: accountLevelMasteryScalesFF ?? false,
+    enabled: !isLoadingSettings,
+    settings: gradebookSettings,
     ...getSearchParams(),
   })
 
   setSearchParams(currentPage, studentsPerPage, sorting)
 
-  const addGradebookFilter = (filterItem: string) => {
-    const filters = new Set(gradebookFilters)
-    if (filters.has(filterItem)) return
-    filters.add(filterItem)
-    setGradebookFilters(Array.from(filters))
-  }
+  const handleGradebookSettingsChange = useCallback(
+    async (settings: GradebookSettings) => {
+      setIsSavingSettings(true)
+      let error = null
 
-  const removeGradebookFilter = (filterItem: string) => {
-    const filters = new Set(gradebookFilters)
-    if (!filters.has(filterItem)) return
-    filters.delete(filterItem)
-    setGradebookFilters(Array.from(filters))
-  }
+      try {
+        const response = await saveLearningMasteryGradebookSettings(courseId, settings)
 
-  const handleGradebookSettingsChange = (settings: GradebookSettings) => {
-    setGradebookSettings(settings)
+        if (response.status !== 200) {
+          throw new Error('Failed to save settings')
+        }
 
-    if (settings.displayFilters.includes(DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS)) {
-      removeGradebookFilter('missing_user_rollups')
-    } else {
-      addGradebookFilter('missing_user_rollups')
-    }
-  }
+        updateSettings(settings)
+      } catch (_) {
+        error = I18n.t('Failed to save settings')
+      } finally {
+        setIsSavingSettings(false)
+      }
+
+      return {success: error === null}
+    },
+    [courseId, updateSettings],
+  )
 
   const renderBody = () => {
     if (error !== null)
@@ -108,7 +115,7 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
           errorCategory={I18n.t('Learning Mastery Gradebook Error Page')}
         />
       )
-    if (isLoading) return renderLoader()
+    if (isLoadingGradebook || isLoadingSettings) return renderLoader()
     return (
       <Gradebook
         courseId={courseId}
@@ -129,10 +136,10 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
       <Toolbar
         courseId={courseId}
         contextURL={contextURL}
-        gradebookFilters={gradebookFilters}
-        showDataDependentControls={error === null}
+        showDataDependentControls={error === null && !isLoadingSettings}
         gradebookSettings={gradebookSettings}
         setGradebookSettings={handleGradebookSettingsChange}
+        isSavingSettings={isSavingSettings}
       />
       <FilterWrapper pagination={pagination} onPerPageChange={setStudentsPerPage} />
       {renderBody()}

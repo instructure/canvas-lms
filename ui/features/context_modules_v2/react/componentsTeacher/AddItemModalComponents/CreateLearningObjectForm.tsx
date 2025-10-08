@@ -28,11 +28,12 @@ import {useAssignmentGroups} from '../../hooks/queries/useAssignmentGroups'
 import ModuleFileDrop from '../AddItemModalComponents/ModuleFileDrop'
 import {QuizEngine, FormState} from '../../utils/types'
 import type {Action} from '../../hooks/mutations/useAddModuleItem'
+import AddItemFormFieldGroup, {AddItemFormFieldGroupData} from './AddItemFormFieldGroup'
 
 const I18n = createI18nScope('context_modules_v2')
 
 // Types for props
-export type CreateLearningObjectFormProps = {
+export type CreateLearningObjectFormProps = AddItemFormFieldGroupData & {
   itemType: 'page' | 'quiz' | 'file' | 'external_url' | string
   onChange: (field: string, value: any) => void
   nameError: string | null
@@ -46,7 +47,10 @@ export const CreateLearningObjectForm: React.FC<CreateLearningObjectFormProps> =
   nameError,
   dispatch,
   state,
-}) => {
+  indentValue,
+  onIndentChange,
+  moduleName,
+}: CreateLearningObjectFormProps) => {
   const [folder, setFolder] = useState<string | undefined>(undefined)
   const {courseId, showQuizzesEngineSelection, quizEngine, setQuizEngine} = useContextModule()
   const {folders} = useCourseFolders(courseId)
@@ -65,27 +69,27 @@ export const CreateLearningObjectForm: React.FC<CreateLearningObjectFormProps> =
 
   const renderQuizFormFields = () => {
     return (
-      <View as="div">
-        <View as="div" margin="small 0">
-          {showQuizzesEngineSelection && (
-            <SimpleSelect
-              data-testid="create-item-quiz-engine-select"
-              renderLabel={I18n.t('Select quiz type')}
-              assistiveText={I18n.t('Type or use arrow keys to navigate options.')}
-              value={quizEngine}
-              onChange={(_e, {value}) => setQuizEngine(value as QuizEngine)}
-            >
-              <SimpleSelect.Option id="classic" key="classic" value="classic">
-                {I18n.t('Quiz Classic')}
-              </SimpleSelect.Option>
-              <SimpleSelect.Option id="new" key="new" value="new">
-                {I18n.t('Quiz New')}
-              </SimpleSelect.Option>
-            </SimpleSelect>
-          )}
-        </View>
+      <>
+        {showQuizzesEngineSelection && (
+          <SimpleSelect
+            data-testid="create-item-quiz-engine-select"
+            renderLabel={I18n.t('Select quiz type')}
+            assistiveText={I18n.t(
+              'Select the quiz engine. Use the arrow keys to navigate options, then press Enter to confirm.',
+            )}
+            value={quizEngine}
+            onChange={(_e, {value}) => setQuizEngine(value as QuizEngine)}
+          >
+            <SimpleSelect.Option id="classic" key="classic" value="classic">
+              {I18n.t('Quiz Classic')}
+            </SimpleSelect.Option>
+            <SimpleSelect.Option id="new" key="new" value="new">
+              {I18n.t('Quiz New')}
+            </SimpleSelect.Option>
+          </SimpleSelect>
+        )}
 
-        <View as="div" margin="small 0">
+        <View as="div" padding="medium none none none">
           <SimpleSelect
             renderLabel="Assignment Group"
             value={state.newItem.assignmentGroup}
@@ -100,7 +104,7 @@ export const CreateLearningObjectForm: React.FC<CreateLearningObjectFormProps> =
             ))}
           </SimpleSelect>
         </View>
-      </View>
+      </>
     )
   }
 
@@ -115,7 +119,11 @@ export const CreateLearningObjectForm: React.FC<CreateLearningObjectFormProps> =
   )
 
   return (
-    <View as="form" padding="small" display="block">
+    <AddItemFormFieldGroup
+      indentValue={indentValue}
+      onIndentChange={onIndentChange}
+      moduleName={moduleName}
+    >
       {itemType !== 'file' && (
         <TextInput
           renderLabel="Name"
@@ -163,7 +171,7 @@ export const CreateLearningObjectForm: React.FC<CreateLearningObjectFormProps> =
           <Text weight="bold">{I18n.t('Selected file:')}</Text> {state.newItem.file?.name}
         </View>
       )}
-    </View>
+    </AddItemFormFieldGroup>
   )
 }
 

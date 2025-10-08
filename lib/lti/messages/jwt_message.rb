@@ -84,8 +84,7 @@ module Lti::Messages
     end
 
     def to_cached_hash
-      without_validation_fields = Account.site_admin.feature_enabled?(:remove_unwanted_lti_validation_claims)
-      post_payload = generate_post_payload_message.to_h(without_validation_fields:)
+      post_payload = generate_post_payload_message.to_h
       assoc_tool_data = {
         shared_secret: associated_1_1_tool&.shared_secret,
         consumer_key: associated_1_1_tool&.consumer_key

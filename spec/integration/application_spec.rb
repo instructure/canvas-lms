@@ -60,14 +60,6 @@ describe "site-wide" do
     expect(response[content_security_policy]).to eq "frame-ancestors 'self' ;"
   end
 
-  it "includes horizon_domain in the content-security-policy header" do
-    account = Account.default
-    account.settings[:horizon_domain] = "test-domain.example.com"
-    account.save!
-    get "/login"
-    expect(response[content_security_policy]).to eq "frame-ancestors 'self' test-domain.example.com;"
-  end
-
   it "does not set content-security-policy when on a files domain" do
     user_session user_factory(active_all: true)
     attachment_model(context: @user)

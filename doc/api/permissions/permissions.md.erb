@@ -7,11 +7,11 @@ This document lists permissions that can be granted to account- and course-level
 
 <% account_perms.keys.each do |perm_group| %>
  <% if perm_group.present? %>
-### <%= perm_group %>
+### <%= group_name_with_link.(perm_group) %>
  <% end %>
 | Key | Permission |
 |-----|------------| <% account_perms[perm_group].each do |perm| %>
-| `<%= perm[:key] %>` | <%= perm[:label] %> | <% end %>
+| `<%= perm[:key] %>` | <%= perm_name_with_link.(perm[:key], perm[:label]) %> | <% end %>
 <% end %>
 
 ## For both Account-level and Course-level roles
@@ -24,9 +24,9 @@ This document lists permissions that can be granted to account- and course-level
 
 <% course_perms.keys.each do |perm_group| %>
   <% if perm_group.present? %>
-### <%= perm_group %>
+### <%= group_name_with_link.(perm_group) %>
   <% end %>
 | Key | Available To | Permission |
 |-----|--------------|------------|  <% course_perms[perm_group].each do |perm| %>
-| `<%= perm[:key] %>` | `<%= perm[:available_to] %>` | <%= perm[:label] %> | <% end %>
+| `<%= perm[:key] %>` | `<%= perm[:available_to] %>` | <%= perm_name_with_link.(perm[:key], perm[:label]) %> | <% end %>
 <% end %>

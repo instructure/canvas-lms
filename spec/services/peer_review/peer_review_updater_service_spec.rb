@@ -201,7 +201,7 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
       it "raises error when parent assignment is nil" do
         service.instance_variable_set(:@parent_assignment, nil)
         expect { service.call }.to raise_error(
-          PeerReview::PeerReviewInvalidParentAssignmentError,
+          PeerReview::InvalidParentAssignmentError,
           "Invalid parent assignment"
         )
       end
@@ -210,7 +210,7 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
         new_assignment = Assignment.new(context: course, title: "New Assignment")
         service.instance_variable_set(:@parent_assignment, new_assignment)
         expect { service.call }.to raise_error(
-          PeerReview::PeerReviewInvalidParentAssignmentError,
+          PeerReview::InvalidParentAssignmentError,
           "Invalid parent assignment"
         )
       end
@@ -224,7 +224,7 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
         service.instance_variable_set(:@parent_assignment, external_tool_assignment)
 
         expect { service.call }.to raise_error(
-          PeerReview::PeerReviewInvalidAssignmentSubmissionTypesError,
+          PeerReview::InvalidAssignmentSubmissionTypesError,
           "Peer reviews cannot be used with External Tool assignments"
         )
       end
@@ -232,7 +232,7 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
       it "raises error when feature is disabled" do
         course.disable_feature!(:peer_review_allocation_and_grading)
         expect { service.call }.to raise_error(
-          PeerReview::PeerReviewFeatureDisabledError,
+          PeerReview::FeatureDisabledError,
           "Peer Review Allocation and Grading feature flag is disabled"
         )
       end
@@ -247,7 +247,7 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
         )
 
         expect { service_without_sub_assignment.call }.to raise_error(
-          PeerReview::PeerReviewSubAssignmentNotExistError,
+          PeerReview::SubAssignmentNotExistError,
           "Peer review sub assignment does not exist"
         )
       end

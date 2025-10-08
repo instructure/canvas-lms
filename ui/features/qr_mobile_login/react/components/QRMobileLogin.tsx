@@ -31,6 +31,8 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {fromNow} from '@canvas/fuzzy-relative-time'
+import {Alert} from '@instructure/ui-alerts'
+import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 
 const I18n = createI18nScope('QRMobileLogin')
 
@@ -67,6 +69,7 @@ export function QRMobileLogin(props: QRMobileLoginProps): JSX.Element {
 
   const [imagePng, setImagePng] = useState<string | null>(null)
   const [validFor, setValidFor] = useState('')
+  const [screenReaderMsg, setScreenReaderMsg] = useState('')
   const [display, setDisplay] = useState<State>(withWarning ? State.warning : State.displayed)
 
   function renderQRCode() {
@@ -134,19 +137,25 @@ export function QRMobileLogin(props: QRMobileLoginProps): JSX.Element {
 
   function startTimedEvents() {
     let timerId: NodeJS.Timeout | null = null
+    let currentValidFor = '' // validFor isn't consistent in the timer loop
     let isFetching = false
     let refetchAt: number | null = null
     let expireAt: number | null = null
 
-    function displayValidFor(): void {
+    function displayValidFor(updateScreenReader: boolean): string | undefined {
       if (expireAt === null) return
-      const newValidFor =
+      const updatedValidFor =
         Date.now() < expireAt
           ? I18n.t('This code will expire %{inThisAmountOfTime}.', {
               inThisAmountOfTime: fromNow(expireAt),
             })
           : I18n.t('This code has expired. Wait a few seconds for a new one...')
-      setValidFor(newValidFor)
+
+      if (updatedValidFor === currentValidFor) return
+      currentValidFor = updatedValidFor
+      setValidFor(updatedValidFor)
+      if (updateScreenReader) setScreenReaderMsg(updatedValidFor)
+      return updatedValidFor
     }
 
     async function getQRCode() {
@@ -160,7 +169,12 @@ export function QRMobileLogin(props: QRMobileLoginProps): JSX.Element {
         refetchAt = Date.now() + refreshInterval
         if (json) {
           expireAt = Date.now() + QR_CODE_LIFETIME
-          displayValidFor()
+          const validForMsg = displayValidFor(false)
+          setScreenReaderMsg(
+            I18n.t('QR code for mobile login has been successfully generated. %{validForMsg}', {
+              validForMsg: validForMsg,
+            }),
+          )
           setImagePng(json.png)
         } else throw new RangeError('No QR code was made available')
       } catch (err) {
@@ -175,7 +189,7 @@ export function QRMobileLogin(props: QRMobileLoginProps): JSX.Element {
 
     function poll() {
       if (!isFetching && (!refetchAt || Date.now() > refetchAt)) getQRCode()
-      else displayValidFor()
+      else displayValidFor(true)
       timerId = setTimeout(poll, pollInterval)
     }
 
@@ -211,6 +225,9 @@ export function QRMobileLogin(props: QRMobileLoginProps): JSX.Element {
                 {validFor}
               </Text>
             )}
+            <Alert screenReaderOnly={true} liveRegionPoliteness="polite" liveRegion={getLiveRegion}>
+              {screenReaderMsg}
+            </Alert>
           </View>
         </Flex.Item>
       </Flex>

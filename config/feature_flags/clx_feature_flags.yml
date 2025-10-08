@@ -16,27 +16,6 @@ horizon_learning_provider_app_for_courses:
   display_name: "Canvas Career: Learning Provider App (Course Contexts)"
   description: |-
     Enables the Canvas Career Learning Provider App in course contexts.
-horizon_learning_provider_app_on_contextless_routes:
-  applies_to: RootAccount
-  state: hidden
-  shadow: true
-  display_name: "Canvas Career: Learning Provider App (Contextless Routes)"
-  description: |-
-    Enables the Canvas Career Learning Provider App on contextless routes.
-horizon_learner_app:
-  applies_to: RootAccount
-  state: hidden
-  shadow: true
-  display_name: "Canvas Career: Learner App"
-  description: |-
-    Enables the Learner app in Canvas Career on all routes.
-horizon_injected_config:
-  applies_to: RootAccount
-  state: hidden
-  shadow: true
-  display_name: "Canvas Career: Injected Config"
-  description: |-
-    Injects config into the microfrontend at load time instead of fetching from the server.
 
 # Feature flags read by Horizon app
 horizon_root_experience:
@@ -81,6 +60,13 @@ horizon_manual_dashboard_builder:
   display_name: "Canvas Career: Manual Dashboard Builder"
   description: |-
     Enables manual dashboard builder in Canvas Career.
+horizon_dark_career_theme_in_learning_provider:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Dark theme in Learning Provider"
+  description: |-
+    Enables dark theme in Learning Provider.
 
 # Feature flags read by Canvas
 horizon_bulk_api_permission:

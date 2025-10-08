@@ -832,6 +832,22 @@ class ActiveRecord::Base
 end
 
 module UsefulFindInBatches
+  def apply_limits(*args)
+    if ::Rails.version < "8.0" || args.count != 4
+      super
+    else
+      super(args[0], Array(primary_key), args[1], args[2], args[3])
+    end
+  end
+
+  def build_batch_orders(*args)
+    if ::Rails.version < "8.0" || args.count != 1
+      super
+    else
+      super(Array(primary_key), args[0])
+    end
+  end
+
   # add the strategy param
   def find_each(start: nil, finish: nil, order: :asc, **, &block)
     if block
@@ -865,7 +881,11 @@ module UsefulFindInBatches
 
   def in_batches(strategy: nil, start: nil, finish: nil, order: :asc, **kwargs, &block)
     unless block
-      return ActiveRecord::Batches::BatchEnumerator.new(strategy:, start:, relation: self, **kwargs)
+      if ::Rails.version < "8.0"
+        return ActiveRecord::Batches::BatchEnumerator.new(strategy:, start:, relation: self, **kwargs)
+      else
+        return ActiveRecord::Batches::BatchEnumerator.new(strategy:, start:, relation: self, cursor: primary_key, **kwargs)
+      end
     end
 
     unless [:asc, :desc].include?(order)
@@ -882,6 +902,7 @@ module UsefulFindInBatches
       return activate { |r| r.call_super(:in_batches, UsefulFindInBatches, start:, finish:, order:, **kwargs, &block) }
     end
 
+    kwargs.delete(:cursor) if ::Rails.version >= "8.0"
     kwargs.delete(:error_on_ignore)
     activate do |r|
       r.send(:"in_batches_with_#{strategy}", start:, finish:, order:, **kwargs, &block)
@@ -1158,7 +1179,11 @@ module UsefulBatchEnumerator
   def initialize(strategy: nil, **kwargs)
     @strategy = strategy
     @kwargs = kwargs.except(:relation)
-    super(**kwargs.slice(:of, :start, :finish, :relation))
+    if Rails.version < "8.0"
+      super(**kwargs.slice(:of, :start, :finish, :relation))
+    else
+      super(**kwargs.slice(:of, :start, :finish, :relation, :cursor))
+    end
   end
 
   def each_record(&block)
@@ -1477,7 +1502,7 @@ module UpdateAndDeleteWithJoins
 
     stmt = Arel::UpdateManager.new
 
-    stmt.set Arel.sql(@klass.send(:sanitize_sql_for_assignment, updates))
+    stmt.set Arel.sql(klass.send(:sanitize_sql_for_assignment, updates))
     from = from_clause.value
     stmt.table(from ? Arel::Nodes::SqlLiteral.new(from) : table)
     stmt.key = table[primary_key]
@@ -2315,3 +2340,20 @@ end
 ActiveRecord::Migrator.singleton_class.include(WithMigrationAdvisoryLock)
 
 ActiveRecord::Enum.prepend(Extensions::ActiveRecord::Enum)
+
+module ActiveModelDirtyRails80
+  # This applies https://github.com/rails/rails/commit/7d69f241bfbcc07ae7491bd5fcfa6def2cf7ac21
+  # which is only available in Rails 8.1
+  def init_attributes(other) # :nodoc:
+    attrs = super
+    if self.class.respond_to?(:_default_attributes)
+      self.class._default_attributes.map do |attr|
+        attr.with_value_from_user(attrs.fetch_value(attr.name))
+      end
+    else
+      attrs
+    end
+  end
+end
+
+ActiveModel::Dirty.prepend(ActiveModelDirtyRails80) if Rails.version >= "8.0" && Rails.version < "8.1"

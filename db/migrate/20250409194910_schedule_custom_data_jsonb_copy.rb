@@ -22,8 +22,6 @@ class ScheduleCustomDataJsonbCopy < ActiveRecord::Migration[7.0]
   tag :postdeploy
 
   def up
-    DataFixup::CopyCustomDataToJsonb
-      .delay_if_production(priority: Delayed::LOWER_PRIORITY, strand: "customdata_jsonb_copy")
-      .run
+    DataFixup::CopyCustomDataToJsonb.run
   end
 end

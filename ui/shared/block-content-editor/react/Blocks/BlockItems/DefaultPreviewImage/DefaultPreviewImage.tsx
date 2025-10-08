@@ -16,15 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconImageLine, IconVideoLine} from '@instructure/ui-icons'
+
+const I18n = createI18nScope('block_content_editor')
 
 type DefaultPreviewImageProps = {
   blockType: 'image' | 'media'
 }
 
 export const DefaultPreviewImage = ({blockType}: DefaultPreviewImageProps) => {
+  const ariaLabel =
+    blockType === 'image' ? I18n.t('Placeholder image') : I18n.t('Placeholder media')
   return (
-    <div className="image-block-container image-block-default-preview">
+    <div
+      role="img"
+      aria-label={ariaLabel}
+      className="image-block-container image-block-default-preview"
+    >
       {blockType === 'image' && <IconImageLine size="large" />}
       {blockType === 'media' && <IconVideoLine size="large" />}
     </div>

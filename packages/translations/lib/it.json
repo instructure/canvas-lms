@@ -314,12 +314,6 @@
     "clear_image_3213fe62": {
         "message": "Cancella immagine"
     },
-    "clear_selected_file_82388e50": {
-        "message": "Cancella file selezionato"
-    },
-    "clear_selected_file_filename_2fe8a58e": {
-        "message": "Cancella file selezionato: { filename }"
-    },
     "click_or_shift_click_for_the_html_editor_25d70bb4": {
         "message": "Fai clic o Maiusc+clic per l’editor html."
     },

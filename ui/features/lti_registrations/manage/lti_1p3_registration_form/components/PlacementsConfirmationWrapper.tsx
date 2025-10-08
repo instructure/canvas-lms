@@ -46,16 +46,18 @@ export const PlacementsConfirmationWrapper = ({
         appName={internalConfig.title}
         availablePlacements={availablePlacements.filter(p => {
           if ('ActivityAssetProcessor' === p) {
-            return window.ENV.FEATURES.lti_asset_processor
+            return window.ENV.FEATURES?.lti_asset_processor
           }
           if ('ActivityAssetProcessorContribution' === p) {
-            return window.ENV.FEATURES.lti_asset_processor_discussions
+            return window.ENV.FEATURES?.lti_asset_processor_discussions
           }
           return true
         })}
         enabledPlacements={state.placements.placements ?? []}
         courseNavigationDefaultHidden={state.placements.courseNavigationDefaultDisabled ?? false}
         onToggleDefaultDisabled={actions.toggleCourseNavigationDefaultDisabled}
+        topNavigationAllowFullscreen={state.placements.topNavigationAllowFullscreen ?? false}
+        onToggleAllowFullscreen={actions.toggleTopNavigationAllowFullscreen}
         onTogglePlacement={actions.togglePlacement}
       />
     </RegistrationModalBody>

@@ -144,6 +144,10 @@ const ModuleItemListSmart: React.FC<ModuleItemListSmartProps> = ({
       totalPages: totalPages,
     })
     onPageLoaded()
+    setModuleCursorState((prev: any) => ({
+      ...prev,
+      [moduleId]: getCursor(pageIndex),
+    }))
   }, [isLoading, moduleItems, onPageLoaded, pageIndex, pageSize, totalCount, totalPages])
 
   useEffect(() => {

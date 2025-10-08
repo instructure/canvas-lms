@@ -61,8 +61,8 @@ module Canvas::LiveEvents
   def self.scan_youtube_links(payload)
     post_event_stringified("scan_youtube_links", {
                              scan_id: payload.scan_id,
-                             course_id: payload.course_id,
-                             external_context_id: payload.external_context_id
+                             canvas_id: payload.canvas_id,
+                             external_tool_id: payload.external_tool_id
                            })
   end
 

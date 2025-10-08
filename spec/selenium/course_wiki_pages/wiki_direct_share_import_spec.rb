@@ -68,24 +68,6 @@ describe "course wiki pages" do
       wiki_page_copy_to_menu.click
       expect(wiki_page_body).to contain_css(copy_to_dialog_css_selector)
     end
-
-    context "copy to" do
-      before do
-        visit_course_wiki_index_page(@course.id)
-        manage_wiki_page_item_button(@wiki_page1.title).click
-        copy_to_menu_item.click
-      end
-
-      it "copy tray lists modules in destination course" do
-        skip("LA-384 gotta add something in jquery to wait for the course fetch to finish")
-        course_search_dropdown.click
-        course_dropdown_item(@course.name).click
-        course_search_dropdown.send_keys(:tab)
-        module_search_dropdown.click
-
-        expect(module_dropdown_list.text).to include "module 1"
-      end
-    end
   end
 
   context "commons favorites" do

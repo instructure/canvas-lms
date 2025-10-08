@@ -24,10 +24,10 @@ import {useSave} from '../BaseBlock/useSave'
 import {ButtonBlockProps} from './types'
 import {Flex} from '@instructure/ui-flex'
 import {TitleView} from '../BlockItems/Title/TitleView'
-import {ButtonDisplay} from './ButtonDisplay'
+import {ButtonBlockLayout} from './ButtonBlockLayout'
+import {ButtonView, ButtonEdit, ButtonEditView} from '../BlockItems/Button'
 import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
 import {useFocusElement} from '../../hooks/useFocusElement'
-import {useOpenSettingsTray} from '../../hooks/useOpenSettingsTray'
 import {TitleEdit} from '../BlockItems/Title/TitleEdit'
 import {defaultProps} from './defaultProps'
 import {buttonBackgroundContrast} from '../../accessibilityChecker/rules/buttonBackgroundContrast'
@@ -41,7 +41,7 @@ const ButtonBlockView = (props: ButtonBlockProps) => {
       {props.includeBlockTitle && !!props.title && (
         <TitleView title={props.title} contentColor={props.titleColor} />
       )}
-      <ButtonDisplay dataTestId="button-block-view" {...props} />
+      <ButtonBlockLayout dataTestId="button-block-view" {...props} ButtonComponent={ButtonView} />
     </Flex>
   )
 }
@@ -52,18 +52,16 @@ const ButtonBlockEditView = (props: ButtonBlockProps) => {
       {props.includeBlockTitle && (
         <TitleEditPreview title={props.title} contentColor={props.titleColor} />
       )}
-      <ButtonDisplay
+      <ButtonBlockLayout
         dataTestId="button-block-edit-preview"
         {...props}
-        onButtonClick={() => {}}
-        viewMode="editview"
+        ButtonComponent={ButtonEditView}
       />
     </Flex>
   )
 }
 
 const ButtonBlockEdit = (props: ButtonBlockProps) => {
-  const {openSettingsTray} = useOpenSettingsTray()
   const [title, setTitle] = useState(props.title)
   const labelColor = getContrastingTextColorCached(props.backgroundColor)
 
@@ -80,12 +78,11 @@ const ButtonBlockEdit = (props: ButtonBlockProps) => {
           labelColor={labelColor}
         />
       )}
-      <ButtonDisplay
+      <ButtonBlockLayout
         dataTestId="button-block-edit"
         {...props}
         focusHandler={props.includeBlockTitle ? undefined : focusHandler}
-        onButtonClick={openSettingsTray}
-        viewMode="edit"
+        ButtonComponent={ButtonEdit}
       />
     </Flex>
   )

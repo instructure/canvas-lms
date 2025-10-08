@@ -48,7 +48,6 @@ end
 module IgnoreMonkeyPatchesInDeprecations
   def extract_callstack(callstack)
     return [] if callstack.empty?
-    return _extract_callstack(callstack) if callstack.first.is_a?(String)
 
     offending_line = callstack.find do |frame|
       # pass the whole frame to the filter function, so we can ignore specific methods

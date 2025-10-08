@@ -829,6 +829,10 @@ describe('RubricForm Tests', () => {
         )
       })
 
+      afterEach(() => {
+        jest.clearAllMocks()
+      })
+
       it('shows regenerate button after criteria has been generated', async () => {
         const {getByTestId, queryAllByTestId} = renderComponent({
           aiRubricsEnabled: true,
@@ -1189,14 +1193,22 @@ describe('RubricForm Tests', () => {
         expect(submitCriterionRegenerateButton).toBeEnabled()
         fireEvent.click(submitCriterionRegenerateButton)
 
-        // Wait for the modal to close using waitFor for more reliability
-        await waitForElementToBeRemoved(queryByText('Regenerate Criterion'))
+        // Wait for the modal to close and error message to appear
+        await waitFor(
+          () => {
+            expect(queryByText('Regenerate Criterion')).not.toBeInTheDocument()
+          },
+          {timeout: 5000},
+        )
 
-        await waitFor(() => {
-          expect(document.querySelector('#flashalert_message_holder')).toHaveTextContent(
-            'Failed to regenerate criteria',
-          )
-        })
+        await waitFor(
+          () => {
+            expect(document.querySelector('#flashalert_message_holder')).toHaveTextContent(
+              'Failed to regenerate criteria',
+            )
+          },
+          {timeout: 5000},
+        )
       })
 
       it('replaces the criterions with the regenerated one', async () => {

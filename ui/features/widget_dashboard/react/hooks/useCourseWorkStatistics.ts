@@ -21,6 +21,7 @@ import {gql} from 'graphql-tag'
 import type {CourseWorkSummary} from '../types'
 import {getCurrentUserId, executeGraphQLQuery, createUserQueryConfig} from '../utils/graphql'
 import {QUERY_CONFIG} from '../constants'
+import {useWidgetDashboard} from './useWidgetDashboardContext'
 
 interface SubmissionStatistics {
   submissionsDueCount: number
@@ -50,15 +51,15 @@ interface CourseWorkStatisticsParams {
 }
 
 const USER_COURSE_STATISTICS_QUERY = gql`
-  query GetUserCourseStatistics($userId: ID!, $startDate: ISO8601DateTime!, $endDate: ISO8601DateTime!) {
+  query GetUserCourseStatistics($userId: ID!, $startDate: ISO8601DateTime!, $endDate: ISO8601DateTime!, $observedUserId: ID) {
     legacyNode(_id: $userId, type: User) {
       ... on User {
         _id
-        enrollments {
+        enrollments(currentOnly: true) {
           course {
             _id
             name
-            submissionStatistics {
+            submissionStatistics(observedUserId: $observedUserId) {
               submissionsDueCount(startDate: $startDate, endDate: $endDate)
               missingSubmissionsCount
               submissionsSubmittedCount
@@ -73,7 +74,10 @@ const USER_COURSE_STATISTICS_QUERY = gql`
 async function fetchAllCourseStatistics({
   startDate,
   endDate,
-}: Omit<CourseWorkStatisticsParams, 'courseId'>): Promise<UserEnrollment[]> {
+  observedUserId,
+}: Omit<CourseWorkStatisticsParams, 'courseId'> & {observedUserId?: string | null}): Promise<
+  UserEnrollment[]
+> {
   try {
     const currentUserId = getCurrentUserId()
 
@@ -81,6 +85,7 @@ async function fetchAllCourseStatistics({
       userId: currentUserId,
       startDate: startDate.toISOString(),
       endDate: endDate.toISOString(),
+      observedUserId,
     })
 
     if (!result.legacyNode?.enrollments) {
@@ -104,8 +109,16 @@ function calculateSummaryFromEnrollments(
     ? enrollments.filter(enrollment => enrollment.course._id === courseId)
     : enrollments
 
+  // Deduplicate course IDs to handle multiple enrollments in same course
+  const uniqueCourses = Object.values(
+    filteredEnrollments.reduce<{[id: string]: UserEnrollment}>((acc, enrollment) => {
+      acc[enrollment.course._id] ||= enrollment
+      return acc
+    }, {}),
+  )
+
   // Sum up statistics from all relevant courses
-  const summary = filteredEnrollments.reduce(
+  const summary = uniqueCourses.reduce(
     (acc, enrollment) => {
       const stats = enrollment.course.submissionStatistics
       if (stats) {
@@ -123,16 +136,24 @@ function calculateSummaryFromEnrollments(
 }
 
 export function useCourseWorkStatistics(params: CourseWorkStatisticsParams) {
-  // Only include date range in query key, not courseId
+  const {observedUserId} = useWidgetDashboard()
+
+  // Not including courseId in queryKey
   const queryKey = [
     'courseStatistics',
     params.startDate.toISOString(),
     params.endDate.toISOString(),
+    observedUserId ?? undefined,
   ]
 
   return useQuery({
     ...createUserQueryConfig(queryKey, QUERY_CONFIG.STALE_TIME.STATISTICS),
-    queryFn: () => fetchAllCourseStatistics({startDate: params.startDate, endDate: params.endDate}),
+    queryFn: () =>
+      fetchAllCourseStatistics({
+        startDate: params.startDate,
+        endDate: params.endDate,
+        observedUserId,
+      }),
     retry: QUERY_CONFIG.RETRY.DISABLED, // Disable retry for tests
     select: (enrollments: UserEnrollment[]) => {
       // Calculate summary based on selected course

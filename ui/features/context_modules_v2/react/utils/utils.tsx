@@ -291,6 +291,15 @@ const compareAssignmentOverrides = (prev: any, next: any): boolean => {
   return true
 }
 
+function extractDueAts(props: {content: {assignedToDates: any}}) {
+  const dates = props?.content?.assignedToDates
+  if (!Array.isArray(dates)) return []
+
+  return dates
+    .map(date => date?.dueAt)
+    .filter(dueAt => typeof dueAt !== 'undefined' && dueAt !== null)
+}
+
 export const validateModuleItemTeacherRenderRequirements = (prevProps: any, nextProps: any) => {
   // Basic props comparison (most likely to differ)
   const basicPropsEqual =
@@ -307,6 +316,15 @@ export const validateModuleItemTeacherRenderRequirements = (prevProps: any, next
     prevProps.position === nextProps.position
 
   if (!basicPropsEqual) return false
+
+  const prevDueAts = extractDueAts(prevProps)
+  const nextDueAts = extractDueAts(nextProps)
+  if (
+    prevDueAts.length !== nextDueAts.length ||
+    !prevDueAts.every((val, idx) => val === nextDueAts[idx])
+  ) {
+    return false
+  }
 
   // Optimized completion requirements comparison
   if (

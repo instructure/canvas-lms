@@ -488,6 +488,33 @@ describe "Common Cartridge exporting" do
       end
     end
 
+    it "includes user files" do
+      folder = Folder.create!(name: "hidden", context: @user, hidden: true, parent_folder: Folder.root_folders(@user).first)
+      att = Attachment.create!(context: @user, folder:, display_name: "cn_image.jpg", uploaded_data: fixture_file_upload("cn_image.jpg"))
+
+      body = <<~HTML
+        <p><img src="/users/#{@user.id}/files/#{att.id}/preview"></p>
+      HTML
+
+      wiki_page_model(course: @ce.context, body:, updating_user: @user)
+
+      @ce.update(export_type: ContentExport::COMMON_CARTRIDGE)
+      @ce.save!
+
+      run_export
+
+      check_resource_node(@page, CC::CCHelper::WEBCONTENT)
+
+      export_html = <<~HTML.strip
+        <p><img src="$IMS-CC-FILEBASE$/Uploaded%20Media/cn_image.jpg" loading="lazy"></p>
+      HTML
+
+      expect(@zip_file.read("wiki_content/some-page.html")).to include export_html
+      path = "web_resources/Uploaded Media/cn_image.jpg"
+      expect(@zip_file.find_entry(path)).not_to be_nil
+      expect(@manifest_doc.at_css("resource[identifier=#{mig_id(att)}]")).to_not be_nil
+    end
+
     it "includes media objects" do
       @q1 = @course.quizzes.create(title: "quiz1", saving_user: @user)
       folder = Folder.create!(name: "hidden", context: @course, hidden: true, parent_folder: Folder.root_folders(@course).first)
@@ -817,6 +844,30 @@ describe "Common Cartridge exporting" do
       expect(doc.at_css("assignmentGroup[identifier=#{mig_id(@ag)}]")).not_to be_nil
       expect(doc.at_css("assignmentGroup[identifier=#{mig_id(@ag2)}]")).not_to be_nil
       expect(ccc_schema.validate(doc)).to be_empty
+    end
+
+    it "does not crash on file that is not found" do
+      att = attachment_model(uploaded_data: stub_png_data)
+      att_id = att.id
+      att.destroy_permanently!
+      body = <<~HTML
+        <p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="audio" src="/media_attachments_iframe/#{att_id}?embedded=true&type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="some-kaltura-id"></iframe></p>
+        <p><img src="/users/#{@user.id}/files/#{att_id}/preview" width="150" height="150" /></p>
+        <p><a id="0" href="/courses/#{@ce.context.id}/files/#{att_id}?wrap=1">file.pdf</a></p>
+      HTML
+
+      wiki_page_model(course: @ce.context, body:, updating_user: @user)
+      @ce.update(export_type: ContentExport::COMMON_CARTRIDGE)
+      @ce.save!
+
+      expect { run_export }.not_to raise_error
+
+      check_resource_node(@page, CC::CCHelper::WEBCONTENT)
+
+      export_body = @zip_file.read("wiki_content/some-page.html")
+      expect(export_body).to include "/media_attachments_iframe/#{att_id}"
+      expect(export_body).to include "/users/#{@user.id}/files/#{att_id}/preview"
+      expect(export_body).to include "/courses/#{@ce.context.id}/files/#{att_id}?wrap=1"
     end
 
     it "has valid course settings XML" do

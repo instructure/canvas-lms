@@ -269,6 +269,58 @@ describe "Conferences API", type: :request do
           expect(conference_json_ids).to eq [future_conference.id, present_conference.id, past_conference.id]
         end
 
+        context "with paginated results" do
+          before do
+            past_conference.add_user(student, "attendee")
+            present_conference.add_user(student, "attendee")
+            future_conference.add_user(student, "attendee")
+            conferences = Timecop.freeze(1.month.from_now) do
+              [
+                WebConference.create!(
+                  id: greater_id,
+                  conference_type: "Wimba",
+                  context: course,
+                  started_at: Time.zone.at(Time.zone.now),
+                  ended_at: Time.zone.at(1.hour.from_now),
+                  user: teacher
+                ),
+                WebConference.create!(
+                  id: smaller_id,
+                  conference_type: "Wimba",
+                  context: course,
+                  started_at: Time.zone.at(Time.zone.now),
+                  ended_at: Time.zone.at(1.hour.from_now),
+                  user: teacher
+                )
+              ]
+            end
+            conferences.each { |conference| conference.add_user(student, "attendee") }
+          end
+
+          let(:greater_id) { 99_999_999 }
+          let(:smaller_id) { 99_999_998 }
+          let(:request_params) do
+            { controller: "conferences", action: "for_user", format: "json", per_page: }
+          end
+          let(:per_page) { 2 }
+
+          it "paginates results with correct previous page" do
+            first_page_response = api_call_as_user(student, :get, "/api/v1/conferences.json", request_params)
+            expect(first_page_response["conferences"].length).to eq 2
+            expect(first_page_response["conferences"].first["id"]).to eq(greater_id)
+            expect(first_page_response["conferences"].second["id"]).to eq(smaller_id)
+
+            # follow_pagination_link is broken
+            links = Api.parse_pagination_links(response.headers["Link"])
+            page = links.find { |l| l[:rel] == "next" }["page"]
+
+            second_page_response = api_call_as_user(student, :get, "/api/v1/conferences.json", request_params.merge({ page: }))
+            expect(second_page_response["conferences"].length).to eq 2
+            expect(second_page_response["conferences"].first["id"]).to eq(future_conference.id)
+            expect(second_page_response["conferences"].second["id"]).to eq(present_conference.id)
+          end
+        end
+
         it "sorts results with equal creation dates by ID in descending order" do
           conferences = Timecop.freeze(1.hour.ago) do
             [
@@ -375,6 +427,156 @@ describe "Conferences API", type: :request do
           home_course.web_conferences.first.id,
           another_course.web_conferences.first.id
         ]
+      end
+
+      context "with paginated results" do
+        let(:request_params) do
+          { controller: "conferences", action: "for_user", format: "json", per_page: }
+        end
+        let(:per_page) { 1 }
+
+        it "paginates results with correct previous page" do
+          first_page_response = api_call_as_user(student, :get, "/api/v1/conferences.json", request_params)
+          expect(first_page_response["conferences"].length).to eq 1
+          expect(first_page_response["conferences"].first["id"]).to eq(another_group.web_conferences.first.id)
+
+          # follow_pagination_link is broken
+          links = Api.parse_pagination_links(response.headers["Link"])
+          page = links.find { |l| l[:rel] == "next" }["page"]
+
+          second_page_response = api_call_as_user(student, :get, "/api/v1/conferences.json", request_params.merge({ page: }))
+          expect(second_page_response["conferences"].length).to eq 1
+          expect(second_page_response["conferences"].first["id"]).to eq(home_group.web_conferences.first.id)
+        end
+
+        context "with multiple results having the same created_at timestamp" do
+          let(:per_page) { 5 }
+          let(:greater_id) { 99_999_999 }
+          let(:smaller_id) { 99_999_998 }
+
+          before(:once) do
+            Timecop.freeze(1.week.ago) do
+              home_shard.activate do
+                conference = home_course.web_conferences.create!(id: greater_id, conference_type: "Wimba", user: teacher)
+                conference.add_user(student, "attendee")
+              end
+
+              another_shard.activate do
+                conference = another_course.web_conferences.create!(id: smaller_id, conference_type: "Wimba", user: teacher)
+                conference.add_user(student, "attendee")
+              end
+            end
+          end
+
+          it "orders by id desc cross-shard" do
+            first_page_response = api_call_as_user(student, :get, "/api/v1/conferences.json", request_params)
+            expect(first_page_response["conferences"].length).to eq 5
+            first_page_last_record = first_page_response["conferences"].pluck("id").last
+            # This is not consistent which shard runs the query so it can be either global or local id
+            expect(first_page_last_record.to_s).to end_with(greater_id.to_s)
+
+            # follow_pagination_link is broken
+            links = Api.parse_pagination_links(response.headers["Link"])
+            page = links.find { |l| l[:rel] == "next" }["page"]
+
+            second_page_response = api_call_as_user(student, :get, "/api/v1/conferences.json", request_params.merge({ page: }))
+            second_page_last_record = second_page_response["conferences"].pluck("id").last
+            # This is not consistent which shard runs the query so it can be either global or local id
+            expect(second_page_last_record.to_s).to end_with(smaller_id.to_s)
+          end
+        end
+
+        context "When only course or group conferences exist" do
+          let(:per_page) { 1 }
+          let(:greater_id) { 99_999_999 }
+          let(:smaller_id) { 99_999_998 }
+
+          context "only course conferences exist" do
+            before(:once) do
+              Shard.find_each do |shard|
+                shard.activate do
+                  WebConference.find_each do |conf|
+                    conf.web_conference_participants.delete_all
+                    conf.delete
+                  end
+                end
+              end
+
+              Timecop.freeze(1.week.ago) do
+                home_shard.activate do
+                  conference = home_course.web_conferences.create!(id: greater_id, conference_type: "Wimba", user: teacher)
+                  conference.add_user(student, "attendee")
+                end
+
+                another_shard.activate do
+                  conference = another_course.web_conferences.create!(id: smaller_id, conference_type: "Wimba", user: teacher)
+                  conference.add_user(student, "attendee")
+                end
+              end
+            end
+
+            it "orders by id desc cross-shard" do
+              first_page_response = api_call_as_user(student, :get, "/api/v1/conferences.json", request_params)
+              expect(first_page_response["conferences"].length).to eq 1
+              first_page_last_record = first_page_response["conferences"].pluck("id").last
+              # This is not consistent which shard runs the query so it can be either global or local id
+              expect(first_page_last_record.to_s).to end_with(greater_id.to_s)
+
+              # follow_pagination_link is broken
+              links = Api.parse_pagination_links(response.headers["Link"])
+              page = links.find { |l| l[:rel] == "next" }["page"]
+
+              second_page_response = api_call_as_user(student, :get, "/api/v1/conferences.json", request_params.merge({ page: }))
+              second_page_last_record = second_page_response["conferences"].pluck("id").last
+              # This is not consistent which shard runs the query so it can be either global or local id
+              expect(second_page_last_record.to_s).to end_with(smaller_id.to_s)
+            end
+          end
+
+          context "only group conferences exist" do
+            before(:once) do
+              Shard.find_each do |shard|
+                shard.activate do
+                  WebConference.find_each do |conf|
+                    conf.web_conference_participants.delete_all
+                    conf.delete
+                  end
+                end
+              end
+
+              Timecop.freeze(1.week.ago) do
+                home_shard.activate do
+                  home_group.add_user(student)
+                  conference = home_group.web_conferences.create!(id: greater_id, conference_type: "Wimba", user: teacher)
+                  conference.add_user(student, "attendee")
+                end
+
+                another_shard.activate do
+                  another_group.add_user(student)
+                  conference = another_group.web_conferences.create!(id: smaller_id, conference_type: "Wimba", user: teacher)
+                  conference.add_user(student, "attendee")
+                end
+              end
+            end
+
+            it "orders by id desc cross-shard" do
+              first_page_response = api_call_as_user(student, :get, "/api/v1/conferences.json", request_params)
+              expect(first_page_response["conferences"].length).to eq 1
+              first_page_last_record = first_page_response["conferences"].pluck("id").last
+              # This is not consistent which shard runs the query so it can be either global or local id
+              expect(first_page_last_record.to_s).to end_with(greater_id.to_s)
+
+              # follow_pagination_link is broken
+              links = Api.parse_pagination_links(response.headers["Link"])
+              page = links.find { |l| l[:rel] == "next" }["page"]
+
+              second_page_response = api_call_as_user(student, :get, "/api/v1/conferences.json", request_params.merge({ page: }))
+              second_page_last_record = second_page_response["conferences"].pluck("id").last
+              # This is not consistent which shard runs the query so it can be either global or local id
+              expect(second_page_last_record.to_s).to end_with(smaller_id.to_s)
+            end
+          end
+        end
       end
     end
   end

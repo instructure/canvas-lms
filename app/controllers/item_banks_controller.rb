@@ -30,7 +30,11 @@ class ItemBanksController < ApplicationController
     return render status: :not_found, template: "shared/errors/404_message" unless ams_service_enabled
 
     js_env(context_url: context_url(@context, :context_item_banks_url))
-    remote_env(ams: { launch_url: Services::Ams.launch_url })
+    remote_env(ams:
+      {
+        launch_url: Services::Ams.launch_url,
+        api_url: Services::Ams.api_url
+      })
 
     render html: '<div id="ams_container"></div>'.html_safe, layout: true
   end

@@ -3143,62 +3143,6 @@ describe Account do
     end
   end
 
-  describe "horizon_url" do
-    before :once do
-      @account = Account.default
-      @account.settings[:horizon_domain] = "test.canvasforcareer.com"
-      @account.save!
-    end
-
-    it "returns the url with the specified path" do
-      expect(@account.horizon_url("api/v1/test").to_s).to eq("https://test.canvasforcareer.com/api/v1/test")
-    end
-
-    it "returns nil if horizon_domain is not set" do
-      @account.settings[:horizon_domain] = nil
-      @account.save!
-      expect(@account.horizon_url("api/v1/test")).to be_nil
-    end
-
-    it "uses http protocol for localhost domains" do
-      @account.settings[:horizon_domain] = "localhost:3002"
-      @account.save!
-      expect(@account.horizon_url("api/v1/test").to_s).to eq("http://localhost:3002/api/v1/test")
-    end
-  end
-
-  describe "horizon_redirect_url" do
-    before :once do
-      @account = Account.default
-      @account.settings[:horizon_domain] = "test.canvasforcareer.com"
-      @account.save!
-    end
-
-    it "returns the redirect url with canvas path" do
-      expect(@account.horizon_redirect_url("/courses")).to eq("https://test.canvasforcareer.com/redirect?canvas_url=%2Fcourses&preview=false&reauthenticate=false")
-    end
-
-    it "returns the redirect url with reauthenticate param" do
-      expect(@account.horizon_redirect_url("/", reauthenticate: true)).to eq("https://test.canvasforcareer.com/redirect?canvas_url=%2F&preview=false&reauthenticate=true")
-    end
-
-    it "returns the redirect url with preview param" do
-      expect(@account.horizon_redirect_url("/", preview: true)).to eq("https://test.canvasforcareer.com/redirect?canvas_url=%2F&preview=true&reauthenticate=false")
-    end
-
-    it "returns nil if horizon_domain is not set" do
-      @account.settings[:horizon_domain] = nil
-      @account.save!
-      expect(@account.horizon_redirect_url("/courses")).to be_nil
-    end
-
-    it "returns redirect url on localhost with port" do
-      @account.settings[:horizon_domain] = "localhost:3002"
-      @account.save!
-      expect(@account.horizon_redirect_url("/courses")).to eq("http://localhost:3002/redirect?canvas_url=%2Fcourses&preview=false&reauthenticate=false")
-    end
-  end
-
   describe "allow_assign_to_differentiation_tags?" do
     before :once do
       @account = Account.default

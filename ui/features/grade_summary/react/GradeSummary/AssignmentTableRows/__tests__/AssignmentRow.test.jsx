@@ -150,8 +150,21 @@ describe('AssignmentRow', () => {
   })
 
   describe('Document Processors', () => {
-    it('does not render AssetProcessorCell when showDocumentProcessors is false', () => {
+    const ltiAssetProcessorsConnection = {
+      nodes: [
+        {
+          _id: '1',
+          externalTool: {
+            _id: '1',
+            name: 'the best tool',
+          },
+        },
+      ],
+    }
+
+    it('does not render LtiAssetProcessorCell when showDocumentProcessors is false', () => {
       const assignment = Assignment.mock({
+        ltiAssetProcessorsConnection,
         submissionsConnection: {
           nodes: [
             Submission.mock({
@@ -160,6 +173,13 @@ describe('AssignmentRow', () => {
                   {
                     _id: '1',
                     priority: 1,
+                    processingProgress: 'Processed',
+                    processorId: '1',
+                    resubmitAvailable: false,
+                    asset: {
+                      attachmentId: '1',
+                      attachmentName: 'file1.pdf',
+                    },
                   },
                 ],
               },
@@ -176,6 +196,7 @@ describe('AssignmentRow', () => {
 
     it('render No result when showDocumentProcessors is true but asset reports array is empty', () => {
       const assignment = Assignment.mock({
+        ltiAssetProcessorsConnection,
         submissionsConnection: {
           nodes: [
             Submission.mock({
@@ -193,8 +214,9 @@ describe('AssignmentRow', () => {
       expect(queryByText('No result')).toBeInTheDocument()
     })
 
-    it('does not render AssetProcessorCell when showDocumentProcessors is true but asset reports array is null', () => {
+    it('does not render LtiAssetProcessorCell when showDocumentProcessors is true but asset reports array is null', () => {
       const assignment = Assignment.mock({
+        ltiAssetProcessorsConnection,
         submissionsConnection: {
           nodes: [
             Submission.mock({
@@ -212,8 +234,9 @@ describe('AssignmentRow', () => {
       expect(queryByText('No result')).not.toBeInTheDocument()
     })
 
-    it('renders AssetProcessorCell when showDocumentProcessors is true and asset reports exist', () => {
+    it('renders LtiAssetProcessorCell when showDocumentProcessors is true and asset reports exist', () => {
       const assignment = Assignment.mock({
+        ltiAssetProcessorsConnection,
         submissionsConnection: {
           nodes: [
             Submission.mock({
@@ -222,6 +245,13 @@ describe('AssignmentRow', () => {
                   {
                     _id: '1',
                     priority: 1,
+                    processingProgress: 'Processed',
+                    processorId: '1',
+                    resubmitAvailable: false,
+                    asset: {
+                      attachmentId: '1',
+                      attachmentName: 'file1.pdf',
+                    },
                   },
                 ],
               },
@@ -236,8 +266,9 @@ describe('AssignmentRow', () => {
       expect(getByText('Needs attention')).toBeInTheDocument()
     })
 
-    it('does not render AssetProcessorCell when assignment has no submissions', () => {
+    it('does not render LtiAssetProcessorCell when assignment has no submissions', () => {
       const assignment = Assignment.mock({
+        ltiAssetProcessorsConnection,
         submissionsConnection: {
           nodes: [],
         },
@@ -251,8 +282,9 @@ describe('AssignmentRow', () => {
       ).not.toBeInTheDocument()
     })
 
-    it('passes correct props to AssetProcessorCell', () => {
+    it('passes correct props to LtiAssetProcessorCell', () => {
       const assignment = Assignment.mock({
+        ltiAssetProcessorsConnection,
         submissionsConnection: {
           nodes: [
             Submission.mock({
@@ -261,10 +293,24 @@ describe('AssignmentRow', () => {
                   {
                     _id: '1',
                     priority: 0,
+                    processingProgress: 'Processed',
+                    processorId: '1',
+                    resubmitAvailable: false,
+                    asset: {
+                      attachmentId: '1',
+                      attachmentName: 'file1.pdf',
+                    },
                   },
                   {
                     _id: '2',
                     priority: 0,
+                    processingProgress: 'Processed',
+                    processorId: '1',
+                    resubmitAvailable: false,
+                    asset: {
+                      attachmentId: '1',
+                      attachmentName: 'file1.pdf',
+                    },
                   },
                 ],
               },

@@ -823,6 +823,7 @@ class DiscussionTopic < ActiveRecord::Base
           topic_participant.unread_entry_count = opts[:new_count] if opts[:new_count]
           topic_participant.subscribed = opts[:subscribed] if opts.key?(:subscribed)
           topic_participant.expanded = opts[:expanded] if opts.key?(:expanded)
+          topic_participant.preferred_language = opts[:preferred_language] if opts.key?(:preferred_language)
           topic_participant.sort_order = opts[:sort_order] if opts.key?(:sort_order)
           topic_participant.summary_enabled = opts[:summary_enabled] if opts.key?(:summary_enabled)
           topic_participant.show_pinned_entries = opts[:show_pinned_entries] if opts.key?(:show_pinned_entries)

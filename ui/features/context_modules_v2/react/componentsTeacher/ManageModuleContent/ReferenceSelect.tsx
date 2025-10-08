@@ -21,6 +21,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Module, ModuleItem, ModuleAction} from '../../utils/types'
+import {Spinner} from '@instructure/ui-spinner'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -36,6 +37,7 @@ export interface ReferenceSelectProps {
   sourceModuleId: string
   selectedModule: string
   sourceModuleItemId: string
+  isLoading: boolean
 }
 
 const ReferenceSelect: React.FC<ReferenceSelectProps> = ({
@@ -47,6 +49,7 @@ const ReferenceSelect: React.FC<ReferenceSelectProps> = ({
   sourceModuleId,
   selectedModule,
   sourceModuleItemId,
+  isLoading = false,
 }) => {
   useEffect(() => {
     if (moduleAction !== 'move_module' && !moduleItems?.find(item => item._id === selectedItem)) {
@@ -71,7 +74,6 @@ const ReferenceSelect: React.FC<ReferenceSelectProps> = ({
     moduleAction,
     onItemChange,
   ])
-  const hasItems = moduleItems && moduleItems.length > 0
 
   return (
     <View as="div" margin="medium 0 0 0">
@@ -79,7 +81,7 @@ const ReferenceSelect: React.FC<ReferenceSelectProps> = ({
          When moving items or contents, show module items as options*/}
       {moduleAction === 'move_module' ? (
         <SimpleSelect
-          renderLabel={hasItems && I18n.t('Select Reference Module')}
+          renderLabel={I18n.t('Select Reference Module')}
           assistiveText={I18n.t('Select a module')}
           value={selectedItem}
           onChange={onItemChange}
@@ -92,15 +94,19 @@ const ReferenceSelect: React.FC<ReferenceSelectProps> = ({
               </SimpleSelect.Option>
             ))}
         </SimpleSelect>
+      ) : isLoading ? (
+        <View as="span" display="flex" textAlign="end">
+          <Spinner size="x-small" renderTitle="Loading module items..." />
+        </View>
       ) : (
-        hasItems && (
-          <SimpleSelect
-            renderLabel={hasItems && I18n.t('Select Reference Item')}
-            assistiveText={I18n.t('Select an item')}
-            value={selectedItem}
-            onChange={onItemChange}
-          >
-            {moduleItems
+        <SimpleSelect
+          renderLabel={I18n.t('Select Reference Item')}
+          assistiveText={I18n.t('Select an item')}
+          value={selectedItem}
+          onChange={onItemChange}
+        >
+          {moduleItems &&
+            moduleItems
               // Filter out the source item when in the same module
               .filter(item => !(item._id === sourceModuleItemId))
               .map((item: ModuleItem) => (
@@ -108,8 +114,7 @@ const ReferenceSelect: React.FC<ReferenceSelectProps> = ({
                   {item.title || 'Untitled Item'}
                 </SimpleSelect.Option>
               ))}
-          </SimpleSelect>
-        )
+        </SimpleSelect>
       )}
     </View>
   )

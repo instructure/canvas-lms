@@ -109,4 +109,63 @@ describe Progress do
       end
     end
   end
+
+  describe "workflow states" do
+    let(:progress) { Progress.create!(tag: "test", context: user_factory) }
+
+    describe "waiting_for_external_tool state" do
+      it "can transition from running to waiting_for_external_tool" do
+        progress.start
+        expect(progress).to be_running
+
+        progress.wait_for_external_tool
+        expect(progress).to be_waiting_for_external_tool
+      end
+
+      it "can complete from waiting_for_external_tool state" do
+        progress.start
+        progress.wait_for_external_tool
+        expect(progress).to be_waiting_for_external_tool
+
+        progress.complete
+        expect(progress).to be_completed
+        expect(progress.completion).to eq 100
+      end
+
+      it "can fail from waiting_for_external_tool state" do
+        progress.start
+        progress.wait_for_external_tool
+        expect(progress).to be_waiting_for_external_tool
+
+        progress.fail
+        expect(progress).to be_failed
+      end
+
+      it "includes waiting_for_external_tool in pending scope" do
+        running_progress = Progress.create!(tag: "running", context: user_factory)
+        running_progress.start
+
+        waiting_progress = Progress.create!(tag: "waiting", context: user_factory)
+        waiting_progress.start
+        waiting_progress.wait_for_external_tool
+
+        queued_progress = Progress.create!(tag: "queued", context: user_factory)
+
+        completed_progress = Progress.create!(tag: "completed", context: user_factory)
+        completed_progress.start
+        completed_progress.complete
+
+        pending_progresses = Progress.is_pending
+        expect(pending_progresses).to include(running_progress, waiting_progress, queued_progress)
+        expect(pending_progresses).not_to include(completed_progress)
+      end
+
+      it "returns true for pending? when waiting_for_external_tool" do
+        progress.start
+        progress.wait_for_external_tool
+
+        expect(progress.pending?).to be true
+      end
+    end
+  end
 end

@@ -229,7 +229,7 @@ describe "BigBlueButton conferences" do
   end
 
   it "persists selected settings" do
-    skip "07/16/2025 - 1/10 failure rate when clicking 'Edit'"
+    skip "2025-07-16 - 1/10 failure rate when clicking 'Edit' FOO-5836"
     get conferences_index_page
     f("button[title='New Conference']").click
 

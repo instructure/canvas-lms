@@ -1029,8 +1029,6 @@ describe User do
       user_factory
       course_factory(course_name: "course_factory", active_course: true).enroll_user(@user, "StudentEnrollment", enrollment_state: "active")
       enable_cache(:redis_cache_store) do
-        expect(Account).to receive(:where).with(id: nil).and_call_original.once # update_account_associations from enrollment deletion
-        expect(Account).to receive(:where).with(id: []).and_call_original.exactly(3).times
         3.times { @user.course_creating_teacher_enrollment_accounts }
         3.times { @user.course_creating_student_enrollment_accounts }
         Enrollment.last.destroy

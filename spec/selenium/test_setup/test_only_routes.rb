@@ -20,9 +20,11 @@
 module SeleniumDriverSetup
   module TestOnlyRoutes
     def self.create_routes(app)
-      app.routes.disable_clear_and_finalize = true
+      app.routes.disable_clear_and_finalize = true if Rails.version < "8.0"
 
-      app.routes.draw do
+      routes_method = (Rails.version < "8.0") ? :draw : :append
+
+      app.routes.send(routes_method) do
         post "/test/mock_lti/ui", to: "test/mock_lti#ui"
         post "/test/mock_lti/login", to: "test/mock_lti#login"
         get "/test/mock_lti/jwks", to: "test/mock_lti#jwks"

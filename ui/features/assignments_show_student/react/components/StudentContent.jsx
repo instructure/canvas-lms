@@ -43,6 +43,7 @@ import UnavailablePeerReview from '../UnavailablePeerReview'
 import VisualOnFocusMessage from './VisualOnFocusMessage'
 import {Flex} from '@instructure/ui-flex'
 import {arrayOf, func, bool} from 'prop-types'
+import {queryClient} from '@canvas/query'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {LtiToolIframe} from './LtiToolIframe'
 import DocumentProcessorsSection from './DocumentProcessorsSection'
@@ -209,10 +210,13 @@ function renderContentBaseOnAvailability(
     const onMarkAsDoneError = () =>
       alertContext.setOnFailure(I18n.t('Error updating status of module item'))
 
-    const queryClient = new QueryClient()
+    // I don't know why, but using the global queryClient with Rubrics seems to
+    // break the page in the Selenium specs. But we need to use global one for
+    // AssetProcessor to avoid duplicate fetching with other components.
+    const rubricsQueryClient = new QueryClient()
 
     return (
-      <>
+      <QueryClientProvider client={queryClient}>
         <Flex margin="medium 0 0 0" alignItems="start">
           <div style={{flexGrow: 1}}>
             {/* EVAL-3711 Remove ICE Feature Flag */}
@@ -226,11 +230,22 @@ function renderContentBaseOnAvailability(
                 )}
               />
             )}
-            <DocumentProcessorsSection submission={submission} />
+            {
+              // For submissions with multiple files, this is shown in FilePreview
+              (submission?.attachments?.length ?? 0) <= 1 && (
+                <DocumentProcessorsSection
+                  submission={{
+                    submissionId: submission._id,
+                    submissionType: submission.submissionType,
+                    ifLastAttemptIsNumber: submission.attempt,
+                  }}
+                />
+              )
+            }
             <AssignmentToggleDetails description={assignment.description} />
             {assignment.rubric && (
               <Suspense fallback={<LoadingIndicator />}>
-                <QueryClientProvider client={queryClient}>
+                <QueryClientProvider client={rubricsQueryClient}>
                   <RubricsQuery
                     assignment={assignment}
                     submission={submission}
@@ -270,7 +285,7 @@ function renderContentBaseOnAvailability(
         {(ENV.enrollment_state === 'completed' || !ENV.can_submit_assignment_from_section) && (
           <EnrollmentConcludedNotice hasActiveEnrollment={ENV.enrollment_state === 'active'} />
         )}
-      </>
+      </QueryClientProvider>
     )
   }
 }

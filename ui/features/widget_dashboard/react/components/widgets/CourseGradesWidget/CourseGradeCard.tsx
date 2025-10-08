@@ -24,7 +24,7 @@ import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {Button} from '@instructure/ui-buttons'
 import type {CourseGradeCardProps} from '../../../types'
-import {formatUpdatedDate} from './utils'
+import {formatUpdatedDate, convertToLetterGrade} from './utils'
 import {COURSE_GRADES_WIDGET} from '../../../constants'
 import {CourseCode} from '../../shared/CourseCode'
 
@@ -35,6 +35,7 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
   courseCode,
   courseName,
   currentGrade,
+  gradingScheme,
   lastUpdated,
   gridIndex,
   globalGradeVisibility = true,
@@ -63,12 +64,13 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
       overflowY="hidden"
     >
       <Flex direction="column" width="100%" height="100%">
-        <Flex.Item padding="0 0 0 xx-small" margin="0 0 small 0">
+        <Flex.Item padding="0" margin="0 0 small 0" overflowX="visible" overflowY="visible">
           <CourseCode
             courseId={courseId}
             overrideCode={courseCode}
             gridIndex={gridIndex}
             size="x-small"
+            maxWidth="14rem"
           />
         </Flex.Item>
 
@@ -80,14 +82,14 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
           </View>
         </Flex.Item>
 
-        <Flex.Item shouldGrow padding="0 0 0 xx-small">
+        <Flex.Item shouldGrow padding="0 0 0 xx-small" overflowY="visible">
           <Flex direction="column" gap="0">
             <Flex.Item>
               <Text size="small" color="secondary">
                 {formatUpdatedDate(lastUpdated)}
               </Text>
             </Flex.Item>
-            <Flex.Item>
+            <Flex.Item overflowX="visible" overflowY="visible">
               <Link href={`/courses/${courseId}/grades`} isWithinText={false}>
                 <Text size="small">{I18n.t('Show gradebook')}</Text>
               </Link>
@@ -105,7 +107,11 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
             <Flex.Item>
               {isGradeVisible && (
                 <Text size="xx-large" weight="bold">
-                  {currentGrade !== null ? `${Math.floor(currentGrade)}%` : '--'}
+                  {currentGrade !== null
+                    ? gradingScheme === 'percentage'
+                      ? `${Math.floor(currentGrade)}%`
+                      : convertToLetterGrade(currentGrade, gradingScheme)
+                    : '--'}
                 </Text>
               )}
             </Flex.Item>

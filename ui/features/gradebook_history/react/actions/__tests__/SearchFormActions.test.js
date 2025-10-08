@@ -31,6 +31,20 @@ import SearchFormActions, {
 } from '../SearchFormActions'
 import UserApi from '../../api/UserApi'
 import Fixtures from '@canvas/grading/Fixtures'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
+
+const server = setupServer(
+  http.get('*/api/v1/courses/:courseId/users', () => {
+    return HttpResponse.json([])
+  }),
+  http.get('*/api/v1/courses/:courseId/gradebook_history', () => {
+    return HttpResponse.json([])
+  }),
+  http.get('*/api/v1/*', () => {
+    return HttpResponse.json({})
+  }),
+)
 
 jest.mock('../../environment', () => ({
   courseId: jest.fn(() => '123'),
@@ -44,6 +58,20 @@ jest.mock('../HistoryActions', () => ({
 }))
 
 describe('SearchFormActions', () => {
+  beforeAll(() => {
+    server.listen({
+      onUnhandledRequest: 'bypass',
+    })
+  })
+
+  afterAll(() => {
+    server.close()
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
+  })
+
   describe('action creators', () => {
     const response = {
       data: Fixtures.userArray(),

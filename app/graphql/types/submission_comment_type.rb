@@ -162,7 +162,8 @@ module Types
 
     field :can_reply, Boolean, null: true
     def can_reply
-      object.submission.grants_right?(current_user, :comment)
+      !object.submission.course.concluded? &&
+        object.submission.grants_right?(current_user, :comment)
     end
 
     field :provisional, Boolean, null: false

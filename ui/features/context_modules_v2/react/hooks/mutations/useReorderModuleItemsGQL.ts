@@ -18,7 +18,8 @@
 
 import {gql} from 'graphql-tag'
 import {executeQuery} from '@canvas/graphql'
-import {useMutation} from '@tanstack/react-query'
+import {useMutation, useQueryClient} from '@tanstack/react-query'
+import {MODULE_ITEMS, MODULE_ITEMS_ALL, MODULES} from '../../utils/constants'
 
 interface ReorderModuleItemsParams {
   courseId: string
@@ -109,7 +110,16 @@ const reorderModuleItems = async (
 }
 
 export const useReorderModuleItemsGQL = () => {
+  const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: reorderModuleItems,
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, variables.oldModuleId], exact: false})
+      queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, variables.moduleId], exact: false})
+      queryClient.invalidateQueries({queryKey: [MODULE_ITEMS_ALL, variables.oldModuleId]})
+      queryClient.invalidateQueries({queryKey: [MODULE_ITEMS_ALL, variables.moduleId]})
+      queryClient.invalidateQueries({queryKey: [MODULES, variables.courseId], exact: false})
+    },
   })
 }

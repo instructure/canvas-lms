@@ -63,7 +63,7 @@ export function setCspEnabledAction(value, opts = {}) {
 
 export function setCspEnabled(context, contextId, value) {
   context = pluralize(context)
-  return (dispatch, getState, {axios}) => {
+  return (dispatch, _getState, {axios}) => {
     dispatch(setCspEnabledAction(value, {optimistic: true}))
     return axios
       .put(`/api/v1/${context}/${contextId}/csp_settings`, {
@@ -77,7 +77,7 @@ export function setCspEnabled(context, contextId, value) {
 
 export function getCspEnabled(context, contextId) {
   context = pluralize(context)
-  return (dispatch, getState, {axios}) =>
+  return (dispatch, _getState, {axios}) =>
     axios.get(`/api/v1/${context}/${contextId}/csp_settings`).then(response => {
       dispatch(setCspEnabledAction(response.data.enabled))
     })
@@ -136,7 +136,7 @@ export function setCspInherited(context, contextId, value) {
 
 export function getCspInherited(context, contextId) {
   context = pluralize(context)
-  return (dispatch, getState, {axios}) =>
+  return (dispatch, _getState, {axios}) =>
     axios.get(`/api/v1/${context}/${contextId}/csp_settings`).then(response => {
       dispatch(setCspInheritedAction(response.data.inherited))
     })
@@ -192,7 +192,7 @@ export function addDomainBulkAction(domainsMap, opts = {}) {
 
 export function addDomain(context, contextId, domain, afterAdd = () => {}) {
   context = pluralize(context)
-  return (dispatch, getState, {axios}) => {
+  return (dispatch, _getState, {axios}) => {
     dispatch(addDomainAction(domain, 'account', {optimistic: true}))
     return axios
       .post(`/api/v1/${context}/${contextId}/csp_settings/domains`, {
@@ -209,7 +209,7 @@ export function addDomain(context, contextId, domain, afterAdd = () => {}) {
 
 export function getCurrentWhitelist(context, contextId) {
   context = pluralize(context)
-  return (dispatch, getState, {axios}) =>
+  return (dispatch, _getState, {axios}) =>
     axios.get(`/api/v1/${context}/${contextId}/csp_settings`).then(response => {
       const addDomainMap = {
         effective: response.data.effective_whitelist || [],
@@ -241,7 +241,7 @@ export function removeDomainAction(domain, opts = {}) {
 
 export function removeDomain(context, contextId, domain) {
   context = pluralize(context)
-  return (dispatch, getState, {axios}) => {
+  return (dispatch, _getState, {axios}) => {
     dispatch(removeDomainAction(domain, {optimistic: true}))
     return axios
       .delete(`/api/v1/${context}/${contextId}/csp_settings/domains?domain=${domain}`)

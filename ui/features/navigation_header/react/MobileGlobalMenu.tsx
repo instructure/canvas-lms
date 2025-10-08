@@ -115,14 +115,6 @@ export default function MobileGlobalMenu(props: Props) {
 
   const {mutate: switchExperience} = useSwitchExperience()
 
-  const showCareer = useMemo(() => {
-    const features = ENV.FEATURES
-    return (
-      hasCareerEnrollment &&
-      (features.horizon_learner_app || features.horizon_learning_provider_app_on_contextless_routes)
-    )
-  }, [hasCareerEnrollment])
-
   return (
     <View
       display="block"
@@ -366,7 +358,7 @@ export default function MobileGlobalMenu(props: Props) {
           </ToggleDetails>
         </List.Item>
 
-        {showCareer && (
+        {hasCareerEnrollment && (
           <List.Item>
             <Link
               href="/career"

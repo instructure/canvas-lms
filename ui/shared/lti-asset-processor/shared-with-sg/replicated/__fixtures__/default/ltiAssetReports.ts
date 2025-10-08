@@ -34,7 +34,6 @@ export function makeMockReport(
     processorId,
     resultTruncated: '',
     processingProgress: 'Processed',
-    reportType: 'originality',
     priority: 1,
     launchUrlPath: `/launch/report/${_id}`,
     comment: `comment for ${title}`,
@@ -56,7 +55,6 @@ export function defaultLtiAssetReports({
       _id: '1234',
       title: 'My OK Report',
       processorId: defaultLtiAssetProcessors[0]?._id || 'oops1',
-      reportType: 'type1',
       asset: {attachmentId, submissionAttempt},
     }),
     makeMockReport({
@@ -65,7 +63,6 @@ export function defaultLtiAssetReports({
       errorCode: 'ASSET_TOO_LARGE',
       processingProgress: 'Failed',
       processorId: defaultLtiAssetProcessors[1]?._id || 'oops2',
-      reportType: 'type2',
       asset: {attachmentId, submissionAttempt},
     }),
     makeMockReport({
@@ -73,7 +70,6 @@ export function defaultLtiAssetReports({
       title: 'My Pending Report',
       processingProgress: 'PendingManual',
       processorId: defaultLtiAssetProcessors[1]?._id || 'oops3',
-      reportType: 'type3',
       resubmitAvailable: true,
       asset: {attachmentId, submissionAttempt},
     }),

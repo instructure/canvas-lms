@@ -51,6 +51,9 @@ const buildProps = (overrides = {}) => ({
   itemType: 'external_url' as const,
   contentItems: mockContentItems,
   formErrors: {},
+  indentValue: 0,
+  onIndentChange: () => {},
+  moduleName: 'Test Module',
   ...overrides,
 })
 

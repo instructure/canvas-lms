@@ -104,7 +104,7 @@ describe "master courses banner" do
       end
 
       it "shows locked banner when locking", priority: "2" do
-        skip "Will be fixed in VICE-5431"
+        skip "Will be fixed in VICE-5431 2025-07-15"
         change_blueprint_settings(@master, content: true, points: true, due_dates: true, availability_dates: true)
         get "/courses/#{@master.id}/discussion_topics/#{@original_disc.id}"
         f(".bpc-lock-toggle button").click

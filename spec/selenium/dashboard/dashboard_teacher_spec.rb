@@ -255,67 +255,6 @@ describe "dashboard" do
       end
     end
 
-    describe "Todo Ignore Options Focus Management" do
-      before do
-        assignment = assignment_model({ submission_types: "online_text_entry", course: @course })
-        @student = user_with_pseudonym(active_user: true, username: "student@example.com", password: "qwertyuiop")
-        @course.enroll_user(@student, "StudentEnrollment", enrollment_state: "active")
-        assignment.submit_homework(@student, { submission_type: "online_text_entry", body: "ABC" })
-      end
-
-      def all_todo_links
-        ff(".to-do-list .disable_item_link")
-      end
-
-      it "focuses on the previous ignore link after ignoring a todo item", custom_timeout: 25, priority: "1" do
-        skip("LS-3421 -- multiple attempts not working here either")
-        assignment2 = assignment_model({ submission_types: "online_text_entry", course: @course })
-        assignment2.submit_homework(@student, { submission_type: "online_text_entry", body: "Number2" })
-        enable_cache do
-          get "/"
-
-          all_todo_links.last.click
-          wait_for_ajaximations
-
-          max_attempts = 5
-          num_attempts = 1
-
-          until all_todo_links.count == 1 || num_attempts == max_attempts
-            puts "Getting all todo links count attempt #{num_attempts}"
-            all_todo_links.last.click
-            wait_for_ajaximations
-
-            num_attempts += 1
-          end
-
-          expect(all_todo_links.count).to eq(1)
-          check_element_has_focus(all_todo_links.first)
-        end
-      end
-
-      it "focuses on the 'To Do' header if there are no other todo items", custom_timeout: 25, priority: "1" do
-        skip("LS-3421 flaky -- won't update on page properly")
-        enable_cache do
-          get "/"
-
-          f(".to-do-list .disable_item_link").click
-          wait_for_animations
-
-          max_attempts = 5
-          num_attempts = 1
-
-          until element_exists?(".to-do-list .disable_item_link") == false || num_attempts == max_attempts
-            puts "Getting all todo links count attempt #{num_attempts}"
-            f(".to-do-list .disable_item_link").click
-            wait_for_animations
-            num_attempts += 1
-          end
-
-          check_element_has_focus(f(".todo-list-header"))
-        end
-      end
-    end
-
     it "does not display assignment to grade in to do list for a designer", priority: "1" do
       course_with_designer_logged_in(active_all: true)
       assignment = assignment_model({ submission_types: "online_text_entry", course: @course })

@@ -23,7 +23,7 @@ import {Button} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
-
+import {usePublishing} from './publishing/publishingContext'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -71,6 +71,7 @@ const ContextModulesPublishMenu = ({
 
   const updateCurrentProgress_cb = useCallback(updateCurrentProgress, [shouldPublishModules])
 
+  const publishingContext = usePublishing()
   useEffect(() => {
     window.addEventListener('module-publish-models-ready', () => {
       setModelsReady(true)
@@ -99,6 +100,17 @@ const ContextModulesPublishMenu = ({
       return <IconPublishSolid size="x-small" color="success" />
     }
   }
+
+  useEffect(() => {
+    if (publishingContext) {
+      const {startPublishing, stopPublishing} = publishingContext
+      if (isPublishing) {
+        startPublishing()
+      } else {
+        stopPublishing()
+      }
+    }
+  }, [isPublishing, publishingContext])
 
   const reset = () => {
     disableContextModulesPublishMenu(false)
@@ -304,7 +316,6 @@ const ContextModulesPublishMenu = ({
       return 'unpublish_all_continue_button'
     }
   }
-
   return (
     <View textAlign="center">
       <Menu

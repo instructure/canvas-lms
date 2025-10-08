@@ -181,7 +181,11 @@ function ClearableDateTimeInput({
         margin="0 0 0 small"
         elementRef={e => (clearButtonContainer.current = e as HTMLElement)}
       >
-        <CondensedButton interaction={disabled ? 'disabled' : 'enabled'} onClick={handleClear}>
+        <CondensedButton
+          data-testid={`${id}_clear_button`}
+          interaction={disabled ? 'disabled' : 'enabled'}
+          onClick={handleClear}
+        >
           <AccessibleContent alt={clearButtonAltLabel}>{I18n.t('Clear')}</AccessibleContent>
         </CondensedButton>
       </Flex.Item>

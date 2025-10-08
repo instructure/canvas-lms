@@ -314,12 +314,6 @@
     "clear_image_3213fe62": {
         "message": "清除影像"
     },
-    "clear_selected_file_82388e50": {
-        "message": "清除所選擇的檔案"
-    },
-    "clear_selected_file_filename_2fe8a58e": {
-        "message": "清除所選擇的檔案：{ filename }"
-    },
     "click_or_shift_click_for_the_html_editor_25d70bb4": {
         "message": "點擊或按住 Shift 點擊調出 html 編輯器。"
     },

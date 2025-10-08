@@ -84,6 +84,9 @@ class TranslationController < ApplicationController
       tags = ["error:text_size_limit"]
       message = I18n.t("Couldn’t translate because the text is too long.")
       status = :unprocessable_entity
+    when Translation::UnsupportedLanguageError
+      message = I18n.t("The source or target language is not supported by the translation service.")
+      status = :unprocessable_entity
     else
       # Generic response for all other ServiceErrors
       tags = ["error:generic"]

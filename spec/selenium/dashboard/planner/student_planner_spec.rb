@@ -385,21 +385,6 @@ describe "student planner" do
       expect(format_date_for_view(@student_to_do.todo_date, :long)).to eq(day)
     end
 
-    it "adds date and time to a to-do item.", priority: "1" do
-      skip "FOO-3821 cf. https://github.com/instructure/instructure-ui/issues/1276"
-      go_to_list_view
-      todo_modal_button.click
-      modal = todo_sidebar_modal
-      element = ff("input", modal)[1]
-      element.click
-      fj("button:contains('15')").click
-      title_input.send_keys("the title")
-      time_input.click
-      fj("span[role=option]:contains('9:00 AM')").click
-      todo_save_button.click
-      expect(ff(".planner-item").last).to include_text "DUE: 9:00 AM"
-    end
-
     it "updates the sidebar when clicking on mutiple to-do items", priority: "1" do
       student_to_do2 = @student1.planner_notes.create!(todo_date: 5.minutes.from_now,
                                                        title: "Student to do 2")

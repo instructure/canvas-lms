@@ -17,12 +17,13 @@
  */
 
 import {gql} from '@apollo/client'
-import {arrayOf, bool, string, number} from 'prop-types'
+import {arrayOf, bool, string, number, object} from 'prop-types'
 
 import {GradingStandard} from './GradingStandard'
 import {Submission} from './Submission'
 import {Rubric} from '@canvas/assignments/graphql/student/Rubric'
 import {RubricAssociation} from '@canvas/assignments/graphql/student/RubricAssociation'
+import {LTI_ASSET_PROCESSORS_QUERY_NODES_FRAGMENT} from '@canvas/lti-asset-processor/shared-with-sg/replicated/queries/getLtiAssetProcessors'
 
 export const Assignment = {
   fragment: gql`
@@ -86,23 +87,14 @@ export const Assignment = {
         ...RubricAssociation
       }
       ltiAssetProcessorsConnection(first: 20) {
-        nodes {
-          _id
-          externalTool {
-            _id
-            name
-            labelFor(placement: ActivityAssetProcessor)
-          }
-          iconOrToolIconUrl
-          text
-          title
-        }
+        nodes { ...LtiAssetProcessorFragment }
       }
     }
     ${GradingStandard.fragment}
     ${Rubric.fragment}
     ${RubricAssociation.fragment}
     ${Submission.fragment}
+    ${LTI_ASSET_PROCESSORS_QUERY_NODES_FRAGMENT}
   `,
   shape: {
     _id: string,
@@ -158,17 +150,9 @@ export const Assignment = {
     rubric: Rubric.shape,
     rubricAssociation: RubricAssociation.shape,
     ltiAssetProcessorsConnection: {
-      nodes: arrayOf({
-        _id: string,
-        externalTool: {
-          _id: string,
-          name: string,
-          labelFor: string,
-        },
-        iconOrToolIconUrl: string,
-        text: string,
-        title: string,
-      }),
+      // Lti Asset Processor types use Zod schemas, so there's not really a
+      // need to replicate the full shape here.
+      nodes: arrayOf(object),
     },
   },
   mock: ({

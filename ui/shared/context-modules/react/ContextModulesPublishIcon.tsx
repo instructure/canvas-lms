@@ -58,7 +58,13 @@ const ContextModulesPublishIcon = ({
       paddingLeft: '0.25rem',
     }
     if (isPublishing) {
-      return <Spinner renderTitle={() => loadingMessage || I18n.t('working')} size="x-small" />
+      return (
+        <Spinner
+          renderTitle={() => loadingMessage || I18n.t('working')}
+          size="x-small"
+          data-testid="publish-icon-spinner"
+        />
+      )
     } else if (published) {
       return (
         <>

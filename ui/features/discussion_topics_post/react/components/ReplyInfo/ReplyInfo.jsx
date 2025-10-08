@@ -23,28 +23,12 @@ import {responsiveQuerySizes} from '../../utils'
 
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Responsive} from '@instructure/ui-responsive'
+import {getFullReplyText} from '../../utils/helpers'
 
 const I18n = createI18nScope('discussions_posts')
 
 export const ReplyInfo = props => {
-  const getFullText = () => {
-    return props.unreadCount > 0
-      ? I18n.t(
-          {
-            one: '%{replyCount} Reply, %{unreadCount} Unread',
-            other: '%{replyCount} Replies, %{unreadCount} Unread',
-          },
-          {
-            count: props.replyCount,
-            replyCount: props.replyCount,
-            unreadCount: props.unreadCount,
-          },
-        )
-      : I18n.t(
-          {one: '%{replyCount} Reply', other: '%{replyCount} Replies'},
-          {count: props.replyCount, replyCount: props.replyCount},
-        )
-  }
+  const fullText = getFullReplyText(props.replyCount, props.unreadCount)
 
   const getCondensedText = () => {
     return props.unreadCount > 0
@@ -72,11 +56,11 @@ export const ReplyInfo = props => {
       props={{
         mobile: {
           displayText: getCondensedText(),
-          screenReaderLabel: getFullText(),
+          screenReaderLabel: fullText,
         },
         desktop: {
-          displayText: getFullText(),
-          screenReaderLabel: getFullText(),
+          displayText: fullText,
+          screenReaderLabel: fullText,
         },
       }}
       render={responsiveProps => (

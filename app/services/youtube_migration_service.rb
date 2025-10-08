@@ -40,6 +40,7 @@ class YoutubeMigrationService
   ].freeze
   SCAN_TAG = "youtube_embed_scan"
   CONVERT_TAG = "youtube_embed_convert"
+  BULK_CONVERT_TAG = "youtube_embed_bulk_convert"
   STUDIO_LTI_TOOL_DOMAIN = "arc.instructure.com"
 
   class EmbedNotFoundError < StandardError; end
@@ -71,19 +72,25 @@ class YoutubeMigrationService
     service = new(progress.context)
     resources_with_embeds = service.scan_course_for_embeds
     total_count = resources_with_embeds.values.sum { |resource| resource[:count] || 0 }
-    progress.set_results({ resources: resources_with_embeds, total_count:, completed_at: Time.now.utc })
 
-    call_external_tool(progress.context, progress.id) if new_quizzes?(progress.context)
+    if new_quizzes?(progress.context)
+      progress.set_results({ resources: resources_with_embeds, total_count: })
+      progress.wait_for_external_tool!
+      call_external_tool(progress.context, progress.id)
+    else
+      progress.set_results({ resources: resources_with_embeds, total_count:, completed_at: Time.now.utc })
+    end
   rescue
     report_id = Canvas::Errors.capture_exception(:youtube_embed_scan, $ERROR_INFO)[:error_report]
     progress.set_results({ error_report_id: report_id, completed_at: Time.now.utc })
   end
 
   def self.call_external_tool(course, scan_id)
-    payload = Struct.new(:scan_id, :course_id, :external_context_id).new(
+    external_tool_id = course.assignments.active.type_quiz_lti.last.external_tool_tag.content_id
+    payload = Struct.new(:scan_id, :canvas_id, :external_tool_id).new(
       scan_id,
-      course.id,
-      course.lti_context_id
+      course.global_id,
+      external_tool_id
     )
     Canvas::LiveEvents.scan_youtube_links(payload)
   end
@@ -186,6 +193,33 @@ class YoutubeMigrationService
     convert_progress
   end
 
+  def convert_all_embeds(scan_progress_id)
+    scan_progress = YoutubeMigrationService.find_scan(course, scan_progress_id)
+    convert_selected_embeds(scan_progress.results[:resources].values.flat_map { |r| r[:embeds] }, scan_progress.id)
+  end
+
+  def convert_selected_embeds(embeds_list, scan_progress_id)
+    total_embeds = embeds_list.size
+    return nil if total_embeds.zero?
+
+    convert_progress = Progress.create!(
+      tag: BULK_CONVERT_TAG,
+      context: course,
+      message: "Converting #{total_embeds} YouTube embeds",
+      results: {
+        scan_progress_id:,
+        total_embeds:,
+        completed_embeds: 0,
+        failed_embeds: 0,
+        errors: []
+      }
+    )
+
+    n_strand = "youtube_embed_bulk_convert_#{convert_progress.id}"
+    convert_progress.process_job(YoutubeMigrationService, :perform_selected_conversions, { n_strand: }, course.id, scan_progress_id)
+    convert_progress
+  end
+
   def self.perform_conversion(progress, course_id, scan_id, embed, user_uuid: nil)
     course = Course.find(course_id)
     service = new(course)
@@ -202,7 +236,6 @@ class YoutubeMigrationService
 
     studio_embed_html = service.convert_youtube_to_studio(embed, studio_tool, user_uuid:)
     service.update_resource_content(embed, studio_embed_html)
-
     service.mark_embed_as_converted(scan_progress, embed)
     progress.set_results({
                            success: true,
@@ -212,6 +245,108 @@ class YoutubeMigrationService
   rescue => e
     report_id = Canvas::Errors.capture_exception(:youtube_embed_convert, e)[:error_report]
     progress.set_results({ error_report_id: report_id, completed_at: Time.now.utc })
+  end
+
+  def self.perform_all_conversions(progress, course_id, scan_progress_id)
+    results = progress.results.dup
+
+    begin
+      course = Course.find(course_id)
+      service = new(course)
+      studio_tool = service.find_studio_tool
+      if studio_tool.nil?
+        results[:error] = "Studio LTI tool not found for account"
+        results[:completed_at] = Time.now.utc
+        progress.set_results(results)
+        return
+      end
+      scan_progress = YoutubeMigrationService.find_scan(course, scan_progress_id)
+
+      all_embeds = []
+      scan_progress.results[:resources]&.each_value do |resource_data|
+        resource_data[:embeds]&.each do |embed|
+          all_embeds << embed
+        end
+      end
+      scan_progress.save
+
+      service.perform_embed_list_conversion(progress, scan_progress, studio_tool)
+    rescue => e
+      report_id = Canvas::Errors.capture_exception(:youtube_embed_bulk_convert, e)[:error_report]
+      results[:error_report_id] = report_id
+      results[:completed_at] = Time.now.utc
+      progress.set_results(results)
+    end
+  end
+
+  def self.perform_selected_conversions(progress, course_id, scan_progress_id)
+    course = Course.find(course_id)
+    service = new(course)
+    studio_tool = service.find_studio_tool
+    if studio_tool.nil?
+      results = progress.results.dup
+      results[:error] = "Studio LTI tool not found for account"
+      results[:completed_at] = Time.now.utc
+      progress.set_results(results)
+      return
+    end
+    scan_progress = YoutubeMigrationService.find_scan(course, scan_progress_id)
+
+    service.perform_embed_list_conversion(progress, scan_progress, studio_tool)
+  rescue => e
+    report_id = Canvas::Errors.capture_exception(:youtube_embed_bulk_convert, e)[:error_report]
+    results = progress.results.dup
+    results[:error_report_id] = report_id
+    results[:completed_at] = Time.now.utc
+    progress.set_results(results)
+  end
+
+  def perform_embed_list_conversion(progress, scan_progress, studio_tool)
+    embeds_list = scan_progress.results[:resources].values.flat_map { |r| r[:embeds] }
+    results = progress.results.dup
+    completed_embeds = results[:completed_embeds] || 0
+    failed_embeds = results[:failed_embeds] || 0
+    errors = results[:errors] || []
+    total_embeds = results[:total_embeds] || embeds_list.size
+
+    embeds_list.each do |embed|
+      begin
+        studio_embed_html = convert_youtube_to_studio(embed, studio_tool)
+        update_resource_content(embed, studio_embed_html)
+        mark_embed_as_converted(scan_progress, embed)
+
+        completed_embeds += 1
+      rescue => e
+        failed_embeds += 1
+        error_report = Canvas::Errors.capture_exception(:youtube_embed_bulk_convert, e)
+        error_info = {
+          embed_src: embed[:src],
+          resource_type: embed[:resource_type],
+          resource_id: embed[:id],
+          error_report_id: error_report[:error_report],
+          error_message: e.message
+        }
+        errors << error_info
+      end
+
+      results.merge!({
+                       completed_embeds:,
+                       failed_embeds:,
+                       errors:,
+                       progress_percentage: ((completed_embeds + failed_embeds).to_f / total_embeds * 100).round(2)
+                     })
+      progress.set_results(results)
+    end
+
+    results.merge!({
+                     success: failed_embeds == 0,
+                     completed_embeds:,
+                     failed_embeds:,
+                     errors:,
+                     progress_percentage: ((completed_embeds + failed_embeds).to_f / total_embeds * 100).round(2),
+                     completed_at: Time.now.utc
+                   })
+    progress.set_results(results)
   end
 
   def scan_course_for_embeds
@@ -534,6 +669,47 @@ class YoutubeMigrationService
       scan_progress.save!
     else
       raise EmbedNotFoundError, "Embed not found for resource type: #{embed[:resource_type]}, id: #{embed[:id]}, src: #{embed[:src]}"
+    end
+  end
+
+  def process_new_quizzes_scan_update(scan_id, new_quizzes_scan_status:, new_quizzes_scan_results: {})
+    progress = self.class.find_scan(course, scan_id)
+    results = progress.results || {}
+    results[:new_quizzes_scan_status] = new_quizzes_scan_status
+
+    begin
+      if new_quizzes_scan_status == "completed"
+        scan_results = (new_quizzes_scan_results || {}).deep_symbolize_keys
+        new_quizzes_resources = {}
+
+        resources_array = scan_results[:resources] || []
+        resources_array.each do |resource|
+          key = YoutubeMigrationService.generate_resource_key(resource[:type], resource[:id])
+          new_quizzes_resources[key] = resource
+        end
+
+        merged_resources = (results[:resources] || {}).merge(new_quizzes_resources)
+        merged_total_count = (results[:total_count] || 0).to_i + (scan_results[:total_count] || 0).to_i
+
+        results[:resources] = merged_resources
+        results[:total_count] = merged_total_count
+      end
+
+      results[:completed_at] = Time.now.utc
+      progress.set_results(results)
+      progress.complete! if progress.waiting_for_external_tool?
+    rescue => e
+      results[:new_quizzes_scan_status] = "failed"
+      results[:completed_at] = Time.now.utc
+      progress.set_results(results)
+      progress.complete! if progress.waiting_for_external_tool?
+
+      Canvas::Errors.capture(:youtube_migration_new_quizzes_scan_error, {
+                               course_id: course.id,
+                               scan_id: progress.id,
+                               error: e.message,
+                               message: "Error processing new quizzes scan update"
+                             })
     end
   end
 end

@@ -21,7 +21,7 @@
 module Factories
   def wiki_page_model(opts = {})
     context = opts.delete(:course) || opts.delete(:context) || @course || (course_with_student(active_all: true) && @course)
-    opts = opts.slice(:title, :body, :url, :user_id, :user, :saving_user, :editing_roles, :notify_of_update, :todo_date)
+    opts = opts.slice(:title, :body, :url, :user_id, :user, :saving_user, :updating_user, :editing_roles, :notify_of_update, :todo_date)
     @page = context.wiki_pages.create!(valid_wiki_page_attributes.merge(opts))
   end
 

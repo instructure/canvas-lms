@@ -30,9 +30,10 @@ import {
   StudentRollupData,
   Pagination,
 } from '../types/rollup'
-import {DEFAULT_STUDENTS_PER_PAGE, SortOrder, SortBy} from '../utils/constants'
+import {DEFAULT_STUDENTS_PER_PAGE, SortOrder, SortBy, GradebookSettings} from '../utils/constants'
 import {Sorting} from '../types/shapes'
 import axios from '@canvas/axios'
+import {mapSettingsToFilters} from '../utils/filter'
 
 const I18n = createI18nScope('OutcomeManagement')
 
@@ -43,13 +44,13 @@ interface UseRollupsProps {
   studentsPerPage?: number
   sortOrder?: SortOrder
   sortBy?: SortBy
+  settings?: GradebookSettings | null
+  enabled?: boolean
 }
 
 interface UseRollupsReturn extends RollupData {
   isLoading: boolean
   error: null | string
-  gradebookFilters: string[]
-  setGradebookFilters: React.Dispatch<React.SetStateAction<string[]>>
   currentPage: number
   setCurrentPage: (page: number) => void
   studentsPerPage: number
@@ -115,10 +116,11 @@ export default function useRollups({
   studentsPerPage: studentsPerPageProp = DEFAULT_STUDENTS_PER_PAGE,
   sortOrder: sortOrderProp = SortOrder.ASC,
   sortBy: sortByProp = SortBy.SortableName,
+  settings = null,
+  enabled = true,
 }: UseRollupsProps): UseRollupsReturn {
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [error, setError] = useState<null | string>(null)
-  const [gradebookFilters, setGradebookFilters] = useState<string[]>([])
   const [currentPage, setCurrentPage] = useState<number>(currentPageProp)
   const [data, setData] = useState<RollupData>({
     rollups: [],
@@ -132,12 +134,16 @@ export default function useRollups({
   const needMasteryAndColorDefaults = !accountMasteryScalesEnabled
 
   useEffect(() => {
+    if (!enabled) {
+      setIsLoading(true)
+      return
+    }
     ;(async () => {
       try {
         setIsLoading(true)
         const {data} = (await loadRollups(
           courseId,
-          gradebookFilters,
+          settings ? mapSettingsToFilters(settings) : [],
           needMasteryAndColorDefaults,
           currentPage,
           studentsPerPage,
@@ -171,11 +177,12 @@ export default function useRollups({
   }, [
     courseId,
     needMasteryAndColorDefaults,
-    gradebookFilters,
     currentPage,
     studentsPerPage,
     sortOrder,
     sortBy,
+    settings,
+    enabled,
   ])
 
   return {
@@ -184,8 +191,6 @@ export default function useRollups({
     students: data.students,
     outcomes: data.outcomes,
     rollups: data.rollups,
-    gradebookFilters,
-    setGradebookFilters,
     pagination: data.pagination ? {...data.pagination, perPage: studentsPerPage} : undefined,
     currentPage,
     setCurrentPage,

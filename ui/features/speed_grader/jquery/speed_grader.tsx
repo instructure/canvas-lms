@@ -1052,16 +1052,11 @@ export function renderLtiAssetReports(
     student = {studentUserId: null, studentAnonymousId: submission.anonymous_id}
   }
 
-  const {attempt, submission_type: submissionType} = historicalSubmission
+  const {attempt, submission_type} = historicalSubmission
   const assignmentId = submission.assignment_id
+  const submissionType = ensureCompatibleSubmissionType(submission_type)
 
-  if (
-    student &&
-    assignmentId &&
-    attempt &&
-    submissionType &&
-    ensureCompatibleSubmissionType(submissionType)
-  ) {
+  if (student && assignmentId && attempt && submissionType) {
     const attachments = (historicalSubmission.versioned_attachments || []).map(({attachment}) => ({
       _id: attachment.id,
       displayName: attachment.display_name,

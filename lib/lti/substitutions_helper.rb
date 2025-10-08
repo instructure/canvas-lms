@@ -325,43 +325,45 @@ module Lti
       # we can cache on the last migration because even if copies are done elsewhere they won't affect anything
       # until a new copy is made to _this_ course
       Rails.cache.fetch(["recursive_copied_course_lti_context_ids", course.global_id, last_migration_id, use_alternate_settings].cache_key) do
-        # Finds content migrations for this course and recursively, all content
-        # migrations for the source course of the migration -- that is, all
-        # content migrations that directly or indirectly provided content to
-        # this course. From there we get the unique list of courses, ordering by
-        # which has the migration with the latest timestamp.
-        results = Course.transaction do
-          Course.connection.statement_timeout = 30 # seconds
-          Course.connection.set("cpu_tuple_cost", 0.2, local: true) if use_alternate_settings
-          Course.from(<<~SQL.squish)
-            (WITH RECURSIVE all_contexts AS (
-              SELECT context_id, source_course_id
-              FROM #{ContentMigration.quoted_table_name}
-              WHERE context_id=#{course.id}
-              UNION
-              SELECT content_migrations.context_id, content_migrations.source_course_id
-              FROM #{ContentMigration.quoted_table_name}
-                INNER JOIN all_contexts t ON content_migrations.context_id = t.source_course_id
-            )
-            SELECT DISTINCT ON (courses.lti_context_id) courses.id, ct.finished_at, courses.lti_context_id
-            FROM #{Course.quoted_table_name}
-            INNER JOIN #{ContentMigration.quoted_table_name} ct
-            ON ct.source_course_id = courses.id
-            AND ct.workflow_state = 'imported'
-            AND (ct.context_id IN (
-              SELECT x.context_id
-              FROM all_contexts x))
-            ORDER BY courses.lti_context_id, ct.finished_at DESC
-            ) as courses
-          SQL
-                .where.not(lti_context_id: nil).order(finished_at: :desc).limit(limit + 1).pluck(:lti_context_id)
-        end
+        GuardRail.activate(:secondary) do
+          # Finds content migrations for this course and recursively, all content
+          # migrations for the source course of the migration -- that is, all
+          # content migrations that directly or indirectly provided content to
+          # this course. From there we get the unique list of courses, ordering by
+          # which has the migration with the latest timestamp.
+          results = Course.transaction do
+            Course.connection.statement_timeout = 30 # seconds
+            Course.connection.set("cpu_tuple_cost", 0.2, local: true) if use_alternate_settings
+            Course.from(<<~SQL.squish)
+              (WITH RECURSIVE all_contexts AS (
+                SELECT context_id, source_course_id
+                FROM #{ContentMigration.quoted_table_name}
+                WHERE context_id=#{course.id}
+                UNION
+                SELECT content_migrations.context_id, content_migrations.source_course_id
+                FROM #{ContentMigration.quoted_table_name}
+                  INNER JOIN all_contexts t ON content_migrations.context_id = t.source_course_id
+              )
+              SELECT DISTINCT ON (courses.lti_context_id) courses.id, ct.finished_at, courses.lti_context_id
+              FROM #{Course.quoted_table_name}
+              INNER JOIN #{ContentMigration.quoted_table_name} ct
+              ON ct.source_course_id = courses.id
+              AND ct.workflow_state = 'imported'
+              AND (ct.context_id IN (
+                SELECT x.context_id
+                FROM all_contexts x))
+              ORDER BY courses.lti_context_id, ct.finished_at DESC
+              ) as courses
+            SQL
+                  .where.not(lti_context_id: nil).order(finished_at: :desc).limit(limit + 1).pluck(:lti_context_id)
+          end
 
-        # We discovered that at around 3000 lti_context_ids, the form data gets too
-        # big and breaks the LTI launch. We decided to truncate after 1000 and note
-        # it in the launch as "truncated"
-        results = results.first(limit) << "truncated" if results.length > limit
-        results.join(",")
+          # We discovered that at around 3000 lti_context_ids, the form data gets too
+          # big and breaks the LTI launch. We decided to truncate after 1000 and note
+          # it in the launch as "truncated"
+          results = results.first(limit) << "truncated" if results.length > limit
+          results.join(",")
+        end
       rescue ActiveRecord::QueryCanceled
         "timed out"
       end

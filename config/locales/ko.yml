@@ -712,6 +712,10 @@ ko:
             start: 
               parameters: 
                 header: "시작 날짜:"
+    edp_student_activity_csv_parameters: 
+      custom_reports: 
+        edp: 
+          all_terms: "모든 학기"
     find_not_authorized: "%{type}을(를) 액세스할 권한이 없음"
     find_not_found: "해당 ID를 가진 %{type}을(를) 찾을 수 없음"
     grade_export_csv_description: 
@@ -7322,6 +7326,7 @@ ko:
   is_invalid_702840b6: "올바르지 않습니다"
   is_reserved_5f0516e4: 예약되었습니다
   items_items_selected_5b55e566: "%{items}개의 항목 선택됨"
+  job_handler_9d3d1007: "작업 처리기"
   jobs: 
     columns: 
       attempt: 시도
@@ -12617,6 +12622,7 @@ ko:
   select_course_5b549441: "과목 선택"
   select_navigation_links_68e1e924: "탐색 링크 선택"
   select_one_8e0af564: "하나 선택"
+  select_profile_picture_172176b6: "프로필 사진 선택"
   select_question_bank_508e5c08: "문제 은행 선택"
   select_the_file_you_want_to_associate_with_this_mo_c88fcd46: "이 *모듈*에 연결하려는 파일을 선택하거나 \"새 파일\"을 선택해서 파일을 추가하십시오."
   selected_answer: "이 답변을 선택했습니다."
@@ -13338,6 +13344,7 @@ ko:
   show_by_type_c5d61732: "종류별로 정렬"
   show_calendar_events_in_the_month_view_on_multiple_e94c33ae: "달력 월별 보기에서 행사 제목이 한 줄에 들어가지 않는 경우 여러 줄로 나타내기"
   show_concluded_enrollments_6a05544c: "종결된 등록 표시"
+  show_d6f24222: 표시
   show_less_f778dab5: "간단히 표시"
   show_more_fae1328: "자세히 표시"
   showing_cceab2d9: "표시 중"

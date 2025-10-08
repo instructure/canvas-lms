@@ -51,6 +51,7 @@ module GraphQLNodeLoader
         return nil unless user && ctx[:current_user]
 
         return user if user.grants_right?(ctx[:current_user], :read_full_profile)
+        return user if user.grants_right?(ctx[:current_user], :read)
         return user if user == ctx[:current_user]
 
         has_permission = Rails.cache.fetch(["node_user_perm", ctx[:current_user], user].cache_key) do

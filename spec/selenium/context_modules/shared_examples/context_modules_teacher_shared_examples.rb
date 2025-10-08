@@ -431,7 +431,7 @@ shared_examples_for "context modules for teachers" do
     end
 
     it "does not indicate multiple due dates if the sections' dates are the same" do
-      skip("needs to ignore base if all visible sections are overridden")
+      skip("2025-04-11 needs to ignore base if all visible sections are overridden LX-3349")
       modules = create_modules(1, true)
       modules[0].add_item({ id: @assignment.id, type: "assignment" })
 
@@ -466,7 +466,7 @@ shared_examples_for "context modules for teachers" do
     end
 
     it "only uses the sections the user is restricted to" do
-      skip("needs to ignore base if all visible sections are overridden")
+      skip("2025-04-11 needs to ignore base if all visible sections are overridden LX-3349")
       modules = create_modules(1, true)
       modules[0].add_item({ id: @assignment.id, type: "assignment" })
 

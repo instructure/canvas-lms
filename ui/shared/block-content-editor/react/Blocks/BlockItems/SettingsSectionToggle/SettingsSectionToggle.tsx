@@ -17,8 +17,8 @@
  */
 
 import {ToggleGroup} from '@instructure/ui-toggle-details'
-import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {Heading} from '@instructure/ui-heading'
 import './settings-section-toggle.css'
 
 export type SettingsSectionToggleProps = {
@@ -45,7 +45,11 @@ export const SettingsSectionToggle = ({
         border={false}
         transition={false}
         toggleLabel={isExpanded => (isExpanded ? expandedLabel : collapsedLabel)}
-        summary={<Text variant="contentImportant">{title}</Text>}
+        summary={
+          <Heading variant="titleCardMini" level="h3">
+            {title}
+          </Heading>
+        }
         data-settingssectiontoggle
         themeOverride={{
           borderColor: 'transparent',

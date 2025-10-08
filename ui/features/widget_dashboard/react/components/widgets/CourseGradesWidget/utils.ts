@@ -67,3 +67,18 @@ export const getCourseCodeColor = (gridIndex?: number, code?: string): CourseCod
 export const createGradebookHandler = (courseId: string) => () => {
   window.open(URL_PATTERNS.GRADEBOOK.replace('{courseId}', courseId), '_blank')
 }
+
+export const convertToLetterGrade = (
+  numericGrade: number,
+  gradingStandardData: Array<[string, number]>,
+): string => {
+  const gradeAsDecimal = numericGrade / 100
+
+  for (const [letter, minScore] of gradingStandardData) {
+    if (gradeAsDecimal >= minScore) {
+      return letter
+    }
+  }
+
+  return gradingStandardData[gradingStandardData.length - 1]?.[0] || 'F'
+}

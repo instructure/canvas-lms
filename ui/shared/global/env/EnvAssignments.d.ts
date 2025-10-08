@@ -22,6 +22,7 @@
  * From assignments_controller.rb
  */
 export type EnvAssignments = Partial<EnvAssignmentsA2StudentView> &
+  Partial<EnvAssignmentsA2TeacherView> &
   Partial<EnvAssignmentsDefaultToolInfo>
 
 /**
@@ -69,6 +70,10 @@ export interface EnvAssignmentsA2StudentView {
   SECTION_LIST?: EnvSection[]
   HAS_GRADING_PERIODS?: boolean
   active_grading_periods?: any[]
+}
+
+export interface EnvAssignmentsA2TeacherView {
+  PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED: boolean
 }
 
 /**

@@ -63,15 +63,6 @@ describe "Canvadoc" do
       expect(fj("#settings_annotations_supported:visible")).to be_displayed
     end
 
-    it "allows annotations settings to be saved", priority: "1" do
-      skip "CAS-918 (8/25/2022)"
-
-      turn_on_plugin_settings
-      fj("#settings_annotations_supported").click
-      f(".save_button").click
-      assert_flash_notice_message("Plugin settings successfully updated.")
-    end
-
     it "embed canvadocs in wiki page", priority: "1" do
       course_with_teacher_logged_in account: @account, active_all: true
       @course.wiki_pages.create!(title: "Page1")

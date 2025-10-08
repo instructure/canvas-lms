@@ -60,6 +60,7 @@ import {
   SearchContext,
   isSpeedGraderInTopUrl,
 } from './utils/constants'
+import {PinnedContainer} from './components/PinnedContainer'
 
 const I18n = createI18nScope('discussion_topics_post')
 const SEARCH_INPUT_SELECTOR = '#discussion-drawer-layout input[data-testid="search-filter"]'
@@ -568,6 +569,13 @@ const DiscussionTopicManager = props => {
                         isSubmitting={isSubmitting}
                       />
 
+                      {ENV.discussion_pin_post && (
+                        <PinnedContainer
+                          entries={discussionTopicQuery?.data?.legacyNode?.pinnedEntries || []}
+                          topic={discussionTopicQuery.data.legacyNode}
+                          breakpoints={props.breakpoints}
+                        />
+                      )}
                       {discussionTopicQuery.data.legacyNode.discussionEntriesConnection.nodes
                         .length === 0 &&
                       (searchTerm || filter === 'unread') ? (

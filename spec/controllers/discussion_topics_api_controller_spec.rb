@@ -993,18 +993,18 @@ describe DiscussionTopicsApiController do
 
       expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("discussion_topic.migrate_disallow_manage.count").exactly(:once)
       expect(InstStatsd::Statsd)
-        .to have_received(:gauge)
+        .to have_received(:distributed_increment)
         .with(
-          "discussion_topic.migrate_disallow_manage.discussions_updated",
+          "discussion_topic.migrate_disallow_manage.discussions_updated_count",
           1,
           tags: { type: DiscussionTopic::DiscussionTypes::THREADED }
         )
         .once
 
       expect(InstStatsd::Statsd)
-        .to have_received(:gauge)
+        .to have_received(:distributed_increment)
         .with(
-          "discussion_topic.migrate_disallow_manage.discussions_updated",
+          "discussion_topic.migrate_disallow_manage.discussions_updated_count",
           1,
           tags: { type: DiscussionTopic::DiscussionTypes::NOT_THREADED }
         )

@@ -134,13 +134,6 @@ describe "editing a quiz" do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
         delete_quiz
       end
-
-      it "publishes the quiz", priority: "1" do
-        skip_if_chrome("research")
-        get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-        f("#quiz-publish-link.btn-publish").click
-        expect(f("#quiz-publish-link")).to include_text "Unpublish"
-      end
     end
 
     it "hides question form when cancelling edit", priority: "1" do

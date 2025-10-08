@@ -255,6 +255,14 @@ describe Assignment do
         assignment.update!(due_at: 2.months.from_now)
       end
 
+      it "does not create a ScheduledSmartAlert if assignment is not published" do
+        assignment = @course.assignments.new(assignment_valid_attributes)
+        assignment.workflow_state = "unpublished"
+        expect(ScheduledSmartAlert).not_to receive(:upsert)
+
+        assignment.update!(due_at: 1.day.from_now)
+      end
+
       it "deletes the ScheduledSmartAlert if the due date is removed" do
         assignment = @course.assignments.new(assignment_valid_attributes)
         assignment.update!(due_at: 1.day.from_now)
@@ -2737,6 +2745,42 @@ describe Assignment do
       @assignment.reload
       decoded = Canvas::Security.decode_jwt(@assignment.secure_params)
       expect(decoded[:description]).to be_nil
+    end
+  end
+
+  describe ".secure_params" do
+    it "generates a JWT with a new UUID when no lti_context_id provided" do
+      jwt = Assignment.secure_params
+      decoded = Canvas::Security.decode_jwt(jwt)
+
+      expect(decoded[:lti_assignment_id]).to be_present
+      expect(decoded[:lti_assignment_id]).to match(/\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/)
+    end
+
+    it "uses provided lti_context_id when given" do
+      custom_id = "custom-lti-id"
+      jwt = Assignment.secure_params(custom_id)
+      decoded = Canvas::Security.decode_jwt(jwt)
+
+      expect(decoded[:lti_assignment_id]).to eq(custom_id)
+    end
+
+    it "includes description when provided" do
+      description = "Test assignment description"
+      jwt = Assignment.secure_params(nil, description)
+      decoded = Canvas::Security.decode_jwt(jwt)
+
+      expect(decoded[:lti_assignment_description]).to eq(description)
+    end
+
+    it "generates different UUIDs for multiple calls" do
+      jwt1 = Assignment.secure_params
+      jwt2 = Assignment.secure_params
+
+      decoded1 = Canvas::Security.decode_jwt(jwt1)
+      decoded2 = Canvas::Security.decode_jwt(jwt2)
+
+      expect(decoded1[:lti_assignment_id]).not_to eq(decoded2[:lti_assignment_id])
     end
   end
 
@@ -6378,6 +6422,44 @@ describe Assignment do
         @a.submission_types = "postal_delivery_of_an_elephant"
         expect(@a.quiz?).to be false
       end
+    end
+  end
+
+  describe "#rollcall_assignment?" do
+    it "returns true when submission_types is external_tool and title is Roll Call Attendance" do
+      assignment_model(
+        submission_types: "external_tool",
+        title: "Roll Call Attendance",
+        course: @course
+      )
+      expect(@a.rollcall_assignment?).to be true
+    end
+
+    it "returns false when submission_types is external_tool but title is not Roll Call Attendance" do
+      assignment_model(
+        submission_types: "external_tool",
+        title: "Some Other Title",
+        course: @course
+      )
+      expect(@a.rollcall_assignment?).to be false
+    end
+
+    it "returns false when title is Roll Call Attendance but submission_types is not external_tool" do
+      assignment_model(
+        submission_types: "online_upload",
+        title: "Roll Call Attendance",
+        course: @course
+      )
+      expect(@a.rollcall_assignment?).to be false
+    end
+
+    it "returns false when neither condition is met" do
+      assignment_model(
+        submission_types: "online_upload",
+        title: "Regular Assignment",
+        course: @course
+      )
+      expect(@a.rollcall_assignment?).to be false
     end
   end
 
@@ -10511,7 +10593,16 @@ describe Assignment do
           }
         end
 
-        it "broadcasts a notification for teachers" do
+        it "does not broadcast a notification for instructors that are not actively participating" do
+          teacher_enrollment.enrollment_state.update!(state: "inactive")
+          expect do
+            assignment.post_submissions(posting_params: { graded_only: false })
+          end.not_to change {
+            submissions_posted_messages.where(communication_channel: teacher.communication_channels).count
+          }
+        end
+
+        it "broadcasts a notification for actively participating instructors" do
           expect do
             assignment.post_submissions(posting_params: { graded_only: false })
           end.to change {
@@ -12964,6 +13055,95 @@ describe Assignment do
       expect do
         other_assignment.restore_module_content_tags_to(new_assignment: other_duplicate)
       end.not_to change { ContentTag.count }
+    end
+  end
+
+  describe "new_quizzes_type" do
+    before :once do
+      assignment_model(submission_types: "online_quiz", course: @course)
+      tool = @c.context_external_tools.create!(
+        name: "Quizzes.Next",
+        consumer_key: "test_key",
+        shared_secret: "test_secret",
+        tool_id: "Quizzes 2",
+        url: "http://example.com/launch"
+      )
+      @assignment.external_tool_tag_attributes = { content: tool }
+      @assignment.quiz_lti! && @assignment.save!
+    end
+
+    context "when the new_quizzes_surveys feature is disabled" do
+      before do
+        allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(false)
+      end
+
+      it "assignment is valid" do
+        @assignment.new_quizzes_type = "anything"
+        expect(@assignment).to be_valid
+      end
+    end
+
+    context "when the new_quizzes_surveys feature is enabled" do
+      before do
+        allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(true)
+      end
+
+      it "assignment is valid if no new_quizzes_type is set" do
+        @assignment.settings = nil
+        expect(@assignment).to be_valid
+        @assignment.settings = {}
+        expect(@assignment).to be_valid
+        @assignment.settings = { "new_quizzes" => nil }
+        expect(@assignment).to be_valid
+      end
+
+      it "sets the settings->new_quizzes->type attribute when settings is nil" do
+        @assignment.settings = nil
+        @assignment.new_quizzes_type = "graded_survey"
+        expect(@assignment.new_quizzes_type).to eq("graded_survey")
+        expect(@assignment.settings).to eq({ "new_quizzes" => { "type" => "graded_survey" } })
+        expect(@assignment).to be_valid
+      end
+
+      it "sets the settings->new_quizzes->type attribute when new_quizzes key does not exist" do
+        @assignment.settings = {}
+        @assignment.new_quizzes_type = "ungraded_survey"
+        expect(@assignment.new_quizzes_type).to eq("ungraded_survey")
+        expect(@assignment.settings).to eq({ "new_quizzes" => { "type" => "ungraded_survey" } })
+        expect(@assignment).to be_valid
+      end
+
+      it "sets the settings->new_quizzes->type attribute when new_quizzes key already exists and empty" do
+        @assignment.settings = { "new_quizzes" => nil }
+        @assignment.new_quizzes_type = "ungraded_survey"
+        expect(@assignment.new_quizzes_type).to eq("ungraded_survey")
+        expect(@assignment.settings).to eq({ "new_quizzes" => { "type" => "ungraded_survey" } })
+        expect(@assignment).to be_valid
+      end
+
+      it "leaves the existing other keys in tact" do
+        @assignment.settings = { "another_key" => 123, "new_quizzes" => { "other_key" => "other_value" } }
+        @assignment.new_quizzes_type = "graded_survey"
+        expect(@assignment.new_quizzes_type).to eq("graded_survey")
+        expect(@assignment.settings).to eq({ "another_key" => 123, "new_quizzes" => { "other_key" => "other_value", "type" => "graded_survey" } })
+        expect(@assignment).to be_valid
+      end
+
+      it "gives validation error" do
+        @assignment.new_quizzes_type = "invalid_type"
+        expect(@assignment.new_quizzes_type).to eq("invalid_type")
+        expect(@assignment).not_to be_valid
+      end
+
+      it "overwrites existing type with new type" do
+        @assignment.settings = { "new_quizzes" => { "type" => "old_value", "other_key" => "other_value" } }
+        @assignment.new_quizzes_type = "graded_survey"
+        expect(@assignment.new_quizzes_type).to eq("graded_survey")
+        expect(@assignment.settings).to eq({ "new_quizzes" => { "other_key" => "other_value", "type" => "graded_survey" } })
+        expect(@assignment).to be_valid
+      end
     end
   end
 end

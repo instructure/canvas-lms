@@ -254,13 +254,19 @@ export const handleOpeningEditItemModal = (
   moduleId: string,
   moduleItemId: string,
 ) => {
-  const queryData = queryClient.getQueryData<PaginatedNavigationResponse>([
-    MODULE_ITEMS,
-    moduleId,
-    null,
-  ])
-  if (!queryData) return
-  const moduleItem = queryData.moduleItems.find((item: any) => item._id === moduleItemId)
+  const queries = queryClient.getQueriesData<PaginatedNavigationResponse>({
+    queryKey: [MODULE_ITEMS, moduleId],
+  })
+
+  let moduleItem: ModuleItem | null = null
+  for (const [, data] of queries) {
+    if (!data) continue
+    const found = data.moduleItems?.find((i: any) => i._id === moduleItemId)
+    if (found) {
+      moduleItem = found
+      break
+    }
+  }
   if (!moduleItem) return
   const itemProps = {
     courseId,

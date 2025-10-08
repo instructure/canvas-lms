@@ -17,10 +17,16 @@
  */
 
 import FilePreview from '../FilePreview'
-import {fireEvent, render, screen} from '@testing-library/react'
+import {fireEvent, render, screen, act} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import {mockSubmission} from '@canvas/assignments/graphql/studentMocks'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
+import {
+  defaultGetLtiAssetProcessorsAndReportsForStudentResult,
+  defaultLtiAssetReportsForStudent,
+} from '@canvas/lti-asset-processor/queries/__fixtures__/LtiAssetProcessorsAndReportsForStudent'
 
 const files = [
   {
@@ -86,7 +92,8 @@ let originalEnv
 describe('FilePreview', () => {
   beforeEach(() => {
     originalEnv = global.ENV
-    global.ENV = {...originalEnv}
+    global.ENV = {...originalEnv, FEATURES: {lti_asset_processor: true}}
+    jest.clearAllMocks()
   })
 
   afterEach(() => {
@@ -99,7 +106,11 @@ describe('FilePreview', () => {
         Submission: {attachments: []},
       }),
     }
-    render(<FilePreview {...props} />)
+    render(
+      <MockedQueryProvider>
+        <FilePreview {...props} />
+      </MockedQueryProvider>,
+    )
 
     expect(screen.getByText('No Submission')).toBeInTheDocument()
   })
@@ -110,7 +121,11 @@ describe('FilePreview', () => {
         Submission: {attachments: files},
       }),
     }
-    const {container} = render(<FilePreview {...props} />)
+    const {container} = render(
+      <MockedQueryProvider>
+        <FilePreview {...props} />
+      </MockedQueryProvider>,
+    )
 
     expect(screen.getByTestId('uploaded_files_table')).toBeInTheDocument()
 
@@ -131,7 +146,11 @@ describe('FilePreview', () => {
         Submission: {attachments: [files[0]]},
       }),
     }
-    render(<FilePreview {...props} />)
+    render(
+      <MockedQueryProvider>
+        <FilePreview {...props} />
+      </MockedQueryProvider>,
+    )
 
     expect(screen.queryByTestId('assignments_2_file_icons')).not.toBeInTheDocument()
   })
@@ -143,7 +162,11 @@ describe('FilePreview', () => {
       }),
       isOriginalityReportVisible: true,
     }
-    render(<FilePreview {...props} />)
+    render(
+      <MockedQueryProvider>
+        <FilePreview {...props} />
+      </MockedQueryProvider>,
+    )
 
     const reports = screen.getAllByTestId('originality_report')
 
@@ -159,7 +182,11 @@ describe('FilePreview', () => {
       }),
       isOriginalityReportVisible: true,
     }
-    render(<FilePreview {...props} />)
+    render(
+      <MockedQueryProvider>
+        <FilePreview {...props} />
+      </MockedQueryProvider>,
+    )
 
     expect(screen.queryByTestId('originality_report')).not.toBeInTheDocument()
   })
@@ -175,63 +202,67 @@ describe('FilePreview', () => {
       }),
       isOriginalityReportVisible: false,
     }
-    render(<FilePreview {...props} />)
+    render(
+      <MockedQueryProvider>
+        <FilePreview {...props} />
+      </MockedQueryProvider>,
+    )
 
     expect(screen.queryByTestId('originality_report')).not.toBeInTheDocument()
   })
 
-  it('renders the Document Processors column header and AssetReportStatus when ASSET_PROCESSORS and ASSET_REPORTS are available', async () => {
+  it('renders the Document Processors column header and AssetReportStatus when asset processors and reports are available', async () => {
     const user = userEvent.setup()
-    global.ENV.ASSET_PROCESSORS = [{id: 'processor1', tool_name: 'Processor 1'}]
-    global.ENV.ASSET_REPORTS = [
-      {asset: {attachment_id: '1'}, priority: 0},
-      {asset: {attachment_id: '2'}, priority: 1},
-      {asset: {attachment_id: '3'}, priority: 0},
-    ]
-    global.ENV.ASSIGNMENT_NAME = 'Test Assignment'
+
+    // Mock the GraphQL query to return fixture data with reports for each file
+    const mockData = defaultGetLtiAssetProcessorsAndReportsForStudentResult()
+    // Create reports with different attachmentIds matching our test files
+    mockData.submission.ltiAssetReportsConnection.nodes = files.flatMap(file =>
+      defaultLtiAssetReportsForStudent({attachmentId: file._id, attachmentName: file.displayName}),
+    )
+
+    queryClient.setQueryData(['ltiAssetProcessorsAndReportsForStudent', '1'], mockData)
+
     const props = {
       submission: await mockSubmissionWithResolvers({
-        Submission: {attachments: files, submissionType: 'online_upload'},
+        Submission: {attachments: files, submissionType: 'online_upload', attempt: 1},
       }),
     }
 
-    render(<FilePreview {...props} />)
+    render(
+      <MockedQueryProvider>
+        <FilePreview {...props} />
+      </MockedQueryProvider>,
+    )
 
-    expect(screen.getByText('Document Processors')).toBeInTheDocument()
-    const assetReportCells = screen
-      .getAllByTestId('uploaded_files_table')[0]
-      .querySelectorAll('tbody tr td:nth-child(5)')
-    expect(assetReportCells).toHaveLength(files.length)
-    expect(screen.getAllByText('All good')).toHaveLength(2)
-    expect(screen.getByText('Needs attention')).toBeInTheDocument()
+    // Wait for async query to resolve and component to update
+    await screen.findByText('Document Processors')
 
-    const allGoodLink = screen.getAllByText('All good')[0]
-    await user.click(allGoodLink)
-
-    await screen.findByText('Document Processors for Test Assignment')
+    // Check for status text based on fixture data - all reports have priority > 0, so all show "Needs attention"
+    const needsAttentionLinks = screen.getAllByText('Needs attention')
+    expect(needsAttentionLinks).toHaveLength(files.length) // One per file
   })
 
-  it('does not render the Document Processors column header when ASSET_PROCESSORS are not available', async () => {
-    global.ENV.ASSET_PROCESSORS = []
+  it('does not render the Document Processors column header when asset processors are present but asset reports is null', async () => {
+    // Mock the query to return processors but no reports
+    const mockData = defaultGetLtiAssetProcessorsAndReportsForStudentResult()
+    mockData.submission.ltiAssetReportsConnection.nodes = null
+
+    queryClient.setQueryData(['ltiAssetProcessorsAndReportsForStudent', '1'], mockData)
+
     const props = {
       submission: await mockSubmissionWithResolvers({
-        Submission: {attachments: files, submissionType: 'online_upload'},
+        Submission: {attachments: files, submissionType: 'online_upload', attempt: 1},
       }),
     }
-    render(<FilePreview {...props} />)
 
-    expect(screen.queryByText('Document Processors')).not.toBeInTheDocument()
-  })
-
-  it('does not render the Document Processors column header when ASSET_PROCESSORS are present but ASSET_REPORTS is nil', async () => {
-    global.ENV.ASSET_PROCESSORS = [{id: 'processor1', name: 'Processor 1'}]
-    global.ENV.ASSET_REPORTS = null
-    const props = {
-      submission: await mockSubmissionWithResolvers({
-        Submission: {attachments: files, submissionType: 'online_upload'},
-      }),
-    }
-    render(<FilePreview {...props} />)
+    act(() =>
+      render(
+        <MockedQueryProvider>
+          <FilePreview {...props} />
+        </MockedQueryProvider>,
+      ),
+    )
 
     expect(screen.queryByText('Document Processors')).not.toBeInTheDocument()
   })
@@ -239,10 +270,14 @@ describe('FilePreview', () => {
   it('renders the size of each file being uploaded', async () => {
     const props = {
       submission: await mockSubmissionWithResolvers({
-        Submission: {attachments: files, submissionType: 'online_upload'},
+        Submission: {attachments: files, submissionType: 'online_upload', attempt: 1},
       }),
     }
-    render(<FilePreview {...props} />)
+    render(
+      <MockedQueryProvider>
+        <FilePreview {...props} />
+      </MockedQueryProvider>,
+    )
 
     const sizes = screen.getAllByTestId('file-size')
 
@@ -256,7 +291,11 @@ describe('FilePreview', () => {
         Submission: {attachments: [files[0]]},
       }),
     }
-    render(<FilePreview {...props} />)
+    render(
+      <MockedQueryProvider>
+        <FilePreview {...props} />
+      </MockedQueryProvider>,
+    )
 
     expect(screen.getByTestId('assignments_2_submission_preview')).toBeInTheDocument()
   })
@@ -267,7 +306,11 @@ describe('FilePreview', () => {
         Submission: {attachments: [files[1]]},
       }),
     }
-    render(<FilePreview {...props} />)
+    render(
+      <MockedQueryProvider>
+        <FilePreview {...props} />
+      </MockedQueryProvider>,
+    )
 
     expect(screen.getByText('Preview Unavailable')).toBeInTheDocument()
   })
@@ -276,7 +319,11 @@ describe('FilePreview', () => {
     const props = {
       submission: await mockSubmissionWithResolvers({Submission: {attachments: [files[1]]}}),
     }
-    const {container} = render(<FilePreview {...props} />)
+    const {container} = render(
+      <MockedQueryProvider>
+        <FilePreview {...props} />
+      </MockedQueryProvider>,
+    )
 
     expect(screen.getByText('Preview Unavailable')).toBeInTheDocument()
     expect(container.querySelector('a[href="/url"]')).toBeInTheDocument()
@@ -289,7 +336,11 @@ describe('FilePreview', () => {
         Submission: {attachments: files},
       }),
     }
-    const {container} = render(<FilePreview {...props} />)
+    const {container} = render(
+      <MockedQueryProvider>
+        <FilePreview {...props} />
+      </MockedQueryProvider>,
+    )
 
     expect(screen.getByTestId('assignments_2_submission_preview')).toBeInTheDocument()
 
@@ -315,12 +366,20 @@ describe('FilePreview', () => {
       }),
     }
 
-    const {rerender, container} = render(<FilePreview {...propsAttempt2} />)
+    const {rerender, container} = render(
+      <MockedQueryProvider>
+        <FilePreview {...propsAttempt2} />
+      </MockedQueryProvider>,
+    )
 
     const thirdFileIcon = container.querySelectorAll('svg[name="IconPaperclip"]')[1]
     fireEvent.click(thirdFileIcon)
 
-    rerender(<FilePreview {...propsAttempt1} />)
+    rerender(
+      <MockedQueryProvider>
+        <FilePreview {...propsAttempt1} />
+      </MockedQueryProvider>,
+    )
 
     const iframe = container.querySelector('iframe')
     expect(iframe).toHaveAttribute('src', '/preview_url')

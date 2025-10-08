@@ -18,7 +18,7 @@
 import {submitModuleItem, createNewItem} from '../../handlers/addItemHandlers'
 import {queryClient} from '@canvas/query'
 import {useContextModule} from '../useModuleContext'
-import {MODULE_ITEMS, MODULES} from '../../utils/constants'
+import {MODULE_ITEMS, MODULE_ITEMS_ALL, MODULES} from '../../utils/constants'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
@@ -34,7 +34,7 @@ export const submitItemData = async (
   if (!response) showFlashError(I18n.t('Error adding item to module.'))()
 
   queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId || '']})
-  queryClient.invalidateQueries({queryKey: ['MODULE_ITEMS_ALL', moduleId || '']})
+  queryClient.invalidateQueries({queryKey: [MODULE_ITEMS_ALL, moduleId || '']})
   queryClient.invalidateQueries({queryKey: [MODULES, courseId]})
   onRequestClose?.()
 }

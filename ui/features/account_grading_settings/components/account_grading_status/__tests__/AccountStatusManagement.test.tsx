@@ -76,8 +76,8 @@ describe('Account Grading Status Management', () => {
       expect(getByText('Custom Statuses')).toBeInTheDocument()
 
       expect(queryAllByTestId(/standard-status-/)).toHaveLength(6)
-      expect(queryAllByTestId(/custom\-status\-[0-9]/)).toHaveLength(2)
-      expect(queryAllByTestId(/custom\-status\-new\-[0-2]/)).toHaveLength(1)
+      expect(queryAllByTestId(/custom-status-[0-9]/)).toHaveLength(2)
+      expect(queryAllByTestId(/custom-status-new-[0-2]/)).toHaveLength(1)
     })
 
     it('should not render extended status when isExtendedStatusEnabled is false', async () => {
@@ -158,8 +158,8 @@ describe('Account Grading Status Management', () => {
       await act(async () => {
         await new Promise(resolve => setTimeout(resolve, 0))
       })
-      expect(queryAllByTestId(/custom\-status\-[0-9]/)).toHaveLength(2)
-      expect(queryAllByTestId(/custom\-status\-new\-[0-2]/)).toHaveLength(1)
+      expect(queryAllByTestId(/custom-status-[0-9]/)).toHaveLength(2)
+      expect(queryAllByTestId(/custom-status-new-[0-2]/)).toHaveLength(1)
       const statusToDelete = getByTestId('custom-status-2')
 
       const deleteButton = statusToDelete?.querySelectorAll('button')[1]

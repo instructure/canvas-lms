@@ -19,10 +19,54 @@
 import React from 'react'
 import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {setupServer} from 'msw/node'
+import {graphql, HttpResponse} from 'msw'
 import {queryClient} from '@canvas/query'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 import ModuleActionMenu from '../ModuleActionMenu'
 import {MODULE_ITEMS, MODULE_ITEM_TITLES, MODULES} from '../../utils/constants'
+
+const server = setupServer(
+  graphql.query('GetModuleItemsQuery', () => {
+    return HttpResponse.json({
+      data: {
+        legacyNode: {
+          moduleItemsConnection: {
+            edges: [],
+            pageInfo: {
+              hasNextPage: false,
+              endCursor: null,
+            },
+          },
+        },
+      },
+    })
+  }),
+  graphql.query('GetModulesQuery', () => {
+    return HttpResponse.json({
+      data: {
+        legacyNode: {
+          modulesConnection: {
+            edges: [
+              {
+                node: {
+                  _id: 'mod_1',
+                  id: 'mod_1',
+                  name: 'Test Module',
+                  moduleItemsTotalCount: 2,
+                },
+              },
+            ],
+            pageInfo: {
+              hasNextPage: false,
+              endCursor: null,
+            },
+          },
+        },
+      },
+    })
+  }),
+)
 import {
   handleDelete,
   handleDuplicate,
@@ -182,9 +226,12 @@ const renderMenu = ({
 }
 
 describe('ModuleActionMenu', () => {
+  beforeAll(() => server.listen())
   afterEach(() => {
+    server.resetHandlers()
     jest.clearAllMocks()
   })
+  afterAll(() => server.close())
   describe('rendering', () => {
     it('renders the menu trigger button', () => {
       setUp()

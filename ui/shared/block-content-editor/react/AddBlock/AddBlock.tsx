@@ -19,7 +19,6 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {useBlockContentEditorContext} from '../BlockContentEditorContext'
 import {AddButton} from './AddButton'

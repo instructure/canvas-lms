@@ -619,9 +619,7 @@ export const DiscussionTopicContainer = ({
                                         >
                                           <DiscussionInsightsButton
                                             isMobile={matches.includes('mobile')}
-                                            onClick={() => {
-                                              assignLocation(ENV.INSIGHTS_URL)
-                                            }}
+                                            href={ENV.INSIGHTS_URL}
                                           />
                                         </Flex.Item>
                                       )}

@@ -83,7 +83,7 @@ module GemOverride
       kwargs = version.pop
     end
     vendor_path = File.expand_path("vendor/#{name}", __dir__)
-    if File.directory?(vendor_path)
+    if File.directory?(vendor_path) && Dir.children(vendor_path).any?
       super(name, path: vendor_path, **kwargs)
     elsif pinned_github_gems.key?(name)
       repo, ref = pinned_github_gems[name].split(":")

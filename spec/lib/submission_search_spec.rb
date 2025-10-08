@@ -596,8 +596,4 @@ describe SubmissionSearch do
       end
     end
   end
-
-  # TODO: implement
-  it "filters results to assigned users if assigned_only filter is set"
-  it "filters results to specified groups"
 end

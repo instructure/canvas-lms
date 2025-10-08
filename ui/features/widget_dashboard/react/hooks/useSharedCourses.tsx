@@ -44,10 +44,7 @@ function transformSharedCourseDataToCourseGrade(sharedCourse: SharedCourseData):
     courseCode: sharedCourse.courseCode,
     courseName: sharedCourse.courseName,
     currentGrade: sharedCourse.currentGrade,
-    gradingScheme:
-      sharedCourse.gradingScheme === 'letter'
-        ? COURSE_GRADES_WIDGET.GRADING_SCHEMES.LETTER
-        : COURSE_GRADES_WIDGET.GRADING_SCHEMES.PERCENTAGE,
+    gradingScheme: sharedCourse.gradingScheme,
     lastUpdated: new Date(sharedCourse.lastUpdated),
   }
 }

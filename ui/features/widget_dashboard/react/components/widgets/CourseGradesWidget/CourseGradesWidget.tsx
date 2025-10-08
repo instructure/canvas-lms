@@ -22,26 +22,25 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Grid} from '@instructure/ui-grid'
 import {Checkbox} from '@instructure/ui-checkbox'
-import {Pagination} from '@instructure/ui-pagination'
 import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import CourseGradeCard from './CourseGradeCard'
 import type {BaseWidgetProps} from '../../../types'
 import {useSharedCourses} from '../../../hooks/useSharedCourses'
 import {createGradebookHandler} from './utils'
 import {COURSE_GRADES_WIDGET} from '../../../constants'
+import {useResponsiveContext} from '../../../hooks/useResponsiveContext'
 
 const I18n = createI18nScope('widget_dashboard')
 
 const CourseGradesWidget: React.FC<BaseWidgetProps> = ({widget}) => {
   const [gradeVisibilities, setGradeVisibilities] = useState<{[key: string]: boolean}>({})
   const [globalGradeVisibility, setGlobalGradeVisibility] = useState(true)
+  const {isMobile} = useResponsiveContext()
 
   const {
     data: courseGrades,
     isLoading,
     error,
-    hasNextPage,
-    hasPreviousPage,
     goToPage,
     currentPage,
     totalPages,
@@ -78,8 +77,11 @@ const CourseGradesWidget: React.FC<BaseWidgetProps> = ({widget}) => {
     setGradeVisibilities(newVisibilities)
   }
 
-  const handlePageChange = (page: number) => {
-    goToPage(page)
+  const paginationProps = {
+    currentPage,
+    totalPages,
+    onPageChange: goToPage,
+    ariaLabel: I18n.t('Course grades pagination'),
   }
 
   return (
@@ -88,6 +90,7 @@ const CourseGradesWidget: React.FC<BaseWidgetProps> = ({widget}) => {
       isLoading={isLoading}
       error={error ? I18n.t('Failed to load course grades. Please try again.') : null}
       loadingText={I18n.t('Loading course grades...')}
+      pagination={paginationProps}
       headerActions={
         <Checkbox
           label={I18n.t('Show all grades')}
@@ -99,60 +102,76 @@ const CourseGradesWidget: React.FC<BaseWidgetProps> = ({widget}) => {
       }
     >
       <Flex direction="column" height="100%">
-        <Flex.Item shouldGrow shouldShrink height="30rem">
-          <View as="div" overflowX="hidden" overflowY="hidden" height="100%">
+        <Flex.Item shouldGrow shouldShrink height="auto">
+          <View as="div" overflowX="hidden" overflowY="visible" height="auto">
             <Grid
               rowSpacing={COURSE_GRADES_WIDGET.GRID_ROW_SPACING}
               colSpacing={COURSE_GRADES_WIDGET.GRID_COL_SPACING}
+              startAt="medium"
             >
-              {Array.from({length: 2}, (_, rowIndex) => (
-                <Grid.Row key={`row-${rowIndex}`}>
-                  {Array.from({length: COURSE_GRADES_WIDGET.GRID_COLUMNS}, (_, colIndex) => {
-                    const gradeIndex = rowIndex * COURSE_GRADES_WIDGET.GRID_COLUMNS + colIndex
-                    const grade = displayedGrades[gradeIndex]
-
-                    return (
-                      <Grid.Col key={`col-${rowIndex}-${colIndex}`} width={4}>
-                        {grade && (
-                          <CourseGradeCard
-                            key={grade.courseId}
-                            courseId={grade.courseId}
-                            courseCode={grade.courseCode}
-                            courseName={grade.courseName}
-                            currentGrade={grade.currentGrade}
-                            lastUpdated={grade.lastUpdated}
-                            onShowGradebook={createGradebookHandler(grade.courseId)}
-                            gridIndex={gradeIndex}
-                            globalGradeVisibility={gradeVisibilities[grade.courseId] ?? true}
-                            onGradeVisibilityChange={visible =>
-                              handleGradeVisibilityChange(grade.courseId, visible)
-                            }
-                          />
-                        )}
-                      </Grid.Col>
-                    )
-                  })}
+              {isMobile ? (
+                <Grid.Row>
+                  {displayedGrades.map((grade, gradeIndex) => (
+                    <Grid.Col
+                      key={grade.courseId}
+                      width={{
+                        small: 12,
+                        medium: 4,
+                        large: 4,
+                      }}
+                    >
+                      <CourseGradeCard
+                        courseId={grade.courseId}
+                        courseCode={grade.courseCode}
+                        courseName={grade.courseName}
+                        currentGrade={grade.currentGrade}
+                        gradingScheme={grade.gradingScheme}
+                        lastUpdated={grade.lastUpdated}
+                        onShowGradebook={createGradebookHandler(grade.courseId)}
+                        gridIndex={gradeIndex}
+                        globalGradeVisibility={gradeVisibilities[grade.courseId] ?? true}
+                        onGradeVisibilityChange={visible =>
+                          handleGradeVisibilityChange(grade.courseId, visible)
+                        }
+                      />
+                    </Grid.Col>
+                  ))}
                 </Grid.Row>
-              ))}
+              ) : (
+                Array.from({length: 2}, (_, rowIndex) => (
+                  <Grid.Row key={`row-${rowIndex}`}>
+                    {Array.from({length: COURSE_GRADES_WIDGET.GRID_COLUMNS}, (_, colIndex) => {
+                      const gradeIndex = rowIndex * COURSE_GRADES_WIDGET.GRID_COLUMNS + colIndex
+                      const grade = displayedGrades[gradeIndex]
+
+                      return (
+                        <Grid.Col key={`col-${rowIndex}-${colIndex}`} width={4}>
+                          {grade && (
+                            <CourseGradeCard
+                              key={grade.courseId}
+                              courseId={grade.courseId}
+                              courseCode={grade.courseCode}
+                              courseName={grade.courseName}
+                              currentGrade={grade.currentGrade}
+                              gradingScheme={grade.gradingScheme}
+                              lastUpdated={grade.lastUpdated}
+                              onShowGradebook={createGradebookHandler(grade.courseId)}
+                              gridIndex={gradeIndex}
+                              globalGradeVisibility={gradeVisibilities[grade.courseId] ?? true}
+                              onGradeVisibilityChange={visible =>
+                                handleGradeVisibilityChange(grade.courseId, visible)
+                              }
+                            />
+                          )}
+                        </Grid.Col>
+                      )
+                    })}
+                  </Grid.Row>
+                ))
+              )}
             </Grid>
           </View>
         </Flex.Item>
-
-        {(hasNextPage || hasPreviousPage) && (
-          <Flex.Item shouldShrink>
-            <View as="div" textAlign="center" padding="x-small 0">
-              <Pagination
-                as="nav"
-                margin="x-small"
-                variant="compact"
-                currentPage={currentPage}
-                totalPageNumber={totalPages}
-                onPageChange={handlePageChange}
-                aria-label={I18n.t('Course grades pagination')}
-              />
-            </View>
-          </Flex.Item>
-        )}
       </Flex>
     </TemplateWidget>
   )

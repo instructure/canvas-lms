@@ -127,6 +127,20 @@ export interface AuthorInfoProps {
   pinnedBy: UserType
 }
 
+const getAvatarSize = (
+  breakpoints: AuthorInfoProps['breakpoints'],
+  threadMode: AuthorInfoProps['threadMode'],
+  threadParent: AuthorInfoProps['threadParent'],
+): 'x-small' | 'small' | 'medium' => {
+  if (breakpoints?.desktopNavOpen) {
+    return threadMode && !threadParent ? 'small' : 'medium'
+  } else if (breakpoints?.mobileOnly) {
+    return 'small'
+  }
+
+  return threadMode ? 'x-small' : 'small'
+}
+
 const AuthorInfoBase = ({breakpoints, ...props}: AuthorInfoProps) => {
   const {searchTerm} = useContext(SearchContext)
 
@@ -144,16 +158,7 @@ const AuthorInfoBase = ({breakpoints, ...props}: AuthorInfoProps) => {
   const timestampTextSize = 'small'
   const authorNameTextSize = 'medium'
   const authorInfoPadding = '0 0 0 small'
-  let avatarSize: 'x-small' | 'small' | 'medium' = 'small'
-
-  if (breakpoints?.desktopNavOpen) {
-    avatarSize = props.threadMode && !props.threadParent ? 'small' : 'medium'
-  } else if (breakpoints?.mobileOnly) {
-    avatarSize = 'small'
-  } else {
-    // tablet
-    avatarSize = props.threadMode ? 'x-small' : 'small'
-  }
+  const avatarSize = getAvatarSize(breakpoints, props.threadMode, props.threadParent)
 
   return (
     <Flex>

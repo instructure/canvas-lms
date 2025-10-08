@@ -81,6 +81,8 @@ ready(() => {
         },
         gradebookGroupFilterId: window.ENV.gradebook_group_filter_id ?? null,
         gradebookSectionFilters: window.ENV.gradebook_section_filter_id ?? null,
+        showInactiveEnrollments: window.ENV.show_inactive_enrollments ?? false,
+        showConcludedEnrollments: window.ENV.show_concluded_enrollments ?? false,
       },
       features: {
         a2StudentEnabled: window.ENV.A2_STUDENT_ENABLED ?? false,

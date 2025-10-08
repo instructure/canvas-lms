@@ -343,6 +343,23 @@ describe "CommunicationChannels API", type: :request do
                              "created_at" => channel.created_at.iso8601
                            })
       end
+
+      it "is able to delete institutionally assigned channels" do
+        Account.default.settings[:edit_institution_email] = false
+        Account.default.save!
+        someone.pseudonyms.first.update!(sis_communication_channel_id: channel.id)
+        json = api_call(:delete, path, path_options)
+
+        expect(json).to eq({
+                             "position" => 1,
+                             "address" => channel.path,
+                             "id" => channel.id,
+                             "workflow_state" => "retired",
+                             "user_id" => someone.id,
+                             "type" => "email",
+                             "created_at" => channel.created_at.iso8601
+                           })
+      end
     end
 
     context "a user" do

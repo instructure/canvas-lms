@@ -17,7 +17,13 @@
  */
 import axios from '@canvas/axios'
 import {AxiosResponse} from 'axios'
-import {DEFAULT_STUDENTS_PER_PAGE, SortOrder, SortBy} from './utils/constants'
+import {
+  DEFAULT_STUDENTS_PER_PAGE,
+  SortOrder,
+  SortBy,
+  GradebookSettings,
+  DisplayFilter,
+} from './utils/constants'
 
 /**
  * Parameters for outcome rollups API
@@ -93,4 +99,38 @@ export const exportCSV = (
   }
 
   return axios.get(`/courses/${courseId}/outcome_rollups.csv`, params)
+}
+
+/**
+ * Load learning mastery gradebook settings
+ * @param courseId - The ID of the course
+ * @returns A promise that resolves to the API response
+ */
+export const loadLearningMasteryGradebookSettings = (
+  courseId: string | number,
+): Promise<AxiosResponse> => {
+  return axios.get(`/api/v1/courses/${courseId}/learning_mastery_gradebook_settings`)
+}
+
+/**
+ * Save learning mastery gradebook settings
+ * @param courseId - The ID of the course
+ * @param settings - The gradebook settings to save
+ * @returns A promise that resolves to the API response
+ */
+export const saveLearningMasteryGradebookSettings = (
+  courseId: string | number,
+  settings: GradebookSettings,
+): Promise<AxiosResponse> => {
+  const body = {
+    learning_mastery_gradebook_settings: {
+      secondary_info_display: settings.secondaryInfoDisplay,
+      show_student_avatars: settings.displayFilters.includes(DisplayFilter.SHOW_STUDENT_AVATARS),
+      show_students_with_no_results: settings.displayFilters.includes(
+        DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS,
+      ),
+    },
+  }
+
+  return axios.put(`/api/v1/courses/${courseId}/learning_mastery_gradebook_settings`, body)
 }

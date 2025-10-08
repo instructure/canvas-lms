@@ -314,12 +314,6 @@
     "clear_image_3213fe62": {
         "message": "Esborra la imatge"
     },
-    "clear_selected_file_82388e50": {
-        "message": "Esborra el fitxer seleccionat"
-    },
-    "clear_selected_file_filename_2fe8a58e": {
-        "message": "Esborra el fitxer seleccionat: { filename }"
-    },
     "click_or_shift_click_for_the_html_editor_25d70bb4": {
         "message": "Feu clic aquí o feu-hi clic mentre premeu la tecla Maj per obrir l’editor d’HTML."
     },

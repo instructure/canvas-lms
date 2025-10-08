@@ -2108,6 +2108,15 @@ class Course < ActiveRecord::Base
     end_at ? end_at < now : false
   end
 
+  def soft_concluded_for_all?(enrollment_types)
+    now = Time.zone.now
+    return end_at < now if end_at && restrict_enrollments_to_course_dates
+
+    override = enrollment_term.enrollment_dates_overrides.where(enrollment_type: enrollment_types).pluck(:end_at).compact.max
+    end_at = [enrollment_term.end_at, override].compact.max
+    end_at ? end_at < now : false
+  end
+
   def soft_conclude!
     self.conclude_at = Time.zone.now
     self.restrict_enrollments_to_course_dates = true
@@ -2854,19 +2863,6 @@ class Course < ActiveRecord::Base
                 :assignment_group_no_drop_assignments,
                 :migration_results
 
-  def map_merge(old_item, new_item)
-    @merge_mappings ||= {}
-    @merge_mappings[old_item.asset_string] = new_item && new_item.id
-  end
-
-  def merge_mapped_id(old_item)
-    @merge_mappings ||= {}
-    return nil unless old_item
-    return @merge_mappings[old_item] if old_item.is_a?(String)
-
-    @merge_mappings[old_item.asset_string]
-  end
-
   def same_dates?(old, new, columns)
     old && new && columns.all? do |column|
       old.respond_to?(column) && new.respond_to?(column) && old.send(column) == new.send(column)
@@ -2879,81 +2875,6 @@ class Course < ActiveRecord::Base
       Folder::STUDENT_ANNOTATION_DOCUMENTS_UNIQUE_TYPE,
       -> { t "Student Annotation Documents" }
     )
-  end
-
-  def copy_attachments_from_course(course, options = {})
-    root_folder = Folder.root_folders(self).first
-    root_folder_name = root_folder.name + "/"
-    ce = options[:content_export]
-    cm = options[:content_migration]
-
-    attachments = course.attachments.not_deleted.to_a
-    total = attachments.count + 1
-
-    Attachment.skip_media_object_creation do
-      attachments.each_with_index do |file, i|
-        cm.update_import_progress((i.to_f / total) * 18.0) if cm && (i % 10 == 0)
-
-        next unless !ce || ce.export_object?(file)
-
-        begin
-          migration_id = ce&.create_key(file)
-          new_file = file.clone_for(self, nil, overwrite: true, migration_id:, migration: cm, match_on_migration_id: cm.for_master_course_import?)
-          cm.add_attachment_path(file.full_display_path.gsub(/\A#{root_folder_name}/, ""), new_file.migration_id)
-          new_folder_id = merge_mapped_id(file.folder)
-
-          if file.folder && file.folder.parent_folder_id.nil?
-            new_folder_id = root_folder.id
-          end
-          # make sure the file has somewhere to go
-          unless new_folder_id
-            # gather mapping of needed folders from old course to new course
-            old_folders = []
-            old_folders << file.folder
-            new_folders = []
-            new_folders << old_folders.last.clone_for(self, nil, options.merge({ include_subcontent: false }))
-            while old_folders.last.parent_folder&.parent_folder_id
-              old_folders << old_folders.last.parent_folder
-              new_folders << old_folders.last.clone_for(self, nil, options.merge({ include_subcontent: false }))
-            end
-            old_folders.reverse!
-            new_folders.reverse!
-            # try to use folders that already match if possible
-            final_new_folders = []
-            parent_folder = Folder.root_folders(self).first
-            old_folders.each_with_index do |folder, idx|
-              final_new_folders << if (f = parent_folder.active_sub_folders.where(name: folder.name).first)
-                                     f
-                                   else
-                                     new_folders[idx]
-                                   end
-              parent_folder = final_new_folders.last
-            end
-            # add or update the folder structure needed for the file
-            final_new_folders.first.parent_folder_id ||=
-              merge_mapped_id(old_folders.first.parent_folder) ||
-              Folder.root_folders(self).first.id
-            old_folders.each_with_index do |folder, idx|
-              final_new_folders[idx].save!
-              map_merge(folder, final_new_folders[idx])
-              final_new_folders[idx + 1].parent_folder_id ||= final_new_folders[idx].id if final_new_folders[idx + 1]
-            end
-            new_folder_id = merge_mapped_id(file.folder)
-          end
-          new_file.folder_id = new_folder_id
-          new_file.need_notify = false
-          new_file.save_without_broadcasting!
-          new_file.handle_duplicates(:rename)
-          cm.add_imported_item(new_file)
-          cm.add_imported_item(new_file.folder, key: new_file.folder.id)
-          map_merge(file, new_file)
-        rescue => e
-          Canvas::Errors.capture(e) unless e.message.include?("Cannot create attachments in deleted folders")
-          Rails.logger.error "Couldn't copy file: #{e}"
-          cm.add_warning(t(:file_copy_error, "Couldn't copy file \"%{name}\"", name: file.display_name || file.path_name), $!)
-        end
-      end
-    end
   end
 
   def self.clonable_attributes

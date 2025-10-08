@@ -42,7 +42,20 @@ const mockSharedCourseData: SharedCourseData[] = [
     courseCode: 'CS 101',
     courseName: 'Test Course 1',
     currentGrade: 95,
-    gradingScheme: 'letter',
+    gradingScheme: [
+      ['A', 0.94],
+      ['A-', 0.9],
+      ['B+', 0.87],
+      ['B', 0.84],
+      ['B-', 0.8],
+      ['C+', 0.77],
+      ['C', 0.74],
+      ['C-', 0.7],
+      ['D+', 0.67],
+      ['D', 0.64],
+      ['D-', 0.61],
+      ['F', 0],
+    ] as Array<[string, number]>,
     lastUpdated: '2025-01-01T00:00:00Z',
   },
   {
@@ -146,6 +159,23 @@ const mockUnreadAnnouncementsResponse = {
   },
 }
 
+const emptyAnnouncementsResponse = {
+  data: {
+    legacyNode: {
+      _id: '123',
+      discussionParticipantsConnection: {
+        nodes: [],
+        pageInfo: {
+          hasNextPage: false,
+          hasPreviousPage: false,
+          startCursor: null,
+          endCursor: null,
+        },
+      },
+    },
+  },
+}
+
 const mockReadAnnouncementsResponse = {
   data: {
     legacyNode: {
@@ -189,6 +219,8 @@ const getMockResponseForReadState = (readState?: string) => {
       return mockReadAnnouncementsResponse
     case 'unread':
       return mockUnreadAnnouncementsResponse
+    case 'empty':
+      return emptyAnnouncementsResponse
     case 'all':
     default:
       return mockAllAnnouncementsResponse
@@ -437,7 +469,7 @@ describe('AnnouncementsWidget', () => {
     await waitForLoadingToComplete()
 
     expect(capturedVariables).not.toBeNull()
-    expect(capturedVariables.first).toBe(3) // Uses the direct limit value
+    expect(capturedVariables.first).toBe(4) // Uses the direct limit value
     expect(capturedVariables.userId).toBe('123') // From ENV.current_user_id
 
     cleanup()
@@ -588,11 +620,18 @@ describe('AnnouncementsWidget', () => {
 
   it('toggles read/unread status when buttons are clicked', async () => {
     // Mock the mutation response
+    let announcementsResponse = getMockResponseForReadState('unread')
+
     server.use(
       graphql.query('GetUserAnnouncements', () => {
-        return HttpResponse.json(getMockResponseForReadState('unread'))
+        return HttpResponse.json(announcementsResponse)
       }),
-      graphql.mutation('UpdateDiscussionReadState', () => {
+      graphql.mutation('UpdateDiscussionReadState', ({variables}) => {
+        // When we mark 2 as read, remove it from the unread list
+        if (variables?.discussionTopicId === '2') {
+          announcementsResponse = getMockResponseForReadState('empty')
+        }
+
         return HttpResponse.json({
           data: {
             updateDiscussionReadState: {
@@ -614,15 +653,23 @@ describe('AnnouncementsWidget', () => {
       expect(screen.getByText('Test Announcement 2')).toBeInTheDocument()
     })
 
+    const announctmentItemContainer = screen.getByTestId('announcement-item-2')
+    expect(announctmentItemContainer).toBeInTheDocument()
+
     // Find and click the mark as read button for Test Announcement 2
     const markReadButton = screen.getByTestId('mark-read-2')
     expect(markReadButton).toBeInTheDocument()
 
     fireEvent.click(markReadButton)
-
+    // "mark as" button disabled when the request is in progress
+    expect(markReadButton).toBeDisabled()
     // The mutation should be called (we can't easily test the actual state change
-    // without more complex mocking, but we can verify the button exists and is clickable)
-    expect(markReadButton).toBeInTheDocument()
+    // without more complex mocking, but we can verify the annoucement is no longer
+    // in the unread page)
+
+    await waitFor(() => {
+      expect(announctmentItemContainer).not.toBeInTheDocument()
+    })
 
     cleanup()
   })
@@ -687,7 +734,7 @@ describe('AnnouncementsWidget', () => {
     // Check that pagination controls are visible
     await waitFor(() => {
       // Check for Instructure UI Pagination component
-      const paginationNav = screen.getByTestId('announcements-pagination')
+      const paginationNav = screen.getByTestId('pagination-container')
       expect(paginationNav).toBeInTheDocument()
 
       // Check for page buttons by text content
@@ -698,13 +745,10 @@ describe('AnnouncementsWidget', () => {
     cleanup()
   })
 
-  it('enriches announcements with course codes from course data', async () => {
+  it('renders course code pills from shared course data lookup', async () => {
     server.use(
       graphql.query('GetUserAnnouncements', ({variables}) => {
         return HttpResponse.json(getMockResponseForReadState(variables.readState))
-      }),
-      graphql.query('GetUserCoursesWithGradesConnection', () => {
-        return HttpResponse.json(mockCourseGradesResponse)
       }),
     )
 
@@ -712,12 +756,11 @@ describe('AnnouncementsWidget', () => {
 
     await waitForLoadingToComplete()
 
-    // Wait for the component to render and data to be enriched
     await waitFor(() => {
-      expect(screen.getByText('Test Announcement 2')).toBeInTheDocument() // Default unread filter
+      expect(screen.getByText('Test Announcement 2')).toBeInTheDocument()
     })
 
-    expect(screen.getByText('ENG 201')).toBeInTheDocument() // Course code should be enriched
+    expect(screen.getByText('ENG 201')).toBeInTheDocument()
 
     cleanup()
   })

@@ -19,7 +19,7 @@
 #breadcrumbs {
   background-color: $ic-content-background-color;
   &.k5-breadcrumbs {
-    > ul {
+    > ul, > ol {
       > li {
         &:last-of-type a {
           color: var(--ic-link-color);
@@ -28,7 +28,7 @@
       }
     }
   }
-  > ul {
+  > ul, > ol {
     margin: 0;
     padding: 4px $ic-content-padding;
     list-style: none;

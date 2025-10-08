@@ -19,16 +19,20 @@
 #
 
 describe Permissions, type: :module do
-  before :all do
-    @original_permission = Permissions.instance_variable_get(:@permissions)
-  end
+  let(:original_permissions) { Permissions.instance_variable_get(:@permissions) }
 
-  after do
-    Permissions.instance_variable_set(:@permissions, @original_permission)
-  end
+  around do |example|
+    # Store original state
+    saved_permissions = Permissions.instance_variable_get(:@permissions)
 
-  before do
+    # Reset for test
     Permissions.instance_variable_set(:@permissions, nil)
+
+    # Run test
+    example.run
+
+    # Restore original state
+    Permissions.instance_variable_set(:@permissions, saved_permissions)
   end
 
   describe ".register" do
@@ -65,7 +69,9 @@ describe Permissions, type: :module do
   end
 
   describe ".retrieve" do
-    it "returns the registered permissions" do
+    let(:account) { account_model }
+
+    it "returns the registered permissions without context" do
       permissions = { read: { description: "Read Permission" }, write: { description: "Write Permission" } }
       Permissions.register(permissions)
       expect(Permissions.retrieve).to eq(permissions)
@@ -79,6 +85,125 @@ describe Permissions, type: :module do
       Permissions.register(read: { description: "Read Permission" })
       Rails.application.config.after_initialize { Permissions.retrieve.freeze }
       expect(Permissions.retrieve).to be_frozen
+    end
+
+    context "with Canvas Career overrides" do
+      before do
+        permissions = {
+          read: {
+            label: -> { "Read" },
+            description: "Read Permission"
+          },
+          write: {
+            label: -> { "Write" },
+            description: "Write Permission"
+          }
+        }
+        Permissions.register(permissions)
+
+        overrides = {
+          read: { label: -> { "View Content" } },
+          write: { label: -> { "Edit Content" } }
+        }
+        allow(CanvasCareer::LabelOverrides).to receive(:permission_label_overrides).and_return(overrides)
+      end
+
+      it "applies Canvas Career overrides when context is provided" do
+        result = Permissions.retrieve(account)
+
+        expect(result[:read][:label].call).to eq("View Content")
+        expect(result[:write][:label].call).to eq("Edit Content")
+      end
+
+      it "preserves non-overridden fields" do
+        result = Permissions.retrieve(account)
+
+        expect(result[:read][:description]).to eq("Read Permission")
+        expect(result[:write][:description]).to eq("Write Permission")
+      end
+
+      it "returns original permissions when no overrides exist" do
+        allow(CanvasCareer::LabelOverrides).to receive(:permission_label_overrides).and_return({})
+
+        result = Permissions.retrieve(account)
+        expect(result[:read][:label].call).to eq("Read")
+        expect(result[:write][:label].call).to eq("Write")
+      end
+
+      it "handles Canvas Career override failures gracefully" do
+        allow(CanvasCareer::LabelOverrides).to receive(:permission_label_overrides).and_raise("Test error")
+        allow(Rails.logger).to receive(:warn)
+
+        result = Permissions.retrieve(account)
+        expect(result[:read][:label].call).to eq("Read") # Falls back to original
+        expect(Rails.logger).to have_received(:warn).with(a_string_matching(/Canvas Career permission overrides failed/))
+      end
+    end
+
+    context "without context" do
+      it "returns original permissions without applying overrides" do
+        permissions = { read: { label: -> { "Read" } } }
+        Permissions.register(permissions)
+
+        result = Permissions.retrieve(nil)
+        expect(result[:read][:label].call).to eq("Read")
+      end
+    end
+  end
+
+  describe ".permission_groups" do
+    let(:account) { account_model }
+
+    before do
+      # Mock PERMISSION_GROUPS constant
+      stub_const("PERMISSION_GROUPS", {
+                   test_group: {
+                     label: -> { "Test Group" },
+                     subtitle: -> { "Test subtitle" }
+                   }
+                 })
+    end
+
+    it "returns base permission groups without context" do
+      result = Permissions.permission_groups
+      expect(result).to have_key(:test_group)
+      expect(result[:test_group][:label].call).to eq("Test Group")
+    end
+
+    context "with Canvas Career group overrides" do
+      before do
+        permissions = {
+          test_permission: {
+            group: :test_group,
+            label: -> { "Test Permission" }
+          }
+        }
+        Permissions.register(permissions)
+
+        overrides = {
+          test_permission: { group_label: -> { "Overridden Group" } }
+        }
+        allow(CanvasCareer::LabelOverrides).to receive(:permission_label_overrides).and_return(overrides)
+      end
+
+      it "applies group label overrides when context is provided" do
+        result = Permissions.permission_groups(account)
+        expect(result[:test_group][:label].call).to eq("Overridden Group")
+      end
+
+      it "preserves non-overridden group fields" do
+        result = Permissions.permission_groups(account)
+        expect(result[:test_group][:subtitle].call).to eq("Test subtitle")
+      end
+    end
+
+    it "handles Canvas Career group override failures gracefully" do
+      allow(CanvasCareer::LabelOverrides).to receive(:permission_label_overrides).and_raise("Test error")
+      allow(Rails.logger).to receive(:warn)
+
+      result = Permissions.permission_groups(account)
+      expect(result[:test_group][:label].call).to eq("Test Group") # Falls back to original
+      expect(Rails.logger).to have_received(:warn).with(a_string_matching(/Canvas Career permission group overrides failed/))
     end
   end
 end

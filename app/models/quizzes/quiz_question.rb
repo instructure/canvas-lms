@@ -78,24 +78,34 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
 
   attr_accessor :force_attachment_associations_update
 
+  QUESTION_DATA_HTML_FIELDS = %i[
+    question_text
+    comments_html
+    correct_comments_html
+    incorrect_comments_html
+    neutral_comments_html
+    text_after_answers
+  ].freeze
+
+  QUESTION_DATA_ANSWER_HTML_FIELDS = %i[
+    html
+    comments_html
+  ].freeze
+
   def update_attachment_associations
-    return unless attachment_associations_enabled?
+    return unless attachment_associations_creation_enabled?
     return if !saved_change_to_attribute?(:question_data) && !force_attachment_associations_update
 
-    all_html = [
-      question_data[:question_text],
-      question_data[:correct_comments_html],
-      question_data[:incorrect_comments_html],
-      question_data[:neutral_comments_html]
-    ]
+    all_html = []
+
+    Quizzes::QuizQuestion::QUESTION_DATA_HTML_FIELDS.each do |field|
+      all_html << question_data[field] if question_data[field].present?
+    end
 
     question_data[:answers]&.each do |answer|
-      if answer[0].present?
-        all_html.push(answer[1][:answer_html] || answer[1][:answer_text])
-        all_html.push(answer[1][:answer_comments])
-      else
-        all_html.push(answer[:html])
-        all_html.push(answer[:comments_html])
+      to_check = answer[0].present? ? answer[1] : answer
+      Quizzes::QuizQuestion::QUESTION_DATA_ANSWER_HTML_FIELDS.each do |field|
+        all_html << to_check[field] if to_check[field].present?
       end
     end
 

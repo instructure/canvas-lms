@@ -142,7 +142,7 @@ module Lti::Messages
     private
 
     def add_asset_processor_request_claims!
-      return if placement != Lti::ResourcePlacement::ASSET_PROCESSOR
+      return unless [Lti::ResourcePlacement::ASSET_PROCESSOR, Lti::ResourcePlacement::ASSET_PROCESSOR_CONTRIBUTION].include?(placement)
 
       @message.activity.id = lti_assignment_id if lti_assignment_id
     end

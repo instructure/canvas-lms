@@ -119,9 +119,6 @@
     "clear_2084585f": {
         "message": "پاک کردن"
     },
-    "clear_selected_file_82388e50": {
-        "message": "پاک کردن فایل انتخاب شده"
-    },
     "click_to_embed_imagename_c41ea8df": {
         "message": "Click to embed { imageName }"
     },
@@ -604,6 +601,9 @@
     },
     "relationships_6602af70": {
         "message": "روابط"
+    },
+    "remove_f47dc62a": {
+        "message": "حذف"
     },
     "replace_e61834a7": {
         "message": "جایگزین کردن"

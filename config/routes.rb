@@ -1229,6 +1229,7 @@ CanvasRails::Application.routes.draw do
 
       get "courses/:course_id/youtube_migration/scan", action: :youtube_migration_scan, as: "course_youtube_migration_scan"
       post "courses/:course_id/youtube_migration/scan", action: :start_youtube_migration_scan
+      put "courses/:course_id/youtube_migration/scan/:scan_id", action: :update_youtube_migration_scan
       post "courses/:course_id/youtube_migration/convert", action: :start_youtube_migration_convert
       get "courses/:course_id/youtube_migration/conversion_status", action: :youtube_migration_conversion_status
 
@@ -1340,6 +1341,7 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :tokens) do
+      get "users/:user_id/user_generated_tokens", action: :user_generated_tokens, as: "user_generated_tokens"
       get "users/:user_id/tokens/:id", action: :show, as: "token"
       post "users/:user_id/tokens", action: :create, as: "tokens"
       put "users/:user_id/tokens/:id", action: :update
@@ -2643,6 +2645,11 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :gradebook_settings) do
       put "courses/:course_id/gradebook_settings", action: :update, as: :course_gradebook_settings_update
+    end
+
+    scope(controller: :learning_mastery_gradebook_settings_api) do
+      get "courses/:course_id/learning_mastery_gradebook_settings", action: :show
+      put "courses/:course_id/learning_mastery_gradebook_settings", action: :update
     end
 
     scope(controller: :announcements_api) do

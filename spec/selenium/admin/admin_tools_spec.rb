@@ -684,24 +684,5 @@ describe "admin_tools" do
       load_admin_tools_page
       expect(f("#adminToolsTabNav")).not_to contain_css('a[href="#bouncedEmailsPane"]')
     end
-
-    it "performs searches" do
-      skip "FOO-4092"
-      @account.settings[:admins_can_view_notifications] = true
-      @account.save!
-      load_admin_tools_page
-      f('a[href="#bouncedEmailsPane"]').click
-      replace_content fj('label:contains("Address") input'), "*@example.com"
-      replace_content fj('label:contains("Last bounced after") input'), 5.days.ago.iso8601
-      replace_content fj('label:contains("Last bounced before") input'), 3.days.ago.iso8601
-      fj('button:contains("Search")').click
-      wait_for_ajaximations
-      data = f("#bouncedEmailsPane").text
-      expect(data).not_to include "one@example.com"
-      expect(data).to include "two@example.com"
-      expect(data).not_to include "three@example.com"
-      csvLink = fj("#bouncedEmailsPane a:contains('Download these results as CSV')")["href"]
-      expect(csvLink).to include "/api/v1/accounts/#{@account.id}/bounced_communication_channels.csv?order=desc&pattern=*%40example.com"
-    end
   end
 end

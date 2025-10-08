@@ -78,6 +78,13 @@ const mockConnectionResponse = {
               _id: '1',
               name: 'Introduction to Computer Science',
               courseCode: 'CS101',
+              gradingStandard: {
+                data: [
+                  {letterGrade: 'A', baseValue: 0.9},
+                  {letterGrade: 'B', baseValue: 0.8},
+                  {letterGrade: 'F', baseValue: 0},
+                ],
+              },
             },
             updatedAt: '2025-01-01T00:00:00Z',
             grades: {
@@ -98,9 +105,9 @@ const mockConnectionResponse = {
             updatedAt: '2025-01-01T00:00:00Z',
             grades: {
               currentScore: 87,
-              currentGrade: 'B+',
+              currentGrade: null,
               finalScore: 87,
-              finalGrade: 'B+',
+              finalGrade: null,
               overrideScore: null,
               overrideGrade: null,
             },
@@ -132,9 +139,9 @@ const mockConnectionResponseWithPagination = {
             updatedAt: '2025-01-01T00:00:00Z',
             grades: {
               currentScore: 95,
-              currentGrade: 'A',
+              currentGrade: null,
               finalScore: 95,
-              finalGrade: 'A',
+              finalGrade: null,
               overrideScore: null,
               overrideGrade: null,
             },
@@ -209,7 +216,11 @@ describe('usePaginatedCoursesWithGrades', () => {
         courseCode: 'CS101',
         courseName: 'Introduction to Computer Science',
         currentGrade: 95,
-        gradingScheme: 'letter',
+        gradingScheme: [
+          ['A', 0.9],
+          ['B', 0.8],
+          ['F', 0],
+        ] as Array<[string, number]>,
         lastUpdated: new Date('2025-01-01T00:00:00Z'),
       })
       expect(result.current.hasNextPage).toBe(false)
@@ -360,6 +371,13 @@ describe('usePaginatedCoursesWithGrades', () => {
                   _id: '1',
                   name: 'Course with Override',
                   courseCode: 'TEST101',
+                  gradingStandard: {
+                    data: [
+                      {letterGrade: 'A', baseValue: 0.9},
+                      {letterGrade: 'B', baseValue: 0.8},
+                      {letterGrade: 'F', baseValue: 0},
+                    ],
+                  },
                 },
                 updatedAt: '2025-01-01T00:00:00Z',
                 grades: {
@@ -376,6 +394,13 @@ describe('usePaginatedCoursesWithGrades', () => {
                   _id: '2',
                   name: 'Course with Final Only',
                   courseCode: null, // Test default course code
+                  gradingStandard: {
+                    data: [
+                      {letterGrade: 'A', baseValue: 0.9},
+                      {letterGrade: 'B', baseValue: 0.8},
+                      {letterGrade: 'F', baseValue: 0},
+                    ],
+                  },
                 },
                 updatedAt: '2025-01-01T00:00:00Z',
                 grades: {
@@ -417,7 +442,11 @@ describe('usePaginatedCoursesWithGrades', () => {
         courseCode: 'TEST101',
         courseName: 'Course with Override',
         currentGrade: 92, // Override score used
-        gradingScheme: 'letter', // Has override grade
+        gradingScheme: [
+          ['A', 0.9],
+          ['B', 0.8],
+          ['F', 0],
+        ] as Array<[string, number]>,
         lastUpdated: new Date('2025-01-01T00:00:00Z'),
       })
 
@@ -465,7 +494,7 @@ describe('usePaginatedCoursesWithGrades', () => {
                 updatedAt: '2025-01-01T00:00:00Z',
                 grades: {
                   currentScore: 95,
-                  currentGrade: 'A',
+                  currentGrade: null,
                   finalScore: null,
                   finalGrade: null,
                   overrideScore: null,
@@ -481,7 +510,7 @@ describe('usePaginatedCoursesWithGrades', () => {
                 updatedAt: '2025-01-01T00:00:00Z',
                 grades: {
                   currentScore: 87,
-                  currentGrade: 'B+',
+                  currentGrade: null,
                   finalScore: null,
                   finalGrade: null,
                   overrideScore: null,
@@ -497,7 +526,7 @@ describe('usePaginatedCoursesWithGrades', () => {
                 updatedAt: '2025-01-01T00:00:00Z',
                 grades: {
                   currentScore: 92,
-                  currentGrade: 'A-',
+                  currentGrade: null,
                   finalScore: null,
                   finalGrade: null,
                   overrideScore: null,
@@ -555,7 +584,7 @@ describe('usePaginatedCoursesWithGrades', () => {
                 updatedAt: '2025-01-01T00:00:00Z',
                 grades: {
                   currentScore: 95,
-                  currentGrade: 'A',
+                  currentGrade: null,
                   finalScore: null,
                   finalGrade: null,
                   overrideScore: null,
@@ -571,7 +600,7 @@ describe('usePaginatedCoursesWithGrades', () => {
                 updatedAt: '2025-01-01T00:00:00Z',
                 grades: {
                   currentScore: 87,
-                  currentGrade: 'B+',
+                  currentGrade: null,
                   finalScore: null,
                   finalGrade: null,
                   overrideScore: null,

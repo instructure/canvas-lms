@@ -188,23 +188,6 @@ describe PseudonymsController do
       user_session(@user, @pseudonym)
     end
 
-    it "does not destroy if for the wrong user" do
-      skip("investigate cause for failures beginning 05/05/21 FOO-1950")
-      @main_user = @user
-      user_model
-      @other_user = @user
-      @other_pseudonym = @user.pseudonyms.create!(unique_id: "test@test.com", password: "password", password_confirmation: "password")
-      delete "destroy", params: { user_id: @main_user.id, id: @other_pseudonym.id }
-      assert_status(404)
-      expect(@other_pseudonym).to be_active
-      expect(@pseudonym).to be_active
-
-      delete "destroy", params: { user_id: @other_user.id, id: @pseudonym.id }
-      assert_status(404)
-      expect(@other_pseudonym).to be_active
-      expect(@pseudonym).to be_active
-    end
-
     it "does not destroy if it's the last active pseudonym" do
       account_admin_user(user: @user)
       delete "destroy", params: { user_id: @user.id, id: @pseudonym.id }

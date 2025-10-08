@@ -42,20 +42,6 @@ describe "SpeedGrader" do
     user_session(@teacher1)
   end
 
-  context "alerts" do
-    it "alerts the teacher before leaving the page if comments are not saved", priority: "1" do
-      skip "QE Team will revisit due to chrome update TESTOPS-232"
-      student_in_course(active_user: true).user
-      Speedgrader.visit(@course.id, @assignment.id)
-      replace_content(Speedgrader.new_comment_text_area, "oh no i forgot to save this comment!")
-      # navigate away
-      driver.navigate.refresh
-      alert_shown = alert_present?
-      dismiss_alert
-      expect(alert_shown).to be(true)
-    end
-  end
-
   context "manually submitted comments" do
     context "using media" do
       before do
@@ -268,16 +254,6 @@ describe "SpeedGrader" do
       it "when choosing a student from the dropdown", priority: "1" do
         expect do
           Speedgrader.select_student @student2
-          wait_for_ajaximations
-        end.to change {
-          SubmissionComment.draft.count
-        }.by(1)
-      end
-
-      it "when going back to the assignment", priority: "1" do
-        skip "QE Team will revisit due to chrome update TESTOPS-232"
-        expect do
-          Speedgrader.assignment_link.click
           wait_for_ajaximations
         end.to change {
           SubmissionComment.draft.count

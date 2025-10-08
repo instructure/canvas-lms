@@ -161,6 +161,7 @@ class ProfileController < ApplicationController
   before_action :require_password_session, only: %i[communication communication_update update]
 
   include HorizonMode
+  include StudentEnrollmentHelper
 
   before_action :load_canvas_career, only: %i[show settings communication content_shares qr_mobile_login]
 
@@ -239,7 +240,8 @@ class ProfileController < ApplicationController
                                        AccessToken.account_session_for_permissions(@domain_root_account),
                                        :update)
     google_drive_oauth_url = oauth_url(service: "google_drive", return_to: settings_profile_url)
-    js_env({ enable_gravatar: @domain_root_account&.enable_gravatar?, register_cc_tabs:, is_default_account:, google_drive_oauth_url:, PERMISSIONS: { can_update_tokens: } })
+    user_is_only_student = user_has_only_student_enrollments?(@current_user)
+    js_env({ enable_gravatar: @domain_root_account&.enable_gravatar?, register_cc_tabs:, is_default_account:, google_drive_oauth_url:, user_is_only_student:, PERMISSIONS: { can_update_tokens: } })
     respond_to do |format|
       format.html do
         @user_data = profile_data(@user.profile, @current_user, session, [])

@@ -127,6 +127,18 @@ class RequestThrottle
         if RequestThrottle.enabled?
           InstStatsd::Statsd.distributed_increment("request_throttling.throttled")
           Rails.logger.info("blocking request due to throttling, client id: #{client_identifier(request)} bucket: #{bucket.to_json}")
+          token_string = AuthenticationMethods.access_token(request, :GET)
+          # Do not bother with exceptions when trying to get the access token
+          # on a throttled response, just ignore any NotFound errors.
+          begin
+            access_token = AccessToken.authenticate(token_string, load_pseudonym_from_access_token: true, eager_load_developer_key: true)
+          rescue
+            access_token = nil
+          end
+          RequestContext::Generator.add_meta_header("at", access_token.global_id) if access_token
+          RequestContext::Generator.add_meta_header("dk", access_token.global_developer_key_id) if access_token&.developer_key_id
+          RequestContext::Generator.add_meta_header("utid", access_token.developer_key.unified_tool_id) if access_token&.developer_key&.unified_tool_id
+
           return false
         else
           Rails.logger.info("WOULD HAVE throttled request (config disabled), client id: #{client_identifier(request)} bucket: #{bucket.to_json}")
@@ -159,15 +171,23 @@ class RequestThrottle
   # This is cached on the request, so a theoretical change to the request
   # object won't be caught.
   def client_identifiers(request)
-    request.env["canvas.request_throttle.user_id"] ||= [
+    return request.env["canvas.request_throttle.user_id"] if request.env["canvas.request_throttle.user_id"]
+
+    token_string = AuthenticationMethods.access_token(request, :GET).presence
+    access_token = nil
+    access_token = AccessToken.authenticate(token_string, load_pseudonym_from_access_token: true, eager_load_developer_key: true) if token_string
+
+    request.env["canvas.request_throttle.user_id"] = [
       tag_identifier("lti_advantage", lti_advantage_client_id_and_cluster(request)),
       tag_identifier("service_user_key", site_admin_service_user_key(request)),
       tag_identifier("service_user_key", inst_access_token_authentication&.tag_identifier),
-      (token_string = AuthenticationMethods.access_token(request, :GET).presence) && "token:#{AccessToken.hashed_token(token_string)}",
+      token_string && "token:#{AccessToken.hashed_token(token_string)}",
       tag_identifier("user", AuthenticationMethods.user_id(request).presence),
       tag_identifier("session", session_id(request).presence),
       tag_identifier("tool", tool_id(request)),
-      tag_identifier("ip", request.ip)
+      tag_identifier("ip", request.ip),
+      tag_identifier("vendor", access_token&.developer_key&.unified_tool_id),
+      tag_identifier("developer_key_id", access_token&.global_developer_key_id),
     ].compact
   end
 

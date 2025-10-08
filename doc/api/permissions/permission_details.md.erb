@@ -1,0 +1,26 @@
+<%= label %>
+======
+
+<% if details.present? %>
+## What it Does
+<% details.each do |block| %>
+<% if block.key?(:title) %>
+### <%= block[:title] %>
+<% end %>
+<% if block.key?(:description) %>
+<%= block[:description] %>
+<% end %>
+<% end %>
+<% end %>
+
+<% if considerations.present? %>
+## Additional Considerations
+<% considerations.each do |block| %>
+<% if block.key?(:title) %>
+### <%= block[:title] %>
+<% end %>
+<% if block.key?(:description) %>
+<%= block[:description] %>
+<% end %>
+<% end %>
+<% end %>

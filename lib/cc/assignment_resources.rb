@@ -331,6 +331,10 @@ module CC
       if assignment.annotated_document? && assignment.annotatable_attachment
         node.annotatable_attachment_migration_id(key_generator.create_key(assignment.annotatable_attachment))
       end
+
+      if assignment.root_account.feature_enabled?(:lti_asset_processor) && assignment.lti_asset_processors.any?
+        node.lti_context_id assignment.lti_context_id
+      end
     end
 
     def self.add_line_item(line_items_node, line_item, assignment)

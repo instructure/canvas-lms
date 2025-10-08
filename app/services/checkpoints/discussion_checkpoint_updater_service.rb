@@ -39,7 +39,10 @@ class Checkpoints::DiscussionCheckpointUpdaterService < Checkpoints::DiscussionC
 
     raise Checkpoints::CheckpointNotFoundError, "Checkpoint '#{@checkpoint_label}' not found" unless checkpoint
 
-    checkpoint.assign_attributes(checkpoint_attributes)
+    # Only assign attributes that have actually changed to avoid triggering
+    # Master Course validation on unchanged restricted columns
+    changed_attributes = checkpoint_attributes_for_update(checkpoint)
+    checkpoint.assign_attributes(changed_attributes) if changed_attributes.any?
 
     update_overrides = override_dates.select { |override| override[:id].present? }
     new_overrides = override_dates.select { |override| override[:id].nil? }

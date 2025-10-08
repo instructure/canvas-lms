@@ -1094,6 +1094,10 @@
 - verb: GET
   path: '/api/v1/courses/:course_id/groups'
 - verb: GET
+  path: '/api/v1/courses/:course_id/learning_mastery_gradebook_settings'
+- verb: PUT
+  path: '/api/v1/courses/:course_id/learning_mastery_gradebook_settings'
+- verb: GET
   path: '/api/v1/courses/:course_id/link_validation'
 - verb: POST
   path: '/api/v1/courses/:course_id/link_validation'
@@ -1501,6 +1505,8 @@
   path: '/api/v1/courses/:course_id/youtube_migration/scan'
 - verb: POST
   path: '/api/v1/courses/:course_id/youtube_migration/scan'
+- verb: PUT
+  path: '/api/v1/courses/:course_id/youtube_migration/scan/:scan_id'
 - verb: DELETE
   path: '/api/v1/courses/:id'
 - verb: GET
@@ -2387,6 +2393,8 @@
   path: '/api/v1/users/:user_id/usage_rights'
 - verb: PUT
   path: '/api/v1/users/:user_id/usage_rights'
+- verb: GET
+  path: '/api/v1/users/:user_id/user_generated_tokens'
 - verb: GET
   path: '/api/v1/users/activity_stream'
 - verb: DELETE

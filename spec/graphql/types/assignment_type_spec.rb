@@ -647,18 +647,6 @@ describe Types::AssignmentType do
     end
   end
 
-  xit "validate assignment 404 return correctly with override instrumenter (ADMIN-2407)" do
-    result = CanvasSchema.execute(<<~GQL, context: { current_user: @teacher })
-      query {
-        assignment(id: "987654321") {
-          _id dueAt lockAt unlockAt
-        }
-      }
-    GQL
-    expect(result["errors"]).to be_nil
-    expect(result.dig("data", "assignment")).to be_nil
-  end
-
   it "can access it's parent course" do
     expect(assignment_type.resolve("course { _id }")).to eq course.to_param
   end
@@ -924,7 +912,7 @@ describe Types::AssignmentType do
 
       context "when student can read their own grade" do
         it "returns lti asset processors" do
-          allow_any_instance_of(Submission).to receive(:user_can_read_grade?).with(student).and_return(true)
+          allow_any_instance_of(Submission).to receive(:user_can_read_grade?).with(student, for_plagiarism: true).and_return(true)
 
           resolver = GraphQLTypeTester.new(assignment, context)
           result = resolver.resolve("ltiAssetProcessorsConnection { edges { node { _id } } }")
@@ -934,7 +922,7 @@ describe Types::AssignmentType do
 
       context "when student cannot read their own grade" do
         it "returns null" do
-          allow_any_instance_of(Submission).to receive(:user_can_read_grade?).with(student).and_return(false)
+          allow_any_instance_of(Submission).to receive(:user_can_read_grade?).with(student, for_plagiarism: true).and_return(false)
 
           resolver = GraphQLTypeTester.new(assignment, context)
           expect(resolver.resolve("ltiAssetProcessorsConnection { edges { node { _id } } }")).to be_nil

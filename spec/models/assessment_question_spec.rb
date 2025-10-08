@@ -99,9 +99,19 @@ describe AssessmentQuestion do
     user_file = @teacher.attachments.create!(uploaded_data: fixture_file_upload("docs/doc.doc", "application/msword", true))
     data = { "name" => "Hi", "question_text" => "Translate this: <img src='/users/#{@teacher.id}/files/#{user_file.id}/download'>", "answers" => [{ "id" => 1 }, { "id" => 2 }] }
 
-    @question = @bank.assessment_questions.create!(question_data: data)
+    @question = @bank.assessment_questions.create!(question_data: data, current_user: @teacher)
     @clone = @question.attachments.where(root_attachment: user_file).first
     expect(@question.reload.question_data["question_text"]).to eq "Translate this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}'>"
+  end
+
+  it "does not allow another users without proper permission to user file to clone it" do
+    other_user = user_model
+    user_file = @teacher.attachments.create!(uploaded_data: fixture_file_upload("docs/doc.doc", "application/msword", true))
+    data = { "name" => "Hi", "question_text" => "Translate this: <img src='/users/#{@teacher.id}/files/#{user_file.id}/download'>", "answers" => [{ "id" => 1 }, { "id" => 2 }] }
+
+    @question = @bank.assessment_questions.create!(question_data: data, current_user: other_user)
+    @clone = @question.attachments.where(root_attachment: user_file).first
+    expect(@clone).to be_nil
   end
 
   context "when disable_file_verifier_access feature flag is enabled" do
@@ -122,7 +132,7 @@ describe AssessmentQuestion do
       data = { "name" => "Hi", "question_text" => "Translate this: <img src='/users/#{@teacher.id}/files/#{user_file.id}/download'>", "answers" => [{ "id" => 1 }, { "id" => 2 }] }
       user_file.root_account.enable_feature!(:disable_file_verifier_access)
 
-      @question = @bank.assessment_questions.create!(question_data: data)
+      @question = @bank.assessment_questions.create!(question_data: data, current_user: @teacher)
       @clone = @question.attachments.where(root_attachment: user_file).first
       expect(@question.reload.question_data["question_text"]).to eq "Translate this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download'>"
     end

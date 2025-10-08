@@ -10613,4 +10613,55 @@ describe Submission do
       end
     end
   end
+
+  describe "#skip_broadcasts" do
+    let(:submission) { @assignment.submissions.find_by(user: @student) }
+
+    context "when super method would return true" do
+      before do
+        @assignment.update!(
+          submission_types: "online_upload",
+          title: "Regular Assignment"
+        )
+
+        submission.skip_broadcasts = true
+      end
+
+      it "returns true regardless of rollcall assignment status" do
+        expect(submission.skip_broadcasts).to be true
+      end
+    end
+
+    context "when super method would return false" do
+      context "and assignment is rollcall" do
+        before do
+          @assignment.update!(
+            submission_types: "external_tool",
+            title: "Roll Call Attendance"
+          )
+
+          submission.skip_broadcasts = false
+        end
+
+        it "returns true because of rollcall assignment" do
+          expect(submission.skip_broadcasts).to be true
+        end
+      end
+
+      context "and assignment is not rollcall" do
+        before do
+          @assignment.update!(
+            submission_types: "online_upload",
+            title: "Regular Assignment"
+          )
+
+          submission.skip_broadcasts = false
+        end
+
+        it "returns false when both conditions are false" do
+          expect(submission.skip_broadcasts).to be false
+        end
+      end
+    end
+  end
 end

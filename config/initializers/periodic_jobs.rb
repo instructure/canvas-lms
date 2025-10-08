@@ -105,18 +105,6 @@ def with_each_shard_by_database(klass, method, *, jitter: nil, local_offset: fal
 end
 
 Rails.configuration.after_initialize do
-  if defined?(ActiveRecord::SessionStore) && Rails.configuration.session_store == ActiveRecord::SessionStore
-    expire_after = (ConfigFile.load("session_store") || {})[:expire_after]
-    expire_after ||= 1.day
-
-    Delayed::Periodic.cron "ActiveRecord::SessionStore::Session.delete_all", "*/5 * * * *" do
-      callback = -> { Canvas::Errors.capture_exception(:periodic_job, $ERROR_INFO) }
-      Shard.with_each_shard(exception: callback) do
-        ActiveRecord::SessionStore::Session.where(updated_at: ...expire_after.seconds.ago).delete_all
-      end
-    end
-  end
-
   persistence_token_expire_after = (ConfigFile.load("session_store") || {})[:expire_remember_me_after]
   persistence_token_expire_after ||= 1.month
   Delayed::Periodic.cron "SessionPersistenceToken.delete_all", "35 11 * * *" do
@@ -278,7 +266,8 @@ Rails.configuration.after_initialize do
       Delayed::Periodic.cron "AuthenticationProvider::SAML::#{federation.class_name}.refresh_providers", "45 0 * * *" do
         DatabaseServer.send_in_each_region(federation,
                                            :refresh_providers,
-                                           { singleton: "AuthenticationProvider::SAML::#{federation.class_name}.refresh_providers" })
+                                           { singleton: "AuthenticationProvider::SAML::#{federation.class_name}.refresh_providers" },
+                                           shard_scope: Shard.in_current_region.where(jobs_held: false))
       end
     end
   end
