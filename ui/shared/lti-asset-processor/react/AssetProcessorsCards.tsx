@@ -186,23 +186,32 @@ export const AssetProcessorsCard = ({
   onClick,
   extraColumns,
   margin,
-}: AssetProcessorsCardProps) => (
-  <View
-    data-pendo="asset-processor-add-modal-tool"
-    data-testid="asset-processor-card"
-    aria-label={title}
-    as="div"
-    background="secondary"
-    borderRadius="medium"
-    borderWidth="none"
-    {...(onClick ? {cursor: 'pointer'} : undefined)}
-    margin={margin}
-    onClick={onClick}
-    padding="mediumSmall"
-    position="relative"
-    role={onClick ? 'button' : undefined}
-    tabIndex={onClick ? 0 : undefined}
-  >
+}: AssetProcessorsCardProps) => {
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (onClick && (event.key === 'Enter' || event.key === ' ')) {
+      event.preventDefault()
+      onClick()
+    }
+  }
+
+  return (
+    <View
+      data-pendo="asset-processor-add-modal-tool"
+      data-testid="asset-processor-card"
+      aria-label={title}
+      as="div"
+      background="secondary"
+      borderRadius="medium"
+      borderWidth="none"
+      {...(onClick ? {cursor: 'pointer'} : undefined)}
+      margin={margin}
+      onClick={onClick}
+      onKeyDown={handleKeyDown}
+      padding="mediumSmall"
+      position="relative"
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+    >
     <Flex direction="column" height="100%">
       <Flex
         margin="0"
@@ -249,4 +258,5 @@ export const AssetProcessorsCard = ({
       </Flex>
     </Flex>
   </View>
-)
+  )
+}
