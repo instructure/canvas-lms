@@ -324,6 +324,16 @@ describe LtiApiController, type: :request do
       expect(submission.score).to eq 12
     end
 
+    it "logs asset access for participation tracking" do
+      make_call("body" => replace_result(score: "0.6"))
+      check_success
+
+      asset_access = AssetUserAccess.where(user_id: @student, asset_code: @assignment.asset_string).first
+      expect(asset_access).to be_present
+      expect(asset_access.action_level).to eq "participate"
+      expect(asset_access.asset_category).to eq "assignments"
+    end
+
     it "includes the appropriate data in the request headers" do
       submission_time = Time.zone.now.to_s
 
