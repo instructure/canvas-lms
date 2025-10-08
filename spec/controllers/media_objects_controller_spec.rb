@@ -1592,4 +1592,46 @@ describe MediaObjectsController do
       end
     end
   end
+
+  describe "rce_studio_embed_improvements feature flag in iframe_media_player" do
+    before do
+      @media_object = @course.media_objects.create! media_id: "0_test123", user_entered_title: "test.mp4"
+      allow_any_instance_of(MediaObject).to receive(:media_sources).and_return(
+        [{ url: "http://example.com/test.mp4", bitrate: 12_345 }]
+      )
+      user_session(@teacher)
+    end
+
+    it "includes the flag when enabled for the course" do
+      @course.enable_feature!(:rce_studio_embed_improvements)
+
+      get "iframe_media_player", params: { attachment_id: @media_object.attachment_id }
+
+      expect(assigns[:js_env][:FEATURES][:rce_studio_embed_improvements]).to be true
+    end
+
+    it "does not include the flag when disabled for the course" do
+      @course.disable_feature!(:rce_studio_embed_improvements)
+
+      get "iframe_media_player", params: { attachment_id: @media_object.attachment_id }
+
+      expect(assigns[:js_env][:FEATURES][:rce_studio_embed_improvements]).to be false
+    end
+
+    it "inherits the flag from the account when not explicitly set on course" do
+      @course.account.enable_feature!(:rce_studio_embed_improvements)
+
+      get "iframe_media_player", params: { attachment_id: @media_object.attachment_id }
+
+      expect(assigns[:js_env][:FEATURES][:rce_studio_embed_improvements]).to be true
+    end
+
+    it "does not include the flag when attachment context is not a Course" do
+      user_media = @teacher.media_objects.create! media_id: "0_user123", user_entered_title: "user.mp4"
+
+      get "iframe_media_player", params: { media_object_id: user_media.media_id }
+
+      expect(assigns[:js_env][:FEATURES]).not_to have_key(:rce_studio_embed_improvements)
+    end
+  end
 end

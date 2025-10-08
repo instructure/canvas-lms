@@ -316,6 +316,10 @@ class MediaObjectsController < ApplicationController
     # this flag is also injected through the normal js_env for the RCE
     # but it needs to be added separately here for the iframe because of subaccount weirdness
     js_env[:FEATURES][:consolidated_media_player_iframe] = true if consolidated_media_player_enabled && js_env[:FEATURES]
+    if @attachment&.context.is_a?(Course)
+      js_env[:FEATURES][:rce_studio_embed_improvements] = @attachment.context.feature_enabled?(:rce_studio_embed_improvements)
+    end
+
     js_bundle :media_player_iframe_content
     css_bundle :media_player
     render html: "<div id='player_container'>#{I18n.t("Loading...")}</div>".html_safe,
@@ -339,6 +343,7 @@ class MediaObjectsController < ApplicationController
                      end
 
     js_env media_object: media_api_json if media_api_json
+
     deferred_js_bundle :media_immersive_view
     render html: '<div id="immersive_view_container"></div>'.html_safe,
            layout: "layouts/application"
