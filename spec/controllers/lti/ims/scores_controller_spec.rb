@@ -221,6 +221,13 @@ module Lti::IMS
               expect(result.submission.reload.submission_type).to eq "external_tool"
             end
 
+            it "logs asset access for participation tracking" do
+              send_request
+              accessed_asset = assigns[:accessed_asset]
+              expect(accessed_asset[:level]).to eq "participate"
+              expect(accessed_asset[:category]).to eq "assignments"
+            end
+
             it_behaves_like "creates a new submission"
           end
 
