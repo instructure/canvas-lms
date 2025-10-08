@@ -93,6 +93,7 @@ module Lti
           },
           activity: {
             id: @params[:assignment].lti_context_id,
+            title: @params[:assignment].title,
           },
           contribution: {
             id: discussion_entry.lti_id,
