@@ -552,6 +552,7 @@ CanvasRails::Application.routes.draw do
     resources :accessibility_issues, only: [:update, :show]
 
     resources :ai_experiences, only: %i[index create new show edit update destroy]
+    resources :ai_experiences, only: %i[index show new edit]
   end
 
   get "quiz_statistics/:quiz_statistics_id/files/:file_id/download" => "files#show", :as => :quiz_statistics_download, :download => "1"
@@ -1249,9 +1250,10 @@ CanvasRails::Application.routes.draw do
       post "courses/:course_id/ai_experiences", action: :create
       get "courses/:course_id/ai_experiences/new", action: :new, as: "new_course_ai_experience"
       get "courses/:course_id/ai_experiences/:id", action: :show, as: "course_ai_experience"
-      get "courses/:course_id/ai_experiences/:id/edit", action: :edit, as: "edit_course_ai_experience"
+      get "courses/:course_id/ai_experiences/:id/edit", action: :edit, as: "course_ai_experience_edit"
       put "courses/:course_id/ai_experiences/:id", action: :update
-      delete "courses/:course_id/ai_experiences/:id", action: :destroy
+      delete "courses/:course_id/ai_experiences/:id", action: :destroy, as: "course_ai_experience_destroy"
+      post "courses/:course_id/ai_experiences/:id/continue_conversation", action: :continue_conversation, as: "course_ai_experience_continue_conversation"
     end
 
     scope(controller: :account_calendars_api) do

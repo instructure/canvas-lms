@@ -73,12 +73,12 @@
 class AiExperiencesController < ApplicationController
   include Api::V1::AiExperience
 
-  protect_from_forgery except: %i[create update destroy], with: :exception
+  protect_from_forgery except: %i[create update destroy continue_conversation], with: :exception
 
   before_action :require_context
   before_action :check_ai_experiences_feature_flag
-  before_action :load_experience, only: %i[show edit update destroy]
-  before_action :require_read_rights, only: %i[index show]
+  before_action :load_experience, only: %i[show edit update destroy continue_conversation]
+  before_action :require_read_rights, only: %i[index show continue_conversation]
   before_action :require_manage_rights, only: %i[new create edit update destroy]
 
   # @API List AI experiences
@@ -105,7 +105,18 @@ class AiExperiencesController < ApplicationController
   #
   # @returns AiExperience
   def show
+    @ai_experience = @experience
+    set_active_tab "ai_experiences"
+    add_crumb t("#crumbs.ai_experiences", "AI Experiences"), course_ai_experiences_path(@context)
+    add_crumb @ai_experience.title
     respond_to do |format|
+      format.html do
+        @page_title = @ai_experience.title
+        js_bundle :ai_experiences_show
+        js_env(AI_EXPERIENCE: ai_experience_json(@ai_experience, @current_user, session))
+        render html: view_context.content_tag(:div, nil, id: "ai_experiences_show"),
+               layout: true
+      end
       format.json { render json: ai_experience_json(@experience, @current_user, session) }
     end
   end
@@ -207,6 +218,37 @@ class AiExperiencesController < ApplicationController
         format.json { render json: @experience.errors, status: :bad_request }
       end
     end
+  end
+
+  # @API Continue AI conversation
+  #
+  # Initialize or continue a conversation with the AI experience
+  #
+  # @argument messages [Optional, Array]
+  #   The conversation history. If empty, will return starting messages.
+  #
+  # @returns {Array} Array of conversation messages
+  def continue_conversation
+    service = LLMConversationService.new(
+      current_user: @current_user,
+      root_account_uuid: @context.root_account.uuid,
+      facts: @experience.facts,
+      learning_objectives: @experience.learning_objective,
+      scenario: @experience.scenario
+    )
+
+    messages = if params[:messages].present?
+                 service.continue_conversation(
+                   messages: params[:messages],
+                   new_user_message: params[:new_user_message]
+                 )
+               else
+                 service.starting_messages
+               end
+
+    render json: { messages: }
+  rescue CedarAi::Errors::ConversationError => e
+    render json: { error: e.message }, status: :service_unavailable
   end
 
   private

@@ -113,24 +113,39 @@ describe AiExperiencesController do
     context "as teacher" do
       before { user_session(@teacher) }
 
-      it "returns the AI experience" do
+      it "returns success for HTML format" do
+        get :show, params: { course_id: @course.id, id: @ai_experience.id }
+        expect(response).to be_successful
+      end
+
+      it "returns JSON for JSON format" do
         get :show, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
-        expect(response).to have_http_status(:ok)
-        experience_data = json_parse(response.body)
-        expect(experience_data["id"]).to eq(@ai_experience.id)
-        expect(experience_data["title"]).to eq(@ai_experience.title)
+        expect(response).to be_successful
+        experience = json_parse(response.body)
+        expect(experience["id"]).to eq(@ai_experience.id)
+        expect(experience["title"]).to eq(@ai_experience.title)
+      end
+
+      it "sets the active tab" do
+        get :show, params: { course_id: @course.id, id: @ai_experience.id }
+        expect(assigns(:active_tab)).to eq("ai_experiences")
       end
     end
 
     context "as student" do
       before { user_session(@student) }
 
-      it "returns the AI experience" do
+      it "returns success for HTML format" do
+        get :show, params: { course_id: @course.id, id: @ai_experience.id }
+        expect(response).to be_successful
+      end
+
+      it "returns success for JSON format" do
         get :show, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
-        expect(response).to have_http_status(:ok)
-        experience_data = json_parse(response.body)
-        expect(experience_data["id"]).to eq(@ai_experience.id)
-        expect(experience_data["title"]).to eq(@ai_experience.title)
+        expect(response).to be_successful
+        experience = json_parse(response.body)
+        expect(experience["id"]).to eq(@ai_experience.id)
+        expect(experience["title"]).to eq(@ai_experience.title)
       end
     end
   end
@@ -352,6 +367,118 @@ describe AiExperiencesController do
           get :edit, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
           expect(response).to have_http_status(:not_found)
         end
+      end
+    end
+  end
+
+  describe "POST #continue_conversation" do
+    context "as teacher" do
+      before { user_session(@teacher) }
+
+      it "returns starting messages when no previous messages" do
+        mock_service = instance_double(LLMConversationService)
+        allow(LLMConversationService).to receive(:new).and_return(mock_service)
+        allow(mock_service).to receive(:starting_messages).and_return([
+                                                                        { role: "User", text: "Hello", timestamp: Time.zone.now },
+                                                                        { role: "Assistant", text: "Hi there!", timestamp: Time.zone.now }
+                                                                      ])
+
+        post :continue_conversation,
+             params: { course_id: @course.id, id: @ai_experience.id },
+             format: :json
+
+        expect(response).to be_successful
+        json_response = json_parse(response.body)
+        expect(json_response["messages"]).to be_an(Array)
+        expect(json_response["messages"].length).to eq(2)
+        expect(json_response["messages"][0]["role"]).to eq("User")
+        expect(json_response["messages"][1]["role"]).to eq("Assistant")
+      end
+
+      it "continues conversation with new user message" do
+        mock_service = instance_double(LLMConversationService)
+        allow(LLMConversationService).to receive(:new).and_return(mock_service)
+
+        existing_messages = [
+          { role: "User", text: "Hello", timestamp: Time.zone.now },
+          { role: "Assistant", text: "Hi there!", timestamp: Time.zone.now }
+        ]
+        new_messages = existing_messages + [
+          { role: "User", text: "How are you?", timestamp: Time.zone.now },
+          { role: "Assistant", text: "I'm doing well!", timestamp: Time.zone.now }
+        ]
+
+        # Use hash_including to handle ActionController::Parameters
+        allow(mock_service).to receive(:continue_conversation)
+          .with(hash_including(new_user_message: "How are you?"))
+          .and_return(new_messages)
+
+        post :continue_conversation,
+             params: {
+               course_id: @course.id,
+               id: @ai_experience.id,
+               messages: existing_messages,
+               new_user_message: "How are you?"
+             },
+             format: :json
+
+        expect(response).to be_successful
+        json_response = json_parse(response.body)
+        expect(json_response["messages"].length).to eq(4)
+      end
+
+      it "initializes LLMConversationService with correct parameters" do
+        expect(LLMConversationService).to receive(:new).with(
+          current_user: @teacher,
+          root_account_uuid: @course.root_account.uuid,
+          facts: @ai_experience.facts,
+          learning_objectives: @ai_experience.learning_objective,
+          scenario: @ai_experience.scenario
+        ).and_call_original
+
+        allow_any_instance_of(LLMConversationService)
+          .to receive(:starting_messages)
+          .and_return([])
+
+        post :continue_conversation,
+             params: { course_id: @course.id, id: @ai_experience.id },
+             format: :json
+      end
+
+      it "returns service unavailable on conversation error" do
+        mock_service = instance_double(LLMConversationService)
+        allow(LLMConversationService).to receive(:new).and_return(mock_service)
+        allow(mock_service).to receive(:starting_messages)
+          .and_raise(CedarAi::Errors::ConversationError, "Service unavailable")
+
+        post :continue_conversation,
+             params: { course_id: @course.id, id: @ai_experience.id },
+             format: :json
+
+        expect(response).to have_http_status(:service_unavailable)
+        json_response = json_parse(response.body)
+        expect(json_response["error"]).to eq("Service unavailable")
+      end
+    end
+
+    context "as student" do
+      before { user_session(@student) }
+
+      it "returns starting messages for students with read access" do
+        mock_service = instance_double(LLMConversationService)
+        allow(LLMConversationService).to receive(:new).and_return(mock_service)
+        allow(mock_service).to receive(:starting_messages).and_return([
+                                                                        { role: "User", text: "Hello", timestamp: Time.zone.now },
+                                                                        { role: "Assistant", text: "Hi there!", timestamp: Time.zone.now }
+                                                                      ])
+
+        post :continue_conversation,
+             params: { course_id: @course.id, id: @ai_experience.id },
+             format: :json
+
+        expect(response).to be_successful
+        json_response = json_parse(response.body)
+        expect(json_response["messages"]).to be_an(Array)
       end
     end
   end

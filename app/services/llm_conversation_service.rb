@@ -21,7 +21,7 @@
 class LLMConversationService
   SYSTEM_PROMPT = <<~TEXT
     Human: <TASK>
-    You are a teacher giving a new assignment to a student. You will be provided with FACTS_STUDENTS_SHOULD_KNOW, LEARNING OBJECTIVES, and SCENARIO.
+      You will be provided with FACTS_STUDENTS_SHOULD_KNOW, LEARNING OBJECTIVES, and SCENARIO.
     </TASK>
   TEXT
 
@@ -38,9 +38,8 @@ class LLMConversationService
 
     Instructions for generating the guidance:
     - Give personal advice to the student using “I” and “you” (e.g., “I liked how you...” or “You could make it even better by…”).
-    - Keep it short, clear, and no more than **100 words**.
-    - Do **not** start with generic phrases like “To improve your essay,” or “Guidance:”.
-    - Use friendly and simple language, like you're speaking directly to a student who needs clear and encouraging advice.
+    - Keep it short, clear, and no more than **50 words**.
+    - Don't be repetitive in your responses.
     </INSTRUCTIONS>
   TEXT
 

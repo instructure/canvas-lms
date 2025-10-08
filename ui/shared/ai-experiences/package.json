@@ -1,0 +1,6 @@
+{
+  "name": "@canvas/ai-experiences",
+  "private": true,
+  "version": "1.0.0",
+  "main": "index.ts"
+}

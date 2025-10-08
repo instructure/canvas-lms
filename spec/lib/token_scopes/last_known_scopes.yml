@@ -593,6 +593,8 @@
   path: '/api/v1/courses/:course_id/ai_experiences/:id'
 - verb: PUT
   path: '/api/v1/courses/:course_id/ai_experiences/:id'
+- verb: POST
+  path: '/api/v1/courses/:course_id/ai_experiences/:id/continue_conversation'
 - verb: GET
   path: '/api/v1/courses/:course_id/ai_experiences/:id/edit'
 - verb: GET
