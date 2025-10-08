@@ -21,6 +21,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Grid} from '@instructure/ui-grid'
+import {List} from '@instructure/ui-list'
 import {Checkbox} from '@instructure/ui-checkbox'
 import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import CourseGradeCard from './CourseGradeCard'
@@ -108,6 +109,7 @@ const CourseGradesWidget: React.FC<BaseWidgetProps> = ({widget}) => {
               rowSpacing={COURSE_GRADES_WIDGET.GRID_ROW_SPACING}
               colSpacing={COURSE_GRADES_WIDGET.GRID_COL_SPACING}
               startAt="medium"
+              role="list"
             >
               {isMobile ? (
                 <Grid.Row>

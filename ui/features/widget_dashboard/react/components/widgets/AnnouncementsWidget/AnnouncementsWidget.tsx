@@ -20,6 +20,7 @@ import React, {useState, useEffect, useMemo} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
+import {List} from '@instructure/ui-list'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import TemplateWidget from '../TemplateWidget/TemplateWidget'
@@ -123,13 +124,16 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
 
     return (
       <View as="div" height="100%" width="100%">
-        {enrichedAnnouncements.map(announcement => (
-          <AnnouncementItem
-            key={`${announcement.id}-${announcement.isRead ? 'read' : 'unread'}`}
-            announcementItem={announcement}
-            filter={filter}
-          />
-        ))}
+        <List isUnstyled margin="0">
+          {enrichedAnnouncements.map(announcement => (
+            <List.Item
+              key={`${announcement.id}-${announcement.isRead ? 'read' : 'unread'}`}
+              margin="0"
+            >
+              <AnnouncementItem announcementItem={announcement} filter={filter} />
+            </List.Item>
+          ))}
+        </List>
       </View>
     )
   }
