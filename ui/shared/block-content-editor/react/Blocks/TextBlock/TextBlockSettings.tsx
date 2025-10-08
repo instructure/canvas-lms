@@ -61,8 +61,6 @@ export const TextBlockSettings = () => {
       <SettingsIncludeTitle checked={includeBlockTitle} onChange={handleIncludeBlockTitleChange} />
       <SettingsSectionToggle
         title={I18n.t('Color settings')}
-        collapsedLabel={I18n.t('Expand color settings')}
-        expandedLabel={I18n.t('Collapse color settings')}
         defaultExpanded={true}
         includeSeparator={true}
       >

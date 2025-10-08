@@ -169,8 +169,6 @@ export const ImageTextBlockSettings = () => {
       <SettingsIncludeTitle checked={includeBlockTitle} onChange={handleIncludeBlockTitleChange} />
       <SettingsSectionToggle
         title={I18n.t('Color settings')}
-        collapsedLabel={I18n.t('Expand color settings')}
-        expandedLabel={I18n.t('Collapse color settings')}
         defaultExpanded={true}
         includeSeparator={true}
       >
@@ -197,8 +195,6 @@ export const ImageTextBlockSettings = () => {
       </SettingsSectionToggle>
       <SettingsSectionToggle
         title={I18n.t('Layout settings')}
-        collapsedLabel={I18n.t('Expand layout settings')}
-        expandedLabel={I18n.t('Collapse layout settings')}
         defaultExpanded={true}
         includeSeparator={true}
       >
@@ -229,8 +225,6 @@ export const ImageTextBlockSettings = () => {
       </SettingsSectionToggle>
       <SettingsSectionToggle
         title={I18n.t('Image settings')}
-        collapsedLabel={I18n.t('Expand image settings')}
-        expandedLabel={I18n.t('Collapse image settings')}
         defaultExpanded={true}
         includeSeparator={false}
       >

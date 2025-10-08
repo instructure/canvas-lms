@@ -68,8 +68,6 @@ export const SeparatorLineBlockSettings = () => {
     <View as="div">
       <SettingsSectionToggle
         title={I18n.t('Color settings')}
-        collapsedLabel={I18n.t('Expand color settings')}
-        expandedLabel={I18n.t('Collapse color settings')}
         defaultExpanded={true}
         includeSeparator={true}
       >
@@ -85,8 +83,6 @@ export const SeparatorLineBlockSettings = () => {
 
       <SettingsSectionToggle
         title={I18n.t('Separator settings')}
-        collapsedLabel={I18n.t('Expand separator settings')}
-        expandedLabel={I18n.t('Collapse separator settings')}
         defaultExpanded={true}
         includeSeparator={false}
       >
