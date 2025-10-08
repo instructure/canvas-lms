@@ -19,7 +19,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import tourPubSub from '@canvas/tour-pubsub'
 import {replaceLocation} from '@canvas/util/globalUtils'
-import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
 import {List} from '@instructure/ui-list'
@@ -86,12 +86,14 @@ export default function HelpLinks({onClick}: Props) {
           {nonFeaturedLinks
             .map(link => {
               const has_new_tag = link.is_new
+              const linkId = `help-link-${link.id}`
               return (
                 <List.Item key={`link-${link.id}`}>
                   <Flex justifyItems="space-between" alignItems="center">
                     <Flex.Item size={has_new_tag ? '80%' : '100%'}>
                       <span role="presentation">
                         <Link
+                          aria-describedby={linkId}
                           isWithinText={false}
                           href={link.url}
                           onClick={handleClick(link)}
@@ -101,7 +103,6 @@ export default function HelpLinks({onClick}: Props) {
                           {link.text || ''}
                         </Link>
                       </span>
-                      {has_new_tag && <ScreenReaderContent>{I18n.t('New')}</ScreenReaderContent>}
                       {link.subtext && (
                         <Text as="div" size="small">
                           {link.subtext}
@@ -111,7 +112,9 @@ export default function HelpLinks({onClick}: Props) {
                     <Flex.Item>
                       {has_new_tag && (
                         <PresentationContent>
-                          <Pill color="success">{I18n.t('NEW')}</Pill>
+                          <Pill color="success" id={linkId}>
+                            {I18n.t('NEW')}
+                          </Pill>
                         </PresentationContent>
                       )}
                     </Flex.Item>
