@@ -18,15 +18,18 @@
 
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 type HighlightBlockLayoutProps = {
   icon?: React.ReactNode
+  screenReaderContent: string
   content: React.ReactNode
   backgroundColor: string
 }
 
 export const HighlightBlockLayout = ({
   icon,
+  screenReaderContent,
   content,
   backgroundColor,
 }: HighlightBlockLayoutProps) => {
@@ -42,6 +45,7 @@ export const HighlightBlockLayout = ({
       }}
       display="block"
     >
+      <ScreenReaderContent>{screenReaderContent}</ScreenReaderContent>
       <Flex gap="mediumSmall" direction="row">
         {icon && <Flex.Item data-testid="highlight-icon">{icon}</Flex.Item>}
         <Flex.Item shouldGrow shouldShrink>
