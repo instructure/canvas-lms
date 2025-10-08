@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useMemo} from 'react'
+import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -62,6 +62,8 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
       display="flex"
       overflowX="hidden"
       overflowY="hidden"
+      role="group"
+      aria-label={courseName}
     >
       <Flex direction="column" width="100%" height="100%">
         <Flex.Item padding="0" margin="0 0 small 0" overflowX="visible" overflowY="visible">
