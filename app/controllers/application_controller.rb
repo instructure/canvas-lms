@@ -389,6 +389,7 @@ class ApplicationController < ActionController::Base
                                     end
         if @context.is_a?(Course)
           @js_env[:FEATURES][:youtube_overlay] = @context.account.feature_enabled?(:youtube_overlay)
+          @js_env[:FEATURES][:rce_studio_embed_improvements] = @context.feature_enabled?(:rce_studio_embed_improvements)
         end
 
         # partner context data
@@ -458,7 +459,6 @@ class ApplicationController < ActionController::Base
     new_quizzes_navigation_updates
     permanent_page_links
     rce_a11y_resize
-    rce_studio_embed_improvements
     rce_find_replace
     render_both_to_do_lists
     scheduled_feedback_releases

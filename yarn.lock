@@ -2957,10 +2957,10 @@
   dependencies:
     prop-types "^15"
 
-"@instructure/studio-player@1.3.9":
-  version "1.3.9"
-  resolved "https://registry.yarnpkg.com/@instructure/studio-player/-/studio-player-1.3.9.tgz#6ed84556c102e021b91994c41a2b92cd905763e9"
-  integrity sha512-Pw0Pn/zZGIfeoVtNBWkaItdWmgb47P9NEHbp9HqUEalYS8bhcrI/yYOnK3bsWmLSiU4akFshcAQHi/bKleksPA==
+"@instructure/studio-player@1.3.10":
+  version "1.3.10"
+  resolved "https://registry.yarnpkg.com/@instructure/studio-player/-/studio-player-1.3.10.tgz#913d0c9d01c9570af33d223da7a8bb655ca79b3a"
+  integrity sha512-YAWt0t9+GcF7U/XLZMpFkHDcU0L0hKdq3FctctAyhlYC/goPBiwDYoNO9Er/U9ndYg1oeWViFOV+JHlb5MqT1A==
   dependencies:
     "@floating-ui/react" "^0.27.3"
     "@nanostores/react" "^1.0.0"

@@ -3777,6 +3777,12 @@ RSpec.describe ApplicationController, "#cached_js_env_account_features" do
     flags = controller.cached_js_env_account_features
 
     expect(flags).to have_key(:course_pace_pacing_with_mastery_paths)
-    expect(flags).to have_key(:rce_studio_embed_improvements)
+  end
+
+  it "does not include course-level feature flags" do
+    flags = controller.cached_js_env_account_features
+
+    # rce_studio_embed_improvements is a course-level flag, so it shouldn't be in account features
+    expect(flags).not_to have_key(:rce_studio_embed_improvements)
   end
 end
