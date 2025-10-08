@@ -23,6 +23,7 @@ import {useAddBlockModal} from '../hooks/useAddBlockModal'
 import {useAppSelector} from '../store'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {showScreenReaderAlert} from '../utilities/accessibility'
+import {useFocusManagement} from '../hooks/useFocusManagement'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -30,6 +31,7 @@ export const AddBlockModalRenderer = () => {
   const {isOpen, insertAfterNodeId} = useAppSelector(state => state.addBlockModal)
   const {close} = useAddBlockModal()
   const addNode = useAddNode()
+  const {focusCopyButton} = useFocusManagement()
 
   const onAddBlock = (block: ReactElement) => {
     const addedNode = addNode(block, insertAfterNodeId)
@@ -37,6 +39,7 @@ export const AddBlockModalRenderer = () => {
       blockType: addedNode.data.displayName,
     })
     showScreenReaderAlert(alertMessage)
+    focusCopyButton(addedNode.id)
   }
 
   return <AddBlockModal open={isOpen} onDismiss={close} onAddBlock={onAddBlock} />
