@@ -97,12 +97,10 @@ export class CardDashboardLoader {
       let xhrHasReturned = false
       let sessionStorageTimeout: number
       const sessionStorageKey = `dashcards_for_user_${ENV && ENV.current_user_id}`
-      const urlPrefix = '/api/v1/dashboard/dashboard_cards'
-      const url = new URL(urlPrefix, window.location.origin)
+      let urlString = '/api/v1/dashboard/dashboard_cards'
       if (observedUserId) {
-        url.searchParams.append('observed_user_id', observedUserId)
+        urlString += `?observed_user_id=${observedUserId}`
       }
-      const urlString = url.toString()
       this.promiseToGetDashboardCards =
         asJson(getPrefetchedXHR(urlString)) ||
         axios
