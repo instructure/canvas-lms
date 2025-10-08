@@ -145,6 +145,25 @@ function createCache() {
           },
         },
       },
+      Discussion: {
+        fields: {
+          mentionableUsersConnection: {
+            keyArgs: ['searchTerm'],
+            merge(existing, incoming, {args}) {
+              // Reset on new search (no cursor) or first page
+              if (!args?.after || !existing) {
+                return incoming
+              }
+
+              // Append new page to existing nodes
+              return {
+                ...incoming,
+                nodes: [...(existing.nodes || []), ...(incoming.nodes || [])],
+              }
+            },
+          },
+        },
+      },
     },
   })
 }
