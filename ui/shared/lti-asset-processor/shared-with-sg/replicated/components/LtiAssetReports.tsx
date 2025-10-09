@@ -41,13 +41,13 @@ import {
 
 const I18n = createI18nScope('lti_asset_processor')
 
-type Attachment = {
+export type Attachment = {
   _id: string
   displayName: string
 }
 
 export type LtiAssetReportsProps = {
-  attachments: Attachment[]
+  attachments?: Attachment[]
   reports: LtiAssetReport[]
   assetProcessors: LtiAssetProcessor[]
   attempt: string
@@ -158,7 +158,7 @@ export function LtiAssetReports({
   submissionType,
   showDocumentDisplayName,
 }: LtiAssetReportsProps): JSX.Element | null {
-  const assetSelector = {submissionType, attachments, attempt}
+  const assetSelector = {submissionType, attachments: attachments || [], attempt}
   const groupedReports = reportsForAssetsByProcessors(reports, assetProcessors, assetSelector)
 
   return (

@@ -1,0 +1,107 @@
+/*
+ * Copyright (C) 2025 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import {Modal} from '@instructure/ui-modal'
+import {Heading} from '@instructure/ui-heading'
+import {CloseButton} from '@instructure/ui-buttons'
+import {Flex, FlexItem} from '@instructure/ui-flex'
+import {Text} from '@instructure/ui-text'
+import TruncateWithTooltip from '@canvas/lti-apps/components/common/TruncateWithTooltip'
+import LtiAssetReportStatus from './LtiAssetReportStatus'
+import {View} from '@instructure/ui-view'
+import {LtiAssetReports, type LtiAssetReportsProps} from './LtiAssetReports'
+import {useScope as createI18nScope} from '@canvas/i18n'
+
+export type AssetReportModalProps = LtiAssetReportsProps & {
+  modalTitle: string
+  mainTitle?: string
+  onClose?: () => void
+}
+
+const I18n = createI18nScope('lti_asset_processor')
+
+export function AssetReportModal({
+  assetProcessors,
+  modalTitle,
+  attachments,
+  attempt,
+  mainTitle,
+  onClose,
+  reports,
+  showDocumentDisplayName,
+  studentIdForResubmission,
+  submissionType,
+}: AssetReportModalProps) {
+  const assetProcessorsWithReports = assetProcessors.filter(assetProcessor =>
+    reports.some(report => report.processorId === assetProcessor._id),
+  )
+
+  return (
+    <Modal
+      label={modalTitle}
+      open={true}
+      onClose={onClose}
+      onDismiss={onClose}
+      size="medium"
+    >
+      <Modal.Header>
+        <Heading>{modalTitle}</Heading>
+        <CloseButton
+          placement="end"
+          offset="medium"
+          onClick={onClose}
+          screenReaderLabel={I18n.t('Close')}
+          elementRef={el => {
+            el?.setAttribute('data-pendo', 'asset-reports-modal-close')
+          }}
+        />
+      </Modal.Header>
+      <Modal.Body>
+        <Flex justifyItems="space-between" alignItems="center" margin="0 0 medium 0" gap="medium">
+          {mainTitle && (
+            <FlexItem>
+              <View maxWidth="30em" as="div">
+                <Text size="descriptionPage" weight="weightImportant">
+                  <TruncateWithTooltip
+                    linesAllowed={1}
+                    horizontalOffset={0}
+                    backgroundColor="primary-inverse"
+                  >
+                    {mainTitle}
+                  </TruncateWithTooltip>
+                </Text>
+              </View>
+            </FlexItem>
+          )}
+          <FlexItem>
+            <LtiAssetReportStatus reports={reports} />
+          </FlexItem>
+        </Flex>
+        <LtiAssetReports
+          assetProcessors={assetProcessorsWithReports}
+          attempt={attempt}
+          reports={reports}
+          studentIdForResubmission={studentIdForResubmission}
+          attachments={attachments}
+          submissionType={submissionType}
+          showDocumentDisplayName={showDocumentDisplayName}
+        />
+      </Modal.Body>
+    </Modal>
+  )
+}

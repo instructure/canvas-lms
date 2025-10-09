@@ -25,7 +25,7 @@ import {
   ZLtiAssetReportForStudent,
 } from '@canvas/lti-asset-processor/model/LtiAssetReport'
 import {ZodType} from 'zod'
-import LtiAssetReportStatus from '@canvas/lti-asset-processor/react/LtiAssetReportStatus'
+import LtiAssetReportStatus from '@canvas/lti-asset-processor/shared-with-sg/replicated/components/LtiAssetReportStatus'
 import StudentLtiAssetReportModal from '@canvas/lti-asset-processor/react/StudentLtiAssetReportModal'
 import {AssetReportCompatibleSubmissionType} from '@canvas/lti-asset-processor/shared-with-sg/replicated/types/LtiAssetReports'
 
