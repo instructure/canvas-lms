@@ -167,6 +167,7 @@ function Assignment() {
     this.newQuizzesAssignmentBuildButtonEnabled.bind(this)
   this.newMasteryConnectIconEnabled = this.newMasteryConnectIconEnabled.bind(this)
   this.newQuizzesType = this.newQuizzesType.bind(this)
+  this.newQuizzesAnonymousSubmission = this.newQuizzesAnonymousSubmission.bind(this)
   this.nonBaseDates = this.nonBaseDates.bind(this)
   this.notifyOfUpdate = this.notifyOfUpdate.bind(this)
   this.objectType = this.objectType.bind(this)
@@ -1079,6 +1080,21 @@ Assignment.prototype.newQuizzesType = function (type) {
     new_quizzes: {
       ...newQuizzes,
       type,
+    },
+  })
+}
+
+Assignment.prototype.newQuizzesAnonymousSubmission = function (isAnonymous) {
+  const settings = this.get('settings') || {}
+  const newQuizzes = settings.new_quizzes || {}
+  if (!(arguments.length > 0)) {
+    return newQuizzes.anonymous_participants || false
+  }
+  return this.set('settings', {
+    ...settings,
+    new_quizzes: {
+      ...newQuizzes,
+      anonymous_participants: isAnonymous,
     },
   })
 }

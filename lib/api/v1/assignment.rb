@@ -1105,7 +1105,7 @@ module Api::V1::Assignment
       assignment.hide_in_gradebook = (type == "ungraded_survey")
       assignment.omit_from_final_grade = (type == "ungraded_survey")
     end
-    assignment.anonymous_participants = assignment_params[:anonymous_participants]
+    assignment.anonymous_participants = assignment_params[:new_quizzes_anonymous_submission]
   end
 
   def turnitin_settings_hash(assignment_params)

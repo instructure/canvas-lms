@@ -73,6 +73,7 @@ const slice = [].slice
 
 const ASSIGNMENT_GROUP_SELECTOR = '#assignment_group_selector'
 const QUIZ_TYPE_SELECTOR = '#quiz_type_selector'
+const ANONYMOUS_SUBMISSION_SELECTOR = '#anonymous_submission_selector'
 const DESCRIPTION = '[name="description"]'
 const SUBMISSION_TYPE = '[name="submission_type"]'
 const SUBMISSION_TYPE_FIELDS = '#submission_type_fields'
@@ -334,6 +335,8 @@ EditView.child('assignmentGroupSelector', '' + ASSIGNMENT_GROUP_SELECTOR)
 
 EditView.child('quizTypeSelector', '' + QUIZ_TYPE_SELECTOR)
 
+EditView.child('anonymousSubmissionSelector', '' + ANONYMOUS_SUBMISSION_SELECTOR)
+
 EditView.child('gradingTypeSelector', '' + GRADING_TYPE_SELECTOR)
 
 EditView.child('groupCategorySelector', '' + GROUP_CATEGORY_SELECTOR)
@@ -386,6 +389,9 @@ EditView.prototype.initialize = function (options) {
   }
   if (this.quizTypeSelector) {
     this.quizTypeSelector.on('change:quizType', this.handleQuizTypeChange)
+  }
+  if (this.anonymousSubmissionSelector) {
+    this.anonymousSubmissionSelector.on('change:anonymousSubmission', this.handleAnonymousSubmissionChange)
   }
   this.lockedItems = options.lockedItems || {}
   return (this.cannotEditGrades = !options.canEditGrades)
@@ -1057,26 +1063,26 @@ EditView.prototype.handleGradingTypeChange = function (gradingType) {
 
 EditView.prototype.handleQuizTypeChange = function (quizType) {
   // Hide points field when ungraded survey is selected
-  const shouldHidePoints = quizType === 'ungraded_survey'
-  this.$assignmentPointsPossible.closest('.control-group').toggleAccessibly(!shouldHidePoints)
+  const isUngradedSurvey = quizType === 'ungraded_survey'
+  this.$assignmentPointsPossible.closest('.control-group').toggleAccessibly(!isUngradedSurvey)
 
   // Set points to 0 for ungraded surveys
-  if (shouldHidePoints) {
+  if (isUngradedSurvey) {
     this.$assignmentPointsPossible.val('0')
   }
+  this.anonymousSubmissionSelector.$el.closest('.control-group').toggleAccessibly(isUngradedSurvey)
 
-  // Hide Assignment Group, Display Grade as, and Submission Type for surveys
   const isSurvey = quizType === 'graded_survey' || quizType === 'ungraded_survey'
+  // Hide Assignment Group, Display Grade as, Submission Type and Graded Assignment Fields for surveys
   this.$assignmentGroupSelector.toggleAccessibly(!isSurvey)
   this.$gradingTypeSelector.toggleAccessibly(!isSurvey)
   this.$submissionTypeFields.toggleAccessibly(!isSurvey)
+  this.$gradedAssignmentFields.toggleAccessibly(!isSurvey)
+}
 
-  // Hide graded assignment fields and related checkboxes for surveys
-  if (isSurvey) {
-    this.$gradedAssignmentFields.toggleAccessibly(false)
-  } else {
-    this.$gradedAssignmentFields.toggleAccessibly(true)
-  }
+EditView.prototype.handleAnonymousSubmissionChange = function (isAnonymous) {
+  // Store the value in the model
+  this.assignment.newQuizzesAnonymousSubmission(isAnonymous)
 }
 
 EditView.prototype.hasMasteryConnectData = function () {
@@ -1389,18 +1395,17 @@ EditView.prototype.afterRender = function () {
   // Hide Assignment Group, Display Grade as, and Submission Type for surveys on initial load
   if (this.quizTypeSelector) {
     const currentQuizType = this.assignment.newQuizzesType() || 'graded_quiz'
-    const isSurvey = currentQuizType === 'graded_survey' || currentQuizType === 'ungraded_survey'
-    const isUngradedSurvey = currentQuizType === 'ungraded_survey'
 
-    if (isSurvey) {
+    if (currentQuizType === 'graded_survey' || currentQuizType === 'ungraded_survey') {
       this.$assignmentGroupSelector.toggleAccessibly(false)
       this.$gradingTypeSelector.toggleAccessibly(false)
       this.$submissionTypeFields.toggleAccessibly(false)
       // Hide graded assignment fields for surveys
       this.$gradedAssignmentFields.toggleAccessibly(false)
+      this.anonymousSubmissionSelector.$el.closest('.control-group').toggleAccessibly(true)
     }
 
-    if (isUngradedSurvey) {
+    if (currentQuizType === 'ungraded_survey') {
       this.$assignmentPointsPossible.closest('.control-group').toggleAccessibly(false)
       this.$assignmentPointsPossible.val('0')
     }
@@ -1447,7 +1452,12 @@ EditView.prototype.toJSON = function () {
         ? ENV.ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED
         : void 0) || false,
     is_horizon_course: !!ENV.horizon_course,
-    showQuizTypeSelector: newQuizzesSurveysFFEnabled && this.assignment.isQuizLTIAssignment(),
+    newQuizzesSurveysFFEnabled:
+      newQuizzesSurveysFFEnabled && this.assignment.isQuizLTIAssignment(),
+    showAnonymousSubmissionSelector:
+      newQuizzesSurveysFFEnabled && this.assignment.isQuizLTIAssignment() &&
+      (this.assignment.newQuizzesType() === 'graded_survey' ||
+        this.assignment.newQuizzesType() === 'ungraded_survey'),
   })
 }
 

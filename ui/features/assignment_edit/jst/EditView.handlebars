@@ -60,7 +60,7 @@
     </div>
   {{/unless}}
 
-  {{#if showQuizTypeSelector}}
+  {{#if newQuizzesSurveysFFEnabled}}
     <div id="quiz_type_selector" class="control-group"></div>
   {{/if}}
 
@@ -95,6 +95,9 @@
 
   </div>
 
+  {{#if newQuizzesSurveysFFEnabled}}
+    <div id="anonymous_submission_selector" class="control-group" style="{{hiddenUnless showAnonymousSubmissionSelector}}"></div>
+  {{/if}}
 
   <div id="assignment_group_selector" class="control-group"></div>
 
