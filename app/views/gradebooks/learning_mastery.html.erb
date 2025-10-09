@@ -27,7 +27,7 @@
 
 <div id="gradebook_wrapper">
   <h1 class="screenreader-only"><%= t('Learning Mastery') %></h1>
-    <% if @domain_root_account.feature_enabled?(:improved_lmgb) %>
+    <% if @context.feature_enabled?(:improved_lmgb) %>
       <% js_bundle :learning_mastery_v2 %>
       <div id="learning_mastery_gradebook"></div>
   <% else %>
