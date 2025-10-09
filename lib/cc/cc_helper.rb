@@ -248,8 +248,10 @@ module CC
             end
           else
             obj = match.obj_class.find_by(id: match.obj_id)
+            next(match.url) if obj.try(:context_type).nil? || %w[Course User AssessmentQuestion].exclude?(obj.context_type)
+
             # find the object in the context in case it's deleted and we need to find the active attachment
-            obj = obj.context.attachments.find_by(id: obj) if obj
+            obj = obj.context.attachments.find_by(id: obj) if %w[Course User].include?(obj.context_type)
             next(match.url) unless obj
             next(match.url) if obj.context_type == "Course" && obj.context_id != @course.id
             next(match.url) if obj.context_type == "AssessmentQuestion" && @for_course_copy

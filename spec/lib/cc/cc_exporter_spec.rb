@@ -881,6 +881,29 @@ describe "Common Cartridge exporting" do
       expect(export_body).to include "/courses/#{@ce.context.id}/files/#{att_id}?wrap=1"
     end
 
+    it "does not crash on a file from a weird place" do
+      sis_batch = SisBatch.create!(account: Account.default)
+      att = attachment_with_context(sis_batch, uploaded_data: stub_png_data)
+      body = <<~HTML
+        <p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="audio" src="/media_attachments_iframe/#{att.id}?embedded=true&type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="some-kaltura-id"></iframe></p>
+        <p><img src="/users/#{@user.id}/files/#{att.id}/preview" width="150" height="150" /></p>
+        <p><a id="0" href="/courses/#{@ce.context.id}/files/#{att.id}?wrap=1">file.pdf</a></p>
+      HTML
+
+      wiki_page_model(course: @ce.context, body:, updating_user: @user)
+      @ce.update(export_type: ContentExport::COMMON_CARTRIDGE)
+      @ce.save!
+
+      expect { run_export }.not_to raise_error
+
+      check_resource_node(@page, CC::CCHelper::WEBCONTENT)
+
+      export_body = @zip_file.read("wiki_content/some-page.html")
+      expect(export_body).to include "/media_attachments_iframe/#{att.id}"
+      expect(export_body).to include "/users/#{@user.id}/files/#{att.id}/preview"
+      expect(export_body).to include "/courses/#{@ce.context.id}/files/#{att.id}?wrap=1"
+    end
+
     it "has valid course settings XML" do
       # include all possible settings, not just changed ones
       # (if this test fails, you need to add your setting to lib/cc/xsd/cccv1p0.xsd)
