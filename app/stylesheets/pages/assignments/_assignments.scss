@@ -145,6 +145,20 @@
   .form-horizontal.display-only .control-group {
     margin-bottom: 0;
   }
+  .form-horizontal .control-label {
+    max-width: 160px;
+    width: 100%;
+  }
+  @media (max-width: 300px) {
+    .form-horizontal .controls {
+      margin-left: unset;
+      float: right;
+    }
+  }
+  .ic-Table.assignment_dates {
+    word-wrap: break-word;
+    table-layout: fixed;
+  }
   .description.teacher-version {
     padding: 15px;
     overflow-y: auto;
