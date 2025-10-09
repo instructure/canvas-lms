@@ -2358,13 +2358,14 @@ end
 
 ActiveModel::Dirty.prepend(ActiveModelDirtyRails80) if Rails.version >= "8.0" && Rails.version < "8.1"
 
-# Restore Rails 7.2 behavior of casting Numeric to nil for DateTime columns
-module DateTimeRails80
-  def cast_value(value)
-    return nil if value.is_a?(Numeric)
+module ValidateDateTimeFormat
+  def _write_attribute(attr_name, value)
+    if value.present? && (value.is_a?(Numeric) || (value.is_a?(String) && value.match?(/^\d+$/))) && self.class.columns_hash[attr_name.to_s]&.type&.in?([:datetime, :timestamp])
+      errors.add(attr_name, "must be in ISO8601 format")
+      return
+    end
 
     super
   end
 end
-
-ActiveModel::Type::DateTime.prepend(DateTimeRails80) if Rails.version >= "8.0"
+ActiveRecord::Base.prepend(ValidateDateTimeFormat)
