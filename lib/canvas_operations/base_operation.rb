@@ -197,13 +197,14 @@ module CanvasOperations
         else
           # by default use the cluster primary account as the context.
           # Subclasses can override this to provide different contexts.
-          switchman_shard.database_server.primary_shard.activate do
+          switchman_shard.database_server.primary_shard&.activate do
             Account.root_accounts.where(external_status: ["administrative", "free_for_teachers"]).active.first ||
               Account.default
           end
         end
       rescue => e
         log_message("Error determining context account: #{e.message}", level: :error)
+        Account.default
       end
     end
 
