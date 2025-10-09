@@ -64,7 +64,7 @@ module Assignments
             when :full, :limited
               manual_count
             when :sections, :sections_limited
-              section_filtered_submissions.distinct.count(:id)
+              count_submissions(section_filtered_submissions)
             else
               0
             end
@@ -96,11 +96,8 @@ module Assignments
       end
 
       scope = (level == :sections) ? section_filtered_submissions : all_submissions
-      if graded_sub_ids.any?
-        scope.where.not(submissions: { id: graded_sub_ids }).distinct.count(:id)
-      else
-        scope.distinct.count(:id)
-      end
+      scope = scope.where.not(submissions: { id: graded_sub_ids }) if graded_sub_ids.any?
+      count_submissions(scope)
     end
 
     def count_by_section
@@ -116,7 +113,8 @@ module Assignments
 
           submissions
             .group("e.course_section_id")
-            .count
+            .distinct
+            .count("submissions.user_id")
             .map { |k, v| { section_id: k.to_i, needs_grading_count: v } }
         end
       end
@@ -124,17 +122,29 @@ module Assignments
 
     def manual_count
       assignment.shard.activate do
-        all_submissions.distinct.count(:id)
+        count_submissions(all_submissions)
       end
     end
 
     private
 
+    def count_submissions(scope)
+      scope.distinct.count(:user_id)
+    end
+
+    def all_submissions
+      if assignment.has_sub_assignments
+        sub_assignment_submissions
+      else
+        all_outer_submissions
+      end
+    end
+
     def section_filtered_submissions
       all_submissions.where(e: { course_section_id: visible_section_ids })
     end
 
-    def all_submissions
+    def all_outer_submissions
       string = <<~SQL.squish
         submissions.assignment_id = ?
           AND e.course_id = ?
@@ -143,6 +153,25 @@ module Assignments
           AND #{Submission.needs_grading_conditions}
       SQL
       joined_submissions.where(string, assignment, course)
+    end
+
+    def sub_assignment_submissions
+      # a better solution would be to fix the logic in submission_aggregator_service.rb
+      # to apply a proper workflow_state to the parent submission based on the states of the child submissions
+      # but this is a quick fix to make the needs_grading_count work correctly for sub-assignments
+
+      sub_assignment_ids = assignment.sub_assignments.pluck(:id)
+      return Submission.none if sub_assignment_ids.empty?
+
+      string = <<~SQL.squish
+        submissions.assignment_id IN (?)
+          AND e.course_id = ?
+          AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
+          AND e.workflow_state = 'active'
+          AND #{Submission.needs_grading_conditions}
+      SQL
+      Submission.joins("INNER JOIN #{Enrollment.quoted_table_name} e ON e.user_id = submissions.user_id")
+                .where(string, sub_assignment_ids, course)
     end
 
     def joined_submissions

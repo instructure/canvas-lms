@@ -194,6 +194,113 @@ module Assignments
           expect(querier.count).to eq 1 # should not count because it has two marks now
         end
       end
+
+      context "with sub_assignments" do
+        before :once do
+          @parent_assignment = @course.assignments.create!(
+            title: "parent assignment",
+            has_sub_assignments: true,
+            submission_types: "online_text_entry"
+          )
+          @sub_assignment1 = @parent_assignment.sub_assignments.create!(
+            context: @course,
+            sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
+            points_possible: 5,
+            due_at: 2.days.from_now
+          )
+          @sub_assignment2 = @parent_assignment.sub_assignments.create!(
+            context: @course,
+            sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY,
+            points_possible: 5,
+            due_at: 3.days.from_now
+          )
+        end
+
+        it "only counts submissions in the user's visible section(s)" do
+          @section = @course.course_sections.create!(name: "section 2")
+          @user2 = user_with_pseudonym(active_all: true, name: "Student2", username: "student2@instructure.com")
+          @section.enroll_user(@user2, "StudentEnrollment", "active")
+          @user1 = user_with_pseudonym(active_all: true, name: "Student1", username: "student1@instructure.com")
+          @course.enroll_student(@user1).update_attribute(:workflow_state, "active")
+
+          # enroll a section-limited TA
+          @ta = user_with_pseudonym(active_all: true, name: "TA1", username: "ta1@instructure.com")
+          ta_enrollment = @course.enroll_ta(@ta)
+          ta_enrollment.limit_privileges_to_course_section = true
+          ta_enrollment.workflow_state = "active"
+          ta_enrollment.save!
+
+          # make a submission in each section
+          @sub_assignment1.submit_homework @user1, submission_type: "online_text_entry", body: "o hai"
+          @sub_assignment1.submit_homework @user2, submission_type: "online_text_entry", body: "haldo"
+
+          # check the teacher sees both, the TA sees one
+          expect(NeedsGradingCountQuery.new(@parent_assignment, @teacher).count).to be(2)
+          expect(NeedsGradingCountQuery.new(@parent_assignment, @ta).count).to be(1)
+
+          # grade an assignment
+          @sub_assignment1.grade_student(@user1, grade: "3", grader: @teacher)
+
+          # check that the numbers changed
+          expect(NeedsGradingCountQuery.new(@parent_assignment, @teacher).count).to be(1)
+          expect(NeedsGradingCountQuery.new(@parent_assignment, @ta).count).to be(0)
+
+          # test limited enrollment in multiple sections
+          @course.enroll_user(@ta,
+                              "TaEnrollment",
+                              enrollment_state: "active",
+                              section: @section,
+                              allow_multiple_enrollments: true,
+                              limit_privileges_to_course_section: true)
+          expect(NeedsGradingCountQuery.new(@parent_assignment, @ta).count).to be(1)
+        end
+
+        it "breaks them out by section if count_by_section is called" do
+          @section = @course.course_sections.create!(name: "section 2")
+          @user2 = user_with_pseudonym(active_all: true, name: "Student2", username: "student2@instructure.com")
+          @section.enroll_user(@user2, "StudentEnrollment", "active")
+          @user1 = user_with_pseudonym(active_all: true, name: "Student1", username: "student1@instructure.com")
+          @course.enroll_student(@user1).update_attribute(:workflow_state, "active")
+
+          @sub_assignment1.submit_homework @user1, submission_type: "online_text_entry", body: "o hai"
+          @sub_assignment2.submit_homework @user2, submission_type: "online_text_entry", body: "haldo"
+
+          expect(NeedsGradingCountQuery.new(@parent_assignment, @teacher).count).to be(2)
+          sections_grading_counts = NeedsGradingCountQuery.new(@parent_assignment, @teacher).count_by_section
+          expect(sections_grading_counts).to be_a(Array)
+          @course.course_sections.each do |section|
+            expect(sections_grading_counts).to include({
+                                                         section_id: section.id,
+                                                         needs_grading_count: 1
+                                                       })
+          end
+        end
+
+        it "counts each user once per section even with multiple sub_assignment submissions" do
+          @section = @course.course_sections.create!(name: "section 2")
+          @user1 = user_with_pseudonym(active_all: true, name: "Student1", username: "student1@instructure.com")
+          @user2 = user_with_pseudonym(active_all: true, name: "Student2", username: "student2@instructure.com")
+          @course.enroll_student(@user1).update_attribute(:workflow_state, "active")
+          @section.enroll_user(@user2, "StudentEnrollment", "active")
+
+          # User1 submits to both sub_assignments in default section
+          @sub_assignment1.submit_homework @user1, submission_type: "online_text_entry", body: "reply 1"
+          @sub_assignment2.submit_homework @user1, submission_type: "online_text_entry", body: "reply 2"
+
+          # User2 submits to both sub_assignments in section 2
+          @sub_assignment1.submit_homework @user2, submission_type: "online_text_entry", body: "reply 3"
+          @sub_assignment2.submit_homework @user2, submission_type: "online_text_entry", body: "reply 4"
+
+          sections_grading_counts = NeedsGradingCountQuery.new(@parent_assignment, @teacher).count_by_section
+
+          # Each section should have count of 1, not 2
+          default_section_count = sections_grading_counts.find { |s| s[:section_id] == @course.default_section.id }
+          section2_count = sections_grading_counts.find { |s| s[:section_id] == @section.id }
+
+          expect(default_section_count[:needs_grading_count]).to be(1)
+          expect(section2_count[:needs_grading_count]).to be(1)
+        end
+      end
     end
 
     describe "#manual_count" do
@@ -305,6 +412,128 @@ module Assignments
           @assignment.reload
           expect(NeedsGradingCountQuery.new(@assignment).manual_count).to be(0)
           expect(@user.enrollments.where(workflow_state: "active").count).to be(1)
+        end
+      end
+
+      context "with sub_assignments" do
+        before :once do
+          @parent_assignment = @course.assignments.create!(
+            title: "parent assignment",
+            has_sub_assignments: true,
+            submission_types: "online_text_entry"
+          )
+          @sub_assignment1 = @parent_assignment.sub_assignments.create!(
+            context: @course,
+            sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
+            points_possible: 5,
+            due_at: 2.days.from_now
+          )
+          @sub_assignment2 = @parent_assignment.sub_assignments.create!(
+            context: @course,
+            sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY,
+            points_possible: 5,
+            due_at: 3.days.from_now
+          )
+        end
+
+        it "counts distinct users with sub_assignment submissions needing grading" do
+          @user1 = user_with_pseudonym(active_all: true, name: "Student1", username: "student1@instructure.com")
+          @user2 = user_with_pseudonym(active_all: true, name: "Student2", username: "student2@instructure.com")
+          @course.enroll_student(@user1).update_attribute(:workflow_state, "active")
+          @course.enroll_student(@user2).update_attribute(:workflow_state, "active")
+
+          @sub_assignment1.submit_homework(@user1, submission_type: "online_text_entry", body: "reply 1")
+          @sub_assignment2.submit_homework(@user2, submission_type: "online_text_entry", body: "reply 2")
+
+          expect(NeedsGradingCountQuery.new(@parent_assignment).manual_count).to be(2)
+        end
+
+        it "counts each user only once even with multiple sub_assignment submissions" do
+          @user1 = user_with_pseudonym(active_all: true, name: "Student1", username: "student1@instructure.com")
+          @course.enroll_student(@user1).update_attribute(:workflow_state, "active")
+
+          # User submits to both sub_assignments
+          @sub_assignment1.submit_homework(@user1, submission_type: "online_text_entry", body: "reply to topic")
+          @sub_assignment2.submit_homework(@user1, submission_type: "online_text_entry", body: "reply to entry")
+
+          # Should only count the user once
+          expect(NeedsGradingCountQuery.new(@parent_assignment).manual_count).to be(1)
+        end
+
+        it "ignores parent assignment submissions when sub_assignments exist" do
+          @user1 = user_with_pseudonym(active_all: true, name: "Student1", username: "student1@instructure.com")
+          @course.enroll_student(@user1).update_attribute(:workflow_state, "active")
+
+          # Create a submission on the parent (this should be ignored)
+          parent_submission = @parent_assignment.find_or_create_submission(@user1)
+          parent_submission.submission_type = "online_text_entry"
+          parent_submission.body = "parent submission"
+          parent_submission.workflow_state = "submitted"
+          parent_submission.submitted_at = Time.zone.now
+          parent_submission.save!
+
+          # Should not count the parent submission
+          expect(NeedsGradingCountQuery.new(@parent_assignment).manual_count).to be(0)
+
+          # Now add a sub_assignment submission
+          @sub_assignment1.submit_homework(@user1, submission_type: "online_text_entry", body: "sub reply")
+
+          # Should count the user once for the sub_assignment submission
+          expect(NeedsGradingCountQuery.new(@parent_assignment).manual_count).to be(1)
+        end
+
+        it "updates count when sub_assignment submissions are graded" do
+          @user1 = user_with_pseudonym(active_all: true, name: "Student1", username: "student1@instructure.com")
+          @user2 = user_with_pseudonym(active_all: true, name: "Student2", username: "student2@instructure.com")
+          @course.enroll_student(@user1).update_attribute(:workflow_state, "active")
+          @course.enroll_student(@user2).update_attribute(:workflow_state, "active")
+
+          @sub_assignment1.submit_homework(@user1, submission_type: "online_text_entry", body: "reply 1")
+          @sub_assignment1.submit_homework(@user2, submission_type: "online_text_entry", body: "reply 2")
+
+          expect(NeedsGradingCountQuery.new(@parent_assignment).manual_count).to be(2)
+
+          # Grade one submission
+          @sub_assignment1.grade_student(@user1, grade: "5", grader: @teacher)
+
+          # User1 should not be counted anymore
+          expect(NeedsGradingCountQuery.new(@parent_assignment).manual_count).to be(1)
+        end
+
+        it "does not count user if all their sub_assignment submissions are graded" do
+          @user1 = user_with_pseudonym(active_all: true, name: "Student1", username: "student1@instructure.com")
+          @course.enroll_student(@user1).update_attribute(:workflow_state, "active")
+
+          @sub_assignment1.submit_homework(@user1, submission_type: "online_text_entry", body: "reply to topic")
+          @sub_assignment2.submit_homework(@user1, submission_type: "online_text_entry", body: "reply to entry")
+
+          expect(NeedsGradingCountQuery.new(@parent_assignment).manual_count).to be(1)
+
+          # Grade only the first sub_assignment
+          @sub_assignment1.grade_student(@user1, grade: "5", grader: @teacher)
+
+          # User should still be counted because sub_assignment2 is not graded
+          expect(NeedsGradingCountQuery.new(@parent_assignment).manual_count).to be(1)
+
+          # Grade the second sub_assignment
+          @sub_assignment2.grade_student(@user1, grade: "5", grader: @teacher)
+
+          # Now user should not be counted
+          expect(NeedsGradingCountQuery.new(@parent_assignment).manual_count).to be(0)
+        end
+
+        it "does not count submissions multiple times for users with multiple enrollments" do
+          @user1 = user_with_pseudonym(active_all: true, name: "Student1", username: "student1@instructure.com")
+          @section1 = @course.course_sections.create!(name: "section 1")
+          @section2 = @course.course_sections.create!(name: "section 2")
+          @section1.enroll_user(@user1, "StudentEnrollment", "active")
+          @section2.enroll_user(@user1, "StudentEnrollment", "active")
+
+          @sub_assignment1.submit_homework(@user1, submission_type: "online_text_entry", body: "reply")
+          @sub_assignment2.submit_homework(@user1, submission_type: "online_text_entry", body: "reply 2")
+
+          # Should count user only once
+          expect(NeedsGradingCountQuery.new(@parent_assignment).manual_count).to be(1)
         end
       end
     end
