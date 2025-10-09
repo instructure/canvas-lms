@@ -35,7 +35,7 @@ describe "Improved Learning Mastery Gradebook" do
       @align2 = @outcome2.align(@assignment, @course)
 
       @course.enable_feature!(:outcome_gradebook)
-      Account.site_admin.enable_feature!(:improved_lmgb)
+      @course.enable_feature!(:improved_lmgb)
     end
 
     before do
