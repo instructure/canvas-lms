@@ -17,17 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module IgniteAgentHelper
-  def add_ignite_agent_bundle
-    return unless @domain_root_account&.feature_enabled?(:ignite_agent_enabled)
-    return unless @current_user
+class AddAccessIgniteAgentPermission < ActiveRecord::Migration[7.2]
+  tag :postdeploy
 
-    return unless @domain_root_account&.grants_right?(@current_user, session, :access_ignite_agent)
-
-    js_bundle :ignite_agent
-    remote_env(ignite_agent: {
-                 launch_url: Services::IgniteAgent.launch_url,
-                 backend_url: Services::IgniteAgent.backend_url
-               })
+  def up
+    DataFixup::AddRoleOverridesForNewPermission
+      .delay_if_production(priority: Delayed::LOW_PRIORITY)
+      .run(:manage_account_settings, :access_ignite_agent)
   end
 end
