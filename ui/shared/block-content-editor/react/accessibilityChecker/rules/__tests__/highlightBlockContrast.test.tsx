@@ -92,6 +92,7 @@ describe('highlightBlockContrast', () => {
     render(
       <div style={{backgroundColor: lightYellow}}>
         <HighlightBlockLayout
+          screenReaderContent=""
           backgroundColor={lightGray}
           content="This highlight has poor contrast"
         />
@@ -108,6 +109,7 @@ describe('highlightBlockContrast', () => {
     render(
       <div style={{backgroundColor: white}}>
         <HighlightBlockLayout
+          screenReaderContent=""
           backgroundColor={darkRed}
           content="This highlight has good contrast"
         />

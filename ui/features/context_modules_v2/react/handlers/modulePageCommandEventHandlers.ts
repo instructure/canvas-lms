@@ -23,9 +23,12 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {
   MODULE_ITEM_TITLES,
   MODULE_ITEMS,
+  MODULE_ITEMS_ALL,
   MODULE_ITEMS_QUERY_MAP,
   MODULES,
   PAGE_SIZE,
+  SHOW_ALL_PAGE_SIZE,
+  TEACHER,
 } from '../utils/constants'
 import {
   GraphQLResult,
@@ -79,10 +82,25 @@ class ModulePageCommandEventHandlers {
 
     if (!module) return
 
-    const itemData = await queryClient.ensureQueryData({
-      queryKey: [MODULE_ITEM_TITLES, moduleId],
-      queryFn: getModuleItemTitles,
-    })
+    // In "show all" mode, prioritize the complete data over paginated data
+    const allModuleData = queryClient.getQueryData([
+      MODULE_ITEMS_ALL,
+      moduleId || '',
+      TEACHER,
+      SHOW_ALL_PAGE_SIZE,
+    ]) as {
+      moduleItems: ModuleItem[]
+    }
+
+    let itemData = allModuleData?.moduleItems
+
+    // Fallback to paginated cache if show all not available
+    if (!allModuleData) {
+      itemData = await queryClient.ensureQueryData({
+        queryKey: [MODULE_ITEM_TITLES, moduleId],
+        queryFn: getModuleItemTitles,
+      })
+    }
 
     handleOpeningModuleUpdateTray(
       moduleData,

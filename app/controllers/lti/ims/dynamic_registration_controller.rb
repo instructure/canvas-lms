@@ -26,13 +26,13 @@ module Lti
     class DynamicRegistrationController < ApplicationController
       REGISTRATION_TOKEN_EXPIRATION = 1.hour
 
-      before_action :require_user, except: [:create]
-      before_action :require_account, except: [:create]
+      before_action :require_user, except: [:create, :update]
+      before_action :require_account, except: [:create, :update]
 
       # This skip_before_action is required because :load_user will
       # attempt to find the bearer token, which is not stored with
       # the other Canvas tokens.
-      skip_before_action :load_user, only: [:create]
+      skip_before_action :load_user, only: [:create, :update]
 
       include Api::V1::Lti::Registration
 
@@ -57,8 +57,10 @@ module Lti
         current_time = Time.zone.now.iso8601
         user_id = @current_user.id
         root_account_global_id = account_context.global_id
+        root_account_domain = account_context.domain(request.host)
         unified_tool_id = params[:unified_tool_id].presence
         registration_url = params[:registration_url]
+        existing_registration = Lti::Registration.find(params[:registration_id]) if params[:registration_id].present? && account_context.feature_enabled?(:lti_dr_registrations_update)
 
         token = Canvas::Security.create_jwt(
           {
@@ -67,8 +69,10 @@ module Lti
             user_id:,
             unified_tool_id:,
             root_account_global_id:,
-            registration_url:
-          },
+            root_account_domain:,
+            registration_url:,
+            existing_registration: existing_registration&.id
+          }.compact,
           REGISTRATION_TOKEN_EXPIRATION.from_now
         )
 
@@ -87,6 +91,11 @@ module Lti
                                            @context,
                                            includes: %i[configuration overlay],
                                            overlay: reg.lti_registration.overlay_for(@context))
+      end
+
+      def lti_registration_update_request_by_uuid
+        registration_update_request = Lti::RegistrationUpdateRequest.find_by!(uuid: params[:registration_uuid])
+        render json: registration_update_request.as_json
       end
 
       def ims_registration_by_uuid
@@ -154,8 +163,8 @@ module Lti
         access_token = AuthenticationMethods.access_token(request)
         jwt = Canvas::Security.decode_jwt(access_token)
 
-        expected_jwt_keys = %w[user_id initiated_at root_account_global_id exp uuid unified_tool_id registration_url]
-        if jwt.keys.sort != expected_jwt_keys.sort
+        required_jwt_keys = %w[user_id initiated_at root_account_global_id root_account_domain exp uuid registration_url]
+        unless required_jwt_keys.all? { |key| jwt.key?(key) }
           respond_with_error(:unauthorized, "JWT did not include expected contents")
           return
         end
@@ -170,6 +179,28 @@ module Lti
         Schemas::Lti::IMS::OidcRegistration.to_model_attrs(params.to_unsafe_h) =>
           { errors:, registration_attrs: }
         return render status: :unprocessable_entity, json: { errors: } if errors.present?
+
+        if jwt["existing_registration"].present?
+          registration = Lti::Registration.find(jwt["existing_registration"])
+          if registration.present?
+            # Create an LTI RegistrationUpdateRequest
+            # to update the existing registration
+            registration_update_request = Lti::RegistrationUpdateRequest.new(
+              root_account_id: registration.root_account.id,
+              lti_registration_id: registration.id,
+              uuid: jwt["uuid"],
+              lti_ims_registration: registration_attrs,
+              created_by_id: jwt["user_id"],
+              accepted_at: nil,
+              rejected_at: nil
+            )
+
+            root_deployment = ContextExternalTool.find_by(account: root_account, lti_registration: registration)
+
+            render_registration(registration.ims_registration, registration.developer_key, root_deployment) if registration_update_request.save
+            return
+          end
+        end
 
         registration_url = jwt["registration_url"]
 
@@ -221,6 +252,49 @@ module Lti
           end
 
           render_registration(ims_registration, developer_key, deployment) if ims_registration.persisted?
+        end
+      end
+
+      def update
+        registration = Lti::Registration.find(params[:registration_id])
+        unless registration.root_account.feature_enabled?(:lti_dr_registrations_update)
+          respond_to do |format|
+            format.html { render "shared/errors/404_message", status: :not_found }
+            format.json { render_error(:not_found, "The specified resource does not exist.", status: :not_found) }
+          end
+        end
+
+        validation_result = Lti::TokenValidationService.verify_developer_key_access_token_and_scopes(
+          request,
+          Lti::ScopeMatchers.all_of(TokenScopes::LTI_REGISTRATION_SCOPE)
+        )
+
+        unless validation_result[:success]
+          return render status: validation_result[:status], json: { errorMessage: validation_result[:error] }
+        end
+
+        # create a registration update request based on the body
+        # of the request and the registration id
+        Schemas::Lti::IMS::OidcRegistration.to_model_attrs(params.to_unsafe_h) =>
+          { errors:, registration_attrs: }
+        return render status: :unprocessable_entity, json: { errors: } if errors.present?
+
+        if registration.present?
+          # Create an LTI RegistrationUpdateRequest
+          # to update the existing registration
+          registration_update_request = Lti::RegistrationUpdateRequest.new(
+            root_account_id: registration.root_account.id,
+            lti_registration_id: registration.id,
+            uuid: nil,
+            lti_ims_registration: registration_attrs,
+            created_by_id: nil,
+            accepted_at: nil,
+            rejected_at: nil
+          )
+
+          root_deployment = ContextExternalTool.find_by(account: registration.root_account, developer_key: registration.developer_key)
+
+          render_registration(registration.ims_registration, registration.developer_key, root_deployment) if registration_update_request.save
         end
       end
 

@@ -26,6 +26,7 @@ import {graphql, HttpResponse} from 'msw'
 import {Group} from './Group'
 import {User} from './User'
 import {PageInfo} from './PageInfo'
+import {TotalCountPageInfo} from './TotalCountPageInfo'
 import {CONVERSATION_ID_WHERE_CAN_REPLY_IS_FALSE} from '../util/constants'
 
 // helper function that filters out undefined values in objects before assigning
@@ -282,14 +283,14 @@ export const handlers = [
               comment: 'my student comment',
               htmlComment: '<p>my student comment</p>',
               author: User.mock({_id: '1', name: 'Student One'}),
-              read: false
-            })
+              read: false,
+            }),
           ],
-          pageInfo: PageInfo.mock({hasNextPage: false}),
-          __typename: 'SubmissionCommentConnection'
+          pageInfo: TotalCountPageInfo.mock({hasNextPage: false}),
+          __typename: 'SubmissionCommentConnection',
         },
-        __typename: 'Submission'
-      }
+        __typename: 'Submission',
+      },
     }
     return HttpResponse.json({data})
   }),
@@ -317,14 +318,14 @@ export const handlers = [
                   shortName: 'Student',
                   pronouns: null,
                   avatarUrl: null,
-                  __typename: 'User'
+                  __typename: 'User',
                 },
                 assignment: {
                   _id: '1',
                   id: 'QXNzaWdubWVudC0x',
                   name: 'Test Assignment',
                   htmlUrl: '/courses/1/assignments/1',
-                  __typename: 'Assignment'
+                  __typename: 'Assignment',
                 },
                 comment: 'my student comment',
                 htmlComment: '<p>my student comment</p>',
@@ -335,26 +336,27 @@ export const handlers = [
                   courseNickname: null,
                   contextName: 'Test Course',
                   assetString: 'course_1',
-                  __typename: 'Course'
+                  __typename: 'Course',
                 },
                 read: false,
-                __typename: 'SubmissionComment'
-              }
+                __typename: 'SubmissionComment',
+              },
             ],
             pageInfo: {
               hasNextPage: false,
               endCursor: null,
-              __typename: 'PageInfo'
+              totalCount: null,
+              __typename: 'TotalCountPageInfo',
             },
-            __typename: 'SubmissionCommentConnection'
+            __typename: 'SubmissionCommentConnection',
           },
           user: {
             _id: '1',
-            __typename: 'User'
+            __typename: 'User',
           },
-          __typename: 'Submission'
-        }
-      }
+          __typename: 'Submission',
+        },
+      },
     })
   }),
 
@@ -374,7 +376,7 @@ export const handlers = [
                 }),
               },
             ],
-            pageInfo: PageInfo.mock({hasNextPage: false}),
+            pageInfo: TotalCountPageInfo.mock({hasNextPage: false}),
             __typename: 'SubmissionCommentConnection',
           },
           __typename: 'User',
@@ -451,7 +453,7 @@ export const handlers = [
               __typename: 'Submission',
             },
           ],
-          pageInfo: PageInfo.mock({hasNextPage: false}),
+          pageInfo: TotalCountPageInfo.mock({hasNextPage: false}),
           __typename: 'SubmissionConnection',
         },
         __typename: 'User',

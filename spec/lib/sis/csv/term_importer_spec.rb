@@ -19,7 +19,7 @@
 #
 
 describe SIS::CSV::TermImporter do
-  before { account_model }
+  before(:once) { account_model }
 
   it "skips bad content" do
     before_count = EnrollmentTerm.where.not(sis_source_id: nil).count
@@ -196,5 +196,26 @@ describe SIS::CSV::TermImporter do
     expect(batch2.roll_back_data.where(updated_workflow_state: "deleted").count).to eq 1
     batch2.restore_states_for_batch
     expect(@account.enrollment_terms.find_by(sis_source_id: "T001").workflow_state).to eq "active"
+  end
+
+  it "sets integration IDs" do
+    process_csv_data(
+      "term_id,name,status,start_date,end_date,integration_id",
+      "T001,Winter11,active,2011-1-05 00:00:00,2011-4-14 00:00:00,INT001"
+    )
+
+    t1 = @account.enrollment_terms.where(sis_source_id: "T001").first
+    expect(t1.integration_id).to eq "INT001"
+  end
+
+  it "doesn't remove integration IDs when not supplied" do
+    t1 = @account.enrollment_terms.create!(sis_source_id: "T001", integration_id: "INT001")
+
+    process_csv_data(
+      "term_id,name,status,start_date,end_date",
+      "T001,Winter11,active,2011-1-05 00:00:00,2011-4-14 00:00:00"
+    )
+    expect(t1.reload.integration_id).to eq "INT001"
+    expect(t1.start_at).not_to be_nil
   end
 end

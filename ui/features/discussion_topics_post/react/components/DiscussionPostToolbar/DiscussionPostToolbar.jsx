@@ -52,6 +52,7 @@ import {TranslationTriggerModal} from '../TranslationTriggerModal/TranslationTri
 import {ExpandCollapseThreadsButton} from './ExpandCollapseThreadsButton'
 import SortOrderDropDown from './SortOrderDropDown'
 import {SplitScreenButton} from './SplitScreenButton'
+import {useTranslationStore} from '../../hooks/useTranslationStore'
 
 const I18n = createI18nScope('discussions_posts')
 
@@ -88,15 +89,15 @@ const getClearButton = buttonProperties => {
 export const DiscussionPostToolbar = props => {
   const [showAssignToTray, setShowAssignToTray] = useState(false)
   const [isModalOpen, setModalOpen] = useState(false)
-  const {
-    translationLanguages,
-    setShowTranslationControl,
-    translateTargetLanguage,
-    setTranslateTargetLanguage,
-    showTranslationControl,
-  } = useContext(DiscussionManagerUtilityContext)
+  const {translationLanguages, setShowTranslationControl, showTranslationControl} = useContext(
+    DiscussionManagerUtilityContext,
+  )
 
   const [showTranslate, setShowTranslate] = useState(false)
+
+  const isTranslateAll = useTranslationStore(state => state.translateAll)
+  const setActiveLanguage = useTranslationStore(state => state.setActiveLanguage)
+  const clearTranslateAll = useTranslationStore(state => state.clearTranslateAll)
 
   const clearButton = () => {
     return getClearButton({
@@ -117,7 +118,7 @@ export const DiscussionPostToolbar = props => {
     if (ENV.ai_translation_improvements) {
       // If translations module is visible and discussion is translated open the modal
       if (showTranslationControl) {
-        translateTargetLanguage ? setModalOpen(true) : setShowTranslationControl(false)
+        isTranslateAll ? setModalOpen(true) : setShowTranslationControl(false)
       } else {
         setShowTranslationControl(true)
       }
@@ -157,9 +158,10 @@ export const DiscussionPostToolbar = props => {
   }
 
   const closeModalAndRemoveTranslations = () => {
+    clearTranslateAll()
+    setActiveLanguage(null)
     setModalOpen(false)
     setShowTranslationControl(false)
-    setTranslateTargetLanguage(null)
   }
 
   const renderSort = width => {

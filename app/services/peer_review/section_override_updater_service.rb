@@ -32,7 +32,7 @@ class PeerReview::SectionOverrideUpdaterService < PeerReview::SectionOverrideCom
     validate_override_exists(override)
 
     section_id = fetch_set_id || override.set_id
-    validate_set_id_present(section_id)
+    validate_set_id_required(section_id)
 
     section = course_section(section_id)
     validate_section_exists(section)

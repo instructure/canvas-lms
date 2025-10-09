@@ -19,6 +19,7 @@
 module Factories
   def lti_registration_history_entry_model(**params)
     params[:lti_registration] ||= lti_registration_with_tool
+    params[:root_account] ||= params[:lti_registration].root_account
     params[:update_type] ||= "manual_edit"
     params[:created_by] ||= user_model
 

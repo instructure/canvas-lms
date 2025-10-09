@@ -3250,218 +3250,352 @@ describe AssignmentsApiController, type: :request do
       end
     end
 
-    describe "update_api_assignment: peer review sub assignment logic" do
-      let(:course) { course_model }
-      let(:assignment) { assignment_model(context: course, name: "Main Assignment") }
-      let(:test_object) { Object.new.extend(Api::V1::Assignment) }
-      let(:user) { user_model }
-      let(:assignment_params) { ActionController::Parameters.new({ peer_review: { points_possible: 50 } }).permit! }
-      let(:prepared_update) { { assignment: } }
+    describe "update_api_assignment" do
+      describe "peer review sub assignment logic" do
+        let(:course) { course_model }
+        let(:assignment) { assignment_model(context: course, name: "Main Assignment") }
+        let(:test_object) { Object.new.extend(Api::V1::Assignment) }
+        let(:user) { user_model }
+        let(:assignment_params) { ActionController::Parameters.new({ peer_review: { points_possible: 50 } }).permit! }
+        let(:prepared_update) { { assignment: } }
 
-      before do
-        course.enable_feature!(:peer_review_allocation_and_grading)
-        allow(test_object).to receive(:prepare_assignment_create_or_update).and_return(prepared_update.merge(valid: true))
-        allow(SubmissionLifecycleManager).to receive(:recompute)
-      end
+        before do
+          course.enable_feature!(:peer_review_allocation_and_grading)
+          allow(test_object).to receive(:prepare_assignment_create_or_update).and_return(prepared_update.merge(valid: true))
+          allow(SubmissionLifecycleManager).to receive(:recompute)
+        end
 
-      context "when assignment update succeeds and peer review allocation and grading feature is enabled" do
-        context "when assignment has existing peer review sub assignment" do
-          let(:peer_review_sub_assignment) { double("peer_review_sub_assignment") }
+        context "when assignment update succeeds and peer review allocation and grading feature is enabled" do
+          context "when assignment has existing peer review sub assignment" do
+            let(:peer_review_sub_assignment) { double("peer_review_sub_assignment") }
 
-          before do
-            allow(assignment).to receive(:peer_review_sub_assignment).and_return(peer_review_sub_assignment)
-          end
-
-          context "when assignment has peer_reviews enabled" do
             before do
-              allow(assignment).to receive(:peer_reviews).and_return(true)
+              allow(assignment).to receive(:peer_review_sub_assignment).and_return(peer_review_sub_assignment)
             end
 
-            it "calls update_api_peer_review_sub_assignment" do
-              expect(test_object).to receive(:update_api_peer_review_sub_assignment)
+            context "when assignment has peer_reviews enabled" do
+              before do
+                allow(assignment).to receive(:peer_reviews).and_return(true)
+              end
+
+              it "calls update_api_peer_review_sub_assignment" do
+                expect(test_object).to receive(:update_api_peer_review_sub_assignment)
+                  .with(assignment, assignment_params[:peer_review])
+
+                result = test_object.send(:update_api_assignment, assignment, assignment_params, user)
+                expect(result).to eq(:ok)
+              end
+            end
+
+            context "when assignment has peer_reviews disabled" do
+              before do
+                allow(assignment).to receive(:peer_reviews).and_return(false)
+              end
+
+              it "calls destroy on peer_review_sub_assignment" do
+                expect(peer_review_sub_assignment).to receive(:destroy)
+
+                result = test_object.send(:update_api_assignment, assignment, assignment_params, user)
+                expect(result).to eq(:ok)
+              end
+            end
+          end
+
+          context "when assignment has no existing peer review sub assignment" do
+            before do
+              allow(assignment).to receive(:peer_review_sub_assignment).and_return(nil)
+            end
+
+            it "calls create_api_peer_review_sub_assignment" do
+              expect(test_object).to receive(:create_api_peer_review_sub_assignment)
                 .with(assignment, assignment_params[:peer_review])
 
               result = test_object.send(:update_api_assignment, assignment, assignment_params, user)
               expect(result).to eq(:ok)
             end
           end
+        end
 
-          context "when assignment has peer_reviews disabled" do
-            before do
-              allow(assignment).to receive(:peer_reviews).and_return(false)
-            end
+        context "when assignment update fails" do
+          before do
+            allow(test_object).to receive(:prepare_assignment_create_or_update).and_return(prepared_update.merge(valid: false))
+          end
 
-            it "calls destroy on peer_review_sub_assignment" do
-              expect(peer_review_sub_assignment).to receive(:destroy)
+          it "does not execute the peer review sub assignment update logic" do
+            expect(test_object).not_to receive(:create_api_peer_review_sub_assignment)
+            expect(test_object).not_to receive(:update_api_peer_review_sub_assignment)
 
-              result = test_object.send(:update_api_assignment, assignment, assignment_params, user)
-              expect(result).to eq(:ok)
-            end
+            result = test_object.send(:update_api_assignment, assignment, assignment_params, user)
+            expect(result).to be(false)
           end
         end
 
-        context "when assignment has no existing peer review sub assignment" do
+        context "when peer review allocation and grading feature is disabled" do
           before do
-            allow(assignment).to receive(:peer_review_sub_assignment).and_return(nil)
+            course.disable_feature!(:peer_review_allocation_and_grading)
+            allow(test_object).to receive(:update_api_assignment_with_overrides).and_return(:ok)
           end
 
-          it "calls create_api_peer_review_sub_assignment" do
-            expect(test_object).to receive(:create_api_peer_review_sub_assignment)
-              .with(assignment, assignment_params[:peer_review])
+          it "does not execute peer review sub assignment update logic" do
+            expect(test_object).not_to receive(:create_api_peer_review_sub_assignment)
+            expect(test_object).not_to receive(:update_api_peer_review_sub_assignment)
 
             result = test_object.send(:update_api_assignment, assignment, assignment_params, user)
             expect(result).to eq(:ok)
           end
         end
-      end
 
-      context "when assignment update fails" do
-        before do
-          allow(test_object).to receive(:prepare_assignment_create_or_update).and_return(prepared_update.merge(valid: false))
-        end
-
-        it "does not execute the peer review sub assignment update logic" do
-          expect(test_object).not_to receive(:create_api_peer_review_sub_assignment)
-          expect(test_object).not_to receive(:update_api_peer_review_sub_assignment)
-
-          result = test_object.send(:update_api_assignment, assignment, assignment_params, user)
-          expect(result).to be(false)
-        end
-      end
-
-      context "when peer review allocation and grading feature is disabled" do
-        before do
-          course.disable_feature!(:peer_review_allocation_and_grading)
-          allow(test_object).to receive(:update_api_assignment_with_overrides).and_return(:ok)
-        end
-
-        it "does not execute peer review sub assignment update logic" do
-          expect(test_object).not_to receive(:create_api_peer_review_sub_assignment)
-          expect(test_object).not_to receive(:update_api_peer_review_sub_assignment)
-
-          result = test_object.send(:update_api_assignment, assignment, assignment_params, user)
-          expect(result).to eq(:ok)
-        end
-      end
-
-      context "error handling" do
-        before do
-          allow(test_object).to receive(:update_api_assignment_with_overrides).and_return(:ok)
-          allow(assignment).to receive(:peer_review_sub_assignment).and_return(nil)
-        end
-
-        it "returns :peer_review_error when create_api_peer_review_sub_assignment fails" do
-          allow(test_object).to receive(:create_api_peer_review_sub_assignment)
-            .and_raise(StandardError.new("Creation failed"))
-
-          result = test_object.send(:update_api_assignment, assignment, assignment_params, user)
-          expect(result).to eq(:peer_review_error)
-        end
-
-        it "returns :peer_review_error when update_api_peer_review_sub_assignment fails" do
-          peer_review_sub_assignment = double("peer_review_sub_assignment")
-          peer_reviews = true
-          allow(assignment).to receive_messages(peer_review_sub_assignment:, peer_reviews:)
-          allow(test_object).to receive(:update_api_peer_review_sub_assignment)
-            .and_raise(StandardError.new("Update failed"))
-
-          result = test_object.send(:update_api_assignment, assignment, assignment_params, user)
-          expect(result).to eq(:peer_review_error)
-        end
-
-        it "returns :peer_review_error when peer_review_sub_assignment.destroy fails" do
-          peer_review_sub_assignment = double("peer_review_sub_assignment")
-          peer_reviews = false
-          allow(assignment).to receive_messages(peer_review_sub_assignment:, peer_reviews:)
-          allow(peer_review_sub_assignment).to receive(:destroy)
-            .and_raise(StandardError.new("Deletion failed"))
-
-          result = test_object.send(:update_api_assignment, assignment, assignment_params, user)
-          expect(result).to eq(:peer_review_error)
-        end
-      end
-
-      context "association reloading" do
-        before do
-          allow(test_object).to receive(:update_api_assignment_with_overrides).and_return(:ok)
-        end
-
-        it "reloads peer_review_sub_assignment association when creating new peer review sub assignment" do
-          allow(assignment).to receive(:peer_review_sub_assignment).and_return(nil)
-          allow(test_object).to receive(:create_api_peer_review_sub_assignment)
-
-          expect(assignment.association(:peer_review_sub_assignment)).to receive(:reload)
-
-          test_object.send(:update_api_assignment, assignment, assignment_params, user)
-        end
-
-        it "reloads peer_review_sub_assignment association when updating existing peer review sub assignment" do
-          peer_review_sub_assignment = double("peer_review_sub_assignment")
-          peer_reviews = true
-          allow(assignment).to receive_messages(peer_review_sub_assignment:, peer_reviews:)
-          allow(test_object).to receive(:update_api_peer_review_sub_assignment)
-
-          expect(assignment.association(:peer_review_sub_assignment)).to receive(:reload)
-
-          test_object.send(:update_api_assignment, assignment, assignment_params, user)
-        end
-
-        it "reloads peer_review_sub_assignment association when destroying existing peer review sub assignment" do
-          peer_review_sub_assignment = double("peer_review_sub_assignment")
-          peer_reviews = false
-          allow(assignment).to receive_messages(peer_review_sub_assignment:, peer_reviews:)
-          allow(peer_review_sub_assignment).to receive(:destroy)
-
-          expect(assignment.association(:peer_review_sub_assignment)).to receive(:reload)
-
-          test_object.send(:update_api_assignment, assignment, assignment_params, user)
-        end
-      end
-
-      context "parameter passing" do
-        before do
-          allow(test_object).to receive(:update_api_assignment_with_overrides).and_return(:ok)
-          allow(assignment).to receive(:peer_review_sub_assignment).and_return(nil)
-        end
-
-        it "passes correct peer_review parameters to create method" do
-          peer_review_params = {
-            points_possible: 75,
-            grading_type: "percent",
-            due_at: 1.week.from_now,
-            unlock_at: 1.day.from_now,
-            lock_at: 2.weeks.from_now
-          }
-          assignment_params = ActionController::Parameters.new({ peer_review: peer_review_params }).permit!
-
-          expect(test_object).to receive(:create_api_peer_review_sub_assignment) do |assignment_arg, params_arg|
-            expect(assignment_arg).to eq(assignment)
-            expect(params_arg).to be_a(ActionController::Parameters)
-            expect(params_arg.to_h.symbolize_keys).to include(peer_review_params)
+        context "error handling" do
+          before do
+            allow(test_object).to receive(:update_api_assignment_with_overrides).and_return(:ok)
+            allow(assignment).to receive(:peer_review_sub_assignment).and_return(nil)
           end
 
-          test_object.send(:update_api_assignment, assignment, assignment_params, user)
-        end
+          it "returns :peer_review_error when create_api_peer_review_sub_assignment fails" do
+            allow(test_object).to receive(:create_api_peer_review_sub_assignment)
+              .and_raise(StandardError.new("Creation failed"))
 
-        it "passes nil peer_review parameters when not provided" do
-          assignment_params_without_peer_review = ActionController::Parameters.new({}).permit!
-
-          expect(test_object).to receive(:create_api_peer_review_sub_assignment)
-            .with(assignment, nil)
-
-          test_object.send(:update_api_assignment, assignment, assignment_params_without_peer_review, user)
-        end
-
-        it "handles empty peer_review parameters" do
-          assignment_params = ActionController::Parameters.new({ peer_review: {} }).permit!
-
-          expect(test_object).to receive(:create_api_peer_review_sub_assignment) do |assignment_arg, params_arg|
-            expect(assignment_arg).to eq(assignment)
-            expect(params_arg).to be_a(ActionController::Parameters)
-            expect(params_arg.to_h).to be_empty
+            result = test_object.send(:update_api_assignment, assignment, assignment_params, user)
+            expect(result).to eq(:peer_review_error)
           end
 
-          test_object.send(:update_api_assignment, assignment, assignment_params, user)
+          it "returns :peer_review_error when update_api_peer_review_sub_assignment fails" do
+            peer_review_sub_assignment = double("peer_review_sub_assignment")
+            peer_reviews = true
+            allow(assignment).to receive_messages(peer_review_sub_assignment:, peer_reviews:)
+            allow(test_object).to receive(:update_api_peer_review_sub_assignment)
+              .and_raise(StandardError.new("Update failed"))
+
+            result = test_object.send(:update_api_assignment, assignment, assignment_params, user)
+            expect(result).to eq(:peer_review_error)
+          end
+
+          it "returns :peer_review_error when peer_review_sub_assignment.destroy fails" do
+            peer_review_sub_assignment = double("peer_review_sub_assignment")
+            peer_reviews = false
+            allow(assignment).to receive_messages(peer_review_sub_assignment:, peer_reviews:)
+            allow(peer_review_sub_assignment).to receive(:destroy)
+              .and_raise(StandardError.new("Deletion failed"))
+
+            result = test_object.send(:update_api_assignment, assignment, assignment_params, user)
+            expect(result).to eq(:peer_review_error)
+          end
+        end
+
+        context "association reloading" do
+          before do
+            allow(test_object).to receive(:update_api_assignment_with_overrides).and_return(:ok)
+          end
+
+          it "reloads peer_review_sub_assignment association when creating new peer review sub assignment" do
+            allow(assignment).to receive(:peer_review_sub_assignment).and_return(nil)
+            allow(test_object).to receive(:create_api_peer_review_sub_assignment)
+
+            expect(assignment.association(:peer_review_sub_assignment)).to receive(:reload)
+
+            test_object.send(:update_api_assignment, assignment, assignment_params, user)
+          end
+
+          it "reloads peer_review_sub_assignment association when updating existing peer review sub assignment" do
+            peer_review_sub_assignment = double("peer_review_sub_assignment")
+            peer_reviews = true
+            allow(assignment).to receive_messages(peer_review_sub_assignment:, peer_reviews:)
+            allow(test_object).to receive(:update_api_peer_review_sub_assignment)
+
+            expect(assignment.association(:peer_review_sub_assignment)).to receive(:reload)
+
+            test_object.send(:update_api_assignment, assignment, assignment_params, user)
+          end
+
+          it "reloads peer_review_sub_assignment association when destroying existing peer review sub assignment" do
+            peer_review_sub_assignment = double("peer_review_sub_assignment")
+            peer_reviews = false
+            allow(assignment).to receive_messages(peer_review_sub_assignment:, peer_reviews:)
+            allow(peer_review_sub_assignment).to receive(:destroy)
+
+            expect(assignment.association(:peer_review_sub_assignment)).to receive(:reload)
+
+            test_object.send(:update_api_assignment, assignment, assignment_params, user)
+          end
+        end
+
+        context "parameter passing" do
+          before do
+            allow(test_object).to receive(:update_api_assignment_with_overrides).and_return(:ok)
+            allow(assignment).to receive(:peer_review_sub_assignment).and_return(nil)
+          end
+
+          it "passes correct peer_review parameters to create method" do
+            peer_review_params = {
+              points_possible: 75,
+              grading_type: "percent",
+              due_at: 1.week.from_now,
+              unlock_at: 1.day.from_now,
+              lock_at: 2.weeks.from_now
+            }
+            assignment_params = ActionController::Parameters.new({ peer_review: peer_review_params }).permit!
+
+            expect(test_object).to receive(:create_api_peer_review_sub_assignment) do |assignment_arg, params_arg|
+              expect(assignment_arg).to eq(assignment)
+              expect(params_arg).to be_a(ActionController::Parameters)
+              expect(params_arg.to_h.symbolize_keys).to include(peer_review_params)
+            end
+
+            test_object.send(:update_api_assignment, assignment, assignment_params, user)
+          end
+
+          it "passes nil peer_review parameters when not provided" do
+            assignment_params_without_peer_review = ActionController::Parameters.new({}).permit!
+
+            expect(test_object).to receive(:create_api_peer_review_sub_assignment)
+              .with(assignment, nil)
+
+            test_object.send(:update_api_assignment, assignment, assignment_params_without_peer_review, user)
+          end
+
+          it "handles empty peer_review parameters" do
+            assignment_params = ActionController::Parameters.new({ peer_review: {} }).permit!
+
+            expect(test_object).to receive(:create_api_peer_review_sub_assignment) do |assignment_arg, params_arg|
+              expect(assignment_arg).to eq(assignment)
+              expect(params_arg).to be_a(ActionController::Parameters)
+              expect(params_arg.to_h).to be_empty
+            end
+
+            test_object.send(:update_api_assignment, assignment, assignment_params, user)
+          end
+        end
+      end
+
+      describe "only_visible_to_overrides reset logic" do
+        let(:course) { course_model }
+        let(:assignment) do
+          assignment_model(
+            context: course,
+            name: "Differentiated",
+            due_at: 2.days.from_now,
+            only_visible_to_overrides: true
+          )
+        end
+        let(:test_object) { Object.new.extend(Api::V1::Assignment) }
+        let(:user) { user_model }
+
+        before do
+          allow(test_object).to receive_messages(
+            prepare_assignment_create_or_update: { assignment:, valid: true },
+            grading_periods_allow_submittable_update?: true
+          )
+
+          allow(SubmissionLifecycleManager).to receive(:recompute)
+        end
+
+        it "preserves only_visible_to_overrides when due_at is unchanged" do
+          params = ActionController::Parameters.new(
+            due_at: assignment.due_at.iso8601,
+            only_visible_to_overrides: true
+          ).permit!
+
+          test_object.send(:update_api_assignment, assignment, params, user)
+          expect(assignment.only_visible_to_overrides).to be true
+        end
+
+        it "resets only_visible_to_overrides when due_at changes and no explicit override param is true" do
+          params = ActionController::Parameters.new(
+            due_at: (assignment.due_at + 1.day).iso8601
+          ).permit!
+
+          test_object.send(:update_api_assignment, assignment, params, user)
+          expect(assignment.only_visible_to_overrides).to be false
+        end
+
+        it "resets only_visible_to_overrides when explicitly set to false" do
+          params = ActionController::Parameters.new(
+            due_at: assignment.due_at.iso8601,
+            only_visible_to_overrides: false
+          ).permit!
+
+          test_object.send(:update_api_assignment, assignment, params, user)
+          expect(assignment.only_visible_to_overrides).to be false
+        end
+
+        it "preserves only_visible_to_overrides when due_at changes but explicitly set to true" do
+          params = ActionController::Parameters.new(
+            due_at: (assignment.due_at + 1.day).iso8601,
+            only_visible_to_overrides: true
+          ).permit!
+
+          test_object.send(:update_api_assignment, assignment, params, user)
+          expect(assignment.only_visible_to_overrides).to be true
+        end
+
+        it "falls back to string comparison when due_at is invalid" do
+          assignment.update!(due_at: 1.week.from_now)
+          params = ActionController::Parameters.new(
+            due_at: "invalid-date-string",
+            only_visible_to_overrides: true
+          ).permit!
+
+          expect do
+            test_object.send(:update_api_assignment, assignment, params, user)
+          end.not_to raise_error
+        end
+
+        it "detects assignment hash vs method access bug that skips logic block" do
+          assignment.update!(only_visible_to_overrides: true)
+          params = ActionController::Parameters.new(
+            due_at: (assignment.due_at + 1.day).iso8601,
+            only_visible_to_overrides: true
+          ).permit!
+
+          test_object.send(:update_api_assignment, assignment, params, user)
+          expect(assignment.only_visible_to_overrides).to be true
+        end
+
+        it "skips reset logic when due_at parameter is nil" do
+          params = ActionController::Parameters.new(
+            due_at: nil,
+            only_visible_to_overrides: true
+          ).permit!
+
+          test_object.send(:update_api_assignment, assignment, params, user)
+          expect(assignment.only_visible_to_overrides).to be true
+        end
+
+        it "resets overrides when only_visible_to_overrides param is missing" do
+          params = ActionController::Parameters.new(
+            due_at: assignment.due_at.iso8601
+          ).permit!
+
+          test_object.send(:update_api_assignment, assignment, params, user)
+          expect(assignment.only_visible_to_overrides).to be false
+        end
+
+        it "preserves overrides when timezone formats differ but time is same" do
+          utc_time = 2.weeks.from_now.beginning_of_hour
+          assignment.update!(due_at: utc_time)
+
+          est_equivalent = utc_time.in_time_zone("America/New_York").iso8601
+          params = ActionController::Parameters.new(
+            due_at: est_equivalent,
+            only_visible_to_overrides: true
+          ).permit!
+
+          test_object.send(:update_api_assignment, assignment, params, user)
+          expect(assignment.only_visible_to_overrides).to be true
+        end
+
+        it "ignores millisecond differences in date comparison" do
+          base_time = 3.weeks.from_now.beginning_of_hour
+          assignment.update!(due_at: base_time)
+
+          time_with_ms = base_time.iso8601(3)
+          params = ActionController::Parameters.new(
+            due_at: time_with_ms,
+            only_visible_to_overrides: true
+          ).permit!
+
+          test_object.send(:update_api_assignment, assignment, params, user)
+          expect(assignment.only_visible_to_overrides).to be true
         end
       end
     end

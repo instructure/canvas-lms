@@ -318,7 +318,7 @@ export type SiteAdminFeatureId =
  */
 export type RootAccountFeatureId =
   | 'account_level_mastery_scales'
-  | 'ams_service'
+  | 'ams_root_account_integration'
   | 'buttons_and_icons_root_account'
   | 'course_pace_allow_bulk_pace_assign'
   | 'course_pace_download_document'
@@ -337,7 +337,6 @@ export type RootAccountFeatureId =
   | 'lti_apps_page_ai_translation'
   | 'lti_asset_processor'
   | 'lti_asset_processor_discussions'
-  | 'lti_deep_linking_module_index_menu_modal'
   | 'lti_link_to_apps_from_developer_keys'
   | 'lti_registrations_next'
   | 'lti_registrations_page'
@@ -349,6 +348,7 @@ export type RootAccountFeatureId =
   | 'open_tools_in_new_tab'
   | 'product_tours'
   | 'rce_lite_enabled_speedgrader_comments'
+  | 'rce_studio_embed_improvements'
   | 'rce_transform_loaded_content'
   | 'restrict_student_access'
   | 'rubric_criterion_range'

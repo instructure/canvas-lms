@@ -26,7 +26,9 @@ import GeneratePairingCode from '@canvas/generate-pairing-code'
 import ready from '@instructure/ready'
 import FeatureFlags from '@canvas/feature-flags'
 import {initializeTopNavPortal} from '@canvas/top-navigation/react/TopNavPortal'
+import AvatarModal from '@canvas/avatar-dialog-view/react/AvatarModal'
 
+let avatarRoot = null
 ready(() => {
   const hiddenFlags = []
   if (!ENV.NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT) {
@@ -45,5 +47,17 @@ ready(() => {
   if (pairingCodeContainer) {
     const pcRoot = createRoot(pairingCodeContainer)
     pcRoot.render(<GeneratePairingCode userId={ENV.current_user.id} />)
+  }
+
+  const avatarModalMount = document.getElementById('avatar-modal-mount')
+  const profilePicLink = document.querySelector('#main .profile_pic_link') // don't add event handler to side nav avatar
+  if (profilePicLink && avatarModalMount) {
+    profilePicLink.addEventListener('click', event => {
+      event.preventDefault()
+      if (avatarRoot === null) {
+        avatarRoot = createRoot(avatarModalMount)
+      }
+      avatarRoot.render(<AvatarModal onClose={() => avatarRoot.render(null)} />)
+    })
   }
 })

@@ -24,7 +24,10 @@ import {
   LTI_ASSET_PROCESSORS_AND_REPORTS_FOR_STUDENT_QUERY,
   ZGetLtiAssetProcessorsAndReportsForStudentResult,
 } from '../../queries/getLtiAssetProcessorsAndReportsForStudent'
-import {ensureCompatibleSubmissionType} from '../../shared-with-sg/replicated/types/LtiAssetReports'
+import {
+  AssetReportCompatibleSubmissionType,
+  ensureCompatibleSubmissionType,
+} from '../../shared-with-sg/replicated/types/LtiAssetReports'
 
 const I18n = createI18nScope('lti_asset_reports_for_student')
 
@@ -62,11 +65,15 @@ export function useLtiAssetProcessorsAndReportsForStudent({
   ...submission
 }: SubmissionIdAndTypeAndAttachment) {
   const data = useLtiAssetProcessorsAndReportsForStudentQuery(submission)
-  if (data && attachmentId !== undefined) {
-    const filtered = data?.reports.filter(report => report.asset?.attachmentId === attachmentId)
-    return {...data, reports: filtered}
+  const submissionType = ensureCompatibleSubmissionType(submission.submissionType)
+  if (!data || !submissionType) {
+    return undefined
   }
-  return data
+  const result = {...data, submissionType}
+  if (attachmentId !== undefined) {
+    result.reports = result.reports.filter(report => report.asset?.attachmentId === attachmentId)
+  }
+  return result
 }
 
 const getLtiAssetProcessors = (submissionId: string) => {

@@ -157,15 +157,4 @@ describe LiveEvents::AsyncWorker do
       end
     end
   end
-
-  describe "exit handling" do
-    it "drains the queue" do
-      skip("flaky spec needs fixed in PLAT-5106")
-      @worker.push(event, partition_key)
-      expect(@worker).to receive(:at_exit).and_yield
-      expect(LiveEvents.logger).not_to receive(:error)
-      @worker.start!
-      @worker.send(:at_exit)
-    end
-  end
 end

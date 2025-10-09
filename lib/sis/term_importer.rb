@@ -77,7 +77,7 @@ module SIS
             term.name = name
           end
 
-          term.integration_id = integration_id
+          term.integration_id = integration_id if integration_id.present?
 
           case status
           when /active/i

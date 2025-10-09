@@ -550,6 +550,8 @@ CanvasRails::Application.routes.draw do
 
     resources :accessibility_resource_scans, only: [:index]
     resources :accessibility_issues, only: [:update, :show]
+
+    resources :ai_experiences, only: %i[index create new show edit update destroy]
   end
 
   get "quiz_statistics/:quiz_statistics_id/files/:file_id/download" => "files#show", :as => :quiz_statistics_download, :download => "1"
@@ -569,6 +571,7 @@ CanvasRails::Application.routes.draw do
   post "media_attachments" => "media_objects#create_media_object", :as => :create_media_attachment
   get "media_attachments/:attachment_id/thumbnail" => "media_objects#media_object_thumbnail", :as => :media_attachment_thumbnail
   get "media_attachments/:attachment_id/info" => "media_objects#show", :as => :media_attachment_info
+  get "media_attachments/:attachment_id/immersive_view" => "media_objects#immersive_view", :as => :media_immersive_view
   get "media_attachments_iframe/:attachment_id" => "media_objects#iframe_media_player", :as => :media_attachment_iframe
   get "media_attachments/:attachment_id/redirect" => "media_objects#media_object_redirect", :as => :media_attachment_redirect
   get "media_attachments/:attachment_id/media_tracks/:id" => "media_tracks#show", :as => :show_media_attachment_tracks
@@ -1239,6 +1242,16 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/permissions", action: :permissions
 
       get "courses/:course_id/student_view_student", action: :student_view_student
+    end
+
+    scope(controller: :ai_experiences) do
+      get "courses/:course_id/ai_experiences", action: :index, as: "course_ai_experiences"
+      post "courses/:course_id/ai_experiences", action: :create
+      get "courses/:course_id/ai_experiences/new", action: :new, as: "new_course_ai_experience"
+      get "courses/:course_id/ai_experiences/:id", action: :show, as: "course_ai_experience"
+      get "courses/:course_id/ai_experiences/:id/edit", action: :edit, as: "edit_course_ai_experience"
+      put "courses/:course_id/ai_experiences/:id", action: :update
+      delete "courses/:course_id/ai_experiences/:id", action: :destroy
     end
 
     scope(controller: :account_calendars_api) do
@@ -2059,6 +2072,7 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/lti_registrations/:registration_id/deployments/:deployment_id/context_search", action: :context_search, as: "lti_registration_context_search"
       get "accounts/:account_id/lti_registrations/:id", action: :show
       get "accounts/:account_id/lti_registrations/:id/overlay_history", action: :overlay_history
+      get "accounts/:account_id/lti_registrations/:id/history", action: :history, as: :lti_registration_history
       get "accounts/:account_id/lti_registration_by_client_id/:client_id", action: :show_by_client_id
       put "accounts/:account_id/lti_registrations/:id", action: :update
       put "accounts/:account_id/lti_registrations/:id/reset", action: :reset
@@ -2384,11 +2398,6 @@ CanvasRails::Application.routes.draw do
       get "support_helpers/plagiarism_platform/resubmit_for_assignment/:assignment_id", action: :resubmit_for_assignment
     end
 
-    scope(controller: "support_helpers/crocodoc") do
-      get "support_helpers/crocodoc/shard", action: :shard
-      get "support_helpers/crocodoc/submission", action: :submission
-    end
-
     scope(controller: "support_helpers/submission_lifecycle_manage") do
       get "support_helpers/submission_lifecycle_manage/course", action: :course
     end
@@ -2570,7 +2579,6 @@ CanvasRails::Application.routes.draw do
       delete "accounts/:account_id/grading_standards/:grading_standard_id", action: :destroy
     end
 
-    get "/crocodoc_session", controller: "crocodoc_sessions", action: "show", as: :crocodoc_session
     get "/canvadoc_session", controller: "canvadoc_sessions", action: "show", as: :canvadoc_session
     post "/canvadoc_session", controller: "canvadoc_sessions", action: "create"
 
@@ -3093,11 +3101,13 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/registration_token", action: :registration_token
       get "accounts/:account_id/registrations/uuid/:registration_uuid", action: :ims_registration_by_uuid
       get "accounts/:account_id/lti_registrations/uuid/:registration_uuid", action: :lti_registration_by_uuid
+      get "accounts/:account_id/lti_registration_update_request/uuid/:registration_uuid", action: :lti_registration_update_request_by_uuid
       get "accounts/:account_id/registrations/:registration_id", action: :show
       put "accounts/:account_id/registrations/:registration_id/overlay", action: :update_registration_overlay
       get "accounts/:account_id/dr_iframe", action: :dr_iframe
       get "registrations/:registration_id/view", action: :registration_view, as: :lti_registration_config
       post "registrations", action: :create, as: :create_lti_registration
+      put "registrations/:registration_id", action: :update, as: :update_lti_registration
     end
 
     # Public JWK Service

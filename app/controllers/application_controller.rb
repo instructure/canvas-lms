@@ -389,6 +389,7 @@ class ApplicationController < ActionController::Base
                                     end
         if @context.is_a?(Course)
           @js_env[:FEATURES][:youtube_overlay] = @context.account.feature_enabled?(:youtube_overlay)
+          @js_env[:FEATURES][:rce_studio_embed_improvements] = @context.feature_enabled?(:rce_studio_embed_improvements)
         end
 
         # partner context data
@@ -458,7 +459,6 @@ class ApplicationController < ActionController::Base
     new_quizzes_navigation_updates
     permanent_page_links
     rce_a11y_resize
-    rce_studio_embed_improvements
     rce_find_replace
     render_both_to_do_lists
     scheduled_feedback_releases
@@ -469,7 +469,7 @@ class ApplicationController < ActionController::Base
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     account_level_mastery_scales
-    ams_service
+    ams_root_account_integration
     buttons_and_icons_root_account
     course_pace_allow_bulk_pace_assign
     course_pace_download_document
@@ -490,7 +490,6 @@ class ApplicationController < ActionController::Base
     lti_apps_page_instructors
     lti_asset_processor
     lti_asset_processor_discussions
-    lti_deep_linking_module_index_menu_modal
     lti_link_to_apps_from_developer_keys
     lti_registrations_discover_page
     lti_registrations_next
@@ -516,7 +515,6 @@ class ApplicationController < ActionController::Base
   ].freeze
   JS_ENV_ROOT_ACCOUNT_SERVICES = %i[account_survey_notifications].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = %i[
-    assign_to_differentiation_tags
     discussion_checkpoints
     embedded_release_notes
   ].freeze

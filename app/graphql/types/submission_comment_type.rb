@@ -44,6 +44,8 @@ module Types
     implements Interfaces::TimestampInterface
     implements Interfaces::LegacyIDInterface
 
+    connection_type_class TotalCountConnection
+
     field :created_at, Types::DateTimeType, null: false
     field :draft, Boolean, null: false
     field :submission_id, ID, null: false

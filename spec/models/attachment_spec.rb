@@ -179,12 +179,6 @@ describe Attachment do
     end
   end
 
-  def configure_crocodoc
-    PluginSetting.create! name: "crocodoc",
-                          settings: { api_key: "blahblahblahblahblah" }
-    allow_any_instance_of(Crocodoc::API).to receive(:upload).and_return "uuid" => "1234567890"
-  end
-
   def configure_canvadocs(opts = {})
     ps = PluginSetting.where(name: "canvadocs").first_or_create
     ps.update_attribute :settings, {
@@ -192,110 +186,6 @@ describe Attachment do
       "base_url" => "http://example.com",
       "annotations_supported" => true
     }.merge(opts)
-  end
-
-  context "crocodoc" do
-    include HmacHelper
-
-    let_once(:user) { user_model }
-    let_once(:course) { course_model }
-    let_once(:student) do
-      course.enroll_student(user_model).accept
-      @user
-    end
-    before { configure_crocodoc }
-
-    it "crocodocable?" do
-      crocodocable_attachment_model
-      expect(@attachment).to be_crocodocable
-    end
-
-    it "includes an allow list of moderated_grading_allow_list in the url blob" do
-      crocodocable_attachment_model
-      moderated_grading_allow_list = [user, student].map { |u| u.moderated_grading_ids(true) }
-
-      @attachment.submit_to_crocodoc
-      url_opts = {
-        moderated_grading_allow_list:
-      }
-      url = Rack::Utils.parse_nested_query(@attachment.crocodoc_url(user, url_opts).sub(/^.*\?{1}/, ""))
-      blob = extract_blob(url["hmac"],
-                          url["blob"],
-                          "user_id" => user.id,
-                          "type" => "crocodoc")
-
-      expect(blob["moderated_grading_allow_list"]).to include(user.moderated_grading_ids.as_json)
-      expect(blob["moderated_grading_allow_list"]).to include(student.moderated_grading_ids.as_json)
-    end
-
-    it "always enables annotations when creating a crocodoc url" do
-      crocodocable_attachment_model
-      @attachment.submit_to_crocodoc
-
-      url = Rack::Utils.parse_nested_query(@attachment.crocodoc_url(user, {}).sub(/^.*\?{1}/, ""))
-      blob = extract_blob(url["hmac"],
-                          url["blob"],
-                          "user_id" => user.id,
-                          "type" => "crocodoc")
-
-      expect(blob["enable_annotations"]).to be(true)
-    end
-
-    it "does not modify the options reference given to create a crocodoc url" do
-      crocodocable_attachment_model
-      @attachment.submit_to_crocodoc
-
-      url_opts = {}
-      @attachment.crocodoc_url(user, url_opts)
-      expect(url_opts).to eql({})
-    end
-
-    it "submits to crocodoc" do
-      crocodocable_attachment_model
-      expect(@attachment.crocodoc_available?).to be_falsey
-      @attachment.submit_to_crocodoc
-
-      expect(@attachment.crocodoc_available?).to be_truthy
-      expect(@attachment.crocodoc_document.uuid).to eq "1234567890"
-    end
-
-    it "spawns delayed jobs to retry failed uploads" do
-      allow_any_instance_of(Crocodoc::API).to receive(:upload).and_return "error" => "blah"
-      crocodocable_attachment_model
-
-      attempts = 3
-      stub_const("Attachment::MAX_CROCODOC_ATTEMPTS", attempts)
-
-      track_jobs do
-        # first attempt
-        @attachment.submit_to_crocodoc
-
-        time = Time.zone.now
-        # nth attempt won't create more jobs
-        attempts.times do
-          time += 1.hour
-          Timecop.freeze(time) do
-            run_jobs
-          end
-        end
-      end
-
-      expect(created_jobs.count { |job| job.tag == "Attachment#submit_to_crocodoc" }).to eq attempts
-    end
-
-    it "submits to canvadocs if crocodoc fails to convert" do
-      crocodocable_attachment_model
-      @attachment.submit_to_crocodoc
-
-      allow_any_instance_of(Crocodoc::API).to receive(:status).and_return [
-        { "uuid" => "1234567890", "status" => "ERROR" }
-      ]
-      allow(Canvadocs).to receive(:enabled?).and_return true
-
-      expects_job_with_tag("Attachment.submit_to_canvadocs") do
-        CrocodocDocument.update_process_states
-      end
-    end
   end
 
   context "canvadocs" do
@@ -357,28 +247,9 @@ describe Attachment do
       end
 
       it "sends annotatable documents to canvadocs if supported" do
-        configure_crocodoc
-        a = crocodocable_attachment_model
+        a = canvadocable_attachment_model
         a.submit_to_canvadocs 1, wants_annotation: true
         expect(a.canvadoc).not_to be_nil
-      end
-
-      it "prefers crocodoc when annotation is requested and canvadocs can't annotate" do
-        configure_crocodoc
-        configure_canvadocs "annotations_supported" => false
-        stub_const("Canvadoc::DEFAULT_MIME_TYPES", Canvadoc::DEFAULT_MIME_TYPES + ["application/blah"])
-
-        crocodocable = crocodocable_attachment_model
-        canvadocable = canvadocable_attachment_model content_type: "application/blah"
-
-        crocodocable.submit_to_canvadocs 1, wants_annotation: true
-        run_jobs
-        expect(crocodocable.canvadoc).to be_nil
-        expect(crocodocable.crocodoc_document).not_to be_nil
-
-        canvadocable.submit_to_canvadocs 1, wants_annotation: true
-        expect(canvadocable.canvadoc).not_to be_nil
-        expect(canvadocable.crocodoc_document).to be_nil
       end
 
       it "downgrades Canvadoc upload timeouts to WARN" do
@@ -756,23 +627,6 @@ describe Attachment do
       a.destroy_content_and_replace # works
       expect(a).not_to receive(:send_to_purgatory)
       a.destroy_content_and_replace # returns because it already happened
-    end
-
-    it "destroys all crocodocs even from children attachments" do
-      local_storage!
-      configure_crocodoc
-
-      a = crocodocable_attachment_model(uploaded_data: default_uploaded_data)
-      a2 = attachment_model(root_attachment: a)
-      a2.submit_to_canvadocs 1, wants_annotation: true
-      a.submit_to_canvadocs 1, wants_annotation: true
-      run_jobs
-
-      expect(a.crocodoc_document).not_to be_nil
-      expect(a2.crocodoc_document).not_to be_nil
-      a.destroy_content_and_replace
-      expect(a.reload.crocodoc_document).to be_nil
-      expect(a2.reload.crocodoc_document).to be_nil
     end
 
     it "allows destroy_content_and_replace on children attachments" do

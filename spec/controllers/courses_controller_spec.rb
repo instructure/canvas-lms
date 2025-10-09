@@ -2435,7 +2435,6 @@ describe CoursesController do
 
     context "differentiation tag rollback" do
       before do
-        @course.account.enable_feature!(:assign_to_differentiation_tags)
         @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
         @course.account.save!
 
@@ -2861,6 +2860,14 @@ describe CoursesController do
       put "update", params: { id: @course.id, course: { name: "new course name" } }
       expect(assigns[:course]).not_to be_nil
       expect(assigns[:course]).to eql(@course)
+    end
+
+    it "transforms a unix timestamp to nil" do
+      user_session(@teacher)
+      put "update", params: { id: @course.id, course: { start_at: 1.day.from_now.to_i, name: "Updated" } }, as: :json
+      expect(response).to be_successful
+      @course.reload
+      expect(@course.start_at).to be_nil
     end
 
     it "updates some settings and stuff" do

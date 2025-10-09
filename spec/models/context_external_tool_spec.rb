@@ -3548,7 +3548,8 @@ describe ContextExternalTool do
         shared_secret: "secret",
         url: "http://www.tool.com/main_launch",
         settings: {
-          ActivityAssetProcessor: { enabled: true, eula: }.compact
+          ActivityAssetProcessor: { enabled: true },
+          message_settings: eula ? [eula] : []
         }
       )
     end
@@ -3563,6 +3564,7 @@ describe ContextExternalTool do
     context "when eula fields are present" do
       let(:eula) do
         {
+          type: "LtiEulaRequest",
           enabled: true,
           target_link_uri: "http://www.tool.com/eula_launch",
           custom_fields: { "field1" => "value1" }

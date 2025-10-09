@@ -717,7 +717,10 @@ class WikiPage < ActiveRecord::Base
     no_assignment_page_visibilities = without_assignment_in_course(opts[:course_id])
 
     visible_wiki_pages = WikiPageVisibility::WikiPageVisibilityService.wiki_pages_visible_to_students(course_ids: opts[:course_id], user_ids: opts[:user_id])
-    visible_wiki_pages = visible_wiki_pages.select { |v| no_assignment_page_visibilities.pluck(:id).include?(v.wiki_page_id) }
+    no_assignment_page_ids = RequestCache.cache("wiki_pages_without_assignment", opts[:course_id]) do
+      no_assignment_page_visibilities.pluck(:id)
+    end
+    visible_wiki_pages = visible_wiki_pages.select { |v| no_assignment_page_ids.include?(v.wiki_page_id) }
     no_assignment_page_visibilities = visible_wiki_pages.group_by(&:user_id)
                                                         .transform_values { |visibilities| visibilities.map(&:wiki_page_id) }
 

@@ -377,6 +377,21 @@
 #           "description": "Configuration for activity asset processor contribution placement. Null if not configured for this placement.",
 #           "example": {"type": "ContextExternalToolPlacement"},
 #           "$ref": "ContextExternalToolPlacement"
+#         },
+#         "message_settings": {
+#           "description": "Configuration for placementless message types (currently only LtiEulaRequest).",
+#           "type": "array",
+#           "items": {
+#             "$ref": "ContextExternalToolMessageSettings"
+#           },
+#           "example": [
+#             {
+#               "type": "LtiEulaRequest",
+#               "enabled": true,
+#               "target_link_uri": "https://example.com/eula",
+#               "custom_fields": {"agreement_version": "2.1"}
+#             }
+#           ]
 #         }
 #       }
 #     }
@@ -530,29 +545,34 @@
 #           "description": "If true, query parameters from the launch URL will not be copied to the POST body. LTI 1.1 only.",
 #           "example": true,
 #           "type": "boolean"
+#         }
+#       }
+#     }
+#
+# @model ContextExternalToolMessageSettings
+#     {
+#       "id": "ContextExternalToolMessageSettings",
+#       "description": "Configuration for a placementless message type (message type that doesn't belong to a specific placement)",
+#       "properties": {
+#         "type": {
+#           "description": "The message type identifier (e.g., 'LtiEulaRequest')",
+#           "example": "LtiEulaRequest",
+#           "type": "string"
 #         },
-#         "eula": {
-#           "description": "End User License Agreement configuration for ActivityAssetProcessor placement. Only valid for ActivityAssetProcessor placement.",
-#           "example": {
-#             "enabled": true,
-#             "target_link_uri": "https://example.com/eula",
-#             "custom_fields": {"agreement_version": "2.1"}
-#           },
-#           "type": "object",
-#           "properties": {
-#             "enabled": {
-#               "description": "Whether the EULA is enabled",
-#               "type": "boolean"
-#             },
-#             "target_link_uri": {
-#               "description": "The URI for the EULA",
-#               "type": "string"
-#             },
-#             "custom_fields": {
-#               "description": "Custom fields for the EULA",
-#               "type": "object"
-#             }
-#           }
+#         "enabled": {
+#           "description": "Whether this message type is enabled",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "target_link_uri": {
+#           "description": "The target URI for launching this message type",
+#           "example": "https://example.com/eula",
+#           "type": "string"
+#         },
+#         "custom_fields": {
+#           "description": "Custom fields specific to this message type.",
+#           "example": {"key": "value"},
+#           "type": "object"
 #         }
 #       }
 #     }
@@ -999,7 +1019,7 @@ class ExternalToolsController < ApplicationController
           named_context_url(@context, :context_external_content_success_url, "external_tool_dialog", include_host: true)
         end
 
-      @lti_launch = lti_launch(tool: @tool, selection_type:, launch_token: params[:launch_token])
+      @lti_launch = lti_launch(tool: @tool, selection_type:, launch_token: params[:launch_token], secure_params: params[:secure_params])
       unless @lti_launch
         timing_meta.tags = { error: true, lti_version: @tool&.lti_version }.compact
         return
@@ -1123,10 +1143,14 @@ class ExternalToolsController < ApplicationController
     end
   end
 
-  def assignment_from_assignment_id
-    return nil unless params[:assignment_id].present?
+  def assignment_from_assignment_id(lti_assignment_id: nil)
+    if params[:assignment_id].present?
+      assignment = api_find(@context.assignments.active, params[:assignment_id])
+    elsif lti_assignment_id.present?
+      assignment = @context.assignments.active.find_by(lti_context_id: lti_assignment_id)
+    end
+    return nil unless assignment
 
-    assignment = api_find(@context.assignments.active, params[:assignment_id])
     raise Lti::Errors::UnauthorizedError unless assignment.grants_right?(@current_user, :read)
 
     assignment
@@ -1147,7 +1171,7 @@ class ExternalToolsController < ApplicationController
     opts = default_opts.merge(opts)
     opts[:launch_url] = tool.url_with_environment_overrides(opts[:launch_url])
 
-    assignment = assignment_from_assignment_id
+    assignment = assignment_from_assignment_id(lti_assignment_id: opts.dig(:link_params, :ext, :lti_assignment_id))
 
     if assignment.present? && @current_user.present?
       assignment = AssignmentOverrideApplicator.assignment_overridden_for(assignment, @current_user)
@@ -1994,7 +2018,8 @@ class ExternalToolsController < ApplicationController
                 oauth_compliant
                 is_rce_favorite
                 is_top_nav_favorite
-                unified_tool_id]
+                unified_tool_id
+                message_settings]
     attrs += [:allow_membership_service_access] if @context.root_account.feature_enabled?(:membership_service_for_lti_tools)
     attrs += [:estimated_duration_attributes] if @context.try(:horizon_course?)
 

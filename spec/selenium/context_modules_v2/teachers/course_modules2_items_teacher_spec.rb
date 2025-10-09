@@ -19,6 +19,7 @@
 
 require_relative "../../helpers/context_modules_common"
 require_relative "../page_objects/modules2_index_page"
+require_relative "../page_objects/modules2_action_tray"
 require_relative "../../helpers/items_assign_to_tray"
 require_relative "../../helpers/assignments_common"
 require_relative "../shared_examples/course_modules2_shared"
@@ -27,8 +28,10 @@ describe "context module items", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include ContextModulesCommon
   include Modules2IndexPage
+  include Modules2ActionTray
   include ItemsAssignToTray
   include AssignmentsCommon
+  include Modules2ActionTray
 
   before :once do
     modules2_teacher_setup
@@ -85,15 +88,16 @@ describe "context module items", :ignore_js_errors do
       wait_for_ajaximations
 
       module_header_expand_toggles.first.click
-
       expect(module_item_publish_button(@module_item1.id).text).to include "Published"
 
       # Unpublish the first module item
       module_item_publish_button(@module_item1.id).click
+      wait_for_ajaximations
       expect(module_item_publish_button(@module_item1.id).text).to include "Unpublished"
 
       # Republish the first module item
       module_item_publish_button(@module_item1.id).click
+      wait_for_ajaximations
       expect(module_item_publish_button(@module_item1.id).text).to include "Published"
     end
 
@@ -222,88 +226,205 @@ describe "context module items", :ignore_js_errors do
   end
 
   context "module items action menu" do
-    before do
-      # Create a module with at least one item of each type
-      module_setup
-      # Create a module item of file type
-      file = @course.attachments.create!(display_name: "some file", uploaded_data: default_uploaded_data, locked: true)
-      @module.add_item(type: "file", id: file.id)
-    end
-
-    def validate_edit_item_form(item)
-      manage_module_item_button(item.id).click
-      module_item_action_menu_link("Edit").click
-
-      expect(edit_item_modal).to be_displayed
-      edit_item_modal.find_element(:css, "button[type='button']").click
-      wait_for_ajaximations
-    end
-
-    def validate_text_fields_has_right_value(item)
-      manage_module_item_button(item.id).click
-      module_item_action_menu_link("Edit").click
-      wait_for_ajaximations
-      item_title = item.title
-      title = edit_item_modal_title_input_value
-      expect(title).to eq(item_title)
-
-      # URL field is only present for ExternalTool, ExternalUrl, and ContextExternalTool items
-      if %w[External ExternalUrl ExternalTool ContextExternalTool].include?(item.content_type)
-        url_value = edit_item_modal_url_value
-        expect(url_value).to eq(item.url)
-
-        new_tab = edit_item_modal.find_element(:css, "input[data-testid='edit-modal-new-tab']")
-        new_tab_value = item.new_tab.nil? ? false : item.new_tab
-        expect(new_tab.selected?).to eq(new_tab_value)
+    context "edit module item kebab form" do
+      before do
+        # add a file item
+        file = @course.attachments.create!(display_name: "some file", uploaded_data: default_uploaded_data, locked: true)
+        @module3.add_item(type: "file", id: file.id)
+        # add external tool
+        @tool = @course.context_external_tools.create!(name: "new tool",
+                                                       consumer_key: "key",
+                                                       shared_secret: "secret",
+                                                       url: "http://localhost:3000/",
+                                                       custom_fields: { "a" => "1", "b" => "2" })
+        @external_tool_tag = @module3.add_item({
+                                                 type: "context_external_tool",
+                                                 title: "Example",
+                                                 url: "http://localhost:3000/",
+                                                 new_tab: "0"
+                                               })
+        @external_tool_tag.publish!
+        # add external url
+        @external_url_tag = @module3.add_item({
+                                                type: "external_url",
+                                                title: "pls view",
+                                                url: "http://localhost:3000/lolcats"
+                                              })
+        @external_url_tag.publish!
       end
 
-      edit_item_modal.find_element(:css, "button[type='button']").click
-      wait_for_ajaximations
-    end
+      def validate_edit_item_form(item)
+        manage_module_item_button(item.id).click
+        module_item_action_menu_link("Edit").click
 
-    def validate_update_module_item_title(item, new_title = "New Title")
-      manage_module_item_button(item.id).click
-      module_item_action_menu_link("Edit").click
-      wait_for_ajaximations
+        expect(edit_item_modal).to be_displayed
+        edit_item_modal_submit_button.click
+        wait_for_ajaximations
+      end
 
-      title = edit_item_modal.find_element(:css, "input[data-testid='edit-modal-title']")
-      replace_content(title, new_title)
+      def validate_text_fields_has_right_value(item)
+        manage_module_item_button(item.id).click
+        module_item_action_menu_link("Edit").click
+        wait_for_ajaximations
+        item_title = item.title
+        title = edit_item_modal_title_input_value
+        expect(title).to eq(item_title)
 
-      edit_item_modal.find_element(:css, "button[type='submit']").click
-      wait_for_ajaximations
-      assignment_title = manage_module_item_container(item.id).find_element(:xpath, ".//*[text()='#{new_title}']")
-      expect(assignment_title.text).to eq(new_title)
-    end
+        # URL field is only present for ExternalTool, ExternalUrl, and ContextExternalTool items
+        if %w[External ExternalUrl ExternalTool ContextExternalTool].include?(item.content_type)
+          url_value = edit_item_modal_url_value
+          expect(url_value).to eq(item.url)
 
-    context "edit module item kebab form" do
-      it "edit item form is shown" do
-        go_to_modules
-        module_header_expand_toggles.last.click
+          new_tab_value = item.new_tab.nil? ? false : item.new_tab
+          expect(edit_item_modal_new_tab_checkbox.selected?).to eq(new_tab_value)
+        end
+
+        edit_item_modal_submit_button.click
+        wait_for_ajaximations
+      end
+
+      def validate_update_module_item_title(item, new_title = "New Title")
+        manage_module_item_button(item.id).click
+        module_item_action_menu_link("Edit").click
         wait_for_ajaximations
 
-        @module.content_tags.each do |item|
+        replace_content(edit_item_modal_title_input, new_title)
+
+        edit_item_modal_submit_button.click
+        wait_for_ajaximations
+        assignment_title = manage_module_item_container(item.id).find_element(:xpath, ".//*[text()='#{new_title}']")
+        expect(assignment_title.text).to eq(new_title)
+      end
+      it "edit item form is shown" do
+        go_to_modules
+        module_header_expand_toggles[2].click
+        wait_for_ajaximations
+
+        @module3.content_tags.each do |item|
           validate_edit_item_form(item)
         end
       end
 
       it "title fields has the right value" do
         go_to_modules
-        module_header_expand_toggles.last.click
+        module_header_expand_toggles[2].click
         wait_for_ajaximations
 
-        @module.content_tags.each do |item|
+        @module3.content_tags.each do |item|
           validate_text_fields_has_right_value(item)
         end
       end
 
       it "item is updated" do
         go_to_modules
-        module_header_expand_toggles.last.click
+        module_header_expand_toggles[2].click
         wait_for_ajaximations
 
-        @module.content_tags.each do |item|
+        @module3.content_tags.each do |item|
           validate_update_module_item_title(item)
         end
+      end
+    end
+
+    context "link to speedgrader" do
+      it "can redirects to speedgrader page" do
+        student_in_course(course: @course, name: "student", active_all: true).user
+
+        go_to_modules
+        module_header_expand_toggles.first.click
+        wait_for_ajaximations
+
+        manage_module_item_button(@module_item1.id).click
+        module_item_action_menu_link("SpeedGrader").click
+
+        expect(driver.current_url).to include(
+          "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+        )
+      end
+    end
+
+    context "indent module items" do
+      before(:once) do
+        @indented_item1 = @module1.add_item(
+          type: "assignment",
+          id: @assignment3.id,
+          indent: 3 # Indent level 3 = 60px
+        )
+
+        @indented_item2 = @module2.add_item(
+          type: "quiz",
+          id: @quiz2.id,
+          indent: 1 # Indent level 1 = 20px
+        )
+      end
+
+      it "can increase indent with edit modal" do
+        go_to_modules
+        module_header_expand_toggles.first.click
+        wait_for_ajaximations
+
+        manage_module_item_button(@module_item1.id).click # First item in the first module
+        module_item_action_menu_link("Edit").click
+        click_INSTUI_Select_option(add_item_indent_select, "Indent 2 levels")
+        edit_item_modal_submit_button.click
+
+        wait_for_ajaximations
+        item_indent = module_item_indent(@module_item1.id)
+        expect(item_indent).to match("padding: 0px 0px 0px 40px;")
+      end
+
+      it "can decrease indent with edit modal" do
+        go_to_modules
+        module_header_expand_toggles.first.click
+        wait_for_ajaximations
+
+        manage_module_item_button(@indented_item1.id).click
+        module_item_action_menu_link("Edit").click
+        click_INSTUI_Select_option(add_item_indent_select, "Indent 1 level")
+        edit_item_modal_submit_button.click
+
+        wait_for_ajaximations
+        item_indent = module_item_indent(@indented_item1.id)
+        expect(item_indent).to match("padding: 0px 0px 0px 20px;")
+      end
+
+      it "can increase indent" do
+        go_to_modules
+        module_header_expand_toggles[1].click
+        wait_for_ajaximations
+
+        manage_module_item_button(@indented_item2.id).click # Last item in second module, already indented 1 level
+        module_item_action_menu_link("Increase indent").click
+
+        wait_for_ajaximations
+        item_indent = module_item_indent(@indented_item2.id)
+        expect(item_indent).to match("padding: 0px 0px 0px 40px;")
+      end
+
+      it "can decrease indent" do
+        go_to_modules
+        module_header_expand_toggles[1].click
+        wait_for_ajaximations
+
+        manage_module_item_button(@indented_item2.id).click
+        module_item_action_menu_link("Decrease indent").click
+
+        wait_for_ajaximations
+        item_indent = module_item_indent(@indented_item2.id)
+        expect(item_indent).to match("padding: 0px;")
+      end
+
+      it "shows correct indent options depending on item position" do
+        go_to_modules
+        module_header_expand_toggles.first.click
+        wait_for_ajaximations
+
+        manage_module_item_button(@module_item1.id).click
+        expect(module_item_action_menu_link_exists?("Decrease indent")).to be_falsey # Can't decrease indent at level 0
+        expect(module_item_action_menu_link_exists?("Increase indent")).to be_truthy
+        manage_module_item_button(@indented_item1.id).click
+        expect(module_item_action_menu_link_exists?("Decrease indent")).to be_truthy
+        expect(module_item_action_menu_link_exists?("Increase indent")).to be_truthy
       end
     end
 
@@ -398,11 +519,27 @@ describe "context module items", :ignore_js_errors do
         module_header_expand_toggles[2].click
         wait_for_ajaximations
 
-        copy_and_expect(@quiz_item, "quizzes")
         copy_and_expect(@assignment_item, "assignments")
         copy_and_expect(@discussion_item, "discussion_topics")
         copy_and_expect(@page_item, "wiki_pages")
+      end
+
+      it "module item files is correctly copied" do
+        go_to_modules
+        # Use the third module
+        module_header_expand_toggles[2].click
+        wait_for_ajaximations
+
         copy_and_expect(@file_item, "attachments")
+      end
+
+      it "module item quiz is correctly copied" do
+        go_to_modules
+        # Use the third module
+        module_header_expand_toggles[2].click
+        wait_for_ajaximations
+
+        copy_and_expect(@quiz_item, "quizzes")
       end
     end
 
@@ -433,7 +570,7 @@ describe "context module items", :ignore_js_errors do
         module_header_expand_toggles.last.click
         wait_for_ajaximations
 
-        moved_item = @module.content_tags.first
+        moved_item = @module3.content_tags.first
         manage_module_item_button(moved_item.id).click
         module_item_action_menu_link("Move to...").click
         expect(move_item_tray_select_modules_listbox).to be_displayed
@@ -441,8 +578,8 @@ describe "context module items", :ignore_js_errors do
 
         option_list_id = move_item_tray_select_modules_listbox.attribute("aria-controls")
         option_list_course_option(option_list_id, @module1.name).click
-        move_item_tray_place_contents_listbox.click
-        place_item_at_bottom_option.click
+        move_tray_place_contents_listbox.click
+        place_item_at_option("At the bottom").click
         submit_move_to_button.click
         wait_for_ajaximations
 
@@ -457,21 +594,21 @@ describe "context module items", :ignore_js_errors do
         module_header_expand_toggles.last.click
         wait_for_ajaximations
 
-        moved_item = @module.content_tags.first
+        moved_item = @module3.content_tags.first
         manage_module_item_button(moved_item.id).click
         module_item_action_menu_link("Move to...").click
         expect(move_item_tray_select_modules_listbox).to be_displayed
         move_item_tray_select_modules_listbox.click
 
         option_list_id = move_item_tray_select_modules_listbox.attribute("aria-controls")
-        option_list_course_option(option_list_id, @module.name).click
-        move_item_tray_place_contents_listbox.click
-        place_item_at_bottom_option.click
+        option_list_course_option(option_list_id, @module3.name).click
+        move_tray_place_contents_listbox.click
+        place_item_at_option("At the bottom").click
         submit_move_to_button.click
         wait_for_ajaximations
 
         item_titles_list = module_item_title_links.map(&:text)
-        expect(@module.content_tags.last.title).to include(moved_item.title)
+        expect(@module3.content_tags.last.title).to include(moved_item.title)
         expect(item_titles_list.count(moved_item.title)).to eq(1)
       end
 
@@ -507,7 +644,7 @@ describe "context module items", :ignore_js_errors do
 
         it "moves item to top of target module" do
           open_move_item_tray(@moved_item.id, @target_module.name)
-          place_item_at_top_option.click
+          place_item_at_option("At the top").click
           submit_move_to_button.click
           wait_for_ajaximations
           expect(@target_module.reload.content_tags.first.title).to eq("Source Assignment First")
@@ -515,7 +652,7 @@ describe "context module items", :ignore_js_errors do
 
         it "moves item to bottom of target module" do
           open_move_item_tray(@moved_item.id, @target_module.name)
-          place_item_at_bottom_option.click
+          place_item_at_option("At the bottom").click
           submit_move_to_button.click
           wait_for_ajaximations
           expect(@target_module.reload.content_tags.last.title).to eq("Source Assignment First")
@@ -524,7 +661,7 @@ describe "context module items", :ignore_js_errors do
         it "moves last item to the top of same module" do
           pagination_page_buttons[1].click
           open_move_item_tray(@moved_item_last.id, @source_module.name)
-          place_item_at_top_option.click
+          place_item_at_option("At the top").click
           submit_move_to_button.click
           wait_for_ajaximations
           expect(@source_module.reload.content_tags.first.title).to eq("Source Assignment Last")
@@ -532,7 +669,7 @@ describe "context module items", :ignore_js_errors do
 
         it "moves item to bottom of same module" do
           open_move_item_tray(@moved_item.id, @source_module.name)
-          place_item_at_bottom_option.click
+          place_item_at_option("At the bottom").click
           submit_move_to_button.click
           wait_for_ajaximations
           expect(@source_module.reload.content_tags.last.title).to eq("Source Assignment First")
@@ -540,7 +677,7 @@ describe "context module items", :ignore_js_errors do
 
         it "moves a module item before another item in a different module" do
           open_move_item_tray(@moved_item.id, @target_module.name)
-          place_item_before_option.click
+          place_item_at_option("Before...").click
           move_item_tray_select_page_listbox.click
           page_option(1).click
           move_item_tray_reference_listbox.click
@@ -557,7 +694,7 @@ describe "context module items", :ignore_js_errors do
 
         it "moves a module item after another item in a different module" do
           open_move_item_tray(@moved_item.id, @target_module.name)
-          place_item_after_option.click
+          place_item_at_option("After...").click
           move_item_tray_select_page_listbox.click
           page_option(1).click
           move_item_tray_reference_listbox.click
@@ -574,7 +711,7 @@ describe "context module items", :ignore_js_errors do
 
         it "moves a module item before another item in the same module" do
           open_move_item_tray(@moved_item.id, @source_module.name)
-          place_item_before_option.click
+          place_item_at_option("Before...").click
           move_item_tray_select_page_listbox.click
           page_option(1).click
           move_item_tray_reference_listbox.click
@@ -590,7 +727,7 @@ describe "context module items", :ignore_js_errors do
 
         it "moves a module item after another item in the same module" do
           open_move_item_tray(@moved_item.id, @source_module.name)
-          place_item_after_option.click
+          place_item_at_option("After...").click
           move_item_tray_select_page_listbox.click
           page_option(1).click
           move_item_tray_reference_listbox.click
@@ -626,6 +763,51 @@ describe "context module items", :ignore_js_errors do
 
         expect(module_item_title_links.length).to eq(ui_count_before + 1)
         expect(module_item_title_links.last.text).to eq("Dup me Copy")
+      end
+    end
+
+    context "remove module item" do
+      before :once do
+        @test_module = @course.context_modules.create!(name: "module_remove_item")
+        @remove_assignment = @course.assignments.create!(title: "Remove me", submission_types: "online_text_entry")
+        @remove_item = @test_module.add_item(type: "assignment", id: @remove_assignment.id)
+      end
+
+      it "removes last module item displays initial module state" do
+        go_to_modules
+        wait_for_ajaximations
+
+        context_module_expand_toggle(@test_module.id).click
+        wait_for_ajaximations
+
+        manage_module_item_button(@remove_item.id).click
+        module_item_action_menu_link("Remove").click
+        expect(driver.switch_to.alert).not_to be_nil
+        driver.switch_to.alert.accept
+        wait_for_ajaximations
+
+        expect(module_file_drop_element_exists?(@test_module.id)).to be true
+        expect(f("body")).not_to contain_css(manage_module_item_container_selector(@remove_item.id))
+      end
+
+      it "removes a module item" do
+        go_to_modules
+        wait_for_ajaximations
+
+        context_module_expand_toggle(@test_module.id).click
+        wait_for_ajaximations
+
+        removed_item = @test_module.content_tags.last
+        expect(removed_item.workflow_state).to eq("active")
+
+        manage_module_item_button(@remove_item.id).click
+        module_item_action_menu_link("Remove").click
+        expect(driver.switch_to.alert).not_to be_nil
+        driver.switch_to.alert.accept
+        wait_for_ajaximations
+
+        expect(removed_item.reload.workflow_state).to eq("deleted")
+        expect(f("body")).not_to contain_css(manage_module_item_container_selector(@remove_item.id))
       end
     end
   end

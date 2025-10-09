@@ -199,7 +199,7 @@ class WikiPagesController < ApplicationController
   def wiki_pages_js_env(context)
     set_k5_mode # we need this to run now, even though we haven't hit the render hook yet
 
-    assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+    assign_to_tags = @context.account.allow_assign_to_differentiation_tags?
 
     editor_feature = determine_editor_feature(context)
 

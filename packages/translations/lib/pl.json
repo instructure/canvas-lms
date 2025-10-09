@@ -1823,6 +1823,9 @@
     "please_enter_a_file_name_f159edc1": {
         "message": "Wpisz nazwę pliku"
     },
+    "please_enter_a_valid_video_url_from_a_supported_pl_30dc0596": {
+        "message": "Wprowadź prawidłowy adres URL wideo z obsługiwanej platformy."
+    },
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "Wybierz plik obsługiwanego typu"
     },
@@ -1945,6 +1948,12 @@
     },
     "religion_icon_246e0be1": {
         "message": "Ikona religii"
+    },
+    "remove_f47dc62a": {
+        "message": "Usuń"
+    },
+    "remove_filename_3ea029f6": {
+        "message": "Usuń { filename }"
     },
     "remove_heading_style_5fdc8855": {
         "message": "Usuń styl nagłówka"
@@ -2699,6 +2708,9 @@
     "video_player_for_title_ffd9fbc4": {
         "message": "Odtwarzacz wideo dla { title }"
     },
+    "video_url_889d3263": {
+        "message": "Adres URL wideo"
+    },
     "vietnamese_e7a76583": {
         "message": "Wietnamski"
     },
@@ -2824,6 +2836,9 @@
     },
     "your_webcam_may_already_be_in_use_6cd64c25": {
         "message": "Kamera sieciowa może być już w użyciu."
+    },
+    "youtube_embed_url_5c1018d4": {
+        "message": "Osadź adres URL z serwisu YouTube"
     },
     "zeta_5ef24f0e": {
         "message": "Zeta"

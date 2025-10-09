@@ -206,6 +206,64 @@ module Types
       end
     end
 
+    class AllocationRulesFilterInputType < Types::BaseInputObject
+      argument :search_term,
+               String,
+               required: false,
+               prepare: :prepare_search_term
+
+      def prepare_search_term(term)
+        if term.presence && term.length < SearchTermHelper::MIN_SEARCH_TERM_LENGTH
+          raise GraphQL::ExecutionError, "search term must be at least #{SearchTermHelper::MIN_SEARCH_TERM_LENGTH} characters"
+        end
+
+        term
+      end
+    end
+
+    class AssignmentAllocationRules < ApplicationObjectType
+      description "Allocation rules for peer review assignments"
+
+      field :rules_connection, AllocationRuleType.connection_type, null: true do
+        description "Paginated list of allocation rules"
+        argument :filter, AllocationRulesFilterInputType, required: false
+      end
+      def rules_connection(filter: {})
+        apply_search_filter(filter).then { |scope| scope.order(:id) }
+      end
+
+      field :count, Int, null: true do
+        description "Total count of allocation rules (filtered if search is applied)"
+        argument :filter, AllocationRulesFilterInputType, required: false
+      end
+      def count(filter: {})
+        apply_search_filter(filter).then(&:count)
+      end
+
+      private
+
+      def apply_search_filter(filter)
+        load_association(:allocation_rules).then do |rules|
+          scope = rules.active
+
+          search_term = filter[:search_term].presence
+          if search_term
+            scope = scope.joins(
+              "JOIN #{User.quoted_table_name} AS assessor_users ON allocation_rules.assessor_id = assessor_users.id"
+            ).joins(
+              "JOIN #{User.quoted_table_name} AS assessee_users ON allocation_rules.assessee_id = assessee_users.id"
+            ).where(
+              "assessor_users.name ILIKE ? OR assessee_users.name ILIKE ?",
+              "%#{search_term}%",
+              "%#{search_term}%"
+            )
+          end
+
+          scope
+        end
+      end
+    end
+
     global_id_field :id
 
     field :name, String, null: true
@@ -691,6 +749,15 @@ module Types
       end
     end
 
+    field :scheduled_post, ScheduledPostType, null: true
+    def scheduled_post
+      load_association(:context).then do |course|
+        if course.grants_right?(current_user, :manage_grades)
+          load_association(:scheduled_post)
+        end
+      end
+    end
+
     field :score_statistic, AssignmentScoreStatisticType, null: true
     def score_statistic
       load_association(:context).then do |course|
@@ -835,15 +902,15 @@ module Types
       end
     end
 
-    field :allocation_rules_connection, AllocationRuleType.connection_type, null: true do
+    field :allocation_rules, AssignmentAllocationRules, null: true do
       description "Allocation rules if peer review is enabled"
     end
-    def allocation_rules_connection
+    def allocation_rules
       return nil unless assignment.grants_right?(current_user, :grade) &&
                         assignment.context.feature_enabled?(:peer_review_allocation_and_grading) &&
                         assignment.peer_reviews
 
-      load_association(:allocation_rules).then(&:active)
+      assignment
     end
   end
 end

@@ -186,4 +186,22 @@ RSpec.describe Lti::Pns::LtiAssetProcessorSubmissionNoticeBuilder do
       )
     end
   end
+
+  describe "#info_log" do
+    let(:notice_builder) { described_class.new(param_hash) }
+
+    it "returns relevant log information" do
+      log_info = notice_builder.info_log(tool)
+      expect(log_info).to include(
+        notice_type: "LtiAssetProcessorSubmissionNotice",
+        tool_id: tool.id,
+        user_id: lti_student.id,
+        assignment_id: assignment.id,
+        submission_lti_id: "submission_id:1",
+        asset_count: 1,
+        asset_uuids: [333]
+      )
+      expect(log_info).to have_key(:notice_id)
+    end
+  end
 end

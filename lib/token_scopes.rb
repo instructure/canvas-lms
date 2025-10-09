@@ -33,6 +33,10 @@ class TokenScopes
 
   ### LTI SCOPE URLS ###
 
+  # LTI: 1Edtech Registration scopes
+  LTI_REGISTRATION_READ_ONLY_SCOPE = "https://purl.imsglobal.org/spec/lti-reg/scope/registration.readonly"
+  LTI_REGISTRATION_SCOPE = "https://purl.imsglobal.org/spec/lti-reg/scope/registration"
+
   # LTI: 1EdTech AGS (Assignment and Grade Services) and NRPS (Names and Role Provisioning Services)
   LTI_AGS_LINE_ITEM_SCOPE = "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"
   LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE = "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly"
@@ -69,6 +73,10 @@ class TokenScopes
   ### LTI SCOPES DESCRIPTIONS HASHES -- Must match lti_scopes.yml and front-end  ###
   # "Public" / documented LTI scopes
   LTI_SCOPES = {
+    # Registrations
+    LTI_REGISTRATION_READ_ONLY_SCOPE => I18n.t("Can view LTI registrations associated with the tool."),
+    LTI_REGISTRATION_SCOPE => I18n.t("Can send automatic updates to be approved by an Administrator."),
+
     # AGS + NRPS
     LTI_AGS_LINE_ITEM_SCOPE => I18n.t("Can create and view assignment data in the gradebook associated with the tool."),
     LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE => I18n.t("Can view assignment data in the gradebook associated with the tool."),
@@ -87,7 +95,7 @@ class TokenScopes
     LTI_UPDATE_PUBLIC_JWK_SCOPE => I18n.t("Can update public jwk for LTI services."),
     LTI_ACCOUNT_LOOKUP_SCOPE => I18n.t("Can lookup Account information."),
     LTI_AGS_SHOW_PROGRESS_SCOPE => I18n.t("Can view Progress records associated with the context the tool is installed in."),
-    LTI_PAGE_CONTENT_SHOW_SCOPE => I18n.t("Can view the content of a page the tool is launched from.")
+    LTI_PAGE_CONTENT_SHOW_SCOPE => I18n.t("Can view the content of a page the tool is launched from."),
   }.freeze
 
   # Undocumented LTI scopes

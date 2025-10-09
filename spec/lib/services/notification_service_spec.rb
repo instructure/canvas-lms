@@ -109,6 +109,22 @@ module Services
         expect { @message.deliver }.not_to raise_error
       end
 
+      it "prefers the most recently updated duplicate endpoint" do
+        expect(@queue).to receive(:send_message).once
+        sns_client = double
+        allow(sns_client).to receive(:create_platform_endpoint).and_return(endpoint_arn: "arn")
+        allow_any_instance_of(NotificationEndpoint).to receive(:sns_client).and_return(sns_client)
+        first = @at.notification_endpoints.create!(token: "token")
+        NotificationEndpoint.where(id: first.id).update_all(updated_at: 2.hours.ago)
+        # Create a second (newer) duplicate for a different access token and force a newer timestamp
+        second = @at2.notification_endpoints.create!(token: "token")
+        NotificationEndpoint.where(id: second.id).update_all(updated_at: Time.zone.now)
+
+        Message.where(id: @message.id).update_all(path_type: "push", notification_name: "Assignment Created")
+        @message.reload.deliver
+        expect { @message.deliver }.not_to raise_error
+      end
+
       def test_push_notification(notification_name)
         expect(@queue).to receive(:send_message).once
         sns_client = double

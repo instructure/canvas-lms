@@ -170,6 +170,8 @@ RSpec.describe CanvasOperations::DataFixup do
         job_scope = Delayed::Job.where(tag: "BatchDataFixup#process_range").order(created_at: :asc)
 
         expect(BatchDataFixup.range_batch_size).to eq 1
+
+        allow(Rails.env).to receive(:production?).and_return(true)
         # Batch size is 1 for this test. Despite there being a gap of 9 IDs between the two users,
         # we only expect jobs to get enqueued if the batch contains a matching row.
         expect { fixup_instance.send(:execute) }.to change { job_scope.count }.from(0).to(2)
@@ -257,9 +259,8 @@ RSpec.describe CanvasOperations::DataFixup do
           it "creates attachment audit logs" do
             user_model
 
-            expect(Attachment).to receive(:create!).with(
+            expect(Attachment).to receive(:new).with(
               context: instance_of(Account),
-              instfs_uuid: instance_of(String),
               filename: "instructure_data_fixup/individual_record_data_fixup/shards/#{Shard.current.id}.part0",
               content_type: "text/plain"
             ).and_call_original
@@ -320,9 +321,8 @@ RSpec.describe CanvasOperations::DataFixup do
           it "creates attachment audit logs" do
             user_model
 
-            expect(Attachment).to receive(:create!).with(
+            expect(Attachment).to receive(:new).with(
               context: instance_of(Account),
-              instfs_uuid: instance_of(String),
               filename: "instructure_data_fixup/batch_data_fixup/shards/#{Shard.current.id}.part0",
               content_type: "text/plain"
             ).and_call_original

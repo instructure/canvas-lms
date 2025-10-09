@@ -37,6 +37,10 @@ import type {LtiConfigurationOverlay} from '../model/internal_lti_configuration/
 import type {DeveloperKeyId} from '../model/developer_key/DeveloperKeyId'
 import {compact} from '../../common/lib/compact'
 import {type LtiOverlayVersion, ZLtiOverlayVersion} from '../model/LtiOverlayVersion'
+import {
+  type LtiRegistrationHistoryEntry,
+  ZLtiRegistrationHistoryEntry,
+} from '../model/LtiRegistrationHistoryEntry'
 import {useMutation, useQuery} from '@tanstack/react-query'
 import {doFetchWithSchema} from '@canvas/do-fetch-api-effect'
 import {getAccountId} from '../../common/lib/getAccountId'
@@ -445,6 +449,18 @@ export const fetchLtiRegistrationOverlayHistory = (
   parseFetchResult(z.array(ZLtiOverlayVersion))(
     fetch(
       `/api/v1/accounts/${accountId}/lti_registrations/${ltiRegistrationId}/overlay_history?limit=${limit}`,
+      defaultFetchOptions(),
+    ),
+  )
+
+export const fetchLtiRegistrationHistory = (
+  accountId: AccountId,
+  ltiRegistrationId: LtiRegistrationId,
+  per_page: number,
+): Promise<ApiResult<LtiRegistrationHistoryEntry[]>> =>
+  parseFetchResult(z.array(ZLtiRegistrationHistoryEntry))(
+    fetch(
+      `/api/v1/accounts/${accountId}/lti_registrations/${ltiRegistrationId}/history?per_page=${per_page}`,
       defaultFetchOptions(),
     ),
   )

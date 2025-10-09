@@ -2891,6 +2891,82 @@ describe Course do
         end
       end
 
+      describe "TAB_AI_EXPERIENCES" do
+        before do
+          @course.enable_feature!(:ai_experiences)
+        end
+
+        after do
+          @course.disable_feature!(:ai_experiences)
+        end
+
+        it "includes AI Experiences tab when feature flag is enabled and user has permissions" do
+          tabs = @course.tabs_available(@user)
+          ai_tab = tabs.find { |t| t[:id] == Course::TAB_AI_EXPERIENCES }
+
+          expect(ai_tab).not_to be_nil
+          expect(ai_tab[:label]).to eq("AI Experiences")
+          expect(ai_tab[:css_class]).to eq("ai_experiences")
+          expect(ai_tab[:href]).to eq(:course_ai_experiences_path)
+        end
+
+        it "positions AI Experiences tab before Settings tab" do
+          tabs = @course.tabs_available(@user)
+          settings_tab_index = tabs.pluck(:id).index(Course::TAB_SETTINGS)
+          ai_tab_index = tabs.pluck(:id).index(Course::TAB_AI_EXPERIENCES)
+
+          expect(ai_tab_index).not_to be_nil
+          expect(settings_tab_index).not_to be_nil
+          expect(ai_tab_index).to be < settings_tab_index
+        end
+
+        it "does not include AI Experiences tab when feature flag is disabled" do
+          @course.disable_feature!(:ai_experiences)
+          tabs = @course.tabs_available(@user)
+          ai_tab = tabs.find { |t| t[:id] == Course::TAB_AI_EXPERIENCES }
+
+          expect(ai_tab).to be_nil
+        end
+
+        it "does not include AI Experiences tab when user lacks permissions" do
+          student = user_factory(active_all: true)
+          @course.enroll_student(student, enrollment_state: "active")
+
+          tabs = @course.tabs_available(student)
+          ai_tab = tabs.find { |t| t[:id] == Course::TAB_AI_EXPERIENCES }
+
+          expect(ai_tab).to be_nil
+        end
+
+        it "includes AI Experiences tab for users with manage_course_content permissions" do
+          ta = user_factory(active_all: true)
+          @course.enroll_ta(ta, enrollment_state: "active")
+
+          tabs = @course.tabs_available(ta)
+          ai_tab = tabs.find { |t| t[:id] == Course::TAB_AI_EXPERIENCES }
+
+          expect(ai_tab).not_to be_nil
+        end
+
+        it "includes AI Experiences tab for users with manage_assignments permissions" do
+          # Create a custom role with only assignment permissions
+          role = @course.account.roles.create!(name: "Grader", base_role_type: "TaEnrollment")
+          @course.account.role_overrides.create!(
+            role:,
+            permission: "manage_assignments_add",
+            enabled: true
+          )
+
+          grader = user_factory(active_all: true)
+          @course.enroll_user(grader, "TaEnrollment", role:, enrollment_state: "active")
+
+          tabs = @course.tabs_available(grader)
+          ai_tab = tabs.find { |t| t[:id] == Course::TAB_AI_EXPERIENCES }
+
+          expect(ai_tab).not_to be_nil
+        end
+      end
+
       describe "TAB_SEARCH" do
         before do
           allow(SmartSearch).to receive(:bedrock_client).and_return(double)
@@ -3054,22 +3130,56 @@ describe Course do
         expect(available_tabs.select { |t| t[:hidden] }).to be_empty
       end
 
-      it "includes item banks tab for active external tools" do
-        @course.context_external_tools.create!(
-          url: "http://example.com/ims/lti",
-          consumer_key: "asdf",
-          shared_secret: "hjkl",
-          name: "external tool 1",
-          course_navigation: {
-            text: "Item Banks",
+      context "with an active external tool" do
+        let!(:quiz_lti_tool) do
+          @course.context_external_tools.create!(
             url: "http://example.com/ims/lti",
-            default: false,
-          }
-        )
+            consumer_key: "asdf",
+            shared_secret: "hjkl",
+            name: "external tool 1",
+            course_navigation: {
+              text: "Item Banks",
+              url: "http://example.com/ims/lti",
+              default: false,
+            }
+          )
+        end
 
-        tabs = @course.tabs_available(@user, include_external: true).pluck(:label)
+        it "includes item banks tab for active external tools" do
+          tabs = @course.tabs_available(@user, include_external: true).pluck(:label)
 
-        expect(tabs).to include("Item Banks")
+          expect(tabs).to include("Item Banks")
+        end
+
+        context "and the ams_root_account_integration is enabled" do
+          before do
+            @course.root_account.enable_feature!(:ams_root_account_integration)
+          end
+
+          context "and the ams_course_integration is disabled" do
+            before do
+              @course.disable_feature!(:ams_course_integration)
+            end
+
+            it "does not replace the context external tool tab" do
+              available_tabs = @course.tabs_available(@user, include_external: true).pluck(:id)
+              expect(available_tabs).not_to include(Course::TAB_ITEM_BANKS)
+              expect(available_tabs).to include("context_external_tool_#{quiz_lti_tool.id}")
+            end
+          end
+
+          context "and the ams_course_integration is enabled" do
+            before do
+              @course.enable_feature!(:ams_course_integration)
+            end
+
+            it "replaces the content external tool tab with the ams_service Item Banks tab" do
+              available_tabs = @course.tabs_available(@user, include_external: true).pluck(:id)
+              expect(available_tabs).to include(Course::TAB_ITEM_BANKS)
+              expect(available_tabs).not_to include("context_external_tool_#{quiz_lti_tool.id}")
+            end
+          end
+        end
       end
 
       describe "with canvas_for_elementary account setting on" do
@@ -3450,18 +3560,6 @@ describe Course do
 
           available_tabs = @course.tabs_available(@user, include_external: true).pluck(:label)
           expect(available_tabs).not_to include("Item Banks")
-        end
-
-        context "and the ams_service is enabled" do
-          before do
-            @course.root_account.enable_feature!(:ams_service)
-          end
-
-          it "replaces the content external tool tab with the ams_service Item Banks tab" do
-            available_tabs = @course.tabs_available(@user, include_external: true).pluck(:id)
-            expect(available_tabs).to include(Course::TAB_ITEM_BANKS)
-            expect(available_tabs).not_to include("context_external_tool_#{quiz_lti_tool.id}")
-          end
         end
       end
 
@@ -5885,6 +5983,119 @@ describe Course do
     end
   end
 
+  describe "#sync_with_homeroom" do
+    before :once do
+      @account = Account.default
+      toggle_k5_setting(@account, true)
+
+      @homeroom_course1 = course_factory(active_course: true, account: @account)
+      @homeroom_course1.homeroom_course = true
+      @homeroom_course1.save!
+
+      @homeroom_course2 = course_factory(active_course: true, account: @account)
+      @homeroom_course2.homeroom_course = true
+      @homeroom_course2.save!
+
+      @teacher = user_factory(active_all: true)
+      @homeroom_course1.enroll_teacher(@teacher, enrollment_state: "active")
+      @homeroom_course2.enroll_teacher(@teacher, enrollment_state: "active")
+
+      @course_1 = course_factory(active_course: true, account: @account)
+      @course_1.sync_enrollments_from_homeroom = true
+      @course_1.homeroom_course_id = @homeroom_course1.id
+      @course_1.save!
+
+      @course_2 = course_factory(active_course: true, account: @account)
+      @course_2.sync_enrollments_from_homeroom = true
+      @course_2.homeroom_course_id = @homeroom_course2.id
+      @course_2.save!
+
+      @course_2.destroy
+    end
+
+    it "does not raise an error when processing courses with deleted linked courses" do
+      expect { Course.sync_with_homeroom }.not_to raise_error
+    end
+
+    it "syncs enrollments from homeroom to the active regular course" do
+      Course.sync_with_homeroom
+      @course_1.reload
+
+      homeroom_teacher_ids = @homeroom_course1.teacher_enrollments.map(&:user_id)
+      regular_teacher_ids = @course_1.teacher_enrollments.map(&:user_id)
+
+      expect(regular_teacher_ids).to match_array(homeroom_teacher_ids)
+    end
+
+    it "does not process the deleted regular course" do
+      Course.sync_with_homeroom
+      @course_2.reload
+
+      expect(@course_2.teacher_enrollments).to be_empty
+    end
+  end
+
+  describe ".syncing_subjects" do
+    before :once do
+      @account = Account.default
+      toggle_k5_setting(@account, true)
+
+      @homeroom_course1 = course_factory(active_course: true, account: @account)
+      @homeroom_course1.homeroom_course = true
+      @homeroom_course1.save!
+
+      @homeroom_course2 = course_factory(active_course: true, account: @account)
+      @homeroom_course2.homeroom_course = true
+      @homeroom_course2.save!
+
+      @course_1 = course_factory(active_course: true, account: @account)
+      @course_1.sync_enrollments_from_homeroom = true
+      @course_1.homeroom_course_id = @homeroom_course1.id
+      @course_1.save!
+
+      @course_2 = course_factory(active_course: true, account: @account)
+      @course_2.sync_enrollments_from_homeroom = true
+      @course_2.homeroom_course_id = @homeroom_course2.id
+      @course_2.save!
+
+      @course_2.destroy
+    end
+
+    it "returns only non-deleted regular courses linked to homerooms" do
+      syncing_courses = Course.syncing_subjects
+
+      expect(syncing_courses).to include(@course_1)
+      expect(syncing_courses).not_to include(@course_2)
+    end
+
+    it "excludes courses with deleted homerooms" do
+      @homeroom_course1.destroy
+
+      syncing_courses = Course.syncing_subjects
+
+      expect(syncing_courses).not_to include(@course_1)
+    end
+
+    it "excludes courses with sis_batch_id" do
+      batch = @account.sis_batches.create!
+      @course_1.sis_batch_id = batch.id
+      @course_1.save!
+
+      syncing_courses = Course.syncing_subjects
+
+      expect(syncing_courses).not_to include(@course_1)
+    end
+
+    it "excludes courses not syncing from homeroom" do
+      @course_1.sync_enrollments_from_homeroom = false
+      @course_1.save!
+
+      syncing_courses = Course.syncing_subjects
+
+      expect(syncing_courses).not_to include(@course_1)
+    end
+  end
+
   describe "#user_is_instructor?" do
     before :once do
       @course = Course.create
@@ -6639,6 +6850,19 @@ describe Course do
         expect(result_enrollment.id).to eq current_course_enrollment.id
         expect(result_enrollment.course_id).to eq @course1.id
         expect(result_enrollment.course_section_id).to eq @section.id
+      end
+
+      context "when multiple enrollments are allowed" do
+        it "reuses enrollment from original course when section is cross-listed to new course" do
+          enrollment = @course1.enroll_user(@user, "TeacherEnrollment", section: @section)
+          enrollment.destroy
+          @section.crosslist_to_course(@course2)
+          @section.reload
+
+          expect { @course2.enroll_user(@user, "TeacherEnrollment", section: @section, allow_multiple_enrollments: true) }
+            .not_to raise_error
+          expect(@user.enrollments.find_by(course: @course2).id).to eq enrollment.id
+        end
       end
     end
 

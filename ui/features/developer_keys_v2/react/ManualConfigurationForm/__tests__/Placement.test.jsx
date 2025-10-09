@@ -218,17 +218,6 @@ it('requires icon_url for editor_button', async () => {
 const couldBeEither = ['assignment_selection']
 
 couldBeEither.forEach(placementName => {
-  if (placementName === 'module_index_menu_modal') {
-    beforeAll(() => {
-      global.ENV.FEATURES ||= {}
-      global.ENV.FEATURES.lti_deep_linking_module_index_menu_modal = true
-    })
-
-    afterAll(() => {
-      global.ENV.FEATURES.lti_deep_linking_module_index_menu_modal = false
-    })
-  }
-
   it(`${placementName}: displays alert when placement supports deep linking and resource link and deep linking chosen`, async () => {
     render(<Placement {...props({placementName}, {message_type: 'LtiDeepLinkingRequest'})} />)
     await userEvent.click(screen.getByRole('button'))

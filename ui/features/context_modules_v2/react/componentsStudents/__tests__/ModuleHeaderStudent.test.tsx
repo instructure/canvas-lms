@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
 import ModuleHeaderStudent, {ModuleHeaderStudentProps} from '../ModuleHeaderStudent'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
@@ -175,7 +175,7 @@ describe('ModuleHeaderStudent', () => {
 
       const toggleButton = getByTestId('module-header-expand-toggle')
       expect(toggleButton).toHaveAttribute('aria-expanded', 'true')
-      expect(toggleButton).toHaveTextContent('Collapse "Test Module"')
+      expect(toggleButton).toHaveAttribute('aria-label', 'Collapse "Test Module"')
     })
 
     it('Module items collapsed', () => {
@@ -183,7 +183,43 @@ describe('ModuleHeaderStudent', () => {
 
       const toggleButton = getByTestId('module-header-expand-toggle')
       expect(toggleButton).toHaveAttribute('aria-expanded', 'false')
-      expect(toggleButton).toHaveTextContent('Expand "Test Module"')
+      expect(toggleButton).toHaveAttribute('aria-label', 'Expand "Test Module"')
+    })
+  })
+
+  describe('Keyboard navigation', () => {
+    it('toggles expand when Enter key is pressed', () => {
+      const onToggleExpand = jest.fn()
+      const {getByTestId} = setUp(buildDefaultProps({expanded: false, onToggleExpand}))
+
+      const toggleButton = getByTestId('module-header-expand-toggle')
+      fireEvent.keyDown(toggleButton, {key: 'Enter', code: 'Enter'})
+
+      expect(onToggleExpand).toHaveBeenCalledWith('1')
+      expect(onToggleExpand).toHaveBeenCalledTimes(1)
+    })
+
+    it('toggles expand when Space key is pressed', () => {
+      const onToggleExpand = jest.fn()
+      const {getByTestId} = setUp(buildDefaultProps({expanded: false, onToggleExpand}))
+
+      const toggleButton = getByTestId('module-header-expand-toggle')
+      fireEvent.keyDown(toggleButton, {key: ' ', code: 'Space'})
+
+      expect(onToggleExpand).toHaveBeenCalledWith('1')
+      expect(onToggleExpand).toHaveBeenCalledTimes(1)
+    })
+
+    it('does not toggle expand when other keys are pressed', () => {
+      const onToggleExpand = jest.fn()
+      const {getByTestId} = setUp(buildDefaultProps({expanded: false, onToggleExpand}))
+
+      const toggleButton = getByTestId('module-header-expand-toggle')
+      fireEvent.keyDown(toggleButton, {key: 'a', code: 'KeyA'})
+      fireEvent.keyDown(toggleButton, {key: 'Escape', code: 'Escape'})
+      fireEvent.keyDown(toggleButton, {key: 'Tab', code: 'Tab'})
+
+      expect(onToggleExpand).not.toHaveBeenCalled()
     })
   })
 })

@@ -227,6 +227,7 @@ export const ExceptionModal = ({
       <Modal.Footer>
         <Button
           color="primary"
+          data-pendo="lti-registrations-save-exception"
           type="submit"
           disabled={disableView}
           onClick={() => {
@@ -241,7 +242,7 @@ export const ExceptionModal = ({
             }
           }}
         >
-          {I18n.t('Done')}
+          {I18n.t('Save')}
         </Button>
       </Modal.Footer>
     </Modal>

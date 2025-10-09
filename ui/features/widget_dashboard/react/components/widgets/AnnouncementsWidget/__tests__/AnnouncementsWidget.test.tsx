@@ -469,7 +469,7 @@ describe('AnnouncementsWidget', () => {
     await waitForLoadingToComplete()
 
     expect(capturedVariables).not.toBeNull()
-    expect(capturedVariables.first).toBe(4) // Uses the direct limit value
+    expect(capturedVariables.first).toBe(3)
     expect(capturedVariables.userId).toBe('123') // From ENV.current_user_id
 
     cleanup()

@@ -70,7 +70,7 @@ module CC::Exporter::Epub
     def zip_file
       @_zip_file ||= Zip::File.new(
         File.join(export_directory, filename),
-        Zip::File::CREATE
+        create: true
       )
     end
   end

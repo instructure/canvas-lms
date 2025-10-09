@@ -70,6 +70,7 @@ class AbstractAssignment < ActiveRecord::Base
   QUIZZES_NEXT_TIMEOUT = 15.minutes
   QUIZZES_NEXT_IMPORTING_TIMEOUT = 30.minutes
   QUIZZES_NEXT_QUIZ_TYPES = %w[graded_quiz graded_survey ungraded_survey].freeze
+  QUIZZES_NEXT_SURVEY_TYPES = %w[graded_survey ungraded_survey].freeze
   ROLLCALL_ASSIGNMENT_TITLE = "Roll Call Attendance"
 
   attr_accessor(
@@ -142,6 +143,7 @@ class AbstractAssignment < ActiveRecord::Base
   has_one :external_tool_tag, class_name: "ContentTag", as: :context, inverse_of: :context, dependent: :destroy
   has_one :score_statistic, dependent: :destroy, inverse_of: :assignment, foreign_key: :assignment_id
   has_one :post_policy, dependent: :destroy, inverse_of: :assignment, foreign_key: :assignment_id
+  has_one :scheduled_post, dependent: :destroy, inverse_of: :assignment, foreign_key: :assignment_id
 
   has_many :moderation_graders, inverse_of: :assignment, foreign_key: :assignment_id
   has_many :moderation_grader_users, through: :moderation_graders, source: :user
@@ -367,6 +369,7 @@ class AbstractAssignment < ActiveRecord::Base
       duplicate_wiki_page: true,
       duplicate_discussion_topic: true,
       duplicate_plagiarism_tool_association: true,
+      duplicate_asset_processors: true,
       copy_title: nil,
       user: nil
     }
@@ -454,6 +457,21 @@ class AbstractAssignment < ActiveRecord::Base
     if active_rubric_association?
       result.rubric_association = rubric_association.clone
       result.rubric_association.skip_updating_points_possible = true
+    end
+
+    if context.root_account.feature_enabled?(:lti_asset_processor) &&
+       opts_with_default[:duplicate_asset_processors] &&
+       lti_asset_processors.active.any?
+
+      result.save!
+
+      Lti::ImportHistory.register(source_lti_id: lti_context_id, target_lti_id: result.lti_context_id, root_account:)
+
+      lti_asset_processors.active.find_each do |asset_processor|
+        new_ap = asset_processor.dup
+        new_ap.assignment = result
+        new_ap.save!
+      end
     end
 
     # Link the duplicated assignment to this assignment
@@ -1280,7 +1298,7 @@ class AbstractAssignment < ActiveRecord::Base
       quiz.saved_by = :assignment
       quiz.workflow_state = published? ? "available" : "unpublished"
       quiz.save if quiz.changed?
-    elsif self.submission_types == "discussion_topic" && @saved_by != :discussion_topic
+    elsif self.submission_types == "discussion_topic" && !%i[discussion_topic sub_assignment].include?(@saved_by)
       topic = discussion_topic || context.discussion_topics.build(user: @updating_user)
       topic.message = description
       save_submittable(topic)
@@ -1611,6 +1629,8 @@ class AbstractAssignment < ActiveRecord::Base
     lti_asset_processors.find_each(&:destroy)
 
     comment_bank_items.destroy_all
+
+    scheduled_post&.destroy
 
     ScheduledSmartAlert.where(context_type: "Assignment", context_id: id).destroy_all
     ScheduledSmartAlert.where(context_type: "AssignmentOverride", context_id: assignment_override_ids).destroy_all

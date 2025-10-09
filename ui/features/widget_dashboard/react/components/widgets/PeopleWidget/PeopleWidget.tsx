@@ -31,6 +31,7 @@ import {useSharedCourses} from '../../../hooks/useSharedCourses'
 import {useCourseInstructors} from '../../../hooks/useCourseInstructors'
 import {CourseCode} from '../../shared/CourseCode'
 import {usePagination} from '../../../hooks/usePagination'
+import {DEFAULT_PAGE_SIZE} from '../../../constants/pagination'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -81,15 +82,20 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
     error: instructorsError,
   } = useCourseInstructors({
     courseIds: instructorCourseIds,
-    limit: 5,
+    limit: DEFAULT_PAGE_SIZE.PEOPLE,
   })
 
   const totalPagesLoaded = data?.pages.length || 0
+
+  // Get totalCount from the first page (it's the same across all pages)
+  const totalCount = data?.pages?.[0]?.totalCount ?? null
 
   const {currentPageIndex, paginationProps} = usePagination({
     hasNextPage: !!hasNextPage,
     totalPagesLoaded,
     fetchNextPage: fetchNextPage,
+    totalCount,
+    pageSize: DEFAULT_PAGE_SIZE.PEOPLE,
   })
 
   const currentPage = data?.pages[currentPageIndex]

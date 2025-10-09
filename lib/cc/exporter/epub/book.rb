@@ -60,7 +60,7 @@ module CC::Exporter::Epub
       @_epub ||= GEPUB::Book.new.tap do |b|
         b.primary_identifier(pub_id)
         b.language = I18n.locale
-        b.add_title(title, nil, GEPUB::TITLE_TYPE::MAIN) do |title|
+        b.add_title(title, title_type: GEPUB::TITLE_TYPE::MAIN) do |title|
           title.file_as = "#{title} ePub"
           title.display_seq = 1
         end

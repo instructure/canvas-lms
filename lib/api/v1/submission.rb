@@ -49,18 +49,19 @@ module Api::V1::Submission
     hash["body"] = nil if assignment.quiz? && !submission.user_can_read_grade?(current_user)
 
     if includes.include?("sub_assignment_submissions") && context.discussion_checkpoints_enabled?
-      # TODO: has_sub_assignment_submissions value will be updated to reflect true/false based off submissions on the sub assignment
-      # Refer to EGG-1916
-      hash["has_sub_assignment_submissions"] = assignment.has_sub_assignments
-      hash["sub_assignment_submissions"] = (assignment.has_sub_assignments &&
-                                           assignment.sub_assignments&.filter_map do |sub_assignment|
-                                             sub_assignment_submission = sub_assignment.submissions.find_by(user_id: submission.user_id)
-                                             # A Submission can be nil for two reasons:
-                                             # 1. The Submission was deleted due to the student no longer having access to the assignment (i.e. enrollment changes, assignment override removal)
-                                             # 2. The Submission was never created.
-                                             #    TODO: Older DiscussionTopic SubAssignments may fall into this category. In this case, we will throw a custom error so we can track. Refer to EGG-1916
-                                             sub_assignment_submission_json(sub_assignment_submission, sub_assignment, current_user, session, context, includes, params, avatars) if sub_assignment_submission.present?
-                                           end) || []
+      if assignment.has_sub_assignments
+        result = Checkpoints::SubAssignmentSubmissionSerializer.serialize(assignment:, user_id: submission.user_id)
+
+        sub_assignment_submissions = result[:submissions]&.filter_map do |sub_assignment_submission|
+          sub_assignment_submission_json(sub_assignment_submission, sub_assignment_submission.assignment, current_user, session, context, includes, params, avatars)
+        end
+
+        hash["has_sub_assignment_submissions"] = result[:has_active_submissions]
+        hash["sub_assignment_submissions"] = sub_assignment_submissions || []
+      else
+        hash["has_sub_assignment_submissions"] = false
+        hash["sub_assignment_submissions"] = []
+      end
     end
 
     if includes.include?("submission_history")

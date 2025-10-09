@@ -99,6 +99,8 @@ export const Discussion = {
         sortOrder
         expanded
         summaryEnabled
+        preferredLanguage
+        posted
       }
     }
     ${User.fragment}
@@ -163,7 +165,7 @@ export const Discussion = {
       id: string,
       sortOrder: string,
       expanded: bool,
-      summaryEnabled: bool
+      summaryEnabled: bool,
     }),
   }),
 

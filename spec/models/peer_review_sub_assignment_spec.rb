@@ -142,6 +142,33 @@ RSpec.describe PeerReviewSubAssignment do
     end
   end
 
+  describe "#effective_group_category_id" do
+    let(:course) { course_model(name: "Course with Assignment") }
+    let(:parent_assignment) { assignment_model(course:, title: "Parent Assignment") }
+    let(:group_category) { course.group_categories.create!(name: "Test Group Category") }
+
+    it "returns the group_category_id when set" do
+      peer_review_sub_assignment = PeerReviewSubAssignment.create!(
+        parent_assignment:,
+        group_category_id: group_category.id
+      )
+      expect(peer_review_sub_assignment.effective_group_category_id).to eq(group_category.id)
+    end
+
+    it "returns nil when group_category_id is not set" do
+      peer_review_sub_assignment = PeerReviewSubAssignment.create!(parent_assignment:)
+      expect(peer_review_sub_assignment.effective_group_category_id).to be_nil
+    end
+
+    it "returns nil when group_category_id is explicitly set to nil" do
+      peer_review_sub_assignment = PeerReviewSubAssignment.create!(
+        parent_assignment:,
+        group_category_id: nil
+      )
+      expect(peer_review_sub_assignment.effective_group_category_id).to be_nil
+    end
+  end
+
   describe "#soft_deleted?" do
     let(:course) { course_model(name: "Course with Assignment") }
     let(:parent_assignment) { assignment_model(course:, title: "Parent Assignment") }

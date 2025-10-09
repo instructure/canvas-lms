@@ -329,6 +329,34 @@ describe SubAssignment do
       expect(@sub_assignment).not_to receive(:sync_with_parent)
       @sub_assignment.update!(unlock_at: 1.day.from_now)
     end
+
+    it "does not sync with parent during initial checkpoint creation" do
+      new_parent = @course.assignments.create!(has_sub_assignments: false, title: "New Parent")
+
+      expect(new_parent).not_to receive(:update_from_sub_assignment)
+
+      new_sub = new_parent.sub_assignments.create!(
+        context: @course,
+        sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY,
+        title: "New Sub",
+        unlock_at: 1.day.from_now,
+        lock_at: 3.days.from_now
+      )
+
+      expect(new_sub).to be_persisted
+    end
+
+    it "does not sync when saved_by is set to :discussion_topic" do
+      @sub_assignment.saved_by = :discussion_topic
+      expect(@parent_assignment).not_to receive(:update_from_sub_assignment)
+      @sub_assignment.update!(unlock_at: 2.days.from_now)
+    end
+
+    it "does not sync when saved_by is set to :transaction" do
+      @sub_assignment.saved_by = :transaction
+      expect(@parent_assignment).not_to receive(:update_from_sub_assignment)
+      @sub_assignment.update!(unlock_at: 2.days.from_now)
+    end
   end
 
   describe "callbacks: sync_parent_has_sub_flag" do

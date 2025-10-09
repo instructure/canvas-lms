@@ -388,7 +388,7 @@ const SplitScreenThreadContainer = props => {
         expandText={I18n.t('View Replies')}
         isExpanded={false}
         onClick={onShowReplies}
-      />
+      />,
     )
   }
 
@@ -450,6 +450,7 @@ const SplitScreenThreadContainer = props => {
                       <ThreadActions
                         authorName={getDisplayName(props.discussionEntry)}
                         id={props.discussionEntry.id}
+                        entry={props.discussionEntry}
                         isUnread={!props.discussionEntry.entryParticipant?.read}
                         onToggleUnread={() => props.onToggleUnread(props.discussionEntry)}
                         onDelete={props.discussionEntry.permissions?.delete ? onDelete : null}

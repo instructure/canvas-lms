@@ -192,6 +192,23 @@ describe('editItemHandlers', () => {
         pointsPossible: '20',
       },
       {id: 'np1', name: 'No Points', resource: 'assignment', graded: false, pointsPossible: ''},
+      {id: 'p1', name: 'Page Item', resource: 'page', graded: false, pointsPossible: ''},
+      {id: 'f1', name: 'File Item', resource: 'file', graded: false, pointsPossible: ''},
+      {
+        id: 'd1',
+        name: 'Discussion Item',
+        resource: 'discussion',
+        graded: false,
+        pointsPossible: '',
+      },
+      {id: 'e1', name: 'External Url', resource: 'externalUrl', graded: false, pointsPossible: ''},
+      {
+        id: 't1',
+        name: 'External Tool',
+        resource: 'externalTool',
+        graded: false,
+        pointsPossible: '',
+      },
     ]
 
     it('maps requirement types and resolves names/fields from corresponding items', () => {
@@ -316,6 +333,28 @@ describe('editItemHandlers', () => {
         type: 'percentage',
         minimumScore: '85',
       })
+    })
+
+    it('ensures the correct resource for non assignment completion requirements', () => {
+      const completionRequirements = [
+        {id: 'p1', type: 'must_view'},
+        {id: 'f1', type: 'must_view'},
+        {id: 'd1', type: 'must_contribute'},
+        {id: 'e1', type: 'must_view'},
+        {id: 't1', type: 'must_view'},
+      ]
+      const result = transformRequirementsForTray(
+        completionRequirements,
+        moduleItems as any[],
+        rawModuleItems as any[],
+      )
+      const get = (id: string) => result.find(i => i.id === id)
+
+      expect(get('p1')).toMatchObject({resource: 'page', type: 'view'})
+      expect(get('f1')).toMatchObject({resource: 'file', type: 'view'})
+      expect(get('d1')).toMatchObject({resource: 'discussion', type: 'contribute'})
+      expect(get('e1')).toMatchObject({resource: 'externalUrl', type: 'view'})
+      expect(get('t1')).toMatchObject({resource: 'externalTool', type: 'view'})
     })
   })
 })

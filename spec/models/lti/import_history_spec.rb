@@ -160,4 +160,31 @@ RSpec.describe Lti::ImportHistory do
       expect(Lti::ImportHistory.recursive_import_history(current_assignment.lti_context_id, limit: 4)).to eq([a2, a6, a1, a3].map(&:lti_context_id))
     end
   end
+
+  describe "register" do
+    it "creates a new history row for a previously unseen source id" do
+      expect do
+        Lti::ImportHistory.register(source_lti_id: "source", target_lti_id: "target", root_account: Account.default)
+      end.to change { Lti::ImportHistory.where(target_lti_id: "target").count }.by(1)
+
+      history = Lti::ImportHistory.where(target_lti_id: "target").first
+      expect(history.source_lti_id).to eq "source"
+      expect(history.target_lti_id).to eq "target"
+    end
+
+    it "does not create a duplicate history row when the edge already exists" do
+      target_id = "target-dup"
+      Lti::ImportHistory.register(source_lti_id: "source-1", target_lti_id: target_id, root_account: Account.default)
+      expect do
+        Lti::ImportHistory.register(source_lti_id: "source-1", target_lti_id: target_id, root_account: Account.default)
+      end.not_to change { Lti::ImportHistory.where(target_lti_id: target_id).count }
+    end
+
+    it "creates multiple history rows for distinct source ids" do
+      target_id = "target-multi"
+      Lti::ImportHistory.register(source_lti_id: "source-1", target_lti_id: target_id, root_account: Account.default)
+      Lti::ImportHistory.register(source_lti_id: "source-2", target_lti_id: target_id, root_account: Account.default)
+      expect(Lti::ImportHistory.where(target_lti_id: target_id).pluck(:source_lti_id)).to match_array(%w[source-1 source-2])
+    end
+  end
 end

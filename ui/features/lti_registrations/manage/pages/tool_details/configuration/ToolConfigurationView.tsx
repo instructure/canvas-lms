@@ -43,6 +43,9 @@ import {
 } from '../../../api/registrations'
 import {isSuccessful} from '../../../../common/lib/apiResult/ApiResult'
 import {PlacementInfoTooltip} from '../../../components/PlacementInfoTooltip'
+import {MessageSetting} from '../../../model/internal_lti_configuration/InternalBaseLaunchSettings'
+import {LtiPlacementlessMessageType} from '../../../model/LtiMessageType'
+import {launchTypeSpecificSettingsLabels} from '../../../registration_wizard_forms/LaunchTypeSpecificSettingsConfirmation'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -91,6 +94,41 @@ const SubSection = ({
   )
 }
 
+const LaunchTypeSpecificSettingsSection = (
+  settings: MessageSetting[],
+  type: LtiPlacementlessMessageType,
+) => {
+  const setting = settings.find(s => s.type === type)
+  if (!setting) return null
+
+  const typeLabels = launchTypeSpecificSettingsLabels[type as LtiPlacementlessMessageType]
+
+  const customFields = Object.entries(setting.custom_fields || {})
+  return (
+    <Section title={typeLabels.title} margin="0 small medium small">
+      <SubSection title={typeLabels.enableLabel}>
+        <Text size="small">{setting?.enabled ? I18n.t('Yes') : I18n.t('No')}</Text>
+      </SubSection>
+      {setting.target_link_uri && (
+        <SubSection title={typeLabels.targetLinkUriLabel}>
+          <Text>{setting.target_link_uri}</Text>
+        </SubSection>
+      )}
+      <SubSection title={typeLabels.customFieldsLabel}>
+        {customFields.length === 0 ? (
+          <Text fontStyle="italic">{I18n.t('No custom fields configured.')}</Text>
+        ) : (
+          <View as="div" margin="x-small 0 0 0">
+            <pre style={{fontFamily: 'monospace'}}>
+              {customFields.map(([key, field]) => `${key}=${field}`).join('\n')}
+            </pre>
+          </View>
+        )}
+      </SubSection>
+    </Section>
+  )
+}
+
 export const ToolConfigurationView = () => {
   const {registration} = useOutletContext<ToolDetailsOutletContext>()
   const mutation = useResetLtiRegistration()
@@ -104,6 +142,10 @@ export const ToolConfigurationView = () => {
   const enabledPlacementsWithIcons = enabledPlacements.filter(p =>
     isLtiPlacementWithIcon(p.placement),
   )
+
+  const enabledMessageSettings = (
+    registration.overlaid_configuration.launch_settings?.message_settings || []
+  ).filter(setting => setting.enabled)
 
   const [tooltipShowing, setTooltipShowing] = React.useState(false)
 
@@ -272,6 +314,8 @@ export const ToolConfigurationView = () => {
           )}
         </Flex>
       </Section>
+
+      {LaunchTypeSpecificSettingsSection(enabledMessageSettings, 'LtiEulaRequest')}
 
       <Section title={I18n.t('Administration Nickname and Description')}>
         <Flex direction="row" alignItems="center" margin="small 0 0">

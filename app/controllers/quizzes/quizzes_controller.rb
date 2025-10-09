@@ -59,7 +59,7 @@ class Quizzes::QuizzesController < ApplicationController
                   submission_versions
                   submission_html
                 ],
-                unless: -> { @context.root_account.feature_enabled?(:ams_service) }
+                unless: -> { ams_integration_enabled? }
   before_action :set_download_submission_dialog_title, only: [:show, :statistics]
   after_action :lock_results, only: [:show, :submission_html]
   # The number of questions that can display "details". After this number, the "Show details" option is disabled
@@ -72,7 +72,7 @@ class Quizzes::QuizzesController < ApplicationController
   QUIZ_TYPE_SURVEYS = ["survey", "graded_survey"].freeze
 
   def index
-    if @context.root_account.feature_enabled?(:ams_service)
+    if ams_integration_enabled?
       render_ams_service
       return
     end
@@ -108,6 +108,11 @@ class Quizzes::QuizzesController < ApplicationController
 
       practice_quizzes   = scoped_quizzes_index.select { |q| q.quiz_type == QUIZ_TYPE_PRACTICE }
       surveys            = scoped_quizzes_index.select { |q| QUIZ_TYPE_SURVEYS.include?(q.quiz_type) }
+      if @context.root_account.feature_enabled?(:newquizzes_on_quiz_page) && Account.site_admin.feature_enabled?(:new_quizzes_surveys)
+        surveys += scoped_new_quizzes_index.select do |q|
+          Assignment::QUIZZES_NEXT_SURVEY_TYPES.include?(q.settings&.dig("new_quizzes", "type"))
+        end
+      end
       if scoped_new_quizzes_index.any? && @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
         mc_status = setup_master_course_restrictions(scoped_new_quizzes_index, @context)
       end
@@ -125,13 +130,13 @@ class Quizzes::QuizzesController < ApplicationController
       due_date_required_for_account = AssignmentUtil.due_date_required_for_account?(@context)
       max_name_length_required_for_account = AssignmentUtil.name_length_required_for_account?(@context)
       sis_integration_settings_enabled = AssignmentUtil.sis_integration_settings_enabled?(@context)
-      assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+      assign_to_tags = @context.account.allow_assign_to_differentiation_tags?
 
       hash = {
         QUIZZES: {
           assignment: assignment_quizzes_json(serializer_options),
           open: quizzes_json(practice_quizzes, *serializer_options),
-          surveys: quizzes_json(surveys, *serializer_options),
+          surveys: quizzes_next_json(sort_quizzes(surveys), *serializer_options),
           options: quiz_options
         },
         URLS: {
@@ -193,7 +198,7 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def show
-    if @context.root_account.feature_enabled?(:ams_service)
+    if ams_integration_enabled?
       render_ams_service
       return
     end
@@ -275,7 +280,7 @@ class Quizzes::QuizzesController < ApplicationController
       setup_attachments
       submission_counts if @quiz.grants_right?(@current_user, session, :grade) || @quiz.grants_right?(@current_user, session, :read_statistics)
 
-      assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+      assign_to_tags = @context.account.allow_assign_to_differentiation_tags?
 
       @stored_params = @submission.temporary_data if params[:take] && @submission && (@submission.untaken? || @submission.preview?)
       @stored_params ||= {}
@@ -374,7 +379,7 @@ class Quizzes::QuizzesController < ApplicationController
       max_name_length_required_for_account = AssignmentUtil.name_length_required_for_account?(@context)
       max_name_length = AssignmentUtil.assignment_max_name_length(@context)
 
-      assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+      assign_to_tags = @context.account.allow_assign_to_differentiation_tags?
 
       hash = {
         ASSIGNMENT_ID: @assignment.present? ? @assignment.id : nil,
@@ -1125,8 +1130,14 @@ class Quizzes::QuizzesController < ApplicationController
       return quizzes_json(old_quizzes, *serializer_options)
     end
 
+    new_quizzes = if Account.site_admin.feature_enabled?(:new_quizzes_surveys)
+                    scoped_new_quizzes_index.reject { |q| Assignment::QUIZZES_NEXT_SURVEY_TYPES.include?(q.settings&.dig("new_quizzes", "type")) }
+                  else
+                    scoped_new_quizzes_index
+                  end
+
     quizzes_next_json(
-      sort_quizzes(old_quizzes + scoped_new_quizzes_index),
+      sort_quizzes(old_quizzes + new_quizzes),
       *serializer_options
     )
   end
@@ -1155,6 +1166,12 @@ class Quizzes::QuizzesController < ApplicationController
         api_url: Services::Ams.api_url
       })
     render html: '<div id="ams_container"></div>'.html_safe, layout: true
+  end
+
+  def ams_integration_enabled?
+    @context.root_account.feature_enabled?(:ams_root_account_integration) &&
+      @context.is_a?(Course) &&
+      @context.feature_enabled?(:ams_course_integration)
   end
 
   protected

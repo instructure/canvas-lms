@@ -20,6 +20,7 @@ import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 import {PostToolbar} from '../PostToolbar'
 import {Discussion} from '../../../../graphql/Discussion'
+import {MockedProvider} from '@apollo/client/testing'
 
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),
@@ -38,13 +39,15 @@ beforeAll(() => {
   })
 })
 
-const setup = props => {
+const setup = (props, mocks = []) => {
   return render(
-    <PostToolbar
-      onReadAll={Function.prototype}
-      {...props}
-      discussionTopic={props?.discussion || Discussion.mock()}
-    />,
+    <MockedProvider mocks={mocks}>
+      <PostToolbar
+        onReadAll={Function.prototype}
+        {...props}
+        discussionTopic={props?.discussion || Discussion.mock()}
+      />
+    </MockedProvider>,
   )
 }
 

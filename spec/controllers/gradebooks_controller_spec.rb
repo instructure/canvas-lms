@@ -1552,7 +1552,6 @@ describe GradebooksController do
 
         context ":differentiation_tags" do
           before :once do
-            @course.account.enable_feature! :assign_to_differentiation_tags
             @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
             @course.account.save!
             @course.account.reload
@@ -3087,17 +3086,6 @@ describe GradebooksController do
         expect(reply_to_topic_submission.score).to eq 10
       end
 
-      it "raises an error if no sub assignment tag is provided" do
-        user_session(@teacher)
-        post(
-          "update_submission",
-          params: post_params,
-          format: :json
-        )
-        expect(response).to have_http_status :bad_request
-        expect(json_parse.dig("errors", "base")).to eq "Must provide a valid sub assignment tag when grading checkpointed discussions"
-      end
-
       it "ignores checkpoints when the feature flag is disabled" do
         @course.account.disable_feature!(:discussion_checkpoints)
         user_session(@teacher)
@@ -3125,7 +3113,7 @@ describe GradebooksController do
         expect(submission_json["sub_assignment_submissions"].length).to eq 2
       end
 
-      it "does return deleted sub assignment submissions" do
+      it "does not return deleted sub assignment submissions" do
         user_session(@teacher)
         @sub1.destroy
         post(
@@ -3137,9 +3125,10 @@ describe GradebooksController do
         json = response.parsed_body
         submission_json = json.first["submission"]
         expect(submission_json["sub_assignment_submissions"].length).to eq 1
+        expect(submission_json["has_sub_assignment_submissions"]).to be true
       end
 
-      it "returns empty array when there are no sub assignment submissions" do
+      it "returns empty array for sub_assignment_submissions and false for has_sub_assignment_submissions when there are no sub assignment submissions" do
         user_session(@teacher)
         @sub1.destroy
         @sub2.destroy
@@ -3152,6 +3141,27 @@ describe GradebooksController do
         json = response.parsed_body
         submission_json = json.first["submission"]
         expect(submission_json["sub_assignment_submissions"]).to eq []
+        expect(submission_json["has_sub_assignment_submissions"]).to be false
+      end
+
+      describe "SubAssignmentSubmissionSerializer integration" do
+        before do
+          user_session(@teacher)
+        end
+
+        it "uses the serializer to process sub-assignment submissions" do
+          expect(Checkpoints::SubAssignmentSubmissionSerializer).to receive(:serialize).with(
+            assignment: @topic.assignment,
+            user_id: @student.id
+          ).and_call_original
+
+          post(
+            "update_submission",
+            params: post_params.merge(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC),
+            format: :json
+          )
+          expect(response).to be_successful
+        end
       end
     end
   end
@@ -3277,6 +3287,13 @@ describe GradebooksController do
         expect(assigns[:js_env].fetch(:MANAGE_GRADES)).to be true
       end
 
+      it "includes VIEW_ALL_GRADES in js_env for platform speedgrader" do
+        Account.site_admin.enable_feature!(:platform_service_speedgrader)
+        @assignment.publish
+        get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+        expect(assigns[:js_env].fetch(:VIEW_ALL_GRADES)).to be true
+      end
+
       it "sets MANAGE_GRADES to false for users without manage_grades permission" do
         @assignment.publish
         Account.site_admin.enable_feature!(:platform_service_speedgrader)
@@ -3291,6 +3308,22 @@ describe GradebooksController do
         user_session(ta)
         get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
         expect(assigns[:js_env].fetch(:MANAGE_GRADES)).to be false
+      end
+
+      it "sets VIEW_ALL_GRADES to false for users without view_all_grades permission" do
+        Account.site_admin.enable_feature!(:platform_service_speedgrader)
+        @assignment.publish
+
+        # Create a user with only manage_grades permission
+        ta = User.create!
+        @course.enroll_ta(ta)
+        role = ta.enrollments.first.role
+        @course.root_account.role_overrides.create!(permission: :view_all_grades, enabled: false, role:)
+        @course.root_account.role_overrides.create!(permission: :manage_grades, enabled: true, role:)
+
+        user_session(ta)
+        get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+        expect(assigns[:js_env].fetch(:VIEW_ALL_GRADES)).to be false
       end
     end
 

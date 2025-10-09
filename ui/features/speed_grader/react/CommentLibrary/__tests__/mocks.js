@@ -24,6 +24,52 @@ import {
 } from '../graphql/Mutations'
 import {COMMENTS_QUERY} from '../graphql/Queries'
 
+const generateComments = (start, end) => {
+  const comments = []
+  for (let i = start; i < end; i++) {
+    comments.push({
+      __typename: 'CommentBankItem',
+      _id: i.toString(),
+      comment: `Comment item ${i}`,
+    })
+  }
+  return comments
+}
+
+const generateCommentBankItems = (nodes, hasNextPage, endCursor) => ({
+  data: {
+    legacyNode: {
+      _id: '1',
+      __typename: 'User',
+      commentBankItemsConnection: {
+        __typename: 'CommentBankItemsConnection',
+        nodes,
+        pageInfo: {__typename: 'PageInfo', hasNextPage, endCursor},
+      },
+    },
+  },
+})
+
+export const commentBankItemMocksV2 = () => {
+  return [
+    {
+      delay: 200,
+      request: {query: COMMENTS_QUERY, variables: {userId: '1'}},
+      result: generateCommentBankItems(generateComments(0, 10), true, 'cursor-10'),
+    },
+    {
+      delay: 200,
+      request: {query: COMMENTS_QUERY, variables: {userId: '1', after: 'cursor-10'}},
+      result: generateCommentBankItems(generateComments(10, 15), false, null),
+    },
+    {
+      delay: 200,
+      request: {query: COMMENTS_QUERY, variables: {userId: '1', query: 'search', first: 5}},
+      result: generateCommentBankItems(generateComments(0, 3), false, null),
+    },
+  ]
+}
+
 export const commentBankItemMocks = ({userId = '1', numberOfComments = 10} = {}) => [
   {
     request: {
@@ -47,8 +93,8 @@ export const commentBankItemMocks = ({userId = '1', numberOfComments = 10} = {})
             pageInfo: {
               __typename: 'PageInfo',
               hasNextPage: false,
-              endCursor: "abcdef",
-            }
+              endCursor: 'abcdef',
+            },
           },
         },
       },
@@ -84,14 +130,14 @@ export async function makeDeleteCommentMutation({overrides = {}, variables = {}}
   ]
 }
 
-export const searchMocks = ({userId = '1', query = 'search', maxResults = 5} = {}) => [
+export const searchMocks = ({userId = '1', query = 'search', first = 5} = {}) => [
   {
     request: {
       query: COMMENTS_QUERY,
       variables: {
         userId,
         query,
-        maxResults,
+        first,
       },
     },
     result: {
@@ -101,7 +147,7 @@ export const searchMocks = ({userId = '1', query = 'search', maxResults = 5} = {
           __typename: 'User',
           commentBankItemsConnection: {
             __typename: 'CommentBankItemsConnection',
-            nodes: new Array(maxResults).fill(0).map((_v, i) => ({
+            nodes: new Array(first).fill(0).map((_v, i) => ({
               __typename: 'CommentBankItem',
               _id: i.toString(),
               comment: `search result ${i}`,
@@ -109,8 +155,8 @@ export const searchMocks = ({userId = '1', query = 'search', maxResults = 5} = {
             pageInfo: {
               __typename: 'PageInfo',
               hasNextPage: false,
-              endCursor: "abcdef",
-            }
+              endCursor: 'abcdef',
+            },
           },
         },
       },

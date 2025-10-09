@@ -29,11 +29,9 @@ describe SIS::CSV::DifferentiationTagMembershipImporter do
       "A002,,No Diff Tags,active"
     )
     @tags_account = Account.find_by(sis_source_id: "A001")
-    @tags_account.enable_feature!(:assign_to_differentiation_tags)
     @tags_account.settings[:allow_assign_to_differentiation_tags] = { value: true }
     @tags_account.save!
     @no_tags_account = Account.find_by(sis_source_id: "A002")
-    @no_tags_account.disable_feature!(:assign_to_differentiation_tags)
     @no_tags_account.settings[:allow_assign_to_differentiation_tags] = { value: false }
     @no_tags_account.save!
     process_csv_data_cleanly(
@@ -62,13 +60,11 @@ describe SIS::CSV::DifferentiationTagMembershipImporter do
 
   it "skips bad content" do
     # enable it to create a tag
-    @no_tags_account.enable_feature!(:assign_to_differentiation_tags)
     @no_tags_account.settings[:allow_assign_to_differentiation_tags] = { value: true }
     @no_tags_account.save!
     tag_set_2 = @no_tags_course.differentiation_tag_categories.create!(name: "Tag Set 2", non_collaborative: true)
     tag_set_2.groups.create!(context: @no_tags_course, sis_source_id: "T002", non_collaborative: true)
     # then disable it again
-    @no_tags_account.disable_feature!(:assign_to_differentiation_tags)
     @no_tags_account.settings[:allow_assign_to_differentiation_tags] = { value: false }
     @no_tags_account.save!
     importer = process_csv_data(

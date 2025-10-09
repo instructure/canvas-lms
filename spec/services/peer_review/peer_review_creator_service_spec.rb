@@ -122,6 +122,14 @@ RSpec.describe PeerReview::PeerReviewCreatorService do
         expect(result.intra_group_peer_reviews).to eq(parent_assignment.intra_group_peer_reviews)
       end
 
+      it "inherits group_category_id from parent" do
+        group_category = course.group_categories.create!(name: "Test Group Category")
+        parent_assignment.update!(group_category_id: group_category.id)
+
+        result = service.call
+        expect(result.group_category_id).to eq(parent_assignment.group_category_id)
+      end
+
       it "recomputes due dates after creating the sub assignment" do
         expect(PeerReviewSubAssignment).to receive(:clear_cache_keys).with(
           an_instance_of(PeerReviewSubAssignment),

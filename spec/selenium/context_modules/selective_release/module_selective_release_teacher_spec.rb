@@ -85,7 +85,7 @@ describe "selective_release module set up" do
       expect(prerequisites_dropdown_value(0)).to eq("module2")
 
       click_settings_tray_update_module_button
-
+      ignore_relock
       expect(prerequisite_message(@module3).text).to eq("Prerequisites: module2")
     end
 
@@ -398,7 +398,6 @@ describe "selective_release module set up" do
 
     context "differentiation tags" do
       before :once do
-        @course.account.enable_feature!(:assign_to_differentiation_tags)
         @course.account.tap do |a|
           a.settings[:allow_assign_to_differentiation_tags] = { value: true }
           a.save!

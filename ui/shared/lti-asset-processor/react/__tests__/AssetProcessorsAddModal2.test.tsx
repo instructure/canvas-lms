@@ -260,4 +260,96 @@ describe('AssetProcessorsAddModal', () => {
       expect(result.current.state.tag).toBe('closed')
     })
   })
+
+  describe('Keyboard accessibility', () => {
+    it('launches the tool when Enter key is pressed on a card', async () => {
+      const {getByText, getByTitle, queryAllByTestId} = renderModal('ActivityAssetProcessor')
+      const open = renderHook(() => useAssetProcessorsAddModalState(s => s.actions)).result.current
+        .showToolList
+      act(() => open())
+
+      const toolCard = await waitFor(
+        () => {
+          expect(getByText('Add A Document Processing App')).toBeInTheDocument()
+
+          const cards = queryAllByTestId('asset-processor-card')
+          expect(cards).toHaveLength(4)
+          const foundCard = cards.find(card => card.textContent?.includes(assignmentTools[0].name))
+          expect(foundCard).toBeDefined()
+          return foundCard!
+        },
+        {timeout: 3000},
+      )
+
+      act(() => {
+        fireEvent.keyDown(toolCard, {key: 'Enter', code: 'Enter', bubbles: true})
+      })
+
+      await waitFor(
+        () => {
+          expect(getByTitle('Configure new document processing app')).toBeInTheDocument()
+        },
+        {timeout: 5000},
+      )
+    })
+
+    it('launches the tool when Space key is pressed on a card', async () => {
+      const {getByText, getByTitle, queryAllByTestId} = renderModal('ActivityAssetProcessor')
+      const open = renderHook(() => useAssetProcessorsAddModalState(s => s.actions)).result.current
+        .showToolList
+      act(() => open())
+
+      const toolCard = await waitFor(
+        () => {
+          expect(getByText('Add A Document Processing App')).toBeInTheDocument()
+
+          const cards = queryAllByTestId('asset-processor-card')
+          expect(cards).toHaveLength(4)
+          const foundCard = cards.find(card => card.textContent?.includes(assignmentTools[0].name))
+          expect(foundCard).toBeDefined()
+          return foundCard!
+        },
+        {timeout: 3000},
+      )
+
+      act(() => {
+        fireEvent.keyDown(toolCard, {key: ' ', code: 'Space', bubbles: true})
+      })
+
+      await waitFor(
+        () => {
+          expect(getByTitle('Configure new document processing app')).toBeInTheDocument()
+        },
+        {timeout: 5000},
+      )
+    })
+
+    it('does not launch the tool when other keys are pressed on a card', async () => {
+      const {getByText, queryByTitle, queryAllByTestId} = renderModal('ActivityAssetProcessor')
+      const open = renderHook(() => useAssetProcessorsAddModalState(s => s.actions)).result.current
+        .showToolList
+      act(() => open())
+
+      const toolCard = await waitFor(
+        () => {
+          expect(getByText('Add A Document Processing App')).toBeInTheDocument()
+
+          const cards = queryAllByTestId('asset-processor-card')
+          expect(cards).toHaveLength(4)
+          const foundCard = cards.find(card => card.textContent?.includes(assignmentTools[0].name))
+          expect(foundCard).toBeDefined()
+          return foundCard!
+        },
+        {timeout: 3000},
+      )
+
+      act(() => {
+        fireEvent.keyDown(toolCard, {key: 'a', code: 'KeyA'})
+        fireEvent.keyDown(toolCard, {key: 'Escape', code: 'Escape'})
+        fireEvent.keyDown(toolCard, {key: 'Tab', code: 'Tab'})
+      })
+
+      expect(queryByTitle('Configure new document processing app')).not.toBeInTheDocument()
+    })
+  })
 })

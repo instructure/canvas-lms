@@ -141,7 +141,7 @@ module Exporters
     end
 
     def create_zip_entry(zip_io, name)
-      Zip::Entry.new(zip_io, name, nil, nil, nil, nil, nil, nil, @export_dos_time)
+      Zip::Entry.new(zip_io, name, time: @export_dos_time)
     end
 
     def add_file(zipstream, file)

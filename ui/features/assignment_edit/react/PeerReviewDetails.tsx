@@ -21,19 +21,21 @@ import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
-import {IconExternalLinkLine} from '@instructure/ui-icons'
-import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {NumberInput} from '@instructure/ui-number-input'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {canvasHighContrast, canvas} from '@instructure/ui-themes'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {createRoot} from 'react-dom/client'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import PeerReviewAllocationRulesTray from '@canvas/assignments/react/PeerReviewAllocationRulesTray'
+import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
+import {usePeerReviewSettings} from './hooks/usePeerReviewSettings'
 
 const I18n = createI18nScope('peer_review_details')
 const baseTheme = ENV.use_high_contrast ? canvasHighContrast : canvas
 const {colors: instui10Colors} = baseTheme
+const inputOverride = {mediumHeight: '1.75rem', mediumFontSize: '0.875rem'}
 
 const roots = new Map()
 function createOrUpdateRoot(elementId: string, component: React.ReactNode) {
@@ -61,10 +63,121 @@ export const renderPeerReviewDetails = (assignment: Assignment) => {
   }
 }
 
+const FlexRow = ({children, ...props}: {children: React.ReactNode} & any) => (
+  <Flex
+    as="div"
+    className="assignment_peer_reviews_checkbox"
+    justifyItems="space-between"
+    wrap="no-wrap"
+    {...props}
+  >
+    {children}
+  </Flex>
+)
+
+const LabeledInput = ({
+  label,
+  children,
+  errorMessage,
+  padding = '0',
+}: {
+  label: string
+  children: React.ReactNode
+  errorMessage?: string
+  padding?: string
+}) => (
+  <>
+    <Flex.Item as="div" padding={padding}>
+      <FlexRow>
+        <Flex.Item as="div" margin="0 0 small large">
+          <Text size="contentSmall" weight="bold">
+            {label}
+          </Text>
+        </Flex.Item>
+        <Flex.Item as="div" padding="0 small small 0">
+          {children}
+        </Flex.Item>
+      </FlexRow>
+    </Flex.Item>
+    {errorMessage && (
+      <Flex.Item as="div">
+        <FormattedErrorMessage message={errorMessage} margin="0 0 x-small large" />
+      </Flex.Item>
+    )}
+  </>
+)
+
+const ToggleCheckbox = ({
+  testId,
+  name,
+  checked,
+  onChange,
+  label,
+  srLabel,
+  id,
+}: {
+  testId: string
+  name: string
+  checked: boolean
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  label: string
+  srLabel: string
+  id?: string
+}) => (
+  <FlexRow>
+    <Flex.Item as="div" margin="0 0 0 medium" shouldGrow={true} shouldShrink={true}>
+      <Text size="contentSmall" weight="bold">
+        {label}
+      </Text>
+    </Flex.Item>
+    <Flex.Item as="div" margin="0" shouldShrink={false}>
+      <Checkbox
+        data-testid={testId}
+        name={name}
+        id={id}
+        variant="toggle"
+        checked={checked}
+        onChange={onChange}
+        label={<ScreenReaderContent>{srLabel}</ScreenReaderContent>}
+      />
+    </Flex.Item>
+  </FlexRow>
+)
+
+const SectionHeader = ({title, padding = 'small'}: {title: string; padding?: string}) => (
+  <Flex.Item as="div" padding={padding}>
+    <Text weight="bold" size="content">
+      {title}
+    </Text>
+  </Flex.Item>
+)
+
 const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
   const [peerReviewChecked, setPeerReviewChecked] = useState(assignment.peerReviews() || false)
   const [peerReviewEnabled, setPeerReviewEnabled] = useState(!assignment.moderatedGrading())
-  const [showRuleTray, setShowRuleTray] = useState(false)
+
+  const {
+    reviewsRequired,
+    handleReviewsRequiredChange,
+    validateReviewsRequired,
+    errorMessageReviewsRequired,
+    pointsPerReview,
+    handlePointsPerReviewChange,
+    validatePointsPerReview,
+    errorMessagePointsPerReview,
+    totalPoints,
+    allowPeerReviewAcrossMultipleSections,
+    handleCrossSectionsCheck,
+    allowPeerReviewWithinGroups,
+    handleInterGroupCheck,
+    usePassFailGrading,
+    handleUsePassFailCheck,
+    anonymousPeerReviews,
+    handleAnonymityCheck,
+    submissionsRequiredBeforePeerReviews,
+    handleSubmissionRequiredCheck,
+    resetFields,
+  } = usePeerReviewSettings()
 
   useEffect(() => {
     const handlePeerReviewToggle = (event: MessageEvent) => {
@@ -73,7 +186,6 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
 
         if (!event.data.enabled) {
           setPeerReviewChecked(false)
-          setShowRuleTray(false)
         }
       }
     }
@@ -88,7 +200,7 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
   const handlePeerReviewCheck = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPeerReviewChecked(e.target.checked)
     if (!e.target.checked) {
-      setShowRuleTray(false)
+      resetFields()
     }
   }
 
@@ -97,22 +209,26 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
   )
 
   return (
-    <Flex direction="column" padding="medium 0 medium x-small">
-      <Flex.Item as="div" padding="xx-small">
-        <Checkbox
-          id="assignment_peer_reviews_checkbox"
-          name="peer_reviews"
-          checked={peerReviewChecked}
-          disabled={!peerReviewEnabled}
-          onChange={handlePeerReviewCheck}
-          label={I18n.t('Require Peer Reviews')}
-          size="small"
-          themeOverride={{
-            checkedBackground: instui10Colors.dataVisualization.ocean40Secondary,
-            checkedBorderColor: 'white',
-          }}
-          data-testid="peer-review-checkbox"
-        />
+    <Flex as="div" direction="column" width="100%">
+      <Flex.Item>
+        <Flex direction="column" padding="medium 0 medium x-small">
+          <Flex.Item as="div" padding="xx-small">
+            <Checkbox
+              id="assignment_peer_reviews_checkbox"
+              name="peer_reviews"
+              checked={peerReviewChecked}
+              disabled={!peerReviewEnabled}
+              onChange={handlePeerReviewCheck}
+              label={I18n.t('Require Peer Reviews')}
+              size="small"
+              themeOverride={{
+                checkedBackground: instui10Colors.dataVisualization.ocean40Secondary,
+                checkedBorderColor: 'white',
+              }}
+              data-testid="peer-review-checkbox"
+            />
+          </Flex.Item>
+        </Flex>
       </Flex.Item>
       {!peerReviewEnabled && (
         <Flex.Item as="div" padding="0 0 xx-small medium">
@@ -125,12 +241,69 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
       )}
       {peerReviewChecked && (
         <>
-          <Flex.Item as="div" padding="xx-small">
-            <Text weight="bold" size="content">
-              {I18n.t('Review Settings')}
-            </Text>
+          <SectionHeader title={I18n.t('Review Settings')} padding="none small small small" />
+
+          <LabeledInput
+            label={I18n.t('Reviews Required*')}
+            padding="x-small 0 0 0"
+            errorMessage={errorMessageReviewsRequired}
+          >
+            <NumberInput
+              id="assignment_peer_reviews_required_input"
+              data-testid="reviews-required-input"
+              width="4.5rem"
+              showArrows={false}
+              size="medium"
+              onChange={handleReviewsRequiredChange}
+              onBlur={validateReviewsRequired}
+              themeOverride={inputOverride}
+              value={reviewsRequired}
+              renderLabel={
+                <ScreenReaderContent>{I18n.t('Number of reviews required')}</ScreenReaderContent>
+              }
+            />
+          </LabeledInput>
+
+          <LabeledInput
+            label={I18n.t('Points per Peer Review')}
+            padding="x-small 0 0 0"
+            errorMessage={errorMessagePointsPerReview}
+          >
+            <NumberInput
+              id="assignment_peer_reviews_max_input"
+              data-testid="points-per-review-input"
+              width="4.5rem"
+              showArrows={false}
+              size="medium"
+              onChange={handlePointsPerReviewChange}
+              onBlur={validatePointsPerReview}
+              themeOverride={inputOverride}
+              value={pointsPerReview}
+              renderLabel={
+                <ScreenReaderContent>
+                  {I18n.t('Number of Points per Peer Review')}
+                </ScreenReaderContent>
+              }
+            />
+          </LabeledInput>
+
+          <Flex.Item as="div" padding="x-small 0 medium 0">
+            <FlexRow>
+              <Flex.Item as="div" margin="0 0 0 large">
+                <Text size="contentSmall" weight="bold">
+                  {I18n.t('Total Points for Peer Review(s)')}
+                </Text>
+              </Flex.Item>
+              <Flex.Item as="div" padding="0 small 0 0">
+                <View as="div" padding="0 x-small 0 0">
+                  <Text size="contentSmall" weight="bold" data-testid="total-peer-review-points">
+                    {totalPoints}
+                  </Text>
+                </View>
+              </Flex.Item>
+            </FlexRow>
           </Flex.Item>
-          <Flex.Item as="div" padding="xx-small">
+          <Flex.Item as="div" padding="small">
             <ToggleDetails
               summary={advancedConfigLabel}
               themeOverride={{
@@ -138,33 +311,78 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
               }}
             >
               <Flex direction="column">
-                <hr style={{margin: '0.5rem 0 1rem'}} aria-hidden="true" />
-                <Text weight="bold" size="content">
-                  {I18n.t('Allocations')}
-                </Text>
-                <Flex.Item padding="small 0 small medium">
-                  <Link
-                    variant="standalone"
-                    renderIcon={<IconExternalLinkLine />}
-                    onClick={() => setShowRuleTray(true)}
-                    href="#"
-                  >
-                    <Text size="content">{I18n.t('Customize Allocations')}</Text>
-                  </Link>
+                <hr style={{margin: '0.5rem 0 1rem'}} aria-hidden="true"></hr>
+
+                <SectionHeader title={I18n.t('Allocations')} padding="0" />
+
+                <Flex.Item as="div" overflowY="visible" margin="small 0">
+                  <ToggleCheckbox
+                    testId="across-sections-checkbox"
+                    name="peer_reviews_across_sections"
+                    id="peer_reviews_across_sections_checkbox"
+                    checked={allowPeerReviewAcrossMultipleSections}
+                    onChange={handleCrossSectionsCheck}
+                    label={I18n.t('Allow peer reviews across sections')}
+                    srLabel={I18n.t('Allow peer reviews to be assigned across course sections')}
+                  />
+                </Flex.Item>
+                <Flex.Item as="div" overflowY="visible">
+                  <ToggleCheckbox
+                    testId="within-groups-checkbox"
+                    name="peer_reviews_prevent_friends"
+                    id="peer_reviews_within_groups_checkbox"
+                    checked={allowPeerReviewWithinGroups}
+                    onChange={handleInterGroupCheck}
+                    label={I18n.t('Allow peer reviews within groups')}
+                    srLabel={I18n.t('Allow peer reviews within student groups')}
+                  />
+                </Flex.Item>
+
+                <SectionHeader title={I18n.t('Grading')} padding="small 0 0 0" />
+
+                <Flex.Item overflowY="visible" margin="small 0">
+                  <ToggleCheckbox
+                    testId="pass-fail-grading-checkbox"
+                    name="peer_reviews_manual_grading"
+                    id="peer_reviews_pass_fail_grading_checkbox"
+                    checked={usePassFailGrading}
+                    onChange={handleUsePassFailCheck}
+                    label={I18n.t('Use complete/incomplete instead of points for grading')}
+                    srLabel={I18n.t('Use complete/incomplete instead of points for grading')}
+                  />
+                </Flex.Item>
+
+                <SectionHeader title={I18n.t('Anonymity')} padding="medium 0 0 0" />
+
+                <Flex.Item overflowY="visible" margin="small 0">
+                  <ToggleCheckbox
+                    testId="anonymity-checkbox"
+                    name="peer_reviews_hide_reviewer_names"
+                    id="peer_reviews_anonymity_checkbox"
+                    checked={anonymousPeerReviews}
+                    onChange={handleAnonymityCheck}
+                    label={I18n.t('Reviewers do not see who they review')}
+                    srLabel={I18n.t('Reviewers do not see who they review')}
+                  />
+                </Flex.Item>
+
+                <SectionHeader title={I18n.t('Submission required')} padding="medium 0 0 0" />
+
+                <Flex.Item overflowY="visible" margin="small 0">
+                  <ToggleCheckbox
+                    testId="submission-required-checkbox"
+                    name="peer_reviews_submission_required"
+                    id="peer_reviews_submission_required_checkbox"
+                    checked={submissionsRequiredBeforePeerReviews}
+                    onChange={handleSubmissionRequiredCheck}
+                    srLabel={I18n.t('Students must submit to see peer reviews')}
+                    label={I18n.t(
+                      'Reviewers must submit their assignment before they can be allocated reviews',
+                    )}
+                  />
                 </Flex.Item>
               </Flex>
             </ToggleDetails>
-          </Flex.Item>
-          <Flex.Item>
-            <PeerReviewAllocationRulesTray
-              assignmentId={assignment.getId()}
-              // For now, always allow editing of allocation rules from the details view.
-              // Once we expose proper permissions in the API, we can use that to determine if editing
-              // https://instructure.atlassian.net/browse/EGG-1709
-              canEdit={true}
-              isTrayOpen={showRuleTray}
-              closeTray={() => setShowRuleTray(false)}
-            />
           </Flex.Item>
         </>
       )}

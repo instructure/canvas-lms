@@ -20,12 +20,6 @@ import {screen} from '@testing-library/react'
 import {ButtonBlock} from '../ButtonBlock'
 import {ButtonBlockProps} from '../types'
 import {renderBlock} from '../../__tests__/render-helper'
-import {mockBlockContentEditorContext} from '../../../__tests__/mockBlockContentEditorContext'
-
-jest.mock('../../../BlockContentEditorContext', () => ({
-  __esModule: true,
-  useBlockContentEditorContext: jest.fn(() => mockBlockContentEditorContext({})),
-}))
 
 const useIsInEditorMock = jest.fn()
 jest.mock('../../../hooks/useIsInEditor', () => ({
@@ -37,14 +31,15 @@ jest.mock('../../../hooks/useIsEditingBlock', () => ({
   useIsEditingBlock: () => useIsEditingBlockMock(),
 }))
 
-const setIsEditedViaEditButtonMock = jest.fn()
 const getUseIsEditingBlockMock = ({
-  isEditingBlock,
-  isEditedViaEditButton,
-}: {isEditingBlock: boolean; isEditedViaEditButton: boolean}) => ({
-  isEditingBlock,
-  isEditedViaEditButton,
-  setIsEditedViaEditButton: setIsEditedViaEditButtonMock,
+  isEditing,
+  isEditingViaEditButton,
+}: {
+  isEditing: boolean
+  isEditingViaEditButton: boolean
+}) => ({
+  isEditing,
+  isEditingViaEditButton,
 })
 
 const defaultProps: ButtonBlockProps = {
@@ -76,7 +71,7 @@ describe('ButtonBlock', () => {
   it('renders ButtonBlockEdit in edit mode', () => {
     useIsInEditorMock.mockReturnValue(true)
     useIsEditingBlockMock.mockReturnValue(
-      getUseIsEditingBlockMock({isEditingBlock: true, isEditedViaEditButton: false}),
+      getUseIsEditingBlockMock({isEditing: true, isEditingViaEditButton: false}),
     )
     renderBlock(ButtonBlock, defaultProps)
     expect(screen.getByTestId('button-block-edit')).toBeInTheDocument()
@@ -85,7 +80,7 @@ describe('ButtonBlock', () => {
   it('renders ButtonBlockEditPreview in editPreview mode', () => {
     useIsInEditorMock.mockReturnValue(true)
     useIsEditingBlockMock.mockReturnValue(
-      getUseIsEditingBlockMock({isEditingBlock: false, isEditedViaEditButton: false}),
+      getUseIsEditingBlockMock({isEditing: false, isEditingViaEditButton: false}),
     )
     renderBlock(ButtonBlock, defaultProps)
     expect(screen.getByTestId('button-block-edit-preview')).toBeInTheDocument()

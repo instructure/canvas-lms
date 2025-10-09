@@ -196,11 +196,6 @@ module Lti
     end
 
     def generate_lti_params
-      if resource_type&.to_sym == :module_index_menu_modal &&
-         !@context.root_account.feature_enabled?(:lti_deep_linking_module_index_menu_modal)
-        return resource_link_request.to_cached_hash
-      end
-
       message_type = @tool.extension_setting(resource_type, :message_type)
       unless Lti::ResourcePlacement.supported_message_type?(resource_type, message_type)
         e = Lti::InvalidMessageTypeForPlacementError.new

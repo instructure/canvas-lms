@@ -233,7 +233,7 @@ module CC
                   end
       FileUtils.mkdir_p File.join(@export_dir, ZIP_DIR)
       @zip_path = File.join(@export_dir, ZIP_DIR, @zip_name)
-      @zip_file = Zip::File.new(@zip_path, Zip::File::CREATE)
+      @zip_file = Zip::File.new(@zip_path, create: true)
     end
   end
 end

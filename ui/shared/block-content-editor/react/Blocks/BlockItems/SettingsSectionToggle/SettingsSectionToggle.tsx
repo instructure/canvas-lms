@@ -23,8 +23,6 @@ import './settings-section-toggle.css'
 
 export type SettingsSectionToggleProps = {
   title: string
-  collapsedLabel: string
-  expandedLabel: string
   defaultExpanded?: boolean
   includeSeparator: boolean
   children: React.ReactNode
@@ -32,8 +30,6 @@ export type SettingsSectionToggleProps = {
 
 export const SettingsSectionToggle = ({
   title,
-  collapsedLabel,
-  expandedLabel,
   defaultExpanded,
   includeSeparator,
   children,
@@ -44,7 +40,7 @@ export const SettingsSectionToggle = ({
         defaultExpanded={defaultExpanded}
         border={false}
         transition={false}
-        toggleLabel={isExpanded => (isExpanded ? expandedLabel : collapsedLabel)}
+        toggleLabel={title}
         summary={
           <Heading variant="titleCardMini" level="h3">
             {title}

@@ -34,6 +34,7 @@ describe IgniteAgentHelper do
       launch_url: "https://ignite.example.com/launch",
       backend_url: "https://ignite.example.com/api"
     )
+    allow(self).to receive(:session).and_return({})
   end
 
   describe "#add_ignite_agent_bundle" do
@@ -68,12 +69,7 @@ describe IgniteAgentHelper do
         account.enable_feature!(:ignite_agent_enabled)
       end
 
-      context "when user has only student enrollments" do
-        before do
-          course.enroll_student(user, enrollment_state: "active")
-          allow(self).to receive(:user_has_only_student_enrollments?).with(user).and_return(true)
-        end
-
+      context "when user does not have access_ignite_agent permission" do
         it "does not add the ignite agent bundle" do
           expect(self).not_to receive(:js_bundle)
           expect(self).not_to receive(:remote_env)
@@ -82,9 +78,14 @@ describe IgniteAgentHelper do
         end
       end
 
-      context "when user does not have only student enrollments" do
+      context "when user has access_ignite_agent permission" do
         before do
-          allow(self).to receive(:user_has_only_student_enrollments?).with(user).and_return(false)
+          account.role_overrides.create!(
+            permission: :access_ignite_agent,
+            role: admin_role,
+            enabled: true
+          )
+          account.account_users.create!(user:, role: admin_role)
         end
 
         it "adds the ignite agent bundle and remote env" do
@@ -98,100 +99,6 @@ describe IgniteAgentHelper do
 
           add_ignite_agent_bundle
         end
-      end
-    end
-  end
-
-  describe "#user_has_only_student_enrollments?" do
-    context "when user has admin roles" do
-      before do
-        account.account_users.create!(user:, role: admin_role)
-      end
-
-      it "returns false" do
-        expect(user_has_only_student_enrollments?(user)).to be false
-      end
-    end
-
-    context "when user has no enrollments" do
-      it "returns false" do
-        expect(user_has_only_student_enrollments?(user)).to be false
-      end
-    end
-
-    context "when user has only student enrollments" do
-      before do
-        course.enroll_student(user, enrollment_state: "active")
-      end
-
-      it "returns true" do
-        expect(user_has_only_student_enrollments?(user)).to be true
-      end
-    end
-
-    context "when user has mixed enrollment types" do
-      before do
-        course.enroll_student(user, enrollment_state: "active")
-        course.enroll_teacher(user, enrollment_state: "active")
-      end
-
-      it "returns false" do
-        expect(user_has_only_student_enrollments?(user)).to be false
-      end
-    end
-
-    context "when user has only teacher enrollments" do
-      before do
-        course.enroll_teacher(user, enrollment_state: "active")
-      end
-
-      it "returns false" do
-        expect(user_has_only_student_enrollments?(user)).to be false
-      end
-    end
-
-    context "when user has only observer enrollments" do
-      before do
-        course.enroll_user(user, "ObserverEnrollment", enrollment_state: "active")
-      end
-
-      it "returns false" do
-        expect(user_has_only_student_enrollments?(user)).to be false
-      end
-    end
-
-    context "when user has inactive student enrollment" do
-      before do
-        course.enroll_student(user, enrollment_state: "deleted")
-      end
-
-      it "returns false (no active enrollments)" do
-        expect(user_has_only_student_enrollments?(user)).to be false
-      end
-    end
-
-    context "when user has both active and inactive enrollments" do
-      before do
-        course.enroll_student(user, enrollment_state: "active")
-        course.enroll_student(user, enrollment_state: "deleted")
-      end
-
-      it "returns true (only considers active enrollments)" do
-        expect(user_has_only_student_enrollments?(user)).to be true
-      end
-    end
-
-    context "when user has student enrollments across multiple accounts" do
-      let(:other_account) { account_model }
-      let(:other_course) { course_factory(account: other_account) }
-
-      before do
-        course.enroll_student(user, enrollment_state: "active")
-        other_course.enroll_student(user, enrollment_state: "active")
-      end
-
-      it "returns true when all enrollments are student type" do
-        expect(user_has_only_student_enrollments?(user)).to be true
       end
     end
   end

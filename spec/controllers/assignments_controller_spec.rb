@@ -407,7 +407,6 @@ describe AssignmentsController do
 
     context "assign to differentiation tags" do
       before :once do
-        @course.account.enable_feature! :assign_to_differentiation_tags
         @course.account.tap do |a|
           a.settings[:allow_assign_to_differentiation_tags] = { value: true }
           a.save!
@@ -1676,7 +1675,6 @@ describe AssignmentsController do
 
           context "differentiation tags" do
             before do
-              Account.default.enable_feature! :assign_to_differentiation_tags
               Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
               Account.default.save!
               Account.default.reload
@@ -2038,7 +2036,6 @@ describe AssignmentsController do
 
     context "assign to differentiation tags" do
       before :once do
-        @course.account.enable_feature! :assign_to_differentiation_tags
         @course.account.tap do |a|
           a.settings[:allow_assign_to_differentiation_tags] = { value: true }
           a.save!
@@ -2072,6 +2069,21 @@ describe AssignmentsController do
         user_session(@student)
         get "show", params: { course_id: @course.id, id: @assignment.id }
         expect(assigns[:js_env][:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be false
+      end
+    end
+
+    context "js_env CAN_EDIT_ASSIGNMENTS" do
+      it "sets CAN_EDIT_ASSIGNMENTS in js_env as true if current user has assignment edit permissions" do
+        user_session(@teacher)
+        get :show, params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:CAN_EDIT_ASSIGNMENTS]).to be(true)
+      end
+
+      it "sets CAN_EDIT_ASSIGNMENTS in js_env as false if current user does not have assignment edit permissions" do
+        user_session(@teacher)
+        @course.account.role_overrides.create! role: teacher_role, permission: "manage_assignments_edit", enabled: false
+        get :show, params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:CAN_EDIT_ASSIGNMENTS]).to be(false)
       end
     end
 
@@ -3168,10 +3180,6 @@ describe AssignmentsController do
     end
 
     context "assign to differentiation tags" do
-      before :once do
-        @course.account.enable_feature! :assign_to_differentiation_tags
-      end
-
       it "is true if account setting is on" do
         @course.account.tap do |a|
           a.settings[:allow_assign_to_differentiation_tags] = { value: true }

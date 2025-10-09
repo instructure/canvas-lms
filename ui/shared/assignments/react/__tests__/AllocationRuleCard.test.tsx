@@ -19,38 +19,75 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import AllocationRuleCard, {type AllocationRuleType} from '../AllocationRuleCard'
-import {CourseStudent} from '../../graphql/hooks/useAssignedStudents'
+import {QueryClient} from '@tanstack/react-query'
+import {MockedQueryClientProvider} from '@canvas/test-utils/query'
+import AllocationRuleCard from '../AllocationRuleCard'
+import {AllocationRuleType} from '../../graphql/teacher/AssignmentTeacherTypes'
 
 describe('AllocationRuleCard', () => {
-  const reviewer: CourseStudent = {
+  const assessor = {
     _id: '1',
     name: 'Pikachu',
   }
 
-  const reviewee: CourseStudent = {
+  const assessee = {
     _id: '2',
     name: 'Piplup',
   }
+
+  const mockRefetchRules = jest.fn()
 
   let user: ReturnType<typeof userEvent.setup>
 
   beforeEach(() => {
     user = userEvent.setup()
+    jest.clearAllMocks()
   })
 
-  describe('Rule descriptions for reviewer-focused rules', () => {
+  const defaultRule: AllocationRuleType = {
+    _id: '1',
+    assessor,
+    assessee,
+    mustReview: true,
+    reviewPermitted: true,
+    appliesToAssessor: true,
+  }
+
+  const defaultProps = {
+    rule: defaultRule,
+    canEdit: false,
+    assignmentId: '123',
+    refetchRules: mockRefetchRules,
+  }
+
+  const renderWithProviders = (props = {}) => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    })
+
+    return render(
+      <MockedQueryClientProvider client={queryClient}>
+        <AllocationRuleCard {...defaultProps} {...props} />
+      </MockedQueryClientProvider>,
+    )
+  }
+
+  describe('Rule descriptions for assessor-focused rules', () => {
     it('displays "Must review" when mustReview is true and reviewPermitted is true', () => {
       const rule: AllocationRuleType = {
-        id: '1',
-        reviewer,
-        reviewee,
+        _id: '1',
+        assessor,
+        assessee,
         mustReview: true,
         reviewPermitted: true,
-        appliesToReviewer: true,
+        appliesToAssessor: true,
       }
 
-      render(<AllocationRuleCard rule={rule} canEdit={false} />)
+      renderWithProviders({rule})
 
       expect(screen.getByText('Pikachu')).toBeInTheDocument()
       expect(screen.getByText('Must review Piplup')).toBeInTheDocument()
@@ -58,15 +95,15 @@ describe('AllocationRuleCard', () => {
 
     it('displays "Must not review" when mustReview is true and reviewPermitted is false', () => {
       const rule: AllocationRuleType = {
-        id: '1',
-        reviewer,
-        reviewee,
+        _id: '1',
+        assessor,
+        assessee,
         mustReview: true,
         reviewPermitted: false,
-        appliesToReviewer: true,
+        appliesToAssessor: true,
       }
 
-      render(<AllocationRuleCard rule={rule} canEdit={false} />)
+      renderWithProviders({rule})
 
       expect(screen.getByText('Pikachu')).toBeInTheDocument()
       expect(screen.getByText('Must not review Piplup')).toBeInTheDocument()
@@ -74,15 +111,15 @@ describe('AllocationRuleCard', () => {
 
     it('displays "Should review" when mustReview is false and reviewPermitted is true', () => {
       const rule: AllocationRuleType = {
-        id: '1',
-        reviewer,
-        reviewee,
+        _id: '1',
+        assessor,
+        assessee,
         mustReview: false,
         reviewPermitted: true,
-        appliesToReviewer: true,
+        appliesToAssessor: true,
       }
 
-      render(<AllocationRuleCard rule={rule} canEdit={false} />)
+      renderWithProviders({rule})
 
       expect(screen.getByText('Pikachu')).toBeInTheDocument()
       expect(screen.getByText('Should review Piplup')).toBeInTheDocument()
@@ -90,33 +127,33 @@ describe('AllocationRuleCard', () => {
 
     it('displays "Should not review" when mustReview is false and reviewPermitted is false', () => {
       const rule: AllocationRuleType = {
-        id: '1',
-        reviewer,
-        reviewee,
+        _id: '1',
+        assessor,
+        assessee,
         mustReview: false,
         reviewPermitted: false,
-        appliesToReviewer: true,
+        appliesToAssessor: true,
       }
 
-      render(<AllocationRuleCard rule={rule} canEdit={false} />)
+      renderWithProviders({rule})
 
       expect(screen.getByText('Pikachu')).toBeInTheDocument()
       expect(screen.getByText('Should not review Piplup')).toBeInTheDocument()
     })
   })
 
-  describe('Rule descriptions for reviewee-focused rules', () => {
+  describe('Rule descriptions for assessee-focused rules', () => {
     it('displays "Must be reviewed by" when mustReview is true and reviewPermitted is true', () => {
       const rule: AllocationRuleType = {
-        id: '1',
-        reviewer,
-        reviewee,
+        _id: '1',
+        assessor,
+        assessee,
         mustReview: true,
         reviewPermitted: true,
-        appliesToReviewer: false,
+        appliesToAssessor: false,
       }
 
-      render(<AllocationRuleCard rule={rule} canEdit={false} />)
+      renderWithProviders({rule})
 
       expect(screen.getByText('Piplup')).toBeInTheDocument()
       expect(screen.getByText('Must be reviewed by Pikachu')).toBeInTheDocument()
@@ -124,15 +161,15 @@ describe('AllocationRuleCard', () => {
 
     it('displays "Must not be reviewed by" when mustReview is true and reviewPermitted is false', () => {
       const rule: AllocationRuleType = {
-        id: '1',
-        reviewer,
-        reviewee,
+        _id: '1',
+        assessor,
+        assessee,
         mustReview: true,
         reviewPermitted: false,
-        appliesToReviewer: false,
+        appliesToAssessor: false,
       }
 
-      render(<AllocationRuleCard rule={rule} canEdit={false} />)
+      renderWithProviders({rule})
 
       expect(screen.getByText('Piplup')).toBeInTheDocument()
       expect(screen.getByText('Must not be reviewed by Pikachu')).toBeInTheDocument()
@@ -140,15 +177,15 @@ describe('AllocationRuleCard', () => {
 
     it('displays "Should be reviewed by" when mustReview is false and reviewPermitted is true', () => {
       const rule: AllocationRuleType = {
-        id: '1',
-        reviewer,
-        reviewee,
+        _id: '1',
+        assessor,
+        assessee,
         mustReview: false,
         reviewPermitted: true,
-        appliesToReviewer: false,
+        appliesToAssessor: false,
       }
 
-      render(<AllocationRuleCard rule={rule} canEdit={false} />)
+      renderWithProviders({rule})
 
       expect(screen.getByText('Piplup')).toBeInTheDocument()
       expect(screen.getByText('Should be reviewed by Pikachu')).toBeInTheDocument()
@@ -156,15 +193,15 @@ describe('AllocationRuleCard', () => {
 
     it('displays "Should not be reviewed by" when mustReview is false and reviewPermitted is false', () => {
       const rule: AllocationRuleType = {
-        id: '1',
-        reviewer,
-        reviewee,
+        _id: '1',
+        assessor,
+        assessee,
         mustReview: false,
         reviewPermitted: false,
-        appliesToReviewer: false,
+        appliesToAssessor: false,
       }
 
-      render(<AllocationRuleCard rule={rule} canEdit={false} />)
+      renderWithProviders({rule})
 
       expect(screen.getByText('Piplup')).toBeInTheDocument()
       expect(screen.getByText('Should not be reviewed by Pikachu')).toBeInTheDocument()
@@ -172,43 +209,43 @@ describe('AllocationRuleCard', () => {
   })
 
   describe('Action buttons', () => {
-    const defaultRule: AllocationRuleType = {
-      id: '1',
-      reviewer,
-      reviewee,
-      mustReview: true,
-      reviewPermitted: true,
-      appliesToReviewer: true,
-    }
-
     describe('when user can edit allocation rules', () => {
       it('renders the edit button with correct accessibility label', () => {
-        render(<AllocationRuleCard rule={defaultRule} canEdit={true} />)
-        const editButton = screen.getByTestId('edit-allocation-rule-button')
+        renderWithProviders({canEdit: true})
+        const editButton = screen.getByTestId(`edit-rule-button-${defaultRule._id}`)
 
         expect(editButton).toBeInTheDocument()
         expect(screen.getByText(/^Edit Allocation Rule:/)).toBeInTheDocument()
       })
 
       it('renders the delete button with correct accessibility label', () => {
-        render(<AllocationRuleCard rule={defaultRule} canEdit={true} />)
+        renderWithProviders({canEdit: true})
         const deleteButton = screen.getByTestId('delete-allocation-rule-button')
 
         expect(deleteButton).toBeInTheDocument()
         expect(screen.getByText(/^Delete Allocation Rule:/)).toBeInTheDocument()
       })
+
+      it('opens edit modal when edit button is clicked', async () => {
+        renderWithProviders({canEdit: true})
+        const editButton = screen.getByTestId(`edit-rule-button-${defaultRule._id}`)
+
+        await user.click(editButton)
+
+        expect(screen.getByText('Edit Rule')).toBeInTheDocument()
+      })
     })
 
     describe('when user cannot edit allocation rules', () => {
       it('does not render the edit button', () => {
-        render(<AllocationRuleCard rule={defaultRule} canEdit={false} />)
-        const editButton = screen.queryByTestId('edit-allocation-rule-button')
+        renderWithProviders()
+        const editButton = screen.queryByTestId(`edit-rule-button-${defaultRule._id}`)
 
         expect(editButton).not.toBeInTheDocument()
       })
 
       it('does not render the delete button', () => {
-        render(<AllocationRuleCard rule={defaultRule} canEdit={false} />)
+        renderWithProviders()
         const deleteButton = screen.queryByTestId('delete-allocation-rule-button')
 
         expect(deleteButton).not.toBeInTheDocument()

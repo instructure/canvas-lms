@@ -21,11 +21,10 @@ import {useNode} from '@craftjs/core'
 import {useIsInEditor} from '../../hooks/useIsInEditor'
 import {useIsEditingBlock} from '../../hooks/useIsEditingBlock'
 import {BaseBlockViewLayout} from './layout/BaseBlockViewLayout'
-import {useBlockContentEditorContext} from '../../BlockContentEditorContext'
 import {BaseBlockEditWrapper} from './components/BaseBlockEditWrapper'
-import {Mask} from './components/Mask/Mask'
 import {AccessibilityChecker} from './components/AccessibilityChecker'
 import type {AccessibilityRule} from '../../accessibilityChecker/types'
+import {useAccessibilityChecker} from '../../hooks/useAccessibilityChecker'
 
 function BaseBlockViewerMode<T extends {}>(props: ComponentProps<typeof BaseBlock<T>>) {
   const Component = props.ViewComponent
@@ -37,11 +36,8 @@ function BaseBlockViewerMode<T extends {}>(props: ComponentProps<typeof BaseBloc
 }
 
 function BaseBlockEditorMode<T extends {}>(props: ComponentProps<typeof BaseBlock<T>>) {
-  const {
-    settingsTray,
-    accessibility: {removeA11yIssues},
-  } = useBlockContentEditorContext()
-  const {isEditingBlock} = useIsEditingBlock()
+  const {removeA11yIssues} = useAccessibilityChecker()
+  const {isEditing} = useIsEditingBlock()
   const {id} = useNode()
 
   useEffect(() => {
@@ -51,9 +47,9 @@ function BaseBlockEditorMode<T extends {}>(props: ComponentProps<typeof BaseBloc
   }, [])
 
   const renderBlockContent = () => {
-    const Component = isEditingBlock ? props.EditComponent : props.EditViewComponent
+    const Component = isEditing ? props.EditComponent : props.EditViewComponent
 
-    if (isEditingBlock) {
+    if (isEditing) {
       return <Component {...props.componentProps} />
     }
 
@@ -70,7 +66,6 @@ function BaseBlockEditorMode<T extends {}>(props: ComponentProps<typeof BaseBloc
   return (
     <BaseBlockEditWrapper title={props.title} backgroundColor={props.backgroundColor}>
       {renderBlockContent()}
-      {settingsTray.isOpen && <Mask />}
     </BaseBlockEditWrapper>
   )
 }

@@ -88,6 +88,7 @@
     "RubricAssociation",
     "RubricCriterion",
     "RubricRating",
+    "ScheduledPost",
     "Section",
     "StandardGradeStatus",
     "Submission",

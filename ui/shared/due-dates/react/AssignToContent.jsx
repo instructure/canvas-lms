@@ -69,6 +69,7 @@ const AssignToContent = ({
   const [hasModuleOverrides, setHasModuleOverrides] = useState(false)
   const [moduleAssignees, setModuleAssignees] = useState([])
   const [initialModuleOverrides, setInitialModuleOverrides] = useState([])
+  const [unassignedOverrides, setUnassignedOverrides] = useState([])
   const [groupCategoryId, setGroupCategoryId] = useState(getGroupCategoryId?.())
   const dateValidator = useMemo(
     () =>
@@ -205,7 +206,9 @@ const AssignToContent = ({
       const state = cloneObject(uniqueOverrides)
       // initialState is set only 1 time to check if the overrides have pending changes
       setInitialState(state)
-      // hasModuleOverrides and module assignees are only set once since they don't change
+      // hasModuleOverrides, module assignees, and existing unassigned overrides are only set once since they don't change
+      const unassigned = overrides.filter(override => override.unassign_item)
+      setUnassignedOverrides(unassigned)
       let moduleOverrides = []
       for (const card in state) {
         moduleOverrides = moduleOverrides.concat(
@@ -254,20 +257,38 @@ const AssignToContent = ({
         .filter(assignee => assignee.includes('student'))
         ?.map(id => id.split('-')[1])
       if (studentIds.length > 0) {
+        // Find existing unassigned override with matching student_ids
+        const existingOverride = unassignedOverrides.find(override => {
+          if (!override.student_ids) {
+            return false
+          }
+          const existingIds = [...override.student_ids].sort()
+          const newIds = [...studentIds].sort()
+          return (
+            existingIds.length === newIds.length &&
+            existingIds.every((id, index) => id === newIds[index])
+          )
+        })
         newOverrides.push({
-          id: undefined,
+          id: existingOverride?.id,
           student_ids: studentIds,
           unassign_item: true,
+          stagedOverrideId: uid(),
         })
       }
       const sectionIds = deletedModuleAssignees
         .filter(assignee => assignee.includes('section'))
         ?.map(id => id.split('-')[1])
       sectionIds.forEach(section => {
+        // Find existing unassigned override for this section
+        const existingOverride = unassignedOverrides.find(
+          override => override.unassign_item && override.course_section_id === section,
+        )
         newOverrides.push({
-          id: undefined,
+          id: existingOverride?.id,
           course_section_id: section,
           unassign_item: true,
+          stagedOverrideId: uid(),
         })
       })
     }

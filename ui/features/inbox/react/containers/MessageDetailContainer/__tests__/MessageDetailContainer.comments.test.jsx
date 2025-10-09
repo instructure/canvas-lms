@@ -142,7 +142,8 @@ describe('MessageDetailContainer', () => {
         pageInfo: {
           hasNextPage: false,
           endCursor: null,
-          __typename: 'PageInfo',
+          totalCount: null,
+          __typename: 'TotalCountPageInfo',
         },
         __typename: 'SubmissionCommentConnection',
       },

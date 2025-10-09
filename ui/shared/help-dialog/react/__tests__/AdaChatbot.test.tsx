@@ -67,11 +67,51 @@ describe('AdaChatbot', () => {
     render(<AdaChatbot onSubmit={mockOnSubmit} />)
 
     expect(mockStart).toHaveBeenCalledTimes(1)
-    expect(mockStart).toHaveBeenCalledWith({
-      handle: 'instructure-gen',
-      adaReadyCallback: expect.any(Function),
-      toggleCallback: expect.any(Function),
-    })
+    expect(mockStart).toHaveBeenCalledWith(
+      expect.objectContaining({
+        handle: 'instructure-gen',
+        adaReadyCallback: expect.any(Function),
+        toggleCallback: expect.any(Function),
+      }),
+    )
+  })
+
+  it('injects global adaSettings metaFields and preserves explicit handle override', () => {
+    const mockStart = jest.fn()
+    const mockToggle = jest.fn()
+    const mockStop = jest.fn()
+    const globalSettings = {
+      crossWindowPersistence: true,
+      metaFields: {
+        institutionUrl: 'https://example.instructure.com',
+        email: 'user@example.com',
+        name: 'Test User',
+        canvasRoles: 'teacher,admin',
+        canvasUUID: 'abc-123',
+        isRootAdmin: false,
+        isAdmin: true,
+        isTeacher: true,
+        isStudent: false,
+        isObserver: false,
+      },
+      handle: 'should-be-overridden',
+    }
+    ;(window as any).adaEmbed = {
+      start: mockStart,
+      toggle: mockToggle,
+      stop: mockStop,
+    }
+    ;(window as any).adaSettings = globalSettings
+
+    render(<AdaChatbot onSubmit={mockOnSubmit} />)
+
+    expect(mockStart).toHaveBeenCalledTimes(1)
+    const passedConfig = mockStart.mock.calls[0][0]
+
+    expect(passedConfig.metaFields).toEqual(globalSettings.metaFields)
+    expect(passedConfig.crossWindowPersistence).toBe(true)
+    expect(passedConfig.handle).toBe('instructure-gen')
+    expect(globalSettings.handle).toBe('should-be-overridden')
   })
 
   it('opens when ready and clears timeout', () => {

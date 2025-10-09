@@ -31,7 +31,6 @@ import {
   isImageEmbed,
   isVideoElement,
   isAudioElement,
-  findMediaPlayerIframe,
 } from '../ContentSelection'
 import FakeEditor from '../../../__tests__/FakeEditor'
 
@@ -322,34 +321,6 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
       editor.setSelectedNode($selectedNode)
       const content = getLinkContentFromEditor(editor)
       expect(content.type).toEqual(LINK_TYPE)
-    })
-  })
-
-  describe('findMediaPlayerIframe', () => {
-    let wrapper, mediaIframe, shim
-    beforeEach(() => {
-      wrapper = document.createElement('span')
-      mediaIframe = document.createElement('iframe')
-      shim = document.createElement('span')
-      shim.setAttribute('class', 'mce-shim')
-      wrapper.appendChild(mediaIframe)
-      wrapper.appendChild(shim)
-    })
-    it('returns the iframe if given the video iframe', () => {
-      const result = findMediaPlayerIframe(mediaIframe)
-      expect(result).toEqual(mediaIframe)
-    })
-    it('returns the iframe if given the tinymce wrapper span', () => {
-      const result = findMediaPlayerIframe(wrapper)
-      expect(result).toEqual(mediaIframe)
-    })
-    it('returns the iframe if given the shim', () => {
-      const result = findMediaPlayerIframe(shim)
-      expect(result).toEqual(mediaIframe)
-    })
-    it('does not error if given null', () => {
-      const result = findMediaPlayerIframe(null)
-      expect(result).toEqual(null)
     })
   })
 

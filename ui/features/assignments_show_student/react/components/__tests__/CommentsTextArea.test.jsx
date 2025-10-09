@@ -333,6 +333,41 @@ describe('CommentTextArea', () => {
     expect(prevFile.focus).toHaveBeenCalled()
   })
 
+  it('renders a visible Comment label associated with the textarea', async () => {
+    const props = await mockAssignmentAndSubmission()
+    const {getByLabelText, getByText} = render(
+      <MockedProvider>
+        <CommentTextArea {...props} />
+      </MockedProvider>,
+    )
+
+    const visibleLabel = getByText('Comment')
+    expect(visibleLabel).toBeInTheDocument()
+
+    const textArea = getByLabelText('Comment')
+    expect(textArea).toBeInTheDocument()
+    expect(textArea).toHaveAttribute('id', 'comment-textarea')
+
+    expect(textArea).toHaveAttribute('placeholder', 'Submit a Comment')
+  })
+
+  it('ensures the Comment label is a proper HTML label element', async () => {
+    const props = await mockAssignmentAndSubmission()
+    const {container} = render(
+      <MockedProvider>
+        <CommentTextArea {...props} />
+      </MockedProvider>,
+    )
+
+    const labelElement = container.querySelector('label[for="comment-textarea"]')
+    expect(labelElement).toBeInTheDocument()
+    expect(labelElement).toHaveTextContent('Comment')
+
+    const textArea = container.querySelector('#comment-textarea')
+    expect(textArea).toBeInTheDocument()
+    expect(labelElement.getAttribute('for')).toBe(textArea.getAttribute('id'))
+  })
+
   // LS-1339 created to figure out why this is failing
   // since updating @instructure/ui-media-player to v7
 

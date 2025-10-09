@@ -97,7 +97,7 @@ module CanvasOperations
       final_job_options = job_options.tap { |options| options[:singleton] = "operations/#{name}/#{options[:singleton]}" if options[:singleton] }
 
       unless use_progress_tracking?
-        log_message("Progress tracking is disabled; running operation without Progress tracking.")
+        log_message("Progress tracking is disabled; running operation without Progress tracking.", level: :debug)
         delay_if_production(**final_job_options).run
         return
       end
@@ -249,7 +249,7 @@ module CanvasOperations
 
     def complete_progress
       unless use_progress_tracking?
-        log_message("Progress tracking is disabled; skipping progress completion.")
+        log_message("Progress tracking is disabled; skipping progress completion.", level: :debug)
         return
       end
 
@@ -259,7 +259,7 @@ module CanvasOperations
 
     def fail_progress
       unless use_progress_tracking?
-        log_message("Progress tracking is disabled; skipping progress failure.")
+        log_message("Progress tracking is disabled; skipping progress failure.", level: :debug)
         return
       end
 
@@ -272,7 +272,7 @@ module CanvasOperations
     end
 
     def report_run_start
-      log_message("Starting Run")
+      log_message("Starting Run", level: :debug)
 
       InstStatsd::Statsd.event(
         "#{name} started",
@@ -284,7 +284,7 @@ module CanvasOperations
     end
 
     def report_run_complete
-      log_message("Completed Run")
+      log_message("Completed Run", level: :debug)
 
       InstStatsd::Statsd.event(
         "#{name} completed",

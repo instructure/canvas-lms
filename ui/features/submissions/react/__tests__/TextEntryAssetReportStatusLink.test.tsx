@@ -16,101 +16,72 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import TextEntryAssetReportStatusLink from '../TextEntryAssetReportStatusLink'
-import {LtiAssetReportWithAsset} from '@canvas/lti-asset-processor/model/AssetReport'
+import React from 'react'
 import {render, screen} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import TextEntryAssetReportStatusLink from '../TextEntryAssetReportStatusLink'
+import {useShouldShowLtiAssetReportsForStudent} from '@canvas/lti-asset-processor/react/hooks/useLtiAssetProcessorsAndReportsForStudent'
+
+// Mock the hooks
+jest.mock('@canvas/lti-asset-processor/react/hooks/useLtiAssetProcessorsAndReportsForStudent')
+
+// Mock the child component
+jest.mock('@canvas/lti-asset-processor/react/LtiAssetReportsForStudentSubmission', () => {
+  return {
+    LtiAssetReportsForStudentSubmission: function MockComponent(props: any) {
+      return (
+        <div data-testid="asset-reports-component">
+          <div data-testid="submission-id">{props.submissionId}</div>
+          <div data-testid="submission-type">{props.submissionType}</div>
+        </div>
+      )
+    },
+  }
+})
+
+// Mock i18n
+jest.mock('@canvas/i18n', () => ({
+  useScope: () => ({
+    t: (key: string) => key,
+  }),
+}))
+
+const mockUseShouldShowLtiAssetReportsForStudent =
+  useShouldShowLtiAssetReportsForStudent as jest.MockedFunction<
+    typeof useShouldShowLtiAssetReportsForStudent
+  >
 
 describe('TextEntryAssetReportStatusLink', () => {
-  const createReport = (
-    priority: 0 | 1 | 2 | 3 | 4 | 5 = 0,
-    submissionAttempt: string = '1',
-    overrides: Partial<LtiAssetReportWithAsset> = {},
-  ): LtiAssetReportWithAsset => ({
-    // LtiAssetReport properties
-    _id: 123,
-    priority,
-    reportType: 'plagiarism',
-    resubmitAvailable: false,
-    processingProgress: 'Processed',
-    // Extended properties from LtiAssetReportWithAsset
-    asset_processor_id: 1,
-    asset: {
-      id: 100,
-      attachment_id: null,
-      attachment_name: 'text_entry',
-      submission_id: '1000',
-      submission_attempt: submissionAttempt,
-    },
-    ...overrides,
+  const defaultProps = {
+    submissionId: '123',
+    submissionType: 'online_text_entry',
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
   })
 
-  const mockAssetProcessors = [
-    {
-      id: 1,
-      tool_id: 101,
-      tool_name: 'Test Processor',
-      title: 'Test Processor Title',
-    },
-  ]
-  const assignmentName = 'Test Assignment'
+  it('renders when shouldShow is true', () => {
+    mockUseShouldShowLtiAssetReportsForStudent.mockReturnValue(true)
 
-  it('filters reports by attempt', () => {
-    const attempt = '1'
-    const reports = [
-      createReport(0, '1'),
-      createReport(1, '2'), // Should be filtered out
-      createReport(0, '1'),
-    ]
+    render(<TextEntryAssetReportStatusLink {...defaultProps} />)
 
-    render(
-      <TextEntryAssetReportStatusLink
-        assetProcessors={mockAssetProcessors}
-        reports={reports}
-        attempt={attempt}
-        assignmentName={assignmentName}
-      />,
-    )
-
-    // Verify that 'All good' status is shown (since no filtered reports have high priority)
-    expect(screen.getByText('All good')).toBeInTheDocument()
     expect(screen.getByText('Document Processors:')).toBeInTheDocument()
+    expect(screen.getByTestId('asset-reports-component')).toBeInTheDocument()
+    expect(screen.getByTestId('submission-id')).toHaveTextContent('123')
+    expect(screen.getByTestId('submission-type')).toHaveTextContent('online_text_entry')
+    expect(mockUseShouldShowLtiAssetReportsForStudent).toHaveBeenCalledWith({
+      submissionId: '123',
+      submissionType: 'online_text_entry',
+    })
   })
 
-  it('opens modal when link is clicked', async () => {
-    const attempt = '1'
-    const reports = [createReport(0, '1')]
-    const user = userEvent.setup()
+  it('does not render when shouldShow is false', () => {
+    mockUseShouldShowLtiAssetReportsForStudent.mockReturnValue(false)
 
-    render(
-      <TextEntryAssetReportStatusLink
-        assetProcessors={mockAssetProcessors}
-        reports={reports}
-        attempt={attempt}
-        assignmentName={assignmentName}
-      />,
-    )
+    const {container} = render(<TextEntryAssetReportStatusLink {...defaultProps} />)
 
-    await user.click(screen.getByText('All good'))
-    expect(screen.getByText('Document Processors for Test Assignment')).toBeInTheDocument()
-
-    await user.click(screen.getByRole('button', {name: 'Close'}))
-    expect(screen.queryByText('Document Processors for Test Assignment')).not.toBeInTheDocument()
-  })
-
-  it('renders nothing when no reports are available', () => {
-    const attempt = '1'
-    const reports: LtiAssetReportWithAsset[] = []
-
-    render(
-      <TextEntryAssetReportStatusLink
-        assetProcessors={mockAssetProcessors}
-        reports={reports}
-        attempt={attempt}
-        assignmentName={assignmentName}
-      />,
-    )
-
-    expect(screen.getByText('No result')).toBeInTheDocument()
+    expect(container).toBeEmptyDOMElement()
+    expect(screen.queryByText('Document Processors:')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('asset-reports-component')).not.toBeInTheDocument()
   })
 })

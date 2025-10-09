@@ -41,6 +41,7 @@ import {
   SelectStrings,
 } from '@canvas/upload-media-translations'
 import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
+import {Text} from '@instructure/ui-text'
 
 const I18n = createI18nScope('assignments_2')
 
@@ -287,7 +288,11 @@ export default class CommentTextArea extends Component {
         {createSubmissionComment => (
           <div>
             <div id="textarea-emoji-container">
+              <Text as="label" htmlFor="comment-textarea">
+                {I18n.t('Comment')}
+              </Text>
               <TextArea
+                id="comment-textarea"
                 label={<ScreenReaderContent>{I18n.t('Comment input box')}</ScreenReaderContent>}
                 onChange={this.onTextChange}
                 placeholder={I18n.t('Submit a Comment')}

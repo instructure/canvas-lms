@@ -89,7 +89,7 @@ class CanvadocSessionsController < ApplicationController
 
     if attachment.canvadocable?
       opts = {
-        preferred_plugins: [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC],
+        preferred_plugins: [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX],
         enable_annotations: blob["enable_annotations"],
         use_cloudfront: true
       }

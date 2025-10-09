@@ -1823,6 +1823,9 @@
     "please_enter_a_file_name_f159edc1": {
         "message": "Rhowch enw ffeil"
     },
+    "please_enter_a_valid_video_url_from_a_supported_pl_30dc0596": {
+        "message": "Rhowch URL fideo dilys o blatfform a gefnogir."
+    },
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "Dewiswch ffeil o fath sy''n cael ei gefnogi"
     },
@@ -1945,6 +1948,12 @@
     },
     "religion_icon_246e0be1": {
         "message": "Eicon Crefydd"
+    },
+    "remove_f47dc62a": {
+        "message": "Tynnu"
+    },
+    "remove_filename_3ea029f6": {
+        "message": "Tynnu { filename }"
     },
     "remove_heading_style_5fdc8855": {
         "message": "Tynnu arddull y pennawd"
@@ -2699,6 +2708,9 @@
     "video_player_for_title_ffd9fbc4": {
         "message": "Chwaraewr fideo ar gyfer { title }"
     },
+    "video_url_889d3263": {
+        "message": "URL Fideo"
+    },
     "vietnamese_e7a76583": {
         "message": "Fietnameg"
     },
@@ -2824,6 +2836,9 @@
     },
     "your_webcam_may_already_be_in_use_6cd64c25": {
         "message": "Efallai bod eich gwe-gamera yn cael ei ddefnyddio’n barod."
+    },
+    "youtube_embed_url_5c1018d4": {
+        "message": "URL plannu YouTube"
     },
     "zeta_5ef24f0e": {
         "message": "Zeta"

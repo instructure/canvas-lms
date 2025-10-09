@@ -42,6 +42,7 @@ import doFetchApi, {type DoFetchApiOpts} from '@canvas/do-fetch-api-effect'
 import type {
   AssigneeOption,
   BaseDateDetails,
+  DateDetailsOverride,
   DateLockTypes,
   exportedOverride,
   FetchDueDatesResponse,
@@ -69,6 +70,7 @@ export interface ItemAssignToTrayContentProps
   hasDifferentiationTagOverrides: boolean
   setHasDifferentiationTagOverrides: (state: boolean) => void
   setModuleAssignees: (assignees: string[]) => void
+  setUnassignedOverrides: (overrides: DateDetailsOverride[]) => void
   defaultGroupCategoryId: string | null
   initialLoadRef: React.MutableRefObject<boolean>
   allOptions: AssigneeOption[]
@@ -160,6 +162,7 @@ const ItemAssignToTrayContent = ({
   hasDifferentiationTagOverrides,
   setHasDifferentiationTagOverrides,
   setModuleAssignees,
+  setUnassignedOverrides,
   defaultGroupCategoryId,
   allOptions,
   setSearchTerm,
@@ -393,6 +396,7 @@ const ItemAssignToTrayContent = ({
         // @ts-expect-error
         const onlyOverrides = !dateDetailsApiResponse.visible_to_everyone
         const allModuleAssignees: string[] = []
+        const unassignedOverrides: DateDetailsOverride[] = []
         // @ts-expect-error
         const hasModuleOverride = overrides?.some(override => override.context_module_id)
         // @ts-expect-error
@@ -425,6 +429,7 @@ const ItemAssignToTrayContent = ({
           overrides.forEach(override => {
             // if an override is unassigned, we don't need to show a card for it
             if (override.unassign_item) {
+              unassignedOverrides.push(override)
               return
             }
             // need to get any module assignees before we start filtering out hidden module cards
@@ -524,6 +529,7 @@ const ItemAssignToTrayContent = ({
           })
         }
         setModuleAssignees(allModuleAssignees)
+        setUnassignedOverrides(unassignedOverrides)
         setHasModuleOverrides(hasModuleOverride || false)
         // @ts-expect-error
         setGroupCategoryId(dateDetailsApiResponse.group_category_id)

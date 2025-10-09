@@ -25,6 +25,20 @@ require_relative "../helpers/k5_common"
 describe User do
   include K5Common
 
+  describe "access_tokens association" do
+    it "includes tokens that have passed permanent_expires_at (expired?)" do
+      user = user_model
+      active_token = user.access_tokens.create!(purpose: "active")
+      expired_token = user.access_tokens.create!(purpose: "expired", permanent_expires_at: 1.hour.ago)
+
+      expect(expired_token.expired?).to be true
+      expect(active_token.expired?).to be false
+
+      ids = user.access_tokens.reload.pluck(:id)
+      expect(ids).to include(active_token.id, expired_token.id)
+    end
+  end
+
   context "validation" do
     it "creates a new instance given valid attributes" do
       expect(user_model).to be_valid

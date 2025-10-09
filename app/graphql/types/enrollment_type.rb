@@ -71,6 +71,8 @@ module Types
     implements Interfaces::TimestampInterface
     implements Interfaces::AssetStringInterface
 
+    connection_type_class TotalCountConnection
+
     alias_method :enrollment, :object
 
     global_id_field :id

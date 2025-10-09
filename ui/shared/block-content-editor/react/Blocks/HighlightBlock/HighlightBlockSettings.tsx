@@ -44,8 +44,6 @@ export const HighlightBlockSettings = () => {
     <View as="div">
       <SettingsSectionToggle
         title={I18n.t('Color settings')}
-        collapsedLabel={I18n.t('Expand color settings')}
-        expandedLabel={I18n.t('Collapse color settings')}
         defaultExpanded={true}
         includeSeparator={true}
       >
@@ -64,8 +62,6 @@ export const HighlightBlockSettings = () => {
       </SettingsSectionToggle>
       <SettingsSectionToggle
         title={I18n.t('Highlight settings')}
-        collapsedLabel={I18n.t('Expand highlight settings')}
-        expandedLabel={I18n.t('Collapse highlight settings')}
         defaultExpanded={true}
         includeSeparator={false}
       >

@@ -159,8 +159,80 @@ describe CC::AssignmentResources do
         tool = external_tool_model(context: assignment.context.root_account)
         lti_asset_processor_model(tool:, assignment:, title: "Text Entry AP")
 
-        # Should export lti_context_id tag only
         expect(subject.at("lti_context_id").text).to eq assignment.lti_context_id
+      end
+    end
+
+    context "export asset processors" do
+      let(:root_account) { assignment.root_account }
+
+      it "does not export asset processors when lti_asset_processor FF is off" do
+        root_account.disable_feature!(:lti_asset_processor)
+        tool = external_tool_model(context: assignment.context.root_account)
+        lti_asset_processor_model(tool:, assignment:, title: "Text Entry AP")
+
+        expect(subject.at("asset_processors")).to be_nil
+      end
+
+      it "does not export asset processors if none are attached to the assignment" do
+        expect(subject.at("asset_processors")).to be_nil
+      end
+
+      it "exports asset processors when they are attached" do
+        tool = external_tool_model(context: assignment.context.root_account)
+        lti_asset_processor_model(tool:, assignment:, title: "Text Entry AP", url: "https://example.com/tool1")
+        lti_asset_processor_model(tool:, assignment:, title: "File Upload AP", url: "https://example.com/tool2")
+
+        asset_processors_node = subject.at("asset_processors")
+        expect(asset_processors_node).not_to be_nil
+
+        asset_processor_nodes = subject.css("asset_processors asset_processor")
+        expect(asset_processor_nodes.size).to eq 2
+
+        ap1_node = asset_processor_nodes.first
+        expect(ap1_node.at("url").text).to eq "https://example.com/tool1"
+        expect(ap1_node.at("title").text).to eq "Text Entry AP"
+        expect(ap1_node["identifier"]).to be_present
+
+        ap2_node = asset_processor_nodes.last
+        expect(ap2_node.at("url").text).to eq "https://example.com/tool2"
+        expect(ap2_node.at("title").text).to eq "File Upload AP"
+        expect(ap2_node["identifier"]).to be_present
+      end
+
+      it "exports asset processor with all fields populated" do
+        custom_data = { "key1" => "value1" }
+        icon_data = { "url" => "https://example.com/icon.png", "width" => 64, "height" => 64 }
+        window_data = { "targetName" => "procwin", "width" => 800, "height" => 600, "windowFeatures" => "left=10,top=20" }
+        iframe_data = { "width" => 900, "height" => 700 }
+        report_data = { "released" => true, "indicator" => false, "url" => "https://example.com/report", "custom" => { "rkey" => "rval" } }
+        context_tool = external_tool_model(context: assignment.context.root_account, placements: ["ActivityAssetProcessor"]) # ensure key generation stable
+
+        lti_asset_processor_model(
+          tool: context_tool,
+          assignment:,
+          title: "Rich AP",
+          text: "Description text",
+          url: "https://example.com/rich-tool",
+          custom: custom_data,
+          icon: icon_data,
+          window: window_data,
+          iframe: iframe_data,
+          report: report_data
+        )
+
+        asset_processor_node = subject.at("asset_processors asset_processor")
+        expect(asset_processor_node["identifier"]).to be_present
+        expect(asset_processor_node.at("url").text).to eq "https://example.com/rich-tool"
+        expect(asset_processor_node.at("title").text).to eq "Rich AP"
+        expect(asset_processor_node.at("text").text).to eq "Description text"
+        expect(JSON.parse(asset_processor_node.at("custom").text)).to eq custom_data
+        expect(JSON.parse(asset_processor_node.at("icon").text)).to eq icon_data
+        expect(JSON.parse(asset_processor_node.at("window").text)).to eq window_data
+        expect(JSON.parse(asset_processor_node.at("iframe").text)).to eq iframe_data
+        expect(JSON.parse(asset_processor_node.at("report").text)).to eq report_data
+        expect(asset_processor_node.at("context_external_tool_global_id").text).to eq context_tool.global_id.to_s
+        expect(asset_processor_node.at("context_external_tool_url").text).to eq context_tool.url
       end
     end
   end

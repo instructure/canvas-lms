@@ -78,14 +78,7 @@ describe Loaders::UserLoaders::DifferentiationTagsLoader do
         fulfills_with_nil_for_user
       end
 
-      it "fulfills with nil when assign_to_differentiation_tags feature is disabled" do
-        @account.disable_feature!(:assign_to_differentiation_tags)
-
-        fulfills_with_nil_for_user
-      end
-
       it "fulfills with nil when allow_assign_to_differentiation_tags setting is false" do
-        @account.enable_feature!(:assign_to_differentiation_tags)
         @account.settings[:allow_assign_to_differentiation_tags] = { value: false }
         @account.save!
 
@@ -93,7 +86,6 @@ describe Loaders::UserLoaders::DifferentiationTagsLoader do
       end
 
       it "fulfills with nil when user lacks permissions" do
-        @account.enable_feature!(:assign_to_differentiation_tags)
         @account.settings[:allow_assign_to_differentiation_tags] = { value: true }
         @account.save!
 
@@ -112,7 +104,6 @@ describe Loaders::UserLoaders::DifferentiationTagsLoader do
 
     context "when prerequisites are met" do
       before do
-        @account.enable_feature!(:assign_to_differentiation_tags)
         @account.settings[:allow_assign_to_differentiation_tags] = { value: true }
         @account.save!
       end

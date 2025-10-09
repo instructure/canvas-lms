@@ -16,9 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useRef} from 'react'
+import React, {useState, useRef, useEffect} from 'react'
 import {Alert} from '@instructure/ui-alerts'
-import {AllocationRuleType} from './AllocationRuleCard'
 import {Button, CloseButton, CondensedButton, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {FormMessage} from '@instructure/ui-form-field'
@@ -30,7 +29,12 @@ import StudentSelect from './StudentSelect'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {CourseStudent} from '../graphql/hooks/useAssignedStudents'
 import {useCreateAllocationRule} from '../graphql/hooks/useCreateAllocationRule'
-import {CreateAllocationRuleResponse} from '../graphql/teacher/AssignmentTeacherTypes'
+import {
+  CreateAllocationRuleResponse,
+  UpdateAllocationRuleResponse,
+  AllocationRuleType,
+} from '../graphql/teacher/AssignmentTeacherTypes'
+import {useEditAllocationRule} from '../graphql/hooks/useEditAllocationRule'
 
 const I18n = createI18nScope('peer_review_allocation_rule_card')
 const TARGET_TYPES = {
@@ -46,6 +50,7 @@ const CreateEditAllocationRuleModal = ({
   courseId,
   setIsOpen,
   rule,
+  refetchRules,
   isOpen = false,
   isEdit = false,
 }: {
@@ -53,12 +58,13 @@ const CreateEditAllocationRuleModal = ({
   courseId?: string
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
+  refetchRules: (ruleId: string, isNewRule?: boolean) => void
   isEdit?: boolean
   rule?: AllocationRuleType
 }): React.ReactElement => {
   const [targetType, setTargetType] = useState(
     rule
-      ? rule.appliesToReviewer
+      ? rule.appliesToAssessor
         ? TARGET_TYPES.REVIEWER
         : TARGET_TYPES.REVIEWEE
       : TARGET_TYPES.REVIEWER,
@@ -66,11 +72,11 @@ const CreateEditAllocationRuleModal = ({
   const [permitReview, setPermitReview] = useState(rule?.reviewPermitted ?? true)
   const [mustReview, setMustReview] = useState(rule?.mustReview ?? true)
 
-  const [target, setTarget] = useState(rule?.appliesToReviewer ? rule?.reviewer : rule?.reviewee)
+  const [target, setTarget] = useState(rule?.appliesToAssessor ? rule?.assessor : rule?.assessee)
   const [targetErrors, setTargetErrors] = useState<FormMessage[]>([])
   const targetSelectRef = useRef<HTMLElement | null>(null)
 
-  const [subject, setSubject] = useState(rule?.reviewee)
+  const [subject, setSubject] = useState(rule?.appliesToAssessor ? rule?.assessee : rule?.assessor)
   const [subjectErrors, setSubjectErrors] = useState<FormMessage[]>([])
   const subjectSelectRef = useRef<HTMLElement | null>(null)
 
@@ -83,10 +89,11 @@ const CreateEditAllocationRuleModal = ({
   }>({})
   const [additionalSubjectCount, setAdditionalSubjectCount] = useState(0)
   const [showErrorAlert, setShowErrorAlert] = useState(false)
+  const [shouldFocusNewField, setShouldFocusNewField] = useState(false)
 
   const createAllocationRuleMutation = useCreateAllocationRule(
-    (_data: CreateAllocationRuleResponse) => {
-      // TODO: [EGG-1589] Handle success (refresh rules displayed in the tray)
+    (data: CreateAllocationRuleResponse) => {
+      refetchRules(data.createAllocationRule.allocationRules[0]._id)
       handleClose()
     },
     (allocationErrors: any[]) => {
@@ -125,7 +132,83 @@ const CreateEditAllocationRuleModal = ({
     },
   )
 
+  const editAllocationRuleMutation = useEditAllocationRule(
+    (data: UpdateAllocationRuleResponse) => {
+      const editedRule = data.updateAllocationRule.allocationRules.find(r => r._id === rule?._id)
+      if (editedRule) {
+        refetchRules(editedRule._id, false)
+        handleClose(editedRule)
+      }
+    },
+    (allocationErrors: any[]) => {
+      let shouldFocus = true
+      allocationErrors.forEach(error => {
+        if (error.attributeId === target?._id) {
+          setTargetErrors([{text: error.message, type: 'newError'}])
+          if (shouldFocus) {
+            targetSelectRef.current?.focus()
+            shouldFocus = false
+          }
+        } else if (error.attributeId === subject?._id) {
+          setSubjectErrors([{text: error.message, type: 'newError'}])
+          if (shouldFocus) {
+            subjectSelectRef.current?.focus()
+            shouldFocus = false
+          }
+        } else if (error.attributeId) {
+          const additionalSubjectKeys = Object.keys(additionalSubjects)
+          additionalSubjectKeys.forEach(subjectKey => {
+            if (error.attributeId === additionalSubjects[subjectKey]?._id) {
+              setAdditionalSubjectsErrors(prev => ({
+                ...prev,
+                [subjectKey]: [{text: error.message, type: 'newError'}],
+              }))
+              if (shouldFocus) {
+                additionalSubjectSelectRefs[subjectKey]?.focus()
+                shouldFocus = false
+              }
+            }
+          })
+        } else {
+          setShowErrorAlert(true)
+        }
+      })
+    },
+  )
+
+  // Store original values for change detection in edit mode
+  const originalValues = React.useMemo(() => {
+    if (isEdit && rule) {
+      return {
+        targetType: rule.appliesToAssessor ? TARGET_TYPES.REVIEWER : TARGET_TYPES.REVIEWEE,
+        permitReview: rule.reviewPermitted,
+        mustReview: rule.mustReview,
+        target: rule.appliesToAssessor ? rule.assessor : rule.assessee,
+        subject: rule.appliesToAssessor ? rule.assessee : rule.assessor,
+      }
+    }
+    return null
+  }, [isEdit, rule])
+
+  const hasChanges = () => {
+    if (!isEdit || !originalValues) return true
+
+    return (
+      targetType !== originalValues.targetType ||
+      permitReview !== originalValues.permitReview ||
+      mustReview !== originalValues.mustReview ||
+      target?._id !== originalValues.target?._id ||
+      subject?._id !== originalValues.subject?._id ||
+      Object.keys(additionalSubjects).length > 0
+    )
+  }
+
   const handleSave = () => {
+    if (isEdit && !hasChanges()) {
+      handleClose()
+      return
+    }
+
     let shouldFocus = true
     if (!target) {
       setTargetErrors([
@@ -211,17 +294,29 @@ const CreateEditAllocationRuleModal = ({
       assesseeIds = [target._id]
     }
 
-    const input = {
-      assignmentId,
-      assessorIds,
-      assesseeIds,
-      mustReview,
-      reviewPermitted: permitReview,
-      appliesToAssessor: isReciprocal ? true : appliesToAssessor,
-      reciprocal: isReciprocal,
+    if (isEdit && rule) {
+      const editInput = {
+        ruleId: rule._id,
+        assessorIds,
+        assesseeIds,
+        mustReview,
+        reviewPermitted: permitReview,
+        appliesToAssessor: isReciprocal ? true : appliesToAssessor,
+        reciprocal: isReciprocal,
+      }
+      editAllocationRuleMutation.mutate(editInput)
+    } else {
+      const createInput = {
+        assignmentId,
+        assessorIds,
+        assesseeIds,
+        mustReview,
+        reviewPermitted: permitReview,
+        appliesToAssessor: isReciprocal ? true : appliesToAssessor,
+        reciprocal: isReciprocal,
+      }
+      createAllocationRuleMutation.mutate(createInput)
     }
-
-    createAllocationRuleMutation.mutate(input)
   }
 
   const clearErrors = (isSubject: boolean, subjectKey?: string) => {
@@ -255,23 +350,41 @@ const CreateEditAllocationRuleModal = ({
     }
   }
 
-  const clearContents = () => {
-    setTarget(undefined)
-    setSubject(undefined)
+  const clearAdditionalSubjects = () => {
     setAdditionalSubjects({})
     setAdditionalSubjectSelectRefs({})
     setAdditionalSubjectCount(0)
   }
 
-  const handleClose = () => {
-    // TODO: [EGG-1387] Handle opening and reopening the modal after submitting is implemented
-    clearContents()
+  const clearContents = () => {
+    setTarget(undefined)
+    setSubject(undefined)
+    clearAdditionalSubjects()
+  }
+
+  const resetContents = (newRule?: AllocationRuleType) => {
+    const ruleToUse = newRule ? newRule : rule
+    if (ruleToUse) {
+      setTarget(ruleToUse.appliesToAssessor ? ruleToUse.assessor : ruleToUse.assessee)
+      setSubject(ruleToUse.appliesToAssessor ? ruleToUse.assessee : ruleToUse.assessor)
+      clearAdditionalSubjects()
+      setTargetType(ruleToUse.appliesToAssessor ? TARGET_TYPES.REVIEWER : TARGET_TYPES.REVIEWEE)
+      setMustReview(ruleToUse.mustReview)
+      setPermitReview(ruleToUse.reviewPermitted)
+    }
+  }
+
+  const handleClose = (newRule?: AllocationRuleType) => {
+    isEdit ? resetContents(newRule) : clearContents()
     clearAllErrors()
     setIsOpen(false)
   }
 
   const handleTargetSelection = (_event: React.ChangeEvent<HTMLInputElement>, value: string) => {
     clearAllErrors(true)
+    if (value === TARGET_TYPES.RECIPROCAL) {
+      if (additionalSubjectCount > 0) clearAdditionalSubjects()
+    }
     setTargetType(value)
   }
 
@@ -305,10 +418,18 @@ const CreateEditAllocationRuleModal = ({
     }
   }
 
+  useEffect(() => {
+    if (shouldFocusNewField && additionalSubjectSelectRefs[additionalSubjectCount]) {
+      additionalSubjectSelectRefs[additionalSubjectCount]?.focus()
+      setShouldFocusNewField(false)
+    }
+  }, [additionalSubjectSelectRefs, additionalSubjectCount, shouldFocusNewField])
+
   const handleAddSubjectField = () => {
     const newCount = additionalSubjectCount + 1
     setAdditionalSubjects(prev => ({...prev, [newCount]: {id: '', name: ''}}))
     setAdditionalSubjectCount(newCount)
+    setShouldFocusNewField(true)
   }
 
   const handleRemoveSubjectField = (key: string, index: number) => {
@@ -354,14 +475,13 @@ const CreateEditAllocationRuleModal = ({
   // index = -1 for the main subject select, otherwise it will be the index of additional subjects
   const renderSubjectSelect = (index = -1, subjectKey: string | undefined = undefined) => (
     <StudentSelect
-      inputId={`subject-select-${index}`}
+      inputId={index === -1 ? 'subject-select-main' : `subject-select-${subjectKey}`}
       label={
         targetType === TARGET_TYPES.REVIEWEE ? I18n.t('Reviewer Name') : I18n.t('Recipient Name')
       }
       errors={index === -1 ? subjectErrors : (additionalSubjectsErrors[subjectKey || ''] ?? [])}
       selectedStudent={index === -1 ? subject : additionalSubjects[subjectKey || '']}
       assignmentId={assignmentId}
-      courseId={courseId}
       filteredStudents={getFilterStudents(true, subjectKey)}
       onOptionSelect={
         !subjectKey
@@ -399,7 +519,7 @@ const CreateEditAllocationRuleModal = ({
       <Modal.Header>
         <CloseButton
           placement="end"
-          onClick={handleClose}
+          onClick={() => handleClose()}
           screenReaderLabel={I18n.t('Close')}
           data-testid="close-button"
         />
@@ -466,7 +586,6 @@ const CreateEditAllocationRuleModal = ({
               errors={targetErrors}
               selectedStudent={target}
               assignmentId={assignmentId}
-              courseId={courseId}
               filteredStudents={getFilterStudents(false)}
               onOptionSelect={setTarget}
               clearErrors={() => clearErrors(false)}
@@ -592,7 +711,7 @@ const CreateEditAllocationRuleModal = ({
       <Modal.Footer>
         <Flex justifyItems="end">
           <Flex.Item margin="0 small 0 0">
-            <Button onClick={handleClose} data-testid="cancel-button">
+            <Button onClick={() => handleClose()} data-testid="cancel-button">
               {I18n.t('Cancel')}
             </Button>
           </Flex.Item>

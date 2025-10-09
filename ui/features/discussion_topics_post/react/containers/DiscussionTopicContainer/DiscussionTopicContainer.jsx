@@ -135,9 +135,7 @@ export const DiscussionTopicContainer = ({
   }
 
   const userHasEntry = () => {
-    return props.discussionTopic.discussionEntriesConnection.nodes.some(entry => {
-      return entry.author?._id === ENV.current_user_id
-    })
+    return props.discussionTopic.participant.posted
   }
 
   const client = useApolloClient()

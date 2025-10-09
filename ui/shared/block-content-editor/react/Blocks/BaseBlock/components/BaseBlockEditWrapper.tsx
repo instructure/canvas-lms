@@ -18,13 +18,14 @@
 
 import {PropsWithChildren} from 'react'
 import {useNode} from '@craftjs/core'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {AddButton} from '../../../AddBlock/AddButton'
-import {useBlockContentEditorContext} from '../../../BlockContentEditorContext'
-import {useOpenSettingsTray} from '../../../hooks/useOpenSettingsTray'
 import {useDeleteNode} from '../../../hooks/useDeleteNode'
 import {useDuplicateNode} from '../../../hooks/useDuplicateNode'
 import {useMoveBlock} from '../../../hooks/useMoveBlock'
 import {useIsEditingBlock} from '../../../hooks/useIsEditingBlock'
+import {useBlockTitle} from '../../../hooks/useBlockTitle'
+import {showScreenReaderAlert} from '../../../utilities/accessibility'
 import {BaseBlockLayout} from '../layout/BaseBlockLayout'
 import {CopyButton} from './CopyButton'
 import {SettingsButton} from './SettingsButton'
@@ -34,31 +35,46 @@ import {BackgroundColorApplier} from './BackgroundColorApplier'
 import {Flex} from '@instructure/ui-flex'
 import {A11yDoneEditingButton} from './A11yDoneEditingButton'
 import {A11yEditButton} from './A11yEditButton'
-import {useInstUIRef} from '../useInstUIRef'
+import {useInstUIRef} from '../../../hooks/useInstUIRef'
+import {useAddBlockModal} from '../../../hooks/useAddBlockModal'
+import {useSettingsTray} from '../../../hooks/useSettingsTray'
+import {useEditingBlock} from '../../../hooks/useEditingBlock'
+
+const I18n = createI18nScope('block_content_editor')
 
 const InsertButton = () => {
-  const {addBlockModal} = useBlockContentEditorContext()
   const {id} = useNode()
-  return <AddButton onClicked={() => addBlockModal.open(id)} />
+  const {open} = useAddBlockModal()
+  return <AddButton onClicked={() => open(id)} />
 }
 
-const DeleteButton = () => {
+const DeleteButton = ({title}: {title: string}) => {
   const deleteNode = useDeleteNode()
-  return <RemoveButton onClicked={deleteNode} />
+  const handleDelete = () => {
+    deleteNode()
+    const alertMessage = I18n.t('Block removed: %{blockType}', {blockType: title})
+    showScreenReaderAlert(alertMessage)
+  }
+  return <RemoveButton onClicked={handleDelete} title={title} />
 }
 
-const DuplicateButton = () => {
+const DuplicateButton = ({title}: {title: string}) => {
   const duplicateNode = useDuplicateNode()
-  return <CopyButton onClicked={duplicateNode} />
+  const handleDuplicate = () => {
+    duplicateNode()
+    const alertMessage = I18n.t('Block duplicated: %{blockType}', {blockType: title})
+    showScreenReaderAlert(alertMessage)
+  }
+  return <CopyButton onClicked={handleDuplicate} title={title} />
 }
 
-const EditSettingsButton = () => {
-  const {openSettingsTray} = useOpenSettingsTray()
-
-  return <SettingsButton onClicked={openSettingsTray} />
+const EditSettingsButton = ({title}: {title: string}) => {
+  const {id} = useNode()
+  const {open} = useSettingsTray()
+  return <SettingsButton onClicked={() => open(id)} title={title} />
 }
 
-const MoveBlockButton = () => {
+const MoveBlockButton = ({title}: {title: string}) => {
   const {canMoveUp, canMoveDown, moveToTop, moveUp, moveToBottom, moveDown} = useMoveBlock()
 
   return (
@@ -69,6 +85,7 @@ const MoveBlockButton = () => {
       onMoveDown={moveDown}
       onMoveToTop={moveToTop}
       onMoveToBottom={moveToBottom}
+      title={title}
     />
   )
 }
@@ -80,19 +97,18 @@ export const BaseBlockEditWrapper = (
   }>,
 ) => {
   const {id} = useNode()
-  const {editingBlock} = useBlockContentEditorContext()
-  const {isEditingBlock, isEditedViaEditButton, setIsEditedViaEditButton} = useIsEditingBlock()
+  const {setId} = useEditingBlock()
+  const {isEditing, isEditingViaEditButton: isEditingByKeyboard} = useIsEditingBlock()
   const [editButtonRef, setEditButtonRef] = useInstUIRef<HTMLButtonElement>()
+  const blockTitle = useBlockTitle()
 
   const handleSave = () => {
-    editingBlock.setId(null)
-    setIsEditedViaEditButton(false)
+    setId(null)
     setTimeout(() => editButtonRef?.current?.focus(), 0)
   }
 
-  const handleEdit = () => {
-    setIsEditedViaEditButton(true)
-    editingBlock.setId(id)
+  const handleEditByKeyboard = () => {
+    setId(id, true)
   }
 
   return (
@@ -102,26 +118,35 @@ export const BaseBlockEditWrapper = (
         title={props.title}
         addButton={<InsertButton />}
         bottomA11yActionMenu={
-          isEditingBlock && (
+          isEditing && (
             <A11yDoneEditingButton
               onUserAction={handleSave}
-              isFullyVisible={isEditedViaEditButton}
+              isFullyVisible={isEditingByKeyboard}
+              title={blockTitle}
             />
           )
         }
         menu={
           <Flex gap="mediumSmall">
-            <DuplicateButton key="menu-duplicate-button" />
-            <EditSettingsButton key="menu-edit-settings-button" />
-            <DeleteButton key="menu-delete-button" />
-            <MoveBlockButton key="menu-move-block-button" />
+            <DuplicateButton key="menu-duplicate-button" title={blockTitle} />
+            <EditSettingsButton key="menu-edit-block-settings-button" title={blockTitle} />
+            <DeleteButton key="menu-delete-button" title={blockTitle} />
+            <MoveBlockButton key="menu-move-block-button" title={blockTitle} />
           </Flex>
         }
         topA11yActionMenu={
-          !isEditingBlock ? (
-            <A11yEditButton onUserAction={handleEdit} elementRef={setEditButtonRef} />
+          !isEditing ? (
+            <A11yEditButton
+              onUserAction={handleEditByKeyboard}
+              elementRef={setEditButtonRef}
+              title={blockTitle}
+            />
           ) : (
-            <A11yDoneEditingButton onUserAction={handleSave} isFullyVisible={false} />
+            <A11yDoneEditingButton
+              onUserAction={handleSave}
+              isFullyVisible={false}
+              title={blockTitle}
+            />
           )
         }
       >

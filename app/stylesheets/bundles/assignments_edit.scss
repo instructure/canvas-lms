@@ -126,6 +126,15 @@ div.form-column-right, div.overrides-column-right {
     background: #E7F4FF;
   }
 
+  #assignment_peer_reviews_checkbox ~ label:hover,
+  #peer_reviews_across_sections_checkbox ~ label:hover,
+  #peer_reviews_within_groups_checkbox ~ label:hover,
+  #peer_reviews_pass_fail_grading_checkbox ~ label:hover,
+  #peer_reviews_anonymity_checkbox ~ label:hover,
+  #peer_reviews_submission_required_checkbox ~ label:hover {
+    background: none!important;
+  }
+
   /* if form field is first item in box */
   label.flush {
     margin: 0px;

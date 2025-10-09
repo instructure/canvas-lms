@@ -99,34 +99,112 @@ class Lti::IMS::Registration < ApplicationRecord
           text: client_name,
           icon_url: logo_uri,
           platform: "canvas.instructure.com",
-          placements:
-        }
+          placements:,
+          message_settings:
+        }.compact
       }]
     }.with_indifferent_access
   end
 
-  def self.to_internal_lti_configuration(registration)
-    config = registration.lti_tool_configuration
+  # This method normalizes access to the various fields of an IMS Registration
+  # regardless of whether the source is a Hash (parsed JSON from
+  # https://www.imsglobal.org/spec/lti-dr/v1p0#openid-configuration-0) or an ActiveRecord
+  # instance of this class.
+  def self.normalize_lti_ims_config_access(source)
+    if source.is_a?(Hash)
+      config = source["lti_tool_configuration"]
+      {
+        config:,
+        client_name: source["client_name"],
+        initiate_login_uri: source["initiate_login_uri"],
+        jwks_uri: source["jwks_uri"],
+        scopes: source["scopes"],
+        redirect_uris: source["redirect_uris"],
+        logo_uri: source["logo_uri"],
+        tool_id: config[TOOL_ID_EXTENSION],
+        privacy_level: source[PRIVACY_LEVEL_EXTENSION],
+        placements: ims_lti_config_to_internal_placement_config(config),
+        message_settings: ims_lti_config_to_internal_message_settings(config)
+      }.compact.with_indifferent_access
+    else
+      config = source.lti_tool_configuration
+      {
+        config:,
+        client_name: source.client_name,
+        initiate_login_uri: source.initiate_login_uri,
+        jwks_uri: source.jwks_uri,
+        scopes: source.scopes,
+        redirect_uris: source.redirect_uris,
+        logo_uri: source.logo_uri,
+        tool_id: source.tool_id,
+        privacy_level: source.privacy_level,
+        placements: source.placements,
+        message_settings: source.message_settings
+      }.compact.with_indifferent_access
+    end
+  end
+
+  # This method converts an IMS Tool Registration's json into an
+  # "InternalLtiConfiguration." Works for instances of Lti::IMS::Registration
+  # or for a Hash (parsed JSON) with the same structure as an instance of
+  # Lti::IMS::Registration.
+  def self.to_internal_lti_configuration(source)
+    normalized = normalize_lti_ims_config_access(source)
 
     {
-      title: registration.client_name,
-      description: config["description"],
-      custom_fields: config["custom_parameters"],
-      target_link_uri: config["target_link_uri"],
-      oidc_initiation_url: registration.initiate_login_uri,
-      public_jwk_url: registration.jwks_uri,
-      scopes: registration.scopes,
-      redirect_uris: registration.redirect_uris,
-      domain: config["domain"],
-      tool_id: registration.tool_id,
-      privacy_level: registration.privacy_level,
-      placements: registration.placements,
+      title: normalized[:client_name],
+      description: normalized.dig(:config, :description),
+      custom_fields: normalized.dig(:config, :custom_parameters),
+      target_link_uri: normalized.dig(:config, :target_link_uri),
+      oidc_initiation_url: normalized[:initiate_login_uri],
+      public_jwk_url: normalized[:jwks_uri],
+      scopes: normalized[:scopes],
+      redirect_uris: normalized[:redirect_uris],
+      domain: normalized.dig(:config, :domain),
+      tool_id: normalized[:tool_id],
+      privacy_level: normalized[:privacy_level],
+      placements: normalized[:placements],
       launch_settings: {
-        icon_url: registration.logo_uri,
-        text: registration.client_name,
-        content_migration: config[CONTENT_MIGRATION_EXTENSION],
+        icon_url: normalized[:logo_uri],
+        text: normalized[:client_name],
+        content_migration: normalized.dig(:config, CONTENT_MIGRATION_EXTENSION),
+        message_settings: normalized[:message_settings],
       }.compact
     }.compact.with_indifferent_access
+  end
+
+  def self.ims_lti_config_to_internal_placement_config(lti_tool_configuration)
+    messages = lti_tool_configuration["messages"] || []
+
+    messages.map do |message|
+      if Lti::ResourcePlacement::PLACEMENTLESS_MESSAGE_TYPES.include?(message["type"])
+        [] # Skip placementless messages like EULA - they're handled in message_settings
+      elsif message["placements"].blank?
+        # default to link_selection if no placements are specified
+        [build_placement_for("link_selection", message)]
+      else
+        message["placements"].flat_map do |placement|
+          build_placement_for(placement, message)
+        end
+      end
+    end.flatten.uniq { |p| p[:placement] }
+  end
+
+  def self.ims_lti_config_to_internal_message_settings(lti_tool_configuration)
+    messages = lti_tool_configuration["messages"] || []
+
+    messages.filter_map do |message|
+      if Lti::ResourcePlacement::PLACEMENTLESS_MESSAGE_TYPES.include?(message["type"])
+        {
+          type: message["type"],
+          enabled: true,
+          target_link_uri: message["target_link_uri"],
+          custom_fields: message["custom_parameters"]
+        }.compact
+      else
+        nil
+      end
+    end.presence
   end
 
   # This method converts an IMS Registration into an "InternalLtiConfiguration",
@@ -149,27 +227,13 @@ class Lti::IMS::Registration < ApplicationRecord
   delegate :update_external_tools!, to: :developer_key
 
   def placements
-    messages = lti_tool_configuration["messages"]
-    eula_message = messages.find { it["type"] == LtiAdvantage::Messages::EulaRequest::MESSAGE_TYPE }
-
-    messages.map do |message|
-      if Lti::ResourcePlacement::PLACEMENTLESS_MESSAGE_TYPES.include?(message["type"])
-        [] # EULA -- handled with eula_message variable
-      elsif message["placements"].blank?
-        # default to link_selection if no placements are specified
-        [build_placement_for("link_selection", message)]
-      else
-        message["placements"].flat_map do |placement|
-          build_placement_for(placement, message, eula_message:)
-        end
-      end
-    end.flatten.uniq { |p| p[:placement] }
+    self.class.ims_lti_config_to_internal_placement_config(lti_tool_configuration)
   end
 
   # Builds a placement object for a given message and placement type
   # returns a list with one item, or an empty list if the placement
   # type is not supported by Canvas
-  def build_placement_for(placement_type, message, eula_message: nil)
+  def self.build_placement_for(placement_type, message)
     placement_name = canvas_placement_name(placement_type)
 
     # Return no placement if the placement type is not supported by Canvas
@@ -190,18 +254,26 @@ class Lti::IMS::Registration < ApplicationRecord
         target_link_uri: message["target_link_uri"],
         visibility: placement_visibility(message),
         default: fetch_default_enabled_setting(message, placement_name),
-        eula: placement_eula(placement_name:, eula_message:),
         **placement_display_settings(message),
         **placement_width_and_height_settings(message, placement_name)
       }.compact
     ]
   end
 
+  def self.placement_visibility(message)
+    availability = message[PLACEMENT_VISIBILITY_EXTENSION]
+    if availability
+      PLACEMENT_VISIBILITY_OPTIONS.include?(availability) ? availability : nil
+    else
+      nil
+    end
+  end
+
   # This supports a very old parameter (hence the obtuse name) that *only* applies to the course navigation placement. It hides the
   # tool from the course navigation by default. Teachers can still add the tool to the course navigation using the course
   # settings page if they'd like. The IMS Message stores this value as a boolean, but the Canvas config expects a string
   # value of "enabled" or "disabled" (nil/not present is equivalent to "enabled").
-  def fetch_default_enabled_setting(message, placement_name)
+  def self.fetch_default_enabled_setting(message, placement_name)
     (message[COURSE_NAV_DEFAULT_ENABLED_EXTENSION] == false && placement_name == "course_navigation") ? "disabled" : nil
   end
 
@@ -236,7 +308,8 @@ class Lti::IMS::Registration < ApplicationRecord
       tool_configuration: Schemas::LtiConfiguration.from_internal_lti_configuration(
         lti_registration.internal_lti_configuration(context: options[:context])
       ),
-      default_configuration: canvas_configuration
+      default_configuration: canvas_configuration,
+      registration_url:
     }.as_json(options)
   end
 
@@ -246,6 +319,61 @@ class Lti::IMS::Registration < ApplicationRecord
 
   def vendor
     lti_tool_configuration[VENDOR_EXTENSION]
+  end
+
+  def self.canvas_placement_name(placement)
+    # IMS placement names that have different names in Canvas
+    return "link_selection" if placement == "ContentArea"
+    return "editor_button" if placement == "RichTextEditor"
+
+    # Otherwise, remove our URL prefix from the Canvas-specific placements
+    canvas_extension = CANVAS_EXTENSION_PREFIX + "/"
+    placement.start_with?(canvas_extension) ? placement.sub(canvas_extension, "") : placement
+  end
+
+  # placement_* Methods used to construct placement in build_placement_for:
+
+  def self.placement_display_settings(message)
+    display_type = message[DISPLAY_TYPE_EXTENSION]
+    if display_type == "new_window"
+      { display_type: "default", windowTarget: "_blank" }
+    else
+      { display_type: }
+    end
+  end
+
+  def self.placement_eula(placement_name:, eula_message:)
+    if eula_message && placement_name == "ActivityAssetProcessor"
+      {
+        enabled: true,
+        target_link_uri: eula_message["target_link_uri"],
+        custom_fields: eula_message["custom_parameters"]
+      }.compact
+    else
+      nil
+    end
+  end
+
+  def self.placement_width_and_height_settings(message, placement)
+    keys = ["selection_width", "selection_height"]
+    # placements that use launch_width and launch_height
+    # instead of selection_width and selection_height
+    uses_launch_width = ["assignment_edit", "post_grades"]
+    keys = ["launch_width", "launch_height"] if uses_launch_width.include?(placement)
+
+    values = [
+      message[LAUNCH_WIDTH_EXTENSION]&.to_i,
+      message[LAUNCH_HEIGHT_EXTENSION]&.to_i,
+    ]
+
+    {
+      keys[0].to_sym => values[0],
+      keys[1].to_sym => values[1],
+    }
+  end
+
+  def message_settings
+    self.class.ims_lti_config_to_internal_message_settings(lti_tool_configuration)
   end
 
   private
@@ -326,18 +454,6 @@ class Lti::IMS::Registration < ApplicationRecord
     availability = message[PLACEMENT_VISIBILITY_EXTENSION]
     if availability
       PLACEMENT_VISIBILITY_OPTIONS.include?(availability) ? availability : nil
-    else
-      nil
-    end
-  end
-
-  def placement_eula(placement_name:, eula_message:)
-    if eula_message && placement_name == "ActivityAssetProcessor"
-      {
-        enabled: true,
-        target_link_uri: eula_message["target_link_uri"],
-        custom_fields: eula_message["custom_parameters"]
-      }.compact
     else
       nil
     end

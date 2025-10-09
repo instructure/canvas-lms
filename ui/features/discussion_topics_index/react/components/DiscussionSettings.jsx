@@ -105,7 +105,7 @@ export default class DiscussionSettings extends Component {
     if (this.props.permissions.change_settings) {
       return (
         <div>
-          <Heading margin="medium 0 medium 0" border="top" level="h3" as="h2">
+          <Heading margin="medium 0 medium 0" border="top" level="h3" as="h3">
             {I18n.t('Student Settings')}
           </Heading>
           <CheckboxGroup
@@ -201,7 +201,7 @@ export default class DiscussionSettings extends Component {
           <Modal.Body>
             <div className="discussion-settings-v2-modal-body-container">
               {this.props.isSavingSettings ? this.renderSpinner() : null}
-              <Heading margin="0 0 medium 0" level="h3" as="h2">
+              <Heading margin="0 0 medium 0" level="h3" as="h3">
                 {I18n.t('My Settings')}
               </Heading>
               <Checkbox

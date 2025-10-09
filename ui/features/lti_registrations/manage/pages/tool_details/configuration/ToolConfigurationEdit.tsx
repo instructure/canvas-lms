@@ -35,6 +35,7 @@ import {
   validateLti1p3RegistrationOverlayState,
 } from '../../../registration_overlay/validateLti1p3RegistrationOverlayState'
 import {LaunchSettingsConfirmation} from '../../../registration_wizard_forms/LaunchSettingsConfirmation'
+import {LaunchTypeSpecificSettingsConfirmation} from '../../../registration_wizard_forms/LaunchTypeSpecificSettingsConfirmation'
 import type {ToolDetailsOutletContext} from '../ToolDetails'
 import {IconConfirmationPerfWrapper} from './IconConfirmationPerfWrapper'
 import {NamingConfirmationPerfWrapper} from './NamingConfirmationPerfWrapper'
@@ -119,6 +120,7 @@ export const ToolConfigurationEdit = () => {
   )
 
   const isDirty = useOverlayState(s => s.state.dirty)
+  const shouldShowEulaSection = useOverlayState().isEulaCapable()
   const unloadHandler = React.useCallback(onBeforeUnload(isDirty), [isDirty])
   React.useEffect(() => {
     window.addEventListener('beforeunload', unloadHandler)
@@ -217,6 +219,16 @@ export const ToolConfigurationEdit = () => {
         ) : null}
       </Section>
 
+      {showAllSettings && shouldShowEulaSection ? (
+        <Section>
+          <LaunchTypeSpecificSettingsConfirmation
+            overlayStore={useOverlayState}
+            internalConfig={registration.configuration}
+            settingType="LtiEulaRequest"
+          />
+        </Section>
+      ) : null}
+
       {showAllSettings ? (
         <Section>
           <OverrideURIsConfirmation
@@ -237,6 +249,7 @@ export const ToolConfigurationEdit = () => {
       <Section>
         <IconConfirmationPerfWrapper overlayStore={useOverlayState} registration={registration} />
       </Section>
+
       <Footer save={save} isSaving={updateMutation.isPending} />
     </div>
   )

@@ -58,13 +58,17 @@ module Types
 
     field :thumbnail_url, String, null: true
     def media_download_url
-      opts = {
-        download: "1",
-        download_frd: "1",
-        host: context[:request].host_with_port,
-        protocol: context[:request].protocol
-      }
-      GraphQLHelpers::UrlHelpers.file_download_url(object, opts)
+      load_association(:attachment).then do
+        next nil unless object.attachment.present? && context[:request]&.host_with_port.present? && context[:request]&.protocol.present?
+
+        opts = {
+          download: "1",
+          download_frd: "1",
+          host: context[:request].host_with_port,
+          protocol: context[:request].protocol
+        }
+        GraphQLHelpers::UrlHelpers.file_download_url(object.attachment, opts)
+      end
     end
   end
 end

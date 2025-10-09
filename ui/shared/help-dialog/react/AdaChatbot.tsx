@@ -25,14 +25,17 @@ function AdaChatbot({onSubmit}: AdaChatbotProps) {
   useEffect(() => {
     if (typeof window !== 'undefined' && (window as any).adaEmbed) {
       const adaEmbed = (window as any).adaEmbed
+      const adaSettings = (window as any).adaSettings || {}
 
       const startTimeout = setTimeout(() => {
         onSubmit()
       }, 10000)
 
       try {
+        // inject global adaSettings from partial (_ada_embed) into start options
         adaEmbed.start({
-          handle: 'instructure-gen',
+          ...adaSettings,
+          handle: 'instructure-gen', // ensure handle remains explicit
           adaReadyCallback: () => {
             clearTimeout(startTimeout)
             adaEmbed.toggle()

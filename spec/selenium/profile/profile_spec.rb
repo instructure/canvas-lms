@@ -541,7 +541,7 @@ describe "profile" do
       f(".profile-edit-link").click
       wait_for_ajaximations
 
-      expect(ff(".avatar-content").length).to eq 1
+      expect(f("[data-testid='avatar-modal']")).to be_truthy
     end
   end
 

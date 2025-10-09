@@ -26,6 +26,8 @@ module Types
     implements Interfaces::LegacyIDInterface
     implements Interfaces::TimestampInterface
 
+    connection_type_class TotalCountConnection
+
     global_id_field :id
 
     field :assignment_id, ID, null: true

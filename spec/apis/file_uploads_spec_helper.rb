@@ -75,7 +75,6 @@ shared_examples_for "file uploads api" do
 
     unless options[:no_doc_preview]
       json["canvadoc_session_url"] = nil
-      json["crocodoc_session_url"] = nil
     end
 
     json
@@ -139,7 +138,6 @@ shared_examples_for "file uploads api" do
           "mime_class" => attachment.mime_class,
           "media_entry_id" => attachment.media_entry_id,
           "canvadoc_session_url" => nil,
-          "crocodoc_session_url" => nil,
           "category" => "uncategorized"
         }
 

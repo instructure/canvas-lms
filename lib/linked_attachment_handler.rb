@@ -146,7 +146,7 @@ module LinkedAttachmentHandler
     root_account&.feature_enabled?(:file_association_access)
   end
 
-  def access_for_attachment_association?(user, session, _association, _location_param)
+  def access_for_attachment_association?(user, session, _association)
     grants_right?(user, session, :read) if user && respond_to?(:grants_right?)
   end
 

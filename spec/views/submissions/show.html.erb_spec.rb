@@ -803,4 +803,64 @@ describe "submissions/show" do
       expect(media_comment.include?("This is a media comment")).to be true
     end
   end
+
+  describe "asset report status containers" do
+    let_once(:assignment) { @course.assignments.create!(submission_types: "online_text_entry") }
+    let_once(:student) do
+      course_with_user("StudentEnrollment", course: @course, active_all: true).user
+    end
+    let_once(:submission) do
+      assignment.submit_homework(student, submission_type: "online_text_entry", body: "my text")
+    end
+
+    before do
+      assign(:assignment, assignment)
+      assign(:context, @course)
+      assign(:current_user, student)
+      assign(:submission, submission)
+    end
+
+    context "when submission is online_text_entry" do
+      it "renders asset report text entry status container with correct data attributes" do
+        render "submissions/show"
+
+        expect(response.body).to include('id="asset_report_text_entry_status_container"')
+        expect(response.body).to match(/id="asset_report_text_entry_status_container"[^>]*data-attempt="#{submission.attempt}"/)
+        expect(response.body).to match(/id="asset_report_text_entry_status_container"[^>]*data-submission-id="#{submission.id}"/)
+        expect(response.body).to match(/id="asset_report_text_entry_status_container"[^>]*data-submission-type="online_text_entry"/)
+      end
+
+      it "renders asset report modal mount point" do
+        render "submissions/show"
+
+        expect(response.body).to include('id="asset_report_modal"')
+      end
+    end
+
+    context "when submission is not online_text_entry" do
+      let(:upload_assignment) { @course.assignments.create!(submission_types: "online_upload") }
+      let(:upload_submission) do
+        upload_assignment.submission_for_student(student)
+      end
+
+      before do
+        assign(:assignment, upload_assignment)
+        assign(:submission, upload_submission)
+        assign(:context, @course)
+        assign(:current_user, student)
+      end
+
+      it "does not render text entry status container" do
+        render "submissions/show"
+
+        expect(response.body).not_to include('id="asset_report_text_entry_status_container"')
+      end
+
+      it "still renders asset report modal mount point" do
+        render "submissions/show"
+
+        expect(response.body).to include('id="asset_report_modal"')
+      end
+    end
+  end
 end

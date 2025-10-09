@@ -22,7 +22,7 @@ import {
   LoadingIndicator,
   sizeMediaPlayer,
 } from '@instructure/canvas-media'
-import {CaptionMetaData, StudioPlayer} from '@instructure/studio-player'
+import {CaptionMetaData, StudioPlayer, type StudioPlayerProps} from '@instructure/studio-player'
 import {Alert} from '@instructure/ui-alerts'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
@@ -106,6 +106,7 @@ interface BaseCanvasStudioPlayerProps {
   explicitSize?: {width: number | string; height: number | string}
   hideUploadCaptions?: boolean
   isInverseVariant?: boolean
+  kebabMenuElements?: StudioPlayerProps['kebabMenuElements']
 }
 
 type CanvasStudioPropsWithMediaIdOrAttachmentId =
@@ -130,6 +131,7 @@ export default function CanvasStudioPlayer({
   explicitSize,
   hideUploadCaptions = false,
   isInverseVariant = false,
+  kebabMenuElements = [],
 }: CanvasStudioPropsWithMediaIdOrAttachmentId) {
   const [mediaId, setMediaId] = useState(media_id)
   const captions: CaptionMetaData[] | undefined = Array.isArray(media_captions)
@@ -404,7 +406,7 @@ export default function CanvasStudioPlayer({
               onCaptionsDelete={hideCaptionButtons ? undefined : deleteCaption}
               kebabMenuElements={
                 hideCaptionButtons
-                  ? undefined
+                  ? [...kebabMenuElements]
                   : [
                       {
                         id: 'upload-cc',

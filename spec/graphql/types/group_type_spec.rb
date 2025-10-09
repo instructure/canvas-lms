@@ -174,7 +174,6 @@ describe Types::GroupType do
       let(:account) { @course.account }
 
       before(:once) do
-        account.enable_feature!(:assign_to_differentiation_tags)
         account.settings[:allow_assign_to_differentiation_tags] = { value: true }
         account.save!
         @non_collab_group_category = @course.group_categories.create!(name: "non-collaborative group category", non_collaborative: true)

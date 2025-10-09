@@ -49,6 +49,7 @@ export const COURSE_INSTRUCTORS_PAGINATED_QUERY = gql`
         hasPreviousPage
         startCursor
         endCursor
+        totalCount
       }
     }
   }
@@ -82,6 +83,7 @@ export interface CourseInstructorsPaginatedResponse {
       hasPreviousPage: boolean
       startCursor: string | null
       endCursor: string | null
+      totalCount: number | null
     }
   }
 }
@@ -97,6 +99,7 @@ export const fetchPaginatedCourseInstructors = async (
   hasPreviousPage: boolean
   endCursor: string | null
   startCursor: string | null
+  totalCount: number | null
 }> => {
   try {
     const response = await executeGraphQLQuery<CourseInstructorsPaginatedResponse>(
@@ -117,6 +120,7 @@ export const fetchPaginatedCourseInstructors = async (
         hasPreviousPage: false,
         endCursor: null,
         startCursor: null,
+        totalCount: null,
       }
     }
 
@@ -153,6 +157,7 @@ export const fetchPaginatedCourseInstructors = async (
       hasPreviousPage: pageInfo.hasPreviousPage,
       endCursor: pageInfo.endCursor,
       startCursor: pageInfo.startCursor,
+      totalCount: pageInfo.totalCount,
     }
   } catch (error) {
     console.error('Error fetching root-level paginated instructors:', error)

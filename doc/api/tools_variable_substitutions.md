@@ -884,6 +884,17 @@ With respect to the current course, returns the course ids of the courses from w
 ```
 1234
 ```
+## com.instructure.Course.rce_studio_embed_improvements
+Returns "true" if the RCE Studio embed improvements feature is enabled
+for the current course, or account context "false" otherwise.
+This allows LTI tools to adapt their UI based on Canvas feature flags.
+
+**Availability**: *always*  
+
+
+```
+"true"
+```
 ## Person.name.full
 Returns the full name of the launching user.
 
@@ -1300,6 +1311,15 @@ Returns the assignment_id of the assignment that was launched.
 
 ```
 1234
+```
+## Canvas.assignment.new_quizzes_type
+Returns the new_quizzes type of the assignment that was launched.
+
+**Availability**: *when launched as an assignment*  
+
+
+```
+"graded_quiz"
 ```
 ## Canvas.assignment.description
 Returns the assignment_description of the assignment that was launched.

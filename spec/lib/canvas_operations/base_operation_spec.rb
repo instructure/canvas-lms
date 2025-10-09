@@ -326,7 +326,7 @@ RSpec.describe CanvasOperations::BaseOperation do
       before { allow(Rails.env).to receive(:production?).and_return(true) }
 
       it "enqueues the operation without Progress tracking" do
-        expect(operation_instance).to receive(:log_message).with("Progress tracking is disabled; running operation without Progress tracking.").once
+        expect(operation_instance).to receive(:log_message).with("Progress tracking is disabled; running operation without Progress tracking.", level: :debug).once
 
         expect { run_later }.to change {
           Delayed::Job.where(

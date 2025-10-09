@@ -232,7 +232,7 @@ rce_a11y_resize:
 
 rce_studio_embed_improvements:
   state: hidden
-  applies_to: SiteAdmin
+  applies_to: Course
   display_name: RCE Studio Embed Improvements
   description: |-
     Enable RCE Studio Embed improvements to embedded content in the rich content editor.

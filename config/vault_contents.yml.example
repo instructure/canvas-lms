@@ -40,6 +40,8 @@ development:
 #       canvas_secret_alg: 'HS256'
       learn_platform_creds:
         learn_platform_basic_token: 'internaltest'
+        service_secret: 'your-secret-here'
+        service_name: 'your-name'
 #      canvas_cdn_creds:
 #        aws_access_key_id: <access_key_id>
 #        aws_secret_access_key: <secret_access_key>

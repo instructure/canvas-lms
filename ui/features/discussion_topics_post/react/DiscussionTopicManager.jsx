@@ -61,6 +61,8 @@ import {
   isSpeedGraderInTopUrl,
 } from './utils/constants'
 import {PinnedContainer} from './components/PinnedContainer'
+import {useTranslation} from './hooks/useTranslation'
+import {PreferredLanguageModal} from './components/PreferredLanguageModal'
 
 const I18n = createI18nScope('discussion_topics_post')
 const SEARCH_INPUT_SELECTOR = '#discussion-drawer-layout input[data-testid="search-filter"]'
@@ -271,6 +273,8 @@ const DiscussionTopicManager = props => {
     () => discussionTopicQuery.data?.legacyNode?.isAnnouncement,
     [discussionTopicQuery.data],
   )
+
+  useTranslation()
 
   usePathTransform(whenPendoReady, 'discussion_topics', 'announcements', isAnnouncement)
   useEventHandler(KeyboardShortcuts.ON_PREV_REPLY, () =>
@@ -640,6 +644,7 @@ const DiscussionTopicManager = props => {
             )
           }}
         />
+        <PreferredLanguageModal discussionTopicId={ENV.discussion_topic_id} />
       </DiscussionManagerUtilityContext.Provider>
     </SearchContext.Provider>
   )

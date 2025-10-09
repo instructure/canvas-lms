@@ -221,17 +221,6 @@ module VisibilitySqlHelper
       SQL
     end
 
-    def assign_to_differentiation_tags_enabled?(course_ids)
-      # alternatively this could throw a error if course_ids is nil. However, this feature flag check will go
-      # away once the feature is fully enabled.
-      return false unless course_ids.present?
-
-      account_ids = Course.where(id: course_ids).distinct.pluck(:account_id).uniq
-      accounts = Account.where(id: account_ids).to_a
-
-      accounts.any? { |account| account.feature_enabled?(:assign_to_differentiation_tags) }
-    end
-
     def full_section_with_left_joins_sql(filter_condition_sql:, id_column_name:, content_tag_type:)
       <<~SQL.squish
         /* join context modules */

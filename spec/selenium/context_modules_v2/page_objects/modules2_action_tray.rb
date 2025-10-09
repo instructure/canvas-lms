@@ -165,6 +165,14 @@ module Modules2ActionTray
     "[data-testid='add-item-indent-selector']"
   end
 
+  def move_module_tray_selector
+    "div[role='dialog'][aria-label='Move Module']"
+  end
+
+  def pre_save_relock_modal_selector
+    "[data-testid='pre-save-relock-modal']"
+  end
+
   #------------------------------ Elements ------------------------------
   def add_module_button
     f(add_module_button_selector)
@@ -321,6 +329,31 @@ module Modules2ActionTray
   def add_item_indent_select
     f(add_item_indent_select_selector)
   end
+
+  def move_tray_place_contents_listbox
+    f("[data-testid='select_position_listbox']")
+  end
+
+  def move_module_tray_reference_listbox
+    f("[data-testid='select_reference_listbox']")
+  end
+
+  def place_item_at_option(position)
+    fj("[role='option']:contains('#{position}')")
+  end
+
+  def cancel_tray_button
+    fxpath("//button[.//span[text()='Cancel']]")
+  end
+
+  def submit_move_to_button
+    fxpath("//button[.//span[text()='Move']]")
+  end
+
+  def close_tray_button
+    fxpath("//button[.//span[text()='Close']]")
+  end
+
   #------------------------------ Actions -------------------------------
 
   def click_custom_access_radio
@@ -375,5 +408,11 @@ module Modules2ActionTray
   def click_add_item_create_new_item_tab
     add_item_create_new_item_form_tab.click
     expect(create_learning_object_name_input).to be_displayed
+  end
+
+  def open_move_tray(module_id)
+    module_action_menu(module_id).click
+    module_item_action_menu_link("Move Module...").click
+    expect(f("body")).to contain_css(move_module_tray_selector)
   end
 end

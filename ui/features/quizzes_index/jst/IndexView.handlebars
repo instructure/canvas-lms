@@ -7,16 +7,26 @@
     {{#if features.instui_nav}}
       <h1 class="quizzes-header">{{#t}}Quizzes{{/t}}</h1>
     {{else}}
-      <label class="hidden-inline-text" for="searchTerm">{{#t "search_for_quiz"}}Search for Quiz{{/t}}</label>
-      <input id="searchTerm" placeholder="{{#t "search_for_quiz"}}Search for Quiz{{/t}}" value="" type="search" />
+      <div class="ic-Search">
+        <label for="searchTerm" class="screenreader-only">{{#t "search_for_quiz"}}Search for Quiz{{/t}}</label>
+        <div class="ic-Search-icon-container">
+          <i class="icon-search ic-Search-icon" aria-hidden="true"></i>
+        </div>
+        <input class="ic-Input ic-Search-input" id="searchTerm" type="search" name="search_term" data-view="inputFilter" value="" placeholder="{{#t "search_for_quiz"}}Search for Quiz{{/t}}">
+      </div>
     {{/if}}
   </div>
 
   {{#ifAny permissions.create permissions.manage}}
     <div class="header-bar-right {{#if features.instui_nav}}no-font-size{{/if}}">
       {{#if features.instui_nav}}
-        <label class="hidden-inline-text" for="searchTerm">{{#t "search_for_quiz"}}Search for Quiz{{/t}}</label>
-        <input id="searchTerm" placeholder="{{#t "quiz_search"}}Search...{{/t}}" value="" type="search" />
+        <div class="ic-Search">
+          <label for="searchTerm" class="screenreader-only">{{#t "search_for_quiz"}}Search for Quiz{{/t}}</label>
+          <div class="ic-Search-icon-container">
+            <i class="icon-search ic-Search-icon" aria-hidden="true"></i>
+          </div>
+          <input class="ic-Input ic-Search-input" id="searchTerm" type="search" name="search_term" data-view="inputFilter" value="" placeholder="{{#t "quiz_search"}}Search...{{/t}}">
+        </div>
       {{/if}}
 
       {{#unless features.instui_nav}}

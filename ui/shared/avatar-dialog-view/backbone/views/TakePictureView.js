@@ -23,6 +23,10 @@ import template from '../../jst/takePictureView.handlebars'
 import BlobFactory from '../../BlobFactory'
 
 export default class TakePictureView extends BaseView {
+  constructor(options) {
+    super(options)
+  }
+
   static initClass() {
     this.optionProperty('avatarSize')
 
@@ -69,7 +73,8 @@ export default class TakePictureView extends BaseView {
   }
 
   startMedia() {
-    return this.getUserMedia({video: true}, this.displayMedia.bind(this), $.noop)
+    const result = this.getUserMedia({video: true}, this.displayMedia.bind(this), $.noop)
+    return result
   }
 
   displayMedia(stream) {

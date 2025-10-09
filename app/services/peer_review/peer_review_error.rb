@@ -32,4 +32,7 @@ module PeerReview
   class StudentIdsRequiredError < PeerReviewError; end
   class SetTypeNotSupportedError < PeerReviewError; end
   class PeerReviewsNotEnabledError < PeerReviewError; end
+  class StudentIdsNotInCourseError < PeerReviewError; end
+  class GroupAssignmentRequiredError < PeerReviewError; end
+  class GroupNotFoundError < PeerReviewError; end
 end

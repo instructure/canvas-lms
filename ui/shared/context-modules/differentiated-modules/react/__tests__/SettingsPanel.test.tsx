@@ -23,11 +23,9 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import * as miscUtils from '../../utils/miscHelpers'
 import * as moduleUtils from '../../utils/moduleHelpers'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import RelockModulesDialog from '@canvas/relock-modules-dialog'
 import userEvent from '@testing-library/user-event'
 
 jest.mock('@canvas/do-fetch-api-effect')
-jest.mock('@canvas/relock-modules-dialog')
 
 jest.mock('../../utils/miscHelpers', () => {
   const originalModule = jest.requireActual('../../utils/miscHelpers')
@@ -289,14 +287,6 @@ describe('SettingsPanel', () => {
           message: 'Error updating Week 1 settings.',
         })
       })
-    })
-
-    it('calls the render function on the re-lock dialog', async () => {
-      // @ts-expect-error
-      doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
-      const {getByRole} = renderComponent()
-      getByRole('button', {name: 'Save'}).click()
-      await waitFor(() => expect(RelockModulesDialog.prototype.renderIfNeeded).toHaveBeenCalled())
     })
 
     it('calls onDidSubmit instead of onDismiss if passed', async () => {

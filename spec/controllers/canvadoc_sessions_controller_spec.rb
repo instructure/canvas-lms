@@ -294,8 +294,7 @@ describe CanvadocSessionsController do
         expect(opts[:preferred_plugins]).to eq [
           Canvadocs::RENDER_O365,
           Canvadocs::RENDER_PDFJS,
-          Canvadocs::RENDER_BOX,
-          Canvadocs::RENDER_CROCODOC
+          Canvadocs::RENDER_BOX
         ]
       end
 
@@ -311,8 +310,7 @@ describe CanvadocSessionsController do
         expect(arg1).to eq 1
         expect(opts[:preferred_plugins]).to eq [
           Canvadocs::RENDER_PDFJS,
-          Canvadocs::RENDER_BOX,
-          Canvadocs::RENDER_CROCODOC
+          Canvadocs::RENDER_BOX
         ]
       end
 
@@ -323,7 +321,7 @@ describe CanvadocSessionsController do
       allow(Attachment).to receive(:find).and_return(@attachment1)
       expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, **opts|
         expect(arg1).to eq 1
-        expect(opts[:preferred_plugins]).to eq [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC]
+        expect(opts[:preferred_plugins]).to eq [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX]
       end
 
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }

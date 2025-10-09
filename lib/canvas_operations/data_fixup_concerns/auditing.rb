@@ -63,6 +63,7 @@ module CanvasOperations
         # Results are chunked into 5MB pieces and stored in Attachments associated with
         # the operation's current context.
         def with_attachment_audits(&)
+          result = nil
           Tempfile.open do |tempfile|
             # Yield a lambda to record the changes in the audit Attachment.
             yield(lambda do |changes|
@@ -70,8 +71,9 @@ module CanvasOperations
               tempfile.flush
             end)
           ensure
-            write_report(tempfile)
+            result = write_report(tempfile)
           end
+          result
         end
 
         def write_report(tempfile)
@@ -87,17 +89,15 @@ module CanvasOperations
             while (chunk = tempfile.read(MAX_CHUNK_SIZE))
               chunk_file_name = "#{FIXUP_PREFIX}/#{file_name}/shards/#{switchman_shard.id}.part#{index}"
 
-              instfs_uuid = InstFS.direct_upload(
-                file_object: StringIO.new(chunk),
-                file_name: chunk_file_name
-              )
-
-              attachment = Attachment.create!(
+              attachment = Attachment.new(
                 context:,
-                instfs_uuid:,
                 filename: chunk_file_name,
                 content_type: "text/plain"
               )
+
+              Attachments::Storage.store_for_attachment(attachment, StringIO.new(chunk))
+
+              attachment.save!
 
               # Cleanup the attachment after the retention window has passed
               delay(

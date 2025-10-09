@@ -29,7 +29,15 @@ class YoutubeMigrationService
     CalendarEvent.name,
     Assignment.name,
     "CourseSyllabus",
-    Course.name
+    Course.name,
+  ].freeze
+  NEW_QUIZZES_RESOURCES = %w[
+    QuizzesNext::Quiz
+    QuizzesNext::Bank
+    QuizzesNext::Quiz:Item
+    QuizzesNext::Quiz:Stimulus
+    QuizzesNext::Bank:Item
+    QuizzesNext::Bank:Stimulus
   ].freeze
   QUESTION_RCE_FIELDS = %i[
     question_text
@@ -99,6 +107,23 @@ class YoutubeMigrationService
     Account.site_admin.feature_enabled?(:new_quizzes_scanning_youtube_links) && course.assignments.active.type_quiz_lti.any?
   end
 
+  def resource_group_key_for(embed = nil, resource_type: nil, id: nil, resource_group_key: nil)
+    if embed
+      resource_type      = embed[:resource_type]
+      id                 = embed[:id]
+      resource_group_key = embed[:resource_group_key]
+    end
+
+    if NEW_QUIZZES_RESOURCES.include?(resource_type)
+      YoutubeMigrationService.generate_resource_key(
+        prepare_new_quiz_resource_type(resource_type),
+        id
+      )
+    else
+      resource_group_key || YoutubeMigrationService.generate_resource_key(resource_type, id)
+    end
+  end
+
   def self.generate_resource_key(type, id)
     "#{type}|#{id}"
   end
@@ -117,7 +142,7 @@ class YoutubeMigrationService
 
   def validate_embed_exists_in_scan!(scan_id, embed)
     scan = YoutubeMigrationService.find_scan(course, scan_id)
-    resource_group_key = embed[:resource_group_key] || YoutubeMigrationService.generate_resource_key(embed[:resource_type], embed[:id])
+    resource_group_key = resource_group_key_for(embed)
 
     return if scan.results.blank? || scan.results[:resources].blank?
 
@@ -126,17 +151,27 @@ class YoutubeMigrationService
 
     embed_exists = resource[:embeds].any? do |scan_embed|
       scan_embed[:src] == embed[:src] &&
-        scan_embed[:field] == embed[:field] &&
+        scan_embed[:field].to_s == embed[:field].to_s &&
         scan_embed[:resource_type] == embed[:resource_type]
     end
 
     raise EmbedNotFoundError, "Embed not found in scan for resource: #{resource_group_key}" unless embed_exists
   end
 
-  def validate_supported_resource!(resource_type)
-    unless SUPPORTED_RESOURCES.include?(resource_type)
-      raise UnsupportedResourceTypeError, "Unsupported resource type: #{resource_type}"
+  def prepare_new_quiz_resource_type(resource_type)
+    case resource_type
+    when /QuizzesNext::Quiz/
+      "QuizzesNext::Quiz"
+    when /QuizzesNext::Bank/
+      "QuizzesNext::Bank"
+    else
+      resource_type
     end
+  end
+
+  def validate_supported_resource!(resource_type)
+    supported = SUPPORTED_RESOURCES.include?(resource_type) || NEW_QUIZZES_RESOURCES.include?(resource_type)
+    raise UnsupportedResourceTypeError, "Unsupported resource type: #{resource_type}" unless supported
   end
 
   def validate_resource_group_key!(resource_group_key)
@@ -147,6 +182,9 @@ class YoutubeMigrationService
   end
 
   def validate_resource_exists!(resource_type, resource_id)
+    # We don't store New Quizzes Data in Canvas, so we can't validate their existence
+    return true if NEW_QUIZZES_RESOURCES.include?(resource_type)
+
     case resource_type
     when "WikiPage"
       course.wiki_pages.find(resource_id)
@@ -553,6 +591,16 @@ class YoutubeMigrationService
     resource_id = embed[:id]
     field = embed[:field]
 
+    # If the resource is a New Quizzes resource, emit an event and return
+    if NEW_QUIZZES_RESOURCES.include?(resource_type)
+      Canvas::LiveEvents.convert_new_quiz_youtube_link(
+        Struct.new(:resource_id, :resource_type, :src, :field, :new_html).new(
+          embed[:content_id], resource_type, embed[:src], field, new_html
+        )
+      )
+      return
+    end
+
     case resource_type
     when "WikiPage"
       page = course.wiki_pages.find(resource_id)
@@ -644,14 +692,16 @@ class YoutubeMigrationService
   end
 
   def mark_embed_as_converted(scan_progress, embed)
-    key = embed[:resource_group_key] || YoutubeMigrationService.generate_resource_key(embed[:resource_type], embed[:id])
+    key = resource_group_key_for(embed)
     resource = scan_progress.results[:resources][key]
     found_embed, index = resource[:embeds].each_with_index.find do |resource_embed, _|
-      embed[:path] == resource_embed[:path] &&
-        embed[:field] == resource_embed[:field] &&
-        embed[:resource_type] == resource_embed[:resource_type] &&
-        embed[:id] == resource_embed[:id] &&
-        embed[:resource_group_key] == resource_embed[:resource_group_key]
+      embed[:path].to_s == resource_embed[:path].to_s &&
+        embed[:field].to_s == resource_embed[:field].to_s &&
+        embed[:resource_type].to_s == resource_embed[:resource_type].to_s &&
+        embed[:id].to_s == resource_embed[:id].to_s &&
+        embed[:resource_group_key].to_s == resource_embed[:resource_group_key].to_s &&
+        (embed[:content_id].to_s.presence || "") ==
+          (resource_embed[:content_id].to_s.presence || "")
     end
 
     if found_embed
@@ -711,5 +761,18 @@ class YoutubeMigrationService
                                message: "Error processing new quizzes scan update"
                              })
     end
+  end
+
+  def reset_scan_status
+    stuck_progress = Progress.find_by(tag: SCAN_TAG, context: course, workflow_state: "waiting_for_external_tool")
+    return unless stuck_progress
+
+    results = (stuck_progress.results || {}).dup
+    results[:new_quizzes_scan_status] = "failed"
+    results[:completed_at] = Time.now.utc
+
+    stuck_progress.set_results(results)
+
+    stuck_progress.complete!
   end
 end

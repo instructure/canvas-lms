@@ -199,24 +199,16 @@ describe('ProfileShow', () => {
   })
 
   describe('profile update notifications', () => {
-    it('shows success message when success container is present', () => {
-      // Arrange
-      container.innerHTML = '<div id="profile_alert_holder_success"></div>'
-      view = new ProfileShow()
-
-      // Assert
-      expect(document.querySelector('#profile_alert_holder_success').textContent).toBe(
+    it('shows success message when success container is present', async () => {
+      view.renderAlert('Profile has been saved successfully', 'error')
+      expect(document.querySelector('#flashalert_message_holder').textContent).toContain(
         'Profile has been saved successfully',
       )
     })
 
-    it('shows failure message when failed container is present', () => {
-      // Arrange
-      container.innerHTML = '<div id="profile_alert_holder_failed"></div>'
-      view = new ProfileShow()
-
-      // Assert
-      expect(document.querySelector('#profile_alert_holder_failed').textContent).toBe(
+    it('shows failure message when failed container is present', async () => {
+      view.renderAlert('Profile save was unsuccessful', 'error')
+      expect(document.querySelector('#flashalert_message_holder').textContent).toContain(
         'Profile save was unsuccessful',
       )
     })

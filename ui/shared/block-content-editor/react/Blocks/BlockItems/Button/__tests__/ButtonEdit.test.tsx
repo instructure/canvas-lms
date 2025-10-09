@@ -23,10 +23,17 @@ import {ButtonEdit} from '../ButtonEdit'
 import {ButtonData} from '../types'
 
 const mockOpenSettingsTray = jest.fn()
-jest.mock('../../../../hooks/useOpenSettingsTray', () => ({
-  useOpenSettingsTray: () => ({
-    openSettingsTray: mockOpenSettingsTray,
+jest.mock('../../../../hooks/useSettingsTray', () => ({
+  useSettingsTray: () => ({
+    open: mockOpenSettingsTray,
+    close: jest.fn(),
   }),
+}))
+
+const mockUseNode = jest.fn()
+jest.mock('@craftjs/core', () => ({
+  ...jest.requireActual('@craftjs/core'),
+  useNode: () => mockUseNode(),
 }))
 
 const defaultButtonData: ButtonData = {
@@ -44,8 +51,11 @@ const defaultProps = {
   isFullWidth: false,
 }
 
+const expectedNodeId = 'node-123'
+
 beforeEach(() => {
   jest.clearAllMocks()
+  mockUseNode.mockReturnValue({id: expectedNodeId})
 })
 
 describe('ButtonEdit', () => {
@@ -64,6 +74,6 @@ describe('ButtonEdit', () => {
 
     const button = screen.getByRole('button')
     await user.click(button)
-    expect(mockOpenSettingsTray).toHaveBeenCalled()
+    expect(mockOpenSettingsTray).toHaveBeenCalledWith(expectedNodeId)
   })
 })

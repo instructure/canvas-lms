@@ -90,7 +90,7 @@ class ContentZipper
 
     make_zip_tmpdir(filename) do |zip_name|
       @logger.debug("creating #{zip_name}")
-      Zip::File.open(zip_name, Zip::File::CREATE) do |zipfile|
+      Zip::File.open(zip_name, create: true) do |zipfile|
         count = submissions.length
         # prevents browser hangs when there are no submissions to download
         mark_successful! if count == 0
@@ -166,7 +166,7 @@ class ContentZipper
     make_zip_tmpdir(portfolio.name) do |zip_name|
       index = 0
       count = all_attachments.length + 2
-      Zip::File.open(zip_name, Zip::File::CREATE) do |zipfile|
+      Zip::File.open(zip_name, create: true) do |zipfile|
         update_progress(zip_attachment, index, count)
         portfolio_entries.each do |entry|
           # if filename > 180 characters (allows 75 character buffer for the unique slug)
@@ -214,7 +214,7 @@ class ContentZipper
     filename = "#{folder.context.short_name}-#{folder.name} files"
     make_zip_tmpdir(filename) do |zip_name|
       @logger.debug("creating #{zip_name}")
-      Zip::File.open(zip_name, Zip::File::CREATE) do |zipfile|
+      Zip::File.open(zip_name, create: true) do |zipfile|
         @logger.debug("zip_name: #{zip_name}")
         process_folder(folder, zipfile)
       end

@@ -29,7 +29,9 @@ export function Component(): JSX.Element | null {
   const moduleRef = useRef<AmsModule | null>(null)
 
   React.useEffect(() => {
-    if (!ENV.FEATURES.ams_service || !containerRef.current) {
+    console.log('ENV: ', ENV.FEATURES)
+
+    if (!ENV.FEATURES.ams_root_account_integration || !containerRef.current) {
       return
     }
 

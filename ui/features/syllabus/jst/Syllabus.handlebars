@@ -5,12 +5,12 @@
   class="date detail_list {{#if passed}} date_passed{{/if}}{{#if date}} events_{{strftime date "%Y_%m_%d"}}{{/if}} syllabus_{{type}} {{#if subtype}}assignment_type_{{subtype}}{{/if}} related-{{related_id}}{{#if override}} special_date{{/if}}"
   data-workflow-state="{{workflow_state}}">
   {{#if @first}}
-  <td scope="row" rowspan="{{eventCount}}" valign="top" class="day_date"
+  <th scope="row" rowspan="{{eventCount}}" valign="top" class="day_date"
     data-date="{{#if date}}{{strftime date "%Y_%m_%d"}}{{/if}}">
     {{#if orig_date}}
     {{tDateToString orig_date "medium_with_weekday"}}
     {{/if}}
-  </td>
+  </th>
   {{/if}}
   <td class="name{{#unless last}} not_last{{/unless}}">
     {{#ifEqual type 'sub_assignment' }}

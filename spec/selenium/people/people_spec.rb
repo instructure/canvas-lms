@@ -370,7 +370,6 @@ describe "people" do
     end
 
     it "shows selection checkboxes for teachers when the allow_assign_to_differentiation_tags setting is ON" do
-      Account.default.enable_feature! :assign_to_differentiation_tags
       Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
       Account.default.save!
       Account.default.reload
@@ -1051,7 +1050,6 @@ describe "people" do
         course_with_teacher active_user: true, active_course: true, active_enrollment: true, name: "Mrs. Commanderson"
         @student = create_user("student@test.com")
         enroll_student(@student)
-        Account.default.enable_feature! :assign_to_differentiation_tags
         Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
         Account.default.save!
         Account.default.reload
@@ -1061,13 +1059,12 @@ describe "people" do
         user_session @teacher
       end
 
-      it "renders the Manage Tags Button if the FF is on" do
+      it "renders the Manage Tags Button if the setting is on" do
         get "/courses/#{@course.id}/users"
         expect(fj("button:contains('Manage Tags')")).to be_displayed
       end
 
-      it "does not render the Manage Tags Button if the FF is off" do
-        Account.default.disable_feature! :assign_to_differentiation_tags
+      it "does not render the Manage Tags Button if the setting is off" do
         Account.default.settings[:allow_assign_to_differentiation_tags] = { value: false }
         Account.default.save!
         Account.default.reload

@@ -24,6 +24,7 @@ import {IconCoursesLine, IconInfoLine, IconSubaccountsLine} from '@instructure/u
 import {Flex} from '@instructure/ui-flex'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
+import {Link} from '@instructure/ui-link'
 import {renderExceptionCounts} from './renderExceptionCounts'
 import {CourseId} from '../../../model/CourseId'
 import {AccountId} from '../../../model/AccountId'
@@ -83,6 +84,9 @@ export const ContextCard = ({
 }: ContextProps) => {
   const marginLeft = depth * 20 + 'px'
 
+  const contextUrl =
+    typeof account_id !== 'undefined' ? `/accounts/${account_id}` : `/courses/${course_id}`
+
   return (
     <div style={{marginLeft}}>
       <View
@@ -102,7 +106,11 @@ export const ContextCard = ({
           <Flex.Item as="div" shouldShrink>
             <Flex as="div" margin="0" alignItems="center">
               <Heading level="h4" margin="0 xx-small 0 0">
-                <Text weight="bold">{context_name}</Text>
+                <Text weight="bold">
+                  <Link href={contextUrl} data-pendo="lti-registrations-availability-context-link">
+                    {context_name}
+                  </Link>
+                </Text>
               </Heading>
               {typeof available !== 'undefined' ? (
                 <Tag text={available ? I18n.t('Available') : I18n.t('Not Available')} />

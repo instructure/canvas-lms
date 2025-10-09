@@ -4136,7 +4136,7 @@ class CoursesController < ApplicationController
 
     return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
 
-    embed = params.require(:embed).permit(:width, :height, :field, :id, :path, :resource_type, :src, :resource_group_key).to_h.with_indifferent_access
+    embed = params.require(:embed).permit(:width, :height, :field, :id, :content_id, :path, :resource_type, :src, :resource_group_key).to_h.with_indifferent_access
     embed[:id] = embed[:id].to_i
     embed[:field] = embed[:field].to_sym
     scan_id = params.require(:scan_id)
@@ -4201,8 +4201,10 @@ class CoursesController < ApplicationController
 
       render json: { success: true }, status: :ok
     rescue ActiveRecord::RecordNotFound
+      reset_progress_with_service if @context
       render json: { error: "Youtube Scan not found" }, status: :not_found
     rescue
+      reset_progress_with_service if @context
       render json: { error: "An Error occured during updating the youtube scan results" }, status: :internal_server_error
     end
   end
@@ -4570,5 +4572,12 @@ class CoursesController < ApplicationController
     ConditionalRelease::Service.delay_if_production(priority: Delayed::LOW_PRIORITY,
                                                     n_strand: ["conditional_release_unassignment", @course.global_root_account_id])
                                .release_mastery_paths_content_in_course(@course)
+  end
+
+  def reset_progress_with_service
+    service = YoutubeMigrationService.new(@context)
+    service.reset_scan_status
+  rescue => e
+    Rails.logger.error("reset_progress failed for course_id=#{@context.id}: #{e.class} #{e.message}")
   end
 end

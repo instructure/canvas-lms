@@ -5,6 +5,13 @@
 # ensure it is added to the correct places in TS, Ruby, and the docs (if
 # applicable)
 
+### 1EdTech LTI Registrations ###
+- scope: https://purl.imsglobal.org/spec/lti-reg/scope/registration.readonly
+  description: Can view LTI registrations associated with the tool
+
+- scope: https://purl.imsglobal.org/spec/lti-reg/scope/registration
+  description: Can send automatic updates to be approved by an Administrator
+
 ### 1EdTech Names and Role Provisioning Services (AGS) ###
 - scope: https://purl.imsglobal.org/spec/lti-ags/scope/lineitem
   description: Can create and view assignment data in the gradebook associated with the tool

@@ -1415,7 +1415,6 @@ describe Types::UserType do
 
     context "differentiation tags" do
       before do
-        Account.default.enable_feature! :assign_to_differentiation_tags
         Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
         Account.default.save!
         Account.default.reload
@@ -1450,7 +1449,6 @@ describe Types::UserType do
         end
 
         it "does not return differentiation tags when flag is off" do
-          Account.default.disable_feature! :assign_to_differentiation_tags
           Account.default.settings[:allow_assign_to_differentiation_tags] = { value: false }
           Account.default.save!
           Account.default.reload
@@ -1880,11 +1878,45 @@ describe Types::UserType do
     end
 
     describe "with the limit argument" do
+      before do
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
+      end
+
       it "returns a limited number of results" do
         comment_bank_item_model(user: @teacher, context: @course, comment: "2nd great comment!")
         expect(
           type.resolve("commentBankItemsConnection(limit: 1) { nodes { comment } }").length
         ).to eq 1
+      end
+
+      context "with send_metrics_for_comment_bank_items_connection_limit_used ON" do
+        before do
+          Account.site_admin.enable_feature!(:send_metrics_for_comment_bank_items_connection_limit_used)
+        end
+
+        it "reports metrics when limit is used" do
+          comment_bank_item_model(user: @teacher, context: @course, comment: "2nd great comment!")
+          type.resolve("commentBankItemsConnection(limit: 1) { nodes { comment } }")
+          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
+            "graphql.user_type.comment_bank_items_connection.limit_used",
+            { tags: { domain: "test.host", user_id: @teacher.global_id } }
+          )
+        end
+      end
+
+      context "with send_metrics_for_comment_bank_items_connection_limit_used OFF" do
+        before do
+          Account.site_admin.disable_feature!(:send_metrics_for_comment_bank_items_connection_limit_used)
+        end
+
+        it "does not report metrics when limit is used" do
+          comment_bank_item_model(user: @teacher, context: @course, comment: "2nd great comment!")
+          type.resolve("commentBankItemsConnection(limit: 1) { nodes { comment } }")
+          expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with(
+            "graphql.user_type.comment_bank_items_connection.limit_used",
+            { tags: { domain: "test.host", user_id: @teacher.global_id } }
+          )
+        end
       end
     end
 
@@ -1914,6 +1946,8 @@ describe Types::UserType do
   end
 
   context "commentBankItemsCount" do
+    specs_require_sharding
+
     before do
       @comment_bank_item_one = comment_bank_item_model(user: @teacher, context: @course, comment: "great comment!")
       @comment_bank_item_two = comment_bank_item_model(user: @teacher, context: @course, comment: "another comment!")
@@ -1935,6 +1969,17 @@ describe Types::UserType do
     it "ignores deleted comment bank items" do
       @comment_bank_item_one.destroy
       expect(type.resolve("commentBankItemsCount")).to eq 1
+    end
+
+    it "accounts for comment bank items on different shards" do
+      @shard1.activate do
+        account = Account.create!(name: "new shard account")
+        @course2 = course_factory(account:)
+        @course2.enroll_user(@teacher)
+        @comment_bank_item_three = comment_bank_item_model(user: @teacher, context: @course2, comment: "shard 2 comment")
+      end
+
+      expect(type.resolve("commentBankItemsCount")).to eq 3
     end
   end
 

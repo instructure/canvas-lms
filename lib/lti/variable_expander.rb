@@ -1192,6 +1192,17 @@ module Lti
                        -> { lti_helper.previous_course_ids },
                        COURSE_GUARD
 
+    # Returns "true" if the RCE Studio embed improvements feature is enabled
+    # for the current course, or account context "false" otherwise.
+    # This allows LTI tools to adapt their UI based on Canvas feature flags.
+    # @example
+    #   ```
+    #   "true"
+    #   ```
+    register_expansion "com.instructure.Course.rce_studio_embed_improvements",
+                       [],
+                       -> { @context.feature_enabled?(:rce_studio_embed_improvements).to_s }
+
     # Returns the full name of the launching user.
     # @launch_parameter lis_person_name_full
     # @example
@@ -1742,6 +1753,17 @@ module Lti
     register_expansion "Canvas.assignment.id",
                        [],
                        -> { @assignment.id },
+                       ASSIGNMENT_GUARD
+
+    # Returns the new_quizzes type of the assignment that was launched
+    #
+    # @example
+    #   ```
+    #   "graded_quiz"
+    #   ```
+    register_expansion "Canvas.assignment.new_quizzes_type",
+                       [],
+                       -> { @assignment.new_quizzes_type },
                        ASSIGNMENT_GUARD
 
     # Returns the assignment_description of the assignment that was launched.

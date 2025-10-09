@@ -49,7 +49,6 @@ const buildDefaultProps = (overrides: Partial<ComponentProps> = {}): ComponentPr
     _id: 'discussion1',
     id: 'discussion1',
     type: 'Discussion',
-    published: false,
   },
   masterCourseRestrictions: null,
   published: false,
@@ -106,7 +105,6 @@ describe('ModuleItemActionPanel', () => {
           _id: 'file1',
           id: 'file1',
           type: 'File',
-          published: true,
           fileState: '',
         },
       }),
@@ -124,7 +122,6 @@ describe('ModuleItemActionPanel', () => {
           _id: 'discussion1',
           id: 'discussion1',
           type: 'Discussion',
-          published: false,
         },
       }),
     )

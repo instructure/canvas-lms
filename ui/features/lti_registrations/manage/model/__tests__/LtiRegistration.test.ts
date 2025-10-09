@@ -114,21 +114,6 @@ describe('LtiRegistration', () => {
       expect(result).toMatchObject(legacyConfig)
     })
 
-    it('allows placement-specific settings', () => {
-      const extraPlacement = {
-        placement: 'ActivityAssetProcessor',
-        eula: {
-          enabled: true,
-          target_link_uri: 'https://example.com/123',
-          custom_fields: {foo: 'bar'},
-        },
-      }
-      const placements = [{}, extraPlacement]
-      const legacyConfig = _.merge(baseConfig, {extensions: [{settings: {placements}}]})
-      const result = ZLtiLegacyConfiguration.parse(legacyConfig)
-      expect(result).toMatchObject(legacyConfig)
-    })
-
     it('accepts the string "true" for the enabled attribute', () => {
       const usingString = _.merge(baseConfig, {
         extensions: [

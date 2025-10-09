@@ -42,10 +42,11 @@ class PeerReview::DateOverrideCommonService < ApplicationService
       if id.present? && set_type.nil?
         existing_override = existing_overrides[id]
         validate_override_exists(existing_override)
+
         set_type = existing_override.set_type
       end
 
-      validate_set_type_present(set_type)
+      validate_set_type_required(set_type)
       validate_set_type_supported(set_type, services)
 
       service = services.fetch(set_type)

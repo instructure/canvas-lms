@@ -409,6 +409,8 @@ describe('CourseWorkCombinedWidget', () => {
   })
 
   it('handles error state', async () => {
+    jest.spyOn(console, 'error').mockImplementation()
+
     server.use(
       graphql.query('GetUserCourseStatistics', () => {
         return HttpResponse.json({
@@ -435,7 +437,7 @@ describe('CourseWorkCombinedWidget', () => {
       http.post('/api/graphql', async ({request}) => {
         const body = (await request.json()) as {query: string; variables: any}
         if (body.query.includes('GetUserCourseWork')) {
-          return HttpResponse.json({errors: [{message: 'Internal Server Error'}]}, {status: 500})
+          return HttpResponse.json({errors: [{message: 'Internal Server Error'}]}, {status: 200})
         }
         return new Response('Query not handled', {status: 404})
       }),

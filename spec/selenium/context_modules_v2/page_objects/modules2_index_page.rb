@@ -58,6 +58,18 @@ module Modules2IndexPage
     "[data-testid='edit-item-modal']"
   end
 
+  def edit_item_submit_button_selector
+    "form[data-testid='edit-item-modal'] button[type='submit']"
+  end
+
+  def edit_item_modal_title_selector
+    "form[data-testid='edit-item-modal'] input[data-testid='edit-modal-title']"
+  end
+
+  def edit_item_modal_new_tab_checkbox_selector
+    "form[data-testid='edit-item-modal'] input[data-testid='edit-modal-new-tab']"
+  end
+
   def expand_all_modules_button_selector
     "button[aria-label='Expand All Modules']"
   end
@@ -515,6 +527,18 @@ module Modules2IndexPage
     edit_item_modal.find_element(:css, "input[data-testid='edit-modal-url']").attribute("value")
   end
 
+  def edit_item_modal_submit_button
+    f(edit_item_submit_button_selector)
+  end
+
+  def edit_item_modal_title_input
+    f(edit_item_modal_title_selector)
+  end
+
+  def edit_item_modal_new_tab_checkbox
+    f(edit_item_modal_new_tab_checkbox_selector)
+  end
+
   def expand_all_modules_button
     f(expand_all_modules_button_selector)
   end
@@ -855,34 +879,6 @@ module Modules2IndexPage
     fxpath("//label[span[text()='Select Reference Item']]//input[@role='combobox']")
   end
 
-  def place_item_at_top_option
-    fj("[role='option']:contains('At the top')")
-  end
-
-  def place_item_at_bottom_option
-    fj("[role='option']:contains('At the bottom')")
-  end
-
-  def place_item_before_option
-    fj("[role='option']:contains('Before...')")
-  end
-
-  def place_item_after_option
-    fj("[role='option']:contains('After...')")
-  end
-
-  def cancel_tray_button
-    fxpath("//button[.//span[text()='Cancel']]")
-  end
-
-  def submit_move_to_button
-    fxpath("//button[.//span[text()='Move']]")
-  end
-
-  def close_tray_button
-    fxpath("//button[.//span[text()='Close']]")
-  end
-
   def tab_create_item
     f(tab_create_item_selector)
   end
@@ -915,7 +911,15 @@ module Modules2IndexPage
     element_exists?(quiz_engine_option_selector)
   end
 
+  def all_modules
+    ff('[data-rbd-droppable-id="modules-list"] [data-module-id]')
+  end
+
   #------------------------------ Actions -------------------------------
+
+  def list_all_module_ids
+    @module_ids = all_modules.map { |module_element| module_element.attribute("data-module-id") }
+  end
 
   def assignments_due_button_exists?
     element_exists?(assignments_due_button_selector)

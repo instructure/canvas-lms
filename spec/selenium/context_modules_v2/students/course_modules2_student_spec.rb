@@ -644,6 +644,24 @@ describe "context modules", :ignore_js_errors do
         expect(module_header_due_date_exists?(@module1.id)).to be_falsey
       end
     end
+
+    it "navigates to the module item's URL when clicking the item container" do
+      assignment = @course.assignments.create!(
+        title: "Clickable assignment",
+        submission_types: "online_text_entry",
+        points_possible: 10,
+        workflow_state: "published"
+      )
+      module_item = @module1.add_item(type: "assignment", id: assignment.id)
+
+      go_to_modules
+      expect(student_modules_container).to be_displayed
+      module_header_expand_toggles[0].click
+
+      module_item_by_id(module_item.id).click
+
+      expect(driver.current_url).to include("/courses/#{@course.id}/assignments/#{assignment.id}")
+    end
   end
 
   context "module locking" do

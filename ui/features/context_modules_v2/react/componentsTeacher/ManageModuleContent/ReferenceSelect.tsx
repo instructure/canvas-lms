@@ -85,6 +85,7 @@ const ReferenceSelect: React.FC<ReferenceSelectProps> = ({
           assistiveText={I18n.t('Select a module')}
           value={selectedItem}
           onChange={onItemChange}
+          data-testid="select_reference_listbox"
         >
           {modules
             .filter(module => module._id !== sourceModuleId)

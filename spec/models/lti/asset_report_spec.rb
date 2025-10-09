@@ -152,7 +152,7 @@ RSpec.describe Lti::AssetReport do
     end
 
     it "returns a hash with the report's details" do
-      expect(subject[:_id]).to eq(report.id)
+      expect(subject[:_id]).to eq(report.id.to_s)
       expect(subject[:title]).to eq("My cool report")
       expect(subject[:comment]).to eq("What a great report")
       expect(subject[:result]).to eq("8/10")

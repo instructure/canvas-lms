@@ -37,21 +37,17 @@ const renderComponent = (props?: Partial<FilePreviewProps>) => {
 }
 
 describe('File Preview', () => {
+  it('renders media player for media files', () => {
+    renderComponent()
+    const mediaPlayer = screen.getByTestId('media-player')
+    expect(mediaPlayer).toBeInTheDocument()
+  })
+
   it('renders preview for non-media files', () => {
     const item = FAKE_FILES[2]
     renderComponent({item})
     const iframe = screen.getByTitle(`Preview for file: ${item.display_name}`)
     expect(iframe).toBeInTheDocument()
-  })
-
-  it('renders no preview for non-previewable mime types', () => {
-    const nonPreviewableFile = {
-      ...FAKE_FILES[2],
-      mime_class: 'application/zip',
-    }
-    renderComponent({item: nonPreviewableFile})
-    const noPreview = screen.getByText('No Preview Available')
-    expect(noPreview).toBeInTheDocument()
   })
 
   it('renders no preview when no preview_url', () => {
@@ -62,11 +58,5 @@ describe('File Preview', () => {
     renderComponent({item: nonPreviewableFile})
     const noPreview = screen.getByText('No Preview Available')
     expect(noPreview).toBeInTheDocument()
-  })
-
-  it('renders media player for media files', () => {
-    renderComponent()
-    const mediaPlayer = screen.getByTestId('media-player')
-    expect(mediaPlayer).toBeInTheDocument()
   })
 })

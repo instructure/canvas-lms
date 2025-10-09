@@ -16,42 +16,63 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
-import {LtiAssetReportWithAsset} from '@canvas/lti-asset-processor/model/AssetReport'
 import ready from '@instructure/ready'
-import {createRoot} from 'react-dom/client'
-import OnlineUploadAssetReportStatusLink from './OnlineUploadAssetReportStatusLink'
+import {
+  useShouldShowLtiAssetReportsForStudent,
+  useLtiAssetProcessorsAndReportsForStudent,
+} from '@canvas/lti-asset-processor/react/hooks/useLtiAssetProcessorsAndReportsForStudent'
 
-declare const ENV: {
-  ASSET_REPORTS?: LtiAssetReportWithAsset[]
-  ASSET_PROCESSORS?: ExistingAttachedAssetProcessor[]
-  ASSIGNMENT_NAME?: string
+import {sendOpenAssetReportModalMessage} from '@canvas/lti-asset-processor/react/StudentAssetReportModalWrapper'
+import LtiAssetReportStatus from '@canvas/lti-asset-processor/react/LtiAssetReportStatus'
+import {z} from 'zod'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {renderAPComponent} from '@canvas/lti-asset-processor/react/util/renderToElements'
+
+const I18n = createI18nScope('lti_asset_reports_for_student')
+
+/**
+ * This code, which renders Asset Report statuses, is used inside an iframe in
+ * case of online_upload in old student submission view, but we want the Report
+ * modal to open in the main window. To do this, we post a message to the main
+ * window which will then open the modal. The message is handled by the
+ * StudentAssetReportModalWrapper component.
+ * (ui/features/submissions/react/StudentAssetReportModalWrapper.tsx)
+ */
+
+const ZAttachmentAssetReportStatusProps = z.object({
+  submissionId: z.string(),
+  submissionType: z.string(),
+  attachmentId: z.string(),
+})
+export default function AttachmentAssetReportStatus(
+  props: z.infer<typeof ZAttachmentAssetReportStatusProps>,
+) {
+  const data = useLtiAssetProcessorsAndReportsForStudent(props)
+  if (!data) return null
+  const openModal = () => sendOpenAssetReportModalMessage(data)
+  return <LtiAssetReportStatus reports={data.reports} openModal={openModal} />
+}
+
+const ZDocumentProcessorsHeaderProps = z.object({
+  submissionId: z.string(),
+  submissionType: z.string(),
+})
+function DocumentProcessorsHeader(submission: z.infer<typeof ZDocumentProcessorsHeaderProps>) {
+  const shouldShow = useShouldShowLtiAssetReportsForStudent(submission)
+  return shouldShow ? <>{I18n.t('Document Processors')}</> : null
 }
 
 ready(() => {
-  const reports = ENV['ASSET_REPORTS']
-  const assetProcessors = ENV['ASSET_PROCESSORS'] || []
-  const assignmentName = ENV['ASSIGNMENT_NAME'] || ''
-
-  // if lti_asset_processor FF is off, reports will be undefined
-  if (!reports || !assetProcessors || !assetProcessors.length) {
-    return
-  }
-
-  const containers = document.querySelectorAll<HTMLDivElement>('.asset_report_status_container')
-  containers.forEach(container => {
-    const attachmentId = container.dataset['attachmentId']
-    if (!attachmentId) {
-      console.warn('No attachmentId found in asset report status container')
-      return
-    }
-    createRoot(container).render(
-      <OnlineUploadAssetReportStatusLink
-        assignmentName={assignmentName}
-        assetProcessors={assetProcessors}
-        assetReports={reports}
-        attachmentId={attachmentId}
-      />,
+  const nRendered = renderAPComponent(
+    '.asset-report-status-container',
+    AttachmentAssetReportStatus,
+    ZAttachmentAssetReportStatusProps,
+  )
+  if (nRendered > 0) {
+    renderAPComponent(
+      '.asset-report-status-header',
+      DocumentProcessorsHeader,
+      ZDocumentProcessorsHeaderProps,
     )
-  })
+  }
 })

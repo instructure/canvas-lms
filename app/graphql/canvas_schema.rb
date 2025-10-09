@@ -112,6 +112,7 @@ class CanvasSchema < GraphQL::Schema
     when Setting then Types::InternalSettingType
     when AssessmentRequest then Types::AssessmentRequestType
     when UsageRights then Types::UsageRightsType
+    when ScheduledPost then Types::ScheduledPostType
     end
   end
 

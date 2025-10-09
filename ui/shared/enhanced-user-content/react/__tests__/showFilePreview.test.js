@@ -33,7 +33,7 @@ $.flashError = jest.fn()
 
 // captured from a real query
 const fauxFile =
-  '{"id":"2282","uuid":"euqlFIGlaDneUO3hdN7n6NRkpRuImBhxSgy4Otev","folder_id":135,"display_name":"client-app-files.txt","filename":"client-app-files.txt","upload_status":"success","content-type":"text/plain","url":"http://localhost:3000/files/2282/download?download_frd=1","size":201105,"created_at":"2021-02-01T15:07:40Z","updated_at":"2021-02-01T15:07:43Z","unlock_at":null,"locked":false,"hidden":true,"lock_at":null,"hidden_for_user":false,"thumbnail_url":null,"modified_at":"2021-02-01T15:07:40Z","mime_class":"text","media_entry_id":null,"locked_for_user":false,"canvadoc_session_url":null,"crocodoc_session_url":null}'
+  '{"id":"2282","uuid":"euqlFIGlaDneUO3hdN7n6NRkpRuImBhxSgy4Otev","folder_id":135,"display_name":"client-app-files.txt","filename":"client-app-files.txt","upload_status":"success","content-type":"text/plain","url":"http://localhost:3000/files/2282/download?download_frd=1","size":201105,"created_at":"2021-02-01T15:07:40Z","updated_at":"2021-02-01T15:07:43Z","unlock_at":null,"locked":false,"hidden":true,"lock_at":null,"hidden_for_user":false,"thumbnail_url":null,"modified_at":"2021-02-01T15:07:40Z","mime_class":"text","media_entry_id":null,"locked_for_user":false,"canvadoc_session_url":null}'
 
 const server = setupServer()
 

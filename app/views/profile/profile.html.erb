@@ -60,6 +60,7 @@
   <% if @user_data[:can_edit_avatar] %>
     <%= avatar(@user, url: '#', edit: true, class: "profile_pic_link #{@user.avatar_state}",
         sr_content: t('Click to change profile picture for %{display_name}', :display_name => @user.short_name)) %>
+    <div id="avatar-modal-mount"></div>
   <% else %>
     <%= avatar(@user, url: nil, edit: false, class: "profile_pic") %>
   <% end %>

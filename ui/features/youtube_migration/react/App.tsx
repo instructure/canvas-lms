@@ -46,6 +46,8 @@ import {
   IconDiscussionLine,
   IconDocumentLine,
   IconCheckSolid,
+  IconQuizLine,
+  IconBankLine,
 } from '@instructure/ui-icons'
 import {Modal} from '@instructure/ui-modal'
 import {type CanvasProgress} from '@canvas/progress/ProgressHelpers'
@@ -224,6 +226,28 @@ const getResultType = (type: string) => {
           </Flex.Item>
           <Flex.Item>
             <Text>{I18n.t('Discussion')}</Text>
+          </Flex.Item>
+        </Flex>
+      )
+    case 'QuizzesNext::Quiz':
+      return (
+        <Flex>
+          <Flex.Item margin={margin}>
+            <IconQuizLine />
+          </Flex.Item>
+          <Flex.Item>
+            <Text>{I18n.t('New Quiz')}</Text>
+          </Flex.Item>
+        </Flex>
+      )
+    case 'QuizzesNext::Bank':
+      return (
+        <Flex>
+          <Flex.Item margin={margin}>
+            <IconBankLine />
+          </Flex.Item>
+          <Flex.Item>
+            <Text>{I18n.t('Item Bank')}</Text>
           </Flex.Item>
         </Flex>
       )

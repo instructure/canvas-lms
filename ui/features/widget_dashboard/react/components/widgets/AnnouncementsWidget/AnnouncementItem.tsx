@@ -104,8 +104,8 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcementItem, fi
     const label = isLoading
       ? I18n.t('Updating...')
       : isRead
-        ? I18n.t('Mark as unread')
-        : I18n.t('Mark as read')
+        ? I18n.t('Mark %{title} as unread', {title: announcement.title})
+        : I18n.t('Mark %{title} as read', {title: announcement.title})
 
     const testId = isLoading
       ? `updating-${announcement.id}`
@@ -127,6 +127,7 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcementItem, fi
         onClick={isLoading ? undefined : handleToggleReadState}
         disabled={isLoading}
         screenReaderLabel={label}
+        aria-pressed={isLoading ? undefined : isRead}
         data-testid={testId}
       >
         {content}
@@ -204,16 +205,6 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcementItem, fi
             <View>
               <Text size="x-small">
                 <TruncatedText maxLength={60}>{decodedMessage}</TruncatedText>{' '}
-                <Link
-                  href={announcement.html_url}
-                  isWithinText={false}
-                  display="block"
-                  margin="xxx-small 0 0"
-                >
-                  <Text size="x-small" color="brand">
-                    {I18n.t('Read more')}
-                  </Text>
-                </Link>
               </Text>
             </View>
           )}

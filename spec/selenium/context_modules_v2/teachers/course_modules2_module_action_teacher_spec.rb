@@ -66,6 +66,18 @@ describe "context modules", :ignore_js_errors do
       expect(element_exists?(add_prerequisite_button_selector)).to be false
     end
 
+    it "prompts relock when adding a prerequisite" do
+      @course.context_modules.create!(name: "name")
+      module2 = @course.context_modules.create!(name: "name2")
+      go_to_modules
+      module_action_menu(module2.id).click
+      module_index_menu_tool_link("Edit").click
+      click_add_prerequisites_button
+      click_save_module_tray_change
+      expect(element_exists?(pre_save_relock_modal_selector)).to be_truthy
+      ignore_relock
+    end
+
     it "accesses prerequisites dropdown for module and assigns prerequisites" do
       go_to_modules
       module_action_menu(@module3.id).click
@@ -133,6 +145,7 @@ describe "context modules", :ignore_js_errors do
       expect(sequential_order_checkbox).to be_displayed
       sequential_order_checkbox.click
       click_save_module_tray_change
+      ignore_relock
       expect(context_module_completion_requirement(@module1.id).text).to include("Complete All Items")
     end
 
@@ -194,6 +207,15 @@ describe "context modules", :ignore_js_errors do
       expect(is_checked(complete_one_radio_checked)).to be true
     end
 
+    it "prompts relock when adding a requirement" do
+      module_action_menu(@module2.id).click
+      module_index_menu_tool_link("Edit").click
+      click_add_requirement_button
+      click_save_module_tray_change
+      expect(element_exists?(pre_save_relock_modal_selector)).to be_truthy
+      ignore_relock
+    end
+
     it_behaves_like "course_module2 module tray requirements", :context_modules
     it_behaves_like "course_module2 module tray requirements", :course_homepage
   end
@@ -212,6 +234,19 @@ describe "context modules", :ignore_js_errors do
       expect(element_exists?(module_header_will_unlock_selector(@module1.id))).to be false
     end
 
+    it "prompts relock when adding an unlock_at date" do
+      lock_until = format_date_for_view(Time.zone.today + 2.days)
+      module1 = @course.context_modules.create!(name: "name")
+      go_to_modules
+      module_action_menu(module1.id).click
+      module_index_menu_tool_link("Edit").click
+      click_lock_until_checkbox
+      update_lock_until_date(lock_until)
+      click_save_module_tray_change
+      expect(element_exists?(pre_save_relock_modal_selector)).to be_truthy
+      ignore_relock
+    end
+
     it "shows error if lock until date and time are empty on edit module tray" do
       go_to_modules
       empty_input = ""
@@ -228,5 +263,78 @@ describe "context modules", :ignore_js_errors do
 
     it_behaves_like "course_module2 module tray lock until", :context_modules
     it_behaves_like "course_module2 module tray lock until", :course_homepage
+  end
+
+  context "modules action menu move" do
+    before do
+      @module4 = @course.context_modules.create!(name: "module4")
+      go_to_modules
+      wait_for_ajaximations
+    end
+
+    it "shows move module tray and close it" do
+      open_move_tray(@module1.id)
+      expect(cancel_tray_button).to be_displayed
+      cancel_tray_button.click
+      expect(f("body")).not_to contain_css(move_module_tray_selector)
+
+      open_move_tray(@module1.id)
+      expect(close_tray_button).to be_displayed
+      close_tray_button.click
+      expect(f("body")).not_to contain_css(move_module_tray_selector)
+    end
+
+    it "moves module down after second module" do
+      open_move_tray(@module4.id)
+      expect(move_tray_place_contents_listbox).to be_displayed
+      move_tray_place_contents_listbox.click
+      place_item_at_option("After...").click
+      expect(move_module_tray_reference_listbox).to be_displayed
+      move_module_tray_reference_listbox.click
+
+      option_list_id = move_module_tray_reference_listbox.attribute("aria-controls")
+      option_list_course_option(option_list_id, @module2.name).click
+      submit_move_to_button.click
+      wait_for_ajaximations
+
+      expect(list_all_module_ids[2]).to eq(@module4.id.to_s)
+      expect(list_all_module_ids.count).to eq(4)
+    end
+
+    it "moves module to bottom" do
+      open_move_tray(@module1.id)
+      expect(move_tray_place_contents_listbox).to be_displayed
+      move_tray_place_contents_listbox.click
+      place_item_at_option("At the bottom").click
+      submit_move_to_button.click
+      wait_for_ajaximations
+
+      expect(list_all_module_ids.last).to eq(@module1.id.to_s)
+      expect(list_all_module_ids.count).to eq(4)
+    end
+
+    it "moves module to top" do
+      open_move_tray(@module3.id)
+      expect(move_tray_place_contents_listbox).to be_displayed
+      move_tray_place_contents_listbox.click
+      place_item_at_option("At the top").click
+      submit_move_to_button.click
+      wait_for_ajaximations
+
+      expect(list_all_module_ids.first).to eq(@module3.id.to_s)
+      expect(list_all_module_ids.count).to eq(4)
+    end
+
+    it "moves module before first module" do
+      open_move_tray(@module4.id)
+      expect(move_tray_place_contents_listbox).to be_displayed
+      move_tray_place_contents_listbox.click
+      place_item_at_option("Before...").click
+      submit_move_to_button.click
+      wait_for_ajaximations
+
+      expect(list_all_module_ids.first).to eq(@module4.id.to_s)
+      expect(list_all_module_ids.count).to eq(4)
+    end
   end
 end

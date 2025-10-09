@@ -122,7 +122,7 @@ type SubmissionsType = {
 
 export type TeacherAssignmentType = {
   __typename?: string
-  id?: string
+  id: string
   gid?: string
   lid?: string
   name?: string
@@ -164,16 +164,18 @@ export interface CreateAllocationRuleInput {
   reciprocal?: boolean
 }
 
+export type AllocationRuleType = {
+  _id: string
+  assessor: UserResponse
+  assessee: UserResponse
+  mustReview: boolean
+  reviewPermitted: boolean
+  appliesToAssessor: boolean
+}
+
 export interface CreateAllocationRuleResponse {
   createAllocationRule: {
-    allocationRules: Array<{
-      _id: string
-      assessor: UserResponse
-      assessee: UserResponse
-      mustReview: boolean
-      reviewPermitted: boolean
-      appliesToAssessor: boolean
-    }>
+    allocationRules: AllocationRuleType[]
     allocationErrors: Array<{
       message: string
       attribute: string
@@ -185,4 +187,37 @@ export interface CreateAllocationRuleResponse {
 interface UserResponse {
   _id: string
   name: string
+}
+
+export interface UpdateAllocationRuleInput {
+  ruleId: string
+  assessorIds: string[]
+  assesseeIds: string[]
+  mustReview: boolean
+  reviewPermitted: boolean
+  appliesToAssessor: boolean
+  reciprocal: boolean
+}
+
+export interface UpdateAllocationRuleResponse {
+  updateAllocationRule: {
+    allocationRules: Array<{
+      _id: string
+      mustReview: boolean
+      reviewPermitted: boolean
+      appliesToAssessor: boolean
+      assessor: {
+        _id: string
+        name: string
+      }
+      assessee: {
+        _id: string
+        name: string
+      }
+    }>
+    allocationErrors: Array<{
+      attributeId: string
+      message: string
+    }>
+  }
 }
