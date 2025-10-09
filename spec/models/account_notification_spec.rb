@@ -113,9 +113,9 @@ describe AccountNotification do
         [@unenrolled, @a3, true]
       ].each do |user, announcement, expected|
         if expected
-          expect(announcement.access_for_attachment_association?(user, nil, attach_assoc, nil)).to be true
+          expect(announcement.access_for_attachment_association?(user, nil, attach_assoc)).to be true
         else
-          expect(announcement.access_for_attachment_association?(user, nil, attach_assoc, nil)).to be false
+          expect(announcement.access_for_attachment_association?(user, nil, attach_assoc)).to be false
         end
       end
     end
