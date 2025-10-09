@@ -23,6 +23,7 @@ import {createCache} from '@canvas/apollo-v3'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {
   commentBankItemMocks,
+  commentBankItemMocksV2,
   makeDeleteCommentMutation,
   makeCreateMutationMock,
   searchMocks,
@@ -86,7 +87,7 @@ describe('LibraryManager', () => {
 
   describe('query', () => {
     it('renders a loading spinner while loading', () => {
-      const {getByText} = render(defaultProps())
+      const {getByText} = render()
       expect(getByText('Loading comment library')).toBeInTheDocument()
     })
 
@@ -105,6 +106,31 @@ describe('LibraryManager', () => {
       fireEvent.click(getByText('Open Comment Library'), {detail: 1})
       fireEvent.click(getByText('Comment item 0'), {detail: 1})
       expect(setFocusToTextAreaMock).toHaveBeenCalled()
+    })
+  })
+
+  describe('query with v2 mocks', () => {
+    // Could not move this into the describe above, somehow mocking
+    // got confused...
+    it('fetches all pages', async () => {
+      const mocks = commentBankItemMocksV2()
+      const {getByText, rerender} = render({
+        mocks,
+      })
+      await flushAllTimersAndPromises()
+      expect(getByText('15')).toBeInTheDocument()
+
+      // Simulate typing "search" in the comment area
+      render({
+        props: defaultProps({commentAreaText: 'search'}),
+        mocks,
+        func: rerender,
+      })
+
+      await flushAllTimersAndPromises()
+      expect(getByText('Comment item 2')).toBeInTheDocument()
+
+      expect(getByText('15')).toBeInTheDocument()
     })
   })
 
