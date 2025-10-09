@@ -1881,6 +1881,67 @@ describe ContextModule do
       expect(progression.user_id).to eq(admin.id)
       expect(progression.context_module_id).to eq(cm.id)
     end
+
+    it "creates progressions for enrolled teachers" do
+      course_with_teacher(active_all: true)
+      cm = @course.context_modules.create!
+      progression = cm.find_or_create_progression(@teacher)
+      expect(progression).not_to be_nil
+      expect(progression.user_id).to eq(@teacher.id)
+      expect(progression.context_module_id).to eq(cm.id)
+    end
+
+    context "with sharding" do
+      specs_require_sharding
+
+      it "does not create progressions for cross-shard site admins" do
+        site_admin_user = nil
+        @shard1.activate do
+          site_admin_user = user_factory(active_all: true)
+          Account.site_admin.account_users.create!(user: site_admin_user)
+        end
+
+        @shard2.activate do
+          account = Account.create!
+          course = account.courses.create!
+          cm = course.context_modules.create!
+          progression = cm.find_or_create_progression(site_admin_user)
+          expect(progression).to be_nil
+          expect(ContextModuleProgression.where(context_module: cm, user: site_admin_user).exists?).to be false
+        end
+      end
+
+      it "creates progressions for same-shard site admins" do
+        @shard1.activate do
+          site_admin_user = user_factory(active_all: true)
+          Account.site_admin.account_users.create!(user: site_admin_user)
+          account = Account.create!
+          course = account.courses.create!
+          cm = course.context_modules.create!
+          progression = cm.find_or_create_progression(site_admin_user)
+          expect(progression).not_to be_nil
+          expect(progression.user_id).to eq(site_admin_user.id)
+          expect(progression.context_module_id).to eq(cm.id)
+        end
+      end
+
+      it "creates progressions for cross-shard enrolled students" do
+        student = nil
+        @shard1.activate do
+          student = user_factory(active_all: true)
+        end
+
+        @shard2.activate do
+          account = Account.create!
+          course = account.courses.create!
+          course.enroll_student(student, enrollment_state: "active")
+          cm = course.context_modules.create!
+          progression = cm.find_or_create_progression(student)
+          expect(progression).not_to be_nil
+          expect(progression.user_id).to eq(student.id)
+        end
+      end
+    end
   end
 
   describe "restore" do
