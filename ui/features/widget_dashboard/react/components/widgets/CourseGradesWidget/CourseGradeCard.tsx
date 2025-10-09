@@ -62,7 +62,7 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
       display="flex"
       overflowX="hidden"
       overflowY="hidden"
-      role="group"
+      role="listitem"
       aria-label={courseName}
     >
       <Flex direction="column" width="100%" height="100%">
