@@ -52,6 +52,32 @@ describe('TemplateWidget', () => {
     expect(screen.getByText('Test content')).toBeInTheDocument()
   })
 
+  it('renders as a section element with proper accessibility attributes', () => {
+    setup()
+
+    const widget = screen.getByTestId('widget-test-widget')
+    expect(widget.tagName).toBe('SECTION')
+    expect(widget).toHaveAttribute('aria-labelledby', 'test-widget-heading')
+    expect(widget).not.toHaveAttribute('aria-label')
+    expect(widget).toHaveAttribute('role', 'region')
+  })
+
+  it('assigns unique heading ID based on widget ID', () => {
+    setup()
+
+    const heading = screen.getByText('Test Widget')
+    expect(heading).toHaveAttribute('id', 'test-widget-heading')
+  })
+
+  it('does not set aria-labelledby when no header is shown', () => {
+    const props = buildDefaultProps({showHeader: false})
+    setup(props)
+
+    const widget = screen.getByTestId('widget-test-widget')
+    expect(widget).not.toHaveAttribute('aria-labelledby')
+    expect(widget).not.toHaveAttribute('aria-label')
+  })
+
   it('renders with custom title', () => {
     const props = buildDefaultProps({title: 'Custom Title'})
     setup(props)
@@ -178,5 +204,20 @@ describe('TemplateWidget', () => {
     setup(props)
 
     expect(screen.queryByLabelText('Test Pagination')).not.toBeInTheDocument()
+  })
+
+  it('handles widget with no title properly', () => {
+    const widgetWithNoTitle = {...mockWidget, title: ''}
+    const props = buildDefaultProps({widget: widgetWithNoTitle})
+    setup(props)
+
+    const widget = screen.getByTestId('widget-test-widget')
+    expect(widget.tagName).toBe('SECTION')
+    expect(widget).not.toHaveAttribute('aria-labelledby')
+    expect(widget).not.toHaveAttribute('aria-label')
+    expect(widget).toHaveAttribute('role', 'region')
+
+    // Should not render header when title is empty
+    expect(screen.queryByRole('heading')).not.toBeInTheDocument()
   })
 })
