@@ -21,7 +21,6 @@ require_relative "../../common"
 
 module WidgetDashboardPage
   #------------------------------ Selectors -----------------------------
-
   def announcement_filter_select
     "[data-testid='announcement-filter-select']"
   end
@@ -46,8 +45,36 @@ module WidgetDashboardPage
     "[data-testid='read-more-#{item_id}']"
   end
 
-  def pagination_button_selector(page_number)
-    "[data-testid='pagination-container'] button:contains('#{page_number}')"
+  def widget_pagination_button_selector(widget, page_number)
+    "[data-testid='widget-#{widget}-widget'] [data-testid='pagination-container'] button:contains('#{page_number}')"
+  end
+
+  def people_widget_selector
+    "[data-testid='widget-people-widget']"
+  end
+
+  def message_instructor_button_selector(account_id, course_id)
+    "[data-testid='message-button-#{account_id}-#{course_id}']"
+  end
+
+  def send_message_to_modal_selector(teacher_name)
+    "span[role = 'dialog'][aria-label='Send Message to #{teacher_name}']"
+  end
+
+  def message_modal_subject_input_selector
+    "span[role = 'dialog'] input[type='text']"
+  end
+
+  def message_modal_body_textarea_selector
+    "span[role = 'dialog'] textarea"
+  end
+
+  def message_modal_send_button_selector
+    "button[data-testid='message-students-submit']"
+  end
+
+  def message_modal_alert_selector
+    ".MessageStudents__Alert"
   end
 
   #------------------------------ Elements ------------------------------
@@ -80,8 +107,40 @@ module WidgetDashboardPage
     f(announcement_item_link_selector(item_id))
   end
 
-  def pagination_button(page_number)
-    fj(pagination_button_selector(page_number))
+  def widget_pagination_button(widget, page_number)
+    fj(widget_pagination_button_selector(widget, page_number))
+  end
+
+  def people_widget
+    f(people_widget_selector)
+  end
+
+  def all_message_buttons
+    ff("[data-testid*='message-button-']")
+  end
+
+  def message_instructor_button(account_id, course_id)
+    f(message_instructor_button_selector(account_id, course_id))
+  end
+
+  def send_message_to_modal(teacher_name)
+    f(send_message_to_modal_selector(teacher_name))
+  end
+
+  def message_modal_subject_input
+    f(message_modal_subject_input_selector)
+  end
+
+  def message_modal_body_textarea
+    f(message_modal_body_textarea_selector)
+  end
+
+  def message_modal_send_button
+    f(message_modal_send_button_selector)
+  end
+
+  def message_modal_alert
+    f(message_modal_alert_selector)
   end
 
   #------------------------------ Actions -------------------------------
@@ -90,9 +149,9 @@ module WidgetDashboardPage
     @course1 = course_factory(active_all: true, course_name: "Course 1")
     @course2 = course_factory(active_all: true, course_name: "Course 2")
 
-    @teacher1 = user_factory(active_all: true, name: "Teacher 1")
-    @teacher2 = user_factory(active_all: true, name: "Teacher 2")
-    @student = user_factory(active_all: true, name: "Student")
+    @teacher1 = user_factory(active_all: true, name: "Nancy Smith")
+    @teacher2 = user_factory(active_all: true, name: "John Doe")
+    @student = user_factory(active_all: true, name: "Jane Brown")
 
     @course1.enroll_teacher(@teacher1, enrollment_state: :active)
     @course2.enroll_teacher(@teacher2, enrollment_state: :active)
@@ -117,6 +176,11 @@ module WidgetDashboardPage
     @announcement5.discussion_topic_participants.find_by(user: @student)&.update!(workflow_state: "read")
   end
 
+  def dashboard_people_setup
+    @ta1 = course_with_ta(name: "Alice Davis", course: @course1, active_all: true).user
+    @ta2 = course_with_ta(name: "Bob Johnson", course: @course2, active_all: true).user
+  end
+
   def filter_announcements_list_by(status)
     announcement_filter.click
     click_INSTUI_Select_option(announcement_filter_select, status)
@@ -126,5 +190,11 @@ module WidgetDashboardPage
     get "/"
     wait_for_ajaximations
     expect(announcement_filter).to be_displayed
+  end
+
+  def go_to_people_widget
+    get "/"
+    wait_for_ajaximations
+    expect(people_widget).to be_displayed
   end
 end
