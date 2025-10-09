@@ -1981,6 +1981,40 @@ describe Types::UserType do
 
       expect(type.resolve("commentBankItemsCount")).to eq 3
     end
+
+    describe "metrics tracking" do
+      before do
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
+      end
+
+      context "with send_metrics_for_comment_bank_items_count_used ON" do
+        before do
+          Account.site_admin.enable_feature!(:send_metrics_for_comment_bank_items_count_used)
+        end
+
+        it "reports metrics when commentBankItemsCount is used" do
+          type.resolve("commentBankItemsCount")
+          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
+            "graphql.user_type.comment_bank_items_count_used",
+            { tags: { cluster: "test" } }
+          )
+        end
+      end
+
+      context "with send_metrics_for_comment_bank_items_count_used OFF" do
+        before do
+          Account.site_admin.disable_feature!(:send_metrics_for_comment_bank_items_count_used)
+        end
+
+        it "does not report metrics when commentBankItemsCount is used" do
+          type.resolve("commentBankItemsCount")
+          expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with(
+            "graphql.user_type.comment_bank_items_count_used",
+            anything
+          )
+        end
+      end
+    end
   end
 
   context "courseBuiltInRoles" do
