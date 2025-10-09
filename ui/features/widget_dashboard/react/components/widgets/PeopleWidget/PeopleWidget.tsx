@@ -199,6 +199,7 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
                               screenReaderLabel={I18n.t('Send a message to %{instructor}', {
                                 instructor: instructor.name,
                               })}
+                              data-testid={`message-button-${instructor.id}`}
                             >
                               <IconMessageLine />
                             </IconButton>
