@@ -38,7 +38,7 @@ describe "student dashboard announcements widget", :ignore_js_errors do
       go_to_announcement_widget
 
       expect(all_announcement_items.size).to eq(3)
-      pagination_button("2").click
+      widget_pagination_button("announcements", "2").click
       expect(all_announcement_items.size).to eq(2)
 
       filter_announcements_list_by("Read")
@@ -46,9 +46,9 @@ describe "student dashboard announcements widget", :ignore_js_errors do
 
       filter_announcements_list_by("All")
       expect(all_announcement_items.size).to eq(3)
-      pagination_button("2").click
+      widget_pagination_button("announcements", "2").click
       expect(all_announcement_items.size).to eq(3)
-      pagination_button("3").click
+      widget_pagination_button("announcements", "3").click
       expect(all_announcement_items.size).to eq(1)
     end
 
