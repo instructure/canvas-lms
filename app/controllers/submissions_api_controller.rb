@@ -275,7 +275,9 @@ class SubmissionsApiController < ApplicationController
              else
                submissions = submissions.order(:user_id)
 
-               submissions = submissions.preload(:group) if includes.include?("group")
+               if includes.include?("group")
+                 submissions = submissions.preload(:group, { user: :groups }, { assignment: :group_category })
+               end
                submissions = submissions.preload(:quiz_submission) unless params[:exclude_response_fields]&.include?("preview_url")
                submissions = submissions.preload(:attachment) unless params[:exclude_response_fields]&.include?("attachments")
 
@@ -514,6 +516,7 @@ class SubmissionsApiController < ApplicationController
       # student_ids is either a subscope returning students in context visible to the caller,
       # or an array whose contents have been verified to be a subset of these
       student_scope = User.where(id: student_ids).preload(:pseudonyms).order(:id)
+      student_scope = student_scope.preload(:groups) if includes.include?("group")
       students = Api.paginate(student_scope, self, polymorphic_url([:api_v1, @section || @context, :student_submissions]))
 
       submissions_scope = Submission.active.where(user_id: students.map(&:id), assignment_id: assignments)
@@ -525,6 +528,11 @@ class SubmissionsApiController < ApplicationController
 
       submission_preloads = [:originality_reports, { quiz_submission: :versions }, :submission_comments]
       submission_preloads << :attachment unless params[:exclude_response_fields]&.include?("attachments")
+
+      if includes.include?("group")
+        submission_preloads.push(:group, { assignment: :group_category })
+      end
+
       submissions = submissions_scope.preload(submission_preloads).to_a
 
       Submission.bulk_load_attachments_and_previews(submissions)
@@ -595,6 +603,10 @@ class SubmissionsApiController < ApplicationController
         submissions = submissions.preload(:submission_comments)
       end
 
+      if includes.include?("group")
+        submissions = submissions.preload(:group, { user: :groups }, { assignment: :group_category })
+      end
+
       # this will speed up pagination for large collections when order_direction is asc
       if order_by == "graded_at" && order_direction == "asc"
         submissions = BookmarkedCollection.wrap(Submission::GradedAtBookmarker, submissions)
@@ -605,6 +617,7 @@ class SubmissionsApiController < ApplicationController
       submissions = Api.paginate(submissions, self, polymorphic_url([:api_v1, @section || @context, :student_submissions]))
       Submission.bulk_load_versioned_attachments(submissions)
       Version.preload_version_number(submissions)
+
       result = submissions.select do |s|
         assignment_visibilities.fetch(s.assignment_id, []).include?(s.user_id) || can_view_all
       end.map do |s|
@@ -747,8 +760,13 @@ class SubmissionsApiController < ApplicationController
   #   Attach files to this comment that were previously uploaded using the
   #   Submission Comment API's files action
   #
-  # @argument include[visibility] [String]
-  #   Whether this assignment is visible to the owner of the submission
+  # @argument include[] [String, "submission_comments"|"visibility"|"sub_assignment_submissions"|"provisional_grades"|"group"]
+  #   Associations to include with the submission. "submission_comments" is always included by default.
+  #   - "submission_comments": Comments on the submission (always included)
+  #   - "visibility": Whether the assignment is visible to the owner of the submission
+  #   - "sub_assignment_submissions": Sub-assignment submissions for discussion checkpoints
+  #   - "provisional_grades": Provisional grades (only available for moderated assignments)
+  #   - "group": Group information (id and name) for group assignments
   #
   # @argument prefer_points_over_scheme [Boolean]
   #   Treat posted_grade as points if the value matches a grading scheme value
@@ -903,7 +921,9 @@ class SubmissionsApiController < ApplicationController
           logger.info "GRADES: grade_student failed because '#{e.message}'"
           return render json: { error: e.to_s }, status: :bad_request
         end
-        @submission = @submissions.first
+        # Find the submission for the specific user that was requested, not just the first one
+        # This is critical for group assignments where @submissions contains multiple user submissions
+        @submission = @submissions.find { |s| s.user_id == @user.id } || @submissions.first
       else
         @submission = @assignment.find_or_create_submission(@user) if @submission.new_record?
         @submissions ||= [@submission]
@@ -1003,12 +1023,17 @@ class SubmissionsApiController < ApplicationController
       includes = %w[submission_comments]
       includes.concat(Array.wrap(params[:include]) & %w[visibility sub_assignment_submissions])
       includes << "provisional_grades" if submission[:provisional]
-
       visiblity_included = includes.include?("visibility")
       if visiblity_included
         user_ids = @submissions.map(&:user_id)
         users_with_visibility = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(course_ids: @context, assignment_ids: @assignment.id, user_ids:).map(&:user_id)
       end
+
+      # Preload group-related associations if 'group' is included to avoid N+1 queries
+      if includes.include?("group")
+        Submission.preload_associations(@submissions, [:group, { user: :groups }, { assignment: :group_category }])
+      end
+
       json = submission_json(
         @submission,
         @assignment,
@@ -1069,8 +1094,13 @@ class SubmissionsApiController < ApplicationController
   #   Attach files to this comment that were previously uploaded using the
   #   Submission Comment API's files action
   #
-  # @argument include[visibility] [String]
-  #   Whether this assignment is visible to the owner of the submission
+  # @argument include[] [String, "submission_comments"|"visibility"|"sub_assignment_submissions"|"provisional_grades"|"group"]
+  #   Associations to include with the submission. "submission_comments" is always included by default.
+  #   - "submission_comments": Comments on the submission (always included)
+  #   - "visibility": Whether the assignment is visible to the owner of the submission
+  #   - "sub_assignment_submissions": Sub-assignment submissions for discussion checkpoints
+  #   - "provisional_grades": Provisional grades (only available for moderated assignments)
+  #   - "group": Group information (id and name) for group assignments
   #
   # @argument submission[posted_grade] [String]
   #   Assign a score to the submission, updating both the "score" and "grade"
