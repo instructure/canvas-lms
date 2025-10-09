@@ -298,6 +298,11 @@ end
     <div class="NewUserTutorialTray__Container"></div>
   <% end %>
   <div id="react-router-portals"></div>
+
+  <% if microfrontend_overrides %>
+    <%= render :partial => 'shared/microfrontend_override_indicator' %>
+  <% end %>
+
   <%= render :partial => 'layouts/foot', :locals => { :include_common_bundle => true } %>
 </div> <!-- #application -->
 </body>

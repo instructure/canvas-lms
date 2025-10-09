@@ -30,7 +30,7 @@ describe CareerController do
 
   before do
     allow(CanvasCareer::ExperienceResolver).to receive(:new).and_return(resolver)
-    allow(CanvasCareer::Config).to receive(:new).with(@course.root_account).and_return(config)
+    allow(CanvasCareer::Config).to receive(:new).with(@course.root_account, anything).and_return(config)
   end
 
   describe "GET show" do

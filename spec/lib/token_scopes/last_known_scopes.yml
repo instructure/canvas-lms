@@ -1948,6 +1948,10 @@
 - verb: PUT
   path: '/api/v1/media_objects/:media_object_id/media_tracks'
 - verb: DELETE
+  path: '/api/v1/microfrontends/release_tag_override'
+- verb: GET
+  path: '/api/v1/microfrontends/release_tag_override'
+- verb: DELETE
   path: '/api/v1/outcomes/:id'
 - verb: GET
   path: '/api/v1/outcomes/:id'
