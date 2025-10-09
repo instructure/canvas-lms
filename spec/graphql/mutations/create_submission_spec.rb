@@ -234,7 +234,7 @@ RSpec.describe Mutations::CreateSubmission do
         uploaded_data: StringIO.new("@channel MY LEGSSSS!!!!! THEY'RE STUCK UNDER MY DESK!!!!!!!")
       )
       run_mutation(submission_type: "online_upload", file_ids: [attachment.id])
-      run_jobs
+      Timecop.freeze(6.minutes.from_now) { run_jobs }
       expect(submission.reload.word_count).to eq 8
     end
 

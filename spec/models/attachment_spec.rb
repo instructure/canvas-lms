@@ -3316,6 +3316,26 @@ describe Attachment do
         expect(Canvas::Errors).to receive(:capture_exception).with(:word_count, an_instance_of(Timeout::Error), :info)
         @attachment.calculate_words
       end
+
+      it "sends metrics" do
+        attachment_model(filename: "test.txt", uploaded_data: fixture_file_upload("amazing_file.txt", "text/plain"))
+        expect(InstStatsd::Statsd).to receive(:distributed_increment).with("attachment.update_word_count", tags: { source: "Canvas" })
+        @attachment.update_word_count
+      end
+
+      context "when word_count is already set" do
+        it "skips counting the words" do
+          attachment_model(filename: "test.txt", uploaded_data: fixture_file_upload("amazing_file.txt", "text/plain"), word_count: 1234)
+          @attachment.update_word_count
+          expect(@attachment.word_count).to eq 1234
+        end
+
+        it "sends metrics" do
+          attachment_model(filename: "test.txt", uploaded_data: fixture_file_upload("amazing_file.txt", "text/plain"), word_count: 1234)
+          expect(InstStatsd::Statsd).to receive(:distributed_increment).with("attachment.update_word_count", tags: { source: "DocViewer" })
+          @attachment.update_word_count
+        end
+      end
     end
   end
 
