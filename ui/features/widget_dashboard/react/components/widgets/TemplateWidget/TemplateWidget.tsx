@@ -63,6 +63,7 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
 }) => {
   const {isMobile} = useResponsiveContext()
   const widgetTitle = title || widget.title
+  const headingId = `${widget.id}-heading`
 
   const renderContent = () => {
     if (isLoading) {
@@ -105,13 +106,15 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
 
   return (
     <View
-      as="div"
+      as="section"
       height="100%"
       padding="medium"
       shadow="above"
       borderRadius="large"
       background="primary"
       data-testid={`widget-${widget.id}`}
+      aria-labelledby={showHeader && widgetTitle ? headingId : undefined}
+      role="region"
       style={{overflow: 'hidden', boxSizing: 'border-box'}}
     >
       <Flex direction="column" gap="small" height="100%" style={{overflow: 'hidden'}}>
@@ -120,7 +123,7 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
             {isMobile ? (
               <Flex direction="column" gap="x-small">
                 <Flex.Item>
-                  <Heading level="h2" margin="0">
+                  <Heading level="h2" margin="0" id={headingId}>
                     {widgetTitle}
                   </Heading>
                 </Flex.Item>
@@ -131,7 +134,7 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
             ) : (
               <Flex direction="row" alignItems="center" justifyItems="space-between">
                 <Flex.Item shouldGrow>
-                  <Heading level="h2" margin="0">
+                  <Heading level="h2" margin="0" id={headingId}>
                     {widgetTitle}
                   </Heading>
                 </Flex.Item>
