@@ -43,38 +43,51 @@ class Test::MockLtiController < ApplicationController
     id_token = params[:id_token]
     jwt = JWT.decode(id_token, nil, false) # false means don't bother verifying signature
     deep_link_settings = jwt.first["https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings"]
-    deep_link_url = deep_link_settings["deep_link_return_url"]
-    eula_url = jwt.first["https://purl.imsglobal.org/spec/lti/claim/eulaservice"]["url"]
+    deep_link_url = deep_link_settings&.dig("deep_link_return_url")
+    deep_link_data = deep_link_settings&.dig("data")
+    eula_url = jwt.first.dig("https://purl.imsglobal.org/spec/lti/claim/eulaservice", "url")
     notification_service_settings = jwt.first["https://purl.imsglobal.org/spec/lti/claim/platformnotificationservice"]
-    notification_service_url = notification_service_settings["platform_notification_service_url"]
-    launch_presentation = jwt.first["https://purl.imsglobal.org/spec/lti/claim/launch_presentation"]
-    return_url = launch_presentation["return_url"]
+    notification_service_url = notification_service_settings&.dig("platform_notification_service_url")
+    user_id = jwt.first["sub"] # The user's LTI ID
 
-    @data = {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer #{id_token}",
+    # Build complete request specifications with all headers and bodies
+    @requests = {
+      pns_subscribe: {
+        url: notification_service_url,
+        method: "PUT",
+        headers: {
+          "Content-Type" => "application/json",
+          "Authorization" => "Bearer #{id_token}"
+        },
+        body: {
+          handler: "http://#{HostUrl.default_host}/test/mock_lti/subscription_handler",
+          notice_type: "LtiAssetProcessorSubmissionNotice"
+        }
+      },
+      eula_service: {
+        url: "#{eula_url}/user",
+        method: "POST",
+        headers: {
+          "Content-Type" => "application/json",
+          "Authorization" => "Bearer #{id_token}"
+        },
+        body: {
+          userId: user_id,
+          accepted: true
+          # timestamp will be added by client when button is clicked
+        }
       },
       deep_link: {
         url: deep_link_url,
         method: "POST",
-      },
-      return: {
-        url: return_url,
-        method: "POST",
-      },
-      eula_service: {
-        url: eula_url,
-        method: "POST",
-      },
-      pns_subscribe: {
-        url: notification_service_url,
-        method: "PUT",
+        headers: {
+          "Content-Type" => "application/x-www-form-urlencoded"
+        },
         body: {
-          handler: "http://#{HostUrl.default_host}/test/mock_lti/subscription_handler",
-          notice_type: "LtiAssetProcessorSubmissionNotice",
-        }
-      },
+          JWT: create_deep_link_jwt(deep_link_data)
+        },
+        form_encoded: true # Signal to client this needs URLSearchParams
+      }
     }
 
     render "ui", layout: nil
@@ -97,5 +110,23 @@ class Test::MockLtiController < ApplicationController
 
   def private_key
     OpenSSL::PKey::RSA.new 2048
+  end
+
+  def create_deep_link_jwt(data)
+    content_item = {
+      type: "ltiResourceLink",
+      title: "Asset Processor",
+      custom: {}
+    }
+
+    header = Base64.strict_encode64({ alg: "none", typ: "JWT" }.to_json).tr("+/", "-_").delete("=")
+    payload = Base64.strict_encode64({
+      "https://purl.imsglobal.org/spec/lti/claim/message_type" => "LtiDeepLinkingResponse",
+      "https://purl.imsglobal.org/spec/lti/claim/version" => "1.3.0",
+      "https://purl.imsglobal.org/spec/lti-dl/claim/content_items" => [content_item],
+      "https://purl.imsglobal.org/spec/lti-dl/claim/data" => data || ""
+    }.to_json).tr("+/", "-_").delete("=")
+
+    "#{header}.#{payload}."
   end
 end
