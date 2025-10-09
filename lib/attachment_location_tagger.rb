@@ -19,15 +19,21 @@
 
 module AttachmentLocationTagger
   def self.tag_url(url, location)
-    file_url_pattern = %r{(?<![a-zA-Z0-9:])(/(?:[\w-]+/(?:\d+(?:~\d+)?)/)?(?:files/(?:\d+(?:~\d+)?)(?:/[\w-]+)?|media_attachments_iframe/(?:\d+(?:~\d+)?))(?:\?[^"'<>]*)?)}
+    file_url_pattern = %r{(?<![a-zA-Z0-9:])(/(?:[\w-]+/(?:#{Api::SHARDID_REGEX})/)?(?:files/(?:#{Api::SHARDID_REGEX})(?:/[\w-]+)?|media_attachments_iframe/(?:#{Api::SHARDID_REGEX}))(?:\?[^"'<>]*)?)}o
 
     url.gsub(file_url_pattern) do |_|
       url = Regexp.last_match(1)
-      if url.include?("?")
-        "#{url}&location=#{location}"
-      else
-        "#{url}?location=#{location}"
+      fragment = nil
+      if url.include?("#")
+        url, fragment = url.split("#", 2)
       end
+      url = if url.include?("?")
+              "#{url}&location=#{location}"
+            else
+              "#{url}?location=#{location}"
+            end
+      url += "##{fragment}" if fragment
+      url
     end
   end
 end
