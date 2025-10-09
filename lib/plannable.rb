@@ -136,7 +136,13 @@ module Plannable
     def column_value(object, col)
       case col
       when Array
-        object.attributes.values_at(*col).compact.first # coalesce nulls
+        # Check if array contains complex types (Hash) or just simple attribute names
+        if col.any?(Hash)
+          # For arrays with Hash/complex types, recursively get each value
+          col.filter_map { |c| c.is_a?(Hash) ? association_value(object, c) : object.attributes[c] }.first
+        else
+          object.attributes.values_at(*col).compact.first
+        end
       when Hash
         association_value(object, col)
       else
