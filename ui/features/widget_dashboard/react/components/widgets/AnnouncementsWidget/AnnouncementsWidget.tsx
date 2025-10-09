@@ -83,13 +83,20 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
 
   const renderFilterSelect = () => (
     <SimpleSelect
+      renderBeforeInput={
+        <View padding="xx-small 0 0 0">
+          <Text size="small" weight="bold">
+            Filter by:
+          </Text>
+        </View>
+      }
       renderLabel={
         <ScreenReaderContent>{I18n.t('Filter announcements by read status')}</ScreenReaderContent>
       }
       value={filter}
       onChange={(_event, {value}) => handleFilterChange(value as FilterOption)}
       size="small"
-      width="6rem"
+      width="7rem"
       data-testid="announcement-filter-select"
     >
       <SimpleSelect.Option id="unread" value="unread">
