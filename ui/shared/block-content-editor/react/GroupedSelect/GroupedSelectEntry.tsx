@@ -16,48 +16,95 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import './grouped-select.css'
+import React from 'react'
 import {Text} from '@instructure/ui-text'
-import {forwardRef} from 'react'
 import {View} from '@instructure/ui-view'
+import {withStyle, type WithStyleProps} from '@instructure/emotion'
+import type {Theme} from '@instructure/ui-themes'
+import './grouped-select.css'
 
-export const GroupedSelectEntry = forwardRef<
-  HTMLDivElement,
-  {
-    variant: 'item' | 'group'
-    title: string
-    active: boolean
-    onClick: () => void
-    onFocus: () => void
+type GroupedSelectEntryOwnProps = {
+  variant: 'item' | 'group'
+  title: string
+  active: boolean
+  onClick: () => void
+  onFocus: () => void
+  forwardedRef: React.Ref<HTMLDivElement>
+}
+
+type GroupedSelectEntryStyleProps = {
+  primaryColor: string
+}
+
+type GroupedSelectEntryProps = GroupedSelectEntryOwnProps &
+  WithStyleProps<GroupedSelectEntryStyleProps, GroupedSelectEntryStyleProps>
+
+class ThemedGroupedSelectEntry extends React.Component<GroupedSelectEntryProps> {
+  isItem = this.props.variant === 'item'
+  className = this.isItem ? 'grouped-select-item' : 'grouped-select-group'
+
+  componentDidMount(): void {
+    this.props.makeStyles!()
   }
->((props, ref) => {
-  const isItem = props.variant === 'item'
-  const className = isItem ? 'grouped-select-item' : 'grouped-select-group'
 
-  const handleElementRef = (element: Element | null) => {
-    if (typeof ref === 'function') {
-      ref(element as HTMLDivElement | null)
-    } else if (ref && 'current' in ref) {
-      ref.current = element as HTMLDivElement | null
+  handleElementRef = (element: Element | null) => {
+    if (typeof this.props.forwardedRef === 'function') {
+      this.props.forwardedRef(element as HTMLDivElement | null)
+    } else if (this.props.forwardedRef && 'current' in this.props.forwardedRef) {
+      ;(this.props.forwardedRef as React.MutableRefObject<HTMLDivElement | null>).current =
+        element as HTMLDivElement | null
     }
   }
 
-  return (
-    <View
-      as="button"
-      type="button"
-      background="transparent"
-      borderColor="transparent"
-      borderWidth="none"
-      textAlign="start"
-      width="100%"
-      elementRef={handleElementRef}
-      aria-selected={props.active}
-      className={`${className} ${props.active ? 'selected' : ''}`}
-      onClick={props.onClick}
-      onFocus={props.onFocus}
-    >
-      <Text variant="content">{props.title}</Text>
-    </View>
-  )
+  render() {
+    const {primaryColor} = this.props.styles!
+    const {active, onClick, onFocus, title, variant} = this.props
+    const isGroupSelected = variant === 'group' && active
+
+    return (
+      <View
+        as="button"
+        type="button"
+        background="transparent"
+        textAlign="start"
+        width="100%"
+        borderColor="transparent"
+        borderRadius="medium"
+        borderWidth={isGroupSelected ? 'none none none large' : 'none'}
+        elementRef={this.handleElementRef}
+        aria-selected={active}
+        className={`${this.className} ${active ? 'selected' : ''}`}
+        onClick={onClick}
+        onFocus={onFocus}
+        themeOverride={
+          isGroupSelected
+            ? {
+                borderColorTransparent: primaryColor,
+              }
+            : undefined
+        }
+      >
+        <Text weight={isGroupSelected ? 'weightImportant' : 'weightRegular'}>{title}</Text>
+      </View>
+    )
+  }
+}
+
+const generateStyles = (componentTheme: GroupedSelectEntryStyleProps) =>
+  ({
+    ...componentTheme,
+  }) as GroupedSelectEntryStyleProps
+
+const generateComponentTheme = (theme: Theme): GroupedSelectEntryStyleProps => ({
+  primaryColor: theme['ic-brand-primary']!,
 })
+
+const StyledGroupedSelectEntry = withStyle(
+  generateStyles,
+  generateComponentTheme,
+)(ThemedGroupedSelectEntry)
+
+export const GroupedSelectEntry = React.forwardRef<
+  HTMLDivElement,
+  Omit<GroupedSelectEntryOwnProps, 'forwardedRef'>
+>((props, ref) => <StyledGroupedSelectEntry {...props} forwardedRef={ref} />)

@@ -4,17 +4,8 @@
   border-radius: 4px;
 }
 
-.grouped-select-group.selected {
-  border-left: 4px solid #133b72;
-  border-radius: 4px;
-}
-
 .grouped-select-group:not(.selected) {
   margin-left: 4px;
-}
-
-.grouped-select-group.selected span {
-  font-weight: 600;
 }
 
 .grouped-select-item {
