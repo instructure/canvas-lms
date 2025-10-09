@@ -608,7 +608,7 @@ class Attachment < ActiveRecord::Base
 
   def set_word_count
     if word_count.nil? && !deleted? && file_state != "broken" && word_count_supported?
-      delay(singleton: "attachment_set_word_count_#{global_id}").update_word_count
+      delay(run_at: 5.minutes.from_now, singleton: "attachment_set_word_count_#{global_id}").update_word_count
     end
   end
 
@@ -617,7 +617,12 @@ class Attachment < ActiveRecord::Base
   end
 
   def update_word_count
-    update_column(:word_count, calculate_words)
+    if word_count
+      InstStatsd::Statsd.distributed_increment("attachment.update_word_count", tags: { source: "DocViewer" })
+    else
+      InstStatsd::Statsd.distributed_increment("attachment.update_word_count", tags: { source: "Canvas" })
+      update_column(:word_count, calculate_words)
+    end
   end
 
   def namespace
@@ -2100,10 +2105,21 @@ class Attachment < ActiveRecord::Base
 
     if canvadocable?
       doc = canvadoc || create_canvadoc
-      doc.upload({
-                   annotatable: opts[:wants_annotation],
-                   preferred_plugins: opts[:preferred_plugins]
-                 })
+      upload_opts = {
+        annotatable: opts[:wants_annotation],
+        preferred_plugins: opts[:preferred_plugins]
+      }
+
+      # Add canvas_metadata for submission attachments to enable word count updates
+      if (submission = assignment_submissions.first)
+        assignment = submission.assignment
+        upload_opts[:canvas_metadata] = {
+          base_url: "#{HostUrl.protocol}://#{HostUrl.context_host(assignment.context)}",
+          attachment_jwt: CanvasSecurity.create_jwt({ id: }, 1.hour.from_now)
+        }
+      end
+
+      doc.upload(upload_opts)
       update_attribute(:workflow_state, "processing")
     end
   rescue => e

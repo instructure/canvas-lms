@@ -1604,6 +1604,8 @@
 - verb: POST
   path: '/api/v1/files/capture'
 - verb: POST
+  path: '/api/v1/files/update_word_count'
+- verb: POST
   path: '/api/v1/folders/:dest_folder_id/copy_file'
 - verb: POST
   path: '/api/v1/folders/:dest_folder_id/copy_folder'

@@ -10017,7 +10017,7 @@ describe Submission do
       attachment1 = attachment_model(uploaded_data: stub_file_data("submission.txt", submission_text, "text/plain"), context: @student)
       attachment2 = attachment_model(uploaded_data: stub_file_data("submission.txt", submission_text, "text/plain"), context: @student)
       sub = @assignment.submit_homework(@student, attachments: [attachment1, attachment2])
-      run_jobs
+      Timecop.freeze(6.minutes.from_now) { run_jobs }
       expect(sub.reload.word_count).to eq 12
     end
 
@@ -10027,7 +10027,7 @@ describe Submission do
       attachment = attachment_model(uploaded_data: stub_file_data("submission.txt", submission_text, "text/plain"), context: @student)
       sub = @assignment.submit_homework(@student, attachments: [attachment])
       sub.update!(body: "")
-      run_jobs
+      Timecop.freeze(6.minutes.from_now) { run_jobs }
       expect(sub.reload.word_count).to eq 8
     end
 

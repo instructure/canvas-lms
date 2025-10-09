@@ -149,6 +149,7 @@ class FilesController < ApplicationController
     api_capture
     icon_metadata
     reset_verifier
+    update_word_count
     rce_linked_file_instfs_ids
     show_relative
   ]
@@ -1550,6 +1551,50 @@ class FilesController < ApplicationController
         :manage_files_delete
       ) && @domain_root_account.grants_right?(@current_user, nil, :become_user)
     end
+  end
+
+  # Internal: update_word_count
+  #
+  # Update the word count for a submission's attachment. This is an internal endpoint
+  # designed to be called by external document viewers (like DocViewer) to report word
+  # counts back to Canvas.
+  #
+  # @argument attachment_jwt [Required, String]
+  #   JWT token containing the id of the attachment
+  #
+  # @argument word_count [Required, Integer]
+  #   The word count to set on the attachment.
+  #
+  # @example_request
+  #   curl 'https://<canvas>/api/v1/files/update_word_count' \
+  #     -X POST \
+  #     -F 'attachment_jwt=<jwt_token>' \
+  #     -F 'word_count=1234' \
+  #     -H "Authorization: Bearer <access_token>"
+  def update_word_count
+    unless params[:attachment_jwt].present?
+      return render json: { message: "Missing attachment_jwt param" }, status: :bad_request
+    end
+
+    unless params[:word_count].present?
+      return render json: { message: "Missing word_count param" }, status: :bad_request
+    end
+
+    begin
+      id = CanvasSecurity.decode_jwt(params[:attachment_jwt])[:id]
+    rescue CanvasSecurity::InvalidToken, CanvasSecurity::TokenExpired
+      return render json: { message: "Invalid attachment_jwt param" }, status: :bad_request
+    end
+
+    begin
+      word_count = Integer(params[:word_count])
+    rescue
+      return render json: { message: "Invalid word_count param" }, status: :bad_request
+    end
+
+    # We use an explicit find-update here, so it will return a 404 if the attachment cannot be found
+    Attachment.find(id).update!(word_count:)
+    head :no_content
   end
 
   def rce_linked_file_instfs_ids
