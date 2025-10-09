@@ -85,7 +85,7 @@ class AttachmentAssociation < ActiveRecord::Base
 
     feature_is_on = association.context.attachment_associations_enabled?
 
-    feature_is_on && association.context&.access_for_attachment_association?(user, session, association, location_param)
+    feature_is_on && association.context&.access_for_attachment_association?(user, session, association)
   end
 
   def self.copy_associations(source, targets, source_context_concern = nil, target_context_concern = nil)

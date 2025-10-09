@@ -112,8 +112,8 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
     associate_attachments_to_rce_object(all_html.compact.join("\n"), updating_user)
   end
 
-  def access_for_attachment_association?(user, session, _association, _location_param)
-    quiz.grants_right?(user, session, :read) if user
+  def access_for_attachment_association?(user, session, _association)
+    user && quiz.grants_right?(user, session, :read)
   end
 
   def infer_defaults

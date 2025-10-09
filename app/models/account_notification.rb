@@ -50,7 +50,7 @@ class AccountNotification < ActiveRecord::Base
     %w[message]
   end
 
-  def access_for_attachment_association?(user, _session, association, _location_param)
+  def access_for_attachment_association?(user, _session, association)
     notification_ids = AccountNotification.for_user_and_account_cached(user, association.root_account).pluck(:id)
     notification_ids.include?(id)
   end

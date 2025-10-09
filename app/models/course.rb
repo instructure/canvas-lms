@@ -1609,8 +1609,8 @@ class Course < ActiveRecord::Base
     root_account.feature_enabled?(:disable_file_verifiers_in_public_syllabus)
   end
 
-  def access_for_attachment_association?(user, session, _association, location_param)
-    location_param.start_with?("course_syllabus_") && grants_right?(user, session, :read_syllabus)
+  def access_for_attachment_association?(user, session, _association)
+    grants_right?(user, session, :read_syllabus)
   end
 
   def home_page
