@@ -34,6 +34,11 @@ development:
         cedar_audience: "cedar-local"
         cedar_shared_secret: fake-secrete-key
         cedar_consumer_name: "canvas"
+      observe:
+        host: "103443579803.observeinc.com"
+        customer_id: "103443579803"
+        dataset_id: "41999019"
+        token: "super-sekret-value"
 #     pandata_creds:
 #       canvas_key: 'INTERNAL_TEST'
 #       canvas_secret: 'internaltest'
