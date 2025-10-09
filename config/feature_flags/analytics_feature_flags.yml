@@ -141,6 +141,15 @@ title_iv_financial_aid_report:
   root_opt_in: true
   beta: true
   shadow: true
+k20_improved_criteria_builder:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Improved Criteria Builder
+  description:
+    k20_improved_criteria_builder: Enables the Intelligent Insights - Improved Criteria Builder feature
+  root_opt_in: true
+  beta: true
+  shadow: true
 
 # Intelligent Insights - Provided through Ask Your Data LTI App
 advanced_analytics_ask_questions:
