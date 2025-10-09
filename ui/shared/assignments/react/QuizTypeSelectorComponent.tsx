@@ -61,7 +61,8 @@ export const QuizTypeSelectorComponent: React.FC<QuizTypeSelectorComponentProps>
         <div className="form-column-left no-group">
           <label htmlFor="assignment_quiz_type">{I18n.t('quiz_type', 'Quiz Type')}</label>
         </div>
-        <div className='form-column-right' style={{ marginBottom: '11px', width: 'unset'}}>
+        <p>&nbsp;</p>
+        <div className='form-column-right' style={{width: 'unset', marginBottom: '12px'}}>
           <Flex alignItems="center" gap="small">
             <select
               id="assignment_quiz_type"
@@ -69,7 +70,7 @@ export const QuizTypeSelectorComponent: React.FC<QuizTypeSelectorComponentProps>
               value={quizType}
               onChange={handleChange}
               disabled={isExistingAssignment}
-              style={{ marginLeft: '4px', width: '392px', flex: '1', marginBottom: '0px' }}
+              style={{ width: '392px', marginBottom: 'unset' }}
             >
               {quizTypeOptions.map(option => (
                 <option key={option.id} value={option.id}>
