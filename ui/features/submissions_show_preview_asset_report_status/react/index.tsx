@@ -23,7 +23,7 @@ import {
 } from '@canvas/lti-asset-processor/react/hooks/useLtiAssetProcessorsAndReportsForStudent'
 
 import {sendOpenAssetReportModalMessage} from '@canvas/lti-asset-processor/react/StudentAssetReportModalWrapper'
-import LtiAssetReportStatus from '@canvas/lti-asset-processor/react/LtiAssetReportStatus'
+import LtiAssetReportStatus from '@canvas/lti-asset-processor/shared-with-sg/replicated/components/LtiAssetReportStatus'
 import {z} from 'zod'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {renderAPComponent} from '@canvas/lti-asset-processor/react/util/renderToElements'
@@ -35,8 +35,8 @@ const I18n = createI18nScope('lti_asset_reports_for_student')
  * case of online_upload in old student submission view, but we want the Report
  * modal to open in the main window. To do this, we post a message to the main
  * window which will then open the modal. The message is handled by the
- * StudentAssetReportModalWrapper component.
- * (ui/features/submissions/react/StudentAssetReportModalWrapper.tsx)
+ * StudentLtiAssetReportModalWrapper component.
+ * (ui/features/submissions/react/StudentLtiAssetReportModalWrapper.tsx)
  */
 
 const ZAttachmentAssetReportStatusProps = z.object({

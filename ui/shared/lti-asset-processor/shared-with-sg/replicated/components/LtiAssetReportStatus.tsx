@@ -22,7 +22,7 @@ import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
-import {LtiAssetReport} from '../model/LtiAssetReport'
+import {LtiAssetReport} from '../types/LtiAssetReports'
 
 const I18n = createI18nScope('lti_asset_reports_for_student')
 
@@ -59,7 +59,7 @@ function renderStatus(status: 'high' | 'ok', openModal?: () => void) {
         themeOverride={
           status === 'ok' ? {} : {color: colors.ui.textError, hoverColor: colors.ui.textError}
         }
-        data-pendo={`asset-processors-student-view-${status === 'high' ? 'needs-attention' : 'all-good'}-button`}
+        data-pendo={`asset-reports-${status === 'high' ? 'needs-attention' : 'all-good'}-button`}
       >
         {status === 'ok' ? I18n.t('All good') : I18n.t('Needs attention')}
       </Link>
