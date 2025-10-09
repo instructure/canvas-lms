@@ -16,9 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useMemo} from 'react'
+import React, {useMemo, useState, useEffect} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
+import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import type {CourseOption} from '../../types'
@@ -63,6 +65,20 @@ const CourseWorkFilters: React.FC<CourseWorkFiltersProps> = ({
   statisticsOnly = false,
 }) => {
   const {isMobile} = useResponsiveContext()
+
+  // Custom breakpoint for 1365px
+  const [isNarrowScreen, setIsNarrowScreen] = useState(false)
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsNarrowScreen(window.innerWidth <= 1365)
+    }
+
+    checkScreenSize()
+    window.addEventListener('resize', checkScreenSize)
+
+    return () => window.removeEventListener('resize', checkScreenSize)
+  }, [])
   const courseOptions: CourseOption[] = useMemo(
     () => [{id: 'all', name: I18n.t('All Courses')}, ...userCourses],
     [userCourses],
@@ -84,13 +100,20 @@ const CourseWorkFilters: React.FC<CourseWorkFiltersProps> = ({
   const filterMobilePadding = useMemo(() => 'xx-small', [])
 
   return (
-    <Flex direction={isMobile ? 'column' : 'row'} gap="x-small">
-      <Flex.Item shouldGrow={isMobile} padding={isMobile ? filterMobilePadding : undefined}>
+    <Flex direction={isNarrowScreen ? 'column' : 'row'} padding="0 x-small">
+      <Flex.Item shouldGrow={isMobile} padding={isNarrowScreen ? filterMobilePadding : undefined}>
         <SimpleSelect
+          renderBeforeInput={
+            <View padding="xx-small 0">
+              <Text size="small" weight="bold">
+                Filter by:
+              </Text>
+            </View>
+          }
           renderLabel={<ScreenReaderContent>{I18n.t('Filter by course')}</ScreenReaderContent>}
           value={selectedCourse}
           onChange={onCourseChange}
-          width={isMobile ? '100%' : '200px'}
+          width={isMobile ? '100%' : '275px'}
           size="small"
         >
           {courseOptions.map(option => (
@@ -100,12 +123,22 @@ const CourseWorkFilters: React.FC<CourseWorkFiltersProps> = ({
           ))}
         </SimpleSelect>
       </Flex.Item>
-      <Flex.Item shouldGrow={isMobile} padding={isMobile ? filterMobilePadding : '0 0 0 small'}>
+      <Flex.Item
+        shouldGrow={isMobile}
+        padding={isNarrowScreen ? filterMobilePadding : '0 0 0 small'}
+      >
         <SimpleSelect
+          renderBeforeInput={
+            <View padding="xx-small 0">
+              <Text size="small" weight="bold">
+                Filter by:
+              </Text>
+            </View>
+          }
           renderLabel={<ScreenReaderContent>{I18n.t('Filter by due date')}</ScreenReaderContent>}
           value={selectedDateFilter}
           onChange={onDateFilterChange}
-          width={isMobile ? '100%' : '150px'}
+          width={isMobile ? '100%' : '275px'}
           size="small"
         >
           {dateFilterOptions.map(option => (
