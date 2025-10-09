@@ -188,7 +188,7 @@ export function getToolbarForVariant(
       },
       {
         name: formatMessage('Content'),
-        items: ['instructure_links', 'instructure_documents'],
+        items: ['instructure_links'],
       },
       {
         name: formatMessage('Alignment and Lists'),
