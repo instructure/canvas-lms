@@ -72,7 +72,9 @@ export const HighlightBlockSettings = () => {
             checked={displayIcon === 'warning'}
             onChange={e =>
               setProp((props: HighlightBlockProps) => {
-                props.displayIcon = e.target.checked ? 'warning' : null
+                // IMPORTANT: Never use null values in setProp - CraftJS filters them out during serialization
+                // Use sentinel values like 'none', 'disabled', 'off' instead of null
+                props.displayIcon = e.target.checked ? 'warning' : 'none'
               })
             }
           />

@@ -22,6 +22,7 @@ export const getIcon = (displayIcon: string | null, color: string) => {
   switch (displayIcon) {
     case 'warning':
       return <IconWarningLine size="medium" style={{color}} />
+    case 'none':
     default:
       return null
   }
