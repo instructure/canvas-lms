@@ -725,6 +725,18 @@ describe Types::SubmissionType do
       ).to eq %w[MQ Mg Mw]
     end
 
+    it "can include up to 100 items" do
+      assignment = @course.assignments.create! name: "pagination test", points_possible: 10
+      100.times do |i|
+        assignment.submit_homework(@student, body: "Attempt #{i + 1}", submitted_at: (100 - i).hours.ago)
+      end
+
+      submissions = @student.submissions.find_by(assignment:)
+      submission_type = GraphQLTypeTester.new(submissions, current_user: @teacher, request: ActionDispatch::TestRequest.create)
+      result = submission_type.resolve("submissionHistoriesConnection(first: 100) { nodes { attempt } }")
+      expect(result.length).to eq(100)
+    end
+
     context "filter" do
       describe "states" do
         before(:once) do
