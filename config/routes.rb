@@ -1259,6 +1259,11 @@ CanvasRails::Application.routes.draw do
       post "courses/:course_id/ai_experiences/:id/continue_conversation", action: :continue_conversation, as: "course_ai_experience_continue_conversation"
     end
 
+    scope(controller: :microfrontends_release_tag_override) do
+      get "microfrontends/release_tag_override", action: :create, as: :microfrontends_release_tag_override
+      delete "microfrontends/release_tag_override", action: :destroy
+    end
+
     scope(controller: :account_calendars_api) do
       get "account_calendars", action: :index, as: :account_calendars
       get "account_calendars/:account_id", action: :show, as: :account_calendar
