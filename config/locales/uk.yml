@@ -5515,6 +5515,7 @@ uk:
   course_statistics: 
     unknown: невідомо
   course_storage_391e1bd: "Сховище курсу"
+  course_summary_99c39cea: "Резюме курсу"
   course_syllabus_5de1b0af: "Програма курсу"
   course_users: 
     greater_than_three: "Будь ласка. введіть пошукові терміни з трьома і більше символами"
