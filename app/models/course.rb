@@ -3467,6 +3467,19 @@ class Course < ActiveRecord::Base
                         })
     end
 
+    # Add AI Experiences tab before Settings if feature flag is enabled
+    # AI Experiences is currently using assignment permissions until granular ai experiences permissions are created
+    if feature_enabled?(:ai_experiences) && grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+      settings_index = default_tabs.index { |t| t[:id] == TAB_SETTINGS }
+      settings_index ||= default_tabs.length
+      default_tabs.insert(settings_index, {
+                            id: TAB_AI_EXPERIENCES,
+                            label: t("#tabs.ai_experiences", "AI Experiences"),
+                            css_class: "ai_experiences",
+                            href: :course_ai_experiences_path
+                          })
+    end
+
     # Remove already cached tabs for Horizon courses
     if horizon_course?
       default_tabs.delete_if do |tab|
@@ -3664,19 +3677,6 @@ class Course < ActiveRecord::Base
             # can't do any of the additional things required
             (!additional_checks[t[:id]] || !check_for_permission.call(*additional_checks[t[:id]]))
         end
-      end
-
-      # Add AI Experiences tab before Settings if feature flag is enabled
-      # AI Experiences is currently using assignment permissions until granular ai experiences permissions are created
-      if feature_enabled?(:ai_experiences) && check_for_permission.call(*RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
-        settings_index = tabs.index { |t| t[:id] == TAB_SETTINGS }
-        settings_index ||= tabs.length
-        tabs.insert(settings_index, {
-                      id: TAB_AI_EXPERIENCES,
-                      label: t("#tabs.ai_experiences", "AI Experiences"),
-                      css_class: "ai_experiences",
-                      href: :course_ai_experiences_path
-                    })
       end
 
       # Add YouTube migration tab before Settings if conditions are met
