@@ -719,14 +719,49 @@ class ContextModule < ActiveRecord::Base
                                  end
   end
 
+  # Find next available position starting from requested position
+  def find_next_available_position(requested_position)
+    used_positions = content_tags.not_deleted.pluck(:position).compact.to_set
+    target_position = requested_position
+    target_position += 1 while used_positions.include?(target_position)
+    target_position
+  end
+
+  # Shift existing items to make room at requested position
+  def resolve_position_conflicts(requested_position)
+    if content_tags.not_deleted.where(position: requested_position).exists?
+      content_tags.not_deleted
+                  .where(position: requested_position..)
+                  .update_all("position = position + 1")
+    end
+  end
+
+  # Decide what position a new module item should get
+  def determine_position(params, opts)
+    raw_position = opts[:position] || params[:position]
+    position_int = raw_position.to_i if raw_position.present? && raw_position.to_i > 0
+
+    if opts[:defer_position]
+      nil
+    elsif position_int
+      position_int
+    else
+      (content_tags.not_deleted.maximum(:position) || 0) + 1
+    end
+  end
+
   def add_item(params, added_item = nil, opts = {})
     params[:type] = params[:type].underscore if params[:type]
-    top_position = (content_tags.not_deleted.maximum(:position) || 0) + 1
-    position = opts[:position] || top_position
-    position = [position, params[:position].to_i].max if params[:position]
-    if content_tags.not_deleted.where(position:).count != 0
-      position = top_position
+
+    # Determine initial position
+    position = determine_position(params, opts)
+
+    # If resolve_conflicts is enabled, handle position conflicts before saving
+    if opts[:resolve_conflicts] && position
+      resolve_position_conflicts(position)
     end
+
+    params[:position] = position if position
     case params[:type]
     when "wiki_page", "page"
       item = opts[:wiki_page] || context.wiki_pages.where(id: params[:id]).first
@@ -746,14 +781,15 @@ class ContextModule < ActiveRecord::Base
     when "external_url"
       title = params[:title]
       added_item ||= content_tags.build(context:)
-      added_item.attributes = {
+      attributes_hash = {
         url: params[:url],
         new_tab: params[:new_tab],
         tag_type: "context_module",
         title:,
-        indent: params[:indent],
-        position:
+        indent: params[:indent]
       }
+      attributes_hash[:position] = position unless position.nil?
+      added_item.attributes = attributes_hash
       added_item.content_id = 0
       added_item.content_type = "ExternalUrl"
       added_item.context_module_id = id
@@ -768,15 +804,16 @@ class ContextModule < ActiveRecord::Base
                 else
                   Lti::ToolFinder.from_url(params[:url], context, preferred_tool_id: params[:id].to_i) || ContextExternalTool.new.tap { |tool| tool.id = 0 }
                 end
-      added_item.attributes = {
+      attributes_hash = {
         content:,
         url: params[:url],
         new_tab: params[:new_tab],
         tag_type: "context_module",
         title:,
-        indent: params[:indent],
-        position:
+        indent: params[:indent]
       }
+      attributes_hash[:position] = position unless position.nil?
+      added_item.attributes = attributes_hash
       added_item.context_module_id = id
       added_item.indent = params[:indent] || 0
       added_item.workflow_state = "unpublished" if added_item.new_record?
@@ -800,12 +837,13 @@ class ContextModule < ActiveRecord::Base
     when "context_module_sub_header", "sub_header"
       title = params[:title]
       added_item ||= content_tags.build(context:)
-      added_item.attributes = {
+      attributes_hash = {
         tag_type: "context_module",
         title:,
-        indent: params[:indent],
-        position:
+        indent: params[:indent]
       }
+      attributes_hash[:position] = position unless position.nil?
+      added_item.attributes = attributes_hash
       added_item.content_id = 0
       added_item.content_type = "ContextModuleSubHeader"
       added_item.context_module_id = id
@@ -816,13 +854,14 @@ class ContextModule < ActiveRecord::Base
 
       title = params[:title] || item.try(:title) || item.name
       added_item ||= content_tags.build(context:)
-      added_item.attributes = {
+      attributes_hash = {
         content: item,
         tag_type: "context_module",
         title:,
-        indent: params[:indent],
-        position:
+        indent: params[:indent]
       }
+      attributes_hash[:position] = position unless position.nil?
+      added_item.attributes = attributes_hash
       added_item.context_module_id = id
       added_item.indent = params[:indent] || 0
       added_item.workflow_state = workflow_state if added_item.new_record?
