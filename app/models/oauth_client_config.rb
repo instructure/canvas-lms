@@ -163,6 +163,26 @@ class OAuthClientConfig < ActiveRecord::Base
 
   Canvas::Reloader.on_reload { Cache.clear_memory_cache }
 
+  # Bookmarker for API pagination with dynamic sorting support
+  class Bookmarker < Plannable::Bookmarker
+    def initialize(order_by = :created_at, descending: false)
+      # Map UI sort fields to database columns
+      column = case order_by
+               when :type then :type
+               when :identifier then :identifier
+               when :client_name then :client_name
+               when :throttle_high_water_mark then :throttle_high_water_mark
+               when :throttle_outflow then :throttle_outflow
+               when :comments then :comment
+               when :updated_at then :updated_at
+               when :updated_by then { users: :name }
+               else :created_at
+               end
+
+      super(OAuthClientConfig, descending, column, :id)
+    end
+  end
+
   # Hybrid caching layer that aims to minimize DB lookups and cache hits
   # during rate limiting checks, similar to Setting.
   #

@@ -188,6 +188,7 @@ const featureBundles: {
   quizzes: () => import('./features/quizzes/index'),
   registration_confirmation: () => import('./features/registration_confirmation/index'),
   registration: () => import('./features/registration/index'),
+  rate_limiting_settings: () => import('./features/rate_limiting_settings/index'),
   roster: () => import('./features/roster/index'),
   rubric_assessment: () => import('./features/rubric_assessment/index'),
   rubrics_index: () => import('./features/rubrics_index/index'),
