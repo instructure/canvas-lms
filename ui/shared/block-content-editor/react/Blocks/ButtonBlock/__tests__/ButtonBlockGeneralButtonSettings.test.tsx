@@ -47,7 +47,7 @@ describe('ButtonBlockGeneralButtonSettings', () => {
     it('renders all layout options', () => {
       render(<ButtonBlockGeneralButtonSettings {...defaultProps} />)
 
-      expect(screen.getByText('Button Layout')).toBeInTheDocument()
+      expect(screen.getByText('Button layout')).toBeInTheDocument()
       expect(screen.getByLabelText('Horizontal')).toBeInTheDocument()
       expect(screen.getByLabelText('Vertical')).toBeInTheDocument()
     })
