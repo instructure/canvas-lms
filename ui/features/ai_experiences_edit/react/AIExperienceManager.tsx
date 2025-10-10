@@ -61,7 +61,7 @@ const AIExperienceManager: React.FC<AIExperienceManagerProps> = ({
     fetchAIExperience()
   }, [])
 
-  const handleSubmit = async (formData: AIExperienceFormData) => {
+  const handleSubmit = async (formData: AIExperienceFormData, shouldPreview = false) => {
     setIsLoading(true)
     try {
       const courseId = ENV.COURSE_ID
@@ -73,10 +73,16 @@ const AIExperienceManager: React.FC<AIExperienceManagerProps> = ({
 
       const method = isEdit ? 'PUT' : 'POST'
 
+      // Set workflow_state to unpublished for draft
+      const dataToSubmit = {
+        ...formData,
+        workflow_state: 'unpublished',
+      }
+
       console.log(`${isEdit ? 'Updating' : 'Creating'} AI experience:`, {
         path,
         method,
-        formData,
+        formData: dataToSubmit,
         courseId,
       })
 
@@ -84,7 +90,7 @@ const AIExperienceManager: React.FC<AIExperienceManagerProps> = ({
         path,
         method,
         body: {
-          ai_experience: formData,
+          ai_experience: dataToSubmit,
         },
       })
 
@@ -94,6 +100,12 @@ const AIExperienceManager: React.FC<AIExperienceManagerProps> = ({
         `AI Experience ${isEdit ? 'updated' : 'created'} successfully:`,
         updatedExperience,
       )
+
+      // Redirect to the show page, optionally with preview parameter
+      if (updatedExperience.id) {
+        const previewParam = shouldPreview ? '?preview=true' : ''
+        window.location.href = `/courses/${courseId}/ai_experiences/${updatedExperience.id}${previewParam}`
+      }
     } catch (error) {
       console.error('Error saving AI Experience:', error)
     } finally {
