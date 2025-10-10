@@ -651,7 +651,8 @@ class ContentMigration < ActiveRecord::Base
           dir, filename = File.split(@exported_data_zip.path)
           all_files_path = create_all_files_path(filename)
           e.extract(all_files_path, destination_directory: dir)
-          data["all_files_export"]["file_path"] = File.join(dir, all_files_path)
+          all_files_path = File.join(dir, all_files_path)
+          data["all_files_export"]["file_path"] = all_files_path
         else
           data["all_files_export"]["file_path"] = nil
         end
