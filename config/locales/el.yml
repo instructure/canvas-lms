@@ -4716,6 +4716,7 @@ el:
   course_starts_at_3a01f9da: "Το μάθημα ξεκινάει στις"
   course_statistics: 
     unknown: άγνωστο
+  course_summary_99c39cea: "Περίληψη Μαθήματος"
   course_syllabus_5de1b0af: "Αναλυτικό Πρόγραμμα Μαθήματος"
   course_users: 
     greater_than_three: "Παρακαλώ εισαγάγετε κάποιον όρο αναζήτησης με τρεις ή περισσότερους χαρακτήρες"
