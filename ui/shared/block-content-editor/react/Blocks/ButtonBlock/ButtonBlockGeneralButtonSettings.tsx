@@ -66,7 +66,7 @@ export const ButtonBlockGeneralButtonSettings = ({
 
       <RadioInputGroup
         name="button-block-general-button-settings-layout"
-        description={I18n.t('Button Layout')}
+        description={I18n.t('Button layout')}
         value={layout}
         onChange={(_event, value) => onLayoutChange(value as ButtonLayout)}
       >
