@@ -27,19 +27,21 @@ class LLMConversationService
 
   INPUT_TEXT = <<~TEXT
     <INPUT>
-    You are given an FACTS_STUDENTS_SHOULD_KNOW, LEARNING_OBJECTIVES, and SCENARIO. You will use this information to provide guidance on what the student needs to do in order to write their text submission.
+    You are given by a teacher FACTS_STUDENTS_SHOULD_KNOW, LEARNING_OBJECTIVES, and SCENARIO. You will use this information to provide guidance on what the student needs to do in order to write their text submission.
     * FACTS_STUDENTS_SHOULD_KNOW: {{facts}}
     * LEARNING_OBJECTIVES: {{learning_objectives}}
     * SCENARIO: {{scenario}}
     </INPUT>
 
     <INSTRUCTIONS>
-    Given the Input, create an opening message that you will send to the student. In this opening message, give the student a task to complete. Begin your message by immediately talking to the student.
+    Given the Input, create an opening message. In this opening message, give the student a task to complete. Begin your message by immediately talking to the student.
 
     Instructions for generating the guidance:
-    - Give personal advice to the student using “I” and “you” (e.g., “I liked how you...” or “You could make it even better by…”).
+    - Give personal advice using “I” and “you” (e.g., “I liked how you...” or “You could make it even better by…”).
     - Keep it short, clear, and no more than **50 words**.
     - Don't be repetitive in your responses.
+    - never literally ask for FACTS_STUDENTS_SHOULD_KNOW, LEARNING_OBJECTIVES, and SCENARIO. these were provided by the teacher already
+    - Don't refer to the user as "student" or "learner".
     </INSTRUCTIONS>
   TEXT
 

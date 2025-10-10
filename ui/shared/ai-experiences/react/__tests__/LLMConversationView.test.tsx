@@ -31,6 +31,8 @@ const defaultProps = {
   facts: 'Test facts',
   learningObjectives: 'Test objectives',
   scenario: 'Test scenario',
+  isExpanded: true,
+  onToggleExpanded: jest.fn(),
 }
 
 describe('LLMConversationView', () => {
@@ -47,30 +49,55 @@ describe('LLMConversationView', () => {
     expect(container.firstChild).toBeNull()
   })
 
-  it('renders when open', () => {
+  it('renders collapsed state when not expanded', () => {
+    render(<LLMConversationView {...defaultProps} isExpanded={false} />)
+    expect(screen.getByText('Preview')).toBeInTheDocument()
+    expect(
+      screen.getByText('Here, you can have a chat with the AI just like a student would.'),
+    ).toBeInTheDocument()
+  })
+
+  it('renders expanded state when expanded', () => {
     fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {messages: []})
 
     render(<LLMConversationView {...defaultProps} />)
-    expect(screen.getByText('Test Experience')).toBeInTheDocument()
+    expect(screen.getByText('Preview')).toBeInTheDocument()
+    expect(screen.getByText('Restart')).toBeInTheDocument()
   })
 
-  it('renders close and reset button', () => {
+  it('renders restart button', () => {
     fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {messages: []})
 
     render(<LLMConversationView {...defaultProps} />)
-    expect(screen.getByText('Close and Reset')).toBeInTheDocument()
+    expect(screen.getByText('Restart')).toBeInTheDocument()
   })
 
-  it('calls onClose when close button is clicked', () => {
+  it('calls onToggleExpanded when collapsed card is clicked', () => {
+    const onToggleExpanded = jest.fn()
+    render(
+      <LLMConversationView
+        {...defaultProps}
+        isExpanded={false}
+        onToggleExpanded={onToggleExpanded}
+      />,
+    )
+
+    const previewCard = screen.getByText('Preview').closest('[role="button"]')
+    fireEvent.click(previewCard!)
+
+    expect(onToggleExpanded).toHaveBeenCalled()
+  })
+
+  it('calls onToggleExpanded when close button is clicked', () => {
     fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {messages: []})
 
-    const onClose = jest.fn()
-    render(<LLMConversationView {...defaultProps} onClose={onClose} />)
+    const onToggleExpanded = jest.fn()
+    render(<LLMConversationView {...defaultProps} onToggleExpanded={onToggleExpanded} />)
 
-    const closeButton = screen.getByText('Close and Reset')
-    fireEvent.click(closeButton)
+    const closeButton = screen.getAllByText('Close preview')[0].closest('button')
+    fireEvent.click(closeButton!)
 
-    expect(onClose).toHaveBeenCalled()
+    expect(onToggleExpanded).toHaveBeenCalled()
   })
 
   it('initializes conversation on mount', async () => {
@@ -119,7 +146,7 @@ describe('LLMConversationView', () => {
 
     render(<LLMConversationView {...defaultProps} />)
 
-    expect(screen.getByLabelText('Your message')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Your answer...')).toBeInTheDocument()
     expect(screen.getByText('Send')).toBeInTheDocument()
   })
 
@@ -150,7 +177,7 @@ describe('LLMConversationView', () => {
       expect(screen.getByText('Hello')).toBeInTheDocument()
     })
 
-    const input = screen.getByLabelText('Your message')
+    const input = screen.getByPlaceholderText('Your answer...')
     fireEvent.change(input, {target: {value: 'Test message'}})
 
     const sendButton = screen.getByText('Send')
@@ -167,7 +194,7 @@ describe('LLMConversationView', () => {
 
     render(<LLMConversationView {...defaultProps} />)
 
-    const input = screen.getByLabelText('Your message') as HTMLTextAreaElement
+    const input = screen.getByPlaceholderText('Your answer...') as HTMLTextAreaElement
     fireEvent.change(input, {target: {value: 'Test message'}})
 
     const sendButton = screen.getByText('Send')
@@ -204,7 +231,7 @@ describe('LLMConversationView', () => {
       expect(screen.getByText('Hello')).toBeInTheDocument()
     })
 
-    const input = screen.getByLabelText('Your message')
+    const input = screen.getByPlaceholderText('Your answer...')
     fireEvent.change(input, {target: {value: 'New message'}})
 
     const sendButton = screen.getByText('Send')
@@ -216,7 +243,7 @@ describe('LLMConversationView', () => {
 
   // Note: Optimistic message rollback on error is tested in integration tests
 
-  it('clears messages when close button is clicked', async () => {
+  it('restarts conversation when restart button is clicked', async () => {
     const mockMessages = [
       {role: 'User', text: 'Start', timestamp: new Date()},
       {role: 'Assistant', text: 'Hello', timestamp: new Date()},
@@ -226,31 +253,22 @@ describe('LLMConversationView', () => {
       messages: mockMessages,
     })
 
-    const onClose = jest.fn()
-    render(<LLMConversationView {...defaultProps} onClose={onClose} />)
+    render(<LLMConversationView {...defaultProps} />)
 
     await waitFor(() => {
       expect(screen.getByText('Hello')).toBeInTheDocument()
     })
 
-    const closeButton = screen.getByText('Close and Reset')
-    fireEvent.click(closeButton)
+    const restartButton = screen.getByText('Restart')
+    fireEvent.click(restartButton)
 
-    expect(onClose).toHaveBeenCalled()
-  })
-
-  it('focuses close button when conversation opens', async () => {
-    fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {messages: []})
-
-    render(<LLMConversationView {...defaultProps} />)
-
+    // Should re-initialize conversation
     await waitFor(() => {
-      const closeButton = screen.getByText('Close and Reset').closest('button')
-      expect(document.activeElement).toBe(closeButton)
+      expect(fetchMock.calls().length).toBeGreaterThan(1)
     })
   })
 
-  it('displays user messages on the right', async () => {
+  it('does not display sender labels in messages', async () => {
     const mockMessages = [
       {role: 'User', text: 'Start', timestamp: new Date()},
       {role: 'Assistant', text: 'Hello', timestamp: new Date()},
@@ -267,8 +285,8 @@ describe('LLMConversationView', () => {
       expect(screen.getByText('User message')).toBeInTheDocument()
     })
 
-    // Verify the user message label is present
-    const youLabels = screen.getAllByText('You')
-    expect(youLabels.length).toBeGreaterThan(0)
+    // Verify no sender labels are present
+    expect(screen.queryByText('You')).not.toBeInTheDocument()
+    expect(screen.queryByText('AI Assistant')).not.toBeInTheDocument()
   })
 })

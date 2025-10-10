@@ -23,9 +23,9 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {TextArea} from '@instructure/ui-text-area'
-import {Button} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
-import {IconAiLine} from '@instructure/ui-icons'
+import {IconPlayLine, IconXLine, IconRefreshLine} from '@instructure/ui-icons'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import type {LLMConversationMessage, LLMConversationViewProps} from '../../types'
 
@@ -37,14 +37,16 @@ interface ContinueConversationResponse {
 
 const LLMConversationView: React.FC<LLMConversationViewProps> = ({
   isOpen,
-  onClose,
-  returnFocusRef,
+  onClose: _onClose,
+  returnFocusRef: _returnFocusRef,
   courseId,
   aiExperienceId,
-  aiExperienceTitle,
-  facts,
-  learningObjectives,
-  scenario,
+  aiExperienceTitle: _aiExperienceTitle,
+  facts: _facts,
+  learningObjectives: _learningObjectives,
+  scenario: _scenario,
+  isExpanded = false,
+  onToggleExpanded,
 }) => {
   const [messages, setMessages] = useState<LLMConversationMessage[]>([])
   const [inputValue, setInputValue] = useState('')
@@ -62,15 +64,15 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
   }, [messages])
 
   useEffect(() => {
-    if (isOpen && messages.length === 0) {
+    if (isOpen && isExpanded && messages.length === 0) {
       initializeConversation()
     }
-    // Focus the close button when the conversation is opened
-    if (isOpen && closeButtonRef.current) {
+    // Focus the close button when the conversation is expanded
+    if (isOpen && isExpanded && closeButtonRef.current) {
       closeButtonRef.current.focus()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen])
+  }, [isOpen, isExpanded])
 
   const initializeConversation = async () => {
     setIsInitializing(true)
@@ -134,54 +136,93 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
     }
   }
 
-  const handleClose = () => {
+  const handleRestart = () => {
     setMessages([])
     setInputValue('')
-    onClose()
-    // Return focus to the button that opened the conversation
-    if (returnFocusRef?.current) {
-      returnFocusRef.current.focus()
-    }
+    initializeConversation()
   }
 
   if (!isOpen) return null
 
+  // Collapsed state - clickable preview card
+  if (!isExpanded) {
+    return (
+      <View
+        as="div"
+        padding="medium"
+        background="primary"
+        borderWidth="small"
+        borderRadius="medium"
+        cursor="pointer"
+        onClick={onToggleExpanded}
+        role="button"
+        tabIndex={0}
+        onKeyDown={e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            onToggleExpanded?.()
+          }
+        }}
+      >
+        <Flex gap="small" alignItems="center">
+          <IconPlayLine size="small" />
+          <View>
+            <Heading level="h3" margin="0 0 xx-small 0">
+              {I18n.t('Preview')}
+            </Heading>
+            <Text size="small">
+              {I18n.t('Here, you can have a chat with the AI just like a student would.')}
+            </Text>
+          </View>
+        </Flex>
+      </View>
+    )
+  }
+
+  // Expanded state - full conversation interface
   return (
-    <View
-      as="div"
-      padding="medium"
-      background="transparent"
-      borderWidth="small 0 0 0"
-      shadow="above"
-    >
-      <Flex direction="column" gap="small">
+    <View as="div" borderWidth="small" borderRadius="medium" overflowX="hidden" overflowY="hidden">
+      {/* Preview header section */}
+      <View as="div" padding="medium" background="primary" borderWidth="0 0 small 0">
         <Flex gap="small" alignItems="center" justifyItems="space-between">
           <Flex gap="small" alignItems="center">
-            <IconAiLine />
-            <Heading level="h3">{aiExperienceTitle || I18n.t('AI Experience')}</Heading>
+            <IconButton
+              onClick={() => {
+                onToggleExpanded?.()
+                setMessages([])
+                setInputValue('')
+              }}
+              size="small"
+              withBackground={false}
+              withBorder={false}
+              screenReaderLabel={I18n.t('Close preview')}
+              elementRef={el => {
+                if (el) {
+                  // @ts-expect-error - elementRef accepts Element but we need HTMLButtonElement for focus()
+                  closeButtonRef.current = el
+                }
+              }}
+            >
+              <IconXLine />
+            </IconButton>
+            <View>
+              <Heading level="h3" margin="0 0 xx-small 0">
+                {I18n.t('Preview')}
+              </Heading>
+              <Text size="small">
+                {I18n.t('Here, you can have a chat with the AI just like a student would.')}
+              </Text>
+            </View>
           </Flex>
-          <Button
-            onClick={handleClose}
-            size="small"
-            elementRef={el => {
-              if (el) {
-                // @ts-expect-error - elementRef accepts Element but we need HTMLButtonElement for focus()
-                closeButtonRef.current = el
-              }
-            }}
-          >
-            {I18n.t('Close and Reset')}
+          <Button onClick={handleRestart} size="medium" renderIcon={<IconRefreshLine />}>
+            {I18n.t('Restart')}
           </Button>
         </Flex>
+      </View>
 
-        <View
-          as="div"
-          height="400px"
-          overflowY="auto"
-          padding="small"
-          background="primary"
-          borderRadius="medium"
-        >
+      {/* Chat conversation section */}
+      <View as="div" padding="medium" background="secondary">
+        <View as="div" height="400px" overflowY="auto" margin="0 0 medium 0">
           {isInitializing ? (
             <Flex justifyItems="center" alignItems="center" height="100%">
               <Spinner renderTitle={I18n.t('Initializing conversation...')} />
@@ -196,20 +237,11 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
                       as="div"
                       maxWidth="75%"
                       padding="small"
-                      background={isUser ? 'brand' : 'secondary'}
+                      background={isUser ? 'primary' : undefined}
                       borderRadius="medium"
-                      shadow="resting"
+                      borderWidth={isUser ? 'small' : undefined}
                     >
-                      <Text
-                        weight="bold"
-                        size="small"
-                        color={isUser ? 'primary-inverse' : 'primary'}
-                      >
-                        {isUser ? I18n.t('You') : I18n.t('AI Assistant')}
-                      </Text>
-                      <View as="div" margin="xx-small 0 0 0">
-                        <Text color={isUser ? 'primary-inverse' : 'primary'}>{message.text}</Text>
-                      </View>
+                      <Text>{message.text}</Text>
                     </View>
                   </Flex>
                 )
@@ -224,31 +256,45 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
           )}
         </View>
 
-        <Flex gap="small">
-          <Flex.Item shouldGrow shouldShrink>
-            <TextArea
-              label={I18n.t('Your message')}
-              value={inputValue}
-              onChange={e => setInputValue(e.target.value)}
-              onKeyDown={handleKeyPress}
-              placeholder={I18n.t('Type your message here...')}
-              height="100px"
-              disabled={isLoading || isInitializing}
-            />
-          </Flex.Item>
-          <Flex.Item>
-            <Button
-              onClick={handleSendMessage}
-              color="primary"
-              interaction={
-                isLoading || isInitializing || !inputValue.trim() ? 'disabled' : 'enabled'
-              }
-            >
-              {I18n.t('Send')}
-            </Button>
-          </Flex.Item>
-        </Flex>
-      </Flex>
+        {/* Message input section */}
+        <View
+          as="div"
+          padding="small"
+          background="primary"
+          borderWidth="small"
+          borderRadius="medium"
+        >
+          <div style={{marginBottom: '0.75rem'}}>
+            <Text weight="bold" size="small">
+              {I18n.t('Message box')}
+            </Text>
+          </div>
+          <Flex gap="small" alignItems="center">
+            <Flex.Item shouldGrow shouldShrink>
+              <TextArea
+                label={<span style={{display: 'none'}}>{I18n.t('Your answer...')}</span>}
+                value={inputValue}
+                onChange={e => setInputValue(e.target.value)}
+                onKeyDown={handleKeyPress}
+                placeholder={I18n.t('Your answer...')}
+                height="60px"
+                disabled={isLoading || isInitializing}
+              />
+            </Flex.Item>
+            <Flex.Item>
+              <Button
+                onClick={handleSendMessage}
+                color="primary"
+                interaction={
+                  isLoading || isInitializing || !inputValue.trim() ? 'disabled' : 'enabled'
+                }
+              >
+                {I18n.t('Send')}
+              </Button>
+            </Flex.Item>
+          </Flex>
+        </View>
+      </View>
     </View>
   )
 }
