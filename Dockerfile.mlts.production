@@ -65,6 +65,15 @@ WORKDIR /app
 # Bring in the built app
 COPY --from=build /usr/src/app /app
 
+
+# --- Bundler runtime setup: pin version and point to vendored gems ---
+RUN gem install bundler:2.5.13
+ENV BUNDLER_VERSION=2.5.13 \
+    BUNDLE_PATH=/app/vendor/bundle \
+    BUNDLE_WITHOUT="development:test" \
+    BUNDLE_FROZEN=1
+    
+    
 # Writable paths
 RUN chown -R canvas:canvas \
   config environment.rb log tmp public app/stylesheets/brandable_css_brands \

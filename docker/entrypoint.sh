@@ -6,6 +6,17 @@ cd /app
 die() { echo "ERROR: $*" >&2; exit 1; }
 have() { command -v "$1" >/dev/null 2>&1; }
 
+ensure_bundler() {
+  # Use the pinned version if present
+  if ! bundle -v 2>/dev/null | grep -q "2.5.13"; then
+    gem install bundler:2.5.13 || true
+  fi
+  # Register bundler-multilock plugin if missing (writes to ~/.bundle)
+  if ! bundle plugin list 2>/dev/null | grep -q "bundler-multilock"; then
+    bundle plugin install bundler-multilock
+  fi
+}
+
 # The guide requires these configs; we generate safe defaults from envs.
 # Production-specific values are written under 'production:' keys.
 gen_configs() {
@@ -71,7 +82,7 @@ YAML
 }
 
 db_exists() {
-  ruby -e "require 'active_record'; require 'yaml'; require 'erb';
+  bundle exec ruby -e "require 'active_record'; require 'yaml'; require 'erb';
     conf=YAML.safe_load(ERB.new(File.read('config/database.yml')).result, aliases: true);
     ActiveRecord::Base.establish_connection(conf['production']);
     begin
@@ -110,6 +121,7 @@ start_worker() {
 }
 
 # --- flow ---
+ensure_bundler
 gen_configs
 initial_setup_if_needed
 migrate_if_requested
