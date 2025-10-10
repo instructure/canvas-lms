@@ -7,8 +7,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates curl git tzdata locales \
     build-essential pkg-config \
     libxml2-dev libxmlsec1-dev xmlsec1 \
-    default-libmysqlclient-dev \
-    libmariadb-dev-compat \
     libpq-dev zlib1g-dev libsqlite3-dev libidn11-dev \
     python3 make g++ shared-mime-info gnupg wget \
  && rm -rf /var/lib/apt/lists/*
@@ -59,6 +57,8 @@ ENV ADAPTER=postgresql
 # Runtime libs only
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libxml2 libxmlsec1 xmlsec1 \
+    default-libmysqlclient-dev \
+    libmariadb-dev-compat \
     libpq5 libsqlite3-0 libidn12 tzdata \
  && rm -rf /var/lib/apt/lists/*
 
