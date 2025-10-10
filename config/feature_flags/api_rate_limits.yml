@@ -1,0 +1,12 @@
+---
+api_rate_limits:
+  type: setting
+  state: hidden
+  display_name: "API Rate Limiting Management"
+  description: "Allow account administrators to manage API rate limits for external tools and integrations using UTIDs"
+  applies_to: RootAccount
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
