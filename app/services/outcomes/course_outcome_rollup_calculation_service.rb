@@ -93,10 +93,10 @@ module Outcomes
           Rails.logger.info("[OutcomeRollup] Successfully created/updated #{rollups_created} rollups for course #{course.id}, outcome #{outcome.id}")
 
           InstStatsd::Statsd.distributed_increment("rollup.course_outcome.success",
-                                                   tags: { course_id: course.id, outcome_id: outcome.id })
+                                                   tags: Utils::InstStatsdUtils::Tags.tags_for(course.shard))
           InstStatsd::Statsd.count("rollup.course_outcome.records_processed",
                                    rollups_created,
-                                   tags: { course_id: course.id, outcome_id: outcome.id })
+                                   tags: Utils::InstStatsdUtils::Tags.tags_for(course.shard))
 
           result
         rescue => e
@@ -105,10 +105,10 @@ module Outcomes
 
           timing_meta.tags = { course_id: course.id, outcome_id: outcome.id, error: true }
           InstStatsd::Statsd.distributed_increment("rollup.course_outcome.error",
-                                                   tags: { course_id: course.id, outcome_id: outcome.id })
+                                                   tags: Utils::InstStatsdUtils::Tags.tags_for(course.shard))
           InstStatsd::Statsd.count("rollup.course_outcome.records_processed",
                                    rollups_created,
-                                   tags: { course_id: course.id, outcome_id: outcome.id })
+                                   tags: Utils::InstStatsdUtils::Tags.tags_for(course.shard))
           raise e
         end
       end
@@ -133,10 +133,10 @@ module Outcomes
       Rails.logger.info("[OutcomeRollup] No students found for course #{course.id}, skipping rollup")
 
       InstStatsd::Statsd.distributed_increment("rollup.course_outcome.success",
-                                               tags: { course_id: course.id, outcome_id: outcome.id })
+                                               tags: Utils::InstStatsdUtils::Tags.tags_for(course.shard))
       InstStatsd::Statsd.count("rollup.course_outcome.records_processed",
                                0,
-                               tags: { course_id: course.id, outcome_id: outcome.id })
+                               tags: Utils::InstStatsdUtils::Tags.tags_for(course.shard))
 
       OutcomeRollup.none
     end
@@ -148,10 +148,10 @@ module Outcomes
       mark_outcome_rollups_deleted
 
       InstStatsd::Statsd.distributed_increment("rollup.course_outcome.success",
-                                               tags: { course_id: course.id, outcome_id: outcome.id })
+                                               tags: Utils::InstStatsdUtils::Tags.tags_for(course.shard))
       InstStatsd::Statsd.count("rollup.course_outcome.records_processed",
                                0,
-                               tags: { course_id: course.id, outcome_id: outcome.id })
+                               tags: Utils::InstStatsdUtils::Tags.tags_for(course.shard))
 
       OutcomeRollup.none
     end
