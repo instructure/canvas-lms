@@ -6255,7 +6255,6 @@ tr:
   course_statistics: 
     unknown: bilinmeyen
   course_storage_391e1bd: "Ders Kotası"
-  course_summary_99c39cea: "Ders Özeti"
   course_syllabus_5de1b0af: "Ders Programı"
   course_users: 
     greater_than_three: "Lütfen üç veya daha fazla karakter içeren bir arama terimi girin"

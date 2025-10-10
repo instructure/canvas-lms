@@ -8387,7 +8387,6 @@ nn:
   course_status_state_7e4ed8f3: "Emnestatus: %{state}"
   course_storage_391e1bd: "Lagringskapasitet for emne"
   course_submission_report_data_example_95971ae4: "Eksempel på datarapport til emneinnleveringar"
-  course_summary_99c39cea: Emnesamandrag
   course_syllabus_5de1b0af: Emneoversikt
   course_syllabus_published_content_report_samford_21dfcb58: "Emneoversikt & publisert innhaldsrapport - Samford"
   course_syllabus_report_becker_92173e15: "Rapport av emneoversikt - Becker"

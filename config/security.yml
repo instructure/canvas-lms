@@ -1,4 +1,0 @@
-development:
-  encryption_key: "41b4a1a74784a2b24e2cfe35be78eab3b8b0ebbeb4fbde20328997f27f7a06fa979fa7afe79543e6b5825fb3d5a9f3867b2a9fa2170f01534a64ac34272394ff"
-  db_key_base: ""
-  secret_token:  ""

@@ -2357,14 +2357,3 @@ module ActiveModelDirtyRails80
 end
 
 ActiveModel::Dirty.prepend(ActiveModelDirtyRails80) if Rails.version >= "8.0" && Rails.version < "8.1"
-
-# Restore Rails 7.2 behavior of casting Numeric to nil for DateTime columns
-module DateTimeRails80
-  def cast_value(value)
-    return nil if value.is_a?(Numeric)
-
-    super
-  end
-end
-
-ActiveModel::Type::DateTime.prepend(DateTimeRails80) if Rails.version >= "8.0"

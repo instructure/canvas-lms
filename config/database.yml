@@ -1,8 +1,0 @@
-development:
-  adapter: postgresql
-  url: <%= ENV.fetch("DATABASE_URL") %>
-test:
-  url: <%= ENV.fetch("DATABASE_URL") %>
-production:
-  adapter: postgresql
-  url: <%= ENV.fetch("DATABASE_URL") %>
