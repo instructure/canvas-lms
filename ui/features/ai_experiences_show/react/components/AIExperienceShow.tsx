@@ -38,7 +38,15 @@ interface AIExperienceShowProps {
 }
 
 const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
-  const [isPreviewExpanded, setIsPreviewExpanded] = useState(false)
+  const [isPreviewExpanded, setIsPreviewExpanded] = useState(() => {
+    const params = new URLSearchParams(window.location.search)
+    const shouldPreview = params.get('preview') === 'true'
+    // Clean up URL parameter after reading it
+    if (shouldPreview) {
+      window.history.replaceState({}, '', window.location.pathname)
+    }
+    return shouldPreview
+  })
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 

@@ -40,6 +40,14 @@ describe('AIExperienceShow', () => {
     fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
       messages: [],
     })
+    // Mock scrollIntoView which is not available in JSDOM
+    Element.prototype.scrollIntoView = jest.fn()
+    // Reset window.location
+    delete (window as any).location
+    window.location = {
+      search: '',
+      pathname: '/courses/123/ai_experiences/1',
+    } as any
   })
 
   afterEach(() => {

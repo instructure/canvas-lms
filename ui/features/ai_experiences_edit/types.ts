@@ -23,6 +23,7 @@ export interface AIExperience {
   facts: string
   learning_objective: string
   scenario: string
+  workflow_state?: string
 }
 
 export interface AIExperienceFormData {
@@ -31,6 +32,7 @@ export interface AIExperienceFormData {
   facts: string
   learning_objective: string
   scenario: string
+  workflow_state?: string
 }
 
 export interface AIExperienceEditProps {
