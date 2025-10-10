@@ -1,0 +1,17 @@
+development:
+  bucket_name: development-bucket
+  access_key_id: access_key
+  secret_access_key: secret_key
+  region: us-east-1
+
+test:
+  bucket_name: test-bucket
+  access_key_id: access_key
+  secret_access_key: secret_key
+  region: us-east-1
+  
+production:
+  bucket_name: production-bucket
+  access_key_id: access_key
+  secret_access_key: secret_key
+  region: us-east-1

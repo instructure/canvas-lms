@@ -1,0 +1,18 @@
+development:
+  storage: local
+  # the secure option in this file is deprecated, use the ssl option in domain.yml instead
+  # secure: false
+  path_prefix: tmp/files
+
+test:
+  storage: local
+  path_prefix: tmp/files
+
+production:
+  storage: local
+  path_prefix: tmp/files
+
+## amazon storage example. requires valid amazon_s3.yml
+#
+# production:
+#   storage: s3
