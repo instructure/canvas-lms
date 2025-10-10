@@ -36,12 +36,14 @@ module InstrumentTLSCiphers
 
     return unless cipher
 
+    # rubocop:disable Lint/NoHighCardinalityStatsdTags -- The hostname tag is needed tounderstand which schools to contact if issues occur
     unless @without_tls_metrics
       InstStatsd::Statsd.distributed_increment("canvas.tls.connection",
                                                tags: { hostname: ssl_socket.hostname,
                                                        cipher:,
                                                        tls_version: })
     end
+    # rubocop:enable Lint/NoHighCardinalityStatsdTags
     Rails.logger.info("#{tls_version} connection established with #{ssl_socket.hostname} using cipher #{cipher}")
   end
 end
