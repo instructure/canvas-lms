@@ -104,9 +104,10 @@ module Outcomes
 
           combined_results = combine_results(canvas_results, os_results)
           if combined_results.empty?
+            Rails.logger.info("[OutcomeRollup] No results found for student #{student&.id} in course #{course&.id}, skipping rollup")
             timing_meta.tags = { course_id: course.id }
-            InstStatsd::Statsd.distributed_increment("rollup.student.success", tags: { course_id: course.id })
-            InstStatsd::Statsd.count("rollup.student.records_processed", rollups_created, tags: { course_id: course.id })
+            InstStatsd::Statsd.distributed_increment("rollup.student.success", tags: Utils::InstStatsdUtils::Tags.tags_for(course.shard))
+            InstStatsd::Statsd.count("rollup.student.records_processed", rollups_created, tags: Utils::InstStatsdUtils::Tags.tags_for(course.shard))
             return OutcomeRollup.none
           end
 
@@ -114,16 +115,18 @@ module Outcomes
           stored_rollups = store_rollups(student_rollups)
 
           rollups_created = stored_rollups.is_a?(ActiveRecord::Relation) ? stored_rollups.count : 0
+          Rails.logger.info("[OutcomeRollup] Successfully created/updated #{rollups_created} rollups for student #{student&.id} in course #{course&.id}")
           timing_meta.tags = { course_id: course.id, records_processed: rollups_created }
 
-          InstStatsd::Statsd.distributed_increment("rollup.student.success", tags: { course_id: course.id })
-          InstStatsd::Statsd.count("rollup.student.records_processed", rollups_created, tags: { course_id: course.id })
+          InstStatsd::Statsd.distributed_increment("rollup.student.success", tags: Utils::InstStatsdUtils::Tags.tags_for(course.shard))
+          InstStatsd::Statsd.count("rollup.student.records_processed", rollups_created, tags: Utils::InstStatsdUtils::Tags.tags_for(course.shard))
 
           stored_rollups
         rescue => e
+          Rails.logger.error("[OutcomeRollup] Error calculating rollups for student #{student&.id} in course #{course&.id}: #{e.message}")
           timing_meta.tags = { course_id: course.id, error: true }
-          InstStatsd::Statsd.distributed_increment("rollup.student.error", tags: { course_id: course.id })
-          InstStatsd::Statsd.count("rollup.student.records_processed", rollups_created, tags: { course_id: course.id })
+          InstStatsd::Statsd.distributed_increment("rollup.student.error", tags: Utils::InstStatsdUtils::Tags.tags_for(course.shard))
+          InstStatsd::Statsd.count("rollup.student.records_processed", rollups_created, tags: Utils::InstStatsdUtils::Tags.tags_for(course.shard))
           raise e
         end
       end

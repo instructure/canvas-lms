@@ -680,8 +680,8 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
       )
 
       expect(Utils::InstStatsdUtils::Timing).to receive(:track).with("rollup.student.runtime").and_call_original
-      expect(InstStatsd::Statsd).to receive(:distributed_increment).with("rollup.student.success", tags: { course_id: course.id }).at_least(:once)
-      expect(InstStatsd::Statsd).to receive(:count).with("rollup.student.records_processed", 1, tags: { course_id: course.id }).at_least(:once)
+      expect(InstStatsd::Statsd).to receive(:distributed_increment).with("rollup.student.success", tags: { cluster: course.shard.database_server&.id }).at_least(:once)
+      expect(InstStatsd::Statsd).to receive(:count).with("rollup.student.records_processed", 1, tags: { cluster: course.shard.database_server&.id }).at_least(:once)
       allow(InstStatsd::Statsd).to receive(:distributed_increment)
 
       subject.call
@@ -691,8 +691,8 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
       allow(subject).to receive(:fetch_canvas_results).and_raise(StandardError, "Database error")
 
       expect(Utils::InstStatsdUtils::Timing).to receive(:track).with("rollup.student.runtime").and_call_original
-      expect(InstStatsd::Statsd).to receive(:distributed_increment).with("rollup.student.error", tags: { course_id: course.id }).at_least(:once)
-      expect(InstStatsd::Statsd).to receive(:count).with("rollup.student.records_processed", 0, tags: { course_id: course.id }).at_least(:once)
+      expect(InstStatsd::Statsd).to receive(:distributed_increment).with("rollup.student.error", tags: { cluster: course.shard.database_server&.id }).at_least(:once)
+      expect(InstStatsd::Statsd).to receive(:count).with("rollup.student.records_processed", 0, tags: { cluster: course.shard.database_server&.id }).at_least(:once)
       allow(InstStatsd::Statsd).to receive(:distributed_increment)
 
       expect { subject.call }.to raise_error(StandardError, "Database error")
@@ -700,8 +700,8 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
 
     it "records metrics for empty results" do
       expect(Utils::InstStatsdUtils::Timing).to receive(:track).with("rollup.student.runtime").and_call_original
-      expect(InstStatsd::Statsd).to receive(:distributed_increment).with("rollup.student.success", tags: { course_id: course.id }).at_least(:once)
-      expect(InstStatsd::Statsd).to receive(:count).with("rollup.student.records_processed", 0, tags: { course_id: course.id }).at_least(:once)
+      expect(InstStatsd::Statsd).to receive(:distributed_increment).with("rollup.student.success", tags: { cluster: course.shard.database_server&.id }).at_least(:once)
+      expect(InstStatsd::Statsd).to receive(:count).with("rollup.student.records_processed", 0, tags: { cluster: course.shard.database_server&.id }).at_least(:once)
       allow(InstStatsd::Statsd).to receive(:distributed_increment)
 
       subject.call
