@@ -340,6 +340,7 @@ class SubmissionComment < ActiveRecord::Base
 
   # Returns the visible name for the comment author based on anonymity settings and user permissions
   def author_visible_name(viewing_user)
+    return I18n.t("Someone") if author.nil?
     return author.short_name if author_id == viewing_user.id
 
     if submission.assignment.moderated_grading?
@@ -362,7 +363,7 @@ class SubmissionComment < ActiveRecord::Base
   # Returns the anonymous identity for a student
   def get_anonymous_student_name(author, assignment)
     student_identity = assignment.anonymous_student_identities[author.id]
-    student_identity&.dig(:name) || "Anonymous Student"
+    student_identity&.dig(:name) || I18n.t("Anonymous Student")
   end
 
   # Returns the anonymous name for a grader
@@ -371,9 +372,9 @@ class SubmissionComment < ActiveRecord::Base
       grader_identities = assignment.grader_identities
       grader_identity = grader_identities.find { |grader| grader[:user_id] == author.id }
       anonymous_identity = Assignments::GraderIdentities.anonymize_grader_identity(grader_identity)
-      anonymous_identity&.dig(:name) || "Anonymous Grader"
+      anonymous_identity&.dig(:name) || I18n.t("Anonymous Grader")
     else
-      "Anonymous Instructor"
+      I18n.t("Anonymous Instructor")
     end
   end
 
