@@ -39,6 +39,7 @@ require "rubocop_canvas/cops/datafixup/strand_downstream_jobs"
 ## lint
 require "rubocop_canvas/cops/lint/no_file_utils_rm_rf"
 require "rubocop_canvas/cops/lint/no_sleep"
+require "rubocop_canvas/cops/lint/no_high_cardinality_statsd_tags"
 ## migration
 require "rubocop_canvas/cops/migration/non_transactional"
 require "rubocop_canvas/cops/migration/primary_key"
