@@ -229,7 +229,7 @@ describe('ToggleShowByView', function () {
     equal(assignments.length, 2)
   })
 
-  test('should sort checkpointed discussions by earliest checkpoint due date', async function () {
+  test('should sort checkpointed discussions by reply to entry checkpoint due date', async function () {
     ENV.PERMISSIONS = {manage: false, read_grades: true}
     const course = new Course({id: 1})
 
@@ -276,7 +276,11 @@ describe('ToggleShowByView', function () {
 
     const past = view.assignmentGroups.findWhere({id: 'past'})
     const sortedAssignments = past.get('assignments').models
-
+    // Assignment 2 should be sorted by its reply_to_entry checkpoint date (June 18)
+    // not by reply_to_topic (June 12) or the main due_at (June 20)
+    // Verify that assignment 2 uses the checkpoint date
+    const assignment2 = sortedAssignments.find(a => a.get('id') === 2)
+    equal(assignment2.sortingDueAt(), new Date(2023, 5, 18).toISOString())
     equal(sortedAssignments[0].get('id'), 1)
     equal(sortedAssignments[1].get('id'), 3)
     equal(sortedAssignments[2].get('id'), 2)
