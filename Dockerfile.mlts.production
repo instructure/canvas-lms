@@ -41,13 +41,12 @@ RUN yarn config set registry https://registry.npmjs.org/ \
  && yarn cache clean --all || true \
  && yarn gulp rev
 
-ENV RAILS_ENV=production
+# Precompile Canvas assets in a single process to avoid Rails/7.2 FrozenError
+ENV RAILS_ENV=production NPROC=1 BOOTSNAP_DISABLE=1
 RUN bundle exec rake canvas:compile_assets
 
-# --- Re-prime gems to PRODUCTION-ONLY for what we copy forward (step 2) ---
-# This prunes dev gems (including dress_code) from vendor/bundle.
-RUN bundle config set without 'development test' \
- && bundle install --jobs 4 --retry 3
+# Re-prime gems to production-only (prunes dev gems before we copy to runtime)
+RUN bundle config set without 'development test' && bundle install --jobs 4 --retry 3
 
 # ====== Stage 2: runtime ======
 FROM ruby:3.4.1-slim-bookworm
