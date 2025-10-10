@@ -6,8 +6,14 @@ services:
     links:
       - postgres
       - redis
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app:Z   
     environment:
-      POSTGRES_PASSWORD: sekret
+      RAILS_ENV: development
+      BUNDLE_APP_CONFIG: /usr/src/app/.bundle
+      DATABASE_URL: postgres://canvas:password@127.0.0.1:5432/canvas_development
+      REDIS_URL: redis://redis:6379/0
 
   jobs:
     <<: *WEB
@@ -16,7 +22,7 @@ services:
   postgres:
     build: ./docker-compose/postgres
     environment:
-      POSTGRES_PASSWORD: sekret
+      POSTGRES_PASSWORD: password
 
   redis:
     image: redis:alpine
