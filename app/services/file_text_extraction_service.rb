@@ -23,6 +23,8 @@ require "docx"
 require "zip"
 
 class FileTextExtractionService
+  CONTROL_DELETE = "\x00-\x08\x0B\x0C\x0E-\x1F\x7F"
+
   Result = Struct.new(:text, :contains_images)
 
   def initialize(attachment:)
@@ -71,7 +73,7 @@ class FileTextExtractionService
       page.xobjects&.any? { |_, stream| stream.hash[:Subtype] == :Image }
     end
 
-    Result.new(text, has_images)
+    Result.new(sanitize(text), has_images)
   end
 
   def extract_docx
@@ -84,6 +86,25 @@ class FileTextExtractionService
       has_images = zip.glob("word/media/*").any?
     end
 
-    Result.new(text, has_images)
+    Result.new(sanitize(text), has_images)
+  end
+
+  def sanitize(str)
+    return str if str.blank?
+
+    # Ensure the string is mutable if it's frozen.
+    str = +str if str.frozen?
+
+    # Convert to UTF-8 and drop any invalid/undefined byte sequences.
+    # - Ensures the string is valid UTF-8 for storage/processing.
+    # - `invalid:` and `undef:` replace bad bytes with "", effectively removing them.
+    unless str.encoding == Encoding::UTF_8 && str.valid_encoding?
+      str.encode!(Encoding::UTF_8, invalid: :replace, undef: :replace, replace: "")
+    end
+
+    # Remove ASCII control characters that can break DB/storage and rendering.
+    # - CONTROL_DELETE = "\x00-\x08\x0B\x0C\x0E-\x1F\x7F" (keeps \t, \n, \r; deletes NUL and others)
+    str.delete!(CONTROL_DELETE) if str.count(CONTROL_DELETE) > 0
+    str
   end
 end
