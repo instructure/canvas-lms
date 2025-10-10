@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
@@ -49,6 +49,13 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
   })
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    if (urlParams.get('preview') === 'true') {
+      setIsPreviewExpanded(true)
+    }
+  }, [])
 
   const handleEdit = () => {
     window.location.href = `/courses/${aiExperience.course_id}/ai_experiences/${aiExperience.id}/edit`

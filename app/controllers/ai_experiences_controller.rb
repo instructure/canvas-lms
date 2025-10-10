@@ -94,7 +94,10 @@ class AiExperiencesController < ApplicationController
     @experiences = @context.ai_experiences.active
     @experiences = @experiences.where(workflow_state: params[:workflow_state]) if params[:workflow_state].present?
     respond_to do |format|
-      format.html { render }
+      format.html do
+        js_env({ COURSE_ID: @context.id })
+        render
+      end
       format.json { render json: ai_experiences_json(@experiences, @current_user, session) }
     end
   end
