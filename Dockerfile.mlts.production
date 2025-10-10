@@ -42,8 +42,8 @@ RUN yarn config set registry https://registry.npmjs.org/ \
  && yarn gulp rev
 
 # Precompile Canvas assets in a single process to avoid Rails/7.2 FrozenError
-ENV RAILS_ENV=production NPROC=1 BOOTSNAP_DISABLE=1 RAILS_MAX_THREADS=1 RAILS_LOG_TO_STDOUT=1
-RUN bundle exec rake canvas:compile_assets
+ENV RAILS_ENV=production BOOTSNAP_DISABLE=1
+RUN bundle exec rake css:compile && bundle exec rake js:webpack_production
 
 # Re-prime gems to production-only (prunes dev gems before we copy to runtime)
 RUN bundle config set without 'development test' && bundle install --jobs 4 --retry 3
