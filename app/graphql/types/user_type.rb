@@ -809,8 +809,7 @@ module Types
         comments = comments.limit(limit).to_a.first(limit)
         if Account.site_admin.feature_enabled?(:send_metrics_for_comment_bank_items_connection_limit_used)
           InstStatsd::Statsd.distributed_increment("graphql.user_type.comment_bank_items_connection.limit_used", tags: {
-                                                     user_id: current_user.global_id,
-                                                     domain: request.host_with_port.sub(":", "_"),
+                                                     cluster: Shard.current.database_server&.id || "unknown"
                                                    })
         end
       end

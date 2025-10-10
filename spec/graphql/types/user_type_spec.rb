@@ -1899,7 +1899,7 @@ describe Types::UserType do
           type.resolve("commentBankItemsConnection(limit: 1) { nodes { comment } }")
           expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
             "graphql.user_type.comment_bank_items_connection.limit_used",
-            { tags: { domain: "test.host", user_id: @teacher.global_id } }
+            { tags: { cluster: "test" } }
           )
         end
       end
@@ -1914,7 +1914,7 @@ describe Types::UserType do
           type.resolve("commentBankItemsConnection(limit: 1) { nodes { comment } }")
           expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with(
             "graphql.user_type.comment_bank_items_connection.limit_used",
-            { tags: { domain: "test.host", user_id: @teacher.global_id } }
+            anything
           )
         end
       end
