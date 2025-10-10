@@ -51,6 +51,24 @@ const LegacyBackboneDateComponent = ({size}: {size: string}) => {
   )
 }
 
+const getPreviousLabel = (currentView?: string) => {
+  if (currentView === 'week') {
+    return I18n.t('Previous Week')
+  } else if (currentView === 'month') {
+    return I18n.t('Previous Month')
+  }
+  return I18n.t('Previous')
+}
+
+const getNextLabel = (currentView?: string) => {
+  if (currentView === 'week') {
+    return I18n.t('Next Week')
+  } else if (currentView === 'month') {
+    return I18n.t('Next Month')
+  }
+  return I18n.t('Next')
+}
+
 const ContentLargeSize = (props: CalendarNavigatorComponentProps) => {
   return (
     <Flex gap="small" withVisualDebug={false} direction="row">
@@ -62,12 +80,15 @@ const ContentLargeSize = (props: CalendarNavigatorComponentProps) => {
         <Flex.Item overflowY="visible">
           <IconButton
             onClick={props.bridge.navigatePrev}
-            screenReaderLabel={I18n.t('Previous')}
+            screenReaderLabel={getPreviousLabel(props.currentView)}
             margin="0 xx-small 0 0"
           >
             <IconArrowStartLine />
           </IconButton>
-          <IconButton onClick={props.bridge.navigateNext} screenReaderLabel={I18n.t('Next')}>
+          <IconButton
+            onClick={props.bridge.navigateNext}
+            screenReaderLabel={getNextLabel(props.currentView)}
+          >
             <IconArrowEndLine />
           </IconButton>
         </Flex.Item>
@@ -92,7 +113,10 @@ const ContentSmallSize = (props: CalendarNavigatorComponentProps) => {
       <Flex gap="small" withVisualDebug={false} direction="row" alignItems="stretch">
         <span className="navigation_buttons" style={{margin: 0}}>
           <Flex.Item overflowY="visible">
-            <IconButton onClick={props.bridge.navigatePrev} screenReaderLabel={I18n.t('Previous')}>
+            <IconButton
+              onClick={props.bridge.navigatePrev}
+              screenReaderLabel={getPreviousLabel(props.currentView)}
+            >
               <IconArrowStartLine />
             </IconButton>
           </Flex.Item>
@@ -104,7 +128,10 @@ const ContentSmallSize = (props: CalendarNavigatorComponentProps) => {
 
         <span className="navigation_buttons" style={{margin: 0}}>
           <Flex.Item overflowY="visible">
-            <IconButton onClick={props.bridge.navigateNext} screenReaderLabel={I18n.t('Next')}>
+            <IconButton
+              onClick={props.bridge.navigateNext}
+              screenReaderLabel={getNextLabel(props.currentView)}
+            >
               <IconArrowEndLine />
             </IconButton>
           </Flex.Item>
@@ -123,6 +150,7 @@ type CalendarNavigatorComponentProps = {
   }
 
   size?: string
+  currentView?: string
 }
 
 const CalendarNavigatorComponent = (props: CalendarNavigatorComponentProps) => {
