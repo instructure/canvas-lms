@@ -2468,13 +2468,16 @@ class UsersController < ApplicationController
   #
   # The route that takes a user id will expire mobile sessions for that user.
   # The route that doesn't take a user id will expire mobile sessions for *all* users
-  # in the institution.
+  # in the institution (except for account administrators if +skip_admins+ is given).
   #
+  # @argument skip_admins [Optional, Boolean]
+  #  If true, will not expire mobile sessions for account administrators.
   def expire_mobile_sessions
     return unless authorized_action(@domain_root_account, @current_user, :manage_user_logins)
 
     user = api_find(@domain_root_account.pseudonym_users, params[:id]) if params.key?(:id)
-    AccessToken.delay_if_production.invalidate_mobile_tokens!(@domain_root_account, user:)
+    skip_admins = value_to_boolean(params[:skip_admins])
+    AccessToken.delay_if_production.invalidate_mobile_tokens!(@domain_root_account, user:, skip_admins:)
 
     render json: "ok"
   end
