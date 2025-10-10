@@ -434,7 +434,7 @@ class ContextModuleItemsApiController < ApplicationController
         item_params[:link_settings] = { selection_width: iframe[:width], selection_height: iframe[:height] }
       end
 
-      if (@tag = @module.add_item(item_params, nil, position: item_params[:position].to_i)) && set_position && set_completion_requirement
+      if (@tag = @module.add_item(item_params, nil, resolve_conflicts: true)) && set_position && set_completion_requirement
         @module.touch
         render json: module_item_json(@tag, @current_user, session, @module, nil)
       elsif @tag

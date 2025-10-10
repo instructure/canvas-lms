@@ -936,6 +936,13 @@ class ContextModulesController < ApplicationController
 
     if authorized_action(@context, @current_user, %i[manage_course_content_add manage_course_content_edit])
       params[:item][:link_settings] = launch_dimensions
+
+      # Resolve position conflicts by finding the next available slot
+      if params[:item][:position].present? && params[:item][:position].to_i.positive?
+        resolved_position = @module.find_next_available_position(params[:item][:position].to_i)
+        params[:item] = params[:item].merge(position: resolved_position)
+      end
+
       @tag = @module.add_item(params[:item])
       unless @tag&.valid?
         body = @tag.nil? ? { error: "Could not find item to tag" } : @tag.errors
