@@ -69,16 +69,17 @@ class Accessibility::ResourceScannerService < ApplicationService
   private
 
   def log_to_datadog(scan)
-    InstStatsd::Statsd.distributed_increment("accessibility.resources_scanned", tags: { course_id: scan.course_id })
+    InstStatsd::Statsd.distributed_increment("accessibility.resources_scanned", Utils::InstStatsdUtils::Tags.tags_for(scan.course.shard))
 
     if scan.wiki_page_id?
-      InstStatsd::Statsd.distributed_increment("accessibility.pages_scanned", tags: { course_id: scan.course_id })
+      InstStatsd::Statsd.distributed_increment("accessibility.pages_scanned", Utils::InstStatsdUtils::Tags.tags_for(scan.course.shard))
     elsif scan.assignment_id?
-      InstStatsd::Statsd.distributed_increment("accessibility.assignments_scanned", tags: { course_id: scan.course_id })
+      InstStatsd::Statsd.distributed_increment("accessibility.assignments_scanned", Utils::InstStatsdUtils::Tags.tags_for(scan.course.shard))
     end
 
     if scan.failed?
-      InstStatsd::Statsd.distributed_increment("accessibility.resource_scan_failed", tags: { course_id: scan.course_id, scan_id: scan.id })
+      Rails.logger.error("Scan failed with ID #{scan.global_id} for course #{scan.course.global_id}")
+      InstStatsd::Statsd.distributed_increment("accessibility.resource_scan_failed", tags: Utils::InstStatsdUtils::Tags.tags_for(scan.course.shard))
     end
   end
 
