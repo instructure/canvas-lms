@@ -16,14 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useRef} from 'react'
+import React, {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
-import {IconAiLine, IconAiSolid} from '@instructure/ui-icons'
-import {Button} from '@instructure/ui-buttons'
+import {IconAiLine, IconMoreLine} from '@instructure/ui-icons'
+import {IconButton, Button} from '@instructure/ui-buttons'
+import {Menu} from '@instructure/ui-menu'
+import {Modal} from '@instructure/ui-modal'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {AIExperience} from '../../types'
 import LLMConversationView from '../../../../shared/ai-experiences/react/components/LLMConversationView'
 
@@ -34,29 +38,83 @@ interface AIExperienceShowProps {
 }
 
 const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
-  const [isConversationOpen, setIsConversationOpen] = useState(false)
-  const testButtonRef = useRef<HTMLButtonElement>(null)
-  console.log('AIExperienceShow received:', aiExperience)
-  console.log('facts:', aiExperience.facts)
-  console.log('learning_objective:', aiExperience.learning_objective)
-  console.log('scenario:', aiExperience.scenario)
-  console.log('Type of aiExperience:', typeof aiExperience)
-  console.log('Keys:', Object.keys(aiExperience))
+  const [isPreviewExpanded, setIsPreviewExpanded] = useState(false)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  const handleEdit = () => {
+    window.location.href = `/courses/${aiExperience.course_id}/ai_experiences/${aiExperience.id}/edit`
+  }
+
+  const handleDelete = async () => {
+    setIsDeleting(true)
+    try {
+      await doFetchApi({
+        path: `/api/v1/courses/${aiExperience.course_id}/ai_experiences/${aiExperience.id}`,
+        method: 'DELETE',
+      })
+      showFlashSuccess(I18n.t('AI Experience deleted successfully'))()
+      window.location.href = `/courses/${aiExperience.course_id}/ai_experiences`
+    } catch (error) {
+      showFlashError(I18n.t('Failed to delete AI Experience'))()
+      setIsDeleting(false)
+      setIsDeleteModalOpen(false)
+    }
+  }
 
   return (
-    <View as="div" maxWidth="1080px" margin="0 auto" padding="medium medium 0 medium">
-      <Heading level="h1" margin="0 0 large 0">
-        {aiExperience.title}
-      </Heading>
+    <View as="div" maxWidth="1080px" margin="0 auto" padding="medium">
+      <Flex justifyItems="space-between" alignItems="start">
+        <Heading level="h1" margin="0 0 large 0">
+          {aiExperience.title}
+        </Heading>
+        <Menu
+          placement="bottom end"
+          trigger={
+            <IconButton
+              screenReaderLabel={I18n.t('AI Experience settings')}
+              withBackground={false}
+              withBorder={false}
+            >
+              <IconMoreLine />
+            </IconButton>
+          }
+        >
+          <Menu.Item onSelect={handleEdit}>{I18n.t('Edit')}</Menu.Item>
+          <Menu.Item disabled={true}>
+            <Flex justifyItems="space-between" gap="small">
+              <Text>{I18n.t('Run chat simulation')}</Text>
+              <Text size="small" color="secondary">
+                {I18n.t('Coming soon')}
+              </Text>
+            </Flex>
+          </Menu.Item>
+          <Menu.Item onSelect={() => setIsDeleteModalOpen(true)}>{I18n.t('Delete')}</Menu.Item>
+        </Menu>
+      </Flex>
 
       {aiExperience.description && (
         <View as="div" margin="0 0 medium 0">
-          <Heading level="h2" margin="0 0 small 0">
-            {I18n.t('Description')}
-          </Heading>
           <Text>{aiExperience.description}</Text>
         </View>
       )}
+
+      <Heading level="h2" margin="large 0 small 0">
+        {I18n.t('Experience')}
+      </Heading>
+
+      <LLMConversationView
+        isOpen={true}
+        onClose={() => setIsPreviewExpanded(false)}
+        courseId={aiExperience.course_id}
+        aiExperienceId={aiExperience.id}
+        aiExperienceTitle={aiExperience.title}
+        facts={aiExperience.facts}
+        learningObjectives={aiExperience.learning_objective}
+        scenario={aiExperience.scenario}
+        isExpanded={isPreviewExpanded}
+        onToggleExpanded={() => setIsPreviewExpanded(!isPreviewExpanded)}
+      />
 
       <Heading level="h2" margin="large 0 0 0">
         {I18n.t('Configurations')}
@@ -125,37 +183,36 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
         </View>
       </div>
 
-      {!isConversationOpen && (
-        <View as="div" margin="large 0 large 0" textAlign="end">
-          <Button
-            color="ai-primary"
-            renderIcon={<IconAiSolid />}
-            onClick={() => setIsConversationOpen(true)}
-            elementRef={el => {
-              if (el) {
-                // @ts-expect-error - elementRef accepts Element but we need HTMLButtonElement for focus()
-                testButtonRef.current = el
-              }
-            }}
-          >
-            {I18n.t('Test AI Experience')}
+      <Modal
+        open={isDeleteModalOpen}
+        onDismiss={() => setIsDeleteModalOpen(false)}
+        size="small"
+        label={I18n.t('Delete AI Experience')}
+        shouldCloseOnDocumentClick={true}
+      >
+        <Modal.Header>
+          <Heading>{I18n.t('Delete AI Experience')}</Heading>
+        </Modal.Header>
+        <Modal.Body>
+          <Text>
+            {I18n.t('Are you sure you want to delete "%{title}"? This action cannot be undone.', {
+              title: aiExperience.title,
+            })}
+          </Text>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={() => setIsDeleteModalOpen(false)} margin="0 small 0 0">
+            {I18n.t('Cancel')}
           </Button>
-        </View>
-      )}
-
-      {isConversationOpen && <View as="div" margin="large 0 0 0" />}
-
-      <LLMConversationView
-        isOpen={isConversationOpen}
-        onClose={() => setIsConversationOpen(false)}
-        returnFocusRef={testButtonRef}
-        courseId={aiExperience.course_id}
-        aiExperienceId={aiExperience.id}
-        aiExperienceTitle={aiExperience.title}
-        facts={aiExperience.facts}
-        learningObjectives={aiExperience.learning_objective}
-        scenario={aiExperience.scenario}
-      />
+          <Button
+            onClick={handleDelete}
+            color="danger"
+            interaction={isDeleting ? 'disabled' : 'enabled'}
+          >
+            {isDeleting ? I18n.t('Deleting...') : I18n.t('Delete')}
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </View>
   )
 }
