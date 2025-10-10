@@ -52,6 +52,8 @@ RUN bundle config set without 'development test' && bundle install --jobs 4 --re
 FROM ruby:3.4.1-slim-bookworm
 ARG DEBIAN_FRONTEND=noninteractive
 
+ENV ADAPTER=postgresql
+
 # Runtime libs only
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libxml2 libxmlsec1 xmlsec1 \
