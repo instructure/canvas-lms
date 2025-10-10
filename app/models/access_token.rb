@@ -404,18 +404,22 @@ class AccessToken < ActiveRecord::Base
   end
 
   # if user is not provided, all user tokens in the account will be invalidated
-  def self.invalidate_mobile_tokens!(account, user: nil)
+  # if skip_admins is true, tokens for users with active admin roles in the account will not be invalidated
+  def self.invalidate_mobile_tokens!(account, user: nil, skip_admins: true)
     return unless account.root_account?
 
     developer_key_ids = DeveloperKey.mobile_app_keys.map do |app_key|
       app_key.respond_to?(:global_id) ? app_key.global_id : app_key.id
     end
-    user_ids = if user
-                 [user.id]
-               else
-                 User.active.joins(:pseudonyms).where(pseudonyms: { account_id: account }).ids
-               end
-    tokens = active.where(developer_key_id: developer_key_ids, user_id: user_ids)
+    user_scope = User.active.joins(:pseudonyms).where(pseudonyms: { account_id: account })
+    user_scope = user_scope.where(id: user) if user
+    user_scope = user_scope.where(<<~SQL.squish, account.id) if skip_admins
+      NOT EXISTS (SELECT 1 FROM #{AccountUser.quoted_table_name}
+                  WHERE account_users.user_id = users.id
+                  AND account_users.account_id = ?
+                  AND account_users.workflow_state = 'active')
+    SQL
+    tokens = active.where(developer_key_id: developer_key_ids, user_id: user_scope.select(:id))
 
     now = Time.zone.now
     tokens.in_batches(of: 10_000).update_all(updated_at: now, permanent_expires_at: now)
