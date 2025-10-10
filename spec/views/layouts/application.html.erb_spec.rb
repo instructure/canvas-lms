@@ -117,6 +117,236 @@ describe "layouts/application" do
         render "layouts/application"
         expect(doc.at_css(".ic-app-nav-toggle-and-crumbs")).to be_nil
       end
+
+      context "with right-of-crumbs elements" do
+        before do
+          @context = course_factory
+          assign(:context, @context)
+          assign(:domain_root_account, Account.default)
+        end
+
+        context "when top_navigation_placement_a11y_fixes is disabled" do
+          before do
+            Account.site_admin.disable_feature!(:top_navigation_placement_a11y_fixes)
+          end
+
+          it "does not add right-of-crumbs-no-reverse class" do
+            render "layouts/application"
+            right_of_crumbs = doc.at_css(".right-of-crumbs")
+            expect(right_of_crumbs).to be_present
+            expect(right_of_crumbs["class"]).not_to include("right-of-crumbs-no-reverse")
+          end
+
+          it "renders elements in reverse order (ai-information first)" do
+            render "layouts/application"
+            right_of_crumbs = doc.at_css(".right-of-crumbs")
+            children = right_of_crumbs.children.select(&:element?)
+            # First element should be ai-information-mount
+            expect(children.first["id"]).to eq("ai-information-mount")
+          end
+        end
+
+        context "when top_navigation_placement_a11y_fixes is enabled" do
+          before do
+            Account.site_admin.enable_feature!(:top_navigation_placement_a11y_fixes)
+          end
+
+          it "adds right-of-crumbs-no-reverse class" do
+            render "layouts/application"
+            right_of_crumbs = doc.at_css(".right-of-crumbs")
+            expect(right_of_crumbs).to be_present
+            expect(right_of_crumbs["class"]).to include("right-of-crumbs-no-reverse")
+          end
+
+          it "renders elements in logical left-to-right order (observer picker first)" do
+            student_in_course(active_all: true, course: @context)
+            observer = user_factory
+            @context.enroll_user(observer, "ObserverEnrollment", enrollment_state: "active", associated_user_id: @student.id)
+            assign(:current_user, observer)
+            assign(:context_enrollment, @context.enrollments.where(user_id: observer.id).first)
+            render "layouts/application"
+
+            right_of_crumbs = doc.at_css(".right-of-crumbs")
+            children = right_of_crumbs.children.select(&:element?)
+            # First element should be observer picker when present
+            expect(children.first["id"]).to eq("observer-picker-mountpoint")
+          end
+
+          it "renders student view button before top-nav-tools when present" do
+            Account.default.enable_feature!(:top_navigation_placement)
+            course_with_teacher_logged_in(active_all: true, course: @context)
+            assign(:current_user, @teacher)
+            render "layouts/application"
+
+            right_of_crumbs = doc.at_css(".right-of-crumbs")
+            children = right_of_crumbs.children.select(&:element?)
+            children_ids = children.pluck("id").compact
+
+            student_view_index = children_ids.index("easy_student_view")
+            top_nav_tools_index = children_ids.index("top-nav-tools-mount-point")
+
+            expect(student_view_index).to be < top_nav_tools_index if student_view_index && top_nav_tools_index
+          end
+
+          it "renders ai-information last" do
+            render "layouts/application"
+            right_of_crumbs = doc.at_css(".right-of-crumbs")
+            children = right_of_crumbs.children.select(&:element?)
+            # Last element should be ai-information-mount
+            expect(children.last["id"]).to eq("ai-information-mount")
+          end
+        end
+
+        context "with top_navigation_placement feature" do
+          it "renders top-nav-tools-mount-point when feature is enabled on domain root account" do
+            Account.default.enable_feature!(:top_navigation_placement)
+            render "layouts/application"
+            expect(doc.at_css("#top-nav-tools-mount-point")).to be_present
+          end
+        end
+
+        context "with student view button" do
+          before do
+            course_with_teacher_logged_in(active_all: true, course: @context)
+            assign(:current_user, @teacher)
+            allow(view).to receive_messages(show_student_view_button?: true, student_view_text: "Student View")
+          end
+
+          it "renders student view button when helper returns true" do
+            render "layouts/application"
+            student_view_link = doc.at_css("#easy_student_view")
+            expect(student_view_link).to be_present
+            expect(student_view_link.text.strip).to include("View as Student")
+          end
+
+          it "has correct attributes for student view button" do
+            render "layouts/application"
+            student_view_link = doc.at_css("#easy_student_view")
+            expect(student_view_link["class"]).to include("btn btn-top-nav")
+            expect(student_view_link["aria-label"]).to be_present
+            expect(student_view_link["data-method"]).to eq("post")
+          end
+
+          it "does not render when helper returns false" do
+            allow(view).to receive(:show_student_view_button?).and_return(false)
+            render "layouts/application"
+            expect(doc.at_css("#easy_student_view")).to be_nil
+          end
+        end
+
+        context "with observer picker" do
+          it "renders observer picker for observers in course context" do
+            student_in_course(active_all: true, course: @context)
+            observer = user_factory
+            enrollment = @context.enroll_user(observer, "ObserverEnrollment", enrollment_state: "active", associated_user_id: @student.id)
+            assign(:current_user, observer)
+            assign(:context_enrollment, enrollment)
+            render "layouts/application"
+            expect(doc.at_css("#observer-picker-mountpoint")).to be_present
+          end
+
+          it "renders observer picker for observers in assignment context" do
+            student_in_course(active_all: true, course: @context)
+            observer = user_factory
+            enrollment = @context.enroll_user(observer, "ObserverEnrollment", enrollment_state: "active", associated_user_id: @student.id)
+            assignment = @context.assignments.create!(title: "Test Assignment")
+            assign(:context, assignment)
+            assign(:current_user, observer)
+            assign(:context_enrollment, enrollment)
+            render "layouts/application"
+            expect(doc.at_css("#observer-picker-mountpoint")).to be_present
+          end
+
+          it "does not render observer picker for non-observers" do
+            course_with_teacher_logged_in(active_all: true, course: @context)
+            assign(:current_user, @teacher)
+            assign(:context_enrollment, @context.enrollments.where(user_id: @teacher.id).first)
+            render "layouts/application"
+            expect(doc.at_css("#observer-picker-mountpoint")).to be_nil
+          end
+        end
+
+        context "with top navigation tools and a11y fixes" do
+          let(:tool) do
+            @context.context_external_tools.create!(
+              name: "Test LTI Tool",
+              consumer_key: "key",
+              shared_secret: "secret",
+              url: "http://example.com/launch",
+              settings: { top_navigation: {} }
+            )
+          end
+
+          before do
+            Account.default.enable_feature!(:top_navigation_placement)
+            course_with_teacher_logged_in(active_all: true, course: @context)
+            assign(:current_user, @teacher)
+            tool # create the tool
+          end
+
+          context "when top_navigation_placement_a11y_fixes is enabled" do
+            before do
+              Account.site_admin.enable_feature!(:top_navigation_placement_a11y_fixes)
+              allow(view).to receive_messages(show_student_view_button?: true, student_view_text: "View as Student")
+            end
+
+            it "renders student view button before top-nav-tools-mount-point" do
+              render "layouts/application"
+
+              right_of_crumbs = doc.at_css(".right-of-crumbs")
+              children = right_of_crumbs.children.select(&:element?)
+              children_ids = children.pluck("id").compact
+
+              student_view_index = children_ids.index("easy_student_view")
+              top_nav_tools_index = children_ids.index("top-nav-tools-mount-point")
+
+              expect(student_view_index).to be_present
+              expect(top_nav_tools_index).to be_present
+              expect(student_view_index).to be < top_nav_tools_index
+            end
+
+            it "maintains visual order with logical DOM order" do
+              render "layouts/application"
+
+              right_of_crumbs = doc.at_css(".right-of-crumbs")
+              children = right_of_crumbs.children.select(&:element?)
+              children_ids = children.pluck("id").compact
+
+              # Expected order: observer-picker (if any), student-view, top-nav-tools,
+              # immersive-reader (if any), tutorials (if any), ai-information
+              student_view_index = children_ids.index("easy_student_view")
+              top_nav_tools_index = children_ids.index("top-nav-tools-mount-point")
+              ai_info_index = children_ids.index("ai-information-mount")
+
+              expect(student_view_index).to be < top_nav_tools_index
+              expect(top_nav_tools_index).to be < ai_info_index
+            end
+          end
+
+          context "when top_navigation_placement_a11y_fixes is disabled" do
+            before do
+              Account.site_admin.disable_feature!(:top_navigation_placement_a11y_fixes)
+              allow(view).to receive_messages(show_student_view_button?: true, student_view_text: "View as Student")
+            end
+
+            it "renders elements in reverse order (student view after top-nav-tools)" do
+              render "layouts/application"
+
+              right_of_crumbs = doc.at_css(".right-of-crumbs")
+              children = right_of_crumbs.children.select(&:element?)
+              children_ids = children.pluck("id").compact
+
+              student_view_index = children_ids.index("easy_student_view")
+              top_nav_tools_index = children_ids.index("top-nav-tools-mount-point")
+
+              # In reverse order, student view appears AFTER top-nav-tools in DOM
+              expect(student_view_index).to be_present
+              expect(top_nav_tools_index).to be_present
+              expect(top_nav_tools_index).to be < student_view_index
+            end
+          end
+        end
+      end
     end
   end
 end

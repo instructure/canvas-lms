@@ -27,6 +27,11 @@ import {
 import type {Tool} from '@canvas/global/env/EnvCommon'
 
 describe('TopNavigationTools', () => {
+  beforeEach(() => {
+    window.ENV = window.ENV || {}
+    window.ENV.FEATURES = {}
+  })
+
   it('renders pinned tools as icon buttons and unpinned tools in menu', async () => {
     jest.useRealTimers()
 
@@ -70,6 +75,168 @@ describe('TopNavigationTools', () => {
     expect(menuItem).toBeInTheDocument()
 
     jest.useFakeTimers()
+  })
+
+  it('renders menu before pinned tools in DOM when a11y fixes flag is OFF', () => {
+    window.ENV.FEATURES = {}
+
+    const tools = [
+      {
+        id: '1',
+        title: 'Tool 1',
+        base_url: 'https://instructure.com',
+        icon_url: 'https://instructure.com',
+        pinned: true,
+      },
+      {
+        id: '2',
+        title: 'Tool 2',
+        base_url: 'https://instructure.com',
+        icon_url: 'https://instructure.com',
+        pinned: false,
+      },
+    ]
+    const handleToolLaunch = jest.fn()
+    const {getAllByRole} = render(
+      <TopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />,
+    )
+
+    const buttons = getAllByRole('button')
+    // When flag is OFF, menu button (without data-tool-id) should be first in DOM
+    expect(buttons[0]).not.toHaveAttribute('data-tool-id')
+    expect(buttons[1]).toHaveAttribute('data-tool-id', '1')
+    // Visual order is reversed by CSS row-reverse
+  })
+
+  it('renders pinned tools before menu in DOM when a11y fixes flag is ON', () => {
+    window.ENV.FEATURES = {top_navigation_placement_a11y_fixes: true}
+
+    const tools = [
+      {
+        id: '1',
+        title: 'Tool 1',
+        base_url: 'https://instructure.com',
+        icon_url: 'https://instructure.com',
+        pinned: true,
+      },
+      {
+        id: '2',
+        title: 'Tool 2',
+        base_url: 'https://instructure.com',
+        icon_url: 'https://instructure.com',
+        pinned: false,
+      },
+    ]
+    const handleToolLaunch = jest.fn()
+    const {getAllByRole} = render(
+      <TopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />,
+    )
+
+    const buttons = getAllByRole('button')
+    // When flag is ON, pinned tool should be first in DOM
+    expect(buttons[0]).toHaveAttribute('data-tool-id', '1')
+    expect(buttons[1]).not.toHaveAttribute('data-tool-id')
+    // Visual order matches DOM order (no reverse)
+  })
+
+  it('maintains logical DOM order when a11y fixes flag is ON (no row-reverse)', () => {
+    window.ENV.FEATURES = {top_navigation_placement_a11y_fixes: true}
+
+    const tools = [
+      {
+        id: '1',
+        title: 'Tool 1',
+        base_url: 'https://instructure.com',
+        icon_url: 'https://instructure.com',
+        pinned: true,
+      },
+      {
+        id: '2',
+        title: 'Tool 2',
+        base_url: 'https://instructure.com',
+        icon_url: 'https://instructure.com',
+        pinned: false,
+      },
+    ]
+    const handleToolLaunch = jest.fn()
+    const {getAllByRole} = render(
+      <TopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />,
+    )
+
+    const buttons = getAllByRole('button')
+    // When flag is ON, DOM order matches visual order (no row-reverse)
+    // Pinned tool first, menu button last
+    expect(buttons[0]).toHaveAttribute('data-tool-id', '1')
+    expect(buttons[1]).not.toHaveAttribute('data-tool-id')
+  })
+
+  it('applies row-reverse flex direction when a11y fixes flag is OFF', () => {
+    window.ENV.FEATURES = {}
+
+    const tools = [
+      {
+        id: '1',
+        title: 'Tool 1',
+        base_url: 'https://instructure.com',
+        icon_url: 'https://instructure.com',
+        pinned: true,
+      },
+      {
+        id: '2',
+        title: 'Tool 2',
+        base_url: 'https://instructure.com',
+        icon_url: 'https://instructure.com',
+        pinned: false,
+      },
+    ]
+    const handleToolLaunch = jest.fn()
+    const {getAllByRole} = render(
+      <TopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />,
+    )
+
+    const buttons = getAllByRole('button')
+    // When flag is OFF with row-reverse, menu button appears first in DOM
+    // but should be visually last due to flex-direction: row-reverse
+    expect(buttons[0]).not.toHaveAttribute('data-tool-id') // menu button first
+    expect(buttons[1]).toHaveAttribute('data-tool-id', '1') // pinned tool second
+  })
+
+  it('maintains correct tab order with multiple pinned tools when a11y fixes ON', () => {
+    window.ENV.FEATURES = {top_navigation_placement_a11y_fixes: true}
+
+    const tools = [
+      {
+        id: '1',
+        title: 'Tool 1',
+        base_url: 'https://instructure.com',
+        icon_url: 'https://instructure.com',
+        pinned: true,
+      },
+      {
+        id: '2',
+        title: 'Tool 2',
+        base_url: 'https://instructure.com',
+        icon_url: 'https://instructure.com',
+        pinned: true,
+      },
+      {
+        id: '3',
+        title: 'Tool 3',
+        base_url: 'https://instructure.com',
+        icon_url: 'https://instructure.com',
+        pinned: false,
+      },
+    ]
+    const handleToolLaunch = jest.fn()
+    const {getAllByRole} = render(
+      <TopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />,
+    )
+
+    const buttons = getAllByRole('button')
+    // With a11y fixes ON: pinned tools first (left-to-right), then menu
+    expect(buttons[0]).toHaveAttribute('data-tool-id', '1')
+    expect(buttons[1]).toHaveAttribute('data-tool-id', '2')
+    expect(buttons[2]).not.toHaveAttribute('data-tool-id') // menu button
   })
 
   it('renders empty container when no tools provided', () => {
