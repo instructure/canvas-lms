@@ -69,6 +69,11 @@ describe AiExperiencesController do
         expect(experiences.length).to eq 1
         expect(experiences.first["id"]).to eq published_experience.id
       end
+
+      it "sets COURSE_ID in js_env for HTML format" do
+        get :index, params: { course_id: @course.id }
+        expect(assigns[:js_env][:COURSE_ID]).to eq(@course.id)
+      end
     end
 
     context "as student" do

@@ -21,6 +21,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
+import {Link} from '@instructure/ui-link'
 import {IconButton} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
 import {IconPublishSolid, IconUnpublishedLine, IconMoreLine} from '@instructure/ui-icons'
@@ -29,43 +30,71 @@ interface AIExperienceRowProps {
   id: number
   title: string
   workflowState: 'published' | 'unpublished'
-  experienceType: string
+  createdAt: string
   onEdit: (id: number) => void
   onTestConversation: (id: number) => void
   onPublishToggle: (id: number, newState: 'published' | 'unpublished') => void
+  onDelete: (id: number) => void
 }
 
 const AIExperienceRow: React.FC<AIExperienceRowProps> = ({
   id,
   title,
   workflowState,
-  experienceType,
+  createdAt,
   onEdit,
   onTestConversation,
   onPublishToggle,
+  onDelete,
 }) => {
   const I18n = useI18nScope('ai_experiences')
   const isPublished = workflowState === 'published'
+  const formattedDate = new Date(createdAt).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
 
   const handlePublishToggle = () => {
     const newState = isPublished ? 'unpublished' : 'published'
-    console.log(`Toggling AI experience ${id} from ${workflowState} to ${newState}`)
     onPublishToggle(id, newState)
   }
 
   return (
-    <View
-      as="div"
-      background="primary"
-      borderWidth="small"
-      borderColor="primary"
-      borderRadius="medium"
-      padding="medium"
-      margin="0 0 medium 0"
-    >
+    <View as="div" background="primary" padding="x-small small">
       <Flex justifyItems="space-between" alignItems="center">
+        <Flex.Item shouldGrow shouldShrink>
+          <View as="div" margin="0 0 0 small">
+            <Link
+              href={`/courses/${ENV.COURSE_ID}/ai_experiences/${id}`}
+              isWithinText={false}
+              themeOverride={{
+                color: 'inherit',
+                hoverColor: 'inherit',
+                fontWeight: 700,
+              }}
+              style={{
+                fontSize: '1.125rem',
+                textDecoration: 'none',
+              }}
+            >
+              {title}
+            </Link>
+            <View as="div">
+              <Text size="small" color="secondary">
+                {I18n.t('Created on %{date}', {date: formattedDate})}
+              </Text>
+            </View>
+          </View>
+        </Flex.Item>
+
         <Flex.Item>
-          <Flex alignItems="center" gap="medium">
+          <Flex alignItems="center" gap="small">
+            <Flex.Item>
+              <Text size="small" color="secondary">
+                {isPublished ? I18n.t('Published') : I18n.t('Not published')}
+              </Text>
+            </Flex.Item>
             <Flex.Item>
               <IconButton
                 size="small"
@@ -75,47 +104,37 @@ const AIExperienceRow: React.FC<AIExperienceRowProps> = ({
                 screenReaderLabel={
                   isPublished ? I18n.t('Unpublish AI Experience') : I18n.t('Publish AI Experience')
                 }
+                data-testid="ai-experience-publish-toggle"
               >
                 {isPublished ? (
-                  <IconPublishSolid color="success" size="small" />
+                  <IconPublishSolid color="success" size="x-small" />
                 ) : (
-                  <IconUnpublishedLine color="secondary" size="small" />
+                  <IconUnpublishedLine color="secondary" size="x-small" />
                 )}
               </IconButton>
             </Flex.Item>
             <Flex.Item>
-              <View as="div">
-                <Text weight="bold" size="large">
-                  {title}
-                </Text>
-                <View as="div" margin="xx-small 0 0 0">
-                  <Text size="small" color="secondary">
-                    {experienceType}
-                  </Text>
-                </View>
-              </View>
+              <Menu
+                trigger={
+                  <IconButton
+                    size="small"
+                    withBackground={false}
+                    withBorder={false}
+                    screenReaderLabel={I18n.t('AI Experience Options')}
+                    data-testid="ai-experience-menu"
+                  >
+                    <IconMoreLine />
+                  </IconButton>
+                }
+              >
+                <Menu.Item onSelect={() => onEdit(id)}>{I18n.t('Edit')}</Menu.Item>
+                <Menu.Item onSelect={() => onTestConversation(id)}>
+                  {I18n.t('Test Conversation')}
+                </Menu.Item>
+                <Menu.Item onSelect={() => onDelete(id)}>{I18n.t('Delete')}</Menu.Item>
+              </Menu>
             </Flex.Item>
           </Flex>
-        </Flex.Item>
-
-        <Flex.Item>
-          <Menu
-            trigger={
-              <IconButton
-                size="small"
-                withBackground={false}
-                withBorder={false}
-                screenReaderLabel={I18n.t('AI Experience Options')}
-              >
-                <IconMoreLine />
-              </IconButton>
-            }
-          >
-            <Menu.Item onSelect={() => onEdit(id)}>{I18n.t('Edit')}</Menu.Item>
-            <Menu.Item onSelect={() => onTestConversation(id)}>
-              {I18n.t('Test Conversation')}
-            </Menu.Item>
-          </Menu>
         </Flex.Item>
       </Flex>
     </View>
