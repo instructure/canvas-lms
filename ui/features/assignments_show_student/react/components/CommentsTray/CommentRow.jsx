@@ -28,7 +28,7 @@ import {MediaPlayer} from '@instructure/ui-media-player'
 import {Link} from '@instructure/ui-link'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import CanvasStudioPlayer from '@canvas/canvas-studio-player'
-import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
+import {containsHtmlTags, formatMessage, stripHtmlTags} from '@canvas/util/TextHelper'
 
 const I18n = createI18nScope('assignments_2')
 
@@ -64,7 +64,7 @@ export default function CommentRow(props) {
             standalone={true}
           />
           <Avatar
-            name={author ? author.shortName : I18n.t('Anonymous')}
+            name={author ? stripHtmlTags(author.shortName) : I18n.t('Anonymous')}
             src={author ? author.avatarUrl : ''}
             margin="0 small 0 0"
             data-fs-exclude={true}
@@ -74,7 +74,7 @@ export default function CommentRow(props) {
       <div className="comment-text-comment-container">
         {!read && <ScreenReaderContent>{I18n.t('Unread')}</ScreenReaderContent>}
         <Text weight="light" size="small">
-          {author ? author.shortName : I18n.t('Anonymous')}{' '}
+          {author ? stripHtmlTags(author.shortName) : I18n.t('Anonymous')}{' '}
           <FriendlyDatetime
             prefix={I18n.t('at')}
             format={I18n.t('#date.formats.full_with_weekday')}
