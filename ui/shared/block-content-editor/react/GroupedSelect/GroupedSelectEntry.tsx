@@ -29,6 +29,7 @@ type GroupedSelectEntryOwnProps = {
   active: boolean
   onClick: () => void
   onFocus: () => void
+  tabIndex: number
   forwardedRef: React.Ref<HTMLDivElement>
 }
 
@@ -58,7 +59,7 @@ class ThemedGroupedSelectEntry extends React.Component<GroupedSelectEntryProps> 
 
   render() {
     const {primaryColor} = this.props.styles!
-    const {active, onClick, onFocus, title, variant} = this.props
+    const {active, onClick, onFocus, title, variant, tabIndex} = this.props
     const isGroupSelected = variant === 'group' && active
 
     return (
@@ -76,6 +77,7 @@ class ThemedGroupedSelectEntry extends React.Component<GroupedSelectEntryProps> 
         className={`${this.className} ${active ? 'selected' : ''}`}
         onClick={onClick}
         onFocus={onFocus}
+        tabIndex={tabIndex}
         themeOverride={
           isGroupSelected
             ? {

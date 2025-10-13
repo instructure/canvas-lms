@@ -70,7 +70,7 @@ export const GroupedSelect = (props: {
     overrideFocus(1, itemIndex)
   }
 
-  const {handleKeyDown, elementsRef, overrideFocus, handleBlur} = useKeyboardNav(
+  const {handleKeyDown, elementsRef, overrideFocus} = useKeyboardNav(
     props.data,
     selectedItem.id,
     selectedGroup,
@@ -154,6 +154,7 @@ export const GroupedSelect = (props: {
                         variant="group"
                         title={group.groupName}
                         active={group.groupName === selectedGroup}
+                        tabIndex={group.groupName === selectedGroup ? 0 : -1}
                         ref={(el: HTMLDivElement | null) => {
                           elementsRef.current.set(group.groupName, el)
                         }}
@@ -184,6 +185,7 @@ export const GroupedSelect = (props: {
                         variant="item"
                         title={item.itemName}
                         active={selectedItem === item}
+                        tabIndex={selectedItem.id === item.id ? 0 : -1}
                         ref={(el: HTMLDivElement | null) => {
                           elementsRef.current.set(item.id, el)
                         }}
@@ -196,7 +198,6 @@ export const GroupedSelect = (props: {
                   ))}
                 </List>
               }
-              onBlur={handleBlur}
               onKeyDown={handleKeyDown}
             />
           )
