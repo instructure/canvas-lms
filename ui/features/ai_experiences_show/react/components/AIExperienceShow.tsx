@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useRef} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
@@ -49,6 +49,7 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
   })
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const previewCardRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
@@ -70,7 +71,7 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
       })
       showFlashSuccess(I18n.t('AI Experience deleted successfully'))()
       window.location.href = `/courses/${aiExperience.course_id}/ai_experiences`
-    } catch (error) {
+    } catch (_error) {
       showFlashError(I18n.t('Failed to delete AI Experience'))()
       setIsDeleting(false)
       setIsDeleteModalOpen(false)
@@ -80,32 +81,40 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
   return (
     <View as="div" maxWidth="1080px" margin="0 auto" padding="medium">
       <Flex justifyItems="space-between" alignItems="start">
-        <Heading level="h1" margin="0 0 large 0">
-          {aiExperience.title}
-        </Heading>
-        <Menu
-          placement="bottom end"
-          trigger={
-            <IconButton
-              screenReaderLabel={I18n.t('AI Experience settings')}
-              withBackground={false}
-              withBorder={false}
-            >
-              <IconMoreLine />
-            </IconButton>
-          }
-        >
-          <Menu.Item onSelect={handleEdit}>{I18n.t('Edit')}</Menu.Item>
-          <Menu.Item disabled={true}>
-            <Flex justifyItems="space-between" gap="small">
-              <Text>{I18n.t('Run chat simulation')}</Text>
-              <Text size="small" color="secondary">
-                {I18n.t('Coming soon')}
-              </Text>
-            </Flex>
-          </Menu.Item>
-          <Menu.Item onSelect={() => setIsDeleteModalOpen(true)}>{I18n.t('Delete')}</Menu.Item>
-        </Menu>
+        <Flex.Item shouldGrow shouldShrink>
+          <Heading level="h1" margin="0 0 large 0">
+            {aiExperience.title}
+          </Heading>
+        </Flex.Item>
+        <Flex.Item>
+          <Menu
+            placement="bottom end"
+            trigger={
+              <IconButton
+                screenReaderLabel={I18n.t('AI Experience settings')}
+                withBackground={false}
+                withBorder={false}
+              >
+                <IconMoreLine />
+              </IconButton>
+            }
+          >
+            <Menu.Item onSelect={handleEdit}>{I18n.t('Edit')}</Menu.Item>
+            <Menu.Item disabled={true}>
+              <Flex justifyItems="space-between" gap="small">
+                <Flex.Item>
+                  <Text>{I18n.t('Run chat simulation')}</Text>
+                </Flex.Item>
+                <Flex.Item>
+                  <Text size="small" color="secondary">
+                    {I18n.t('Coming soon')}
+                  </Text>
+                </Flex.Item>
+              </Flex>
+            </Menu.Item>
+            <Menu.Item onSelect={() => setIsDeleteModalOpen(true)}>{I18n.t('Delete')}</Menu.Item>
+          </Menu>
+        </Flex.Item>
       </Flex>
 
       {aiExperience.description && (
@@ -121,6 +130,7 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
       <LLMConversationView
         isOpen={true}
         onClose={() => setIsPreviewExpanded(false)}
+        returnFocusRef={previewCardRef}
         courseId={aiExperience.course_id}
         aiExperienceId={aiExperience.id}
         aiExperienceTitle={aiExperience.title}
@@ -154,17 +164,21 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
           }}
         >
           <Flex gap="small" alignItems="start">
-            <IconAiLine color="primary-inverse" size="small" />
-            <View>
-              <Text color="primary-inverse" weight="bold" size="large">
-                {I18n.t('Learning design')}
-              </Text>
-              <View as="div" margin="xx-small 0 0 0">
-                <Text color="primary-inverse" size="small">
-                  {I18n.t('What should students know and how should the AI behave?')}
+            <Flex.Item>
+              <IconAiLine color="primary-inverse" size="small" />
+            </Flex.Item>
+            <Flex.Item shouldGrow shouldShrink>
+              <View>
+                <Text color="primary-inverse" weight="bold" size="large">
+                  {I18n.t('Learning design')}
                 </Text>
+                <View as="div" margin="xx-small 0 0 0">
+                  <Text color="primary-inverse" size="small">
+                    {I18n.t('What should students know and how should the AI behave?')}
+                  </Text>
+                </View>
               </View>
-            </View>
+            </Flex.Item>
           </Flex>
         </div>
 

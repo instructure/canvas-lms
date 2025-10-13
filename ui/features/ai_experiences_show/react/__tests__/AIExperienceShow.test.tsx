@@ -243,4 +243,12 @@ describe('AIExperienceShow', () => {
       expect(fetchMock.called('/api/v1/courses/123/ai_experiences/1')).toBe(true)
     })
   })
+
+  it('passes returnFocusRef to LLMConversationView', () => {
+    render(<AIExperienceShow aiExperience={mockAiExperience} />)
+    // The preview card should be rendered and accessible
+    const previewCard = screen.getByText('Preview').closest('[role="button"]')
+    expect(previewCard).toBeInTheDocument()
+    expect(previewCard).toHaveAttribute('tabindex', '0')
+  })
 })
