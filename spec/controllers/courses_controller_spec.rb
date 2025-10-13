@@ -1227,6 +1227,56 @@ describe CoursesController do
       assigned_tool = assigns[:course_settings_sub_navigation_tools].first
       expect(assigned_tool.id).to eq active_tool.id
     end
+
+    it "sets COURSE_DEFAULT_GRADING_SCHEME_ID when grading_scheme_updates feature is enabled" do
+      Account.site_admin.enable_feature!(:grading_scheme_updates)
+      grading_standard_data = [["A", 0.9], ["B", 0.8], ["C", 0.7], ["D", 0.6], ["F", 0.0]]
+      grading_standard = GradingStandard.create!(
+        context: @course.account,
+        workflow_state: "active",
+        data: grading_standard_data,
+        title: "Test Grading Standard"
+      )
+      @course.update!(grading_standard_id: grading_standard.id)
+
+      user_session(@teacher)
+      get "settings", params: { course_id: @course.id }
+      expect(controller.js_env[:COURSE_DEFAULT_GRADING_SCHEME_ID]).to eq grading_standard.id
+    end
+
+    it "sets COURSE_DEFAULT_GRADING_SCHEME_ID from account default when course has no grading standard" do
+      Account.site_admin.enable_feature!(:grading_scheme_updates)
+      grading_standard_data = [["A", 0.9], ["B", 0.8], ["C", 0.7], ["D", 0.6], ["F", 0.0]]
+      account_grading_standard = GradingStandard.create!(
+        context: @course.account,
+        workflow_state: "active",
+        data: grading_standard_data,
+        title: "Account Default Grading Standard"
+      )
+      @course.account.update!(grading_standard_id: account_grading_standard.id)
+
+      # Explicitly verify course has no grading_standard_id
+      expect(@course.grading_standard_id).to be_nil
+
+      user_session(@teacher)
+      get "settings", params: { course_id: @course.id }
+      expect(controller.js_env[:COURSE_DEFAULT_GRADING_SCHEME_ID]).to eq account_grading_standard.id
+    end
+
+    it "does not set COURSE_DEFAULT_GRADING_SCHEME_ID when grading_scheme_updates feature is disabled" do
+      grading_standard_data = [["A", 0.9], ["B", 0.8], ["C", 0.7], ["D", 0.6], ["F", 0.0]]
+      grading_standard = GradingStandard.create!(
+        context: @course.account,
+        workflow_state: "active",
+        data: grading_standard_data,
+        title: "Test Grading Standard"
+      )
+      @course.update!(grading_standard_id: grading_standard.id)
+
+      user_session(@teacher)
+      get "settings", params: { course_id: @course.id }
+      expect(controller.js_env[:COURSE_DEFAULT_GRADING_SCHEME_ID]).to be_nil
+    end
   end
 
   describe "GET 'enrollment_invitation'" do
