@@ -51,7 +51,7 @@ describe('assitnToHelper', () => {
       const expectedPayload: AssignmentOverridesPayload = {
         overrides: [
           {course_section_id: '1', id: undefined},
-          {group_id: '1'},
+          {group_category_id: '1', group_id: '1', id: undefined},
           {student_ids: ['1'], id: undefined},
         ],
       }
@@ -85,7 +85,7 @@ describe('assitnToHelper', () => {
       const expectedPayload: AssignmentOverridesPayload = {
         overrides: [
           {course_section_id: '1', id: '1'},
-          {group_id: '1', id: '3'},
+          {group_category_id: '1', group_id: '1', id: '3'},
           {student_ids: ['1'], id: '2'},
         ],
       }
@@ -246,6 +246,7 @@ describe('assitnToHelper', () => {
             lock_at: '2021-05-01T00:00:00Z',
             group_id: '1',
             unlock_at: '2021-01-01T00:00:00Z',
+            non_collaborative: true,
             reply_to_topic_due_at: undefined,
             required_replies_due_at: undefined,
             unassign_item: false,
@@ -291,6 +292,7 @@ describe('assitnToHelper', () => {
           {
             id: undefined,
             lock_at: undefined,
+            non_collaborative: true,
             group_id: '1',
             due_at: undefined,
             reply_to_topic_due_at: undefined,
@@ -301,6 +303,7 @@ describe('assitnToHelper', () => {
           {
             id: undefined,
             lock_at: undefined,
+            non_collaborative: true,
             group_id: '2',
             due_at: undefined,
             reply_to_topic_due_at: undefined,
