@@ -661,6 +661,7 @@ export const DiscussionThreadContainer = props => {
                         <ThreadActions
                           moreOptionsButtonRef={moreOptionsButtonRef}
                           id={props.discussionEntry._id}
+                          entry={props.discussionEntry}
                           authorName={getDisplayName(props.discussionEntry)}
                           isUnread={!props.discussionEntry.entryParticipant?.read}
                           onToggleUnread={toggleUnread}
