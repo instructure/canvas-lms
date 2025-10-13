@@ -442,6 +442,9 @@ CanvasRails::Application.routes.draw do
       get :lockdown_browser_required
     end
 
+    # Route alias for AMS activity_builder to quizzes index
+    get "quizzes/activity_builder/:id" => "quizzes/quizzes#index", :as => :quiz_activity_builder
+
     resources :collaborations
     get "lti_collaborations" => "collaborations#lti_index"
     get "lti_collaborations/*all" => "collaborations#lti_index"
