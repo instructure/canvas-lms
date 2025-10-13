@@ -38,6 +38,10 @@ const defaultProps = {
 describe('LLMConversationView', () => {
   beforeEach(() => {
     fetchMock.restore()
+    // Mock scrollIntoView which is not available in JSDOM
+    Element.prototype.scrollIntoView = jest.fn()
+    // Mock focus which is used for accessibility
+    HTMLElement.prototype.focus = jest.fn()
   })
 
   afterEach(() => {
@@ -288,5 +292,124 @@ describe('LLMConversationView', () => {
     // Verify no sender labels are present
     expect(screen.queryByText('You')).not.toBeInTheDocument()
     expect(screen.queryByText('AI Assistant')).not.toBeInTheDocument()
+  })
+
+  describe('accessibility features', () => {
+    it('renders ARIA live region for screen reader announcements', () => {
+      fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {messages: []})
+
+      render(<LLMConversationView {...defaultProps} />)
+
+      const liveRegion = document.querySelector('[aria-live="polite"]')
+      expect(liveRegion).toBeInTheDocument()
+      expect(liveRegion).toHaveAttribute('aria-atomic', 'true')
+    })
+
+    it('adds role="log" to messages container', () => {
+      fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {messages: []})
+
+      render(<LLMConversationView {...defaultProps} />)
+
+      const messagesContainer = screen.getByLabelText('Conversation messages')
+      expect(messagesContainer).toBeInTheDocument()
+      expect(messagesContainer).toHaveAttribute('role', 'log')
+    })
+
+    it('adds role="article" to messages', async () => {
+      const mockMessages = [
+        {role: 'User', text: 'Start', timestamp: new Date()},
+        {role: 'Assistant', text: 'Hello', timestamp: new Date()},
+        {role: 'User', text: 'Test message', timestamp: new Date()},
+      ]
+
+      fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
+        messages: mockMessages,
+      })
+
+      render(<LLMConversationView {...defaultProps} />)
+
+      await waitFor(() => {
+        const articles = document.querySelectorAll('[role="article"]')
+        expect(articles.length).toBeGreaterThan(0)
+      })
+    })
+
+    it('adds appropriate aria-labels to user and assistant messages', async () => {
+      const mockMessages = [
+        {role: 'User', text: 'Start', timestamp: new Date()},
+        {role: 'Assistant', text: 'Assistant response', timestamp: new Date()},
+        {role: 'User', text: 'User message', timestamp: new Date()},
+      ]
+
+      fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
+        messages: mockMessages,
+      })
+
+      render(<LLMConversationView {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(screen.getByLabelText('Message from Assistant')).toBeInTheDocument()
+        expect(screen.getAllByLabelText('Your message').length).toBeGreaterThan(0)
+      })
+    })
+
+    it('announces "Initializing conversation..." when initializing', () => {
+      fetchMock.post(
+        '/api/v1/courses/123/ai_experiences/1/continue_conversation',
+        {messages: []},
+        {delay: 100},
+      )
+
+      render(<LLMConversationView {...defaultProps} />)
+
+      const liveRegion = document.querySelector('[aria-live="polite"]')
+      expect(liveRegion?.textContent).toContain('Initializing conversation...')
+    })
+
+    it('announces "Assistant is thinking..." when loading', async () => {
+      const initialMessages = [
+        {role: 'User', text: 'Start', timestamp: new Date()},
+        {role: 'Assistant', text: 'Hello', timestamp: new Date()},
+      ]
+
+      let callCount = 0
+      fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', () => {
+        callCount++
+        if (callCount === 1) {
+          return {messages: initialMessages}
+        }
+        return new Promise(resolve =>
+          setTimeout(
+            () =>
+              resolve({
+                messages: [
+                  ...initialMessages,
+                  {role: 'User', text: 'Test', timestamp: new Date()},
+                  {role: 'Assistant', text: 'Response', timestamp: new Date()},
+                ],
+              }),
+            100,
+          ),
+        )
+      })
+
+      render(<LLMConversationView {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(screen.getByText('Hello')).toBeInTheDocument()
+      })
+
+      const input = screen.getByPlaceholderText('Your answer...')
+      fireEvent.change(input, {target: {value: 'Test'}})
+
+      const sendButton = screen.getByText('Send')
+      fireEvent.click(sendButton)
+
+      // Check that the announcement is made
+      await waitFor(() => {
+        const liveRegion = document.querySelector('[aria-live="polite"]')
+        expect(liveRegion?.textContent).toContain('Assistant is thinking...')
+      })
+    })
   })
 })
