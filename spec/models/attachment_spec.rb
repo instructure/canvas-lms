@@ -1927,7 +1927,7 @@ describe Attachment do
       expect(attachment).to receive(:public_url).with(include(expires_in: 1.day))
       attachment.public_download_url
       expect(attachment).to receive(:public_url).with(include(expires_in: 2.days))
-      attachment.public_download_url(2.days)
+      attachment.public_download_url(expires_in: 2.days)
     end
 
     it "allows custom ttl for root_account" do
