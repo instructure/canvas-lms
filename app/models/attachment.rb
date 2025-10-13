@@ -966,6 +966,7 @@ class Attachment < ActiveRecord::Base
     else
       # s3 can't handle unknown options :sigh:
       options.delete(:internal)
+      options.delete(:no_jti)
       should_download = options.delete(:download)
       disposition = should_download ? "attachment" : "inline"
       options[:response_content_disposition] = "#{disposition}; #{disposition_filename}"
@@ -973,12 +974,12 @@ class Attachment < ActiveRecord::Base
     end
   end
 
-  def public_inline_url(ttl = url_ttl)
-    public_url(expires_in: ttl, download: false)
+  def public_inline_url(expires_in: url_ttl, no_jti: false)
+    public_url(expires_in:, no_jti:, download: false)
   end
 
-  def public_download_url(ttl = url_ttl)
-    public_url(expires_in: ttl, download: true)
+  def public_download_url(expires_in: url_ttl, no_jti: false)
+    public_url(expires_in:, no_jti:, download: true)
   end
 
   def url_ttl
