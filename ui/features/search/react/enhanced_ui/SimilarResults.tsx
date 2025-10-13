@@ -29,12 +29,10 @@ interface Props {
   searchTerm: string
 }
 
-export default function SimilarResults(props: Props) {
-  if (props.results.length === 0) {
-    return null
-  }
+export default function SimilarResults(props: Props): React.JSX.Element | null {
+  if (props.results.length === 0) return null
   return (
-    <Flex gap="sectionElements" direction="column">
+    <Flex gap="sectionElements" direction="column" width="100%">
       <Flex.Item>
         <Heading variant="titleSection" level="h2">
           {I18n.t('You may also be interested in')}
