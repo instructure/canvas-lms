@@ -155,6 +155,7 @@ const featureBundles: {
     import('./features/module_student_view_peer_reviews/index'),
   nav_tourpoints: () => import('./features/nav_tourpoints/index'),
   navigation_header: () => import('./features/navigation_header/index'),
+  new_quizzes: () => import('./features/new_quizzes/index'),
   new_user_tutorial: () => import('./features/new_user_tutorial/index'),
   not_found_index: () => import('./features/not_found_index/index'),
   oauth2_confirm: () => import('./features/oauth2_confirm/index'),
