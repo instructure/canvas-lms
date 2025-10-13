@@ -278,6 +278,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
           height="400px"
           overflowY="auto"
           margin="0 0 medium 0"
+          padding="xx-small"
           role="log"
           aria-label={I18n.t('Conversation messages')}
         >
@@ -302,7 +303,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
                         : undefined
                     }
                   >
-                    <Flex.Item shouldShrink overflowX="hidden" overflowY="hidden">
+                    <Flex.Item shouldShrink>
                       <View
                         as="div"
                         padding="small"
@@ -314,7 +315,11 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
                           isUser ? I18n.t('Your message') : I18n.t('Message from Assistant')
                         }
                         tabIndex={isLastAssistantMessage ? -1 : undefined}
-                        maxWidth="75%"
+                        style={{
+                          maxWidth: '75%',
+                          overflowWrap: 'break-word',
+                          wordBreak: 'break-word',
+                        }}
                       >
                         <Text>{message.text}</Text>
                       </View>
