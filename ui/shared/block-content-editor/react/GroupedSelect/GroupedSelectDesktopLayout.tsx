@@ -24,10 +24,9 @@ export const GroupedSelectDesktopLayout = (props: {
   group: ReactNode
   items: ReactNode
   onKeyDown: (e: React.KeyboardEvent) => void
-  onBlur: (e: React.FocusEvent) => void
 }) => {
   return (
-    <Flex alignItems="start" gap="medium" onKeyDown={props.onKeyDown} onBlur={props.onBlur}>
+    <Flex alignItems="start" gap="medium" onKeyDown={props.onKeyDown}>
       <View width="50%">{props.group}</View>
       <View width="50%">{props.items}</View>
     </Flex>
