@@ -1850,6 +1850,16 @@ class ExternalToolsController < ApplicationController
 
     return unless authorized_action(assignment, @current_user, :read)
 
+    # Apply assignment overrides for the current user (critical for date-based locks)
+    assignment = AssignmentOverrideApplicator.assignment_overridden_for(assignment, @current_user) if @current_user
+
+    # For students, verify submit permission (includes: visible_to_user, locked_for, excused_for, enrollment_active)
+    if @context.grants_right?(@current_user, :participate_as_student) &&
+       !@context.grants_right?(@current_user, :manage_assignments) &&
+       !assignment.grants_right?(@current_user, :submit)
+      return render_unauthorized_action
+    end
+
     unless assignment.external_tool_tag
       @context.errors.add(:assignment_id, "The assignment must have an external tool tag")
       return render json: @context.errors, status: :bad_request

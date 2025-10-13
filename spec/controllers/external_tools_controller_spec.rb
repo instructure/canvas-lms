@@ -3098,6 +3098,77 @@ describe ExternalToolsController do
           expect(Time.zone.parse(tool_settings["custom_assignment_due_at"])).to be_within(5.seconds).of(assignment_override.due_at)
         end
       end
+
+      context "security checks for assignment access" do
+        context "when assignment is locked by dates" do
+          it "does not allow launch when assignment is locked" do
+            assignment.update!(due_at: 2.days.ago, unlock_at: 3.days.ago, lock_at: 1.day.ago)
+
+            get :generate_sessionless_launch, params: { course_id: course.id, launch_type: "assessment", assignment_id: assignment.id }
+
+            expect(response).to have_http_status(:unauthorized)
+          end
+
+          it "allows teachers to generate launch URL even when locked" do
+            assignment.update!(due_at: 2.days.ago, unlock_at: 3.days.ago, lock_at: 1.day.ago)
+            teacher = teacher_in_course(course:, active_all: true).user
+            user_session(teacher)
+
+            get :generate_sessionless_launch, params: { course_id: course.id, launch_type: "assessment", assignment_id: assignment.id }
+
+            expect(response).to be_successful
+          end
+        end
+
+        context "when assignment visibility is restricted" do
+          let(:section1) { course.course_sections.create!(name: "Section 1") }
+          let(:section2) { course.course_sections.create!(name: "Section 2") }
+          let(:student_in_section2) do
+            user = user_factory(active_all: true)
+            course.enroll_student(user, section: section2, enrollment_state: "active").user
+            user
+          end
+
+          before do
+            assignment.update!(only_visible_to_overrides: true)
+            # Create override only for section1
+            assignment.assignment_overrides.create!(
+              set_type: "CourseSection",
+              set_id: section1.id
+            )
+          end
+
+          it "does not allow launch when assignment is not visible to user's section" do
+            user_session(student_in_section2)
+
+            get :generate_sessionless_launch, params: { course_id: course.id, launch_type: "assessment", assignment_id: assignment.id }
+
+            expect(response).to have_http_status(:unauthorized)
+          end
+
+          it "allows launch when assignment is visible to user's section" do
+            student_in_section1 = user_factory(active_all: true)
+            course.enroll_student(student_in_section1, section: section1, enrollment_state: "active")
+            user_session(student_in_section1)
+
+            get :generate_sessionless_launch, params: { course_id: course.id, launch_type: "assessment", assignment_id: assignment.id }
+
+            expect(response).to be_successful
+          end
+        end
+
+        context "when assignment is excused" do
+          before do
+            assignment.grade_student(@user, excuse: true, grader: @teacher)
+          end
+
+          it "does not allow launch when assignment is excused for the user" do
+            get :generate_sessionless_launch, params: { course_id: course.id, launch_type: "assessment", assignment_id: assignment.id }
+
+            expect(response).to have_http_status(:unauthorized)
+          end
+        end
+      end
     end
 
     context "when url is provided in params" do
