@@ -1652,6 +1652,10 @@ class CoursesController < ApplicationController
                }
              })
 
+      if Account.site_admin.feature_enabled?(:grading_scheme_updates)
+        js_env({ COURSE_DEFAULT_GRADING_SCHEME_ID: @context.grading_standard_id || @context.default_grading_standard&.id })
+      end
+
       set_tutorial_js_env
 
       master_template = @context.master_course_templates.for_full_course.first
