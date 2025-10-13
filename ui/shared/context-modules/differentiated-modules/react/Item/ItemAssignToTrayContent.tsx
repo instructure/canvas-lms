@@ -736,18 +736,30 @@ const ItemAssignToTrayContent = ({
         differentiationTagAssignees?.includes(initialCard?.defaultOptions?.[0] ?? '') ||
         JSON.stringify(studentAssignees) === JSON.stringify(initialCard?.defaultOptions)
 
-      const cards = assignToCardsRef.current.map(card =>
-        card.key === cardId
-          ? {
-              ...card,
-              selectedAssigneeIds,
-              highlightCard: !areEquals,
-              isEdited: !areEquals,
-              hasAssignees: assignees.length > 0,
-              hasInitialOverride: hasInitialAssignees,
-            }
-          : card,
-      )
+      const cards = assignToCardsRef.current.map(card => {
+        if (card.key !== cardId) return card
+
+        // Merge new assignees into initialAssigneeOptions to preserve their metadata
+        const optionsMap = new Map((card.initialAssigneeOptions || []).map(opt => [opt.id, opt]))
+        assignees.forEach(assignee => {
+          if (!optionsMap.has(assignee.id)) {
+            optionsMap.set(assignee.id, assignee)
+          }
+        })
+        const updatedInitialAssigneeOptions = Array.from(optionsMap.values()).filter(
+          opt => opt.id !== 'everyone' && opt.id !== 'mastery_paths',
+        )
+
+        return {
+          ...card,
+          selectedAssigneeIds,
+          highlightCard: !areEquals,
+          isEdited: !areEquals,
+          hasAssignees: assignees.length > 0,
+          hasInitialOverride: hasInitialAssignees,
+          initialAssigneeOptions: updatedInitialAssigneeOptions,
+        }
+      })
       if (onAssigneesChange) {
         handleCustomAssigneesChange(cardId, assignees, deletedAssignees)
       } else {
