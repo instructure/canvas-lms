@@ -22,7 +22,7 @@ import userEvent from '@testing-library/user-event'
 import {QueryClient} from '@tanstack/react-query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import StudentSelect from '../StudentSelect'
-import {CourseStudent} from '../../graphql/hooks/useAssignedStudents'
+import {CourseStudent} from '@canvas/assignments/graphql/teacher/AssignmentTeacherTypes'
 
 jest.mock('@canvas/graphql', () => ({
   executeQuery: jest.fn(),
@@ -38,10 +38,33 @@ const mockUseAssignedStudents = useAssignedStudents as jest.MockedFunction<
 >
 
 const mockStudents: CourseStudent[] = [
-  {_id: '1', name: 'Pikachu'},
-  {_id: '2', name: 'Squirtle'},
-  {_id: '3', name: 'Togepi'},
-  {_id: '4', name: 'Snorlax'},
+  {_id: '1', name: 'Pikachu', peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0}},
+  {_id: '2', name: 'Squirtle', peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0}},
+  {_id: '3', name: 'Togepi', peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0}},
+  {_id: '4', name: 'Snorlax', peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0}},
+]
+
+const mockStudentsWithPeerReviewStatus: CourseStudent[] = [
+  {
+    _id: '1',
+    name: 'Pikachu',
+    peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 3},
+  },
+  {
+    _id: '2',
+    name: 'Squirtle',
+    peerReviewStatus: {mustReviewCount: 2, completedReviewsCount: 1},
+  },
+  {
+    _id: '3',
+    name: 'Togepi',
+    peerReviewStatus: {mustReviewCount: 3, completedReviewsCount: 0},
+  },
+  {
+    _id: '4',
+    name: 'Snorlax',
+    peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 1},
+  },
 ]
 
 describe('StudentSelect', () => {
@@ -58,6 +81,8 @@ describe('StudentSelect', () => {
     onOptionSelect: mockOnOptionSelect,
     handleInputRef: mockHandleInputRef,
     clearErrors: mockClearErrors,
+    requiredPeerReviewsCount: 2,
+    assignmentId: '123',
   }
 
   let user: ReturnType<typeof userEvent.setup>
@@ -140,7 +165,6 @@ describe('StudentSelect', () => {
 
       renderWithMocks({
         selectedStudent: mockStudents[0],
-        assignmentId: 'assignment-123',
       })
 
       const input = document.getElementById('test-student-select')
@@ -164,7 +188,7 @@ describe('StudentSelect', () => {
         error: null,
       })
 
-      renderWithMocks({assignmentId: 'assignment-123', filteredStudents})
+      renderWithMocks({filteredStudents})
 
       const input = document.getElementById('test-student-select')
       expect(input).not.toBeNull()
@@ -185,7 +209,7 @@ describe('StudentSelect', () => {
         error: null,
       })
 
-      renderWithMocks({assignmentId: 'assignment-123', filteredStudents: []})
+      renderWithMocks({filteredStudents: []})
 
       const input = document.getElementById('test-student-select')
       expect(input).not.toBeNull()
@@ -207,7 +231,7 @@ describe('StudentSelect', () => {
         error: null,
       })
 
-      renderWithMocks({assignmentId: 'assignment-123'})
+      renderWithMocks({})
 
       const input = document.getElementById('test-student-select')
       expect(input).not.toBeNull()
@@ -223,7 +247,7 @@ describe('StudentSelect', () => {
         error: null,
       })
 
-      renderWithMocks({assignmentId: 'assignment-123'})
+      renderWithMocks()
 
       const input = document.getElementById('test-student-select')
       expect(input).not.toBeNull()
@@ -242,7 +266,7 @@ describe('StudentSelect', () => {
         error: null,
       })
 
-      renderWithMocks({assignmentId: 'assignment-123'})
+      renderWithMocks()
 
       const input = document.getElementById('test-student-select')
       expect(input).not.toBeNull()
@@ -268,7 +292,7 @@ describe('StudentSelect', () => {
         error: null,
       })
 
-      renderWithMocks({assignmentId: 'assignment-123'})
+      renderWithMocks()
 
       const input = document.getElementById('test-student-select')
       expect(input).not.toBeNull()
@@ -304,7 +328,7 @@ describe('StudentSelect', () => {
         error: null,
       })
 
-      renderWithMocks({assignmentId: 'assignment-123'})
+      renderWithMocks()
 
       const input = document.getElementById('test-student-select')
       expect(input).not.toBeNull()
@@ -316,7 +340,7 @@ describe('StudentSelect', () => {
     })
 
     it('shows empty option when no students are available', async () => {
-      renderWithMocks({assignmentId: 'assignment-123'})
+      renderWithMocks()
 
       const input = document.getElementById('test-student-select')
       expect(input).not.toBeNull()
@@ -336,7 +360,7 @@ describe('StudentSelect', () => {
         error: new Error('Network error occurred'),
       })
 
-      renderWithMocks({assignmentId: 'assignment-123'})
+      renderWithMocks()
 
       const input = document.getElementById('test-student-select')
       expect(input).not.toBeNull()
@@ -356,7 +380,7 @@ describe('StudentSelect', () => {
         error: new Error('Network error occurred'),
       })
 
-      renderWithMocks({assignmentId: 'assignment-123'})
+      renderWithMocks()
 
       const input = document.getElementById('test-student-select')
       expect(input).not.toBeNull()
@@ -368,7 +392,7 @@ describe('StudentSelect', () => {
     })
 
     it('does not show error alert for single character search', async () => {
-      renderWithMocks({assignmentId: 'assignment-123'})
+      renderWithMocks()
 
       const input = document.getElementById('test-student-select')
       expect(input).not.toBeNull()
@@ -395,13 +419,84 @@ describe('StudentSelect', () => {
         error: null,
       })
 
-      renderWithMocks({assignmentId: 'assignment-123'})
+      renderWithMocks()
 
       const input = document.getElementById('test-student-select')
       expect(input).not.toBeNull()
       await user.type(input!, 'Pikachu')
 
       expect(screen.getByTitle('Loading')).toBeInTheDocument()
+    })
+  })
+
+  describe('Search term validation', () => {
+    it('shows error message for single character search', async () => {
+      renderWithMocks({delay: 0})
+
+      const input = document.getElementById('test-student-select')
+      expect(input).not.toBeNull()
+      await user.type(input!, 'A')
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Search term must be at least 2 characters long'),
+        ).toBeInTheDocument()
+      })
+    })
+
+    it('clears single character error when typing more characters', async () => {
+      renderWithMocks({delay: 0})
+
+      const input = document.getElementById('test-student-select')
+      expect(input).not.toBeNull()
+      await user.type(input!, 'A')
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Search term must be at least 2 characters long'),
+        ).toBeInTheDocument()
+      })
+
+      await user.type(input!, 'B')
+
+      await waitFor(() => {
+        expect(
+          screen.queryByText('Search term must be at least 2 characters long'),
+        ).not.toBeInTheDocument()
+      })
+    })
+
+    it('does not show options when search term is only one character', async () => {
+      renderWithMocks()
+
+      const input = document.getElementById('test-student-select')
+      expect(input).not.toBeNull()
+      await user.type(input!, 'A')
+
+      expect(input!.getAttribute('aria-expanded')).toBe('false')
+    })
+  })
+
+  describe('Peer review status hints', () => {
+    it('displays hint message when passed as prop', () => {
+      const hintMessage = {
+        type: 'hint',
+        text: 'Pikachu has already completed the required amount of peer reviews.',
+      }
+      const errors = [hintMessage]
+
+      renderWithMocks({errors})
+
+      expect(
+        screen.getByText('Pikachu has already completed the required amount of peer reviews.'),
+      ).toBeInTheDocument()
+    })
+
+    it('does not display hint when errors array is empty', () => {
+      renderWithMocks({errors: []})
+
+      expect(screen.queryByText(/has already completed/)).not.toBeInTheDocument()
+      expect(screen.queryByText(/has enough "must review"/)).not.toBeInTheDocument()
     })
   })
 })

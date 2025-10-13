@@ -7672,6 +7672,21 @@ interface PagesConnectionInterface {
 }
 
 """
+Peer review status for a student on an assignment
+"""
+type PeerReviewStatus {
+  """
+  Number of peer reviews the student has completed
+  """
+  completedReviewsCount: Int!
+
+  """
+  Number of peer reviews the student has been allocated
+  """
+  mustReviewCount: Int!
+}
+
+"""
 Settings for Peer Reviews on an Assignment
 """
 type PeerReviews {
@@ -11382,6 +11397,11 @@ type User implements LegacyIDInterface & Node & Timestamped {
   name: HtmlEncodedString
   notificationPreferences: NotificationPreferences
   notificationPreferencesEnabled(accountId: ID, contextType: NotificationPreferencesContextType!, courseId: ID): Boolean!
+
+  """
+  Peer review status for assignments where peer reviews are enabled
+  """
+  peerReviewStatus: PeerReviewStatus
   pronouns: String
   recipients(context: String, search: String): Recipients
   recipientsObservers(

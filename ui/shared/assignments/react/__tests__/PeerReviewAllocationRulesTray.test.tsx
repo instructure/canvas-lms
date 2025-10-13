@@ -22,7 +22,7 @@ import userEvent from '@testing-library/user-event'
 import {QueryClient} from '@tanstack/react-query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import PeerReviewAllocationRulesTray from '../PeerReviewAllocationRulesTray'
-import {AllocationRule} from '../../graphql/hooks/useAllocationRules'
+import {AllocationRuleType} from '@canvas/assignments/graphql/teacher/AssignmentTeacherTypes'
 
 jest.mock('../images/pandasBalloon.svg', () => 'mock-pandas-balloon.svg')
 jest.mock('@canvas/graphql', () => ({
@@ -42,36 +42,61 @@ jest.mock('../CreateEditAllocationRuleModal', () => {
 const {executeQuery} = require('@canvas/graphql')
 const mockExecuteQuery = executeQuery as jest.MockedFunction<typeof executeQuery>
 
-const mockAllocationRules: AllocationRule[] = [
+const mockAllocationRules: AllocationRuleType[] = [
   {
     _id: '1',
     mustReview: true,
     reviewPermitted: true,
     appliesToAssessor: true,
-    assessor: {_id: 'assessor-1', name: 'John Smith'},
-    assessee: {_id: 'assessee-1', name: 'Jane Doe'},
+    assessor: {
+      _id: 'assessor-1',
+      name: 'John Smith',
+      peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
+    },
+    assessee: {
+      _id: 'assessee-1',
+      name: 'Jane Doe',
+      peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
+    },
   },
   {
     _id: '2',
     mustReview: false,
     reviewPermitted: true,
     appliesToAssessor: false,
-    assessor: {_id: 'assessor-2', name: 'Bob Johnson'},
-    assessee: {_id: 'assessee-2', name: 'Alice Brown'},
+    assessor: {
+      _id: 'assessor-2',
+      name: 'Bob Johnson',
+      peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
+    },
+    assessee: {
+      _id: 'assessee-2',
+      name: 'Alice Brown',
+      peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
+    },
   },
   {
     _id: '3',
     mustReview: true,
     reviewPermitted: false,
     appliesToAssessor: true,
-    assessor: {_id: 'assessor-3', name: 'Charlie Wilson'},
-    assessee: {_id: 'assessee-3', name: 'Diana Prince'},
+    assessor: {
+      _id: 'assessor-3',
+      name: 'Charlie Wilson',
+      peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
+    },
+    assessee: {
+      _id: 'assessee-3',
+      name: 'Diana Prince',
+      peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
+    },
   },
 ]
 
 describe('PeerReviewAllocationRulesTray', () => {
   const defaultProps = {
     assignmentId: '456',
+    requiredPeerReviewsCount: 2,
     isTrayOpen: true,
     closeTray: jest.fn(),
     canEdit: false,
@@ -391,8 +416,16 @@ describe('PeerReviewAllocationRulesTray', () => {
         mustReview: true,
         reviewPermitted: true,
         appliesToAssessor: true,
-        assessor: {_id: `assessor-${i + 1}`, name: `Assessor ${i + 1}`},
-        assessee: {_id: `assessee-${i + 1}`, name: `Assessee ${i + 1}`},
+        assessor: {
+          _id: `assessor-${i + 1}`,
+          name: `Assessor ${i + 1}`,
+          peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
+        },
+        assessee: {
+          _id: `assessee-${i + 1}`,
+          name: `Assessee ${i + 1}`,
+          peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
+        },
       }))
 
       mockExecuteQuery.mockResolvedValue({
@@ -454,8 +487,16 @@ describe('PeerReviewAllocationRulesTray', () => {
         mustReview: true,
         reviewPermitted: true,
         appliesToAssessor: true,
-        assessor: {_id: `assessor-${i + 1}`, name: `Assessor ${i + 1}`},
-        assessee: {_id: `assessee-${i + 1}`, name: `Assessee ${i + 1}`},
+        assessor: {
+          _id: `assessor-${i + 1}`,
+          name: `Assessor ${i + 1}`,
+          peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
+        },
+        assessee: {
+          _id: `assessee-${i + 1}`,
+          name: `Assessee ${i + 1}`,
+          peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
+        },
       }))
 
       mockExecuteQuery.mockResolvedValue({

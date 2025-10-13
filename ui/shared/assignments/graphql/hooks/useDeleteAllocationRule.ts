@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useMutation} from '@tanstack/react-query'
+import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {executeQuery} from '@canvas/graphql'
 import {DELETE_ALLOCATION_RULE_MUTATION} from '../teacher/Mutations'
 import {
@@ -28,6 +28,8 @@ export const useDeleteAllocationRule = (
   onDeleteRuleSuccess?: (data: DeleteAllocationRuleResponse) => void,
   onDeleteRuleError?: (error: any) => void,
 ) => {
+  const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: async (input: DeleteAllocationRuleInput) => {
       const response = await executeQuery<
@@ -38,6 +40,8 @@ export const useDeleteAllocationRule = (
       return response
     },
     onSuccess: data => {
+      // Remove cache for the assignedStudents data so a student's peerReviewStatus is up to date
+      queryClient.removeQueries({queryKey: ['assignedStudents']})
       onDeleteRuleSuccess?.(data)
     },
     onError: (error, _variables, _context) => {

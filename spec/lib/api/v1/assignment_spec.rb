@@ -595,6 +595,21 @@ describe "Api::V1::Assignment" do
         expect(json).to have_key("estimated_duration")
       end
     end
+
+    context "with peer_review_allocation feature flag enabled" do
+      before do
+        @assignment = assignment_model
+        @assignment.update_attribute(:peer_reviews, true)
+        @assignment.update_attribute(:peer_review_count, 2)
+        @assignment.course.enable_feature!(:peer_review_allocation)
+      end
+
+      it "includes peer_review_count" do
+        json = api.assignment_json(@assignment, user, session, {})
+        expect(json).to have_key("peer_review_count")
+        expect(json["peer_review_count"]).to eq 2
+      end
+    end
   end
 
   describe "*_settings_hash methods" do

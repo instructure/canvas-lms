@@ -23,8 +23,10 @@ const I18n = createI18nScope('peer_review_settings')
 
 export const MAX_NUM_PEER_REVIEWS = 10
 
-export const usePeerReviewSettings = () => {
-  const [reviewsRequired, setReviewsRequired] = useState<string>('1')
+export const usePeerReviewSettings = ({peerReviewCount}: {peerReviewCount: number}) => {
+  const [reviewsRequired, setReviewsRequired] = useState<string>(
+    peerReviewCount ? peerReviewCount.toString() : '1',
+  )
   const [totalPoints, setTotalPoints] = useState<string>('0')
   const [errorMessageReviewsRequired, setErrorMessageReviewsRequired] = useState<
     string | undefined

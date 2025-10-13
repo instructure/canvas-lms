@@ -38,6 +38,7 @@ global.ENV = {
 
 const createMockAssignment = (overrides = {}) => ({
   peerReviews: jest.fn(() => false),
+  peerReviewCount: jest.fn(() => 1),
   courseID: jest.fn(() => '123'),
   getId: jest.fn(() => '456'),
   ...overrides,

@@ -177,7 +177,7 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
     submissionsRequiredBeforePeerReviews,
     handleSubmissionRequiredCheck,
     resetFields,
-  } = usePeerReviewSettings()
+  } = usePeerReviewSettings({peerReviewCount: assignment.peerReviewCount()})
 
   useEffect(() => {
     const handlePeerReviewToggle = (event: MessageEvent) => {
@@ -252,7 +252,8 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
             errorMessage={errorMessageReviewsRequired}
           >
             <NumberInput
-              id="assignment_peer_reviews_required_input"
+              id="assignment_peer_reviews_count"
+              name="peer_review_count"
               data-testid="reviews-required-input"
               width="4.5rem"
               showArrows={false}

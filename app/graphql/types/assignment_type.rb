@@ -884,6 +884,7 @@ module Types
         scope = scope.name_like(search_term, "peer_review")
       end
 
+      context.scoped_set!(:assignment_id, assignment.id)
       scope
     end
 
@@ -910,6 +911,7 @@ module Types
                         assignment.context.feature_enabled?(:peer_review_allocation) &&
                         assignment.peer_reviews
 
+      context.scoped_set!(:assignment_id, assignment.id)
       assignment
     end
   end

@@ -41,6 +41,21 @@ module Types
     MD
   end
 
+  class PeerReviewStatusType < ApplicationObjectType
+    description "Peer review status for a student on an assignment"
+
+    field :completed_reviews_count, Int, null: false, description: "Number of peer reviews the student has completed"
+    field :must_review_count, Int, null: false, description: "Number of peer reviews the student has been allocated"
+
+    def must_review_count
+      object[:must_review_count] || 0
+    end
+
+    def completed_reviews_count
+      object[:completed_reviews_count] || 0
+    end
+  end
+
   class UserType < ApplicationObjectType
     #
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -954,6 +969,23 @@ module Types
       return unless object == current_user
 
       object.inbox_labels
+    end
+
+    field :peer_review_status, PeerReviewStatusType, null: true do
+      description "Peer review status for assignments where peer reviews are enabled"
+    end
+    def peer_review_status
+      assignment_id = context[:assignment_id]
+      return nil unless assignment_id
+
+      assignment = Assignment.find_by(id: assignment_id)
+      return nil unless assignment
+
+      return nil unless assignment.grants_right?(current_user, :grade) &&
+                        assignment.context.feature_enabled?(:peer_review_allocation) &&
+                        assignment.peer_reviews
+
+      Loaders::PeerReviewStatusLoader.for(assignment_id).load(object.id)
     end
 
     field :activity_stream, ActivityStreamType, null: true do

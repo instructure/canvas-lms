@@ -1684,6 +1684,92 @@ describe Types::AssignmentType do
       expect(result).to eq [student2.id.to_s]
       expect(result).not_to include(student.id.to_s)
     end
+
+    describe "assigned_students with peer review status" do
+      before(:once) do
+        @peer_review_course = course_factory(active_all: true)
+        @peer_review_teacher = teacher_in_course(active_all: true, course: @peer_review_course).user
+        @peer_review_assignment = @peer_review_course.assignments.create!(
+          title: "Peer Review Assignment",
+          points_possible: 10,
+          peer_reviews: true,
+          peer_review_count: 2
+        )
+        @student1 = student_in_course(course: @peer_review_course, name: "Student One", active_all: true).user
+        @student2 = student_in_course(course: @peer_review_course, name: "Student Two", active_all: true).user
+
+        @peer_review_course.enable_feature!(:peer_review_allocation)
+
+        AllocationRule.create!(
+          assignment: @peer_review_assignment,
+          course: @peer_review_course,
+          assessor: @student1,
+          assessee: @student2,
+          must_review: true
+        )
+
+        submission1 = @peer_review_assignment.submit_homework(@student1, {
+                                                                submission_type: "online_text_entry",
+                                                                body: "Student 1 submission"
+                                                              })
+        submission2 = @peer_review_assignment.submit_homework(@student2, {
+                                                                submission_type: "online_text_entry",
+                                                                body: "Student 2 submission"
+                                                              })
+        AssessmentRequest.create!(
+          asset: submission2,
+          assessor_asset: submission1,
+          user: @student2,
+          assessor: @student1,
+          workflow_state: "completed"
+        )
+      end
+
+      let(:peer_review_assignment_type) { GraphQLTypeTester.new(@peer_review_assignment, current_user: @peer_review_teacher) }
+
+      it "includes peer review status for assigned students" do
+        must_review_count = peer_review_assignment_type.resolve("assignedStudents { nodes { peerReviewStatus { mustReviewCount } } }")
+        expect(must_review_count.length).to eq(2)
+        expect(must_review_count.sort).to eq([0, 1])
+
+        completed_reviews_count = peer_review_assignment_type.resolve("assignedStudents { nodes { peerReviewStatus { completedReviewsCount } } }")
+        expect(completed_reviews_count.sort).to eq([0, 1])
+      end
+
+      it "returns nil for peer review status when user lacks grade permission" do
+        student_assignment_type = GraphQLTypeTester.new(@peer_review_assignment, current_user: @student1)
+
+        result = student_assignment_type.resolve("assignedStudents { nodes { peerReviewStatus { mustReviewCount } } }")
+        expect(result).to be_nil
+      end
+
+      it "returns nil for peer review status when feature is disabled" do
+        @peer_review_course.disable_feature!(:peer_review_allocation)
+
+        result = peer_review_assignment_type.resolve("assignedStudents { nodes { peerReviewStatus { mustReviewCount } } }")
+
+        # Should still return students but with nil peer review status
+        expect(result.length).to eq(2)
+        expect(result).to all(be_nil)
+      end
+
+      it "returns nil for peer review status when peer reviews are disabled" do
+        @peer_review_assignment.update!(peer_reviews: false)
+
+        result = peer_review_assignment_type.resolve("assignedStudents { nodes { peerReviewStatus { mustReviewCount } } }")
+
+        # Should still return students but with nil peer review status
+        expect(result.length).to eq(2)
+        expect(result).to all(be_nil)
+      end
+
+      it "filters students with search term and maintains peer review status" do
+        result = peer_review_assignment_type.resolve("assignedStudents (filter: { searchTerm: \"Student One\" }) { edges { node { peerReviewStatus { mustReviewCount } } } }")
+
+        expect(result.length).to eq(1)
+        expect(result.first).to eq(1)
+      end
+    end
   end
 
   describe "graderIdentitiesConnection" do
