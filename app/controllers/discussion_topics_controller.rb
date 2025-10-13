@@ -904,6 +904,7 @@ class DiscussionTopicsController < ApplicationController
                discussion_entry_version_history: Account.site_admin.feature_enabled?(:discussion_entry_version_history),
                discussion_translation_available: Translation.available?(translation_flags), # Is translation enabled on the course.
                ai_translation_improvements: @domain_root_account.feature_enabled?(:ai_translation_improvements),
+               cedar_translation: @domain_root_account.feature_enabled?(:cedar_translation),
                discussion_translation_languages: Translation.available?(translation_flags) ? Translation.languages(translation_flags) : [],
                discussion_anonymity_enabled: @context.feature_enabled?(:react_discussions_post),
                user_can_summarize: @topic.user_can_summarize?(@current_user),

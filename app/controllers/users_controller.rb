@@ -2473,7 +2473,7 @@ class UsersController < ApplicationController
   def expire_mobile_sessions
     return unless authorized_action(@domain_root_account, @current_user, :manage_user_logins)
 
-    user = api_find(User, params[:id]) if params.key?(:id)
+    user = api_find(@domain_root_account.pseudonym_users, params[:id]) if params.key?(:id)
     AccessToken.delay_if_production.invalidate_mobile_tokens!(@domain_root_account, user:)
 
     render json: "ok"
