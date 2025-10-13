@@ -33,6 +33,7 @@ class ApplicationController < ActionController::Base
   include Api::V1::WikiPage
   include LegalInformationHelper
   include ObserverEnrollmentsHelper
+  include NewQuizzesHelper
 
   helper :all
 
@@ -2316,6 +2317,11 @@ class ApplicationController < ActionController::Base
 
       tag.context_module_action(@current_user, :read)
       if @tool
+        # Check if we should use native New Quizzes experience
+        if @tool.quiz_lti? && new_quizzes_native_experience_enabled?
+          return render_native_new_quizzes
+        end
+
         log_asset_access(@tool, "external_tools", "external_tools", overwrite: false)
         @opaque_id = @tool.opaque_identifier_for(@tag)
 
@@ -3443,6 +3449,32 @@ class ApplicationController < ActionController::Base
 
   def new_quizzes_lti_tool?
     @tool&.quiz_lti?
+  end
+
+  def new_quizzes_native_experience_enabled?
+    return false unless @context.respond_to?(:root_account)
+
+    @context.root_account.feature_enabled?(:new_quizzes_native_experience)
+  end
+  helper_method :new_quizzes_native_experience_enabled?
+
+  def render_native_new_quizzes
+    add_new_quizzes_bundle
+
+    # Build launch data with HMAC signature for tamper protection
+    signed_launch_data = ::NewQuizzes::LaunchDataBuilder.new(
+      context: @context,
+      assignment: @assignment,
+      tool: @tool,
+      current_user: @current_user,
+      request:
+    ).build_with_signature
+
+    js_env(NEW_QUIZZES: signed_launch_data)
+
+    add_body_class("native-new-quizzes full-width")
+
+    render "assignments/native_new_quizzes", layout: "application"
   end
 
   def show_blueprint_button?

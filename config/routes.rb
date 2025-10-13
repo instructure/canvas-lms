@@ -348,6 +348,14 @@ CanvasRails::Application.routes.draw do
       get :tool_launch
     end
 
+    # Support wildcard paths to enable routing in the federated New Quizzes app.
+    #
+    # When `new_quizzes_native_experience_enabled` is false, path segments after `/assignment/:id`
+    # will not redirect to the 404 page but will instead open the assignment show page as usual.
+    #
+    # This route must come after the resources :assignments block to avoid conflicts.
+    get "assignments/:id#{full_path_glob}", controller: :assignments, action: :show
+
     resources :grading_standards, only: %i[index create update destroy]
 
     resources :assignment_groups do
