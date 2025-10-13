@@ -77,9 +77,8 @@ class AiExperiencesController < ApplicationController
 
   before_action :require_context
   before_action :check_ai_experiences_feature_flag
+  before_action :require_manage_rights
   before_action :load_experience, only: %i[show edit update destroy continue_conversation]
-  before_action :require_read_rights, only: %i[index show continue_conversation]
-  before_action :require_manage_rights, only: %i[new create edit update destroy]
 
   # @API List AI experiences
   #
@@ -93,8 +92,11 @@ class AiExperiencesController < ApplicationController
   def index
     @experiences = @context.ai_experiences.active
     @experiences = @experiences.where(workflow_state: params[:workflow_state]) if params[:workflow_state].present?
+    set_active_tab "ai_experiences"
+    add_crumb t("#crumbs.ai_experiences", "AI Experiences")
     respond_to do |format|
       format.html do
+        @page_title = t("#page_title.ai_experiences", "AI Experiences")
         js_env({ COURSE_ID: @context.id })
         render
       end
@@ -130,6 +132,10 @@ class AiExperiencesController < ApplicationController
   def new
     @experience = @context.ai_experiences.build
     @experience.workflow_state = "unpublished"
+    set_active_tab "ai_experiences"
+    add_crumb t("#crumbs.ai_experiences", "AI Experiences"), course_ai_experiences_path(@context)
+    add_crumb t("#crumbs.new_ai_experience", "New AI Experience")
+    @page_title = t("#page_title.new_ai_experience", "New AI Experience")
     js_env({ COURSE_ID: @context.id })
   end
 
@@ -137,6 +143,10 @@ class AiExperiencesController < ApplicationController
   #
   # Display the form for editing an existing AI experience
   def edit
+    set_active_tab "ai_experiences"
+    add_crumb t("#crumbs.ai_experiences", "AI Experiences"), course_ai_experiences_path(@context)
+    add_crumb @experience.title
+    @page_title = t("#page_title.edit_ai_experience", "Edit %{title}", title: @experience.title)
     js_env({ COURSE_ID: @context.id, AI_EXPERIENCE_ID: params[:id] })
   end
 
@@ -265,13 +275,7 @@ class AiExperiencesController < ApplicationController
 
   def load_experience
     @experience = AiExperience.find_by(id: params[:id])
-    return render_404 unless @experience&.course == @context && !@experience.deleted?
-
-    nil unless authorized_action(@context, @current_user, :read)
-  end
-
-  def require_read_rights
-    render_unauthorized_action unless authorized_action(@context, @current_user, :read)
+    render_404 unless @experience&.course == @context && !@experience.deleted?
   end
 
   def require_manage_rights

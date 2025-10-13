@@ -70,46 +70,24 @@ describe AiExperiencesController do
         expect(experiences.first["id"]).to eq published_experience.id
       end
 
-      it "sets COURSE_ID in js_env for HTML format" do
+      it "sets COURSE_ID in js_env and page title for HTML format" do
         get :index, params: { course_id: @course.id }
         expect(assigns[:js_env][:COURSE_ID]).to eq(@course.id)
+        expect(assigns(:page_title)).to eq("AI Experiences")
+      end
+
+      it "sets the active tab" do
+        get :index, params: { course_id: @course.id }
+        expect(assigns(:active_tab)).to eq("ai_experiences")
       end
     end
 
     context "as student" do
       before { user_session(@student) }
 
-      it "returns http success" do
+      it "returns forbidden" do
         get :index, params: { course_id: @course.id }, format: :json
-        expect(response).to be_successful
-      end
-
-      it "returns published experiences" do
-        @ai_experience.publish!
-        get :index, params: { course_id: @course.id }, format: :json
-        expect(response).to be_successful
-        experiences = json_parse(response.body)
-        expect(experiences.length).to eq 1
-        expect(experiences.first["id"]).to eq @ai_experience.id
-      end
-
-      it "filters by workflow_state" do
-        @ai_experience.publish!
-        @course.ai_experiences.create!(
-          title: "Unpublished Experience",
-          facts: "Test prompt"
-        )
-
-        get :index, params: { course_id: @course.id, workflow_state: "published" }, format: :json
-        experiences = json_parse(response.body)
-        expect(experiences.length).to eq 1
-        expect(experiences.first["id"]).to eq @ai_experience.id
-      end
-
-      it "returns unauthorized for other courses" do
-        other_course = course_factory
-        get :index, params: { course_id: other_course.id }
-        assert_unauthorized
+        assert_forbidden
       end
     end
   end
@@ -131,26 +109,19 @@ describe AiExperiencesController do
         expect(experience["title"]).to eq(@ai_experience.title)
       end
 
-      it "sets the active tab" do
+      it "sets the active tab and page title" do
         get :show, params: { course_id: @course.id, id: @ai_experience.id }
         expect(assigns(:active_tab)).to eq("ai_experiences")
+        expect(assigns(:page_title)).to eq(@ai_experience.title)
       end
     end
 
     context "as student" do
       before { user_session(@student) }
 
-      it "returns success for HTML format" do
-        get :show, params: { course_id: @course.id, id: @ai_experience.id }
-        expect(response).to be_successful
-      end
-
-      it "returns success for JSON format" do
+      it "returns forbidden" do
         get :show, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
-        expect(response).to be_successful
-        experience = json_parse(response.body)
-        expect(experience["id"]).to eq(@ai_experience.id)
-        expect(experience["title"]).to eq(@ai_experience.title)
+        assert_forbidden
       end
     end
   end
@@ -310,9 +281,24 @@ describe AiExperiencesController do
     context "as teacher" do
       before { user_session(@teacher) }
 
-      it "sets COURSE_ID in js_env" do
+      it "sets COURSE_ID in js_env and page title" do
         get :new, params: { course_id: @course.id }
         expect(assigns[:js_env][:COURSE_ID]).to eq(@course.id)
+        expect(assigns(:page_title)).to eq("New AI Experience")
+      end
+
+      it "sets the active tab" do
+        get :new, params: { course_id: @course.id }
+        expect(assigns(:active_tab)).to eq("ai_experiences")
+      end
+    end
+
+    context "as student" do
+      before { user_session(@student) }
+
+      it "returns unauthorized" do
+        get :new, params: { course_id: @course.id }
+        assert_unauthorized
       end
     end
   end
@@ -321,10 +307,25 @@ describe AiExperiencesController do
     context "as teacher" do
       before { user_session(@teacher) }
 
-      it "sets COURSE_ID and AI_EXPERIENCE_ID in js_env" do
+      it "sets COURSE_ID and AI_EXPERIENCE_ID in js_env and page title" do
         get :edit, params: { course_id: @course.id, id: @ai_experience.id }
         expect(assigns[:js_env][:COURSE_ID]).to eq(@course.id)
         expect(assigns[:js_env][:AI_EXPERIENCE_ID]).to eq(@ai_experience.id.to_s)
+        expect(assigns(:page_title)).to eq("Edit #{@ai_experience.title}")
+      end
+
+      it "sets the active tab" do
+        get :edit, params: { course_id: @course.id, id: @ai_experience.id }
+        expect(assigns(:active_tab)).to eq("ai_experiences")
+      end
+    end
+
+    context "as student" do
+      before { user_session(@student) }
+
+      it "returns unauthorized" do
+        get :edit, params: { course_id: @course.id, id: @ai_experience.id }
+        assert_unauthorized
       end
     end
   end
@@ -469,21 +470,12 @@ describe AiExperiencesController do
     context "as student" do
       before { user_session(@student) }
 
-      it "returns starting messages for students with read access" do
-        mock_service = instance_double(LLMConversationService)
-        allow(LLMConversationService).to receive(:new).and_return(mock_service)
-        allow(mock_service).to receive(:starting_messages).and_return([
-                                                                        { role: "User", text: "Hello", timestamp: Time.zone.now },
-                                                                        { role: "Assistant", text: "Hi there!", timestamp: Time.zone.now }
-                                                                      ])
-
+      it "returns forbidden" do
         post :continue_conversation,
              params: { course_id: @course.id, id: @ai_experience.id },
              format: :json
 
-        expect(response).to be_successful
-        json_response = json_parse(response.body)
-        expect(json_response["messages"]).to be_an(Array)
+        assert_forbidden
       end
     end
   end
