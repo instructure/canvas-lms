@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useMutation} from '@tanstack/react-query'
+import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {executeQuery} from '@canvas/graphql'
 import {CREATE_ALLOCATION_RULE_MUTATION} from '../teacher/Mutations'
 import {
@@ -28,6 +28,8 @@ export const useCreateAllocationRule = (
   onCreateRuleSuccess?: (data: CreateAllocationRuleResponse) => void,
   onCreateRuleError?: (errors: any[]) => void,
 ) => {
+  const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: async (input: CreateAllocationRuleInput) => {
       const response = await executeQuery<
@@ -41,6 +43,8 @@ export const useCreateAllocationRule = (
       if (data.createAllocationRule?.allocationErrors?.length > 0) {
         onCreateRuleError?.(data.createAllocationRule.allocationErrors)
       } else {
+        // Remove cache for the assignedStudents data so a student's peerReviewStatus is up to date
+        queryClient.removeQueries({queryKey: ['assignedStudents']})
         onCreateRuleSuccess?.(data)
       }
     },

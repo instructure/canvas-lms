@@ -17,57 +17,9 @@
  */
 
 import {useQuery} from '@tanstack/react-query'
-import {gql} from 'graphql-tag'
 import {executeQuery} from '@canvas/graphql'
-
-export interface CourseStudent {
-  _id: string
-  name: string
-}
-
-export interface CourseStudentsData {
-  course: {
-    usersConnection: {
-      nodes: CourseStudent[]
-    }
-  }
-}
-
-export interface CourseStudentsVariables {
-  courseId: string
-  filter?: {
-    searchTerm?: string
-    excludeTestStudents: boolean
-  }
-}
-
-export interface AssignedStudentsData {
-  assignment: {
-    assignedStudents: {
-      nodes: CourseStudent[]
-    }
-  }
-}
-
-export interface AssignedStudentsVariables {
-  assignmentId: string
-  filter?: {
-    searchTerm?: string
-  }
-}
-
-export const ASSIGNED_STUDENTS_QUERY = gql`
-  query GetAssignedStudents($assignmentId: ID!, $filter: AssignedStudentsFilter) {
-    assignment(id: $assignmentId) {
-      assignedStudents(filter: $filter) {
-        nodes {
-          _id
-          name
-        }
-      }
-    }
-  }
-`
+import {AssignedStudentsData, CourseStudent} from '../teacher/AssignmentTeacherTypes'
+import {ASSIGNED_STUDENTS_QUERY} from '../teacher/Queries'
 
 async function getAssignedStudents(
   assignmentId: string,

@@ -107,11 +107,13 @@ interface DeleteFocusInfo {
 
 const PeerReviewAllocationRulesTray = ({
   assignmentId,
+  requiredPeerReviewsCount,
   isTrayOpen,
   closeTray,
   canEdit = false,
 }: {
   assignmentId: string
+  requiredPeerReviewsCount: number
   isTrayOpen: boolean
   closeTray: () => void
   canEdit: boolean
@@ -472,6 +474,7 @@ const PeerReviewAllocationRulesTray = ({
                 assignmentId={assignmentId}
                 refetchRules={handleRuleSave}
                 handleRuleDelete={handleRuleDelete}
+                requiredPeerReviewsCount={requiredPeerReviewsCount}
               />
             </Flex.Item>
           ))}
@@ -586,7 +589,7 @@ const PeerReviewAllocationRulesTray = ({
         isOpen={isCreateModalOpen}
         setIsOpen={setIsCreateModalOpen}
         assignmentId={assignmentId}
-        courseId={ENV.COURSE_ID}
+        requiredPeerReviewsCount={requiredPeerReviewsCount}
         refetchRules={handleRuleSave}
       />
     </View>

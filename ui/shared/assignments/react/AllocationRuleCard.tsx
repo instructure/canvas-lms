@@ -33,12 +33,14 @@ const AllocationRuleCard = ({
   rule,
   canEdit,
   assignmentId,
+  requiredPeerReviewsCount,
   refetchRules,
   handleRuleDelete,
 }: {
   rule: AllocationRuleType
   canEdit: boolean
   assignmentId: string
+  requiredPeerReviewsCount: number
   refetchRules: (ruleId: string, isNewRule?: boolean) => void
   handleRuleDelete?: (ruleId: string, error?: any) => void
 }): React.ReactElement => {
@@ -131,7 +133,7 @@ const AllocationRuleCard = ({
         isEdit={true}
         setIsOpen={setIsEditModalOpen}
         assignmentId={assignmentId}
-        courseId={ENV.COURSE_ID}
+        requiredPeerReviewsCount={requiredPeerReviewsCount}
         refetchRules={refetchRules}
       />
     </View>

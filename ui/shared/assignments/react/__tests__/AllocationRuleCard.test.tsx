@@ -35,11 +35,13 @@ describe('AllocationRuleCard', () => {
   const assessor = {
     _id: '1',
     name: 'Pikachu',
+    peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
   }
 
   const assessee = {
     _id: '2',
     name: 'Piplup',
+    peerReviewStatus: {mustReviewCount: 1, completedReviewsCount: 0},
   }
 
   const mockRefetchRules = jest.fn()
@@ -69,6 +71,7 @@ describe('AllocationRuleCard', () => {
     rule: defaultRule,
     canEdit: false,
     assignmentId: '123',
+    requiredPeerReviewsCount: 2,
     refetchRules: mockRefetchRules,
   }
 

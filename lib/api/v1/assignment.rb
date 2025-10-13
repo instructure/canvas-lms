@@ -276,14 +276,8 @@ module Api::V1::Assignment
       hash["webhook_info"] = assignment.assignment_configuration_tool_lookups[0]&.webhook_info
     end
 
-    if assignment.automatic_peer_reviews? && assignment.peer_reviews?
-      peer_review_params = assignment.slice(
-        :peer_review_count,
-        :peer_reviews_assign_at,
-        :intra_group_peer_reviews
-      )
-      hash.merge!(peer_review_params)
-    end
+    peer_review_params = extract_peer_review_params(assignment)
+    hash.merge!(peer_review_params) if peer_review_params
 
     include_needs_grading_count = opts[:exclude_response_fields].exclude?("needs_grading_count")
     if include_needs_grading_count && assignment.context.grants_right?(user, :manage_grades)
@@ -534,6 +528,16 @@ module Api::V1::Assignment
     end
 
     hash
+  end
+
+  def extract_peer_review_params(assignment)
+    return unless assignment.peer_reviews?
+
+    if assignment.automatic_peer_reviews?
+      assignment.slice(:peer_review_count, :peer_reviews_assign_at, :intra_group_peer_reviews)
+    elsif assignment.context.feature_enabled?(:peer_review_allocation)
+      assignment.slice(:peer_review_count)
+    end
   end
 
   def turnitin_settings_json(assignment)
