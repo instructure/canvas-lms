@@ -29,6 +29,7 @@ import {MockedProvider} from '@apollo/client/testing'
 import {PageInfo} from '../../../../graphql/PageInfo'
 import React from 'react'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
+import {ObserverContext} from '../../../utils/ObserverContext'
 
 injectGlobalAlertContainers()
 
@@ -81,7 +82,11 @@ describe('SplitScreenViewContainer', () => {
     return render(
       <MockedProvider mocks={mocks}>
         <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
-          <SplitScreenViewContainer {...props} />
+          <ObserverContext.Provider
+            value={{observerRef: {current: undefined}, nodesRef: {current: new Map()}}}
+          >
+            <SplitScreenViewContainer {...props} />
+          </ObserverContext.Provider>
         </AlertManagerContext.Provider>
       </MockedProvider>,
     )

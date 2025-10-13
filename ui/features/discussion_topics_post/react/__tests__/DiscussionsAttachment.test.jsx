@@ -27,6 +27,7 @@ import {DiscussionEntry} from '../../graphql/DiscussionEntry'
 import {DiscussionThreadContainer} from '../containers/DiscussionThreadContainer/DiscussionThreadContainer'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {ObserverContext} from '../utils/ObserverContext'
 
 jest.mock('@canvas/util/globalUtils', () => ({
   openWindow: jest.fn(),
@@ -80,11 +81,15 @@ describe('DiscussionsAttachment', () => {
   const setup = (props, mocks) => {
     return render(
       <MockedProvider mocks={mocks}>
-        <AlertManagerContext.Provider
-          value={{setOnFailure: onFailureStub, setOnSuccess: onSuccessStub}}
+        <ObserverContext.Provider
+          value={{observerRef: {current: undefined}, nodesRef: {current: new Map()}}}
         >
-          <DiscussionThreadContainer {...props} />
-        </AlertManagerContext.Provider>
+          <AlertManagerContext.Provider
+            value={{setOnFailure: onFailureStub, setOnSuccess: onSuccessStub}}
+          >
+            <DiscussionThreadContainer {...props} />
+          </AlertManagerContext.Provider>
+        </ObserverContext.Provider>
       </MockedProvider>,
     )
   }
