@@ -163,6 +163,49 @@ describe "Account Reports API", type: :request do
                           parameters: { "enrollment_term_id" => "" } })
       expect(report).to have_key("id")
     end
+
+    it "allows creation of a same type report with different parameters" do
+      different_params = @report.parameters.merge("param" => "different_value")
+      expect do
+        raw_api_call(:post,
+                     "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}",
+                     { report: @report.report_type,
+                       controller: "account_reports",
+                       action: "create",
+                       format: "json",
+                       account_id: @admin.account.id.to_s,
+                       parameters: different_params })
+      end.to change { AccountReport.where(account: @admin.account, report_type: @report.report_type, parameters: different_params).count }.by(1)
+      expect(response).to have_http_status :ok
+    end
+
+    it "does not create a new report when a duplicate exists" do
+      existing_report = @report
+      expect do
+        raw_api_call(:post,
+                     "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}",
+                     { report: @report.report_type,
+                       controller: "account_reports",
+                       action: "create",
+                       format: "json",
+                       account_id: @admin.account.id.to_s,
+                       parameters: @report.parameters })
+      end.not_to change {
+        AccountReport.where(
+          account: @admin.account,
+          report_type: @report.report_type,
+          workflow_state: "created",
+          parameters: @report.parameters
+        ).count
+      }
+
+      expect(response).to have_http_status :conflict
+      expect(response.headers).to have_key("Location")
+      expect(response.headers["Location"])
+        .to include("/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}/#{existing_report.id}")
+      json = JSON.parse(response.body)
+      expect(json["id"]).to eq existing_report.id
+    end
   end
 
   describe "index" do

@@ -1895,7 +1895,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: :account_reports) do
       get "accounts/:account_id/reports/:report", action: :index
       get "accounts/:account_id/reports", action: :available_reports
-      get "accounts/:account_id/reports/:report/:id", action: :show
+      get "accounts/:account_id/reports/:report/:id", action: :show, as: "account_report"
       post "accounts/:account_id/reports/:report", action: :create, as: "account_create_report"
       delete "accounts/:account_id/reports/:report/:id", action: :destroy
       put "accounts/:account_id/reports/:report/:id/abort", action: :abort
