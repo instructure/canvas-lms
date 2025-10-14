@@ -7550,6 +7550,7 @@ type Page implements LegacyIDInterface & ModuleItemInterface & Node & Timestampe
   """
   published: Boolean
   title: String
+  todoDate: DateTime
   type: String
   updatedAt: DateTime
 }
