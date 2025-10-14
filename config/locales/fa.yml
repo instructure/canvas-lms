@@ -17526,6 +17526,8 @@ fa:
   page_not_found_2b0d05f5: "صفحه موجود نیست"
   page_page_59070cd8: "صفحه %{page}"
   page_pagenum_20dbfeb8: "صفحه %{pageNum}"
+  page_title: 
+    edit_ai_experience: "ویرایش %{title}"
   page_title_106304bb: "عنوان صفحه"
   page_title_ascending_b5df950c: "عنوان صفحه: صعودی"
   page_title_d1a22bbf: "عنوان صفحه"
