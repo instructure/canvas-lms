@@ -407,12 +407,6 @@ describe FilesController do
     end
 
     context "with safefiles" do
-      it "with new url style" do
-        enable_cache do
-          do_with_safefiles_test("http://test.host/assessment_questions/#{@aq.id}/files/#{@att.id}/#{@att.uuid}")
-        end
-      end
-
       it "with old url style" do
         enable_cache do
           do_with_safefiles_test("http://test.host/assessment_questions/#{@aq.id}/files/#{@att.id}/download?verifier=#{@att.uuid}")
@@ -430,10 +424,6 @@ describe FilesController do
     end
 
     context "without safefiles" do
-      it "with new url style" do
-        do_without_safefiles_test("http://test.host/assessment_questions/#{@aq.id}/files/#{@att.id}/#{@att.uuid}")
-      end
-
       it "with old url style" do
         do_without_safefiles_test("http://test.host/assessment_questions/#{@aq.id}/files/#{@att.id}/download?verifier=#{@att.uuid}")
       end

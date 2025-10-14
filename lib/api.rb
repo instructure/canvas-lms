@@ -187,6 +187,11 @@ module Api
       is_not_scoped_to_account: ["id"].freeze,
       root_account_id_column: "root_account_id"
     }.freeze,
+    "assessment_questions" => {
+      lookups: { "id" => "id" }.freeze,
+      is_not_scoped_to_account: ["id"].freeze,
+      root_account_id_column: "root_account_id"
+    }.freeze
   }.freeze
 
   MAX_ID = ((2**63) - 1)

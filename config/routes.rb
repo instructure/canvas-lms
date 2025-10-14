@@ -633,9 +633,7 @@ CanvasRails::Application.routes.draw do
   end
 
   resources :assessment_questions do
-    get "files/:id/download" => "files#assessment_question_show", :as => :map, :download => "1"
-    get "files/:id/preview" => "files#assessment_question_show", :preview => "1"
-    get "files/:id/:verifier" => "files#assessment_question_show", :as => :verified_file, :download => "1"
+    concerns :files
   end
 
   resources :eportfolios, except: :index do
