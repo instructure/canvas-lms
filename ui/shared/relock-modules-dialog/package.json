@@ -3,5 +3,6 @@
   "private": true,
   "version": "1.0.0",
   "author": "neme",
-  "main": "./RelockModulesDialog.js"
+  "main": "./RelockModulesDialog.js",
+  "owner": "LX"
 }
