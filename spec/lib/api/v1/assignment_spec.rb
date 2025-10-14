@@ -1529,15 +1529,6 @@ describe "Api::V1::Assignment" do
           end
         end
 
-        context "when new_quizzes_quiz_type param has content" do
-          it "calls the #new_quizzes_type= method on assignment" do
-            assignment_params[:new_quizzes_quiz_type] = "quiz_type"
-
-            expect(assignment).to receive(:new_quizzes_type=).with("quiz_type")
-            api.update_new_quizzes_params(assignment, assignment_params)
-          end
-        end
-
         context "edge cases" do
           it "ignores string keys in assignment_params" do
             assignment_params["new_quizzes_quiz_type"] = "ungraded_survey"
@@ -1545,6 +1536,50 @@ describe "Api::V1::Assignment" do
             api.update_new_quizzes_params(assignment, assignment_params)
 
             expect(assignment.settings).to be_nil
+          end
+        end
+
+        context "when new_quizzes_quiz_type param has content" do
+          context "when quiz type is ungraded_survey" do
+            before do
+              assignment_params[:new_quizzes_quiz_type] = "ungraded_survey"
+            end
+
+            it "sets hide_in_gradebook and omit_from_final_grade to true" do
+              api.update_new_quizzes_params(assignment, assignment_params)
+
+              expect(assignment.new_quizzes_type).to eq "ungraded_survey"
+              expect(assignment.hide_in_gradebook).to be true
+              expect(assignment.omit_from_final_grade).to be true
+            end
+          end
+
+          context "when quiz type is graded_quiz" do
+            before do
+              assignment_params[:new_quizzes_quiz_type] = "graded_quiz"
+            end
+
+            it "does not set hide_in_gradebook and omit_from_final_grade to true" do
+              api.update_new_quizzes_params(assignment, assignment_params)
+
+              expect(assignment.new_quizzes_type).to eq "graded_quiz"
+              expect(assignment.hide_in_gradebook).to be false
+              expect(assignment.omit_from_final_grade).to be false
+            end
+          end
+
+          context "when quiz type is graded_survey" do
+            before do
+              assignment_params[:new_quizzes_quiz_type] = "graded_survey"
+            end
+
+            it "does not set hide_in_gradebook and omit_from_final_grade to true" do
+              api.update_new_quizzes_params(assignment, assignment_params)
+
+              expect(assignment.new_quizzes_type).to eq "graded_survey"
+              expect(assignment.hide_in_gradebook).to be false
+              expect(assignment.omit_from_final_grade).to be false
+            end
           end
         end
       end
