@@ -31,7 +31,6 @@ admin_analytics:
   root_opt_in: true
   beta: false
 
-
 # Intelligent Insights - Provided through K20 LTI App
 k20_course_readiness:
   state: hidden
@@ -183,6 +182,14 @@ intelligent_insights_contextual_messaging:
   applies_to: Account
   display_name: "Intelligent Insights - Contextual Messaging"
   description: Show Intelligent Insights new contextual messaging feature.
+  root_opt_in: true
+  beta: true
+  shadow: true
+intelligent_insights_student_level_contextual_messaging:
+  state: hidden
+  applies_to: Account
+  display_name: "Intelligent Insights - Student level contextual messaging"
+  description: Show Intelligent Insights new student level contextual messaging feature.
   root_opt_in: true
   beta: true
   shadow: true
