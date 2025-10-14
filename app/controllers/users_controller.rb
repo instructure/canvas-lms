@@ -464,7 +464,7 @@ class UsersController < ApplicationController
       includes.delete("ui_invoked")
     elsif params[:sort] == "id"
       # for a more efficient way to retrieve many pages in bulk
-      users = BookmarkedCollection.wrap(UserSearch::Bookmarker.new(order: params[:order]), users)
+      users = BookmarkedCollection.wrap(Plannable::Bookmarker.new(User, params[:order] == "desc", :id), users)
     end
 
     GuardRail.activate(:secondary) do
