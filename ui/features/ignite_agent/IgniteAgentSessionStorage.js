@@ -38,24 +38,13 @@ export const IgniteAgentSessionStorage = {
   },
 
   /**
-   * Set the agent state to open
+   * Set the agent state to open or closed
    */
-  setAgentOpen() {
+  setAgentState(open) {
     try {
-      sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({isOpen: true}))
-      console.log('[Ignite Agent] Session state set to "open".')
-    } catch (e) {
-      console.error('[Ignite Agent] Could not write to sessionStorage:', e)
-    }
-  },
-
-  /**
-   * Set the agent state to closed
-   */
-  setAgentClosed() {
-    try {
-      sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({isOpen: false}))
-      console.log('[Ignite Agent] Session state set to "closed".')
+      const sessionState = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY))
+      sessionState['isOpen'] = open
+      sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(sessionState))
     } catch (e) {
       console.error('[Ignite Agent] Could not write to sessionStorage:', e)
     }
