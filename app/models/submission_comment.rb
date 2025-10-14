@@ -247,7 +247,7 @@ class SubmissionComment < ActiveRecord::Base
         record.provisional_grade_id.nil? &&
         record.submission.assignment &&
         record.submission.assignment.context.available? &&
-        record.submission.posted? &&
+        record.submission.comments_posted? &&
         record.submission.assignment.context.grants_right?(record.submission.user, :read) &&
         (!record.submission.assignment.context.instructors.include?(author) || record.submission.assignment.published?)
     end
@@ -303,6 +303,8 @@ class SubmissionComment < ActiveRecord::Base
     # generally, any instructor comments if the assignment is muted); the same
     # holds for anyone observing the student
     if submission.user_id == user.id || User.observing_students_in_course(submission.user, assignment.context).include?(user)
+      # For scheduled comment releases, return true if they have been posted
+      return true if submission.posted_comments_at.present?
       return false if draft? || hidden? || !submission.posted?
 
       # Generally the student should see only non-provisional comments--but they should

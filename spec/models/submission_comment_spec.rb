@@ -293,6 +293,15 @@ RSpec.describe SubmissionComment do
       expect(@comment.messages_sent.keys).not_to include("Submission Comment")
     end
 
+    it "dispatches notifications when posted_comments_at is set" do
+      @assignment.ensure_post_policy(post_manually: true)
+      @assignment.hide_submissions(submission_ids: [@submission.id])
+      @submission.reload.update!(posted_comments_at: Time.zone.now)
+
+      @comment = @submission.add_comment(author: @teacher, comment: "some comment")
+      expect(@comment.messages_sent.keys).to include("Submission Comment")
+    end
+
     context "draft comment" do
       before do
         @comment = @submission.add_comment(author: @teacher, comment: "42", draft_comment: true)
@@ -790,6 +799,47 @@ RSpec.describe SubmissionComment do
             expect(ta_comment.grants_right?(teacher, :read_author)).to be true
             expect(teacher_comment.grants_right?(teacher, :read_author)).to be true
           end
+        end
+      end
+
+      context "with manual posting and posted_comments_at" do
+        let(:course) { Course.create! }
+        let(:assignment) { course.assignments.create!(title: "test assignment") }
+        let(:student) { course.enroll_student(User.create!, enrollment_state: "active").user }
+        let(:teacher) { course.enroll_teacher(User.create!, enrollment_state: "active").user }
+        let(:submission) { assignment.submission_for_student(student) }
+
+        before do
+          assignment.ensure_post_policy(post_manually: true)
+          assignment.hide_submissions(submission_ids: [submission.id])
+        end
+
+        it "student cannot read hidden comments when neither posted_at nor posted_comments_at are set" do
+          comment = submission.add_comment(author: teacher, comment: "hidden comment")
+          expect(comment.grants_right?(student, :read)).to be false
+        end
+
+        it "student can read comments when posted_comments_at is set" do
+          submission.update!(posted_comments_at: Time.zone.now)
+          comment = submission.add_comment(author: teacher, comment: "posted comment")
+          expect(comment.grants_right?(student, :read)).to be true
+        end
+
+        it "student can read previously hidden comments after posted_comments_at is set" do
+          comment = submission.add_comment(author: teacher, comment: "comment", hidden: true)
+          expect(comment.grants_right?(student, :read)).to be false
+
+          submission.update!(posted_comments_at: Time.zone.now)
+          AdheresToPolicy::Cache.clear
+          expect(comment.grants_right?(student, :read)).to be true
+        end
+
+        it "teacher can always read comments regardless of posting status" do
+          comment = submission.add_comment(author: teacher, comment: "teacher comment")
+          expect(comment.grants_right?(teacher, :read)).to be true
+
+          submission.update!(posted_comments_at: Time.zone.now)
+          expect(comment.grants_right?(teacher, :read)).to be true
         end
       end
     end

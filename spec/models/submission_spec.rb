@@ -6294,6 +6294,28 @@ describe Submission do
                                          })
           expect(submission.submission_comments.last).to be_hidden
         end
+
+        it "shows the comment if posted_comments_at is set on the submission" do
+          submission.update!(posted_comments_at: Time.zone.now)
+
+          Submission.process_bulk_update(@progress, @course, nil, @teacher, {
+                                           manual_assignment.id.to_s => {
+                                             @u1.id => { text_comment: "comment visible via posted_comments_at" }
+                                           }
+                                         })
+          expect(submission.submission_comments.last).not_to be_hidden
+        end
+
+        it "leaves the comment hidden if neither posted_at nor posted_comments_at is set" do
+          submission.update!(posted_at: nil, posted_comments_at: nil)
+
+          Submission.process_bulk_update(@progress, @course, nil, @teacher, {
+                                           manual_assignment.id.to_s => {
+                                             @u1.id => { text_comment: "fully hidden comment" }
+                                           }
+                                         })
+          expect(submission.submission_comments.last).to be_hidden
+        end
       end
     end
 
@@ -9798,6 +9820,83 @@ describe Submission do
       it "returns true if the submission's posted_at date is not nil" do
         submission.update!(posted_at: Time.zone.now)
         expect(submission).to be_posted
+      end
+    end
+
+    describe "#comments_posted?" do
+      it "returns false when neither posted_at nor posted_comments_at are set" do
+        expect(submission).not_to be_comments_posted
+      end
+
+      it "returns true when posted_at is set" do
+        submission.update!(posted_at: Time.zone.now)
+        expect(submission).to be_comments_posted
+      end
+
+      it "returns true when posted_comments_at is set" do
+        submission.update!(posted_comments_at: Time.zone.now)
+        expect(submission).to be_comments_posted
+      end
+
+      it "returns true when both posted_at and posted_comments_at are set" do
+        submission.update!(posted_at: Time.zone.now, posted_comments_at: Time.zone.now)
+        expect(submission).to be_comments_posted
+      end
+    end
+
+    describe "#hide_comments_from_student?" do
+      context "when assignment posts manually" do
+        before do
+          @assignment.ensure_post_policy(post_manually: true)
+        end
+
+        it "returns true when neither posted_at nor posted_comments_at are set" do
+          expect(submission.hide_comments_from_student?).to be true
+        end
+
+        it "returns false when posted_at is set" do
+          submission.update!(posted_at: Time.zone.now)
+          expect(submission.hide_comments_from_student?).to be false
+        end
+
+        it "returns false when posted_comments_at is set" do
+          submission.update!(posted_comments_at: Time.zone.now)
+          expect(submission.hide_comments_from_student?).to be false
+        end
+
+        it "returns false when both posted_at and posted_comments_at are set" do
+          submission.update!(posted_at: Time.zone.now, posted_comments_at: Time.zone.now)
+          expect(submission.hide_comments_from_student?).to be false
+        end
+      end
+
+      context "when assignment posts automatically" do
+        before do
+          @assignment.ensure_post_policy(post_manually: false)
+        end
+
+        it "returns true when submission is graded but not posted" do
+          submission.update!(score: 10, workflow_state: "graded")
+          expect(submission.hide_comments_from_student?).to be true
+        end
+
+        it "returns false when submission is graded and posted" do
+          submission.update!(score: 10, workflow_state: "graded", posted_at: Time.zone.now)
+          expect(submission.hide_comments_from_student?).to be false
+        end
+
+        it "returns true when submission is resubmitted but not posted" do
+          resubmission = @assignment.submit_homework(@student, body: "frd")
+          resubmission.update!(score: 10, workflow_state: "graded", posted_at: Time.zone.now)
+          resubmission = @assignment.submit_homework(@student, body: "frd")
+          resubmission.update!(posted_at: nil)
+          expect(resubmission.hide_comments_from_student?).to be true
+        end
+
+        it "returns false when submission is ungraded" do
+          submission.update!(workflow_state: "submitted", score: nil, grade: nil)
+          expect(submission.hide_comments_from_student?).to be false
+        end
       end
     end
 
