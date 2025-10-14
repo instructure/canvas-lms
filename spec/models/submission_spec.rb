@@ -7082,6 +7082,78 @@ describe Submission do
       end
     end
 
+    context "when posted_comments_at is set but posted_at is not" do
+      before(:once) do
+        @assignment.post_policy.update!(post_manually: true)
+        @viewing_user = @student
+        @submission.update!(posted_comments_at: Time.zone.now)
+
+        # Add data with points to the assessments
+        @teacher_assessment.update!(
+          score: 8.5,
+          data: [
+            { criterion_id: "crit1", points: 5, comments: "Good work on this part" },
+            { criterion_id: "crit2", points: 3.5, comments: "Needs improvement here" }
+          ]
+        )
+        @student_assessment.update!(
+          score: 7.0,
+          data: [
+            { criterion_id: "crit1", points: 4, comments: "Self assessment comment" },
+            { criterion_id: "crit2", points: 3, comments: "I think I did okay" }
+          ]
+        )
+      end
+
+      it "returns rubric assessments with points stripped" do
+        assessments = @submission.visible_rubric_assessments_for(@viewing_user)
+        expect(assessments.length).to eq(2)
+
+        assessments.each do |assessment|
+          expect(assessment.score).to be_nil
+          expect(assessment.data).to be_present
+          assessment.data.each do |rating|
+            expect(rating[:points]).to be_nil
+          end
+        end
+      end
+
+      it "preserves comments in the assessment data" do
+        assessments = @submission.visible_rubric_assessments_for(@viewing_user)
+        teacher_assessment = assessments.find { |a| a.assessor_id == @teacher.id }
+
+        expect(teacher_assessment.data[0][:comments]).to eq("Good work on this part")
+        expect(teacher_assessment.data[1][:comments]).to eq("Needs improvement here")
+      end
+
+      it "preserves the assessment ID" do
+        assessments = @submission.visible_rubric_assessments_for(@viewing_user)
+        teacher_assessment = assessments.find { |a| a.assessor_id == @teacher.id }
+
+        expect(teacher_assessment.id).to eq(@teacher_assessment.id)
+      end
+
+      it "does not modify the original assessment object" do
+        original_score = @teacher_assessment.score
+        original_data = @teacher_assessment.data.deep_dup
+
+        @submission.visible_rubric_assessments_for(@viewing_user)
+
+        @teacher_assessment.reload
+        expect(@teacher_assessment.score).to eq(original_score)
+        expect(@teacher_assessment.data[0][:points]).to eq(original_data[0][:points])
+      end
+
+      it "preserves other assessment attributes" do
+        assessments = @submission.visible_rubric_assessments_for(@viewing_user)
+        teacher_assessment = assessments.find { |a| a.assessor_id == @teacher.id }
+
+        expect(teacher_assessment.assessor_id).to eq(@teacher.id)
+        expect(teacher_assessment.user_id).to eq(@assessed_user.id)
+        expect(teacher_assessment.rubric_id).to eq(@rubric.id)
+      end
+    end
+
     it "returns the rubric assessments if user can :read_grade" do
       expect(subject).to contain_exactly(@teacher_assessment, @student_assessment)
     end
