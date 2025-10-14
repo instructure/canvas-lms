@@ -19,6 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import CommentArea from '../CommentArea'
+import fakeEnv from '@canvas/test-utils/fakeENV'
 
 describe('CommentArea', () => {
   let getTextAreaRefMock
@@ -37,7 +38,7 @@ describe('CommentArea', () => {
 
   afterEach(() => {
     jest.clearAllMocks()
-    window.ENV = {}
+    fakeEnv.teardown()
   })
 
   it('calls getTextAreaRef within TextArea', () => {
@@ -47,9 +48,9 @@ describe('CommentArea', () => {
 
   describe('with the comment library flag enabled', () => {
     beforeEach(() => {
-      window.ENV = {
+      fakeEnv.setup({
         assignment_comment_library_feature_enabled: true,
-      }
+      })
     })
 
     it('loads the comment library', () => {
@@ -60,13 +61,13 @@ describe('CommentArea', () => {
 
   describe('with the comment library flag disabled', () => {
     beforeEach(() => {
-      window.ENV = {
+      fakeEnv.setup({
         assignment_comment_library_feature_enabled: false,
-      }
+        context_asset_string: 'course_1',
+      })
     })
 
     it('does not load the comment library', () => {
-      ENV.context_asset_string = 'course_1'
       const {queryByText} = render(<CommentArea {...defaultProps()} />)
       expect(queryByText('Loading comment library')).not.toBeInTheDocument()
     })
