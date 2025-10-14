@@ -60,28 +60,31 @@ export const AccessibilityCheckerButton = ({count = 0, issues = []}: Accessibili
       onHideContent={handleHideContent}
       issues={issues}
       renderTrigger={() => (
-        <Badge
-          elementRef={el => {
-            if (!el) {
-              return
-            }
+        // div wrapper is needed to pass aria-expanded
+        <div>
+          <Badge
+            elementRef={el => {
+              if (!el) {
+                return
+              }
 
-            // Ensure not hidden behind focus outline
-            const parentSpan = el as HTMLSpanElement
-            const innerSpan = parentSpan.querySelector(':scope > span') as HTMLSpanElement
-            innerSpan.style.zIndex = '11'
-          }}
-          count={count}
-          countUntil={99}
-        >
-          <ToolbarButton
-            color={isPopoverOpen ? 'primary' : 'secondary'}
-            screenReaderLabel={screenReaderLabel}
-            renderIcon={<IconA11yLine />}
-            onClick={handleButtonClick}
-            data-testid="accessibility-button"
-          />
-        </Badge>
+              // Ensure not hidden behind focus outline
+              const parentSpan = el as HTMLSpanElement
+              const innerSpan = parentSpan.querySelector(':scope > span') as HTMLSpanElement
+              innerSpan.style.zIndex = '11'
+            }}
+            count={count}
+            countUntil={99}
+          >
+            <ToolbarButton
+              color={isPopoverOpen ? 'primary' : 'secondary'}
+              screenReaderLabel={screenReaderLabel}
+              renderIcon={<IconA11yLine />}
+              onClick={handleButtonClick}
+              data-testid="accessibility-button"
+            />
+          </Badge>
+        </div>
       )}
     />
   )
