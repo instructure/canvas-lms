@@ -292,14 +292,12 @@ export default function CanvasStudioPlayer({
     if (mediaObjNetworkErr) {
       if (is_attachment) {
         return (
-          // @ts-expect-error
           <Alert key="bepatientalert" variant="info" margin="x-small" liveRegion={liveRegion}>
             {I18n.t('Your media has been uploaded and will appear here after processing.')}
           </Alert>
         )
       } else {
         return (
-          // @ts-expect-error
           <Alert key="erralert" variant="error" margin="small" liveRegion={liveRegion}>
             {I18n.t('Failed retrieving media sources.')}
           </Alert>
@@ -309,7 +307,6 @@ export default function CanvasStudioPlayer({
     if (retryAttempt >= retryAttempts) {
       // this should be very rare
       return (
-        // @ts-expect-error
         <Alert key="giveupalert" variant="info" margin="x-small" liveRegion={liveRegion}>
           {I18n.t(
             'Giving up on retrieving media sources. This issue will probably resolve itself eventually.',
@@ -321,7 +318,6 @@ export default function CanvasStudioPlayer({
       return (
         <Flex margin="xx-small" justifyItems="space-between">
           <Flex.Item margin="0 0 x-small 0" shouldGrow={true} shouldShrink={true}>
-            {/* @ts-expect-error */}
             <Alert key="bepatientalert" variant="info" margin="x-small" liveRegion={liveRegion}>
               {I18n.t('Your media has been uploaded and will appear here after processing.')}
             </Alert>
