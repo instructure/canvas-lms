@@ -9198,6 +9198,7 @@ type StudentSummaryAnalytics {
 
 type SubAssignmentSubmission {
   assignmentId: ID!
+  cachedDueDate: DateTime
   customGradeStatusId: ID
 
   """
