@@ -3039,16 +3039,29 @@ class Submission < ActiveRecord::Base
     assignment.muted?
   end
 
+  def graded_or_resubmitted_without_posting?
+    # Only indicate that the grade is hidden if there's an actual grade.
+    # Similarly, hide the grade if the student resubmits (which will keep
+    # the old grade but bump the workflow back to "submitted").
+    (graded? || resubmitted?) && !posted?
+  end
+  private :graded_or_resubmitted_without_posting?
+
   def hide_grade_from_student?(for_plagiarism: false)
     return false if for_plagiarism
 
     if assignment.post_manually?
       posted_at.blank?
     else
-      # Only indicate that the grade is hidden if there's an actual grade.
-      # Similarly, hide the grade if the student resubmits (which will keep
-      # the old grade but bump the workflow back to "submitted").
-      (graded? || resubmitted?) && !posted?
+      graded_or_resubmitted_without_posting?
+    end
+  end
+
+  def hide_comments_from_student?
+    if assignment.post_manually?
+      !comments_posted?
+    else
+      graded_or_resubmitted_without_posting?
     end
   end
 
@@ -3061,6 +3074,10 @@ class Submission < ActiveRecord::Base
 
   def posted?
     posted_at.present?
+  end
+
+  def comments_posted?
+    posted? || posted_comments_at.present?
   end
 
   def assignment_muted_changed
@@ -3242,7 +3259,7 @@ class Submission < ActiveRecord::Base
             comment = {
               comment: comment[:text_comment],
               author: grader,
-              hidden: assignment.post_manually? && !submission.posted?
+              hidden: assignment.post_manually? && !submission.comments_posted?,
             }.merge(
               comment
             ).with_indifferent_access

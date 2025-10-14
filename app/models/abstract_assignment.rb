@@ -4221,6 +4221,7 @@ class AbstractAssignment < ActiveRecord::Base
       all_user_ids.concat(user_ids)
       User.clear_cache_keys(user_ids, :submissions)
       submissions_batch.update_all(posted_comments_at: update_time, updated_at: update_time)
+      show_stream_items(submissions: submissions_batch)
     end
     progress.set_results(assignment_id: id, posted_comments_at: update_time, user_ids: all_user_ids) if progress.present? && all_user_ids.any?
   end
