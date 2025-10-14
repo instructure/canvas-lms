@@ -1398,6 +1398,10 @@ class ApplicationController < ActionController::Base
           params[:context_id] = params[:course_section_id]
           params[:context_type] = "CourseSection"
           @context = api_find(CourseSection, params[:course_section_id])
+        elsif params[:assessment_question_id]
+          params[:context_id] = params[:assessment_question_id]
+          params[:context_type] = "AssessmentQuestion"
+          @context = api_find(AssessmentQuestion, params[:assessment_question_id])
         elsif request.path.start_with?("/profile") || request.path == "/" || request.path.start_with?("/dashboard/files") || request.path.start_with?("/calendar") || request.path.start_with?("/assignments") || request.path.start_with?("/files") || request.path == "/api/v1/calendar_events/visible_contexts"
           # ^ this should be split out into things on the individual controllers
           @context_is_current_user = true
@@ -1426,6 +1430,10 @@ class ApplicationController < ActionController::Base
           if @context.respond_to?(:short_name)
             crumb_url = named_context_url(@context, :context_url) if @context.grants_right?(@current_user, session, :read)
             add_crumb(@context.nickname_for(@current_user, :short_name), crumb_url)
+          end
+
+          if @context.is_a?(AssessmentQuestion)
+            @skip_crumb = true if params[:controller] == "files" && params[:action] == "show"
           end
 
           @set_badge_counts = true
