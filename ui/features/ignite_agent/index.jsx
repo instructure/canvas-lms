@@ -68,7 +68,7 @@ function IgniteAgent(props) {
     setError(null)
 
     // Set session storage state to "open"
-    IgniteAgentSessionStorage.setAgentOpen()
+    IgniteAgentSessionStorage.setAgentState(true)
 
     try {
       console.log("[Ignite Agent] Importing remote 'igniteagent/appInjector'...")
@@ -89,7 +89,7 @@ function IgniteAgent(props) {
       captureException(loadError)
       setError(loadError)
       setIsOpen(false)
-      IgniteAgentSessionStorage.setAgentClosed()
+      IgniteAgentSessionStorage.setAgentState(false)
     } finally {
       setIsLoading(false)
     }
