@@ -3450,6 +3450,20 @@ describe GradebooksController do
         expect(js_env.fetch(:assignment_comment_library_feature_enabled)).to be true
       end
 
+      context "comment library v2" do
+        it "sets use_comment_library_v2 to true when enabled" do
+          Account.site_admin.enable_feature!(:use_comment_library_v2)
+          get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
+          expect(js_env.fetch(:use_comment_library_v2)).to be true
+        end
+
+        it "sets use_comment_library_v2 to false when disabled" do
+          Account.site_admin.disable_feature!(:use_comment_library_v2)
+          get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
+          expect(js_env.fetch(:use_comment_library_v2)).to be false
+        end
+      end
+
       it "sets outcomes keys" do
         get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id }
         expect(js_env).to have_key :outcome_proficiency

@@ -1204,6 +1204,7 @@ class GradebooksController < ApplicationController
           enhanced_rubrics_enabled:,
           rubric_outcome_data: enhanced_rubrics_enabled ? rubric&.outcome_data : [],
           multiselect_filters_enabled: multiselect_filters_enabled?,
+          use_comment_library_v2: Account.site_admin.feature_enabled?(:use_comment_library_v2),
         }
         if grading_role_for_user == :moderator
           env[:provisional_select_url] = api_v1_select_provisional_grade_path(@context.id, @assignment.id, "{{provisional_grade_id}}")
