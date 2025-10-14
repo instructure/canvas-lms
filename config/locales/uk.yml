@@ -12744,6 +12744,8 @@ uk:
   page_name_21defa75: "Назва сторінки"
   page_name_is_required_d8c2736e: "Назва сторінки обов'язкова"
   page_not_found_2b0d05f5: "Сторінку не знайдено"
+  page_title: 
+    edit_ai_experience: "Редагувати %{title}"
   page_title_106304bb: "Заголовок сторінки"
   page_title_d1a22bbf: "Заголовок сторінки"
   page_views: 
