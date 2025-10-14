@@ -429,7 +429,7 @@ export default class ItemView extends Backbone.View {
     base.isMasterCourseChildContent = this.model.isMasterCourseChildContent()
     base.failedToMigrate = this.model.get('workflow_state') === 'failed_to_migrate'
     base.showAvailability =
-      !(this.model.get('in_paced_course') && this.canManage()) &&
+      !this.model.get('in_paced_course') &&
       (this.model.multipleDueDates() || !this.model.defaultDates().available())
     base.showDueDate =
       !(this.model.get('in_paced_course') && this.canManage()) &&

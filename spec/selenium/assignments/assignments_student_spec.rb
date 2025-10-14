@@ -213,6 +213,22 @@ describe "assignments" do
       expect(f("#content")).not_to contain_css(".student-assignment-overview")
     end
 
+    it "does not honor unlock dates if course paces is enabled" do
+      @course.enable_course_paces = true
+      @course.save!
+      assignment = @course.assignments.create!(name: "locked assignment", unlock_at: 1.day.from_now)
+      get "/courses/#{@course.id}/assignments/#{assignment.id}"
+      expect(f("#content")).not_to include_text("This assignment is locked until")
+    end
+
+    it "does not honor lock dates if course paces is enabled" do
+      @course.enable_course_paces = true
+      @course.save!
+      assignment = @course.assignments.create!(name: "locked assignment", lock_at: 1.day.ago)
+      get "/courses/#{@course.id}/assignments/#{assignment.id}"
+      expect(f("#content")).not_to include_text("This assignment was locked")
+    end
+
     context "overridden lock_at" do
       before do
         setup_sections_and_overrides_all_future

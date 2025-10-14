@@ -859,9 +859,8 @@ class Quizzes::Quiz < ActiveRecord::Base
 
       quiz_for_user = overridden_for(user)
 
-      unlock_time_not_yet_reached = quiz_for_user.unlock_at && quiz_for_user.unlock_at > Time.zone.now
-      lock_time_already_occurred = quiz_for_user.lock_at && quiz_for_user.lock_at <= Time.zone.now
-
+      unlock_time_not_yet_reached = quiz_for_user.unlock_at && quiz_for_user.unlock_at > Time.zone.now && !context.enable_course_paces?
+      lock_time_already_occurred = quiz_for_user.lock_at && quiz_for_user.lock_at <= Time.zone.now && !context.enable_course_paces?
       locked = false
       lock_info = { object: quiz_for_user }
       if unlock_time_not_yet_reached

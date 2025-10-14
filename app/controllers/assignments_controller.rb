@@ -167,6 +167,7 @@ class AssignmentsController < ApplicationController
              points_based: grading_standard.points_based?,
              scaling_factor: grading_standard.scaling_factor,
              enhanced_rubrics_enabled: @context.feature_enabled?(:enhanced_rubrics),
+             course_pacing_enabled: @context.enable_course_paces,
            })
 
     if peer_review_mode_enabled

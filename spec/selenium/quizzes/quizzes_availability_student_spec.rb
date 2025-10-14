@@ -72,4 +72,38 @@ describe "Taking a quiz as a student" do
       expect(f("#take_quiz_link")).to be_truthy
     end
   end
+
+  context "when the quiz is in a paced course" do
+    before do
+      @course.update(enable_course_paces: true)
+    end
+
+    context "and the available from date is in the future" do
+      before do
+        create_quiz_with_due_date(
+          unlock_at: default_time_for_unlock_date(1.day.from_now),
+          due_at: default_time_for_due_date(2.days.from_now)
+        )
+      end
+
+      it "allows taking the quiz", priority: 1 do
+        get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+        expect(f("#take_quiz_link")).to be_truthy
+      end
+    end
+
+    context "and the available until date is in the past" do
+      before do
+        create_quiz_with_due_date(
+          due_at: default_time_for_due_date(2.days.ago),
+          lock_at: default_time_for_lock_date(1.day.ago)
+        )
+      end
+
+      it "allows taking the quiz", priority: 1 do
+        get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+        expect(f("#take_quiz_link")).to be_truthy
+      end
+    end
+  end
 end
