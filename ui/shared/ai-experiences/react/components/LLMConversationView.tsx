@@ -58,13 +58,9 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
   const closeButtonRef = useRef<HTMLButtonElement>(null)
   const textAreaRef = useRef<HTMLTextAreaElement>(null)
 
-  const scrollToLastMessage = () => {
-    lastMessageElement?.scrollIntoView({behavior: 'smooth', block: 'start'})
-  }
-
   useEffect(() => {
-    scrollToLastMessage()
-  }, [messages])
+    lastMessageElement?.scrollIntoView({behavior: 'smooth', block: 'start'})
+  }, [messages, lastMessageElement])
 
   useEffect(() => {
     if (isOpen && isExpanded && messages.length === 0) {
@@ -293,38 +289,36 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
                 const isLastMessage = index === messages.slice(1).length - 1
                 const isLastAssistantMessage = isLastMessage && !isUser
                 return (
-                  <Flex
+                  <View
                     key={index}
-                    justifyItems={isUser ? 'end' : 'start'}
+                    as="div"
+                    display="block"
                     margin="small 0"
+                    textAlign={isUser ? 'end' : 'start'}
                     elementRef={
                       isLastMessage
                         ? (el: Element | null) => setLastMessageElement(el as HTMLElement)
                         : undefined
                     }
                   >
-                    <Flex.Item shouldShrink>
-                      <View
-                        as="div"
-                        padding="small"
-                        background={isUser ? 'primary' : undefined}
-                        borderRadius="medium"
-                        borderWidth={isUser ? 'small' : undefined}
-                        role="article"
-                        aria-label={
-                          isUser ? I18n.t('Your message') : I18n.t('Message from Assistant')
-                        }
-                        tabIndex={isLastAssistantMessage ? -1 : undefined}
-                        style={{
-                          maxWidth: '75%',
-                          overflowWrap: 'break-word',
-                          wordBreak: 'break-word',
-                        }}
-                      >
-                        <Text>{message.text}</Text>
-                      </View>
-                    </Flex.Item>
-                  </Flex>
+                    <View
+                      as="div"
+                      display="inline-block"
+                      maxWidth="70%"
+                      padding="small"
+                      background={isUser ? 'primary' : undefined}
+                      borderRadius="medium"
+                      borderWidth={isUser ? 'small' : undefined}
+                      role="article"
+                      aria-label={
+                        isUser ? I18n.t('Your message') : I18n.t('Message from Assistant')
+                      }
+                      tabIndex={isLastAssistantMessage ? -1 : undefined}
+                      textAlign="start"
+                    >
+                      <Text>{message.text}</Text>
+                    </View>
+                  </View>
                 )
               })}
               {isLoading && (
