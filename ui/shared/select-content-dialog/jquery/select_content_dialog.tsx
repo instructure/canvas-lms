@@ -588,6 +588,9 @@ export const selectContentDialog = function (options?: SelectContentDialogOption
         }
         upload_form?.onClose()
       },
+      open() {
+        $(this).parent().find('.ui-dialog-titlebar-close').focus()
+      },
       modal: true,
       zIndex: 1000,
       create() {
