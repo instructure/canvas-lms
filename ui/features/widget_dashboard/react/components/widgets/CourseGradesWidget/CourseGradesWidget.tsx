@@ -99,6 +99,7 @@ const CourseGradesWidget: React.FC<BaseWidgetProps> = ({widget}) => {
           value="showGrades"
           checked={hasVisibleGrades}
           onChange={handleToggleAllGrades}
+          data-testid={hasVisibleGrades ? 'hide-all-grades-checkbox' : 'show-all-grades-checkbox'}
         />
       }
     >

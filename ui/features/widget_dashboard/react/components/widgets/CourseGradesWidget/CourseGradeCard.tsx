@@ -94,6 +94,7 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
                 href={`/courses/${courseId}/grades`}
                 isWithinText={false}
                 aria-label={I18n.t('View %{courseName} gradebook', {courseName})}
+                data-testid={`course-${courseId}-gradebook-link`}
               >
                 <Text size="small">{I18n.t('View gradebook')}</Text>
               </Link>
@@ -114,13 +115,18 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
                     ? I18n.t('Hide grades for %{courseName}', {courseName})
                     : I18n.t('Show grades for %{courseName}', {courseName})
                 }
+                data-testid={
+                  isGradeVisible
+                    ? `hide-single-grade-button-${courseId}`
+                    : `show-single-grade-button-${courseId}`
+                }
               >
                 {isGradeVisible ? I18n.t('Hide grade') : I18n.t('Show grade')}
               </Button>
             </Flex.Item>
             <Flex.Item>
               {isGradeVisible && (
-                <Text size="xx-large" weight="bold">
+                <Text size="xx-large" weight="bold" data-testid={`course-${courseId}-grade`}>
                   {currentGrade !== null
                     ? gradingScheme === 'percentage'
                       ? `${Math.floor(currentGrade)}%`

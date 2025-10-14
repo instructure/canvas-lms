@@ -35,7 +35,7 @@ describe "student dashboard people widget", :ignore_js_errors do
 
   context "people widget smoke tests" do
     it "displays teachers and TA" do
-      go_to_people_widget
+      go_to_dashboard
 
       expect(message_instructor_button(@teacher1.id, @course1.id)).to be_displayed
       expect(message_instructor_button(@teacher2.id, @course2.id)).to be_displayed
@@ -44,7 +44,7 @@ describe "student dashboard people widget", :ignore_js_errors do
 
     it "displays people in pagination" do
       skip "Will unskip after fixing LX-3406 (2025-10-09)"
-      go_to_people_widget
+      go_to_dashboard
 
       expect(all_message_buttons.size).to eq(5)
       widget_pagination_button("people", "2").click
@@ -52,7 +52,7 @@ describe "student dashboard people widget", :ignore_js_errors do
     end
 
     it "can message instructors" do
-      go_to_people_widget
+      go_to_dashboard
 
       expect(message_instructor_button(@teacher1.id, @course1.id)).to be_displayed
       message_instructor_button(@teacher1.id, @course1.id).click
