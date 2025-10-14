@@ -17,22 +17,25 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class AiExperience < ApplicationRecord
+class AiConversation < ApplicationRecord
   belongs_to :root_account, class_name: "Account"
   belongs_to :account
   belongs_to :course
+  belongs_to :user
+  belongs_to :ai_experience
 
-  has_many :ai_conversations, dependent: :destroy
+  validates :llm_conversation_id, presence: true, uniqueness: true
+  validates :workflow_state, presence: true, inclusion: { in: %w[active completed deleted] }
 
-  validates :title, presence: true, length: { maximum: 255 }
-  validates :learning_objective, presence: true
-  validates :pedagogical_guidance, presence: true
-  validates :workflow_state, presence: true, inclusion: { in: %w[unpublished published deleted] }
-
-  scope :published, -> { where(workflow_state: "published") }
-  scope :unpublished, -> { where(workflow_state: "unpublished") }
-  scope :active, -> { where.not(workflow_state: "deleted") }
+  scope :for_user, ->(user_id) { where(user_id:) }
   scope :for_course, ->(course_id) { where(course_id:) }
+  scope :for_account, ->(account_id) { where(account_id:) }
+  scope :for_ai_experience, ->(ai_experience_id) { where(ai_experience_id:) }
+  scope :active, -> { where(workflow_state: "active") }
+  scope :completed, -> { where(workflow_state: "completed") }
+  scope :deleted, -> { where(workflow_state: "deleted") }
+
+  before_create :set_account_associations
 
   def delete
     return false if deleted?
@@ -40,24 +43,18 @@ class AiExperience < ApplicationRecord
     update_column(:workflow_state, "deleted")
   end
 
-  def publish!
+  def complete!
     return false if deleted?
 
-    update_column(:workflow_state, "published")
+    update_column(:workflow_state, "completed")
   end
 
-  def unpublish!
-    return false if deleted?
-
-    update_column(:workflow_state, "unpublished")
+  def active?
+    workflow_state == "active"
   end
 
-  def published?
-    workflow_state == "published"
-  end
-
-  def unpublished?
-    workflow_state == "unpublished"
+  def completed?
+    workflow_state == "completed"
   end
 
   def deleted?
@@ -72,6 +69,4 @@ class AiExperience < ApplicationRecord
       self.account_id ||= course.account_id
     end
   end
-
-  before_create :set_account_associations
 end
