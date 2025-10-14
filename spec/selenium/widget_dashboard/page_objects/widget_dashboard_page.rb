@@ -77,6 +77,29 @@ module WidgetDashboardPage
     ".MessageStudents__Alert"
   end
 
+  def hide_all_grades_checkbox_selector
+    "[data-testid='hide-all-grades-checkbox']"
+  end
+
+  def show_all_grades_checkbox_selector
+    "[data-testid='show-all-grades-checkbox']"
+  end
+
+  def hide_single_grade_button_selector(course_id)
+    "[data-testid='hide-single-grade-button-#{course_id}']"
+  end
+
+  def show_single_grade_button_selector(course_id)
+    "[data-testid='show-single-grade-button-#{course_id}']"
+  end
+
+  def course_gradebook_link_selector(course_id)
+    "[data-testid='course-#{course_id}-gradebook-link']"
+  end
+
+  def course_grade_text_selector(course_id)
+    "[data-testid='course-#{course_id}-grade']"
+  end
   #------------------------------ Elements ------------------------------
 
   def announcement_filter
@@ -143,6 +166,34 @@ module WidgetDashboardPage
     f(message_modal_alert_selector)
   end
 
+  def hide_all_grades_checkbox
+    f(hide_all_grades_checkbox_selector)
+  end
+
+  def show_all_grades_checkbox
+    f(show_all_grades_checkbox_selector)
+  end
+
+  def hide_single_grade_button(course_id)
+    f(hide_single_grade_button_selector(course_id))
+  end
+
+  def show_single_grade_button(course_id)
+    f(show_single_grade_button_selector(course_id))
+  end
+
+  def course_gradebook_link(course_id)
+    f(course_gradebook_link_selector(course_id))
+  end
+
+  def course_grade_text(course_id)
+    f(course_grade_text_selector(course_id))
+  end
+
+  def all_course_grade_items
+    ff("[data-testid*='hide-single-grade-button-']")
+  end
+
   #------------------------------ Actions -------------------------------
 
   def dashboard_student_setup
@@ -181,20 +232,52 @@ module WidgetDashboardPage
     @ta2 = course_with_ta(name: "Bob Johnson", course: @course2, active_all: true).user
   end
 
+  def dashboard_course_assignment_setup
+    @due_graded_discussion = @course1.assignments.create!(name: "Course 1: due_graded_discussion", points_possible: "10", due_at: 1.day.from_now, submission_types: "discussion_topic")
+    @due_assignment = @course1.assignments.create!(name: "Course 1: due_assignment", points_possible: "10", due_at: 6.days.from_now, submission_types: "online_text_entry")
+    @due_quiz = @course1.assignments.create!(title: "Course 1: due_quiz", points_possible: "10", due_at: 13.days.from_now, submission_types: "online_quiz")
+
+    @missing_graded_discussion = @course1.assignments.create!(name: "Course 1: missing_graded_discussion", points_possible: "10", due_at: 2.days.ago, submission_types: "discussion_topic")
+    @missing_assignment = @course2.assignments.create!(name: "Course 2: missing_assignment", points_possible: "10", due_at: 3.days.ago, submission_types: "online_text_entry")
+    @missing_quiz = @course2.assignments.create!(title: "Course 2: missing_quiz", points_possible: "10", due_at: 4.days.ago, submission_types: "online_quiz")
+
+    @graded_discussion = @course1.assignments.create!(name: "Course 1: graded_discussion", points_possible: "10", due_at: 5.days.ago, submission_types: "discussion_topic")
+    @graded_assignment = @course2.assignments.create!(name: "Course 2: graded_assignment", points_possible: "10", due_at: 3.days.ago, submission_types: "online_text_entry")
+    @graded_quiz = @course2.quizzes.create!(title: "Course 2: graded_quiz", points_possible: "10", due_at: 1.day.from_now, quiz_type: "assignment")
+
+    @submitted_discussion = @course2.assignments.create!(name: "Course 2: submitted_discussion", points_possible: "10", due_at: 2.days.ago, submission_types: "discussion_topic")
+    @submitted_assignment = @course1.assignments.create!(name: "Course 1: submitted_assignment", points_possible: "10", due_at: 1.day.from_now, submission_types: "online_text_entry")
+  end
+
+  def dashboard_course_submission_setup
+    @submitted_assignment.submit_homework(@student, submission_type: "online_text_entry")
+    @submitted_discussion.submit_homework(@student, submission_type: "discussion_topic")
+
+    @graded_assignment.submit_homework(@student, submission_type: "online_text_entry")
+    @graded_discussion.submit_homework(@student, submission_type: "discussion_topic")
+
+    @graded_quiz = @course1.quizzes.create!(title: "submitted_quiz", due_at: 1.day.from_now)
+    @graded_quiz.quiz_questions.create!(question_data: { question_type: "true_false_question", points_possible: 10 })
+    @graded_quiz.generate_quiz_data
+    @graded_quiz.workflow_state = "available"
+    @graded_quiz.save!
+    qs = @graded_quiz.generate_submission(@student)
+    qs.submission_data
+    Quizzes::SubmissionGrader.new(qs).grade_submission
+  end
+
+  def dashboard_course_grade_setup
+    @graded_assignment.grade_student(@student, grade: "8", grader: @teacher2)
+    @graded_discussion.grade_student(@student, grade: "9", grader: @teacher1)
+  end
+
   def filter_announcements_list_by(status)
     announcement_filter.click
     click_INSTUI_Select_option(announcement_filter_select, status)
   end
 
-  def go_to_announcement_widget
+  def go_to_dashboard
     get "/"
     wait_for_ajaximations
-    expect(announcement_filter).to be_displayed
-  end
-
-  def go_to_people_widget
-    get "/"
-    wait_for_ajaximations
-    expect(people_widget).to be_displayed
   end
 end

@@ -35,7 +35,7 @@ describe "student dashboard announcements widget", :ignore_js_errors do
 
   context "announcements widget smoke tests" do
     it "displays announcements in pagination" do
-      go_to_announcement_widget
+      go_to_dashboard
 
       expect(all_announcement_items.size).to eq(3)
       widget_pagination_button("announcements", "2").click
@@ -53,7 +53,7 @@ describe "student dashboard announcements widget", :ignore_js_errors do
     end
 
     it "can filter by read status" do
-      go_to_announcement_widget
+      go_to_dashboard
 
       expect(announcement_item(@announcement7.id)).to be_displayed
       expect(announcement_item(@announcement4.id)).to be_displayed
@@ -71,7 +71,7 @@ describe "student dashboard announcements widget", :ignore_js_errors do
     end
 
     it "marks announcements as read" do
-      go_to_announcement_widget
+      go_to_dashboard
 
       expect(announcement_item_mark_read(@announcement7.id)).to be_displayed
       announcement_item_mark_read(@announcement7.id).click
@@ -83,7 +83,7 @@ describe "student dashboard announcements widget", :ignore_js_errors do
     end
 
     it "marks announcements as unread" do
-      go_to_announcement_widget
+      go_to_dashboard
 
       filter_announcements_list_by("Read")
       expect(announcement_item_mark_unread(@announcement6.id)).to be_displayed
@@ -96,7 +96,7 @@ describe "student dashboard announcements widget", :ignore_js_errors do
     end
 
     it "navigates to the announcement page when clicking announcement title" do
-      go_to_announcement_widget
+      go_to_dashboard
 
       expect(announcement_item_title(@announcement7.id)).to be_displayed
       announcement_item_title(@announcement7.id).click
@@ -122,7 +122,7 @@ describe "student dashboard announcements widget", :ignore_js_errors do
     end
 
     it "displays section specific announcements" do
-      go_to_announcement_widget
+      go_to_dashboard
       expect(announcement_item(@announcement9.id)).to be_displayed
       expect(element_exists?(announcement_item_selector(@announcement8.id))).to be_falsey
     end
