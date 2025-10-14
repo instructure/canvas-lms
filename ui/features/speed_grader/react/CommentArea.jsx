@@ -26,6 +26,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
 import ReactDOM from 'react-dom'
 import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
+import {CommentLibrary as CommentLibraryV2} from './CommentLibraryV2/CommentLibrary'
 
 const I18n = createI18nScope('speed_grader')
 
@@ -91,16 +92,19 @@ export default function CommentArea({
 
   return (
     <>
-      {showCommentLibrary && (
-        <CommentLibrary
-          setFocusToTextArea={setFocusToTextArea}
-          setComment={content => handleContentChange(content, useRCELite)}
-          courseId={courseId}
-          userId={userId}
-          commentAreaText={stripHtmlTags(comment)}
-          suggestionsRef={suggestionsRef}
-        />
-      )}
+      {showCommentLibrary &&
+        (ENV?.use_comment_library_v2 ? (
+          <CommentLibraryV2 userId={userId} />
+        ) : (
+          <CommentLibrary
+            setFocusToTextArea={setFocusToTextArea}
+            setComment={content => handleContentChange(content, useRCELite)}
+            courseId={courseId}
+            userId={userId}
+            commentAreaText={stripHtmlTags(comment)}
+            suggestionsRef={suggestionsRef}
+          />
+        ))}
       <div id="textarea-container">
         {useRCELite ? (
           <CanvasRce
