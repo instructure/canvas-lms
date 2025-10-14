@@ -1389,6 +1389,7 @@ DEPENDENCIES
   multi_json (= 1.15.0)
   net-http (~> 0.1)
   net-ldap (~> 0.18)
+  net-pop (~> 0.1)
   oauth (~> 1.1)
   oauth2 (~> 2.0)
   oj (~> 3.16)

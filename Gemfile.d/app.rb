@@ -85,6 +85,7 @@ gem "mini_magick", "~> 5.0"
 gem "multi_json", "1.15.0"
 gem "net-http", "~> 0.1", require: false
 gem "net-ldap", "~> 0.18", require: false
+gem "net-pop", "~> 0.1", require: false
 gem "oauth", "~> 1.1", require: false
 gem "oauth2", "~> 2.0", require: false
 gem "oj", "~> 3.16"

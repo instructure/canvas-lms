@@ -1,0 +1,66 @@
+image:
+  repository: canvas-lms:latest
+  tag: ""
+  pullPolicy: IfNotPresent
+
+web:
+  replicas: 1
+  service:
+    type: ClusterIP
+    port: 3000
+  env:
+    CANVAS_LMS_ACCOUNT_NAME: Canvas
+    CANVAS_LMS_ADMIN_EMAIL: admin@example.com
+    CANVAS_LMS_ADMIN_PASSWORD: CanvasAdmin#2025
+    CANVAS_LMS_HOST: canvas.local
+  resources: {}
+  extraEnv:
+    - name: CANVAS_SKIP_WEBPACK_WAIT
+      value: "1"
+    - name: CANVAS_LMS_STATS_COLLECTION
+      value: "opt_out"
+
+jobs:
+  replicas: 1
+  resources: {}
+  extraEnv:
+    - name: CANVAS_LMS_STATS_COLLECTION
+      value: "opt_out"
+
+webpack:
+  replicas: 1
+  resources: {}
+  extraEnv: []
+
+postgres:
+  enabled: true
+  image: postgres:14
+  username: canvas
+  password: canvas
+  existingSecret: ""
+  database: canvas_development
+  resources: {}
+  persistence:
+    enabled: false
+    size: 5Gi
+    storageClass: ""
+
+redis:
+  enabled: true
+  image: redis:7-alpine
+  resources: {}
+
+security:
+  existingSecret: ""
+  encryptionKey: "dev_local_encryption_key_please_change"
+  jwtEncryptionKey: "e3effd14b7e310bb4b182255dbf7b74203247fb0b1b7ad5a107aeef534f1089d"
+
+serviceAccount:
+  create: false
+  name: ""
+
+extraEnv: []
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

@@ -71,6 +71,13 @@ function _inst_spinner() {
 }
 
 function start_spinner {
+  if [[ "${CANVAS_DOCKER_SETUP_TUI:-0}" == "1" ]]; then
+    printf "\n> %s\n" "$1"
+    if [[ ! -z ${LOG-} ]]; then
+      echo "$1" >> "$LOG"
+    fi
+    return
+  fi
   if ! is_running_on_jenkins; then
     _inst_spinner "start" "$1" &
     export _sp_pid=$!
@@ -79,6 +86,9 @@ function start_spinner {
 }
 
 function stop_spinner {
+  if [[ "${CANVAS_DOCKER_SETUP_TUI:-0}" == "1" ]]; then
+    return
+  fi
   if ! is_running_on_jenkins; then
     exit_status=$?
     if [[ ! -z ${1-} ]]; then

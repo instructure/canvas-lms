@@ -175,8 +175,11 @@ module.exports = {
     },
 
     modules: [resolve(canvasDir, 'public/javascripts'), 'node_modules'],
+    alias: {
+      translations: resolve(canvasDir, 'public/javascripts/translations'),
+    },
 
-    extensions: ['.js', '.jsx', '.ts', '.tsx', '.graphql'],
+    extensions: ['.js', '.jsx', '.ts', '.tsx', '.graphql', '.json'],
   },
   module: {
     parser: {

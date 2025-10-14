@@ -1,0 +1,70 @@
+name: Dev Toolbox Smoke
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/dev-toolbox-smoke.yml'
+      - 'Makefile'
+      - 'script/dev_toolbox.sh'
+      - 'script/stack-manager/**'
+      - 'docker-compose*.yml'
+      - 'Dockerfile*'
+  pull_request:
+    paths:
+      - 'Makefile'
+      - 'script/dev_toolbox.sh'
+      - 'script/stack-manager/**'
+      - 'docker-compose*.yml'
+      - 'Dockerfile*'
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        stack: [default, alpine, arch]
+    env:
+      STACK: ${{ matrix.stack }}
+      COMPOSE: "echo docker compose"
+      DOCKER: "echo docker"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Install expect
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y expect
+
+      - name: Go unit tests
+        run: |
+          cd script/stack-manager
+          go test ./...
+
+      - name: Start dev stack (detached)
+        run: STACK=${STACK} make dev-up-detached
+
+      - name: Run dev toolbox smoke
+        run: |
+          expect <<EOF
+          set timeout 120
+          spawn env STACK=${STACK} ./script/dev_toolbox.sh
+          expect {
+            "Canvas Dev Toolbox" {}
+            timeout { exit 1 }
+          }
+          send "q\r"
+          expect eof
+          EOF
+
+      - name: Tear down stack
+        if: always()
+        run: STACK=${STACK} make dev-down

@@ -80,6 +80,6 @@ volumes:
   reports: {}
   styleguide: {}
   tmp: {}
-  translations: {}
   yardoc: {}
   yarn-cache: {}
+  translations: {}

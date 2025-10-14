@@ -1,0 +1,11 @@
+Thank you for installing Canvas LMS!
+
+The web service is exposed internally at:
+  {{ include "canvas.componentName" (dict "root" . "component" "web") }}:{{ .Values.web.service.port }}
+
+To port-forward:
+  kubectl port-forward svc/{{ include "canvas.componentName" (dict "root" . "component" "web") }} 3000:{{ .Values.web.service.port }}
+
+Default admin credentials (override via values):
+  Email: {{ index .Values.web.env "CANVAS_LMS_ADMIN_EMAIL" }}
+  Password: {{ index .Values.web.env "CANVAS_LMS_ADMIN_PASSWORD" }}

@@ -8,6 +8,9 @@ function set_service_util {
   elif installed systemctl; then
     service_manager='systemctl'
     start_docker="sudo systemctl start docker"
+  elif installed rc-update; then
+    service_manager='rc-service'
+    start_docker="sudo rc-service docker start"
   else
     echo "Unable to find 'service' or 'systemctl' installed."
     exit 1

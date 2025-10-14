@@ -1,0 +1,174 @@
+# EXPERIMENTAL: Alpine Linux development image for Canvas LMS
+#
+# This Dockerfile mirrors the Arch-based variant but starts from
+# alpine:3.20. It is not wired into the default docker-compose stack;
+# point docker-compose at this file if you want to experiment with a
+# musl-based toolchain.
+
+ARG RUBY_VERSION=3.4.1
+ARG APP_USER=docker
+ARG USER_ID=1000
+ARG CACHE_BUST=dev
+ARG BUILD_DATE=unknown
+ARG VCS_REF=unknown
+
+FROM alpine:3.20 AS base
+
+ARG RUBY_VERSION
+ARG APP_USER
+ARG USER_ID
+ARG CACHE_BUST
+ARG BUILD_DATE
+ARG VCS_REF
+
+ENV APP_HOME=/usr/src/app \
+    RAILS_ENV=development \
+    LANG=en_US.UTF-8 \
+    LANGUAGE=en_US.UTF-8 \
+    LC_CTYPE=en_US.UTF-8 \
+    LC_ALL=en_US.UTF-8 \
+    NODE_MAJOR=20 \
+    GEM_HOME=/home/${APP_USER}/.gem/${RUBY_VERSION} \
+    BUNDLE_APP_CONFIG=/home/${APP_USER}/.bundle \
+    COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+
+WORKDIR ${APP_HOME}
+
+# Surface build metadata so caching issues are easier to spot when images are reused.
+LABEL org.opencontainers.image.created=${BUILD_DATE} \
+      org.opencontainers.image.revision=${VCS_REF}
+
+# Install runtime and build dependencies needed for Canvas tooling.
+RUN set -eux \
+    && apk update \
+    && apk add --no-cache \
+         bash \
+         build-base \
+         autoconf \
+         bison \
+         libtool \
+         pkgconf \
+         linux-headers \
+         gmp-dev \
+         gdbm-dev \
+         yaml-dev \
+         zlib-dev \
+         libffi-dev \
+         readline-dev \
+         ncurses-dev \
+         openssl-dev \
+         libxml2 \
+         libxml2-dev \
+         libxslt \
+         libxslt-dev \
+         libidn \
+         libidn-dev \
+         libidn2 \
+         libidn2-dev \
+         xmlsec \
+         xmlsec-dev \
+         icu \
+         icu-dev \
+         icu-data-full \
+         python3 \
+         py3-lxml \
+         tzdata \
+         curl \
+         wget \
+         git \
+         gnupg \
+         ca-certificates \
+         coreutils \
+         findutils \
+         diffutils \
+         grep \
+         sed \
+         unzip \
+         zip \
+         p7zip \
+         parallel \
+         fontforge \
+         imagemagick \
+         procps \
+         shared-mime-info \
+         postgresql-client \
+         postgresql-dev \
+         nodejs \
+         npm \
+         which \
+         su-exec
+
+# Create application user matching the stock image expectations.
+RUN adduser -D -h /home/${APP_USER} -s /bin/bash -u "${USER_ID}" "${APP_USER}"
+
+# Build Ruby from source so the version stays in sync with Canvas.
+RUN set -eux \
+    && curl -fsSL https://cache.ruby-lang.org/pub/ruby/${RUBY_VERSION%.*}/ruby-${RUBY_VERSION}.tar.gz -o /tmp/ruby.tar.gz \
+    && tar -xzf /tmp/ruby.tar.gz -C /tmp \
+    && cd /tmp/ruby-${RUBY_VERSION} \
+    && ./configure --prefix=/usr/local --disable-install-doc --with-opt-dir=/usr \
+    && make -j"$(nproc)" \
+    && make install \
+    && cd / \
+    && rm -rf /tmp/ruby-${RUBY_VERSION} /tmp/ruby.tar.gz \
+    && gem update --system --no-document \
+    && gem install bundler --no-document -v 2.6.7
+
+# Enable Corepack-managed Yarn parity with the Ubuntu image.
+RUN npm install -g corepack@0.17.1 \
+    && corepack enable \
+    && corepack prepare yarn@1.19.1 --activate
+
+# Canvas scripts still expect npm 9.x. Node 20 ships npm 10, so pin to 9.8.1.
+RUN npm install -g npm@9.8.1 && npm cache clean --force
+
+# Prepare writable directories matching docker-compose volume mounts.
+RUN install -d -o ${APP_USER} -g ${APP_USER} \
+      ${APP_HOME} \
+      ${APP_HOME}/app/stylesheets/brandable_css_brands \
+      ${APP_HOME}/app/views/info \
+      ${APP_HOME}/config/locales/generated \
+      ${APP_HOME}/log \
+      ${APP_HOME}/node_modules \
+      ${APP_HOME}/packages/js-utils/es \
+      ${APP_HOME}/packages/js-utils/lib \
+      ${APP_HOME}/packages/js-utils/node_modules \
+      ${APP_HOME}/pacts \
+      ${APP_HOME}/public/dist \
+      ${APP_HOME}/public/javascripts/translations \
+      ${APP_HOME}/reports \
+      ${APP_HOME}/tmp \
+      /home/${APP_USER}/.bundle \
+      /home/${APP_USER}/.cache/node \
+      /home/${APP_USER}/.cache/node/corepack \
+      /home/${APP_USER}/.cache/yarn \
+      /home/${APP_USER}/.gem
+RUN chown -R ${APP_USER}:${APP_USER} /home/${APP_USER}
+
+# Provide an easy cache-busting hook; pass --build-arg CACHE_BUST="$(date +%s)" when rebuilding.
+RUN mkdir -p /tmp/cache-bust && echo "Cache bust marker: ${CACHE_BUST}" > /tmp/cache-bust/marker
+
+COPY --chown=${APP_USER}:${APP_USER} . ${APP_HOME}
+
+USER ${APP_USER}
+
+RUN mkdir -p tmp/files \
+  && bundle config set --local build.nokogiri --use-system-libraries \
+  && bundle config set --local build.ffi --enable-system-libffi \
+  && bundle install
+
+RUN yarn install --frozen-lockfile || yarn install --frozen-lockfile --network-concurrency 1
+
+USER root
+
+COPY docker/alpine/start-web.sh /usr/local/bin/start-web.sh
+COPY docker/alpine/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod 0755 /usr/local/bin/start-web.sh /usr/local/bin/docker-entrypoint.sh
+
+USER root
+
+ENV PATH=${APP_HOME}/bin:${GEM_HOME}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+# Default command mirrors upstream image (overridden by docker-compose)
+CMD ["bash"]

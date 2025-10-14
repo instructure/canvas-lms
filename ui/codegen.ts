@@ -23,6 +23,12 @@ const config: CodegenConfig = {
   documents: [
     'ui/**/*.tsx',
     'ui/**/*.ts',
+    '!ui/**/*.d.ts',
+    '!ui/**/*.test.ts',
+    '!ui/**/*.test.tsx',
+    '!ui/**/*.spec.ts',
+    '!ui/**/*.spec.tsx',
+    '!ui/**/__tests__/**',
     '!ui/features/context_modules_v2/**/*',
     '!ui/features/grade_summary/**/*',
   ],
@@ -35,6 +41,7 @@ const config: CodegenConfig = {
       },
       config: {
         enumsAsTypes: true,
+        dedupeOperationSuffix: true,
       },
     },
   },

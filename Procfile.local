@@ -1,0 +1,3 @@
+web: bundle exec rails server -b 0.0.0.0 -p ${PORT:-3000}
+webpack: YARN_ENABLE_IMMUTABLE_INSTALLS=0 yarn webpack-development
+jobs: bundle exec script/delayed_job run

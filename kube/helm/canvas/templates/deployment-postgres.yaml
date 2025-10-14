@@ -1,0 +1,79 @@
+{{- if .Values.postgres.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "canvas.componentName" (dict "root" . "component" "postgres") }}
+  labels:
+    app.kubernetes.io/name: {{ include "canvas.name" . }}
+    app.kubernetes.io/component: postgres
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "canvas.name" . }}
+      app.kubernetes.io/component: postgres
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "canvas.name" . }}
+        app.kubernetes.io/component: postgres
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: postgres
+          image: {{ .Values.postgres.image }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: POSTGRES_USER
+              value: {{ .Values.postgres.username }}
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.postgres.existingSecret }}{{ .Values.postgres.existingSecret }}{{ else }}{{ include "canvas.postgresSecretName" . }}{{ end }}
+                  key: password
+            - name: POSTGRES_DB
+              value: {{ .Values.postgres.database }}
+          ports:
+            - containerPort: 5432
+              name: postgres
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+          {{- with .Values.postgres.resources }}
+          resources:
+{{ toYaml . | indent 12 }}
+          {{- end }}
+      volumes:
+        - name: data
+          {{- if and .Values.postgres.persistence.enabled .Values.postgres.persistence.storageClass }}
+          persistentVolumeClaim:
+            claimName: {{ include "canvas.componentName" (dict "root" . "component" "postgres") }}
+          {{- else if .Values.postgres.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "canvas.componentName" (dict "root" . "component" "postgres") }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+---
+{{- if .Values.postgres.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "canvas.componentName" (dict "root" . "component" "postgres") }}
+  labels:
+    app.kubernetes.io/name: {{ include "canvas.name" . }}
+    app.kubernetes.io/component: postgres
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.postgres.persistence.size }}
+  {{- if .Values.postgres.persistence.storageClass }}
+  storageClassName: {{ .Values.postgres.persistence.storageClass }}
+  {{- end }}
+{{- end }}
+{{- end }}

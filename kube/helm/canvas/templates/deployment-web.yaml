@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "canvas.componentName" (dict "root" . "component" "web") }}
+  labels:
+    app.kubernetes.io/name: {{ include "canvas.name" . }}
+    app.kubernetes.io/component: web
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.web.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "canvas.name" . }}
+      app.kubernetes.io/component: web
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "canvas.name" . }}
+        app.kubernetes.io/component: web
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      {{- if .Values.serviceAccount.create }}
+      serviceAccountName: {{ default (include "canvas.componentName" (dict "root" . "component" "sa")) .Values.serviceAccount.name }}
+      {{- else if .Values.serviceAccount.name }}
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      {{- end }}
+      {{- $securitySecret := default (include "canvas.securitySecretName" .) .Values.security.existingSecret }}
+      containers:
+        - name: web
+          image: {{ include "canvas.image" (dict "root" . "component" "web") }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args: ["/usr/local/bin/start-web.sh"]
+          env:
+            - name: RAILS_ENV
+              value: development
+            - name: NODE_ENV
+              value: development
+            - name: PORT
+              value: "{{ .Values.web.service.port }}"
+            - name: POSTGRES_HOST
+              value: {{ include "canvas.postgresHost" . }}
+            - name: CANVAS_DATABASE_HOST
+              value: {{ include "canvas.postgresHost" . }}
+            - name: POSTGRES_USER
+              value: {{ .Values.postgres.username }}
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.postgres.existingSecret }}{{ .Values.postgres.existingSecret }}{{ else }}{{ include "canvas.postgresSecretName" . }}{{ end }}
+                  key: password
+            - name: POSTGRES_DB
+              value: {{ .Values.postgres.database }}
+            - name: CANVAS_DATABASE_USERNAME
+              value: {{ .Values.postgres.username }}
+            - name: CANVAS_DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.postgres.existingSecret }}{{ .Values.postgres.existingSecret }}{{ else }}{{ include "canvas.postgresSecretName" . }}{{ end }}
+                  key: password
+            - name: ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $securitySecret }}
+                  key: encryption_key
+            - name: JWT_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $securitySecret }}
+                  key: jwt_encryption_key
+            - name: REDIS_URL
+              value: redis://{{ include "canvas.redisHost" . }}:6379
+            {{- range $key, $val := .Values.web.env }}
+            - name: {{ $key }}
+              value: {{ $val | quote }}
+            {{- end }}
+            {{- range $env := .Values.extraEnv }}
+            - name: {{ $env.name }}
+              value: {{ $env.value | quote }}
+            {{- end }}
+            {{- range $env := .Values.web.extraEnv }}
+            - name: {{ $env.name }}
+              value: {{ $env.value | quote }}
+            {{- end }}
+          ports:
+            - containerPort: {{ .Values.web.service.port }}
+              name: http
+          {{- with .Values.web.resources }}
+          resources:
+{{ toYaml . | indent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /usr/src/app/tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+      {{- with .Values.nodeSelector }}
+      nodeSelector: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity: {{ toYaml . | nindent 6 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations: {{ toYaml . | nindent 6 }}
+      {{- end }}

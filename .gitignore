@@ -10,10 +10,19 @@
 #
 # That's what .git/info/exclude and core.excludesfile are for :)
 .bundle/
+build/
 .env
 .mutagen
 .swc
 .idea/
+.canvas-stack
+.canvas-stack.last
+.gocache/
+.gomodcache/
+/script/stack-manager/selectstack
+.terraform/
+*.tfstate
+*.tfstate.backup
 /.claude/
 /.yardoc/
 /.ruby-version

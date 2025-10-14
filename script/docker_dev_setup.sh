@@ -10,7 +10,7 @@ LOG="$(pwd)/log/docker_dev_setup.log"
 SCRIPT_NAME="$0 $@"
 OS="$(uname)"
 DOCKER='true'
-CANVAS_SKIP_DOCKER_USERMOD='true'
+CANVAS_SKIP_DOCKER_USERMOD=''
 
 _canvas_lms_opt_in_telemetry "$SCRIPT_NAME" "$LOG"
 

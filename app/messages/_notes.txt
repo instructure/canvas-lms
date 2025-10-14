@@ -1,3 +1,4 @@
+
 You need to register any new notifications in the DB. To do this edit the rake
 task db:load_notifications in lib/tasks/db_load_data.rake
 

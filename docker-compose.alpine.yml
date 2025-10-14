@@ -1,0 +1,118 @@
+x-canvas-volumes: &canvas-volumes
+  - .:/usr/src/app
+  - api_docs:/usr/src/app/public/doc/api
+  - brandable_css_brands:/usr/src/app/app/stylesheets/brandable_css_brands
+  - bundler:/home/docker/.bundle/
+  - canvas-docker-gems:/home/docker/.gem/
+  - js-utils_es:/usr/src/app/packages/js-utils/es
+  - js-utils_lib:/usr/src/app/packages/js-utils/lib
+  - js-utils_node_modules:/usr/src/app/packages/js-utils/node_modules
+  - locales:/usr/src/app/config/locales/generated
+  - log:/usr/src/app/log
+  - node_modules:/usr/src/app/node_modules
+  - pacts:/usr/src/app/pacts
+  - public_dist:/usr/src/app/public/dist
+  - reports:/usr/src/app/reports
+  - styleguide:/usr/src/app/app/views/info
+  - tmp:/usr/src/app/tmp
+  - ./public/javascripts/translations:/usr/src/app/public/javascripts/translations
+  - yardoc:/usr/src/app/.yardoc
+  - yarn-cache:/home/docker/.cache/yarn
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.alpine
+    command: /usr/local/bin/start-web.sh
+    ulimits:
+      nofile:
+        soft: "${CANVAS_NOFILE_LIMIT:-1048576}"
+        hard: "${CANVAS_NOFILE_LIMIT:-1048576}"
+    environment:
+      PORT: "3000"
+      CANVAS_AUTO_MIGRATE: "${CANVAS_AUTO_MIGRATE:-true}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-sekret}"
+      ENCRYPTION_KEY: "${ENCRYPTION_KEY:-dev_local_encryption_key_please_change}"
+      CANVAS_NOFILE_LIMIT: "${CANVAS_NOFILE_LIMIT:-1048576}"
+      CANVAS_EMFILE_DEBUG: "${CANVAS_EMFILE_DEBUG:-1}"
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "127.0.0.1:80:3000"
+    volumes: *canvas-volumes
+
+  jobs:
+    build:
+      context: .
+      dockerfile: Dockerfile.alpine
+    command: bundle exec script/delayed_job run
+    ulimits:
+      nofile:
+        soft: "${CANVAS_NOFILE_LIMIT:-1048576}"
+        hard: "${CANVAS_NOFILE_LIMIT:-1048576}"
+    environment:
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-sekret}"
+      ENCRYPTION_KEY: "${ENCRYPTION_KEY:-dev_local_encryption_key_please_change}"
+      CANVAS_NOFILE_LIMIT: "${CANVAS_NOFILE_LIMIT:-1048576}"
+      CANVAS_EMFILE_DEBUG: "${CANVAS_EMFILE_DEBUG:-1}"
+    depends_on:
+      - postgres
+      - redis
+    volumes: *canvas-volumes
+
+  webpack:
+    build:
+      context: .
+      dockerfile: Dockerfile.alpine
+    command: yarn run webpack
+    ulimits:
+      nofile:
+        soft: "${CANVAS_NOFILE_LIMIT:-1048576}"
+        hard: "${CANVAS_NOFILE_LIMIT:-1048576}"
+    environment:
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-sekret}"
+      ENCRYPTION_KEY: "${ENCRYPTION_KEY:-dev_local_encryption_key_please_change}"
+      CHOKIDAR_USEPOLLING: "true"
+      CHOKIDAR_INTERVAL: "500"
+      WATCHPACK_POLLING: "true"
+      WATCHPACK_POLLING_INTERVAL: "1000"
+      CANVAS_NOFILE_LIMIT: "${CANVAS_NOFILE_LIMIT:-1048576}"
+      CANVAS_EMFILE_DEBUG: "${CANVAS_EMFILE_DEBUG:-1}"
+    env_file:
+      - ./.env
+    depends_on:
+      - web
+      - postgres
+      - redis
+    volumes: *canvas-volumes
+
+  postgres:
+    build: ./docker-compose/postgres
+    environment:
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-sekret}"
+    ports:
+      - "127.0.0.1:5432:5432"
+
+  redis:
+    image: redis:alpine
+
+volumes:
+  api_docs: {}
+  brandable_css_brands: {}
+  bundler: {}
+  canvas-docker-gems: {}
+  js-utils_es: {}
+  js-utils_lib: {}
+  js-utils_node_modules: {}
+  locales: {}
+  log: {}
+  node_modules: {}
+  pacts: {}
+  public_dist: {}
+  reports: {}
+  styleguide: {}
+  tmp: {}
+  yardoc: {}
+  yarn-cache: {}
