@@ -10185,6 +10185,8 @@ ko:
     errors: 
       create_failed: "의견 생성 실패함"
   page_name_21defa75: "페이지 이름"
+  page_title: 
+    edit_ai_experience: "%{title} 편집"
   page_title_106304bb: "페이지 제목"
   page_title_d1a22bbf: "페이지 제목"
   page_views: 
