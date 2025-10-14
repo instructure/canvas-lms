@@ -40,4 +40,17 @@ describe Types::PageType do
     page.context_module_tags.create!(context_module: module2, context: course, tag_type: "context_module")
     expect(page_type.resolve("modules { _id }").sort).to eq [module1.id.to_s, module2.id.to_s]
   end
+
+  describe "todoDate" do
+    it "returns the date as ISO8601 when set" do
+      todo_date = Time.zone.now
+      page.update!(todo_date:)
+      expect(page_type.resolve("todoDate")).to eq todo_date.iso8601
+    end
+
+    it "returns nil for todo_date when not set" do
+      page.update!(todo_date: nil)
+      expect(page_type.resolve("todoDate")).to be_nil
+    end
+  end
 end
