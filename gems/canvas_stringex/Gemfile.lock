@@ -6,13 +6,13 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    activemodel (7.2.2.2)
-      activesupport (= 7.2.2.2)
-    activerecord (7.2.2.2)
-      activemodel (= 7.2.2.2)
-      activesupport (= 7.2.2.2)
+    activemodel (8.0.3)
+      activesupport (= 8.0.3)
+    activerecord (8.0.3)
+      activemodel (= 8.0.3)
+      activesupport (= 8.0.3)
       timeout (>= 0.4.0)
-    activesupport (7.2.2.2)
+    activesupport (8.0.3)
       base64
       benchmark (>= 0.3)
       bigdecimal
@@ -24,6 +24,7 @@ GEM
       minitest (>= 5.1)
       securerandom (>= 0.3)
       tzinfo (~> 2.0, >= 2.0.5)
+      uri (>= 0.13.1)
     base64 (0.3.0)
     benchmark (0.4.1)
     bigdecimal (3.2.3)
@@ -35,7 +36,6 @@ GEM
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
     logger (1.7.0)
-    mini_portile2 (2.8.9)
     minitest (5.25.5)
     rake (13.3.0)
     rspec (3.13.1)
@@ -58,8 +58,6 @@ GEM
       simplecov_json_formatter (~> 0.1)
     simplecov-html (0.13.2)
     simplecov_json_formatter (0.1.4)
-    sqlite3 (2.7.4)
-      mini_portile2 (~> 2.8.0)
     sqlite3 (2.7.4-aarch64-linux-gnu)
     sqlite3 (2.7.4-arm64-darwin)
     sqlite3 (2.7.4-x86_64-darwin)
@@ -67,6 +65,7 @@ GEM
     timeout (0.4.3)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
+    uri (1.0.3)
 
 PLATFORMS
   aarch64-linux

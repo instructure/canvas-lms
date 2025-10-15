@@ -9,13 +9,13 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    activemodel (7.2.2.2)
-      activesupport (= 7.2.2.2)
-    activerecord (7.2.2.2)
-      activemodel (= 7.2.2.2)
-      activesupport (= 7.2.2.2)
+    activemodel (8.0.3)
+      activesupport (= 8.0.3)
+    activerecord (8.0.3)
+      activemodel (= 8.0.3)
+      activesupport (= 8.0.3)
       timeout (>= 0.4.0)
-    activesupport (7.2.2.2)
+    activesupport (8.0.3)
       base64
       benchmark (>= 0.3)
       bigdecimal
@@ -27,6 +27,7 @@ GEM
       minitest (>= 5.1)
       securerandom (>= 0.3)
       tzinfo (~> 2.0, >= 2.0.5)
+      uri (>= 0.13.1)
     aroi (1.0.0)
       activerecord (>= 5.2)
       activesupport (>= 5.2)
@@ -69,11 +70,7 @@ GEM
       reline (>= 0.4.2)
     jmespath (1.6.2)
     logger (1.7.0)
-    mini_portile2 (2.8.9)
     minitest (5.25.5)
-    nokogiri (1.18.10)
-      mini_portile2 (~> 2.8.2)
-      racc (~> 1.4)
     nokogiri (1.18.10-aarch64-linux-gnu)
       racc (~> 1.4)
     nokogiri (1.18.10-arm64-darwin)
@@ -114,6 +111,7 @@ GEM
     timeout (0.4.3)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
+    uri (1.0.3)
 
 PLATFORMS
   aarch64-linux
