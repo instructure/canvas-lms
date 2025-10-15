@@ -237,10 +237,16 @@ module AccountReports
   end
 
   def self.failed_report(account_report, exception: nil)
+    requires_root_account = begin
+      exception.is_a?(CustomReports::Rubrics::RootAccountRequiredError)
+    rescue NameError
+      false
+    end
+
     fail_text = if @er
                   I18n.t("Failed, please report the following error code to your system administrator: ErrorReport:%{error};",
                          error: @er.id.to_s)
-                elsif exception.is_a?(CustomReports::Rubrics::RootAccountRequiredError)
+                elsif requires_root_account
                   I18n.t("This report can only be run on the root account.")
                 else
                   I18n.t("Failed, the report failed to generate a file. Please try again.")
