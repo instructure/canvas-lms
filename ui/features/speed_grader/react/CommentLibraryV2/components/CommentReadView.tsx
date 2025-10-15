@@ -25,6 +25,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import shave from '@canvas/shave'
+import DeleteCommentIconButton from './DeleteCommentIconButton'
 
 const I18n = createI18nScope('CommentLibrary')
 
@@ -93,11 +94,12 @@ const FocusedComment: React.FC<FocusedCommentProps> = ({
 }
 
 export type CommentReadViewProps = {
+  id: string
   comment: string
   index: number
   onClick: () => void
 }
-const CommentReadView: React.FC<CommentReadViewProps> = ({comment, index, onClick}) => {
+const CommentReadView: React.FC<CommentReadViewProps> = ({comment, index, onClick, id}) => {
   const [isTruncated, setIsTruncated] = useState<boolean>(false)
   const [isExpanded, setIsExpanded] = useState(false)
 
@@ -120,6 +122,11 @@ const CommentReadView: React.FC<CommentReadViewProps> = ({comment, index, onClic
         </Flex.Item>
         <Flex.Item as="div" size="20%" shouldGrow={true}>
           <Flex as="div" direction="column">
+            <Flex.Item as="div" padding="xx-small">
+              <Flex as="div" justifyItems="center">
+                <DeleteCommentIconButton comment={comment} id={id} index={index} />
+              </Flex>
+            </Flex.Item>
             {isTruncated && (
               <Flex.Item as="div" padding="xx-small">
                 <Flex as="div" justifyItems="center">

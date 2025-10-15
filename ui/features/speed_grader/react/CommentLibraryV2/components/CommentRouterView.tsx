@@ -22,6 +22,7 @@ import CommentReadView from './CommentReadView'
 export type CommentRouterViewProps = {
   comment: string
   index: number
+  id: string
   onClick: () => void
 }
 const CommentRouterView: React.FC<CommentRouterViewProps> = ({comment, ...props}) => {
