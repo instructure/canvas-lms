@@ -255,4 +255,18 @@ describe('CommentLibraryTray', () => {
       expect(onDismiss).toHaveBeenCalled()
     })
   })
+
+  describe('CreateCommentSection Integration Tests', () => {
+    it('renders CreateCommentSection within the tray', async () => {
+      const mocks = [createCommentsMock()]
+      setup(mocks)
+
+      await waitFor(() => {
+        expect(screen.getByTestId('library-comment-area')).toBeInTheDocument()
+      })
+
+      expect(screen.getByTestId('create-comment-library-item-textarea')).toBeInTheDocument()
+      expect(screen.getByTestId('add-to-library-button')).toBeInTheDocument()
+    })
+  })
 })

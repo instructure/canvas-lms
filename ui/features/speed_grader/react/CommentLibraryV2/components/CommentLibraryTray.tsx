@@ -30,6 +30,7 @@ import CommentRouterView from './CommentRouterView'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {SpeedGrader_CommentBankItems} from '../graphql/queries'
 import {SpeedGrader_CommentBankItemsQuery} from '@canvas/graphql/codegen/graphql'
+import {CreateCommentSection} from './CreateCommentSection'
 
 const I18n = createI18nScope('CommentLibrary')
 
@@ -146,6 +147,9 @@ export const CommentLibraryTray: React.FC<CommentLibraryTrayProps> = ({
 
         <Flex.Item as="div" shouldGrow shouldShrink padding="small">
           {content}
+        </Flex.Item>
+        <Flex.Item as="div" padding="small">
+          <CreateCommentSection courseId={courseId} />
         </Flex.Item>
       </Flex>
     </Tray>
