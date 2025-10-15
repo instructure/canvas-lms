@@ -164,6 +164,8 @@ export default function AssignmentInformation({
             <Link
               href={speedGraderUrl()}
               isWithinText={false}
+              target="_blank"
+              rel="noopener"
               data-testid="assignment-speedgrader-link"
             >
               {I18n.t('See this assignment in speedgrader')}

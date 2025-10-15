@@ -327,7 +327,7 @@ describe "context module items", :ignore_js_errors do
     end
 
     context "link to speedgrader" do
-      it "can redirects to speedgrader page" do
+      it "redirects to speedgrader page" do
         student_in_course(course: @course, name: "student", active_all: true).user
 
         go_to_modules
@@ -337,6 +337,7 @@ describe "context module items", :ignore_js_errors do
         manage_module_item_button(@module_item1.id).click
         module_item_action_menu_link("SpeedGrader").click
 
+        driver.switch_to.window(driver.window_handles.last)
         expect(driver.current_url).to include(
           "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
         )
