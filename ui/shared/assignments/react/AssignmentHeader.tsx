@@ -56,7 +56,7 @@ const AssignmentHeader: React.FC<HeaderProps> = ({type, assignment, breakpoints}
   const isSavedView = type === ASSIGNMENT_VIEW_TYPES.SAVED
 
   return (
-    <Flex alignItems="start" direction="column" width="100%">
+    <Flex alignItems="start" direction="column" width="100%" data-testid="assignment-header">
       <Flex
         direction={isMobile ? 'column' : 'row'}
         alignItems={isMobile ? 'center' : 'start'}

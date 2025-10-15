@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -20,25 +20,20 @@ import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 import AssignmentDescription from '@canvas/assignments/react/AssignmentDescription'
-import {Text} from '@instructure/ui-text'
-import {ToggleDetails} from '@instructure/ui-toggle-details'
+import {Flex} from '@instructure/ui-flex'
+import {Heading} from '@instructure/ui-heading'
 
-const I18n = createI18nScope('assignment_2_assignment_toggle_details')
+const I18n = createI18nScope('assignment_2_teacher_assignment_details')
 
-interface AssignmentToggleDetailsProps {
-  description?: string
-}
-
-export default function AssignmentToggleDetails(props: AssignmentToggleDetailsProps) {
+const AssignmentDetailsView = ({description}: {description?: string}) => {
   return (
-    <div className="a2-toggle-details-container">
-      <ToggleDetails
-        defaultExpanded={true}
-        data-testid="assignments-2-assignment-toggle-details"
-        summary={<Text weight="bold">{I18n.t('Details')}</Text>}
-      >
-        <AssignmentDescription description={props.description} />
-      </ToggleDetails>
-    </div>
+    <Flex as="div" direction="column">
+      <Flex.Item as="div" direction="column" margin="medium 0">
+        <Heading variant="label">{I18n.t('Description')}</Heading>
+        <AssignmentDescription description={description} />
+      </Flex.Item>
+    </Flex>
   )
 }
+
+export default AssignmentDetailsView

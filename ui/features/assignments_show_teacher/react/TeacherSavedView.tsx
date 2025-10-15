@@ -18,6 +18,7 @@
 
 import React from 'react'
 import type {TeacherAssignmentType} from '@canvas/assignments/graphql/teacher/AssignmentTeacherTypes'
+import AssignmentDetailsView from '@canvas/assignments/react/AssignmentDescription'
 import AssignmentHeader from '@canvas/assignments/react/AssignmentHeader'
 import AssignmentFooter from './components/AssignmentFooter'
 import AssignmentTabs from './components/AssignmentTabs'
@@ -42,9 +43,10 @@ const TeacherSavedView: React.FC<TeacherViewProps> = ({assignment, breakpoints =
         assignment={assignment}
         breakpoints={breakpoints}
       />
-      {/* The main content of the saved view could go here */}
-      {ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED && assignment.peerReviews?.enabled && (
+      {ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED && assignment.peerReviews?.enabled ? (
         <AssignmentTabs assignment={assignment} />
+      ) : (
+        <AssignmentDetailsView description={assignment.description} />
       )}
       {moduleItemId && <AssignmentFooter moduleItemId={moduleItemId} />}
     </QueryClientProvider>

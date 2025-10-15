@@ -28,6 +28,10 @@ class TeacherViewPageV2
       fj("div[role='tab']:contains('Details')")
     end
 
+    def assignment_tab
+      fj("div[role='tab']:contains('Assignment')")
+    end
+
     def peer_review_tab
       fj("div[role='tab']:contains('Peer Review')")
     end
@@ -147,6 +151,10 @@ class TeacherViewPageV2
 
     def edit_rule_button(rule_card)
       f("button[id^='edit-rule-button-']", rule_card)
+    end
+
+    def assignment_description
+      f("[data-testid='assignments-2-assignment-description']")
     end
   end
 end
