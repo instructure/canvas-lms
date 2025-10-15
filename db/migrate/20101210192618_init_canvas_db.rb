@@ -398,6 +398,47 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.index [:developer_key_id, :last_used_at]
     end
 
+    rule_types = Accessibility::Rule.registry.keys.map { |type| ActiveRecord::Base.connection.quote(type) }.join(", ")
+    create_table :accessibility_issues do |t|
+      t.references :root_account, null: false, foreign_key: { to_table: :accounts }, index: false
+      t.references :course, null: false, foreign_key: true
+      t.references :context, polymorphic: %i[wiki_page assignment attachment], foreign_key: true, check_constraint: false
+      t.string :rule_type, null: false, index: true
+      t.text :node_path, limit: 1024
+      t.jsonb :metadata, null: false, default: {}
+      t.string :workflow_state, default: "active", null: false
+      t.references :updated_by, foreign_key: { to_table: :users }, index: { where: "updated_by_id IS NOT NULL" }
+      t.timestamps
+
+      t.check_constraint <<~SQL.squish, name: "chk_require_context"
+        (wiki_page_id IS NOT NULL AND assignment_id IS NULL AND attachment_id IS NULL) OR
+        (wiki_page_id IS NULL AND assignment_id IS NOT NULL AND attachment_id IS NULL) OR
+        (wiki_page_id IS NULL AND assignment_id IS NULL AND attachment_id IS NOT NULL)
+      SQL
+      t.check_constraint "rule_type IN (#{rule_types})", name: "chk_rule_type_enum"
+      t.check_constraint "workflow_state IN ('active', 'resolved', 'dismissed')", name: "chk_workflow_state_enum"
+
+      t.replica_identity_index
+    end
+
+    create_table :accessibility_resource_scans do |t|
+      t.references :root_account, null: false, foreign_key: { to_table: :accounts }, index: false
+      t.references :course, null: false, foreign_key: true
+      t.references :context, polymorphic: %i[wiki_page assignment attachment], foreign_key: true, check_constraint: false
+      t.string :error_message, limit: 255
+      t.string :workflow_state, default: "queued", null: false
+      t.timestamps
+
+      t.check_constraint <<~SQL.squish, name: "chk_require_context"
+        (wiki_page_id IS NOT NULL AND assignment_id IS NULL AND attachment_id IS NULL) OR
+        (wiki_page_id IS NULL AND assignment_id IS NOT NULL AND attachment_id IS NULL) OR
+        (wiki_page_id IS NULL AND assignment_id IS NULL AND attachment_id IS NOT NULL)
+      SQL
+      t.check_constraint "workflow_state IN ('queued', 'in_progress', 'completed', 'failed')", name: "chk_workflow_state_enum"
+
+      t.replica_identity_index
+    end
+
     create_table :account_notifications do |t|
       t.string :subject, limit: 255
       t.string :icon, default: "warning", limit: 255
@@ -2870,6 +2911,23 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.index [:assessment_id, :user_id], unique: true
     end
 
+    create_table :llm_responses do |t|
+      t.references :associated_assignment, foreign_key: { to_table: :assignments }, null: false
+      t.references :user, null: false, foreign_key: true
+      t.string :prompt_name, null: false, limit: 255
+      t.string :prompt_model_id, null: false, limit: 255
+      t.jsonb :prompt_dynamic_content
+      t.text :raw_response, null: false
+      t.integer :input_tokens, null: false
+      t.integer :output_tokens, null: false
+      t.float :response_time, null: false
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.timestamps
+
+      t.replica_identity_index
+      t.index [:prompt_name, :prompt_model_id]
+    end
+
     create_table :lti_assets do |t|
       t.uuid :uuid, null: false, index: { unique: true }
       t.references :attachment
@@ -2945,6 +3003,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.timestamps
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
       t.string :result, limit: 255, default: nil
+      t.boolean :visible_to_owner, null: false, default: false
 
       t.replica_identity_index
       t.index %i[lti_asset_id lti_asset_processor_id report_type],
@@ -3813,6 +3872,24 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
       t.index [:outcome_proficiency_id, :points],
               name: "index_outcome_proficiency_ratings_on_proficiency_and_points"
+    end
+
+    create_table :outcome_rollups do |t|
+      t.references :root_account, null: false, foreign_key: { to_table: :accounts }, index: false
+      t.references :course, null: false, foreign_key: true, index: false
+      t.references :user, null: false, foreign_key: true
+      t.references :outcome, null: false, foreign_key: { to_table: :learning_outcomes }
+      t.string :calculation_method, null: false
+      t.float :aggregate_score, null: false
+      t.timestamp :last_calculated_at, null: false
+      t.string :workflow_state, default: "active", null: false
+      t.timestamps
+
+      t.check_constraint "calculation_method IN ('average', 'decaying_average', 'highest', 'latest', 'n_mastery', 'standard_decaying_average', 'weighted_average')", name: "chk_calculation_method_enum"
+      t.check_constraint "workflow_state IN ('active', 'deleted')", name: "chk_workflow_state_enum"
+
+      t.replica_identity_index
+      t.index %i[course_id user_id outcome_id], unique: true, name: "index_outcome_rollups_on_course_user_outcome"
     end
 
     create_table :page_comments do |t|
@@ -4785,6 +4862,20 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.index [:submission_draft_id, :attachment_id],
               name: "index_submission_draft_and_attachment_unique",
               unique: true
+    end
+
+    create_table :submission_texts do |t|
+      t.references :submission, null: false, foreign_key: true, index: false
+      t.references :attachment, null: false, foreign_key: true
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+
+      t.text :text, null: false, limit: 16_777_215
+      t.integer :attempt, null: false, check: { constraint_name: "chk_attempt_positive", expression: "attempt > 0" }
+      t.boolean :contains_images, null: false, default: false
+      t.timestamps
+
+      t.replica_identity_index
+      t.index %i[submission_id attachment_id attempt], unique: true, name: "index_on_sub_attach_attempt"
     end
 
     create_table :submission_versions do |t|
