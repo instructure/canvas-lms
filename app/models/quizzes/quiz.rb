@@ -834,6 +834,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       question.assessment_question = assessment_question
       question.assessment_question_version = assessment_question.version_number
       Quizzes::QuizQuestion.suspend_callbacks(:update_attachment_associations) do
+        question.updating_user = updating_user
         question.save
         question.copy_attachment_associations_from(assessment_question)
       end
