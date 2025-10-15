@@ -1182,7 +1182,7 @@ GEM
       regexp_parser (~> 2.5, >= 2.5.0)
     stringio (3.1.7)
     swearjar (1.4.0)
-    switchman (4.2.2)
+    switchman (4.2.3)
       activerecord (>= 7.1, < 8.1)
       guardrail (~> 3.1.0)
       parallel (~> 1.22)
