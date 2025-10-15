@@ -96,6 +96,7 @@ export const CommentLibraryTray: React.FC<CommentLibraryTrayProps> = ({
             onClick={() => {}}
             comment={it.comment}
             index={index}
+            id={it._id}
           />
         ))}
         {hasNextPage && (

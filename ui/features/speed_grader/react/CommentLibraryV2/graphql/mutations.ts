@@ -32,3 +32,15 @@ export const SpeedGrader_CreateCommentBankItem = gql`
     }
   }
 `
+
+export const SpeedGrader_DeleteCommentBankItem = gql`
+  mutation SpeedGrader_DeleteCommentBankItem($id: ID!) {
+    deleteCommentBankItem(input: {id: $id}) {
+      commentBankItemId
+      errors {
+        attribute
+        message
+      }
+    }
+  }
+`
