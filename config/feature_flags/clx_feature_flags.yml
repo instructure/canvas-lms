@@ -67,6 +67,13 @@ horizon_dark_career_theme_in_learning_provider:
   display_name: "Canvas Career: Dark theme in Learning Provider"
   description: |-
     Enables dark theme in Learning Provider.
+horizon_learning_library:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Learning Library"
+  description: |-
+    Enables the Learning Library in Canvas Career.
 
 # Feature flags read by Canvas
 horizon_bulk_api_permission:
