@@ -200,6 +200,26 @@ describe('ConversationListItem', () => {
 
       expect(getByText('(No subject)')).toBeTruthy()
     })
+
+    it('renders correct checkbox accessible name when conversation is not selected', () => {
+      const props = createProps({isSelected: false})
+
+      const {getByLabelText} = render(<ConversationListItem {...props} />)
+
+      expect(
+        getByLabelText('Message This is the subject line from Nov 5, 2020 not selected'),
+      ).toBeInTheDocument()
+    })
+
+    it('renders correct checkbox accessible name when conversation is selected', () => {
+      const props = createProps({isSelected: true})
+
+      const {getByLabelText} = render(<ConversationListItem {...props} />)
+
+      expect(
+        getByLabelText('Message This is the subject line from Nov 5, 2020 selected'),
+      ).toBeInTheDocument()
+    })
   })
 
   describe('submission comments', () => {
