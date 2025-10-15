@@ -43,7 +43,7 @@
 #           "type": "string"
 #         },
 #         "facts": {
-#           "description": "The AI facts for the experience",
+#           "description": "The AI facts for the experience (optional)",
 #           "example": "You are a customer service representative...",
 #           "type": "string"
 #         },
@@ -52,8 +52,8 @@
 #           "example": "Students will practice active listening and problem-solving",
 #           "type": "string"
 #         },
-#         "scenario": {
-#           "description": "The scenario description for the experience",
+#         "pedagogical_guidance": {
+#           "description": "The pedagogical guidance for the experience",
 #           "example": "A customer is calling about a billing issue",
 #           "type": "string"
 #         },
@@ -158,12 +158,12 @@ class AiExperiencesController < ApplicationController
   #   The title of the AI experience.
   # @argument description [Optional, String]
   #   The description of the AI experience.
-  # @argument facts [Required, String]
+  # @argument facts [Optional, String]
   #   The AI facts for the experience.
-  # @argument learning_objective [Optional, String]
+  # @argument learning_objective [Required, String]
   #   The learning objectives for this experience.
-  # @argument scenario [Optional, String]
-  #   The scenario description for the experience.
+  # @argument pedagogical_guidance [Required, String]
+  #   The pedagogical guidance for the experience.
   # @argument workflow_state [Optional, String]
   #   The initial state of the experience. Defaults to 'unpublished'.
   #   Allowed values: published, unpublished
@@ -195,10 +195,10 @@ class AiExperiencesController < ApplicationController
   #   The description of the AI experience.
   # @argument facts [Optional, String]
   #   The AI facts for the experience.
-  # @argument learning_objective [Optional, String]
+  # @argument learning_objective [Required, String]
   #   The learning objectives for this experience.
-  # @argument scenario [Optional, String]
-  #   The scenario description for the experience.
+  # @argument pedagogical_guidance [Required, String]
+  #   The pedagogical guidance for the experience.
   # @argument workflow_state [Optional, String]
   #   The state of the experience.
   #   Allowed values: published, unpublished
@@ -247,7 +247,7 @@ class AiExperiencesController < ApplicationController
       root_account_uuid: @context.root_account.uuid,
       facts: @experience.facts,
       learning_objectives: @experience.learning_objective,
-      scenario: @experience.scenario
+      scenario: @experience.pedagogical_guidance
     )
 
     messages = if params[:messages].present?
@@ -287,7 +287,7 @@ class AiExperiencesController < ApplicationController
   end
 
   def experience_params
-    params.require(:ai_experience).permit(:title, :description, :facts, :learning_objective, :scenario, :workflow_state)
+    params.require(:ai_experience).permit(:title, :description, :facts, :learning_objective, :pedagogical_guidance, :workflow_state)
   end
 
   def render_404

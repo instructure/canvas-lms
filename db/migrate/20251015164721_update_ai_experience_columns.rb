@@ -17,20 +17,20 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Api::V1::AiExperience
-  include Api::V1::Json
+class UpdateAiExperienceColumns < ActiveRecord::Migration[7.2]
+  tag :predeploy
 
-  API_JSON_OPTS = {
-    only: %w[id title description facts learning_objective pedagogical_guidance workflow_state course_id created_at updated_at]
-  }.freeze
+  def up
+    change_table :ai_experiences, bulk: true do |t|
+      # Rename scenario column to pedagogical_guidance and make it required
+      t.rename :scenario, :pedagogical_guidance
+      t.change_null :pedagogical_guidance, false
 
-  def ai_experience_json(ai_experience, user, session, opts = {})
-    api_json(ai_experience, user, session, opts.merge(API_JSON_OPTS))
-  end
+      # Make learning_objective required
+      t.change_null :learning_objective, false
 
-  def ai_experiences_json(ai_experiences, user, session, opts = {})
-    ai_experiences.map do |ai_experience|
-      ai_experience_json(ai_experience, user, session, opts)
+      # Remove required constraint from facts column
+      t.change_null :facts, true
     end
   end
 end
