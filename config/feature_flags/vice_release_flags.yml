@@ -161,7 +161,7 @@ discussion_permalink:
 discussion_insights:
   state: hidden
   applies_to: Course
-  display_name: Discussion Insights
+  display_name: IgniteAI Insights for Discussions
   description: |-
     Allow access to discussion insights
 
