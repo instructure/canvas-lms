@@ -188,6 +188,14 @@ describe "Account Reports" do
       expect(account_report.parameters["extra_text"]).to eq message
     end
 
+    context "when given an error report id" do
+      it "includes the error report id in the message" do
+        AccountReports.failed_report(account_report, error_report_id: 42)
+        message = "Failed, please report the following error code to your system administrator: ErrorReport:42;"
+        expect(account_report.parameters["extra_text"]).to eq message
+      end
+    end
+
     context "when custom reports is installed" do
       before do
         stub_const("CustomReports", Module.new)

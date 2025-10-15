@@ -129,8 +129,7 @@ module AccountReports
                        else
                          " Unable to create error_report_id for #{e}"
                        end
-      finalize_report(account_report, error_message, exception: e)
-      @er = nil
+      finalize_report(account_report, error_message, exception: e, error_report_id:)
     end
   end
 
@@ -236,16 +235,16 @@ module AccountReports
     account_report.attachment = attachment
   end
 
-  def self.failed_report(account_report, exception: nil)
+  def self.failed_report(account_report, exception: nil, error_report_id: nil)
     requires_root_account = begin
       exception.is_a?(CustomReports::Rubrics::RootAccountRequiredError)
     rescue NameError
       false
     end
 
-    fail_text = if @er
+    fail_text = if error_report_id
                   I18n.t("Failed, please report the following error code to your system administrator: ErrorReport:%{error};",
-                         error: @er.id.to_s)
+                         error: error_report_id.to_s)
                 elsif requires_root_account
                   I18n.t("This report can only be run on the root account.")
                 else
@@ -254,7 +253,7 @@ module AccountReports
     account_report.parameters["extra_text"] = fail_text
   end
 
-  def self.finalize_report(account_report, message, csv = nil, exception: nil)
+  def self.finalize_report(account_report, message, csv = nil, exception: nil, error_report_id: nil)
     account_report.reload
     account_report.message = message
 
@@ -264,7 +263,7 @@ module AccountReports
       report_attachment(account_report, csv)
       account_report.workflow_state = "complete"
     else
-      failed_report(account_report, exception:)
+      failed_report(account_report, exception:, error_report_id:)
       account_report.workflow_state = "error"
     end
 
