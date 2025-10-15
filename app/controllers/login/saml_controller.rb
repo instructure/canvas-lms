@@ -279,8 +279,8 @@ class Login::SamlController < ApplicationController
         aac.debug_set(:debugging, t("debug.logout_response_redirect_from_idp", "Received LogoutResponse from IdP"))
       end
 
-      unless message.status.code == SAML2::Status::SUCCESS
-        logger.error "Failed SAML LogoutResponse: #{message.status.code}: #{message.status.message}"
+      unless message.status.success?
+        logger.error "Failed SAML LogoutResponse: #{message.status.codes.inspect}: #{message.status.message} #{message.status.detail}"
         flash[:delegated_message] = t("There was a failure logging out at your IdP")
         increment_statsd(:failure, action: :slo_response)
         return redirect_to login_url
@@ -379,7 +379,7 @@ class Login::SamlController < ApplicationController
     # Seperate the debugging out because we want it to log the request even if the response dies.
     if aac.debugging? && aac.debug_get(:logged_in_user_id) == @current_user.id
       aac.debug_set(:idp_logout_response_xml_encrypted, logout_response.to_s)
-      aac.debug_set(:idp_logout_response_status_code, logout_response.status.code)
+      aac.debug_set(:idp_logout_response_status_code, logout_response.status.codes.inspect)
       aac.debug_set(:idp_logout_response_destination, logout_response.destination)
       aac.debug_set(:idp_logout_response_in_response_to, logout_response.in_response_to)
       aac.debug_set(:debugging, t("debug.logout_response_redirect_to_idp", "Sending LogoutResponse to IdP"))
