@@ -189,8 +189,7 @@ export default class IndexHeader extends Component {
         disabled={this.props.isBusy}
         key="markAllAsReadButton"
       >
-        <ScreenReaderContent>{I18n.t('Mark All Announcement Read')}</ScreenReaderContent>
-        <PresentationContent>{I18n.t('Mark All as Read')}</PresentationContent>
+        {I18n.t('Mark All as Read')}
       </Button>
     )
   }
