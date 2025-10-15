@@ -27,6 +27,7 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :account_users
     set_replica_identity :accounts
     set_replica_identity :asset_user_accesses
+    set_replica_identity :auto_grade_results
     set_replica_identity :blackout_dates
     set_replica_identity :block_editors
     set_replica_identity :comment_bank_items
@@ -65,6 +66,7 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :lti_asset_processor_eula_acceptances
     set_replica_identity :lti_asset_processors
     set_replica_identity :lti_asset_reports
+    set_replica_identity :lti_context_controls
     set_replica_identity :lti_ims_registrations
     set_replica_identity :lti_line_items
     set_replica_identity :lti_notice_handlers
@@ -72,6 +74,7 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :lti_overlay_versions
     set_replica_identity :lti_registrations
     set_replica_identity :lti_registration_account_bindings
+    set_replica_identity :lti_registration_update_requests
     set_replica_identity :lti_resource_links
     set_replica_identity :lti_results
     set_replica_identity :mentions

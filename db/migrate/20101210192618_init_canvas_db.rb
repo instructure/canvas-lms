@@ -228,6 +228,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.timestamp :deleted_at, precision: 6
       t.datetime :archived_at
       t.boolean :horizon_course, null: false, default: false
+      t.boolean :content_library, null: false, default: false
 
       t.replica_identity_index
       t.index [:sis_source_id, :root_account_id], where: "sis_source_id IS NOT NULL", unique: true
@@ -742,6 +743,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :sub_assignment_tag, limit: 255
       t.boolean :has_sub_assignments, null: false, default: false
       t.boolean :rubric_self_assessment_enabled, null: false, default: false
+      t.boolean :suppress_assignment, default: false, null: false
 
       t.index [:context_id, :context_type]
       t.index [:sis_source_id, :root_account_id], where: "sis_source_id IS NOT NULL", unique: true
@@ -1079,6 +1081,19 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.text :internal_ca
       # this field will be removed after VERIFY_NONE is removed entirely
       t.boolean :verify_tls_cert_opt_in, default: false, null: false
+    end
+
+    create_table :auto_grade_results do |t|
+      t.references :submission, null: false, foreign_key: true, index: false
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.integer :attempt, null: false, check: { constraint_name: "chk_attempt_positive", expression: "attempt > 0" }
+      t.jsonb :grade_data, null: false
+      t.string :error_message, limit: 255, default: nil
+      t.integer :grading_attempts, null: false, default: 0, check: { constraint_name: "chk_grading_attempts_positive", expression: "grading_attempts > 0" }
+      t.timestamps
+
+      t.replica_identity_index
+      t.index [:submission_id, :attempt], unique: true
     end
 
     create_table :blackout_dates do |t|
@@ -1698,6 +1713,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.index [:user_id, :last_message_at]
       t.index [:conversation_id, :user_id], unique: true
       t.index [:private_hash, :user_id], where: "private_hash IS NOT NULL", unique: true
+      t.index :visible_last_authored_at, name: "index_conversation_participants_on_visible_last_authored_at"
     end
 
     create_table :course_account_associations do |t|
@@ -1809,6 +1825,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :namespace, limit: 255
       t.references :user, index: false
       t.timestamps precision: nil
+      t.jsonb :data_json, null: false, default: {}
 
       t.index [:user_id, :namespace], unique: true
     end
@@ -1923,6 +1940,9 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
                    null: true
       t.string :client_type, null: false, default: "confidential"
       t.string :allowed_audiences, array: true, default: [], null: false, limit: 4096
+      t.string :authorized_flows, array: true, default: [], null: false, limit: 255
+
+      t.check_constraint "authorized_flows <@ ARRAY['service_user_client_credentials']::varchar[]", name: "chk_authorized_flows_enum"
 
       t.replica_identity_index
     end
@@ -2917,6 +2937,29 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
               name: "idx_on_lti_asset_id_lti_asset_processor_id_report_t_a649bf83c5"
     end
 
+    create_table :lti_context_controls do |t|
+      t.boolean :available, null: false, default: true
+      t.string :path, null: false, limit: 4096, index: true
+      t.references :deployment, foreign_key: { to_table: :context_external_tools }, null: false
+      t.references :registration, foreign_key: { to_table: :lti_registrations }, null: false
+      t.references :context, polymorphic: %i[account course], foreign_key: true, index: false, check_constraint: false
+      t.references :created_by, foreign_key: { to_table: :users }, index: { where: "created_by_id IS NOT NULL" }
+      t.references :updated_by, foreign_key: { to_table: :users }, index: { where: "updated_by_id IS NOT NULL" }
+      t.string :workflow_state, limit: 48, null: false, default: "active"
+      t.timestamps
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+
+      t.check_constraint <<~SQL.squish, name: "chk_require_context"
+        (account_id IS NOT NULL OR
+        course_id IS NOT NULL) AND NOT
+        (account_id IS NOT NULL AND course_id IS NOT NULL)
+      SQL
+
+      t.replica_identity_index
+      t.index [:course_id, :registration_id], unique: true, where: "course_id IS NOT NULL", name: "index_lti_context_controls_on_course_and_registration"
+      t.index [:account_id, :registration_id], unique: true, where: "account_id IS NOT NULL", name: "index_lti_context_controls_on_account_and_registration"
+    end
+
     create_table :lti_ims_registrations do |t|
       t.jsonb :lti_tool_configuration, null: false
       t.references :developer_key, null: false, foreign_key: true
@@ -3059,11 +3102,11 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :name, null: false, index: true, limit: 255
       t.string :admin_nickname, limit: 255
       t.string :vendor, limit: 255
-
       t.string :workflow_state, default: "active", null: false, limit: 255
-      t.replica_identity_index
-
       t.timestamps
+      t.text :description, limit: 2048, default: nil
+
+      t.replica_identity_index
     end
 
     create_table :lti_registration_account_bindings do |t|
@@ -3079,6 +3122,28 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.timestamps
 
       t.index %i[account_id registration_id], name: "index_lti_reg_bindings_on_account_id_and_registration_id", unique: true
+    end
+
+    create_table :lti_registration_update_requests do |t|
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.timestamps
+      t.uuid :uuid
+      t.references :lti_registration, null: false, foreign_key: false
+      t.jsonb :lti_ims_registration
+      t.jsonb :canvas_lti_configuration
+      t.references :created_by, foreign_key: { to_table: :users }
+      t.references :updated_by, foreign_key: { to_table: :users }
+      t.date :accepted_at
+      t.date :rejected_at
+      t.boolean :reinstall, null: false, default: false
+      t.boolean :tool_initiated, null: false, default: false
+      t.string :comment, limit: 500
+
+      t.check_constraint "(lti_ims_registration IS NOT NULL AND canvas_lti_configuration IS NULL) OR " \
+                         "(lti_ims_registration IS NULL AND canvas_lti_configuration IS NOT NULL)",
+                         name: "registration_config_mutually_exclusive"
+
+      t.replica_identity_index
     end
 
     create_table :lti_resource_handlers do |t|
@@ -3930,6 +3995,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       # different login attributes in the future
       t.jsonb :unique_ids, null: false, default: {}, if_not_exists: true
       t.string :verification_token, limit: 255
+      t.string :unique_id_normalized, limit: 255, null: false
 
       # login_attribute can only be set if authentication_provider_id is set
       # conversely, if authentication_provider_id IS NULL, login_attribute MUST be NULL
@@ -3948,19 +4014,96 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
               name: "index_pseudonyms_on_integration_id",
               where: "integration_id IS NOT NULL"
       t.index "LOWER(unique_id), account_id, authentication_provider_id",
-              name: "index_pseudonyms_unique_without_login_attribute",
+              name: "index_pseudonyms_unique_without_login_attribute_old",
               unique: true,
               where: "workflow_state IN ('active', 'suspended') AND login_attribute IS NULL"
       t.index "LOWER(unique_id), account_id",
-              name: "index_pseudonyms_unique_without_auth_provider",
+              name: "index_pseudonyms_unique_without_auth_provider_old",
               unique: true,
               where: "workflow_state IN ('active', 'suspended') AND authentication_provider_id IS NULL"
       t.index "LOWER(unique_id), account_id, authentication_provider_id, login_attribute",
+              name: "index_pseudonyms_unique_with_login_attribute_old",
+              unique: true,
+              where: "workflow_state IN ('active', 'suspended')"
+      t.index "LOWER(unique_id), account_id", name: "index_pseudonyms_on_unique_id_and_account_id_old"
+      t.index [:unique_id_normalized, :account_id], name: "index_pseudonyms_on_unique_id_and_account_id"
+      t.index %i[unique_id_normalized account_id authentication_provider_id],
+              name: "index_pseudonyms_unique_without_login_attribute",
+              unique: true,
+              where: "workflow_state IN ('active', 'suspended') AND login_attribute IS NULL"
+      t.index %i[unique_id_normalized account_id authentication_provider_id login_attribute],
               name: "index_pseudonyms_unique_with_login_attribute",
               unique: true,
               where: "workflow_state IN ('active', 'suspended')"
-      t.index "LOWER(unique_id), account_id", name: "index_pseudonyms_on_unique_id_and_account_id"
+      t.index %i[unique_id_normalized account_id],
+              name: "index_pseudonyms_unique_without_auth_provider",
+              unique: true,
+              where: "workflow_state IN ('active', 'suspended') AND authentication_provider_id IS NULL"
     end
+
+    execute(<<~SQL) # rubocop:disable Rails/SquishedSQLHeredocs
+      CREATE FUNCTION #{connection.quote_table_name("pseudonyms_before_insert_or_update_enforce_unique_across_auth_providers__tr_fn")}()
+      RETURNS trigger AS $$
+      DECLARE
+        auth_type TEXT;
+      BEGIN
+        IF (OLD.authentication_provider_id IS DISTINCT FROM NEW.authentication_provider_id OR
+            OLD.unique_id_normalized IS DISTINCT FROM NEW.unique_id_normalized OR
+            OLD.account_id IS DISTINCT FROM NEW.account_id OR
+            OLD.workflow_state IS DISTINCT FROM NEW.workflow_state) AND
+            NEW.workflow_state <> 'deleted' THEN
+          IF NEW.authentication_provider_id IS NOT NULL THEN
+            SELECT ap.auth_type
+            INTO auth_type
+            FROM authentication_providers ap
+            WHERE ap.id = NEW.authentication_provider_id;
+          ELSE
+            auth_type := NULL;
+          END IF;
+
+          IF auth_type IN ('cas', 'saml', 'canvas', 'ldap') THEN
+            IF EXISTS (
+              SELECT 1
+              FROM pseudonyms p
+              WHERE p.unique_id_normalized = NEW.unique_id_normalized
+                AND p.account_id = NEW.account_id
+                AND p.workflow_state <> 'deleted'
+                AND p.authentication_provider_id IS NULL
+                AND p.id <> NEW.id
+            ) THEN
+              RAISE EXCEPTION 'duplicate unique_id_normalized found against unassociated pseudonyms'
+              USING ERRCODE = '23505',
+              DETAIL = format('Key (unique_id_normalized, account_id)=(%s, %s) already exists.', NEW.unique_id_normalized, NEW.account_id);
+            END IF;
+          ELSIF auth_type IS NULL THEN
+            IF EXISTS (
+              SELECT 1
+              FROM pseudonyms p
+              JOIN authentication_providers ap ON ap.id = p.authentication_provider_id
+              WHERE p.unique_id_normalized = NEW.unique_id_normalized
+                AND p.account_id = NEW.account_id
+                AND p.workflow_state <> 'deleted'
+                AND ap.auth_type IN ('cas', 'saml', 'canvas', 'ldap')
+                AND p.id <> NEW.id
+            ) THEN
+              RAISE EXCEPTION 'duplicate unique_id_normalized found for unassociated pseudonym'
+              USING ERRCODE = '23505',
+              DETAIL = format('Key (unique_id_normalized, account_id)=(%s, %s) already exists.', NEW.unique_id_normalized, NEW.account_id);
+            END IF;
+          END IF;
+        END IF;
+
+        RETURN NEW;
+      END;
+      $$ LANGUAGE plpgsql SET search_path TO #{Shard.current.name};
+    SQL
+
+    execute(<<~SQL.squish)
+      CREATE TRIGGER pseudonyms_before_insert_or_update_enforce_unique_across_auth_providers__tr
+        BEFORE INSERT OR UPDATE ON #{Pseudonym.quoted_table_name}
+        FOR EACH ROW
+        EXECUTE PROCEDURE #{connection.quote_table_name("pseudonyms_before_insert_or_update_enforce_unique_across_auth_providers__tr_fn")}()
+    SQL
 
     create_table :purgatories do |t|
       t.references :attachment, null: false, foreign_key: true, index: { unique: true }
