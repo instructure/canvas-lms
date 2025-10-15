@@ -9,12 +9,12 @@ PATH
     canvas_unzip (0.0.1)
       activesupport
       canvas_mimetype_fu
-      rubyzip (~> 2.0)
+      rubyzip
 
 GEM
   remote: https://rubygems.org/
   specs:
-    activesupport (7.2.2.2)
+    activesupport (8.0.3)
       base64
       benchmark (>= 0.3)
       bigdecimal
@@ -26,6 +26,7 @@ GEM
       minitest (>= 5.1)
       securerandom (>= 0.3)
       tzinfo (~> 2.0, >= 2.0.5)
+      uri (>= 0.13.1)
     base64 (0.3.0)
     benchmark (0.4.1)
     bigdecimal (3.2.3)
@@ -51,10 +52,11 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.6)
-    rubyzip (2.3.2)
+    rubyzip (3.0.2)
     securerandom (0.4.1)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
+    uri (1.0.3)
 
 PLATFORMS
   aarch64-linux
