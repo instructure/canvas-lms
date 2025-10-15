@@ -24,6 +24,8 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     return if connection.index_exists?(:content_tags, replica_identity: true)
 
     set_replica_identity :access_tokens
+    set_replica_identity :accessibility_issues
+    set_replica_identity :accessibility_resource_scans
     set_replica_identity :account_users
     set_replica_identity :accounts
     set_replica_identity :asset_user_accesses
@@ -62,6 +64,7 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :group_memberships
     set_replica_identity :groups
     set_replica_identity :inbox_settings
+    set_replica_identity :llm_responses
     set_replica_identity :lti_assets
     set_replica_identity :lti_asset_processor_eula_acceptances
     set_replica_identity :lti_asset_processors
@@ -82,6 +85,7 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :microsoft_sync_partial_sync_changes
     set_replica_identity :microsoft_sync_user_mappings
     set_replica_identity :originality_reports
+    set_replica_identity :outcome_rollups
     set_replica_identity :pseudonyms
     set_replica_identity :role_overrides
     set_replica_identity :roles
@@ -89,6 +93,7 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :rubric_criteria
     set_replica_identity :rubric_imports
     set_replica_identity :standard_grade_statuses
+    set_replica_identity :submission_texts
     set_replica_identity :temporary_enrollment_pairings
     set_replica_identity :user_account_associations
     set_replica_identity :user_lmgb_outcome_orderings
