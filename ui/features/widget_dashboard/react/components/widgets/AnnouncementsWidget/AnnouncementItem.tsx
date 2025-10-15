@@ -185,9 +185,20 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcementItem, fi
                   </Flex.Item>
                 )}
 
-                {/* Row 3: Posted date */}
+                {/* Row 3: Author name and posted date */}
                 <Flex.Item>
-                  <Text size="x-small" color="secondary">
+                  <Text
+                    size="x-small"
+                    color="secondary"
+                    wrap="break-word"
+                    style={{wordBreak: 'break-all'}}
+                  >
+                    {announcement.author?.name && (
+                      <>
+                        {I18n.t('Sent by %{authorName}', {authorName: announcement.author.name})}
+                        {' | '}
+                      </>
+                    )}
                     <FriendlyDatetime
                       dateTime={announcement.posted_at}
                       format={I18n.t('#date.formats.medium')}
