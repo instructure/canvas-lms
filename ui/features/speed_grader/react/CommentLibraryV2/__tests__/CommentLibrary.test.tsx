@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {render, waitFor} from '@testing-library/react'
+import {render, waitFor, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {MockedProvider} from '@apollo/client/testing'
 import {CommentLibraryContent} from '../CommentLibrary'
 import fakeENV from '@canvas/test-utils/fakeENV'
@@ -25,6 +26,7 @@ import {SpeedGrader_CommentBankItemsCount} from '../graphql/queries'
 
 describe('CommentLibrary', () => {
   const defaultUserId = '1'
+  const defaultCourseId = '1'
 
   const createCountMock = (userId: string, totalCount: number) => ({
     request: {
@@ -50,6 +52,7 @@ describe('CommentLibrary', () => {
   const setup = (mocks: any[], props = {}) => {
     const defaultProps = {
       userId: defaultUserId,
+      courseId: defaultCourseId,
       ...props,
     }
 
@@ -202,12 +205,44 @@ describe('CommentLibrary', () => {
 
       rerender(
         <MockedProvider mocks={mocks} addTypename={true}>
-          <CommentLibraryContent userId="2" />
+          <CommentLibraryContent userId="2" courseId={defaultCourseId} />
         </MockedProvider>,
       )
 
       await waitFor(() => {
         expect(getByTestId('comment-library-count')).toHaveTextContent('25')
+      })
+    })
+  })
+
+  describe('Tray Integration Tests', () => {
+    it('tray is closed by default', async () => {
+      const mocks = [createCountMock(defaultUserId, 10)]
+      setup(mocks)
+
+      await waitFor(() => {
+        expect(screen.getByTestId('comment-library-button')).toBeInTheDocument()
+      })
+
+      // Tray should exist but content should not be visible
+      expect(screen.queryByTestId('library-comment-area')).not.toBeInTheDocument()
+    })
+
+    it('opens tray when comment library button is clicked', async () => {
+      const user = userEvent.setup()
+      const mocks = [createCountMock(defaultUserId, 10)]
+      setup(mocks)
+
+      await waitFor(() => {
+        expect(screen.getByTestId('comment-library-button')).toBeInTheDocument()
+      })
+
+      const button = screen.getByTestId('comment-library-button')
+      await user.click(button)
+
+      // Tray should now be open
+      await waitFor(() => {
+        expect(screen.getByText('Manage Comment Library')).toBeInTheDocument()
       })
     })
   })
