@@ -48,7 +48,13 @@ export default function AssignmentFooter({moduleItemId}: AssignmentFooterProps) 
   return (
     <Transition in={displayFooter} type="slide-down">
       {displayFooter && (
-        <View as="div" width="100%" padding="small" borderWidth="small none none none">
+        <View
+          as="div"
+          width="100%"
+          padding="small"
+          borderWidth="small none none none"
+          data-testid="assignment-footer"
+        >
           <Flex width="100%" justifyItems={sequence.previous ? 'space-between' : 'end'}>
             {sequence.previous && (
               <Tooltip renderTip={sequence.previous.title}>

@@ -17,6 +17,7 @@
  */
 
 import React, {useState} from 'react'
+import AssignmentDetailsView from './AssignmentDetailsView'
 import PeerReviewDetailsView from './PeerReviewDetailsView'
 import {Tabs} from '@instructure/ui-tabs'
 import {TeacherAssignmentType} from '@canvas/assignments/graphql/teacher/AssignmentTeacherTypes'
@@ -41,7 +42,9 @@ export default function AssignmentTabs({assignment}: {assignment: TeacherAssignm
         data-testid="assignment-tab"
         renderTitle={I18n.t('Assignment')}
         isSelected={selectedIndex === 0}
-      ></Tabs.Panel>
+      >
+        <AssignmentDetailsView description={assignment.description} />
+      </Tabs.Panel>
       <Tabs.Panel
         data-testid="peer-review-tab"
         renderTitle={I18n.t('Peer Review')}

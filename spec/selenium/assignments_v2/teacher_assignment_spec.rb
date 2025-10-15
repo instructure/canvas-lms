@@ -155,6 +155,89 @@ describe "as a teacher" do
       end
     end
 
+    context "assignment description" do
+      context "without peer review tabs" do
+        before(:once) do
+          @assignment = @course.assignments.create!(
+            name: "assignment with description",
+            description: "<p>This is a detailed assignment description</p>",
+            due_at: 5.days.from_now,
+            points_possible: 10,
+            submission_types: "online_text_entry"
+          )
+        end
+
+        before do
+          user_session(@teacher)
+          TeacherViewPageV2.visit(@course, @assignment)
+          wait_for_ajaximations
+        end
+
+        it "displays assignment description when peer reviews are disabled" do
+          expect(TeacherViewPageV2.assignment_description).to be_displayed
+          expect(TeacherViewPageV2.assignment_description.text).to include("This is a detailed assignment description")
+        end
+
+        it "does not show assignment tabs when peer reviews are disabled" do
+          expect(element_exists?("[data-testid='assignment-tab']")).to be_falsey
+          expect(element_exists?("[data-testid='peer-review-tab']")).to be_falsey
+        end
+      end
+
+      context "with peer review tabs" do
+        before(:once) do
+          @course.enable_feature!(:peer_review_allocation_and_grading)
+          @assignment = @course.assignments.create!(
+            name: "assignment with peer reviews",
+            description: "<p>Description within tabs</p>",
+            due_at: 5.days.from_now,
+            points_possible: 10,
+            submission_types: "online_text_entry",
+            peer_reviews: true
+          )
+        end
+
+        before do
+          user_session(@teacher)
+          TeacherViewPageV2.visit(@course, @assignment)
+          wait_for_ajaximations
+        end
+
+        it "displays assignment and peer review tabs" do
+          expect(TeacherViewPageV2.assignment_tab).to be_displayed
+          expect(TeacherViewPageV2.peer_review_tab).to be_displayed
+        end
+
+        it "displays description in the assignment tab" do
+          expect(TeacherViewPageV2.assignment_description).to be_displayed
+          expect(TeacherViewPageV2.assignment_description.text).to include("Description within tabs")
+        end
+      end
+
+      context "with empty description" do
+        before(:once) do
+          @assignment = @course.assignments.create!(
+            name: "assignment without description",
+            description: "",
+            due_at: 5.days.from_now,
+            points_possible: 10,
+            submission_types: "online_text_entry"
+          )
+        end
+
+        before do
+          user_session(@teacher)
+          TeacherViewPageV2.visit(@course, @assignment)
+          wait_for_ajaximations
+        end
+
+        it "displays fallback message when description is empty" do
+          expect(TeacherViewPageV2.assignment_description).to be_displayed
+          expect(TeacherViewPageV2.assignment_description.text).to include("No additional details were added for this assignment.")
+        end
+      end
+    end
+
     context "assignment footer" do
       before do
         # Create 3 assignments and put them in a module together
