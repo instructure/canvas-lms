@@ -61,6 +61,7 @@ class CareerController < ApplicationController
       horizon_bulk_metadata_import
       horizon_manual_dashboard_builder
       horizon_dark_career_theme_in_learning_provider
+      horizon_learning_library
     ].index_with { |feature| @domain_root_account.feature_enabled?(feature) }
   end
 end
