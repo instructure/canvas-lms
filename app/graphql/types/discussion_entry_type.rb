@@ -281,7 +281,8 @@ module Types
     def discussion_entry_versions
       is_course_teacher = object.context.is_a?(Course) && object.context.user_is_instructor?(current_user)
       is_group_teacher = object.context.is_a?(Group) && object.context&.course&.user_is_instructor?(current_user)
-      return nil unless is_course_teacher || is_group_teacher || object.user == current_user
+      is_admin = object.context.grants_right?(current_user, session, :read_as_admin)
+      return nil unless is_course_teacher || is_group_teacher || is_admin || object.user == current_user
 
       if object.deleted?
         nil
@@ -294,7 +295,8 @@ module Types
     def report_type_counts
       is_course_teacher = object.context.is_a?(Course) && object.context.user_is_instructor?(current_user)
       is_group_teacher = object.context.is_a?(Group) && object.context&.course&.user_is_instructor?(current_user)
-      return nil unless is_course_teacher || is_group_teacher
+      is_admin = object.context.grants_right?(current_user, session, :read_as_admin)
+      return nil unless is_course_teacher || is_group_teacher || is_admin
 
       if object.deleted?
         nil
