@@ -28,17 +28,18 @@ describe AiExperience do
       description: "A test AI experience",
       facts: "These are test facts",
       learning_objective: "Learn something useful",
-      scenario: "A test scenario",
+      pedagogical_guidance: "A test pedagogical guidance",
       course:
     }
   end
 
   describe "validations" do
-    it "requires title and facts" do
-      experience = AiExperience.new(valid_attributes.except(:title, :facts))
+    it "requires title, learning_objective, and pedagogical_guidance" do
+      experience = AiExperience.new(valid_attributes.except(:title, :learning_objective, :pedagogical_guidance))
       expect(experience).not_to be_valid
       expect(experience.errors[:title]).to include("can't be blank")
-      expect(experience.errors[:facts]).to include("can't be blank")
+      expect(experience.errors[:learning_objective]).to include("can't be blank")
+      expect(experience.errors[:pedagogical_guidance]).to include("can't be blank")
     end
 
     it "validates title length" do
@@ -50,6 +51,11 @@ describe AiExperience do
       experience = AiExperience.new(valid_attributes.merge(workflow_state: "invalid_state"))
       expect(experience).not_to be_valid
       expect(experience.errors[:workflow_state]).to include("is not included in the list")
+    end
+
+    it "allows facts to be blank" do
+      experience = AiExperience.new(valid_attributes.except(:facts))
+      expect(experience).to be_valid
     end
   end
 

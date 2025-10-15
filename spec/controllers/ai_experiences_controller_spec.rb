@@ -29,7 +29,7 @@ describe AiExperiencesController do
       description: "Practice customer service scenarios",
       facts: "You are a customer service representative helping customers with billing issues.",
       learning_objective: "Students will learn to handle customer complaints professionally",
-      scenario: "A customer calls about incorrect billing"
+      pedagogical_guidance: "A customer calls about incorrect billing"
     )
   end
 
@@ -46,6 +46,8 @@ describe AiExperiencesController do
         published_experience = @course.ai_experiences.create!(
           title: "Published Experience",
           facts: "Test prompt",
+          learning_objective: "Test objective",
+          pedagogical_guidance: "Test pedagogical guidance",
           workflow_state: "published"
         )
 
@@ -61,6 +63,8 @@ describe AiExperiencesController do
         published_experience = @course.ai_experiences.create!(
           title: "Published Experience",
           facts: "Test prompt",
+          learning_objective: "Test objective",
+          pedagogical_guidance: "Test pedagogical guidance",
           workflow_state: "published"
         )
 
@@ -136,7 +140,7 @@ describe AiExperiencesController do
           description: "A test experience",
           facts: "Test prompt",
           learning_objective: "Test objective",
-          scenario: "Test scenario"
+          pedagogical_guidance: "Test pedagogical guidance"
         }
 
         initial_count = AiExperience.count
@@ -150,13 +154,14 @@ describe AiExperiencesController do
         expect(created_experience.description).to eq("A test experience")
         expect(created_experience.facts).to eq("Test prompt")
         expect(created_experience.learning_objective).to eq("Test objective")
-        expect(created_experience.scenario).to eq("Test scenario")
+        expect(created_experience.pedagogical_guidance).to eq("Test pedagogical guidance")
       end
 
       it "returns bad request with invalid params" do
         invalid_params = {
           title: "", # title is required
-          facts: "" # facts is required
+          learning_objective: "", # learning_objective is required
+          pedagogical_guidance: "" # pedagogical_guidance is required
         }
 
         initial_count = AiExperience.count
@@ -166,10 +171,31 @@ describe AiExperiencesController do
         expect(response).to have_http_status(:bad_request)
       end
 
+      it "creates a new AI experience without facts (facts is optional)" do
+        experience_params = {
+          title: "New Experience Without Facts",
+          learning_objective: "Test objective",
+          pedagogical_guidance: "Test pedagogical guidance"
+        }
+
+        initial_count = AiExperience.count
+        post :create, params: { course_id: @course.id, ai_experience: experience_params }, format: :json
+        expect(AiExperience.count).to eq(initial_count + 1)
+
+        expect(response).to have_http_status(:created)
+
+        created_experience = AiExperience.last
+        expect(created_experience.title).to eq("New Experience Without Facts")
+        expect(created_experience.facts).to be_nil
+        expect(created_experience.learning_objective).to eq("Test objective")
+        expect(created_experience.pedagogical_guidance).to eq("Test pedagogical guidance")
+      end
+
       it "sets the correct associations for course, account, and root_account" do
         experience_params = {
           title: "New Experience",
-          facts: "Test prompt"
+          learning_objective: "Test objective",
+          pedagogical_guidance: "Test pedagogical guidance"
         }
 
         post :create, params: { course_id: @course.id, ai_experience: experience_params }, format: :json
@@ -187,7 +213,8 @@ describe AiExperiencesController do
       it "returns forbidden" do
         experience_params = {
           title: "New Experience",
-          facts: "Test prompt"
+          learning_objective: "Test objective",
+          pedagogical_guidance: "Test pedagogical guidance"
         }
 
         post :create, params: { course_id: @course.id, ai_experience: experience_params }, format: :json
@@ -206,7 +233,7 @@ describe AiExperiencesController do
           description: "Updated description",
           facts: "Updated prompt",
           learning_objective: "Updated objective",
-          scenario: "Updated scenario"
+          pedagogical_guidance: "Updated pedagogical guidance"
         }
 
         put :update, params: { course_id: @course.id, id: @ai_experience.id, ai_experience: update_params }, format: :json
@@ -218,13 +245,14 @@ describe AiExperiencesController do
         expect(@ai_experience.description).to eq("Updated description")
         expect(@ai_experience.facts).to eq("Updated prompt")
         expect(@ai_experience.learning_objective).to eq("Updated objective")
-        expect(@ai_experience.scenario).to eq("Updated scenario")
+        expect(@ai_experience.pedagogical_guidance).to eq("Updated pedagogical guidance")
       end
 
       it "returns bad request with invalid params" do
         invalid_params = {
           title: "", # title is required
-          facts: "" # facts is required
+          learning_objective: "", # learning_objective is required
+          pedagogical_guidance: "" # pedagogical_guidance is required
         }
 
         put :update, params: { course_id: @course.id, id: @ai_experience.id, ai_experience: invalid_params }, format: :json
@@ -350,7 +378,7 @@ describe AiExperiencesController do
         end
 
         it "returns 404 for create" do
-          post :create, params: { course_id: @course.id, ai_experience: { title: "Test", facts: "Test" } }, format: :json
+          post :create, params: { course_id: @course.id, ai_experience: { title: "Test", facts: "Test", learning_objective: "Test", pedagogical_guidance: "Test" } }, format: :json
           expect(response).to have_http_status(:not_found)
         end
 
@@ -439,7 +467,7 @@ describe AiExperiencesController do
           root_account_uuid: @course.root_account.uuid,
           facts: @ai_experience.facts,
           learning_objectives: @ai_experience.learning_objective,
-          scenario: @ai_experience.scenario
+          scenario: @ai_experience.pedagogical_guidance
         ).and_call_original
 
         allow_any_instance_of(LLMConversationService)
