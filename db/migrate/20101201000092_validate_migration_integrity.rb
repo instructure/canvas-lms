@@ -31,7 +31,7 @@ class ValidateMigrationIntegrity < ActiveRecord::Migration[7.0]
 
   def up
     initial_migration_version = "20101210192618"
-    last_squashed_migration_version = "20250424144501"
+    last_squashed_migration_version = "20250530172201"
 
     versions = ActiveRecord::Base.schema_migration.versions
     initial_migration_has_run = versions.include?(initial_migration_version)
