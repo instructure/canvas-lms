@@ -31,3 +31,27 @@ export const SpeedGrader_CommentBankItemsCount = gql`
     }
   }
 `
+
+export const SpeedGrader_CommentBankItems = gql`
+  query SpeedGrader_CommentBankItems(
+    $userId: ID!
+    $query: String
+    $first: Int
+    $after: String
+  ) {
+    legacyNode(_id: $userId, type: User) {
+      ... on User {
+        commentBankItemsConnection(query: $query, first: $first, after: $after) {
+          nodes {
+            comment
+            _id
+          }
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+        }
+      }
+    }
+  }
+`

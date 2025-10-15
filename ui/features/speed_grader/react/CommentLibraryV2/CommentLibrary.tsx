@@ -29,15 +29,18 @@ import {useQuery} from '@apollo/client'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {SpeedGrader_CommentBankItemsCount} from './graphql/queries'
 import {ApolloProvider, createClient} from '@canvas/apollo-v3'
+import {CommentLibraryTray} from './components/CommentLibraryTray'
 import {SpeedGrader_CommentBankItemsCountQuery} from '@canvas/graphql/codegen/graphql'
 
 const I18n = createI18nScope('CommentLibrary')
 
 export type CommentLibraryContentProps = {
   userId: string
+  courseId: string
 }
 
-export const CommentLibraryContent: React.FC<CommentLibraryContentProps> = ({userId}) => {
+export const CommentLibraryContent: React.FC<CommentLibraryContentProps> = ({courseId, userId}) => {
+  const [isTrayOpen, setIsTrayOpen] = useState(false)
   const [suggestionsWhenTypingEnabled] = useState(ENV.comment_library_suggestions_enabled)
 
   const {data, loading} = useQuery<SpeedGrader_CommentBankItemsCountQuery>(
@@ -66,6 +69,7 @@ export const CommentLibraryContent: React.FC<CommentLibraryContentProps> = ({use
     <Button
       withBackground={false}
       color="primary"
+      onClick={() => setIsTrayOpen(true)}
       data-testid="comment-library-button"
       themeOverride={{borderWidth: '0'}}
       renderIcon={<IconCommentLine />}
@@ -87,14 +91,22 @@ export const CommentLibraryContent: React.FC<CommentLibraryContentProps> = ({use
   }
 
   return (
-    <Flex direction="row-reverse" padding="medium 0 xx-small small">
-      <Flex.Item>
-        <View display="flex" />
-        <View as="div" padding="0 0 0 x-small" display="flex">
-          {commentLibraryButton}
-        </View>
-      </Flex.Item>
-    </Flex>
+    <>
+      <Flex direction="row-reverse" padding="medium 0 xx-small small">
+        <Flex.Item>
+          <View display="flex" />
+          <View as="div" padding="0 0 0 x-small" display="flex">
+            {commentLibraryButton}
+          </View>
+        </Flex.Item>
+      </Flex>
+      <CommentLibraryTray
+        userId={userId}
+        courseId={courseId}
+        isOpen={isTrayOpen}
+        onDismiss={() => setIsTrayOpen(false)}
+      />
+    </>
   )
 }
 
@@ -102,6 +114,7 @@ const client = createClient()
 
 type CommentLibraryProps = {
   userId: string
+  courseId: string
 }
 
 export const CommentLibrary: React.FC<CommentLibraryProps> = props => (
