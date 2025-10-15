@@ -730,18 +730,18 @@ end
 
 module UsefulFindInBatches
   def apply_limits(*args)
-    if ::Rails.version < "8.0" || args.count != 4
-      super
-    else
+    if args.count == 4
       super(args[0], Array(primary_key), args[1], args[2], args[3])
+    else
+      super
     end
   end
 
   def build_batch_orders(*args)
-    if ::Rails.version < "8.0" || args.count != 1
-      super
-    else
+    if args.count == 1
       super(Array(primary_key), args[0])
+    else
+      super
     end
   end
 
@@ -778,11 +778,7 @@ module UsefulFindInBatches
 
   def in_batches(strategy: nil, start: nil, finish: nil, order: :asc, **kwargs, &block)
     unless block
-      if ::Rails.version < "8.0"
-        return ActiveRecord::Batches::BatchEnumerator.new(strategy:, start:, relation: self, **kwargs)
-      else
-        return ActiveRecord::Batches::BatchEnumerator.new(strategy:, start:, relation: self, cursor: primary_key, **kwargs)
-      end
+      return ActiveRecord::Batches::BatchEnumerator.new(strategy:, start:, relation: self, cursor: primary_key, **kwargs)
     end
 
     unless [:asc, :desc].include?(order)
@@ -1076,11 +1072,7 @@ module UsefulBatchEnumerator
   def initialize(strategy: nil, **kwargs)
     @strategy = strategy
     @kwargs = kwargs.except(:relation)
-    if Rails.version < "8.0"
-      super(**kwargs.slice(:of, :start, :finish, :relation))
-    else
-      super(**kwargs.slice(:of, :start, :finish, :relation, :cursor))
-    end
+    super(**kwargs.slice(:of, :start, :finish, :relation, :cursor))
   end
 
   def each_record(&block)
