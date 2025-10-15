@@ -142,7 +142,7 @@ export const AccessibilityCheckerPopover = ({
       <View as="div" width="30rem">
         <Flex direction="column" justifyItems="space-between" padding="medium">
           <Flex justifyItems="space-between">
-            <Heading level="h3" margin="0" data-testid="a11y-checker-popover-header">
+            <Heading level="h2" margin="0" data-testid="a11y-checker-popover-header">
               {I18n.t('Accessibility checker')}
             </Heading>
             <CloseButton
