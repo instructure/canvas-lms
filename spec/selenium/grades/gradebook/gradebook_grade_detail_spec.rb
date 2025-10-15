@@ -176,11 +176,14 @@ shared_examples "Grade Detail Tray:" do |ff_enabled|
         Gradebook.visit(@course)
       end
 
-      it "speedgrader link navigates to speedgrader page", priority: "1" do
+      it "speedgrader link opens in a new tab", priority: "1" do
         Gradebook::Cells.open_tray(@course.students[0], @a1)
-        Gradebook::GradeDetailTray.speedgrader_link.click
 
-        expect(driver.current_url).to include "courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@a1.id}"
+        speedgrader_link = Gradebook::GradeDetailTray.speedgrader_link
+        expect(speedgrader_link.attribute("target")).to eq("_blank")
+        expect(speedgrader_link.attribute("href")).to include(
+          "courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@a1.id}"
+        )
       end
 
       it "clicking assignment name navigates to assignment page", priority: "2" do

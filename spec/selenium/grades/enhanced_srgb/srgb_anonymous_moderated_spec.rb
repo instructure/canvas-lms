@@ -123,16 +123,26 @@ describe "Individual View Gradebook" do
       expect(EnhancedSRGB.assignment_dropdown).to include_text "Unmuted Anon Assignment"
     end
 
-    it "hides student names in speedgrader" do
-      # Open speedgrader for the anonymous assignment
+    it "speedgrader link opens in new tab" do
       EnhancedSRGB.select_assignment(@anonymous_assignment)
       scroll_into_view('[data-testid="assignment-speedgrader-link"]')
-      wait_for_new_page_load(EnhancedSRGB.speedgrader_link.click)
 
-      # open the student list dropdown
+      speedgrader_link = EnhancedSRGB.speedgrader_link
+      expect(speedgrader_link.attribute("target")).to eq("_blank")
+      expect(speedgrader_link.attribute("href")).to include(
+        "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@anonymous_assignment.id}"
+      )
+    end
+
+    it "hides student names in speedgrader" do
+      EnhancedSRGB.select_assignment(@anonymous_assignment)
+      scroll_into_view('[data-testid="assignment-speedgrader-link"]')
+      EnhancedSRGB.speedgrader_link.click
+
+      driver.switch_to.window(driver.window_handles.last)
+
       Speedgrader.students_dropdown_button.click
 
-      # ensure the student names are anonymized
       student_names = Speedgrader.students_select_menu_list.map(&:text)
       expect(student_names).to match_array ["Student 1", "Student 2"]
     end
