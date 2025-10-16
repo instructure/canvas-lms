@@ -478,7 +478,8 @@ class Pseudonym < ActiveRecord::Base
     given do |user|
       self.account.grants_right?(user, :manage_user_logins) &&
         self.user.has_subset_of_account_permissions?(user, self.account) &&
-        self.user.grants_right?(user, :read)
+        self.user.grants_right?(user, :read) &&
+        directly_editable?
     end
     can :create and can :update
 
@@ -488,7 +489,8 @@ class Pseudonym < ActiveRecord::Base
     # change.
     given do |user|
       user_id == user.try(:id) &&
-        passwordable?
+        passwordable? &&
+        directly_editable?
     end
     can :change_password
 
@@ -497,7 +499,8 @@ class Pseudonym < ActiveRecord::Base
     given do |user|
       new_record? &&
         passwordable? &&
-        grants_right?(user, :create)
+        grants_right?(user, :create) &&
+        directly_editable?
     end
     can :change_password
 
@@ -507,7 +510,8 @@ class Pseudonym < ActiveRecord::Base
     given do |user|
       account.settings[:admins_can_change_passwords] &&
         passwordable? &&
-        grants_right?(user, :update)
+        grants_right?(user, :update) &&
+        directly_editable?
     end
     can :change_password
 
@@ -515,19 +519,20 @@ class Pseudonym < ActiveRecord::Base
     # permission on the pseudonym's account
     given do |user|
       self.account.grants_right?(user, :manage_sis) &&
-        grants_right?(user, :update)
+        grants_right?(user, :update) &&
+        directly_editable?
     end
     can :manage_sis
 
     # an admin can delete any non-SIS pseudonym that they can update
     given do |user|
-      !sis_user_id && grants_right?(user, :update)
+      !sis_user_id && grants_right?(user, :update) && directly_editable?
     end
     can :delete
 
     # an admin can only delete an SIS pseudonym if they also can :manage_sis
     given do |user|
-      sis_user_id && grants_right?(user, :manage_sis)
+      sis_user_id && grants_right?(user, :manage_sis) && directly_editable?
     end
     can :delete
   end
@@ -591,6 +596,10 @@ class Pseudonym < ActiveRecord::Base
     @inferred_auth_provider = true if ap && authentication_provider_id.nil?
     self.authentication_provider ||= ap
     save! if !previously_changed && changed?
+  end
+
+  def directly_editable?
+    true
   end
 
   # managed_password? and passwordable? differ in their treatment of pseudonyms
