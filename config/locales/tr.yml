@@ -4182,11 +4182,17 @@ tr:
         goBackToInclude: "Aşağıdakileri dahil etmek için geri dönmek ister misiniz:"
         notAllSectionsAssigned: "Bu öğeye tüm bölümler atanmayacak."
     name_is_required: "İsim zorunludur!"
+    next: Sonraki
+    next_month: "Sonraki Hafta"
+    next_week: "Gelecek Hafta"
     no_dates_error: "En az bir gün ve saat belirtmelisiniz"
     no_groups: "Hiç grup bulunamadı"
     no_users: "Hiç kullanıcı bulunamadı"
     ok: Tamam
     open_appointment_on_this_day: "Bugün için açık bir randevu var."
+    previous: Önceki
+    previous_month: "Önceki Hafta"
+    previous_week: "Önceki Hafta"
     prompts: 
       delete_assignment: "Bu ödevi silmek isteğinize emin misiniz?"
       delete_event: "Bu olayı silmek istediğinize emin misiniz?"
@@ -13551,6 +13557,7 @@ tr:
   next_page_d2a39853: "Sonraki Sayfa"
   next_steps_ce0f0d0c: "Sonraki Adımlar"
   next_student_79955068: "Sonraki Öğrenci"
+  next_week_9df347b3: "Gelecek Hafta"
   nickname_1e6da3ad: "Takma İsim"
   nickname_7df95b09: "Takma İsim:"
   no_74e9b590: hayır
@@ -15025,6 +15032,7 @@ tr:
   previous_student_899a6732: "Önceki Öğrenci"
   previous_time_cc96b361: "Önceki (%{time})"
   previous_timestamp_19343a58: "Önceki (%{timestamp})"
+  previous_week_dddf1ef2: "Önceki Hafta"
   print_d0e3d53f: Yazdır
   priority_dd4381ee: Öncelik
   privacy_290109ea: Gizlilik
