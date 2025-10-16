@@ -1460,4 +1460,60 @@ describe Types::SubmissionType do
       )
     end
   end
+
+  describe "hasOriginalityReport" do
+    before(:once) do
+      @assignment_with_report = @course.assignments.create!(
+        name: "assignment with originality report",
+        submission_types: "online_upload"
+      )
+      @attachment = attachment_model
+      @submission_with_report = @assignment_with_report.submit_homework(
+        @student,
+        submission_type: "online_upload",
+        attachments: [@attachment]
+      )
+    end
+
+    let(:submission_with_report_type) { GraphQLTypeTester.new(@submission_with_report, current_user: @teacher) }
+
+    it "returns false when submission has no originality report" do
+      expect(submission_with_report_type.resolve("hasOriginalityReport")).to be false
+    end
+
+    it "returns false for unsubmitted submissions" do
+      unsubmitted_assignment = @course.assignments.create!(name: "unsubmitted assignment")
+      unsubmitted_submission = unsubmitted_assignment.submissions.find_by!(user: @student)
+      unsubmitted_type = GraphQLTypeTester.new(unsubmitted_submission, current_user: @teacher)
+
+      expect(unsubmitted_type.resolve("hasOriginalityReport")).to be false
+    end
+
+    context "when submission has an originality report" do
+      before(:once) do
+        @report = OriginalityReport.create!(
+          attachment: @attachment,
+          originality_score: 75,
+          submission: @submission_with_report,
+          submission_time: @submission_with_report.submitted_at
+        )
+      end
+
+      it "returns true" do
+        expect(submission_with_report_type.resolve("hasOriginalityReport")).to be true
+      end
+
+      it "delegates to submission.originality_report_matches_current_version? for matching logic" do
+        # The resolver should call the model method - verify it returns the same result
+        expect(submission_with_report_type.resolve("hasOriginalityReport")).to eq(
+          @submission_with_report.originality_report_matches_current_version?(@report)
+        )
+      end
+
+      it "works without throwing NoMethodError when originality reports exist" do
+        # Should not raise NoMethodError
+        expect { submission_with_report_type.resolve("hasOriginalityReport") }.not_to raise_error
+      end
+    end
+  end
 end

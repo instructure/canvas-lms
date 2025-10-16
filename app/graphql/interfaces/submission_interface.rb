@@ -427,10 +427,10 @@ module Interfaces::SubmissionInterface
   field :has_originality_report, Boolean, null: false
   def has_originality_report
     if submission.submitted_at.nil?
-      []
+      false
     else
       load_association(:originality_reports).then do |originality_reports|
-        originality_reports.any? { |o| originality_report_matches_current_version?(o) }
+        originality_reports.any? { |o| submission.originality_report_matches_current_version?(o) }
       end
     end
   end
