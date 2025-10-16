@@ -3628,10 +3628,14 @@ uk:
       unregistered_users: "Користувачі, які ще не зареєстровані"
     messages_sent: "Повідомлень надіслано"
     name_is_required: "Ім'я обов'язкове!"
+    next: Наступний
+    next_month: "Наступний місяць"
     no_dates_error: "Ви повинні вказати хоча б одну дату та час"
     no_groups: "Групи не знайдені"
     no_users: "Користувачі не знайдені"
     open_appointment_on_this_day: "На цей день призначена відкрита зустріч"
+    previous: Попередній
+    previous_month: "Попередній місяць"
     prompts: 
       delete_assignment: "Ви впевнені, що хочете видалити це завдання?"
       delete_override: "Ви впевнені, що хочете видалити це перевизначене завдання?"
