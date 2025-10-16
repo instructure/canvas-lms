@@ -22,18 +22,37 @@ import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import {Link} from '@instructure/ui-link'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import type {ViewOwnProps} from '@instructure/ui-view'
+import {openWindow} from '@canvas/util/globalUtils'
 
 const I18n = createI18nScope('terms_of_service_modal')
 const termsOfServiceText = I18n.t('Acceptable Use Policy')
 
-// Type for the API response - either has content or redirectUrl
+// Type for the raw API response - either has content or redirectUrl
 type AcceptableUsePolicyResponse = {content: string} | {redirectUrl: string}
 
-function NewWindow({url}: {url: string}): null {
-  useEffect(() => {
-    window.open(url, '_blank', 'noopener,noreferrer')
-  }, [url])
-  return null // Render nothing, all the action is in th' new window
+// normalized AUP response with a type tag for safe narrowing
+type ParsedAupApi = {type: 'content'; content: string} | {type: 'redirectUrl'; url: string}
+
+// normalize AUP API response into ParsedAupApi; throw if missing or malformed
+function parseAupApiResponse(json: AcceptableUsePolicyResponse | undefined): ParsedAupApi {
+  if (typeof json === 'undefined') throw new Error('No JSON response')
+  if ('content' in json) return {type: 'content', content: json.content}
+  if ('redirectUrl' in json) return {type: 'redirectUrl', url: json.redirectUrl}
+  throw new Error('Unexpected JSON response')
+}
+
+// fetch AUP JSON from /api; return undefined on error
+async function fetchAcceptableUsePolicy(): Promise<AcceptableUsePolicyResponse | undefined> {
+  try {
+    const {json} = await doFetchApi<AcceptableUsePolicyResponse>({
+      path: '/api/v1/acceptable_use_policy',
+    })
+    return json
+  } catch (e) {
+    console.error('Failed to fetch acceptable use policy from API:', e)
+    return undefined
+  }
 }
 
 interface TermsOfServiceCustomContentsProps {
@@ -52,17 +71,13 @@ function TermsOfServiceCustomContents({
   useEffect(
     function () {
       async function fetchTermsOfService() {
+        const json = await fetchAcceptableUsePolicy()
         try {
-          const {json} = await doFetchApi<AcceptableUsePolicyResponse>({
-            path: '/api/v1/acceptable_use_policy',
-          })
-          if (typeof json === 'undefined') throw new Error('No JSON response')
-
-          if ('content' in json) setContent(json.content)
-          else if ('redirectUrl' in json) setUrl(json.redirectUrl)
-          else throw new Error('Unexpected JSON response')
+          const result = parseAupApiResponse(json)
+          if (result.type === 'content') setContent(result.content)
+          else if (result.type === 'redirectUrl') setUrl(result.url)
         } catch (e) {
-          console.error('An error occurred while fetching the Terms of Service content:', e)
+          console.error('Failed to parse acceptable use policy response:', e)
         }
       }
 
@@ -105,21 +120,54 @@ export default function TermsOfServiceModal(props: TermsOfServiceModalProps): Re
     linkRef.current = element as HTMLAnchorElement
   }
 
-  function handleLinkClick(): void {
-    const rceContainer = document.getElementById('custom_tos_rce_container')
-    if (rceContainer) {
-      const textArea = rceContainer.querySelector('textarea')
-      setCustomContent(RichContentEditor.callOnRCE(textArea, 'get_code'))
+  async function handleLinkClick(e?: React.MouseEvent<ViewOwnProps>): Promise<void> {
+    e?.preventDefault()
+
+    if (preview) {
+      const rceContainer = document.getElementById('custom_tos_rce_container')
+      if (rceContainer) {
+        const textArea = rceContainer.querySelector('textarea')
+        setCustomContent(RichContentEditor.callOnRCE(textArea, 'get_code'))
+      }
+      setOpen(true)
+      return
     }
+
+    // read cached url from state
+    let redirectUrl = url
+
+    // fetch if needed (no url and no inline content yet)
+    if (!redirectUrl && !tosContentHTML) {
+      const json = await fetchAcceptableUsePolicy()
+
+      try {
+        const result = parseAupApiResponse(json)
+
+        if (result.type === 'content') {
+          setTosContentHTML(result.content)
+        } else if (result.type === 'redirectUrl') {
+          redirectUrl = result.url
+          setUrl(redirectUrl)
+        }
+      } catch (e) {
+        console.error('Failed to load acceptable use policy:', e)
+        // silently fail (don’t open broken modal)
+        return
+      }
+    }
+
+    // open external AUP and skip modal
+    if (redirectUrl) {
+      openWindow(redirectUrl, '_blank', 'noopener,noreferrer')
+      return
+    }
+
+    // no redirect: show modal with inline content
     setOpen(true)
   }
 
   function TOSContents(): React.JSX.Element | null {
     if (!open) return null
-    if (!preview && url) {
-      requestAnimationFrame(() => setOpen(false)) // only open a new window once
-      return <NewWindow url={url} />
-    }
 
     if (preview && typeof customContent === 'undefined') return null
 
@@ -135,7 +183,13 @@ export default function TermsOfServiceModal(props: TermsOfServiceModalProps): Re
     )
 
     return (
-      <Modal open onDismiss={handleCloseModal} size="fullscreen" label={termsOfServiceText}>
+      <Modal
+        data-testid="tos-modal"
+        open
+        onDismiss={handleCloseModal}
+        size="fullscreen"
+        label={termsOfServiceText}
+      >
         <Modal.Body>{body}</Modal.Body>
       </Modal>
     )
@@ -144,6 +198,7 @@ export default function TermsOfServiceModal(props: TermsOfServiceModalProps): Re
   return (
     <span id="terms_of_service_modal">
       <Link
+        data-testid="tos-link"
         elementRef={setLinkRef}
         interaction={open ? 'disabled' : 'enabled'}
         href="#"

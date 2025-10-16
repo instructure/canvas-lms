@@ -18,9 +18,17 @@
 
 import React from 'react'
 import $ from 'jquery'
-import {render, screen} from '@testing-library/react'
+import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import TermsOfServiceModal from '../TermsOfServiceModal'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import {openWindow} from '@canvas/util/globalUtils'
+
+jest.mock('@canvas/do-fetch-api-effect', () => jest.fn())
+jest.mock('@canvas/util/globalUtils', () => {
+  const actual = jest.requireActual('@canvas/util/globalUtils')
+  return {...actual, openWindow: jest.fn()}
+})
 
 interface TermsOfServiceModalProps {
   preview?: boolean
@@ -31,6 +39,7 @@ const renderTermsOfServiceModal = (props: TermsOfServiceModalProps = {}) =>
 
 describe('TermsOfServiceModal', () => {
   beforeEach(() => {
+    jest.clearAllMocks()
     fakeENV.setup({
       TERMS_OF_SERVICE_CUSTOM_CONTENT: 'Hello World',
     })
@@ -38,19 +47,129 @@ describe('TermsOfServiceModal', () => {
   })
 
   afterEach(() => {
+    cleanup()
     $('#fixtures').empty()
     fakeENV.teardown()
   })
 
   it('renders correct link when preview is provided', () => {
     renderTermsOfServiceModal({preview: true})
-
     expect(screen.getByText('Preview')).toBeInTheDocument()
   })
 
   it('renders correct link when preview is not provided', () => {
     renderTermsOfServiceModal()
-
     expect(screen.getByText('Acceptable Use Policy')).toBeInTheDocument()
+  })
+
+  it('opens external url instead of modal when aup returns redirectUrl', async () => {
+    const mockDoFetchApi = doFetchApi as jest.MockedFunction<typeof doFetchApi>
+    const mockOpenWindow = openWindow as unknown as jest.Mock
+    mockDoFetchApi.mockResolvedValueOnce({
+      json: {redirectUrl: 'https://example.com/aup'},
+    } as any)
+    renderTermsOfServiceModal()
+    screen.getByTestId('tos-link').click()
+    // assert window open and no modal
+    await waitFor(() =>
+      expect(mockOpenWindow).toHaveBeenCalledWith(
+        'https://example.com/aup',
+        '_blank',
+        'noopener,noreferrer',
+      ),
+    )
+    expect(screen.queryByTestId('tos-modal')).toBeNull()
+  })
+
+  it('opens modal when aup returns inline content', async () => {
+    const mockDoFetchApi = doFetchApi as jest.MockedFunction<typeof doFetchApi>
+    const mockOpenWindow = openWindow as unknown as jest.Mock
+    mockDoFetchApi.mockResolvedValueOnce({
+      json: {content: '<p>Inline AUP</p>'},
+    } as any)
+    renderTermsOfServiceModal()
+    screen.getByTestId('tos-link').click()
+    // modal should appear
+    await waitFor(() => expect(screen.queryByTestId('tos-modal')).not.toBeNull())
+    expect(screen.getByText('Inline AUP')).toBeInTheDocument()
+    expect(mockOpenWindow).not.toHaveBeenCalled()
+  })
+
+  it('reuses cached redirectUrl on subsequent clicks without refetch', async () => {
+    const mockDoFetchApi = doFetchApi as jest.MockedFunction<typeof doFetchApi>
+    const mockOpenWindow = openWindow as unknown as jest.Mock
+    mockDoFetchApi.mockResolvedValueOnce({json: {redirectUrl: 'https://ex.com/aup'}} as any)
+    renderTermsOfServiceModal()
+    const link = screen.getByTestId('tos-link')
+    // first click fetches + opens
+    link.click()
+    await waitFor(() => expect(mockOpenWindow).toHaveBeenCalledTimes(1))
+    // second click should not refetch
+    link.click()
+    await waitFor(() => expect(mockOpenWindow).toHaveBeenCalledTimes(2))
+    expect(mockDoFetchApi).toHaveBeenCalledTimes(1)
+  })
+
+  it('reuses cached inline content on subsequent clicks without refetch', async () => {
+    const mockDoFetchApi = doFetchApi as jest.MockedFunction<typeof doFetchApi>
+    mockDoFetchApi.mockResolvedValueOnce({json: {content: '<p>Inline AUP</p>'}} as any)
+    renderTermsOfServiceModal()
+    const link = screen.getByTestId('tos-link')
+    // first open
+    link.click()
+    await waitFor(() => expect(screen.getByText('Inline AUP')).toBeInTheDocument())
+    expect(mockDoFetchApi).toHaveBeenCalledTimes(1)
+    // close modal
+    const closeWrapper = screen.getByTestId('instui-modal-close')
+    closeWrapper.querySelector('button')!.click()
+    await waitFor(() => expect(screen.queryByTestId('tos-modal')).toBeNull())
+    // second open uses cached content
+    link.click()
+    await waitFor(() => expect(screen.getByText('Inline AUP')).toBeInTheDocument())
+    expect(mockDoFetchApi).toHaveBeenCalledTimes(1)
+  })
+
+  it('silently fails and does not open modal when api returns invalid response', async () => {
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    const mockDoFetchApi = doFetchApi as jest.MockedFunction<typeof doFetchApi>
+    const mockOpenWindow = openWindow as unknown as jest.Mock
+    // return invalid response (missing content and redirectUrl)
+    mockDoFetchApi.mockResolvedValueOnce({json: {invalid: 'data'}} as any)
+    renderTermsOfServiceModal()
+    screen.getByTestId('tos-link').click()
+    // wait a bit to ensure nothing happens
+    await new Promise(resolve => setTimeout(resolve, 100))
+    // modal should not open
+    expect(screen.queryByTestId('tos-modal')).toBeNull()
+    // no window should open
+    expect(mockOpenWindow).not.toHaveBeenCalled()
+    // error should be logged
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      'Failed to load acceptable use policy:',
+      expect.any(Error),
+    )
+    consoleErrorSpy.mockRestore()
+  })
+
+  it('silently fails and does not open modal when api returns undefined', async () => {
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    const mockDoFetchApi = doFetchApi as jest.MockedFunction<typeof doFetchApi>
+    const mockOpenWindow = openWindow as unknown as jest.Mock
+    // return undefined (fetch error already logged)
+    mockDoFetchApi.mockResolvedValueOnce({json: undefined} as any)
+    renderTermsOfServiceModal()
+    screen.getByTestId('tos-link').click()
+    // wait a bit to ensure nothing happens
+    await new Promise(resolve => setTimeout(resolve, 100))
+    // modal should not open
+    expect(screen.queryByTestId('tos-modal')).toBeNull()
+    // no window should open
+    expect(mockOpenWindow).not.toHaveBeenCalled()
+    // error should be logged
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      'Failed to load acceptable use policy:',
+      expect.any(Error),
+    )
+    consoleErrorSpy.mockRestore()
   })
 })
