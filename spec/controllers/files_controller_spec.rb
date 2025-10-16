@@ -2434,6 +2434,15 @@ describe FilesController do
           end
         end
 
+        it "does not add a jti if the thumbnail is accessed with the avatar location (meaning it's a profile picture)" do
+          enable_cache do
+            user_session @teacher
+            token = get("image_thumbnail", params: { id: image.id, no_cache: true, location: "avatar_#{@teacher.id}" }).location.split("?token=")[1]
+            claims = Canvas::Security.decode_jwt(token, [InstFS.jwt_secret])
+            expect(claims["jti"]).not_to be_present
+          end
+        end
+
         it "returns a proper jwt token" do
           user_session @teacher
           token = get("image_thumbnail", params: { id: image.id, no_cache: true }).location.split("?token=")[1]

@@ -1650,8 +1650,9 @@ class FilesController < ApplicationController
       end
     end
 
-    thumb_opts = params.slice(:size, :location)
+    thumb_opts = { size: params[:size] }
     thumb_opts[:fallback_url] = @access_verifier[:fallback_url] if @access_verifier
+    thumb_opts[:no_jti] = authed && params[:location]&.include?("avatar")
     url = authenticated_thumbnail_url(attachment, options: thumb_opts) if attachment && authed
     if url && attachment.instfs_hosted? && file_location_mode?
       render_file_location(url)
@@ -1735,7 +1736,7 @@ class FilesController < ApplicationController
   end
 
   def strong_attachment_params
-    params.require(:attachment).permit(:display_name, :locked, :lock_at, :unlock_at, :uploaded_data, :hidden, :visibility_level)
+    params.require(:attachment).permit(:display_name, :locked, :lock_at, :unlock_at, :uploaded_data, :hidden, :visibility_level) # rubocop:disable Rails/StrongParametersExpect
   end
 
   def redirect_for_inline?(sf_verifier)
