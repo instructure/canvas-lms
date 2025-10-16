@@ -5262,6 +5262,7 @@ ready(function () {
       $('#conditional_release_target').get(0),
       I18n.t('quiz'),
       ENV.CONDITIONAL_RELEASE_ENV,
+      !!lockedItems.content,
     )
 
     $('#questions').on('change DOMNodeRemoved DOMNodeInserted', () => {

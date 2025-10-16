@@ -48,6 +48,14 @@ $disabled-text-color: $ic-color-medium;
     cursor: not-allowed;
     color: $disabled-text-color;
   }
+
+  .cr-condition-toggle__read-only & {
+    cursor: default;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }
 
 .cr-condition-toggle__or {

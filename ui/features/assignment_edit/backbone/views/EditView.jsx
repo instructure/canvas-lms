@@ -1338,6 +1338,7 @@ EditView.prototype.afterRender = function () {
       this.$conditionalReleaseTarget.get(0),
       I18n.t('assignment'),
       ENV.CONDITIONAL_RELEASE_ENV,
+      !!this.lockedItems.content,
     )
   }
   if (this.assignment.inClosedGradingPeriod()) {
