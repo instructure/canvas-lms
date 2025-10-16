@@ -79,7 +79,7 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
   end
 
   before do
-    course.enable_feature!(:peer_review_allocation_and_grading)
+    course.enable_feature!(:peer_review_grading)
   end
 
   describe "#initialize" do
@@ -239,10 +239,10 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
       end
 
       it "raises error when feature is disabled" do
-        course.disable_feature!(:peer_review_allocation_and_grading)
+        course.disable_feature!(:peer_review_grading)
         expect { service.call }.to raise_error(
           PeerReview::FeatureDisabledError,
-          "Peer Review Allocation and Grading feature flag is disabled"
+          "Peer Review Grading feature flag is disabled"
         )
       end
 

@@ -86,6 +86,8 @@ PeerReviewsSelector.prototype.afterRender = function () {
 
 PeerReviewsSelector.prototype.toJSON = function () {
   const frozenAttributes = this.parentModel.frozenAttributes()
+  const allocationEnabled = ENV.PEER_REVIEW_ALLOCATION_ENABLED
+  const gradingEnabled = ENV.PEER_REVIEW_GRADING_ENABLED
   return {
     anonymousPeerReviews: this.parentModel.anonymousPeerReviews(),
     peerReviews: this.parentModel.peerReviews(),
@@ -99,7 +101,7 @@ PeerReviewsSelector.prototype.toJSON = function () {
     hideAnonymousPeerReview: this.hideAnonymousPeerReview,
     hasGroupCategory: this.parentModel.groupCategoryId(),
     intraGroupPeerReviews: this.parentModel.intraGroupPeerReviews(),
-    allocationAndGradingEnabled: ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED,
+    allocationOrGradingEnabled: allocationEnabled || gradingEnabled,
   }
 }
 

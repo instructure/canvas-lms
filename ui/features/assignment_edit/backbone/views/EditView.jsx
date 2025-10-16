@@ -1505,7 +1505,7 @@ EditView.prototype.getFormData = function () {
   if ($grader_count.length > 0) {
     data.grader_count = numberHelper.parse($grader_count[0].value)
   }
-  if (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED) {
+  if (ENV.PEER_REVIEW_ALLOCATION_ENABLED) {
     const checkedInput = document.getElementById('assignment_peer_reviews_checkbox')
     data.peer_reviews = checkedInput?.checked
   }
@@ -2275,7 +2275,7 @@ EditView.prototype.renderModeratedGradingFormFieldGroup = function () {
     this.hideErrors('final_grader_id_errors')
   }
   let isPeerReviewEnabled
-  if (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED) {
+  if (ENV.PEER_REVIEW_ALLOCATION_ENABLED) {
     const peerReviewCheckbox = document.getElementById('assignment_peer_reviews_checkbox')
     if (peerReviewCheckbox) {
       isPeerReviewEnabled = peerReviewCheckbox.checked

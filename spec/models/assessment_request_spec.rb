@@ -357,7 +357,7 @@ describe AssessmentRequest do
 
     before :once do
       @assignment.update!(peer_reviews: true)
-      @assignment.context.enable_feature!(:peer_review_allocation_and_grading)
+      @assignment.context.enable_feature!(:peer_review_grading)
       peer_review_sub_assignment = PeerReviewSubAssignment.create!(parent_assignment: @assignment)
       @request.peer_review_sub_assignment = peer_review_sub_assignment
       @request.save!

@@ -43,7 +43,8 @@ const TeacherSavedView: React.FC<TeacherViewProps> = ({assignment, breakpoints =
         assignment={assignment}
         breakpoints={breakpoints}
       />
-      {ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED && assignment.peerReviews?.enabled ? (
+      {/* The main content of the saved view could go here */}
+      {ENV.PEER_REVIEW_ALLOCATION_ENABLED && assignment.peerReviews?.enabled ? (
         <AssignmentTabs assignment={assignment} />
       ) : (
         <AssignmentDetailsView description={assignment.description} />

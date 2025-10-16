@@ -2532,7 +2532,7 @@ describe AssignmentsApiController, type: :request do
 
     context "create_api_assignment: peer review sub assignment creation logic" do
       before do
-        @course.enable_feature!(:peer_review_allocation_and_grading)
+        @course.enable_feature!(:peer_review_grading)
         @group = @course.assignment_groups.create!(name: "test group")
       end
 
@@ -2656,7 +2656,7 @@ describe AssignmentsApiController, type: :request do
           end
 
           it "does not call create_api_peer_review_sub_assignment when feature is disabled" do
-            @course.disable_feature!(:peer_review_allocation_and_grading)
+            @course.disable_feature!(:peer_review_grading)
             assignment, assignment_params = build_peer_review_assignment(peer_review_params: { points_possible: 50 })
 
             expect_any_instance_of(Api::V1::Assignment).not_to receive(:create_api_peer_review_sub_assignment)
@@ -2816,7 +2816,7 @@ describe AssignmentsApiController, type: :request do
         end
 
         it "returns error message via HTTP API when peer review sub assignment creation fails" do
-          @course.enable_feature!(:peer_review_allocation_and_grading)
+          @course.enable_feature!(:peer_review_grading)
 
           allow_any_instance_of(Api::V1::Assignment).to receive(:create_api_peer_review_sub_assignment)
             .and_raise(PeerReview::PeerReviewError.new("Peer review sub assignment creation failed"))
@@ -2849,7 +2849,7 @@ describe AssignmentsApiController, type: :request do
       let(:test_object) { Object.new.extend(Api::V1::Assignment) }
 
       before do
-        course.enable_feature!(:peer_review_allocation_and_grading)
+        course.enable_feature!(:peer_review_grading)
       end
 
       context "with valid parameters" do
@@ -3260,12 +3260,12 @@ describe AssignmentsApiController, type: :request do
         let(:prepared_update) { { assignment: } }
 
         before do
-          course.enable_feature!(:peer_review_allocation_and_grading)
+          course.enable_feature!(:peer_review_grading)
           allow(test_object).to receive(:prepare_assignment_create_or_update).and_return(prepared_update.merge(valid: true))
           allow(SubmissionLifecycleManager).to receive(:recompute)
         end
 
-        context "when assignment update succeeds and peer review allocation and grading feature is enabled" do
+        context "when assignment update succeeds and peer review grading feature is enabled" do
           context "when assignment has existing peer review sub assignment" do
             let(:peer_review_sub_assignment) { double("peer_review_sub_assignment") }
 
@@ -3330,9 +3330,9 @@ describe AssignmentsApiController, type: :request do
           end
         end
 
-        context "when peer review allocation and grading feature is disabled" do
+        context "when peer review grading feature is disabled" do
           before do
-            course.disable_feature!(:peer_review_allocation_and_grading)
+            course.disable_feature!(:peer_review_grading)
             allow(test_object).to receive(:update_api_assignment_with_overrides).and_return(:ok)
           end
 
@@ -3606,7 +3606,7 @@ describe AssignmentsApiController, type: :request do
       let(:test_object) { Object.new.extend(Api::V1::Assignment) }
 
       before do
-        course.enable_feature!(:peer_review_allocation_and_grading)
+        course.enable_feature!(:peer_review_grading)
       end
 
       context "with valid parameters" do
@@ -8067,7 +8067,7 @@ describe AssignmentsApiController, type: :request do
 
       context "when include_peer_review is false" do
         it "does not include peer_review_sub_assignment in JSON" do
-          @course.enable_feature!(:peer_review_allocation_and_grading)
+          @course.enable_feature!(:peer_review_grading)
           PeerReviewSubAssignment.create!(
             title: "Peer Review Sub Assignment",
             context: @course,
@@ -8083,7 +8083,7 @@ describe AssignmentsApiController, type: :request do
 
       context "when include_peer_review is not provided" do
         it "does not include peer_review_sub_assignment" do
-          @course.enable_feature!(:peer_review_allocation_and_grading)
+          @course.enable_feature!(:peer_review_grading)
           PeerReviewSubAssignment.create!(
             title: "Peer Review Sub Assignment",
             context: @course,
@@ -8100,7 +8100,7 @@ describe AssignmentsApiController, type: :request do
       context "when include_peer_review is true" do
         context "when feature flag is disabled" do
           before do
-            @course.disable_feature!(:peer_review_allocation_and_grading)
+            @course.disable_feature!(:peer_review_grading)
           end
 
           it "does not include peer_review_sub_assignment in JSON" do
@@ -8112,7 +8112,7 @@ describe AssignmentsApiController, type: :request do
 
         context "when feature flag is enabled" do
           before do
-            @course.enable_feature!(:peer_review_allocation_and_grading)
+            @course.enable_feature!(:peer_review_grading)
           end
 
           context "when peer review sub assignment exists" do
