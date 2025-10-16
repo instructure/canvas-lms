@@ -67,9 +67,10 @@ development:
             secret: 6e4e7300bc30589203e95559e85bb823bfe71958edd7dc7dc28f0b78c0ce4eb4
             key_type: oct
       inst_fs:
+        # if you are using inst-cli you have to use this host instead:
+        # app_host: "http://inst-fs-api.<your INST_DOMAIN>"
         app_host: "http://api.inst-fs.docker"
-        # this is just "super-sekret-value", base64-encoded:
-        secret: "c3VwZXItc2VrcmV0LXZhbHVlCg=="
+        secret: "YXN0cmluZ3RoYXRpc2FjdHVhbGx5MzJieXRlc2xvbmc="
 #      linked_in_creds:
 #        api_key: <api_key>
 #        secret_key: <secret_key>
