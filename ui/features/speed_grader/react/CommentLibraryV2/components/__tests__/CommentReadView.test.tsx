@@ -32,6 +32,7 @@ describe('CommentReadView', () => {
     comment: 'This is a test comment',
     index: 0,
     onClick: jest.fn(),
+    setIsEditing: jest.fn(),
   }
 
   beforeEach(() => {
@@ -68,6 +69,23 @@ describe('CommentReadView', () => {
     it('renders DeleteCommentIconButton', () => {
       const {getByTestId} = renderWithMocks()
       expect(getByTestId('comment-library-delete-button-0')).toBeInTheDocument()
+    })
+
+    it('renders edit button with correct icon', () => {
+      const {getByTestId} = renderWithMocks()
+      expect(getByTestId('comment-library-edit-button-0')).toBeInTheDocument()
+    })
+
+    it('edit button has correct data-testid based on index', () => {
+      const {getByTestId} = renderWithMocks({index: 3})
+      expect(getByTestId('comment-library-edit-button-3')).toBeInTheDocument()
+    })
+
+    it('edit button has correct screen reader label with comment text', () => {
+      renderWithMocks({comment: 'Specific comment'})
+      expect(
+        screen.getByRole('button', {name: 'Edit comment: Specific comment'}),
+      ).toBeInTheDocument()
     })
   })
 
@@ -204,6 +222,47 @@ describe('CommentReadView', () => {
       const {getByTestId} = renderWithMocks({index: 3})
 
       expect(getByTestId('comment-library-item-use-button-3')).toBeInTheDocument()
+    })
+  })
+
+  describe('Edit Button Tests', () => {
+    it('clicking edit button calls setIsEditing with true', async () => {
+      const user = userEvent.setup()
+      const setIsEditing = jest.fn()
+
+      renderWithMocks({setIsEditing})
+
+      const editButton = screen.getByRole('button', {name: /Edit comment:/i})
+      await user.click(editButton)
+
+      expect(setIsEditing).toHaveBeenCalledTimes(1)
+      expect(setIsEditing).toHaveBeenCalledWith(true)
+    })
+
+    it('edit button is keyboard accessible with Enter key', async () => {
+      const user = userEvent.setup()
+      const setIsEditing = jest.fn()
+
+      renderWithMocks({setIsEditing})
+
+      const editButton = screen.getByRole('button', {name: /Edit comment:/i})
+      editButton.focus()
+      await user.keyboard('{Enter}')
+
+      expect(setIsEditing).toHaveBeenCalledWith(true)
+    })
+
+    it('edit button is keyboard accessible with Space key', async () => {
+      const user = userEvent.setup()
+      const setIsEditing = jest.fn()
+
+      renderWithMocks({setIsEditing})
+
+      const editButton = screen.getByRole('button', {name: /Edit comment:/i})
+      editButton.focus()
+      await user.keyboard(' ')
+
+      expect(setIsEditing).toHaveBeenCalledWith(true)
     })
   })
 })
