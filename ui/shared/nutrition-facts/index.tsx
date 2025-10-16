@@ -20,23 +20,37 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import ready from '@instructure/ready'
 import {captureException} from '@sentry/browser'
-import {NutritionFactsExternalRoot} from './react/types'
+import {AiInfo} from '@instructure.ai/aiinfo'
 import {NutritionFacts} from './react/NutritionFacts'
 
-const renderNutritionFacts = (elementId: string, props: NutritionFactsExternalRoot) => {
+const renderNutritionFacts = (elementId: string, feature: string) => {
   const node = document.getElementById(elementId)
   if (!node) {
-    throw new Error(`Could not find element with id ${elementId}`)
+    captureException(new Error(`Could not find element with id ${elementId}`))
+    return null
   }
+
+  const info = AiInfo[feature]
+  if (!info) {
+    captureException(new Error(`No nutrition facts data found for feature: ${feature}`))
+    return null
+  }
+
   const root = ReactDOM.createRoot(node)
-  root.render(<NutritionFacts {...props} />)
+  root.render(
+    <NutritionFacts
+      aiInformation={info.aiInformation}
+      dataPermissionLevels={info.dataPermissionLevels}
+      nutritionFacts={info.nutritionFacts}
+    />,
+  )
   return root
 }
 
-export const mountNutritionFacts = (props: NutritionFactsExternalRoot) => {
+export const mountNutritionFacts = (feature: string) => {
   ready(() => {
     try {
-      renderNutritionFacts('nutrition_facts_container', props)
+      renderNutritionFacts('nutrition_facts_container', feature)
     } catch (error) {
       captureException(error)
     }
