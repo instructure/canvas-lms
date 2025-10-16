@@ -3964,11 +3964,17 @@ he:
         goBackToInclude: "האם ברצנוך לחזור אחורנית כדי לכלול:"
         notAllSectionsAssigned: "פריט זה יוקצה לכל ההקבצות ."
     name_is_required: "דרוש שם!"
+    next: הבא
+    next_month: "החודש הבא"
+    next_week: "שבוע הבא"
     no_dates_error: "יש להגדיר לפחות תאריך וזמן אחד."
     no_groups: "לא נמצאו קבוצות"
     no_users: "לא נמצאו משתמשים"
     ok: OK
     open_appointment_on_this_day: "יש חלון פגישה פתוח ביום זה"
+    previous: קודם
+    previous_month: "החודש הקודם"
+    previous_week: "שבוע שעבר"
     prompts: 
       delete_assignment: "האם אתה בטוח שברצונך למחוק את המשימה?"
       delete_event: "האם אתה בטוח שאתה רוצה למחוק ארוע זה?"
@@ -13443,6 +13449,7 @@ he:
   next_month_749b1778: "החודש הבא"
   next_month_b55a387c: "חודש הבא"
   next_steps_ce0f0d0c: "הצעדים הבאים"
+  next_week_9df347b3: "שבוע הבא"
   nickname_1e6da3ad: "שם חיבה"
   nickname_7df95b09: "שם חיבה:"
   no_74e9b590: לא
@@ -14926,6 +14933,7 @@ he:
   previous_snapshots_d8cd4820: "צילומי מצב קודמים"
   previous_time_cc96b361: "קודם (%{time})"
   previous_timestamp_19343a58: "קודם (%{timestamp})"
+  previous_week_dddf1ef2: "שבוע שעבר"
   primary_brand_color_db79b428: "צבע מיתוג עיקרי"
   primary_button_3a98f4bc: "כפתור ראשי"
   primary_button_text_1f55d27b: "טקסט כפתור ראשי"

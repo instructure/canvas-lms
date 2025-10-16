@@ -4982,11 +4982,17 @@ fa:
         goBackToInclude: "مایلید برای شامل سازی برگردید؟"
         notAllSectionsAssigned: "این مورد به برخی بخش ها تخصیص داده نخواهد شد."
     name_is_required: "نام مورد نیاز است!"
+    next: Next
+    next_month: "ماه بعد"
+    next_week: "هفته بعدی"
     no_dates_error: "حداقل باید یک تاریخ و زمان تعیین کنید"
     no_groups: "گروهی یافت نشد"
     no_users: "کاربری یافت نشد"
     ok: تأیید
     open_appointment_on_this_day: "یک قرار ملاقات در این روز موجود است"
+    previous: Previous
+    previous_month: "ماه قبل"
+    previous_week: "هفته قبلی"
     prompts: 
       delete_assignment: "مطمئنید که می خواهید این تکلیف حذف شود؟"
       delete_event: "مطمئنید که می خواهید این رویداد حذف شود؟"
@@ -16540,6 +16546,7 @@ fa:
   next_steps_ce0f0d0c: "مراحل بعدی"
   next_student_79955068: "دانشجوی بعدی"
   next_student_b62869f4: "دانشجوی بعدی"
+  next_week_9df347b3: "هفته بعدی"
   nickname_1e6da3ad: "نام مستعار"
   nickname_7df95b09: "نام مستعار:"
   no_74e9b590: خیر
@@ -18383,6 +18390,7 @@ fa:
   previous_student_899a6732: "دانشجوی قبلی"
   previous_time_cc96b361: "(%{time}) قبلی"
   previous_timestamp_19343a58: "(%{timestamp}) قبلی"
+  previous_week_dddf1ef2: "هفته قبلی"
   primary_brand_color_db79b428: "رنگ نوع اصلی"
   primary_button_3a98f4bc: "دکمه اولیه"
   primary_button_text_1f55d27b: "متن رنگ اولیه"
