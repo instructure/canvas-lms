@@ -368,7 +368,7 @@ class AssignmentsController < ApplicationController
                        DUE_DATE_REQUIRED_FOR_ACCOUNT: AssignmentUtil.due_date_required_for_account?(@context),
                        ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
                        CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS),
-                       PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED: @context.feature_enabled?(:peer_review_allocation_and_grading),
+                       PEER_REVIEW_ALLOCATION_ENABLED: @context.feature_enabled?(:peer_review_allocation),
                        CAN_EDIT_ASSIGNMENTS: @context.grants_right?(@current_user, session, :manage_assignments_edit)
                      })
         set_section_list_js_env
@@ -919,7 +919,8 @@ class AssignmentsController < ApplicationController
           Account.site_admin.feature_enabled?(:grading_scheme_updates),
         ARCHIVED_GRADING_SCHEMES_ENABLED: Account.site_admin.feature_enabled?(:archived_grading_schemes),
         OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION: @context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation),
-        PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED: @context.feature_enabled?(:peer_review_allocation_and_grading)
+        PEER_REVIEW_ALLOCATION_ENABLED: @context.feature_enabled?(:peer_review_allocation),
+        PEER_REVIEW_GRADING_ENABLED: @context.feature_enabled?(:peer_review_grading)
       }
 
       if @context.root_account.feature_enabled?(:instui_nav)

@@ -1942,7 +1942,7 @@ describe Types::AssignmentType do
     let(:observer) { observer_in_course(course:, active_all: true).user }
 
     before do
-      course.enable_feature!(:peer_review_allocation_and_grading)
+      course.enable_feature!(:peer_review_allocation)
 
       @allocation_rule_1 = AllocationRule.create!(
         course:,
@@ -2028,7 +2028,7 @@ describe Types::AssignmentType do
 
     context "when feature flag is disabled" do
       before do
-        course.disable_feature!(:peer_review_allocation_and_grading)
+        course.disable_feature!(:peer_review_allocation)
       end
 
       it "returns nil even for teachers" do

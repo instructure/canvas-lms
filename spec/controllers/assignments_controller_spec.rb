@@ -2087,19 +2087,19 @@ describe AssignmentsController do
       end
     end
 
-    context "js_env PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED" do
-      it "sets PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED in js_env as true if enabled" do
+    context "js_env PEER_REVIEW_ALLOCATION_ENABLED" do
+      it "sets PEER_REVIEW_ALLOCATION_ENABLED in js_env as true if enabled" do
         user_session(@teacher)
-        @course.enable_feature!(:peer_review_allocation_and_grading)
+        @course.enable_feature!(:peer_review_allocation)
         get :show, params: { course_id: @course.id, id: @assignment.id }
-        expect(assigns[:js_env][:PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED]).to be(true)
+        expect(assigns[:js_env][:PEER_REVIEW_ALLOCATION_ENABLED]).to be(true)
       end
 
-      it "sets PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED in js_env as false if disabled" do
+      it "sets PEER_REVIEW_ALLOCATION_ENABLED in js_env as false if disabled" do
         user_session(@teacher)
-        @course.disable_feature!(:peer_review_allocation_and_grading)
+        @course.disable_feature!(:peer_review_allocation)
         get :show, params: { course_id: @course.id, id: @assignment.id }
-        expect(assigns[:js_env][:PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED]).to be(false)
+        expect(assigns[:js_env][:PEER_REVIEW_ALLOCATION_ENABLED]).to be(false)
       end
     end
 
@@ -3119,19 +3119,35 @@ describe AssignmentsController do
       end
     end
 
-    describe "js_env PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED" do
-      it "sets PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED in js_env as true if enabled" do
+    describe "js_env PEER_REVIEW_ALLOCATION_ENABLED" do
+      it "sets PEER_REVIEW_ALLOCATION_ENABLED in js_env as true if enabled" do
         user_session(@teacher)
-        @course.enable_feature!(:peer_review_allocation_and_grading)
+        @course.enable_feature!(:peer_review_allocation)
         get "edit", params: { course_id: @course.id, id: @assignment.id }
-        expect(assigns[:js_env][:PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED]).to be(true)
+        expect(assigns[:js_env][:PEER_REVIEW_ALLOCATION_ENABLED]).to be(true)
       end
 
-      it "sets PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED in js_env as false if disabled" do
+      it "sets PEER_REVIEW_ALLOCATION_ENABLED in js_env as false if disabled" do
         user_session(@teacher)
-        @course.disable_feature!(:peer_review_allocation_and_grading)
+        @course.disable_feature!(:peer_review_allocation)
         get "edit", params: { course_id: @course.id, id: @assignment.id }
-        expect(assigns[:js_env][:PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED]).to be(false)
+        expect(assigns[:js_env][:PEER_REVIEW_ALLOCATION_ENABLED]).to be(false)
+      end
+    end
+
+    describe "js_env PEER_REVIEW_GRADING_ENABLED" do
+      it "sets PEER_REVIEW_GRADING_ENABLED in js_env as true if enabled" do
+        user_session(@teacher)
+        @course.enable_feature!(:peer_review_grading)
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:PEER_REVIEW_GRADING_ENABLED]).to be(true)
+      end
+
+      it "sets PEER_REVIEW_GRADING_ENABLED in js_env as false if disabled" do
+        user_session(@teacher)
+        @course.disable_feature!(:peer_review_grading)
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:PEER_REVIEW_GRADING_ENABLED]).to be(false)
       end
     end
 
