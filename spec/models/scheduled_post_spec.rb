@@ -59,7 +59,8 @@ describe ScheduledPost do
           assignment: @assignment,
           post_policy: @post_policy,
           root_account_id: @root_account.id,
-          post_comments_at: future_time,
+          post_comments_at: past_time,
+          post_comments_ran_at: past_time,
           post_grades_at: past_time
         )
 
@@ -70,7 +71,6 @@ describe ScheduledPost do
 
         scheduled_post.reload
         expect(scheduled_post.post_grades_ran_at).not_to be_nil
-        expect(scheduled_post.post_comments_ran_at).to be_nil
       end
 
       it "processes comments when post_comments_at is in the past" do
@@ -180,6 +180,117 @@ describe ScheduledPost do
         expect(scheduled_post.post_comments_ran_at).not_to be_nil
         expect(scheduled_post.post_grades_ran_at).not_to be_nil
       end
+    end
+  end
+
+  describe "validations" do
+    describe "#post_grades_at_not_before_post_comments_at" do
+      it "allows post_grades_at to be the same as post_comments_at" do
+        time = 1.hour.from_now
+        scheduled_post = ScheduledPost.new(
+          assignment: @assignment,
+          post_policy: @post_policy,
+          root_account_id: @root_account.id,
+          post_comments_at: time,
+          post_grades_at: time
+        )
+        expect(scheduled_post).to be_valid
+      end
+
+      it "allows post_grades_at to be after post_comments_at" do
+        scheduled_post = ScheduledPost.new(
+          assignment: @assignment,
+          post_policy: @post_policy,
+          root_account_id: @root_account.id,
+          post_comments_at: 1.hour.from_now,
+          post_grades_at: 2.hours.from_now
+        )
+        expect(scheduled_post).to be_valid
+      end
+
+      it "does not allow post_grades_at to be before post_comments_at" do
+        scheduled_post = ScheduledPost.new(
+          assignment: @assignment,
+          post_policy: @post_policy,
+          root_account_id: @root_account.id,
+          post_comments_at: 2.hours.from_now,
+          post_grades_at: 1.hour.from_now
+        )
+        expect(scheduled_post).not_to be_valid
+        expect(scheduled_post.errors[:post_grades_at]).to include("must be the same as or after post_comments_at")
+      end
+    end
+  end
+
+  describe "#reset_ran_at_timestamps" do
+    let(:scheduled_post) do
+      ScheduledPost.create!(
+        assignment: @assignment,
+        post_policy: @post_policy,
+        root_account_id: @root_account.id,
+        post_comments_at: 1.hour.from_now,
+        post_grades_at: 2.hours.from_now
+      )
+    end
+
+    it "resets post_comments_ran_at when post_comments_at is updated" do
+      scheduled_post.update!(post_comments_ran_at: Time.current)
+      expect(scheduled_post.post_comments_ran_at).not_to be_nil
+
+      scheduled_post.update!(post_comments_at: 30.minutes.from_now)
+      expect(scheduled_post.post_comments_ran_at).to be_nil
+    end
+
+    it "resets post_grades_ran_at when post_grades_at is updated" do
+      scheduled_post.update!(post_grades_ran_at: Time.current)
+      expect(scheduled_post.post_grades_ran_at).not_to be_nil
+
+      scheduled_post.update!(post_grades_at: 4.hours.from_now)
+      expect(scheduled_post.post_grades_ran_at).to be_nil
+    end
+
+    it "resets both ran_at fields when both at fields are updated" do
+      scheduled_post.update!(
+        post_comments_ran_at: Time.current,
+        post_grades_ran_at: Time.current
+      )
+      expect(scheduled_post.post_comments_ran_at).not_to be_nil
+      expect(scheduled_post.post_grades_ran_at).not_to be_nil
+
+      scheduled_post.update!(
+        post_comments_at: 5.hours.from_now,
+        post_grades_at: 6.hours.from_now
+      )
+      expect(scheduled_post.post_comments_ran_at).to be_nil
+      expect(scheduled_post.post_grades_ran_at).to be_nil
+    end
+
+    it "does not reset post_comments_ran_at when post_comments_at is unchanged" do
+      run_time = Time.current
+      scheduled_post.update!(post_comments_ran_at: run_time)
+
+      scheduled_post.update!(post_grades_at: 7.hours.from_now)
+      expect(scheduled_post.post_comments_ran_at).to eq(run_time)
+    end
+
+    it "does not reset post_grades_ran_at when post_grades_at is unchanged" do
+      run_time = Time.current
+      scheduled_post.update!(post_grades_ran_at: run_time)
+
+      scheduled_post.update!(post_comments_at: 30.minutes.from_now)
+      expect(scheduled_post.post_grades_ran_at).to eq(run_time)
+    end
+
+    it "does not reset ran_at fields when other attributes are updated" do
+      run_time = Time.current
+      scheduled_post.update!(
+        post_comments_ran_at: run_time,
+        post_grades_ran_at: run_time
+      )
+
+      scheduled_post.touch
+      expect(scheduled_post.post_comments_ran_at).to eq(run_time)
+      expect(scheduled_post.post_grades_ran_at).to eq(run_time)
     end
   end
 end

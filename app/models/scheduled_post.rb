@@ -26,9 +26,27 @@ class ScheduledPost < ActiveRecord::Base
   validates :root_account_id, presence: true
   validates :post_comments_at, presence: true
   validates :post_grades_at, presence: true
+  validate :post_grades_at_not_before_post_comments_at
+
+  before_save :reset_ran_at_timestamps
 
   scope :pending_comments_posting, ->(time) { where(post_comments_ran_at: nil, post_comments_at: ..time) }
   scope :pending_grades_posting, ->(time) { where(post_grades_ran_at: nil, post_grades_at: ..time) }
+
+  def reset_ran_at_timestamps
+    return if new_record?
+
+    self.post_comments_ran_at = nil if will_save_change_to_post_comments_at?
+    self.post_grades_ran_at = nil if will_save_change_to_post_grades_at?
+  end
+
+  def post_grades_at_not_before_post_comments_at
+    return if post_grades_at.nil? || post_comments_at.nil?
+
+    if post_grades_at < post_comments_at
+      errors.add(:post_grades_at, "must be the same as or after post_comments_at")
+    end
+  end
 
   def should_post_comments_and_grades?
     post_comments_at.to_i == post_grades_at.to_i

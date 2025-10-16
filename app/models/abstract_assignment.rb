@@ -4293,7 +4293,7 @@ class AbstractAssignment < ActiveRecord::Base
     user_ids = submissions.pluck(:user_id)
 
     User.clear_cache_keys(user_ids, :submissions)
-    submissions.update_all(posted_at: nil, updated_at: Time.zone.now) unless skip_updating_timestamp
+    submissions.update_all(posted_at: nil, posted_comments_at: nil, updated_at: Time.zone.now) unless skip_updating_timestamp
     submissions.in_workflow_state("graded").each(&:assignment_muted_changed) unless skip_muted_changed
     course.refresh_content_participation_counts_for_users(user_ids) unless skip_content_participation_refresh
     hide_stream_items(submissions:)
