@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 7.3.0 - 2025-10-16
+
+### Added
+- Block Content Editor (BCE) support and improvements
+- Media Embed by URL functionality
+- A11y checker for block editor
+- User choices to improved Studio toolbar options
+- Feature flag for upcoming Studio embed improvements
+
+### Changed
+- Upgrade to InstUI 10.26.2
+- Unify image upload buttons
+- Adjust the text block footer
+- Remove documents from RCE's toolbar for BCE
+
+### Fixed
+- Prevent setState from TinyMCE events after unmount
+- Image upload modal for BCE
+- Revert Alert conditional rendering
+- Revert axios version upgrade
+
+### Removed
+- Remove crocodoc from canvas
+
+### Localization
+- Updated RCE translations for multiple locales
+
 ## 7.2.0 - 2025-08-21
 
 ### Added
