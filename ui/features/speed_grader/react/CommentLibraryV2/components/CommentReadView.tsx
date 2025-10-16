@@ -17,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Button, CondensedButton} from '@instructure/ui-buttons'
+import {Button, CondensedButton, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {useEffect, useRef, useState} from 'react'
@@ -26,6 +26,7 @@ import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-con
 import {Text} from '@instructure/ui-text'
 import shave from '@canvas/shave'
 import DeleteCommentIconButton from './DeleteCommentIconButton'
+import {IconEditLine} from '@instructure/ui-icons'
 
 const I18n = createI18nScope('CommentLibrary')
 
@@ -98,8 +99,16 @@ export type CommentReadViewProps = {
   comment: string
   index: number
   onClick: () => void
+  setIsEditing: (value: boolean) => void
 }
-const CommentReadView: React.FC<CommentReadViewProps> = ({comment, index, onClick, id}) => {
+const CommentReadView: React.FC<CommentReadViewProps> = ({
+  comment,
+  index,
+  onClick,
+  id,
+  setIsEditing,
+}) => {
+  const editButtonRef = useRef<Element | null>(null)
   const [isTruncated, setIsTruncated] = useState<boolean>(false)
   const [isExpanded, setIsExpanded] = useState(false)
 
@@ -124,6 +133,20 @@ const CommentReadView: React.FC<CommentReadViewProps> = ({comment, index, onClic
           <Flex as="div" direction="column">
             <Flex.Item as="div" padding="xx-small">
               <Flex as="div" justifyItems="center">
+                <IconButton
+                  screenReaderLabel={I18n.t('Edit comment: {{comment}}', {
+                    comment,
+                  })}
+                  renderIcon={IconEditLine}
+                  onClick={() => setIsEditing(true)}
+                  withBackground={false}
+                  withBorder={false}
+                  elementRef={el => {
+                    editButtonRef.current = el
+                  }}
+                  size="small"
+                  data-testid={`comment-library-edit-button-${index}`}
+                />
                 <DeleteCommentIconButton comment={comment} id={id} index={index} />
               </Flex>
             </Flex.Item>

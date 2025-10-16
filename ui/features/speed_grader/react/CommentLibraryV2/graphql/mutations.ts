@@ -44,3 +44,18 @@ export const SpeedGrader_DeleteCommentBankItem = gql`
     }
   }
 `
+
+export const SpeedGrader_UpdateCommentBankItem = gql`
+  mutation SpeedGrader_UpdateCommentBankItem($id: ID!, $comment: String!) {
+    updateCommentBankItem(input: {id: $id, comment: $comment}) {
+      commentBankItem {
+        id: _id
+        comment
+      }
+      errors {
+        attribute
+        message
+      }
+    }
+  }
+`
