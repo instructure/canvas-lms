@@ -161,6 +161,7 @@ const useTranslation = () => {
         setTranslationEnd(entryId, language, translatedMessage, translatedTitle)
       } catch (error: any) {
         // TODO: Fix any type
+        setTranslationEnd(entryId)
         if (error.translationError) {
           setTranslationError(entryId, error.translationError, language)
         } else {
@@ -173,7 +174,6 @@ const useTranslation = () => {
             language,
           )
         }
-        setTranslationEnd(entryId)
       }
     },
     [setTranslationEnd, setTranslationError, setTranslationStart, getTranslations],

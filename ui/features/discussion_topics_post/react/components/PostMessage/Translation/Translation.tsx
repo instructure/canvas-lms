@@ -192,7 +192,11 @@ interface ContentProps {
     title,
     message,
     targetLanguage,
-  }: {title: string | null; message: string | null; targetLanguage?: string}) => React.ReactNode
+  }: {
+    title: string | null
+    message: string | null
+    targetLanguage?: string
+  }) => React.ReactNode
 }
 
 const Content = ({children}: ContentProps) => {

@@ -157,7 +157,7 @@ const useTranslationStore = create<State & Actions>()(
             [entryId]: {
               ...state.entries[entryId],
               loading: false,
-              language,
+              language: language !== undefined ? language : state.entries[entryId]?.language,
               translatedMessage: translatedMessage || undefined,
               translatedTitle: translatedTitle || undefined,
             },
@@ -170,6 +170,7 @@ const useTranslationStore = create<State & Actions>()(
             ...state.entries,
             [entryId]: {
               ...state.entries[entryId],
+              loading: false,
               translatedMessage: undefined,
               translatedTitle: undefined,
               language,
