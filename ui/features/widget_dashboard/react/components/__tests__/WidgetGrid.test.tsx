@@ -132,17 +132,18 @@ describe('WidgetGrid', () => {
       // Widget 1: col 1, row 1
       const widget1Container = getByTestId('widget-container-widget-1')
       expect(indexInParent(widget1Container)).toBe(0) // row 1
-      expect(indexInParent(widget1Container.parentNode as HTMLElement)).toBe(0) // column 1
+      // With Flex components, we need to go up an extra level: widget-container -> inner Flex -> Flex.Item (column)
+      expect(indexInParent(widget1Container.parentNode!.parentNode as HTMLElement)).toBe(0) // column 1
 
       // Widget 2: col 2, row 1
       const widget2Container = getByTestId('widget-container-widget-2')
       expect(indexInParent(widget2Container)).toBe(0) // row 1
-      expect(indexInParent(widget2Container.parentNode as HTMLElement)).toBe(1) // column 2
+      expect(indexInParent(widget2Container.parentNode!.parentNode as HTMLElement)).toBe(1) // column 2
 
       // Widget 3: col 1, row 2
       const widget3Container = getByTestId('widget-container-widget-3')
       expect(indexInParent(widget3Container)).toBe(1) // row 2
-      expect(indexInParent(widget3Container.parentNode as HTMLElement)).toBe(0) // column 1
+      expect(indexInParent(widget3Container.parentNode!.parentNode as HTMLElement)).toBe(0) // column 1
     })
   })
 

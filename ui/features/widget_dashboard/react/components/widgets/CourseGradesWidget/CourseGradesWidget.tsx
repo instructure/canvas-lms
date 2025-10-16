@@ -21,7 +21,6 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Grid} from '@instructure/ui-grid'
-import {List} from '@instructure/ui-list'
 import {Checkbox} from '@instructure/ui-checkbox'
 import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import CourseGradeCard from './CourseGradeCard'
@@ -105,7 +104,7 @@ const CourseGradesWidget: React.FC<BaseWidgetProps> = ({widget}) => {
     >
       <Flex direction="column" height="100%">
         <Flex.Item shouldGrow shouldShrink height="auto">
-          <View as="div" overflowX="hidden" overflowY="visible" height="auto">
+          <View as="div" padding="xx-small">
             <Grid
               rowSpacing={COURSE_GRADES_WIDGET.GRID_ROW_SPACING}
               colSpacing={COURSE_GRADES_WIDGET.GRID_COL_SPACING}
@@ -141,14 +140,14 @@ const CourseGradesWidget: React.FC<BaseWidgetProps> = ({widget}) => {
                   ))}
                 </Grid.Row>
               ) : (
-                Array.from({length: 2}, (_, rowIndex) => (
+                Array.from({length: 3}, (_, rowIndex) => (
                   <Grid.Row key={`row-${rowIndex}`}>
                     {Array.from({length: COURSE_GRADES_WIDGET.GRID_COLUMNS}, (_, colIndex) => {
                       const gradeIndex = rowIndex * COURSE_GRADES_WIDGET.GRID_COLUMNS + colIndex
                       const grade = displayedGrades[gradeIndex]
 
                       return (
-                        <Grid.Col key={`col-${rowIndex}-${colIndex}`} width={4}>
+                        <Grid.Col key={`col-${rowIndex}-${colIndex}`} width={6}>
                           {grade && (
                             <CourseGradeCard
                               key={grade.courseId}

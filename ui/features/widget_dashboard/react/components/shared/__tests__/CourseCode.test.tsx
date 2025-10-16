@@ -68,28 +68,18 @@ const renderWithProvider = (ui: React.ReactElement, overrides = {}) => {
 
 describe('CourseCode', () => {
   describe('getCourseCodeColor', () => {
-    it('should return consistent colors based on grid index', () => {
-      const color1 = getCourseCodeColor(0)
-      const color2 = getCourseCodeColor(0)
+    it('should return consistent default color', () => {
+      const color1 = getCourseCodeColor()
+      const color2 = getCourseCodeColor()
       expect(color1).toEqual(color2)
     })
 
-    it('should return different colors for different grid indices', () => {
-      const color1 = getCourseCodeColor(0)
-      const color2 = getCourseCodeColor(1)
-      expect(color1).not.toEqual(color2)
-    })
-
-    it('should cycle through the palette', () => {
-      const color1 = getCourseCodeColor(0)
-      const color7 = getCourseCodeColor(6) // Should be same as index 0
-      expect(color1).toEqual(color7)
-    })
-
-    it('should use code hash when no grid index provided', () => {
-      const color1 = getCourseCodeColor(undefined, 'CS101')
-      const color2 = getCourseCodeColor(undefined, 'CS101')
-      expect(color1).toEqual(color2)
+    it('should return default neutral colors', () => {
+      const color = getCourseCodeColor()
+      expect(color).toHaveProperty('background')
+      expect(color).toHaveProperty('textColor')
+      expect(color.background).toBe('#E5E5E5')
+      expect(color.textColor).toBe('#2D3B45')
     })
   })
 

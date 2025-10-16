@@ -227,10 +227,10 @@ describe('CourseWorkCombinedWidget', () => {
     renderWithProviders(<CourseWorkCombinedWidget {...buildDefaultProps()} />)
 
     expect(screen.getByText('Course Work')).toBeInTheDocument()
-    expect(screen.getByText('Filter by course')).toBeInTheDocument()
 
-    // Wait for data to load
+    // Wait for data to load first, then check for filters
     await screen.findByText('Essay on Climate Change')
+    expect(screen.getByText('Course filter:')).toBeInTheDocument()
     expect(screen.getByText('Chapter 5 Quiz')).toBeInTheDocument()
     expect(screen.getByText('Discussion: Modern Art')).toBeInTheDocument()
     expect(screen.getByText('Lab Report: Chemical Reactions')).toBeInTheDocument()

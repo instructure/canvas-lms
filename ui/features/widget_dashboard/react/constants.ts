@@ -46,7 +46,7 @@ export const DEFAULT_WIDGET_CONFIG = {
       id: 'course-work-combined-widget',
       type: WIDGET_TYPES.COURSE_WORK_COMBINED,
       position: {col: 1, row: 1, relative: 1},
-      title: I18n.t('Course Work'),
+      title: I18n.t('Course work'),
     },
     {
       id: 'announcements-widget',
@@ -58,7 +58,7 @@ export const DEFAULT_WIDGET_CONFIG = {
       id: 'course-grades-widget',
       type: WIDGET_TYPES.COURSE_GRADES,
       position: {col: 1, row: 2, relative: 4},
-      title: I18n.t('Course Grades'),
+      title: I18n.t('Course grades'),
     },
     {
       id: 'people-widget',
@@ -73,7 +73,7 @@ export const DEFAULT_WIDGET_CONFIG = {
 export const COURSE_GRADES_WIDGET = {
   MAX_GRID_ITEMS: 6,
   // CARD_HEIGHT: '14rem',
-  GRID_COLUMNS: 3,
+  GRID_COLUMNS: 2,
   GRID_COL_SPACING: 'small',
   GRID_ROW_SPACING: 'small',
   DEFAULT_COURSE_CODE: 'N/A',

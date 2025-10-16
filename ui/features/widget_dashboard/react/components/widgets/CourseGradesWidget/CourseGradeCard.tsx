@@ -54,17 +54,20 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
       background="secondary"
       borderRadius="medium"
       borderColor="secondary"
-      padding="x-small"
+      padding="xx-small"
       width="100%"
+      height="100%"
       shadow="resting"
-      display="flex"
-      overflowX="hidden"
-      overflowY="hidden"
       role="listitem"
       aria-label={courseName}
     >
       <Flex direction="column" width="100%" height="100%">
-        <Flex.Item padding="0" margin="0 0 small 0" overflowX="visible" overflowY="visible">
+        <Flex.Item
+          padding="0"
+          margin="small 0 small xx-small"
+          overflowX="visible"
+          overflowY="visible"
+        >
           <CourseCode
             courseId={courseId}
             overrideCode={courseCode}
@@ -102,40 +105,42 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
           </Flex>
         </Flex.Item>
 
-        <Flex.Item width="100%" height="5rem">
-          <Flex direction="row" justifyItems="start" alignItems="center" height="100%">
-            <Flex.Item shouldGrow padding="0 0 0 xx-small">
-              <Button
-                color="secondary"
-                size="small"
-                onClick={handleToggleGrade}
-                aria-pressed={!isGradeVisible}
-                aria-label={
-                  isGradeVisible
-                    ? I18n.t('Hide grades for %{courseName}', {courseName})
-                    : I18n.t('Show grades for %{courseName}', {courseName})
-                }
-                data-testid={
-                  isGradeVisible
-                    ? `hide-single-grade-button-${courseId}`
-                    : `show-single-grade-button-${courseId}`
-                }
-              >
-                {isGradeVisible ? I18n.t('Hide grade') : I18n.t('Show grade')}
-              </Button>
-            </Flex.Item>
-            <Flex.Item>
-              {isGradeVisible && (
-                <Text size="xx-large" weight="bold" data-testid={`course-${courseId}-grade`}>
-                  {currentGrade !== null
-                    ? gradingScheme === 'percentage'
-                      ? `${Math.floor(currentGrade)}%`
-                      : convertToLetterGrade(currentGrade, gradingScheme)
-                    : 'N/A'}
-                </Text>
-              )}
-            </Flex.Item>
-          </Flex>
+        <Flex.Item width="100%" margin="medium 0 0 0">
+          <View as="div" borderWidth="small 0 0 0">
+            <Flex direction="row" justifyItems="start" alignItems="center" height="100%">
+              <Flex.Item shouldGrow padding="0 0 0 0">
+                <Button
+                  color="secondary"
+                  size="small"
+                  onClick={handleToggleGrade}
+                  aria-pressed={!isGradeVisible}
+                  aria-label={
+                    isGradeVisible
+                      ? I18n.t('Hide grades for %{courseName}', {courseName})
+                      : I18n.t('Show grades for %{courseName}', {courseName})
+                  }
+                  data-testid={
+                    isGradeVisible
+                      ? `hide-single-grade-button-${courseId}`
+                      : `show-single-grade-button-${courseId}`
+                  }
+                >
+                  {isGradeVisible ? I18n.t('Hide grade') : I18n.t('Show grade')}
+                </Button>
+              </Flex.Item>
+              <Flex.Item padding="0 x-small 0 0">
+                {isGradeVisible && (
+                  <Text size="xx-large" weight="bold" data-testid={`course-${courseId}-grade`}>
+                    {currentGrade !== null
+                      ? gradingScheme === 'percentage'
+                        ? `${Math.floor(currentGrade)}%`
+                        : convertToLetterGrade(currentGrade, gradingScheme)
+                      : 'N/A'}
+                  </Text>
+                )}
+              </Flex.Item>
+            </Flex>
+          </View>
         </Flex.Item>
       </Flex>
     </View>
