@@ -21,6 +21,7 @@ import {render, act} from '@testing-library/react'
 import App from '../App'
 
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashAlert: jest.fn(() => jest.fn(() => {})),
@@ -86,7 +87,7 @@ const initialApplicationState = inheritedList => {
     },
   }
 }
-const renderApp = ({ENV, inheritedList, ...overrides}) => {
+const renderApp = ({inheritedList, ...overrides}) => {
   const props = {
     applicationState: initialApplicationState(inheritedList),
     actions: {
@@ -129,8 +130,8 @@ describe('DeveloperKeys App', () => {
   let getAllByRole
   let queryByTestId
 
-  const setup = (ENV, inheritedList) => {
-    const wrapper = renderApp({ENV, inheritedList}).wrapper
+  const setup = inheritedList => {
+    const wrapper = renderApp({inheritedList}).wrapper
     getByText = wrapper.getByText
     queryByText = wrapper.queryByText
     getAllByRole = wrapper.getAllByRole
@@ -139,11 +140,52 @@ describe('DeveloperKeys App', () => {
     act(() => getByText('Inherited').click())
   }
 
+  beforeEach(() => {
+    fakeENV.setup()
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+  })
+
+  describe('alerts', () => {
+    it('shows info about new Apps page', () => {
+      setup([])
+      expect(getByText('LTI tool management is now live', {exact: false})).toBeInTheDocument()
+    })
+
+    describe('when user agent alert flag is disabled', () => {
+      beforeEach(() => {
+        fakeENV.setup({FEATURES: {developer_key_user_agent_alert: false}})
+      })
+
+      it('does not show user agent alert', () => {
+        setup([])
+        expect(
+          queryByText('API requests now require the User-Agent header', {exact: false}),
+        ).not.toBeInTheDocument()
+      })
+    })
+
+    describe('when user agent alert flag is enabled', () => {
+      beforeEach(() => {
+        fakeENV.setup({FEATURES: {developer_key_user_agent_alert: true}})
+      })
+
+      it('shows user agent alert', () => {
+        setup([])
+        expect(
+          getByText('API requests now require the User-Agent header', {exact: false}),
+        ).toBeInTheDocument()
+      })
+    })
+  })
+
   describe('inherited tab', () => {
     describe('when parent keys are present', () => {
       beforeEach(() => {
-        ENV = {FEATURES: {developer_key_page_checkboxes: true}}
-        setup(ENV, [...parentKeys, ...siteAdminKeys])
+        fakeENV.setup({FEATURES: {developer_key_page_checkboxes: true}})
+        setup([...parentKeys, ...siteAdminKeys])
       })
 
       it('renders Parent Keys heading', () => {
@@ -172,7 +214,7 @@ describe('DeveloperKeys App', () => {
 
     describe('when parent keys are not present', () => {
       beforeEach(() => {
-        setup({}, siteAdminKeys)
+        setup(siteAdminKeys)
       })
 
       it('does not render Parent Keys heading', () => {
@@ -193,9 +235,9 @@ describe('DeveloperKeys App', () => {
     jest.useFakeTimers()
     let ref
     beforeEach(() => {
-      const ENV = {FEATURES: {developer_key_page_checkboxes: true}}
+      fakeENV.setup({FEATURES: {developer_key_page_checkboxes: true}})
       const inheritedList = [...parentKeys, ...siteAdminKeys]
-      ref = renderApp({ENV, inheritedList}).ref
+      ref = renderApp({inheritedList}).ref
     })
 
     describe('with list of warnings', () => {

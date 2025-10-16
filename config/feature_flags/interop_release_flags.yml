@@ -57,6 +57,18 @@ custom_variables_booleans_as_strings:
       state: allowed_on
     ci:
       state: allowed_on
+developer_key_user_agent_alert:
+  state: hidden
+  display_name: Show User-Agent alert on Developer Keys page
+  description: |-
+    If enabled, the Developer Keys page will show an alert
+    about blocking requests that don't have the User-Agent header.
+  applies_to: SiteAdmin
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 disable_graphql_authentication:
   state: hidden
   display_name: Disable authentication for GraphQL
