@@ -743,8 +743,8 @@ export const handlers = [
       },
     }
 
-    if (variables.recipients.length > 0 && variables.contextCode) {
-      data.recipientsObservers = {
+    if (variables.recipientIds && variables.recipientIds.length > 0 && variables.contextCode) {
+      data.legacyNode.recipientsObservers = {
         nodes: [
           {
             id: 'TWVzc2FnZWFibGVVc2VyLTM',
@@ -753,6 +753,11 @@ export const handlers = [
             _id: '3',
           },
         ],
+        pageInfo: {
+          hasNextPage: false,
+          endCursor: null,
+          __typename: 'PageInfo',
+        },
       }
     }
     return HttpResponse.json({data})
