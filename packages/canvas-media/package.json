@@ -1,6 +1,6 @@
 {
   "name": "@instructure/canvas-media",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "description": "A component that will handle upload/record and displaying of media",
   "author": "Instructure, Inc.",
   "main": "es/index.js",
