@@ -5064,10 +5064,16 @@ hu:
       unregistered_users: "Felhasználók, akik nem iratkoztak még fel"
     messages_sent: "Üzenet elküldve"
     name_is_required: "A név megadása kötelező!"
+    next: Következő
+    next_month: "Következő hónap"
+    next_week: "Következő hét"
     no_dates_error: "Meg kell adnia legalább egy dátumot és időt"
     no_groups: "Nem találhatóak csoportok"
     no_users: "Nincsenek ilyen felhasználók"
     open_appointment_on_this_day: "Van egy nyitott megbeszélése ezen a napon"
+    previous: Előző
+    previous_month: "Előző hónap"
+    previous_week: "Előző hét"
     prompts: 
       delete_assignment: "Biztos benne, hogy törli ezt a feladatot?"
       delete_override: "Biztos benne, hogy törli ennek a feladatnak a felülbírálását?"
@@ -16999,6 +17005,7 @@ hu:
   next_student_b62869f4: "Következő hallgató"
   next_up_review_feedback_59555dbd: "KÖVETKEZIK: Visszajelzés"
   next_up_submit_assignment_2fdb7174: "KÖVETKEZIK: Feladat beküldése"
+  next_week_9df347b3: "Következő hét"
   next_window_window_90271943: "Következő ablak:%{window}"
   nickname_1e6da3ad: Becenév
   nightingale_student_activity_tracking_f7d7c4cf: "Nightingale Student Activity Nyomonkövetés"
@@ -19138,6 +19145,7 @@ hu:
   previous_snapshots_d8cd4820: "Előző képernyőképek"
   previous_student_46275eae: "Előző hallgató"
   previous_student_899a6732: "Előző hallgató"
+  previous_week_dddf1ef2: "Előző hét"
   primary_brand_color_db79b428: "A márka elsődleges színe"
   primary_button_3a98f4bc: "Elsődleges gomb"
   primary_button_text_1f55d27b: "Elsődleges gomb felirata"
