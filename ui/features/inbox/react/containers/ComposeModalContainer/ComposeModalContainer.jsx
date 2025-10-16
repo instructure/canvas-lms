@@ -37,9 +37,10 @@ import {
   SelectStrings,
 } from '@canvas/upload-media-translations'
 import {ConversationContext} from '../../../util/constants'
-import {useLazyQuery, useQuery} from '@apollo/client'
+import {useQuery} from '@apollo/client'
 import {RECIPIENTS_OBSERVERS_QUERY, INBOX_SETTINGS_QUERY} from '../../../graphql/Queries'
 import {TranslationContext, useTranslationContextState} from '../../hooks/useTranslationContext'
+import {useFetchAllPages} from '@canvas/apollo-v3/hooks/useFetchAllPages'
 
 const I18n = createI18nScope('conversations_2')
 
@@ -95,7 +96,9 @@ const ComposeModalContainer = props => {
       loading: recipientsObserversDataLoading,
       error: recipientsObserversError,
     },
-  ] = useLazyQuery(RECIPIENTS_OBSERVERS_QUERY)
+  ] = useFetchAllPages(RECIPIENTS_OBSERVERS_QUERY, {
+    getPageInfo: data => data?.legacyNode?.recipientsObservers?.pageInfo,
+  })
 
   useEffect(() => {
     if (recipientsObserversError) {
