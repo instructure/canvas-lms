@@ -19,14 +19,18 @@
 import React from 'react'
 import {AiInformation} from '@instructure/ui-instructure'
 import {IconButton} from '@instructure/ui-buttons'
-import {NutritionFactsExternalRoot} from './types'
 import {STATIC_TEXT} from './constants'
 import {NutritionFactsIcon} from './NutritionFactsIcon'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {NutritionFactsProps} from './types'
 
 const I18n = createI18nScope('nutrition_facts')
 
-export const NutritionFacts: React.FC<NutritionFactsExternalRoot> = props => {
+export const NutritionFacts: React.FC<NutritionFactsProps> = ({
+  aiInformation,
+  dataPermissionLevels,
+  nutritionFacts,
+}) => {
   return (
     <AiInformation
       fullscreenModals={false}
@@ -43,11 +47,11 @@ export const NutritionFacts: React.FC<NutritionFactsExternalRoot> = props => {
         </IconButton>
       }
       {...STATIC_TEXT}
-      data={[{...props.AiInformation}]}
-      dataPermissionLevelsData={props.dataPermissionLevels}
-      nutritionFactsData={props.nutritionFacts.data}
-      dataPermissionLevelsCurrentFeature={props.name}
-      nutritionFactsFeatureName={props.name}
+      data={aiInformation.data}
+      dataPermissionLevelsData={dataPermissionLevels.data}
+      nutritionFactsData={nutritionFacts.data}
+      dataPermissionLevelsCurrentFeature={nutritionFacts.featureName}
+      nutritionFactsFeatureName={nutritionFacts.featureName}
     />
   )
 }

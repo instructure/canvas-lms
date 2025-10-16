@@ -5,5 +5,8 @@
   "author": "collaboration",
   "main": "./index.tsx",
   "module": "./index.tsx",
-  "owner": "CFA"
+  "owner": "CFA",
+  "dependencies": {
+    "@instructure.ai/aiinfo": "^2.0.0"
+  }
 }
