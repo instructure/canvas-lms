@@ -44,6 +44,7 @@ const StatisticsCard: React.FC<StatisticsCardProps> = ({count, label, background
       themeOverride={{
         backgroundPrimary: backgroundColor,
       }}
+      data-testid={`statistics-card-${label}`}
     >
       <Text size="x-large" weight="bold">
         {formatCount(count)}

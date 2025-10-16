@@ -37,7 +37,13 @@ export function CourseWorkItem({item}: CourseWorkItemProps) {
   const {isMobile} = useResponsiveContext()
 
   return (
-    <Flex.Item key={item.id} overflowY="hidden" role="group" aria-label={item.title}>
+    <Flex.Item
+      key={item.id}
+      overflowY="hidden"
+      role="group"
+      aria-label={item.title}
+      data-testid={`listed-course-work-item-${item.id}`}
+    >
       <View as="div" margin="small" background="primary">
         <Flex
           gap="small"
@@ -93,6 +99,7 @@ export function CourseWorkItem({item}: CourseWorkItemProps) {
               padding="x-small"
               display="inline-block"
               themeOverride={{backgroundPrimary: submissionStatus.color.background}}
+              data-testid={`${submissionStatus.type}-status-pill-${item.id}`}
             >
               <Flex gap="xx-small" alignItems="center">
                 {submissionStatus.icon && (
