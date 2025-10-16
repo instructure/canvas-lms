@@ -195,7 +195,7 @@ export const saveRubric = async (
     body: qs.stringify({
       _method: method,
       rubric: {
-        title,
+        title: title.trim(),
         hide_points: hidePoints,
         free_form_criterion_comments: freeFormCriterionComments ? 1 : 0,
         criteria,

@@ -131,26 +131,42 @@ export const RubricForm = ({
 
   const criteriaRef = useRef(rubricForm.criteria)
 
+  const validateField = useCallback(
+    <K extends keyof RubricFormProps>(key: K, value: RubricFormProps[K]): boolean => {
+      if (key === 'title') {
+        const titleString = value?.toString() ?? ''
+        const trimmedTitle = titleString.trim()
+        const isTitleEmpty = trimmedTitle.length === 0
+        const isTitleTooLong = trimmedTitle.length > 255
+        const isTitleValid = !isTitleEmpty && !isTitleTooLong
+        let message = undefined
+
+        if (isTitleEmpty) {
+          message = I18n.t('Rubric requires a name')
+        } else if (isTitleTooLong) {
+          message = I18n.t('The Rubric Name must be between 1 and 255 characters.')
+        }
+
+        setValidationErrors(prevState => ({
+          ...prevState,
+          [key]: {message},
+        }))
+        if (!isTitleValid) {
+          return false
+        }
+      }
+      return true
+    },
+    [],
+  )
+
   const setRubricFormField = useCallback(
     <K extends keyof RubricFormProps>(key: K, value: RubricFormProps[K]) => {
       setRubricForm(prevState => ({...prevState, [key]: value}))
 
-      const validateField = (key: K, value: RubricFormProps[K]): void => {
-        if (key === 'title') {
-          const messageValidation =
-            typeof value === 'string' && value.trim().length > 0 && value.length <= 255
-          const message = messageValidation
-            ? undefined
-            : I18n.t('The Rubric Name must be between 1 and 255 characters.')
-          setValidationErrors(prevState => ({
-            ...prevState,
-            [key]: {message},
-          }))
-        }
-      }
       validateField(key, value)
     },
-    [setRubricForm],
+    [validateField],
   )
 
   const isAIRubricsAvailable = aiRubricsEnabled && isNewRubric && hasAssignment
@@ -253,11 +269,19 @@ export const RubricForm = ({
   }
 
   const handleSaveAsDraft = () => {
+    if (!validateField('title', rubricForm.title)) {
+      return
+    }
+
     setRubricFormField('workflowState', 'draft')
     saveRubricMutation()
   }
 
   const handleSave = (skipUpdatingPointsPossible?: boolean) => {
+    if (!validateField('title', rubricForm.title)) {
+      return
+    }
+
     if (skipUpdatingPointsPossible !== undefined) {
       setRubricFormField('skipUpdatingPointsPossible', skipUpdatingPointsPossible)
     }
@@ -354,8 +378,10 @@ export const RubricForm = ({
               <TextInput
                 data-testid="rubric-form-title"
                 renderLabel={I18n.t('Rubric Name')}
+                onBlur={e => validateField('title', e.target.value)}
                 onChange={e => setRubricFormField('title', e.target.value)}
                 value={rubricForm.title}
+                isRequired
                 messages={[
                   validationErrors.title?.message
                     ? {text: validationErrors.title.message, type: 'error'}
