@@ -13211,7 +13211,7 @@ describe Assignment do
         assignment: @assignment,
         post_policy: @post_policy,
         root_account_id: @course.root_account.id,
-        post_comments_at: 5.minutes.ago,
+        post_comments_at: 15.minutes.ago,
         post_grades_at: 10.minutes.ago
       )
 
@@ -13271,7 +13271,7 @@ describe Assignment do
         assignment: @assignment,
         post_policy: @post_policy,
         root_account_id: @course.root_account.id,
-        post_comments_at: 5.minutes.ago,
+        post_comments_at: 15.minutes.ago,
         post_grades_at: run_at
       )
 
