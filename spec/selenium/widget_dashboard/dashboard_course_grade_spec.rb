@@ -25,7 +25,7 @@ describe "student dashboard Course grade widget", :ignore_js_errors do
 
   before :once do
     dashboard_student_setup # Creates 2 courses and a student enrolled in both
-    dashboard_course_assignment_setup # Add one more teacher and TA to course 1
+    dashboard_course_assignment_setup # Add 11 assignments
     dashboard_course_submission_setup
     dashboard_course_grade_setup
     set_widget_dashboard_flag(feature_status: true)

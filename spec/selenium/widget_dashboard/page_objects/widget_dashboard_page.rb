@@ -100,6 +100,34 @@ module WidgetDashboardPage
   def course_grade_text_selector(course_id)
     "[data-testid='course-#{course_id}-grade']"
   end
+
+  def course_work_summary_stats_selector(label)
+    "[data-testid='statistics-card-#{label}']"
+  end
+
+  def course_work_course_filter_select_selector
+    "[data-testid='course-filter-select']"
+  end
+
+  def course_work_date_filter_select_selector
+    "[data-testid='date-filter-select']"
+  end
+
+  def course_work_item_selector(item_id)
+    "[data-testid='listed-course-work-item-#{item_id}']"
+  end
+
+  def course_work_item_link_selector(item_id)
+    "[data-testid='course-work-item-link-#{item_id}']"
+  end
+
+  def course_work_item_pill_selector(status_label, item_id)
+    "[data-testid='#{status_label}-status-pill-#{item_id}']"
+  end
+
+  def no_course_work_message_selector
+    "[data-testid='no-course-work-message']"
+  end
   #------------------------------ Elements ------------------------------
 
   def announcement_filter
@@ -194,6 +222,30 @@ module WidgetDashboardPage
     ff("[data-testid*='hide-single-grade-button-']")
   end
 
+  def course_work_summary_stats(label)
+    f(course_work_summary_stats_selector(label))
+  end
+
+  def all_course_work_items
+    ff("[data-testid*='listed-course-work-item-']")
+  end
+
+  def course_work_item(item_id)
+    f(course_work_item_selector(item_id))
+  end
+
+  def course_work_item_link(item_id)
+    f(course_work_item_link_selector(item_id))
+  end
+
+  def course_work_item_pill(status_label, item_id)
+    f(course_work_item_pill_selector(status_label, item_id))
+  end
+
+  def no_course_work_message
+    f(no_course_work_message_selector)
+  end
+
   #------------------------------ Actions -------------------------------
 
   def dashboard_student_setup
@@ -233,8 +285,8 @@ module WidgetDashboardPage
   end
 
   def dashboard_course_assignment_setup
-    @due_graded_discussion = @course1.assignments.create!(name: "Course 1: due_graded_discussion", points_possible: "10", due_at: 1.day.from_now, submission_types: "discussion_topic")
-    @due_assignment = @course1.assignments.create!(name: "Course 1: due_assignment", points_possible: "10", due_at: 6.days.from_now, submission_types: "online_text_entry")
+    @due_graded_discussion = @course1.assignments.create!(name: "Course 1: due_graded_discussion", points_possible: "10", due_at: 6.days.from_now, submission_types: "discussion_topic")
+    @due_assignment = @course1.assignments.create!(name: "Course 1: due_assignment", points_possible: "10", due_at: 1.day.from_now, submission_types: "online_text_entry")
     @due_quiz = @course1.assignments.create!(title: "Course 1: due_quiz", points_possible: "10", due_at: 13.days.from_now, submission_types: "online_quiz")
 
     @missing_graded_discussion = @course1.assignments.create!(name: "Course 1: missing_graded_discussion", points_possible: "10", due_at: 2.days.ago, submission_types: "discussion_topic")
@@ -243,7 +295,6 @@ module WidgetDashboardPage
 
     @graded_discussion = @course1.assignments.create!(name: "Course 1: graded_discussion", points_possible: "10", due_at: 5.days.ago, submission_types: "discussion_topic")
     @graded_assignment = @course2.assignments.create!(name: "Course 2: graded_assignment", points_possible: "10", due_at: 3.days.ago, submission_types: "online_text_entry")
-    @graded_quiz = @course2.quizzes.create!(title: "Course 2: graded_quiz", points_possible: "10", due_at: 1.day.from_now, quiz_type: "assignment")
 
     @submitted_discussion = @course2.assignments.create!(name: "Course 2: submitted_discussion", points_possible: "10", due_at: 2.days.ago, submission_types: "discussion_topic")
     @submitted_assignment = @course1.assignments.create!(name: "Course 1: submitted_assignment", points_possible: "10", due_at: 1.day.from_now, submission_types: "online_text_entry")
@@ -274,6 +325,16 @@ module WidgetDashboardPage
   def filter_announcements_list_by(status)
     announcement_filter.click
     click_INSTUI_Select_option(announcement_filter_select, status)
+  end
+
+  def filter_course_work_by(filter_type, filter_value)
+    case filter_type
+    when :course
+      click_INSTUI_Select_option(course_work_course_filter_select_selector, filter_value)
+    when :date
+      click_INSTUI_Select_option(course_work_date_filter_select_selector, filter_value)
+    end
+    wait_for_ajaximations
   end
 
   def go_to_dashboard
