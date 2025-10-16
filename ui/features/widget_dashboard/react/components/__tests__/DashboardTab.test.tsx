@@ -246,7 +246,7 @@ describe('DashboardTab', () => {
     const {getByText, cleanup} = setup()
 
     await waitFor(() => {
-      expect(getByText('Course Work')).toBeInTheDocument()
+      expect(getByText('Course work')).toBeInTheDocument()
     })
 
     cleanup()

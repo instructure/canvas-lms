@@ -24,6 +24,7 @@ import {Responsive} from '@instructure/ui-responsive'
 import type {Widget, WidgetConfig} from '../types'
 import {getWidget} from './WidgetRegistry'
 import {ResponsiveProvider} from '../hooks/useResponsiveContext'
+import {Flex} from '@instructure/ui-flex'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -56,14 +57,17 @@ const sortWidgetsForStacking = (widgets: Widget[]): Widget[] => {
 }
 
 const widgetsAsColumns = (widgets: Widget[]): Widget[][] => {
-  const inColumns = widgets.reduce((acc, val) => {
-    const column = val.position.col || 1
-    acc[column - 1].push(val)
-    return acc
-  }, [[] as Widget[], [] as Widget[]] as Widget[][])
+  const inColumns = widgets.reduce(
+    (acc, val) => {
+      const column = val.position.col || 1
+      acc[column - 1].push(val)
+      return acc
+    },
+    [[] as Widget[], [] as Widget[]] as Widget[][],
+  )
 
   inColumns.forEach((column, idx) => {
-    inColumns[idx] = column.sort((a, b) => a.position.row = b.position.row)
+    inColumns[idx] = column.sort((a, b) => a.position.row - b.position.row)
   })
 
   return inColumns
@@ -91,71 +95,41 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config}) => {
   }
 
   const renderWidgetInView = (widget: Widget, key?: string) => (
-    <div
-      key={key || widget.id}
-      data-testid={`widget-container-${widget.id}`}
-      style={{ marginBottom: '1rem' }}
-    >
-      <View height="100%" style={{overflow: 'hidden'}}>
-        {renderWidget(widget)}
-      </View>
-    </div>
+    <Flex.Item key={key || widget.id} data-testid={`widget-container-${widget.id}`}>
+      {renderWidget(widget)}
+    </Flex.Item>
   )
 
   const renderDesktopGrid = () => (
-    <div
-      data-testid="widget-columns"
-      style={{
-        width: '100%',
-        overflow: 'visible',
-        display: 'flex'
-      }}
-    >
-      <div
-        data-testid="widget-column-1"
-        style={{
-          flexGrow: 2,
-          marginRight: '1rem',
-        }}
-      >
-        {widgetsByColumn[0].map(widget => (
-          <div
-            key={widget.id}
-            data-testid={`widget-container-${widget.id}`}
-            style={{
-              marginBottom: '1rem'
-            }}
-          >
-            <View height="100%" style={{overflow: 'hidden'}}>
+    <Flex data-testid="widget-columns" direction="row" gap="x-small" alignItems="start">
+      <Flex.Item shouldGrow shouldShrink width="66%">
+        <Flex direction="column" gap="x-small" data-testid="widget-column-1" width="100%">
+          {widgetsByColumn[0].map(widget => (
+            <Flex.Item key={widget.id} data-testid={`widget-container-${widget.id}`}>
               {renderWidget(widget)}
-            </View>
-          </div>
-        ))}
-      </div>
-      <div
-        data-testid="widget-column-1"
-        style={{
-          flexGrow: 1
-        }}
-      >
-        {widgetsByColumn[1].map(widget => (renderWidgetInView(widget)))}
-      </div>
-    </div>
+            </Flex.Item>
+          ))}
+        </Flex>
+      </Flex.Item>
+      <Flex.Item shouldGrow shouldShrink width="33%">
+        <Flex direction="column" gap="x-small" data-testid="widget-column-2" width="100%">
+          {widgetsByColumn[1].map(widget => renderWidgetInView(widget))}
+        </Flex>
+      </Flex.Item>
+    </Flex>
   )
 
   const renderTabletStack = () => (
-    <div
-      data-testid="widget-columns"
-      style={{
-        width: '100%',
-        overflow: 'visible',
-        display: 'flex'
-      }}
-    >
-      <div data-testid="widget-column-tablet">
-        {sortedWidgets.map((widget) => renderWidgetInView(widget))}
-      </div>
-    </div>
+    <Flex data-testid="widget-columns" width="100%">
+      <Flex.Item
+        data-testid="widget-column-tablet"
+        overflowX="visible"
+        overflowY="visible"
+        width="100%"
+      >
+        {sortedWidgets.map(widget => renderWidgetInView(widget))}
+      </Flex.Item>
+    </Flex>
   )
 
   const renderMobileStack = renderTabletStack

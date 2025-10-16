@@ -126,7 +126,7 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
     >
       <Flex direction="column" height="100%">
         <Flex.Item shouldGrow>
-          <View as="div" padding="small 0">
+          <View as="div" padding="0">
             {instructors.length === 0 ? (
               <Text color="secondary">{I18n.t('No instructors found')}</Text>
             ) : (
