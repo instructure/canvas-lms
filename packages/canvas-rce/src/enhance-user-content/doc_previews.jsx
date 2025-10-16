@@ -143,6 +143,10 @@ export function loadDocPreview($container, options) {
     }
   }
 
+  const iframeAriaLabel = opts.attachment_name
+    ? formatMessage('File preview for {fileName}', {fileName: opts.attachment_name})
+    : formatMessage('File preview')
+
   if (opts.canvadoc_session_url) {
     const canvadocWrapper = document.createElement('div')
     canvadocWrapper.setAttribute(
@@ -154,10 +158,12 @@ export function loadDocPreview($container, options) {
     const minHeight = opts.iframe_min_height !== undefined ? opts.iframe_min_height : '800px'
     const sanitizedUrl = sanitizeUrl(opts.canvadoc_session_url)
     const iframe = document.createElement('iframe')
+
     iframe.addEventListener('load', () => {
       tellAppIViewedThisInline('canvadocs')
       if (typeof opts.ready === 'function') opts.ready()
     })
+    iframe.setAttribute('aria-label', iframeAriaLabel)
     iframe.setAttribute('src', sanitizedUrl)
     iframe.setAttribute('width', opts.width)
     iframe.setAttribute('allowfullscreen', '1')
@@ -188,6 +194,7 @@ export function loadDocPreview($container, options) {
         iframe.setAttribute('src', googleDocPreviewUrl)
         iframe.setAttribute('height', opts.height)
         iframe.setAttribute('width', '100%')
+        iframe.setAttribute('aria-label', iframeAriaLabel)
         $container.appendChild(iframe)
       }
     }

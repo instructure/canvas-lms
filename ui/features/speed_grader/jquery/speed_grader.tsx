@@ -3413,6 +3413,7 @@ EG = {
       id: 'speedgrader_iframe',
       mimeType: attachment.content_type,
       attachment_id: attachment.id,
+      attachment_name: attachment.display_name,
       // @ts-expect-error
       submission_id: this.currentStudent.submission.id,
       attachment_view_inline_ping_url: attachment.view_inline_ping_url,

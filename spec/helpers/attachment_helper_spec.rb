@@ -36,6 +36,12 @@ describe AttachmentHelper do
     expect(attrs).to match(/#{@att.id}/)
   end
 
+  it "includes attachment name for iframe's aria-label" do
+    @current_user = @student
+    attrs = doc_preview_attributes(@att)
+    expect(attrs).to match(/data-attachment_name="#{@att.name}"/)
+  end
+
   it "includes anonymous_instructor_annotations in canvadoc url" do
     @current_user = @teacher
     allow(@att).to receive(:canvadocable?).and_return(true)
