@@ -263,10 +263,15 @@ export default class FilePreview extends React.PureComponent {
     const sandbox = classnames('allow-same-origin', 'allow-downloads', {
       'allow-scripts': !html || FLAMEGRAPH_FOLDER_REGEX.test(this.props.splat),
     })
+    const ariaLabel = item.get('display_name')
+      ? I18n.t('File Preview for %{fileName}', {fileName: item.get('display_name')})
+      : I18n.t('File Preview')
+
     return (
       <iframe
         allowFullScreen={true}
         title={I18n.t('File Preview')}
+        aria-label={ariaLabel}
         src={item.get('preview_url')}
         className={iFrameClasses}
         {...(disableSandboxing ? {} : {sandbox})}
