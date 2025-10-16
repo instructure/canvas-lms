@@ -294,6 +294,7 @@ export type SiteAdminFeatureId =
   | 'courses_popout_sisid'
   | 'create_external_apps_side_tray_overrides'
   | 'dashboard_graphql_integration'
+  | 'developer_key_user_agent_alert'
   | 'enhanced_course_creation_account_fetching'
   | 'explicit_latex_typesetting'
   | 'files_a11y_rewrite'
