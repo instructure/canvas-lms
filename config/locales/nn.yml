@@ -5626,11 +5626,15 @@ nn:
         goBackToInclude: "Vil du gå tilbake og inkludere:"
         notAllSectionsAssigned: "Ikkje alle klassene blir tildelte dette elementet."
     name_is_required: "Namn er obligatorisk!"
+    next: Neste
+    next_month: "Neste månad"
     no_dates_error: "Du må oppgi minst ein dato og eit tidspunkt"
     no_groups: "Finn ingen grupper"
     no_users: "Finn ingen brukarar"
     ok: OK
     open_appointment_on_this_day: "Det er ein open avtale denne dagen"
+    previous: Førre
+    previous_month: "Førre månad"
     prompts: 
       delete_assignment: "Er du sikker på at du vil slette denne oppgåva?"
       delete_event: "Er du sikker på at du vil slette denne hendinga?"
