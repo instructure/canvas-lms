@@ -95,8 +95,7 @@ export const CourseCode: React.FC<CourseCodeProps> = ({
       }
     }
 
-    const code = overrideCode || courseData?.courseCode
-    return getCourseCodeColor(gridIndex, code)
+    return getCourseCodeColor()
   }, [
     overrideColor,
     overrideCode,

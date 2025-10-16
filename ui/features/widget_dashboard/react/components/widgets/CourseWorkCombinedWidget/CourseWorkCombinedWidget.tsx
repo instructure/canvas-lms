@@ -133,17 +133,19 @@ const CourseWorkCombinedWidget: React.FC<BaseWidgetProps> = ({
         isLoading: courseWorkLoading,
         ariaLabel: I18n.t('Course work pagination'),
       }}
-      headerActions={
-        <CourseWorkFilters
-          selectedCourse={selectedCourse}
-          selectedDateFilter={selectedDateFilter}
-          onCourseChange={handleCourseChange}
-          onDateFilterChange={handleDateFilterChange}
-          userCourses={userCourses}
-        />
-      }
     >
       <Flex direction="column" gap="small" height="100%">
+        {/* Filters Section */}
+        <Flex.Item overflowX="visible" overflowY="visible">
+          <CourseWorkFilters
+            selectedCourse={selectedCourse}
+            selectedDateFilter={selectedDateFilter}
+            onCourseChange={handleCourseChange}
+            onDateFilterChange={handleDateFilterChange}
+            userCourses={userCourses}
+          />
+        </Flex.Item>
+
         {/* Statistics Cards Section */}
         <Flex.Item overflowY="hidden">
           <StatisticsCardsGrid summary={summary} margin="small 0" />

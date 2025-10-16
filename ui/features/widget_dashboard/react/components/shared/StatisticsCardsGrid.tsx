@@ -65,7 +65,7 @@ const StatisticsCardsGrid: React.FC<StatisticsCardsGridProps> = ({
   )
 
   return (
-    <Flex gap="small" margin={margin} direction={isMobile ? 'column' : 'row'}>
+    <Flex gap="x-small" margin={margin} direction={isMobile ? 'column' : 'row'}>
       {statisticsData.map(stat => (
         <Flex.Item key={stat.key} shouldGrow={!isMobile} shouldShrink>
           <StatisticsCard

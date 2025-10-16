@@ -68,7 +68,7 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
   const renderContent = () => {
     if (isLoading) {
       return (
-        <View as="div" textAlign="center" margin="large 0">
+        <View as="div" textAlign="center" width="100%" minHeight="400px">
           <Spinner renderTitle={loadingText || I18n.t('Loading widget data...')} size="medium" />
         </View>
       )
@@ -76,7 +76,7 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
 
     if (error) {
       return (
-        <View as="div" textAlign="center" margin="large 0">
+        <View as="div" textAlign="center">
           <Text color="danger" size="medium">
             {error}
           </Text>
@@ -93,7 +93,7 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
 
     if (!children) {
       return (
-        <View as="div" textAlign="center" margin="large 0">
+        <View as="div" textAlign="center">
           <Text color="secondary" size="medium">
             {I18n.t('No content available')}
           </Text>
@@ -108,6 +108,7 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
     <View
       as="section"
       height="100%"
+      margin="x-small"
       padding="medium"
       shadow="above"
       borderRadius="large"
@@ -115,9 +116,8 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
       data-testid={`widget-${widget.id}`}
       aria-labelledby={showHeader && widgetTitle ? headingId : undefined}
       role="region"
-      style={{overflow: 'hidden', boxSizing: 'border-box'}}
     >
-      <Flex direction="column" gap="small" height="100%" style={{overflow: 'hidden'}}>
+      <Flex direction="column" gap="small">
         {showHeader && widgetTitle && (
           <>
             {isMobile ? (
@@ -134,7 +134,7 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
             ) : (
               <Flex direction="row" alignItems="center" justifyItems="space-between">
                 <Flex.Item shouldGrow>
-                  <Heading level="h2" margin="0" id={headingId}>
+                  <Heading level="h2" variant="titleCardSection" margin="0" id={headingId}>
                     {widgetTitle}
                   </Heading>
                 </Flex.Item>

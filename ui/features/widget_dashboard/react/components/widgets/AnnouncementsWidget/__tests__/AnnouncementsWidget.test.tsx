@@ -567,12 +567,16 @@ describe('AnnouncementsWidget', () => {
 
     await waitForLoadingToComplete()
 
-    // Should show truncated title (max 25 chars) - shows "This is an Extremely Long..."
-    expect(screen.getByText(/This is an Extremely Long\.\.\./)).toBeInTheDocument()
-
-    // Should show truncated message (max 60 chars) - shows "This is an extremely long announcement message that contains..."
     expect(
-      screen.getByText(/This is an extremely long announcement message that contains\.\.\./),
+      screen.getByText(
+        /This is an Extremely Long Announcement Title That Should Be Truncated Becau\.\.\./,
+      ),
+    ).toBeInTheDocument()
+
+    expect(
+      screen.getByText(
+        /This is an extremely long announcement message that contains lots of details and should be truncated to prevent the widg\.\.\./,
+      ),
     ).toBeInTheDocument()
 
     cleanup()

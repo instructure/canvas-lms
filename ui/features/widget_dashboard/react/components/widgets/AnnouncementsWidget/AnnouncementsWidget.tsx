@@ -20,9 +20,9 @@ import React, {useState, useEffect, useMemo} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
+import {Flex} from '@instructure/ui-flex'
 import {List} from '@instructure/ui-list'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import AnnouncementItem from './AnnouncementItem'
 import type {BaseWidgetProps, Announcement} from '../../../types'
@@ -82,16 +82,7 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
 
   const renderFilterSelect = () => (
     <SimpleSelect
-      renderBeforeInput={
-        <View padding="xx-small 0 0 0">
-          <Text size="small" weight="bold">
-            Filter by:
-          </Text>
-        </View>
-      }
-      renderLabel={
-        <ScreenReaderContent>{I18n.t('Filter announcements by read status')}</ScreenReaderContent>
-      }
+      renderLabel={I18n.t('Read filter:')}
       value={filter}
       onChange={(_event, {value}) => handleFilterChange(value as FilterOption)}
       size="small"
@@ -129,7 +120,7 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
     }
 
     return (
-      <View as="div" height="100%" width="100%">
+      <View as="div">
         <List isUnstyled margin="0">
           {enrichedAnnouncements.map(announcement => (
             <List.Item
@@ -151,7 +142,6 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
       error={error ? I18n.t('Failed to load announcements. Please try again.') : null}
       onRetry={refetch}
       loadingText={I18n.t('Loading announcements...')}
-      headerActions={renderFilterSelect()}
       pagination={{
         currentPage: currentPageIndex + 1,
         totalPages,
@@ -160,7 +150,12 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
         ariaLabel: I18n.t('Announcements pagination'),
       }}
     >
-      {renderContent()}
+      <Flex direction="column" gap="small">
+        <Flex.Item overflowX="visible" overflowY="visible">
+          {renderFilterSelect()}
+        </Flex.Item>
+        <Flex.Item shouldGrow>{renderContent()}</Flex.Item>
+      </Flex>
     </TemplateWidget>
   )
 }
