@@ -257,6 +257,102 @@ describe "native canvas conditional release" do
     end
   end
 
+  context "Blueprint courses with Mastery Paths" do
+    before(:once) do
+      @copy_from = course_factory(active_all: true)
+      @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
+      @copy_from.conditional_release = true
+      @copy_from.save!
+    end
+
+    before do
+      course_with_teacher(active_all: true)
+      @copy_to = @course
+      @copy_to.conditional_release = true
+      @copy_to.save!
+      @template.add_child_course!(@copy_to)
+      user_session(@teacher)
+    end
+
+    it "disables Mastery Paths editor for locked assignment in associated course", :ignore_js_errors do
+      # Create assignment with mastery paths in blueprint
+      assignment = @copy_from.assignments.create!(
+        title: "Blueprint Assignment",
+        points_possible: 100,
+        submission_types: "online_text_entry"
+      )
+      tag = @template.create_content_tag_for!(assignment)
+      tag.update(restrictions: { content: true })
+
+      # Create mastery path assignment to add to range
+      mp_assignment = @copy_from.assignments.create!(
+        title: "MP Assignment",
+        points_possible: 10
+      )
+      mp_tag = @template.create_content_tag_for!(mp_assignment)
+
+      ranges = [
+        ConditionalRelease::ScoringRange.new(
+          lower_bound: 0.7,
+          upper_bound: 1.0,
+          assignment_sets: [
+            ConditionalRelease::AssignmentSet.new(
+              assignment_set_associations: [
+                ConditionalRelease::AssignmentSetAssociation.new(
+                  assignment_id: mp_assignment.id
+                )
+              ]
+            )
+          ]
+        )
+      ]
+      @copy_from.conditional_release_rules.create!(trigger_assignment: assignment, scoring_ranges: ranges)
+
+      # Copy assignments to child course
+      assmt_copy = @copy_to.assignments.new(
+        title: "Blueprint Assignment",
+        points_possible: 100,
+        submission_types: "online_text_entry"
+      )
+      assmt_copy.migration_id = tag.migration_id
+      assmt_copy.save!
+
+      mp_assmt_copy = @copy_to.assignments.new(
+        title: "MP Assignment",
+        points_possible: 10
+      )
+      mp_assmt_copy.migration_id = mp_tag.migration_id
+      mp_assmt_copy.save!
+
+      child_ranges = [
+        ConditionalRelease::ScoringRange.new(
+          lower_bound: 0.7,
+          upper_bound: 1.0,
+          assignment_sets: [
+            ConditionalRelease::AssignmentSet.new(
+              assignment_set_associations: [
+                ConditionalRelease::AssignmentSetAssociation.new(
+                  assignment_id: mp_assmt_copy.id
+                )
+              ]
+            )
+          ]
+        )
+      ]
+      @copy_to.conditional_release_rules.create!(trigger_assignment: assmt_copy, scoring_ranges: child_ranges)
+
+      get "/courses/#{@copy_to.id}/assignments/#{assmt_copy.id}/edit"
+      ConditionalReleaseObjects.conditional_release_link.click
+
+      expect(element_exists?(".cr-scoring-range__add-assignment-button")).to be_falsey
+      expect(element_exists?("input.cr-percent-input__input")).to be_falsey
+      expect(element_exists?("button[aria-label*='options']")).to be_falsey
+      expect(element_exists?("button.cr-condition-toggle__button")).to be_falsey
+
+      expect(element_exists?(".cr-assignment-card__read-only")).to be_truthy
+    end
+  end
+
   context "Copying a course with a mastery path" do
     it "copies a mastery path course with wiki pages correctly" do
       course_with_admin_logged_in

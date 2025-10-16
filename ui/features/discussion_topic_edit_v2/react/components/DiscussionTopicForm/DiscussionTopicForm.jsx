@@ -1542,7 +1542,11 @@ function DiscussionTopicForm({
       </View>
       <div style={{display: selectedView === Views.MasteryPaths ? 'block' : 'none'}}>
         {ENV.CONDITIONAL_RELEASE_ENV && (
-          <MasteryPathsReactWrapper type="discussion topic" env={ENV.CONDITIONAL_RELEASE_ENV} />
+          <MasteryPathsReactWrapper
+            type="discussion topic"
+            env={ENV.CONDITIONAL_RELEASE_ENV}
+            readOnly={ENV?.DISCUSSION_CONTENT_LOCKED}
+          />
         )}
       </div>
       <FormFieldGroup description="" rowSpacing="small">

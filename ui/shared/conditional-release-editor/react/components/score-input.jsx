@@ -24,8 +24,8 @@ import shortid from '@canvas/shortid'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import GradingTypes from '../grading-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {Tooltip} from '@instructure/ui-tooltip'
 import {TextInput} from '@instructure/ui-text-input'
+import {Text} from '@instructure/ui-text'
 
 import {
   scoreToPercent,
@@ -37,7 +37,7 @@ import {
 
 const I18n = createI18nScope('conditional_release')
 
-const {string, func, object, number} = PropTypes
+const {string, func, object, number, bool} = PropTypes
 
 export default class ScoreInput extends React.Component {
   static get propTypes() {
@@ -47,6 +47,7 @@ export default class ScoreInput extends React.Component {
       label: string,
       error: string,
       onScoreChanged: func.isRequired,
+      readOnly: bool,
     }
   }
 
@@ -145,18 +146,22 @@ export default class ScoreInput extends React.Component {
             {srLabel}
           </label>
         </ScreenReaderContent>
-        <TextInput
-          className="cr-input cr-percent-input__input"
-          id={this.shortid}
-          type="text"
-          value={this.value()}
-          title={this.props.label}
-          onChange={this.changed}
-          onFocus={this.focused}
-          onBlur={this.blurred}
-          messages={this.hasError() ? [{text: this.errorMessage(), type: 'error'}] : null}
-          {...optionalProps}
-        />
+        {this.props.readOnly ? (
+          <Text size="medium">{this.value()}</Text>
+        ) : (
+          <TextInput
+            className="cr-input cr-percent-input__input"
+            id={this.shortid}
+            type="text"
+            value={this.value()}
+            title={this.props.label}
+            onChange={this.changed}
+            onFocus={this.focused}
+            onBlur={this.blurred}
+            messages={this.hasError() ? [{text: this.errorMessage(), type: 'error'}] : null}
+            {...optionalProps}
+          />
+        )}
       </div>
     )
   }
