@@ -214,104 +214,6 @@ describe GradebooksController do
                                                   })
         end
       end
-
-      describe "asset processor functionality" do
-        context "with online_text_entry submission" do
-          before do
-            @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "test submission")
-          end
-
-          it "includes processors and reports in submission data if user can read grade" do
-            allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_processors).and_return([{ id: 1, title: "Test Processor" }])
-            allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_reports_info_for_display).and_return([{ id: 1, priority: 0 }])
-
-            get "grade_summary", params: { course_id: @course.id, id: @student.id }
-
-            submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
-            expect(submission).to have_key(:asset_processors)
-            expect(submission[:asset_processors]).to eq([{ id: 1, title: "Test Processor" }])
-            expect(submission).to have_key(:asset_reports)
-            expect(submission[:asset_reports]).to eq([{ id: 1, priority: 0 }])
-            expect(submission).to have_key(:submission_type)
-            expect(submission[:submission_type]).to eq("online_text_entry")
-          end
-
-          it "includes processors and reports in submission data if grades are hidden" do
-            allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_processors).and_return([{ id: 1, title: "Test Processor" }])
-            allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_reports_info_for_display).and_return([{ id: 1, priority: 0 }])
-            # ensure the grades are hidden
-            allow(@assignment).to receive(:user_can_read_grades?).and_return(false)
-            submission = @assignment.grade_student(@student, grade: 10, grader: @teacher).first
-            submission.update(posted_at: nil)
-
-            get "grade_summary", params: { course_id: @course.id, id: @student.id }
-
-            submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
-            expect(submission).to have_key(:asset_processors)
-            expect(submission[:asset_processors]).to eq([{ id: 1, title: "Test Processor" }])
-            expect(submission).to have_key(:asset_reports)
-            expect(submission[:asset_reports]).to eq([{ id: 1, priority: 0 }])
-            expect(submission).to have_key(:submission_type)
-            expect(submission[:submission_type]).to eq("online_text_entry")
-          end
-
-          it "does not include processors and reports in submission data if user cannot read grades" do
-            allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_processors).and_return([{ id: 1, title: "Test Processor" }])
-            allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_reports_info_for_display).and_return([{ id: 1, priority: 0 }])
-            allow_any_instance_of(Submission).to receive(:user_can_read_grade?).and_return(false)
-
-            get "grade_summary", params: { course_id: @course.id, id: @student.id }
-
-            submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
-            expect(submission).not_to have_key(:asset_processors)
-            expect(submission).not_to have_key(:asset_reports)
-            expect(submission).not_to have_key(:submission_type)
-          end
-        end
-
-        context "with discussion_topic submission" do
-          before do
-            @assignment.update!(submission_types: "discussion_topic")
-            @discussion_topic = @assignment.discussion_topic || @course.discussion_topics.create!(
-              title: "Test Discussion",
-              assignment: @assignment
-            )
-            @discussion_topic.discussion_entries.create!(
-              user: @student,
-              message: "Test entry"
-            )
-          end
-
-          it "does not include processors and reports without feature flag" do
-            @course.root_account.disable_feature!(:lti_asset_processor_discussions)
-
-            allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_processors).and_return([{ id: 1, title: "Test Processor" }])
-            allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_reports_info_for_display).and_return([{ id: 1, priority: 0 }])
-
-            get "grade_summary", params: { course_id: @course.id, id: @student.id }
-
-            submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
-
-            expect(submission).not_to have_key(:asset_processors)
-            expect(submission).not_to have_key(:asset_reports)
-          end
-
-          it "includes processors and reports with feature flag enabled" do
-            allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_processors).and_return([{ id: 1, title: "Test Processor" }])
-            allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_reports_info_for_display).and_return([{ id: 1, priority: 0 }])
-
-            get "grade_summary", params: { course_id: @course.id, id: @student.id }
-
-            submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
-            expect(submission).to have_key(:asset_processors)
-            expect(submission[:asset_processors]).to eq([{ id: 1, title: "Test Processor" }])
-            expect(submission).to have_key(:asset_reports)
-            expect(submission[:asset_reports]).to eq([{ id: 1, priority: 0 }])
-            expect(submission).to have_key(:submission_type)
-            expect(submission[:submission_type]).to eq("discussion_topic")
-          end
-        end
-      end
     end
 
     context "when logged in as a teacher" do
@@ -365,13 +267,6 @@ describe GradebooksController do
         get :grade_summary, params: { course_id: @course.id, id: @student.id }
         assignment_id = assigns.dig(:js_env, :assignment_groups, 0, :assignments, 0, :id)
         expect(assignment_id).to eq @assignment.id
-      end
-
-      it "returns nil for asset_reports" do
-        allow_any_instance_of(AssetProcessorReportHelper).to receive(:asset_reports_info_for_display).and_return([{ id: 1, priority: 0 }])
-        get "grade_summary", params: { course_id: @course.id, id: @student.id }
-        submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
-        expect(submission[:asset_reports]).to be_nil
       end
     end
 

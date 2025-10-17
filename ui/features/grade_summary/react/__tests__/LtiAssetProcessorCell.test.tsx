@@ -60,6 +60,7 @@ describe('LtiAssetProcessorCell', () => {
       attachmentId: '10',
       attachmentName: 'test.pdf',
       submissionAttempt: 1,
+      discussionEntryVersion: null,
     },
     ...overrides,
   })

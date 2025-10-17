@@ -902,6 +902,7 @@ describe Types::AssignmentType do
     let(:course) { Course.create!(workflow_state: "available") }
     let(:student) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
     let(:teacher) { course.enroll_user(User.create!, "TeacherEnrollment", enrollment_state: "active").user }
+    let(:observer) { course.enroll_user(User.create!, "ObserverEnrollment", enrollment_state: "active", associated_user_id: student.id).user }
 
     context "when lti_asset_processor feature flag is disabled" do
       before { course.root_account.disable_feature!(:lti_asset_processor) }
@@ -929,27 +930,20 @@ describe Types::AssignmentType do
       end
     end
 
-    context "when user does not have manage_grades permission" do
-      let(:context) { { current_user: student } }
-      let!(:asset_processor) { lti_asset_processor_model(assignment:) }
+    context "when user is an observer" do
+      let(:context) { { current_user: observer } }
 
-      context "when student can read their own grade" do
-        it "returns lti asset processors" do
-          allow_any_instance_of(Submission).to receive(:user_can_read_grade?).with(student, for_plagiarism: true).and_return(true)
-
-          resolver = GraphQLTypeTester.new(assignment, context)
-          result = resolver.resolve("ltiAssetProcessorsConnection { edges { node { _id } } }")
-          expect(result).to eq([asset_processor.id.to_s])
-        end
+      it "returns lti asset processors" do
+        asset_processor = lti_asset_processor_model(assignment:)
+        resolver = GraphQLTypeTester.new(assignment, context)
+        result = resolver.resolve("ltiAssetProcessorsConnection { edges { node { _id } } }")
+        expect(result).to eq([asset_processor.id.to_s])
       end
 
-      context "when student cannot read their own grade" do
-        it "returns null" do
-          allow_any_instance_of(Submission).to receive(:user_can_read_grade?).with(student, for_plagiarism: true).and_return(false)
-
-          resolver = GraphQLTypeTester.new(assignment, context)
-          expect(resolver.resolve("ltiAssetProcessorsConnection { edges { node { _id } } }")).to be_nil
-        end
+      it "returns empty collection when no asset processors exist" do
+        resolver = GraphQLTypeTester.new(assignment, context)
+        result = resolver.resolve("ltiAssetProcessorsConnection { edges { node { _id } } }")
+        expect(result).to eq([])
       end
     end
   end

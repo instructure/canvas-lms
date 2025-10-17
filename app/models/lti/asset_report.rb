@@ -130,26 +130,6 @@ class Lti::AssetReport < ApplicationRecord
     end
   end
 
-  # See also fields in graphql/types/lti_asset_report_type.rb (used
-  # in New Speedgrader). For frontend display of a report, this should
-  # be compatible with the graphql type.
-  def info_for_display
-    {
-      _id: id.to_s,
-      title:,
-      comment:,
-      result:,
-      resultTruncated: result_truncated,
-      indicationColor: indication_color,
-      indicationAlt: indication_alt,
-      errorCode: error_code,
-      processingProgress: effective_processing_progress,
-      priority:,
-      launchUrlPath: launch_url_path,
-      resubmitAvailable: resubmit_available?,
-    }.compact
-  end
-
   def effective_processing_progress
     if PROGRESSES.include?(processing_progress)
       processing_progress
