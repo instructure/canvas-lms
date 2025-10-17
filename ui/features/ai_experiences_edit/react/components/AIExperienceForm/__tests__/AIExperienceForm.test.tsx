@@ -29,7 +29,7 @@ const mockAiExperience: AIExperience = {
   description: 'Test Description',
   facts: 'Test Facts',
   learning_objective: 'Test Objectives',
-  scenario: 'Test Scenario',
+  pedagogical_guidance: 'Test Pedagogical Guidance',
   workflow_state: 'unpublished',
 }
 
@@ -107,7 +107,7 @@ describe('AIExperienceForm', () => {
       expect(screen.getByDisplayValue('Test Description')).toBeInTheDocument()
       expect(screen.getByDisplayValue('Test Facts')).toBeInTheDocument()
       expect(screen.getByDisplayValue('Test Objectives')).toBeInTheDocument()
-      expect(screen.getByDisplayValue('Test Scenario')).toBeInTheDocument()
+      expect(screen.getByDisplayValue('Test Pedagogical Guidance')).toBeInTheDocument()
     })
   })
 

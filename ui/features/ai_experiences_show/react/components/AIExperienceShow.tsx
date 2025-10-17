@@ -136,7 +136,7 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
         aiExperienceTitle={aiExperience.title}
         facts={aiExperience.facts}
         learningObjectives={aiExperience.learning_objective}
-        scenario={aiExperience.scenario}
+        scenario={aiExperience.pedagogical_guidance}
         isExpanded={isPreviewExpanded}
         onToggleExpanded={() => setIsPreviewExpanded(!isPreviewExpanded)}
       />
@@ -201,12 +201,12 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
             </View>
           )}
 
-          {aiExperience.scenario && (
+          {aiExperience.pedagogical_guidance && (
             <View as="div" margin="0 0 0 0">
               <Heading level="h3" margin="0 0 small 0">
                 {I18n.t('Pedagogical guidance')}
               </Heading>
-              <Text>{aiExperience.scenario}</Text>
+              <Text>{aiExperience.pedagogical_guidance}</Text>
             </View>
           )}
         </View>

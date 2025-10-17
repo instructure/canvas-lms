@@ -23,7 +23,7 @@ export interface AIExperience {
   description: string
   facts: string
   learning_objective: string
-  scenario: string
+  pedagogical_guidance: string
 }
 
 export interface AIExperienceShowProps {

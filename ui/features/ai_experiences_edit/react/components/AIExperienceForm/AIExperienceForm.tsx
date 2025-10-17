@@ -59,7 +59,7 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
     description: '',
     facts: '',
     learning_objective: '',
-    scenario: '',
+    pedagogical_guidance: '',
   })
   const [showPreviewModal, setShowPreviewModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -72,7 +72,7 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
         description: aiExperience.description || '',
         facts: aiExperience.facts || '',
         learning_objective: aiExperience.learning_objective || '',
-        scenario: aiExperience.scenario || '',
+        pedagogical_guidance: aiExperience.pedagogical_guidance || '',
       })
     }
   }, [aiExperience])
@@ -247,8 +247,8 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
 
                 <TextArea
                   label={I18n.t('Pedagogical guidance')}
-                  value={formData.scenario}
-                  onChange={handleInputChange('scenario')}
+                  value={formData.pedagogical_guidance}
+                  onChange={handleInputChange('pedagogical_guidance')}
                   placeholder={I18n.t(
                     'Describe the role or style of the AI (e.g., friendly guide, strict examiner, storyteller).',
                   )}
