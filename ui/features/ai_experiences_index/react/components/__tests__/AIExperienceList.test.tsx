@@ -30,7 +30,7 @@ const mockExperiences: AiExperience[] = [
     workflow_state: 'published',
     facts: 'You are a customer service representative',
     learning_objective: 'Learn to handle complaints',
-    scenario: 'A customer calls about billing',
+    pedagogical_guidance: 'A customer calls about billing',
     created_at: '2025-01-15T10:30:00Z',
   },
   {
@@ -40,7 +40,7 @@ const mockExperiences: AiExperience[] = [
     workflow_state: 'unpublished',
     facts: 'You are a sales representative',
     learning_objective: 'Learn to close deals',
-    scenario: 'A potential customer is interested',
+    pedagogical_guidance: 'A potential customer is interested',
     created_at: '2025-01-10T14:20:00Z',
   },
 ]
