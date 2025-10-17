@@ -43,7 +43,7 @@ import {AllocationRuleType} from '../graphql/teacher/AssignmentTeacherTypes'
 const I18n = createI18nScope('peer_review_allocation_rules_tray')
 
 const NoResultsFound = ({searchTerm}: {searchTerm: string}) => (
-  <Flex.Item as="div" padding="x-small medium">
+  <Flex.Item as="div" padding="x-small medium" data-testid="no-search-results">
     <Text as="p" size="content">
       {I18n.t('No matching results where found for "%{searchTerm}"', {searchTerm})}
     </Text>
@@ -86,7 +86,10 @@ const EmptyState = () => (
 
 const LoadingState = () => (
   <Flex direction="column" alignItems="center" padding="large">
-    <Spinner renderTitle={I18n.t('Loading allocation rules')} />
+    <Spinner
+      renderTitle={I18n.t('Loading allocation rules')}
+      data-testid={'allocation-rules-loading-spinner'}
+    />
   </Flex>
 )
 
@@ -148,15 +151,16 @@ const PeerReviewAllocationRulesTray = ({
 
   const handleRuleSave = useCallback(
     (ruleId?: string) => {
+      if (ruleId) {
+        setRuleToFocus(ruleId)
+      }
       setShouldRefetch(true)
       if (!containerRef.current || isUserNavigating || loading) {
-        if (!ruleId && preCreationTotalCount !== null) {
+        if (preCreationTotalCount !== null) {
           const firstNewRulePage = Math.floor(preCreationTotalCount / itemsPerPage) + 1
           if (firstNewRulePage !== currentPage) {
             handlePageChange(firstNewRulePage)
           }
-        } else if (ruleId) {
-          setRuleToFocus(ruleId)
         }
       }
     },
@@ -440,6 +444,7 @@ const PeerReviewAllocationRulesTray = ({
             renderCloseButtonLabel={I18n.t('Close error alert for allocation rule tray')}
             margin="0 0 medium 0"
             variantScreenReaderLabel={I18n.t('Error, ')}
+            data-testid="fetch-rules-error-alert"
           >
             {I18n.t('An error occurred while fetching allocation rules')}
           </Alert>
@@ -536,6 +541,7 @@ const PeerReviewAllocationRulesTray = ({
                   renderAfterInput={clearSearchButton}
                   messages={searchInputErrors}
                   shouldNotWrap
+                  data-testid="allocation-rules-search-input"
                 />
               </Flex.Item>
             )}
@@ -571,6 +577,7 @@ const PeerReviewAllocationRulesTray = ({
               currentPage={currentPage}
               totalPageNumber={totalPages}
               onPageChange={handlePageChange}
+              data-testid="allocation-rules-pagination"
             />
           </Flex.Item>
         </Flex>
