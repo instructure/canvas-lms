@@ -139,3 +139,13 @@ export const ZGetLtiAssetProcessorsResult = z.strictObject({
 })
 
 export type GetLtiAssetProcessorsResult = z.infer<typeof ZGetLtiAssetProcessorsResult>
+
+export function shouldShowAssetReportCell(
+  assetProcessors: LtiAssetProcessor[] | null | undefined,
+  assetReports: LtiAssetReport[] | null | undefined,
+): boolean {
+  // Don't show if there are no processors. For asset reports,
+  // note that empty array means to still show, but show "No Reports"
+  // see AssetProcessorReportHelper#raw_asset_reports
+  return !!assetProcessors?.length && !!assetReports
+}
