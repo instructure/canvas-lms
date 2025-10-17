@@ -451,7 +451,7 @@ class AssignmentsController < ApplicationController
           return
         end
 
-        if @context.root_account.feature_enabled?(:assignment_enhancements_teacher_view) &&
+        if @context.feature_enabled?(:assignment_enhancements_teacher_view) &&
            can_do(@context, @current_user, :read_as_admin)
           css_bundle :assignment_enhancements_teacher_view
           js_bundle :assignments_show_teacher

@@ -38,7 +38,7 @@ class TeacherViewPageV2
 
     # Methods & Actions
     def visit(course, assignment)
-      course.account.enable_feature!(:assignment_enhancements_teacher_view)
+      course.enable_feature!(:assignment_enhancements_teacher_view)
       get "/courses/#{course.id}/assignments/#{assignment.id}"
       wait_for(method: nil, timeout: 1) do
         assignment_type

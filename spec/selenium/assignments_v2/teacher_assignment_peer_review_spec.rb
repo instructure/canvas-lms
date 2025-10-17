@@ -27,8 +27,8 @@ describe "as a teacher" do
 
   context "peer review allocation rules" do
     before(:once) do
-      Account.default.enable_feature!(:assignment_enhancements_teacher_view)
       @course = course_factory(name: "course", active_course: true)
+      @course.enable_feature!(:assignment_enhancements_teacher_view)
       @course.enable_feature!(:peer_review_allocation_and_grading)
       @teacher = teacher_in_course(name: "teacher", course: @course, enrollment_state: :active).user
       @student1 = student_in_course(name: "Student 1", course: @course, enrollment_state: :active).user
