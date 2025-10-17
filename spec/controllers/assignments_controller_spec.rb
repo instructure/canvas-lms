@@ -1350,7 +1350,7 @@ describe AssignmentsController do
 
     describe "assignment_enhancements_teacher_view" do
       before do
-        @course.root_account.enable_feature!(:assignment_enhancements_teacher_view)
+        @course.enable_feature!(:assignment_enhancements_teacher_view)
         @course.save!
       end
 

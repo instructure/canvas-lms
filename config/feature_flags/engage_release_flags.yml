@@ -1,7 +1,7 @@
 ---
 assignment_enhancements_teacher_view:
   state: hidden
-  applies_to: RootAccount
+  applies_to: Course
   shadow: true
   display_name: Assignment Enhancements Teacher View (Saved)
   description: Updates to the Teacher saved view of assignments.

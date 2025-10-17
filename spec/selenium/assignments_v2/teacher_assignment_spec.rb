@@ -29,8 +29,8 @@ describe "as a teacher" do
 
   context "on assignments 2 page" do
     before(:once) do
-      Account.default.enable_feature!(:assignment_enhancements_teacher_view)
       @course = course_factory(name: "course", active_course: true)
+      @course.enable_feature!(:assignment_enhancements_teacher_view)
       @student = student_in_course(name: "Student", course: @course, enrollment_state: :active).user
       @teacher = teacher_in_course(name: "teacher", course: @course, enrollment_state: :active).user
     end
