@@ -8380,6 +8380,7 @@ nn:
   course_sis_7ae8f649: emne-SIS
   course_sis_df8b379: Emne-SIS
   course_sis_id_bbed1a60: emne-SIS-ID
+  course_sis_id_c026d0f3: Emne-SIS-ID
   course_sis_id_cd834b3c: "Emne-SIS-ID:"
   course_sis_id_sis_id_or_canvas_id_4d323f5c: "Emne-SIS-ID (SIS_ID:####) ELLER Canvas-ID: (###)"
   course_start_date_daae16ae: "Startdatoen til emnet"
@@ -25517,6 +25518,7 @@ nn:
   student_sis_d9f0cd39: student-SIS
   student_sis_id: "Student SIS ID"
   student_sis_id_abe6b292: student-SIS-ID
+  student_sis_id_ae374b2c: "Student SIS ID"
   student_student_number_5c98bd2d: "Student %{student_number}"
   student_studentnumber_f398d9c2: "Student %{studentNumber}"
   student_submission_report_af01e697: "Rapport studentinnleveringar"
