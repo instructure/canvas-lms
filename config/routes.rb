@@ -407,6 +407,12 @@ CanvasRails::Application.routes.draw do
     post "assignments/publish/quiz"   => "assignments#publish_quizzes"
     post "assignments/unpublish/quiz" => "assignments#unpublish_quizzes"
 
+    # Wildcard routes for AMS paths
+    # The controller checks ams_integration_enabled? and renders AMS or falls back to regular quiz views
+    get "quizzes/activity_builder/*path" => "quizzes/quizzes#index"
+    get "quizzes/take/*path" => "quizzes/quizzes#index"
+    get "quizzes/reports/*path" => "quizzes/quizzes#index"
+
     post "quizzes/new" => "quizzes/quizzes#new" # use POST instead of GET (not idempotent)
     resources :quizzes, controller: "quizzes/quizzes", except: :new do
       get :managed_quiz_data
@@ -441,9 +447,6 @@ CanvasRails::Application.routes.draw do
       get :moderate
       get :lockdown_browser_required
     end
-
-    # Route alias for AMS activity_builder to quizzes index
-    get "quizzes/activity_builder/:id" => "quizzes/quizzes#index", :as => :quiz_activity_builder
 
     resources :collaborations
     get "lti_collaborations" => "collaborations#lti_index"
