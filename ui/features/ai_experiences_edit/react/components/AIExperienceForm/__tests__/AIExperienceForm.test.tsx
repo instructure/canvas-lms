@@ -120,10 +120,14 @@ describe('AIExperienceForm', () => {
       const learningObjectivesInput = screen.getByLabelText(
         /Learning objectives/,
       ) as HTMLTextAreaElement
+      const pedagogicalGuidanceInput = screen.getByLabelText(
+        /Pedagogical guidance/,
+      ) as HTMLTextAreaElement
 
       fireEvent.change(titleInput, {target: {value: 'New Title'}})
       fireEvent.change(descriptionInput, {target: {value: 'New Description'}})
       fireEvent.change(learningObjectivesInput, {target: {value: 'New Learning Objectives'}})
+      fireEvent.change(pedagogicalGuidanceInput, {target: {value: 'New Pedagogical Guidance'}})
 
       const saveButton = screen.getByText('Save as draft')
       fireEvent.click(saveButton)
@@ -134,6 +138,7 @@ describe('AIExperienceForm', () => {
             title: 'New Title',
             description: 'New Description',
             learning_objective: 'New Learning Objectives',
+            pedagogical_guidance: 'New Pedagogical Guidance',
           }),
         )
       })

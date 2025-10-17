@@ -35,6 +35,7 @@ import {
 import {Menu} from '@instructure/ui-menu'
 import {Modal} from '@instructure/ui-modal'
 import {Pill} from '@instructure/ui-pill'
+import {Alert} from '@instructure/ui-alerts'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {AIExperience, AIExperienceFormData} from '../../../types'
@@ -64,6 +65,9 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
   const [showPreviewModal, setShowPreviewModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [showErrors, setShowErrors] = useState(false)
+  const [showErrorBanner, setShowErrorBanner] = useState(false)
 
   useEffect(() => {
     if (aiExperience) {
@@ -86,8 +90,36 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
       }))
     }
 
+  const validateForm = (): Record<string, string> => {
+    const newErrors: Record<string, string> = {}
+
+    if (!formData.title.trim()) {
+      newErrors.title = I18n.t('Title required')
+    }
+
+    if (!formData.learning_objective.trim()) {
+      newErrors.learning_objective = I18n.t('Please provide at least one learning objective')
+    }
+
+    if (!formData.pedagogical_guidance.trim()) {
+      newErrors.pedagogical_guidance = I18n.t('Please provide pedagogical guidance')
+    }
+
+    return newErrors
+  }
+
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault()
+
+    const validationErrors = validateForm()
+    setErrors(validationErrors)
+
+    if (Object.keys(validationErrors).length > 0) {
+      setShowErrors(true)
+      setShowErrorBanner(true)
+      return
+    }
+
     onSubmit(formData)
   }
 
@@ -138,6 +170,19 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
 
   return (
     <View as="div" maxWidth="1000px" margin="0 auto" padding="medium">
+      {showErrorBanner && showErrors && Object.keys(errors).length > 0 && (
+        <Alert
+          variant="error"
+          renderCloseButtonLabel={I18n.t('Close')}
+          onDismiss={() => setShowErrorBanner(false)}
+          margin="0 0 medium 0"
+        >
+          {I18n.t(
+            'Some required information is missing. Please complete all highlighted fields before saving.',
+          )}
+        </Alert>
+      )}
+
       <Flex justifyItems="space-between" alignItems="start" margin="0 0 large 0">
         <Heading level="h1" margin="0">
           {isEdit ? I18n.t('Edit AI Experience') : I18n.t('New AI Experience')}
@@ -164,7 +209,7 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
         </Flex>
       </Flex>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} noValidate={true}>
         <View as="div" margin="0 0 large 0">
           <TextInput
             renderLabel={I18n.t('Title')}
@@ -172,6 +217,7 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
             onChange={handleInputChange('title')}
             isRequired
             placeholder=""
+            messages={showErrors && errors.title ? [{type: 'newError', text: errors.title}] : []}
           />
         </View>
 
@@ -243,17 +289,28 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
                   )}
                   resize="vertical"
                   height="120px"
+                  messages={
+                    showErrors && errors.learning_objective
+                      ? [{type: 'newError', text: errors.learning_objective}]
+                      : []
+                  }
                 />
 
                 <TextArea
                   label={I18n.t('Pedagogical guidance')}
                   value={formData.pedagogical_guidance}
                   onChange={handleInputChange('pedagogical_guidance')}
+                  required
                   placeholder={I18n.t(
                     'Describe the role or style of the AI (e.g., friendly guide, strict examiner, storyteller).',
                   )}
                   resize="vertical"
                   height="120px"
+                  messages={
+                    showErrors && errors.pedagogical_guidance
+                      ? [{type: 'newError', text: errors.pedagogical_guidance}]
+                      : []
+                  }
                 />
               </FormFieldGroup>
             </View>
