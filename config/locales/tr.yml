@@ -6255,6 +6255,7 @@ tr:
   course_sis_7ae8f649: "ders öbs"
   course_sis_df8b379: "Ders Öbs"
   course_sis_id_bbed1a60: "ders sis id"
+  course_sis_id_c026d0f3: "Ders ÖBS Numarası"
   course_sis_id_cd834b3c: "Ders ÖBS ID:"
   course_sis_id_sis_id_or_canvas_id_4d323f5c: "Ders ÖBS ID (ÖBS_ID:####) YA DA Canvas ID: (###)"
   course_start_date_daae16ae: "Ders Başlangıç Tarihi"
@@ -18891,6 +18892,7 @@ tr:
   student_sis_d9f0cd39: "öğrenci öbs"
   student_sis_id: "Öğrenci SIS ID"
   student_sis_id_abe6b292: "öğrenci öbs id"
+  student_sis_id_ae374b2c: "Öğrenci SIS ID"
   student_submissions_910da1b3: "Öğrenci Gönderimleri"
   student_summary: 
     student_summary_table_ascending: "Öğrenci Özet Tablosu %{sortText} e göre artan sıralı"
