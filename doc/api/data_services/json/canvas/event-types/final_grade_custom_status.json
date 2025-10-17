@@ -1,0 +1,61 @@
+{
+  "name": "final_grade_custom_status",
+  "definition": "The event gets emitted when a custom status is removed or applied to a student's final grade.",
+  "trigger": "Triggered when a custom status is applied or removed from a student's final grade.",
+  "schema": {
+    "score_id": "The Canvas ID of the score record.",
+    "enrollment_id": "The Canvas ID of the enrollment record for the student.",
+    "user_id": "The Canvas user ID of the student.",
+    "course_id": "The Canvas ID of the course.",
+    "grading_period_id": "The Canvas ID of the grading period, if applicable.",
+    "override_status": "The new custom status name applied to a user's final grade",
+    "override_status_id": "The new custom status ID applied to a user's final grade",
+    "old_override_status": "The previous custom status name applied to a user's final grade, if applicable",
+    "old_override_status_id": "The previous custom status ID applied to a user's final grade, if applicable",
+    "updated_at": "The time when the custom status was applied."
+  },
+  "examples": [
+    {
+      "payload": {
+        "metadata": {
+          "root_account_uuid": "44fJ44GgJ29gJBsl43JLKgljsBIOTsbnKT48932g",
+          "root_account_id": "10000000000001",
+          "root_account_lti_guid": "794d72b707af6ea82cfe3d5d473f16888a8366c7.canvas.docker",
+          "user_login": "oxana@instructure.com",
+          "user_account_id": "10000000000002",
+          "user_sis_id": null,
+          "user_id": "21070000000000001",
+          "time_zone": "America/Denver",
+          "context_type": "Course",
+          "context_id": "21070000000000002",
+          "context_sis_source_id": "194387",
+          "context_account_id": "21070000000000003",
+          "context_role": "TeacherEnrollment",
+          "request_id": "98e1b771-fe22-4481-8264-d523dadb16b1",
+          "session_id": "242872453a9d69f7ccddeb4788d22506",
+          "hostname": "oxana.instructure.com",
+          "http_method": "POST",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+          "client_ip": "93.184.216.34",
+          "url": "http://oxana.instructure.com/courses/2/gradebook/update_submission",
+          "referrer": "http://oxana.instructure.com/courses/2/gradebook/speed_grader?assignment_id=39&student_id=2",
+          "producer": "canvas",
+          "event_name": "final_grade_custom_status",
+          "event_time": "2019-12-11T16:26:34.552Z"
+        },
+        "body": {
+          "score_id": "12345",
+          "enrollment_id": "67890",
+          "user_id": "2",
+          "course_id": "2",
+          "grading_period_id": "13579",
+          "override_status": "Incomplete Passing",
+          "override_status_id": "2",
+          "old_override_status": "Incomplete",
+          "old_override_status_id": "1",
+          "updated_at": "2019-12-11T16:26:34Z"
+        }
+      }
+    }
+  ]
+}
