@@ -19,36 +19,12 @@
 import React, {useMemo} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
-import {View} from '@instructure/ui-view'
-import {Responsive} from '@instructure/ui-responsive'
 import type {Widget, WidgetConfig} from '../types'
 import {getWidget} from './WidgetRegistry'
-import {ResponsiveProvider} from '../hooks/useResponsiveContext'
+import {useResponsiveContext} from '../hooks/useResponsiveContext'
 import {Flex} from '@instructure/ui-flex'
 
 const I18n = createI18nScope('widget_dashboard')
-
-const responsiveQuerySizes = ({
-  mobile = false,
-  tablet = false,
-  desktop = false,
-}: {
-  mobile?: boolean
-  tablet?: boolean
-  desktop?: boolean
-} = {}) => {
-  const querySizes: Record<string, {minWidth?: string; maxWidth?: string}> = {}
-  if (mobile) {
-    querySizes.mobile = {maxWidth: '639px'}
-  }
-  if (tablet) {
-    querySizes.tablet = {minWidth: mobile ? '640px' : '0px', maxWidth: '1023px'}
-  }
-  if (desktop) {
-    querySizes.desktop = {minWidth: tablet ? '1024px' : '640px'}
-  }
-  return querySizes
-}
 
 const sortWidgetsForStacking = (widgets: Widget[]): Widget[] => {
   return [...widgets].sort((a, b) => {
@@ -78,6 +54,7 @@ interface WidgetGridProps {
 }
 
 const WidgetGrid: React.FC<WidgetGridProps> = ({config}) => {
+  const {matches} = useResponsiveContext()
   const sortedWidgets = useMemo(() => sortWidgetsForStacking(config.widgets), [config.widgets])
   const widgetsByColumn = useMemo(() => widgetsAsColumns(config.widgets), [config.widgets])
 
@@ -134,26 +111,13 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config}) => {
 
   const renderMobileStack = renderTabletStack
 
-  return (
-    <Responsive
-      match="media"
-      query={responsiveQuerySizes({mobile: true, tablet: true, desktop: true})}
-      render={(_props, matches) => {
-        const matchesArray = matches || ['desktop']
-
-        let content
-        if (matchesArray.includes('mobile')) {
-          content = renderMobileStack()
-        } else if (matchesArray.includes('tablet')) {
-          content = renderTabletStack()
-        } else {
-          content = renderDesktopGrid()
-        }
-
-        return <ResponsiveProvider matches={matchesArray}>{content}</ResponsiveProvider>
-      }}
-    />
-  )
+  if (matches.includes('mobile')) {
+    return renderMobileStack()
+  } else if (matches.includes('tablet')) {
+    return renderTabletStack()
+  } else {
+    return renderDesktopGrid()
+  }
 }
 
 export default WidgetGrid

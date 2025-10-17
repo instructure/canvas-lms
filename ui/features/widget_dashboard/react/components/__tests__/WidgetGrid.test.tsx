@@ -20,6 +20,7 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import WidgetGrid from '../WidgetGrid'
 import type {WidgetConfig} from '../../types'
+import {ResponsiveProvider} from '../../hooks/useResponsiveContext'
 
 // Mock the WidgetRegistry to avoid dependency issues
 jest.mock('../WidgetRegistry', () => ({
@@ -32,10 +33,16 @@ jest.mock('../WidgetRegistry', () => ({
 
 type Props = {
   config: WidgetConfig
+  matches?: string[]
 }
 
 const setUp = (props: Props) => {
-  return render(<WidgetGrid {...props} />)
+  const {matches = ['desktop'], ...gridProps} = props
+  return render(
+    <ResponsiveProvider matches={matches}>
+      <WidgetGrid {...gridProps} />
+    </ResponsiveProvider>,
+  )
 }
 
 const buildDefaultProps = (overrides = {}): Props => {
@@ -153,7 +160,7 @@ describe('WidgetGrid', () => {
     })
 
     it('renders single column layout', () => {
-      const {getByTestId} = setUp(buildDefaultProps())
+      const {getByTestId} = setUp({...buildDefaultProps(), matches: ['tablet']})
       const grid = getByTestId('widget-columns')
 
       expect(grid).toBeInTheDocument()
@@ -164,7 +171,7 @@ describe('WidgetGrid', () => {
     })
 
     it('sorts widgets in proper stacking order (relative)', () => {
-      const {getAllByTestId} = setUp(buildDefaultProps())
+      const {getAllByTestId} = setUp({...buildDefaultProps(), matches: ['tablet']})
       const widgetContainers = getAllByTestId(/^widget-container-/)
 
       // Expected order: widget-1 (relative 1), widget-2 (relative 2), widget-3 (relative 3)
