@@ -4266,6 +4266,7 @@ ko:
       section_enrollments: "섹션 등록"
   course_settings_f6d0bbf8: "과목 설정"
   course_setup_checklist_78dcff7e: "과목 설정 검사 목록"
+  course_sis_id_c026d0f3: "과목 SIS ID"
   course_statistics: 
     unknown: "알 수 없음"
   course_syllabus_5de1b0af: "과목 강의 계획"
@@ -5899,6 +5900,7 @@ ko:
   everyone_else_6c6dc7b6: "나머지 모든 사람"
   everyone_else_cc5f6888: "다른 모든 사람"
   example_84698b7d: 예
+  example_cb3509b8: "예:"
   exceeds_expectations_5910fc3a: "기대를 초과함"
   expand_all_bb64d2ea: "모두 확장"
   expires_7019786e: 만료일
