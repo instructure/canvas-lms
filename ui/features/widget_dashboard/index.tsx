@@ -27,8 +27,16 @@ import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {queryClient} from '@canvas/query'
 import {WidgetDashboardProvider} from './react/hooks/useWidgetDashboardContext'
+import {Responsive} from '@instructure/ui-responsive'
+import {ResponsiveProvider} from './react/hooks/useResponsiveContext'
 
 const I18n = createI18nScope('widget_dashboard')
+
+const RESPONSIVE_QUERY = {
+  mobile: {maxWidth: '639px'},
+  tablet: {minWidth: '640px', maxWidth: '1023px'},
+  desktop: {minWidth: '1024px'},
+}
 
 ready(() => {
   const container = document.getElementById('content')
@@ -54,7 +62,15 @@ ready(() => {
             currentUserRoles={ENV.current_user_roles}
             sharedCourseData={ENV.SHARED_COURSE_DATA}
           >
-            <WidgetDashboardContainer />
+            <Responsive
+              match="media"
+              query={RESPONSIVE_QUERY}
+              render={(_props, matches) => (
+                <ResponsiveProvider matches={matches || ['desktop']}>
+                  <WidgetDashboardContainer />
+                </ResponsiveProvider>
+              )}
+            />
           </WidgetDashboardProvider>
         </QueryClientProvider>
       </ErrorBoundary>,
