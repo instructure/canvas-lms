@@ -4992,6 +4992,7 @@ hy:
   course_setup_checklist_78dcff7e: "Դասընթացի տեղադրման ստուգիչ հարցեր"
   course_setup_wizard_is_showing_a7c087c1: "Ցույց է տրվում դասընթացի տեղադրման վիզարդը:"
   course_sis_id_bbed1a60: "դասընթացի sis id"
+  course_sis_id_c026d0f3: "Դասընթացի SIS ID"
   course_starts_at_3a01f9da: "Դասընթացն սկսվում է "
   course_statistics: 
     unknown: "անհայտ է "
@@ -6950,6 +6951,7 @@ hy:
   everyone_else_6c6dc7b6: "Մնացած բոլորը"
   everyone_else_cc5f6888: "Մնացած յուրաքանչյուրը"
   example_84698b7d: Օրինակ
+  example_cb3509b8: Օրինակ՝
   example_final_score_355aff0f: "Վերջնական գնահատականի օրինակ"
   example_final_score_a92b30b9: "Վերջնական գնահատականի օրինակ]]"
   example_https_example_com_config_xml_be5f36ac: "Օրինակ՝  https://example.com/config.xml"
