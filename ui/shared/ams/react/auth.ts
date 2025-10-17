@@ -50,6 +50,7 @@ export const getAccessToken: AuthProps['getAccessToken'] = async () => {
       return resp.json()
     })
     .then(data => data.token)
+    .then(token => atob(token)) // remove extra encoding carried by this JWT
   // uncomment for debugging
   // console.debug('Access token:', token)
   // console.debug('Decoded access token:', Buffer.from(token, 'base64').toString('utf8'))
