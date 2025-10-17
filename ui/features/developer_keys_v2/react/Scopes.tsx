@@ -29,6 +29,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {Tooltip} from '@instructure/ui-tooltip'
+import {debounce} from 'lodash'
 
 import ScopesList from './ScopesList'
 
@@ -62,7 +63,7 @@ interface ScopesProps {
   dispatch: Function
   listDeveloperKeyScopesSet: Function
   developerKey?: DeveloperKey
-  requireScopes?: boolean | null
+  requireScopes: boolean
   onRequireScopesChange: (event: React.ChangeEvent<HTMLInputElement>) => void
   updateDeveloperKey: Function
 }
@@ -73,15 +74,24 @@ interface ScopesState {
 
 export default class Scopes extends React.Component<ScopesProps, ScopesState> {
   state = {filter: ''}
+  debouncedSetFilter: (value: string) => void
+
+  constructor(props: ScopesProps) {
+    super(props)
+
+    this.debouncedSetFilter = debounce((value: string) => {
+      this.setState({filter: value})
+    }, 400)
+  }
 
   handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({
-      filter: e.currentTarget.value,
-    })
+    // Extract value immediately to avoid React synthetic event pooling issues
+    const value = e.currentTarget.value
+    this.debouncedSetFilter(value)
   }
 
   enforceScopesSrText() {
-    const requireScopes = this.props.requireScopes ?? false
+    const requireScopes = this.props.requireScopes
     return requireScopes
       ? I18n.t('Clicking the checkbox will cause scopes table to disappear below')
       : I18n.t('Clicking the checkbox will cause scopes table to appear below')
@@ -89,7 +99,7 @@ export default class Scopes extends React.Component<ScopesProps, ScopesState> {
 
   body() {
     const {developerKey} = this.props
-    const requireScopes = this.props.requireScopes ?? false
+    const requireScopes = this.props.requireScopes
     if (this.props.availableScopesPending) {
       return (
         <Grid.Row hAlign="space-around">
@@ -136,7 +146,7 @@ export default class Scopes extends React.Component<ScopesProps, ScopesState> {
   render() {
     const searchEndpoints = I18n.t('Search endpoints')
     const {developerKey, updateDeveloperKey} = this.props
-    const requireScopes = this.props.requireScopes ?? false
+    const requireScopes = this.props.requireScopes
     const includeTooltip = I18n.t(
       'Permit usage of all "includes" parameters for this developer key. "Includes"' +
         ' parameters may grant access to additional data not included in the scopes selected below.',

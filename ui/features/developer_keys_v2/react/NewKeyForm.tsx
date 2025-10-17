@@ -118,7 +118,8 @@ export default class NewKeyForm extends React.Component<NewKeyFormProps> {
   }
 
   handleRequireScopesChange = () => {
-    this.props.updateDeveloperKey('require_scopes', !this.props.developerKey.require_scopes)
+    const currentValue = this.props.developerKey.require_scopes ?? true
+    this.props.updateDeveloperKey('require_scopes', !currentValue)
   }
 
   handleTestClusterOnlyChange = () => {
@@ -316,7 +317,7 @@ export default class NewKeyForm extends React.Component<NewKeyFormProps> {
                   availableScopes={this.props.availableScopes}
                   availableScopesPending={this.props.availableScopesPending}
                   developerKey={this.props.developerKey}
-                  requireScopes={developerKey.require_scopes}
+                  requireScopes={developerKey.require_scopes ?? true}
                   onRequireScopesChange={this.handleRequireScopesChange}
                   dispatch={this.props.dispatch}
                   listDeveloperKeyScopesSet={this.props.listDeveloperKeyScopesSet}

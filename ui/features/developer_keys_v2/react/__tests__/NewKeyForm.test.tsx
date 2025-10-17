@@ -225,7 +225,7 @@ describe('DeveloperKeyFormFields', () => {
       const {getByTestId, getByText} = renderComponent(developerKey, false)
       const enforceScopes = document.querySelector('[data-automation="enforce_scopes"]')
       expect(enforceScopes).toBeInTheDocument()
-      expect(getByText(/when scope enforcement is disabled/i)).toBeInTheDocument()
+      expect(getByText(/allow include parameters/i)).toBeInTheDocument()
     })
   })
 
