@@ -1099,8 +1099,8 @@ class DiscussionTopicsApiController < ApplicationController
     to_not_threaded_update_count = to_not_threaded.in_batches.update_all(discussion_type: DiscussionTopic::DiscussionTypes::NOT_THREADED, updated_at: Time.now.utc)
 
     InstStatsd::Statsd.distributed_increment("discussion_topic.migrate_disallow_manage.count")
-    InstStatsd::Statsd.distributed_increment("discussion_topic.migrate_disallow_manage.discussions_updated_count", to_threaded_update_count, tags: { type: DiscussionTopic::DiscussionTypes::THREADED })
-    InstStatsd::Statsd.distributed_increment("discussion_topic.migrate_disallow_manage.discussions_updated_count", to_not_threaded_update_count, tags: { type: DiscussionTopic::DiscussionTypes::NOT_THREADED })
+    InstStatsd::Statsd.distribution("discussion_topic.migrate_disallow_manage.discussions_updated_count", to_threaded_update_count, tags: { type: DiscussionTopic::DiscussionTypes::THREADED })
+    InstStatsd::Statsd.distribution("discussion_topic.migrate_disallow_manage.discussions_updated_count", to_not_threaded_update_count, tags: { type: DiscussionTopic::DiscussionTypes::NOT_THREADED })
 
     render json: { success: "true" }
   end
