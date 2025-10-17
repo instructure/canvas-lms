@@ -74,6 +74,20 @@ horizon_learning_library:
   display_name: "Canvas Career: Learning Library"
   description: |-
     Enables the Learning Library in Canvas Career.
+horizon_course_navigation:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Course Navigation"
+  description: |-
+    Enables native course navigation in Canvas Career.
+horizon_course_redesign:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Course Redesign"
+  description: |-
+    Enables courses to leverage Canvas Career features natively.
 
 # Feature flags read by Canvas
 horizon_bulk_api_permission:

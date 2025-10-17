@@ -73,7 +73,9 @@ describe CareerController do
             horizon_bulk_metadata_import: false,
             horizon_manual_dashboard_builder: false,
             horizon_dark_career_theme_in_learning_provider: false,
-            horizon_learning_library: false
+            horizon_learning_library: false,
+            horizon_course_navigation: false,
+            horizon_course_redesign: false
           )
         end
 
