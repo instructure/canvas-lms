@@ -16,27 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createRoot} from 'react-dom/client'
-import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
-import type {MediaInfo} from '@canvas/canvas-studio-player/react/types'
-import './index.css'
+/* Global layout overrides for immersive media view */
+/* Remove all default layout padding on mobile, preserve nav margin on desktop */
 
-import {ImmersiveView} from './ImmersiveView'
-
-declare const ENV: GlobalEnv & {
-  media_object: MediaInfo
-  attachment_id?: string
-  attachment?: boolean
+/* Preserve the left margin for navigation on desktop (≥768px) */
+body.immersive-media-view .ic-Layout-wrapper {
+  min-height: 100vh;
 }
 
-const container = document.getElementById('immersive_view_container')
-const root = createRoot(container!)
+@media (min-width: 768px) {
+  #immersive_view_container {
+    padding: 2.25rem;
+  }
 
-root.render(
-  <ImmersiveView
-    id={ENV.media_object?.media_id}
-    title={ENV.media_object?.title}
-    attachmentId={ENV.attachment_id}
-    isAttachment={ENV.attachment}
-  />,
-)
+  body.immersive-media-view:not(.no-headers) .ic-Layout-wrapper {
+    margin-left: 54px;
+  }
+
+  body.immersive-media-view:not(.no-headers).primary-nav-expanded .ic-Layout-wrapper {
+    margin-left: 84px;
+  }
+}

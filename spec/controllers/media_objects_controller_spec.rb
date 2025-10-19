@@ -1268,6 +1268,14 @@ describe MediaObjectsController do
       get "immersive_view", params: { attachment_id: attachment.id }
       expect(response).to be_successful
     end
+
+    it "sets custom body classes for immersive view layout" do
+      user_session(@student)
+      attachment = @media_object.attachment
+
+      get "immersive_view", params: { attachment_id: attachment.id }
+      expect(assigns[:body_classes]).to include("immersive-media-view", "content-only")
+    end
   end
 
   describe "POST '/media_objects'" do
