@@ -16,27 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createRoot} from 'react-dom/client'
-import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
-import type {MediaInfo} from '@canvas/canvas-studio-player/react/types'
-import './index.css'
+import {Flex} from '@instructure/ui-flex'
+import {Heading} from '@instructure/ui-heading'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {View} from '@instructure/ui-view'
+import ConfusedPanda from '@canvas/images/ConfusedPanda.svg'
 
-import {ImmersiveView} from './ImmersiveView'
+const I18n = createI18nScope('media_immersive_view')
 
-declare const ENV: GlobalEnv & {
-  media_object: MediaInfo
-  attachment_id?: string
-  attachment?: boolean
+export function NoTranscript() {
+  return (
+    <Flex gap="space16" alignItems="center" justifyItems="center" direction="column" height="100%">
+      <View maxWidth="102px">
+        <img src={ConfusedPanda} alt="" />
+      </View>
+      <Heading variant="titleCardRegular">{I18n.t('There is no transcript yet.')}</Heading>
+    </Flex>
+  )
 }
-
-const container = document.getElementById('immersive_view_container')
-const root = createRoot(container!)
-
-root.render(
-  <ImmersiveView
-    id={ENV.media_object?.media_id}
-    title={ENV.media_object?.title}
-    attachmentId={ENV.attachment_id}
-    isAttachment={ENV.attachment}
-  />,
-)

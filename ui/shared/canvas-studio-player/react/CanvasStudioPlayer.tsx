@@ -107,6 +107,11 @@ interface BaseCanvasStudioPlayerProps {
   hideUploadCaptions?: boolean
   isInverseVariant?: boolean
   kebabMenuElements?: StudioPlayerProps['kebabMenuElements']
+  enableSidebar?: StudioPlayerProps['enableSidebar']
+  openSidebar?: StudioPlayerProps['openSidebar']
+  tabs?: StudioPlayerProps['tabs']
+  emptyTranscriptsComponent?: StudioPlayerProps['emptyTranscriptsComponent']
+  rollingTranscriptElement?: StudioPlayerProps['rollingTranscriptElement']
 }
 
 type CanvasStudioPropsWithMediaIdOrAttachmentId =
@@ -132,6 +137,11 @@ export default function CanvasStudioPlayer({
   hideUploadCaptions = false,
   isInverseVariant = false,
   kebabMenuElements = [],
+  enableSidebar = false,
+  openSidebar = false,
+  tabs,
+  emptyTranscriptsComponent,
+  rollingTranscriptElement,
 }: CanvasStudioPropsWithMediaIdOrAttachmentId) {
   const [mediaId, setMediaId] = useState(media_id)
   const captions: CaptionMetaData[] | undefined = Array.isArray(media_captions)
@@ -364,6 +374,17 @@ export default function CanvasStudioPlayer({
     handlePlayerSize({})
   }, [mediaSources, type, boundingBox, handlePlayerSize])
 
+  useEffect(() => {
+    if (explicitSize) {
+      if (explicitSize.width !== containerWidth) {
+        setContainerWidth(explicitSize.width)
+      }
+      if (explicitSize.height !== containerHeight) {
+        setContainerHeight(explicitSize.height)
+      }
+    }
+  }, [explicitSize, containerWidth, containerHeight])
+
   function renderLoader() {
     if (retryAttempt >= showBePatientMsgAfterAttempts) {
       setIsLoading(false)
@@ -400,6 +421,11 @@ export default function CanvasStudioPlayer({
               hideFullScreen={!includeFullscreen}
               title={getAriaLabel()}
               onCaptionsDelete={hideCaptionButtons ? undefined : deleteCaption}
+              enableSidebar={enableSidebar}
+              openSidebar={openSidebar}
+              tabs={tabs}
+              emptyTranscriptsComponent={emptyTranscriptsComponent}
+              rollingTranscriptElement={rollingTranscriptElement}
               kebabMenuElements={
                 hideCaptionButtons
                   ? [...kebabMenuElements]
