@@ -523,15 +523,26 @@ class OutcomeResultsController < ApplicationController
     excludes = Api.value_to_array(params[:exclude]).uniq
     filter_users_by_excludes
 
-    @results, @outcome_service_results = find_canvas_os_results(opts)
+    ff_read_enabled = Account.site_admin.feature_enabled?(:outcomes_rollup_read)
 
-    @results = @results.preload(:user)
-    ActiveRecord::Associations.preload(@results, :learning_outcome)
-    if @outcome_service_results.nil?
-      outcome_results_rollups(results: @results, users: @users, excludes:, context: @context)
+    if ff_read_enabled
+      stored_outcome_rollups(
+        users: opts[:all_users] ? @all_users : @users,
+        context: @context,
+        outcomes: @outcomes,
+        excludes:
+      )
     else
-      @outcome_service_results.push(@results).flatten!
-      outcome_results_rollups(results: @outcome_service_results, users: @users, excludes:, context: @context)
+      @results, @outcome_service_results = find_canvas_os_results(opts)
+
+      @results = @results.preload(:user)
+      ActiveRecord::Associations.preload(@results, :learning_outcome)
+      if @outcome_service_results.nil?
+        outcome_results_rollups(results: @results, users: @users, excludes:, context: @context)
+      else
+        @outcome_service_results.push(@results).flatten!
+        outcome_results_rollups(results: @outcome_service_results, users: @users, excludes:, context: @context)
+      end
     end
   end
 
