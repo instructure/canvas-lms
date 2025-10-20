@@ -24,7 +24,7 @@ import {IconCommentLine} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
-import {useMemo, useState} from 'react'
+import {useCallback, useMemo, useState} from 'react'
 import {useQuery} from '@apollo/client'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {SpeedGrader_CommentBankItemsCount} from './graphql/queries'
@@ -37,9 +37,16 @@ const I18n = createI18nScope('CommentLibrary')
 export type CommentLibraryContentProps = {
   userId: string
   courseId: string
+  setFocusToTextArea: () => void
+  setComment: (content: string) => void
 }
 
-export const CommentLibraryContent: React.FC<CommentLibraryContentProps> = ({courseId, userId}) => {
+export const CommentLibraryContent: React.FC<CommentLibraryContentProps> = ({
+  courseId,
+  userId,
+  setFocusToTextArea,
+  setComment,
+}) => {
   const [isTrayOpen, setIsTrayOpen] = useState(false)
   const [suggestionsWhenTypingEnabled] = useState(ENV.comment_library_suggestions_enabled)
 
@@ -55,6 +62,17 @@ export const CommentLibraryContent: React.FC<CommentLibraryContentProps> = ({cou
     }
     return count > 99 ? '99+' : String(count)
   }, [data])
+
+  const setCommentFromLibrary = useCallback(
+    (value: string) => {
+      setIsTrayOpen(false)
+      setComment(value)
+      setTimeout(() => {
+        setFocusToTextArea()
+      }, 0)
+    },
+    [setComment, setFocusToTextArea],
+  )
 
   // Show loading state if count is loading for more than 500ms
   if (loading || !data) {
@@ -105,6 +123,7 @@ export const CommentLibraryContent: React.FC<CommentLibraryContentProps> = ({cou
         courseId={courseId}
         isOpen={isTrayOpen}
         onDismiss={() => setIsTrayOpen(false)}
+        setCommentFromLibrary={setCommentFromLibrary}
       />
     </>
   )
@@ -115,6 +134,8 @@ const client = createClient()
 type CommentLibraryProps = {
   userId: string
   courseId: string
+  setFocusToTextArea: () => void
+  setComment: (content: string) => void
 }
 
 export const CommentLibrary: React.FC<CommentLibraryProps> = props => (
