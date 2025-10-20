@@ -20,7 +20,10 @@ import {render, screen, waitFor} from '@testing-library/react'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import type {LtiOverlayVersion} from '../../../../model/LtiOverlayVersion'
-import type {LtiRegistrationHistoryEntry} from '../../../../model/LtiRegistrationHistoryEntry'
+import type {
+  AvailabilityChangeHistoryEntry,
+  LtiRegistrationHistoryEntry,
+} from '../../../../model/LtiRegistrationHistoryEntry'
 import {
   mockLtiOverlayVersion,
   mockRegistrationWithAllInformation,
@@ -33,21 +36,33 @@ import {ZLtiRegistrationHistoryEntryId} from '../../../../model/LtiRegistrationH
 import {HISTORY_DISPLAY_LIMIT} from '../useHistory'
 import {ZLtiRegistrationId} from '../../../../model/LtiRegistrationId'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {ZLtiContextControlId} from '../../../../model/LtiContextControl'
 
 const server = setupServer()
 
 const mockLtiRegistrationHistoryEntry = (
-  overrides: Partial<LtiRegistrationHistoryEntry> = {},
-): LtiRegistrationHistoryEntry => ({
+  overrides: Partial<AvailabilityChangeHistoryEntry> = {},
+): AvailabilityChangeHistoryEntry => ({
   id: ZLtiRegistrationHistoryEntryId.parse('1'),
   root_account_id: ZAccountId.parse('4'),
   lti_registration_id: ZLtiRegistrationId.parse('1'),
   created_at: new Date('2025-01-15T12:00:00Z'),
   updated_at: new Date('2025-01-15T12:00:00Z'),
   diff: {registration: [['~', 'name', 'Old Name', 'New Name']]},
-  update_type: 'manual_edit',
+  update_type: 'control_edit',
   comment: 'Test update',
   created_by: mockUser({overrides: {name: 'Foo Bar Baz'}}),
+  old_context_controls: {},
+  new_context_controls: {
+    [ZLtiContextControlId.parse('1')]: {
+      id: ZLtiContextControlId.parse('1'),
+      available: false,
+      account_id: ZAccountId.parse('4'),
+      course_id: null,
+      deployment_id: '4',
+      workflow_state: 'active',
+    },
+  },
   ...overrides,
 })
 

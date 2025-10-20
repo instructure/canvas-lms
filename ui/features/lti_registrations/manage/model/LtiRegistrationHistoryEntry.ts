@@ -20,24 +20,127 @@ import {z} from 'zod'
 import {ZAccountId} from './AccountId'
 import {ZLtiRegistrationId} from './LtiRegistrationId'
 import {ZUser} from './User'
+import {ZInternalLtiConfiguration} from './internal_lti_configuration/InternalLtiConfiguration'
+import {ZLtiRegistration} from './LtiRegistration'
+import {ZLtiContextControl, ZLtiContextControlId} from './LtiContextControl'
+import {ZDeveloperKey} from './developer_key/DeveloperKey'
+import {ZLtiOverlay} from './LtiOverlay'
+import {ZLtiConfigurationOverlay} from './internal_lti_configuration/LtiConfigurationOverlay'
 
 export const ZLtiRegistrationHistoryEntryId = z.string().brand('ZLtiRegistrationHistoryEntryId')
 
-/**
- * @see The Lti::RegistrationHistoryEntry Rails model and its associated serializer.
- */
-export const ZLtiRegistrationHistoryEntry = z.object({
+const DevKeyAttributesMask = {
+  email: true,
+  user_name: true,
+  name: true,
+  redirect_uri: true,
+  redirect_uris: true,
+  icon_url: true,
+  vendor_code: true,
+  public_jwk: true,
+  oidc_initiation_url: true,
+  public_jwk_url: true,
+  scopes: true,
+} as const
+
+export const ZDeveloperKeyAttributes = ZDeveloperKey.pick(DevKeyAttributesMask)
+
+export type DeveloperKeyTrackedAttributes = z.infer<typeof ZDeveloperKeyAttributes>
+
+const RegistrationAttributesMask = {
+  admin_nickname: true,
+  name: true,
+  vendor: true,
+  workflow_state: true,
+  description: true,
+} as const
+
+export const ZLtiRegistrationAttributes = ZLtiRegistration.pick(RegistrationAttributesMask)
+
+export type LtiRegistrationTrackedAttributes = z.infer<typeof ZLtiRegistrationAttributes>
+
+export const ContextControlAttributesMask = {
+  id: true,
+  account_id: true,
+  course_id: true,
+  deployment_id: true,
+  available: true,
+  workflow_state: true,
+} as const
+
+export const ZLtiContextControlAttributes = ZLtiContextControl.pick(ContextControlAttributesMask)
+
+export type LtiContextControlTrackedAttributes = z.infer<typeof ZLtiContextControlAttributes>
+
+export const ZConfigurationSnapshot = z.object({
+  internal_config: ZInternalLtiConfiguration,
+  developer_key: ZDeveloperKeyAttributes,
+  registration: ZLtiRegistrationAttributes,
+  overlaid_internal_config: ZInternalLtiConfiguration,
+  // Overlay data can be null if no overlay exists yet, which is common
+  // for brand-new registrations.
+  overlay: ZLtiConfigurationOverlay.nullish(),
+})
+
+const ZBaseLtiRegistrationHistoryEntry = z.object({
   id: ZLtiRegistrationHistoryEntryId,
   root_account_id: ZAccountId,
   lti_registration_id: ZLtiRegistrationId,
   created_at: z.coerce.date(),
   updated_at: z.coerce.date(),
-  // TODO: Refine this type to be a bit more specific once we start
-  // working on the new history view.
-  diff: z.unknown(), // The diff object containing all changes
-  update_type: z.string(),
+  // We don't actually use the diff anymore, as dealing with Hashdiff's paths
+  // was *very* annoying.
+  diff: z.unknown(),
+  update_type: z.enum([
+    'manual_edit',
+    'registration_update',
+    'control_edit',
+    'bulk_control_create',
+  ]),
   comment: z.string().nullable(),
   created_by: z.union([ZUser, z.literal('Instructure')]),
 })
+
+export const ZHistoryEntryForAvailabilityChange = z.intersection(
+  ZBaseLtiRegistrationHistoryEntry,
+  z.object({
+    update_type: z.union([z.literal('control_edit'), z.literal('bulk_control_create')]),
+    old_context_controls: z.record(ZLtiContextControlId, ZLtiContextControlAttributes),
+    new_context_controls: z.record(ZLtiContextControlId, ZLtiContextControlAttributes),
+  }),
+)
+
+export const ZHistoryEntryForConfigChange = z.intersection(
+  ZBaseLtiRegistrationHistoryEntry,
+  z.object({
+    update_type: z.union([z.literal('manual_edit'), z.literal('registration_update')]),
+    old_configuration: ZConfigurationSnapshot,
+    new_configuration: ZConfigurationSnapshot,
+  }),
+)
+
+export type AvailabilityChangeHistoryEntry = z.infer<typeof ZHistoryEntryForAvailabilityChange>
+
+export type ConfigChangeHistoryEntry = z.infer<typeof ZHistoryEntryForConfigChange>
+
+export const isEntryForAvailabilityChange = (
+  entry: LtiRegistrationHistoryEntry,
+): entry is AvailabilityChangeHistoryEntry => {
+  return entry.update_type === 'control_edit' || entry.update_type === 'bulk_control_create'
+}
+
+export const isEntryForConfigChange = (
+  entry: LtiRegistrationHistoryEntry,
+): entry is ConfigChangeHistoryEntry => {
+  return entry.update_type === 'manual_edit' || entry.update_type === 'registration_update'
+}
+
+/**
+ * @see The Lti::RegistrationHistoryEntry Rails model and its associated serializer.
+ */
+export const ZLtiRegistrationHistoryEntry = z.union([
+  ZHistoryEntryForAvailabilityChange,
+  ZHistoryEntryForConfigChange,
+])
 
 export type LtiRegistrationHistoryEntry = z.infer<typeof ZLtiRegistrationHistoryEntry>
