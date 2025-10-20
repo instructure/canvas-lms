@@ -1,0 +1,62 @@
+name: canvas
+services:
+  jobs:
+    build:
+      context: /home/ephi/Documents/GitHub/canvas
+      dockerfile: Dockerfile
+    command:
+      - bundle
+      - exec
+      - script/delayed_job
+      - run
+    depends_on:
+      postgres:
+        condition: service_started
+        restart: true
+        required: true
+      redis:
+        condition: service_started
+        restart: true
+        required: true
+    environment:
+      POSTGRES_PASSWORD: sekret
+    links:
+      - postgres
+      - redis
+    networks:
+      default: null
+  postgres:
+    build:
+      context: /home/ephi/Documents/GitHub/canvas/docker-compose/postgres
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_PASSWORD: sekret
+    networks:
+      default: null
+  redis:
+    image: redis:alpine
+    networks:
+      default: null
+  web:
+    build:
+      context: /home/ephi/Documents/GitHub/canvas
+      dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_started
+        restart: true
+        required: true
+      redis:
+        condition: service_started
+        restart: true
+        required: true
+    environment:
+      POSTGRES_PASSWORD: sekret
+    links:
+      - postgres
+      - redis
+    networks:
+      default: null
+networks:
+  default:
+    name: canvas_default

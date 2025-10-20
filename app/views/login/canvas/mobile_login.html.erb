@@ -28,27 +28,34 @@
   end
 %>
 
-  <div class="mobileLogin-Header">
-    <span class="screenreader-only">
-      <%= t 'Canvas by Instructure' %>
-      <script type="text/javascript">
-        window.onload = function() {
-          var msg
-          var email = document.querySelector('[placeholder="Email"]')
-          function showMessage() {
-            var elt = document.querySelector('span#screenreader-errormsg')
-            if (elt) elt.innerText = msg
-          }
-          <% if request.post? && flash[:error] %>
-            msg = '<%= t "Error logging in: %{error_msg}", error_msg: flash[:error] %>'
-            setTimeout(showMessage, 1500)
-            if (email) email.focus()
-          <% end %>
+<div class="mobileLogin-Header">
+  <span class="screenreader-only">
+    <%= t 'Canvas by Instructure' %>
+    <script type="text/javascript">
+      window.onload = function() {
+        var msg
+        var email = document.querySelector('[placeholder="Email"]')
+        function showMessage() {
+          var elt = document.querySelector('span#screenreader-errormsg')
+          if (elt) elt.innerText = msg
         }
-      </script>
-      <span aria-live="assertive" id="screenreader-errormsg"></span>
-    </span>
+        <% if request.post? && flash[:error] %>
+          msg = '<%= t "Error logging in: %{error_msg}", error_msg: flash[:error] %>'
+          setTimeout(showMessage, 1500)
+          if (email) email.focus()
+        <% end %>
+      }
+    </script>
+    <span aria-live="assertive" id="screenreader-errormsg"></span>
+  </span>
+</div>
+
+<div> 
+  <div class="ic-Login-header">
+    <%= render :partial => 'login/shared/header_logo' %>
   </div>
+</div>
+
 <%= form_for :pseudonym_session, :url => url_for({ action: :create }.merge(params.slice(:id).to_unsafe_h)), :html => {:id => "login_form", :class => "front face", :novalidate => 'novalidate', :autocomplete => "off" } do |f| %>
 
   <div class="ic-Form-control">
