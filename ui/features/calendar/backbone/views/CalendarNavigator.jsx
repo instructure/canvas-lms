@@ -156,7 +156,12 @@ CalendarNavigator.prototype.showPicker = function (visible) {
 }
 
 CalendarNavigator.prototype.hidePicker = function () {
-  return this.showPicker(false)
+  this.showPicker(false)
+  // Restore focus to the trigger element for accessibility
+  if (this._pickerTriggerElement) {
+    this._pickerTriggerElement.focus()
+    this._pickerTriggerElement = null
+  }
 }
 
 CalendarNavigator.prototype.showPrevNext = function () {
@@ -211,6 +216,10 @@ CalendarNavigator.prototype._triggerDate = function (selectedDate) {
 
 CalendarNavigator.prototype._onTitleClick = function (event) {
   event.preventDefault()
+  // Store the trigger element only for keyboard navigation (not mouse clicks)
+  if (event.type === 'keyclick') {
+    this._pickerTriggerElement = event.target
+  }
   return this._titleActivated()
 }
 
