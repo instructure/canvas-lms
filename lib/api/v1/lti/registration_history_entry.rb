@@ -23,7 +23,18 @@ module Api::V1::Lti::RegistrationHistoryEntry
   include Api::V1::User
 
   JSON_ATTRS = %w[
-    id root_account_id lti_registration_id created_at updated_at diff update_type comment
+    id
+    root_account_id
+    lti_registration_id
+    created_at
+    updated_at
+    diff
+    update_type
+    comment
+    old_configuration
+    new_configuration
+    old_context_controls
+    new_context_controls
   ].freeze
 
   def lti_registration_history_entry_json(history_entry, user, session, context)
