@@ -2761,12 +2761,55 @@ describe Types::UserType do
         submitted_submission = submitted_assignment.submissions.find_or_create_by(user: @student)
         submitted_submission.update!(
           submitted_at: @frozen_time - 1.hour,
-          workflow_state: "submitted"
+          workflow_state: "submitted",
+          submission_type: "online_text_entry"
         )
 
         result = student_user_type.resolve("courseWorkSubmissionsConnection(onlySubmitted: true) { edges { node { assignment { title } } } }")
         expect(result).to include("Submitted Assignment")
         expect(result).not_to include("Test Assignment") # Should not include unsubmitted
+      end
+    end
+
+    it "includes graded submissions in onlySubmitted filter even without submitted_at" do
+      Timecop.freeze(@frozen_time) do
+        # Create assignment with no submission required (e.g., "on_paper")
+        no_submission_assignment = @course.assignments.create!(
+          title: "Graded No Submission Assignment",
+          due_at: (@frozen_time - 1.day).end_of_day,
+          workflow_state: "published",
+          submission_types: "none"
+        )
+        graded_submission = no_submission_assignment.submissions.find_or_create_by(user: @student)
+        graded_submission.update!(
+          submitted_at: nil, # Never submitted
+          workflow_state: "graded",
+          grader_id: @teacher.id,
+          score: 90
+        )
+
+        result = student_user_type.resolve("courseWorkSubmissionsConnection(onlySubmitted: true) { edges { node { assignment { title } } } }")
+        expect(result).to include("Graded No Submission Assignment")
+      end
+    end
+
+    it "includes excused submissions in onlySubmitted filter" do
+      Timecop.freeze(@frozen_time) do
+        excused_assignment = @course.assignments.create!(
+          title: "Excused Assignment",
+          due_at: (@frozen_time + 1.day).end_of_day,
+          workflow_state: "published",
+          submission_types: "online_text_entry"
+        )
+        excused_submission = excused_assignment.submissions.find_or_create_by(user: @student)
+        excused_submission.update!(
+          submitted_at: nil,
+          workflow_state: "unsubmitted",
+          excused: true
+        )
+
+        result = student_user_type.resolve("courseWorkSubmissionsConnection(onlySubmitted: true) { edges { node { assignment { title } } } }")
+        expect(result).to include("Excused Assignment")
       end
     end
 
