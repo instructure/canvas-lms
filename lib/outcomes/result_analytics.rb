@@ -142,6 +142,49 @@ module Outcomes
       end
     end
 
+    # Public: Retrieves rollup data from the OutcomeRollup table.
+    #
+    # users - The users to lookup rollup data for (required)
+    # context - The context to lookup rollup data for (required)
+    # outcomes - (Optional) The outcomes to lookup rollup data for
+    # excludes - (Optional) Specify additional values to exclude. "missing_user_rollups" excludes
+    #            rollups for users without results.
+    #
+    # Returns an Array of Rollup objects in the same format as outcome_results_rollups.
+    def stored_outcome_rollups(users:, context:, outcomes: nil, excludes: [])
+      rollup_records = OutcomeRollup.active
+                                    .where(course_id: context.id, user_id: users.map(&:id))
+      rollup_records = rollup_records.where(outcome_id: outcomes.map(&:id)) if outcomes.present?
+      rollup_records = rollup_records.preload(:user, :outcome)
+
+      rollups = rollup_records.group_by(&:user_id).map do |_, user_rollups|
+        user = user_rollups.first.user
+        scores = user_rollups.map do |rollup_record|
+          # Use RollupScore in stored mode for pre-calculated rollups
+          # Note: count, hide_points, title, and submitted_at are not available in stored rollups
+          RollupScore.new(
+            opts: {
+              stored: true,
+              outcome: rollup_record.outcome,
+              score: rollup_record.aggregate_score,
+              count: 0, # TODO: should reflect actual number of results used in calculation
+              hide_points: false, # TODO: should reflect whether points are hidden in actual results
+              title: nil,         # Not available in stored rollups (aggregate data only)
+              submitted_at: nil   # Not available in stored rollups (aggregate data only)
+            }
+          )
+        end
+
+        Rollup.new(user, scores)
+      end
+
+      if excludes.include? "missing_user_rollups"
+        rollups
+      else
+        add_missing_user_rollups(rollups, users)
+      end
+    end
+
     # Public: Calculates an average rollup for the specified results
     #
     # results - An Enumeration of properly sorted LearningOutcomeResult objects.
