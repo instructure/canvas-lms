@@ -76,6 +76,8 @@ export const RubricAssignmentContainer = ({
   const [_criteriaViaLlm, setCriteriaViaLlm] = useState(false)
   const [assignmentPoints, setAssignmentPoints] = useState(assignmentPointsPossible)
 
+  const deleteTooltipText = (rubric?.association_count ?? 0) > 1 ? I18n.t('Unlink Rubric') : I18n.t('Delete Rubric')
+
   const handleSaveRubric = (
     savedRubricResponse: SaveRubricResponse,
     updatePointsPossible?: boolean,
@@ -196,11 +198,11 @@ export const RubricAssignmentContainer = ({
               </Tooltip>
             )}
 
-            <Tooltip renderTip={I18n.t('Delete Rubric')}>
+            <Tooltip renderTip={deleteTooltipText}>
               <IconButton
                 margin="0 0 0 small"
                 data-testid="remove-assignment-rubric-button"
-                screenReaderLabel={I18n.t('Delete Rubric')}
+                screenReaderLabel={deleteTooltipText}
                 onClick={() => setIsDeleteConfirmModalOpen(true)}
               >
                 <IconTrashLine />
