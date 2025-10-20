@@ -84,11 +84,6 @@ const EnrollmentInvitation: React.FC<EnrollmentInvitationProps> = ({
         enrollmentUuid,
       })
     },
-    onSuccess: () => {
-      // Reload the page on invitation accepted
-      // so we pull the latest data
-      window.location.reload()
-    },
   })
 
   const rejectMutation = useMutation<RejectEnrollmentInvitationResponse, Error, string>({
@@ -109,6 +104,10 @@ const EnrollmentInvitation: React.FC<EnrollmentInvitationProps> = ({
           type: 'success',
         })
         onAccept?.(invitation.id)
+
+        // Small delay to allow backend after_transaction_commit to clear cache
+        await new Promise(resolve => setTimeout(resolve, 500))
+        window.location.reload()
       } else {
         const errors = result?.acceptEnrollmentInvitation?.errors || []
         const errorMessage =
@@ -158,7 +157,7 @@ const EnrollmentInvitation: React.FC<EnrollmentInvitationProps> = ({
   const courseUrl = `/courses/${invitation.course.id}?invitation=${invitation.uuid}`
 
   return (
-    <View as="div" margin="0 0 small 0">
+    <View as="div" margin="0 0 small 0" data-testid="enrollment-invitation">
       <Alert variant="success" renderCloseButtonLabel="">
         <Flex>
           <Flex.Item shouldGrow shouldShrink>
