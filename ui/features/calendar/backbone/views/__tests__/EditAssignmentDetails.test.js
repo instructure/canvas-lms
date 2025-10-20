@@ -174,7 +174,7 @@ describe('EditAssignmentDetails', () => {
     const errors = view.validateBeforeSave(data, [])
     expect(errors['assignment[name]']).toBeTruthy()
     expect(errors['assignment[name]']).toHaveLength(1)
-    expect(errors['assignment[name]'][0].message).toBe('Name is required!')
+    expect(errors['assignment[name]'][0].message).toBe('Title is required!')
   })
 
   test('has an error when a name has 257 chars', () => {
