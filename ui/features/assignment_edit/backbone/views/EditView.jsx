@@ -1295,7 +1295,11 @@ EditView.prototype.afterRender = function () {
       parseInt(this.assignment.id, 10),
     )
   }
-  if (window.ENV?.FEATURES?.lti_asset_processor && this.$assetProcessorsContainer.length > 0) {
+  if (
+    window.ENV?.FEATURES?.lti_asset_processor &&
+    window.ENV?.FEATURES?.lti_asset_processor_course &&
+    this.$assetProcessorsContainer.length > 0
+  ) {
     assetProcessorsAttach({
       container: this.$assetProcessorsContainer.get(0),
       courseId: ENV.COURSE_ID,

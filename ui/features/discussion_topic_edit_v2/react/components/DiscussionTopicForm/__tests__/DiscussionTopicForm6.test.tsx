@@ -72,6 +72,7 @@ describe('DiscussionTopicForm', () => {
       },
       FEATURES: {
         lti_asset_processor_discussions: true,
+        lti_asset_processor_course: true,
       },
       // @ts-expect-error
       PERMISSIONS: {},
@@ -218,6 +219,54 @@ describe('DiscussionTopicForm', () => {
           },
         },
       ])
+    })
+
+    it('does not show AssetProcessors section when lti_asset_processor_course is disabled', () => {
+      window.ENV.FEATURES = {
+        lti_asset_processor_discussions: true,
+        lti_asset_processor_course: false,
+      }
+      const assignment = Assignment.mock()
+      // @ts-expect-error
+      const mockDiscussionTopic = DiscussionTopic.mock({assignment})
+      const {queryByText} = setup({
+        isEditing: true,
+        currentDiscussionTopic: mockDiscussionTopic,
+      })
+
+      expect(queryByText('Document Processing App(s)')).not.toBeInTheDocument()
+    })
+
+    it('does not show AssetProcessors section when lti_asset_processor_discussions is disabled', () => {
+      window.ENV.FEATURES = {
+        lti_asset_processor_discussions: false,
+        lti_asset_processor_course: true,
+      }
+      const assignment = Assignment.mock()
+      // @ts-expect-error
+      const mockDiscussionTopic = DiscussionTopic.mock({assignment})
+      const {queryByText} = setup({
+        isEditing: true,
+        currentDiscussionTopic: mockDiscussionTopic,
+      })
+
+      expect(queryByText('Document Processing App(s)')).not.toBeInTheDocument()
+    })
+
+    it('does not show AssetProcessors section when both feature flags are disabled', () => {
+      window.ENV.FEATURES = {
+        lti_asset_processor_discussions: false,
+        lti_asset_processor_course: false,
+      }
+      const assignment = Assignment.mock()
+      // @ts-expect-error
+      const mockDiscussionTopic = DiscussionTopic.mock({assignment})
+      const {queryByText} = setup({
+        isEditing: true,
+        currentDiscussionTopic: mockDiscussionTopic,
+      })
+
+      expect(queryByText('Document Processing App(s)')).not.toBeInTheDocument()
     })
   })
 })

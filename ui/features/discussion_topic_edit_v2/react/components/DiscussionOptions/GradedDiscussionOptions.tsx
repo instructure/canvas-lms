@@ -172,7 +172,7 @@ export const GradedDiscussionOptions = ({
           setIntraGroupPeerReviews={setIntraGroupPeerReviews}
         />
       </View>
-      {ENV.FEATURES.lti_asset_processor_discussions && (
+      {ENV.FEATURES.lti_asset_processor_discussions && ENV.FEATURES.lti_asset_processor_course && (
         <AssetProcessorsForDiscussion
           courseId={parseInt(ENV.COURSE_ID!)}
           secureParams={

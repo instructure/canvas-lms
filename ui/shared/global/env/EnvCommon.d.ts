@@ -373,7 +373,10 @@ export type BrandAccountFeatureId =
  * Feature id exported in ApplicationController that aren't mentioned in
  * JS_ENV_SITE_ADMIN_FEATURES or JS_ENV_ROOT_ACCOUNT_FEATURES or JS_ENV_BRAND_ACCOUNT_FEATURES
  */
-export type OtherFeatureId = 'canvas_k6_theme' | 'new_math_equation_handling'
+export type OtherFeatureId =
+  | 'canvas_k6_theme'
+  | 'new_math_equation_handling'
+  | 'lti_asset_processor_course'
 
 /**
  * From ApplicationHelper#set_tutorial_js_env

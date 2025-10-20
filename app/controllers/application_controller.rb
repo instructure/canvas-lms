@@ -342,7 +342,8 @@ class ApplicationController < ActionController::Base
         @js_env[:DIRECT_SHARE_ENABLED] = @context.respond_to?(:grants_right?) && @context.grants_right?(@current_user, session, :direct_share)
         @js_env[:CAN_VIEW_CONTENT_SHARES] = @current_user&.can_view_content_shares?
         @js_env[:FEATURES] = cached_features.merge(
-          canvas_k6_theme: @context.try(:feature_enabled?, :canvas_k6_theme)
+          canvas_k6_theme: @context.try(:feature_enabled?, :canvas_k6_theme),
+          lti_asset_processor_course: @context.try(:feature_enabled?, :lti_asset_processor_course)
         )
         @js_env[:PENDO_APP_ID] = usage_metrics_api_key if load_usage_metrics?
         @js_env[:current_user] = @current_user ? Rails.cache.fetch(["user_display_json", @current_user].cache_key, expires_in: 1.hour) { user_display_json(@current_user, :profile, [:avatar_is_fallback, :email]) } : {}
