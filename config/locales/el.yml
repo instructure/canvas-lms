@@ -4715,6 +4715,7 @@ el:
   course_setup_checklist_78dcff7e: "Λίστα Ελέγχου για τη Δημιουργία του Μαθήματος"
   course_setup_wizard_is_showing_a7c087c1: "Ο Οδηγός για τη Δημιουργία του Μαθήματος εμφανίζεται."
   course_sis_id_bbed1a60: "id sis μαθήματος"
+  course_sis_id_c026d0f3: "Αναγνωριστικό/ΙD για το Μάθημα SIS"
   course_starts_at_3a01f9da: "Το μάθημα ξεκινάει στις"
   course_statistics: 
     unknown: άγνωστο
@@ -6453,6 +6454,7 @@ el:
   everyone_else_cc5f6888: "Όλοι οι άλλοι"
   exact_value_margin_eae7e67e: "%{exact_value} +/- %{margin}"
   example_84698b7d: Παράδειγμα
+  example_cb3509b8: "Παράδειγμα:"
   example_final_score_355aff0f: "Υπόδειγμα τελικής βαθμολογίας"
   example_final_score_a92b30b9: "Υπόδειγμα τελικής βαθμολογίας]]"
   example_https_example_com_config_xml_be5f36ac: "Παράδειγμα: https://example.com/config.xml"
