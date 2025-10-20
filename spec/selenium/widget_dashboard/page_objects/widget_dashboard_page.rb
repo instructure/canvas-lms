@@ -128,6 +128,23 @@ module WidgetDashboardPage
   def no_course_work_message_selector
     "[data-testid='no-course-work-message']"
   end
+
+  def enrollment_invitation_selector
+    "[data-testid='enrollment-invitation']"
+  end
+
+  def enrollment_invitation_accept_button_selector
+    "[data-testid='enrollment-invitation'] button:contains('Accept')"
+  end
+
+  def enrollment_invitation_decline_button_selector
+    "[data-testid='enrollment-invitation'] button:contains('Decline')"
+  end
+
+  def all_enrollment_invitations_selector
+    "[data-testid='enrollment-invitation']"
+  end
+
   #------------------------------ Elements ------------------------------
 
   def announcement_filter
@@ -244,6 +261,22 @@ module WidgetDashboardPage
 
   def no_course_work_message
     f(no_course_work_message_selector)
+  end
+
+  def enrollment_invitation
+    f(enrollment_invitation_selector)
+  end
+
+  def all_enrollment_invitations
+    ff(all_enrollment_invitations_selector)
+  end
+
+  def enrollment_invitation_accept_button
+    fj(enrollment_invitation_accept_button_selector)
+  end
+
+  def enrollment_invitation_decline_button
+    fj(enrollment_invitation_decline_button_selector)
   end
 
   #------------------------------ Actions -------------------------------
