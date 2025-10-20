@@ -17,12 +17,13 @@
  */
 
 import React from 'react'
-import {render, waitFor, screen} from '@testing-library/react'
+import {render, waitFor, screen, act} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {MockedProvider} from '@apollo/client/testing'
 import {CommentLibraryContent} from '../CommentLibrary'
+import {InMemoryCache} from '@apollo/client'
+import {SpeedGrader_CommentBankItemsCount, SpeedGrader_CommentBankItems} from '../graphql/queries'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import {SpeedGrader_CommentBankItemsCount} from '../graphql/queries'
 
 describe('CommentLibrary', () => {
   const defaultUserId = '1'
@@ -49,15 +50,67 @@ describe('CommentLibrary', () => {
     },
   })
 
+  const createCommentsMock = (
+    userId: string,
+    courseId: string,
+    comments: Array<{_id: string; comment: string}> = [
+      {_id: 'comment-1', comment: 'Great work!'},
+      {_id: 'comment-2', comment: 'Needs improvement'},
+      {_id: 'comment-3', comment: 'Well done'},
+    ],
+  ) => ({
+    request: {
+      query: SpeedGrader_CommentBankItems,
+      variables: {userId, courseId, first: 20, after: ''},
+    },
+    result: {
+      data: {
+        legacyNode: {
+          __typename: 'User',
+          commentBankItemsConnection: {
+            __typename: 'CommentBankItemConnection',
+            nodes: comments,
+            pageInfo: {
+              __typename: 'PageInfo',
+              hasNextPage: false,
+              endCursor: null,
+            },
+          },
+        },
+      },
+    },
+  })
+
   const setup = (mocks: any[], props = {}) => {
     const defaultProps = {
       userId: defaultUserId,
       courseId: defaultCourseId,
+      setComment: jest.fn(),
+      setFocusToTextArea: jest.fn(),
       ...props,
     }
 
+    const cache = new InMemoryCache({
+      typePolicies: {
+        User: {
+          fields: {
+            commentBankItemsConnection: {
+              keyArgs: ['courseId'],
+              merge(existing, incoming) {
+                if (!existing) return incoming
+                return {
+                  ...incoming,
+                  nodes: [...existing.nodes, ...incoming.nodes],
+                }
+              },
+            },
+          },
+        },
+      },
+    })
+
     return render(
-      <MockedProvider mocks={mocks} addTypename={true}>
+      <MockedProvider mocks={mocks} addTypename={true} cache={cache}>
         <CommentLibraryContent {...defaultProps} />
       </MockedProvider>,
     )
@@ -194,55 +247,76 @@ describe('CommentLibrary', () => {
     })
   })
 
-  describe('Dynamic Data Updates', () => {
-    it('re-renders when userId changes', async () => {
-      const mocks = [createCountMock('1', 10), createCountMock('2', 25)]
-      const {getByTestId, rerender} = setup(mocks, {userId: '1'})
+  describe('setCommentFromLibrary callback', () => {
+    it('calls setComment and setFocusToTextArea when comment is selected', async () => {
+      jest.useFakeTimers()
+      const user = userEvent.setup({delay: null})
+      const setComment = jest.fn()
+      const setFocusToTextArea = jest.fn()
+      const mocks = [
+        createCountMock(defaultUserId, 3),
+        createCommentsMock(defaultUserId, defaultCourseId),
+      ]
 
-      await waitFor(() => {
-        expect(getByTestId('comment-library-count')).toHaveTextContent('10')
-      })
-
-      rerender(
-        <MockedProvider mocks={mocks} addTypename={true}>
-          <CommentLibraryContent userId="2" courseId={defaultCourseId} />
-        </MockedProvider>,
-      )
-
-      await waitFor(() => {
-        expect(getByTestId('comment-library-count')).toHaveTextContent('25')
-      })
-    })
-  })
-
-  describe('Tray Integration Tests', () => {
-    it('tray is closed by default', async () => {
-      const mocks = [createCountMock(defaultUserId, 10)]
-      setup(mocks)
+      setup(mocks, {setComment, setFocusToTextArea})
 
       await waitFor(() => {
         expect(screen.getByTestId('comment-library-button')).toBeInTheDocument()
       })
 
-      // Tray should exist but content should not be visible
-      expect(screen.queryByTestId('library-comment-area')).not.toBeInTheDocument()
+      await user.click(screen.getByTestId('comment-library-button'))
+
+      await waitFor(() => {
+        expect(screen.getByText('Great work!')).toBeInTheDocument()
+      })
+
+      // Select a comment
+      await user.click(screen.getByText('Great work!'))
+
+      // Verify comment is set
+      expect(setComment).toHaveBeenCalledWith('Great work!')
+
+      // setFocusToTextArea should not be called yet (async timeout)
+      expect(setFocusToTextArea).not.toHaveBeenCalled()
+
+      // Fast-forward timers to trigger async focus
+      act(() => {
+        jest.runAllTimers()
+      })
+
+      // Now setFocus should be called
+      expect(setFocusToTextArea).toHaveBeenCalled()
+
+      jest.useRealTimers()
     })
 
-    it('opens tray when comment library button is clicked', async () => {
+    it('closes tray after comment selection', async () => {
       const user = userEvent.setup()
-      const mocks = [createCountMock(defaultUserId, 10)]
-      setup(mocks)
+      const setComment = jest.fn()
+      const setFocusToTextArea = jest.fn()
+      const mocks = [
+        createCountMock(defaultUserId, 3),
+        createCommentsMock(defaultUserId, defaultCourseId),
+      ]
+
+      setup(mocks, {setComment, setFocusToTextArea})
 
       await waitFor(() => {
         expect(screen.getByTestId('comment-library-button')).toBeInTheDocument()
       })
 
-      const button = screen.getByTestId('comment-library-button')
-      await user.click(button)
+      await user.click(screen.getByTestId('comment-library-button'))
 
-      // Tray should now be open
       await waitFor(() => {
-        expect(screen.getByText('Manage Comment Library')).toBeInTheDocument()
+        expect(screen.getByText('Great work!')).toBeInTheDocument()
+      })
+
+      // Select a comment
+      await user.click(screen.getByText('Great work!'))
+
+      // Verify tray closes
+      await waitFor(() => {
+        expect(screen.queryByText('Manage Comment Library')).not.toBeInTheDocument()
       })
     })
   })

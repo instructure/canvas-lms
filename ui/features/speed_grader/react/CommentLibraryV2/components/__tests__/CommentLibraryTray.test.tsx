@@ -32,6 +32,7 @@ describe('CommentLibraryTray', () => {
     courseId: '1',
     isOpen: true,
     onDismiss: jest.fn(),
+    setCommentFromLibrary: jest.fn(),
   }
 
   const createCommentsMock = ({
@@ -267,6 +268,62 @@ describe('CommentLibraryTray', () => {
 
       expect(screen.getByTestId('create-comment-library-item-textarea')).toBeInTheDocument()
       expect(screen.getByTestId('add-to-library-button')).toBeInTheDocument()
+    })
+  })
+
+  describe('Comment Selection Tests', () => {
+    it('calls setCommentFromLibrary when a comment is clicked', async () => {
+      const user = userEvent.setup()
+      const setCommentFromLibrary = jest.fn()
+      const mocks = [createCommentsMock({commentCount: 3})]
+      setup(mocks, {setCommentFromLibrary})
+
+      await waitFor(() => {
+        expect(screen.getByText('Test comment 0')).toBeInTheDocument()
+      })
+
+      // Click on the first comment
+      await user.click(screen.getByText('Test comment 0'))
+
+      expect(setCommentFromLibrary).toHaveBeenCalledWith('Test comment 0')
+    })
+
+    it('calls setCommentFromLibrary with correct comment text for different comments', async () => {
+      const user = userEvent.setup()
+      const setCommentFromLibrary = jest.fn()
+      const mocks = [createCommentsMock({commentCount: 3})]
+      setup(mocks, {setCommentFromLibrary})
+
+      await waitFor(() => {
+        expect(screen.getByText('Test comment 1')).toBeInTheDocument()
+      })
+
+      // Click on the second comment
+      await user.click(screen.getByText('Test comment 1'))
+
+      expect(setCommentFromLibrary).toHaveBeenCalledWith('Test comment 1')
+      expect(setCommentFromLibrary).toHaveBeenCalledTimes(1)
+    })
+
+    it('calls setCommentFromLibrary multiple times for multiple clicks', async () => {
+      const user = userEvent.setup()
+      const setCommentFromLibrary = jest.fn()
+      const mocks = [createCommentsMock({commentCount: 3})]
+      setup(mocks, {setCommentFromLibrary})
+
+      await waitFor(() => {
+        expect(screen.getByText('Test comment 0')).toBeInTheDocument()
+      })
+
+      // Click on first comment
+      await user.click(screen.getByText('Test comment 0'))
+      expect(setCommentFromLibrary).toHaveBeenCalledWith('Test comment 0')
+
+      // Click on second comment
+      await user.click(screen.getByText('Test comment 1'))
+      expect(setCommentFromLibrary).toHaveBeenCalledWith('Test comment 1')
+
+      expect(setCommentFromLibrary).toHaveBeenCalledTimes(2)
     })
   })
 })

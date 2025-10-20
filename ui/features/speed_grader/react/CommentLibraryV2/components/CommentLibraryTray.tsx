@@ -39,6 +39,7 @@ export type CommentLibraryTrayProps = {
   courseId: string
   isOpen: boolean
   onDismiss: () => void
+  setCommentFromLibrary: (value: string) => void
 }
 
 export const CommentLibraryTray: React.FC<CommentLibraryTrayProps> = ({
@@ -46,6 +47,7 @@ export const CommentLibraryTray: React.FC<CommentLibraryTrayProps> = ({
   userId,
   isOpen,
   onDismiss,
+  setCommentFromLibrary,
 }) => {
   const queryVariables = useMemo(
     () => ({userId, courseId, first: 20, after: ''}),
@@ -92,8 +94,7 @@ export const CommentLibraryTray: React.FC<CommentLibraryTrayProps> = ({
         {comments.map((it: {_id: string; comment: string}, index: number) => (
           <CommentRouterView
             key={it._id}
-            // doing nothing for now
-            onClick={() => {}}
+            onClick={() => setCommentFromLibrary(it.comment)}
             comment={it.comment}
             index={index}
             id={it._id}
