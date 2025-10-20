@@ -240,6 +240,67 @@ describe LearnPlatform::GlobalApi do
         expect(subject).to eq(unified_tool_id)
       end
     end
+
+    context "caching behavior" do
+      it "caches successful responses for 5 minutes" do
+        expect(CanvasHttp).to receive(:get).once.and_return(success_response)
+
+        # First call should hit the API
+        result1 = subject
+        expect(result1).to eq(unified_tool_id)
+
+        # Second call should use cache
+        result2 = subject
+        expect(result2).to eq(unified_tool_id)
+      end
+
+      it "caches null responses for 5 minutes" do
+        allow(success_response).to receive(:body).and_return({ unified_tool_id: nil }.to_json)
+        expect(CanvasHttp).to receive(:get).once.and_return(success_response)
+
+        # First call should hit the API and return nil
+        result1 = subject
+        expect(result1).to be_nil
+
+        # Second call should use cache and return nil
+        result2 = subject
+        expect(result2).to be_nil
+      end
+
+      it "caches error responses for 5 minutes" do
+        error_response = Net::HTTPBadRequest.new(Net::HTTPBadRequest, "400", "Bad Request")
+        expect(CanvasHttp).to receive(:get).once.and_return(error_response)
+
+        # First call should hit the API and return false
+        result1 = subject
+        expect(result1).to be false
+
+        # Second call should use cache and return false
+        result2 = subject
+        expect(result2).to be false
+      end
+
+      it "uses tool info as cache key" do
+        # Different tool info should not use cached result
+        expect(CanvasHttp).to receive(:get).twice.and_return(success_response)
+
+        # First call with original params
+        result1 = subject
+        expect(result1).to eq(unified_tool_id)
+
+        # Second call with different tool name should hit API again
+        result2 = described_class.get_unified_tool_id(
+          lti_name: "Different Tool Name",
+          lti_tool_id:,
+          lti_domain:,
+          lti_version:,
+          lti_url:,
+          integration_type:,
+          lti_redirect_url:
+        )
+        expect(result2).to eq(unified_tool_id)
+      end
+    end
   end
 
   describe ".jwt" do
