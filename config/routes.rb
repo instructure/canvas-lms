@@ -2431,6 +2431,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: "support_helpers/asset_processor") do
       get "support_helpers/asset_processor/submission_details", action: :submission_details
       post "support_helpers/asset_processor/bulk_resubmit", action: :bulk_resubmit
+      post "support_helpers/asset_processor_discussion/bulk_resubmit", action: :bulk_resubmit_discussion
     end
 
     scope(controller: :outcome_groups_api) do

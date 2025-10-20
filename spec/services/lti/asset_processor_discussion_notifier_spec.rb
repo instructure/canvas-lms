@@ -174,5 +174,48 @@ RSpec.describe Lti::AssetProcessorDiscussionNotifier do
         expect(filenames).to include("note.txt")
       end
     end
+
+    context "tool_id filtering" do
+      it "filters asset processors by tool_id when provided" do
+        # Create a second tool and asset processor (first one created in before block)
+        tool2 = new_valid_external_tool(course)
+        lti_asset_processor_model(tool: tool2, assignment:)
+
+        stub_asset_processor_routes
+
+        # Create discussion entry and version before setting up notification spy
+        # to avoid counting notifications from reply_version
+        version, submission = reply_version(user: @student, html: "Test comment")
+
+        received_notifications = []
+        allow(Lti::PlatformNotificationService).to receive(:notify_tools) do |payload|
+          received_notifications << payload
+        end
+
+        # Initial notify sends to both tools (2 asset processors total)
+        described_class.notify_asset_processors_of_discussion(
+          discussion_entry_version: version,
+          assignment:,
+          contribution_status:,
+          submission:,
+          current_user: @student
+        )
+
+        expect(received_notifications.size).to eq(2)
+
+        # Resubmit filtered to tool2 only
+        described_class.notify_asset_processors_of_discussion(
+          discussion_entry_version: version,
+          assignment:,
+          contribution_status:,
+          submission:,
+          current_user: @student,
+          tool_id: tool2.id
+        )
+
+        expect(received_notifications.size).to eq(3)
+        expect(received_notifications.last[:cet_id_or_ids]).to eq(tool2.id)
+      end
+    end
   end
 end
