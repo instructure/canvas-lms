@@ -83,6 +83,7 @@ describe('ModuleSequenceFooter', () => {
 
   beforeEach(() => {
     $fixtures = $('<div id="fixtures" />')
+    document.body.innerHTML = ''
     document.body.appendChild($fixtures[0])
     $testEl = $('<div>')
     $fixtures.append($testEl)
@@ -461,7 +462,13 @@ describe('ModuleSequenceFooter', () => {
       await msf.data('msfInstance').fetch()
       jest.runAllTimers()
 
-      expect($testEl.find('[aria-label="Next Module Item"][disabled]')).toHaveLength(1)
+      const nextButton = $testEl.find('[aria-label="Next Module Item"][disabled]')
+
+      expect(nextButton).toHaveLength(1)
+
+      // assert proper rendering of mouseover tooltip icon
+      nextButton.mouseover()
+      expect(document.querySelectorAll('i.icon-module')).toHaveLength(1)
     })
 
     it('shows next button when no next items exist and paths are processing', async () => {
