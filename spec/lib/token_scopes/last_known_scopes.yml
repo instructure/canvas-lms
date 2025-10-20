@@ -2169,6 +2169,8 @@
   path: '/api/v1/support_helpers/asset_processor/bulk_resubmit'
 - verb: GET
   path: '/api/v1/support_helpers/asset_processor/submission_details'
+- verb: POST
+  path: '/api/v1/support_helpers/asset_processor_discussion/bulk_resubmit'
 - verb: GET
   path: '/api/v1/support_helpers/plagiarism_platform/add_service'
 - verb: GET
