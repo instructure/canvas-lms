@@ -96,6 +96,9 @@ development:
       translation.yml: |
         translation_region: us-west-2
         vault_credential_path: sts/testaccount/sts/translation-dev
+      ignite_agent.yml: |
+        launch_url: http://localhost:9003/remoteEntry.js
+        backend_url: http://localhost:9002
       # datadog_apm.yml: |
       #   sample_rate: 0.0
       #   host_sample_rate: 0.0
