@@ -684,7 +684,12 @@ module Types
 
       # Filter by submission status
       submissions_query = if only_submitted
-                            submissions_query.where.not(submitted_at: nil)
+                            # Include submitted, graded, or excused submissions
+                            submissions_query.where(<<~SQL.squish)
+                              (submissions.excused = true
+                              OR submissions.workflow_state IN ('submitted', 'pending_review')
+                              OR (submissions.score IS NOT NULL AND submissions.workflow_state = 'graded'))
+                            SQL
                           else
                             # Default: show unsubmitted, non-excused assignments (actionable items)
                             submissions_query.where(submitted_at: nil).where("excused = FALSE OR excused IS NULL")
