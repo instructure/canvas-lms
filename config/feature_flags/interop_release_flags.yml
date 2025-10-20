@@ -206,6 +206,20 @@ lti_asset_processor_discussions:
       state: allowed_on
     ci:
       state: allowed_on
+lti_asset_processor_course:
+  state: hidden
+  applies_to: Course
+  display_name: Document Processor
+  description: |-
+    If enabled, the Document Processor placement will be visible on Assignments and Discussions
+    when at least one tool is configured to use this placement and Documents Processors are enabled for the root account.
+  environments:
+    development:
+      state: allowed_on
+    test:
+      state: allowed_on
+    ci:
+      state: allowed_on
 lti_before_assignment_results:
   state: hidden
   display_name: Display LTI placement before assignment description after submitting.

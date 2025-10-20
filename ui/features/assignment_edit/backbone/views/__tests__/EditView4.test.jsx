@@ -390,7 +390,7 @@ describe('EditView', () => {
     }
 
     it('attaches AssetProcessors component when FF is on', async () => {
-      window.ENV.FEATURES = {lti_asset_processor: true}
+      window.ENV.FEATURES = {lti_asset_processor: true, lti_asset_processor_course: true}
       const view = createEditViewOnlineSubmission({onlineUpload: true})
       view.afterRender()
       await waitFor(() => {
@@ -404,7 +404,7 @@ describe('EditView', () => {
     })
 
     it('contains the correct initialAttachedProcessors', async () => {
-      window.ENV.FEATURES = {lti_asset_processor: true}
+      window.ENV.FEATURES = {lti_asset_processor: true, lti_asset_processor_course: true}
       window.ENV.ASSET_PROCESSORS = [{id: 1}] // rest of the fields omitted here for brevity
       const view = createEditViewOnlineSubmission({onlineUpload: true})
       view.afterRender()
@@ -419,16 +419,18 @@ describe('EditView', () => {
       window.ENV.FEATURES = {lti_asset_processor: false}
       const view = createEditViewOnlineSubmission({onlineUpload: true})
       view.afterRender()
-      await waitFor(() => {
-        expect(view.$assetProcessorsContainer.children()).toHaveLength(0)
-      })
-      // Ensure no children are added after the initial render
-      await new Promise(resolve => setTimeout(resolve, 100))
+      expect(view.$assetProcessorsContainer.children()).toHaveLength(0)
+    })
+
+    it('does not attach AssetProcessors component when lti_asset_processor is on but lti_asset_processor_course is off', async () => {
+      window.ENV.FEATURES = {lti_asset_processor: true, lti_asset_processor_course: false}
+      const view = createEditViewOnlineSubmission({onlineUpload: true})
+      view.afterRender()
       expect(view.$assetProcessorsContainer.children()).toHaveLength(0)
     })
 
     it('is hidden if submission type does not include online with a file upload', () => {
-      window.ENV.FEATURES = {lti_asset_processor: true}
+      window.ENV.FEATURES = {lti_asset_processor: true, lti_asset_processor_course: true}
       let view = createEditViewOnlineSubmission({onlineUpload: true})
       view.afterRender()
       expect(view.$assetProcessorsContainer.css('display')).toBe('block')
