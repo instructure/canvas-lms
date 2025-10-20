@@ -811,4 +811,202 @@ describe Outcomes::ResultAnalytics do
       expect(rollups.map(&:score)).to eq [3.38]
     end
   end
+
+  describe "#stored_outcome_rollups" do
+    before(:once) do
+      @course = course_factory
+      @students = create_users(Array.new(3) { |i| { name: "Student #{i + 1}" } }, return_type: :record)
+      @students.each { |student| course_with_user("StudentEnrollment", course: @course, user: student) }
+
+      @outcome1 = outcome_model(context: @course, title: "Outcome 1")
+      @outcome2 = outcome_model(context: @course, title: "Outcome 2")
+      @outcome3 = outcome_model(context: @course, title: "Outcome 3")
+    end
+
+    it "retrieves rollups for specified users with multiple outcomes" do
+      OutcomeRollup.create!(
+        course: @course,
+        user: @students[0],
+        outcome: @outcome1,
+        calculation_method: "highest",
+        aggregate_score: 4.5,
+        last_calculated_at: Time.zone.now
+      )
+      OutcomeRollup.create!(
+        course: @course,
+        user: @students[0],
+        outcome: @outcome2,
+        calculation_method: "average",
+        aggregate_score: 3.2,
+        last_calculated_at: Time.zone.now
+      )
+
+      rollups = ra.stored_outcome_rollups(users: [@students[0]], context: @course)
+
+      expect(rollups.length).to eq 1
+      expect(rollups.first.context).to eq @students[0]
+      expect(rollups.first.scores.length).to eq 2
+      expect(rollups.first.scores.map(&:score)).to contain_exactly(4.5, 3.2)
+      expect(rollups.first.scores.map(&:outcome)).to contain_exactly(@outcome1, @outcome2)
+    end
+
+    it "returns rollups for multiple users" do
+      OutcomeRollup.create!(
+        course: @course,
+        user: @students[0],
+        outcome: @outcome1,
+        calculation_method: "highest",
+        aggregate_score: 4.5,
+        last_calculated_at: Time.zone.now
+      )
+      OutcomeRollup.create!(
+        course: @course,
+        user: @students[1],
+        outcome: @outcome1,
+        calculation_method: "highest",
+        aggregate_score: 3.8,
+        last_calculated_at: Time.zone.now
+      )
+
+      rollups = ra.stored_outcome_rollups(users: @students[0..1], context: @course)
+
+      expect(rollups.length).to eq 2
+      expect(rollups.map(&:context)).to contain_exactly(@students[0], @students[1])
+      expect(rollups.flat_map(&:scores).map(&:score)).to contain_exactly(4.5, 3.8)
+    end
+
+    it "filters by outcomes when outcomes parameter is provided" do
+      OutcomeRollup.create!(
+        course: @course,
+        user: @students[0],
+        outcome: @outcome1,
+        calculation_method: "highest",
+        aggregate_score: 4.5,
+        last_calculated_at: Time.zone.now
+      )
+      OutcomeRollup.create!(
+        course: @course,
+        user: @students[0],
+        outcome: @outcome2,
+        calculation_method: "average",
+        aggregate_score: 3.2,
+        last_calculated_at: Time.zone.now
+      )
+      OutcomeRollup.create!(
+        course: @course,
+        user: @students[0],
+        outcome: @outcome3,
+        calculation_method: "highest",
+        aggregate_score: 5.0,
+        last_calculated_at: Time.zone.now
+      )
+
+      rollups = ra.stored_outcome_rollups(users: [@students[0]], context: @course, outcomes: [@outcome1, @outcome3])
+
+      expect(rollups.length).to eq 1
+      expect(rollups.first.scores.length).to eq 2
+      expect(rollups.first.scores.map(&:outcome)).to contain_exactly(@outcome1, @outcome3)
+      expect(rollups.first.scores.map(&:score)).to contain_exactly(4.5, 5.0)
+    end
+
+    it "includes users without rollups by default" do
+      OutcomeRollup.create!(
+        course: @course,
+        user: @students[0],
+        outcome: @outcome1,
+        calculation_method: "highest",
+        aggregate_score: 4.5,
+        last_calculated_at: Time.zone.now
+      )
+
+      rollups = ra.stored_outcome_rollups(users: @students, context: @course)
+
+      expect(rollups.length).to eq 3
+      user_with_rollup = rollups.find { |r| r.context == @students[0] }
+      users_without_rollups = rollups.select { |r| [@students[1], @students[2]].include?(r.context) }
+
+      expect(user_with_rollup.scores.length).to eq 1
+      expect(user_with_rollup.scores.first.score).to eq 4.5
+      expect(users_without_rollups.all? { |r| r.scores.empty? }).to be true
+    end
+
+    it "excludes missing user rollups when specified in excludes parameter" do
+      OutcomeRollup.create!(
+        course: @course,
+        user: @students[0],
+        outcome: @outcome1,
+        calculation_method: "highest",
+        aggregate_score: 4.5,
+        last_calculated_at: Time.zone.now
+      )
+
+      rollups = ra.stored_outcome_rollups(
+        users: @students,
+        context: @course,
+        excludes: ["missing_user_rollups"]
+      )
+
+      expect(rollups.length).to eq 1
+      expect(rollups.first.context).to eq @students[0]
+    end
+
+    it "does not return deleted rollups" do
+      OutcomeRollup.create!(
+        course: @course,
+        user: @students[0],
+        outcome: @outcome1,
+        calculation_method: "highest",
+        aggregate_score: 4.5,
+        last_calculated_at: Time.zone.now,
+        workflow_state: "active"
+      )
+      OutcomeRollup.create!(
+        course: @course,
+        user: @students[0],
+        outcome: @outcome2,
+        calculation_method: "average",
+        aggregate_score: 3.2,
+        last_calculated_at: Time.zone.now,
+        workflow_state: "deleted"
+      )
+
+      rollups = ra.stored_outcome_rollups(users: [@students[0]], context: @course)
+
+      expect(rollups.first.scores.length).to eq 1
+      expect(rollups.first.scores.first.outcome).to eq @outcome1
+    end
+
+    it "returns empty array when no rollups exist and missing users excluded" do
+      rollups = ra.stored_outcome_rollups(
+        users: @students,
+        context: @course,
+        excludes: ["missing_user_rollups"]
+      )
+
+      expect(rollups).to be_empty
+    end
+
+    it "returns rollups in the same format as outcome_results_rollups" do
+      OutcomeRollup.create!(
+        course: @course,
+        user: @students[0],
+        outcome: @outcome1,
+        calculation_method: "highest",
+        aggregate_score: 4.5,
+        last_calculated_at: Time.zone.now
+      )
+
+      rollups = ra.stored_outcome_rollups(users: [@students[0]], context: @course)
+
+      expect(rollups.first).to be_a(Outcomes::ResultAnalytics::Rollup)
+      expect(rollups.first.context).to be_a(User)
+      expect(rollups.first.scores).to be_an(Array)
+
+      score = rollups.first.scores.first
+      expect(score).to respond_to(:outcome)
+      expect(score).to respond_to(:score)
+      expect(score).to respond_to(:count)
+      expect(score).to respond_to(:hide_points)
+    end
+  end
 end
