@@ -85,20 +85,24 @@ module LearnPlatform
         lti_redirect_url:
       }
 
-      encoded_params = URI.encode_www_form(params)
-      url = "#{endpoint}#{GET_UNIFIED_TOOL_ID_ENDPOINT}?#{encoded_params}"
-      response = CanvasHttp.get(url, auth_headers)
+      cache_key = ["learn_platform_utid", params].cache_key
 
-      if response.is_a?(Net::HTTPSuccess)
-        InstStatsd::Statsd.distributed_increment("learn_platform_api.success", tags: { event_type: "get_unified_tool_id" })
-        JSON.parse(response.body, symbolize_names: true)[:unified_tool_id]
-      else
-        InstStatsd::Statsd.distributed_increment("learn_platform_api.error.http_failure", tags: { event_type: "get_unified_tool_id", status_code: response.code })
+      Rails.cache.fetch(cache_key, expires_in: 5.minutes) do
+        encoded_params = URI.encode_www_form(params)
+        url = "#{endpoint}#{GET_UNIFIED_TOOL_ID_ENDPOINT}?#{encoded_params}"
+        response = CanvasHttp.get(url, auth_headers)
+
+        if response.is_a?(Net::HTTPSuccess)
+          InstStatsd::Statsd.distributed_increment("learn_platform_api.success", tags: { event_type: "get_unified_tool_id" })
+          JSON.parse(response.body, symbolize_names: true)[:unified_tool_id]
+        else
+          InstStatsd::Statsd.distributed_increment("learn_platform_api.error.http_failure", tags: { event_type: "get_unified_tool_id", status_code: response.code })
+          false
+        end
+      rescue CanvasHttp::Error
+        InstStatsd::Statsd.distributed_increment("learn_platform_api.error", tags: { event_type: "get_unified_tool_id" })
         false
       end
-    rescue CanvasHttp::Error
-      InstStatsd::Statsd.distributed_increment("learn_platform_api.error", tags: { event_type: "get_unified_tool_id" })
-      false
     end
 
     def self.lookup_api_registrations(redirect_uris, sources: [:partner_provided])
