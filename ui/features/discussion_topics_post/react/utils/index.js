@@ -495,8 +495,15 @@ export const showErrorWhenMessageTooLong = message => {
   return false
 }
 
-export const getTranslation = async (text, translateTargetLanguage) => {
-  if (!text) return // Don't translate, if no content
+export const getTranslation = async (text, translateTargetLanguage, signal) => {
+  if (!text) return
+
+  // Check if already aborted before making the request
+  if (signal?.aborted) {
+    const error = new Error('Translation request was aborted')
+    error.name = 'AbortError'
+    throw error
+  }
 
   const apiPath = `/courses/${ENV.course_id}/translate`
 
@@ -511,13 +518,34 @@ export const getTranslation = async (text, translateTargetLanguage) => {
           feature_slug: 'discussion',
         },
       },
+      signal,
     })
+
+    // Check if aborted after receiving response but before returning
+    if (signal?.aborted) {
+      const error = new Error('Translation request was aborted')
+      error.name = 'AbortError'
+      throw error
+    }
 
     return json.translated_text
   } catch (e) {
-    const response = await e.response.json()
-    const error = new Error()
-    Object.assign(error, {...response})
-    throw error
+    // If the request was aborted, throw a specific error
+    if (e.name === 'AbortError' || signal?.aborted) {
+      const error = new Error('Translation request was aborted')
+      error.name = 'AbortError'
+      throw error
+    }
+
+    // Check if e has a response property before trying to read it
+    if (e.response) {
+      const response = await e.response.json()
+      const error = new Error()
+      Object.assign(error, {...response})
+      throw error
+    }
+
+    // If no response, just rethrow the original error
+    throw e
   }
 }

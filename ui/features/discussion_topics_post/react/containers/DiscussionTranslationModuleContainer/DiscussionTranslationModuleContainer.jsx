@@ -45,10 +45,10 @@ export const DiscussionTranslationModuleContainer = ({isAnnouncement}) => {
   const entries = useTranslationStore(state => state.entries)
 
   const translationControlsRef = React.createRef()
-  const {setTranslateTargetLanguage, setShowTranslationControl} = useContext(
+  const {setTranslateTargetLanguage, setShowTranslationControl, clearQueue} = useContext(
     DiscussionManagerUtilityContext,
   )
-  const {startObserving} = useObserverContext()
+  const {startObserving, stopObserving} = useObserverContext()
 
   const isLoading = useMemo(() => {
     return Object.values(entries).some(entry => entry.loading)
@@ -74,18 +74,27 @@ export const DiscussionTranslationModuleContainer = ({isAnnouncement}) => {
   }
 
   const closeModalAndRemoveTranslations = () => {
-    clearTranslateAll()
+    // Clear translateAll FIRST to prevent any new jobs from being enqueued
+    clearTranslateAll(false)
     setActiveLangauge(null)
+    // Then stop observing and clear queue
+    stopObserving()
+    clearQueue()
     setModalOpen(false)
     setShowTranslationControl(false)
   }
 
   const resetTranslationsModule = () => {
+    // Clear translateAll FIRST to prevent any new jobs from being enqueued
+    clearTranslateAll(false)
+    setActiveLangauge(null)
+    // Then stop observing and clear queue
+    stopObserving()
+    clearQueue()
     translationControlsRef.current?.reset()
     setTranslateTargetLanguage(null)
     setIsLanguageNotSelectedError(false)
     setIsLanguageAlreadyActiveError(false)
-    clearTranslateAll()
   }
 
   const translateDiscussion = () => {
@@ -99,10 +108,12 @@ export const DiscussionTranslationModuleContainer = ({isAnnouncement}) => {
       return
     }
 
-    // Update preferred language if it was set before
     if (preferredLanguage && preferredLanguage !== selectedLanguage) {
       savePreferredLanguage(selectedLanguage, ENV?.discussion_topic_id)
     }
+
+    clearQueue()
+    clearTranslateAll(true)
     setActiveLangauge(selectedLanguage)
     setTranslateAll(true)
     startObserving(selectedLanguage)

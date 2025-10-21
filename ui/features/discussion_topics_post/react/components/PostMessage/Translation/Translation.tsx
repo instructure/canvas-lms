@@ -63,24 +63,57 @@ const Translation = ({id, title, message, children}: PropsWithChildren<Translati
   useEffect(() => {
     addEntry(id, {title, message})
 
-    // This is a very hard anti pattern
-    // we should avoid att all cost to extend this hook
-    // we need exhaustive testsing to make sure it works as excpected
     if (isTranslateAll) {
-      const translationJob = async () => {
+      // Double-check translateAll is still active before enqueueing
+      const currentState = useTranslationStore.getState()
+      if (!currentState.translateAll) {
+        return
+      }
+
+      const translationJob = async (signal: AbortSignal) => {
         try {
+          // Check if already aborted before starting
+          if (signal.aborted) {
+            return
+          }
+
+          // Get current language from store, not from closure
+          const currentLanguage = useTranslationStore.getState().activeLanguage
+          if (!currentLanguage) {
+            return
+          }
+
           setTranslationStart(id)
 
           const [translatedTitle, translatedMessage] = await Promise.all([
-            getTranslation(title, activeLanguage),
-            getTranslation(message, activeLanguage),
+            getTranslation(title, currentLanguage, signal),
+            getTranslation(message, currentLanguage, signal),
           ])
 
-          setTranslationEnd(id, activeLanguage!, translatedMessage, translatedTitle)
+          // Check multiple conditions before updating state
+          const currentState = useTranslationStore.getState()
+
+          if (
+            signal.aborted ||
+            !currentState.translateAll ||
+            currentState.activeLanguage !== currentLanguage
+          ) {
+            return
+          }
+
+          setTranslationEnd(id, currentLanguage, translatedMessage, translatedTitle)
         } catch (error: any) {
+          // Don't update state if the request was aborted
+          if (error.name === 'AbortError' || error.message?.includes('aborted')) {
+            return
+          }
+
+          // Get current language from store for error reporting
+          const errorLanguage = useTranslationStore.getState().activeLanguage
+
           setTranslationEnd(id)
           if (error.translationError) {
-            setTranslationError(id, error.translationError, activeLanguage!)
+            setTranslationError(id, error.translationError, errorLanguage!)
           } else {
             setTranslationError(
               id,
@@ -88,7 +121,7 @@ const Translation = ({id, title, message, children}: PropsWithChildren<Translati
                 type: 'newError',
                 message: I18n.t('There was an unexpected error during translation.'),
               },
-              activeLanguage!,
+              errorLanguage!,
             )
           }
         }

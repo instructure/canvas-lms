@@ -18,13 +18,13 @@
 
 import {useRef, useCallback} from 'react'
 import {useTranslationStore} from './useTranslationStore'
-import {useTranslationQueue} from './useTranslationQueue'
 import {useTranslation} from './useTranslation'
 
-export const useObservedTranslations = () => {
+export const useObservedTranslations = (
+  enqueueTranslation: (job: (signal: AbortSignal) => Promise<void>) => void,
+) => {
   const setTranslationStart = useTranslationStore(state => state.setTranslationStart)
 
-  const {enqueueTranslation} = useTranslationQueue()
   const {translateEntry} = useTranslation()
 
   const observerRef = useRef<IntersectionObserver>()
@@ -42,16 +42,36 @@ export const useObservedTranslations = () => {
               if (entryId) {
                 const entry = useTranslationStore.getState().entries[entryId]
                 const activeLanguage = useTranslationStore.getState().activeLanguage
-                if (entry && entry.language !== activeLanguage && !entry.loading) {
+                if (
+                  entry &&
+                  activeLanguage &&
+                  entry.language !== activeLanguage &&
+                  !entry.loading
+                ) {
                   const timeoutId = setTimeout(() => {
+                    // Check that translateAll is still active before enqueueing
+                    const currentState = useTranslationStore.getState()
+                    if (!currentState.translateAll) {
+                      return
+                    }
+
                     setTranslationStart(entryId)
-                    const translateJob = async () => {
-                      await translateEntry({
-                        language,
-                        entryId,
-                        message: entry.message,
-                        title: entry.title,
-                      })
+                    const translateJob = async (signal: AbortSignal) => {
+                      // Get current language from store to avoid stale closure
+                      const currentLanguage = useTranslationStore.getState().activeLanguage
+                      if (!currentLanguage) {
+                        return
+                      }
+
+                      await translateEntry(
+                        {
+                          language: currentLanguage,
+                          entryId,
+                          message: entry.message,
+                          title: entry.title,
+                        },
+                        signal,
+                      )
                     }
                     enqueueTranslation(translateJob)
                   }, 200)
@@ -90,6 +110,12 @@ export const useObservedTranslations = () => {
       observerRef.current.disconnect()
       observerRef.current = undefined
     }
+
+    // Clear all pending timeouts to prevent translations from starting after stopping
+    timeoutRef.current.forEach(timeoutId => {
+      clearTimeout(timeoutId)
+    })
+    timeoutRef.current.clear()
   }, [observerRef])
 
   return {startObserving, stopObserving, observerRef, nodesRef}

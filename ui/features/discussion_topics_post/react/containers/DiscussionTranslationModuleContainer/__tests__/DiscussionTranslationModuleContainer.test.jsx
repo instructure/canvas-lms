@@ -28,6 +28,7 @@ import {ObserverContext} from '../../../utils/ObserverContext'
 const mockContextValue = {
   setTranslateTargetLanguage: jest.fn(),
   setShowTranslationControl: jest.fn(),
+  clearQueue: jest.fn(),
   translationLanguages: {
     current: [
       {id: 'en', name: 'English', translated_to_name: 'Translated to English'},
@@ -199,7 +200,9 @@ describe('DiscussionTranslationModuleContainer', () => {
     expect(mockContextValue.setShowTranslationControl).not.toHaveBeenCalled()
 
     expect(screen.getByText('Are you sure you want to close?')).toBeInTheDocument()
-    const closeAndRemoveButton = screen.getByRole('button', {name: /close and remove translations/i})
+    const closeAndRemoveButton = screen.getByRole('button', {
+      name: /close and remove translations/i,
+    })
     await userEvent.click(closeAndRemoveButton)
 
     expect(mockContextValue.setShowTranslationControl).toHaveBeenCalledWith(false)
