@@ -77,7 +77,6 @@ module Accessibility
         styles["color"] = value
 
         new_style = styles.map { |k, v| "#{k.strip}: #{v.strip}" }.join("; ") + ";"
-        return nil if new_style == style_str
 
         elem.set_attribute("style", new_style)
 

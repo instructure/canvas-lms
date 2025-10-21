@@ -27,19 +27,23 @@ module Accessibility
           return NO_ACCESSIBILITY_ISSUES.dup if html_content.blank? || !html_content.include?("<")
 
           begin
-            doc = Nokogiri::HTML5.fragment(html_content, nil, **CanvasSanitize::SANITIZE[:parser_options])
-            extend_nokogiri_with_dom_adapter(doc)
+            doc = Nokogiri::HTML5(html_content, nil, **CanvasSanitize::SANITIZE[:parser_options])
+            body = doc.at_css("body")
+            extend_nokogiri_with_dom_adapter(body)
 
             issues = []
 
             Rule.registry.each_value do |rule|
-              doc.children.each do |node|
+              body.children.each do |node|
                 next unless node.is_a?(Nokogiri::XML::Element)
 
                 walk_dom_tree(node) do |element|
                   next if rule.test(element).nil?
 
-                  issues << build_issue(rule, element: element.name, form: rule.form(element).to_h, path: element_path(element))
+                  # Use built-in .path and strip /html/body prefix
+                  xpath = element.path.sub(%r{^/html/body}, ".")
+
+                  issues << build_issue(rule, element: element.name, form: rule.form(element).to_h, path: xpath)
                 rescue => e
                   log_rule_error(rule, element, e)
                 end
