@@ -569,7 +569,7 @@ GEM
       rspec (~> 3.10)
       timecop (~> 0.9)
     folio-pagination (0.0.12)
-    fugit (1.12.0)
+    fugit (1.12.1)
       et-orbi (~> 1.4)
       raabro (~> 1.4)
     gepub (2.0.0)
@@ -671,7 +671,7 @@ GEM
       json-jwt (~> 1.16.6)
       rexml
       simple_oauth (~> 0.3.1)
-    inst-jobs (3.3.1)
+    inst-jobs (3.3.2)
       activerecord (>= 7.1)
       activerecord-pg-extensions (~> 0.4)
       activesupport (>= 7.1)
