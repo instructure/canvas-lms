@@ -33,7 +33,6 @@ class ApplicationController < ActionController::Base
   include Api::V1::WikiPage
   include LegalInformationHelper
   include ObserverEnrollmentsHelper
-  include IgniteAgentHelper
 
   helper :all
 
@@ -3501,5 +3500,11 @@ class ApplicationController < ActionController::Base
     js_env(AI_FEEDBACK_LINK: Setting.get("ai_feedback_link", "https://inst.bid/ai/feedback"))
   end
 
-  helper_method :add_ignite_agent_bundle
+  def add_ignite_agent_bundle?
+    return false unless @domain_root_account&.feature_enabled?(:ignite_agent_enabled)
+    return false unless @domain_root_account&.grants_right?(@current_user, session, :access_ignite_agent)
+
+    true
+  end
+  helper_method :add_ignite_agent_bundle?
 end

@@ -89,20 +89,20 @@ function fetchAnalyticsHub(resolve, reject) {
 exports.fetchAnalyticsHub = fetchAnalyticsHub
 
 function fetchIgniteAgentLibrary(resolve, reject) {
-  const DEV_HOST = 'http://localhost:9003/remoteEntry.js'
-  const remoteUrl = window.REMOTES?.ignite_agent?.launch_url //ToDo: Canvas consul config (https://gerrit.instructure.com/admin/repos/canvas-consul-config,general), we will need to contact Cameron Ray or Keith Garner
-  // e.g.
-  // iad-prod/global/private/canvas/prod/platform_service_speedgrader.yml
-  // launch_url: https://assets.instructure.com/speedgrader/15.0.1/remoteEntry.js
-  // look at the confluence page again for more details on module federation setup
+  const remoteUrl = window.REMOTES?.ignite_agent?.launch_url
 
   if (!remoteUrl) {
-    console.log(`[Ignite Agent] Remote not configured; using ${DEV_HOST}`)
+    const errorMessage = '[Ignite Agent] Remote not configured, agent can not be loaded'
+    console.error(errorMessage)
+    if (typeof reject === 'function') {
+      reject(new Error(errorMessage))
+    }
+    return
   }
 
   const script = document.createElement('script')
 
-  script.src = remoteUrl || DEV_HOST
+  script.src = remoteUrl
   script.onload = () => {
     const module = {
       get: request => window.IgniteAgentLibrary.get(request),
