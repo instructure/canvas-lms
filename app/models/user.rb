@@ -996,7 +996,7 @@ class User < ActiveRecord::Base
 
   def infer_defaults
     self.name = nil if name == "User"
-    self.name ||= email || t("#user.default_user_name", "User")
+    self.name ||= short_name || email || t("#user.default_user_name", "User")
     self.short_name = nil if short_name == ""
     self.short_name ||= self.name
     self.sortable_name = nil if sortable_name == ""
