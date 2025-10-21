@@ -133,9 +133,9 @@ export const DiscussionPostToolbar = props => {
   const renderTranslate = () => {
     const text = showTranslate ? I18n.t('Hide Translate Text') : I18n.t('Translate Text')
 
-    const translationText = I18n.t('Open Translate')
+    const translationText = I18n.t('Enable Translation')
 
-    const improvedText = showTranslationControl ? I18n.t('Close Translate') : translationText
+    const improvedText = showTranslationControl ? I18n.t('Disable Translation') : translationText
 
     return (
       <Button
@@ -144,7 +144,7 @@ export const DiscussionPostToolbar = props => {
         data-action-state={showTranslationControl ? 'disableTranslation' : 'enableTranslation'}
         renderIcon={showTranslationControl ? <IconXSolid /> : <IconAiColoredSolid />}
         color={showTranslationControl ? 'secondary' : 'ai-secondary'}
-        aria-expanded={showTranslationControl ? I18n.t('Expanded') : I18n.t('Collapsed')}
+        aria-pressed={showTranslationControl}
         aria-label={I18n.t('Ignite AI %{improvedText}', {improvedText})}
       >
         {ENV.ai_translation_improvements ? improvedText : text}
@@ -253,6 +253,11 @@ export const DiscussionPostToolbar = props => {
               shouldShrink: false,
               margin: '0 0 0 small',
             },
+            translation: {
+              shouldGrow: false,
+              shouldShrink: false,
+              margin: '0 0 0 small',
+            },
             padding: 'xxx-small',
           },
         }}
@@ -301,11 +306,6 @@ export const DiscussionPostToolbar = props => {
                         </span>
                       </Flex.Item>
                     )}
-                  {translationLanguages.current.length > 0 && !isSpeedGraderInTopUrl && (
-                    <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
-                      {renderTranslate()}
-                    </Flex.Item>
-                  )}
                   {isSpeedGraderInTopUrl && window?.ENV?.FEATURES?.discussion_checkpoints && (
                     <Flex.Item
                       margin="0 small 0 0"
@@ -423,6 +423,16 @@ export const DiscussionPostToolbar = props => {
                   >
                     {renderSort(responsiveProps?.sortOrder?.width)}
                   </Flex.Item>
+                  {translationLanguages.current.length > 0 && !isSpeedGraderInTopUrl && (
+                    <Flex.Item
+                      padding={responsiveProps.padding}
+                      margin={responsiveProps?.translation?.margin}
+                      shouldGrow={responsiveProps?.translation?.shouldGrow}
+                      shouldShrink={responsiveProps?.translation?.shouldShrink}
+                    >
+                      {renderTranslate()}
+                    </Flex.Item>
+                  )}
                 </Flex>
               </Flex.Item>
             </Flex>
