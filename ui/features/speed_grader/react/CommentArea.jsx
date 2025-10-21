@@ -107,6 +107,7 @@ export default function CommentArea({
       {showCommentLibrary &&
         (ENV?.use_comment_library_v2 ? (
           <CommentLibraryV2
+            comment={comment}
             userId={userId}
             courseId={courseId}
             setFocusToTextArea={setFocusToTextArea}
