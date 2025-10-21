@@ -32,6 +32,8 @@ import {
   IconCommentLine,
   IconLinkLine,
   IconAiSolid,
+  IconXLine,
+  IconAiColoredSolid,
 } from '@instructure/ui-icons'
 
 import {IconButton} from '@instructure/ui-buttons'
@@ -48,12 +50,18 @@ const I18n = createI18nScope('discussion_posts')
 // are produced by the menu causing the page to scroll all over the place
 export const ThreadActions = props => {
   const {tryTranslate} = useTranslation()
+  const clearEntry = useTranslationStore(state => state.clearEntry)
+  const translateAll = useTranslationStore(state => state.translateAll)
 
   const entryInfo = useTranslationStore(state => state.entries[props.entry.id])
 
   const menuItems = useMemo(() => {
     const handleTranslate = () => {
       tryTranslate(props.entry.id, props.entry.message)
+    }
+
+    const handleHideTranslation = () => {
+      clearEntry(props.entry.id)
     }
 
     return getMenuConfigs({
@@ -73,9 +81,11 @@ export const ThreadActions = props => {
       onReport: props.onReport,
       isReported: props.isReported,
       onTranslate: handleTranslate,
-      translateDisabled: !!entryInfo?.translatedMessage,
+      onHideTranslation: handleHideTranslation,
+      hasTranslation: !!entryInfo?.translatedMessage,
+      translateAll: translateAll,
     }).map(config => renderMenuItem({...config}, props.id))
-  }, [props, tryTranslate, entryInfo?.translatedMessage])
+  }, [props, tryTranslate, clearEntry, translateAll, entryInfo?.translatedMessage])
 
   if (props.isSearch) {
     return null
@@ -238,18 +248,27 @@ const getMenuConfigs = props => {
     })
   }
 
-  if (window.ENV.ai_translation_improvements) {
+  if (window.ENV.ai_translation_improvements && !props.translateAll) {
     options.push({
       key: 'separator2',
       separator: true,
     })
-    options.push({
-      key: 'translate',
-      icon: <IconAiSolid />,
-      label: I18n.t('Translate Text'),
-      selectionCallback: props.onTranslate,
-      disabled: props.translateDisabled,
-    })
+
+    if (props.hasTranslation) {
+      options.push({
+        key: 'hideTranslation',
+        icon: <IconXLine />,
+        label: I18n.t('Hide Translation'),
+        selectionCallback: props.onHideTranslation,
+      })
+    } else {
+      options.push({
+        key: 'translate',
+        icon: <IconAiColoredSolid />,
+        label: I18n.t('Translate Text'),
+        selectionCallback: props.onTranslate,
+      })
+    }
   }
 
   return options
