@@ -62,7 +62,13 @@ type Actions = {
 
   setActiveLanguage: (language: string | null) => void
   setTranslateAll: (value: boolean) => void
-  clearTranslateAll: () => void
+  /**
+   * Clears translation data from entries.
+   * @param onlyEntries - When true, only clears translation data from entries (language, translatedTitle, translatedMessage)
+   *                      while preserving the translateAll flag. This is useful when switching languages and needing to
+   *                      clear existing translations before loading new ones. When false, also resets the translateAll flag.
+   */
+  clearTranslateAll: (onlyEntries: boolean) => void
 
   setTranslationStart: (entryId: string) => void
   setTranslationEnd: (
@@ -89,95 +95,142 @@ const useTranslationStore = create<State & Actions>()(
       translations: {},
       entries: {},
       setModalOpen: (entryId: string, message: string, title?: string) =>
-        set({
-          modalOpen: true,
-          translationEntryId: entryId,
-          translationMessage: message,
-          translationTitle: title || null,
-        }),
+        set(
+          {
+            modalOpen: true,
+            translationEntryId: entryId,
+            translationMessage: message,
+            translationTitle: title || null,
+          },
+          false,
+          {type: 'translation/setModalOpen', entryId, message, title},
+        ),
       setTranslateContent: (entryId: string, message: string, title?: string) =>
-        set({
-          translationEntryId: entryId,
-          translationMessage: message,
-          translationTitle: title || null,
-        }),
-      closeModal: () => set({modalOpen: false, translationEntryId: null}),
+        set(
+          {
+            translationEntryId: entryId,
+            translationMessage: message,
+            translationTitle: title || null,
+          },
+          false,
+          {type: 'translation/setTranslateContent', entryId, message, title},
+        ),
+      closeModal: () =>
+        set({modalOpen: false, translationEntryId: null}, false, {type: 'translation/closeModal'}),
 
       addEntry: (entryId: string, entry: Pick<Translation, 'title' | 'message'>) =>
-        set(state => ({entries: {...state.entries, [entryId]: {...entry, loading: false}}})),
+        set(
+          state => ({entries: {...state.entries, [entryId]: {...entry, loading: false}}}),
+          false,
+          {type: 'translation/addEntry', entryId, entry},
+        ),
       removeEntry: (entryId: string) =>
-        set(state => {
-          const newEntries = {...state.entries}
-          delete newEntries[entryId]
-          return {entries: newEntries}
-        }),
+        set(
+          state => {
+            const newEntries = {...state.entries}
+            delete newEntries[entryId]
+            return {entries: newEntries}
+          },
+          false,
+          {type: 'translation/removeEntry', entryId},
+        ),
 
       setActiveLanguage: (language: string | null) =>
-        set({activeLanguage: language, isActiveLanguageSet: true}),
-      setTranslateAll: (value: boolean) => set({translateAll: value}),
-      clearTranslateAll: () =>
-        set(state => {
-          const newEntries: Record<string, Translation> = {}
-
-          Object.keys(state.entries).forEach(entryId => {
-            newEntries[entryId] = {
-              ...state.entries[entryId],
-              loading: false,
-              language: undefined,
-              translatedTitle: undefined,
-              translatedMessage: undefined,
-            }
-          })
-
-          return {translateAll: false, entries: newEntries}
+        set({activeLanguage: language, isActiveLanguageSet: true}, false, {
+          type: 'translation/setActiveLanguage',
+          language,
         }),
+      setTranslateAll: (value: boolean) =>
+        set({translateAll: value}, false, {type: 'translation/setTranslateAll', value}),
+      clearTranslateAll: (onlyEntries: boolean) =>
+        set(
+          state => {
+            const newEntries: Record<string, Translation> = {}
+
+            Object.keys(state.entries).forEach(entryId => {
+              newEntries[entryId] = {
+                ...state.entries[entryId],
+                loading: false,
+                language: undefined,
+                translatedTitle: undefined,
+                translatedMessage: undefined,
+              }
+            })
+
+            if (onlyEntries) {
+              return {entries: newEntries}
+            }
+
+            return {translateAll: false, entries: newEntries}
+          },
+          false,
+          {type: 'translation/clearTranslateAll', onlyEntries},
+        ),
 
       setTranslationStart: (entryId: string) =>
-        set(state => ({
-          entries: {
-            ...state.entries,
-            [entryId]: {
-              ...state.entries[entryId],
-              loading: true,
-              translatedMessage: undefined,
-              translatedTitle: undefined,
-              error: undefined,
+        set(
+          state => ({
+            entries: {
+              ...state.entries,
+              [entryId]: {
+                ...state.entries[entryId],
+                loading: true,
+                translatedMessage: undefined,
+                translatedTitle: undefined,
+                error: undefined,
+              },
             },
-          },
-        })),
+          }),
+          false,
+          {type: 'translation/setTranslationStart', entryId},
+        ),
       setTranslationEnd: (
         entryId: string,
         language?: string,
         translatedMessage?: string | null,
         translatedTitle?: string | null,
       ) =>
-        set(state => ({
-          entries: {
-            ...state.entries,
-            [entryId]: {
-              ...state.entries[entryId],
-              loading: false,
-              language: language !== undefined ? language : state.entries[entryId]?.language,
-              translatedMessage: translatedMessage || undefined,
-              translatedTitle: translatedTitle || undefined,
+        set(
+          state => ({
+            entries: {
+              ...state.entries,
+              [entryId]: {
+                ...state.entries[entryId],
+                loading: false,
+                language: language !== undefined ? language : state.entries[entryId]?.language,
+                translatedMessage: translatedMessage || undefined,
+                translatedTitle: translatedTitle || undefined,
+              },
             },
+          }),
+          false,
+          {
+            type: 'translation/setTranslationEnd',
+            entryId,
+            language,
+            translatedMessage,
+            translatedTitle,
           },
-        })),
+        ),
 
       setTranslationError: (entryId: string, error: Error, language: string) =>
-        set(state => ({
-          entries: {
-            ...state.entries,
-            [entryId]: {
-              ...state.entries[entryId],
-              loading: false,
-              translatedMessage: undefined,
-              translatedTitle: undefined,
-              language,
-              error,
+        set(
+          state => ({
+            entries: {
+              ...state.entries,
+              [entryId]: {
+                ...state.entries[entryId],
+                loading: false,
+                translatedMessage: undefined,
+                translatedTitle: undefined,
+                language,
+                error,
+              },
             },
-          },
-        })),
+          }),
+          false,
+          {type: 'translation/setTranslationError', entryId, error, language},
+        ),
     }),
     {
       name: 'TranslationStore',

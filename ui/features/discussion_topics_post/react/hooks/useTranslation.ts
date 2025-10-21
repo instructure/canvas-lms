@@ -117,49 +117,76 @@ const useTranslation = () => {
    * It will return early if preferred language or entryId is not set
    */
   const getTranslations = useCallback(
-    async ({
-      language,
-      entryId,
-      message,
-      title,
-    }: {
-      language: string
-      entryId: string
-      message?: string | null
-      title?: string | null
-    }) => {
+    async (
+      {
+        language,
+        entryId,
+        message,
+        title,
+      }: {
+        language: string
+        entryId: string
+        message?: string | null
+        title?: string | null
+      },
+      signal?: AbortSignal,
+    ) => {
       if (!language || !entryId) {
         return null
       }
 
-      return await Promise.all([getTranslation(title, language), getTranslation(message, language)])
+      return await Promise.all([
+        getTranslation(title, language, signal),
+        getTranslation(message, language, signal),
+      ])
     },
     [],
   )
 
   const translateEntry = useCallback(
-    async ({
-      language,
-      entryId,
-      message,
-      title,
-    }: {
-      language: string
-      entryId: string
-      message?: string | null
-      title?: string | null
-    }) => {
+    async (
+      {
+        language,
+        entryId,
+        message,
+        title,
+      }: {
+        language: string
+        entryId: string
+        message?: string | null
+        title?: string | null
+      },
+      signal?: AbortSignal,
+    ) => {
       try {
+        // Check if aborted
+        if (signal?.aborted) {
+          return
+        }
+
         setTranslationStart(entryId)
-        const [translatedTitle, translatedMessage] = await getTranslations({
-          language,
-          entryId,
-          message,
-          title,
-        })
+        const [translatedTitle, translatedMessage] = await getTranslations(
+          {
+            language,
+            entryId,
+            message,
+            title,
+          },
+          signal,
+        )
+
+        // Check if aborted after translation completes
+        if (signal?.aborted) {
+          return
+        }
 
         setTranslationEnd(entryId, language, translatedMessage, translatedTitle)
       } catch (error: any) {
+        // Don't update state if the request was aborted
+        if (error.name === 'AbortError') {
+          return
+        }
+
         // TODO: Fix any type
         setTranslationEnd(entryId)
         if (error.translationError) {

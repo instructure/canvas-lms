@@ -23,6 +23,7 @@ export const MAX_CONCURRENT_TRANSLATIONS = 10
 export function useTranslationQueue() {
   const activeTranslationCount = useRef(0)
   const translationQueue = useRef([])
+  const activeAbortControllers = useRef(new Set())
 
   const actualMaxConcurrentTranslations = useMemo(() => {
     return ENV.ai_translation_improvements ? MAX_CONCURRENT_TRANSLATIONS : Number.POSITIVE_INFINITY
@@ -33,25 +34,51 @@ export function useTranslationQueue() {
       activeTranslationCount.current < actualMaxConcurrentTranslations &&
       translationQueue.current.length > 0
     ) {
-      const job = translationQueue.current.shift()
+      const {jobFn, abortController} = translationQueue.current.shift()
       activeTranslationCount.current++
-      job().finally(() => {
-        activeTranslationCount.current--
-        processTranslationQueue()
-      })
+      activeAbortControllers.current.add(abortController)
+
+      jobFn(abortController.signal)
+        .catch(() => {
+          // Ignore errors from aborted requests
+        })
+        .finally(() => {
+          activeTranslationCount.current--
+          activeAbortControllers.current.delete(abortController)
+          processTranslationQueue()
+        })
     }
   }, [actualMaxConcurrentTranslations])
 
   const enqueueTranslation = useCallback(
     jobFn => {
-      translationQueue.current.push(jobFn)
+      const abortController = new AbortController()
+      translationQueue.current.push({jobFn, abortController})
       processTranslationQueue()
     },
     [processTranslationQueue],
   )
 
+  const clearQueue = useCallback(() => {
+    // Clear the queue
+    translationQueue.current.forEach(({abortController}) => {
+      abortController.abort()
+    })
+    translationQueue.current = []
+
+    // Abort all active requests
+    activeAbortControllers.current.forEach(abortController => {
+      abortController.abort()
+    })
+    activeAbortControllers.current.clear()
+
+    // Reset active count
+    activeTranslationCount.current = 0
+  }, [])
+
   return {
     enqueueTranslation,
+    clearQueue,
     getActiveCount: () => activeTranslationCount.current,
     getQueueLength: () => translationQueue.current.length,
   }
