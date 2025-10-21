@@ -24,10 +24,13 @@ import {DiscussionManagerUtilityContext} from '../../../utils/constants'
 import {useTranslationStore} from '../../../hooks/useTranslationStore'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {getTranslation} from '../../../utils'
+import {Link} from '@instructure/ui-link'
 
 const I18n = createI18nScope('discussion_topics_post')
 
 interface TranslationContextType {
+  id: string
+  originalMessage: string
   isTranslating: boolean
   isTranslationReady: boolean
   translateTargetLanguage: string | null
@@ -161,6 +164,8 @@ const Translation = ({id, title, message, children}: PropsWithChildren<Translati
   return (
     <TranslationContext.Provider
       value={{
+        id,
+        originalMessage: message,
         isTranslating: entryInfo.loading,
         isTranslationReady,
         translateTargetLanguage: entryInfo.language || null,
@@ -299,10 +304,69 @@ const Error = () => {
   return null
 }
 
+const Actions = () => {
+  const context = useContext(TranslationContext)
+  const clearEntry = useTranslationStore(state => state.clearEntry)
+  const setModalOpen = useTranslationStore(state => state.setModalOpen)
+  const translateAll = useTranslationStore(state => state.translateAll)
+
+  if (context === undefined) {
+    return null
+  }
+
+  const {id, originalMessage, isTranslationReady, translationError} = context
+
+  if (!isTranslationReady || translationError || translateAll) {
+    return null
+  }
+
+  const handleChangeLanguage = () => {
+    setModalOpen(id, originalMessage)
+  }
+
+  const handleHideTranslation = () => {
+    clearEntry(id)
+  }
+
+  return (
+    <Flex direction="row" gap="x-small" margin="small 0" alignItems="center">
+      <Flex.Item>
+        <Link
+          onClick={handleChangeLanguage}
+          isWithinText={false}
+          data-testid="change-language-link"
+        >
+          <Flex direction="row" gap="x-small" alignItems="center">
+            <Text size="small">{I18n.t('Change translation language')}</Text>
+          </Flex>
+        </Link>
+      </Flex.Item>
+      <Flex.Item>
+        <Text color="brand" size="small">
+          •
+        </Text>
+      </Flex.Item>
+      <Flex.Item>
+        <Link
+          onClick={handleHideTranslation}
+          isWithinText={false}
+          data-testid="hide-translation-link"
+        >
+          <Flex direction="row" gap="x-small" alignItems="center">
+            <Text size="small">{I18n.t('Hide translation')}</Text>
+          </Flex>
+        </Link>
+      </Flex.Item>
+    </Flex>
+  )
+}
+
 Translation.Content = Content
 
 Translation.Divider = Divider
 
 Translation.Error = Error
+
+Translation.Actions = Actions
 
 export {Translation}

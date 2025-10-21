@@ -59,6 +59,7 @@ type Actions = {
 
   addEntry: (entryId: string, entry: Pick<Translation, 'title' | 'message'>) => void
   removeEntry: (entryId: string) => void
+  clearEntry: (entryId: string) => void
 
   setActiveLanguage: (language: string | null) => void
   setTranslateAll: (value: boolean) => void
@@ -134,7 +135,21 @@ const useTranslationStore = create<State & Actions>()(
           false,
           {type: 'translation/removeEntry', entryId},
         ),
-
+      clearEntry: (entryId: string) =>
+        set(
+          state => {
+            const newEntries = {...state.entries}
+            newEntries[entryId] = {
+              ...state.entries[entryId],
+              language: undefined,
+              translatedTitle: undefined,
+              translatedMessage: undefined,
+            }
+            return {entries: newEntries}
+          },
+          false,
+          {type: 'translation/clearEntry', entryId},
+        ),
       setActiveLanguage: (language: string | null) =>
         set({activeLanguage: language, isActiveLanguageSet: true}, false, {
           type: 'translation/setActiveLanguage',

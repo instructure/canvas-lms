@@ -28,7 +28,7 @@ import {assignLocation} from '@canvas/util/globalUtils'
 import {IconButton, ToggleButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {
-  IconAiSolid,
+  IconAiColoredSolid,
   IconBookmarkLine,
   IconBookmarkSolid,
   IconCompleteSolid,
@@ -43,6 +43,7 @@ import {
   IconTrashLine,
   IconUnlockLine,
   IconUserLine,
+  IconXLine,
 } from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {Responsive} from '@instructure/ui-responsive'
@@ -163,23 +164,34 @@ export function PostToolbar({repliesCount, unreadCount, ...props}) {
 
 const ToolbarMenu = props => {
   const {tryTranslate} = useTranslation()
+  const clearEntry = useTranslationStore(state => state.clearEntry)
+  const translateAll = useTranslationStore(state => state.translateAll)
 
   const entryInfo = useTranslationStore(state => state.entries['topic'])
 
   const menuConfigs = useMemo(() => {
+    const handleTranslate = () => {
+      tryTranslate(
+        'topic',
+        props.discussionTopic?.message || '',
+        props.discussionTopic?.title || '',
+      )
+    }
+
+    const handleHideTranslation = () => {
+      clearEntry('topic')
+    }
+
     return getMenuConfigs({
       ...props,
-      onTranslate: () =>
-        tryTranslate(
-          'topic',
-          props.discussionTopic?.message || '',
-          props.discussionTopic?.title || '',
-        ),
-      translateDisabled: !!entryInfo?.translatedMessage,
+      onTranslate: handleTranslate,
+      onHideTranslation: handleHideTranslation,
+      hasTranslation: !!entryInfo?.translatedMessage,
+      translateAll: translateAll,
     }).map(config => {
       return renderMenuItem(config)
     })
-  }, [props, tryTranslate, entryInfo])
+  }, [props, tryTranslate, clearEntry, translateAll, entryInfo?.translatedMessage])
 
   if (menuConfigs.length === 0) {
     return null
@@ -308,14 +320,22 @@ const getMenuConfigs = props => {
     })
   }
 
-  if (ENV.ai_translation_improvements && props.onTranslate) {
-    options.push({
-      key: 'translate',
-      icon: <IconAiSolid />,
-      label: I18n.t('Translate Text'),
-      selectionCallback: props.onTranslate,
-      disabled: props.translateDisabled,
-    })
+  if (ENV.ai_translation_improvements && !props.translateAll) {
+    if (props.hasTranslation) {
+      options.push({
+        key: 'hideTranslation',
+        icon: <IconXLine />,
+        label: I18n.t('Hide Translation'),
+        selectionCallback: props.onHideTranslation,
+      })
+    } else {
+      options.push({
+        key: 'translate',
+        icon: <IconAiColoredSolid />,
+        label: I18n.t('Translate Text'),
+        selectionCallback: props.onTranslate,
+      })
+    }
   }
 
   return options
