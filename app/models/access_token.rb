@@ -97,11 +97,11 @@ class AccessToken < ActiveRecord::Base
       # (from this block; if you're an admin, you'll still be able to from the block below)
       next false if root_account.limit_personal_access_tokens?
       # if students are restricted from creating personal access tokens,
-      # then if you're _only_ a student, you can't create tokens
-      # (a teacher that is a student will still be allowed to)
+      # then if you're _only_ a student, only an observer, or only both, you can't create tokens
+      # (a teacher that is a student/observer will still be allowed to)
       next false if root_account.restrict_personal_access_tokens_from_students? &&
                     (roles = user.roles(root_account) - ["user"]) &&
-                    (roles == ["student"] || roles.empty?)
+                    (roles.empty? || (roles - ["student", "observer"]).empty?)
 
       true
     end

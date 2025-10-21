@@ -582,17 +582,52 @@ describe TokensController do
             it_behaves_like "access token creation and update denied"
           end
 
+          context "as an observer" do
+            before do
+              course_with_observer(active_all: true, user: @user)
+            end
+
+            it_behaves_like "access token creation and update denied"
+          end
+
+          context "as both a student and an observer" do
+            before do
+              course_with_student(active_all: true, user: @user)
+              course_with_observer(active_all: true, user: @user)
+            end
+
+            it_behaves_like "access token creation and update denied"
+          end
+
           context "as a teacher" do
             before do
               course_with_teacher(active_all: true, user: @user)
             end
 
-            it "does allows creating an access token" do
+            it "does allow creating an access token" do
               post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
               assert_status(200)
             end
 
-            it "does allows updating an access token" do
+            it "does allow updating an access token" do
+              token = @user.access_tokens.create!(purpose: "test")
+              put "update", params: { user_id: "self", id: token.id, token: { regenerate: "1" } }
+              assert_status(200)
+            end
+          end
+
+          context "as both a student and a teacher" do
+            before do
+              course_with_student(active_all: true, user: @user)
+              course_with_teacher(active_all: true, user: @user)
+            end
+
+            it "does allow creating an access token" do
+              post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
+              assert_status(200)
+            end
+
+            it "does allow updating an access token" do
               token = @user.access_tokens.create!(purpose: "test")
               put "update", params: { user_id: "self", id: token.id, token: { regenerate: "1" } }
               assert_status(200)
