@@ -310,13 +310,13 @@ class AuthenticationProvider < ActiveRecord::Base
         unique_id = unique_ids
         unique_ids = {}
       end
+      user = User.new(default_name: unique_id, workflow_state: "registered")
       pseudonym = account.pseudonyms.build
-      pseudonym.user = User.create!(name: unique_id) { |u| u.workflow_state = "registered" }
+      pseudonym.user = user
       pseudonym.authentication_provider = self
       pseudonym.unique_id = unique_id
       pseudonym.unique_ids = unique_ids
-      pseudonym.save!
-      apply_federated_attributes(pseudonym, provider_attributes, purpose: :provisioning)
+      apply_federated_attributes(pseudonym, provider_attributes, purpose: :provisioning, strict: true)
       try(:post_provision_user, pseudonym:, provider_attributes:)
       pseudonym
     end
@@ -326,7 +326,7 @@ class AuthenticationProvider < ActiveRecord::Base
     end
   end
 
-  def apply_federated_attributes(pseudonym, provider_attributes, purpose: :login, translate_attributes: true)
+  def apply_federated_attributes(pseudonym, provider_attributes, purpose: :login, translate_attributes: true, strict: false)
     user = pseudonym.user
 
     canvas_attributes = translate_attributes ? translate_provider_attributes(provider_attributes) : provider_attributes.dup
@@ -410,10 +410,13 @@ class AuthenticationProvider < ActiveRecord::Base
           user.send(:"#{attribute}=", value)
         end
       end
-      if pseudonym.changed? && !pseudonym.save
+
+      save_method = strict ? :save! : :save
+
+      if pseudonym.changed? && !pseudonym.send(save_method)
         Rails.logger.warn("Unable to save federated pseudonym: #{pseudonym.errors.to_hash}")
       end
-      if user.changed? && !user.save
+      if user.changed? && !user.send(save_method)
         Rails.logger.warn("Unable to save federated user: #{user.errors.to_hash}")
       end
       try(:post_federated_attribute_application, pseudonym:, provider_attributes:, purpose:)

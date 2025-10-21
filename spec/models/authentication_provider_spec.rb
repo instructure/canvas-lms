@@ -644,6 +644,27 @@ describe AuthenticationProvider do
       expect(p.unique_id).to eq "unique_id"
       expect(p.unique_ids).to eq({ "sub" => "unique_id", "tid" => "abc" })
     end
+
+    it "defaults to the user's unique_id if no name is provided" do
+      p = auth_provider.provision_user("unique_id")
+      expect(p.user.name).to eq "unique_id"
+    end
+
+    it "assigns the user's actual name" do
+      auth_provider.federated_attributes = { "name" => "name" }
+      auth_provider.save!
+
+      p = auth_provider.provision_user({ "sub" => "unique_id" }, { "name" => "Cody Cutrer" })
+      expect(p.user.name).to eq "Cody Cutrer"
+    end
+
+    it "assigns the user's actual name if the display_name is provided" do
+      auth_provider.federated_attributes = { "display_name" => "name" }
+      auth_provider.save!
+
+      p = auth_provider.provision_user({ "sub" => "unique_id" }, { "name" => "Cody Cutrer" })
+      expect(p.user.name).to eq "Cody Cutrer"
+    end
   end
 
   context "otp_via_sms" do
