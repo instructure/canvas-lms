@@ -2416,7 +2416,7 @@ describe FilesController do
       end
 
       context "with InstFS enabled" do
-        let(:image) { @teacher.attachments.create!(uploaded_data: stub_png_data, instfs_uuid: "1234") }
+        let(:image) { attachment_model(context: @teacher, uploaded_data: stub_png_data, content_type: "image/png", instfs_uuid: "1234") }
 
         it "returns default 'no_pic' thumbnail if attachment not found" do
           user_session @teacher
@@ -2434,12 +2434,16 @@ describe FilesController do
           end
         end
 
-        it "does not add a jti if the thumbnail is accessed with the avatar location (meaning it's a profile picture)" do
-          enable_cache do
-            user_session @teacher
-            token = get("image_thumbnail", params: { id: image.id, no_cache: true, location: "avatar_#{@teacher.id}" }).location.split("?token=")[1]
-            claims = Canvas::Security.decode_jwt(token, [InstFS.jwt_secret])
-            expect(claims["jti"]).not_to be_present
+        context "with profile pictures" do
+          it "does not add a jti if the thumbnail is a user's profile picture" do
+            enable_cache do
+              user_session @teacher
+              @teacher.avatar_image = { "url" => thumbnail_image_plain_url(image), "type" => "attachment" }
+              @teacher.save!
+              token = get("image_thumbnail", params: { id: image.id, no_cache: true }).location.split("?token=")[1]
+              claims = Canvas::Security.decode_jwt(token, [InstFS.jwt_secret])
+              expect(claims["jti"]).not_to be_present
+            end
           end
         end
 

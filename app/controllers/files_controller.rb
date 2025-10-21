@@ -1651,7 +1651,12 @@ class FilesController < ApplicationController
 
     thumb_opts = { size: params[:size] }
     thumb_opts[:fallback_url] = @access_verifier[:fallback_url] if @access_verifier
-    thumb_opts[:no_jti] = authed && params[:location]&.include?("avatar")
+    if authed && attachment.context_type == "User"
+      avatar_url = attachment.context&.avatar_image_url
+      avatar_params = avatar_url && Rails.application.routes.recognize_path(avatar_url)
+      avatar_id = avatar_params && (avatar_params[:file_id] || avatar_params[:attachment_id] || avatar_params[:id])
+      thumb_opts[:no_jti] = avatar_id && Shard.integral_id_for(avatar_id) == attachment.id
+    end
     url = authenticated_thumbnail_url(attachment, options: thumb_opts) if attachment && authed
     if url && attachment.instfs_hosted? && file_location_mode?
       render_file_location(url)
