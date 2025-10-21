@@ -263,6 +263,8 @@ module Lti::IMS
       json[:resultUrl] = result_url
 
       render json:, content_type: MIME_TYPE
+    rescue Assignment::GradeError => e
+      render_error(e.message, :unprocessable_entity)
     end
 
     private
