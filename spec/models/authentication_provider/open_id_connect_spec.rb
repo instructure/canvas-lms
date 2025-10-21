@@ -305,6 +305,10 @@ describe AuthenticationProvider::OpenIDConnect do
   describe "#user_logout_url" do
     let(:controller) { instance_double(ApplicationController, login_url: "http//www.example.com/login", session: {}) }
 
+    before(:all) do
+      Rails.application.reload_routes! unless ApplicationController.method_defined?(:login_url)
+    end
+
     before do
       subject.account = Account.default
       subject.end_session_endpoint = "http://somewhere/logout"
