@@ -3,6 +3,6 @@ discussion_summary:
   state: allowed
   root_opt_in: true
   applies_to: Course
-  display_name: Discussion Summary
+  display_name: IgniteAI Summaries for Discussions
   description: Summarize discussions using AI.
   beta: true
