@@ -704,6 +704,24 @@ describe "Discussion Topic Show" do
       expect(Discussion.discussion_page_body).to include_text("a very cool discussion")
     end
 
+    it "does not honor unlock dates if course paces is enabled" do
+      @course.enable_course_paces = true
+      @course.save!
+      @topic.update!(unlock_at: 1.day.from_now)
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      expect(Discussion.discussion_page_body).not_to include_text("This topic is locked until")
+      expect(Discussion.discussion_page_body).to include_text("a very cool discussion")
+    end
+
+    it "does not honor lock dates if course paces is enabled" do
+      @course.enable_course_paces = true
+      @course.save!
+      @topic.update!(lock_at: 1.day.ago)
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      expect(Discussion.discussion_page_body).not_to include_text("This topic is closed for comments")
+      expect(Discussion.discussion_page_body).to include_text("a very cool discussion")
+    end
+
     context "discussion checkpoints" do
       before do
         Account.site_admin.enable_feature! :discussion_checkpoints

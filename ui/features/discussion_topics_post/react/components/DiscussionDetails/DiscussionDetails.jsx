@@ -110,6 +110,7 @@ export function DiscussionDetails({...props}) {
                   anonymousState={props.discussionTopic.anonymousState}
                   groupSet={props.discussionTopic.groupSet}
                   assignment={props.discussionTopic.assignment}
+                  inPacedCourse={props.inPacedCourse}
                 />
               </Flex.Item>
             </Flex>
