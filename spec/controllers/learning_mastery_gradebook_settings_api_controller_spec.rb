@@ -83,7 +83,7 @@ RSpec.describe LearningMasteryGradebookSettingsApiController do
     context "with valid params" do
       let(:learning_mastery_gradebook_settings) do
         {
-          "secondary_info_display" => "percentage",
+          "secondary_info_display" => "sis_id",
           "show_students_with_no_results" => true,
           "show_student_avatars" => false
         }
@@ -143,7 +143,7 @@ RSpec.describe LearningMasteryGradebookSettingsApiController do
         {
           course_id: @course.id,
           learning_mastery_gradebook_settings: {
-            "secondary_info_display" => "percentage"
+            "secondary_info_display" => "sis_id"
           }
         }
       end
@@ -162,7 +162,7 @@ RSpec.describe LearningMasteryGradebookSettingsApiController do
         {
           course_id: @course.id,
           learning_mastery_gradebook_settings: {
-            "secondary_info_display" => "percentage"
+            "secondary_info_display" => "sis_id"
           }
         }
       end
@@ -189,7 +189,7 @@ RSpec.describe LearningMasteryGradebookSettingsApiController do
         {
           course_id: @course.id,
           learning_mastery_gradebook_settings: {
-            "secondary_info_display" => "percentage",
+            "secondary_info_display" => "sis_id",
             "show_students_with_no_results" => true,
             "show_student_avatars" => false,
             "unpermitted_param" => "should_be_filtered"
@@ -204,7 +204,7 @@ RSpec.describe LearningMasteryGradebookSettingsApiController do
         saved_settings = teacher.get_preference(:learning_mastery_gradebook_settings, @course.global_id)
         expect(saved_settings).not_to have_key("unpermitted_param")
         expect(saved_settings).to include(
-          "secondary_info_display" => "percentage",
+          "secondary_info_display" => "sis_id",
           "show_students_with_no_results" => "true",
           "show_student_avatars" => "false"
         )
@@ -249,6 +249,310 @@ RSpec.describe LearningMasteryGradebookSettingsApiController do
 
         expect(response).to be_successful
         expect(json_parse["learning_mastery_gradebook_settings"]).to include("name_display_format" => "last_first")
+      end
+    end
+
+    context "with parameter validation" do
+      describe "secondary_info_display validation" do
+        it "accepts 'none' as a valid value" do
+          put :update, params: {
+            course_id: @course.id,
+            learning_mastery_gradebook_settings: { "secondary_info_display" => "none" }
+          }
+
+          expect(response).to be_successful
+          saved_settings = teacher.get_preference(:learning_mastery_gradebook_settings, @course.global_id)
+          expect(saved_settings["secondary_info_display"]).to eq("none")
+        end
+
+        it "accepts 'sis_id' as a valid value" do
+          put :update, params: {
+            course_id: @course.id,
+            learning_mastery_gradebook_settings: { "secondary_info_display" => "sis_id" }
+          }
+
+          expect(response).to be_successful
+          saved_settings = teacher.get_preference(:learning_mastery_gradebook_settings, @course.global_id)
+          expect(saved_settings["secondary_info_display"]).to eq("sis_id")
+        end
+
+        it "accepts 'integration_id' as a valid value" do
+          put :update, params: {
+            course_id: @course.id,
+            learning_mastery_gradebook_settings: { "secondary_info_display" => "integration_id" }
+          }
+
+          expect(response).to be_successful
+          saved_settings = teacher.get_preference(:learning_mastery_gradebook_settings, @course.global_id)
+          expect(saved_settings["secondary_info_display"]).to eq("integration_id")
+        end
+
+        it "accepts 'login_id' as a valid value" do
+          put :update, params: {
+            course_id: @course.id,
+            learning_mastery_gradebook_settings: { "secondary_info_display" => "login_id" }
+          }
+
+          expect(response).to be_successful
+          saved_settings = teacher.get_preference(:learning_mastery_gradebook_settings, @course.global_id)
+          expect(saved_settings["secondary_info_display"]).to eq("login_id")
+        end
+
+        it "rejects invalid values" do
+          put :update, params: {
+            course_id: @course.id,
+            learning_mastery_gradebook_settings: { "secondary_info_display" => "invalid_value" }
+          }
+
+          expect(response).to have_http_status(:unprocessable_content)
+          json = json_parse
+          expect(json["errors"]).to include(a_string_matching(/Invalid secondary_info_display.*Valid values are/))
+        end
+
+        it "rejects 'percentage' (previously allowed)" do
+          put :update, params: {
+            course_id: @course.id,
+            learning_mastery_gradebook_settings: { "secondary_info_display" => "percentage" }
+          }
+
+          expect(response).to have_http_status(:unprocessable_content)
+          json = json_parse
+          expect(json["errors"]).to include(a_string_matching(/Invalid secondary_info_display.*Valid values are/))
+        end
+
+        it "rejects 'points' (previously allowed)" do
+          put :update, params: {
+            course_id: @course.id,
+            learning_mastery_gradebook_settings: { "secondary_info_display" => "points" }
+          }
+
+          expect(response).to have_http_status(:unprocessable_content)
+          json = json_parse
+          expect(json["errors"]).to include(a_string_matching(/Invalid secondary_info_display.*Valid values are/))
+        end
+
+        it "rejects empty string" do
+          put :update, params: {
+            course_id: @course.id,
+            learning_mastery_gradebook_settings: { "secondary_info_display" => "" }
+          }
+
+          expect(response).to have_http_status(:unprocessable_content)
+          json = json_parse
+          expect(json["errors"]).to include(a_string_matching(/Invalid secondary_info_display.*Valid values are/))
+        end
+      end
+
+      describe "show_students_with_no_results validation" do
+        it "accepts true as a valid value" do
+          put :update, params: {
+            course_id: @course.id,
+            learning_mastery_gradebook_settings: { "show_students_with_no_results" => true }
+          }
+
+          expect(response).to be_successful
+          saved_settings = teacher.get_preference(:learning_mastery_gradebook_settings, @course.global_id)
+          expect(saved_settings["show_students_with_no_results"]).to eq("true")
+        end
+
+        it "accepts false as a valid value" do
+          put :update, params: {
+            course_id: @course.id,
+            learning_mastery_gradebook_settings: { "show_students_with_no_results" => false }
+          }
+
+          expect(response).to be_successful
+          saved_settings = teacher.get_preference(:learning_mastery_gradebook_settings, @course.global_id)
+          expect(saved_settings["show_students_with_no_results"]).to eq("false")
+        end
+
+        it "accepts 'true' string as a valid value" do
+          put :update, params: {
+            course_id: @course.id,
+            learning_mastery_gradebook_settings: { "show_students_with_no_results" => "true" }
+          }
+
+          expect(response).to be_successful
+          saved_settings = teacher.get_preference(:learning_mastery_gradebook_settings, @course.global_id)
+          expect(saved_settings["show_students_with_no_results"]).to eq("true")
+        end
+
+        it "accepts 'false' string as a valid value" do
+          put :update, params: {
+            course_id: @course.id,
+            learning_mastery_gradebook_settings: { "show_students_with_no_results" => "false" }
+          }
+
+          expect(response).to be_successful
+          saved_settings = teacher.get_preference(:learning_mastery_gradebook_settings, @course.global_id)
+          expect(saved_settings["show_students_with_no_results"]).to eq("false")
+        end
+
+        it "rejects non-boolean values" do
+          put :update, params: {
+            course_id: @course.id,
+            learning_mastery_gradebook_settings: { "show_students_with_no_results" => "invalid" }
+          }
+
+          expect(response).to have_http_status(:unprocessable_content)
+          json = json_parse
+          expect(json["errors"]).to include(a_string_matching(/Invalid show_students_with_no_results.*Valid values are/))
+        end
+
+        it "rejects numeric values" do
+          put :update, params: {
+            course_id: @course.id,
+            learning_mastery_gradebook_settings: { "show_students_with_no_results" => 1 }
+          }
+
+          expect(response).to have_http_status(:unprocessable_content)
+          json = json_parse
+          expect(json["errors"]).to include(a_string_matching(/Invalid show_students_with_no_results.*Valid values are/))
+        end
+      end
+
+      describe "show_student_avatars validation" do
+        it "accepts true as a valid value" do
+          put :update, params: {
+            course_id: @course.id,
+            learning_mastery_gradebook_settings: { "show_student_avatars" => true }
+          }
+
+          expect(response).to be_successful
+          saved_settings = teacher.get_preference(:learning_mastery_gradebook_settings, @course.global_id)
+          expect(saved_settings["show_student_avatars"]).to eq("true")
+        end
+
+        it "accepts false as a valid value" do
+          put :update, params: {
+            course_id: @course.id,
+            learning_mastery_gradebook_settings: { "show_student_avatars" => false }
+          }
+
+          expect(response).to be_successful
+          saved_settings = teacher.get_preference(:learning_mastery_gradebook_settings, @course.global_id)
+          expect(saved_settings["show_student_avatars"]).to eq("false")
+        end
+
+        it "accepts 'true' string as a valid value" do
+          put :update, params: {
+            course_id: @course.id,
+            learning_mastery_gradebook_settings: { "show_student_avatars" => "true" }
+          }
+
+          expect(response).to be_successful
+          saved_settings = teacher.get_preference(:learning_mastery_gradebook_settings, @course.global_id)
+          expect(saved_settings["show_student_avatars"]).to eq("true")
+        end
+
+        it "accepts 'false' string as a valid value" do
+          put :update, params: {
+            course_id: @course.id,
+            learning_mastery_gradebook_settings: { "show_student_avatars" => "false" }
+          }
+
+          expect(response).to be_successful
+          saved_settings = teacher.get_preference(:learning_mastery_gradebook_settings, @course.global_id)
+          expect(saved_settings["show_student_avatars"]).to eq("false")
+        end
+
+        it "rejects non-boolean values" do
+          put :update, params: {
+            course_id: @course.id,
+            learning_mastery_gradebook_settings: { "show_student_avatars" => "invalid" }
+          }
+
+          expect(response).to have_http_status(:unprocessable_content)
+          json = json_parse
+          expect(json["errors"]).to include(a_string_matching(/Invalid show_student_avatars.*Valid values are/))
+        end
+
+        it "rejects numeric values" do
+          put :update, params: {
+            course_id: @course.id,
+            learning_mastery_gradebook_settings: { "show_student_avatars" => 0 }
+          }
+
+          expect(response).to have_http_status(:unprocessable_content)
+          json = json_parse
+          expect(json["errors"]).to include(a_string_matching(/Invalid show_student_avatars.*Valid values are/))
+        end
+      end
+
+      describe "multiple validation errors" do
+        it "returns all validation errors when multiple parameters are invalid" do
+          put :update, params: {
+            course_id: @course.id,
+            learning_mastery_gradebook_settings: {
+              "secondary_info_display" => "invalid",
+              "show_students_with_no_results" => "not_boolean",
+              "show_student_avatars" => 123
+            }
+          }
+
+          expect(response).to have_http_status(:unprocessable_content)
+          json = json_parse
+          expect(json["errors"].length).to eq(3)
+          expect(json["errors"]).to include(
+            a_string_matching(/Invalid secondary_info_display.*Valid values are/),
+            a_string_matching(/Invalid show_students_with_no_results.*Valid values are/),
+            a_string_matching(/Invalid show_student_avatars.*Valid values are/)
+          )
+        end
+      end
+
+      describe "mixed valid and invalid parameters" do
+        it "rejects the request if any parameter is invalid" do
+          put :update, params: {
+            course_id: @course.id,
+            learning_mastery_gradebook_settings: {
+              "secondary_info_display" => "sis_id",
+              "show_students_with_no_results" => "invalid"
+            }
+          }
+
+          expect(response).to have_http_status(:unprocessable_content)
+          json = json_parse
+          expect(json["errors"]).to include(a_string_matching(/Invalid show_students_with_no_results.*Valid values are/))
+        end
+
+        it "does not save any settings when validation fails" do
+          existing_settings = { "existing_key" => "existing_value" }
+          teacher.set_preference(:learning_mastery_gradebook_settings, @course.global_id, existing_settings)
+
+          put :update, params: {
+            course_id: @course.id,
+            learning_mastery_gradebook_settings: {
+              "secondary_info_display" => "sis_id",
+              "show_students_with_no_results" => "invalid"
+            }
+          }
+
+          expect(response).to have_http_status(:unprocessable_content)
+          saved_settings = teacher.get_preference(:learning_mastery_gradebook_settings, @course.global_id)
+          expect(saved_settings).to eq(existing_settings)
+        end
+      end
+
+      describe "validation with all parameters valid" do
+        it "successfully updates all parameters when all are valid" do
+          put :update, params: {
+            course_id: @course.id,
+            learning_mastery_gradebook_settings: {
+              "secondary_info_display" => "login_id",
+              "show_students_with_no_results" => true,
+              "show_student_avatars" => false
+            }
+          }
+
+          expect(response).to be_successful
+          saved_settings = teacher.get_preference(:learning_mastery_gradebook_settings, @course.global_id)
+          expect(saved_settings).to include(
+            "secondary_info_display" => "login_id",
+            "show_students_with_no_results" => "true",
+            "show_student_avatars" => "false"
+          )
+        end
       end
     end
   end
