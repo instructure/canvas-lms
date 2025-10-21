@@ -119,38 +119,39 @@ export function DiscussionAvailabilityContainer({...props}) {
               {prefixText && <Text size={responsiveProps.textSize}>{prefixText}</Text>}
             </Flex.Item>
             <Flex.Item>
-              {availabilities.length === 1 ? (
-                <AssignmentAvailabilityWindow
-                  availabilityWindowName={availabilities[0].name}
-                  availableDate={availabilities[0].delayedPostAt}
-                  untilDate={availabilities[0].lockAt}
-                  anonymousState={availabilities[0].anonymousState}
-                  showDateWithTime={true}
-                />
-              ) : (
-                <>
-                  {prefixText && <Text size={responsiveProps.textSize}>{' | '}</Text>}
-                  <Link
-                    isWithinText={false}
-                    as="button"
-                    onClick={() => {
-                      setAvailabilityTrayOpen(true)
-                    }}
-                    data-testid="view-availability-button"
-                    margin={responsiveProps.margin}
-                  >
-                    <Text weight="bold" size={responsiveProps.textSize}>
-                      {I18n.t('View Availability')}
-                    </Text>
-                  </Link>
-                  <TrayDisplayer
-                    setTrayOpen={setAvailabilityTrayOpen}
-                    trayTitle="Availability"
-                    isTrayOpen={availabilityTrayOpen}
-                    trayComponent={<DiscussionAvailabilityTray availabilities={availabilities} />}
+              {!props.inPacedCourse &&
+                (availabilities.length === 1 ? (
+                  <AssignmentAvailabilityWindow
+                    availabilityWindowName={availabilities[0].name}
+                    availableDate={availabilities[0].delayedPostAt}
+                    untilDate={availabilities[0].lockAt}
+                    anonymousState={availabilities[0].anonymousState}
+                    showDateWithTime={true}
                   />
-                </>
-              )}
+                ) : (
+                  <>
+                    {prefixText && <Text size={responsiveProps.textSize}>{' | '}</Text>}
+                    <Link
+                      isWithinText={false}
+                      as="button"
+                      onClick={() => {
+                        setAvailabilityTrayOpen(true)
+                      }}
+                      data-testid="view-availability-button"
+                      margin={responsiveProps.margin}
+                    >
+                      <Text weight="bold" size={responsiveProps.textSize}>
+                        {I18n.t('View Availability')}
+                      </Text>
+                    </Link>
+                    <TrayDisplayer
+                      setTrayOpen={setAvailabilityTrayOpen}
+                      trayTitle="Availability"
+                      isTrayOpen={availabilityTrayOpen}
+                      trayComponent={<DiscussionAvailabilityTray availabilities={availabilities} />}
+                    />
+                  </>
+                ))}
             </Flex.Item>
           </Flex>
         )
@@ -167,4 +168,5 @@ DiscussionAvailabilityContainer.propTypes = {
   totalUserCount: PropTypes.number,
   groupSet: PropTypes.object,
   assignment: PropTypes.object,
+  inPacedCourse: PropTypes.bool,
 }
