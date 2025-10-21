@@ -31,7 +31,7 @@ GEM
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
     logger (1.7.0)
-    minitest (5.25.5)
+    minitest (5.26.0)
     rake (13.3.0)
     rspec (3.13.1)
       rspec-core (~> 3.13.0)

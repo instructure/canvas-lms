@@ -770,7 +770,7 @@ GEM
       logger
     mini_mime (1.1.5)
     mini_portile2 (2.8.9)
-    minitest (5.25.5)
+    minitest (5.26.0)
     mize (0.6.1)
     moodle2cc (0.2.47)
       builder
@@ -890,7 +890,7 @@ GEM
     pg (1.5.9)
     pg_query (6.1.0)
       google-protobuf (>= 3.25.3)
-    pp (0.6.2)
+    pp (0.6.3)
       prettyprint
     pragmatic_segmenter (0.3.24)
     prawn (2.5.0)
