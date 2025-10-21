@@ -210,6 +210,47 @@ RSpec.describe LearningMasteryGradebookSettingsApiController do
         )
       end
     end
+
+    context "with name_display_format parameter" do
+      it "persists name_display_format when set to first_last" do
+        params = {
+          course_id: @course.id,
+          learning_mastery_gradebook_settings: {
+            "name_display_format" => "first_last"
+          }
+        }
+
+        put(:update, params:)
+
+        expect(response).to be_successful
+        saved_settings = teacher.get_preference(:learning_mastery_gradebook_settings, @course.global_id)
+        expect(saved_settings).to include("name_display_format" => "first_last")
+      end
+
+      it "persists name_display_format when set to last_first" do
+        params = {
+          course_id: @course.id,
+          learning_mastery_gradebook_settings: {
+            "name_display_format" => "last_first"
+          }
+        }
+
+        put(:update, params:)
+
+        expect(response).to be_successful
+        saved_settings = teacher.get_preference(:learning_mastery_gradebook_settings, @course.global_id)
+        expect(saved_settings).to include("name_display_format" => "last_first")
+      end
+
+      it "returns the saved name_display_format on subsequent GET requests" do
+        teacher.set_preference(:learning_mastery_gradebook_settings, @course.global_id, { "name_display_format" => "last_first" })
+
+        get :show, params: { course_id: @course.id }
+
+        expect(response).to be_successful
+        expect(json_parse["learning_mastery_gradebook_settings"]).to include("name_display_format" => "last_first")
+      end
+    end
   end
 
   describe "permissions" do

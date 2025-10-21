@@ -51,12 +51,19 @@ export enum DisplayFilter {
   SHOW_STUDENT_AVATARS = 'show_student_avatars',
 }
 
+export enum NameDisplayFormat {
+  FIRST_LAST = 'first_last',
+  LAST_FIRST = 'last_first',
+}
+
 export interface GradebookSettings {
   secondaryInfoDisplay: SecondaryInfoDisplay
   displayFilters: DisplayFilter[]
+  nameDisplayFormat: NameDisplayFormat
 }
 
 export const DEFAULT_GRADEBOOK_SETTINGS: GradebookSettings = {
   secondaryInfoDisplay: SecondaryInfoDisplay.NONE,
   displayFilters: [DisplayFilter.SHOW_STUDENT_AVATARS, DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS],
+  nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
 }

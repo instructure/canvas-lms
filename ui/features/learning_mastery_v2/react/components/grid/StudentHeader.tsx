@@ -23,16 +23,28 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconArrowOpenDownLine, IconArrowDownLine, IconArrowUpLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {View} from '@instructure/ui-view'
-import {CELL_HEIGHT, SortOrder, SortBy, STUDENT_COLUMN_WIDTH} from '../../utils/constants'
+import {
+  CELL_HEIGHT,
+  SortOrder,
+  SortBy,
+  STUDENT_COLUMN_WIDTH,
+  NameDisplayFormat,
+} from '../../utils/constants'
 import {Sorting} from '../../types/shapes'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 
 export interface StudentHeaderProps {
   sorting: Sorting
+  nameDisplayFormat: NameDisplayFormat
+  onChangeNameDisplayFormat: (format: NameDisplayFormat) => void
 }
 
-export const StudentHeader: React.FC<StudentHeaderProps> = ({sorting}) => {
+export const StudentHeader: React.FC<StudentHeaderProps> = ({
+  sorting,
+  nameDisplayFormat,
+  onChangeNameDisplayFormat,
+}) => {
   return (
     <View background="secondary" as="div" width={STUDENT_COLUMN_WIDTH}>
       <Flex alignItems="center" justifyItems="space-between" height={CELL_HEIGHT}>
@@ -47,12 +59,26 @@ export const StudentHeader: React.FC<StudentHeaderProps> = ({sorting}) => {
                 withBorder={false}
                 withBackground={false}
                 size="small"
-                screenReaderLabel={I18n.t('Sort Students')}
+                screenReaderLabel={I18n.t('Student Options')}
               >
                 <IconArrowOpenDownLine />
               </IconButton>
             }
           >
+            <Menu.Group label={I18n.t('Display as')}>
+              <Menu.Item
+                onSelect={() => onChangeNameDisplayFormat(NameDisplayFormat.FIRST_LAST)}
+                selected={nameDisplayFormat === NameDisplayFormat.FIRST_LAST}
+              >
+                {I18n.t('First, Last Name')}
+              </Menu.Item>
+              <Menu.Item
+                onSelect={() => onChangeNameDisplayFormat(NameDisplayFormat.LAST_FIRST)}
+                selected={nameDisplayFormat === NameDisplayFormat.LAST_FIRST}
+              >
+                {I18n.t('Last, First Name')}
+              </Menu.Item>
+            </Menu.Group>
             <Menu.Group label={I18n.t('Sort Order')}></Menu.Group>
             <Menu.Item onClick={() => sorting.setSortOrder(SortOrder.ASC)}>
               <Flex gap="x-small">
