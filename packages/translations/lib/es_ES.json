@@ -347,6 +347,9 @@
     "clubs_suit_c1ffedff": {
         "message": "Tréboles (naipes)"
     },
+    "collab_575ac7bc": {
+        "message": "Colaboración"
+    },
     "collaborations_5c56c15f": {
         "message": "Colaboraciones"
     },
@@ -1271,6 +1274,9 @@
     "latvian_2bbb6aab": {
         "message": "Letón"
     },
+    "learn_ad3b3505": {
+        "message": "Aprendizaje"
+    },
     "learn_more_about_adjacent_links_2cb9762c": {
         "message": "Más información sobre enlaces adyacentes"
     },
@@ -1697,6 +1703,9 @@
     "operators_a2ef9a93": {
         "message": "Operadores"
     },
+    "options_3ab0ea65": {
+        "message": "Opciones"
+    },
     "or_9b70ccaa": {
         "message": "O"
     },
@@ -1960,6 +1969,9 @@
     },
     "remove_link_d1f2f4d0": {
         "message": "Eliminar enlace"
+    },
+    "remove_studio_media_f913e502": {
+        "message": "Eliminar contenido multimedia de Studio"
     },
     "replace_all_d3d68b3": {
         "message": "Reemplazar todo"
@@ -2482,6 +2494,9 @@
     },
     "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
         "message": "Aunque tu vídeo tendrá el título correcto en el navegador, no pudimos actualizarlo en la base de datos."
+    },
+    "thumbnail_e0de666f": {
+        "message": "Miniaturas"
     },
     "timebar_a4d18443": {
         "message": "Barra de tiempo"
