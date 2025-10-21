@@ -61,7 +61,8 @@ class LearningMasteryGradebookSettingsApiController < ApplicationController
     params.require(:learning_mastery_gradebook_settings).permit(
       :secondary_info_display,
       :show_students_with_no_results,
-      :show_student_avatars
+      :show_student_avatars,
+      :name_display_format
     )
   end
 

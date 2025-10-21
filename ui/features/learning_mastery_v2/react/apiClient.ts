@@ -129,6 +129,7 @@ export const saveLearningMasteryGradebookSettings = (
       show_students_with_no_results: settings.displayFilters.includes(
         DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS,
       ),
+      name_display_format: settings.nameDisplayFormat,
     },
   }
 

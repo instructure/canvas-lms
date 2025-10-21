@@ -31,7 +31,7 @@ import {Toolbar} from './components/toolbar/Toolbar'
 import {getSearchParams, setSearchParams} from './utils/ManageURLSearchParams'
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
-import {GradebookSettings} from './utils/constants'
+import {GradebookSettings, NameDisplayFormat} from './utils/constants'
 import {saveLearningMasteryGradebookSettings} from './apiClient'
 import {useGradebookSettings} from './hooks/useGradebookSettings'
 
@@ -105,6 +105,14 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
     [courseId, updateSettings],
   )
 
+  const handleNameDisplayFormatChange = useCallback(
+    async (format: NameDisplayFormat) => {
+      const newSettings = {...gradebookSettings, nameDisplayFormat: format}
+      await handleGradebookSettingsChange(newSettings)
+    },
+    [gradebookSettings, handleGradebookSettingsChange],
+  )
+
   const renderBody = () => {
     if (error !== null)
       return (
@@ -126,6 +134,7 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
         setCurrentPage={setCurrentPage}
         sorting={sorting}
         gradebookSettings={gradebookSettings}
+        onChangeNameDisplayFormat={handleNameDisplayFormatChange}
         data-testid="gradebook-body"
       />
     )

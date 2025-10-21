@@ -19,7 +19,7 @@
 import {render} from '@testing-library/react'
 import {StudentCell, StudentCellProps} from '../StudentCell'
 import {Student} from '../../../types/rollup'
-import {SecondaryInfoDisplay} from '../../../utils/constants'
+import {SecondaryInfoDisplay, NameDisplayFormat} from '../../../utils/constants'
 import {MOCK_STUDENTS} from '../../../__fixtures__/rollups'
 
 describe('StudentCell', () => {
@@ -126,6 +126,27 @@ describe('StudentCell', () => {
         />,
       )
       expect(getByTestId('student-secondary-info')).toHaveTextContent('LOGIN123')
+    })
+  })
+
+  describe('name display format', () => {
+    it('renders sortable_name when format is LAST_FIRST', () => {
+      const {getByText} = render(
+        <StudentCell {...defaultProps({nameDisplayFormat: NameDisplayFormat.LAST_FIRST})} />,
+      )
+      expect(getByText('Test, Student')).toBeInTheDocument()
+    })
+
+    it('renders display_name when format is FIRST_LAST', () => {
+      const {getByText} = render(
+        <StudentCell {...defaultProps({nameDisplayFormat: NameDisplayFormat.FIRST_LAST})} />,
+      )
+      expect(getByText('Student Test')).toBeInTheDocument()
+    })
+
+    it('renders display_name by default when nameDisplayFormat is not provided', () => {
+      const {getByText} = render(<StudentCell {...defaultProps({nameDisplayFormat: undefined})} />)
+      expect(getByText('Student Test')).toBeInTheDocument()
     })
   })
 })
