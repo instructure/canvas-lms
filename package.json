@@ -8,7 +8,12 @@
   },
   "private": true,
   "workspaces": {
-    "packages": ["gems/plugins/*", "packages/*", "ui/engine", "ui/shared/*"]
+    "packages": [
+      "gems/plugins/*",
+      "packages/*",
+      "ui/engine",
+      "ui/shared/*"
+    ]
   },
   "dependencies": {
     "@apollo/client": "3.12.4",
@@ -292,6 +297,7 @@
     "eslint-plugin-react": "^7.37.2",
     "eslint-plugin-react-compiler": "^19.0.0-beta-27714ef-20250124",
     "eslint-plugin-react-hooks": "^5.1.0",
+    "fast-check": "^4.3.0",
     "fast-glob": "^3.2.4",
     "fetch-mock": "9.11.0",
     "gglobby": "0.0.3",
@@ -353,7 +359,9 @@
     "xsslint": "instructure/xsslint#babel7"
   },
   "optionalDependencies": {},
-  "browserslist": ["extends @instructure/browserslist-config-canvas-lms"],
+  "browserslist": [
+    "extends @instructure/browserslist-config-canvas-lms"
+  ],
   "repository": "instructure/canvas-lms",
   "scripts": {
     "test": "jest --color",
