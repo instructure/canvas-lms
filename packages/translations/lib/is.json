@@ -347,6 +347,9 @@
     "clubs_suit_c1ffedff": {
         "message": "Kylfur (búningur)"
     },
+    "collab_575ac7bc": {
+        "message": "Samstarf"
+    },
     "collaborations_5c56c15f": {
         "message": "Samvinnutól"
     },
@@ -1271,6 +1274,9 @@
     "latvian_2bbb6aab": {
         "message": "Lettneska"
     },
+    "learn_ad3b3505": {
+        "message": "Læra"
+    },
     "learn_more_about_adjacent_links_2cb9762c": {
         "message": "Fá að vita meira um samliggjandi tengla"
     },
@@ -1697,6 +1703,9 @@
     "operators_a2ef9a93": {
         "message": "Stjórnendur"
     },
+    "options_3ab0ea65": {
+        "message": "Valkostir"
+    },
     "or_9b70ccaa": {
         "message": "Eða"
     },
@@ -1960,6 +1969,9 @@
     },
     "remove_link_d1f2f4d0": {
         "message": "Fjarlægja tengil"
+    },
+    "remove_studio_media_f913e502": {
+        "message": "Fjarlægja Studio margmiðlunarefni"
     },
     "replace_all_d3d68b3": {
         "message": "Skipta um allt"
@@ -2482,6 +2494,9 @@
     },
     "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
         "message": "Þó að myndbandið sé með réttan titil í vafranum, uppfærðum við það ekki í gagnagrunninum."
+    },
+    "thumbnail_e0de666f": {
+        "message": "Smámynd"
     },
     "timebar_a4d18443": {
         "message": "Tímaslá"

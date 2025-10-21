@@ -347,6 +347,9 @@
     "clubs_suit_c1ffedff": {
         "message": "चिड़िया (ताश का रंग)"
     },
+    "collab_575ac7bc": {
+        "message": "कोलैब"
+    },
     "collaborations_5c56c15f": {
         "message": "कोलैबोरेशंस"
     },
@@ -1271,6 +1274,9 @@
     "latvian_2bbb6aab": {
         "message": "लातवियाई"
     },
+    "learn_ad3b3505": {
+        "message": "सीखें"
+    },
     "learn_more_about_adjacent_links_2cb9762c": {
         "message": "निकटवर्ती लिंक के बारे में और जानें"
     },
@@ -1697,6 +1703,9 @@
     "operators_a2ef9a93": {
         "message": "ऑपरेटर"
     },
+    "options_3ab0ea65": {
+        "message": "विकल्प"
+    },
     "or_9b70ccaa": {
         "message": "या"
     },
@@ -1960,6 +1969,9 @@
     },
     "remove_link_d1f2f4d0": {
         "message": "लिंक निकालें"
+    },
+    "remove_studio_media_f913e502": {
+        "message": "स्टूडियो मीडिया निकालें"
     },
     "replace_all_d3d68b3": {
         "message": "सभी को प्रतिस्थापित करें"
@@ -2482,6 +2494,9 @@
     },
     "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
         "message": "हालांकि, आपके वीडियो का शीर्षक ब्राउज़र में सही तरीके से प्रदर्शित होगा, लेकिन हम उसे डेटाबेस में अपडेट करने में विफल रहे।"
+    },
+    "thumbnail_e0de666f": {
+        "message": "थम्बनेल"
     },
     "timebar_a4d18443": {
         "message": "टाइमबार"

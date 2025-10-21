@@ -347,6 +347,9 @@
     "clubs_suit_c1ffedff": {
         "message": "梅花（花色）"
     },
+    "collab_575ac7bc": {
+        "message": "協作"
+    },
     "collaborations_5c56c15f": {
         "message": "協作"
     },
@@ -1271,6 +1274,9 @@
     "latvian_2bbb6aab": {
         "message": "拉脫維亞語"
     },
+    "learn_ad3b3505": {
+        "message": "學習"
+    },
     "learn_more_about_adjacent_links_2cb9762c": {
         "message": "了解更多有關相鄰連結"
     },
@@ -1697,6 +1703,9 @@
     "operators_a2ef9a93": {
         "message": "操作員"
     },
+    "options_3ab0ea65": {
+        "message": "選項"
+    },
     "or_9b70ccaa": {
         "message": "或者"
     },
@@ -1960,6 +1969,9 @@
     },
     "remove_link_d1f2f4d0": {
         "message": "移除連結"
+    },
+    "remove_studio_media_f913e502": {
+        "message": "移除 Studio 媒體"
     },
     "replace_all_d3d68b3": {
         "message": "全部取代"
@@ -2482,6 +2494,9 @@
     },
     "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
         "message": "雖然您的影片在瀏覽器中有正確的標題，但我們無法在資料庫中將其更新。"
+    },
+    "thumbnail_e0de666f": {
+        "message": "縮略圖"
     },
     "timebar_a4d18443": {
         "message": "時間欄"
