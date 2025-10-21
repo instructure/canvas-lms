@@ -57,7 +57,7 @@ class User < ActiveRecord::Base
   include UserLearningObjectScopes
   include PermissionsHelper
 
-  attr_accessor :previous_id, :gradebook_importer_submissions, :prior_enrollment, :override_lti_id_lock, :trusted_account
+  attr_accessor :default_name, :previous_id, :gradebook_importer_submissions, :prior_enrollment, :override_lti_id_lock, :trusted_account
 
   before_save :infer_defaults
   before_validation :ensure_lti_id, on: :update
@@ -996,7 +996,7 @@ class User < ActiveRecord::Base
 
   def infer_defaults
     self.name = nil if name == "User"
-    self.name ||= short_name || email || t("#user.default_user_name", "User")
+    self.name ||= short_name || email || default_name || t("#user.default_user_name", "User")
     self.short_name = nil if short_name == ""
     self.short_name ||= self.name
     self.sortable_name = nil if sortable_name == ""
