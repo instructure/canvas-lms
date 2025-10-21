@@ -102,4 +102,147 @@ describe('useTranslationQueue', () => {
 
     expect(result.current.getQueueLength()).toBe(0)
   })
+
+  describe('clearQueue', () => {
+    it('aborts all queued jobs', () => {
+      window.ENV.ai_translation_improvements = true
+      const {result} = renderHook(() => useTranslationQueue())
+
+      const done = []
+      const jobs = Array.from({length: MAX_CONCURRENT_TRANSLATIONS + 5}, (_, i) =>
+        createMockJob(`job${i}`, done),
+      )
+
+      // Track abort signals
+      const signals = []
+      const jobsWithSignalTracking = jobs.map(job => signal => {
+        signals.push(signal)
+        return job(signal)
+      })
+
+      act(() => {
+        jobsWithSignalTracking.forEach(job => result.current.enqueueTranslation(job))
+      })
+
+      // First MAX_CONCURRENT_TRANSLATIONS should be running
+      expect(result.current.getActiveCount()).toBe(MAX_CONCURRENT_TRANSLATIONS)
+      expect(result.current.getQueueLength()).toBe(5)
+
+      // Clear the queue
+      act(() => {
+        result.current.clearQueue()
+      })
+
+      // All signals should be aborted
+      signals.forEach(signal => {
+        expect(signal.aborted).toBe(true)
+      })
+
+      expect(result.current.getActiveCount()).toBe(0)
+      expect(result.current.getQueueLength()).toBe(0)
+    })
+
+    it('aborts active jobs', () => {
+      window.ENV.ai_translation_improvements = true
+      const {result} = renderHook(() => useTranslationQueue())
+
+      const signals = []
+      const job = signal => {
+        signals.push(signal)
+        return new Promise(() => {}) // Never resolves
+      }
+
+      act(() => {
+        result.current.enqueueTranslation(job)
+        result.current.enqueueTranslation(job)
+      })
+
+      expect(result.current.getActiveCount()).toBe(2)
+      expect(signals).toHaveLength(2)
+      expect(signals[0].aborted).toBe(false)
+      expect(signals[1].aborted).toBe(false)
+
+      // Clear the queue - should abort active jobs
+      act(() => {
+        result.current.clearQueue()
+      })
+
+      expect(signals[0].aborted).toBe(true)
+      expect(signals[1].aborted).toBe(true)
+      expect(result.current.getActiveCount()).toBe(0)
+    })
+
+    it('prevents aborted jobs from updating state', async () => {
+      window.ENV.ai_translation_improvements = true
+      const {result} = renderHook(() => useTranslationQueue())
+
+      let capturedSignal = null
+      const stateUpdates = []
+
+      const job = async signal => {
+        capturedSignal = signal
+        // Simulate async work
+        await new Promise(resolve => setTimeout(resolve, 10))
+
+        // Check signal before updating state
+        if (signal.aborted) {
+          return
+        }
+
+        stateUpdates.push('updated')
+      }
+
+      act(() => {
+        result.current.enqueueTranslation(job)
+      })
+
+      // Immediately clear before the job completes
+      act(() => {
+        result.current.clearQueue()
+      })
+
+      expect(capturedSignal.aborted).toBe(true)
+
+      // Wait for the job's timeout to complete
+      await waitFor(() => {
+        // State should not be updated
+        expect(stateUpdates).toHaveLength(0)
+      })
+    })
+
+    it('clears both queued and active jobs together', () => {
+      window.ENV.ai_translation_improvements = true
+      const {result} = renderHook(() => useTranslationQueue())
+
+      const signals = []
+      const job = signal => {
+        signals.push(signal)
+        return new Promise(() => {}) // Never resolves
+      }
+
+      act(() => {
+        // Enqueue more than MAX to have both active and queued
+        for (let i = 0; i < MAX_CONCURRENT_TRANSLATIONS + 3; i++) {
+          result.current.enqueueTranslation(job)
+        }
+      })
+
+      expect(result.current.getActiveCount()).toBe(MAX_CONCURRENT_TRANSLATIONS)
+      expect(result.current.getQueueLength()).toBe(3)
+      expect(signals).toHaveLength(MAX_CONCURRENT_TRANSLATIONS) // Only active jobs get signals
+
+      // Clear everything
+      act(() => {
+        result.current.clearQueue()
+      })
+
+      // All signals should be aborted
+      signals.forEach(signal => {
+        expect(signal.aborted).toBe(true)
+      })
+
+      expect(result.current.getActiveCount()).toBe(0)
+      expect(result.current.getQueueLength()).toBe(0)
+    })
+  })
 })
