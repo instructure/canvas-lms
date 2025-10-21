@@ -24,17 +24,23 @@ import {IconCommentLine} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
-import {useCallback, useMemo, useState} from 'react'
+import {useCallback, useEffect, useMemo, useState} from 'react'
 import {useQuery} from '@apollo/client'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {SpeedGrader_CommentBankItemsCount} from './graphql/queries'
+import {SpeedGrader_CommentBankItems, SpeedGrader_CommentBankItemsCount} from './graphql/queries'
 import {ApolloProvider, createClient} from '@canvas/apollo-v3'
 import {CommentLibraryTray} from './components/CommentLibraryTray'
-import {SpeedGrader_CommentBankItemsCountQuery} from '@canvas/graphql/codegen/graphql'
+import {
+  SpeedGrader_CommentBankItemsCountQuery,
+  SpeedGrader_CommentBankItemsQuery,
+} from '@canvas/graphql/codegen/graphql'
+import {useDebounce} from 'use-debounce'
+import Suggestions from './Suggestions'
 
 const I18n = createI18nScope('CommentLibrary')
 
 export type CommentLibraryContentProps = {
+  comment: string
   userId: string
   courseId: string
   setFocusToTextArea: () => void
@@ -42,18 +48,59 @@ export type CommentLibraryContentProps = {
 }
 
 export const CommentLibraryContent: React.FC<CommentLibraryContentProps> = ({
+  comment,
   courseId,
   userId,
   setFocusToTextArea,
   setComment,
 }) => {
   const [isTrayOpen, setIsTrayOpen] = useState(false)
+
+  const [isSearchEnabled, setIsSearchEnabled] = useState(true)
+  const [showSuggestionResults, setShowSuggestionResults] = useState(true)
   const [suggestionsWhenTypingEnabled] = useState(ENV.comment_library_suggestions_enabled)
 
   const {data, loading} = useQuery<SpeedGrader_CommentBankItemsCountQuery>(
     SpeedGrader_CommentBankItemsCount,
     {variables: {userId}},
   )
+  useEffect(() => {
+    if (comment.length === 0) setIsSearchEnabled(true)
+    setShowSuggestionResults(true)
+  }, [comment])
+
+  const [searchTerm, state] = useDebounce(comment.replace(/<[^>]*>/g, ''), 750)
+
+  const {data: suggestedCommentsData} = useQuery<SpeedGrader_CommentBankItemsQuery>(
+    SpeedGrader_CommentBankItems,
+    {
+      variables: {userId, query: searchTerm, first: 5},
+      skip: searchTerm.length < 3 || !suggestionsWhenTypingEnabled || !isSearchEnabled,
+    },
+  )
+
+  const suggestedComments = useMemo(() => {
+    if (
+      suggestedCommentsData?.legacyNode &&
+      'commentBankItemsConnection' in suggestedCommentsData.legacyNode
+    ) {
+      const conn = suggestedCommentsData.legacyNode.commentBankItemsConnection
+      return conn?.nodes?.filter(it => it !== null) ?? []
+    }
+    return []
+  }, [suggestedCommentsData])
+
+  const showResults =
+    // comment libary suggestions are enabled
+    suggestionsWhenTypingEnabled &&
+    !state.isPending() &&
+    // search is enabled (there was no inserted comment library item since the textarea was
+    // cleared)
+    isSearchEnabled &&
+    // suggested items are not being loaded an there is any suggested comment item
+    suggestedComments.length > 0 &&
+    // suggestions results are not shown on purpose (user closed popover)
+    showSuggestionResults
 
   const commentBankItemsCount = useMemo(() => {
     let count = 0
@@ -66,6 +113,8 @@ export const CommentLibraryContent: React.FC<CommentLibraryContentProps> = ({
   const setCommentFromLibrary = useCallback(
     (value: string) => {
       setIsTrayOpen(false)
+      setShowSuggestionResults(false)
+      setIsSearchEnabled(false)
       setComment(value)
       setTimeout(() => {
         setFocusToTextArea()
@@ -115,6 +164,17 @@ export const CommentLibraryContent: React.FC<CommentLibraryContentProps> = ({
           <View display="flex" />
           <View as="div" padding="0 0 0 x-small" display="flex">
             {commentLibraryButton}
+            <Suggestions
+              searchResults={suggestedComments}
+              setComment={setCommentFromLibrary}
+              onClose={() => {
+                setShowSuggestionResults(false)
+                setTimeout(() => {
+                  setFocusToTextArea()
+                }, 0)
+              }}
+              showResults={showResults}
+            />
           </View>
         </Flex.Item>
       </Flex>
@@ -132,6 +192,7 @@ export const CommentLibraryContent: React.FC<CommentLibraryContentProps> = ({
 const client = createClient()
 
 type CommentLibraryProps = {
+  comment: string
   userId: string
   courseId: string
   setFocusToTextArea: () => void
