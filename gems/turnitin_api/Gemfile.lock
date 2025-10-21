@@ -66,7 +66,7 @@ GEM
       statsd-ruby (~> 1.0)
     json (2.15.0)
     logger (1.7.0)
-    minitest (5.25.5)
+    minitest (5.26.0)
     multipart-post (2.4.1)
     net-http (0.6.0)
       uri

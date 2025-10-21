@@ -147,7 +147,7 @@ GEM
     loofah (2.24.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
-    minitest (5.25.5)
+    minitest (5.26.0)
     net-http (0.6.0)
       uri
     nokogiri (1.18.10-aarch64-linux-gnu)
@@ -160,7 +160,7 @@ GEM
       racc (~> 1.4)
     packs-specification (0.0.10)
       sorbet-runtime
-    pp (0.6.2)
+    pp (0.6.3)
       prettyprint
     prettyprint (0.2.0)
     psych (5.2.6)
