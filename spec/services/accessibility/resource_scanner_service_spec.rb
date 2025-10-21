@@ -177,11 +177,11 @@ describe Accessibility::ResourceScannerService do
 
         expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
           "accessibility.resources_scanned",
-          cluster: scan.course.shard.database_server&.id
+          tags: { cluster: scan.course.shard.database_server&.id }
         )
         expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
           "accessibility.pages_scanned",
-          cluster: scan.course.shard.database_server&.id
+          tags: { cluster: scan.course.shard.database_server&.id }
         )
       end
     end
@@ -210,7 +210,7 @@ describe Accessibility::ResourceScannerService do
 
         expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
           "accessibility.resources_scanned",
-          cluster: scan.course.shard.database_server&.id
+          tags: { cluster: scan.course.shard.database_server&.id }
         )
         expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
           "accessibility.resource_scan_failed",
