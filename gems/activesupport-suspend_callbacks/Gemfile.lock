@@ -49,9 +49,10 @@ GEM
       date
       stringio
     rake (13.3.0)
-    rdoc (6.14.2)
+    rdoc (6.15.0)
       erb
       psych (>= 4.0.0)
+      tsort
     reline (0.6.2)
       io-console (~> 0.5)
     rspec (3.13.1)
@@ -75,6 +76,7 @@ GEM
     simplecov-html (0.13.2)
     simplecov_json_formatter (0.1.4)
     stringio (3.1.7)
+    tsort (0.2.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     uri (1.0.3)

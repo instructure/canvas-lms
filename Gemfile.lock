@@ -977,9 +977,10 @@ GEM
       logger
     rchardet (1.10.0)
     rdiscount (2.2.7.3)
-    rdoc (6.14.2)
+    rdoc (6.15.0)
       erb
       psych (>= 4.0.0)
+      tsort
     redcarpet (3.6.1)
     redis (5.4.1)
       redis-client (>= 0.22.0)
