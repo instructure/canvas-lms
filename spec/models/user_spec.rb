@@ -2400,6 +2400,30 @@ describe User do
     end
   end
 
+  it "assigns the name to the short_name if short_name is blank" do
+    u = User.new
+    u.name = "Cody Cutrer"
+    u.save!
+    expect(u.short_name).to eq "Cody Cutrer"
+
+    u.name = "Bracken Mosbacker"
+    u.short_name = "Bracken"
+    u.save!
+    expect(u.short_name).to eq "Bracken"
+  end
+
+  it "assigns the short_name to the name if name is blank" do
+    u = User.new
+    u.short_name = "Cody Cutrer"
+    u.save!
+    expect(u.name).to eq "Cody Cutrer"
+
+    u.short_name = "Bracken"
+    u.name = "Bracken Mosbacker"
+    u.save!
+    expect(u.name).to eq "Bracken Mosbacker"
+  end
+
   context "group_member_json" do
     before :once do
       @account = Account.default
