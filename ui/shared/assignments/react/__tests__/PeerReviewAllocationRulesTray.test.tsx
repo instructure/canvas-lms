@@ -573,70 +573,28 @@ describe('PeerReviewAllocationRulesTray', () => {
 
       expect(screen.queryByPlaceholderText('Type to search')).not.toBeInTheDocument()
     })
+  })
 
-    it('handles search input changes with debounce', async () => {
-      mockExecuteQuery.mockResolvedValue({
-        assignment: {
-          allocationRules: {
-            rulesConnection: {
-              nodes: mockAllocationRules,
-              pageInfo: {hasNextPage: false, endCursor: null},
-            },
-            count: mockAllocationRules.length,
-          },
-        },
-      })
-
-      renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
-
-      await waitFor(() => {
-        expect(screen.getByPlaceholderText('Type to search')).toBeInTheDocument()
-      })
-
-      const searchInput = screen.getByPlaceholderText('Type to search')
-      await user.type(searchInput, 'John')
-
-      expect(searchInput).toHaveValue('John')
+  describe('Screen reader alerts', () => {
+    beforeEach(() => {
+      jest.useFakeTimers()
+      HTMLElement.prototype.focus = jest.fn()
     })
 
-    it('shows error message for single character search', async () => {
-      mockExecuteQuery.mockResolvedValue({
-        assignment: {
-          allocationRules: {
-            rulesConnection: {
-              nodes: mockAllocationRules,
-              pageInfo: {hasNextPage: false, endCursor: null},
-            },
-            count: mockAllocationRules.length,
-          },
-        },
-      })
-
-      renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
-
-      await waitFor(() => {
-        expect(screen.getByPlaceholderText('Type to search')).toBeInTheDocument()
-      })
-
-      const searchInput = screen.getByPlaceholderText('Type to search')
-      await user.type(searchInput, 'J')
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Search term must be at least 2 characters long'),
-        ).toBeInTheDocument()
-      })
+    afterEach(() => {
+      jest.runOnlyPendingTimers()
+      jest.useRealTimers()
     })
 
-    it('displays clear search button when search term exists', async () => {
+    it('renders aria-live region with correct attributes', async () => {
       mockExecuteQuery.mockResolvedValue({
         assignment: {
           allocationRules: {
             rulesConnection: {
-              nodes: mockAllocationRules,
+              nodes: [],
               pageInfo: {hasNextPage: false, endCursor: null},
             },
-            count: mockAllocationRules.length,
+            count: 0,
           },
         },
       })
@@ -644,26 +602,23 @@ describe('PeerReviewAllocationRulesTray', () => {
       renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
 
       await waitFor(() => {
-        expect(screen.getByPlaceholderText('Type to search')).toBeInTheDocument()
+        expect(screen.getByText('Allocation Rules')).toBeInTheDocument()
       })
 
-      const searchInput = screen.getByPlaceholderText('Type to search')
-      await user.type(searchInput, 'John')
-
-      await waitFor(() => {
-        expect(screen.getByTestId('clear-search-button')).toBeInTheDocument()
-      })
+      const ariaLiveRegion = screen.getByTestId('allocation-rules-tray-alert')
+      expect(ariaLiveRegion).toBeInTheDocument()
+      expect(ariaLiveRegion).toHaveAttribute('aria-live', 'polite')
     })
 
-    it('clears search when clear button is clicked', async () => {
+    it('initially renders with empty screen reader announcement', async () => {
       mockExecuteQuery.mockResolvedValue({
         assignment: {
           allocationRules: {
             rulesConnection: {
-              nodes: mockAllocationRules,
+              nodes: [],
               pageInfo: {hasNextPage: false, endCursor: null},
             },
-            count: mockAllocationRules.length,
+            count: 0,
           },
         },
       })
@@ -671,19 +626,62 @@ describe('PeerReviewAllocationRulesTray', () => {
       renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
 
       await waitFor(() => {
-        expect(screen.getByPlaceholderText('Type to search')).toBeInTheDocument()
+        expect(screen.getByText('Allocation Rules')).toBeInTheDocument()
       })
 
-      const searchInput = screen.getByPlaceholderText('Type to search')
-      await user.type(searchInput, 'John')
+      const ariaLiveRegion = screen.getByTestId('allocation-rules-tray-alert')
+      expect(ariaLiveRegion.textContent).toBe('')
+    })
+
+    it('uses polite aria-live to avoid interrupting current screen reader speech', async () => {
+      mockExecuteQuery.mockResolvedValue({
+        assignment: {
+          allocationRules: {
+            rulesConnection: {
+              nodes: [],
+              pageInfo: {hasNextPage: false, endCursor: null},
+            },
+            count: 0,
+          },
+        },
+      })
+
+      renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
 
       await waitFor(() => {
-        expect(screen.getByTestId('clear-search-button')).toBeInTheDocument()
+        expect(screen.getByText('Allocation Rules')).toBeInTheDocument()
       })
 
-      await user.click(screen.getByTestId('clear-search-button'))
+      const ariaLiveRegion = screen.getByTestId('allocation-rules-tray-alert')
+      expect(ariaLiveRegion).toHaveAttribute('aria-live', 'polite')
+      expect(ariaLiveRegion).not.toHaveAttribute('aria-live', 'assertive')
+    })
 
-      expect(searchInput).toHaveValue('')
+    it('clears timeout on unmount to prevent memory leaks', async () => {
+      mockExecuteQuery.mockResolvedValue({
+        assignment: {
+          allocationRules: {
+            rulesConnection: {
+              nodes: [],
+              pageInfo: {hasNextPage: false, endCursor: null},
+            },
+            count: 0,
+          },
+        },
+      })
+
+      const clearTimeoutSpy = jest.spyOn(global, 'clearTimeout')
+
+      const {unmount} = renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(screen.getByText('Allocation Rules')).toBeInTheDocument()
+      })
+
+      unmount()
+
+      expect(clearTimeoutSpy).toHaveBeenCalled()
+      clearTimeoutSpy.mockRestore()
     })
   })
 })

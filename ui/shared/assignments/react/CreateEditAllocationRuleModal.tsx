@@ -38,6 +38,7 @@ import {
 } from '../graphql/teacher/AssignmentTeacherTypes'
 import {useCreateAllocationRule} from '../graphql/hooks/useCreateAllocationRule'
 import {useEditAllocationRule} from '../graphql/hooks/useEditAllocationRule'
+import {formatFullRuleDescription} from './utils/formatRuleDescription'
 
 const I18n = createI18nScope('peer_review_allocation_rule_card')
 const baseTheme = ENV.use_high_contrast ? canvasHighContrast : canvas
@@ -64,7 +65,7 @@ const CreateEditAllocationRuleModal = ({
   requiredPeerReviewsCount: number
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
-  refetchRules: (ruleId: string, isNewRule?: boolean) => void
+  refetchRules: (ruleId: string, isNewRule?: boolean, ruleDescription?: string) => void
   isEdit?: boolean
   rule?: AllocationRuleType
 }): React.ReactElement => {
@@ -99,7 +100,8 @@ const CreateEditAllocationRuleModal = ({
 
   const createAllocationRuleMutation = useCreateAllocationRule(
     (data: CreateAllocationRuleResponse) => {
-      refetchRules(data.createAllocationRule.allocationRules[0]._id)
+      const newRule = data.createAllocationRule.allocationRules[0]
+      refetchRules(newRule._id, true, formatFullRuleDescription(newRule))
       handleClose()
     },
     (allocationErrors: any[]) => {
@@ -142,7 +144,7 @@ const CreateEditAllocationRuleModal = ({
     (data: UpdateAllocationRuleResponse) => {
       const editedRule = data.updateAllocationRule.allocationRules.find(r => r._id === rule?._id)
       if (editedRule) {
-        refetchRules(editedRule._id, false)
+        refetchRules(editedRule._id, false, formatFullRuleDescription(editedRule))
         handleClose(editedRule)
       }
     },
