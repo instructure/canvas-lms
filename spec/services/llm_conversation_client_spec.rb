@@ -1,0 +1,202 @@
+# frozen_string_literal: true
+
+#
+# Copyright (C) 2025 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
+require "spec_helper"
+require "webmock/rspec"
+require_relative "../../lib/llm_conversation"
+require_relative "../../lib/llm_conversation/errors"
+
+describe LLMConversationClient do
+  let(:user) { user_model }
+  let(:root_account_uuid) { "test-account-uuid" }
+  let(:facts) { "Test facts" }
+  let(:learning_objectives) { "Test learning objectives" }
+  let(:scenario) { "Test scenario" }
+  let(:conversation_id) { "test-conversation-id" }
+
+  let(:client) do
+    described_class.new(
+      current_user: user,
+      root_account_uuid:,
+      facts:,
+      learning_objectives:,
+      scenario:
+    )
+  end
+
+  let(:client_with_conversation_id) do
+    described_class.new(
+      current_user: user,
+      root_account_uuid:,
+      facts:,
+      learning_objectives:,
+      scenario:,
+      conversation_id:
+    )
+  end
+
+  before do
+    allow(described_class).to receive(:base_url).and_return("http://localhost:3001")
+  end
+
+  describe "#starting_messages" do
+    let(:create_response) do
+      {
+        "success" => true,
+        "data" => {
+          "id" => conversation_id,
+          "root_account_id" => root_account_uuid
+        }
+      }
+    end
+
+    let(:add_message_response) do
+      {
+        "success" => true,
+        "data" => {
+          "text" => "What do you know about this topic?"
+        }
+      }
+    end
+
+    before do
+      stub_request(:post, "http://localhost:3001/conversations")
+        .to_return(status: 200, body: create_response.to_json, headers: { "Content-Type" => "application/json" })
+
+      stub_request(:post, "http://localhost:3001/conversations/#{conversation_id}/messages/add")
+        .to_return(status: 200, body: add_message_response.to_json, headers: { "Content-Type" => "application/json" })
+    end
+
+    it "creates a conversation and returns starting messages" do
+      result = client.starting_messages
+
+      expect(result).to be_a(Hash)
+      expect(result[:conversation_id]).to eq(conversation_id)
+      expect(result[:messages]).to be_an(Array)
+      expect(result[:messages].length).to eq(2)
+      expect(result[:messages][0][:role]).to eq("User")
+      expect(result[:messages][1][:role]).to eq("Assistant")
+      expect(result[:messages][1][:text]).to eq("What do you know about this topic?")
+    end
+
+    it "raises ConversationError on API failure" do
+      stub_request(:post, "http://localhost:3001/conversations")
+        .to_return(status: 500, body: "Internal Server Error")
+
+      expect { client.starting_messages }.to raise_error(LlmConversation::Errors::ConversationError)
+    end
+  end
+
+  describe "#continue_conversation" do
+    let(:messages) do
+      [
+        { role: "User", text: "Initial message" },
+        { role: "Assistant", text: "Initial response" }
+      ]
+    end
+
+    let(:add_message_response) do
+      {
+        "success" => true,
+        "data" => {
+          "text" => "Follow-up response"
+        }
+      }
+    end
+
+    before do
+      stub_request(:post, "http://localhost:3001/conversations/#{conversation_id}/messages/add")
+        .to_return(status: 200, body: add_message_response.to_json, headers: { "Content-Type" => "application/json" })
+    end
+
+    it "adds user message and returns updated messages" do
+      result = client_with_conversation_id.continue_conversation(
+        messages:,
+        new_user_message: "Follow-up question"
+      )
+
+      expect(result).to be_a(Hash)
+      expect(result[:conversation_id]).to eq(conversation_id)
+      expect(result[:messages].length).to eq(4)
+      expect(result[:messages][-2][:role]).to eq("User")
+      expect(result[:messages][-2][:text]).to eq("Follow-up question")
+      expect(result[:messages][-1][:role]).to eq("Assistant")
+      expect(result[:messages][-1][:text]).to eq("Follow-up response")
+    end
+
+    it "raises ConversationError on API failure" do
+      stub_request(:post, "http://localhost:3001/conversations/#{conversation_id}/messages/add")
+        .to_return(status: 500, body: "Internal Server Error")
+
+      expect do
+        client_with_conversation_id.continue_conversation(
+          messages:,
+          new_user_message: "Follow-up question"
+        )
+      end.to raise_error(LlmConversation::Errors::ConversationError)
+    end
+  end
+
+  describe "#messages" do
+    let(:messages_response) do
+      {
+        "success" => true,
+        "data" => [
+          {
+            "id" => "msg1",
+            "text" => "User message",
+            "is_llm_message" => false
+          },
+          {
+            "id" => "msg2",
+            "text" => "Assistant message",
+            "is_llm_message" => true
+          }
+        ]
+      }
+    end
+
+    before do
+      stub_request(:get, "http://localhost:3001/conversations/#{conversation_id}/messages")
+        .to_return(status: 200, body: messages_response.to_json, headers: { "Content-Type" => "application/json" })
+    end
+
+    it "fetches and converts messages" do
+      result = client_with_conversation_id.messages
+
+      expect(result).to be_an(Array)
+      expect(result.length).to eq(2)
+      expect(result[0][:role]).to eq("User")
+      expect(result[0][:text]).to eq("User message")
+      expect(result[1][:role]).to eq("Assistant")
+      expect(result[1][:text]).to eq("Assistant message")
+    end
+
+    it "raises ConversationError when conversation_id is not set" do
+      expect { client.messages }.to raise_error(LlmConversation::Errors::ConversationError, /Conversation ID not set/)
+    end
+
+    it "raises ConversationError on API failure" do
+      stub_request(:get, "http://localhost:3001/conversations/#{conversation_id}/messages")
+        .to_return(status: 404, body: "Not Found")
+
+      expect { client_with_conversation_id.messages }.to raise_error(LlmConversation::Errors::ConversationError)
+    end
+  end
+end

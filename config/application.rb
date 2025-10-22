@@ -156,7 +156,8 @@ module CanvasRails
     # This needs to be set for things in the `once` autoloader really early
     Rails.autoloaders.each do |autoloader|
       autoloader.inflector.inflect(
-        "csv_with_i18n" => "CSVWithI18n"
+        "csv_with_i18n" => "CSVWithI18n",
+        "llm_conversation" => "LlmConversation"
       )
     end
 

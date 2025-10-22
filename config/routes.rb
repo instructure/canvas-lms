@@ -1258,6 +1258,7 @@ CanvasRails::Application.routes.draw do
       put "courses/:course_id/ai_experiences/:id", action: :update
       delete "courses/:course_id/ai_experiences/:id", action: :destroy, as: "course_ai_experience_destroy"
       post "courses/:course_id/ai_experiences/:id/continue_conversation", action: :continue_conversation, as: "course_ai_experience_continue_conversation"
+      get "courses/:course_id/ai_experiences/:id/messages", action: :messages, as: "course_ai_experience_messages"
     end
 
     scope(controller: :microfrontends_release_tag_override) do

@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../spec_helper"
+require_relative "../../lib/llm_conversation"
+require_relative "../../lib/llm_conversation/errors"
 
 describe AiExperiencesController do
   before :once do
@@ -410,12 +412,15 @@ describe AiExperiencesController do
       before { user_session(@teacher) }
 
       it "returns starting messages when no previous messages" do
-        mock_service = instance_double(LLMConversationService)
-        allow(LLMConversationService).to receive(:new).and_return(mock_service)
-        allow(mock_service).to receive(:starting_messages).and_return([
-                                                                        { role: "User", text: "Hello", timestamp: Time.zone.now },
-                                                                        { role: "Assistant", text: "Hi there!", timestamp: Time.zone.now }
-                                                                      ])
+        mock_client = instance_double(LLMConversationClient)
+        allow(LLMConversationClient).to receive(:new).and_return(mock_client)
+        allow(mock_client).to receive(:starting_messages).and_return({
+                                                                       conversation_id: "test-conv-id",
+                                                                       messages: [
+                                                                         { role: "User", text: "Hello" },
+                                                                         { role: "Assistant", text: "Hi there!" }
+                                                                       ]
+                                                                     })
 
         post :continue_conversation,
              params: { course_id: @course.id, id: @ai_experience.id },
@@ -423,6 +428,7 @@ describe AiExperiencesController do
 
         expect(response).to be_successful
         json_response = json_parse(response.body)
+        expect(json_response["conversation_id"]).to eq("test-conv-id")
         expect(json_response["messages"]).to be_an(Array)
         expect(json_response["messages"].length).to eq(2)
         expect(json_response["messages"][0]["role"]).to eq("User")
@@ -430,22 +436,25 @@ describe AiExperiencesController do
       end
 
       it "continues conversation with new user message" do
-        mock_service = instance_double(LLMConversationService)
-        allow(LLMConversationService).to receive(:new).and_return(mock_service)
+        mock_client = instance_double(LLMConversationClient)
+        allow(LLMConversationClient).to receive(:new).and_return(mock_client)
 
         existing_messages = [
-          { role: "User", text: "Hello", timestamp: Time.zone.now },
-          { role: "Assistant", text: "Hi there!", timestamp: Time.zone.now }
+          { role: "User", text: "Hello" },
+          { role: "Assistant", text: "Hi there!" }
         ]
         new_messages = existing_messages + [
-          { role: "User", text: "How are you?", timestamp: Time.zone.now },
-          { role: "Assistant", text: "I'm doing well!", timestamp: Time.zone.now }
+          { role: "User", text: "How are you?" },
+          { role: "Assistant", text: "I'm doing well!" }
         ]
 
         # Use hash_including to handle ActionController::Parameters
-        allow(mock_service).to receive(:continue_conversation)
+        allow(mock_client).to receive(:continue_conversation)
           .with(hash_including(new_user_message: "How are you?"))
-          .and_return(new_messages)
+          .and_return({
+                        conversation_id: "test-conv-id",
+                        messages: new_messages
+                      })
 
         post :continue_conversation,
              params: {
@@ -458,21 +467,23 @@ describe AiExperiencesController do
 
         expect(response).to be_successful
         json_response = json_parse(response.body)
+        expect(json_response["conversation_id"]).to eq("test-conv-id")
         expect(json_response["messages"].length).to eq(4)
       end
 
-      it "initializes LLMConversationService with correct parameters" do
-        expect(LLMConversationService).to receive(:new).with(
+      it "initializes LLMConversationClient with correct parameters" do
+        expect(LLMConversationClient).to receive(:new).with(
           current_user: @teacher,
           root_account_uuid: @course.root_account.uuid,
           facts: @ai_experience.facts,
           learning_objectives: @ai_experience.learning_objective,
-          scenario: @ai_experience.pedagogical_guidance
+          scenario: @ai_experience.pedagogical_guidance,
+          conversation_id: nil
         ).and_call_original
 
-        allow_any_instance_of(LLMConversationService)
+        allow_any_instance_of(LLMConversationClient)
           .to receive(:starting_messages)
-          .and_return([])
+          .and_return({ conversation_id: "test-id", messages: [] })
 
         post :continue_conversation,
              params: { course_id: @course.id, id: @ai_experience.id },
@@ -480,10 +491,10 @@ describe AiExperiencesController do
       end
 
       it "returns service unavailable on conversation error" do
-        mock_service = instance_double(LLMConversationService)
-        allow(LLMConversationService).to receive(:new).and_return(mock_service)
-        allow(mock_service).to receive(:starting_messages)
-          .and_raise(CedarAi::Errors::ConversationError, "Service unavailable")
+        mock_client = instance_double(LLMConversationClient)
+        allow(LLMConversationClient).to receive(:new).and_return(mock_client)
+        allow(mock_client).to receive(:starting_messages)
+          .and_raise(LlmConversation::Errors::ConversationError, "Service unavailable")
 
         post :continue_conversation,
              params: { course_id: @course.id, id: @ai_experience.id },
@@ -492,6 +503,68 @@ describe AiExperiencesController do
         expect(response).to have_http_status(:service_unavailable)
         json_response = json_parse(response.body)
         expect(json_response["error"]).to eq("Service unavailable")
+      end
+
+      it "fetches existing conversation when user has active conversation" do
+        # Create an existing conversation
+        @ai_experience.ai_conversations.create!(
+          llm_conversation_id: "existing-conv-id",
+          user: @teacher,
+          course: @course,
+          root_account: @course.root_account,
+          account: @course.account,
+          workflow_state: "active"
+        )
+
+        mock_client = instance_double(LLMConversationClient)
+        allow(LLMConversationClient).to receive(:new).and_return(mock_client)
+        allow(mock_client).to receive(:messages).and_return([
+                                                              { role: "User", text: "Previous message" },
+                                                              { role: "Assistant", text: "Previous response" }
+                                                            ])
+
+        post :continue_conversation,
+             params: { course_id: @course.id, id: @ai_experience.id },
+             format: :json
+
+        expect(response).to be_successful
+        json_response = json_parse(response.body)
+        expect(json_response["conversation_id"]).to eq("existing-conv-id")
+        expect(json_response["messages"].length).to eq(2)
+      end
+
+      it "supports restart parameter to create new conversation" do
+        # Create an existing conversation
+        existing_conversation = @ai_experience.ai_conversations.create!(
+          llm_conversation_id: "old-conv-id",
+          user: @teacher,
+          course: @course,
+          root_account: @course.root_account,
+          account: @course.account,
+          workflow_state: "active"
+        )
+
+        mock_client = instance_double(LLMConversationClient)
+        allow(LLMConversationClient).to receive(:new).and_return(mock_client)
+        allow(mock_client).to receive(:starting_messages).and_return({
+                                                                       conversation_id: "new-conv-id",
+                                                                       messages: [
+                                                                         { role: "User", text: "Fresh start" },
+                                                                         { role: "Assistant", text: "New beginning" }
+                                                                       ]
+                                                                     })
+
+        post :continue_conversation,
+             params: { course_id: @course.id, id: @ai_experience.id, restart: true },
+             format: :json
+
+        expect(response).to be_successful
+        json_response = json_parse(response.body)
+        expect(json_response["conversation_id"]).to eq("new-conv-id")
+
+        # Check that old conversation was marked as completed
+        existing_conversation.reload
+        expect(existing_conversation.workflow_state).to eq("completed")
       end
     end
 
@@ -502,6 +575,67 @@ describe AiExperiencesController do
         post :continue_conversation,
              params: { course_id: @course.id, id: @ai_experience.id },
              format: :json
+
+        assert_forbidden
+      end
+    end
+  end
+
+  describe "GET #messages" do
+    context "as teacher" do
+      before { user_session(@teacher) }
+
+      it "fetches messages for a conversation" do
+        mock_client = instance_double(LLMConversationClient)
+        allow(LLMConversationClient).to receive(:new).and_return(mock_client)
+        allow(mock_client).to receive(:messages).and_return([
+                                                              { role: "User", text: "Hello" },
+                                                              { role: "Assistant", text: "Hi there!" }
+                                                            ])
+
+        get :messages,
+            params: { course_id: @course.id, id: @ai_experience.id, conversation_id: "test-conv-id" },
+            format: :json
+
+        expect(response).to be_successful
+        json_response = json_parse(response.body)
+        expect(json_response["conversation_id"]).to eq("test-conv-id")
+        expect(json_response["messages"].length).to eq(2)
+      end
+
+      it "returns bad request when conversation_id is missing" do
+        get :messages,
+            params: { course_id: @course.id, id: @ai_experience.id },
+            format: :json
+
+        expect(response).to have_http_status(:bad_request)
+        json_response = json_parse(response.body)
+        expect(json_response["error"]).to eq("conversation_id is required")
+      end
+
+      it "returns service unavailable on conversation error" do
+        mock_client = instance_double(LLMConversationClient)
+        allow(LLMConversationClient).to receive(:new).and_return(mock_client)
+        allow(mock_client).to receive(:messages)
+          .and_raise(LlmConversation::Errors::ConversationError, "Failed to fetch messages")
+
+        get :messages,
+            params: { course_id: @course.id, id: @ai_experience.id, conversation_id: "test-conv-id" },
+            format: :json
+
+        expect(response).to have_http_status(:service_unavailable)
+        json_response = json_parse(response.body)
+        expect(json_response["error"]).to eq("Failed to fetch messages")
+      end
+    end
+
+    context "as student" do
+      before { user_session(@student) }
+
+      it "returns forbidden" do
+        get :messages,
+            params: { course_id: @course.id, id: @ai_experience.id, conversation_id: "test-conv-id" },
+            format: :json
 
         assert_forbidden
       end

@@ -62,7 +62,10 @@ describe('LLMConversationView', () => {
   })
 
   it('renders expanded state when expanded', () => {
-    fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {messages: []})
+    fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
+      conversation_id: 'test-conv-id',
+      messages: [],
+    })
 
     render(<LLMConversationView {...defaultProps} />)
     expect(screen.getByText('Preview')).toBeInTheDocument()
@@ -70,7 +73,10 @@ describe('LLMConversationView', () => {
   })
 
   it('renders restart button', () => {
-    fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {messages: []})
+    fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
+      conversation_id: 'test-conv-id',
+      messages: [],
+    })
 
     render(<LLMConversationView {...defaultProps} />)
     expect(screen.getByText('Restart')).toBeInTheDocument()
@@ -93,7 +99,10 @@ describe('LLMConversationView', () => {
   })
 
   it('calls onToggleExpanded when close button is clicked', () => {
-    fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {messages: []})
+    fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
+      conversation_id: 'test-conv-id',
+      messages: [],
+    })
 
     const onToggleExpanded = jest.fn()
     render(<LLMConversationView {...defaultProps} onToggleExpanded={onToggleExpanded} />)
@@ -111,6 +120,7 @@ describe('LLMConversationView', () => {
     ]
 
     fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
+      conversation_id: 'test-conv-id',
       messages: mockMessages,
     })
 
@@ -130,6 +140,7 @@ describe('LLMConversationView', () => {
     ]
 
     fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
+      conversation_id: 'test-conv-id',
       messages: mockMessages,
     })
 
@@ -146,7 +157,10 @@ describe('LLMConversationView', () => {
   })
 
   it('renders text input and send button', () => {
-    fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {messages: []})
+    fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
+      conversation_id: 'test-conv-id',
+      messages: [],
+    })
 
     render(<LLMConversationView {...defaultProps} />)
 
@@ -164,9 +178,10 @@ describe('LLMConversationView', () => {
     fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', () => {
       callCount++
       if (callCount === 1) {
-        return {messages: initialMessages}
+        return {conversation_id: 'test-conv-id', messages: initialMessages}
       }
       return {
+        conversation_id: 'test-conv-id',
         messages: [
           ...initialMessages,
           {role: 'User', text: 'Test message', timestamp: new Date()},
@@ -194,7 +209,10 @@ describe('LLMConversationView', () => {
   })
 
   it('clears input after sending message', async () => {
-    fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {messages: []})
+    fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
+      conversation_id: 'test-conv-id',
+      messages: [],
+    })
 
     render(<LLMConversationView {...defaultProps} />)
 
@@ -219,13 +237,16 @@ describe('LLMConversationView', () => {
 
     fetchMock.post(
       '/api/v1/courses/123/ai_experiences/1/continue_conversation',
-      {messages: initialMessages},
+      {conversation_id: 'test-conv-id', messages: initialMessages},
       {overwriteRoutes: false},
     )
 
     fetchMock.post(
       '/api/v1/courses/123/ai_experiences/1/continue_conversation',
-      {messages: [...initialMessages, {role: 'User', text: 'New message', timestamp: new Date()}]},
+      {
+        conversation_id: 'test-conv-id',
+        messages: [...initialMessages, {role: 'User', text: 'New message', timestamp: new Date()}],
+      },
       {delay: 100, overwriteRoutes: false},
     )
 
@@ -254,6 +275,7 @@ describe('LLMConversationView', () => {
     ]
 
     fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
+      conversation_id: 'test-conv-id',
       messages: mockMessages,
     })
 
@@ -280,6 +302,7 @@ describe('LLMConversationView', () => {
     ]
 
     fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
+      conversation_id: 'test-conv-id',
       messages: mockMessages,
     })
 
@@ -296,7 +319,10 @@ describe('LLMConversationView', () => {
 
   describe('accessibility features', () => {
     it('renders ARIA live region for screen reader announcements', () => {
-      fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {messages: []})
+      fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
+        conversation_id: 'test-conv-id',
+        messages: [],
+      })
 
       render(<LLMConversationView {...defaultProps} />)
 
@@ -306,7 +332,10 @@ describe('LLMConversationView', () => {
     })
 
     it('adds role="log" to messages container', () => {
-      fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {messages: []})
+      fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
+        conversation_id: 'test-conv-id',
+        messages: [],
+      })
 
       render(<LLMConversationView {...defaultProps} />)
 
@@ -323,6 +352,7 @@ describe('LLMConversationView', () => {
       ]
 
       fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
+        conversation_id: 'test-conv-id',
         messages: mockMessages,
       })
 
@@ -342,6 +372,7 @@ describe('LLMConversationView', () => {
       ]
 
       fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
+        conversation_id: 'test-conv-id',
         messages: mockMessages,
       })
 
@@ -356,7 +387,7 @@ describe('LLMConversationView', () => {
     it('announces "Initializing conversation..." when initializing', () => {
       fetchMock.post(
         '/api/v1/courses/123/ai_experiences/1/continue_conversation',
-        {messages: []},
+        {conversation_id: 'test-conv-id', messages: []},
         {delay: 100},
       )
 
@@ -376,12 +407,13 @@ describe('LLMConversationView', () => {
       fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', () => {
         callCount++
         if (callCount === 1) {
-          return {messages: initialMessages}
+          return {conversation_id: 'test-conv-id', messages: initialMessages}
         }
         return new Promise(resolve =>
           setTimeout(
             () =>
               resolve({
+                conversation_id: 'test-conv-id',
                 messages: [
                   ...initialMessages,
                   {role: 'User', text: 'Test', timestamp: new Date()},
@@ -409,6 +441,155 @@ describe('LLMConversationView', () => {
       await waitFor(() => {
         const liveRegion = document.querySelector('[aria-live="polite"]')
         expect(liveRegion?.textContent).toContain('Assistant is thinking...')
+      })
+    })
+  })
+
+  describe('error handling', () => {
+    it('displays error alert when conversation initialization fails', async () => {
+      fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
+        status: 503,
+        body: {error: 'Service unavailable'},
+      })
+
+      render(<LLMConversationView {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Failed to start conversation. Please try again.'),
+        ).toBeInTheDocument()
+      })
+    })
+
+    it('displays error alert when sending message fails', async () => {
+      const initialMessages = [
+        {role: 'User', text: 'Start', timestamp: new Date()},
+        {role: 'Assistant', text: 'Hello', timestamp: new Date()},
+      ]
+
+      let callCount = 0
+      fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', () => {
+        callCount++
+        if (callCount === 1) {
+          return {conversation_id: 'test-conv-id', messages: initialMessages}
+        }
+        return {
+          status: 503,
+          body: {error: 'Failed to send'},
+        }
+      })
+
+      render(<LLMConversationView {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(screen.getByText('Hello')).toBeInTheDocument()
+      })
+
+      const input = screen.getByPlaceholderText('Your answer...')
+      fireEvent.change(input, {target: {value: 'Test message'}})
+
+      const sendButton = screen.getByText('Send')
+      fireEvent.click(sendButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Failed to send message. Please try again.')).toBeInTheDocument()
+      })
+
+      // Optimistically added message should be removed
+      expect(screen.queryByText('Test message')).not.toBeInTheDocument()
+    })
+
+    it('displays error alert when restart fails', async () => {
+      const initialMessages = [
+        {role: 'User', text: 'Start', timestamp: new Date()},
+        {role: 'Assistant', text: 'Hello', timestamp: new Date()},
+      ]
+
+      let callCount = 0
+      fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', () => {
+        callCount++
+        if (callCount === 1) {
+          return {conversation_id: 'test-conv-id', messages: initialMessages}
+        }
+        return {
+          status: 503,
+          body: {error: 'Failed to restart'},
+        }
+      })
+
+      render(<LLMConversationView {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(screen.getByText('Hello')).toBeInTheDocument()
+      })
+
+      const restartButton = screen.getByText('Restart')
+      fireEvent.click(restartButton)
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Failed to restart conversation. Please try again.'),
+        ).toBeInTheDocument()
+      })
+    })
+
+    it('allows dismissing error alerts', async () => {
+      fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', {
+        status: 503,
+        body: {error: 'Service unavailable'},
+      })
+
+      render(<LLMConversationView {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Failed to start conversation. Please try again.'),
+        ).toBeInTheDocument()
+      })
+
+      const closeButton = screen.getByText('Close').closest('button')
+      fireEvent.click(closeButton!)
+
+      await waitFor(() => {
+        expect(
+          screen.queryByText('Failed to start conversation. Please try again.'),
+        ).not.toBeInTheDocument()
+      })
+    })
+
+    it('clears error when retrying after failure', async () => {
+      let callCount = 0
+      fetchMock.post('/api/v1/courses/123/ai_experiences/1/continue_conversation', () => {
+        callCount++
+        if (callCount === 1) {
+          return {status: 503, body: {error: 'Failed'}}
+        }
+        return {
+          conversation_id: 'test-conv-id',
+          messages: [
+            {role: 'User', text: 'Start', timestamp: new Date()},
+            {role: 'Assistant', text: 'Hello', timestamp: new Date()},
+          ],
+        }
+      })
+
+      render(<LLMConversationView {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Failed to start conversation. Please try again.'),
+        ).toBeInTheDocument()
+      })
+
+      // Trigger restart which should clear the error
+      const restartButton = screen.getByText('Restart')
+      fireEvent.click(restartButton)
+
+      await waitFor(() => {
+        expect(
+          screen.queryByText('Failed to start conversation. Please try again.'),
+        ).not.toBeInTheDocument()
+        expect(screen.getByText('Hello')).toBeInTheDocument()
       })
     })
   })
