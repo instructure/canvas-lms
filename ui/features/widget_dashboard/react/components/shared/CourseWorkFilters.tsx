@@ -20,7 +20,6 @@ import React, {useMemo} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import type {CourseOption} from '../../types'
 import {useResponsiveContext} from '../../hooks/useResponsiveContext'
 
@@ -63,6 +62,7 @@ const CourseWorkFilters: React.FC<CourseWorkFiltersProps> = ({
   statisticsOnly = false,
 }) => {
   const {isMobile} = useResponsiveContext()
+
   const courseOptions: CourseOption[] = useMemo(
     () => [{id: 'all', name: I18n.t('All Courses')}, ...userCourses],
     [userCourses],
@@ -81,17 +81,13 @@ const CourseWorkFilters: React.FC<CourseWorkFiltersProps> = ({
       : options
   }, [statisticsOnly])
 
-  const filterMobilePadding = useMemo(() => 'xx-small', [])
-
   return (
-    <Flex direction={isMobile ? 'column' : 'row'} gap="x-small">
-      <Flex.Item shouldGrow={isMobile} padding={isMobile ? filterMobilePadding : undefined}>
+    <Flex direction={isMobile ? 'column' : 'row'} wrap="wrap" gap="small">
+      <Flex.Item shouldGrow overflowX="visible" overflowY="visible">
         <SimpleSelect
-          renderLabel={<ScreenReaderContent>{I18n.t('Filter by course')}</ScreenReaderContent>}
+          renderLabel={I18n.t('Course filter:')}
           value={selectedCourse}
           onChange={onCourseChange}
-          width={isMobile ? '100%' : '200px'}
-          size="small"
         >
           {courseOptions.map(option => (
             <SimpleSelect.Option key={option.id} id={option.id} value={option.id}>
@@ -100,13 +96,11 @@ const CourseWorkFilters: React.FC<CourseWorkFiltersProps> = ({
           ))}
         </SimpleSelect>
       </Flex.Item>
-      <Flex.Item shouldGrow={isMobile} padding={isMobile ? filterMobilePadding : '0 0 0 small'}>
+      <Flex.Item shouldGrow overflowX="visible" overflowY="visible">
         <SimpleSelect
-          renderLabel={<ScreenReaderContent>{I18n.t('Filter by due date')}</ScreenReaderContent>}
+          renderLabel={I18n.t('Date filter:')}
           value={selectedDateFilter}
           onChange={onDateFilterChange}
-          width={isMobile ? '100%' : '150px'}
-          size="small"
         >
           {dateFilterOptions.map(option => (
             <SimpleSelect.Option key={option.id} id={option.id} value={option.id}>

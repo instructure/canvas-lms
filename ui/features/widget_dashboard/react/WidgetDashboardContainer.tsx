@@ -29,20 +29,30 @@ import {
   autoFocusObserverPicker,
 } from '@canvas/observer-picker/util/pageReloadHelper'
 import {useWidgetDashboard} from './hooks/useWidgetDashboardContext'
+import FeedbackQuestionTile from './components/FeedbackQuestionTile'
+import {useResponsiveContext} from './hooks/useResponsiveContext'
 
 const I18n = createI18nScope('widget_dashboard')
 
 const WidgetDashboardContainer: React.FC = () => {
   const {observedUsersList, canAddObservee, currentUser, currentUserRoles} = useWidgetDashboard()
+  const {isMobile} = useResponsiveContext()
 
   return (
     <View as="div">
       <DashboardNotifications />
       <Flex margin="0 0 medium" alignItems="center">
         <Flex.Item shouldGrow>
-          <Heading level="h1" margin="0" data-testid="dashboard-heading">
-            {I18n.t('Dashboard')}
-          </Heading>
+          <Flex gap="small" direction={isMobile ? 'column' : 'row'}>
+            <Flex.Item shouldGrow>
+              <Heading level="h1" margin="0" data-testid="dashboard-heading">
+                {I18n.t('Dashboard')}
+              </Heading>
+            </Flex.Item>
+            <Flex.Item padding="small">
+              <FeedbackQuestionTile />
+            </Flex.Item>
+          </Flex>
         </Flex.Item>
         {observedUsersList.length > 0 && currentUser && (
           <Flex.Item>

@@ -41,8 +41,7 @@ const mockStatisticsData = {
 const mockWidget: Widget = {
   id: 'course-work-combined-widget',
   type: 'course_work_combined',
-  position: {col: 1, row: 1},
-  size: {width: 2, height: 2},
+  position: {col: 1, row: 1, relative: 1},
   title: 'Course Work',
 }
 
@@ -228,10 +227,10 @@ describe('CourseWorkCombinedWidget', () => {
     renderWithProviders(<CourseWorkCombinedWidget {...buildDefaultProps()} />)
 
     expect(screen.getByText('Course Work')).toBeInTheDocument()
-    expect(screen.getByText('Filter by course')).toBeInTheDocument()
 
-    // Wait for data to load
+    // Wait for data to load first, then check for filters
     await screen.findByText('Essay on Climate Change')
+    expect(screen.getByText('Course filter:')).toBeInTheDocument()
     expect(screen.getByText('Chapter 5 Quiz')).toBeInTheDocument()
     expect(screen.getByText('Discussion: Modern Art')).toBeInTheDocument()
     expect(screen.getByText('Lab Report: Chemical Reactions')).toBeInTheDocument()

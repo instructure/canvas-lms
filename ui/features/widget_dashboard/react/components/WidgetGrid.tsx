@@ -19,39 +19,34 @@
 import React, {useMemo} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
-import {View} from '@instructure/ui-view'
-import {Responsive} from '@instructure/ui-responsive'
 import type {Widget, WidgetConfig} from '../types'
 import {getWidget} from './WidgetRegistry'
-import {ResponsiveProvider} from '../hooks/useResponsiveContext'
+import {useResponsiveContext} from '../hooks/useResponsiveContext'
+import {Flex} from '@instructure/ui-flex'
 
 const I18n = createI18nScope('widget_dashboard')
 
-const responsiveQuerySizes = ({
-  mobile = false,
-  tablet = false,
-  desktop = false,
-}: {mobile?: boolean; tablet?: boolean; desktop?: boolean} = {}) => {
-  const querySizes: Record<string, {minWidth?: string; maxWidth?: string}> = {}
-  if (mobile) {
-    querySizes.mobile = {maxWidth: '639px'}
-  }
-  if (tablet) {
-    querySizes.tablet = {minWidth: mobile ? '640px' : '0px', maxWidth: '1023px'}
-  }
-  if (desktop) {
-    querySizes.desktop = {minWidth: tablet ? '1024px' : '640px'}
-  }
-  return querySizes
-}
-
 const sortWidgetsForStacking = (widgets: Widget[]): Widget[] => {
   return [...widgets].sort((a, b) => {
-    if (a.position.row !== b.position.row) {
-      return a.position.row - b.position.row
-    }
-    return a.position.col - b.position.col
+    return a.position.relative - b.position.relative
   })
+}
+
+const widgetsAsColumns = (widgets: Widget[]): Widget[][] => {
+  const inColumns = widgets.reduce(
+    (acc, val) => {
+      const column = val.position.col || 1
+      acc[column - 1].push(val)
+      return acc
+    },
+    [[] as Widget[], [] as Widget[]] as Widget[][],
+  )
+
+  inColumns.forEach((column, idx) => {
+    inColumns[idx] = column.sort((a, b) => a.position.row - b.position.row)
+  })
+
+  return inColumns
 }
 
 interface WidgetGridProps {
@@ -59,7 +54,9 @@ interface WidgetGridProps {
 }
 
 const WidgetGrid: React.FC<WidgetGridProps> = ({config}) => {
+  const {matches} = useResponsiveContext()
   const sortedWidgets = useMemo(() => sortWidgetsForStacking(config.widgets), [config.widgets])
+  const widgetsByColumn = useMemo(() => widgetsAsColumns(config.widgets), [config.widgets])
 
   const renderWidget = (widget: Widget) => {
     const widgetRenderer = getWidget(widget.type)
@@ -74,116 +71,53 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config}) => {
     return <WidgetComponent widget={widget} />
   }
 
-  const calculateGridColumn = (widget: Widget) => {
-    const startCol = widget.position.col
-    const endCol = startCol + widget.size.width - 1
-    return `${startCol} / ${endCol + 1}`
-  }
-
-  const calculateGridRow = (widget: Widget) => {
-    const startRow = widget.position.row
-    const endRow = startRow + widget.size.height - 1
-    return `${startRow} / ${endRow + 1}`
-  }
-
-  const maxRows =
-    config.widgets.length > 0
-      ? Math.max(...config.widgets.map(widget => widget.position.row + widget.size.height - 1))
-      : 1
-
   const renderWidgetInView = (widget: Widget, key?: string) => (
-    <div key={key || widget.id} data-testid={`widget-container-${widget.id}`}>
-      <View height="100%" style={{overflow: 'hidden'}}>
-        {renderWidget(widget)}
-      </View>
-    </div>
+    <Flex.Item key={key || widget.id} data-testid={`widget-container-${widget.id}`}>
+      {renderWidget(widget)}
+    </Flex.Item>
   )
 
   const renderDesktopGrid = () => (
-    <div
-      data-testid="widget-grid"
-      style={{
-        display: 'grid',
-        gridTemplateColumns: `repeat(${config.columns}, 1fr)`,
-        gridTemplateRows: `repeat(${maxRows}, 20rem)`,
-        gap: '1rem',
-        width: '100%',
-        overflow: 'visible',
-      }}
-    >
-      {config.widgets.map(widget => (
-        <div
-          key={widget.id}
-          data-testid={`widget-container-${widget.id}`}
-          style={{
-            gridColumn: calculateGridColumn(widget),
-            gridRow: calculateGridRow(widget),
-          }}
-        >
-          <View height="100%" style={{overflow: 'hidden'}}>
-            {renderWidget(widget)}
-          </View>
-        </div>
-      ))}
-    </div>
+    <Flex data-testid="widget-columns" direction="row" gap="x-small" alignItems="start">
+      <Flex.Item shouldGrow shouldShrink width="66%">
+        <Flex direction="column" gap="x-small" data-testid="widget-column-1" width="100%">
+          {widgetsByColumn[0].map(widget => (
+            <Flex.Item key={widget.id} data-testid={`widget-container-${widget.id}`}>
+              {renderWidget(widget)}
+            </Flex.Item>
+          ))}
+        </Flex>
+      </Flex.Item>
+      <Flex.Item shouldGrow shouldShrink width="33%">
+        <Flex direction="column" gap="x-small" data-testid="widget-column-2" width="100%">
+          {widgetsByColumn[1].map(widget => renderWidgetInView(widget))}
+        </Flex>
+      </Flex.Item>
+    </Flex>
   )
 
-  const renderTabletStack = () => {
-    return (
-      <div
-        data-testid="widget-grid"
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '1rem',
-          width: '100%',
-          maxWidth: '800px',
-          margin: '0 auto',
-          overflow: 'visible',
-        }}
+  const renderTabletStack = () => (
+    <Flex data-testid="widget-columns" width="100%">
+      <Flex.Item
+        data-testid="widget-column-tablet"
+        overflowX="visible"
+        overflowY="visible"
+        width="100%"
       >
         {sortedWidgets.map(widget => renderWidgetInView(widget))}
-      </div>
-    )
-  }
-
-  const renderMobileStack = () => {
-    return (
-      <div
-        data-testid="widget-grid"
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '1rem',
-          width: '100%',
-          overflow: 'visible',
-        }}
-      >
-        {sortedWidgets.map(widget => renderWidgetInView(widget))}
-      </div>
-    )
-  }
-
-  return (
-    <Responsive
-      match="media"
-      query={responsiveQuerySizes({mobile: true, tablet: true, desktop: true})}
-      render={(_props, matches) => {
-        const matchesArray = matches || ['desktop']
-
-        let content
-        if (matchesArray.includes('mobile')) {
-          content = renderMobileStack()
-        } else if (matchesArray.includes('tablet')) {
-          content = renderTabletStack()
-        } else {
-          content = renderDesktopGrid()
-        }
-
-        return <ResponsiveProvider matches={matchesArray}>{content}</ResponsiveProvider>
-      }}
-    />
+      </Flex.Item>
+    </Flex>
   )
+
+  const renderMobileStack = renderTabletStack
+
+  if (matches.includes('mobile')) {
+    return renderMobileStack()
+  } else if (matches.includes('tablet')) {
+    return renderTabletStack()
+  } else {
+    return renderDesktopGrid()
+  }
 }
 
 export default WidgetGrid

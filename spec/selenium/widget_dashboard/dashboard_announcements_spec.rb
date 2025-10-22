@@ -35,10 +35,10 @@ describe "student dashboard announcements widget", :ignore_js_errors do
 
   context "announcements widget smoke tests" do
     it "displays announcements in pagination" do
-      go_to_announcement_widget
+      go_to_dashboard
 
       expect(all_announcement_items.size).to eq(3)
-      pagination_button("2").click
+      widget_pagination_button("announcements", "2").click
       expect(all_announcement_items.size).to eq(2)
 
       filter_announcements_list_by("Read")
@@ -46,32 +46,34 @@ describe "student dashboard announcements widget", :ignore_js_errors do
 
       filter_announcements_list_by("All")
       expect(all_announcement_items.size).to eq(3)
-      pagination_button("2").click
+      widget_pagination_button("announcements", "2").click
       expect(all_announcement_items.size).to eq(3)
-      pagination_button("3").click
+      widget_pagination_button("announcements", "3").click
       expect(all_announcement_items.size).to eq(1)
     end
 
     it "can filter by read status" do
-      go_to_announcement_widget
+      go_to_dashboard
 
       expect(announcement_item(@announcement7.id)).to be_displayed
       expect(announcement_item(@announcement4.id)).to be_displayed
       expect(announcement_item(@announcement3.id)).to be_displayed
 
       filter_announcements_list_by("Read")
+      wait_for_ajaximations
       expect(all_announcement_items.size).to eq(2)
       expect(announcement_item(@announcement6.id)).to be_displayed
       expect(announcement_item(@announcement5.id)).to be_displayed
 
       filter_announcements_list_by("All")
+      wait_for_ajaximations
       expect(announcement_item(@announcement7.id)).to be_displayed
       expect(announcement_item(@announcement6.id)).to be_displayed
       expect(announcement_item(@announcement5.id)).to be_displayed
     end
 
     it "marks announcements as read" do
-      go_to_announcement_widget
+      go_to_dashboard
 
       expect(announcement_item_mark_read(@announcement7.id)).to be_displayed
       announcement_item_mark_read(@announcement7.id).click
@@ -79,13 +81,15 @@ describe "student dashboard announcements widget", :ignore_js_errors do
       expect(element_exists?(announcement_item_selector(@announcement7.id))).to be_falsey
 
       filter_announcements_list_by("Read")
+      wait_for_ajaximations
       expect(announcement_item_mark_unread(@announcement7.id)).to be_displayed
     end
 
     it "marks announcements as unread" do
-      go_to_announcement_widget
+      go_to_dashboard
 
       filter_announcements_list_by("Read")
+      wait_for_ajaximations
       expect(announcement_item_mark_unread(@announcement6.id)).to be_displayed
       announcement_item_mark_unread(@announcement6.id).click
       wait_for_ajaximations
@@ -96,7 +100,7 @@ describe "student dashboard announcements widget", :ignore_js_errors do
     end
 
     it "navigates to the announcement page when clicking announcement title" do
-      go_to_announcement_widget
+      go_to_dashboard
 
       expect(announcement_item_title(@announcement7.id)).to be_displayed
       announcement_item_title(@announcement7.id).click
@@ -122,7 +126,7 @@ describe "student dashboard announcements widget", :ignore_js_errors do
     end
 
     it "displays section specific announcements" do
-      go_to_announcement_widget
+      go_to_dashboard
       expect(announcement_item(@announcement9.id)).to be_displayed
       expect(element_exists?(announcement_item_selector(@announcement8.id))).to be_falsey
     end

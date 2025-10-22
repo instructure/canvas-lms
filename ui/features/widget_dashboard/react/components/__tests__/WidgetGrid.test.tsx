@@ -20,6 +20,7 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import WidgetGrid from '../WidgetGrid'
 import type {WidgetConfig} from '../../types'
+import {ResponsiveProvider} from '../../hooks/useResponsiveContext'
 
 // Mock the WidgetRegistry to avoid dependency issues
 jest.mock('../WidgetRegistry', () => ({
@@ -32,36 +33,39 @@ jest.mock('../WidgetRegistry', () => ({
 
 type Props = {
   config: WidgetConfig
+  matches?: string[]
 }
 
 const setUp = (props: Props) => {
-  return render(<WidgetGrid {...props} />)
+  const {matches = ['desktop'], ...gridProps} = props
+  return render(
+    <ResponsiveProvider matches={matches}>
+      <WidgetGrid {...gridProps} />
+    </ResponsiveProvider>,
+  )
 }
 
 const buildDefaultProps = (overrides = {}): Props => {
   const defaultProps: Props = {
     config: {
-      columns: 3,
+      columns: 2,
       widgets: [
         {
           id: 'widget-1',
           type: 'test-widget',
-          position: {col: 1, row: 1},
-          size: {width: 1, height: 1},
+          position: {col: 1, row: 1, relative: 1},
           title: 'Widget 1',
         },
         {
           id: 'widget-2',
           type: 'test-widget',
-          position: {col: 2, row: 1},
-          size: {width: 1, height: 1},
+          position: {col: 2, row: 1, relative: 2},
           title: 'Widget 2',
         },
         {
           id: 'widget-3',
           type: 'test-widget',
-          position: {col: 1, row: 2},
-          size: {width: 2, height: 1},
+          position: {col: 1, row: 2, relative: 3},
           title: 'Widget 3',
         },
       ],
@@ -77,6 +81,8 @@ const buildDefaultProps = (overrides = {}): Props => {
     },
   }
 }
+
+const indexInParent = (el: HTMLElement) => Array.from(el.parentNode!.children).indexOf(el)
 
 // Mock window.matchMedia for responsive testing
 const mockMatchMedia = (width: number) => {
@@ -127,51 +133,24 @@ describe('WidgetGrid', () => {
       mockMatchMedia(1200)
     })
 
-    it('renders desktop grid layout with proper CSS grid properties', () => {
-      const {getByTestId} = setUp(buildDefaultProps())
-      const grid = getByTestId('widget-grid')
-
-      expect(grid).toBeInTheDocument()
-      expect(grid).toHaveStyle({
-        display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: '1rem',
-      })
-    })
-
-    it('positions widgets using explicit grid coordinates', () => {
+    it('positions widgets in the correct column and row', () => {
       const {getByTestId} = setUp(buildDefaultProps())
 
-      // Widget 1: col 1, row 1, width 1, height 1 -> gridColumn: "1 / 2", gridRow: "1 / 2"
+      // Widget 1: col 1, row 1
       const widget1Container = getByTestId('widget-container-widget-1')
-      expect(widget1Container).toHaveStyle({
-        gridColumn: '1 / 2',
-        gridRow: '1 / 2',
-      })
+      expect(indexInParent(widget1Container)).toBe(0) // row 1
+      // With Flex components, we need to go up an extra level: widget-container -> inner Flex -> Flex.Item (column)
+      expect(indexInParent(widget1Container.parentNode!.parentNode as HTMLElement)).toBe(0) // column 1
 
-      // Widget 2: col 2, row 1, width 1, height 1 -> gridColumn: "2 / 3", gridRow: "1 / 2"
+      // Widget 2: col 2, row 1
       const widget2Container = getByTestId('widget-container-widget-2')
-      expect(widget2Container).toHaveStyle({
-        gridColumn: '2 / 3',
-        gridRow: '1 / 2',
-      })
+      expect(indexInParent(widget2Container)).toBe(0) // row 1
+      expect(indexInParent(widget2Container.parentNode!.parentNode as HTMLElement)).toBe(1) // column 2
 
-      // Widget 3: col 1, row 2, width 2, height 1 -> gridColumn: "1 / 3", gridRow: "2 / 3"
+      // Widget 3: col 1, row 2
       const widget3Container = getByTestId('widget-container-widget-3')
-      expect(widget3Container).toHaveStyle({
-        gridColumn: '1 / 3',
-        gridRow: '2 / 3',
-      })
-    })
-
-    it('calculates correct number of rows based on widget positions', () => {
-      const {getByTestId} = setUp(buildDefaultProps())
-      const grid = getByTestId('widget-grid')
-
-      // Max row is 2 (widget-3), so gridTemplateRows should be "repeat(2, 20rem)"
-      expect(grid).toHaveStyle({
-        gridTemplateRows: 'repeat(2, 20rem)',
-      })
+      expect(indexInParent(widget3Container)).toBe(1) // row 2
+      expect(indexInParent(widget3Container.parentNode!.parentNode as HTMLElement)).toBe(0) // column 1
     })
   })
 
@@ -180,115 +159,25 @@ describe('WidgetGrid', () => {
       mockMatchMedia(800)
     })
 
-    it('renders tablet stacked layout with flexbox and double width', () => {
-      const {getByTestId} = setUp(buildDefaultProps())
-      const grid = getByTestId('widget-grid')
+    it('renders single column layout', () => {
+      const {getByTestId} = setUp({...buildDefaultProps(), matches: ['tablet']})
+      const grid = getByTestId('widget-columns')
 
       expect(grid).toBeInTheDocument()
       expect(grid).toHaveStyle({
         display: 'flex',
-        flexDirection: 'column',
-        gap: '1rem',
-        maxWidth: '800px',
-        margin: '0 auto',
       })
+      expect(grid.childElementCount).toBe(1)
     })
 
-    it('does not use explicit grid positioning on tablet', () => {
-      const {getByTestId} = setUp(buildDefaultProps())
-
-      // In tablet view, widgets should not have gridColumn/gridRow styles
-      const widget1Container = getByTestId('widget-container-widget-1')
-      const containerStyle = window.getComputedStyle(widget1Container)
-      expect(containerStyle.gridColumn).toBe('')
-      expect(containerStyle.gridRow).toBe('')
-    })
-
-    it('sorts widgets in proper stacking order (row then column)', () => {
-      const {getAllByTestId} = setUp(buildDefaultProps())
+    it('sorts widgets in proper stacking order (relative)', () => {
+      const {getAllByTestId} = setUp({...buildDefaultProps(), matches: ['tablet']})
       const widgetContainers = getAllByTestId(/^widget-container-/)
 
-      // Expected order: widget-1 (row 1, col 1), widget-2 (row 1, col 2), widget-3 (row 2, col 1)
+      // Expected order: widget-1 (relative 1), widget-2 (relative 2), widget-3 (relative 3)
       expect(widgetContainers[0]).toHaveAttribute('data-testid', 'widget-container-widget-1')
       expect(widgetContainers[1]).toHaveAttribute('data-testid', 'widget-container-widget-2')
       expect(widgetContainers[2]).toHaveAttribute('data-testid', 'widget-container-widget-3')
-    })
-  })
-
-  describe('Mobile Layout (≤639px)', () => {
-    beforeEach(() => {
-      mockMatchMedia(400)
-    })
-
-    it('renders mobile flexbox layout with vertical stacking', () => {
-      const {getByTestId} = setUp(buildDefaultProps())
-      const grid = getByTestId('widget-grid')
-
-      expect(grid).toBeInTheDocument()
-      expect(grid).toHaveStyle({
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '1rem',
-      })
-    })
-
-    it('sorts widgets in proper stacking order for mobile', () => {
-      const {getAllByTestId} = setUp(buildDefaultProps())
-      const widgetContainers = getAllByTestId(/^widget-container-/)
-
-      // Expected order: widget-1 (row 1, col 1), widget-2 (row 1, col 2), widget-3 (row 2, col 1)
-      expect(widgetContainers[0]).toHaveAttribute('data-testid', 'widget-container-widget-1')
-      expect(widgetContainers[1]).toHaveAttribute('data-testid', 'widget-container-widget-2')
-      expect(widgetContainers[2]).toHaveAttribute('data-testid', 'widget-container-widget-3')
-    })
-  })
-
-  describe('Widget Sorting Utility', () => {
-    it('sorts widgets by row first, then by column', () => {
-      const config: WidgetConfig = {
-        columns: 3,
-        widgets: [
-          {
-            id: 'widget-a',
-            type: 'test-widget',
-            position: {col: 2, row: 2},
-            size: {width: 1, height: 1},
-            title: 'Widget A',
-          },
-          {
-            id: 'widget-b',
-            type: 'test-widget',
-            position: {col: 1, row: 1},
-            size: {width: 1, height: 1},
-            title: 'Widget B',
-          },
-          {
-            id: 'widget-c',
-            type: 'test-widget',
-            position: {col: 3, row: 1},
-            size: {width: 1, height: 1},
-            title: 'Widget C',
-          },
-          {
-            id: 'widget-d',
-            type: 'test-widget',
-            position: {col: 1, row: 2},
-            size: {width: 1, height: 1},
-            title: 'Widget D',
-          },
-        ],
-      }
-
-      // Test with mobile layout to verify sorting
-      mockMatchMedia(400)
-      const {getAllByTestId} = setUp({config})
-      const widgetContainers = getAllByTestId(/^widget-container-/)
-
-      // Expected order: widget-b (1,1), widget-c (3,1), widget-d (1,2), widget-a (2,2)
-      expect(widgetContainers[0]).toHaveAttribute('data-testid', 'widget-container-widget-b')
-      expect(widgetContainers[1]).toHaveAttribute('data-testid', 'widget-container-widget-c')
-      expect(widgetContainers[2]).toHaveAttribute('data-testid', 'widget-container-widget-d')
-      expect(widgetContainers[3]).toHaveAttribute('data-testid', 'widget-container-widget-a')
     })
   })
 
@@ -300,10 +189,12 @@ describe('WidgetGrid', () => {
       }
 
       const {getByTestId} = setUp({config})
-      const grid = getByTestId('widget-grid')
+      const columns = getByTestId('widget-columns')
 
-      expect(grid).toBeInTheDocument()
-      expect(grid.children).toHaveLength(0)
+      expect(columns).toBeInTheDocument()
+      expect(columns.children).toHaveLength(2)
+      expect((columns.children.item(0) as Element).children).toHaveLength(0)
+      expect((columns.children.item(1) as Element).children).toHaveLength(0)
     })
   })
 

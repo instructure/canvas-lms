@@ -39,29 +39,15 @@ interface CourseCodeColors {
   textColor: string
 }
 
-const COURSE_COLOR_PALETTE: CourseCodeColors[] = [
-  {background: '#F1E6F5', textColor: '#7F399E'}, // Purple
-  {background: '#DDECF3', textColor: '#135F81'}, // Teal
-  {background: '#FFE5D3', textColor: '#90420D'}, // Orange
-  {background: '#DFEBFB', textColor: '#1C57A8'}, // Blue
-  {background: '#DAEEE8', textColor: '#036549'}, // Green
-  {background: '#F7E5F0', textColor: '#A31C73'}, // Pink
-]
+// Default neutral color for course codes when no custom color is set
+// Custom colors should be provided via the preferences.custom_colors system
+export const DEFAULT_COURSE_COLOR: CourseCodeColors = {
+  background: '#E5E5E5', // Neutral gray background
+  textColor: '#2D3B45', // Dark text for accessibility
+}
 
-export const getCourseCodeColor = (gridIndex?: number, code?: string): CourseCodeColors => {
-  if (typeof gridIndex === 'number') {
-    // Use grid index for consistent positioning
-    return COURSE_COLOR_PALETTE[gridIndex % COURSE_COLOR_PALETTE.length]
-  }
-
-  if (code) {
-    // Fallback to hash-based selection for backwards compatibility
-    const hash = code.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
-    return COURSE_COLOR_PALETTE[hash % COURSE_COLOR_PALETTE.length]
-  }
-
-  // Default to first color if no parameters provided
-  return COURSE_COLOR_PALETTE[0]
+export const getCourseCodeColor = (): CourseCodeColors => {
+  return DEFAULT_COURSE_COLOR
 }
 
 export const createGradebookHandler = (courseId: string) => () => {

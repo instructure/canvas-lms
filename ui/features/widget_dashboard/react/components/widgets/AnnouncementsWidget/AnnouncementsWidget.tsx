@@ -20,13 +20,13 @@ import React, {useState, useEffect, useMemo} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
+import {Flex} from '@instructure/ui-flex'
+import {List} from '@instructure/ui-list'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import AnnouncementItem from './AnnouncementItem'
 import type {BaseWidgetProps, Announcement} from '../../../types'
-import {usePaginatedAnnouncements} from '../../../hooks/useAnnouncements'
-import {usePagination} from '../../../hooks/usePagination'
+import {useAnnouncementsPaginated} from '../../../hooks/useAnnouncements'
 import {useWidgetDashboard} from '../../../hooks/useWidgetDashboardContext'
 import {FilterOption} from './utils'
 
@@ -35,15 +35,18 @@ const I18n = createI18nScope('widget_dashboard')
 const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
   const [filter, setFilter] = useState<FilterOption>('unread')
 
-  const {data, fetchNextPage, hasNextPage, isLoading, error, refetch} = usePaginatedAnnouncements({
+  const {
+    currentPage,
+    currentPageIndex,
+    totalPages,
+    goToPage,
+    resetPagination,
+    isLoading,
+    error,
+    refetch,
+  } = useAnnouncementsPaginated({
     limit: 3,
     filter,
-  })
-
-  const {currentPageIndex, paginationProps, resetPagination} = usePagination({
-    hasNextPage: !!hasNextPage,
-    totalPagesLoaded: data?.pages?.length || 0,
-    fetchNextPage,
   })
 
   useEffect(() => {
@@ -57,10 +60,7 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
   const {sharedCourseData} = useWidgetDashboard()
 
   const enrichedAnnouncements = useMemo(() => {
-    const currentPageData = data?.pages[currentPageIndex] as
-      | {announcements: Announcement[]}
-      | undefined
-    const filteredAnnouncements = currentPageData?.announcements || []
+    const filteredAnnouncements = currentPage?.announcements || []
 
     return filteredAnnouncements.map(announcement => {
       if (!announcement.course) return announcement
@@ -78,17 +78,15 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
         },
       }
     })
-  }, [data?.pages, currentPageIndex, sharedCourseData])
+  }, [currentPage, sharedCourseData])
 
   const renderFilterSelect = () => (
     <SimpleSelect
-      renderLabel={
-        <ScreenReaderContent>{I18n.t('Filter announcements by read status')}</ScreenReaderContent>
-      }
+      renderLabel={I18n.t('Read filter:')}
       value={filter}
       onChange={(_event, {value}) => handleFilterChange(value as FilterOption)}
       size="small"
-      width="6rem"
+      width="7rem"
       data-testid="announcement-filter-select"
     >
       <SimpleSelect.Option id="unread" value="unread">
@@ -122,14 +120,17 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
     }
 
     return (
-      <View as="div" height="100%" width="100%">
-        {enrichedAnnouncements.map(announcement => (
-          <AnnouncementItem
-            key={`${announcement.id}-${announcement.isRead ? 'read' : 'unread'}`}
-            announcementItem={announcement}
-            filter={filter}
-          />
-        ))}
+      <View as="div">
+        <List isUnstyled margin="0">
+          {enrichedAnnouncements.map(announcement => (
+            <List.Item
+              key={`${announcement.id}-${announcement.isRead ? 'read' : 'unread'}`}
+              margin="0"
+            >
+              <AnnouncementItem announcementItem={announcement} filter={filter} />
+            </List.Item>
+          ))}
+        </List>
       </View>
     )
   }
@@ -141,13 +142,20 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
       error={error ? I18n.t('Failed to load announcements. Please try again.') : null}
       onRetry={refetch}
       loadingText={I18n.t('Loading announcements...')}
-      headerActions={renderFilterSelect()}
       pagination={{
-        ...paginationProps,
+        currentPage: currentPageIndex + 1,
+        totalPages,
+        onPageChange: goToPage,
+        isLoading,
         ariaLabel: I18n.t('Announcements pagination'),
       }}
     >
-      {renderContent()}
+      <Flex direction="column" gap="small">
+        <Flex.Item overflowX="visible" overflowY="visible">
+          {renderFilterSelect()}
+        </Flex.Item>
+        <Flex.Item shouldGrow>{renderContent()}</Flex.Item>
+      </Flex>
     </TemplateWidget>
   )
 }

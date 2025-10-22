@@ -4311,11 +4311,7 @@ type DiscussionParticipantConnection {
   A list of nodes.
   """
   nodes: [DiscussionParticipant]
-
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
+  pageInfo: TotalCountPageInfo!
 }
 
 """

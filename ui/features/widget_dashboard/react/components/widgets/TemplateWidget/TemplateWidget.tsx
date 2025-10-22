@@ -63,11 +63,12 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
 }) => {
   const {isMobile} = useResponsiveContext()
   const widgetTitle = title || widget.title
+  const headingId = `${widget.id}-heading`
 
   const renderContent = () => {
     if (isLoading) {
       return (
-        <View as="div" textAlign="center" margin="large 0">
+        <View as="div" textAlign="center" width="100%" minHeight="400px">
           <Spinner renderTitle={loadingText || I18n.t('Loading widget data...')} size="medium" />
         </View>
       )
@@ -75,7 +76,7 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
 
     if (error) {
       return (
-        <View as="div" textAlign="center" margin="large 0">
+        <View as="div" textAlign="center">
           <Text color="danger" size="medium">
             {error}
           </Text>
@@ -92,7 +93,7 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
 
     if (!children) {
       return (
-        <View as="div" textAlign="center" margin="large 0">
+        <View as="div" textAlign="center">
           <Text color="secondary" size="medium">
             {I18n.t('No content available')}
           </Text>
@@ -105,22 +106,24 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
 
   return (
     <View
-      as="div"
+      as="section"
       height="100%"
+      margin="x-small"
       padding="medium"
       shadow="above"
       borderRadius="large"
       background="primary"
       data-testid={`widget-${widget.id}`}
-      style={{overflow: 'hidden', boxSizing: 'border-box'}}
+      aria-labelledby={showHeader && widgetTitle ? headingId : undefined}
+      role="region"
     >
-      <Flex direction="column" gap="small" height="100%" style={{overflow: 'hidden'}}>
+      <Flex direction="column" gap="small">
         {showHeader && widgetTitle && (
           <>
             {isMobile ? (
               <Flex direction="column" gap="x-small">
                 <Flex.Item>
-                  <Heading level="h2" margin="0">
+                  <Heading level="h2" margin="0" id={headingId}>
                     {widgetTitle}
                   </Heading>
                 </Flex.Item>
@@ -131,7 +134,7 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
             ) : (
               <Flex direction="row" alignItems="center" justifyItems="space-between">
                 <Flex.Item shouldGrow>
-                  <Heading level="h2" margin="0">
+                  <Heading level="h2" variant="titleCardSection" margin="0" id={headingId}>
                     {widgetTitle}
                   </Heading>
                 </Flex.Item>

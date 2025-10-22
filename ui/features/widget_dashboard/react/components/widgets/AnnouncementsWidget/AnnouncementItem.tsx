@@ -64,26 +64,31 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcementItem, fi
   const handleToggleReadState = async () => {
     setIsLoading(true)
     try {
+      const newReadState = !announcement.isRead
       await toggleReadState.mutateAsync({
         discussionTopicId: announcement.id,
-        read: !announcement.isRead,
+        read: newReadState,
       })
       if (filter === 'all') {
-        // No need to set isLoading to false on `finally` or `success` as the item will
-        // be removed from the list, unless filtering by all
         setAnnouncement(prev => ({
           ...prev,
           isRead: !prev.isRead,
         }))
-        setIsLoading(false)
       }
+      showFlashAlert({
+        message: newReadState
+          ? I18n.t('"%{title}" marked as read', {title: announcement.title})
+          : I18n.t('"%{title}" marked as unread', {title: announcement.title}),
+        type: 'success',
+      })
     } catch (error) {
       showFlashAlert({
         message: I18n.t("An error ocurred while changing the announcement's read state"),
         type: 'error',
       })
-      setIsLoading(false)
       console.error('Failed to toggle read state:', error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -138,12 +143,14 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcementItem, fi
   return (
     <View
       as="div"
-      padding="x-small"
+      padding="x-small 0"
       borderWidth="0 0 small 0"
       borderColor="primary"
       width="100%"
       maxWidth="100%"
       data-testid={`announcement-item-${announcement.id}`}
+      role="group"
+      aria-label={announcement.title}
     >
       <Flex direction="column" gap="xxx-small">
         <Flex.Item overflowY="visible">
@@ -164,11 +171,9 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcementItem, fi
                 <Flex.Item shouldShrink overflowX="visible" overflowY="visible">
                   <Flex direction="row" justifyItems="space-between" alignItems="start" gap="small">
                     <Flex.Item shouldGrow shouldShrink>
-                      <Link href={announcement.html_url} isWithinText={false}>
-                        <Text weight="bold" size="small" wrap="normal" color="primary">
-                          <TruncatedText maxLength={25}>{announcement.title}</TruncatedText>
-                        </Text>
-                      </Link>
+                      <Text weight="bold" size="small" wrap="normal" color="primary">
+                        <TruncatedText maxLength={75}>{announcement.title}</TruncatedText>
+                      </Text>
                     </Flex.Item>
                     <Flex.Item shouldShrink={false}>{renderReadUnreadButton()}</Flex.Item>
                   </Flex>
@@ -185,9 +190,20 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcementItem, fi
                   </Flex.Item>
                 )}
 
-                {/* Row 3: Posted date */}
+                {/* Row 3: Author name and posted date */}
                 <Flex.Item>
-                  <Text size="x-small" color="secondary">
+                  <Text
+                    size="x-small"
+                    color="secondary"
+                    wrap="break-word"
+                    style={{wordBreak: 'break-all'}}
+                  >
+                    {announcement.author?.name && (
+                      <>
+                        {I18n.t('Sent by %{authorName}', {authorName: announcement.author.name})}
+                        {' | '}
+                      </>
+                    )}
                     <FriendlyDatetime
                       dateTime={announcement.posted_at}
                       format={I18n.t('#date.formats.medium')}
@@ -204,10 +220,15 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcementItem, fi
           {announcement.message && (
             <View>
               <Text size="x-small">
-                <TruncatedText maxLength={60}>{decodedMessage}</TruncatedText>{' '}
+                <TruncatedText maxLength={120}>{decodedMessage}</TruncatedText>{' '}
               </Text>
             </View>
           )}
+        </Flex.Item>
+        <Flex.Item overflowX="visible" overflowY="visible">
+          <Link href={announcement.html_url} isWithinText={false}>
+            <Text size="small">{I18n.t('Read more')}</Text>
+          </Link>
         </Flex.Item>
       </Flex>
     </View>

@@ -35,8 +35,7 @@ threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3)
 const mockWidget: Widget = {
   id: 'course-work-widget',
   type: 'course_work',
-  position: {col: 1, row: 1},
-  size: {width: 2, height: 2},
+  position: {col: 1, row: 1, relative: 1},
   title: 'Course Work',
 }
 
