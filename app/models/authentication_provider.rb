@@ -414,10 +414,10 @@ class AuthenticationProvider < ActiveRecord::Base
       save_method = strict ? :save! : :save
 
       if pseudonym.changed? && !pseudonym.send(save_method)
-        Rails.logger.warn("Unable to save federated pseudonym: #{pseudonym.errors.to_hash}")
+        Rails.logger.warn("Unable to save federated pseudonym: #{pseudonym.errors.full_messages.join(", ")}")
       end
       if user.changed? && !user.send(save_method)
-        Rails.logger.warn("Unable to save federated user: #{user.errors.to_hash}")
+        Rails.logger.warn("Unable to save federated user: #{user.errors.full_messages.join(", ")}")
       end
       try(:post_federated_attribute_application, pseudonym:, provider_attributes:, purpose:)
     end
