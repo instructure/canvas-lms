@@ -15333,6 +15333,7 @@ uk:
   remove_name_as_an_admin_c296cf49: "Прибрати %{name}з ролі адміністратора"
   remove_name_as_leader_3e03780a: "Видалити %{name} як лідера"
   remove_name_from_group_487cce74: "Видалити %{name} з групи"
+  remove_never_drop_rule_b9d08c64: "Видалити правило Ніколи не знищувати"
   remove_recipient_name_a6b83cef: "Видалити одержувача %{name}"
   remove_row_c198da5a: "Видалити рядок"
   remove_student_from_recipients_4b206e35: "Видалити %{student} зі списку отримувачів"
@@ -15340,6 +15341,7 @@ uk:
   remove_these_dates_48453a81: "Видалити ці дати"
   remove_this_item_from_the_module_4b2ceab7: "Видалити цей елемент з модуля"
   remove_this_rubric_from_my_list_c7d80704: "Видалити цю категорію з мого списку"
+  remove_unsaved_never_drop_rule_bde18827: "Видалити незбережене правило Ніколи не знищувати"
   removed_course_association_course_a233342c: "Видалено зв'язок з курсом %{course}"
   removed_user_as_group_leader_bb69330f: "Прибрано %{user}з ролі лідера групи"
   rename_45608f54: Перейменувати
