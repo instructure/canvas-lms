@@ -106,7 +106,10 @@ describe "Asset Processor" do
 
       # Switch to the EULA iframe and interact with the tool
       in_frame(f("iframe[title*='EULA']")) do
-        MockLtiToolUi.eula_accept_button.click
+        wait_for_ajaximations
+        button = MockLtiToolUi.eula_accept_button
+        expect(button).to be_displayed
+        button.click
       end
 
       # After accepting, verify the EULA acceptance is recorded
