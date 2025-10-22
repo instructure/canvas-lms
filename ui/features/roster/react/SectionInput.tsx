@@ -33,13 +33,14 @@ const I18n = createI18nScope('roster_section_input')
 
 type SectionInputProps = {
   onSelect: (section: ResponseSection) => void
-  courseId: number
+  courseId: string
   exclude: string[]
 }
 
 function renderSectionOption(section: ResponseSection, isHighlighted: boolean) {
   return (
     <Select.Option
+      data-testid={`section-option-${section.id}`}
       key={section.id}
       id={section.id}
       value={section.id}
@@ -75,7 +76,7 @@ const SectionInput: React.FC<SectionInputProps> = ({onSelect, courseId, exclude}
     enabled: showOptions,
   })
 
-  const handleOnSelect = (e: SyntheticEvent<Element, Event>, {id}: {id?: string}) => {
+  const handleOnSelect = (_e: SyntheticEvent<Element, Event>, {id}: {id?: string}) => {
     setSearchTerm('')
     setInputValue('')
     setShowOptions(false)
@@ -92,6 +93,7 @@ const SectionInput: React.FC<SectionInputProps> = ({onSelect, courseId, exclude}
   return (
     <View>
       <Select
+        data-testid="section-input"
         renderLabel=""
         isShowingOptions={showOptions}
         onInputChange={e => {
@@ -103,7 +105,7 @@ const SectionInput: React.FC<SectionInputProps> = ({onSelect, courseId, exclude}
         onRequestSelectOption={handleOnSelect}
         onRequestShowOptions={() => setShowOptions(true)}
         onRequestHideOptions={() => setShowOptions(false)}
-        onRequestHighlightOption={(event, {id}) => setHighlightedSectionId(id || '')}
+        onRequestHighlightOption={(_event, {id}) => setHighlightedSectionId(id || '')}
         placeholder={I18n.t('Enter a section name')}
       >
         {showSpinner && (
