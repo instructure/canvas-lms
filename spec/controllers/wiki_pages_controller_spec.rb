@@ -72,6 +72,52 @@ describe WikiPagesController do
       expect(assigns[:js_env][:DISPLAY_SHOW_ALL_LINK]).to be(true)
     end
 
+    it "suppresses text editor preferences with block editor FF off" do
+      @user.set_preference(:text_editor_preference, "block_editor")
+      @course.account.enable_feature!(:block_editor)
+      get "index", params: { course_id: @course.id }
+      expect(assigns[:js_env][:text_editor_preference]).to eq "block_editor"
+      @course.account.disable_feature!(:block_editor)
+      get "index", params: { course_id: @course.id }
+      expect(assigns[:js_env].keys).not_to include(:text_editor_preference)
+    end
+
+    describe "js_env for EDITOR_FEATURE" do
+      context "when the block editor is enabled" do
+        it "sets EDITOR_FEATURE to block_editor" do
+          @course.account.enable_feature!(:block_editor)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:js_env][:EDITOR_FEATURE]).to eq :block_editor
+        end
+      end
+
+      context "when the block content editor is enabled" do
+        it "sets EDITOR_FEATURE to block_content_editor" do
+          @course.account.enable_feature!(:block_content_editor)
+          @course.enable_feature!(:block_content_editor_eap)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:js_env][:EDITOR_FEATURE]).to eq :block_content_editor
+        end
+      end
+
+      context "when both features are enabled" do
+        it "sets EDITOR_FEATURE to block_content_editor" do
+          @course.account.enable_feature!(:block_editor)
+          @course.account.enable_feature!(:block_content_editor)
+          @course.enable_feature!(:block_content_editor_eap)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:js_env][:EDITOR_FEATURE]).to eq :block_content_editor
+        end
+      end
+
+      context "when neither feature is enabled" do
+        it "sets EDITOR_FEATURE to nil" do
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:js_env][:EDITOR_FEATURE]).to be_nil
+        end
+      end
+    end
+
     context "assign to differentiation tags" do
       before do
         @course.account.tap do |a|
