@@ -106,7 +106,13 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
         </Flex.Item>
 
         <Flex.Item width="100%" margin="medium 0 0 0">
-          <View as="div" borderWidth="small 0 0 0">
+          <View
+            as="div"
+            borderWidth="small 0 0 0"
+            themeOverride={{
+              borderColorPrimary: '#E8EAEC',
+            }}
+          >
             <Flex direction="row" justifyItems="start" alignItems="center" height="100%">
               <Flex.Item shouldGrow padding="0 0 0 0">
                 <Button
