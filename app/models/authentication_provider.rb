@@ -373,6 +373,13 @@ class AuthenticationProvider < ActiveRecord::Base
           pseudonym[attribute] = value
         when "display_name"
           user.short_name = value
+
+          # Previously, there was an issue where setting the short_name would not
+          # propagate to the name if no other name attributes were set, resulting in
+          # the name being the unique_id. Fix that the first time we get a display_name.
+          if user.name == pseudonym.unique_id
+            user.name = value
+          end
         when "email"
           next if value.empty?
 
