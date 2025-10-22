@@ -42,25 +42,6 @@ module Translation
       InstStatsd::Statsd.distributed_increment("translation.invocations", tags:)
     end
 
-    # The following one are common to AWS Translate and Sagemaker but not Cedar
-    # Since the plan is to remove AWS Translate and Sagemaker
-    # cedar_translator.rb should be merged with this class
-    # and the methods below should be erased
-    # But that's not for now
-    def trim_locale(locale_string)
-      locale_string.to_s[0..1]
-    end
-
-    def parse_src_lang(text)
-      result = trim_locale(CLD.detect_language(text)[:code])
-      if result == "un"
-        Rails.logger.warn("Could not detect language from src text, defaulting to English")
-        "en"
-      else
-        result
-      end
-    end
-
     def create_client_config(yaml_name)
       Rails.logger.info("Creating translation client")
       settings = YAML.safe_load(DynamicSettings.find(tree: :private)[yaml_name] || "{}")
