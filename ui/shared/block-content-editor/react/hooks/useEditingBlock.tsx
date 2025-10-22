@@ -16,28 +16,42 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useRef, useState} from 'react'
+import {useGetAppStore, useAppSetStore} from '../store'
 
 export const useEditingBlock = () => {
-  const [id, setId] = useState<string | null>(null)
-  const callbackRef = useRef<Set<() => void>>(new Set())
-  const idRef = useRef<string | null>(id)
-  idRef.current = id
+  const getStore = useGetAppStore()
+  const set = useAppSetStore()
+
+  function saveOtherBlock(newId: string | null) {
+    const {
+      editingBlock: {id, saveCallbacks},
+    } = getStore()
+    if (id && id !== newId) {
+      saveCallbacks.forEach(callback => callback())
+    }
+  }
+
+  function setId(newId: string, viaEditButton: boolean): void
+  function setId(newId: null): void
+  function setId(newId: string | null, viaEditButton?: boolean): void {
+    saveOtherBlock(newId)
+    set(state => {
+      state.editingBlock.id = newId
+      state.editingBlock.viaEditButton = viaEditButton ?? false
+    })
+  }
 
   return {
-    id,
-    setId: (newId: string | null) => {
-      if (id !== null && newId !== id) {
-        callbackRef.current.forEach(cb => cb())
-      }
-      setId(newId)
-    },
-    idRef,
+    setId,
     addSaveCallback: (callback: () => void) => {
-      callbackRef.current.add(callback)
+      set(state => {
+        state.editingBlock.saveCallbacks.add(callback)
+      })
     },
     deleteSaveCallback: (callback: () => void) => {
-      callbackRef.current.delete(callback)
+      set(state => {
+        state.editingBlock.saveCallbacks.delete(callback)
+      })
     },
   }
 }

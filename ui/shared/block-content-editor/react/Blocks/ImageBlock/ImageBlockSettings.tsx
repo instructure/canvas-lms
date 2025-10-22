@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {useNode} from '@craftjs/core'
 import type {ImageBlockProps} from './types'
 import {SettingsImageInfos} from '../BlockItems/SettingsImageInfos/SettingsImageInfos'
@@ -106,8 +105,6 @@ export const ImageBlockSettings = () => {
       <SettingsIncludeTitle checked={includeBlockTitle} onChange={handleIncludeBlockTitleChange} />
       <SettingsSectionToggle
         title={I18n.t('Color settings')}
-        collapsedLabel={I18n.t('Expand color settings')}
-        expandedLabel={I18n.t('Collapse color settings')}
         defaultExpanded={true}
         includeSeparator={true}
       >
@@ -134,8 +131,6 @@ export const ImageBlockSettings = () => {
       </SettingsSectionToggle>
       <SettingsSectionToggle
         title={I18n.t('Image settings')}
-        collapsedLabel={I18n.t('Expand image settings')}
-        expandedLabel={I18n.t('Collapse image settings')}
         defaultExpanded={true}
         includeSeparator={false}
       >

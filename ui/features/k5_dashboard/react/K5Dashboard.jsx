@@ -401,6 +401,7 @@ const K5Dashboard = ({
     .concat(
       accountCalendarContexts.map(c => ({
         assetString: c.asset_string,
+        color: c.color,
         name: c.name,
       })),
     )

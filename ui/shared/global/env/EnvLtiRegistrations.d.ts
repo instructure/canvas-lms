@@ -29,4 +29,5 @@ interface LtiUsage {
 
 export interface EnvLtiRegistrations {
   LTI_USAGE: LtiUsage
+  LTI_REGISTRATIONS_HISTORY: boolean
 }

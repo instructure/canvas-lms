@@ -173,7 +173,6 @@ describe "wiki pages edit page assign to" do
 
   context "differentiation tags" do
     before :once do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.tap do |a|
         a.settings[:allow_assign_to_differentiation_tags] = { value: true }
         a.save!

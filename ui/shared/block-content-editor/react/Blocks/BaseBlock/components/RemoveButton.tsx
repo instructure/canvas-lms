@@ -24,12 +24,13 @@ const I18n = createI18nScope('block_content_editor')
 
 export const RemoveButton = (props: {
   onClicked: () => void
+  title: string
 }) => {
   return (
     <IconButton
       data-testid="remove-block-button"
       data-action-button
-      screenReaderLabel={I18n.t('Remove block')}
+      screenReaderLabel={I18n.t('Remove block: %{title}', {title: props.title})}
       onClick={props.onClicked}
     >
       <IconTrashLine />

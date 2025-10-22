@@ -1823,6 +1823,9 @@
     "please_enter_a_file_name_f159edc1": {
         "message": "請輸入一個檔案名稱"
     },
+    "please_enter_a_valid_video_url_from_a_supported_pl_30dc0596": {
+        "message": "請輸入受支援平台的有效影片 URL。"
+    },
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "請選取支援類型的檔案"
     },
@@ -1945,6 +1948,12 @@
     },
     "religion_icon_246e0be1": {
         "message": "宗教圖示"
+    },
+    "remove_f47dc62a": {
+        "message": "移除"
+    },
+    "remove_filename_3ea029f6": {
+        "message": "移除 { filename }"
     },
     "remove_heading_style_5fdc8855": {
         "message": "移除標題樣式"
@@ -2699,6 +2708,9 @@
     "video_player_for_title_ffd9fbc4": {
         "message": "{ title } 的影片播放器"
     },
+    "video_url_889d3263": {
+        "message": "影片網址"
+    },
     "vietnamese_e7a76583": {
         "message": "緬甸語"
     },
@@ -2824,6 +2836,9 @@
     },
     "your_webcam_may_already_be_in_use_6cd64c25": {
         "message": "您的網路攝影機可能已在使用中。"
+    },
+    "youtube_embed_url_5c1018d4": {
+        "message": "YouTube 嵌入網址"
     },
     "zeta_5ef24f0e": {
         "message": "θ"

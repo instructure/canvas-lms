@@ -34,8 +34,6 @@ describe "Differentiation Tag Management" do
     @third_student = student_in_course(active_all: true, name: "student@test.com").user
     ta_in_course(active_all: true)
 
-    # Enable FF
-    Account.default.enable_feature! :assign_to_differentiation_tags
     # Set account setting to true but not locked
     @sub2_account.settings[:allow_assign_to_differentiation_tags] = { value: true }
     @sub2_account.save!
@@ -950,15 +948,7 @@ describe "Differentiation Tag Management" do
       end
     end
 
-    context "sub account setting and feature flag conditions" do
-      it "does not display 'Manage Tags' if the feature flag is off" do
-        Account.default.disable_feature!(:assign_to_differentiation_tags)
-
-        user_session @teacher
-        get "/courses/#{@course.id}/users"
-        expect(f("body")).not_to contain_jqcss("button:contains('Manage Tags')")
-      end
-
+    context "sub account settings" do
       context "when the parent account differentiation tags setting is on and locked" do
         before do
           Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true, locked: true }
@@ -974,7 +964,6 @@ describe "Differentiation Tag Management" do
 
       context "when the parent account setting is on and not locked" do
         before do
-          Account.default.set_feature_flag! :assign_to_differentiation_tags, Feature::STATE_DEFAULT_ON
           Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
           Account.default.save!
         end
@@ -986,7 +975,6 @@ describe "Differentiation Tag Management" do
         end
 
         it "does not show the 'Manage Tags' button when sub account setting is off" do
-          @sub1_account.disable_feature! :assign_to_differentiation_tags
           @sub1_account.settings[:allow_assign_to_differentiation_tags] = { value: false }
           @sub1_account.save!
           @teacher.clear_caches
@@ -998,7 +986,6 @@ describe "Differentiation Tag Management" do
 
       context "when the parent account setting is off and not locked" do
         before do
-          Account.default.set_feature_flag! :assign_to_differentiation_tags, Feature::STATE_DEFAULT_ON
           Account.default.settings[:allow_assign_to_differentiation_tags] = { value: false }
           Account.default.save!
         end
@@ -1010,31 +997,6 @@ describe "Differentiation Tag Management" do
         end
 
         it "does not show the 'Manage Tags' button when sub account setting is off" do
-          @sub1_account.disable_feature! :assign_to_differentiation_tags
-          user_session @teacher
-          get "/courses/#{@course_with_tags_disabled.id}/users"
-          expect(f("body")).not_to contain_jqcss("button:contains('Manage Tags')")
-        end
-
-        it "does show 'Manage Tags' button when parent ff is off and unlocked" do
-          Account.default.set_feature_flag! :assign_to_differentiation_tags, Feature::STATE_DEFAULT_OFF
-          @sub1_account.set_feature_flag! :assign_to_differentiation_tags, Feature::STATE_DEFAULT_ON
-          @sub1_account.settings[:allow_assign_to_differentiation_tags] = { value: true }
-          @sub1_account.save!
-          @sub1_account.reload
-          user_session @teacher
-          get "/courses/#{@course_with_tags_disabled.id}/users"
-          expect(f("body")).to contain_jqcss("button:contains('Manage Tags')")
-        end
-
-        it "does not show 'Manage Tags' button when parent ff is off and locked" do
-          Account.default.disable_feature! :assign_to_differentiation_tags
-          # when you disable parent FF and lock it sub accounts FF and settings won't work even if
-          # enabled by code without using the ui
-          @sub1_account.set_feature_flag! :assign_to_differentiation_tags, Feature::STATE_DEFAULT_ON
-          @sub1_account.settings[:allow_assign_to_differentiation_tags] = { value: true }
-          @sub1_account.save!
-          @sub1_account.reload
           user_session @teacher
           get "/courses/#{@course_with_tags_disabled.id}/users"
           expect(f("body")).not_to contain_jqcss("button:contains('Manage Tags')")

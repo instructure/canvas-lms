@@ -145,8 +145,6 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
 
     {
       attachment_id: attachment.id,
-      crocodoc_url: attachment.crocodoc_available? &&
-        attachment.crocodoc_url(user, url_opts),
       canvadoc_url: attachment.canvadoc_available? &&
         attachment.canvadoc_url(user, url_opts)
     }

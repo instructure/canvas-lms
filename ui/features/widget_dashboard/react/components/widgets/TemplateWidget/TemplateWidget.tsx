@@ -120,7 +120,7 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
             {isMobile ? (
               <Flex direction="column" gap="x-small">
                 <Flex.Item>
-                  <Heading level="h3" margin="0">
+                  <Heading level="h2" margin="0">
                     {widgetTitle}
                   </Heading>
                 </Flex.Item>
@@ -131,7 +131,7 @@ const TemplateWidget: React.FC<TemplateWidgetProps> = ({
             ) : (
               <Flex direction="row" alignItems="center" justifyItems="space-between">
                 <Flex.Item shouldGrow>
-                  <Heading level="h3" margin="0">
+                  <Heading level="h2" margin="0">
                     {widgetTitle}
                   </Heading>
                 </Flex.Item>

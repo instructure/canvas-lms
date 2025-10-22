@@ -49,6 +49,8 @@ module Types
     implements Interfaces::SubmissionInterface
     implements Interfaces::LegacyIDInterface
 
+    connection_type_class TotalCountConnection
+
     def initialize(object, context)
       super
       anonymous_grading_scoped_context(object)

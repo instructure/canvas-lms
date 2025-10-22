@@ -279,7 +279,6 @@ describe AssignmentVisibility::AssignmentVisibilityService do
 
           context "user is non-collaborative group" do
             before do
-              @course.account.enable_feature!(:assign_to_differentiation_tags)
               @course.account.settings = { allow_assign_to_differentiation_tags: { value: true } }
               @course.account.save
 
@@ -306,18 +305,6 @@ describe AssignmentVisibility::AssignmentVisibilityService do
 
               visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @student.id, course_ids: @course.id).map { |x| x.assignment_id.to_i }
               expect(visible_assignment_ids.include?(@assignment.id)).to be_falsy
-            end
-
-            it "does not see the assignment if the feature flag is disabled" do
-              @course.account.disable_feature!(:assign_to_differentiation_tags)
-
-              visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @student.id, course_ids: @course.id).map { |x| x.assignment_id.to_i }
-              expect(visible_assignment_ids.include?(@assignment.id)).to be_falsy
-            end
-
-            it "does not show the assignment if course_ids is not present" do
-              visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @user.id, assignment_ids: @assignment.id, course_ids: nil).map(&:assignment_id)
-              expect(visible_assignment_ids.map(&:to_i).include?(@assignment.id)).to be_falsy
             end
           end
         end
@@ -561,7 +548,6 @@ describe AssignmentVisibility::AssignmentVisibilityService do
           end
 
           it "applies context module tags overrides" do
-            @course.account.enable_feature!(:assign_to_differentiation_tags)
             @course.account.settings = { allow_assign_to_differentiation_tags: { value: true } }
             @course.account.save
             assignment_with_false_only_visible_to_overrides
@@ -579,7 +565,6 @@ describe AssignmentVisibility::AssignmentVisibilityService do
           end
 
           it "does not show Assignment in the module if user does not belong to the tag" do
-            @course.account.enable_feature!(:assign_to_differentiation_tags)
             @course.account.settings = { allow_assign_to_differentiation_tags: { value: true } }
             @course.account.save
 

@@ -370,7 +370,7 @@ class GradingStandard < ActiveRecord::Base
   end
 
   def used_as_default?
-    courses.active.any? || accounts.active.any?
+    courses.active.not_completed.any? || accounts.active.any?
   end
 
   def data_with_calculated_value

@@ -3033,6 +3033,7 @@ class UsersController < ApplicationController
     user = api_find(User, params[:id])
     if user && authorized_action(@domain_root_account, @current_user, :manage_site_settings)
       user.clear_caches
+      user.update_account_associations
       render json: { status: "ok" }
     end
   end
@@ -3581,7 +3582,7 @@ class UsersController < ApplicationController
       }
     end
 
-    course_data.compact.uniq { |c| c[:courseId] }
+    course_data.compact.uniq { |c| c[:courseId] }.sort_by { |course| course[:courseName].downcase }
   end
 
   def should_show_widget_dashboard?

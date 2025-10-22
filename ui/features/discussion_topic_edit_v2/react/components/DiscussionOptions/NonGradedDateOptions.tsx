@@ -70,6 +70,12 @@ export const NonGradedDateOptions = ({
     availableUntilTimeRef?.setAttribute('data-testid', `${testIdPrefix}-available-until-time`)
   })
 
+  const defaultEndTime = () => {
+    if (isAnnouncement) {
+      return '23:59'
+    }
+  }
+
   return (
     <FormFieldGroup description="" width={inputWidth}>
       <Flex gap="medium" alignItems="start">
@@ -182,6 +188,7 @@ export const NonGradedDateOptions = ({
             timeInputRef={ref => {
               setAvailableUntilTimeRef(ref)
             }}
+            initialTimeForNewDate={defaultEndTime()}
           />
         </Flex.Item>
         <Flex.Item>

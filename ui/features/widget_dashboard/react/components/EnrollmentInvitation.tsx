@@ -84,6 +84,11 @@ const EnrollmentInvitation: React.FC<EnrollmentInvitationProps> = ({
         enrollmentUuid,
       })
     },
+    onSuccess: () => {
+      // Reload the page on invitation accepted
+      // so we pull the latest data
+      window.location.reload()
+    },
   })
 
   const rejectMutation = useMutation<RejectEnrollmentInvitationResponse, Error, string>({

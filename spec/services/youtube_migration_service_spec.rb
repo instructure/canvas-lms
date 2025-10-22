@@ -510,6 +510,19 @@ RSpec.describe YoutubeMigrationService do
         expect { service.validate_resource_exists!("UnhandledType", 123) }
           .to raise_error(YoutubeMigrationService::ResourceNotFoundError, /Cannot validate existence/)
       end
+
+      shared_examples "passes for New Quizzes resource" do |type|
+        it "returns true for #{type}" do
+          expect { service.validate_resource_exists!(type, 123) }.not_to raise_error
+          expect(service.validate_resource_exists!(type, 123)).to be(true)
+        end
+      end
+
+      context "when resource_type is a New Quizzes resource" do
+        YoutubeMigrationService::NEW_QUIZZES_RESOURCES.each do |type|
+          include_examples "passes for New Quizzes resource", type
+        end
+      end
     end
   end
 
@@ -1115,6 +1128,58 @@ RSpec.describe YoutubeMigrationService do
       it "raises an error" do
         expect { service.update_resource_content(embed, new_html) }
           .to raise_error(/Unsupported resource type/)
+      end
+    end
+  end
+
+  describe "#resource_group_key_for" do
+    context "when resource_type is in NEW_QUIZZES_RESOURCES" do
+      before do
+        stub_const("NEW_QUIZZES_RESOURCES", ["QuizzesNext::Quiz"])
+      end
+
+      it "normalizes the type via prepare_new_quiz_resource_type and generates a key (embed hash form)" do
+        embed = { resource_type: "QuizzesNext::Quiz", id: 42, resource_group_key: nil }
+
+        expect(service)
+          .to receive(:prepare_new_quiz_resource_type)
+          .with("QuizzesNext::Quiz")
+          .and_return("QuizzesNext::Quiz")
+
+        expect(YoutubeMigrationService)
+          .to receive(:generate_resource_key)
+          .with("QuizzesNext::Quiz", 42)
+          .and_return("QuizzesNext::Quiz|42")
+
+        result = service.send(:resource_group_key_for, embed)
+        expect(result).to eq("QuizzesNext::Quiz|42")
+      end
+    end
+
+    context "when resource_type is NOT in NEW_QUIZZES_RESOURCES" do
+      before do
+        stub_const("NEW_QUIZZES_RESOURCES", [])
+      end
+
+      it "returns the existing resource_group_key as-is when present (including empty string)" do
+        embed = { resource_type: "Assignment", id: 7, resource_group_key: "" }
+
+        expect(YoutubeMigrationService).not_to receive(:generate_resource_key)
+
+        result = service.send(:resource_group_key_for, embed)
+        expect(result).to eq("")
+      end
+
+      it "falls back to generate_resource_key when resource_group_key is nil" do
+        embed = { resource_type: "Assignment", id: 7, resource_group_key: nil }
+
+        expect(YoutubeMigrationService)
+          .to receive(:generate_resource_key)
+          .with("Assignment", 7)
+          .and_return("Assignment|7")
+
+        result = service.send(:resource_group_key_for, embed)
+        expect(result).to eq("Assignment|7")
       end
     end
   end
@@ -2444,6 +2509,106 @@ RSpec.describe YoutubeMigrationService do
         end
 
         service.convert_youtube_to_studio(youtube_embed, studio_tool, user_uuid:)
+      end
+    end
+
+    describe "#reset_scan_status" do
+      subject(:call) { service.reset_scan_status }
+
+      let(:scan_tag) { "youtube_embed_scan" }
+
+      context "when a scan is waiting_for_external_tool" do
+        let!(:stuck_progress) do
+          Progress.create!(
+            tag: scan_tag,
+            context: course,
+            workflow_state: "waiting_for_external_tool",
+            results: { total_count: 3 }
+          )
+        end
+
+        it "marks scan as failed, completes it, and sets completed_at" do
+          call
+          stuck_progress.reload
+
+          expect(stuck_progress.workflow_state).to eq("completed")
+          expect(stuck_progress.results).to be_present
+          expect(stuck_progress.results[:new_quizzes_scan_status]).to eq("failed")
+          expect(stuck_progress.results[:completed_at]).to be_within(10.seconds).of(Time.now.utc)
+        end
+
+        it "preserves existing results keys" do
+          call
+          expect(stuck_progress.reload.results[:total_count]).to eq(3)
+        end
+      end
+
+      context "when the scan's results are initially nil" do
+        let!(:stuck_progress) do
+          Progress.create!(
+            tag: scan_tag,
+            context: course,
+            workflow_state: "waiting_for_external_tool",
+            results: nil
+          )
+        end
+
+        it "initializes results and sets failure + completed_at" do
+          call
+          stuck_progress.reload
+
+          expect(stuck_progress.workflow_state).to eq("completed")
+          expect(stuck_progress.results[:new_quizzes_scan_status]).to eq("failed")
+          expect(stuck_progress.results[:completed_at]).to be_within(10.seconds).of(Time.now.utc)
+        end
+      end
+
+      context "when there is no waiting scan" do
+        it "does nothing and does not raise" do
+          running = Progress.create!(
+            tag: scan_tag,
+            context: course,
+            workflow_state: "running",
+            results: { total_count: 1 }
+          )
+
+          expect { call }.not_to change { Progress.count }
+
+          running.reload
+          expect(running.workflow_state).to eq("running")
+          expect(running.results[:new_quizzes_scan_status]).to be_nil
+          expect(running.results[:completed_at]).to be_nil
+        end
+      end
+
+      context "when multiple scans exist" do
+        let!(:waiting) do
+          Progress.create!(
+            tag: scan_tag,
+            context: course,
+            workflow_state: "waiting_for_external_tool",
+            results: { foo: "bar" }
+          )
+        end
+
+        let!(:completed) do
+          Progress.create!(
+            tag: scan_tag,
+            context: course,
+            workflow_state: "completed",
+            results: { baz: 1 }
+          )
+        end
+
+        it "only completes the waiting scan and leaves others unchanged" do
+          call
+
+          expect(waiting.reload.workflow_state).to eq("completed")
+          expect(waiting.results[:new_quizzes_scan_status]).to eq("failed")
+
+          expect(completed.reload.workflow_state).to eq("completed")
+          expect(completed.results).to eq(baz: 1)
+        end
       end
     end
   end

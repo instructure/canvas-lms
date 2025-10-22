@@ -21,7 +21,7 @@
 
 gem "bootsnap", "~> 1.16", require: false
 gem "rails", ($canvas_rails == "7.2") ? "~> 7.2.0" : "~> 8.0.0"
-gem "rack", "~> 3.1"
+gem "rack", ($canvas_rails == "7.2") ? "~> 3.1.0" : "~> 3.2"
 gem "sqlite3", "~> 2.6"
 
 gem "switchman", "~> 4.0"
@@ -35,6 +35,7 @@ gem "addressable", "~> 2.8", require: false
 gem "authlogic", github: "binarylogic/authlogic", ref: "d155fff4672595af99cb3488d9731f1efc595049"
   gem "scrypt", "~> 3.0"
 gem "aws-sdk-bedrockruntime", "~> 1.7", require: false
+gem "aws-sdk-core", "3.218.1", require: false # pinned for now, because it breaks one of our specs
 gem "aws-sdk-kinesis", "~> 1.45", require: false
 gem "aws-sdk-s3", "~> 1.119", require: false
 gem "aws-sdk-sns", "~> 1.60", require: false
@@ -51,12 +52,11 @@ gem "canvas_connect", "0.3.16"
 gem "canvas_link_migrator", "~> 1.0"
 gem "canvas_webex", "0.18.2"
 gem "cld", "~> 0.13"
-gem "crocodoc-ruby", "0.0.1", require: false
 gem "code_ownership", "~> 1.33"
 gem "datadog", "~> 2.1", require: false
 gem "docx", "~> 0.8"
 gem "encrypted_cookie_store-instructure", "~> 1.2", require: "encrypted_cookie_store"
-gem "gepub", "~> 1.0"
+gem "gepub", "~> 2.0"
 gem "graphql", "~> 2.3"
 gem "graphql-batch", "~> 0.5"
 gem "hashdiff", "~> 1.1", require: false
@@ -96,10 +96,10 @@ gem "pragmatic_segmenter", "~> 0.3"
 gem "prawn-emoji", "~> 6.0", require: false
 gem "prawn-rails", "~> 1.4"
 gem "prosopite", "~> 2.1"
-gem "puma", "~> 6.3", require: false
+gem "puma", "~> 7.0", require: false
 gem "rack3-brotli", "~> 1.0", require: "rack/brotli"
 gem "rails-observers", "0.1.5"
-gem "feedjira", "~> 3.2.3", require: false
+gem "feedjira", "~> 4.0", require: false
 gem "redcarpet", "~> 3.6", require: false
 gem "retriable", "~> 3.1"
 gem "ritex", "1.0.1", require: false
@@ -109,7 +109,7 @@ gem "ruby-duration", "3.2.3", require: false
 gem "rubycas-client", "2.3.9", require: false
   gem "pstore", "~> 0.2", require: false
 gem "ruby-rtf", "0.0.5"
-gem "rubyzip", "~> 2.3", require: "zip"
+gem "rubyzip", "~> 3.0", require: "zip"
 gem "saml2", "~> 3.1"
 gem "sanitize", "~> 7.0", require: false
 gem "stackprof", github: "instructure/stackprof", branch: "switch-d3-data-to-iterative"

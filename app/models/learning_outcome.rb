@@ -577,13 +577,22 @@ class LearningOutcome < ActiveRecord::Base
   end
 
   def rollup_calculation
-    return unless context.is_a?(Course)
+    return unless context.is_a?(Course) || context.is_a?(Account)
+    return unless Account.site_admin.feature_enabled?(:outcomes_rollup_propagation)
 
     begin
-      enqueue_rollup_calculation(course_id: context.id)
+      if context.is_a?(Account) && Account.site_admin.feature_enabled?(:account_outcome_rollup_orchestrator)
+        Outcomes::AccountOutcomeRollupOrchestrator.process_account_outcome_change(
+          account_id: context.id,
+          outcome_id: id
+        )
+      elsif context.is_a?(Course)
+        enqueue_rollup_calculation(course_id: context.id)
+      end
     rescue => e
       Canvas::Errors.capture_exception(:outcome_rollup_callback, e, {
-                                         course_id: context.id,
+                                         context_type: context.class.name,
+                                         context_id: context.id,
                                          learning_outcome_id: id,
                                          calculation_method:
                                        })

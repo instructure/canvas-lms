@@ -1,7 +1,14 @@
 ---
-ams_service:
+ams_root_account_integration:
   state: hidden
   shadow: true
   applies_to: RootAccount
   display_name: Assessment Management Service
   description: Enables the Assessment Management Service.
+
+ams_course_integration:
+  state: hidden
+  shadow: true
+  applies_to: Course
+  display_name: Assessment Management Service Integration
+  description: Enables integration with the Assessment Management Service (AMS) for accounts and courses.

@@ -3177,10 +3177,12 @@ el:
       unregistered_groups: "Ομάδες που δεν έχουν εγγραφεί ακόμα"
       unregistered_users: "Χρήστες που δεν έχουν εγγραφεί ακόμα"
     messages_sent: "Τα μηνύματα εστάλησαν"
+    next: Επόμενη
     no_dates_error: "Θα πρέπει να ορίσετε τουλάχιστον μία ημερομηνία και ώρα"
     no_groups: "Δεν βρέθηκαν ομάδες"
     no_users: "Δεν βρέθηκαν χρήστες"
     open_appointment_on_this_day: "Υπάρχει κάποιο ανοιχτό ραντεβού αυτή την ημέρα"
+    previous: Προηγούμενο
     prompts: 
       delete_assignment: "Είστε σίγουρος/η ότι επιθυμείτε να διαγράψετε αυτή την εργασία;"
       delete_override: "Είστε σίγουρος/η ότι θέλετε να αντικαταστήσετε αυτή την εργασία;"
@@ -4713,9 +4715,11 @@ el:
   course_setup_checklist_78dcff7e: "Λίστα Ελέγχου για τη Δημιουργία του Μαθήματος"
   course_setup_wizard_is_showing_a7c087c1: "Ο Οδηγός για τη Δημιουργία του Μαθήματος εμφανίζεται."
   course_sis_id_bbed1a60: "id sis μαθήματος"
+  course_sis_id_c026d0f3: "Αναγνωριστικό/ΙD για το Μάθημα SIS"
   course_starts_at_3a01f9da: "Το μάθημα ξεκινάει στις"
   course_statistics: 
     unknown: άγνωστο
+  course_summary_99c39cea: "Περίληψη Μαθήματος"
   course_syllabus_5de1b0af: "Αναλυτικό Πρόγραμμα Μαθήματος"
   course_users: 
     greater_than_three: "Παρακαλώ εισαγάγετε κάποιον όρο αναζήτησης με τρεις ή περισσότερους χαρακτήρες"
@@ -6450,6 +6454,7 @@ el:
   everyone_else_cc5f6888: "Όλοι οι άλλοι"
   exact_value_margin_eae7e67e: "%{exact_value} +/- %{margin}"
   example_84698b7d: Παράδειγμα
+  example_cb3509b8: "Παράδειγμα:"
   example_final_score_355aff0f: "Υπόδειγμα τελικής βαθμολογίας"
   example_final_score_a92b30b9: "Υπόδειγμα τελικής βαθμολογίας]]"
   example_https_example_com_config_xml_be5f36ac: "Παράδειγμα: https://example.com/config.xml"
@@ -10791,6 +10796,8 @@ el:
       create_failed: "Αποτυχία δημιουργίας σχολίου"
   page_name_21defa75: "Όνομα Σελίδας"
   page_not_found_2b0d05f5: "Η Σελίδα δεν βρέθηκε"
+  page_title: 
+    edit_ai_experience: "Επεξεργασία %{title}"
   page_title_106304bb: "Τίτλος Σελίδας"
   page_title_d1a22bbf: "Τίτλος Σελίδας"
   page_views: 

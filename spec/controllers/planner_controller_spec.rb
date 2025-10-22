@@ -594,6 +594,196 @@ describe PlannerController do
           )
         end
 
+        context "incomplete_items filter" do
+          it "filters incomplete_items excluding completed assignments and overridden items" do
+            assignment_group = @course1.assignment_groups.create!(name: "test group")
+
+            submitted_assignment = @course1.assignments.create!(
+              title: "submitted assignment",
+              assignment_group:,
+              due_at: 1.week.from_now
+            )
+            submitted_assignment.submit_homework(@student, submission_type: "online_text_entry", body: "some text")
+
+            incomplete_assignment = @course1.assignments.create!(
+              title: "incomplete assignment",
+              assignment_group:,
+              due_at: 2.weeks.from_now
+            )
+
+            marked_complete_quiz = @course1.quizzes.create!(
+              title: "marked complete quiz",
+              due_at: 3.weeks.from_now,
+              quiz_type: "practice_quiz"
+            )
+            marked_complete_quiz.publish!
+            PlannerOverride.create!(
+              plannable: marked_complete_quiz,
+              user: @student,
+              marked_complete: true
+            )
+
+            incomplete_quiz = @course1.quizzes.create!(
+              title: "incomplete quiz",
+              due_at: 4.weeks.from_now,
+              quiz_type: "practice_quiz"
+            )
+            incomplete_quiz.publish!
+
+            get :index, params: {
+              filter: "incomplete_items",
+              context_codes: [@course1.asset_string],
+              start_date: 2.weeks.ago.iso8601,
+              end_date: 6.weeks.from_now.iso8601
+            }
+            response_json = json_parse(response.body)
+            items_by_type = response_json.group_by { |item| item["plannable_type"] }
+
+            assignment_ids = items_by_type["assignment"]&.pluck("plannable_id") || []
+            expect(assignment_ids).to include(incomplete_assignment.id)
+            expect(assignment_ids).not_to include(submitted_assignment.id)
+
+            quiz_ids = items_by_type["quiz"]&.pluck("plannable_id") || []
+            expect(quiz_ids).to include(incomplete_quiz.id)
+            expect(quiz_ids).not_to include(marked_complete_quiz.id)
+
+            expect(assignment_ids).to match_array([@assignment1.id, @assignment3.id, @group_assignment.id, incomplete_assignment.id])
+          end
+
+          it "applies incomplete filtering to all supported planner item types" do
+            assignment_group = @course1.assignment_groups.create!(name: "test group")
+
+            test_items = {
+              assignment: @course1.assignments.create!(
+                title: "test assignment",
+                assignment_group:,
+                due_at: 1.week.from_now
+              ),
+              quiz: @course1.quizzes.create!(
+                title: "test quiz",
+                due_at: 2.weeks.from_now,
+                quiz_type: "practice_quiz"
+              ).tap(&:publish!),
+              planner_note: planner_note_model(
+                user: @student,
+                todo_date: 3.weeks.from_now,
+                course: @course1,
+                title: "test note"
+              ),
+              calendar_event: @course1.calendar_events.create!(
+                title: "test event",
+                start_at: 4.weeks.from_now,
+                end_at: 4.weeks.from_now + 1.hour
+              ),
+              discussion_topic: @course1.discussion_topics.create!(
+                title: "test discussion",
+                message: "test content",
+                todo_date: 5.weeks.from_now
+              ).tap(&:publish!),
+              wiki_page: @course1.wiki_pages.create!(
+                title: "test page",
+                body: "test content",
+                todo_date: 6.weeks.from_now
+              )
+            }
+
+            # Mark all test items as complete via PlannerOverride
+            test_items.each_value do |item|
+              PlannerOverride.create!(
+                plannable: item,
+                user: @student,
+                marked_complete: true
+              )
+            end
+
+            get :index, params: {
+              filter: "incomplete_items",
+              context_codes: [@course1.asset_string],
+              start_date: 2.weeks.ago.iso8601,
+              end_date: 8.weeks.from_now.iso8601
+            }
+            response_json = json_parse(response.body)
+
+            returned_items = response_json.pluck("plannable_type", "plannable_id")
+            test_item_tuples = test_items.map { |type, item| [type.to_s, item.id] }
+
+            expect(returned_items).not_to include(*test_item_tuples)
+          end
+
+          it "respects PlannerOverride precedence over submission status for incomplete_items filter" do
+            assignment_group = @course1.assignment_groups.create!(name: "test group")
+            submitted_assignment = @course1.assignments.create!(
+              title: "submitted assignment",
+              assignment_group:,
+              due_at: 1.week.from_now
+            )
+
+            submitted_assignment.submit_homework(@student, submission_type: "online_text_entry", body: "submission")
+
+            PlannerOverride.create!(
+              plannable: submitted_assignment,
+              user: @student,
+              marked_complete: false
+            )
+
+            get :index, params: {
+              filter: "incomplete_items",
+              context_codes: [@course1.asset_string],
+              start_date: 2.weeks.ago.iso8601,
+              end_date: 4.weeks.from_now.iso8601
+            }
+
+            response_json = json_parse(response.body)
+            assignment_ids = response_json
+                             .select { |item| item["plannable_type"] == "assignment" }
+                             .pluck("plannable_id")
+
+            expect(assignment_ids).to include(submitted_assignment.id)
+          end
+
+          it "excludes assignments with complete overrides regardless of submission status" do
+            assignment_group = @course1.assignment_groups.create!(name: "test group")
+
+            submitted_assignment = @course1.assignments.create!(
+              title: "submitted assignment with complete override",
+              assignment_group:,
+              due_at: 1.week.from_now
+            )
+            submitted_assignment.submit_homework(@student, submission_type: "online_text_entry", body: "submission")
+            PlannerOverride.create!(
+              plannable: submitted_assignment,
+              user: @student,
+              marked_complete: true
+            )
+
+            unsubmitted_assignment = @course1.assignments.create!(
+              title: "unsubmitted assignment with complete override",
+              assignment_group:,
+              due_at: 2.weeks.from_now
+            )
+            PlannerOverride.create!(
+              plannable: unsubmitted_assignment,
+              user: @student,
+              marked_complete: true
+            )
+
+            get :index, params: {
+              filter: "incomplete_items",
+              context_codes: [@course1.asset_string],
+              start_date: 2.weeks.ago.iso8601,
+              end_date: 4.weeks.from_now.iso8601
+            }
+
+            response_json = json_parse(response.body)
+            assignment_ids = response_json
+                             .select { |item| item["plannable_type"] == "assignment" }
+                             .pluck("plannable_id")
+
+            expect(assignment_ids).not_to include(submitted_assignment.id)
+            expect(assignment_ids).not_to include(unsubmitted_assignment.id)
+          end
+        end
+
         it "filters all_ungraded_todo_items for teachers, including unpublished items" do
           @course_page.unpublish
           @group_topic.unpublish

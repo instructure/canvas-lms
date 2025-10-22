@@ -19,7 +19,7 @@
 
 module AttachmentLocationTagger
   def self.tag_url(url, location)
-    file_url_pattern = %r{(?<![a-zA-Z0-9:])(/(?:[\w-]+/\d+/)?(?:files/\d+(?:/[\w-]+)?|media_attachments_iframe/\d+)(?:\?[^"'<>]*)?)}
+    file_url_pattern = %r{(?<![a-zA-Z0-9:])(/(?:[\w-]+/(?:\d+(?:~\d+)?)/)?(?:files/(?:\d+(?:~\d+)?)(?:/[\w-]+)?|media_attachments_iframe/(?:\d+(?:~\d+)?))(?:\?[^"'<>]*)?)}
 
     url.gsub(file_url_pattern) do |_|
       url = Regexp.last_match(1)

@@ -176,8 +176,7 @@ module Api::V1::Attachment
         access_token: options[:access_token],
         instfs_id: options[:instfs_id]
       }
-      hash["preview_url"] = attachment.crocodoc_url(user, url_opts) ||
-                            attachment.canvadoc_url(user, url_opts)
+      hash["preview_url"] = attachment.canvadoc_url(user, url_opts)
     end
     if includes.include?("canvadoc_document_id")
       hash["canvadoc_document_id"] = attachment&.canvadoc&.document_id

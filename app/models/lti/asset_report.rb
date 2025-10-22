@@ -133,10 +133,11 @@ class Lti::AssetReport < ApplicationRecord
   end
 
   # See also fields in graphql/types/lti_asset_report_type.rb (used
-  # in New Speedgrader)
+  # in New Speedgrader). For frontend display of a report, this should
+  # be compatible with the graphql type.
   def info_for_display
     {
-      _id: id,
+      _id: id.to_s,
       title:,
       comment:,
       result:,

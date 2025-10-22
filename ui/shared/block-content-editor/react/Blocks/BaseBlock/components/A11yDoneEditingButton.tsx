@@ -24,9 +24,14 @@ const I18n = createI18nScope('block_content_editor')
 type A11ySaveButtonProps = {
   onUserAction: () => void
   isFullyVisible: boolean
+  title: string
 }
 
-export const A11yDoneEditingButton = ({onUserAction, isFullyVisible}: A11ySaveButtonProps) => {
+export const A11yDoneEditingButton = ({
+  onUserAction,
+  isFullyVisible,
+  title,
+}: A11ySaveButtonProps) => {
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault()
@@ -37,8 +42,9 @@ export const A11yDoneEditingButton = ({onUserAction, isFullyVisible}: A11ySaveBu
   return (
     <Button
       {...(!isFullyVisible && {'data-focus-reveal-button': true})}
+      data-testid="a11y-done-editing-button"
       color="primary"
-      aria-label={I18n.t('Done editing block content')}
+      aria-label={I18n.t('Done editing for %{title}', {title})}
       onKeyDown={handleKeyDown}
       onClick={onUserAction}
     >

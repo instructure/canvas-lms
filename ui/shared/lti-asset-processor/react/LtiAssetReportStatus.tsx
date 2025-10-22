@@ -24,7 +24,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {LtiAssetReport} from '../model/LtiAssetReport'
 
-const I18n = createI18nScope('submissions_show_preview_asset_report_status')
+const I18n = createI18nScope('lti_asset_reports_for_student')
 
 interface Props {
   reports: LtiAssetReport[]

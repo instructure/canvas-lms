@@ -21,17 +21,19 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ButtonEditProps} from './types'
 import {getButtonText, getCommonButtonProps} from './utils'
-import {useOpenSettingsTray} from '../../../hooks/useOpenSettingsTray'
+import {useSettingsTray} from '../../../hooks/useSettingsTray'
+import {useNode} from '@craftjs/core'
 
 const I18n = createI18nScope('block_content_editor')
 
 export const ButtonEdit = (props: ButtonEditProps) => {
-  const {openSettingsTray} = useOpenSettingsTray()
+  const {id} = useNode()
+  const {open} = useSettingsTray()
   const buttonText = getButtonText(props)
   const commonProps = getCommonButtonProps(props)
 
   const buttonElement = (
-    <Button {...commonProps} onClick={openSettingsTray}>
+    <Button {...commonProps} onClick={() => open(id)}>
       {buttonText}
     </Button>
   )

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.2.4/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -8,23 +8,24 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "ignore": [
-      "Jenkinsfile.js",
-      "**/coverage/**",
-      "**/dist/**",
-      "**/es/**",
-      "**/locales/**",
-      "**/public/**",
-      "packages/bootstrap*",
-      "packages/bundles",
-      "packages/jquery*",
-      "packages/react-dnd-test-backend/index.js",
-      "packages/slickgrid",
-      "ui/shared/apollo-v3/possibleTypes.json",
-      "ui/shared/graphql/fragment-masking.ts",
-      "ui/shared/graphql/gql.ts",
-      "ui/shared/graphql/graphql.ts",
-      "schema.graphql"
+    "includes": [
+      "**",
+      "!**/Jenkinsfile.js",
+      "!**/coverage/**",
+      "!**/dist/**",
+      "!**/es/**",
+      "!**/locales/**",
+      "!**/public/**",
+      "!**/packages/bootstrap*",
+      "!**/packages/bundles",
+      "!**/packages/jquery*",
+      "!**/packages/react-dnd-test-backend/index.js",
+      "!**/packages/slickgrid",
+      "!**/ui/shared/apollo-v3/possibleTypes.json",
+      "!**/ui/shared/graphql/fragment-masking.ts",
+      "!**/ui/shared/graphql/gql.ts",
+      "!**/ui/shared/graphql/graphql.ts",
+      "!**/schema.graphql"
     ]
   },
   "formatter": {
@@ -32,9 +33,7 @@
     "indentWidth": 2,
     "indentStyle": "space"
   },
-  "organizeImports": {
-    "enabled": false
-  },
+  "assist": { "actions": { "source": { "organizeImports": "off" } } },
   "linter": {
     "enabled": false
   },

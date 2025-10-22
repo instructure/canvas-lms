@@ -121,9 +121,22 @@ describe('HelpLinks', () => {
   })
 
   it('renders a "NEW" pill when a link is tagged with is_new', () => {
+    const expectedPillId = `help-link-${newLink.id}`
     queryClient.setQueryData(['helpLinks'], [newLink])
-    const {queryByText} = render(<HelpLinks {...props} />)
-    expect(queryByText('NEW')).toBeInTheDocument()
+    const {queryByText, getByText} = render(<HelpLinks {...props} />)
+
+    // Verify the "NEW" pill is rendered
+    const pillElement = queryByText('NEW')?.closest('span')
+    expect(pillElement).toBeInTheDocument()
+    expect(pillElement).toHaveTextContent('NEW')
+
+    // Verify that the pill has the right id
+    const pillId = pillElement?.getAttribute('id')
+    expect(pillId).toBe(expectedPillId)
+
+    // Verify the Link has the corresponding aria-describedby attribute
+    const linkElement = getByText('Google')
+    expect(linkElement).toHaveAttribute('aria-describedby', expectedPillId)
   })
 
   it('does not render a "NEW" pill if there is no link tagged with is_new', () => {

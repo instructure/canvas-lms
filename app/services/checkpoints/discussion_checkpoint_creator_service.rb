@@ -39,7 +39,15 @@ class Checkpoints::DiscussionCheckpointCreatorService < Checkpoints::DiscussionC
       checkpoint = @assignment.sub_assignments.create!(checkpoint_attributes)
       Checkpoints::DateOverrideCreatorService.call(checkpoint:, overrides: override_dates) if override_dates.any?
       update_assignment
+      sync_parent_dates_from_checkpoint(checkpoint)
       checkpoint
     end
+  end
+
+  def sync_parent_dates_from_checkpoint(checkpoint)
+    changed_attributes = SubAssignment::SUB_ASSIGNMENT_SYNC_ATTRIBUTES.index_with do |attr|
+      [nil, checkpoint.send(attr)]
+    end
+    @assignment.update_from_sub_assignment(changed_attributes) if changed_attributes.present?
   end
 end

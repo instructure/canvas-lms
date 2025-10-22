@@ -211,7 +211,7 @@ describe('FilePreview', () => {
     expect(screen.queryByTestId('originality_report')).not.toBeInTheDocument()
   })
 
-  it('renders the Document Processors column header and AssetReportStatus when asset processors and reports are available', async () => {
+  it('renders the Document Processors column header and LtiAssetReportStatus when asset processors and reports are available', async () => {
     const user = userEvent.setup()
 
     // Mock the GraphQL query to return fixture data with reports for each file

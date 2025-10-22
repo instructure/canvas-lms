@@ -17,14 +17,53 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import AssignmentTabs from '../AssignmentTabs'
+import {TeacherAssignmentType} from '@canvas/assignments/graphql/teacher/AssignmentTeacherTypes'
+
+const mockAssignment: TeacherAssignmentType = {
+  id: '1',
+  name: 'Test Assignment',
+  course: {
+    lid: '1',
+  },
+  peerReviews: {
+    enabled: true,
+  },
+} as TeacherAssignmentType
 
 describe('AssignmentTabs', () => {
   it('renders tabs', () => {
-    render(<AssignmentTabs />)
+    render(<AssignmentTabs assignment={mockAssignment} />)
 
     expect(screen.getByTestId('assignment-tab')).toBeInTheDocument()
     expect(screen.getByTestId('peer-review-tab')).toBeInTheDocument()
+  })
+
+  describe('PeerReviewDetailsView', () => {
+    it('renders PeerReviewDetailsView when Peer Review tab is selected and user has permissions', async () => {
+      const user = userEvent.setup()
+      render(<AssignmentTabs assignment={mockAssignment} />)
+
+      const peerReviewTab = screen.getByTestId('peer-review-tab')
+      await user.click(peerReviewTab)
+
+      waitFor(() => {
+        expect(screen.getByTestId('peer-review-details-view')).toBeInTheDocument()
+      })
+    })
+
+    it('does not render PeerReviewDetailsView when user lacks permissions', async () => {
+      const user = userEvent.setup()
+      render(<AssignmentTabs assignment={mockAssignment} />)
+
+      const peerReviewTab = screen.getByTestId('peer-review-tab')
+      await user.click(peerReviewTab)
+
+      waitFor(() => {
+        expect(screen.queryByTestId('peer-review-details-view')).not.toBeInTheDocument()
+      })
+    })
   })
 })

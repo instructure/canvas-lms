@@ -16,55 +16,52 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
+import CreateEditAllocationRuleModal from './CreateEditAllocationRuleModal'
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconEditLine, IconTrashLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {CourseStudent} from '../graphql/hooks/useAssignedStudents'
+import {AllocationRuleType} from '../graphql/teacher/AssignmentTeacherTypes'
 
 const I18n = createI18nScope('peer_review_allocation_rule_card')
-
-export type AllocationRuleType = {
-  id: string
-  reviewer: CourseStudent
-  reviewee: CourseStudent
-  mustReview: boolean
-  reviewPermitted: boolean
-  appliesToReviewer: boolean
-}
 
 const AllocationRuleCard = ({
   rule,
   canEdit,
+  assignmentId,
+  refetchRules,
 }: {
   rule: AllocationRuleType
   canEdit: boolean
+  assignmentId: string
+  refetchRules: (ruleId: string, isNewRule?: boolean) => void
 }): React.ReactElement => {
-  const {mustReview, reviewPermitted, appliesToReviewer, reviewer, reviewee} = rule
+  const {mustReview, reviewPermitted, appliesToAssessor, assessor, assessee} = rule
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
   const formatRuleDescription = () => {
-    if (appliesToReviewer) {
+    if (appliesToAssessor) {
       if (mustReview && reviewPermitted) {
-        return I18n.t('Must review %{subject}', {subject: reviewee.name})
+        return I18n.t('Must review %{subject}', {subject: assessee.name})
       } else if (mustReview && !reviewPermitted) {
-        return I18n.t('Must not review %{subject}', {subject: reviewee.name})
+        return I18n.t('Must not review %{subject}', {subject: assessee.name})
       } else if (!mustReview && reviewPermitted) {
-        return I18n.t('Should review %{subject}', {subject: reviewee.name})
+        return I18n.t('Should review %{subject}', {subject: assessee.name})
       } else {
-        return I18n.t('Should not review %{subject}', {subject: reviewee.name})
+        return I18n.t('Should not review %{subject}', {subject: assessee.name})
       }
     } else {
       if (mustReview && reviewPermitted) {
-        return I18n.t('Must be reviewed by %{subject}', {subject: reviewer.name})
+        return I18n.t('Must be reviewed by %{subject}', {subject: assessor.name})
       } else if (mustReview && !reviewPermitted) {
-        return I18n.t('Must not be reviewed by %{subject}', {subject: reviewer.name})
+        return I18n.t('Must not be reviewed by %{subject}', {subject: assessor.name})
       } else if (!mustReview && reviewPermitted) {
-        return I18n.t('Should be reviewed by %{subject}', {subject: reviewer.name})
+        return I18n.t('Should be reviewed by %{subject}', {subject: assessor.name})
       } else {
-        return I18n.t('Should not be reviewed by %{subject}', {subject: reviewer.name})
+        return I18n.t('Should not be reviewed by %{subject}', {subject: assessor.name})
       }
     }
   }
@@ -74,7 +71,7 @@ const AllocationRuleCard = ({
       <Flex direction="column">
         <Flex.Item padding="none small" margin="small none xx-small none">
           <Text size="content" wrap="break-word">
-            {appliesToReviewer ? reviewer.name : reviewee.name}{' '}
+            {appliesToAssessor ? assessor.name : assessee.name}{' '}
           </Text>
           <br />
           <Text color="secondary" size="contentSmall" wrap="break-word">
@@ -87,7 +84,8 @@ const AllocationRuleCard = ({
             <Flex>
               <Flex.Item padding="small none x-small small">
                 <IconButton
-                  data-testid="edit-allocation-rule-button"
+                  id={`edit-rule-button-${rule._id}`}
+                  data-testid={`edit-rule-button-${rule._id}`}
                   renderIcon={<IconEditLine color="brand" />}
                   withBackground={false}
                   withBorder={false}
@@ -95,7 +93,7 @@ const AllocationRuleCard = ({
                   screenReaderLabel={I18n.t('Edit Allocation Rule: %{rule}', {
                     rule: formatRuleDescription(),
                   })}
-                  onClick={() => {}} // TODO [EGG-1627]: Open edit allocation rule modal
+                  onClick={() => setIsEditModalOpen(true)}
                 />
               </Flex.Item>
               <Flex.Item padding="small none x-small">
@@ -115,6 +113,15 @@ const AllocationRuleCard = ({
           </Flex.Item>
         )}
       </Flex>
+      <CreateEditAllocationRuleModal
+        rule={rule}
+        isOpen={isEditModalOpen}
+        isEdit={true}
+        setIsOpen={setIsEditModalOpen}
+        assignmentId={assignmentId}
+        courseId={ENV.COURSE_ID}
+        refetchRules={refetchRules}
+      />
     </View>
   )
 }

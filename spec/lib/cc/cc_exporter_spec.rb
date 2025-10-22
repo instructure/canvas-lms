@@ -1668,7 +1668,7 @@ describe "Common Cartridge exporting" do
     before do
       @export_dir = Dir.mktmpdir
       @zip_path = File.join(@export_dir, "test-export.zip")
-      @zip_file = Zip::File.new(@zip_path, Zip::File::CREATE)
+      @zip_file = Zip::File.new(@zip_path, create: true)
     end
 
     after do

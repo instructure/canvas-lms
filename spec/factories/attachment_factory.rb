@@ -93,11 +93,9 @@ module Factories
     fixture_file_upload(fixture_path, "image/png", true)
   end
 
-  def crocodocable_attachment_model(opts = {})
+  def canvadocable_attachment_model(opts = {})
     attachment_model({ content_type: "application/pdf" }.merge(opts))
   end
-
-  alias_method :canvadocable_attachment_model, :crocodocable_attachment_model
 
   def attachment_obj_with_context(obj, opts = {})
     @attachment = Attachment.create!(valid_attachment_attributes.merge(opts))

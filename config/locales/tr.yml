@@ -22,6 +22,7 @@ tr:
     headings: 
       page: "Yetki Yok"
     title: "Yetki Yok"
+  4th_grade_fdfaa9a9: "4. Sınıf"
   558x270_png_jpg_gif_c3faa839: "558x270 png, jpg, gif"
   558x558_png_jpg_gif_1_8x_the_standard_tile_size_so_c56cc472: "558x558 png, jpg, gif  (1.8x standart desen boyutu, bu sayede istenildiği gibi büyültülüp küçültülebilir)"
   AssignmentGroupCreateDialog: 
@@ -202,6 +203,7 @@ tr:
   a_front_page_is_required_fd57b80: "Bir Ön sayfa gerekiyor"
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "Canvas yönetim panelinin sağdaki kenar çubuğunda görünen tam ölçülü logo. İdeal boyutlar 360 x 140 pikseldir. Kabul edilen dosya formatları: svg, png, jepg, gif"
   a_great_discussion_6526a6d9: "Harika bir tartışma"
+  a_group_name_is_required_307c5aac: "Bir grup adı gerekli."
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Raporlayan kullanıcı için ilgi çekici ortam bilgisi barındırmada kullanışlı bir anahtar/değer yığını "
   a_json_url_is_required_please_supply_one_ed03101c: "Bir json url gereklidir, lütfen bir tane girin."
   a_locked_item_named_name_already_exists_in_this_lo_ab03ee39: "\"%{name}\" adına bir öğe zaten bu konumda mevcut. Lütfen teni bir ad giriniz."
@@ -4180,11 +4182,17 @@ tr:
         goBackToInclude: "Aşağıdakileri dahil etmek için geri dönmek ister misiniz:"
         notAllSectionsAssigned: "Bu öğeye tüm bölümler atanmayacak."
     name_is_required: "İsim zorunludur!"
+    next: Sonraki
+    next_month: "Sonraki Hafta"
+    next_week: "Gelecek Hafta"
     no_dates_error: "En az bir gün ve saat belirtmelisiniz"
     no_groups: "Hiç grup bulunamadı"
     no_users: "Hiç kullanıcı bulunamadı"
     ok: Tamam
     open_appointment_on_this_day: "Bugün için açık bir randevu var."
+    previous: Önceki
+    previous_month: "Önceki Hafta"
+    previous_week: "Önceki Hafta"
     prompts: 
       delete_assignment: "Bu ödevi silmek isteğinize emin misiniz?"
       delete_event: "Bu olayı silmek istediğinize emin misiniz?"
@@ -6247,6 +6255,7 @@ tr:
   course_sis_7ae8f649: "ders öbs"
   course_sis_df8b379: "Ders Öbs"
   course_sis_id_bbed1a60: "ders sis id"
+  course_sis_id_c026d0f3: "Ders ÖBS Numarası"
   course_sis_id_cd834b3c: "Ders ÖBS ID:"
   course_sis_id_sis_id_or_canvas_id_4d323f5c: "Ders ÖBS ID (ÖBS_ID:####) YA DA Canvas ID: (###)"
   course_start_date_daae16ae: "Ders Başlangıç Tarihi"
@@ -13549,6 +13558,7 @@ tr:
   next_page_d2a39853: "Sonraki Sayfa"
   next_steps_ce0f0d0c: "Sonraki Adımlar"
   next_student_79955068: "Sonraki Öğrenci"
+  next_week_9df347b3: "Gelecek Hafta"
   nickname_1e6da3ad: "Takma İsim"
   nickname_7df95b09: "Takma İsim:"
   no_74e9b590: hayır
@@ -14312,6 +14322,8 @@ tr:
   page_name_is_required_d8c2736e: "Sayfa Adı zounludur"
   page_not_found_2b0d05f5: "Sayfa bulunamadı"
   page_pagenum_20dbfeb8: "Sayfa %{pageNum}"
+  page_title: 
+    edit_ai_experience: "%{title}'yi düzenle"
   page_title_106304bb: "Sayfa başlığı"
   page_title_d1a22bbf: "Sayfa Başlığı"
   page_views: 
@@ -15021,6 +15033,7 @@ tr:
   previous_student_899a6732: "Önceki Öğrenci"
   previous_time_cc96b361: "Önceki (%{time})"
   previous_timestamp_19343a58: "Önceki (%{timestamp})"
+  previous_week_dddf1ef2: "Önceki Hafta"
   print_d0e3d53f: Yazdır
   priority_dd4381ee: Öncelik
   privacy_290109ea: Gizlilik
@@ -17094,12 +17107,14 @@ tr:
   remove_media_comment_f4afdb4b: "Medya yorumunu sil"
   remove_name_as_leader_3e03780a: "%{name}'i liderlikten kaldır"
   remove_name_from_group_487cce74: "Gruptan %{name}'i kaldır"
+  remove_never_drop_rule_b9d08c64: "Asla bırakma kuralını kaldır"
   remove_null_values_from_live_event_payloads_3c826f: "Etkinlik verilerinden boş değerleri kaldır"
   remove_row_c198da5a: "Satırı sil"
   remove_row_f9d59cba: "Satırı Sil"
   remove_these_dates_48453a81: "Bu Tarihleri Sil"
   remove_this_item_from_the_module_4b2ceab7: "Bu öğeyi modülden çıkar"
   remove_this_rubric_from_my_list_c7d80704: "Değerlendirme listesini listemden sil"
+  remove_unsaved_never_drop_rule_bde18827: "Kaydedilmemiş asla bırakma kuralını kaldır"
   remove_user_from_section_5556f465: "Kullanıcıyı Bölümden Sil"
   rename_45608f54: "Yeniden adlandır"
   rename_this_section_73065edd: "Bu Bölümü Yeniden Adlandır"
@@ -18879,6 +18894,7 @@ tr:
   student_sis_d9f0cd39: "öğrenci öbs"
   student_sis_id: "Öğrenci SIS ID"
   student_sis_id_abe6b292: "öğrenci öbs id"
+  student_sis_id_ae374b2c: "Öğrenci SIS ID"
   student_submissions_910da1b3: "Öğrenci Gönderimleri"
   student_summary: 
     student_summary_table_ascending: "Öğrenci Özet Tablosu %{sortText} e göre artan sıralı"

@@ -18,7 +18,7 @@
 
 import {useState} from 'react'
 import {useScope as i18nScope} from '@canvas/i18n'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import doFetchApi, {FetchApiError} from '@canvas/do-fetch-api-effect'
 const I18n = i18nScope('page_views')
 
 const EXPORT_TTL = 24 * 60 * 60 * 1000 // 24 hours
@@ -29,6 +29,7 @@ export enum AsyncPageViewJobStatus {
   Running = 'running',
   Finished = 'finished',
   Failed = 'failed',
+  Empty = 'empty',
 }
 export interface AsyncPageviewJob {
   query_id: string
@@ -62,12 +63,12 @@ export function useAsyncPageviewJobs(
   (value: AsyncPageviewJob[]) => void,
   () => Promise<boolean>,
   (user: string, jobName: string, startDate: string, endDate: string) => Promise<void>,
-  (record: AsyncPageviewJob) => string,
+  (record: AsyncPageviewJob) => Promise<string>,
 ] {
   const arr = getLocalJSONArray(key)
   const [jobs, _setJobs] = useState(arr.filter(notExpired))
   const BASE_URL = `/api/v1/users/${userid}/page_views`
-  //const BASE_URL = 'http://localhost:8081/api/v5/pageviews' // for local pv5 mock
+  //const BASE_URL = 'http://localhost:8082/api/v5/pageviews' // for local pv5 mock
 
   function setJobs(value: AsyncPageviewJob[]) {
     const filtered = value.filter(notExpired)
@@ -112,7 +113,16 @@ export function useAsyncPageviewJobs(
         return false
       }
       return jobs.filter(isInProgress).length > 0
-    } catch (_error) {
+    } catch (error) {
+      // remove the job if status is 410 or 404
+      if (error instanceof FetchApiError) {
+        if (error.response.status === 404 || error.response.status === 410) {
+          const updatedJobs = jobs.filter(record => record.query_id !== job.query_id)
+          setJobs(updatedJobs)
+          return false
+        }
+      }
+      // Other errors are considered intermittent, so we keep polling
       return true
     }
   }
@@ -146,8 +156,45 @@ export function useAsyncPageviewJobs(
     }
   }
 
-  function getDownloadUrl(record: AsyncPageviewJob): string {
-    return `${BASE_URL}/query/${record.query_id}/results`
+  async function getDownloadUrl(record: AsyncPageviewJob): Promise<string> {
+    const path = `${BASE_URL}/query/${record.query_id}/results`
+
+    try {
+      const {response} = await doFetchApi({
+        path,
+        method: 'HEAD',
+      })
+
+      // Check for 204 No Content (doFetchApi won't throw for this since it's 2xx)
+      if (response.status === 204) {
+        // No content, mark as empty
+        const updatedJobs = jobs.map(job =>
+          job.query_id === record.query_id ? {...job, status: AsyncPageViewJobStatus.Empty} : job,
+        )
+        setJobs(updatedJobs)
+        throw new FetchApiError('No content available for download', response)
+      }
+
+      // If we get here, it's a successful response (200), download is ready
+      return path
+    } catch (error) {
+      if (error instanceof FetchApiError) {
+        const status = error.response.status
+
+        // Handle job state updates based on response status for non-2xx responses
+        if (status === 404 || status === 410) {
+          // File not found or gone, remove from jobs
+          const updatedJobs = jobs.filter(job => job.query_id !== record.query_id)
+          setJobs(updatedJobs)
+        }
+
+        // For any error status, throw the FetchApiError for caller to handle
+        throw error
+      }
+
+      // For non-HTTP errors (network issues, etc.), wrap in a generic error
+      throw new Error(`Failed to check download status: ${error}`)
+    }
   }
 
   return [jobs, setJobs, pollJobs, postJob, getDownloadUrl]
@@ -164,6 +211,7 @@ export function notExpired(record: AsyncPageviewJob) {
 export function displayTTL(record: AsyncPageviewJob) {
   if (isInProgress(record)) return I18n.t('Not yet')
   if (record.status === 'failed') return '-'
+  if (record.status === 'empty') return '-'
 
   const age = new Date().getTime() - new Date(record.createdAt).getTime()
   const timeLeft = EXPORT_TTL - age
@@ -181,6 +229,7 @@ export function isInProgress(j: AsyncPageviewJob) {
 export function statusColor(j: AsyncPageviewJob) {
   if (j.status === AsyncPageViewJobStatus.Finished) return 'success'
   if (j.status === AsyncPageViewJobStatus.Failed) return 'warning'
+  if (j.status === AsyncPageViewJobStatus.Empty) return 'success'
   return 'info'
 }
 
@@ -189,5 +238,6 @@ export function statusDisplayName(j: AsyncPageviewJob) {
   if (j.status === AsyncPageViewJobStatus.Running) return I18n.t('In progress')
   if (j.status === AsyncPageViewJobStatus.Finished) return I18n.t('Completed')
   if (j.status === AsyncPageViewJobStatus.Failed) return I18n.t('Failed')
+  if (j.status === AsyncPageViewJobStatus.Empty) return I18n.t('Empty')
   return j.status
 }

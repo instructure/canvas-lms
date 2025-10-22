@@ -1823,6 +1823,9 @@
     "please_enter_a_file_name_f159edc1": {
         "message": "Silakan masukkan nama file"
     },
+    "please_enter_a_valid_video_url_from_a_supported_pl_30dc0596": {
+        "message": "Harap masukkan URL video yang valid dari platform yang didukung."
+    },
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "Silakan pilih file dari jenis yang didukung"
     },
@@ -1945,6 +1948,12 @@
     },
     "religion_icon_246e0be1": {
         "message": "Ikon Agama"
+    },
+    "remove_f47dc62a": {
+        "message": "Hapus"
+    },
+    "remove_filename_3ea029f6": {
+        "message": "Hapus { filename }"
     },
     "remove_heading_style_5fdc8855": {
         "message": "Hapus gaya heading"
@@ -2699,6 +2708,9 @@
     "video_player_for_title_ffd9fbc4": {
         "message": "Video player untuk { title }"
     },
+    "video_url_889d3263": {
+        "message": "URL Video"
+    },
     "vietnamese_e7a76583": {
         "message": "Vietnam"
     },
@@ -2824,6 +2836,9 @@
     },
     "your_webcam_may_already_be_in_use_6cd64c25": {
         "message": "Webcam Anda mungkin sudah digunakan."
+    },
+    "youtube_embed_url_5c1018d4": {
+        "message": "URL sematan YouTube"
     },
     "zeta_5ef24f0e": {
         "message": "Zeta"

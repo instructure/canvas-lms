@@ -22,9 +22,10 @@ class ObserverAlertsApiController < ApplicationController
   include Api::V1::ObserverAlert
 
   before_action :require_user
+  before_action :require_observer
 
   def alerts_by_student
-    all_alerts = @current_user
+    all_alerts = @observer
                  .as_observer_observer_alerts
                  .active
                  .where(student: params[:student_id])
@@ -37,21 +38,21 @@ class ObserverAlertsApiController < ApplicationController
       expired_account_notifications = AccountNotification.where(id: account_notification_ids).where(end_at: ...Time.zone.now).select(:id)
       student = User.find(params[:student_id])
 
-      all_alerts = all_alerts.belongs_to_enrolled(student, @current_user).where.not(context_id: deleted_account_notifications.or(expired_account_notifications), context_type: "AccountNotification")
+      all_alerts = all_alerts.belongs_to_enrolled(student, @observer).where.not(context_id: deleted_account_notifications.or(expired_account_notifications), context_type: "AccountNotification")
     else
       # avoid n+1, all alerts are for the same student, we don't need to check each one.
       all_alerts = []
     end
 
     alerts = Api.paginate(all_alerts, self, api_v1_observer_alerts_by_student_url)
-    render json: alerts.map { |alert| observer_alert_json(alert, @current_user, session) }
+    render json: alerts.map { |alert| observer_alert_json(alert, @observer, session) }
   end
 
   def alerts_count
     all_alerts = if params[:student_id]
-                   ObserverAlert.unread.where(observer: @current_user, student: params[:student_id])
+                   ObserverAlert.unread.where(observer: @observer, student: params[:student_id])
                  else
-                   ObserverAlert.unread.where(observer: @current_user)
+                   ObserverAlert.unread.where(observer: @observer)
                  end
 
     alerts = all_alerts.select(&:users_are_still_linked?)
@@ -61,7 +62,7 @@ class ObserverAlertsApiController < ApplicationController
 
   def update
     alert = ObserverAlert.find(params[:observer_alert_id])
-    return render_unauthorized_action unless alert.observer_id == @current_user.id && alert.users_are_still_linked?
+    return render_unauthorized_action unless alert.observer_id == @observer.id && alert.users_are_still_linked?
 
     case params[:workflow_state]
     when "read"
@@ -71,9 +72,16 @@ class ObserverAlertsApiController < ApplicationController
     end
 
     if alert.save
-      render json: observer_alert_json(alert, @current_user, session)
+      render json: observer_alert_json(alert, @observer, session)
     else
       render(json: alert.errors, status: :bad_request)
     end
+  end
+
+  private
+
+  def require_observer
+    @observer = api_find(User, params[:user_id])
+    render_unauthorized_action unless @current_user.grants_right?(@observer, :read_observer_alerts)
   end
 end

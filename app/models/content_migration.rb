@@ -646,10 +646,12 @@ class ContentMigration < ActiveRecord::Base
         data = JSON.parse(@zip_file.read("course_export.json"), max_nesting: 50)
         data = prepare_data(data)
 
-        if @zip_file.find_entry("all_files.zip")
+        if (e = @zip_file.find_entry("all_files.zip"))
           # the file importer needs an actual file to process
-          all_files_path = create_all_files_path(@exported_data_zip.path)
-          @zip_file.extract("all_files.zip", all_files_path)
+          dir, filename = File.split(@exported_data_zip.path)
+          all_files_path = create_all_files_path(filename)
+          e.extract(all_files_path, destination_directory: dir)
+          all_files_path = File.join(dir, all_files_path)
           data["all_files_export"]["file_path"] = all_files_path
         else
           data["all_files_export"]["file_path"] = nil

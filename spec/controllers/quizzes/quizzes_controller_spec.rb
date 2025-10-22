@@ -247,8 +247,9 @@ describe Quizzes::QuizzesController do
       expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to be(false)
     end
 
-    it "uses the ams service logic when the ams_service is enabled" do
-      @course.root_account.enable_feature!(:ams_service)
+    it "uses the ams service logic when the ams_root_account_integration and integrations are enabled" do
+      @course.root_account.enable_feature!(:ams_root_account_integration)
+      @course.enable_feature!(:ams_course_integration)
       user_session(@teacher)
 
       get "index", params: { course_id: @course.id }
@@ -262,7 +263,6 @@ describe Quizzes::QuizzesController do
 
     context "assign to differentiation tags" do
       before :once do
-        @course.account.enable_feature! :assign_to_differentiation_tags
         @course.account.tap do |a|
           a.settings[:allow_assign_to_differentiation_tags] = { value: true }
           a.save!
@@ -325,7 +325,7 @@ describe Quizzes::QuizzesController do
       let_once(:due_at) { 1.week.from_now }
       let_once(:course_assignments) do
         group = @course.assignment_groups.create(name: "some group")
-        (0..3).map do |i|
+        (0..5).map do |i|
           @course.assignments.create(
             title: "some assignment #{i}",
             assignment_group: group,
@@ -341,7 +341,7 @@ describe Quizzes::QuizzesController do
       end
 
       let_once(:workflow_states) do
-        %i[unpublished published unpublished published]
+        %i[unpublished published unpublished published unpublished published]
       end
 
       let_once(:tool) do
@@ -360,9 +360,20 @@ describe Quizzes::QuizzesController do
         @course.root_account.enable_feature! :quizzes_next
         @course.enable_feature! :quizzes_next
         @course.root_account.enable_feature! :newquizzes_on_quiz_page
-        # make the last two of course_assignments to be quiz_lti assignment
+        # make two course_assignments to be quiz_lti assignment
         (2..3).each { |i| course_assignments[i].quiz_lti! && course_assignments[i].save! }
+        # make two course_assignments to be quiz_lti survey
+        (4..5).each do |i|
+          course_assignments[i].quiz_lti!
+          course_assignments[i].new_quizzes_type = "graded_survey"
+          course_assignments[i].save!
+        end
         course_quizzes
+      end
+
+      before do
+        allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(true)
       end
 
       context "teacher interface" do
@@ -370,6 +381,7 @@ describe Quizzes::QuizzesController do
           user_session(@teacher)
           get "index", params: { course_id: @course.id }
           expect(controller.js_env[:QUIZZES][:assignment]).not_to be_nil
+          expect(controller.js_env[:QUIZZES][:surveys].count).to eq(2)
           expect(controller.js_env[:QUIZZES][:assignment].count).to eq(4)
 
           expect(
@@ -377,6 +389,32 @@ describe Quizzes::QuizzesController do
           ).to eq([
                     [course_assignments[2].id, due_at, "some assignment 2"],
                     [course_assignments[3].id, due_at, "some assignment 3"],
+                    [course_quizzes[0].id, nil, "quiz 1"],
+                    [course_quizzes[1].id, nil, "quiz 2"]
+                  ])
+          expect(
+            controller.js_env[:QUIZZES][:surveys].map { |x| [x[:id], x[:due_at], x[:title]] }
+          ).to eq([
+                    [course_assignments[4].id, due_at, "some assignment 4"],
+                    [course_assignments[5].id, due_at, "some assignment 5"],
+                  ])
+        end
+
+        it "lists new quiz surveys as assignments when new_quizzes_surveys feature flag is disabled" do
+          allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(false)
+          user_session(@teacher)
+          get "index", params: { course_id: @course.id }
+          expect(controller.js_env[:QUIZZES][:assignment]).not_to be_nil
+          expect(controller.js_env[:QUIZZES][:surveys].count).to eq(0)
+          expect(controller.js_env[:QUIZZES][:assignment].count).to eq(6)
+
+          expect(
+            controller.js_env[:QUIZZES][:assignment].map { |x| [x[:id], x[:due_at], x[:title]] }
+          ).to eq([
+                    [course_assignments[2].id, due_at, "some assignment 2"],
+                    [course_assignments[3].id, due_at, "some assignment 3"],
+                    [course_assignments[4].id, due_at, "some assignment 4"],
+                    [course_assignments[5].id, due_at, "some assignment 5"],
                     [course_quizzes[0].id, nil, "quiz 1"],
                     [course_quizzes[1].id, nil, "quiz 2"]
                   ])
@@ -391,7 +429,7 @@ describe Quizzes::QuizzesController do
             get "index", params: { course_id: @course.id }
 
             expect(controller.js_env[:QUIZZES][:options]).not_to be_nil
-            expect(controller.js_env[:QUIZZES][:options].count).to eq(4)
+            expect(controller.js_env[:QUIZZES][:options].count).to eq(6)
 
             controller.js_env[:QUIZZES][:options].each_value do |assignment_options|
               expect(assignment_options[:can_unpublish]).to be true
@@ -406,7 +444,7 @@ describe Quizzes::QuizzesController do
             get "index", params: { course_id: @course.id }
 
             expect(controller.js_env[:QUIZZES][:options]).not_to be_nil
-            expect(controller.js_env[:QUIZZES][:options].count).to eq(4)
+            expect(controller.js_env[:QUIZZES][:options].count).to eq(6)
 
             controller.js_env[:QUIZZES][:options].each_value do |assignment_options|
               expect(assignment_options[:can_unpublish]).to be false
@@ -432,10 +470,15 @@ describe Quizzes::QuizzesController do
           user_session(@student)
           get "index", params: { course_id: @course.id }
           expect(controller.js_env[:QUIZZES][:assignment]).not_to be_nil
+          expect(controller.js_env[:QUIZZES][:surveys]).not_to be_nil
           expect(controller.js_env[:QUIZZES][:assignment].count).to eq(2)
+          expect(controller.js_env[:QUIZZES][:surveys].count).to eq(1)
           expect(
             controller.js_env[:QUIZZES][:assignment].pluck(:id)
           ).to contain_exactly(course_quizzes[1].id, course_assignments[3].id)
+          expect(
+            controller.js_env[:QUIZZES][:surveys].pluck(:id)
+          ).to contain_exactly(course_assignments[5].id)
         end
       end
     end
@@ -538,7 +581,6 @@ describe Quizzes::QuizzesController do
 
     context "assign to differentiation tags" do
       before do
-        @course.account.enable_feature! :assign_to_differentiation_tags
         @course.account.tap do |a|
           a.settings[:allow_assign_to_differentiation_tags] = { value: true }
           a.save!
@@ -666,9 +708,10 @@ describe Quizzes::QuizzesController do
       expect(attach[:display_name]).to eq attachment.display_name
     end
 
-    context "when the ams_service is enabled" do
+    context "when the ams_root_account_integration and ams_course_integration are enabled" do
       before do
-        @course.root_account.enable_feature!(:ams_service)
+        @course.root_account.enable_feature!(:ams_root_account_integration)
+        @course.enable_feature!(:ams_course_integration)
         user_session(@teacher)
         course_quiz(true)
       end
@@ -692,7 +735,6 @@ describe Quizzes::QuizzesController do
 
     context "assign to differentiation tags" do
       before do
-        @course.account.enable_feature! :assign_to_differentiation_tags
         @course.account.tap do |a|
           a.settings[:allow_assign_to_differentiation_tags] = { value: true }
           a.save!

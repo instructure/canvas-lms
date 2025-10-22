@@ -172,7 +172,8 @@ export const validateModuleItemStudentRenderRequirements = (prevProps: any, next
     prevProps.title === nextProps.title &&
     prevProps.indent === nextProps.indent &&
     prevProps.index === nextProps.index &&
-    prevProps.smallScreen === nextProps.smallScreen
+    prevProps.smallScreen === nextProps.smallScreen &&
+    prevProps.published === nextProps.published
 
   if (!basicPropsEqual) return false
 
@@ -206,7 +207,6 @@ export const validateModuleItemStudentRenderRequirements = (prevProps: any, next
     prevProps.content?.id === nextProps.content?.id &&
     prevProps.content?.title === nextProps.content?.title &&
     prevProps.content?.type === nextProps.content?.type &&
-    prevProps.content?.published === nextProps.content?.published &&
     prevProps.content?.pointsPossible === nextProps.content?.pointsPossible &&
     prevProps.content?.dueAt === nextProps.content?.dueAt &&
     prevProps.content?.lockAt === nextProps.content?.lockAt &&
@@ -228,7 +228,7 @@ const compareCompletionRequirements = (prev: any[], next: any[]): boolean => {
       prevReq?.type !== nextReq?.type ||
       prevReq?.min_score !== nextReq?.min_score ||
       prevReq?.minScore !== nextReq?.minScore ||
-      prevReq?.completed !== nextReq?.completed
+      prevReq?.score !== nextReq?.score
     ) {
       return false
     }

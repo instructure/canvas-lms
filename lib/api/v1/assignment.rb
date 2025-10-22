@@ -669,9 +669,7 @@ module Api::V1::Assignment
     prepared_update = prepare_assignment_create_or_update(assignment, assignment_params, user, context)
     return false unless prepared_update[:valid]
 
-    if !assignment_params["due_at"].nil? && assignment["only_visible_to_overrides"]
-      assignment["only_visible_to_overrides"] = false
-    end
+    handle_only_visible_to_overrides!(assignment, assignment_params)
 
     cached_due_dates_changed = prepared_update[:assignment].update_cached_due_dates?
     response = :ok
@@ -1143,6 +1141,29 @@ module Api::V1::Assignment
   end
 
   private
+
+  # Checks whether the assignment's `only_visible_to_overrides` flag should be reset
+  # when a `due_at` param is provided, and applies the reset if conditions are met
+  def handle_only_visible_to_overrides!(assignment, params)
+    return unless params["due_at"].present? && assignment["only_visible_to_overrides"]
+
+    dates_unchanged = due_dates_unchanged?(assignment, params["due_at"])
+    param_only_visible = params["only_visible_to_overrides"]
+    visibility_unchanged = param_only_visible == assignment.only_visible_to_overrides
+
+    # Decide whether to reset if visibility flag changes or due dates change and they
+    # do not preserve visibility
+    should_reset = !visibility_unchanged || (!dates_unchanged && !param_only_visible)
+    assignment["only_visible_to_overrides"] = false if should_reset
+  end
+
+  def due_dates_unchanged?(assignment, due_at_param)
+    param_time = Time.zone.parse(due_at_param)
+    existing_time = assignment.due_at
+    param_time && existing_time && param_time.to_i == existing_time.to_i
+  rescue ArgumentError
+    due_at_param == assignment.due_at&.iso8601
+  end
 
   def final_grader_changes(assignment, assignment_params)
     no_changes = OpenStruct.new(grader_changed?: false)

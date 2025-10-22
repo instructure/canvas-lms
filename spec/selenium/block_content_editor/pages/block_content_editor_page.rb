@@ -17,10 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 require_relative "../../common"
-require_relative "../components/block_component"
+require_relative "../components/blocks/block_component"
 require_relative "../components/toolbar_component"
 require_relative "../components/preview_component"
-require_relative "../components/block_modes/block_component_factory"
+require_relative "../components/blocks/block_component_factory"
+require_relative "../components/settings_tray/settings_tray_component"
 
 module BlockContentEditorPage
   def add_block_modal_selector
@@ -28,6 +29,10 @@ module BlockContentEditorPage
   end
 
   def block_selector
+    "[data-testid='background-color-applier']"
+  end
+
+  def base_block_edit_layout_selector
     ".base-block-layout"
   end
 
@@ -83,36 +88,20 @@ module BlockContentEditorPage
     f("[data-testid='add-modal-add-to-page-button']")
   end
 
+  def page_title_input
+    f("#wikipage-title-input")
+  end
+
   def block_layout
     f(block_selector)
   end
 
-  def blocks(mode: :edit)
-    find_all_with_jquery(block_selector).map { |element| BlockComponentFactory.create(element, mode:) }
+  def blocks
+    find_all_with_jquery(block_selector).map { |element| BlockComponentFactory.create(element) }
   end
 
-  def edit_blocks
-    blocks(mode: :edit)
-  end
-
-  def preview_blocks
-    blocks(mode: :preview)
-  end
-
-  def settings_tray
-    f("[data-testid='settings-tray']")
-  end
-
-  def block(index = 0, mode: :edit)
-    blocks(mode:)[index]
-  end
-
-  def first_block(mode: :edit)
-    blocks(mode:).first
-  end
-
-  def last_block(mode: :edit)
-    blocks(mode:).last
+  def blocks_with_title
+    blocks.select { |block| block.respond_to?(:block_title) }
   end
 
   def toolbar_component
@@ -148,6 +137,11 @@ module BlockContentEditorPage
     click_block_option(block_items, block_item_name)
 
     add_to_page_button.click
+    wait_for_ajaximations
+  end
+
+  def click_outside_block
+    page_title_input.click
     wait_for_ajaximations
   end
 end

@@ -40,7 +40,7 @@ module Exporters
       Dir.mktmpdir do |dirname|
         zip_name = File.join(dirname, filename)
         files_in_zip = Set.new
-        Zip::File.open(zip_name, Zip::File::CREATE) do |zipfile|
+        Zip::File.open(zip_name, create: true) do |zipfile|
           # other user data will (hopefully) be included here in the future
           Exporters::SubmissionExporter.export_user_submissions(user, folder_name, zipfile, files_in_zip)
         end

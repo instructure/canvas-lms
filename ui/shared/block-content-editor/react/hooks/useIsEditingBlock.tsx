@@ -16,25 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useState, useEffect} from 'react'
 import {useNode} from '@craftjs/core'
-import {useBlockContentEditorContext} from '../BlockContentEditorContext'
+import {useAppSelector} from '../store'
 
 export const useIsEditingBlock = () => {
   const {id} = useNode()
-  const {editingBlock} = useBlockContentEditorContext()
-  const [isEditedViaEditButton, setIsEditedViaEditButton] = useState(false)
-  const isEditingBlock = editingBlock.id === id
-
-  useEffect(() => {
-    if (!isEditingBlock) {
-      setIsEditedViaEditButton(false)
+  return useAppSelector(state => {
+    const isEditing = state.editingBlock.id === id
+    return {
+      isEditing,
+      isEditingViaEditButton: isEditing && state.editingBlock.viaEditButton,
     }
-  }, [isEditingBlock])
-
-  return {
-    isEditingBlock,
-    isEditedViaEditButton,
-    setIsEditedViaEditButton,
-  }
+  })
 }

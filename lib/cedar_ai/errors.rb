@@ -20,5 +20,6 @@
 module CedarAi
   module Errors
     class GraderError < StandardError; end
+    class ConversationError < StandardError; end
   end
 end

@@ -225,6 +225,79 @@ describe('SelectContentDialog', () => {
     const dialogContainer = $dialog.closest('.ui-dialog')
     expect(dialogContainer.attr('aria-modal')).toBe('true')
   })
+
+  describe('secure_params handling', () => {
+    beforeEach(() => {
+      // Add the necessary elements for URL construction
+      fixtures!.innerHTML = `
+        <div id="context_external_tools_select">
+          <div class="tools">
+            <div id="test-tool" class="tool resource_selection"></div>
+          </div>
+        </div>
+        <a href="/courses/1/external_tools/{{ id }}/resource_selection" id="select_content_resource_selection_url"></a>
+        <div id="select_context_content_dialog"></div>
+      `
+      const $tool = $('#test-tool')
+      $tool.data('tool', {
+        name: 'mytool',
+        definition_id: '123',
+        placements: {
+          link_selection: {
+            message_type: 'ContentItemSelectionRequest',
+            url: 'http://example.com/launch',
+            title: 'My Tool',
+            selection_width: 800,
+            selection_height: 600,
+          },
+        },
+      })
+    })
+
+    it('does not include secure_params in URL when field is missing', () => {
+      // Call the function that builds the resource selection URL
+      callOnContextExternalToolSelect()
+
+      const $dialog = $('#resource_selection_dialog')
+      const iframeSrc = $dialog.find('#resource_selection_iframe').attr('src')
+
+      // Should not include undefined or empty secure_params
+      expect(iframeSrc).not.toContain('secure_params=undefined')
+      expect(iframeSrc).toContain('?placement=link_selection')
+      expect(iframeSrc).not.toMatch(/secure_params=(&|$)/)
+    })
+
+    it('does not include secure_params in URL when field is empty', () => {
+      // Add empty secure_params field
+      $('<input type="hidden" id="secure_params" value="" />').appendTo(fixtures!)
+
+      callOnContextExternalToolSelect()
+
+      const $dialog = $('#resource_selection_dialog')
+      const iframeSrc = $dialog.find('#resource_selection_iframe').attr('src')
+
+      // Should not include empty secure_params
+      expect(iframeSrc).not.toContain('secure_params=')
+      expect(iframeSrc).toContain('?placement=link_selection')
+    })
+
+    it('includes secure_params in URL when field has a value', () => {
+      // Add secure_params field with value
+      const secureParamsValue = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'
+      $(`<input type="hidden" id="secure_params" value="${secureParamsValue}" />`).appendTo(
+        fixtures!,
+      )
+
+      callOnContextExternalToolSelect()
+
+      const $dialog = $('#resource_selection_dialog')
+      const iframeSrc = $dialog.find('#resource_selection_iframe').attr('src')
+
+      // Should include the secure_params value
+      expect(iframeSrc).toContain(`secure_params=${secureParamsValue}`)
+      expect(iframeSrc).toContain('?placement=link_selection')
+    })
+  })
 })
 
 describe('SelectContentDialog: Dialog options', () => {

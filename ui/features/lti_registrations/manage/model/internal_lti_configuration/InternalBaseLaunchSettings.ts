@@ -17,8 +17,17 @@
  */
 
 import * as z from 'zod'
-import {ZLtiMessageType} from '../LtiMessageType'
+import {ZLtiMessageType, ZLtiPlacementlessMessageType} from '../LtiMessageType'
 import {ZLtiDisplayType} from './LtiDisplayType'
+
+export const ZMessageSetting = z.object({
+  type: ZLtiPlacementlessMessageType,
+  enabled: z.boolean(),
+  target_link_uri: z.string().optional(),
+  custom_fields: z.record(z.string()).optional(),
+})
+
+export type MessageSetting = z.infer<typeof ZMessageSetting>
 
 export const ZInternalBaseLaunchSettings = z.object({
   message_type: ZLtiMessageType.optional(),
@@ -59,13 +68,8 @@ export const ZInternalBaseLaunchSettings = z.object({
   allow_fullscreen: z.boolean().optional(),
   accept_media_types: z.string().optional().nullable(),
   use_tray: z.boolean().optional().nullable(),
-  eula: z
-    .object({
-      enabled: z.boolean(),
-      target_link_uri: z.string().optional(),
-      custom_fields: z.record(z.string()).optional(),
-    })
-    .optional(),
+
+  message_settings: z.array(ZMessageSetting).optional(),
 })
 
 export interface InternalBaseLaunchSettings extends z.infer<typeof ZInternalBaseLaunchSettings> {}

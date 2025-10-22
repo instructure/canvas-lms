@@ -3777,6 +3777,50 @@ RSpec.describe ApplicationController, "#cached_js_env_account_features" do
     flags = controller.cached_js_env_account_features
 
     expect(flags).to have_key(:course_pace_pacing_with_mastery_paths)
-    expect(flags).to have_key(:rce_studio_embed_improvements)
+  end
+
+  it "does not include course-level feature flags" do
+    flags = controller.cached_js_env_account_features
+
+    # rce_studio_embed_improvements is a course-level flag, so it shouldn't be in account features
+    expect(flags).not_to have_key(:rce_studio_embed_improvements)
+  end
+end
+
+RSpec.describe ApplicationController, "#add_ignite_agent_bundle?" do
+  let_once(:user) { user_factory(active_all: true) }
+  let_once(:account) { Account.default }
+
+  before do
+    controller.instance_variable_set(:@domain_root_account, account)
+    controller.instance_variable_set(:@current_user, user)
+    allow(controller).to receive(:session).and_return({})
+  end
+
+  it "returns false when no user is logged in" do
+    controller.instance_variable_set(:@current_user, nil)
+    expect(controller.send(:add_ignite_agent_bundle?)).to be false
+  end
+
+  it "returns false when ignite_agent_enabled feature is disabled" do
+    account.disable_feature!(:ignite_agent_enabled)
+    expect(controller.send(:add_ignite_agent_bundle?)).to be false
+  end
+
+  it "returns false when user lacks access_ignite_agent permission" do
+    account.enable_feature!(:ignite_agent_enabled)
+    expect(controller.send(:add_ignite_agent_bundle?)).to be false
+  end
+
+  it "returns true when user has access_ignite_agent permission" do
+    account.enable_feature!(:ignite_agent_enabled)
+    account.role_overrides.create!(
+      permission: :access_ignite_agent,
+      role: admin_role,
+      enabled: true
+    )
+    account.account_users.create!(user:, role: admin_role)
+
+    expect(controller.send(:add_ignite_agent_bundle?)).to be true
   end
 end

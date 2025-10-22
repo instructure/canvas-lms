@@ -2791,10 +2791,14 @@ ko:
         noDueDate: "기한 없음"
       modal: 
         chooseDueDate: "뒤로 가서 기한을 선택하시겠습니까?"
+    next: 다음
+    next_week: "다음 주"
     no_groups: "그룹 없음"
     no_users: "사용자 없음"
     ok: 확인
     open_appointment_on_this_day: "이 날에 공개 약속이 있음"
+    previous: 이전
+    previous_week: "이전 주"
     prompts: 
       delete_assignment: "이 과제를 삭제하시겠습니까?"
       delete_event: "이 행사를 삭제하시겠습니까?"
@@ -4262,6 +4266,7 @@ ko:
       section_enrollments: "섹션 등록"
   course_settings_f6d0bbf8: "과목 설정"
   course_setup_checklist_78dcff7e: "과목 설정 검사 목록"
+  course_sis_id_c026d0f3: "과목 SIS ID"
   course_statistics: 
     unknown: "알 수 없음"
   course_syllabus_5de1b0af: "과목 강의 계획"
@@ -5895,6 +5900,7 @@ ko:
   everyone_else_6c6dc7b6: "나머지 모든 사람"
   everyone_else_cc5f6888: "다른 모든 사람"
   example_84698b7d: 예
+  example_cb3509b8: "예:"
   exceeds_expectations_5910fc3a: "기대를 초과함"
   expand_all_bb64d2ea: "모두 확장"
   expires_7019786e: 만료일
@@ -9658,6 +9664,7 @@ ko:
   next_module_66f58e91: "다음 모듈"
   next_steps_ce0f0d0c: "다음 단계"
   next_student_79955068: "다음 학생"
+  next_week_9df347b3: "다음 주"
   no_active_user_with_that_id_was_found_b8fb5e14: "해당 ID를 가진 활성 사용자를 찾을 수 없습니다."
   no_assignment_selected_65d9e422: "선택한 과제 없음"
   no_assignments_found_2097cfc1: "과제를 찾을 수 없음"
@@ -10185,6 +10192,8 @@ ko:
     errors: 
       create_failed: "의견 생성 실패함"
   page_name_21defa75: "페이지 이름"
+  page_title: 
+    edit_ai_experience: "%{title} 편집"
   page_title_106304bb: "페이지 제목"
   page_title_d1a22bbf: "페이지 제목"
   page_views: 
@@ -10571,6 +10580,7 @@ ko:
   previous_assignment_cc8cf7f3: "이전 과제"
   previous_module_8801a74b: "이전 모듈"
   previous_student_899a6732: "이전 학생"
+  previous_week_dddf1ef2: "이전 주"
   print_grades_9d5dd50f: "평점 인쇄"
   priority_dd4381ee: "우선 순위"
   privacy_290109ea: "개인 정보"

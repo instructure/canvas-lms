@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "crocodoc"
-
 # See the uploads controller and views for examples on how to use this model.
 class Attachment < ActiveRecord::Base
   class UniqueRenameFailure < StandardError; end
@@ -125,7 +123,6 @@ class Attachment < ActiveRecord::Base
   has_many :thumbnails, foreign_key: "parent_id", inverse_of: :attachment
   has_many :children, foreign_key: :root_attachment_id, class_name: "Attachment", inverse_of: :root_attachment
   has_many :attachment_upload_statuses
-  has_one :crocodoc_document
   has_one :canvadoc
   belongs_to :usage_rights
   has_many :canvadocs_annotation_contexts, inverse_of: :attachment
@@ -999,13 +996,11 @@ class Attachment < ActiveRecord::Base
     Attachment.local_storage?
   end
 
-  HTML_MAX_PROXY_SIZE = 128.kilobytes
-  FLASH_MAX_PROXY_SIZE = 1.megabyte
-  CSS_MAX_PROXY_SIZE = 64.kilobytes
+  HTML_MAX_PROXY_SIZE = 510.kilobytes
+  CSS_MAX_PROXY_SIZE = 255.kilobytes
 
   def can_be_proxied?
     (mime_class == "html" && size < HTML_MAX_PROXY_SIZE) ||
-      (mime_class == "flash" && size < FLASH_MAX_PROXY_SIZE) ||
       (content_type == "text/css" && size < CSS_MAX_PROXY_SIZE)
   end
 
@@ -1808,7 +1803,6 @@ class Attachment < ActiveRecord::Base
         Attachments::Storage.store_for_attachment(att, File.open(file_removed_path))
       end
       attachment_ids = att.children_and_self.select(:id)
-      CrocodocDocument.where(attachment_id: attachment_ids).delete_all
       canvadoc_scope = Canvadoc.where(attachment_id: attachment_ids)
       CanvadocsSubmission.where(canvadoc_id: canvadoc_scope.select(:id)).delete_all
       AnonymousOrModerationEvent.where(canvadoc_id: canvadoc_scope.select(:id)).delete_all
@@ -2062,11 +2056,6 @@ class Attachment < ActiveRecord::Base
     self.file_state == "available"
   end
 
-  def crocodocable?
-    Canvas::Crocodoc.enabled? &&
-      CrocodocDocument::MIME_TYPES.include?(content_type)
-  end
-
   def canvadocable?
     for_assignment_or_submissions = folder&.for_submissions? || folder&.for_student_annotation_documents?
     canvadocable_mime_types = for_assignment_or_submissions ? Canvadoc.submission_mime_types : Canvadoc.mime_types
@@ -2099,19 +2088,9 @@ class Attachment < ActiveRecord::Base
   MAX_CANVADOCS_ATTEMPTS = 5
 
   def submit_to_canvadocs(attempt = 1, **opts)
-    # ... or crocodoc (this will go away soon)
     return if Attachment.skip_3rd_party_submits?
 
-    submit_to_crocodoc_instead = opts[:wants_annotation] &&
-                                 crocodocable? &&
-                                 !Canvadocs.annotations_supported?
-    if submit_to_crocodoc_instead
-      # get crocodoc off the canvadocs strand
-      # (maybe :wants_annotation was a dumb idea)
-      delay(n_strand: "crocodoc",
-            priority: Delayed::LOW_PRIORITY)
-        .submit_to_crocodoc(attempt)
-    elsif canvadocable?
+    if canvadocable?
       doc = canvadoc || create_canvadoc
       doc.upload({
                    annotatable: opts[:wants_annotation],
@@ -2135,26 +2114,6 @@ class Attachment < ActiveRecord::Base
       delay(n_strand: "canvadocs_retries",
             run_at: (5 * attempt).minutes.from_now,
             priority: Delayed::LOW_PRIORITY).submit_to_canvadocs(attempt + 1, **opts)
-    end
-  end
-
-  MAX_CROCODOC_ATTEMPTS = 5
-
-  def submit_to_crocodoc(attempt = 1)
-    if crocodocable? && !Attachment.skip_3rd_party_submits?
-      crocodoc = crocodoc_document || create_crocodoc_document
-      crocodoc.upload
-      update_attribute(:workflow_state, "processing")
-    end
-  rescue => e
-    update_attribute(:workflow_state, "errored")
-    Canvas::Errors.capture(e, type: :canvadocs, attachment_id: id)
-
-    if attempt <= MAX_CROCODOC_ATTEMPTS
-      delay(n_strand: "crocodoc_retries",
-            run_at: (5 * attempt).minutes.from_now,
-            priority: Delayed::LOW_PRIORITY)
-        .submit_to_crocodoc(attempt + 1)
     end
   end
 
@@ -2271,7 +2230,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def self.serialization_methods
-    %i[mime_class currently_locked crocodoc_available?]
+    %i[mime_class currently_locked]
   end
   cattr_accessor :skip_thumbnails
 
@@ -2436,10 +2395,6 @@ class Attachment < ActiveRecord::Base
     failed_retryable
   end
 
-  def crocodoc_available?
-    crocodoc_document.try(:available?)
-  end
-
   def canvadoc_available?
     canvadoc.try(:available?)
   end
@@ -2448,12 +2403,6 @@ class Attachment < ActiveRecord::Base
     return unless canvadocable?
 
     "/api/v1/canvadoc_session?#{preview_params(user, "canvadoc", opts, access_token:)}"
-  end
-
-  def crocodoc_url(user, opts = {})
-    return unless crocodoc_available?
-
-    "/api/v1/crocodoc_session?#{preview_params(user, "crocodoc", opts.merge(enable_annotations: true))}"
   end
 
   def previewable_media?

@@ -19,7 +19,7 @@
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {executeQuery} from '@canvas/graphql'
 import {gql} from 'graphql-tag'
-import {ANNOUNCEMENTS_PAGINATED} from '../constants'
+import {ANNOUNCEMENTS_PAGINATED_KEY} from '../constants'
 
 interface UpdateDiscussionReadStateVariables {
   discussionTopicId: string
@@ -70,13 +70,13 @@ export function useToggleAnnouncementReadState() {
     onMutate: async (variables: UpdateDiscussionReadStateVariables) => {
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
       await queryClient.cancelQueries({
-        queryKey: [ANNOUNCEMENTS_PAGINATED, currentUserId],
+        queryKey: [ANNOUNCEMENTS_PAGINATED_KEY, currentUserId],
       })
 
       // Snapshot the previous value
-      const previousData = queryClient.getQueryData([ANNOUNCEMENTS_PAGINATED, currentUserId])
+      const previousData = queryClient.getQueryData([ANNOUNCEMENTS_PAGINATED_KEY, currentUserId])
       // Optimistically update the cache
-      queryClient.setQueryData([ANNOUNCEMENTS_PAGINATED, currentUserId], (old: any) => {
+      queryClient.setQueryData([ANNOUNCEMENTS_PAGINATED_KEY, currentUserId], (old: any) => {
         if (!old) return old
         return old.map((announcement: any) => {
           if (announcement.id === variables.discussionTopicId) {
@@ -96,13 +96,13 @@ export function useToggleAnnouncementReadState() {
     onError: (_err, _variables, context) => {
       // If the mutation fails, use the context returned from onMutate to roll back
       if (context?.previousData) {
-        queryClient.setQueryData([ANNOUNCEMENTS_PAGINATED, currentUserId], context.previousData)
+        queryClient.setQueryData([ANNOUNCEMENTS_PAGINATED_KEY, currentUserId], context.previousData)
       }
     },
     onSettled: () => {
       // Always refetch after error or success to ensure consistency
       queryClient.invalidateQueries({
-        queryKey: [ANNOUNCEMENTS_PAGINATED, currentUserId],
+        queryKey: [ANNOUNCEMENTS_PAGINATED_KEY, currentUserId],
       })
     },
   })

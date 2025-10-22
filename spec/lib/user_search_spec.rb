@@ -1071,7 +1071,6 @@ describe UserSearch do
       StudentEnrollment.create!(user: user2, course:, workflow_state: "active")
       StudentEnrollment.create!(user: user3, course:, workflow_state: "active")
 
-      account.enable_feature!(:assign_to_differentiation_tags)
       allow(account).to receive(:allow_assign_to_differentiation_tags?).and_return(true)
     end
 
@@ -1114,13 +1113,7 @@ describe UserSearch do
         end
       end
 
-      describe "feature flag or setting not enabled" do
-        it "returns original users scope when assign_to_differentiation_tags feature is disabled" do
-          account.disable_feature!(:assign_to_differentiation_tags)
-          result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options_with_tag_id)
-          expect(result).to eq users_scope
-        end
-
+      describe "setting not enabled" do
         it "returns original users scope when account setting for assign to differentiation tags is disabled" do
           allow(account).to receive(:allow_assign_to_differentiation_tags?).and_return(false)
           result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options_with_tag_id)

@@ -3964,11 +3964,17 @@ he:
         goBackToInclude: "האם ברצנוך לחזור אחורנית כדי לכלול:"
         notAllSectionsAssigned: "פריט זה יוקצה לכל ההקבצות ."
     name_is_required: "דרוש שם!"
+    next: הבא
+    next_month: "החודש הבא"
+    next_week: "שבוע הבא"
     no_dates_error: "יש להגדיר לפחות תאריך וזמן אחד."
     no_groups: "לא נמצאו קבוצות"
     no_users: "לא נמצאו משתמשים"
     ok: OK
     open_appointment_on_this_day: "יש חלון פגישה פתוח ביום זה"
+    previous: קודם
+    previous_month: "החודש הקודם"
+    previous_week: "שבוע שעבר"
     prompts: 
       delete_assignment: "האם אתה בטוח שברצונך למחוק את המשימה?"
       delete_event: "האם אתה בטוח שאתה רוצה למחוק ארוע זה?"
@@ -5993,6 +5999,7 @@ he:
   course_sis_7ae8f649: "המערכת הבית ספרית של הקורס"
   course_sis_df8b379: "המערכת הבית ספרית של הקורס"
   course_sis_id_bbed1a60: "מזהה הקורס במערכת הבית ספרית"
+  course_sis_id_c026d0f3: "מזהה SIS של הקורס"
   course_sis_id_cd834b3c: "מזהה קורס במערכת הבית ספרית"
   course_sis_id_sis_id_or_canvas_id_4d323f5c: "מזהה קורס  מערכת בית ספרית או של קנבס  SIS ID (SIS_ID:####) OR Canvas ID: (###)"
   course_starts_at_3a01f9da: "קורס מתחיל ב"
@@ -13443,6 +13450,7 @@ he:
   next_month_749b1778: "החודש הבא"
   next_month_b55a387c: "חודש הבא"
   next_steps_ce0f0d0c: "הצעדים הבאים"
+  next_week_9df347b3: "שבוע הבא"
   nickname_1e6da3ad: "שם חיבה"
   nickname_7df95b09: "שם חיבה:"
   no_74e9b590: לא
@@ -14211,6 +14219,8 @@ he:
   page_name_21defa75: "שם דף"
   page_name_is_required_d8c2736e: "נדרש שם דף"
   page_not_found_2b0d05f5: "הדף לא נמצא"
+  page_title: 
+    edit_ai_experience: "עריכת %{title}"
   page_title_106304bb: "כותרת דף"
   page_title_d1a22bbf: "כותרת דף"
   page_views: 
@@ -14924,6 +14934,7 @@ he:
   previous_snapshots_d8cd4820: "צילומי מצב קודמים"
   previous_time_cc96b361: "קודם (%{time})"
   previous_timestamp_19343a58: "קודם (%{timestamp})"
+  previous_week_dddf1ef2: "שבוע שעבר"
   primary_brand_color_db79b428: "צבע מיתוג עיקרי"
   primary_button_3a98f4bc: "כפתור ראשי"
   primary_button_text_1f55d27b: "טקסט כפתור ראשי"
@@ -17022,6 +17033,7 @@ he:
   remove_media_comment_f4afdb4b: "הסרת תגובת מדיה"
   remove_name_as_leader_3e03780a: "הסרת %{name} מהובלה"
   remove_name_from_group_487cce74: "הסרת %{name} מהקבוצה"
+  remove_never_drop_rule_b9d08c64: "הסרת הכלל \"אין לדלג\""
   remove_recipient_name_a6b83cef: "הסרת נמען %{name}"
   remove_row_c198da5a: "הסרת שורה"
   remove_student_from_recipients_4b206e35: "הסרת %{student} מרשימת הנמענים"
@@ -17030,6 +17042,7 @@ he:
   remove_this_item_from_the_module_4b2ceab7: "הסרת פריט זה מהמודול"
   remove_this_rubric_from_my_list_c7d80704: "הסרת רובריקה זו מהרשימה שלי"
   remove_this_section_9a88ca43: "הסרת הקבצה זו"
+  remove_unsaved_never_drop_rule_bde18827: "הסרת כללי \"אין לדלג\" שלא נשמרו"
   remove_user_from_section_5556f465: "הסרת תלמיד מהקבצה"
   removed_user_as_group_leader_bb69330f: " %{user} הוסר כמוביל קבוצה"
   rename_45608f54: "שינוי שם"

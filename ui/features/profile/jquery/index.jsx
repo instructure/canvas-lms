@@ -21,7 +21,6 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {createRoot} from 'react-dom/client'
 import Pseudonym from '@canvas/pseudonyms/backbone/models/Pseudonym'
-import AvatarWidget from '@canvas/avatar-dialog-view'
 import '@canvas/jquery/jquery.ajaxJSON'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
@@ -350,8 +349,6 @@ $(document)
     }
   })
   .fragmentChange()
-
-new AvatarWidget('.profile_pic_link')
 
 $('#disable_mfa_link').click(function (event) {
   const $disable_mfa_link = $(this)

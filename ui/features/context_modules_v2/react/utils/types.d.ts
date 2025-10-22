@@ -106,7 +106,6 @@ export type ModuleItemContent = {
     | 'ExternalTool'
   pointsPossible?: number
   title?: string
-  published?: boolean
   canUnpublish?: boolean
   canDuplicate?: boolean
   canManageAssignTo?: boolean
@@ -181,24 +180,22 @@ export interface ModuleRequirement {
   type: string
   minScore?: number
   minPercentage?: number
-  completed?: boolean
+  score?: number
 }
 
 export interface ModuleProgression {
   id: string
   _id: string
-  workflowState: string
+  workflowState?: string
   completedAt?: string
   currentPosition?: number
   collapsed?: boolean
   requirementsMet: ModuleRequirement[]
   incompleteRequirements?: ModuleRequirement[]
-  current?: boolean
-  evaluatedAt?: string
-  completed: boolean
-  locked: boolean
-  unlocked: boolean
-  started: boolean
+  completed?: boolean
+  locked?: boolean
+  unlocked?: boolean
+  started?: boolean
 }
 
 export interface Prerequisite {

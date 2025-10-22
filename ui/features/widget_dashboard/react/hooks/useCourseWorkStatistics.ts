@@ -20,7 +20,7 @@ import {useQuery} from '@tanstack/react-query'
 import {gql} from 'graphql-tag'
 import type {CourseWorkSummary} from '../types'
 import {getCurrentUserId, executeGraphQLQuery, createUserQueryConfig} from '../utils/graphql'
-import {QUERY_CONFIG} from '../constants'
+import {COURSE_STATISTICS_KEY, QUERY_CONFIG} from '../constants'
 import {useWidgetDashboard} from './useWidgetDashboardContext'
 
 interface SubmissionStatistics {
@@ -140,7 +140,7 @@ export function useCourseWorkStatistics(params: CourseWorkStatisticsParams) {
 
   // Not including courseId in queryKey
   const queryKey = [
-    'courseStatistics',
+    COURSE_STATISTICS_KEY,
     params.startDate.toISOString(),
     params.endDate.toISOString(),
     observedUserId ?? undefined,

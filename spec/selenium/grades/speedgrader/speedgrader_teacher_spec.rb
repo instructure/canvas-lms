@@ -483,37 +483,4 @@ describe "SpeedGrader" do
       expect(f("#students_selectmenu-button")).to have_class("graded")
     end
   end
-
-  context "Crocodocable Submissions" do
-    # set up course and users
-    let(:test_course) { @course }
-    let(:student)     { user_factory(active_all: true) }
-    let!(:crocodoc_plugin) { PluginSetting.create! name: "crocodoc", settings: { api_key: "abc123" } }
-    let!(:enroll_student) do
-      test_course.enroll_user(student, "StudentEnrollment", enrollment_state: "active")
-    end
-    # create an assignment with online_upload type submission
-    let!(:assignment) { test_course.assignments.create!(title: "Assignment A", submission_types: "online_text_entry,online_upload") }
-    # submit to the assignment as a student twice, one with file and other with text
-    let!(:file_attachment) { attachment_model(content_type: "application/pdf", context: student) }
-    let!(:submit_with_attachment) do
-      assignment.submit_homework(
-        student,
-        submission_type: "online_upload",
-        attachments: [file_attachment]
-      )
-    end
-
-    it "displays a flash warning banner when viewed in Firefox", priority: "2" do
-      skip_if_chrome("This test applies to Firefox")
-      skip_if_ie("This test applies to Firefox")
-      # sometimes google docs is slow to load, which causes the flash
-      # message to go away before `get` finishes. we're not testing
-      # google docs here anyway, so ¯\_(ツ)_/¯
-      Account.default.disable_service(:google_docs_previews)
-      Account.default.save
-      get "/courses/#{test_course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}"
-      assert_flash_notice_message "Warning: Crocodoc has limitations when used in Firefox. Comments will not always be saved."
-    end
-  end
 end

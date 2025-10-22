@@ -158,10 +158,7 @@ export const transformRequirementsForTray = (
       id: req.id,
       name: moduleItem?.name || '',
       type: mappedType,
-      resource:
-        rawModuleItem?.content?.isNewQuiz || rawModuleItem?.content?.type == 'Quiz'
-          ? 'quiz'
-          : 'assignment',
+      resource: moduleItem?.resource || 'assignment',
       graded: rawModuleItem?.content?.graded,
       pointsPossible:
         moduleItem?.pointsPossible || String(rawModuleItem?.content?.pointsPossible || 0),
@@ -244,6 +241,7 @@ export const handleOpeningModuleUpdateTray = (
     requireSequentialProgress: currentModule?.requireSequentialProgress || false,
     publishFinalGrade: false,
     unlockAt: currentModule?.unlockAt,
+    published: currentModule?.published || false,
   }
 
   root.render(<DifferentiatedModulesTray {...(trayProps as any)} />)

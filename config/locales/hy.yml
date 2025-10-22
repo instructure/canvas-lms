@@ -3301,11 +3301,13 @@ hy:
         chooseDueDate: "Ցանկանո՞ւմ եք վերադառնալ և սահմանել կատարման վերջնաժամկետ:"
         goBackToInclude: "Կցանկանայի՞ք վերադառնալ ինչ-որ բան ներառելու համար"
         notAllSectionsAssigned: "Այս տարրը կնշանակվի ոչ բոլոր բաժինների համար "
+    next: Հաջորդը
     no_dates_error: "Դուք պետք է նշել առնվազն մեկ ամսաթիվ և ժամ"
     no_groups: "Խմբեր չեն գտնվել"
     no_users: "Օգտատերեր չեն գտնվել"
     ok: OK
     open_appointment_on_this_day: "Նշված օրվա համար բաց մնացած հանդիպում կա "
+    previous: Նախորդը
     prompts: 
       delete_assignment: "Դուք իսկապե՞ս ցանկանում եք ջնջել այս հանձնարարությունը:"
       delete_event: "Դուք իսկապե՞ս ցանկանում եք ջնջել այս միջոցառումը"
@@ -4990,6 +4992,7 @@ hy:
   course_setup_checklist_78dcff7e: "Դասընթացի տեղադրման ստուգիչ հարցեր"
   course_setup_wizard_is_showing_a7c087c1: "Ցույց է տրվում դասընթացի տեղադրման վիզարդը:"
   course_sis_id_bbed1a60: "դասընթացի sis id"
+  course_sis_id_c026d0f3: "Դասընթացի SIS ID"
   course_starts_at_3a01f9da: "Դասընթացն սկսվում է "
   course_statistics: 
     unknown: "անհայտ է "
@@ -6948,6 +6951,7 @@ hy:
   everyone_else_6c6dc7b6: "Մնացած բոլորը"
   everyone_else_cc5f6888: "Մնացած յուրաքանչյուրը"
   example_84698b7d: Օրինակ
+  example_cb3509b8: Օրինակ՝
   example_final_score_355aff0f: "Վերջնական գնահատականի օրինակ"
   example_final_score_a92b30b9: "Վերջնական գնահատականի օրինակ]]"
   example_https_example_com_config_xml_be5f36ac: "Օրինակ՝  https://example.com/config.xml"
@@ -12072,6 +12076,8 @@ hy:
       create_failed: "Մեկնաբանության ստեղծումը չհաջողվեց"
   page_name_21defa75: "Էջի անվանում"
   page_not_found_2b0d05f5: "Էջը չի գտնվել"
+  page_title: 
+    edit_ai_experience: "Խմբագրել %{title}"
   page_title_106304bb: "Էջի վերնագիրը"
   page_title_d1a22bbf: "Էջի անվանում"
   page_views: 
@@ -14683,12 +14689,14 @@ hy:
   remove_media_comment_f4afdb4b: "Հանել մուլտիմեդիա մեկնաբանությունը"
   remove_name_as_leader_3e03780a: " %{name} հանել առաջնորդությունից"
   remove_name_from_group_487cce74: " %{name} հանել խմբից"
+  remove_never_drop_rule_b9d08c64: "Հանել \"երբեք բաց չթողնել\" կանոնը"
   remove_recipient_name_a6b83cef: "Հեռացնել  %{name} ստացողին "
   remove_row_c198da5a: "Հանել տողը"
   remove_row_f9d59cba: "Հանել Տողը"
   remove_student_from_recipients_4b206e35: "Ջնջել %{student} -ին ստացողների ցանկից"
   remove_these_dates_48453a81: "Հեռացնել այս ամսաթվերը"
   remove_this_section_9a88ca43: "Ջնջել այս բաժինը"
+  remove_unsaved_never_drop_rule_bde18827: "Հանել չպահպանված՝ \"երբեք բաց չթողնել\" կանոնը"
   remove_user_from_section_5556f465: "Բաժնից ջնջել օգտատիրոջը "
   rename_45608f54: Վերանվանել
   rename_c_name_section_e0e92c97: "Վերանվանել %{c.name} բաժինը"

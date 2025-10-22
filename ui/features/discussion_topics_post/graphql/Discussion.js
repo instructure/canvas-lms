@@ -100,6 +100,7 @@ export const Discussion = {
         expanded
         summaryEnabled
         preferredLanguage
+        posted
       }
     }
     ${User.fragment}

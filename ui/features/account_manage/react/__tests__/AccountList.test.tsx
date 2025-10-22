@@ -54,20 +54,16 @@ describe('AccountLists', () => {
     await waitFor(() => expect(queryByText('acc1')).toBeTruthy())
   })
 
-  // FOO-4877: the mocked error is appearing in console, failing the test
-  it.skip('renders an error message when loading accounts fails', async () => {
-    fetchMock.get(
-      '/api/v1/accounts?include=course_count,sub_account_count&per_page=50&page=1',
-      () => {
-        throw Object.assign(new Error('mocked error'), {code: 402})
-      },
-    )
-    const {queryByText} = render(
+  it('renders an error message when loading accounts fails', async () => {
+    fetchMock.get('/api/v1/accounts?include=course_count,sub_account_count&per_page=50&page=1', 500)
+    const {getByText} = render(
       <MockedQueryProvider>
         <AccountList />
       </MockedQueryProvider>,
     )
-    await waitFor(() => expect(queryByText('Accounts could not be found')).toBeTruthy())
+    await waitFor(() =>
+      expect(getByText('Help us improve by telling us what happened')).toBeInTheDocument(),
+    )
   })
 
   it('renders when the API does not return the last page', async () => {

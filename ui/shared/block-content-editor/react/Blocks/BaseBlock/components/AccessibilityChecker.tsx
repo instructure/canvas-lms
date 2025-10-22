@@ -18,12 +18,12 @@
 
 import {ReactNode, useEffect} from 'react'
 import {useNode} from '@craftjs/core'
-import {useBlockContentEditorContext} from '../../../BlockContentEditorContext'
 import {checkHtmlContent} from '../../../accessibilityChecker/htmlChecker'
 import {debounce} from 'lodash'
 import {View} from '@instructure/ui-view'
-import {useInstUIRef} from '../useInstUIRef'
+import {useInstUIRef} from '../../../hooks/useInstUIRef'
 import {AccessibilityRule} from '../../../accessibilityChecker/types'
+import {useAccessibilityChecker} from '../../../hooks/useAccessibilityChecker'
 
 interface BaseBlockA11yWrapperProps {
   children: ReactNode
@@ -37,10 +37,7 @@ export function AccessibilityChecker({
   componentProps,
 }: BaseBlockA11yWrapperProps) {
   const [renderedContentRef, setRenderedContentRef] = useInstUIRef<Element>()
-
-  const {
-    accessibility: {addA11yIssues},
-  } = useBlockContentEditorContext()
+  const {addA11yIssues} = useAccessibilityChecker()
   const {id, blockName} = useNode(node => ({
     blockName: node.data.name,
   }))
@@ -52,6 +49,7 @@ export function AccessibilityChecker({
           renderedContentRef.current,
           customAccessibilityCheckRules,
         )
+        // TODO: check if node is still mounted?
         addA11yIssues(id, result.issues)
       }
     }, 600)

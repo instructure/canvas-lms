@@ -51,28 +51,15 @@ Paths below are relative to `canvas-lms` or `canvas-lms/ui/shared/lti-asset-proc
     GraphQL to fetch data
 
 ### Old Student Submission
-* Full data flow 1 (text entry)
-  1. Controller `app/controllers/submissions_base_controller.rb` sets `@asset_reports`
-  2. View `app/views/submissions/show.html.erb` sets `js_env ... ASSET_REPORTS` (`online_text_entry` only)
-  3. UI `ui/features/submissions/jquery/index.jsx` (non-React) gets from ENV, and (if mount point `asset_report_text_entry_status_container` rendered by view exists) renders
-  4. AP React Component `ui/features/submissions/react/TextEntryAssetReportStatusLink.tsx` 
-  5. That uses `StudentAssetReportModal` and `AssetReportStatus`
-* POST-REFACTOR: something simple will probably work, similar to new speedgrader single attachment/RCE
+* Frontend 1 -- Text Entry
+  1. View `app/views/submissions/show.html.erb` renders container div `asset_report_text_entry_status_container`
+  2. `ui/features/submissions/jquery/index.jsx` (non-React) renders `TextEntryAssetReportStatusLink` into that container div.
 
-* Full data flow 2 (attachment)
-  1. Controller `app/controllers/submissions/previews_base_controller.rb` sets `@asset_processors`
-  2. View `app/views/submissions/show_preview.html.erb` sets `js_env ... ASSET_REPORTS` and includes with `js_bundle`
-  3. feature `ui/features/submissions_show_preview_asset_report_status/` which reads from ENV and renders
-  4. AP React Component `OnlineUploadAssetReportStatusLink`
-  5. After clicking status link, data is passed via `ASSET_REPORT_MODAL_EVENT` postMessage to `StudentAssetReportModalWrapper` (rendered in `ui/features/submissions/jquery/index.jsx`)
-* POST-REFACTOR: need to render each attachment individual status (into non-React) and have send *postMessage* with particular attachment ID. postMessage has the data actually.
-change StudentAssetReportModal to be like ui/shared/lti-asset-processor/react/LtiAssetReportsForStudentSubmission.tsx but implement its own openModal -- doing the postMessage stuff
-
-* Note that `features/submissions_show_preview_asset_report_status` and
-  StudentAssetReportModalWrapper are in different iframes and use postMessage
-
-* Original implementation:
-  b57c8eba3abb32ea76db2fc105d3ddda44335544
-  and
-  bc16ceb8ca005f59e57b5f905618ad03e3f3df3a (text entry, both old + new pages)
-
+* Frontend 2 -- Attachment
+  * Part A -- Modal (on main window)
+      1. View `app/views/submissions/show.html.erb` renders container div `asset_report_modal`
+      2. `ui/features/submissions/jquery/index.jsx` renders `StudentAssetReportModalWrapper` into that iframe.
+      3. `StudentAssetReportModalWrapper` listens to postMessages with reports data to display. (see next part)
+  * Part B -- Status Links (inside iframe)
+    1. `app/views/submissions/show_preview.html.erb` renders container elements `asset-report-status-header` and `asset-report-status-container`.
+    2. `ui/features/submissions_show_preview_asset_report_status/react/index.tsx` renders into those divs (in particular, using the `LtiAssetReportStatus` component). This file also makes the status links send a `postMessage` when clicked, to open up the modal in the main window.

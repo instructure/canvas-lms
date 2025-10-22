@@ -397,6 +397,96 @@ describe "as a student" do
       end
     end
 
+    context "allowed attempts" do
+      before(:once) do
+        @assignment = @course.assignments.create!(
+          name: "Test Assignment",
+          submission_types: "online_text_entry",
+          allowed_attempts: 2,
+          points_possible: 10
+        )
+      end
+
+      context "with allowed_attempts on the assignment" do
+        it "prevents submitting if the student has exceeded the max number of attempts" do
+          @assignment.submit_homework(@student, body: "first attempt", submission_type: "online_text_entry")
+          @assignment.submit_homework(@student, body: "second attempt", submission_type: "online_text_entry")
+
+          user_session(@student)
+          StudentAssignmentPageV2.visit(@course, @assignment)
+          wait_for_ajaximations
+          expect(StudentAssignmentPageV2.assignment_title("Test Assignment")).to be_displayed
+
+          expect(StudentAssignmentPageV2.view).to include_text("2 Attempts")
+          expect(f("body")).not_to contain_css("button[data-testid='submit-button']")
+        end
+
+        it "allows submitting if the student has not exceeded the max number of attempts" do
+          user_session(@student)
+          StudentAssignmentPageV2.visit(@course, @assignment)
+          wait_for_ajaximations
+          expect(StudentAssignmentPageV2.assignment_title("Test Assignment")).to be_displayed
+
+          expect(StudentAssignmentPageV2.view).to include_text("2 Attempts")
+          expect(StudentAssignmentPageV2.submit_button).to be_displayed
+        end
+
+        it "shows the new attempt button when student has attempts remaining after submitting" do
+          assignment = @course.assignments.create!(
+            name: "Test Assignment",
+            submission_types: "online_text_entry",
+            allowed_attempts: 3,
+            points_possible: 10
+          )
+          assignment.submit_homework(@student, body: "first attempt", submission_type: "online_text_entry")
+
+          user_session(@student)
+          StudentAssignmentPageV2.visit(@course, assignment)
+          wait_for_ajaximations
+          expect(StudentAssignmentPageV2.assignment_title("Test Assignment")).to be_displayed
+
+          expect(StudentAssignmentPageV2.view).to include_text("3 Attempts")
+          expect(StudentAssignmentPageV2.new_attempt_button).to be_displayed
+        end
+      end
+
+      context "without allowed_attempts on the assignment" do
+        it "does not show attempt data when allowed_attempts is -1" do
+          assignment = @course.assignments.create!(
+            name: "Test Assignment",
+            submission_types: "online_text_entry",
+            allowed_attempts: -1,
+            points_possible: 10
+          )
+          assignment.submit_homework(@student, body: "first attempt", submission_type: "online_text_entry")
+
+          user_session(@student)
+          StudentAssignmentPageV2.visit(@course, assignment)
+          wait_for_ajaximations
+          expect(StudentAssignmentPageV2.assignment_title("Test Assignment")).to be_displayed
+
+          expect(StudentAssignmentPageV2.view).to include_text("Unlimited Attempts")
+          expect(StudentAssignmentPageV2.new_attempt_button).to be_displayed
+        end
+
+        it "shows unlimited attempts when allowed_attempts is null" do
+          assignment = @course.assignments.create!(
+            name: "Test Assignment",
+            submission_types: "online_text_entry",
+            points_possible: 10
+          )
+
+          user_session(@student)
+          StudentAssignmentPageV2.visit(@course, assignment)
+          wait_for_ajaximations
+          expect(StudentAssignmentPageV2.assignment_title("Test Assignment")).to be_displayed
+
+          expect(StudentAssignmentPageV2.view).to include_text("Unlimited Attempts")
+          expect(StudentAssignmentPageV2.submit_button).to_not be_disabled
+        end
+      end
+    end
+
     context "0 points possible assignments" do
       it "shows score/0 for points type assignments" do
         assignment = @course.assignments.create!(

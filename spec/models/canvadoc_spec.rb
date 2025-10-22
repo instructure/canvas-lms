@@ -118,8 +118,19 @@ describe "Canvadoc" do
       @attachment.user.crocodoc_id = 6
       canvadocs_api = @doc.send(:canvadocs_api)
 
-      expect(canvadocs_api).to receive(:session).with(anything, hash_including(user_crocodoc_id: @attachment.user.crocodoc_id)).and_return({})
+      expect(canvadocs_api).to receive(:session).with(anything, hash_including(user_crocodoc_id: @attachment.user.crocodoc_id.to_s)).and_return({})
       @doc.session_url(user: @attachment.user, enable_annotations: true)
+    end
+
+    it "stringifies ids" do
+      expect_any_instance_of(Canvadocs::API).to receive(:session) do |_m, _doc_id, opts|
+        expect(opts[:user_id]).to eq "30030000000000001"
+        expect(opts[:submission_user_ids]).to eq ["30030000000000002", "30030000000000003"]
+        { "id" => "blah", "status" => "pending" }
+      end
+      @doc.upload
+      @doc.session_url(user_id: 30_030_000_000_000_001,
+                       submission_user_ids: [30_030_000_000_000_002, 30_030_000_000_000_003])
     end
 
     context "if enhanced_docviewer_url_security feature flag set" do

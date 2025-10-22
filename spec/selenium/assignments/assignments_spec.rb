@@ -240,7 +240,7 @@ describe "assignments" do
       end
 
       def create_zip_file(zip_path, files)
-        Zip::File.open(zip_path, Zip::File::CREATE) do |zipfile|
+        Zip::File.open(zip_path, create: true) do |zipfile|
           files.each do |file|
             zipfile.add(File.basename(file), file)
           end

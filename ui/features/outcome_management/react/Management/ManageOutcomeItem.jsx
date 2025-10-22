@@ -34,6 +34,7 @@ import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {ratingsShape} from './shapes'
 import {REMOVE_PENDING} from '@canvas/outcomes/react/hooks/useOutcomesRemove'
 import descriptionType from '../shared/descriptionType'
+import OutcomeContextTag from '@canvas/outcome-context-tag'
 
 const I18n = createI18nScope('OutcomeManagement')
 
@@ -187,6 +188,12 @@ const ManageOutcomeItem = ({
               />
             </View>
           )}
+          <View as="div" padding="0 0 x-small">
+            <OutcomeContextTag
+              outcomeContextType={outcomeContextType}
+              outcomeContextId={outcomeContextId}
+            />
+          </View>
         </Flex.Item>
       </Flex>
     </View>

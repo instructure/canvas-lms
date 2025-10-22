@@ -110,6 +110,10 @@ const portalRouter = createBrowserRouter(
         lazy={() => import('../../features/account_reports/react/AccountReportsRoute')}
       />
       <Route
+        path="/accounts/:accountId/statistics"
+        lazy={() => import('../../features/account_statistics/AccountStatisticsRoute')}
+      />
+      <Route
         path="/profile/qr_mobile_login"
         lazy={() => import('../../features/qr_mobile_login/react/QRMobileLoginRoute')}
       />
@@ -118,14 +122,14 @@ const portalRouter = createBrowserRouter(
         lazy={() => import('../../features/all_courses/react/AllCoursesRoute')}
       />
 
-      {ENV.FEATURES.ams_service && (
+      {ENV.FEATURES.ams_root_account_integration && (
         <Route
           path="/courses/:courseId/quizzes/*"
           lazy={() => import('../../features/ams/react/AmsRoute')}
         />
       )}
 
-      {ENV.FEATURES.ams_service && (
+      {ENV.FEATURES.ams_root_account_integration && (
         <Route
           path="/courses/:courseId/item_banks/*"
           lazy={() => import('../../features/ams/react/AmsRoute')}

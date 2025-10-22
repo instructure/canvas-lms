@@ -248,16 +248,6 @@ lti_context_copy_notice:
       state: allowed_on
     ci:
       state: allowed_on
-lti_deep_linking_line_items:
-  state: hidden
-  display_name: LTI Deep Linking Line Items
-  description: If enabled, creates assignments from LineItems in deep link messages.
-  applies_to: RootAccount
-lti_deep_linking_module_index_menu_modal:
-  state: hidden
-  display_name: LTI Deep Linking for Module Index Menu
-  description: If enabled, allows deep linking from the module index via a modal.
-  applies_to: RootAccount
 lti_deployment_id_in_login_request:
   state: hidden
   applies_to: RootAccount
@@ -331,6 +321,19 @@ lti_registrations_discover_page:
     ci:
       state: allowed_on
   custom_transition_proc: lti_registrations_discover_page_hook
+lti_registrations_history:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: LTI Apps Page Improved History
+  description: |-
+    When enabled, the History tab on the Tool Details page will provide a more comprehensive view of changes
+    to an LTI registration and its availability.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 lti_registrations_next:
   state: hidden
   shadow: true
@@ -515,3 +518,17 @@ tune_lti_context_id_history_query:
     improve performance. Caution: for some accounts where this query
     doesn't already time out, enabling this may cause the query to take
     much longer and even time out.
+use_jwt_auth_for_utid_sync:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: "Use JWTs for UTID Syncing"
+  description: >-
+    If enabled, Canvas will use JWTs signed by a shared secret to authenticate with LearnPlatform
+    when syncing unified tool IDs (UTIDs).
+  environments:
+    development:
+      state: allowed_on
+    test:
+      state: allowed_on
+    ci:
+      state: allowed_on

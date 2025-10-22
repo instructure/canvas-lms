@@ -18,13 +18,7 @@
 
 import {TextBlock} from '../TextBlock'
 import {renderBlock} from '../../__tests__/render-helper'
-import {mockBlockContentEditorContext} from '../../../__tests__/mockBlockContentEditorContext'
 import {TextBlockProps} from '../types'
-
-jest.mock('../../../BlockContentEditorContext', () => ({
-  __esModule: true,
-  useBlockContentEditorContext: jest.fn(() => mockBlockContentEditorContext({})),
-}))
 
 const defaultProps: TextBlockProps = {
   title: 'Test Title',

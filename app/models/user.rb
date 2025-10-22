@@ -156,7 +156,7 @@ class User < ActiveRecord::Base
   has_many :developer_keys
   has_many :access_tokens, -> { where(workflow_state: ["active", "pending"]) }, inverse_of: :user, multishard: true
   has_many :masquerade_tokens, -> { where(workflow_state: "active") }, class_name: "AccessToken", inverse_of: :real_user
-  has_many :notification_endpoints, -> { merge(AccessToken.active) }, through: :access_tokens, multishard: true
+  has_many :notification_endpoints, through: :access_tokens, multishard: true
   has_many :context_external_tools, -> { order(:name) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :lti_results, inverse_of: :user, class_name: "Lti::Result", dependent: :destroy
   has_many :lti_registration_history_entries, inverse_of: :created_by, class_name: "Lti::RegistrationHistoryEntry", foreign_key: "created_by_id"
@@ -275,7 +275,7 @@ class User < ActiveRecord::Base
   has_many :lti_overlay_versions, class_name: "Lti::OverlayVersion", inverse_of: :created_by, dependent: :destroy
   has_many :lti_asset_processor_eula_acceptances, class_name: "Lti::AssetProcessorEulaAcceptance", inverse_of: :user, dependent: :destroy
 
-  has_many :comment_bank_items, -> { where("workflow_state<>'deleted'") }
+  has_many :comment_bank_items, -> { where("workflow_state<>'deleted'") }, multishard: true
   has_many :microsoft_sync_partial_sync_changes, class_name: "MicrosoftSync::PartialSyncChange", dependent: :destroy, inverse_of: :user
 
   has_many :gradebook_filters, inverse_of: :user, dependent: :destroy
@@ -1409,6 +1409,7 @@ class User < ActiveRecord::Base
       view_user_generated_access_tokens
       generate_observer_pairing_code
       update_speed_grader_settings
+      read_observer_alerts
     ]
 
     given { |user| user == self && user.user_can_edit_name? }
@@ -3346,6 +3347,8 @@ class User < ActiveRecord::Base
     end
   end
 
+  # despite the name being crocodoc_id, this is still used for DocViewer. It's also sometimes used for moderated grading
+  # ids as well. Renaming it would be too much work for now.
   def crocodoc_id!
     cid = crocodoc_id
     return cid if cid
@@ -3652,7 +3655,7 @@ class User < ActiveRecord::Base
     end
     roles << "student" if enrollment_types.intersect?(%w[StudentEnrollment StudentViewEnrollment])
     roles << "fake_student" if fake_student?
-    roles << "observer" if enrollment_types.intersect?(%w[ObserverEnrollment])
+    roles << "observer" if enrollment_types.include?("ObserverEnrollment")
     roles << "teacher" if enrollment_types.intersect?(%w[TeacherEnrollment TaEnrollment DesignerEnrollment])
     account_users = GuardRail.activate(:secondary) do
       root_account.cached_all_account_users_for(self)

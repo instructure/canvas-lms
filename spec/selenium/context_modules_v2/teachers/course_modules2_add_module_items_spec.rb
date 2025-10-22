@@ -293,6 +293,8 @@ describe "selective_release module item assign to tray", :ignore_js_errors do
         workflow_state: "active"
       )
 
+      @external_tool.context_external_tool_placements.create!(placement_type: "link_selection")
+
       go_to_modules
       wait_for_ajaximations
 

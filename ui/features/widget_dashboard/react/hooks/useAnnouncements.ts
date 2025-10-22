@@ -20,7 +20,7 @@ import {useInfiniteQuery} from '@tanstack/react-query'
 import {executeQuery} from '@canvas/graphql'
 import {gql} from 'graphql-tag'
 import type {Announcement} from '../types'
-import {ANNOUNCEMENTS_PAGINATED} from '../constants'
+import {ANNOUNCEMENTS_PAGINATED_KEY} from '../constants'
 import {useWidgetDashboard} from './useWidgetDashboardContext'
 
 interface UseAnnouncementsOptions {
@@ -105,7 +105,7 @@ export function usePaginatedAnnouncements(options: UseAnnouncementsOptions = {})
   const {observedUserId} = useWidgetDashboard()
 
   return useInfiniteQuery({
-    queryKey: [ANNOUNCEMENTS_PAGINATED, currentUserId, limit, filter, observedUserId],
+    queryKey: [ANNOUNCEMENTS_PAGINATED_KEY, currentUserId, limit, filter, observedUserId],
     queryFn: async ({pageParam}): Promise<{announcements: Announcement[]; pageInfo: any}> => {
       if (!currentUserId) {
         throw new Error('No current user ID found - please ensure you are logged in')

@@ -104,6 +104,22 @@ module CanvasOperations
       #
       # @param strategy [Symbol] the batch strategy to use
       attr_writer :batch_strategy
+
+      # Default to sending messages to both the log _and_ stdout if we're in a migration
+      # So that a developer running the migration can actually see if it fails.
+      def log_message(message, level: :info)
+        if ActiveRecord::Base.in_migration
+          if level == :debug
+            # Don't send to stdout
+          elsif [:warn, :error].include?(level)
+            warn message
+          else
+            puts message # rubocop:disable Rails/Output
+          end
+        end
+
+        super
+      end
     end
 
     protected
@@ -199,7 +215,7 @@ module CanvasOperations
           # Don't enqueue a bunch of no-op jobs (at the cost of an extra EXISTS query per batch)
           next unless scope.where(id: min_id..max_id).exists?
 
-          GuardRail.activate(:primary) { delay(n_strand:).process_range(min_id, max_id) }
+          GuardRail.activate(:primary) { delay_if_production(n_strand:).process_range(min_id, max_id) }
 
           wait_between_jobs
         end
@@ -235,7 +251,13 @@ module CanvasOperations
         end
       end
 
-      log_message("Wrote attachment audits: #{attachment_audits.join(", ")}") if record_changes?
+      if record_changes?
+        if attachment_audits.blank?
+          log_message("No audit attachments were written")
+        else
+          log_message("Wrote audit attachments: #{attachment_audits.join(", ")}")
+        end
+      end
     end
 
     # Returns a string representing the strand identifier for the current object,
@@ -256,7 +278,7 @@ module CanvasOperations
     end
 
     def ensure_valid_shard
-      raise Errors::InvalidOperationTarget, "DataFixup is being run on an invalid target: #{Shard.current.id}" unless valid_shard?
+      raise Errors::InvalidOperationTarget, "DataFixup is being run on a shard that has been excluded: #{Shard.current.id}" unless valid_shard?
     end
 
     def mode
@@ -272,12 +294,12 @@ module CanvasOperations
     end
 
     def wait_between_jobs
-      log_message("Sleeping between job scheduling for #{job_scheduled_sleep_time} seconds")
+      log_message("Sleeping between job scheduling for #{job_scheduled_sleep_time} seconds", level: :debug)
       sleep(job_scheduled_sleep_time) # rubocop:disable Lint/NoSleep
     end
 
     def wait_between_processing
-      log_message("Sleeping between processing for #{processing_sleep_time} seconds")
+      log_message("Sleeping between processing for #{processing_sleep_time} seconds", level: :debug)
       sleep(processing_sleep_time) # rubocop:disable Lint/NoSleep
     end
   end

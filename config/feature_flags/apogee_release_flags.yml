@@ -441,7 +441,7 @@ ai_rubrics:
   applies_to: Course
   root_opt_in: true
   beta: true
-  display_name: AI Generated Rubrics
+  display_name: IgniteAI Generator for Rubrics
   description: Give rubric creators the option to generate rubric criteria automatically based on an assignment description via a large language model (LLM).
 use_body_word_count:
   state: allowed_on # this is intentional. we want to enable this upon deploy so we start populating word count.
@@ -528,3 +528,10 @@ use_batches_score_metadata_updates:
       state: allowed_on
     development:
       state: allowed_on
+send_metrics_for_comment_bank_items_connection_limit_used:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Send Metrics for when Limit Arg is used on Comment Bank Items
+  shadow: true
+  description: |
+    Enables sending metrics when the `limit` argument is used on user_type.comment_bank_items_connection.

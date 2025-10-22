@@ -21,6 +21,7 @@ import {isOnlyTextSelected} from '../../contentInsertionUtils'
 import formatMessage from '../../../format-message'
 import {isStudioEmbeddedMedia} from './StudioLtiSupportUtils'
 import {parseUrlPath} from '../../../util/url-util'
+import {findMediaPlayerIframe} from './iframeUtils'
 
 const FILE_DOWNLOAD_PATH_REGEX = /^\/(courses\/\d+\/)?files\/\d+\/download$/
 
@@ -255,24 +256,4 @@ export function isVideoElement($element) {
 
 export function isAudioElement($element) {
   return isMediaElement($element, 'audio')
-}
-
-export function findMediaPlayerIframe(elem) {
-  if (!elem) return null
-
-  if (elem.tagName === 'IFRAME') {
-    // we have the iframe
-    return elem
-  }
-  if (elem.firstElementChild?.tagName === 'IFRAME') {
-    // we have the shim tinymce puts around the iframe
-    return elem.firstElementChild
-  }
-  if (elem.classList.contains('mce-shim')) {
-    // tinymce puts a <span class='mce-shin'> after the iframe (since v5, I think)
-    if (elem.previousSibling?.tagName === 'IFRAME') {
-      return elem.previousSibling
-    }
-  }
-  return null
 }

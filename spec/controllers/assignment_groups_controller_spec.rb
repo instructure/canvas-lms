@@ -72,6 +72,181 @@ describe AssignmentGroupsController do
       end
     end
 
+    context "checks new quizzes quiz type" do
+      let(:root_account) { Account.default }
+
+      before(:once) do
+        account_admin_user(account: root_account)
+      end
+
+      before do
+        course_with_teacher(active_all: true)
+        course_group
+        user_session(@admin)
+      end
+
+      context "when new_quizzes_surveys feature is enabled" do
+        before do
+          allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
+          allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(true)
+        end
+
+        it "excludes assignments with new_quizzes type ungraded_survey from the response" do
+          regular_assignment = @course.assignments.create!(
+            title: "Regular Assignment",
+            assignment_group: @group,
+            workflow_state: "published"
+          )
+          ungraded_survey_assignment = @course.assignments.create!(
+            title: "Ungraded Survey Assignment",
+            assignment_group: @group,
+            workflow_state: "published",
+            settings: {
+              "new_quizzes" => {
+                "type" => "ungraded_survey"
+              }
+            }
+          )
+          graded_quiz_assignment = @course.assignments.create!(
+            title: "Graded Quiz Assignment",
+            assignment_group: @group,
+            workflow_state: "published",
+            settings: {
+              "new_quizzes" => {
+                "type" => "graded_quiz"
+              }
+            }
+          )
+
+          get :index,
+              params: {
+                course_id: @course.id,
+                include: %w[assignments],
+              },
+              format: "json"
+
+          expect(response).to be_successful
+          group = json_parse(response.body).first
+          assignments = group["assignments"]
+          assignment_ids = assignments.pluck("id")
+          assignment_titles = assignments.pluck("name")
+
+          expect(assignment_ids).to include(regular_assignment.id)
+          expect(assignment_ids).to include(graded_quiz_assignment.id)
+          expect(assignment_ids).not_to include(ungraded_survey_assignment.id)
+
+          expect(assignment_titles).to include("Regular Assignment")
+          expect(assignment_titles).to include("Graded Quiz Assignment")
+          expect(assignment_titles).not_to include("Ungraded Survey Assignment")
+        end
+
+        it "includes assignments with null settings" do
+          assignment_null_settings = @course.assignments.create!(
+            title: "Assignment with Settings null",
+            assignment_group: @group,
+            workflow_state: "published",
+            settings: nil
+          )
+
+          get :index,
+              params: {
+                course_id: @course.id,
+                include: %w[assignments],
+              },
+              format: "json"
+
+          expect(response).to be_successful
+
+          group = json_parse(response.body).first
+          assignments = group["assignments"]
+          assignment_ids = assignments.pluck("id")
+
+          expect(assignment_ids).to include(assignment_null_settings.id)
+        end
+
+        it "includes assignments with settings->new_quizzes null" do
+          assignment_with_null_new_quizzes = @course.assignments.create!(
+            title: "Assignment with New Quizzes null",
+            assignment_group: @group,
+            workflow_state: "published",
+            settings: {
+              "new_quizzes" => nil
+            }
+          )
+          assignment_with_other_keys = @course.assignments.create!(
+            title: "Assignment with other keys",
+            assignment_group: @group,
+            workflow_state: "published",
+            settings: {
+              lockdown_browser: {
+                require_lockdown_browser: false
+              }
+            }
+          )
+
+          get :index,
+              params: {
+                course_id: @course.id,
+                include: %w[assignments],
+              },
+              format: "json"
+
+          expect(response).to be_successful
+
+          group = json_parse(response.body).first
+          assignments = group["assignments"]
+          assignment_ids = assignments.pluck("id")
+
+          expect(assignment_ids).to include(assignment_with_null_new_quizzes.id)
+          expect(assignment_ids).to include(assignment_with_other_keys.id)
+        end
+      end
+
+      context "when new_quizzes_surveys feature is disabled" do
+        before do
+          allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
+          allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(false)
+        end
+
+        it "includes all assignments including ungraded surveys when feature is disabled" do
+          regular_assignment = @course.assignments.create!(
+            title: "Regular Assignment",
+            assignment_group: @group,
+            workflow_state: "published"
+          )
+          ungraded_survey_assignment = @course.assignments.create!(
+            title: "Ungraded Survey Assignment",
+            assignment_group: @group,
+            workflow_state: "published",
+            settings: {
+              "new_quizzes" => {
+                "type" => "ungraded_survey"
+              }
+            }
+          )
+
+          get :index,
+              params: {
+                course_id: @course.id,
+                include: %w[assignments],
+              },
+              format: "json"
+
+          expect(response).to be_successful
+          group = json_parse(response.body).first
+          assignments = group["assignments"]
+          assignment_ids = assignments.pluck("id")
+          assignment_titles = assignments.pluck("name")
+
+          expect(assignment_ids).to include(regular_assignment.id)
+          expect(assignment_ids).to include(ungraded_survey_assignment.id)
+
+          expect(assignment_titles).to include("Regular Assignment")
+          expect(assignment_titles).to include("Ungraded Survey Assignment")
+        end
+      end
+    end
+
     describe "filtering by grading period and overrides" do
       let!(:assignment) { course.assignments.create!(name: "Assignment without overrides", due_at: Date.new(2015, 1, 15)) }
       let!(:assignment_with_override) do

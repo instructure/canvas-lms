@@ -27,12 +27,12 @@ group :test do
   gem "db-query-matchers", "~> 0.12"
   gem "rspec", "~> 3.12"
   gem "rspec_around_all", "0.2.0"
-  gem "rspec-rails", "~> 7.0"
+  gem "rspec-rails", "~> 8.0"
   gem "rspec-collection_matchers", "~> 1.2"
 
   gem "once-ler", "~> 2.0"
 
-  gem "rspec-openapi"
+  gem "rspec-openapi", "0.16.1" # pinned for now, because it breaks specs
   gem "selenium-webdriver", "~> 4.12", require: false
   gem "testrailtagging", "0.3.8.7", require: false
 
@@ -47,7 +47,7 @@ group :test do
   # pinned to 1.72 due to contract tests breaking with the following versions
   gem "pact_broker-client", "1.72"
   gem "database_cleaner", "~> 2.0"
-  gem "json-schema", "~> 5.0"
+  gem "json-schema", "~> 6.0"
 
   gem "rspecq", github: "instructure/rspecq"
   gem "flakey_spec_catcher", "~> 0.12", require: false

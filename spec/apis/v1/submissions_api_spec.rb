@@ -875,7 +875,7 @@ describe "Submissions API", type: :request do
     end
 
     it "does not return deleted sub assignment submissions" do
-      @sub1.destroy
+      @sub1.update(workflow_state: "deleted")
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student1.id}.json",
                       { controller: "submissions_api",
@@ -890,8 +890,8 @@ describe "Submissions API", type: :request do
     end
 
     it "returns empty array for sub_assignment_submissions when there are none" do
-      @sub1.destroy
-      @sub2.destroy
+      @sub1.update(workflow_state: "deleted")
+      @sub2.update(workflow_state: "deleted")
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student1.id}.json",
                       { controller: "submissions_api",
@@ -5972,7 +5972,7 @@ describe "Submissions API", type: :request do
     a = @course.assignments.create!
     a.submit_homework(@student,
                       submission_type: "online_upload",
-                      attachments: [crocodocable_attachment_model(context: @student)])
+                      attachments: [canvadocable_attachment_model(context: @student)])
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{a.id}/submissions?include[]=submission_history",
                     { course_id: @course.id.to_s,
@@ -5996,7 +5996,7 @@ describe "Submissions API", type: :request do
     a = @course.assignments.create!
     a.submit_homework(@student,
                       submission_type: "online_upload",
-                      attachments: [crocodocable_attachment_model(context: @student)])
+                      attachments: [canvadocable_attachment_model(context: @student)])
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{a.id}/submissions?include[]=submission_history",
                     { course_id: @course.id.to_s,
@@ -6037,49 +6037,6 @@ describe "Submissions API", type: :request do
                       include: %w[canvadoc_document_id] })
     canvadoc_document_id = a.submissions[0].attachments[0].canvadoc.document_id
     expect(json[0]["attachments"][0]["canvadoc_document_id"]).to eq canvadoc_document_id
-  end
-
-  it "includes crocodoc allowed ids in the preview url for attachments" do
-    allow(Canvas::Crocodoc).to receive(:config).and_return({ a: 1 })
-
-    course_with_teacher_logged_in active_all: true
-    student_in_course active_all: true
-    @user = @teacher
-    assignment = @course.assignments.create!(moderated_grading: true, grader_count: 1)
-    submission = assignment.submit_homework(@student,
-                                            submission_type: "online_upload",
-                                            attachments: [crocodocable_attachment_model(context: @student)])
-    provisional_grade = submission.find_or_create_provisional_grade!(@teacher, score: 1)
-    assignment.moderated_grading_selections
-              .where(student_id: @student.id).first
-              .update_attribute(:provisional_grade, provisional_grade)
-    provisional_grade.publish!
-    assignment.update(grades_published_at: 1.hour.ago)
-    submission.reload
-    submission.attachments.first.create_crocodoc_document(uuid: "1234",
-                                                          process_state: "PROCESSED")
-
-    url = "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/submissions?include[]=submission_history"
-    json = api_call(:get, url, { course_id: @course.id.to_s,
-                                 assignment_id: assignment.id.to_s,
-                                 action: "index",
-                                 controller: "submissions_api",
-                                 format: "json",
-                                 include: %w[submission_history] })
-
-    result_url = json.first.fetch("submission_history").first.fetch("attachments").first
-                     .fetch("preview_url")
-
-    @teacher.reload
-    @student.reload
-
-    parsed = URI.parse result_url
-    parsed_params = CGI.parse parsed.query
-    parsed_blob = JSON.parse parsed_params["blob"].first
-    expect(parsed.path).to eq "/api/v1/crocodoc_session"
-
-    expect(parsed_blob["moderated_grading_allow_list"]).to include(@student.moderated_grading_ids.as_json)
-    expect(parsed_blob["moderated_grading_allow_list"]).to include(@teacher.moderated_grading_ids.as_json)
   end
 
   def course_with_student_and_submitted_homework

@@ -473,7 +473,7 @@ class GroupCategoriesController < ApplicationController
   def import_tags
     return unless check_group_authorization(context: @context, current_user: @current_user, action_category: :add, non_collaborative: true)
 
-    unless @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+    unless @context.account.allow_assign_to_differentiation_tags?
       return render(json: { "status" => "unauthorized" }, status: :unauthorized)
     end
 
@@ -751,7 +751,7 @@ class GroupCategoriesController < ApplicationController
     GuardRail.activate(:secondary) do
       return unless check_group_authorization(context: @context, current_user: @current_user, action_category: :manage, non_collaborative: true)
 
-      unless @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+      unless @context.account.allow_assign_to_differentiation_tags?
         return render(json: { "status" => "unauthorized" }, status: :unauthorized)
       end
 

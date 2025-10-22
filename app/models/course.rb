@@ -181,6 +181,7 @@ class Course < ActiveRecord::Base
   has_many :combined_groups_and_differentiation_tags, class_name: "Group", as: :context, inverse_of: :context
   has_many :assignment_groups, -> { order("assignment_groups.position", AssignmentGroup.best_unicode_collation_key("assignment_groups.name")) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :assignments, -> { order("assignments.created_at") }, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :ai_experiences, dependent: :destroy
   has_many :calendar_events, -> { where("calendar_events.workflow_state<>'cancelled'") }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :submissions, -> { active.order("submissions.updated_at DESC") }, inverse_of: :course, dependent: :destroy
   has_many :submission_comments, -> { published }, as: :context, inverse_of: :context
@@ -1089,7 +1090,7 @@ class Course < ActiveRecord::Base
   scope :templates, -> { where(template: true) }
 
   scope :homeroom, -> { where(homeroom_course: true) }
-  scope :syncing_subjects, -> { joins("INNER JOIN #{Course.quoted_table_name} AS homeroom ON homeroom.id = courses.homeroom_course_id").where("homeroom.homeroom_course = true AND homeroom.workflow_state <> 'deleted'").where(sis_batch_id: nil).where(sync_enrollments_from_homeroom: true) }
+  scope :syncing_subjects, -> { joins("INNER JOIN #{Course.quoted_table_name} AS homeroom ON homeroom.id = courses.homeroom_course_id").where("homeroom.homeroom_course = true AND homeroom.workflow_state <> 'deleted'").where(sis_batch_id: nil).where(sync_enrollments_from_homeroom: true).where.not(workflow_state: "deleted") }
 
   scope :horizon, -> { where(horizon_course: true) }
   scope :not_horizon, -> { where(horizon_course: false) }
@@ -1608,8 +1609,8 @@ class Course < ActiveRecord::Base
     root_account.feature_enabled?(:disable_file_verifiers_in_public_syllabus)
   end
 
-  def access_for_attachment_association?(user, session, _association, location_param)
-    location_param.start_with?("course_syllabus_") && grants_right?(user, session, :read_syllabus)
+  def access_for_attachment_association?(user, session, _association)
+    grants_right?(user, session, :read_syllabus)
   end
 
   def home_page
@@ -2635,32 +2636,28 @@ class Course < ActiveRecord::Base
         pairing_id = opts[:temporary_enrollment_pairing_id]
       end
 
-      e = if opts[:allow_multiple_enrollments]
-            # For multiple enrollments, only look within current course
-            course_scope.where(course_section_id: section.id).first
-          else
-            # Try to find the enrollment in the current course, preferring the target section
-            course_scope.order(Arel.sql("course_section_id<>#{section.id}")).first ||
-              # Expand scope if needed to ALL courses for this section (handles cross-course constraint)
-              section_scope.where.not(course_id: id).first
-          end
+      # Try to find an existing enrollment for this user/role in the target section.
+      # If not found AND allow_multiple_enrollments is NOT set, fall back to any enrollment in this course.
+      # If still not found, check for an enrollment in the same physical section, but tied
+      # to another course via cross‑listing
+      e = course_scope.find_by(course_section_id: section.id)
+      e ||= course_scope.first unless opts[:allow_multiple_enrollments]
+      e ||= section_scope.where.not(course_id: id).first
 
       if e && (!e.active? || opts[:force_update])
         e.already_enrolled = true
-        # If the enrollment is in a different course due to crosslisting,
-        # we need to transfer it to this course.
-        if e.course_id != id
-          e.course_id = id
+        e.course_id = id if e.course_id != id # in case we found it via section_scope
+        e.sis_batch_id = nil if e.workflow_state == "deleted" # clear sis_batch_id so it can be reimported
+
+        desired_workflow_state = e.is_a?(StudentViewEnrollment) ? "active" : enrollment_state
+        needs_state_change = e.completed? || e.rejected? || e.deleted? || e.workflow_state != desired_workflow_state
+
+        if e.course_section_id != section.id && (needs_state_change || e.saved_change_to_course_id?)
           e.course_section = section
         end
-        if e.workflow_state == "deleted"
-          e.sis_batch_id = nil
-        end
-        if e.completed? || e.rejected? || e.deleted? || e.workflow_state != enrollment_state
-          e.attributes = {
-            course_section: section,
-            workflow_state: e.is_a?(StudentViewEnrollment) ? "active" : enrollment_state
-          }
+
+        if needs_state_change && e.workflow_state != desired_workflow_state
+          e.workflow_state = desired_workflow_state
         end
       end
       # if we're reusing an enrollment and +limit_privileges_to_course_section+ was supplied, apply it
@@ -3241,6 +3238,7 @@ class Course < ActiveRecord::Base
   TAB_ACCESSIBILITY = 22
   TAB_ITEM_BANKS = 23
   TAB_YOUTUBE_MIGRATION = 24
+  TAB_AI_EXPERIENCES = 25
 
   CANVAS_K6_TAB_IDS = [TAB_HOME, TAB_ANNOUNCEMENTS, TAB_GRADES, TAB_MODULES].freeze
   COURSE_SUBJECT_TAB_IDS = [TAB_HOME, TAB_SCHEDULE, TAB_MODULES, TAB_GRADES, TAB_GROUPS].freeze
@@ -3521,7 +3519,9 @@ class Course < ActiveRecord::Base
       tabs += default_tabs
       tabs += external_tabs
 
-      if root_account.feature_enabled?(:ams_service) && tabs.any? { |t| t[:label] == "Item Banks" }
+      if root_account.feature_enabled?(:ams_root_account_integration) &&
+         feature_enabled?(:ams_course_integration) &&
+         tabs.any? { |t| t[:label] == "Item Banks" }
         ams_item_banks_tab = {
           id: TAB_ITEM_BANKS,
           label: t("#tabs.item_banks", "Item Banks"),
@@ -3664,6 +3664,19 @@ class Course < ActiveRecord::Base
             # can't do any of the additional things required
             (!additional_checks[t[:id]] || !check_for_permission.call(*additional_checks[t[:id]]))
         end
+      end
+
+      # Add AI Experiences tab before Settings if feature flag is enabled
+      # AI Experiences is currently using assignment permissions until granular ai experiences permissions are created
+      if feature_enabled?(:ai_experiences) && check_for_permission.call(*RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+        settings_index = tabs.index { |t| t[:id] == TAB_SETTINGS }
+        settings_index ||= tabs.length
+        tabs.insert(settings_index, {
+                      id: TAB_AI_EXPERIENCES,
+                      label: t("#tabs.ai_experiences", "AI Experiences"),
+                      css_class: "ai_experiences",
+                      href: :course_ai_experiences_path
+                    })
       end
 
       # Add YouTube migration tab before Settings if conditions are met

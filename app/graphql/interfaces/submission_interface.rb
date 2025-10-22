@@ -314,19 +314,30 @@ module Interfaces::SubmissionInterface
     Loaders::HasAutoGradeResultsLoader.load(submission)
   end
 
+  field :has_sub_assignment_submissions, Boolean, null: true
+  def has_sub_assignment_submissions
+    load_association(:assignment).then do
+      next false unless object.assignment.checkpoints_parent?
+
+      result = Checkpoints::SubAssignmentSubmissionSerializer.serialize(assignment: object.assignment, user_id: submission.user_id)
+      result[:has_active_submissions]
+    end
+  end
+
   field :sub_assignment_submissions, [Types::SubAssignmentSubmissionType], null: true
   def sub_assignment_submissions
-    # TODO: remove this antipattern as soon as EGG-1372 is resolved
-    # data should not be created while fetching
-    # Code to use after EGG-1372 is resolved:
-    # Loaders::SubmissionLoaders::SubAssignmentSubmissionsLoader.load(object)
-
     load_association(:assignment).then do
       next nil unless object.assignment.checkpoints_parent?
 
       Loaders::AssociationLoader.for(Assignment, :sub_assignments).load(object.assignment).then do |sub_assignments|
-        sub_assignments&.map do |sub_assignment|
-          sub_assignment.find_or_create_submission(submission.user)
+        sub_assignments&.filter_map do |sub_assignment|
+          sub_assignment_submission = Checkpoints::SubAssignmentSubmissionSerializer.find_single_sub_assignment_submission(sub_assignment, submission.user_id)
+
+          if sub_assignment_submission.presence
+            sub_assignment_submission
+          else
+            nil
+          end
         end
       end
     end

@@ -31,6 +31,7 @@ import {executeQuery} from '@canvas/graphql'
 import {initializePendo} from '@canvas/pendo'
 import speedGrader from './jquery/speed_grader'
 import SGUploader from './sg_uploader'
+import getRCSProps from '@canvas/rce/getRCSProps'
 
 const I18n = createI18nScope('speed_grader')
 
@@ -78,11 +79,19 @@ ready(() => {
         permissions: {
           canViewAuditTrail: window.ENV.can_view_audit_trail ?? false,
           canManageGrades: window.ENV.MANAGE_GRADES ?? false,
+          canViewAllGrades: window.ENV.VIEW_ALL_GRADES ?? false,
         },
         gradebookGroupFilterId: window.ENV.gradebook_group_filter_id ?? null,
         gradebookSectionFilters: window.ENV.gradebook_section_filter_id ?? null,
         showInactiveEnrollments: window.ENV.show_inactive_enrollments ?? false,
         showConcludedEnrollments: window.ENV.show_concluded_enrollments ?? false,
+        userTimeZone:
+          window.ENV.TIMEZONE ||
+          Intl.DateTimeFormat().resolvedOptions().timeZone ||
+          window.ENV.CONTEXT_TIMEZONE ||
+          'UTC',
+        masquerade: window.ENV.masquerade ?? null,
+        rceTrayProps: getRCSProps(),
       },
       features: {
         a2StudentEnabled: window.ENV.A2_STUDENT_ENABLED ?? false,

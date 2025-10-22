@@ -25,6 +25,8 @@ const pluginReactCompiler = require('eslint-plugin-react-compiler')
 const execAsync = util.promisify(exec)
 const projectRoot = path.resolve(__dirname, '..')
 
+const DEFAULT_EXAMPLE_LIMIT = 3
+
 const colors = {
   reset: '\x1b[0m',
   red: '\x1b[31m',
@@ -50,6 +52,7 @@ function parseArgs() {
     sections: [],
     verbose: false,
     help: false,
+    limit: DEFAULT_EXAMPLE_LIMIT,
   }
 
   for (let i = 0; i < args.length; i++) {
@@ -72,6 +75,19 @@ function parseArgs() {
           i++ // Skip the next argument since we used it
         }
         break
+      case '-l':
+      case '--limit':
+        if (i + 1 >= args.length) {
+          console.error(colorize('red', 'Error: --limit requires a value'))
+          process.exit(1)
+        }
+        options.limit = Number.parseInt(args[i + 1], 10)
+        if (Number.isNaN(options.limit) || options.limit < 1) {
+          console.error(colorize('red', 'Error: --limit must be a positive number'))
+          process.exit(1)
+        }
+        i++ // Skip the next argument since we used it
+        break
     }
   }
 
@@ -86,6 +102,7 @@ Options:
   -h, --help                Show this help message
   -v, --verbose            Show all files instead of just examples
   -s, --section <n>     Show only specific section(s), comma-separated (e.g., skipped,proptypes)
+  -l, --limit <n>          Number of example files to show (default: ${DEFAULT_EXAMPLE_LIMIT})
 
 Available sections:
   skipped         - Skipped tests
@@ -104,6 +121,8 @@ Examples:
   node techdebt_stats.js -s skipped                    # Show only skipped tests
   node techdebt_stats.js -s proptypes,defaultprops     # Show multiple sections
   node techdebt_stats.js -s typescript -v              # Show TypeScript suppressions with verbose output
+  node techdebt_stats.js -l 10                         # Show 10 examples for each section
+  node techdebt_stats.js -s skipped -l 5               # Show 5 skipped test examples
 `)
   process.exit(0)
 }
@@ -111,7 +130,7 @@ Examples:
 const normalizePath = filePath => filePath.replace(/\/+/g, '/')
 
 // Helper function to get random examples
-function getRandomExamples(files, count = 3) {
+function getRandomExamples(files, count = DEFAULT_EXAMPLE_LIMIT) {
   if (files.length === 0) return []
   if (files.length <= count) return files.map(normalizePath)
 
@@ -119,7 +138,7 @@ function getRandomExamples(files, count = 3) {
   return shuffled.slice(0, count).map(normalizePath)
 }
 
-async function getMatchingFiles(searchPattern, verbose = false) {
+async function getMatchingFiles(searchPattern) {
   try {
     const {stdout} = await execAsync(
       `git ls-files "ui/" "packages/" | grep -E "${searchPattern}"`,
@@ -131,7 +150,7 @@ async function getMatchingFiles(searchPattern, verbose = false) {
   }
 }
 
-async function getGrepMatchingFiles(filePattern, grepPattern, verbose = false) {
+async function getGrepMatchingFiles(filePattern, grepPattern) {
   try {
     const cmd = `git ls-files "ui/" "packages/" | grep -E "${filePattern}" | xargs grep -l "${grepPattern}"`
     const {stdout} = await execAsync(cmd, {cwd: projectRoot})
@@ -141,9 +160,10 @@ async function getGrepMatchingFiles(filePattern, grepPattern, verbose = false) {
   }
 }
 
-async function countAndShowFiles(searchPattern, description, verbose = false) {
+async function countAndShowFiles(searchPattern, description, opts = {}) {
+  const {verbose = false, limit = DEFAULT_EXAMPLE_LIMIT} = opts
   try {
-    const files = await getMatchingFiles(searchPattern, verbose)
+    const files = await getMatchingFiles(searchPattern)
     const fileCount = files.length
 
     if (fileCount > 0) {
@@ -153,7 +173,7 @@ async function countAndShowFiles(searchPattern, description, verbose = false) {
           console.log(colorize('gray', `  ${file}`))
         })
       } else {
-        const examples = getRandomExamples(files, 3)
+        const examples = getRandomExamples(files, limit)
         examples.forEach(file => {
           console.log(colorize('gray', `  Example: ${file}`))
         })
@@ -166,7 +186,7 @@ async function countAndShowFiles(searchPattern, description, verbose = false) {
   }
 }
 
-async function countTsSuppressions(type, verbose = false) {
+async function countTsSuppressions(type) {
   try {
     const {stdout} = await execAsync(
       `git ls-files "ui/" | grep -E "\\.(ts|tsx)$" | xargs grep -l "@${type}" | wc -l`,
@@ -179,32 +199,34 @@ async function countTsSuppressions(type, verbose = false) {
   }
 }
 
-async function getRandomTsSuppressionFiles(type, verbose = false) {
+async function getRandomTsSuppressionFiles(type, opts = {}) {
+  const {limit = DEFAULT_EXAMPLE_LIMIT} = opts
   try {
     const {stdout} = await execAsync(
       `git ls-files "ui/" | grep -E "\\.(ts|tsx)$" | xargs grep -l "@${type}"`,
       {cwd: projectRoot},
     )
     const files = stdout.trim().split('\n').filter(Boolean)
-    return getRandomExamples(files, 3)
+    return getRandomExamples(files, limit)
   } catch (error) {
     console.error(colorize('red', `Error finding @${type} examples: ${error.message}`))
   }
   return []
 }
 
-async function showTsSuppressionStats(type, verbose = false) {
-  const count = await countTsSuppressions(type, verbose)
+async function showTsSuppressionStats(type, opts = {}) {
+  const {verbose = false, limit = DEFAULT_EXAMPLE_LIMIT} = opts
+  const count = await countTsSuppressions(type)
   console.log(colorize('yellow', `- Total files with @${type}: ${bold(count)}`))
 
   if (count > 0) {
-    const files = await getGrepMatchingFiles('\\.(ts|tsx)$', `@${type}`, verbose)
+    const files = await getGrepMatchingFiles('\\.(ts|tsx)$', `@${type}`)
     if (verbose) {
       files.sort().forEach(file => {
         console.log(colorize('gray', `  ${file}`))
       })
     } else {
-      const examples = await getRandomTsSuppressionFiles(type, verbose)
+      const examples = await getRandomTsSuppressionFiles(type, {limit})
       examples.forEach(file => {
         console.log(colorize('gray', `  Example: ${file}`))
       })
@@ -212,7 +234,7 @@ async function showTsSuppressionStats(type, verbose = false) {
   }
 }
 
-async function countJqueryImports(verbose = false) {
+async function countJqueryImports() {
   try {
     const cmd =
       'git ls-files "ui/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
@@ -225,22 +247,24 @@ async function countJqueryImports(verbose = false) {
   }
 }
 
-async function getRandomJqueryImportFiles(verbose = false) {
+async function getRandomJqueryImportFiles(opts = {}) {
+  const {limit = DEFAULT_EXAMPLE_LIMIT} = opts
   try {
     const cmd =
       'git ls-files "ui/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
       'xargs grep -l "from [\'\\"]jquery[\'\\"]"'
     const {stdout} = await execAsync(cmd, {cwd: projectRoot})
     const files = stdout.trim().split('\n').filter(Boolean)
-    return getRandomExamples(files, 3)
+    return getRandomExamples(files, limit)
   } catch (error) {
     console.error(colorize('red', `Error finding jQuery import examples: ${error.message}`))
   }
   return []
 }
 
-async function showJqueryImportStats(verbose = false) {
-  const count = await countJqueryImports(verbose)
+async function showJqueryImportStats(opts = {}) {
+  const {verbose = false, limit = DEFAULT_EXAMPLE_LIMIT} = opts
+  const count = await countJqueryImports()
   console.log(colorize('yellow', `- Files with jQuery imports: ${bold(count)}`))
 
   if (count > 0) {
@@ -254,7 +278,7 @@ async function showJqueryImportStats(verbose = false) {
         console.log(colorize('gray', `  ${file}`))
       })
     } else {
-      const examples = await getRandomJqueryImportFiles(verbose)
+      const examples = await getRandomJqueryImportFiles({limit})
       examples.forEach(file => {
         console.log(colorize('gray', `  Example: ${file}`))
       })
@@ -262,7 +286,8 @@ async function showJqueryImportStats(verbose = false) {
   }
 }
 
-async function countSkippedTests(verbose = false) {
+async function countSkippedTests(opts = {}) {
+  const {verbose = false, limit = DEFAULT_EXAMPLE_LIMIT} = opts
   try {
     let itSkipFiles = []
     let describeSkipFiles = []
@@ -298,7 +323,7 @@ async function countSkippedTests(verbose = false) {
           console.log(colorize('gray', `  ${file}`))
         })
       } else {
-        const examples = getRandomExamples(allFiles, 3)
+        const examples = getRandomExamples(allFiles, limit)
         examples.forEach(file => {
           console.log(colorize('gray', `  Example: ${file}`))
         })
@@ -320,19 +345,20 @@ async function countSkippedTests(verbose = false) {
   }
 }
 
-async function checkOutdatedPackages(verbose = false) {
+async function checkOutdatedPackages(opts = {}) {
+  const {verbose = false, limit = DEFAULT_EXAMPLE_LIMIT} = opts
   try {
     const output = execSync('npm outdated --json', {
       cwd: projectRoot,
       stdio: ['pipe', 'pipe', 'pipe'],
       encoding: 'utf8',
     }).toString()
-    handleOutdatedPackages(output, verbose)
+    handleOutdatedPackages(output, {verbose, limit})
   } catch (error) {
     // npm outdated exits with code 1 when it finds outdated packages
     // This is expected behavior, so we should still try to parse the output
     if (error.stdout) {
-      handleOutdatedPackages(error.stdout, verbose)
+      handleOutdatedPackages(error.stdout, {verbose, limit})
     } else {
       console.error(colorize('red', `Error running npm outdated: ${error.message}`))
       if (error.stderr) {
@@ -348,7 +374,8 @@ async function checkOutdatedPackages(verbose = false) {
   }
 }
 
-function handleOutdatedPackages(output, verbose = false) {
+function handleOutdatedPackages(output, opts = {}) {
+  const {verbose = false, limit = DEFAULT_EXAMPLE_LIMIT} = opts
   if (output.trim()) {
     const outdatedData = JSON.parse(output)
     const majorOutdated = []
@@ -391,7 +418,7 @@ function handleOutdatedPackages(output, verbose = false) {
             pkg =>
               `${pkg.packageName} (current: ${pkg.current}, wanted: ${pkg.wanted}, latest: ${pkg.latest})`,
           ),
-          3,
+          limit,
         )
         examples.forEach(example => {
           console.log(colorize('gray', `  Example: ${example}`))
@@ -409,11 +436,12 @@ function handleOutdatedPackages(output, verbose = false) {
   }
 }
 
-async function countReactDomRenderFiles(verbose = false) {
+async function countReactDomRenderFiles(opts = {}) {
+  const {verbose = false, limit = DEFAULT_EXAMPLE_LIMIT} = opts
   try {
     // Find files containing ReactDOM.render
     const {stdout} = await execAsync(
-      `git ls-files "ui/" "packages/" | xargs grep -l "ReactDOM.render"`,
+      `git ls-files "ui/" "packages/" | grep -E "\\.(js|jsx|ts|tsx)$" | xargs grep -l "ReactDOM.render"`,
       {cwd: projectRoot},
     )
     const files = stdout.trim().split('\n').filter(Boolean)
@@ -426,7 +454,7 @@ async function countReactDomRenderFiles(verbose = false) {
           console.log(colorize('gray', `  ${file}`))
         })
       } else {
-        const examples = getRandomExamples(files, 3)
+        const examples = getRandomExamples(files, limit)
         examples.forEach(file => {
           console.log(colorize('gray', `  Example: ${file}`))
         })
@@ -448,7 +476,8 @@ async function countReactDomRenderFiles(verbose = false) {
   }
 }
 
-async function countReactClassComponentFiles(verbose = false) {
+async function countReactClassComponentFiles(opts = {}) {
+  const {verbose = false, limit = DEFAULT_EXAMPLE_LIMIT} = opts
   try {
     let reactComponentFiles = []
     let componentFiles = []
@@ -485,7 +514,7 @@ async function countReactClassComponentFiles(verbose = false) {
           console.log(colorize('gray', `  ${file}`))
         })
       } else {
-        const examples = getRandomExamples(allFiles, 3)
+        const examples = getRandomExamples(allFiles, limit)
         examples.forEach(file => {
           console.log(colorize('gray', `  Example: ${file}`))
         })
@@ -507,7 +536,7 @@ async function countReactClassComponentFiles(verbose = false) {
   }
 }
 
-async function countPropTypesFiles(verbose = false) {
+async function countPropTypesFiles() {
   try {
     const cmd =
       'git ls-files "ui/" "packages/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
@@ -520,22 +549,24 @@ async function countPropTypesFiles(verbose = false) {
   }
 }
 
-async function getRandomPropTypesFiles(verbose = false) {
+async function getRandomPropTypesFiles(opts = {}) {
+  const {limit = DEFAULT_EXAMPLE_LIMIT} = opts
   try {
     const cmd =
       'git ls-files "ui/" "packages/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
       'xargs grep -l "\\.propTypes\\s*="'
     const {stdout} = await execAsync(cmd, {cwd: projectRoot})
     const files = stdout.trim().split('\n').filter(Boolean)
-    return getRandomExamples(files, 3)
+    return getRandomExamples(files, limit)
   } catch (error) {
     console.error(colorize('red', `Error finding PropTypes examples: ${error.message}`))
   }
   return []
 }
 
-async function showPropTypesStats(verbose = false) {
-  const count = await countPropTypesFiles(verbose)
+async function showPropTypesStats(opts = {}) {
+  const {verbose = false, limit = DEFAULT_EXAMPLE_LIMIT} = opts
+  const count = await countPropTypesFiles()
   console.log(colorize('yellow', `- Files with PropTypes: ${bold(count)}`))
   if (count > 0) {
     if (verbose) {
@@ -548,7 +579,7 @@ async function showPropTypesStats(verbose = false) {
         console.log(colorize('gray', `  ${file}`))
       })
     } else {
-      const examples = await getRandomPropTypesFiles(verbose)
+      const examples = await getRandomPropTypesFiles({limit})
       examples.forEach(file => {
         console.log(colorize('gray', `  Example: ${file}`))
       })
@@ -556,7 +587,7 @@ async function showPropTypesStats(verbose = false) {
   }
 }
 
-async function countDefaultPropsFiles(verbose = false) {
+async function countDefaultPropsFiles() {
   try {
     const cmd =
       'git ls-files "ui/" "packages/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
@@ -569,22 +600,24 @@ async function countDefaultPropsFiles(verbose = false) {
   }
 }
 
-async function getRandomDefaultPropsFiles(verbose = false) {
+async function getRandomDefaultPropsFiles(opts = {}) {
+  const {limit = DEFAULT_EXAMPLE_LIMIT} = opts
   try {
     const cmd =
       'git ls-files "ui/" "packages/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
       'xargs grep -l "\\.defaultProps\\s*="'
     const {stdout} = await execAsync(cmd, {cwd: projectRoot})
     const files = stdout.trim().split('\n').filter(Boolean)
-    return getRandomExamples(files, 3)
+    return getRandomExamples(files, limit)
   } catch (error) {
     console.error(colorize('red', `Error finding defaultProps examples: ${error.message}`))
   }
   return []
 }
 
-async function showDefaultPropsStats(verbose = false) {
-  const count = await countDefaultPropsFiles(verbose)
+async function showDefaultPropsStats(opts = {}) {
+  const {verbose = false, limit = DEFAULT_EXAMPLE_LIMIT} = opts
+  const count = await countDefaultPropsFiles()
   console.log(colorize('yellow', `- Files with defaultProps: ${bold(count)}`))
   if (count > 0) {
     if (verbose) {
@@ -597,7 +630,7 @@ async function showDefaultPropsStats(verbose = false) {
         console.log(colorize('gray', `  ${file}`))
       })
     } else {
-      const examples = await getRandomDefaultPropsFiles(verbose)
+      const examples = await getRandomDefaultPropsFiles({limit})
       examples.forEach(file => {
         console.log(colorize('gray', `  Example: ${file}`))
       })
@@ -653,7 +686,8 @@ async function countReactCompilerViolations() {
   }
 }
 
-async function getRandomReactCompilerViolationFiles() {
+async function getRandomReactCompilerViolationFiles(opts = {}) {
+  const {limit = DEFAULT_EXAMPLE_LIMIT} = opts
   try {
     const spinner = startSpinner('Finding files with react-compiler violations...')
     const eslint = createReactCompilerESLint()
@@ -675,7 +709,7 @@ async function getRandomReactCompilerViolationFiles() {
       return []
     }
 
-    return getRandomExamples(filesWithViolations, 3)
+    return getRandomExamples(filesWithViolations, limit)
   } catch (error) {
     console.error(
       colorize('red', `Error finding react-compiler violation examples: ${error.message}`),
@@ -684,7 +718,8 @@ async function getRandomReactCompilerViolationFiles() {
   }
 }
 
-async function showReactCompilerViolationStats(verbose = false) {
+async function showReactCompilerViolationStats(opts = {}) {
+  const {verbose = false, limit = DEFAULT_EXAMPLE_LIMIT} = opts
   const count = await countReactCompilerViolations()
   console.log(colorize('yellow', `- Files with react-compiler violations: ${bold(count)}`))
 
@@ -714,7 +749,7 @@ async function showReactCompilerViolationStats(verbose = false) {
         console.log(colorize('gray', `  ${file}`))
       })
     } else {
-      const examples = await getRandomReactCompilerViolationFiles()
+      const examples = await getRandomReactCompilerViolationFiles({limit})
       if (examples.length > 0) {
         examples.forEach(file => {
           console.log(colorize('gray', `  Example: ${file}`))
@@ -758,73 +793,73 @@ async function printDashboard() {
     console.log(bold(colorize('green', '\nTech Debt Summary\n')))
 
     const selectedSections = options.sections
-    const verbose = options.verbose
+    const opts = {verbose: options.verbose, limit: options.limit}
 
     if (selectedSections.length === 0 || selectedSections.includes('skipped')) {
       console.log(getSectionTitle('skipped'))
-      await countSkippedTests(verbose)
+      await countSkippedTests(opts)
       console.log()
     }
 
     if (selectedSections.length === 0 || selectedSections.includes('reactdom')) {
       console.log(getSectionTitle('reactdom'))
-      await countReactDomRenderFiles(verbose)
+      await countReactDomRenderFiles(opts)
       console.log()
     }
 
     if (selectedSections.length === 0 || selectedSections.includes('defaultprops')) {
       console.log(getSectionTitle('defaultprops'))
-      await showDefaultPropsStats(verbose)
+      await showDefaultPropsStats(opts)
       console.log()
     }
 
     if (selectedSections.length === 0 || selectedSections.includes('handlebars')) {
       console.log(getSectionTitle('handlebars'))
-      await countAndShowFiles('\\.handlebars$', 'Total Handlebars files', verbose)
+      await countAndShowFiles('\\.handlebars$', 'Total Handlebars files', opts)
       console.log()
     }
 
     if (selectedSections.length === 0 || selectedSections.includes('class')) {
       console.log(getSectionTitle('class'))
-      await countReactClassComponentFiles(verbose)
+      await countReactClassComponentFiles(opts)
       console.log()
     }
 
     if (selectedSections.length === 0 || selectedSections.includes('proptypes')) {
       console.log(getSectionTitle('proptypes'))
-      await showPropTypesStats(verbose)
+      await showPropTypesStats(opts)
       console.log()
     }
 
     if (selectedSections.length === 0 || selectedSections.includes('jquery')) {
       console.log(getSectionTitle('jquery'))
-      await showJqueryImportStats(verbose)
+      await showJqueryImportStats(opts)
       console.log()
     }
 
     if (selectedSections.length === 0 || selectedSections.includes('javascript')) {
       console.log(getSectionTitle('javascript'))
-      await countAndShowFiles('\\.(js|jsx)$', 'Total JavaScript files', verbose)
+      await countAndShowFiles('\\.(js|jsx)$', 'Total JavaScript files', opts)
       console.log()
     }
 
     if (selectedSections.length === 0 || selectedSections.includes('typescript')) {
       console.log(getSectionTitle('typescript'))
-      await showTsSuppressionStats('ts-nocheck', verbose)
-      await showTsSuppressionStats('ts-ignore', verbose)
-      await showTsSuppressionStats('ts-expect-error', verbose)
+      await showTsSuppressionStats('ts-nocheck', opts)
+      await showTsSuppressionStats('ts-ignore', opts)
+      await showTsSuppressionStats('ts-expect-error', opts)
       console.log()
     }
 
     if (selectedSections.length === 0 || selectedSections.includes('outdated')) {
       console.log(getSectionTitle('outdated'))
-      await checkOutdatedPackages(verbose)
+      await checkOutdatedPackages(opts)
       console.log()
     }
 
     if (selectedSections.includes('react-compiler')) {
       console.log(getSectionTitle('reactCompiler'))
-      await showReactCompilerViolationStats(verbose)
+      await showReactCompilerViolationStats(opts)
     }
   } catch (error) {
     console.error(colorize('red', `Error: ${error.message}`))

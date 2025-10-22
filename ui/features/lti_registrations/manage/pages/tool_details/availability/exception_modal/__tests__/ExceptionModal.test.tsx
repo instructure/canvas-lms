@@ -28,6 +28,7 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {SearchableContexts} from '../../../../../model/SearchableContext'
 import {ZCourseId} from '../../../../../model/CourseId'
 import {ZLtiRegistrationId} from '../../../../../model/LtiRegistrationId'
+import {clickOrFail} from '../../../../__tests__/interactionHelpers'
 
 const mockContexts: SearchableContexts = {
   accounts: [
@@ -110,7 +111,7 @@ describe('ExceptionModal', () => {
     ).toBeInTheDocument()
   })
 
-  it('calls onClose when CloseButton is clicked', () => {
+  it('calls onClose when CloseButton is clicked', async () => {
     const onClose = jest.fn()
     renderWithQueryClient(
       <ExceptionModal
@@ -121,8 +122,8 @@ describe('ExceptionModal', () => {
         onConfirm={jest.fn()}
       />,
     )
-    const closeBtn = screen.getByRole('button', {name: /close/i})
-    fireEvent.click(closeBtn)
+    const closeBtn = screen.getByText('Close').closest('button')
+    await clickOrFail(closeBtn)
     expect(onClose).toHaveBeenCalled()
   })
 
@@ -169,7 +170,7 @@ describe('ExceptionModal', () => {
     expect(screen.getByText('Course 201')).toBeInTheDocument()
 
     // Close the modal
-    await userEvent.click(screen.getByRole('button', {name: /close/i}))
+    await clickOrFail(screen.getByText('Close').closest('button'))
     expect(onClose).toHaveBeenCalled()
   })
 
@@ -197,8 +198,8 @@ describe('ExceptionModal', () => {
 
     // Find and click the delete/remove button for the added exception
     // (Assume the button has an accessible label like "Remove Subaccount 101" or a role "button" near the exception name)
-    const removeBtn = screen.getByRole('button', {name: /delete exception.*subaccount 101/i})
-    await userEvent.click(removeBtn)
+    const removeBtn = screen.getByText(/delete exception.*subaccount 101/i).closest('button')
+    await clickOrFail(removeBtn)
 
     // The exception should be removed from the list
     expect(screen.queryByText('Subaccount 101')).not.toBeInTheDocument()
@@ -245,7 +246,7 @@ describe('ExceptionModal', () => {
     expect(select).toHaveDisplayValue(/not available/i)
   })
 
-  it('calls onConfirm with selected controls when Done is clicked', async () => {
+  it('calls onConfirm with selected controls when Save is clicked', async () => {
     const accountId = ZAccountId.parse('1')
     const openState = {open: true, deployment: mockDeployment({})}
     const onClose = jest.fn()
@@ -268,9 +269,9 @@ describe('ExceptionModal', () => {
     await userEvent.click(subaccount_1)
     expect(screen.getByText('Subaccount 101')).toBeInTheDocument()
 
-    // Click Done
-    const doneBtn = screen.getByRole('button', {name: /done/i})
-    await userEvent.click(doneBtn)
+    // Click Save
+    const saveBtn = screen.getByText('Save').closest('button')
+    await clickOrFail(saveBtn)
 
     expect(onConfirm).toHaveBeenCalledTimes(1)
     // Should be called with an array of controls, containing the selected context
@@ -301,8 +302,8 @@ describe('ExceptionModal', () => {
     )
 
     // Open the browse popover
-    const browseBtn = screen.getByRole('button', {name: /browse sub-accounts or courses/i})
-    await userEvent.click(browseBtn)
+    const browseBtn = screen.getByText(/browse sub-accounts or courses/i).closest('button')
+    await clickOrFail(browseBtn)
 
     // Wait for the popover to appear and search input to be present
     const browseSearchInput = await screen.findByPlaceholderText(/search\.\.\./i)
@@ -323,7 +324,7 @@ describe('ExceptionModal', () => {
     expect(screen.getByText('Subaccount 101')).toBeInTheDocument()
 
     // Open the browse popover again
-    await userEvent.click(browseBtn)
+    await clickOrFail(browseBtn)
     // Filter for course
     browseSearchInput.focus()
     await userEvent.paste('Course')
@@ -335,9 +336,9 @@ describe('ExceptionModal', () => {
     // The exception should be added
     expect(screen.getByText('Course 201')).toBeInTheDocument()
 
-    // Click Done and assert onConfirm is called with both contexts
-    const doneBtn = screen.getByRole('button', {name: /done/i})
-    await userEvent.click(doneBtn)
+    // Click Save and assert onConfirm is called with both contexts
+    const saveBtn = screen.getByText('Save').closest('button')
+    await clickOrFail(saveBtn)
 
     expect(onConfirm).toHaveBeenCalledTimes(1)
     const calledArgs = onConfirm.mock.calls[0][0]
@@ -357,7 +358,7 @@ describe('ExceptionModal', () => {
     )
   })
 
-  it('does not call onConfirm when Done is clicked with no selected exceptions, but does call onClose', async () => {
+  it('does not call onConfirm when Save is clicked with no selected exceptions, but does call onClose', async () => {
     const accountId = ZAccountId.parse('1')
     const openState = {open: true, deployment: mockDeployment({})}
     const onClose = jest.fn()
@@ -372,8 +373,8 @@ describe('ExceptionModal', () => {
       />,
     )
 
-    const doneBtn = screen.getByRole('button', {name: /done/i})
-    await userEvent.click(doneBtn)
+    const saveBtn = screen.getByText('Save').closest('button')
+    await clickOrFail(saveBtn)
 
     expect(onConfirm).not.toHaveBeenCalled()
     expect(onClose).toHaveBeenCalled()

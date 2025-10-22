@@ -19,7 +19,7 @@
 import React, {useState} from 'react'
 import {useScope as i18nScope} from '@canvas/i18n'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
-import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
+import {fudgeDateForProfileTimezone, unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
 import {PageViewsTable} from './PageViewsTable'
 import {PageViewsDownload} from './PageViewsDownload'
@@ -48,11 +48,19 @@ export default function PageViews({userId}: PageViewsProps): React.JSX.Element {
   const formatDateForDisplay = useDateTimeFormat('date.formats.long')
 
   // Cache top date is tomorrow 00:00 to allow today to be selected as an end date
-  const cacheTopDate = new Date(Date.now() + 24 * 60 * 60 * 1000)
-  cacheTopDate.setHours(0, 0, 0, 0)
-  // Cache bottom date is 30 days ago, 00:00
-  const cacheBottomDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-  cacheBottomDate.setHours(0, 0, 0, 0)
+  // We expect the range to represent whole days in the user's timezone
+  // For this to work, we have to fudge the current datetime (translate to target timezone), zero out time
+  // and then unfudge (translate back) to get the correct cache date boundaries
+  const topTimestamp = Date.now() + 24 * 60 * 60 * 1000
+  const fudgedTop = fudgeDateForProfileTimezone(new Date(topTimestamp)) ?? new Date(topTimestamp)
+  fudgedTop.setHours(0, 0, 0, 0)
+  const cacheTopDate = unfudgeDateForProfileTimezone(fudgedTop) ?? fudgedTop
+  // Cache bottom date is 30 days ago, 00:00, which is 31 days before the top date
+  const bottomTimestamp = topTimestamp - 31 * 24 * 60 * 60 * 1000
+  const fudgedBottom =
+    fudgeDateForProfileTimezone(new Date(bottomTimestamp)) ?? new Date(bottomTimestamp)
+  fudgedBottom.setHours(0, 0, 0, 0)
+  const cacheBottomDate = unfudgeDateForProfileTimezone(fudgedBottom) ?? fudgedBottom
 
   function onStartDateChange(date: Date | null) {
     const targetDate = date ?? undefined
@@ -110,8 +118,10 @@ export default function PageViews({userId}: PageViewsProps): React.JSX.Element {
   }
 
   const queryDates: DateRange = {
-    startDate: unfudgeDateForProfileTimezone(filterDate.startDate ?? cacheBottomDate) ?? undefined,
-    endDate: unfudgeDateForProfileTimezone(filterDate.endDate ?? cacheTopDate) ?? undefined,
+    startDate: filterDate.startDate ?? cacheBottomDate,
+    endDate: filterDate.endDate
+      ? new Date(filterDate.endDate.getTime() + 24 * 60 * 60 * 1000)
+      : cacheTopDate,
   }
 
   // Check if a date is within the cached 30-day range

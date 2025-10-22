@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useEditor} from '@craftjs/core'
+import {useEditor, Node} from '@craftjs/core'
 import {ReactElement} from 'react'
 import {useGetRootNode} from './useGetRootNode'
 
@@ -32,10 +32,11 @@ export const useAddNode = () => {
     return siblings.indexOf(afterNodeId) + 1
   }
 
-  const addNode = (element: ReactElement, afterNodeId?: string) => {
-    const node = query.createNode(element)
+  const addNode = (element: ReactElement, afterNodeId?: string): Node => {
+    const nodeTree = query.parseReactElement(element).toNodeTree()
     const index = getIndex(afterNodeId)
-    actions.add(node, rootNode.id, index)
+    actions.addNodeTree(nodeTree, rootNode.id, index)
+    return query.node(nodeTree.rootNodeId).get()
   }
   return addNode
 }

@@ -29,6 +29,11 @@ module Types
       object.discussion_topic.expanded_for_user(current_user)
     end
 
+    field :posted, Boolean, null: false
+    def posted
+      object.posted?
+    end
+
     field :read, Boolean, null: false
     def read_status
       object.workflow_state == "read"
@@ -47,10 +52,10 @@ module Types
       object.preferred_language
     end
 
-    field :summary_enabled, Boolean, null: true
-    field :workflow_state, String, null: false
     field :has_unread_pinned_entry, Boolean, null: true
     field :show_pinned_entries, Boolean, null: true
+    field :summary_enabled, Boolean, null: true
+    field :workflow_state, String, null: false
 
     field :discussion_topic, Types::DiscussionType, null: false
     def discussion_topic

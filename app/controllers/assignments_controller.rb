@@ -78,7 +78,7 @@ class AssignmentsController < ApplicationController
         set_tutorial_js_env
         set_section_list_js_env
         grading_standard = @context.grading_standard_or_default
-        assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+        assign_to_tags = @context.account.allow_assign_to_differentiation_tags?
         hash = {
           ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
           CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS),
@@ -355,7 +355,7 @@ class AssignmentsController < ApplicationController
           end
         end
 
-        assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+        assign_to_tags = @context.account.allow_assign_to_differentiation_tags?
 
         env = js_env({
                        COURSE_ID: @context.id,
@@ -367,7 +367,8 @@ class AssignmentsController < ApplicationController
                        DUE_DATE_REQUIRED_FOR_ACCOUNT: AssignmentUtil.due_date_required_for_account?(@context),
                        ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
                        CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS),
-                       PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED: @context.feature_enabled?(:peer_review_allocation_and_grading)
+                       PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED: @context.feature_enabled?(:peer_review_allocation_and_grading),
+                       CAN_EDIT_ASSIGNMENTS: @context.grants_right?(@current_user, session, :manage_assignments_edit)
                      })
         set_section_list_js_env
         submission = @assignment.submissions.find_by(user: @current_user)
@@ -874,7 +875,7 @@ class AssignmentsController < ApplicationController
 
       post_to_sis = Assignment.sis_grade_export_enabled?(@context)
 
-      assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+      assign_to_tags = @context.account.allow_assign_to_differentiation_tags?
 
       hash = {
         ROOT_FOLDER_ID: Folder.root_folders(@context).first&.id,

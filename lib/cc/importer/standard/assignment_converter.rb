@@ -119,6 +119,26 @@ module CC::Importer::Standard
         assignment[:lti_context_id] = lti_context_id if lti_context_id.present?
       end
 
+      if meta_doc.at_css("asset_processors")
+        fields = %w[url title text custom icon window iframe report context_external_tool_url]
+        asset_processors = meta_doc.css("asset_processors asset_processor").map do |ap_node|
+          asset_processor_data = {}
+          asset_processor_data[:migration_id] = ap_node["identifier"]
+          fields.each do |field|
+            val = get_node_val(ap_node, field)
+            next if val.blank?
+
+            asset_processor_data[field.to_sym] = val
+          end
+          global_id_val = get_node_val(ap_node, "context_external_tool_global_id")
+          if global_id_val.present?
+            asset_processor_data[:context_external_tool_global_id] = global_id_val.to_i
+          end
+          asset_processor_data
+        end
+        assignment[:asset_processors] = asset_processors if asset_processors.any?
+      end
+
       %w[title allowed_extensions grading_type submission_types external_tool_url external_tool_data_json external_tool_link_settings_json turnitin_settings time_zone_edited].each do |string_type|
         val = get_node_val(meta_doc, string_type)
         assignment[string_type] = val unless val.nil?

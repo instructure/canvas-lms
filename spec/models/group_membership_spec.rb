@@ -334,7 +334,6 @@ describe GroupMembership do
     end
 
     it "does not allow ta without permissions to add to a tag" do
-      Account.default.enable_feature! :assign_to_differentiation_tags
       Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
       Account.default.save!
       Account.default.reload
@@ -435,7 +434,6 @@ describe GroupMembership do
     context "non-collaborative group" do
       before do
         account = @course.account
-        account.enable_feature!(:assign_to_differentiation_tags)
         account.tap do |a|
           a.settings[:allow_assign_to_differentiation_tags] = { value: true }
           a.save!

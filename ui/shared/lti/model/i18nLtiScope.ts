@@ -64,6 +64,10 @@ export const LtiScopeTranslations: Record<LtiScope, string> = {
   ),
   [LtiScopes.AccessPageContent]: I18n.t('Can view the content of a page the tool is launched from'),
   [LtiScopes.ReplaceEditorContent]: I18n.t('Can replace the entire contents of the RCE'),
+  [LtiScopes.RegistrationReadonly]: I18n.t('Can view LTI registrations associated with the tool'),
+  [LtiScopes.RegistrationUpdate]: I18n.t(
+    'Can send automatic updates to be approved by an Administrator',
+  ),
 }
 
 /**

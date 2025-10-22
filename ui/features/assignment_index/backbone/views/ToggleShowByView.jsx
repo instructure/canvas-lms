@@ -119,12 +119,12 @@ export default class ToggleShowByView extends Backbone.View {
   }
 
   _sortAscending(assignments) {
-    assignments.comparator = a => Date.parse(a.dueAt())
+    assignments.comparator = a => Date.parse(a.sortingDueAt())
     return assignments.sort()
   }
 
   _sortDescending(assignments) {
-    assignments.comparator = a => new Date() - Date.parse(a.dueAt())
+    assignments.comparator = a => new Date() - Date.parse(a.sortingDueAt())
     return assignments.sort()
   }
 

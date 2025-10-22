@@ -65,7 +65,6 @@ shared_examples_for "learning object with due dates" do
 
       context "differentiation tags" do
         before do
-          course.account.enable_feature!(:assign_to_differentiation_tags)
           course.account.tap do |a|
             a.settings[:allow_assign_to_differentiation_tags] = { value: true }
             a.save!
@@ -98,7 +97,6 @@ shared_examples_for "learning object with due dates" do
 
       context "differentiation tags" do
         before do
-          course.account.enable_feature!(:assign_to_differentiation_tags)
           course.account.tap do |a|
             a.settings[:allow_assign_to_differentiation_tags] = { value: true }
             a.save!
@@ -222,6 +220,16 @@ shared_examples_for "learning object with due dates" do
         expect(dates_hash.size).to eq 1
         expect(dates_hash[0][:title]).to eq "Everyone"
         expect(dates_hash[0][:base]).to be true
+      end
+
+      it "does not error for mastery path assignment" do
+        override.destroy!
+        empty_course = Course.create!(name: "empty course")
+        mastery_paths_assignment = Assignment.create!(course: empty_course, only_visible_to_overrides: true)
+        mastery_paths_assignment.assignment_overrides.create!(set_type: "Noop", title: "Mastery Paths")
+        dates_hash = mastery_paths_assignment.dates_hash_visible_to(@admin)
+        expect(dates_hash.size).to eq 1
+        expect(dates_hash[0][:title]).to eq "Mastery Paths"
       end
     end
 

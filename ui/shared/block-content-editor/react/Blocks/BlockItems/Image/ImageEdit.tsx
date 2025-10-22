@@ -22,13 +22,14 @@ import {ImageBlockUploadModal} from './ImageBlockUploadModal'
 import {AddButton} from '../AddButton/AddButton'
 import {ImageEditProps, ModalImageData} from './types'
 import {IconButton} from '@instructure/ui-buttons'
-import {IconEditLine, IconUploadLine} from '@instructure/ui-icons'
+import {IconEditLine, IconProgressLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
-import {useBlockContentEditorContext} from '../../../BlockContentEditorContext'
 import {useNode} from '@craftjs/core'
+import {useBlockTitle} from '../../../hooks/useBlockTitle'
 import {ImageCaption} from './ImageCaption'
 import {View} from '@instructure/ui-view'
+import {useSettingsTray} from '../../../hooks/useSettingsTray'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -43,8 +44,9 @@ export const ImageEdit = ({
   focusHandler,
 }: ImageEditProps) => {
   const [isOpen, setIsOpen] = useState(false)
-  const {settingsTray} = useBlockContentEditorContext()
+  const {open} = useSettingsTray()
   const {id} = useNode()
+  const blockTitle = useBlockTitle()
 
   const closeModal = () => setIsOpen(false)
   const openModal = () => setIsOpen(true)
@@ -69,7 +71,7 @@ export const ImageEdit = ({
             />
             <View as="div" className="image-actions">
               <IconButton
-                renderIcon={<IconUploadLine />}
+                renderIcon={<IconProgressLine />}
                 onClick={openModal}
                 screenReaderLabel={I18n.t('Replace image')}
                 size="small"
@@ -93,8 +95,8 @@ export const ImageEdit = ({
             </ImageCaption>
             <IconButton
               data-testid="edit-block-image"
-              screenReaderLabel={I18n.t('Edit block')}
-              onClick={() => settingsTray.open(id)}
+              screenReaderLabel={I18n.t('Edit settings for %{title}', {title: blockTitle})}
+              onClick={() => open(id)}
               size="small"
             >
               <IconEditLine fontSize="small" />

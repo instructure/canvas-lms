@@ -21,7 +21,7 @@ require_relative "../../spec_helper"
 describe Lti::EulaUiService do
   describe "eula_launch_urls" do
     subject do
-      ap
+      asset_processor
       Lti::EulaUiService.eula_launch_urls(user: student, assignment:)
     end
 
@@ -46,11 +46,18 @@ describe Lti::EulaUiService do
         placements: ["ActivityAssetProcessor"],
         developer_key:
       )
-      t.settings["ActivityAssetProcessor"]["eula"] = { enabled: true }
+      t.settings["message_settings"] = [
+        {
+          type: "LtiEulaRequest",
+          enabled: true,
+          target_link_uri: "http://example.com/eula",
+          custom_fields: { "foo" => "bar" }
+        }
+      ]
       t.save!
       t
     end
-    let!(:ap) { lti_asset_processor_model(tool:, assignment:) }
+    let!(:asset_processor) { lti_asset_processor_model(tool:, assignment:) }
 
     it "returns [] if lti_asset_processor FF is off" do
       course.root_account.disable_feature!(:lti_asset_processor)
@@ -59,7 +66,7 @@ describe Lti::EulaUiService do
     end
 
     it "returns [] if assignment does not have active processors" do
-      ap.destroy
+      asset_processor.destroy
 
       expect(subject).to be_empty
     end
@@ -69,8 +76,8 @@ describe Lti::EulaUiService do
       expect(subject).to be_empty
     end
 
-    it "returns [] if ActitiveAssetProcessor eula is not enabled" do
-      tool.settings["ActivityAssetProcessor"]["eula"]["enabled"] = false
+    it "returns [] if EULA is not enabled in message_settings" do
+      tool.settings["message_settings"][0]["enabled"] = false
       tool.save!
       expect(subject).to be_empty
     end
@@ -113,7 +120,14 @@ describe Lti::EulaUiService do
           opts: { name: "test tool2" }
         )
         tool2.developer_key.update!(scopes: [TokenScopes::LTI_EULA_USER_SCOPE, TokenScopes::LTI_EULA_DEPLOYMENT_SCOPE])
-        tool2.settings["ActivityAssetProcessor"]["eula"] = { enabled: true }
+        tool2.settings["message_settings"] = [
+          {
+            type: "LtiEulaRequest",
+            enabled: true,
+            target_link_uri: "http://example.com/eula2",
+            custom_fields: { "tool2" => "test" }
+          }
+        ]
         tool2.save!
 
         lti_asset_processor_model(tool: tool2, assignment:)

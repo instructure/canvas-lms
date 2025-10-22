@@ -35,6 +35,7 @@ describe Types::AccountType do
   it "works" do
     expect(account_type.resolve(:name)).to eq account.name
     expect(account_type.resolve(:_id)).to eq account.id.to_s
+    expect(account_type.resolve(:workflowState)).to eq "active"
   end
 
   it "requires read permission" do
@@ -72,6 +73,12 @@ describe Types::AccountType do
 
   it "works for subaccounts" do
     expect(account_type.resolve("subAccountsConnection { nodes { _id } }")).to eq [@sub_account.id.to_s]
+  end
+
+  it "returns deleted state for deleted accounts" do
+    @sub_account.destroy
+    account_type = GraphQLTypeTester.new(@sub_account, current_user: @admin)
+    expect(account_type.resolve(:workflowState)).to eq "deleted"
   end
 
   it "works for root_outcome_group" do

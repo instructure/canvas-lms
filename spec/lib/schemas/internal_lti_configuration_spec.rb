@@ -363,7 +363,7 @@ describe Schemas::InternalLtiConfiguration do
       end
     end
 
-    describe "eula subsettings" do
+    describe "message_settings for eula" do
       let(:eula_settings) do
         {
           enabled: true,
@@ -372,15 +372,12 @@ describe Schemas::InternalLtiConfiguration do
         }
       end
 
-      context "in ActivityAssetProcessor" do
+      context "in message_settings" do
         let(:json) do
-          super().merge(
-            {
-              placements: [
-                { placement: "ActivityAssetProcessor", eula: eula_settings }
-              ]
-            }
-          )
+          internal_lti_configuration.tap do |c|
+            c[:placements] = [{ placement: "ActivityAssetProcessor" }]
+            c[:launch_settings][:message_settings] = [{ type: "LtiEulaRequest", **eula_settings }]
+          end
         end
 
         it "returns no errors" do
@@ -390,13 +387,13 @@ describe Schemas::InternalLtiConfiguration do
         context "with invalid eula custom_fields" do
           let(:eula_settings) { { enabled: true, custom_fields: { "abc" => false } } }
 
-          it { expect(error_message).to include "eula" }
+          it { expect(error_message).to include "message_settings" }
         end
 
         context "with eula missing enabled field" do
           let(:eula_settings) { { custom_fields: { "abc" => "def" } } }
 
-          it { expect(error_message).to include "eula" }
+          it { expect(error_message).to include "message_settings" }
         end
       end
     end

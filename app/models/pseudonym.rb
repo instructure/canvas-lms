@@ -54,7 +54,6 @@ class Pseudonym < ActiveRecord::Base
 
   CAS_TICKET_TTL = 1.day
 
-  validates :unique_id, length: { maximum: MAX_UNIQUE_ID_LENGTH }
   validates :sis_user_id, length: { maximum: maximum_string_length, allow_blank: true }
   validates :integration_id, length: { maximum: maximum_string_length, allow_blank: true }
   validates :account_id, presence: true
@@ -85,12 +84,7 @@ class Pseudonym < ActiveRecord::Base
 
   validates :unique_id,
             format: { with: /\A[[:print:]]+\z/ },
-            length: { within: 1..MAX_UNIQUE_ID_LENGTH },
-            uniqueness: {
-              case_sensitive: false,
-              scope: %i[account_id workflow_state authentication_provider_id],
-              if: ->(p) { !p.unique_id.nil? && (p.unique_id_changed? || p.workflow_state_changed?) && p.active? }
-            }
+            length: { within: 1..MAX_UNIQUE_ID_LENGTH }
 
   validates :password, confirmation: true, if: :require_password?
   validates_each :password, if: :require_password?, &:validate_password
@@ -412,9 +406,9 @@ class Pseudonym < ActiveRecord::Base
   def validate_unique_id
     self.account ||= Account.default
 
-    if unique_id && unique_id_changed?
-      self.unique_id_normalized = self.class.normalize(unique_id)
-    end
+    return unless unique_id
+
+    self.unique_id_normalized = self.class.normalize(unique_id) if unique_id_changed?
     if invalid_email?
       errors.add(:unique_id, "not_email")
       throw :abort

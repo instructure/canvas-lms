@@ -27,9 +27,11 @@ describe Mutations::SetAssignmentPostPolicy do
   let(:student) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
   let(:teacher) { course.enroll_user(User.create!, "TeacherEnrollment", enrollment_state: "active").user }
 
-  def mutation_str(assignment_id: nil, post_manually: nil)
+  def mutation_str(assignment_id: nil, post_manually: nil, post_comments_at: nil, post_grades_at: nil)
     input_string = assignment_id ? "assignmentId: #{assignment_id}" : ""
     input_string += " postManually: #{post_manually} " unless post_manually.nil?
+    input_string += " postCommentsAt: \"#{post_comments_at}\" " unless post_comments_at.nil?
+    input_string += " postGradesAt: \"#{post_grades_at}\" " unless post_grades_at.nil?
 
     <<~GQL
       mutation {
@@ -129,6 +131,39 @@ describe Mutations::SetAssignmentPostPolicy do
     it "does not return data for the related post policy" do
       result = execute_query(mutation_str(assignment_id: assignment.id, post_manually: true), context)
       expect(result.dig("data", "setAssignmentPostPolicy")).to be_nil
+    end
+  end
+
+  describe "when setting scheduled feedback release" do
+    before do
+      Account.site_admin.enable_feature!(:scheduled_feedback_releases)
+    end
+
+    let(:context) { { current_user: teacher } }
+
+    it "will not set scheduled feedback release fields when the scheduled_feedback_releases ff is OFF" do
+      Account.site_admin.disable_feature!(:scheduled_feedback_releases)
+      execute_query(mutation_str(assignment_id: assignment.id, post_manually: true, post_comments_at: Time.zone.now, post_grades_at: Time.zone.now), context)
+      policy = PostPolicy.find_by(course:, assignment:)
+      expect(policy.scheduled_post&.post_comments_at).to be_nil
+      expect(policy.scheduled_post&.post_grades_at).to be_nil
+    end
+
+    it "will set scheduled feedback release fields when the scheduled_feedback_releases is ON and post_manually is true" do
+      post_comments_at = Time.zone.now
+      post_grades_at = Time.zone.now
+
+      execute_query(mutation_str(assignment_id: assignment.id, post_manually: true, post_comments_at:, post_grades_at:), context)
+      policy = PostPolicy.find_by(course:, assignment:)
+      expect(policy.scheduled_post.post_comments_at.to_i).to eq(post_comments_at.to_i)
+      expect(policy.scheduled_post.post_grades_at.to_i).to eq(post_grades_at.to_i)
+    end
+
+    it "will set scheduled feedback release fields to nil if the scheduled_feedback_releases ff is ON and post_manually is false" do
+      execute_query(mutation_str(assignment_id: assignment.id, post_manually: false, post_comments_at: Time.zone.now, post_grades_at: Time.zone.now), context)
+      policy = PostPolicy.find_by(course:, assignment:)
+      expect(policy.scheduled_post&.post_comments_at).to be_nil
+      expect(policy.scheduled_post&.post_grades_at).to be_nil
     end
   end
 end

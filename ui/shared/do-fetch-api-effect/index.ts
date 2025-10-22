@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import getCookie from '@instructure/get-cookie'
 import parseLinkHeader, {type Links} from '@canvas/parse-link-header'
 import {defaultFetchOptions} from '@canvas/util/xhr'
 import {toQueryString} from '@instructure/query-string-encoding'
@@ -34,7 +33,8 @@ function constructRelativeUrl({
 }): string {
   const queryString = toQueryString(params)
   if (queryString.length === 0) return path
-  return `${path}?${queryString}`
+  const separator = path.includes('?') ? '&' : '?' // in case path already contains query parms
+  return `${path}${separator}${queryString}`
 }
 
 // https://fetch.spec.whatwg.org/#requestinit
@@ -158,6 +158,7 @@ export async function safelyFetch<T = unknown>(
     try {
       schema.parse(json)
     } catch (err) {
+      // eslint-disable-next-line import/no-named-as-default-member
       if (err instanceof z.ZodError) {
         console.group(`Zod parsing error for ${path}`)
         for (const issue of err.issues) {

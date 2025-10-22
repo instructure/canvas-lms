@@ -23,6 +23,10 @@ import md5 from 'md5'
 import '@canvas/jquery/jquery.ajaxJSON'
 
 export default class GravatarView extends AvatarUploadBaseView {
+  constructor(options) {
+    super(options)
+  }
+
   static initClass() {
     this.optionProperty('avatarSize')
 
@@ -61,10 +65,13 @@ export default class GravatarView extends AvatarUploadBaseView {
 
   updateAvatar() {
     const url = '/api/v1/users/self'
+    const gravatarUrl = this._gravatarUrl(this._gravatarHashFromInput(), this.avatarSize.w)
     const updateParams = {
-      'user[avatar][url]': this._gravatarUrl(this._gravatarHashFromInput(), this.avatarSize.w),
+      'user[avatar][url]': gravatarUrl,
     }
-    return $.ajaxJSON(url, 'PUT', updateParams)
+    return $.ajaxJSON(url, 'PUT', updateParams).then(() => {
+      return gravatarUrl
+    })
   }
 
   getImage() {

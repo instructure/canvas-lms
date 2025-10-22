@@ -241,7 +241,7 @@ module SpeedGrader
       res[:context][:quiz] =
         assignment.quiz.as_json(include_root: false, only: [:anonymous_submissions])
 
-      attachment_includes = %i[crocodoc_document canvadoc root_attachment]
+      attachment_includes = %i[canvadoc root_attachment]
 
       # Preload attachments for later looping
       attachments_for_submission =
@@ -415,10 +415,6 @@ module SpeedGrader
                                 view_inline_ping_url:
                                   assignment_file_inline_view_path(assignment.id, a.id),
                                 canvadoc_url: a.canvadoc_url(current_user, url_opts),
-                                crocodoc_url: a.crocodoc_url(current_user, url_opts),
-                                submitted_to_crocodoc: a.crocodoc_document.present?,
-                                hijack_crocodoc_session:
-                                  a.crocodoc_document.present? && migrate_to_canvadocs?,
                                 upload_status: AttachmentUploadStatus.upload_status(a)
                               }
                             )
@@ -534,11 +530,6 @@ module SpeedGrader
 
     def course
       assignment.context
-    end
-
-    def migrate_to_canvadocs?
-      account_context = course.try(:account) || course.try(:root_account)
-      account_context.present? && account_context.migrate_to_canvadocs?
     end
 
     def rubric_assessments_to_json(rubric_assessments:, submissions:)

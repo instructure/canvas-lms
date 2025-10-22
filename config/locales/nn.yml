@@ -5626,11 +5626,15 @@ nn:
         goBackToInclude: "Vil du gå tilbake og inkludere:"
         notAllSectionsAssigned: "Ikkje alle klassene blir tildelte dette elementet."
     name_is_required: "Namn er obligatorisk!"
+    next: Neste
+    next_month: "Neste månad"
     no_dates_error: "Du må oppgi minst ein dato og eit tidspunkt"
     no_groups: "Finn ingen grupper"
     no_users: "Finn ingen brukarar"
     ok: OK
     open_appointment_on_this_day: "Det er ein open avtale denne dagen"
+    previous: Førre
+    previous_month: "Førre månad"
     prompts: 
       delete_assignment: "Er du sikker på at du vil slette denne oppgåva?"
       delete_event: "Er du sikker på at du vil slette denne hendinga?"
@@ -8376,6 +8380,7 @@ nn:
   course_sis_7ae8f649: emne-SIS
   course_sis_df8b379: Emne-SIS
   course_sis_id_bbed1a60: emne-SIS-ID
+  course_sis_id_c026d0f3: Emne-SIS-ID
   course_sis_id_cd834b3c: "Emne-SIS-ID:"
   course_sis_id_sis_id_or_canvas_id_4d323f5c: "Emne-SIS-ID (SIS_ID:####) ELLER Canvas-ID: (###)"
   course_start_date_daae16ae: "Startdatoen til emnet"
@@ -19473,6 +19478,8 @@ nn:
   page_not_found_2b0d05f5: "Finn ikkje side"
   page_page_59070cd8: "Side %{page}"
   page_pagenum_20dbfeb8: "Side %{pageNum}"
+  page_title: 
+    edit_ai_experience: "Rediger %{title}"
   page_title_106304bb: Sidetittel
   page_title_ascending_b5df950c: "Sidetittel: Aukande"
   page_title_d1a22bbf: Sidetittel
@@ -22647,6 +22654,7 @@ nn:
   remove_name_content_requirement_7af56c50: "Fjern %{name} innhaldskrav"
   remove_name_from_group_487cce74: "Fjern %{name} frå gruppa"
   remove_name_prerequisite_98377b60: "Fjern %{name} føresetnad"
+  remove_never_drop_rule_b9d08c64: "Fjern regelen om å ikkje fjerne"
   remove_null_values_from_live_event_payloads_3c826f: "Fjern null-verdiar frå live event payloads"
   remove_observers_from_courses_703edc34: "Fjern observatørar frå emna"
   remove_optionname_8a67379b: "Fjern %{optionName}"
@@ -22682,6 +22690,7 @@ nn:
   remove_this_section_9a88ca43: "Fjern denne klassa"
   remove_this_section_pace_ba87ad3c: "Fjern denne seksjonensframdrifta?"
   remove_this_student_pace_a5e7b3c5: "Fjern denne Studentframdrifta?"
+  remove_unsaved_never_drop_rule_bde18827: "Fjern den ulagra regelen om å ikkje fjerne"
   remove_user_from_section_5556f465: "Fjern brukaren frå klassa"
   remove_webcam_image_count_efee4a11: "Fjern bilde frå webkamera %{count}"
   removed_assignment_assignment_name_835cc776: "Fjern oppgåve %{assignment_name}"
@@ -25511,6 +25520,7 @@ nn:
   student_sis_d9f0cd39: student-SIS
   student_sis_id: "Student SIS ID"
   student_sis_id_abe6b292: student-SIS-ID
+  student_sis_id_ae374b2c: "Student SIS ID"
   student_student_number_5c98bd2d: "Student %{student_number}"
   student_studentnumber_f398d9c2: "Student %{studentNumber}"
   student_submission_report_af01e697: "Rapport studentinnleveringar"

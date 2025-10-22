@@ -60,25 +60,30 @@ def gergichLintersStage(stages) {
   }
 }
 
-def miscJsChecksStage(stages) {
+def miscJsChecksStage(stages, buildConfig) {
   { ->
     callableWithDelegate(queueTestStage())(stages,
       name: 'miscJsChecks',
-      command: './build/new-jenkins/linters/run-misc-js-checks.sh'
+      command: './build/new-jenkins/linters/run-misc-js-checks.sh',
+      // JS files for obvious reasons, yarn files in case dependencies are changed.
+      required: filesChangedStage.hasYarnFiles(buildConfig) || filesChangedStage.hasJsFiles(buildConfig)
     )
   }
 }
 
-def typescriptStage(stages) {
+def typescriptStage(stages, buildConfig) {
   { ->
     callableWithDelegate(queueTestStage())(stages,
       name: 'TypeScript',
-      command: './build/new-jenkins/linters/run-ts-type-check.sh'
+      command: './build/new-jenkins/linters/run-ts-type-check.sh',
+      // We include all JS files to be safe, GraphQL because we use GraphQL codegen which generates TS files,
+      // and yarn files in case dependencies were added/removed that affect types or we update TS itself.
+      required: env.GERRIT_PROJECT == 'canvas-lms' && (filesChangedStage.hasJsFiles(buildConfig) || filesChangedStage.hasGraphqlFiles(buildConfig) || filesChangedStage.hasYarnFiles(buildConfig))
     )
   }
 }
 
-def eslintStage(stages) {
+def eslintStage(stages, buildConfig) {
   { ->
     def codeEnvVars = [
       "SKIP_ESLINT=${commitMessageFlag('skip-eslint') as Boolean}",
@@ -87,7 +92,9 @@ def eslintStage(stages) {
     callableWithDelegate(queueTestStage())(stages,
       name: 'ESLint',
       envVars: codeEnvVars,
-      command: './build/new-jenkins/linters/run-eslint.sh'
+      command: './build/new-jenkins/linters/run-eslint.sh',
+      // JS files for obvious reasons, yarn files in case dependencies were added/removed that affect linting or we update ESLint itself.
+      required: filesChangedStage.hasJsFiles(buildConfig) || filesChangedStage.hasYarnFiles(buildConfig)
     )
   }
 }

@@ -101,8 +101,7 @@ module Lti
       course.save!
       user.save!
 
-      # Enable differentiation tags feature flag and setting on course account
-      course.account.enable_feature!(:assign_to_differentiation_tags)
+      # Enable differentiation tags setting on course account
       course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       course.account.save!
 
@@ -153,8 +152,7 @@ module Lti
 
     before do
       root_account.disable_feature!(:refactor_custom_variables)
-      # Enable the differentiation tags feature
-      course.account.enable_feature!(:assign_to_differentiation_tags)
+      # Enable the differentiation tags
       root_account.settings = { allow_assign_to_differentiation_tags: { value: true } }
       course.account.save!
     end
@@ -1264,6 +1262,39 @@ module Lti
         end
       end
 
+      context "com.instructure.Course.rce_studio_embed_improvements expansion" do
+        let(:subst_name) { "$com.instructure.Course.rce_studio_embed_improvements" }
+
+        it "returns 'true' when the feature flag is enabled for the course" do
+          course.save!
+          course.enable_feature!(:rce_studio_embed_improvements)
+
+          expander = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:
+          )
+
+          expect(expand!(subst_name, expander:)).to eq "true"
+        end
+
+        it "returns 'false' when the feature flag is not enabled for the course" do
+          course.save!
+
+          expander = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:
+          )
+
+          expect(expand!(subst_name, expander:)).to eq "false"
+        end
+      end
+
       context "modules resources expansion" do
         let(:available_canvas_resources) { [{ "course_id" => course.id, "type" => "module" }] }
 
@@ -2228,6 +2259,15 @@ module Lti
           expect(expand!("$Canvas.assignment.title")).to eq "Buy as many ducks as you can"
         end
 
+        it "has substitution for $Canvas.assignment.new_quizzes_type" do
+          expect(expand!("$Canvas.assignment.new_quizzes_type")).to eq "graded_quiz"
+        end
+
+        it "has substitution for $Canvas.assignment.new_quizzes_type with custom type" do
+          allow(assignment).to receive(:new_quizzes_type).and_return("ungraded_survey")
+          expect(expand!("$Canvas.assignment.new_quizzes_type")).to eq "ungraded_survey"
+        end
+
         describe "$Canvas.assignment.pointsPossible" do
           it "has substitution for $Canvas.assignment.pointsPossible" do
             allow(assignment).to receive(:points_possible).and_return(10.0)
@@ -2955,8 +2995,7 @@ module Lti
           course.save!
           user.save!
 
-          # Enable differentiation tags feature flag and setting on course account
-          course.account.enable_feature!(:assign_to_differentiation_tags)
+          # Enable differentiation tags setting on course account
           course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
           course.account.save!
 
@@ -3010,8 +3049,7 @@ module Lti
           course.save!
           user.save!
 
-          # Enable differentiation tags feature flag and setting
-          course.account.enable_feature!(:assign_to_differentiation_tags)
+          # Enable differentiation tags setting
           course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
           course.account.save!
 
@@ -3133,8 +3171,7 @@ module Lti
           course.save!
           user.save!
 
-          # Enable differentiation tags feature flag and setting
-          course.account.enable_feature!(:assign_to_differentiation_tags)
+          # Enable differentiation tags setting
           course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
           course.account.save!
 
@@ -3188,8 +3225,7 @@ module Lti
           course.save!
           user.save!
 
-          # Enable differentiation tags feature flag and setting
-          course.account.enable_feature!(:assign_to_differentiation_tags)
+          # Enable differentiation tags setting
           course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
           course.account.save!
 

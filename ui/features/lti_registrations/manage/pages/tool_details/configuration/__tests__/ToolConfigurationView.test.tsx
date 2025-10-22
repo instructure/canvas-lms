@@ -450,3 +450,138 @@ describe('Tool Configuration Copy JSON Code button', () => {
     expect(queryByText('Copy JSON Code')).not.toBeInTheDocument()
   })
 })
+
+describe('Tool Configuration View EULA Settings', () => {
+  const mockEulaMessageSettings = [
+    {
+      type: 'LtiEulaRequest' as const,
+      enabled: true,
+      target_link_uri: 'https://example.com/eula',
+      custom_fields: {
+        eula_field1: 'value1',
+        eula_field2: 'value2',
+      },
+    },
+  ]
+
+  beforeEach(() => {
+    // Ensure window.ENV exists
+    if (!window.ENV) {
+      ;(window as any).ENV = {}
+    }
+    if (!window.ENV.FEATURES) {
+      window.ENV.FEATURES = {}
+    }
+  })
+
+  it('should render EULA settings when feature flag is enabled and message settings are present', () => {
+    // Mock the feature flag
+    window.ENV.FEATURES.lti_asset_processor = true
+
+    const {getByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
+        overlaid_configuration: mockConfiguration({
+          launch_settings: {
+            message_settings: mockEulaMessageSettings,
+          },
+        }),
+      },
+    })(<ToolConfigurationView />)
+
+    expect(getByText('EULA Settings')).toBeInTheDocument()
+    expect(getByText('https://example.com/eula')).toBeInTheDocument()
+    expect(getByText(/eula_field1=value1/)).toBeInTheDocument()
+    expect(getByText(/eula_field2=value2/)).toBeInTheDocument()
+  })
+
+  it('should render EULA settings when message settings contain LtiEulaRequest', () => {
+    const {getByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
+        overlaid_configuration: mockConfiguration({
+          launch_settings: {
+            message_settings: mockEulaMessageSettings,
+          },
+        }),
+      },
+    })(<ToolConfigurationView />)
+
+    expect(getByText('EULA Settings')).toBeInTheDocument()
+    expect(getByText('https://example.com/eula')).toBeInTheDocument()
+  })
+
+  it('should not render EULA settings when no message settings and no EULA scope/placements', () => {
+    const {queryByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
+        overlaid_configuration: mockConfiguration({
+          // No launch_settings with EULA message settings
+          // No scopes that include EulaUser
+          // No placements that include ActivityAssetProcessor
+        }),
+      },
+    })(<ToolConfigurationView />)
+
+    expect(queryByText('EULA Settings')).not.toBeInTheDocument()
+  })
+
+  it('should render proper labels for EULA settings', () => {
+    ;(window as any).ENV = {
+      FEATURES: {
+        lti_asset_processor: true,
+      },
+    }
+
+    const {getByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
+        overlaid_configuration: mockConfiguration({
+          launch_settings: {
+            message_settings: mockEulaMessageSettings,
+          },
+        }),
+      },
+    })(<ToolConfigurationView />)
+
+    expect(getByText('EULA Settings')).toBeInTheDocument()
+    expect(getByText('EULA Target Link URI')).toBeInTheDocument()
+    expect(getByText('EULA Custom Fields')).toBeInTheDocument()
+  })
+
+  it('should handle empty EULA custom fields', () => {
+    ;(window as any).ENV = {
+      FEATURES: {
+        lti_asset_processor: true,
+      },
+    }
+
+    const eulaWithoutCustomFields = [
+      {
+        type: 'LtiEulaRequest' as const,
+        enabled: true,
+        target_link_uri: 'https://example.com/eula',
+        custom_fields: {},
+      },
+    ]
+
+    const {getByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
+        overlaid_configuration: mockConfiguration({
+          launch_settings: {
+            message_settings: eulaWithoutCustomFields,
+          },
+        }),
+      },
+    })(<ToolConfigurationView />)
+
+    expect(getByText('EULA Settings')).toBeInTheDocument()
+    expect(getByText('No custom fields configured.')).toBeInTheDocument()
+  })
+})

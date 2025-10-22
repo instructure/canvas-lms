@@ -490,11 +490,12 @@ module Lti::IMS
         describe "when the tool does not support LtiEulaRequest" do
           let(:eula_message) { nil }
 
-          it "does not add a eula object to the ActivityAssetProcessor placement" do
+          it "does not add EULA to message_settings" do
             expect(registration.canvas_configuration["extensions"][0]["settings"]["placements"]).to match_array([
                                                                                                                   deep_linking_placement("ActivityAssetProcessor"),
                                                                                                                   deep_linking_placement("course_navigation")
                                                                                                                 ])
+            expect(registration.canvas_configuration["extensions"][0]["settings"]).not_to have_key("message_settings")
           end
         end
 
@@ -507,12 +508,17 @@ module Lti::IMS
             registration.canvas_configuration["extensions"][0]["settings"]["placements"]
           end
 
-          it "adds eula: {enabled: true} to the ActivityAssetProcessor placement" do
-            eula = { enabled: true }
+          it "adds EULA to message_settings" do
             expect(actual_placements).to match_array([
-                                                       deep_linking_placement("ActivityAssetProcessor", eula:),
+                                                       deep_linking_placement("ActivityAssetProcessor"),
                                                        deep_linking_placement("course_navigation")
                                                      ])
+            expect(registration.canvas_configuration["extensions"][0]["settings"]["message_settings"]).to match_array([
+                                                                                                                        {
+                                                                                                                          type: "LtiEulaRequest",
+                                                                                                                          enabled: true
+                                                                                                                        }
+                                                                                                                      ])
           end
 
           describe "when eula_message has custom_parameters and target_link_uri" do
@@ -524,16 +530,19 @@ module Lti::IMS
               }
             end
 
-            it "adds those settings to the ActivityAssetProcessor's eula settings" do
-              eula = {
-                enabled: true,
-                target_link_uri: "http://example.com/eula",
-                custom_fields: { "this_is_a_eula" => "yes" },
-              }
+            it "adds those settings to message_settings" do
               expect(actual_placements).to match_array([
-                                                         deep_linking_placement("ActivityAssetProcessor", eula:),
+                                                         deep_linking_placement("ActivityAssetProcessor"),
                                                          deep_linking_placement("course_navigation")
                                                        ])
+              expect(registration.canvas_configuration["extensions"][0]["settings"]["message_settings"]).to match_array([
+                                                                                                                          {
+                                                                                                                            type: "LtiEulaRequest",
+                                                                                                                            enabled: true,
+                                                                                                                            target_link_uri: "http://example.com/eula",
+                                                                                                                            custom_fields: { "this_is_a_eula" => "yes" }
+                                                                                                                          }
+                                                                                                                        ])
             end
           end
         end
@@ -961,6 +970,60 @@ module Lti::IMS
       end
     end
 
+    describe "to_internal_lti_configuration" do
+      let(:expected_config) do
+        {
+          title: "Example Tool",
+          domain: "example.com",
+          target_link_uri: "http://example.com/launch",
+          privacy_level: "anonymous",
+          oidc_initiation_url: "http://example.com/login",
+          redirect_uris: ["http://example.com"],
+          public_jwk_url: "http://example.com/jwks",
+          scopes: [],
+          placements: [],
+          launch_settings: {
+            icon_url: "http://example.com/logo.png",
+            text: "Example Tool"
+          }
+        }.with_indifferent_access
+      end
+
+      context "when called with an Lti::IMS::Registration instance" do
+        subject { Registration.to_internal_lti_configuration(registration) }
+
+        it "returns the correct internal configuration" do
+          expect(subject).to eq(expected_config)
+        end
+      end
+
+      context "when called with a hash" do
+        let(:registration_hash) do
+          {
+            "client_name" => "Example Tool",
+            "initiate_login_uri" => "http://example.com/login",
+            "jwks_uri" => "http://example.com/jwks",
+            "scopes" => [],
+            "redirect_uris" => ["http://example.com"],
+            "logo_uri" => "http://example.com/logo.png",
+            "lti_tool_configuration" => {
+              "target_link_uri" => "http://example.com/launch",
+              "domain" => "example.com",
+              "messages" => [],
+              "claims" => []
+            },
+            "https://canvas.instructure.com/lti/privacy_level" => "anonymous"
+          }
+        end
+
+        subject { Registration.to_internal_lti_configuration(registration_hash) }
+
+        it "returns the correct internal configuration" do
+          expect(subject).to eq(expected_config)
+        end
+      end
+    end
+
     describe "as_json" do
       subject { registration.as_json }
 
@@ -991,6 +1054,7 @@ module Lti::IMS
             guid
             tool_configuration
             default_configuration
+            registration_url
           ]
         )
       end

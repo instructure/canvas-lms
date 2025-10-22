@@ -152,6 +152,14 @@ module GraphQLNodeLoader
           policy
         end
       end
+    when "ScheduledPost"
+      Loaders::IDLoader.for(ScheduledPost).load(id).then do |scheduled_post|
+        Loaders::AssociationLoader.for(ScheduledPost, :assignment).load(scheduled_post).then do |assignment|
+          next nil unless assignment.course.grants_right?(ctx[:current_user], :manage_grades)
+
+          scheduled_post
+        end
+      end
     when "File"
       Loaders::IDLoader.for(Attachment).load(id).then do |attachment|
         next if attachment.deleted?

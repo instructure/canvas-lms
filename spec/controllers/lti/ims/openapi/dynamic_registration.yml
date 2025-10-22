@@ -65,6 +65,27 @@ paths:
           description: TBD
         404:
           description: TBD
+  /api/lti/accounts/:account_id/lti_registration_update_request/uuid/:registration_uuid:
+    get:
+      summary: TBD
+      parameters:
+        - in: path
+          name: registration_uuid
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: TBD
+          content:
+            # We return an Lti::RegistrationUpdateRequest object
+            application/json:
+              schema:
+                type: object
+        401:
+          description: TBD
+        404:
+          description: TBD
   /api/lti/accounts/:account_id/registrations/:registration_id:
     get:
       summary: TBD
@@ -155,6 +176,32 @@ paths:
                       type: array
                     target_link_uri:
                       type: string
+  /api/lti/registrations/:registration_id:
+    put:
+      summary: Updates an existing tool registration.
+      parameters:
+        - in: path
+          name: registration_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "The tool registration was updated."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/registration"
+        '401':
+          description: "The provided token was invalid."
+        '404':
+          description: "The tool registration was not found."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/registration"
   /api/lti/registrations/:registration_id/view:
     get:
       summary: Redirects the user to the tool's configuration view.

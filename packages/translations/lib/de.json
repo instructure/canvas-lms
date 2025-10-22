@@ -1823,6 +1823,9 @@
     "please_enter_a_file_name_f159edc1": {
         "message": "Bitte geben Sie einen Dateinamen ein"
     },
+    "please_enter_a_valid_video_url_from_a_supported_pl_30dc0596": {
+        "message": "Bitte geben Sie eine gültige Video-URL von einer unterstützten Plattform ein."
+    },
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "Bitte wählen Sie eine Datei mit einem unterstützten Typ"
     },
@@ -1945,6 +1948,12 @@
     },
     "religion_icon_246e0be1": {
         "message": "Religionssymbol"
+    },
+    "remove_f47dc62a": {
+        "message": "Entfernen"
+    },
+    "remove_filename_3ea029f6": {
+        "message": "{ filename } entfernen"
     },
     "remove_heading_style_5fdc8855": {
         "message": "Überschriftsstil entfernen"
@@ -2699,6 +2708,9 @@
     "video_player_for_title_ffd9fbc4": {
         "message": "Videoplayer für { title }"
     },
+    "video_url_889d3263": {
+        "message": "Video-URL"
+    },
     "vietnamese_e7a76583": {
         "message": "Vietnamesisch"
     },
@@ -2824,6 +2836,9 @@
     },
     "your_webcam_may_already_be_in_use_6cd64c25": {
         "message": "Ihre Webcam wird möglicherweise bereits benutzt."
+    },
+    "youtube_embed_url_5c1018d4": {
+        "message": "Einbettungs-URL von YouTube"
     },
     "zeta_5ef24f0e": {
         "message": "Zeta"

@@ -103,9 +103,8 @@ shared_examples_for "item assign to on page during assignment creation/update" d
     check_element_has_focus(assign_to_card_delete_button[1])
   end
 
-  context "differentiaiton tags" do
+  context "differentiation tags" do
     before :once do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.tap do |a|
         a.settings[:allow_assign_to_differentiation_tags] = { value: true }
         a.save!
@@ -205,6 +204,21 @@ shared_examples_for "item assign to on page during assignment creation/update" d
       update_due_time(0, "5:00 PM")
 
       expect(module_item_assign_to_card.last).not_to contain_css(AssignmentCreateEditPage.assignment_inherited_from_selector)
+    end
+
+    it "reuses existing unassigned override when assignment is saved" do
+      unassigned_override = @assignment.assignment_overrides.create!(set: @course.course_sections.first, unassign_item: true)
+      @assignment.assignment_overrides.create!(set: @course, due_at: 1.day.from_now)
+
+      AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @assignment.id)
+
+      update_due_date(0, "12/31/2024")
+      AssignmentCreateEditPage.save_assignment
+      @assignment.reload
+
+      unassigned_overrides = @assignment.assignment_overrides.where(unassign_item: true)
+      expect(unassigned_overrides.count).to eq(1)
+      expect(unassigned_overrides.first.id).to eq(unassigned_override.id)
     end
   end
 end

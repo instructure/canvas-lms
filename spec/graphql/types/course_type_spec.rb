@@ -1802,7 +1802,6 @@ describe Types::CourseType do
 
     context "differentiation_tags" do
       before :once do
-        Account.default.enable_feature! :assign_to_differentiation_tags
         Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
         Account.default.save!
         Account.default.reload
@@ -1862,7 +1861,6 @@ describe Types::CourseType do
     end
 
     it "includes non_collaborative group sets when asked for by someone with permissions" do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -1914,7 +1912,6 @@ describe Types::CourseType do
     end
 
     it "includes non_collaborative group sets when asked for by someone with permissions" do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload

@@ -45,6 +45,13 @@ class TermsOfService < ActiveRecord::Base
     terms_type == "custom"
   end
 
+  def self.external_url(account)
+    return nil if Rails.env.test?
+    return nil unless account.terms_of_service&.terms_type =~ /^built_in:(.+)$/
+
+    Setting.get("external_aup_url_for_#{$1}", nil)
+  end
+
   def self.ensure_terms_for_account(account, is_new_account = false)
     return unless table_exists?
     return if account.dummy?

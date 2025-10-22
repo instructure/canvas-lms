@@ -573,7 +573,6 @@ describe "due date validations", :ignore_js_errors do
 
   context "differentiation tags" do
     before do
-      @course.account.enable_feature!(:assign_to_differentiation_tags)
       @course.account.tap do |a|
         a.settings[:allow_assign_to_differentiation_tags] = { value: true }
         a.save!

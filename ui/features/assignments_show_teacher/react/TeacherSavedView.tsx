@@ -44,7 +44,7 @@ const TeacherSavedView: React.FC<TeacherViewProps> = ({assignment, breakpoints =
       />
       {/* The main content of the saved view could go here */}
       {ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED && assignment.peerReviews?.enabled && (
-        <AssignmentTabs />
+        <AssignmentTabs assignment={assignment} />
       )}
       {moduleItemId && <AssignmentFooter moduleItemId={moduleItemId} />}
     </QueryClientProvider>

@@ -234,6 +234,7 @@ describe('useLtiAssetProcessorsAndReportsForStudent hooks', () => {
       expect(result.current).toEqual({
         assignmentName: 'Test Assignment',
         attempt: 1,
+        submissionType: 'online_upload',
         assetProcessors: expect.arrayContaining([
           expect.objectContaining({
             _id: expect.any(String),

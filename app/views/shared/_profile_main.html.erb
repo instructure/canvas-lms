@@ -36,9 +36,10 @@
         <div class="image-block-image profile-avatar-wrapper">
           <% if @user_data[:can_edit_avatar] %>
             <%= avatar(@user_data[:id], size: image_size, url: nil, edit: true, class: "profile_pic_link") %>
-                <button class="btn btn-small profile-edit-link" aria-label="<%= t('Click to change profile picture for %{display_name}', display_name: @user.short_name) %>">
+                <button id="profile-edit-link" class="btn btn-small profile-edit-link" aria-label="<%= t('Click to change profile picture for %{display_name}', display_name: @user.short_name) %>">
                     <%= t('Edit Profile Picture') %>
                 </button>
+                <div id="avatar-modal-mount"></div>
           <% else %>
             <%= avatar(@user_data[:id], size: image_size, url: nil) %>
           <% end %>

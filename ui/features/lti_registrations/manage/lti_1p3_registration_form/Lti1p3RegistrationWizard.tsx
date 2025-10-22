@@ -44,6 +44,7 @@ import {toUndefined} from '../../common/lib/toUndefined'
 import {Footer} from '../registration_wizard_forms/Footer'
 import {isLtiPlacementWithIcon} from '../model/LtiPlacement'
 import {Header} from '../registration_wizard_forms/Header'
+import {LaunchTypeSpecificSettingsConfirmationWrapper} from './components/LaunchTypeSpecificSettingsConfirmationWrapper'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -82,8 +83,14 @@ export const Lti1p3RegistrationWizard = ({
 
   const handlePreviousClicked = (prevStep: Lti1p3RegistrationWizardStep) => () => {
     store.setReviewing(false)
-    store.setStep(prevStep)
+    if (prevStep === 'EulaSettings' && !shouldShowEula) {
+      store.setStep('Placements')
+    } else {
+      store.setStep(prevStep)
+    }
   }
+
+  const shouldShowEula = store.state.overlayStore().isEulaCapable()
 
   const handleNextClicked = (nextStep: Lti1p3RegistrationWizardStep) => () => {
     if (store.state.reviewing) {
@@ -92,7 +99,11 @@ export const Lti1p3RegistrationWizard = ({
       if (nextStep === 'Review') {
         store.setReviewing(true)
       }
-      store.setStep(nextStep)
+      if (nextStep === 'EulaSettings' && !shouldShowEula) {
+        store.setStep('OverrideURIs')
+      } else {
+        store.setStep(nextStep)
+      }
     }
   }
 
@@ -155,6 +166,23 @@ export const Lti1p3RegistrationWizard = ({
             currentScreen="intermediate"
             reviewing={store.state.reviewing}
             onPreviousClicked={handlePreviousClicked('DataSharing')}
+            onNextClicked={handleNextClicked('EulaSettings')}
+          />
+        </>
+      )
+    case 'EulaSettings':
+      return (
+        <>
+          <Header onClose={onDismiss} editing={!!existingRegistration} />
+          <LaunchTypeSpecificSettingsConfirmationWrapper
+            settingType="LtiEulaRequest"
+            internalConfig={internalConfiguration}
+            overlayStore={store.state.overlayStore}
+          />
+          <Footer
+            currentScreen="intermediate"
+            reviewing={store.state.reviewing}
+            onPreviousClicked={handlePreviousClicked('Placements')}
             onNextClicked={handleNextClicked('OverrideURIs')}
           />
         </>
@@ -167,7 +195,7 @@ export const Lti1p3RegistrationWizard = ({
             overlayStore={store.state.overlayStore}
             internalConfig={internalConfiguration}
             reviewing={store.state.reviewing}
-            onPreviousClicked={handlePreviousClicked('Placements')}
+            onPreviousClicked={handlePreviousClicked('EulaSettings')}
             onNextClicked={handleNextClicked('Naming')}
           />
         </>

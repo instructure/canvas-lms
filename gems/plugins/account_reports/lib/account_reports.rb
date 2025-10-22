@@ -169,7 +169,7 @@ module AccountReports
       filename += ".zip"
       temp.close!
 
-      Zip::File.open(filepath, Zip::File::CREATE) do |zipfile|
+      Zip::File.open(filepath, create: true) do |zipfile|
         csv.each do |report_name, contents|
           zipfile.add(report_name + ".csv", contents)
         end

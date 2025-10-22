@@ -1564,7 +1564,7 @@ class Submission < ActiveRecord::Base
 
   def submit_attachments_to_canvadocs
     if saved_change_to_attachment_ids? && submission_type != "discussion_topic"
-      attachments.preload(:crocodoc_document, :canvadoc).each do |a|
+      attachments.preload(:canvadoc).find_each do |a|
         # associate previewable-document and submission for permission checks
         if a.canvadocable? && Canvadocs.annotations_supported?
           submit_to_canvadocs = true
@@ -1572,18 +1572,12 @@ class Submission < ActiveRecord::Base
           a.shard.activate do
             CanvadocsSubmission.find_or_create_by(submission_id: id, canvadoc_id: a.canvadoc.id)
           end
-        elsif a.crocodocable?
-          submit_to_canvadocs = true
-          a.create_crocodoc_document! unless a.crocodoc_document
-          a.shard.activate do
-            CanvadocsSubmission.find_or_create_by(submission_id: id, crocodoc_document_id: a.crocodoc_document.id)
-          end
         end
 
         next unless submit_to_canvadocs
 
         opts = {
-          preferred_plugins: [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC],
+          preferred_plugins: [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX],
           wants_annotation: true,
         }
 
@@ -2045,8 +2039,7 @@ class Submission < ActiveRecord::Base
   def self.bulk_load_attachments_and_previews(submissions)
     bulk_load_versioned_attachments(submissions)
     attachments = submissions.flat_map(&:versioned_attachments)
-    ActiveRecord::Associations.preload(attachments,
-                                       [:canvadoc, :crocodoc_document])
+    ActiveRecord::Associations.preload(attachments, :canvadoc)
     Version.preload_version_number(submissions)
   end
 
@@ -2433,10 +2426,7 @@ class Submission < ActiveRecord::Base
   def moderated_grading_allow_list(current_user = user, loaded_attachments: nil)
     return nil unless assignment.moderated_grading? && current_user.present?
 
-    has_crocodoc = (loaded_attachments || attachments).any?(&:crocodoc_available?)
-    moderation_allow_list_for_user(current_user).map do |user|
-      user.moderated_grading_ids(has_crocodoc)
-    end
+    moderation_allow_list_for_user(current_user).map(&:moderated_grading_ids)
   end
 
   def moderation_allow_list_for_user(current_user)

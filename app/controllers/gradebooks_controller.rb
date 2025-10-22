@@ -998,18 +998,19 @@ class GradebooksController < ApplicationController
         ).map { |c| { submission_comment: c } }
 
         if assignment.context.discussion_checkpoints_enabled?
-          # TODO: has_sub_assignment_submissions value will be updated to reflect true/false based off submissions on the sub assignment
-          # Refer to EGG-1916
-          submission_json[:has_sub_assignment_submissions] = assignment.has_sub_assignments
-          submission_json[:sub_assignment_submissions] = (assignment.has_sub_assignments &&
-            assignment.sub_assignments&.filter_map do |sub_assignment|
-              sub_assignment_submission = sub_assignment.submissions.find_by(user_id: submission.user_id)
-              # A Submission can be nil for two reasons:
-              # 1. The Submission was deleted due to the student no longer having access to the assignment (i.e. enrollment changes, assignment override removal)
-              # 2. The Submission was never created.
-              #    TODO: Older DiscussionTopic SubAssignments may fall into this category. In this case, we will throw a custom error so we can track. Refer to EGG-1916
-              sub_assignment_submission_json(sub_assignment_submission, sub_assignment_submission.assignment, @current_user, @session, @context) if sub_assignment_submission.present?
-            end) || []
+          if assignment.has_sub_assignments
+            result = Checkpoints::SubAssignmentSubmissionSerializer.serialize(assignment:, user_id: submission.user_id)
+
+            sub_assignment_submissions = result[:submissions]&.filter_map do |sub_assignment_submission|
+              sub_assignment_submission_json(sub_assignment_submission, sub_assignment_submission.assignment, @current_user, @session, @context)
+            end
+
+            submission_json[:has_sub_assignment_submissions] = result[:has_active_submissions]
+            submission_json[:sub_assignment_submissions] = sub_assignment_submissions || []
+          else
+            submission_json[:has_sub_assignment_submissions] = false
+            submission_json[:sub_assignment_submissions] = []
+          end
         end
       end
       json
@@ -1096,6 +1097,7 @@ class GradebooksController < ApplicationController
         ENHANCED_RUBRICS_ENABLED: @context.feature_enabled?(:enhanced_rubrics),
         PLATFORM_SERVICE_SPEEDGRADER_ENABLED: platform_service_speedgrader_enabled,
         MANAGE_GRADES: @context.grants_right?(@current_user, session, :manage_grades),
+        VIEW_ALL_GRADES: @context.grants_right?(@current_user, session, :view_all_grades),
         RESTRICT_QUANTITATIVE_DATA_ENABLED: @context.restrict_quantitative_data?(@current_user),
         GRADE_BY_STUDENT_ENABLED: @context.root_account.feature_enabled?(:speedgrader_grade_by_student),
         STICKERS_ENABLED_FOR_ASSIGNMENT: @assignment.present? && @assignment.stickers_enabled?(@current_user),
@@ -1113,6 +1115,22 @@ class GradebooksController < ApplicationController
         show_inactive_enrollments: gradebook_settings(@context.global_id)&.[]("show_inactive_enrollments") == "true",
         show_concluded_enrollments: @context.completed? || gradebook_settings(@context.global_id)&.[]("show_concluded_enrollments") == "true",
       }
+
+      if @current_user && @real_current_user && @real_current_user != @current_user
+        masquerade_data = { is_fake_student: @current_user.fake_student? }
+
+        if @current_user.fake_student?
+          student_view_course = @current_user.all_courses.first
+          masquerade_data[:reset_student_url] = course_test_student_path(student_view_course) if student_view_course
+          masquerade_data[:leave_student_view_url] = course_student_view_path(student_view_course) if student_view_course
+        else
+          masquerade_data[:stop_masquerading_url] = user_masquerade_path(@real_current_user.id)
+          masquerade_data[:acting_as_user_name] = @current_user.short_name
+          masquerade_data[:acting_as_avatar_url] = @current_user.avatar_url if service_enabled?(:avatars)
+        end
+
+        env[:masquerade] = masquerade_data
+      end
       js_env(env)
 
       deferred_js_bundle :platform_speedgrader

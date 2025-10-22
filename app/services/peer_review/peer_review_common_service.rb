@@ -45,17 +45,18 @@ class PeerReview::PeerReviewCommonService < ApplicationService
 
   def attributes_to_inherit_from_parent
     %w[
+      anonymous_peer_reviews
       assignment_group_id
+      automatic_peer_reviews
       context_id
       context_type
       description
+      group_category_id
+      intra_group_peer_reviews
       peer_review_count
       peer_reviews
-      peer_reviews_due_at
       peer_reviews_assigned
-      anonymous_peer_reviews
-      automatic_peer_reviews
-      intra_group_peer_reviews
+      peer_reviews_due_at
       workflow_state
     ]
   end

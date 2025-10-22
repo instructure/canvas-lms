@@ -33,9 +33,10 @@ import {convertModuleSettingsForApi} from '../utils/miscHelpers'
 import {updateModuleUI} from '../utils/moduleHelpers'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import type {Module, ModuleItem, PointsInputMessages, Requirement} from './types'
-import RelockModulesDialog from '@canvas/relock-modules-dialog'
+import {shouldShowRelockWarning} from '../../utils/relockValidation'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingOverlay from './LoadingOverlay'
+import PreSaveRelockModal from './PreSaveRelockModal'
 
 const I18n = createI18nScope('differentiated_modules')
 
@@ -55,6 +56,7 @@ export type SettingsPanelProps = {
   requirements?: Requirement[]
   moduleItems?: ModuleItem[]
   publishFinalGrade?: boolean
+  published?: boolean
   enablePublishFinalGrade?: boolean
   addModuleUI?: (data: Record<string, any>, element: HTMLDivElement) => void
   mountNodeRef: React.RefObject<HTMLElement>
@@ -96,27 +98,40 @@ const doRequest = (
       }),
     )
 
-export const updateModule = ({moduleId, moduleElement, data, onComplete}: any) => {
-  if (!moduleId) return Promise.reject(I18n.t('Invalid module id.'))
+export const updateModule = async ({
+  moduleId,
+  moduleElement,
+  data,
+  onComplete,
+  shouldRelock = false,
+}: any) => {
+  if (!moduleId) throw new Error(I18n.t('Invalid module id.'))
 
-  return doRequest(
+  await doRequest(
     `/courses/${ENV.COURSE_ID || ENV.course_id}/modules/${moduleId}`,
     'PUT',
     data,
-    responseJSON => {
-      const {context_module: responseData} = responseJSON
+    () => {
       updateModuleUI(moduleElement, data)
-      const dialog = new RelockModulesDialog()
-      dialog.renderIfNeeded({
-        relock_warning: responseData?.relock_warning ?? false,
-        id: moduleId,
-      })
     },
     I18n.t('%{moduleName} settings updated successfully.', {
       moduleName: data.moduleName,
     }),
     I18n.t('Error updating %{moduleName} settings.', {moduleName: data.moduleName}),
-  ).then(() => onComplete?.())
+  )
+
+  if (shouldRelock) {
+    const url = `/api/v1/courses/${ENV.COURSE_ID || ENV.course_id}/modules/${moduleId}/relock`
+    try {
+      await doFetchApi({path: url, method: 'PUT', body: {}})
+    } catch (e) {
+      showFlashAlert({
+        err: e as Error,
+        message: I18n.t('Error re-locking modules.'),
+      })
+    }
+  }
+  onComplete?.()
 }
 
 export const createModule = ({moduleElement, addModuleUI, data, onComplete}: any) =>
@@ -145,6 +160,7 @@ export default function SettingsPanel({
   requireSequentialProgress,
   requirements,
   publishFinalGrade,
+  published,
   enablePublishFinalGrade = false,
   moduleList = [],
   moduleItems = [],
@@ -171,10 +187,12 @@ export default function SettingsPanel({
 
   const [loading, setLoading] = useState(false)
   const [validDate, setValidDate] = useState(true)
+  const [showRelockModal, setShowRelockModal] = useState(false)
 
   const hasErrors = () => {
     return (
-      state.nameInputMessages.length > 0 || state.pointsInputMessages.length > 0 ||
+      state.nameInputMessages.length > 0 ||
+      state.pointsInputMessages.length > 0 ||
       (state.lockUntilChecked && (state.lockUntilInputMessages.length > 0 || !validDate))
     )
   }
@@ -233,14 +251,15 @@ export default function SettingsPanel({
       type: actions.SET_POINTS_INPUT_MESSAGES,
       payload: pointsMessages,
     })
-
   }, [])
 
   const validatePointsInput = (requirement: Requirement) => {
     const message = setPointsInputError(requirement)
-    const pointsMessages = state.pointsInputMessages.filter((item) => item.requirementId !== requirement.id)
+    const pointsMessages = state.pointsInputMessages.filter(
+      item => item.requirementId !== requirement.id,
+    )
 
-    if (message){
+    if (message) {
       pointsMessages.push({
         requirementId: requirement.id,
         message,
@@ -251,10 +270,9 @@ export default function SettingsPanel({
   }
 
   const validatePointsInputList = useCallback(() => {
-    const pointsMessages : PointsInputMessages  = []
+    const pointsMessages: PointsInputMessages = []
 
-    state.requirements?.forEach((requirement) => {
-
+    state.requirements?.forEach(requirement => {
       const message = setPointsInputError(requirement)
 
       if (message)
@@ -267,7 +285,48 @@ export default function SettingsPanel({
     return pointsMessages
   }, [state.requirements])
 
-  const handleSave = useCallback(() => {
+  const performSave = useCallback(
+    async (shouldRelock: boolean) => {
+      setLoading(true)
+
+      try {
+        const handleRequest = moduleId ? updateModule : createModule
+        await handleRequest({
+          moduleId,
+          moduleElement,
+          addModuleUI,
+          data: state,
+          onComplete,
+          shouldRelock,
+        })
+
+        // Request succeeded, close the tray
+        if (onDidSubmit) {
+          onDidSubmit()
+        } else {
+          onDismiss()
+        }
+      } catch (_) {
+        setLoading(false)
+      }
+    },
+    [moduleId, moduleElement, addModuleUI, state, onComplete, onDidSubmit, onDismiss],
+  )
+
+  const handleModalSave = useCallback(
+    async (shouldRelock: boolean) => {
+      setShowRelockModal(false)
+      await performSave(shouldRelock)
+    },
+    [performSave],
+  )
+
+  const handleModalCancel = useCallback(() => {
+    setShowRelockModal(false)
+    onDismiss()
+  }, [onDismiss])
+
+  const handleSave = useCallback(async () => {
     // check for errors
     if (state.moduleName.trim().length === 0) {
       handleNameError()
@@ -294,23 +353,34 @@ export default function SettingsPanel({
       return
     }
 
-    const handleRequest = moduleId ? updateModule : createModule
+    // Check if we need to show relock warning for updates (not creates)
+    if (moduleId) {
+      const shouldWarn = shouldShowRelockWarning(
+        {
+          prerequisites: state.prerequisites || undefined,
+          requirements: state.requirements || undefined,
+          unlockAt: state.lockUntilChecked ? state.unlockAt : undefined,
+        },
+        initialState.current,
+        published ?? false,
+      )
 
-    setLoading(true)
+      if (shouldWarn) {
+        setShowRelockModal(true)
+        return
+      }
+    }
 
-    handleRequest({ moduleId, moduleElement, addModuleUI, data: state, onComplete })
-      .finally(() => setLoading(false))
-      .then(() => (onDidSubmit ? onDidSubmit() : onDismiss()))
+    // No warning needed, proceed with save directly
+    performSave(false)
   }, [
     state,
     moduleId,
-    moduleElement,
-    addModuleUI,
     handleNameError,
     handlePointsInputError,
-    onDidSubmit,
-    onDismiss,
     validatePointsInputList,
+    performSave,
+    published,
   ])
 
   function customOnDismiss() {
@@ -328,188 +398,198 @@ export default function SettingsPanel({
   )
 
   return (
-    <Flex direction="column" justifyItems="space-between">
-      <LoadingOverlay showLoadingOverlay={loading} mountNode={mountNodeRef.current} />
-      <Flex.Item shouldGrow={true} padding="small" size={bodyHeight}>
-        <View as="div" padding="small">
-          <TextInput
-            data-testid="module-name-input"
-            renderLabel={I18n.t('Module Name')}
-            isRequired={true}
-            inputRef={el => (nameInputRef.current = el)}
-            value={state.moduleName}
-            messages={state.nameInputMessages}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              const {value} = e.target
-              dispatch({type: actions.SET_MODULE_NAME, payload: value})
-              if (value.trim().length > 0) {
-                dispatch({type: actions.SET_NAME_INPUT_MESSAGES, payload: []})
-              }
-            }}
-            onBlur={() => {
-              if (state.moduleName.trim().length === 0) {
-                handleNameError()
-              }
-            }}
-          />
-        </View>
-        <View as="div" padding="x-small small">
-          <Checkbox
-            data-testid="lock-until-checkbox"
-            label={I18n.t('Lock Until')}
-            checked={state.lockUntilChecked}
-            onChange={() =>
-              dispatch({type: actions.SET_LOCK_UNTIL_CHECKED, payload: !state.lockUntilChecked})
-            }
-          />
-        </View>
-        {state.lockUntilChecked && (
-          <View data-testid="lock-until-input" as="div" padding="small">
-            <DateTimeInput
-              value={state.unlockAt}
-              locale={ENV.LOCALE || 'en'}
-              timezone={ENV.TIMEZONE || 'UTC'}
-              dateRenderLabel={I18n.t('Date')}
-              timeRenderLabel={I18n.t('Time')}
-              invalidDateTimeMessage={I18n.t('Invalid date')}
-              messages={state.lockUntilInputMessages}
-              dateInputRef={el => (dateInputRef.current = el)}
-              layout="columns"
-              colSpacing="small"
-              prevMonthLabel={I18n.t('Previous month')}
-              nextMonthLabel={I18n.t('Next month')}
-              allowNonStepInput={true}
-              onChange={(_e, dateTimeString) => {
-                dispatch({type: actions.SET_UNLOCK_AT, payload: dateTimeString})
-                if (dateTimeString) {
-                  setValidDate(true)
-                  dispatch({type: actions.SET_LOCK_UNTIL_INPUT_MESSAGES, payload: []})
-                } else {
-                  setValidDate(false)
+    <>
+      <PreSaveRelockModal
+        open={showRelockModal}
+        onSave={handleModalSave}
+        onCancel={handleModalCancel}
+      />
+      <Flex direction="column" justifyItems="space-between">
+        <LoadingOverlay showLoadingOverlay={loading} mountNode={mountNodeRef.current} />
+        <Flex.Item shouldGrow={true} padding="small" size={bodyHeight}>
+          <View as="div" padding="small">
+            <TextInput
+              data-testid="module-name-input"
+              renderLabel={I18n.t('Module Name')}
+              isRequired={true}
+              inputRef={el => (nameInputRef.current = el)}
+              value={state.moduleName}
+              messages={state.nameInputMessages}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const {value} = e.target
+                dispatch({type: actions.SET_MODULE_NAME, payload: value})
+                if (value.trim().length > 0) {
+                  dispatch({type: actions.SET_NAME_INPUT_MESSAGES, payload: []})
                 }
               }}
-              onBlur={e => {
-                const target = e.target as HTMLInputElement
-                if (!target) return
-                if (target.value.length > 0) {
-                  setTimeout(() => {
-                    dispatch({type: actions.SET_LOCK_UNTIL_INPUT_MESSAGES, payload: []})
-                  }, 1)
-                } else {
-                  handleLockUntilError()
+              onBlur={() => {
+                if (state.moduleName.trim().length === 0) {
+                  handleNameError()
                 }
               }}
-              description={
-                <ScreenReaderContent>
-                  {I18n.t('Unlock Date for %{moduleName}', {moduleName: state.moduleName})}
-                </ScreenReaderContent>
+            />
+          </View>
+          <View as="div" padding="x-small small">
+            <Checkbox
+              data-testid="lock-until-checkbox"
+              label={I18n.t('Lock Until')}
+              checked={state.lockUntilChecked}
+              onChange={() =>
+                dispatch({type: actions.SET_LOCK_UNTIL_CHECKED, payload: !state.lockUntilChecked})
               }
             />
           </View>
-        )}
-        <hr />
-        {availableModules.length > 0 && (
-          <View as="div">
+          {state.lockUntilChecked && (
+            <View data-testid="lock-until-input" as="div" padding="small">
+              <DateTimeInput
+                value={state.unlockAt}
+                locale={ENV.LOCALE || 'en'}
+                timezone={ENV.TIMEZONE || 'UTC'}
+                dateRenderLabel={I18n.t('Date')}
+                timeRenderLabel={I18n.t('Time')}
+                invalidDateTimeMessage={I18n.t('Invalid date')}
+                messages={state.lockUntilInputMessages}
+                dateInputRef={el => (dateInputRef.current = el)}
+                layout="columns"
+                colSpacing="small"
+                prevMonthLabel={I18n.t('Previous month')}
+                nextMonthLabel={I18n.t('Next month')}
+                allowNonStepInput={true}
+                onChange={(_e, dateTimeString) => {
+                  dispatch({type: actions.SET_UNLOCK_AT, payload: dateTimeString})
+                  if (dateTimeString) {
+                    setValidDate(true)
+                    dispatch({type: actions.SET_LOCK_UNTIL_INPUT_MESSAGES, payload: []})
+                  } else {
+                    setValidDate(false)
+                  }
+                }}
+                onBlur={e => {
+                  const target = e.target as HTMLInputElement
+                  if (!target) return
+                  if (target.value.length > 0) {
+                    setTimeout(() => {
+                      dispatch({type: actions.SET_LOCK_UNTIL_INPUT_MESSAGES, payload: []})
+                    }, 1)
+                  } else {
+                    handleLockUntilError()
+                  }
+                }}
+                description={
+                  <ScreenReaderContent>
+                    {I18n.t('Unlock Date for %{moduleName}', {moduleName: state.moduleName})}
+                  </ScreenReaderContent>
+                }
+              />
+            </View>
+          )}
+          <hr />
+          {availableModules.length > 0 && (
+            <View as="div">
+              <View as="div" padding="x-small small">
+                <PrerequisiteForm
+                  prerequisites={state.prerequisites}
+                  availableModules={availableModules}
+                  onAddPrerequisite={module =>
+                    dispatch({
+                      type: actions.SET_PREREQUISITES,
+                      payload: [...state.prerequisites, module],
+                    })
+                  }
+                  onDropPrerequisite={index =>
+                    dispatch({
+                      type: actions.SET_PREREQUISITES,
+                      payload: [
+                        ...state.prerequisites.slice(0, index),
+                        ...state.prerequisites.slice(index + 1),
+                      ],
+                    })
+                  }
+                  onUpdatePrerequisite={(module, index) =>
+                    dispatch({
+                      type: actions.SET_PREREQUISITES,
+                      payload: [
+                        ...state.prerequisites.slice(0, index),
+                        module,
+                        ...state.prerequisites.slice(index + 1),
+                      ],
+                    })
+                  }
+                />
+              </View>
+              <hr />
+            </View>
+          )}
+          {moduleItems.length > 0 && (
             <View as="div" padding="x-small small">
-              <PrerequisiteForm
-                prerequisites={state.prerequisites}
-                availableModules={availableModules}
-                onAddPrerequisite={module =>
+              <RequirementForm
+                requirements={state.requirements}
+                requirementCount={state.requirementCount}
+                requireSequentialProgress={state.requireSequentialProgress}
+                moduleItems={moduleItems}
+                onChangeRequirementCount={type => {
+                  dispatch({type: actions.SET_REQUIREMENT_COUNT, payload: type})
+                }}
+                onToggleSequentialProgress={() =>
                   dispatch({
-                    type: actions.SET_PREREQUISITES,
-                    payload: [...state.prerequisites, module],
+                    type: actions.SET_REQUIRE_SEQUENTIAL_PROGRESS,
+                    payload: !state.requireSequentialProgress,
                   })
                 }
-                onDropPrerequisite={index =>
+                onAddRequirement={requirement => {
                   dispatch({
-                    type: actions.SET_PREREQUISITES,
+                    type: actions.SET_REQUIREMENTS,
+                    payload: [...state.requirements, requirement],
+                  })
+                }}
+                onDropRequirement={index => {
+                  dispatch({
+                    type: actions.SET_REQUIREMENTS,
                     payload: [
-                      ...state.prerequisites.slice(0, index),
-                      ...state.prerequisites.slice(index + 1),
+                      ...state.requirements.slice(0, index),
+                      ...state.requirements.slice(index + 1),
                     ],
                   })
-                }
-                onUpdatePrerequisite={(module, index) =>
+                }}
+                onUpdateRequirement={(requirement, index) => {
                   dispatch({
-                    type: actions.SET_PREREQUISITES,
+                    type: actions.SET_REQUIREMENTS,
                     payload: [
-                      ...state.prerequisites.slice(0, index),
-                      module,
-                      ...state.prerequisites.slice(index + 1),
+                      ...state.requirements.slice(0, index),
+                      requirement,
+                      ...state.requirements.slice(index + 1),
                     ],
+                  })
+                }}
+                pointsInputMessages={state.pointsInputMessages}
+                validatePointsInput={validatePointsInput}
+              />
+            </View>
+          )}
+          {enablePublishFinalGrade && (
+            <View as="div" padding="small">
+              <Checkbox
+                label={I18n.t('Publish final grade for the student when this module is completed')}
+                checked={state.publishFinalGrade}
+                onChange={() =>
+                  dispatch({
+                    type: actions.SET_PUBLISH_FINAL_GRADE,
+                    payload: !state.publishFinalGrade,
                   })
                 }
               />
             </View>
-            <hr />
-          </View>
-        )}
-        {moduleItems.length > 0 && (
-          <View as="div" padding="x-small small">
-            <RequirementForm
-              requirements={state.requirements}
-              requirementCount={state.requirementCount}
-              requireSequentialProgress={state.requireSequentialProgress}
-              moduleItems={moduleItems}
-              onChangeRequirementCount={type => {
-                dispatch({type: actions.SET_REQUIREMENT_COUNT, payload: type})
-              }}
-              onToggleSequentialProgress={() =>
-                dispatch({
-                  type: actions.SET_REQUIRE_SEQUENTIAL_PROGRESS,
-                  payload: !state.requireSequentialProgress,
-                })
-              }
-              onAddRequirement={requirement => {
-                dispatch({
-                  type: actions.SET_REQUIREMENTS,
-                  payload: [...state.requirements, requirement],
-                })
-              }}
-              onDropRequirement={index => {
-                dispatch({
-                  type: actions.SET_REQUIREMENTS,
-                  payload: [
-                    ...state.requirements.slice(0, index),
-                    ...state.requirements.slice(index + 1),
-                  ],
-                })
-              }}
-              onUpdateRequirement={(requirement, index) => {
-                dispatch({
-                  type: actions.SET_REQUIREMENTS,
-                  payload: [
-                    ...state.requirements.slice(0, index),
-                    requirement,
-                    ...state.requirements.slice(index + 1),
-                  ],
-                })
-              }}
-              pointsInputMessages={state.pointsInputMessages}
-              validatePointsInput={validatePointsInput}
-            />
-          </View>
-        )}
-        {enablePublishFinalGrade && (
-          <View as="div" padding="small">
-            <Checkbox
-              label={I18n.t('Publish final grade for the student when this module is completed')}
-              checked={state.publishFinalGrade}
-              onChange={() =>
-                dispatch({type: actions.SET_PUBLISH_FINAL_GRADE, payload: !state.publishFinalGrade})
-              }
-            />
-          </View>
-        )}
-      </Flex.Item>
-      <Flex.Item size={footerHeight}>
-        <Footer
-          saveButtonLabel={moduleId ? I18n.t('Save') : I18n.t('Add Module')}
-          onDismiss={customOnDismiss}
-          onUpdate={handleSave}
-          hasErrors={hasErrors()}
-        />
-      </Flex.Item>
-    </Flex>
+          )}
+        </Flex.Item>
+        <Flex.Item size={footerHeight}>
+          <Footer
+            saveButtonLabel={moduleId ? I18n.t('Save') : I18n.t('Add Module')}
+            onDismiss={customOnDismiss}
+            onUpdate={handleSave}
+            hasErrors={hasErrors()}
+          />
+        </Flex.Item>
+      </Flex>
+    </>
   )
 }
