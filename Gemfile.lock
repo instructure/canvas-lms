@@ -408,9 +408,6 @@ GEM
       aws-sdk-core (~> 3, >= 3.234.0)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.5)
-    aws-sdk-sagemakerruntime (1.89.0)
-      aws-sdk-core (~> 3, >= 3.234.0)
-      aws-sigv4 (~> 1.5)
     aws-sdk-sns (1.108.0)
       aws-sdk-core (~> 3, >= 3.234.0)
       aws-sigv4 (~> 1.5)
@@ -467,8 +464,6 @@ GEM
     childprocess (5.1.0)
       logger (~> 1.5)
     chunky_png (1.4.0)
-    cld (0.13.0)
-      ffi
     code_ownership (1.39.0)
       code_teams (~> 1.0)
       packs-specification
@@ -894,7 +889,6 @@ GEM
       google-protobuf (>= 3.25.3)
     pp (0.6.3)
       prettyprint
-    pragmatic_segmenter (0.3.24)
     prawn (2.5.0)
       matrix (~> 0.4)
       pdf-core (~> 0.10.0)
@@ -1287,7 +1281,6 @@ DEPENDENCIES
   aws-sdk-bedrockruntime (~> 1.7)
   aws-sdk-kinesis (~> 1.45)
   aws-sdk-s3 (~> 1.119)
-  aws-sdk-sagemakerruntime (~> 1.61)
   aws-sdk-sns (~> 1.60)
   aws-sdk-sqs (~> 1.53)
   aws-sdk-translate (~> 1.77)
@@ -1326,7 +1319,6 @@ DEPENDENCIES
   canvas_time!
   canvas_unzip!
   canvas_webex (= 0.18.2)
-  cld (~> 0.13)
   code_ownership (~> 1.33)
   colorize (~> 1.0)
   config_file!
@@ -1406,7 +1398,6 @@ DEPENDENCIES
   pdf-reader (~> 2.11)
   pg (~> 1.5)
   pg_query (~> 6.0)
-  pragmatic_segmenter (~> 0.3)
   prawn-emoji (~> 6.0)
   prawn-rails (~> 1.4)
   prosopite (~> 2.1)

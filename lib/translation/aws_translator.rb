@@ -19,8 +19,10 @@
 module Translation
   class AwsTranslator < BaseTranslator
     def initialize
-      @client = create_translation_client
       super
+      @client = create_translation_client
+    rescue => e
+      Rails.logger.error("Failed to create translation client: #{e.message}")
     end
 
     def available?
