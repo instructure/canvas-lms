@@ -25,6 +25,7 @@ import {Text} from '@instructure/ui-text'
 import {TextArea} from '@instructure/ui-text-area'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
+import {Alert} from '@instructure/ui-alerts'
 import {IconPlayLine, IconXLine, IconRefreshLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import doFetchApi from '@canvas/do-fetch-api-effect'
@@ -33,6 +34,7 @@ import type {LLMConversationMessage, LLMConversationViewProps} from '../../types
 const I18n = createI18nScope('ai_experiences')
 
 interface ContinueConversationResponse {
+  conversation_id: string
   messages: LLMConversationMessage[]
 }
 
@@ -50,9 +52,11 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
   onToggleExpanded,
 }) => {
   const [messages, setMessages] = useState<LLMConversationMessage[]>([])
+  const [conversationId, setConversationId] = useState<string | null>(null)
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isInitializing, setIsInitializing] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [lastMessageElement, setLastMessageElement] = useState<HTMLElement | null>(null)
   const [screenReaderAnnouncement, setScreenReaderAnnouncement] = useState('')
   const closeButtonRef = useRef<HTMLButtonElement>(null)
@@ -64,6 +68,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
 
   useEffect(() => {
     if (isOpen && isExpanded && messages.length === 0) {
+      // Backend will check for existing conversation automatically
       initializeConversation()
     }
     // Focus the close button when the conversation is expanded
@@ -106,24 +111,28 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
 
   const initializeConversation = async () => {
     setIsInitializing(true)
+    setError(null)
     try {
       const {json} = await doFetchApi<ContinueConversationResponse>({
         path: `/api/v1/courses/${courseId}/ai_experiences/${aiExperienceId}/continue_conversation`,
         method: 'POST',
       })
 
-      if (json?.messages) {
+      if (json?.conversation_id && json?.messages) {
+        setConversationId(json.conversation_id)
         setMessages(json.messages)
+        setError(null)
       }
     } catch (error) {
       console.error('Failed to initialize conversation:', error)
+      setError(I18n.t('Failed to start conversation. Please try again.'))
     } finally {
       setIsInitializing(false)
     }
   }
 
   const handleSendMessage = async () => {
-    if (!inputValue.trim() || isLoading) return
+    if (!inputValue.trim() || isLoading || !conversationId) return
 
     const newUserMessage = inputValue
     const userMessage: LLMConversationMessage = {
@@ -136,12 +145,14 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
     setMessages(prev => [...prev, userMessage])
     setInputValue('')
     setIsLoading(true)
+    setError(null)
 
     try {
       const {json} = await doFetchApi<ContinueConversationResponse>({
         path: `/api/v1/courses/${courseId}/ai_experiences/${aiExperienceId}/continue_conversation`,
         method: 'POST',
         body: {
+          conversation_id: conversationId,
           messages,
           new_user_message: newUserMessage,
         },
@@ -149,9 +160,11 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
 
       if (json?.messages) {
         setMessages(json.messages)
+        setError(null)
       }
     } catch (error) {
       console.error('Failed to send message:', error)
+      setError(I18n.t('Failed to send message. Please try again.'))
       // Remove the optimistically added message on error
       setMessages(prev => prev.slice(0, -1))
     } finally {
@@ -166,10 +179,32 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
     }
   }
 
-  const handleRestart = () => {
+  const handleRestart = async () => {
     setMessages([])
+    setConversationId(null)
     setInputValue('')
-    initializeConversation()
+    setIsInitializing(true)
+    setError(null)
+
+    try {
+      const {json} = await doFetchApi<ContinueConversationResponse>({
+        path: `/api/v1/courses/${courseId}/ai_experiences/${aiExperienceId}/continue_conversation`,
+        method: 'POST',
+        body: {restart: true},
+      })
+
+      if (json?.conversation_id && json?.messages) {
+        setConversationId(json.conversation_id)
+        setMessages(json.messages)
+        setError(null)
+      }
+    } catch (error) {
+      console.error('Failed to restart conversation:', error)
+      setError(I18n.t('Failed to restart conversation. Please try again.'))
+    } finally {
+      setIsInitializing(false)
+    }
+
     // Focus textarea after restart
     setTimeout(() => {
       textAreaRef.current?.focus({preventScroll: true})
@@ -269,6 +304,16 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
 
       {/* Chat conversation section */}
       <View as="div" padding="medium" background="secondary">
+        {error && (
+          <Alert
+            variant="error"
+            margin="0 0 small 0"
+            renderCloseButtonLabel="Close"
+            onDismiss={() => setError(null)}
+          >
+            {error}
+          </Alert>
+        )}
         <View
           as="div"
           height="400px"
