@@ -29,7 +29,6 @@ export type ToolHistoryProps = {
 export const ToolHistory = (props: ToolHistoryProps) => {
   const {registration} = useOutletContext<ToolDetailsOutletContext>()
 
-  // Check if the new history feature flag is enabled
   const useNewHistory = window.ENV?.LTI_REGISTRATIONS_HISTORY || false
 
   if (useNewHistory) {
