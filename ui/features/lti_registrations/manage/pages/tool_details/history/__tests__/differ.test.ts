@@ -31,7 +31,7 @@ import type {InternalLtiConfiguration} from '../../../../model/internal_lti_conf
 import {mockToolConfiguration} from '../../../../dynamic_registration_wizard/__tests__/helpers'
 import {LtiPlacements} from '../../../../model/LtiPlacement'
 
-const createMockConfigEntry = (
+export const createMockConfigEntry = (
   oldConfig: Partial<InternalLtiConfiguration>,
   newConfig: Partial<InternalLtiConfiguration>,
 ): ConfigChangeHistoryEntry => ({
