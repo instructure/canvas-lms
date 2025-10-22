@@ -1092,6 +1092,87 @@ describe "as a teacher" do
           expect(TeacherViewPageV2.peer_review_status_hint).to be_displayed
         end
       end
+
+      context "flash success messages" do
+        before do
+          TeacherViewPageV2.visit(@course, @assignment)
+          TeacherViewPageV2.peer_review_tab.click
+          wait_for_ajaximations
+          TeacherViewPageV2.peer_review_allocation_rules_link.click
+          wait_for_ajaximations
+        end
+
+        it "shows success message when creating a new rule" do
+          TeacherViewPageV2.add_rule_button.click
+          wait_for_ajaximations
+
+          select_student(TeacherViewPageV2.target_select_input, @student1.name)
+          select_student(TeacherViewPageV2.subject_select_input, @student2.name)
+
+          TeacherViewPageV2.modal_save_button.click
+          wait_for_ajaximations
+
+          expect_instui_flash_message("New rule has been created successfully")
+
+          rule_cards = TeacherViewPageV2.allocation_rule_cards
+          expect(rule_cards.length).to eq(1)
+        end
+
+        it "shows success message when editing a rule" do
+          AllocationRule.create!(
+            course: @course,
+            assignment: @assignment,
+            assessor: @student1,
+            assessee: @student2,
+            must_review: true,
+            review_permitted: true,
+            applies_to_assessor: true
+          )
+
+          TeacherViewPageV2.visit(@course, @assignment)
+          TeacherViewPageV2.peer_review_tab.click
+          wait_for_ajaximations
+          TeacherViewPageV2.peer_review_allocation_rules_link.click
+          wait_for_ajaximations
+
+          rule_cards = TeacherViewPageV2.allocation_rule_cards
+          TeacherViewPageV2.edit_rule_button(rule_cards.first).click
+          wait_for_ajaximations
+
+          TeacherViewPageV2.review_type_should_review_radio.click
+
+          TeacherViewPageV2.modal_save_button.click
+          wait_for_ajaximations
+
+          expect_instui_flash_message("Rule has been edited successfully")
+        end
+
+        it "shows success message when deleting a rule" do
+          AllocationRule.create!(
+            course: @course,
+            assignment: @assignment,
+            assessor: @student1,
+            assessee: @student2,
+            must_review: true,
+            review_permitted: true,
+            applies_to_assessor: true
+          )
+
+          TeacherViewPageV2.visit(@course, @assignment)
+          TeacherViewPageV2.peer_review_tab.click
+          wait_for_ajaximations
+          TeacherViewPageV2.peer_review_allocation_rules_link.click
+          wait_for_ajaximations
+
+          rule_cards = TeacherViewPageV2.allocation_rule_cards
+          TeacherViewPageV2.delete_allocation_rule_button(rule_cards.first).click
+          wait_for_ajaximations
+
+          expect_instui_flash_message("Rule has been deleted successfully")
+
+          expect(element_exists?("div[data-testid='allocation-rule-card-wrapper']")).to be_falsey
+        end
+      end
     end
   end
 end
