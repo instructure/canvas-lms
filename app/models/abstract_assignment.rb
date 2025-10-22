@@ -396,7 +396,7 @@ class AbstractAssignment < ActiveRecord::Base
 
     # Default to the last position of all active assignments in the group.  Clients can still
     # override later.  Just helps to avoid duplicate positions.
-    result.position = Assignment.active.where(assignment_group:).maximum(:position) + 1
+    result.position = Assignment.active.where(assignment_group:).maximum(:position) + 1 if assignment_group
     result.title =
       opts_with_default[:copy_title] || get_copy_title(self, t("Copy"), title)
 

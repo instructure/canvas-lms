@@ -146,6 +146,41 @@ describe WikiPage do
       expect(new_wiki4.assignment.title).to eq "Stupid title"
     end
 
+    context "with mastery path wiki page" do
+      before do
+        Account.site_admin.enable_feature!(:wiki_page_mastery_path_no_assignment_group)
+      end
+
+      it "works on assignment without assignment group" do
+        course_with_teacher(active_all: true)
+        @course.conditional_release = true
+        @course.save
+
+        old_wiki = wiki_page_assignment_model({ title: "Wiki Assignment" }).wiki_page
+        old_wiki.workflow_state = "published"
+        old_wiki.save!
+
+        new_wiki = old_wiki.duplicate
+        expect(new_wiki.new_record?).to be true
+        expect(new_wiki.assignment).not_to be_nil
+        expect(new_wiki.assignment.new_record?).to be true
+        expect(new_wiki.title).to eq "Wiki Assignment Copy"
+        expect(new_wiki.assignment.title).to eq "Wiki Assignment Copy"
+        expect(new_wiki.workflow_state).to eq "unpublished"
+        new_wiki.save!
+        new_wiki2 = old_wiki.duplicate
+        expect(new_wiki2.title).to eq "Wiki Assignment Copy 2"
+        expect(new_wiki2.assignment.title).to eq "Wiki Assignment Copy 2"
+        new_wiki2.save!
+        new_wiki3 = new_wiki.duplicate
+        expect(new_wiki3.title).to eq "Wiki Assignment Copy 3"
+        expect(new_wiki3.assignment.title).to eq "Wiki Assignment Copy 3"
+        new_wiki4 = new_wiki.duplicate({ copy_title: "Stupid title" })
+        expect(new_wiki4.title).to eq "Stupid title"
+        expect(new_wiki4.assignment.title).to eq "Stupid title"
+      end
+    end
+
     it "works on non-assignment" do
       course_with_teacher(active_all: true)
       old_wiki = wiki_page_model({ title: "Wiki Page" })
