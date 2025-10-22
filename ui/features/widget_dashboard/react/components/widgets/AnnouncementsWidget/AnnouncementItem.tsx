@@ -160,7 +160,7 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcementItem, fi
               <Avatar
                 name={announcement.author?.name || I18n.t('Unknown Author')}
                 src={announcement.author?.avatarUrl}
-                size="x-small"
+                size="medium"
               />
             </Flex.Item>
 
