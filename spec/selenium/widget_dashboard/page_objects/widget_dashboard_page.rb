@@ -21,7 +21,6 @@ require_relative "../../common"
 
 module WidgetDashboardPage
   #------------------------------ Selectors -----------------------------
-
   def announcement_filter_select
     "[data-testid='announcement-filter-select']"
   end
@@ -46,10 +45,61 @@ module WidgetDashboardPage
     "[data-testid='read-more-#{item_id}']"
   end
 
-  def pagination_button_selector(page_number)
-    "[data-testid='pagination-container'] button:contains('#{page_number}')"
+  def widget_pagination_button_selector(widget, page_number)
+    "[data-testid='widget-#{widget}-widget'] [data-testid='pagination-container'] button:contains('#{page_number}')"
   end
 
+  def people_widget_selector
+    "[data-testid='widget-people-widget']"
+  end
+
+  def message_instructor_button_selector(account_id, course_id)
+    "[data-testid='message-button-#{account_id}-#{course_id}']"
+  end
+
+  def send_message_to_modal_selector(teacher_name)
+    "span[role = 'dialog'][aria-label='Send Message to #{teacher_name}']"
+  end
+
+  def message_modal_subject_input_selector
+    "span[role = 'dialog'] input[type='text']"
+  end
+
+  def message_modal_body_textarea_selector
+    "span[role = 'dialog'] textarea"
+  end
+
+  def message_modal_send_button_selector
+    "button[data-testid='message-students-submit']"
+  end
+
+  def message_modal_alert_selector
+    ".MessageStudents__Alert"
+  end
+
+  def hide_all_grades_checkbox_selector
+    "[data-testid='hide-all-grades-checkbox']"
+  end
+
+  def show_all_grades_checkbox_selector
+    "[data-testid='show-all-grades-checkbox']"
+  end
+
+  def hide_single_grade_button_selector(course_id)
+    "[data-testid='hide-single-grade-button-#{course_id}']"
+  end
+
+  def show_single_grade_button_selector(course_id)
+    "[data-testid='show-single-grade-button-#{course_id}']"
+  end
+
+  def course_gradebook_link_selector(course_id)
+    "[data-testid='course-#{course_id}-gradebook-link']"
+  end
+
+  def course_grade_text_selector(course_id)
+    "[data-testid='course-#{course_id}-grade']"
+  end
   #------------------------------ Elements ------------------------------
 
   def announcement_filter
@@ -80,8 +130,68 @@ module WidgetDashboardPage
     f(announcement_item_link_selector(item_id))
   end
 
-  def pagination_button(page_number)
-    fj(pagination_button_selector(page_number))
+  def widget_pagination_button(widget, page_number)
+    fj(widget_pagination_button_selector(widget, page_number))
+  end
+
+  def people_widget
+    f(people_widget_selector)
+  end
+
+  def all_message_buttons
+    ff("[data-testid*='message-button-']")
+  end
+
+  def message_instructor_button(account_id, course_id)
+    f(message_instructor_button_selector(account_id, course_id))
+  end
+
+  def send_message_to_modal(teacher_name)
+    f(send_message_to_modal_selector(teacher_name))
+  end
+
+  def message_modal_subject_input
+    f(message_modal_subject_input_selector)
+  end
+
+  def message_modal_body_textarea
+    f(message_modal_body_textarea_selector)
+  end
+
+  def message_modal_send_button
+    f(message_modal_send_button_selector)
+  end
+
+  def message_modal_alert
+    f(message_modal_alert_selector)
+  end
+
+  def hide_all_grades_checkbox
+    f(hide_all_grades_checkbox_selector)
+  end
+
+  def show_all_grades_checkbox
+    f(show_all_grades_checkbox_selector)
+  end
+
+  def hide_single_grade_button(course_id)
+    f(hide_single_grade_button_selector(course_id))
+  end
+
+  def show_single_grade_button(course_id)
+    f(show_single_grade_button_selector(course_id))
+  end
+
+  def course_gradebook_link(course_id)
+    f(course_gradebook_link_selector(course_id))
+  end
+
+  def course_grade_text(course_id)
+    f(course_grade_text_selector(course_id))
+  end
+
+  def all_course_grade_items
+    ff("[data-testid*='hide-single-grade-button-']")
   end
 
   #------------------------------ Actions -------------------------------
@@ -90,9 +200,9 @@ module WidgetDashboardPage
     @course1 = course_factory(active_all: true, course_name: "Course 1")
     @course2 = course_factory(active_all: true, course_name: "Course 2")
 
-    @teacher1 = user_factory(active_all: true, name: "Teacher 1")
-    @teacher2 = user_factory(active_all: true, name: "Teacher 2")
-    @student = user_factory(active_all: true, name: "Student")
+    @teacher1 = user_factory(active_all: true, name: "Nancy Smith")
+    @teacher2 = user_factory(active_all: true, name: "John Doe")
+    @student = user_factory(active_all: true, name: "Jane Brown")
 
     @course1.enroll_teacher(@teacher1, enrollment_state: :active)
     @course2.enroll_teacher(@teacher2, enrollment_state: :active)
@@ -117,14 +227,57 @@ module WidgetDashboardPage
     @announcement5.discussion_topic_participants.find_by(user: @student)&.update!(workflow_state: "read")
   end
 
+  def dashboard_people_setup
+    @ta1 = course_with_ta(name: "Alice Davis", course: @course1, active_all: true).user
+    @ta2 = course_with_ta(name: "Bob Johnson", course: @course2, active_all: true).user
+  end
+
+  def dashboard_course_assignment_setup
+    @due_graded_discussion = @course1.assignments.create!(name: "Course 1: due_graded_discussion", points_possible: "10", due_at: 1.day.from_now, submission_types: "discussion_topic")
+    @due_assignment = @course1.assignments.create!(name: "Course 1: due_assignment", points_possible: "10", due_at: 6.days.from_now, submission_types: "online_text_entry")
+    @due_quiz = @course1.assignments.create!(title: "Course 1: due_quiz", points_possible: "10", due_at: 13.days.from_now, submission_types: "online_quiz")
+
+    @missing_graded_discussion = @course1.assignments.create!(name: "Course 1: missing_graded_discussion", points_possible: "10", due_at: 2.days.ago, submission_types: "discussion_topic")
+    @missing_assignment = @course2.assignments.create!(name: "Course 2: missing_assignment", points_possible: "10", due_at: 3.days.ago, submission_types: "online_text_entry")
+    @missing_quiz = @course2.assignments.create!(title: "Course 2: missing_quiz", points_possible: "10", due_at: 4.days.ago, submission_types: "online_quiz")
+
+    @graded_discussion = @course1.assignments.create!(name: "Course 1: graded_discussion", points_possible: "10", due_at: 5.days.ago, submission_types: "discussion_topic")
+    @graded_assignment = @course2.assignments.create!(name: "Course 2: graded_assignment", points_possible: "10", due_at: 3.days.ago, submission_types: "online_text_entry")
+    @graded_quiz = @course2.quizzes.create!(title: "Course 2: graded_quiz", points_possible: "10", due_at: 1.day.from_now, quiz_type: "assignment")
+
+    @submitted_discussion = @course2.assignments.create!(name: "Course 2: submitted_discussion", points_possible: "10", due_at: 2.days.ago, submission_types: "discussion_topic")
+    @submitted_assignment = @course1.assignments.create!(name: "Course 1: submitted_assignment", points_possible: "10", due_at: 1.day.from_now, submission_types: "online_text_entry")
+  end
+
+  def dashboard_course_submission_setup
+    @submitted_assignment.submit_homework(@student, submission_type: "online_text_entry")
+    @submitted_discussion.submit_homework(@student, submission_type: "discussion_topic")
+
+    @graded_assignment.submit_homework(@student, submission_type: "online_text_entry")
+    @graded_discussion.submit_homework(@student, submission_type: "discussion_topic")
+
+    @graded_quiz = @course1.quizzes.create!(title: "submitted_quiz", due_at: 1.day.from_now)
+    @graded_quiz.quiz_questions.create!(question_data: { question_type: "true_false_question", points_possible: 10 })
+    @graded_quiz.generate_quiz_data
+    @graded_quiz.workflow_state = "available"
+    @graded_quiz.save!
+    qs = @graded_quiz.generate_submission(@student)
+    qs.submission_data
+    Quizzes::SubmissionGrader.new(qs).grade_submission
+  end
+
+  def dashboard_course_grade_setup
+    @graded_assignment.grade_student(@student, grade: "8", grader: @teacher2)
+    @graded_discussion.grade_student(@student, grade: "9", grader: @teacher1)
+  end
+
   def filter_announcements_list_by(status)
     announcement_filter.click
     click_INSTUI_Select_option(announcement_filter_select, status)
   end
 
-  def go_to_announcement_widget
+  def go_to_dashboard
     get "/"
     wait_for_ajaximations
-    expect(announcement_filter).to be_displayed
   end
 end

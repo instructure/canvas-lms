@@ -37,7 +37,7 @@ export function CourseWorkItem({item}: CourseWorkItemProps) {
   const {isMobile} = useResponsiveContext()
 
   return (
-    <Flex.Item key={item.id} overflowY="hidden">
+    <Flex.Item key={item.id} overflowY="hidden" role="group" aria-label={item.title}>
       <View as="div" margin="small" background="primary">
         <Flex
           gap="small"
@@ -51,7 +51,7 @@ export function CourseWorkItem({item}: CourseWorkItemProps) {
                 background="secondary"
                 borderRadius="medium"
                 padding={isMobile ? 'small' : 'medium'}
-                margin="0 0 x-small 0"
+                margin="0 0 0 0"
                 themeOverride={{
                   backgroundSecondary: submissionStatus.color.background,
                 }}
@@ -61,22 +61,28 @@ export function CourseWorkItem({item}: CourseWorkItemProps) {
             </Flex.Item>
           )}
           <Flex.Item shouldGrow shouldShrink>
-            <Flex direction="column" gap="xx-small">
-              <Link
-                href={item.htmlUrl}
-                isWithinText={false}
-                data-testid={`course-work-item-link-${item.id}`}
-              >
-                <Text weight="bold" size="small">
-                  {item.title}
+            <Flex direction="column" gap="0">
+              <Flex.Item>
+                <Link
+                  href={item.htmlUrl}
+                  isWithinText={false}
+                  data-testid={`course-work-item-link-${item.id}`}
+                >
+                  <Text weight="bold" size="small">
+                    {item.title}
+                  </Text>
+                </Link>
+              </Flex.Item>
+              <Flex.Item>
+                <Text size="x-small" color="secondary">
+                  {item.course.name}
                 </Text>
-              </Link>
-              <Text size="x-small" color="secondary">
-                {item.course.name}
-              </Text>
-              <Text size="x-small" color="secondary">
-                {item.points != null && `${I18n.t('%{points} pts', {points: item.points})}`}
-              </Text>
+              </Flex.Item>
+              <Flex.Item>
+                <Text size="x-small" color="secondary">
+                  {item.points != null && `${I18n.t('%{points} pts', {points: item.points})}`}
+                </Text>
+              </Flex.Item>
             </Flex>
           </Flex.Item>
           <Flex.Item>

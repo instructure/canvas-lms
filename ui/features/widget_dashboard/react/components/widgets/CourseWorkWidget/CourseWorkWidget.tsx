@@ -21,6 +21,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
+import {List} from '@instructure/ui-list'
 import TemplateWidget from '../TemplateWidget/TemplateWidget'
 import CourseWorkFilters, {type DateFilterOption} from '../../shared/CourseWorkFilters'
 import type {BaseWidgetProps, CourseOption} from '../../../types'
@@ -119,33 +120,41 @@ const CourseWorkWidget: React.FC<BaseWidgetProps> = ({
         isLoading: courseWorkLoading,
         ariaLabel: I18n.t('Course work pagination'),
       }}
-      headerActions={
-        <CourseWorkFilters
-          selectedCourse={selectedCourse}
-          selectedDateFilter={selectedDateFilter}
-          onCourseChange={handleCourseChange}
-          onDateFilterChange={handleDateFilterChange}
-          userCourses={userCourses}
-        />
-      }
     >
-      {filteredItems.length === 0 ? (
-        <Flex justifyItems="center" padding="large">
-          <Text color="secondary">
-            {selectedCourse === 'all'
-              ? I18n.t('No upcoming course work')
-              : I18n.t('No upcoming course work for selected course')}
-          </Text>
-        </Flex>
-      ) : (
-        <View height="100%">
-          <Flex direction="column">
-            {filteredItems.map(item => (
-              <CourseWorkItemComponent key={item.id} item={item} />
-            ))}
-          </Flex>
-        </View>
-      )}
+      <Flex direction="column" gap="small" height="100%">
+        <Flex.Item>
+          <CourseWorkFilters
+            selectedCourse={selectedCourse}
+            selectedDateFilter={selectedDateFilter}
+            onCourseChange={handleCourseChange}
+            onDateFilterChange={handleDateFilterChange}
+            userCourses={userCourses}
+          />
+        </Flex.Item>
+        <Flex.Item shouldGrow>
+          {filteredItems.length === 0 ? (
+            <Flex justifyItems="center" padding="large">
+              <Text color="secondary">
+                {selectedCourse === 'all'
+                  ? I18n.t('No upcoming course work')
+                  : I18n.t('No upcoming course work for selected course')}
+              </Text>
+            </Flex>
+          ) : (
+            <View height="100%">
+              <Flex direction="column">
+                <List isUnstyled margin="0">
+                  {filteredItems.map(item => (
+                    <List.Item key={item.id} margin="0">
+                      <CourseWorkItemComponent item={item} />
+                    </List.Item>
+                  ))}
+                </List>
+              </Flex>
+            </View>
+          )}
+        </Flex.Item>
+      </Flex>
     </TemplateWidget>
   )
 }

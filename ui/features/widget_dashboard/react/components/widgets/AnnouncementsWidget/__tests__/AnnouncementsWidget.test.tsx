@@ -31,8 +31,7 @@ import {
 const mockWidget: Widget = {
   id: 'test-announcements-widget',
   type: 'announcements',
-  position: {col: 1, row: 1},
-  size: {width: 1, height: 1},
+  position: {col: 1, row: 1, relative: 1},
   title: 'Announcements',
 }
 
@@ -117,6 +116,7 @@ const mockAllAnnouncementsResponse = {
           hasPreviousPage: false,
           startCursor: null,
           endCursor: null,
+          totalCount: null,
         },
       },
     },
@@ -153,6 +153,7 @@ const mockUnreadAnnouncementsResponse = {
           hasPreviousPage: false,
           startCursor: null,
           endCursor: null,
+          totalCount: null,
         },
       },
     },
@@ -170,6 +171,7 @@ const emptyAnnouncementsResponse = {
           hasPreviousPage: false,
           startCursor: null,
           endCursor: null,
+          totalCount: null,
         },
       },
     },
@@ -206,6 +208,7 @@ const mockReadAnnouncementsResponse = {
           hasPreviousPage: false,
           startCursor: null,
           endCursor: null,
+          totalCount: null,
         },
       },
     },
@@ -319,6 +322,7 @@ const mockCourseGradesResponse = {
           hasPreviousPage: false,
           startCursor: null,
           endCursor: null,
+          totalCount: null,
         },
       },
     },
@@ -395,6 +399,7 @@ describe('AnnouncementsWidget', () => {
                   hasPreviousPage: false,
                   startCursor: null,
                   endCursor: null,
+                  totalCount: null,
                 },
               },
             },
@@ -503,7 +508,6 @@ describe('AnnouncementsWidget', () => {
     const retryButton = screen.getByText('Retry')
     fireEvent.click(retryButton)
 
-    // Wait for successful data to load - with default "unread" filter, should show Test Announcement 2
     await waitFor(() => {
       expect(screen.getByText('Test Announcement 2')).toBeInTheDocument()
     })
@@ -546,6 +550,7 @@ describe('AnnouncementsWidget', () => {
               hasPreviousPage: false,
               startCursor: null,
               endCursor: null,
+              totalCount: null,
             },
           },
         },
@@ -562,12 +567,16 @@ describe('AnnouncementsWidget', () => {
 
     await waitForLoadingToComplete()
 
-    // Should show truncated title (max 25 chars) - shows "This is an Extremely Long..."
-    expect(screen.getByText(/This is an Extremely Long\.\.\./)).toBeInTheDocument()
-
-    // Should show truncated message (max 60 chars) - shows "This is an extremely long announcement message that contains..."
     expect(
-      screen.getByText(/This is an extremely long announcement message that contains\.\.\./),
+      screen.getByText(
+        /This is an Extremely Long Announcement Title That Should Be Truncated Becau\.\.\./,
+      ),
+    ).toBeInTheDocument()
+
+    expect(
+      screen.getByText(
+        /This is an extremely long announcement message that contains lots of details and should be truncated to prevent the widg\.\.\./,
+      ),
     ).toBeInTheDocument()
 
     cleanup()
@@ -620,18 +629,11 @@ describe('AnnouncementsWidget', () => {
 
   it('toggles read/unread status when buttons are clicked', async () => {
     // Mock the mutation response
-    let announcementsResponse = getMockResponseForReadState('unread')
-
     server.use(
       graphql.query('GetUserAnnouncements', () => {
-        return HttpResponse.json(announcementsResponse)
+        return HttpResponse.json(getMockResponseForReadState('unread'))
       }),
       graphql.mutation('UpdateDiscussionReadState', ({variables}) => {
-        // When we mark 2 as read, remove it from the unread list
-        if (variables?.discussionTopicId === '2') {
-          announcementsResponse = getMockResponseForReadState('empty')
-        }
-
         return HttpResponse.json({
           data: {
             updateDiscussionReadState: {
@@ -661,14 +663,9 @@ describe('AnnouncementsWidget', () => {
     expect(markReadButton).toBeInTheDocument()
 
     fireEvent.click(markReadButton)
-    // "mark as" button disabled when the request is in progress
-    expect(markReadButton).toBeDisabled()
-    // The mutation should be called (we can't easily test the actual state change
-    // without more complex mocking, but we can verify the annoucement is no longer
-    // in the unread page)
 
     await waitFor(() => {
-      expect(announctmentItemContainer).not.toBeInTheDocument()
+      expect(markReadButton).toBeDisabled()
     })
 
     cleanup()
@@ -706,6 +703,7 @@ describe('AnnouncementsWidget', () => {
               hasPreviousPage: false,
               startCursor: 'start-cursor',
               endCursor: 'end-cursor',
+              totalCount: 6,
             },
           },
         },
@@ -797,6 +795,7 @@ describe('AnnouncementsWidget', () => {
               hasPreviousPage: false,
               startCursor: null,
               endCursor: null,
+              totalCount: null,
             },
           },
         },

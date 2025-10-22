@@ -23,6 +23,7 @@ import {setupServer} from 'msw/node'
 import {graphql, http, HttpResponse} from 'msw'
 import WidgetDashboardContainer from '../WidgetDashboardContainer'
 import {WidgetDashboardProvider} from '../hooks/useWidgetDashboardContext'
+import {ResponsiveProvider} from '../hooks/useResponsiveContext'
 import {defaultGraphQLHandlers} from './testHelpers'
 
 const mockStatisticsData = {
@@ -112,7 +113,9 @@ const setup = (contextProps = {}, envOverrides = {}) => {
   const renderResult = render(
     <QueryClientProvider client={queryClient}>
       <WidgetDashboardProvider {...contextProps}>
-        <WidgetDashboardContainer />
+        <ResponsiveProvider matches={['desktop']}>
+          <WidgetDashboardContainer />
+        </ResponsiveProvider>
       </WidgetDashboardProvider>
     </QueryClientProvider>,
   )

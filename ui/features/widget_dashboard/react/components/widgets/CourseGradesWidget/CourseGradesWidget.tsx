@@ -98,16 +98,18 @@ const CourseGradesWidget: React.FC<BaseWidgetProps> = ({widget}) => {
           value="showGrades"
           checked={hasVisibleGrades}
           onChange={handleToggleAllGrades}
+          data-testid={hasVisibleGrades ? 'hide-all-grades-checkbox' : 'show-all-grades-checkbox'}
         />
       }
     >
       <Flex direction="column" height="100%">
         <Flex.Item shouldGrow shouldShrink height="auto">
-          <View as="div" overflowX="hidden" overflowY="visible" height="auto">
+          <View as="div" padding="xx-small">
             <Grid
               rowSpacing={COURSE_GRADES_WIDGET.GRID_ROW_SPACING}
               colSpacing={COURSE_GRADES_WIDGET.GRID_COL_SPACING}
               startAt="medium"
+              role="list"
             >
               {isMobile ? (
                 <Grid.Row>
@@ -138,14 +140,14 @@ const CourseGradesWidget: React.FC<BaseWidgetProps> = ({widget}) => {
                   ))}
                 </Grid.Row>
               ) : (
-                Array.from({length: 2}, (_, rowIndex) => (
+                Array.from({length: 3}, (_, rowIndex) => (
                   <Grid.Row key={`row-${rowIndex}`}>
                     {Array.from({length: COURSE_GRADES_WIDGET.GRID_COLUMNS}, (_, colIndex) => {
                       const gradeIndex = rowIndex * COURSE_GRADES_WIDGET.GRID_COLUMNS + colIndex
                       const grade = displayedGrades[gradeIndex]
 
                       return (
-                        <Grid.Col key={`col-${rowIndex}-${colIndex}`} width={4}>
+                        <Grid.Col key={`col-${rowIndex}-${colIndex}`} width={6}>
                           {grade && (
                             <CourseGradeCard
                               key={grade.courseId}
