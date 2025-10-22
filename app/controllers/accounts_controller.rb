@@ -1370,7 +1370,6 @@ class AccountsController < ApplicationController
              enable_eportfolios
              enable_profiles
              enable_turnitin
-             enable_content_a11y_checker
              suppress_assignments
              include_integration_ids_in_gradebook_exports
              show_scheduler
@@ -2201,7 +2200,6 @@ class AccountsController < ApplicationController
                                    :enable_profiles,
                                    :enable_gravatar,
                                    :enable_turnitin,
-                                   :enable_content_a11y_checker,
                                    :equella_endpoint,
                                    :equella_teaser,
                                    :external_notification_warning,

@@ -195,8 +195,6 @@ class Account < ActiveRecord::Base
   after_update :log_rqd_setting_enable_or_disable
   after_create :create_default_objects
 
-  after_commit :enqueue_a11y_scan_if_enabled, on: :update
-
   serialize :settings, type: Hash
   include TimeZoneHelper
 
@@ -348,7 +346,6 @@ class Account < ActiveRecord::Base
   add_setting :show_scheduler, boolean: true, root_only: true, default: false
   add_setting :enable_profiles, boolean: true, root_only: true, default: false
   add_setting :enable_turnitin, boolean: true, default: false
-  add_setting :enable_content_a11y_checker, boolean: true, root_only: true, default: false
   add_setting :suppress_assignments, boolean: true, root_only: true, default: false
   add_setting :mfa_settings, root_only: true
   add_setting :mobile_qr_login_is_enabled, boolean: true, root_only: true, default: true
@@ -2873,16 +2870,5 @@ class Account < ActiveRecord::Base
 
       client.delete_tenant(root_account_uuid: root_account.uuid, feature_slug: HORIZON_FEATURE_SLUG, current_user:)
     end
-  end
-
-  def enqueue_a11y_scan_if_enabled
-    return unless root_account?
-    return unless saved_change_to_settings?
-    return unless enable_content_a11y_checker?
-
-    old_settings, = saved_change_to_settings
-    return if old_settings[:enable_content_a11y_checker]
-
-    Accessibility::RootAccountScannerService.call(account: self)
   end
 end

@@ -649,16 +649,6 @@
               </div>
             </div>
 
-            <% if @account.primary_settings_root_account? &&
-                  !@account.site_admin? &&
-                  Account.site_admin.grants_right?(@current_user, session, :read) &&  # Until the end of the EAP, only Instructure will be able to see this option.
-                  @account.grants_right?(@current_user, :manage_account_settings) %>
-              <div>
-                <%= settings.check_box :enable_content_a11y_checker, :checked => @account.settings[:enable_content_a11y_checker] %>
-                <%= settings.label :enable_content_a11y_checker, :en => "Content Accessibility Checker" %>
-              </div>
-            <% end %>
-
             <% if !@account.site_admin? %>
               <div>
                 <% diff_tags = @account.allow_assign_to_differentiation_tags %>
