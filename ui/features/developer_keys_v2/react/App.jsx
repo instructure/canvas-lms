@@ -166,7 +166,7 @@ class DeveloperKeysApp extends React.Component {
     return [
       {
         text: I18n.t(
-          `API requests now require the User-Agent header to be set. These requests are now blocked in Beta, and enforcement in Test and Prod is coming soon - please see the *API Change Log* for exact dates. 
+          `API requests now require the User-Agent header to be set. These requests are now blocked in Beta, and enforcement in Test and Prod is coming soon - please see the *API Change Log* for dates. 
           You can review any current calls which do not meet this requirement in the Requests Without User Agent report on the **reports page**, 
           and read more about the change on our ***blog***.`,
           {
