@@ -609,7 +609,7 @@ class CoursesController < ApplicationController
       when "enrolled_as"
         e.readable_role_name
       when "accessibility"
-        [e.course.exceeds_accessibility_scan_limit? ? 1 : 0, accessibility_issues_count(e.course)]
+        [e.course.a11y_checker_enabled? ? 1 : 0, accessibility_issues_count(e.course)]
       else
         if type == "past"
           [e.course.published? ? 0 : 1, Canvas::ICU.collation_key(e.long_name)]
@@ -2306,8 +2306,7 @@ class CoursesController < ApplicationController
           @course_notifications_enabled = NotificationPolicyOverride.enabled_for(@current_user, @context)
         end
 
-        @accessibility_scan_enabled =
-          @context.root_account.enable_content_a11y_checker? ? !@context.exceeds_accessibility_scan_limit? : false
+        @accessibility_scan_enabled = @context.try(:a11y_checker_enabled?) || false
       end
 
       return if check_for_xlist
@@ -4460,8 +4459,6 @@ class CoursesController < ApplicationController
   helper_method :visible_self_enrollment_option
 
   def accessibility_issues_count(course)
-    return 0 if course.exceeds_accessibility_scan_limit?
-
     AccessibilityIssue.active.where(course:).count
   end
   helper_method :accessibility_issues_count

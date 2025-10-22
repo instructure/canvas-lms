@@ -391,11 +391,13 @@ RSpec.describe ApplicationController do
                               cache_key: "key",
                               uuid: "bleh",
                               salesforce_id: "blah",
-                              suppress_assignments?: false,
-                              enable_content_a11y_checker?: true)
+                              suppress_assignments?: false)
+        context = double(a11y_checker_enabled?: true)
+        allow(context).to receive(:grants_any_right?).and_return(false)
         allow(root_account).to receive(:kill_joy?).and_return(false)
         allow(HostUrl).to receive_messages(file_host: "files.example.com")
         controller.instance_variable_set(:@domain_root_account, root_account)
+        controller.instance_variable_set(:@context, context)
         expect(controller.js_env[:SETTINGS][:open_registration]).to be_truthy
         expect(controller.js_env[:SETTINGS][:can_add_pronouns]).to be_truthy
         expect(controller.js_env[:SETTINGS][:show_sections_in_course_tray]).to be_truthy

@@ -21,21 +21,31 @@ module Accessibility
     extend ActiveSupport::Concern
 
     included do
-      after_commit :trigger_accessibility_scan_on_create, on: :create
-      after_commit :trigger_accessibility_scan_on_update, on: :update, unless: :deleted?
-      after_commit :remove_accessibility_scan, on: :update, if: :deleted?
+      after_commit :trigger_accessibility_scan_on_create,
+                   on: :create,
+                   if: :a11y_checker_enabled?
+
+      after_commit :trigger_accessibility_scan_on_update,
+                   on: :update,
+                   unless: :deleted?,
+                   if: :a11y_checker_enabled?
+
+      after_commit :remove_accessibility_scan,
+                   on: :update,
+                   if: :deleted?
     end
 
     private
 
-    def trigger_accessibility_scan_on_create
-      return unless root_account.enable_content_a11y_checker?
+    def a11y_checker_enabled?
+      context.is_a?(Course) && context.a11y_checker_enabled?
+    end
 
+    def trigger_accessibility_scan_on_create
       Accessibility::ResourceScannerService.call(resource: self)
     end
 
     def trigger_accessibility_scan_on_update
-      return unless root_account.enable_content_a11y_checker?
       return unless scan_relevant_attribute_changed?
 
       Accessibility::ResourceScannerService.call(resource: self)
@@ -46,13 +56,12 @@ module Accessibility
       when WikiPage
         saved_change_to_body? || saved_change_to_title?
       else
+        # TODO: ADD ASSIGNMENT CHECKING HERE
         true
       end
     end
 
     def remove_accessibility_scan
-      return unless root_account.enable_content_a11y_checker?
-
       AccessibilityResourceScan.where(context: self).destroy_all
     end
   end

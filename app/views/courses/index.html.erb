@@ -37,7 +37,10 @@ end %>
 <% @favorite_course_ids =
   @current_user.courses_with_primary_enrollment(:favorite_courses).map(&:id) %>
 <% @show_star_column = show_favorites_col_for_index?(:current) %>
-<% @show_accessibility_column = @domain_root_account.enable_content_a11y_checker? %>
+<%
+  # TODO TEMPORARY TURNED OFF
+  @show_accessibility_column = false
+%>
 
 <div class="header-bar">
   <h1><%= all_courses_title %></h1>

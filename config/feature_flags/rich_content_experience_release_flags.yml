@@ -323,3 +323,20 @@ youtube_overlay:
       state: allowed_on
     development:
       state: allowed_on
+
+a11y_checker:
+  applies_to: Account
+  state: hidden
+  display_name: Accessibility Checker
+  description: |-
+    Enable the new Accessibility Checker.
+  shadow: true
+
+a11y_checker_eap:
+  applies_to: Course
+  state: allowed
+  display_name: Accessibility Checker EAP
+  description: |-
+    Enable the new Accessibility Checker in EAP. The flag is allowed only for root account admins.
+  visible_on: a11y_checker_flag_enabled
+  custom_transition_proc: only_admins_can_enable_a11y_checker_during_eap

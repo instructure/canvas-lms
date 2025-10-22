@@ -2801,7 +2801,8 @@ describe Course do
       end
 
       it "returns Accessibility tab if feature flag is enabled for teachers" do
-        @course.root_account.settings[:enable_content_a11y_checker] = true
+        @course.root_account.enable_feature!(:a11y_checker)
+        @course.enable_feature!(:a11y_checker_eap)
         tabs = @course.tabs_available(@user)
 
         # Checks that Accessibility tab is at the end of the tabs (except for Settings tab)
@@ -2809,7 +2810,8 @@ describe Course do
         accessibility_tab_index = tabs.pluck(:id).index(Course::TAB_ACCESSIBILITY)
         expect(accessibility_tab_index).to eq(settings_tab_index - 1)
       ensure
-        @course.root_account.settings[:enable_content_a11y_checker] = false
+        @course.disable_feature!(:a11y_checker_eap)
+        @course.root_account.disable_feature!(:a11y_checker)
       end
 
       describe "TAB_YOUTUBE_MIGRATION" do

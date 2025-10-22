@@ -3498,14 +3498,12 @@ class Course < ActiveRecord::Base
                           })
     end
 
-    if root_account.enable_content_a11y_checker?
-      # Add Accessibility tab at the end of the tabs (except for Settings tab)
+    if a11y_checker_enabled? && grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
       default_tabs.push({
                           id: TAB_ACCESSIBILITY,
                           label: t("#tabs.accessibility", "Accessibility"),
                           css_class: "accessibility",
-                          href: :course_accessibility_index_path,
-                          visibility: "admins"
+                          href: :course_accessibility_index_path
                         })
     end
 
@@ -3867,6 +3865,10 @@ class Course < ActiveRecord::Base
 
   def block_content_editor_enabled?
     account.feature_enabled?(:block_content_editor) && feature_enabled?(:block_content_editor_eap)
+  end
+
+  def a11y_checker_enabled?
+    account.feature_enabled?(:a11y_checker) && feature_enabled?(:a11y_checker_eap)
   end
 
   def elementary_enabled?

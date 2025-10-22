@@ -24,8 +24,8 @@ RSpec.shared_examples "an accessibility scannable resource" do
       context "when feature is enabled" do
         before do
           account = course.root_account
-          account.settings[:enable_content_a11y_checker] = true
-          account.save!
+          account.enable_feature!(:a11y_checker)
+          course.enable_feature!(:a11y_checker_eap)
         end
 
         it "triggers the scanner service" do
@@ -51,8 +51,9 @@ RSpec.shared_examples "an accessibility scannable resource" do
       context "when feature is enabled" do
         before do
           account = resource.root_account
-          account.settings[:enable_content_a11y_checker] = true
-          account.save!
+          account.enable_feature!(:a11y_checker)
+          resource.context.enable_feature!(:a11y_checker_eap)
+          resource.context.reload
         end
 
         context "when relevant attribute is changed" do
@@ -90,30 +91,12 @@ RSpec.shared_examples "an accessibility scannable resource" do
       end
     end
 
-    describe "#remove_accessibility_scan" do
+    describe "cascade deletion" do
       let(:resource) { described_class.create!(valid_attributes) }
+      let!(:scan) { AccessibilityResourceScan.create!(context: resource, course:) }
 
-      context "when feature is enabled" do
-        before do
-          account = resource.root_account
-          account.settings[:enable_content_a11y_checker] = true
-          account.save!
-          resource.update!(relevant_attributes_for_scan) # update resource to trigger a scan
-        end
-
-        it "removes the associated AccessibilityResourceScan" do
-          expect do
-            resource.destroy
-          end.to change { AccessibilityResourceScan.where(context: resource).count }.from(1).to(0)
-        end
-      end
-
-      context "when feature is disabled" do
-        it "does not remove the associated AccessibilityResourceScan" do
-          expect(AccessibilityResourceScan).not_to receive(:for_context)
-
-          resource.destroy
-        end
+      it "destroys the associated AccessibilityResourceScan when resource is destroyed" do
+        expect { resource.destroy }.to change { AccessibilityResourceScan.exists?(scan.id) }.from(true).to(false)
       end
     end
   end

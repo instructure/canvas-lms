@@ -282,12 +282,16 @@ describe CoursesController do
       context "on accessibility column" do
         before do
           account = Account.default
-          account.settings[:enable_content_a11y_checker] = true
-          account.save!
+          account.enable_feature!(:a11y_checker)
+          @course1.enable_feature!(:a11y_checker_eap)
+          @course2.enable_feature!(:a11y_checker_eap)
+
+          # Disable scan callbacks to avoid interference
+          allow_any_instance_of(Course).to receive(:a11y_checker_enabled?).and_return(false)
 
           wiki_page = wiki_page_model(course: @course1, title: "Wiki Page", body: "<div><h1>Document Title</h1></div>")
-          scan = AccessibilityResourceScan.where(context: wiki_page).first
-          scan.update!(
+          scan = AccessibilityResourceScan.create!(
+            context: wiki_page,
             course: @course1,
             workflow_state: "completed",
             resource_name: wiki_page.title,
@@ -301,6 +305,9 @@ describe CoursesController do
             rule_type: Accessibility::Rules::HeadingsStartAtH2Rule.id,
             node_path: "./div/h1"
           )
+
+          # Re-enable for the actual test
+          allow_any_instance_of(Course).to receive(:a11y_checker_enabled?).and_call_original
         end
 
         it "lists courses with less accessibility issues first" do
