@@ -227,6 +227,7 @@ class User < ActiveRecord::Base
   has_many :block_editor_templates, class_name: "BlockEditorTemplate", as: :context, inverse_of: :context
   has_many :asset_user_accesses
   has_many :wiki_pages
+  has_many :announcements
 
   has_one :profile, class_name: "UserProfile"
 
