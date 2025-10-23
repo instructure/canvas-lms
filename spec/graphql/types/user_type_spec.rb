@@ -2591,31 +2591,92 @@ describe Types::UserType do
         # Should only return participants from course1
         expect(result.length).to eq(2)
       end
+
+      it "excludes announcements from past courses (section end date in past)" do
+        # Create a course with section that ended
+        past_course = course_factory(active_all: true)
+        past_section = past_course.course_sections.create!(name: "Past Section", end_at: 1.week.ago)
+        past_course.enroll_student(@student_user, section: past_section, enrollment_state: "active")
+
+        # Create an announcement in the past course
+        past_course.announcements.create!(
+          title: "Past Course Announcement",
+          message: "This should not appear"
+        )
+
+        result = resolve_participants_with_topics(filter: { isAnnouncement: true })
+        titles = result.flatten
+
+        # Should only include announcements from current courses
+        expect(titles).to match_array(["Course 1 Announcement", "Course 2 Announcement"])
+        expect(titles).not_to include("Past Course Announcement")
+      end
+
+      it "excludes announcements from courses with conclude_at in past" do
+        # Create a course that concluded
+        concluded_course = course_factory(active_all: true)
+        concluded_course.update!(conclude_at: 1.week.ago)
+        concluded_course.enroll_student(@student_user, enrollment_state: "active")
+
+        # Create an announcement in the concluded course
+        concluded_course.announcements.create!(
+          title: "Concluded Course Announcement",
+          message: "This should not appear"
+        )
+
+        result = resolve_participants_with_topics(filter: { isAnnouncement: true })
+        titles = result.flatten
+
+        # Should only include announcements from current courses
+        expect(titles).to match_array(["Course 1 Announcement", "Course 2 Announcement"])
+        expect(titles).not_to include("Concluded Course Announcement")
+      end
+
+      it "excludes announcements from unpublished courses" do
+        # Create an unpublished course
+        unpublished_course = course_factory
+        unpublished_course.workflow_state = "claimed"
+        unpublished_course.save!
+        unpublished_course.enroll_student(@student_user, enrollment_state: "active")
+
+        # Create an announcement in the unpublished course
+        unpublished_course.announcements.create!(
+          title: "Unpublished Course Announcement",
+          message: "This should not appear"
+        )
+
+        result = resolve_participants_with_topics(filter: { isAnnouncement: true })
+        titles = result.flatten
+
+        # Should only include announcements from current courses
+        expect(titles).to match_array(["Course 1 Announcement", "Course 2 Announcement"])
+        expect(titles).not_to include("Unpublished Course Announcement")
+      end
     end
   end
 
   context "discussionParticipantsConnection with observed user" do
     before(:once) do
-      @course1 = Course.create!(name: "Course 1", workflow_state: "available")
-      @course2 = Course.create!(name: "Course 2", workflow_state: "available")
+      @course1 = course_factory(active_all: true, course_name: "Course 1")
+      @course2 = course_factory(active_all: true, course_name: "Course 2")
 
       @observer = user_factory(name: "Observer")
       @observed_student = user_factory(name: "Observed Student")
 
-      @course1.enroll_student(@observed_student, active_all: true)
-      @course2.enroll_student(@observed_student, active_all: true)
-      @course1.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @observed_student.id, active_all: true)
-      @course2.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @observed_student.id, active_all: true)
+      @course1.enroll_student(@observed_student, enrollment_state: "active")
+      @course2.enroll_student(@observed_student, enrollment_state: "active")
+      @course1.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @observed_student.id, enrollment_state: "active")
+      @course2.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @observed_student.id, enrollment_state: "active")
 
       # Create discussions and announcements
       @discussion1 = @course1.discussion_topics.create!(title: "Discussion 1", message: "Test discussion", workflow_state: "active")
       @announcement1 = @course1.announcements.create!(title: "Announcement 1", message: "Test announcement", workflow_state: "active")
       @discussion2 = @course2.discussion_topics.create!(title: "Discussion 2", message: "Another discussion", workflow_state: "active")
 
-      # Create participation records for observed student
-      @discussion1.discussion_topic_participants.create!(user: @observed_student)
-      @announcement1.discussion_topic_participants.create!(user: @observed_student)
-      @discussion2.discussion_topic_participants.create!(user: @observed_student)
+      # Create participation records for observed student (announcements auto-create, so use find_or_create)
+      @discussion1.discussion_topic_participants.find_or_create_by!(user: @observed_student)
+      @announcement1.discussion_topic_participants.find_or_create_by!(user: @observed_student)
+      @discussion2.discussion_topic_participants.find_or_create_by!(user: @observed_student)
     end
 
     let(:observer_user_type) do
@@ -3000,12 +3061,88 @@ describe Types::UserType do
         expect(submission.missing?).to be false
       end
     end
+
+    it "excludes assignments from past courses (section end date in past)" do
+      Timecop.freeze(@frozen_time) do
+        # Create a course with section that ended
+        past_course = course_factory(active_all: true)
+        past_section = past_course.course_sections.create!(name: "Past Section", end_at: @frozen_time - 1.week)
+        past_course.enroll_student(@student, section: past_section, enrollment_state: "active")
+
+        # Create an assignment in the past course
+        past_assignment = past_course.assignments.create!(
+          title: "Past Course Assignment",
+          due_at: (@frozen_time + 1.day).end_of_day,
+          workflow_state: "published",
+          submission_types: "online_text_entry"
+        )
+        past_assignment.submissions.find_or_create_by(user: @student) do |s|
+          s.submitted_at = nil
+          s.workflow_state = "unsubmitted"
+        end
+
+        result = student_user_type.resolve("courseWorkSubmissionsConnection { edges { node { assignment { title } } } }")
+        expect(result).not_to include("Past Course Assignment")
+        expect(result).to include("Test Assignment") # Should still show current course
+      end
+    end
+
+    it "excludes assignments from courses with conclude_at in past" do
+      Timecop.freeze(@frozen_time) do
+        # Create a course that concluded
+        concluded_course = course_factory(active_all: true)
+        concluded_course.update!(conclude_at: @frozen_time - 1.week)
+        concluded_course.enroll_student(@student, enrollment_state: "active")
+
+        # Create an assignment in the concluded course
+        concluded_assignment = concluded_course.assignments.create!(
+          title: "Concluded Course Assignment",
+          due_at: (@frozen_time + 1.day).end_of_day,
+          workflow_state: "published",
+          submission_types: "online_text_entry"
+        )
+        concluded_assignment.submissions.find_or_create_by(user: @student) do |s|
+          s.submitted_at = nil
+          s.workflow_state = "unsubmitted"
+        end
+
+        result = student_user_type.resolve("courseWorkSubmissionsConnection { edges { node { assignment { title } } } }")
+        expect(result).not_to include("Concluded Course Assignment")
+        expect(result).to include("Test Assignment") # Should still show current course
+      end
+    end
+
+    it "excludes assignments from unpublished courses" do
+      Timecop.freeze(@frozen_time) do
+        # Create an unpublished course
+        unpublished_course = course_factory
+        unpublished_course.workflow_state = "claimed"
+        unpublished_course.save!
+        unpublished_course.enroll_student(@student, enrollment_state: "active")
+
+        # Create an assignment in the unpublished course
+        unpublished_assignment = unpublished_course.assignments.create!(
+          title: "Unpublished Course Assignment",
+          due_at: (@frozen_time + 1.day).end_of_day,
+          workflow_state: "published",
+          submission_types: "online_text_entry"
+        )
+        unpublished_assignment.submissions.find_or_create_by(user: @student) do |s|
+          s.submitted_at = nil
+          s.workflow_state = "unsubmitted"
+        end
+
+        result = student_user_type.resolve("courseWorkSubmissionsConnection { edges { node { assignment { title } } } }")
+        expect(result).not_to include("Unpublished Course Assignment")
+        expect(result).to include("Test Assignment") # Should still show current course
+      end
+    end
   end
 
   context "courseWorkSubmissionsConnection with observed user" do
     before(:once) do
-      @course1 = Course.create!(name: "Course 1", workflow_state: "available")
-      @course2 = Course.create!(name: "Course 2", workflow_state: "available")
+      @course1 = course_factory(active_all: true, course_name: "Course 1")
+      @course2 = course_factory(active_all: true, course_name: "Course 2")
 
       @assignment1 = @course1.assignments.create!(title: "Assignment 1", due_at: 1.day.from_now, workflow_state: "published")
       @assignment2 = @course2.assignments.create!(title: "Assignment 2", due_at: 2.days.from_now, workflow_state: "published")
@@ -3013,10 +3150,10 @@ describe Types::UserType do
       @observer = user_factory(name: "Observer")
       @observed_student = user_factory(name: "Observed Student")
 
-      @course1.enroll_student(@observed_student, active_all: true)
-      @course2.enroll_student(@observed_student, active_all: true)
-      @course1.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @observed_student.id, active_all: true)
-      @course2.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @observed_student.id, active_all: true)
+      @course1.enroll_student(@observed_student, enrollment_state: "active")
+      @course2.enroll_student(@observed_student, enrollment_state: "active")
+      @course1.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @observed_student.id, enrollment_state: "active")
+      @course2.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @observed_student.id, enrollment_state: "active")
 
       @submission1 = @assignment1.submissions.find_by(user: @observed_student)
       @submission2 = @assignment2.submissions.find_by(user: @observed_student)
@@ -3082,9 +3219,9 @@ describe Types::UserType do
 
     it "only returns submissions from courses observer can access" do
       # Create a course the observer can't see
-      other_course = Course.create!(name: "Other Course")
+      other_course = course_factory(active_all: true, course_name: "Other Course")
       other_course.assignments.create!(title: "Other Assignment")
-      other_course.enroll_student(@observed_student, active_all: true)
+      other_course.enroll_student(@observed_student, enrollment_state: "active")
 
       result = observer_user_type.resolve(
         "courseWorkSubmissionsConnection(observedUserId: \"#{@observed_student.id}\") {

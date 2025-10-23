@@ -3539,15 +3539,27 @@ class UsersController < ApplicationController
   end
 
   def fetch_courses_with_grades(observed_user = nil)
-    # Get current enrollments for the user
-    if observed_user
-      observer_courses = @current_user.cached_course_ids_for_observed_user(observed_user)
-      enrollments = observed_user.enrollments.current.preload(:course, :scores).where(course_id: observer_courses)
-    else
-      enrollments = @current_user.enrollments.current.preload(:course, :scores)
-    end
+    # Get current course IDs using shared filtering logic
+    target_user = observed_user || @current_user
+    current_course_ids = if observed_user
+                           observer_courses = @current_user.cached_course_ids_for_observed_user(observed_user)
+                           observed_current_courses = observed_user.cached_current_course_ids_for_dashboard(domain_root_account: @domain_root_account)
+                           observer_courses & observed_current_courses
+                         else
+                           @current_user.cached_current_course_ids_for_dashboard(domain_root_account: @domain_root_account)
+                         end
 
-    course_data = enrollments.filter_map do |enrollment|
+    return [] if current_course_ids.empty?
+
+    # Get enrollments for current courses with scores preloaded
+    current_enrollments = target_user.enrollments
+                                     .not_deleted
+                                     .shard(target_user.in_region_associated_shards)
+                                     .where(course_id: current_course_ids)
+                                     .preload(:course, :scores)
+                                     .to_a
+
+    course_data = current_enrollments.filter_map do |enrollment|
       course = enrollment.course
 
       can_read_grades = if (observed_user || @current_user).id == @current_user.id
