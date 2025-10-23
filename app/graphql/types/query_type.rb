@@ -20,8 +20,6 @@
 
 module Types
   class QueryType < ApplicationObjectType
-    graphql_name "Query"
-
     include GraphQL::Types::Relay::HasNodeField
 
     field :legacy_node, GraphQL::Types::Relay::Node, null: true do
@@ -187,14 +185,21 @@ module Types
                      course_ids & user_course_ids
                    end
 
-      # Get unique instructor enrollments grouped by user, ordered by course name
-      # to ensure consistent pagination and grouping by course
-      Enrollment.joins(:course, :user)
-                .where(course_id: course_ids)
-                .where(type: ["TeacherEnrollment", "TaEnrollment"])
-                .where(workflow_state: "active")
-                .where(courses: { workflow_state: "available" })
-                .order("courses.name ASC")
+      # Subquery approach required because distinct_on() breaks .count() for totalCount
+      subquery = Enrollment.joins(:user, :enrollment_state)
+                           .current
+                           .where(course_id: course_ids)
+                           .where(type: ["TeacherEnrollment", "TaEnrollment"])
+                           .where(enrollment_states: { restricted_access: false, state: "active" })
+                           .where(courses: { workflow_state: "available" })
+                           .where("courses.conclude_at IS NULL OR courses.conclude_at > ?", Time.now.utc)
+                           .select("enrollments.id")
+                           .order(:course_id, :user_id, Enrollment.state_by_date_rank_sql)
+                           .distinct_on(:course_id, :user_id)
+
+      Enrollment.where(id: subquery)
+                .joins(:user, :course)
+                .order("courses.name ASC, users.sortable_name ASC")
     end
 
     field :courses,
