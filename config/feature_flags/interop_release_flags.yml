@@ -57,6 +57,18 @@ custom_variables_booleans_as_strings:
       state: allowed_on
     ci:
       state: allowed_on
+developer_key_user_agent_alert:
+  state: hidden
+  display_name: Show User-Agent alert on Developer Keys page
+  description: |-
+    If enabled, the Developer Keys page will show an alert
+    about blocking requests that don't have the User-Agent header.
+  applies_to: SiteAdmin
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 disable_graphql_authentication:
   state: hidden
   display_name: Disable authentication for GraphQL
@@ -199,6 +211,20 @@ lti_asset_processor_discussions:
   display_name: Document Processing in Discussions
   description: |-
     This enables support for document processing using the LTI Asset Processor specification within graded Discussions.
+  environments:
+    development:
+      state: allowed_on
+    test:
+      state: allowed_on
+    ci:
+      state: allowed_on
+lti_asset_processor_course:
+  state: hidden
+  applies_to: Course
+  display_name: Document Processor
+  description: |-
+    If enabled, the Document Processor placement will be visible on Assignments and Discussions
+    when at least one tool is configured to use this placement and Documents Processors are enabled for the root account.
   environments:
     development:
       state: allowed_on
@@ -501,6 +527,21 @@ top_navigation_placement:
   applies_to: RootAccount
   display_name: Top Navigation Placement
   description: Enables top_navigation LTI placement. (LTI 1.3 Only)
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
+top_navigation_placement_a11y_fixes:
+  state: hidden
+  shadow: true
+  applies_to: SiteAdmin
+  display_name: Top Navigation Placement Accessibility Tab Order Fix
+  description: |-
+    When enabled, fixes the tab order for View as Student and LTI Tools buttons
+    in the top navigation. View as Student will receive focus before LTI Tools,
+    following logical left-to-right reading order. Requires top_navigation_placement
+    to be enabled.
   environments:
     development:
       state: allowed_on

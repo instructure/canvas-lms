@@ -18,9 +18,34 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {CourseCode} from '../CourseCode'
 import {getCourseCodeColor} from '../../widgets/CourseGradesWidget/utils'
 import {WidgetDashboardProvider} from '../../../hooks/useWidgetDashboardContext'
+
+//Mock TruncateText to simulate truncation behavior in tests
+jest.mock('@instructure/ui-truncate-text', () => ({
+  TruncateText: ({
+    children,
+    onUpdate,
+  }: {
+    children: string
+    onUpdate?: (truncated: boolean) => void
+  }) => {
+    // Simulate truncation for strings longer than 30 characters
+    React.useEffect(() => {
+      if (onUpdate && children && children.length > 30) {
+        onUpdate(true)
+      }
+    }, [children, onUpdate])
+
+    // Simulate truncated text display (first 15 chars + ...)
+    const displayText =
+      children && children.length > 30 ? `${children.substring(0, 15)}...` : children
+
+    return displayText
+  },
+}))
 
 const mockSharedCourseData = [
   {
@@ -126,6 +151,47 @@ describe('CourseCode', () => {
     it('should use grid index for consistent colors', () => {
       renderWithProvider(<CourseCode courseId="123" gridIndex={0} />)
       expect(screen.getByText('TEST101')).toBeInTheDocument()
+    })
+
+    it('should render with tooltip for long course code', async () => {
+      const longCode = 'VERYLONGCOURSECODE12345678901234567890'
+      const truncatedCode = 'VERYLONGCOURSEC...'
+
+      const user = userEvent.setup()
+
+      renderWithProvider(<CourseCode courseId="123" overrideCode={longCode} />)
+
+      // Verify truncated text is displayed
+      expect(screen.getByText(truncatedCode)).toBeInTheDocument()
+
+      // The tooltip wrapper should be focusable and have tabIndex 0
+      const truncatedTextElement = screen.getByText(truncatedCode)
+      const tooltipWrapper = truncatedTextElement.closest('[tabindex="0"]')
+      expect(tooltipWrapper).toBeInTheDocument()
+      expect(tooltipWrapper).toHaveAttribute('tabIndex', '0')
+
+      // Hover over the tooltip wrapper to trigger the tooltip
+      if (tooltipWrapper) {
+        await user.hover(tooltipWrapper)
+      }
+
+      // After hovering, the full code should appear in the tooltip
+      const tooltip = await screen.findByText(
+        (content: string, element: Element | null): boolean => {
+          return content === longCode && Boolean(element?.id?.startsWith('Tooltip___'))
+        },
+      )
+      expect(tooltip).toBeInTheDocument()
+    })
+
+    it('should not render with tooltip for normal course code length', () => {
+      const shortCode = 'SHORT'
+      renderWithProvider(<CourseCode courseId="123" overrideCode={shortCode} />)
+
+      expect(screen.getByText(shortCode)).toBeInTheDocument()
+
+      // Check that there's no focusable wrapper (should not find element with aria-label)
+      expect(screen.queryByLabelText(shortCode)).not.toBeInTheDocument()
     })
   })
 })

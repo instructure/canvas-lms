@@ -84,4 +84,18 @@ describe('CommentRow', () => {
     expect(queryByTestId('canvas-studio-player')).not.toBeInTheDocument()
     expect(container.querySelector('video')).toBeInTheDocument()
   })
+
+  it('should decode HTML entities in author shortName', () => {
+    const props = getMockProps()
+    props.comment.author.shortName = 'John Fields j&quot;E&amp;D&lt;I&gt;'
+    const {getByText} = render(<CommentRow {...props} />)
+    expect(getByText(/John Fields j"E&D<I>/)).toBeInTheDocument()
+  })
+
+  it('should handle null author gracefully', () => {
+    const props = getMockProps()
+    props.comment.author = null
+    const {getByText} = render(<CommentRow {...props} />)
+    expect(getByText(/Anonymous/)).toBeInTheDocument()
+  })
 })

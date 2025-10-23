@@ -1295,7 +1295,11 @@ EditView.prototype.afterRender = function () {
       parseInt(this.assignment.id, 10),
     )
   }
-  if (window.ENV?.FEATURES?.lti_asset_processor && this.$assetProcessorsContainer.length > 0) {
+  if (
+    window.ENV?.FEATURES?.lti_asset_processor &&
+    window.ENV?.FEATURES?.lti_asset_processor_course &&
+    this.$assetProcessorsContainer.length > 0
+  ) {
     assetProcessorsAttach({
       container: this.$assetProcessorsContainer.get(0),
       courseId: ENV.COURSE_ID,
@@ -1338,6 +1342,7 @@ EditView.prototype.afterRender = function () {
       this.$conditionalReleaseTarget.get(0),
       I18n.t('assignment'),
       ENV.CONDITIONAL_RELEASE_ENV,
+      !!this.lockedItems.content,
     )
   }
   if (this.assignment.inClosedGradingPeriod()) {
@@ -1500,7 +1505,7 @@ EditView.prototype.getFormData = function () {
   if ($grader_count.length > 0) {
     data.grader_count = numberHelper.parse($grader_count[0].value)
   }
-  if (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED) {
+  if (ENV.PEER_REVIEW_ALLOCATION_ENABLED) {
     const checkedInput = document.getElementById('assignment_peer_reviews_checkbox')
     data.peer_reviews = checkedInput?.checked
   }
@@ -2270,7 +2275,7 @@ EditView.prototype.renderModeratedGradingFormFieldGroup = function () {
     this.hideErrors('final_grader_id_errors')
   }
   let isPeerReviewEnabled
-  if (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED) {
+  if (ENV.PEER_REVIEW_ALLOCATION_ENABLED) {
     const peerReviewCheckbox = document.getElementById('assignment_peer_reviews_checkbox')
     if (peerReviewCheckbox) {
       isPeerReviewEnabled = peerReviewCheckbox.checked

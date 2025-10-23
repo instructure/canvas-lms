@@ -596,7 +596,7 @@ class Quizzes::QuizzesApiController < ApplicationController
   end
 
   def render_update_error(status)
-    errors = @quiz.errors.as_json[:errors]
+    errors = ::Api::Errors::Reporter.to_json(@quiz.errors)[:errors]
     errors["published"] = errors.delete(:workflow_state) if errors.key?(:workflow_state)
     render json: { errors: }, status:
   end

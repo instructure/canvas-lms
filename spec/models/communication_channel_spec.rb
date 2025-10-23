@@ -913,7 +913,7 @@ describe CommunicationChannel do
       expect(cc.e164_path).to eq "+18015555555"
       allow(InstStatsd::Statsd).to receive(:increment)
       account = double
-      allow(account).to receive_messages(feature_enabled?: true, global_id: "totes_an_ID")
+      allow(account).to receive_messages(feature_enabled?: true, global_id: "totes_an_ID", shard: Shard.current)
       expect(Services::NotificationService).to receive(:process).with(
         "otp:#{cc.global_id}",
         anything,
@@ -935,7 +935,7 @@ describe CommunicationChannel do
         "message.deliver.sms.totes_an_ID",
         {
           short_stat: "message.deliver_per_account",
-          tags: { path_type: "sms", root_account_id: "totes_an_ID" }
+          tags: { path_type: "sms", cluster: "test" }
         }
       )
     end

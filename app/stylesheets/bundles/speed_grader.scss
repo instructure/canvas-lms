@@ -34,9 +34,12 @@
 // their browser font size to either small or very large
 
 $gradebook_header_height: 3.5em;
+$header-padding: 0.375em 0.75em;
+$stacked-header-cutoff-width: 800px;
 
 #gradebook_header_container {
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .speed_grader_nav_form {
@@ -51,9 +54,8 @@ $gradebook_header_height: 3.5em;
 #gradebook_header {
   background-color: var(--ic-brand-global-nav-bgd);
   color: var(--ic-brand-global-nav-menu-item__text-color);
-  padding: 0.375em 0.75em;
+  padding: $header-padding;
   @include fontSize(11px);
-  min-width: 960px;
 
   .ui-icon {
     background-image: $iconsActive;
@@ -94,20 +96,10 @@ $gradebook_header_height: 3.5em;
 
 .subheadContent {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: nowrap;
 }
 
 .subheadContent--flex-start {
   display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  flex-wrap: nowrap;
-  flex-shrink: 2;
-  min-width: 0;
-  padding-#{direction(right)}: $ic-sp;
-  overflow: hidden;
 }
 
 // little trick to make the icon-font and the icon svg match in size
@@ -117,7 +109,6 @@ $icon-size: 1.4rem;
   display: flex;
   align-items: center;
   flex-wrap: nowrap;
-  margin-#{direction(right)}: $ic-sp;
   flex-shrink: 0;
 
   // sizes the icon font
@@ -139,8 +130,6 @@ $icon-size: 1.4rem;
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
-  padding-#{direction(left)}: 20px;
-  border-#{direction(left)}: 1px dotted var(--ic-brand-global-nav-menu-item__text-color);
   text-align: direction(left);
   white-space: nowrap;
   overflow: hidden;
@@ -170,21 +159,11 @@ $icon-size: 1.4rem;
 
 .subheadContent--flex-end {
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  flex-wrap: nowrap;
-  flex-shrink: 0;
-  min-width: 0;
-  padding-#{direction(left)}: $ic-sp;
 }
 
 .statsMetric {
   display: flex;
   align-items: center;
-  flex-wrap: nowrap;
-  align-self: flex-end;
-  padding-#{direction(right)}: $ic-sp;
-  border-#{direction(right)}: 1px dotted var(--ic-brand-global-nav-menu-item__text-color);
 }
 
 .statsMetric__Item {
@@ -196,7 +175,7 @@ $icon-size: 1.4rem;
   margin-#{direction(right)}: $ic-sp*2;
 
   &:last-of-type {
-    margin-#{direction(right)}: $ic-sp;
+    margin-#{direction(right)}: 0;
   }
 }
 
@@ -210,15 +189,14 @@ $icon-size: 1.4rem;
 }
 
 .studentSelection {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  flex-wrap: nowrap;
-  margin-#{direction(left)}: $ic-sp;
 }
 
 .gradebookMoveToNext {
-  padding: 0 $ic-sp;
+  flex-shrink: 0;
+  padding-#{direction(right)}: $ic-sp;
 
   i {
     color: var(--ic-brand-global-nav-menu-item__text-color);
@@ -226,6 +204,7 @@ $icon-size: 1.4rem;
 }
 
 .gradebookAvatar {
+  flex-shrink: 0;
   height: 30px;
   max-width: 30px;
   border-radius: 30px; //match size of avatar width
@@ -312,12 +291,7 @@ $icon-size: 1.4rem;
 }
 
 #left_side {
-  position: absolute;
-  top: 0;
-  bottom: 0;
   overflow-y: hidden;
-  #{direction(left)}: 0;
-  #{direction(right)}: 25%;
 
   #submissions_container,
   #left_side_inner,
@@ -350,20 +324,32 @@ $icon-size: 1.4rem;
   }
 }
 
-#width_resizer {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  #{direction(left)}: 0;
-  background: #bbb url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%;
-  cursor: ew-resize;
-  width: 7px;
-  border-#{direction(right)}: 1px solid #838383;
-  z-index: 2;
+#width_resizer_ew.highlight,
+#width_resizer_ns.highlight {
+  background-color: #bbb;
+  animation-name: yellowFade;
+  animation-duration: 4s;
+  animation-iteration-count: 1;
+}
 
-  &.highlight {
-    background-color: #FBEC88;
+@keyframes yellowFade {
+  0% {
+      background-color: #bbb;
   }
+  10% {
+      background-color: #FBEC88;
+  }
+  50% {
+      background-color: #FBEC88;
+  }
+  100% {
+      background-color: #bbb;
+  }
+}
+
+.width_resizer {
+  position: absolute;
+  z-index: 2;
 }
 
 #speedgrader_iframe {
@@ -371,8 +357,6 @@ $icon-size: 1.4rem;
 }
 
 #right_side {
-  width: 25%;
-  position: absolute;
   top: 0;
   bottom: 0;
   #{direction(right)}: 0;
@@ -910,7 +894,6 @@ body .ui-state-active .ui-selectmenu-icon {
     height: 19px;
     margin-#{direction(left)}: 8px;
     padding-#{direction(left)}: 29px;
-    background: url("/images/arrow_#{direction(left)}.png") no-repeat center direction(left);
     overflow: hidden;
     white-space: nowrap;
     color: $ic-font-color-dark;
@@ -925,7 +908,6 @@ body .ui-state-active .ui-selectmenu-icon {
   ul {
     position: absolute;
     top: 0;
-    #{direction(left)}: -200px;
     width: 200px;
     background-color: $ic-color-light;
     padding: 0;
@@ -1235,4 +1217,225 @@ body.is-masquerading-or-student-view {
 #sg-section-filter-apply-container {
   padding: 0.5em 1em;
   border-top: 1px solid $ic-border-light;
+}
+
+$arrow-background: no-repeat center direction(left);
+$left-arrow-background: url("/images/arrow_#{direction(left)}.png") $arrow-background;
+$right-arrow-background: url("/images/arrow_#{direction(right)}.png") $arrow-background;
+$dotted-border: 1px dotted var(--ic-brand-global-nav-menu-item__text-color);
+
+@media (width < $stacked-header-cutoff-width) {
+  #full_width_container {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  #gradebook_header {
+    flex-direction: column;
+  }
+
+  #section-menu {
+    ul {
+      #{direction(right)}: 60px;
+    }
+  }
+
+  #section-menu-link {
+    background: $left-arrow-background;
+  }
+
+  #speedgrader-icons {
+    padding: $header-padding;
+    border-bottom: $dotted-border;
+  }
+
+  #students_selectmenu-button {
+    max-width: 180px;
+  }
+
+  .assignmentDetails {
+    padding: $header-padding;
+    border-bottom: $dotted-border;
+  }
+
+  .full_height {
+    #left_side {
+      height: calc(100% - 7px);
+
+      #left_side_inner {
+        height: calc(100% - 7px);
+      }
+    }
+
+    #right_side {
+      height: 7px;
+      overflow: hidden;
+    }
+  }
+
+  .right_side_content {
+    position: static;
+    top: auto;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .statsMetric {
+    padding: $header-padding;
+    border-bottom: $dotted-border;
+  }
+
+  .studentSelection {
+    padding: $header-padding;
+  }
+
+
+  #left_side {
+    flex: 0 0 60%;
+  }
+
+  #right_side {
+    flex: 0 0 40%;
+    overflow: scroll;
+  }
+
+  #width_resizer_ew {
+    display: none;
+  }
+
+  #width_resizer_ns {
+    display: initial;
+    background: #bbb url("/images/splitpane-handle-ns.png") no-repeat scroll 50% 50%;
+    border-bottom: 1px solid #838383;
+    cursor: ns-resize;
+    height: 7px;
+    max-height: 7px;
+    min-height: 7px;
+    width: 100%;
+  }
+
+  #right_side {
+    #rightside_inner {
+      position: static;
+      overflow-y: auto;
+    }
+  }
+}
+
+@media (width >=540px) and (width < $stacked-header-cutoff-width) {
+  #section-menu {
+    ul {
+      #{direction(right)}: -200px;
+    }
+  }
+
+  #section-menu-link {
+    background: $right-arrow-background;
+  }
+}
+
+@media (width >=$stacked-header-cutoff-width) {
+  #gradebook_header {
+    flex-direction: row;
+  }
+
+  #section-menu {
+    ul {
+      #{direction(left)}: -200px;
+    }
+  }
+
+  #left_side, #right_side {
+    height: 100%;
+    overflow-x: auto;
+  }
+
+  #left_side {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    #{direction(left)}: 0;
+    #{direction(right)}: 25%;
+  }
+
+  #right_side {
+    position: absolute;
+    width: 25%;
+  }
+
+  #section-menu-link {
+    background: $left-arrow-background;
+  }
+
+  #width_resizer_ew {
+    display: initial;
+    #{direction(left)}: 0;
+    background: #bbb url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%;
+    border-#{direction(right)}: 1px solid #838383;
+    bottom: 0;
+    cursor: ew-resize;
+    top: 0;
+    width: 7px;
+  }
+
+  #width_resizer_ns {
+    display: none;
+  }
+
+  .gradebookActions {
+    padding-#{direction(right)}: $ic-sp;
+    padding-bottom: 2px;
+  }
+
+  .subheadContent {
+    align-items: center;
+    flex-wrap: nowrap;
+  }
+
+  .subheadContent--flex-start {
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .subheadContent--flex-end {
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+    min-width: 0;
+  }
+
+  .time-late-input-container {
+    position: absolute;
+    #{direction(right)}: 24px;
+  }
+
+  .assignmentDetails {
+    padding-#{direction(left)}: $ic-sp;
+    padding-#{direction(right)}: $ic-sp;
+    border-#{direction(left)}: $dotted-border;
+    margin-right: auto;
+  }
+
+  .statsMetric {
+    flex-wrap: nowrap;
+    align-self: flex-end;
+    padding-#{direction(left)}: $ic-sp;
+    padding-#{direction(right)}: $ic-sp;
+    border-#{direction(right)}: $dotted-border;
+  }
+
+  .studentSelection {
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+    padding-#{direction(left)}: $ic-sp;
+  }
 }

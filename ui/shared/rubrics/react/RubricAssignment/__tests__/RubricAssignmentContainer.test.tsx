@@ -239,6 +239,28 @@ describe('RubricAssignmentContainer Tests', () => {
       expect(getByTestId('rubric-form-title')).toHaveValue('Rubric 1')
     })
 
+    it('should render "Unlink Rubric" for the trash icon tooltip and modal when associationCount > 1', () => {
+      const {getByTestId, queryAllByText} = renderComponent({
+        assignmentRubric: {...RUBRIC, association_count: 3},
+        assignmentRubricAssociation: RUBRIC_ASSOCIATION,
+      })
+
+      fireEvent.mouseOver(getByTestId('remove-assignment-rubric-button'))
+      expect(queryAllByText('Delete Rubric')).toHaveLength(0)
+      expect(queryAllByText('Unlink Rubric')).toHaveLength(2)
+    })
+
+    it('should render "Delete Rubric" for the trash icon tooltip and modal when associationCount is 0', () => {
+      const {getByTestId, queryAllByText} = renderComponent({
+        assignmentRubric: {...RUBRIC, association_count: 0},
+        assignmentRubricAssociation: RUBRIC_ASSOCIATION,
+      })
+
+      fireEvent.mouseOver(getByTestId('remove-assignment-rubric-button'))
+      expect(queryAllByText('Unlink Rubric')).toHaveLength(0)
+      expect(queryAllByText('Delete Rubric')).toHaveLength(2)
+    })
+
     describe('self assessment settings', () => {
       it('does not render self assessment settings when rubricSelfAssessmentFFEnabled is false', () => {
         const {queryByTestId} = renderComponent({

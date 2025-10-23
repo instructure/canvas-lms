@@ -522,7 +522,7 @@ module Api::V1::Assignment
       hash["estimated_duration"] = estimated_duration_json(assignment.estimated_duration, user, session)
     end
 
-    if opts[:include_peer_review] && assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
+    if opts[:include_peer_review] && assignment.context.feature_enabled?(:peer_review_grading)
       peer_review_sub_assignment = assignment.peer_review_sub_assignment
       if peer_review_sub_assignment
         # Exclude recursive peer_review_sub_assignment
@@ -643,7 +643,7 @@ module Api::V1::Assignment
 
     if [:created, :ok].include?(response) &&
        prepared_create[:assignment].peer_reviews &&
-       prepared_create[:assignment].context.feature_enabled?(:peer_review_allocation_and_grading)
+       prepared_create[:assignment].context.feature_enabled?(:peer_review_grading)
 
       begin
         create_api_peer_review_sub_assignment(prepared_create[:assignment], assignment_params[:peer_review])
@@ -766,7 +766,7 @@ module Api::V1::Assignment
       end
     end
 
-    if response == :ok && prepared_update[:assignment].context.feature_enabled?(:peer_review_allocation_and_grading)
+    if response == :ok && prepared_update[:assignment].context.feature_enabled?(:peer_review_grading)
       begin
         if prepared_update[:assignment].peer_review_sub_assignment.present?
           if prepared_update[:assignment].peer_reviews
@@ -1465,7 +1465,7 @@ module Api::V1::Assignment
       { "ab_guid" => strong_anything },
       ({ "suppress_assignment" => strong_anything } if assignment.root_account.suppress_assignments?),
       ({ "estimated_duration_attributes" => strong_anything } if estimated_duration_enabled?(assignment)),
-      ({ "peer_review" => %w[points_possible grading_type due_at unlock_at lock_at] } if assignment.context.feature_enabled?(:peer_review_allocation_and_grading)),
+      ({ "peer_review" => %w[points_possible grading_type due_at unlock_at lock_at] } if assignment.context.feature_enabled?(:peer_review_grading)),
     ].compact
   end
 

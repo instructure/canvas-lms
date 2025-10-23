@@ -861,6 +861,7 @@ describe ContentMigration do
       page_to = @copy_to.wiki_pages.find_by(migration_id: mig_id(page))
       expect(page_to.body).to include "/courses/#{@copy_to.id}/files/#{image_to.id}/preview"
       expect(image_to.folder).to eq Folder.media_folder(@copy_to)
+      expect(image_to.folder.hidden).to be_truthy
     end
 
     context "media objects" do

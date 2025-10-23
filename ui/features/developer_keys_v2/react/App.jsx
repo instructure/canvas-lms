@@ -162,6 +162,39 @@ class DeveloperKeysApp extends React.Component {
     }, ALERT_WAIT_TIME)
   }
 
+  alerts() {
+    return [
+      {
+        text: I18n.t(
+          `API requests now require the User-Agent header to be set. These requests are now blocked in Beta, and enforcement in Test and Prod is coming soon - please see the *API Change Log* for dates. 
+          You can review any current calls which do not meet this requirement in the Requests Without User Agent report on the **reports page**, 
+          and read more about the change on our ***blog***.`,
+          {
+            wrappers: [
+              `<a data-pendo='dev-key-change-log' target='_blank' href='https://community.canvaslms.com/t5/Canvas-Change-Log/2025-API-and-CLI-Change-Log/ta-p/626858' style='text-decoration: underline'>$1</a>`,
+              `<a data-pendo='dev-key-reports-page' target='_blank' href='/accounts/${window.ENV.ACCOUNT_ID}/settings#tab-reports' style='text-decoration: underline'>$1</a>`,
+              `<a data-pendo='dev-key-blog' target='_blank' href='https://community.canvaslms.com/t5/Canvas-LMS-Blog/Enforcing-User-Agent-Header-for-Canvas-API-Requests/ba-p/658205' style='text-decoration: underline'>$1</a>`,
+            ],
+          },
+        ),
+        type: 'warning',
+        shouldShow: ENV.FEATURES?.developer_key_user_agent_alert,
+      },
+      {
+        text: I18n.t(
+          `LTI tool management is now live in *Canvas Apps*! Changes sync between both pages as we develop more features for Apps. From now on, Apps is the primary home for LTI tools.`,
+          {
+            wrappers: [
+              `<a data-pendo='dev-key-apps-link' target='_blank' href='/accounts/${window.ENV.ACCOUNT_ID}/apps/manage' style='text-decoration: underline'>$1</a>`,
+            ],
+          },
+        ),
+        type: 'info',
+        shouldShow: true,
+      },
+    ]
+  }
+
   render() {
     const {
       applicationState: {
@@ -189,20 +222,22 @@ class DeveloperKeysApp extends React.Component {
         <View as="div" margin="none" padding="none">
           <Heading level="h1">{I18n.t('Developer Keys')}</Heading>
         </View>
-        <Alert margin="large 0" variant="info" hasShadow={false}>
-          <Text
-            dangerouslySetInnerHTML={{
-              __html: I18n.t(
-                'LTI tool management is now live in *Canvas Apps*! Changes sync between both pages as we develop more features for Apps. From now on, Apps is the primary home for LTI tools.',
-                {
-                  wrappers: [
-                    `<a data-pendo='dev-key-apps-link' target='_blank' href='/accounts/${window.ENV.ACCOUNT_ID}/apps/manage' style='text-decoration: underline'>$1</a>`,
-                  ],
-                },
-              ),
-            }}
-          />
-        </Alert>
+        {this.alerts()
+          .filter(alert => alert.shouldShow)
+          .map((alert, i) => (
+            <Alert
+              key={`alert-${i}`}
+              margin="medium 0"
+              variant={alert.type || 'info'}
+              hasShadow={false}
+            >
+              <Text
+                dangerouslySetInnerHTML={{
+                  __html: alert.text,
+                }}
+              />
+            </Alert>
+          ))}
         <Tabs
           onRequestTabChange={this.changeTab.bind(this)}
           shouldFocusOnRender={this.state.focusTab}

@@ -51,13 +51,17 @@ const ZLtiAssetReportProcessingProgress = z.string()
 // Can update this when zod is updated to allow z.literal(ARRAY): https://github.com/colinhacks/zod/issues/2686
 const ZLtiAssetReportPriority = z.number()
 
-const ZLtiAsset = z
-  .object({
-    __typename: z.literal('LtiAsset').optional(),
-    attachmentId: z.string().nullish(),
-    submissionAttempt: z.number().nullish(),
-  })
-  .strict()
+const ZDiscussionEntryVersion = zGqlObj('DiscussionEntryVersion', {
+  _id: z.string(),
+  messageIntro: z.string(),
+  createdAt: z.string().nullish(),
+})
+
+const ZLtiAsset = zGqlObj('LtiAsset', {
+  attachmentId: z.string().nullish(),
+  submissionAttempt: z.number().nullish(),
+  discussionEntryVersion: ZDiscussionEntryVersion.nullish(),
+})
 export type LtiAsset = z.infer<typeof ZLtiAsset>
 
 /**

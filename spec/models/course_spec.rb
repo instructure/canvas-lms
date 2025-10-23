@@ -2889,6 +2889,18 @@ describe Course do
 
           expect(youtube_tab).to be_nil
         end
+
+        it "includes YouTube migration tab when Studio tool is on a higher level account" do
+          sub_account = @course.root_account.sub_accounts.create!(name: "Sub Account")
+          @course.update!(account: sub_account)
+          sub_account.context_external_tools.where(domain: "arc.instructure.com").destroy_all
+
+          tabs = @course.tabs_available(@user)
+          youtube_tab = tabs.find { |t| t[:id] == Course::TAB_YOUTUBE_MIGRATION }
+
+          expect(youtube_tab).not_to be_nil
+          expect(youtube_tab[:label]).to eq("YouTube Migration")
+        end
       end
 
       describe "TAB_AI_EXPERIENCES" do
@@ -2964,6 +2976,32 @@ describe Course do
           ai_tab = tabs.find { |t| t[:id] == Course::TAB_AI_EXPERIENCES }
 
           expect(ai_tab).not_to be_nil
+        end
+
+        it "can be reordered and persists the custom position" do
+          # Move AI Experiences to the second position (after home)
+          @course.tab_configuration = [
+            { id: Course::TAB_AI_EXPERIENCES },
+            { id: Course::TAB_ANNOUNCEMENTS },
+            { id: Course::TAB_ASSIGNMENTS },
+            { id: Course::TAB_DISCUSSIONS },
+            { id: Course::TAB_GRADES },
+            { id: Course::TAB_PEOPLE },
+            { id: Course::TAB_PAGES },
+            { id: Course::TAB_FILES },
+            { id: Course::TAB_SYLLABUS },
+            { id: Course::TAB_OUTCOMES },
+            { id: Course::TAB_QUIZZES },
+            { id: Course::TAB_MODULES }
+          ]
+          @course.save!
+
+          tabs = @course.tabs_available(@user)
+          tab_ids = tabs.pluck(:id)
+
+          # Home should be first, AI Experiences should be second
+          expect(tab_ids[0]).to eq(Course::TAB_HOME)
+          expect(tab_ids[1]).to eq(Course::TAB_AI_EXPERIENCES)
         end
       end
 

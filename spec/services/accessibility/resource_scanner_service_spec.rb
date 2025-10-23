@@ -35,7 +35,7 @@ describe Accessibility::ResourceScannerService do
       it "creates a scan for the resource" do
         described_class.call(resource: wiki_page)
 
-        scan = AccessibilityResourceScan.for_context(wiki_page).first
+        scan = AccessibilityResourceScan.where(context: wiki_page).first
         expect(scan).to be_present
       end
 
@@ -104,7 +104,7 @@ describe Accessibility::ResourceScannerService do
         it "deletes the existing records" do
           subject.scan_resource(scan:)
 
-          expect(AccessibilityIssue.for_context(wiki_page)).not_to exist
+          expect(AccessibilityIssue.where(context: wiki_page)).not_to exist
         end
       end
 
@@ -117,17 +117,17 @@ describe Accessibility::ResourceScannerService do
 
         it "removes the active issues" do
           subject.scan_resource(scan:)
-          expect(AccessibilityIssue.for_context(wiki_page).active.count).to be(0)
+          expect(AccessibilityIssue.where(context: wiki_page).active.count).to be(0)
         end
 
         it "keeps the resolved issues" do
           subject.scan_resource(scan:)
-          expect(AccessibilityIssue.for_context(wiki_page).resolved.count).to be(3)
+          expect(AccessibilityIssue.where(context: wiki_page).resolved.count).to be(3)
         end
 
         it "keeps the dismissed issues" do
           subject.scan_resource(scan:)
-          expect(AccessibilityIssue.for_context(wiki_page).dismissed.count).to be(2)
+          expect(AccessibilityIssue.where(context: wiki_page).dismissed.count).to be(2)
         end
       end
 
@@ -146,8 +146,8 @@ describe Accessibility::ResourceScannerService do
         it "creates the proper number of AccessibilityIssue records" do
           subject.scan_resource(scan:)
 
-          issues = AccessibilityIssue.for_context(wiki_page)
-          expect(AccessibilityIssue.for_context(wiki_page).count).to be(2)
+          issues = AccessibilityIssue.where(context: wiki_page)
+          expect(AccessibilityIssue.where(context: wiki_page).count).to be(2)
           expect(issues.first.rule_type).to eq(Accessibility::Rules::HeadingsSequenceRule.id)
           expect(issues.second.rule_type).to eq(Accessibility::Rules::HeadingsStartAtH2Rule.id)
         end
@@ -161,7 +161,7 @@ describe Accessibility::ResourceScannerService do
         it "connects the scan to the issue" do
           subject.scan_resource(scan:)
 
-          issue = AccessibilityIssue.for_context(wiki_page).first
+          issue = AccessibilityIssue.where(context: wiki_page).first
           expect(issue.accessibility_resource_scan).to eq(scan)
         end
       end
@@ -177,11 +177,11 @@ describe Accessibility::ResourceScannerService do
 
         expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
           "accessibility.resources_scanned",
-          tags: { course_id: scan.course_id }
+          tags: { cluster: scan.course.shard.database_server&.id }
         )
         expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
           "accessibility.pages_scanned",
-          tags: { course_id: scan.course_id }
+          tags: { cluster: scan.course.shard.database_server&.id }
         )
       end
     end
@@ -210,11 +210,11 @@ describe Accessibility::ResourceScannerService do
 
         expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
           "accessibility.resources_scanned",
-          tags: { course_id: scan.course_id }
+          tags: { cluster: scan.course.shard.database_server&.id }
         )
         expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
           "accessibility.resource_scan_failed",
-          tags: { course_id: scan.course_id, scan_id: scan.id }
+          tags: { cluster: scan.course.shard.database_server&.id }
         )
       end
     end

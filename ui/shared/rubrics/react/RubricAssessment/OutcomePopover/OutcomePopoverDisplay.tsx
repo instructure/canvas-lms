@@ -24,6 +24,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import CalculationMethodContent from '@canvas/grading/CalculationMethodContent'
 import type {GetRubricOutcomeQuery} from '@canvas/graphql/codegen/graphql'
+import OutcomeContextTag from '@canvas/outcome-context-tag'
 
 const I18n = createI18nScope('rubrics-assessment-outcome')
 
@@ -79,6 +80,11 @@ export const OutcomePopoverDisplay = ({outcome}: OutcomePopoverDisplayProps) => 
               as="div"
               data-testid="outcome-popover-display-content-description"
               dangerouslySetInnerHTML={{__html: outcome.description ?? ''}}
+            />
+            <OutcomeContextTag
+              outcomeContextType={outcome.contextType ?? undefined}
+              outcomeContextId={outcome.contextId ?? undefined}
+              margin="0 0 x-small 0"
             />
             {friendlyCalculationMethod && exampleText && (
               <>

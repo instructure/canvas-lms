@@ -1,17 +1,36 @@
 <html>
   <body>
+    <h2>Mock LTI Tool UI</h2>
     <button id="notification-btn" onclick="sendRequest('pns_subscribe')">Subscribe to Notification Service</button>
+    <button id="eula-accept-btn" onclick="sendRequest('eula_service')">Accept EULA</button>
+    <button id="deep-link-btn" onclick="sendRequest('deep_link')">Create Asset Processor</button>
 
     <script>
-      const data = <%= raw(@data.to_json) %>
+      const requests = <%= raw(@requests.to_json) %>
 
       const sendRequest = async (requestType) => {
-        const requestData = data[requestType]
-        await fetch(requestData.url, {
-          method: requestData.method,
-          headers: data.headers,
-          body: JSON.stringify(requestData.body)
-        })
+        const request = requests[requestType]
+
+        // Add timestamp to EULA request at send time
+        let body = request.body
+        if (requestType === 'eula_service') {
+          body = {...body, timestamp: new Date().toISOString()}
+        }
+
+        // Format body based on content type
+        const formattedBody = request.form_encoded
+          ? new URLSearchParams(body)
+          : JSON.stringify(body)
+
+        try {
+          await fetch(request.url, {
+            method: request.method,
+            headers: request.headers,
+            body: formattedBody
+          })
+        } catch (error) {
+          console.error(`Request failed for ${requestType}:`, error)
+        }
       }
     </script>
   </body>

@@ -16,8 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useMemo} from 'react'
+import React, {useMemo, useState} from 'react'
 import {Pill} from '@instructure/ui-pill'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {TruncateText} from '@instructure/ui-truncate-text'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {getCourseCodeColor} from '../widgets/CourseGradesWidget/utils'
 import {useWidgetDashboard} from '../../hooks/useWidgetDashboardContext'
 
@@ -70,6 +73,7 @@ export const CourseCode: React.FC<CourseCodeProps> = ({
   useCustomColors = true,
   maxWidth = '15rem',
 }) => {
+  const [isTruncated, setIsTruncated] = useState(false)
   const {preferences, sharedCourseData} = useWidgetDashboard()
 
   // Find course data from shared context
@@ -108,19 +112,35 @@ export const CourseCode: React.FC<CourseCodeProps> = ({
 
   const displayCode = overrideCode || courseData?.courseCode || 'N/A'
 
-  return (
+  const pillElement = (
     <Pill
       color="primary"
-      className={className}
+      className={`course-code-pill ${className || ''}`}
       themeOverride={{
         background: courseCodeStyle.background,
         primaryColor: courseCodeStyle.textColor,
         maxWidth,
       }}
     >
-      {displayCode}
+      {isTruncated && <ScreenReaderContent>{displayCode}</ScreenReaderContent>}
+      <span aria-hidden={isTruncated}>
+        <TruncateText onUpdate={setIsTruncated}>{displayCode}</TruncateText>
+      </span>
     </Pill>
   )
+
+  if (isTruncated) {
+    return (
+      <Tooltip renderTip={displayCode} placement="top">
+        {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
+        <span tabIndex={0} style={{display: 'inline-block'}}>
+          {pillElement}
+        </span>
+      </Tooltip>
+    )
+  }
+
+  return pillElement
 }
 
 export default CourseCode

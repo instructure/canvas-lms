@@ -383,6 +383,11 @@ body:not(.course-menu-expanded) {
     align-items: center;
   }
 
+  .right-of-crumbs.right-of-crumbs-no-reverse {
+    flex-direction: unset;
+    justify-content: flex-end;
+  }
+
   .right-of-crumbs>* {
     margin-left: 12px;
   }

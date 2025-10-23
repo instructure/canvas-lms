@@ -1651,6 +1651,15 @@ class CoursesController < ApplicationController
                  data: @alerts,
                }
              })
+      remote_env(ams:
+        {
+          launch_url: Services::Ams.launch_url,
+          api_url: Services::Ams.api_url
+        })
+
+      if Account.site_admin.feature_enabled?(:grading_scheme_updates)
+        js_env({ COURSE_DEFAULT_GRADING_SCHEME_ID: @context.grading_standard_id || @context.default_grading_standard&.id })
+      end
 
       set_tutorial_js_env
 
@@ -3395,7 +3404,8 @@ class CoursesController < ApplicationController
         params_for_update[:start_at] = nil if @course.unpublished?
         params_for_update[:conclude_at] = nil
       end
-      can_change_csp = @course.account.grants_right?(@current_user, session, :manage_courses_admin)
+
+      can_change_csp = @course.can_update_csp_settings?(@current_user, session)
       disable_csp = params_for_update.delete(:disable_csp)
       if can_change_csp && !disable_csp.nil?
         if value_to_boolean(disable_csp)

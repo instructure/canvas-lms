@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { render, screen } from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { TranslationTriggerModal } from '../TranslationTriggerModal'
+import {TranslationTriggerModal} from '../TranslationTriggerModal'
 
 describe('TranslationTriggerModal', () => {
   let closeModal, closeModalAndKeepTranslations, closeModalAndRemoveTranslations
@@ -29,14 +29,14 @@ describe('TranslationTriggerModal', () => {
     closeModalAndRemoveTranslations = jest.fn()
   })
 
-  const renderModal = (isModalOpen) => {
+  const renderModal = isModalOpen => {
     render(
       <TranslationTriggerModal
         isModalOpen={isModalOpen}
         closeModal={closeModal}
         closeModalAndKeepTranslations={closeModalAndKeepTranslations}
         closeModalAndRemoveTranslations={closeModalAndRemoveTranslations}
-      />
+      />,
     )
   }
 
@@ -52,21 +52,21 @@ describe('TranslationTriggerModal', () => {
 
   it('should call closeModal when clicking the Cancel button', async () => {
     renderModal(true)
-    const cancelButton = screen.getByRole('button', { name: /cancel/i })
+    const cancelButton = screen.getByTestId('cancel-translation-button')
     await userEvent.click(cancelButton)
     expect(closeModal).toHaveBeenCalledTimes(1)
   })
 
   it('should call closeModalAndKeepTranslations when clicking the Keep Translations button', async () => {
     renderModal(true)
-    const keepButton = screen.getByRole('button', { name: /close and keep translations/i })
+    const keepButton = screen.getByTestId('close-and-keep-translations-button')
     await userEvent.click(keepButton)
     expect(closeModalAndKeepTranslations).toHaveBeenCalledTimes(1)
   })
 
   it('should call closeModalAndRemoveTranslations when clicking the Remove Translations button', async () => {
     renderModal(true)
-    const removeButton = screen.getByRole('button', { name: /close and remove translations/i })
+    const removeButton = screen.getByTestId('close-and-remove-translations-button')
     await userEvent.click(removeButton)
     expect(closeModalAndRemoveTranslations).toHaveBeenCalledTimes(1)
   })

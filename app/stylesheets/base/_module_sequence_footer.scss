@@ -38,6 +38,7 @@ $bar-height: 64px;
   padding-top: $ic-sp;
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
 }
 
 .module-sequence-footer .module-sequence-footer-content a {

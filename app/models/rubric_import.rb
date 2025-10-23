@@ -22,8 +22,7 @@ class RubricImport < ApplicationRecord
   include Workflow
   include RubricImporterErrors
 
-  belongs_to :account, optional: true
-  belongs_to :course, optional: true
+  belongs_to :context, polymorphic: %i[account course], separate_columns: true, optional: false
   belongs_to :attachment
   belongs_to :root_account, class_name: "Account", inverse_of: :rubric_imports
   belongs_to :user
@@ -45,19 +44,6 @@ class RubricImport < ApplicationRecord
     state :succeeded
     state :succeeded_with_errors
     state :failed
-  end
-
-  def context
-    account || course
-  end
-
-  def context=(val)
-    case val
-    when Account
-      self.account = val
-    when Course
-      self.course = val
-    end
   end
 
   def self.create_with_attachment(rubric_context, attachment, user = nil)

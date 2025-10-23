@@ -28,35 +28,6 @@ module Accessibility
       end
     end
 
-    def element_path(element)
-      path = []
-      current = element
-
-      while current && current.name != "document"
-        break if current.name == "#document-fragment"
-
-        identifier = current.name
-
-        if current["id"]
-          identifier += "[@id='#{current["id"]}']"
-        elsif current["class"]
-          classes = current["class"].split.map { |cls| "contains(concat(' ', normalize-space(@class), ' '), ' #{cls} ')" }.join(" and ")
-          identifier += "[#{classes}]" unless classes.empty?
-        end
-
-        siblings = current.parent ? current.parent.xpath("./#{current.name}") : []
-        if siblings.size > 1 && siblings.index(current)
-          index = siblings.index(current) + 1
-          identifier += "[#{index}]" if siblings.size > 1
-        end
-
-        path.unshift(identifier)
-        current = current.parent
-      end
-
-      "./" + path.join("/")
-    end
-
     def extend_nokogiri_with_dom_adapter(doc)
       extend_document(doc)
       doc.traverse do |node|

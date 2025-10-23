@@ -13192,4 +13192,100 @@ describe Assignment do
       end
     end
   end
+
+  describe "#post_scheduled_comments" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+      @assignment = @course.assignments.create!(title: "Test Assignment")
+      @post_policy = @course.post_policies.create!(post_manually: true)
+    end
+
+    let(:run_at) { 10.minutes.ago }
+
+    it "returns early if scheduled_post does not exist" do
+      expect(@assignment.post_scheduled_comments(run_at:)).to be_nil
+    end
+
+    it "returns early if scheduled_post.post_comments_at does not match run_at" do
+      ScheduledPost.create!(
+        assignment: @assignment,
+        post_policy: @post_policy,
+        root_account_id: @course.root_account.id,
+        post_comments_at: 15.minutes.ago,
+        post_grades_at: 10.minutes.ago
+      )
+
+      expect(@assignment.post_scheduled_comments(run_at:)).to be_nil
+    end
+
+    it "posts comments when scheduled_post.post_comments_at matches run_at" do
+      ScheduledPost.create!(
+        assignment: @assignment,
+        post_policy: @post_policy,
+        root_account_id: @course.root_account.id,
+        post_comments_at: run_at,
+        post_grades_at: 5.minutes.ago
+      )
+
+      student = student_in_course(course: @course, active_all: true).user
+      submission = @assignment.submit_homework(student, body: "test")
+      submission.add_comment(author: @teacher, comment: "test comment")
+
+      expect(submission.posted_comments_at).to be_nil
+
+      @assignment.post_scheduled_comments(run_at:)
+
+      submission.reload
+      expect(submission.posted_comments_at).not_to be_nil
+    end
+  end
+
+  describe "#post_scheduled_submissions" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+      @course.default_post_policy.update!(post_manually: true)
+      @assignment = @course.assignments.create!(title: "Test Assignment")
+      @post_policy = @course.post_policies.create!(post_manually: true)
+    end
+
+    let(:run_at) { 10.minutes.ago }
+
+    it "returns early if scheduled_post does not exist" do
+      expect(@assignment.post_scheduled_submissions(run_at:)).to be_nil
+    end
+
+    it "returns early if scheduled_post.post_grades_at does not match run_at" do
+      ScheduledPost.create!(
+        assignment: @assignment,
+        post_policy: @post_policy,
+        root_account_id: @course.root_account.id,
+        post_comments_at: 10.minutes.ago,
+        post_grades_at: 5.minutes.ago
+      )
+
+      expect(@assignment.post_scheduled_submissions(run_at:)).to be_nil
+    end
+
+    it "posts submissions when scheduled_post.post_grades_at matches run_at" do
+      ScheduledPost.create!(
+        assignment: @assignment,
+        post_policy: @post_policy,
+        root_account_id: @course.root_account.id,
+        post_comments_at: 15.minutes.ago,
+        post_grades_at: run_at
+      )
+
+      student = student_in_course(course: @course, active_all: true).user
+      submission = @assignment.submit_homework(student, body: "test")
+      @assignment.grade_student(student, grader: @teacher, score: 10)
+
+      submission.reload
+      expect(submission.posted_at).to be_nil
+
+      @assignment.post_scheduled_submissions(run_at:)
+
+      submission.reload
+      expect(submission.posted_at).not_to be_nil
+    end
+  end
 end

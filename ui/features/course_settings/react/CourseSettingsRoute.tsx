@@ -21,6 +21,7 @@ import {useParams} from 'react-router-dom'
 import {Portal} from '@instructure/ui-portal'
 import FeatureFlags from '@canvas/feature-flags'
 import AlertList, {calculateUIMetadata} from '@canvas/student-alerts/react/AlertList'
+import {AmsLoader} from '../../../shared/ams'
 
 type PortalMount = {
   mountPoint: HTMLElement
@@ -64,12 +65,31 @@ function alertsTab(portals: PortalMount[], courseId?: string): void {
   })
 }
 
+// Quiz Settings tab
+function quizSettingsTab(portals: PortalMount[]): void {
+  const mountPoint = document.getElementById('tab-quiz-settings-mount')
+  if (!mountPoint) return
+
+  if (ENV.FEATURES.ams_root_account_integration) {
+    portals.push({
+      mountPoint,
+      component: (
+        <>
+          <div id="ams_container"></div>
+          <AmsLoader containerId="ams_container" />
+        </>
+      ),
+    })
+  }
+}
+
 export function Component(): JSX.Element | null {
   const params = useParams()
   const portals: Array<PortalMount> = []
 
   featureFlagsTab(portals)
   alertsTab(portals, params.courseId)
+  quizSettingsTab(portals)
 
   return (
     <>

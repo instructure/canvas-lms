@@ -31,6 +31,7 @@ module Types
     end
 
     field :assignment_id, ID, null: false
+    field :cached_due_date, Types::DateTimeType, null: true
 
     field :custom_grade_status_id, ID, null: true
     field :seconds_late, Integer, null: true

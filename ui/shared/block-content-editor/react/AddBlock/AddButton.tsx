@@ -24,9 +24,11 @@ const I18n = createI18nScope('block_content_editor')
 
 export const AddButton = (props: {
   onClicked: () => void
+  elementRef?: (element: Element | null) => void
 }) => {
   return (
     <IconButton
+      elementRef={props.elementRef}
       data-testid="add-block-button"
       data-addbutton
       data-action-button

@@ -22,4 +22,10 @@ class DiscussionEntryVersion < ActiveRecord::Base
   belongs_to :user, inverse_of: :discussion_entry_versions
   has_many :discussion_topic_insight_entries, class_name: "DiscussionTopicInsight::Entry", inverse_of: :discussion_entry_version
   has_one :lti_asset, class_name: "Lti::Asset", inverse_of: :discussion_entry_version, dependent: :nullify
+
+  MESSAGE_INTRO_TRUNCATE_LENGTH = 300
+
+  def message_intro
+    HtmlTextHelper.strip_tags(message)[0..MESSAGE_INTRO_TRUNCATE_LENGTH]
+  end
 end

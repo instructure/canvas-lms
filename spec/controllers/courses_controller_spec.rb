@@ -286,7 +286,7 @@ describe CoursesController do
           account.save!
 
           wiki_page = wiki_page_model(course: @course1, title: "Wiki Page", body: "<div><h1>Document Title</h1></div>")
-          scan = AccessibilityResourceScan.for_context(wiki_page).first
+          scan = AccessibilityResourceScan.where(context: wiki_page).first
           scan.update!(
             course: @course1,
             workflow_state: "completed",
@@ -1112,6 +1112,11 @@ describe CoursesController do
       expect(controller.js_env[:MSFT_SYNC_CAN_BYPASS_COOLDOWN]).to be false
     end
 
+    it "sets ams remote settings in the remote env" do
+      subject
+      expect(controller.remote_env[:ams]).to_not be_nil
+    end
+
     it "sets the external tools create url" do
       user_session(@teacher)
       get "settings", params: { course_id: @course.id }
@@ -1226,6 +1231,56 @@ describe CoursesController do
       expect(assigns[:course_settings_sub_navigation_tools].size).to eq 1
       assigned_tool = assigns[:course_settings_sub_navigation_tools].first
       expect(assigned_tool.id).to eq active_tool.id
+    end
+
+    it "sets COURSE_DEFAULT_GRADING_SCHEME_ID when grading_scheme_updates feature is enabled" do
+      Account.site_admin.enable_feature!(:grading_scheme_updates)
+      grading_standard_data = [["A", 0.9], ["B", 0.8], ["C", 0.7], ["D", 0.6], ["F", 0.0]]
+      grading_standard = GradingStandard.create!(
+        context: @course.account,
+        workflow_state: "active",
+        data: grading_standard_data,
+        title: "Test Grading Standard"
+      )
+      @course.update!(grading_standard_id: grading_standard.id)
+
+      user_session(@teacher)
+      get "settings", params: { course_id: @course.id }
+      expect(controller.js_env[:COURSE_DEFAULT_GRADING_SCHEME_ID]).to eq grading_standard.id
+    end
+
+    it "sets COURSE_DEFAULT_GRADING_SCHEME_ID from account default when course has no grading standard" do
+      Account.site_admin.enable_feature!(:grading_scheme_updates)
+      grading_standard_data = [["A", 0.9], ["B", 0.8], ["C", 0.7], ["D", 0.6], ["F", 0.0]]
+      account_grading_standard = GradingStandard.create!(
+        context: @course.account,
+        workflow_state: "active",
+        data: grading_standard_data,
+        title: "Account Default Grading Standard"
+      )
+      @course.account.update!(grading_standard_id: account_grading_standard.id)
+
+      # Explicitly verify course has no grading_standard_id
+      expect(@course.grading_standard_id).to be_nil
+
+      user_session(@teacher)
+      get "settings", params: { course_id: @course.id }
+      expect(controller.js_env[:COURSE_DEFAULT_GRADING_SCHEME_ID]).to eq account_grading_standard.id
+    end
+
+    it "does not set COURSE_DEFAULT_GRADING_SCHEME_ID when grading_scheme_updates feature is disabled" do
+      grading_standard_data = [["A", 0.9], ["B", 0.8], ["C", 0.7], ["D", 0.6], ["F", 0.0]]
+      grading_standard = GradingStandard.create!(
+        context: @course.account,
+        workflow_state: "active",
+        data: grading_standard_data,
+        title: "Test Grading Standard"
+      )
+      @course.update!(grading_standard_id: grading_standard.id)
+
+      user_session(@teacher)
+      get "settings", params: { course_id: @course.id }
+      expect(controller.js_env[:COURSE_DEFAULT_GRADING_SCHEME_ID]).to be_nil
     end
   end
 
@@ -2862,12 +2917,12 @@ describe CoursesController do
       expect(assigns[:course]).to eql(@course)
     end
 
-    it "transforms a unix timestamp to nil" do
+    it "returns a 400 if the start_at date is a unix timestamp" do
       user_session(@teacher)
       put "update", params: { id: @course.id, course: { start_at: 1.day.from_now.to_i, name: "Updated" } }, as: :json
-      expect(response).to be_successful
-      @course.reload
-      expect(@course.start_at).to be_nil
+      expect(response).to have_http_status :bad_request
+      json = response.parsed_body
+      expect(json["errors"]["start_at"][0]["message"]).to eq "must be in ISO8601 format"
     end
 
     it "updates some settings and stuff" do
@@ -3923,6 +3978,17 @@ describe CoursesController do
         put "update", params: { id: @course.id, course: { disable_csp: "0" } }
         @course.reload
         expect(@course.csp_enabled?).to be_truthy
+      end
+
+      it "does not update the csp setting when csp is locked" do
+        @account.lock_csp!
+        account_admin_user(active_all: true, account: @account)
+        user_session(@admin)
+
+        put "update", params: { id: @course.id, course: { disable_csp: "1" } }
+        @course.reload
+        expect(@course.csp_enabled?).to be_truthy
+        @account.unlock_csp!
       end
 
       it "does not update the csp setting when not admin" do

@@ -88,6 +88,7 @@ const CourseWorkFilters: React.FC<CourseWorkFiltersProps> = ({
           renderLabel={I18n.t('Course filter:')}
           value={selectedCourse}
           onChange={onCourseChange}
+          data-testid="course-filter-select"
         >
           {courseOptions.map(option => (
             <SimpleSelect.Option key={option.id} id={option.id} value={option.id}>
@@ -101,6 +102,7 @@ const CourseWorkFilters: React.FC<CourseWorkFiltersProps> = ({
           renderLabel={I18n.t('Date filter:')}
           value={selectedDateFilter}
           onChange={onDateFilterChange}
+          data-testid="date-filter-select"
         >
           {dateFilterOptions.map(option => (
             <SimpleSelect.Option key={option.id} id={option.id} value={option.id}>

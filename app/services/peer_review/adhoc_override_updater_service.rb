@@ -18,13 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class PeerReview::AdhocOverrideUpdaterService < PeerReview::AdhocOverrideCommonService
-  def initialize(
-    peer_review_sub_assignment: nil,
-    override: nil
-  )
-    super
-  end
-
   def call
     validate_override_dates(@override)
 

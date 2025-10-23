@@ -521,7 +521,7 @@ const CreateEditAllocationRuleModal = ({
           placement="end"
           onClick={() => handleClose()}
           screenReaderLabel={I18n.t('Close')}
-          data-testid="close-button"
+          data-testid="allocation-rule-modal-close-button"
         />
         <Heading level="h2">{isEdit ? I18n.t('Edit Rule') : I18n.t('Create Rule')}</Heading>
       </Modal.Header>

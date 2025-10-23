@@ -116,7 +116,7 @@ export interface EnvCommon {
   }
   confetti_branding_enabled: boolean
   url_to_what_gets_loaded_inside_the_tinymce_editor_css: string
-  url_for_high_contrast_tinymce_editor_css: string
+  url_for_high_contrast_tinymce_editor_css: string[]
   csp?: string
   current_user_id: string | null
   current_user_global_id: string
@@ -294,6 +294,7 @@ export type SiteAdminFeatureId =
   | 'courses_popout_sisid'
   | 'create_external_apps_side_tray_overrides'
   | 'dashboard_graphql_integration'
+  | 'developer_key_user_agent_alert'
   | 'enhanced_course_creation_account_fetching'
   | 'explicit_latex_typesetting'
   | 'files_a11y_rewrite'
@@ -310,6 +311,7 @@ export type SiteAdminFeatureId =
   | 'scheduled_feedback_releases'
   | 'speedgrader_studio_media_capture'
   | 'student_access_token_management'
+  | 'top_navigation_placement_a11y_fixes'
   | 'validate_call_to_action'
   | 'youtube_migration'
   | 'youtube_overlay'
@@ -372,7 +374,11 @@ export type BrandAccountFeatureId =
  * Feature id exported in ApplicationController that aren't mentioned in
  * JS_ENV_SITE_ADMIN_FEATURES or JS_ENV_ROOT_ACCOUNT_FEATURES or JS_ENV_BRAND_ACCOUNT_FEATURES
  */
-export type OtherFeatureId = 'canvas_k6_theme' | 'new_math_equation_handling'
+export type OtherFeatureId =
+  | 'ams_course_integration'
+  | 'canvas_k6_theme'
+  | 'new_math_equation_handling'
+  | 'lti_asset_processor_course'
 
 /**
  * From ApplicationHelper#set_tutorial_js_env

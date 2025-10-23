@@ -435,7 +435,7 @@ export default (AssignmentListItemView = (function () {
       data.is_locked = this.model.isRestrictedByMasterCourse()
       data.isCheckpoint = this.model.get('checkpoints') && this.model.get('checkpoints').length > 0
       data.showAvailability =
-        !(this.model.inPacedCourse() && this.canManage()) &&
+        !this.model.inPacedCourse() &&
         (this.model.multipleDueDates() || !this.model.defaultDates().available())
       data.showDueDate =
         !data.isCheckpoint &&

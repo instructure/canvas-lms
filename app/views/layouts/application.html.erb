@@ -155,24 +155,45 @@ end
           <% end %>
 
           <div id="nutrition_facts_container"></div>
-          <div class="right-of-crumbs">
-            <div id="ai-information-mount"></div>
-            <% if tutorials_enabled? %>
-              <div class="TutorialToggleHolder"></div>
-            <% end %>
-            <%if @domain_root_account&.feature_enabled?(:top_navigation_placement) %>
-              <div id="top-nav-tools-mount-point"></div>
-            <% end %>
-            <% if show_immersive_reader? %>
-              <div id="immersive_reader_mount_point"></div>
-            <% end %>
-          <% if show_student_view_button? %>
-              <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "btn btn-top-nav", :id => "easy_student_view", :method => :post, :"aria-label" => student_view_text do %>
-                <i class="icon-student-view"></i> <%= student_view_text %>
+          <div class="right-of-crumbs <%= 'right-of-crumbs-no-reverse' if Account.site_admin.feature_enabled?(:top_navigation_placement_a11y_fixes) %>">
+            <% if Account.site_admin.feature_enabled?(:top_navigation_placement_a11y_fixes) %>
+              <% if (@context&.is_a?(Course) || @context&.is_a?(Assignment)) && @context_enrollment&.observer? %>
+                <div id='observer-picker-mountpoint' style="margin: 3px;"></div>
               <% end %>
-            <% end %>
-            <% if (@context&.is_a?(Course) || @context&.is_a?(Assignment)) && @context_enrollment&.observer? %>
-              <div id='observer-picker-mountpoint' style="margin: 3px;"></div>
+            <% if show_student_view_button? %>
+                <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "btn btn-top-nav", :id => "easy_student_view", :method => :post, :"aria-label" => student_view_text do %>
+                  <i class="icon-student-view"></i> <%= student_view_text %>
+                <% end %>
+              <% end %>
+              <% if show_immersive_reader? %>
+                <div id="immersive_reader_mount_point"></div>
+              <% end %>
+              <%if @domain_root_account&.feature_enabled?(:top_navigation_placement) %>
+                <div id="top-nav-tools-mount-point"></div>
+              <% end %>
+              <% if tutorials_enabled? %>
+                <div class="TutorialToggleHolder"></div>
+              <% end %>
+              <div id="ai-information-mount"></div>
+            <% else %>
+              <div id="ai-information-mount"></div>
+              <% if tutorials_enabled? %>
+                <div class="TutorialToggleHolder"></div>
+              <% end %>
+              <%if @domain_root_account&.feature_enabled?(:top_navigation_placement) %>
+                <div id="top-nav-tools-mount-point"></div>
+              <% end %>
+              <% if show_immersive_reader? %>
+                <div id="immersive_reader_mount_point"></div>
+              <% end %>
+            <% if show_student_view_button? %>
+                <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "btn btn-top-nav", :id => "easy_student_view", :method => :post, :"aria-label" => student_view_text do %>
+                  <i class="icon-student-view"></i> <%= student_view_text %>
+                <% end %>
+              <% end %>
+              <% if (@context&.is_a?(Course) || @context&.is_a?(Assignment)) && @context_enrollment&.observer? %>
+                <div id='observer-picker-mountpoint' style="margin: 3px;"></div>
+              <% end %>
             <% end %>
           </div>
 
@@ -304,6 +325,11 @@ end
     <div class="NewUserTutorialTray__Container"></div>
   <% end %>
   <div id="react-router-portals"></div>
+
+  <% if microfrontend_overrides %>
+    <%= render :partial => 'shared/microfrontend_override_indicator' %>
+  <% end %>
+
   <%= render :partial => 'layouts/foot', :locals => { :include_common_bundle => true } %>
 </div> <!-- #application -->
 </body>

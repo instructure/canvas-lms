@@ -489,7 +489,7 @@
                   <tr>
                     <td colspan="2">
                       <%= settings.check_box :restrict_personal_access_tokens_from_students, checked: @account.restrict_personal_access_tokens_from_students? %>
-                      <%= settings.label :restrict_personal_access_tokens_from_students, t("Restrict students from creating personal access tokens.") %>
+                      <%= settings.label :restrict_personal_access_tokens_from_students, t("Restrict students and observers from creating personal access tokens.") %>
                     </td>
                   </tr>
                 <% end%>

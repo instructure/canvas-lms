@@ -3,5 +3,6 @@
   "private": true,
   "version": "1.0.0",
   "author": "neme",
-  "main": "./react/index.tsx"
+  "main": "./react/index.tsx",
+  "owner": "CFA"
 }

@@ -22,16 +22,17 @@
 # Canvas Career.
 module CanvasCareer
   class Config
-    def initialize(root_account)
+    def initialize(root_account, session = nil)
       @root_account = root_account
+      @session = session
     end
 
     def learner_app_launch_url
-      config["learner_launch_url"]
+      override_service.get_override("canvas_career_learner") || config["learner_launch_url"]
     end
 
     def learning_provider_app_launch_url
-      config["learning_provider_launch_url"]
+      override_service.get_override("canvas_career_learning_provider") || config["learning_provider_launch_url"]
     end
 
     def theme_url
@@ -53,6 +54,10 @@ module CanvasCareer
 
     def config
       @_config ||= YAML.safe_load(DynamicSettings.find(tree: :private)["canvas_career.yml", failsafe: nil] || "{}")
+    end
+
+    def override_service
+      @_override_service ||= MicrofrontendsReleaseTagOverrideService.new(@session)
     end
   end
 end

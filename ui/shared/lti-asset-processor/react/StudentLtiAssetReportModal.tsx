@@ -75,6 +75,7 @@ export default function StudentLtiAssetReportModal({
       open={true}
       onClose={onClose}
       onDismiss={onClose}
+      size="medium"
     >
       <Modal.Header>
         <Heading>{t('Document Processors for %{assignmentName}', {assignmentName})}</Heading>
@@ -114,7 +115,7 @@ export default function StudentLtiAssetReportModal({
           attempt={attempt}
           reports={reports}
           studentIdForResubmission={undefined}
-          attachments={attachments}
+          attachments={attachments || []}
           submissionType={submissionType}
           showDocumentDisplayName={showDocumentDisplayName}
         />
@@ -125,20 +126,20 @@ export default function StudentLtiAssetReportModal({
 
 /**
  * Map data based on submission type, and figures out whether to show
- * document display name or a main title.
+ * document display name (headings handled by LtiAssetReports component) or a
+ * main title.
  */
 function mapData(
   reports: LtiAssetReportForStudent[],
   submissionType: AssetReportCompatibleSubmissionType,
 ): {
-  attachments: {_id: string; displayName: string}[]
-  mainTitle: string | undefined
+  attachments?: {_id: string; displayName: string}[]
+  mainTitle?: string
   showDocumentDisplayName: boolean
 } {
   switch (submissionType) {
     case 'online_text_entry':
       return {
-        attachments: [],
         mainTitle: I18n.t('Text submitted to Canvas'),
         showDocumentDisplayName: false,
       }
@@ -150,12 +151,24 @@ function mapData(
           mainTitle: attachments[0].displayName,
           showDocumentDisplayName: false,
         }
-      } else {
+      }
+      return {
+        attachments,
+        showDocumentDisplayName: true,
+      }
+    }
+    case 'discussion_topic': {
+      const attachments = attachmentsFromReports(reports)
+      if (reports.length === 1) {
         return {
           attachments,
-          mainTitle: undefined,
-          showDocumentDisplayName: true,
+          mainTitle: I18n.t('All comments'),
+          showDocumentDisplayName: false,
         }
+      }
+      return {
+        attachments,
+        showDocumentDisplayName: true,
       }
     }
     default:

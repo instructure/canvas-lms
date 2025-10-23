@@ -41,17 +41,9 @@ const defaultProps = (overrides: UnknownSubset<FrequencyPickerProps> = {}) => {
   }
 }
 
-const selectOption = async (buttonName: RegExp, optionName: RegExp) => {
-  await userEvent.click(
-    screen.getByRole('combobox', {
-      name: buttonName,
-    }),
-  )
-  await userEvent.click(
-    screen.getByRole('option', {
-      name: optionName,
-    }),
-  )
+const selectOption = async (_buttonName: RegExp, optionName: RegExp) => {
+  await userEvent.click(screen.getByTestId('frequency-picker'))
+  await userEvent.click(screen.getByText(optionName))
 }
 
 describe('FrequencyPicker', () => {
@@ -138,12 +130,12 @@ describe('FrequencyPicker', () => {
     it('returns focus to the frequency picker button when the modal is closed', async () => {
       const user = userEvent.setup({delay: null})
       const props = defaultProps()
-      const {getByText, getByRole, getByLabelText} = render(<FrequencyPicker {...props} />)
+      const {getByText, getByTestId} = render(<FrequencyPicker {...props} />)
       await selectOption(/frequency/i, /custom/i)
       const modal = getByText('Custom Repeating Event')
       expect(modal).toBeInTheDocument()
-      await user.click(getByRole('button', {name: /cancel/i}))
-      await waitFor(() => expect(getByLabelText('Frequency')).toHaveFocus())
+      await user.click(getByTestId('custom-recurrence-modal-cancel'))
+      await waitFor(() => expect(getByTestId('frequency-picker')).toHaveFocus())
     })
 
     it('sets width to auto', () => {
@@ -160,11 +152,11 @@ describe('FrequencyPicker', () => {
 
     it('retains auto width after selecting a custom frequency', async () => {
       const props = defaultProps({width: 'auto'})
-      const {container, getByText, getByRole} = render(<FrequencyPicker {...props} />)
+      const {container, getByText, getByTestId} = render(<FrequencyPicker {...props} />)
       await selectOption(/frequency/i, /custom/i)
       const modal = getByText('Custom Repeating Event')
       expect(modal).toBeInTheDocument()
-      await userEvent.click(getByRole('button', {name: /done/i}))
+      await userEvent.click(getByTestId('custom-recurrence-modal-done'))
       expect(container.querySelector('label')).toHaveStyle({width: 'auto'})
     })
 

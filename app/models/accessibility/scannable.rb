@@ -53,7 +53,7 @@ module Accessibility
     def remove_accessibility_scan
       return unless root_account.enable_content_a11y_checker?
 
-      AccessibilityResourceScan.for_context(self).destroy_all
+      AccessibilityResourceScan.where(context: self).destroy_all
     end
   end
 end

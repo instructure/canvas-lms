@@ -1986,11 +1986,11 @@ class AbstractAssignment < ActiveRecord::Base
     RequestCache.cache(locked_request_cache_key(user)) do
       locked = false
       assignment_for_user = overridden_for(user)
-      if assignment_for_user.unlock_at && assignment_for_user.unlock_at > Time.zone.now
+      if assignment_for_user.unlock_at && assignment_for_user.unlock_at > Time.zone.now && !context.enable_course_paces?
         locked = { object: assignment_for_user, unlock_at: assignment_for_user.unlock_at }
       elsif could_be_locked && (item = locked_by_module_item?(user, opts))
         locked = { object: self, module: item.context_module }
-      elsif assignment_for_user.lock_at && assignment_for_user.lock_at < Time.zone.now
+      elsif assignment_for_user.lock_at && assignment_for_user.lock_at < Time.zone.now && !context.enable_course_paces?
         locked = { object: assignment_for_user, lock_at: assignment_for_user.lock_at, can_view: true }
       else
         each_submission_type do |submission, _, short_type|
@@ -4209,6 +4209,30 @@ class AbstractAssignment < ActiveRecord::Base
     !!effective_post_policy&.post_manually?
   end
 
+  def post_scheduled_comments(run_at:, progress: nil)
+    return if scheduled_post.nil?
+    return if scheduled_post.post_comments_at != run_at
+
+    update_time = Time.zone.now
+
+    all_user_ids = []
+    submissions.in_batches do |submissions_batch|
+      user_ids = submissions_batch.pluck(:user_id)
+      all_user_ids.concat(user_ids)
+      User.clear_cache_keys(user_ids, :submissions)
+      submissions_batch.update_all(posted_comments_at: update_time, updated_at: update_time)
+      show_stream_items(submissions: submissions_batch)
+    end
+    progress.set_results(assignment_id: id, posted_comments_at: update_time, user_ids: all_user_ids) if progress.present? && all_user_ids.any?
+  end
+
+  def post_scheduled_submissions(run_at:, **)
+    return if scheduled_post.nil?
+    return if scheduled_post.post_grades_at != run_at
+
+    post_submissions(**)
+  end
+
   def post_submissions(progress: nil, submission_ids: nil, skip_updating_timestamp: false, posting_params: nil, skip_muted_changed: false, skip_content_participation_refresh: true)
     submissions = if submission_ids.nil?
                     self.submissions.active
@@ -4269,7 +4293,7 @@ class AbstractAssignment < ActiveRecord::Base
     user_ids = submissions.pluck(:user_id)
 
     User.clear_cache_keys(user_ids, :submissions)
-    submissions.update_all(posted_at: nil, updated_at: Time.zone.now) unless skip_updating_timestamp
+    submissions.update_all(posted_at: nil, posted_comments_at: nil, updated_at: Time.zone.now) unless skip_updating_timestamp
     submissions.in_workflow_state("graded").each(&:assignment_muted_changed) unless skip_muted_changed
     course.refresh_content_participation_counts_for_users(user_ids) unless skip_content_participation_refresh
     hide_stream_items(submissions:)

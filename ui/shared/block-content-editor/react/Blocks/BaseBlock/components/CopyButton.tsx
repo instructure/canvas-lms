@@ -25,9 +25,11 @@ const I18n = createI18nScope('block_content_editor')
 export const CopyButton = (props: {
   onClicked: () => void
   title: string
+  elementRef?: (element: Element | null) => void
 }) => {
   return (
     <IconButton
+      elementRef={props.elementRef}
       data-testid="copy-block-button"
       data-action-button
       screenReaderLabel={I18n.t('Duplicate block: %{title}', {title: props.title})}

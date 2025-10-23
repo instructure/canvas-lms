@@ -1,5 +1,7 @@
 common: &common
   encryption_key: <%= ENV.fetch("ENCRYPTION_KEY", 'tEmtL3NHrF+Z/bwkDXGRav/D7FU=') %>
+  jwt_encryption_keys:
+    - 68ddd5576efad4bc90eed3ab0543a1112b0f51ec9425573a80a96cbc4a9e12b6
 
 development:
   <<: *common

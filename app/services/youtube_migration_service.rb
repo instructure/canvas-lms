@@ -529,8 +529,7 @@ class YoutubeMigrationService
   end
 
   def find_studio_tool
-    course.root_account.context_external_tools.active.find_by(domain: STUDIO_LTI_TOOL_DOMAIN) ||
-      course.account.context_external_tools.active.find_by(domain: STUDIO_LTI_TOOL_DOMAIN)
+    Course.find_studio_tool(course)
   end
 
   def convert_youtube_to_studio(embed, studio_tool, user_uuid: nil)

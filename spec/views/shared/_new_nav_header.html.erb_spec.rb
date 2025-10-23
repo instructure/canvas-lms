@@ -76,4 +76,66 @@ describe "shared/_new_nav_header" do
       end
     end
   end
+
+  context "global navigation tools" do
+    it "displays locale-specific labels for external tools" do
+      user = user_factory
+      assign(:current_user, user)
+
+      Account.default.context_external_tools.create!(
+        name: "Test Tool",
+        consumer_key: "key",
+        shared_secret: "secret",
+        url: "http://example.com/launch",
+        settings: {
+          global_navigation: {
+            text: "Default Text",
+            labels: {
+              "en" => "English Label",
+              "es" => "Etiqueta Española"
+            },
+            url: "http://example.com"
+          }
+        }
+      )
+
+      I18n.with_locale(:es) do
+        render "shared/_new_nav_header"
+        doc = Nokogiri::HTML5(response.body)
+
+        expect(doc.text).to include("Etiqueta Española")
+        expect(doc.text).not_to include("English Label")
+        expect(doc.text).not_to include("Default Text")
+      end
+    end
+
+    it "falls back to default text when locale not in labels" do
+      user = user_factory
+      assign(:current_user, user)
+
+      Account.default.context_external_tools.create!(
+        name: "Test Tool",
+        consumer_key: "key",
+        shared_secret: "secret",
+        url: "http://example.com/launch",
+        settings: {
+          global_navigation: {
+            text: "Default Text",
+            labels: {
+              "es" => "Etiqueta Española"
+            },
+            url: "http://example.com"
+          }
+        }
+      )
+
+      I18n.with_locale(:en) do
+        render "shared/_new_nav_header"
+        doc = Nokogiri::HTML5(response.body)
+
+        expect(doc.text).to include("Default Text")
+        expect(doc.text).not_to include("Etiqueta Española")
+      end
+    end
+  end
 end

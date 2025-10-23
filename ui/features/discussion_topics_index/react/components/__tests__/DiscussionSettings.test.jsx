@@ -98,7 +98,9 @@ describe('DiscussionsSettings', () => {
       />,
     )
 
-    const checkboxes = screen.getAllByRole('checkbox')
+    const checkboxes = screen
+      .getByTestId('discussion-settings-modal-body')
+      .querySelectorAll('input[type="checkbox"]')
     expect(checkboxes).toHaveLength(6)
     checkboxes.forEach(checkbox => {
       expect(checkbox).not.toHaveAttribute('checked')
@@ -107,7 +109,9 @@ describe('DiscussionsSettings', () => {
 
   it('should render one checkbox if can not change settings', () => {
     render(<DiscussionSettings {...makeProps({isSettingsModalOpen: true})} />)
-    const checkboxes = screen.getAllByRole('checkbox')
+    const checkboxes = screen
+      .getByTestId('discussion-settings-modal-body')
+      .querySelectorAll('input[type="checkbox"]')
     expect(checkboxes).toHaveLength(1)
   })
 
@@ -117,7 +121,9 @@ describe('DiscussionsSettings', () => {
         {...makeProps({isSettingsModalOpen: true, permissions: {change_settings: true}})}
       />,
     )
-    const checkboxes = screen.getAllByRole('checkbox')
+    const checkboxes = screen
+      .getByTestId('discussion-settings-modal-body')
+      .querySelectorAll('input[type="checkbox"]')
     expect(checkboxes).toHaveLength(6)
   })
 
@@ -156,12 +162,14 @@ describe('DiscussionsSettings', () => {
       />,
     )
 
-    const checkboxes = screen.getAllByRole('checkbox')
+    const checkboxes = screen
+      .getByTestId('discussion-settings-modal-body')
+      .querySelectorAll('input[type="checkbox"]')
     for (const checkbox of checkboxes) {
       await user.click(checkbox)
     }
 
-    const button = screen.getByRole('button', {name: 'Save Settings'})
+    const button = screen.getByTestId('save-discussion-settings')
     await user.click(button)
     expect(saveMock).toHaveBeenCalledWith(
       expect.anything(),
@@ -204,12 +212,14 @@ describe('DiscussionsSettings', () => {
       />,
     )
 
-    const checkboxes = screen.getAllByRole('checkbox')
+    const checkboxes = screen
+      .getByTestId('discussion-settings-modal-body')
+      .querySelectorAll('input[type="checkbox"]')
     for (const checkbox of checkboxes) {
       await user.click(checkbox)
     }
 
-    const button = screen.getByRole('button', {name: 'Save Settings'})
+    const button = screen.getByTestId('save-discussion-settings')
     await user.click(button)
     expect(saveMock).toHaveBeenCalledWith(
       expect.anything(),

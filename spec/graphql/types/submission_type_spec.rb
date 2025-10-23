@@ -725,6 +725,18 @@ describe Types::SubmissionType do
       ).to eq %w[MQ Mg Mw]
     end
 
+    it "can include up to 100 items" do
+      assignment = @course.assignments.create! name: "pagination test", points_possible: 10
+      100.times do |i|
+        assignment.submit_homework(@student, body: "Attempt #{i + 1}", submitted_at: (100 - i).hours.ago)
+      end
+
+      submissions = @student.submissions.find_by(assignment:)
+      submission_type = GraphQLTypeTester.new(submissions, current_user: @teacher, request: ActionDispatch::TestRequest.create)
+      result = submission_type.resolve("submissionHistoriesConnection(first: 100) { nodes { attempt } }")
+      expect(result.length).to eq(100)
+    end
+
     context "filter" do
       describe "states" do
         before(:once) do
@@ -1347,29 +1359,29 @@ describe Types::SubmissionType do
     let(:assignment) { @assignment }
     let(:submission) { @submission }
     let(:submission_type) { GraphQLTypeTester.new(submission, current_user:) }
-
-    before do
-      root_account.enable_feature!(:lti_asset_processor)
-      @lti_asset = lti_asset_model(submission:)
-      asset_processor = lti_asset_processor_model(assignment:)
-      @lti_asset_report = lti_asset_report_model(
-        lti_asset_processor_id: asset_processor.id,
-        asset: @lti_asset,
+    let(:lti_asset) { lti_asset_model(submission:) }
+    let(:lti_asset_processor) { lti_asset_processor_model(assignment:) }
+    let(:lti_asset_report) do
+      lti_asset_report_model(
+        lti_asset_processor_id: lti_asset_processor.id,
+        asset: lti_asset,
         visible_to_owner: true
       )
     end
+
+    before { lti_asset_report }
 
     context "when the current user is a teacher" do
       let(:current_user) { submission.assignment.context.instructors.first }
 
       it "returns LTI asset reports" do
         result = submission_type.resolve("ltiAssetReportsConnection { nodes { _id } }")
-        expect(result).to eq [@lti_asset_report.id.to_s]
+        expect(result).to eq [lti_asset_report.id.to_s]
       end
 
       it "returns LTI asset reports when latest is false" do
         result = submission_type.resolve("ltiAssetReportsConnection(latest: false) { nodes { _id } }")
-        expect(result).to eq [@lti_asset_report.id.to_s]
+        expect(result).to eq [lti_asset_report.id.to_s]
       end
 
       it "returns nil when latest is true (not implemented yet)" do
@@ -1382,9 +1394,9 @@ describe Types::SubmissionType do
       let(:current_user) { @student }
 
       it "returns LTI asset reports" do
-        @lti_asset_report.update!(processing_progress: Lti::AssetReport::PROGRESS_PROCESSED)
+        lti_asset_report.update!(processing_progress: Lti::AssetReport::PROGRESS_PROCESSED)
         result = submission_type.resolve("ltiAssetReportsConnection { nodes { _id } }")
-        expect(result).to eq [@lti_asset_report.id.to_s]
+        expect(result).to eq [lti_asset_report.id.to_s]
       end
 
       it "returns [] when there are reports, but not processed" do
@@ -1405,6 +1417,48 @@ describe Types::SubmissionType do
       it "returns nil when user cannot read the submission" do
         result = submission_type.resolve("ltiAssetReportsConnection { nodes { _id } }")
         expect(result).to be_nil
+      end
+    end
+
+    context "when submission is a discussion_topic" do
+      let(:discussion_entry_version) do
+        @assignment.update!(submission_types: "discussion_topic")
+        @discussion_topic = @assignment.discussion_topic
+        @discussion_topic.discussion_entries.create!(user: @student, message: "I have a lot to say about this topic").discussion_entry_versions.first
+      end
+
+      let(:lti_asset) { lti_asset_model(submission:, discussion_entry_version:) }
+
+      context "when the current user is a teacher" do
+        let(:current_user) { assignment.context.instructors.first }
+
+        it "returns nil with feature flag disabled" do
+          root_account.disable_feature!(:lti_asset_processor_discussions)
+          result = submission_type.resolve("ltiAssetReportsConnection { nodes { _id } }")
+          expect(result).to be_nil
+        end
+
+        it "returns LTI asset reports" do
+          result = submission_type.resolve("ltiAssetReportsConnection { nodes { _id } }")
+          expect(result).to eq [lti_asset_report.id.to_s]
+        end
+      end
+
+      context "when the current user is a student" do
+        let(:current_user) { @student }
+
+        it "returns nil with feature flag disabled" do
+          root_account.disable_feature!(:lti_asset_processor_discussions)
+          lti_asset_report.update!(processing_progress: Lti::AssetReport::PROGRESS_PROCESSED)
+          result = submission_type.resolve("ltiAssetReportsConnection { nodes { _id } }")
+          expect(result).to be_nil
+        end
+
+        it "returns LTI asset reports" do
+          lti_asset_report.update!(processing_progress: Lti::AssetReport::PROGRESS_PROCESSED)
+          result = submission_type.resolve("ltiAssetReportsConnection { nodes { _id } }")
+          expect(result).to eq [lti_asset_report.id.to_s]
+        end
       end
     end
   end

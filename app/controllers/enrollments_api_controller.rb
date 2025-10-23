@@ -815,7 +815,7 @@ class EnrollmentsApiController < ApplicationController
       if @current_user.save
         render(json: enrollment_json(@current_user.self_enrollment, @current_user, session))
       else
-        render(json: { user: @current_user.errors }, status: :bad_request)
+        render(json: { user: ::Api::Errors::Reporter.to_json(@current_user.errors) }, status: :bad_request)
       end
     end
   end

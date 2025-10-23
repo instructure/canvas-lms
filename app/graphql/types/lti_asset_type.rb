@@ -30,6 +30,11 @@ module Types
       end
     end
 
+    field :discussion_entry_version, Types::DiscussionEntryVersionType, null: true
+    def discussion_entry_version
+      load_association(:discussion_entry_version)
+    end
+
     field :submission_attempt, Int, null: true
     field :submission_id, ID, null: true
   end

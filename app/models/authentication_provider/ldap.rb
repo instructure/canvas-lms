@@ -268,6 +268,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
     ldap_account_ids_to_send_to_statsd.include? Shard.global_id_for(account_id)
   end
 
+  # rubocop:disable Lint/NoHighCardinalityStatsdTags -- sufficient protections exist via #ldap_account_ids_to_send_to_statsd
   def ldap_bind_result(unique_id, password_plaintext)
     return nil if password_plaintext.blank?
 
@@ -303,6 +304,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
     end
     nil
   end
+  # rubocop:enable Lint/NoHighCardinalityStatsdTags
 
   def slo?
     false

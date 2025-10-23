@@ -50,6 +50,20 @@ module Api
     # This is the official, publicly documented error response formatter for our
     # API JSON error responses.
     class Reporter
+      def self.to_json(errors)
+        errors = errors.group_by_attribute.transform_values do |suberrors|
+          suberrors.map do |error|
+            {
+              attribute: (error.attribute == :base) ? nil : error.attribute,
+              message: error.message || "invalid",
+              type: error.type,
+            }
+          end
+        end
+
+        { errors: }
+      end
+
       def self.to_hash(errors)
         errors = errors.map do |error|
           {

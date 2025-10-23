@@ -24,6 +24,9 @@
 <body class="<%= (body_classes).uniq.join(" ") %>">
 <%= yield %>
 <div id="react-router-portals"></div>
+<% if microfrontend_overrides %>
+  <%= render :partial => 'shared/microfrontend_override_indicator' %>
+<% end %>
 <%= render :partial => 'layouts/foot', :locals => { :include_common_bundle => true } %>
 <%- if @include_masquerade_layout %>
   <%= render partial: "layouts/fixed_bottom" %>

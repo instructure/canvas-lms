@@ -97,11 +97,11 @@ class AccessToken < ActiveRecord::Base
       # (from this block; if you're an admin, you'll still be able to from the block below)
       next false if root_account.limit_personal_access_tokens?
       # if students are restricted from creating personal access tokens,
-      # then if you're _only_ a student, you can't create tokens
-      # (a teacher that is a student will still be allowed to)
+      # then if you're _only_ a student, only an observer, or only both, you can't create tokens
+      # (a teacher that is a student/observer will still be allowed to)
       next false if root_account.restrict_personal_access_tokens_from_students? &&
                     (roles = user.roles(root_account) - ["user"]) &&
-                    (roles == ["student"] || roles.empty?)
+                    (roles.empty? || (roles - ["student", "observer"]).empty?)
 
       true
     end
@@ -155,9 +155,7 @@ class AccessToken < ActiveRecord::Base
         access_token
       else
         scope = load_pseudonym_from_access_token ? self : not_deleted
-        scope = scope.where(token_key => hashed_tokens).order(Arel.sql("#{AccessToken.table_name}.workflow_state = 'active' DESC, #{AccessToken.table_name}.workflow_state"))
-        scope = scope.eager_load(:developer_key) if eager_load_developer_key
-        scope.first
+        scope.where(token_key => hashed_tokens).order(Arel.sql("workflow_state = 'active' DESC, workflow_state")).first
       end
     if token && token.send(token_key) != hashed_tokens.first
       # we found the token but, its hashed using an old key. save the updated hash
@@ -406,18 +404,22 @@ class AccessToken < ActiveRecord::Base
   end
 
   # if user is not provided, all user tokens in the account will be invalidated
-  def self.invalidate_mobile_tokens!(account, user: nil)
+  # if skip_admins is true, tokens for users with active admin roles in the account will not be invalidated
+  def self.invalidate_mobile_tokens!(account, user: nil, skip_admins: true)
     return unless account.root_account?
 
     developer_key_ids = DeveloperKey.mobile_app_keys.map do |app_key|
       app_key.respond_to?(:global_id) ? app_key.global_id : app_key.id
     end
-    user_ids = if user
-                 [user.id]
-               else
-                 User.active.joins(:pseudonyms).where(pseudonyms: { account_id: account }).ids
-               end
-    tokens = active.where(developer_key_id: developer_key_ids, user_id: user_ids)
+    user_scope = User.active.joins(:pseudonyms).where(pseudonyms: { account_id: account })
+    user_scope = user_scope.where(id: user) if user
+    user_scope = user_scope.where(<<~SQL.squish, account.id) if skip_admins
+      NOT EXISTS (SELECT 1 FROM #{AccountUser.quoted_table_name}
+                  WHERE account_users.user_id = users.id
+                  AND account_users.account_id = ?
+                  AND account_users.workflow_state = 'active')
+    SQL
+    tokens = active.where(developer_key_id: developer_key_ids, user_id: user_scope.select(:id))
 
     now = Time.zone.now
     tokens.in_batches(of: 10_000).update_all(updated_at: now, permanent_expires_at: now)

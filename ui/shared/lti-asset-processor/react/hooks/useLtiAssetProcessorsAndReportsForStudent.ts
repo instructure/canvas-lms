@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {QueryClient, useQuery} from '@tanstack/react-query'
+import {useQuery} from '@tanstack/react-query'
 import {executeQueryAndValidate} from './graphqlQueryHooks'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {
@@ -24,10 +24,7 @@ import {
   LTI_ASSET_PROCESSORS_AND_REPORTS_FOR_STUDENT_QUERY,
   ZGetLtiAssetProcessorsAndReportsForStudentResult,
 } from '../../queries/getLtiAssetProcessorsAndReportsForStudent'
-import {
-  AssetReportCompatibleSubmissionType,
-  ensureCompatibleSubmissionType,
-} from '../../shared-with-sg/replicated/types/LtiAssetReports'
+import {ensureCompatibleSubmissionType} from '../../shared-with-sg/replicated/types/LtiAssetReports'
 
 const I18n = createI18nScope('lti_asset_reports_for_student')
 

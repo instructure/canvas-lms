@@ -221,3 +221,13 @@ export interface UpdateAllocationRuleResponse {
     }>
   }
 }
+
+export interface DeleteAllocationRuleInput {
+  ruleId: string
+}
+
+export interface DeleteAllocationRuleResponse {
+  deleteAllocationRule: {
+    allocationRuleId: string
+  }
+}

@@ -4251,6 +4251,7 @@ type DiscussionEntryVersion implements LegacyIDInterface & Timestamped {
   createdAt: DateTime
   id: ID!
   message: String!
+  messageIntro: String!
   updatedAt: DateTime
   version: Int!
 }
@@ -5709,6 +5710,7 @@ type LtiAsset implements LegacyIDInterface {
   _id: ID!
   attachmentId: ID
   attachmentName: String
+  discussionEntryVersion: DiscussionEntryVersion
   submissionAttempt: Int
   submissionId: ID
 }
@@ -7546,6 +7548,7 @@ type Page implements LegacyIDInterface & ModuleItemInterface & Node & Timestampe
   """
   published: Boolean
   title: String
+  todoDate: DateTime
   type: String
   updatedAt: DateTime
 }
@@ -7938,7 +7941,7 @@ type ProficiencyRating implements LegacyIDInterface {
   color: String
   description: String
   mastery: Boolean!
-  points: Float
+  points: Float!
 }
 
 """
@@ -9194,6 +9197,7 @@ type StudentSummaryAnalytics {
 
 type SubAssignmentSubmission {
   assignmentId: ID!
+  cachedDueDate: DateTime
   customGradeStatusId: ID
 
   """
@@ -11062,7 +11066,7 @@ type User implements LegacyIDInterface & Node & Timestamped {
     """
     query: String
   ): CommentBankItemConnection
-  commentBankItemsCount: Int
+  commentBankItemsCount: Int @deprecated(reason: "Use `commentBankItems.pageInfo.totalCount` instead. This field will be removed in a future version.")
   conversationsConnection(
     """
     Returns the elements in the list that come after the specified cursor.

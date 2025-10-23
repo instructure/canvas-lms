@@ -25,7 +25,7 @@ describe Api::V1::AiExperience do
       description: "Practice customer service scenarios",
       facts: "You are a customer service representative",
       learning_objective: "Learn customer service skills",
-      scenario: "Handle billing issues"
+      pedagogical_guidance: "Handle billing issues"
     )
   end
 
@@ -35,7 +35,7 @@ describe Api::V1::AiExperience do
   describe "ai_experience_json" do
     it "includes all specified attributes" do
       json = api.ai_experience_json(@ai_experience, @teacher, session)
-      expected_fields = %w[id title description facts learning_objective scenario workflow_state course_id created_at updated_at]
+      expected_fields = %w[id title description facts learning_objective pedagogical_guidance workflow_state course_id created_at updated_at]
 
       expected_fields.each do |field|
         expect(json).to have_key(field)
@@ -50,7 +50,7 @@ describe Api::V1::AiExperience do
       expect(json["description"]).to eq @ai_experience.description
       expect(json["facts"]).to eq @ai_experience.facts
       expect(json["learning_objective"]).to eq @ai_experience.learning_objective
-      expect(json["scenario"]).to eq @ai_experience.scenario
+      expect(json["pedagogical_guidance"]).to eq @ai_experience.pedagogical_guidance
       expect(json["workflow_state"]).to eq @ai_experience.workflow_state
       expect(json["course_id"]).to eq @ai_experience.course_id
     end

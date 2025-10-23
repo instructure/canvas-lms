@@ -82,7 +82,7 @@ describe('DiscussionTopicForm', () => {
     it('clears todo date in submission when switching to graded', async () => {
       const mockOnSubmit = jest.fn()
       const todoDate = '2024-12-31T23:59:00Z'
-      const {getByRole, getByLabelText} = setup({
+      const {getByTestId} = setup({
         onSubmit: mockOnSubmit,
         currentDiscussionTopic: DiscussionTopic.mock({
           todoDate,
@@ -91,10 +91,10 @@ describe('DiscussionTopicForm', () => {
       })
 
       // Switch to graded
-      getByLabelText('Graded').click()
+      getByTestId('graded-checkbox').querySelector('input').click()
 
       // Submit form
-      getByRole('button', {name: 'Save'}).click()
+      getByTestId('save-button').click()
 
       // Verify submission
       expect(mockOnSubmit).toHaveBeenCalledWith(
@@ -109,7 +109,7 @@ describe('DiscussionTopicForm', () => {
     it('preserves todo date in ungraded mode', async () => {
       const mockOnSubmit = jest.fn()
       const todoDate = '2024-12-31T23:59:00Z'
-      const {getByRole} = setup({
+      const {getByTestId} = setup({
         onSubmit: mockOnSubmit,
         currentDiscussionTopic: DiscussionTopic.mock({
           todoDate,
@@ -118,7 +118,7 @@ describe('DiscussionTopicForm', () => {
       })
 
       // Submit form
-      getByRole('button', {name: 'Save'}).click()
+      getByTestId('save-button').click()
 
       // Verify submission
       expect(mockOnSubmit).toHaveBeenCalledWith(
@@ -133,10 +133,10 @@ describe('DiscussionTopicForm', () => {
 
   // returns 12:00 AM in jsdom 25
   it.skip('applies fancy midnight to assign reviews when needed', () => {
-    const {getByTestId, getByLabelText, getByText} = setup()
+    const {getByTestId, getByText} = setup()
 
-    getByLabelText('Graded').click()
-    getByLabelText('Automatically assign').click()
+    getByTestId('graded-checkbox').querySelector('input').click()
+    getByTestId('peer_review_auto').click()
 
     const dueDate = getByTestId('reviews-due-date')
     const dueTime = getByTestId('reviews-due-time')
@@ -151,10 +151,10 @@ describe('DiscussionTopicForm', () => {
   })
 
   it('does not apply fancy midnight to assign reviews when the user have other time set', () => {
-    const {getByTestId, getByLabelText, getByText} = setup()
+    const {getByTestId, getByText} = setup()
 
-    getByLabelText('Graded').click()
-    getByLabelText('Automatically assign').click()
+    getByTestId('graded-checkbox').querySelector('input').click()
+    getByTestId('peer_review_auto').click()
 
     const dueDate = getByTestId('reviews-due-date')
     const dueTime = getByTestId('reviews-due-time')

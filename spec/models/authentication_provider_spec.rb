@@ -459,6 +459,39 @@ describe AuthenticationProvider do
       expect(@user.sortable_name).to eq "Cutrer, Cody"
     end
 
+    context "when only display_name is provided" do
+      before do
+        @user.update!(name: @pseudonym.unique_id, short_name: "Mr. Cutrer")
+
+        aac.federated_attributes = {
+          "display_name" => { "attribute" => "display_name", "provisioning_only" => true }
+        }
+      end
+
+      it "overrides the name if the display_name is provided and the name is the same as the unique_id" do
+        aac.apply_federated_attributes(@pseudonym,
+                                       {
+                                         "display_name" => "Cody Cutrer",
+                                       },
+                                       purpose: :provisioning)
+
+        expect(@user.name).to eq "Cody Cutrer"
+        expect(@user.sortable_name).to eq "Cutrer, Cody"
+        expect(@user.short_name).to eq "Cody Cutrer"
+      end
+
+      it "does not override the name when not provisioning" do
+        aac.apply_federated_attributes(@pseudonym,
+                                       {
+                                         "display_name" => "Cody Cutrer",
+                                       })
+
+        expect(@user.name).to eq @pseudonym.unique_id
+        expect(@user.sortable_name).to eq @pseudonym.unique_id
+        expect(@user.short_name).to eq "Mr. Cutrer"
+      end
+    end
+
     it "ignores attributes that are for provisioning only when not provisioning" do
       aac.apply_federated_attributes(@pseudonym,
                                      {
@@ -643,6 +676,27 @@ describe AuthenticationProvider do
       p = auth_provider.provision_user("sub" => "unique_id", "tid" => "abc")
       expect(p.unique_id).to eq "unique_id"
       expect(p.unique_ids).to eq({ "sub" => "unique_id", "tid" => "abc" })
+    end
+
+    it "defaults to the user's unique_id if no name is provided" do
+      p = auth_provider.provision_user("unique_id")
+      expect(p.user.name).to eq "unique_id"
+    end
+
+    it "assigns the user's actual name" do
+      auth_provider.federated_attributes = { "name" => "name" }
+      auth_provider.save!
+
+      p = auth_provider.provision_user({ "sub" => "unique_id" }, { "name" => "Cody Cutrer" })
+      expect(p.user.name).to eq "Cody Cutrer"
+    end
+
+    it "assigns the user's actual name if the display_name is provided" do
+      auth_provider.federated_attributes = { "display_name" => "name" }
+      auth_provider.save!
+
+      p = auth_provider.provision_user({ "sub" => "unique_id" }, { "name" => "Cody Cutrer" })
+      expect(p.user.name).to eq "Cody Cutrer"
     end
   end
 

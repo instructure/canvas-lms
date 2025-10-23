@@ -20,6 +20,7 @@ import React, {memo} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {Tag} from '@instructure/ui-tag'
+import {View} from '@instructure/ui-view'
 import {IconCoursesLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {colors} from '@instructure/canvas-theme'
@@ -30,9 +31,14 @@ const I18n = createI18nScope('OutcomeManagement')
 interface OutcomeContextTagProps {
   outcomeContextType?: string
   outcomeContextId?: string
+  margin?: string
 }
 
-const OutcomeContextTag = ({outcomeContextType, outcomeContextId}: OutcomeContextTagProps) => {
+const OutcomeContextTag = ({
+  outcomeContextType,
+  outcomeContextId,
+  margin = '0',
+}: OutcomeContextTagProps) => {
   const trimmedContextType = outcomeContextType?.trim() || ''
   const trimmedContextId = outcomeContextId?.trim() || ''
 
@@ -70,23 +76,25 @@ const OutcomeContextTag = ({outcomeContextType, outcomeContextId}: OutcomeContex
     : colors.additionalPrimitives.copper45
 
   return (
-    <Tag
-      size="small"
-      text={
-        <Flex gap="xxx-small" padding="xxx-small 0">
-          {icon}
-          <Text color="primary-inverse" size="x-small" weight="normal" lineHeight="condensed">
-            {contextLabel}
-          </Text>
-        </Flex>
-      }
-      themeOverride={{
-        defaultBackground: backgroundColor,
-        defaultBorderStyle: 'none',
-      }}
-      aria-label={ariaLabel}
-      data-testid="outcome-context-tag"
-    />
+    <View as="div" margin={margin}>
+      <Tag
+        size="small"
+        text={
+          <Flex gap="xxx-small" padding="xxx-small 0">
+            {icon}
+            <Text color="primary-inverse" size="x-small" weight="normal" lineHeight="condensed">
+              {contextLabel}
+            </Text>
+          </Flex>
+        }
+        themeOverride={{
+          defaultBackground: backgroundColor,
+          defaultBorderStyle: 'none',
+        }}
+        aria-label={ariaLabel}
+        data-testid="outcome-context-tag"
+      />
+    </View>
   )
 }
 

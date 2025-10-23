@@ -317,9 +317,13 @@ class CommunicationChannel < ActiveRecord::Base
         InstStatsd::Statsd.increment("message.deliver.sms.one_time_password",
                                      short_stat: "message.deliver",
                                      tags: { path_type: "sms", notification_name: "one_time_password" })
-        InstStatsd::Statsd.increment("message.deliver.sms.#{account.global_id}",
-                                     short_stat: "message.deliver_per_account",
-                                     tags: { path_type: "sms", root_account_id: account.global_id })
+        InstStatsd::Statsd.increment(
+          "message.deliver.sms.#{account.global_id}",
+          short_stat: "message.deliver_per_account",
+          tags: { path_type: "sms" }.merge(
+            Utils::InstStatsdUtils::Tags.tags_for(account.shard)
+          )
+        )
         Services::NotificationService.process(
           "otp:#{global_id}",
           message,

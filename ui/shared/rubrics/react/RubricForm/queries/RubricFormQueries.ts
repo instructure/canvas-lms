@@ -175,6 +175,7 @@ export const saveRubric = async (
       },
       learning_outcome_id: criterion.learningOutcomeId,
       ignore_for_scoring: criterion.ignoreForScoring,
+      mastery_points: criterion.masteryPoints,
       criterion_use_range: criterion.criterionUseRange,
       ratings: criterion.ratings.map(rating => ({
         description: rating.description,
@@ -194,7 +195,7 @@ export const saveRubric = async (
     body: qs.stringify({
       _method: method,
       rubric: {
-        title,
+        title: title.trim(),
         hide_points: hidePoints,
         free_form_criterion_comments: freeFormCriterionComments ? 1 : 0,
         criteria,

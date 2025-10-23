@@ -22,8 +22,11 @@ class AiExperience < ApplicationRecord
   belongs_to :account
   belongs_to :course
 
+  has_many :ai_conversations, dependent: :destroy
+
   validates :title, presence: true, length: { maximum: 255 }
-  validates :facts, presence: true
+  validates :learning_objective, presence: true
+  validates :pedagogical_guidance, presence: true
   validates :workflow_state, presence: true, inclusion: { in: %w[unpublished published deleted] }
 
   scope :published, -> { where(workflow_state: "published") }

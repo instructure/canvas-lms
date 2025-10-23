@@ -31,7 +31,7 @@ class Accessibility::ResourceScannerService < ApplicationService
   def call
     return if scan_already_queued_or_in_progress?
 
-    scan = AccessibilityResourceScan.for_context(@resource).first_or_initialize
+    scan = AccessibilityResourceScan.where(context: @resource).first_or_initialize
     scan.assign_attributes(
       course: @resource.course,
       workflow_state: "queued",
@@ -69,21 +69,23 @@ class Accessibility::ResourceScannerService < ApplicationService
   private
 
   def log_to_datadog(scan)
-    InstStatsd::Statsd.distributed_increment("accessibility.resources_scanned", tags: { course_id: scan.course_id })
+    tags = Utils::InstStatsdUtils::Tags.tags_for(scan.course.shard)
+    InstStatsd::Statsd.distributed_increment("accessibility.resources_scanned", tags:)
 
     if scan.wiki_page_id?
-      InstStatsd::Statsd.distributed_increment("accessibility.pages_scanned", tags: { course_id: scan.course_id })
+      InstStatsd::Statsd.distributed_increment("accessibility.pages_scanned", tags:)
     elsif scan.assignment_id?
-      InstStatsd::Statsd.distributed_increment("accessibility.assignments_scanned", tags: { course_id: scan.course_id })
+      InstStatsd::Statsd.distributed_increment("accessibility.assignments_scanned", tags:)
     end
 
     if scan.failed?
-      InstStatsd::Statsd.distributed_increment("accessibility.resource_scan_failed", tags: { course_id: scan.course_id, scan_id: scan.id })
+      Rails.logger.error("Scan failed with ID #{scan.global_id} for course #{scan.course.global_id}")
+      InstStatsd::Statsd.distributed_increment("accessibility.resource_scan_failed", tags:)
     end
   end
 
   def scan_already_queued_or_in_progress?
-    AccessibilityResourceScan.for_context(@resource)
+    AccessibilityResourceScan.where(context: @resource)
                              .where(workflow_state: %w[queued in_progress])
                              .exists?
   end

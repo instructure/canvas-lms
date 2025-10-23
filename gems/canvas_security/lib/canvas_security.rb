@@ -81,6 +81,20 @@ module CanvasSecurity
     @encryption_keys ||= [encryption_key] + Array(config && config["previous_encryption_keys"]).map(&:to_s)
   end
 
+  def self.jwt_encryption_key
+    jwt_encryption_keys.first
+  end
+
+  def self.jwt_encryption_keys
+    @jwt_encryption_keys ||= begin
+      res = Array.wrap(config && config["jwt_encryption_keys"]).map(&:to_s)
+      raise("jwt encryption key required, see config/security.yml") if res.empty?
+      raise("jwt encryption key must be 64 characters") unless res.all? { |r| r.length == 64 }
+
+      res
+    end
+  end
+
   def self.config
     @config ||= begin
       path = Rails.root.join("config/security.yml")
@@ -88,6 +102,7 @@ module CanvasSecurity
 
       result = YAML.safe_load(ERB.new(path.read).result, aliases: true)[Rails.env]
       result["encryption_key"] ||= Rails.application.credentials.security_encryption_key
+      result["jwt_encryption_keys"] ||= Rails.application.credentials.security_jwt_encryption_keys
       result
     end
   end
@@ -220,7 +235,7 @@ module CanvasSecurity
     raw_jwt = JSON::JWT.new(jwt_body)
     return raw_jwt.to_s if key == :unsigned
 
-    raw_jwt.sign(key || encryption_key, alg || :autodetect).to_s
+    raw_jwt.sign(key || jwt_encryption_key, alg || :autodetect).to_s
   end
 
   # Creates an encrypted JWT token string
@@ -260,7 +275,9 @@ module CanvasSecurity
   # Raises CanvasSecurity::TokenExpired if the token has expired, and
   # CanvasSecurity::InvalidToken if the token is otherwise invalid.
   def self.decode_jwt(token, keys = [], ignore_expiration: false)
+    # TODO: remove the first line a deploy cycle or two after the separate JWT key goes out (allow all in flight jwts to be validated successfully)
     keys += encryption_keys
+    keys += jwt_encryption_keys
 
     keys.each do |key|
       body = JSON::JWT.decode(token, key)

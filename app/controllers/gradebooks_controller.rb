@@ -140,7 +140,9 @@ class GradebooksController < ApplicationController
         json[:custom_grade_status_id] = submission.custom_grade_status_id if custom_gradebook_statuses_enabled
       end
 
-      if submission.user_can_read_grade?(@presenter.student, for_plagiarism: true)
+      if submission.user_can_read_grade?(@presenter.student, for_plagiarism: true) && (
+        submission.submission_type != "discussion_topic" || @context.root_account.feature_enabled?(:lti_asset_processor_discussions)
+      )
         json[:asset_processors] = asset_processors(assignment: submission.assignment)
         json[:asset_reports] = @presenter.user_has_elevated_permissions? ? nil : asset_reports_info_for_display(submission:)
         json[:submission_type] = submission.submission_type
@@ -799,7 +801,7 @@ class GradebooksController < ApplicationController
                sections: sections_json(visible_sections, @current_user, session, [], allow_sis_ids: true),
                settings: gradebook_settings(@context.global_id),
                settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
-               IMPROVED_LMGB: root_account.feature_enabled?(:improved_lmgb),
+               IMPROVED_LMGB: @context.feature_enabled?(:improved_lmgb),
              },
              OUTCOME_AVERAGE_CALCULATION: root_account.feature_enabled?(:outcome_average_calculation),
              outcome_service_results_to_canvas: outcome_service_results_to_canvas_enabled?,
@@ -1202,6 +1204,7 @@ class GradebooksController < ApplicationController
           enhanced_rubrics_enabled:,
           rubric_outcome_data: enhanced_rubrics_enabled ? rubric&.outcome_data : [],
           multiselect_filters_enabled: multiselect_filters_enabled?,
+          use_comment_library_v2: Account.site_admin.feature_enabled?(:use_comment_library_v2),
         }
         if grading_role_for_user == :moderator
           env[:provisional_select_url] = api_v1_select_provisional_grade_path(@context.id, @assignment.id, "{{provisional_grade_id}}")

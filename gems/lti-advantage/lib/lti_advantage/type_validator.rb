@@ -43,8 +43,22 @@ module LtiAdvantage
       return unless value.respond_to?(:invalid?)
 
       if value.invalid?
-        errors = value.errors.respond_to?(:as_json) ? value.errors.as_json[:errors] : value.errors
+        errors = self.class.format_errors(value.errors)
         record.errors.add(attr, errors)
+      end
+    end
+
+    class << self
+      attr_accessor :error_formatter
+
+      def format_errors(errors)
+        if error_formatter
+          error_formatter.call(errors)[:errors]
+        elsif errors.respond_to?(:as_json)
+          errors.as_json[:errors]
+        else
+          errors
+        end
       end
     end
 

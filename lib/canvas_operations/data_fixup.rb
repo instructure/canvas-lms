@@ -120,6 +120,18 @@ module CanvasOperations
 
         super
       end
+
+      # Should the data fixup run on the default shard?
+      #
+      # The deafult shard contains shadow copies of all other root accounts in production,
+      # which may result in unexpected behavior if a data fixup is run there.
+      #
+      # Defaults to `true`, which means the data fixup will run on the default shard.
+      attr_writer :run_on_default_shard
+
+      def run_on_default_shard?
+        @run_on_default_shard.nil? || @run_on_default_shard
+      end
     end
 
     protected
@@ -142,14 +154,16 @@ module CanvasOperations
 
     # Determines if the current shard is a valid target for the DataFixup operation.
     #
-    # By default this method halts the operation on the default shard. Subclasses can
-    # override this method to implement custom shard validation logic.
+    # In its base form this check returns true unless run_on_default_shard is false,
+    # in which case it returns true only if the current shard is not the default shard.
     #
     # Be wary if overriding this method. The default shard contains shadow copies of all
     # root accounts, which may lead to unexpected fixup behavior.
     #
     # @return [Boolean] true if the current shard is not the default, false otherwise.
     def valid_shard?
+      return true if self.class.run_on_default_shard?
+
       !switchman_shard.default?
     end
 

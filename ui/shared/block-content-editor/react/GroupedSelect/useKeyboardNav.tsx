@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useRef, useEffect, useCallback} from 'react'
+import {useRef, useEffect} from 'react'
 import {GroupedSelectData, GroupedSelectItem} from './GroupedSelect'
 
 export const useKeyboardNav = (
@@ -30,16 +30,6 @@ export const useKeyboardNav = (
   const focusedPositionRef = useRef<{column: number; row: number}>({column: 0, row: 0})
   const elementsRef = useRef<Map<string | number, HTMLDivElement | null>>(new Map())
 
-  const updateTabIndexes = useCallback(() => {
-    elementsRef.current.forEach(element => {
-      if (element) {
-        element.setAttribute('tabIndex', '-1')
-      }
-    })
-    elementsRef.current.get(selectedGroup)?.setAttribute('tabIndex', '0')
-    elementsRef.current.get(selectedItem)?.setAttribute('tabIndex', '0')
-  }, [selectedGroup, selectedItem])
-
   const updateFocus = (column: number, row: number) => {
     focusedPositionRef.current = {column, row}
 
@@ -48,7 +38,6 @@ export const useKeyboardNav = (
     )
 
     if (focusedElement) {
-      focusedElement.setAttribute('tabIndex', '0')
       focusedElement.focus()
     }
   }
@@ -59,9 +48,7 @@ export const useKeyboardNav = (
         elementsRef.current.delete(key)
       }
     }
-
-    updateTabIndexes()
-  }, [elementsRef, updateTabIndexes])
+  }, [elementsRef])
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     const {column, row} = focusedPositionRef.current
@@ -99,19 +86,9 @@ export const useKeyboardNav = (
     focusedPositionRef.current = {column, row}
   }
 
-  const handleBlur = (event: React.FocusEvent) => {
-    if (
-      event.target !== elementsRef.current.get(selectedGroup) &&
-      event.target !== elementsRef.current.get(selectedItem)
-    ) {
-      event.target.setAttribute('tabIndex', '-1')
-    }
-  }
-
   return {
     handleKeyDown,
     elementsRef,
     overrideFocus,
-    handleBlur,
   }
 }

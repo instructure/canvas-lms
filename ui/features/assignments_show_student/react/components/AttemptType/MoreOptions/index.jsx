@@ -101,8 +101,8 @@ function BaseUploadTool({children, hideFooter, icon, label, renderFooter, title}
       withBackground={false}
     >
       <Flex direction="row" justifyItems="center" padding="xxx-small 0">
-        <Flex.Item>{icon}</Flex.Item>
-        <Flex.Item margin="0 small">
+        <Flex.Item margin="0 0 0 small">{icon}</Flex.Item>
+        <Flex.Item margin="0 small" shouldShrink>
           <ScreenReaderContent>{I18n.t('Submit file using %{label}', {label})}</ScreenReaderContent>
           <Text color="primary" size="large">
             {label}

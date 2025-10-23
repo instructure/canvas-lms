@@ -350,11 +350,12 @@ $(document).ready(function () {
   const grading_scheme_selector = document.getElementById('grading_scheme_selector')
 
   function renderGradingSchemeSelector() {
+    const courseDefaultSchemeId = ENV.COURSE_DEFAULT_GRADING_SCHEME_ID
     let selectedGradingSchemeId = $('#grading_standard_id').val()
     if (grading_scheme_selector) {
       if (selectedGradingSchemeId === '0' || selectedGradingSchemeId === '') {
         // special value indicating the default grading scheme
-        selectedGradingSchemeId = undefined
+        selectedGradingSchemeId = courseDefaultSchemeId || undefined
       }
 
       ReactDOM.render(
@@ -367,6 +368,7 @@ $(document).ready(function () {
           onChange={gradingSchemeId => handleSelectedGradingSchemeIdChanged(gradingSchemeId)}
           archivedGradingSchemesEnabled={ENV.ARCHIVED_GRADING_SCHEMES_ENABLED}
           shrinkSearchBar={true}
+          courseDefaultSchemeId={courseDefaultSchemeId || ''}
         />,
         grading_scheme_selector,
       )
@@ -388,8 +390,6 @@ $(document).ready(function () {
           $course_form.find('.grading_scheme_selector').show()
           renderGradingSchemeSelector($('#grading_standard_id').val())
         } else {
-          $('#grading_standard_id').val('')
-
           ReactDOM.render(<></>, grading_scheme_selector)
           $course_form.find('.grading_scheme_selector').hide()
         }

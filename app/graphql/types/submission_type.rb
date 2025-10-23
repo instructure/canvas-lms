@@ -133,6 +133,7 @@ module Types
     def lti_asset_reports_connection(latest: false)
       load_association(:root_account).then do |root_account|
         next unless root_account.feature_enabled?(:lti_asset_processor)
+        next if object.submission_type == "discussion_topic" && !root_account.feature_enabled?(:lti_asset_processor_discussions)
 
         if object.assignment.context.grants_any_right?(current_user, :manage_grades, :view_all_grades)
           if latest

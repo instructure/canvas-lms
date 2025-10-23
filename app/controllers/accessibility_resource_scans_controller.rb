@@ -85,7 +85,9 @@ class AccessibilityResourceScansController < ApplicationController
   # @param scan [AccessibilityResourceScan] the scan record
   # @return [Hash] the scan attributes
   def scan_attributes(scan)
-    resource_id, resource_type = scan.context_id_and_type
+    resource = scan.context
+    resource_id = resource&.id
+    resource_type = resource&.class&.name
     scan_completed = scan.workflow_state == "completed"
     {
       id: scan.id,

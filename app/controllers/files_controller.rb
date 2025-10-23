@@ -134,7 +134,6 @@ class FilesController < ApplicationController
 
   before_action :require_user, only: :create_pending
   before_action :require_context, except: %i[
-    assessment_question_show
     image_thumbnail
     show_thumbnail
     create_pending
@@ -469,17 +468,6 @@ class FilesController < ApplicationController
 
       render html: "".html_safe, layout: true
     end
-  end
-
-  def assessment_question_show
-    @context = AssessmentQuestion.find(params[:assessment_question_id])
-    @attachment = @context.attachments.find(params[:id])
-    @skip_crumb = true
-    if @attachment.deleted?
-      flash[:notice] = t "notices.deleted", "The file %{display_name} has been deleted", display_name: @attachment.display_name
-      return redirect_to dashboard_url
-    end
-    show
   end
 
   # @API Get public inline preview url
@@ -1651,7 +1639,12 @@ class FilesController < ApplicationController
 
     thumb_opts = { size: params[:size] }
     thumb_opts[:fallback_url] = @access_verifier[:fallback_url] if @access_verifier
-    thumb_opts[:no_jti] = authed && params[:location]&.include?("avatar")
+    if authed && attachment.context_type == "User"
+      avatar_url = attachment.context&.avatar_image_url
+      avatar_params = avatar_url && Rails.application.routes.recognize_path(avatar_url)
+      avatar_id = avatar_params && (avatar_params[:file_id] || avatar_params[:attachment_id] || avatar_params[:id])
+      thumb_opts[:no_jti] = avatar_id && Shard.integral_id_for(avatar_id) == attachment.id
+    end
     url = authenticated_thumbnail_url(attachment, options: thumb_opts) if attachment && authed
     if url && attachment.instfs_hosted? && file_location_mode?
       render_file_location(url)

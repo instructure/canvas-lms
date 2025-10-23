@@ -53,8 +53,8 @@ module Canvas
         next unless r.macro == :belongs_to
         next if name == "root_account"
 
-        if r.options[:polymorphic]
-          next unless klass.canonicalize_polymorph_list(r.options[:polymorphic]).map(&:last).include?("Account")
+        if r.options[:polymorphic].is_a?(Hash)
+          next unless r.options[:polymorphic].key?("Account") && !r.options[:separate_columns]
         else
           next unless r.class_name == "Account"
         end

@@ -18,13 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class PeerReview::SectionOverrideCreatorService < PeerReview::SectionOverrideCommonService
-  def initialize(
-    peer_review_sub_assignment: nil,
-    override: nil
-  )
-    super
-  end
-
   def call
     validate_override_dates(@override)
 
@@ -42,6 +35,7 @@ class PeerReview::SectionOverrideCreatorService < PeerReview::SectionOverrideCom
   def create_override(section)
     override = @peer_review_sub_assignment.assignment_overrides.build(
       set: section,
+      dont_touch_assignment: true,
       unassign_item: fetch_unassign_item
     )
     apply_overridden_dates(override, @override)

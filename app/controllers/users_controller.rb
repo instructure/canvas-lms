@@ -464,7 +464,7 @@ class UsersController < ApplicationController
       includes.delete("ui_invoked")
     elsif params[:sort] == "id"
       # for a more efficient way to retrieve many pages in bulk
-      users = BookmarkedCollection.wrap(UserSearch::Bookmarker.new(order: params[:order]), users)
+      users = BookmarkedCollection.wrap(Plannable::Bookmarker.new(User, params[:order] == "desc", :id), users)
     end
 
     GuardRail.activate(:secondary) do
@@ -2468,13 +2468,16 @@ class UsersController < ApplicationController
   #
   # The route that takes a user id will expire mobile sessions for that user.
   # The route that doesn't take a user id will expire mobile sessions for *all* users
-  # in the institution.
+  # in the institution (except for account administrators if +skip_admins+ is given).
   #
+  # @argument skip_admins [Optional, Boolean]
+  #  If true, will not expire mobile sessions for account administrators.
   def expire_mobile_sessions
     return unless authorized_action(@domain_root_account, @current_user, :manage_user_logins)
 
     user = api_find(@domain_root_account.pseudonym_users, params[:id]) if params.key?(:id)
-    AccessToken.delay_if_production.invalidate_mobile_tokens!(@domain_root_account, user:)
+    skip_admins = value_to_boolean(params[:skip_admins])
+    AccessToken.delay_if_production.invalidate_mobile_tokens!(@domain_root_account, user:, skip_admins:)
 
     render json: "ok"
   end
@@ -3466,10 +3469,10 @@ class UsersController < ApplicationController
     else
       errors = {
         errors: {
-          user: @user.errors.as_json[:errors],
-          pseudonym: @pseudonym ? @pseudonym.errors.as_json[:errors] : {},
-          observee: @invalid_observee_creds ? @invalid_observee_creds.errors.as_json[:errors] : {},
-          pairing_code: @invalid_observee_code ? @invalid_observee_code.errors.as_json[:errors] : {},
+          user: ::Api::Errors::Reporter.to_json(@user.errors)[:errors],
+          pseudonym: @pseudonym ? ::Api::Errors::Reporter.to_json(@pseudonym.errors)[:errors] : {},
+          observee: @invalid_observee_creds ? ::Api::Errors::Reporter.to_json(@invalid_observee_creds.errors)[:errors] : {},
+          pairing_code: @invalid_observee_code ? ::Api::Errors::Reporter.to_json(@invalid_observee_code.errors)[:errors] : {},
           recaptcha: @recaptcha_valid ? nil : @recaptcha_errors
         }
       }

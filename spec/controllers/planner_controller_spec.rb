@@ -1060,6 +1060,69 @@ describe PlannerController do
         end
       end
 
+      context "peer_reviews pagination" do
+        let(:per_page) { 5 }
+
+        before do
+          user_session(@user_student)
+        end
+
+        before :once do
+          @user_student = course_with_student(course: @course, active_all: true).user
+
+          @assessment_requests = []
+          @reviewees = []
+
+          assignment = assignment_model(
+            course: @course,
+            peer_reviews: true,
+            due_at: 2.days.from_now,
+            peer_reviews_due_at: 1.day.from_now
+          )
+
+          21.times do
+            reviewee = course_with_student(course: @course, active_all: true).user
+            @reviewees << reviewee
+
+            submission = submission_model(assignment:, user: @student)
+            assessor_submission = assignment.submit_homework(@student, submission_type: "online_text_entry", body: "text")
+
+            assessment_request = AssessmentRequest.create!(
+              assessor: @user_student,
+              assessor_asset: assessor_submission,
+              asset: submission,
+              user: reviewee
+            )
+
+            @assessment_requests << assessment_request
+          end
+        end
+
+        it "paginates results in correct order" do
+          collected_ids = []
+          next_page = nil
+
+          5.times do
+            opts = { per_page: }
+            opts[:page] = next_page if next_page.present?
+
+            get :index, params: opts
+            response_json = json_parse(response.body)
+            peer_reviews = response_json.select { |i| i["plannable_type"] == "assessment_request" }
+
+            collected_ids.concat(peer_reviews.pluck("plannable_id"))
+
+            links = Api.parse_pagination_links(response.headers["Link"])
+            next_link = links&.detect { |l| l[:rel] == "next" }
+
+            next_page = next_link["page"] if next_link
+          end
+
+          # Verify we got all assessment_requests (order may vary)
+          expect(collected_ids).to match_array(@assessment_requests.map(&:id))
+        end
+      end
+
       context "re-viewing the index with caching" do
         before do
           enable_cache

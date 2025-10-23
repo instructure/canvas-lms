@@ -40,12 +40,16 @@ export default function BestResults(props: Props) {
   })
   const splitTranslated = startOverMsg.split('ZZZZ_STARTOVER')
   return (
-    <Flex direction="column" gap="sectionElements">
-      <Flex direction="row-reverse" alignItems="start">
+    <Flex
+      direction="column"
+      gap={props.results.length > 0 ? 'sectionElements' : 'space0'}
+      width="100%"
+    >
+      <Flex direction="row-reverse" alignItems="start" width="100%">
         <Flex.Item>
           <Feedback courseId={props.courseId} searchTerm={props.searchTerm} />
         </Flex.Item>
-        <Flex.Item shouldGrow>
+        <Flex.Item shouldGrow shouldShrink>
           <Heading variant="titleSection" level="h2">
             {I18n.t(
               {
@@ -56,17 +60,19 @@ export default function BestResults(props: Props) {
               {count: props.results.length},
             )}
           </Heading>
-          {props.results.length < 1 && (
-            <Text>
-              {splitTranslated[0]}
-              <Link as="button" onClick={props.resetSearch}>
-                {I18n.t('start over')}
-              </Link>
-              {splitTranslated[1]}
-            </Text>
-          )}
         </Flex.Item>
       </Flex>
+      {props.results.length < 1 && (
+        <Flex.Item>
+          <Text>
+            {splitTranslated[0]}
+            <Link as="button" onClick={props.resetSearch}>
+              {I18n.t('start over')}
+            </Link>
+            {splitTranslated[1]}
+          </Text>
+        </Flex.Item>
+      )}
       {props.results.map(result => {
         return (
           <ResultCard

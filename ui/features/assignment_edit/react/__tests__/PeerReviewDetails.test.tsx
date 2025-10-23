@@ -32,6 +32,8 @@ jest.mock('@canvas/graphql', () => ({
 // @ts-expect-error
 global.ENV = {
   use_high_contrast: false,
+  PEER_REVIEW_ALLOCATION_ENABLED: true,
+  PEER_REVIEW_GRADING_ENABLED: true,
 }
 
 const createMockAssignment = (overrides = {}) => ({
@@ -403,6 +405,134 @@ describe('PeerReviewDetails', () => {
       )
       await waitFor(() => {
         expect(checkbox).not.toBeDisabled()
+      })
+    })
+  })
+
+  describe('Feature flag toggles', () => {
+    // @ts-expect-error
+    const originalEnv = global.ENV
+
+    afterEach(() => {
+      // @ts-expect-error
+      global.ENV = originalEnv
+    })
+
+    describe('when only PEER_REVIEW_GRADING_ENABLED is true', () => {
+      beforeEach(() => {
+        // @ts-expect-error
+        global.ENV = {
+          ...originalEnv,
+          PEER_REVIEW_GRADING_ENABLED: true,
+          PEER_REVIEW_ALLOCATION_ENABLED: false,
+        }
+      })
+
+      it('shows Reviews Required and grading features', async () => {
+        renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
+        const checkbox = screen.getByTestId('peer-review-checkbox')
+        await user.click(checkbox)
+
+        expect(screen.getByText('Reviews Required*')).toBeInTheDocument()
+        expect(screen.getByTestId('reviews-required-input')).toBeInTheDocument()
+        expect(screen.getByText('Points per Peer Review')).toBeInTheDocument()
+        expect(screen.getByTestId('points-per-review-input')).toBeInTheDocument()
+        expect(screen.getByText('Total Points for Peer Review(s)')).toBeInTheDocument()
+
+        const advancedSettingsToggle = screen.getByText('Advanced Peer Review Configurations')
+        await user.click(advancedSettingsToggle)
+
+        expect(screen.getByText('Grading')).toBeInTheDocument()
+        expect(screen.getByTestId('pass-fail-grading-checkbox')).toBeInTheDocument()
+      })
+
+      it('hides allocation-specific features when only grading is enabled', async () => {
+        renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
+        const checkbox = screen.getByTestId('peer-review-checkbox')
+        await user.click(checkbox)
+
+        const advancedSettingsToggle = screen.getByText('Advanced Peer Review Configurations')
+        await user.click(advancedSettingsToggle)
+
+        expect(screen.queryByText('Allocations')).not.toBeInTheDocument()
+        expect(screen.queryByText('Anonymity')).not.toBeInTheDocument()
+        expect(screen.queryByText('Submission required')).not.toBeInTheDocument()
+      })
+    })
+
+    describe('when only PEER_REVIEW_ALLOCATION_ENABLED is true', () => {
+      beforeEach(() => {
+        // @ts-expect-error
+        global.ENV = {
+          ...originalEnv,
+          PEER_REVIEW_GRADING_ENABLED: false,
+          PEER_REVIEW_ALLOCATION_ENABLED: true,
+        }
+      })
+
+      it('shows Reviews Required and allocation features', async () => {
+        renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
+        const checkbox = screen.getByTestId('peer-review-checkbox')
+        await user.click(checkbox)
+
+        expect(screen.getByText('Reviews Required*')).toBeInTheDocument()
+        expect(screen.getByTestId('reviews-required-input')).toBeInTheDocument()
+
+        const advancedSettingsToggle = screen.getByText('Advanced Peer Review Configurations')
+        await user.click(advancedSettingsToggle)
+
+        expect(screen.getByText('Allocations')).toBeInTheDocument()
+        expect(screen.getByTestId('across-sections-checkbox')).toBeInTheDocument()
+        expect(screen.getByTestId('within-groups-checkbox')).toBeInTheDocument()
+        expect(screen.getByText('Anonymity')).toBeInTheDocument()
+        expect(screen.getByTestId('anonymity-checkbox')).toBeInTheDocument()
+        expect(screen.getByText('Submission required')).toBeInTheDocument()
+        expect(screen.getByTestId('submission-required-checkbox')).toBeInTheDocument()
+      })
+
+      it('hides grading-specific features when only allocation is enabled', async () => {
+        renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
+        const checkbox = screen.getByTestId('peer-review-checkbox')
+        await user.click(checkbox)
+
+        expect(screen.queryByText('Points per Peer Review')).not.toBeInTheDocument()
+        expect(screen.queryByTestId('points-per-review-input')).not.toBeInTheDocument()
+        expect(screen.queryByText('Total Points for Peer Review(s)')).not.toBeInTheDocument()
+
+        const advancedSettingsToggle = screen.getByText('Advanced Peer Review Configurations')
+        await user.click(advancedSettingsToggle)
+
+        expect(screen.queryByText('Grading')).not.toBeInTheDocument()
+        expect(screen.queryByTestId('pass-fail-grading-checkbox')).not.toBeInTheDocument()
+      })
+    })
+
+    describe('when both flags are enabled', () => {
+      beforeEach(() => {
+        // @ts-expect-error
+        global.ENV = {
+          ...originalEnv,
+          PEER_REVIEW_GRADING_ENABLED: true,
+          PEER_REVIEW_ALLOCATION_ENABLED: true,
+        }
+      })
+
+      it('shows all features when both flags are enabled', async () => {
+        renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
+        const checkbox = screen.getByTestId('peer-review-checkbox')
+        await user.click(checkbox)
+
+        expect(screen.getByText('Reviews Required*')).toBeInTheDocument()
+        expect(screen.getByText('Points per Peer Review')).toBeInTheDocument()
+        expect(screen.getByText('Total Points for Peer Review(s)')).toBeInTheDocument()
+
+        const advancedSettingsToggle = screen.getByText('Advanced Peer Review Configurations')
+        await user.click(advancedSettingsToggle)
+
+        expect(screen.getByText('Allocations')).toBeInTheDocument()
+        expect(screen.getByText('Grading')).toBeInTheDocument()
+        expect(screen.getByText('Anonymity')).toBeInTheDocument()
+        expect(screen.getByText('Submission required')).toBeInTheDocument()
       })
     })
   })

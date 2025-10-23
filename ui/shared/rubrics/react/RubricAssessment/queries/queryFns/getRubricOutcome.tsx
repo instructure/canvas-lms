@@ -26,6 +26,8 @@ const GET_RUBRIC_OUTCOME = gql`
       id: _id
       calculationInt
       calculationMethod
+      contextId
+      contextType
       displayName
       description
       masteryPoints

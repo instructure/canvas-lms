@@ -40,12 +40,15 @@ export default function renderAssignmentsApp(env, elt) {
   root.render(
     <ApolloProvider client={client}>
       <ErrorBoundary
-        errorComponent={
+        errorComponent={({error}) => (
           <GenericErrorPage
             imageUrl={errorShipUrl}
+            errorSubject={error.message}
             errorCategory="Assignments 2 Student Error Page"
+            errorMessage={error.message}
+            stack={error.stack}
           />
-        }
+        )}
       >
         <AlertManager>
           <StudentViewQuery
@@ -55,7 +58,7 @@ export default function renderAssignmentsApp(env, elt) {
           />
         </AlertManager>
       </ErrorBoundary>
-    </ApolloProvider>
+    </ApolloProvider>,
   )
 
   const observerPickerContainer = document.getElementById('observer-picker-mountpoint')
@@ -72,7 +75,7 @@ export default function renderAssignmentsApp(env, elt) {
           observedUsersList={ENV.OBSERVER_OPTIONS.OBSERVED_USERS_LIST}
           renderLabel={I18n.t('Select a student to view. The page will refresh automatically.')}
         />
-      </View>
+      </View>,
     )
   }
 }

@@ -347,6 +347,9 @@
     "clubs_suit_c1ffedff": {
         "message": "クラブ(1組)"
     },
+    "collab_575ac7bc": {
+        "message": "コラボ"
+    },
     "collaborations_5c56c15f": {
         "message": "コラボレーション"
     },
@@ -1271,6 +1274,9 @@
     "latvian_2bbb6aab": {
         "message": "ラトビア語"
     },
+    "learn_ad3b3505": {
+        "message": "学習する"
+    },
     "learn_more_about_adjacent_links_2cb9762c": {
         "message": "隣接リンクの詳細"
     },
@@ -1697,6 +1703,9 @@
     "operators_a2ef9a93": {
         "message": "演算子"
     },
+    "options_3ab0ea65": {
+        "message": "オプション"
+    },
     "or_9b70ccaa": {
         "message": "または"
     },
@@ -1960,6 +1969,9 @@
     },
     "remove_link_d1f2f4d0": {
         "message": "リンクの削除"
+    },
+    "remove_studio_media_f913e502": {
+        "message": "Studio メディアを削除する"
     },
     "replace_all_d3d68b3": {
         "message": "すべて置換する"
@@ -2482,6 +2494,9 @@
     },
     "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
         "message": "あなたのビデオのブラウザ内のタイトルは正しいものですが、データベース内でそれを更新できませんでした。"
+    },
+    "thumbnail_e0de666f": {
+        "message": "サムネイル"
     },
     "timebar_a4d18443": {
         "message": "タイムバー"

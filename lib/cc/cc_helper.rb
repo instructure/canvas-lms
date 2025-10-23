@@ -206,7 +206,7 @@ module CC
 
     class HtmlContentExporter
       attr_reader :course, :user, :used_media_objects, :media_object_flavor, :media_object_infos
-      attr_accessor :referenced_files, :referenced_assessment_question_files
+      attr_accessor :referenced_files
 
       def initialize(course, user, opts = {})
         @media_object_flavor = opts[:media_object_flavor]
@@ -220,7 +220,6 @@ module CC
         @for_epub_export = opts[:for_epub_export]
         @key_generator = opts[:key_generator] || CC::CCHelper
         @referenced_files = {}
-        @referenced_assessment_question_files = {}
         @disable_content_rewriting = !!opts[:disable_content_rewriting] || false
 
         @rewriter.set_handler("file_contents") do |match|
@@ -248,22 +247,19 @@ module CC
               "#{COURSE_TOKEN}/files"
             end
           else
-            current_referenced_files = @referenced_files
             obj = match.obj_class.find_by(id: match.obj_id)
+            next(match.url) if obj.try(:context_type).nil? || %w[Course User AssessmentQuestion].exclude?(obj.context_type)
+
             # find the object in the context in case it's deleted and we need to find the active attachment
-            obj = obj.context.attachments.find_by(id: obj) if obj
+            obj = obj.context.attachments.find_by(id: obj) if %w[Course User].include?(obj.context_type)
             next(match.url) unless obj
             next(match.url) if obj.context_type == "Course" && obj.context_id != @course.id
             next(match.url) if obj.context_type == "AssessmentQuestion" && @for_course_copy
             next(match.url) if match.context_type.present? && (match.context_type.classify != obj&.context_type || match.context_id != obj.context_id.to_s)
             next(match.url) unless @rewriter.user_can_view_content?(obj) || @for_epub_export
 
-            if obj.context_type == "AssessmentQuestion"
-              current_referenced_files = @referenced_assessment_question_files
-            end
-
             obj.export_id = @key_generator.create_key(obj)
-            current_referenced_files[obj.id] = obj if @track_referenced_files && !current_referenced_files[obj.id]
+            @referenced_files[obj.id] = obj if @track_referenced_files && !@referenced_files[obj.id]
 
             if @for_course_copy
               "#{COURSE_TOKEN}/file_ref/#{obj.export_id}#{match.rest}"

@@ -41,6 +41,10 @@ export type BlockContentEditorStore = {
     viaEditButton: boolean
     saveCallbacks: Set<() => void>
   }
+  focusTarget: {
+    type: 'addButton' | 'insertButton' | 'copyButton' | null
+    nodeId: string | null
+  }
   aiAltTextGenerationURL: string | null
 }
 
@@ -65,6 +69,10 @@ export const createStore = (props: {aiAltTextGenerationURL: string | null}) =>
       id: null,
       viaEditButton: false,
       saveCallbacks: new Set(),
+    },
+    focusTarget: {
+      type: null,
+      nodeId: null,
     },
     aiAltTextGenerationURL: props.aiAltTextGenerationURL,
   })

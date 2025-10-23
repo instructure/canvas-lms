@@ -104,7 +104,7 @@ RSpec.shared_examples "an accessibility scannable resource" do
         it "removes the associated AccessibilityResourceScan" do
           expect do
             resource.destroy
-          end.to change { AccessibilityResourceScan.for_context(resource).count }.from(1).to(0)
+          end.to change { AccessibilityResourceScan.where(context: resource).count }.from(1).to(0)
         end
       end
 

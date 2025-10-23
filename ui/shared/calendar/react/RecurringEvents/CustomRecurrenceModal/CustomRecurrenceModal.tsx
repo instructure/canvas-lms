@@ -80,8 +80,11 @@ type FooterProps = {
 const Footer = ({canSave, onDismiss, onSave}: FooterProps) => {
   return (
     <>
-      <Button onClick={onDismiss}>{I18n.t('Cancel')}</Button>
+      <Button data-testid="custom-recurrence-modal-cancel" onClick={onDismiss}>
+        {I18n.t('Cancel')}
+      </Button>
       <Button
+        data-testid="custom-recurrence-modal-done"
         interaction={canSave ? 'enabled' : 'disabled'}
         type="submit"
         color="primary"

@@ -224,8 +224,8 @@ class SubmissionLifecycleManager
 
       effective_due_dates.to_hash.each do |assignment_id, student_due_dates|
         existing_anonymous_ids = existing_anonymous_ids_by_assignment_id[assignment_id]
-
-        create_moderation_selections_for_assignment(assignments_by_id[assignment_id], student_due_dates.keys, @user_ids)
+        assignment = assignments_by_id[assignment_id]
+        create_moderation_selections_for_assignment(assignment, student_due_dates.keys, @user_ids)
 
         quiz_lti = quiz_lti_assignments.include?(assignment_id)
 
@@ -240,8 +240,6 @@ class SubmissionLifecycleManager
           anonymous_id = Anonymity.generate_id(existing_ids: existing_anonymous_ids)
           existing_anonymous_ids << anonymous_id
           sql_ready_anonymous_id = Submission.connection.quote(anonymous_id)
-
-          assignment = AbstractAssignment.find_by(id: assignment_id)
 
           if @create_sub_assignment_submissions && assignment.checkpoints_parent? && assignment.sub_assignment_submissions.find_by(user_id: student_id).nil?
             assignment.sub_assignments.each do |sub_assignment|

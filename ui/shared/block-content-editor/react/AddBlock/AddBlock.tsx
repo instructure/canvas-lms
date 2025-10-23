@@ -23,12 +23,15 @@ import {View} from '@instructure/ui-view'
 import {AddButton} from './AddButton'
 import {useGetBlocksCount} from '../hooks/useGetBlocksCount'
 import {useAddBlockModal} from '../hooks/useAddBlockModal'
+import {useFocusManagement} from '../hooks/useFocusManagement'
 
 const I18n = createI18nScope('block_content_editor')
 
 export const AddBlock = () => {
   const {open} = useAddBlockModal()
   const {blocksCount} = useGetBlocksCount()
+  const {elementRef} = useFocusManagement({buttonType: 'addButton'})
+
   if (blocksCount > 0) {
     return null
   }
@@ -49,7 +52,7 @@ export const AddBlock = () => {
             )}
           </span>
         </Flex>
-        <AddButton onClicked={open} />
+        <AddButton onClicked={open} elementRef={elementRef} />
       </Flex>
     </View>
   )

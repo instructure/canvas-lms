@@ -40,7 +40,7 @@ describe AssessmentQuestion do
     end.not_to raise_error
   end
 
-  it "infer_defaultses from question_data before validation" do
+  it "infer_defaults from question_data before validation" do
     @question = assessment_question_model(bank: AssessmentQuestionBank.create!(context: Course.create!))
     @question.name = "1" * 300
     @question.save(validate: false)
@@ -55,7 +55,7 @@ describe AssessmentQuestion do
   it "translates links to be readable when creating the assessment question" do
     @attachment = attachment_in_course(@course)
     data = { "name" => "Hi", "question_text" => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download'>", "answers" => [{ "id" => 1 }, { "id" => 2 }] }
-    @question = @bank.assessment_questions.create!(question_data: data)
+    @question = @bank.assessment_questions.create!(question_data: data, current_user: @teacher)
 
     @clone = @question.attachments.where(root_attachment: @attachment).first
 
@@ -65,7 +65,7 @@ describe AssessmentQuestion do
   it "translates links relative path url" do
     @attachment = attachment_in_course(@course)
     data = { "name" => "Hi", "question_text" => "Translate this: <img src='/courses/#{@course.id}/file_contents/course%20files/unfiled/test.jpg'>", "answers" => [{ "id" => 1 }, { "id" => 2 }] }
-    @question = @bank.assessment_questions.create!(question_data: data)
+    @question = @bank.assessment_questions.create!(question_data: data, current_user: @teacher)
 
     @clone = @question.attachments.where(root_attachment: @attachment).first
 
@@ -77,7 +77,7 @@ describe AssessmentQuestion do
     data = { "name" => "Hi",
              "question_text" => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1'> and this: <img src='/courses/#{@course.id}/file_contents/course%20files/unfiled/test.jpg?wrap=1'>",
              "answers" => [{ "id" => 1 }, { "id" => 2 }] }
-    @question = @bank.assessment_questions.create!(question_data: data)
+    @question = @bank.assessment_questions.create!(question_data: data, current_user: @teacher)
 
     @clone = @question.attachments.where(root_attachment: @attachment).first
 
@@ -88,7 +88,7 @@ describe AssessmentQuestion do
     @attachment = attachment_in_course(@course)
 
     data = { "name" => "Hi", "question_text" => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download'> and this: <img src='/courses/#{@course.id}/file_contents/course%20files/unfiled/test.jpg'>", "answers" => [{ "id" => 1 }, { "id" => 2 }] }
-    @question = @bank.assessment_questions.create!(question_data: data)
+    @question = @bank.assessment_questions.create!(question_data: data, current_user: @teacher)
 
     @clone = @question.attachments.where(root_attachment: @attachment).first
 
@@ -114,13 +114,94 @@ describe AssessmentQuestion do
     expect(@clone).to be_nil
   end
 
+  it "only creates one clone when same attachment appears multiple times" do
+    @attachment = attachment_in_course(@course)
+    data = { "name" => "Hi", "question_text" => "First: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download'> Second: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download'> Third: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download'>", "answers" => [{ "id" => 1 }, { "id" => 2 }] }
+    @question = @bank.assessment_questions.create!(question_data: data, current_user: @teacher)
+
+    clones = @question.attachments.where(root_attachment: @attachment)
+    expect(clones.count).to eq 1
+  end
+
+  describe "translate_link_regex" do
+    it "matches course file links with query params" do
+      question = @bank.assessment_questions.create!(question_data: { "name" => "Test", "question_text" => "Test", "answers" => [] })
+      link = "/courses/#{@course.id}/files/2323?wrap=1"
+      match = link.match(question.translate_link_regex)
+      expect(match).not_to be_nil
+      expect(match[:course_attachment_id]).to eq "2323"
+      expect(match[:rest]).to eq "?wrap=1"
+    end
+
+    it "matches course file links with tilde in ID" do
+      question = @bank.assessment_questions.create!(question_data: { "name" => "Test", "question_text" => "Test", "answers" => [] })
+      link = "/courses/#{@course.id}/files/23~23/download?xs=1"
+      match = link.match(question.translate_link_regex)
+      expect(match).not_to be_nil
+      expect(match[:course_attachment_id]).to eq "23~23"
+      expect(match[:rest]).to eq "/download?xs=1"
+    end
+
+    it "matches course file_contents links" do
+      question = @bank.assessment_questions.create!(question_data: { "name" => "Test", "question_text" => "Test", "answers" => [] })
+      link = "/courses/#{@course.id}/file_contents/course%20files/Pinkman.png/preview"
+      match = link.match(question.translate_link_regex)
+      expect(match).not_to be_nil
+      expect(match[:course_file_path]).to eq "Pinkman.png/preview"
+      expect(match[:rest]).to be_nil
+    end
+
+    it "matches user file links" do
+      question = @bank.assessment_questions.create!(question_data: { "name" => "Test", "question_text" => "Test", "answers" => [] })
+      link = "/users/15/files/2323"
+      match = link.match(question.translate_link_regex)
+      expect(match).not_to be_nil
+      expect(match[:user_id]).to eq "15"
+      expect(match[:user_attachment_id]).to eq "2323"
+      expect(match[:rest]).to be_nil
+    end
+
+    it "matches user file links with tilde in IDs" do
+      question = @bank.assessment_questions.create!(question_data: { "name" => "Test", "question_text" => "Test", "answers" => [] })
+      link = "/users/15~15/files/23~23?wrap=1"
+      match = link.match(question.translate_link_regex)
+      expect(match).not_to be_nil
+      expect(match[:user_id]).to eq "15~15"
+      expect(match[:user_attachment_id]).to eq "23~23"
+      expect(match[:rest]).to eq "?wrap=1"
+    end
+
+    it "matches media_attachments_iframe links" do
+      question = @bank.assessment_questions.create!(question_data: { "name" => "Test", "question_text" => "Test", "answers" => [] })
+      link = "/media_attachments_iframe/23~23?ping=1"
+      match = link.match(question.translate_link_regex)
+      expect(match).not_to be_nil
+      expect(match[:media_attachment_id]).to eq "23~23"
+      expect(match[:rest]).to eq "?ping=1"
+    end
+
+    it "does not match course file links with different context ID" do
+      question = @bank.assessment_questions.create!(question_data: { "name" => "Test", "question_text" => "Test", "answers" => [] })
+      link = "/courses/2555/files/2323"
+      match = link.match(question.translate_link_regex)
+      expect(match).to be_nil # should not match because context_id is different
+    end
+
+    it "does not match invalid paths" do
+      question = @bank.assessment_questions.create!(question_data: { "name" => "Test", "question_text" => "Test", "answers" => [] })
+      expect("/something/15/files/2323".match(question.translate_link_regex)).to be_nil
+      expect("/p".match(question.translate_link_regex)).to be_nil
+      expect("/files/25".match(question.translate_link_regex)).to be_nil
+    end
+  end
+
   context "when disable_file_verifier_access feature flag is enabled" do
     it "translates multiple links in same body and would not add verifiers" do
       @attachment = attachment_in_course(@course)
       @attachment.root_account.enable_feature!(:disable_file_verifier_access)
 
       data = { "name" => "Hi", "question_text" => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download'> and this: <img src='/courses/#{@course.id}/file_contents/course%20files/unfiled/test.jpg'>", "answers" => [{ "id" => 1 }, { "id" => 2 }] }
-      @question = @bank.assessment_questions.create!(question_data: data)
+      @question = @bank.assessment_questions.create!(question_data: data, current_user: @teacher)
 
       @clone = @question.attachments.where(root_attachment: @attachment).first
 
@@ -139,6 +220,7 @@ describe AssessmentQuestion do
   end
 
   it "translates links to be readable w/ verifier" do
+    # TODO: verifier string matching should be removed with GROW-146
     @attachments = {}
     attachment_tag = lambda do |key|
       @attachments[key] ||= []
@@ -170,7 +252,7 @@ describe AssessmentQuestion do
 
     serialized_data_before = Marshal.dump(data)
 
-    @question = @bank.assessment_questions.create!(question_data: data)
+    @question = @bank.assessment_questions.create!(question_data: data, current_user: @teacher)
 
     @attachment_clones = @attachments.transform_values { |ary| ary.map { |a| @question.attachments.where(root_attachment_id: a).first } }
 
@@ -204,7 +286,7 @@ describe AssessmentQuestion do
       }
     }
 
-    question = bank.assessment_questions.create!(question_data: data)
+    question = bank.assessment_questions.create!(question_data: data, current_user: @teacher)
     expect(question.question_data[:points_possible]).to eq "10"
     data[:points_possible] = "50"
     question.form_question_data = data
@@ -282,6 +364,154 @@ describe AssessmentQuestion do
       smallest_id_question = questions.min_by(&:id)
       qq = AssessmentQuestion.find_or_create_quiz_questions([assessment_question], quiz.id, nil).first
       expect(qq.id).to eq(smallest_id_question.id)
+    end
+  end
+
+  describe "media_attachments_iframe link translation" do
+    def media_attachment_in_course(course)
+      attachment = Attachment.create!(
+        filename: "video.mp4",
+        display_name: "video.mp4",
+        uploaded_data: StringIO.new("fake video content"),
+        folder: Folder.unfiled_folder(course),
+        context: course,
+        content_type: "video/mp4"
+      )
+
+      media_object = MediaObject.create!(
+        media_id: "test_media_id_#{attachment.id}",
+        media_type: "video",
+        context: course,
+        attachment_id: attachment.id
+      )
+
+      attachment.update!(media_entry_id: media_object.media_id)
+      attachment
+    end
+
+    it "translates media_attachments_iframe links to use original iframe format" do
+      @media_attachment = media_attachment_in_course(@course)
+
+      data = {
+        "name" => "Media Question",
+        "question_text" => "Watch this video: <iframe src='/media_attachments_iframe/#{@media_attachment.id}?embedded=true&type=video'></iframe>",
+        "answers" => [{ "id" => 1 }, { "id" => 2 }]
+      }
+
+      @question = @bank.assessment_questions.create!(question_data: data, current_user: @teacher)
+      @clone = @question.attachments.where(root_attachment: @media_attachment).first
+
+      expected_url = "/media_attachments_iframe/#{@clone.id}?verifier=#{@clone.uuid}&embedded=true&type=video"
+      expect(@question.reload.question_data["question_text"]).to eq "Watch this video: <iframe src='#{expected_url}'></iframe>"
+    end
+
+    it "handles multiple media iframe links in the same content" do
+      @media_attachment1 = media_attachment_in_course(@course)
+      @media_attachment2 = media_attachment_in_course(@course)
+
+      data = {
+        "name" => "Multiple Media Question",
+        "question_text" => "First video: <iframe src='/media_attachments_iframe/#{@media_attachment1.id}?embedded=true'></iframe> Second video: <iframe src='/media_attachments_iframe/#{@media_attachment2.id}?type=video'></iframe>",
+        "answers" => [{ "id" => 1 }, { "id" => 2 }]
+      }
+
+      @question = @bank.assessment_questions.create!(question_data: data, current_user: @teacher)
+      @clone1 = @question.attachments.where(root_attachment: @media_attachment1).first
+      @clone2 = @question.attachments.where(root_attachment: @media_attachment2).first
+
+      result = @question.reload.question_data["question_text"]
+      expect(result).to include("<iframe src='/media_attachments_iframe/#{@clone1.id}")
+      expect(result).to include("<iframe src='/media_attachments_iframe/#{@clone2.id}")
+    end
+
+    it "handles mixed regular file and media iframe links" do
+      @attachment = attachment_in_course(@course)
+      @media_attachment = media_attachment_in_course(@course)
+
+      data = {
+        "name" => "Mixed Content Question",
+        "question_text" => "Download this: <a href='/courses/#{@course.id}/files/#{@attachment.id}/download'>file</a> and watch this: <iframe src='/media_attachments_iframe/#{@media_attachment.id}?embedded=true'></iframe>",
+        "answers" => [{ "id" => 1 }, { "id" => 2 }]
+      }
+
+      @question = @bank.assessment_questions.create!(question_data: data, current_user: @teacher)
+      @file_clone = @question.attachments.where(root_attachment: @attachment).first
+      @media_clone = @question.attachments.where(root_attachment: @media_attachment).first
+
+      result = @question.reload.question_data["question_text"]
+      expect(result).to include("<a href='/assessment_questions/#{@question.id}/files/#{@file_clone.id}/download")
+      expect(result).to include("<iframe src='/media_attachments_iframe/#{@media_clone.id}")
+    end
+
+    # TODO: should be removed with GROW-146
+    context "when disable_file_verifier_access feature flag is enabled" do
+      it "translates media iframe links without adding verifiers" do
+        @media_attachment = media_attachment_in_course(@course)
+        @media_attachment.root_account.enable_feature!(:disable_file_verifier_access)
+
+        data = {
+          "name" => "Media Question",
+          "question_text" => "Media: <iframe src='/media_attachments_iframe/#{@media_attachment.id}?embedded=true'></iframe>",
+          "answers" => [{ "id" => 1 }, { "id" => 2 }]
+        }
+
+        @question = @bank.assessment_questions.create!(question_data: data, current_user: @teacher)
+        @clone = @question.attachments.where(root_attachment: @media_attachment).first
+
+        expected_url = "/media_attachments_iframe/#{@clone.id}?embedded=true"
+        expect(@question.reload.question_data["question_text"]).to eq "Media: <iframe src='#{expected_url}'></iframe>"
+      end
+    end
+
+    it "handles media iframe links in answer choices" do
+      @media_attachment = media_attachment_in_course(@course)
+
+      data = {
+        "name" => "Media Answer Question",
+        "question_text" => "Which video shows the correct technique?",
+        "question_type" => "multiple_choice_question",
+        "answers" => [
+          {
+            "id" => 1,
+            "weight" => 1,
+            "text" => "Option A",
+            "html" => "Watch this: <iframe src='/media_attachments_iframe/#{@media_attachment.id}?embedded=true'></iframe>",
+            "comments_html" => "Good choice! <iframe src='/media_attachments_iframe/#{@media_attachment.id}?type=video'></iframe>"
+          },
+          {
+            "id" => 2,
+            "weight" => 0,
+            "text" => "Option B",
+            "html" => "B"
+          }
+        ]
+      }
+
+      @question = @bank.assessment_questions.create!(question_data: data, current_user: @teacher)
+      @clone = @question.attachments.where(root_attachment: @media_attachment).first
+
+      answer_html = @question.reload.question_data["answers"][0]["html"]
+      comments_html = @question.reload.question_data["answers"][0]["comments_html"]
+
+      expect(answer_html).to include("<iframe src='/media_attachments_iframe/#{@clone.id}")
+      expect(comments_html).to include("<iframe src='/media_attachments_iframe/#{@clone.id}")
+    end
+
+    it "preserves media iframe URLs when attachment cloning fails" do
+      @media_attachment = media_attachment_in_course(@course)
+
+      allow_any_instance_of(Attachment).to receive(:clone_for).and_return(nil)
+
+      data = {
+        "name" => "Media Question",
+        "question_text" => "Media: <iframe src='/media_attachments_iframe/#{@media_attachment.id}?embedded=true'></iframe>",
+        "answers" => [{ "id" => 1 }, { "id" => 2 }]
+      }
+
+      @question = @bank.assessment_questions.create!(question_data: data)
+
+      original_url = "/media_attachments_iframe/#{@media_attachment.id}?embedded=true"
+      expect(@question.reload.question_data["question_text"]).to eq "Media: <iframe src='#{original_url}'></iframe>"
     end
   end
 

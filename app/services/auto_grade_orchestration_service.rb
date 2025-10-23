@@ -165,7 +165,7 @@ class AutoGradeOrchestrationService
     autograde_error_handling(submission, auto_grade_result, progress, error_message)
     current_attempts = progress&.delayed_job&.attempts&.+ 1
 
-    if retryable && current_attempts < MAX_ATTEMPTS
+    if retryable && current_attempts && current_attempts < MAX_ATTEMPTS
       raise Delayed::RetriableError, error_message
     end
 

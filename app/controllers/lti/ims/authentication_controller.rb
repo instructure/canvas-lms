@@ -97,14 +97,13 @@ module Lti
             end
 
             if !account.root_account.feature_enabled?(:lti_oidc_missing_cookie_retry) || params[:retried] == "true"
-              InstStatsd::Statsd.increment("lti.oidc_login_required_error", tags: {
-                                             account: account&.global_id,
-                                             client_id: oidc_params[:client_id],
-                                           })
+              Rails.logger.info("[LTI] OIDC login required error for account #{account&.global_id}, client_id #{oidc_params[:client_id]}")
+              InstStatsd::Statsd.increment("lti.oidc_login_required_error", tags: Utils::InstStatsdUtils::Tags.tags_for(account&.shard || Shard.current))
               render("lti/ims/authentication/login_required_error_screen", status: :unauthorized, layout: "borderless_lti", formats: :html)
             else
               # In some cases resubmitting the request from within Canvas can fix the missing cookie problem (see INTEROP-8868)
-              InstStatsd::Statsd.increment("lti.oidc_missing_cookie_retry", tags: { client_id: oidc_params[:client_id] })
+              Rails.logger.info("[LTI] OIDC missing cookie retry for account #{account&.global_id}, client_id #{oidc_params[:client_id]}")
+              InstStatsd::Statsd.increment("lti.oidc_missing_cookie_retry", tags: Utils::InstStatsdUtils::Tags.tags_for(account&.shard || Shard.current))
               @oidc_params = oidc_params
               render("lti/ims/authentication/missing_cookie_fix", status: :ok, layout: "borderless_lti", formats: :html)
             end
@@ -115,7 +114,8 @@ module Lti
           validate_launch_eligibility!
 
           if params[:retried] == "true"
-            InstStatsd::Statsd.increment("lti.oidc_missing_cookie_retry_worked", tags: { client_id: oidc_params[:client_id] })
+            Rails.logger.info("[LTI] OIDC missing cookie retry worked for client_id #{oidc_params[:client_id]}")
+            InstStatsd::Statsd.increment("lti.oidc_missing_cookie_retry_worked", tags: Utils::InstStatsdUtils::Tags.tags_for(account&.shard || Shard.current))
           end
 
           render(

@@ -572,6 +572,71 @@ describe ConversationMessage do
     end
   end
 
+  describe "#attachment_associations_enabled?" do
+    before :once do
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+    end
+
+    it "returns true when feature is enabled on any root account" do
+      Account.default.enable_feature!(:file_association_access)
+      account2 = Account.create!
+      conversation = @teacher.initiate_conversation([@student])
+      message = conversation.add_message("test", root_account_id: Account.default.id)
+      message.root_account_ids = "#{Account.default.id},#{account2.id}"
+
+      expect(message.attachment_associations_enabled?).to be true
+    end
+
+    it "returns false when feature is disabled on root account" do
+      Account.default.disable_feature!(:file_association_access)
+      conversation = @teacher.initiate_conversation([@student])
+      message = conversation.add_message("test", root_account_id: Account.default.id)
+
+      expect(message.attachment_associations_enabled?).to be false
+    end
+  end
+
+  describe "location-based attachment access" do
+    before :once do
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+      Account.default.enable_feature!(:file_association_access)
+    end
+
+    let(:attachment) { attachment_model(context: @teacher, folder: @teacher.conversation_attachments_folder) }
+
+    it "allows access to attachments via location parameter" do
+      conversation = @teacher.initiate_conversation([@student])
+      message = conversation.add_message("test with attachment", attachment_ids: [attachment.id], root_account_id: Account.default.id)
+
+      expect(message.attachment_associations.count).to eq 1
+      association = message.attachment_associations.first
+      expect(association.attachment_id).to eq attachment.id
+
+      location_param = "conversation_message_#{message.id}"
+      expect(AttachmentAssociation.verify_access(location_param, attachment, @student)).to be_truthy
+    end
+
+    it "denies access when user is not a participant" do
+      other_user = user_factory(active_all: true)
+      conversation = @teacher.initiate_conversation([@student])
+      message = conversation.add_message("test with attachment", attachment_ids: [attachment.id], root_account_id: Account.default.id)
+
+      location_param = "conversation_message_#{message.id}"
+      expect(AttachmentAssociation.verify_access(location_param, attachment, other_user)).to be_falsey
+    end
+
+    it "denies access when feature flag is disabled" do
+      Account.default.disable_feature!(:file_association_access)
+      conversation = @teacher.initiate_conversation([@student])
+      message = conversation.add_message("test with attachment", attachment_ids: [attachment.id], root_account_id: Account.default.id)
+
+      location_param = "conversation_message_#{message.id}"
+      expect(AttachmentAssociation.verify_access(location_param, attachment, @student)).to be_falsey
+    end
+  end
+
   describe "reply_from" do
     before do
       course_with_teacher

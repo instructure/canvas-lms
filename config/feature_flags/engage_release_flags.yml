@@ -1,7 +1,7 @@
 ---
 assignment_enhancements_teacher_view:
   state: hidden
-  applies_to: RootAccount
+  applies_to: Course
   shadow: true
   display_name: Assignment Enhancements Teacher View (Saved)
   description: Updates to the Teacher saved view of assignments.
@@ -27,12 +27,18 @@ deprecate_context_groups_old_view:
   applies_to: SiteAdmin
   display_name: Deprecate Legacy View of Context Groups
   description: Removes dead code from the context groups view that is no longer used.
-peer_review_allocation_and_grading:
+peer_review_allocation:
   state: hidden
   applies_to: Course
   shadow: true
-  display_name: Peer Review Allocation and Grading
-  description: Enable dynamic peer review allocation and separate due dates and grading for a streamlined, flexible review experience.
+  display_name: Peer Review Allocation
+  description: Enable dynamic peer review allocation for a streamlined experience.
+peer_review_grading:
+  state: hidden
+  applies_to: Course
+  shadow: true
+  display_name: Peer Review Grading
+  description: Enable separate due dates and grading for peer reviews on assignments.
 ai_experiences:
   state: hidden
   applies_to: Course
