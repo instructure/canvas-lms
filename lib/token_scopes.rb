@@ -85,7 +85,7 @@ class TokenScopes
     LTI_NRPS_V2_SCOPE => I18n.t("Can retrieve user data associated with the context the tool is installed in."),
 
     # PNS + Asset Processor
-    LTI_PNS_SCOPE => I18n.t("Can register to be notified when Document Processor Assignment is submitted to."),
+    LTI_PNS_SCOPE => I18n.t("Can register to receive asynchronous notifications from Canvas."),
     LTI_ASSET_READ_ONLY_SCOPE => I18n.t("Can retrieve submissions from Document Processor Assignments."),
     LTI_ASSET_REPORT_SCOPE => I18n.t("Can send reports for Document Processor Assignments."),
     LTI_EULA_DEPLOYMENT_SCOPE => I18n.t("Can reset EULA acceptance status."),
