@@ -23,33 +23,49 @@ const I18n = createI18nScope('peer_review_settings')
 
 export const MAX_NUM_PEER_REVIEWS = 10
 
-export const usePeerReviewSettings = ({
-  peerReviewCount,
-  submissionRequired,
-  acrossSections,
-}: {
-  peerReviewCount: number
-  submissionRequired: boolean
-  acrossSections: boolean
-}) => {
+export interface PeerReviewSettings {
+  reviewsRequired: number
+  pointsPerReview: number
+  totalPoints: number
+  allowPeerReviewAcrossMultipleSections: boolean
+  allowPeerReviewWithinGroups: boolean
+  usePassFailGrading: boolean
+  anonymousPeerReviews: boolean
+  submissionRequiredBeforePeerReviews: boolean
+}
+
+export const usePeerReviewSettings = (settings: PeerReviewSettings) => {
+  const formatPoints = (value: number): string => {
+    if (!Number.isFinite(value) || value === 0) return '0'
+
+    const rounded = Math.round(value * 100) / 100
+    return rounded.toString()
+  }
+
   const [reviewsRequired, setReviewsRequired] = useState<string>(
-    peerReviewCount ? peerReviewCount.toString() : '1',
+    settings.reviewsRequired.toString(),
   )
-  const [totalPoints, setTotalPoints] = useState<string>('0')
+  const [totalPoints, setTotalPoints] = useState<string>(settings.totalPoints.toString())
   const [errorMessageReviewsRequired, setErrorMessageReviewsRequired] = useState<
     string | undefined
   >(undefined)
-  const [pointsPerReview, setPointsPerReview] = useState<string>('0')
+  const [pointsPerReview, setPointsPerReview] = useState<string>(
+    formatPoints(settings.pointsPerReview),
+  )
   const [errorMessagePointsPerReview, setErrorMessagePointsPerReview] = useState<
     string | undefined
   >(undefined)
   const [allowPeerReviewAcrossMultipleSections, setAllowPeerReviewAcrossMultipleSections] =
-    useState<boolean>(acrossSections)
-  const [allowPeerReviewWithinGroups, setAllowPeerReviewWithinGroups] = useState<boolean>(false)
-  const [usePassFailGrading, setUsePassFailGrading] = useState<boolean>(false)
-  const [anonymousPeerReviews, setAnonymousPeerReviews] = useState<boolean>(false)
-  const [submissionsRequiredBeforePeerReviews, setSubmissionsRequiredBeforePeerReviews] =
-    useState<boolean>(submissionRequired)
+    useState<boolean>(settings.allowPeerReviewAcrossMultipleSections)
+  const [allowPeerReviewWithinGroups, setAllowPeerReviewWithinGroups] = useState<boolean>(
+    settings.allowPeerReviewWithinGroups,
+  )
+  const [usePassFailGrading, setUsePassFailGrading] = useState<boolean>(settings.usePassFailGrading)
+  const [anonymousPeerReviews, setAnonymousPeerReviews] = useState<boolean>(
+    settings.anonymousPeerReviews,
+  )
+  const [submissionRequiredBeforePeerReviews, setSubmissionRequiredBeforePeerReviews] =
+    useState<boolean>(settings.submissionRequiredBeforePeerReviews)
 
   useEffect(() => {
     setTotalPoints(calculateTotalPoints())
@@ -119,6 +135,10 @@ export const usePeerReviewSettings = ({
       errorMessage = I18n.t('Points per review cannot be negative.')
     }
 
+    if (numPoints !== undefined) {
+      setPointsPerReview(formatPoints(numPoints))
+    }
+
     setErrorMessagePointsPerReview(errorMessage)
     return errorMessage
   }
@@ -155,7 +175,7 @@ export const usePeerReviewSettings = ({
   }
 
   const handleSubmissionRequiredCheck = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSubmissionsRequiredBeforePeerReviews(e.target.checked)
+    setSubmissionRequiredBeforePeerReviews(e.target.checked)
   }
 
   const resetFields = () => {
@@ -167,7 +187,7 @@ export const usePeerReviewSettings = ({
     setAllowPeerReviewWithinGroups(false)
     setUsePassFailGrading(false)
     setAnonymousPeerReviews(false)
-    setSubmissionsRequiredBeforePeerReviews(false)
+    setSubmissionRequiredBeforePeerReviews(false)
   }
 
   const stringToNumber = (value: string): number | undefined => {
@@ -193,7 +213,7 @@ export const usePeerReviewSettings = ({
     handleUsePassFailCheck,
     anonymousPeerReviews,
     handleAnonymityCheck,
-    submissionsRequiredBeforePeerReviews,
+    submissionRequiredBeforePeerReviews,
     handleSubmissionRequiredCheck,
     resetFields,
   }

@@ -171,6 +171,22 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
 
   const gradingEnabled = ENV.PEER_REVIEW_GRADING_ENABLED
   const allocationEnabled = ENV.PEER_REVIEW_ALLOCATION_ENABLED
+  const peerReviewSubAssignment = assignment.peerReviewSubAssignment?.()
+  const reviewsRequiredCount = assignment.peerReviewCount?.() || 1
+  const totalPointsFromDB = peerReviewSubAssignment?.points_possible || 0
+  const pointsPerReviewCalculated =
+    reviewsRequiredCount > 0 ? totalPointsFromDB / reviewsRequiredCount : 0
+
+  const initialValues = {
+    reviewsRequired: reviewsRequiredCount,
+    pointsPerReview: pointsPerReviewCalculated,
+    totalPoints: totalPointsFromDB,
+    allowPeerReviewAcrossMultipleSections: assignment.peerReviewAcrossSections?.() || false,
+    allowPeerReviewWithinGroups: assignment.intraGroupPeerReviews?.() || false,
+    usePassFailGrading: peerReviewSubAssignment?.grading_type === 'pass_fail',
+    anonymousPeerReviews: assignment.anonymousPeerReviews?.() || false,
+    submissionRequiredBeforePeerReviews: assignment.peerReviewSubmissionRequired?.() || false,
+  }
 
   const {
     reviewsRequired,
@@ -190,14 +206,10 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
     handleUsePassFailCheck,
     anonymousPeerReviews,
     handleAnonymityCheck,
-    submissionsRequiredBeforePeerReviews,
+    submissionRequiredBeforePeerReviews,
     handleSubmissionRequiredCheck,
     resetFields,
-  } = usePeerReviewSettings({
-    peerReviewCount: assignment.peerReviewCount(),
-    submissionRequired: assignment.peerReviewSubmissionRequired(),
-    acrossSections: assignment.peerReviewAcrossSections(),
-  })
+  } = usePeerReviewSettings(initialValues)
 
   const validatePeerReviewDetails = useCallback(() => {
     let valid = true
@@ -293,16 +305,53 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
 
   return (
     <Flex as="div" direction="column" width="100%">
-      {peerReviewChecked && (
-        <Flex.Item>
-          <input
-            type="hidden"
-            id="peer_reviews_across_sections_checkbox_hidden"
-            name="peer_reviews_across_sections_hidden"
-            value={allowPeerReviewAcrossMultipleSections ? 'true' : 'false'}
-          />
-        </Flex.Item>
-      )}
+      {/* Hidden inputs to preserve values when Advanced Configuration is collapsed or peer reviews disabled */}
+      <Flex.Item>
+        <input
+          type="hidden"
+          id="peer_reviews_across_sections_checkbox_hidden"
+          name="peer_reviews_across_sections_hidden"
+          value={peerReviewChecked && allowPeerReviewAcrossMultipleSections ? 'true' : 'false'}
+        />
+        <input
+          type="hidden"
+          id="peer_reviews_within_groups_checkbox_hidden"
+          name="intra_group_peer_reviews_hidden"
+          value={
+            peerReviewChecked && isGroupAssignment && allowPeerReviewWithinGroups ? 'true' : 'false'
+          }
+        />
+        <input
+          type="hidden"
+          id="peer_reviews_pass_fail_grading_checkbox_hidden"
+          name="peer_reviews_pass_fail_grading_hidden"
+          value={peerReviewChecked && usePassFailGrading ? 'true' : 'false'}
+        />
+        <input
+          type="hidden"
+          id="peer_reviews_anonymity_checkbox_hidden"
+          name="anonymous_peer_reviews_hidden"
+          value={peerReviewChecked && anonymousPeerReviews ? 'true' : 'false'}
+        />
+        <input
+          type="hidden"
+          id="peer_reviews_submission_required_checkbox_hidden"
+          name="peer_review_submission_required_hidden"
+          value={peerReviewChecked && submissionRequiredBeforePeerReviews ? 'true' : 'false'}
+        />
+        <input
+          type="hidden"
+          id="assignment_peer_reviews_count_hidden"
+          name="peer_review_count_hidden"
+          value={peerReviewChecked ? reviewsRequired : '0'}
+        />
+        <input
+          type="hidden"
+          id="assignment_peer_reviews_max_input_hidden"
+          name="peer_review_points_per_review_hidden"
+          value={peerReviewChecked ? pointsPerReview : '0'}
+        />
+      </Flex.Item>
       <Flex.Item>
         <Flex direction="column" padding="medium 0 medium x-small">
           <Flex.Item as="div" padding="xx-small">
@@ -493,7 +542,7 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
                         testId="submission-required-checkbox"
                         name="peer_reviews_submission_required"
                         id="peer_reviews_submission_required_checkbox"
-                        checked={submissionsRequiredBeforePeerReviews}
+                        checked={submissionRequiredBeforePeerReviews}
                         onChange={handleSubmissionRequiredCheck}
                         srLabel={I18n.t('Students must submit to see peer reviews')}
                         label={I18n.t(
