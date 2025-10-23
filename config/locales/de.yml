@@ -31145,8 +31145,8 @@ de:
   set_the_mastery_scale_to_be_used_for_all_courses_w_a95a48a4: "Stellen Sie die Leistungszielskala so ein, dass sie für alle Kurse in diesem Konto verwendet wird."
   set_the_number_of_columns_1089c3a3: "Anzahl der Spalten festlegen"
   set_the_priority_of_youtube_content_migration_conv_6757896f: "Setzen Sie die Priorität von Konvertierungsaufträgen für die Migration von YouTube-Inhalten auf hoch, um eine schnellere Verarbeitung zu erreichen. Wenn diese Option deaktiviert ist, werden die Aufträge mit niedriger Priorität ausgeführt."
-  set_to_not_threaded_30bcef01: "Auf „Mit Threads“ setzen"
-  set_to_threaded_ca4719fa: "Auf „Ohne Threads“ setzen"
+  set_to_not_threaded_30bcef01: "Auf „Ohne Threads“ setzen"
+  set_to_threaded_ca4719fa: "Auf „Mit Threads“ setzen"
   set_type_is_required_c875e747: "Set-Typ ist erforderlich"
   set_type_set_type_is_not_supported_supported_types_2f3546ec: "Set-Typ „%{set_type}“ wird nicht unterstützt Unterstützte Typen sind: %{supported_types}"
   set_up_how_your_proficiency_ratings_appear_inside__8139bb81: "\n\
