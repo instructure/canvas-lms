@@ -587,6 +587,70 @@ class User < ActiveRecord::Base
     courses_for_enrollments(enrollments.current_and_concluded)
   end
 
+  # Returns course IDs for truly current enrollments, filtered the same way as the dashboard
+  # Excludes past courses, completed/rejected/inactive enrollments, and homeroom/horizon courses for students
+  #
+  # This is the non-cached version - prefer using cached_current_course_ids_for_dashboard for better performance
+  def current_course_ids_for_dashboard(domain_root_account: nil)
+    all_enrollments = enrollments
+                      .not_deleted
+                      .shard(in_region_associated_shards)
+                      .preload(:enrollment_state, :course, :course_section)
+                      .to_a
+
+    # Filter out homeroom and horizon courses for students
+    if domain_root_account && roles(domain_root_account).all? { |role| ["student", "user"].include?(role) }
+      all_enrollments = all_enrollments.reject { |e| e.course.elementary_homeroom_course? || e.course.horizon_course? }
+    end
+
+    # Filter to only current enrollments (matching courses_controller logic)
+    completed_states = %i[completed rejected]
+    active_states = %i[active]
+
+    current_enrollments = all_enrollments.select do |enrollment|
+      state = enrollment.state_based_on_date
+      course = enrollment.course
+
+      # Skip if course is not published
+      next false unless course.workflow_state == "available"
+
+      # Skip completed or rejected
+      next false if completed_states.include?(state)
+
+      # Skip invited/pending enrollments (these are future enrollments)
+      next false if enrollment.workflow_state == "invited" || enrollment.enrollment_state.pending? || state == :creation_pending
+
+      # Skip if active but dates are in the past
+      next false if active_states.include?(state) && enrollment.section_or_course_date_in_past?
+
+      # Skip hard inactive
+      next false if enrollment.hard_inactive?
+
+      # Skip inactive state
+      next false if state == :inactive
+
+      true
+    end
+
+    current_enrollments.map(&:course_id).uniq
+  end
+
+  # Cached version of current_course_ids_for_dashboard
+  # Uses Rails.cache with batched keys to automatically invalidate when enrollments change
+  def cached_current_course_ids_for_dashboard(domain_root_account: nil)
+    # Include domain_root_account in cache key since it affects filtering
+    cache_key = ["current_course_ids_for_dashboard", domain_root_account&.global_id, ApplicationController.region].cache_key
+
+    Rails.cache.fetch_with_batched_keys(
+      cache_key,
+      batch_object: self,
+      batched_keys: :enrollments,
+      expires_in: 1.day
+    ) do
+      current_course_ids_for_dashboard(domain_root_account:)
+    end
+  end
+
   def self.skip_updating_account_associations
     @skip_updating_account_associations = true
     yield
