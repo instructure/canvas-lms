@@ -821,4 +821,124 @@ describe('AnnouncementsWidget', () => {
 
     cleanup()
   })
+
+  it('maintains pagination visibility when switching filters', async () => {
+    // Mock paginated responses for different filters
+    const paginatedUnreadResponse = {
+      data: {
+        legacyNode: {
+          _id: '123',
+          discussionParticipantsConnection: {
+            nodes: [
+              {
+                id: 'participant1',
+                read: false,
+                discussionTopic: {
+                  _id: '1',
+                  title: 'Unread Announcement 1',
+                  message: '<p>Unread message</p>',
+                  createdAt: '2025-01-15T10:00:00Z',
+                  contextName: 'Test Course 1',
+                  contextId: '1',
+                  isAnnouncement: true,
+                  author: {
+                    _id: 'user1',
+                    name: 'Test Teacher 1',
+                    avatarUrl: 'https://example.com/avatar1.jpg',
+                  },
+                },
+              },
+            ],
+            pageInfo: {
+              hasNextPage: true,
+              hasPreviousPage: false,
+              startCursor: 'start-cursor',
+              endCursor: 'end-cursor',
+              totalCount: 6,
+            },
+          },
+        },
+      },
+    }
+
+    const paginatedAllResponse = {
+      data: {
+        legacyNode: {
+          _id: '123',
+          discussionParticipantsConnection: {
+            nodes: [
+              {
+                id: 'participant1',
+                read: true,
+                discussionTopic: {
+                  _id: '2',
+                  title: 'All Announcement 1',
+                  message: '<p>All message</p>',
+                  createdAt: '2025-01-15T10:00:00Z',
+                  contextName: 'Test Course 1',
+                  contextId: '1',
+                  isAnnouncement: true,
+                  author: {
+                    _id: 'user1',
+                    name: 'Test Teacher 1',
+                    avatarUrl: 'https://example.com/avatar1.jpg',
+                  },
+                },
+              },
+            ],
+            pageInfo: {
+              hasNextPage: true,
+              hasPreviousPage: false,
+              startCursor: 'start-cursor-all',
+              endCursor: 'end-cursor-all',
+              totalCount: 9,
+            },
+          },
+        },
+      },
+    }
+
+    server.use(
+      graphql.query('GetUserAnnouncements', ({variables}) => {
+        if (variables.readState === 'unread') {
+          return HttpResponse.json(paginatedUnreadResponse)
+        }
+        return HttpResponse.json(paginatedAllResponse)
+      }),
+    )
+
+    const {cleanup} = setup()
+
+    await waitForLoadingToComplete()
+
+    // Wait for initial pagination to appear with "unread" filter
+    await waitFor(() => {
+      const paginationContainer = screen.getByTestId('pagination-container')
+      expect(paginationContainer).toBeInTheDocument()
+      expect(screen.getByText('1')).toBeInTheDocument()
+      expect(screen.getByText('2')).toBeInTheDocument()
+    })
+
+    // Change filter to "all"
+    const filterDropdown = screen.getByTitle('Unread')
+    fireEvent.click(filterDropdown)
+
+    const allOption = await screen.findByText('All')
+    fireEvent.click(allOption)
+
+    // Pagination should remain visible during and after filter change
+    await waitFor(() => {
+      const paginationContainer = screen.getByTestId('pagination-container')
+      expect(paginationContainer).toBeInTheDocument()
+    })
+
+    // Verify new pagination reflects the "all" filter's total count
+    await waitFor(() => {
+      expect(screen.getByText('1')).toBeInTheDocument()
+      expect(screen.getByText('2')).toBeInTheDocument()
+      expect(screen.getByText('3')).toBeInTheDocument() // 9 items / 3 per page = 3 pages
+    })
+
+    cleanup()
+  })
 })

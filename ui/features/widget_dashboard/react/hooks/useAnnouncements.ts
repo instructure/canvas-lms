@@ -315,7 +315,6 @@ export function useAnnouncementsPaginated(options: UseAnnouncementsOptions = {})
 
   useEffect(() => {
     setPageCache({})
-    setTotalCount(null)
     setCurrentPageIndex(0)
   }, [options.filter])
 
