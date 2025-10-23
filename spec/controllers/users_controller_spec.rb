@@ -4062,5 +4062,173 @@ describe UsersController do
         expect(course_names).to eq(["Apple Course", "Zebra Course"])
       end
     end
+
+    context "enrollment filtering" do
+      before do
+        @student = user_factory(active_all: true)
+        @current_course = course_factory(active_all: true)
+        @current_course.enroll_student(@student, enrollment_state: "active")
+        user_session(@student)
+      end
+
+      it "excludes courses with section dates in the past" do
+        # Create a course with section that ended
+        past_course = course_factory(active_all: true)
+        past_section = past_course.course_sections.create!(name: "Past Section", end_at: 1.week.ago)
+        past_course.enroll_student(@student, section: past_section, enrollment_state: "active")
+
+        get :user_dashboard
+        expect(response).to be_successful
+
+        course_data = assigns[:js_env][:SHARED_COURSE_DATA]
+        course_ids = course_data.pluck(:courseId)
+
+        # Should include current course but not past course
+        expect(course_ids).to include(@current_course.id.to_s)
+        expect(course_ids).not_to include(past_course.id.to_s)
+      end
+
+      it "excludes courses with conclude_at dates in the past" do
+        # Create a course that concluded
+        past_course = course_factory(active_all: true)
+        past_course.update!(conclude_at: 1.week.ago)
+        past_course.enroll_student(@student, enrollment_state: "active")
+
+        get :user_dashboard
+        expect(response).to be_successful
+
+        course_data = assigns[:js_env][:SHARED_COURSE_DATA]
+        course_ids = course_data.pluck(:courseId)
+
+        # Should include current course but not concluded course
+        expect(course_ids).to include(@current_course.id.to_s)
+        expect(course_ids).not_to include(past_course.id.to_s)
+      end
+
+      it "excludes completed enrollments" do
+        # Create a new student with only one course to test completed enrollment
+        student = user_factory(active_all: true)
+        course = course_factory(active_all: true)
+        enrollment = course.enroll_student(student, enrollment_state: "active")
+
+        # Conclude the enrollment
+        enrollment.workflow_state = "completed"
+        enrollment.save!
+
+        user_session(student)
+        get :user_dashboard
+        expect(response).to be_successful
+
+        course_data = assigns[:js_env][:SHARED_COURSE_DATA] || []
+        expect(course_data).to be_empty
+      end
+
+      it "excludes hard inactive enrollments" do
+        # Create a new student with only one course to test inactive enrollment
+        student = user_factory(active_all: true)
+        course = course_factory(active_all: true)
+        enrollment = course.enroll_student(student, enrollment_state: "active")
+
+        # Make enrollment inactive
+        enrollment.workflow_state = "inactive"
+        enrollment.save!
+
+        user_session(student)
+        get :user_dashboard
+        expect(response).to be_successful
+
+        course_data = assigns[:js_env][:SHARED_COURSE_DATA] || []
+        expect(course_data).to be_empty
+      end
+
+      it "excludes elementary homeroom courses for students" do
+        # Enable elementary subject setting
+        @current_course.account.enable_as_k5_account!
+
+        # Create an elementary homeroom course
+        homeroom = course_factory(active_all: true)
+        homeroom.homeroom_course = true
+        homeroom.save!
+        homeroom.enroll_student(@student, enrollment_state: "active")
+
+        get :user_dashboard
+        expect(response).to be_successful
+
+        course_data = assigns[:js_env][:SHARED_COURSE_DATA]
+        course_ids = course_data.pluck(:courseId)
+
+        # Should include regular course but not homeroom
+        expect(course_ids).to include(@current_course.id.to_s)
+        expect(course_ids).not_to include(homeroom.id.to_s)
+      end
+
+      it "excludes horizon courses for students" do
+        # Enable the horizon course feature flag
+        @current_course.account.enable_feature!(:horizon_course_setting)
+
+        # Create a horizon course
+        horizon = course_factory(active_all: true)
+        horizon.update!(horizon_course: true)
+        horizon.enroll_student(@student, enrollment_state: "active")
+
+        get :user_dashboard
+        expect(response).to be_successful
+
+        course_data = assigns[:js_env][:SHARED_COURSE_DATA]
+        course_ids = course_data.pluck(:courseId)
+
+        # Should include regular course but not horizon
+        expect(course_ids).to include(@current_course.id.to_s)
+        expect(course_ids).not_to include(horizon.id.to_s)
+      end
+
+      it "excludes unpublished courses for students" do
+        # Create an unpublished course
+        unpublished = course_factory
+        unpublished.workflow_state = "claimed"
+        unpublished.save!
+        unpublished.enroll_student(@student, enrollment_state: "active")
+
+        get :user_dashboard
+        expect(response).to be_successful
+
+        course_data = assigns[:js_env][:SHARED_COURSE_DATA]
+        course_ids = course_data.pluck(:courseId)
+
+        # Should include published course but not unpublished
+        expect(course_ids).to include(@current_course.id.to_s)
+        expect(course_ids).not_to include(unpublished.id.to_s)
+      end
+    end
+
+    context "observer enrollment filtering" do
+      before do
+        @student = user_factory(active_all: true)
+        @observer = user_with_pseudonym(active_all: true)
+        @current_course = course_factory(active_all: true)
+        @current_course.enroll_student(@student, enrollment_state: "active")
+        @current_course.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @student.id, enrollment_state: "active")
+        user_session(@observer)
+        session[:observed_user_id] = @student.id
+      end
+
+      it "excludes observed student's past courses" do
+        # Create a past course for the student
+        past_course = course_factory(active_all: true)
+        past_section = past_course.course_sections.create!(name: "Past Section", end_at: 1.week.ago)
+        past_course.enroll_student(@student, section: past_section, enrollment_state: "active")
+        past_course.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @student.id, enrollment_state: "active")
+
+        get :user_dashboard
+        expect(response).to be_successful
+
+        course_data = assigns[:js_env][:SHARED_COURSE_DATA]
+        course_ids = course_data.pluck(:courseId)
+
+        # Should include current course but not past course
+        expect(course_ids).to include(@current_course.id.to_s)
+        expect(course_ids).not_to include(past_course.id.to_s)
+      end
+    end
   end
 end
