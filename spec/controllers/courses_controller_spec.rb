@@ -1112,6 +1112,11 @@ describe CoursesController do
       expect(controller.js_env[:MSFT_SYNC_CAN_BYPASS_COOLDOWN]).to be false
     end
 
+    it "sets ams remote settings in the remote env" do
+      subject
+      expect(controller.remote_env[:ams]).to_not be_nil
+    end
+
     it "sets the external tools create url" do
       user_session(@teacher)
       get "settings", params: { course_id: @course.id }

@@ -375,6 +375,7 @@ export type BrandAccountFeatureId =
  * JS_ENV_SITE_ADMIN_FEATURES or JS_ENV_ROOT_ACCOUNT_FEATURES or JS_ENV_BRAND_ACCOUNT_FEATURES
  */
 export type OtherFeatureId =
+  | 'ams_course_integration'
   | 'canvas_k6_theme'
   | 'new_math_equation_handling'
   | 'lti_asset_processor_course'
