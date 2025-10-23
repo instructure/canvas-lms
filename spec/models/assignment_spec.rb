@@ -40,6 +40,11 @@ describe Assignment do
     expect(assignment.lti_context_id).to be_present
   end
 
+  it "defaults peer_review_submission_required to false" do
+    assignment = @course.assignments.create!(assignment_valid_attributes)
+    expect(assignment.peer_review_submission_required).to be false
+  end
+
   it "has a useful state machine" do
     assignment_model(course: @course)
     expect(@a.state).to be(:published)
@@ -1801,6 +1806,16 @@ describe Assignment do
       new_assignment.save!
 
       expect(new_assignment.peer_reviews_assigned).to be false
+    end
+
+    it "copies peer_review_submission_required value" do
+      assignment = @course.assignments.create!(title: "test assignment", points_possible: 100)
+      assignment.update!(peer_review_submission_required: true)
+
+      new_assignment = assignment.duplicate
+      new_assignment.save!
+
+      expect(new_assignment.peer_review_submission_required).to be true
     end
 
     context "with an assignment that can't be duplicated" do
