@@ -1651,6 +1651,11 @@ class CoursesController < ApplicationController
                  data: @alerts,
                }
              })
+      remote_env(ams:
+        {
+          launch_url: Services::Ams.launch_url,
+          api_url: Services::Ams.api_url
+        })
 
       if Account.site_admin.feature_enabled?(:grading_scheme_updates)
         js_env({ COURSE_DEFAULT_GRADING_SCHEME_ID: @context.grading_standard_id || @context.default_grading_standard&.id })

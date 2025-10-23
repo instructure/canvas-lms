@@ -84,6 +84,9 @@
 <% if @context.grants_right?(@current_user, session, :update) && @context.root_account.feature_enabled?(:microsoft_group_enrollments_syncing) %>
   <% tabs << { id: "integrations", title: t('tabs.integrations', default: "Integrations"), contentMount: "tab-integrations-mount" } %>
 <% end %>
+<% if @context.feature_enabled?(:ams_course_integration) %>
+  <% tabs << { id: "quiz_settings", title: t('tabs.quiz_settings', default: "Quiz Settings"), contentMount: "tab-quiz-settings-mount" } %>
+<% end %>
 <%= tag.div id: "course_settings_tabs_mount",
             data: {
               component: "SettingsTabs",
@@ -1013,6 +1016,9 @@
 
   <% if @context.grants_right?(@current_user, session, :update) && @context.root_account.feature_enabled?(:microsoft_group_enrollments_syncing) && !@context.elementary_homeroom_course? %>
     <div id="tab-integrations-mount"></div>
+  <% end %>
+  <% if @context.feature_enabled?(:ams_course_integration) %>
+    <div id="tab-quiz-settings-mount"></div>
   <% end %>
   <% if @context.account.feature_enabled?(:horizon_course_setting) && can_do(@context, @current_user, :read_as_admin) %>
     <% js_bundle :horizon_toggle %>

@@ -16,8 +16,5 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AmsLoader} from '../../../shared/ams'
-
-export function Component(): JSX.Element | null {
-  return <AmsLoader containerId="ams_container" />
-}
+export {AmsLoader} from './react/AmsLoader'
+export * from './react/auth'
