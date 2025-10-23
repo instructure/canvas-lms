@@ -311,15 +311,17 @@
                   <a
                     class="module-item-assign-to-link"
                     href="#<%= module_item ? module_item.id : "{{ id }}" %>"
+                    title="<%= t('Assign this module') %>"
+                  >
+                  <span class="assign-to-link-resources"
+                    translate="no"
                     data-item-id="<%= module_item ? module_item.id : '' %>"
                     data-item-name="<%= module_item ? module_item.title : '' %>"
                     data-item-type="<%= module_item ? module_item.content_type_class : '' %>"
                     data-item-context-id="<%= module_item ? module_item.context_id : '' %>"
                     data-item-content-id="<%= module_item ? module_item.content_id : '' %>"
                     data-item-has-assignment="<%= module_item ? module_item&.assignment&.present? : '' %>"
-                    data-item-has-assignment-checkpoint="<%= module_item ? module_item&.assignment&.has_sub_assignments : '' %>"
-                    title="<%= t('Assign this module') %>"
-                  >
+                    data-item-has-assignment-checkpoint="<%= module_item ? module_item&.assignment&.has_sub_assignments : '' %>"></span>
                     <%= @module_item_image_tags['assign_to'] %> <%= t('Assign To...') %>
                   </a>
                 </li>

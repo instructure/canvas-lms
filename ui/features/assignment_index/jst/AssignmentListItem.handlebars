@@ -254,15 +254,16 @@
                       class="assign-to-link icon-permissions"
                       id="assign_to_{{id}}_link"
                       href="{{id}}%>"
+                      title="{{#t}}Assign this Assignment{{/t}}"
+                      aria-label="{{#t}}Assign To...{{/t}}"
+                      data-focus-returns-to="assign_{{id}}_manage_link"
+                    ><span class="assign-to-link-resources"
+                      translate="no"
                       data-assignment-name="{{name}}"
                       data-assignment-context-id="{{courseId}}"
                       data-assignment-id="{{id}}"
                       data-assignment-type="{{item_assignment_type}}"
-                      data-assignment-has-checkpoint="{{isCheckpoint}}"
-                      title="{{#t}}Assign this Assignment{{/t}}"
-                      aria-label="{{#t}}Assign To...{{/t}}"
-                      data-focus-returns-to="assign_{{id}}_manage_link"
-                    >{{#t}}Assign To...{{/t}}</a>
+                      data-assignment-has-checkpoint="{{isCheckpoint}}"></span>{{#t}}Assign To...{{/t}}</a>
                   </li>
                 {{/if}}
             {{/if}}
@@ -427,15 +428,16 @@
                       class="assign-to-link icon-permissions"
                       id="assign_to_{{id}}_link"
                       href="{{id}}%>"
+                      title="{{#t}}Assign this Assignment{{/t}}"
+                      aria-label="{{#t}}Assign To...{{/t}}"
+                      data-focus-returns-to="assign_{{id}}_manage_link"
+                    ><span class="assign-to-link-resources"
+                      translate="no"
                       data-assignment-name="{{name}}"
                       data-assignment-context-id="{{courseId}}"
                       data-assignment-id="{{id}}"
                       data-assignment-type="{{item_assignment_type}}"
-                      data-assignment-has-checkpoint="{{isCheckpoint}}"
-                      title="{{#t}}Assign this Assignment{{/t}}"
-                      aria-label="{{#t}}Assign To...{{/t}}"
-                      data-focus-returns-to="assign_{{id}}_manage_link"
-                    >{{#t}}Assign To...{{/t}}</a>
+                      data-assignment-has-checkpoint="{{isCheckpoint}}"></span>{{#t}}Assign To...{{/t}}</a>
                   </li>
                 {{/if}}
                 {{#if canMove}}

@@ -621,18 +621,20 @@ window.modules = (function () {
         const $assignToMenuItem = $item.find('.assign-to-option')
         if ($assignToMenuItem.length) {
           $assignToMenuItem.removeClass('hidden')
-          const $a = $assignToMenuItem.find('a')
-          $a.attr('data-item-id', data.id)
-          $a.attr('data-item-name', data.title)
-          $a.attr(
+          const $dataSpan = $assignToMenuItem.find('.assign-to-link-resources')
+          $dataSpan.attr('data-item-id', data.id)
+          $dataSpan.attr('data-item-name', data.title)
+          $dataSpan.attr(
             'data-item-type',
             data.quiz_lti ? 'lti-quiz' : data.content_type == 'Quizzes::Quiz' ? 'quiz' : data.type,
           )
-          $a.attr('data-item-context-id', data.context_id)
-          $a.attr('data-item-context-type', data.context_type)
-          $a.attr('data-item-content-id', data.content_id)
-          $a.attr('data-item-has-assignment', data.assignment_id ? 'true' : 'false')
-          $a.attr('data-item-has-assignment-checkpoint', data.is_checkpointed ? 'true' : 'false')
+          $dataSpan.attr('data-item-context-id', data.context_id)
+          $dataSpan.attr('data-item-content-id', data.content_id)
+          $dataSpan.attr('data-item-has-assignment', data.assignment_id ? 'true' : 'false')
+          $dataSpan.attr(
+            'data-item-has-assignment-checkpoint',
+            data.is_checkpointed ? 'true' : 'false',
+          )
         }
       }
 
@@ -2692,13 +2694,18 @@ function initContextModules() {
   $(document).on('click keyclick', '.module-item-assign-to-link', function (event) {
     event.preventDefault()
     const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
-    const moduleItemId = event.target.getAttribute('data-item-id')
-    const moduleItemName = event.target.getAttribute('data-item-name')
-    const moduleItemType = event.target.getAttribute('data-item-type')
-    const courseId = event.target.getAttribute('data-item-context-id')
-    const moduleItemContentId = event.target.getAttribute('data-item-content-id')
-    const moduleItemHasAssignment = event.target.getAttribute('data-item-has-assignment')
-    const moduleItemHasCheckpoint = event.target.getAttribute('data-item-has-assignment-checkpoint')
+
+    // Get data from the inner span with translate="no"
+    const $link = $(event.target).closest('.module-item-assign-to-link')
+    const $dataSpan = $link.find('.assign-to-link-resources')
+
+    const moduleItemId = $dataSpan.attr('data-item-id')
+    const moduleItemName = $dataSpan.attr('data-item-name')
+    const moduleItemType = $dataSpan.attr('data-item-type')
+    const courseId = $dataSpan.attr('data-item-context-id')
+    const moduleItemContentId = $dataSpan.attr('data-item-content-id')
+    const moduleItemHasAssignment = $dataSpan.attr('data-item-has-assignment')
+    const moduleItemHasCheckpoint = $dataSpan.attr('data-item-has-assignment-checkpoint')
 
     const itemProps = parseModuleItemElement(
       document.getElementById(`context_module_item_${moduleItemId}`),
