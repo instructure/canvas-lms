@@ -81,6 +81,7 @@ describe('api actions', () => {
   beforeAll(() => server.listen())
   afterEach(() => {
     server.resetHandlers()
+    SidebarActions.maybeUpdateTodoSidebar.reset()
   })
   afterAll(() => server.close())
 

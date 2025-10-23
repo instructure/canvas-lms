@@ -69,9 +69,6 @@ class PlannerController < ApplicationController
   # @argument filter [String, "new_activity"]
   #   Only return items that have new or unread activity
   #
-  # @argument filter [String, "incomplete_items"]
-  #   Only return items that are not completed (excludes items with planner_override.marked_complete = true or submitted assignments)
-  #
   # @example_response
   #  [
   #   {
@@ -198,22 +195,20 @@ class PlannerController < ApplicationController
       ungraded_todo_items
     when "all_ungraded_todo_items"
       all_ungraded_todo_items
-    when "incomplete_items"
-      planner_items(incomplete: true)
     else
       planner_items
     end
   end
 
-  def planner_items(incomplete: false)
-    collections = [*assignment_collections(incomplete:),
-                   ungraded_quiz_collection(incomplete:),
-                   planner_note_collection(incomplete:),
-                   page_collection(incomplete:),
-                   ungraded_discussion_collection(incomplete:),
-                   calendar_events_collection(incomplete:),
-                   peer_reviews_collection(incomplete:)]
-    collections << sub_assignment_collection(incomplete:)
+  def planner_items
+    collections = [*assignment_collections,
+                   ungraded_quiz_collection,
+                   planner_note_collection,
+                   page_collection,
+                   ungraded_discussion_collection,
+                   calendar_events_collection,
+                   peer_reviews_collection]
+    collections << sub_assignment_collection if sub_assignment_collection.present?
 
     BookmarkedCollection.merge(*collections)
   end
@@ -245,7 +240,7 @@ class PlannerController < ApplicationController
     BookmarkedCollection.merge(*collections)
   end
 
-  def assignment_collections(incomplete: false)
+  def assignment_collections
     # TODO: For Teacher Planner, we'll need to optimize & add
     # the below `grading` and `moderation` collections. Disabled
     # for now to better optimize the Student Planner.
@@ -254,8 +249,6 @@ class PlannerController < ApplicationController
     # moderation = @user.assignments_needing_moderation(default_opts)
     viewing = @user.assignments_for_student("viewing", **default_opts)
                    .preload(:quiz, :discussion_topic, :wiki_page)
-    viewing = filter_incomplete_items(viewing) if incomplete
-
     scopes = { viewing: }
     # TODO: Add when ready (see above comment)
     # scopes[:grading] = grading if grading
@@ -273,23 +266,17 @@ class PlannerController < ApplicationController
     collections
   end
 
-  def sub_assignment_collection(incomplete: false)
-    scope = @user.assignments_for_student("viewing", is_sub_assignment: true, **default_opts).preload(:discussion_topic)
-    scope = filter_incomplete_items(scope) if incomplete
-
+  def sub_assignment_collection
     item_collection("sub_assignment_viewing",
-                    scope,
+                    @user.assignments_for_student("viewing", is_sub_assignment: true, **default_opts).preload(:discussion_topic),
                     SubAssignment,
                     %i[user_due_date due_at created_at],
                     :id)
   end
 
-  def ungraded_quiz_collection(incomplete: false)
-    scope = @user.ungraded_quizzes(**default_opts)
-    scope = filter_incomplete_items(scope) if incomplete
-
+  def ungraded_quiz_collection
     item_collection("ungraded_quizzes",
-                    scope,
+                    @user.ungraded_quizzes(**default_opts),
                     Quizzes::Quiz,
                     %i[user_due_date due_at created_at],
                     :id)
@@ -340,62 +327,46 @@ class PlannerController < ApplicationController
                     :id)
   end
 
-  def planner_note_collection(incomplete: false)
+  def planner_note_collection
     user = @local_user_ids.presence || @user
     shard = @local_user_ids.present? ? Shard.shard_for(@local_user_ids.first) : @user.shard # TODO: fix to span multiple shards if needed
     course_ids = @course_ids.map { |id| Shard.relative_id_for(id, @user.shard, shard) }
     course_ids += [nil] if @user_ids.present?
-
-    scope = shard.activate { PlannerNote.active.where(user:, todo_date: @start_date..@end_date, course_id: course_ids) }
-    scope = filter_incomplete_items(scope) if incomplete
-
     item_collection("planner_notes",
-                    scope,
+                    shard.activate { PlannerNote.active.where(user:, todo_date: @start_date..@end_date, course_id: course_ids) },
                     PlannerNote,
                     [:todo_date, :created_at],
                     :id)
   end
 
-  def page_collection(incomplete: false)
-    scope = @user.wiki_pages_needing_viewing(**default_opts.except(:include_locked))
-    scope = filter_incomplete_items(scope) if incomplete
-
+  def page_collection
     item_collection("pages",
-                    scope,
+                    @user.wiki_pages_needing_viewing(**default_opts.except(:include_locked)),
                     WikiPage,
                     [:todo_date, :created_at],
                     :id)
   end
 
-  def ungraded_discussion_collection(incomplete: false)
-    scope = @user.discussion_topics_needing_viewing(**default_opts.except(:include_locked))
-    scope = filter_incomplete_items(scope) if incomplete
-
+  def ungraded_discussion_collection
     item_collection("ungraded_discussions",
-                    scope,
+                    @user.discussion_topics_needing_viewing(**default_opts.except(:include_locked)),
                     DiscussionTopic,
                     %i[todo_date posted_at created_at],
                     :id)
   end
 
-  def calendar_events_collection(incomplete: false)
-    scope = CalendarEvent.active.not_hidden.for_user_and_context_codes(@user, @context_codes)
-                         .between(@start_date, @end_date)
-    scope = filter_incomplete_items(scope) if incomplete
-
+  def calendar_events_collection
     item_collection("calendar_events",
-                    scope,
+                    CalendarEvent.active.not_hidden.for_user_and_context_codes(@user, @context_codes)
+                       .between(@start_date, @end_date),
                     CalendarEvent,
                     [:start_at, :created_at],
                     :id)
   end
 
-  def peer_reviews_collection(incomplete: false)
-    scope = @user.submissions_needing_peer_review(**default_opts.except(:include_locked))
-    scope = filter_incomplete_items(scope) if incomplete
-
+  def peer_reviews_collection
     item_collection("peer_reviews",
-                    scope,
+                    @user.submissions_needing_peer_review(**default_opts.except(:include_locked)),
                     AssessmentRequest,
                     [{ submission: { assignment: :peer_reviews_due_at } },
                      { assessor_asset: :cached_due_date },
@@ -574,35 +545,5 @@ class PlannerController < ApplicationController
       scopes << DiscussionTopic.where(todo_date: @start_date..@end_date, context: contexts, assignment_id: nil).active
     end
     scopes
-  end
-
-  def filter_incomplete_items(scope)
-    scope_filtered = scope.where.not(
-      id: PlannerOverride.where(
-        plannable_type: scope.klass.name,
-        user: @user,
-        marked_complete: true
-      ).select(:plannable_id)
-    )
-
-    if [Assignment, SubAssignment].include?(scope.klass)
-      submitted_assignment_ids = Submission.where(user: @user)
-                                           .where.not(submitted_at: nil)
-                                           .where(redo_request: [false, nil])
-                                           .select(:assignment_id)
-
-      incomplete_override_ids = PlannerOverride.where(
-        plannable_type: scope.klass.name,
-        user: @user,
-        marked_complete: false
-      ).select(:plannable_id)
-
-      scope_filtered.where(
-        scope_filtered.arel_table[:id].not_in(submitted_assignment_ids.arel)
-        .or(scope_filtered.arel_table[:id].in(incomplete_override_ids.arel))
-      )
-    else
-      scope_filtered
-    end
   end
 end
