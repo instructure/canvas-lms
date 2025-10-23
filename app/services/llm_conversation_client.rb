@@ -66,7 +66,12 @@ class LLMConversationClient
   TEXT
 
   def self.base_url
-    @base_url ||= Setting.get("llm_conversation_base_url", "http://localhost:3001")
+    url = Setting.get("llm_conversation_base_url", nil)
+    if url.nil?
+      raise LlmConversation::Errors::ConversationError, "llm_conversation_base_url setting is not configured"
+    end
+
+    url
   end
 
   def initialize(current_user: nil, root_account_uuid: nil, facts: "", learning_objectives: "", scenario: "", conversation_id: nil)
