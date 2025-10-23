@@ -75,11 +75,13 @@
         <% if @assignment.grants_right?(@current_user, :manage_assign_to) %>
           <button
             class='btn assign-to-link'
+          >
+          <span class='assign-to-link-resources'
+            translate="no"
             data-assignment-name="<%= @assignment.title %>"
             data-assignment-context-id="<%= @assignment.context_id %>"
             data-assignment-id="<%= @assignment.id %>"
-            data-assignment-points-possible="<%= @assignment.points_possible %>"
-          >
+            data-assignment-points-possible="<%= @assignment.points_possible %>"></span>
             <i class='icon-permissions'></i> <%= t('Assign To') %>
           </button>
         <% end %>
