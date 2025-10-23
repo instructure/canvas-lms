@@ -2552,6 +2552,7 @@ CanvasRails::Application.routes.draw do
         put "#{prefix}/flags/:feature", action: :update
         delete "#{prefix}/flags/:feature", action: :delete
       end
+      post "accounts/:account_id/features/early_access_program", action: :accept_early_access_terms
       get "features/environment", action: :environment
     end
 

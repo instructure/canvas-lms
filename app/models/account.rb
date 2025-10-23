@@ -452,6 +452,7 @@ class Account < ActiveRecord::Base
 
   add_setting :decimal_separator, inheritable: true
   add_setting :thousand_separator, inheritable: true
+  add_setting :early_access_program, boolean: true, default: false, root_only: true, inheritable: true
 
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)

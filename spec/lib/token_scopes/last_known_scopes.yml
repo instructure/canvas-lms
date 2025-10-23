@@ -155,6 +155,8 @@
   path: '/api/v1/accounts/:account_id/external_tools/top_nav_favorites/:id'
 - verb: GET
   path: '/api/v1/accounts/:account_id/features'
+- verb: POST
+  path: '/api/v1/accounts/:account_id/features/early_access_program'
 - verb: GET
   path: '/api/v1/accounts/:account_id/features/enabled'
 - verb: DELETE
