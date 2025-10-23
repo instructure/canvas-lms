@@ -444,4 +444,154 @@ describe('feature_flags::FeatureFlagTable', () => {
       expect(rowsAfterClick[2]).toHaveTextContent('Feature Z')
     })
   })
+
+  describe('early access program', () => {
+    const earlyAccessFeature = {
+      feature: 'early_access_feature',
+      applies_to: 'RootAccount',
+      display_name: 'Early Access Feature',
+      description: 'This is an early access feature',
+      early_access_program: true,
+      feature_flag: {
+        feature: 'early_access_feature',
+        state: 'allowed',
+        transitions: {
+          off: {locked: false},
+          on: {locked: false},
+          allowed_on: {locked: false},
+        },
+        locked: false,
+        hidden: false,
+        parent_state: 'allowed',
+      },
+      type: 'setting',
+    }
+
+    beforeEach(() => {
+      fakeEnv.setup({
+        CONTEXT_BASE_URL: '/accounts/1',
+        EARLY_ACCESS_PROGRAM: false, // Start with terms not accepted
+        FEATURES: {
+          feature_flag_ui_sorting: true,
+        },
+      })
+    })
+
+    afterEach(() => {
+      fakeEnv.teardown()
+      fetchMock.restore()
+    })
+
+    it('shows early access modal when enabling early access feature for first time', async () => {
+      const eapRoute = `/api/v1${ENV.CONTEXT_BASE_URL}/features/early_access_program`
+      const flagRoute = `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/early_access_feature`
+
+      fetchMock.postOnce(eapRoute, {early_access_program: true})
+      fetchMock.putOnce(flagRoute, {
+        ...earlyAccessFeature.feature_flag,
+        state: 'allowed_on',
+      })
+
+      const {getByText, getByTestId, queryByText} = wrapper([earlyAccessFeature], title)
+
+      const row = getByTestId('ff-table-row')
+      const button = row.querySelectorAll('button')[1]
+      await userEvent.click(button)
+
+      await userEvent.click(getByText('Enabled'))
+
+      await waitFor(() => {
+        expect(getByText('Early Access Program Terms and Conditions')).toBeInTheDocument()
+      })
+
+      const acceptButton = getByTestId('eap-accept-button')
+      await userEvent.click(acceptButton)
+
+      await waitFor(() => {
+        expect(fetchMock.called(eapRoute)).toBe(true)
+        expect(fetchMock.called(flagRoute)).toBe(true)
+      })
+
+      await waitFor(() => {
+        expect(queryByText('Early Access Program Terms and Conditions')).not.toBeInTheDocument()
+      })
+    })
+
+    it('does not change feature flag when user cancels early access modal', async () => {
+      const flagRoute = `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/early_access_feature`
+
+      const {getByText, getByTestId, queryByText} = wrapper([earlyAccessFeature], title)
+
+      const row = getByTestId('ff-table-row')
+      const button = row.querySelectorAll('button')[1]
+      await userEvent.click(button)
+      await userEvent.click(getByText('Enabled'))
+
+      await waitFor(() => {
+        expect(getByText('Early Access Program Terms and Conditions')).toBeInTheDocument()
+      })
+
+      const cancelButton = getByTestId('eap-cancel-button')
+      await userEvent.click(cancelButton)
+
+      await waitFor(() => {
+        expect(queryByText('Early Access Program Terms and Conditions')).not.toBeInTheDocument()
+      })
+
+      expect(fetchMock.called(flagRoute)).toBe(false)
+    })
+
+    it('skips modal when early access terms already accepted', async () => {
+      fakeEnv.setup({
+        CONTEXT_BASE_URL: '/accounts/1',
+        EARLY_ACCESS_PROGRAM: true,
+        FEATURES: {
+          feature_flag_ui_sorting: true,
+        },
+      })
+
+      const flagRoute = `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/early_access_feature`
+
+      fetchMock.putOnce(flagRoute, {
+        ...earlyAccessFeature.feature_flag,
+        state: 'allowed_on',
+      })
+
+      const {getByText, getByTestId, queryByText} = wrapper([earlyAccessFeature], title)
+
+      const row = getByTestId('ff-table-row')
+      const button = row.querySelectorAll('button')[1]
+      await userEvent.click(button)
+      await userEvent.click(getByText('Enabled'))
+
+      expect(queryByText('Early Access Program Terms and Conditions')).not.toBeInTheDocument()
+
+      await waitFor(() => {
+        expect(fetchMock.called(flagRoute)).toBe(true)
+      })
+    })
+
+    it('does not show modal for non-early access features', async () => {
+      const regularFeature = {...earlyAccessFeature, early_access_program: false}
+      const flagRoute = `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/early_access_feature`
+
+      fetchMock.putOnce(flagRoute, {
+        ...regularFeature.feature_flag,
+        state: 'allowed_on',
+      })
+
+      const {getByText, getByTestId, queryByText} = wrapper([regularFeature], title)
+
+      const row = getByTestId('ff-table-row')
+      const button = row.querySelectorAll('button')[1]
+      await userEvent.click(button)
+      await userEvent.click(getByText('Enabled'))
+
+      expect(queryByText('Early Access Program Terms and Conditions')).not.toBeInTheDocument()
+
+      await waitFor(() => {
+        expect(fetchMock.called(flagRoute)).toBe(true)
+      })
+    })
+  })
 })
