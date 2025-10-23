@@ -535,11 +535,21 @@ module Api::V1::Assignment
   def extract_peer_review_params(assignment)
     return unless assignment.peer_reviews?
 
-    if assignment.automatic_peer_reviews?
-      assignment.slice(:peer_review_count, :peer_reviews_assign_at, :intra_group_peer_reviews)
-    elsif assignment.context.feature_enabled?(:peer_review_allocation)
-      assignment.slice(:peer_review_count, :peer_review_submission_required, :peer_review_across_sections)
+    context = assignment.context
+    automatic_peer_reviews = assignment.automatic_peer_reviews?
+    allocation_enabled = context.feature_enabled?(:peer_review_allocation)
+    grading_enabled = context.feature_enabled?(:peer_review_grading)
+
+    return unless automatic_peer_reviews || allocation_enabled || grading_enabled
+
+    attrs = [:peer_review_count]
+    if automatic_peer_reviews
+      attrs += [:peer_reviews_assign_at, :intra_group_peer_reviews]
+    elsif allocation_enabled
+      attrs += [:peer_review_submission_required, :peer_review_across_sections]
     end
+
+    assignment.slice(*attrs)
   end
 
   def turnitin_settings_json(assignment)

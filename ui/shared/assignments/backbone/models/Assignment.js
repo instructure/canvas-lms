@@ -706,6 +706,10 @@ Assignment.prototype.intraGroupPeerReviews = function () {
   return this.get('intra_group_peer_reviews')
 }
 
+Assignment.prototype.peerReviewSubAssignment = function () {
+  return this.get('peer_review_sub_assignment')
+}
+
 Assignment.prototype.notifyOfUpdate = function (notifyOfUpdateBoolean) {
   if (!(arguments.length > 0)) {
     return this.get('notify_of_update')
