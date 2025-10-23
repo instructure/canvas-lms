@@ -42,13 +42,30 @@ export const {
 export const ENOUGH_ITEMS_TO_SHOW_LIST = 7
 export const DESIRED_ITEMS_TO_HAVE_LOADED = 14
 
+function incompleteItems(state) {
+  return state.sidebar.items.filter(item => !item.completed)
+}
+
+function enoughSidebarItemsAreLoaded(state) {
+  return incompleteItems(state).length >= ENOUGH_ITEMS_TO_SHOW_LIST
+}
+
+function desiredSidebarItemsAreLoaded(state) {
+  return incompleteItems(state).length >= DESIRED_ITEMS_TO_HAVE_LOADED
+}
+
 function handleSidebarLoadingResponse(response, dispatch, getState) {
   const nextUrl = findNextLink(response)
   const transformedItems = response.data.map(item =>
     transformApiToInternalItem(item, getState().courses, getState().groups, getState().timeZone),
   )
   dispatch(sidebarItemsLoaded({items: transformedItems, nextUrl}))
-  dispatch(sidebarEnoughItemsLoaded())
+  if (!nextUrl || enoughSidebarItemsAreLoaded(getState())) {
+    dispatch(sidebarEnoughItemsLoaded())
+  }
+  if (nextUrl && !desiredSidebarItemsAreLoaded(getState())) {
+    return dispatch(sidebarLoadNextItems())
+  }
 }
 
 export const sidebarLoadNextItems = identifiableThunk(() => (dispatch, getState) => {
@@ -56,8 +73,6 @@ export const sidebarLoadNextItems = identifiableThunk(() => (dispatch, getState)
     dispatch(sidebarItemsLoading())
     const params = {
       order: 'asc',
-      filter: 'incomplete_items',
-      per_page: 14,
     }
     if (getState().sidebar.course_id) {
       params.context_codes = [
@@ -86,8 +101,6 @@ export const sidebarLoadInitialItems = (currentMoment, course_id) => (dispatch, 
       const params = {
         start_date: firstMomentDate.toISOString(),
         order: 'asc',
-        filter: 'incomplete_items',
-        per_page: 14,
       }
       if (course_id) {
         params.context_codes = [`course_${course_id}`, `user_${ENV.current_user_id}`]
@@ -109,3 +122,17 @@ export const sidebarLoadInitialItems = (currentMoment, course_id) => (dispatch, 
       dispatch(sidebarItemsLoadingFailed(response))
     })
 }
+
+export const maybeUpdateTodoSidebar = identifiableThunk(
+  updateItemPromise => (dispatch, getState) => {
+    if (getState().sidebar.nextUrl == null) {
+      return updateItemPromise
+    }
+    return updateItemPromise.then(payload => {
+      if (!desiredSidebarItemsAreLoaded(getState())) {
+        dispatch(sidebarLoadNextItems())
+      }
+      return payload
+    })
+  },
+)
