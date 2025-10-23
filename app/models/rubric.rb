@@ -889,7 +889,11 @@ class Rubric < ActiveRecord::Base
   end
 
   def learning_outcome_ids_from_results
-    learning_outcome_results.select(:learning_outcome_id).distinct.pluck(:learning_outcome_id)
+    if learning_outcome_alignments.exists?
+      learning_outcome_results.select(:learning_outcome_id).distinct.pluck(:learning_outcome_id)
+    else
+      []
+    end
   end
 
   def rubric_assignment_associations?
