@@ -13155,11 +13155,13 @@ el:
   remove_media_comment_f4afdb4b: "Αφαίρεση πολυμεσιτικού σχόλιου"
   remove_name_as_leader_3e03780a: "Αφαίρεση %{name} από αρχηγό"
   remove_name_from_group_487cce74: "Αφαίρεση %{name} από την ομάδα"
+  remove_never_drop_rule_b9d08c64: "Αφαίρεση του κανόνα \"να υπολογίζεται πάντα\""
   remove_recipient_name_a6b83cef: "Αφαίρεση παραλήπτη %{name}"
   remove_row_c198da5a: "Αφαίρεση σειράς"
   remove_student_from_recipients_4b206e35: "Αφαίρεση του/της %{student} από τους παραλήπτες"
   remove_text_8e485c41: "Αφαίρεση %{text}"
   remove_these_dates_48453a81: "Αφαίρεση αυτων των ημερομηνιών"
+  remove_unsaved_never_drop_rule_bde18827: "Αφαίρεση του μη αποθηκευμένου κανόνα \"να υπολογίζεται πάντα\""
   remove_user_from_section_5556f465: "Αφαίρεση Χρήστη από τον Τομέα"
   rename_45608f54: Μετανόμασε
   rename_this_page_554f0583: "Μετονομασία Σελίδας"
