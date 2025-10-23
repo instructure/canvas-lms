@@ -51,11 +51,48 @@ describe LLMConversationClient do
     )
   end
 
-  before do
-    allow(described_class).to receive(:base_url).and_return("http://localhost:3001")
+  describe ".base_url" do
+    it "raises error when setting is not configured" do
+      expect { described_class.base_url }.to raise_error(
+        LlmConversation::Errors::ConversationError,
+        "llm_conversation_base_url setting is not configured"
+      )
+    end
+
+    it "returns the configured setting value" do
+      Setting.set("llm_conversation_base_url", "https://llm-conversation.example.com")
+      expect(described_class.base_url).to eq("https://llm-conversation.example.com")
+    end
+
+    it "dynamically reflects setting changes without caching" do
+      Setting.set("llm_conversation_base_url", "https://url1.example.com")
+      expect(described_class.base_url).to eq("https://url1.example.com")
+
+      Setting.set("llm_conversation_base_url", "https://url2.example.com")
+      expect(described_class.base_url).to eq("https://url2.example.com")
+    end
+
+    it "does not cache the value in class instance variables" do
+      # Set initial value
+      Setting.set("llm_conversation_base_url", "https://initial.example.com")
+      described_class.base_url
+
+      # Change the setting
+      Setting.set("llm_conversation_base_url", "https://changed.example.com")
+
+      # Verify it doesn't use cached value from @base_url or similar
+      expect(described_class.base_url).to eq("https://changed.example.com")
+
+      # Verify no instance variables are being set on the class
+      expect(described_class.instance_variables).not_to include(:@base_url)
+    end
   end
 
   describe "#starting_messages" do
+    before do
+      allow(described_class).to receive(:base_url).and_return("http://localhost:3001")
+    end
+
     let(:create_response) do
       {
         "success" => true,
@@ -104,6 +141,10 @@ describe LLMConversationClient do
   end
 
   describe "#continue_conversation" do
+    before do
+      allow(described_class).to receive(:base_url).and_return("http://localhost:3001")
+    end
+
     let(:messages) do
       [
         { role: "User", text: "Initial message" },
@@ -154,6 +195,10 @@ describe LLMConversationClient do
   end
 
   describe "#messages" do
+    before do
+      allow(described_class).to receive(:base_url).and_return("http://localhost:3001")
+    end
+
     let(:messages_response) do
       {
         "success" => true,
