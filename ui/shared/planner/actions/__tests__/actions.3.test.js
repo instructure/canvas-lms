@@ -85,6 +85,7 @@ describe('api actions', () => {
   beforeAll(() => server.listen())
   afterEach(() => {
     server.resetHandlers()
+    SidebarActions.maybeUpdateTodoSidebar.reset()
   })
   afterAll(() => server.close())
 
@@ -112,6 +113,8 @@ describe('api actions', () => {
         payload: {item: savingItem, isNewItem: false, wasToggled: true},
       })
       expect(mockDispatch).toHaveBeenCalledWith({type: 'SAVED_PLANNER_ITEM', payload: savePromise})
+      expect(mockDispatch).toHaveBeenCalledWith(SidebarActions.maybeUpdateTodoSidebar)
+      expect(SidebarActions.maybeUpdateTodoSidebar.args()).toEqual([savePromise])
     })
 
     it('updates marked_complete and sends override data in the request', async () => {
