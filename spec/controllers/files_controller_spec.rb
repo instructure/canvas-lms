@@ -2445,6 +2445,24 @@ describe FilesController do
               expect(claims["jti"]).not_to be_present
             end
           end
+
+          context "with sharding" do
+            specs_require_sharding
+
+            it "works with cross-shard thumbnails" do
+              @shard1.activate do
+                @shard1_user = user_factory(active_user: true)
+                @shard1_att = attachment_model(context: @shard1_user, uploaded_data: stub_png_data, content_type: "image/png", instfs_uuid: "1234")
+              end
+
+              user_session(@shard1_user)
+              @shard1_user.avatar_image = { "url" => thumbnail_image_plain_url(@shard1_att), "type" => "attachment" }
+              @shard1_user.save!
+              token = get("image_thumbnail", params: { id: @shard1_att.id, no_cache: true }).location.split("?token=")[1]
+              claims = Canvas::Security.decode_jwt(token, [InstFS.jwt_secret])
+              expect(claims["jti"]).not_to be_present
+            end
+          end
         end
 
         it "returns a proper jwt token" do
