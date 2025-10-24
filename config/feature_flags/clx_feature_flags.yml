@@ -97,3 +97,10 @@ horizon_bulk_api_permission:
   display_name: "Canvas Career: Manage Bulk API & Permission"
   description: |-
     Enables the ability to manage bulk API and permission settings in Canvas Career.
+horizon_auto_content_ingestion:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Auto Content Ingestion"
+  description: |-
+    Automatically ingests course files and wiki pages into Pine when a course becomes a Canvas Career course.

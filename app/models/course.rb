@@ -338,6 +338,7 @@ class Course < ActiveRecord::Base
   before_save :set_self_enrollment_code
   before_save :validate_license
   before_save :set_horizon_course, if: -> { account_id_changed? || new_record? }
+  after_save :handle_horizon_activation, if: :just_became_horizon_course?
   after_save :update_final_scores_on_weighting_scheme_change
   after_save :update_account_associations_if_changed
   after_save :update_lti_context_controls_if_necessary
@@ -1563,6 +1564,16 @@ class Course < ActiveRecord::Base
     true
   end
 
+  def just_became_horizon_course?
+    saved_change_to_horizon_course? && horizon_course?
+  end
+
+  def handle_horizon_activation
+    return unless root_account.feature_enabled?(:horizon_auto_content_ingestion)
+
+    delay(n_strand: ["horizon_content_discovery", global_root_account_id], singleton: "horizon_content_discovery:#{global_id}").ingest_horizon_content
+  end
+
   def update_cached_due_dates
     if saved_change_to_enrollment_term_id?
       recompute_student_scores
@@ -1623,6 +1634,32 @@ class Course < ActiveRecord::Base
       grading_period_id: opts[:grading_period_id],
       update_all_grading_period_scores: opts.fetch(:update_all_grading_period_scores, true)
     )
+  end
+
+  def ingest_horizon_content
+    return unless horizon_course?
+
+    files = attachments
+            .active
+            .by_content_types(PineClient.allowed_attachment_content_types)
+
+    pages = wiki_pages.active
+
+    files.find_each do |file|
+      file.delay(
+        n_strand: ["horizon_file_ingestion", global_root_account_id],
+        singleton: "horizon_file_ingestion:#{global_id}:#{file.id}",
+        max_attempts: 3
+      ).ingest_to_pine
+    end
+
+    pages.find_each do |page|
+      page.delay(
+        n_strand: ["horizon_wiki_ingestion", global_root_account_id],
+        singleton: "horizon_wiki_ingestion:#{global_id}:#{page.id}",
+        max_attempts: 3
+      ).ingest_to_pine
+    end
   end
 
   def handle_syllabus_changes_for_master_migration

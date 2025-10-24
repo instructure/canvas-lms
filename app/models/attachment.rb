@@ -2514,6 +2514,36 @@ class Attachment < ActiveRecord::Base
     end
   end
 
+  def ingest_to_pine
+    return unless context.is_a?(Course) && context.root_account.present?
+
+    url = public_download_url
+
+    metadata = {
+      course_id: context.id.to_s,
+      filename:,
+      content_type:
+    }
+
+    # PineClient requires a user object with uuid and global_id, but we don't have a user in this context
+    # and the action is more of a system-initiated action than a user-initiated action
+    null_user = Struct.new(:uuid, :global_id, keyword_init: true).new(uuid: nil, global_id: nil)
+
+    PineClient.ingest_url(
+      url:,
+      metadata:,
+      source: "canvas",
+      source_id: id.to_s,
+      source_type: "attachment",
+      feature_slug: "horizon-content-ingestion",
+      root_account_uuid: context.root_account.uuid,
+      current_user: null_user
+    )
+  rescue => e
+    Rails.logger.error("Failed to ingest attachment #{id} for context #{context.class.name}:#{context.id}: #{e.message}")
+    raise
+  end
+
   def self.migrate_attachments(from_context, to_context, scope = nil)
     from_attachments = scope
     from_attachments ||= from_context.shard.activate do
