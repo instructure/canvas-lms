@@ -92,6 +92,7 @@ development:
 #      twilio_creds:
 #        account_sid: <sid>
 #        auth_token: <token>
+#      llm_conversation_bearer_token: <bearer token here>
 test:
   'sts/testaccount/sts/canvas-shards-lookupper-test':
     access_key: 'fake-access-key'
