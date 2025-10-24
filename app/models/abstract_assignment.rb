@@ -279,7 +279,7 @@ class AbstractAssignment < ActiveRecord::Base
     self.group_category_id = nil
     self.rubric_association = nil
     self.submission_types = "online_text_entry" unless (submission_types_array - HORIZON_SUBMISSION_TYPES).empty?
-    self.workflow_state = "unpublished" if context_module_tags.none? { |t| t.tag_type == "context_module" && t.context_module&.published? }
+    self.workflow_state = "unpublished" if workflow_state == "published" && context_module_tags.none? { |t| t.tag_type == "context_module" && t.context_module&.published? }
   end
 
   def self.html_fields
