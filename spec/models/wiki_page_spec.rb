@@ -1630,4 +1630,83 @@ describe WikiPage do
     let(:valid_attributes) { { title: "Test Page", course: } }
     let(:relevant_attributes_for_scan) { { body: "<p>Lorem ipsum</p>" } }
   end
+
+  describe "#ingest_to_pine" do
+    let(:course) { Course.create! }
+    let(:wiki_page) { course.wiki_pages.create!(title: "Test Page", body: "<p>Test content</p>") }
+    let(:pine_client_mock) { double("PineClient") }
+
+    before do
+      allow(pine_client_mock).to receive_messages(enabled?: true, ingest_html: true)
+      stub_const("PineClient", pine_client_mock)
+    end
+
+    it "calls PineClient.ingest_html with correct parameters" do
+      expect(pine_client_mock).to receive(:ingest_html) do |**args|
+        expect(args[:html_content]).to eq("<p>Test content</p>")
+        expect(args[:metadata]).to eq({
+                                        course_id: course.id.to_s,
+                                        title: "Test Page"
+                                      })
+        expect(args[:source]).to eq("canvas")
+        expect(args[:source_id]).to eq(wiki_page.id.to_s)
+        expect(args[:source_type]).to eq("wiki_page")
+        expect(args[:feature_slug]).to eq("horizon-content-ingestion")
+        expect(args[:root_account_uuid]).to eq(course.root_account.uuid)
+        expect(args[:current_user].uuid).to be_nil
+        expect(args[:current_user].global_id).to be_nil
+        true
+      end
+
+      wiki_page.ingest_to_pine
+    end
+
+    it "does not ingest wiki pages with nil body" do
+      empty_page = course.wiki_pages.create!(title: "Empty", body: nil)
+
+      expect(pine_client_mock).not_to receive(:ingest_html)
+
+      empty_page.ingest_to_pine
+    end
+
+    it "does not ingest wiki pages with blank body" do
+      blank_page = course.wiki_pages.create!(title: "Blank", body: "")
+
+      expect(pine_client_mock).not_to receive(:ingest_html)
+
+      blank_page.ingest_to_pine
+    end
+
+    it "does not ingest wiki pages with whitespace-only body" do
+      whitespace_page = course.wiki_pages.create!(title: "Whitespace", body: "   ")
+
+      expect(pine_client_mock).not_to receive(:ingest_html)
+
+      whitespace_page.ingest_to_pine
+    end
+
+    it "does not ingest deleted wiki pages" do
+      wiki_page.destroy
+
+      expect(pine_client_mock).not_to receive(:ingest_html)
+
+      wiki_page.ingest_to_pine
+    end
+
+    it "logs error and re-raises on failure" do
+      expect(pine_client_mock).to receive(:ingest_html).and_raise(StandardError.new("API Error"))
+
+      expect(Rails.logger).to receive(:error).with(/Failed to ingest wiki page/)
+      expect { wiki_page.ingest_to_pine }.to raise_error(StandardError, "API Error")
+    end
+
+    it "does not ingest if context is not a Course" do
+      group = group_model(context: course)
+      group_page = group.wiki_pages.create!(title: "Group Page", body: "Content")
+
+      expect(pine_client_mock).not_to receive(:ingest_html)
+
+      group_page.ingest_to_pine
+    end
+  end
 end
