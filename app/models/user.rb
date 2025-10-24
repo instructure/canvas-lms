@@ -3038,7 +3038,7 @@ class User < ActiveRecord::Base
       end
 
       cc_rows = convert_global_id_rows(
-        Enrollment.joins(:course)
+        Enrollment.joins(:course, :enrollment_state)
             .where(User.enrollment_conditions(:completed))
             .where(user_id: users)
             .distinct.pluck(:user_id, :course_id)

@@ -37,7 +37,7 @@ module EpubExports
     private
 
     def courses_not_including_epub_exports
-      @_courses_not_including_epub_exports ||= Course.joins(:enrollments)
+      @_courses_not_including_epub_exports ||= Course.joins(enrollments: :enrollment_state)
                                                      .where(Enrollment::QueryBuilder.new(:current_and_concluded).conditions)
                                                      .where(
                                                        "enrollments.type IN (?) AND enrollments.user_id = ?",
