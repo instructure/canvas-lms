@@ -2134,6 +2134,7 @@ he:
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "כל שדות התאריך חייבים בתוכן בפורמט הנכון"
   all_day_fb42c4fc: "כל היום"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "האם הכל מוכן? הגיע המועד לפרסום הקורס! יש להקליק על הכפתור שבהמשך כדי להפוך את הקורס לרשמי!. הפרסום יאפשר למשתמשים להתחיל ולהשתתף בקורס. "
+  all_grades_for_students_in_this_course_will_no_lon_a32bf5d4: "כל הציונים של תלמידים בקורס זה לא יהיו גלויים יותר. ניתן לאחזר את הציונים מאוחר יותר בעזרת החזרת הרישום הצולב של הקורס, אך בינתיים הציונים לתלמידים אלו יגיעו מהקורס המקורי."
   all_grading_period_sets_must_have_a_title_799538f: "נדרשת כותרת לכל תקופות ההערכה"
   all_grading_periods_77974940: "כל תקופת חישוב הציונים"
   all_grading_periods_must_have_a_title_a1a38d87: "כל תקופות חישוב הציונים צריכות לקבל כותרת"
@@ -2443,6 +2444,7 @@ he:
   are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496: "האם בטוחים שרוצים לבטל? שינויים שבוצעו לא ישמרו"
   are_you_sure_you_want_to_cancel_your_appointment_w_dbbd27eb: "בטוחים שרוצים לבטל את הפגישה עם %{name}?"
   are_you_sure_you_want_to_copy_to_the_final_mark_th_28a7e7b3: "בטוח/ה שרוצה להעתיק אל הרישום הסופי? הדבר ידרוס את הרישום הקיים."
+  are_you_sure_you_want_to_de_cross_list_this_sectio_fae8a399: "בטוח/ה שרוצה לבטל את הרישום הצולב של הקבצה זו?"
   are_you_sure_you_want_to_deactivate_this_user_they_3fdaab79: "האם בטוחים שרוצים להשבית משתמש זה? הדבר ימנע מהתלמיד/ה השתתפות בקורס כל עוד נמצא/ת במצב לא פעיל."
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
     many: "בטוח/ה שרוצה לבטל את %{count} פריטי החשבון האלה?"
@@ -6932,6 +6934,9 @@ he:
   day_9d999bec: יום
   day_s_7cc1231f: יום/ימים
   days_late_a3a721b0: איחורים
+  de_cross_list_this_section_6f7b5984: "ביטול רישום צולב של הקבצה זו"
+  de_cross_list_this_section_774a827c: "ניתוק רישום צולב מהקבצה זו"
+  de_cross_listing_section_c2ee371: "ביטול רישום צולב של הקבצה..."
   deactivate_this_key_3e79a2b5: "השבת מפתח זה"
   deactivate_user_86c09036: "השבתת תלמיד"
   debugging_f98fcd74: מדאבג
@@ -17592,6 +17597,7 @@ he:
   section_sis_94511bcd: "הקבצה במערכת הבית ספרית SIS"
   section_sis_id_6f989834: "מזהה הקבצה במערכת הבית ספרית"
   section_starts_at_65eaed1: "ההקבצה מתחילה ב"
+  section_successfully_de_cross_listed_df3b64e: "רישום צולב של ההקבצה בוטל בהצלחה"
   sections: 
     section_created: "ההקבצה נוצרה בהצלחה"
     section_creation_failed: "יצירת הקבצה נכשלה"
