@@ -22,22 +22,22 @@ import {Heading} from '@instructure/ui-heading'
 import {IconArrowOpenDownSolid, IconArrowOpenUpSolid} from '@instructure/ui-icons'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {View} from '@instructure/ui-view'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {useFormatDateTime, useResubmitLtiAssetReports} from '../../dependenciesShims'
+import {
+  type LtiAssetReportGroup,
+  reportsForAssetsByProcessors,
+} from '../lib/reportsForAssetsByProcessors'
+import {buildAPDisplayTitle} from '../lib/util'
+import {
+  type ResubmitLtiAssetReportsParams,
+  resubmitPath,
+} from '../mutations/resubmitLtiAssetReports'
+import type {LtiAssetProcessor} from '../types/LtiAssetProcessors'
+import type {AssetReportCompatibleSubmissionType, LtiAssetReport} from '../types/LtiAssetReports'
 import {LtiAssetReportsCard, LtiAssetReportsMissingReportsCard} from './LtiAssetReportsCard'
 import {ToolIconOrDefault} from './ToolIconOrDefault'
 import TruncateWithTooltip from './TruncateWithTooltip'
-import {buildAPDisplayTitle} from '../lib/util'
-import type {AssetReportCompatibleSubmissionType, LtiAssetReport} from '../types/LtiAssetReports'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import {useResubmitLtiAssetReports} from '../../dependenciesShims'
-import {
-  reportsForAssetsByProcessors,
-  type LtiAssetReportGroup,
-} from '../lib/reportsForAssetsByProcessors'
-import type {LtiAssetProcessor} from '../types/LtiAssetProcessors'
-import {
-  resubmitPath,
-  type ResubmitLtiAssetReportsParams,
-} from '../mutations/resubmitLtiAssetReports'
 
 const I18n = createI18nScope('lti_asset_processor')
 
@@ -158,8 +158,18 @@ export function LtiAssetReports({
   submissionType,
   showDocumentDisplayName,
 }: LtiAssetReportsProps): JSX.Element | null {
-  const assetSelector = {submissionType, attachments: attachments || [], attempt}
-  const groupedReports = reportsForAssetsByProcessors(reports, assetProcessors, assetSelector)
+  const assetSelector = {
+    submissionType,
+    attachments: attachments || [],
+    attempt,
+  }
+  const formatDateTime = useFormatDateTime()
+  const groupedReports = reportsForAssetsByProcessors(
+    reports,
+    assetProcessors,
+    assetSelector,
+    formatDateTime,
+  )
 
   return (
     <View as="div" padding="small none none none">

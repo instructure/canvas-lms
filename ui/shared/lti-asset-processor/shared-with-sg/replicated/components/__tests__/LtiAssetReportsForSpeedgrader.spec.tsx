@@ -21,11 +21,10 @@ import {
   mockUseLtiAssetProcessors,
   mockUseLtiAssetReports,
 } from '../../../__tests__/mockedDependenciesShims'
-
-import {describe, expect, it} from '../../../__tests__/testPlatformShims'
 import {renderComponent} from '../../../__tests__/renderingShims'
-import {defaultGetLtiAssetProcessorsResult} from '../../__fixtures__/default/ltiAssetProcessors'
+import {describe, expect, it} from '../../../__tests__/testPlatformShims'
 import {useLtiAssetProcessors, useLtiAssetReports} from '../../../dependenciesShims'
+import {defaultGetLtiAssetProcessorsResult} from '../../__fixtures__/default/ltiAssetProcessors'
 import {defaultGetLtiAssetReportsResult} from '../../__fixtures__/default/ltiAssetReports'
 import {LtiAssetReportsForSpeedgrader} from '../LtiAssetReportsForSpeedgrader'
 
@@ -40,11 +39,11 @@ describe('LtiAssetReportsForSpeedgrader', () => {
 
     const component = (
       <LtiAssetReportsForSpeedgrader
-        assignmentId={'123'}
+        assignmentId="123"
         attempt={1}
-        submissionType={'online_upload'}
+        submissionType="online_upload"
         attachments={[{_id: '1234', displayName: 'test.txt'}]}
-        studentUserId={'456'}
+        studentUserId="456"
         studentAnonymousId={null}
       />
     )

@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {LtiAssetReports} from './LtiAssetReports'
 import {useLtiAssetProcessorsAndReportsForSpeedgrader} from '../hooks/useLtiAssetProcessorsAndReportsForSpeedgrader'
 import {
   extractStudentUserIdOrAnonymousId,
   type StudentUserIdOrAnonymousId,
 } from '../queries/getLtiAssetReports'
+import {LtiAssetReports} from './LtiAssetReports'
 
 /**
  * LtiAssetReports component is also used for Student View / Gradebook page.

@@ -16,19 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AssetReportModal} from '../AssetReportModal'
 import {render, screen} from '@testing-library/react'
-import {
-  LtiAssetProcessor,
-  LtiAssetReportForStudent,
-} from '@canvas/lti-asset-processor/model/LtiAssetReport'
+import type {LtiAssetProcessor} from '../../types/LtiAssetProcessors'
+import type {LtiAssetReport} from '../../types/LtiAssetReports'
+import {AssetReportModal} from '../AssetReportModal'
 
 describe('AssetReportModal', () => {
   const createBaseReport = (
     priority: number = 0,
-    assetOverrides: Partial<LtiAssetReportForStudent['asset']> = {},
-    overrides: Partial<LtiAssetReportForStudent> = {},
-  ): LtiAssetReportForStudent => ({
+    assetOverrides: Partial<LtiAssetReport['asset']> = {},
+    overrides: Partial<LtiAssetReport> = {},
+  ): LtiAssetReport => ({
     _id: '123',
     priority,
     resubmitAvailable: false,
@@ -44,7 +42,6 @@ describe('AssetReportModal', () => {
     title: null,
     asset: {
       attachmentId: null,
-      attachmentName: null,
       submissionAttempt: null,
       ...assetOverrides,
     },
@@ -54,14 +51,12 @@ describe('AssetReportModal', () => {
   const createUploadReport = (
     priority: number = 0,
     assetAttachmentId: string = '10',
-    assetAttachmentName: string = 'test.pdf',
-    overrides: Partial<LtiAssetReportForStudent> = {},
-  ): LtiAssetReportForStudent =>
+    overrides: Partial<LtiAssetReport> = {},
+  ): LtiAssetReport =>
     createBaseReport(
       priority,
       {
         attachmentId: assetAttachmentId,
-        attachmentName: assetAttachmentName,
       },
       overrides,
     )
@@ -101,8 +96,8 @@ describe('AssetReportModal', () => {
 
   it('filters asset processors to only include those with reports', () => {
     const reports = [
-      createUploadReport(0, '10', 'test.pdf', {processorId: '1'}),
-      createUploadReport(1, '10', 'test.pdf', {processorId: '2'}),
+      createUploadReport(0, '10', {processorId: '1'}),
+      createUploadReport(1, '10', {processorId: '2'}),
     ]
 
     const attachments = [{_id: '10', displayName: 'test.pdf'}]

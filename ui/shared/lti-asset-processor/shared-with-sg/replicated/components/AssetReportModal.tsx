@@ -16,16 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Modal} from '@instructure/ui-modal'
-import {Heading} from '@instructure/ui-heading'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Flex, FlexItem} from '@instructure/ui-flex'
+import {Heading} from '@instructure/ui-heading'
+// biome-ignore lint/style/noRestrictedImports: the modal in SG's instui-bindings is incompatible with all three of Canvas's modals and doesn't permit pendo tracking
+import {Modal} from '@instructure/ui-modal'
 import {Text} from '@instructure/ui-text'
-import TruncateWithTooltip from '@canvas/lti-apps/components/common/TruncateWithTooltip'
-import LtiAssetReportStatus from './LtiAssetReportStatus'
 import {View} from '@instructure/ui-view'
-import {LtiAssetReports, type LtiAssetReportsProps} from './LtiAssetReports'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import LtiAssetReportStatus from './LtiAssetReportStatus'
+import {LtiAssetReports, type LtiAssetReportsProps} from './LtiAssetReports'
+import TruncateWithTooltip from './TruncateWithTooltip'
 
 export type AssetReportModalProps = LtiAssetReportsProps & {
   modalTitle: string
@@ -46,7 +47,7 @@ export function AssetReportModal({
   showDocumentDisplayName,
   studentIdForResubmission,
   submissionType,
-}: AssetReportModalProps) {
+}: AssetReportModalProps): JSX.Element {
   const assetProcessorsWithReports = assetProcessors.filter(assetProcessor =>
     reports.some(report => report.processorId === assetProcessor._id),
   )
