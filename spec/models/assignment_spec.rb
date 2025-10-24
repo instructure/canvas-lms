@@ -12985,6 +12985,13 @@ describe Assignment do
       expect(@assignment.peer_review_count).to eq 0
       expect(@assignment.automatic_peer_reviews).to be false
     end
+
+    it "allows assignment deletion" do
+      @assignment = assignment_model(course: @course)
+      @assignment.destroy
+      expect(@assignment.workflow_state).to eq("deleted")
+      expect(@assignment.reload.workflow_state).to eq("deleted")
+    end
   end
 
   describe "rubric_self_assessment_enabled?" do
