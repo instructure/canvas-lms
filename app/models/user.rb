@@ -228,6 +228,7 @@ class User < ActiveRecord::Base
   has_many :asset_user_accesses
   has_many :wiki_pages
   has_many :announcements
+  has_many :discussion_topics, -> { where(type: nil) }
 
   has_one :profile, class_name: "UserProfile"
 
