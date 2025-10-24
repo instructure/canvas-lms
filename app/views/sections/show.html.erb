@@ -25,11 +25,13 @@
       <% if can_do(@section.nonxlist_course, @current_user, :manage_sections_edit) %>
         <div
           id="uncrosslist_link_button_container"
-          data-course-name="<%= @section.nonxlist_course.name %>"
-          data-enrollments-count="<%= @student_enrollments_count %>"
-          data-section-id="<%= @section.id %>"
-          data-course-id="<%= @section.course.id %>"
-          data-nonxlist-course-id="<%= @section.nonxlist_course.id %>"
+          data-props="<%= {
+            courseName: @section.nonxlist_course.name,
+            enrollmentsCount: @student_enrollments_count,
+            sectionId: @section.id.to_s,
+            courseId: @section.course.id.to_s,
+            nonxlistCourseId: @section.nonxlist_course.id.to_s
+          }.to_json %>"
         ></div>
       <% end %>
       <a href="#" class="btn button-sidebar-wide crosslist_link"><i class="icon-off"></i> <%= t('buttons.recrosslist_section', 'Re-Cross-List this Section') %></a>

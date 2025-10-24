@@ -258,17 +258,6 @@ export interface EnvCommon {
     >
   >
 
-  /**
-   * Referenced by ui/shared/rails-flash-notifications/jquery/index.ts but doesn't appear to be defined anywhere.
-   * Perhaps some rails magic?
-   */
-  notices?: Array<{
-    content?: {
-      timeout?: number
-    }
-    type?: string
-    classes?: string
-  }>
   breadcrumbs?: {name: string; url: string}[]
   enhanced_rubrics_enabled?: boolean
   enhanced_rubrics_copy_to?: boolean

@@ -35,6 +35,7 @@ import {EnvGradebook} from './EnvGradebook'
 import {EnvGradingStandards} from './EnvGradingStandards'
 import {EnvHorizon} from './EnvHorizon'
 import {EnvLtiRegistrations} from './EnvLtiRegistrations'
+import {EnvNotices} from './EnvNotices'
 import {EnvPlatformStorage} from './EnvPlatformStorage'
 import {EnvPortfolio} from './EnvPortfolio'
 import {EnvProfiles} from './EnvProfiles'
@@ -88,5 +89,6 @@ export type GlobalEnv =
         EnvSmartSearch &
         EnvHorizon &
         EnvAuthentication &
-        EnvWidgetDashboard
+        EnvWidgetDashboard &
+        EnvNotices
     >
