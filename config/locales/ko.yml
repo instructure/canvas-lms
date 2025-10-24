@@ -1470,6 +1470,7 @@ ko:
   all_4321c3a1: 전부
   all_assignment_groups_a65e9e46: "모든 과제 그룹"
   all_courses_a7dbb853: "모든 과목"
+  all_grades_for_students_in_this_course_will_no_lon_a32bf5d4: "이 과목에서 학생의 모든 평점은 더 이상 표시되지 않습니다. 나중에 과목 다시 교차 나열함으로써 평점을 찾아올 수 있으나 당분간 학생의 평점은 원래 과목에서 오게 됩니다."
   all_groups_cea25817: "모든 그룹"
   all_my_files_a0213441: "모든 내 파일"
   all_rubrics_5114c466: "모든 루브릭"
@@ -1626,6 +1627,7 @@ ko:
   archive_3f794d7e: 저장소
   archived_de543437: "보관된 메시지"
   are_you_sure_26795d3c: 확실합니까?
+  are_you_sure_you_want_to_de_cross_list_this_sectio_fae8a399: "이 섹션을 교차 나열 해제하시겠습니까?"
   are_you_sure_you_want_to_delete_this_announcement_293d51a8: "이 공지 사항을 삭제하시겠습니까?"
   are_you_sure_you_want_to_delete_this_developer_key_9937481a: "이 개발자 키를 삭제하시겠습니까?"
   are_you_sure_you_want_to_delete_this_discussion_334554e0: "이 토론을 삭제하시겠습니까?"
@@ -5030,6 +5032,9 @@ ko:
       month: 월
       second: 초
       year: 년
+  de_cross_list_this_section_6f7b5984: "섹션 교차 나열 해제"
+  de_cross_list_this_section_774a827c: "섹션 교차 나열 해제"
+  de_cross_listing_section_c2ee371: "섹션 교차 나열 해제 중..."
   debugging_f98fcd74: 디버깅
   decline_7eeb5ff4: 거부
   default_account_quotas_e34112fd: "기본 계정 할당량"
@@ -12552,6 +12557,7 @@ ko:
   section_name_b6d82574: "섹션 이름"
   section_name_edb51b2: 섹션명
   section_name_is_too_long_9cec2a30: "섹션 이름이 너무 김"
+  section_successfully_de_cross_listed_df3b64e: "섹션을 성공적으로 교차 나열 해제했습니다."
   sections: 
     section_created: "섹션을 성공적으로 만들었습니다!"
     section_creation_failed: "섹션 만들기에 실패"
