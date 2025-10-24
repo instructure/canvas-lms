@@ -1748,6 +1748,7 @@ el:
   all_courses_a7dbb853: "Όλα τα μαθήματα"
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Όλα τα πεδία ημερομηνιών πρέπει να εμφανίζονται και να έχουν σωστή μορφοποίηση"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Όλα έτοιμα; Ώρα να κοινοποιήσετε το μάθημά σας! Κάντε κλικ στο κουμπί παρακάτω για να το επισημοποιήσετε! Η δημοσίευση θα επιτρέψει στους χρήστες να ξεκινήσουν να συμμετέχουν στο μάθημα."
+  all_grades_for_students_in_this_course_will_no_lon_a32bf5d4: "<mrk mid=\"4298\" mtype=\"seg\">Όλοι οι βαθμοί των σπουδαστών σε αυτό το μάθημα έχουν πάψει να είναι ορατοί.</mrk> <mrk mid=\"4299\" mtype=\"seg\">Μπορείτε να ανακτήσετε τους βαθμούς αργότερα επαναφέροντας το μάθημα στη λίστα, αλλά στο μεταξύ οι βαθμοί αυτών των σπουδαστών θα προέρχονται από το αρχικό μάθημα.</mrk>"
   all_grading_periods_77974940: "Όλες οι περίοδοι βαθμολογήσεων"
   all_grading_periods_must_have_a_title_a1a38d87: "Όλες οι περίοδοι βαθμολογήσεων πρέπει να έχουν τίτλο"
   all_groups_cea25817: "Όλες οι ομάδες"
@@ -1965,6 +1966,7 @@ el:
   archived_de543437: Αρχειοθετήθηκε
   are_you_sure_26795d3c: "Είσαστε σίγουροι;"
   are_you_sure_you_want_to_copy_to_the_final_mark_th_28a7e7b3: "Είστε σίγουρος/η ότι θέλετε να αντιγράψετε τον τελικό βαθμό; Αυτή η ενέργεια θα αντικαταστήσει τον υπάρχοντα βαθμό."
+  are_you_sure_you_want_to_de_cross_list_this_sectio_fae8a399: "Είστε σίγουρος/η ότι επιθυμείτε να επαναφέρετε αυτόν τον τομέα;"
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
     one: "Είσαστε σίγουροι πως θέλετε να αφαιρέσετε %{name};"
     other: "Είσαστε σίγουροι πως θέλετε να αφαιρέσετε αυτά τα %{count} στοιχεία;"
@@ -5427,6 +5429,7 @@ el:
       second: Δευτερόλεπτα
       year: Έτος
   day_s_7cc1231f: Ημέρα/ες
+  de_cross_listing_section_c2ee371: "Επαναφορά Τομέα..."
   deactivate_this_key_3e79a2b5: "Απενεργοποιήστε αυτό το κλειδί"
   deactivate_user_86c09036: "Απενεργοποίηση Χρήστη"
   decaying_average_8bf6a0dd: "Υπολογισμός Με Μεγαλύτερο Βάρος στα Πιο Πρόσφατη βαθμολογία"
@@ -13612,6 +13615,7 @@ el:
   section_name_is_too_long_9cec2a30: "Το Όνομα του Τμήματος είναι πολύ μακρύ"
   section_sis_id_6f989834: "section sis id"
   section_starts_at_65eaed1: "Ο τομέας ξεκινάει στις"
+  section_successfully_de_cross_listed_df3b64e: "Ο τομέας επαναφέρθηκε επιτυχώς!"
   sections: 
     section_created: "Ο τομέας δημιουργήθηκε επιτυχώς!"
     section_creation_failed: "Η δημιουργία τομέα απέτυχε"
