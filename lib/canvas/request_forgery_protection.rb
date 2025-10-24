@@ -40,7 +40,7 @@ module Canvas
 
     def authenticity_token_options
       session_options = CanvasRails::Application.config.session_options
-      options = session_options.slice(:domain, :secure)
+      options = session_options.slice(:domain, :secure, :same_site)
       options[:httponly] = HostUrl.is_file_host?(request.host_with_port)
       options
     end
