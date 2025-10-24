@@ -146,7 +146,7 @@ def sendCrystalballMetrics() {
     def exampleCount = queueInfo[0].replaceAll('"', '').trim()
     def buildTime = queueInfo[1].replaceAll('"', '').trim()
 
-    reportToSplunk('rspecq_crystalball_data', [
+    reportBuildLog('rspecq_crystalball_data', [
                     'node_count': rspecqNodeTotal,
                     'example_count': exampleCount.toInteger(),
                     'execution_time': buildTime.toInteger(),
