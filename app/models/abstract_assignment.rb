@@ -3342,14 +3342,14 @@ class AbstractAssignment < ActiveRecord::Base
   }
 
   scope :due_between_for_user, lambda { |start, ending, user|
-    with_user_due_date(user).where(user_due_date: start..ending)
+    with_user_due_date(user).where(submissions: { cached_due_date: start..ending })
   }
 
   scope :with_user_due_date, lambda { |user|
-    from("(SELECT s.cached_due_date AS user_due_date, a.*
-          FROM #{Assignment.quoted_table_name} a
-          INNER JOIN #{Submission.quoted_table_name} AS s ON s.assignment_id = a.id
-          WHERE s.user_id = #{User.connection.quote(user.id_for_database)} AND s.workflow_state <> 'deleted') AS assignments").select(arel.projections, "user_due_date")
+    joins(:submissions)
+      .where(submissions: { user_id: user.id_for_database })
+      .where.not(submissions: { workflow_state: "deleted" })
+      .select(arel.projections, "submissions.cached_due_date")
   }
 
   scope :with_latest_due_date, lambda {
