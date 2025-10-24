@@ -2242,6 +2242,7 @@ tr:
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Tüm tarih alanları olmalı ve doğru biçimlendirilmeli"
   all_day_fb42c4fc: "Tüm Gün"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Her şey tamam mı? Dersinizi yayınlama zamanı! Yayınlamak için aşağıdaki butona tıklayın! Dersi yayınladığınızda kullanıcılar derse katılmaya başlayacaklar."
+  all_grades_for_students_in_this_course_will_no_lon_a32bf5d4: "Bu dersteki tüm öğrenci notları artık görülemeyecek. Dersi tekrar çarpraz listeleyerek notları geri getirebilirsiniz fakat bu öğrencilerin notları orijinal dersten getirilecek."
   all_grades_posted_616a85ab: "Tüm notlar yayınlandı"
   all_grades_posted_d5b8cb68: "Tüm notlar yayınlandı"
   all_grading_period_sets_must_have_a_title_799538f: "Tüm notlandırma peryodlarının başlığı olmalı"
@@ -2600,6 +2601,7 @@ tr:
   are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496: "İptal etmek istediğinize emin misiniz? Yaptığınız değişiklikler kaydedilmeyebilir."
   are_you_sure_you_want_to_cancel_your_appointment_w_dbbd27eb: "%{name} ile olan randevunuzu iptal etmek istediğinizden emin misiniz?"
   are_you_sure_you_want_to_copy_to_the_final_mark_th_28a7e7b3: "Final puanını kopyalamak istediğinize emin misiniz? Var olan puanın üzerine yazılacak."
+  are_you_sure_you_want_to_de_cross_list_this_sectio_fae8a399: "Bu bölümü çarpraz listeden kaldırmak istediğinize emin misiniz?"
   are_you_sure_you_want_to_deactivate_this_user_they_3fdaab79: "Bu kullanıcıyı etkisiz kılmak istediğinize emin misiniz? Bu kullanıcılar etkisiz durumdayken derse katılamayacaklar."
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
     one: "%{name} öğesini silmek istediğinizden emin misiniz?"
@@ -6673,6 +6675,7 @@ tr:
         grade_publishing: "Not Yayınlama"
         integrations: Entegrasyonlar
         navigation: Gezinme
+        quiz_settings: "Kısa Sınav Ayarları"
         sections: Bölümler
         tools: Uygulamalar
       titles: 
@@ -7214,6 +7217,9 @@ tr:
   day_9d999bec: Gün
   day_s_7cc1231f: Gün(ler)
   days_late_a3a721b0: "Geç kalınan Günler"
+  de_cross_list_this_section_6f7b5984: "Bu Bölümü Çarpraz Listeden Kaldır"
+  de_cross_list_this_section_774a827c: "Bu Bölümü Çarpraz Listeden Kaldır"
+  de_cross_listing_section_c2ee371: "Çarpraz Listeden Kaldırma Bölümü..."
   deactivate_this_key_3e79a2b5: "Bu anahtarı etkisiz kıl"
   deactivate_user_86c09036: "Kullanıcıyı etkisiz kıl"
   debugging_f98fcd74: "Hata  Ayıklaması"
@@ -17632,6 +17638,7 @@ tr:
   section_sis_94511bcd: "bölüm öbs"
   section_sis_id_6f989834: "bölüm öbs id"
   section_specific_topics_must_have_sections_11868960: "Bölüme özel konularda bölüm olmak zorunda"
+  section_successfully_de_cross_listed_df3b64e: "Bölüm çarpraz listeden başarılı bir şekilde kaldırıldı!"
   sections: 
     section_created: "Bölüm başarıyla oluşturuldu!"
     section_creation_failed: "Bölüm oluşturma başarısız"
