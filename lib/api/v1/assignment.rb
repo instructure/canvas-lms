@@ -537,7 +537,7 @@ module Api::V1::Assignment
     if assignment.automatic_peer_reviews?
       assignment.slice(:peer_review_count, :peer_reviews_assign_at, :intra_group_peer_reviews)
     elsif assignment.context.feature_enabled?(:peer_review_allocation)
-      assignment.slice(:peer_review_count)
+      assignment.slice(:peer_review_count, :peer_review_submission_required)
     end
   end
 
@@ -591,6 +591,7 @@ module Api::V1::Assignment
     peer_review_count
     automatic_peer_reviews
     intra_group_peer_reviews
+    peer_review_submission_required
     peer_review
     grade_group_students_individually
     turnitin_enabled

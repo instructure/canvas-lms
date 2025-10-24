@@ -2603,6 +2603,87 @@ describe AssignmentsApiController, type: :request do
       expect(Assignment.count).to eq 1
     end
 
+    describe "peer_review_submission_required" do
+      before do
+        @course.root_account.enable_feature!(:peer_review_allocation)
+      end
+
+      it "creates assignment with peer_review_submission_required set to true" do
+        json = api_create_assignment_in_course(@course, {
+                                                 "name" => "test assignment",
+                                                 "peer_reviews" => true,
+                                                 "peer_review_submission_required" => true
+                                               })
+
+        assignment = Assignment.find(json["id"])
+        expect(json["peer_review_submission_required"]).to be true
+        expect(assignment.peer_review_submission_required).to be true
+      end
+
+      it "creates assignment with peer_review_submission_required set to false" do
+        json = api_create_assignment_in_course(@course, {
+                                                 "name" => "test assignment",
+                                                 "peer_reviews" => true,
+                                                 "peer_review_submission_required" => false
+                                               })
+
+        assignment = Assignment.find(json["id"])
+        expect(json["peer_review_submission_required"]).to be false
+        expect(assignment.peer_review_submission_required).to be false
+      end
+
+      it "defaults peer_review_submission_required to false when not provided" do
+        json = api_create_assignment_in_course(@course, {
+                                                 "name" => "test assignment",
+                                                 "peer_reviews" => true
+                                               })
+
+        assignment = Assignment.find(json["id"])
+        expect(json["peer_review_submission_required"]).to be false
+        expect(assignment.peer_review_submission_required).to be false
+      end
+
+      it "updates assignment peer_review_submission_required to true" do
+        assignment = @course.assignments.create!(name: "test assignment", peer_reviews: true)
+
+        api_call(:put,
+                 "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}",
+                 {
+                   controller: "assignments_api",
+                   action: "update",
+                   format: "json",
+                   course_id: @course.id.to_s,
+                   id: assignment.to_param
+                 },
+                 { assignment: { peer_review_submission_required: true } })
+
+        assignment.reload
+        expect(assignment.peer_review_submission_required).to be true
+      end
+
+      it "updates assignment peer_review_submission_required to false" do
+        assignment = @course.assignments.create!(
+          name: "test assignment",
+          peer_reviews: true,
+          peer_review_submission_required: true
+        )
+
+        api_call(:put,
+                 "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}",
+                 {
+                   controller: "assignments_api",
+                   action: "update",
+                   format: "json",
+                   course_id: @course.id.to_s,
+                   id: assignment.to_param
+                 },
+                 { assignment: { peer_review_submission_required: false } })
+
+        assignment.reload
+        expect(assignment.peer_review_submission_required).to be false
+      end
+    end
+
     context "create_api_assignment: peer review sub assignment creation logic" do
       before do
         @course.enable_feature!(:peer_review_grading)
