@@ -25,6 +25,7 @@ import {Text} from '@instructure/ui-text'
 import {IconOffLine} from '@instructure/ui-icons'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {addFlashNoticeForNextPage} from '@canvas/rails-flash-notifications'
 
 const I18n = createI18nScope('section')
 
@@ -62,6 +63,7 @@ export default function UncrosslistForm({
         method: 'DELETE',
       })
       // On success, redirect to the section page in the original (nonxlist) course
+      addFlashNoticeForNextPage('success', 'Section successfully de-cross-listed!')
       window.location.href = `/courses/${nonxlistCourseId}/sections/${sectionId}`
     } catch (error) {
       setIsSubmitting(false)

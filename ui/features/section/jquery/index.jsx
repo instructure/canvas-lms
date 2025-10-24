@@ -331,11 +331,9 @@ ready(() => {
 
   const uncrosslistLinkContainer = document.getElementById('uncrosslist_link_button_container')
   if (uncrosslistLinkContainer) {
-    const courseName = uncrosslistLinkContainer.dataset.courseName
-    const enrollmentsCount = parseInt(uncrosslistLinkContainer.dataset.enrollmentsCount, 10)
-    const courseId = uncrosslistLinkContainer.dataset.courseId
-    const sectionId = uncrosslistLinkContainer.dataset.sectionId
-    const nonxlistCourseId = uncrosslistLinkContainer.dataset.nonxlistCourseId
+    /** @type {{courseName: string, enrollmentsCount: number, courseId: string, sectionId: string, nonxlistCourseId: string}} */
+    const props = JSON.parse(uncrosslistLinkContainer.dataset.props)
+    const {courseName, enrollmentsCount, courseId, sectionId, nonxlistCourseId} = props
     createRoot(uncrosslistLinkContainer).render(
       <UncrosslistForm
         courseId={courseId}
