@@ -22,8 +22,9 @@ import {waitFor} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
-import {useCourseWork} from '../useCourseWork'
+import {useCourseWork, useCourseWorkPaginated} from '../useCourseWork'
 import type {CourseWorkItem} from '../useCourseWork'
+import {WidgetDashboardProvider} from '../useWidgetDashboardContext'
 
 const server = setupServer()
 
@@ -524,5 +525,214 @@ describe('useCourseWork', () => {
       'Assignment C', // Later due date
       'Assignment B', // No due date (null)
     ])
+  })
+  describe('observer scenarios', () => {
+    it('passes observedUserId to GraphQL query when observer views observee data', async () => {
+      let receivedVariables: any = null
+
+      server.use(
+        http.post('/api/graphql', async ({request}) => {
+          const body = (await request.json()) as {query: string; variables: any}
+          if (body.query.includes('GetUserCourseWork')) {
+            receivedVariables = body.variables
+            return HttpResponse.json({
+              data: {
+                legacyNode: {
+                  _id: '1',
+                  courseWorkSubmissionsConnection: {
+                    nodes: [
+                      {
+                        _id: 'sub1',
+                        cachedDueDate: tomorrow.toISOString(),
+                        submittedAt: null,
+                        late: false,
+                        missing: false,
+                        excused: false,
+                        state: 'unsubmitted',
+                        assignment: {
+                          _id: '1',
+                          name: 'Student Assignment',
+                          dueAt: tomorrow.toISOString(),
+                          pointsPossible: 25,
+                          htmlUrl: '/courses/101/assignments/1',
+                          submissionTypes: ['online_upload'],
+                          state: 'published',
+                          published: true,
+                          quiz: null,
+                          discussion: null,
+                          course: {
+                            _id: '101',
+                            name: 'Biology',
+                          },
+                        },
+                      },
+                    ],
+                    pageInfo: {
+                      hasNextPage: false,
+                      hasPreviousPage: false,
+                      endCursor: null,
+                      startCursor: null,
+                    },
+                  },
+                },
+              },
+            })
+          }
+          return HttpResponse.json({errors: [{message: 'Query not matched'}]}, {status: 400})
+        }),
+      )
+
+      const queryClient = new QueryClient({
+        defaultOptions: {queries: {retry: false}, mutations: {retry: false}},
+      })
+
+      const wrapper = ({children}: {children: React.ReactNode}) => (
+        <QueryClientProvider client={queryClient}>
+          <WidgetDashboardProvider observedUserId="student123">{children}</WidgetDashboardProvider>
+        </QueryClientProvider>
+      )
+
+      const {result} = renderHook(() => useCourseWork(), {wrapper})
+
+      await waitFor(() => {
+        expect(result.current.data?.pages?.[0]?.items).toBeDefined()
+      })
+
+      // Verify observedUserId was passed to the GraphQL query
+      expect(receivedVariables).toMatchObject({
+        observedUserId: 'student123',
+      })
+      expect(result.current.data?.pages?.[0]?.items).toHaveLength(1)
+      expect(result.current.data?.pages?.[0]?.items?.[0].title).toBe('Student Assignment')
+    })
+
+    it('useCourseWorkPaginated passes observedUserId to GraphQL query', async () => {
+      let receivedVariables: any = null
+
+      server.use(
+        http.post('/api/graphql', async ({request}) => {
+          const body = (await request.json()) as {query: string; variables: any}
+          if (body.query.includes('GetUserCourseWork')) {
+            receivedVariables = body.variables
+            return HttpResponse.json({
+              data: {
+                legacyNode: {
+                  _id: '1',
+                  courseWorkSubmissionsConnection: {
+                    nodes: [
+                      {
+                        _id: 'sub1',
+                        cachedDueDate: tomorrow.toISOString(),
+                        submittedAt: null,
+                        late: false,
+                        missing: false,
+                        excused: false,
+                        state: 'unsubmitted',
+                        assignment: {
+                          _id: '1',
+                          name: 'Observed Student Assignment',
+                          dueAt: tomorrow.toISOString(),
+                          pointsPossible: 50,
+                          htmlUrl: '/courses/101/assignments/1',
+                          submissionTypes: ['online_upload'],
+                          state: 'published',
+                          published: true,
+                          quiz: null,
+                          discussion: null,
+                          course: {
+                            _id: '101',
+                            name: 'Math',
+                          },
+                        },
+                      },
+                    ],
+                    pageInfo: {
+                      hasNextPage: false,
+                      hasPreviousPage: false,
+                      endCursor: null,
+                      startCursor: null,
+                      totalCount: 1,
+                    },
+                  },
+                },
+              },
+            })
+          }
+          return HttpResponse.json({errors: [{message: 'Query not matched'}]}, {status: 400})
+        }),
+      )
+
+      const queryClient = new QueryClient({
+        defaultOptions: {queries: {retry: false}, mutations: {retry: false}},
+      })
+
+      const wrapper = ({children}: {children: React.ReactNode}) => (
+        <QueryClientProvider client={queryClient}>
+          <WidgetDashboardProvider observedUserId="student456">{children}</WidgetDashboardProvider>
+        </QueryClientProvider>
+      )
+
+      const {result} = renderHook(() => useCourseWorkPaginated({pageSize: 4}), {wrapper})
+
+      await waitFor(() => {
+        expect(result.current.currentPage?.items).toBeDefined()
+      })
+
+      // Verify observedUserId was passed to the GraphQL query
+      expect(receivedVariables).toMatchObject({
+        observedUserId: 'student456',
+      })
+      expect(result.current.currentPage?.items).toHaveLength(1)
+      expect(result.current.currentPage?.items?.[0].title).toBe('Observed Student Assignment')
+    })
+
+    it('does not pass observedUserId when not in observer context', async () => {
+      let receivedVariables: any = null
+
+      server.use(
+        http.post('/api/graphql', async ({request}) => {
+          const body = (await request.json()) as {query: string; variables: any}
+          if (body.query.includes('GetUserCourseWork')) {
+            receivedVariables = body.variables
+            return HttpResponse.json({
+              data: {
+                legacyNode: {
+                  _id: '1',
+                  courseWorkSubmissionsConnection: {
+                    nodes: [],
+                    pageInfo: {
+                      hasNextPage: false,
+                      hasPreviousPage: false,
+                      endCursor: null,
+                      startCursor: null,
+                    },
+                  },
+                },
+              },
+            })
+          }
+          return HttpResponse.json({errors: [{message: 'Query not matched'}]}, {status: 400})
+        }),
+      )
+
+      const queryClient = new QueryClient({
+        defaultOptions: {queries: {retry: false}, mutations: {retry: false}},
+      })
+
+      const wrapper = ({children}: {children: React.ReactNode}) => (
+        <QueryClientProvider client={queryClient}>
+          <WidgetDashboardProvider observedUserId={null}>{children}</WidgetDashboardProvider>
+        </QueryClientProvider>
+      )
+
+      const {result} = renderHook(() => useCourseWork(), {wrapper})
+
+      await waitFor(() => {
+        expect(result.current.data?.pages?.[0]?.items).toBeDefined()
+      })
+
+      // Verify observedUserId is null (not observing anyone)
+      expect(receivedVariables.observedUserId).toBeNull()
+    })
   })
 })

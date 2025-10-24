@@ -232,6 +232,7 @@ export function calculateCursorForPage(pageIndex: number, pageSize: number): str
 export async function fetchCourseWorkPage(
   pageIndex: number,
   options: UseCourseWorkOptions = {},
+  observedUserId?: string | null,
 ): Promise<CourseWorkResult> {
   const {
     pageSize = 4,
@@ -256,6 +257,7 @@ export async function fetchCourseWorkPage(
     includeOverdue,
     includeNoDueDate,
     onlySubmitted,
+    observedUserId,
   })
 
   if (!response?.legacyNode?.courseWorkSubmissionsConnection) {
@@ -436,6 +438,7 @@ interface PageCache {
  * Used by widgets that need to jump directly to any page (e.g., CourseWorkWidget, CourseWorkCombinedWidget)
  */
 export function useCourseWorkPaginated(options: UseCourseWorkOptions = {}) {
+  const {observedUserId} = useWidgetDashboard()
   const [currentPageIndex, setCurrentPageIndex] = useState<number>(0)
   const [pageCache, setPageCache] = useState<PageCache>({})
   const [isLoading, setIsLoading] = useState(false)
@@ -465,7 +468,7 @@ export function useCourseWorkPaginated(options: UseCourseWorkOptions = {}) {
       setError(null)
 
       try {
-        const result = await fetchCourseWorkPage(pageIndex, optionsRef.current)
+        const result = await fetchCourseWorkPage(pageIndex, optionsRef.current, observedUserId)
 
         setPageCache(prev => ({
           ...prev,
@@ -484,7 +487,7 @@ export function useCourseWorkPaginated(options: UseCourseWorkOptions = {}) {
         isFetchingRef.current[pageIndex] = false
       }
     },
-    [pageCache],
+    [pageCache, observedUserId],
   )
 
   useEffect(() => {
@@ -498,7 +501,7 @@ export function useCourseWorkPaginated(options: UseCourseWorkOptions = {}) {
     setTotalCount(null)
     setCurrentPageIndex(0)
     isFetchingRef.current = {}
-  }, [options.courseFilter, options.startDate, options.endDate])
+  }, [options.courseFilter, options.startDate, options.endDate, observedUserId])
 
   const resetAndRefetch = useCallback(() => {
     setPageCache({})
