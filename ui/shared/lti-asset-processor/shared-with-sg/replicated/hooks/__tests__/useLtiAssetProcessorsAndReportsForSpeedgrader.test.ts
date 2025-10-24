@@ -16,19 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {describe, expect, it, clearAllMocks} from '../../../__tests__/testPlatformShims'
 import {
   mockUseLtiAssetProcessors,
   mockUseLtiAssetReports,
 } from '../../../__tests__/mockedDependenciesShims'
-import {
-  useLtiAssetProcessorsAndReportsForSpeedgrader,
-  type UseLtiAssetProcessorsAndReportsForSpeedgraderParams,
-} from '../useLtiAssetProcessorsAndReportsForSpeedgrader'
+import {renderHook} from '../../../__tests__/renderingShims'
+import {clearAllMocks, describe, expect, it} from '../../../__tests__/testPlatformShims'
 import {useLtiAssetReports} from '../../../dependenciesShims'
 import {defaultGetLtiAssetProcessorsResult} from '../../__fixtures__/default/ltiAssetProcessors'
 import {defaultGetLtiAssetReportsResult} from '../../__fixtures__/default/ltiAssetReports'
-import {renderHook} from '../../../__tests__/renderingShims'
+import {
+  type UseLtiAssetProcessorsAndReportsForSpeedgraderParams,
+  useLtiAssetProcessorsAndReportsForSpeedgrader,
+} from '../useLtiAssetProcessorsAndReportsForSpeedgrader'
 
 describe('useLtiAssetProcessorsAndReportsForSpeedgrader', () => {
   const mockParams: UseLtiAssetProcessorsAndReportsForSpeedgraderParams = {

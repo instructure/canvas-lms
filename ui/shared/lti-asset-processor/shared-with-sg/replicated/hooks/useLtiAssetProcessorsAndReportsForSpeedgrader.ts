@@ -23,8 +23,8 @@ import {
 } from '../queries/getLtiAssetReports'
 import type {LtiAssetProcessor} from '../types/LtiAssetProcessors'
 import {
-  ensureCompatibleSubmissionType,
   type AssetReportCompatibleSubmissionType,
+  ensureCompatibleSubmissionType,
   type LtiAssetReport,
 } from '../types/LtiAssetReports'
 

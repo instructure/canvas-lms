@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {colors} from '@instructure/canvas-theme'
+import {Flex} from '@instructure/ui-flex'
 import {IconCompleteSolid, IconWarningSolid} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
+import {canvas} from '@instructure/ui-themes'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {Flex} from '@instructure/ui-flex'
-import {LtiAssetReport} from '../types/LtiAssetReports'
+import type {LtiAssetReport} from '../types/LtiAssetReports'
 
 const I18n = createI18nScope('lti_asset_reports_for_student')
 
@@ -34,16 +34,15 @@ interface Props {
 /**
  * Stateless/presentational component to render the status of LTI Asset Reports for a student.
  */
-export default function LtiAssetReportStatus({reports, openModal}: Props) {
+export default function LtiAssetReportStatus({reports, openModal}: Props): JSX.Element {
   if (reports.length === 0) {
     return <Text>{I18n.t('No result')}</Text>
   }
   const hasHighPriority = reports.some(report => report.priority > 0)
   if (hasHighPriority) {
     return renderStatus('high', openModal)
-  } else {
-    return renderStatus('ok', openModal)
   }
+  return renderStatus('ok', openModal)
 }
 
 function renderStatus(status: 'high' | 'ok', openModal?: () => void) {
@@ -57,29 +56,33 @@ function renderStatus(status: 'high' | 'ok', openModal?: () => void) {
         renderIcon={status === 'ok' ? <IconCompleteSolid /> : <IconWarningSolid color="error" />}
         variant="inline"
         themeOverride={
-          status === 'ok' ? {} : {color: colors.ui.textError, hoverColor: colors.ui.textError}
+          status === 'ok'
+            ? {}
+            : {
+                color: canvas.colors.ui.textError,
+                hoverColor: canvas.colors.ui.textError,
+              }
         }
         data-pendo={`asset-reports-${status === 'high' ? 'needs-attention' : 'all-good'}-button`}
       >
         {status === 'ok' ? I18n.t('All good') : I18n.t('Needs attention')}
       </Link>
     )
-  } else {
-    return (
-      <Text
-        size="descriptionPage"
-        weight="weightImportant"
-        color={status === 'ok' ? 'brand' : 'danger'}
-      >
-        <Flex display="flex" gap="xx-small">
-          {status === 'ok' ? (
-            <IconCompleteSolid color="brand" />
-          ) : (
-            <IconWarningSolid color="error" />
-          )}
-          {status === 'ok' ? I18n.t('All good') : I18n.t('Needs attention')}
-        </Flex>
-      </Text>
-    )
   }
+  return (
+    <Text
+      size="descriptionPage"
+      weight="weightImportant"
+      color={status === 'ok' ? 'brand' : 'danger'}
+    >
+      <Flex display="flex" gap="xx-small">
+        {status === 'ok' ? (
+          <IconCompleteSolid color="brand" />
+        ) : (
+          <IconWarningSolid color="error" />
+        )}
+        {status === 'ok' ? I18n.t('All good') : I18n.t('Needs attention')}
+      </Flex>
+    </Text>
+  )
 }
