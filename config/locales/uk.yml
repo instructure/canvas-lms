@@ -1966,6 +1966,7 @@ uk:
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Всі поля с датами мають бути присутні і правильно відформатовані"
   all_day_fb42c4fc: "Весь день"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Все закінчили? Час опублікувати свій курс! Натисніть на кнопку нижче, щоб зробити курс офіційно доступним! Публікація дозволить користувачам почати вивчати курс."
+  all_grades_for_students_in_this_course_will_no_lon_a32bf5d4: "Усі оцінки цього курсу більше не будуть відображатися для студентів. Ви можете отримати оцінку пізніше шляхом re-cross-listing курсу, але в той же час оцінки для цих студентів будуть прийматися з оригінального курсу."
   all_grading_period_sets_must_have_a_title_799538f: "Усі налаштування періоду оцінювання повинні мати назву"
   all_grading_periods_77974940: "Усі періоди оцінювання"
   all_grading_periods_must_have_a_title_a1a38d87: "Всі періоди оцінювання повинні мати назву"
@@ -2264,6 +2265,7 @@ uk:
   are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496: "Ви впевнені, що хочете скасувати? Зроблені зміни можуть бути не збережені."
   are_you_sure_you_want_to_cancel_your_appointment_w_dbbd27eb: "Ви впевнені, що хочете скасувати зустріч з %{name}?"
   are_you_sure_you_want_to_copy_to_the_final_mark_th_28a7e7b3: "Ви впевнені, що хочете скопіювати до підсумкового маркування? Це  перезапише існуючу позначку."
+  are_you_sure_you_want_to_de_cross_list_this_sectio_fae8a399: "Ви впевнені, що хочете de-cross-list цього розділу?"
   are_you_sure_you_want_to_deactivate_this_user_they_3fdaab79: "Ви впевнені, що хочете відключити цього користувача? Вони не зможуть брати участь у процесі в той час, коли неактивні."
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
     few: "Ви впевнені, що хочете видалити %{count} елементи?"
@@ -5830,6 +5832,7 @@ uk:
         feature_options: "Варіанти функції"
         grade_syncing: "Синхронізація оцінок"
         navigation: Навігація
+        quiz_settings: "Налаштування контрольної роботи"
         sections: Розділи
         tools: Застосунки
       titles: 
@@ -6341,6 +6344,9 @@ uk:
   day_9d999bec: День
   day_s_7cc1231f: "День (дні)"
   days_late_a3a721b0: "Днів пізніше"
+  de_cross_list_this_section_6f7b5984: "De-Cross-List цього розділу"
+  de_cross_list_this_section_774a827c: "De-Cross-List цього розділу"
+  de_cross_listing_section_c2ee371: "De-Cross-Listing розділу"
   deactivate_this_key_3e79a2b5: "Деактивувати цей ключ"
   deactivate_user_86c09036: "Деактивувати користувача"
   debugging_f98fcd74: Відлагодження
@@ -15888,6 +15894,7 @@ uk:
   section_specific_discussions_are_disabled_9e3fd431: "Обговорення для конкретних розділів відключено"
   section_specific_topics_must_have_sections_11868960: "Теми конкретних розділів повинні мати розділи"
   section_starts_at_65eaed1: "Розділ починається в"
+  section_successfully_de_cross_listed_df3b64e: "Розділ успішно de-cross-listed!"
   sections: 
     section_created: "Розділ успішно створено!"
     section_creation_failed: "Створення розділу не вдалося"
