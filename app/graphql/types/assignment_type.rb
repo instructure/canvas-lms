@@ -92,6 +92,15 @@ module Types
             "Boolean representing whether or not members from within the same group on a group assignment can be assigned to peer review their own group's work",
             method: :intra_group_peer_reviews,
             null: true
+      field :submission_required,
+            Boolean,
+            "Boolean indicating if students must submit their assignment before they can do peer reviews",
+            null: true
+      def submission_required
+        return nil unless object.context.feature_enabled?(:peer_review_allocation)
+
+        object.peer_review_submission_required
+      end
     end
 
     class AssignmentModeratedGrading < ApplicationObjectType

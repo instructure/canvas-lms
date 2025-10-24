@@ -1239,6 +1239,7 @@ input AssignmentPeerReviewsUpdate {
   dueAt: DateTime
   enabled: Boolean
   intraReviews: Boolean
+  submissionRequired: Boolean
 }
 
 """
@@ -7726,6 +7727,11 @@ type PeerReviews {
   group assignment can be assigned to peer review their own group's work
   """
   intraReviews: Boolean
+
+  """
+  Boolean indicating if students must submit their assignment before they can do peer reviews
+  """
+  submissionRequired: Boolean
 }
 
 type Placement {
