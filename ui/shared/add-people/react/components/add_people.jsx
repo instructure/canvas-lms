@@ -24,7 +24,6 @@ import {CloseButton, Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import * as z from 'zod'
 import {
   courseParamsShape,
   apiStateShape,
@@ -37,7 +36,7 @@ import PeopleSearch from './people_search'
 import PeopleReadyList from './people_ready_list'
 import PeopleValidationIssues from './people_validation_issues'
 import APIError from './api_error'
-import {parseNameList, findEmailInEntry, emailValidator} from '../helpers'
+import {parseNameList, findEmailInEntry, emailValidator, validateEmailForNewUser} from '../helpers'
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('add_people')
@@ -47,10 +46,6 @@ const PEOPLEREADYLIST = 'peoplereadylist'
 const PEOPLEVALIDATIONISSUES = 'peoplevalidationissues'
 const RESULTPENDING = 'resultpending'
 const APIERROR = 'apierror'
-
-const emailSchema = z.object({
-  email: z.string().min(1, I18n.t('Email is required.')).email(I18n.t('Invalid email address.')),
-})
 
 export default class AddPeople extends React.Component {
   // TODO: deal with defaut props after the warmfix to keep this change small
@@ -227,9 +222,7 @@ export default class AddPeople extends React.Component {
         errors.push([
           address,
           {
-            errorMessage: createNew
-              ? emailSchema.safeParse(newUserInfo)?.error?.issues[0]?.message
-              : null,
+            errorMessage: createNew ? validateEmailForNewUser(newUserInfo) : null,
           },
         ])
       })
