@@ -24,11 +24,19 @@ type TokenResponse = {
   refreshToken: string | null
 }
 
+type Context = {
+  id: string
+  name: string
+  type: string
+  url: string
+}
+
 export type User = {
   name: string
   id: string
   roles: string[]
   isStudent: boolean
+  context: Context
 }
 
 export type AuthProps = {
@@ -91,5 +99,6 @@ export const getUser: AuthProps['getUser'] = async () => {
     name: ENV.current_user?.display_name,
     roles: ENV.current_user_roles,
     isStudent: ENV.current_user_is_student,
+    context: ENV.current_context as Context,
   }
 }
