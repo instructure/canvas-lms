@@ -1751,6 +1751,12 @@ ko:
     unmuting_assignment: "과제 평점 공개 중..."
   assignment_name_12eadcbd: "과제 이름"
   assignment_name_b2d87383: "과제 이름"
+  assignment_quiz_type: 
+    quiz_type: "퀴즈 유형"
+    quiz_type_options: 
+      graded_quiz: "평가된 퀴즈"
+      graded_survey: "평가된 설문"
+      ungraded_survey: "평가 안 된 설문"
   assignments: 
     assignment_count: 
       one: "과제 %{count}개"
@@ -12262,6 +12268,7 @@ ko:
   resume_quiz_afeceb87: "퀴즈 다시 시작"
   resume_survey_58dce775: "설문 다시 시작"
   retrieve_timeout: "구성을 찾아올 수 없음 - 서버 응답 시간 만료"
+  revision_history_abfd1cfd: "수정 이력"
   role_7c0b7eaa: "역할:"
   role_override: 
     permission: 

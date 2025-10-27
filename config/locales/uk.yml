@@ -2482,6 +2482,11 @@ uk:
       other: "%{count} студентів"
   assignment_path_selected_e80191d1: "Шлях завдання обрано"
   assignment_preview_3833e819: "%{assignment} перегляду"
+  assignment_quiz_type: 
+    quiz_type_options: 
+      graded_quiz: "Контрольну роботу оцінено"
+      graded_survey: "Огляд оцінено"
+      ungraded_survey: "Неоцінене Опитування"
   assignment_selection_6bff05c4: "Вибір завдання"
   assignment_title_82b4422e: "Назва завдання:"
   assignment_title_8a707dd2: "назва завдання"
@@ -15433,6 +15438,7 @@ uk:
   review_now_318a6a3e: "Переглянути зараз"
   reviewer_b993ce28: Рецензент
   reviewers_successfully_added_bd4b629a: "Рецензенти успішно додані"
+  revision_history_abfd1cfd: "Історія редакцій"
   rich_content_editor_2708ef21: "Покращений редактор контенту"
   rich_content_editor_sidebar_enhancements_8bd945d3: "Покращення бічній панелі редактора Rich Content"
   right_sidebar_logo_5483dc0a: "Логотип правої бічної панелі"

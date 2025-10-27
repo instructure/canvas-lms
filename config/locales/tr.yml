@@ -2835,6 +2835,12 @@ tr:
       other: "%{count} öğrenci"
   assignment_path_selected_e80191d1: "Ödev Süreci Seçildi"
   assignment_preview_3833e819: "%{assignment} önizleme"
+  assignment_quiz_type: 
+    quiz_type: "Kısa Sınav Türü"
+    quiz_type_options: 
+      graded_quiz: "Notlandırılmış Kısa Sınav"
+      graded_survey: "Notlandırılmış Anket"
+      ungraded_survey: "Notlandırılmamış Anket"
   assignment_score_summary_f1dc9708: "Sınav Not Özeti"
   assignment_selection_6bff05c4: "Ödev Seçimi"
   assignment_title_82b4422e: "Ödev Başlığı:"
@@ -17191,6 +17197,7 @@ tr:
   resume_survey_58dce775: "Ankete Devam Et"
   retrieve_timeout: "ayarlar alınamıyor, sunucu cevabı zaman aşımına uğradı"
   retry_ebd5f8ba: Tekrar
+  revision_history_abfd1cfd: "Güncelleme Geçmişi"
   rich_content_editor_2708ef21: "Zengin İçerik Editörü"
   role: 
     duplicate_role: "Bu isimle bir rol zaten var"
