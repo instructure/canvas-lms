@@ -480,6 +480,7 @@ class ApplicationController < ActionController::Base
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     account_level_mastery_scales
     ams_root_account_integration
+    ams_enhanced_rubrics
     api_rate_limits
     buttons_and_icons_root_account
     course_pace_allow_bulk_pace_assign
