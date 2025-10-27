@@ -24,19 +24,14 @@ module Accessibility
     before_action :check_authorized_action
 
     def show
-      content_loader = Accessibility::ContentLoader.new(
-        context: @context,
-        type: params[:content_type],
-        id: params[:content_id]
-      )
+      return head :bad_request unless params[:issue_id].present?
 
-      response = if params[:path].present?
-                   content_loader.extract_element_from_content(params[:path])
-                 else
-                   content_loader.content
-                 end
-
-      render json: response[:json], status: response[:status]
+      content_loader = Accessibility::ContentLoader.new(issue_id: params[:issue_id])
+      render json: { content: content_loader.content }
+    rescue Accessibility::ContentLoader::ElementNotFoundError, ActiveRecord::RecordNotFound => e
+      render json: { error: e.message }, status: :not_found
+    rescue Accessibility::ContentLoader::UnsupportedResourceTypeError => e
+      render json: { error: e.message }, status: :unprocessable_entity
     end
 
     def create

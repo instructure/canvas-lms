@@ -31,7 +31,7 @@ export const mockIssue1: AccessibilityIssue = {
   id: '1',
   ruleId: 'adjacent-links',
   element: 'a',
-  displayName: 'Adjacent links',
+  displayName: 'Duplicate links',
   message:
     'These are two links that go to the same place. Turn them into one link to avoid repetition.',
   why: 'When two or more links are next to each other and lead to the same destination, screen readers interpret them as two separate links, even though the intent is usually displaying a single link. This creates unnecessary repetition and is confusing.',
@@ -51,7 +51,7 @@ export const mockIssue2: AccessibilityIssue = {
   id: '2',
   ruleId: 'adjacent-links',
   element: 'a',
-  displayName: 'Adjacent links',
+  displayName: 'Duplicate links',
   message:
     'These are two links that go to the same place. Turn them into one link to avoid repetition.',
   why: 'When two or more links are next to each other and lead to the same destination, screen readers interpret them as two separate links, even though the intent is usually displaying a single link. This creates unnecessary repetition and is confusing.',
@@ -92,7 +92,7 @@ export const mockIssue4: AccessibilityIssue = {
   id: '4',
   ruleId: 'adjacent-links',
   element: 'a',
-  displayName: 'Adjacent links',
+  displayName: 'Duplicate links',
   message:
     'These are two links that go to the same place. Turn them into one link to avoid repetition.',
   why: 'When two or more links are next to each other and lead to the same destination, screen readers interpret them as two separate links, even though the intent is usually displaying a single link. This creates unnecessary repetition and is confusing.',
