@@ -123,5 +123,25 @@ describe "context modules" do
         expect(button.text).to eq("Expand All")
       end
     end
+
+    context "moving newly added module items" do
+      before do
+        @course.root_account.disable_feature!(:modules_page_rewrite)
+        @module1 = @course.context_modules.create!(name: "Module 1")
+        @module2 = @course.context_modules.create!(name: "Module 2")
+        get "/courses/#{@course.id}/modules"
+      end
+
+      it "allows moving a newly added module item without page refresh" do
+        add_new_module_item(@module1, "assignment", @assignment.title)
+        wait_for_ajaximations
+
+        new_item = @module1.content_tags.last
+        manage_module_item_button(new_item).click
+        click_module_item_move(new_item)
+
+        expect(module_item_move_tray).to be_displayed
+      end
+    end
   end
 end
