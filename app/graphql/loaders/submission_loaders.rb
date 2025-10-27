@@ -21,12 +21,6 @@
 module Loaders
   module SubmissionLoaders
     class ProvisionalGradesLoader < GraphQL::Batch::Loader
-      def self.for(scorer)
-        key = scorer.id
-        @loaders ||= {}
-        @loaders[key] ||= new(scorer)
-      end
-
       def initialize(scorer)
         super()
         @scorer = scorer
