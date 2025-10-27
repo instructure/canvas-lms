@@ -130,6 +130,7 @@ export const saveLearningMasteryGradebookSettings = (
         DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS,
       ),
       name_display_format: settings.nameDisplayFormat,
+      students_per_page: settings.studentsPerPage,
     },
   }
 

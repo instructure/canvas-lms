@@ -79,6 +79,8 @@ export const useGradebookSettings = (courseId: string): UseGradebookSettingsRetu
             nameDisplayFormat:
               apiSettings.name_display_format ??
               (DEFAULT_GRADEBOOK_SETTINGS.nameDisplayFormat as NameDisplayFormat),
+            studentsPerPage:
+              apiSettings.students_per_page ?? DEFAULT_GRADEBOOK_SETTINGS.studentsPerPage,
           }
 
           setSettings(loadedSettings)

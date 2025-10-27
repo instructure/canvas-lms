@@ -53,8 +53,6 @@ interface UseRollupsReturn extends RollupData {
   error: null | string
   currentPage: number
   setCurrentPage: (page: number) => void
-  studentsPerPage: number
-  setStudentsPerPage: (studentsPerPage: number) => void
   sorting: Sorting
 }
 
@@ -127,7 +125,6 @@ export default function useRollups({
     outcomes: [],
     students: [],
   })
-  const [studentsPerPage, setStudentsPerPage] = useState<number>(studentsPerPageProp)
   const [sortOrder, setSortOrder] = useState<SortOrder>(sortOrderProp)
   const [sortBy, setSortBy] = useState<SortBy>(sortByProp)
 
@@ -146,7 +143,7 @@ export default function useRollups({
           settings ? mapSettingsToFilters(settings) : [],
           needMasteryAndColorDefaults,
           currentPage,
-          studentsPerPage,
+          settings?.studentsPerPage,
           sortOrder,
           sortBy,
         )) as RollupsResponse
@@ -174,16 +171,7 @@ export default function useRollups({
         setIsLoading(false)
       }
     })()
-  }, [
-    courseId,
-    needMasteryAndColorDefaults,
-    currentPage,
-    studentsPerPage,
-    sortOrder,
-    sortBy,
-    settings,
-    enabled,
-  ])
+  }, [courseId, needMasteryAndColorDefaults, currentPage, sortOrder, sortBy, settings, enabled])
 
   return {
     isLoading,
@@ -191,11 +179,11 @@ export default function useRollups({
     students: data.students,
     outcomes: data.outcomes,
     rollups: data.rollups,
-    pagination: data.pagination ? {...data.pagination, perPage: studentsPerPage} : undefined,
+    pagination: data.pagination
+      ? {...data.pagination, perPage: settings?.studentsPerPage || DEFAULT_STUDENTS_PER_PAGE}
+      : undefined,
     currentPage,
     setCurrentPage,
-    studentsPerPage,
-    setStudentsPerPage,
     sorting: {
       sortOrder,
       setSortOrder,

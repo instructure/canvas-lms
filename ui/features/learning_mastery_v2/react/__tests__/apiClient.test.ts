@@ -119,6 +119,7 @@ describe('apiClient', () => {
           DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS,
         ],
         nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
+        studentsPerPage: 15,
       }
 
       await saveLearningMasteryGradebookSettings('123', settings)
@@ -131,6 +132,7 @@ describe('apiClient', () => {
             show_student_avatars: true,
             show_students_with_no_results: true,
             name_display_format: 'first_last',
+            students_per_page: 15,
           },
         },
       )
@@ -141,6 +143,7 @@ describe('apiClient', () => {
         secondaryInfoDisplay: SecondaryInfoDisplay.NONE,
         displayFilters: [],
         nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
+        studentsPerPage: 30,
       }
 
       await saveLearningMasteryGradebookSettings('456', settings)
@@ -153,6 +156,7 @@ describe('apiClient', () => {
             show_student_avatars: false,
             show_students_with_no_results: false,
             name_display_format: 'first_last',
+            students_per_page: 30,
           },
         },
       )
@@ -163,6 +167,7 @@ describe('apiClient', () => {
         secondaryInfoDisplay: SecondaryInfoDisplay.SIS_ID,
         displayFilters: [],
         nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
+        studentsPerPage: 50,
       }
 
       await saveLearningMasteryGradebookSettings(789, settings)
@@ -175,6 +180,7 @@ describe('apiClient', () => {
             show_student_avatars: false,
             show_students_with_no_results: false,
             name_display_format: 'first_last',
+            students_per_page: 50,
           },
         },
       )
@@ -185,6 +191,7 @@ describe('apiClient', () => {
         secondaryInfoDisplay: SecondaryInfoDisplay.NONE,
         displayFilters: [DisplayFilter.SHOW_STUDENT_AVATARS],
         nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
+        studentsPerPage: DEFAULT_STUDENTS_PER_PAGE,
       }
 
       await saveLearningMasteryGradebookSettings('123', settings)
@@ -197,6 +204,7 @@ describe('apiClient', () => {
             show_student_avatars: true,
             show_students_with_no_results: false,
             name_display_format: 'first_last',
+            students_per_page: 15,
           },
         },
       )
@@ -207,6 +215,7 @@ describe('apiClient', () => {
         secondaryInfoDisplay: SecondaryInfoDisplay.NONE,
         displayFilters: [],
         nameDisplayFormat: NameDisplayFormat.LAST_FIRST,
+        studentsPerPage: DEFAULT_STUDENTS_PER_PAGE,
       }
 
       await saveLearningMasteryGradebookSettings('123', settings)
@@ -219,6 +228,7 @@ describe('apiClient', () => {
             show_student_avatars: false,
             show_students_with_no_results: false,
             name_display_format: 'last_first',
+            students_per_page: 15,
           },
         },
       )
