@@ -74,6 +74,13 @@ module Types
     field :usage_rights, UsageRightsType, null: true
     delegate :usage_rights, to: :object
 
+    field :folder, Types::FolderType, null: true
+    def folder
+      return nil unless object.folder_id
+
+      load_association(:folder)
+    end
+
     field :url, Types::UrlType, null: true
     def url
       return if object.locked_for?(current_user, check_policies: true)
