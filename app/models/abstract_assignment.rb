@@ -3059,6 +3059,10 @@ class AbstractAssignment < ActiveRecord::Base
     group_category_id.present?
   end
 
+  def has_groups?
+    has_group_category? && Group.active.where(group_category_id:).exists?
+  end
+
   def assign_peer_review(reviewer, reviewee)
     reviewer_submission = find_or_create_submission(reviewer)
     reviewee_submission = find_or_create_submission(reviewee)

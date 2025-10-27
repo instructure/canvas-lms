@@ -756,6 +756,7 @@ export const ZSpeedGraderResponse = z
     group_category_id: z.string().nullable(), // not used in SpeedGrader
     group_category: z.null(), // not used in SpeedGrader
     GROUP_GRADING_MODE: z.boolean(),
+    HAS_GROUPS: z.boolean(),
     has_sub_assignments: z.boolean(), // not used in SpeedGrader
     hide_in_gradebook: z.boolean(), // not used in SpeedGrader
     id: z.string(),
