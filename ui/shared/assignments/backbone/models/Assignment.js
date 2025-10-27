@@ -177,6 +177,7 @@ function Assignment() {
   this.peerReviewCount = this.peerReviewCount.bind(this)
   this.peerReviews = this.peerReviews.bind(this)
   this.peerReviewsAssignAt = this.peerReviewsAssignAt.bind(this)
+  this.peerReviewSubmissionRequired = this.peerReviewSubmissionRequired.bind(this)
   this.pointsPossible = this.pointsPossible.bind(this)
   this.pollUntilFinished = this.pollUntilFinished.bind(this)
   this.pollUntilFinishedCloningAlignment = this.pollUntilFinishedCloningAlignment.bind(this)
@@ -682,6 +683,13 @@ Assignment.prototype.peerReviewsAssignAt = function (date) {
     return this.get('peer_reviews_assign_at') || null
   }
   return this.set('peer_reviews_assign_at', date)
+}
+
+Assignment.prototype.peerReviewSubmissionRequired = function (submissionRequired) {
+  if (!(arguments.length > 0)) {
+    return this.get('peer_review_submission_required') || false
+  }
+  return this.set('peer_review_submission_required', submissionRequired)
 }
 
 Assignment.prototype.intraGroupPeerReviews = function () {

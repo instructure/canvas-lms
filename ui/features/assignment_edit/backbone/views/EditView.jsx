@@ -1566,6 +1566,10 @@ EditView.prototype.getFormData = function () {
   if (ENV.PEER_REVIEW_ALLOCATION_ENABLED) {
     const checkedInput = document.getElementById('assignment_peer_reviews_checkbox')
     data.peer_reviews = checkedInput?.checked
+    const submissionRequiredInput = document.getElementById(
+      'peer_reviews_submission_required_checkbox',
+    )
+    data.peer_review_submission_required = submissionRequiredInput?.checked
   }
   return data
 }
