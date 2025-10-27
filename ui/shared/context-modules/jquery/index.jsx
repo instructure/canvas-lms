@@ -1741,6 +1741,7 @@ modules.initModuleManagement = async function (duplicate) {
             $module.find('.context_module_items.ui-sortable').sortable('enable').sortable('refresh')
             initNewItemPublishButton($item, data.content_tag)
             initNewItemDirectShare($item, data.content_tag)
+            initNewItemMoveHandler($item)
             modules.updateAssignmentData()
             modules.updateEstimatedDurations()
 
@@ -1782,6 +1783,7 @@ modules.initModuleManagement = async function (duplicate) {
           const $item = modules.addItemToModule($module, data.content_tag)
           initNewItemPublishButton($item, data.content_tag)
           initNewItemDirectShare($item, data.content_tag)
+          initNewItemMoveHandler($item)
 
           modules.updateAssignmentData()
           modules.updateEstimatedDurations()
@@ -2094,38 +2096,8 @@ if (!ENV.FEATURE_MODULES_PERF || ENV.IS_STUDENT) {
 }
 
 // Post process lazy loaded module items ----------------------
-function initContextModuleItems(moduleId) {
-  const $module = moduleId ? $(`#context_module_${moduleId}`) : $('#context_modules')
-
-  if (ENV.IS_STUDENT) {
-    $module.find('.context_module_item .ig-row').addClass('student-view')
-  }
-
-  $module.find('.context_module_item').each((_i, $item) => {
-    modules.evaluateItemCyoe($item)
-  })
-
-  $module.find('.publish-icon').each((_index, el) => {
-    const $el = $(el)
-    if ($el.data('id')) {
-      const view = initPublishButton($el)
-      overrideModel({}, modules.relock_modules_dialog, view.model, view)
-    }
-  })
-
-  const opts = modules.sortable_module_options
-  opts.update = modules.updateModuleItemPositions
-  $module.find('.context_module_items').sortable(opts)
-  // NOTE: This takes an extraordinary amount of time, and without it
-  //       I have not seen any issues with drag-and-drop ordering
-  //       of module items
-  // $('#context_modules.ui-sortable').sortable('refresh')
-  // $('#context_modules .context_module .context_module_items.ui-sortable').each(function () {
-  //   $(this).sortable('refresh')
-  //   $(this).sortable('option', 'connectWith', '.context_module_items')
-  // })
-
-  $module.find('.move_module_item_link').on('click keyclick', function (event) {
+function initNewItemMoveHandler($item) {
+  $item.find('.move_module_item_link').on('click keyclick', function (event) {
     event.preventDefault()
 
     const currentItem = $(this).parents('.context_module_item')[0]
@@ -2182,6 +2154,34 @@ function initContextModuleItems(moduleId) {
     }
 
     renderTray(moveTrayProps, document.getElementById('not_right_side'))
+  })
+}
+
+function initContextModuleItems(moduleId) {
+  const $module = moduleId ? $(`#context_module_${moduleId}`) : $('#context_modules')
+
+  if (ENV.IS_STUDENT) {
+    $module.find('.context_module_item .ig-row').addClass('student-view')
+  }
+
+  $module.find('.context_module_item').each((_i, $item) => {
+    modules.evaluateItemCyoe($item)
+  })
+
+  $module.find('.publish-icon').each((_index, el) => {
+    const $el = $(el)
+    if ($el.data('id')) {
+      const view = initPublishButton($el)
+      overrideModel({}, modules.relock_modules_dialog, view.model, view)
+    }
+  })
+
+  const opts = modules.sortable_module_options
+  opts.update = modules.updateModuleItemPositions
+  $module.find('.context_module_items').sortable(opts)
+
+  $module.find('.context_module_item').each(function () {
+    initNewItemMoveHandler($(this))
   })
 
   if (ENV.FEATURE_MODULES_PERF) {
