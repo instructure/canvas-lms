@@ -2574,7 +2574,7 @@ class Submission < ActiveRecord::Base
   end
 
   def visible_submission_comments_for(current_user)
-    displayable_comments = if assignment.grade_as_group?
+    displayable_comments = if assignment.grade_as_group? && assignment.has_groups?
                              all_submission_comments_for_groups
                            elsif assignment.moderated_grading? && assignment.grades_published?
                              # When grades are published for a moderated assignment, provisional

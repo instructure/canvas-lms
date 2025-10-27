@@ -3744,8 +3744,13 @@ EG = {
       comment = commentData.submission_comment
     }
 
-    // don't render private comments when viewing a group assignment
-    if (!comment.group_comment_id && window.jsonData.GROUP_GRADING_MODE) return undefined
+    // don't render private comments when viewing a group assignment with actual groups
+    if (
+      !comment.group_comment_id &&
+      window.jsonData.GROUP_GRADING_MODE &&
+      window.jsonData.HAS_GROUPS
+    )
+      return undefined
 
     // For screenreaders
     spokenComment = comment.comment.replace(/\s+/, ' ')
