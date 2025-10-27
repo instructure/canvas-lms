@@ -38,6 +38,9 @@ shared_examples "Gradebook Controls" do |ff_enabled|
   end
 
   before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:graphql_usage_rate).and_return(100)
+    end
     user_session(@teacher)
   end
 
