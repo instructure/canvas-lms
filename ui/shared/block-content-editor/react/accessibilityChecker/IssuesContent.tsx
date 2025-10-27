@@ -22,12 +22,13 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {CondensedButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
-import {IconInfoLine} from '@instructure/ui-icons'
+import {Link} from '@instructure/ui-link'
+import {IconInfoLine, IconExternalLinkLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {AccessibilityIssue} from './types'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const I18n = createI18nScope('block_content_editor')
-const linkColor = '#0374B5'
 
 interface IssuesContentProps {
   currentIssue: AccessibilityIssue
@@ -80,14 +81,16 @@ export const IssuesContent = ({
             {currentIssue?.rule.link && (
               <Flex.Item>
                 <Text size="medium">
-                  <a
+                  <Link
                     href={currentIssue.rule.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{color: linkColor, textDecoration: 'underline'}}
+                    iconPlacement="end"
+                    renderIcon={<IconExternalLinkLine size="x-small" />}
                   >
                     {currentIssue.rule.linkText?.()}
-                  </a>
+                    <ScreenReaderContent>{I18n.t('- Opens in a new tab.')}</ScreenReaderContent>
+                  </Link>
                 </Text>
               </Flex.Item>
             )}
