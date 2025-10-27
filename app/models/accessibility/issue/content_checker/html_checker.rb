@@ -27,9 +27,7 @@ module Accessibility
           return NO_ACCESSIBILITY_ISSUES.dup if html_content.blank? || !html_content.include?("<")
 
           begin
-            doc = Nokogiri::HTML5(html_content, nil, **CanvasSanitize::SANITIZE[:parser_options])
-            body = doc.at_css("body")
-            extend_nokogiri_with_dom_adapter(body)
+            _, body = parse_html_content(html_content)
 
             issues = []
 

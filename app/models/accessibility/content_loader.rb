@@ -19,37 +19,59 @@
 
 module Accessibility
   class ContentLoader
-    def initialize(context:, type:, id:)
-      @context = context
-      @type = type
-      @id = id
+    class UnsupportedResourceTypeError < StandardError; end
+    class ElementNotFoundError < StandardError; end
+
+    include ::Accessibility::NokogiriMethods
+
+    def initialize(issue_id:)
+      @issue = AccessibilityIssue.find(issue_id)
+      @resource = @issue.context
+      @rule_id = @issue.rule_type
+      @path = @issue.node_path
     end
 
     def content
-      case @type
-      when "Assignment"
-        return { json: { content: @context.assignments.find_by(id: @id)&.description }, status: :ok } if @context.assignments.exists?(@id)
-      when "Page"
-        return { json: { content: @context.wiki_pages.find_by(id: @id)&.body }, status: :ok } if @context.wiki_pages.exists?(@id)
-      else
-        Rails.logger.error "Unknown content type: #{@type}"
-        return { json: { error: "Unknown content type: #{@type}" }, status: :unprocessable_entity }
-      end
-      { json: { error: "Resource '#{@type}' with id '#{@id}' was not found." }, status: :not_found }
+      @path.present? ? extract_element_from_content : full_document
     end
 
-    def extract_element_from_content(path)
-      full_content = content
-      return full_content unless full_content[:status] == :ok && path
+    def full_document
+      resource_html_content
+    end
 
-      doc = Nokogiri::HTML5.fragment(full_content[:json][:content])
-      element = doc.at_xpath(path)
+    def extract_element_from_content
+      html_content = resource_html_content
 
-      if element
-        { json: { content: element.to_html }, status: :ok }
+      doc, _ = parse_html_content(html_content)
+
+      absolute_path = @path.sub(/^\./, "/html/body")
+      element = doc.at_xpath(absolute_path)
+
+      raise ElementNotFoundError, "Element not found at path: #{@path}" unless element
+
+      generate_preview_html(element)
+    end
+
+    private
+
+    def resource_html_content
+      case @resource
+      when Assignment
+        @resource.description
+      when WikiPage
+        @resource.body
       else
-        { json: { error: "Element not found" }, status: :not_found }
+        raise UnsupportedResourceTypeError, "Unsupported resource type: #{@resource.class.name}"
       end
+    end
+
+    def generate_preview_html(element)
+      return element.to_html unless @rule_id
+
+      rule = Accessibility::Rule.registry[@rule_id]
+      return element.to_html unless rule
+
+      rule.issue_preview(element) || element.to_html
     end
   end
 end
