@@ -40,6 +40,12 @@ shared_examples "gradebook" do |ff_enabled|
     update_course_preferences(@teacher, selected_view_options_filters: ["gradingPeriods"])
   end
 
+  before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:use_graphql?).and_return(true)
+    end
+  end
+
   let(:total_grade) do
     grading_period_names = ["All Grading Periods", @gp1.title, @gp2.title]
     user_session(@teacher)
