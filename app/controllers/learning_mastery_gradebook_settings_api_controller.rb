@@ -24,6 +24,7 @@ class LearningMasteryGradebookSettingsApiController < ApplicationController
   before_action :authorize
 
   VALID_SECONDARY_INFO_DISPLAY_VALUES = %w[none sis_id integration_id login_id].freeze
+  VALID_NAME_DISPLAY_FORMAT_VALUES = %w[first_last last_first].freeze
 
   # @API Get Learning Mastery Gradebook Settings
   #
@@ -108,6 +109,13 @@ class LearningMasteryGradebookSettingsApiController < ApplicationController
       value = settings[:show_student_avatars]
       unless [true, false, "true", "false"].include?(value)
         errors << "Invalid show_student_avatars ('#{value}'). Valid values are: [true, false]"
+      end
+    end
+
+    if settings.key?(:name_display_format)
+      value = settings[:name_display_format]
+      unless VALID_NAME_DISPLAY_FORMAT_VALUES.include?(value)
+        errors << "Invalid name_display_format ('#{value}'). Valid values are: #{VALID_NAME_DISPLAY_FORMAT_VALUES.join(", ")}"
       end
     end
 
