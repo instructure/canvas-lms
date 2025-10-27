@@ -20,8 +20,9 @@ import {renderHook, act} from '@testing-library/react-hooks/dom'
 import {usePeerReviewSettings, MAX_NUM_PEER_REVIEWS} from '../usePeerReviewSettings'
 
 describe('usePeerReviewSettings', () => {
-  const defaultProps = () => ({
+  const defaultProps = (): {peerReviewCount: number; submissionRequired: boolean} => ({
     peerReviewCount: 0,
+    submissionRequired: false,
   })
 
   it('initializes with default values', () => {
@@ -44,6 +45,20 @@ describe('usePeerReviewSettings', () => {
       usePeerReviewSettings({...defaultProps(), peerReviewCount: 3}),
     )
     expect(result.current.reviewsRequired).toBe('3')
+  })
+
+  it('sets initial submissionsRequiredBeforePeerReviews to false when submissionRequired is false', () => {
+    const {result} = renderHook(() =>
+      usePeerReviewSettings({...defaultProps(), submissionRequired: false}),
+    )
+    expect(result.current.submissionsRequiredBeforePeerReviews).toBe(false)
+  })
+
+  it('sets initial submissionsRequiredBeforePeerReviews to true when submissionRequired is true', () => {
+    const {result} = renderHook(() =>
+      usePeerReviewSettings({...defaultProps(), submissionRequired: true}),
+    )
+    expect(result.current.submissionsRequiredBeforePeerReviews).toBe(true)
   })
 
   describe('reviews required validation', () => {

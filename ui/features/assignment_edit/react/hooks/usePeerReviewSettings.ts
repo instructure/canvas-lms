@@ -23,7 +23,13 @@ const I18n = createI18nScope('peer_review_settings')
 
 export const MAX_NUM_PEER_REVIEWS = 10
 
-export const usePeerReviewSettings = ({peerReviewCount}: {peerReviewCount: number}) => {
+export const usePeerReviewSettings = ({
+  peerReviewCount,
+  submissionRequired,
+}: {
+  peerReviewCount: number
+  submissionRequired: boolean
+}) => {
   const [reviewsRequired, setReviewsRequired] = useState<string>(
     peerReviewCount ? peerReviewCount.toString() : '1',
   )
@@ -41,7 +47,7 @@ export const usePeerReviewSettings = ({peerReviewCount}: {peerReviewCount: numbe
   const [usePassFailGrading, setUsePassFailGrading] = useState<boolean>(false)
   const [anonymousPeerReviews, setAnonymousPeerReviews] = useState<boolean>(false)
   const [submissionsRequiredBeforePeerReviews, setSubmissionsRequiredBeforePeerReviews] =
-    useState<boolean>(false)
+    useState<boolean>(submissionRequired)
 
   useEffect(() => {
     setTotalPoints(calculateTotalPoints())

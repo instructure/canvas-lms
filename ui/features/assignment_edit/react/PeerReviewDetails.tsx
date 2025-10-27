@@ -177,7 +177,7 @@ const PeerReviewDetails = ({assignment}: {assignment: Assignment}) => {
     submissionsRequiredBeforePeerReviews,
     handleSubmissionRequiredCheck,
     resetFields,
-  } = usePeerReviewSettings({peerReviewCount: assignment.peerReviewCount()})
+  } = usePeerReviewSettings({peerReviewCount: assignment.peerReviewCount(), submissionRequired: assignment.peerReviewSubmissionRequired()})
 
   useEffect(() => {
     const handlePeerReviewToggle = (event: MessageEvent) => {

@@ -41,6 +41,7 @@ const createMockAssignment = (overrides = {}) => ({
   peerReviewCount: jest.fn(() => 1),
   courseID: jest.fn(() => '123'),
   getId: jest.fn(() => '456'),
+  peerReviewSubmissionRequired: jest.fn(() => false),
   ...overrides,
 })
 
@@ -92,6 +93,30 @@ describe('PeerReviewDetails', () => {
 
       const checkbox = screen.getByTestId('peer-review-checkbox')
       expect(checkbox).toBeDisabled()
+    })
+
+    it('loads initial value of submission required as checked when set to true in assignment', async () => {
+      assignment.peerReviews = jest.fn(() => true)
+      assignment.peerReviewSubmissionRequired = jest.fn(() => true)
+
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
+
+      const advancedSettingsToggle = screen.getByText('Advanced Peer Review Configurations')
+      await user.click(advancedSettingsToggle)
+
+      const submissionRequiredCheckbox = screen.getByTestId('submission-required-checkbox')
+      expect(submissionRequiredCheckbox).toBeChecked()
+    })
+
+    it('defaults submission required to unchecked when not set in assignment', async () => {
+      assignment.peerReviews = jest.fn(() => true)
+      renderWithQueryClient(<PeerReviewDetails assignment={assignment} />)
+
+      const advancedSettingsToggle = screen.getByText('Advanced Peer Review Configurations')
+      await user.click(advancedSettingsToggle)
+
+      const submissionRequiredCheckbox = screen.getByTestId('submission-required-checkbox')
+      expect(submissionRequiredCheckbox).not.toBeChecked()
     })
   })
 
