@@ -51,6 +51,12 @@ shared_examples "Grade Detail Tray:" do |ff_enabled|
     @course.students.first.submissions.find_by(assignment_id: @a5.id).update!(custom_grade_status: @custom_status)
   end
 
+  before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:use_graphql?).and_return(true)
+    end
+  end
+
   context "status" do
     before do
       user_session(@teacher)
