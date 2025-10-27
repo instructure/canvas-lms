@@ -3475,6 +3475,12 @@ fa:
       other: "%{count} دانشجو"
   assignment_path_selected_e80191d1: "مسیر تکلیف انتخاب شد"
   assignment_preview_3833e819: "پیش نمایش %{assignment}"
+  assignment_quiz_type: 
+    quiz_type: "نوع آزمون"
+    quiz_type_options: 
+      graded_quiz: "آزمون نمره گذاری شده"
+      graded_survey: "نظرسنجی نمره گذاری شده"
+      ungraded_survey: "نظرسنجی نمره گذاری نشده"
   assignment_scheduling_e2a3eaf6: "زمان بندی تکلیف"
   assignment_score_summary_f1dc9708: "خلاصه نمره تکلیف"
   assignment_selection_6bff05c4: "انتخاب تکلیف"
@@ -20800,6 +20806,7 @@ fa:
   review_now_318a6a3e: "هم اکنون بازبینی کنید"
   reviewer_b993ce28: "بازبینی کننده"
   reviewers_successfully_added_bd4b629a: "بازبینی کننده ها با موفقیت افزوده شدند!"
+  revision_history_abfd1cfd: "تاریخچه بازنگری"
   rich_content_editor_2708ef21: "ویرایشگر محتوای غنی"
   rich_content_editor_sidebar_enhancements_8bd945d3: "ارتقاء نوار کناری ویرایشگر محتوای غنی"
   right_sidebar_logo_5483dc0a: "لوگوی نوار کناری سمت راست"
