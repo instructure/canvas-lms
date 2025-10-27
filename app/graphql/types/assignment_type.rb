@@ -840,13 +840,21 @@ module Types
 
     field :auto_grade_assignment_issues, Types::EligibilityIssueType, null: true, description: "Issues related to the assignment"
     def auto_grade_assignment_issues
-      GraphQLHelpers::AutoGradeEligibilityHelper.validate_assignment(assignment:)
+      load_association(:context).then do |course|
+        next nil unless course.feature_enabled?(:project_lhotse)
+
+        GraphQLHelpers::AutoGradeEligibilityHelper.validate_assignment(assignment:)
+      end
     end
 
     field :auto_grade_assignment_errors, [String], null: false, description: "Errors related to the assignment"
     def auto_grade_assignment_errors
-      issues = GraphQLHelpers::AutoGradeEligibilityHelper.validate_assignment(assignment:)
-      issues ? [issues[:message]] : []
+      load_association(:context).then do |course|
+        next [] unless course.feature_enabled?(:project_lhotse)
+
+        issues = GraphQLHelpers::AutoGradeEligibilityHelper.validate_assignment(assignment:)
+        issues ? [issues[:message]] : []
+      end
     end
 
     field :is_new_quiz, Boolean, null: false, description: "Assignment is connected to a New Quiz"
