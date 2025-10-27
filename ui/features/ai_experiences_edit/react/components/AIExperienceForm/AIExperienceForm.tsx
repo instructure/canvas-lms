@@ -202,7 +202,11 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
               </IconButton>
             }
           >
-            <Menu.Item onClick={handleDeleteClick} disabled={!isEdit}>
+            <Menu.Item
+              data-testid="ai-experience-edit-delete-menu-item"
+              onClick={handleDeleteClick}
+              disabled={!isEdit}
+            >
               {I18n.t('Delete')}
             </Menu.Item>
           </Menu>
@@ -212,6 +216,7 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
       <form onSubmit={handleSubmit} noValidate={true}>
         <View as="div" margin="0 0 large 0">
           <TextInput
+            data-testid="ai-experience-edit-title-input"
             renderLabel={I18n.t('Title')}
             value={formData.title}
             onChange={handleInputChange('title')}
@@ -223,6 +228,7 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
 
         <View as="div" margin="0 0 large 0">
           <TextArea
+            data-testid="ai-experience-edit-description-input"
             label={I18n.t('Description')}
             value={formData.description}
             onChange={handleInputChange('description')}
@@ -269,6 +275,7 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
             <View as="div" padding="medium">
               <FormFieldGroup description="" layout="stacked">
                 <TextArea
+                  data-testid="ai-experience-edit-facts-input"
                   label={I18n.t('Facts students should know')}
                   value={formData.facts}
                   onChange={handleInputChange('facts')}
@@ -280,6 +287,7 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
                 />
 
                 <TextArea
+                  data-testid="ai-experience-edit-learning-objective-input"
                   label={I18n.t('Learning objectives')}
                   value={formData.learning_objective}
                   onChange={handleInputChange('learning_objective')}
@@ -297,6 +305,7 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
                 />
 
                 <TextArea
+                  data-testid="ai-experience-edit-pedagogical-guidance-input"
                   label={I18n.t('Pedagogical guidance')}
                   value={formData.pedagogical_guidance}
                   onChange={handleInputChange('pedagogical_guidance')}
@@ -318,12 +327,19 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
         </View>
 
         <Flex justifyItems="end" margin="large 0 0 0" gap="small">
-          <Button onClick={handleCancel}>{I18n.t('Cancel')}</Button>
+          <Button data-testid="ai-experience-edit-cancel-button" onClick={handleCancel}>
+            {I18n.t('Cancel')}
+          </Button>
           <Menu
             placement="top"
             trigger={<Button renderIcon={<IconArrowOpenDownLine />}>{I18n.t('Preview')}</Button>}
           >
-            <Menu.Item onClick={handlePreviewExperience}>{I18n.t('Preview experience')}</Menu.Item>
+            <Menu.Item
+              data-testid="ai-experience-edit-preview-item"
+              onClick={handlePreviewExperience}
+            >
+              {I18n.t('Preview experience')}
+            </Menu.Item>
             <Menu.Item disabled>
               <div
                 style={{
@@ -338,7 +354,12 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
               </div>
             </Menu.Item>
           </Menu>
-          <Button type="submit" color="primary" interaction={isLoading ? 'disabled' : 'enabled'}>
+          <Button
+            data-testid="ai-experience-save-as-draft-item"
+            type="submit"
+            color="primary"
+            interaction={isLoading ? 'disabled' : 'enabled'}
+          >
             {isLoading ? I18n.t('Saving...') : I18n.t('Save as draft')}
           </Button>
         </Flex>
@@ -353,6 +374,7 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
       >
         <Modal.Header>
           <CloseButton
+            data-testid="ai-experience-edit-preview-close-preview-confirmation-button"
             placement="end"
             offset="small"
             onClick={() => setShowPreviewModal(false)}
@@ -368,10 +390,18 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
           </Text>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={() => setShowPreviewModal(false)} margin="0 x-small 0 0">
+          <Button
+            data-testid="ai-experience-edit-cancel-preview-confirmation-button"
+            onClick={() => setShowPreviewModal(false)}
+            margin="0 x-small 0 0"
+          >
             {I18n.t('Cancel')}
           </Button>
-          <Button onClick={handleConfirmPreview} color="primary">
+          <Button
+            data-testid="ai-experience-edit-confirm-preview-confirmation-button"
+            onClick={handleConfirmPreview}
+            color="primary"
+          >
             {I18n.t('Confirm')}
           </Button>
         </Modal.Footer>
@@ -386,6 +416,7 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
       >
         <Modal.Header>
           <CloseButton
+            data-testid="ai-experience-edit-close-delete-confirm-button"
             placement="end"
             offset="small"
             onClick={() => setShowDeleteModal(false)}
@@ -401,10 +432,15 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
           </Text>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={() => setShowDeleteModal(false)} margin="0 x-small 0 0">
+          <Button
+            data-testid="ai-experience-edit-cancel-delete-confirm-button"
+            onClick={() => setShowDeleteModal(false)}
+            margin="0 x-small 0 0"
+          >
             {I18n.t('Cancel')}
           </Button>
           <Button
+            data-testid="ai-experience-edit-confirm-delete-confirm-button"
             onClick={handleConfirmDelete}
             color="danger"
             interaction={isDeleting ? 'disabled' : 'enabled'}

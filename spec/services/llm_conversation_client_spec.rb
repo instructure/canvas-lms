@@ -51,11 +51,60 @@ describe LLMConversationClient do
     )
   end
 
-  before do
-    allow(described_class).to receive(:base_url).and_return("http://localhost:3001")
+  describe ".base_url" do
+    it "raises error when setting is not configured" do
+      expect { described_class.base_url }.to raise_error(
+        LlmConversation::Errors::ConversationError,
+        "llm_conversation_base_url setting is not configured"
+      )
+    end
+
+    it "returns the configured setting value" do
+      Setting.set("llm_conversation_base_url", "https://llm-conversation.example.com")
+      expect(described_class.base_url).to eq("https://llm-conversation.example.com")
+    end
+
+    it "dynamically reflects setting changes without caching" do
+      Setting.set("llm_conversation_base_url", "https://url1.example.com")
+      expect(described_class.base_url).to eq("https://url1.example.com")
+
+      Setting.set("llm_conversation_base_url", "https://url2.example.com")
+      expect(described_class.base_url).to eq("https://url2.example.com")
+    end
+
+    it "does not cache the value in class instance variables" do
+      # Set initial value
+      Setting.set("llm_conversation_base_url", "https://initial.example.com")
+      described_class.base_url
+
+      # Change the setting
+      Setting.set("llm_conversation_base_url", "https://changed.example.com")
+
+      # Verify it doesn't use cached value from @base_url or similar
+      expect(described_class.base_url).to eq("https://changed.example.com")
+
+      # Verify no instance variables are being set on the class
+      expect(described_class.instance_variables).not_to include(:@base_url)
+    end
+  end
+
+  describe ".bearer_token" do
+    it "returns the bearer token from credentials" do
+      allow(Rails.application.credentials).to receive(:llm_conversation_bearer_token).and_return("test-bearer-token")
+      expect(described_class.bearer_token).to eq("test-bearer-token")
+    end
+
+    it "returns nil when token is not configured" do
+      allow(Rails.application.credentials).to receive(:llm_conversation_bearer_token).and_return(nil)
+      expect(described_class.bearer_token).to be_nil
+    end
   end
 
   describe "#starting_messages" do
+    before do
+      allow(described_class).to receive_messages(base_url: "http://localhost:3001", bearer_token: "test-bearer-token")
+    end
+
     let(:create_response) do
       {
         "success" => true,
@@ -77,9 +126,11 @@ describe LLMConversationClient do
 
     before do
       stub_request(:post, "http://localhost:3001/conversations")
+        .with(headers: { "Authorization" => "Bearer test-bearer-token" })
         .to_return(status: 200, body: create_response.to_json, headers: { "Content-Type" => "application/json" })
 
       stub_request(:post, "http://localhost:3001/conversations/#{conversation_id}/messages/add")
+        .with(headers: { "Authorization" => "Bearer test-bearer-token" })
         .to_return(status: 200, body: add_message_response.to_json, headers: { "Content-Type" => "application/json" })
     end
 
@@ -101,9 +152,21 @@ describe LLMConversationClient do
 
       expect { client.starting_messages }.to raise_error(LlmConversation::Errors::ConversationError)
     end
+
+    it "raises ConversationError when bearer token is not configured" do
+      allow(described_class).to receive(:bearer_token).and_return(nil)
+      expect { client.starting_messages }.to raise_error(
+        LlmConversation::Errors::ConversationError,
+        "llm_conversation_bearer_token not found in vault secrets"
+      )
+    end
   end
 
   describe "#continue_conversation" do
+    before do
+      allow(described_class).to receive_messages(base_url: "http://localhost:3001", bearer_token: "test-bearer-token")
+    end
+
     let(:messages) do
       [
         { role: "User", text: "Initial message" },
@@ -122,6 +185,7 @@ describe LLMConversationClient do
 
     before do
       stub_request(:post, "http://localhost:3001/conversations/#{conversation_id}/messages/add")
+        .with(headers: { "Authorization" => "Bearer test-bearer-token" })
         .to_return(status: 200, body: add_message_response.to_json, headers: { "Content-Type" => "application/json" })
     end
 
@@ -154,6 +218,10 @@ describe LLMConversationClient do
   end
 
   describe "#messages" do
+    before do
+      allow(described_class).to receive_messages(base_url: "http://localhost:3001", bearer_token: "test-bearer-token")
+    end
+
     let(:messages_response) do
       {
         "success" => true,
@@ -174,6 +242,7 @@ describe LLMConversationClient do
 
     before do
       stub_request(:get, "http://localhost:3001/conversations/#{conversation_id}/messages")
+        .with(headers: { "Authorization" => "Bearer test-bearer-token" })
         .to_return(status: 200, body: messages_response.to_json, headers: { "Content-Type" => "application/json" })
     end
 

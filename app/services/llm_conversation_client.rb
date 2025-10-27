@@ -66,7 +66,30 @@ class LLMConversationClient
   TEXT
 
   def self.base_url
-    @base_url ||= Setting.get("llm_conversation_base_url", "http://localhost:3001")
+    region = ApplicationController.region
+
+    # Try region-specific setting first, fall back to base setting
+    url = if region.present?
+            Setting.get("llm_conversation_base_url_#{region}", nil)
+          end
+
+    # Fall back to base setting if region-specific not found
+    url ||= Setting.get("llm_conversation_base_url", nil)
+
+    if url.nil?
+      error_msg = if region.present?
+                    "Neither llm_conversation_base_url_#{region} nor llm_conversation_base_url setting is configured"
+                  else
+                    "llm_conversation_base_url setting is not configured"
+                  end
+      raise LlmConversation::Errors::ConversationError, error_msg
+    end
+
+    url
+  end
+
+  def self.bearer_token
+    Rails.application.credentials.llm_conversation_bearer_token
   end
 
   def initialize(current_user: nil, root_account_uuid: nil, facts: "", learning_objectives: "", scenario: "", conversation_id: nil)
@@ -120,19 +143,13 @@ class LLMConversationClient
   def messages
     raise LlmConversation::Errors::ConversationError, "Conversation ID not set" unless @conversation_id
 
-    uri = URI("#{self.class.base_url}/conversations/#{@conversation_id}/messages")
-    http = Net::HTTP.new(uri.host, uri.port)
-    headers = { "Content-Type" => "application/json" }
-    request = Net::HTTP::Get.new(uri.path, headers)
+    response = make_request(
+      method: :get,
+      path: "/conversations/#{@conversation_id}/messages",
+      error_message: "Failed to get messages"
+    )
 
-    response = http.request(request)
-
-    unless response.is_a?(Net::HTTPSuccess)
-      raise LlmConversation::Errors::ConversationError, "Failed to get messages: #{response.code} - #{response.body}"
-    end
-
-    parsed_response = JSON.parse(response.body)
-    messages_data = parsed_response["data"]
+    messages_data = response["data"]
 
     # Convert llm-conversation message format to our format
     messages_data.map do |msg|
@@ -141,20 +158,53 @@ class LLMConversationClient
         text: msg["text"]
       }
     end
-  rescue LlmConversation::Errors::ConversationError
-    raise
-  rescue Timeout::Error, SocketError, SystemCallError, OpenSSL::SSL::SSLError, JSON::ParserError => e
-    raise LlmConversation::Errors::ConversationError, "Failed to get messages: #{e.message}"
   end
 
   private
 
-  def create_conversation
-    uri = URI("#{self.class.base_url}/conversations")
+  def make_request(method:, path:, payload: nil, error_message:)
+    uri = URI("#{self.class.base_url}#{path}")
     http = Net::HTTP.new(uri.host, uri.port)
-    headers = { "Content-Type" => "application/json" }
-    request = Net::HTTP::Post.new(uri.path, headers)
 
+    # Configure SSL for HTTPS
+    if uri.scheme.casecmp?("https")
+      http.use_ssl = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+    end
+
+    token = self.class.bearer_token
+    if token.nil?
+      raise LlmConversation::Errors::ConversationError, "llm_conversation_bearer_token not found in vault secrets"
+    end
+
+    headers = {
+      "Content-Type" => "application/json",
+      "Authorization" => "Bearer #{token}"
+    }
+
+    request = case method
+              when :get
+                Net::HTTP::Get.new(uri.path, headers)
+              when :post
+                req = Net::HTTP::Post.new(uri.path, headers)
+                req.body = payload.to_json if payload
+                req
+              end
+
+    response = http.request(request)
+
+    unless response.is_a?(Net::HTTPSuccess)
+      raise LlmConversation::Errors::ConversationError, "#{error_message}: #{response.code} - #{response.body}"
+    end
+
+    JSON.parse(response.body)
+  rescue LlmConversation::Errors::ConversationError
+    raise
+  rescue Timeout::Error, SocketError, SystemCallError, OpenSSL::SSL::SSLError, JSON::ParserError, EOFError, Net::HTTPBadResponse, Net::ProtocolError => e
+    raise LlmConversation::Errors::ConversationError, "#{error_message}: #{e.message}"
+  end
+
+  def create_conversation
     payload = {
       root_account_id: @root_account_uuid || "default",
       account_id: @root_account_uuid || "default",
@@ -163,45 +213,31 @@ class LLMConversationClient
       workflow_state: "active"
     }
 
-    request.body = payload.to_json
-    response = http.request(request)
+    response = make_request(
+      method: :post,
+      path: "/conversations",
+      payload:,
+      error_message: "Failed to create conversation"
+    )
 
-    unless response.is_a?(Net::HTTPSuccess)
-      raise LlmConversation::Errors::ConversationError, "Failed to create conversation: #{response.code} - #{response.body}"
-    end
-
-    JSON.parse(response.body)["data"]
-  rescue LlmConversation::Errors::ConversationError
-    raise
-  rescue Timeout::Error, SocketError, SystemCallError, OpenSSL::SSL::SSLError, JSON::ParserError => e
-    raise LlmConversation::Errors::ConversationError, "Failed to create conversation: #{e.message}"
+    response["data"]
   end
 
   def add_message_to_conversation(message_text, role)
     raise LlmConversation::Errors::ConversationError, "Conversation ID not set" unless @conversation_id
-
-    uri = URI("#{self.class.base_url}/conversations/#{@conversation_id}/messages/add")
-    http = Net::HTTP.new(uri.host, uri.port)
-    headers = { "Content-Type" => "application/json" }
-    request = Net::HTTP::Post.new(uri.path, headers)
 
     payload = {
       role:,
       text: message_text
     }
 
-    request.body = payload.to_json
-    response = http.request(request)
+    response = make_request(
+      method: :post,
+      path: "/conversations/#{@conversation_id}/messages/add",
+      payload:,
+      error_message: "Failed to add message"
+    )
 
-    unless response.is_a?(Net::HTTPSuccess)
-      raise LlmConversation::Errors::ConversationError, "Failed to add message: #{response.code} - #{response.body}"
-    end
-
-    parsed_response = JSON.parse(response.body)
-    parsed_response["data"]["text"]
-  rescue LlmConversation::Errors::ConversationError
-    raise
-  rescue Timeout::Error, SocketError, SystemCallError, OpenSSL::SSL::SSLError, JSON::ParserError => e
-    raise LlmConversation::Errors::ConversationError, "Failed to add message to conversation: #{e.message}"
+    response["data"]["text"]
   end
 end

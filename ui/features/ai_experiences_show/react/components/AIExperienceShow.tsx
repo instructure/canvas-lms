@@ -99,8 +99,13 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
               </IconButton>
             }
           >
-            <Menu.Item onSelect={handleEdit}>{I18n.t('Edit')}</Menu.Item>
-            <Menu.Item disabled={true}>
+            <Menu.Item data-testid="ai-experience-show-edit-menu-item" onSelect={handleEdit}>
+              {I18n.t('Edit')}
+            </Menu.Item>
+            <Menu.Item
+              data-testid="ai-experience-show-run-chat-simulation-menu-item"
+              disabled={true}
+            >
               <Flex justifyItems="space-between" gap="small">
                 <Flex.Item>
                   <Text>{I18n.t('Run chat simulation')}</Text>
@@ -112,14 +117,19 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
                 </Flex.Item>
               </Flex>
             </Menu.Item>
-            <Menu.Item onSelect={() => setIsDeleteModalOpen(true)}>{I18n.t('Delete')}</Menu.Item>
+            <Menu.Item
+              data-testid="ai-experience-show-delete-menu-item"
+              onSelect={() => setIsDeleteModalOpen(true)}
+            >
+              {I18n.t('Delete')}
+            </Menu.Item>
           </Menu>
         </Flex.Item>
       </Flex>
 
       {aiExperience.description && (
         <View as="div" margin="0 0 medium 0">
-          <Text>{aiExperience.description}</Text>
+          <Text data-testid="ai-experience-show-description-text">{aiExperience.description}</Text>
         </View>
       )}
 
@@ -188,7 +198,7 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
               <Heading level="h3" margin="0 0 small 0">
                 {I18n.t('Facts students should know')}
               </Heading>
-              <Text>{aiExperience.facts}</Text>
+              <Text data-testid="ai-experience-show-facts-text">{aiExperience.facts}</Text>
             </View>
           )}
 
@@ -197,7 +207,9 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
               <Heading level="h3" margin="0 0 small 0">
                 {I18n.t('Learning objectives')}
               </Heading>
-              <Text>{aiExperience.learning_objective}</Text>
+              <Text data-testid="ai-experience-show-learning-objectives-text">
+                {aiExperience.learning_objective}
+              </Text>
             </View>
           )}
 
@@ -206,7 +218,9 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
               <Heading level="h3" margin="0 0 small 0">
                 {I18n.t('Pedagogical guidance')}
               </Heading>
-              <Text>{aiExperience.pedagogical_guidance}</Text>
+              <Text data-testid="ai-experience-show-pedagogical-guidance-text">
+                {aiExperience.pedagogical_guidance}
+              </Text>
             </View>
           )}
         </View>
@@ -230,10 +244,15 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
           </Text>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={() => setIsDeleteModalOpen(false)} margin="0 small 0 0">
+          <Button
+            data-testid="ai-experience-show-delete-cancel-button"
+            onClick={() => setIsDeleteModalOpen(false)}
+            margin="0 small 0 0"
+          >
             {I18n.t('Cancel')}
           </Button>
           <Button
+            data-testid="ai-experience-show-delete-confirm-button"
             onClick={handleDelete}
             color="danger"
             interaction={isDeleting ? 'disabled' : 'enabled'}
