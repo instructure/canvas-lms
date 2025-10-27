@@ -1247,6 +1247,60 @@ describe LearningObjectDatesController do
           end
         end
       end
+
+      context "on blueprint child courses" do
+        before :once do
+          @child_course = @course
+          @child_assignment = learning_object
+          master_template = MasterCourses::MasterTemplate.set_as_master_course(course_model)
+          child_subscription = master_template.add_child_course!(@child_course)
+          MasterCourses::ChildContentTag.create!(child_subscription:, content: @child_assignment)
+          @mct = MasterCourses::MasterContentTag.create!(master_template:, content: assignment_model)
+          @child_assignment.update! migration_id: @mct.migration_id
+        end
+
+        it "returns unauthorized when due_dates are locked and updating overrides" do
+          @mct.update_attribute(:restrictions, { due_dates: true })
+          put :update, params: { **default_params,
+            assignment_overrides: [{ course_section_id: @course.default_section.id, due_at: "2024-01-02T05:00:00Z" }] }
+          expect(response).to be_unauthorized
+        end
+
+        it "returns unauthorized when availability_dates are locked and updating overrides" do
+          @mct.update_attribute(:restrictions, { availability_dates: true })
+          put :update, params: { **default_params,
+            assignment_overrides: [{ course_section_id: @course.default_section.id, unlock_at: "2024-01-01T05:00:00Z" }] }
+          expect(response).to be_unauthorized
+        end
+
+        it "allows updating due_dates when only availability_dates are locked" do
+          @mct.update_attribute(:restrictions, { availability_dates: true })
+          put :update, params: { **default_params,
+            assignment_overrides: [{ course_section_id: @child_course.default_section.id, due_at: "2024-01-02T05:00:00Z" }] }
+          expect(response).to be_successful
+        end
+
+        it "allows updating availability_dates when only due_dates are locked" do
+          @mct.update_attribute(:restrictions, { due_dates: true })
+          put :update, params: { **default_params,
+            assignment_overrides: [{ course_section_id: @child_course.default_section.id, unlock_at: "2024-01-01T05:00:00Z" }] }
+          expect(response).to be_successful
+        end
+
+        it "returns unauthorized when both are locked and updating due_dates" do
+          @mct.update_attribute(:restrictions, { due_dates: true, availability_dates: true })
+          put :update, params: { **default_params,
+            assignment_overrides: [{ course_section_id: @child_course.default_section.id, due_at: "2024-01-02T05:00:00Z" }] }
+          expect(response).to be_unauthorized
+        end
+
+        it "returns unauthorized when both are locked and updating availability_dates" do
+          @mct.update_attribute(:restrictions, { due_dates: true, availability_dates: true })
+          put :update, params: { **default_params,
+            assignment_overrides: [{ course_section_id: @child_course.default_section.id, unlock_at: "2024-01-01T05:00:00Z" }] }
+          expect(response).to be_unauthorized
+        end
+      end
     end
 
     context "quizzes" do

@@ -58,6 +58,7 @@ interface Props {
   disabledWithGradingPeriod?: boolean
   disabledOptionIdsRef?: React.MutableRefObject<string[]>
   itemType?: ItemType
+  disabled?: boolean
 }
 
 const AssigneeSelector = ({
@@ -81,6 +82,7 @@ const AssigneeSelector = ({
   disabledWithGradingPeriod,
   disabledOptionIdsRef,
   itemType,
+  disabled = false,
 }: Props) => {
   const listElementRef = useRef<HTMLElement | null>(null)
   const [options, setOptions] = useState<AssigneeOption[]>(defaultValues)
@@ -209,7 +211,7 @@ const AssigneeSelector = ({
   return (
     <AlertManager breakpoints={{}}>
       <CanvasMultiSelect
-        disabled={disabledWithGradingPeriod || shouldDisableSelector}
+        disabled={disabled || disabledWithGradingPeriod || shouldDisableSelector}
         data-testid="assignee_selector"
         messages={messages}
         label={showVisualLabel ? label : <ScreenReaderContent>{label}</ScreenReaderContent>}
