@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {CloseButton} from '@instructure/ui-buttons'
+import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Flex, FlexItem} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 // biome-ignore lint/style/noRestrictedImports: the modal in SG's instui-bindings is incompatible with all three of Canvas's modals and doesn't permit pendo tracking
@@ -53,13 +53,7 @@ export function AssetReportModal({
   )
 
   return (
-    <Modal
-      label={modalTitle}
-      open={true}
-      onClose={onClose}
-      onDismiss={onClose}
-      size="medium"
-    >
+    <Modal label={modalTitle} open={true} onClose={onClose} onDismiss={onClose} size="medium">
       <Modal.Header>
         <Heading>{modalTitle}</Heading>
         <CloseButton
@@ -72,37 +66,44 @@ export function AssetReportModal({
           }}
         />
       </Modal.Header>
-      <Modal.Body>
-        <Flex justifyItems="space-between" alignItems="center" margin="0 0 medium 0" gap="medium">
-          {mainTitle && (
+      <Modal.Body overflow="scroll">
+        <View height="25rem" as="div">
+          <Flex justifyItems="space-between" alignItems="center" margin="0 0 medium 0" gap="medium">
+            {mainTitle && (
+              <FlexItem>
+                <View maxWidth="30em" as="div">
+                  <Text size="descriptionPage" weight="weightImportant">
+                    <TruncateWithTooltip
+                      linesAllowed={1}
+                      horizontalOffset={0}
+                      backgroundColor="primary-inverse"
+                    >
+                      {mainTitle}
+                    </TruncateWithTooltip>
+                  </Text>
+                </View>
+              </FlexItem>
+            )}
             <FlexItem>
-              <View maxWidth="30em" as="div">
-                <Text size="descriptionPage" weight="weightImportant">
-                  <TruncateWithTooltip
-                    linesAllowed={1}
-                    horizontalOffset={0}
-                    backgroundColor="primary-inverse"
-                  >
-                    {mainTitle}
-                  </TruncateWithTooltip>
-                </Text>
-              </View>
+              <LtiAssetReportStatus reports={reports} />
             </FlexItem>
-          )}
-          <FlexItem>
-            <LtiAssetReportStatus reports={reports} />
-          </FlexItem>
-        </Flex>
-        <LtiAssetReports
-          assetProcessors={assetProcessorsWithReports}
-          attempt={attempt}
-          reports={reports}
-          studentIdForResubmission={studentIdForResubmission}
-          attachments={attachments}
-          submissionType={submissionType}
-          showDocumentDisplayName={showDocumentDisplayName}
-        />
+          </Flex>
+          <LtiAssetReports
+            assetProcessors={assetProcessorsWithReports}
+            attempt={attempt}
+            reports={reports}
+            studentIdForResubmission={studentIdForResubmission}
+            attachments={attachments}
+            submissionType={submissionType}
+            showDocumentDisplayName={showDocumentDisplayName}
+          />
+        </View>
       </Modal.Body>
+      <Modal.Footer>
+        <Button data-pendo="asset-reports-modal-close-footer-button" onClick={onClose}>
+          {I18n.t('Close')}
+        </Button>
+      </Modal.Footer>
     </Modal>
   )
 }

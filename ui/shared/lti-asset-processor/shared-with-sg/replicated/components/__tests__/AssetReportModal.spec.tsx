@@ -17,6 +17,7 @@
  */
 
 import {render, screen} from '@testing-library/react'
+import {fn} from '../../../__tests__/testPlatformShims'
 import type {LtiAssetProcessor} from '../../types/LtiAssetProcessors'
 import type {LtiAssetReport} from '../../types/LtiAssetReports'
 import {AssetReportModal} from '../AssetReportModal'
@@ -94,6 +95,12 @@ describe('AssetReportModal', () => {
     },
   ]
 
+  const mockOnClose = fn()
+
+  beforeEach(() => {
+    mockOnClose.mockClear()
+  })
+
   it('filters asset processors to only include those with reports', () => {
     const reports = [
       createUploadReport(0, '10', {processorId: '1'}),
@@ -119,5 +126,77 @@ describe('AssetReportModal', () => {
     expect(screen.getByText('Test Processor · Test Processor Title')).toBeInTheDocument()
     expect(screen.getByText('Another Processor · Another Processor Title')).toBeInTheDocument()
     expect(screen.queryByText('Unused Processor · Unused Processor Title')).not.toBeInTheDocument()
+  })
+
+  it('renders close buttons in header and footer', () => {
+    const reports = [createUploadReport(0, '10', {processorId: '1'})]
+    const attachments = [{_id: '10', displayName: 'test.pdf'}]
+
+    render(
+      <AssetReportModal
+        assetProcessors={mockAssetProcessors}
+        modalTitle="Test Modal"
+        onClose={mockOnClose}
+        attachments={attachments}
+        attempt=""
+        mainTitle={undefined}
+        reports={reports}
+        showDocumentDisplayName={false}
+        studentIdForResubmission={undefined}
+        submissionType="online_upload"
+      />,
+    )
+
+    // There should be two close buttons - one in header (X) and one in footer
+    const closeButtons = screen.getAllByRole('button', {name: /close/i})
+    expect(closeButtons).toHaveLength(2)
+  })
+
+  it('calls onClose when footer close button is clicked', () => {
+    const reports = [createUploadReport(0, '10', {processorId: '1'})]
+    const attachments = [{_id: '10', displayName: 'test.pdf'}]
+
+    render(
+      <AssetReportModal
+        assetProcessors={mockAssetProcessors}
+        modalTitle="Test Modal"
+        onClose={mockOnClose}
+        attachments={attachments}
+        attempt=""
+        mainTitle={undefined}
+        reports={reports}
+        showDocumentDisplayName={false}
+        studentIdForResubmission={undefined}
+        submissionType="online_upload"
+      />,
+    )
+
+    expect(mockOnClose).toHaveBeenCalledTimes(0)
+    const closeButtons = screen.getAllByRole('button', {name: /close/i})
+    // Click the footer close button (the second one)
+    closeButtons[1]?.click()
+    expect(mockOnClose).toHaveBeenCalledTimes(1)
+  })
+
+  it('displays mainTitle when provided', () => {
+    const reports = [createUploadReport(0, '10', {processorId: '1'})]
+    const attachments = [{_id: '10', displayName: 'test.pdf'}]
+
+    render(
+      <AssetReportModal
+        assetProcessors={mockAssetProcessors}
+        modalTitle="Test Modal"
+        onClose={mockOnClose}
+        attachments={attachments}
+        attempt=""
+        mainTitle="Assignment Title"
+        reports={reports}
+        showDocumentDisplayName={false}
+        studentIdForResubmission={undefined}
+        submissionType="online_upload"
+      />,
+    )
+
+    expect(screen.getByText('Assignment Title')).toBeInTheDocument()
   })
 })

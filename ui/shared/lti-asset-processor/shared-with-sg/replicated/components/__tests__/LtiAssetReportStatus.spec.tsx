@@ -17,10 +17,10 @@
  */
 
 import {fireEvent, screen} from '@testing-library/react'
-import type {LtiAssetReport} from '../../types/LtiAssetReports'
-import LtiAssetReportStatus from '../LtiAssetReportStatus'
 import {renderComponent} from '../../../__tests__/renderingShims'
 import {fn} from '../../../__tests__/testPlatformShims'
+import type {LtiAssetReport} from '../../types/LtiAssetReports'
+import LtiAssetReportStatus from '../LtiAssetReportStatus'
 
 describe('LtiAssetReportStatus', () => {
   const createReport = (
@@ -109,6 +109,33 @@ describe('LtiAssetReportStatus', () => {
       renderComponent(<LtiAssetReportStatus reports={reports} openModal={openModal} />)
       fireEvent.click(screen.getByText('Needs attention'))
       expect(openModal).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('custom text styling', () => {
+    const reports = [createReport(0)]
+
+    it('applies custom textSize when provided', () => {
+      const {container} = renderComponent(
+        <LtiAssetReportStatus reports={reports} textSize="small" />,
+      )
+      const textElement = container.querySelector('[class*="text"]')
+      expect(textElement).toBeInTheDocument()
+    })
+
+    it('applies custom textWeight when provided', () => {
+      const {container} = renderComponent(
+        <LtiAssetReportStatus reports={reports} textWeight="normal" />,
+      )
+      const textElement = container.querySelector('[class*="text"]')
+      expect(textElement).toBeInTheDocument()
+    })
+
+    it('applies both textSize and textWeight when provided', () => {
+      const {container} = renderComponent(
+        <LtiAssetReportStatus reports={reports} textSize="small" textWeight="normal" />,
+      )
+      expect(screen.getByText('All good')).toBeInTheDocument()
     })
   })
 })
