@@ -64,6 +64,12 @@ shared_examples "Moderated Marking" do |ff_enabled|
     )
   end
 
+  before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:use_graphql?).and_return(true)
+    end
+  end
+
   context "with a final-grader in a moderated assignment" do
     it "moderate option is visible for final-grader", priority: "1" do
       user_session(@teacher1)
@@ -135,6 +141,8 @@ shared_examples "Moderated Marking" do |ff_enabled|
 
       # go to gradebook
       Gradebook.visit(@moderated_course)
+      # wait for gradebook to load and display data
+      wait_for_ajaximations
 
       # expect grades to be shown
       expect(Gradebook::Cells.get_grade(@student1, @moderated_assignment)).to eq("15")
