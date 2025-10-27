@@ -27407,7 +27407,7 @@ ja:
   qti_name: "QTI コンバータ"
   quality_96371bf2: 質
   quantitative_data_options_4f071510: 定量データオプション
-  question_9121487: 質問
+  question_9121487: 問題
   question_answered: 解答済み
   question_bank: 
     align_outcomes: アウトカムの整列
@@ -28852,8 +28852,8 @@ ja:
     default_answer_comments: 受講者がこの解答を選択した場合の応答
     default_answer_comments_on_match: 受講者の解答がこの解答と一致した場合の応答
     default_comments_on_wrong_match: ユーザの解答が一致しなかった場合の応答
-    default_quesiton_name: 質問
-    default_question_name: 質問
+    default_quesiton_name: 問題
+    default_question_name: 問題
     default_quiz_title: 小テスト
     default_response_to_essay: 受講者が解答を提出した後、受講者に表示する応答
     default_response_to_file_upload: 受講者が解答を提出した後、受講者に表示する応答
