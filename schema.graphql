@@ -4766,6 +4766,7 @@ type File implements LegacyIDInterface & ModuleItemInterface & Node & Timestampe
   createdAt: DateTime
   displayName: String
   fileState: String
+  folder: Folder
   graded: Boolean
   id: ID!
   isLockedByMasterCourse: Boolean!

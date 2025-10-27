@@ -72,7 +72,7 @@ describe('ModuleItemAsyncSelect', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockUseModuleItemContent.mockReturnValue({
-      data: {items: []},
+      data: {pages: [{items: []}]},
       isLoading: false,
       isError: false,
     } as any)
@@ -81,7 +81,7 @@ describe('ModuleItemAsyncSelect', () => {
   describe('Initial loading and display', () => {
     it('displays search results when user types', async () => {
       mockUseModuleItemContent.mockReturnValue({
-        data: {items: mockAssignments},
+        data: {pages: [{items: mockAssignments}]},
         isLoading: false,
         isError: false,
       } as any)
@@ -112,7 +112,7 @@ describe('ModuleItemAsyncSelect', () => {
   describe('Search functionality', () => {
     it('triggers search after typing minimum characters', async () => {
       mockUseModuleItemContent.mockReturnValue({
-        data: {items: [{id: '3', name: 'Test Assignment'}]},
+        data: {pages: [{items: [{id: '3', name: 'Test Assignment'}]}]},
         isLoading: false,
         isError: false,
       } as any)
@@ -129,7 +129,7 @@ describe('ModuleItemAsyncSelect', () => {
 
     it('maintains search text as user types', async () => {
       mockUseModuleItemContent.mockReturnValue({
-        data: {items: []},
+        data: {pages: [{items: []}]},
         isLoading: false,
         isError: false,
       } as any)
@@ -146,7 +146,7 @@ describe('ModuleItemAsyncSelect', () => {
 
     it('maintains search text in input field', async () => {
       mockUseModuleItemContent.mockReturnValue({
-        data: {items: [{id: '3', name: 'Test Assignment'}]},
+        data: {pages: [{items: [{id: '3', name: 'Test Assignment'}]}]},
         isLoading: false,
         isError: false,
       } as any)
@@ -165,7 +165,7 @@ describe('ModuleItemAsyncSelect', () => {
       const mockOnSelectionChange = jest.fn()
 
       mockUseModuleItemContent.mockReturnValue({
-        data: {items: mockAssignments},
+        data: {pages: [{items: mockAssignments}]},
         isLoading: false,
         isError: false,
       } as any)
@@ -216,7 +216,7 @@ describe('ModuleItemAsyncSelect', () => {
 
     it('maintains selectedOptionId prop synchronization', async () => {
       mockUseModuleItemContent.mockReturnValue({
-        data: {items: mockAssignments},
+        data: {pages: [{items: mockAssignments}]},
         isLoading: false,
         isError: false,
       } as any)
@@ -244,7 +244,7 @@ describe('ModuleItemAsyncSelect', () => {
       ]
 
       mockUseModuleItemContent.mockReturnValue({
-        data: {items: mockAssignmentsWithQuizzes},
+        data: {pages: [{items: mockAssignmentsWithQuizzes}]},
         isLoading: false,
         isError: false,
       } as any)
@@ -263,7 +263,7 @@ describe('ModuleItemAsyncSelect', () => {
 
     it('works with different content types', async () => {
       mockUseModuleItemContent.mockReturnValue({
-        data: {items: mockQuizzes},
+        data: {pages: [{items: mockQuizzes}]},
         isLoading: false,
         isError: false,
       } as any)
@@ -288,7 +288,7 @@ describe('ModuleItemAsyncSelect', () => {
       }))
 
       mockUseModuleItemContent.mockReturnValue({
-        data: {items: manySearchResults},
+        data: {pages: [{items: manySearchResults}]},
         isLoading: false,
         isError: false,
       } as any)
