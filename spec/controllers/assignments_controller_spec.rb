@@ -3415,4 +3415,96 @@ describe AssignmentsController do
       expect(response.parsed_body.size).to eq(2)
     end
   end
+
+  describe "GET 'rubric_data'" do
+    before do
+      user_session(@teacher)
+      @rubric = @course.rubrics.create!(user: @teacher, data: [])
+      rubric_association_params = {
+        purpose: "grading",
+        use_for_grading: "1",
+        association_object: @assignment
+      }
+      @assignment.rubric_association = RubricAssociation.generate(@teacher, @rubric, @course, rubric_association_params)
+      @assignment.save!
+    end
+
+    it "returns rubric data when assignment has an active rubric association" do
+      get :rubric_data, params: { course_id: @course.id, assignment_id: @assignment.id }, format: :json
+
+      expect(response).to have_http_status(:ok)
+      json = response.parsed_body
+      expect(json["assigned_rubric"]).to be_present
+      expect(json["assigned_rubric"]["id"]).to eq @rubric.id
+      expect(json["rubric_association"]).to be_present
+      expect(json["rubric_association"]["id"]).to eq @assignment.rubric_association.id
+    end
+
+    it "returns nil rubric data when assignment has no rubric association" do
+      @assignment.rubric_association.destroy
+      get :rubric_data, params: { course_id: @course.id, assignment_id: @assignment.id }, format: :json
+
+      expect(response).to have_http_status(:ok)
+      json = response.parsed_body
+      expect(json["assigned_rubric"]).to be_nil
+      expect(json["rubric_association"]).to be_nil
+    end
+
+    it "includes can_update permission in rubric data" do
+      get :rubric_data, params: { course_id: @course.id, assignment_id: @assignment.id }, format: :json
+
+      expect(response).to have_http_status(:ok)
+      json = response.parsed_body
+      expect(json["assigned_rubric"]["can_update"]).to be_truthy
+    end
+
+    it "includes association_count in rubric data" do
+      get :rubric_data, params: { course_id: @course.id, assignment_id: @assignment.id }, format: :json
+
+      expect(response).to have_http_status(:ok)
+      json = response.parsed_body
+      expect(json["assigned_rubric"]["association_count"]).to eq 1
+    end
+
+    it "returns 404 for non-existent assignment" do
+      get :rubric_data, params: { course_id: @course.id, assignment_id: 99_999 }, format: :json
+
+      expect(response).to have_http_status(:not_found)
+    end
+
+    context "as a student" do
+      it "denies students access to rubric data" do
+        user_session(@student)
+        get :rubric_data, params: { course_id: @course.id, assignment_id: @assignment.id }, format: :json
+
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+
+    context "as a TA with grading permissions" do
+      it "allows TAs with update permission to view rubric data" do
+        ta = user_factory(active_all: true)
+        @course.enroll_ta(ta, enrollment_state: "active")
+        user_session(ta)
+
+        get :rubric_data, params: { course_id: @course.id, assignment_id: @assignment.id }, format: :json
+
+        expect(response).to have_http_status(:ok)
+        json = response.parsed_body
+        expect(json["assigned_rubric"]).to be_present
+      end
+    end
+
+    context "without update permission" do
+      it "denies access to users without update permission" do
+        observer = user_factory(active_all: true)
+        @course.enroll_user(observer, "ObserverEnrollment", enrollment_state: "active")
+        user_session(observer)
+
+        get :rubric_data, params: { course_id: @course.id, assignment_id: @assignment.id }, format: :json
+
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+  end
 end

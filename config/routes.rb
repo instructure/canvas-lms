@@ -319,6 +319,7 @@ CanvasRails::Application.routes.draw do
           as: :anonymous_submission_vericite_report
 
       get :rubric
+      get :rubric_data
       resource :rubric_association, path: :rubric do
         resources :rubric_assessments, path: :assessments do
           collection do

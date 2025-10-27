@@ -18,9 +18,19 @@
 
 import React, {useRef} from 'react'
 import {getAccessToken, refreshToken, getUser} from './auth'
+import {createRubricController} from '@canvas/rubrics/react/RubricAssignment'
+import type {RubricController} from '@canvas/rubrics/react/RubricAssignment'
 
 interface AmsModule {
-  render: (container: HTMLElement, config: {routerBasename: string}) => void
+  render: (
+    container: HTMLElement,
+    config: {
+      routerBasename: string
+      rubrics?: {
+        createController: (container: HTMLElement) => RubricController
+      }
+    },
+  ) => void
   unmount: (container: HTMLElement) => void
 }
 
@@ -60,6 +70,9 @@ export function AmsLoader({containerId}: AmsLoaderProps): JSX.Element | null {
               getAccessToken,
               refreshToken,
               getUser,
+            },
+            rubrics: {
+              createController: createRubricController,
             },
           })
         }
