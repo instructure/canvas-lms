@@ -66,6 +66,7 @@ const AIExperienceRow: React.FC<AIExperienceRowProps> = ({
         <Flex.Item shouldGrow shouldShrink>
           <View as="div" margin="0 0 0 small">
             <Link
+              data-testid="ai-experiences-index-show-link"
               href={`/courses/${ENV.COURSE_ID}/ai_experiences/${id}`}
               isWithinText={false}
               themeOverride={{
@@ -127,11 +128,24 @@ const AIExperienceRow: React.FC<AIExperienceRowProps> = ({
                   </IconButton>
                 }
               >
-                <Menu.Item onSelect={() => onEdit(id)}>{I18n.t('Edit')}</Menu.Item>
-                <Menu.Item onSelect={() => onTestConversation(id)}>
+                <Menu.Item
+                  data-testid="ai-experiences-index-edit-menu-item"
+                  onSelect={() => onEdit(id)}
+                >
+                  {I18n.t('Edit')}
+                </Menu.Item>
+                <Menu.Item
+                  data-testid="ai-experiences-index-test-conversation-menu-item"
+                  onSelect={() => onTestConversation(id)}
+                >
                   {I18n.t('Test Conversation')}
                 </Menu.Item>
-                <Menu.Item onSelect={() => onDelete(id)}>{I18n.t('Delete')}</Menu.Item>
+                <Menu.Item
+                  data-testid="ai-experiences-index-delete-menu-item"
+                  onSelect={() => onDelete(id)}
+                >
+                  {I18n.t('Delete')}
+                </Menu.Item>
               </Menu>
             </Flex.Item>
           </Flex>
