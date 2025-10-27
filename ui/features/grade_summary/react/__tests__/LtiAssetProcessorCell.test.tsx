@@ -117,7 +117,7 @@ describe('LtiAssetProcessorCell', () => {
 
     expect(screen.getByText('Document Processors for Test Assignment')).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', {name: /close/i}))
+    await user.click(screen.getAllByRole('button', {name: /close/i})[0])
 
     expect(screen.queryByText('Document Processors for Test Assignment')).not.toBeInTheDocument()
   })

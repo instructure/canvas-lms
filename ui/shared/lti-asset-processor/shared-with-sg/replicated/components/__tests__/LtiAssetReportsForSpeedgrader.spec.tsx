@@ -17,6 +17,8 @@
  */
 
 // This import needs to be first to ensure that the mocked dependencies are set up before any other imports.
+
+import {fireEvent, screen} from '@testing-library/react'
 import {
   mockUseLtiAssetProcessors,
   mockUseLtiAssetReports,
@@ -25,7 +27,11 @@ import {renderComponent} from '../../../__tests__/renderingShims'
 import {describe, expect, it} from '../../../__tests__/testPlatformShims'
 import {useLtiAssetProcessors, useLtiAssetReports} from '../../../dependenciesShims'
 import {defaultGetLtiAssetProcessorsResult} from '../../__fixtures__/default/ltiAssetProcessors'
-import {defaultGetLtiAssetReportsResult} from '../../__fixtures__/default/ltiAssetReports'
+import {
+  defaultGetLtiAssetReportsResult,
+  makeMockReport,
+} from '../../__fixtures__/default/ltiAssetReports'
+import type {LtiAssetReport} from '../../types/LtiAssetReports'
 import {LtiAssetReportsForSpeedgrader} from '../LtiAssetReportsForSpeedgrader'
 
 describe('LtiAssetReportsForSpeedgrader', () => {
@@ -64,5 +70,187 @@ describe('LtiAssetReportsForSpeedgrader', () => {
     )
 
     expect(queryByText('Resubmit All Files')).toBeInTheDocument()
+  })
+
+  describe('for discussion_topic submissions', () => {
+    function makeMockDiscussionReport(params: Partial<LtiAssetReport> = {}): LtiAssetReport {
+      return makeMockReport({
+        title: 'Discussion Report',
+        processorId: '1000',
+        asset: {
+          discussionEntryVersion: {
+            _id: 'entry_123',
+            createdAt: '2025-01-15T16:45:00Z',
+            messageIntro: 'This is a test discussion entry message',
+          },
+        },
+        priority: 0,
+        ...params,
+      })
+    }
+
+    it('renders status in AllReportsCard for multiple reports', () => {
+      mockUseLtiAssetProcessors(defaultGetLtiAssetProcessorsResult)
+      const multipleReports = [makeMockDiscussionReport(), makeMockDiscussionReport({priority: 5})]
+      mockUseLtiAssetReports({
+        submission: {
+          ltiAssetReportsConnection: {
+            nodes: multipleReports,
+          },
+        },
+      })
+
+      renderComponent(
+        <LtiAssetReportsForSpeedgrader
+          assignmentId="123"
+          attempt={1}
+          submissionType="discussion_topic"
+          attachments={[{_id: '1234', displayName: 'test.txt'}]}
+          studentUserId="456"
+          studentAnonymousId={null}
+        />,
+      )
+
+      expect(screen.getByText('All comments')).toBeInTheDocument()
+      expect(screen.getByText('Reports')).toBeInTheDocument()
+      expect(screen.getByText('View reports')).toBeInTheDocument()
+      expect(screen.getByText('Needs attention')).toBeInTheDocument()
+    })
+
+    it('opens modal when View reports button is clicked for discussion_topic with multiple reports', () => {
+      mockUseLtiAssetProcessors(defaultGetLtiAssetProcessorsResult)
+      const multipleReports = [
+        makeMockDiscussionReport({title: 'myreport1'}),
+        makeMockDiscussionReport(),
+      ]
+      mockUseLtiAssetReports({
+        submission: {
+          ltiAssetReportsConnection: {
+            nodes: multipleReports,
+          },
+        },
+      })
+
+      renderComponent(
+        <LtiAssetReportsForSpeedgrader
+          assignmentId="123"
+          attempt={1}
+          submissionType="discussion_topic"
+          attachments={[{_id: '1234', displayName: 'test.txt'}]}
+          studentUserId="456"
+          studentAnonymousId={null}
+        />,
+      )
+
+      // expect myreport1 not in Document:
+      expect(screen.queryByText('myreport1')).not.toBeInTheDocument()
+
+      const viewReportsButton = screen.getByText('View reports')
+      fireEvent.click(viewReportsButton)
+
+      expect(screen.getByText('myreport1')).toBeInTheDocument()
+    })
+
+    it('renders LtiAssetReports directly when there is only one report for discussion_topic', () => {
+      mockUseLtiAssetProcessors(defaultGetLtiAssetProcessorsResult)
+      mockUseLtiAssetReports({
+        submission: {
+          ltiAssetReportsConnection: {
+            nodes: [makeMockDiscussionReport({title: 'My OK Report'})],
+          },
+        },
+      })
+
+      renderComponent(
+        <LtiAssetReportsForSpeedgrader
+          assignmentId="123"
+          attempt={1}
+          submissionType="discussion_topic"
+          attachments={[]}
+          studentUserId="456"
+          studentAnonymousId={null}
+        />,
+      )
+
+      // Should show the report directly, not in AllReportsCard
+      expect(screen.queryByText('All comments')).not.toBeInTheDocument()
+      expect(screen.getByText('My OK Report')).toBeInTheDocument()
+    })
+  })
+
+  describe('for non-discussion submissions', () => {
+    it('renders LtiAssetReports directly for online_upload with multiple reports', () => {
+      mockUseLtiAssetProcessors(defaultGetLtiAssetProcessorsResult)
+      const multipleReports = [
+        makeMockReport({
+          title: 'Report 1',
+          processorId: '1000',
+          asset: {attachmentId: '1234'},
+          _id: '1',
+          priority: 0,
+        }),
+        makeMockReport({
+          title: 'Report 2',
+          processorId: '1000',
+          asset: {attachmentId: '1234'},
+          _id: '2',
+          priority: 0,
+        }),
+      ]
+      mockUseLtiAssetReports({
+        submission: {
+          ltiAssetReportsConnection: {
+            nodes: multipleReports,
+          },
+        },
+      })
+
+      renderComponent(
+        <LtiAssetReportsForSpeedgrader
+          assignmentId="123"
+          attempt={1}
+          submissionType="online_upload"
+          attachments={[{_id: '1234', displayName: 'test.txt'}]}
+          studentUserId="456"
+          studentAnonymousId={null}
+        />,
+      )
+
+      // Should not show AllReportsCard for non-discussion submissions
+      expect(screen.queryByText('All comments')).not.toBeInTheDocument()
+      expect(screen.queryByText('View reports')).not.toBeInTheDocument()
+    })
+
+    it('renders LtiAssetReports directly for online_text_entry', () => {
+      mockUseLtiAssetProcessors(defaultGetLtiAssetProcessorsResult)
+      const singleReport = [
+        makeMockReport({
+          title: 'My OK Report',
+          processorId: '1000',
+          asset: {submissionAttempt: 1},
+        }),
+      ]
+      mockUseLtiAssetReports({
+        submission: {
+          ltiAssetReportsConnection: {
+            nodes: singleReport,
+          },
+        },
+      })
+
+      renderComponent(
+        <LtiAssetReportsForSpeedgrader
+          assignmentId="123"
+          attempt={1}
+          submissionType="online_text_entry"
+          attachments={[{_id: '1234', displayName: 'test.txt'}]}
+          studentUserId="456"
+          studentAnonymousId={null}
+        />,
+      )
+
+      expect(screen.queryByText('All comments')).not.toBeInTheDocument()
+      expect(screen.getByText('My OK Report')).toBeInTheDocument()
+    })
   })
 })
