@@ -67,15 +67,22 @@ class LLMConversationClient
 
   def self.base_url
     region = ApplicationController.region
-    setting_key = if region.present?
-                    "llm_conversation_base_url_#{region}"
-                  else
-                    "llm_conversation_base_url"
-                  end
 
-    url = Setting.get(setting_key, nil)
+    # Try region-specific setting first, fall back to base setting
+    url = if region.present?
+            Setting.get("llm_conversation_base_url_#{region}", nil)
+          end
+
+    # Fall back to base setting if region-specific not found
+    url ||= Setting.get("llm_conversation_base_url", nil)
+
     if url.nil?
-      raise LlmConversation::Errors::ConversationError, "#{setting_key} setting is not configured"
+      error_msg = if region.present?
+                    "Neither llm_conversation_base_url_#{region} nor llm_conversation_base_url setting is configured"
+                  else
+                    "llm_conversation_base_url setting is not configured"
+                  end
+      raise LlmConversation::Errors::ConversationError, error_msg
     end
 
     url
