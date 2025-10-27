@@ -169,7 +169,12 @@ const AiExperiencesIndex: React.FC = () => {
             <Heading level="h1">{I18n.t('AI Experiences')}</Heading>
           </Flex.Item>
           <Flex.Item>
-            <Button color="primary" renderIcon={() => <IconAddLine />} onClick={handleCreateNew}>
+            <Button
+              data-testid="ai-expriences-index-create-new-button"
+              color="primary"
+              renderIcon={() => <IconAddLine />}
+              onClick={handleCreateNew}
+            >
               {I18n.t('Create new')}
             </Button>
           </Flex.Item>
