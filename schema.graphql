@@ -4462,8 +4462,13 @@ enum DraftableSubmissionType {
 }
 
 type EligibilityIssue {
-  level: String!
+  level: EligibilityIssueLevel!
   message: String!
+}
+
+enum EligibilityIssueLevel {
+  error
+  warning
 }
 
 type Enrollment implements AssetString & Node & Timestamped {
