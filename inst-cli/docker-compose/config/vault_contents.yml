@@ -20,7 +20,7 @@ development:
       security_token: 'fake-security-token'
   'app-canvas/data/secrets':
     data:
-      observe:
+      observe_api:
         host: "103443579803.observeinc.com"
         customer_id: "103443579803"
         dataset_id: "41999019"
