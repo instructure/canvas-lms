@@ -2127,6 +2127,12 @@ hy:
     student_count: 
       one: "%{count} ունկնդիր"
       other: "%{count}  ունկնդիր"
+  assignment_quiz_type: 
+    quiz_type: "Թեստի տեսակ"
+    quiz_type_options: 
+      graded_quiz: "Գնահատվող թեստ"
+      graded_survey: "Գնահատվող հարցում"
+      ungraded_survey: "Չգնահատված հարցում"
   assignment_selection_6bff05c4: "Հանձնարարության ընտրություն"
   assignment_title_8a707dd2: "հանձնարարության անվանում"
   assignment_url_37c849c6: "Հանձնարարության url հասցեն"
@@ -14762,6 +14768,7 @@ hy:
   retry_ebd5f8ba: "Փորձել կրկին"
   reviewer_b993ce28: "Կարծիք ներկայացնող"
   reviewers_successfully_added_bd4b629a: "Կարծիք ներկայացնողները հաջողությամբ ավելացվել են"
+  revision_history_abfd1cfd: "Վերանայման պատմություն"
   rich_content_editor_2708ef21: "Ֆորմատավորված տեքստի խմբագիր"
   right_sidebar_logo_5483dc0a: "Աջ մասի կողային վահանակ"
   role: 
