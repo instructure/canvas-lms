@@ -3699,6 +3699,12 @@ hu:
   assignment_overrides_export_1c008ad2: "Feladat felülírások Exportálása"
   assignment_path_selected_e80191d1: "Feladat útvonal kiválasztva"
   assignment_preview_3833e819: "%{assignment}előnézete"
+  assignment_quiz_type: 
+    quiz_type: "Kvíz típusa"
+    quiz_type_options: 
+      graded_quiz: "Értékelésbe számító kvíz"
+      graded_survey: "Értékelésbe számító felmérés"
+      ungraded_survey: "Nem értékelt felmérés"
   assignment_scheduling_e2a3eaf6: "Feladat ütemezése"
   assignment_score_summary_f1dc9708: "Feladat pontszám összefoglalója"
   assignment_selection_6bff05c4: Feladatkiválasztás
@@ -21480,6 +21486,7 @@ hu:
   reviewers_successfully_added_bd4b629a: "Az értékelők sikeresen hozzá lettek rendelve"
   reviews_due_5178cab6: "Vélemények Határideje"
   reviews_per_student_378292b3: "Vélemények Hallgatónként"
+  revision_history_abfd1cfd: "Módosítási előzmények"
   rich_content_editor_2708ef21: "Vizuális szövegszerkesztő"
   right_sidebar_logo_5483dc0a: "Jobb oldalsáv logó"
   rocketship_on_launchpad_4011ea8c: "rakétahajó a kilövőálláson"
