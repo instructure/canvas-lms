@@ -284,6 +284,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
                   closeButtonRef.current = el
                 }
               }}
+              data-testid="llm-conversation-close-preview-button"
             >
               <IconXLine />
             </IconButton>
@@ -296,7 +297,12 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
               </Text>
             </View>
           </Flex>
-          <Button onClick={handleRestart} size="medium" renderIcon={<IconRefreshLine />}>
+          <Button
+            data-testid="llm-conversation-restart-button"
+            onClick={handleRestart}
+            size="medium"
+            renderIcon={<IconRefreshLine />}
+          >
             {I18n.t('Restart')}
           </Button>
         </Flex>
@@ -361,7 +367,9 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
                       tabIndex={isLastAssistantMessage ? -1 : undefined}
                       textAlign="start"
                     >
-                      <Text>{message.text}</Text>
+                      <Text data-testid={`llm-conversation-message-${message.role}`}>
+                        {message.text}
+                      </Text>
                     </View>
                   </View>
                 )
@@ -391,6 +399,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
           <Flex gap="small" alignItems="center">
             <Flex.Item shouldGrow shouldShrink>
               <TextArea
+                data-testid="llm-conversation-message-input"
                 label={<span style={{display: 'none'}}>{I18n.t('Your answer...')}</span>}
                 value={inputValue}
                 onChange={e => setInputValue(e.target.value)}
@@ -405,6 +414,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
             </Flex.Item>
             <Flex.Item>
               <Button
+                data-testid="llm-conversation-send-message-button"
                 onClick={handleSendMessage}
                 color="primary"
                 interaction={
