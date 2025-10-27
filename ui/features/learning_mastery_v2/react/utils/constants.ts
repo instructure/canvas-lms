@@ -60,10 +60,12 @@ export interface GradebookSettings {
   secondaryInfoDisplay: SecondaryInfoDisplay
   displayFilters: DisplayFilter[]
   nameDisplayFormat: NameDisplayFormat
+  studentsPerPage: number
 }
 
 export const DEFAULT_GRADEBOOK_SETTINGS: GradebookSettings = {
   secondaryInfoDisplay: SecondaryInfoDisplay.NONE,
   displayFilters: [DisplayFilter.SHOW_STUDENT_AVATARS, DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS],
   nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
+  studentsPerPage: DEFAULT_STUDENTS_PER_PAGE,
 }

@@ -222,10 +222,12 @@ describe('useGradebookSettings', () => {
         secondaryInfoDisplay: SecondaryInfoDisplay.INTEGRATION_ID,
         displayFilters: [DisplayFilter.SHOW_STUDENT_AVATARS],
         nameDisplayFormat: NameDisplayFormat.LAST_FIRST,
+        studentsPerPage: 15,
       })
     })
     expect(result.current.settings.secondaryInfoDisplay).toBe(SecondaryInfoDisplay.INTEGRATION_ID)
     expect(result.current.settings.displayFilters).toEqual([DisplayFilter.SHOW_STUDENT_AVATARS])
     expect(result.current.settings.nameDisplayFormat).toBe(NameDisplayFormat.LAST_FIRST)
+    expect(result.current.settings.studentsPerPage).toBe(15)
   })
 })

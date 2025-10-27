@@ -94,8 +94,6 @@ describe('LearningMastery', () => {
       rollups,
       currentPage: 1,
       setCurrentPage: jest.fn(),
-      studentsPerPage: 15,
-      setStudentsPerPage: jest.fn(),
       sorting: {
         sortOrder: SortOrder.ASC,
         setSortOrder: jest.fn(),
@@ -146,8 +144,6 @@ describe('LearningMastery', () => {
       rollups,
       currentPage: 1,
       setCurrentPage: jest.fn(),
-      studentsPerPage: 30,
-      setStudentsPerPage: jest.fn(),
       sorting: {
         sortOrder: SortOrder.DESC,
         setSortOrder: jest.fn(),
@@ -157,7 +153,7 @@ describe('LearningMastery', () => {
     })
     render(<LearningMastery {...defaultProps()} />)
     expect(getSearchParams).toHaveBeenCalled()
-    expect(setSearchParams).toHaveBeenCalledWith(1, 30, {
+    expect(setSearchParams).toHaveBeenCalledWith(1, 15, {
       setSortOrder: expect.any(Function),
       setSortBy: expect.any(Function),
       sortBy: SortBy.Name,
@@ -171,7 +167,6 @@ describe('LearningMastery', () => {
       isLoading: true,
       error: null,
       currentPage: 1,
-      studentsPerPage: 15,
       sorting: {
         sortBy: SortBy.SortableName,
         sortOrder: SortOrder.ASC,

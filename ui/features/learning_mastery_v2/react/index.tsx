@@ -68,8 +68,6 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
     pagination,
     currentPage,
     setCurrentPage,
-    studentsPerPage,
-    setStudentsPerPage,
     sorting,
   } = useRollups({
     courseId,
@@ -79,7 +77,7 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
     ...getSearchParams(),
   })
 
-  setSearchParams(currentPage, studentsPerPage, sorting)
+  setSearchParams(currentPage, gradebookSettings.studentsPerPage, sorting)
 
   const handleGradebookSettingsChange = useCallback(
     async (settings: GradebookSettings) => {
@@ -109,6 +107,15 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
     async (format: NameDisplayFormat) => {
       const newSettings = {...gradebookSettings, nameDisplayFormat: format}
       await handleGradebookSettingsChange(newSettings)
+    },
+    [gradebookSettings, handleGradebookSettingsChange],
+  )
+
+  const handleUpdateStudentsPerPage = useCallback(
+    async (studentsPerPage: number) => {
+      const newSettings = {...gradebookSettings, studentsPerPage}
+
+      handleGradebookSettingsChange(newSettings)
     },
     [gradebookSettings, handleGradebookSettingsChange],
   )
@@ -150,7 +157,7 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
         setGradebookSettings={handleGradebookSettingsChange}
         isSavingSettings={isSavingSettings}
       />
-      <FilterWrapper pagination={pagination} onPerPageChange={setStudentsPerPage} />
+      <FilterWrapper pagination={pagination} onPerPageChange={handleUpdateStudentsPerPage} />
       {renderBody()}
     </LMGBContext.Provider>
   )
