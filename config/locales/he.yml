@@ -2675,6 +2675,12 @@ he:
       two: "%{count} תלמידים "
   assignment_path_selected_e80191d1: "מסלול המטלה נבחר"
   assignment_preview_3833e819: "תצוגה מקדימה של %{assignment}"
+  assignment_quiz_type: 
+    quiz_type: "סוג הבוחן"
+    quiz_type_options: 
+      graded_quiz: "בוחן מוערך"
+      graded_survey: "סקר מוערך"
+      ungraded_survey: "סקר שלא להערכה"
   assignment_selection_6bff05c4: "בחירת משימה"
   assignment_title_82b4422e: "כותרת המטלה:"
   assignment_title_8a707dd2: "כותרת משימה"
@@ -17125,6 +17131,7 @@ he:
   review_now_318a6a3e: "סקור/י כעת"
   reviewer_b993ce28: בודק/ת
   reviewers_successfully_added_bd4b629a: "בודקים נתווספו בהצלחה"
+  revision_history_abfd1cfd: "היסטורית גירסאות"
   rich_content_editor_2708ef21: "עורך תוכן עשיר"
   right_sidebar_logo_5483dc0a: "לוגו של סרגל הצד"
   role: 
