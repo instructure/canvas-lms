@@ -1309,7 +1309,15 @@ module Api::V1::Assignment
     assignment = prepared_update[:assignment]
     overrides = prepared_update[:overrides]
 
-    return :forbidden if overrides.any? && assignment.is_child_content? && (assignment.editing_restricted?(:due_dates) || assignment.editing_restricted?(:availability_dates))
+    if overrides.any? && assignment.is_child_content?
+      updating_due_dates = overrides.any? { |o| o.key?(:due_at) || o.key?(:reply_to_topic_due_at) || o.key?(:required_replies_due_at) }
+      updating_availability_dates = overrides.any? { |o| o.key?(:unlock_at) || o.key?(:lock_at) }
+
+      if (updating_due_dates && assignment.editing_restricted?(:due_dates)) ||
+         (updating_availability_dates && assignment.editing_restricted?(:availability_dates))
+        return :forbidden
+      end
+    end
 
     prepared_batch = prepare_assignment_overrides_for_batch_update(assignment, overrides, user)
 
