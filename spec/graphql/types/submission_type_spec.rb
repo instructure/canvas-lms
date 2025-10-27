@@ -1664,4 +1664,47 @@ describe Types::SubmissionType do
       end
     end
   end
+
+  describe "auto_grade_submission_issues" do
+    before do
+      allow(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_submission)
+        .with(submission: @submission)
+        .and_return({ level: "error", message: "Test error" })
+    end
+
+    it "returns nil when project_lhotse feature flag is disabled" do
+      @course.disable_feature!(:project_lhotse)
+      expect(GraphQLHelpers::AutoGradeEligibilityHelper).not_to receive(:validate_submission)
+      expect(submission_type.resolve("autoGradeSubmissionIssues { level message }")).to be_nil
+    end
+
+    it "returns issues when project_lhotse feature flag is enabled" do
+      @course.enable_feature!(:project_lhotse)
+      expect(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_submission)
+      level = submission_type.resolve("autoGradeSubmissionIssues { level }")
+      message = submission_type.resolve("autoGradeSubmissionIssues { message }")
+      expect(level).to eq "error"
+      expect(message).to eq "Test error"
+    end
+  end
+
+  describe "auto_grade_submission_errors" do
+    before do
+      allow(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_submission)
+        .with(submission: @submission)
+        .and_return({ level: "error", message: "Test error" })
+    end
+
+    it "returns empty array when project_lhotse feature flag is disabled" do
+      @course.disable_feature!(:project_lhotse)
+      expect(GraphQLHelpers::AutoGradeEligibilityHelper).not_to receive(:validate_submission)
+      expect(submission_type.resolve("autoGradeSubmissionErrors")).to eq([])
+    end
+
+    it "returns error messages when project_lhotse feature flag is enabled" do
+      @course.enable_feature!(:project_lhotse)
+      expect(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_submission)
+      expect(submission_type.resolve("autoGradeSubmissionErrors")).to eq(["Test error"])
+    end
+  end
 end

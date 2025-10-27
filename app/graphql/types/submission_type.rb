@@ -173,13 +173,21 @@ module Types
 
     field :auto_grade_submission_issues, Types::EligibilityIssueType, null: true, description: "Issues related to the submission"
     def auto_grade_submission_issues
-      GraphQLHelpers::AutoGradeEligibilityHelper.validate_submission(submission:)
+      load_association(:course).then do |course|
+        next nil unless course.feature_enabled?(:project_lhotse)
+
+        GraphQLHelpers::AutoGradeEligibilityHelper.validate_submission(submission:)
+      end
     end
 
     field :auto_grade_submission_errors, [String], null: false, description: "Errors related to the submission"
     def auto_grade_submission_errors
-      issues = GraphQLHelpers::AutoGradeEligibilityHelper.validate_submission(submission:)
-      issues ? [issues[:message]] : []
+      load_association(:course).then do |course|
+        next [] unless course.feature_enabled?(:project_lhotse)
+
+        issues = GraphQLHelpers::AutoGradeEligibilityHelper.validate_submission(submission:)
+        issues ? [issues[:message]] : []
+      end
     end
 
     field :provisional_grades_connection, Types::ProvisionalGradeType.connection_type, null: true

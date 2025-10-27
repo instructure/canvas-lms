@@ -2340,4 +2340,47 @@ describe Types::AssignmentType do
       end
     end
   end
+
+  describe "auto_grade_assignment_issues" do
+    before do
+      allow(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_assignment)
+        .with(assignment:)
+        .and_return({ level: "error", message: "Test error" })
+    end
+
+    it "returns nil when project_lhotse feature flag is disabled" do
+      course.disable_feature!(:project_lhotse)
+      expect(GraphQLHelpers::AutoGradeEligibilityHelper).not_to receive(:validate_assignment)
+      expect(assignment_type.resolve("autoGradeAssignmentIssues { level message }")).to be_nil
+    end
+
+    it "returns issues when project_lhotse feature flag is enabled" do
+      course.enable_feature!(:project_lhotse)
+      expect(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_assignment)
+      level = assignment_type.resolve("autoGradeAssignmentIssues { level }")
+      message = assignment_type.resolve("autoGradeAssignmentIssues { message }")
+      expect(level).to eq "error"
+      expect(message).to eq "Test error"
+    end
+  end
+
+  describe "auto_grade_assignment_errors" do
+    before do
+      allow(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_assignment)
+        .with(assignment:)
+        .and_return({ level: "error", message: "Test error" })
+    end
+
+    it "returns empty array when project_lhotse feature flag is disabled" do
+      course.disable_feature!(:project_lhotse)
+      expect(GraphQLHelpers::AutoGradeEligibilityHelper).not_to receive(:validate_assignment)
+      expect(assignment_type.resolve("autoGradeAssignmentErrors")).to eq([])
+    end
+
+    it "returns error messages when project_lhotse feature flag is enabled" do
+      course.enable_feature!(:project_lhotse)
+      expect(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_assignment)
+      expect(assignment_type.resolve("autoGradeAssignmentErrors")).to eq(["Test error"])
+    end
+  end
 end
