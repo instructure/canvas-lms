@@ -2126,6 +2126,10 @@ el:
     student_count: 
       one: "%{count} σπουδαστής"
       other: "%{count} φοιτητές/τριες"
+  assignment_quiz_type: 
+    quiz_type: "Τύπος Κουίζ"
+    quiz_type_options: 
+      graded_survey: "Βαθμολογημένη Δημοσκόπηση"
   assignment_selection_6bff05c4: "Επιλογή Εργασίας"
   assignment_title_8a707dd2: "τίτλος εργασίας"
   assignment_url_37c849c6: "url εργασίας"
@@ -5429,6 +5433,8 @@ el:
       second: Δευτερόλεπτα
       year: Έτος
   day_s_7cc1231f: Ημέρα/ες
+  de_cross_list_this_section_6f7b5984: "Επαναφορά αυτού του Τομέα στη Λίστα"
+  de_cross_list_this_section_774a827c: "Επαναφορά αυτού του Τομέα στη Λίστα"
   de_cross_listing_section_c2ee371: "Επαναφορά Τομέα..."
   deactivate_this_key_3e79a2b5: "Απενεργοποιήστε αυτό το κλειδί"
   deactivate_user_86c09036: "Απενεργοποίηση Χρήστη"
