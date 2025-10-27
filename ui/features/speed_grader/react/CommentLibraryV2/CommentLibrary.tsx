@@ -58,7 +58,9 @@ export const CommentLibraryContent: React.FC<CommentLibraryContentProps> = ({
 
   const [isSearchEnabled, setIsSearchEnabled] = useState(true)
   const [showSuggestionResults, setShowSuggestionResults] = useState(true)
-  const [suggestionsWhenTypingEnabled] = useState(ENV.comment_library_suggestions_enabled)
+  const [suggestionsWhenTypingEnabled, setSuggestionsWhenTypingEnabled] = useState(
+    ENV.comment_library_suggestions_enabled,
+  )
 
   const {data, loading} = useQuery<SpeedGrader_CommentBankItemsCountQuery>(
     SpeedGrader_CommentBankItemsCount,
@@ -184,6 +186,8 @@ export const CommentLibraryContent: React.FC<CommentLibraryContentProps> = ({
         isOpen={isTrayOpen}
         onDismiss={() => setIsTrayOpen(false)}
         setCommentFromLibrary={setCommentFromLibrary}
+        suggestionsWhenTypingEnabled={suggestionsWhenTypingEnabled}
+        setSuggestionsWhenTypingEnabled={setSuggestionsWhenTypingEnabled}
       />
     </>
   )

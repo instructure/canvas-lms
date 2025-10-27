@@ -24,10 +24,13 @@ import {CommentLibraryContent} from '../CommentLibrary'
 import {InMemoryCache} from '@apollo/client'
 import {SpeedGrader_CommentBankItemsCount, SpeedGrader_CommentBankItems} from '../graphql/queries'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
 jest.mock('use-debounce', () => ({
   useDebounce: jest.fn((value: string) => [value, {isPending: () => false}]),
 }))
+
+jest.mock('@canvas/do-fetch-api-effect')
 
 describe('CommentLibrary', () => {
   const defaultUserId = '1'
@@ -153,6 +156,7 @@ describe('CommentLibrary', () => {
 
   beforeEach(() => {
     fakeENV.setup({comment_library_suggestions_enabled: true})
+    ;(doFetchApi as jest.Mock).mockResolvedValue({})
   })
 
   afterEach(() => {
@@ -422,6 +426,83 @@ describe('CommentLibrary', () => {
         })
 
         // No suggestions query should be triggered
+      })
+    })
+
+    describe('Toggle state management', () => {
+      it('disables suggestions when toggle is turned off', async () => {
+        const user = userEvent.setup()
+        const {useDebounce} = require('use-debounce')
+        useDebounce.mockReturnValue(['great', {isPending: () => false}])
+
+        const mocks = [
+          createCountMock(defaultUserId, 10),
+          createCommentsMock(defaultUserId, defaultCourseId),
+          createSuggestionsMock(defaultUserId, 'great'),
+        ]
+
+        setup(mocks, {comment: 'great'})
+
+        // Wait for suggestions to appear
+        await waitFor(
+          () => {
+            expect(screen.getByTestId('comment-suggestion-suggestion-1')).toBeInTheDocument()
+          },
+          {timeout: 3000},
+        )
+
+        // Open tray
+        await user.click(screen.getByTestId('comment-library-button'))
+
+        await waitFor(() => {
+          expect(screen.getByText('Manage Comment Library')).toBeInTheDocument()
+        })
+
+        // Turn off suggestions toggle
+        const checkbox = screen.getByTestId('suggestions-when-typing-toggle')
+        await user.click(checkbox)
+
+        // Close tray
+        await user.click(screen.getByTestId('tray-close-button'))
+
+        // Suggestions should no longer appear
+        await waitFor(() => {
+          expect(screen.queryByTestId('comment-suggestion-suggestion-1')).not.toBeInTheDocument()
+        })
+      })
+
+      it('shows toggle in checked state when suggestions are enabled', async () => {
+        const user = userEvent.setup()
+        const {useDebounce} = require('use-debounce')
+        useDebounce.mockReturnValue(['test', {isPending: () => false}])
+
+        const mocks = [
+          createCountMock(defaultUserId, 10),
+          createCommentsMock(defaultUserId, defaultCourseId),
+          createSuggestionsMock(defaultUserId, 'test', [{_id: 'test-1', comment: 'Test comment'}]),
+        ]
+
+        // Start with suggestions enabled (default)
+        setup(mocks, {comment: 'test'})
+
+        // Wait for suggestions to appear
+        await waitFor(
+          () => {
+            expect(screen.getByTestId('comment-suggestion-test-1')).toBeInTheDocument()
+          },
+          {timeout: 3000},
+        )
+
+        // Open tray
+        await user.click(screen.getByTestId('comment-library-button'))
+
+        await waitFor(() => {
+          expect(screen.getByText('Manage Comment Library')).toBeInTheDocument()
+        })
+
+        // Toggle should be checked initially since suggestions are enabled
+        const checkbox = screen.getByTestId('suggestions-when-typing-toggle')
+        expect(checkbox).toBeChecked()
       })
     })
 
