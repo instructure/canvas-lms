@@ -47,6 +47,8 @@ module Translation
       raise UnsupportedLanguageError
     rescue InstructureMiscPlugin::Extensions::CedarClient::ValidationError
       raise ValidationError
+    rescue InstructureMiscPlugin::Extensions::CedarClient::CedarLimitReachedError
+      raise CedarLimitReachedError
     end
 
     def translate_html(html_string:, tgt_lang:, options: {})
@@ -74,6 +76,8 @@ module Translation
       raise UnsupportedLanguageError
     rescue InstructureMiscPlugin::Extensions::CedarClient::ValidationError
       raise ValidationError
+    rescue InstructureMiscPlugin::Extensions::CedarClient::CedarLimitReachedError
+      raise CedarLimitReachedError
     end
 
     def self.languages
