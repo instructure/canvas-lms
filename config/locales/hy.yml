@@ -3209,6 +3209,8 @@ hy:
       slot_limit: "Սահմանափակել այս միջակայքը __ով"
       users: օգտատերեր
     edit_assignment: 
+      ? " group"
+      : Խումբ.
       calendar: Օրացույց
       due: Մինչև
       group: Խումբ.
