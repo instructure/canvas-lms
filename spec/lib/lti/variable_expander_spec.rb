@@ -2268,6 +2268,16 @@ module Lti
           expect(expand!("$Canvas.assignment.new_quizzes_type")).to eq "ungraded_survey"
         end
 
+        it "has substitution for $Canvas.assignment.anonymous_participants" do
+          allow(assignment).to receive(:anonymous_participants?).and_return(false)
+          expect(expand!("$Canvas.assignment.anonymous_participants")).to be false
+        end
+
+        it "has substitution for $Canvas.assignment.anonymous_participants when true" do
+          allow(assignment).to receive(:anonymous_participants?).and_return(true)
+          expect(expand!("$Canvas.assignment.anonymous_participants")).to be true
+        end
+
         describe "$Canvas.assignment.pointsPossible" do
           it "has substitution for $Canvas.assignment.pointsPossible" do
             allow(assignment).to receive(:points_possible).and_return(10.0)

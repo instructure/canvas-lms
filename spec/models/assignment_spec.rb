@@ -13325,6 +13325,96 @@ describe Assignment do
     end
   end
 
+  describe "anonymous_participants?" do
+    before :once do
+      assignment_model(submission_types: "online_quiz", course: @course)
+      tool = @c.context_external_tools.create!(
+        name: "Quizzes.Next",
+        consumer_key: "test_key",
+        shared_secret: "test_secret",
+        tool_id: "Quizzes 2",
+        url: "http://example.com/launch"
+      )
+      @assignment.external_tool_tag_attributes = { content: tool }
+      @assignment.quiz_lti! && @assignment.save!
+    end
+
+    it "returns false when settings is nil" do
+      @assignment.settings = nil
+      expect(@assignment.anonymous_participants?).to be false
+    end
+
+    it "returns false when settings exists but new_quizzes key does not exist" do
+      @assignment.settings = {}
+      expect(@assignment.anonymous_participants?).to be false
+    end
+
+    it "returns false when new_quizzes exists but anonymous_participants does not exist" do
+      @assignment.settings = { "new_quizzes" => {} }
+      expect(@assignment.anonymous_participants?).to be false
+    end
+
+    it "returns true when anonymous_participants is set to true" do
+      @assignment.settings = { "new_quizzes" => { "anonymous_participants" => true } }
+      expect(@assignment.anonymous_participants?).to be true
+    end
+
+    it "returns false when anonymous_participants is set to false" do
+      @assignment.settings = { "new_quizzes" => { "anonymous_participants" => false } }
+      expect(@assignment.anonymous_participants?).to be false
+    end
+  end
+
+  describe "anonymous_participants=" do
+    before :once do
+      assignment_model(submission_types: "online_quiz", course: @course)
+      tool = @c.context_external_tools.create!(
+        name: "Quizzes.Next",
+        consumer_key: "test_key",
+        shared_secret: "test_secret",
+        tool_id: "Quizzes 2",
+        url: "http://example.com/launch"
+      )
+      @assignment.external_tool_tag_attributes = { content: tool }
+      @assignment.quiz_lti! && @assignment.save!
+    end
+
+    it "sets the settings->new_quizzes->anonymous_participants attribute when settings is nil" do
+      @assignment.settings = nil
+      @assignment.anonymous_participants = true
+      expect(@assignment.anonymous_participants?).to be true
+      expect(@assignment.settings).to eq({ "new_quizzes" => { "anonymous_participants" => true } })
+    end
+
+    it "sets the settings->new_quizzes->anonymous_participants attribute when new_quizzes key does not exist" do
+      @assignment.settings = {}
+      @assignment.anonymous_participants = true
+      expect(@assignment.anonymous_participants?).to be true
+      expect(@assignment.settings).to eq({ "new_quizzes" => { "anonymous_participants" => true } })
+    end
+
+    it "sets the settings->new_quizzes->anonymous_participants attribute when new_quizzes key already exists and empty" do
+      @assignment.settings = { "new_quizzes" => nil }
+      @assignment.anonymous_participants = false
+      expect(@assignment.anonymous_participants?).to be false
+      expect(@assignment.settings).to eq({ "new_quizzes" => { "anonymous_participants" => false } })
+    end
+
+    it "leaves the existing other keys in tact" do
+      @assignment.settings = { "another_key" => 123, "new_quizzes" => { "other_key" => "other_value" } }
+      @assignment.anonymous_participants = true
+      expect(@assignment.anonymous_participants?).to be true
+      expect(@assignment.settings).to eq({ "another_key" => 123, "new_quizzes" => { "other_key" => "other_value", "anonymous_participants" => true } })
+    end
+
+    it "overwrites existing anonymous_participants with new value" do
+      @assignment.settings = { "new_quizzes" => { "anonymous_participants" => false, "other_key" => "other_value" } }
+      @assignment.anonymous_participants = true
+      expect(@assignment.anonymous_participants?).to be true
+      expect(@assignment.settings).to eq({ "new_quizzes" => { "other_key" => "other_value", "anonymous_participants" => true } })
+    end
+  end
+
   describe "#post_scheduled_comments" do
     before(:once) do
       course_with_teacher(active_all: true)

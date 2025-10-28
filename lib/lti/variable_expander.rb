@@ -1766,6 +1766,17 @@ module Lti
                        -> { @assignment.new_quizzes_type },
                        ASSIGNMENT_GUARD
 
+    # Returns whether the assignment that was launched anonymizes the participants
+    #
+    # @example
+    #   ```
+    #   true
+    #   ```
+    register_expansion "Canvas.assignment.anonymous_participants",
+                       [],
+                       -> { @assignment.anonymous_participants? },
+                       ASSIGNMENT_GUARD
+
     # Returns the assignment_description of the assignment that was launched.
     #
     # @example
