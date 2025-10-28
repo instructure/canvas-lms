@@ -18,7 +18,7 @@
 
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
-import {IconAiLine, IconWarningSolid} from '@instructure/ui-icons'
+import {IconAiLine, IconWarningSolid, IconRefreshLine} from '@instructure/ui-icons'
 import {createContext, PropsWithChildren, useContext, useEffect} from 'react'
 import {DiscussionManagerUtilityContext} from '../../../utils/constants'
 import {useTranslationStore} from '../../../hooks/useTranslationStore'
@@ -38,6 +38,7 @@ interface TranslationContextType {
   translatedTitle: string | null
   translatedMessage: string | null
   translationLanguages?: {id: string; translated_to_name: string}[]
+  retryTranslation?: () => void
 }
 
 const TranslationContext = createContext<TranslationContextType | undefined>(undefined)
@@ -62,6 +63,27 @@ const Translation = ({id, title, message, children}: PropsWithChildren<Translati
 
   const addEntry = useTranslationStore(state => state.addEntry)
   const removeEntry = useTranslationStore(state => state.removeEntry)
+
+  const retryTranslation = async () => {
+    const language = entryInfo?.language || activeLanguage
+    if (!language) return
+
+    try {
+      setTranslationStart(id)
+
+      const [translatedTitle, translatedMessage] = await Promise.all([
+        getTranslation(title, language),
+        getTranslation(message, language),
+      ])
+
+      setTranslationEnd(id, language, translatedMessage, translatedTitle)
+    } catch (error: any) {
+      setTranslationEnd(id)
+      if (error.translationError) {
+        setTranslationError(id, error.translationError, language)
+      }
+    }
+  }
 
   useEffect(() => {
     addEntry(id, {title, message})
@@ -173,6 +195,7 @@ const Translation = ({id, title, message, children}: PropsWithChildren<Translati
         translatedMessage: entryInfo.translatedMessage || null,
         translationError: entryInfo.error || null,
         translationLanguages: translationLanguages?.current,
+        retryTranslation,
       }}
     >
       {children}
@@ -274,10 +297,35 @@ const Error = () => {
     return null
   }
 
-  const {isTranslating, translateTargetLanguage, translationError} = context
+  const {isTranslating, translateTargetLanguage, translationError, retryTranslation} = context
 
   if (isTranslating || !translateTargetLanguage || !translationError) {
     return null
+  }
+
+  if (translationError.type === 'rateLimitError') {
+    return (
+      <Flex direction="column" gap="medium" margin="0 0 small 0">
+        <Flex direction="row" alignItems="center" gap="x-small">
+          <IconWarningSolid color="error" title="warning" />
+          <Text color="danger" data-testid="error_type_rate_limit">
+            {translationError.message}
+          </Text>
+        </Flex>
+        <Link
+          variant="standalone"
+          onClick={retryTranslation}
+          data-testid="retry-translation-button"
+          width="fit-content"
+          forceButtonRole={false}
+        >
+          <Flex direction="row" alignItems="center" gap="x-small">
+            <IconRefreshLine />
+            <Text>{I18n.t('Retry Translation')}</Text>
+          </Flex>
+        </Link>
+      </Flex>
+    )
   }
 
   if (translationError.type === 'error' || translationError.type === 'newError') {
