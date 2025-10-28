@@ -231,7 +231,7 @@ class User < ActiveRecord::Base
   has_many :wiki_pages
   has_many :announcements
   has_many :discussion_topics, -> { where(type: nil) }
-  has_many :submission_comments, foreign_key: "author_id", inverse_of: :user
+  has_many :submission_comments, foreign_key: "author_id", inverse_of: :author
 
   has_one :profile, class_name: "UserProfile"
 
