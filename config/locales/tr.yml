@@ -4086,6 +4086,8 @@ tr:
       slot_limit: "Bu slotu sınırla"
       users: kulanıcılar.
     edit_assignment: 
+      ? " group"
+      : "Grup:"
       calendar: "Takvim:"
       due: "Bitiş:"
       group: "Grup:"

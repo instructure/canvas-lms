@@ -2705,6 +2705,8 @@ ko:
       slot_limit: "이 슬롯을 다음으로 제한"
       users: 사용자입니다.
     edit_assignment: 
+      ? " group"
+      : "그룹:"
       calendar: "달력:"
       due: "기한:"
       group: "그룹:"

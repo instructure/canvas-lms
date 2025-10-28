@@ -3870,6 +3870,8 @@ he:
       slot_limit: "הגבל חלון זמן זה ל"
       users: משתמשים.
     edit_assignment: 
+      ? " group"
+      : "קבוצה:"
       calendar: "יומן:"
       due: "תאריך יעד:"
       group: "קבוצה:"

@@ -4884,6 +4884,8 @@ fa:
       slot_limit: "این بازه زمانی محدود شود به"
       users: کاربران.
     edit_assignment: 
+      ? " group"
+      : "گروه:"
       calendar: "تقویم:"
       due: "مهلت:"
       group: "گروه:"
@@ -5025,6 +5027,7 @@ fa:
       delete_link: "حذف بازه زمانی"
       end_time_label: "تاریخ پایان"
       start_time_label: "زمان شروع"
+    title_is_required: "عنوان لازم است!"
     titles: 
       edit_appointment_group: "ویرایش گروه قرار ملاقات"
       edit_event: "ویرایش رویداد"
