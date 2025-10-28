@@ -387,5 +387,37 @@ describe "conversations new" do
         expect(f("body")).not_to contain_jqcss('button[data-testid="manage-labels"]')
       end
     end
+
+    context "nutrition facts functionality" do
+      before do
+        @course.root_account.enable_feature!(:translate_inbox_messages)
+      end
+
+      context "when cedar_translation feature flag is enabled" do
+        before do
+          @course.root_account.enable_feature!(:cedar_translation)
+        end
+
+        it "loads nutrition facts element in compose modal" do
+          get "/conversations"
+          f("button[data-testid='compose']").click
+          wait_for_ajaximations
+          expect(f("#nutrition_facts_trigger")).to be_present
+        end
+      end
+
+      context "when cedar_translation feature flag is disabled" do
+        before do
+          @course.root_account.disable_feature!(:cedar_translation)
+        end
+
+        it "does not mount nutrition facts content in compose modal" do
+          get "/conversations"
+          f("button[data-testid='compose']").click
+          wait_for_ajaximations
+          expect(f("body")).not_to contain_css("#nutrition_facts_trigger")
+        end
+      end
+    end
   end
 end

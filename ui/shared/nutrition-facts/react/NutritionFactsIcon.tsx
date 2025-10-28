@@ -18,10 +18,14 @@
 
 import React from 'react'
 
-export const NutritionFactsIcon: React.FC = () => (
+interface NutritionFactsIconProps {
+  size?: number
+}
+
+export const NutritionFactsIcon: React.FC<NutritionFactsIconProps> = ({size = 18}) => (
   <svg
-    width="18"
-    height="18"
+    width={size}
+    height={size}
     viewBox="0 0 18 18"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"

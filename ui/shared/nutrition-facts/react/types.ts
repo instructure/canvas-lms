@@ -49,4 +49,5 @@ export interface NutritionFactsProps {
       }>
     }>
   }
+  iconSize?: number
 }

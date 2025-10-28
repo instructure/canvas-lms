@@ -30,6 +30,7 @@ export const NutritionFacts: React.FC<NutritionFactsProps> = ({
   aiInformation,
   dataPermissionLevels,
   nutritionFacts,
+  iconSize,
 }) => {
   return (
     <AiInformation
@@ -43,7 +44,7 @@ export const NutritionFacts: React.FC<NutritionFactsProps> = ({
           withBorder={false}
           shape="circle"
         >
-          <NutritionFactsIcon />
+          <NutritionFactsIcon size={iconSize} />
         </IconButton>
       }
       {...STATIC_TEXT}
