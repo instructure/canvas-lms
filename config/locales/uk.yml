@@ -3549,6 +3549,8 @@ uk:
     edit_appt_calendar_event: 
       description: "Опис:"
     edit_assignment: 
+      ? " group"
+      : "Група:"
       calendar: "Календар:"
       due: "Очікується:"
       group: "Група:"
@@ -3663,6 +3665,7 @@ uk:
       delete_link: "Видалити часовий діапазон"
       end_time_label: "Час завершення"
       start_time_label: "Час початку"
+    title_is_required: "Заголовок обов'язковий!"
     titles: 
       edit_appointment_group: "Змінити призначення групи"
       edit_event: "Редагувати подію"
