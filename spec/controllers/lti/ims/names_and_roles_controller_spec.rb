@@ -992,17 +992,6 @@ describe Lti::IMS::NamesAndRolesController do
       end
     end
 
-    context "when a group has a pending membership" do
-      let(:group_record) { group_with_user(join_level: "invitation_only", context: course).group }
-      let(:group_member) { group_record.group_memberships.first }
-
-      it "does not return the pending membership" do
-        pending("group memberships are always auto-accepted so cant test \"invited\" workflow state - see GroupMembership#auto_join")
-        send_request
-        expect_empty_members_array
-      end
-    end
-
     # rubocop:disable RSpec/LetSetup
     context "when the rlid param is specified" do
       let(:group_record) { group_with_user(active_all: true, context: course, name: user_full_name).group }
