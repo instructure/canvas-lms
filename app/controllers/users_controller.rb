@@ -1826,6 +1826,7 @@ class UsersController < ApplicationController
     comment_library_suggestions_enabled
     elementary_dashboard_disabled
     default_to_block_editor
+    widget_dashboard_user_preference
   ].freeze
 
   # @API Update user settings.
@@ -1855,6 +1856,11 @@ class UsersController < ApplicationController
   # @argument elementary_dashboard_disabled [Boolean]
   #   If true, will display the user's preferred class Canvas dashboard
   #   view instead of the canvas for elementary view.
+  #
+  # @argument widget_dashboard_user_preference [Boolean]
+  #   If true, enables the widget dashboard for the user. Only applies
+  #   when the widget_dashboard feature is enabled at the account level.
+  #   Defaults to true when the feature becomes available.
   #
   # @example_request
   #
@@ -3602,7 +3608,27 @@ class UsersController < ApplicationController
 
   def should_show_widget_dashboard?
     return false if k5_user?
-    return false unless @domain_root_account.feature_enabled?(:widget_dashboard)
+
+    flag = @domain_root_account.lookup_feature_flag(:widget_dashboard)
+    return false unless flag
+
+    # If feature is locked on (cannot override), force widget dashboard for all eligible users
+    # If feature can be overridden (allowed or allowed_on), respect user preference
+    if flag.enabled? && !flag.can_override?
+      # Feature is locked on - show for all eligible users regardless of preference
+      if @current_user.observer_enrollments.active.any?
+        # only show widget dashboard if observer is actively observing a student
+        return true if @selected_observed_user && @selected_observed_user != @current_user
+      elsif !@current_user.non_student_enrollment?
+        return true
+      end
+      return false
+    end
+
+    # Feature allows override (allowed or allowed_on) - check user preference
+    # For allowed_on, preference defaults to true; for allowed, it defaults to true
+    return false unless flag.can_override?
+    return false unless @current_user.prefers_widget_dashboard?
 
     if @current_user.observer_enrollments.active.any?
       # only show widget dashboard if observer is actively observing a student

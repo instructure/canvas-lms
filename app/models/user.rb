@@ -2088,7 +2088,7 @@ class User < ActiveRecord::Base
 
   # the logic here is copied from feature_flags_controller#index
   # we don't want to add use_dyslexic_font to ENV if
-  # (a) the flag is shadowed or (b) the flag is off/locked at site admin
+  # the flag is off/locked at site admin
   def can_see_dyslexic_font_feature_flag?(session)
     can_read_site_admin = Account.site_admin.grants_right?(@current_user, session, :read)
 
@@ -2103,6 +2103,11 @@ class User < ActiveRecord::Base
     return false if ff.enabled? && ff.locked?(self)
 
     true
+  end
+
+  def prefers_widget_dashboard?
+    # Default to true when feature is available at account level
+    preferences[:widget_dashboard_user_preference] != false
   end
 
   def auto_show_cc?
