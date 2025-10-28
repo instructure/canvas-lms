@@ -25,6 +25,10 @@ module WidgetDashboardPage
     "[data-testid='announcement-filter-select']"
   end
 
+  def announcement_item_prefix_selector
+    "[data-testid*='announcement-item-']"
+  end
+
   def announcement_item_selector(item_id)
     "[data-testid='announcement-item-#{item_id}']"
   end
@@ -145,6 +149,9 @@ module WidgetDashboardPage
     "[data-testid='enrollment-invitation']"
   end
 
+  def observed_student_dropdown_selector
+    "[data-testid='observed-student-dropdown']"
+  end
   #------------------------------ Elements ------------------------------
 
   def announcement_filter
@@ -152,7 +159,7 @@ module WidgetDashboardPage
   end
 
   def all_announcement_items
-    ff("[data-testid*='announcement-item-']")
+    ff(announcement_item_prefix_selector)
   end
 
   def announcement_item(item_id)
@@ -279,6 +286,10 @@ module WidgetDashboardPage
     fj(enrollment_invitation_decline_button_selector)
   end
 
+  def observed_student_dropdown
+    f(observed_student_dropdown_selector)
+  end
+
   #------------------------------ Actions -------------------------------
 
   def dashboard_student_setup
@@ -355,6 +366,23 @@ module WidgetDashboardPage
     @graded_discussion.grade_student(@student, grade: "9", grader: @teacher1)
   end
 
+  def observed_student_setup
+    @student2 = user_factory(active_all: true, name: "student2")
+    @course1.enroll_student(@student2, enrollment_state: :active)
+    @course2.enroll_student(@student2, enrollment_state: :active)
+
+    @submitted_discussion.submit_homework(@student2, submission_type: "discussion_topic")
+    @graded_assignment.submit_homework(@student2, submission_type: "online_text_entry")
+    @graded_assignment.grade_student(@student2, grade: "10", grader: @teacher2)
+  end
+
+  def observer_setup
+    @observer = user_factory(name: "Observer", active_all: true)
+
+    @course1.enroll_user(@observer, "ObserverEnrollment", { allow_multiple_enrollments: true, associated_user_id: @student })
+    @course2.enroll_user(@observer, "ObserverEnrollment", { allow_multiple_enrollments: true, associated_user_id: @student2 })
+  end
+
   def filter_announcements_list_by(status)
     announcement_filter.click
     click_INSTUI_Select_option(announcement_filter_select, status)
@@ -367,6 +395,12 @@ module WidgetDashboardPage
     when :date
       click_INSTUI_Select_option(course_work_date_filter_select_selector, filter_value)
     end
+    wait_for_ajaximations
+  end
+
+  def select_observed_student(student_name)
+    expect(observed_student_dropdown).to be_displayed
+    click_INSTUI_Select_option(observed_student_dropdown_selector, student_name)
     wait_for_ajaximations
   end
 
