@@ -37,6 +37,9 @@ module Translation
   class ValidationError < TranslationError
   end
 
+  class CedarLimitReachedError < TranslationError
+  end
+
   module TranslationType
     AWS_TRANSLATE = :aws_translate
     SAGEMAKER = :sagemaker
