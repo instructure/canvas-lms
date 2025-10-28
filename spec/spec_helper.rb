@@ -905,7 +905,7 @@ RSpec.configure do |config|
       ConfigFile.singleton_class.prepend(StubS3)
       allow(StubS3).to receive(:stubbed?).and_return(true)
     elsif Attachment.s3_config.blank? || Attachment.s3_config[:access_key_id] == "access_key"
-      skip "Please put valid S3 credentials in config/amazon_s3.yml"
+      raise "Please put valid S3 credentials in config/amazon_s3.yml"
     end
   end
 
@@ -1006,10 +1006,6 @@ RSpec.configure do |config|
     yield
   ensure
     Rails.application.config.consider_all_requests_local = old_value
-  end
-
-  def skip_if_prepended_class_method_stubs_broken
-    skip("stubbing prepended class methods is broken in new versions of ruby") # rubocop:disable Specs/NoSkipWithoutDate,Specs/NoSkipWithoutTicket
   end
 end
 

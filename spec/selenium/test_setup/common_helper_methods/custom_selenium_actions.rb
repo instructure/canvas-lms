@@ -28,10 +28,6 @@ module CustomSeleniumActions
     skip("skipping test, fails in Firefox: #{additional_error_text}") if driver.browser == :firefox
   end
 
-  def skip_if_chrome(additional_error_text)
-    skip("skipping test, fails in Chrome: #{additional_error_text}") if driver.browser == :chrome
-  end
-
   def skip_if_safari(additional_error_text)
     return unless driver.browser == :safari
 

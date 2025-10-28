@@ -450,10 +450,8 @@ describe OAuth2ProviderController do
         context "key secret and provided secret do not match" do
           let(:client_secret) { other_key.api_key }
 
-          it do
-            if grant_type == "client_credentials" && !key.site_admin_service_auth?
-              skip "not valid for this grant_type"
-            end
+          it "returns unauthorized" do
+            skip "not valid for this grant_type" if grant_type == "client_credentials" && !key.site_admin_service_auth?
 
             expect(subject).to have_http_status(:unauthorized)
           end
@@ -462,10 +460,8 @@ describe OAuth2ProviderController do
         context "key secret is not provided" do
           let(:client_secret) { nil }
 
-          it do
-            if grant_type == "client_credentials" && !key.site_admin_service_auth?
-              skip "not valid for this grant_type"
-            end
+          it "returns unauthorized" do
+            skip "not valid for this grant_type" if grant_type == "client_credentials" && !key.site_admin_service_auth?
 
             expect(subject).to have_http_status(:unauthorized)
           end
