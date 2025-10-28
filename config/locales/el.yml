@@ -2129,7 +2129,9 @@ el:
   assignment_quiz_type: 
     quiz_type: "Τύπος Κουίζ"
     quiz_type_options: 
+      graded_quiz: "Βαθμολογημένο κουίζ"
       graded_survey: "Βαθμολογημένη Δημοσκόπηση"
+      ungraded_survey: "Μη Βαθμολογημένη Δημοσκόπηση"
   assignment_selection_6bff05c4: "Επιλογή Εργασίας"
   assignment_title_8a707dd2: "τίτλος εργασίας"
   assignment_url_37c849c6: "url εργασίας"
@@ -3100,6 +3102,8 @@ el:
     edit_appt_calendar_event: 
       description: "Περιγραφή:"
     edit_assignment: 
+      ? " group"
+      : "Ομάδα:"
       calendar: "Ημερολόγιο:"
       due: "Καταληκτική Ημερ/νία:"
       group: "Ομάδα:"
@@ -13229,6 +13233,7 @@ el:
   retry_ebd5f8ba: "Δοκιμάστε ξανά"
   reviewer_b993ce28: Αξιολογητής
   reviewers_successfully_added_bd4b629a: "Οι αξιολογητές προστέθηκαν επιτυχώς"
+  revision_history_abfd1cfd: "Ιστορικό Εκδόσεων"
   rich_content_editor_2708ef21: "Επεξεργαστής Πλούσιου Περιεχομένου-rich content"
   right_sidebar_logo_5483dc0a: "Λογότυπο Δεξιάς Πλευράς"
   role: 
