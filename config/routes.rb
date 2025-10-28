@@ -2462,6 +2462,10 @@ CanvasRails::Application.routes.draw do
       post "enqueue_outcome_rollup_calculation", action: :enqueue_outcome_rollup_calculation
     end
 
+    scope(controller: :lmgb_user_details) do
+      get "courses/:course_id/users/:id/lmgb_user_details", action: :show, as: "course_lmgb_user_details"
+    end
+
     scope(controller: :outcomes_academic_benchmark_import_api) do
       # These can be uncommented when implemented
       # get  "global/outcomes_import",            action: :index
