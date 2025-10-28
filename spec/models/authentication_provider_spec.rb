@@ -523,6 +523,11 @@ describe AuthenticationProvider do
       expect(@user.name).not_to be_blank
     end
 
+    it "doesn't asplode with invalid email" do
+      aac.apply_federated_attributes(@pseudonym, { "email" => "garbage" })
+      expect(@user.name).not_to be_blank
+    end
+
     it "ignores empty sis_user_id or integration_id values" do
       @pseudonym.update sis_user_id: "test", integration_id: "testfrd"
       aac.apply_federated_attributes(@pseudonym,
