@@ -19,7 +19,7 @@
 import {gql} from '@apollo/client'
 
 export const GET_USERS_QUERY = gql`
-query getUsers($after: String, $courseId: ID!, $first: Int!, $userIds: [ID!]) {
+query Gradebook__GetUsers($after: String, $courseId: ID!, $first: Int!, $userIds: [ID!]) {
   course(id: $courseId) {
     usersConnection(
       after: $after
