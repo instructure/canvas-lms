@@ -1668,6 +1668,13 @@ class AssignmentsApiController < ApplicationController
   #   The day/time the peer reviews are unlocked. Must be before the due date if there is a due date.
   #   Accepts times in ISO 8601 format, e.g. 2025-08-15T12:10:00Z.
   #
+  # @argument assignment[peer_review][peer_review_overrides][] [AssignmentOverride]
+  #   List of overrides for the peer reviews.
+  #   When updating overrides:
+  #   - Include "id" to update an existing override
+  #   - Omit "id" to create a new override
+  #   - Omit an override from the list to delete it
+  #
   # @returns Assignment
   def update
     @assignment = api_find(@context.active_assignments, params[:id])
@@ -1774,14 +1781,10 @@ class AssignmentsApiController < ApplicationController
     if [:created, :ok].include?(result)
       render json: assignment_json(@assignment, @current_user, session, opts), status: result
     else
-      if result == :peer_review_error
-        status = :bad_request
-        errors = I18n.t("Failed to create or update peer review sub assignment")
-      else
-        status = (result == :forbidden) ? :forbidden : :bad_request
-        errors = ::Api::Errors::Reporter.to_json(@assignment.errors)[:errors]
-        errors["published"] = errors.delete(:workflow_state) if errors.key?(:workflow_state)
-      end
+      status = (result == :forbidden) ? :forbidden : :bad_request
+      errors = ::Api::Errors::Reporter.to_json(@assignment.errors)[:errors]
+      errors["published"] = errors.delete(:workflow_state) if errors.key?(:workflow_state)
+
       render json: { errors: }, status:
     end
   end

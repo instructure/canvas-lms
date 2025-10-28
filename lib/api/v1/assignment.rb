@@ -688,17 +688,49 @@ module Api::V1::Assignment
     cached_due_dates_changed = prepared_update[:assignment].update_cached_due_dates?
     response = :ok
 
+    has_peer_reviews = prepared_update[:assignment].peer_reviews
+    peer_review_grading_enabled = prepared_update[:assignment].context.feature_enabled?(:peer_review_grading)
+
     Assignment.suspend_due_date_caching do
-      response = if prepared_update[:overrides]
-                   update_api_assignment_with_overrides(prepared_update, user)
-                 else
-                   if assignment_params["force_updated_at"] && !prepared_update[:assignment].changed?
-                     prepared_update[:assignment].touch
+      if peer_review_grading_enabled
+        Assignment.transaction do
+          response = if prepared_update[:overrides].present?
+                       update_api_assignment_with_overrides(prepared_update, user)
+                     else
+                       if assignment_params["force_updated_at"] && !prepared_update[:assignment].changed?
+                         prepared_update[:assignment].touch
+                       else
+                         prepared_update[:assignment].save!
+                       end
+                       :ok
+                     end
+
+          if response == :ok
+            if has_peer_reviews
+              if prepared_update[:assignment].peer_review_sub_assignment.present?
+                update_api_peer_review_sub_assignment(prepared_update[:assignment], assignment_params[:peer_review])
+              else
+                create_api_peer_review_sub_assignment(prepared_update[:assignment], assignment_params[:peer_review])
+              end
+            else
+              prepared_update[:assignment]&.peer_review_sub_assignment&.destroy
+            end
+
+            prepared_update[:assignment].association(:peer_review_sub_assignment).reload
+          end
+        end
+      else
+        response = if prepared_update[:overrides]
+                     update_api_assignment_with_overrides(prepared_update, user)
                    else
-                     prepared_update[:assignment].save!
+                     if assignment_params["force_updated_at"] && !prepared_update[:assignment].changed?
+                       prepared_update[:assignment].touch
+                     else
+                       prepared_update[:assignment].save!
+                     end
+                     :ok
                    end
-                   :ok
-                 end
+      end
     end
 
     if @overrides_affected.to_i > 0 || cached_due_dates_changed
@@ -777,24 +809,6 @@ module Api::V1::Assignment
         end
 
         opts[:migrated_urls_content_migration_id] = content_migration.global_id
-      end
-    end
-
-    if response == :ok && prepared_update[:assignment].context.feature_enabled?(:peer_review_grading)
-      begin
-        if prepared_update[:assignment].peer_review_sub_assignment.present?
-          if prepared_update[:assignment].peer_reviews
-            update_api_peer_review_sub_assignment(prepared_update[:assignment], assignment_params[:peer_review])
-          else
-            prepared_update[:assignment].peer_review_sub_assignment.destroy
-          end
-        else
-          create_api_peer_review_sub_assignment(prepared_update[:assignment], assignment_params[:peer_review])
-        end
-
-        prepared_update[:assignment].association(:peer_review_sub_assignment).reload
-      rescue
-        return :peer_review_error
       end
     end
 
@@ -1567,7 +1581,13 @@ module Api::V1::Assignment
       peer_review_params[:due_at] = params[:due_at] if params[:due_at].present?
       peer_review_params[:unlock_at] = params[:unlock_at] if params[:unlock_at].present?
       peer_review_params[:lock_at] = params[:lock_at] if params[:lock_at].present?
-      peer_review_params[:peer_review_overrides] = params[:peer_review_overrides] if params[:peer_review_overrides].present?
+      if params.key?(:peer_review_overrides)
+        overrides = params[:peer_review_overrides]
+        # Form-encoded empty arrays come through as [""] (array with empty string)
+        # Filter out blank entries to ensure we get a true empty array
+        overrides = overrides.compact_blank if overrides.is_a?(Array)
+        peer_review_params[:peer_review_overrides] = overrides
+      end
     end
 
     peer_review_params
@@ -1581,7 +1601,7 @@ module Api::V1::Assignment
       **peer_review_params
     )
 
-    if overrides.present?
+    unless overrides.nil?
       PeerReview::DateOverriderService.call(
         peer_review_sub_assignment:,
         overrides:
@@ -1593,6 +1613,20 @@ module Api::V1::Assignment
 
   def update_api_peer_review_sub_assignment(parent_assignment, params)
     peer_review_params = prepare_peer_review_params(params)
-    PeerReview::PeerReviewUpdaterService.call(parent_assignment:, **peer_review_params)
+    overrides = peer_review_params.delete(:peer_review_overrides)
+
+    peer_review_sub_assignment = PeerReview::PeerReviewUpdaterService.call(
+      parent_assignment:,
+      **peer_review_params
+    )
+
+    unless overrides.nil?
+      PeerReview::DateOverriderService.call(
+        peer_review_sub_assignment:,
+        overrides:
+      )
+    end
+
+    peer_review_sub_assignment
   end
 end
