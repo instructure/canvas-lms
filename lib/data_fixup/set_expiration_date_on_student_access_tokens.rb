@@ -44,7 +44,9 @@ module DataFixup::SetExpirationDateOnStudentAccessTokens
     users = User.where(id: users_with_access_tokens).select(:id).to_a
     User.preload_shard_associations(users)
 
-    no_enrollments_on_a_shard = []
+    # Save a copy of users_with_access tokens; we'll subtract from this array as we iterate
+    # through the shards and figure out which users have no enrollments on any shard.
+    users_with_no_enrollments = users_with_access_tokens
 
     Shard.partition_by_shard(users) do |users_on_shard|
       # Find all enrollments for those users that *aren't* a StudentEnrollment
@@ -54,18 +56,19 @@ module DataFixup::SetExpirationDateOnStudentAccessTokens
       users_with_access_tokens -= non_students
 
       # If they have no enrollments on any shard, we also don't want to change
-      # their access tokens. So remember the ones that didn't have enrollments on
-      # *this* shard, so that we can later check if they have none on *any* shard.
-      no_enrollments_users = User.shard(Shard.current).active.where(id: users_on_shard.pluck(:id)).where.missing(:enrollments).pluck(:id).map { |id| Shard.global_id_for(id) }
-      no_enrollments_on_a_shard << no_enrollments_users
+      # their access tokens.
+      no_enrollments_on_this_shard = User.shard(Shard.current).active.where(id: users_on_shard.pluck(:id)).where.missing(:enrollments).pluck(:id).map do |id|
+        Shard.global_id_for(id)
+      end
+
+      # Take the users who we expected to have enrollments on this shard, and subtract the ones with no enrollments on this shard.
+      # That leaves us with the users who did have enrollments on this shard. Remove them from our list of users with no enrollments.
+      users_on_shard_ids = users_on_shard.pluck(:global_id)
+      users_with_no_enrollments -= (users_on_shard_ids - no_enrollments_on_this_shard)
     end
 
-    # Keep the entries that were present in every array. That would mean they were
-    # the ones with no enrollments on every shard they checked. We can check that
-    # by taking the union of each array; that will keep the items that are in every array.
-    no_enrollments_at_all = no_enrollments_on_a_shard.reduce(&:&)
-
-    users_with_access_tokens -= no_enrollments_at_all
+    # Now, subtract the users with no enrollments. If they had no enrollments, we don't want to affect their tokens.
+    users_with_access_tokens -= users_with_no_enrollments
 
     AccessToken.active.where(id: access_token_batch, user_id: users_with_access_tokens).update_all(permanent_expires_at: expiration_date)
   end
