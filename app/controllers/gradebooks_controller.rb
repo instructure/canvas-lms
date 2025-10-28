@@ -1902,8 +1902,12 @@ class GradebooksController < ApplicationController
   end
 
   def track_update_metrics(params, submission)
-    if params.dig(:submission, :grade) && params["submission"]["grade"].to_s != submission.grade.to_s && params["originator"] == "speed_grader"
-      InstStatsd::Statsd.distributed_increment("speedgrader.submission.posted_grade")
+    if params.dig(:submission, :grade) && params["submission"]["grade"].to_s != submission.grade.to_s
+      if params["originator"] == "speed_grader"
+        InstStatsd::Statsd.distributed_increment("speedgrader.submission.posted_grade")
+      elsif params["originator"] == "platform_speed_grader"
+        InstStatsd::Statsd.distributed_increment("platform_speedgrader.submission.posted_grade")
+      end
     end
   end
 
