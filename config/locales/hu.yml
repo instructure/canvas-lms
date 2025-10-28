@@ -4982,6 +4982,8 @@ hu:
     edit_appt_calendar_event: 
       description: "Leírás:"
     edit_assignment: 
+      ? " group"
+      : "Csoport:"
       calendar: "Naptár:"
       due: "Határidő: "
       group: "Csoport:"
@@ -5102,6 +5104,7 @@ hu:
       delete_link: "Idősáv törlése"
       end_time_label: "Záró időpont"
       start_time_label: "Kezdési idő"
+    title_is_required: "Cím megadása kötelező!"
     titles: 
       edit_appointment_group: "Megbeszélés-csoport szerkesztése"
       edit_event: "Esemény szerkesztése"
