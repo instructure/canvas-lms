@@ -1321,6 +1321,15 @@ Returns the new_quizzes type of the assignment that was launched.
 ```
 "graded_quiz"
 ```
+## Canvas.assignment.anonymous_participants
+Returns whether the assignment that was launched anonymizes the participants.
+
+**Availability**: *when launched as an assignment*  
+
+
+```
+true
+```
 ## Canvas.assignment.description
 Returns the assignment_description of the assignment that was launched.
 

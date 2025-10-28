@@ -1097,7 +1097,7 @@ module Api::V1::Assignment
   end
 
   def update_new_quizzes_params(assignment, assignment_params)
-    return unless Account.site_admin.feature_enabled?(:new_quizzes_surveys) && assignment.quiz_lti?
+    return unless Account.site_admin.feature_enabled?(:new_quizzes_surveys) && assignment.quiz_lti? && assignment.new_record?
 
     type = assignment_params[:new_quizzes_quiz_type]
     if type.present?
@@ -1105,6 +1105,7 @@ module Api::V1::Assignment
       assignment.hide_in_gradebook = (type == "ungraded_survey")
       assignment.omit_from_final_grade = (type == "ungraded_survey")
     end
+    assignment.anonymous_participants = assignment_params[:anonymous_participants]
   end
 
   def turnitin_settings_hash(assignment_params)

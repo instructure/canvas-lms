@@ -4446,9 +4446,19 @@ class AbstractAssignment < ActiveRecord::Base
     settings&.dig("new_quizzes", "type") || "graded_quiz"
   end
 
+  def anonymous_participants?
+    value = settings&.dig("new_quizzes", "anonymous_participants")
+    ActiveModel::Type::Boolean.new.cast(value) || false
+  end
+
   def new_quizzes_type=(type)
     self.settings ||= {}
     self.settings["new_quizzes"] = (settings["new_quizzes"] || {}).merge({ "type" => type })
+  end
+
+  def anonymous_participants=(enabled)
+    self.settings ||= {}
+    self.settings["new_quizzes"] = (settings["new_quizzes"] || {}).merge({ "anonymous_participants" => ActiveModel::Type::Boolean.new.cast(enabled) || false })
   end
 
   private
