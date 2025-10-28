@@ -3008,7 +3008,7 @@ describe Account do
     end
 
     it "updates submission grades in account inheriting courses/assignments and all sub account courses/assignments" do
-      @root_account.recompute_assignments_using_account_default(@new_grading_standard)
+      @root_account.recompute_assignments_using_account_default(@new_grading_standard.id)
 
       expect(@submission_root.reload.grade).to eq "A"
       expect(@submission_not_inheriting.reload.grade).to eq "F"
@@ -3017,12 +3017,21 @@ describe Account do
     end
 
     it "updates the most recent submission version in all inheriting account and sub account courses" do
-      @root_account.recompute_assignments_using_account_default(@new_grading_standard)
+      @root_account.recompute_assignments_using_account_default(@new_grading_standard.id)
 
       expect(@submission_root.reload.versions.first.model.grade).to eq "A"
       expect(@submission_not_inheriting.reload.versions.first.model.grade).to eq "F"
       expect(@submission_sub.reload.versions.first.model.grade).to eq "A"
       expect(@submission_sub_sub.reload.versions.first.model.grade).to eq "A"
+    end
+
+    it "handles nil grading_standard_id by using default instance" do
+      @root_account.recompute_assignments_using_account_default(nil)
+
+      # Should use GradingStandard.default_instance for grading
+      expect(@submission_root.reload.grade).not_to be_nil
+      expect(@submission_sub.reload.grade).not_to be_nil
+      expect(@submission_sub_sub.reload.grade).not_to be_nil
     end
   end
 
