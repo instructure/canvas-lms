@@ -1513,6 +1513,8 @@
   path: '/api/v1/courses/:course_id/users'
 - verb: GET
   path: '/api/v1/courses/:course_id/users/:id'
+- verb: GET
+  path: '/api/v1/courses/:course_id/users/:id/lmgb_user_details'
 - verb: PUT
   path: '/api/v1/courses/:course_id/users/:user_id/last_attended'
 - verb: GET
