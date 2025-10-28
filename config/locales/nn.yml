@@ -5529,6 +5529,8 @@ nn:
       slot_limit: "Avgrens tidsluka til"
       users: brukarar.
     edit_assignment: 
+      ? " group"
+      : "Gruppe:"
       calendar: "Kalender:"
       due: "Frist:"
       group: "Gruppe:"
@@ -5665,6 +5667,7 @@ nn:
       delete_link: "Slett tidsintervallet"
       end_time_label: Sluttidspunkt
       start_time_label: Starttidspunkt
+    title_is_required: "Tittel er obligatorisk! "
     titles: 
       edit_appointment_group: "Rediger avtalegruppe"
       edit_event: "Rediger hending"
