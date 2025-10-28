@@ -2797,14 +2797,20 @@ class Account < ActiveRecord::Base
     end
   end
 
-  def recompute_assignments_using_account_default(grading_standard)
+  def recompute_assignments_using_account_default(grading_standard_id, grading_standard = nil)
+    grading_standard ||= if grading_standard_id
+                           GradingStandard.find(grading_standard_id)
+                         else
+                           GradingStandard.default_instance
+                         end
+
     courses.where(grading_standard_id: nil).where.not(workflow_state: "completed").where.not(workflow_state: "deleted").find_each do |course|
       affected_assignment_ids = course.assignments.where(grading_type: ["letter_grade", "gpa_scale"], grading_standard_id: nil).pluck(:id)
       delay_if_production(priority: Delayed::LOWER_PRIORITY, strand: ["recalc_account_default", Shard.current.database_server.id], singleton: "recalc_account_default:#{course.global_id}").regrade_affected_assignments(affected_assignment_ids, grading_standard.id)
     end
 
     sub_accounts.where(grading_standard: nil).find_each do |sub_account|
-      sub_account.recompute_assignments_using_account_default(grading_standard)
+      sub_account.recompute_assignments_using_account_default(grading_standard_id, grading_standard)
     end
   end
 
