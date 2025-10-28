@@ -3319,7 +3319,8 @@ describe UsersController do
 
     context "with widget_dashboard feature enabled" do
       before do
-        Account.default.enable_feature!(:widget_dashboard)
+        # Make feature available at account level - user preference defaults to ON
+        Account.default.allow_feature!(:widget_dashboard)
       end
 
       it "includes each course once even for multiple enrollments" do
@@ -3388,6 +3389,34 @@ describe UsersController do
           expect(assigns[:js_bundles].flatten).to include :dashboard
           expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
           expect(assigns[:css_bundles].flatten).to include :dashboard
+        end
+
+        it "respects user preference when feature is allowed (can override)" do
+          user_session(@student)
+          @student.preferences[:widget_dashboard_user_preference] = false
+          @student.save!
+          get "user_dashboard"
+          expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
+          expect(assigns[:js_bundles].flatten).to include :dashboard
+        end
+
+        it "respects user preference when feature is allowed_on (can override, default on)" do
+          Account.default.set_feature_flag!(:widget_dashboard, Feature::STATE_DEFAULT_ON)
+          user_session(@student)
+          @student.preferences[:widget_dashboard_user_preference] = false
+          @student.save!
+          get "user_dashboard"
+          expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
+          expect(assigns[:js_bundles].flatten).to include :dashboard
+        end
+
+        it "ignores user preference when feature is locked on (cannot override)" do
+          Account.default.enable_feature!(:widget_dashboard)
+          user_session(@student)
+          @student.preferences[:widget_dashboard_user_preference] = false
+          @student.save!
+          get "user_dashboard"
+          expect(assigns[:js_bundles].flatten).to include :widget_dashboard
         end
       end
     end
@@ -3931,7 +3960,8 @@ describe UsersController do
 
   describe "dashboard with course grades" do
     before do
-      Account.default.enable_feature!(:widget_dashboard)
+      # Make feature available at account level - user preference defaults to ON
+      Account.default.allow_feature!(:widget_dashboard)
     end
 
     context "when student accesses their own dashboard" do
