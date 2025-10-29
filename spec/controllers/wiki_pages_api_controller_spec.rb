@@ -121,6 +121,40 @@ describe WikiPagesApiController, type: :request do
     end
   end
 
+  describe "n_plus_one_index_wiki_page_api feature flag" do
+    before :once do
+      student_in_course(active_all: true)
+
+      5.times do |i|
+        page = @course.wiki_pages.create!(title: "Test Page #{i}")
+        page.assignment_overrides.create!(set_type: "CourseSection", set_id: @course.default_section.id)
+        mod = @course.context_modules.first || @course.context_modules.create!(name: "Module")
+        mod.add_item(type: "wiki_page", id: page.id)
+      end
+    end
+
+    def count_queries_for_pages_api(flag_enabled:)
+      flag_enabled ? Account.site_admin.enable_feature!(:n_plus_one_index_wiki_page_api) : Account.site_admin.disable_feature!(:n_plus_one_index_wiki_page_api)
+
+      query_count = 0
+      ActiveSupport::Notifications.subscribed(
+        ->(*, payload) { query_count += 1 if payload[:sql] && !payload[:cached] },
+        "sql.active_record"
+      ) do
+        json = api_call_as_user(@student, :get, "/api/v1/courses/#{@course.id}/pages", controller: "wiki_pages_api", action: "index", format: "json", course_id: @course.to_param)
+        expect(json).to be_an(Array)
+      end
+      query_count
+    end
+
+    it "reduces N+1 queries compared to flag disabled" do
+      query_count_off = count_queries_for_pages_api(flag_enabled: false)
+      query_count_on = count_queries_for_pages_api(flag_enabled: true)
+
+      expect(query_count_on).to be < query_count_off, "Query count should be less, but its not: #{query_count_on} < #{query_count_off}"
+    end
+  end
+
   describe "attachment associations" do
     before do
       @aa_test_data = AttachmentAssociationsSpecHelper.new(@course.account, @course)

@@ -302,6 +302,18 @@ visibility_performance_improvements:
     development:
       state: allowed_on
 
+n_plus_one_index_wiki_page_api:
+  state: hidden
+  display_name: Wiki Pages API N+1 Query Fix
+  description: |-
+    Eliminates N+1 queries in the wiki pages API index endpoint by preloading associations.
+  applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
+
 youtube_migration:
   applies_to: Course
   state: hidden
