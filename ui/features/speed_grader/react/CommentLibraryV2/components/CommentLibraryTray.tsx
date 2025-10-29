@@ -28,8 +28,8 @@ import {Text} from '@instructure/ui-text'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import CommentRouterView from './CommentRouterView'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {SpeedGrader_CommentBankItems} from '../graphql/queries'
-import {SpeedGrader_CommentBankItemsQuery} from '@canvas/graphql/codegen/graphql'
+import {SpeedGraderLegacy_CommentBankItems} from '../graphql/queries'
+import {SpeedGraderLegacy_CommentBankItemsQuery} from '@canvas/graphql/codegen/graphql'
 import {CreateCommentSection} from './CreateCommentSection'
 import {SuggestionsEnabledToggleSection} from './SuggestionsEnabledToggleSection'
 
@@ -58,8 +58,8 @@ export const CommentLibraryTray: React.FC<CommentLibraryTrayProps> = ({
     () => ({userId, courseId, first: 20, after: ''}),
     [userId, courseId],
   )
-  const {data, error, fetchMore, networkStatus} = useQuery<SpeedGrader_CommentBankItemsQuery>(
-    SpeedGrader_CommentBankItems,
+  const {data, error, fetchMore, networkStatus} = useQuery<SpeedGraderLegacy_CommentBankItemsQuery>(
+    SpeedGraderLegacy_CommentBankItems,
     {
       variables: queryVariables,
       notifyOnNetworkStatusChange: true,

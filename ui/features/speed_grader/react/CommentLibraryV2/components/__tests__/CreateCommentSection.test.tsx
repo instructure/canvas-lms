@@ -21,7 +21,7 @@ import {render, waitFor, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {MockedProvider} from '@apollo/client/testing'
 import {CreateCommentSection} from '../CreateCommentSection'
-import {SpeedGrader_CreateCommentBankItem} from '../../graphql/mutations'
+import {SpeedGraderLegacy_CreateCommentBankItem} from '../../graphql/mutations'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
 jest.mock('@canvas/alerts/react/FlashAlert')
@@ -41,7 +41,7 @@ describe('CreateCommentSection', () => {
     success?: boolean
   } = {}) => ({
     request: {
-      query: SpeedGrader_CreateCommentBankItem,
+      query: SpeedGraderLegacy_CreateCommentBankItem,
       variables: {courseId, comment},
     },
     result: success
