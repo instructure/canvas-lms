@@ -129,6 +129,24 @@ describe('Todo', () => {
     expect(getByText('(Multiple Due Dates)')).toBeInTheDocument()
   })
 
+  it('renders "Multiple Due Dates" without specific date when all_dates_count > 25 and all_dates is empty', () => {
+    const props = {
+      ...defaultProps,
+      assignment: {
+        ...defaultProps.assignment,
+        all_dates_count: 26,
+        all_dates: [],
+        due_at: '2021-07-02T23:59:59Z',
+      },
+    }
+    const {getByText, queryByText} = render(<Todo {...props} />)
+    expect(getByText('Multiple Due Dates')).toBeInTheDocument()
+    // Should NOT show the "(Multiple Due Dates)" text with parentheses
+    expect(queryByText('(Multiple Due Dates)')).not.toBeInTheDocument()
+    // Should NOT show a specific date like "Jul 2 at 11:59pm"
+    expect(queryByText(/Jul 2/)).not.toBeInTheDocument()
+  })
+
   it('displays a badge with the number of submissions that need grading with correct pluralization', () => {
     const multiSubmissions = render(<Todo {...defaultProps} />)
     expect(multiSubmissions.getByText('3 submissions need grading')).toBeInTheDocument()
