@@ -3458,7 +3458,7 @@ class Course < ActiveRecord::Base
 
   def tabs_available(user = nil, opts = {})
     opts.reverse_merge!(include_external: true, include_hidden_unused: true)
-    cache_key = [user, self, opts].cache_key
+    cache_key = [user, self, opts, feature_enabled?(:ai_experiences)].cache_key
     @tabs_available ||= {}
     @tabs_available[cache_key] ||= uncached_tabs_available(user, opts)
     @tabs_available[cache_key]
