@@ -219,5 +219,15 @@ module FeatureFlags
       transitions["allowed_on"]["locked"] = true
     end
     private_class_method :only_admins_can_enable_during_eap
+
+    def self.sync_with_salesforce(_user, context, old_state, new_state)
+      return unless context.respond_to?(:sync_with_salesforce)
+
+      enabled_before = ["allowed_on", "on"].include?(old_state)
+      enabled_after = ["allowed_on", "on"].include?(new_state)
+      if enabled_before != enabled_after
+        context.sync_with_salesforce
+      end
+    end
   end
 end
