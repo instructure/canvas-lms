@@ -409,4 +409,54 @@ describe('LtiAssetReports', () => {
       expect(getByText('Unable to process: File is too large.')).toBeInTheDocument()
     })
   })
+
+  describe('pagination notification', () => {
+    it('shows notification when hasNextPage is true', () => {
+      const {getByText} = renderComponent(
+        <LtiAssetReports
+          attachments={attachments}
+          reports={reports}
+          assetProcessors={defaultLtiAssetProcessors}
+          attempt="1"
+          submissionType="online_upload"
+          showDocumentDisplayName={true}
+          hasNextPage={true}
+        />,
+      )
+      expect(getByText('Too many results, not all reports are being displayed')).toBeInTheDocument()
+    })
+
+    it('does not show notification when hasNextPage is false', () => {
+      const {queryByText} = renderComponent(
+        <LtiAssetReports
+          attachments={attachments}
+          reports={reports}
+          assetProcessors={defaultLtiAssetProcessors}
+          attempt="1"
+          submissionType="online_upload"
+          showDocumentDisplayName={true}
+          hasNextPage={false}
+        />,
+      )
+      expect(
+        queryByText('Too many results, not all reports are being displayed'),
+      ).not.toBeInTheDocument()
+    })
+
+    it('does not show notification when hasNextPage is undefined', () => {
+      const {queryByText} = renderComponent(
+        <LtiAssetReports
+          attachments={attachments}
+          reports={reports}
+          assetProcessors={defaultLtiAssetProcessors}
+          attempt="1"
+          submissionType="online_upload"
+          showDocumentDisplayName={true}
+        />,
+      )
+      expect(
+        queryByText('Too many results, not all reports are being displayed'),
+      ).not.toBeInTheDocument()
+    })
+  })
 })

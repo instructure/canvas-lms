@@ -141,6 +141,9 @@ export function defaultGetLtiAssetReportsResult({
     submission: {
       ltiAssetReportsConnection: {
         nodes: defaultLtiAssetReports({attachmentId, submissionAttempt}),
+        pageInfo: {
+          hasNextPage: false,
+        },
       },
     },
   }
@@ -163,6 +166,9 @@ export function defaultGetLtiAssetReportsResultForDiscussion({
           createdAt,
           messageIntro,
         }),
+        pageInfo: {
+          hasNextPage: false,
+        },
       },
     },
   }

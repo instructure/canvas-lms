@@ -152,9 +152,8 @@ describe('LtiAssetReportsForStudentSubmission', () => {
     await user.click(screen.getByText('Please review'))
     expect(screen.getByText('Document Processors for Test Assignment')).toBeInTheDocument()
 
-    // Close modal (look for close button)
-    const closeButton = screen.getAllByRole('button', {name: /close/i})[0]
-    await user.click(closeButton)
+    // Close modal
+    await user.click(screen.getByTestId('asset-report-modal-close-button'))
 
     // Modal should be closed
     expect(screen.queryByText('Document Processors for Test Assignment')).not.toBeInTheDocument()

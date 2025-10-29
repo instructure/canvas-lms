@@ -123,6 +123,7 @@ function discussionReports(
       result.push({key: entryId, displayName, reports})
     }
   }
+
   return result
 }
 
