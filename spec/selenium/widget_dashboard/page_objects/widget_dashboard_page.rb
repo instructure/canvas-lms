@@ -133,6 +133,18 @@ module WidgetDashboardPage
     "[data-testid='no-course-work-message']"
   end
 
+  def no_announcements_message_selector
+    "[data-testid='no-announcements-message']"
+  end
+
+  def no_instructors_message_selector
+    "[data-testid='no-instructors-message']"
+  end
+
+  def no_enrolled_courses_message_selector
+    "[data-testid='no-courses-message']"
+  end
+
   def enrollment_invitation_selector
     "[data-testid='enrollment-invitation']"
   end
@@ -270,6 +282,18 @@ module WidgetDashboardPage
     f(no_course_work_message_selector)
   end
 
+  def no_announcements_message
+    f(no_announcements_message_selector)
+  end
+
+  def no_instructors_message
+    f(no_instructors_message_selector)
+  end
+
+  def no_enrolled_courses_message
+    f(no_enrolled_courses_message_selector)
+  end
+
   def enrollment_invitation
     f(enrollment_invitation_selector)
   end
@@ -381,6 +405,46 @@ module WidgetDashboardPage
 
     @course1.enroll_user(@observer, "ObserverEnrollment", { allow_multiple_enrollments: true, associated_user_id: @student })
     @course2.enroll_user(@observer, "ObserverEnrollment", { allow_multiple_enrollments: true, associated_user_id: @student2 })
+  end
+
+  def dashboard_pending_enrollment_setup
+    @course3 = course_factory(active_all: true, course_name: "Test Course")
+
+    @assignment_pending_course = @course3.assignments.create!(name: "Course 3: due_graded_discussion", points_possible: "10", due_at: 2.days.from_now, submission_types: "discussion_topic")
+    @course3.enroll_teacher(@teacher1, enrollment_state: :active)
+    @announcement_pending_course = @course3.announcements.create!(title: "Course 3 - Announcement", message: "Announcement message for pending enrollment course")
+  end
+
+  def dashboard_inactive_courses_setup
+    @student_w_inactive = user_factory(active_all: true, name: "Student-W Inactive-courses")
+
+    @past_course = course_factory(active_all: true, course_name: "Past Course")
+    @past_course.enroll_student(@student_w_inactive, enrollment_state: "active")
+    @past_course.update!(conclude_at: 1.week.ago, restrict_enrollments_to_course_dates: true)
+
+    @concluded_course = course_factory(active_all: true, course_name: "Concluded Course")
+    student_enroll1 = @concluded_course.enroll_student(@student_w_inactive, enrollment_state: "active")
+    student_enroll1.workflow_state = "completed"
+    student_enroll1.save!
+
+    @unpublished_course = course_factory(active_all: true, course_name: "Unpublished Course")
+    student_enroll2 = @unpublished_course.enroll_student(@student_w_inactive, enrollment_state: "active")
+    student_enroll2.workflow_state = "creation_pending"
+    student_enroll2.save!
+  end
+
+  def observer_w_inactive_courses_setup
+    @observer = user_factory(name: "Observer2", active_all: true)
+    @past_course.enroll_user(@observer, "ObserverEnrollment", enrollment_state: "active", associated_user_id: @student_w_inactive)
+    observer_enroll2 = @concluded_course.enroll_user(@observer, "ObserverEnrollment", enrollment_state: "active", associated_user_id: @student_w_inactive)
+    observer_enroll2.workflow_state = "completed"
+    observer_enroll2.save!
+
+    observer_enroll2 = @unpublished_course.enroll_user(@observer, "ObserverEnrollment", enrollment_state: "active", associated_user_id: @student_w_inactive)
+    observer_enroll2.workflow_state = "creation_pending"
+    observer_enroll2.save!
+    @course1.enroll_user(@observer, "ObserverEnrollment", { allow_multiple_enrollments: true, associated_user_id: @student })
+    @course1.enroll_user(@observer, "ObserverEnrollment", { allow_multiple_enrollments: true, associated_user_id: @student_w_inactive })
   end
 
   def filter_announcements_list_by(status)
