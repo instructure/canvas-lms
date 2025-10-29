@@ -38,6 +38,9 @@ shared_examples "admin avatars" do |ff_enabled|
   end
 
   before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:graphql_usage_rate).and_return(100)
+    end
     course_with_admin_logged_in
     Account.default.enable_service(:avatars)
     Account.default.settings[:avatars] = "enabled_pending"
