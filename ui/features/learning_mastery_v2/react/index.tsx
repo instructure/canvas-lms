@@ -28,7 +28,6 @@ import LMGBContext, {
 } from '@canvas/outcomes/react/contexts/LMGBContext'
 import {FilterWrapper} from './components/filters/FilterWrapper'
 import {Toolbar} from './components/toolbar/Toolbar'
-import {getSearchParams, setSearchParams} from './utils/ManageURLSearchParams'
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {GradebookSettings, NameDisplayFormat} from './utils/constants'
@@ -66,7 +65,6 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
     outcomes,
     rollups,
     pagination,
-    currentPage,
     setCurrentPage,
     sorting,
   } = useRollups({
@@ -74,10 +72,7 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
     accountMasteryScalesEnabled: accountLevelMasteryScalesFF ?? false,
     enabled: !isLoadingSettings,
     settings: gradebookSettings,
-    ...getSearchParams(),
   })
-
-  setSearchParams(currentPage, gradebookSettings.studentsPerPage, sorting)
 
   const handleGradebookSettingsChange = useCallback(
     async (settings: GradebookSettings) => {
