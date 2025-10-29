@@ -867,11 +867,15 @@ module Types
       case object.submission_types
       when "online_quiz"
         load_association(:quiz).then do |quiz|
+          next unless quiz
+
           Loaders::AssociationLoader.for(QuizType, :context_module_tags).load(quiz)
         end
 
       when "discussion_topic"
         load_association(:discussion_topic).then do |discussion|
+          next unless discussion
+
           Loaders::AssociationLoader.for(DiscussionType, :context_module_tags).load(discussion)
         end
       else

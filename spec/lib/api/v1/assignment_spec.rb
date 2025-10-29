@@ -399,6 +399,34 @@ describe "Api::V1::Assignment" do
       end
     end
 
+    it "handles include_module_ids gracefully when quiz is nil (CNVS-15477)" do
+      orphaned_quiz_assignment = assignment_model
+      orphaned_quiz_assignment.update_column(:submission_types, "online_quiz")
+      # Intentionally not creating a quiz to simulate orphaned state
+
+      expect(orphaned_quiz_assignment.submission_types).to eq "online_quiz"
+      expect(orphaned_quiz_assignment.quiz).to be_nil
+
+      json = api.assignment_json(orphaned_quiz_assignment, user, session, { include_module_ids: true })
+
+      expect(json["module_ids"]).to be_nil
+      expect(json["module_positions"]).to be_nil
+    end
+
+    it "handles include_module_ids gracefully when discussion_topic is nil" do
+      orphaned_discussion_assignment = assignment_model
+      orphaned_discussion_assignment.update_column(:submission_types, "discussion_topic")
+      # Intentionally not creating a discussion_topic to simulate orphaned state
+
+      expect(orphaned_discussion_assignment.submission_types).to eq "discussion_topic"
+      expect(orphaned_discussion_assignment.discussion_topic).to be_nil
+
+      json = api.assignment_json(orphaned_discussion_assignment, user, session, { include_module_ids: true })
+
+      expect(json["module_ids"]).to be_nil
+      expect(json["module_positions"]).to be_nil
+    end
+
     context "when file_association_access feature flag is enabled" do
       it "adds location tag to description" do
         attachment = Attachment.create!(context: user, filename: "user_avatar_pic", uploaded_data: StringIO.new("sometextgoeshere"))
