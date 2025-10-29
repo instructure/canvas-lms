@@ -50,4 +50,13 @@ export interface NutritionFactsProps {
     }>
   }
   iconSize?: number
+  responsiveProps: ResponsiveProps
+}
+
+interface ResponsiveProps {
+  domElement: string
+  fullscreenModals: boolean
+  color: 'primary' | 'secondary'
+  buttonColor: 'primary' | 'primary-inverse'
+  withBackground: boolean
 }

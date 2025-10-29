@@ -21,6 +21,9 @@ import {AiInformation} from '@instructure/ui-instructure'
 import {IconButton} from '@instructure/ui-buttons'
 import {STATIC_TEXT} from './constants'
 import {NutritionFactsIcon} from './NutritionFactsIcon'
+// TODO: We need IconAIInfoLine works by inheriting props.color from its parent
+// while waiting we use NutritionFactsIcon instead
+// import {IconAIInfoLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {NutritionFactsProps} from './types'
 
@@ -31,20 +34,22 @@ export const NutritionFacts: React.FC<NutritionFactsProps> = ({
   dataPermissionLevels,
   nutritionFacts,
   iconSize,
+  responsiveProps,
 }) => {
   return (
     <AiInformation
-      fullscreenModals={false}
+      fullscreenModals={responsiveProps.fullscreenModals}
       trigger={
         <IconButton
           id="nutrition_facts_trigger"
           screenReaderLabel={I18n.t('Nutrition facts')}
           margin={'none'}
-          withBackground={false}
+          withBackground={responsiveProps.withBackground}
           withBorder={false}
           shape="circle"
+          color={responsiveProps.buttonColor}
         >
-          <NutritionFactsIcon size={iconSize} />
+          <NutritionFactsIcon size={iconSize} color={responsiveProps.color}/>
         </IconButton>
       }
       {...STATIC_TEXT}
