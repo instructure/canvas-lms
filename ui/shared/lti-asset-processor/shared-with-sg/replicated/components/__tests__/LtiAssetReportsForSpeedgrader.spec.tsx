@@ -96,6 +96,9 @@ describe('LtiAssetReportsForSpeedgrader', () => {
         submission: {
           ltiAssetReportsConnection: {
             nodes: multipleReports,
+            pageInfo: {
+              hasNextPage: false,
+            },
           },
         },
       })
@@ -127,6 +130,9 @@ describe('LtiAssetReportsForSpeedgrader', () => {
         submission: {
           ltiAssetReportsConnection: {
             nodes: multipleReports,
+            pageInfo: {
+              hasNextPage: false,
+            },
           },
         },
       })
@@ -161,6 +167,9 @@ describe('LtiAssetReportsForSpeedgrader', () => {
         submission: {
           ltiAssetReportsConnection: {
             nodes: multipleReports,
+            pageInfo: {
+              hasNextPage: false,
+            },
           },
         },
       })
@@ -186,6 +195,9 @@ describe('LtiAssetReportsForSpeedgrader', () => {
         submission: {
           ltiAssetReportsConnection: {
             nodes: reports,
+            pageInfo: {
+              hasNextPage: false,
+            },
           },
         },
       })
@@ -214,6 +226,9 @@ describe('LtiAssetReportsForSpeedgrader', () => {
         submission: {
           ltiAssetReportsConnection: {
             nodes: multipleReports,
+            pageInfo: {
+              hasNextPage: false,
+            },
           },
         },
       })
@@ -256,6 +271,9 @@ describe('LtiAssetReportsForSpeedgrader', () => {
         submission: {
           ltiAssetReportsConnection: {
             nodes: multipleReports,
+            pageInfo: {
+              hasNextPage: false,
+            },
           },
         },
       })
@@ -289,6 +307,9 @@ describe('LtiAssetReportsForSpeedgrader', () => {
         submission: {
           ltiAssetReportsConnection: {
             nodes: singleReport,
+            pageInfo: {
+              hasNextPage: false,
+            },
           },
         },
       })

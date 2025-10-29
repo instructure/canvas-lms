@@ -107,7 +107,12 @@ export type LtiAssetReports = z.infer<typeof ZLtiAssetReports>
 export const ZGetLtiAssetReportsResult = z.strictObject({
   __typename: z.literal('Query').optional(),
   submission: zNullishGqlObj('Submission', {
-    ltiAssetReportsConnection: zGqlConnection('LtiAssetReportConnection', ZLtiAssetReport),
+    ltiAssetReportsConnection: zNullishGqlObj('LtiAssetReportConnection', {
+      nodes: z.array(ZLtiAssetReport.nullable()).nullish(),
+      pageInfo: zGqlObj('PageInfo', {
+        hasNextPage: z.boolean(),
+      }),
+    }),
   }),
 })
 

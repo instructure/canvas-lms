@@ -50,6 +50,7 @@ export function AssetReportModal({
   studentIdForResubmission,
   submissionType,
   assignmentId,
+  hasNextPage,
 }: AssetReportModalProps): JSX.Element {
   const assetProcessorsWithReports = assetProcessors.filter(assetProcessor =>
     reports.some(report => report.processorId === assetProcessor._id),
@@ -66,6 +67,7 @@ export function AssetReportModal({
           screenReaderLabel={I18n.t('Close')}
           elementRef={el => {
             el?.setAttribute('data-pendo', 'asset-reports-modal-close')
+            el?.setAttribute('data-testid', 'asset-report-modal-close-button')
           }}
         />
       </Modal.Header>
@@ -99,6 +101,7 @@ export function AssetReportModal({
             attachments={attachments}
             submissionType={submissionType}
             showDocumentDisplayName={showDocumentDisplayName}
+            hasNextPage={hasNextPage}
           />
         </View>
       </Modal.Body>

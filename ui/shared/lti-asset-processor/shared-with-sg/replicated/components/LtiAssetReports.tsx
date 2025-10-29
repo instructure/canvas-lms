@@ -20,6 +20,7 @@ import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useFormatDateTime, useResubmitLtiAssetReports} from '../../dependenciesShims'
 import {
@@ -56,6 +57,8 @@ export type LtiAssetReportsProps = {
   // Document display name is not shown in some scenarios (e.g. student view
   // page with there is only one attachment)
   showDocumentDisplayName: boolean
+  // Whether there are more than 100 reports available
+  hasNextPage?: boolean
 }
 
 function ltiAssetProcessorHeader(assetProcessor: LtiAssetProcessor) {
@@ -155,6 +158,7 @@ export function LtiAssetReports({
   attempt,
   submissionType,
   showDocumentDisplayName,
+  hasNextPage,
 }: LtiAssetReportsProps): JSX.Element | null {
   const assetSelector = {
     submissionType,
@@ -196,6 +200,13 @@ export function LtiAssetReports({
             </Flex>
           </View>
         ))}
+        {hasNextPage && (
+          <View as="div" textAlign="center">
+            <Text color="warning">
+              {I18n.t('Too many results, not all reports are being displayed')}
+            </Text>
+          </View>
+        )}
       </Flex>
     </View>
   )
