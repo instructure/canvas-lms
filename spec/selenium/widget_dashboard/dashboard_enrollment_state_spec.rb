@@ -18,23 +18,24 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "page_objects/widget_dashboard_page"
-
+require_relative "page_objects/course_tab_page"
 describe "student dashboard", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include WidgetDashboardPage
+  include CourseTabPage
 
   before :once do
     dashboard_student_setup
+    dashboard_pending_enrollment_setup
     set_widget_dashboard_flag(feature_status: true)
-    @course3 = course_factory(active_all: true, course_name: "Test Course")
   end
 
   before do
     user_session(@student)
   end
 
-  context "enrollment invitations" do
-    before :once do
+  context "Pending enrollment scenarios" do
+    before do
       @enrollment = @course3.enroll_student(@student, enrollment_state: "invited")
     end
 
@@ -60,6 +61,23 @@ describe "student dashboard", :ignore_js_errors do
 
       expect(element_exists?(enrollment_invitation_selector)).to be_falsey
     end
+
+    it "does not display dashboard content for pending enrollments" do
+      go_to_dashboard
+      expect(enrollment_invitation).to be_displayed
+
+      filter_course_work_by(:date, "Next 14 days")
+      expect(course_work_summary_stats("Due").text).to eq("0\nDue")
+      expect(course_work_summary_stats("Missing").text).to eq("0\nMissing")
+      expect(course_work_summary_stats("Submitted").text).to eq("0\nSubmitted")
+
+      expect(element_exists?(hide_single_grade_button_selector(@course3.id))).to be_falsey
+
+      expect(no_announcements_message).to be_displayed
+
+      expect(all_message_buttons.size).to eq(4)
+      expect(element_exists?(message_instructor_button_selector(@teacher1.id, @course3.id))).to be_falsey
+    end
   end
 
   context "multiple enrollment invitations" do
@@ -78,6 +96,34 @@ describe "student dashboard", :ignore_js_errors do
       end
 
       expect(all_enrollment_invitations.length).to eq(1)
+    end
+  end
+
+  context "Past or inactive course filtering" do
+    before :once do
+      dashboard_inactive_courses_setup # enrolls @student_w_inactive in only inactive or concluded courses
+    end
+
+    it "displays only active courses" do
+      user_session(@student_w_inactive)
+
+      go_to_dashboard
+      expect(element_exists?(enrollment_invitation_selector)).to be_falsey
+      expect(no_announcements_message).to be_displayed
+      expect(no_instructors_message).to be_displayed
+
+      go_to_course_tab
+      expect(no_enrolled_courses_message).to be_displayed
+    end
+
+    it "displays only active courses for observed courses and students" do
+      observer_w_inactive_courses_setup # enrolls in inactive courses and @course1
+      user_session(@observer)
+      go_to_dashboard
+
+      select_observed_student(@student_w_inactive.name)
+      expect(message_instructor_button(@teacher1.id, @course1.id)).to be_displayed
+      expect(all_message_buttons.size).to eq(2)
     end
   end
 end
