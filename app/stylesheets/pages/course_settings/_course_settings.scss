@@ -236,6 +236,24 @@ ul.user_list div.enrollment_type.pending {
         display: none;
       }
     }
+    &:focus {
+      outline: 2px solid var(--ic-brand-primary);
+      outline-offset: -2px;
+      z-index: 1;
+    }
+    &.keyboard-focus {
+      background-color: $section_tabs_hover_background_color;
+    }
+    &.dragging {
+      background-color: color-mix(in srgb, var(--ic-brand-primary) 15%, white);
+      border-color: var(--ic-brand-primary);
+      border-width: 3px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      transform: scale(1.02);
+      position: relative;
+      z-index: 10;
+      cursor: grabbing;
+    }
     .draggable_handle {
       display: inline-block;
       padding: 10px 0px;
