@@ -18,39 +18,68 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import {createPortal} from 'react-dom'
 import ready from '@instructure/ready'
 import {captureException} from '@sentry/browser'
 import {AiInfo} from '@instructure.ai/aiinfo'
 import {NutritionFacts} from './react/NutritionFacts'
+import {Responsive} from '@instructure/ui-responsive'
+import {responsiveQuerySizes} from '@canvas/discussions/react/utils'
 
-const renderNutritionFacts = (elementId: string, feature: string) => {
-  const node = document.getElementById(elementId)
-  if (!node) {
-    captureException(new Error(`Could not find element with id ${elementId}`))
-    return null
-  }
-
+const ResponsiveNutritionFacts = (feature: string) => {
   const info = AiInfo[feature]
   if (!info) {
     captureException(new Error(`No nutrition facts data found for feature: ${feature}`))
     return null
   }
 
-  const root = ReactDOM.createRoot(node)
-  root.render(
-    <NutritionFacts
-      aiInformation={info.aiInformation}
-      dataPermissionLevels={info.dataPermissionLevels}
-      nutritionFacts={info.nutritionFacts}
-    />,
+  return (
+    <Responsive
+      match="media"
+      query={responsiveQuerySizes({mobile: true, desktop: true}) as any}
+      props={{
+        mobile: {
+          domElement: 'nutrition_facts_mobile_container',
+          fullscreenModals: true,
+          color: 'secondary',
+          buttonColor: 'primary',
+          withBackground: false,
+        },
+        desktop: {
+          domElement: 'nutrition_facts_container',
+          fullscreenModals: false,
+          color: 'primary',
+          buttonColor: 'primary-inverse',
+          withBackground: false,
+        },
+      }}
+      render={(responsiveProps: any) => {
+        const node = document.getElementById(responsiveProps.domElement)
+        if (!node) {
+          captureException(new Error(`Could not find element with id ${responsiveProps.domElement}`))
+          return null
+        }
+        return createPortal(
+          <NutritionFacts 
+            responsiveProps={responsiveProps} 
+            aiInformation={info.aiInformation}
+            dataPermissionLevels={info.dataPermissionLevels}
+            nutritionFacts={info.nutritionFacts}
+          />
+          , node
+        )
+      }}
+    />
   )
-  return root
 }
 
 export const mountNutritionFacts = (feature: string) => {
   ready(() => {
     try {
-      renderNutritionFacts('nutrition_facts_container', feature)
+      const wrapperDiv = document.createElement('div')
+      document.body.appendChild(wrapperDiv)
+      const root = ReactDOM.createRoot(wrapperDiv)
+      root.render(ResponsiveNutritionFacts(feature))
     } catch (error) {
       captureException(error)
     }
