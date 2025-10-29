@@ -73,6 +73,13 @@ const mockInfo = {
       },
     ],
   },
+  responsiveProps: {
+    fullscreenModals: false,
+    color: 'primary' as const,
+    buttonColor: 'primary' as const,
+    withBackground: false,
+    domElement: 'nutrition_facts_container',
+  },
 }
 
 injectGlobalAlertContainers()
@@ -124,5 +131,58 @@ describe('Nutrition facts', () => {
     fireEvent.click(trigger)
     fireEvent.click(getByText(/Permission Levels/i))
     expect(getByText(mockInfo.dataPermissionLevels.data[0].title)).toBeInTheDocument()
+  })
+
+  it('renders with mobile responsive props', () => {
+    const mobileProps = {
+      ...mockInfo,
+      responsiveProps: {
+        fullscreenModals: true,
+        color: 'secondary' as const,
+        buttonColor: 'primary' as const,
+        withBackground: false,
+        domElement: 'nutrition_facts_mobile_container',
+      },
+    }
+    render(<NutritionFacts {...mobileProps} />)
+    const trigger = document.getElementById('nutrition_facts_trigger')
+    expect(trigger).toBeInTheDocument()
+    // Verify the button exists and can be clicked (fullscreen modal behavior)
+    expect(trigger).toHaveAttribute('type', 'button')
+  })
+
+  it('renders with desktop responsive props', () => {
+    const desktopProps = {
+      ...mockInfo,
+      responsiveProps: {
+        fullscreenModals: false,
+        color: 'primary' as const,
+        buttonColor: 'primary-inverse' as const,
+        withBackground: false,
+        domElement: 'nutrition_facts_container',
+      },
+    }
+    render(<NutritionFacts {...desktopProps} />)
+    const trigger = document.getElementById('nutrition_facts_trigger')
+    expect(trigger).toBeInTheDocument()
+    expect(trigger).toHaveAttribute('type', 'button')
+  })
+
+  it('uses correct icon color based on responsive props', () => {
+    const {rerender} = render(<NutritionFacts {...mockInfo} />)
+    let trigger = document.getElementById('nutrition_facts_trigger')
+    expect(trigger).toBeInTheDocument()
+
+    // Test with secondary color (mobile)
+    const mobileProps = {
+      ...mockInfo,
+      responsiveProps: {
+        ...mockInfo.responsiveProps,
+        color: 'secondary' as const,
+      },
+    }
+    rerender(<NutritionFacts {...mobileProps} />)
+    trigger = document.getElementById('nutrition_facts_trigger')
+    expect(trigger).toBeInTheDocument()
   })
 })

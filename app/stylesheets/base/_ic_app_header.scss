@@ -449,6 +449,7 @@ body.primary-nav-expanded {
 }
 .mobile-header-student-view {
   padding-#{direction('right')}: $ic-sp * 0.65;
+  padding-#{direction('left')}: $ic-sp * 0.65;
 }
 .mobile-header-arrow {
   padding-#{direction('left')}: $ic-sp * 0.65;
