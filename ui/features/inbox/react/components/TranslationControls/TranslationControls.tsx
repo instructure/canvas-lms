@@ -72,6 +72,13 @@ const TranslationControls = (props: TranslationControlsProps) => {
               dataPermissionLevels={inboxTranslationInfo.dataPermissionLevels}
               nutritionFacts={inboxTranslationInfo.nutritionFacts}
               iconSize={24}
+              responsiveProps={{
+                fullscreenModals: false,
+                color: 'primary',
+                buttonColor: 'primary',
+                withBackground: false,
+                domElement: 'inbox_nutrition_facts_container',
+              }}
             />
           </Flex.Item>
         )}
