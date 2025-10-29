@@ -3401,6 +3401,16 @@ class Submission < ActiveRecord::Base
     read_or_calc_extracted_text[:contains_images]
   end
 
+  def read_extracted_text
+    rows = submission_texts.where(attempt:).pluck(:text, :contains_images)
+
+    rows.each_with_object({ text: +"", contains_images: false }) do |(row_txt, has_img), result|
+      result[:text] << "\n\n" unless result[:text].empty?
+      result[:text] << row_txt.to_s
+      result[:contains_images] ||= has_img
+    end
+  end
+
   def extract_text_from_upload?
     submission_type == "online_upload" && Account.site_admin.feature_enabled?(:grading_assistance_file_uploads) && attachments.any?
   end
@@ -3721,19 +3731,6 @@ class Submission < ActiveRecord::Base
 
       result
     end
-  end
-
-  def read_extracted_text
-    rows = submission_texts.where(attempt:).pluck(:text, :contains_images)
-
-    rows.each_with_object({ text: +"", contains_images: false }) do |(row_txt, has_img), result|
-      result[:text] << "\n\n" unless result[:text].empty?
-      result[:text] << row_txt.to_s
-      result[:contains_images] ||= has_img
-    end
-  rescue => e
-    Rails.logger.error("Failed to read extracted attachment for submission #{id}: #{e.message}")
-    { text: "", contains_images: false }
   end
 
   def contains_rce_file_link?(html_body)
