@@ -44,6 +44,7 @@ export interface DeveloperKey {
   vendor_code: string | null
   redirect_uri: string | null
   redirect_uris?: string
+  unified_tool_id?: string | null
   public_jwk_url?: string
   public_jwk?: string
   email: string | null

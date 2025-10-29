@@ -128,6 +128,8 @@
 - verb: POST
   path: '/api/v1/accounts/:account_id/developer_keys/:developer_key_id/developer_key_account_bindings'
 - verb: GET
+  path: '/api/v1/accounts/:account_id/developer_keys/lookup_utids'
+- verb: GET
   path: '/api/v1/accounts/:account_id/enrollments/:id'
 - verb: GET
   path: '/api/v1/accounts/:account_id/external_tools'

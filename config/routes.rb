@@ -2077,6 +2077,7 @@ CanvasRails::Application.routes.draw do
 
       get "accounts/:account_id/developer_keys", action: :index, as: "account_developer_keys"
       post "accounts/:account_id/developer_keys", action: :create
+      get "accounts/:account_id/developer_keys/lookup_utids", action: :lookup_utids
     end
 
     scope(controller: "lti/registrations") do
