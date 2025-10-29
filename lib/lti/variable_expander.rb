@@ -1075,7 +1075,7 @@ module Lti
     # enabled.
     # @example
     #   ```
-    #   true
+    #   "true"
     #   ```
     register_expansion "com.instructure.Assignment.anonymous_grading",
                        [],
@@ -1087,7 +1087,7 @@ module Lti
     # Assignment types: points, percentage, gpa_scale are all considered quantitative.
     # @example
     #   ```
-    #   true
+    #   "true"
     #   ```
     register_expansion "com.instructure.Assignment.restrict_quantitative_data",
                        [],
@@ -1490,7 +1490,7 @@ module Lti
     # Returns true for root account admins and false for all other roles.
     # @example
     #   ```
-    #   true
+    #   "true"
     #   ```
     register_expansion "Canvas.user.isRootAccountAdmin",
                        [],
@@ -1688,7 +1688,7 @@ module Lti
     #
     # @example
     #   ```
-    #   true
+    #   "true"
     #   ```
     register_expansion "Canvas.course.sectionRestricted",
                        [],
@@ -1896,7 +1896,7 @@ module Lti
     #
     # @example
     #   ```
-    #   true
+    #   "true"
     #   ```
     register_expansion "Canvas.assignment.hideInGradebook",
                        [],
@@ -1907,7 +1907,7 @@ module Lti
     #
     # @example
     #   ```
-    #   true
+    #   "true"
     #   ```
     register_expansion "Canvas.assignment.omitFromFinalGrade",
                        [],
@@ -2013,7 +2013,7 @@ module Lti
     # Only available when launched as an assignment.
     # @example
     #   ```
-    #   true
+    #   "true"
     #   ```
     register_expansion "Canvas.assignment.published",
                        [],
@@ -2024,7 +2024,7 @@ module Lti
     # Only available when launched as an assignment.
     # @example
     #   ```
-    #   true
+    #   "true"
     #   ```
     register_expansion "Canvas.assignment.lockdownEnabled",
                        [],
@@ -2247,7 +2247,7 @@ module Lti
     #
     # @example
     #   ```
-    #   true
+    #   "true"
     #   ```
     register_expansion "com.instructure.Course.allow_canvas_resource_selection",
                        [],
@@ -2362,7 +2362,7 @@ module Lti
     #
     # @example
     #   ```
-    #   true
+    #   "true"
     #   ```
     register_expansion "Canvas.course.aiQuizGeneration",
                        [],
