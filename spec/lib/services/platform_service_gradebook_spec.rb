@@ -265,52 +265,38 @@ module Services
       end
 
       context "without overrides (fallback to rate)" do
-        before do
-          allow(described_class).to receive(:rand).with(0..100).and_return(25)
+        [
+          { rand_value: 0, usage_rate: 0, expected: false, description: "returns false when rand == usage_rate == 0" },
+          { rand_value: 25, usage_rate: 10, expected: false, description: "returns false when rand > usage_rate" },
+          { rand_value: 50, usage_rate: 50, expected: false, description: "returns false when rand == usage_rate == 50" },
+          { rand_value: 25, usage_rate: 50, expected: true, description: "returns true when rand < usage_rate" },
+          { rand_value: 99.99999, usage_rate: 100, expected: true, description: "returns true when usage_rate is 100" }
+        ].each do |test_case|
+          it test_case[:description] do
+            allow(described_class).to receive(:rand).and_return(test_case[:rand_value])
+            yaml_content = <<~YAML
+              graphql_usage_rate: #{test_case[:usage_rate]}
+            YAML
+            allow(mock_dynamic_settings).to receive(:[]).and_return(yaml_content)
+
+            expect(described_class.use_graphql?(global_account_id, global_course_id)).to be test_case[:expected]
+          end
         end
 
-        it "returns true when rand <= usage_rate" do
+        it "calls rand with exclusive range 0...100" do
+          expect(described_class).to receive(:rand).with(0...100).and_return(50)
           yaml_content = <<~YAML
-            graphql_usage_rate: 50
+            graphql_usage_rate: 75
           YAML
           allow(mock_dynamic_settings).to receive(:[]).and_return(yaml_content)
 
-          expect(described_class.use_graphql?(global_account_id, global_course_id)).to be true
-        end
-
-        it "returns false when rand > usage_rate" do
-          yaml_content = <<~YAML
-            graphql_usage_rate: 10
-          YAML
-          allow(mock_dynamic_settings).to receive(:[]).and_return(yaml_content)
-
-          expect(described_class.use_graphql?(global_account_id, global_course_id)).to be false
-        end
-
-        it "returns false when usage_rate is 0" do
-          allow(described_class).to receive(:rand).with(0..100).and_return(1)
-          yaml_content = <<~YAML
-            graphql_usage_rate: 0
-          YAML
-          allow(mock_dynamic_settings).to receive(:[]).and_return(yaml_content)
-
-          expect(described_class.use_graphql?(global_account_id, global_course_id)).to be false
-        end
-
-        it "returns true when usage_rate is 100" do
-          allow(described_class).to receive(:rand).with(0..100).and_return(100)
-          yaml_content = <<~YAML
-            graphql_usage_rate: 100
-          YAML
-          allow(mock_dynamic_settings).to receive(:[]).and_return(yaml_content)
-
-          expect(described_class.use_graphql?(global_account_id, global_course_id)).to be true
+          described_class.use_graphql?(global_account_id, global_course_id)
         end
       end
 
       context "edge cases" do
         it "handles missing account key in overrides" do
-          allow(described_class).to receive(:rand).with(0..100).and_return(50)
+          allow(described_class).to receive(:rand).and_return(50)
           yaml_content = <<~YAML
             overrides:
               course: {}
@@ -323,7 +309,7 @@ module Services
         end
 
         it "handles empty overrides object" do
-          allow(described_class).to receive(:rand).with(0..100).and_return(25)
+          allow(described_class).to receive(:rand).and_return(25)
           yaml_content = <<~YAML
             overrides: {}
             graphql_usage_rate: 50
@@ -335,7 +321,7 @@ module Services
         end
 
         it "handles nil overrides" do
-          allow(described_class).to receive(:rand).with(0..100).and_return(25)
+          allow(described_class).to receive(:rand).and_return(25)
           yaml_content = <<~YAML
             overrides: null
             graphql_usage_rate: 50
@@ -347,7 +333,7 @@ module Services
         end
 
         it "handles completely empty config" do
-          allow(described_class).to receive(:rand).with(0..100).and_return(25)
+          allow(described_class).to receive(:rand).and_return(25)
           allow(mock_dynamic_settings).to receive(:[]).and_return(nil)
 
           expect(described_class).to receive(:rand)

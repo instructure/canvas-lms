@@ -38,7 +38,7 @@ module Services
       account_override = overrides&.dig("account", global_account_id)
       return !!account_override unless account_override.nil?
 
-      rand(0..100) <= graphql_usage_rate
+      graphql_usage_rate > rand(0.0...100.0)
     end
 
     class << self
