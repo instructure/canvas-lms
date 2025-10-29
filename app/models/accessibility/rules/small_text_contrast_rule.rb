@@ -20,14 +20,14 @@
 module Accessibility
   module Rules
     class SmallTextContrastRule < Accessibility::Rule
-      extend Accessibility::CssAttributesHelper
+      include Accessibility::CssAttributesHelper
 
       CONTRAST_THRESHOLD = 4.5
       SMALL_TEXT_MAX_SIZE_PX = 18.5
       SMALL_TEXT_MAX_SIZE_BOLD_PX = 14.0
 
       self.id = "small-text-contrast"
-      self.link = "https://www.w3.org/TR/WCAG21/#contrast-minimum"
+      self.link = "https://www.w3.org/TR/WCAG20-TECHS/G17.html"
 
       # Accessibility::Rule methods
 
@@ -41,10 +41,12 @@ module Accessibility
         style_str = elem.attribute("style")&.value.to_s
         return nil if style_str.include?("display: none") || style_str.include?("visibility: hidden")
 
-        return nil unless self.class.small_text?(style_str)
+        return nil unless small_text?(style_str)
 
-        foreground = self.class.extract_color(style_str, "color") || "000000"
-        background = self.class.extract_color(style_str, "background-color") || "FFFFFF"
+        foreground = extract_color(style_str, "color") || "000000"
+        background = extract_background_color(style_str)
+
+        return nil if background.nil?
 
         contrast_ratio = WCAGColorContrast.ratio(foreground, background)
 
@@ -55,16 +57,22 @@ module Accessibility
 
       def form(elem)
         style_str = elem.attribute("style")&.value.to_s
-        foreground = self.class.extract_color(style_str, "color") || "000000"
-        background = self.class.extract_color(style_str, "background-color") || "FFFFFF"
+        background = extract_background_color(style_str)
+
+        foreground = if WCAGColorContrast.ratio("000000", background) >= CONTRAST_THRESHOLD
+                       "000000"
+                     else
+                       "FFFFFF"
+                     end
 
         Accessibility::Forms::ColorPickerField.new(
           title_label: I18n.t("Contrast Ratio"),
           input_label: I18n.t("New text color"),
           label: I18n.t("Change text color"),
+          action: I18n.t("Change text color"),
+          undo_text: I18n.t("Color changed"),
           options: ["normal"],
           background_color: "##{background}",
-          undo_text: I18n.t("Color changed"),
           value: "##{foreground}",
           contrast_ratio: WCAGColorContrast.ratio(foreground, background)
         )
@@ -80,22 +88,22 @@ module Accessibility
 
         elem.set_attribute("style", new_style)
 
-        foreground = self.class.extract_color(new_style, "color") || "000000"
-        background = self.class.extract_color(style_str, "background-color") || "FFFFFF"
+        foreground = extract_color(new_style, "color") || "000000"
+        background = extract_background_color(style_str)
 
         contrast_ratio = WCAGColorContrast.ratio(foreground, background)
 
-        raise StandardError, "Insufficient contrast ratio (#{contrast_ratio})." if contrast_ratio < CONTRAST_THRESHOLD
+        raise StandardError, "Insufficient contrast ratio (#{contrast_ratio.round(2)})" if contrast_ratio < CONTRAST_THRESHOLD
 
         elem
       end
 
       def display_name
-        I18n.t("Small text contrast")
+        I18n.t("Low contrast")
       end
 
       def message
-        I18n.t("Text smaller than 18pt (or bold 14pt) should display a minimum contrast ratio of 4.5:1.")
+        I18n.t("This text doesn’t stand out enough from the background. Use a color that provides more contrast so it's easier to read.")
       end
 
       def why
@@ -104,7 +112,7 @@ module Accessibility
 
       # Helper methods
 
-      def self.small_text?(style_str)
+      def small_text?(style_str)
         font_size = extract_font_size(style_str) || 16
         font_weight = extract_font_weight(style_str) || "normal"
 
