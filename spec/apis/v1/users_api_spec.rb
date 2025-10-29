@@ -1529,17 +1529,20 @@ describe "Users API", type: :request do
 
     it "does bookmarked pagination when sorting by id" do
       @account = Account.default
-      3.times { |x| user_with_pseudonym(name: "testuser #{x}") }
+      2.times { |x| user_with_pseudonym(name: "testuser #{x}") }
+
+      params = { controller: "users",
+                 action: "api_index",
+                 format: "json",
+                 account_id: @account.id.to_param,
+                 search_term: "testuser",
+                 per_page: "1",
+                 sort: "id" }
+
       account_admin_user
       json = api_call(:get,
                       "/api/v1/accounts/#{@account.id}/users?search_term=testuser&sort=id&per_page=1",
-                      { controller: "users",
-                        action: "api_index",
-                        format: "json",
-                        account_id: @account.id.to_param,
-                        search_term: "testuser",
-                        per_page: "1",
-                        sort: "id" })
+                      params)
       expect(json.pluck("name")).to eq ["testuser 0"]
 
       links = Api.parse_pagination_links(response.headers["Link"])
@@ -1548,15 +1551,23 @@ describe "Users API", type: :request do
 
       json = api_call(:get,
                       next_link[:uri].to_s,
-                      { controller: "users",
-                        action: "api_index",
-                        format: "json",
-                        account_id: @account.id.to_param,
-                        search_term: "testuser",
-                        per_page: "1",
-                        sort: "id",
-                        page: next_link["page"] })
+                      params.merge(page: next_link["page"]))
       expect(json.pluck("name")).to eq ["testuser 1"]
+
+      links = Api.parse_pagination_links(response.headers["Link"])
+      next_link = links.detect { |link| link[:rel] == "next" }
+      if next_link
+        # since we turned off count_total_entries and filled up page 2,
+        # we may have an empty page at the end
+        json = api_call(:get,
+                        next_link[:uri].to_s,
+                        params.merge(page: next_link["page"]))
+        expect(json).to be_empty
+
+        links = Api.parse_pagination_links(response.headers["Link"])
+        next_link = links.detect { |link| link[:rel] == "next" }
+      end
+      expect(next_link).to be_nil
     end
 
     context "user profile preloading" do
