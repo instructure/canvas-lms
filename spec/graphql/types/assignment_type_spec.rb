@@ -1625,6 +1625,28 @@ describe Types::AssignmentType do
       expect(resolver.resolve("moduleItems { content { type } }")).to eq ["Assignment", "Assignment"]
       expect(resolver.resolve("moduleItems { module { _id } }")).to eq [module_1.id.to_s, module_2.id.to_s]
     end
+
+    it "returns nil for module_items when quiz is nil (CNVS-15477)" do
+      orphaned_quiz = course.assignments.create!(title: "orphaned quiz")
+      orphaned_quiz.update_column(:submission_types, "online_quiz")
+
+      expect(orphaned_quiz.submission_types).to eq "online_quiz"
+      expect(orphaned_quiz.quiz).to be_nil
+
+      resolver = GraphQLTypeTester.new(orphaned_quiz, current_user: teacher)
+      expect(resolver.resolve("moduleItems { id }")).to be_nil
+    end
+
+    it "returns nil for module_items when discussion_topic is nil" do
+      orphaned_discussion = course.assignments.create!(title: "orphaned discussion")
+      orphaned_discussion.update_column(:submission_types, "discussion_topic")
+
+      expect(orphaned_discussion.submission_types).to eq "discussion_topic"
+      expect(orphaned_discussion.discussion_topic).to be_nil
+
+      resolver = GraphQLTypeTester.new(orphaned_discussion, current_user: teacher)
+      expect(resolver.resolve("moduleItems { id }")).to be_nil
+    end
   end
 
   describe "assigned_students" do
