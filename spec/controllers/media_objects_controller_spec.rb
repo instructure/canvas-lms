@@ -1063,6 +1063,40 @@ describe MediaObjectsController do
       assert_status(200)
       expect(response.headers["content-security-policy"]).to be_nil
     end
+
+    it "sets page title with attachment display name when attachment exists" do
+      course_with_teacher_logged_in
+      media_object = @course.media_objects.create! media_id: "0_test", user_entered_title: "test.mp4"
+      attachment = media_object.attachment
+      attachment.update(display_name: "My Video File.mp4")
+
+      get "iframe_media_player", params: { attachment_id: attachment.id }
+
+      assert_status(200)
+      expect(assigns[:page_title]).to eq("Video Player - My Video File.mp4")
+    end
+
+    it "sets page title with media object title when only media object exists" do
+      course_with_teacher_logged_in
+      media_object = @course.media_objects.create! media_id: "0_myvideo", title: "My Great Video"
+
+      get "iframe_media_player", params: { media_object_id: media_object.media_id }
+
+      assert_status(200)
+      expect(assigns[:page_title]).to eq("Video Player - My Great Video")
+    end
+
+    it "sets page title to default when neither attachment nor media object exists" do
+      course_with_teacher_logged_in
+      allow(controller).to receive_messages(
+        load_media_object_from_service: nil,
+        check_media_permissions: true
+      )
+
+      get "iframe_media_player", params: { media_object_id: "nonexistent" }
+
+      expect(assigns[:page_title]).to eq("Video Player")
+    end
   end
 
   describe "GET 'media_attachments_iframe'" do
