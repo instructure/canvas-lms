@@ -22,11 +22,11 @@ import {Flex} from '@instructure/ui-flex'
 import {TextArea} from '@instructure/ui-text-area'
 import {View} from '@instructure/ui-view'
 import {useEffect, useRef, useState} from 'react'
-import {SpeedGrader_UpdateCommentBankItem} from '../graphql/mutations'
+import {SpeedGraderLegacy_UpdateCommentBankItem} from '../graphql/mutations'
 import {useMutation} from '@apollo/client'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {SpeedGrader_UpdateCommentBankItemMutation} from '@canvas/graphql/codegen/graphql'
+import {SpeedGraderLegacy_UpdateCommentBankItemMutation} from '@canvas/graphql/codegen/graphql'
 
 const I18n = createI18nScope('CommentLibrary')
 
@@ -41,10 +41,16 @@ const CommentEditView: React.FC<CommentEditViewProps> = ({id, initialValue, onCl
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null)
   const [value, setValue] = useState(initialValue)
 
-  const [updateCommentBankItem, {loading}] = useMutation<SpeedGrader_UpdateCommentBankItemMutation>(
-    SpeedGrader_UpdateCommentBankItem,
-    {refetchQueries: ['SpeedGrader_CommentBankItems', 'SpeedGrader_CommentBankItemsCount']},
-  )
+  const [updateCommentBankItem, {loading}] =
+    useMutation<SpeedGraderLegacy_UpdateCommentBankItemMutation>(
+      SpeedGraderLegacy_UpdateCommentBankItem,
+      {
+        refetchQueries: [
+          'SpeedGraderLegacy_CommentBankItems',
+          'SpeedGraderLegacy_CommentBankItemsCount',
+        ],
+      },
+    )
 
   const handleUpdateCommentBankItem = async () => {
     try {

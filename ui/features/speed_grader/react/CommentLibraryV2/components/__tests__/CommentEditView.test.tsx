@@ -21,7 +21,7 @@ import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {MockedProvider} from '@apollo/client/testing'
 import CommentEditView from '../CommentEditView'
-import {SpeedGrader_UpdateCommentBankItem} from '../../graphql/mutations'
+import {SpeedGraderLegacy_UpdateCommentBankItem} from '../../graphql/mutations'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
 jest.mock('@canvas/alerts/react/FlashAlert')
@@ -47,7 +47,7 @@ describe('CommentEditView', () => {
     success?: boolean
   } = {}) => ({
     request: {
-      query: SpeedGrader_UpdateCommentBankItem,
+      query: SpeedGraderLegacy_UpdateCommentBankItem,
       variables: {id, comment},
     },
     result: success
@@ -255,7 +255,7 @@ describe('CommentEditView', () => {
       const user = userEvent.setup()
       const delayedMock = {
         request: {
-          query: SpeedGrader_UpdateCommentBankItem,
+          query: SpeedGraderLegacy_UpdateCommentBankItem,
           variables: {id: 'comment-1', comment: 'Initial comment text loading'},
         },
         delay: 100,

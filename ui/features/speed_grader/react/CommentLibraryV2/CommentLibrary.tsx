@@ -27,12 +27,15 @@ import {View} from '@instructure/ui-view'
 import {useCallback, useEffect, useMemo, useState} from 'react'
 import {useQuery} from '@apollo/client'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {SpeedGrader_CommentBankItems, SpeedGrader_CommentBankItemsCount} from './graphql/queries'
+import {
+  SpeedGraderLegacy_CommentBankItems,
+  SpeedGraderLegacy_CommentBankItemsCount,
+} from './graphql/queries'
 import {ApolloProvider, createClient} from '@canvas/apollo-v3'
 import {CommentLibraryTray} from './components/CommentLibraryTray'
 import {
-  SpeedGrader_CommentBankItemsCountQuery,
-  SpeedGrader_CommentBankItemsQuery,
+  SpeedGraderLegacy_CommentBankItemsCountQuery,
+  SpeedGraderLegacy_CommentBankItemsQuery,
 } from '@canvas/graphql/codegen/graphql'
 import {useDebounce} from 'use-debounce'
 import Suggestions from './Suggestions'
@@ -62,8 +65,8 @@ export const CommentLibraryContent: React.FC<CommentLibraryContentProps> = ({
     ENV.comment_library_suggestions_enabled,
   )
 
-  const {data, loading} = useQuery<SpeedGrader_CommentBankItemsCountQuery>(
-    SpeedGrader_CommentBankItemsCount,
+  const {data, loading} = useQuery<SpeedGraderLegacy_CommentBankItemsCountQuery>(
+    SpeedGraderLegacy_CommentBankItemsCount,
     {variables: {userId}},
   )
   useEffect(() => {
@@ -73,8 +76,8 @@ export const CommentLibraryContent: React.FC<CommentLibraryContentProps> = ({
 
   const [searchTerm, state] = useDebounce(comment.replace(/<[^>]*>/g, ''), 750)
 
-  const {data: suggestedCommentsData} = useQuery<SpeedGrader_CommentBankItemsQuery>(
-    SpeedGrader_CommentBankItems,
+  const {data: suggestedCommentsData} = useQuery<SpeedGraderLegacy_CommentBankItemsQuery>(
+    SpeedGraderLegacy_CommentBankItems,
     {
       variables: {userId, query: searchTerm, first: 5},
       skip: searchTerm.length < 3 || !suggestionsWhenTypingEnabled || !isSearchEnabled,

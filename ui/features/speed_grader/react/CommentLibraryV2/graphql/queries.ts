@@ -18,8 +18,8 @@
 
 import {gql} from '@apollo/client'
 
-export const SpeedGrader_CommentBankItemsCount = gql`
-  query SpeedGrader_CommentBankItemsCount($userId: ID!) {
+export const SpeedGraderLegacy_CommentBankItemsCount = gql`
+  query SpeedGraderLegacy_CommentBankItemsCount($userId: ID!) {
     legacyNode(_id: $userId, type: User) {
       ... on User {
         commentBankItemsConnection {
@@ -32,8 +32,8 @@ export const SpeedGrader_CommentBankItemsCount = gql`
   }
 `
 
-export const SpeedGrader_CommentBankItems = gql`
-  query SpeedGrader_CommentBankItems(
+export const SpeedGraderLegacy_CommentBankItems = gql`
+  query SpeedGraderLegacy_CommentBankItems(
     $userId: ID!
     $query: String
     $first: Int
