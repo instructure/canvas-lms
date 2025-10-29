@@ -66,27 +66,39 @@ class LLMConversationClient
   TEXT
 
   def self.base_url
-    region = ApplicationController.region
-
-    # Try region-specific setting first, fall back to base setting
-    url = if region.present?
-            Setting.get("llm_conversation_base_url_#{region}", nil)
-          end
-
-    # Fall back to base setting if region-specific not found
-    url ||= Setting.get("llm_conversation_base_url", nil)
-
-    if url.nil?
-      error_msg = if region.present?
-                    "Neither llm_conversation_base_url_#{region} nor llm_conversation_base_url setting is configured"
-                  else
-                    "llm_conversation_base_url setting is not configured"
-                  end
-      raise LlmConversation::Errors::ConversationError, error_msg
-    end
+    url = resolve_base_url
+    raise LlmConversation::Errors::ConversationError, base_url_error_message if url.nil?
 
     url
   end
+
+  def self.resolve_base_url
+    region = ApplicationController.region
+    test_cluster = ApplicationController.test_cluster_name
+
+    # Try beta-specific setting first if in beta or test cluster
+    return Setting.get("llm_conversation_base_url_beta_#{region}", nil) if test_cluster.present? && region.present?
+
+    # Fall back to production region-specific setting
+    return Setting.get("llm_conversation_base_url_#{region}", nil) if region.present?
+
+    # Fall back to base setting
+    Setting.get("llm_conversation_base_url", nil)
+  end
+
+  def self.base_url_error_message
+    region = ApplicationController.region
+    test_cluster = ApplicationController.test_cluster_name
+
+    if test_cluster.present? && region.present?
+      "None of llm_conversation_base_url_beta_#{region}, llm_conversation_base_url_#{region}, or llm_conversation_base_url setting is configured"
+    elsif region.present?
+      "Neither llm_conversation_base_url_#{region} nor llm_conversation_base_url setting is configured"
+    else
+      "llm_conversation_base_url setting is not configured"
+    end
+  end
+  private_class_method :resolve_base_url, :base_url_error_message
 
   def self.bearer_token
     Rails.application.credentials.llm_conversation_bearer_token

@@ -86,6 +86,90 @@ describe LLMConversationClient do
       # Verify no instance variables are being set on the class
       expect(described_class.instance_variables).not_to include(:@base_url)
     end
+
+    context "with region-specific settings" do
+      before do
+        allow(ApplicationController).to receive_messages(region: "us-east-1", test_cluster_name: nil)
+      end
+
+      after do
+        Setting.remove("llm_conversation_base_url")
+        Setting.remove("llm_conversation_base_url_us-east-1")
+      end
+
+      it "uses region-specific URL when available" do
+        Setting.set("llm_conversation_base_url", "https://default.example.com")
+        Setting.set("llm_conversation_base_url_us-east-1", "https://us-east-1.example.com")
+        expect(described_class.base_url).to eq("https://us-east-1.example.com")
+      end
+
+      it "raises error when neither region-specific nor base URL is set" do
+        expect { described_class.base_url }.to raise_error(
+          LlmConversation::Errors::ConversationError,
+          /Neither llm_conversation_base_url_us-east-1 nor llm_conversation_base_url/
+        )
+      end
+    end
+
+    context "with beta/test cluster settings" do
+      before do
+        allow(ApplicationController).to receive_messages(region: "us-east-1", test_cluster_name: "beta")
+      end
+
+      after do
+        Setting.remove("llm_conversation_base_url")
+        Setting.remove("llm_conversation_base_url_us-east-1")
+        Setting.remove("llm_conversation_base_url_beta_us-east-1")
+      end
+
+      it "uses beta-specific URL when available in beta environment" do
+        Setting.set("llm_conversation_base_url_beta_us-east-1", "https://beta-us-east-1.example.com")
+        Setting.set("llm_conversation_base_url_us-east-1", "https://prod-us-east-1.example.com")
+        expect(described_class.base_url).to eq("https://beta-us-east-1.example.com")
+      end
+
+      it "raises error when no URLs are configured" do
+        expect { described_class.base_url }.to raise_error(
+          LlmConversation::Errors::ConversationError,
+          /None of llm_conversation_base_url_beta_us-east-1, llm_conversation_base_url_us-east-1, or llm_conversation_base_url/
+        )
+      end
+    end
+
+    context "with test cluster (not beta)" do
+      before do
+        allow(ApplicationController).to receive_messages(region: "us-west-2", test_cluster_name: "test")
+      end
+
+      after do
+        Setting.remove("llm_conversation_base_url_us-west-2")
+        Setting.remove("llm_conversation_base_url_beta_us-west-2")
+      end
+
+      it "uses beta-specific URL for test cluster as well" do
+        Setting.set("llm_conversation_base_url_beta_us-west-2", "https://staging-us-west-2.example.com")
+        Setting.set("llm_conversation_base_url_us-west-2", "https://prod-us-west-2.example.com")
+        expect(described_class.base_url).to eq("https://staging-us-west-2.example.com")
+      end
+    end
+
+    context "without region" do
+      before do
+        allow(ApplicationController).to receive_messages(region: nil, test_cluster_name: nil)
+      end
+
+      it "uses base URL when no region is available" do
+        Setting.set("llm_conversation_base_url", "https://default.example.com")
+        expect(described_class.base_url).to eq("https://default.example.com")
+      end
+
+      it "raises error when base URL is not configured and no region" do
+        expect { described_class.base_url }.to raise_error(
+          LlmConversation::Errors::ConversationError,
+          "llm_conversation_base_url setting is not configured"
+        )
+      end
+    end
   end
 
   describe ".bearer_token" do
