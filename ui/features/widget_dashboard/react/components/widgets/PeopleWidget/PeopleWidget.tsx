@@ -128,7 +128,9 @@ const PeopleWidget: React.FC<BaseWidgetProps> = ({
         <Flex.Item shouldGrow>
           <View as="div" padding="0">
             {instructors.length === 0 ? (
-              <Text color="secondary">{I18n.t('No instructors found')}</Text>
+              <Text color="secondary" data-testid="no-instructors-message">
+                {I18n.t('No instructors found')}
+              </Text>
             ) : (
               <View as="div">
                 <List isUnstyled margin="0">
