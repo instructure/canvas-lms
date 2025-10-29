@@ -1227,30 +1227,14 @@ class ExternalToolsController < ApplicationController
                 )
               end
 
-    lti_launch.params = if selection_type == "homework_submission" && assignment && !tool.use_1_3?
-                          adapter.generate_post_payload_for_homework_submission(assignment)
-                        elsif selection_type == "student_context_card" && params[:student_id]
-                          student = api_find(User, params[:student_id])
-                          can_launch = tool.visible_with_permission_check?(selection_type, @current_user, @context, session) &&
-                                       @context.user_has_been_student?(student)
-                          raise Lti::Errors::UnauthorizedError unless can_launch
+    lti_launch.params = generate_lti_launch_params(
+      selection_type:,
+      adapter:,
+      assignment:,
+      tool:,
+      student_id: params[:student_id]
+    )
 
-                          adapter.generate_post_payload_for_student_context_card(student:)
-                        elsif tool.extension_setting(selection_type, "required_permissions")
-                          can_launch = tool.visible_with_permission_check?(selection_type, @current_user, @context, session)
-                          raise Lti::Errors::UnauthorizedError unless can_launch
-
-                          adapter.generate_post_payload
-                        elsif selection_type == "assignment_selection" && assignment&.external_tool_tag&.content_id == tool.id
-                          adapter.generate_post_payload_for_assignment(
-                            assignment,
-                            lti_grade_passback_api_url(tool),
-                            blti_legacy_grade_passback_api_url(tool),
-                            lti_turnitin_outcomes_placement_url(tool.id)
-                          )
-                        else
-                          adapter.generate_post_payload
-                        end
     lti_launch.resource_url = opts[:launch_url] || adapter.launch_url
     lti_launch.link_text = selection_type ? tool.label_for(selection_type.to_sym, I18n.locale) : tool.default_label
     lti_launch.analytics_id = tool.tool_id
@@ -1258,6 +1242,46 @@ class ExternalToolsController < ApplicationController
     lti_launch
   end
   protected :basic_lti_launch_request
+
+  def generate_lti_launch_params(
+    selection_type:,
+    adapter:,
+    tool:,
+    assignment:,
+    student_id:
+  )
+    if selection_type == "homework_submission" && assignment && !tool.use_1_3?
+      adapter.generate_post_payload_for_homework_submission(assignment)
+    elsif selection_type == "student_context_card" && student_id
+      student = api_find(User, student_id)
+      can_launch = tool.visible_with_permission_check?(selection_type, @current_user, @context, session) &&
+                   @context.user_has_been_student?(student)
+      raise Lti::Errors::UnauthorizedError unless can_launch
+
+      adapter.generate_post_payload_for_student_context_card(student:)
+    elsif tool.extension_setting(selection_type, "required_permissions")
+      can_launch = tool.visible_with_permission_check?(selection_type, @current_user, @context, session)
+      raise Lti::Errors::UnauthorizedError unless can_launch
+
+      adapter.generate_post_payload
+    elsif selection_type == "assignment_selection" && assignment&.external_tool_tag&.content_id == tool.id &&
+          !tool.use_1_3? && params[:assignment_id].present?
+      # Special case mostly for New Quizzes' benefit to make certain
+      # assignment_selection launches have more assignment context. Should not
+      # be used for LTI 1.3 as generate_post_payload_for_assignment is for
+      # resource link requests only and DeepLinkingRequest doesn't support
+      # resource_link claim. See efa31c0bfb1d
+      adapter.generate_post_payload_for_assignment(
+        assignment,
+        lti_grade_passback_api_url(tool),
+        blti_legacy_grade_passback_api_url(tool),
+        lti_turnitin_outcomes_placement_url(tool.id)
+      )
+    else
+      adapter.generate_post_payload
+    end
+  end
+  protected :generate_lti_launch_params
 
   def content_item_selection(tool, placement, message_type, opts = {})
     media_types = params.select do |param|
