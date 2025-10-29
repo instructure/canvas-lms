@@ -46,6 +46,7 @@ export interface FormComponentProps {
   error?: string | null
   onChangeValue: (formValue: FormValue) => void
   onReload?: (formValue: FormValue) => void
+  onValidationChange?: (isValid: boolean, errorMessage?: string) => void
 }
 
 interface FormProps {
@@ -53,6 +54,7 @@ interface FormProps {
   error?: string | null
   onReload?: (formValue: FormValue) => void
   onClearError?: () => void
+  onValidationChange?: (isValid: boolean) => void
 }
 
 const FormTypeMap = {
@@ -65,7 +67,7 @@ const FormTypeMap = {
 const Form: React.FC<FormProps & React.RefAttributes<FormHandle>> = forwardRef<
   FormHandle,
   FormProps
->(({issue, error, onReload, onClearError}: FormProps, ref) => {
+>(({issue, error, onReload, onClearError, onValidationChange}: FormProps, ref) => {
   const formRef = useRef<FormComponentHandle>(null)
   const [value, setValue] = useState<FormValue>(issue.form.value || null)
 
@@ -103,6 +105,7 @@ const Form: React.FC<FormProps & React.RefAttributes<FormHandle>> = forwardRef<
       error={error}
       onChangeValue={handleChange}
       onReload={onReload}
+      onValidationChange={onValidationChange}
     />
   )
 })

@@ -33,7 +33,7 @@ class Accessibility::ResourceScannerService < ApplicationService
 
     scan = AccessibilityResourceScan.where(context: @resource).first_or_initialize
     scan.assign_attributes(
-      course: @resource.course,
+      course_id: @resource.course.id,
       workflow_state: "queued",
       resource_name: @resource.try(:title),
       resource_workflow_state:,
@@ -153,7 +153,7 @@ class Accessibility::ResourceScannerService < ApplicationService
 
   def build_issue_attributes(issue)
     {
-      course: @resource.course,
+      course_id: @resource.course.id,
       context: @resource,
       rule_type: issue[:rule_id],
       node_path: issue[:path],

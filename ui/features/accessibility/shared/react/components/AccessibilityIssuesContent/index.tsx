@@ -88,6 +88,7 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
   const [isFormLocked, setIsFormLocked] = useState<boolean>(false)
   const [assertiveAlertMessage, setAssertiveAlertMessage] = useState<string | null>(null)
   const [formError, setFormError] = useState<string | null>()
+  const [isSaveButtonEnabled, setIsSaveButtonEnabled] = useState<boolean>(true)
 
   const {doFetchAccessibilityIssuesSummary} = useAccessibilityScansFetchUtils()
   const [accessibilityScans, nextResource] = useAccessibilityScansStore(
@@ -300,11 +301,9 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
 
   const applyButtonText = useMemo(() => {
     if (!current.issue) return null
-    if (
-      current.issue.form.type === FormType.Button ||
-      current.issue.form.type === FormType.ColorPicker
-    )
+    if (current.issue.form.type === FormType.Button) {
       return current.issue.form.label
+    }
     return current.issue.form.action || I18n.t('Apply')
   }, [current.issue])
 
@@ -312,11 +311,31 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
     setFormError(null)
   }, [])
 
+  const handleValidationChange = useCallback(
+    (isValid: boolean, errorMessage?: string) => {
+      if (['small-text-contrast', 'large-text-contrast'].includes(current.issue?.ruleId)) {
+        setIsSaveButtonEnabled(isValid)
+        if (!isValid) {
+          setFormError(errorMessage)
+        } else {
+          setFormError(null)
+        }
+
+        // Reset remediation state when color changes after being applied
+        if (isRemediated) {
+          setIsRemediated(false)
+        }
+      }
+    },
+    [current.issue?.ruleId, isRemediated],
+  )
+
   useEffect(() => {
     setIsRemediated(false)
     setIsFormLocked(false)
     setAssertiveAlertMessage(null)
     setFormError(null)
+    setIsSaveButtonEnabled(true)
   }, [current.issue])
 
   if (!current.issue)
@@ -408,6 +427,7 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
               error={formError}
               onReload={updatePreview}
               onClearError={handleClearError}
+              onValidationChange={handleValidationChange}
             />
           </View>
           {!isApplyButtonHidden && (
@@ -418,6 +438,7 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
                 undoMessage={current.issue.form.undoText}
                 isApplied={isRemediated}
                 isLoading={isFormLocked}
+                disabled={!isSaveButtonEnabled}
               >
                 {applyButtonText}
               </ApplyButton>
@@ -438,7 +459,10 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
             isBackDisabled={currentIssueIndex === 0 || isFormLocked}
             isNextDisabled={currentIssueIndex === issues.length - 1 || isFormLocked}
             isSaveAndNextDisabled={
-              (!isRemediated && !isApplyButtonHidden) || isFormLocked || !!formError
+              (!isRemediated && !isApplyButtonHidden) ||
+              isFormLocked ||
+              !!formError ||
+              !isSaveButtonEnabled
             }
           />
         </Flex.Item>
