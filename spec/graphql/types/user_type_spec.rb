@@ -3137,6 +3137,184 @@ describe Types::UserType do
         expect(result).to include("Test Assignment") # Should still show current course
       end
     end
+
+    context "graded unsubmitted work filtering" do
+      before(:once) do
+        @frozen_time = Time.zone.parse("2024-01-15 12:00:00")
+      end
+
+      it "excludes graded-unsubmitted work from default filter (onlySubmitted: false)" do
+        Timecop.freeze(@frozen_time) do
+          graded_unsubmitted_assignment = @course.assignments.create!(
+            title: "Graded but Never Submitted",
+            due_at: (@frozen_time + 2.days).end_of_day,
+            workflow_state: "published",
+            submission_types: "online_text_entry"
+          )
+          graded_submission = graded_unsubmitted_assignment.submissions.find_or_create_by(user: @student)
+          graded_submission.update!(
+            submitted_at: nil,           # NOT submitted
+            workflow_state: "graded",    # But graded
+            grader_id: @teacher.id,
+            score: 85
+          )
+
+          # Query without onlySubmitted (default filter for "due" items)
+          start_date = @frozen_time.beginning_of_day
+          end_date = (@frozen_time + 7.days).end_of_day
+
+          result = student_user_type.resolve(
+            "courseWorkSubmissionsConnection(startDate: \"#{start_date.iso8601}\", endDate: \"#{end_date.iso8601}\") {
+              edges { node { assignment { title } } }
+            }"
+          )
+
+          expect(result).not_to include("Graded but Never Submitted")
+        end
+      end
+
+      it "includes graded-unsubmitted work in onlySubmitted filter" do
+        Timecop.freeze(@frozen_time) do
+          graded_unsubmitted_assignment = @course.assignments.create!(
+            title: "Graded but Never Submitted",
+            due_at: (@frozen_time + 2.days).end_of_day,
+            workflow_state: "published",
+            submission_types: "online_text_entry"
+          )
+          graded_submission = graded_unsubmitted_assignment.submissions.find_or_create_by(user: @student)
+          graded_submission.update!(
+            submitted_at: nil,
+            workflow_state: "graded",
+            grader_id: @teacher.id,
+            score: 85
+          )
+
+          result = student_user_type.resolve(
+            "courseWorkSubmissionsConnection(onlySubmitted: true) {
+              edges { node { assignment { title } } }
+            }"
+          )
+
+          expect(result).to include("Graded but Never Submitted")
+        end
+      end
+
+      it "handles edge case: graded workflow_state without score (grade cleared)" do
+        Timecop.freeze(@frozen_time) do
+          # Edge case: assignment has graded workflow_state but no score (score was cleared)
+          graded_no_score_assignment = @course.assignments.create!(
+            title: "Graded State Without Score",
+            due_at: (@frozen_time + 2.days).end_of_day,
+            workflow_state: "published",
+            submission_types: "online_text_entry"
+          )
+          graded_no_score_submission = graded_no_score_assignment.submissions.find_or_create_by(user: @student)
+          graded_no_score_submission.update!(
+            submitted_at: nil,
+            workflow_state: "graded",  # Has graded state
+            grader_id: @teacher.id,
+            score: nil                 # But no score
+          )
+
+          start_date = @frozen_time.beginning_of_day
+          end_date = (@frozen_time + 7.days).end_of_day
+
+          result = student_user_type.resolve(
+            "courseWorkSubmissionsConnection(startDate: \"#{start_date.iso8601}\", endDate: \"#{end_date.iso8601}\") {
+              edges { node { assignment { title } } }
+            }"
+          )
+
+          expect(result).to include("Graded State Without Score")
+        end
+      end
+
+      it "handles edge case: score without graded workflow_state (race condition)" do
+        Timecop.freeze(@frozen_time) do
+          # Edge case: submission has score but workflow_state is not 'graded' (race condition)
+          score_no_graded_state_assignment = @course.assignments.create!(
+            title: "Score Without Graded State",
+            due_at: (@frozen_time + 2.days).end_of_day,
+            workflow_state: "published",
+            submission_types: "online_text_entry"
+          )
+          score_no_graded_submission = score_no_graded_state_assignment.submissions.find_or_create_by(user: @student)
+          score_no_graded_submission.update!(
+            submitted_at: nil,
+            workflow_state: "unsubmitted",  # NOT graded state
+            score: 75                       # But has score
+          )
+
+          start_date = @frozen_time.beginning_of_day
+          end_date = (@frozen_time + 7.days).end_of_day
+
+          result = student_user_type.resolve(
+            "courseWorkSubmissionsConnection(startDate: \"#{start_date.iso8601}\", endDate: \"#{end_date.iso8601}\") {
+              edges { node { assignment { title } } }
+            }"
+          )
+
+          expect(result).to include("Score Without Graded State")
+        end
+      end
+
+      it "excludes normal graded work with both score and graded state from default filter" do
+        Timecop.freeze(@frozen_time) do
+          normal_graded_assignment = @course.assignments.create!(
+            title: "Normal Graded Assignment",
+            due_at: (@frozen_time + 2.days).end_of_day,
+            workflow_state: "published",
+            submission_types: "online_text_entry"
+          )
+          normal_graded_submission = normal_graded_assignment.submissions.find_or_create_by(user: @student)
+          normal_graded_submission.update!(
+            submitted_at: nil,
+            workflow_state: "graded",  # Has graded state
+            grader_id: @teacher.id,
+            score: 90                  # And has score
+          )
+
+          start_date = @frozen_time.beginning_of_day
+          end_date = (@frozen_time + 7.days).end_of_day
+
+          result = student_user_type.resolve(
+            "courseWorkSubmissionsConnection(startDate: \"#{start_date.iso8601}\", endDate: \"#{end_date.iso8601}\") {
+              edges { node { assignment { title } } }
+            }"
+          )
+
+          expect(result).not_to include("Normal Graded Assignment")
+        end
+      end
+
+      it "includes truly ungraded work in default filter" do
+        Timecop.freeze(@frozen_time) do
+          ungraded_assignment = @course.assignments.create!(
+            title: "Truly Ungraded Assignment",
+            due_at: (@frozen_time + 2.days).end_of_day,
+            workflow_state: "published",
+            submission_types: "online_text_entry"
+          )
+          ungraded_submission = ungraded_assignment.submissions.find_or_create_by(user: @student)
+          ungraded_submission.update!(
+            submitted_at: nil,
+            workflow_state: "unsubmitted",
+            score: nil
+          )
+
+          start_date = @frozen_time.beginning_of_day
+          end_date = (@frozen_time + 7.days).end_of_day
+
+          result = student_user_type.resolve(
+            "courseWorkSubmissionsConnection(startDate: \"#{start_date.iso8601}\", endDate: \"#{end_date.iso8601}\") {
+              edges { node { assignment { title } } }
+            }"
+          )
+
+          expect(result).to include("Truly Ungraded Assignment")
+        end
+      end
+    end
   end
 
   context "courseWorkSubmissionsConnection with observed user" do
