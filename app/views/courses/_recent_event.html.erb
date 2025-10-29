@@ -51,6 +51,7 @@
           (recent_event.due_at if is_assignment_or_sub_assignment),
           Time.zone.today,
           Time.zone.name,
+          recent_event.context.short_name,
           recent_event.context.grants_right?(@current_user, :manage_grades),
           recent_event.context.grants_right?(@current_user, :participate_as_student)
         ].cache_key) do
