@@ -76,7 +76,8 @@ module GraphQLHelpers::AutoGradeEligibilityHelper
   end
 
   def self.contains_images?(submission)
-    submission.contains_images
+    extracted_text = submission.read_extracted_text
+    extracted_text.fetch(:contains_images, false)
   end
 
   def self.invalid_file?(submission)
