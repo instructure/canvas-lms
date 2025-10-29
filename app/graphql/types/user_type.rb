@@ -689,8 +689,11 @@ module Types
                               OR (submissions.score IS NOT NULL AND submissions.workflow_state = 'graded'))
                             SQL
                           else
-                            # Default: show unsubmitted, non-excused assignments (actionable items)
-                            submissions_query.where(submitted_at: nil).where("excused = FALSE OR excused IS NULL")
+                            # Default: show unsubmitted, non-excused, non-graded assignments (actionable items)
+                            # Match the logic in SubmissionStatisticsType.submissions_due_count
+                            submissions_query.where(submitted_at: nil)
+                                             .where("excused = FALSE OR excused IS NULL")
+                                             .where("(submissions.score IS NULL OR submissions.workflow_state != 'graded')")
                           end
 
       # Apply date filtering using flexible date parameters (skip for submitted items)
