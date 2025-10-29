@@ -1639,7 +1639,7 @@ describe AssignmentsApiController, type: :request do
                       "/api/v1/courses/#{@course.id}/assignments.json",
                       { controller: "assignments_api", action: "index", format: "json", course_id: @course.id.to_s },
                       include: ["all_dates"])
-      expect(json.first["all_dates"]).to be_nil
+      expect(json.first["all_dates"]).to eq([])
       expect(json.first["all_dates_count"]).to eq 2
     end
 

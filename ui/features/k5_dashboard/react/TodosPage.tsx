@@ -43,6 +43,7 @@ interface TodoItem {
       base?: boolean
       due_at?: string
     }>
+    all_dates_count?: number
     due_at?: string
     name: string
     points_possible: number

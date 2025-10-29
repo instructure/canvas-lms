@@ -382,6 +382,27 @@ describe "Api::V1::Assignment" do
           expect(json["all_dates"].pluck(:due_at)).to contain_exactly(*due_dates)
         end
       end
+
+      it "returns empty all_dates array and all_dates_count when there are more than 25 overrides" do
+        course = course_model
+        teacher = teacher_in_course(course:, active_all: true).user
+        assignment = assignment_model(course:)
+
+        # Create 26 sections and one override for each section
+        26.times do |i|
+          section = course.course_sections.create!(name: "Section #{i + 1}")
+          assignment.assignment_overrides.create!(
+            set_type: "CourseSection",
+            set_id: section.id,
+            due_at: (i + 1).days.from_now
+          )
+        end
+
+        json = api.assignment_json(assignment, teacher, session, { include_all_dates: true })
+
+        expect(json["all_dates"]).to eq([])
+        expect(json["all_dates_count"]).to eq(26)
+      end
     end
 
     context "for a quiz" do

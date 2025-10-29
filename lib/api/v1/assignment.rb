@@ -383,6 +383,7 @@ module Api::V1::Assignment
           hash["all_dates"] = assignment.dates_hash_visible_to(user)
         else
           hash["all_dates_count"] = override_count
+          hash["all_dates"] = []
         end
       end
     end
