@@ -295,7 +295,33 @@ class WikiPagesApiController < ApplicationController
       scope_columns = WikiPage.column_names
       scope_columns -= ["body"] unless includes.include?("body")
       scope_columns += ["CASE WHEN body IS NULL THEN true ELSE false END AS is_body_null"] if @context.try(:block_content_editor_enabled?)
-      scope = @context.wiki_pages.select(scope_columns).preload(:user)
+      scope = @context.wiki_pages.select(scope_columns)
+      scope = if Account.site_admin.feature_enabled?(:n_plus_one_index_wiki_page_api)
+                scope.preload(
+                  :user,
+                  :assignment_overrides,
+                  :active_assignment_overrides,
+                  :assignment_override_students,
+                  :current_lookup,
+                  :wiki,
+                  :block_editor,
+                  :estimated_duration,
+                  context_module_tags: { context_module: :context },
+                  assignment: [
+                    :assignment_overrides,
+                    :assignment_override_students,
+                    :quiz,
+                    :discussion_topic,
+                    :context_module_tags,
+                    :external_tool_tag,
+                    :rubric_association,
+                    :post_policy,
+                    { context: %i[active_course_sections grading_period_groups enrollment_term] }
+                  ]
+                ).strict_loading(mode: :n_plus_one_only)
+              else
+                scope.preload(:user)
+              end
       scope = if params.key?(:published)
                 value_to_boolean(params[:published]) ? scope.published : scope.unpublished
               else
