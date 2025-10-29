@@ -25,6 +25,7 @@ module LearnPlatform
 
     GET_UNIFIED_TOOL_ID_ENDPOINT = "/api/v2/lti/global_products/unified_tool_id"
     POST_UNIFIED_TOOL_ID_BULK_LOAD_CALLBACK_ENDPOINT = "/api/v2/lti/unified_tool_id_bulk_load"
+    GET_API_LOOKUP_ENDPOINT = "/public-products/api/public/v1/products/api_registrations/lookup"
 
     def self.credentials
       @credentials ||= Rails.application.credentials.learn_platform_creds&.with_indifferent_access || {}
@@ -98,6 +99,29 @@ module LearnPlatform
     rescue CanvasHttp::Error
       InstStatsd::Statsd.distributed_increment("learn_platform_api.error", tags: { event_type: "get_unified_tool_id" })
       false
+    end
+
+    def self.lookup_api_registrations(redirect_uris, sources: [:partner_provided])
+      return [] unless enabled?
+      return [] if redirect_uris.blank? || redirect_uris.empty?
+
+      payload = { redirect_urls: redirect_uris, sources: }
+      url = "#{endpoint}#{GET_API_LOOKUP_ENDPOINT}?#{payload.to_query}"
+      response = CanvasHttp.get(url, auth_headers)
+
+      if response.is_a?(Net::HTTPSuccess)
+        InstStatsd::Statsd.distributed_increment("learn_platform_api.success", tags: { event_type: "lookup_api_registrations" })
+        parsed_response = JSON.parse(response.body, symbolize_names: true)
+        parsed_response[:api_registrations] || []
+      else
+        InstStatsd::Statsd.distributed_increment("learn_platform_api.error.http_failure", tags: { event_type: "lookup_api_registrations", status_code: response.code })
+        Rails.logger.error("[LearnPlatform] lookup_api_registrations failure: #{response.body}")
+        []
+      end
+    rescue CanvasHttp::Error, JSON::ParserError => e
+      InstStatsd::Statsd.distributed_increment("learn_platform_api.error", tags: { event_type: "lookup_api_registrations" })
+      Rails.logger.error("[LearnPlatform] lookup_api_registrations error: #{e.message}")
+      []
     end
 
     def self.post_unified_tool_id_bulk_load_callback(id:, region:, shard_issues:, row_stats:, error:)

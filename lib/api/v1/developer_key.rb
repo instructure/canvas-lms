@@ -49,6 +49,7 @@ module Api::V1::DeveloperKey
         hash["notes"] = key.notes
         hash["access_token_count"] = key.access_token_count
         hash["last_used_at"] = key.last_used_at
+        hash["unified_tool_id"] = key.unified_tool_id
         hash["vendor_code"] = key.vendor_code
         hash["public_jwk"] = key.public_jwk
         hash["public_jwk_url"] = key.public_jwk_url
