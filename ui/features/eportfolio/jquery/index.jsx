@@ -53,6 +53,7 @@ import 'jqueryui/sortable'
 import CreatePortfolioForm from '../react/CreatePortfolioForm'
 import {Portal} from '@instructure/ui-portal'
 import PageNameContainer from '../react/PageNameContainer'
+import DeprecationNoticeAlert from '../react/DeprecationNoticeAlert'
 
 const I18n = createI18nScope('eportfolio')
 
@@ -210,6 +211,7 @@ function renderPortal(portfolio_id) {
 
 $(document).ready(function () {
   const portfolio_id = ENV.eportfolio_id
+  const showDeprecation = ENV.show_eportfolio_deprecation_notice
   // formRoot is for the name field in the edit page form and renders dynamically
   // root is for everything else and should always be rendered
   let formRoot = null
@@ -222,6 +224,13 @@ $(document).ready(function () {
     root.render(renderPortal(portfolio_id))
   } else {
     root.render(renderCreateForm())
+  }
+  if (showDeprecation) {
+    const mount = document.getElementById('eportfolio_deprecation_notice_mount')
+    if (mount) {
+      const noticeRoot = ReactDOM.createRoot(mount)
+      noticeRoot.render(<DeprecationNoticeAlert open={true} />)
+    }
   }
   // Add ePortfolio related
   $('.add_eportfolio_link').click(function (event) {
