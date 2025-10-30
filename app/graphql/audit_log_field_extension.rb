@@ -148,8 +148,8 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
       # hackweek.
       #
       # Via the same logic for skipping audit logs for user inbox label,
-      # we can skip audit logs for updating gradebook group filter, as it
-      # updates the current user's settings.
+      # we can skip audit logs for updating gradebook group filter and
+      # learner dashboard tab selection, as they update the current user's settings.
       next if [Mutations::CreateDiscussionEntryDraft,
                Mutations::CreateInternalSetting,
                Mutations::UpdateInternalSetting,
@@ -157,6 +157,7 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
                Mutations::CreateUserInboxLabel,
                Mutations::DeleteUserInboxLabel,
                Mutations::UpdateGradebookGroupFilter,
+               Mutations::UpdateLearnerDashboardTabSelection,
                Mutations::AcceptEnrollmentInvitation,
                Mutations::RejectEnrollmentInvitation].include? mutation
 
