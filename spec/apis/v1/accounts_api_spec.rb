@@ -1673,6 +1673,21 @@ describe "Accounts API", type: :request do
       expect(json.pluck("name")).to match_array(["c2"])
     end
 
+    it "does not set pagination total_pages/last page link for token-authenticated API requests" do
+      course_factory(account: @a1, course_name: "c1")
+      api_call_as_user(account_admin_user(account: @a1),
+                       :get,
+                       "/api/v1/accounts/#{@a1.id}/courses",
+                       account_id: @a1.to_param,
+                       controller: "accounts",
+                       action: "courses_api",
+                       format: "json",
+                       per_page: 1)
+
+      expect(response).to be_successful
+      expect(response.headers.to_a.find { |a| a.first.downcase == "link" }.last).to_not include("last")
+    end
+
     describe "sort" do
       before :once do
         @me = @user

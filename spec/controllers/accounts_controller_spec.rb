@@ -1844,18 +1844,9 @@ describe AccountsController do
       end
     end
 
-    it "does not set pagination total_pages/last page link" do
+    it "sets pagination total_pages/last page link for session-authenticated requests" do
       admin_logged_in(@account)
       get "courses_api", params: { account_id: @account.id, per_page: 1 }
-
-      expect(response).to be_successful
-      expect(response.headers.to_a.find { |a| a.first.downcase == "link" }.last).to_not include("last")
-    end
-
-    it "sets pagination total_pages/last page link if includes ui_invoked is set" do
-      Setting.set("ui_invoked_count_pages", "true")
-      admin_logged_in(@account)
-      get "courses_api", params: { account_id: @account.id, per_page: 1, include: ["ui_invoked"] }
 
       expect(response).to be_successful
       expect(response.headers.to_a.find { |a| a.first.downcase == "link" }.last).to include("last")

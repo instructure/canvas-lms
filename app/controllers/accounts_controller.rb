@@ -935,8 +935,8 @@ class AccountsController < ApplicationController
     includes -= %w[permissions sections needs_grading_count total_scores]
     all_precalculated_permissions = nil
 
-    page_opts = { total_entries: nil }
-    page_opts = {} if includes.include?("ui_invoked") # let Folio calculate total entries
+    # Let Folio calculate total entries for pagination when invoked from web interface
+    page_opts = in_app? ? {} : { total_entries: nil }
 
     GuardRail.activate(:secondary) do
       @courses = Api.paginate(@courses, self, api_v1_account_courses_url, page_opts)

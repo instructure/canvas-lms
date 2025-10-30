@@ -1279,15 +1279,17 @@ describe "Users API", type: :request do
       end
     end
 
-    context "includes ui_invoked" do
+    context "ui-invoked requests" do
       let(:root_account) { Account.default }
 
-      it "sets pagination total_pages/last page link" do
+      it "sets pagination total_pages/last page link with session auth" do
         user_session(@admin)
         api_call(:get,
                  "/api/v1/accounts/#{root_account.id}/users",
-                 { controller: "users", action: "api_index", format: "json", account_id: root_account.id.to_param },
-                 { role_filter_id: student_role.id.to_s, include: ["ui_invoked"] })
+                 { controller: "users", action: "api_index", format: "json", account_id: root_account.id.to_param, per_page: 1 },
+                 { role_filter_id: student_role.id.to_s },
+                 {},
+                 { skip_token_auth: true })
         expect(response).to be_successful
         expect(response.headers["Link"]).to include("last")
       end
@@ -1300,7 +1302,7 @@ describe "Users API", type: :request do
         json = api_call(:get,
                         "/api/v1/accounts/#{root_account.id}/users",
                         { controller: "users", action: "api_index", format: "json", account_id: root_account.id.to_param },
-                        { role_filter_id: student_role.id.to_s, include: ["ui_invoked"] })
+                        { role_filter_id: student_role.id.to_s })
         expect(response).to be_successful
         # includes the first describe block student and the new subaccount student user
         expect(json.count).to eq 2
@@ -1500,7 +1502,7 @@ describe "Users API", type: :request do
       end
     end
 
-    it "does return a next header on the last page" do
+    it "returns a next header on the last page for token-authenticated requests" do
       @account = Account.default
       u = User.create!(name: "test user")
       u.pseudonyms.create!(account: @account, unique_id: "user")
@@ -1513,16 +1515,18 @@ describe "Users API", type: :request do
       expect(response.headers["Link"]).to_not include("rel=\"next\"")
     end
 
-    it "does not return a next-page link on the last page" do
-      Setting.set("ui_invoked_count_pages", "true")
+    it "does not return a next-page link on the last page for session-authenticated requests" do
       @account = Account.default
       u = User.create!(name: "test user")
       u.pseudonyms.create!(account: @account, unique_id: "user")
+      user_session(@user)
 
       json = api_call(:get,
                       "/api/v1/accounts/#{@account.id}/users",
                       { controller: "users", action: "api_index", format: "json", account_id: @account.id.to_param },
-                      { search_term: u.id.to_s, per_page: "1", page: "1", include: ["ui_invoked"] })
+                      { search_term: u.id.to_s, per_page: "1", page: "1" },
+                      {},
+                      { skip_token_auth: true, expected_status: 200 })
       expect(json.length).to eq 1
       expect(response.headers["Link"]).to_not include("rel=\"next\"")
     end
