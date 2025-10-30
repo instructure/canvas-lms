@@ -31,6 +31,7 @@ const I18n = createI18nScope('discussion_topics_post')
 interface TranslationContextType {
   id: string
   originalMessage: string
+  originalTitle?: string
   isTranslating: boolean
   isTranslationReady: boolean
   translateTargetLanguage: string | null
@@ -188,6 +189,7 @@ const Translation = ({id, title, message, children}: PropsWithChildren<Translati
       value={{
         id,
         originalMessage: message,
+        originalTitle: id === 'topic' ? title : undefined,
         isTranslating: entryInfo.loading,
         isTranslationReady,
         translateTargetLanguage: entryInfo.language || null,
@@ -362,14 +364,14 @@ const Actions = () => {
     return null
   }
 
-  const {id, originalMessage, isTranslationReady, translationError} = context
+  const {id, originalMessage, originalTitle, isTranslationReady, translationError} = context
 
   if (!isTranslationReady || translationError || translateAll) {
     return null
   }
 
   const handleChangeLanguage = () => {
-    setModalOpen(id, originalMessage)
+    setModalOpen(id, originalMessage, originalTitle)
   }
 
   const handleHideTranslation = () => {
