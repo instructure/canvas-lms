@@ -369,7 +369,7 @@ class AiExperiencesController < ApplicationController
 
   def render_404
     respond_to do |format|
-      format.html { render file: Rails.public_path.join("404.html").to_s, status: :not_found, layout: false }
+      format.html { render status: :not_found, template: "shared/errors/404_message" }
       format.json { render json: { error: "Resource Not Found" }, status: :not_found }
     end
   end
