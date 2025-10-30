@@ -19,37 +19,72 @@
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import {MockedProvider} from '@apollo/client/testing'
 import CommentReadView from '../CommentReadView'
 import * as shave from '@canvas/shave'
 
 jest.mock('@canvas/shave')
+jest.mock('@canvas/alerts/react/FlashAlert')
 
 describe('CommentReadView', () => {
   const defaultProps = {
+    id: 'comment-1',
     comment: 'This is a test comment',
     index: 0,
     onClick: jest.fn(),
+    setIsEditing: jest.fn(),
   }
 
   beforeEach(() => {
     jest.clearAllMocks()
   })
 
+  const renderWithMocks = (props = {}) => {
+    const mergedProps = {...defaultProps, ...props}
+    return render(
+      <MockedProvider mocks={[]} addTypename={false}>
+        <CommentReadView {...mergedProps} />
+      </MockedProvider>,
+    )
+  }
+
   describe('Rendering Tests', () => {
     it('renders comment text', () => {
-      render(<CommentReadView {...defaultProps} />)
+      renderWithMocks()
       expect(screen.getByText('This is a test comment')).toBeInTheDocument()
     })
 
     it('renders with correct data-testid including index', () => {
-      const {getByTestId} = render(<CommentReadView {...defaultProps} index={5} />)
+      const {getByTestId} = renderWithMocks({index: 5})
       expect(getByTestId('comment-library-item-5')).toBeInTheDocument()
     })
 
     it('renders screen reader button with Use comment text', () => {
-      render(<CommentReadView {...defaultProps} />)
+      renderWithMocks()
       expect(
         screen.getByRole('button', {name: /Use comment This is a test comment/i}),
+      ).toBeInTheDocument()
+    })
+
+    it('renders DeleteCommentIconButton', () => {
+      const {getByTestId} = renderWithMocks()
+      expect(getByTestId('comment-library-delete-button-0')).toBeInTheDocument()
+    })
+
+    it('renders edit button with correct icon', () => {
+      const {getByTestId} = renderWithMocks()
+      expect(getByTestId('comment-library-edit-button-0')).toBeInTheDocument()
+    })
+
+    it('edit button has correct data-testid based on index', () => {
+      const {getByTestId} = renderWithMocks({index: 3})
+      expect(getByTestId('comment-library-edit-button-3')).toBeInTheDocument()
+    })
+
+    it('edit button has correct screen reader label with comment text', () => {
+      renderWithMocks({comment: 'Specific comment'})
+      expect(
+        screen.getByRole('button', {name: 'Edit comment: Specific comment'}),
       ).toBeInTheDocument()
     })
   })
@@ -58,7 +93,7 @@ describe('CommentReadView', () => {
     it('shows show more button when comment is truncated', async () => {
       ;(shave.default as jest.Mock).mockReturnValue(true)
 
-      render(<CommentReadView {...defaultProps} />)
+      renderWithMocks()
 
       await waitFor(() => {
         expect(screen.getByText('show more')).toBeInTheDocument()
@@ -68,7 +103,7 @@ describe('CommentReadView', () => {
     it('does not show show more button when comment is not truncated', async () => {
       ;(shave.default as jest.Mock).mockReturnValue(false)
 
-      render(<CommentReadView {...defaultProps} />)
+      renderWithMocks()
 
       await waitFor(() => {
         expect(screen.queryByText('show more')).not.toBeInTheDocument()
@@ -79,7 +114,7 @@ describe('CommentReadView', () => {
       const user = userEvent.setup()
       ;(shave.default as jest.Mock).mockReturnValue(true)
 
-      render(<CommentReadView {...defaultProps} />)
+      renderWithMocks()
 
       await waitFor(() => {
         expect(screen.getByText('show more')).toBeInTheDocument()
@@ -100,7 +135,7 @@ describe('CommentReadView', () => {
       ;(shave.default as jest.Mock).mockReturnValue(true)
 
       const longComment = 'This is a very long comment that should be truncated initially'
-      render(<CommentReadView {...defaultProps} comment={longComment} />)
+      renderWithMocks({comment: longComment})
 
       await waitFor(() => {
         expect(screen.getByText('show more')).toBeInTheDocument()
@@ -119,7 +154,7 @@ describe('CommentReadView', () => {
       const user = userEvent.setup()
       const onClick = jest.fn()
 
-      render(<CommentReadView {...defaultProps} onClick={onClick} />)
+      renderWithMocks({onClick})
 
       const commentArea = screen.getByText('This is a test comment').closest('div')
       await user.click(commentArea!)
@@ -131,7 +166,7 @@ describe('CommentReadView', () => {
       const user = userEvent.setup()
       const onClick = jest.fn()
 
-      render(<CommentReadView {...defaultProps} onClick={onClick} />)
+      renderWithMocks({onClick})
 
       const srButton = screen.getByRole('button', {name: /Use comment/i})
       await user.click(srButton)
@@ -141,7 +176,7 @@ describe('CommentReadView', () => {
 
     it('applies hover background styling on mouse enter', async () => {
       const user = userEvent.setup()
-      render(<CommentReadView {...defaultProps} />)
+      renderWithMocks()
 
       const commentArea = screen.getByText('This is a test comment').closest('div')
       await user.hover(commentArea!)
@@ -151,7 +186,7 @@ describe('CommentReadView', () => {
     })
 
     it('applies focus background on focus', async () => {
-      render(<CommentReadView {...defaultProps} />)
+      renderWithMocks()
 
       const commentArea = screen.getByText('This is a test comment').closest('div')
       commentArea!.focus()
@@ -163,7 +198,7 @@ describe('CommentReadView', () => {
 
   describe('Accessibility Tests', () => {
     it('screen reader button has correct label with comment text', () => {
-      render(<CommentReadView {...defaultProps} comment="Custom comment text" />)
+      renderWithMocks({comment: 'Custom comment text'})
 
       expect(
         screen.getByRole('button', {name: 'Use comment Custom comment text'}),
@@ -174,7 +209,7 @@ describe('CommentReadView', () => {
       const user = userEvent.setup()
       const onClick = jest.fn()
 
-      render(<CommentReadView {...defaultProps} onClick={onClick} />)
+      renderWithMocks({onClick})
 
       const srButton = screen.getByRole('button', {name: /Use comment/i})
       srButton.focus()
@@ -184,9 +219,50 @@ describe('CommentReadView', () => {
     })
 
     it('screen reader button has correct test id', () => {
-      const {getByTestId} = render(<CommentReadView {...defaultProps} index={3} />)
+      const {getByTestId} = renderWithMocks({index: 3})
 
       expect(getByTestId('comment-library-item-use-button-3')).toBeInTheDocument()
+    })
+  })
+
+  describe('Edit Button Tests', () => {
+    it('clicking edit button calls setIsEditing with true', async () => {
+      const user = userEvent.setup()
+      const setIsEditing = jest.fn()
+
+      renderWithMocks({setIsEditing})
+
+      const editButton = screen.getByRole('button', {name: /Edit comment:/i})
+      await user.click(editButton)
+
+      expect(setIsEditing).toHaveBeenCalledTimes(1)
+      expect(setIsEditing).toHaveBeenCalledWith(true)
+    })
+
+    it('edit button is keyboard accessible with Enter key', async () => {
+      const user = userEvent.setup()
+      const setIsEditing = jest.fn()
+
+      renderWithMocks({setIsEditing})
+
+      const editButton = screen.getByRole('button', {name: /Edit comment:/i})
+      editButton.focus()
+      await user.keyboard('{Enter}')
+
+      expect(setIsEditing).toHaveBeenCalledWith(true)
+    })
+
+    it('edit button is keyboard accessible with Space key', async () => {
+      const user = userEvent.setup()
+      const setIsEditing = jest.fn()
+
+      renderWithMocks({setIsEditing})
+
+      const editButton = screen.getByRole('button', {name: /Edit comment:/i})
+      editButton.focus()
+      await user.keyboard(' ')
+
+      expect(setIsEditing).toHaveBeenCalledWith(true)
     })
   })
 })

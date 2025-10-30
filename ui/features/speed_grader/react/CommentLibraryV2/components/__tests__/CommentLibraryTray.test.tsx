@@ -23,8 +23,10 @@ import {InMemoryCache} from '@apollo/client'
 import {CommentLibraryTray} from '../CommentLibraryTray'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import {SpeedGrader_CommentBankItems} from '../../graphql/queries'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
 jest.mock('@canvas/alerts/react/FlashAlert')
+jest.mock('@canvas/do-fetch-api-effect')
 
 describe('CommentLibraryTray', () => {
   const defaultProps = {
@@ -32,6 +34,9 @@ describe('CommentLibraryTray', () => {
     courseId: '1',
     isOpen: true,
     onDismiss: jest.fn(),
+    setCommentFromLibrary: jest.fn(),
+    suggestionsWhenTypingEnabled: true,
+    setSuggestionsWhenTypingEnabled: jest.fn(),
   }
 
   const createCommentsMock = ({
@@ -102,6 +107,7 @@ describe('CommentLibraryTray', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    ;(doFetchApi as jest.Mock).mockResolvedValue({})
   })
 
   describe('Rendering Tests', () => {
@@ -183,10 +189,10 @@ describe('CommentLibraryTray', () => {
       setup(mocks)
 
       await waitFor(() => {
-        expect(screen.getByText('Load more comments')).toBeInTheDocument()
+        expect(screen.getByTestId('load-more-comments-button')).toBeInTheDocument()
       })
 
-      const loadMoreButton = screen.getByRole('button', {name: 'Load more comments'})
+      const loadMoreButton = screen.getByTestId('load-more-comments-button')
       await user.click(loadMoreButton)
 
       await waitFor(() => {
@@ -203,10 +209,10 @@ describe('CommentLibraryTray', () => {
       setup(mocks)
 
       await waitFor(() => {
-        expect(screen.getByText('Load more comments')).toBeInTheDocument()
+        expect(screen.getByTestId('load-more-comments-button')).toBeInTheDocument()
       })
 
-      const loadMoreButton = screen.getByRole('button', {name: 'Load more comments'})
+      const loadMoreButton = screen.getByTestId('load-more-comments-button')
       await user.click(loadMoreButton)
 
       // After fetching more data, we should have additional comments
@@ -247,12 +253,123 @@ describe('CommentLibraryTray', () => {
       setup(mocks, {onDismiss})
 
       await waitFor(() => {
-        expect(screen.getByTestId('tray-close-button')).toBeInTheDocument()
+        expect(screen.getByTestId('library-comment-area')).toBeInTheDocument()
       })
 
-      const closeButton = screen.getByRole('button', {name: 'Close'})
+      const closeButton = screen
+        .getByTestId('tray-close-button')
+        .querySelector('button') as HTMLButtonElement
       await user.click(closeButton)
       expect(onDismiss).toHaveBeenCalled()
+    })
+  })
+
+  describe('CreateCommentSection Integration Tests', () => {
+    it('renders CreateCommentSection within the tray', async () => {
+      const mocks = [createCommentsMock()]
+      setup(mocks)
+
+      await waitFor(() => {
+        expect(screen.getByTestId('library-comment-area')).toBeInTheDocument()
+      })
+
+      expect(screen.getByTestId('create-comment-library-item-textarea')).toBeInTheDocument()
+      expect(screen.getByTestId('add-to-library-button')).toBeInTheDocument()
+    })
+  })
+
+  describe('Comment Selection Tests', () => {
+    it('calls setCommentFromLibrary when a comment is clicked', async () => {
+      const user = userEvent.setup()
+      const setCommentFromLibrary = jest.fn()
+      const mocks = [createCommentsMock({commentCount: 3})]
+      setup(mocks, {setCommentFromLibrary})
+
+      await waitFor(() => {
+        expect(screen.getByText('Test comment 0')).toBeInTheDocument()
+      })
+
+      // Click on the first comment
+      await user.click(screen.getByText('Test comment 0'))
+
+      expect(setCommentFromLibrary).toHaveBeenCalledWith('Test comment 0')
+    })
+
+    it('calls setCommentFromLibrary with correct comment text for different comments', async () => {
+      const user = userEvent.setup()
+      const setCommentFromLibrary = jest.fn()
+      const mocks = [createCommentsMock({commentCount: 3})]
+      setup(mocks, {setCommentFromLibrary})
+
+      await waitFor(() => {
+        expect(screen.getByText('Test comment 1')).toBeInTheDocument()
+      })
+
+      // Click on the second comment
+      await user.click(screen.getByText('Test comment 1'))
+
+      expect(setCommentFromLibrary).toHaveBeenCalledWith('Test comment 1')
+      expect(setCommentFromLibrary).toHaveBeenCalledTimes(1)
+    })
+
+    it('calls setCommentFromLibrary multiple times for multiple clicks', async () => {
+      const user = userEvent.setup()
+      const setCommentFromLibrary = jest.fn()
+      const mocks = [createCommentsMock({commentCount: 3})]
+      setup(mocks, {setCommentFromLibrary})
+
+      await waitFor(() => {
+        expect(screen.getByText('Test comment 0')).toBeInTheDocument()
+      })
+
+      // Click on first comment
+      await user.click(screen.getByText('Test comment 0'))
+      expect(setCommentFromLibrary).toHaveBeenCalledWith('Test comment 0')
+
+      // Click on second comment
+      await user.click(screen.getByText('Test comment 1'))
+      expect(setCommentFromLibrary).toHaveBeenCalledWith('Test comment 1')
+
+      expect(setCommentFromLibrary).toHaveBeenCalledTimes(2)
+    })
+  })
+
+  describe('SuggestionsEnabledToggleSection Integration Tests', () => {
+    it('renders suggestions toggle section', async () => {
+      const mocks = [createCommentsMock()]
+      setup(mocks)
+
+      await waitFor(() => {
+        expect(screen.getByTestId('comment-suggestions-when-typing')).toBeInTheDocument()
+      })
+    })
+
+    it('toggle reflects initial suggestionsWhenTypingEnabled state', async () => {
+      const mocks = [createCommentsMock()]
+      setup(mocks, {suggestionsWhenTypingEnabled: false})
+
+      await waitFor(() => {
+        expect(screen.getByTestId('suggestions-when-typing-toggle')).toBeInTheDocument()
+      })
+
+      const checkbox = screen.getByTestId('suggestions-when-typing-toggle')
+      expect(checkbox).not.toBeChecked()
+    })
+
+    it('calls setSuggestionsWhenTypingEnabled when toggle is clicked', async () => {
+      const user = userEvent.setup()
+      const setSuggestionsWhenTypingEnabled = jest.fn()
+      const mocks = [createCommentsMock()]
+      setup(mocks, {suggestionsWhenTypingEnabled: true, setSuggestionsWhenTypingEnabled})
+
+      await waitFor(() => {
+        expect(screen.getByTestId('suggestions-when-typing-toggle')).toBeInTheDocument()
+      })
+
+      const checkbox = screen.getByTestId('suggestions-when-typing-toggle')
+      await user.click(checkbox)
+
+      expect(setSuggestionsWhenTypingEnabled).toHaveBeenCalledWith(false)
     })
   })
 })

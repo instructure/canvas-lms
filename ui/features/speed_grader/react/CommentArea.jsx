@@ -28,6 +28,12 @@ import ReactDOM from 'react-dom'
 import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
 import {CommentLibrary as CommentLibraryV2} from './CommentLibraryV2/CommentLibrary'
 
+const pureTextCommentToRCEComment = value =>
+  value
+    .split(/\n/)
+    .map(it => `<p>${it}</p>`)
+    .join('')
+
 const I18n = createI18nScope('speed_grader')
 
 function Portal({node, children}) {
@@ -62,9 +68,15 @@ export default function CommentArea({
 
   const setFocusToTextArea = useCallback(() => {
     if (textAreaRef.current) {
-      textAreaRef.current.focus()
+      if (useRCELite) {
+        const editor = textAreaRef.current?.editor
+        editor?.focus()
+        editor?.selection.setCursorLocation(editor.getBody(), editor.getBody().childNodes.length)
+      } else {
+        textAreaRef.current.focus()
+      }
     }
-  }, [textAreaRef])
+  }, [useRCELite])
 
   const onSetSuggestionsRef = useCallback(node => {
     setSuggestionsRef(node)
@@ -94,7 +106,21 @@ export default function CommentArea({
     <>
       {showCommentLibrary &&
         (ENV?.use_comment_library_v2 ? (
-          <CommentLibraryV2 userId={userId} courseId={courseId} />
+          <CommentLibraryV2
+            comment={comment}
+            userId={userId}
+            courseId={courseId}
+            setFocusToTextArea={setFocusToTextArea}
+            setComment={content => {
+              // Instead of forcing rerenders with handleContentChange to set value,
+              // just use RCE's api to set content
+              handleContentChange(content, false)
+              if (useRCELite) {
+                const editor = textAreaRef.current?.editor
+                editor?.setContent(pureTextCommentToRCEComment(editor?.dom.encode(content)))
+              }
+            }}
+          />
         ) : (
           <CommentLibrary
             setFocusToTextArea={setFocusToTextArea}

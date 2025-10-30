@@ -17,16 +17,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {useState} from 'react'
 import CommentReadView from './CommentReadView'
+import CommentEditView from './CommentEditView'
 
 export type CommentRouterViewProps = {
   comment: string
   index: number
+  id: string
   onClick: () => void
 }
-const CommentRouterView: React.FC<CommentRouterViewProps> = ({comment, ...props}) => {
-  // editing view will be routed here
-  return <CommentReadView comment={comment} {...props} />
+const CommentRouterView: React.FC<CommentRouterViewProps> = ({comment, id, ...props}) => {
+  const [isEditing, setIsEditing] = useState(false)
+
+  if (isEditing) {
+    return <CommentEditView id={id} initialValue={comment} onClose={() => setIsEditing(false)} />
+  }
+  return <CommentReadView id={id} comment={comment} setIsEditing={setIsEditing} {...props} />
 }
 
 export default CommentRouterView

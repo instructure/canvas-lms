@@ -30,6 +30,8 @@ import CommentRouterView from './CommentRouterView'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {SpeedGrader_CommentBankItems} from '../graphql/queries'
 import {SpeedGrader_CommentBankItemsQuery} from '@canvas/graphql/codegen/graphql'
+import {CreateCommentSection} from './CreateCommentSection'
+import {SuggestionsEnabledToggleSection} from './SuggestionsEnabledToggleSection'
 
 const I18n = createI18nScope('CommentLibrary')
 
@@ -38,6 +40,9 @@ export type CommentLibraryTrayProps = {
   courseId: string
   isOpen: boolean
   onDismiss: () => void
+  setCommentFromLibrary: (value: string) => void
+  suggestionsWhenTypingEnabled: boolean
+  setSuggestionsWhenTypingEnabled: (value: boolean) => void
 }
 
 export const CommentLibraryTray: React.FC<CommentLibraryTrayProps> = ({
@@ -45,6 +50,9 @@ export const CommentLibraryTray: React.FC<CommentLibraryTrayProps> = ({
   userId,
   isOpen,
   onDismiss,
+  setCommentFromLibrary,
+  suggestionsWhenTypingEnabled,
+  setSuggestionsWhenTypingEnabled,
 }) => {
   const queryVariables = useMemo(
     () => ({userId, courseId, first: 20, after: ''}),
@@ -91,16 +99,17 @@ export const CommentLibraryTray: React.FC<CommentLibraryTrayProps> = ({
         {comments.map((it: {_id: string; comment: string}, index: number) => (
           <CommentRouterView
             key={it._id}
-            // doing nothing for now
-            onClick={() => {}}
+            onClick={() => setCommentFromLibrary(it.comment)}
             comment={it.comment}
             index={index}
+            id={it._id}
           />
         ))}
         {hasNextPage && (
           <Flex justifyItems="center" padding="small 0">
             <Flex.Item>
               <Button
+                data-testid="load-more-comments-button"
                 onClick={() => {
                   fetchMore({variables: {...queryVariables, after: endCursor}})
                 }}
@@ -135,9 +144,9 @@ export const CommentLibraryTray: React.FC<CommentLibraryTrayProps> = ({
             {onDismiss && (
               <Flex.Item as="div">
                 <CloseButton
-                  data-testid="tray-close-button"
                   screenReaderLabel={I18n.t('Close')}
                   onClick={onDismiss}
+                  data-testid="tray-close-button"
                 />
               </Flex.Item>
             )}
@@ -145,7 +154,14 @@ export const CommentLibraryTray: React.FC<CommentLibraryTrayProps> = ({
         </Flex.Item>
 
         <Flex.Item as="div" shouldGrow shouldShrink padding="small">
+          <SuggestionsEnabledToggleSection
+            checked={suggestionsWhenTypingEnabled}
+            onChange={setSuggestionsWhenTypingEnabled}
+          />
           {content}
+        </Flex.Item>
+        <Flex.Item as="div" padding="small">
+          <CreateCommentSection courseId={courseId} />
         </Flex.Item>
       </Flex>
     </Tray>
