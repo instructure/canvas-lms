@@ -440,6 +440,7 @@ class ApplicationController < ActionController::Base
     courses_popout_sisid
     create_external_apps_side_tray_overrides
     dashboard_graphql_integration
+    developer_key_user_agent_alert
     disallow_threaded_replies_fix_alert
     disallow_threaded_replies_manage
     discussion_ai_survey_link
