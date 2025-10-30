@@ -189,9 +189,24 @@ class GroupMembership < ActiveRecord::Base
   def update_cached_due_dates
     return unless update_cached_due_dates?
 
+    # Visibility cache keys are generated from input parameters, not from query results.
+    # Different API endpoints pass different parameter combinations (specific content IDs,
+    # all active IDs, or nil), each with include_concluded true/false. We must invalidate
+    # all possible combinations to ensure users immediately lose access when removed from groups.
+
     assignments = []
+    wiki_pages = []
+    discussion_topics = []
+
     if group.non_collaborative
-      assignments += AssignmentOverride.active.where(set_type: "Group", set_id: group.id).pluck(:assignment_id)
+      overrides = AssignmentOverride.active.where(set_type: "Group", set_id: group.id)
+      parent_assignment_ids = overrides.where.not(assignment_id: nil).pluck(:assignment_id)
+      assignments += parent_assignment_ids
+      if parent_assignment_ids.any?
+        assignments += SubAssignment.active.where(parent_assignment_id: parent_assignment_ids).pluck(:id)
+      end
+      wiki_pages += overrides.where.not(wiki_page_id: nil).pluck(:wiki_page_id)
+      discussion_topics += overrides.where.not(discussion_topic_id: nil).pluck(:discussion_topic_id)
     else
       assignments += Assignment.where(context_type: group.context_type, context_id: group.context_id)
                                .where(group_category_id: group.group_category_id).pluck(:id)
@@ -199,7 +214,85 @@ class GroupMembership < ActiveRecord::Base
                                     .where.not(assignment_id: nil).where(group_category_id: group.group_category_id).pluck(:assignment_id)
     end
 
-    SubmissionLifecycleManager.recompute_users_for_course(user.id, group.context_id, assignments) if assignments.any?
+    if assignments.any?
+      Submission.active.where(user_id: user.id, assignment_id: assignments)
+                .update_all(workflow_state: :deleted, updated_at: Time.zone.now)
+
+      AbstractAssignment.where(id: assignments).touch_and_clear_cache_keys(:availability)
+
+      published_assignment_ids = Assignment.where(context_id: group.context_id, workflow_state: "published").pluck(:id)
+      assignment_id_sets = [assignments, published_assignment_ids].uniq
+
+      [true, false].each do |include_concluded|
+        assignment_id_sets.each do |assignment_ids|
+          AssignmentVisibility::AssignmentVisibilityService.invalidate_cache(
+            course_ids: [group.context_id],
+            user_ids: [user.id],
+            assignment_ids:,
+            include_concluded:
+          )
+        end
+
+        AssignmentVisibility::AssignmentVisibilityService.invalidate_cache(
+          course_ids: [group.context_id],
+          user_ids: [user.id],
+          include_concluded:
+        )
+      end
+
+      SubmissionLifecycleManager.recompute_users_for_course(user.id, group.context_id, assignments)
+    end
+
+    RequestCache.clear if RequestCache.instance_variable_get(:@enabled)
+
+    if wiki_pages.any?
+      WikiPage.where(id: wiki_pages).touch_and_clear_cache_keys(:availability)
+
+      active_wiki_page_ids = WikiPage.where(context_type: "Course", context_id: group.context_id, workflow_state: "active").pluck(:id)
+      wiki_page_id_sets = [wiki_pages, active_wiki_page_ids].uniq
+
+      [true, false].each do |include_concluded|
+        wiki_page_id_sets.each do |page_ids|
+          WikiPageVisibility::WikiPageVisibilityService.invalidate_cache(
+            course_ids: [group.context_id],
+            user_ids: [user.id],
+            wiki_page_ids: page_ids,
+            include_concluded:
+          )
+        end
+
+        WikiPageVisibility::WikiPageVisibilityService.invalidate_cache(
+          course_ids: [group.context_id],
+          user_ids: [user.id],
+          include_concluded:
+        )
+      end
+    end
+
+    if discussion_topics.any?
+      DiscussionTopic.where(id: discussion_topics).touch_and_clear_cache_keys(:availability)
+
+      active_discussion_ids = DiscussionTopic.where(context_type: "Course", context_id: group.context_id, workflow_state: "active").pluck(:id)
+      discussion_id_sets = [discussion_topics, active_discussion_ids].uniq
+
+      [true, false].each do |include_concluded|
+        discussion_id_sets.each do |topic_ids|
+          UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.invalidate_cache(
+            course_ids: [group.context_id],
+            user_ids: [user.id],
+            discussion_topic_ids: topic_ids,
+            include_concluded:
+          )
+        end
+
+        UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.invalidate_cache(
+          course_ids: [group.context_id],
+          user_ids: [user.id],
+          include_concluded:
+        )
+      end
+    end
+    User.touch_and_clear_cache_keys([user], :groups, :todo_list, :submissions, :potential_unread_submission_ids)
   end
 
   def touch_groups
@@ -233,7 +326,7 @@ class GroupMembership < ActiveRecord::Base
   end
 
   def invalidate_user_membership_cache
-    user.clear_cache_key(:groups)
+    user.clear_cache_key(:groups, :todo_list, :submissions, :potential_unread_submission_ids)
   end
 
   alias_method :destroy_permanently!, :destroy

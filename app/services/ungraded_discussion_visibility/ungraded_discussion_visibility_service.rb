@@ -37,6 +37,20 @@ module UngradedDiscussionVisibility
           )
         end
       end
+
+      def invalidate_cache(course_ids: nil, user_ids: nil, discussion_topic_ids: nil, include_concluded: true)
+        unless course_ids || discussion_topic_ids
+          raise ArgumentError, "at least one non nil course_id or discussion_topic_id is required (for query performance reasons)"
+        end
+
+        course_ids = Array(course_ids) if course_ids
+        user_ids = Array(user_ids) if user_ids
+        discussion_topic_ids = Array(discussion_topic_ids) if discussion_topic_ids
+
+        key = service_cache_key(service: name, course_ids:, user_ids:, additional_ids: discussion_topic_ids, include_concluded:)
+
+        Rails.cache.delete(key)
+      end
     end
   end
 end
