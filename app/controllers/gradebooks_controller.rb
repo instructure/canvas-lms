@@ -157,6 +157,7 @@ class GradebooksController < ApplicationController
           updated_at: comment.updated_at,
           comment: comment.comment,
           display_updated_at: datetime_string(comment.updated_at),
+          # this is causing multiple N+1 query problems and should be fixed
           is_read: comment.read?(@current_user) || (!@presenter.student_is_user? && !@presenter.user_an_observer_of_student?),
         }
         if comment.media_comment? && (media_object = SubmissionComment.serialize_media_comment(comment.media_comment_id))
@@ -1851,6 +1852,7 @@ class GradebooksController < ApplicationController
     courses << @context if courses.empty?
 
     courses.map do |course|
+      # this is causing an N+1 query problem and should be fixed
       grading_period_set_id = GradingPeriodGroup.for_course(course)&.id
 
       {
