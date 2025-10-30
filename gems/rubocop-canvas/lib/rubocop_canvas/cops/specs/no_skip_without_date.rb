@@ -27,9 +27,11 @@ module RuboCop
       # @example
       #   # bad
       #   skip 'This test needs to be fixed'
+      #   context "name", skip: "reason"
       #
       #   # good
       #   skip '2025-09-05 This test needs to be fixed'
+      #   context "name", skip: "2025-09-05 reason"
       class NoSkipWithoutDate < RuboCop::Cop::Base
         MSG = "Must include a date for all 'skip' in the format YYYY-MM-DD."
         METHOD = :skip
@@ -59,6 +61,21 @@ module RuboCop
 
           # If no related comments contain the date format, add an offense.
           add_offense node, message: MSG, severity: :error
+        end
+
+        # Check for skip in RSpec metadata (e.g., context "name", skip: "reason")
+        def on_hash(node)
+          node.pairs.each do |pair|
+            next unless pair.key.type == :sym && pair.key.value == :skip
+
+            value_node = pair.value
+            next unless value_node.type == :str
+
+            skip_reason = value_node.value
+            next if skip_reason.match?(DATE_REGEX)
+
+            add_offense pair, message: MSG, severity: :error
+          end
         end
 
         def contains_date?(reason)

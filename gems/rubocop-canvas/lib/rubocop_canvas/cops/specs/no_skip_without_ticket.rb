@@ -22,6 +22,16 @@ require "jira_ref_parser"
 module RuboCop
   module Cop
     module Specs
+      # This cop checks that RSpec's `skip` includes a JIRA ticket reference.
+      #
+      # @example
+      #   # bad
+      #   skip 'This test needs to be fixed'
+      #   context "name", skip: "Not ready yet"
+      #
+      #   # good
+      #   skip 'This test needs to be fixed CNVS-12345'
+      #   context "name", skip: "Not ready yet CNVS-12345"
       class NoSkipWithoutTicket < Base
         MSG = "Reference a ticket if skipping. " \
               "Example: skip('time bomb on saturdays CNVS-123456')."
@@ -48,6 +58,21 @@ module RuboCop
           return if refs_ticket?(reason)
 
           add_offense node, message: MSG, severity: :error
+        end
+
+        # Check for skip in RSpec metadata (e.g., context "name", skip: "reason")
+        def on_hash(node)
+          node.pairs.each do |pair|
+            next unless pair.key.type == :sym && pair.key.value == :skip
+
+            value_node = pair.value
+            next unless value_node.type == :str
+
+            skip_reason = value_node.value
+            next if refs_ticket?(skip_reason)
+
+            add_offense pair, message: MSG, severity: :error
+          end
         end
 
         def refs_ticket?(reason)
