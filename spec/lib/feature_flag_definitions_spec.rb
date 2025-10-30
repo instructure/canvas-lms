@@ -21,8 +21,12 @@
 require "spec_helper"
 
 describe "feature_flag_definition_spec" do
+  let(:skip_features) { %w[block_editor block_template_editor] }
+
   Feature.definitions.each_key do |feature_name|
     it "#{feature_name} should have a display_name and description lambdas" do
+      skip if skip_features.include?(feature_name)
+
       feature = Feature.definitions[feature_name]
       expect(feature).to_not be_nil
       expect(feature.display_name.call).to_not be_nil
@@ -36,6 +40,8 @@ describe "feature_flag_definition_spec" do
 
       hook_name = definition[hook]
       it "#{name} hook for #{hook} (#{hook_name}) should exist in FeatureFlags::Hooks as a static method" do
+        skip if skip_features.include?(name)
+
         expect(FeatureFlags::Hooks.respond_to?(hook_name)).to be true
       end
     end

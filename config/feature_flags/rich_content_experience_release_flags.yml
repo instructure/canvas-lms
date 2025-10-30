@@ -24,7 +24,7 @@ auto_show_cc:
 
 block_editor:
   applies_to: Account
-  state: hidden
+  state: disabled
   display_name: Block Editor
   description: |-
     Enable the new block editor for the rich content editor.
@@ -32,7 +32,7 @@ block_editor:
 
 block_template_editor:
   applies_to: Account
-  state: hidden
+  state: disabled
   display_name: Block Template Editor
   description: |-
     Surfaces the "Block Editor Templates - edit" permission in the permissions UI.
