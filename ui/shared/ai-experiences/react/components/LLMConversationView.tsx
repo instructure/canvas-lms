@@ -124,7 +124,6 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
         setError(null)
       }
     } catch (error) {
-      console.error('Failed to initialize conversation:', error)
       setError(I18n.t('Failed to start conversation. Please try again.'))
     } finally {
       setIsInitializing(false)
@@ -163,7 +162,6 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
         setError(null)
       }
     } catch (error) {
-      console.error('Failed to send message:', error)
       setError(I18n.t('Failed to send message. Please try again.'))
       // Remove the optimistically added message on error
       setMessages(prev => prev.slice(0, -1))
@@ -199,7 +197,6 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
         setError(null)
       }
     } catch (error) {
-      console.error('Failed to restart conversation:', error)
       setError(I18n.t('Failed to restart conversation. Please try again.'))
     } finally {
       setIsInitializing(false)
@@ -314,7 +311,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
           <Alert
             variant="error"
             margin="0 0 small 0"
-            renderCloseButtonLabel="Close"
+            renderCloseButtonLabel={I18n.t('Close')}
             onDismiss={() => setError(null)}
           >
             {error}
