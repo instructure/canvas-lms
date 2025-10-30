@@ -9227,6 +9227,11 @@ type SubAssignmentSubmission {
   customGradeStatusId: ID
 
   """
+  how many points are being deducted due to late policy
+  """
+  deductedPoints: Float
+
+  """
   the submission grade *before* late policy deductions were applied
   """
   enteredGrade: String
@@ -9251,6 +9256,7 @@ type SubAssignmentSubmission {
   secondsLate: Int
   statusTag: SubmissionStatusTagType!
   subAssignmentTag: String
+  submittedAt: DateTime
 }
 
 type SubHeader implements ModuleItemInterface {

@@ -453,7 +453,9 @@ module Api::V1::Submission
       "grade",
       "score",
       "user_id",
-      "grade_matches_current_submission"
+      "grade_matches_current_submission",
+      "submitted_at",
+      "points_deducted"
     )
     sub_assignment_json["sub_assignment_tag"] = assignment.sub_assignment_tag
     sub_assignment_json["published_grade"] = submission.published_grade
