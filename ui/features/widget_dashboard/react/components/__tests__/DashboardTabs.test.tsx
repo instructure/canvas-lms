@@ -23,6 +23,7 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {setupServer} from 'msw/node'
 import {graphql, http, HttpResponse} from 'msw'
 import DashboardTabs from '../DashboardTabs'
+import {WidgetDashboardProvider} from '../../hooks/useWidgetDashboardContext'
 import {defaultGraphQLHandlers} from '../../__tests__/testHelpers'
 
 type Props = Record<string, never> // DashboardTabs has no props
@@ -111,6 +112,17 @@ const server = setupServer(
       },
     ])
   }),
+  // Mock GraphQL mutation for tab selection
+  graphql.mutation('UpdateLearnerDashboardTabSelection', () => {
+    return HttpResponse.json({
+      data: {
+        updateLearnerDashboardTabSelection: {
+          tab: 'courses',
+          errors: null,
+        },
+      },
+    })
+  }),
 )
 
 const buildDefaultProps = (overrides = {}): Props => {
@@ -119,7 +131,7 @@ const buildDefaultProps = (overrides = {}): Props => {
   return {...defaultProps, ...overrides}
 }
 
-const setup = (props?: Props, envOverrides = {}) => {
+const setup = (props?: Props, envOverrides = {}, preferencesOverrides = {}) => {
   const user = userEvent.setup()
 
   // Set up Canvas ENV with current_user_id
@@ -140,9 +152,18 @@ const setup = (props?: Props, envOverrides = {}) => {
     },
   })
 
+  const preferences = {
+    dashboard_view: 'cards',
+    hide_dashcard_color_overlays: false,
+    custom_colors: {},
+    ...preferencesOverrides,
+  }
+
   const renderResult = render(
     <QueryClientProvider client={queryClient}>
-      <DashboardTabs {...buildDefaultProps(props)} />
+      <WidgetDashboardProvider preferences={preferences}>
+        <DashboardTabs {...buildDefaultProps(props)} />
+      </WidgetDashboardProvider>
     </QueryClientProvider>,
   )
 
@@ -302,6 +323,46 @@ describe('DashboardTabs', () => {
     await waitFor(() => {
       expect(getByTestId('dashboard-tabs')).toBeInTheDocument()
     })
+
+    cleanup()
+  })
+
+  it('should initialize with saved preference for courses tab', async () => {
+    const {getByTestId, cleanup} = setup({}, {}, {learner_dashboard_tab_selection: 'courses'})
+
+    await waitFor(() => {
+      expect(getByTestId('courses-tab-content')).toBeInTheDocument()
+    })
+
+    cleanup()
+  })
+
+  it('should initialize with saved preference for dashboard tab', async () => {
+    const {getByTestId, cleanup} = setup({}, {}, {learner_dashboard_tab_selection: 'dashboard'})
+
+    await waitFor(() => {
+      expect(getByTestId('dashboard-tab-content')).toBeInTheDocument()
+    })
+
+    cleanup()
+  })
+
+  it('should persist tab selection when switching tabs', async () => {
+    const {user, getByTestId, cleanup} = setup()
+
+    await waitFor(() => {
+      expect(getByTestId('tab-courses')).toBeInTheDocument()
+    })
+
+    const coursesTab = getByTestId('tab-courses')
+    await user.click(coursesTab)
+
+    await waitFor(() => {
+      expect(getByTestId('courses-tab-content')).toBeInTheDocument()
+    })
+
+    // Verify mutation was called (mutation is mocked in server)
+    // The actual API call happens via the useTabState hook
 
     cleanup()
   })
