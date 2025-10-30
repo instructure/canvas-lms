@@ -607,6 +607,7 @@ export default (AssignmentListItemView = (function () {
 
         // Rerender the list item
         this.render()
+        document.getElementById(`assign_${this.model.id}_manage_link`)?.focus()
       }
       root.render(<CreateAssignmentViewAdapter assignment={this.model} closeHandler={onClose} />)
     }
