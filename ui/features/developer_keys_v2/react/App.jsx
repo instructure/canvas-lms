@@ -34,6 +34,7 @@ import NewKeyModal from './NewKeyModal'
 import {showFlashAlert, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import DateHelper from '@canvas/datetime/dateHelper'
 import {DynamicRegistrationModal} from './dynamic_registration/DynamicRegistrationModal'
+import {Flex} from '@instructure/ui-flex'
 
 const I18n = createI18nScope('react_developer_keys')
 /**
@@ -165,30 +166,39 @@ class DeveloperKeysApp extends React.Component {
   alerts() {
     return [
       {
-        text: I18n.t(
-          `API requests now require the User-Agent header to be set. These requests are now blocked in Beta, and enforcement in Test and Prod is coming soon - please see the *API Change Log* for dates. 
-          You can review any current calls which do not meet this requirement in the Requests Without User Agent report on the **reports page**, 
-          and read more about the change on our ***blog***.`,
-          {
-            wrappers: [
-              `<a data-pendo='dev-key-change-log' target='_blank' href='https://community.canvaslms.com/t5/Canvas-Change-Log/2025-API-and-CLI-Change-Log/ta-p/626858' style='text-decoration: underline'>$1</a>`,
-              `<a data-pendo='dev-key-reports-page' target='_blank' href='/accounts/${window.ENV.ACCOUNT_ID}/settings#tab-reports' style='text-decoration: underline'>$1</a>`,
-              `<a data-pendo='dev-key-blog' target='_blank' href='https://community.canvaslms.com/t5/Canvas-LMS-Blog/Enforcing-User-Agent-Header-for-Canvas-API-Requests/ba-p/658205' style='text-decoration: underline'>$1</a>`,
-            ],
-          },
-        ),
+        text: [
+          I18n.t(
+            `API requests now require the User-Agent header to be set. These requests are now blocked in Beta, and enforcement in Test and Production is coming soon - please see the *API Change Log* for dates. `,
+            {
+              wrappers: [
+                `<a data-pendo='dev-key-change-log' target='_blank' href='https://community.canvaslms.com/t5/Canvas-Change-Log/2025-API-and-CLI-Change-Log/ta-p/626858' style='text-decoration: underline'>$1</a>`,
+              ],
+            },
+          ),
+          I18n.t(
+            `You can review any current calls without a User-Agent set in Test and Production on the *Reports Page* until the enforcement date, and read more about the change on our **blog**.`,
+            {
+              wrappers: [
+                `<a data-pendo='dev-key-reports-page' target='_blank' href='/accounts/${window.ENV.ACCOUNT_ID}/settings#tab-reports' style='text-decoration: underline'>$1</a>`,
+                `<a data-pendo='dev-key-blog' target='_blank' href='https://community.canvaslms.com/t5/Canvas-LMS-Blog/Enforcing-User-Agent-Header-for-Canvas-API-Requests/ba-p/658205' style='text-decoration: underline'>$1</a>`,
+              ],
+            },
+          ),
+        ],
         type: 'warning',
         shouldShow: ENV.FEATURES?.developer_key_user_agent_alert,
       },
       {
-        text: I18n.t(
-          `LTI tool management is now live in *Canvas Apps*! Changes sync between both pages as we develop more features for Apps. From now on, Apps is the primary home for LTI tools.`,
-          {
-            wrappers: [
-              `<a data-pendo='dev-key-apps-link' target='_blank' href='/accounts/${window.ENV.ACCOUNT_ID}/apps/manage' style='text-decoration: underline'>$1</a>`,
-            ],
-          },
-        ),
+        text: [
+          I18n.t(
+            `LTI tool management is now live in *Canvas Apps*! Changes sync between both pages as we develop more features for Apps. From now on, Apps is the primary home for LTI tools.`,
+            {
+              wrappers: [
+                `<a data-pendo='dev-key-apps-link' target='_blank' href='/accounts/${window.ENV.ACCOUNT_ID}/apps/manage' style='text-decoration: underline'>$1</a>`,
+              ],
+            },
+          ),
+        ],
         type: 'info',
         shouldShow: true,
       },
@@ -231,11 +241,16 @@ class DeveloperKeysApp extends React.Component {
               variant={alert.type || 'info'}
               hasShadow={false}
             >
-              <Text
-                dangerouslySetInnerHTML={{
-                  __html: alert.text,
-                }}
-              />
+              <Flex gap="xx-small" direction="column">
+                {alert.text.map((text, j) => (
+                  <Text
+                    key={j}
+                    dangerouslySetInnerHTML={{
+                      __html: text,
+                    }}
+                  />
+                ))}
+              </Flex>
             </Alert>
           ))}
         <Tabs
