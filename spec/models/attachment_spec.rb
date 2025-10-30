@@ -2010,6 +2010,44 @@ describe Attachment do
     end
   end
 
+  describe "copy_attachment_content" do
+    let_once(:course) { course_model }
+
+    def fresh_attachment(**opts)
+      attachment_model({ context: course }.merge(opts))
+      @attachment
+    end
+
+    it "copy_attachment_content stores file when open returns IO" do
+      source = fresh_attachment(filename: "src.txt", content_type: "text/plain")
+      dest = fresh_attachment(filename: "dest.txt", content_type: "text/plain")
+      io = StringIO.new("content2")
+      allow(source).to receive(:open).and_return(io)
+      expect(Attachments::Storage).to receive(:store_for_attachment).with(dest, io)
+      source.copy_attachment_content(dest)
+      expect(dest.workflow_state).to eq("pending_upload")
+      expect(dest.filename).to eq(source.filename)
+    end
+
+    it "copy_attachment_content marks destination broken when open returns nil and md5 nil" do
+      source = fresh_attachment(filename: "src.txt", content_type: "text/plain")
+      dest = fresh_attachment(filename: "dest.txt", content_type: "text/plain")
+      allow(source).to receive(:open).and_return(nil)
+      expect(Attachments::Storage).not_to receive(:store_for_attachment)
+      expect { source.copy_attachment_content(dest) }.to change { dest.reload.file_state }.to("broken")
+    end
+
+    it "copy_attachment_content leaves file_state unchanged when open returns nil and md5 present" do
+      source = fresh_attachment(filename: "src.txt", content_type: "text/plain")
+      dest = fresh_attachment(filename: "dest.txt", content_type: "text/plain", md5: "already")
+      original_state = dest.file_state
+      allow(source).to receive(:open).and_return(nil)
+      expect(Attachments::Storage).not_to receive(:store_for_attachment)
+      source.copy_attachment_content(dest)
+      expect(dest.reload.file_state).to eq(original_state)
+    end
+  end
+
   describe "#change_namespace and #make_childless" do
     before :once do
       @old_account = account_model
