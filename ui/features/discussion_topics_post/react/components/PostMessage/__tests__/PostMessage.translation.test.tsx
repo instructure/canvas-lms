@@ -440,7 +440,36 @@ describe('PostMessage AI translation', () => {
       const changeLanguageLink = await findByTestId('change-language-link')
       changeLanguageLink.click()
 
-      expect(setModalOpenMock).toHaveBeenCalledWith('1', 'Posts are fun')
+      expect(setModalOpenMock).toHaveBeenCalledWith('1', 'Posts are fun', undefined)
+    })
+
+    it('should call setModalOpen with originalTitle when id is "topic"', async () => {
+      const setModalOpenMock = jest.fn()
+
+      useTranslationStoreMock.mockImplementation((selector: any) => {
+        const state = {
+          ...initalMockState,
+          entries: {
+            topic: {
+              loading: false,
+              language: 'en',
+              translatedTitle: 'Translated title',
+              translatedMessage: 'Translated message',
+            },
+          },
+          removeEntry: jest.fn(),
+          setModalOpen: setModalOpenMock,
+        }
+
+        return selector(state)
+      })
+
+      const {findByTestId} = setup({discussionEntry: undefined})
+
+      const changeLanguageLink = await findByTestId('change-language-link')
+      changeLanguageLink.click()
+
+      expect(setModalOpenMock).toHaveBeenCalledWith('topic', 'Posts are fun', 'Thoughts')
     })
 
     it('should call clearEntry when "Hide translation" is clicked', async () => {
