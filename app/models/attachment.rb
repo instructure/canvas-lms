@@ -2019,7 +2019,14 @@ class Attachment < ActiveRecord::Base
       destination.workflow_state = "processed"
     else
       destination.avoid_linking_to_root_attachment = true if split_root_attachment
-      Attachments::Storage.store_for_attachment(destination, open)
+      # If open returns nil (e.g., underlying S3 object missing and marked broken),
+      # skip attempting to store, and mark destination broken as well to prevent
+      # downstream service errors like InstFS::BadRequestError ("No file uploaded").
+      if (source_file = open)
+        Attachments::Storage.store_for_attachment(destination, source_file)
+      elsif destination.md5.nil?
+        Attachment.where(id: destination).update_all(file_state: "broken")
+      end
     end
   end
 
