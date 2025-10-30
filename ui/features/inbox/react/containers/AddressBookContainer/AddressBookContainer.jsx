@@ -26,6 +26,7 @@ import {
 import {useQuery} from '@apollo/client'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {decodeHTMLShortName} from '../../../util/utils'
 
 const I18n = createI18nScope('conversations_2')
 
@@ -226,7 +227,7 @@ export const AddressBookContainer = props => {
     let contextData = (data?.legacyNode?.recipients?.contextsConnection?.nodes || []).map(c => {
       return {
         id: c.id,
-        name: c.name,
+        name: decodeHTMLShortName(c.name),
         userCount: c.userCount,
         itemType: CONTEXT_TYPE,
       }
@@ -237,7 +238,7 @@ export const AddressBookContainer = props => {
       return {
         _id: u._id,
         id: u.id,
-        name: u.shortName,
+        name: decodeHTMLShortName(u.shortName),
         pronouns: u.pronouns,
         commonCoursesInfo: props.includeCommonCourses
           ? getCommonCoursesInformation(u.commonCoursesConnection)

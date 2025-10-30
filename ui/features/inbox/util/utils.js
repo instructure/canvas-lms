@@ -49,8 +49,9 @@ export const decodeHTMLAuthor = author => {
   }
 }
 
-const decodeHTMLShortName = name => {
-  return new DOMParser().parseFromString(name, 'text/html').body.innerHTML
+export const decodeHTMLShortName = name => {
+  if (!name) return name
+  return new DOMParser().parseFromString(name, 'text/html').body.textContent
 }
 
 // Takes in data from either a VIEWABLE_SUBMISSIONS_QUERY or CONVERSATIONS_QUERY
