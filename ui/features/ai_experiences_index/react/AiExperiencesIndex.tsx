@@ -26,6 +26,7 @@ import {Text} from '@instructure/ui-text'
 import {Button} from '@instructure/ui-buttons'
 import {IconAddLine} from '@instructure/ui-icons'
 import AIExperienceList from './components/AIExperienceList'
+import AIExperiencesEmptyState from './components/AIExperiencesEmptyState'
 import type {AiExperience} from './types'
 
 const AiExperiencesIndex: React.FC = () => {
@@ -168,28 +169,23 @@ const AiExperiencesIndex: React.FC = () => {
           <Flex.Item>
             <Heading level="h1">{I18n.t('AI Experiences')}</Heading>
           </Flex.Item>
-          <Flex.Item>
-            <Button
-              data-testid="ai-expriences-index-create-new-button"
-              color="primary"
-              renderIcon={() => <IconAddLine />}
-              onClick={handleCreateNew}
-            >
-              {I18n.t('Create new')}
-            </Button>
-          </Flex.Item>
+          {experiences.length > 0 && (
+            <Flex.Item>
+              <Button
+                data-testid="ai-expriences-index-create-new-button"
+                color="primary"
+                renderIcon={() => <IconAddLine />}
+                onClick={handleCreateNew}
+              >
+                {I18n.t('Create new')}
+              </Button>
+            </Flex.Item>
+          )}
         </Flex>
       </View>
 
       {experiences.length === 0 ? (
-        <View as="div" textAlign="center" margin="large">
-          <Text size="large">{I18n.t('No AI experiences found')}</Text>
-          <View as="div" margin="medium 0 0 0">
-            <Text size="medium" color="secondary">
-              {I18n.t('Create your first AI experience to get started')}
-            </Text>
-          </View>
-        </View>
+        <AIExperiencesEmptyState onCreateNew={handleCreateNew} />
       ) : (
         <AIExperienceList
           experiences={experiences}
