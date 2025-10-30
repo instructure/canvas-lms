@@ -47,6 +47,7 @@ describe('useWidgetDashboardContext', () => {
         dashboard_view: 'cards',
         hide_dashcard_color_overlays: false,
         custom_colors: {},
+        learner_dashboard_tab_selection: 'dashboard',
       }),
     )
     expect(getByTestId('observed-users')).toHaveTextContent('[]')
@@ -187,6 +188,7 @@ describe('useWidgetDashboardContext', () => {
         dashboard_view: 'cards',
         hide_dashcard_color_overlays: false,
         custom_colors: {},
+        learner_dashboard_tab_selection: 'dashboard',
       }),
     )
     expect(getByTestId('observed-users')).toHaveTextContent('[]')

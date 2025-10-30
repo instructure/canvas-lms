@@ -34,6 +34,7 @@ interface DashboardPreferences {
   dashboard_view: string
   hide_dashcard_color_overlays: boolean
   custom_colors: Record<string, string>
+  learner_dashboard_tab_selection?: 'dashboard' | 'courses'
 }
 
 export interface SharedCourseData {
@@ -123,6 +124,7 @@ export const widgetDashboardDefaultProps = {
     dashboard_view: 'cards',
     hide_dashcard_color_overlays: false,
     custom_colors: {},
+    learner_dashboard_tab_selection: 'dashboard' as const,
   },
   observedUsersList: [],
   canAddObservee: false,
