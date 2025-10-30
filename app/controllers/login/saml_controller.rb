@@ -198,6 +198,10 @@ class Login::SamlController < ApplicationController
   end
 
   def destroy
+    # allow this to be in an IFrame, since some IdPs (like Okta) will do that,
+    # and we want the process to process our redirect response
+    @embeddable = true
+
     @aac = message = nil
     key_to_certificate = {}
     log_key_used = lambda do |key|
