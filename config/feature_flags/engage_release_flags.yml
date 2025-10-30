@@ -45,6 +45,7 @@ ai_experiences:
   shadow: true
   display_name: AI Experiences
   description: Introduces AI Experiences - a new Canvas Learning Object.
+  touch_context: true
 updated_mastery_connect_icon:
   state: hidden
   applies_to: SiteAdmin
