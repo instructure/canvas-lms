@@ -403,6 +403,19 @@ describe AiExperiencesController do
           get :edit, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
           expect(response).to have_http_status(:not_found)
         end
+
+        it "renders proper 404 template for HTML requests" do
+          get :index, params: { course_id: @course.id }
+          expect(response).to have_http_status(:not_found)
+          expect(response).to render_template("shared/errors/404_message")
+        end
+
+        it "returns JSON error for JSON requests" do
+          get :index, params: { course_id: @course.id }, format: :json
+          expect(response).to have_http_status(:not_found)
+          json_response = json_parse(response.body)
+          expect(json_response["error"]).to eq("Resource Not Found")
+        end
       end
     end
   end
