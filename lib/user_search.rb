@@ -72,13 +72,11 @@ module UserSearch
       @include_deleted_users = options[:include_deleted_users]
       users_scope = context_scope(context, searcher, options.slice(:enrollment_state,
                                                                    :include_inactive_enrollments,
-                                                                   :enrollment_role_id,
-                                                                   :ui_invoked))
+                                                                   :enrollment_role_id))
       users_scope = roles_scope(users_scope, context, options.slice(:enrollment_role,
                                                                     :enrollment_role_id,
                                                                     :enrollment_type,
                                                                     :exclude_groups,
-                                                                    :ui_invoked,
                                                                     :temporary_enrollment_recipients,
                                                                     :temporary_enrollment_providers))
       users_scope = order_scope(users_scope, context, options.slice(:order, :sort))
