@@ -23,6 +23,7 @@ import {IconArrowOpenDownSolid, IconArrowOpenUpSolid} from '@instructure/ui-icon
 import {Text} from '@instructure/ui-text'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {View} from '@instructure/ui-view'
+import type {ComponentProps} from 'react'
 import {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useLtiAssetProcessorsAndReportsForSpeedgrader} from '../hooks/useLtiAssetProcessorsAndReportsForSpeedgrader'
@@ -47,6 +48,11 @@ export type LtiAssetReportsForSpeedgraderProps = {
   attempt: number
   submissionType: string
   attachments: {_id: string; displayName: string}[]
+
+  // This is to allow the caller to remember the state of the toggle (used in
+  // new speedgrader)
+  expanded?: boolean
+  onToggleExpanded?: ComponentProps<typeof ToggleDetails>['onToggle']
 } & StudentUserIdOrAnonymousId
 
 // If we ever need to use this outside of speedgrader, we should probably change
@@ -133,8 +139,10 @@ export function LtiAssetReportsForSpeedgrader(
         iconPosition="end"
         icon={() => <IconArrowOpenDownSolid />}
         iconExpanded={() => <IconArrowOpenUpSolid />}
-        defaultExpanded
         fluidWidth
+        expanded={props.expanded}
+        onToggle={props.onToggleExpanded}
+        defaultExpanded={props.onToggleExpanded ? undefined : true}
       >
         {submissionType === 'discussion_topic' && assetReports.length > 1 ? (
           <AllReportsCard reports={assetReports} openModal={() => setModalOpen(true)} />

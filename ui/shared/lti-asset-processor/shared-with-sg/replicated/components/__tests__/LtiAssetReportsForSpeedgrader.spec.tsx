@@ -24,7 +24,7 @@ import {
   mockUseLtiAssetReports,
 } from '../../../__tests__/mockedDependenciesShims'
 import {renderComponent} from '../../../__tests__/renderingShims'
-import {describe, expect, it} from '../../../__tests__/testPlatformShims'
+import {describe, expect, fn, it} from '../../../__tests__/testPlatformShims'
 import {useLtiAssetProcessors, useLtiAssetReports} from '../../../dependenciesShims'
 import {defaultGetLtiAssetProcessorsResult} from '../../__fixtures__/default/ltiAssetProcessors'
 import {
@@ -251,6 +251,104 @@ describe('LtiAssetReportsForSpeedgrader', () => {
 
       expect(screen.queryByText('All comments')).not.toBeInTheDocument()
       expect(screen.getByText('My OK Report')).toBeInTheDocument()
+    })
+  })
+
+  describe('collapsible behavior', () => {
+    it("renders with header 'Document processor reports'", () => {
+      mockUseLtiAssetProcessors(defaultGetLtiAssetProcessorsResult)
+      mockUseLtiAssetReports(
+        defaultGetLtiAssetReportsResult({
+          attachmentId: '1234',
+        }),
+      )
+
+      renderComponent(
+        <LtiAssetReportsForSpeedgrader
+          assignmentId="123"
+          attempt={1}
+          submissionType="online_upload"
+          attachments={[{_id: '1234', displayName: 'test.txt'}]}
+          studentUserId="456"
+          studentAnonymousId={null}
+        />,
+      )
+
+      expect(screen.getByTestId('comments-label')).toHaveTextContent('Document processor reports')
+    })
+
+    it('passes expanded prop to ToggleDetails', () => {
+      mockUseLtiAssetProcessors(defaultGetLtiAssetProcessorsResult)
+      mockUseLtiAssetReports(
+        defaultGetLtiAssetReportsResult({
+          attachmentId: '1234',
+        }),
+      )
+
+      const onToggleExpanded = fn()
+      const {rerender} = renderComponent(
+        <LtiAssetReportsForSpeedgrader
+          assignmentId="123"
+          attempt={1}
+          submissionType="online_upload"
+          attachments={[{_id: '1234', displayName: 'test.txt'}]}
+          studentUserId="456"
+          studentAnonymousId={null}
+          expanded={true}
+          onToggleExpanded={onToggleExpanded}
+        />,
+      )
+
+      // When expanded=true, content should be visible
+      expect(screen.getByText('My OK Report')).toBeInTheDocument()
+
+      rerender(
+        <LtiAssetReportsForSpeedgrader
+          assignmentId="123"
+          attempt={1}
+          submissionType="online_upload"
+          attachments={[{_id: '1234', displayName: 'test.txt'}]}
+          studentUserId="456"
+          studentAnonymousId={null}
+          expanded={false}
+          onToggleExpanded={onToggleExpanded}
+        />,
+      )
+
+      // When expanded=false, content should not be visible
+      expect(screen.queryByText('My OK Report')).not.toBeInTheDocument()
+    })
+
+    it('calls onToggleExpanded when ToggleDetails is toggled', () => {
+      mockUseLtiAssetProcessors(defaultGetLtiAssetProcessorsResult)
+      mockUseLtiAssetReports(
+        defaultGetLtiAssetReportsResult({
+          attachmentId: '1234',
+        }),
+      )
+
+      const onToggleExpanded = fn()
+
+      renderComponent(
+        <LtiAssetReportsForSpeedgrader
+          assignmentId="123"
+          attempt={1}
+          submissionType="online_upload"
+          attachments={[{_id: '1234', displayName: 'test.txt'}]}
+          studentUserId="456"
+          studentAnonymousId={null}
+          expanded={false}
+          onToggleExpanded={onToggleExpanded}
+        />,
+      )
+
+      // Click the toggle button to expand
+      const toggleButton = screen.getByRole('button', {
+        name: /Document processor reports/i,
+      })
+      fireEvent.click(toggleButton)
+
+      expect(onToggleExpanded).toHaveBeenCalledWith(expect.any(Object), true)
     })
   })
 })
