@@ -60,6 +60,9 @@ Rails.application.configure do
   # Send deprecation notices to registered listeners
   config.active_support.deprecation = :notify
 
+  # In production, log strict loading violations instead of raising errors
+  config.active_record.action_on_strict_loading_violation = :log
+
   # we use lots of db specific stuff - don't bother trying to dump to ruby
   # (it also takes forever)
   config.active_record.schema_format = :sql
