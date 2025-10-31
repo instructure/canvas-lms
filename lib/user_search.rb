@@ -43,7 +43,7 @@ module UserSearch
       @include_deleted_users = options[:include_deleted_users]
 
       context.shard.activate do
-        users_scope = context_scope(context, searcher, options.slice(:enrollment_state, :include_inactive_enrollments))
+        users_scope = context_scope(context, searcher, options.slice(:enrollment_state, :include_inactive_enrollments, :section_ids))
         users_scope = users_scope.from("(#{conditions_statement(search_term, context.root_account, users_scope, searcher)}) AS users")
         users_scope = order_scope(users_scope, context, options.slice(:order, :sort))
         users_scope = roles_scope(users_scope, context, options.slice(:enrollment_type,
@@ -76,7 +76,8 @@ module UserSearch
       @include_deleted_users = options[:include_deleted_users]
       users_scope = context_scope(context, searcher, options.slice(:enrollment_state,
                                                                    :include_inactive_enrollments,
-                                                                   :enrollment_role_id))
+                                                                   :enrollment_role_id,
+                                                                   :section_ids))
       users_scope = roles_scope(users_scope, context, options.slice(:enrollment_role,
                                                                     :enrollment_role_id,
                                                                     :enrollment_type,
@@ -101,7 +102,8 @@ module UserSearch
         context.users_visible_to(searcher,
                                  include_prior_enrollments,
                                  enrollment_state: enrollment_states,
-                                 include_inactive: include_inactive_enrollments).distinct
+                                 include_inactive: include_inactive_enrollments,
+                                 section_ids: options[:section_ids]).distinct
       else
         context.users_visible_to(searcher, include_inactive: include_inactive_enrollments).distinct
       end

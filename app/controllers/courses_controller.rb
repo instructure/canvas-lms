@@ -1117,6 +1117,9 @@ class CoursesController < ApplicationController
   #   'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment',
   #   or 'DesignerEnrollment'.
   #
+  # @argument section_ids[] [Integer]
+  #   When set, only return users who are enrolled in the given section(s).
+  #
   # @argument include[] [String, "enrollments"|"locked"|"avatar_url"|"test_student"|"bio"|"custom_links"|"current_grading_period_scores"|"uuid"]
   #   - "enrollments":
   #   Optionally include with each Course the user's current and invited
@@ -1161,7 +1164,7 @@ class CoursesController < ApplicationController
         # backcompat limit param
         params[:per_page] ||= params[:limit]
 
-        search_params = params.slice(:search_term, :enrollment_role, :enrollment_role_id, :enrollment_type, :enrollment_state, :sort, :differentiation_tag_id)
+        search_params = params.slice(:search_term, :enrollment_role, :enrollment_role_id, :enrollment_type, :enrollment_state, :sort, :differentiation_tag_id, :section_ids)
         include_inactive = @context.grants_right?(@current_user, session, :read_as_admin) && value_to_boolean(params[:include_inactive])
 
         search_params[:include_inactive_enrollments] = true if include_inactive
