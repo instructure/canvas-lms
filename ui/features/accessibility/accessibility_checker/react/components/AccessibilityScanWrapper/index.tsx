@@ -15,25 +15,5 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {Alert} from '@instructure/ui-alerts'
-import {Flex} from '@instructure/ui-flex'
-import {LIMIT_EXCEEDED_MESSAGE} from '../../constants'
 
-export const AccessibilityCheckerHeader: React.FC = () => {
-  const accessibilityScanDisabled = window.ENV.SCAN_DISABLED
-  return (
-    <Flex direction="column">
-      {accessibilityScanDisabled && (
-        <Alert
-          variant="info"
-          renderCloseButtonLabel="Close"
-          onDismiss={() => {}}
-          margin="small 0"
-          data-testid="accessibility-scan-disabled-alert"
-        >
-          {LIMIT_EXCEEDED_MESSAGE}
-        </Alert>
-      )}
-    </Flex>
-  )
-}
+export {CourseScan} from './CourseScan'
