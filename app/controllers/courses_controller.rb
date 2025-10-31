@@ -1835,7 +1835,8 @@ class CoursesController < ApplicationController
       :conditional_release,
       :show_student_only_module_id,
       :show_teacher_only_module_id,
-      :horizon_course
+      :horizon_course,
+      :default_student_gradebook_view
     )
     changes = changed_settings(@course.changes, @course.settings, old_settings)
 
@@ -4591,7 +4592,8 @@ class CoursesController < ApplicationController
       :conditional_release,
       :post_manually,
       :horizon_course,
-      :disable_csp
+      :disable_csp,
+      :default_student_gradebook_view
     )
   end
 
