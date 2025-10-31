@@ -229,6 +229,7 @@ class GradeSummaryPresenter
   def submissions
     preload_params = if preload_optimizations_enabled?
                        [
+                         :attachment_associations,
                          :content_participations,
                          { originality_reports: :lti_link },
                          :user,
@@ -262,7 +263,9 @@ class GradeSummaryPresenter
                      .where(user_id: student).to_a
            end
 
-      if !preload_optimizations_enabled? && (vericite_enabled? || turnitin_enabled?)
+      if preload_optimizations_enabled?
+        Submission.bulk_load_attachments_for_submissions(ss, preloads: [:last_attachment_upload_status], preload_only: true)
+      elsif vericite_enabled? || turnitin_enabled?
         ActiveRecord::Associations.preload(ss, :originality_reports)
       end
 

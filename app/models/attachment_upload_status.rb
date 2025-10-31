@@ -50,10 +50,10 @@ class AttachmentUploadStatus < ApplicationRecord
       return status if status
     end
 
-    failed = if attachment.attachment_upload_statuses.loaded?
+    failed = if !attachment.association(:last_attachment_upload_status).loaded? && attachment.attachment_upload_statuses.loaded?
                attachment.attachment_upload_statuses.any?
              else
-               attachment.attachment_upload_statuses.exists?
+               attachment.last_attachment_upload_status.present?
              end
     return "failed" if failed
 
