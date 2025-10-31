@@ -24,6 +24,7 @@ import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
 import {useCourseWorkStatistics} from '../useCourseWorkStatistics'
 import {WidgetDashboardProvider} from '../useWidgetDashboardContext'
+import {clearWidgetDashboardCache} from '../../__tests__/testHelpers'
 
 const mockStatisticsData = {
   submissionsDueCount: 5,
@@ -99,6 +100,10 @@ const server = setupServer()
 describe('useCourseWorkStatistics', () => {
   beforeAll(() => {
     server.listen()
+  })
+  beforeEach(() => {
+    window.ENV = {current_user_id: '123'} as any
+    clearWidgetDashboardCache()
   })
   afterEach(() => {
     server.resetHandlers()

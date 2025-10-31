@@ -16,12 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useState, useCallback, useEffect, useRef} from 'react'
-import {useInfiniteQuery} from '@tanstack/react-query'
+import {useState, useCallback, useEffect} from 'react'
+import {useInfiniteQuery, useQuery, useQueryClient} from '@tanstack/react-query'
 import {createUserQueryConfig} from '../utils/graphql'
 import {COURSE_INSTRUCTORS_PAGINATED_KEY, QUERY_CONFIG} from '../constants'
 import {fetchPaginatedCourseInstructors} from '../graphql/coursePeople'
 import {useWidgetDashboard} from './useWidgetDashboardContext'
+import {widgetDashboardPersister} from '../utils/persister'
+import {useBroadcastQuery} from '@canvas/query/broadcast'
 
 export interface CourseInstructorForComponent {
   id: string
@@ -129,87 +131,51 @@ async function fetchInstructorsPage(
   }
 }
 
-interface PageCache {
-  [pageIndex: number]: InstructorResult
-}
-
 export function useCourseInstructorsPaginated(options: UseCourseInstructorsOptions = {}) {
   const {courseIds = [], limit = 5} = options
+  const queryClient = useQueryClient()
   const [currentPageIndex, setCurrentPageIndex] = useState<number>(0)
-  const [pageCache, setPageCache] = useState<PageCache>({})
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<Error | null>(null)
-  const [totalCount, setTotalCount] = useState<number | null>(null)
-  const optionsRef = useRef(options)
-  const isFetchingRef = useRef<{[key: number]: boolean}>({})
   const {observedUserId} = useWidgetDashboard()
-
-  useEffect(() => {
-    optionsRef.current = options
-  }, [options])
-
   const pageSize = limit
 
-  const fetchPage = useCallback(
-    async (pageIndex: number) => {
-      if (pageCache[pageIndex]) {
-        return pageCache[pageIndex]
-      }
+  // Generate unique query key for current page
+  const queryKey = [
+    COURSE_INSTRUCTORS_PAGINATED_KEY,
+    'page',
+    currentPageIndex,
+    courseIds.join(','),
+    limit,
+    observedUserId ?? undefined,
+  ]
 
-      if (isFetchingRef.current[pageIndex]) {
-        return
-      }
+  // Use TanStack Query for this specific page (uses client from context)
+  const {
+    data: currentPage,
+    isLoading,
+    error,
+    refetch: refetchCurrentPage,
+  } = useQuery({
+    queryKey,
+    queryFn: () =>
+      fetchInstructorsPage(currentPageIndex, courseIds, limit, observedUserId ?? undefined),
+    staleTime: QUERY_CONFIG.STALE_TIME.USERS * 60 * 1000, // Convert minutes to ms
+    persister: widgetDashboardPersister,
+    refetchOnMount: false,
+  })
 
-      isFetchingRef.current[pageIndex] = true
-      setIsLoading(true)
-      setError(null)
+  // Broadcast instructor updates across tabs
+  useBroadcastQuery({
+    queryKey: [COURSE_INSTRUCTORS_PAGINATED_KEY],
+    broadcastChannel: 'widget-dashboard',
+  })
 
-      try {
-        const result = await fetchInstructorsPage(
-          pageIndex,
-          optionsRef.current.courseIds || [],
-          optionsRef.current.limit || 5,
-          observedUserId ?? undefined,
-        )
-
-        setPageCache(prev => ({
-          ...prev,
-          [pageIndex]: result,
-        }))
-
-        if (result.pageInfo.totalCount !== null) {
-          setTotalCount(result.pageInfo.totalCount)
-        }
-
-        return result
-      } catch (err) {
-        setError(err as Error)
-      } finally {
-        setIsLoading(false)
-        isFetchingRef.current[pageIndex] = false
-      }
-    },
-    [pageCache, observedUserId],
-  )
-
+  // Reset to page 0 when course filters change
+  const courseIdString = courseIds.join(',')
   useEffect(() => {
-    fetchPage(currentPageIndex)
-  }, [currentPageIndex, fetchPage])
-
-  useEffect(() => {
-    setPageCache({})
-    setTotalCount(null)
     setCurrentPageIndex(0)
-    isFetchingRef.current = {}
-  }, [courseIds.join(','), limit])
+  }, [courseIdString, limit])
 
-  const resetAndRefetch = useCallback(() => {
-    setPageCache({})
-    setTotalCount(null)
-    isFetchingRef.current = {}
-    return fetchPage(currentPageIndex)
-  }, [fetchPage, currentPageIndex])
-
+  const totalCount = currentPage?.pageInfo.totalCount ?? null
   const totalPages =
     totalCount !== null && totalCount !== undefined ? Math.ceil(totalCount / pageSize) : 0
 
@@ -224,7 +190,13 @@ export function useCourseInstructorsPaginated(options: UseCourseInstructorsOptio
     setCurrentPageIndex(0)
   }, [])
 
-  const currentPage = pageCache[currentPageIndex]
+  const refetch = useCallback(async () => {
+    // Invalidate all course instructors queries to force refetch
+    await queryClient.invalidateQueries({
+      queryKey: [COURSE_INSTRUCTORS_PAGINATED_KEY],
+    })
+    return refetchCurrentPage()
+  }, [queryClient, refetchCurrentPage])
 
   return {
     currentPage,
@@ -233,9 +205,9 @@ export function useCourseInstructorsPaginated(options: UseCourseInstructorsOptio
     totalCount,
     goToPage,
     resetPagination,
-    refetch: resetAndRefetch,
+    refetch,
     isLoading,
-    error,
+    error: error as Error | null,
     pageSize,
   }
 }

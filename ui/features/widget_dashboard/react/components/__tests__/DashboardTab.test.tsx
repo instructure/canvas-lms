@@ -22,6 +22,7 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
 import DashboardTab from '../DashboardTab'
+import {clearWidgetDashboardCache} from '../../__tests__/testHelpers'
 type Props = Record<string, never> // DashboardTab has no props
 
 const mockStatisticsData = {
@@ -208,6 +209,10 @@ const setup = (props?: Props, envOverrides = {}) => {
 describe('DashboardTab', () => {
   beforeAll(() => {
     server.listen({onUnhandledRequest: 'error'})
+  })
+
+  beforeEach(() => {
+    clearWidgetDashboardCache()
   })
 
   afterEach(() => {

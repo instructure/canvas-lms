@@ -27,6 +27,7 @@ import {
   WidgetDashboardProvider,
   type SharedCourseData,
 } from '../../../../hooks/useWidgetDashboardContext'
+import {clearWidgetDashboardCache} from '../../../../__tests__/testHelpers'
 
 const mockWidget: Widget = {
   id: 'test-announcements-widget',
@@ -343,6 +344,9 @@ describe('AnnouncementsWidget', () => {
       onUnhandledRequest: 'bypass',
     }),
   )
+  beforeEach(() => {
+    clearWidgetDashboardCache()
+  })
   afterEach(() => {
     server.resetHandlers()
   })
