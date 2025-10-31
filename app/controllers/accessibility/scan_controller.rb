@@ -23,13 +23,34 @@ module Accessibility
     before_action :require_user
     before_action :check_authorized_action
 
+    def show
+      progress = Accessibility::CourseScannerService.last_accessibility_scan_progress_by_course(@context)
+
+      unless progress
+        head :not_found
+        return
+      end
+
+      render json: {
+               id: progress.id,
+               workflow_state: progress.workflow_state
+             },
+             status: :ok
+    end
+
     def create
-      Accessibility::CourseScannerService.call(course: @context)
-      render json: response[:json], status: :ok
+      progress = Accessibility::CourseScannerService.queue_scan_course(@context)
+      render json: {
+               id: progress.id,
+               workflow_state: progress.workflow_state
+             },
+             status: :ok
+    rescue Accessibility::CourseScannerService::ScanLimitExceededError => e
+      render json: { error: e.message }, status: :bad_request
     end
 
     def check_authorized_action
-      return render_unauthorized_action unless tab_enabled?(Course::TAB_ACCESSIBILITY)
+      return render_unauthorized_action unless @context.is_a?(Course) && @context.a11y_checker_enabled?
 
       authorized_action(@context, @current_user, [:read, :update])
     end

@@ -15,25 +15,23 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {Alert} from '@instructure/ui-alerts'
-import {Flex} from '@instructure/ui-flex'
-import {LIMIT_EXCEEDED_MESSAGE} from '../../constants'
 
-export const AccessibilityCheckerHeader: React.FC = () => {
-  const accessibilityScanDisabled = window.ENV.SCAN_DISABLED
+import React from 'react'
+import {Flex} from '@instructure/ui-flex'
+import {Spinner} from '@instructure/ui-spinner'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {ScanHandler} from './ScanHandler'
+
+const I18n = createI18nScope('accessibility_scan')
+
+export const LoadingView: React.FC = () => {
   return (
-    <Flex direction="column">
-      {accessibilityScanDisabled && (
-        <Alert
-          variant="info"
-          renderCloseButtonLabel="Close"
-          onDismiss={() => {}}
-          margin="small 0"
-          data-testid="accessibility-scan-disabled-alert"
-        >
-          {LIMIT_EXCEEDED_MESSAGE}
-        </Alert>
-      )}
-    </Flex>
+    <ScanHandler scanButtonDisabled={true}>
+      <Flex justifyItems="center" padding="large">
+        <Flex.Item textAlign="center">
+          <Spinner renderTitle={() => I18n.t('Course scan result is loading')} size="large" />
+        </Flex.Item>
+      </Flex>
+    </ScanHandler>
   )
 }

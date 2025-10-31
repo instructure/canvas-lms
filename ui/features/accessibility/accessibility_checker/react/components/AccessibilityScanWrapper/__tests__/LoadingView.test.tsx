@@ -15,25 +15,22 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {Alert} from '@instructure/ui-alerts'
-import {Flex} from '@instructure/ui-flex'
-import {LIMIT_EXCEEDED_MESSAGE} from '../../constants'
 
-export const AccessibilityCheckerHeader: React.FC = () => {
-  const accessibilityScanDisabled = window.ENV.SCAN_DISABLED
-  return (
-    <Flex direction="column">
-      {accessibilityScanDisabled && (
-        <Alert
-          variant="info"
-          renderCloseButtonLabel="Close"
-          onDismiss={() => {}}
-          margin="small 0"
-          data-testid="accessibility-scan-disabled-alert"
-        >
-          {LIMIT_EXCEEDED_MESSAGE}
-        </Alert>
-      )}
-    </Flex>
-  )
-}
+import React from 'react'
+import {render, screen} from '@testing-library/react'
+import {LoadingView} from '../components/LoadingView'
+
+describe('LoadingView', () => {
+  it('renders a loading spinner', () => {
+    render(<LoadingView />)
+
+    expect(screen.getByTitle('Course scan result is loading')).toBeInTheDocument()
+  })
+
+  it('has scan button disabled', () => {
+    render(<LoadingView />)
+
+    const button = screen.getByRole('button', {name: /scan course/i})
+    expect(button).toBeDisabled()
+  })
+})
