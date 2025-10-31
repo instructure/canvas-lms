@@ -31,17 +31,23 @@ class GradeSummaryAssignmentPresenter
     @originality_reports = @submission.originality_reports_for_display if @submission
   end
 
+  def attachments
+    @attachments ||= if submission
+                       (submission.preloaded_attachments || submission.attachments).to_a
+                     else
+                       []
+                     end
+  end
+
   def upload_status
     return unless submission
 
-    # This is causing multiple N+1 query problems and should be fixed
-    #
     # The sort here ensures that statuses received are in the failed,
     # pending and success order. With that security we can just pluck
     # first one.
-    submission.attachments
-              .map { |a| AttachmentUploadStatus.upload_status(a) }
-              .min
+    attachments
+      .map { |a| AttachmentUploadStatus.upload_status(a) }
+      .min
   end
 
   def originality_report?
@@ -290,7 +296,7 @@ class GradeSummaryAssignmentPresenter
   end
 
   def file
-    @file ||= submission.attachments.detect { |a| plagiarism_attachment?(a) }
+    @file ||= attachments.detect { |a| plagiarism_attachment?(a) }
   end
 
   def plagiarism_attachment?(a)

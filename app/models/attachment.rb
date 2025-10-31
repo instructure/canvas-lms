@@ -123,6 +123,7 @@ class Attachment < ActiveRecord::Base
   has_many :thumbnails, foreign_key: "parent_id", inverse_of: :attachment
   has_many :children, foreign_key: :root_attachment_id, class_name: "Attachment", inverse_of: :root_attachment
   has_many :attachment_upload_statuses
+  has_one :last_attachment_upload_status, -> { order(created_at: :desc) }, class_name: "AttachmentUploadStatus"
   has_one :canvadoc
   belongs_to :usage_rights
   has_many :canvadocs_annotation_contexts, inverse_of: :attachment
