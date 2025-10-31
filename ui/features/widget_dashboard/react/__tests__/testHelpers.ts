@@ -17,6 +17,10 @@
  */
 
 import {graphql, HttpResponse} from 'msw'
+import {clearWidgetDashboardCache} from '../utils/persister'
+
+// Export for use in tests - call this in beforeEach to prevent cache pollution
+export {clearWidgetDashboardCache}
 
 // Default mock data for GraphQL queries
 const mockCoursesWithGradesResponse = {

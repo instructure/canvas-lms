@@ -25,6 +25,7 @@ import {http, HttpResponse} from 'msw'
 import {useCourseWork, useCourseWorkPaginated} from '../useCourseWork'
 import type {CourseWorkItem} from '../useCourseWork'
 import {WidgetDashboardProvider} from '../useWidgetDashboardContext'
+import {clearWidgetDashboardCache} from '../../__tests__/testHelpers'
 
 const server = setupServer()
 
@@ -64,6 +65,10 @@ const createWrapper = () => {
 }
 
 describe('useCourseWork', () => {
+  beforeEach(() => {
+    clearWidgetDashboardCache()
+  })
+
   it('returns course work items from multiple courses', async () => {
     server.use(
       http.post('/api/graphql', async ({request}) => {

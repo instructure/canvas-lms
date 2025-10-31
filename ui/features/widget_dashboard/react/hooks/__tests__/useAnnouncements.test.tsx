@@ -23,6 +23,7 @@ import {waitFor} from '@testing-library/react'
 import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
 import {usePaginatedAnnouncements} from '../useAnnouncements'
+import {clearWidgetDashboardCache} from '../../__tests__/testHelpers'
 
 const mockGqlResponse = {
   data: {
@@ -125,6 +126,10 @@ describe('usePaginatedAnnouncements', () => {
     server.listen({
       onUnhandledRequest: 'bypass',
     })
+  })
+
+  beforeEach(() => {
+    clearWidgetDashboardCache()
   })
 
   afterEach(() => {
