@@ -591,18 +591,22 @@
   path: '/api/v1/courses/:course_id/ai_experiences'
 - verb: POST
   path: '/api/v1/courses/:course_id/ai_experiences'
+- verb: GET
+  path: '/api/v1/courses/:course_id/ai_experiences/:ai_experience_id/conversations'
+- verb: POST
+  path: '/api/v1/courses/:course_id/ai_experiences/:ai_experience_id/conversations'
+- verb: DELETE
+  path: '/api/v1/courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id'
+- verb: POST
+  path: '/api/v1/courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id/messages'
 - verb: DELETE
   path: '/api/v1/courses/:course_id/ai_experiences/:id'
 - verb: GET
   path: '/api/v1/courses/:course_id/ai_experiences/:id'
 - verb: PUT
   path: '/api/v1/courses/:course_id/ai_experiences/:id'
-- verb: POST
-  path: '/api/v1/courses/:course_id/ai_experiences/:id/continue_conversation'
 - verb: GET
   path: '/api/v1/courses/:course_id/ai_experiences/:id/edit'
-- verb: GET
-  path: '/api/v1/courses/:course_id/ai_experiences/:id/messages'
 - verb: GET
   path: '/api/v1/courses/:course_id/ai_experiences/new'
 - verb: GET
