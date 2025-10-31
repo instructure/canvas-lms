@@ -113,8 +113,13 @@ const CourseGradeCard: React.FC<CourseGradeCardProps> = ({
               borderColorPrimary: '#E8EAEC',
             }}
           >
-            <Flex direction="row" justifyItems="start" alignItems="center" height="100%">
-              <Flex.Item shouldGrow padding="0 0 0 0">
+            <Flex direction="row" justifyItems="start" alignItems="center" height="60px">
+              <Flex.Item
+                shouldGrow
+                padding="0 0 0 xx-small"
+                overflowX="visible"
+                overflowY="visible"
+              >
                 <Button
                   color="secondary"
                   size="small"
