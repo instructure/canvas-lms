@@ -1806,6 +1806,85 @@ describe Types::AssignmentType do
         expect(result.first).to eq(1)
       end
     end
+
+    describe "section-limited visibility" do
+      before(:once) do
+        @section1 = course.course_sections.create!(name: "Section 1")
+        @section2 = course.course_sections.create!(name: "Section 2")
+
+        @student_section1 = user_factory(name: "Student Section 1", account: @account)
+        student_in_course(course:, user: @student_section1, section: @section1, active_all: true)
+
+        @student_section2 = user_factory(name: "Student Section 2", account: @account)
+        student_in_course(course:, user: @student_section2, section: @section2, active_all: true)
+
+        @section_limited_teacher = user_factory(name: "Section Limited Teacher", account: @account)
+        teacher_in_course(
+          course:,
+          user: @section_limited_teacher,
+          section: @section1,
+          active_all: true,
+          limit_privileges_to_course_section: true
+        )
+      end
+
+      it "returns only students from teacher's section when teacher has limited section privileges" do
+        resolver = GraphQLTypeTester.new(regular_assignment, current_user: @section_limited_teacher)
+        result = resolver.resolve("assignedStudents { nodes { _id } }")
+        expect(result).to include(@student_section1.id.to_s)
+        expect(result).not_to include(@student_section2.id.to_s)
+      end
+
+      it "returns all students when teacher has no section limits" do
+        resolver = GraphQLTypeTester.new(regular_assignment, current_user: teacher)
+        result = resolver.resolve("assignedStudents { nodes { _id } }")
+        expect(result).to include(@student_section1.id.to_s)
+        expect(result).to include(@student_section2.id.to_s)
+      end
+
+      it "respects both section visibility and differentiated assignments" do
+        create_adhoc_override_for_assignment(regular_assignment, @student_section1)
+        regular_assignment.update!(only_visible_to_overrides: true)
+
+        resolver = GraphQLTypeTester.new(regular_assignment, current_user: @section_limited_teacher)
+        result = resolver.resolve("assignedStudents { nodes { _id } }")
+        expect(result).to eq([@student_section1.id.to_s])
+        expect(result).not_to include(@student_section2.id.to_s)
+      end
+
+      it "filters by search term within section-limited scope" do
+        resolver = GraphQLTypeTester.new(regular_assignment, current_user: @section_limited_teacher)
+        result = resolver.resolve("assignedStudents (filter: { searchTerm: \"Section 1\" }) { nodes { name } }")
+        expect(result).to eq([@student_section1.name])
+        expect(result).not_to include(@student_section2.name)
+      end
+
+      it "returns empty when section-limited teacher has no students in their section assigned to the assignment" do
+        create_adhoc_override_for_assignment(regular_assignment, @student_section2)
+        regular_assignment.update!(only_visible_to_overrides: true)
+
+        resolver = GraphQLTypeTester.new(regular_assignment, current_user: @section_limited_teacher)
+        result = resolver.resolve("assignedStudents { nodes { _id } }")
+        expect(result).to be_empty
+      end
+
+      it "excludes students with enrollments that are not active by date" do
+        course.update!(
+          conclude_at: 1.day.ago,
+          restrict_enrollments_to_course_dates: true
+        )
+        course.reload
+
+        @student_concluded = user_factory(name: "Student Concluded", account: @account)
+        student_in_course(course:, user: @student_concluded, active_all: true)
+
+        resolver = GraphQLTypeTester.new(regular_assignment, current_user: teacher)
+        result = resolver.resolve("assignedStudents { nodes { _id } }")
+
+        expect(result).not_to include(@student_concluded.id.to_s)
+        expect(result).not_to include(student.id.to_s)
+      end
+    end
   end
 
   describe "graderIdentitiesConnection" do
