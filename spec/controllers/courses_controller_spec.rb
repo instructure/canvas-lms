@@ -4861,6 +4861,80 @@ describe CoursesController do
         expect(json.length).to eq(3)
       end
     end
+
+    describe "filters by section ids" do
+      it "when requested with a string" do
+        user_session(teacher)
+        course.enroll_student(student1, section: section1, enrollment_state: "active", allow_multiple_enrollments: true)
+        course.enroll_student(student2, section: section2, enrollment_state: "active", allow_multiple_enrollments: true)
+
+        get "users", params: {
+          course_id: course.id,
+          format: "json",
+          include: ["enrollments"],
+          section_ids: section1.id.to_s
+        }
+        json = json_parse(response.body)
+        expect(response).to be_successful
+        expect(json.length).to eq(1)
+        expect(json[0]).to include({ "id" => student1.id })
+      end
+
+      it "when requested with an array of strings" do
+        user_session(teacher)
+
+        course.enroll_student(student1, section: section1, enrollment_state: "active", allow_multiple_enrollments: true)
+        course.enroll_student(student2, section: section2, enrollment_state: "active", allow_multiple_enrollments: true)
+        course.enroll_student(student_in_course(course:, active_all: true).user, section: section3, enrollment_state: "active", allow_multiple_enrollments: true)
+
+        get "users", params: {
+          course_id: course.id,
+          format: "json",
+          include: ["enrollments"],
+          section_ids: [section1.id.to_s, section2.id.to_s]
+        }
+        json = json_parse(response.body)
+        expect(response).to be_successful
+        expect(json.length).to eq(2)
+      end
+
+      it "doesn't duplicate users enrolled in multiple sections" do
+        user_session(teacher)
+        course.enroll_student(student1, section: section1, enrollment_state: "active", allow_multiple_enrollments: true)
+        course.enroll_student(student2, section: section2, enrollment_state: "active", allow_multiple_enrollments: true)
+        course.enroll_student(student2, section: section3, enrollment_state: "active", allow_multiple_enrollments: true)
+
+        get "users", params: {
+          course_id: course.id,
+          format: "json",
+          include: ["enrollments"],
+          section_ids: [section1.id.to_s, section2.id.to_s, section3.id.to_s]
+        }
+        json = json_parse(response.body)
+        expect(response).to be_successful
+        expect(json.length).to eq(2)
+      end
+
+      it "filters by section with search term" do
+        user_session(teacher)
+        student1.update(name: "Bob Johnson")
+        student2.update(name: "Bob Smith")
+        course.enroll_student(student1, section: section1, enrollment_state: "active", allow_multiple_enrollments: true)
+        course.enroll_student(student2, section: section2, enrollment_state: "active", allow_multiple_enrollments: true)
+
+        get "users", params: {
+          course_id: course.id,
+          format: "json",
+          include: ["enrollments"],
+          section_ids: section1.id.to_s,
+          search_term: "bob"
+        }
+        json = json_parse(response.body)
+        expect(response).to be_successful
+        expect(json.length).to eq(1)
+        expect(json[0]).to include({ "id" => student1.id })
+      end
+    end
   end
 
   describe "#content_share_users" do
