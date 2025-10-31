@@ -20,6 +20,6 @@ import {BlockContentEditorStore, createStore} from '../store'
 
 export const createMockStore = (defaults: Partial<BlockContentEditorStore>) =>
   ({
-    ...createStore({aiAltTextGenerationURL: null}).get(),
+    ...createStore({aiAltTextGenerationURL: null, toolbarReorder: false}).get(),
     ...defaults,
   }) as BlockContentEditorStore
