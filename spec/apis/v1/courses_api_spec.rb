@@ -4834,6 +4834,7 @@ describe CoursesController, type: :request do
                                "image_id" => nil,
                                "image" => nil,
                                "default_due_time" => "23:59:59",
+                               "default_student_gradebook_view" => false,
                                "conditional_release" => false
                              })
         end
@@ -4914,6 +4915,7 @@ describe CoursesController, type: :request do
                                "image_id" => nil,
                                "image" => nil,
                                "default_due_time" => "09:00:00",
+                               "default_student_gradebook_view" => false,
                                "conditional_release" => false
                              })
           @course.reload
@@ -4969,6 +4971,46 @@ describe CoursesController, type: :request do
           expect(json["conditional_release"]).to be true
           expect(@course.reload.conditional_release?).to be true
         end
+
+        it "updates default_student_gradebook_view when all feature flags are enabled" do
+          @course.enable_feature!(:outcome_gradebook)
+          @course.enable_feature!(:student_outcome_gradebook)
+          @course.enable_feature!(:default_to_learning_mastery_gradebook)
+
+          json = api_call(:put,
+                          "/api/v1/courses/#{@course.id}/settings",
+                          {
+                            controller: "courses",
+                            action: "update_settings",
+                            course_id: @course.to_param,
+                            format: "json"
+                          },
+                          { default_student_gradebook_view: true })
+
+          expect(json["default_student_gradebook_view"]).to be true
+          expect(@course.reload.default_student_gradebook_view).to be true
+        end
+
+        it "clears default_student_gradebook_view when set to false" do
+          @course.enable_feature!(:outcome_gradebook)
+          @course.enable_feature!(:student_outcome_gradebook)
+          @course.enable_feature!(:default_to_learning_mastery_gradebook)
+          @course.default_student_gradebook_view = true
+          @course.save!
+
+          json = api_call(:put,
+                          "/api/v1/courses/#{@course.id}/settings",
+                          {
+                            controller: "courses",
+                            action: "update_settings",
+                            course_id: @course.to_param,
+                            format: "json"
+                          },
+                          { default_student_gradebook_view: false })
+
+          expect(json["default_student_gradebook_view"]).to be false
+          expect(@course.reload.default_student_gradebook_view).to be false
+        end
       end
 
       context "as student" do
@@ -5016,6 +5058,7 @@ describe CoursesController, type: :request do
                                "image_id" => nil,
                                "image" => nil,
                                "default_due_time" => "23:59:59",
+                               "default_student_gradebook_view" => false,
                                "conditional_release" => false
                              })
         end

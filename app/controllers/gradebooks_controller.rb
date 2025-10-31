@@ -195,6 +195,7 @@ class GradebooksController < ApplicationController
       rubrics: rubrics_json(@presenter.rubrics, @current_user, session, style: "full"),
       save_assignment_order_url: course_save_assignment_order_url(@context),
       student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
+      default_student_grade_summary_tab:,
       student_id: @presenter.student_id,
       students: @presenter.students.as_json(include_root: false),
       outcome_proficiency:,
@@ -1650,6 +1651,22 @@ class GradebooksController < ApplicationController
 
   def preferred_gradebook_view
     gradebook_settings(context.global_id)["gradebook_view"]
+  end
+
+  def course_default_student_gradebook_view
+    @context.settings[:default_student_gradebook_view]
+  end
+
+  def default_student_grade_summary_tab
+    course_default = course_default_student_gradebook_view
+    default_lmgb_enabled = @context.feature_enabled?(:default_to_learning_mastery_gradebook)
+    student_og_enabled = @context.feature_enabled?(:student_outcome_gradebook)
+
+    if default_lmgb_enabled && student_og_enabled && course_default
+      "outcomes"
+    else
+      nil # Let frontend decide
+    end
   end
 
   def update_preferred_gradebook_view!(gradebook_view)

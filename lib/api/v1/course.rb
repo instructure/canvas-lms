@@ -62,6 +62,7 @@ module Api::V1::Course
     settings[:friendly_name] = course.friendly_name
     settings[:default_due_time] = course.default_due_time || "23:59:59"
     settings[:conditional_release] = course.conditional_release?
+    settings[:default_student_gradebook_view] = course.default_student_gradebook_view
 
     settings
   end
