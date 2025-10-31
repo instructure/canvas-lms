@@ -24,6 +24,7 @@ import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
 import PeopleWidget from '../PeopleWidget'
 import type {BaseWidgetProps, Widget} from '../../../../types'
+import {clearWidgetDashboardCache} from '../../../../__tests__/testHelpers'
 
 jest.mock('@canvas/message-students-modal/react', () => {
   return function MockMessageStudents({onRequestClose, title, recipients, contextCode}: any) {
@@ -137,6 +138,10 @@ describe('PeopleWidget', () => {
       GRAPHQL_URL: '/api/graphql',
       CSRF_TOKEN: 'mock-csrf-token',
     } as any
+  })
+
+  beforeEach(() => {
+    clearWidgetDashboardCache()
   })
 
   afterEach(() => {

@@ -23,8 +23,8 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {setupServer} from 'msw/node'
 import {graphql, http, HttpResponse} from 'msw'
 import DashboardTabs from '../DashboardTabs'
+import {clearWidgetDashboardCache, defaultGraphQLHandlers} from '../../__tests__/testHelpers'
 import {WidgetDashboardProvider} from '../../hooks/useWidgetDashboardContext'
-import {defaultGraphQLHandlers} from '../../__tests__/testHelpers'
 
 type Props = Record<string, never> // DashboardTabs has no props
 
@@ -180,6 +180,10 @@ const setup = (props?: Props, envOverrides = {}, preferencesOverrides = {}) => {
 describe('DashboardTabs', () => {
   beforeAll(() => {
     server.listen({onUnhandledRequest: 'error'})
+  })
+
+  beforeEach(() => {
+    clearWidgetDashboardCache()
   })
 
   afterEach(() => {

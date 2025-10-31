@@ -23,6 +23,7 @@ import {waitFor} from '@testing-library/react'
 import {useCourseInstructors} from '../useCourseInstructors'
 import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
+import {clearWidgetDashboardCache} from '../../__tests__/testHelpers'
 
 const server = setupServer()
 
@@ -118,6 +119,10 @@ describe('useCourseInstructors', () => {
       GRAPHQL_URL: '/api/graphql',
       CSRF_TOKEN: 'mock-csrf-token',
     } as any
+  })
+
+  beforeEach(() => {
+    clearWidgetDashboardCache()
   })
 
   afterEach(() => {

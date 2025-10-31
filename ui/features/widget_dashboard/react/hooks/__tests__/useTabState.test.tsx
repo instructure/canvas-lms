@@ -25,6 +25,7 @@ import {graphql, HttpResponse} from 'msw'
 import {useTabState} from '../useTabState'
 import {TAB_IDS} from '../../constants'
 import type {TabId} from '../../types'
+import {clearWidgetDashboardCache} from '../../__tests__/testHelpers'
 
 type HookArgs = {
   defaultTab?: TabId
@@ -70,6 +71,10 @@ const buildDefaultArgs = (overrides: Partial<HookArgs> = {}): HookArgs => {
 describe('useTabState', () => {
   beforeAll(() => {
     server.listen({onUnhandledRequest: 'error'})
+  })
+
+  beforeEach(() => {
+    clearWidgetDashboardCache()
   })
 
   afterEach(() => {
