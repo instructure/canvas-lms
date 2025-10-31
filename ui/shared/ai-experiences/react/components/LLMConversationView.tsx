@@ -33,8 +33,8 @@ import type {LLMConversationMessage, LLMConversationViewProps} from '../../types
 
 const I18n = createI18nScope('ai_experiences')
 
-interface ContinueConversationResponse {
-  conversation_id: string
+interface ConversationResponse {
+  id: string
   messages: LLMConversationMessage[]
 }
 
@@ -113,15 +113,29 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
     setIsInitializing(true)
     setError(null)
     try {
-      const {json} = await doFetchApi<ContinueConversationResponse>({
-        path: `/api/v1/courses/${courseId}/ai_experiences/${aiExperienceId}/continue_conversation`,
-        method: 'POST',
+      // First, check if there's an active conversation
+      const {json: activeConversation} = await doFetchApi<ConversationResponse>({
+        path: `/api/v1/courses/${courseId}/ai_experiences/${aiExperienceId}/conversations`,
+        method: 'GET',
       })
 
-      if (json?.conversation_id && json?.messages) {
-        setConversationId(json.conversation_id)
-        setMessages(json.messages)
+      // If active conversation exists, use it
+      if (activeConversation?.id && activeConversation?.messages) {
+        setConversationId(activeConversation.id)
+        setMessages(activeConversation.messages)
         setError(null)
+      } else {
+        // No active conversation, create a new one
+        const {json: newConversation} = await doFetchApi<ConversationResponse>({
+          path: `/api/v1/courses/${courseId}/ai_experiences/${aiExperienceId}/conversations`,
+          method: 'POST',
+        })
+
+        if (newConversation?.id && newConversation?.messages) {
+          setConversationId(newConversation.id)
+          setMessages(newConversation.messages)
+          setError(null)
+        }
       }
     } catch (error) {
       setError(I18n.t('Failed to start conversation. Please try again.'))
@@ -147,13 +161,11 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
     setError(null)
 
     try {
-      const {json} = await doFetchApi<ContinueConversationResponse>({
-        path: `/api/v1/courses/${courseId}/ai_experiences/${aiExperienceId}/continue_conversation`,
+      const {json} = await doFetchApi<ConversationResponse>({
+        path: `/api/v1/courses/${courseId}/ai_experiences/${aiExperienceId}/conversations/${conversationId}/messages`,
         method: 'POST',
         body: {
-          conversation_id: conversationId,
-          messages,
-          new_user_message: newUserMessage,
+          message: newUserMessage,
         },
       })
 
@@ -179,20 +191,19 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
 
   const handleRestart = async () => {
     setMessages([])
-    setConversationId(null)
     setInputValue('')
     setIsInitializing(true)
     setError(null)
 
     try {
-      const {json} = await doFetchApi<ContinueConversationResponse>({
-        path: `/api/v1/courses/${courseId}/ai_experiences/${aiExperienceId}/continue_conversation`,
+      // Create a new conversation (server will automatically complete any existing active conversation)
+      const {json} = await doFetchApi<ConversationResponse>({
+        path: `/api/v1/courses/${courseId}/ai_experiences/${aiExperienceId}/conversations`,
         method: 'POST',
-        body: {restart: true},
       })
 
-      if (json?.conversation_id && json?.messages) {
-        setConversationId(json.conversation_id)
+      if (json?.id && json?.messages) {
+        setConversationId(json.id)
         setMessages(json.messages)
         setError(null)
       }

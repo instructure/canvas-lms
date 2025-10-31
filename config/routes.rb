@@ -1269,8 +1269,13 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/ai_experiences/:id/edit", action: :edit, as: "course_ai_experience_edit"
       put "courses/:course_id/ai_experiences/:id", action: :update
       delete "courses/:course_id/ai_experiences/:id", action: :destroy, as: "course_ai_experience_destroy"
-      post "courses/:course_id/ai_experiences/:id/continue_conversation", action: :continue_conversation, as: "course_ai_experience_continue_conversation"
-      get "courses/:course_id/ai_experiences/:id/messages", action: :messages, as: "course_ai_experience_messages"
+    end
+
+    scope(controller: :ai_conversations) do
+      get "courses/:course_id/ai_experiences/:ai_experience_id/conversations", action: :active_conversation, as: "course_ai_experience_conversations"
+      post "courses/:course_id/ai_experiences/:ai_experience_id/conversations", action: :create
+      post "courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id/messages", action: :post_message, as: "course_ai_experience_conversation_messages"
+      delete "courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id", action: :destroy, as: "course_ai_experience_conversation"
     end
 
     scope(controller: :microfrontends_release_tag_override) do
