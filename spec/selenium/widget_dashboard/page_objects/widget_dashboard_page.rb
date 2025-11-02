@@ -331,7 +331,7 @@ module WidgetDashboardPage
   end
 
   def set_widget_dashboard_flag(feature_status: true)
-    feature_status ? @course1.root_account.allow_feature!(:widget_dashboard) : @course1.root_account.disable_feature!(:widget_dashboard)
+    feature_status ? @course1.root_account.enable_feature!(:widget_dashboard) : @course1.root_account.disable_feature!(:widget_dashboard)
   end
 
   def dashboard_announcement_setup
