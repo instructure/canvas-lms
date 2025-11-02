@@ -3610,7 +3610,7 @@ class UsersController < ApplicationController
   def should_show_widget_dashboard?
     return false if k5_user?
 
-    flag = @domain_root_account.lookup_feature_flag(:widget_dashboard)
+    flag = widget_dashboard_feature_flag
     return false unless flag
 
     # If feature is locked on (cannot override), force widget dashboard for all eligible users
@@ -3638,5 +3638,29 @@ class UsersController < ApplicationController
       return true
     end
     false
+  end
+
+  def widget_dashboard_feature_flag
+    return nil unless @current_user
+
+    # Check all associated accounts and return the most permissive flag
+    # This allows any account in the user's hierarchy to enable the feature
+    flags = @current_user.associated_accounts.filter_map do |account|
+      flag = account.lookup_feature_flag(:widget_dashboard)
+      flag if flag && (flag.enabled? || flag.can_override?)
+    end
+
+    # Return the most enabling flag (prioritize locked-on > enabled > allowed)
+    flags.max_by do |flag|
+      if flag.enabled? && !flag.can_override?
+        3 # Locked on
+      elsif flag.enabled?
+        2 # Enabled
+      elsif flag.can_override?
+        1 # Allowed
+      else
+        0
+      end
+    end
   end
 end
