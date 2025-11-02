@@ -3317,14 +3317,16 @@ describe UsersController do
       end
     end
 
-    context "with widget_dashboard feature enabled" do
+    context "with widget_dashboard feature allowed" do
       before do
-        # Make feature available at account level - user preference defaults to ON
+        # Make feature available at account level - user preference defaults to OFF (opt-in required)
         Account.default.allow_feature!(:widget_dashboard)
       end
 
       it "includes each course once even for multiple enrollments" do
         course_with_student_logged_in(active_all: true)
+        @user.preferences[:widget_dashboard_user_preference] = true
+        @user.save!
         @section = @course.course_sections.create! name: "section 2"
         multiple_student_enrollment(@user, @section)
         @current_user = @user
@@ -3344,13 +3346,13 @@ describe UsersController do
           user_session(@observer)
         end
 
-        it "shows widget dashboard if actively observing" do
+        it "does not show widget dashboard to observer by default when feature is allowed" do
           @observer_enrollment = @course.enroll_user(@observer, "ObserverEnrollment", section: @course.course_sections.first, enrollment_state: "active")
           @observer_enrollment.update_attribute(:associated_user_id, @student.id)
           user_session(@observer)
           get "user_dashboard"
-          expect(assigns[:js_bundles].flatten).to include :widget_dashboard
-          expect(assigns[:css_bundles].flatten).to include :dashboard_card
+          expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
+          expect(assigns[:js_bundles].flatten).to include :dashboard
         end
 
         it "shows legacy dashboard if not actively observing" do
@@ -3363,7 +3365,16 @@ describe UsersController do
           expect(assigns[:css_bundles].flatten).to include :dashboard
         end
 
-        it "shows widget dashboard to students" do
+        it "does not show widget dashboard to students by default when feature is allowed" do
+          user_session(@student)
+          get "user_dashboard"
+          expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
+          expect(assigns[:js_bundles].flatten).to include :dashboard
+        end
+
+        it "shows widget dashboard to students who opt in when feature is allowed" do
+          @student.preferences[:widget_dashboard_user_preference] = true
+          @student.save!
           user_session(@student)
           get "user_dashboard"
           expect(assigns[:js_bundles].flatten).to include :widget_dashboard
@@ -3415,6 +3426,63 @@ describe UsersController do
           user_session(@student)
           @student.preferences[:widget_dashboard_user_preference] = false
           @student.save!
+          get "user_dashboard"
+          expect(assigns[:js_bundles].flatten).to include :widget_dashboard
+        end
+      end
+
+      context "with sub-account widget_dashboard control" do
+        before :once do
+          @sub_account = Account.default.sub_accounts.create!(name: "Sub Account")
+          @course = course_factory(account: @sub_account, active_all: true)
+          @student = user_factory(active_all: true)
+          @course.enroll_student(@student, enrollment_state: "active")
+        end
+
+        before do
+          user_session(@student)
+        end
+
+        it "shows widget dashboard when sub-account enables it" do
+          @sub_account.enable_feature!(:widget_dashboard)
+
+          get "user_dashboard"
+          expect(assigns[:js_bundles].flatten).to include :widget_dashboard
+        end
+
+        it "does not show widget dashboard when root disables it" do
+          Account.default.disable_feature!(:widget_dashboard)
+
+          get "user_dashboard"
+          expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
+        end
+
+        it "shows widget dashboard when enrolled in multiple accounts and one enables it" do
+          @sub_account2 = Account.default.sub_accounts.create!(name: "Sub Account 2")
+          @course2 = course_factory(account: @sub_account2, active_all: true)
+          @course2.enroll_student(@student, enrollment_state: "active")
+
+          @sub_account.enable_feature!(:widget_dashboard)
+          @sub_account2.disable_feature!(:widget_dashboard)
+
+          get "user_dashboard"
+          expect(assigns[:js_bundles].flatten).to include :widget_dashboard
+        end
+
+        it "respects user preference when at least one account allows override" do
+          @sub_account.allow_feature!(:widget_dashboard)
+          @student.preferences[:widget_dashboard_user_preference] = false
+          @student.save!
+
+          get "user_dashboard"
+          expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
+        end
+
+        it "ignores user preference when any account locks feature on" do
+          @sub_account.enable_feature!(:widget_dashboard)
+          @student.preferences[:widget_dashboard_user_preference] = false
+          @student.save!
+
           get "user_dashboard"
           expect(assigns[:js_bundles].flatten).to include :widget_dashboard
         end
@@ -3960,8 +4028,8 @@ describe UsersController do
 
   describe "dashboard with course grades" do
     before do
-      # Make feature available at account level - user preference defaults to ON
-      Account.default.allow_feature!(:widget_dashboard)
+      # Enable feature at account level - widget dashboard shown by default
+      Account.default.enable_feature!(:widget_dashboard)
     end
 
     context "when student accesses their own dashboard" do
