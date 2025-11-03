@@ -418,9 +418,9 @@ CanvasRails::Application.routes.draw do
 
     # Wildcard routes for AMS paths
     # The controller checks ams_integration_enabled? and renders AMS or falls back to regular quiz views
-    get "quizzes/activity_builder/*path" => "quizzes/quizzes#index"
-    get "quizzes/take/*path" => "quizzes/quizzes#index"
-    get "quizzes/reports/*path" => "quizzes/quizzes#index"
+    get "activity_builder/*path" => "quizzes/quizzes#index"
+    get "take/*path" => "quizzes/quizzes#index"
+    get "reports/*path" => "quizzes/quizzes#index"
 
     post "quizzes/new" => "quizzes/quizzes#new" # use POST instead of GET (not idempotent)
     resources :quizzes, controller: "quizzes/quizzes", except: :new do
