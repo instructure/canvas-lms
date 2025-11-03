@@ -100,7 +100,7 @@ const DiscussionTopicManager = props => {
   const [entryTranslatingSet, setEntryTranslatingSet] = useState(new Set())
   const [focusSelector, setFocusSelector] = useState('')
 
-  const {enqueueTranslation} = useTranslationQueue()
+  const {enqueueTranslation, clearQueue} = useTranslationQueue()
   const {translateAll} = useTranslationAll(enqueueTranslation)
 
   const setEntryTranslating = useCallback((id, isTranslating) => {
@@ -207,6 +207,7 @@ const DiscussionTopicManager = props => {
     entryTranslatingSet,
     setEntryTranslating,
     enqueueTranslation,
+    clearQueue,
     isSummaryEnabled,
     setIsSummaryEnabled,
   }
@@ -469,7 +470,7 @@ const DiscussionTopicManager = props => {
     updateCache,
   )
 
-  const observerContextData = useObservedTranslations()
+  const observerContextData = useObservedTranslations(enqueueTranslation)
 
   if (discussionTopicQuery.loading || waitForUnreadFilter) {
     return <LoadingSpinner />

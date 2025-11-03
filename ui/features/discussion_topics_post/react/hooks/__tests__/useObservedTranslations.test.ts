@@ -20,17 +20,14 @@ import {renderHook, act} from '@testing-library/react-hooks'
 import {cleanup} from '@testing-library/react'
 import {useObservedTranslations} from '../useObservedTranslations'
 import {useTranslationStore} from '../useTranslationStore'
-import {useTranslationQueue} from '../useTranslationQueue'
 import {useTranslation} from '../useTranslation'
 
 jest.mock('../useTranslationStore')
-jest.mock('../useTranslationQueue')
 jest.mock('../useTranslation')
 
 const useTranslationStoreMock = useTranslationStore as unknown as jest.Mock & {
   getState: jest.Mock
 }
-const useTranslationQueueMock = useTranslationQueue as jest.Mock
 const useTranslationMock = useTranslation as jest.Mock
 
 describe('useObservedTranslations', () => {
@@ -58,11 +55,8 @@ describe('useObservedTranslations', () => {
     useTranslationStoreMock.getState = jest.fn(() => ({
       entries: {},
       activeLanguage: 'en',
+      translateAll: true,
     }))
-
-    useTranslationQueueMock.mockReturnValue({
-      enqueueTranslation: enqueueTranslationMock,
-    })
 
     useTranslationMock.mockReturnValue({
       translateEntry: translateEntryMock,
@@ -91,7 +85,7 @@ describe('useObservedTranslations', () => {
 
   describe('startObserving', () => {
     it('should create an IntersectionObserver with threshold 0.1', () => {
-      const {result} = renderHook(() => useObservedTranslations())
+      const {result} = renderHook(() => useObservedTranslations(enqueueTranslationMock))
 
       act(() => {
         result.current.startObserving('es')
@@ -103,7 +97,7 @@ describe('useObservedTranslations', () => {
     })
 
     it('should observe all nodes in nodesRef', () => {
-      const {result} = renderHook(() => useObservedTranslations())
+      const {result} = renderHook(() => useObservedTranslations(enqueueTranslationMock))
 
       const node1 = document.createElement('div')
       const node2 = document.createElement('div')
@@ -121,7 +115,7 @@ describe('useObservedTranslations', () => {
     })
 
     it('should enqueue translation when entry is intersecting', () => {
-      const {result} = renderHook(() => useObservedTranslations())
+      const {result} = renderHook(() => useObservedTranslations(enqueueTranslationMock))
 
       const mockElement = document.createElement('div')
       mockElement.dataset.id = 'entry-1'
@@ -136,6 +130,7 @@ describe('useObservedTranslations', () => {
           },
         },
         activeLanguage: 'en',
+        translateAll: true,
       }))
 
       act(() => {
@@ -168,7 +163,7 @@ describe('useObservedTranslations', () => {
     })
 
     it('should not enqueue translation if entry is already loading', () => {
-      const {result} = renderHook(() => useObservedTranslations())
+      const {result} = renderHook(() => useObservedTranslations(enqueueTranslationMock))
 
       const mockElement = document.createElement('div')
       mockElement.dataset.id = 'entry-1'
@@ -183,6 +178,7 @@ describe('useObservedTranslations', () => {
           },
         },
         activeLanguage: 'en',
+        translateAll: true,
       }))
 
       act(() => {
@@ -215,7 +211,7 @@ describe('useObservedTranslations', () => {
     })
 
     it('should not enqueue translation if entry language matches active language', () => {
-      const {result} = renderHook(() => useObservedTranslations())
+      const {result} = renderHook(() => useObservedTranslations(enqueueTranslationMock))
 
       const mockElement = document.createElement('div')
       mockElement.dataset.id = 'entry-1'
@@ -230,6 +226,7 @@ describe('useObservedTranslations', () => {
           },
         },
         activeLanguage: 'en',
+        translateAll: true,
       }))
 
       act(() => {
@@ -262,7 +259,7 @@ describe('useObservedTranslations', () => {
     })
 
     it('should not enqueue translation if entry does not exist', () => {
-      const {result} = renderHook(() => useObservedTranslations())
+      const {result} = renderHook(() => useObservedTranslations(enqueueTranslationMock))
 
       const mockElement = document.createElement('div')
       mockElement.dataset.id = 'entry-1'
@@ -270,6 +267,7 @@ describe('useObservedTranslations', () => {
       useTranslationStoreMock.getState = jest.fn(() => ({
         entries: {},
         activeLanguage: 'en',
+        translateAll: true,
       }))
 
       act(() => {
@@ -302,7 +300,7 @@ describe('useObservedTranslations', () => {
     })
 
     it('should not enqueue translation if element does not have data-id', () => {
-      const {result} = renderHook(() => useObservedTranslations())
+      const {result} = renderHook(() => useObservedTranslations(enqueueTranslationMock))
 
       const mockElement = document.createElement('div')
 
@@ -336,7 +334,7 @@ describe('useObservedTranslations', () => {
     })
 
     it('should clear timeout when entry stops intersecting', () => {
-      const {result} = renderHook(() => useObservedTranslations())
+      const {result} = renderHook(() => useObservedTranslations(enqueueTranslationMock))
 
       const mockElement = document.createElement('div')
       mockElement.dataset.id = 'entry-1'
@@ -351,6 +349,7 @@ describe('useObservedTranslations', () => {
           },
         },
         activeLanguage: 'en',
+        translateAll: true,
       }))
 
       act(() => {
@@ -402,7 +401,7 @@ describe('useObservedTranslations', () => {
     })
 
     it('should call translateEntry with correct parameters when translation is enqueued', async () => {
-      const {result} = renderHook(() => useObservedTranslations())
+      const {result} = renderHook(() => useObservedTranslations(enqueueTranslationMock))
 
       const mockElement = document.createElement('div')
       mockElement.dataset.id = 'entry-1'
@@ -419,6 +418,7 @@ describe('useObservedTranslations', () => {
           'entry-1': mockEntry,
         },
         activeLanguage: 'en',
+        translateAll: true,
       }))
 
       act(() => {
@@ -450,18 +450,22 @@ describe('useObservedTranslations', () => {
 
       // Execute the enqueued job
       const translateJob = enqueueTranslationMock.mock.calls[0][0]
-      await translateJob()
+      const mockSignal = new AbortController().signal
+      await translateJob(mockSignal)
 
-      expect(translateEntryMock).toHaveBeenCalledWith({
-        language: 'en',
-        entryId: 'entry-1',
-        message: mockEntry.message,
-        title: mockEntry.title,
-      })
+      expect(translateEntryMock).toHaveBeenCalledWith(
+        {
+          language: 'en',
+          entryId: 'entry-1',
+          message: mockEntry.message,
+          title: mockEntry.title,
+        },
+        mockSignal,
+      )
     })
 
     it('should handle multiple intersecting entries', () => {
-      const {result} = renderHook(() => useObservedTranslations())
+      const {result} = renderHook(() => useObservedTranslations(enqueueTranslationMock))
 
       const mockElement1 = document.createElement('div')
       mockElement1.dataset.id = 'entry-1'
@@ -484,6 +488,7 @@ describe('useObservedTranslations', () => {
           },
         },
         activeLanguage: 'en',
+        translateAll: true,
       }))
 
       act(() => {
@@ -529,7 +534,7 @@ describe('useObservedTranslations', () => {
 
   describe('stopObserving', () => {
     it('should disconnect the observer', () => {
-      const {result} = renderHook(() => useObservedTranslations())
+      const {result} = renderHook(() => useObservedTranslations(enqueueTranslationMock))
 
       act(() => {
         result.current.startObserving('es')
@@ -546,7 +551,7 @@ describe('useObservedTranslations', () => {
     })
 
     it('should handle calling stopObserving when observer does not exist', () => {
-      const {result} = renderHook(() => useObservedTranslations())
+      const {result} = renderHook(() => useObservedTranslations(enqueueTranslationMock))
 
       expect(() => {
         act(() => {
@@ -560,7 +565,7 @@ describe('useObservedTranslations', () => {
 
   describe('refs', () => {
     it('should return observerRef and nodesRef', () => {
-      const {result} = renderHook(() => useObservedTranslations())
+      const {result} = renderHook(() => useObservedTranslations(enqueueTranslationMock))
 
       expect(result.current.observerRef).toBeDefined()
       expect(result.current.nodesRef).toBeDefined()
@@ -568,7 +573,7 @@ describe('useObservedTranslations', () => {
     })
 
     it('should maintain nodesRef across re-renders', () => {
-      const {result, rerender} = renderHook(() => useObservedTranslations())
+      const {result, rerender} = renderHook(() => useObservedTranslations(enqueueTranslationMock))
 
       const node = document.createElement('div')
       result.current.nodesRef.current.set('1', node)
@@ -581,7 +586,7 @@ describe('useObservedTranslations', () => {
 
   describe('timeout behavior', () => {
     it('should use 200ms delay before triggering translation', () => {
-      const {result} = renderHook(() => useObservedTranslations())
+      const {result} = renderHook(() => useObservedTranslations(enqueueTranslationMock))
 
       const mockElement = document.createElement('div')
       mockElement.dataset.id = 'entry-1'
@@ -596,6 +601,7 @@ describe('useObservedTranslations', () => {
           },
         },
         activeLanguage: 'en',
+        translateAll: true,
       }))
 
       act(() => {
