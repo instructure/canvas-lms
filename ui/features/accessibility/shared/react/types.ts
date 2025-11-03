@@ -102,7 +102,7 @@ export interface AccessibilityIssue {
   ruleId: string
   displayName: string
   message: string
-  why: string
+  why: string | string[]
   element: string
   path: string
   issueUrl?: string

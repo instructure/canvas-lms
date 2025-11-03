@@ -184,4 +184,37 @@ describe('RadioInputGroupForm', () => {
     render(<RadioInputGroupForm {...propsWithError} />)
     expect(screen.getByText('Error message')).toBeInTheDocument()
   })
+
+  describe('disabled state', () => {
+    it('disables the radio group when isDisabled prop is true', () => {
+      const props = {
+        ...defaultProps,
+        isDisabled: true,
+      }
+
+      render(<RadioInputGroupForm {...props} />)
+
+      const radioGroup = screen.getByTestId('radio-input-group')
+      expect(radioGroup).toHaveAttribute('aria-disabled', 'true')
+    })
+
+    it('does not disable the radio group when isDisabled prop is false', () => {
+      const props = {
+        ...defaultProps,
+        isDisabled: false,
+      }
+
+      render(<RadioInputGroupForm {...props} />)
+
+      const radioGroup = screen.getByTestId('radio-input-group')
+      expect(radioGroup).not.toHaveAttribute('aria-disabled', 'true')
+    })
+
+    it('does not disable the radio group when disabled prop is not provided', () => {
+      render(<RadioInputGroupForm {...defaultProps} />)
+
+      const radioGroup = screen.getByTestId('radio-input-group')
+      expect(radioGroup).not.toHaveAttribute('aria-disabled', 'true')
+    })
+  })
 })
