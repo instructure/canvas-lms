@@ -27,6 +27,9 @@ const I18n = createI18nScope('DateValidator')
 const DATE_RANGE_ERRORS = {
   due_at: {
     start_range: {
+      get peerReviewDueAt() {
+        return I18n.t('Due date must be after peer review due date')
+      },
       get section() {
         return I18n.t('Due date cannot be before section start')
       },
@@ -100,6 +103,55 @@ const DATE_RANGE_ERRORS = {
       },
     },
   },
+  peer_review_available_from: {
+    start_range: {
+      get unlock() {
+        return I18n.t(
+          'Peer review available from date must be on or after assignment available from date',
+        )
+      },
+    },
+    end_range: {
+      get peerReviewDueAt() {
+        return I18n.t('Reviewing starts date must be before peer review due date')
+      },
+      get lock() {
+        return I18n.t('Peer review available from date must be before assignment available to date')
+      },
+    },
+  },
+  peer_review_due_at: {
+    start_range: {
+      get unlock() {
+        return I18n.t('Peer review due date must be after assignment available from date')
+      },
+    },
+    end_range: {
+      get lock() {
+        return I18n.t('Peer review due date must be before assignment available to date')
+      },
+    },
+  },
+  peer_review_available_to: {
+    start_range: {
+      get peerReviewDueDate() {
+        return I18n.t('Peer review available to date must be on or after peer review due date')
+      },
+      get unlock() {
+        return I18n.t('Peer review available to date must be after assignment available from date')
+      },
+      get peerReviewAvailableFrom() {
+        return I18n.t('Peer review available to date must be after peer review available from date')
+      },
+    },
+    end_range: {
+      get lock() {
+        return I18n.t(
+          'Peer review available to date must be on or before assignment available to date',
+        )
+      },
+    },
+  },
 }
 
 export default class DateValidator {
@@ -122,6 +174,9 @@ export default class DateValidator {
     const currentDateRange = section ? this.getSectionRange(section) : this.dateRange
     const datetimesToValidate = []
     const forIndividualStudents = data.student_ids?.length || data.set_type === 'ADHOC'
+    const peerReviewAvailableFrom = data.peer_review_available_from
+    const peerReviewDueAt = data.peer_review_due_at
+    const peerReviewAvailableTo = data.peer_review_available_to
 
     if (currentDateRange.start_at && currentDateRange.start_at.date && !forIndividualStudents) {
       datetimesToValidate.push({
@@ -231,6 +286,116 @@ export default class DateValidator {
         type: 'lock',
       })
     }
+
+    // Peer review available from must be >= unlock_at (assignment available from)
+    if (peerReviewAvailableFrom && unlockAt) {
+      datetimesToValidate.push({
+        date: unlockAt,
+        validationDates: {
+          peer_review_available_from: peerReviewAvailableFrom,
+        },
+        range: 'start_range',
+        type: 'unlock',
+      })
+    }
+
+    // Peer review available from must be < lock_at (assignment available to)
+    if (peerReviewAvailableFrom && lockAt) {
+      datetimesToValidate.push({
+        date: lockAt,
+        validationDates: {
+          peer_review_available_from: peerReviewAvailableFrom,
+        },
+        range: 'end_range',
+        type: 'lock',
+      })
+    }
+
+    // Peer review available from must be < peer review due date (strict inequality)
+    if (peerReviewDueAt && peerReviewAvailableFrom) {
+      datetimesToValidate.push({
+        date: peerReviewDueAt,
+        validationDates: {
+          peer_review_available_from: peerReviewAvailableFrom,
+        },
+        range: 'end_range',
+        type: 'peerReviewDueAt',
+        strict: true,
+      })
+    }
+
+    // Peer review available to must be >= peer review due date
+    if (peerReviewAvailableTo && peerReviewDueAt) {
+      datetimesToValidate.push({
+        date: peerReviewDueAt,
+        validationDates: {
+          peer_review_available_to: peerReviewAvailableTo,
+        },
+        range: 'start_range',
+        type: 'peerReviewDueDate',
+      })
+    }
+
+    // Peer review available to must be <= lock_at (assignment available to)
+    if (peerReviewAvailableTo && lockAt) {
+      datetimesToValidate.push({
+        date: lockAt,
+        validationDates: {
+          peer_review_available_to: peerReviewAvailableTo,
+        },
+        range: 'end_range',
+        type: 'lock',
+      })
+    }
+
+    // Peer review due date must be > assignment available from (unlock_at)
+    if (peerReviewDueAt && unlockAt) {
+      datetimesToValidate.push({
+        date: unlockAt,
+        validationDates: {
+          peer_review_due_at: peerReviewDueAt,
+        },
+        range: 'start_range',
+        type: 'unlock',
+      })
+    }
+
+    // Peer review due date must be < lock_at (assignment available to)
+    if (peerReviewDueAt && lockAt) {
+      datetimesToValidate.push({
+        date: lockAt,
+        validationDates: {
+          peer_review_due_at: peerReviewDueAt,
+        },
+        range: 'end_range',
+        type: 'lock',
+      })
+    }
+
+    // Peer review available to must be > assignment available from (unlock_at)
+    if (peerReviewAvailableTo && unlockAt) {
+      datetimesToValidate.push({
+        date: unlockAt,
+        validationDates: {
+          peer_review_available_to: peerReviewAvailableTo,
+        },
+        range: 'start_range',
+        type: 'unlock',
+      })
+    }
+
+    // Peer review available to must be > peer review available from
+    if (peerReviewAvailableTo && peerReviewAvailableFrom) {
+      datetimesToValidate.push({
+        date: peerReviewAvailableFrom,
+        validationDates: {
+          peer_review_available_to: peerReviewAvailableTo,
+        },
+        range: 'start_range',
+        type: 'peerReviewAvailableFrom',
+      })
+    }
+
     const errs = {}
     return this._validateDatetimeSequences(datetimesToValidate, errs)
   }
@@ -297,20 +462,24 @@ export default class DateValidator {
         switch (datetimeSet.range) {
           case 'start_range':
             forEach(datetimeSet.validationDates, (validationDate, dateType) => {
-              if (
-                validationDate &&
-                this._formatDatetime(datetimeSet.date) > this._formatDatetime(validationDate)
-              ) {
+              const dateFormatted = this._formatDatetime(datetimeSet.date)
+              const validationDateFormatted = this._formatDatetime(validationDate)
+              const isInvalid = datetimeSet.strict
+                ? dateFormatted >= validationDateFormatted
+                : dateFormatted > validationDateFormatted
+              if (validationDate && isInvalid) {
                 errs[dateType] = DATE_RANGE_ERRORS[dateType][datetimeSet.range][datetimeSet.type]
               }
             })
             break
           case 'end_range':
             forEach(datetimeSet.validationDates, (validationDate, dateType) => {
-              if (
-                validationDate &&
-                this._formatDatetime(datetimeSet.date) < this._formatDatetime(validationDate)
-              ) {
+              const dateFormatted = this._formatDatetime(datetimeSet.date)
+              const validationDateFormatted = this._formatDatetime(validationDate)
+              const isInvalid = datetimeSet.strict
+                ? dateFormatted <= validationDateFormatted
+                : dateFormatted < validationDateFormatted
+              if (validationDate && isInvalid) {
                 errs[dateType] = DATE_RANGE_ERRORS[dateType][datetimeSet.range][datetimeSet.type]
               }
             })

@@ -27,6 +27,9 @@ export interface BaseDateDetails {
   lock_at: string | null
   reply_to_topic_due_at: string | null
   required_replies_due_at: string | null
+  peer_review_available_to: string | null
+  peer_review_available_from: string | null
+  peer_review_due_at: string | null
   group_category_id: string | null
   only_visible_to_overrides: boolean
   visible_to_everyone: boolean
@@ -88,6 +91,9 @@ export interface ItemAssignToCardSpec {
   reply_to_topic_due_at: string | null
   required_replies_due_at: string | null
   lock_at: string | null
+  peer_review_available_from: string | null
+  peer_review_due_at: string | null
+  peer_review_available_to: string | null
   selectedAssigneeIds: string[]
   initialAssigneeOptions?: AssigneeOption[]
   defaultOptions?: string[]
