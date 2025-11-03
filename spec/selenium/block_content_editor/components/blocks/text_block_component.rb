@@ -21,6 +21,9 @@ require_relative "block_component"
 require_relative "../settings_tray/block_settings/text_block_settings"
 
 class TextBlockComponent < BlockComponent
+  BLOCK_TYPE = "Text column"
+  BLOCK_SELECTOR = "div p"
+
   attr_reader :block_title
 
   def initialize(block)

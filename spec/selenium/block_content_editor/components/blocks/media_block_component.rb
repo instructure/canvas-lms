@@ -23,6 +23,9 @@ require_relative "../settings_tray/block_settings/media_block_settings"
 require_relative "../upload_modal_component"
 
 class MediaBlockComponent < BlockComponent
+  BLOCK_TYPE = "Media"
+  BLOCK_SELECTOR = "iframe"
+
   attr_reader :block_title
 
   def initialize(block)
