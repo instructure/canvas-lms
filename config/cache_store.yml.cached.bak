@@ -1,0 +1,7 @@
+---
+common: 
+production: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  cache_store: redis_cache_store
+development: !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+  cache_store: redis_cache_store
+test: 
