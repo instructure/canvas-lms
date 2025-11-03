@@ -38,6 +38,7 @@ export enum SortBy {
   SisId = 'student_sis_id',
   IntegrationId = 'student_integration_id',
   LoginId = 'student_login_id',
+  Outcome = 'outcome',
 }
 
 export enum SecondaryInfoDisplay {

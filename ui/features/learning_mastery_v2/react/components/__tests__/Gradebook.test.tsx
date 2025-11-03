@@ -43,6 +43,8 @@ describe('Gradebook', () => {
         setSortOrder: jest.fn(),
         sortBy: SortBy.SortableName,
         setSortBy: jest.fn(),
+        sortOutcomeId: null,
+        setSortOutcomeId: jest.fn(),
       },
       onChangeNameDisplayFormat: jest.fn(),
       ...props,
