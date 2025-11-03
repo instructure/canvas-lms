@@ -45,6 +45,11 @@ describe Assignment do
     expect(assignment.peer_review_submission_required).to be false
   end
 
+  it "defaults peer_review_across_sections to true" do
+    assignment = @course.assignments.create!(assignment_valid_attributes)
+    expect(assignment.peer_review_across_sections).to be true
+  end
+
   it "has a useful state machine" do
     assignment_model(course: @course)
     expect(@a.state).to be(:published)
@@ -1833,6 +1838,16 @@ describe Assignment do
       new_assignment.save!
 
       expect(new_assignment.peer_review_submission_required).to be true
+    end
+
+    it "copies peer_review_across_sections value" do
+      assignment = @course.assignments.create!(title: "test assignment", points_possible: 100)
+      assignment.update!(peer_review_across_sections: false)
+
+      new_assignment = assignment.duplicate
+      new_assignment.save!
+
+      expect(new_assignment.peer_review_across_sections).to be false
     end
 
     context "with an assignment that can't be duplicated" do
