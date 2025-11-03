@@ -288,9 +288,11 @@ export default function BulkEditTable({
   const handleRevertClick = (assignment, override, event) => {
     // assuming the revert button is going away, so we reset focus to the prior input before that
     // happens.
-    const tableRow = event.target.closest('tr')
-    const rowInputs = tableRow.querySelectorAll('input')
-    if (rowInputs.length) rowInputs[rowInputs.length - 1].focus()
+    const tableRow = event.target.closest('[data-testid="bulk-edit-table-row"]')
+    if (tableRow) {
+      const rowInputs = tableRow.querySelectorAll('input')
+      if (rowInputs.length) rowInputs[rowInputs.length - 1].focus()
+    }
     clearOverrideEdits({assignmentId: assignment.id, overrideId: override.id})
   }
 
