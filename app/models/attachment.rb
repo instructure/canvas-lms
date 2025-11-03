@@ -199,6 +199,7 @@ class Attachment < ActiveRecord::Base
   # That means you can't rely on these happening in the same transaction as the save.
   after_save_and_attachment_processing :touch_context_if_appropriate
   after_save_and_attachment_processing :ensure_media_object
+  after_save_and_attachment_processing :index_in_pine, if: :should_index_in_pine?
 
   # this mixin can be added to a has_many :attachments association, and it'll
   # handle finding replaced attachments. In other words, if an attachment found
@@ -2698,6 +2699,25 @@ class Attachment < ActiveRecord::Base
     vl = context.files_visibility_option if vl == "inherit"
     vl = "context" if vl == context.class.name.downcase
     vl
+  end
+
+  def should_index_in_pine?
+    return false unless context.is_a?(Course)
+    return false unless context.horizon_course?
+    return false unless context.root_account.feature_enabled?(:horizon_learning_object_ingestion_on_change)
+    return false unless PineClient.enabled?
+    return false unless file_state == "available"
+    return false unless PineClient.allowed_attachment_content_types.include?(content_type)
+
+    true
+  end
+
+  def index_in_pine
+    delay(
+      n_strand: ["horizon_file_ingestion", context.global_root_account_id],
+      singleton: "horizon_file_ingestion:#{context.global_id}:#{id}",
+      max_attempts: 3
+    ).ingest_to_pine
   end
 
   private

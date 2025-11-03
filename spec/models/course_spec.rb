@@ -9244,39 +9244,27 @@ describe Course do
         txt_file
         image_file
 
-        delayed_files = []
-        allow_any_instance_of(Attachment).to receive(:delay) do |attachment, **args|
-          expect(args[:n_strand]).to eq(["horizon_file_ingestion", horizon_account.global_id])
-          expect(args[:singleton]).to match(/^horizon_file_ingestion:#{course.global_id}:\d+$/)
-          expect(args[:max_attempts]).to eq(3)
-          delayed_files << attachment
-          attachment
+        indexed_files = []
+        allow_any_instance_of(Attachment).to receive(:index_in_pine) do |attachment|
+          indexed_files << attachment
         end
-
-        allow_any_instance_of(Attachment).to receive(:ingest_to_pine)
 
         course.ingest_horizon_content
 
-        expect(delayed_files.map(&:id)).to match_array([pdf_file.id, txt_file.id])
+        expect(indexed_files.map(&:id)).to match_array([pdf_file.id, txt_file.id])
       end
 
       it "enqueues jobs for wiki pages" do
         wiki_page
 
-        delayed_pages = []
-        allow_any_instance_of(WikiPage).to receive(:delay) do |page, **args|
-          expect(args[:n_strand]).to eq(["horizon_wiki_ingestion", horizon_account.global_id])
-          expect(args[:singleton]).to match(/^horizon_wiki_ingestion:#{course.global_id}:\d+$/)
-          expect(args[:max_attempts]).to eq(3)
-          delayed_pages << page
-          page
+        indexed_pages = []
+        allow_any_instance_of(WikiPage).to receive(:index_in_pine) do |page|
+          indexed_pages << page
         end
-
-        allow_any_instance_of(WikiPage).to receive(:ingest_to_pine)
 
         course.ingest_horizon_content
 
-        expect(delayed_pages.map(&:id)).to eq([wiki_page.id])
+        expect(indexed_pages.map(&:id)).to eq([wiki_page.id])
       end
 
       it "does not enqueue jobs for non-horizon courses" do

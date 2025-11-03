@@ -1645,21 +1645,9 @@ class Course < ActiveRecord::Base
 
     pages = wiki_pages.active
 
-    files.find_each do |file|
-      file.delay(
-        n_strand: ["horizon_file_ingestion", global_root_account_id],
-        singleton: "horizon_file_ingestion:#{global_id}:#{file.id}",
-        max_attempts: 3
-      ).ingest_to_pine
-    end
+    files.find_each(&:index_in_pine)
 
-    pages.find_each do |page|
-      page.delay(
-        n_strand: ["horizon_wiki_ingestion", global_root_account_id],
-        singleton: "horizon_wiki_ingestion:#{global_id}:#{page.id}",
-        max_attempts: 3
-      ).ingest_to_pine
-    end
+    pages.find_each(&:index_in_pine)
   end
 
   def handle_syllabus_changes_for_master_migration
