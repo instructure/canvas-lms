@@ -36,6 +36,7 @@ interface WhyMattersPopoverProps {
 
 const WhyMattersPopover = ({issue}: WhyMattersPopoverProps) => {
   const [isShowingContent, setIsShowingContent] = useState(false)
+  const why = typeof issue.why === 'string' ? [issue.why] : issue.why
 
   return (
     <Popover
@@ -77,9 +78,11 @@ const WhyMattersPopover = ({issue}: WhyMattersPopoverProps) => {
             </Flex.Item>
           </Flex>
         </Flex.Item>
-        <Flex.Item>
-          <Text variant="content">{issue.why}</Text>
-        </Flex.Item>
+        {why.map((paragraph, index) => (
+          <Flex.Item key={index} margin="0 0 x-small 0">
+            <Text variant="content">{paragraph}</Text>
+          </Flex.Item>
+        ))}
         <Flex.Item>
           <Flex direction="column">
             <Flex.Item>

@@ -434,7 +434,7 @@ const AccessibilityIssuesContent: React.FC<AccessibilityIssuesDrawerContentProps
               <Text weight="weightRegular">{current.issue.message}</Text>
             </View>
           )}
-          <View as="section" margin="medium 0">
+          <View as="section" margin="large 0 medium 0">
             <Form
               ref={formRef}
               issue={current.issue}
