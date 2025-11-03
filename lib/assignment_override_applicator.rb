@@ -221,7 +221,7 @@ module AssignmentOverrideApplicator
   end
 
   def self.group_overrides(learning_object, user)
-    return nil unless learning_object.is_a?(AbstractAssignment)
+    return nil unless learning_object.is_a?(AbstractAssignment) || learning_object.is_a?(DiscussionTopic)
 
     group_category_id = learning_object.effective_group_category_id
     return nil unless group_category_id
