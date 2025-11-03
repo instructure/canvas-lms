@@ -2238,9 +2238,12 @@ hi:
   ai_customization_for_individual_institutions_451ffc4c: "व्यक्तिगत संस्थानों के लिए AI अनुकूलन"
   ai_driven_smart_search_feature_597dbd4f: "AI संचालित खोज का स्मार्ट फ़ीचर।"
   ai_driven_translation_controls_for_courses_12eb6085: "पाठ्यक्रमों के लिए AI-संचालित अनुवाद नियंत्रण"
+  ai_experience_deleted_successfully_64ab9bee: "AI अनुभव सफलतापूर्वक मिटा दिया गया"
   ai_experience_details_e2be0836: "AI अनुभव विवरण"
   ai_experience_edit_error_page_db0af90e: "AI अनुभव संपादन त्रुटि पेज"
   ai_experience_options_40adf93b: "AI अनुभव विकल्प"
+  ai_experience_settings_866a0c1f: "AI अनुभव सेटिंग्स"
+  ai_experience_show_error_page_401c2eb3: "AI अनुभव त्रुटि पेज दिखाएं"
   ai_experiences_68bc22ad: "AI अनुभव"
   ai_generated_rubrics_42964825: "AI द्वारा जेनरेट किए गए रुब्रिक्स"
   ai_genreated_rubrics_889d7e0b: "AI से जनरेट किए गए रुब्रिक"
@@ -2338,6 +2341,7 @@ hi:
   all_changes_were_applied_to_the_pacescount_student_cfe9e7bf: "सभी परिवर्तन %{pacesCount} छात्र पाठ्यक्रम चरणों पर सफलतापूर्वक लागू किए गए।"
   all_changes_were_saved_f6f3ddcc: "सभी परिवर्तन सहेजे गए"
   all_close_dates_must_be_on_or_after_the_end_date_b898d85d: "सभी समाप्ति तिथियां अंतिम तिथि पर या उसके बाद की होनी चाहिए"
+  all_comments_578fa2b0: "सभी टिप्पणियां"
   all_comments_are_sent_to_the_whole_group_284591e7: "सभी टिप्पणियां पूरे ग्रुप को भेजी जाती हैं"
   all_comments_are_sent_to_the_whole_group_778126f3: "सभी टिप्पणियां पूरे ग्रुप को भेजी जाती हैं।"
   all_configured_apps_a14eef0a: "सभी कॉन्फ़िगर किए गए ऐप्स"
@@ -2352,6 +2356,7 @@ hi:
   all_discussion_entries_report_c1e02906: "सभी चर्चा प्रविष्टियां रिपोर्ट"
   all_discussions_c6176d4: "सभी चर्चाएं"
   all_discussions_have_successfully_been_updated_to__f68247fc: "सभी चर्चाओं को सफलतापूर्वक थ्रेडेड में अपडेट कर दिया गया है।"
+  all_enrollment_states_are_included_except_deleted_39866e07: "\"मिटाए गए\" को छोड़कर सभी नामांकन स्थितियां शामिल हैं"
   all_events_6ae4331b: "सभी घटनाएं"
   all_existing_course_content_is_supported_your_cour_5e3a97dd: "सभी मौजूदा पाठ्यक्रम सामग्री समर्थित है। आपका पाठ्यक्रम Canvas करियर में बदलने के लिए तैयार है।"
   all_fields_are_required_c64a74e9: "सभी फ़ील्ड आवश्यक हैं।"
@@ -3006,6 +3011,7 @@ hi:
   an_error_occurred_while_creating_this_outcome_plea_f1c69d92: "इस परिणाम को बनाते समय त्रुटि उत्पन्न हुई। कृपया फिर से कोशिश करें।"
   an_error_occurred_while_declining_the_invitation_f6fdb44e: "आमंत्रण अस्वीकार करते समय त्रुटि हुई"
   an_error_occurred_while_deleting_announcements_ab1ff3f6: "घोषणाएं मिटाते समय त्रुटि उत्पन्न हुई।"
+  an_error_occurred_while_deleting_the_allocation_ru_b2179de9: "आवंटन नियम हटाते समय एक त्रुटि हुई"
   an_error_occurred_while_deleting_the_appointment_g_aad99e47: "नियुक्ति को ग्रुप मिटाते समय त्रुटि उत्पन्न हुई"
   an_error_occurred_while_deleting_the_caption_8aa106: "कैप्शन मिटाते समय त्रुटि उत्पन्न हुई।"
   an_error_occurred_while_deleting_the_items_please__7d20b7e1: "आइटमें मिटाते समय त्रुटि हुई। कृपया फिर से कोशिश करें।"
@@ -3226,11 +3232,13 @@ hi:
   anonymous_discussion_1e9b981: "अनाम चर्चा | "
   anonymous_discussion_54517e84: "अनाम चर्चा"
   anonymous_e1b8ad27: अनाम
+  anonymous_grader_e1ff1c57: "अनाम ग्रेडर"
   anonymous_grading_cannot_be_enabled_for_group_assi_faa33494: "समूह असाइनमेंट के लिए अनाम ग्रेडिंग सक्षम नहीं की जा सकती"
   anonymous_grading_ccb5045c: "अनाम ग्रेडिंग"
   anonymous_grading_with_new_quizzes_ba0391f3: "नई प्रश्नोत्तरी के साथ अनाम ग्रेडिंग"
   anonymous_id_2ef1c6d2: "अनाम %{id}"
   anonymous_id_you_cf43ab76: "अनाम %{id} (आप)"
+  anonymous_instructor_a514c456: "अनाम प्रशिक्षक"
   anonymous_instructor_annotations_2b6c822: "अनाम प्रशिक्षक एनोटेशन"
   anonymous_mode_on_2dd9b94a: "अनाम मोड चालू है"
   anonymous_mode_on_feb53729: "अनाम मोड चालू है:"
@@ -3271,6 +3279,7 @@ hi:
   answers_which_scored_in_the_middle_46_46466ffd: "मध्य 46% में अंक प्राप्त करने वाले उत्तर हुए"
   answers_which_scored_in_the_top_27_a605232d: "शीर्ष 27% में अंक प्राप्त करने वाले उत्तर"
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "आपके अंतिम प्रयास के बाद उत्तर दिखाए जाएंगे"
+  anthropic_claude_models_are_provided_via_amazon_be_e2594083: "एंथ्रोपिक क्लाउड मॉडल Amazon बेडरॉक फ़ाउंडेशन मॉडल (FM) के माध्यम से प्रदान किए जाते हैं।"
   anthropic_claude_models_are_provided_via_instructu_73d90e1a: "एन्थ्रोपिक क्लाउड मॉडल Instructure के इन-हाउस AI प्लेटफ़ॉर्म के माध्यम से प्रदान किए जाते हैं।"
   any_changes_made_to_these_students_pacing_will_eff_e9dafa4c: "इन छात्रों के पेसिंग में किए गए किसी भी बदलाव से सभी व्यक्तिगत छात्र पेस प्रभावित होंगे।"
   any_risks_the_model_may_pose_to_the_user_d756b783: "मॉडल से उपयोगकर्ता को होने वाले संभावित जोखिम।"
@@ -3282,6 +3291,10 @@ hi:
   api_host_ddaf400e: "API होस्ट:"
   api_key_eeeb2167: "API कुंजी"
   api_keys_393d8b5c: "API कुंजियां"
+  api_requests_now_require_the_user_agent_header_to__199e1721: |-
+      API अनुरोधों के लिए अब उपयोगकर्ता-एजेंट हेडर सेट करना आवश्यक है। ये अनुरोध अब बीटा में अवरुद्ध हैं, तथा परीक्षण और उत्पादन में इनका प्रवर्तन शीघ्र ही होने वाला है - कृपया तारीखों के लिए *API चेंज लॉग* देखें। 
+                आप **रिपोर्ट पेज** पर उपयोगकर्ता एजेंट के बिना अनुरोध रिपोर्ट में उन वर्तमान कॉलों की समीक्षा कर सकते हैं जो इस आवश्यकता को पूरा नहीं करते हैं,
+                और हमारे ***ब्लॉग*** पर परिवर्तन के बारे में अधिक पढ़ सकते हैं।
   api_status_statustext_fetching_url_56076dca: "API %{status} %{statusText} प्राप्त किया जा रहा है %{url}"
   api_token_scopes_67b11c16: "API टोकन दायरे"
   apollo_caching_185f0b09: "Apollo कैशिंग"
@@ -3438,6 +3451,7 @@ hi:
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
     one: "क्या आप सच में %{name} मिटाना चाहते हैं?"
     other: "क्या आप सच में इन %{count} आइटमों को मिटाना चाहते हैं?"
+  are_you_sure_you_want_to_delete_this_ai_experience_375402d1: "क्या आप वाकई इस AI अनुभव को मिटाना चाहते हैं? इस कार्यवाही को पूर्वत नहीं किया जा सकता।"
   are_you_sure_you_want_to_delete_this_announcement_293d51a8: "क्या आप सच में इस घोषणा को मिटाना चाहते हैं?"
   are_you_sure_you_want_to_delete_this_assignment_88be6f5e: "क्या आप सच में इस असाइनमेंट को मिटाना चाहते हैं?"
   are_you_sure_you_want_to_delete_this_comment_4ee386d: "क्या आप सच में इस टिप्पणियां को मिटाना चाहते हैं?"
@@ -3464,6 +3478,7 @@ hi:
   are_you_sure_you_want_to_delete_this_to_do_item_497016ea: "क्या आप सच में इस करने के लिए आइटम को मिटाना चाहते हैं?"
   are_you_sure_you_want_to_delete_this_topic_403a0f40: "क्या आप सच में इस विषय को मिटाना चाहते हैं?"
   are_you_sure_you_want_to_delete_this_track_f5a16357: "क्या आप सच में इस ट्रैक को मिटाना चाहते हैं?"
+  are_you_sure_you_want_to_delete_title_this_action__6c077c19: "क्या आप सच में \"%{title}\" मिटाना चाहते हैं? इस कार्यवाही को पूर्वत नहीं किया जा सकता।"
   are_you_sure_you_want_to_delete_your_copy_of_these_f04442ed: 
     one: "क्या आप सच में इस बातचीत की अपनी प्रति को मिटाना चाहते हैं? इस कार्यवाही को पूर्ववत नहीं किया जा सकता।"
     other: "क्या आप वाकई इन बातचीतों की अपनी प्रति को मिटाना चाहते हैं? इस कार्यवाही को पूर्ववत नहीं किया जा सकता।"
@@ -4217,6 +4232,8 @@ hi:
   assignmenttype_title_is_not_marked_as_done_9344572f: "%{assignmentType} %{title} हो गया के रूप में नहीं चिह्नित किया गया है।"
   assignmenttype_title_posted_datetime_e070c79: "%{assignmentType} %{title} को %{datetime} बजे पोस्ट किया गया।"
   assignmenttype_title_reminder_datetime_2f1e8dca: "%{assignmentType} %{title}, %{datetime} बजे का अनुस्मारक।"
+  assistant_is_thinking_adf4674b: "सहायक सोच रहा है..."
+  assistant_message_1af7efda: "सहायक: %{message}"
   associated_74756cc4: संबद्ध
   associated_account_course_id_d87a01c5: "संबद्ध खाता/पाठ्यक्रम आईडी"
   associated_account_name_91854e37: "संबद्ध खाता नाम"
@@ -4291,8 +4308,10 @@ hi:
     other: प्रयास
   attempts_allowed_8441aadf: "स्वीकृत प्रयास"
   attendance_ca433183: उपस्थिति
+  attendance_determination_e624c08e: "उपस्थिति निर्धारण"
   attendance_on_dap_e29cb404: "DAP पर उपस्थिति"
   attendance_on_dap_model_description: "DAP डेटा पर looker_canvas_attendance पर उपस्थिति सक्षम करें"
+  attended_d9b2b838: "भाग लिया"
   attendee_sync_in_progress_cd882292: " प्रतिभागी सिंक किया जा रहा है... "
   attendees_eb402bac: प्रतिभागी
   attendees_failed_to_sync_725c8137: " प्रतिभागी सिंक नहीं किए जा सके।"
@@ -4500,6 +4519,7 @@ hi:
   back_to_app_center_95420d83: "ऐप सेंटर पर वापस जाएं"
   back_to_assignment_1df86a69: "वापस असाइनमेंट पर"
   back_to_attempt_attempt_ffb22bb8: "प्रयास %{attempt} पर वापस जाएं"
+  back_to_course_22250a77: "वापस पाठ्यक्रम पर"
   back_to_login_2574d967: "वापस लॉगिन पर"
   back_to_login_e4b5f663: "वापस लॉगिन पर"
   back_to_pages_6ec9d806: "वापस पेज पर"
@@ -4574,6 +4594,9 @@ hi:
   between_1_and_10_7118bf2d: "1 और 10 के बीच में"
   between_1_and_99_d421a4c0: "1% और 99% के बीच में"
   between_50_and_99_72540d1c: "50% और 99% के बीच में"
+  between_curly_braces_e_g_squankston_e4b9673e: "मध्यम कोष्ठकों के बीच, जैसे, {Squankston}"
+  between_parentheses_e_g_d09087_28c4448c: "कोष्ठकों के बीच, जैसे, (D09087)"
+  between_square_brackets_e_g_principal_64797b64: "वर्गाकार कोष्ठकों के बीच, जैसे, [प्रिंसिपल]"
   between_two_assessments_the_most_recent_assessment_9f616a5d: "दो आकलनों के बीच, सबसे हालिया आकलन को %{calculation_int} भार मिलता है, और पहले को %{remainder} मिलता है। प्रत्येक अतिरिक्त आकलन के लिए, पिछले अंक गणना का योग एक अतिरिक्त %{remainder} से कम हो जाता है। यदि केवल एक ही परिणाम है, तो एकल अंक लौटाया जाएगा।"
   big_blue_button_conference: 
     create_time: "समय बनाएं"
@@ -4770,6 +4793,7 @@ hi:
   button_color_a14b2d46: "बटन का रंग"
   button_display_84bad037: "बटन डिस्प्ले"
   button_layout_c2c31620: "बटन लेआउट"
+  button_layout_c56f1316: "बटन लेआउट"
   button_style_f4a0ddc5: "बटन शैली"
   button_text_4c8cd072: "बटन पाठ"
   button_text_link_407f2066: "बटन पाठ/लिंक*"
@@ -5065,10 +5089,16 @@ hi:
       unregistered_users: "वे उपयोगकर्ता जिन्होंने अभी तक साइन अप नहीं किया है"
     messages_sent: "संदेश भेजे गए"
     name_is_required: "नाम ज़रूरी है!"
+    next: अगला
+    next_month: "अगला महीना"
+    next_week: "अगला सप्ताह"
     no_dates_error: "आपको कम से कम एक तिथि और समय निर्दिष्ट करना होगा"
     no_groups: "कोई ग्रुप नहीं मिला"
     no_users: "कोई उपयोगकर्ता नहीं मिला"
     open_appointment_on_this_day: "इस दिन खुली नियुक्ति होती है"
+    previous: पिछला
+    previous_month: "पिछला महीना"
+    previous_week: "पिछला सप्ताह"
     prompts: 
       delete_assignment: "क्या आप सच में इस असाइनमेंट को मिटाना चाहते हैं?"
       delete_override: "क्या आप सच में इस असाइनमेंट अवहेलना को मिटाना चाहते हैं?"
@@ -5187,6 +5217,7 @@ hi:
   calendars_toggle_list_visibility_488db143: "कैलेंडर टॉगल सूची दृश्यता"
   callout_cards_4e9557c8: "कॉलआउट कार्ड"
   callout_cards_guide_page_viewers_to_important_info_12fab704: "कॉलआउट कार्ड पेज दर्शकों को महत्वपूर्ण जानकारी के लिए मार्गदर्शन करते हैं। प्रभावी कॉलआउट कार्ड आगंतुकों की अपेक्षाओं का संक्षिप्त सारांश प्रदान करता है, साथ में एक बटन या लिंक होता है जो अतिरिक्त सामग्री की ओर निर्देशित करता है।"
+  calls_in_last_30_days_5b80a4c7: "पिछले 30 दिनों में कॉल"
   campbell_union_high_school_district_grade_report_7f3bb801: "कैंपबेल यूनियन हाई स्कूल डिस्ट्रिक्ट ग्रेड रिपोर्ट"
   campus_vue_non_graded_assignment_report_1cd8999a: "कैम्पस व्यू बिना ग्रेड वाली असाइनमेंट रिपोर्ट"
   campus_vue_submission_data_18f72868: "कैम्पस व्यू सबमिशन डेटा"
@@ -5408,6 +5439,8 @@ hi:
   canvas_career_bulk_metadata_import_b9c482aa: "Canvas करियर: बल्क मेटाडेटा इंपोर्ट"
   canvas_career_cannot_be_set_without_the_feature_fl_8bb3985e: "फ़ीचर फ़्लैग सक्षम किए बिना Canvas करियर सेट नहीं किया जा सकता"
   canvas_career_content_library_c04859c1: "Canvas करियर: सामग्री लाइब्रेरी"
+  canvas_career_course_navigation_3efd0cd5: "Canvas करियर: पाठ्यक्रम नेविगेशन"
+  canvas_career_course_redesign_5581703f: "Canvas करियर: पाठ्यक्रम का पुन: डिज़ाइन"
   canvas_career_crm_integration_b49af8ae: "Canvas करियर: CRM एकीकरण"
   canvas_career_dark_theme_in_learning_provider_2c659d00: "Canvas करियर: लर्निंग प्रोवाइडर में डार्क थीम"
   canvas_career_data_insights_ai_widgets_c82286ea: "Canvas करियर: डेटा और इनसाइट AI विजेट"
@@ -5421,6 +5454,7 @@ hi:
   canvas_career_leader_dashboards_d1ce914b: "Canvas करियर: लीडर डैशबोर्ड"
   canvas_career_learner_app_37ad65c0: "Canvas करियर: लर्नर ऐप"
   canvas_career_learner_app_course_contexts_f0181a46: "Canvas करियर: लर्नर ऐप (पाठ्यक्रम संदर्भ)"
+  canvas_career_learning_library_43164be1: "Canvas करियर: लर्निंग लाइब्रेरी"
   canvas_career_learning_provider_app_975a34af: "Canvas करियर लर्निंग प्रोवाइडर ऐप"
   canvas_career_learning_provider_app_account_contex_3c8f5c55: "Canvas करियर: लर्निंग प्रदाता ऐप (खाता संदर्भ)"
   canvas_career_learning_provider_app_contextless_ro_2cfc4891: "Canvas करियर: लर्निंग प्रोवाइडर ऐप (संदर्भ रहित मार्ग)"
@@ -5874,6 +5908,7 @@ hi:
   close_enrollment_dialog_235489a3: "नामांकन डायलॉग बंद करें"
   close_error_alert_for_allocation_rule_tray_91c85ef2: "आवंटन नियम ट्रे के लिए त्रुटि चेतावनी बंद करें"
   close_error_alert_for_create_allocation_rule_modal_5bff320f: "आवंटन नियम मॉडल बनाने के लिए त्रुटि चेतावनी बंद करें"
+  close_error_alert_for_deleting_allocation_rule_1e560e26: "आवंटन नियम हटाने के लिए त्रुटि चेतावनी बंद करें"
   close_error_alert_for_edit_allocation_rule_modal_3123216d: "आवंटन नियम मोडल संपादित करने के लिए त्रुटि चेतावनी बंद करें"
   close_error_alert_for_label_search_input_a0bf1cb4: "%{label} सर्च इनपुट के लिए त्रुटि चेतावनी बंद करें"
   close_error_message_eec774d8: "त्रुटि संदेश बंद करें"
@@ -5888,6 +5923,7 @@ hi:
   close_help_tray_bb1299f6: "हेल्प ट्रे बंद करें।"
   close_move_tray_8609e988: "मूव ट्रे बंद करें"
   close_opportunity_center_popup_9907d981: "ऑपरचुनिटी सेंटर पॉप अप बंद करें"
+  close_preview_2fd61cda: "पूर्वावलोकन बंद करें"
   close_settings_tray_7b3084c2: "सेटिंग्स ट्रे बंद करें"
   close_sidebar_10b0fbb4: "साइडबार बंद करें"
   close_student_details_2f6900: "छात्र विवरण बंद करें"
@@ -6088,6 +6124,7 @@ hi:
   columns_464bd055: स्तंभ
   come_back_later_5eab7dba: "बाद में वापस आएं!"
   coming_soon_79d46687: "आ रहा है"
+  coming_soon_b38a54bc: "जल्द आ रहा है"
   coming_up_4348b0bd: "आ रहा है"
   comm_messages: 
     from_beginning: शुरुआत
@@ -6458,6 +6495,7 @@ hi:
   configuration_location_ee0f6592: "कॉन्फ़िगरेशन लोकेशन"
   configuration_type_25a084a4: "कॉन्फ़िगरेशन प्रकार"
   configuration_update_history_9c760033: "कॉन्फ़िगरेशन अपडेट इतिहास"
+  configurations_e6f92f1c: कॉन्फ़िगरेशन
   configure_aspen_client_integration_91f8c934: "एस्पेन क्लाइंट एकीकरण कॉन्फ़िगर करें"
   configure_cedar_client_integration_7024ba39: "सेडार क्लाइंट एकीकरण कॉन्फ़िगर करें"
   configure_ecb97e30: "कॉन्फ़िगर करें"
@@ -6928,6 +6966,7 @@ hi:
     url_or_domain_no_valid: "%{url} के लिए गलत URL"
     url_or_domain_required: "या तो URL या डोमेन सेट किया जाना चाहिए।"
   context_id_3de7d6da: "संदर्भ आईडी"
+  context_id_689f612: "संदर्भ आईडी"
   context_level_56d88f5b: "(%{context} स्तर)"
   context_module: 
     requirements: 
@@ -7120,6 +7159,7 @@ hi:
     users_added: 
       one: "%{user} को %{current_user} द्वारा बातचीत में जोड़ा गया था"
       other: "%{list_of_users} को %{current_user} द्वारा बातचीत में जोड़ा गया था"
+  conversation_messages_17429dbb: "बातचीत संदेश"
   conversation_participant: 
     batch_update_message: 
       one: "1 बातचीत को प्रोसेस किया गया"
@@ -7569,8 +7609,8 @@ hi:
     other: "%{count} नतीजे"
     zero: "कोई नतीजा नहीं"
   count_results_for_searchterm_a70b872d: 
-    one: "%{searchTerm} के लिए 1 नतीजा"
-    other: "%{searchTerm} के लिए %{count} नतीजे"
+    one: "\"%{searchTerm}\" के लिए 1 नतीजा"
+    other: "\"%{searchTerm}\" के लिए %{count} नतीजे"
   count_results_found_da21e05c: 
     one: "1 नतीजा मिला"
     other: "%{count} नतीजे मिले"
@@ -7757,8 +7797,11 @@ hi:
   course_default_grading_scheme_6b902d8: "पाठ्यक्रम डिफ़ॉल्ट ग्रेडिंग योजना"
   course_details_25cdf103: "पाठ्यक्रम विवरण"
   course_discussions_38c0b74f: "पाठ्यक्रम चर्चाएं"
+  course_does_not_exist_32ed9246: "पाठ्यक्रम मौजूद नहीं है"
   course_end_date_4c797823: "पाठ्यक्रम समाप्ति तिथि"
+  course_end_date_end_range_47feb469: "पाठ्यक्रम समाप्ति तिथि - समाप्ति सीमा"
   course_end_date_on_after_a6bbb0b7: "इस पर/इसके बाद पाठ्यक्रम समाप्ति तिथि"
+  course_end_date_start_range_713c302b: "पाठ्यक्रम समाप्ति तिथि - आरंभ सीमा"
   course_ends_at_e8b166df: "पाठ्यक्रम समाप्ति तिथि: "
   course_ends_endat_d1b11465: "पाठ्यक्रम समाप्ति तिथि: %{endat}"
   course_enrollments_are_in_85eb1e6b: "इसमें पाठ्यक्रम नामांकन हैं: "
@@ -7813,10 +7856,12 @@ hi:
   course_files_add_2eede390: "पाठ्यक्रम फ़ाइलें - जोड़ें"
   course_files_delete_fae0effe: "पाठ्यक्रम फ़ाइलें - मिटाएं"
   course_files_edit_d05d4e8b: "पाठ्यक्रम फ़ाइलें - संपादित करें"
+  course_filter_ef215dac: "पाठ्यक्रम फ़िल्टर:"
   course_found_f5a40cd3: "पाठ्यक्रम मिला"
   course_found_not_deleted_a20f72f0: "पाठ्यक्रम मिला (मिटाया नहीं गया)"
   course_grade_grade_in_course_code_9fa854db: "पाठ्यक्रम ग्रेड: %{course_code} में %{grade}%"
   course_grades_22adc27e: "पाठ्यक्रम ग्रेड"
+  course_grades_2501c748: "पाठ्यक्रम ग्रेड"
   course_grades_pagination_d28081b2: "पाठ्यक्रम ग्रेड पृष्ठांकन"
   course_grading_schemes_can_be_enabled_disabled_in__26b298b3: "पाठ्यक्रम ग्रेडिंग योजनाओं को पाठ्यक्रम सेटिंग्स में सक्षम/अक्षम किया जा सकता है।"
   course_has_no_active_instructors_with_this_id_74f1d8a: "पाठ्यक्रम में इस आईडी वाला कोई सक्रिय प्रशिक्षक नहीं है"
@@ -8049,6 +8094,7 @@ hi:
   course_sis_7ae8f649: "पाठ्यक्रम SIS"
   course_sis_df8b379: "पाठ्यक्रम SIS"
   course_sis_id_bbed1a60: "पाठ्यक्रम SIS आईडी"
+  course_sis_id_c026d0f3: "पाठ्यक्रम SIS आईडी"
   course_sis_id_cd834b3c: "पाठ्यक्रम SIS आईडी:"
   course_sis_id_sis_id_or_canvas_id_4d323f5c: "पाठ्यक्रम SIS आईडी (SIS_आईडी:####) या Canvas आईडी: (###)"
   course_start_date_daae16ae: "पाठ्यक्रम आरंभ तिथि"
@@ -8084,6 +8130,7 @@ hi:
   course_with_canvas_id_id_not_found_1ff06bec: "Canvas आईडी %{id} वाला पाठ्यक्रम नहीं मिला"
   course_wizard_31c87552: "पाठ्यक्रम विज़ार्ड"
   course_work_6ed46557: "पाठ्यक्रम कार्य"
+  course_work_cee6ca69: "पाठ्यक्रम कार्य"
   course_work_item_8f95486e: "पाठ्यक्रम कार्य आइटम"
   course_work_pagination_e625c69e: "पाठ्यक्रम कार्य पृष्ठांकन"
   coursecontext_label_d563be4c: "%{courseContext} %{label}"
@@ -8366,6 +8413,7 @@ hi:
         grade_syncing: "ग्रेड सिंक किया जा रहा है"
         integrations: एकीकरण
         navigation: नेविगेशन
+        quiz_settings: "प्रश्नोत्तरी सेटिंग्स"
         sections: अनुभाग
         tools: ऐप
       titles: 
@@ -8587,6 +8635,7 @@ hi:
   created_descending_e9a1b097: "बनाया गया: अवरोही क्रम"
   created_group_group_name_224ce5f9: "बनाया गया ग्रुप: %{group_name}"
   created_new_group_with_microsoft_id_group_id_71010b3: "Microsoft आईडी के साथ नया ग्रुप बनाया गया: %{group_id}"
+  created_on_date_3fc25e8: "%{date} को बनाया गया"
   created_timingdisplay_82e15b1e: "%{timingDisplay} द्वारा बनाया गया"
   creating_261dbb7a: "बनाया जा रहा है..."
   creating_88cc5158: "बनाया जा रहा है"
@@ -8626,6 +8675,7 @@ hi:
   cross_listing_3318526a: क्रॉस-लिस्टिंग्स
   crumbs: 
     access_report: "एक्सेस रिपोर्ट"
+    ai_experiences: "AI अनुभव"
     announcements: घोषणाएं
     apps: ऐप
     assignments: असाइनमेंट
@@ -8648,6 +8698,7 @@ hi:
     media: मीडिया
     messages: संदेश
     modules: मॉड्यूल
+    new_ai_experience: "नया AI अनुभव"
     outcomes: परिणाम
     people: लोग
     plugins: प्लगइन
@@ -8857,10 +8908,12 @@ hi:
   dashboard_options_b240ed5a: "डैशबोर्ड विकल्प"
   dashboard_view_d7d85969: "डैशबोर्ड व्यू"
   dashboard_widgets_and_customization_features_comin_ae7f3631: "डैशबोर्ड विजेट और कस्टमाइज़ेशन फ़ीचर जल्द ही आ रही हैं।"
+  data_e93dc77e: डेटा
   data_exports: "डेटा निर्यात"
   data_is_not_stored_or_reused_by_the_model_34192f1d: "मॉडल द्वारा डेटा संग्रहीत या पुन: उपयोग नहीं किया जाता है,"
   data_is_not_stored_or_reused_by_the_model_da174e31: "मॉडल द्वारा डेटा को संग्रहीत या पुनः उपयोग नहीं किया जाता है।"
   data_logging_a2a6e1f2: "डेटा लॉगिंग"
+  data_parsing_4fa9ae02: "डेटा पार्सिंग"
   data_permission_levels_8185fa37: "डेटा अनुमति स्तर"
   data_point_over_time_8d0a54cc: "समय के साथ %{data_point}"
   data_retention_c28657c9: "डेटा प्रतिधारण"
@@ -8959,6 +9012,7 @@ hi:
   date_created_createdat_265a0dfa: "निर्माण तिथि: %{createdAt}"
   date_ee500367: तिथि
   date_error_7b38f8ff: "तिथि त्रुटि"
+  date_filter_8d157521: "डेटा फ़िल्टर:"
   date_filter_is_in_effect_4363df73: "तिथि फ़िल्टर प्रभावी है"
   date_imported_2e9ff69a: "तिथि आयात की गई"
   date_is_after_course_end_date_94a2f4e3: "तिथि पाठ्यक्रम समाप्ति तिथि के बाद की है"
@@ -8966,11 +9020,13 @@ hi:
   date_is_not_a_valid_date_1910719f: "#{date}मान्य तिथि नहीं है।"
   date_is_required_8660ec22: "तिथि आवश्यक है"
   date_is_required_9c6f5e83: "तिथि आवश्यक है!"
+  date_messageintro_b7bc9f3f: "%{date}: \"%{messageIntro}\""
   date_modified_e1c8ac8f: "तिथि संशोधित हो गई है"
   date_modified_modifiedat_b839cc8b: "तिथि संशोधित हो गई है: %{modifiedAt}"
   date_must_be_after_date_available_55bdfee0: "तिथि उपलब्ध तिथि के बाद की होनी चाहिए।"
   date_must_be_after_date_available_b4fbd204: "तिथि उपलब्ध तिथि के बाद की होनी चाहिए"
   date_must_be_in_the_future_307eebdd: "तिथि भविष्य में होनी चाहिए"
+  date_of_attendance_766862b1: "उपस्थिति की तिथि"
   date_of_most_recent_bounce_b23d0119: "सबसे हालिया बाउंस की तिथि"
   date_range_74a331c3: "तिथि सीमा"
   date_range_b5621ec7: "तिथि सीमा"
@@ -9113,6 +9169,7 @@ hi:
   delete_account_name_96aee330: "%{account_name}को मिटाएं"
   delete_additional_empty_subject_field_f8605f02: "अतिरिक्त खाली विषय फ़ील्ड मिटाएं"
   delete_additional_subject_field_name_7022bbf5: "अतिरिक्त विषय फ़ील्ड मिटाएं: %{name}"
+  delete_ai_experience_a73950c6: "AI अनुभव मिटाएं"
   delete_alert_3d3facec: "चेतावनी मिटाएं"
   delete_alert_button_c177234: "चेतावनी बटन मिटाएं"
   delete_alignment_f33c97d5: "संरेखण मिटाएं"
@@ -9273,6 +9330,7 @@ hi:
   desc_12ad2869: "%{desc}"
   descending_b7828162: "अवरोही क्रम"
   describe_the_ai_experience_c07fe581: "AI अनुभव का वर्णन करें"
+  describe_the_role_or_style_of_the_ai_e_g_friendly__10fde448: "AI की भूमिका या शैली का वर्णन करें (उदाहरण के लिए, स्नेही मार्गदर्शक, सख्त परीक्षक, कहानीकार)।"
   describe_the_scenario_or_context_for_the_ai_experi_3e30726e: "AI अनुभव के लिए परिदृश्य या संदर्भ का वर्णन करें"
   describe_what_s_on_the_picture_c4791974: "चित्र में क्या है, इसका वर्णन करें।"
   description_436c48d7: विवरण
@@ -9330,6 +9388,7 @@ hi:
   developer_key_developerkeyid_deleted_focus_moved_t_9f5b5198: "डेवलपर कुंजी %{developerKeyId} मिटाई गई। फ़ोकस को सूची में पिछली डेवलपर कुंजी के मिटाएं बटन पर ले जाया गया।"
   developer_key_include_parameter_support_58cbf874: "डेवलपर कुंजी में पैरामीटर समर्थन शामिल है"
   developer_key_is_an_external_tool_27c6166b: "डेवलपर कुंजी बाहरी उपकरण है।"
+  developer_key_name_830f8a91: "डेवलपर कुंजी नाम"
   developer_key_settings_889721f1: "डेवलपर कुंजी सेटिंग्स"
   developer_keys: 
     index: 
@@ -9465,6 +9524,7 @@ hi:
   discussion_group_category_locked: "ग्रुप श्रेणियों को सीधे चर्चा असाइनमेंट पर सेट नहीं किया जा सकता है, बल्कि उन्हें चर्चा पर सेट किया जाना चाहिए"
   discussion_insights_c00b5b14: "चर्चाओं से जुड़ी गहन जानकारी"
   discussion_insights_error_page_1202f5a5: "चर्चाओं से जुड़ी गहन जानकारी त्रुटि पेज"
+  discussion_insights_uses_ai_to_evaluate_student_di_2c7b9f0e: "चर्चा संबंधी अंतर्दृष्टि छात्रों के चर्चा उत्तरों का मूल्यांकन करने, प्रासंगिक योगदानों को उजागर करने और उन लोगों को चिह्नित करने के लिए AI का उपयोग करती है जिन्हें प्रशिक्षक की समीक्षा की आवश्यकता हो सकती है।"
   discussion_itemtitle_1a5ff063: "चर्चा, %{itemTitle}"
   discussion_mention_c70cb87a: "चर्चा मेंशन"
   discussion_participant_1446188e: "चर्चा प्रतिभागी"
@@ -9494,6 +9554,7 @@ hi:
   discussion_topic_initial_query_error_37c98b4: "चर्चा का विषय आरंभिक पूछताछ त्रुटि"
   discussion_topic_menu_3d4684c6: "चर्चा का विषय मेनू"
   discussion_topic_post_error_page_7f7edc49: "चर्चा का विषय पोस्ट त्रुटि पेज"
+  discussion_topic_prompt_and_student_replies_are_us_7098d1e4: "चर्चा विषय, प्रॉम्प्ट और छात्र उत्तरों का उपयोग किया जाता है।"
   discussion_topic_title_68693786: "चर्चा विषय शीर्षक"
   discussion_topic_title_95b1d6b6: "चर्चा का विषय: %{title}"
   discussion_topic_will_be_available_starting_at_46aa7477: "चर्चा का विषय इस तिथि से शुरू होते हुए उपलब्ध कराया जाएगा: "
@@ -9799,6 +9860,7 @@ hi:
   document_processing_app_s_af9108d1: "डॉक्युमेंट प्रोसेसिंग ऐप(प्स)"
   document_processing_apps_d3b8006f: "दस्तावेज़ प्रसंस्करण ऐप्स"
   document_processing_in_discussions_2ce93578: "चर्चाओं में दस्तावेज़ प्रसंस्करण"
+  document_processor_a9d64fed: "डॉक्युमेंट प्रोसेसर"
   document_processor_settings_won_t_be_copied_for_as_57d8ca08: "डॉक्युमेंट प्रोसेसर सेटिंग्स को असाइनमेंट '%{assignment_name}' के लिए कॉपी नहीं किया जाएगा क्योंकि चयनित टूल डॉक्युमेंट प्रोसेसर संगत नहीं है।"
   document_processor_settings_won_t_be_copied_for_as_74411f1a: "डॉक्युमेंट प्रोसेसर सेटिंग्स को असाइनमेंट '%{assignment_name}' के लिए कॉपी नहीं किया जाएगा क्योंकि निर्दिष्ट टूल कॉन्फ़िगर नहीं किया गया है।"
   document_processor_won_t_be_copied_for_assignment__9aa72954: "डॉक्युमेंट प्रोसेसर को असाइनमेंट '%{assignment_name}' के लिए कॉपी नहीं किया जाएगा: %{error}"
@@ -10045,6 +10107,7 @@ hi:
   e_g_http_university_edu_helpdesk_acab04d6: "उदाहरण के लिए, http://university.edu/helpdesk"
   e_g_most_problematic_areas_to_clarify_for_my_stude_a1b144c9: "उदाहरण के लिए, मेरे छात्रों को स्पष्ट करने के लिए सबसे अधिक समस्याग्रस्त क्षेत्र"
   e_mail_only_2cc5e513: "केवल ईमेल"
+  each_student_appears_only_once_per_course_duplicat_faf24fcc: "प्रत्येक छात्र प्रति पाठ्यक्रम केवल एक बार उपस्थित होता है, डुप्लिकेट निकाल दिए जाते हैं"
   easily_import_or_copy_content_from_another_canvas__c6312f32: |-
       आसानी से किसी अन्य Canvas पाठ्यक्रम से सामग्री को अपने पाठ्यक्रम में आयात करें या
               प्रति बनाएं, या Moodle या QTI जैसे अन्य प्रारूपों से सामग्री आयात करें।
@@ -10212,6 +10275,7 @@ hi:
     switch_editor_rich_text: "रिच कॉन्टेंट संपादक"
     switch_editor_visual: "रिच कॉन्टेंट संपादक"
   editor_button_6647db9c: "संपादक बटन"
+  editor_id_8035e70a: "संपादक आईडी"
   editor_id_bb5bc7c2: "संपादक आईडी"
   editor_toolbar_c0c78b6: "संपादक उपकरण पट्टी"
   editsection_1bf813f5: अनुभागसंपादितकरें
@@ -10271,6 +10335,7 @@ hi:
   enable_course_as_a_blueprint_course_8515ffd5: "पाठ्यक्रम को ब्लूप्रिंट पाठ्यक्रम के रूप में सक्षम करें"
   enable_course_as_a_course_template_5299afb6: "पाठ्यक्रम को पाठ्यक्रम टेम्पलेट के रूप में सक्षम करें"
   enable_dynamic_peer_review_allocation_and_separate_44f7e8d: "सुव्यवस्थित, लचीले समीक्षा अनुभव के लिए गतिशील सहकर्मी समीक्षा आवंटन और अलग-अलग नियत तिथियां और ग्रेडिंग सक्षम करें।"
+  enable_dynamic_peer_review_allocation_for_a_stream_9a6237a6: "सुव्यवस्थित अनुभव के लिए गतिशील सहकर्मी समीक्षा आवंटन सक्षम करें।"
   enable_eula_request_523968fd: "EULA अनुरोध सक्षम करें"
   enable_external_apps_side_tray_d49ff9a7: "बाहरी ऐप्स साइड ट्रे सक्षम करें"
   enable_extra_filter_options_b52c23e6: "अतिरिक्त फ़िल्टर विकल्प सक्षम करें"
@@ -10303,6 +10368,7 @@ hi:
   enable_scope_ac28b832: "दायरा सक्षम करें"
   enable_self_assessment_f6afa193: "स्व-आकलन सक्षम करें"
   enable_sending_oauth_consumer_key_5bb4bc5d: "OAuth उपभोक्ता कुंजी भेजना सक्षम करें"
+  enable_separate_due_dates_and_grading_for_peer_rev_70f2518a: "असाइनमेंट पर सहकर्मी समीक्षा के लिए अलग-अलग नियत तिथियां और ग्रेडिंग सक्षम करें।"
   enable_the_deprecation_of_the_faculty_journal_func_78b3344d: "संकाय पत्रिका कार्यक्षमता का अवमूल्यन सक्षम करें।"
   enable_the_new_block_content_editor_for_creating_p_13f4fa21: "EAP में पेज बनाने के लिए नया ब्लॉक सामग्री संपादक सक्षम करें। यह फ़्लैग केवल मूल खाता व्यवस्थापकों के लिए अनुमत है।"
   enable_the_new_block_content_editor_for_creating_p_72c671c7: "पेज बनाने के लिए नया ब्लॉक कॉन्टेंट संपादक सक्षम करें।"
@@ -10356,6 +10422,7 @@ hi:
       उत्तरों के लिए अलग-अलग नियत तिथियां बनाने की अनुमति देते हैं। प्रारंभिक प्रतिक्रिया
       और उत्तरों को फिर अलग-अलग ग्रेड किया जाता है, और उन ग्रेडों को मिलाकर
       अंतिम चर्चा ग्रेड बनाया जाता है।
+  enables_courses_to_leverage_canvas_career_features_22bf68c7: "पाठ्यक्रमों को Canvas करियर फ़ीचर्स का मूल रूप से लाभ उठाने में सक्षम बनाता है।"
   enables_dark_theme_in_learning_provider_ebe48699: "लर्निंग प्रोवाइडर में डार्क थीम को सक्षम करता है।"
   enables_dashboards_for_admins_in_canvas_career_f34966b: "Canvas करियर में व्यवस्थापक के लिए डैशबोर्ड सक्षम करता है।"
   enables_dashboards_for_leaders_in_canvas_career_4ce72c91: "Canvas करियर में लीडरों के लिए डैशबोर्ड सक्षम करता है।"
@@ -10365,10 +10432,12 @@ hi:
   enables_importing_metadata_in_bulk_in_canvas_caree_2db97d50: "Canvas करियर में मेटाडेटा को थोक में आयात करने में सक्षम बनाता है।"
   enables_integration_with_the_assessment_management_7ebf2fdc: "खातों और पाठ्यक्रमों के लिए आकलन प्रबंधन सेवा (AMS) के साथ एकीकरण सक्षम करता है।"
   enables_manual_dashboard_builder_in_canvas_career_1666e03f: "Canvas करियर में मैन्युअल डैशबोर्ड बिल्डर सक्षम करता है।"
+  enables_native_course_navigation_in_canvas_career_1ee52496: "Canvas करियर में मूल पाठ्यक्रम नेविगेशन सक्षम करता है।"
   enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: "नए एनालिटिक्स द्वारा प्रदान किए गए पाठ्यक्रम और उपयोगकर्ता डेटा के लिए नए API endpoints को सक्षम बनाता है।"
   enables_postprocessing_records_after_sql_execution_61ec2943: "परिणाम रिपोर्ट में क्वेरी जटिलता को कम करने के लिए SQL एग्ज़ीक्यूशन के बाद पोस्टप्रोसेसिंग रिकॉर्ड सक्षम करता है।"
   enables_program_management_in_canvas_career_92aa043c: "Canvas करियर में कार्यक्रम प्रबंधन को सक्षम बनाता है।"
   enables_sending_additional_parameters_client_id_po_8be6c5f8: "Canvas से लॉग आउट करते समय `end_session_endpoint` को अतिरिक्त पैरामीटर (client_id, post_logout_redirect_uri और id_token_hint) भेजने में सक्षम बनाता है।"
+  enables_sending_metrics_when_the_comment_bank_item_310e4575: "`comment_bank_items_count` रिज़ॉल्वर का उपयोग user_type.comment_bank_items_connection पर किए जाने पर मीट्रिक्स भेजने को सक्षम करता है।"
   enables_sending_metrics_when_the_limit_argument_is_a4c63beb: "जब `limit` तर्क का उपयोग user_type.comment_bank_items_connection पर किया जाता है, तो मेट्रिक्स भेजने को सक्षम करता है।"
   enables_skill_management_in_canvas_career_f88a6a76: "Canvas करियर में कौशल प्रबंधन को सक्षम बनाता है।"
   enables_support_for_uploading_files_as_part_of_the_712baa12: "आधुनिकीकृत SpeedGrader में AI-सहायता प्राप्त ग्रेडिंग टूल के भाग के रूप में फ़ाइलें अपलोड करने के लिए समर्थन सक्षम करता है।"
@@ -10390,9 +10459,11 @@ hi:
   enables_the_ignite_agent_feature_for_the_root_acco_44fee4e9: "मूल खाते के लिए इग्नाइट एजेंट सुविधा सक्षम करता है। इग्नाइट एजेंट प्रशासकों और शिक्षकों के लिए एक AI साथी है जो उन्हें Canvas LMS में उनके दैनिक कार्यों में मदद करता है। यह फ़ीचर अभी विकास के चरण में है और सामान्य उपयोग के लिए उपलब्ध नहीं है।"
   enables_the_learner_app_in_canvas_career_bd225f22: "Canvas करियर में लर्नर ऐप को सक्षम करता है।"
   enables_the_learner_app_in_canvas_career_on_all_ro_986e8e82: "सभी मार्गों पर Canvas करियर में लर्नर ऐप को सक्षम करता है।"
+  enables_the_learning_library_in_canvas_career_9c5ee3e1: "Canvas करियर में लर्निंग लाइब्रेरी को सक्षम करता है।"
   enables_the_microsoft_immersive_reader_button_in_s_ab4af0cd: "Canvas के समर्थित क्षेत्रों में Microsoft इमर्सिव रीडर बटन को सक्षम बनाता है। यदि खाता व्यवस्थापक ने इसे सभी उपयोगकर्ताओं के लिए चालू कर दिया है, तो इस सेटिंग की परवाह किए बिना बटन को अभी भी सक्षम किया जा सकता है।"
   enables_the_new_ai_assisted_grading_tool_codename__483d068a: "इस पाठ्यक्रम में असाइनमेंट के लिए नए AI-सहायता प्राप्त ग्रेडिंग टूल, कोडनाम प्रोजेक्ट Lhotse को सक्षम करता है।"
   enables_the_new_ai_assisted_grading_tool_inside_of_e9480bb2: "इस पाठ्यक्रम में असाइनमेंट के लिए आधुनिकीकृत SpeedGrader के अंदर नए AI-सहायता प्राप्त ग्रेडिंग टूल को सक्षम करता है।"
+  enables_the_new_comment_library_experience_in_spee_c69fd350: "SpeedGrader में नया केमेंट लाइब्रेरी अनुभव सक्षम करता है।"
   enables_the_new_files_a11y_rewrite_page_75d23b14: "नई फ़ाइलें a11y पुनर्लेखन पेज सक्षम करता है।"
   enables_the_optimized_root_account_experience_in_c_974cfdcc: "Canvas करियर में अनुकूलित मूल खाता अनुभव सक्षम करता है।"
   enables_the_refreshed_user_profile_page_in_canvas__42c5e6f6: "Canvas करियर में ताज़ा उपयोगकर्ता प्रोफ़ाइल पेज को सक्षम करता है।"
@@ -11209,6 +11280,7 @@ hi:
   exactly_one_rating_can_have_mastery_c1d87990: "बिल्कुल एक रेटिंग में प्रवीणता हासिल हो सकती है"
   example_84698b7d: उदाहरण
   example_c_2024_acme_inc_6171aaf5: "उदाहरण: (c) 2024 Acme Inc."
+  example_cb3509b8: "उदाहरण:"
   example_edu_cc1a0744: "@example.edu"
   example_final_score_355aff0f: "अंतिम अंक का उदाहरण"
   example_https_schoolofrock_catalog_instructure_com_b7a35ab5: "उदाहरण: \"https://schoolofrock.catalog.instructure.com\""
@@ -11281,6 +11353,7 @@ hi:
   expected_array_of_objects_b09ead01: "ऑब्जेक्ट्स अपेक्षित शृंखला"
   expected_filter_param_to_be_one_of_visible_hidden_c658bc3: "अपेक्षित %{filter} परम इनमें से एक होगा: %{visible}, %{hidden}"
   expected_risks_b3904755: "अपेक्षित जोखिम"
+  experience_a230fd11: अनुभव
   expiration_date_cannot_be_more_than_days_days_in_t_138c65fe: "वैधता समाप्ति तिथि भविष्य में %{days} दिनों से अधिक नहीं हो सकती।"
   expiration_date_e3855fa9: "समय-समाप्ति तिथि"
   expiration_date_is_required_563d7fa3: "वैधता समाप्ति तिथि आवश्यक है।"
@@ -11439,6 +11512,8 @@ hi:
   failed_to_create_temporary_enrollment_pairing_due__a2bf61a: "किसी अज्ञात त्रुटि के कारण अस्थायी नामांकन पेयर बनाने में विफल"
   failed_to_create_temporary_enrollment_please_try_a_4d765613: "अस्थायी नामांकन बनाने में विफल, कृपया बाद में फिर से कोशिश करें"
   failed_to_decline_invitation_4fe6b4c3: "आमंत्रण अस्वीकार करने में विफल"
+  failed_to_delete_ai_experience_16526856: "AI अनुभव को मिटाने में विफल"
+  failed_to_delete_ai_experience_please_try_again_15da80c7: "AI अनुभव को मिटाने में विफल। कृपया फिर से कोशिश करें।"
   failed_to_delete_alert_please_try_again_later_a3d7d2cc: "चेतावनी मिटाने में विफल। कृपया बाद में फिर से कोशिश करें।"
   failed_to_delete_all_selected_items_please_try_aga_1e4e7f03: "सभी चयनित आइटम मिटाने में विफल। कृपया फिर से कोशिश करें।"
   failed_to_delete_auth_tokens_on_canvas_side_1d871f46: "Canvas की ओर से प्रमाणीकरण टोकन मिटाने में विफल"
@@ -11565,6 +11640,7 @@ hi:
   failed_to_reorder_pages_4fb7578f: "पेज पुन: व्यवस्थित करने में विफल"
   failed_to_reorder_sections_4039e3a8: "अनुभाग पुन: व्यवस्थित करने में विफल"
   failed_to_report_the_image_please_try_again_92398b47: "छवि रिपोर्ट करने में विफल, कृपया फिर से कोशिश करें।"
+  failed_to_restart_conversation_please_try_again_9876bc91: "बातचीत पुनः आरंभ करने में विफल। कृपया फिर से कोशिश करें।"
   failed_to_retrieve_folder_information_7eebdc0c: "फ़ोल्डर जानकारी पुनर्प्राप्त करने में विफल"
   failed_to_retrieve_history_67e65267: "इतिहास पुनर्प्राप्त करने में विफल"
   failed_to_retrieve_page_list_a425e67e: "पेज सूची पुनः प्राप्त करने में विफल।"
@@ -11578,10 +11654,12 @@ hi:
   failed_to_save_settings_80f1808e: "सेटिंग्स सहेजने में विफल"
   failed_to_save_to_do_ddc7503b: "करने के लिए सहेजने में विफल"
   failed_to_search_f29a4a7: "खोजने में विफल"
+  failed_to_send_message_please_try_again_a4139c0: "संदेश भेजने में विफल। कृपया फिर से कोशिश करें।"
   failed_to_send_the_code_due_to_a_network_error_ple_ec49a622: "नेटवर्क त्रुटि के कारण कोड भेजने में विफल। कृपया अपने इंटरनेट कनेक्शन की जांच करें और फिर से कोशिश करें।"
   failed_to_set_default_grade_aa3defda: "डिफ़ॉल्ट ग्रेड सेट करने में विफल"
   failed_to_split_users_d9759007: "उपयोगकर्ता विभाजित करने में विफल।"
   failed_to_start_a_scan_338db148: "स्कैन प्रारंभ करने में विफल"
+  failed_to_start_conversation_please_try_again_6045bb5: "बातचीत आरंभ करने में विफल। कृपया फिर से कोशिश करें।"
   failed_to_start_copy_operation_please_try_again_c6dccd7c: "कॉपी ऑपरेशन शुरू करने में विफल। कृपया फिर से कोशिश करें।"
   failed_to_start_report_79f30949: "रिपोर्ट शुरू करने में विफल।"
   failed_to_submit_draft_comment_1de83451: "ड्राफ़्ट टिप्पणी सबमिट करने में विफल"
@@ -12980,6 +13058,7 @@ hi:
   hausa_455223ee: हौसा
   have_a_pairing_code_258090de: "पेयरिंग कोड है?"
   have_a_question_about_canvas_ask_it_here_5781cce: "क्या आपको Canvas के बारे में कोई प्रश्न पूछना है? यहां पूछें।"
+  have_an_idea_for_a_new_widget_8eb35e40: "क्या आपके पास किसी नए विजेट के लिए कोई विचार है?"
   have_not_been_graded_df2a5fd2: "ग्रेड नहीं किया गया है"
   have_not_yet_submitted_57e6a58b: "अभी तक सबमिट नहीं किया है"
   have_not_yet_submitted_and_excused_8987e3ab: "अभी तक सबमिट नहीं किया गया है और माफ़ी नहीं मांगी गई है"
@@ -13133,6 +13212,7 @@ hi:
   helps_administrators_and_teachers_make_more_meanin_c458bcf7: "व्यवस्थापकों और शिक्षकों को अपने खाते और पाठ्यक्रमों में परिणामों को आयात, संगठित और संपादित करते समय अधिक सार्थक निर्णय लेने में मदद मिलती है।"
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "आपको कैलेंडर को जानने और अपने पास मौजूद किसी भी गैर-असाइनमेंट घटना को पाठ्यक्रम में जोड़ने का एक शानदार मौका दिया जाता है। चिंता न करें, हम इसमें आपकी मदद करेंगे।"
   here_s_some_quick_tips_to_get_you_started_in_canva_72425979: "Canvas में शुरुआत करने के लिए यहां कुछ त्वरित सुझाव दिए गए हैं!"
+  here_you_can_have_a_chat_with_the_ai_just_like_a_s_b66963a2: "यहाँ, आप एक छात्र की तरह AI के साथ बातचीत कर सकते हैं।"
   here_you_can_view_and_navigate_to_your_enrolled_co_4ed0c49f: "यहाँ आप अपने नामांकित पाठ्यक्रमों को देख और नेविगेट कर सकते हैं। पाठ्यक्रम सामग्री, असाइनमेंट और घोषणाओं तक त्वरित पहुँच।"
   hero_15005a9b: हीरो
   hero_image_with_text_a1e032df: "पाठ के साथ हीरो छवि"
@@ -13541,6 +13621,12 @@ hi:
       यदि सक्षम किया गया, तो अप्रचलित oembed_retrieve endpoint अनुपलब्ध होगा। 
       इसका उद्देश्य किसी भी संभावित उपयोगकर्ता को पूरी तरह से निकालने से पहले उसे इस endpoint से
       स्थानांतरित करने की प्रक्रिया को आसान बनाना है।
+  if_enabled_the_developer_keys_page_will_show_an_al_187f7c2b: |-
+      यदि सक्षम किया गया है, तो डेवलपर कुंजी पेज उन अनुरोधों को अवरुद्ध करने के बारे में अलर्ट
+      दिखाएगा जिनमें उपयोगकर्ता-एजेंट हेडर नहीं है।
+  if_enabled_the_document_processor_placement_will_b_fd68dcd: |-
+      यदि सक्षम किया गया है, तो डॉक्युमेंट प्रोसेसर प्लेसमेंट असाइनमेंट और चर्चाओं पर दिखाई देगा,
+      जब कम से कम एक टूल इस प्लेसमेंट का उपयोग करने के लिए कॉन्फ़िगर किया गया हो और मूल खाते के लिए डॉक्युमेंट प्रोसेसर सक्षम हों।
   if_enabled_the_generate_with_ai_button_will_appear_291b4450: "यदि सक्षम किया गया है, तो \"जेनरेट विद AI\" बटन दिखाई देगा, जो प्रारंभिक एडॉप्टर प्रोग्राम में संस्थानों के लिए AI-आधारित प्रश्नोत्तरी निर्माण की अनुमति देगा"
   if_enabled_the_modules_page_will_use_the_new_modul_a585c7d8: "यदि सक्षम किया गया है, तो मॉड्यूल पेज छात्र दृश्य पर नए मॉड्यूल पेज रीराइट का उपयोग करेगा।"
   if_enabled_the_modules_page_will_use_the_new_modul_c4a1a3de: "यदि सक्षम किया गया है, तो मॉड्यूल पेज नए मॉड्यूल पेज पुनर्लेखन का उपयोग करेगा।"
@@ -13576,6 +13662,7 @@ hi:
   if_left_blank_uses_due_date_e3d14dc1: "खाली छोड़ने पर नियत तिथि का उपयोग करें"
   if_lti_add_is_disabled_users_can_still_install_app_78aa7908: "यदि LTI - जोड़ें अक्षम है, तो उपयोगकर्ता अभी भी Canvas ऐप सेंटर के माध्यम से स्वीकृत ऐप्स इंस्टॉल कर सकते हैं (यदि आपके संस्थान के लिए सक्षम है)। हालांकि, यदि LTI - मिटाएं सक्षम नहीं है, तो वे मैन्युअल रूप से जोड़े गए बाहरी ऐप्स को नहीं हटा सकते।"
   if_mastery_scales_are_enabled_the_report_will_be_t_bf48d520: "यदि प्रवीणता स्केल सक्षम हैं, तो रिपोर्ट को गणना पद्धति, गणना पूर्णांक, प्रवीणता अंक या रेटिंग शामिल नहीं करने के लिए छोटा कर दिया जाएगा।"
+  if_multiple_roll_call_attendance_assignments_exist_8ccd46d: "यदि एकाधिक \"रोल कॉल अटेंडेंस\" असाइनमेंट मौजूद हैं, तो पहले वाले (असाइनमेंट आईडी द्वारा) का उपयोग किया जाता है"
   if_new_quizzes_is_enabled_this_allows_for_the_crea_87343d6f: |-
       यदि नई प्रश्नोत्तरी सक्षम है, तो विशिष्ट पाठ्यक्रमों के स्वामित्व वाले आइटम बैंकों और नई प्रश्नोत्तरी में
       मूल खाते के निर्माण और प्रबंधन की अनुमति मिलती है।
@@ -13676,6 +13763,11 @@ hi:
   ignite_ai_summarize_53a7af3d: "इग्नाइट AI सारांशित करें"
   ignite_ai_text_8e4e1ee6: "इग्नाइट AI %{text}"
   ignite_ai_translate_46414b4f: "इग्नाइट AI अनुवाद करें"
+  igniteai_generator_for_rubrics_d04fd660: "रुब्रिक्स के लिए IgniteAI जेनरेटर"
+  igniteai_insights_for_discussions_4e640837: "चर्चाओं के लिए IgniteAI अंतर्दृष्टि"
+  igniteai_summaries_for_discussions_63b8c8eb: "चर्चाओं के लिए IgniteAI सारांश"
+  igniteai_translations_for_discussions_announcement_c3be6962: "चर्चाओं और घोषणाओं के लिए IgniteAI अनुवाद"
+  igniteai_translations_for_inbox_5c3ee598: "इनबॉक्स के लिए IgniteAI अनुवाद"
   ignore_assignment_738b3c99: "असाइनमेंट की अनदेखी करें"
   ignore_assignment_a4837cb3: "%{assignment} की अनदेखी करें"
   ignore_assignment_until_new_submission_424f8f01: "नए सबमिशन तक %{assignment} की अनदेखी करें"
@@ -13949,6 +14041,7 @@ hi:
   inherited_from_parent_account_4776070d: "माता-पिता खाते से विरासत में पाया गया"
   inherited_from_salesforce_44d98f5e: "(Salesforce से विरासत में मिला)"
   initial_sync_incomplete_ec74fe8e: "आरंभिक सिंक अधूरा"
+  initializing_conversation_6cd13d: "बातचीत आरंभ हो रही है..."
   injects_config_into_the_microfrontend_at_load_time_d0ab9192: "यह कॉन्फ़िगरेशन को सर्वर से प्राप्त करने के बजाय लोड समय पर माइक्रोफ़्रंटएंड में इंजेक्ट करता है।"
   inner_box_background_6f9092f: "इनर बॉक्स बैकग्राउंड"
   inner_box_border_d0524b03: "इनर बॉक्स बॉर्डर"
@@ -13971,6 +14064,8 @@ hi:
   insert_row_in_edit_mode_5976f269: "संपादित करें मोड में पंक्ति डालें"
   insert_subject_9f0d8e49: "विषय डालें"
   insights_are_generated_by_ai_and_reflect_the_lates_a01ab2f1: "गहन जानकारी AI द्वारा जेनरेट की गई है और चर्चा में नवीनतम योगदानों को दर्शाता है। कृपया ध्यान दें कि आउटपुट हमेशा सटीक नहीं हो सकता है। गहन जानकारी केवल प्रशिक्षकों को दिखाई देती है।"
+  insights_generated_fc00bd3: "अंतर्दृष्टि जेनरेट की गई"
+  insights_loading_be606654: "अंतर्दृष्टि लोड हो रही है"
   instaccess_tokens_b13a8390: "InstAccess टोकन"
   install_a_new_app_bfae9444: "नया ऐप इंस्टॉल करें"
   install_app_e0e91726: "ऐप इंस्टॉल करें"
@@ -14001,9 +14096,11 @@ hi:
   instructor_score_6e11587f: "प्रशिक्षक अंक"
   instructor_sis_id_899dd697: "प्रशिक्षक SIS आईडी"
   instructors_4b491a07: प्रशिक्षक
+  instructors_are_able_to_quickly_assess_the_quality_8e9c96f7: "प्रशिक्षक छात्रों के उत्तरों की गुणवत्ता का शीघ्रता से आकलन करने, कम प्रयास वाले या विषय से हटकर योगदान की पहचान करने, तथा जहां इसकी सबसे अधिक आवश्यकता है, वहां अपना ध्यान केन्द्रित करने में सक्षम होते हैं।"
   instructors_are_not_bound_by_attempt_limits_but_an_20b78fea: "प्रशिक्षक प्रयास की सीमा से बंधे नहीं हैं, लेकिन प्रशिक्षक के सबमिशन को छात्र के प्रयास के रूप में गिना जाएगा।"
   instructors_can_submit_on_behalf_of_students_d9de3c83: "प्रशिक्षक छात्रों की ओर से सबमिट कर सकते हैं"
   instructors_cdd595d0: प्रशिक्षक
+  instructors_may_review_ai_generated_evaluations_or_7f032db0: "प्रशिक्षक AI से तैयार मूल्यांकनों की समीक्षा कर सकते हैं या सीधे पोस्ट की समीक्षा कर सकते हैं।"
   instructors_pagination_13cfa0a9: "प्रशिक्षक पृष्ठांकन"
   instructure: 
     errors: 
@@ -14108,8 +14205,10 @@ hi:
   intelligent_insights_course_readiness_rubric_crite_79dac31c: "इंटेलिजेंट इनसाइट्स - पाठ्यक्रम तत्परता - रुब्रिक मानदंड"
   intelligent_insights_criteria_set_preview_f725b660: "इंटेलिजेंट इनसाइट्स - मानदंड सेट पूर्वावलोकन"
   intelligent_insights_financial_aid_compliance_75fc6936: "इंटेलिजेंट इनसाइट्स - वित्तीय सहायता अनुपालन"
+  intelligent_insights_improved_criteria_builder_eee94da6: "इंटेलिजेंट इनसाइट्स - बेहतर क्राइटेरिया बिल्डर"
   intelligent_insights_lti_insights_c49de651: "इंटेलिजेंट इनसाइट्स - LTI अंतर्दृष्टि"
   intelligent_insights_lti_usage_dashboard_8dfa0a83: "इंटेलिजेंट इनसाइट्स - LTI प्रयोग डैशबोर्ड"
+  intelligent_insights_student_level_contextual_mess_765ec91e: "इंटेलिजेंट इनसाइट्स - छात्र स्तर पर प्रासंगिक संदेश"
   intelligent_insights_students_in_need_of_attention_4b4a30f0: "इंटेलिजेंट इनसाइट्स - विद्यार्थी जिन पर ध्यान देने की आवश्यकता है - पाठ्यक्रम स्तर (फ़्लैग)"
   intelligent_insights_students_in_need_of_attention_8f751fa7: "इंटेलिजेंट इनसाइट्स - विद्यार्थी जिन पर ध्यान देने की आवश्यकता है - पाठ्यक्रम स्तर (बीटा)"
   intelligent_insights_students_in_need_of_attention_9ae46d7f: "इंटेलिजेंट इनसाइट्स - ध्यान देने की आवश्यकता वाले छात्र"
@@ -14325,6 +14424,7 @@ hi:
   javascript_file_fc27c32b: "JavaScript फ़ाइल"
   jmc_grade_export_52bedbcb: "JMC ग्रेड निर्यात"
   job_category_f8e4dfe7: "जॉब श्रेणी"
+  job_classification_certification_464fdfdb: "नौकरी का वर्गीकरण/प्रमाणन"
   job_count_9cb9298b: "जॉब की गिनती"
   job_details_b33137dc: "जॉब का विवरण"
   job_grouping_f652413e: "जॉब समूहीकरण"
@@ -14332,6 +14432,7 @@ hi:
   job_lookup_1d980054: "जॉब की खोज"
   job_stats_4e270a43: "जॉब के आंकड़े"
   job_stats_by_cluster_32872c13: "क्लस्टर अनुसार जॉब के आंकड़े"
+  job_title_32561582: "नौकरी का शीर्षक"
   jobs: 
     columns: 
       attempt: प्रयास
@@ -14455,6 +14556,7 @@ hi:
   k20_course_readiness_lti_apps_criteria: "इंटेलिजेंट इनसाइट्स - पाठ्यक्रम तत्परता - LTI ऐप्स फ़ीचर सक्षम करता है।"
   k20_course_readiness_rubric_criteria: "इंटेलिजेंट इनसाइट्स - पाठ्यक्रम तत्परता - रुब्रिक मानदंड फ़ीचर सक्षम करता है।"
   k20_criteria_set_preview: "इंटेलिजेंट इनसाइट्स - मानदंड सेट पूर्वावलोकन फ़ीचर सक्षम करता है।"
+  k20_improved_criteria_builder: "इंटेलिजेंट इनसाइट्स - बेहतर क्राइटेरिया बिल्डर फ़ीचर को सक्षम करता है"
   k20_lti_insights: "इंटेलिजेंट इनसाइट्स - LTI अंतर्दृष्टि फ़ीचर और संलग्न अनुमति सक्षम करता है।"
   k20_lti_usage: "LTI प्रयोग डैशबोर्ड और संलग्न अनुमति सक्षम करता है।"
   k20_students_in_need_of_attention: "इंटेलिजेंट इनसाइट्स - ध्यान देने की आवश्यकता वाले छात्र फ़ीचर और संलग्न अनुमति सक्षम करता है।"
@@ -14472,6 +14574,7 @@ hi:
   keep_the_content_brief_for_more_complex_layouts_e__da43ce65: "सामग्री को संक्षिप्त रखें। अधिक जटिल लेआउट (जैसे कि सूचियां, मीडिया या विस्तृत पाठ) के लिए, अतिरिक्त ब्लॉक का उपयोग करें।"
   kenya_254_2945663a: "केन्या (+254)"
   key_f2a919d5: कुंजी
+  key_facts_or_details_the_student_is_expected_to_re_3dc67d88: "मुख्य तथ्य या विवरण जिन्हें छात्र से याद रखने की अपेक्षा की जाती है (उदाहरण के लिए, राइट बंधु, 1903, किट्टी हॉक)।"
   key_name_7311d22: "कुंजी नाम:"
   key_name_bc712026: "कुंजी नाम"
   key_settings_44df6a41: "कुंजी सेटिंग्स"
@@ -14485,6 +14588,7 @@ hi:
   kindergarten_3c95802: किंडरगार्टन
   know_your_users_5c1323be: "अपने उपयोगकर्ताओं को जानें"
   knowledge_check_4aade5c5: "ज्ञान की जांच"
+  known_pii_is_masked_before_being_sent_to_the_model_7b4dcf0c: "ज्ञात PII को मॉडल को भेजे जाने से पहले छिपा दिया जाता है, हालांकि चर्चा के उत्तर में मौजूद कोई भी PII छिपाया नहीं जाता है और उसे मॉडल के साथ साझा किया जा सकता है।"
   korean_da812d9: कोरियाई
   label_3c9a991: "%{label}:"
   label_9fe386a0: "%{label}"
@@ -14664,6 +14768,7 @@ hi:
   learner_passport_prototype_1c3446b3: "शिक्षार्थी पासपोर्ट प्रोटोटाइप"
   learner_passport_prototype_r2_98517178: "शिक्षार्थी पासपोर्ट प्रोटोटाइप R2"
   learner_preview_562438f0: "शिक्षार्थी पूर्वावलोकन"
+  learning_design_7dd0a932: "डिज़ाइन सीखना"
   learning_mastery_5fc34276: "शिक्षण प्रवीणता"
   learning_mastery_context_name_a0b70957: "शिक्षण प्रवीणता - %{context_name}"
   learning_mastery_gradebook_72097130: "शिक्षण प्रवीणता ग्रेडबुक"
@@ -14721,6 +14826,7 @@ hi:
   let_instructors_tag_enrolled_users_and_assign_cour_90131b01: "प्रशिक्षकों को नामांकित उपयोगकर्ताओं को टैग करने और उन टैगों के आधार पर पाठ्यक्रम सामग्री निर्दिष्ट करने की सुविधा दें, जिससे अधिक व्यक्तिगत शिक्षण अनुभव को बढ़ावा मिले।"
   let_students_see_the_correct_answers_dacc2faf: "छात्रों को सही उत्तर देखने दें"
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: "छात्रों को उनके प्रश्नोत्तरी उत्तर देखने दें (गलत प्रश्न छात्र प्रतिक्रिया में चिह्नित किए जाएंगे)"
+  let_us_know_d8b3f0ee: "आइए, जानते हैं!"
   let_us_know_how_we_can_improve_846cbf4c: "हमें बताएं कि हम कैसे सुधार कर सकते हैं"
   letter_12ff3510: अक्षर
   letter_grade_29ff1938: "अक्षर ग्रेड"
@@ -14948,6 +15054,7 @@ hi:
   load_more_35d33c7: "और अधिक लोड करें"
   load_more_a36f9cf9: "और अधिक लोड करें"
   load_more_assignments_f708f2e7: "और अधिक असाइनमेंट लोड करें ..."
+  load_more_comments_96088597: "और टिप्पणियां लोड करें"
   load_more_results_460f49a9: "और अधिक नतीजे लोड करें"
   load_previous_comments_c3aaa07d: "पिछली टिप्पणियां लोड करें"
   load_prior_dates_f2b0f6f0: "पूर्व तिथियां लोड करें"
@@ -15272,6 +15379,7 @@ hi:
   logoutrequest_sent_to_idp_4da4261e: "IdP को LogoutRequest भेजी गई"
   logoutrequest_xml_sent_to_idp_39a7ffd: "IdP को LogoutRequest XML भेजा गया"
   logoutresponse_from_idp_d45995f1: "IdP की ओर से LogoutResponse"
+  logs_data_f8cd9aff: "लॉग्स डेटा"
   long_description_7d89285c: "लंबा विवरण"
   looking_up_microsoft_users_by_remote_attribute_ema_58c65037: "रिमोट एट्रिब्यूट के आधार पर Microsoft उपयोगकर्ताओं को खोजना: ईमेल पता (मेल)"
   looking_up_microsoft_users_by_remote_attribute_mai_452ac441: "रिमोट एट्रिब्यूट के आधार पर Microsoft उपयोगकर्ताओं को खोजना: मेल उपनाम"
@@ -15360,8 +15468,10 @@ hi:
   lti_resource_links_14385464: "LTI संसाधन लिंक"
   lti_submissions_require_a_url_to_submit_85ca9988: "LTI सबमिशन को सबमिट करने के लिए URL की आवश्यकता होती है"
   lti_tool_details_fetch_error_74722d7e: "LTI उपकरण विवरण पाने में त्रुटि हुई"
+  lti_tool_id_894a3f3: "LTI टूल आईडी"
   lti_tool_management_is_now_live_in_canvas_apps_cha_2ca55ef: "LTI उपकरण प्रबंधन अब *Canvas ऐप्स* में लाइव है! जैसे-जैसे हम ऐप्स के लिए और अधिक फ़ीचर्स विकसित करते हैं, दोनों पेजों के बीच परिवर्तन समन्वयित होते जाते हैं। अब से, ऐप्स LTI उपकरणों के लिए प्राथमिक स्थान है।"
   lti_tool_menu_f4ed93cc: "LTI उपकरण मेनू"
+  lti_tool_name_d7cbd759: "LTI टूल नाम"
   lti_tool_report_f13213b3: "LTI उपकरण रिपोर्ट"
   lti_tool_report_slcc_c98a3902: "LTI उपकरण रिपोर्ट - SLCC"
   lti_tools_menu_b6ef9b4c: "LTI उपकरण मेनू"
@@ -15664,8 +15774,10 @@ hi:
   message_actions_for_conversation_subject_fdb54c88: "बातचीत %{subject} के लिए संदेश क्रियाएं"
   message_actions_for_text_27eead86: "%{text} के लिए संदेश क्रियाएं"
   message_body_1f782712: "संदेश बॉडी"
+  message_box_3c487aed: "संदेश बॉक्स"
   message_for_name_648f5765: "%{name} के लिए संदेश"
   message_form_9658d1ef: "संदेश फ़ॉर्म"
+  message_from_assistant_5cedcdb4: "सहायक का संदेश"
   message_from_document_processing_app_messagefromto_b65a4d3d: "दस्तावेज़ प्रसंस्करण ऐप से संदेश: %{messageFromTool}"
   message_from_external_tool_message_3e857697: "बाहरी उपकरण से संदेश: %{message}"
   message_is_required_c547cb60: "संदेश आवश्यक है"
@@ -17408,7 +17520,9 @@ hi:
   mobile_offline_mode_7eaff590: "मोबाइल ऑफ़लाइन मोड"
   modal_dialog_start_end_date_674315cc: "मोडल डायलॉग: आरंभ और समाप्ति तिथि"
   model_data_24100c9: "मॉडल और डेटा"
+  model_evaluations_and_reply_labels_are_logged_for__a53a5d38: "मॉडल मूल्यांकन और उत्तर लेबल को डिबगिंग और समस्या निवारण उद्देश्यों के लिए लॉग किया जाता है।"
   model_is_already_located_in_newgroup_e5cea361: "%{model} पहले से %{newGroup} में स्थित है"
+  model_responses_are_logged_for_quality_assurance_a_68904beb: "गुणवत्ता आश्वासन के लिए मॉडल प्रतिक्रियाओं को लॉग किया जाता है, तथा कम विश्वास वाली प्रतिक्रियाओं को मानवीय हस्तक्षेप को प्रोत्साहित करने के लिए \"समीक्षा की आवश्यकता है\" के रूप में चिह्नित किया जाता है।"
   modelsOutcome: 
     criteria: 
       does_not_meet_expectations: "अपेक्षाओं पर खरा नहीं उतरता"
@@ -17910,6 +18024,7 @@ hi:
   new_account_role_6e5c4964: "नई खाता भूमिका"
   new_activity_8b84847d: "नई गतिविधि"
   new_activity_for_title_c5cc74: "%{title} के लिए नई गतिविधि"
+  new_ai_experience_63593cb7: "नया AI अनुभव"
   new_alert_f757d585: "नई चेतावनी"
   new_analytics_api_access_7eec1ead: "नया एनालिटिक्स API एक्सेस"
   new_analytics_attendance_config_v2_5f7a9e2c: "नया एनालिटिक्स - उपस्थिति कॉन्फ़िग V2"
@@ -18081,6 +18196,7 @@ hi:
   next_student_reply_39c3c626: "अगले छात्र का उत्तर"
   next_up_review_feedback_59555dbd: "आगे: फ़ीडबैक की समीक्षा करें"
   next_up_submit_assignment_2fdb7174: "आगे: असाइनमेंट सबमिट करें"
+  next_week_9df347b3: "अगला सप्ताह"
   next_window_window_90271943: "अगली विंडो %{window}"
   nickname_1e6da3ad: उपनाम
   nightingale_student_activity_tracking_f7d7c4cf: "Nightingale छात्र गतिविधि निगरानी"
@@ -18247,6 +18363,7 @@ hi:
   no_results_found_2ace1494: "कोई नतीजा नहीं मिला"
   no_results_found_58717065: "कोई नतीजा नहीं मिला"
   no_results_found_e4b686bd: "कोई नतीजा नहीं मिला।"
+  no_results_found_for_searchterm_76b3c243: "\"%{searchTerm}\" के लिए कोई परिणाम नहीं मिला"
   no_results_match_searchterm_f28e50e0: "“%{searchTerm} से कोई नतीजा मेल नहीं खाता\""
   no_roles_available_1708d8ce: "कोई भूमिका उपलब्ध नहीं"
   no_rubric_ids_provided_ed0d0cb8: "कोई रुब्रिक आईडी प्रदान नहीं की गई"
@@ -18296,6 +18413,7 @@ hi:
   no_upcoming_course_work_aeb17cfa: "कोई आगामी पाठ्यक्रम कार्य नहीं"
   no_upcoming_course_work_for_selected_course_258f921f: "चयनित पाठ्यक्रम के लिए कोई आगामी पाठ्यक्रम कार्य नहीं"
   no_usage_rights_object_supplied_304b8d40: "किसी 'usage_rights' ऑब्जेक्ट की आपूर्ति नहीं की गई"
+  no_user_data_is_stored_or_reused_by_the_model_88cd853c: "मॉडल द्वारा कोई उपयोगकर्ता डेटा संग्रहीत या पुनः उपयोग नहीं किया जाता है।"
   no_users_found_64a043ff: "कोई उपयोगकर्ता नहीं मिला"
   no_users_were_selected_to_add_to_the_course_a51c6083: "पाठ्यक्रम में जोड़ने के लिए किसी उपयोगकर्ता का चयन नहीं किया गया"
   no_valid_lti_resource_was_returned_11f7f91f: "कोई मान्य LTI संसाधन नहीं लौटाया गया"
@@ -18363,6 +18481,7 @@ hi:
   not_mastered_5c2f9968: "प्रवीणता प्राप्त नहीं की गई"
   not_now_afa29fa7: "अभी नहीं"
   not_published_73f7079: "प्रकाशित नहीं किया गया"
+  not_published_85cef2da: "प्रकाशित नहीं किया गया"
   not_required_if_this_is_populated_the_entered_text_68a9b719: "ज़रूरी नहीं। यदि यह भर जाता है, तो दर्ज किया गया पाठ लॉगिन एट्रिब्यूट में जोड़ दिया जाएगा"
   not_reviewed_c38d9e97: "समीक्षा नहीं की गई"
   not_signed_47acf472: "हस्ताक्षर नहीं किए गए"
@@ -18385,6 +18504,7 @@ hi:
   note_associated_tools_are_only_listed_once_even_if_ebae2aba: |-
       NOTE: संबद्ध उपकरण केवल एक बार सूचीबद्ध किए जाते हैं, भले ही वे एकाधिक
                       उप-खातों में स्थापित किए गए हों।
+  note_cb2ef6e1: "ध्यान दें:"
   note_for_differentiated_group_topics_some_threads__90adbb21: "ध्यान दें: विभेदित समूह विषयों के लिए, कुछ थ्रेड में कोई भी छात्र निर्दिष्ट नहीं हो सकता है।"
   note_grades_and_notes_will_be_saved_automatically__e3270872: "ध्यान दें: फ़ील्ड से बाहर जाने के बाद ग्रेड और नोट्स स्वचालित रूप से सहेजे जाएंगे।"
   note_it_may_take_up_to_a_week_for_the_beta_url_to__d695bddc: "ध्यान दें: बीटा रिफ़्रेश साइकल के आधार पर, बीटा URL को प्रावधानित होने में एक सप्ताह तक का समय लग सकता है।"
@@ -18409,6 +18529,7 @@ hi:
   note_this_login_s_account_uses_delegated_authentic_89227914: "ध्यान दें: इस लॉगिन का खाता प्रत्यायोजित प्रमाणीकरण का उपयोग करता है, लेकिन फ़ॉलबैक Canvas पासवर्ड प्रमाणीकरण की अनुमति देता है। इस फ़ॉर्म में पासवर्ड फ़ील्ड फ़ॉलबैक Canvas पासवर्ड को अपडेट करते हैं, *न* कि प्रत्यायोजित प्रमाणीकरण को।"
   note_this_login_s_account_uses_delegated_authentic_b340b00e: "ध्यान दें: इस लॉगिन का खाता प्रत्यायोजित प्रमाणीकरण का उपयोग करता है, लेकिन फ़ॉलबैक Canvas पासवर्ड प्रमाणीकरण की अनुमति देता है। इस फ़ॉर्म में पासवर्ड फ़ील्ड फ़ॉलबैक Canvas पासवर्ड को अपडेट करते हैं, <b>न</b> कि प्रत्यायोजित प्रमाणीकरण को।"
   note_this_will_attempt_to_undo_the_merge_as_fully__41c9c4e9: "ध्यान दें: इस तरह से मर्ज को यथासंभव पूर्णतः पूर्ववत करने का प्रयास किया जाएगा; हालांकि, मर्ज किए गए उपयोगकर्ताओं को उनकी पूर्व स्थिति में पूरी तरह से बहाल नहीं किया जा सकता है।"
+  note_you_may_receive_this_email_when_new_authentic_5d9403f4: "ध्यान दें: आपको यह ईमेल तब प्राप्त हो सकता है जब नए प्रमाणीकरण प्रदाता प्रकार प्रवास के लिए समर्थित हो जाएं, या जब हम मौजूदा प्रदाता प्रकारों के लिए प्रवास प्रक्रिया शुरू करने के लिए तैयार हों।"
   notebook_b0eea5b4: नोटबुक
   notes_5ef20d1: नोट्स
   notes_6cfc3988: "ध्यान दें:"
@@ -19075,11 +19196,16 @@ hi:
   option_text_ce230304: "%{option} पाठ"
   optional_41c6c9b7: वैकल्पिक।
   optional_add_course_ef0d70fc: "वैकल्पिक: पाठ्यक्रम जोड़ें"
+  optional_end_date_for_course_end_date_range_filter_f3ab813e: "वैकल्पिक: पाठ्यक्रम समाप्ति तिथि सीमा फ़िल्टर के लिए समाप्ति तिथि (YYYY-MM-DD)"
+  optional_enter_a_single_course_sis_id_to_filter_re_568a27e6: "वैकल्पिक: परिणामों को फ़िल्टर करने के लिए एकल पाठ्यक्रम SIS ID दर्ज करें"
+  optional_filter_by_a_single_course_sis_id_f0246aaf: "वैकल्पिक। एकल पाठ्यक्रम SIS ID द्वारा फ़िल्टर करें।"
+  optional_filter_courses_by_their_end_date_using_st_925711c8: "वैकल्पिक। प्रारंभ और समाप्ति तिथियों का उपयोग करके पाठ्यक्रमों को उनकी समाप्ति तिथि के अनुसार फ़िल्टर करें।"
   optional_filters_9dc03f5e: "वैकल्पिक फ़िल्टर्स"
   optional_for_example_target_a_college_level_semina_862d3a91: "वैकल्पिक। उदाहरण के लिए, \"कॉलेज स्तर के सेमिनार को लक्ष्य बनाएं।\" या \"तर्क के सार पर ध्यान केंद्रित करें।\" या \"उदार बनें।\""
   optional_in_course_default_off_2b03604: "पाठ्यक्रम में वैकल्पिक, डिफ़ॉल्ट रूप से बंद"
   optional_in_course_default_on_2dcef31b: "पाठ्यक्रम में वैकल्पिक, डिफ़ॉल्ट रूप से चालू"
   optional_place_standard_or_outcome_here_for_exampl_ff6ca7cb: "वैकल्पिक। यहां मानक या परिणाम रखें। उदाहरण के लिए,\"छात्र प्राथमिक स्रोतों का विश्लेषण करेंगे\"।"
+  optional_start_date_for_course_end_date_range_filt_8e9004c0: "वैकल्पिक: पाठ्यक्रम समाप्ति तिथि सीमा फ़िल्टर के लिए आरंभ तिथि (YYYY-MM-DD)"
   optionally_include_a_byte_order_mark_in_compatible_f3d0d243: "वैकल्पिक रूप से संगत स्प्रैडशीट निर्यात में एक बाइट-ऑर्डर चिह्न शामिल करें, ताकि उन्हें कुछ स्थानों में उपयोगकर्ताओं के लिए Excel में आयात किया जा सके।"
   optioncount_options_available_5a34688e: "%{optionCount} विकल्प उपलब्ध हैं।"
   optionname_selected_list_collapsed_9e69b18a: "%{optionName} चुना गया। सूची संक्षिप्त की गई।"
@@ -19357,6 +19483,10 @@ hi:
   page_options_for_page_768f49d9: "%{page} के लिए पेज विकल्प"
   page_page_59070cd8: "पेज %{page}"
   page_pagenum_20dbfeb8: "पेज %{pageNum}"
+  page_title: 
+    ai_experiences: "AI अनुभव"
+    edit_ai_experience: "%{title} संपादित करें"
+    new_ai_experience: "नया AI अनुभव"
   page_title_106304bb: "पेज का शीर्षक"
   page_title_ascending_b5df950c: "पेज शीर्षक: आरोही क्रम"
   page_title_d1a22bbf: "पेज शीर्षक"
@@ -19515,11 +19645,14 @@ hi:
   pdf_file_d3fac21d: "PDF फ़ाइल"
   pdf_language_entry_1d3c9ae6: "PDF भाषा प्रविष्टि"
   pdf_language_is_not_specified_in_the_document_prop_3d9f2048: "दस्तावेज़ गुणों में PDF भाषा निर्दिष्ट नहीं है।"
+  pedagogical_guidance_98e3902a: "शैक्षणिक मार्गदर्शन"
   peer_632472b7: "सहकर्मी:"
   peer_review_74f26a13: "सहकर्मी समीक्षा"
+  peer_review_allocation_11b02bc9: "सहकर्मी समीक्षा आवंटन"
   peer_review_allocation_and_grading_695a9e41: "सहकर्मी समीक्षा आवंटन और ग्रेडिंग"
   peer_review_allocation_and_grading_feature_flag_is_5dbd49d: "सहकर्मी समीक्षा आवंटन और ग्रेडिंग फ़ीचर फ़्लैग अक्षम है"
   peer_review_allocation_and_grading_feature_flag_is_de172b35: "इस पाठ्यक्रम के लिए peer_review_allocation_and_grading फ़ीचर फ़्लैग सक्षम नहीं है"
+  peer_review_allocation_feature_flag_is_not_enabled_8618e57f: "इस पाठ्यक्रम के लिए peer_review_allocation फ़ीचर फ़्लैग सक्षम नहीं है"
   peer_review_allocation_updates_6ae34936: "सहकर्मी समीक्षा आवंटन अपडेट"
   peer_review_assignment_7d314c59: "सहकर्मी समीक्षा असाइनमेंट"
   peer_review_comments_71cb4605: "सहकर्मी समीक्षा टिप्पणियां"
@@ -19530,6 +19663,8 @@ hi:
   peer_review_for_itemtitle_91198440: "%{itemTitle} के लिए सहकर्मी समीक्षा"
   peer_review_for_name_bcffa32f: "%{name} के लिए सहकर्मी समीक्षा"
   peer_review_for_name_due_dueattext_f5f6547d: "%{name} के लिए सहकर्मी समीक्षा नियत: %{dueAtText}"
+  peer_review_grading_88a2f4de: "सहकर्मी समीक्षा ग्रेडिंग"
+  peer_review_grading_feature_flag_is_disabled_d9827be6: "सहकर्मी समीक्षा ग्रेडिंग सुविधा फ़्लैग अक्षम है"
   peer_review_itemtitle_112ccc67: "सहकर्मी समीक्षा, %{itemTitle}"
   peer_review_not_yet_submitted_2ab13b19: "सहकर्मी समीक्षा अभी तक सबमिट नहीं की गई है"
   peer_review_options_b0613216: "सहकर्मी समीक्षा विकल्प"
@@ -19859,8 +19994,10 @@ hi:
   please_provide_a_valid_email_address_50a27c00: "कृपया मान्य ईमेल पता प्रदान करें।"
   please_provide_a_valid_letter_grade_c076900f: "कृपया एक वैध अक्षर ग्रेड प्रदान करें"
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "कृपया मान्य टेनेंट डोमेन प्रदान करें। इसे ढूंढने के लिए अपनी Azure सक्रिय निर्देशिका सेटिंग्स जांचें।"
+  please_provide_at_least_one_learning_objective_1be464af: "कृपया कम से कम एक शिक्षण उद्देश्य प्रदान करें"
   please_provide_more_information_about_how_you_woul_547910a9: "कृपया इस बारे में अधिक जानकारी प्रदान करें कि आप मानदंड को कैसे पुनः उत्पन्न करना चाहेंगे।"
   please_provide_more_information_about_how_you_woul_dac6ae8a: "कृपया इस बारे में अधिक जानकारी प्रदान करें कि आप मानदंडों को कैसे पुन: उत्पन्न करना चाहेंगे । "
+  please_provide_pedagogical_guidance_14341b2b: "कृपया शैक्षणिक मार्गदर्शन प्रदान करें"
   please_reach_out_in_slack_at_canvas_sre_if_this_ke_bfa853d7: "यदि ऐसा होता रहता है, तो कृपया #Canvas-SRE पर Slack से संपर्क करें।"
   please_reach_out_in_slack_at_canvas_sre_the_region_85440d71: "कृपया #Canvas-SRE पर Slack से संपर्क करें। इस ग्राहक का Canvas इंस्टेंस जिस क्षेत्र में स्थित है, वह SFTP का समर्थन नहीं करता है।"
   please_reach_out_in_slack_at_canvas_sre_to_create__7ae1850c: "कृपया इस खाते के लिए SFTP बनाने के लिए #Canvas-SRE पर Slack से संपर्क करें।"
@@ -19895,6 +20032,7 @@ hi:
   please_select_the_level_of_privacy_desired_for_sup_7744af5: "कृपया सहायता एक्सेस के लिए वांछित गोपनीयता का स्तर चुनें"
   please_set_a_due_date_or_change_your_selection_for_3b94850c: "कृपया नियत तिथि निर्धारित करें या “SIS से सिंक करें” विकल्प के लिए अपना चयन बदलें।"
   please_set_all_discussions_to_either_threaded_or_n_47a1223e: "कृपया सभी चर्चाओं को *'थ्रेडेड'* या *'थ्रेडेड नहीं'* पर सेट करें। एकाधिक चयनित चर्चाओं को सामूहिक रूप से अपडेट करने के लिए *'थ्रेडेड पर सेट करें'* और *'थ्रेडेड पर सेट न करें'* कार्रवाइयों का उपयोग करें। व्यक्तिगत चर्चाओं पर निर्णय लेने के लिए ड्रॉपडाउन मेनू का उपयोग करें।"
+  please_share_your_feedback_16061669: "कृपया अपना फ़ीडबैक साझा करें!"
   please_share_your_feedback_6406a1c5: "कृपया अपना फ़ीडबैक साझा करें"
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "कृपया निर्दिष्ट करें कि Microsoft Teams सिंक को सक्षम या अक्षम करना है या नहीं।"
   please_try_again_f0dbc13: "कृपया फिर से कोशिश करें"
@@ -20540,7 +20678,9 @@ hi:
   preview_53003fd2: पूर्वावलोकन
   preview_9cbd064e: पूर्वावलोकन
   preview_a3f8f854: पूर्वावलोकन
+  preview_ai_experience_51e65049: "पूर्वावलोकन AI अनुभव"
   preview_confirm_8b9986a8: "पूर्वावलोकन और पुष्टि करें"
+  preview_experience_6fdb7129: "पूर्वावलोकन अनुभव"
   preview_filename_f1b58572: "%{filename} का पूर्वावलोकन करें"
   preview_for_file_name_17488a7a: "फ़ाइल के लिए पूर्वावलोकन: %{name}"
   preview_rubric_267b2a9d: "रुब्रिक का पूर्वावलोकन करें"
@@ -20575,6 +20715,7 @@ hi:
   previous_student_46275eae: "पिछला छात्र"
   previous_student_899a6732: "पिछला छात्र"
   previous_student_reply_b4574866: "पिछले छात्र का उत्तर"
+  previous_week_dddf1ef2: "पिछला सप्ताह"
   previously_chosen_colors_f1338315: "पहले चुने गए रंग"
   previously_imported_content_from_the_same_course_w_3e97b9d0: "उसी पाठ्यक्रम से पहले आयातित सामग्री को प्रतिस्थापित कर दिया जाएगा। मैन्युअल रूप से जोड़ी गई सामग्री बनी रहेगी।"
   primary_brand_color_db79b428: "प्राथमिक ब्रांड रंग"
@@ -22319,6 +22460,7 @@ hi:
   read_context_membership_data_cf406033: "संदर्भ सदस्यता डेटा पढ़ें"
   read_dc99757a: पढ़ें
   read_feature_flags_ec9a6434: "फ़ीचर फ्लैग पढ़ें"
+  read_filter_8151050: "फ़िल्टर पढ़ें:"
   read_less_ae7bd04f: "कम पढ़ें"
   read_less_reply_from_author_4a41ca22: "कम पढ़ें, %{author} से जवाब दें"
   read_more_56ad19d2: "और पढ़ें"
@@ -22590,6 +22732,7 @@ hi:
   remove_name_content_requirement_7af56c50: "सामग्री आवश्यकता %{name} निकालें"
   remove_name_from_group_487cce74: "%{name} को ग्रुप में से निकालें"
   remove_name_prerequisite_98377b60: "पूर्वावश्यकता %{name} निकालें"
+  remove_never_drop_rule_b9d08c64: "कभी न छोड़ें नियम निकालें"
   remove_no_teacher_interaction_cb9994db: "शिक्षक से कोई बातचीत नहीं निकालें"
   remove_null_values_from_live_event_payloads_3c826f: "लाइव घटना पेलोड से शून्य मान निकालें"
   remove_oberveename_99262bd0: "%{oberveeName}निकालें"
@@ -22638,6 +22781,7 @@ hi:
   remove_top_level_submittedat_from_lti_ags_score_ap_4f969cc4: "LTI AGS अंक API से शीर्ष-स्तरीय submittedAt निकालें"
   remove_ungraded_submissions_count_4b13922: "बिना ग्रेड किए गए सबमिशन (गिनती) निकालें"
   remove_ungraded_submissions_time_e3b58118: "बिना ग्रेड किए गए सबमिशन (समय) निकालें"
+  remove_unsaved_never_drop_rule_bde18827: "सहेजा नहीं गया कभी न छोड़ें नियम निकालें"
   remove_user_from_section_5556f465: "अनुभाग से उपयोगकर्ता को निकालें"
   remove_user_from_sectionname_e73b51d1: "उपयोगकर्ता को %{sectionName}में से निकालें"
   remove_users_from_differentiation_tags_24a70d23: "विभेदन टैग से उपयोगकर्ताओं को निकालें"
@@ -22733,6 +22877,8 @@ hi:
     other: "%{replyCount} जवाब, %{unreadCount} अपठित"
   replying_as_f8371a46: "इस के रूप में जवाब दिया जा रहा है: "
   report_58d2ac9e: रिपोर्ट
+  report_columns_937f42d2: "रिपोर्ट स्तंभ"
+  report_configuration_9640f9a3: "रिपोर्ट कॉन्फ़िगरेशन"
   report_date_2c8a0a50: "रिपोर्ट तिथि"
   report_date_328c81a: "रिपोर्ट तिथि:"
   report_description_1b2307d6: "विवरण रिपोर्ट करें"
@@ -22763,15 +22909,21 @@ hi:
   reports_account_settings_78f5336a: "रिपोर्ट (खाता सेटिंग्स)"
   reports_course_f09b7d9e: "रिपोर्ट (पाठ्यक्रम)"
   reports_manage_92bc45cb: "रिपोर्ट - प्रबंधित करें"
+  reports_run_within_a_sub_account_only_return_resul_4ad6c867: "किसी उप-खाते में चलाई जाने वाली रिपोर्ट केवल उसी उप-खाते के पाठ्यक्रमों के परिणाम ही लौटाती हैं"
   request_date_692cdbc8: "अनुरोध तिथि:"
   request_failed_try_again_828d918b: "अनुरोध विफल हुआ। फिर से कोशिश करें"
   request_failed_with_status_status_47054af0: "%{status} स्थिति के साथ अनुरोध विफल हुआ"
   request_id_1499afb0: "अनुरोध आईडी"
   request_name_is_required_ebc2fda0: "अनुरोध नाम आवश्यक है"
   request_successfully_sent_note_that_applying_score_ee8665b6: "अनुरोध सफलतापूर्वक भेजा गया ध्यान दें कि अंक लागू करने में कुछ समय लग सकता है और जब तक आप पेज को पुनः लोड नहीं करेंगे तब तक परिवर्तन दिखाई नहीं देंगे।"
+  request_type_9e3cc7aa: "अनुरोध प्रकार"
   request_values_89976f2c: "अनुरोध मान"
   requested_bbdb5b26: "अनुरोध किया गया"
   requester_e9c75398: "अनुरोधकर्ता:"
+  requests_made_by_a_user_generated_access_token_b2451dbf: "उपयोगकर्ता द्वारा जेनरेट किए गए एक्सेस टोकन द्वारा किए गए अनुरोध।"
+  requests_made_by_an_access_token_associated_with_a_e7d8dfaf: "डेवलपर कुंजी से संबद्ध एक्सेस टोकन द्वारा किए गए अनुरोध। इसमें मानक Canvas API endpoint एक्सेस करने वाली API कुंजियां, तथा LTI एडवांटेज सेवाएं एक्सेस करने वाली LTI 1.3 कुंजियां शामिल हैं।"
+  requests_made_by_an_lti_1_1_tool_performing_grade__be0dce6b: "ग्रेड पासबैक करने वाले LTI 1.1 टूल द्वारा किए गए अनुरोध, जो अपने स्वयं के प्रमाणीकरण का उपयोग करता है।"
+  requests_without_user_agent_2a50bf04: "उपयोगकर्ता एजेंट के बिना अनुरोध"
   requeue_job_98b20240: "जॉब को पुनः क्रमबद्ध करें"
   requeued_job_id_367324e9: "पुनः क्रमबद्ध जॉब आईडी"
   require_an_access_code_600e06e8: "एक्सेस कोड आवश्यक है"
@@ -22804,6 +22956,7 @@ hi:
   required_replies_number_d941ee4c: "उत्तरों की आवश्यकता है (%{number})"
   required_replies_required_replies_ab82825e: "उत्तरों की आवश्यकता है (%{required_replies})"
   required_replies_requiredreplies_d91bed30: "उत्तरों की आवश्यकता है (%{requiredReplies})"
+  required_select_a_term_default_term_or_all_terms_c7f83421: "आवश्यक है। एक शब्द, डिफ़ॉल्ट शब्द, या सभी शब्द चुनें।"
   required_to_view_quiz_results_dba7368b: "प्रश्नोत्तरी के परिणाम देखना आवश्यक"
   required_values_1eb5841f: "आवश्यक मान"
   requirement_f5b75da1: आवश्यकता
@@ -22866,6 +23019,7 @@ hi:
   response_received_from_end_idp_as_received_dc42e8c: "अंतिम IdP से प्राप्त प्रतिक्रिया (जैसा प्राप्त हुआ)"
   responsive_global_nav_logo_99488e92: "रिस्पॉन्सिव ग्लोबल नेव लोगो"
   responsive_student_grades_page_324e9c8b: "रिस्पॉन्सिव छात्र ग्रेड पेज"
+  restart_d7c32e5: "फिर से शुरू करें"
   restart_link_validation_b61286fc: "लिंक मान्यकरण फिर से शुरू करें"
   restore_6d523f1d: "पुनर्स्थापित करें"
   restore_account_ccbd1ac6: "खाता पुनर्स्थापित करें"
@@ -22881,6 +23035,7 @@ hi:
   restored_to_default_186b6f78: "डिफ़ॉल्ट पर पुनर्स्थापित किया गया"
   restrict_quantitative_data_72411674: "मात्रात्मक डेटा को प्रतिबंधित करें"
   restrict_quantitative_data_fcd08bb0: "मात्रात्मक डेटा प्रतिबंधित करें"
+  restrict_students_and_observers_from_creating_pers_bd0e20e1: "छात्रों और पर्यवेक्षकों को व्यक्तिगत एक्सेस टोकन बनाने से प्रतिबंधित करें।"
   restrict_students_from_accessing_courses_after_end_7dd66bce: "समाप्ति तिथि के बाद छात्रों को पाठ्यक्रम एक्सेस करने से प्रतिबंधित करें"
   restrict_students_from_accessing_courses_before_st_f7c22c00: "प्रारंभ तिथि के पहले छात्रों को पाठ्यक्रम एक्सेस करने से प्रतिबंधित करें"
   restrict_students_from_annotating_6c28ab9b: "छात्रों को एनोटेशन करने से प्रतिबंधित करें"
@@ -22903,6 +23058,7 @@ hi:
   resubmitted_to_document_processing_app_a5e1bc1: "दस्तावेज़ प्रसंस्करण ऐप में फिर से सबमिट किया गया"
   result_8f971a09: परिणाम
   result_for_19482b14: "इसके लिए परिणाम "
+  results_are_sorted_by_course_name_then_by_student__d9f510de: "परिणाम पाठ्यक्रम नाम के अनुसार, फिर छात्र के अंतिम नाम के अनुसार वर्णानुक्रम में क्रमबद्ध किए जाते हैं"
   results_filtered_by_186c4aaa: "नतीजे इसके द्वारा फ़िल्टर किए गए: "
   results_for_2bc07172: "इसके लिए नतीजे:"
   results_for_331ce107: "इसके लिए परिणाम "
@@ -22927,6 +23083,7 @@ hi:
   return_to_conversation_list_86688140: "बातचीत सूची पर वापस जाएं"
   return_to_parent_folder_4ece2184: "मूल फ़ोल्डर में वापस जाएं"
   return_to_subject_in_conversation_list_d67b8e73: "बातचीत सूची में %{subject} पर वापस जाएं"
+  returns_students_attendance_values_based_on_their__921c2032: "Canvas में रोल कॉल उपस्थिति असाइनमेंट के अंतर्गत छात्रों के अंकों के आधार पर उनकी उपस्थिति मान लौटाता है"
   revert_account_4f1529a5: "खाता पूर्वस्थिति में लौटएं"
   revert_course_768c828f: "पाठ्यक्रम को पूर्वस्थिति में लौटाएं"
   revert_date_changes_5105ce5: "तिथि परिवर्तन को पूर्ववत करें"
@@ -22949,6 +23106,7 @@ hi:
   reviews_per_student_378292b3: "प्रति छात्र समीक्षा"
   reviews_per_user_4da58e69: "समीक्षाएं प्रति उपयोगकर्ता"
   reviews_required_2ae05bbc: "समीक्षाएं आवश्यक हैं*"
+  revised_at_3a143e8c: "संशोधित तिथि: "
   rework_the_login_registration_ui_to_support_identi_fbece583: "पहचान परिवर्तनों का समर्थन करने तथा एक समान लॉगिन अनुभव और पारदर्शी प्रमाणीकरण प्रवेश सुनिश्चित करने के लिए लॉगिन/पंजीकरण UI पर पुनः कार्य करें।"
   rich_text_editor_a0491c6e: "रिच टेक्स्ट संपादक"
   rich_text_f1b4274a: "रिच टेक्स्ट"
@@ -23078,6 +23236,7 @@ hi:
     teacher: शिक्षक
     teachers: शिक्षक
   roles_730b879e: भूमिकाएं
+  roll_call_sourced_attendance_report_18a6301d: "रोल कॉल स्रोत उपस्थिति रिपोर्ट"
   romanian_13670c1e: रोमानियाई
   romanian_moldavian_moldovan_8cec1be0: "रोमानियाई; मोलदावियन; मोल्दोवन"
   rootFoldersFinder: 
@@ -23146,6 +23305,7 @@ hi:
   rubric_read_states_changed_4e4959a5: 
     one: "रुब्रिक पढ़ने की स्थिति में परिवर्तन हो गया!"
     other: "रुब्रिक पढ़ने की स्थितियों में परिवर्तन हो गया!"
+  rubric_requires_a_name_2c03d0a8: "रुब्रिक को नाम की आवश्यकता है"
   rubric_save_confirmation_dialog_94a487a3: "रुब्रिक सहेजें पुष्टिकरण डायलॉग"
   rubric_saved_successfully_e6373e24: "रुब्रिक सफलतापूर्वक सहेजा गया"
   rubric_search_tray_1f7a85ee: "रुब्रिक खोजें ट्रे"
@@ -23208,6 +23368,7 @@ hi:
   ruler_fa692ff7: रूलर
   run_at_759b47d: "इतने बजे रन करें: "
   run_at_92dd90df: "इतने बजे रन करें:"
+  run_chat_simulation_c1f2bdf8: "चैट सिमुलेशन चलाएं"
   run_report_743fdf5f: "रिपोर्ट रन करें"
   run_time_370dedb6: "रन करने का समय"
   running_c5a4998d: "रन हो रहा है"
@@ -23235,6 +23396,7 @@ hi:
   save_alert_b64f9fa3: "चेतावनी सहेजें"
   save_and_publish_1b765e7: "सहेजें और प्रकाशित करें"
   save_as_draft_341d4577: "मसौदे के रूप में सहेजें"
+  save_as_draft_f5dc6a73: "मसौदे के रूप में सहेजें"
   save_as_template_489ed7fd: "टेम्पलेट के तौर पर सहेजें"
   save_as_template_b1e8b5ab: "टेम्पलेट के तौर पर सहेजें"
   save_changes_698abe77: "परिवर्तन सहेजें"
@@ -23894,6 +24056,7 @@ hi:
   select_submission_type_displayname_97e47bc2: "सबमीशन प्रकार %{displayName} चुनें"
   select_target_groups_type_or_use_arrow_keys_to_nav_aa648826: "लक्ष्य ग्रुप्स चुनें। नेविगेट करने के लिए लिखें या तीर कुंजियों का उपयोग करें। एकाधिक चयन करने की अनुमति है।"
   select_term_f8083fb0: "अवधि चुनें"
+  select_the_enrollment_term_to_report_on_9ba4f6f5: "रिपोर्ट करने के लिए नामांकन अवधि चुनें"
   select_the_files_you_want_to_associate_or_add_file_741ad4fa: "आप जिन फ़ाइलों को एसोसिएट करना चाहते हैं उन्हें चुनें, या \"फ़ाइल/फ़ाइलें बनाएं\" चुनकर फ़ाइलें जोड़ें।"
   select_the_files_you_want_to_associate_with_this_m_fedc2638: "आप जिन फ़ाइलों को इस *मॉड्यूल* के साथ एसोसिएट करना चाहते हैं उन्हें चुनें, या \"फ़ाइल/फ़ाइलें बनाएं\" चुनकर फ़ाइलें जोड़ें।"
   select_the_page_you_want_to_associate_or_add_a_new_ca82cdfd: "आप जिस पेज को एसोसिएट करना चाहते हैं उसे चुनें, या \"पेज बनाएं\" चुनकर एक नया पेज जोड़ें।"
@@ -24049,6 +24212,7 @@ hi:
   send_message_to_891eb84: "इस को संदेश भेजें:"
   send_message_to_name_95eabdcc: "%{name} को संदेश भेजें"
   send_message_to_name_c8ac05fc: "%{name} को संदेश भेजें"
+  send_metrics_for_when_comment_bank_items_count_res_c45116e4: "कमेंट बैंक आइटम पर `comment_bank_items_count` रिज़ॉल्वर का उपयोग किए जाने पर मीट्रिक्स भेजें"
   send_metrics_for_when_limit_arg_is_used_on_comment_69a16b6e: "टिप्पणी बैंक आइटम पर सीमा तर्क का उपयोग किए जाने पर मेट्रिक्स भेजें"
   send_notification_81773687: "सूचना भेजें"
   send_notification_directly_to_users_when_announcem_c3aac61c: "घोषणा शुरू होने पर सीधे उपयोगकर्ताओं को सूचना भेजें"
@@ -24085,6 +24249,7 @@ hi:
   sending_messages_f8f41998: "संदेश भेजे जा रहे हैं..."
   sensitive_data_that_can_be_used_to_identify_an_ind_bac74ea2: "संवेदनशील डेटा जिसका उपयोग किसी व्यक्ति की पहचान करने के लिए किया जा सकता है।"
   sent_at_23cccc07: "यहां भेजा गया: "
+  sent_by_authorname_f8fa1200: "%{authorName} द्वरा भेजा गया"
   sent_f4ee89ec: "भेजा गया!"
   sent_fe0a1eb4: "भेजा गया"
   separate_columns_for_first_last_names_in_gradebook_419126c3: "ग्रेडबुक में पहले/आखिरी नाम वाले स्तंभ को अलग करें"
@@ -24757,6 +24922,7 @@ hi:
   show_instructure_provided_release_notes_filtered_b_f3c285c9: "मदद मेनू में उपयोगकर्ता की भूमिका के अनुसार फ़िल्टर किए गए Instructure-प्रदत्त रिलीज़ नोट्स दिखाएं। व्यवस्थापक, शिक्षक (प्रशिक्षक) और समीक्षक की भूमिका वाले उपयोगकर्ताओं के लिए उपलब्ध है। छात्र भूमिकाओं के लिए लागू फ़ीचर समीक्षक नोट्स में शामिल हैं।"
   show_instructure_provided_release_notes_in_the_hel_ae0d315: "मदद मेनू में Instructure द्वारा प्रदान किए गए रिलीज़ नोट्स दिखाएं।"
   show_intelligent_insights_new_contextual_messaging_bd55f5be: "इंटेलिजेंट इनसाइट्स का नया प्रासंगिक संदेश फ़ीचर दिखाएं।"
+  show_intelligent_insights_new_student_level_contex_f9c83e90: "इंटेलिजेंट इनसाइट्स का नया छात्र स्तरीय प्रासंगिक संदेश फ़ीचर दिखाएं।"
   show_key_1fbf0c64: "कुंजी दिखाएं"
   show_less_574a758b: "कम दिखाएं"
   show_less_d5bbf728: "कम दिखाएं"
@@ -24803,6 +24969,7 @@ hi:
   show_translation_first_c183694a: "अनुवाद दिखाएं पहला"
   show_translation_second_70c11f39: "अनुवाद दिखाएं दूसरा"
   show_unassessed_outcomes_e31a3f53: "आकलन नहीं किए गए परिणाम दिखाएं"
+  show_user_agent_alert_on_developer_keys_page_b4bb7ceb: "डेवलपर कुंजी पेज पर उपयोगकर्ता-एजेंट अलर्ट दिखाएं"
   show_user_services_d8d6c2c2: "उपयोगकर्ता सेवाएं दिखाएं"
   show_welcome_tour_a105aa2e: "स्वागत यात्रा दिखाएं"
   showing_all_sets_of_grading_periods_6c160874: "ग्रेडिग अवधि के सभी सेट दिखाए जा रहे हैं।"
@@ -25034,6 +25201,7 @@ hi:
       यह फ़ीचर फ़्लैग कस्टम चरों को रिफ़ैक्टर करेगा यदि चर प्रतिस्थापन नियंत्रक रहित हो।
   some_of_the_outcomes_that_you_have_selected_cannot_4a42634a: "आपके द्वारा चुने गए कुछ परिणाम निकाले नहीं जा सकते क्योंकि वे इस खाते की सामग्री से संरेखित हैं। क्या आप बिना संरेखण के परिणामों को निकालने के साथ आगे बढ़ना चाहते हैं?"
   some_of_the_outcomes_that_you_have_selected_cannot_c417625: "आपके द्वारा चुने गए कुछ परिणाम निकाले नहीं जा सकते क्योंकि वे इस पाठ्यक्रम की सामग्री से संरेखित हैं। क्या आप बिना संरेखण के परिणामों को निकालने के साथ आगे बढ़ना चाहते हैं?"
+  some_required_information_is_missing_please_comple_fc725fae: "कुछ आवश्यक जानकारी गायब है। कृपया सहेजने से पहले सभी हाइलाइट किए गए फ़ील्ड भरें।"
   some_settings_have_been_administratively_locked_9e3ee880: "कुछ सेटिंग्स प्रशासनिक रूप से लॉक कर दी गई हैं।"
   some_settings_have_been_disabled_because_the_assig_6b6cc3b4: "कुछ सेटिंग्स अक्षम कर दी गई हैं क्योंकि असाइनमेंट बंद ग्रेडिंग अवधि में है।"
   some_submissions_are_not_gradeable_grade_changes_f_f8bf44e2: "कुछ सबमिशन ग्रेड करने योग्य नहीं हैं; उन सबमिशन के लिए ग्रेड परिवर्तन को अनदेखा कर दिया गया है।"
@@ -25484,10 +25652,13 @@ hi:
   student_progress_custom_report_bc7593d4: "छात्र प्रगति कस्टम रिपोर्ट"
   student_progress_custom_report_proservices_119dffa6: "छात्र प्रगति कस्टम रिपोर्ट (प्रोसर्विसेज़)"
   student_progress_report_559c7963: "छात्र प्रगति रिपोर्ट"
+  student_scored_100_in_the_roll_call_attendance_ass_f6635601: "छात्र ने रोल कॉल अटेंडेंस असाइनमेंट में 100% अंक प्राप्त किए"
+  student_scored_less_than_100_assignment_does_not_e_7560b045: "छात्र के 100% से कम अंक हैं, असाइनमेंट मौजूद नहीं है, या छात्र का कोई अंक नहीं है"
   student_settings_354d9a7e: "छात्र सेटिंग्स"
   student_sis_6721040e: "छात्र Sis"
   student_sis_d9f0cd39: "छात्र sis"
   student_sis_id: "छात्र SIS आईडी"
+  student_sis_id_ae374b2c: "छात्र SIS आईडी"
   student_student_number_5c98bd2d: "छात्र %{student_number}"
   student_studentnumber_f398d9c2: "छात्र %{studentNumber}"
   student_submission_report_af01e697: "छात्र सबमिशन रिपोर्ट"
@@ -26335,9 +26506,11 @@ hi:
   the_assignment_you_requested_is_not_associated_wit_7f5a421b: "आपके द्वारा अनुरोधित असाइनमेंट LTI उपकरण से संबद्ध नहीं है।"
   the_assignments_data_structure_is_invalid_this_cou_81665bfa: "असाइनमेंट डेटा संरचना अमान्य है। ऐसा सर्वर-साइड समस्या के कारण हो सकता है।"
   the_attendance_tool_must_be_enabled_by_your_canvas_108e6dca: "उपस्थिति उपकरण आपके Canvas व्यवस्थापक द्वारा सक्षम किया जाना चाहिए।"
+  the_attended_field_is_determined_by_the_student_s__4727c37c: "\"भाग लिया\" फ़ील्ड \"रोल कॉल उपस्थिति\" असाइनमेंट में छात्र के अंक द्वारा निर्धारित किया जाता है:"
   the_attribute_to_use_when_associating_a_canvas_use_112f140d: "Canvas उपयोगकर्ता को Microsoft उपयोगकर्ता के साथ संबद्ध करते समय उपयोग किया जाने वाला एट्रिब्यूट"
   the_begining_date_for_user_notes_updated_at_9d5a592b: "उपयोगकर्ता नोट्स की प्रारंभ तिथि को यहां पर अपडेट किया गया: "
   the_beginning_date_for_5400bfb7: "इस के लिए प्रारंभ तिथि "
+  the_beginning_date_for_course_end_dates_7fc71f6b: "पाठ्यक्रम समाप्ति तिथियों के लिए आरंभ तिथि"
   the_beginning_date_for_discussion_entries_3e0e51b8: "चर्चा प्रविष्टियों के लिए प्रारंभ तिथि"
   the_beginning_date_for_due_at_date_range_required_98bf3761: "due_at तिथि सीमा (आवश्यक) के लिए प्रारंभ तिथि"
   the_beginning_date_for_recent_user_accesses_defaul_86fa5ffb: "हालिया उपयोगकर्ता एक्सेस की प्रारंभ तिथि  डिफ़ॉल्ट रूप से पिछले हफ्ते की शुरुआत।  एक महीने से अधिक पुरानी आइटमें वापस नहीं की जाएंगी।"
@@ -26398,6 +26571,7 @@ hi:
   the_course_link_validator_searches_course_content__563fa215: "पाठ्यक्रम लिंक सत्यापनकर्ता अमान्य या नहीं पहुंचने योग्य लिंक और छवियों के लिए पाठ्यक्रम सामग्री खोजता है।"
   the_course_pace_download_encountered_an_error_3b1298fa: "कोर्स पेस डाउनलोड करते समय एक त्रुटि का सामना करना पड़ा।"
   the_course_pace_download_is_complete_5dc2a1d3: "कोर्स पेस डाउनलोड पूरा हो गया है।"
+  the_course_sis_id_to_filter_by_36dbd29d: "फ़िल्टर करने के लिए पाठ्यक्रम SIS ID"
   the_course_status_buttons_unpublished_and_publishe_e2dca595: "पाठ्यक्रम स्थिति बटन (अप्रकाशित और प्रकाशित) केवल तब तक डिस्प्ले किए जाते हैं जब तक कि छात्र का सबमिशन प्राप्त न हो जाए। छात्रों के सबमिशन के साथ पाठ्यक्रम अप्रकाशित नहीं किया जा सकता।"
   the_course_to_report_on_91a9721d: "जिस पाठ्यक्रम पर रिपोर्ट करनी है"
   the_course_to_report_on_b72d0409: "जिस पाठ्यक्रम पर रिपोर्ट करनी है"
@@ -26448,6 +26622,7 @@ hi:
   the_end_date_can_not_occur_before_the_start_date_d87117b8: "समाप्ति तिथि, आरंभ तिथि से पहले नहीं हो सकती।"
   the_end_date_cannot_precede_the_start_date_8a392429: "समाप्ति तिथि, प्रारंभ तिथि से पहले नहीं हो सकती"
   the_end_date_for_841d2ecd: "इस के लिए अंतिम तिथि: "
+  the_end_date_for_course_end_dates_f865c1c7: "पाठ्यक्रम समाप्ति तिथियों की अंतिम तिथि"
   the_end_date_for_default_to_end_of_yesterday_d8ebec31: "इस के लिए अंतिम तिथि (डिफ़ॉल्ट रूप से बीते हुए कल का अंत): "
   the_end_date_for_discussion_entries_6ac1b0d9: "चर्चा प्रविष्टियों के लिए अंतिम तिथि"
   the_end_date_for_due_at_date_range_required_4e7b7a1a: "due_at तिथि सीमा (आवश्यक) के लिए अंतिम तिथि"
@@ -26566,6 +26741,7 @@ hi:
   the_methods_for_communicating_with_the_subject_e_g_3a969113: "विषय के साथ संवाद करने के तरीके, जैसे ई-मेल, SMS, स्लैक आदि"
   the_microsoft_365_group_created_by_sync_no_longer__106b74a7: "सिंक द्वारा बनाया गया Microsoft 365 ग्रुप अब मौजूद नहीं है। आमतौर पर, इसका मतलब है कि ग्रुप को Microsoft की ओर से मिटा दिया गया था (जैसे, किसी व्यवस्थापक द्वारा)। मैनुअल तरीके से पुनः सिंक करने से समस्या का समाधान हो जाना चाहिए और यदि आवश्यक हो तो ग्रुप को फिर से बनाना चाहिए।"
   the_microsoft_365_tenant_provided_in_account_setti_7be0b625: "खाता सेटिंग्स में प्रदान किया गया Microsoft 365 टेनेंट एक शिक्षा टेनेंट नहीं है, इसलिए इसका उपयोग Microsoft Teams सिंक एकीकरण के साथ नहीं किया जा सकता है।"
+  the_model_may_misclassify_some_nuanced_replies_da89b5dd: "मॉडल कुछ सूक्ष्म उत्तरों को गलत वर्गीकृत कर सकता है।"
   the_module_item_is_locked_27fe420b: "मॉड्यूल आइटम लॉक है।"
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "उपयोगकर्ता %{current_user_name} और परिणाम %{outcome_name} के लिए नवीनतम अंक।"
   the_next_available_appointment_in_this_course_is_o_da10316c: "इस पाठ्यक्रम में अगली उपलब्ध नियुक्ति *%{date}* को है"
@@ -26614,6 +26790,7 @@ hi:
   the_search_either_failed_or_returned_0_results_thi_b3a0e261: "खोज या तो विफल रही या परिणाम में 0 लौटाया गया। विचार करने योग्य बातें:"
   the_search_returned_no_results_c2e4d13c: "खोज से कोई परिणाम नहीं मिला।"
   the_section_to_report_on_11e3757b: "जिस अनुभाग को रिपोर्ट करनी है"
+  the_security_reasons_for_blocking_these_requests_a_c2c94b98: "इन अनुरोधों को अवरुद्ध करने के सुरक्षा कारणों को इस *ब्लॉग पोस्ट* में समझाया गया है।"
   the_selected_calculation_method_is_no_longer_avail_e42ee80d: "चुनी गई गणना पद्धति अब उपलब्ध नहीं है"
   the_selected_date_is_on_a_blackout_day_bedcc1b8: "चुनी गई तिथि ब्लैकआउट दिवस पर है।"
   the_selected_date_is_on_a_weekend_and_this_course__66d43756: "चुनी गई तिथि सप्ताहांत पर है और इस पाठ्यक्रम की गति सप्ताहांत को स्किप होती है।"
@@ -26641,10 +26818,14 @@ hi:
   the_start_date_was_set_to_the_beginning_of_last_we_39f49e1d: "प्रारंभ तिथि पिछले हफ्ते के शुरुआत की निर्धारित की गई थी।"
   the_state_parameter_is_required_ffadf213: "स्थिति पैरामीटर आवश्यक है"
   the_student_annotation_tab_includes_the_document_f_4cc5cac8: "छात्र एनोटेशन टैब में असाइनमेंट के लिए दस्तावेज़ शामिल है। अतिरिक्त सबमिशन प्रकार वाले टैब भी उपलब्ध हो सकते हैं।"
+  the_student_s_last_name_should_be_formatted_as_fol_c003fafd: "छात्र का अंतिम नाम निम्न प्रकार से प्रारूपित होना चाहिए:"
   the_student_to_report_on_defaults_to_canvas_id_unl_9d76ffdf: "जिस छात्र पर रिपोर्ट करनी है; जब तक SIS में student_id_type के रूप में निर्दिष्ट न किया जाए, Canvas आईडी डिफ़ॉल्ट होती है"
+  the_subject_s_announcements_15999c82: "विषय की घोषणाएं।"
   the_subject_s_course_and_section_enrollments_ce8e7728: "विषय का पाठ्यक्रम और अनुभाग नामांकन।"
   the_subject_s_discussion_entries_81af59a: "विषय की चर्चा प्रविष्टियां।"
   the_subject_s_methods_for_logging_into_canvas_and__dbd8b6ab: "Canvas और संबंधित मेटाडेटा में लॉग इन करने के लिए विषय के तरीके।"
+  the_subject_s_pages_fbb7cbad: "विषय के पेज।"
+  the_subject_s_rubrics_ba10759e: "विषय के रुब्रिक्स।"
   the_submission_is_not_available_just_yet_b3c199c: "सबमिशन अभी उपलब्ध नहीं है।"
   the_submitted_after_date_to_report_on_9d90f026: "रिपोर्ट करने की टिथि के बाद सबमिट किया गया"
   the_syllabus_lets_you_welcome_your_course_users_an_ba74c779: |-
@@ -26726,6 +26907,7 @@ hi:
   there_are_no_unsynced_changes_4e8f0838: "बिना सिंक किए गए कोई परिवर्तन नहीं हैं"
   there_are_no_user_accounts_to_split_from_this_user_4e132eb1: "इस उपयोगकर्ता से विभाजित करने के लिए कोई उपयोगकर्ता खाता नहीं है।"
   there_are_still_classic_quizzes_in_the_course_plea_7c02b154: "पाठ्यक्रम में अभी भी क्लासिक प्रश्नोत्तरी हैं। कृपया उन्हें पहले नई प्रश्नोत्तरी में बदलें।"
+  there_are_three_categories_of_requests_that_are_in_c46cd2af: "इस रिपोर्ट में अनुरोधों की तीन श्रेणियां शामिल हैं:"
   there_are_unread_rubric_comments_337270ca: "बिना पढ़ी गईं रुब्रिक टिप्पणियां हैं।"
   there_are_unsaved_changes_to_a_grade_n_ncontinue_a_103d3b3c: "ग्रेड में बिना सहेजे गए परिवर्तन हैं।\\n\\nफिर भी जारी रखें?"
   there_is_a_2_app_limit_for_pinned_tools_in_top_nav_4cadc458: "शीर्ष नेविगेशन में पिन किए गए उपकरण के लिए 2 ऐप की सीमा है।"
@@ -26739,6 +26921,7 @@ hi:
   there_is_no_description_for_this_outcome_b160e6e4: "इस परिणाम का कोई वर्णन नहीं है।"
   there_is_no_integration_description_for_this_tool_e66fbbad: "इस उपकरण के लिए कोई एकीकरण विवरण नहीं है"
   there_is_no_processing_occurring_by_the_tool_d07df210: "उपकरण द्वारा कोई प्रसंस्करण नहीं हो रहा है।"
+  there_is_no_transcript_yet_bcf9ae30: "अभी तक कोई ट्रांसक्रिप्ट नहीं है।"
   there_is_nothing_planned_for_today_e09bfc8c: "आज के लिए कोई योजना नहीं है।"
   there_was_a_failure_logging_out_at_your_idp_30070527: "लॉग आउट करने में आपके IdP पर विफलता हुई"
   there_was_a_problem_creating_a_new_export_job_plea_8cacbbc6: "नया निर्यात कार्य बनाने में समस्या आई। कृपया बाद में फिर से कोशिश करें।"
@@ -26908,11 +27091,13 @@ hi:
   these_scores_are_out_of_order_4f0859ef: "ये अंक क्रम में नहीं हैं"
   they_them_f4d17a04: वे/उन्हें
   they_were_merged_into_other_user_64758f01: "उनका विलय *%{other_user}* में कर दिया गया।"
+  thinking_3fde768c: "सोचा जा रहा है..."
   third_20c6a639: तीसरा
   this_account_does_not_allow_for_microsoft_teams_sy_266f11c7: "यह खाता Microsoft Teams सिंक को सक्षम करने की अनुमति नहीं देता है। किसी भी सेटिंग को संपादित करने से पहले कृपया \"Microsoft ग्रुप नामांकन सिंकिंग\" फ़ीचर फ़्लैग सक्षम करें।"
   this_account_does_not_own_this_app_and_therefore_c_901eb52: "यह खाता इस ऐप का स्वामी नहीं है, इसलिए इसे मिटाया नहीं जा सकता।"
   this_account_does_not_own_this_app_and_therefore_c_9ab22b6e: "यह खाता इस ऐप का स्वामी नहीं है, इसलिए इसका कॉन्फ़िगरेशन रीसेट नहीं किया जा सकता।"
   this_adds_an_option_to_pick_the_tool_from_the_the__a1252655: "इससे सबमिशन प्रकार ड्रॉपडाउन सूची से उपकरण चुनने का विकल्प जुड़ जाता है"
+  this_ai_experience_e9ddf9b0: "यह AI अनुभव"
   this_allows_the_tool_to_provide_content_in_an_ifra_5aa71a0f: "इससे उपकरण को कोलैबोरेशंस पेज पर iframe में सामग्री उपलब्ध कराने की अनुमति मिलती है। यह छात्रों को दिखाई देता है।"
   this_allows_the_tool_to_provide_content_in_an_ifra_5e72b491: "इससे उपकरण को असाइनमेंट पेज पर iframe में सामग्री उपलब्ध कराने की अनुमति मिलती है। यह छात्रों को दिखाई देता है।"
   this_allows_the_tool_to_provide_content_in_an_ifra_7651e8db: "इससे उपकरण को असाइनमेंट संपादन पेज के भीतर iframe में सामग्री उपलब्ध कराने की अनुमति मिलती है।"
@@ -27233,6 +27418,7 @@ hi:
        रिपोर्ट चलाने वाले खाते के निर्धारित समय क्षेत्र में दिन की शुरुआत से दिन के अंत तक गणना की जाती है।
   this_report_gets_recent_big_blue_button_conference_5d7dcddb: "इस रिपोर्ट में किसी खाते के लिए हाल ही में बड़े नीले बटन कॉन्फ़्रेंस प्राप्त होते हैं।"
   this_report_gets_the_submissions_for_courses_d83bb449: "यह रिपोर्ट पाठ्यक्रमों के लिए सबमिशन प्राप्त करती है।"
+  this_report_gives_information_about_api_requests_t_6d59d572: "यह रिपोर्ट उन API अनुरोधों के बारे में जानकारी देती है जिनमें उपयोगकर्ता-एजेंट हेडर नहीं होता है. ये अनुरोध वर्तमान में बीटा में अवरुद्ध हैं, तथा परीक्षण और उत्पादन में इनका प्रवर्तन होने वाला है - कृपया सटीक तिथियों के लिए *API चेंज लॉग* देखें।"
   this_report_outlines_a_detailed_service_request_ds_10f35d01: "यह रिपोर्ट Canvas LMS से संबंधित एक विस्तृत सेवा अनुरोध (DSR) की रूपरेखा तैयार करती है। इस दस्तावेज़ का उद्देश्य अनुरोध का एक व्यापक अवलोकन प्रदान करना है, ताकि यह सुनिश्चित किया जा सके कि सभी प्रासंगिक हितधारकों को रिपोर्ट के उद्देश्यों और दायरे की स्पष्ट समझ हो।"
   this_report_provides_a_list_of_all_developer_keys__dd2bfadf: "यह रिपोर्ट संस्थान के लिए उपलब्ध सभी डेवलपर कुंजियों की एक सूची प्रदान करती है। इन कुंजियों को या तो सीधे उस मूल खाते में स्थापित किया जा सकता है जिससे रिपोर्ट चलाई जाती है या माता-पिता मूल खातों से विरासत में प्राप्त की जा सकती है। डेवलपर कुंजी या तो API या LTI कुंजी हो सकती है।"
   this_report_provides_all_active_eportfolios_for_th_f7432621: "यह रिपोर्ट वर्तमान संस्थान के लिए सभी सक्रिय ePortfolios प्रदान करती है। वैकल्पिक रूप से 'केवल बिना नामांकन वाले उपयोगकर्ताओं के ePortfolios को शामिल करें' चुनें, जिससे ePortfolio परिणामों का दायरा केवल उन उपयोगकर्ताओं तक रह जाए, जिनका कोई नामांकन नहीं है। आप केवल उन ePortfolios को शामिल करने के लिए रिपोर्ट को 'मिटाए गए ऑब्जेक्ट शामिल करें' के साथ भी चला सकते हैं जिन्हें निकाल दिया गया है।"
@@ -27259,6 +27445,7 @@ hi:
   this_report_shows_all_the_courses_for_a_given_term_3cdc11e5: "यह रिपोर्ट किसी दिए गए अवधि के लिए सभी पाठ्यक्रम दिखाती है। परिणामी csv फ़ाइल में प्रति पाठ्यक्रम एक पंक्ति होगी और पाठ्यक्रम आईडी, पाठ्यक्रम sis आईडी, पाठ्यक्रम संक्षिप्त नाम, पाठ्यक्रम का नाम, खाता आईडी, खाता sis आईडी, खाता नाम, MB में प्रयुक्त भंडारण, और MB में सभी फाइलों का योग दिखाएगा। उपयोग किया गया भंडारण उन सभी फ़ाइलों को दर्शाता है जो पाठ्यक्रम कोटा से हैं। पाठ्यक्रम की सभी फाइलों का योग पाठ्यक्रम कोटा पर प्रभाव की परवाह किए बिना पाठ्यक्रम में मौजूद सभी फाइलों का योग है।"
   this_report_shows_grading_period_grades_and_overal_a86346a: "यह रिपोर्ट किसी दिए गए अवधि में नामांकित प्रत्येक छात्र के लिए ग्रेडिंग अवधि ग्रेड (और समग्र पाठ्यक्रम ग्रेड) दिखाती है। परिणामी csv फ़ाइल में प्रति नामांकन एक पंक्ति होगी।"
   this_report_shows_the_student_final_grade_results__5a508b55: "यह रिपोर्ट किसी दिए गए अवधि में सभी छात्रों के लिए अंतिम ग्रेड के परिणाम दिखाती है। परिणामी CSV फ़ाइल में प्रति नामांकन एक पंक्ति होगी, और पाठ्यक्रम ग्रेडबुक में डिस्प्ले की गई वर्तमान और अंतिम ग्रेड दिखाएगी।"
+  this_report_will_show_the_count_of_requests_over_t_59477589: "यह रिपोर्ट पिछले 7 दिनों के अनुरोधों की संख्या दिखाएगी। इस समय सीमा को बदला नहीं जा सकता।"
   this_rubric_has_already_been_used_for_grading_any__73967cc3: "इस रुब्रिक का उपयोग ग्रेडिंग के लिए पहले ही किया जा चुका है। किए गए किसी भी परिवर्तन से मौजूदा छात्र अंक या ग्रेडिंग डेटा प्रभावित हो सकता है।"
   this_rubric_has_already_been_used_for_grading_savi_e6f63bb0: "इस रुब्रिक का उपयोग ग्रेडिंग के लिए पहले ही किया जा चुका है। परिवर्तनों को सहेजने से छात्र के अंकों या ग्रेडिंग इतिहास में परिवर्तन हो सकता है। क्या आप सच में आगे बढ़ना चाहते हैं?"
   this_rubric_removes_criterions_that_have_learning__46a402bc: "यह रुब्रिक उन मानदंडों को निकालता है, जिनमें शिक्षण परिणाम के नतीजे होते हैं"
@@ -27580,6 +27767,8 @@ hi:
   title_is_too_long_b192a46a: "शीर्षक बहुत लंबा है"
   title_is_too_long_must_be_under_length_characters_ab694ae4: "शीर्षक बहुत लंबा है, इसे %{length} कैरेक्टर से कम होना चाहिए"
   title_is_unlocked_click_to_lock_6a20cfcb: "%{title} अनलॉक है लॉक करने के लिए क्लिक करें।"
+  title_marked_as_read_2d2a69e3: "\"%{title}\" को पढ़ा हुआ के रूप में चिह्नित किया गया"
+  title_marked_as_unread_d9699806: "\"%{title}\" को नहीं पढ़ा हुआ के रूप में चिह्नित किया गया"
   title_must_be_less_than_255_characters_f2f8ef16: "शीर्षक को 255 कैरेक्टर से कम होना चाहिए।"
   title_must_contain_at_least_one_letter_or_number_6a6e4b54: "शीर्षक में कम से कम एक वर्ण या संख्या अवश्य होनी चाहिए"
   title_must_not_be_empty_89f29a21: "शीर्षक खाली नहीं होना चाहिए।"
@@ -27898,6 +28087,7 @@ hi:
   toggling_placement_ee1ab8b5: "प्लेसमेंट टॉगल किया जा रहा है"
   token_9a020862: टोकन
   token_is_not_signed_4c8ec218: "टोकन हस्ताक्षरित नहीं है"
+  token_purpose_47bfd71f: "टोकन उद्देश्य"
   tolerance_value_9e96573c: "सहनशीलता का मान"
   tomorrow_631af856: "आने वाला कल"
   tomorrow_9a6c9a00: कल
@@ -27935,6 +28125,7 @@ hi:
   top_navigation_a925af8d: "शीर्ष नेविगेशन"
   top_navigation_favorite_eb8ff09e: "शीर्ष नेविगेशन पसंदीदा"
   top_navigation_placement_78239065: "शीर्ष नेविगेशन प्लेसमेंट"
+  top_navigation_placement_accessibility_tab_order_f_84228a9f: "टॉप नेविगेशन प्लेसमेंट एक्सेसिबिलिटी टैब ऑर्डर फ़िक्स"
   topic_content_a8e42997: "विषय सामग्री"
   topic_podcast_feed_9ab6f5ac: "विषय: पॉडकास्ट फ़ीड"
   topic_title_85384ce8: "विषय का शीर्षक"
@@ -27973,6 +28164,7 @@ hi:
   traditional_e5a0d358: परंपरागत
   traditional_gradebook_d90461dc: "परंपरागत ग्रेडबुक"
   trained_with_user_data_dbf333e0: "उपयोगकर्ता डेटा के साथ प्रशिक्षित"
+  transcript_f562bd1: ट्रांस्क्रिप्ट
   transferred_student_enrollments_90dc27d3: "स्थानांतरित छात्र नामांकन"
   transform_rce_content_on_load_1f521086: "RCE सामग्री को लोड पर स्थानांतरित करें"
   transform_rce_iframe_sandbox_attributes_d1033606: "RCE iframe सैंडबॉक्स विशेषताएं परिवर्तित करें"
@@ -28207,6 +28399,8 @@ hi:
   type_to_search_for_tools_or_use_arrow_keys_to_navi_e62666d3: "उपकरण खोजने के लिए टाइप करें या विकल्पों को नेविगेट करने के लिए तीर कुंजियों का उपयोग करें"
   type_to_search_use_arrow_keys_to_navigate_options_5d538c0: "खोजने के लिए टाइप करें, विकल्पों को नेविगेट करने के लिए तीर कुंजियों का उपयोग करें।"
   type_your_message_here_3551e252: "अपना संदेश यहां टाइप करें…"
+  uagc_all_discussion_entries_report_12bc50be: "UAGC सभी चर्चा प्रविष्टियों की रिपोर्ट"
+  uagc_all_submission_attachments_report_71ef378b: "UAGC सभी सबमिशन अनुलग्नकों की रिपोर्ट"
   uc_irvine_quiz_adoption_report_9279da8e: "UC Irvine प्रश्नोत्तरी एडॉप्शन रिपोर्ट"
   uc_merced_student_activity_report_4a9a1eb8: "UC Merced छात्र गतिविधि रिपोर्ट"
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "उह ओह! अपने मित्रवत कैटलॉग डेवलपर से संपर्क करें। त्रुटि संदेश: %{message}"
@@ -28672,11 +28866,13 @@ hi:
   use_body_word_count_for_displaying_submission_word_febf5a6: "सबमिशन शब्द गणना प्रदर्शित करने के लिए body_word_count का उपयोग करें"
   use_checkboxes_to_select_one_or_more_assignments_t_b3069d58: "बैच संपादन के उद्देश्य से एक या अधिक असाइनमेंट चुनने के लिए चेकबॉक्स का उपयोग करें।"
   use_comment_comment_136b5cb3: "%{comment} टिप्पणी का उपयोग करें"
+  use_comment_comment_218e0d4a: "{{comment}} टिप्पणी का उपयोग करें"
   use_complete_incomplete_instead_of_points_for_grad_a25a3eca: "ग्रेडिंग के लिए पॉइंट के बजाय पूर्ण/अपूर्ण का उपयोग करें"
   use_custom_csrf_protection_on_oauth2_confirmation__aa8ce74d: "OAuth2 पुष्टिकरण पेज पर कस्टम CSRF सुरक्षा का उपयोग करें"
   use_default_890939b7: "डिफ़ॉल्ट का उपयोग करें"
   use_direct_api_call_for_content_migration_complete_7d006ae5: "content_migration_completed घटना के लिए डायरेक्ट API कॉल का उपयोग करें। नई प्रश्नोत्तरी साइड फ़ीचर फ़्लैग की आवश्यकता है: enable_event_endpoint"
   use_dyslexic_friendly_font_52e6f341: "डिस्लेक्सिक अनुकूल फ़ॉन्ट का उपयोग करें"
+  use_enhanced_comment_library_in_speedgrader_c143b2fc: "SpeedGrader में उन्नत कमेंट लाइब्रेरी का उपयोग करें"
   use_experimental_features_before_they_are_generall_3dfaddd1: "आमतौर पर उत्पादन में सक्षम होने से पहले प्रयोगात्मक फ़ीचर का उपयोग करें"
   use_file_verifier_authentication_for_new_quiz_file_3f0594ef: "नई प्रश्नोत्तरी फ़ाइल लिंक के लिए फ़ाइल सत्यापनकर्ता प्रमाणीकरण का उपयोग करें"
   use_gem_during_course_import_to_update_canvas_reso_3fcd9a8b: "Canvas स्रोत लिंक को अपडेट करने के लिए पाठ्यक्रम आयात के दौरान रत्न का उपयोग करें"
@@ -29473,6 +29669,7 @@ hi:
   we_were_unable_to_remove_this_course_from_your_fav_70fa598d: "हम इस पाठ्यक्रम को आपके पसंदीदा से हटाने में असमर्थ रहे।"
   we_were_unable_to_update_the_app_659f5bc6: "हम ऐप को अपडेट करने में असमर्थ रहे।"
   we_will_be_implementing_improvements_to_the_underl_d01e8e3b: "हम Canvas के लिए उपयोगकर्ता प्रमाणीकरण को संभालने वाली अंतर्निहित अवसंरचना में सुधार लागू करेंगे। ये परिवर्तन मुख्यतः हमारे बैकएंड पर हैं और आपके उपयोगकर्ताओं के लिए सहज बनाने के लिए डिज़ाइन किए गए हैं। हम आपके Canvas इंस्टेंस में प्रत्येक कॉन्फ़िगर किए गए प्रमाणीकरण प्रदाता को एकीकरण प्रकार और SSO प्रदाता के आधार पर स्वतंत्र रूप से प्रवास कर रहे हैं।"
+  we_will_save_this_experience_as_a_draft_so_you_can_1e828062: "हम इस अनुभव को ड्राफ्ट के रूप में सहेज लेंगे, ताकि आप इसका पूर्वावलोकन कर सकें। कृपया आगे बढ़ने के लिए पुष्टि करें।"
   web_conference: 
     default_name_for_courses: "पाठ्यक्रम वेब कॉन्फ़्रेंस"
     default_name_for_groups: "ग्रुप वेब कॉन्फ़्रेंस"
@@ -29541,6 +29738,7 @@ hi:
   what_content_is_searchable_375a0670: "कौन सी सामग्री खोज योग्य है?"
   what_do_you_think_of_discussion_insights_612ef8df: "*डिस्कशन इनसाइट्स* के बारे में आपका क्या विचार है?"
   what_do_you_think_of_discussion_translate_77c39a98: "*डिस्कशन ट्रांसलेट* के बारे में आपका क्या विचार है?"
+  what_do_you_think_of_the_new_dashboard_6b824284: "नये डैशबोर्ड के बारे में आप क्या सोचते हैं?"
   what_do_you_think_of_the_new_modules_experience_b9a9b681: "अपने नए मॉड्यूल्स अनुभव के बारे में आपका क्या विचार है?"
   what_does_autoconfirm_mean_d94112d: "ऑटोकंफ़र्म का क्या अर्थ है?"
   what_does_provisioning_only_mean_eac9a4a1: "केवल प्रावधान का क्या मतलब है?"
@@ -29563,8 +29761,11 @@ hi:
             अपने पाठ्यक्रम में जोड़ने में सक्षम हो सकते हैं। आप ग्रुप असाइनमेंट, चर्चाएं और फ़ाइलें रखने के लिए
             छात्र ग्रुप्स भी बना सकते हैं।
   what_s_changing_91566423: "क्या बदल रहा है?"
+  what_should_students_know_and_how_should_the_ai_be_6614903d: "छात्रों को क्या पता होना चाहिए और AI को किस प्रकार व्यवहार करना चाहिए?"
   what_should_the_csv_file_look_like_985a59ac: "CSV फ़ाइल कैसी दिखनी चाहिए?"
   what_storage_options_do_i_have_in_zoom_b79c738e: "Zoom में मेरे पास कौन से भंडारण विकल्प हैं?"
+  what_the_student_should_be_able_to_explain_or_demo_6514db57: "इस गतिविधि के बाद छात्र क्या समझा या प्रदर्शित कर सकेगा।"
+  what_would_make_this_dashboard_better_e5ee3311: "इस डैशबोर्ड को और बेहतर क्या बनाएगा?"
   what_would_you_like_to_do_next_2835397e: "अब आप क्या करना पसंद करेंगे?"
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "एकाधिक उपयोगकर्ताओं को जोड़ते समय, उपयोगकर्ताओं को अलग करने के लिए अल्पविराम या लाइन ब्रेक का उपयोग करें।"
   when_an_assignment_uses_online_submission_the_tool_3be80627: "जब कोई असाइनमेंट ऑनलाइन सबमिशन का उपयोग करता है, तो उपकरण का चयन किया जा सकता है और पेज पर एक iframe प्रदर्शित किया जा सकता है। यह छात्रों को दिखाई देता है"
@@ -29597,6 +29798,11 @@ hi:
       सक्षम होने पर, कोई भी कस्टम चर जो पहले NULL लौटा रहा था,
       अब कस्टम चर का नाम लौटाएगा।
   when_enabled_canvas_will_inherit_account_survey_se_39875d62: "सक्षम होने पर, Canvas Salesforce में Canvas_Survey_Opt_Out__c फ़ील्ड से खाता सर्वेक्षण सेटिंग प्राप्त करेगा। एक आवर्ती कार्य इस सेटिंग को हर 24 घंटे में सिंक करेगा और UI केवल पढ़ने के लिए हो जाएगा।"
+  when_enabled_fixes_the_tab_order_for_view_as_stude_2f92d5ae: |-
+      सक्षम होने पर, टॉप नेविगेशन में छात्र के रूप में देखें और LTI टूल बटन के लिए
+      टैब क्रम को ठीक करता है। तार्किक बाएं से दाएं पठन क्रम का पालन करते हुए,
+      'छात्र के रूप में देखें' को LTI टूल्स से पहले फ़ोकस प्राप्त होगा। top_navigation_placement
+      सक्षम करने की आवश्यकता है।
   when_enabled_for_an_account_sends_data_for_all_lti_77568a4f: |-
       किसी खाते के लिए सक्षम होने पर, क्वेरी और विज़ुअलाइज़ेशन के लिए PandataEvents सिस्टम
       को सभी LTI लॉन्च के लिए डेटा भेजता है। लॉग LTI लॉन्च (साइट व्यवस्थापक) को भी सक्षम करने की आवश्यकता है।
@@ -29765,6 +29971,7 @@ hi:
   widget_dashboard_204dc6bf: "विजेट डैशबोर्ड"
   widget_dashboard_error_page_82de7838: "विजेट डैशबोर्ड त्रुटि पेज"
   widget_dashboard_in_dev_do_not_turn_it_on_e467ec0: "विजेट डैशबोर्ड [डेवलपमेंट में - इसे चालू न करें]"
+  widgets_for_dashboard_2375bad0: "डैशबोर्ड के लिए विजेट"
   width_492fec76: चौड़ाई
   wiki: 
     default_course_wiki_name: "%{course_name} विकी"
@@ -30047,6 +30254,7 @@ hi:
   you_can_create_tags_by_downloading_the_differentia_49b744e6: "आप विभेदन टैग टेम्पलेट को डाउनलोड करके, स्प्रेडशीट संपादक (जैसे Excel या Google शीट्स) में फ़ाइल को संपादित करके और फिर अपनी संपादित फ़ाइल को अपलोड करके टैग बना सकते हैं।"
   you_can_customise_the_button_text_style_and_destin_95f10f0e: "आप बटन का पाठ, शैली और गंतव्य लिंक अनुकूलित कर सकते हैं।"
   you_can_fac644aa: "आप यह कर सकते हैं: "
+  you_can_filter_by_either_course_sis_id_or_by_cours_2394428a: "आप पाठ्यक्रम SIS आईडी या पाठ्यक्रम समाप्ति तिथि सीमा (start_at और end_at एक साथ) के आधार पर फ़िल्टर कर सकते हैं। दोनों फ़िल्टर वैकल्पिक हैं लेकिन परिणामों को सीमित करने के वैकल्पिक तरीके प्रदान करते हैं।"
   you_can_leave_the_page_and_you_will_get_a_notifica_fefe11e8: "आप पेज छोड़ सकते हैं और सिंक प्रक्रिया पूरी होने पर आपको एक सूचना मिलेगी।"
   you_can_leave_this_page_and_come_back_and_we_will__e80e8204: "आप इस पेज को छोड़ कर वापस आ सकते हैं, और हम पृष्ठभूमि में काम करते रहेंगे।"
   you_can_locate_this_url_on_the_integration_page_of_a7c2cf89: "यदि यह विधि इस उपकरण का समर्थन करती है, तो आप इस URL को उपकरण के एकीकरण पेज पर ढूंढ सकते हैं"
@@ -30335,6 +30543,7 @@ hi:
   you_will_not_be_able_to_preview_your_changes_f7b868fb: "आप अपने परिवर्तनों का पूर्वावलोकन नहीं कर पाएंगे"
   you_will_not_receive_any_course_notifications_at_t_7d9ce24f: "आपको इस समय कोई पाठ्यक्रम सूचना प्राप्त नहीं होगी। पाठ्यक्रम सूचनाएं सक्षम करने के लिए, ऊपर दिए गए टॉगल का उपयोग करें।"
   you_will_only_see_comments_written_by_you_f294cb9d: "आपको केवल आपके द्वारा लिखी गई टिप्पणियां ही दिखाई देंगी।"
+  your_answer_3c264ee8: "आपका उत्तर..."
   your_answer_8dad6ea4: "आपका उत्तर:"
   your_app_has_been_successfully_installed_this_moda_29640ff1: "आपका ऐप सफलतापूर्वक इंस्टॉल हो गया है। यह मोडल कुछ ही देर में बंद हो जाना चाहिए।"
   your_assignment_assignment_name_is_due_on_due_at_9f82e587: "आपका असाइनमेंट %{assignment_name} %{due_at} को देय है।"
@@ -30365,6 +30574,7 @@ hi:
   your_instructor_has_not_posted_the_grade_while_you_c5cd731c: "आपके प्रशिक्षक ने ग्रेड पोस्ट नहीं किया है। आपके प्रशिक्षक ने ग्रेड पोस्ट नहीं किया है, इसलिए ग्रेड और टिप्पणी की जानकारी उपलब्ध नहीं हैं।"
   your_ldap_server_rejected_the_bind_attempt_things__9d986660: "आपके LDAP सर्वर ने बाइंड प्रयास को अस्वीकार कर दिया। विचार करने योग्य बातें:"
   your_media_has_been_uploaded_and_will_appear_here__8546af57: "आपका मीडिया अपलोड कर दिया गया है और संसाधित होने के बाद यहां दिखाई देगा।"
+  your_message_ab7d5875: "आपका संदेश"
   your_message_has_been_sent_thank_you_e0284316: "आपका संदेश भेज दिया गया है। धन्यवाद!"
   your_message_was_sent_977f6583: "आपका संदेश भेज दिया गया!"
   your_migration_can_not_exceed_file_size_b0dda25f: "आपका प्रवास %{file_size} से ज्यादा नहीं हो सकता"
