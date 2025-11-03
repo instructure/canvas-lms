@@ -56,7 +56,7 @@ export default function NegativeFeedbackModal(props: Props) {
         </Modal.Header>
         <Modal.Body>
           <Flex as="div" gap="modalElements" direction="column">
-            <Text>{I18n.t('Your feedback helps us improve smart search.')}</Text>
+            <Text>{I18n.t('Your feedback helps us improve IgniteAI Search.')}</Text>
             <TextArea
               maxHeight="6em"
               height="6em"
