@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import BulkEditTable from '../BulkEditTable'
 
 function standardAssignmentData() {
@@ -33,6 +34,34 @@ function standardAssignmentData() {
           due_at: '2020-03-20T03:00:00Z',
           lock_at: '2020-04-11T00:00:00Z',
           can_edit: true,
+        },
+      ],
+    },
+  ]
+}
+
+function assignmentWithEditedOverride() {
+  return [
+    {
+      id: 'assignment_1',
+      name: 'First Assignment',
+      can_edit: true,
+      all_dates: [
+        {
+          base: true,
+          unlock_at: '2020-03-19T00:00:00Z',
+          due_at: '2020-03-20T03:00:00Z',
+          lock_at: '2020-04-11T00:00:00Z',
+          can_edit: true,
+        },
+        {
+          id: 'override_1',
+          title: 'Section A',
+          unlock_at: '2020-03-19T00:00:00Z',
+          due_at: '2020-03-21T03:00:00Z',
+          lock_at: '2020-04-11T00:00:00Z',
+          can_edit: true,
+          original_due_at: '2020-03-20T03:00:00Z',
         },
       ],
     },
@@ -64,7 +93,9 @@ describe('BulkEditTable Layout', () => {
           dispatchEvent: jest.fn(),
         })),
       })
+    })
 
+    it('shows visible text for Actions column header in stacked layout', () => {
       render(
         <BulkEditTable
           assignments={standardAssignmentData()}
@@ -74,14 +105,44 @@ describe('BulkEditTable Layout', () => {
           clearOverrideEdits={mockClearOverrideEdits}
         />,
       )
-    })
 
-    it('shows visible text for Actions column header in stacked layout', () => {
       expect(screen.getByText('Actions')).toBeInTheDocument()
     })
 
     it('shows visible text for Notes column header in stacked layout', () => {
+      render(
+        <BulkEditTable
+          assignments={standardAssignmentData()}
+          updateAssignmentDate={mockUpdateAssignmentDate}
+          setAssignmentSelected={mockSetAssignmentSelected}
+          selectAllAssignments={mockSelectAllAssignments}
+          clearOverrideEdits={mockClearOverrideEdits}
+        />,
+      )
+
       expect(screen.getByText('Notes')).toBeInTheDocument()
+    })
+
+    it('handles revert click without errors in stacked layout', async () => {
+      const user = userEvent.setup()
+
+      render(
+        <BulkEditTable
+          assignments={assignmentWithEditedOverride()}
+          updateAssignmentDate={mockUpdateAssignmentDate}
+          setAssignmentSelected={mockSetAssignmentSelected}
+          selectAllAssignments={mockSelectAllAssignments}
+          clearOverrideEdits={mockClearOverrideEdits}
+        />,
+      )
+
+      const revertButton = screen.getByRole('button', {name: /revert date changes/i})
+      await user.click(revertButton)
+
+      expect(mockClearOverrideEdits).toHaveBeenCalledWith({
+        assignmentId: 'assignment_1',
+        overrideId: 'override_1',
+      })
     })
   })
 
@@ -108,7 +169,9 @@ describe('BulkEditTable Layout', () => {
         writable: true,
         value: matchMediaMock,
       })
+    })
 
+    it('shows screen reader only text for Actions column header in fixed layout', async () => {
       render(
         <BulkEditTable
           assignments={standardAssignmentData()}
@@ -118,18 +181,48 @@ describe('BulkEditTable Layout', () => {
           clearOverrideEdits={mockClearOverrideEdits}
         />,
       )
-    })
 
-    it('shows screen reader only text for Actions column header in fixed layout', async () => {
       const actionsText = await screen.findByText('Actions')
 
       expect(actionsText).toHaveAttribute('class', expect.stringContaining('screenReaderContent'))
     })
 
     it('shows screen reader only text for Notes column header in fixed layout', async () => {
+      render(
+        <BulkEditTable
+          assignments={standardAssignmentData()}
+          updateAssignmentDate={mockUpdateAssignmentDate}
+          setAssignmentSelected={mockSetAssignmentSelected}
+          selectAllAssignments={mockSelectAllAssignments}
+          clearOverrideEdits={mockClearOverrideEdits}
+        />,
+      )
+
       const notesText = await screen.findByText('Notes')
 
       expect(notesText).toHaveAttribute('class', expect.stringContaining('screenReaderContent'))
+    })
+
+    it('handles revert click without errors in fixed layout', async () => {
+      const user = userEvent.setup()
+
+      render(
+        <BulkEditTable
+          assignments={assignmentWithEditedOverride()}
+          updateAssignmentDate={mockUpdateAssignmentDate}
+          setAssignmentSelected={mockSetAssignmentSelected}
+          selectAllAssignments={mockSelectAllAssignments}
+          clearOverrideEdits={mockClearOverrideEdits}
+        />,
+      )
+
+      const revertButton = screen.getByRole('button', {name: /revert date changes/i})
+      await user.click(revertButton)
+
+      expect(mockClearOverrideEdits).toHaveBeenCalledWith({
+        assignmentId: 'assignment_1',
+        overrideId: 'override_1',
+      })
     })
   })
 })
