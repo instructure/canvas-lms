@@ -25,6 +25,7 @@ import {
   DisplayFilter,
   SecondaryInfoDisplay,
   NameDisplayFormat,
+  ScoreDisplayFormat,
 } from '../utils/constants'
 
 jest.mock('@canvas/axios')
@@ -120,6 +121,7 @@ describe('apiClient', () => {
         ],
         nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
         studentsPerPage: 15,
+        scoreDisplayFormat: ScoreDisplayFormat.ICON_ONLY,
       }
 
       await saveLearningMasteryGradebookSettings('123', settings)
@@ -133,6 +135,7 @@ describe('apiClient', () => {
             show_students_with_no_results: true,
             name_display_format: 'first_last',
             students_per_page: 15,
+            score_display_format: 'icon_only',
           },
         },
       )
@@ -144,6 +147,7 @@ describe('apiClient', () => {
         displayFilters: [],
         nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
         studentsPerPage: 30,
+        scoreDisplayFormat: ScoreDisplayFormat.ICON_AND_LABEL,
       }
 
       await saveLearningMasteryGradebookSettings('456', settings)
@@ -157,6 +161,7 @@ describe('apiClient', () => {
             show_students_with_no_results: false,
             name_display_format: 'first_last',
             students_per_page: 30,
+            score_display_format: 'icon_and_label',
           },
         },
       )
@@ -168,6 +173,7 @@ describe('apiClient', () => {
         displayFilters: [],
         nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
         studentsPerPage: 50,
+        scoreDisplayFormat: ScoreDisplayFormat.ICON_ONLY,
       }
 
       await saveLearningMasteryGradebookSettings(789, settings)
@@ -181,6 +187,7 @@ describe('apiClient', () => {
             show_students_with_no_results: false,
             name_display_format: 'first_last',
             students_per_page: 50,
+            score_display_format: 'icon_only',
           },
         },
       )
@@ -192,6 +199,7 @@ describe('apiClient', () => {
         displayFilters: [DisplayFilter.SHOW_STUDENT_AVATARS],
         nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
         studentsPerPage: DEFAULT_STUDENTS_PER_PAGE,
+        scoreDisplayFormat: ScoreDisplayFormat.ICON_ONLY,
       }
 
       await saveLearningMasteryGradebookSettings('123', settings)
@@ -205,6 +213,7 @@ describe('apiClient', () => {
             show_students_with_no_results: false,
             name_display_format: 'first_last',
             students_per_page: 15,
+            score_display_format: 'icon_only',
           },
         },
       )
@@ -216,6 +225,7 @@ describe('apiClient', () => {
         displayFilters: [],
         nameDisplayFormat: NameDisplayFormat.LAST_FIRST,
         studentsPerPage: DEFAULT_STUDENTS_PER_PAGE,
+        scoreDisplayFormat: ScoreDisplayFormat.ICON_ONLY,
       }
 
       await saveLearningMasteryGradebookSettings('123', settings)
@@ -229,6 +239,33 @@ describe('apiClient', () => {
             show_students_with_no_results: false,
             name_display_format: 'last_first',
             students_per_page: 15,
+            score_display_format: 'icon_only',
+          },
+        },
+      )
+    })
+
+    it('includes score_display_format in the request body', async () => {
+      const settings = {
+        secondaryInfoDisplay: SecondaryInfoDisplay.NONE,
+        displayFilters: [],
+        nameDisplayFormat: NameDisplayFormat.FIRST_LAST,
+        studentsPerPage: DEFAULT_STUDENTS_PER_PAGE,
+        scoreDisplayFormat: ScoreDisplayFormat.ICON_AND_POINTS,
+      }
+
+      await saveLearningMasteryGradebookSettings('123', settings)
+
+      expect(mockedAxios.put).toHaveBeenCalledWith(
+        '/api/v1/courses/123/learning_mastery_gradebook_settings',
+        {
+          learning_mastery_gradebook_settings: {
+            secondary_info_display: 'none',
+            show_student_avatars: false,
+            show_students_with_no_results: false,
+            name_display_format: 'first_last',
+            students_per_page: 15,
+            score_display_format: 'icon_and_points',
           },
         },
       )
