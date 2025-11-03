@@ -37,6 +37,7 @@ interface RollupParams {
   sort_order: string
   page: number
   add_defaults?: boolean
+  sort_outcome_id?: string
 }
 
 /**
@@ -48,6 +49,7 @@ interface RollupParams {
  * @param perPage - The number of results per page
  * @param sortOrder - The order to sort the results by
  * @param sortBy - The field to sort the results by
+ * @param sortOutcomeId - The ID of the outcome to sort by (when sortBy is 'outcome')
  * @returns A promise that resolves to the API response
  */
 export const loadRollups = (
@@ -58,6 +60,7 @@ export const loadRollups = (
   perPage: number = DEFAULT_STUDENTS_PER_PAGE,
   sortOrder: SortOrder = SortOrder.ASC,
   sortBy: string = SortBy.SortableName,
+  sortOutcomeId?: string,
 ): Promise<AxiosResponse> => {
   const params: {params: RollupParams} = {
     params: {
@@ -69,6 +72,7 @@ export const loadRollups = (
       sort_order: sortOrder,
       page,
       ...(needDefaults && {add_defaults: true}),
+      ...(sortOutcomeId && {sort_outcome_id: sortOutcomeId}),
     },
   }
 

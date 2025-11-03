@@ -92,6 +92,8 @@ describe('LearningMastery', () => {
         setSortOrder: jest.fn(),
         sortBy: SortBy.SortableName,
         setSortBy: jest.fn(),
+        sortOutcomeId: null,
+        setSortOutcomeId: jest.fn(),
       },
     })
 
@@ -130,6 +132,8 @@ describe('LearningMastery', () => {
         sortOrder: SortOrder.ASC,
         setSortOrder: jest.fn(),
         setSortBy: jest.fn(),
+        sortOutcomeId: null,
+        setSortOutcomeId: jest.fn(),
       },
     } as ReturnType<typeof useRollups>)
     const {getByText} = render(<LearningMastery {...defaultProps()} />)

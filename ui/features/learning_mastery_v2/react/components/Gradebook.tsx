@@ -107,7 +107,7 @@ export const Gradebook: React.FC<GradebookProps> = ({
         >
           {outcomes.map((outcome, index) => (
             <Flex.Item size={`${COLUMN_WIDTH + COLUMN_PADDING}px`} key={`${outcome.id}.${index}`}>
-              <OutcomeHeader outcome={outcome} />
+              <OutcomeHeader outcome={outcome} sorting={sorting} />
             </Flex.Item>
           ))}
         </View>
