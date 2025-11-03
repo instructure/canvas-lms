@@ -21,6 +21,9 @@ require_relative "block_component"
 require_relative "../settings_tray/block_settings/text_image_block_settings"
 
 class TextImageBlockComponent < BlockComponent
+  BLOCK_TYPE = "Image + text"
+  BLOCK_SELECTOR = "[data-testid='imagetext-block-view']"
+
   attr_reader :block_title
 
   def initialize(block)

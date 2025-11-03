@@ -18,17 +18,32 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "block_component"
-require_relative "../settings_tray/block_settings/separator_block_settings"
+require_relative "../settings_tray/block_settings/button_block_settings"
 
-class SeparatorBlockComponent < BlockComponent
-  BLOCK_TYPE = "Separator line"
-  BLOCK_SELECTOR = "[data-testid='separator-line']"
+class ButtonBlockComponent < BlockComponent
+  BLOCK_TYPE = "Button"
+  BLOCK_SELECTOR = "[data-testid='button-block-view']"
 
-  def settings
-    @settings ||= SeparatorBlockSettings.new
+  attr_reader :block_title
+
+  def initialize(block)
+    super
+    @block_title = BlockTitleComponent.new(@block)
   end
 
-  def separator_line
-    f("[data-testid='separator-line']", @block)
+  def settings
+    @settings ||= ButtonBlockSettings.new
+  end
+
+  def buttons
+    ff("[data-button]", @block)
+  end
+
+  def button_background_color(button)
+    button.find_element(:css, "span").css_value("background-color")
+  end
+
+  def button_text_color(button)
+    button.find_element(:css, "span").css_value("color")
   end
 end
