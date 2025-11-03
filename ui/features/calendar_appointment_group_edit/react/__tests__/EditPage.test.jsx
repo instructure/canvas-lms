@@ -141,11 +141,41 @@ describe('AppointmentGroup EditPage', () => {
   })
 
   describe('Delete Group', () => {
-    it('sends delete request with correct id and redirects', async () => {
+    it('shows confirmation modal when delete button is clicked', async () => {
+      render(<EditPage {...defaultProps} />)
+      const deleteButton = await testScreen.findByText('Delete Group')
+      fireEvent.click(deleteButton)
+      await waitFor(() => {
+        expect(testScreen.getByTestId('delete-appointment-group-modal')).toBeInTheDocument()
+      })
+    })
+
+    it('closes modal when "Never mind" is clicked', async () => {
+      render(<EditPage {...defaultProps} />)
+      const deleteButton = await testScreen.findByText('Delete Group')
+      fireEvent.click(deleteButton)
+      await waitFor(() => {
+        expect(testScreen.getByTestId('delete-appointment-group-modal')).toBeInTheDocument()
+      })
+      const cancelButton = testScreen.getByTestId('cancel-delete-button')
+      fireEvent.click(cancelButton)
+      await waitFor(() => {
+        expect(testScreen.queryByTestId('delete-appointment-group-modal')).not.toBeInTheDocument()
+      })
+
+      expect(axios.delete).not.toHaveBeenCalled()
+    })
+
+    it('sends delete request with correct id and redirects when confirmed', async () => {
       axios.delete.mockResolvedValueOnce({})
       render(<EditPage {...defaultProps} />)
       const deleteButton = await testScreen.findByText('Delete Group')
       fireEvent.click(deleteButton)
+      await waitFor(() => {
+        expect(testScreen.getByTestId('delete-appointment-group-modal')).toBeInTheDocument()
+      })
+      const confirmButton = testScreen.getByTestId('confirm-delete-button')
+      fireEvent.click(confirmButton)
       await waitFor(() => {
         expect(axios.delete).toHaveBeenCalledWith('/api/v1/appointment_groups/1')
         expect(assignLocation).toHaveBeenCalledWith('/calendar')
@@ -157,6 +187,11 @@ describe('AppointmentGroup EditPage', () => {
       render(<EditPage {...defaultProps} />)
       const deleteButton = await testScreen.findByText('Delete Group')
       fireEvent.click(deleteButton)
+      await waitFor(() => {
+        expect(testScreen.getByTestId('delete-appointment-group-modal')).toBeInTheDocument()
+      })
+      const confirmButton = testScreen.getByTestId('confirm-delete-button')
+      fireEvent.click(confirmButton)
       await waitFor(() => {
         expect($.flashError).toHaveBeenCalledWith(
           'An error occurred while deleting the appointment group',
