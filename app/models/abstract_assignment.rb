@@ -1226,6 +1226,7 @@ class AbstractAssignment < ActiveRecord::Base
       intra_group_peer_reviews
       anonymous_grading
       peer_review_submission_required
+      peer_review_across_sections
     ].each { |attr| self[attr] = false if self[attr].nil? }
     self.graders_anonymous_to_graders = false unless grader_comments_visible_to_graders
   end
@@ -4637,6 +4638,8 @@ class AbstractAssignment < ActiveRecord::Base
     self.automatic_peer_reviews = false
     self.anonymous_peer_reviews = false
     self.intra_group_peer_reviews = false
+    self.peer_review_submission_required = false
+    self.peer_review_across_sections = false
   end
 
   def instructor_selectable_states
