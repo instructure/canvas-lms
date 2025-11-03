@@ -3504,6 +3504,117 @@ describe Attachment do
     end
   end
 
+  describe "#should_index_in_pine?" do
+    let(:horizon_course) do
+      course = Course.create!
+      course.update!(horizon_course: true)
+      course.account.enable_feature!(:horizon_course_setting)
+      course.account.enable_feature!(:horizon_learning_object_ingestion_on_change)
+      course
+    end
+    let(:regular_course) { Course.create! }
+    let(:pdf_attachment) do
+      attachment_model(
+        context: horizon_course,
+        content_type: "application/pdf",
+        filename: "test.pdf",
+        file_state: "available"
+      )
+    end
+    let(:pine_client_mock) { double("PineClient") }
+
+    before do
+      allow(pine_client_mock).to receive_messages(
+        enabled?: true,
+        allowed_attachment_content_types: ["application/pdf", "text/plain"]
+      )
+      stub_const("PineClient", pine_client_mock)
+    end
+
+    context "returns true when" do
+      it "attachment is available in a horizon course with allowed content type" do
+        expect(pdf_attachment.should_index_in_pine?).to be true
+      end
+    end
+
+    context "returns false when" do
+      it "context is not a Course" do
+        user = User.create!
+        user_attachment = attachment_model(context: user, content_type: "application/pdf")
+        expect(user_attachment.should_index_in_pine?).to be false
+      end
+
+      it "course is not a horizon course" do
+        regular_attachment = attachment_model(
+          context: regular_course,
+          content_type: "application/pdf",
+          file_state: "available"
+        )
+        expect(regular_attachment.should_index_in_pine?).to be false
+      end
+
+      it "PineClient is disabled" do
+        allow(PineClient).to receive(:enabled?).and_return(false)
+        expect(pdf_attachment.should_index_in_pine?).to be false
+      end
+
+      it "file_state is not available" do
+        pdf_attachment.file_state = "deleted"
+        expect(pdf_attachment.should_index_in_pine?).to be false
+      end
+
+      it "content_type is not allowed" do
+        image_attachment = attachment_model(
+          context: horizon_course,
+          content_type: "image/jpeg",
+          file_state: "available"
+        )
+        expect(image_attachment.should_index_in_pine?).to be false
+      end
+
+      it "feature flag is not enabled" do
+        horizon_course.account.disable_feature!(:horizon_learning_object_ingestion_on_change)
+        expect(pdf_attachment.should_index_in_pine?).to be false
+      end
+    end
+  end
+
+  describe "#index_in_pine" do
+    let(:horizon_course) do
+      course = Course.create!
+      course.update!(horizon_course: true)
+      course.account.enable_feature!(:horizon_course_setting)
+      course
+    end
+    let(:pdf_attachment) do
+      attachment_model(
+        context: horizon_course,
+        content_type: "application/pdf",
+        filename: "test.pdf"
+      )
+    end
+    let(:pine_client_mock) { double("PineClient") }
+
+    before do
+      allow(pine_client_mock).to receive_messages(
+        enabled?: true,
+        allowed_attachment_content_types: ["application/pdf", "text/plain"]
+      )
+      stub_const("PineClient", pine_client_mock)
+    end
+
+    it "calls delay with correct parameters and ingest_to_pine" do
+      expect(pdf_attachment).to receive(:delay).with(
+        n_strand: ["horizon_file_ingestion", pdf_attachment.context.global_root_account_id],
+        singleton: "horizon_file_ingestion:#{pdf_attachment.context.global_id}:#{pdf_attachment.id}",
+        max_attempts: 3
+      ).and_return(pdf_attachment)
+      expect(pdf_attachment).to receive(:ingest_to_pine)
+
+      pdf_attachment.index_in_pine
+    end
+  end
+
   describe "#ingest_to_pine" do
     let(:course) { Course.create! }
     let(:public_download_url) { "https://s3.amazonaws.com/bucket/file.pdf" }

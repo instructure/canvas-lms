@@ -111,3 +111,10 @@ horizon_auto_content_ingestion:
   display_name: "Canvas Career: Auto Content Ingestion"
   description: |-
     Automatically ingests course files and wiki pages into Pine when a course becomes a Canvas Career course.
+horizon_learning_object_ingestion_on_change:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Learning Object Ingestion on Change"
+  description: |-
+    Automatically ingests course files and wiki pages into Pine when they are created or modified in a Canvas Career course.
