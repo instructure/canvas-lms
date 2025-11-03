@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useAllPages} from '@canvas/query'
+import {useInfiniteQuery} from '@tanstack/react-query'
 import {gql} from 'graphql-tag'
 import {executeQuery} from '@canvas/graphql'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
@@ -101,11 +101,12 @@ export function useStudentEntries(
   discussionPageAmount = 50,
   userSearchId,
 ) {
-  return useAllPages({
+  return useInfiniteQuery({
     queryKey: ['studentEntries', discussionID, perPage, discussionPageAmount, userSearchId],
     queryFn: getStudentEntries,
     getNextPageParam: lastPage =>
       lastPage.pageInfo.hasNextPage ? lastPage.pageInfo.endCursor : undefined,
+    initialPageParam: null,
     enabled: !!discussionID,
   })
 }
