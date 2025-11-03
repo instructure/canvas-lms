@@ -50,33 +50,6 @@ module Outcomes
           end
         end
       end
-
-      # @param course_id [Integer] the ID of the course to calculate rollups for
-      # @param outcome_id [Integer] the ID of the specific outcome to calculate rollups for
-      def calculate_for_course_outcome(course_id:, outcome_id:)
-        Course.find(course_id)
-        LearningOutcome.find(outcome_id)
-
-        # TODO: Implementation steps:
-        # 1. Get the course and outcome (done above)
-        # 2. Find students who have results for this specific outcome
-        # 3. Fetch Canvas results for just this outcome and these students
-        # 4. Fetch Outcome Service results for just this outcome and these students
-        # 5. Combine results using existing combine_results method
-        # 6. Calculate rollups using existing generate_student_rollups method
-        # 7. Update OutcomeRollup records (need modified store_rollups for single outcome)
-        # 8. Track success/failure metrics
-        #
-        # REUSABLE METHODS:
-        # - combine_results
-        # - generate_student_rollups
-        # - build_rollup_rows
-        #
-        # NEED NEW/MODIFIED METHODS:
-        # - fetch_canvas_results_for_outcome (filter to specific outcome)
-        # - fetch_outcomes_service_results_for_outcome (filter to specific outcome)
-        # - store_rollups_for_outcome (only update specific outcome, don't delete others)
-      end
     end
 
     # @param course_id [Integer] the course_id whose outcomes to roll up
