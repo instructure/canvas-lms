@@ -121,6 +121,9 @@ const ItemAssignToCardMemo = memo(
       prevProps.original_due_at === nextProps.original_due_at &&
       prevProps.unlock_at === nextProps.unlock_at &&
       prevProps.lock_at === nextProps.lock_at &&
+      prevProps.peer_review_available_to === nextProps.peer_review_available_to &&
+      prevProps.peer_review_available_from === nextProps.peer_review_available_from &&
+      prevProps.peer_review_due_at === nextProps.peer_review_due_at &&
       prevProps.reply_to_topic_due_at === nextProps.reply_to_topic_due_at &&
       prevProps.required_replies_due_at === nextProps.required_replies_due_at &&
       prevProps.removeDueDateInput === nextProps.removeDueDateInput &&
@@ -418,6 +421,9 @@ const ItemAssignToTrayContent = ({
             original_due_at: baseDates.due_at,
             unlock_at: baseDates.unlock_at,
             lock_at: baseDates.lock_at,
+            peer_review_available_to: baseDates.peer_review_available_to,
+            peer_review_available_from: baseDates.peer_review_available_from,
+            peer_review_due_at: baseDates.peer_review_due_at,
             selectedAssigneeIds: selectedOption,
             // @ts-expect-error
             overrideId: dateDetailsApiResponse.id,
@@ -518,6 +524,9 @@ const ItemAssignToTrayContent = ({
               original_due_at: override.due_at,
               unlock_at: override.unlock_at,
               lock_at: override.lock_at,
+              peer_review_available_to: override.peer_review_available_to,
+              peer_review_available_from: override.peer_review_available_from,
+              peer_review_due_at: override.peer_review_due_at,
               selectedAssigneeIds: defaultOptions,
               defaultOptions,
               initialAssigneeOptions,
@@ -577,6 +586,9 @@ const ItemAssignToTrayContent = ({
         due_at: null,
         unlock_at: null,
         lock_at: null,
+        peer_review_available_to: null,
+        peer_review_available_from: null,
+        peer_review_due_at: null,
         contextModuleId: null,
         contextModuleName: null,
         selectedAssigneeIds: [] as string[],
@@ -854,6 +866,9 @@ const ItemAssignToTrayContent = ({
             original_due_at={card.original_due_at}
             unlock_at={card.unlock_at}
             lock_at={card.lock_at}
+            peer_review_available_to={card.peer_review_available_to}
+            peer_review_available_from={card.peer_review_available_from}
+            peer_review_due_at={card.peer_review_due_at}
             onDelete={cardCount === 1 ? undefined : handleDeleteCard}
             onCardAssignmentChange={handleCardAssignment}
             onCardDatesChange={handleDatesChange}

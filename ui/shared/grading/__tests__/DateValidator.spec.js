@@ -520,3 +520,546 @@ describe('section dates', () => {
     expect(isValid(validator, data)).toBe(true)
   })
 })
+
+describe('peer review dates', () => {
+  let makeValidator
+
+  beforeEach(() => {
+    makeValidator = (params = {}) =>
+      createValidator({
+        dueDateRequiredForAccount: false,
+        gradingPeriods: null,
+        hasGradingPeriods: false,
+        postToSIS: false,
+        userIsAdmin: false,
+        ...params,
+      })
+  })
+
+  describe('peer_review_available_from validation', () => {
+    test('allows peer_review_available_from to be equal to unlock_at', () => {
+      const data = generateData({
+        unlock_at: '2015-09-01T00:00:00Z',
+        peer_review_available_from: '2015-09-01T00:00:00Z',
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+
+    test('allows peer_review_available_from to be after unlock_at', () => {
+      const data = generateData({
+        unlock_at: '2015-09-01T00:00:00Z',
+        peer_review_available_from: '2015-09-02T00:00:00Z',
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+
+    test('disallows peer_review_available_from to be before unlock_at', () => {
+      const data = generateData({
+        unlock_at: '2015-09-02T00:00:00Z',
+        peer_review_available_from: '2015-09-01T00:00:00Z',
+      })
+      const validator = makeValidator()
+      const errors = validator.validateDatetimes(data)
+      expect(isValid(validator, data)).toBe(false)
+      expect(errors.peer_review_available_from).toBe(
+        'Peer review available from date must be on or after assignment available from date',
+      )
+    })
+
+    test('allows peer_review_available_from when unlock_at is null', () => {
+      const data = generateData({
+        unlock_at: null,
+        peer_review_available_from: '2015-09-01T00:00:00Z',
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+
+    test('allows unlock_at when peer_review_available_from is null', () => {
+      const data = generateData({
+        unlock_at: '2015-09-01T00:00:00Z',
+        peer_review_available_from: null,
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+
+    test('allows peer_review_available_from to be before lock_at', () => {
+      const data = generateData({
+        due_at: '2015-09-05T00:00:00Z',
+        lock_at: '2015-09-10T00:00:00Z',
+        peer_review_available_from: '2015-09-05T00:00:00Z',
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+
+    test('allows peer_review_available_from to be equal to lock_at', () => {
+      const data = generateData({
+        due_at: '2015-09-05T00:00:00Z',
+        lock_at: '2015-09-10T00:00:00Z',
+        peer_review_available_from: '2015-09-10T00:00:00Z',
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+
+    test('disallows peer_review_available_from to be after lock_at', () => {
+      const data = generateData({
+        due_at: '2015-09-05T00:00:00Z',
+        lock_at: '2015-09-10T00:00:00Z',
+        peer_review_available_from: '2015-09-15T00:00:00Z',
+      })
+      const validator = makeValidator()
+      const errors = validator.validateDatetimes(data)
+      expect(isValid(validator, data)).toBe(false)
+      expect(errors.peer_review_available_from).toBe(
+        'Peer review available from date must be before assignment available to date',
+      )
+    })
+
+    test('allows peer_review_available_from when lock_at is null', () => {
+      const data = generateData({
+        due_at: '2015-09-10T00:00:00Z',
+        lock_at: null,
+        peer_review_available_from: '2015-09-15T00:00:00Z',
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+
+    test('allows lock_at when peer_review_available_from is null', () => {
+      const data = generateData({
+        due_at: '2015-09-10T00:00:00Z',
+        lock_at: '2015-09-30T00:00:00Z',
+        peer_review_available_from: null,
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+  })
+
+  describe('peer_review_due_at validation', () => {
+    test('allows peer_review_due_at to be after peer_review_available_from', () => {
+      const data = generateData({
+        peer_review_available_from: '2015-09-01T00:00:00Z',
+        peer_review_due_at: '2015-09-02T00:00:00Z',
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+
+    test('disallows peer_review_due_at to be before peer_review_available_from', () => {
+      const data = generateData({
+        peer_review_available_from: '2015-09-02T00:00:00Z',
+        peer_review_due_at: '2015-09-01T00:00:00Z',
+      })
+      const validator = makeValidator()
+      const errors = validator.validateDatetimes(data)
+      expect(isValid(validator, data)).toBe(false)
+      expect(errors.peer_review_available_from).toBe(
+        'Reviewing starts date must be before peer review due date',
+      )
+    })
+
+    test('disallows peer_review_due_at to be equal to peer_review_available_from', () => {
+      const data = generateData({
+        peer_review_available_from: '2015-09-01T00:00:00Z',
+        peer_review_due_at: '2015-09-01T00:00:00Z',
+      })
+      const validator = makeValidator()
+      const errors = validator.validateDatetimes(data)
+      expect(isValid(validator, data)).toBe(false)
+      expect(errors.peer_review_available_from).toBe(
+        'Reviewing starts date must be before peer review due date',
+      )
+    })
+
+    test('allows peer_review_due_at when peer_review_available_from is null', () => {
+      const data = generateData({
+        peer_review_available_from: null,
+        peer_review_due_at: '2015-09-01T00:00:00Z',
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+
+    test('allows peer_review_available_from when peer_review_due_at is null', () => {
+      const data = generateData({
+        peer_review_available_from: '2015-09-01T00:00:00Z',
+        peer_review_due_at: null,
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+
+    test('allows peer_review_due_at to be after unlock_at', () => {
+      const data = generateData({
+        unlock_at: '2015-09-01T00:00:00Z',
+        peer_review_due_at: '2015-09-10T00:00:00Z',
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+
+    test('allows peer_review_due_at to be equal to unlock_at', () => {
+      const data = generateData({
+        unlock_at: '2015-09-01T00:00:00Z',
+        peer_review_due_at: '2015-09-01T00:00:00Z',
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+
+    test('disallows peer_review_due_at to be before unlock_at', () => {
+      const data = generateData({
+        unlock_at: '2015-09-10T00:00:00Z',
+        peer_review_due_at: '2015-09-05T00:00:00Z',
+      })
+      const validator = makeValidator()
+      const errors = validator.validateDatetimes(data)
+      expect(isValid(validator, data)).toBe(false)
+      expect(errors.peer_review_due_at).toBe(
+        'Peer review due date must be after assignment available from date',
+      )
+    })
+
+    test('allows peer_review_due_at when unlock_at is null', () => {
+      const data = generateData({
+        unlock_at: null,
+        peer_review_due_at: '2015-09-05T00:00:00Z',
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+
+    test('allows unlock_at when peer_review_due_at is null', () => {
+      const data = generateData({
+        unlock_at: '2015-09-10T00:00:00Z',
+        peer_review_due_at: null,
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+
+    test('allows peer_review_due_at to be before lock_at', () => {
+      const data = generateData({
+        due_at: '2015-09-20T00:00:00Z',
+        lock_at: '2015-09-30T00:00:00Z',
+        peer_review_due_at: '2015-09-15T00:00:00Z',
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+
+    test('allows peer_review_due_at to be equal to lock_at', () => {
+      const data = generateData({
+        due_at: '2015-09-30T00:00:00Z',
+        lock_at: '2015-09-30T00:00:00Z',
+        peer_review_due_at: '2015-09-30T00:00:00Z',
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+
+    test('disallows peer_review_due_at to be after lock_at', () => {
+      const data = generateData({
+        due_at: '2015-09-30T00:00:00Z',
+        lock_at: '2015-09-20T00:00:00Z',
+        peer_review_due_at: '2015-09-25T00:00:00Z',
+      })
+      const validator = makeValidator()
+      const errors = validator.validateDatetimes(data)
+      expect(isValid(validator, data)).toBe(false)
+      expect(errors.peer_review_due_at).toBe(
+        'Peer review due date must be before assignment available to date',
+      )
+    })
+
+    test('allows peer_review_due_at when lock_at is null', () => {
+      const data = generateData({
+        due_at: '2015-09-30T00:00:00Z',
+        lock_at: null,
+        peer_review_due_at: '2015-09-25T00:00:00Z',
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+
+    test('allows lock_at when peer_review_due_at is null', () => {
+      const data = generateData({
+        due_at: '2015-09-10T00:00:00Z',
+        lock_at: '2015-09-30T00:00:00Z',
+        peer_review_due_at: null,
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+  })
+
+  describe('peer_review_available_to validation with peer_review_due_at', () => {
+    test('allows peer_review_available_to to be equal to peer_review_due_at', () => {
+      const data = generateData({
+        peer_review_due_at: '2015-09-01T00:00:00Z',
+        peer_review_available_to: '2015-09-01T00:00:00Z',
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+
+    test('allows peer_review_available_to to be after peer_review_due_at', () => {
+      const data = generateData({
+        peer_review_due_at: '2015-09-01T00:00:00Z',
+        peer_review_available_to: '2015-09-02T00:00:00Z',
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+
+    test('disallows peer_review_available_to to be before peer_review_due_at', () => {
+      const data = generateData({
+        peer_review_due_at: '2015-09-02T00:00:00Z',
+        peer_review_available_to: '2015-09-01T00:00:00Z',
+      })
+      const validator = makeValidator()
+      const errors = validator.validateDatetimes(data)
+      expect(isValid(validator, data)).toBe(false)
+      expect(errors.peer_review_available_to).toBe(
+        'Peer review available to date must be on or after peer review due date',
+      )
+    })
+
+    test('allows peer_review_available_to when peer_review_due_at is null', () => {
+      const data = generateData({
+        peer_review_due_at: null,
+        peer_review_available_to: '2015-09-01T00:00:00Z',
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+
+    test('allows peer_review_due_at when peer_review_available_to is null', () => {
+      const data = generateData({
+        peer_review_due_at: '2015-09-01T00:00:00Z',
+        peer_review_available_to: null,
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+  })
+
+  describe('peer_review_available_to validation with lock_at', () => {
+    test('allows peer_review_available_to to be equal to lock_at', () => {
+      const data = generateData({
+        due_at: '2015-09-20T23:59:59Z',
+        lock_at: '2015-09-30T23:59:59Z',
+        peer_review_available_to: '2015-09-30T23:59:59Z',
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+
+    test('allows peer_review_available_to to be before lock_at', () => {
+      const data = generateData({
+        due_at: '2015-09-20T23:59:59Z',
+        lock_at: '2015-09-30T23:59:59Z',
+        peer_review_available_to: '2015-09-25T23:59:59Z',
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+
+    test('disallows peer_review_available_to to be after lock_at', () => {
+      const data = generateData({
+        due_at: '2015-09-20T23:59:59Z',
+        lock_at: '2015-09-25T23:59:59Z',
+        peer_review_available_to: '2015-09-30T23:59:59Z',
+      })
+      const validator = makeValidator()
+      const errors = validator.validateDatetimes(data)
+      expect(isValid(validator, data)).toBe(false)
+      expect(errors.peer_review_available_to).toBe(
+        'Peer review available to date must be on or before assignment available to date',
+      )
+    })
+
+    test('allows peer_review_available_to when lock_at is null', () => {
+      const data = generateData({
+        lock_at: null,
+        peer_review_available_to: '2015-09-25T23:59:59Z',
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+
+    test('allows lock_at when peer_review_available_to is null', () => {
+      const data = generateData({
+        due_at: '2015-09-20T23:59:59Z',
+        lock_at: '2015-09-30T23:59:59Z',
+        peer_review_available_to: null,
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+  })
+
+  describe('peer_review_available_to validation with unlock_at', () => {
+    test('allows peer_review_available_to to be after unlock_at', () => {
+      const data = generateData({
+        unlock_at: '2015-09-01T00:00:00Z',
+        peer_review_available_to: '2015-09-25T23:59:59Z',
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+
+    test('allows peer_review_available_to to be equal to unlock_at', () => {
+      const data = generateData({
+        unlock_at: '2015-09-01T00:00:00Z',
+        peer_review_available_to: '2015-09-01T00:00:00Z',
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+
+    test('disallows peer_review_available_to to be before unlock_at', () => {
+      const data = generateData({
+        unlock_at: '2015-09-20T00:00:00Z',
+        peer_review_available_to: '2015-09-15T23:59:59Z',
+      })
+      const validator = makeValidator()
+      const errors = validator.validateDatetimes(data)
+      expect(isValid(validator, data)).toBe(false)
+      expect(errors.peer_review_available_to).toBe(
+        'Peer review available to date must be after assignment available from date',
+      )
+    })
+
+    test('allows peer_review_available_to when unlock_at is null', () => {
+      const data = generateData({
+        unlock_at: null,
+        peer_review_available_to: '2015-09-25T23:59:59Z',
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+
+    test('allows unlock_at when peer_review_available_to is null', () => {
+      const data = generateData({
+        unlock_at: '2015-09-20T00:00:00Z',
+        peer_review_available_to: null,
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+  })
+
+  describe('peer_review_available_to validation with peer_review_available_from', () => {
+    test('allows peer_review_available_to to be after peer_review_available_from', () => {
+      const data = generateData({
+        peer_review_available_from: '2015-09-01T00:00:00Z',
+        peer_review_available_to: '2015-09-25T23:59:59Z',
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+
+    test('allows peer_review_available_to to be equal to peer_review_available_from', () => {
+      const data = generateData({
+        peer_review_available_from: '2015-09-01T00:00:00Z',
+        peer_review_available_to: '2015-09-01T00:00:00Z',
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+
+    test('disallows peer_review_available_to to be before peer_review_available_from', () => {
+      const data = generateData({
+        peer_review_available_from: '2015-09-20T00:00:00Z',
+        peer_review_available_to: '2015-09-15T23:59:59Z',
+      })
+      const validator = makeValidator()
+      const errors = validator.validateDatetimes(data)
+      expect(isValid(validator, data)).toBe(false)
+      expect(errors.peer_review_available_to).toBe(
+        'Peer review available to date must be after peer review available from date',
+      )
+    })
+
+    test('allows peer_review_available_to when peer_review_available_from is null', () => {
+      const data = generateData({
+        peer_review_available_from: null,
+        peer_review_available_to: '2015-09-25T23:59:59Z',
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+
+    test('allows peer_review_available_from when peer_review_available_to is null', () => {
+      const data = generateData({
+        peer_review_available_from: '2015-09-20T00:00:00Z',
+        peer_review_available_to: null,
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+  })
+
+  describe('complete peer review date chain', () => {
+    test('allows valid peer review date sequence', () => {
+      const data = generateData({
+        unlock_at: '2015-09-01T00:00:00Z',
+        due_at: '2015-09-25T23:59:59Z',
+        lock_at: '2015-09-30T23:59:59Z',
+        peer_review_available_from: '2015-09-11T00:00:00Z',
+        peer_review_due_at: '2015-09-20T23:59:59Z',
+        peer_review_available_to: '2015-09-28T23:59:59Z',
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+
+    test('disallows peer review dates that violate multiple constraints', () => {
+      const data = generateData({
+        unlock_at: '2015-09-10T00:00:00Z',
+        due_at: '2015-09-15T23:59:59Z',
+        lock_at: '2015-09-20T23:59:59Z',
+        peer_review_available_from: '2015-09-01T00:00:00Z', // Before unlock_at
+        peer_review_due_at: '2015-08-31T23:59:59Z', // Before available_from
+        peer_review_available_to: '2015-09-25T23:59:59Z', // After lock_at
+      })
+      const validator = makeValidator()
+      const errors = validator.validateDatetimes(data)
+      expect(isValid(validator, data)).toBe(false)
+      expect(errors.peer_review_available_from).toBeDefined() // Both unlock_at and peer_review_due_at errors
+      expect(errors.peer_review_available_to).toBeDefined()
+    })
+
+    test('allows peer review dates when all are at the boundary', () => {
+      const data = generateData({
+        unlock_at: '2015-09-01T00:00:00Z',
+        lock_at: '2015-09-30T23:59:59Z',
+        peer_review_available_from: '2015-09-01T00:00:00Z',
+        peer_review_due_at: '2015-09-02T00:00:00Z',
+        peer_review_available_to: '2015-09-30T23:59:59Z',
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+
+    test('allows peer review dates to span across assignment dates', () => {
+      const data = generateData({
+        unlock_at: '2015-09-01T00:00:00Z',
+        due_at: '2015-09-20T23:59:59Z',
+        lock_at: '2015-09-30T23:59:59Z',
+        peer_review_available_from: '2015-09-05T00:00:00Z',
+        peer_review_due_at: '2015-09-15T23:59:59Z',
+        peer_review_available_to: '2015-09-25T23:59:59Z',
+      })
+      const validator = makeValidator()
+      expect(isValid(validator, data)).toBe(true)
+    })
+  })
+})
