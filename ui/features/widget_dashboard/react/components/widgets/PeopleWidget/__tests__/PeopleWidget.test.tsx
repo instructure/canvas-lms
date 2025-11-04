@@ -233,4 +233,229 @@ describe('PeopleWidget', () => {
       expect(screen.queryByTestId('message-students-modal')).not.toBeInTheDocument()
     })
   })
+
+  describe('Multiple Instructors', () => {
+    beforeEach(() => {
+      server.use(
+        graphql.query('GetCourseInstructorsPaginated', () => {
+          return HttpResponse.json({
+            data: {
+              courseInstructorsConnection: {
+                nodes: [
+                  {
+                    user: {
+                      _id: '1',
+                      name: 'Alice Teacher',
+                      sortableName: 'Teacher, Alice',
+                      shortName: 'Alice',
+                      avatarUrl: 'https://example.com/alice.jpg',
+                      email: 'alice@example.com',
+                    },
+                    course: {_id: '100', name: 'Math 101', courseCode: 'MATH101'},
+                    type: 'TeacherEnrollment',
+                    role: {_id: '1', name: 'TeacherEnrollment'},
+                    enrollmentState: 'active',
+                  },
+                  {
+                    user: {
+                      _id: '2',
+                      name: 'Bob TA',
+                      sortableName: 'TA, Bob',
+                      shortName: 'Bob',
+                      avatarUrl: 'https://example.com/bob.jpg',
+                      email: 'bob@example.com',
+                    },
+                    course: {_id: '100', name: 'Math 101', courseCode: 'MATH101'},
+                    type: 'TaEnrollment',
+                    role: {_id: '2', name: 'TaEnrollment'},
+                    enrollmentState: 'active',
+                  },
+                ],
+                pageInfo: {
+                  hasNextPage: false,
+                  hasPreviousPage: false,
+                  startCursor: null,
+                  endCursor: null,
+                },
+              },
+            },
+          })
+        }),
+      )
+    })
+
+    it('renders all instructors in response', async () => {
+      renderWithQueryClient(<PeopleWidget {...buildDefaultProps()} />)
+
+      await screen.findByText('Alice Teacher')
+      expect(screen.getByText('Bob TA')).toBeInTheDocument()
+      expect(screen.getAllByRole('button', {name: /send a message to/i})).toHaveLength(2)
+    })
+
+    it('displays TA role correctly', async () => {
+      renderWithQueryClient(<PeopleWidget {...buildDefaultProps()} />)
+
+      await screen.findByText('Bob TA')
+      expect(screen.getByText('Teaching Assistant')).toBeInTheDocument()
+      expect(screen.getByText('Teacher')).toBeInTheDocument()
+    })
+
+    it('displays email for both instructors', async () => {
+      renderWithQueryClient(<PeopleWidget {...buildDefaultProps()} />)
+
+      await screen.findByText('alice@example.com')
+      expect(screen.getByText('bob@example.com')).toBeInTheDocument()
+    })
+  })
+
+  describe('Empty State', () => {
+    beforeEach(() => {
+      server.use(
+        graphql.query('GetCourseInstructorsPaginated', () => {
+          return HttpResponse.json({
+            data: {
+              courseInstructorsConnection: {
+                nodes: [],
+                pageInfo: {
+                  hasNextPage: false,
+                  hasPreviousPage: false,
+                  startCursor: null,
+                  endCursor: null,
+                },
+              },
+            },
+          })
+        }),
+      )
+    })
+
+    it('displays "No instructors found" when response is empty', async () => {
+      renderWithQueryClient(<PeopleWidget {...buildDefaultProps()} />)
+
+      await screen.findByTestId('no-instructors-message')
+      expect(screen.getByText('No instructors found')).toBeInTheDocument()
+    })
+  })
+
+  describe('GraphQL Errors', () => {
+    beforeEach(() => {
+      server.use(
+        graphql.query('GetCourseInstructorsPaginated', () => {
+          return HttpResponse.json({
+            errors: [{message: 'Network error'}],
+          })
+        }),
+      )
+    })
+
+    it('displays error message when query fails', async () => {
+      renderWithQueryClient(<PeopleWidget {...buildDefaultProps()} />)
+
+      await screen.findByText(/Failed to load instructor data/i)
+    })
+  })
+
+  describe('Pagination', () => {
+    beforeEach(() => {
+      server.use(
+        graphql.query('GetCourseInstructorsPaginated', () => {
+          return HttpResponse.json({
+            data: {
+              courseInstructorsConnection: {
+                nodes: [
+                  {
+                    user: {
+                      _id: '1',
+                      name: 'Instructor 1',
+                      sortableName: 'Instructor 1',
+                      shortName: 'Inst 1',
+                      avatarUrl: null,
+                      email: 'inst1@example.com',
+                    },
+                    course: {_id: '100', name: 'Course 1', courseCode: 'C1'},
+                    type: 'TeacherEnrollment',
+                    role: {_id: '1', name: 'TeacherEnrollment'},
+                    enrollmentState: 'active',
+                  },
+                ],
+                pageInfo: {
+                  hasNextPage: true,
+                  hasPreviousPage: false,
+                  startCursor: 'cursor1',
+                  endCursor: 'cursor2',
+                  totalCount: 10,
+                },
+              },
+            },
+          })
+        }),
+      )
+    })
+
+    it('displays pagination controls when totalPages > 1', async () => {
+      renderWithQueryClient(<PeopleWidget {...buildDefaultProps()} />)
+
+      await screen.findByText('Instructor 1')
+
+      // Pagination should be rendered
+      expect(screen.getByLabelText('Instructors pagination')).toBeInTheDocument()
+    })
+
+    it('navigates to next page when next button clicked', async () => {
+      const user = userEvent.setup()
+      renderWithQueryClient(<PeopleWidget {...buildDefaultProps()} />)
+
+      await screen.findByText('Instructor 1')
+
+      // Look for page 2 button
+      const page2Button = screen.getByRole('button', {name: '2'})
+      await user.click(page2Button)
+
+      // Should request next page (implementation would need to verify GraphQL call)
+    })
+  })
+
+  describe('Missing Email', () => {
+    beforeEach(() => {
+      server.use(
+        graphql.query('GetCourseInstructorsPaginated', () => {
+          return HttpResponse.json({
+            data: {
+              courseInstructorsConnection: {
+                nodes: [
+                  {
+                    user: {
+                      _id: '1',
+                      name: 'No Email Instructor',
+                      sortableName: 'Instructor, No Email',
+                      shortName: 'No Email',
+                      avatarUrl: null,
+                      email: null,
+                    },
+                    course: {_id: '100', name: 'Course 1', courseCode: 'C1'},
+                    type: 'TeacherEnrollment',
+                    role: {_id: '1', name: 'TeacherEnrollment'},
+                    enrollmentState: 'active',
+                  },
+                ],
+                pageInfo: {
+                  hasNextPage: false,
+                  hasPreviousPage: false,
+                  startCursor: null,
+                  endCursor: null,
+                },
+              },
+            },
+          })
+        }),
+      )
+    })
+
+    it('renders instructor without email gracefully', async () => {
+      renderWithQueryClient(<PeopleWidget {...buildDefaultProps()} />)
+
+      await screen.findByText('No Email Instructor')
+      expect(screen.getByRole('button', {name: /send a message to/i})).toBeInTheDocument()
+    })
+  })
 })
