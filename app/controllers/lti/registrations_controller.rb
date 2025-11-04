@@ -1041,16 +1041,19 @@
 #     }
 #
 class Lti::RegistrationsController < ApplicationController
-  before_action :require_root_account_instrumented
+  before_action :require_root_account_instrumented_or_sub_account_and_feature_flag
   before_action :require_feature_flag
   before_action :require_lti_registrations_next_feature_flag, only: %i[reset context_search overlay_history]
   before_action :require_lti_registrations_history_feature_flag, only: [:history]
   before_action :require_manage_lti_registrations
+  before_action :require_manage_lti_registrations_in_registrations_account, only: %i[reset update destroy]
+  before_action :restrict_sub_account_to_read_only, except: %i[index list show show_by_client_id context_search overlay_history history]
   before_action :validate_workflow_state, only: %i[bind create update]
   before_action :validate_list_params, only: :list
   before_action :validate_registration_params, only: %i[create update]
   before_action :restrict_dynamic_registration_updates, only: %i[update]
   before_action :require_registration_params, only: :create
+  before_action :require_in_account_or_site_admin, only: %i[show bind update reset overlay_history history]
 
   include Api::V1::Lti::Registration
   include Api::V1::Lti::RegistrationHistoryEntry
@@ -1071,9 +1074,9 @@ class Lti::RegistrationsController < ApplicationController
 
     # Inject feature flags for LTI registrations
     js_env({
-             LTI_REGISTRATIONS_HISTORY: @account.feature_enabled?(:lti_registrations_history)
+             LTI_REGISTRATIONS_HISTORY: @account.root_account.feature_enabled?(:lti_registrations_history),
+             ACCOUNT_GLOBAL_ID: @account.global_id
            })
-
     render :index
   end
 
@@ -1341,12 +1344,19 @@ class Lti::RegistrationsController < ApplicationController
 
       registration = developer_key.lti_registration
 
-      render json: lti_registration_json(registration,
-                                         @current_user,
-                                         session,
-                                         @context,
-                                         includes: [:account_binding, :configuration],
-                                         account_binding: registration.account_binding_for(@context))
+      # ensure the registration is active and in the current account, or is bound to it
+      unless registration.active? && (registration.account == @context || registration.account == Account.site_admin)
+        return render json: { errors: "LTI registration not found" }, status: :not_found
+      end
+
+      render json: lti_registration_json(
+        registration,
+        @current_user,
+        session,
+        @context,
+        includes: [:account_binding, :configuration],
+        account_binding: registration.account_binding_for(@context)
+      )
     end
   rescue => e
     report_error(e)
@@ -1753,7 +1763,7 @@ class Lti::RegistrationsController < ApplicationController
   private
 
   def render_configuration_errors(errors)
-    render json: { errors: }, status: :unprocessable_entity
+    render json: { errors: }, status: :unprocessable_content
   end
 
   def configuration_params
@@ -1856,6 +1866,18 @@ class Lti::RegistrationsController < ApplicationController
     raise e
   end
 
+  def require_root_account_instrumented_or_sub_account_and_feature_flag
+    require_account_context
+    return if @account.root_account?
+
+    unless Account.site_admin.feature_enabled?(:canvas_apps_sub_account_access)
+      raise ActiveRecord::RecordNotFound
+    end
+  rescue ActiveRecord::RecordNotFound => e
+    report_error(e)
+    raise e
+  end
+
   def require_root_account_instrumented
     require_account_context
     unless @account.root_account?
@@ -1867,7 +1889,7 @@ class Lti::RegistrationsController < ApplicationController
   end
 
   def require_feature_flag
-    unless @account.feature_enabled?(:lti_registrations_page)
+    unless @account.root_account.feature_enabled?(:lti_registrations_page)
       respond_to do |format|
         format.html { render "shared/errors/404_message", status: :not_found }
         format.json { render_error(:not_found, "The specified resource does not exist.", status: :not_found) }
@@ -1876,7 +1898,7 @@ class Lti::RegistrationsController < ApplicationController
   end
 
   def require_lti_registrations_next_feature_flag
-    unless @account.feature_enabled?(:lti_registrations_next)
+    unless @account.root_account.feature_enabled?(:lti_registrations_next)
       respond_to do |format|
         format.html { render "shared/errors/404_message", status: :not_found }
         format.json { render_error(:not_found, "The specified resource does not exist.", status: :not_found) }
@@ -1885,7 +1907,7 @@ class Lti::RegistrationsController < ApplicationController
   end
 
   def require_lti_registrations_history_feature_flag
-    unless @account.feature_enabled?(:lti_registrations_history)
+    unless @account.root_account.feature_enabled?(:lti_registrations_history)
       respond_to do |format|
         format.html { render "shared/errors/404_message", status: :not_found }
         format.json { render_error(:not_found, "The specified resource does not exist.", status: :not_found) }
@@ -1893,8 +1915,24 @@ class Lti::RegistrationsController < ApplicationController
     end
   end
 
+  def require_in_account_or_site_admin
+    unless registration.account == @context || registration.account == Account.site_admin
+      render json: { errors: "registration does not belong to account" }, status: :bad_request
+    end
+  end
+
   def require_manage_lti_registrations
     require_context_with_permission(@context, :manage_lti_registrations)
+  end
+
+  def require_manage_lti_registrations_in_registrations_account
+    require_context_with_permission(registration.account, :manage_lti_registrations)
+  end
+
+  def restrict_sub_account_to_read_only
+    unless @context.root_account?
+      render json: { errors: "sub-accounts can only view registrations" }, status: :forbidden
+    end
   end
 
   def report_error(exception, code = nil)
@@ -1928,9 +1966,9 @@ class Lti::RegistrationsController < ApplicationController
                canvasBaseUrl: request.base_url,
                firstName: @current_user.short_name,
                locale: I18n.locale,
-               rootAccountId: @account.id,
-               rootAccountUuid: @account.uuid,
-               isPremiumAccount: @account.feature_enabled?(:lti_usage_premium)
+               rootAccountId: @account.root_account.id,
+               rootAccountUuid: @account.root_account.uuid,
+               isPremiumAccount: @account.root_account.feature_enabled?(:lti_usage_premium)
              },
            })
 
