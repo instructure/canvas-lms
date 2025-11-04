@@ -125,80 +125,17 @@ describe BasicLTI::BasicOutcomes do
       end
     end
 
-    describe "#course_concluded?" do
+    describe "#grade_passback_allowed?" do
       let(:lti_response) { BasicLTI::BasicOutcomes::LtiResponse.new(xml) }
+      let(:student) { user_model }
 
-      context "when enrollment term has override dates in the future" do
-        before do
-          @course.enrollment_term.enrollment_dates_overrides.create!(
-            enrollment_type: "TeacherEnrollment",
-            enrollment_term: @course.enrollment_term,
-            end_at: 1.day.from_now,
-            context: @course.account
-          )
-        end
-
-        it "returns true" do
-          expect(lti_response.course_concluded?(@course)).to be false
-        end
+      before do
+        @course.enroll_student(student, enrollment_state: "active")
       end
 
-      context "when enrollment term has override dates in the past" do
-        before do
-          @course.enrollment_term.enrollment_dates_overrides.create!(
-            enrollment_type: "TeacherEnrollment",
-            enrollment_term: @course.enrollment_term,
-            end_at: 1.day.ago,
-            context: @course.account
-          )
-        end
-
-        it "returns false" do
-          expect(lti_response.course_concluded?(@course)).to be true
-        end
-      end
-
-      context "when enrollment term end date is in the future" do
-        before do
-          @course.enrollment_term.end_at = 1.day.from_now
-          @course.enrollment_term.save
-        end
-
-        it "returns true" do
-          expect(lti_response.course_concluded?(@course)).to be false
-        end
-      end
-
-      context "when enrollment term end date is in the past" do
-        before do
-          @course.enrollment_term.end_at = 1.day.ago
-          @course.enrollment_term.save
-        end
-
-        it "returns false" do
-          expect(lti_response.course_concluded?(@course)).to be true
-        end
-      end
-
-      context "when there are multiple override dates" do
-        before do
-          @course.enrollment_term.enrollment_dates_overrides.create!(
-            enrollment_type: "TeacherEnrollment",
-            enrollment_term: @course.enrollment_term,
-            end_at: 1.day.ago,
-            context: @course.account
-          )
-          @course.enrollment_term.enrollment_dates_overrides.create!(
-            enrollment_type: "TaEnrollment",
-            enrollment_term: @course.enrollment_term,
-            end_at: 1.day.from_now,
-            context: @course.account
-          )
-        end
-
-        it "returns true when the latest override date is in the future" do
-          expect(lti_response.course_concluded?(@course)).to be false
-        end
+      it "calls grade_passback_allowed? with correct parameters" do
+        expect(lti_response).to receive(:grade_passback_allowed?).with(@course, student).and_return(true)
+        lti_response.grade_passback_allowed?(@course, student)
       end
     end
   end
