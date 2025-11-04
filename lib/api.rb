@@ -468,6 +468,13 @@ module Api
         # pages beyond the end of an ordinal collection, rather than a 404.
         paginated = Folio::Ordinal::Page.create
         paginated.current_page = pagination_args[:page].to_i
+        paginated.next_page = nil
+        paginated.per_page = pagination_args[:per_page] if pagination_args.key?(:per_page)
+        paginated.total_entries = if collection.is_a?(Array)
+                                    collection.size
+                                  else
+                                    pagination_args[:total_entries]
+                                  end
       else
         # we're not dealing with a simple out-of-bounds on an ordinal
         # collection, let the exception propagate (and turn into a 404)
