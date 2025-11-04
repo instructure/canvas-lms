@@ -704,6 +704,11 @@ type Assignment implements AssignedDates & LegacyIDInterface & ModuleItemInterfa
   """
   hasGroupCategory: Boolean!
   hasMultipleDueDates: Boolean
+
+  """
+  Indicates if the assignment has LTI 2.0 plagiarism detection tool configured
+  """
+  hasPlagiarismTool: Boolean!
   hasRubric: Boolean!
 
   """

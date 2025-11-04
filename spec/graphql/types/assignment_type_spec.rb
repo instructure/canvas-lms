@@ -100,6 +100,26 @@ describe Types::AssignmentType do
     end
   end
 
+  describe "hasPlagiarismTool" do
+    it "returns true when assignment has a plagiarism tool configured" do
+      tool = course.context_external_tools.create!(
+        name: "Plagiarism Tool",
+        url: "http://example.com",
+        consumer_key: "key",
+        shared_secret: "secret"
+      )
+      assignment.assignment_configuration_tool_lookups.create!(
+        tool:,
+        tool_type: "ContextExternalTool"
+      )
+      expect(assignment_type.resolve("hasPlagiarismTool")).to be true
+    end
+
+    it "returns false when assignment has no plagiarism tool configured" do
+      expect(assignment_type.resolve("hasPlagiarismTool")).to be false
+    end
+  end
+
   describe "gradeAsGroup" do
     it "returns true for group assignments being graded as group" do
       assignment.update!(group_category: course.group_categories.create!(name: "My Category"))
