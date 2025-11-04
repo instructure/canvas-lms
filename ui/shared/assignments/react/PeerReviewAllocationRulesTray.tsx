@@ -39,13 +39,14 @@ import {debounce} from 'lodash'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import pandasBalloonUrl from './images/pandasBalloon.svg'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {
+  SCREENREADER_ALERT_TIMEOUT,
+  SEARCH_RESULT_ANNOUNCEMENT_DELAY,
+  CARD_HEIGHT,
+  SEARCH_DEBOUNCE_DELAY,
+} from './peerReviewConstants'
 
 const I18n = createI18nScope('peer_review_allocation_rules_tray')
-
-// We allow 5000ms for the screen reader to finish reading the label of the focused element before
-// announcing the screen reader alert. Otherwise, the focus announcement steals the alert announcement.
-const SCREENREADER_ALERT_TIMEOUT = 5000
-const CARD_HEIGHT = 120
 
 const NoResultsFound = ({searchTerm}: {searchTerm: string}) => (
   <Flex.Item as="div" padding="x-small medium" data-testid="no-search-results">
@@ -148,6 +149,8 @@ const PeerReviewAllocationRulesTray = ({
     searchTerm,
   )
 
+  const prevLoadingRef = useRef(loading)
+  const prevSearchTermRef = useRef(searchTerm)
   const totalPages = totalCount ? Math.ceil(totalCount / itemsPerPage) : 0
 
   const handlePageChange = useCallback((newPage: number) => {
@@ -269,7 +272,7 @@ const PeerReviewAllocationRulesTray = ({
         } else {
           setSearchTerm(value)
         }
-      }, 300),
+      }, SEARCH_DEBOUNCE_DELAY),
     [setSearchTerm],
   )
 
@@ -335,6 +338,20 @@ const PeerReviewAllocationRulesTray = ({
       debouncedSearch.cancel()
     }
   }, [searchInputValue, debouncedSearch])
+
+  useEffect(() => {
+    const wasLoading = prevLoadingRef.current && !loading
+    const searchTermChanged = prevSearchTermRef.current !== searchTerm
+
+    if (searchTerm && (wasLoading || searchTermChanged)) {
+      setTimeout(() => {
+        setScreenReaderAnnouncement(I18n.t('Search Results for "%{searchTerm}"', {searchTerm}))
+      }, SEARCH_RESULT_ANNOUNCEMENT_DELAY)
+    }
+
+    prevLoadingRef.current = loading
+    prevSearchTermRef.current = searchTerm
+  }, [loading, searchTerm])
 
   useEffect(() => {
     if (totalCount !== null) {

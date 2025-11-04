@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {render, screen, waitFor, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {QueryClient} from '@tanstack/react-query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
@@ -27,6 +27,10 @@ import {AllocationRuleType} from '@canvas/assignments/graphql/teacher/Assignment
 jest.mock('../images/pandasBalloon.svg', () => 'mock-pandas-balloon.svg')
 jest.mock('@canvas/graphql', () => ({
   executeQuery: jest.fn(),
+}))
+jest.mock('../peerReviewConstants', () => ({
+  SEARCH_DEBOUNCE_DELAY: 0,
+  SEARCH_RESULT_ANNOUNCEMENT_DELAY: 0,
 }))
 jest.mock('../AllocationRuleCard', () => {
   return function MockAllocationRuleCard({rule}: {rule: any}) {
@@ -682,6 +686,62 @@ describe('PeerReviewAllocationRulesTray', () => {
 
       expect(clearTimeoutSpy).toHaveBeenCalled()
       clearTimeoutSpy.mockRestore()
+    })
+
+    it('announces search results when search completes', async () => {
+      Object.defineProperty(HTMLElement.prototype, 'clientHeight', {
+        configurable: true,
+        get() {
+          if (this.dataset?.testid === 'allocation-rule-card-wrapper') {
+            return 120
+          }
+          return 600
+        },
+      })
+
+      let callCount = 0
+      mockExecuteQuery.mockImplementation(() => {
+        callCount++
+        if (callCount === 1) {
+          return Promise.resolve({
+            assignment: {
+              allocationRules: {
+                rulesConnection: {
+                  nodes: mockAllocationRules,
+                  pageInfo: {hasNextPage: false, endCursor: null},
+                },
+                count: mockAllocationRules.length,
+              },
+            },
+          })
+        } else {
+          return Promise.resolve({
+            assignment: {
+              allocationRules: {
+                rulesConnection: {
+                  nodes: mockAllocationRules.filter(rule => rule.assessor.name.includes('John')),
+                  pageInfo: {hasNextPage: false, endCursor: null},
+                },
+                count: 1,
+              },
+            },
+          })
+        }
+      })
+
+      renderWithQueryClient(<PeerReviewAllocationRulesTray {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(screen.getByPlaceholderText('Type to search')).toBeInTheDocument()
+      })
+
+      const searchInput = screen.getByPlaceholderText('Type to search')
+      fireEvent.change(searchInput, {target: {value: 'Jo'}})
+
+      await waitFor(() => {
+        const ariaLiveRegion = screen.getByTestId('allocation-rules-tray-alert')
+        expect(ariaLiveRegion.textContent).toBe('Search Results for "Jo"')
+      })
     })
   })
 })
