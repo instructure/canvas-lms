@@ -22,14 +22,25 @@ import {
   PlacementChanges,
   NamingDiff,
   diffConfigChangeEntry,
+  diffHistoryEntry,
 } from '../differ'
-import type {ConfigChangeHistoryEntry} from '../../../../model/LtiRegistrationHistoryEntry'
+import type {
+  ConfigChangeHistoryEntry,
+  AvailabilityChangeHistoryEntry,
+} from '../../../../model/LtiRegistrationHistoryEntry'
+import type {AvailabilityChangeEntryWithDiff} from '../differ'
 import {ZLtiRegistrationHistoryEntryId} from '../../../../model/LtiRegistrationHistoryEntry'
 import {ZAccountId} from '../../../../model/AccountId'
 import {ZLtiRegistrationId} from '../../../../model/LtiRegistrationId'
+import {ZLtiContextControlId} from '../../../../model/LtiContextControl'
+import {ZCourseId} from '../../../../model/CourseId'
+import {ZLtiDeploymentId} from '../../../../model/LtiDeploymentId'
+import type {LtiDeployment} from '../../../../model/LtiDeployment'
 import type {InternalLtiConfiguration} from '../../../../model/internal_lti_configuration/InternalLtiConfiguration'
 import {mockToolConfiguration} from '../../../../dynamic_registration_wizard/__tests__/helpers'
 import {LtiPlacements} from '../../../../model/LtiPlacement'
+import {mockDeployment} from '../../../manage/__tests__/helpers'
+import {mockContextControl} from '../../availability/__tests__/helpers'
 
 export const createMockConfigEntry = (
   oldConfig: Partial<InternalLtiConfiguration>,
@@ -91,6 +102,25 @@ export const createMockConfigEntry = (
     overlaid_internal_config: mockToolConfiguration(newConfig),
   },
 })
+
+const createMockAvailabilityEntry = (
+  oldDeployments: Array<Partial<LtiDeployment>>,
+  newDeployments: Array<Partial<LtiDeployment>>,
+): AvailabilityChangeHistoryEntry => {
+  return {
+    id: ZLtiRegistrationHistoryEntryId.parse('1'),
+    root_account_id: ZAccountId.parse('1'),
+    lti_registration_id: ZLtiRegistrationId.parse('1'),
+    created_at: new Date(),
+    updated_at: new Date(),
+    diff: {},
+    update_type: 'control_edit',
+    comment: null,
+    created_by: 'Instructure',
+    old_controls_by_deployment: oldDeployments.map(mockDeployment),
+    new_controls_by_deployment: newDeployments.map(mockDeployment),
+  }
+}
 
 describe('countDiffValue', () => {
   it('returns 0 additions and 0 removals for null or undefined', () => {
@@ -1342,6 +1372,623 @@ describe('diffConfigChangeEntry', () => {
         // Should count 3 removals (text, icon_url, and the placement itself) and 0 additions
         expect(result.totalAdditions).toBe(0)
         expect(result.totalRemovals).toBe(3)
+      })
+    })
+  })
+})
+
+describe('diffAvailabilityChangeEntry', () => {
+  describe('context control additions', () => {
+    it('detects when a new context control is added', () => {
+      const entry = createMockAvailabilityEntry(
+        [],
+        [
+          {
+            id: ZLtiDeploymentId.parse('1'),
+            deployment_id: '1',
+            context_id: '100',
+            context_type: 'Account',
+            context_name: 'Main Account',
+            context_controls: [
+              mockContextControl({
+                deployment_id: ZLtiDeploymentId.parse('1'),
+                id: ZLtiContextControlId.parse('1'),
+                account_id: ZAccountId.parse('100'),
+                available: true,
+              }),
+            ],
+          },
+        ],
+      )
+
+      const result = diffHistoryEntry(entry) as AvailabilityChangeEntryWithDiff
+
+      expect(result.totalAdditions).toBe(1)
+      expect(result.totalRemovals).toBe(0)
+      expect(result.deploymentDiffs).toHaveLength(1)
+
+      const deploymentDiff = result.deploymentDiffs[0]!
+      expect(deploymentDiff.context_name).toBe('Main Account')
+      expect(deploymentDiff.context_type).toBe('Account')
+      expect(deploymentDiff.controlDiffs).toHaveLength(1)
+
+      const controlDiff = deploymentDiff.controlDiffs[0]!
+      expect(controlDiff.availabilityChange).toEqual({
+        oldValue: undefined,
+        newValue: true,
+      })
+    })
+
+    it('detects when a context control is made available', () => {
+      const entry = createMockAvailabilityEntry(
+        [
+          {
+            id: ZLtiDeploymentId.parse('1'),
+            deployment_id: '1',
+            context_id: '100',
+            context_type: 'Account',
+            context_name: 'Main Account',
+            context_controls: [
+              mockContextControl({
+                id: ZLtiContextControlId.parse('1'),
+                deployment_id: ZLtiDeploymentId.parse('1'),
+                account_id: ZAccountId.parse('100'),
+                available: false,
+              }),
+            ],
+          },
+        ],
+        [
+          {
+            id: ZLtiDeploymentId.parse('1'),
+            deployment_id: '1',
+            context_id: '100',
+            context_type: 'Account',
+            context_name: 'Main Account',
+            context_controls: [
+              mockContextControl({
+                id: ZLtiContextControlId.parse('1'),
+                deployment_id: ZLtiDeploymentId.parse('1'),
+                account_id: ZAccountId.parse('100'),
+                available: true,
+              }),
+            ],
+          },
+        ],
+      )
+
+      const result = diffHistoryEntry(entry) as AvailabilityChangeEntryWithDiff
+
+      expect(result.totalAdditions).toBe(1)
+      expect(result.totalRemovals).toBe(1)
+      expect(result.deploymentDiffs).toHaveLength(1)
+      expect(result.deploymentDiffs[0]!.controlDiffs).toHaveLength(1)
+
+      const diff = result.deploymentDiffs[0]!.controlDiffs[0]!
+      expect(diff.availabilityChange).toEqual({
+        oldValue: false,
+        newValue: true,
+      })
+    })
+  })
+
+  describe('context control removals', () => {
+    it('detects when a context control is deleted', () => {
+      const entry = createMockAvailabilityEntry(
+        [
+          {
+            id: ZLtiDeploymentId.parse('1'),
+            deployment_id: '1',
+            context_id: '200',
+            context_type: 'Course',
+            context_name: 'Test Course',
+            context_controls: [
+              mockContextControl({
+                id: ZLtiContextControlId.parse('1'),
+                deployment_id: ZLtiDeploymentId.parse('1'),
+                course_id: ZCourseId.parse('200'),
+                available: true,
+              }),
+            ],
+          },
+        ],
+        [],
+      )
+
+      const result = diffHistoryEntry(entry) as AvailabilityChangeEntryWithDiff
+
+      expect(result.totalAdditions).toBe(0)
+      expect(result.totalRemovals).toBe(1)
+      expect(result.deploymentDiffs).toHaveLength(1)
+
+      const deploymentDiff = result.deploymentDiffs[0]!
+      expect(deploymentDiff.context_name).toBe('Test Course')
+      expect(deploymentDiff.context_type).toBe('Course')
+      expect(deploymentDiff.controlDiffs).toHaveLength(1)
+
+      const diff = deploymentDiff.controlDiffs[0]!
+      expect(diff.availabilityChange.oldValue).toBe(true)
+      expect(diff.availabilityChange.newValue).toBe(undefined)
+    })
+
+    it('detects when a context control is made unavailable', () => {
+      const entry = createMockAvailabilityEntry(
+        [
+          {
+            id: ZLtiDeploymentId.parse('1'),
+            deployment_id: '1',
+            context_id: '100',
+            context_type: 'Account',
+            context_name: 'Main Account',
+            context_controls: [
+              mockContextControl({
+                id: ZLtiContextControlId.parse('1'),
+                account_id: ZAccountId.parse('100'),
+                available: true,
+                deployment_id: ZLtiDeploymentId.parse('1'),
+              }),
+            ],
+          },
+        ],
+        [
+          {
+            id: ZLtiDeploymentId.parse('1'),
+            deployment_id: '1',
+            context_id: '100',
+            context_type: 'Account',
+            context_name: 'Main Account',
+            context_controls: [
+              mockContextControl({
+                id: ZLtiContextControlId.parse('1'),
+                deployment_id: ZLtiDeploymentId.parse('1'),
+                account_id: ZAccountId.parse('100'),
+                available: false,
+              }),
+            ],
+          },
+        ],
+      )
+
+      const result = diffHistoryEntry(entry) as AvailabilityChangeEntryWithDiff
+
+      expect(result.totalAdditions).toBe(1)
+      expect(result.totalRemovals).toBe(1)
+      expect(result.deploymentDiffs).toHaveLength(1)
+      expect(result.deploymentDiffs[0]!.controlDiffs).toHaveLength(1)
+
+      const diff = result.deploymentDiffs[0]!.controlDiffs[0]!
+      expect(diff.availabilityChange.oldValue).toBe(true)
+      expect(diff.availabilityChange.newValue).toBe(false)
+    })
+  })
+
+  describe('context control modifications', () => {
+    it('handles multiple context control changes', () => {
+      const entry = createMockAvailabilityEntry(
+        [
+          {
+            id: ZLtiDeploymentId.parse('1'),
+            deployment_id: '1',
+            context_id: '100',
+            context_type: 'Account',
+            context_name: 'Account A',
+            context_controls: [
+              mockContextControl({
+                id: ZLtiContextControlId.parse('1'),
+                deployment_id: ZLtiDeploymentId.parse('1'),
+                account_id: ZAccountId.parse('100'),
+                available: true,
+              }),
+            ],
+          },
+          {
+            id: ZLtiDeploymentId.parse('2'),
+            deployment_id: '2',
+            context_id: '200',
+            context_type: 'Course',
+            context_name: 'Course B',
+            context_controls: [
+              mockContextControl({
+                id: ZLtiContextControlId.parse('2'),
+                deployment_id: ZLtiDeploymentId.parse('2'),
+                course_id: ZCourseId.parse('200'),
+                available: false,
+              }),
+            ],
+          },
+        ],
+        [
+          {
+            id: ZLtiDeploymentId.parse('1'),
+            deployment_id: '1',
+            context_id: '100',
+            context_type: 'Account',
+            context_name: 'Account A',
+            context_controls: [
+              mockContextControl({
+                id: ZLtiContextControlId.parse('1'),
+                deployment_id: ZLtiDeploymentId.parse('1'),
+                account_id: ZAccountId.parse('100'),
+                available: false,
+              }),
+            ],
+          },
+          {
+            id: ZLtiDeploymentId.parse('2'),
+            deployment_id: '2',
+            context_id: '200',
+            context_type: 'Course',
+            context_name: 'Course B',
+            context_controls: [
+              mockContextControl({
+                id: ZLtiContextControlId.parse('2'),
+                deployment_id: ZLtiDeploymentId.parse('2'),
+                course_id: ZCourseId.parse('200'),
+                available: true,
+              }),
+            ],
+          },
+        ],
+      )
+
+      const result = diffHistoryEntry(entry) as AvailabilityChangeEntryWithDiff
+
+      // Two modifications, mods are counted for both
+      expect(result.totalAdditions).toBe(2)
+      expect(result.totalRemovals).toBe(2)
+      expect(result.deploymentDiffs).toHaveLength(2)
+
+      const accountDeployment = result.deploymentDiffs.find(d => d.context_type === 'Account')!
+      expect(accountDeployment.controlDiffs).toHaveLength(1)
+      expect(accountDeployment.controlDiffs[0]!.availabilityChange.oldValue).toBe(true)
+      expect(accountDeployment.controlDiffs[0]!.availabilityChange.newValue).toBe(false)
+
+      const courseDeployment = result.deploymentDiffs.find(d => d.context_type === 'Course')!
+      expect(courseDeployment.controlDiffs).toHaveLength(1)
+      expect(courseDeployment.controlDiffs[0]!.availabilityChange.oldValue).toBe(false)
+      expect(courseDeployment.controlDiffs[0]!.availabilityChange.newValue).toBe(true)
+    })
+
+    it('handles mixed additions, removals, and no-changes', () => {
+      const entry = createMockAvailabilityEntry(
+        [
+          {
+            id: ZLtiDeploymentId.parse('1'),
+            deployment_id: '1',
+            context_id: '100',
+            context_type: 'Account',
+            context_name: 'Existing Available',
+            context_controls: [
+              mockContextControl({
+                id: ZLtiContextControlId.parse('1'),
+                deployment_id: ZLtiDeploymentId.parse('1'),
+                account_id: ZAccountId.parse('100'),
+                available: true,
+              }),
+            ],
+          },
+          {
+            id: ZLtiDeploymentId.parse('2'),
+            deployment_id: '2',
+            context_id: '200',
+            context_type: 'Account',
+            context_name: 'To Be Removed',
+            context_controls: [
+              mockContextControl({
+                id: ZLtiContextControlId.parse('2'),
+                deployment_id: ZLtiDeploymentId.parse('2'),
+                account_id: ZAccountId.parse('200'),
+                available: true,
+              }),
+            ],
+          },
+        ],
+        [
+          {
+            id: ZLtiDeploymentId.parse('1'),
+            deployment_id: '1',
+            context_id: '100',
+            context_type: 'Account',
+            context_name: 'Existing Available',
+            context_controls: [
+              mockContextControl({
+                id: ZLtiContextControlId.parse('1'),
+                deployment_id: ZLtiDeploymentId.parse('1'),
+                account_id: ZAccountId.parse('100'),
+                available: true,
+              }),
+            ],
+          },
+          {
+            id: ZLtiDeploymentId.parse('3'),
+            deployment_id: '3',
+            context_id: '300',
+            context_type: 'Account',
+            context_name: 'Newly Added',
+            context_controls: [
+              mockContextControl({
+                id: ZLtiContextControlId.parse('3'),
+                deployment_id: ZLtiDeploymentId.parse('3'),
+                account_id: ZAccountId.parse('300'),
+                available: true,
+              }),
+            ],
+          },
+        ],
+      )
+
+      const result = diffHistoryEntry(entry) as AvailabilityChangeEntryWithDiff
+
+      expect(result.totalAdditions).toBe(1) // New account 300
+      expect(result.totalRemovals).toBe(1) // Removed account 200
+      expect(result.deploymentDiffs).toHaveLength(2) // Only changed deployments
+
+      // no change - deployment 1 should not be included
+      expect(result.deploymentDiffs.find(d => d.context_id === '100')).toBeUndefined()
+
+      // deleted - deployment 2
+      const deployment200 = result.deploymentDiffs.find(d => d.context_id === '200')!
+      expect(deployment200.controlDiffs).toHaveLength(1)
+      expect(deployment200.controlDiffs[0]!.availabilityChange.oldValue).toBe(true)
+      expect(deployment200.controlDiffs[0]!.availabilityChange.newValue).toBe(undefined)
+
+      // added - deployment 3
+      const deployment300 = result.deploymentDiffs.find(d => d.context_id === '300')!
+      expect(deployment300.controlDiffs).toHaveLength(1)
+      expect(deployment300.controlDiffs[0]!.availabilityChange.oldValue).toBe(undefined)
+      expect(deployment300.controlDiffs[0]!.availabilityChange.newValue).toBe(true)
+    })
+  })
+
+  describe('multiple controls per deployment', () => {
+    it('groups multiple control changes within the same deployment', () => {
+      const entry = createMockAvailabilityEntry(
+        [
+          {
+            id: ZLtiDeploymentId.parse('1'),
+            deployment_id: '1',
+            context_id: '100',
+            context_type: 'Account',
+            context_name: 'Main Account',
+            context_controls: [
+              mockContextControl({
+                id: ZLtiContextControlId.parse('1'),
+                deployment_id: ZLtiDeploymentId.parse('1'),
+                account_id: ZAccountId.parse('100'),
+                available: true,
+              }),
+              mockContextControl({
+                id: ZLtiContextControlId.parse('2'),
+                deployment_id: ZLtiDeploymentId.parse('1'),
+                account_id: ZAccountId.parse('100'),
+                available: false,
+              }),
+            ],
+          },
+        ],
+        [
+          {
+            id: ZLtiDeploymentId.parse('1'),
+            deployment_id: '1',
+            context_id: '100',
+            context_type: 'Account',
+            context_name: 'Main Account',
+            context_controls: [
+              mockContextControl({
+                id: ZLtiContextControlId.parse('1'),
+                deployment_id: ZLtiDeploymentId.parse('1'),
+                account_id: ZAccountId.parse('100'),
+                available: false,
+              }),
+              mockContextControl({
+                id: ZLtiContextControlId.parse('2'),
+                deployment_id: ZLtiDeploymentId.parse('1'),
+                account_id: ZAccountId.parse('100'),
+                available: true,
+              }),
+            ],
+          },
+        ],
+      )
+
+      const result = diffHistoryEntry(entry) as AvailabilityChangeEntryWithDiff
+
+      expect(result.deploymentDiffs).toHaveLength(1)
+      expect(result.deploymentDiffs[0]!.controlDiffs).toHaveLength(2)
+      expect(result.totalAdditions).toBe(2)
+      expect(result.totalRemovals).toBe(2)
+
+      const deployment = result.deploymentDiffs[0]!
+      expect(deployment.context_name).toBe('Main Account')
+
+      const control1 = deployment.controlDiffs.find(c => c.id === ZLtiContextControlId.parse('1'))!
+      expect(control1.availabilityChange.oldValue).toBe(true)
+      expect(control1.availabilityChange.newValue).toBe(false)
+
+      const control2 = deployment.controlDiffs.find(c => c.id === ZLtiContextControlId.parse('2'))!
+      expect(control2.availabilityChange.oldValue).toBe(false)
+      expect(control2.availabilityChange.newValue).toBe(true)
+    })
+
+    it('only includes controls that changed within a deployment', () => {
+      const entry = createMockAvailabilityEntry(
+        [
+          {
+            id: ZLtiDeploymentId.parse('1'),
+            deployment_id: '1',
+            context_id: '100',
+            context_type: 'Account',
+            context_name: 'Main Account',
+            context_controls: [
+              mockContextControl({
+                id: ZLtiContextControlId.parse('1'),
+                deployment_id: ZLtiDeploymentId.parse('1'),
+                account_id: ZAccountId.parse('100'),
+                available: true,
+              }),
+              mockContextControl({
+                id: ZLtiContextControlId.parse('2'),
+                deployment_id: ZLtiDeploymentId.parse('1'),
+                account_id: ZAccountId.parse('100'),
+                available: false,
+              }),
+            ],
+          },
+        ],
+        [
+          {
+            id: ZLtiDeploymentId.parse('1'),
+            deployment_id: '1',
+            context_id: '100',
+            context_type: 'Account',
+            context_name: 'Main Account',
+            context_controls: [
+              mockContextControl({
+                id: ZLtiContextControlId.parse('1'),
+                deployment_id: ZLtiDeploymentId.parse('1'),
+                account_id: ZAccountId.parse('100'),
+                available: false,
+              }),
+              mockContextControl({
+                id: ZLtiContextControlId.parse('2'),
+                deployment_id: ZLtiDeploymentId.parse('1'),
+                account_id: ZAccountId.parse('100'),
+                available: false,
+              }),
+            ],
+          },
+        ],
+      )
+
+      const result = diffHistoryEntry(entry) as AvailabilityChangeEntryWithDiff
+
+      expect(result.deploymentDiffs).toHaveLength(1)
+      expect(result.deploymentDiffs[0]!.controlDiffs).toHaveLength(1)
+      expect(result.totalAdditions).toBe(1)
+      expect(result.totalRemovals).toBe(1)
+
+      const control1 = result.deploymentDiffs[0]!.controlDiffs[0]!
+      expect(control1.id).toBe(ZLtiContextControlId.parse('1'))
+      expect(control1.availabilityChange.oldValue).toBe(true)
+      expect(control1.availabilityChange.newValue).toBe(false)
+    })
+  })
+
+  describe('edge cases', () => {
+    it('handles empty old and new deployments', () => {
+      const entry = createMockAvailabilityEntry([], [])
+
+      const result = diffHistoryEntry(entry) as AvailabilityChangeEntryWithDiff
+
+      expect(result.totalAdditions).toBe(0)
+      expect(result.totalRemovals).toBe(0)
+      expect(result.deploymentDiffs).toHaveLength(0)
+    })
+
+    it('distinguishes between accounts and courses with same ID', () => {
+      const entry = createMockAvailabilityEntry(
+        [],
+        [
+          {
+            id: ZLtiDeploymentId.parse('1'),
+            deployment_id: '1',
+            context_id: '100',
+            context_type: 'Account',
+            context_name: 'Account 100',
+            context_controls: [
+              mockContextControl({
+                id: ZLtiContextControlId.parse('1'),
+                deployment_id: ZLtiDeploymentId.parse('1'),
+                account_id: ZAccountId.parse('100'),
+                available: true,
+              }),
+            ],
+          },
+          {
+            id: ZLtiDeploymentId.parse('2'),
+            deployment_id: '2',
+            context_id: '100',
+            context_type: 'Course',
+            context_name: 'Course 100',
+            context_controls: [
+              mockContextControl({
+                id: ZLtiContextControlId.parse('2'),
+                deployment_id: ZLtiDeploymentId.parse('2'),
+                course_id: ZCourseId.parse('100'),
+                available: true,
+              }),
+            ],
+          },
+        ],
+      )
+
+      const result = diffHistoryEntry(entry) as AvailabilityChangeEntryWithDiff
+
+      expect(result.totalAdditions).toBe(2)
+      expect(result.deploymentDiffs).toHaveLength(2)
+
+      expect(result.deploymentDiffs.find(d => d.context_type === 'Account')!.context_name).toBe(
+        'Account 100',
+      )
+
+      expect(result.deploymentDiffs.find(d => d.context_type === 'Course')!.context_name).toBe(
+        'Course 100',
+      )
+    })
+  })
+
+  describe('workflow_state transitions', () => {
+    // Accounts for cases where someone deletes the control, then sets it to a value again
+    it('treats a context control with workflow_state deleted as having no value', () => {
+      const entry = createMockAvailabilityEntry(
+        [
+          {
+            id: ZLtiDeploymentId.parse('1'),
+            deployment_id: '1',
+            context_id: '100',
+            context_type: 'Account',
+            context_name: 'Main Account',
+            context_controls: [
+              mockContextControl({
+                id: ZLtiContextControlId.parse('1'),
+                deployment_id: ZLtiDeploymentId.parse('1'),
+                account_id: ZAccountId.parse('100'),
+                available: true,
+                workflow_state: 'deleted',
+              }),
+            ],
+          },
+        ],
+        [
+          {
+            id: ZLtiDeploymentId.parse('1'),
+            deployment_id: '1',
+            context_id: '100',
+            context_type: 'Account',
+            context_name: 'Main Account',
+            context_controls: [
+              mockContextControl({
+                id: ZLtiContextControlId.parse('1'),
+                deployment_id: ZLtiDeploymentId.parse('1'),
+                account_id: ZAccountId.parse('100'),
+                available: true,
+                workflow_state: 'active',
+              }),
+            ],
+          },
+        ],
+      )
+
+      const result = diffHistoryEntry(entry) as AvailabilityChangeEntryWithDiff
+
+      expect(result.totalAdditions).toBe(1)
+      expect(result.totalRemovals).toBe(0)
+      expect(result.deploymentDiffs).toHaveLength(1)
+
+      const controlDiff = result.deploymentDiffs[0]!.controlDiffs[0]!
+      expect(controlDiff.availabilityChange).toEqual({
+        oldValue: undefined,
+        newValue: true,
       })
     })
   })
