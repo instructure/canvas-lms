@@ -2275,6 +2275,7 @@ class AccountsController < ApplicationController
                                    { conditional_release: [:value, :locked] }.freeze,
                                    { enable_course_paces: [:value, :locked] }.freeze,
                                    { allow_observers_in_appointment_groups: [:value] }.freeze,
+                                   { default_allow_observer_signup: [:value] }.freeze,
                                    :enable_inbox_signature_block,
                                    :disable_inbox_signature_block_for_students,
                                    :enable_inbox_auto_response,

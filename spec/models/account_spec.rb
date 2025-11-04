@@ -2514,6 +2514,28 @@ describe Account do
     end
   end
 
+  describe "default_allow_observer_signup?" do
+    it "returns false by default" do
+      account = Account.create!
+      expect(account.default_allow_observer_signup?).to be false
+    end
+
+    it "returns true if the setting is enabled" do
+      account = Account.create!
+      account.settings[:default_allow_observer_signup] = { value: true }
+      account.save!
+      expect(account.default_allow_observer_signup?).to be true
+    end
+
+    it "inherits the setting from parent account" do
+      parent = Account.create!
+      parent.settings[:default_allow_observer_signup] = { value: true }
+      parent.save!
+      sub_account = Account.create!(parent_account: parent, root_account: parent)
+      expect(sub_account.default_allow_observer_signup?).to be true
+    end
+  end
+
   describe "enable_as_k5_account setting" do
     it "enable_as_k5_account? helper returns false by default" do
       account = Account.create!
