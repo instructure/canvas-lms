@@ -147,6 +147,9 @@ export interface EnvCommon {
   help_link_icon: string
   use_high_contrast: boolean
   use_dyslexic_font?: boolean
+  widget_dashboard?: boolean
+  widget_dashboard_overridable?: boolean
+  widget_dashboard_enabled?: boolean
   auto_show_cc: boolean
   disable_celebrations: boolean
   disable_keyboard_shortcuts: boolean

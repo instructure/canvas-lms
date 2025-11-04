@@ -22,6 +22,8 @@ import type {CourseWorkSummary} from '../types'
 import {getCurrentUserId, executeGraphQLQuery, createUserQueryConfig} from '../utils/graphql'
 import {COURSE_STATISTICS_KEY, QUERY_CONFIG} from '../constants'
 import {useWidgetDashboard} from './useWidgetDashboardContext'
+import {widgetDashboardPersister} from '../utils/persister'
+import {useBroadcastQuery} from '@canvas/query/broadcast'
 
 interface SubmissionStatistics {
   submissionsDueCount: number
@@ -146,7 +148,7 @@ export function useCourseWorkStatistics(params: CourseWorkStatisticsParams) {
     observedUserId ?? undefined,
   ]
 
-  return useQuery({
+  const query = useQuery({
     ...createUserQueryConfig(queryKey, QUERY_CONFIG.STALE_TIME.STATISTICS),
     queryFn: () =>
       fetchAllCourseStatistics({
@@ -159,5 +161,15 @@ export function useCourseWorkStatistics(params: CourseWorkStatisticsParams) {
       // Calculate summary based on selected course
       return calculateSummaryFromEnrollments(enrollments, params.courseId)
     },
+    persister: widgetDashboardPersister,
+    refetchOnMount: false,
   })
+
+  // Broadcast statistics updates across tabs
+  useBroadcastQuery({
+    queryKey: [COURSE_STATISTICS_KEY],
+    broadcastChannel: 'widget-dashboard',
+  })
+
+  return query
 }

@@ -103,7 +103,7 @@ const CoursesTab: React.FC = () => {
   if (dashboardCards.length === 0) {
     return (
       <View as="div" padding="medium" data-testid="courses-tab-content">
-        <Text>{I18n.t("You don't have any courses yet")}</Text>
+        <Text data-testid="no-courses-message">{I18n.t("You don't have any courses yet")}</Text>
       </View>
     )
   }

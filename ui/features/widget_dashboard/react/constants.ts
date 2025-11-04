@@ -142,3 +142,14 @@ export const REJECT_ENROLLMENT_INVITATION = gql`
     }
   }
 `
+
+export const UPDATE_LEARNER_DASHBOARD_TAB_SELECTION = gql`
+  mutation UpdateLearnerDashboardTabSelection($tab: LearnerDashboardTabType!) {
+    updateLearnerDashboardTabSelection(input: {tab: $tab}) {
+      tab
+      errors {
+        message
+      }
+    }
+  }
+`

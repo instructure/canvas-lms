@@ -24,7 +24,7 @@ import {graphql, http, HttpResponse} from 'msw'
 import WidgetDashboardContainer from '../WidgetDashboardContainer'
 import {WidgetDashboardProvider} from '../hooks/useWidgetDashboardContext'
 import {ResponsiveProvider} from '../hooks/useResponsiveContext'
-import {defaultGraphQLHandlers} from './testHelpers'
+import {defaultGraphQLHandlers, clearWidgetDashboardCache} from './testHelpers'
 
 const mockStatisticsData = {
   data: {
@@ -132,6 +132,11 @@ const setup = (contextProps = {}, envOverrides = {}) => {
 describe('WidgetDashboardContainer', () => {
   beforeAll(() => {
     server.listen({onUnhandledRequest: 'error'})
+  })
+
+  beforeEach(() => {
+    window.ENV = {current_user_id: '123'} as any
+    clearWidgetDashboardCache()
   })
 
   afterEach(() => {

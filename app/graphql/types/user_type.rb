@@ -644,19 +644,17 @@ module Types
     def course_work_submissions_connection(course_filter: nil, start_date: nil, end_date: nil, include_overdue: false, include_no_due_date: false, only_submitted: false, observed_user_id: nil)
       return [] unless object == current_user
 
-      # Get active course enrollments
+      # Get active course enrollments using the same filtering as dashboard
       active_course_ids = if observed_user_id.present?
                             observed_user = User.find_by(id: observed_user_id)
                             return [] unless observed_user
 
-                            object.cached_course_ids_for_observed_user(observed_user)
+                            # For observers, get the observed user's current courses
+                            observer_course_ids = object.cached_course_ids_for_observed_user(observed_user)
+                            observed_user_current_ids = observed_user.cached_current_course_ids_for_dashboard(domain_root_account: context[:domain_root_account])
+                            observer_course_ids & observed_user_current_ids
                           else
-                            object.enrollments
-                                  .joins(:course)
-                                  .where(courses: { workflow_state: "available" })
-                                  .active_by_date
-                                  .pluck(:course_id)
-                                  .uniq
+                            object.cached_current_course_ids_for_dashboard(domain_root_account: context[:domain_root_account])
                           end
 
       if active_course_ids.empty?
@@ -691,8 +689,11 @@ module Types
                               OR (submissions.score IS NOT NULL AND submissions.workflow_state = 'graded'))
                             SQL
                           else
-                            # Default: show unsubmitted, non-excused assignments (actionable items)
-                            submissions_query.where(submitted_at: nil).where("excused = FALSE OR excused IS NULL")
+                            # Default: show unsubmitted, non-excused, non-graded assignments (actionable items)
+                            # Match the logic in SubmissionStatisticsType.submissions_due_count
+                            submissions_query.where(submitted_at: nil)
+                                             .where("excused = FALSE OR excused IS NULL")
+                                             .where("(submissions.score IS NULL OR submissions.workflow_state != 'graded')")
                           end
 
       # Apply date filtering using flexible date parameters (skip for submitted items)
@@ -865,23 +866,24 @@ module Types
       )
 
       # Filter to only discussions in courses where user has active enrollment
-      # Use a subquery to avoid loading all enrollment IDs into memory
-      enrollment_subquery = if observed_user_id.present?
-                              observed_user = User.find_by(id: observed_user_id)
-                              return DiscussionTopicParticipant.none unless observed_user
+      # Use cached_current_course_ids_for_dashboard for consistent filtering
+      active_course_ids = if observed_user_id.present?
+                            observed_user = User.find_by(id: observed_user_id)
+                            return DiscussionTopicParticipant.none unless observed_user
 
-                              current_user.cached_course_ids_for_observed_user(observed_user)
-                            else
-                              current_user.enrollments
-                                          .active_by_date
-                                          .joins(:course)
-                                          .where(courses: { workflow_state: "available" })
-                                          .select(:course_id)
-                            end
+                            # For observers, get the observed user's current courses
+                            observer_course_ids = current_user.cached_course_ids_for_observed_user(observed_user)
+                            observed_user_current_ids = observed_user.cached_current_course_ids_for_dashboard(domain_root_account: context[:domain_root_account])
+                            observer_course_ids & observed_user_current_ids
+                          else
+                            current_user.cached_current_course_ids_for_dashboard(domain_root_account: context[:domain_root_account])
+                          end
+
+      return DiscussionTopicParticipant.none if active_course_ids.empty?
 
       participants = participants.where(
         discussion_topics: {
-          context_id: enrollment_subquery,
+          context_id: active_course_ids,
           context_type: "Course"
         }
       )

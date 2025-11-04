@@ -16,12 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useInfiniteQuery} from '@tanstack/react-query'
+import {useInfiniteQuery, useQuery, useQueryClient} from '@tanstack/react-query'
 import {gql} from 'graphql-tag'
-import {useState, useCallback, useEffect, useRef} from 'react'
+import {useState, useCallback, useEffect} from 'react'
 import {getCurrentUserId, executeGraphQLQuery, createUserQueryConfig} from '../utils/graphql'
 import {COURSE_WORK_KEY, QUERY_CONFIG} from '../constants'
 import {useWidgetDashboard} from './useWidgetDashboardContext'
+import {widgetDashboardPersister} from '../utils/persister'
+import {useBroadcastQuery} from '@canvas/query/broadcast'
 
 export interface CourseWorkItem {
   id: string
@@ -232,6 +234,7 @@ export function calculateCursorForPage(pageIndex: number, pageSize: number): str
 export async function fetchCourseWorkPage(
   pageIndex: number,
   options: UseCourseWorkOptions = {},
+  observedUserId?: string | null,
 ): Promise<CourseWorkResult> {
   const {
     pageSize = 4,
@@ -256,6 +259,7 @@ export async function fetchCourseWorkPage(
     includeOverdue,
     includeNoDueDate,
     onlySubmitted,
+    observedUserId,
   })
 
   if (!response?.legacyNode?.courseWorkSubmissionsConnection) {
@@ -426,87 +430,59 @@ export function useCourseWork(options: UseCourseWorkOptions = {}) {
   })
 }
 
-interface PageCache {
-  [pageIndex: number]: CourseWorkResult
-}
-
 /**
  * Enhanced hook for direct page jumping with caching
- * Manages its own page state and provides navigation
+ * Uses TanStack Query for automatic caching and persistence
  * Used by widgets that need to jump directly to any page (e.g., CourseWorkWidget, CourseWorkCombinedWidget)
  */
 export function useCourseWorkPaginated(options: UseCourseWorkOptions = {}) {
+  const {observedUserId} = useWidgetDashboard()
+  const queryClient = useQueryClient()
   const [currentPageIndex, setCurrentPageIndex] = useState<number>(0)
-  const [pageCache, setPageCache] = useState<PageCache>({})
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<Error | null>(null)
-  const [totalCount, setTotalCount] = useState<number | null>(null)
-  const optionsRef = useRef(options)
-  const isFetchingRef = useRef<{[key: number]: boolean}>({})
-
-  useEffect(() => {
-    optionsRef.current = options
-  }, [options])
-
   const pageSize = options.pageSize || 4
 
-  const fetchPage = useCallback(
-    async (pageIndex: number) => {
-      if (pageCache[pageIndex]) {
-        return pageCache[pageIndex]
-      }
+  // Generate unique query key for current page
+  const queryKey = [
+    COURSE_WORK_KEY,
+    'page',
+    currentPageIndex,
+    pageSize,
+    options.courseFilter,
+    options.startDate,
+    options.endDate,
+    options.includeOverdue?.toString(),
+    options.includeNoDueDate?.toString(),
+    options.onlySubmitted?.toString(),
+    observedUserId ?? undefined,
+  ]
 
-      if (isFetchingRef.current[pageIndex]) {
-        return
-      }
+  // Use TanStack Query for this specific page (uses client from context)
+  const {
+    data: currentPage,
+    isLoading,
+    error,
+    refetch: refetchCurrentPage,
+  } = useQuery({
+    queryKey,
+    queryFn: () => fetchCourseWorkPage(currentPageIndex, options, observedUserId),
+    enabled: !!window.ENV?.current_user_id,
+    staleTime: QUERY_CONFIG.STALE_TIME.STATISTICS * 60 * 1000, // Convert minutes to ms
+    persister: widgetDashboardPersister,
+    refetchOnMount: false,
+  })
 
-      isFetchingRef.current[pageIndex] = true
-      setIsLoading(true)
-      setError(null)
+  // Broadcast course work updates across tabs
+  useBroadcastQuery({
+    queryKey: [COURSE_WORK_KEY],
+    broadcastChannel: 'widget-dashboard',
+  })
 
-      try {
-        const result = await fetchCourseWorkPage(pageIndex, optionsRef.current)
-
-        setPageCache(prev => ({
-          ...prev,
-          [pageIndex]: result,
-        }))
-
-        if (result.pageInfo.totalCount !== null) {
-          setTotalCount(result.pageInfo.totalCount)
-        }
-
-        return result
-      } catch (err) {
-        setError(err as Error)
-      } finally {
-        setIsLoading(false)
-        isFetchingRef.current[pageIndex] = false
-      }
-    },
-    [pageCache],
-  )
-
+  // Reset to page 0 when filters change
   useEffect(() => {
-    if (window.ENV?.current_user_id) {
-      fetchPage(currentPageIndex)
-    }
-  }, [currentPageIndex, fetchPage])
-
-  useEffect(() => {
-    setPageCache({})
-    setTotalCount(null)
     setCurrentPageIndex(0)
-    isFetchingRef.current = {}
-  }, [options.courseFilter, options.startDate, options.endDate])
+  }, [options.courseFilter, options.startDate, options.endDate, observedUserId])
 
-  const resetAndRefetch = useCallback(() => {
-    setPageCache({})
-    setTotalCount(null)
-    isFetchingRef.current = {}
-    return fetchPage(currentPageIndex)
-  }, [fetchPage, currentPageIndex])
-
+  const totalCount = currentPage?.pageInfo.totalCount ?? null
   const totalPages =
     totalCount !== null && totalCount !== undefined ? Math.ceil(totalCount / pageSize) : 0
 
@@ -521,7 +497,13 @@ export function useCourseWorkPaginated(options: UseCourseWorkOptions = {}) {
     setCurrentPageIndex(0)
   }, [])
 
-  const currentPage = pageCache[currentPageIndex]
+  const refetch = useCallback(async () => {
+    // Invalidate all course work queries to force refetch
+    await queryClient.invalidateQueries({
+      queryKey: [COURSE_WORK_KEY],
+    })
+    return refetchCurrentPage()
+  }, [queryClient, refetchCurrentPage])
 
   return {
     currentPage,
@@ -530,9 +512,9 @@ export function useCourseWorkPaginated(options: UseCourseWorkOptions = {}) {
     totalCount,
     goToPage,
     resetPagination,
-    refetch: resetAndRefetch,
+    refetch,
     isLoading,
-    error,
+    error: error as Error | null,
     pageSize,
   }
 }

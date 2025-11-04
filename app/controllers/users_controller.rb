@@ -538,7 +538,8 @@ class UsersController < ApplicationController
                PREFERENCES: {
                  dashboard_view: @current_user.dashboard_view(@domain_root_account),
                  hide_dashcard_color_overlays: @current_user.preferences[:hide_dashcard_color_overlays],
-                 custom_colors: @current_user.custom_colors
+                 custom_colors: @current_user.custom_colors,
+                 learner_dashboard_tab_selection: @current_user.get_preference(:learner_dashboard_tab_selection) || "dashboard"
                },
                OBSERVED_USERS_LIST: observed_users_list,
                OBSERVED_USER_ID: observed_user&.id,
@@ -1826,6 +1827,7 @@ class UsersController < ApplicationController
     comment_library_suggestions_enabled
     elementary_dashboard_disabled
     default_to_block_editor
+    widget_dashboard_user_preference
   ].freeze
 
   # @API Update user settings.
@@ -1855,6 +1857,11 @@ class UsersController < ApplicationController
   # @argument elementary_dashboard_disabled [Boolean]
   #   If true, will display the user's preferred class Canvas dashboard
   #   view instead of the canvas for elementary view.
+  #
+  # @argument widget_dashboard_user_preference [Boolean]
+  #   If true, enables the widget dashboard for the user. Only applies
+  #   when the widget_dashboard feature is enabled at the account level.
+  #   Defaults to true when the feature becomes available.
   #
   # @example_request
   #
@@ -3539,15 +3546,27 @@ class UsersController < ApplicationController
   end
 
   def fetch_courses_with_grades(observed_user = nil)
-    # Get current enrollments for the user
-    if observed_user
-      observer_courses = @current_user.cached_course_ids_for_observed_user(observed_user)
-      enrollments = observed_user.enrollments.current.preload(:course, :scores).where(course_id: observer_courses)
-    else
-      enrollments = @current_user.enrollments.current.preload(:course, :scores)
-    end
+    # Get current course IDs using shared filtering logic
+    target_user = observed_user || @current_user
+    current_course_ids = if observed_user
+                           observer_courses = @current_user.cached_course_ids_for_observed_user(observed_user)
+                           observed_current_courses = observed_user.cached_current_course_ids_for_dashboard(domain_root_account: @domain_root_account)
+                           observer_courses & observed_current_courses
+                         else
+                           @current_user.cached_current_course_ids_for_dashboard(domain_root_account: @domain_root_account)
+                         end
 
-    course_data = enrollments.filter_map do |enrollment|
+    return [] if current_course_ids.empty?
+
+    # Get enrollments for current courses with scores preloaded
+    current_enrollments = target_user.enrollments
+                                     .not_deleted
+                                     .shard(target_user.in_region_associated_shards)
+                                     .where(course_id: current_course_ids)
+                                     .preload(:course, :scores)
+                                     .to_a
+
+    course_data = current_enrollments.filter_map do |enrollment|
       course = enrollment.course
 
       can_read_grades = if (observed_user || @current_user).id == @current_user.id
@@ -3590,7 +3609,27 @@ class UsersController < ApplicationController
 
   def should_show_widget_dashboard?
     return false if k5_user?
-    return false unless @domain_root_account.feature_enabled?(:widget_dashboard)
+
+    flag = widget_dashboard_feature_flag
+    return false unless flag
+
+    # If feature is locked on (cannot override), force widget dashboard for all eligible users
+    # If feature can be overridden (allowed or allowed_on), respect user preference
+    if flag.enabled? && !flag.can_override?
+      # Feature is locked on - show for all eligible users regardless of preference
+      if @current_user.observer_enrollments.active.any?
+        # only show widget dashboard if observer is actively observing a student
+        return true if @selected_observed_user && @selected_observed_user != @current_user
+      elsif !@current_user.non_student_enrollment?
+        return true
+      end
+      return false
+    end
+
+    # Feature allows override (allowed or allowed_on) - check user preference
+    # For allowed_on, preference defaults to true; for allowed, it defaults to true
+    return false unless flag.can_override?
+    return false unless @current_user.prefers_widget_dashboard?
 
     if @current_user.observer_enrollments.active.any?
       # only show widget dashboard if observer is actively observing a student
@@ -3599,5 +3638,29 @@ class UsersController < ApplicationController
       return true
     end
     false
+  end
+
+  def widget_dashboard_feature_flag
+    return nil unless @current_user
+
+    # Check all associated accounts and return the most permissive flag
+    # This allows any account in the user's hierarchy to enable the feature
+    flags = @current_user.associated_accounts.filter_map do |account|
+      flag = account.lookup_feature_flag(:widget_dashboard)
+      flag if flag && (flag.enabled? || flag.can_override?)
+    end
+
+    # Return the most enabling flag (prioritize locked-on > enabled > allowed)
+    flags.max_by do |flag|
+      if flag.enabled? && !flag.can_override?
+        3 # Locked on
+      elsif flag.enabled?
+        2 # Enabled
+      elsif flag.can_override?
+        1 # Allowed
+      else
+        0
+      end
+    end
   end
 end

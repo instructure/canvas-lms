@@ -112,7 +112,7 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
 
       return (
         <View as="div" margin="large 0">
-          <Text color="secondary" size="medium">
+          <Text color="secondary" size="medium" data-testid="no-announcements-message">
             {message}
           </Text>
         </View>

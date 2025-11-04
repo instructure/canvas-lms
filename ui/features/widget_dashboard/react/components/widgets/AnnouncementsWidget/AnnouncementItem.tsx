@@ -156,11 +156,11 @@ const AnnouncementItem: React.FC<AnnouncementItemProps> = ({announcementItem, fi
         <Flex.Item overflowY="visible">
           <Flex direction="row" gap="x-small">
             {/* Avatar */}
-            <Flex.Item shouldShrink>
+            <Flex.Item shouldShrink={false}>
               <Avatar
                 name={announcement.author?.name || I18n.t('Unknown Author')}
                 src={announcement.author?.avatarUrl}
-                size="x-small"
+                size="medium"
               />
             </Flex.Item>
 

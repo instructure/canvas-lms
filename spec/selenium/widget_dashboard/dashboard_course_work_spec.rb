@@ -26,7 +26,6 @@ describe "student dashboard Course work widget", :ignore_js_errors do
   before :once do
     dashboard_student_setup # Creates 2 courses and a student enrolled in both
     dashboard_course_assignment_setup # Add 11 assignments
-    dashboard_course_submission_setup
     set_widget_dashboard_flag(feature_status: true)
   end
 
@@ -35,6 +34,10 @@ describe "student dashboard Course work widget", :ignore_js_errors do
   end
 
   context "course work widget smoke tests" do
+    before :once do
+      dashboard_course_submission_setup
+    end
+
     it "can filter work items in dues" do
       go_to_dashboard
       expect(course_work_summary_stats("Due")).to be_displayed
@@ -132,6 +135,57 @@ describe "student dashboard Course work widget", :ignore_js_errors do
       expect(course_work_summary_stats("Due").text).to eq("7\nDue")
       widget_pagination_button("course-work-combined", "2").click
       expect(all_course_work_items.size).to eq(1)
+    end
+  end
+
+  context "graded unsubmitted work edge case" do
+    before :once do
+      @graded_unsubmitted_future = @course1.assignments.create!(
+        name: "Graded but Never Submitted (Future)",
+        points_possible: 10,
+        due_at: 2.days.from_now,
+        submission_types: "online_text_entry"
+      )
+      @graded_unsubmitted_future.grade_student(@student, grade: "8", grader: @teacher1)
+
+      @graded_unsubmitted_overdue = @course1.assignments.create!(
+        name: "Graded but Never Submitted (Overdue)",
+        points_possible: 10,
+        due_at: 2.days.ago,
+        submission_types: "online_text_entry"
+      )
+      @graded_unsubmitted_overdue.grade_student(@student, grade: "7", grader: @teacher1)
+    end
+
+    it "displays graded unsubmitted work only in submitted filter" do
+      go_to_dashboard
+
+      expect(element_exists?(course_work_item_selector(@graded_unsubmitted_future.id))).to be_falsey
+      expect(element_exists?(course_work_item_selector(@graded_unsubmitted_overdue.id))).to be_falsey
+      filter_course_work_by(:date, "Submitted")
+
+      expect(course_work_item(@graded_unsubmitted_future.id)).to be_displayed
+      expect(course_work_item(@graded_unsubmitted_overdue.id)).to be_displayed
+
+      filter_course_work_by(:date, "Missing")
+      expect(element_exists?(course_work_item_selector(@graded_unsubmitted_future.id))).to be_falsey
+      expect(element_exists?(course_work_item_selector(@graded_unsubmitted_overdue.id))).to be_falsey
+    end
+
+    it "maintains correct stats count" do
+      go_to_dashboard
+
+      filter_course_work_by(:date, "Submitted")
+      expect(all_course_work_items.size).to eq(2)
+      expect(course_work_summary_stats("Submitted").text).to eq("2\nSubmitted")
+
+      filter_course_work_by(:date, "Next 14 days")
+      expect(all_course_work_items.size).to eq(4)
+      expect(course_work_summary_stats("Due").text).to eq("4\nDue")
+
+      filter_course_work_by(:date, "Missing")
+      expect(all_course_work_items.size).to eq(6)
+      expect(course_work_summary_stats("Missing").text).to eq("6\nMissing")
     end
   end
 end
