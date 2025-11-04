@@ -3848,6 +3848,29 @@ describe DiscussionTopic do
         expect(lock_info).to be_falsey
       end
     end
+
+    context "with group context" do
+      before :once do
+        @group = group_model(context: @course)
+        @group_topic = @group.discussion_topics.create!(title: "group topic")
+      end
+
+      it "locks for future unlock_at date" do
+        timestamp = 1.week.from_now
+        @group_topic.update(unlock_at: timestamp)
+        lock_info = @group_topic.locked_for?(@student)
+        expect(lock_info).to be_truthy
+        expect(lock_info[:unlock_at]).to eq timestamp
+      end
+
+      it "locks for past lock_at date" do
+        timestamp = 1.week.ago
+        @group_topic.update(lock_at: timestamp)
+        lock_info = @group_topic.locked_for?(@student)
+        expect(lock_info).to be_truthy
+        expect(lock_info[:lock_at]).to eq timestamp
+      end
+    end
   end
 
   describe "edited_at" do
