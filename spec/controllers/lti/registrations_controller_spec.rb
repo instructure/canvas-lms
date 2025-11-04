@@ -1114,6 +1114,46 @@ RSpec.describe Lti::RegistrationsController do
       expect(subject).to be_successful
     end
 
+    context "with a site admin registration" do
+      context "as a root account admin" do
+        let_once(:site_admin) { site_admin_user }
+        let_once(:registration) { lti_registration_with_tool(account: Account.site_admin, created_by: site_admin) }
+        let_once(:account_admin) { account_admin_user(account:, name: "Account Admin") }
+
+        before do
+          user_session(account_admin)
+        end
+
+        it "doesn't let them update the registration" do
+          expect { subject }.not_to change { registration.reload.internal_lti_configuration }
+          expect(response).to be_forbidden
+        end
+      end
+    end
+
+    context "on a separate shard" do
+      context "as a root account admin on another shard" do
+        specs_require_sharding
+
+        let_once(:first_admin) { @shard1.activate { account_admin_user(account:) } }
+        # Think of this as the first account
+        let_once(:account) { @shard1.activate { account_model } }
+        let_once(:registration) { @shard1.activate { lti_registration_with_tool(account:) } }
+
+        let_once(:second_admin) { @shard2.activate { account_admin_user(account: second_account) } }
+        let_once(:second_account) { @shard2.activate { account_model } }
+
+        before do
+          user_session(second_admin)
+        end
+
+        it "doesn't let them update the registration" do
+          expect { subject }.not_to change { registration.reload.internal_lti_configuration }
+          expect(response).to be_forbidden
+        end
+      end
+    end
+
     context "change-log tracking" do
       # The update request above changes a TON of stuff and makes the diff
       # rather large. We'll make targeted changes here instead.
@@ -1513,9 +1553,9 @@ RSpec.describe Lti::RegistrationsController do
       let_once(:other_reg) { lti_registration_model(account: Account.site_admin) }
       let_once(:other_ims_registration) { lti_ims_registration_model(lti_registration: other_reg) }
 
-      it "returns 400" do
+      it "returns 403" do
         subject
-        expect(response).to have_http_status(:bad_request)
+        expect(response).to be_forbidden
       end
     end
 

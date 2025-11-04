@@ -1046,6 +1046,7 @@ class Lti::RegistrationsController < ApplicationController
   before_action :require_lti_registrations_next_feature_flag, only: %i[reset context_search overlay_history]
   before_action :require_lti_registrations_history_feature_flag, only: [:history]
   before_action :require_manage_lti_registrations
+  before_action :require_manage_lti_registrations_in_registrations_account, only: %i[reset update destroy]
   before_action :restrict_sub_account_to_read_only, except: %i[index list show show_by_client_id context_search overlay_history history]
   before_action :validate_workflow_state, only: %i[bind create update]
   before_action :validate_list_params, only: :list
@@ -1922,6 +1923,10 @@ class Lti::RegistrationsController < ApplicationController
 
   def require_manage_lti_registrations
     require_context_with_permission(@context, :manage_lti_registrations)
+  end
+
+  def require_manage_lti_registrations_in_registrations_account
+    require_context_with_permission(registration.account, :manage_lti_registrations)
   end
 
   def restrict_sub_account_to_read_only
