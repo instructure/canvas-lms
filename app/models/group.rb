@@ -147,7 +147,7 @@ class Group < ActiveRecord::Base
     users = users.order_by_sortable_name if sort
     return users unless !include_inactive_users && (context.is_a? Course)
 
-    context.participating_users(users.pluck(:id))
+    User.where(id: context.enrollments.active_or_pending_by_date.where(user_id: users.pluck(:id)).select(:user_id))
   end
 
   def all_real_students
