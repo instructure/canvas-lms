@@ -1,7 +1,4 @@
 <div id="group_categories_tabs" class="ui-tabs-minimal ui-tabs ui-widget ui-widget-content ui-corner-all" style="display: block;">
-  {{#unless isHorizonCourse}}
-    <ul class="collectionViewItems ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all" role="tablist" data-view="rosterTabs"></ul>
-  {{/unless}}
   {{#if canAddCategories}}
   <div class='pull-right group-categories-actions'>
     {{#if permissions.can_add_groups}}
@@ -13,7 +10,10 @@
     {{/if}}
   </div>
   {{/if}}
-  <div id="tab-0" class="roster-tab tab-panel ui-tabs-panel form-inline" style="min-height: 800px;">
+  {{#unless isHorizonCourse}}
+    <ul class="collectionViewItems ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all" role="tablist" aria-label="{{#t}}People navigation tabs{{/t}}" data-view="rosterTabs"></ul>
+  {{/unless}}
+  <div tabindex="0" id="tab-0" class="roster-tab tab-panel ui-tabs-panel form-inline" style="min-height: 800px;">
     <div style="display: flex; flex-wrap: wrap; gap: 0.4em; align-items: stretch; margin-bottom: 0.5em;">
       <span id="search_input_container"></span>
       <input
