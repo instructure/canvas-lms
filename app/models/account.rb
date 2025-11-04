@@ -424,6 +424,7 @@ class Account < ActiveRecord::Base
   add_setting :enable_usage_metrics, boolean: true, root_only: true, default: false
 
   add_setting :allow_observers_in_appointment_groups, boolean: true, default: false, inheritable: true
+  add_setting :default_allow_observer_signup, boolean: true, default: false, inheritable: true
   add_setting :enable_name_pronunciation, boolean: true, root_only: true, default: false
   add_setting :allow_name_pronunciation_edit_for_admins, boolean: true, root_only: true, default: false
   add_setting :allow_name_pronunciation_edit_for_students, boolean: true, root_only: true, default: false
@@ -553,6 +554,10 @@ class Account < ActiveRecord::Base
 
   def allow_observers_in_appointment_groups?
     allow_observers_in_appointment_groups[:value] && Account.site_admin.feature_enabled?(:observer_appointment_groups)
+  end
+
+  def default_allow_observer_signup?
+    default_allow_observer_signup[:value]
   end
 
   def allow_assign_to_differentiation_tags?

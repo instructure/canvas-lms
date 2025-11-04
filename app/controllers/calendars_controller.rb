@@ -106,6 +106,7 @@ class CalendarsController < ApplicationController
         default_due_time: context.is_a?(Course) && context.default_due_time,
         can_view_context: context.grants_right?(@current_user, session, :read),
         allow_observers_in_appointment_groups: context.is_a?(Course) && context.account.allow_observers_in_appointment_groups?,
+        default_allow_observer_signup: context.is_a?(Course) && context.account.default_allow_observer_signup?,
       }
       if context.is_a?(Course)
         info[:course_conclude_at] = context.restrict_enrollments_to_course_dates ? context.conclude_at : context.enrollment_term.end_at

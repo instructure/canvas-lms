@@ -447,6 +447,15 @@
                       </td>
                     </tr>
                   <% end %>
+                  <%= settings.fields_for :default_allow_observer_signup do |r| %>
+                    <% hash = @account.default_allow_observer_signup %>
+                    <tr>
+                      <td colspan="2" class="sub_checkbox">
+                        <%= r.check_box :value, checked: hash[:value] %>
+                        <%= r.label :value, t("Check 'Allow observers to sign-up' by default when creating new appointment groups") %>
+                      </td>
+                    </tr>
+                  <% end %>
                 <% end %>
 
                 <% if Account.site_admin.feature_enabled?(:gradebook_show_first_last_names) %>
