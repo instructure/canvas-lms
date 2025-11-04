@@ -370,6 +370,11 @@ describe('CreateEditAllocationRuleModal', () => {
       renderWithProviders()
     })
 
+    it('has exactly two radio groups: target type and review type', () => {
+      expect(screen.getByTestId('target-type-radio-group')).toBeInTheDocument()
+      expect(screen.getByTestId('review-type-group')).toBeInTheDocument()
+    })
+
     it('provides correct aria-label for add subject button based on target type', async () => {
       const addButton = screen.getByTestId('add-subject-button')
       expect(addButton).toHaveAttribute('aria-label', 'Add another recipient name')

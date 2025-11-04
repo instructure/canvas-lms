@@ -20,7 +20,8 @@ import React, {useState, useRef, useEffect, useMemo} from 'react'
 import {Alert} from '@instructure/ui-alerts'
 import {Button, CloseButton, CondensedButton, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {FormMessage} from '@instructure/ui-form-field'
+import {FormFieldGroup, FormMessage} from '@instructure/ui-form-field'
+import {Grid} from '@instructure/ui-grid'
 import {Heading} from '@instructure/ui-heading'
 import {IconTrashLine, IconInfoLine} from '@instructure/ui-icons'
 import {Modal} from '@instructure/ui-modal'
@@ -725,70 +726,76 @@ const CreateEditAllocationRuleModal = ({
             />
           </Flex.Item>
           <Flex.Item padding="small">
-            <Flex direction="row">
-              <Flex.Item
-                margin={targetType !== TARGET_TYPES.REVIEWEE ? '0 medium 0 0' : '0 small 0 0'}
-              >
-                <RadioInputGroup
-                  onChange={handleReviewTypeChange}
-                  name="reviewPermitted"
-                  value={REQUIRED_REVIEW_TYPE.includes(reviewType) ? reviewType : ''}
-                  description=""
-                  data-testid="required-review-type-group"
-                >
-                  <RadioInput
-                    key={'permit'}
-                    value={'permit'}
-                    label={
-                      targetType !== TARGET_TYPES.REVIEWEE
-                        ? I18n.t('Must review')
-                        : I18n.t('Must be reviewed by')
-                    }
-                    data-testid="review-type-must-review"
-                  />
-                  <RadioInput
-                    key={'prohibit'}
-                    value={'prohibit'}
-                    label={
-                      targetType !== TARGET_TYPES.REVIEWEE
-                        ? I18n.t('Must not review')
-                        : I18n.t('Must not be reviewed by')
-                    }
-                    data-testid="review-type-must-not-review"
-                  />
-                </RadioInputGroup>
-              </Flex.Item>
-              <Flex.Item>
-                <RadioInputGroup
-                  onChange={handleReviewTypeChange}
-                  name="shouldReview"
-                  value={SUGGESTED_REVIEW_TYPE.includes(reviewType) ? reviewType : ''}
-                  description=""
-                  data-testid="suggested-review-type-group"
-                >
-                  <RadioInput
-                    key={'should'}
-                    value={'should'}
-                    label={
-                      targetType !== TARGET_TYPES.REVIEWEE
-                        ? I18n.t('Should review')
-                        : I18n.t('Should be reviewed by')
-                    }
-                    data-testid="review-type-should-review"
-                  />
-                  <RadioInput
-                    key={'should_not'}
-                    value={'should_not'}
-                    label={
-                      targetType !== TARGET_TYPES.REVIEWEE
-                        ? I18n.t('Should not review')
-                        : I18n.t('Should not be reviewed by')
-                    }
-                    data-testid="review-type-should-not-review"
-                  />
-                </RadioInputGroup>
-              </Flex.Item>
-            </Flex>
+            <FormFieldGroup
+              description=""
+              layout="stacked"
+              rowSpacing="small"
+              role="radiogroup"
+              data-testid="review-type-group"
+            >
+              <Grid colSpacing="medium" rowSpacing="small">
+                <Grid.Row>
+                  <Grid.Col>
+                    <RadioInput
+                      name="reviewType"
+                      value="permit"
+                      checked={reviewType === 'permit'}
+                      onChange={e => handleReviewTypeChange(e, e.target.value)}
+                      label={
+                        targetType !== TARGET_TYPES.REVIEWEE
+                          ? I18n.t('Must review')
+                          : I18n.t('Must be reviewed by')
+                      }
+                      data-testid="review-type-must-review"
+                    />
+                  </Grid.Col>
+                  <Grid.Col>
+                    <RadioInput
+                      name="reviewType"
+                      value="should"
+                      checked={reviewType === 'should'}
+                      onChange={e => handleReviewTypeChange(e, e.target.value)}
+                      label={
+                        targetType !== TARGET_TYPES.REVIEWEE
+                          ? I18n.t('Should review')
+                          : I18n.t('Should be reviewed by')
+                      }
+                      data-testid="review-type-should-review"
+                    />
+                  </Grid.Col>
+                </Grid.Row>
+                <Grid.Row>
+                  <Grid.Col>
+                    <RadioInput
+                      name="reviewType"
+                      value="prohibit"
+                      checked={reviewType === 'prohibit'}
+                      onChange={e => handleReviewTypeChange(e, e.target.value)}
+                      label={
+                        targetType !== TARGET_TYPES.REVIEWEE
+                          ? I18n.t('Must not review')
+                          : I18n.t('Must not be reviewed by')
+                      }
+                      data-testid="review-type-must-not-review"
+                    />
+                  </Grid.Col>
+                  <Grid.Col>
+                    <RadioInput
+                      name="reviewType"
+                      value="should_not"
+                      checked={reviewType === 'should_not'}
+                      onChange={e => handleReviewTypeChange(e, e.target.value)}
+                      label={
+                        targetType !== TARGET_TYPES.REVIEWEE
+                          ? I18n.t('Should not review')
+                          : I18n.t('Should not be reviewed by')
+                      }
+                      data-testid="review-type-should-not-review"
+                    />
+                  </Grid.Col>
+                </Grid.Row>
+              </Grid>
+            </FormFieldGroup>
           </Flex.Item>
           <Flex.Item padding="small">{renderSubjectSelect()}</Flex.Item>
           {Object.keys(additionalSubjects).length > 0 && (
