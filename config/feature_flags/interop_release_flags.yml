@@ -23,6 +23,24 @@ ags_score_trigger_needs_grading_after_submitted:
       state: allowed_on
     ci:
       state: allowed_on
+ags_improved_course_concluded_check:
+  state: hidden
+  shadow: true
+  display_name: Improved LTI AGS Course Concluded Check
+  description: |-
+    If enabled, grading will be allowed if the student is participating in a section which is still active even if the course is concluded (by term or course dates).
+  applies_to: SiteAdmin
+  environments:
+    development:
+      state: allowed_on
+    test:
+      state: allowed_on
+    ci:
+      state: allowed_on
+    beta:
+      state: allowed_on
+    production:
+      state: allowed_on
 assignment_edit_placement_not_on_announcements:
   state: hidden
   applies_to: SiteAdmin
