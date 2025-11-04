@@ -33,7 +33,6 @@ import {LtiRegistrationsTab} from './constants'
 import {isLtiRegistrationsDiscoverEnabled} from '../discover/utils'
 import {isLtiRegistrationsUsageEnabled} from '../monitor/utils'
 import {refreshRegistrations} from '../manage/api/registrations'
-
 const I18n = createI18nScope('lti_registrations')
 
 export const LtiAppsLayout = React.memo(() => {
@@ -43,13 +42,22 @@ export const LtiAppsLayout = React.memo(() => {
   const navigate = useNavigate()
   const isMobile = useMedia('(max-width: 767px)')
 
+  const isSubAccount = React.useMemo(() => {
+    return window.ENV.ACCOUNT_GLOBAL_ID !== window.ENV.DOMAIN_ROOT_ACCOUNT_ID
+  }, [])
+
   const tabSelected = React.useMemo(() => {
+    // If we're in a sub-account, force the monitor tab
+    if (isSubAccount) {
+      return LtiRegistrationsTab.monitor
+    }
+
     return isManage
       ? LtiRegistrationsTab.manage
       : isMonitor
         ? LtiRegistrationsTab.monitor
         : LtiRegistrationsTab.discover
-  }, [isManage, isMonitor])
+  }, [isManage, isMonitor, isSubAccount])
 
   const {isTabManage, isTabDiscover, isTabMonitor} = React.useMemo(() => {
     return {
@@ -61,23 +69,34 @@ export const LtiAppsLayout = React.memo(() => {
 
   const onTabClick = React.useCallback(
     (_: any, tab: {id?: string}) => {
-      switch (tab.id) {
-        case LtiRegistrationsTab.discover:
-          navigate('/')
-          break
-        case LtiRegistrationsTab.manage:
-          navigate('/manage')
-          break
-        case LtiRegistrationsTab.monitor:
-          navigate('/monitor')
-          break
-        default:
-          navigate('/')
-          break
+      if (isSubAccount) {
+        navigate('/monitor')
+      } else {
+        switch (tab.id) {
+          case LtiRegistrationsTab.discover:
+            navigate('/')
+            break
+          case LtiRegistrationsTab.manage:
+            navigate('/manage')
+            break
+          case LtiRegistrationsTab.monitor:
+            navigate('/monitor')
+            break
+          default:
+            navigate(isSubAccount ? '/monitor' : '/')
+            break
+        }
       }
     },
-    [navigate],
+    [navigate, isSubAccount],
   )
+
+  // Redirect sub-accounts to monitor tab if they're on discover or manage
+  React.useEffect(() => {
+    if (isSubAccount && !isMonitor) {
+      navigate('/monitor', {replace: true})
+    }
+  }, [isSubAccount, isMonitor, navigate])
 
   const open = React.useCallback(() => {
     openRegistrationWizard({
@@ -105,7 +124,7 @@ export const LtiAppsLayout = React.memo(() => {
             </Flex.Item>
           </Flex>
         </Flex.Item>
-        {isManage ? (
+        {isManage && !isSubAccount ? (
           <Flex.Item>
             <Button color="primary" onClick={open} id="install-new-lti-app">
               {I18n.t('Install a New App')}
@@ -122,14 +141,16 @@ export const LtiAppsLayout = React.memo(() => {
         <>
           <View margin="small 0" display="block">
             <SimpleSelect renderLabel="" onChange={onTabClick} value={tabSelected}>
-              {isLtiRegistrationsDiscoverEnabled() && (
+              {isLtiRegistrationsDiscoverEnabled() && !isSubAccount && (
                 <SimpleSelect.Option id="discover" value="discover">
                   {I18n.t('Discover')}
                 </SimpleSelect.Option>
               )}
-              <SimpleSelect.Option id="manage" value="manage">
-                {I18n.t('Manage')}
-              </SimpleSelect.Option>
+              {!isSubAccount && (
+                <SimpleSelect.Option id="manage" value="manage">
+                  {I18n.t('Manage')}
+                </SimpleSelect.Option>
+              )}
               {isLtiRegistrationsUsageEnabled() && (
                 <SimpleSelect.Option id="monitor" value="monitor">
                   {I18n.t('Monitor')}
@@ -141,7 +162,7 @@ export const LtiAppsLayout = React.memo(() => {
         </>
       ) : (
         <Tabs margin="medium auto" padding="medium" onRequestTabChange={onTabClick}>
-          {isLtiRegistrationsDiscoverEnabled() && (
+          {isLtiRegistrationsDiscoverEnabled() && !isSubAccount && (
             <Tabs.Panel
               renderTitle={
                 <Text style={{color: 'initial', textDecoration: 'initial'}}>
@@ -158,17 +179,21 @@ export const LtiAppsLayout = React.memo(() => {
               <Outlet />
             </Tabs.Panel>
           )}
-          <Tabs.Panel
-            renderTitle={
-              <Text style={{color: 'initial', textDecoration: 'initial'}}>{I18n.t('Manage')}</Text>
-            }
-            id={LtiRegistrationsTab.manage}
-            padding="large x-small"
-            active={isTabManage}
-            isSelected={isTabManage}
-          >
-            <Outlet />
-          </Tabs.Panel>
+          {!isSubAccount && (
+            <Tabs.Panel
+              renderTitle={
+                <Text style={{color: 'initial', textDecoration: 'initial'}}>
+                  {I18n.t('Manage')}
+                </Text>
+              }
+              id={LtiRegistrationsTab.manage}
+              padding="large x-small"
+              active={isTabManage}
+              isSelected={isTabManage}
+            >
+              <Outlet />
+            </Tabs.Panel>
+          )}
           {isLtiRegistrationsUsageEnabled() ? (
             <Tabs.Panel
               renderTitle={

@@ -544,3 +544,17 @@ use_jwt_auth_for_utid_sync:
       state: allowed_on
     ci:
       state: allowed_on
+canvas_apps_sub_account_access:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: "Canvas Apps Sub-Account Access"
+  description: |-
+    When enabled, Canvas Apps will appear in sub-account Account Navigations.
+    Sub-account admins will only see the Monitor tab for now, allowing them to
+    view usage data of their applications without being able to manage
+    configurations of dev keys.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on

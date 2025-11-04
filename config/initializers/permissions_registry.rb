@@ -323,10 +323,10 @@ BASE_PERMISSIONS = {
   },
   manage_lti_registrations: {
     label: -> { I18n.t("LTI Registrations - Manage") },
-    account_only: :root,
+    account_only: true,
     true_for: %w[AccountAdmin],
     available_to: %w[AccountAdmin AccountMembership],
-    account_allows: ->(a) { a.feature_enabled?(:lti_registrations_page) },
+    account_allows: ->(a) { a.root_account.feature_enabled?(:lti_registrations_page) },
     account_details: [
       { title: -> { I18n.t("LTI Registrations - Manage") },
         description: -> { I18n.t("Allows users to view, add, modify, and delete LTI 1.3 tool registrations on the new Apps page.") } }
