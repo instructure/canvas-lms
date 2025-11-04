@@ -26,6 +26,7 @@ import {ZLtiContextControl, ZLtiContextControlId} from './LtiContextControl'
 import {ZDeveloperKey} from './developer_key/DeveloperKey'
 import {ZLtiOverlay} from './LtiOverlay'
 import {ZLtiConfigurationOverlay} from './internal_lti_configuration/LtiConfigurationOverlay'
+import {ZLtiDeployment} from './LtiDeployment'
 
 export const ZLtiRegistrationHistoryEntryId = z.string().brand('ZLtiRegistrationHistoryEntryId')
 
@@ -66,6 +67,7 @@ export const ContextControlAttributesMask = {
   deployment_id: true,
   available: true,
   workflow_state: true,
+  context_name: true,
 } as const
 
 export const ZLtiContextControlAttributes = ZLtiContextControl.pick(ContextControlAttributesMask)
@@ -105,8 +107,8 @@ export const ZHistoryEntryForAvailabilityChange = z.intersection(
   ZBaseLtiRegistrationHistoryEntry,
   z.object({
     update_type: z.union([z.literal('control_edit'), z.literal('bulk_control_create')]),
-    old_context_controls: z.record(ZLtiContextControlId, ZLtiContextControlAttributes),
-    new_context_controls: z.record(ZLtiContextControlId, ZLtiContextControlAttributes),
+    old_controls_by_deployment: z.array(ZLtiDeployment),
+    new_controls_by_deployment: z.array(ZLtiDeployment),
   }),
 )
 

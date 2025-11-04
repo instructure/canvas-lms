@@ -31,6 +31,7 @@ import type {
   ConfigChangeHistoryEntry,
 } from '../../../../model/LtiRegistrationHistoryEntry'
 import {ZLtiContextControlId} from '../../../../model/LtiContextControl'
+import {ZLtiDeploymentId} from '../../../../model/LtiDeploymentId'
 import userEvent from '@testing-library/user-event'
 
 const server = setupServer()
@@ -53,7 +54,10 @@ const mockConfigChangeEntry = (
 
 const mockAvailabilityChangeEntry = (
   overrides: Partial<AvailabilityChangeHistoryEntry> &
-    Pick<AvailabilityChangeHistoryEntry, 'old_context_controls' | 'new_context_controls'>,
+    Pick<
+      AvailabilityChangeHistoryEntry,
+      'old_controls_by_deployment' | 'new_controls_by_deployment'
+    >,
 ): AvailabilityChangeHistoryEntry => ({
   id: ZLtiRegistrationHistoryEntryId.parse('2'),
   root_account_id: ZAccountId.parse('4'),
@@ -401,17 +405,41 @@ describe('RegistrationHistoryView', () => {
     it('shows "Availability & Exceptions" for context control changes', async () => {
       const entries = [
         mockAvailabilityChangeEntry({
-          old_context_controls: {},
-          new_context_controls: {
-            [ZLtiContextControlId.parse('1')]: {
-              id: ZLtiContextControlId.parse('1'),
-              account_id: ZAccountId.parse('1'),
-              available: false,
-              course_id: null,
+          old_controls_by_deployment: [],
+          new_controls_by_deployment: [
+            {
+              id: ZLtiDeploymentId.parse('1'),
+              registration_id: ZLtiRegistrationId.parse('1'),
               deployment_id: '1',
+              context_id: '1',
+              context_type: 'Account',
+              context_name: 'Test Account',
+              root_account_deployment: false,
               workflow_state: 'active',
+              context_controls: [
+                {
+                  id: ZLtiContextControlId.parse('1'),
+                  registration_id: ZLtiRegistrationId.parse('1'),
+                  deployment_id: ZLtiDeploymentId.parse('1'),
+                  account_id: ZAccountId.parse('1'),
+                  course_id: null,
+                  available: false,
+                  path: '/1',
+                  display_path: ['Test Account'],
+                  context_name: 'Test Account',
+                  depth: 0,
+                  child_control_count: 0,
+                  course_count: 0,
+                  subaccount_count: 0,
+                  workflow_state: 'active',
+                  created_at: new Date('2025-01-16T12:00:00Z'),
+                  updated_at: new Date('2025-01-16T12:00:00Z'),
+                  created_by: null,
+                  updated_by: null,
+                },
+              ],
             },
-          },
+          ],
         }),
       ]
 
