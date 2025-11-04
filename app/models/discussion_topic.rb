@@ -1924,9 +1924,9 @@ class DiscussionTopic < ActiveRecord::Base
       overridden_unlock_at = topic_for_user.unlock_at
       overridden_unlock_at ||= topic_for_user.delayed_post_at if topic_for_user.respond_to?(:delayed_post_at)
       overridden_lock_at = topic_for_user.lock_at
-      if overridden_unlock_at && overridden_unlock_at > Time.zone.now && !context.enable_course_paces?
+      if overridden_unlock_at && overridden_unlock_at > Time.zone.now && (!context.is_a?(Course) || !context.enable_course_paces?)
         locked = { object: self, unlock_at: overridden_unlock_at }
-      elsif overridden_lock_at && overridden_lock_at < Time.zone.now && !context.enable_course_paces?
+      elsif overridden_lock_at && overridden_lock_at < Time.zone.now && (!context.is_a?(Course) || !context.enable_course_paces?)
         locked = { object: self, lock_at: overridden_lock_at, can_view: true }
       elsif could_be_locked && (item = locked_by_module_item?(user, opts))
         locked = { object: self, module: item.context_module }
