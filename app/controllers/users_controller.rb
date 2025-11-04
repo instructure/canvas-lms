@@ -3546,53 +3546,96 @@ class UsersController < ApplicationController
   end
 
   def fetch_courses_with_grades(observed_user = nil)
-    # Get current course IDs using shared filtering logic
     target_user = observed_user || @current_user
-    current_course_ids = if observed_user
-                           observer_courses = @current_user.cached_course_ids_for_observed_user(observed_user)
-                           observed_current_courses = observed_user.cached_current_course_ids_for_dashboard(domain_root_account: @domain_root_account)
-                           observer_courses & observed_current_courses
-                         else
-                           @current_user.cached_current_course_ids_for_dashboard(domain_root_account: @domain_root_account)
-                         end
 
-    return [] if current_course_ids.empty?
+    # Use menu_courses to get filtered course list (handles favorites, invited enrollments, etc.)
+    # Pass limit directly to menu_courses for thread-safe, request-isolated behavior
+    courses = target_user.menu_courses(nil, { observee_user: observed_user, limit: 50 })
 
-    # Get enrollments for current courses with scores preloaded
-    current_enrollments = target_user.enrollments
-                                     .not_deleted
-                                     .shard(target_user.in_region_associated_shards)
-                                     .where(course_id: current_course_ids)
-                                     .preload(:course, :scores)
-                                     .to_a
+    return [] if courses.empty?
 
-    course_data = current_enrollments.filter_map do |enrollment|
-      course = enrollment.course
+    # Preload enrollments and scores for efficient querying
+    course_ids = courses.map(&:id)
+    enrollments_by_course = target_user.enrollments
+                                       .not_deleted
+                                       .shard(target_user.in_region_associated_shards)
+                                       .where(course_id: course_ids)
+                                       .preload(:scores, :enrollment_state, :course_section)
+                                       .index_by(&:course_id)
 
-      can_read_grades = if (observed_user || @current_user).id == @current_user.id
+    # Filter courses for grade widget display
+    # While menu_courses provides navigation courses (includes invited, homerooms, etc.),
+    # the grade widget should only show courses with active enrollments and meaningful grades
+    courses = courses.reject do |course|
+      enrollment = enrollments_by_course[course.id]
+
+      # Exclude if no enrollment
+      next true if enrollment.nil?
+
+      # Exclude if enrollment is invited/pending
+      next true if %w[invited creation_pending].include?(enrollment.workflow_state)
+
+      # Exclude if enrollment dates are in the past
+      next true if enrollment.respond_to?(:section_or_course_date_in_past?) && enrollment.section_or_course_date_in_past?
+
+      # Exclude homeroom courses (no grades to display)
+      next true if course.homeroom_course?
+
+      false
+    end
+
+    # For observers: only show courses where observer has enrollment linked to this specific student
+    if observed_user
+      observer_linked_course_ids = @current_user.cached_course_ids_for_observed_user(observed_user)
+      courses = courses.select { |c| observer_linked_course_ids.include?(c.id) }
+    end
+
+    return [] if courses.empty?
+
+    # Update course_ids after filtering
+    course_ids = courses.map(&:id)
+
+    # For observers, get observer's enrollments to check read_grades permission
+    observer_enrollments_by_course = if target_user.id == @current_user.id
+                                       {}
+                                     else
+                                       @current_user.enrollments
+                                                    .not_deleted
+                                                    .shard(@current_user.in_region_associated_shards)
+                                                    .where(
+                                                      course_id: course_ids,
+                                                      type: "ObserverEnrollment",
+                                                      associated_user_id: observed_user.id
+                                                    )
+                                                    .index_by(&:course_id)
+                                     end
+
+    course_data = courses.filter_map do |course|
+      enrollment = enrollments_by_course[course.id]
+      next unless enrollment
+
+      # Check grade visibility
+      can_read_grades = if target_user.id == @current_user.id
                           !course.hide_final_grades? || course.grants_any_right?(@current_user, :view_all_grades, :manage_grades)
                         else
-                          enrollment.grants_right?(@current_user, :read_grades) || course.grants_any_right?(@current_user, :view_all_grades, :manage_grades)
+                          observer_enrollment = observer_enrollments_by_course[course.id]
+                          observer_enrollment&.grants_right?(@current_user, :read_grades) || course.grants_any_right?(@current_user, :view_all_grades, :manage_grades)
                         end
 
-      next unless can_read_grades
-
-      course_score = enrollment.find_score(course_score: true)
+      # Get grade data if visible
       display_grade = nil
+      grading_scheme = "percentage"
 
-      if course_score
-        if course_score.override_score.present?
-          display_grade = course_score.override_score
-        elsif course_score.current_score.present?
-          display_grade = course_score.current_score
+      if can_read_grades
+        course_score = enrollment.find_score(course_score: true)
+        if course_score
+          display_grade = course_score.override_score.presence || course_score.current_score
+        end
+
+        if course.grading_standard_enabled? && course.grading_standard
+          grading_scheme = course.grading_standard.data
         end
       end
-
-      grading_scheme = if course.grading_standard_enabled? && course.grading_standard
-                         course.grading_standard.data
-                       else
-                         "percentage"
-                       end
 
       {
         courseId: course.id.to_s,
@@ -3604,7 +3647,7 @@ class UsersController < ApplicationController
       }
     end
 
-    course_data.compact.uniq { |c| c[:courseId] }.sort_by { |course| course[:courseName].downcase }
+    course_data.sort_by { |course| course[:courseName].downcase }
   end
 
   def should_show_widget_dashboard?
