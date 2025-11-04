@@ -63,22 +63,7 @@ const ControlPageSize = 20
 export const ToolAvailability = (props: ToolAvailabilityProps) => {
   const {registration} = useOutletContext<ToolDetailsOutletContext>()
 
-  const [debug, setDebug] = React.useState(false)
   const [creatingDeployment, setCreatingDeployment] = React.useState(false)
-
-  // TODO: Remove this when debug mode is no longer needed
-  // Add keyboard shortcut for CMD+d to toggle debug mode
-  React.useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      // CMD+d (Mac) or CTRL+d (Windows/Linux)
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'd') {
-        e.preventDefault()
-        setDebug(d => !d)
-      }
-    }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [])
 
   const controlsQuery = useInfiniteQuery({
     queryKey: ['fetchControlsByDeployment', registration.id] as [string, LtiRegistrationId],
@@ -138,7 +123,6 @@ export const ToolAvailability = (props: ToolAvailabilityProps) => {
                       deleteControl={props.deleteContextControl}
                       editControl={props.editContextControl}
                       deleteDeployment={props.deleteDeployment}
-                      debug={debug}
                     />
                   </List.Item>
                 ))}
@@ -195,41 +179,6 @@ export const ToolAvailability = (props: ToolAvailabilityProps) => {
                   {I18n.t('Show More')}
                 </Button>
               </Flex>
-            )}
-            {debug && (
-              <Button
-                onClick={() => {
-                  confirm({
-                    title: 'Create Deployment',
-                    message: 'Are you sure you want to create a deployment?',
-                    confirmButtonLabel: 'Create',
-                    cancelButtonLabel: 'Cancel',
-                  }).then(confirmed => {
-                    if (confirmed) {
-                      // Call the API to create a deployment
-                      createDeployment({
-                        registrationId: registration.id,
-                        accountId: props.accountId,
-                      }).then(result => {
-                        if (result._type === 'Success' || result._type === 'ApiParseError') {
-                          // Handle success (e.g., show a success message or refresh the deployments)
-                          // Deployments from this API do not include context_controls, so the parsing
-                          // fails but since the deployment is created and we don't care about the result,
-                          // we can throw it away.
-                          controlsQuery.refetch()
-                        } else {
-                          showFlashAlert({
-                            type: 'error',
-                            message: I18n.t('There was an error when creating the deployment.'),
-                          })
-                        }
-                      })
-                    }
-                  })
-                }}
-              >
-                Create Deployment
-              </Button>
             )}
           </>
         )

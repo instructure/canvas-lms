@@ -69,19 +69,11 @@ export type DeploymentAvailabilityProps = {
   deleteDeployment: DeleteDeployment
   editControl: UpdateContextControl
   refetchControls: () => void
-  debug: boolean
 }
 
 export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
-  const {
-    registration,
-    deleteDeployment,
-    deployment,
-    debug,
-    refetchControls,
-    deleteControl,
-    editControl,
-  } = props
+  const {registration, deleteDeployment, deployment, refetchControls, deleteControl, editControl} =
+    props
 
   const controls_with_ids = React.useMemo(
     () => buildControlsByPath(deployment.context_controls || []),
@@ -380,46 +372,6 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
         onClose={() => setDeleteExceptionModalOpenProps({open: false})}
         onDelete={onDelete}
       />
-      {
-        /**
-         * These are debug buttons, and will be removed before release
-         */
-        debug && (
-          <>
-            <Button
-              onClick={() => {
-                confirm({
-                  title: 'Delete Deployment',
-                  message: 'Are you sure you want to delete this deployment?',
-                  confirmButtonLabel: 'Delete',
-                  cancelButtonLabel: 'Cancel',
-                }).then(confirmed => {
-                  if (confirmed) {
-                    // Call the API to delete the deployment
-                    deleteDeployment({
-                      registrationId: registration.id,
-                      accountId: props.accountId,
-                      deploymentId: deployment.id,
-                    }).then(result => {
-                      if (result._type === 'Success') {
-                        // Handle success (e.g., show a success message or refresh the deployments)
-                        refetchControls()
-                      } else {
-                        showFlashAlert({
-                          type: 'error',
-                          message: I18n.t('There was an error when deleting the deployment.'),
-                        })
-                      }
-                    })
-                  }
-                })
-              }}
-            >
-              Delete Deployment
-            </Button>
-          </>
-        )
-      }
     </View>
   )
 }
