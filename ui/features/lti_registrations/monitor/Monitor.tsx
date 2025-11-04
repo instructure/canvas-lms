@@ -23,7 +23,7 @@ import type {AccountId} from '../manage/model/AccountId'
 import {fetchImpact} from './api/impact'
 import {fetchLtiUsageToken} from './api/jwt'
 import {ltiUsageConfig, ltiUsageOptions} from './utils'
-import {useBreadcrumbStore} from '@canvas/breadcrumbs/useBreadcrumbStore'
+import {useBreadcrumbStore, type Breadcrumb} from '@canvas/breadcrumbs/useBreadcrumbStore'
 
 const I18n = createI18nScope('lti_registrations.monitor')
 
@@ -40,8 +40,8 @@ type Module = {
       fetchImpact: typeof fetchImpact
     }
     breadcrumbStore: {
-      appendBreadcrumb: (breadcrumb: {name: string; url: string}) => void
-      popBreadcrumb: () => void
+      getBreadcrumbs: () => Breadcrumb[]
+      setBreadcrumbs: (breadcrumbs: Breadcrumb[]) => void
     }
     options: Record<string, any>
   }) => () => void
@@ -51,10 +51,10 @@ export const Monitor = ({accountId}: MonitorProps) => {
   const root = React.useRef<HTMLDivElement>(null)
 
   React.useEffect(() => {
-    const store = useBreadcrumbStore.getState()
     let unmount = () => {}
 
-    let addedBreadcrumbCount = 0
+    const store = useBreadcrumbStore.getState()
+    const initialBreadcrumbs = [...store.state]
 
     import('ltiusage/AppModule').then((module: Module) => {
       if (root.current !== null) {
@@ -67,17 +67,9 @@ export const Monitor = ({accountId}: MonitorProps) => {
             fetchImpact,
           },
           breadcrumbStore: {
-            appendBreadcrumb: breadcrumb => {
-              // We only want to append the breadcrumb once
-              store.appendBreadcrumb(breadcrumb)
-              addedBreadcrumbCount += 1
-            },
-            popBreadcrumb: () => {
-              if (addedBreadcrumbCount > 0) {
-                addedBreadcrumbCount -= 1
-                store.popBreadcrumb()
-              }
-            },
+            getBreadcrumbs: () => store.state.slice(initialBreadcrumbs.length),
+            setBreadcrumbs: (breadcrumbs: Breadcrumb[]) =>
+              store.setBreadcrumbs([...initialBreadcrumbs, ...breadcrumbs]),
           },
           options: ltiUsageOptions(),
         })
@@ -86,7 +78,10 @@ export const Monitor = ({accountId}: MonitorProps) => {
       }
     })
 
-    return () => unmount()
+    return () => {
+      store.setBreadcrumbs(initialBreadcrumbs)
+      unmount()
+    }
   }, [])
 
   return <div ref={root}></div>
