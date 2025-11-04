@@ -61,6 +61,7 @@ export default class EditAppointmentGroupDetails {
           pattern="[0-9]"
           name="duration"
           value="30"
+          min="1"
           style="width: 40px"
           aria-label="${htmlEscape(I18n.t('Minutes per slot'))}"
         />`,
@@ -141,8 +142,11 @@ export default class EditAppointmentGroupDetails {
 
     this.form.find('[name="slot_duration"]').change(e => {
       if (this.form.find('[name="autosplit_option"]').is(':checked')) {
-        this.timeBlockList.split(e.target.value)
-        return this.timeBlockList.render()
+        const value = parseFloat(e.target.value)
+        if (value > 0) {
+          this.timeBlockList.split(value)
+          return this.timeBlockList.render()
+        }
       }
     })
 
