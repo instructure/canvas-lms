@@ -38626,6 +38626,11 @@ nb:
       nå returnere navnet på den tilpassede variabelen.
   when_enabled_canvas_will_inherit_account_survey_se_39875d62: "Når aktivert vil Canvas arve innstillinger for kontoundersøkelser fra Canvas_Survey_Opt_Out__c-feltet i Salesforce. En gjentakende jobb synkroniserer denne innstillingen hver 24. time, og brukergrensesnittet blir skrivebeskyttet."
   when_enabled_collect_internal_analytics_metrics_us_88e81ee5: "Når aktivert, samle inn interne analyseberegninger ved hjelp av et distribuert system."
+  when_enabled_fixes_the_tab_order_for_view_as_stude_2f92d5ae: |-
+      Når den er aktivert, fikserer det fanerekkefølgen for knappene Vis som student og LTI-verktøy
+      i toppnavigasjonsfanen. Vis som student vil motta fokus før LTI-verktøy,
+      og følger logisk leserekkefølge fra venstre til høyre. Krever top_navigation_placement
+      for å aktiveres.
   when_enabled_for_a_child_account_of_a_non_centrall_8b126bc0: |-
       Når aktivert for en barnekonto i et ikke-sentralt administrert konsortium,
       vil ikke utviklernøkkelstatus og tokens fra det overordnede konsortiet bli
