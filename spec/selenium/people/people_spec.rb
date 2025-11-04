@@ -976,6 +976,34 @@ describe "people" do
       expect(driver.current_url).to include("/courses/#{@course.id}/groups")
     end
 
+    it "navigates to groups page using right arrow key", custom_timeout: 30 do
+      user_session(@teacher)
+
+      get "/courses/#{@course.id}/users"
+
+      everyone_tab = f(".collectionViewItems > li:first-child")
+      everyone_tab.click
+      expect_new_page_load { everyone_tab.send_keys(:arrow_right) }
+      expect(driver.current_url).to include("/courses/#{@course.id}/groups")
+    end
+
+    it "navigates to users page using left arrow key from group tab", custom_timeout: 30 do
+      user_session(@teacher)
+
+      GroupCategory.create(name: "Test Group", context: @course)
+      get "/courses/#{@course.id}/groups"
+      wait_for_ajaximations
+
+      # Click on the first group category tab
+      group_tab = f(".collectionViewItems > li:nth-child(2)")
+      group_tab.click
+      wait_for_ajaximations
+
+      # Press left arrow to navigate back to users page
+      expect_new_page_load { group_tab.send_keys(:arrow_left) }
+      expect(driver.current_url).to include("/courses/#{@course.id}/users")
+    end
+
     context "student tray" do
       before :once do
         @account = Account.default
