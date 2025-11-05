@@ -57,6 +57,7 @@ export type AccessibilityScansState = {
   accessibilityScans: AccessibilityResourceScan[] | null
   issuesSummary: AccessibilityIssuesSummaryData | null
   nextResource: NextResource
+  aiGenerationEnabled?: boolean
 }
 
 export type AccessibilityScansActions = {
@@ -93,6 +94,7 @@ export const initialState: AccessibilityScansState = {
   accessibilityScans: null,
   issuesSummary: null,
   nextResource: defaultNextResource,
+  aiGenerationEnabled: window.ENV.FEATURES?.a11y_checker_ai_generation || false,
 }
 
 export const defaultStateToFetch: NewStateToFetch = {
