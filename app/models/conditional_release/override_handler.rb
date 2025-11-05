@@ -85,6 +85,13 @@ module ConditionalRelease
                                            AssignmentOverrideStudent.where(user_id: student_id)) # only care about records for this student
         existing_overrides_map_with_dates = existing_overrides.group_by { |override| [override.assignment_id, override.due_at] }
         existing_overrides_map = existing_overrides.group_by(&:assignment_id)
+
+        noop_due_dates = AssignmentOverride.active
+                                           .where(assignment_id: assignments_to_assign, set_type: "Noop")
+                                           .where.not(due_at: nil)
+                                           .pluck(:assignment_id, :due_at)
+                                           .to_h
+
         due_dates = {}
         course_pace = nil
 
@@ -107,18 +114,27 @@ module ConditionalRelease
           due_at = if course_pace
                      due_dates[to_assign.id]
                    else
-                     nil
+                     noop_due_dates[to_assign.id]
                    end
 
-          overrides = existing_overrides_map_with_dates[[to_assign.id, due_dates[to_assign.id]]]
+          if due_at.present?
+            fancy_due_at = CanvasTime.fancy_midnight(due_at)
+            normalized_due_at = fancy_due_at.change(nsec: fancy_due_at.usec * 1000)
+          end
+
+          # With course pacing: group by assignment + due date (students get pace-calculated dates)
+          # Without course pacing: group by assignment only (allows manual due date edits)
+          overrides = if course_pace
+                        existing_overrides_map_with_dates[[to_assign.id, normalized_due_at]]
+                      else
+                        existing_overrides_map[to_assign.id]
+                      end
           if overrides
             unless overrides.any? { |o| o.assignment_override_students.map(&:user_id).include?(student_id) }
-              override = overrides.min_by(&:id) # kind of arbitrary but may as well be consistent and always pick the earliest
-              # we can pass in :no_enrollment to skip some queries - i assume they have an enrollment since they have a submission
+              override = overrides.min_by(&:id)
               override.assignment_override_students.create!(user_id: student_id, no_enrollment: false)
             end
           else
-            # have to create an override
             new_override = to_assign.assignment_overrides.create!(
               set_type: "ADHOC",
               assignment_override_students: [
@@ -128,7 +144,11 @@ module ConditionalRelease
               due_at:
             )
 
-            existing_overrides_map_with_dates[[to_assign.id, due_dates[to_assign.id]]] = [new_override]
+            if course_pace
+              existing_overrides_map_with_dates[[to_assign.id, normalized_due_at]] = [new_override]
+            else
+              existing_overrides_map[to_assign.id] = [new_override]
+            end
           end
         end
         if course

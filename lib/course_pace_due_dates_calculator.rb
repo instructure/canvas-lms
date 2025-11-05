@@ -48,8 +48,14 @@ class CoursePaceDueDatesCalculator
 
       # If the course pace hasn't been committed yet we need to group the items from their module_item_id or we will
       # end up grouping them by nil and losing the data for each item as it gets overwritten by the next item.
-      key = if by_assignment && item.module_item.content_type == "Assignment"
-              item.module_item.content_id
+      key = if by_assignment && ["Assignment", "Quizzes::Quiz", "DiscussionTopic"].include?(item.module_item.content_type)
+              # For quizzes and discussions, we need to use the assignment ID, not the content ID
+              # because mastery paths works with assignment objects
+              if item.module_item.content_type == "Assignment"
+                item.module_item.content_id
+              else
+                item.module_item.content&.assignment_id || item.module_item.content_id
+              end
             elsif course_pace.persisted?
               item.id
             else
