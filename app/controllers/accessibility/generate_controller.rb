@@ -35,9 +35,13 @@ module Accessibility
     private
 
     def check_authorized_action
-      return render_unauthorized_action unless tab_enabled?(Course::TAB_ACCESSIBILITY)
+      return render_unauthorized_action unless @context.try(:a11y_checker_enabled?) && ai_text_generation_enabled?
 
       authorized_action(@context, @current_user, [:read, :update])
+    end
+
+    def ai_text_generation_enabled?
+      Account.site_admin.feature_enabled?(:a11y_checker_ai_generation)
     end
   end
 end

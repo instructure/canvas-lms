@@ -438,6 +438,7 @@ class ApplicationController < ActionController::Base
     account_level_blackout_dates
     assignment_edit_placement_not_on_announcements
     accessibility_issues_in_full_page
+    a11y_checker_ai_generation
     block_content_editor_toolbar_reorder
     commons_new_quizzes
     consolidated_media_player

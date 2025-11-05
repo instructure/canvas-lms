@@ -28,6 +28,7 @@ import {
 import {FormType, IssueWorkflowState} from '../../../../types'
 import {getAsAccessibilityResourceScan} from '../../../../utils/apiData'
 import TextInputForm from '../TextInput'
+import {useAccessibilityScansStore} from '../../../../stores/AccessibilityScansStore'
 
 // Mock the Button component to handle ai-primary color
 jest.mock('@instructure/ui-buttons', () => {
@@ -47,9 +48,15 @@ jest.mock('@instructure/ui-buttons', () => {
 
 jest.mock('@canvas/do-fetch-api-effect')
 
+jest.mock('../../../../stores/AccessibilityScansStore')
+
 describe('TextInputForm', () => {
   beforeEach(() => {
     jest.resetAllMocks()
+    ;(useAccessibilityScansStore as unknown as jest.Mock).mockImplementation((selector: any) => {
+      const state = {aiGenerationEnabled: true}
+      return selector(state)
+    })
   })
   const defaultProps = {
     issue: {
@@ -196,5 +203,37 @@ describe('TextInputForm', () => {
     expect(input).not.toHaveFocus()
     input?.focus()
     expect(input).toHaveFocus()
+  })
+
+  describe('AI generation feature flag', () => {
+    it('shows generate button when feature flag is enabled', () => {
+      ;(useAccessibilityScansStore as unknown as jest.Mock).mockImplementation((selector: any) => {
+        const state = {aiGenerationEnabled: true}
+        return selector(state)
+      })
+
+      render(
+        <AccessibilityCheckerContext.Provider value={mockContextValue}>
+          <TextInputForm {...propsWithGenerateOption} />
+        </AccessibilityCheckerContext.Provider>,
+      )
+
+      expect(screen.getByText('Generate Alt Text')).toBeInTheDocument()
+    })
+
+    it('hides generate button when feature flag is disabled', () => {
+      ;(useAccessibilityScansStore as unknown as jest.Mock).mockImplementation((selector: any) => {
+        const state = {aiGenerationEnabled: false}
+        return selector(state)
+      })
+
+      render(
+        <AccessibilityCheckerContext.Provider value={mockContextValue}>
+          <TextInputForm {...propsWithGenerateOption} />
+        </AccessibilityCheckerContext.Provider>,
+      )
+
+      expect(screen.queryByText('Generate Alt Text')).not.toBeInTheDocument()
+    })
   })
 })
