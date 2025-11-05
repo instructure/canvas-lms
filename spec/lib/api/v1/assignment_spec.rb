@@ -52,6 +52,10 @@ class AssignmentApiHarness
   def grading_periods?
     false
   end
+
+  def in_app?
+    true
+  end
 end
 
 describe "Api::V1::Assignment" do
@@ -1248,6 +1252,19 @@ describe "Api::V1::Assignment" do
           expect(subject.lti_asset_processors.count).to eq 0
         end
       end
+
+      context "when not in app (API token authentication)" do
+        before do
+          allow(api).to receive(:in_app?).and_return(false)
+        end
+
+        it "raises RequestError with forbidden status" do
+          expect { subject }.to raise_error(RequestError) do |error|
+            expect(error.response_status).to eq(403)
+            expect(error.message).to include("LTI Deep Linking flow")
+          end
+        end
+      end
     end
   end
 
@@ -1414,6 +1431,42 @@ describe "Api::V1::Assignment" do
         it "deletes any previous asset processors" do
           assignment_update_params[:submission_types] = ["online_url"]
           expect { subject }.to change { assignment.lti_asset_processors.count }.from(2).to(0)
+        end
+      end
+
+      context "when not in app (API token authentication)" do
+        before do
+          allow(api).to receive(:in_app?).and_return(false)
+        end
+
+        context "when creating new asset processors" do
+          it "raises RequestError with forbidden status" do
+            expect { subject }.to raise_error(RequestError) do |error|
+              expect(error.response_status).to eq(403)
+              expect(error.message).to include("LTI Deep Linking flow")
+            end
+          end
+        end
+
+        context "when deleting asset processors" do
+          let(:content_items) { [] }
+
+          it "allows deletion" do
+            expect { subject }.to change { assignment.lti_asset_processors.count }.from(2).to(0)
+          end
+        end
+
+        context "when only keeping existing asset processors" do
+          let(:content_items) do
+            [
+              { "existing_id" => existing_ap1.id }
+            ]
+          end
+
+          it "allows keeping existing processors" do
+            expect { subject }.not_to raise_error
+            expect(assignment.lti_asset_processors.pluck(:title)).to eq(["Existing1"])
+          end
         end
       end
     end

@@ -1416,6 +1416,12 @@ module Api::V1::Assignment
     existing_ids_to_keep = asset_processors_from_params.filter_map { |ap| ap["existing_id"] }
     content_items_to_create = asset_processors_from_params.filter_map { |ap| ap["new_content_item"] }
 
+    # Asset processors can only be created via Deep Linking flow (session-based auth).
+    # Deletion via API is allowed.
+    if content_items_to_create.any? && !in_app?
+      raise RequestError.new("Asset processors can only be created via the LTI Deep Linking flow. ", :forbidden)
+    end
+
     assignment.lti_asset_processors.where.not(id: existing_ids_to_keep).destroy_all
     assignment.lti_asset_processors += content_items_to_create.filter_map do |content_item|
       Lti::AssetProcessor.build_for_assignment(content_item:, context: assignment.context)
