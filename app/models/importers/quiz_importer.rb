@@ -256,7 +256,14 @@ module Importers
         end
         item.assignment = nil if item.assignment&.quiz && item.assignment.quiz.id != item.id
         item.assignment ||= context.assignments.temp_record
-        item.assignment = ::Importers::AssignmentImporter.import_from_migration(hash[:assignment], context, migration, item.assignment, item)
+
+        # For Quizzes.next, use the quiz's migration_id instead of the assignment's
+        assignment_hash = hash[:assignment].dup
+        if hash[:qti_new_quiz]
+          assignment_hash[:migration_id] = hash[:migration_id]
+        end
+
+        item.assignment = ::Importers::AssignmentImporter.import_from_migration(assignment_hash, context, migration, item.assignment, item)
         if migration.cc_qti_migration? && (migration.import_quizzes_next? || !!hash[:qti_new_quiz])
           migration.migration_settings[:quiz_next_imported] = true
           migration.save if migration.changed?
