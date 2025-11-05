@@ -425,6 +425,153 @@ describe AssignmentGroupsController, type: :request do
     end
   end
 
+  describe "peer review sub assignments" do
+    before :once do
+      setup_groups
+    end
+
+    context "with feature flag enabled" do
+      before :once do
+        @course.enable_feature!(:peer_review_grading)
+      end
+
+      it "includes peer review sub assignment data when peer_review is included" do
+        parent_assignment = @course.assignments.create!(
+          title: "Assignment with Peer Review",
+          assignment_group: @group1,
+          points_possible: 20,
+          peer_reviews: true,
+          submission_types: "online_text_entry"
+        )
+        peer_review_model(parent_assignment:)
+
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/assignment_groups.json",
+                        {
+                          controller: "assignment_groups",
+                          action: "index",
+                          format: "json",
+                          course_id: @course.id.to_s
+                        },
+                        include: %w[assignments peer_review])
+
+        # @group1 position is 10, @group2 position is 7
+        # So, @group1 should be second in the list
+        assignment_group = json[1]
+        assignment = assignment_group["assignments"].first
+
+        expect(assignment["id"]).to eq parent_assignment.id
+        expect(assignment["peer_review_sub_assignment"]).to be_present
+      end
+
+      it "does not include peer review sub assignment data when peer_review is not included" do
+        parent_assignment = @course.assignments.create!(
+          title: "Assignment with Peer Review",
+          assignment_group: @group1,
+          points_possible: 20,
+          peer_reviews: true,
+          submission_types: "online_text_entry"
+        )
+        peer_review_model(parent_assignment:)
+
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/assignment_groups.json",
+                        {
+                          controller: "assignment_groups",
+                          action: "index",
+                          format: "json",
+                          course_id: @course.id.to_s
+                        },
+                        include: %w[assignments])
+
+        assignment_group = json[1]
+        assignment = assignment_group["assignments"].first
+
+        expect(assignment["id"]).to eq parent_assignment.id
+        expect(assignment).not_to have_key("peer_review_sub_assignment")
+      end
+
+      it "includes peer review sub assignment as nil when assignment has no peer review" do
+        assignment_without_peer_review = @course.assignments.create!(
+          title: "Assignment without Peer Review",
+          assignment_group: @group1,
+          points_possible: 20,
+          submission_types: "online_text_entry"
+        )
+
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/assignment_groups.json",
+                        {
+                          controller: "assignment_groups",
+                          action: "index",
+                          format: "json",
+                          course_id: @course.id.to_s
+                        },
+                        include: %w[assignments peer_review])
+
+        assignment_group = json[1]
+        assignment = assignment_group["assignments"].first
+
+        expect(assignment["id"]).to eq assignment_without_peer_review.id
+        expect(assignment["peer_review_sub_assignment"]).to be_nil
+      end
+
+      it "includes peer_review_sub_assignment as nil when peer_reviews is false" do
+        assignment = @course.assignments.create!(
+          title: "Assignment without Peer Review",
+          assignment_group: @group1,
+          points_possible: 20,
+          peer_reviews: false,
+          submission_types: "online_text_entry"
+        )
+
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/assignment_groups.json",
+                        {
+                          controller: "assignment_groups",
+                          action: "index",
+                          format: "json",
+                          course_id: @course.id.to_s
+                        },
+                        include: %w[assignments peer_review])
+
+        assignment_group = json[1]
+        assignment_json = assignment_group["assignments"].first
+
+        expect(assignment_json["id"]).to eq assignment.id
+        expect(assignment_json["peer_review_sub_assignment"]).to be_nil
+      end
+    end
+
+    context "with feature flag disabled" do
+      it "omits peer_review_sub_assignment field" do
+        assignment = @course.assignments.create!(
+          title: "Assignment with Peer Review",
+          assignment_group: @group1,
+          points_possible: 20,
+          peer_reviews: true,
+          submission_types: "online_text_entry"
+        )
+
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/assignment_groups.json",
+                        {
+                          controller: "assignment_groups",
+                          action: "index",
+                          format: "json",
+                          course_id: @course.id.to_s
+                        },
+                        include: %w[assignments peer_review])
+
+        assignment_group = json[1]
+        assignment_json = assignment_group["assignments"].first
+
+        expect(assignment_json["id"]).to eq assignment.id
+        expect(assignment_json).not_to have_key("peer_review_sub_assignment")
+      end
+    end
+  end
+
   context "grading periods" do
     before :once do
       setup_grading_periods
