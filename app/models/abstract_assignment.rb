@@ -4135,6 +4135,8 @@ class AbstractAssignment < ActiveRecord::Base
   # If you're going to be checking this for multiple assignments, you may want
   # to call .preload_unposted_anonymous_submissions on the lot of them first
   def anonymize_students?
+    return true if anonymous_participants?
+
     return false unless anonymous_grading?
 
     # Only anonymize students for moderated assignments if grades have not been published.
