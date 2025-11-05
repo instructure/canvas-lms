@@ -2031,6 +2031,7 @@ class ApplicationController < ActionController::Base
   rescue_from CanvasHttp::CircuitBreakerError, with: :rescue_expected_error_type
   rescue_from InstFS::ServiceError, with: :rescue_expected_error_type
   rescue_from InstFS::BadRequestError, with: :rescue_expected_error_type
+  rescue_from BookmarkedCollection::InvalidPage, with: :rescue_expected_error_type
 
   def rescue_expected_error_type(error)
     rescue_exception(error, level: :info)
@@ -2187,6 +2188,8 @@ class ApplicationController < ActionController::Base
       data = { errors: [{ message: "Insufficient scopes on access token." }] }
     when ActionController::ParameterMissing
       data = { errors: [{ message: "#{exception.param} is missing" }] }
+    when BookmarkedCollection::InvalidPage
+      data = { status: :bad_request, errors: [{ page: "Invalid page; please restart iteration and follow `next` links" }] }
     when BasicLTI::BasicOutcomes::Unauthorized,
         BasicLTI::BasicOutcomes::InvalidRequest
       data = { errors: [{ message: exception.message }] }

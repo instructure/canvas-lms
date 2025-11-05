@@ -147,6 +147,17 @@ describe "BookmarkedCollection::Collection" do
       @collection.current_page = page
       expect(@collection.current_bookmark).to eq(bookmark)
     end
+
+    it "is nil if given page 1" do
+      @collection.current_page = "1"
+      expect(@collection.current_bookmark).to be_nil
+    end
+
+    it "raises an error if given page > 1" do
+      expect do
+        @collection.current_page = "2"
+      end.to raise_error(BookmarkedCollection::InvalidPage)
+    end
   end
 
   describe "#first_page" do

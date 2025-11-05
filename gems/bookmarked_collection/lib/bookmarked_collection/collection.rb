@@ -88,6 +88,8 @@ class BookmarkedCollection::Collection < Array
         # bookmark value could not be decoded
         nil
       end
+    elsif page.to_s =~ /^\d+$/ && page.to_i > 1
+      raise BookmarkedCollection::InvalidPage
       # else
       # not tagged as a bookmark
       # nil

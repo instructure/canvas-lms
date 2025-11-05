@@ -1574,6 +1574,36 @@ describe "Users API", type: :request do
       expect(next_link).to be_nil
     end
 
+    it "rejects page numbers > 1 when doing bookmark pagination" do
+      @account = Account.default
+      params = { controller: "users",
+                 action: "api_index",
+                 format: "json",
+                 account_id: @account.to_param,
+                 per_page: "1",
+                 sort: "id" }
+
+      account_admin_user
+      api_call(:get,
+               "/api/v1/accounts/#{@account.id}/users?sort=id&page=1",
+               params.merge(page: "1"),
+               {},
+               {},
+               expected_status: 200)
+
+      json = api_call(:get,
+                      "/api/v1/accounts/#{@account.id}/users?sort=id&page=2",
+                      params.merge(page: "2"),
+                      {},
+                      {},
+                      expected_status: 400)
+
+      expect(json).to eq({ "status" => "bad_request",
+                           "errors" => [{
+                             "page" => "Invalid page; please restart iteration and follow `next` links"
+                           }] })
+    end
+
     context "user profile preloading" do
       before(:once) do
         @account = Account.default
