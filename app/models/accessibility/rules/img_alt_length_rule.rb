@@ -23,10 +23,6 @@ module Accessibility
       self.id = "img-alt-length"
       self.link = "https://www.w3.org/TR/WCAG20-TECHS/H37.html"
 
-      MAX_LENGTH = 120
-
-      # Accessibility::Rule methods
-
       def test(elem)
         return nil if elem.tag_name != "img"
         return nil unless elem.attribute?("alt")
@@ -37,7 +33,7 @@ module Accessibility
         return nil if alt == "" && role == "presentation"
         return nil if alt.blank?
 
-        I18n.t("Alt text is longer than 120.") if alt.length > MAX_LENGTH
+        ImgAltRuleHelper.validation_error_too_long if alt.length > ImgAltRuleHelper::MAX_LENGTH
       end
 
       def form(elem)
@@ -47,7 +43,7 @@ module Accessibility
           input_label: I18n.t("Alt text"),
           undo_text: I18n.t("Alt text fixed"),
           input_description: I18n.t("Describe what's on the picture."),
-          input_max_length: MAX_LENGTH,
+          input_max_length: ImgAltRuleHelper::MAX_LENGTH,
           can_generate_fix: true,
           generate_button_label: I18n.t("Generate alt text"),
           value: elem.get_attribute("alt") || ""
@@ -63,16 +59,7 @@ module Accessibility
       end
 
       def fix!(elem, value)
-        if value == "" || value.nil?
-          elem["role"] = "presentation"
-        elsif value.length > MAX_LENGTH
-          raise StandardError, I18n.t("Too long alt text. It should be less than 120 characters.")
-        end
-
-        return nil if elem["alt"] == value
-
-        elem["alt"] = value
-        elem
+        ImgAltRuleHelper.fix_alt_text!(elem, value)
       end
 
       def display_name

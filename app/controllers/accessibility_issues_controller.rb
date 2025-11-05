@@ -66,7 +66,18 @@ class AccessibilityIssuesController < ApplicationController
 
   def validate_update_params
     return "Invalid workflow_state" unless %w[resolved dismissed].include?(params[:workflow_state])
-    return "Value is required for resolved state" if params[:workflow_state] == "resolved" && params[:value].blank?
+
+    return nil if params[:workflow_state] == "dismissed"
+
+    return "Value is required for resolved state" unless params.key?(:value)
+
+    value = params[:value]
+
+    if value.nil? && @issue.allow_nil_param_value?
+      return nil
+    end
+
+    return "Value is required for resolved state" if value.presence.nil? || value&.strip&.empty?
 
     nil
   end
@@ -76,11 +87,15 @@ class AccessibilityIssuesController < ApplicationController
   end
 
   def apply_fix_and_render_error_if_failed?
+    # For decorative images, we want to pass nil, not empty string
+    value = params.key?(:value) ? params[:value] : nil
+    sanitized_value = value.nil? ? nil : Sanitize.clean(value)
+
     fix_response = Accessibility::Issue::HtmlFixer.new(
       @issue.rule_type,
       @issue.context,
       @issue.node_path,
-      Sanitize.clean(params[:value])
+      sanitized_value
     ).apply_fix!
 
     if fix_response[:status] != :ok
