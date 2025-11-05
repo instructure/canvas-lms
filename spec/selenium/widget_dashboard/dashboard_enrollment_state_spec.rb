@@ -19,10 +19,13 @@
 
 require_relative "page_objects/widget_dashboard_page"
 require_relative "page_objects/course_tab_page"
+require_relative "../helpers/student_dashboard_common"
+
 describe "student dashboard", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include WidgetDashboardPage
   include CourseTabPage
+  include StudentDashboardCommon
 
   before :once do
     dashboard_student_setup

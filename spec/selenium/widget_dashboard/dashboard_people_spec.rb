@@ -18,10 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "page_objects/widget_dashboard_page"
+require_relative "../helpers/student_dashboard_common"
 
 describe "student dashboard people widget", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include WidgetDashboardPage
+  include StudentDashboardCommon
 
   before :once do
     dashboard_student_setup # Creates 2 courses and a student enrolled in both
@@ -43,7 +45,6 @@ describe "student dashboard people widget", :ignore_js_errors do
     end
 
     it "displays people in pagination" do
-      skip "Will unskip after fixing LX-3406 (2025-10-09)"
       go_to_dashboard
 
       expect(all_message_buttons.size).to eq(5)
