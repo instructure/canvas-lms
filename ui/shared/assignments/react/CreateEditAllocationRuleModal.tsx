@@ -494,9 +494,9 @@ const CreateEditAllocationRuleModal = ({
   const deleteAdditionalSubjectLabel = (key: string) => {
     const name = additionalSubjects[key]?.name || ''
     if (name) {
-      return I18n.t('Delete additional subject field: %{name}', {name: name})
+      return I18n.t('Delete additional recipient: %{name}', {name: name})
     } else {
-      return I18n.t('Delete additional empty subject field')
+      return I18n.t('Delete additional empty recipient')
     }
   }
 
@@ -647,6 +647,7 @@ const CreateEditAllocationRuleModal = ({
     <Modal
       label={isEdit ? I18n.t('Edit Rule Modal') : I18n.t('Create Rule Modal')}
       open={isOpen}
+      onDismiss={() => handleClose()}
       size="small"
       data-testid={isEdit ? 'edit-rule-modal' : 'create-rule-modal'}
     >

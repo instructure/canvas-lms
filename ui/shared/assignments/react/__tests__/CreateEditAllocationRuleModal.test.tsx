@@ -401,7 +401,7 @@ describe('CreateEditAllocationRuleModal', () => {
 
       await waitFor(() => {
         const deleteButton = screen.getByTestId('delete-additional-subject-field-1-button')
-        expect(deleteButton).toHaveTextContent('Delete additional empty subject field')
+        expect(deleteButton).toHaveTextContent('Delete additional empty recipient')
       })
     })
   })
