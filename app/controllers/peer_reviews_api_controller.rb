@@ -142,6 +142,38 @@ class PeerReviewsApiController < ApplicationController
     end
   end
 
+  # @API Allocate Peer Review
+  # Allocates a submission for the current user to peer review
+  #
+  # @returns PeerReview
+  def allocate
+    # Validation: Assignment must be assigned to the student (visibility check)
+    visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService
+                             .visible_assignment_ids_in_course_by_user(
+                               user_ids: [@current_user.id],
+                               course_ids: [@context.id]
+                             )[@current_user.id] || []
+
+    unless visible_assignment_ids.include?(@assignment.id)
+      return render json: { errors: { base: t("Assignment is not assigned to you") } },
+                    status: :forbidden
+    end
+
+    # Use the allocation service to handle the business logic
+    result = PeerReview::AllocationService.new(
+      assignment: @assignment,
+      assessor: @current_user
+    ).allocate
+
+    if result[:success]
+      includes = Set.new(Array(params[:include]))
+      render json: assessment_request_json(result[:assessment_request], @current_user, session, includes)
+    else
+      status_code = result[:status] || :bad_request
+      render json: { errors: { base: result[:message] } }, status: status_code
+    end
+  end
+
   private
 
   def require_assignment

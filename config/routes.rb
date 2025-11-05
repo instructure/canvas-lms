@@ -1475,6 +1475,7 @@ CanvasRails::Application.routes.draw do
       post "sections/:section_id/assignments/:assignment_id/submissions/:submission_id/peer_reviews", action: :create
       delete "courses/:course_id/assignments/:assignment_id/submissions/:submission_id/peer_reviews", action: :destroy
       delete "sections/:section_id/assignments/:assignment_id/submissions/:submission_id/peer_reviews", action: :destroy
+      post "courses/:course_id/assignments/:assignment_id/allocate", action: :allocate, as: :allocate_peer_review
     end
 
     scope(controller: :moderation_set) do

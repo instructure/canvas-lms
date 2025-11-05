@@ -641,6 +641,8 @@
   path: '/api/v1/courses/:course_id/assignments'
 - verb: POST
   path: '/api/v1/courses/:course_id/assignments/:assignment_id/accessibility/scan'
+- verb: POST
+  path: '/api/v1/courses/:course_id/assignments/:assignment_id/allocate'
 - verb: GET
   path: '/api/v1/courses/:course_id/assignments/:assignment_id/anonymous_provisional_grades/status'
 - verb: GET
