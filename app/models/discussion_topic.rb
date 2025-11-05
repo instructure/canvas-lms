@@ -1765,10 +1765,10 @@ class DiscussionTopic < ActiveRecord::Base
     assignment_overrides.select(&:active?).each do |override|
       # specific user
       if override.adhoc?
-        adhoc_users = users_with_visibility.concat(override.assignment_override_students.pluck(:user_id))
+        adhoc_users = override.assignment_override_students.pluck(:user_id)
         users_with_visibility.concat(adhoc_users)
       elsif override.course_section?
-        users_in_section = User.joins(:enrollments).where(enrollments: { course_section_id: override.set_id }).pluck(:id)
+        users_in_section = course.participating_students.where(enrollments: { course_section_id: override.set_id }).pluck(:id)
         users_with_visibility.concat(users_in_section)
       end
     end
