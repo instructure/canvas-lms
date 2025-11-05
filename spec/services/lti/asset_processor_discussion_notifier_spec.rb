@@ -96,7 +96,7 @@ RSpec.describe Lti::AssetProcessorDiscussionNotifier do
           expect(asset_hash[required_key]).to be_present, "expected asset to have #{required_key}"
         end
         expect(asset_hash[:content_type]).to eq("text/html")
-        expect(asset_hash[:title]).to eq(assignment.title)
+        expect(asset_hash).not_to have_key(:title)
         expect(asset_hash[:filename]).to be_nil
         # compute size from html string to avoid brittle literal
         expect(asset_hash[:size]).to eq("This is my comment".bytesize)
@@ -172,6 +172,10 @@ RSpec.describe Lti::AssetProcessorDiscussionNotifier do
         expect(builder_params[:user]).to eq(@teacher)
         filenames = builder_params[:assets].filter_map { |a| a[:filename] }
         expect(filenames).to include("note.txt")
+        attachment_asset = builder_params[:assets].find { |a| a[:filename] == "note.txt" }
+        expect(attachment_asset[:title]).to eq("note.txt")
+        text_asset = builder_params[:assets].find { |a| a[:filename].nil? }
+        expect(text_asset).not_to have_key(:title)
       end
     end
 

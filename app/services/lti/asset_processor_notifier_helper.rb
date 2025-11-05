@@ -27,9 +27,10 @@ module Lti
         sha256_checksum: asset.sha256_checksum,
         size: asset.content_size,
         url: asset_url(asset_processor, asset),
-        title: submission.assignment.title,
         content_type: asset.content_type
       }
+      title = asset.attachment&.display_name
+      hash[:title] = title unless title.nil?
       if asset.text_entry?
         hash[:timestamp] = submission.submitted_at.iso8601
       elsif asset.discussion_entry?
