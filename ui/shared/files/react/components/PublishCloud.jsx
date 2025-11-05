@@ -50,6 +50,7 @@ const PublishCloud = ({
 
   // Initialize state from model
   const [state, setState] = useState(() => extractStateFromModel(model))
+  const modelLocked = model.get('locked')
 
   // Update publish class elements
   const updatePublishClassElements = () => {
@@ -77,6 +78,11 @@ const PublishCloud = ({
       model.off('change', handleModelChange, this)
     }
   }, [model])
+
+  // Update state when model locked changes
+  useEffect(() => {
+    setState(extractStateFromModel(model))
+  }, [model, modelLocked])
 
   const getRestrictedText = () => {
     if (model.get('unlock_at') && model.get('lock_at')) {

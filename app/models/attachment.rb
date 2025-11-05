@@ -2432,7 +2432,15 @@ class Attachment < ActiveRecord::Base
   private :preview_params
 
   def can_unpublish?
-    false
+    # Only allow if file is in a simple "published" state with no special restrictions
+    return false if locked?
+
+    has_complex_state = file_state != "available" ||
+                        lock_at.present? ||
+                        unlock_at.present? ||
+                        (visibility_level.present? && visibility_level != "inherit")
+
+    !has_complex_state
   end
 
   def self.copy_attachments_to_submissions_folder(assignment_context, attachments)

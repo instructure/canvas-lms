@@ -3544,4 +3544,128 @@ describe Attachment do
       user_attachment.ingest_to_pine
     end
   end
+
+  describe "#can_unpublish?" do
+    context "published file" do
+      it "returns true for basic published file" do
+        course_factory
+        attachment = @course.attachments.create!(
+          filename: "test.txt",
+          uploaded_data: stub_file_data("test.txt", "test data", "text/plain"),
+          locked: false,
+          file_state: "available"
+        )
+        expect(attachment.can_unpublish?).to be true
+      end
+
+      it "returns true for file with inherit visibility" do
+        course_factory
+        attachment = @course.attachments.create!(
+          filename: "test.txt",
+          uploaded_data: stub_file_data("test.txt", "test data", "text/plain"),
+          locked: false,
+          file_state: "available",
+          visibility_level: "inherit"
+        )
+        expect(attachment.can_unpublish?).to be true
+      end
+    end
+
+    context "file with complex permissions" do
+      it "returns false for hidden file" do
+        course_factory
+        attachment = @course.attachments.create!(
+          filename: "test.txt",
+          uploaded_data: stub_file_data("test.txt", "test data", "text/plain"),
+          locked: false,
+          file_state: "hidden"
+        )
+        expect(attachment.can_unpublish?).to be false
+      end
+
+      it "returns false for public file" do
+        course_factory
+        attachment = @course.attachments.create!(
+          filename: "test.txt",
+          uploaded_data: stub_file_data("test.txt", "test data", "text/plain"),
+          locked: false,
+          file_state: "public"
+        )
+        expect(attachment.can_unpublish?).to be false
+      end
+
+      it "returns false for file with lock_at date" do
+        course_factory
+        attachment = @course.attachments.create!(
+          filename: "test.txt",
+          uploaded_data: stub_file_data("test.txt", "test data", "text/plain"),
+          locked: false,
+          file_state: "available",
+          lock_at: 1.day.from_now
+        )
+        expect(attachment.can_unpublish?).to be false
+      end
+
+      it "returns false for file with unlock_at date" do
+        course_factory
+        attachment = @course.attachments.create!(
+          filename: "test.txt",
+          uploaded_data: stub_file_data("test.txt", "test data", "text/plain"),
+          locked: false,
+          file_state: "available",
+          unlock_at: 1.day.ago
+        )
+        expect(attachment.can_unpublish?).to be false
+      end
+
+      it "returns false for file with context visibility" do
+        course_factory
+        attachment = @course.attachments.create!(
+          filename: "test.txt",
+          uploaded_data: stub_file_data("test.txt", "test data", "text/plain"),
+          locked: false,
+          file_state: "available",
+          visibility_level: "context"
+        )
+        expect(attachment.can_unpublish?).to be false
+      end
+
+      it "returns false for file with institution visibility" do
+        course_factory
+        attachment = @course.attachments.create!(
+          filename: "test.txt",
+          uploaded_data: stub_file_data("test.txt", "test data", "text/plain"),
+          locked: false,
+          file_state: "available",
+          visibility_level: "institution"
+        )
+        expect(attachment.can_unpublish?).to be false
+      end
+
+      it "returns false for file with public visibility" do
+        course_factory
+        attachment = @course.attachments.create!(
+          filename: "test.txt",
+          uploaded_data: stub_file_data("test.txt", "test data", "text/plain"),
+          locked: false,
+          file_state: "available",
+          visibility_level: "public"
+        )
+        expect(attachment.can_unpublish?).to be false
+      end
+    end
+
+    context "already unpublished file" do
+      it "returns false for locked file" do
+        course_factory
+        attachment = @course.attachments.create!(
+          filename: "test.txt",
+          uploaded_data: stub_file_data("test.txt", "test data", "text/plain"),
+          locked: true,
+          file_state: "available"
+        )
+        expect(attachment.can_unpublish?).to be false
+      end
+    end
+  end
 end
