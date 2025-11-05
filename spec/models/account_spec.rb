@@ -3309,4 +3309,47 @@ describe Account do
       root_account.denormalize_horizon_account_if_changed
     end
   end
+
+  describe "cache staleness and conditional reload" do
+    let(:account) { Account.create!(name: "Original") }
+
+    describe "#cache_stale?" do
+      it "returns false on a freshly loaded record" do
+        expect(account.cache_stale?).to be false
+      end
+
+      it "returns true when the DB updated_at is newer than the in-memory record" do
+        # Force an update directly in SQL so the in-memory object does not see the updated timestamp
+        future_time = 2.minutes.from_now
+        Account.where(id: account).update_all(updated_at: future_time)
+        expect(account.cache_stale?).to be true
+      end
+    end
+
+    describe "#reload_if_cache_stale" do
+      it "reloads the record when stale" do
+        Account.where(id: account).update_all(name: "Changed", updated_at: 1.minute.from_now)
+        expect(account.name).to eq "Original" # still old in-memory value
+        account.reload_if_cache_stale
+        expect(account.name).to eq "Changed"
+      end
+
+      it "does not reload when not stale" do
+        expect(account.cache_stale?).to be false
+        expect(account).not_to receive(:reload)
+        account.reload_if_cache_stale
+        expect(account.name).to eq "Original"
+      end
+    end
+
+    describe "callback invocation in invalidate_caches_if_changed" do
+      it "invokes reload_if_cache_stale after invalidations are committed" do
+        allow(account).to receive(:reload_if_cache_stale).and_call_original
+        # Change an inheritable setting to populate @invalidations
+        account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+        account.save!
+        expect(account).to have_received(:reload_if_cache_stale)
+      end
+    end
+  end
 end
