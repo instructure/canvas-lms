@@ -95,29 +95,22 @@ const CourseWorkCombinedWidget: React.FC<BaseWidgetProps> = ({
     null
   const handleRetry = onRetry || (() => refetch())
 
-  const handleResetPagination = useCallback(() => {
-    resetPagination()
-    refetch()
-  }, [resetPagination, refetch])
-
   const handleCourseChange = useCallback(
     (_event: React.SyntheticEvent, data: {value?: string | number; id?: string}) => {
       if (data.value && typeof data.value === 'string') {
         setSelectedCourse(data.value)
-        handleResetPagination()
       }
     },
-    [handleResetPagination],
+    [],
   )
 
   const handleDateFilterChange = useCallback(
     (_event: React.SyntheticEvent, data: {value?: string | number; id?: string}) => {
       if (data.value && typeof data.value === 'string') {
         setSelectedDateFilter(data.value as DateFilterOption)
-        handleResetPagination()
       }
     },
-    [handleResetPagination],
+    [],
   )
 
   return (
