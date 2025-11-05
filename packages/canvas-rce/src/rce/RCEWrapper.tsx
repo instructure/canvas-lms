@@ -1164,6 +1164,28 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
       tinyapp.setAttribute('tabIndex', '-1')
     }
 
+    // remove role="aplication" attribute from the iframe body
+    // tinymce adds this when the editor is wrapped in an iframe
+    // which makes RCE input fields inaccessible to screen readers
+    const iframe = tinyapp?.querySelector('iframe')
+    const body = iframe?.contentDocument?.body
+    if (body) {
+      const observer = new MutationObserver(() => {
+        try {
+          if (body && body.getAttribute('role') === 'application') {
+            body.removeAttribute('role')
+          }
+        } catch (_) {
+          /* pass */
+        }
+      })
+
+      observer.observe(body, {attributes: true, childList: false, subtree: false})
+      body.setAttribute('data-role-checked', 'true') // to trigger observer
+
+      setTimeout(() => observer.disconnect(), 10000)
+    }
+
     // Probably should do this in tinymce.scss, but we only want it in new rce
     textarea.style.resize = 'none'
     editor.on('keydown', this.handleKey)
