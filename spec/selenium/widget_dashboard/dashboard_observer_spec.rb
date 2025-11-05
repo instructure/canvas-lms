@@ -18,10 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "page_objects/widget_dashboard_page"
+require_relative "../helpers/student_dashboard_common"
 
 describe "Student dashboard as observer", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include WidgetDashboardPage
+  include StudentDashboardCommon
 
   before :once do
     dashboard_student_setup # Creates courses and a student enrolled in
