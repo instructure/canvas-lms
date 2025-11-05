@@ -533,7 +533,12 @@ const PeerReviewAllocationRulesTray = ({
       <View as="div" role="alert" aria-live="polite" data-testid="allocation-rules-tray-alert">
         <ScreenReaderContent>{screenReaderAnnouncement}</ScreenReaderContent>
       </View>
-      <Tray label={I18n.t('Allocation Rules')} open={isTrayOpen} placement="end">
+      <Tray
+        label={I18n.t('Allocation Rules')}
+        open={isTrayOpen}
+        onDismiss={closeTray}
+        placement="end"
+      >
         <Flex direction="column" height="100vh">
           <Flex.Item>
             <Flex as="div" padding="medium">
