@@ -1203,6 +1203,34 @@ describe Canvas::LiveEvents do
         Canvas::LiveEvents.assignment_created(@assignment)
       end
     end
+
+    context "with new_quizzes_surveys feature flag" do
+      before do
+        @assignment.settings = { "new_quizzes" => { "anonymous_participants" => true } }
+        @assignment.save!
+        allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
+      end
+
+      it "includes anonymous_participants when feature flag is enabled" do
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(true)
+
+        expect_event(
+          "assignment_created",
+          hash_including(anonymous_participants: true)
+        )
+        Canvas::LiveEvents.assignment_created(@assignment)
+      end
+
+      it "does not include anonymous_participants when feature flag is disabled" do
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(false)
+
+        expect_event(
+          "assignment_created",
+          hash_not_including(:anonymous_participants)
+        )
+        Canvas::LiveEvents.assignment_created(@assignment)
+      end
+    end
   end
 
   describe ".assignment_updated" do
@@ -1281,6 +1309,34 @@ describe Canvas::LiveEvents do
         expect_event(
           "assignment_updated",
           hash_not_including(:associated_integration_id)
+        )
+        Canvas::LiveEvents.assignment_updated(@assignment)
+      end
+    end
+
+    context "with new_quizzes_surveys feature flag" do
+      before do
+        @assignment.settings = { "new_quizzes" => { "anonymous_participants" => true } }
+        @assignment.save!
+        allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
+      end
+
+      it "includes anonymous_participants when feature flag is enabled" do
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(true)
+
+        expect_event(
+          "assignment_updated",
+          hash_including(anonymous_participants: true)
+        )
+        Canvas::LiveEvents.assignment_updated(@assignment)
+      end
+
+      it "does not include anonymous_participants when feature flag is disabled" do
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_surveys).and_return(false)
+
+        expect_event(
+          "assignment_updated",
+          hash_not_including(:anonymous_participants)
         )
         Canvas::LiveEvents.assignment_updated(@assignment)
       end

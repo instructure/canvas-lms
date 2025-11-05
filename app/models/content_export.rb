@@ -326,6 +326,9 @@ class ContentExport < ActiveRecord::Base
         )
         settings[:quizzes2][:qti_export] = {}
         settings[:quizzes2][:qti_export][:url] = attachment.public_download_url
+        if Account.site_admin.feature_enabled?(:new_quizzes_surveys)
+          settings[:quizzes2][:anonymous_participants] = assignment.anonymous_participants?
+        end
         self.progress = 100
         mark_exported
       else
