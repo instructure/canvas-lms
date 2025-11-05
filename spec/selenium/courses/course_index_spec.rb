@@ -139,7 +139,7 @@ describe "course index" do
     end
   end
 
-  context "accessibility column", skip: "Temporarily disabled until we figure out what to do with this" do
+  context "accessibility column", skip: "2025-10-22 Temporarily disabled until we figure out what to do with this (in scope of RCX-4312)" do
     before do
       account = Account.default
       account.enable_feature!(:a11y_checker)
