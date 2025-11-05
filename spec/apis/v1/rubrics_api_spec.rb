@@ -644,6 +644,17 @@ describe "Rubrics API", type: :request do
         post "/api/v1/courses/#{@course.id}/rubrics/download_rubrics", params: { rubric_ids: [@rubric.id] }
         expect(response).to have_http_status(:forbidden)
       end
+
+      it "allows account admin to download rubrics" do
+        account_admin = account_admin_user(account: @course.account)
+        user_session(account_admin)
+        post "/api/v1/courses/#{@course.id}/rubrics/download_rubrics", params: { rubric_ids: [@rubric.id] }
+        expect(response).to be_successful
+        data = response.body.split("\n")
+        expect(data.size).to eq 3
+        expect(data[1]).to eq "Unnamed Course Rubric,Criteria row 1,,,Rockin',,3,Lame,,0"
+        expect(data[2]).to eq "Unnamed Course Rubric,Criteria row,,,Rockin',,5,Meh',,3,Lame,,0"
+      end
     end
   end
 
@@ -862,6 +873,35 @@ describe "Rubrics API", type: :request do
         expect(rubric_import["workflow_state"]).to eq "succeeded"
         expect(rubric_import["account_id"]).to eq @course.root_account_id
         expect(rubric_import["id"]).to eq new_import.id
+      end
+    end
+
+    describe "download_rubrics" do
+      before :once do
+        @account = Account.default
+        @user = account_admin_user(account: @account)
+        @rubric = Rubric.create!(context: @account, title: "Account Rubric")
+        @rubric.data = [
+          {
+            points: 3,
+            description: "Criteria row 1",
+            id: 1,
+            ratings: [
+              { description: "Rockin'", points: 3, id: 45 },
+              { description: "Lame", points: 0, id: 46 }
+            ]
+          }
+        ]
+        @rubric.save!
+      end
+
+      it "allows account admin to download rubrics at account level" do
+        user_session(@user)
+        post "/api/v1/accounts/#{@account.id}/rubrics/download_rubrics", params: { rubric_ids: [@rubric.id] }
+        expect(response).to be_successful
+        data = response.body.split("\n")
+        expect(data.size).to eq 2
+        expect(data[1]).to eq "Account Rubric,Criteria row 1,,,Rockin',,3,Lame,,0"
       end
     end
   end
