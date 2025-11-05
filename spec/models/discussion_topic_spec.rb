@@ -713,11 +713,8 @@ describe DiscussionTopic do
 
     context "differentiated assignements" do
       before do
-        @course = course_factory(active_course: true)
-        discussion_topic_model(user: @teacher, context: @course)
-        @course.enroll_teacher(@teacher).accept!
-        @course_section = @course.course_sections.create
         @student1, @student2, @student3 = create_users(3, return_type: :record)
+        @course.enroll_student(@student2, enrollment_state: "active")
 
         @assignment = @course.assignments.create!(title: "some discussion assignment", only_visible_to_overrides: true)
         @assignment.submission_types = "discussion_topic"
@@ -725,7 +722,6 @@ describe DiscussionTopic do
         @topic.assignment_id = @assignment.id
         @topic.save!
 
-        @course.enroll_student(@student2, enrollment_state: "active")
         @section = @course.course_sections.create!(name: "test section")
         student_in_section(@section, user: @student1)
         create_section_override_for_assignment(@assignment, { course_section: @section })
@@ -807,6 +803,25 @@ describe DiscussionTopic do
           expect(@topic.active_participants_with_visibility.include?(@teacher)).to be_truthy
         end
 
+        it "works for subtopics for graded assignments" do
+          group_discussion_assignment
+          ct = @topic.child_topics.first
+          ct.context.add_user(@student)
+
+          @section = @course.course_sections.create!(name: "test section")
+          student_in_section(@section, user: @student)
+          create_section_override_for_assignment(@assignment, { course_section: @section })
+
+          @topic = @topic.child_topics.first
+          @topic.subscribe(@student)
+          @topic.save!
+
+          expect(@topic.context.class).to eq(Group)
+          expect(@topic.active_participants_with_visibility.include?(@student)).to be_truthy
+        end
+      end
+
+      context "permissions" do
         it "does not grant reply permissions to group if course is concluded" do
           @relevant_permissions = %i[read reply update delete read_replies]
           group_category = @course.group_categories.create(name: "new cat")
@@ -878,23 +893,6 @@ describe DiscussionTopic do
           expect(@topic.context).to eq(@group)
           expect((@topic.check_policy(@teacher) & @relevant_permissions).sort).to eq @relevant_permissions.sort
           expect(@topic.check_policy(@student1) & @relevant_permissions).to be_empty
-        end
-
-        it "works for subtopics for graded assignments" do
-          group_discussion_assignment
-          ct = @topic.child_topics.first
-          ct.context.add_user(@student)
-
-          @section = @course.course_sections.create!(name: "test section")
-          student_in_section(@section, user: @student)
-          create_section_override_for_assignment(@assignment, { course_section: @section })
-
-          @topic = @topic.child_topics.first
-          @topic.subscribe(@student)
-          @topic.save!
-
-          expect(@topic.context.class).to eq(Group)
-          expect(@topic.active_participants_with_visibility.include?(@student)).to be_truthy
         end
       end
     end
@@ -3510,7 +3508,7 @@ describe DiscussionTopic do
       before :once do
         @course = course_factory(active_course: true)
 
-        @item_without_assignment = discussion_topic_model(user: @teacher)
+        @item_without_assignment = discussion_topic_model(user: @teacher, context: @course)
         @item_with_assignment_and_only_vis, @assignment = discussion_and_assignment(only_visible_to_overrides: true)
         @item_with_assignment_and_visible_to_all, @assignment2 = discussion_and_assignment(only_visible_to_overrides: false)
         @item_with_override_for_section_with_no_students, @assignment3 = discussion_and_assignment(only_visible_to_overrides: true)
@@ -3541,6 +3539,17 @@ describe DiscussionTopic do
           @item_without_assignment.id,
           @item_with_assignment_and_visible_to_all.id
         ].sort
+      end
+
+      it "filters concluded students" do
+        # @student2 is in default section, @student1 is in @section
+        student_in_section(@course.default_section, user: @student1, allow_multiple_enrollments: true)
+        @student1.enrollments.where(course: @course, course_section: @section).first.conclude
+        @course.reload
+
+        topic = discussion_topic_model(user: @teacher, workflow_state: "active", only_visible_to_overrides: true)
+        topic.assignment_overrides.create!(set: @section)
+        expect(topic.active_participants_with_visibility.include?(@student1)).to be_falsey
       end
     end
 
